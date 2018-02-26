@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eqCbq-0003NO-3R
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 01:50:03 -0500
+	(envelope-from <famz@redhat.com>) id 1eqCoz-0005dr-Rq
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 02:03:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eqCbn-0001ue-1P
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 01:50:02 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34102 helo=mx1.redhat.com)
+	(envelope-from <famz@redhat.com>) id 1eqCou-00089F-M7
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 02:03:37 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33440 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eqCbm-0001uZ-SX
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 01:49:58 -0500
-References: <1519533358-13759-1-git-send-email-suhang16@mails.ucas.ac.cn>
-	<1519533358-13759-4-git-send-email-suhang16@mails.ucas.ac.cn>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <eff138d4-b83b-80f0-34c7-90bbf002f0b3@redhat.com>
-Date: Mon, 26 Feb 2018 07:49:46 +0100
-MIME-Version: 1.0
-In-Reply-To: <1519533358-13759-4-git-send-email-suhang16@mails.ucas.ac.cn>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 RFC 3/3] util/uri.c: wrap single
- statement blocks with braces {}
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eqCou-000893-H7
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 02:03:32 -0500
+From: Fam Zheng <famz@redhat.com>
+Date: Mon, 26 Feb 2018 15:03:11 +0800
+Message-Id: <20180226070311.10057-3-famz@redhat.com>
+In-Reply-To: <20180226070311.10057-1-famz@redhat.com>
+References: <20180226070311.10057-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/2] tests: Use query-usernet instead of 'info
+ usernet'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +24,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Su Hang <suhang16@mails.ucas.ac.cn>, boxafox@163.com
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 25.02.2018 05:35, Su Hang wrote:
-> For this patch, using curly braces to wrap `if` `while` `else` statements,
-> which only hold single statement. For example:
-> '''
-> if (cond)
->     statement;
-> '''
-> to
-> '''
-> if (cond) {
->     statement;
-> }
-> '''
-> 
-> And using tricks that compare the disassemblies before and after
-> code changes, to make sure code logic isn't changed:
-> '''
-> git checkout master
-> make util/uri.o
-> strip util/uri.o
-> objdump -Drx util/uri.o > /tmp/uri-master.txt
-> git checkout cleanupbranch
-> make util/uri.o
-> strip util/uri.o
-> objdump -Drx util/uri.o > /tmp/uri-cleanup.txt
-> diff -u /tmp/uri-*.txt
-> '''
-> 
-> With that, all complaints raised by checkpatch.pl have been suppressed.  
-> 
-> Suggested-by: Thomas Huth <thuth@redhat.com>
-> Suggested-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Su Hang <suhang16@mails.ucas.ac.cn>
-> ---
->  util/uri.c | 463 +++++++++++++++++++++++++++++++++++++++----------------------
->  1 file changed, 294 insertions(+), 169 deletions(-)
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ tests/vm/basevm.py | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-
-I've also checked again with the "objdump" trick that there are no
-differences in the generated code, and indeed, looks good now, so I
-think I can also say:
-
-Tested-by: Thomas Huth <thuth@redhat.com>
-
-Thank you very much for cleaning up that huge file!
-
- Thomas
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index 686d88decf..f51604e0ab 100755
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -101,7 +101,7 @@ class BaseVM(object):
+                    "-o", "StrictHostKeyChecking=no",
+                    "-o", "UserKnownHostsFile=" + os.devnull,
+                    "-o", "ConnectTimeout=1",
+-                   "-p", self.ssh_port, "-i", self._ssh_key_file]
++                   "-p", str(self.ssh_port), "-i", self._ssh_key_file]
+         if interactive:
+             ssh_cmd += ['-t']
+         assert not isinstance(cmd, str)
+@@ -166,13 +166,13 @@ class BaseVM(object):
+             raise
+         atexit.register(self.shutdown)
+         self._guest = guest
+-        usernet_info = guest.qmp("human-monitor-command",
+-                                 command_line="info usernet")
++        usernet_info = guest.qmp("query-usernet")
+         self.ssh_port = None
+-        for l in usernet_info["return"].splitlines():
+-            fields = l.split()
+-            if "TCP[HOST_FORWARD]" in fields and "22" in fields:
+-                self.ssh_port = l.split()[3]
++        for i in usernet_info["return"]:
++            if i.get("id") != "vnet":
++                continue
++            self.ssh_port = i["connections"][0]["src_port"]
++            break
+         if not self.ssh_port:
+             raise Exception("Cannot find ssh port from 'info usernet':\n%s" % \
+                             usernet_info)
+-- 
+2.14.3
