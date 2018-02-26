@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1eqMLr-0007IP-RU
+	(envelope-from <juterry@microsoft.com>) id 1eqMLr-0007IO-Qz
 	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 12:14:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1eqMLo-0004dA-1K
+	(envelope-from <juterry@microsoft.com>) id 1eqMLo-0004dK-Bx
 	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 12:14:11 -0500
 Received: from mail-sn1nam02on0115.outbound.protection.outlook.com
 	([104.47.36.115]:20112
 	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <juterry@microsoft.com>)
-	id 1eqMLn-0004c7-Rf
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 12:14:07 -0500
+	id 1eqMLo-0004c7-54
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 12:14:08 -0500
 From: "Justin Terry (VM)" <juterry@microsoft.com>
-Date: Mon, 26 Feb 2018 09:13:29 -0800
-Message-Id: <1519665216-1078-2-git-send-email-juterry@microsoft.com>
+Date: Mon, 26 Feb 2018 09:13:30 -0800
+Message-Id: <1519665216-1078-3-git-send-email-juterry@microsoft.com>
 In-Reply-To: <1519665216-1078-1-git-send-email-juterry@microsoft.com>
 References: <1519665216-1078-1-git-send-email-juterry@microsoft.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 1/8] Fixing WHPX casing to match SDK
+Subject: [Qemu-devel] [PATCH 2/8] Resolves WHPX breaking changes in SDK 17095
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +31,86 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, "Justin Terry (VM)" <juterry@microsoft.com>
 
-Fixes an issue where the SDK that was releases had a different casing for the
-*.h and *.lib files causing a build break if linked directly from Windows Kits.
+1. Fixes the changes required to the WHvTryMmioEmulation, WHvTryIoEmulation, and
+WHvEmulatorCreateEmulator based on the new VpContext forwarding.
+2. Removes the WHvRunVpExitReasonAlerted case.
 
 Signed-off-by: Justin Terry (VM) <juterry@microsoft.com>
 ---
- configure              | 10 +++++-----
- target/i386/whpx-all.c |  4 ++--
- 2 files changed, 7 insertions(+), 7 deletions(-)
+ target/i386/whpx-all.c | 26 ++++++++++----------------
+ 1 file changed, 10 insertions(+), 16 deletions(-)
 
-diff --git a/configure b/configure
-index 39f3a43001..220b9ce52b 100755
---- a/configure
-+++ b/configure
-@@ -2475,20 +2475,20 @@ fi
- if test "$whpx" != "no" ; then
-     cat > $TMPC << EOF
- #include <windows.h>
--#include <winhvplatform.h>
--#include <winhvemulation.h>
-+#include <WinHvPlatform.h>
-+#include <WinHvEmulation.h>
- int main(void) {
-     WHV_CAPABILITY whpx_cap;
-     WHvGetCapability(WHvCapabilityCodeFeatures, &whpx_cap, sizeof(whpx_cap));
-     return 0;
- }
- EOF
--    if compile_prog "" "-lwinhvplatform -lwinhvemulation" ; then
--        libs_softmmu="$libs_softmmu -lwinhvplatform -lwinhvemulation"
-+    if compile_prog "" "-lWinHvPlatform -lWinHvEmulation" ; then
-+        libs_softmmu="$libs_softmmu -lWinHvPlatform -lWinHvEmulation"
-         whpx="yes"
-     else
-         if test "$whpx" = "yes"; then
--            feature_not_found "winhvplatform" "winhvemulation is not installed"
-+            feature_not_found "WinHvPlatform" "WinHvEmulation is not installed"
-         fi
-         whpx="no"
-     fi
 diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
-index 0015b27509..eeee43e187 100644
+index eeee43e187..969c2f5f93 100644
 --- a/target/i386/whpx-all.c
 +++ b/target/i386/whpx-all.c
-@@ -26,8 +26,8 @@
- #include "qapi/error.h"
- #include "migration/blocker.h"
+@@ -613,6 +613,7 @@ static HRESULT CALLBACK whpx_emu_translate_callback(
+ }
  
--#include <winhvplatform.h>
--#include <winhvemulation.h>
-+#include <WinHvPlatform.h>
-+#include <WinHvEmulation.h>
+ static const WHV_EMULATOR_CALLBACKS whpx_emu_callbacks = {
++    .Size = sizeof(WHV_EMULATOR_CALLBACKS),
+     .WHvEmulatorIoPortCallback = whpx_emu_ioport_callback,
+     .WHvEmulatorMemoryCallback = whpx_emu_memio_callback,
+     .WHvEmulatorGetVirtualProcessorRegisters = whpx_emu_getreg_callback,
+@@ -626,7 +627,9 @@ static int whpx_handle_mmio(CPUState *cpu, WHV_MEMORY_ACCESS_CONTEXT *ctx)
+     struct whpx_vcpu *vcpu = get_whpx_vcpu(cpu);
+     WHV_EMULATOR_STATUS emu_status;
  
- struct whpx_state {
-     uint64_t mem_quota;
+-    hr = WHvEmulatorTryMmioEmulation(vcpu->emulator, cpu, ctx, &emu_status);
++    hr = WHvEmulatorTryMmioEmulation(vcpu->emulator, cpu,
++                                     &vcpu->exit_ctx.VpContext, ctx,
++                                     &emu_status);
+     if (FAILED(hr)) {
+         __debugbreak();
+         error_report("WHPX: Failed to parse MMIO access, hr=%08lx", hr);
+@@ -649,7 +652,9 @@ static int whpx_handle_portio(CPUState *cpu,
+     struct whpx_vcpu *vcpu = get_whpx_vcpu(cpu);
+     WHV_EMULATOR_STATUS emu_status;
+ 
+-    hr = WHvEmulatorTryIoEmulation(vcpu->emulator, cpu, ctx, &emu_status);
++    hr = WHvEmulatorTryIoEmulation(vcpu->emulator, cpu,
++                                   &vcpu->exit_ctx.VpContext, ctx,
++                                   &emu_status);
+     if (FAILED(hr)) {
+         __debugbreak();
+         error_report("WHPX: Failed to parse PortIO access, hr=%08lx", hr);
+@@ -905,18 +910,8 @@ static int whpx_vcpu_run(CPUState *cpu)
+             whpx_vcpu_kick(cpu);
+         }
+ 
+-        for (;;) {
+-            hr = WHvRunVirtualProcessor(whpx->partition, cpu->cpu_index,
+-                                        &vcpu->exit_ctx, whpx->exit_ctx_size);
+-
+-            if (SUCCEEDED(hr) && (vcpu->exit_ctx.ExitReason ==
+-                                  WHvRunVpExitReasonAlerted)) {
+-                WHvCancelRunVirtualProcessor(whpx->partition, cpu->cpu_index,
+-                                             0);
+-            } else {
+-                break;
+-            }
+-        }
++        hr = WHvRunVirtualProcessor(whpx->partition, cpu->cpu_index,
++                                    &vcpu->exit_ctx, whpx->exit_ctx_size);
+ 
+         if (FAILED(hr)) {
+             error_report("WHPX: Failed to exec a virtual processor,"
+@@ -956,7 +951,6 @@ static int whpx_vcpu_run(CPUState *cpu)
+         case WHvRunVpExitReasonX64MsrAccess:
+         case WHvRunVpExitReasonX64Cpuid:
+         case WHvRunVpExitReasonException:
+-        case WHvRunVpExitReasonAlerted:
+         default:
+             error_report("WHPX: Unexpected VP exit code %d",
+                          vcpu->exit_ctx.ExitReason);
+@@ -1068,7 +1062,7 @@ int whpx_init_vcpu(CPUState *cpu)
+         return -ENOMEM;
+     }
+ 
+-    hr = WHvEmulatorCreateEmulator(whpx_emu_callbacks, &vcpu->emulator);
++    hr = WHvEmulatorCreateEmulator(&whpx_emu_callbacks, &vcpu->emulator);
+     if (FAILED(hr)) {
+         error_report("WHPX: Failed to setup instruction completion support,"
+                      " hr=%08lx", hr);
 -- 
 2.13.6
