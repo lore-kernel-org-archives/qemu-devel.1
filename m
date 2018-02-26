@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eqR7e-0006OY-Gc
+	(envelope-from <mjc@sifive.com>) id 1eqR7h-0006Pj-JI
 	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:19:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eqR7X-00055f-Jj
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:19:50 -0500
-Received: from mail-pf0-x22e.google.com ([2607:f8b0:400e:c00::22e]:39730)
+	(envelope-from <mjc@sifive.com>) id 1eqR7e-000578-27
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:19:53 -0500
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:36143)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eqR7X-00055O-4F
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:19:43 -0500
-Received: by mail-pf0-x22e.google.com with SMTP id u5so359710pfh.6
-	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 14:19:43 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eqR7d-00056n-MX
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:19:49 -0500
+Received: by mail-pl0-x241.google.com with SMTP id v3so10130474plg.3
+	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 14:19:49 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Tue, 27 Feb 2018 11:17:45 +1300
-Message-Id: <1519683480-33201-9-git-send-email-mjc@sifive.com>
+Date: Tue, 27 Feb 2018 11:17:47 +1300
+Message-Id: <1519683480-33201-11-git-send-email-mjc@sifive.com>
 In-Reply-To: <1519683480-33201-1-git-send-email-mjc@sifive.com>
 References: <1519683480-33201-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v7 08/23] RISC-V TCG Code Generation
+Subject: [Qemu-devel] [PATCH v7 10/23] RISC-V Linux User Emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,2372 +28,1198 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
 
-TCG code generation for the RV32IMAFDC and RV64IMAFDC. The QEMU
-RISC-V code generator has complete coverage for the Base ISA v2.2,
-Privileged ISA v1.9.1 and Privileged ISA v1.10:
-
-- RISC-V Instruction Set Manual Volume I: User-Level ISA Version 2.2
-- RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.9.1
-- RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.10
+Implementation of linux user emulation for RISC-V.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- target/riscv/instmap.h   |  364 +++++++++
- target/riscv/translate.c | 1974 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 2338 insertions(+)
- create mode 100644 target/riscv/instmap.h
- create mode 100644 target/riscv/translate.c
+ linux-user/elfload.c              |  22 +++
+ linux-user/main.c                 |  99 +++++++++++++
+ linux-user/riscv/syscall_nr.h     | 287 ++++++++++++++++++++++++++++++++++++++
+ linux-user/riscv/target_cpu.h     |  18 +++
+ linux-user/riscv/target_signal.h  |  23 +++
+ linux-user/riscv/target_structs.h |  46 ++++++
+ linux-user/riscv/target_syscall.h |  56 ++++++++
+ linux-user/riscv/termbits.h       | 222 +++++++++++++++++++++++++++++
+ linux-user/signal.c               | 203 ++++++++++++++++++++++++++-
+ linux-user/syscall.c              |   2 +
+ linux-user/syscall_defs.h         |  13 +-
+ target/riscv/cpu_user.h           |  13 ++
+ 12 files changed, 998 insertions(+), 6 deletions(-)
+ create mode 100644 linux-user/riscv/syscall_nr.h
+ create mode 100644 linux-user/riscv/target_cpu.h
+ create mode 100644 linux-user/riscv/target_signal.h
+ create mode 100644 linux-user/riscv/target_structs.h
+ create mode 100644 linux-user/riscv/target_syscall.h
+ create mode 100644 linux-user/riscv/termbits.h
+ create mode 100644 target/riscv/cpu_user.h
 
-diff --git a/target/riscv/instmap.h b/target/riscv/instmap.h
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 8bb9a2c..0277091 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -1291,6 +1291,28 @@ static inline void init_thread(struct target_pt_regs *regs,
+ 
+ #endif /* TARGET_TILEGX */
+ 
++#ifdef TARGET_RISCV
++
++#define ELF_START_MMAP 0x80000000
++#define ELF_ARCH  EM_RISCV
++
++#ifdef TARGET_RISCV32
++#define ELF_CLASS ELFCLASS32
++#else
++#define ELF_CLASS ELFCLASS64
++#endif
++
++static inline void init_thread(struct target_pt_regs *regs,
++                               struct image_info *infop)
++{
++    regs->sepc = infop->entry;
++    regs->sp = infop->start_stack;
++}
++
++#define ELF_EXEC_PAGESIZE 4096
++
++#endif /* TARGET_RISCV */
++
+ #ifdef TARGET_HPPA
+ 
+ #define ELF_START_MMAP  0x80000000
+diff --git a/linux-user/main.c b/linux-user/main.c
+index fd79006..b27890a 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -3652,6 +3652,100 @@ void cpu_loop(CPUTLGState *env)
+ 
+ #endif
+ 
++#ifdef TARGET_RISCV
++
++void cpu_loop(CPURISCVState *env)
++{
++    CPUState *cs = CPU(riscv_env_get_cpu(env));
++    int trapnr, signum, sigcode;
++    target_ulong sigaddr;
++    target_ulong ret;
++
++    for (;;) {
++        cpu_exec_start(cs);
++        trapnr = cpu_exec(cs);
++        cpu_exec_end(cs);
++        process_queued_cpu_work(cs);
++
++        signum = 0;
++        sigcode = 0;
++        sigaddr = 0;
++
++        switch (trapnr) {
++        case EXCP_INTERRUPT:
++            /* just indicate that signals should be handled asap */
++            break;
++        case EXCP_ATOMIC:
++            cpu_exec_step_atomic(cs);
++            break;
++        case RISCV_EXCP_U_ECALL:
++            env->pc += 4;
++            if (env->gpr[xA7] == TARGET_NR_arch_specific_syscall + 15) {
++                /* riscv_flush_icache_syscall is a no-op in QEMU as
++                   self-modifying code is automatically detected */
++                ret = 0;
++            } else {
++                ret = do_syscall(env,
++                                 env->gpr[xA7],
++                                 env->gpr[xA0],
++                                 env->gpr[xA1],
++                                 env->gpr[xA2],
++                                 env->gpr[xA3],
++                                 env->gpr[xA4],
++                                 env->gpr[xA5],
++                                 0, 0);
++            }
++            if (ret == -TARGET_ERESTARTSYS) {
++                env->pc -= 4;
++            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
++                env->gpr[xA0] = ret;
++            }
++            if (cs->singlestep_enabled) {
++                goto gdbstep;
++            }
++            break;
++        case RISCV_EXCP_ILLEGAL_INST:
++            signum = TARGET_SIGILL;
++            sigcode = TARGET_ILL_ILLOPC;
++            break;
++        case RISCV_EXCP_BREAKPOINT:
++            signum = TARGET_SIGTRAP;
++            sigcode = TARGET_TRAP_BRKPT;
++            sigaddr = env->pc;
++            break;
++        case RISCV_EXCP_INST_PAGE_FAULT:
++        case RISCV_EXCP_LOAD_PAGE_FAULT:
++        case RISCV_EXCP_STORE_PAGE_FAULT:
++            signum = TARGET_SIGSEGV;
++            sigcode = TARGET_SEGV_MAPERR;
++            break;
++        case EXCP_DEBUG:
++        gdbstep:
++            signum = gdb_handlesig(cs, TARGET_SIGTRAP);
++            sigcode = TARGET_TRAP_BRKPT;
++            break;
++        default:
++            EXCP_DUMP(env, "\nqemu: unhandled CPU exception %#x - aborting\n",
++                     trapnr);
++            exit(EXIT_FAILURE);
++        }
++
++        if (signum) {
++            target_siginfo_t info = {
++                .si_signo = signum,
++                .si_errno = 0,
++                .si_code = sigcode,
++                ._sifields._sigfault._addr = sigaddr
++            };
++            queue_signal(env, info.si_signo, QEMU_SI_KILL, &info);
++        }
++
++        process_pending_signals(env);
++    }
++}
++
++#endif /* TARGET_RISCV */
++
+ #ifdef TARGET_HPPA
+ 
+ static abi_ulong hppa_lws(CPUHPPAState *env)
+@@ -4840,6 +4934,11 @@ int main(int argc, char **argv, char **envp)
+         env->pc = regs->pc;
+         cpu_set_sr(env, regs->sr);
+     }
++#elif defined(TARGET_RISCV)
++    {
++        env->pc = regs->sepc;
++        env->gpr[xSP] = regs->sp;
++    }
+ #elif defined(TARGET_SH4)
+     {
+         int i;
+diff --git a/linux-user/riscv/syscall_nr.h b/linux-user/riscv/syscall_nr.h
 new file mode 100644
-index 0000000..58baa1b
+index 0000000..7e30f1f
 --- /dev/null
-+++ b/target/riscv/instmap.h
-@@ -0,0 +1,364 @@
++++ b/linux-user/riscv/syscall_nr.h
+@@ -0,0 +1,287 @@
 +/*
-+ * RISC-V emulation for qemu: Instruction decode helpers
-+ *
-+ * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ * Syscall numbers from asm-generic, common for most
++ * of recently-added arches including RISC-V.
 + */
 +
-+#define MASK_OP_MAJOR(op)  (op & 0x7F)
-+enum {
-+    /* rv32i, rv64i, rv32m */
-+    OPC_RISC_LUI    = (0x37),
-+    OPC_RISC_AUIPC  = (0x17),
-+    OPC_RISC_JAL    = (0x6F),
-+    OPC_RISC_JALR   = (0x67),
-+    OPC_RISC_BRANCH = (0x63),
-+    OPC_RISC_LOAD   = (0x03),
-+    OPC_RISC_STORE  = (0x23),
-+    OPC_RISC_ARITH_IMM  = (0x13),
-+    OPC_RISC_ARITH      = (0x33),
-+    OPC_RISC_FENCE      = (0x0F),
-+    OPC_RISC_SYSTEM     = (0x73),
++#define TARGET_NR_io_setup 0
++#define TARGET_NR_io_destroy 1
++#define TARGET_NR_io_submit 2
++#define TARGET_NR_io_cancel 3
++#define TARGET_NR_io_getevents 4
++#define TARGET_NR_setxattr 5
++#define TARGET_NR_lsetxattr 6
++#define TARGET_NR_fsetxattr 7
++#define TARGET_NR_getxattr 8
++#define TARGET_NR_lgetxattr 9
++#define TARGET_NR_fgetxattr 10
++#define TARGET_NR_listxattr 11
++#define TARGET_NR_llistxattr 12
++#define TARGET_NR_flistxattr 13
++#define TARGET_NR_removexattr 14
++#define TARGET_NR_lremovexattr 15
++#define TARGET_NR_fremovexattr 16
++#define TARGET_NR_getcwd 17
++#define TARGET_NR_lookup_dcookie 18
++#define TARGET_NR_eventfd2 19
++#define TARGET_NR_epoll_create1 20
++#define TARGET_NR_epoll_ctl 21
++#define TARGET_NR_epoll_pwait 22
++#define TARGET_NR_dup 23
++#define TARGET_NR_dup3 24
++#ifdef TARGET_RISCV32
++#define TARGET_NR_fcntl64 25
++#else
++#define TARGET_NR_fcntl 25
++#endif
++#define TARGET_NR_inotify_init1 26
++#define TARGET_NR_inotify_add_watch 27
++#define TARGET_NR_inotify_rm_watch 28
++#define TARGET_NR_ioctl 29
++#define TARGET_NR_ioprio_set 30
++#define TARGET_NR_ioprio_get 31
++#define TARGET_NR_flock 32
++#define TARGET_NR_mknodat 33
++#define TARGET_NR_mkdirat 34
++#define TARGET_NR_unlinkat 35
++#define TARGET_NR_symlinkat 36
++#define TARGET_NR_linkat 37
++#define TARGET_NR_renameat 38
++#define TARGET_NR_umount2 39
++#define TARGET_NR_mount 40
++#define TARGET_NR_pivot_root 41
++#define TARGET_NR_nfsservctl 42
++#define TARGET_NR_statfs 43
++#define TARGET_NR_fstatfs 44
++#define TARGET_NR_truncate 45
++#define TARGET_NR_ftruncate 46
++#define TARGET_NR_fallocate 47
++#define TARGET_NR_faccessat 48
++#define TARGET_NR_chdir 49
++#define TARGET_NR_fchdir 50
++#define TARGET_NR_chroot 51
++#define TARGET_NR_fchmod 52
++#define TARGET_NR_fchmodat 53
++#define TARGET_NR_fchownat 54
++#define TARGET_NR_fchown 55
++#define TARGET_NR_openat 56
++#define TARGET_NR_close 57
++#define TARGET_NR_vhangup 58
++#define TARGET_NR_pipe2 59
++#define TARGET_NR_quotactl 60
++#define TARGET_NR_getdents64 61
++#define TARGET_NR_lseek 62
++#define TARGET_NR_read 63
++#define TARGET_NR_write 64
++#define TARGET_NR_readv 65
++#define TARGET_NR_writev 66
++#define TARGET_NR_pread64 67
++#define TARGET_NR_pwrite64 68
++#define TARGET_NR_preadv 69
++#define TARGET_NR_pwritev 70
++#define TARGET_NR_sendfile 71
++#define TARGET_NR_pselect6 72
++#define TARGET_NR_ppoll 73
++#define TARGET_NR_signalfd4 74
++#define TARGET_NR_vmsplice 75
++#define TARGET_NR_splice 76
++#define TARGET_NR_tee 77
++#define TARGET_NR_readlinkat 78
++#define TARGET_NR_newfstatat 79
++#define TARGET_NR_fstat 80
++#define TARGET_NR_sync 81
++#define TARGET_NR_fsync 82
++#define TARGET_NR_fdatasync 83
++#define TARGET_NR_sync_file_range 84
++#define TARGET_NR_timerfd_create 85
++#define TARGET_NR_timerfd_settime 86
++#define TARGET_NR_timerfd_gettime 87
++#define TARGET_NR_utimensat 88
++#define TARGET_NR_acct 89
++#define TARGET_NR_capget 90
++#define TARGET_NR_capset 91
++#define TARGET_NR_personality 92
++#define TARGET_NR_exit 93
++#define TARGET_NR_exit_group 94
++#define TARGET_NR_waitid 95
++#define TARGET_NR_set_tid_address 96
++#define TARGET_NR_unshare 97
++#define TARGET_NR_futex 98
++#define TARGET_NR_set_robust_list 99
++#define TARGET_NR_get_robust_list 100
++#define TARGET_NR_nanosleep 101
++#define TARGET_NR_getitimer 102
++#define TARGET_NR_setitimer 103
++#define TARGET_NR_kexec_load 104
++#define TARGET_NR_init_module 105
++#define TARGET_NR_delete_module 106
++#define TARGET_NR_timer_create 107
++#define TARGET_NR_timer_gettime 108
++#define TARGET_NR_timer_getoverrun 109
++#define TARGET_NR_timer_settime 110
++#define TARGET_NR_timer_delete 111
++#define TARGET_NR_clock_settime 112
++#define TARGET_NR_clock_gettime 113
++#define TARGET_NR_clock_getres 114
++#define TARGET_NR_clock_nanosleep 115
++#define TARGET_NR_syslog 116
++#define TARGET_NR_ptrace 117
++#define TARGET_NR_sched_setparam 118
++#define TARGET_NR_sched_setscheduler 119
++#define TARGET_NR_sched_getscheduler 120
++#define TARGET_NR_sched_getparam 121
++#define TARGET_NR_sched_setaffinity 122
++#define TARGET_NR_sched_getaffinity 123
++#define TARGET_NR_sched_yield 124
++#define TARGET_NR_sched_get_priority_max 125
++#define TARGET_NR_sched_get_priority_min 126
++#define TARGET_NR_sched_rr_get_interval 127
++#define TARGET_NR_restart_syscall 128
++#define TARGET_NR_kill 129
++#define TARGET_NR_tkill 130
++#define TARGET_NR_tgkill 131
++#define TARGET_NR_sigaltstack 132
++#define TARGET_NR_rt_sigsuspend 133
++#define TARGET_NR_rt_sigaction 134
++#define TARGET_NR_rt_sigprocmask 135
++#define TARGET_NR_rt_sigpending 136
++#define TARGET_NR_rt_sigtimedwait 137
++#define TARGET_NR_rt_sigqueueinfo 138
++#define TARGET_NR_rt_sigreturn 139
++#define TARGET_NR_setpriority 140
++#define TARGET_NR_getpriority 141
++#define TARGET_NR_reboot 142
++#define TARGET_NR_setregid 143
++#define TARGET_NR_setgid 144
++#define TARGET_NR_setreuid 145
++#define TARGET_NR_setuid 146
++#define TARGET_NR_setresuid 147
++#define TARGET_NR_getresuid 148
++#define TARGET_NR_setresgid 149
++#define TARGET_NR_getresgid 150
++#define TARGET_NR_setfsuid 151
++#define TARGET_NR_setfsgid 152
++#define TARGET_NR_times 153
++#define TARGET_NR_setpgid 154
++#define TARGET_NR_getpgid 155
++#define TARGET_NR_getsid 156
++#define TARGET_NR_setsid 157
++#define TARGET_NR_getgroups 158
++#define TARGET_NR_setgroups 159
++#define TARGET_NR_uname 160
++#define TARGET_NR_sethostname 161
++#define TARGET_NR_setdomainname 162
++#define TARGET_NR_getrlimit 163
++#define TARGET_NR_setrlimit 164
++#define TARGET_NR_getrusage 165
++#define TARGET_NR_umask 166
++#define TARGET_NR_prctl 167
++#define TARGET_NR_getcpu 168
++#define TARGET_NR_gettimeofday 169
++#define TARGET_NR_settimeofday 170
++#define TARGET_NR_adjtimex 171
++#define TARGET_NR_getpid 172
++#define TARGET_NR_getppid 173
++#define TARGET_NR_getuid 174
++#define TARGET_NR_geteuid 175
++#define TARGET_NR_getgid 176
++#define TARGET_NR_getegid 177
++#define TARGET_NR_gettid 178
++#define TARGET_NR_sysinfo 179
++#define TARGET_NR_mq_open 180
++#define TARGET_NR_mq_unlink 181
++#define TARGET_NR_mq_timedsend 182
++#define TARGET_NR_mq_timedreceive 183
++#define TARGET_NR_mq_notify 184
++#define TARGET_NR_mq_getsetattr 185
++#define TARGET_NR_msgget 186
++#define TARGET_NR_msgctl 187
++#define TARGET_NR_msgrcv 188
++#define TARGET_NR_msgsnd 189
++#define TARGET_NR_semget 190
++#define TARGET_NR_semctl 191
++#define TARGET_NR_semtimedop 192
++#define TARGET_NR_semop 193
++#define TARGET_NR_shmget 194
++#define TARGET_NR_shmctl 195
++#define TARGET_NR_shmat 196
++#define TARGET_NR_shmdt 197
++#define TARGET_NR_socket 198
++#define TARGET_NR_socketpair 199
++#define TARGET_NR_bind 200
++#define TARGET_NR_listen 201
++#define TARGET_NR_accept 202
++#define TARGET_NR_connect 203
++#define TARGET_NR_getsockname 204
++#define TARGET_NR_getpeername 205
++#define TARGET_NR_sendto 206
++#define TARGET_NR_recvfrom 207
++#define TARGET_NR_setsockopt 208
++#define TARGET_NR_getsockopt 209
++#define TARGET_NR_shutdown 210
++#define TARGET_NR_sendmsg 211
++#define TARGET_NR_recvmsg 212
++#define TARGET_NR_readahead 213
++#define TARGET_NR_brk 214
++#define TARGET_NR_munmap 215
++#define TARGET_NR_mremap 216
++#define TARGET_NR_add_key 217
++#define TARGET_NR_request_key 218
++#define TARGET_NR_keyctl 219
++#define TARGET_NR_clone 220
++#define TARGET_NR_execve 221
++#ifdef TARGET_RISCV32
++#define TARGET_NR_mmap2 222
++#define TARGET_NR_fadvise64_64 223
++#else
++#define TARGET_NR_mmap 222
++#define TARGET_NR_fadvise64 223
++#endif
++#define TARGET_NR_swapon 224
++#define TARGET_NR_swapoff 225
++#define TARGET_NR_mprotect 226
++#define TARGET_NR_msync 227
++#define TARGET_NR_mlock 228
++#define TARGET_NR_munlock 229
++#define TARGET_NR_mlockall 230
++#define TARGET_NR_munlockall 231
++#define TARGET_NR_mincore 232
++#define TARGET_NR_madvise 233
++#define TARGET_NR_remap_file_pages 234
++#define TARGET_NR_mbind 235
++#define TARGET_NR_get_mempolicy 236
++#define TARGET_NR_set_mempolicy 237
++#define TARGET_NR_migrate_pages 238
++#define TARGET_NR_move_pages 239
++#define TARGET_NR_rt_tgsigqueueinfo 240
++#define TARGET_NR_perf_event_open 241
++#define TARGET_NR_accept4 242
++#define TARGET_NR_recvmmsg 243
++#define TARGET_NR_arch_specific_syscall 244
++#define TARGET_NR_wait4 260
++#define TARGET_NR_prlimit64 261
++#define TARGET_NR_fanotify_init 262
++#define TARGET_NR_fanotify_mark 263
++#define TARGET_NR_name_to_handle_at 264
++#define TARGET_NR_open_by_handle_at 265
++#define TARGET_NR_clock_adjtime 266
++#define TARGET_NR_syncfs 267
++#define TARGET_NR_setns 268
++#define TARGET_NR_sendmmsg 269
++#define TARGET_NR_process_vm_readv 270
++#define TARGET_NR_process_vm_writev 271
++#define TARGET_NR_kcmp 272
++#define TARGET_NR_finit_module 273
++#define TARGET_NR_sched_setattr 274
++#define TARGET_NR_sched_getattr 275
++#define TARGET_NR_renameat2 276
++#define TARGET_NR_seccomp 277
++#define TARGET_NR_getrandom 278
++#define TARGET_NR_memfd_create 279
++#define TARGET_NR_bpf 280
++#define TARGET_NR_execveat 281
++#define TARGET_NR_userfaultfd 282
++#define TARGET_NR_membarrier 283
++#define TARGET_NR_mlock2 284
++#define TARGET_NR_copy_file_range 285
 +
-+    /* rv64i, rv64m */
-+    OPC_RISC_ARITH_IMM_W = (0x1B),
-+    OPC_RISC_ARITH_W = (0x3B),
-+
-+    /* rv32a, rv64a */
-+    OPC_RISC_ATOMIC = (0x2F),
-+
-+    /* floating point */
-+    OPC_RISC_FP_LOAD = (0x7),
-+    OPC_RISC_FP_STORE = (0x27),
-+
-+    OPC_RISC_FMADD = (0x43),
-+    OPC_RISC_FMSUB = (0x47),
-+    OPC_RISC_FNMSUB = (0x4B),
-+    OPC_RISC_FNMADD = (0x4F),
-+
-+    OPC_RISC_FP_ARITH = (0x53),
-+};
-+
-+#define MASK_OP_ARITH(op)   (MASK_OP_MAJOR(op) | (op & ((0x7 << 12) | \
-+                            (0x7F << 25))))
-+enum {
-+    OPC_RISC_ADD   = OPC_RISC_ARITH | (0x0 << 12) | (0x00 << 25),
-+    OPC_RISC_SUB   = OPC_RISC_ARITH | (0x0 << 12) | (0x20 << 25),
-+    OPC_RISC_SLL   = OPC_RISC_ARITH | (0x1 << 12) | (0x00 << 25),
-+    OPC_RISC_SLT   = OPC_RISC_ARITH | (0x2 << 12) | (0x00 << 25),
-+    OPC_RISC_SLTU  = OPC_RISC_ARITH | (0x3 << 12) | (0x00 << 25),
-+    OPC_RISC_XOR   = OPC_RISC_ARITH | (0x4 << 12) | (0x00 << 25),
-+    OPC_RISC_SRL   = OPC_RISC_ARITH | (0x5 << 12) | (0x00 << 25),
-+    OPC_RISC_SRA   = OPC_RISC_ARITH | (0x5 << 12) | (0x20 << 25),
-+    OPC_RISC_OR    = OPC_RISC_ARITH | (0x6 << 12) | (0x00 << 25),
-+    OPC_RISC_AND   = OPC_RISC_ARITH | (0x7 << 12) | (0x00 << 25),
-+
-+    /* RV64M */
-+    OPC_RISC_MUL    = OPC_RISC_ARITH | (0x0 << 12) | (0x01 << 25),
-+    OPC_RISC_MULH   = OPC_RISC_ARITH | (0x1 << 12) | (0x01 << 25),
-+    OPC_RISC_MULHSU = OPC_RISC_ARITH | (0x2 << 12) | (0x01 << 25),
-+    OPC_RISC_MULHU  = OPC_RISC_ARITH | (0x3 << 12) | (0x01 << 25),
-+
-+    OPC_RISC_DIV    = OPC_RISC_ARITH | (0x4 << 12) | (0x01 << 25),
-+    OPC_RISC_DIVU   = OPC_RISC_ARITH | (0x5 << 12) | (0x01 << 25),
-+    OPC_RISC_REM    = OPC_RISC_ARITH | (0x6 << 12) | (0x01 << 25),
-+    OPC_RISC_REMU   = OPC_RISC_ARITH | (0x7 << 12) | (0x01 << 25),
-+};
-+
-+
-+#define MASK_OP_ARITH_IMM(op)   (MASK_OP_MAJOR(op) | (op & (0x7 << 12)))
-+enum {
-+    OPC_RISC_ADDI   = OPC_RISC_ARITH_IMM | (0x0 << 12),
-+    OPC_RISC_SLTI   = OPC_RISC_ARITH_IMM | (0x2 << 12),
-+    OPC_RISC_SLTIU  = OPC_RISC_ARITH_IMM | (0x3 << 12),
-+    OPC_RISC_XORI   = OPC_RISC_ARITH_IMM | (0x4 << 12),
-+    OPC_RISC_ORI    = OPC_RISC_ARITH_IMM | (0x6 << 12),
-+    OPC_RISC_ANDI   = OPC_RISC_ARITH_IMM | (0x7 << 12),
-+    OPC_RISC_SLLI   = OPC_RISC_ARITH_IMM | (0x1 << 12), /* additional part of
-+                                                           IMM */
-+    OPC_RISC_SHIFT_RIGHT_I = OPC_RISC_ARITH_IMM | (0x5 << 12) /* SRAI, SRLI */
-+};
-+
-+#define MASK_OP_BRANCH(op)     (MASK_OP_MAJOR(op) | (op & (0x7 << 12)))
-+enum {
-+    OPC_RISC_BEQ  = OPC_RISC_BRANCH  | (0x0  << 12),
-+    OPC_RISC_BNE  = OPC_RISC_BRANCH  | (0x1  << 12),
-+    OPC_RISC_BLT  = OPC_RISC_BRANCH  | (0x4  << 12),
-+    OPC_RISC_BGE  = OPC_RISC_BRANCH  | (0x5  << 12),
-+    OPC_RISC_BLTU = OPC_RISC_BRANCH  | (0x6  << 12),
-+    OPC_RISC_BGEU = OPC_RISC_BRANCH  | (0x7  << 12)
-+};
-+
-+enum {
-+    OPC_RISC_ADDIW   = OPC_RISC_ARITH_IMM_W | (0x0 << 12),
-+    OPC_RISC_SLLIW   = OPC_RISC_ARITH_IMM_W | (0x1 << 12), /* additional part of
-+                                                              IMM */
-+    OPC_RISC_SHIFT_RIGHT_IW = OPC_RISC_ARITH_IMM_W | (0x5 << 12) /* SRAI, SRLI
-+                                                                  */
-+};
-+
-+enum {
-+    OPC_RISC_ADDW   = OPC_RISC_ARITH_W | (0x0 << 12) | (0x00 << 25),
-+    OPC_RISC_SUBW   = OPC_RISC_ARITH_W | (0x0 << 12) | (0x20 << 25),
-+    OPC_RISC_SLLW   = OPC_RISC_ARITH_W | (0x1 << 12) | (0x00 << 25),
-+    OPC_RISC_SRLW   = OPC_RISC_ARITH_W | (0x5 << 12) | (0x00 << 25),
-+    OPC_RISC_SRAW   = OPC_RISC_ARITH_W | (0x5 << 12) | (0x20 << 25),
-+
-+    /* RV64M */
-+    OPC_RISC_MULW   = OPC_RISC_ARITH_W | (0x0 << 12) | (0x01 << 25),
-+    OPC_RISC_DIVW   = OPC_RISC_ARITH_W | (0x4 << 12) | (0x01 << 25),
-+    OPC_RISC_DIVUW  = OPC_RISC_ARITH_W | (0x5 << 12) | (0x01 << 25),
-+    OPC_RISC_REMW   = OPC_RISC_ARITH_W | (0x6 << 12) | (0x01 << 25),
-+    OPC_RISC_REMUW  = OPC_RISC_ARITH_W | (0x7 << 12) | (0x01 << 25),
-+};
-+
-+#define MASK_OP_LOAD(op)   (MASK_OP_MAJOR(op) | (op & (0x7 << 12)))
-+enum {
-+    OPC_RISC_LB   = OPC_RISC_LOAD | (0x0 << 12),
-+    OPC_RISC_LH   = OPC_RISC_LOAD | (0x1 << 12),
-+    OPC_RISC_LW   = OPC_RISC_LOAD | (0x2 << 12),
-+    OPC_RISC_LD   = OPC_RISC_LOAD | (0x3 << 12),
-+    OPC_RISC_LBU  = OPC_RISC_LOAD | (0x4 << 12),
-+    OPC_RISC_LHU  = OPC_RISC_LOAD | (0x5 << 12),
-+    OPC_RISC_LWU  = OPC_RISC_LOAD | (0x6 << 12),
-+};
-+
-+#define MASK_OP_STORE(op)   (MASK_OP_MAJOR(op) | (op & (0x7 << 12)))
-+enum {
-+    OPC_RISC_SB   = OPC_RISC_STORE | (0x0 << 12),
-+    OPC_RISC_SH   = OPC_RISC_STORE | (0x1 << 12),
-+    OPC_RISC_SW   = OPC_RISC_STORE | (0x2 << 12),
-+    OPC_RISC_SD   = OPC_RISC_STORE | (0x3 << 12),
-+};
-+
-+#define MASK_OP_JALR(op)   (MASK_OP_MAJOR(op) | (op & (0x7 << 12)))
-+/* no enum since OPC_RISC_JALR is the actual value */
-+
-+#define MASK_OP_ATOMIC(op) \
-+    (MASK_OP_MAJOR(op) | (op & ((0x7 << 12) | (0x7F << 25))))
-+#define MASK_OP_ATOMIC_NO_AQ_RL_SZ(op) \
-+    (MASK_OP_MAJOR(op) | (op & (0x1F << 27)))
-+
-+enum {
-+    OPC_RISC_LR          = OPC_RISC_ATOMIC | (0x02 << 27),
-+    OPC_RISC_SC          = OPC_RISC_ATOMIC | (0x03 << 27),
-+    OPC_RISC_AMOSWAP     = OPC_RISC_ATOMIC | (0x01 << 27),
-+    OPC_RISC_AMOADD      = OPC_RISC_ATOMIC | (0x00 << 27),
-+    OPC_RISC_AMOXOR      = OPC_RISC_ATOMIC | (0x04 << 27),
-+    OPC_RISC_AMOAND      = OPC_RISC_ATOMIC | (0x0C << 27),
-+    OPC_RISC_AMOOR       = OPC_RISC_ATOMIC | (0x08 << 27),
-+    OPC_RISC_AMOMIN      = OPC_RISC_ATOMIC | (0x10 << 27),
-+    OPC_RISC_AMOMAX      = OPC_RISC_ATOMIC | (0x14 << 27),
-+    OPC_RISC_AMOMINU     = OPC_RISC_ATOMIC | (0x18 << 27),
-+    OPC_RISC_AMOMAXU     = OPC_RISC_ATOMIC | (0x1C << 27),
-+};
-+
-+#define MASK_OP_SYSTEM(op)   (MASK_OP_MAJOR(op) | (op & (0x7 << 12)))
-+enum {
-+    OPC_RISC_ECALL       = OPC_RISC_SYSTEM | (0x0 << 12),
-+    OPC_RISC_EBREAK      = OPC_RISC_SYSTEM | (0x0 << 12),
-+    OPC_RISC_ERET        = OPC_RISC_SYSTEM | (0x0 << 12),
-+    OPC_RISC_MRTS        = OPC_RISC_SYSTEM | (0x0 << 12),
-+    OPC_RISC_MRTH        = OPC_RISC_SYSTEM | (0x0 << 12),
-+    OPC_RISC_HRTS        = OPC_RISC_SYSTEM | (0x0 << 12),
-+    OPC_RISC_WFI         = OPC_RISC_SYSTEM | (0x0 << 12),
-+    OPC_RISC_SFENCEVM    = OPC_RISC_SYSTEM | (0x0 << 12),
-+
-+    OPC_RISC_CSRRW       = OPC_RISC_SYSTEM | (0x1 << 12),
-+    OPC_RISC_CSRRS       = OPC_RISC_SYSTEM | (0x2 << 12),
-+    OPC_RISC_CSRRC       = OPC_RISC_SYSTEM | (0x3 << 12),
-+    OPC_RISC_CSRRWI      = OPC_RISC_SYSTEM | (0x5 << 12),
-+    OPC_RISC_CSRRSI      = OPC_RISC_SYSTEM | (0x6 << 12),
-+    OPC_RISC_CSRRCI      = OPC_RISC_SYSTEM | (0x7 << 12),
-+};
-+
-+#define MASK_OP_FP_LOAD(op)   (MASK_OP_MAJOR(op) | (op & (0x7 << 12)))
-+enum {
-+    OPC_RISC_FLW   = OPC_RISC_FP_LOAD | (0x2 << 12),
-+    OPC_RISC_FLD   = OPC_RISC_FP_LOAD | (0x3 << 12),
-+};
-+
-+#define MASK_OP_FP_STORE(op)   (MASK_OP_MAJOR(op) | (op & (0x7 << 12)))
-+enum {
-+    OPC_RISC_FSW   = OPC_RISC_FP_STORE | (0x2 << 12),
-+    OPC_RISC_FSD   = OPC_RISC_FP_STORE | (0x3 << 12),
-+};
-+
-+#define MASK_OP_FP_FMADD(op)   (MASK_OP_MAJOR(op) | (op & (0x3 << 25)))
-+enum {
-+    OPC_RISC_FMADD_S = OPC_RISC_FMADD | (0x0 << 25),
-+    OPC_RISC_FMADD_D = OPC_RISC_FMADD | (0x1 << 25),
-+};
-+
-+#define MASK_OP_FP_FMSUB(op)   (MASK_OP_MAJOR(op) | (op & (0x3 << 25)))
-+enum {
-+    OPC_RISC_FMSUB_S = OPC_RISC_FMSUB | (0x0 << 25),
-+    OPC_RISC_FMSUB_D = OPC_RISC_FMSUB | (0x1 << 25),
-+};
-+
-+#define MASK_OP_FP_FNMADD(op)   (MASK_OP_MAJOR(op) | (op & (0x3 << 25)))
-+enum {
-+    OPC_RISC_FNMADD_S = OPC_RISC_FNMADD | (0x0 << 25),
-+    OPC_RISC_FNMADD_D = OPC_RISC_FNMADD | (0x1 << 25),
-+};
-+
-+#define MASK_OP_FP_FNMSUB(op)   (MASK_OP_MAJOR(op) | (op & (0x3 << 25)))
-+enum {
-+    OPC_RISC_FNMSUB_S = OPC_RISC_FNMSUB | (0x0 << 25),
-+    OPC_RISC_FNMSUB_D = OPC_RISC_FNMSUB | (0x1 << 25),
-+};
-+
-+#define MASK_OP_FP_ARITH(op)   (MASK_OP_MAJOR(op) | (op & (0x7F << 25)))
-+enum {
-+    /* float */
-+    OPC_RISC_FADD_S    = OPC_RISC_FP_ARITH | (0x0 << 25),
-+    OPC_RISC_FSUB_S    = OPC_RISC_FP_ARITH | (0x4 << 25),
-+    OPC_RISC_FMUL_S    = OPC_RISC_FP_ARITH | (0x8 << 25),
-+    OPC_RISC_FDIV_S    = OPC_RISC_FP_ARITH | (0xC << 25),
-+
-+    OPC_RISC_FSGNJ_S   = OPC_RISC_FP_ARITH | (0x10 << 25),
-+    OPC_RISC_FSGNJN_S  = OPC_RISC_FP_ARITH | (0x10 << 25),
-+    OPC_RISC_FSGNJX_S  = OPC_RISC_FP_ARITH | (0x10 << 25),
-+
-+    OPC_RISC_FMIN_S    = OPC_RISC_FP_ARITH | (0x14 << 25),
-+    OPC_RISC_FMAX_S    = OPC_RISC_FP_ARITH | (0x14 << 25),
-+
-+    OPC_RISC_FSQRT_S   = OPC_RISC_FP_ARITH | (0x2C << 25),
-+
-+    OPC_RISC_FEQ_S     = OPC_RISC_FP_ARITH | (0x50 << 25),
-+    OPC_RISC_FLT_S     = OPC_RISC_FP_ARITH | (0x50 << 25),
-+    OPC_RISC_FLE_S     = OPC_RISC_FP_ARITH | (0x50 << 25),
-+
-+    OPC_RISC_FCVT_W_S  = OPC_RISC_FP_ARITH | (0x60 << 25),
-+    OPC_RISC_FCVT_WU_S = OPC_RISC_FP_ARITH | (0x60 << 25),
-+    OPC_RISC_FCVT_L_S  = OPC_RISC_FP_ARITH | (0x60 << 25),
-+    OPC_RISC_FCVT_LU_S = OPC_RISC_FP_ARITH | (0x60 << 25),
-+
-+    OPC_RISC_FCVT_S_W  = OPC_RISC_FP_ARITH | (0x68 << 25),
-+    OPC_RISC_FCVT_S_WU = OPC_RISC_FP_ARITH | (0x68 << 25),
-+    OPC_RISC_FCVT_S_L  = OPC_RISC_FP_ARITH | (0x68 << 25),
-+    OPC_RISC_FCVT_S_LU = OPC_RISC_FP_ARITH | (0x68 << 25),
-+
-+    OPC_RISC_FMV_X_S   = OPC_RISC_FP_ARITH | (0x70 << 25),
-+    OPC_RISC_FCLASS_S  = OPC_RISC_FP_ARITH | (0x70 << 25),
-+
-+    OPC_RISC_FMV_S_X   = OPC_RISC_FP_ARITH | (0x78 << 25),
-+
-+    /* double */
-+    OPC_RISC_FADD_D    = OPC_RISC_FP_ARITH | (0x1 << 25),
-+    OPC_RISC_FSUB_D    = OPC_RISC_FP_ARITH | (0x5 << 25),
-+    OPC_RISC_FMUL_D    = OPC_RISC_FP_ARITH | (0x9 << 25),
-+    OPC_RISC_FDIV_D    = OPC_RISC_FP_ARITH | (0xD << 25),
-+
-+    OPC_RISC_FSGNJ_D   = OPC_RISC_FP_ARITH | (0x11 << 25),
-+    OPC_RISC_FSGNJN_D  = OPC_RISC_FP_ARITH | (0x11 << 25),
-+    OPC_RISC_FSGNJX_D  = OPC_RISC_FP_ARITH | (0x11 << 25),
-+
-+    OPC_RISC_FMIN_D    = OPC_RISC_FP_ARITH | (0x15 << 25),
-+    OPC_RISC_FMAX_D    = OPC_RISC_FP_ARITH | (0x15 << 25),
-+
-+    OPC_RISC_FCVT_S_D = OPC_RISC_FP_ARITH | (0x20 << 25),
-+
-+    OPC_RISC_FCVT_D_S = OPC_RISC_FP_ARITH | (0x21 << 25),
-+
-+    OPC_RISC_FSQRT_D   = OPC_RISC_FP_ARITH | (0x2D << 25),
-+
-+    OPC_RISC_FEQ_D     = OPC_RISC_FP_ARITH | (0x51 << 25),
-+    OPC_RISC_FLT_D     = OPC_RISC_FP_ARITH | (0x51 << 25),
-+    OPC_RISC_FLE_D     = OPC_RISC_FP_ARITH | (0x51 << 25),
-+
-+    OPC_RISC_FCVT_W_D  = OPC_RISC_FP_ARITH | (0x61 << 25),
-+    OPC_RISC_FCVT_WU_D = OPC_RISC_FP_ARITH | (0x61 << 25),
-+    OPC_RISC_FCVT_L_D  = OPC_RISC_FP_ARITH | (0x61 << 25),
-+    OPC_RISC_FCVT_LU_D = OPC_RISC_FP_ARITH | (0x61 << 25),
-+
-+    OPC_RISC_FCVT_D_W  = OPC_RISC_FP_ARITH | (0x69 << 25),
-+    OPC_RISC_FCVT_D_WU = OPC_RISC_FP_ARITH | (0x69 << 25),
-+    OPC_RISC_FCVT_D_L  = OPC_RISC_FP_ARITH | (0x69 << 25),
-+    OPC_RISC_FCVT_D_LU = OPC_RISC_FP_ARITH | (0x69 << 25),
-+
-+    OPC_RISC_FMV_X_D   = OPC_RISC_FP_ARITH | (0x71 << 25),
-+    OPC_RISC_FCLASS_D  = OPC_RISC_FP_ARITH | (0x71 << 25),
-+
-+    OPC_RISC_FMV_D_X   = OPC_RISC_FP_ARITH | (0x79 << 25),
-+};
-+
-+#define GET_B_IMM(inst) ((extract32(inst, 8, 4) << 1) \
-+                         | (extract32(inst, 25, 6) << 5) \
-+                         | (extract32(inst, 7, 1) << 11) \
-+                         | (sextract64(inst, 31, 1) << 12))
-+
-+#define GET_STORE_IMM(inst) ((extract32(inst, 7, 5)) \
-+                             | (sextract64(inst, 25, 7) << 5))
-+
-+#define GET_JAL_IMM(inst) ((extract32(inst, 21, 10) << 1) \
-+                           | (extract32(inst, 20, 1) << 11) \
-+                           | (extract32(inst, 12, 8) << 12) \
-+                           | (sextract64(inst, 31, 1) << 20))
-+
-+#define GET_RM(inst)   extract32(inst, 12, 3)
-+#define GET_RS3(inst)  extract32(inst, 27, 5)
-+#define GET_RS1(inst)  extract32(inst, 15, 5)
-+#define GET_RS2(inst)  extract32(inst, 20, 5)
-+#define GET_RD(inst)   extract32(inst, 7, 5)
-+#define GET_IMM(inst)  sextract64(inst, 20, 12)
-+
-+/* RVC decoding macros */
-+#define GET_C_IMM(inst)             (extract32(inst, 2, 5) \
-+                                    | (sextract64(inst, 12, 1) << 5))
-+#define GET_C_ZIMM(inst)            (extract32(inst, 2, 5) \
-+                                    | (extract32(inst, 12, 1) << 5))
-+#define GET_C_ADDI4SPN_IMM(inst)    ((extract32(inst, 6, 1) << 2) \
-+                                    | (extract32(inst, 5, 1) << 3) \
-+                                    | (extract32(inst, 11, 2) << 4) \
-+                                    | (extract32(inst, 7, 4) << 6))
-+#define GET_C_ADDI16SP_IMM(inst)    ((extract32(inst, 6, 1) << 4) \
-+                                    | (extract32(inst, 2, 1) << 5) \
-+                                    | (extract32(inst, 5, 1) << 6) \
-+                                    | (extract32(inst, 3, 2) << 7) \
-+                                    | (sextract64(inst, 12, 1) << 9))
-+#define GET_C_LWSP_IMM(inst)        ((extract32(inst, 4, 3) << 2) \
-+                                    | (extract32(inst, 12, 1) << 5) \
-+                                    | (extract32(inst, 2, 2) << 6))
-+#define GET_C_LDSP_IMM(inst)        ((extract32(inst, 5, 2) << 3) \
-+                                    | (extract32(inst, 12, 1) << 5) \
-+                                    | (extract32(inst, 2, 3) << 6))
-+#define GET_C_SWSP_IMM(inst)        ((extract32(inst, 9, 4) << 2) \
-+                                    | (extract32(inst, 7, 2) << 6))
-+#define GET_C_SDSP_IMM(inst)        ((extract32(inst, 10, 3) << 3) \
-+                                    | (extract32(inst, 7, 3) << 6))
-+#define GET_C_LW_IMM(inst)          ((extract32(inst, 6, 1) << 2) \
-+                                    | (extract32(inst, 10, 3) << 3) \
-+                                    | (extract32(inst, 5, 1) << 6))
-+#define GET_C_LD_IMM(inst)          ((extract32(inst, 10, 3) << 3) \
-+                                    | (extract32(inst, 5, 2) << 6))
-+#define GET_C_J_IMM(inst)           ((extract32(inst, 3, 3) << 1) \
-+                                    | (extract32(inst, 11, 1) << 4) \
-+                                    | (extract32(inst, 2, 1) << 5) \
-+                                    | (extract32(inst, 7, 1) << 6) \
-+                                    | (extract32(inst, 6, 1) << 7) \
-+                                    | (extract32(inst, 9, 2) << 8) \
-+                                    | (extract32(inst, 8, 1) << 10) \
-+                                    | (sextract64(inst, 12, 1) << 11))
-+#define GET_C_B_IMM(inst)           ((extract32(inst, 3, 2) << 1) \
-+                                    | (extract32(inst, 10, 2) << 3) \
-+                                    | (extract32(inst, 2, 1) << 5) \
-+                                    | (extract32(inst, 5, 2) << 6) \
-+                                    | (sextract64(inst, 12, 1) << 8))
-+#define GET_C_SIMM3(inst)           extract32(inst, 10, 3)
-+#define GET_C_RD(inst)              GET_RD(inst)
-+#define GET_C_RS1(inst)             GET_RD(inst)
-+#define GET_C_RS2(inst)             extract32(inst, 2, 5)
-+#define GET_C_RS1S(inst)            (8 + extract32(inst, 7, 3))
-+#define GET_C_RS2S(inst)            (8 + extract32(inst, 2, 3))
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
++#define TARGET_NR_syscalls (TARGET_NR_copy_file_range + 1)
+diff --git a/linux-user/riscv/target_cpu.h b/linux-user/riscv/target_cpu.h
 new file mode 100644
-index 0000000..e1238e1
+index 0000000..c5549b1
 --- /dev/null
-+++ b/target/riscv/translate.c
-@@ -0,0 +1,1974 @@
-+/*
-+ * RISC-V emulation for qemu: main translation routines.
-+ *
-+ * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
++++ b/linux-user/riscv/target_cpu.h
+@@ -0,0 +1,18 @@
++#ifndef TARGET_CPU_H
++#define TARGET_CPU_H
 +
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
++static inline void cpu_clone_regs(CPURISCVState *env, target_ulong newsp)
++{
++    if (newsp) {
++        env->gpr[xSP] = newsp;
++    }
++
++    env->gpr[xA0] = 0;
++}
++
++static inline void cpu_set_tls(CPURISCVState *env, target_ulong newtls)
++{
++    env->gpr[xTP] = newtls;
++}
++
++#endif
+diff --git a/linux-user/riscv/target_signal.h b/linux-user/riscv/target_signal.h
+new file mode 100644
+index 0000000..ce77f75
+--- /dev/null
++++ b/linux-user/riscv/target_signal.h
+@@ -0,0 +1,23 @@
++#ifndef TARGET_SIGNAL_H
++#define TARGET_SIGNAL_H
++
 +#include "cpu.h"
-+#include "tcg-op.h"
-+#include "disas/disas.h"
-+#include "exec/cpu_ldst.h"
-+#include "exec/exec-all.h"
-+#include "exec/helper-proto.h"
-+#include "exec/helper-gen.h"
 +
-+#include "exec/log.h"
++typedef struct target_sigaltstack {
++    abi_ulong ss_sp;
++    abi_int ss_flags;
++    abi_ulong ss_size;
++} target_stack_t;
 +
-+#include "instmap.h"
++#define TARGET_SS_ONSTACK 1
++#define TARGET_SS_DISABLE 2
 +
-+/* global register indices */
-+static TCGv cpu_gpr[32], cpu_pc;
-+static TCGv_i64 cpu_fpr[32]; /* assume F and D extensions */
-+static TCGv load_res;
-+static TCGv load_val;
++#define TARGET_MINSIGSTKSZ 2048
++#define TARGET_SIGSTKSZ 8192
 +
-+#include "exec/gen-icount.h"
++static inline abi_ulong get_sp_from_cpustate(CPURISCVState *state)
++{
++   return state->gpr[xSP];
++}
 +
-+typedef struct DisasContext {
-+    struct TranslationBlock *tb;
-+    target_ulong pc;
-+    target_ulong next_pc;
-+    uint32_t opcode;
-+    uint32_t flags;
-+    uint32_t mem_idx;
-+    int singlestep_enabled;
-+    int bstate;
-+    /* Remember the rounding mode encoded in the previous fp instruction,
-+       which we have already installed into env->fp_status.  Or -1 for
-+       no previous fp instruction.  Note that we exit the TB when writing
-+       to any system register, which includes CSR_FRM, so we do not have
-+       to reset this known value.  */
-+    int frm;
-+} DisasContext;
++#endif /* TARGET_SIGNAL_H */
+diff --git a/linux-user/riscv/target_structs.h b/linux-user/riscv/target_structs.h
+new file mode 100644
+index 0000000..4f0462c
+--- /dev/null
++++ b/linux-user/riscv/target_structs.h
+@@ -0,0 +1,46 @@
++/*
++ * RISC-V specific structures for linux-user
++ *
++ * This is a copy of ../aarch64/target_structs.h atm.
++ *
++ */
++#ifndef TARGET_STRUCTS_H
++#define TARGET_STRUCTS_H
 +
-+enum {
-+    BS_NONE     = 0, /* When seen outside of translation while loop, indicates
-+                     need to exit tb due to end of page. */
-+    BS_STOP     = 1, /* Need to exit tb for syscall, sret, etc. */
-+    BS_BRANCH   = 2, /* Need to exit tb for branch, jal, etc. */
++struct target_ipc_perm {
++    abi_int __key;                      /* Key.  */
++    abi_uint uid;                       /* Owner's user ID.  */
++    abi_uint gid;                       /* Owner's group ID.  */
++    abi_uint cuid;                      /* Creator's user ID.  */
++    abi_uint cgid;                      /* Creator's group ID.  */
++    abi_ushort mode;                    /* Read/write permission.  */
++    abi_ushort __pad1;
++    abi_ushort __seq;                   /* Sequence number.  */
++    abi_ushort __pad2;
++    abi_ulong __unused1;
++    abi_ulong __unused2;
 +};
 +
-+/* convert riscv funct3 to qemu memop for load/store */
-+static const int tcg_memop_lookup[8] = {
-+    [0 ... 7] = -1,
-+    [0] = MO_SB,
-+    [1] = MO_TESW,
-+    [2] = MO_TESL,
-+    [4] = MO_UB,
-+    [5] = MO_TEUW,
-+#ifdef TARGET_RISCV64
-+    [3] = MO_TEQ,
-+    [6] = MO_TEUL,
++struct target_shmid_ds {
++    struct target_ipc_perm shm_perm;    /* operation permission struct */
++    abi_long shm_segsz;                 /* size of segment in bytes */
++    abi_ulong shm_atime;                /* time of last shmat() */
++#if TARGET_ABI_BITS == 32
++    abi_ulong __unused1;
 +#endif
++    abi_ulong shm_dtime;                /* time of last shmdt() */
++#if TARGET_ABI_BITS == 32
++    abi_ulong __unused2;
++#endif
++    abi_ulong shm_ctime;                /* time of last change by shmctl() */
++#if TARGET_ABI_BITS == 32
++    abi_ulong __unused3;
++#endif
++    abi_int shm_cpid;                   /* pid of creator */
++    abi_int shm_lpid;                   /* pid of last shmop */
++    abi_ulong shm_nattch;               /* number of current attaches */
++    abi_ulong __unused4;
++    abi_ulong __unused5;
 +};
 +
-+#ifdef TARGET_RISCV64
-+#define CASE_OP_32_64(X) case X: case glue(X, W)
-+#else
-+#define CASE_OP_32_64(X) case X
 +#endif
-+
-+static void generate_exception(DisasContext *ctx, int excp)
-+{
-+    tcg_gen_movi_tl(cpu_pc, ctx->pc);
-+    TCGv_i32 helper_tmp = tcg_const_i32(excp);
-+    gen_helper_raise_exception(cpu_env, helper_tmp);
-+    tcg_temp_free_i32(helper_tmp);
-+    ctx->bstate = BS_BRANCH;
-+}
-+
-+static void generate_exception_mbadaddr(DisasContext *ctx, int excp)
-+{
-+    tcg_gen_movi_tl(cpu_pc, ctx->pc);
-+    tcg_gen_st_tl(cpu_pc, cpu_env, offsetof(CPURISCVState, badaddr));
-+    TCGv_i32 helper_tmp = tcg_const_i32(excp);
-+    gen_helper_raise_exception(cpu_env, helper_tmp);
-+    tcg_temp_free_i32(helper_tmp);
-+    ctx->bstate = BS_BRANCH;
-+}
-+
-+static void gen_exception_debug(void)
-+{
-+    TCGv_i32 helper_tmp = tcg_const_i32(EXCP_DEBUG);
-+    gen_helper_raise_exception(cpu_env, helper_tmp);
-+    tcg_temp_free_i32(helper_tmp);
-+}
-+
-+static void gen_exception_illegal(DisasContext *ctx)
-+{
-+    generate_exception(ctx, RISCV_EXCP_ILLEGAL_INST);
-+}
-+
-+static void gen_exception_inst_addr_mis(DisasContext *ctx)
-+{
-+    generate_exception_mbadaddr(ctx, RISCV_EXCP_INST_ADDR_MIS);
-+}
-+
-+static inline bool use_goto_tb(DisasContext *ctx, target_ulong dest)
-+{
-+    if (unlikely(ctx->singlestep_enabled)) {
-+        return false;
-+    }
-+
-+#ifndef CONFIG_USER_ONLY
-+    return (ctx->tb->pc & TARGET_PAGE_MASK) == (dest & TARGET_PAGE_MASK);
-+#else
-+    return true;
-+#endif
-+}
-+
-+static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
-+{
-+    if (use_goto_tb(ctx, dest)) {
-+        /* chaining is only allowed when the jump is to the same page */
-+        tcg_gen_goto_tb(n);
-+        tcg_gen_movi_tl(cpu_pc, dest);
-+        tcg_gen_exit_tb((uintptr_t)ctx->tb + n);
-+    } else {
-+        tcg_gen_movi_tl(cpu_pc, dest);
-+        if (ctx->singlestep_enabled) {
-+            gen_exception_debug();
-+        } else {
-+            tcg_gen_exit_tb(0);
-+        }
-+    }
-+}
-+
-+/* Wrapper for getting reg values - need to check of reg is zero since
-+ * cpu_gpr[0] is not actually allocated
+diff --git a/linux-user/riscv/target_syscall.h b/linux-user/riscv/target_syscall.h
+new file mode 100644
+index 0000000..d4e109a
+--- /dev/null
++++ b/linux-user/riscv/target_syscall.h
+@@ -0,0 +1,56 @@
++/*
++ * This struct defines the way the registers are stored on the
++ *  stack during a system call.
++ *
++ * Reference: linux/arch/riscv/include/uapi/asm/ptrace.h
 + */
-+static inline void gen_get_gpr(TCGv t, int reg_num)
-+{
-+    if (reg_num == 0) {
-+        tcg_gen_movi_tl(t, 0);
-+    } else {
-+        tcg_gen_mov_tl(t, cpu_gpr[reg_num]);
-+    }
-+}
 +
-+/* Wrapper for setting reg values - need to check of reg is zero since
-+ * cpu_gpr[0] is not actually allocated. this is more for safety purposes,
-+ * since we usually avoid calling the OP_TYPE_gen function if we see a write to
-+ * $zero
-+ */
-+static inline void gen_set_gpr(int reg_num_dst, TCGv t)
-+{
-+    if (reg_num_dst != 0) {
-+        tcg_gen_mov_tl(cpu_gpr[reg_num_dst], t);
-+    }
-+}
-+
-+static void gen_mulhsu(TCGv ret, TCGv arg1, TCGv arg2)
-+{
-+    TCGv rl = tcg_temp_new();
-+    TCGv rh = tcg_temp_new();
-+
-+    tcg_gen_mulu2_tl(rl, rh, arg1, arg2);
-+    /* fix up for one negative */
-+    tcg_gen_sari_tl(rl, arg1, TARGET_LONG_BITS - 1);
-+    tcg_gen_and_tl(rl, rl, arg2);
-+    tcg_gen_sub_tl(ret, rh, rl);
-+
-+    tcg_temp_free(rl);
-+    tcg_temp_free(rh);
-+}
-+
-+static void gen_fsgnj(DisasContext *ctx, uint32_t rd, uint32_t rs1,
-+    uint32_t rs2, int rm, uint64_t min)
-+{
-+    switch (rm) {
-+    case 0: /* fsgnj */
-+        if (rs1 == rs2) { /* FMOV */
-+            tcg_gen_mov_i64(cpu_fpr[rd], cpu_fpr[rs1]);
-+        } else {
-+            tcg_gen_deposit_i64(cpu_fpr[rd], cpu_fpr[rs2], cpu_fpr[rs1],
-+                                0, min == INT32_MIN ? 31 : 63);
-+        }
-+        break;
-+    case 1: /* fsgnjn */
-+        if (rs1 == rs2) { /* FNEG */
-+            tcg_gen_xori_i64(cpu_fpr[rd], cpu_fpr[rs1], min);
-+        } else {
-+            TCGv_i64 t0 = tcg_temp_new_i64();
-+            tcg_gen_not_i64(t0, cpu_fpr[rs2]);
-+            tcg_gen_deposit_i64(cpu_fpr[rd], t0, cpu_fpr[rs1],
-+                                0, min == INT32_MIN ? 31 : 63);
-+            tcg_temp_free_i64(t0);
-+        }
-+        break;
-+    case 2: /* fsgnjx */
-+        if (rs1 == rs2) { /* FABS */
-+            tcg_gen_andi_i64(cpu_fpr[rd], cpu_fpr[rs1], ~min);
-+        } else {
-+            TCGv_i64 t0 = tcg_temp_new_i64();
-+            tcg_gen_andi_i64(t0, cpu_fpr[rs2], min);
-+            tcg_gen_xor_i64(cpu_fpr[rd], cpu_fpr[rs1], t0);
-+            tcg_temp_free_i64(t0);
-+        }
-+        break;
-+    default:
-+        gen_exception_illegal(ctx);
-+    }
-+}
-+
-+static void gen_arith(DisasContext *ctx, uint32_t opc, int rd, int rs1,
-+        int rs2)
-+{
-+    TCGv source1, source2, cond1, cond2, zeroreg, resultopt1;
-+    source1 = tcg_temp_new();
-+    source2 = tcg_temp_new();
-+    gen_get_gpr(source1, rs1);
-+    gen_get_gpr(source2, rs2);
-+
-+    switch (opc) {
-+    CASE_OP_32_64(OPC_RISC_ADD):
-+        tcg_gen_add_tl(source1, source1, source2);
-+        break;
-+    CASE_OP_32_64(OPC_RISC_SUB):
-+        tcg_gen_sub_tl(source1, source1, source2);
-+        break;
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_SLLW:
-+        tcg_gen_andi_tl(source2, source2, 0x1F);
-+        tcg_gen_shl_tl(source1, source1, source2);
-+        break;
-+#endif
-+    case OPC_RISC_SLL:
-+        tcg_gen_andi_tl(source2, source2, TARGET_LONG_BITS - 1);
-+        tcg_gen_shl_tl(source1, source1, source2);
-+        break;
-+    case OPC_RISC_SLT:
-+        tcg_gen_setcond_tl(TCG_COND_LT, source1, source1, source2);
-+        break;
-+    case OPC_RISC_SLTU:
-+        tcg_gen_setcond_tl(TCG_COND_LTU, source1, source1, source2);
-+        break;
-+    case OPC_RISC_XOR:
-+        tcg_gen_xor_tl(source1, source1, source2);
-+        break;
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_SRLW:
-+        /* clear upper 32 */
-+        tcg_gen_ext32u_tl(source1, source1);
-+        tcg_gen_andi_tl(source2, source2, 0x1F);
-+        tcg_gen_shr_tl(source1, source1, source2);
-+        break;
-+#endif
-+    case OPC_RISC_SRL:
-+        tcg_gen_andi_tl(source2, source2, TARGET_LONG_BITS - 1);
-+        tcg_gen_shr_tl(source1, source1, source2);
-+        break;
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_SRAW:
-+        /* first, trick to get it to act like working on 32 bits (get rid of
-+        upper 32, sign extend to fill space) */
-+        tcg_gen_ext32s_tl(source1, source1);
-+        tcg_gen_andi_tl(source2, source2, 0x1F);
-+        tcg_gen_sar_tl(source1, source1, source2);
-+        break;
-+        /* fall through to SRA */
-+#endif
-+    case OPC_RISC_SRA:
-+        tcg_gen_andi_tl(source2, source2, TARGET_LONG_BITS - 1);
-+        tcg_gen_sar_tl(source1, source1, source2);
-+        break;
-+    case OPC_RISC_OR:
-+        tcg_gen_or_tl(source1, source1, source2);
-+        break;
-+    case OPC_RISC_AND:
-+        tcg_gen_and_tl(source1, source1, source2);
-+        break;
-+    CASE_OP_32_64(OPC_RISC_MUL):
-+        tcg_gen_mul_tl(source1, source1, source2);
-+        break;
-+    case OPC_RISC_MULH:
-+        tcg_gen_muls2_tl(source2, source1, source1, source2);
-+        break;
-+    case OPC_RISC_MULHSU:
-+        gen_mulhsu(source1, source1, source2);
-+        break;
-+    case OPC_RISC_MULHU:
-+        tcg_gen_mulu2_tl(source2, source1, source1, source2);
-+        break;
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_DIVW:
-+        tcg_gen_ext32s_tl(source1, source1);
-+        tcg_gen_ext32s_tl(source2, source2);
-+        /* fall through to DIV */
-+#endif
-+    case OPC_RISC_DIV:
-+        /* Handle by altering args to tcg_gen_div to produce req'd results:
-+         * For overflow: want source1 in source1 and 1 in source2
-+         * For div by zero: want -1 in source1 and 1 in source2 -> -1 result */
-+        cond1 = tcg_temp_new();
-+        cond2 = tcg_temp_new();
-+        zeroreg = tcg_const_tl(0);
-+        resultopt1 = tcg_temp_new();
-+
-+        tcg_gen_movi_tl(resultopt1, (target_ulong)-1);
-+        tcg_gen_setcondi_tl(TCG_COND_EQ, cond2, source2, (target_ulong)(~0L));
-+        tcg_gen_setcondi_tl(TCG_COND_EQ, cond1, source1,
-+                            ((target_ulong)1) << (TARGET_LONG_BITS - 1));
-+        tcg_gen_and_tl(cond1, cond1, cond2); /* cond1 = overflow */
-+        tcg_gen_setcondi_tl(TCG_COND_EQ, cond2, source2, 0); /* cond2 = div 0 */
-+        /* if div by zero, set source1 to -1, otherwise don't change */
-+        tcg_gen_movcond_tl(TCG_COND_EQ, source1, cond2, zeroreg, source1,
-+                resultopt1);
-+        /* if overflow or div by zero, set source2 to 1, else don't change */
-+        tcg_gen_or_tl(cond1, cond1, cond2);
-+        tcg_gen_movi_tl(resultopt1, (target_ulong)1);
-+        tcg_gen_movcond_tl(TCG_COND_EQ, source2, cond1, zeroreg, source2,
-+                resultopt1);
-+        tcg_gen_div_tl(source1, source1, source2);
-+
-+        tcg_temp_free(cond1);
-+        tcg_temp_free(cond2);
-+        tcg_temp_free(zeroreg);
-+        tcg_temp_free(resultopt1);
-+        break;
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_DIVUW:
-+        tcg_gen_ext32u_tl(source1, source1);
-+        tcg_gen_ext32u_tl(source2, source2);
-+        /* fall through to DIVU */
-+#endif
-+    case OPC_RISC_DIVU:
-+        cond1 = tcg_temp_new();
-+        zeroreg = tcg_const_tl(0);
-+        resultopt1 = tcg_temp_new();
-+
-+        tcg_gen_setcondi_tl(TCG_COND_EQ, cond1, source2, 0);
-+        tcg_gen_movi_tl(resultopt1, (target_ulong)-1);
-+        tcg_gen_movcond_tl(TCG_COND_EQ, source1, cond1, zeroreg, source1,
-+                resultopt1);
-+        tcg_gen_movi_tl(resultopt1, (target_ulong)1);
-+        tcg_gen_movcond_tl(TCG_COND_EQ, source2, cond1, zeroreg, source2,
-+                resultopt1);
-+        tcg_gen_divu_tl(source1, source1, source2);
-+
-+        tcg_temp_free(cond1);
-+        tcg_temp_free(zeroreg);
-+        tcg_temp_free(resultopt1);
-+        break;
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_REMW:
-+        tcg_gen_ext32s_tl(source1, source1);
-+        tcg_gen_ext32s_tl(source2, source2);
-+        /* fall through to REM */
-+#endif
-+    case OPC_RISC_REM:
-+        cond1 = tcg_temp_new();
-+        cond2 = tcg_temp_new();
-+        zeroreg = tcg_const_tl(0);
-+        resultopt1 = tcg_temp_new();
-+
-+        tcg_gen_movi_tl(resultopt1, 1L);
-+        tcg_gen_setcondi_tl(TCG_COND_EQ, cond2, source2, (target_ulong)-1);
-+        tcg_gen_setcondi_tl(TCG_COND_EQ, cond1, source1,
-+                            (target_ulong)1 << (TARGET_LONG_BITS - 1));
-+        tcg_gen_and_tl(cond2, cond1, cond2); /* cond1 = overflow */
-+        tcg_gen_setcondi_tl(TCG_COND_EQ, cond1, source2, 0); /* cond2 = div 0 */
-+        /* if overflow or div by zero, set source2 to 1, else don't change */
-+        tcg_gen_or_tl(cond2, cond1, cond2);
-+        tcg_gen_movcond_tl(TCG_COND_EQ, source2, cond2, zeroreg, source2,
-+                resultopt1);
-+        tcg_gen_rem_tl(resultopt1, source1, source2);
-+        /* if div by zero, just return the original dividend */
-+        tcg_gen_movcond_tl(TCG_COND_EQ, source1, cond1, zeroreg, resultopt1,
-+                source1);
-+
-+        tcg_temp_free(cond1);
-+        tcg_temp_free(cond2);
-+        tcg_temp_free(zeroreg);
-+        tcg_temp_free(resultopt1);
-+        break;
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_REMUW:
-+        tcg_gen_ext32u_tl(source1, source1);
-+        tcg_gen_ext32u_tl(source2, source2);
-+        /* fall through to REMU */
-+#endif
-+    case OPC_RISC_REMU:
-+        cond1 = tcg_temp_new();
-+        zeroreg = tcg_const_tl(0);
-+        resultopt1 = tcg_temp_new();
-+
-+        tcg_gen_movi_tl(resultopt1, (target_ulong)1);
-+        tcg_gen_setcondi_tl(TCG_COND_EQ, cond1, source2, 0);
-+        tcg_gen_movcond_tl(TCG_COND_EQ, source2, cond1, zeroreg, source2,
-+                resultopt1);
-+        tcg_gen_remu_tl(resultopt1, source1, source2);
-+        /* if div by zero, just return the original dividend */
-+        tcg_gen_movcond_tl(TCG_COND_EQ, source1, cond1, zeroreg, resultopt1,
-+                source1);
-+
-+        tcg_temp_free(cond1);
-+        tcg_temp_free(zeroreg);
-+        tcg_temp_free(resultopt1);
-+        break;
-+    default:
-+        gen_exception_illegal(ctx);
-+        return;
-+    }
-+
-+    if (opc & 0x8) { /* sign extend for W instructions */
-+        tcg_gen_ext32s_tl(source1, source1);
-+    }
-+
-+    gen_set_gpr(rd, source1);
-+    tcg_temp_free(source1);
-+    tcg_temp_free(source2);
-+}
-+
-+static void gen_arith_imm(DisasContext *ctx, uint32_t opc, int rd,
-+        int rs1, target_long imm)
-+{
-+    TCGv source1 = tcg_temp_new();
-+    int shift_len = TARGET_LONG_BITS;
-+    int shift_a;
-+
-+    gen_get_gpr(source1, rs1);
-+
-+    switch (opc) {
-+    case OPC_RISC_ADDI:
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_ADDIW:
-+#endif
-+        tcg_gen_addi_tl(source1, source1, imm);
-+        break;
-+    case OPC_RISC_SLTI:
-+        tcg_gen_setcondi_tl(TCG_COND_LT, source1, source1, imm);
-+        break;
-+    case OPC_RISC_SLTIU:
-+        tcg_gen_setcondi_tl(TCG_COND_LTU, source1, source1, imm);
-+        break;
-+    case OPC_RISC_XORI:
-+        tcg_gen_xori_tl(source1, source1, imm);
-+        break;
-+    case OPC_RISC_ORI:
-+        tcg_gen_ori_tl(source1, source1, imm);
-+        break;
-+    case OPC_RISC_ANDI:
-+        tcg_gen_andi_tl(source1, source1, imm);
-+        break;
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_SLLIW:
-+        shift_len = 32;
-+        /* FALLTHRU */
-+#endif
-+    case OPC_RISC_SLLI:
-+        if (imm >= shift_len) {
-+            goto do_illegal;
-+        }
-+        tcg_gen_shli_tl(source1, source1, imm);
-+        break;
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_SHIFT_RIGHT_IW:
-+        shift_len = 32;
-+        /* FALLTHRU */
-+#endif
-+    case OPC_RISC_SHIFT_RIGHT_I:
-+        /* differentiate on IMM */
-+        shift_a = imm & 0x400;
-+        imm &= 0x3ff;
-+        if (imm >= shift_len) {
-+            goto do_illegal;
-+        }
-+        if (imm != 0) {
-+            if (shift_a) {
-+                /* SRAI[W] */
-+                tcg_gen_sextract_tl(source1, source1, imm, shift_len - imm);
-+            } else {
-+                /* SRLI[W] */
-+                tcg_gen_extract_tl(source1, source1, imm, shift_len - imm);
-+            }
-+            /* No further sign-extension needed for W instructions.  */
-+            opc &= ~0x8;
-+        }
-+        break;
-+    default:
-+    do_illegal:
-+        gen_exception_illegal(ctx);
-+        return;
-+    }
-+
-+    if (opc & 0x8) { /* sign-extend for W instructions */
-+        tcg_gen_ext32s_tl(source1, source1);
-+    }
-+
-+    gen_set_gpr(rd, source1);
-+    tcg_temp_free(source1);
-+}
-+
-+static void gen_jal(CPURISCVState *env, DisasContext *ctx, int rd,
-+                    target_ulong imm)
-+{
-+    target_ulong next_pc;
-+
-+    /* check misaligned: */
-+    next_pc = ctx->pc + imm;
-+    if (!riscv_has_ext(env, RVC)) {
-+        if ((next_pc & 0x3) != 0) {
-+            gen_exception_inst_addr_mis(ctx);
-+            return;
-+        }
-+    }
-+    if (rd != 0) {
-+        tcg_gen_movi_tl(cpu_gpr[rd], ctx->next_pc);
-+    }
-+
-+    gen_goto_tb(ctx, 0, ctx->pc + imm); /* must use this for safety */
-+    ctx->bstate = BS_BRANCH;
-+}
-+
-+static void gen_jalr(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
-+                     int rd, int rs1, target_long imm)
-+{
-+    /* no chaining with JALR */
-+    TCGLabel *misaligned = NULL;
-+    TCGv t0 = tcg_temp_new();
-+
-+    switch (opc) {
-+    case OPC_RISC_JALR:
-+        gen_get_gpr(cpu_pc, rs1);
-+        tcg_gen_addi_tl(cpu_pc, cpu_pc, imm);
-+        tcg_gen_andi_tl(cpu_pc, cpu_pc, (target_ulong)-2);
-+
-+        if (!riscv_has_ext(env, RVC)) {
-+            misaligned = gen_new_label();
-+            tcg_gen_andi_tl(t0, cpu_pc, 0x2);
-+            tcg_gen_brcondi_tl(TCG_COND_NE, t0, 0x0, misaligned);
-+        }
-+
-+        if (rd != 0) {
-+            tcg_gen_movi_tl(cpu_gpr[rd], ctx->next_pc);
-+        }
-+        tcg_gen_exit_tb(0);
-+
-+        if (misaligned) {
-+            gen_set_label(misaligned);
-+            gen_exception_inst_addr_mis(ctx);
-+        }
-+        ctx->bstate = BS_BRANCH;
-+        break;
-+
-+    default:
-+        gen_exception_illegal(ctx);
-+        break;
-+    }
-+    tcg_temp_free(t0);
-+}
-+
-+static void gen_branch(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
-+                       int rs1, int rs2, target_long bimm)
-+{
-+    TCGLabel *l = gen_new_label();
-+    TCGv source1, source2;
-+    source1 = tcg_temp_new();
-+    source2 = tcg_temp_new();
-+    gen_get_gpr(source1, rs1);
-+    gen_get_gpr(source2, rs2);
-+
-+    switch (opc) {
-+    case OPC_RISC_BEQ:
-+        tcg_gen_brcond_tl(TCG_COND_EQ, source1, source2, l);
-+        break;
-+    case OPC_RISC_BNE:
-+        tcg_gen_brcond_tl(TCG_COND_NE, source1, source2, l);
-+        break;
-+    case OPC_RISC_BLT:
-+        tcg_gen_brcond_tl(TCG_COND_LT, source1, source2, l);
-+        break;
-+    case OPC_RISC_BGE:
-+        tcg_gen_brcond_tl(TCG_COND_GE, source1, source2, l);
-+        break;
-+    case OPC_RISC_BLTU:
-+        tcg_gen_brcond_tl(TCG_COND_LTU, source1, source2, l);
-+        break;
-+    case OPC_RISC_BGEU:
-+        tcg_gen_brcond_tl(TCG_COND_GEU, source1, source2, l);
-+        break;
-+    default:
-+        gen_exception_illegal(ctx);
-+        return;
-+    }
-+    tcg_temp_free(source1);
-+    tcg_temp_free(source2);
-+
-+    gen_goto_tb(ctx, 1, ctx->next_pc);
-+    gen_set_label(l); /* branch taken */
-+    if (!riscv_has_ext(env, RVC) && ((ctx->pc + bimm) & 0x3)) {
-+        /* misaligned */
-+        gen_exception_inst_addr_mis(ctx);
-+    } else {
-+        gen_goto_tb(ctx, 0, ctx->pc + bimm);
-+    }
-+    ctx->bstate = BS_BRANCH;
-+}
-+
-+static void gen_load(DisasContext *ctx, uint32_t opc, int rd, int rs1,
-+        target_long imm)
-+{
-+    TCGv t0 = tcg_temp_new();
-+    TCGv t1 = tcg_temp_new();
-+    gen_get_gpr(t0, rs1);
-+    tcg_gen_addi_tl(t0, t0, imm);
-+    int memop = tcg_memop_lookup[(opc >> 12) & 0x7];
-+
-+    if (memop < 0) {
-+        gen_exception_illegal(ctx);
-+        return;
-+    }
-+
-+    tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, memop);
-+    gen_set_gpr(rd, t1);
-+    tcg_temp_free(t0);
-+    tcg_temp_free(t1);
-+}
-+
-+static void gen_store(DisasContext *ctx, uint32_t opc, int rs1, int rs2,
-+        target_long imm)
-+{
-+    TCGv t0 = tcg_temp_new();
-+    TCGv dat = tcg_temp_new();
-+    gen_get_gpr(t0, rs1);
-+    tcg_gen_addi_tl(t0, t0, imm);
-+    gen_get_gpr(dat, rs2);
-+    int memop = tcg_memop_lookup[(opc >> 12) & 0x7];
-+
-+    if (memop < 0) {
-+        gen_exception_illegal(ctx);
-+        return;
-+    }
-+
-+    tcg_gen_qemu_st_tl(dat, t0, ctx->mem_idx, memop);
-+    tcg_temp_free(t0);
-+    tcg_temp_free(dat);
-+}
-+
-+static void gen_fp_load(DisasContext *ctx, uint32_t opc, int rd,
-+        int rs1, target_long imm)
-+{
-+    TCGv t0;
-+
-+    if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
-+        gen_exception_illegal(ctx);
-+        return;
-+    }
-+
-+    t0 = tcg_temp_new();
-+    gen_get_gpr(t0, rs1);
-+    tcg_gen_addi_tl(t0, t0, imm);
-+
-+    switch (opc) {
-+    case OPC_RISC_FLW:
-+        tcg_gen_qemu_ld_i64(cpu_fpr[rd], t0, ctx->mem_idx, MO_TEUL);
-+        /* RISC-V requires NaN-boxing of narrower width floating point values */
-+        tcg_gen_ori_i64(cpu_fpr[rd], cpu_fpr[rd], 0xffffffff00000000ULL);
-+        break;
-+    case OPC_RISC_FLD:
-+        tcg_gen_qemu_ld_i64(cpu_fpr[rd], t0, ctx->mem_idx, MO_TEQ);
-+        break;
-+    default:
-+        gen_exception_illegal(ctx);
-+        break;
-+    }
-+    tcg_temp_free(t0);
-+}
-+
-+static void gen_fp_store(DisasContext *ctx, uint32_t opc, int rs1,
-+        int rs2, target_long imm)
-+{
-+    TCGv t0;
-+
-+    if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
-+        gen_exception_illegal(ctx);
-+        return;
-+    }
-+
-+    t0 = tcg_temp_new();
-+    gen_get_gpr(t0, rs1);
-+    tcg_gen_addi_tl(t0, t0, imm);
-+
-+    switch (opc) {
-+    case OPC_RISC_FSW:
-+        tcg_gen_qemu_st_i64(cpu_fpr[rs2], t0, ctx->mem_idx, MO_TEUL);
-+        break;
-+    case OPC_RISC_FSD:
-+        tcg_gen_qemu_st_i64(cpu_fpr[rs2], t0, ctx->mem_idx, MO_TEQ);
-+        break;
-+    default:
-+        gen_exception_illegal(ctx);
-+        break;
-+    }
-+
-+    tcg_temp_free(t0);
-+}
-+
-+static void gen_atomic(DisasContext *ctx, uint32_t opc,
-+                      int rd, int rs1, int rs2)
-+{
-+    TCGv src1, src2, dat;
-+    TCGLabel *l1, *l2;
-+    TCGMemOp mop;
-+    TCGCond cond;
-+    bool aq, rl;
-+
-+    /* Extract the size of the atomic operation.  */
-+    switch (extract32(opc, 12, 3)) {
-+    case 2: /* 32-bit */
-+        mop = MO_ALIGN | MO_TESL;
-+        break;
-+#if defined(TARGET_RISCV64)
-+    case 3: /* 64-bit */
-+        mop = MO_ALIGN | MO_TEQ;
-+        break;
-+#endif
-+    default:
-+        gen_exception_illegal(ctx);
-+        return;
-+    }
-+    rl = extract32(opc, 25, 1);
-+    aq = extract32(opc, 26, 1);
-+
-+    src1 = tcg_temp_new();
-+    src2 = tcg_temp_new();
-+
-+    switch (MASK_OP_ATOMIC_NO_AQ_RL_SZ(opc)) {
-+    case OPC_RISC_LR:
-+        /* Put addr in load_res, data in load_val.  */
-+        gen_get_gpr(src1, rs1);
-+        if (rl) {
-+            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
-+        }
-+        tcg_gen_qemu_ld_tl(load_val, src1, ctx->mem_idx, mop);
-+        if (aq) {
-+            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);
-+        }
-+        tcg_gen_mov_tl(load_res, src1);
-+        gen_set_gpr(rd, load_val);
-+        break;
-+
-+    case OPC_RISC_SC:
-+        l1 = gen_new_label();
-+        l2 = gen_new_label();
-+        dat = tcg_temp_new();
-+
-+        gen_get_gpr(src1, rs1);
-+        tcg_gen_brcond_tl(TCG_COND_NE, load_res, src1, l1);
-+
-+        gen_get_gpr(src2, rs2);
-+        /* Note that the TCG atomic primitives are SC,
-+           so we can ignore AQ/RL along this path.  */
-+        tcg_gen_atomic_cmpxchg_tl(src1, load_res, load_val, src2,
-+                                  ctx->mem_idx, mop);
-+        tcg_gen_setcond_tl(TCG_COND_NE, dat, src1, load_val);
-+        gen_set_gpr(rd, dat);
-+        tcg_gen_br(l2);
-+
-+        gen_set_label(l1);
-+        /* Address comparion failure.  However, we still need to
-+           provide the memory barrier implied by AQ/RL.  */
-+        tcg_gen_mb(TCG_MO_ALL + aq * TCG_BAR_LDAQ + rl * TCG_BAR_STRL);
-+        tcg_gen_movi_tl(dat, 1);
-+        gen_set_gpr(rd, dat);
-+
-+        gen_set_label(l2);
-+        tcg_temp_free(dat);
-+        break;
-+
-+    case OPC_RISC_AMOSWAP:
-+        /* Note that the TCG atomic primitives are SC,
-+           so we can ignore AQ/RL along this path.  */
-+        gen_get_gpr(src1, rs1);
-+        gen_get_gpr(src2, rs2);
-+        tcg_gen_atomic_xchg_tl(src2, src1, src2, ctx->mem_idx, mop);
-+        gen_set_gpr(rd, src2);
-+        break;
-+    case OPC_RISC_AMOADD:
-+        gen_get_gpr(src1, rs1);
-+        gen_get_gpr(src2, rs2);
-+        tcg_gen_atomic_fetch_add_tl(src2, src1, src2, ctx->mem_idx, mop);
-+        gen_set_gpr(rd, src2);
-+        break;
-+    case OPC_RISC_AMOXOR:
-+        gen_get_gpr(src1, rs1);
-+        gen_get_gpr(src2, rs2);
-+        tcg_gen_atomic_fetch_xor_tl(src2, src1, src2, ctx->mem_idx, mop);
-+        gen_set_gpr(rd, src2);
-+        break;
-+    case OPC_RISC_AMOAND:
-+        gen_get_gpr(src1, rs1);
-+        gen_get_gpr(src2, rs2);
-+        tcg_gen_atomic_fetch_and_tl(src2, src1, src2, ctx->mem_idx, mop);
-+        gen_set_gpr(rd, src2);
-+        break;
-+    case OPC_RISC_AMOOR:
-+        gen_get_gpr(src1, rs1);
-+        gen_get_gpr(src2, rs2);
-+        tcg_gen_atomic_fetch_or_tl(src2, src1, src2, ctx->mem_idx, mop);
-+        gen_set_gpr(rd, src2);
-+        break;
-+
-+    case OPC_RISC_AMOMIN:
-+        cond = TCG_COND_LT;
-+        goto do_minmax;
-+    case OPC_RISC_AMOMAX:
-+        cond = TCG_COND_GT;
-+        goto do_minmax;
-+    case OPC_RISC_AMOMINU:
-+        cond = TCG_COND_LTU;
-+        goto do_minmax;
-+    case OPC_RISC_AMOMAXU:
-+        cond = TCG_COND_GTU;
-+        goto do_minmax;
-+    do_minmax:
-+        /* Handle the RL barrier.  The AQ barrier is handled along the
-+           parallel path by the SC atomic cmpxchg.  On the serial path,
-+           of course, barriers do not matter.  */
-+        if (rl) {
-+            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
-+        }
-+        if (tb_cflags(ctx->tb) & CF_PARALLEL) {
-+            l1 = gen_new_label();
-+            gen_set_label(l1);
-+        } else {
-+            l1 = NULL;
-+        }
-+
-+        gen_get_gpr(src1, rs1);
-+        gen_get_gpr(src2, rs2);
-+        if ((mop & MO_SSIZE) == MO_SL) {
-+            /* Sign-extend the register comparison input.  */
-+            tcg_gen_ext32s_tl(src2, src2);
-+        }
-+        dat = tcg_temp_local_new();
-+        tcg_gen_qemu_ld_tl(dat, src1, ctx->mem_idx, mop);
-+        tcg_gen_movcond_tl(cond, src2, dat, src2, dat, src2);
-+
-+        if (tb_cflags(ctx->tb) & CF_PARALLEL) {
-+            /* Parallel context.  Make this operation atomic by verifying
-+               that the memory didn't change while we computed the result.  */
-+            tcg_gen_atomic_cmpxchg_tl(src2, src1, dat, src2, ctx->mem_idx, mop);
-+
-+            /* If the cmpxchg failed, retry. */
-+            /* ??? There is an assumption here that this will eventually
-+               succeed, such that we don't live-lock.  This is not unlike
-+               a similar loop that the compiler would generate for e.g.
-+               __atomic_fetch_and_xor, so don't worry about it.  */
-+            tcg_gen_brcond_tl(TCG_COND_NE, dat, src2, l1);
-+        } else {
-+            /* Serial context.  Directly store the result.  */
-+            tcg_gen_qemu_st_tl(src2, src1, ctx->mem_idx, mop);
-+        }
-+        gen_set_gpr(rd, dat);
-+        tcg_temp_free(dat);
-+        break;
-+
-+    default:
-+        gen_exception_illegal(ctx);
-+        break;
-+    }
-+
-+    tcg_temp_free(src1);
-+    tcg_temp_free(src2);
-+}
-+
-+static void gen_set_rm(DisasContext *ctx, int rm)
-+{
-+    TCGv_i32 t0;
-+
-+    if (ctx->frm == rm) {
-+        return;
-+    }
-+    ctx->frm = rm;
-+    t0 = tcg_const_i32(rm);
-+    gen_helper_set_rounding_mode(cpu_env, t0);
-+    tcg_temp_free_i32(t0);
-+}
-+
-+static void gen_fp_fmadd(DisasContext *ctx, uint32_t opc, int rd,
-+                         int rs1, int rs2, int rs3, int rm)
-+{
-+    switch (opc) {
-+    case OPC_RISC_FMADD_S:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fmadd_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
-+                           cpu_fpr[rs2], cpu_fpr[rs3]);
-+        break;
-+    case OPC_RISC_FMADD_D:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fmadd_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
-+                           cpu_fpr[rs2], cpu_fpr[rs3]);
-+        break;
-+    default:
-+        gen_exception_illegal(ctx);
-+        break;
-+    }
-+}
-+
-+static void gen_fp_fmsub(DisasContext *ctx, uint32_t opc, int rd,
-+                         int rs1, int rs2, int rs3, int rm)
-+{
-+    switch (opc) {
-+    case OPC_RISC_FMSUB_S:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fmsub_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
-+                           cpu_fpr[rs2], cpu_fpr[rs3]);
-+        break;
-+    case OPC_RISC_FMSUB_D:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fmsub_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
-+                           cpu_fpr[rs2], cpu_fpr[rs3]);
-+        break;
-+    default:
-+        gen_exception_illegal(ctx);
-+        break;
-+    }
-+}
-+
-+static void gen_fp_fnmsub(DisasContext *ctx, uint32_t opc, int rd,
-+                          int rs1, int rs2, int rs3, int rm)
-+{
-+    switch (opc) {
-+    case OPC_RISC_FNMSUB_S:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fnmsub_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
-+                            cpu_fpr[rs2], cpu_fpr[rs3]);
-+        break;
-+    case OPC_RISC_FNMSUB_D:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fnmsub_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
-+                            cpu_fpr[rs2], cpu_fpr[rs3]);
-+        break;
-+    default:
-+        gen_exception_illegal(ctx);
-+        break;
-+    }
-+}
-+
-+static void gen_fp_fnmadd(DisasContext *ctx, uint32_t opc, int rd,
-+                          int rs1, int rs2, int rs3, int rm)
-+{
-+    switch (opc) {
-+    case OPC_RISC_FNMADD_S:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fnmadd_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
-+                            cpu_fpr[rs2], cpu_fpr[rs3]);
-+        break;
-+    case OPC_RISC_FNMADD_D:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fnmadd_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
-+                            cpu_fpr[rs2], cpu_fpr[rs3]);
-+        break;
-+    default:
-+        gen_exception_illegal(ctx);
-+        break;
-+    }
-+}
-+
-+static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
-+                         int rs1, int rs2, int rm)
-+{
-+    TCGv t0 = NULL;
-+
-+    if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
-+        goto do_illegal;
-+    }
-+
-+    switch (opc) {
-+    case OPC_RISC_FADD_S:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fadd_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+        break;
-+    case OPC_RISC_FSUB_S:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fsub_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+        break;
-+    case OPC_RISC_FMUL_S:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fmul_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+        break;
-+    case OPC_RISC_FDIV_S:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fdiv_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+        break;
-+    case OPC_RISC_FSQRT_S:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fsqrt_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1]);
-+        break;
-+    case OPC_RISC_FSGNJ_S:
-+        gen_fsgnj(ctx, rd, rs1, rs2, rm, INT32_MIN);
-+        break;
-+
-+    case OPC_RISC_FMIN_S:
-+        /* also handles: OPC_RISC_FMAX_S */
-+        switch (rm) {
-+        case 0x0:
-+            gen_helper_fmin_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+            break;
-+        case 0x1:
-+            gen_helper_fmax_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+            break;
-+        default:
-+            goto do_illegal;
-+        }
-+        break;
-+
-+    case OPC_RISC_FEQ_S:
-+        /* also handles: OPC_RISC_FLT_S, OPC_RISC_FLE_S */
-+        t0 = tcg_temp_new();
-+        switch (rm) {
-+        case 0x0:
-+            gen_helper_fle_s(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+            break;
-+        case 0x1:
-+            gen_helper_flt_s(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+            break;
-+        case 0x2:
-+            gen_helper_feq_s(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+            break;
-+        default:
-+            goto do_illegal;
-+        }
-+        gen_set_gpr(rd, t0);
-+        tcg_temp_free(t0);
-+        break;
-+
-+    case OPC_RISC_FCVT_W_S:
-+        /* also OPC_RISC_FCVT_WU_S, OPC_RISC_FCVT_L_S, OPC_RISC_FCVT_LU_S */
-+        t0 = tcg_temp_new();
-+        switch (rs2) {
-+        case 0: /* FCVT_W_S */
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_w_s(t0, cpu_env, cpu_fpr[rs1]);
-+            break;
-+        case 1: /* FCVT_WU_S */
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_wu_s(t0, cpu_env, cpu_fpr[rs1]);
-+            break;
-+#if defined(TARGET_RISCV64)
-+        case 2: /* FCVT_L_S */
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_l_s(t0, cpu_env, cpu_fpr[rs1]);
-+            break;
-+        case 3: /* FCVT_LU_S */
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_lu_s(t0, cpu_env, cpu_fpr[rs1]);
-+            break;
-+#endif
-+        default:
-+            goto do_illegal;
-+        }
-+        gen_set_gpr(rd, t0);
-+        tcg_temp_free(t0);
-+        break;
-+
-+    case OPC_RISC_FCVT_S_W:
-+        /* also OPC_RISC_FCVT_S_WU, OPC_RISC_FCVT_S_L, OPC_RISC_FCVT_S_LU */
-+        t0 = tcg_temp_new();
-+        gen_get_gpr(t0, rs1);
-+        switch (rs2) {
-+        case 0: /* FCVT_S_W */
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_s_w(cpu_fpr[rd], cpu_env, t0);
-+            break;
-+        case 1: /* FCVT_S_WU */
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_s_wu(cpu_fpr[rd], cpu_env, t0);
-+            break;
-+#if defined(TARGET_RISCV64)
-+        case 2: /* FCVT_S_L */
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_s_l(cpu_fpr[rd], cpu_env, t0);
-+            break;
-+        case 3: /* FCVT_S_LU */
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_s_lu(cpu_fpr[rd], cpu_env, t0);
-+            break;
-+#endif
-+        default:
-+            goto do_illegal;
-+        }
-+        tcg_temp_free(t0);
-+        break;
-+
-+    case OPC_RISC_FMV_X_S:
-+        /* also OPC_RISC_FCLASS_S */
-+        t0 = tcg_temp_new();
-+        switch (rm) {
-+        case 0: /* FMV */
-+#if defined(TARGET_RISCV64)
-+            tcg_gen_ext32s_tl(t0, cpu_fpr[rs1]);
++struct target_pt_regs {
++    abi_long sepc;
++    abi_long ra;
++    abi_long sp;
++    abi_long gp;
++    abi_long tp;
++    abi_long t0;
++    abi_long t1;
++    abi_long t2;
++    abi_long s0;
++    abi_long s1;
++    abi_long a0;
++    abi_long a1;
++    abi_long a2;
++    abi_long a3;
++    abi_long a4;
++    abi_long a5;
++    abi_long a6;
++    abi_long a7;
++    abi_long s2;
++    abi_long s3;
++    abi_long s4;
++    abi_long s5;
++    abi_long s6;
++    abi_long s7;
++    abi_long s8;
++    abi_long s9;
++    abi_long s10;
++    abi_long s11;
++    abi_long t3;
++    abi_long t4;
++    abi_long t5;
++    abi_long t6;
++};
++
++#ifdef TARGET_RISCV32
++#define UNAME_MACHINE "riscv32"
 +#else
-+            tcg_gen_extrl_i64_i32(t0, cpu_fpr[rs1]);
++#define UNAME_MACHINE "riscv64"
 +#endif
-+            break;
-+        case 1:
-+            gen_helper_fclass_s(t0, cpu_fpr[rs1]);
-+            break;
-+        default:
-+            goto do_illegal;
-+        }
-+        gen_set_gpr(rd, t0);
-+        tcg_temp_free(t0);
-+        break;
++#define UNAME_MINIMUM_RELEASE "3.8.0"
 +
-+    case OPC_RISC_FMV_S_X:
-+        t0 = tcg_temp_new();
-+        gen_get_gpr(t0, rs1);
-+#if defined(TARGET_RISCV64)
-+        tcg_gen_mov_i64(cpu_fpr[rd], t0);
-+#else
-+        tcg_gen_extu_i32_i64(cpu_fpr[rd], t0);
++#define TARGET_MINSIGSTKSZ 2048
++#define TARGET_MLOCKALL_MCL_CURRENT 1
++#define TARGET_MLOCKALL_MCL_FUTURE  2
++
++/* clone(flags, newsp, ptidptr, tls, ctidptr) for RISC-V */
++/* This comes from linux/kernel/fork.c, CONFIG_CLONE_BACKWARDS */
++#define TARGET_CLONE_BACKWARDS
+diff --git a/linux-user/riscv/termbits.h b/linux-user/riscv/termbits.h
+new file mode 100644
+index 0000000..7e4e230
+--- /dev/null
++++ b/linux-user/riscv/termbits.h
+@@ -0,0 +1,222 @@
++/* from asm/termbits.h */
++/* NOTE: exactly the same as i386 */
++
++#define TARGET_NCCS 19
++
++struct target_termios {
++    unsigned int c_iflag;               /* input mode flags */
++    unsigned int c_oflag;               /* output mode flags */
++    unsigned int c_cflag;               /* control mode flags */
++    unsigned int c_lflag;               /* local mode flags */
++    unsigned char c_line;               /* line discipline */
++    unsigned char c_cc[TARGET_NCCS];    /* control characters */
++};
++
++/* c_iflag bits */
++#define TARGET_IGNBRK  0000001
++#define TARGET_BRKINT  0000002
++#define TARGET_IGNPAR  0000004
++#define TARGET_PARMRK  0000010
++#define TARGET_INPCK   0000020
++#define TARGET_ISTRIP  0000040
++#define TARGET_INLCR   0000100
++#define TARGET_IGNCR   0000200
++#define TARGET_ICRNL   0000400
++#define TARGET_IUCLC   0001000
++#define TARGET_IXON    0002000
++#define TARGET_IXANY   0004000
++#define TARGET_IXOFF   0010000
++#define TARGET_IMAXBEL 0020000
++#define TARGET_IUTF8   0040000
++
++/* c_oflag bits */
++#define TARGET_OPOST   0000001
++#define TARGET_OLCUC   0000002
++#define TARGET_ONLCR   0000004
++#define TARGET_OCRNL   0000010
++#define TARGET_ONOCR   0000020
++#define TARGET_ONLRET  0000040
++#define TARGET_OFILL   0000100
++#define TARGET_OFDEL   0000200
++#define TARGET_NLDLY   0000400
++#define   TARGET_NL0   0000000
++#define   TARGET_NL1   0000400
++#define TARGET_CRDLY   0003000
++#define   TARGET_CR0   0000000
++#define   TARGET_CR1   0001000
++#define   TARGET_CR2   0002000
++#define   TARGET_CR3   0003000
++#define TARGET_TABDLY  0014000
++#define   TARGET_TAB0  0000000
++#define   TARGET_TAB1  0004000
++#define   TARGET_TAB2  0010000
++#define   TARGET_TAB3  0014000
++#define   TARGET_XTABS 0014000
++#define TARGET_BSDLY   0020000
++#define   TARGET_BS0   0000000
++#define   TARGET_BS1   0020000
++#define TARGET_VTDLY   0040000
++#define   TARGET_VT0   0000000
++#define   TARGET_VT1   0040000
++#define TARGET_FFDLY   0100000
++#define   TARGET_FF0   0000000
++#define   TARGET_FF1   0100000
++
++/* c_cflag bit meaning */
++#define TARGET_CBAUD   0010017
++#define  TARGET_B0     0000000         /* hang up */
++#define  TARGET_B50    0000001
++#define  TARGET_B75    0000002
++#define  TARGET_B110   0000003
++#define  TARGET_B134   0000004
++#define  TARGET_B150   0000005
++#define  TARGET_B200   0000006
++#define  TARGET_B300   0000007
++#define  TARGET_B600   0000010
++#define  TARGET_B1200  0000011
++#define  TARGET_B1800  0000012
++#define  TARGET_B2400  0000013
++#define  TARGET_B4800  0000014
++#define  TARGET_B9600  0000015
++#define  TARGET_B19200 0000016
++#define  TARGET_B38400 0000017
++#define TARGET_EXTA B19200
++#define TARGET_EXTB B38400
++#define TARGET_CSIZE   0000060
++#define   TARGET_CS5   0000000
++#define   TARGET_CS6   0000020
++#define   TARGET_CS7   0000040
++#define   TARGET_CS8   0000060
++#define TARGET_CSTOPB  0000100
++#define TARGET_CREAD   0000200
++#define TARGET_PARENB  0000400
++#define TARGET_PARODD  0001000
++#define TARGET_HUPCL   0002000
++#define TARGET_CLOCAL  0004000
++#define TARGET_CBAUDEX 0010000
++#define  TARGET_B57600  0010001
++#define  TARGET_B115200 0010002
++#define  TARGET_B230400 0010003
++#define  TARGET_B460800 0010004
++#define TARGET_CIBAUD    002003600000  /* input baud rate (not used) */
++#define TARGET_CMSPAR    010000000000  /* mark or space (stick) parity */
++#define TARGET_CRTSCTS   020000000000  /* flow control */
++
++/* c_lflag bits */
++#define TARGET_ISIG    0000001
++#define TARGET_ICANON  0000002
++#define TARGET_XCASE   0000004
++#define TARGET_ECHO    0000010
++#define TARGET_ECHOE   0000020
++#define TARGET_ECHOK   0000040
++#define TARGET_ECHONL  0000100
++#define TARGET_NOFLSH  0000200
++#define TARGET_TOSTOP  0000400
++#define TARGET_ECHOCTL 0001000
++#define TARGET_ECHOPRT 0002000
++#define TARGET_ECHOKE  0004000
++#define TARGET_FLUSHO  0010000
++#define TARGET_PENDIN  0040000
++#define TARGET_IEXTEN  0100000
++
++/* c_cc character offsets */
++#define TARGET_VINTR    0
++#define TARGET_VQUIT    1
++#define TARGET_VERASE   2
++#define TARGET_VKILL    3
++#define TARGET_VEOF     4
++#define TARGET_VTIME    5
++#define TARGET_VMIN     6
++#define TARGET_VSWTC    7
++#define TARGET_VSTART   8
++#define TARGET_VSTOP    9
++#define TARGET_VSUSP    10
++#define TARGET_VEOL     11
++#define TARGET_VREPRINT 12
++#define TARGET_VDISCARD 13
++#define TARGET_VWERASE  14
++#define TARGET_VLNEXT   15
++#define TARGET_VEOL2    16
++
++/* ioctls */
++
++#define TARGET_TCGETS           0x5401
++#define TARGET_TCSETS           0x5402
++#define TARGET_TCSETSW          0x5403
++#define TARGET_TCSETSF          0x5404
++#define TARGET_TCGETA           0x5405
++#define TARGET_TCSETA           0x5406
++#define TARGET_TCSETAW          0x5407
++#define TARGET_TCSETAF          0x5408
++#define TARGET_TCSBRK           0x5409
++#define TARGET_TCXONC           0x540A
++#define TARGET_TCFLSH           0x540B
++
++#define TARGET_TIOCEXCL         0x540C
++#define TARGET_TIOCNXCL         0x540D
++#define TARGET_TIOCSCTTY        0x540E
++#define TARGET_TIOCGPGRP        0x540F
++#define TARGET_TIOCSPGRP        0x5410
++#define TARGET_TIOCOUTQ         0x5411
++#define TARGET_TIOCSTI          0x5412
++#define TARGET_TIOCGWINSZ       0x5413
++#define TARGET_TIOCSWINSZ       0x5414
++#define TARGET_TIOCMGET         0x5415
++#define TARGET_TIOCMBIS         0x5416
++#define TARGET_TIOCMBIC         0x5417
++#define TARGET_TIOCMSET         0x5418
++#define TARGET_TIOCGSOFTCAR     0x5419
++#define TARGET_TIOCSSOFTCAR     0x541A
++#define TARGET_FIONREAD         0x541B
++#define TARGET_TIOCINQ          TARGET_FIONREAD
++#define TARGET_TIOCLINUX        0x541C
++#define TARGET_TIOCCONS         0x541D
++#define TARGET_TIOCGSERIAL      0x541E
++#define TARGET_TIOCSSERIAL      0x541F
++#define TARGET_TIOCPKT          0x5420
++#define TARGET_FIONBIO          0x5421
++#define TARGET_TIOCNOTTY        0x5422
++#define TARGET_TIOCSETD         0x5423
++#define TARGET_TIOCGETD         0x5424
++#define TARGET_TCSBRKP          0x5425 /* Needed for POSIX tcsendbreak() */
++#define TARGET_TIOCTTYGSTRUCT   0x5426 /* For debugging only */
++#define TARGET_TIOCSBRK         0x5427 /* BSD compatibility */
++#define TARGET_TIOCCBRK         0x5428 /* BSD compatibility */
++#define TARGET_TIOCGSID         0x5429 /* Return the session ID of FD */
++#define TARGET_TIOCGPTN         TARGET_IOR('T', 0x30, unsigned int)
++        /* Get Pty Number (of pty-mux device) */
++#define TARGET_TIOCSPTLCK       TARGET_IOW('T', 0x31, int)
++        /* Lock/unlock Pty */
++#define TARGET_TIOCGPTPEER      TARGET_IO('T', 0x41)
++        /* Safely open the slave */
++
++#define TARGET_FIONCLEX         0x5450  /* these numbers need to be adjusted. */
++#define TARGET_FIOCLEX          0x5451
++#define TARGET_FIOASYNC         0x5452
++#define TARGET_TIOCSERCONFIG    0x5453
++#define TARGET_TIOCSERGWILD     0x5454
++#define TARGET_TIOCSERSWILD     0x5455
++#define TARGET_TIOCGLCKTRMIOS   0x5456
++#define TARGET_TIOCSLCKTRMIOS   0x5457
++#define TARGET_TIOCSERGSTRUCT   0x5458 /* For debugging only */
++#define TARGET_TIOCSERGETLSR    0x5459 /* Get line status register */
++#define TARGET_TIOCSERGETMULTI  0x545A /* Get multiport config  */
++#define TARGET_TIOCSERSETMULTI  0x545B /* Set multiport config */
++
++#define TARGET_TIOCMIWAIT      0x545C
++        /* wait for a change on serial input line(s) */
++#define TARGET_TIOCGICOUNT     0x545D
++        /* read serial port inline interrupt counts */
++#define TARGET_TIOCGHAYESESP   0x545E  /* Get Hayes ESP configuration */
++#define TARGET_TIOCSHAYESESP   0x545F  /* Set Hayes ESP configuration */
++
++/* Used for packet mode */
++#define TARGET_TIOCPKT_DATA              0
++#define TARGET_TIOCPKT_FLUSHREAD         1
++#define TARGET_TIOCPKT_FLUSHWRITE        2
++#define TARGET_TIOCPKT_STOP              4
++#define TARGET_TIOCPKT_START             8
++#define TARGET_TIOCPKT_NOSTOP           16
++#define TARGET_TIOCPKT_DOSTOP           32
++
++#define TARGET_TIOCSER_TEMT    0x01 /* Transmitter physically empty */
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index 9a380b9..4d3f244 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -535,6 +535,7 @@ static void force_sig(int sig)
+  * up the signal frame. oldsig is the signal we were trying to handle
+  * at the point of failure.
+  */
++#if !defined(TARGET_RISCV)
+ static void force_sigsegv(int oldsig)
+ {
+     if (oldsig == SIGSEGV) {
+@@ -547,6 +548,8 @@ static void force_sigsegv(int oldsig)
+ }
+ #endif
+ 
 +#endif
-+        tcg_temp_free(t0);
-+        break;
 +
-+    /* double */
-+    case OPC_RISC_FADD_D:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fadd_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+        break;
-+    case OPC_RISC_FSUB_D:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fsub_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+        break;
-+    case OPC_RISC_FMUL_D:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fmul_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+        break;
-+    case OPC_RISC_FDIV_D:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fdiv_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+        break;
-+    case OPC_RISC_FSQRT_D:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fsqrt_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1]);
-+        break;
-+    case OPC_RISC_FSGNJ_D:
-+        gen_fsgnj(ctx, rd, rs1, rs2, rm, INT64_MIN);
-+        break;
+ /* abort execution with signal */
+ static void QEMU_NORETURN dump_core_and_abort(int target_sig)
+ {
+@@ -6385,6 +6388,203 @@ long do_rt_sigreturn(CPUTLGState *env)
+     return -TARGET_QEMU_ESIGRETURN;
+ }
+ 
++#elif defined(TARGET_RISCV)
 +
-+    case OPC_RISC_FMIN_D:
-+        /* also OPC_RISC_FMAX_D */
-+        switch (rm) {
-+        case 0:
-+            gen_helper_fmin_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+            break;
-+        case 1:
-+            gen_helper_fmax_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+            break;
-+        default:
-+            goto do_illegal;
-+        }
-+        break;
++/* Signal handler invocation must be transparent for the code being
++   interrupted. Complete CPU (hart) state is saved on entry and restored
++   before returning from the handler. Process sigmask is also saved to block
++   signals while the handler is running. The handler gets its own stack,
++   which also doubles as storage for the CPU state and sigmask.
 +
-+    case OPC_RISC_FCVT_S_D:
-+        switch (rs2) {
-+        case 1:
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_s_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1]);
-+            break;
-+        default:
-+            goto do_illegal;
-+        }
-+        break;
++   The code below is qemu re-implementation of arch/riscv/kernel/signal.c */
 +
-+    case OPC_RISC_FCVT_D_S:
-+        switch (rs2) {
-+        case 0:
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_d_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1]);
-+            break;
-+        default:
-+            goto do_illegal;
-+        }
-+        break;
++struct target_sigcontext {
++    abi_long pc;
++    abi_long gpr[31]; /* x0 is not present, so all offsets must be -1 */
++    uint64_t fpr[32];
++    uint32_t fcsr;
++}; /* cf. riscv-linux:arch/riscv/include/uapi/asm/ptrace.h */
 +
-+    case OPC_RISC_FEQ_D:
-+        /* also OPC_RISC_FLT_D, OPC_RISC_FLE_D */
-+        t0 = tcg_temp_new();
-+        switch (rm) {
-+        case 0:
-+            gen_helper_fle_d(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+            break;
-+        case 1:
-+            gen_helper_flt_d(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+            break;
-+        case 2:
-+            gen_helper_feq_d(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+            break;
-+        default:
-+            goto do_illegal;
-+        }
-+        gen_set_gpr(rd, t0);
-+        tcg_temp_free(t0);
-+        break;
++struct target_ucontext {
++    unsigned long uc_flags;
++    struct target_ucontext *uc_link;
++    target_stack_t uc_stack;
++    struct target_sigcontext uc_mcontext;
++    target_sigset_t uc_sigmask;
++};
 +
-+    case OPC_RISC_FCVT_W_D:
-+        /* also OPC_RISC_FCVT_WU_D, OPC_RISC_FCVT_L_D, OPC_RISC_FCVT_LU_D */
-+        t0 = tcg_temp_new();
-+        switch (rs2) {
-+        case 0:
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_w_d(t0, cpu_env, cpu_fpr[rs1]);
-+            break;
-+        case 1:
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_wu_d(t0, cpu_env, cpu_fpr[rs1]);
-+            break;
-+#if defined(TARGET_RISCV64)
-+        case 2:
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_l_d(t0, cpu_env, cpu_fpr[rs1]);
-+            break;
-+        case 3:
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_lu_d(t0, cpu_env, cpu_fpr[rs1]);
-+            break;
-+#endif
-+        default:
-+            goto do_illegal;
-+        }
-+        gen_set_gpr(rd, t0);
-+        tcg_temp_free(t0);
-+        break;
++struct target_rt_sigframe {
++    uint32_t tramp[2]; /* not in kernel, which uses VDSO instead */
++    struct target_siginfo info;
++    struct target_ucontext uc;
++};
 +
-+    case OPC_RISC_FCVT_D_W:
-+        /* also OPC_RISC_FCVT_D_WU, OPC_RISC_FCVT_D_L, OPC_RISC_FCVT_D_LU */
-+        t0 = tcg_temp_new();
-+        gen_get_gpr(t0, rs1);
-+        switch (rs2) {
-+        case 0:
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_d_w(cpu_fpr[rd], cpu_env, t0);
-+            break;
-+        case 1:
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_d_wu(cpu_fpr[rd], cpu_env, t0);
-+            break;
-+#if defined(TARGET_RISCV64)
-+        case 2:
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_d_l(cpu_fpr[rd], cpu_env, t0);
-+            break;
-+        case 3:
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_d_lu(cpu_fpr[rd], cpu_env, t0);
-+            break;
-+#endif
-+        default:
-+            goto do_illegal;
-+        }
-+        tcg_temp_free(t0);
-+        break;
-+
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_FMV_X_D:
-+        /* also OPC_RISC_FCLASS_D */
-+        switch (rm) {
-+        case 0: /* FMV */
-+            gen_set_gpr(rd, cpu_fpr[rs1]);
-+            break;
-+        case 1:
-+            t0 = tcg_temp_new();
-+            gen_helper_fclass_d(t0, cpu_fpr[rs1]);
-+            gen_set_gpr(rd, t0);
-+            tcg_temp_free(t0);
-+            break;
-+        default:
-+            goto do_illegal;
-+        }
-+        break;
-+
-+    case OPC_RISC_FMV_D_X:
-+        t0 = tcg_temp_new();
-+        gen_get_gpr(t0, rs1);
-+        tcg_gen_mov_tl(cpu_fpr[rd], t0);
-+        tcg_temp_free(t0);
-+        break;
-+#endif
-+
-+    default:
-+    do_illegal:
-+        if (t0) {
-+            tcg_temp_free(t0);
-+        }
-+        gen_exception_illegal(ctx);
-+        break;
-+    }
-+}
-+
-+static void gen_system(DisasContext *ctx, uint32_t opc,
-+                      int rd, int rs1, int csr)
++static abi_ulong get_sigframe(struct target_sigaction *ka,
++                              CPURISCVState *regs, size_t framesize)
 +{
-+    TCGv source1, csr_store, dest, rs1_pass, imm_rs1;
-+    source1 = tcg_temp_new();
-+    csr_store = tcg_temp_new();
-+    dest = tcg_temp_new();
-+    rs1_pass = tcg_temp_new();
-+    imm_rs1 = tcg_temp_new();
-+    gen_get_gpr(source1, rs1);
-+    tcg_gen_movi_tl(cpu_pc, ctx->pc);
-+    tcg_gen_movi_tl(rs1_pass, rs1);
-+    tcg_gen_movi_tl(csr_store, csr); /* copy into temp reg to feed to helper */
++    abi_ulong sp = regs->gpr[xSP];
++    int onsigstack = on_sig_stack(sp);
 +
-+#ifndef CONFIG_USER_ONLY
-+    /* Extract funct7 value and check whether it matches SFENCE.VMA */
-+    if ((opc == OPC_RISC_ECALL) && ((csr >> 5) == 9)) {
-+        /* sfence.vma */
-+        /* TODO: handle ASID specific fences */
-+        gen_helper_tlb_flush(cpu_env);
-+        return;
++    /* redzone */
++    /* This is the X/Open sanctioned signal stack switching.  */
++    if ((ka->sa_flags & TARGET_SA_ONSTACK) != 0 && !onsigstack) {
++        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
 +    }
-+#endif
 +
-+    switch (opc) {
-+    case OPC_RISC_ECALL:
-+        switch (csr) {
-+        case 0x0: /* ECALL */
-+            /* always generates U-level ECALL, fixed in do_interrupt handler */
-+            generate_exception(ctx, RISCV_EXCP_U_ECALL);
-+            tcg_gen_exit_tb(0); /* no chaining */
-+            ctx->bstate = BS_BRANCH;
-+            break;
-+        case 0x1: /* EBREAK */
-+            generate_exception(ctx, RISCV_EXCP_BREAKPOINT);
-+            tcg_gen_exit_tb(0); /* no chaining */
-+            ctx->bstate = BS_BRANCH;
-+            break;
-+#ifndef CONFIG_USER_ONLY
-+        case 0x002: /* URET */
-+            gen_exception_illegal(ctx);
-+            break;
-+        case 0x102: /* SRET */
-+            gen_helper_sret(cpu_pc, cpu_env, cpu_pc);
-+            tcg_gen_exit_tb(0); /* no chaining */
-+            ctx->bstate = BS_BRANCH;
-+            break;
-+        case 0x202: /* HRET */
-+            gen_exception_illegal(ctx);
-+            break;
-+        case 0x302: /* MRET */
-+            gen_helper_mret(cpu_pc, cpu_env, cpu_pc);
-+            tcg_gen_exit_tb(0); /* no chaining */
-+            ctx->bstate = BS_BRANCH;
-+            break;
-+        case 0x7b2: /* DRET */
-+            gen_exception_illegal(ctx);
-+            break;
-+        case 0x105: /* WFI */
-+            tcg_gen_movi_tl(cpu_pc, ctx->next_pc);
-+            gen_helper_wfi(cpu_env);
-+            break;
-+        case 0x104: /* SFENCE.VM */
-+            gen_helper_tlb_flush(cpu_env);
-+            break;
-+#endif
-+        default:
-+            gen_exception_illegal(ctx);
-+            break;
-+        }
-+        break;
-+    default:
-+        tcg_gen_movi_tl(imm_rs1, rs1);
-+        switch (opc) {
-+        case OPC_RISC_CSRRW:
-+            gen_helper_csrrw(dest, cpu_env, source1, csr_store);
-+            break;
-+        case OPC_RISC_CSRRS:
-+            gen_helper_csrrs(dest, cpu_env, source1, csr_store, rs1_pass);
-+            break;
-+        case OPC_RISC_CSRRC:
-+            gen_helper_csrrc(dest, cpu_env, source1, csr_store, rs1_pass);
-+            break;
-+        case OPC_RISC_CSRRWI:
-+            gen_helper_csrrw(dest, cpu_env, imm_rs1, csr_store);
-+            break;
-+        case OPC_RISC_CSRRSI:
-+            gen_helper_csrrs(dest, cpu_env, imm_rs1, csr_store, rs1_pass);
-+            break;
-+        case OPC_RISC_CSRRCI:
-+            gen_helper_csrrc(dest, cpu_env, imm_rs1, csr_store, rs1_pass);
-+            break;
-+        default:
-+            gen_exception_illegal(ctx);
-+            return;
-+        }
-+        gen_set_gpr(rd, dest);
-+        /* end tb since we may be changing priv modes, to get mmu_index right */
-+        tcg_gen_movi_tl(cpu_pc, ctx->next_pc);
-+        tcg_gen_exit_tb(0); /* no chaining */
-+        ctx->bstate = BS_BRANCH;
-+        break;
++    sp -= framesize;
++    sp &= ~3UL; /* align sp on 4-byte boundary */
++
++    /* If we are on the alternate signal stack and would overflow it, don't.
++       Return an always-bogus address instead so we will die with SIGSEGV. */
++    if (onsigstack && !likely(on_sig_stack(sp))) {
++        return -1L;
 +    }
-+    tcg_temp_free(source1);
-+    tcg_temp_free(csr_store);
-+    tcg_temp_free(dest);
-+    tcg_temp_free(rs1_pass);
-+    tcg_temp_free(imm_rs1);
++
++    return sp;
 +}
 +
-+static void decode_RV32_64C0(DisasContext *ctx)
-+{
-+    uint8_t funct3 = extract32(ctx->opcode, 13, 3);
-+    uint8_t rd_rs2 = GET_C_RS2S(ctx->opcode);
-+    uint8_t rs1s = GET_C_RS1S(ctx->opcode);
-+
-+    switch (funct3) {
-+    case 0:
-+        /* illegal */
-+        if (ctx->opcode == 0) {
-+            gen_exception_illegal(ctx);
-+        } else {
-+            /* C.ADDI4SPN -> addi rd', x2, zimm[9:2]*/
-+            gen_arith_imm(ctx, OPC_RISC_ADDI, rd_rs2, 2,
-+                          GET_C_ADDI4SPN_IMM(ctx->opcode));
-+        }
-+        break;
-+    case 1:
-+        /* C.FLD -> fld rd', offset[7:3](rs1')*/
-+        gen_fp_load(ctx, OPC_RISC_FLD, rd_rs2, rs1s,
-+                    GET_C_LD_IMM(ctx->opcode));
-+        /* C.LQ(RV128) */
-+        break;
-+    case 2:
-+        /* C.LW -> lw rd', offset[6:2](rs1') */
-+        gen_load(ctx, OPC_RISC_LW, rd_rs2, rs1s,
-+                 GET_C_LW_IMM(ctx->opcode));
-+        break;
-+    case 3:
-+#if defined(TARGET_RISCV64)
-+        /* C.LD(RV64/128) -> ld rd', offset[7:3](rs1')*/
-+        gen_load(ctx, OPC_RISC_LD, rd_rs2, rs1s,
-+                 GET_C_LD_IMM(ctx->opcode));
-+#else
-+        /* C.FLW (RV32) -> flw rd', offset[6:2](rs1')*/
-+        gen_fp_load(ctx, OPC_RISC_FLW, rd_rs2, rs1s,
-+                    GET_C_LW_IMM(ctx->opcode));
-+#endif
-+        break;
-+    case 4:
-+        /* reserved */
-+        gen_exception_illegal(ctx);
-+        break;
-+    case 5:
-+        /* C.FSD(RV32/64) -> fsd rs2', offset[7:3](rs1') */
-+        gen_fp_store(ctx, OPC_RISC_FSD, rs1s, rd_rs2,
-+                     GET_C_LD_IMM(ctx->opcode));
-+        /* C.SQ (RV128) */
-+        break;
-+    case 6:
-+        /* C.SW -> sw rs2', offset[6:2](rs1')*/
-+        gen_store(ctx, OPC_RISC_SW, rs1s, rd_rs2,
-+                  GET_C_LW_IMM(ctx->opcode));
-+        break;
-+    case 7:
-+#if defined(TARGET_RISCV64)
-+        /* C.SD (RV64/128) -> sd rs2', offset[7:3](rs1')*/
-+        gen_store(ctx, OPC_RISC_SD, rs1s, rd_rs2,
-+                  GET_C_LD_IMM(ctx->opcode));
-+#else
-+        /* C.FSW (RV32) -> fsw rs2', offset[6:2](rs1')*/
-+        gen_fp_store(ctx, OPC_RISC_FSW, rs1s, rd_rs2,
-+                     GET_C_LW_IMM(ctx->opcode));
-+#endif
-+        break;
-+    }
-+}
-+
-+static void decode_RV32_64C1(CPURISCVState *env, DisasContext *ctx)
-+{
-+    uint8_t funct3 = extract32(ctx->opcode, 13, 3);
-+    uint8_t rd_rs1 = GET_C_RS1(ctx->opcode);
-+    uint8_t rs1s, rs2s;
-+    uint8_t funct2;
-+
-+    switch (funct3) {
-+    case 0:
-+        /* C.ADDI -> addi rd, rd, nzimm[5:0] */
-+        gen_arith_imm(ctx, OPC_RISC_ADDI, rd_rs1, rd_rs1,
-+                      GET_C_IMM(ctx->opcode));
-+        break;
-+    case 1:
-+#if defined(TARGET_RISCV64)
-+        /* C.ADDIW (RV64/128) -> addiw rd, rd, imm[5:0]*/
-+        gen_arith_imm(ctx, OPC_RISC_ADDIW, rd_rs1, rd_rs1,
-+                      GET_C_IMM(ctx->opcode));
-+#else
-+        /* C.JAL(RV32) -> jal x1, offset[11:1] */
-+        gen_jal(env, ctx, 1, GET_C_J_IMM(ctx->opcode));
-+#endif
-+        break;
-+    case 2:
-+        /* C.LI -> addi rd, x0, imm[5:0]*/
-+        gen_arith_imm(ctx, OPC_RISC_ADDI, rd_rs1, 0, GET_C_IMM(ctx->opcode));
-+        break;
-+    case 3:
-+        if (rd_rs1 == 2) {
-+            /* C.ADDI16SP -> addi x2, x2, nzimm[9:4]*/
-+            gen_arith_imm(ctx, OPC_RISC_ADDI, 2, 2,
-+                          GET_C_ADDI16SP_IMM(ctx->opcode));
-+        } else if (rd_rs1 != 0) {
-+            /* C.LUI (rs1/rd =/= {0,2}) -> lui rd, nzimm[17:12]*/
-+            tcg_gen_movi_tl(cpu_gpr[rd_rs1],
-+                            GET_C_IMM(ctx->opcode) << 12);
-+        }
-+        break;
-+    case 4:
-+        funct2 = extract32(ctx->opcode, 10, 2);
-+        rs1s = GET_C_RS1S(ctx->opcode);
-+        switch (funct2) {
-+        case 0: /* C.SRLI(RV32) -> srli rd', rd', shamt[5:0] */
-+            gen_arith_imm(ctx, OPC_RISC_SHIFT_RIGHT_I, rs1s, rs1s,
-+                               GET_C_ZIMM(ctx->opcode));
-+            /* C.SRLI64(RV128) */
-+            break;
-+        case 1:
-+            /* C.SRAI -> srai rd', rd', shamt[5:0]*/
-+            gen_arith_imm(ctx, OPC_RISC_SHIFT_RIGHT_I, rs1s, rs1s,
-+                            GET_C_ZIMM(ctx->opcode) | 0x400);
-+            /* C.SRAI64(RV128) */
-+            break;
-+        case 2:
-+            /* C.ANDI -> andi rd', rd', imm[5:0]*/
-+            gen_arith_imm(ctx, OPC_RISC_ANDI, rs1s, rs1s,
-+                          GET_C_IMM(ctx->opcode));
-+            break;
-+        case 3:
-+            funct2 = extract32(ctx->opcode, 5, 2);
-+            rs2s = GET_C_RS2S(ctx->opcode);
-+            switch (funct2) {
-+            case 0:
-+                /* C.SUB -> sub rd', rd', rs2' */
-+                if (extract32(ctx->opcode, 12, 1) == 0) {
-+                    gen_arith(ctx, OPC_RISC_SUB, rs1s, rs1s, rs2s);
-+                }
-+#if defined(TARGET_RISCV64)
-+                else {
-+                    gen_arith(ctx, OPC_RISC_SUBW, rs1s, rs1s, rs2s);
-+                }
-+#endif
-+                break;
-+            case 1:
-+                /* C.XOR -> xor rs1', rs1', rs2' */
-+                if (extract32(ctx->opcode, 12, 1) == 0) {
-+                    gen_arith(ctx, OPC_RISC_XOR, rs1s, rs1s, rs2s);
-+                }
-+#if defined(TARGET_RISCV64)
-+                else {
-+                    /* C.ADDW (RV64/128) */
-+                    gen_arith(ctx, OPC_RISC_ADDW, rs1s, rs1s, rs2s);
-+                }
-+#endif
-+                break;
-+            case 2:
-+                /* C.OR -> or rs1', rs1', rs2' */
-+                gen_arith(ctx, OPC_RISC_OR, rs1s, rs1s, rs2s);
-+                break;
-+            case 3:
-+                /* C.AND -> and rs1', rs1', rs2' */
-+                gen_arith(ctx, OPC_RISC_AND, rs1s, rs1s, rs2s);
-+                break;
-+            }
-+            break;
-+        }
-+        break;
-+    case 5:
-+        /* C.J -> jal x0, offset[11:1]*/
-+        gen_jal(env, ctx, 0, GET_C_J_IMM(ctx->opcode));
-+        break;
-+    case 6:
-+        /* C.BEQZ -> beq rs1', x0, offset[8:1]*/
-+        rs1s = GET_C_RS1S(ctx->opcode);
-+        gen_branch(env, ctx, OPC_RISC_BEQ, rs1s, 0, GET_C_B_IMM(ctx->opcode));
-+        break;
-+    case 7:
-+        /* C.BNEZ -> bne rs1', x0, offset[8:1]*/
-+        rs1s = GET_C_RS1S(ctx->opcode);
-+        gen_branch(env, ctx, OPC_RISC_BNE, rs1s, 0, GET_C_B_IMM(ctx->opcode));
-+        break;
-+    }
-+}
-+
-+static void decode_RV32_64C2(CPURISCVState *env, DisasContext *ctx)
-+{
-+    uint8_t rd, rs2;
-+    uint8_t funct3 = extract32(ctx->opcode, 13, 3);
-+
-+
-+    rd = GET_RD(ctx->opcode);
-+
-+    switch (funct3) {
-+    case 0: /* C.SLLI -> slli rd, rd, shamt[5:0]
-+               C.SLLI64 -> */
-+        gen_arith_imm(ctx, OPC_RISC_SLLI, rd, rd, GET_C_ZIMM(ctx->opcode));
-+        break;
-+    case 1: /* C.FLDSP(RV32/64DC) -> fld rd, offset[8:3](x2) */
-+        gen_fp_load(ctx, OPC_RISC_FLD, rd, 2, GET_C_LDSP_IMM(ctx->opcode));
-+        break;
-+    case 2: /* C.LWSP -> lw rd, offset[7:2](x2) */
-+        gen_load(ctx, OPC_RISC_LW, rd, 2, GET_C_LWSP_IMM(ctx->opcode));
-+        break;
-+    case 3:
-+#if defined(TARGET_RISCV64)
-+        /* C.LDSP(RVC64) -> ld rd, offset[8:3](x2) */
-+        gen_load(ctx, OPC_RISC_LD, rd, 2, GET_C_LDSP_IMM(ctx->opcode));
-+#else
-+        /* C.FLWSP(RV32FC) -> flw rd, offset[7:2](x2) */
-+        gen_fp_load(ctx, OPC_RISC_FLW, rd, 2, GET_C_LWSP_IMM(ctx->opcode));
-+#endif
-+        break;
-+    case 4:
-+        rs2 = GET_C_RS2(ctx->opcode);
-+
-+        if (extract32(ctx->opcode, 12, 1) == 0) {
-+            if (rs2 == 0) {
-+                /* C.JR -> jalr x0, rs1, 0*/
-+                gen_jalr(env, ctx, OPC_RISC_JALR, 0, rd, 0);
-+            } else {
-+                /* C.MV -> add rd, x0, rs2 */
-+                gen_arith(ctx, OPC_RISC_ADD, rd, 0, rs2);
-+            }
-+        } else {
-+            if (rd == 0) {
-+                /* C.EBREAK -> ebreak*/
-+                gen_system(ctx, OPC_RISC_ECALL, 0, 0, 0x1);
-+            } else {
-+                if (rs2 == 0) {
-+                    /* C.JALR -> jalr x1, rs1, 0*/
-+                    gen_jalr(env, ctx, OPC_RISC_JALR, 1, rd, 0);
-+                } else {
-+                    /* C.ADD -> add rd, rd, rs2 */
-+                    gen_arith(ctx, OPC_RISC_ADD, rd, rd, rs2);
-+                }
-+            }
-+        }
-+        break;
-+    case 5:
-+        /* C.FSDSP -> fsd rs2, offset[8:3](x2)*/
-+        gen_fp_store(ctx, OPC_RISC_FSD, 2, GET_C_RS2(ctx->opcode),
-+                     GET_C_SDSP_IMM(ctx->opcode));
-+        /* C.SQSP */
-+        break;
-+    case 6: /* C.SWSP -> sw rs2, offset[7:2](x2)*/
-+        gen_store(ctx, OPC_RISC_SW, 2, GET_C_RS2(ctx->opcode),
-+                  GET_C_SWSP_IMM(ctx->opcode));
-+        break;
-+    case 7:
-+#if defined(TARGET_RISCV64)
-+        /* C.SDSP(Rv64/128) -> sd rs2, offset[8:3](x2)*/
-+        gen_store(ctx, OPC_RISC_SD, 2, GET_C_RS2(ctx->opcode),
-+                  GET_C_SDSP_IMM(ctx->opcode));
-+#else
-+        /* C.FSWSP(RV32) -> fsw rs2, offset[7:2](x2) */
-+        gen_fp_store(ctx, OPC_RISC_FSW, 2, GET_C_RS2(ctx->opcode),
-+                     GET_C_SWSP_IMM(ctx->opcode));
-+#endif
-+        break;
-+    }
-+}
-+
-+static void decode_RV32_64C(CPURISCVState *env, DisasContext *ctx)
-+{
-+    uint8_t op = extract32(ctx->opcode, 0, 2);
-+
-+    switch (op) {
-+    case 0:
-+        decode_RV32_64C0(ctx);
-+        break;
-+    case 1:
-+        decode_RV32_64C1(env, ctx);
-+        break;
-+    case 2:
-+        decode_RV32_64C2(env, ctx);
-+        break;
-+    }
-+}
-+
-+static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
-+{
-+    int rs1;
-+    int rs2;
-+    int rd;
-+    uint32_t op;
-+    target_long imm;
-+
-+    /* We do not do misaligned address check here: the address should never be
-+     * misaligned at this point. Instructions that set PC must do the check,
-+     * since epc must be the address of the instruction that caused us to
-+     * perform the misaligned instruction fetch */
-+
-+    op = MASK_OP_MAJOR(ctx->opcode);
-+    rs1 = GET_RS1(ctx->opcode);
-+    rs2 = GET_RS2(ctx->opcode);
-+    rd = GET_RD(ctx->opcode);
-+    imm = GET_IMM(ctx->opcode);
-+
-+    switch (op) {
-+    case OPC_RISC_LUI:
-+        if (rd == 0) {
-+            break; /* NOP */
-+        }
-+        tcg_gen_movi_tl(cpu_gpr[rd], sextract64(ctx->opcode, 12, 20) << 12);
-+        break;
-+    case OPC_RISC_AUIPC:
-+        if (rd == 0) {
-+            break; /* NOP */
-+        }
-+        tcg_gen_movi_tl(cpu_gpr[rd], (sextract64(ctx->opcode, 12, 20) << 12) +
-+               ctx->pc);
-+        break;
-+    case OPC_RISC_JAL:
-+        imm = GET_JAL_IMM(ctx->opcode);
-+        gen_jal(env, ctx, rd, imm);
-+        break;
-+    case OPC_RISC_JALR:
-+        gen_jalr(env, ctx, MASK_OP_JALR(ctx->opcode), rd, rs1, imm);
-+        break;
-+    case OPC_RISC_BRANCH:
-+        gen_branch(env, ctx, MASK_OP_BRANCH(ctx->opcode), rs1, rs2,
-+                   GET_B_IMM(ctx->opcode));
-+        break;
-+    case OPC_RISC_LOAD:
-+        gen_load(ctx, MASK_OP_LOAD(ctx->opcode), rd, rs1, imm);
-+        break;
-+    case OPC_RISC_STORE:
-+        gen_store(ctx, MASK_OP_STORE(ctx->opcode), rs1, rs2,
-+                  GET_STORE_IMM(ctx->opcode));
-+        break;
-+    case OPC_RISC_ARITH_IMM:
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_ARITH_IMM_W:
-+#endif
-+        if (rd == 0) {
-+            break; /* NOP */
-+        }
-+        gen_arith_imm(ctx, MASK_OP_ARITH_IMM(ctx->opcode), rd, rs1, imm);
-+        break;
-+    case OPC_RISC_ARITH:
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_ARITH_W:
-+#endif
-+        if (rd == 0) {
-+            break; /* NOP */
-+        }
-+        gen_arith(ctx, MASK_OP_ARITH(ctx->opcode), rd, rs1, rs2);
-+        break;
-+    case OPC_RISC_FP_LOAD:
-+        gen_fp_load(ctx, MASK_OP_FP_LOAD(ctx->opcode), rd, rs1, imm);
-+        break;
-+    case OPC_RISC_FP_STORE:
-+        gen_fp_store(ctx, MASK_OP_FP_STORE(ctx->opcode), rs1, rs2,
-+                     GET_STORE_IMM(ctx->opcode));
-+        break;
-+    case OPC_RISC_ATOMIC:
-+        gen_atomic(ctx, MASK_OP_ATOMIC(ctx->opcode), rd, rs1, rs2);
-+        break;
-+    case OPC_RISC_FMADD:
-+        gen_fp_fmadd(ctx, MASK_OP_FP_FMADD(ctx->opcode), rd, rs1, rs2,
-+                     GET_RS3(ctx->opcode), GET_RM(ctx->opcode));
-+        break;
-+    case OPC_RISC_FMSUB:
-+        gen_fp_fmsub(ctx, MASK_OP_FP_FMSUB(ctx->opcode), rd, rs1, rs2,
-+                     GET_RS3(ctx->opcode), GET_RM(ctx->opcode));
-+        break;
-+    case OPC_RISC_FNMSUB:
-+        gen_fp_fnmsub(ctx, MASK_OP_FP_FNMSUB(ctx->opcode), rd, rs1, rs2,
-+                      GET_RS3(ctx->opcode), GET_RM(ctx->opcode));
-+        break;
-+    case OPC_RISC_FNMADD:
-+        gen_fp_fnmadd(ctx, MASK_OP_FP_FNMADD(ctx->opcode), rd, rs1, rs2,
-+                      GET_RS3(ctx->opcode), GET_RM(ctx->opcode));
-+        break;
-+    case OPC_RISC_FP_ARITH:
-+        gen_fp_arith(ctx, MASK_OP_FP_ARITH(ctx->opcode), rd, rs1, rs2,
-+                     GET_RM(ctx->opcode));
-+        break;
-+    case OPC_RISC_FENCE:
-+#ifndef CONFIG_USER_ONLY
-+        if (ctx->opcode & 0x1000) {
-+            /* FENCE_I is a no-op in QEMU,
-+             * however we need to end the translation block */
-+            tcg_gen_movi_tl(cpu_pc, ctx->next_pc);
-+            tcg_gen_exit_tb(0);
-+            ctx->bstate = BS_BRANCH;
-+        } else {
-+            /* FENCE is a full memory barrier. */
-+            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
-+        }
-+#endif
-+        break;
-+    case OPC_RISC_SYSTEM:
-+        gen_system(ctx, MASK_OP_SYSTEM(ctx->opcode), rd, rs1,
-+                   (ctx->opcode & 0xFFF00000) >> 20);
-+        break;
-+    default:
-+        gen_exception_illegal(ctx);
-+        break;
-+    }
-+}
-+
-+static void decode_opc(CPURISCVState *env, DisasContext *ctx)
-+{
-+    /* check for compressed insn */
-+    if (extract32(ctx->opcode, 0, 2) != 3) {
-+        if (!riscv_has_ext(env, RVC)) {
-+            gen_exception_illegal(ctx);
-+        } else {
-+            ctx->next_pc = ctx->pc + 2;
-+            decode_RV32_64C(env, ctx);
-+        }
-+    } else {
-+        ctx->next_pc = ctx->pc + 4;
-+        decode_RV32_64G(env, ctx);
-+    }
-+}
-+
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-+{
-+    CPURISCVState *env = cs->env_ptr;
-+    DisasContext ctx;
-+    target_ulong pc_start;
-+    target_ulong next_page_start;
-+    int num_insns;
-+    int max_insns;
-+    pc_start = tb->pc;
-+    next_page_start = (pc_start & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
-+    ctx.pc = pc_start;
-+
-+    /* once we have GDB, the rest of the translate.c implementation should be
-+       ready for singlestep */
-+    ctx.singlestep_enabled = cs->singlestep_enabled;
-+
-+    ctx.tb = tb;
-+    ctx.bstate = BS_NONE;
-+    ctx.flags = tb->flags;
-+    ctx.mem_idx = tb->flags & TB_FLAGS_MMU_MASK;
-+    ctx.frm = -1;  /* unknown rounding mode */
-+
-+    num_insns = 0;
-+    max_insns = tb->cflags & CF_COUNT_MASK;
-+    if (max_insns == 0) {
-+        max_insns = CF_COUNT_MASK;
-+    }
-+    if (max_insns > TCG_MAX_INSNS) {
-+        max_insns = TCG_MAX_INSNS;
-+    }
-+    gen_tb_start(tb);
-+
-+    while (ctx.bstate == BS_NONE) {
-+        tcg_gen_insn_start(ctx.pc);
-+        num_insns++;
-+
-+        if (unlikely(cpu_breakpoint_test(cs, ctx.pc, BP_ANY))) {
-+            tcg_gen_movi_tl(cpu_pc, ctx.pc);
-+            ctx.bstate = BS_BRANCH;
-+            gen_exception_debug();
-+            /* The address covered by the breakpoint must be included in
-+               [tb->pc, tb->pc + tb->size) in order to for it to be
-+               properly cleared -- thus we increment the PC here so that
-+               the logic setting tb->size below does the right thing.  */
-+            ctx.pc += 4;
-+            goto done_generating;
-+        }
-+
-+        if (num_insns == max_insns && (tb->cflags & CF_LAST_IO)) {
-+            gen_io_start();
-+        }
-+
-+        ctx.opcode = cpu_ldl_code(env, ctx.pc);
-+        decode_opc(env, &ctx);
-+        ctx.pc = ctx.next_pc;
-+
-+        if (cs->singlestep_enabled) {
-+            break;
-+        }
-+        if (ctx.pc >= next_page_start) {
-+            break;
-+        }
-+        if (tcg_op_buf_full()) {
-+            break;
-+        }
-+        if (num_insns >= max_insns) {
-+            break;
-+        }
-+        if (singlestep) {
-+            break;
-+        }
-+
-+    }
-+    if (tb->cflags & CF_LAST_IO) {
-+        gen_io_end();
-+    }
-+    switch (ctx.bstate) {
-+    case BS_STOP:
-+        gen_goto_tb(&ctx, 0, ctx.pc);
-+        break;
-+    case BS_NONE: /* handle end of page - DO NOT CHAIN. See gen_goto_tb. */
-+        tcg_gen_movi_tl(cpu_pc, ctx.pc);
-+        if (cs->singlestep_enabled) {
-+            gen_exception_debug();
-+        } else {
-+            tcg_gen_exit_tb(0);
-+        }
-+        break;
-+    case BS_BRANCH: /* ops using BS_BRANCH generate own exit seq */
-+    default:
-+        break;
-+    }
-+done_generating:
-+    gen_tb_end(tb, num_insns);
-+    tb->size = ctx.pc - pc_start;
-+    tb->icount = num_insns;
-+
-+#ifdef DEBUG_DISAS
-+    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
-+        && qemu_log_in_addr_range(pc_start)) {
-+        qemu_log("IN: %s\n", lookup_symbol(pc_start));
-+        log_target_disas(cs, pc_start, ctx.pc - pc_start);
-+        qemu_log("\n");
-+    }
-+#endif
-+}
-+
-+void riscv_translate_init(void)
++static void setup_sigcontext(struct target_sigcontext *sc, CPURISCVState *env)
 +{
 +    int i;
 +
-+    /* cpu_gpr[0] is a placeholder for the zero register. Do not use it. */
-+    /* Use the gen_set_gpr and gen_get_gpr helper functions when accessing */
-+    /* registers, unless you specifically block reads/writes to reg 0 */
-+    cpu_gpr[0] = NULL;
++    __put_user(env->pc, &sc->pc);
 +
 +    for (i = 1; i < 32; i++) {
-+        cpu_gpr[i] = tcg_global_mem_new(cpu_env,
-+            offsetof(CPURISCVState, gpr[i]), riscv_int_regnames[i]);
++        __put_user(env->gpr[i], &sc->gpr[i - 1]);
 +    }
-+
 +    for (i = 0; i < 32; i++) {
-+        cpu_fpr[i] = tcg_global_mem_new_i64(cpu_env,
-+            offsetof(CPURISCVState, fpr[i]), riscv_fpr_regnames[i]);
++        __put_user(env->fpr[i], &sc->fpr[i]);
 +    }
 +
-+    cpu_pc = tcg_global_mem_new(cpu_env, offsetof(CPURISCVState, pc), "pc");
-+    load_res = tcg_global_mem_new(cpu_env, offsetof(CPURISCVState, load_res),
-+                             "load_res");
-+    load_val = tcg_global_mem_new(cpu_env, offsetof(CPURISCVState, load_val),
-+                             "load_val");
++    uint32_t fcsr = csr_read_helper(env, CSR_FCSR); /*riscv_get_fcsr(env);*/
++    __put_user(fcsr, &sc->fcsr);
 +}
++
++static void setup_ucontext(struct target_ucontext *uc,
++                           CPURISCVState *env, target_sigset_t *set)
++{
++    abi_ulong ss_sp = (target_ulong)target_sigaltstack_used.ss_sp;
++    abi_ulong ss_flags = sas_ss_flags(env->gpr[xSP]);
++    abi_ulong ss_size = target_sigaltstack_used.ss_size;
++
++    __put_user(0,    &(uc->uc_flags));
++    __put_user(0,    &(uc->uc_link));
++
++    __put_user(ss_sp,    &(uc->uc_stack.ss_sp));
++    __put_user(ss_flags, &(uc->uc_stack.ss_flags));
++    __put_user(ss_size,  &(uc->uc_stack.ss_size));
++
++    int i;
++    for (i = 0; i < TARGET_NSIG_WORDS; i++) {
++        __put_user(set->sig[i], &(uc->uc_sigmask.sig[i]));
++    }
++
++    setup_sigcontext(&uc->uc_mcontext, env);
++}
++
++static inline void install_sigtramp(uint32_t *tramp)
++{
++    __put_user(0x08b00893, tramp + 0);  /* li a7, 139 = __NR_rt_sigreturn */
++    __put_user(0x00000073, tramp + 1);  /* ecall */
++}
++
++static void setup_rt_frame(int sig, struct target_sigaction *ka,
++                           target_siginfo_t *info,
++                           target_sigset_t *set, CPURISCVState *env)
++{
++    abi_ulong frame_addr;
++    struct target_rt_sigframe *frame;
++
++    frame_addr = get_sigframe(ka, env, sizeof(*frame));
++    trace_user_setup_rt_frame(env, frame_addr);
++
++    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
++        goto badframe;
++    }
++
++    setup_ucontext(&frame->uc, env, set);
++    tswap_siginfo(&frame->info, info);
++    install_sigtramp(frame->tramp);
++
++    env->pc = ka->_sa_handler;
++    env->gpr[xSP] = frame_addr;
++    env->gpr[xA0] = sig;
++    env->gpr[xA1] = frame_addr + offsetof(struct target_rt_sigframe, info);
++    env->gpr[xA2] = frame_addr + offsetof(struct target_rt_sigframe, uc);
++    env->gpr[xRA] = frame_addr + offsetof(struct target_rt_sigframe, tramp);
++
++    return;
++
++badframe:
++    unlock_user_struct(frame, frame_addr, 1);
++    if (sig == TARGET_SIGSEGV) {
++        ka->_sa_handler = TARGET_SIG_DFL;
++    }
++    force_sig(TARGET_SIGSEGV);
++}
++
++static void restore_sigcontext(CPURISCVState *env, struct target_sigcontext *sc)
++{
++    int i;
++
++    __get_user(env->pc, &sc->pc);
++
++    for (i = 1; i < 32; ++i) {
++        __get_user(env->gpr[i], &sc->gpr[i - 1]);
++    }
++    for (i = 0; i < 32; ++i) {
++        __get_user(env->fpr[i], &sc->fpr[i]);
++    }
++
++    uint32_t fcsr;
++    __get_user(fcsr, &sc->fcsr);
++    csr_write_helper(env, fcsr, CSR_FCSR);
++}
++
++static void restore_ucontext(CPURISCVState *env, struct target_ucontext *uc)
++{
++    sigset_t blocked;
++    target_sigset_t target_set;
++    int i;
++
++    target_sigemptyset(&target_set);
++    for (i = 0; i < TARGET_NSIG_WORDS; i++) {
++        __get_user(target_set.sig[i], &(uc->uc_sigmask.sig[i]));
++    }
++
++    target_to_host_sigset_internal(&blocked, &target_set);
++    set_sigmask(&blocked);
++
++    restore_sigcontext(env, &uc->uc_mcontext);
++}
++
++long do_rt_sigreturn(CPURISCVState *env)
++{
++    struct target_rt_sigframe *frame;
++    abi_ulong frame_addr;
++
++    frame_addr = env->gpr[xSP];
++    trace_user_do_sigreturn(env, frame_addr);
++    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1)) {
++        goto badframe;
++    }
++
++    restore_ucontext(env, &frame->uc);
++
++    if (do_sigaltstack(frame_addr + offsetof(struct target_rt_sigframe,
++            uc.uc_stack), 0, get_sp_from_cpustate(env)) == -EFAULT) {
++        goto badframe;
++    }
++
++    unlock_user_struct(frame, frame_addr, 0);
++    return -TARGET_QEMU_ESIGRETURN;
++
++badframe:
++    unlock_user_struct(frame, frame_addr, 0);
++    force_sig(TARGET_SIGSEGV);
++    return 0;
++}
++
+ #elif defined(TARGET_HPPA)
+ 
+ struct target_sigcontext {
+@@ -6676,7 +6876,8 @@ static void handle_pending_signal(CPUArchState *cpu_env, int sig,
+ #if defined(TARGET_ABI_MIPSN32) || defined(TARGET_ABI_MIPSN64) \
+         || defined(TARGET_OPENRISC) || defined(TARGET_TILEGX) \
+         || defined(TARGET_PPC64) || defined(TARGET_HPPA) \
+-        || defined(TARGET_NIOS2) || defined(TARGET_X86_64)
++        || defined(TARGET_NIOS2) || defined(TARGET_X86_64) \
++        || defined(TARGET_RISCV)
+         /* These targets do not have traditional signals.  */
+         setup_rt_frame(sig, sa, &k->info, &target_old_set, cpu_env);
+ #else
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index e24f43c..a8abfd4 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -8555,9 +8555,11 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+     case TARGET_NR_ioctl:
+         ret = do_ioctl(arg1, arg2, arg3);
+         break;
++#ifdef TARGET_NR_fcntl
+     case TARGET_NR_fcntl:
+         ret = do_fcntl(arg1, arg2, arg3);
+         break;
++#endif
+ #ifdef TARGET_NR_mpx
+     case TARGET_NR_mpx:
+         goto unimplemented;
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index a35c52a..e00e1b3 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -71,7 +71,7 @@
+     || defined(TARGET_M68K) || defined(TARGET_CRIS) \
+     || defined(TARGET_UNICORE32) || defined(TARGET_S390X) \
+     || defined(TARGET_OPENRISC) || defined(TARGET_TILEGX) \
+-    || defined(TARGET_NIOS2)
++    || defined(TARGET_NIOS2) || defined(TARGET_RISCV)
+ 
+ #define TARGET_IOC_SIZEBITS	14
+ #define TARGET_IOC_DIRBITS	2
+@@ -435,7 +435,8 @@ int do_sigaction(int sig, const struct target_sigaction *act,
+     || defined(TARGET_M68K) || defined(TARGET_ALPHA) || defined(TARGET_CRIS) \
+     || defined(TARGET_MICROBLAZE) || defined(TARGET_UNICORE32) \
+     || defined(TARGET_S390X) || defined(TARGET_OPENRISC) \
+-    || defined(TARGET_TILEGX) || defined(TARGET_HPPA) || defined(TARGET_NIOS2)
++    || defined(TARGET_TILEGX) || defined(TARGET_HPPA) || defined(TARGET_NIOS2) \
++    || defined(TARGET_RISCV)
+ 
+ #if defined(TARGET_SPARC)
+ #define TARGET_SA_NOCLDSTOP    8u
+@@ -2093,7 +2094,7 @@ struct target_stat {
+     unsigned int __unused[2];
+ };
+ #elif defined(TARGET_OPENRISC) || defined(TARGET_TILEGX) || \
+-      defined(TARGET_NIOS2)
++      defined(TARGET_NIOS2) || defined(TARGET_RISCV)
+ 
+ /* These are the asm-generic versions of the stat and stat64 structures */
+ 
+@@ -2120,6 +2121,7 @@ struct target_stat {
+     unsigned int __unused5;
+ };
+ 
++#if !defined(TARGET_RISCV64)
+ #define TARGET_HAS_STRUCT_STAT64
+ struct target_stat64 {
+     uint64_t st_dev;
+@@ -2143,6 +2145,7 @@ struct target_stat64 {
+     unsigned int __unused4;
+     unsigned int __unused5;
+ };
++#endif
+ 
+ #elif defined(TARGET_HPPA)
+ 
+@@ -2258,8 +2261,8 @@ struct target_statfs64 {
+ 	uint32_t	f_spare[6];
+ };
+ #elif (defined(TARGET_PPC64) || defined(TARGET_X86_64) || \
+-       defined(TARGET_SPARC64) || defined(TARGET_AARCH64)) && \
+-       !defined(TARGET_ABI32)
++       defined(TARGET_SPARC64) || defined(TARGET_AARCH64) || \
++       defined(TARGET_RISCV)) && !defined(TARGET_ABI32)
+ struct target_statfs {
+ 	abi_long f_type;
+ 	abi_long f_bsize;
+diff --git a/target/riscv/cpu_user.h b/target/riscv/cpu_user.h
+new file mode 100644
+index 0000000..c219961
+--- /dev/null
++++ b/target/riscv/cpu_user.h
+@@ -0,0 +1,13 @@
++#define xRA 1   /* return address (aka link register) */
++#define xSP 2   /* stack pointer */
++#define xGP 3   /* global pointer */
++#define xTP 4   /* thread pointer */
++
++#define xA0 10  /* gpr[10-17] are syscall arguments */
++#define xA1 11
++#define xA2 12
++#define xA3 13
++#define xA4 14
++#define xA5 15
++#define xA6 16
++#define xA7 17  /* syscall number goes here */
 -- 
 2.7.0
