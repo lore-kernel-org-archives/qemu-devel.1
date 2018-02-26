@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eqHtq-0007o5-5U
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 07:28:59 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eqHvC-0000iG-SN
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 07:30:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eqHtp-0008Sr-Af
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 07:28:58 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eqHv7-0000mx-4w
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 07:30:22 -0500
 References: <20180223192549.26666-1-kwolf@redhat.com>
-	<20180223192549.26666-28-kwolf@redhat.com>
+	<20180223192549.26666-29-kwolf@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <65fe215a-62b2-f94f-97fe-615ce0d15487@redhat.com>
-Date: Mon, 26 Feb 2018 13:28:46 +0100
+Message-ID: <6b40fa10-795e-32b4-33ef-9c69d31c18ee@redhat.com>
+Date: Mon, 26 Feb 2018 13:30:03 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180223192549.26666-28-kwolf@redhat.com>
+In-Reply-To: <20180223192549.26666-29-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="aaF3fu3s36FBEAdodYQ0Qv0h4NHBOsUDt"
-Subject: Re: [Qemu-devel] [PATCH v3 27/36] sheepdog: QAPIfy "redundancy"
- create option
+	boundary="4grnIq1Xhbpw0Dzw1DeUUr8ek0zvLDJQo"
+Subject: Re: [Qemu-devel] [PATCH v3 28/36] sheepdog: Support .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,78 +28,50 @@ To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aaF3fu3s36FBEAdodYQ0Qv0h4NHBOsUDt
+--4grnIq1Xhbpw0Dzw1DeUUr8ek0zvLDJQo
 From: Max Reitz <mreitz@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com,
  jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com,
  qemu-devel@nongnu.org
-Message-ID: <65fe215a-62b2-f94f-97fe-615ce0d15487@redhat.com>
-Subject: Re: [PATCH v3 27/36] sheepdog: QAPIfy "redundancy" create option
+Message-ID: <6b40fa10-795e-32b4-33ef-9c69d31c18ee@redhat.com>
+Subject: Re: [PATCH v3 28/36] sheepdog: Support .bdrv_co_create
 References: <20180223192549.26666-1-kwolf@redhat.com>
- <20180223192549.26666-28-kwolf@redhat.com>
-In-Reply-To: <20180223192549.26666-28-kwolf@redhat.com>
+ <20180223192549.26666-29-kwolf@redhat.com>
+In-Reply-To: <20180223192549.26666-29-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 2018-02-23 20:25, Kevin Wolf wrote:
-> The "redundancy" option for Sheepdog image creation is currently a
-> string that can encode one or two integers depending on its format,
-> which at the same time implicitly selects a mode.
->=20
-> This patch turns it into a QAPI union and converts the string into such=
-
-> a QAPI object before interpreting the values.
+> This adds the .bdrv_co_create driver callback to sheepdog, which enable=
+s
+> image creation over QMP.
 >=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
 > ---
->  qapi/block-core.json | 45 +++++++++++++++++++++++++
->  block/sheepdog.c     | 94 +++++++++++++++++++++++++++++++++++++-------=
+>  qapi/block-core.json |  24 ++++-
+>  block/sheepdog.c     | 242 +++++++++++++++++++++++++++++++++++--------=
 --------
->  2 files changed, 112 insertions(+), 27 deletions(-)
+>  2 files changed, 191 insertions(+), 75 deletions(-)
 
-[...]
-
-> @@ -1907,35 +1950,32 @@ static int parse_redundancy(BDRVSheepdogState *=
-s, const char *opt)
->          return -EINVAL;
->      }
-> =20
-> -    copy =3D strtol(n1, NULL, 10);
-> -    /* FIXME fix error checking by switching to qemu_strtol() */
-> -    if (copy > SD_MAX_COPIES || copy < 1) {
-> -        return -EINVAL;
-> -    }
-> -    if (!n2) {
-> -        inode->copy_policy =3D 0;
-> -        inode->nr_copies =3D copy;
-> -        return 0;
-> +    ret =3D qemu_strtol(n1, NULL, 10, &copy);
-
-(By the way: This was what I was thanking you for in v2 -- I just now
-realized I was clever enough not to point to it in my reply...)
-
-> +    if (ret < 0) {
-> +        return ret;
->      }
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---aaF3fu3s36FBEAdodYQ0Qv0h4NHBOsUDt
+--4grnIq1Xhbpw0Dzw1DeUUr8ek0zvLDJQo
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqT/X4SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ABcwIALIWgU40WGgBeVL9SwgdsaWDqPwB90Lf
-yBEB/dXO79Ae6JY0RAdt6lbT0addXx+sgqWFthtE/tT+oggMEkHRDq3X3uNPDK8p
-DXq3SsLTAQ8ahvDv45V6hUUjS5u9xImX+xE4WSSv8DQzBVbUTYh63z9d0PYv+4bk
-6vI208JcuBriqNs31fBoQuRB+lSvX5iKK0uyJNdCbqijWVjnjbrsy53X8ilVP7Zq
-Gkq21MxN9Wyl5o75DdAPALxUaHCSW8k9MVayderJMeIhuSqSfubI0pnnoA2wI2cZ
-D4sPjCOAH76a+qMHkvLSxWTSukywYR7ZTHJ+ea0HpsgASYznzv1PcPE=
-=kluO
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqT/csSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9Ao4YH/R5KPk8v1tBR3Ty6EdxciS1Rcs9jeN+O
+SgCA5zwvtet21zJ4R1j8q3drthEa6w9PJ157AXTq9sm6hFVS1VDuuHX983T6sRgy
+aIdJfzYLStrhjLCPsvz6qZSm9zGuKASmJAsjUXnXnnqIQxbWL/epLCT12LXjNoFh
+RBVXQQnoW8VG3w0Y45zzhyNJpeJ7Oe0IVi5LII0d+OxMivsMQeX2q9GTwnfXhVo9
+XYqyN+gee6GglrtXZuuNSjOu1h8d2kaQp9y9qroPui7+NtVz/9YHY8H1Et+QRXC5
+gugXl7LmR8pHAoBJNbBCHugrgLQ1fSJofFYSLKWqulKacKRFyvKF054=
+=hOy2
 -----END PGP SIGNATURE-----
 
---aaF3fu3s36FBEAdodYQ0Qv0h4NHBOsUDt--
+--4grnIq1Xhbpw0Dzw1DeUUr8ek0zvLDJQo--
