@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eqQ26-0007pe-D6
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 16:10:04 -0500
+	(envelope-from <mjc@sifive.com>) id 1eqR77-0005zg-Ma
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:19:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eqQ23-0003Vg-6M
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 16:10:02 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37902)
+	(envelope-from <mjc@sifive.com>) id 1eqR76-0004mZ-Lc
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:19:17 -0500
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:41841)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eqQ23-0003VM-0L
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 16:09:59 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eqQ21-0007JB-7f
-	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 21:09:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3661F2E80C7
-	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 21:09:57 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 26 Feb 2018 20:57:01 -0000
-From: Thomas Huth <1429034@bugs.launchpad.net>
-Reply-To: Bug 1429034 <1429034@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150306094424.12161.38872.malonedeb@gac.canonical.com>
-Message-Id: <151967862111.11992.6445597541270964944.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1429034] Re: qemu abort in qemu_coroutine_enter
- when multi-thread writing
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eqR76-0004mN-GI
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:19:16 -0500
+Received: by mail-pl0-x241.google.com with SMTP id k8so10118849pli.8
+	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 14:19:16 -0800 (PST)
+From: Michael Clark <mjc@sifive.com>
+Date: Tue, 27 Feb 2018 11:17:38 +1300
+Message-Id: <1519683480-33201-2-git-send-email-mjc@sifive.com>
+In-Reply-To: <1519683480-33201-1-git-send-email-mjc@sifive.com>
+References: <1519683480-33201-1-git-send-email-mjc@sifive.com>
+Subject: [Qemu-devel] [PATCH v7 01/23] RISC-V Maintainers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,62 +26,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
 
-Triaging old bug tickets... can you still reproduce this issue with the
-latest version of QEMU? Or could we close this ticket nowadays?
+Add Michael Clark, Palmer Dabbelt, Sagar Karandikar and Bastian
+Koppelmann as RISC-V Maintainers.
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Signed-off-by: Michael Clark <mjc@sifive.com>
+---
+ MAINTAINERS | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1429034
-
-Title:
-  qemu abort in qemu_coroutine_enter when multi-thread writing
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  qemu release version: 2.2.0
-  platform: x86_64
-
-  qemu would be aborted when there are two threads to write two seperate
-  qcow2 files.
-
-  call stack:
-
-  #0 0x7ffff5e18989	__GI_raise(sig=3Dsig@entry=3D6) (../nptl/sysdeps/unix/s=
-ysv/linux/raise.c:56)
-  #1 0x7ffff5e1a098	__GI_abort() (abort.c:90)
-  #2 0x7ffff728c034	qemu_coroutine_enter(co=3D0x7fffe0004800, opaque=3D0x0)=
- (qemu-coroutine.c:117)
-  #3 0x7ffff727df39	bdrv_co_io_em_complete(opaque=3D0x7ffff7fd6ae0, ret=3D0=
-) (block.c:4847)
-  #4 0x7ffff7270314	thread_pool_completion_bh(opaque=3D0x7fffe0006ad0) (thr=
-ead-pool.c:187)
-  #5 0x7ffff726f873	aio_bh_poll(ctx=3D0x7fffe0001d00) (async.c:82)
-  #6 0x7ffff728340b	aio_dispatch(ctx=3D0x7fffe0001d00) (aio-posix.c:137)
-  #7 0x7ffff72837b0	aio_poll(ctx=3D0x7fffe0001d00, blocking=3Dtrue) (aio-po=
-six.c:248)
-  #8 ??	0x00007ffff72795a8 in bdrv_prwv_co (bs=3D0x7fffdc0021c0, offset=3D1=
-2071639552, qiov=3D0x7fffe67fa590, is_write=3Dtrue, flags=3D(unknown: 0)) (=
-block.c:2703)
-  #9 ??	0x00007ffff727966a in bdrv_rw_co (bs=3D0x7fffdc0021c0, sector_num=
-=3D23577421, buf=3D0x7fffe4629250 "\234\b\335=C7=BC\254\213q\301\366\315=3D=
-\005oI\301\245=3D\373\004+2?H\212\025\035+\262\274C;X\301FaP\324\335\061=D2=
-=9D&Y\316=3D\347\335\020\365\003go=C9=BF\214\312S=3D\v2]\373\363C\311\341\3=
-34\r5k\346k\204\332\023\264\315=E9=99=8C\230\203J\222u\214\066", nb_sectors=
-=3D128, is_write=3Dtrue, flags=3D(unknown: 0)) (block.c:2726)
-  #10 0x7ffff7279758	bdrv_write(bs=3D0x7fffdc0021c0, sector_num=3D23577421,=
- buf=3D0x7fffe4629250 "\234\b\335=C7=BC\254\213q\301\366\315=3D\005oI\301\2=
-45=3D\373\004+2?H\212\025\035+\262\274C;X\301FaP\324\335\061=D2=9D&Y\316=3D=
-\347\335\020\365\003go=C9=BF\214\312S=3D\v2]\373\363C\311\341\334\r5k\346k\=
-204\332\023\264\315=E9=99=8C\230\203J\222u\214\066", nb_sectors=3D128) (blo=
-ck.c:2760)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1429034/+subscriptions
+diff --git a/MAINTAINERS b/MAINTAINERS
+index a334a25..858ab51 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -233,6 +233,17 @@ F: hw/ppc/
+ F: include/hw/ppc/
+ F: disas/ppc.c
+ 
++RISC-V
++M: Michael Clark <mjc@sifive.com>
++M: Palmer Dabbelt <palmer@sifive.com>
++M: Sagar Karandikar <sagark@eecs.berkeley.edu>
++M: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
++S: Maintained
++F: target/riscv/
++F: hw/riscv/
++F: include/hw/riscv/
++F: disas/riscv.c
++
+ S390
+ M: Richard Henderson <rth@twiddle.net>
+ M: Alexander Graf <agraf@suse.de>
+-- 
+2.7.0
