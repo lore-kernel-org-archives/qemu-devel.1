@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1eqHtX-0007YN-Lo
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 07:28:40 -0500
+	(envelope-from <jianjay.zhou@huawei.com>) id 1eqHtX-0007YM-LT
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 07:28:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1eqHtW-0008NL-O6
+	(envelope-from <jianjay.zhou@huawei.com>) id 1eqHtU-0008MQ-DA
 	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 07:28:39 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2169 helo=huawei.com)
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2168 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1eqHtV-0008Ku-VX
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 07:28:38 -0500
+	id 1eqHtS-0008KT-Dp
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 07:28:36 -0500
 From: Jay Zhou <jianjay.zhou@huawei.com>
-Date: Mon, 26 Feb 2018 20:27:37 +0800
-Message-ID: <0596094b09f50289bf9d6a48cebd1cd211bfd20b.1519647019.git.arei.gonglei@huawei.com>
+Date: Mon, 26 Feb 2018 20:27:34 +0800
+Message-ID: <4218e0d4888dfe9aae04f2440a233cf2aa560304.1519647019.git.arei.gonglei@huawei.com>
 In-Reply-To: <cover.1519647019.git.arei.gonglei@huawei.com>
 References: <cover.1519647019.git.arei.gonglei@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v7 4/4] cryptodev-vhost-user: set the key length
+Subject: [Qemu-devel] [PATCH v7 1/4] cryptodev: add vhost-user as a new
+ cryptodev backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +32,743 @@ Cc: mst@redhat.com, pbonzini@redhat.com, weidong.huang@huawei.com, stefanha@redh
 
 From: Gonglei <arei.gonglei@huawei.com>
 
-Signed-off-by: Gonglei <arei.gonglei@huawei.com>
----
- backends/cryptodev-vhost-user.c       | 4 ++++
- include/sysemu/cryptodev-vhost-user.h | 3 +++
- 2 files changed, 7 insertions(+)
+Usage:
+ -chardev socket,id=charcrypto0,path=/path/to/your/socket
+ -object cryptodev-vhost-user,id=cryptodev0,chardev=charcrypto0
+ -device virtio-crypto-pci,id=crypto0,cryptodev=cryptodev0
 
+Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+---
+ backends/Makefile.objs           |   6 +
+ backends/cryptodev-vhost-user.c  | 331 +++++++++++++++++++++++++++++++++++++++
+ backends/cryptodev-vhost.c       |  89 +++++++++++
+ configure                        |  15 ++
+ include/sysemu/cryptodev-vhost.h | 154 ++++++++++++++++++
+ qemu-options.hx                  |  21 +++
+ vl.c                             |   6 +
+ 7 files changed, 622 insertions(+)
+ create mode 100644 backends/cryptodev-vhost-user.c
+ create mode 100644 backends/cryptodev-vhost.c
+ create mode 100644 include/sysemu/cryptodev-vhost.h
+
+diff --git a/backends/Makefile.objs b/backends/Makefile.objs
+index 67eeeba..9b7face 100644
+--- a/backends/Makefile.objs
++++ b/backends/Makefile.objs
+@@ -9,4 +9,10 @@ common-obj-$(CONFIG_LINUX) += hostmem-file.o
+ common-obj-y += cryptodev.o
+ common-obj-y += cryptodev-builtin.o
+ 
++ifeq ($(CONFIG_VIRTIO),y)
++common-obj-$(CONFIG_LINUX) += cryptodev-vhost.o
++common-obj-$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX)) += \
++    cryptodev-vhost-user.o
++endif
++
+ common-obj-$(CONFIG_LINUX) += hostmem-memfd.o
 diff --git a/backends/cryptodev-vhost-user.c b/backends/cryptodev-vhost-user.c
-index 9cd06c4..862d4f2 100644
---- a/backends/cryptodev-vhost-user.c
+new file mode 100644
+index 0000000..93c3f10
+--- /dev/null
 +++ b/backends/cryptodev-vhost-user.c
-@@ -224,6 +224,10 @@ static void cryptodev_vhost_user_init(
-                          1u << VIRTIO_CRYPTO_SERVICE_MAC;
-     backend->conf.cipher_algo_l = 1u << VIRTIO_CRYPTO_CIPHER_AES_CBC;
-     backend->conf.hash_algo = 1u << VIRTIO_CRYPTO_HASH_SHA1;
+@@ -0,0 +1,331 @@
++/*
++ * QEMU Cryptodev backend for QEMU cipher APIs
++ *
++ * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * Authors:
++ *    Gonglei <arei.gonglei@huawei.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ *
++ */
 +
-+    backend->conf.max_size = UINT64_MAX;
-+    backend->conf.max_cipher_key_len = VHOST_USER_MAX_CIPHER_KEY_LEN;
-+    backend->conf.max_auth_key_len = VHOST_USER_MAX_AUTH_KEY_LEN;
- }
- 
- static int64_t cryptodev_vhost_user_sym_create_session(
-diff --git a/include/sysemu/cryptodev-vhost-user.h b/include/sysemu/cryptodev-vhost-user.h
-index 937217b..6debf53 100644
---- a/include/sysemu/cryptodev-vhost-user.h
-+++ b/include/sysemu/cryptodev-vhost-user.h
-@@ -23,6 +23,9 @@
- #ifndef CRYPTODEV_VHOST_USER_H
- #define CRYPTODEV_VHOST_USER_H
- 
-+#define VHOST_USER_MAX_AUTH_KEY_LEN    512
-+#define VHOST_USER_MAX_CIPHER_KEY_LEN  64
++#include "qemu/osdep.h"
++#include "hw/boards.h"
++#include "qapi/error.h"
++#include "qapi/qmp/qerror.h"
++#include "qemu/error-report.h"
++#include "standard-headers/linux/virtio_crypto.h"
++#include "sysemu/cryptodev-vhost.h"
++#include "chardev/char-fe.h"
 +
++
++/**
++ * @TYPE_CRYPTODEV_BACKEND_VHOST_USER:
++ * name of backend that uses vhost user server
++ */
++#define TYPE_CRYPTODEV_BACKEND_VHOST_USER "cryptodev-vhost-user"
++
++#define CRYPTODEV_BACKEND_VHOST_USER(obj) \
++    OBJECT_CHECK(CryptoDevBackendVhostUser, \
++                 (obj), TYPE_CRYPTODEV_BACKEND_VHOST_USER)
++
++
++typedef struct CryptoDevBackendVhostUser {
++    CryptoDevBackend parent_obj;
++
++    CharBackend chr;
++    char *chr_name;
++    bool opened;
++    CryptoDevBackendVhost *vhost_crypto[MAX_CRYPTO_QUEUE_NUM];
++} CryptoDevBackendVhostUser;
++
++static int
++cryptodev_vhost_user_running(
++             CryptoDevBackendVhost *crypto)
++{
++    return crypto ? 1 : 0;
++}
++
++static void cryptodev_vhost_user_stop(int queues,
++                          CryptoDevBackendVhostUser *s)
++{
++    size_t i;
++
++    for (i = 0; i < queues; i++) {
++        if (!cryptodev_vhost_user_running(s->vhost_crypto[i])) {
++            continue;
++        }
++
++        cryptodev_vhost_cleanup(s->vhost_crypto[i]);
++        s->vhost_crypto[i] = NULL;
++    }
++}
++
++static int
++cryptodev_vhost_user_start(int queues,
++                         CryptoDevBackendVhostUser *s)
++{
++    CryptoDevBackendVhostOptions options;
++    CryptoDevBackend *b = CRYPTODEV_BACKEND(s);
++    int max_queues;
++    size_t i;
++
++    for (i = 0; i < queues; i++) {
++        if (cryptodev_vhost_user_running(s->vhost_crypto[i])) {
++            continue;
++        }
++
++        options.opaque = &s->chr;
++        options.backend_type = VHOST_BACKEND_TYPE_USER;
++        options.cc = b->conf.peers.ccs[i];
++        s->vhost_crypto[i] = cryptodev_vhost_init(&options);
++        if (!s->vhost_crypto[i]) {
++            error_report("failed to init vhost_crypto for queue %zu", i);
++            goto err;
++        }
++
++        if (i == 0) {
++            max_queues =
++              cryptodev_vhost_get_max_queues(s->vhost_crypto[i]);
++            if (queues > max_queues) {
++                error_report("you are asking more queues than supported: %d",
++                             max_queues);
++                goto err;
++            }
++        }
++    }
++
++    return 0;
++
++err:
++    cryptodev_vhost_user_stop(i + 1, s);
++    return -1;
++}
++
++static Chardev *
++cryptodev_vhost_claim_chardev(CryptoDevBackendVhostUser *s,
++                                    Error **errp)
++{
++    Chardev *chr;
++
++    if (s->chr_name == NULL) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
++                   "chardev", "a valid character device");
++        return NULL;
++    }
++
++    chr = qemu_chr_find(s->chr_name);
++    if (chr == NULL) {
++        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
++                  "Device '%s' not found", s->chr_name);
++        return NULL;
++    }
++
++    return chr;
++}
++
++static void cryptodev_vhost_user_event(void *opaque, int event)
++{
++    CryptoDevBackendVhostUser *s = opaque;
++    CryptoDevBackend *b = CRYPTODEV_BACKEND(s);
++    Error *err = NULL;
++    int queues = b->conf.peers.queues;
++
++    assert(queues < MAX_CRYPTO_QUEUE_NUM);
++
++    switch (event) {
++    case CHR_EVENT_OPENED:
++        if (cryptodev_vhost_user_start(queues, s) < 0) {
++            exit(1);
++        }
++        b->ready = true;
++        break;
++    case CHR_EVENT_CLOSED:
++        b->ready = false;
++        cryptodev_vhost_user_stop(queues, s);
++        break;
++    }
++
++    if (err) {
++        error_report_err(err);
++    }
++}
++
++static void cryptodev_vhost_user_init(
++             CryptoDevBackend *backend, Error **errp)
++{
++    int queues = backend->conf.peers.queues;
++    size_t i;
++    Error *local_err = NULL;
++    Chardev *chr;
++    CryptoDevBackendClient *cc;
++    CryptoDevBackendVhostUser *s =
++                      CRYPTODEV_BACKEND_VHOST_USER(backend);
++
++    chr = cryptodev_vhost_claim_chardev(s, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    s->opened = true;
++
++    for (i = 0; i < queues; i++) {
++        cc = cryptodev_backend_new_client(
++                  "cryptodev-vhost-user", NULL);
++        cc->info_str = g_strdup_printf("cryptodev-vhost-user%zu to %s ",
++                                       i, chr->label);
++        cc->queue_index = i;
++
++        backend->conf.peers.ccs[i] = cc;
++
++        if (i == 0) {
++            if (!qemu_chr_fe_init(&s->chr, chr, &local_err)) {
++                error_propagate(errp, local_err);
++                return;
++            }
++        }
++    }
++
++    qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
++                     cryptodev_vhost_user_event, NULL, s, NULL, true);
++
++    backend->conf.crypto_services =
++                         1u << VIRTIO_CRYPTO_SERVICE_CIPHER |
++                         1u << VIRTIO_CRYPTO_SERVICE_HASH |
++                         1u << VIRTIO_CRYPTO_SERVICE_MAC;
++    backend->conf.cipher_algo_l = 1u << VIRTIO_CRYPTO_CIPHER_AES_CBC;
++    backend->conf.hash_algo = 1u << VIRTIO_CRYPTO_HASH_SHA1;
++}
++
++static int64_t cryptodev_vhost_user_sym_create_session(
++           CryptoDevBackend *backend,
++           CryptoDevBackendSymSessionInfo *sess_info,
++           uint32_t queue_index, Error **errp)
++{
++    return 0;
++}
++
++static int cryptodev_vhost_user_sym_close_session(
++           CryptoDevBackend *backend,
++           uint64_t session_id,
++           uint32_t queue_index, Error **errp)
++{
++    return 0;
++}
++
++static int cryptodev_vhost_user_sym_operation(
++                 CryptoDevBackend *backend,
++                 CryptoDevBackendSymOpInfo *op_info,
++                 uint32_t queue_index, Error **errp)
++{
++    return VIRTIO_CRYPTO_OK;
++}
++
++static void cryptodev_vhost_user_cleanup(
++             CryptoDevBackend *backend,
++             Error **errp)
++{
++    CryptoDevBackendVhostUser *s =
++                      CRYPTODEV_BACKEND_VHOST_USER(backend);
++    size_t i;
++    int queues = backend->conf.peers.queues;
++    CryptoDevBackendClient *cc;
++
++    cryptodev_vhost_user_stop(queues, s);
++
++    for (i = 0; i < queues; i++) {
++        cc = backend->conf.peers.ccs[i];
++        if (cc) {
++            cryptodev_backend_free_client(cc);
++            backend->conf.peers.ccs[i] = NULL;
++        }
++    }
++}
++
++static void cryptodev_vhost_user_set_chardev(Object *obj,
++                                    const char *value, Error **errp)
++{
++    CryptoDevBackendVhostUser *s =
++                      CRYPTODEV_BACKEND_VHOST_USER(obj);
++
++    if (s->opened) {
++        error_setg(errp, QERR_PERMISSION_DENIED);
++    } else {
++        g_free(s->chr_name);
++        s->chr_name = g_strdup(value);
++    }
++}
++
++static char *
++cryptodev_vhost_user_get_chardev(Object *obj, Error **errp)
++{
++    CryptoDevBackendVhostUser *s =
++                      CRYPTODEV_BACKEND_VHOST_USER(obj);
++    Chardev *chr = qemu_chr_fe_get_driver(&s->chr);
++
++    if (chr && chr->label) {
++        return g_strdup(chr->label);
++    }
++
++    return NULL;
++}
++
++static void cryptodev_vhost_user_instance_int(Object *obj)
++{
++    object_property_add_str(obj, "chardev",
++                            cryptodev_vhost_user_get_chardev,
++                            cryptodev_vhost_user_set_chardev,
++                            NULL);
++}
++
++static void cryptodev_vhost_user_finalize(Object *obj)
++{
++    CryptoDevBackendVhostUser *s =
++                      CRYPTODEV_BACKEND_VHOST_USER(obj);
++
++    qemu_chr_fe_deinit(&s->chr, false);
++
++    g_free(s->chr_name);
++}
++
++static void
++cryptodev_vhost_user_class_init(ObjectClass *oc, void *data)
++{
++    CryptoDevBackendClass *bc = CRYPTODEV_BACKEND_CLASS(oc);
++
++    bc->init = cryptodev_vhost_user_init;
++    bc->cleanup = cryptodev_vhost_user_cleanup;
++    bc->create_session = cryptodev_vhost_user_sym_create_session;
++    bc->close_session = cryptodev_vhost_user_sym_close_session;
++    bc->do_sym_op = cryptodev_vhost_user_sym_operation;
++}
++
++static const TypeInfo cryptodev_vhost_user_info = {
++    .name = TYPE_CRYPTODEV_BACKEND_VHOST_USER,
++    .parent = TYPE_CRYPTODEV_BACKEND,
++    .class_init = cryptodev_vhost_user_class_init,
++    .instance_init = cryptodev_vhost_user_instance_int,
++    .instance_finalize = cryptodev_vhost_user_finalize,
++    .instance_size = sizeof(CryptoDevBackendVhostUser),
++};
++
++static void
++cryptodev_vhost_user_register_types(void)
++{
++    type_register_static(&cryptodev_vhost_user_info);
++}
++
++type_init(cryptodev_vhost_user_register_types);
+diff --git a/backends/cryptodev-vhost.c b/backends/cryptodev-vhost.c
+new file mode 100644
+index 0000000..27e1c4a
+--- /dev/null
++++ b/backends/cryptodev-vhost.c
+@@ -0,0 +1,89 @@
++/*
++ * QEMU Cryptodev backend for QEMU cipher APIs
++ *
++ * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * Authors:
++ *    Gonglei <arei.gonglei@huawei.com>
++ *    Jay Zhou <jianjay.zhou@huawei.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "sysemu/cryptodev-vhost.h"
++
++#ifdef CONFIG_VHOST_CRYPTO
++uint64_t
++cryptodev_vhost_get_max_queues(
++                        CryptoDevBackendVhost *crypto)
++{
++    return crypto->dev.max_queues;
++}
++
++void cryptodev_vhost_cleanup(CryptoDevBackendVhost *crypto)
++{
++    vhost_dev_cleanup(&crypto->dev);
++    g_free(crypto);
++}
++
++struct CryptoDevBackendVhost *
++cryptodev_vhost_init(
++             CryptoDevBackendVhostOptions *options)
++{
++    int r;
++    CryptoDevBackendVhost *crypto;
++
++    crypto = g_new(CryptoDevBackendVhost, 1);
++    crypto->dev.max_queues = 1;
++    crypto->dev.nvqs = 1;
++    crypto->dev.vqs = crypto->vqs;
++
++    crypto->cc = options->cc;
++
++    crypto->dev.protocol_features = 0;
++    crypto->backend = -1;
++
++    /* vhost-user needs vq_index to initiate a specific queue pair */
++    crypto->dev.vq_index = crypto->cc->queue_index * crypto->dev.nvqs;
++
++    r = vhost_dev_init(&crypto->dev, options->opaque, options->backend_type, 0);
++    if (r < 0) {
++        goto fail;
++    }
++
++    return crypto;
++fail:
++    g_free(crypto);
++    return NULL;
++}
++
++#else
++uint64_t
++cryptodev_vhost_get_max_queues(CryptoDevBackendVhost *crypto)
++{
++    return 0;
++}
++
++void cryptodev_vhost_cleanup(CryptoDevBackendVhost *crypto)
++{
++}
++
++struct CryptoDevBackendVhost *
++cryptodev_vhost_init(CryptoDevBackendVhostOptions *options)
++{
++    return NULL;
++}
++#endif
+diff --git a/configure b/configure
+index 39f3a43..e55d67d 100755
+--- a/configure
++++ b/configure
+@@ -344,6 +344,7 @@ xfs=""
+ tcg="yes"
  
- /**
-  * cryptodev_vhost_user_get_vhost:
+ vhost_net="no"
++vhost_crypto="no"
+ vhost_scsi="no"
+ vhost_vsock="no"
+ vhost_user=""
+@@ -813,6 +814,7 @@ Linux)
+   linux_user="yes"
+   kvm="yes"
+   vhost_net="yes"
++  vhost_crypto="yes"
+   vhost_scsi="yes"
+   vhost_vsock="yes"
+   QEMU_INCLUDES="-I\$(SRC_PATH)/linux-headers -I$(pwd)/linux-headers $QEMU_INCLUDES"
+@@ -1183,6 +1185,14 @@ for opt do
+   ;;
+   --enable-vhost-net) vhost_net="yes"
+   ;;
++  --disable-vhost-crypto) vhost_crypto="no"
++  ;;
++  --enable-vhost-crypto)
++      vhost_crypto="yes"
++      if test "$mingw32" = "yes"; then
++          error_exit "vhost-crypto isn't available on win32"
++      fi
++  ;;
+   --disable-vhost-scsi) vhost_scsi="no"
+   ;;
+   --enable-vhost-scsi) vhost_scsi="yes"
+@@ -1580,6 +1590,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   cap-ng          libcap-ng support
+   attr            attr and xattr support
+   vhost-net       vhost-net acceleration support
++  vhost-crypto    vhost-crypto acceleration support
+   spice           spice
+   rbd             rados block device (rbd)
+   libiscsi        iscsi support
+@@ -5771,6 +5782,7 @@ echo "posix_madvise     $posix_madvise"
+ echo "posix_memalign    $posix_memalign"
+ echo "libcap-ng support $cap_ng"
+ echo "vhost-net support $vhost_net"
++echo "vhost-crypto support $vhost_crypto"
+ echo "vhost-scsi support $vhost_scsi"
+ echo "vhost-vsock support $vhost_vsock"
+ echo "vhost-user support $vhost_user"
+@@ -6855,6 +6867,9 @@ if supported_kvm_target $target; then
+             echo "CONFIG_VHOST_USER_NET_TEST_$target_name=y" >> $config_host_mak
+         fi
+     fi
++    if test "$vhost_crypto" = "yes" ; then
++        echo "CONFIG_VHOST_CRYPTO=y" >> $config_target_mak
++    fi
+ fi
+ if supported_hax_target $target; then
+     echo "CONFIG_HAX=y" >> $config_target_mak
+diff --git a/include/sysemu/cryptodev-vhost.h b/include/sysemu/cryptodev-vhost.h
+new file mode 100644
+index 0000000..fb26b86
+--- /dev/null
++++ b/include/sysemu/cryptodev-vhost.h
+@@ -0,0 +1,154 @@
++/*
++ * QEMU Crypto Device Common Vhost Implement
++ *
++ * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * Authors:
++ *    Gonglei <arei.gonglei@huawei.com>
++ *    Jay Zhou <jianjay.zhou@huawei.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ *
++ */
++#ifndef CRYPTODEV_VHOST_H
++#define CRYPTODEV_VHOST_H
++
++#include "qemu-common.h"
++#include "hw/virtio/vhost.h"
++#include "hw/virtio/vhost-backend.h"
++#include "chardev/char.h"
++
++#include "sysemu/cryptodev.h"
++
++
++typedef struct CryptoDevBackendVhostOptions {
++    VhostBackendType backend_type;
++    void *opaque;
++    int total_queues;
++    CryptoDevBackendClient *cc;
++} CryptoDevBackendVhostOptions;
++
++typedef struct CryptoDevBackendVhost {
++    struct vhost_dev dev;
++    struct vhost_virtqueue vqs[1];
++    int backend;
++    CryptoDevBackendClient *cc;
++} CryptoDevBackendVhost;
++
++/**
++ * cryptodev_vhost_get_max_queues:
++ * @crypto: the cryptodev backend common vhost object
++ *
++ * Get the maximum queue number of @crypto.
++ *
++ *
++ * Returns: the maximum queue number
++ */
++uint64_t
++cryptodev_vhost_get_max_queues(
++                        CryptoDevBackendVhost *crypto);
++
++
++/**
++ * cryptodev_vhost_init:
++ * @options: the common vhost object's option
++ *
++ * Creates a new cryptodev backend common vhost object
++ *
++ ** The returned object must be released with
++ * cryptodev_vhost_cleanup() when no
++ * longer required
++ *
++ * Returns: the cryptodev backend common vhost object
++ */
++struct CryptoDevBackendVhost *
++cryptodev_vhost_init(
++             CryptoDevBackendVhostOptions *options);
++
++/**
++ * cryptodev_vhost_cleanup:
++ * @crypto: the cryptodev backend common vhost object
++ *
++ * Clean the resouce associated with @crypto that realizaed
++ * by cryptodev_vhost_init()
++ *
++ */
++void cryptodev_vhost_cleanup(
++                        CryptoDevBackendVhost *crypto);
++
++/**
++ * cryptodev_get_vhost:
++ * @cc: the client object for each queue
++ * @b: the cryptodev backend common vhost object
++ * @queue: the cryptodev backend queue index
++ *
++ * Gets a new cryptodev backend common vhost object based on
++ * @b and @queue
++ *
++ * Returns: the cryptodev backend common vhost object
++ */
++CryptoDevBackendVhost *
++cryptodev_get_vhost(CryptoDevBackendClient *cc,
++                            CryptoDevBackend *b,
++                            uint16_t queue);
++/**
++ * cryptodev_vhost_start:
++ * @dev: the virtio crypto object
++ * @total_queues: the total count of queue
++ *
++ * Starts the vhost crypto logic
++ *
++ * Returns: 0 for success, negative for errors
++ */
++int cryptodev_vhost_start(VirtIODevice *dev, int total_queues);
++
++/**
++ * cryptodev_vhost_stop:
++ * @dev: the virtio crypto object
++ * @total_queues: the total count of queue
++ *
++ * Stops the vhost crypto logic
++ *
++ */
++void cryptodev_vhost_stop(VirtIODevice *dev, int total_queues);
++
++/**
++ * cryptodev_vhost_virtqueue_mask:
++ * @dev: the virtio crypto object
++ * @queue: the cryptodev backend queue index
++ * @idx: the virtqueue index
++ * @mask: mask or not (true or false)
++ *
++ * Mask/unmask events for @idx virtqueue on @dev device
++ *
++ */
++void cryptodev_vhost_virtqueue_mask(VirtIODevice *dev,
++                                           int queue,
++                                           int idx, bool mask);
++
++/**
++ * cryptodev_vhost_virtqueue_pending:
++ * @dev: the virtio crypto object
++ * @queue: the cryptodev backend queue index
++ * @idx: the virtqueue index
++ *
++ * Test and clear event pending status for @idx virtqueue on @dev device.
++ * Should be called after unmask to avoid losing events.
++ *
++ * Returns: true for success, false for errors
++ */
++bool cryptodev_vhost_virtqueue_pending(VirtIODevice *dev,
++                                              int queue, int idx);
++
++#endif /* CRYPTODEV_VHOST_H */
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 8ccd5dc..fea949d 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4233,6 +4233,27 @@ which specify the queue number of cryptodev backend, the default of
+    [...]
+ @end example
+ 
++@item -object cryptodev-vhost-user,id=@var{id},chardev=@var{chardevid}[,queues=@var{queues}]
++
++Creates a vhost-user cryptodev backend, backed by a chardev @var{chardevid}.
++The @var{id} parameter is a unique ID that will be used to reference this
++cryptodev backend from the @option{virtio-crypto} device.
++The chardev should be a unix domain socket backed one. The vhost-user uses
++a specifically defined protocol to pass vhost ioctl replacement messages
++to an application on the other end of the socket.
++The @var{queues} parameter is optional, which specify the queue number
++of cryptodev backend for multiqueue vhost-user, the default of @var{queues} is 1.
++
++@example
++
++ # qemu-system-x86_64 \
++   [...] \
++       -chardev socket,id=chardev0,path=/path/to/socket \
++       -object cryptodev-vhost-user,id=cryptodev0,chardev=chardev0 \
++       -device virtio-crypto-pci,id=crypto0,cryptodev=cryptodev0 \
++   [...]
++@end example
++
+ @item -object secret,id=@var{id},data=@var{string},format=@var{raw|base64}[,keyid=@var{secretid},iv=@var{string}]
+ @item -object secret,id=@var{id},file=@var{filename},format=@var{raw|base64}[,keyid=@var{secretid},iv=@var{string}]
+ 
+diff --git a/vl.c b/vl.c
+index 9e7235d..6d15386 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2838,6 +2838,12 @@ static bool object_create_initial(const char *type)
+         return false;
+     }
+ 
++#if defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)
++    if (g_str_equal(type, "cryptodev-vhost-user")) {
++        return false;
++    }
++#endif
++
+     /*
+      * return false for concrete netfilters since
+      * they depend on netdevs already existing
 -- 
 1.8.3.1
