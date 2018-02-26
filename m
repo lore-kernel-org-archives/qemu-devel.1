@@ -1,28 +1,49 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <SRS0=4cAc=FU=redhat.com=mst@kernel.org>)
-	id 1eqPNP-0005VN-8R
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 15:28:00 -0500
+	(envelope-from <jl4312@columbia.edu>) id 1eqPdu-0001MG-Hv
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 15:45:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <SRS0=4cAc=FU=redhat.com=mst@kernel.org>)
-	id 1eqPNK-0001NF-7f
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 15:27:59 -0500
-Received: from mail.kernel.org ([198.145.29.99]:43032)
+	(envelope-from <jl4312@columbia.edu>) id 1eqPdp-0004Uk-Md
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 15:45:02 -0500
+Received: from outprodmail02.cc.columbia.edu ([128.59.72.51]:37478)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <SRS0=4cAc=FU=redhat.com=mst@kernel.org>)
-	id 1eqPNJ-0001Mm-V0
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 15:27:54 -0500
-Date: Mon, 26 Feb 2018 22:27:49 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180226222712-mutt-send-email-mst@kernel.org>
-References: <20180216131625.9639-1-dgilbert@redhat.com>
-	<20180216131625.9639-25-dgilbert@redhat.com>
+	(Exim 4.71) (envelope-from <jl4312@columbia.edu>) id 1eqPdp-0004Sq-IB
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 15:44:57 -0500
+Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
+	by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
+	w1QKhoqd052725
+	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 15:44:51 -0500
+Received: from hazelnut (localhost.localdomain [127.0.0.1])
+	by hazelnut (Postfix) with ESMTP id A7E238C
+	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 15:44:52 -0500 (EST)
+Received: from sendprodmail04.cc.columbia.edu (sendprodmail04.cc.columbia.edu
+	[128.59.72.16]) by hazelnut (Postfix) with ESMTP id C09CBC7
+	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 15:44:44 -0500 (EST)
+Received: from mail-wr0-f199.google.com (mail-wr0-f199.google.com
+	[209.85.128.199])
+	by sendprodmail04.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
+	w1QKigPj016896
+	(version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 15:44:43 -0500
+Received: by mail-wr0-f199.google.com with SMTP id c37so12418791wra.5
+	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 12:44:43 -0800 (PST)
+Received: from mail-wr0-f169.google.com (mail-wr0-f169.google.com.
+	[209.85.128.169]) by smtp.gmail.com with ESMTPSA id
+	f19sm9494195edd.84.2018.02.26.12.44.40 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 26 Feb 2018 12:44:40 -0800 (PST)
+Received: by mail-wr0-f169.google.com with SMTP id s5so22650793wra.0
+	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 12:44:40 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180216131625.9639-25-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 24/29] vhost-user: Add
- VHOST_USER_POSTCOPY_END message
+In-Reply-To: <a69c1fcb-9902-720a-12ed-c8e979163f61@redhat.com>
+References: <CAHyh4xii5y-8=uMJeQGARrHZAETtW4ugmBWUypbQ923vk0P3Lw@mail.gmail.com>
+	<a69c1fcb-9902-720a-12ed-c8e979163f61@redhat.com>
+From: Jintack Lim <jintack@cs.columbia.edu>
+Date: Mon, 26 Feb 2018 15:44:39 -0500
+Message-ID: <CAHyh4xhbheoCzMquUMFy5zPTq2z+_t9gEY_dcZSv5amg+CWiWA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] intel-iommu and vhost: Do we need 'device-iotlb'
+ and 'ats'?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,120 +52,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, marcandre.lureau@redhat.com, peterx@redhat.com, imammedo@redhat.com, quintela@redhat.com, aarcange@redhat.com
+To: Auger Eric <eric.auger@redhat.com>
+Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>, jasowang@redhat.com, Peter Xu <peterx@redhat.com>
 
-On Fri, Feb 16, 2018 at 01:16:20PM +0000, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> This message is sent just before the end of postcopy to get the
-> client to stop using userfault since we wont respond to any more
-> requests.  It should close userfaultfd so that any other pages
-> get mapped to the backing file automatically by the kernel, since
-> at this point we know we've received everything.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Reviewed-by: Peter Xu <peterx@redhat.com>
-> ---
->  contrib/libvhost-user/libvhost-user.c | 23 +++++++++++++++++++++++
->  contrib/libvhost-user/libvhost-user.h |  1 +
->  docs/interop/vhost-user.txt           |  8 ++++++++
->  hw/virtio/vhost-user.c                |  1 +
->  4 files changed, 33 insertions(+)
-> 
-> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-> index 1b224af706..1f988ab787 100644
-> --- a/contrib/libvhost-user/libvhost-user.c
-> +++ b/contrib/libvhost-user/libvhost-user.c
-> @@ -99,6 +99,7 @@ vu_request_to_string(unsigned int req)
->          REQ(VHOST_USER_SET_CONFIG),
->          REQ(VHOST_USER_POSTCOPY_ADVISE),
->          REQ(VHOST_USER_POSTCOPY_LISTEN),
-> +        REQ(VHOST_USER_POSTCOPY_END),
->          REQ(VHOST_USER_MAX),
->      };
->  #undef REQ
-> @@ -1095,6 +1096,26 @@ vu_set_postcopy_listen(VuDev *dev, VhostUserMsg *vmsg)
->      vmsg->payload.u64 = 0; /* Success */
->      return true;
->  }
-> +
-> +static bool
-> +vu_set_postcopy_end(VuDev *dev, VhostUserMsg *vmsg)
-> +{
-> +    DPRINT("%s: Entry\n", __func__);
-> +    dev->postcopy_listening = false;
-> +    if (dev->postcopy_ufd > 0) {
-> +        close(dev->postcopy_ufd);
-> +        dev->postcopy_ufd = -1;
-> +        DPRINT("%s: Done close\n", __func__);
-> +    }
-> +
-> +    vmsg->fd_num = 0;
-> +    vmsg->payload.u64 = 0;
-> +    vmsg->size = sizeof(vmsg->payload.u64);
-> +    vmsg->flags = VHOST_USER_VERSION |  VHOST_USER_REPLY_MASK;
-> +    DPRINT("%s: exit\n", __func__);
-> +    return true;
-> +}
-> +
->  static bool
->  vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
->  {
-> @@ -1170,6 +1191,8 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
->          return vu_set_postcopy_advise(dev, vmsg);
->      case VHOST_USER_POSTCOPY_LISTEN:
->          return vu_set_postcopy_listen(dev, vmsg);
-> +    case VHOST_USER_POSTCOPY_END:
-> +        return vu_set_postcopy_end(dev, vmsg);
->      default:
->          vmsg_close_fds(vmsg);
->          vu_panic(dev, "Unhandled request: %d", vmsg->request);
-> diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
-> index fcba53c3c3..9696b89f6e 100644
-> --- a/contrib/libvhost-user/libvhost-user.h
-> +++ b/contrib/libvhost-user/libvhost-user.h
-> @@ -84,6 +84,7 @@ typedef enum VhostUserRequest {
->      VHOST_USER_SET_CONFIG = 25,
->      VHOST_USER_POSTCOPY_ADVISE  = 26,
->      VHOST_USER_POSTCOPY_LISTEN  = 27,
-> +    VHOST_USER_POSTCOPY_END     = 28,
->      VHOST_USER_MAX
->  } VhostUserRequest;
->  
-> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-> index 5bbcab2cc4..4bf7d8ef99 100644
-> --- a/docs/interop/vhost-user.txt
-> +++ b/docs/interop/vhost-user.txt
-> @@ -697,6 +697,14 @@ Master message types
->  
->        Master advises slave that a transition to postcopy mode has happened.
->  
-> + * VHOST_USER_POSTCOPY_END
-> +      Id: 28
-> +      Slave payload: u64
-> +
-> +      Master advises that postcopy migration has now completed.  The
-> +      slave must disable the userfaultfd. The response is an acknowledgement
-> +      only.
-> +
->  Slave message types
->  -------------------
->  
+Hi Eric,
 
-Which protocol feature enables this message?
+On Mon, Feb 26, 2018 at 5:14 AM, Auger Eric <eric.auger@redhat.com> wrote:
+> Hi Jintack,
+>
+> On 21/02/18 05:03, Jintack Lim wrote:
+>> Hi,
+>>
+>> I'm using vhost with the virtual intel-iommu, and this page[1] shows
+>> the QEMU command line example.
+>>
+>> qemu-system-x86_64 -M q35,accel=kvm,kernel-irqchip=split -m 2G \
+>>                    -device intel-iommu,intremap=on,device-iotlb=on \
+>>                    -device ioh3420,id=pcie.1,chassis=1 \
+>>                    -device
+>> virtio-net-pci,bus=pcie.1,netdev=net0,disable-legacy=on,disable-modern=off,iommu_platform=on,ats=on
+>> \
+>>                    -netdev tap,id=net0,vhostforce \
+>>                    $IMAGE_PATH
+>>
+>> I wonder what's the impact of using device-iotlb and ats options as
+>> they are described necessary.
+>>
+>> In my understanding, vhost in the kernel only looks at
+>> VIRTIO_F_IOMMU_PLATFORM, and when it is set, vhost uses a
+>> device-iotlb. In addition, vhost and QEMU communicate using vhost_msg
+>> basically to cache mappings correctly in the vhost, so I wonder what's
+>> the role of ats in this case.
+>>
+>> A related question is that if we use SMMU emulation[2] on ARM without
+>> those options, does vhost cache mappings as if it has a device-iotlb?
+>> (I guess this is the case.)
+> vsmmuv3 emulation code does not support ATS at the moment. vhost support
+> is something different. As Peter explained it comes with the capability
+> of the virtio device to register unmap notifiers. Those notifiers get
+> called each time there are TLB invalidation commands. That way the
+> in-kernel vhost cache can be invalidated. vhost support was there until
+> vsmmuv3 v7. With latest versions, I removed it to help reviewers
+> concentrate on the root functionality. However I will send it to you
+> based on v9.
 
-> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> index 74807091a0..cf7923b25f 100644
-> --- a/hw/virtio/vhost-user.c
-> +++ b/hw/virtio/vhost-user.c
-> @@ -78,6 +78,7 @@ typedef enum VhostUserRequest {
->      VHOST_USER_SET_CONFIG = 25,
->      VHOST_USER_POSTCOPY_ADVISE  = 26,
->      VHOST_USER_POSTCOPY_LISTEN  = 27,
-> +    VHOST_USER_POSTCOPY_END     = 28,
->      VHOST_USER_MAX
->  } VhostUserRequest;
->  
-> -- 
-> 2.14.3
+Thanks, Eric. I'm happy to take a look at those patches!
+
+Thanks,
+Jintack
+
+>
+> Thanks
+>
+> Eric
+>>
+>> I'm pretty new to QEMU code, so I might be missing something. Can
+>> somebody shed some light on it?
+>>
+>> [1] https://wiki.qemu.org/Features/VT-d
+>> [2] http://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg04736.html
+>>
+>> Thanks,
+>> Jintack
+>>
+>>
+>
