@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eqHqm-0005og-E6
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 07:25:49 -0500
+	(envelope-from <jianjay.zhou@huawei.com>) id 1eqHtT-0007V3-3W
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 07:28:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eqHql-0007Bf-HY
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 07:25:48 -0500
-References: <20180223192549.26666-1-kwolf@redhat.com>
-	<20180223192549.26666-25-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <d8e38b05-0879-6fda-c642-4d9eae7b2fa1@redhat.com>
-Date: Mon, 26 Feb 2018 13:25:41 +0100
+	(envelope-from <jianjay.zhou@huawei.com>) id 1eqHtP-0008Ky-US
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 07:28:35 -0500
+Received: from [45.249.212.35] (port=48988 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
+	id 1eqHtP-0008Io-5m
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 07:28:31 -0500
+From: Jay Zhou <jianjay.zhou@huawei.com>
+Date: Mon, 26 Feb 2018 20:27:33 +0800
+Message-ID: <cover.1519647019.git.arei.gonglei@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20180223192549.26666-25-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="JIeqgdNO06EMmXfnMVSGr9fjMdPLQhMYY"
-Subject: Re: [Qemu-devel] [PATCH v3 24/36] rbd: Use qemu_rbd_connect() in
- qemu_rbd_do_create()
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v7 0/4] cryptodev: add vhost support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +24,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, pbonzini@redhat.com, weidong.huang@huawei.com, stefanha@redhat.com, jianjay.zhou@huawei.com, pasic@linux.vnet.ibm.com, longpeng2@huawei.com, xin.zeng@intel.com, roy.fan.zhang@intel.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JIeqgdNO06EMmXfnMVSGr9fjMdPLQhMYY
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com,
- jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com,
- qemu-devel@nongnu.org
-Message-ID: <d8e38b05-0879-6fda-c642-4d9eae7b2fa1@redhat.com>
-Subject: Re: [PATCH v3 24/36] rbd: Use qemu_rbd_connect() in
- qemu_rbd_do_create()
-References: <20180223192549.26666-1-kwolf@redhat.com>
- <20180223192549.26666-25-kwolf@redhat.com>
-In-Reply-To: <20180223192549.26666-25-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+From: Gonglei <arei.gonglei@huawei.com>
 
-On 2018-02-23 20:25, Kevin Wolf wrote:
-> This is almost exactly the same code. The differences are that
-> qemu_rbd_connect() supports BlockdevOptionsRbd.server and that the cach=
-e
-> mode is set explicitly.
->=20
-> Supporting 'server' is a welcome new feature for image creation.
-> Caching is disabled by default, so leave it that way.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/rbd.c | 54 ++++++++++-------------------------------------------=
--
->  1 file changed, 10 insertions(+), 44 deletions(-)
+I posted the RFC verion a few months ago for DPDK
+vhost-crypto implmention, and now it's time to send
+the formal version. Because we need an user space scheme
+for better performance.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+The vhost user crypto server side patches had been
+sent to DPDK community, pls see
 
+[RFC PATCH 0/6] lib/librte_vhost: introduce new vhost_user crypto backend
+support
+http://dpdk.org/ml/archives/dev/2017-November/081048.html
 
---JIeqgdNO06EMmXfnMVSGr9fjMdPLQhMYY
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+You also can get virtio-crypto polling mode driver from:
 
------BEGIN PGP SIGNATURE-----
+[PATCH v2 0/7] crypto: add virtio poll mode driver
+http://dpdk.org/ml/archives/dev/2018-February/091410.html
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqT/MUSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AP2kH/RM0rjbR0joeUUvV2e4afAUhFtdr5h04
-O8TueCe6JU7O4Blm1M7jLX5RqlQlN+xMe1v/nMHBAWs3irno5mGP4r3CJf21tUTQ
-FpP8KkMxV3u7xywM8qjdRy735B3Hm6GMNIXahkCM0ekNC4M104a7wWa9x+rzhl/f
-PLEHUfv8LiYgrkVlSvnhS6V3F1jlCiN44NH7OeDHUHOmXJsosA1xA4OMxauwS58w
-6r8P4Q3Ea6d2jV+nEYKWq6+vo0v6zMBqWud+cYfQgIRHVsI3a0iawEhXZk2Aco+k
-4iIMlsYA6w5fUn9HDLi9S2qkiY/CC77U5FCo4i6RCADexlt1gCv5Oqg=
-=/Ujw
------END PGP SIGNATURE-----
+v7:
+  - make virtio crypto enabled on non-Linux
+  - fix format-string issues
+  - fix error reported by clang
+  - fix a typo when setting length of cipher key
+  - rebased on the master
+v6:
+  - Fix compile error about backends/cryptodev-vhost-user.o and rebase on
+    the master
+v5:
+  - squash [PATCH v4 5/5] into previous patches [Michael]
+v4:
+  - "[PATCH v4 5/5] cryptodev-vhost-user: depend on CONFIG_VHOST_CRYPTO
+    and CONFIG_VHOST_USER" newly added to fix compilation dependency [Michael]
+v3:
+  - New added vhost user messages should be sent only when feature
+    has been successfully negotiated [Michael]
+v2:
+  - Fix compile error on mingw32
 
---JIeqgdNO06EMmXfnMVSGr9fjMdPLQhMYY--
+Gonglei (4):
+  cryptodev: add vhost-user as a new cryptodev backend
+  cryptodev: add vhost support
+  cryptodev-vhost-user: add crypto session handler
+  cryptodev-vhost-user: set the key length
+
+ backends/Makefile.objs                |   6 +
+ backends/cryptodev-builtin.c          |   1 +
+ backends/cryptodev-vhost-user.c       | 377 ++++++++++++++++++++++++++++++++++
+ backends/cryptodev-vhost.c            | 347 +++++++++++++++++++++++++++++++
+ configure                             |  15 ++
+ docs/interop/vhost-user.txt           |  26 +++
+ hw/virtio/vhost-user.c                | 104 ++++++++++
+ hw/virtio/virtio-crypto.c             |  70 +++++++
+ include/hw/virtio/vhost-backend.h     |   8 +
+ include/hw/virtio/virtio-crypto.h     |   1 +
+ include/sysemu/cryptodev-vhost-user.h |  47 +++++
+ include/sysemu/cryptodev-vhost.h      | 154 ++++++++++++++
+ include/sysemu/cryptodev.h            |   8 +
+ qemu-options.hx                       |  21 ++
+ vl.c                                  |   6 +
+ 15 files changed, 1191 insertions(+)
+ create mode 100644 backends/cryptodev-vhost-user.c
+ create mode 100644 backends/cryptodev-vhost.c
+ create mode 100644 include/sysemu/cryptodev-vhost-user.h
+ create mode 100644 include/sysemu/cryptodev-vhost.h
+
+--
+1.8.3.1
