@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eqHU2-0007NF-Kk
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 07:02:19 -0500
+	(envelope-from <berrange@redhat.com>) id 1eqHVi-0008I6-H4
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 07:04:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eqHTx-0000ly-VC
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 07:02:18 -0500
-References: <20180224154033.29559-1-mreitz@redhat.com>
-	<20180224154033.29559-4-mreitz@redhat.com>
-	<abd5ed7a-d5ee-028c-1cd5-208161f88beb@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <fb3756be-e002-8b47-921f-80a5ce332721@redhat.com>
-Date: Mon, 26 Feb 2018 13:01:59 +0100
+	(envelope-from <berrange@redhat.com>) id 1eqHVc-00020j-QX
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 07:04:02 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41278 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eqHVc-00020V-Lz
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 07:03:56 -0500
+Date: Mon, 26 Feb 2018 12:03:44 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180226120344.GN14196@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1519344729-73482-1-git-send-email-mjc@sifive.com>
+	<20180223101032.GA31076@redhat.com>
+	<CAHNT7NvMMAD6sAT60RnLgFXwdFPWHEXtysMQt04Qejnpw30Bkg@mail.gmail.com>
+	<20180226104723.GH14196@redhat.com>
+	<CAFEAcA_Gwh3EpVVhZ_zU3LuogZXjh8cpRWrvtHbNdfgQmdzgJg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <abd5ed7a-d5ee-028c-1cd5-208161f88beb@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="RbFacshWmVEstVn8qImcHCHUPkdKnEiXt"
-Subject: Re: [Qemu-devel] [PATCH v3 3/7] qapi: Replace qobject_to_X(o) by
- qobject_to(o, X)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_Gwh3EpVVhZ_zU3LuogZXjh8cpRWrvtHbNdfgQmdzgJg@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 00/23] RISC-V QEMU Port Submission
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,137 +32,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Alberto Garcia <berto@igalia.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Michael Clark <mjc@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RbFacshWmVEstVn8qImcHCHUPkdKnEiXt
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Alberto Garcia <berto@igalia.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-ID: <fb3756be-e002-8b47-921f-80a5ce332721@redhat.com>
-Subject: Re: [PATCH v3 3/7] qapi: Replace qobject_to_X(o) by qobject_to(o, X)
-References: <20180224154033.29559-1-mreitz@redhat.com>
- <20180224154033.29559-4-mreitz@redhat.com>
- <abd5ed7a-d5ee-028c-1cd5-208161f88beb@redhat.com>
-In-Reply-To: <abd5ed7a-d5ee-028c-1cd5-208161f88beb@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-02-24 22:04, Eric Blake wrote:
-> On 02/24/2018 09:40 AM, Max Reitz wrote:
->> This patch was generated using the following Coccinelle script:
->>
+On Mon, Feb 26, 2018 at 11:57:10AM +0000, Peter Maydell wrote:
+> On 26 February 2018 at 10:47, Daniel P. Berrang=C3=A9 <berrange@redhat.=
+com> wrote:
+> > I accept that MIT is compatible with GPLv2+, so that's not an immedia=
+te legal
+> > problem. The issue is that as we add more & more different licenses t=
+o QEMU,
+> > it becomes a maintenance burden to developers, especially when doing =
+code
+> > refactoring across files. You have to be careful you're not taking a =
+piece
+> > of GPLv2+ code and copying/moving it into a file that's MIT licensed,=
+ as
+> > that would be non-compliant. We already suffer this problem with our =
+mixture
+> > of GPLv2-only and GPLv2+ and LGPLv2+ and BSD licensed code. So I'm pe=
+rsonally
+> > loathe to see us add yet another license to the mix.
 >=20
->> and a bit of manual fix-up for overly long lines and three places in
->> tests/check-qjson.c that Coccinelle did not find.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> Reviewed-by: Alberto Garcia <berto@igalia.com>
->> ---
->=20
->> diff --git a/block.c b/block.c
->> index 814e5a02da..cb69fd7ae4 100644
->> --- a/block.c
->> +++ b/block.c
->> @@ -1457,7 +1457,7 @@ static QDict *parse_json_filename(const char
->> *filename, Error **errp)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0 -=C2=A0=C2=A0=C2=A0 options =3D qobject_to_qdict(options_obj);
->> +=C2=A0=C2=A0=C2=A0 options =3D qobject_to(options_obj, QDict);
->=20
-> Bikeshedding - would it read any easier as:
->=20
-> options =3D qobject_to(QDict, options_obj);
->=20
-> ?=C2=A0 If so, your Coccinelle script can be touched up, and patch 2/7 =
-swaps
-> argument order around, so it would be tolerable but still slightly
-> busywork to regenerate the series.=C2=A0 But I'm not strongly attached =
-to
-> either order, and so I'm also willing to take this as-is (especially
-> since that's less work), if no one else has a strong opinion that
-> swapping order would aid legibility.
+> Unless I'm confused, we already have a lot of MIT-licensed code in the =
+tree,
+> including much of the block layer, accel/tcg, the audio subsystem. Look=
+ing
+> at vl.c, it was put under the MIT license by Fabrice in 2003, so we've
+> been living with it as part of our licensing mix for a very long time a=
+lready.
 
-Well, same for me. :-)
+Eeek, I totally missed that as the top level LICENSE file only mentions
+GPL and BSD licenses :-(  I guess that's a trigger for a patch to improve
+the text in the LICENSE file to better reflect reality...
 
-In a template/generic language, we'd write the type first (e.g.
-qobject_cast<QDict>(options_obj)).  But maybe we'd write the object
-first, too (e.g. options_obj.cast<QDict>()).  And the current order of
-the arguments follows the order in the name ("qobject" options_obj "to"
-QDict).  But maybe it's more natural to read it as "qobject to" QDict
-"applied to" options_obj.
+So I guess you can ignore my comments in this thread about MIT license
+being different from normal practice in QEMU.
 
-I don't know either.
-
-Max
-
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
->=20
->> +++ b/block/rbd.c
->> @@ -256,14 +256,14 @@ static int qemu_rbd_set_keypairs(rados_t
->> cluster, const char *keypairs_json,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!keypairs_json) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ret;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> -=C2=A0=C2=A0=C2=A0 keypairs =3D qobject_to_qlist(qobject_from_json(ke=
-ypairs_json,
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- &error_abort));
->> +=C2=A0=C2=A0=C2=A0 keypairs =3D qobject_to(qobject_from_json(keypairs=
-_json,
->> &error_abort),
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 QList);
->=20
-> The question about legibility gets a bit more obvious when you span lin=
-es.
->=20
->> @@ -893,8 +893,9 @@ static void simple_number(void)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QNum *qnum;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int64_t val;
->> =C2=A0 -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qnum =3D
->> qobject_to_qnum(qobject_from_json(test_cases[i].encoded,
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 &er=
-ror_abort));
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qnum =3D qobject_to(qobjec=
-t_from_json(test_cases[i].encoded,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 &error_abort),
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 QNum);
->=20
-
-
-
---RbFacshWmVEstVn8qImcHCHUPkdKnEiXt
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqT9zcSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A3v4IAKtzHsm/HlPqMUbVK2GscejA1eUpybSo
-1iQd7DyhP+GXFqhCdBCl9VMCajZz+grVx2/mdag+xIadYaQveeggfKDSBXp3s1js
-nVdIIlpZA/6KALBTj2ipjjOEHckYkFaixngp6hUUxAP+ZJG7r5TYeHtHTTuwXmpC
-4HX7GXgLArC+/STdIRmESS3NsnJTYLUzo91M5qWQJPxlIATNVRtoW23y920JHKl1
-RO3lwqRqlghBeqMqRchLEJtnJMWOcNe4wtM7z56v01MwUwfrkgENb8bdgwbneMHE
-NrEncCdLI2Pm34XnShCV/EG14fo/pqj0OhW/2kUoxJ0mnTq2Wuz3dpo=
-=x0SD
------END PGP SIGNATURE-----
-
---RbFacshWmVEstVn8qImcHCHUPkdKnEiXt--
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
