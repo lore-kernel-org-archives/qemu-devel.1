@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eqR88-0006u9-2d
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:20:23 -0500
+	(envelope-from <mjc@sifive.com>) id 1eqR8B-0006w4-2a
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:20:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eqR85-0005dD-GD
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:20:20 -0500
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:35239)
+	(envelope-from <mjc@sifive.com>) id 1eqR88-0005gE-Oz
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:20:23 -0500
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:35237)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eqR85-0005cU-6D
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:20:17 -0500
-Received: by mail-pf0-x244.google.com with SMTP id y186so6425250pfb.2
-	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 14:20:17 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eqR88-0005fj-GP
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 17:20:20 -0500
+Received: by mail-pf0-x241.google.com with SMTP id y186so6425319pfb.2
+	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 14:20:20 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Tue, 27 Feb 2018 11:17:55 +1300
-Message-Id: <1519683480-33201-19-git-send-email-mjc@sifive.com>
+Date: Tue, 27 Feb 2018 11:17:56 +1300
+Message-Id: <1519683480-33201-20-git-send-email-mjc@sifive.com>
 In-Reply-To: <1519683480-33201-1-git-send-email-mjc@sifive.com>
 References: <1519683480-33201-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v7 18/23] RISC-V VirtIO Machine
+Subject: [Qemu-devel] [PATCH v7 19/23] SiFive RISC-V UART Device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +28,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
 
-RISC-V machine with device-tree, 16550a UART and VirtIO MMIO.
-The following machine is implemented:
+QEMU model of the UART on the SiFive E300 and U500 series SOCs.
+BBL supports the SiFive UART for early console access via the SBI
+(Supervisor Binary Interface) and the linux kernel SBI console.
 
-- 'virt'; CLINT, PLIC, 16550A UART, VirtIO MMIO, device-tree
+The SiFive UART implements the pre qom legacy interface consistent
+with the 16550a UART in 'hw/char/serial.c'.
 
 Acked-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- hw/riscv/virt.c         | 420 ++++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/riscv/virt.h |  68 ++++++++
- 2 files changed, 488 insertions(+)
- create mode 100644 hw/riscv/virt.c
- create mode 100644 include/hw/riscv/virt.h
+ hw/riscv/sifive_uart.c         | 176 +++++++++++++++++++++++++++++++++++++++++
+ include/hw/riscv/sifive_uart.h |  71 +++++++++++++++++
+ 2 files changed, 247 insertions(+)
+ create mode 100644 hw/riscv/sifive_uart.c
+ create mode 100644 include/hw/riscv/sifive_uart.h
 
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+diff --git a/hw/riscv/sifive_uart.c b/hw/riscv/sifive_uart.c
 new file mode 100644
-index 0000000..62351fb
+index 0000000..b0c3798
 --- /dev/null
-+++ b/hw/riscv/virt.c
-@@ -0,0 +1,420 @@
++++ b/hw/riscv/sifive_uart.c
+@@ -0,0 +1,176 @@
 +/*
-+ * QEMU RISC-V VirtIO Board
++ * QEMU model of the UART on the SiFive E300 and U500 series SOCs.
 + *
-+ * Copyright (c) 2017 SiFive, Inc.
-+ *
-+ * RISC-V machine with 16550a UART and VirtIO MMIO
++ * Copyright (c) 2016 Stefan O'Rear
 + *
 + * This program is free software; you can redistribute it and/or modify it
 + * under the terms and conditions of the GNU General Public License,
@@ -69,414 +69,173 @@ index 0000000..62351fb
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "qemu/error-report.h"
 +#include "qapi/error.h"
-+#include "hw/hw.h"
-+#include "hw/boards.h"
-+#include "hw/loader.h"
 +#include "hw/sysbus.h"
-+#include "hw/char/serial.h"
-+#include "target/riscv/cpu.h"
-+#include "hw/riscv/riscv_htif.h"
-+#include "hw/riscv/riscv_hart.h"
-+#include "hw/riscv/sifive_plic.h"
-+#include "hw/riscv/sifive_clint.h"
-+#include "hw/riscv/sifive_test.h"
-+#include "hw/riscv/virt.h"
 +#include "chardev/char.h"
-+#include "sysemu/arch_init.h"
-+#include "sysemu/device_tree.h"
-+#include "exec/address-spaces.h"
-+#include "elf.h"
++#include "chardev/char-fe.h"
++#include "target/riscv/cpu.h"
++#include "hw/riscv/sifive_uart.h"
 +
-+static const struct MemmapEntry {
-+    hwaddr base;
-+    hwaddr size;
-+} virt_memmap[] = {
-+    [VIRT_DEBUG] =    {        0x0,      0x100 },
-+    [VIRT_MROM] =     {     0x1000,     0x2000 },
-+    [VIRT_TEST] =     {     0x4000,     0x1000 },
-+    [VIRT_CLINT] =    {  0x2000000,    0x10000 },
-+    [VIRT_PLIC] =     {  0xc000000,  0x4000000 },
-+    [VIRT_UART0] =    { 0x10000000,      0x100 },
-+    [VIRT_VIRTIO] =   { 0x10001000,     0x1000 },
-+    [VIRT_DRAM] =     { 0x80000000,        0x0 },
-+};
++/*
++ * Not yet implemented:
++ *
++ * Transmit FIFO using "qemu/fifo8.h"
++ * SIFIVE_UART_IE_TXWM interrupts
++ * SIFIVE_UART_IE_RXWM interrupts must honor fifo watermark
++ * Rx FIFO watermark interrupt trigger threshold
++ * Tx FIFO watermark interrupt trigger threshold.
++ */
 +
-+static void copy_le32_to_phys(hwaddr pa, uint32_t *rom, size_t len)
++static void update_irq(SiFiveUARTState *s)
 +{
-+    int i;
-+    for (i = 0; i < (len >> 2); i++) {
-+        stl_phys(&address_space_memory, pa + (i << 2), rom[i]);
++    int cond = 0;
++    if ((s->ie & SIFIVE_UART_IE_RXWM) && s->rx_fifo_len) {
++        cond = 1;
++    }
++    if (cond) {
++        qemu_irq_raise(s->irq);
++    } else {
++        qemu_irq_lower(s->irq);
 +    }
 +}
 +
-+static uint64_t identity_translate(void *opaque, uint64_t addr)
++static uint64_t
++uart_read(void *opaque, hwaddr addr, unsigned int size)
 +{
-+    return addr;
-+}
-+
-+static uint64_t load_kernel(const char *kernel_filename)
-+{
-+    uint64_t kernel_entry, kernel_high;
-+
-+    if (load_elf(kernel_filename, identity_translate, NULL,
-+                 &kernel_entry, NULL, &kernel_high,
-+                 0, ELF_MACHINE, 1, 0) < 0) {
-+        error_report("qemu: could not load kernel '%s'", kernel_filename);
-+        exit(1);
-+    }
-+    return kernel_entry;
-+}
-+
-+static hwaddr load_initrd(const char *filename, uint64_t mem_size,
-+                          uint64_t kernel_entry, hwaddr *start)
-+{
-+    int size;
-+
-+    /* We want to put the initrd far enough into RAM that when the
-+     * kernel is uncompressed it will not clobber the initrd. However
-+     * on boards without much RAM we must ensure that we still leave
-+     * enough room for a decent sized initrd, and on boards with large
-+     * amounts of RAM we must avoid the initrd being so far up in RAM
-+     * that it is outside lowmem and inaccessible to the kernel.
-+     * So for boards with less  than 256MB of RAM we put the initrd
-+     * halfway into RAM, and for boards with 256MB of RAM or more we put
-+     * the initrd at 128MB.
-+     */
-+    *start = kernel_entry + MIN(mem_size / 2, 128 * 1024 * 1024);
-+
-+    size = load_ramdisk(filename, *start, mem_size - *start);
-+    if (size == -1) {
-+        size = load_image_targphys(filename, *start, mem_size - *start);
-+        if (size == -1) {
-+          error_report("qemu: could not load ramdisk '%s'", filename);
-+          exit(1);
++    SiFiveUARTState *s = opaque;
++    unsigned char r;
++    switch (addr) {
++    case SIFIVE_UART_RXFIFO:
++        if (s->rx_fifo_len) {
++            r = s->rx_fifo[0];
++            memmove(s->rx_fifo, s->rx_fifo + 1, s->rx_fifo_len - 1);
++            s->rx_fifo_len--;
++            qemu_chr_fe_accept_input(&s->chr);
++            update_irq(s);
++            return r;
 +        }
-+    }
-+    return *start + size;
-+}
++        return 0x80000000;
 +
-+static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-+    uint64_t mem_size, const char *cmdline)
-+{
-+    void *fdt;
-+    int cpu;
-+    uint32_t *cells;
-+    char *nodename;
-+    uint32_t plic_phandle, phandle = 1;
-+    int i;
-+
-+    fdt = s->fdt = create_device_tree(&s->fdt_size);
-+    if (!fdt) {
-+        error_report("create_device_tree() failed");
-+        exit(1);
++    case SIFIVE_UART_TXFIFO:
++        return 0; /* Should check tx fifo */
++    case SIFIVE_UART_IE:
++        return s->ie;
++    case SIFIVE_UART_IP:
++        return s->rx_fifo_len ? SIFIVE_UART_IP_RXWM : 0;
++    case SIFIVE_UART_TXCTRL:
++        return s->txctrl;
++    case SIFIVE_UART_RXCTRL:
++        return s->rxctrl;
++    case SIFIVE_UART_DIV:
++        return s->div;
 +    }
 +
-+    qemu_fdt_setprop_string(fdt, "/", "model", "riscv-virtio,qemu");
-+    qemu_fdt_setprop_string(fdt, "/", "compatible", "riscv-virtio");
-+    qemu_fdt_setprop_cell(fdt, "/", "#size-cells", 0x2);
-+    qemu_fdt_setprop_cell(fdt, "/", "#address-cells", 0x2);
-+
-+    qemu_fdt_add_subnode(fdt, "/soc");
-+    qemu_fdt_setprop(fdt, "/soc", "ranges", NULL, 0);
-+    qemu_fdt_setprop_string(fdt, "/soc", "compatible", "riscv-virtio-soc");
-+    qemu_fdt_setprop_cell(fdt, "/soc", "#size-cells", 0x2);
-+    qemu_fdt_setprop_cell(fdt, "/soc", "#address-cells", 0x2);
-+
-+    nodename = g_strdup_printf("/memory@%lx",
-+        (long)memmap[VIRT_DRAM].base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-+        memmap[VIRT_DRAM].base >> 32, memmap[VIRT_DRAM].base,
-+        mem_size >> 32, mem_size);
-+    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
-+    g_free(nodename);
-+
-+    qemu_fdt_add_subnode(fdt, "/cpus");
-+    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency", 10000000);
-+    qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
-+    qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
-+
-+    for (cpu = s->soc.num_harts - 1; cpu >= 0; cpu--) {
-+        int cpu_phandle = phandle++;
-+        nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
-+        char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
-+        char *isa = riscv_isa_string(&s->soc.harts[cpu]);
-+        qemu_fdt_add_subnode(fdt, nodename);
-+        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 1000000000);
-+        qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
-+        qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
-+        qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
-+        qemu_fdt_setprop_string(fdt, nodename, "status", "okay");
-+        qemu_fdt_setprop_cell(fdt, nodename, "reg", cpu);
-+        qemu_fdt_setprop_string(fdt, nodename, "device_type", "cpu");
-+        qemu_fdt_add_subnode(fdt, intc);
-+        qemu_fdt_setprop_cell(fdt, intc, "phandle", cpu_phandle);
-+        qemu_fdt_setprop_cell(fdt, intc, "linux,phandle", cpu_phandle);
-+        qemu_fdt_setprop_string(fdt, intc, "compatible", "riscv,cpu-intc");
-+        qemu_fdt_setprop(fdt, intc, "interrupt-controller", NULL, 0);
-+        qemu_fdt_setprop_cell(fdt, intc, "#interrupt-cells", 1);
-+        g_free(isa);
-+        g_free(intc);
-+        g_free(nodename);
-+    }
-+
-+    cells =  g_new0(uint32_t, s->soc.num_harts * 4);
-+    for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
-+        nodename =
-+            g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
-+        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, nodename);
-+        cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
-+        cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_SOFT);
-+        cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
-+        cells[cpu * 4 + 3] = cpu_to_be32(IRQ_M_TIMER);
-+        g_free(nodename);
-+    }
-+    nodename = g_strdup_printf("/soc/clint@%lx",
-+        (long)memmap[VIRT_CLINT].base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,clint0");
-+    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-+        0x0, memmap[VIRT_CLINT].base,
-+        0x0, memmap[VIRT_CLINT].size);
-+    qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
-+        cells, s->soc.num_harts * sizeof(uint32_t) * 4);
-+    g_free(cells);
-+    g_free(nodename);
-+
-+    plic_phandle = phandle++;
-+    cells =  g_new0(uint32_t, s->soc.num_harts * 4);
-+    for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
-+        nodename =
-+            g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
-+        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, nodename);
-+        cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
-+        cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_EXT);
-+        cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
-+        cells[cpu * 4 + 3] = cpu_to_be32(IRQ_S_EXT);
-+        g_free(nodename);
-+    }
-+    nodename = g_strdup_printf("/soc/interrupt-controller@%lx",
-+        (long)memmap[VIRT_PLIC].base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_cell(fdt, nodename, "#interrupt-cells", 1);
-+    qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,plic0");
-+    qemu_fdt_setprop(fdt, nodename, "interrupt-controller", NULL, 0);
-+    qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
-+        cells, s->soc.num_harts * sizeof(uint32_t) * 4);
-+    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-+        0x0, memmap[VIRT_PLIC].base,
-+        0x0, memmap[VIRT_PLIC].size);
-+    qemu_fdt_setprop_string(fdt, nodename, "reg-names", "control");
-+    qemu_fdt_setprop_cell(fdt, nodename, "riscv,max-priority", 7);
-+    qemu_fdt_setprop_cell(fdt, nodename, "riscv,ndev", VIRTIO_NDEV);
-+    qemu_fdt_setprop_cells(fdt, nodename, "phandle", plic_phandle);
-+    qemu_fdt_setprop_cells(fdt, nodename, "linux,phandle", plic_phandle);
-+    plic_phandle = qemu_fdt_get_phandle(fdt, nodename);
-+    g_free(cells);
-+    g_free(nodename);
-+
-+    for (i = 0; i < VIRTIO_COUNT; i++) {
-+        nodename = g_strdup_printf("/virtio_mmio@%lx",
-+            (long)(memmap[VIRT_VIRTIO].base + i * memmap[VIRT_VIRTIO].size));
-+        qemu_fdt_add_subnode(fdt, nodename);
-+        qemu_fdt_setprop_string(fdt, nodename, "compatible", "virtio,mmio");
-+        qemu_fdt_setprop_cells(fdt, nodename, "reg",
-+            0x0, memmap[VIRT_VIRTIO].base + i * memmap[VIRT_VIRTIO].size,
-+            0x0, memmap[VIRT_VIRTIO].size);
-+        qemu_fdt_setprop_cells(fdt, nodename, "interrupt-parent", plic_phandle);
-+        qemu_fdt_setprop_cells(fdt, nodename, "interrupts", VIRTIO_IRQ + i);
-+        g_free(nodename);
-+    }
-+
-+    nodename = g_strdup_printf("/test@%lx",
-+        (long)memmap[VIRT_TEST].base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_string(fdt, nodename, "compatible", "sifive,test0");
-+    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-+        0x0, memmap[VIRT_TEST].base,
-+        0x0, memmap[VIRT_TEST].size);
-+
-+    nodename = g_strdup_printf("/uart@%lx",
-+        (long)memmap[VIRT_UART0].base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_string(fdt, nodename, "compatible", "ns16550a");
-+    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-+        0x0, memmap[VIRT_UART0].base,
-+        0x0, memmap[VIRT_UART0].size);
-+    qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 3686400);
-+        qemu_fdt_setprop_cells(fdt, nodename, "interrupt-parent", plic_phandle);
-+        qemu_fdt_setprop_cells(fdt, nodename, "interrupts", UART0_IRQ);
-+
-+    qemu_fdt_add_subnode(fdt, "/chosen");
-+    qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", nodename);
-+    qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
-+    g_free(nodename);
-+
-+    return fdt;
-+}
-+
-+static void riscv_virt_board_init(MachineState *machine)
-+{
-+    const struct MemmapEntry *memmap = virt_memmap;
-+
-+    RISCVVirtState *s = g_new0(RISCVVirtState, 1);
-+    MemoryRegion *system_memory = get_system_memory();
-+    MemoryRegion *main_mem = g_new(MemoryRegion, 1);
-+    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
-+    char *plic_hart_config;
-+    size_t plic_hart_config_len;
-+    int i;
-+    void *fdt;
-+
-+    /* Initialize SOC */
-+    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
-+    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
-+                              &error_abort);
-+    object_property_set_str(OBJECT(&s->soc), TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_10,
-+                            "cpu-type", &error_abort);
-+    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
-+                            &error_abort);
-+    object_property_set_bool(OBJECT(&s->soc), true, "realized",
-+                            &error_abort);
-+
-+    /* register system main memory (actual RAM) */
-+    memory_region_init_ram(main_mem, NULL, "riscv_virt_board.ram",
-+                           machine->ram_size, &error_fatal);
-+    memory_region_add_subregion(system_memory, memmap[VIRT_DRAM].base,
-+        main_mem);
-+
-+    /* create device tree */
-+    fdt = create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
-+
-+    /* boot rom */
-+    memory_region_init_ram(boot_rom, NULL, "riscv_virt_board.bootrom",
-+                           s->fdt_size + 0x2000, &error_fatal);
-+    memory_region_add_subregion(system_memory, 0x0, boot_rom);
-+
-+    if (machine->kernel_filename) {
-+        uint64_t kernel_entry = load_kernel(machine->kernel_filename);
-+
-+        if (machine->initrd_filename) {
-+            hwaddr start;
-+            hwaddr end = load_initrd(machine->initrd_filename,
-+                                     machine->ram_size, kernel_entry,
-+                                     &start);
-+            qemu_fdt_setprop_cell(fdt, "/chosen",
-+                                  "linux,initrd-start", start);
-+            qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-end",
-+                                  end);
-+        }
-+    }
-+
-+    /* reset vector */
-+    uint32_t reset_vec[8] = {
-+        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(dtb) */
-+        0x02028593,                  /*     addi   a1, t0, %pcrel_lo(1b) */
-+        0xf1402573,                  /*     csrr   a0, mhartid  */
-+#if defined(TARGET_RISCV32)
-+        0x0182a283,                  /*     lw     t0, 24(t0) */
-+#elif defined(TARGET_RISCV64)
-+        0x0182b283,                  /*     ld     t0, 24(t0) */
-+#endif
-+        0x00028067,                  /*     jr     t0 */
-+        0x00000000,
-+        memmap[VIRT_DRAM].base,      /* start: .dword memmap[VIRT_DRAM].base */
-+        0x00000000,
-+                                     /* dtb: */
-+    };
-+
-+    /* copy in the reset vector */
-+    copy_le32_to_phys(ROM_BASE, reset_vec, sizeof(reset_vec));
-+
-+    /* copy in the device tree */
-+    qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
-+    cpu_physical_memory_write(ROM_BASE + sizeof(reset_vec),
-+        s->fdt, s->fdt_size);
-+
-+    /* create PLIC hart topology configuration string */
-+    plic_hart_config_len = (strlen(VIRT_PLIC_HART_CONFIG) + 1) * smp_cpus;
-+    plic_hart_config = g_malloc0(plic_hart_config_len);
-+    for (i = 0; i < smp_cpus; i++) {
-+        if (i != 0) {
-+            strncat(plic_hart_config, ",", plic_hart_config_len);
-+        }
-+        strncat(plic_hart_config, VIRT_PLIC_HART_CONFIG, plic_hart_config_len);
-+        plic_hart_config_len -= (strlen(VIRT_PLIC_HART_CONFIG) + 1);
-+    }
-+
-+    /* MMIO */
-+    s->plic = sifive_plic_create(memmap[VIRT_PLIC].base,
-+        plic_hart_config,
-+        VIRT_PLIC_NUM_SOURCES,
-+        VIRT_PLIC_NUM_PRIORITIES,
-+        VIRT_PLIC_PRIORITY_BASE,
-+        VIRT_PLIC_PENDING_BASE,
-+        VIRT_PLIC_ENABLE_BASE,
-+        VIRT_PLIC_ENABLE_STRIDE,
-+        VIRT_PLIC_CONTEXT_BASE,
-+        VIRT_PLIC_CONTEXT_STRIDE,
-+        memmap[VIRT_PLIC].size);
-+    sifive_clint_create(memmap[VIRT_CLINT].base,
-+        memmap[VIRT_CLINT].size, smp_cpus,
-+        SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
-+    sifive_test_create(memmap[VIRT_TEST].base);
-+
-+    for (i = 0; i < VIRTIO_COUNT; i++) {
-+        sysbus_create_simple("virtio-mmio",
-+            memmap[VIRT_VIRTIO].base + i * memmap[VIRT_VIRTIO].size,
-+            SIFIVE_PLIC(s->plic)->irqs[VIRTIO_IRQ + i]);
-+    }
-+
-+    serial_mm_init(system_memory, memmap[VIRT_UART0].base,
-+        0, SIFIVE_PLIC(s->plic)->irqs[UART0_IRQ], 399193,
-+        serial_hds[0], DEVICE_LITTLE_ENDIAN);
-+}
-+
-+static int riscv_virt_board_sysbus_device_init(SysBusDevice *sysbusdev)
-+{
++    hw_error("%s: bad read: addr=0x%x\n",
++        __func__, (int)addr);
 +    return 0;
 +}
 +
-+static void riscv_virt_board_class_init(ObjectClass *klass, void *data)
++static void
++uart_write(void *opaque, hwaddr addr,
++           uint64_t val64, unsigned int size)
 +{
-+    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
-+    k->init = riscv_virt_board_sysbus_device_init;
++    SiFiveUARTState *s = opaque;
++    uint32_t value = val64;
++    unsigned char ch = value;
++
++    switch (addr) {
++    case SIFIVE_UART_TXFIFO:
++        qemu_chr_fe_write(&s->chr, &ch, 1);
++        return;
++    case SIFIVE_UART_IE:
++        s->ie = val64;
++        update_irq(s);
++        return;
++    case SIFIVE_UART_TXCTRL:
++        s->txctrl = val64;
++        return;
++    case SIFIVE_UART_RXCTRL:
++        s->rxctrl = val64;
++        return;
++    case SIFIVE_UART_DIV:
++        s->div = val64;
++        return;
++    }
++    hw_error("%s: bad write: addr=0x%x v=0x%x\n",
++        __func__, (int)addr, (int)value);
 +}
 +
-+static const TypeInfo riscv_virt_board_device = {
-+    .name          = TYPE_RISCV_VIRT_BOARD,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(RISCVVirtState),
-+    .class_init    = riscv_virt_board_class_init,
++static const MemoryRegionOps uart_ops = {
++    .read = uart_read,
++    .write = uart_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4
++    }
 +};
 +
-+static void riscv_virt_board_machine_init(MachineClass *mc)
++static void uart_rx(void *opaque, const uint8_t *buf, int size)
 +{
-+    mc->desc = "RISC-V VirtIO Board (Privileged spec v1.10)";
-+    mc->init = riscv_virt_board_init;
-+    mc->max_cpus = 8; /* hardcoded limit in BBL */
++    SiFiveUARTState *s = opaque;
++
++    /* Got a byte.  */
++    if (s->rx_fifo_len >= sizeof(s->rx_fifo)) {
++        printf("WARNING: UART dropped char.\n");
++        return;
++    }
++    s->rx_fifo[s->rx_fifo_len++] = *buf;
++
++    update_irq(s);
 +}
 +
-+DEFINE_MACHINE("virt", riscv_virt_board_machine_init)
-+
-+static void riscv_virt_board_register_types(void)
++static int uart_can_rx(void *opaque)
 +{
-+    type_register_static(&riscv_virt_board_device);
++    SiFiveUARTState *s = opaque;
++
++    return s->rx_fifo_len < sizeof(s->rx_fifo);
 +}
 +
-+type_init(riscv_virt_board_register_types);
-diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
-new file mode 100644
-index 0000000..e0a7301
---- /dev/null
-+++ b/include/hw/riscv/virt.h
-@@ -0,0 +1,68 @@
++static void uart_event(void *opaque, int event)
++{
++}
++
++static int uart_be_change(void *opaque)
++{
++    SiFiveUARTState *s = opaque;
++
++    qemu_chr_fe_set_handlers(&s->chr, uart_can_rx, uart_rx, uart_event,
++        uart_be_change, s, NULL, true);
++
++    return 0;
++}
++
 +/*
-+ * SiFive VirtIO Board
++ * Create UART device.
++ */
++SiFiveUARTState *sifive_uart_create(MemoryRegion *address_space, hwaddr base,
++    Chardev *chr, qemu_irq irq)
++{
++    SiFiveUARTState *s = g_malloc0(sizeof(SiFiveUARTState));
++    s->irq = irq;
++    qemu_chr_fe_init(&s->chr, chr, &error_abort);
++    qemu_chr_fe_set_handlers(&s->chr, uart_can_rx, uart_rx, uart_event,
++        uart_be_change, s, NULL, true);
++    memory_region_init_io(&s->mmio, NULL, &uart_ops, s,
++                          TYPE_SIFIVE_UART, SIFIVE_UART_MAX);
++    memory_region_add_subregion(address_space, base, &s->mmio);
++    return s;
++}
+diff --git a/include/hw/riscv/sifive_uart.h b/include/hw/riscv/sifive_uart.h
+new file mode 100644
+index 0000000..504f18a
+--- /dev/null
++++ b/include/hw/riscv/sifive_uart.h
+@@ -0,0 +1,71 @@
++/*
++ * SiFive UART interface
 + *
++ * Copyright (c) 2016 Stefan O'Rear
 + * Copyright (c) 2017 SiFive, Inc.
 + *
 + * This program is free software; you can redistribute it and/or modify it
@@ -492,54 +251,56 @@ index 0000000..e0a7301
 + * this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#ifndef HW_VIRT_H
-+#define HW_VIRT_H
++#ifndef HW_SIFIVE_UART_H
++#define HW_SIFIVE_UART_H
 +
-+#define TYPE_RISCV_VIRT_BOARD "riscv.virt"
-+#define VIRT(obj) \
-+    OBJECT_CHECK(RISCVVirtState, (obj), TYPE_RISCV_VIRT_BOARD)
++enum {
++    SIFIVE_UART_TXFIFO        = 0,
++    SIFIVE_UART_RXFIFO        = 4,
++    SIFIVE_UART_TXCTRL        = 8,
++    SIFIVE_UART_TXMARK        = 10,
++    SIFIVE_UART_RXCTRL        = 12,
++    SIFIVE_UART_RXMARK        = 14,
++    SIFIVE_UART_IE            = 16,
++    SIFIVE_UART_IP            = 20,
++    SIFIVE_UART_DIV           = 24,
++    SIFIVE_UART_MAX           = 32
++};
 +
-+enum { ROM_BASE = 0x1000 };
++enum {
++    SIFIVE_UART_IE_TXWM       = 1, /* Transmit watermark interrupt enable */
++    SIFIVE_UART_IE_RXWM       = 2  /* Receive watermark interrupt enable */
++};
 +
-+typedef struct {
++enum {
++    SIFIVE_UART_IP_TXWM       = 1, /* Transmit watermark interrupt pending */
++    SIFIVE_UART_IP_RXWM       = 2  /* Receive watermark interrupt pending */
++};
++
++#define TYPE_SIFIVE_UART "riscv.sifive.uart"
++
++#define SIFIVE_UART(obj) \
++    OBJECT_CHECK(SiFiveUARTState, (obj), TYPE_SIFIVE_UART)
++
++typedef struct SiFiveUARTState {
 +    /*< private >*/
 +    SysBusDevice parent_obj;
 +
 +    /*< public >*/
-+    RISCVHartArrayState soc;
-+    DeviceState *plic;
-+    void *fdt;
-+    int fdt_size;
-+} RISCVVirtState;
++    qemu_irq irq;
++    MemoryRegion mmio;
++    CharBackend chr;
++    uint8_t rx_fifo[8];
++    unsigned int rx_fifo_len;
++    uint32_t ie;
++    uint32_t ip;
++    uint32_t txctrl;
++    uint32_t rxctrl;
++    uint32_t div;
++} SiFiveUARTState;
 +
-+enum {
-+    VIRT_DEBUG,
-+    VIRT_MROM,
-+    VIRT_TEST,
-+    VIRT_CLINT,
-+    VIRT_PLIC,
-+    VIRT_UART0,
-+    VIRT_VIRTIO,
-+    VIRT_DRAM
-+};
-+
-+
-+enum {
-+    UART0_IRQ = 10,
-+    VIRTIO_IRQ = 1, /* 1 to 8 */
-+    VIRTIO_COUNT = 8,
-+    VIRTIO_NDEV = 10
-+};
-+
-+#define VIRT_PLIC_HART_CONFIG "MS"
-+#define VIRT_PLIC_NUM_SOURCES 127
-+#define VIRT_PLIC_NUM_PRIORITIES 7
-+#define VIRT_PLIC_PRIORITY_BASE 0x0
-+#define VIRT_PLIC_PENDING_BASE 0x1000
-+#define VIRT_PLIC_ENABLE_BASE 0x2000
-+#define VIRT_PLIC_ENABLE_STRIDE 0x80
-+#define VIRT_PLIC_CONTEXT_BASE 0x200000
-+#define VIRT_PLIC_CONTEXT_STRIDE 0x1000
++SiFiveUARTState *sifive_uart_create(MemoryRegion *address_space, hwaddr base,
++    Chardev *chr, qemu_irq irq);
 +
 +#endif
 -- 
