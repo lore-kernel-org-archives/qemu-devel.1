@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eqXzG-0004ad-B6
+	(envelope-from <cota@braap.org>) id 1eqXzH-0004bR-QL
 	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 00:39:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eqXzC-0000QO-PO
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 00:39:38 -0500
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:40511)
+	(envelope-from <cota@braap.org>) id 1eqXzD-0000RY-FH
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 00:39:39 -0500
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:54061)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eqXzC-0000Pq-L3
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 00:39:34 -0500
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eqXzD-0000Qn-9w
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 00:39:35 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Tue, 27 Feb 2018 00:39:18 -0500
-Message-Id: <1519709965-29833-10-git-send-email-cota@braap.org>
+Date: Tue, 27 Feb 2018 00:39:21 -0500
+Message-Id: <1519709965-29833-13-git-send-email-cota@braap.org>
 In-Reply-To: <1519709965-29833-1-git-send-email-cota@braap.org>
 References: <1519709965-29833-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 09/16] translate-all: move
- tb_invalidate_phys_page_range up in the file
+Subject: [Qemu-devel] [PATCH 12/16] translate-all: discard TB when
+ tb_link_page returns an existing matching TB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,107 +27,148 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-This greatly simplifies next commit's diff.
+Use the recently-gained QHT feature of returning the matching TB if it
+already exists. This allows us to get rid of the lookup we perform
+right after acquiring tb_lock.
 
+Suggested-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/translate-all.c | 77 ++++++++++++++++++++++++-----------------------
- 1 file changed, 39 insertions(+), 38 deletions(-)
+ accel/tcg/cpu-exec.c      | 14 ++------------
+ accel/tcg/translate-all.c | 47 ++++++++++++++++++++++++++++++++++++++---------
+ 2 files changed, 40 insertions(+), 21 deletions(-)
 
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index 7c83887..8aed38c 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -243,10 +243,7 @@ void cpu_exec_step_atomic(CPUState *cpu)
+         if (tb == NULL) {
+             mmap_lock();
+             tb_lock();
+-            tb = tb_htable_lookup(cpu, pc, cs_base, flags, cf_mask);
+-            if (likely(tb == NULL)) {
+-                tb = tb_gen_code(cpu, pc, cs_base, flags, cflags);
+-            }
++            tb = tb_gen_code(cpu, pc, cs_base, flags, cflags);
+             tb_unlock();
+             mmap_unlock();
+         }
+@@ -396,14 +393,7 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
+         tb_lock();
+         acquired_tb_lock = true;
+ 
+-        /* There's a chance that our desired tb has been translated while
+-         * taking the locks so we check again inside the lock.
+-         */
+-        tb = tb_htable_lookup(cpu, pc, cs_base, flags, cf_mask);
+-        if (likely(tb == NULL)) {
+-            /* if no translated code available, then translate it now */
+-            tb = tb_gen_code(cpu, pc, cs_base, flags, cf_mask);
+-        }
++        tb = tb_gen_code(cpu, pc, cs_base, flags, cf_mask);
+ 
+         mmap_unlock();
+         /* We add the TB in the virtual pc hash table for the fast lookup */
 diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index a98e182..4cb03f1 100644
+index 82832ef..dbe6c12 100644
 --- a/accel/tcg/translate-all.c
 +++ b/accel/tcg/translate-all.c
-@@ -1371,44 +1371,6 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+@@ -1503,12 +1503,16 @@ static inline void tb_page_add(PageDesc *p, TranslationBlock *tb,
+  * (-1) to indicate that only one page contains the TB.
+  *
+  * Called with mmap_lock held for user-mode emulation.
++ *
++ * Returns @tb or an existing TB that matches @tb.
+  */
+-static void tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
+-                         tb_page_addr_t phys_page2)
++static TranslationBlock *
++tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
++             tb_page_addr_t phys_page2)
+ {
+     PageDesc *p;
+     PageDesc *p2 = NULL;
++    void *existing_tb;
+     uint32_t h;
  
- /*
-  * Invalidate all TBs which intersect with the target physical address range
-- * [start;end[. NOTE: start and end may refer to *different* physical pages.
-- * 'is_cpu_write_access' should be true if called from a real cpu write
-- * access: the virtual CPU will exit the current TB if code is modified inside
-- * this TB.
-- *
-- * Called with mmap_lock held for user-mode emulation, grabs tb_lock
-- * Called with tb_lock held for system-mode emulation
-- */
--static void tb_invalidate_phys_range_1(tb_page_addr_t start, tb_page_addr_t end)
--{
--    tb_page_addr_t next;
+     assert_memory_lock();
+@@ -1516,6 +1520,11 @@ static void tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
+     /*
+      * Add the TB to the page list.
+      * To avoid deadlock, acquire first the lock of the lower-addressed page.
++     * We keep the locks held until after inserting the TB in the hash table,
++     * so that if the insertion fails we know for sure that the TBs are still
++     * in the page descriptors.
++     * Note that inserting into the hash table first isn't an option, since
++     * we can only insert TBs that are fully initialized.
+      */
+     p = page_find_alloc(phys_pc >> TARGET_PAGE_BITS, 1);
+     if (likely(phys_page2 == -1)) {
+@@ -1535,21 +1544,33 @@ static void tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
+         tb_page_add(p2, tb, 1, phys_page2);
+     }
+ 
++    /* add in the hash table */
++    h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->cflags & CF_HASH_MASK,
++                     tb->trace_vcpu_dstate);
++    existing_tb = qht_insert(&tb_ctx.htable, tb, h);
++
++    /* remove TB from the page(s) if we couldn't insert it */
++    if (unlikely(existing_tb)) {
++        tb_page_remove(p, tb);
++        invalidate_page_bitmap(p);
++        if (p2) {
++            tb_page_remove(p2, tb);
++            invalidate_page_bitmap(p2);
++        }
++        tb = existing_tb;
++    }
++
+     if (p2) {
+         page_unlock(p2);
+     }
+     page_unlock(p);
+ 
+-    /* add in the hash table */
+-    h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->cflags & CF_HASH_MASK,
+-                     tb->trace_vcpu_dstate);
+-    qht_insert(&tb_ctx.htable, tb, h);
 -
--    for (next = (start & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
--         start < end;
--         start = next, next += TARGET_PAGE_SIZE) {
--        tb_page_addr_t bound = MIN(next, end);
--
--        tb_invalidate_phys_page_range(start, bound, 0);
--    }
--}
--
--#ifdef CONFIG_SOFTMMU
--void tb_invalidate_phys_range(tb_page_addr_t start, tb_page_addr_t end)
--{
--    assert_tb_locked();
--    tb_invalidate_phys_range_1(start, end);
--}
--#else
--void tb_invalidate_phys_range(tb_page_addr_t start, tb_page_addr_t end)
--{
--    assert_memory_lock();
--    tb_lock();
--    tb_invalidate_phys_range_1(start, end);
--    tb_unlock();
--}
--#endif
--/*
-- * Invalidate all TBs which intersect with the target physical address range
-  * [start;end[. NOTE: start and end must refer to the *same* physical page.
-  * 'is_cpu_write_access' should be true if called from a real cpu write
-  * access: the virtual CPU will exit the current TB if code is modified inside
-@@ -1505,6 +1467,45 @@ void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
+ #ifdef CONFIG_USER_ONLY
+     if (DEBUG_TB_CHECK_GATE) {
+         tb_page_check();
+     }
  #endif
++    return tb;
  }
  
-+/*
-+ * Invalidate all TBs which intersect with the target physical address range
-+ * [start;end[. NOTE: start and end may refer to *different* physical pages.
-+ * 'is_cpu_write_access' should be true if called from a real cpu write
-+ * access: the virtual CPU will exit the current TB if code is modified inside
-+ * this TB.
-+ *
-+ * Called with mmap_lock held for user-mode emulation, grabs tb_lock
-+ * Called with tb_lock held for system-mode emulation
-+ */
-+static void tb_invalidate_phys_range_1(tb_page_addr_t start, tb_page_addr_t end)
-+{
-+    tb_page_addr_t next;
+ /* Called with mmap_lock held for user mode emulation.  */
+@@ -1558,7 +1579,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+                               uint32_t flags, int cflags)
+ {
+     CPUArchState *env = cpu->env_ptr;
+-    TranslationBlock *tb;
++    TranslationBlock *tb, *existing_tb;
+     tb_page_addr_t phys_pc, phys_page2;
+     target_ulong virt_page2;
+     tcg_insn_unit *gen_code_buf;
+@@ -1706,7 +1727,15 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+      * memory barrier is required before tb_link_page() makes the TB visible
+      * through the physical hash table and physical page list.
+      */
+-    tb_link_page(tb, phys_pc, phys_page2);
++    existing_tb = tb_link_page(tb, phys_pc, phys_page2);
++    /* if the TB already exists, discard what we just translated */
++    if (unlikely(existing_tb != tb)) {
++        uintptr_t orig_aligned = (uintptr_t)gen_code_buf;
 +
-+    for (next = (start & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
-+         start < end;
-+         start = next, next += TARGET_PAGE_SIZE) {
-+        tb_page_addr_t bound = MIN(next, end);
-+
-+        tb_invalidate_phys_page_range(start, bound, 0);
++        orig_aligned -= ROUND_UP(sizeof(*tb), qemu_icache_linesize);
++        atomic_set(&tcg_ctx->code_gen_ptr, orig_aligned);
++        return existing_tb;
 +    }
-+}
-+
-+#ifdef CONFIG_SOFTMMU
-+void tb_invalidate_phys_range(tb_page_addr_t start, tb_page_addr_t end)
-+{
-+    assert_tb_locked();
-+    tb_invalidate_phys_range_1(start, end);
-+}
-+#else
-+void tb_invalidate_phys_range(tb_page_addr_t start, tb_page_addr_t end)
-+{
-+    assert_memory_lock();
-+    tb_lock();
-+    tb_invalidate_phys_range_1(start, end);
-+    tb_unlock();
-+}
-+#endif
-+
- #ifdef CONFIG_SOFTMMU
- /* len must be <= 8 and start must be a multiple of len.
-  * Called via softmmu_template.h when code areas are written to with
+     tcg_tb_insert(tb);
+     return tb;
+ }
 -- 
 2.7.4
