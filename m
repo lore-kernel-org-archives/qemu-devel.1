@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1eqh4r-00075j-DY
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:22:05 -0500
+	(envelope-from <groug@kaod.org>) id 1eqh5t-0007zp-TJ
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:23:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1eqh4o-0008Uw-JZ
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:22:01 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49662 helo=mx1.redhat.com)
+	(envelope-from <groug@kaod.org>) id 1eqh5q-0000Su-1v
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:23:05 -0500
+Received: from 8.mo179.mail-out.ovh.net ([46.105.75.26]:51832)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1eqh4o-0008Uc-D2
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:21:58 -0500
-References: <20180223215858.16987-1-wei@redhat.com>
-	<20180223215858.16987-3-wei@redhat.com> <20180226180110.GE2873@work-vm>
-	<3904e31b-8c66-b241-7369-1b479b683da8@redhat.com>
-	<20180227113841.GC2847@work-vm>
-From: Wei Huang <wei@redhat.com>
-Message-ID: <87398bbc-d017-75ba-8805-4e39dd75cc5d@redhat.com>
-Date: Tue, 27 Feb 2018 09:21:48 -0600
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eqh5p-0000PM-RW
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:23:01 -0500
+Received: from player729.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id F1EE7A558D
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 16:22:53 +0100 (CET)
+From: Greg Kurz <groug@kaod.org>
+Date: Tue, 27 Feb 2018 16:22:40 +0100
+Message-ID: <151974496089.17040.8929640429507724311.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20180227113841.GC2847@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V5 2/4] tests/migration: Convert the boot
- block compilation script into Makefile
+Subject: [Qemu-devel] [PATCH 0/2] spapr: fix migration of old guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,188 +27,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, quintela@redhat.com, drjones@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, Lukas Doktor <ldoktor@redhat.com>
+
+Recent VSMT work broke migration of old guests as reported in this BZ:
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1549087
+
+Patch 1 fixes the issue, while patch 2 is a tentative code reorg to
+ensure VSMT is set before anyone tries to use spapr->vsmt.
+
+--
+Greg
+
+---
+
+Greg Kurz (2):
+      spapr: register dummy ICPs later
+      spapr: harden code that depends on VSMT
 
 
-
-On 02/27/2018 05:38 AM, Dr. David Alan Gilbert wrote:
-> * Wei Huang (wei@redhat.com) wrote:
->>
->>
->> On 02/26/2018 12:01 PM, Dr. David Alan Gilbert wrote:
->>> * Wei Huang (wei@redhat.com) wrote:
->>>> The x86 boot block header currently is generated with a shell script.
->>>> To better support other CPUs (e.g. aarch64), we convert the script
->>>> into Makefile. This allows us to 1) support cross-compilation easily,
->>>> and 2) avoid creating a script file for every architecture.
->>>>
->>>> Signed-off-by: Wei Huang <wei@redhat.com>
->>>
->>> But what happens if you're on a system that doesn't have the cross
->>> compilers?  I found it's too easy to get stuck with it trying
->>> to rebuild the header when there's no need.
->>
->> I think it is fine. If no cross compiler is present, NNN_cross_prefix
->> won't find anything. So it ends up with using the gcc tools on host
->> systems. Obviously the compilation will fail. This should become the
->> problem to solve for whoever wants to do cross-compile. For us, we have
->> done our part because the .h files have been provided.
-> 
-> But isn't it a problem for people just trying to make check?
-
-"make check" doesn't invoke the Makefile in tests/migration/. This
-Makefile is only invoked when people manually run "make" or "make
-x86-a-b-bootblock.h" inside the tests/migration/ directory.
-
-> One of the things that convinced me to move it out of the makefile and
-> into a separate script was that it was too easy to get into a situation
-> where Make wanted to rebuild the headerilfe on a system.
-
-This could be potentially one concern. But the real reason behind this
-concern is the cross-compilation doesn't always work (it depends on the
-availability of cross-compiler tools). My argument is this problem also
-exists in the original script approach. As long as QEMU doesn't include
-tests/migration/Makefile in "make" or "make check", I think this rebuild
-headerfile situation won't happen.
-
-Also, using Makefile, we don't need to write a script for each single
-architecture. And it is easier to support cross-compilation detection
-(than script).
-
-Thanks,
--Wei
-
-> 
-> Dave
-> 
->>>
->>> Dave
->>>
->>>> ---
->>>>  tests/migration/Makefile                 | 36 ++++++++++++++++++++++++++++++++
->>>>  tests/migration/rebuild-x86-bootblock.sh | 33 -----------------------------
->>>>  tests/migration/x86-a-b-bootblock.h      |  2 +-
->>>>  tests/migration/x86-a-b-bootblock.s      |  5 ++---
->>>>  4 files changed, 39 insertions(+), 37 deletions(-)
->>>>  create mode 100644 tests/migration/Makefile
->>>>  delete mode 100755 tests/migration/rebuild-x86-bootblock.sh
->>>>
->>>> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
->>>> new file mode 100644
->>>> index 0000000000..8fbedaa8b8
->>>> --- /dev/null
->>>> +++ b/tests/migration/Makefile
->>>> @@ -0,0 +1,36 @@
->>>> +#
->>>> +# Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
->>>> +#
->>>> +# Authors:
->>>> +#   Dave Gilbert <dgilbert@redhat.com>
->>>> +#
->>>> +# This work is licensed under the terms of the GNU GPL, version 2 or later.
->>>> +# See the COPYING file in the top-level directory.
->>>> +#
->>>> +export __note
->>>> +override define __note
->>>> +/* This file is automatically generated from
->>>> + * tests/migration/$<, edit that and then run
->>>> + * "make $@" inside tests/migration to update,
->>>> + * and then remember to send both in your patch submission.
->>>> + */
->>>> +endef
->>>> +
->>>> +all: x86-a-b-bootblock.h
->>>> +# Dummy command so that make thinks it has done something
->>>> +	@true
->>>> +
->>>> +SRC_PATH=../..
->>>> +include $(SRC_PATH)/rules.mak
->>>> +
->>>> +x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
->>>> +
->>>> +x86-a-b-bootblock.h: x86-a-b-bootblock.s
->>>> +	$(x86_64_cross_prefix)as --32 -march=i486 $< -o x86.o
->>>> +	$(x86_64_cross_prefix)objcopy -O binary x86.o x86.boot
->>>> +	dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124
->>>> +	echo "$$__note" > $@
->>>> +	xxd -i x86.bootsect | sed -e 's/.*int.*//' >> $@
->>>> +
->>>> +clean:
->>>> +	rm -f *.bootsect *.boot *.o
->>>> diff --git a/tests/migration/rebuild-x86-bootblock.sh b/tests/migration/rebuild-x86-bootblock.sh
->>>> deleted file mode 100755
->>>> index 86cec5d284..0000000000
->>>> --- a/tests/migration/rebuild-x86-bootblock.sh
->>>> +++ /dev/null
->>>> @@ -1,33 +0,0 @@
->>>> -#!/bin/sh
->>>> -# Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
->>>> -# This work is licensed under the terms of the GNU GPL, version 2 or later.
->>>> -# See the COPYING file in the top-level directory.
->>>> -#
->>>> -# Author: dgilbert@redhat.com
->>>> -
->>>> -ASMFILE=$PWD/tests/migration/x86-a-b-bootblock.s
->>>> -HEADER=$PWD/tests/migration/x86-a-b-bootblock.h
->>>> -
->>>> -if [ ! -e "$ASMFILE" ]
->>>> -then
->>>> -  echo "Couldn't find $ASMFILE" >&2
->>>> -  exit 1
->>>> -fi
->>>> -
->>>> -ASM_WORK_DIR=$(mktemp -d --tmpdir X86BB.XXXXXX)
->>>> -cd "$ASM_WORK_DIR" &&
->>>> -as --32 -march=i486 "$ASMFILE" -o x86.o &&
->>>> -objcopy -O binary x86.o x86.boot &&
->>>> -dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124 &&
->>>> -xxd -i x86.bootsect |
->>>> -sed -e 's/.*int.*//' > x86.hex &&
->>>> -cat - x86.hex <<HERE > "$HEADER"
->>>> -/* This file is automatically generated from
->>>> - * tests/migration/x86-a-b-bootblock.s, edit that and then run
->>>> - * tests/migration/rebuild-x86-bootblock.sh to update,
->>>> - * and then remember to send both in your patch submission.
->>>> - */
->>>> -HERE
->>>> -
->>>> -rm x86.hex x86.bootsect x86.boot x86.o
->>>> -cd .. && rmdir "$ASM_WORK_DIR"
->>>> diff --git a/tests/migration/x86-a-b-bootblock.h b/tests/migration/x86-a-b-bootblock.h
->>>> index 78a151fe2a..9e8e2e028b 100644
->>>> --- a/tests/migration/x86-a-b-bootblock.h
->>>> +++ b/tests/migration/x86-a-b-bootblock.h
->>>> @@ -1,6 +1,6 @@
->>>>  /* This file is automatically generated from
->>>>   * tests/migration/x86-a-b-bootblock.s, edit that and then run
->>>> - * tests/migration/rebuild-x86-bootblock.sh to update,
->>>> + * "make x86-a-b-bootblock.h" inside tests/migration to update,
->>>>   * and then remember to send both in your patch submission.
->>>>   */
->>>>  unsigned char x86_bootsect[] = {
->>>> diff --git a/tests/migration/x86-a-b-bootblock.s b/tests/migration/x86-a-b-bootblock.s
->>>> index b1642641a7..98dbfab084 100644
->>>> --- a/tests/migration/x86-a-b-bootblock.s
->>>> +++ b/tests/migration/x86-a-b-bootblock.s
->>>> @@ -3,9 +3,8 @@
->>>>  #  range.
->>>>  #  Outputs an initial 'A' on serial followed by repeated 'B's
->>>>  #
->>>> -# run   tests/migration/rebuild-x86-bootblock.sh
->>>> -#   to regenerate the hex, and remember to include both the .h and .s
->>>> -#   in any patches.
->>>> +#  In tests/migration dir, run 'make x86-a-b-bootblock.h' to regenerate
->>>> +#  the hex, and remember to include both the .h and .s in any patches.
->>>>  #
->>>>  # Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
->>>>  # This work is licensed under the terms of the GNU GPL, version 2 or later.
->>>> -- 
->>>> 2.14.3
->>>>
->>> --
->>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->>>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+ hw/ppc/spapr.c |  144 +++++++++++++++++++++++++++++---------------------------
+ 1 file changed, 75 insertions(+), 69 deletions(-)
