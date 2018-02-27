@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49982)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=5899da973=anthony.perard@citrix.com>)
-	id 1eqijB-0002Dm-IA
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:07:46 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eqikQ-0002xj-Mz
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:09:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=5899da973=anthony.perard@citrix.com>)
-	id 1eqij8-0002zj-Cn
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:07:45 -0500
-Received: from smtp.citrix.com ([66.165.176.89]:55877)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=5899da973=anthony.perard@citrix.com>)
-	id 1eqij8-0002yt-5M
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:07:42 -0500
-Date: Tue, 27 Feb 2018 16:37:28 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20180227163728.GA1799@perard.uk.xensource.com>
-References: <20171207101812.23602-1-haozhong.zhang@intel.com>
-	<20171207101812.23602-3-haozhong.zhang@intel.com>
+	(envelope-from <kwolf@redhat.com>) id 1eqikP-0003hM-CS
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:09:02 -0500
+Date: Tue, 27 Feb 2018 18:08:49 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180227170849.GC5269@localhost.localdomain>
+References: <20180223235142.21501-1-jsnow@redhat.com>
+	<20180223235142.21501-6-jsnow@redhat.com>
+	<20180227162759.GB5269@localhost.localdomain>
+	<0b9a7368-0425-8879-91db-3c1b3049912e@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171207101812.23602-3-haozhong.zhang@intel.com>
-Subject: Re: [Qemu-devel] [RFC QEMU PATCH v4 02/10] xen-hvm: create the
- hotplug memory region on Xen
+In-Reply-To: <0b9a7368-0425-8879-91db-3c1b3049912e@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v4 05/21] blockjobs: add state transition
+ table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +26,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Haozhong Zhang <haozhong.zhang@intel.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-block@nongnu.org, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
 
-On Thu, Dec 07, 2017 at 06:18:04PM +0800, Haozhong Zhang wrote:
-> The guest physical address of vNVDIMM is allocated from the hotplug
-> memory region, which is not created when QEMU is used as Xen device
-> model. In order to use vNVDIMM for Xen HVM domains, this commit reuses
-> the code for pc machine type to create the hotplug memory region for
-> Xen HVM domains.
+Am 27.02.2018 um 17:45 hat John Snow geschrieben:
 > 
-> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> ---
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> ---
->  hw/i386/pc.c          | 86 ++++++++++++++++++++++++++++-----------------------
->  hw/i386/xen/xen-hvm.c |  2 ++
->  include/hw/i386/pc.h  |  1 +
->  3 files changed, 51 insertions(+), 38 deletions(-)
 > 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 186545d2a4..9f46c8df79 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1315,6 +1315,53 @@ void xen_load_linux(PCMachineState *pcms)
->      pcms->fw_cfg = fw_cfg;
->  }
->  
-> +void pc_memory_hotplug_init(PCMachineState *pcms, MemoryRegion *system_memory)
+> On 02/27/2018 11:27 AM, Kevin Wolf wrote:
+> > Am 24.02.2018 um 00:51 hat John Snow geschrieben:
+> >> The state transition table has mostly been implied. We're about to make
+> >> it a bit more complex, so let's make the STM explicit instead.
+> >>
+> >> Perform state transitions with a function that for now just asserts the
+> >> transition is appropriate.
+> >>
+> >> Transitions:
+> >> Undefined -> Created: During job initialization.
+> >> Created   -> Running: Once the job is started.
+> >>                       Jobs cannot transition from "Created" to "Paused"
+> >>                       directly, but will instead synchronously transition
+> >>                       to running to paused immediately.
+> >> Running   -> Paused:  Normal workflow for pauses.
+> >> Running   -> Ready:   Normal workflow for jobs reaching their sync point.
+> >>                       (e.g. mirror)
+> >> Ready     -> Standby: Normal workflow for pausing ready jobs.
+> >> Paused    -> Running: Normal resume.
+> >> Standby   -> Ready:   Resume of a Standby job.
+> >>
+> >>
+> >> +---------+
+> >> |UNDEFINED|
+> >> +--+------+
+> >>    |
+> >> +--v----+
+> >> |CREATED|
+> >> +--+----+
+> >>    |
+> >> +--v----+     +------+
+> >> |RUNNING<----->PAUSED|
+> >> +--+----+     +------+
+> >>    |
+> >> +--v--+       +-------+
+> >> |READY<------->STANDBY|
+> >> +-----+       +-------+
+> >>
+> >>
+> >> Notably, there is no state presently defined as of this commit that
+> >> deals with a job after the "running" or "ready" states, so this table
+> >> will be adjusted alongside the commits that introduce those states.
+> >>
+> >> Signed-off-by: John Snow <jsnow@redhat.com>
+> >> ---
+> >>  block/trace-events |  3 +++
+> >>  blockjob.c         | 42 ++++++++++++++++++++++++++++++++++++------
+> >>  2 files changed, 39 insertions(+), 6 deletions(-)
+> >>
+> >> diff --git a/block/trace-events b/block/trace-events
+> >> index 02dd80ff0c..b75a0c8409 100644
+> >> --- a/block/trace-events
+> >> +++ b/block/trace-events
+> >> @@ -4,6 +4,9 @@
+> >>  bdrv_open_common(void *bs, const char *filename, int flags, const char *format_name) "bs %p filename \"%s\" flags 0x%x format_name \"%s\""
+> >>  bdrv_lock_medium(void *bs, bool locked) "bs %p locked %d"
+> >>  
+> >> +# blockjob.c
+> >> +block_job_state_transition(void *job,  int ret, const char *legal, const char *s0, const char *s1) "job %p (ret: %d) attempting %s transition (%s-->%s)"
+> >> +
+> >>  # block/block-backend.c
+> >>  blk_co_preadv(void *blk, void *bs, int64_t offset, unsigned int bytes, int flags) "blk %p bs %p offset %"PRId64" bytes %u flags 0x%x"
+> >>  blk_co_pwritev(void *blk, void *bs, int64_t offset, unsigned int bytes, int flags) "blk %p bs %p offset %"PRId64" bytes %u flags 0x%x"
+> >> diff --git a/blockjob.c b/blockjob.c
+> >> index 1be9c20cff..d745b3bb69 100644
+> >> --- a/blockjob.c
+> >> +++ b/blockjob.c
+> >> @@ -28,6 +28,7 @@
+> >>  #include "block/block.h"
+> >>  #include "block/blockjob_int.h"
+> >>  #include "block/block_int.h"
+> >> +#include "block/trace.h"
+> >>  #include "sysemu/block-backend.h"
+> >>  #include "qapi/error.h"
+> >>  #include "qapi/qmp/qerror.h"
+> >> @@ -41,6 +42,34 @@
+> >>   * block_job_enter. */
+> >>  static QemuMutex block_job_mutex;
+> >>  
+> >> +/* BlockJob State Transition Table */
+> >> +bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
+> >> +                                          /* U, C, R, P, Y, S */
+> >> +    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0},
+> > 
+> > Even at the end of the series, this is the only use of
+> > BLOCK_JOB_STATUS_UNDEFINED.
+> > 
+> >> +    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0},
+> >> +    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0},
+> >> +    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0},
+> >> +    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1},
+> >> +    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0},
+> >> +};
+> >> +
+> >> +static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
+> >> +{
+> >> +    BlockJobStatus s0 = job->status;
+> >> +    if (s0 == s1) {
+> >> +        return;
+> >> +    }
+> >> +    assert(s1 >= 0 && s1 <= BLOCK_JOB_STATUS__MAX);
+> >> +    trace_block_job_state_transition(job, job->ret, BlockJobSTT[s0][s1] ?
+> >> +                                     "allowed" : "disallowed",
+> >> +                                     qapi_enum_lookup(&BlockJobStatus_lookup,
+> >> +                                                      s0),
+> >> +                                     qapi_enum_lookup(&BlockJobStatus_lookup,
+> >> +                                                      s1));
+> >> +    assert(BlockJobSTT[s0][s1]);
+> >> +    job->status = s1;
+> >> +}
+> >> +
+> >>  static void block_job_lock(void)
+> >>  {
+> >>      qemu_mutex_lock(&block_job_mutex);
+> >> @@ -320,7 +349,7 @@ void block_job_start(BlockJob *job)
+> >>      job->pause_count--;
+> >>      job->busy = true;
+> >>      job->paused = false;
+> >> -    job->status = BLOCK_JOB_STATUS_RUNNING;
+> >> +    block_job_state_transition(job, BLOCK_JOB_STATUS_RUNNING);
+> >>      bdrv_coroutine_enter(blk_bs(job->blk), job->co);
+> >>  }
+> >>  
+> >> @@ -704,6 +733,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+> >>      job->refcnt        = 1;
+> >>      job->manual        = (flags & BLOCK_JOB_MANUAL);
+> >>      job->status        = BLOCK_JOB_STATUS_CREATED;
+> >> +    block_job_state_transition(job, BLOCK_JOB_STATUS_CREATED);
+> > 
+> > So did you intend to start with BLOCK_JOB_STATUS_UNDEFINED and then
+> > transition to BLOCK_JOB_STATUS_CREATED?
+> > 
+> > Or should we completely remove BLOCK_JOB_STATUS_UNDEFINED, keep the
+> > initialisation and not call block_job_state_transition() here?
+> > 
+> > Kevin
+> > 
+> 
+> We can do that;
+> 
+> I had it start as "Undefined" because I liked how a g_new0() object will
+> default to that state, so it felt "safe."
+> 
+> On the negatives, it does mean that technically you COULD witness a job
+> in this state if QEMU did something wrong, which would be confusing
+> because you wouldn't be able to fix it via QMP.
 
-It might be better to have a separate patch which move the code into a function.
+I don't really mind which way you do it as long as the code seems
+self-consistent. You could change the initialisation this way:
 
-> +{
-> +    MachineState *machine = MACHINE(pcms);
-> +    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
-> +    ram_addr_t hotplug_mem_size = machine->maxram_size - machine->ram_size;
-> +
-> +    if (!pcmc->has_reserved_memory || machine->ram_size >= machine->maxram_size)
-> +        return;
-> +
-> +    if (memory_region_size(&pcms->hotplug_memory.mr)) {
+    job->status        = BLOCK_JOB_STATUS_UNDEFINED;
+    block_job_state_transition(job, BLOCK_JOB_STATUS_CREATED);
 
-This new check looks like to catch programming error, rather than user
-error. Would it be better to be an assert instead?
+Or if you want to make use of the fact that g_new0() already results in
+BLOCK_JOB_STATUS_UNDEFINED, you can omit the first line.
 
-> +        error_report("hotplug memory region has been initialized");
-> +        exit(EXIT_FAILURE);
-> +    }
-> +
+I'm also not strictly opposed to a CREATED -> CREATED transition, even
+though it looks a bit odd. But then there is no reason to allow an
+UNDEFINED -> CREATED transition that never happens in practice.
+UNDEFINED would then be a completely unused state that could only be
+active in the case of a bug.
 
--- 
-Anthony PERARD
+Kevin
