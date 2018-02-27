@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eqbx0-00023z-QR
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 04:53:36 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eqbx7-0002B7-8u
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 04:53:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eqbwz-0005NN-77
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 04:53:34 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:57648)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eqbx5-0005Qd-0V
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 04:53:41 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:57666)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eqbwy-0005N0-Qj
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 04:53:33 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eqbx4-0005Pj-C2
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 04:53:38 -0500
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 27 Feb 2018 12:53:33 +0300
-Message-ID: <20180227095333.1060.1331.stgit@pasha-VirtualBox>
+Date: Tue, 27 Feb 2018 12:53:38 +0300
+Message-ID: <20180227095338.1060.27385.stgit@pasha-VirtualBox>
 In-Reply-To: <20180227095135.1060.36549.stgit@pasha-VirtualBox>
 References: <20180227095135.1060.36549.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v7 21/22] replay: update documentation
+Subject: [Qemu-devel] [PATCH v7 22/22] tcg: fix cpu_io_recompile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,143 +29,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org
 
-This patch clarifies the description of the record/replay feature
-in docs/replay.txt
+cpu_io_recompile() function was broken by
+the commit 9b990ee5a3cc6aa38f81266fb0c6ef37a36c45b9. Instead of regenerating
+the block starting from PC of the original block, it just set the instruction
+counter for TCG. In most cases this was unnoticed, but in icount mode
+there was an exception for incorrect usage of CF_LAST_IO flag.
+This patch recovers recompilation of the original block and also
+configures translation for executing single IO instruction which
+caused a recompilation.
 
 Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 ---
- docs/replay.txt |   72 ++++++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 52 insertions(+), 20 deletions(-)
+ accel/tcg/translate-all.c |   18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/docs/replay.txt b/docs/replay.txt
-index 959633e..2e21e9c 100644
---- a/docs/replay.txt
-+++ b/docs/replay.txt
-@@ -7,14 +7,10 @@ See the COPYING file in the top-level directory.
- Record/replay
- -------------
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 67795cd..5ad1b91 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -1728,7 +1728,8 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+     CPUArchState *env = cpu->env_ptr;
+ #endif
+     TranslationBlock *tb;
+-    uint32_t n;
++    uint32_t n, flags;
++    target_ulong pc, cs_base;
  
--Record/replay functions are used for the reverse execution and deterministic
--replay of qemu execution. This implementation of deterministic replay can
--be used for deterministic debugging of guest code through a gdb remote
--interface.
--
-+Record/replay functions are used for the deterministic replay of qemu execution.
- Execution recording writes a non-deterministic events log, which can be later
- used for replaying the execution anywhere and for unlimited number of times.
--It also supports checkpointing for faster rewinding during reverse debugging.
-+It also supports checkpointing for faster rewind to the specific replay moment.
- Execution replaying reads the log and replays all non-deterministic events
- including external input, hardware clocks, and interrupts.
+     tb_lock();
+     tb = tb_find_pc(retaddr);
+@@ -1766,8 +1767,14 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+         cpu_abort(cpu, "TB too big during recompile");
+     }
  
-@@ -28,16 +24,36 @@ Deterministic replay has the following features:
-    input devices.
- 
- Usage of the record/replay:
-- * First, record the execution, by adding the following arguments to the command line:
--   '-icount shift=7,rr=record,rrfile=replay.bin -net none'.
--   Block devices' images are not actually changed in the recording mode,
-+ * First, record the execution with the following command line:
-+    qemu-system-i386 \
-+     -icount shift=7,rr=record,rrfile=replay.bin \
-+     -drive file=disk.qcow2,if=none,id=img-direct \
-+     -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay \
-+     -device ide-hd,drive=img-blkreplay \
-+     -netdev user,id=net1 -device rtl8139,netdev=net1 \
-+     -object filter-replay,id=replay,netdev=net1
-+ * After recording, you can replay it by using another command line:
-+    qemu-system-i386 \
-+     -icount shift=7,rr=replay,rrfile=replay.bin \
-+     -drive file=disk.qcow2,if=none,id=img-direct \
-+     -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay \
-+     -device ide-hd,drive=img-blkreplay \
-+     -netdev user,id=net1 -device rtl8139,netdev=net1 \
-+     -object filter-replay,id=replay,netdev=net1
-+   The only difference with recording is changing the rr option
-+   from record to replay.
-+ * Block device images are not actually changed in the recording mode,
-    because all of the changes are written to the temporary overlay file.
-- * Then you can replay it by using another command
--   line option: '-icount shift=7,rr=replay,rrfile=replay.bin -net none'
-- * '-net none' option should also be specified if network replay patches
--   are not applied.
--
--Papers with description of deterministic replay implementation:
-+   This behavior is enabled by using blkreplay driver. It should be used
-+   for every enabled block device, as described in 'Block devices' section.
-+ * '-net none' option should be specified when network is not used,
-+   because QEMU adds network card by default. When network is needed,
-+   it should be configured explicitly with replay filter, as described
-+   in 'Network devices' section.
-+ * Interaction with audio devices and serial ports are recorded and replayed
-+   automatically when such devices are enabled.
+-    /* Adjust the execution state of the next TB.  */
+-    cpu->cflags_next_tb = curr_cflags() | CF_LAST_IO | n;
++    pc = tb->pc;
++    cs_base = tb->cs_base;
++    flags = tb->flags;
++    tb_phys_invalidate(tb, -1);
 +
-+Academic papers with description of deterministic replay implementation:
- http://www.computer.org/csdl/proceedings/csmr/2012/4666/00/4666a553-abs.html
- http://dl.acm.org/citation.cfm?id=2786805.2803179
++    /* Execute one IO instruction without caching
++       instead of creating large TB. */
++    cpu->cflags_next_tb = curr_cflags() | CF_LAST_IO | CF_NOCACHE | 1;
  
-@@ -46,8 +62,11 @@ Modifications of qemu include:
-  * saving different asynchronous events (e.g. system shutdown) into the log
-  * synchronization of the bottom halves execution
-  * synchronization of the threads from thread pool
-- * recording/replaying user input (mouse and keyboard)
-+ * recording/replaying user input (mouse, keyboard, and microphone)
-  * adding internal checkpoints for cpu and io synchronization
-+ * network filter for recording and replaying the packets
-+ * block driver for making block layer deterministic
-+ * serial port input record and replay
+     if (tb->cflags & CF_NOCACHE) {
+         if (tb->orig_tb) {
+@@ -1778,6 +1785,11 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+         tb_remove(tb);
+     }
  
- Locking and thread synchronisation
- ----------------------------------
-@@ -77,12 +96,11 @@ Non-deterministic events
- Our record/replay system is based on saving and replaying non-deterministic
- events (e.g. keyboard input) and simulating deterministic ones (e.g. reading
- from HDD or memory of the VM). Saving only non-deterministic events makes
--log file smaller, simulation faster, and allows using reverse debugging even
--for realtime applications.
-+log file smaller and simulation faster.
- 
- The following non-deterministic data from peripheral devices is saved into
- the log: mouse and keyboard input, network packets, audio controller input,
--USB packets, serial port input, and hardware clocks (they are non-deterministic
-+serial port input, and hardware clocks (they are non-deterministic
- too, because their values are taken from the host machine). Inputs from
- simulated hardware, memory of VM, software interrupts, and execution of
- instructions are not saved into the log, because they are deterministic and
-@@ -205,7 +223,7 @@ Block devices record/replay module intercepts calls of
- bdrv coroutine functions at the top of block drivers stack.
- To record and replay block operations the drive must be configured
- as following:
-- -drive file=disk.qcow,if=none,id=img-direct
-+ -drive file=disk.qcow2,if=none,id=img-direct
-  -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay
-  -device ide-hd,drive=img-blkreplay
- 
-@@ -234,6 +252,12 @@ This snapshot is created at start of recording and restored at start
- of replaying. It also can be loaded while replaying to roll back
- the execution.
- 
-+Use QEMU monitor to create additional snapshots. 'savevm <name>' command
-+created the snapshot and 'loadvm <name>' restores it. To prevent corruption
-+of the original disk image, use overlay files linked to the original images.
-+Therefore all new snapshots (including the starting one) will be saved in
-+overlays and the original image remains unchanged.
++    /* Generate new TB instead of the current one. */
++    /* FIXME: In theory this could raise an exception.  In practice
++       we have already translated the block once so it's probably ok.  */
++    tb_gen_code(cpu, pc, cs_base, flags, curr_cflags() | CF_LAST_IO | n);
 +
- Network devices
- ---------------
- 
-@@ -255,6 +279,14 @@ Audio data is recorded and replay automatically. The command line for recording
- and replaying must contain identical specifications of audio hardware, e.g.:
-  -soundhw ac97
- 
-+Serial ports
-+------------
-+
-+Serial ports input is recorded and replay automatically. The command lines
-+for recording and replaying must contain identical number of ports in record
-+and replay modes, but their backends may differ.
-+E.g., '-serial stdio' in record mode, and '-serial null' in replay mode.
-+
- Replay log format
- -----------------
- 
+     /* TODO: If env->pc != tb->pc (i.e. the faulting instruction was not
+      * the first in the TB) then we end up generating a whole new TB and
+      *  repeating the fault, which is horribly inefficient.
