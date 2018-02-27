@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eqing-0005It-VQ
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:12:25 -0500
+	(envelope-from <frasse.iglesias@gmail.com>) id 1eqiq3-0007Pd-DE
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:14:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eqinf-0006Ga-W8
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:12:24 -0500
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:36835)
+	(envelope-from <frasse.iglesias@gmail.com>) id 1eqiq2-0008LX-90
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:14:51 -0500
+Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:39268)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eqinf-0006GB-RJ
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:12:23 -0500
-Received: by mail-ot0-x242.google.com with SMTP id 108so4468919otv.3
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 09:12:23 -0800 (PST)
+	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
+	id 1eqiq2-0008LD-24
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:14:50 -0500
+Received: by mail-pg0-x235.google.com with SMTP id w17so7756418pgv.6
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 09:14:50 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180227104903.21353-6-linus.walleij@linaro.org>
-References: <20180227104903.21353-1-linus.walleij@linaro.org>
-	<20180227104903.21353-6-linus.walleij@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Feb 2018 17:12:02 +0000
-Message-ID: <CAFEAcA88tabmji-pa6HNBAyx8aXV7cX3z=S0iw-GTW2rBBgMDA@mail.gmail.com>
+In-Reply-To: <CAFEAcA8bKM_Z9skCUE2HaF8zdca7YCAazxOXX-+dF5xC_xvGJw@mail.gmail.com>
+References: <20180223232233.31482-1-frasse.iglesias@gmail.com>
+	<CAFEAcA8bKM_Z9skCUE2HaF8zdca7YCAazxOXX-+dF5xC_xvGJw@mail.gmail.com>
+From: francisco iglesias <frasse.iglesias@gmail.com>
+Date: Tue, 27 Feb 2018 18:14:48 +0100
+Message-ID: <CAAYMZQs7NZJyhD=3Y3r_Tx+7O8stPtssLwZ4pSkvwv4VKUvTow@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 5/5] arm/vexpress: Add proper display
- connector emulation
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] xilinx_spips: Update CS assertion
+ when striping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +30,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Corey Minyard <cminyard@mvista.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>, Alistair Francis <alistai@xilinx.com>, Francisco Iglesias <francisco.iglesias@feimtech.se>
 
-On 27 February 2018 at 10:49, Linus Walleij <linus.walleij@linaro.org> wrote:
-> This adds the SiI9022 and EDID I2C devices to the ARM Versatile
-> Express machine, and selects the two I2C devices necessary in the
-> arm-softmmy.mak configuration so everything will build smoothly.
+On Tuesday, 27 February 2018, Peter Maydell <peter.maydell@linaro.org>
+wrote:
+
+> On 23 February 2018 at 23:22, Francisco Iglesias
+> <frasse.iglesias@gmail.com> wrote:
+> > Hi,
+> >
+> > The first patch in this series attempts to correct the slave selection
+> when
+> > using the striping functionality in the QSPI. The second patch in the
+> series
+> > updates the QIOR/QIOR4 commands to use 8 dummy cycles in the QSPI for
+> matching
+> > Micron (Numonyx) flashes (the default target flash type of the QSPI).
+> >
+> > Best regards,
+> > Francisco Iglesias
+> >
+> > Changelog:
+> > v1 -> v2
+> >   * Attempted to improve readability in the patch 'xilinx_spips: Enable
+> only
+> >     two slaves when reading/writing with stripe' when selecting chip
+> selects.
+> >
+> >
+> > Francisco Iglesias (2):
+> >   xilinx_spips: Enable only two slaves when reading/writing with stripe
+> >   xilinx_spips: Use 8 dummy cycles with the QIOR/QIOR4 commands
+> >
+> >  hw/ssi/xilinx_spips.c | 43 ++++++++++++++++++++++++++++++++++++++-----
+> >  1 file changed, 38 insertions(+), 5 deletions(-)
 >
-> I am implementing proper handling of the graphics in the Linux
-> kernel and adding proper emulation of SiI9022 and EDID makes the
-> driver probe as nicely as before, retrieveing the resolutions
-> supported by the "QEMU monitor" and overall just working nice.
 >
-> The assignment of the SiI9022 at address 0x39 and the EDID
-> DDC I2C at address 0x50 is not strictly correct: the DDC I2C
-> is there all the time but in the actual component it only
-> appears once activated inside the SiI9022, so ideally it should
-> be added and removed to the bus by the SiI9022. However for this
-> purpose it works fine to just have it around.
+>
+> Applied to target-arm.next, thanks.
+>
+> -- PMM
+>
 
-This last paragraph in the commit message can just be
-removed now the DDC I2C isn't created here, right?
+Hi Peter,
 
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
-> ChangeLog v1->v2:
-> - Only add the SII9022 now that it will by itself realize
->   the DDCI2C as part of the bridge.
-> ---
->  default-configs/arm-softmmu.mak | 2 ++
->  hw/arm/vexpress.c               | 6 +++++-
->  2 files changed, 7 insertions(+), 1 deletion(-)
+Thank you very much!
 
-(if this is the only problem with the patchset I'll just fix
-it up in my tree)
-
-thanks
--- PMM
+Best regards,
+Francisco Iglesias
