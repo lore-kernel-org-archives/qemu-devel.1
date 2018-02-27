@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eqXzG-0004aU-8W
+	(envelope-from <cota@braap.org>) id 1eqXzG-0004aW-8x
 	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 00:39:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eqXzC-0000Qb-SB
+	(envelope-from <cota@braap.org>) id 1eqXzC-0000PZ-9h
 	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 00:39:38 -0500
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:49779)
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:35265)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eqXzC-0000PD-NN
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eqXzC-0000NJ-13
 	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 00:39:34 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Tue, 27 Feb 2018 00:39:13 -0500
-Message-Id: <1519709965-29833-5-git-send-email-cota@braap.org>
-In-Reply-To: <1519709965-29833-1-git-send-email-cota@braap.org>
-References: <1519709965-29833-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 04/16] tcg: move
- tb_ctx.tb_phys_invalidate_count to tcg_ctx
+Date: Tue, 27 Feb 2018 00:39:09 -0500
+Message-Id: <1519709965-29833-1-git-send-email-cota@braap.org>
+Subject: [Qemu-devel] [PATCH 00/16] tcg: tb_lock removal redux v1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,97 +24,20 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-Thereby making it per-TCGContext. Once we remove tb_lock, this will
-avoid an atomic increment every time a TB is invalidated.
+With this set we finally remove tb_lock. The performance gains
+when booting a guest are compelling at low core counts. However,
+beyond 8 cores performance doesn't improve due to unrelated
+contention--see results in the last patch of the series
+("tcg: remove tb_lock").
 
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- accel/tcg/translate-all.c |  5 +++--
- include/exec/tb-context.h |  1 -
- tcg/tcg.c                 | 14 ++++++++++++++
- tcg/tcg.h                 |  3 +++
- 4 files changed, 20 insertions(+), 3 deletions(-)
+I have another series that greatly reduces this other contention by
+using per-CPU locks instead of the BQL to keep track of a subset
+of CPUState. But that series is pretty large so let's deal with
+this first.
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 3a51d49..20ad3fc 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1072,7 +1072,8 @@ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr)
-     /* suppress any remaining jumps to this TB */
-     tb_jmp_unlink(tb);
- 
--    tb_ctx.tb_phys_invalidate_count++;
-+    atomic_set(&tcg_ctx->tb_phys_invalidate_count,
-+               tcg_ctx->tb_phys_invalidate_count + 1);
- }
- 
- #ifdef CONFIG_SOFTMMU
-@@ -1862,7 +1863,7 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
-     cpu_fprintf(f, "\nStatistics:\n");
-     cpu_fprintf(f, "TB flush count      %u\n",
-                 atomic_read(&tb_ctx.tb_flush_count));
--    cpu_fprintf(f, "TB invalidate count %d\n", tb_ctx.tb_phys_invalidate_count);
-+    cpu_fprintf(f, "TB invalidate count %zu\n", tcg_tb_phys_invalidate_count());
-     cpu_fprintf(f, "TLB flush count     %zu\n", tlb_flush_count());
-     tcg_dump_info(f, cpu_fprintf);
- }
-diff --git a/include/exec/tb-context.h b/include/exec/tb-context.h
-index d8472c8..8c9b49c 100644
---- a/include/exec/tb-context.h
-+++ b/include/exec/tb-context.h
-@@ -37,7 +37,6 @@ struct TBContext {
- 
-     /* statistics */
-     unsigned tb_flush_count;
--    int tb_phys_invalidate_count;
- };
- 
- extern TBContext tb_ctx;
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index b471708..a7b596e 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -791,6 +791,20 @@ size_t tcg_code_capacity(void)
-     return capacity;
- }
- 
-+size_t tcg_tb_phys_invalidate_count(void)
-+{
-+    unsigned int n_ctxs = atomic_read(&n_tcg_ctxs);
-+    unsigned int i;
-+    size_t total = 0;
-+
-+    for (i = 0; i < n_ctxs; i++) {
-+        const TCGContext *s = atomic_read(&tcg_ctxs[i]);
-+
-+        total += atomic_read(&s->tb_phys_invalidate_count);
-+    }
-+    return total;
-+}
-+
- /* pool based memory allocation */
- void *tcg_malloc_internal(TCGContext *s, int size)
- {
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 8bf29cc..9dd9448 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -694,6 +694,8 @@ struct TCGContext {
-     /* Threshold to flush the translated code buffer.  */
-     void *code_gen_highwater;
- 
-+    size_t tb_phys_invalidate_count;
-+
-     /* Track which vCPU triggers events */
-     CPUState *cpu;                      /* *_trans */
- 
-@@ -852,6 +854,7 @@ size_t tcg_code_capacity(void);
- 
- void tcg_tb_insert(TranslationBlock *tb);
- void tcg_tb_remove(TranslationBlock *tb);
-+size_t tcg_tb_phys_invalidate_count(void);
- TranslationBlock *tcg_tb_lookup(uintptr_t tc_ptr);
- void tcg_tb_foreach(GTraverseFunc func, gpointer user_data);
- size_t tcg_nb_tbs(void);
--- 
-2.7.4
+You can fetch the patches from:
+  https://github.com/cota/qemu/tree/tb-lock-removal-redux-v1
+
+Thanks,
+
+		Emilio
