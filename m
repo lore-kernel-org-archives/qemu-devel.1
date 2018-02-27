@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linus.walleij@linaro.org>) id 1eqcNh-00074d-QO
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 05:21:10 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eqcRK-0008EJ-0A
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 05:24:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linus.walleij@linaro.org>) id 1eqcNg-0008OI-SA
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 05:21:09 -0500
-Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:37047)
+	(envelope-from <peter.maydell@linaro.org>) id 1eqcRJ-0001Ic-3z
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 05:24:53 -0500
+Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:35166)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <linus.walleij@linaro.org>)
-	id 1eqcNg-0008Nz-N8
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 05:21:08 -0500
-Received: by mail-io0-x243.google.com with SMTP id d71so11514665iog.4
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 02:21:08 -0800 (PST)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eqcRI-0001IG-UN
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 05:24:53 -0500
+Received: by mail-ot0-x232.google.com with SMTP id w2so739874otg.2
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 02:24:52 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-jqgBxoEprjTPed0k_vZFGrAVd87Gj5nAfFysau4WrSw@mail.gmail.com>
+In-Reply-To: <CACRpkdZuNUmZbHnYwUQFJkBNQWADd5tXfc9PYv8amosbO=zn4Q@mail.gmail.com>
 References: <20180217140051.22731-1-linus.walleij@linaro.org>
 	<20180217140051.22731-2-linus.walleij@linaro.org>
 	<eff4f015-38ad-60e1-e1de-886bb4f93328@amsat.org>
 	<CACRpkdZLwbVr2O5__GpHt+y0pqpk3-j_AXD_qv5JQc3JZNRm7A@mail.gmail.com>
 	<CAFEAcA-jqgBxoEprjTPed0k_vZFGrAVd87Gj5nAfFysau4WrSw@mail.gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 27 Feb 2018 11:21:07 +0100
-Message-ID: <CACRpkdZuNUmZbHnYwUQFJkBNQWADd5tXfc9PYv8amosbO=zn4Q@mail.gmail.com>
+	<CACRpkdZuNUmZbHnYwUQFJkBNQWADd5tXfc9PYv8amosbO=zn4Q@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Feb 2018 10:24:31 +0000
+Message-ID: <CAFEAcA_bZ-w7WWUtr8RE6rU8ELLbZpBmeuDnwZ=rLreXgJ6fRg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 2/3] hw/sii9022: Add support for
@@ -34,44 +35,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
+To: Linus Walleij <linus.walleij@linaro.org>
 Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, Feb 27, 2018 at 11:09 AM, Peter Maydell
-<peter.maydell@linaro.org> wrote:
-> On 27 February 2018 at 07:41, Linus Walleij <linus.walleij@linaro.org> wr=
-ote:
->> On Sat, Feb 17, 2018 at 7:32 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsa=
-t.org> wrote:
->>
->>> [Me]
->>>> +#define DEBUG_SII9022 0
->>>> +
->>>> +#define DPRINTF(fmt, ...) \
->>>> +    do { \
->>>> +        if (DEBUG_SII9022) { \
->>>> +            printf("sii9022: " fmt, ## __VA_ARGS__); \
->>>> +        } \
->>>> +    } while (0)
+On 27 February 2018 at 10:21, Linus Walleij <linus.walleij@linaro.org> wrot=
+e:
+> On Tue, Feb 27, 2018 at 11:09 AM, Peter Maydell
+> <peter.maydell@linaro.org> wrote:
+>> On 27 February 2018 at 07:41, Linus Walleij <linus.walleij@linaro.org> w=
+rote:
+>>> On Sat, Feb 17, 2018 at 7:32 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@ams=
+at.org> wrote:
 >>>
->>> Can you replace DPRINTF() by trace events?
+>>>> [Me]
+>>>>> +#define DEBUG_SII9022 0
+>>>>> +
+>>>>> +#define DPRINTF(fmt, ...) \
+>>>>> +    do { \
+>>>>> +        if (DEBUG_SII9022) { \
+>>>>> +            printf("sii9022: " fmt, ## __VA_ARGS__); \
+>>>>> +        } \
+>>>>> +    } while (0)
+>>>>
+>>>> Can you replace DPRINTF() by trace events?
+>>>
+>>> Absolutely but which ones?
+>>>
+>>> I do not feel senior enough to also invent new trace events
+>>> for displays or I2C devices...
 >>
->> Absolutely but which ones?
->>
->> I do not feel senior enough to also invent new trace events
->> for displays or I2C devices...
+>> Just put a trace event where you've put DPRINTF debug statements.
 >
-> Just put a trace event where you've put DPRINTF debug statements.
+> Yeah, hm the question might be silly or something but I don't
+> know how to do that.
 
-Yeah, hm the question might be silly or something but I don't
-know how to do that.
+docs/devel/tracing.txt describes them, but basically:
+ * include "trace.h"
+ * define trace events with a line for each in the trace-events
+   file for the subdirectory (basically a function prototype-ish
+   thing followed by a printf-style format string)
+ * call them like normal function calls with a trace_ prefix
 
-I guess I should include "trace.h".
+commit 1b640aa9292bc00beb441e97d862ba322a7ba18d is a recent one
+which converted some DRINTFs in hw/sd/sd.c to trace events.
 
-#include "trace.h" says it is autogenerated from tracetool.
-
-Is there some documentation I should be reading or a good
-example commit I can study to get the hang of it?
-
-Yours,
-Linus Walleij
+thanks
+-- PMM
