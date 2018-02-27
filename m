@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eqfDi-0005rs-QN
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:23:04 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eqfDl-0005uj-AB
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:23:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eqfDh-0000AG-5P
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:23:02 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eqfDj-0000CC-CO
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:23:05 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Tue, 27 Feb 2018 14:21:42 +0100
-Message-Id: <20180227132150.13847-19-cohuck@redhat.com>
+Date: Tue, 27 Feb 2018 14:21:43 +0100
+Message-Id: <20180227132150.13847-20-cohuck@redhat.com>
 In-Reply-To: <20180227132150.13847-1-cohuck@redhat.com>
 References: <20180227132150.13847-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 18/26] s390x/tcg: add various alignment checks
+Subject: [Qemu-devel] [PULL 19/26] qmp: expose s390-specific CPU info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,233 +20,431 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, rth@twiddle.net, agraf@suse.de, david@redhat.com, thuth@redhat.com, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, rth@twiddle.net, agraf@suse.de, david@redhat.com, thuth@redhat.com, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
 
-From: David Hildenbrand <david@redhat.com>
+From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 
-Let's add proper alignment checks for a handful of instructions that
-require a SPECIFICATION exception in case alignment is violated.
+Presently s390x is the only architecture not exposing specific
+CPU information via QMP query-cpus. Upstream discussion has shown
+that it could make sense to report the architecture specific CPU
+state, e.g. to detect that a CPU has been stopped.
 
-Introduce new wout/in functions. As we are right now only using them for
-privileged instructions, we have to add ugly ifdefs to silence
-compilers.
+With this change the output of query-cpus will look like this on
+s390:
 
-Convert STORE CPU ID right away to make use of the wout function.
+   [
+     {"arch": "s390", "current": true,
+      "props": {"core-id": 0}, "cpu-state": "operating", "CPU": 0,
+      "qom_path": "/machine/unattached/device[0]",
+      "halted": false, "thread_id": 63115},
+     {"arch": "s390", "current": false,
+      "props": {"core-id": 1}, "cpu-state": "stopped", "CPU": 1,
+      "qom_path": "/machine/unattached/device[1]",
+      "halted": true, "thread_id": 63116}
+   ]
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20180215103822.15179-1-david@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+This change doesn't add the s390-specific data to HMP 'info cpus'.
+A follow-on patch will remove all architecture specific information
+from there.
+
+Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <1518797321-28356-2-git-send-email-mihajlov@linux.vnet.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/insn-data.def | 16 ++++++++--------
- target/s390x/mem_helper.c  | 25 +++++++++++++++++++++++++
- target/s390x/translate.c   | 43 ++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 75 insertions(+), 9 deletions(-)
+ cpus.c                     |  6 ++++++
+ hw/intc/s390_flic.c        |  4 ++--
+ hw/s390x/s390-virtio-ccw.c |  2 +-
+ qapi-schema.json           | 28 +++++++++++++++++++++++++++-
+ target/s390x/cpu.c         | 24 ++++++++++++------------
+ target/s390x/cpu.h         |  7 ++-----
+ target/s390x/kvm.c         |  8 ++++----
+ target/s390x/sigp.c        | 38 +++++++++++++++++++-------------------
+ 8 files changed, 73 insertions(+), 44 deletions(-)
 
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 621e10d615..157619403d 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -1000,13 +1000,13 @@
-     /* ??? Not implemented - is it necessary? */
-     C(0xb204, SCK,     S,     Z,   0, 0, 0, 0, 0, 0)
- /* SET CLOCK COMPARATOR */
--    C(0xb206, SCKC,    S,     Z,   0, m2_64, 0, 0, sckc, 0)
-+    C(0xb206, SCKC,    S,     Z,   0, m2_64a, 0, 0, sckc, 0)
- /* SET CLOCK PROGRAMMABLE FIELD */
-     C(0x0107, SCKPF,   E,     Z,   0, 0, 0, 0, sckpf, 0)
- /* SET CPU TIMER */
--    C(0xb208, SPT,     S,     Z,   0, m2_64, 0, 0, spt, 0)
-+    C(0xb208, SPT,     S,     Z,   0, m2_64a, 0, 0, spt, 0)
- /* SET PREFIX */
--    C(0xb210, SPX,     S,     Z,   0, m2_32u, 0, 0, spx, 0)
-+    C(0xb210, SPX,     S,     Z,   0, m2_32ua, 0, 0, spx, 0)
- /* SET PSW KEY FROM ADDRESS */
-     C(0xb20a, SPKA,    S,     Z,   0, a2, 0, 0, spka, 0)
- /* SET STORAGE KEY EXTENDED */
-@@ -1021,20 +1021,20 @@
- /* STORE CLOCK EXTENDED */
-     C(0xb278, STCKE,   S,     Z,   0, a2, 0, 0, stcke, 0)
- /* STORE CLOCK COMPARATOR */
--    C(0xb207, STCKC,   S,     Z,   la2, 0, new, m1_64, stckc, 0)
-+    C(0xb207, STCKC,   S,     Z,   la2, 0, new, m1_64a, stckc, 0)
- /* STORE CONTROL */
-     C(0xb600, STCTL,   RS_a,  Z,   0, a2, 0, 0, stctl, 0)
-     C(0xeb25, STCTG,   RSY_a, Z,   0, a2, 0, 0, stctg, 0)
- /* STORE CPU ADDRESS */
--    C(0xb212, STAP,    S,     Z,   la2, 0, new, m1_16, stap, 0)
-+    C(0xb212, STAP,    S,     Z,   la2, 0, new, m1_16a, stap, 0)
- /* STORE CPU ID */
--    C(0xb202, STIDP,   S,     Z,   la2, 0, new, 0, stidp, 0)
-+    C(0xb202, STIDP,   S,     Z,   la2, 0, new, m1_64a, stidp, 0)
- /* STORE CPU TIMER */
--    C(0xb209, STPT,    S,     Z,   la2, 0, new, m1_64, stpt, 0)
-+    C(0xb209, STPT,    S,     Z,   la2, 0, new, m1_64a, stpt, 0)
- /* STORE FACILITY LIST */
-     C(0xb2b1, STFL,    S,     Z,   0, 0, 0, 0, stfl, 0)
- /* STORE PREFIX */
--    C(0xb211, STPX,    S,     Z,   la2, 0, new, m1_32, stpx, 0)
-+    C(0xb211, STPX,    S,     Z,   la2, 0, new, m1_32a, stpx, 0)
- /* STORE SYSTEM INFORMATION */
-     C(0xb27d, STSI,    S,     Z,   0, a2, 0, 0, stsi, 0)
- /* STORE THEN AND SYSTEM MASK */
-diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 427b795a78..d5291b246e 100644
---- a/target/s390x/mem_helper.c
-+++ b/target/s390x/mem_helper.c
-@@ -693,6 +693,11 @@ void HELPER(lam)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
-     uintptr_t ra = GETPC();
-     int i;
+diff --git a/cpus.c b/cpus.c
+index f298b659f4..6006931d3a 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -2100,6 +2100,9 @@ CpuInfoList *qmp_query_cpus(Error **errp)
+ #elif defined(TARGET_TRICORE)
+         TriCoreCPU *tricore_cpu = TRICORE_CPU(cpu);
+         CPUTriCoreState *env = &tricore_cpu->env;
++#elif defined(TARGET_S390X)
++        S390CPU *s390_cpu = S390_CPU(cpu);
++        CPUS390XState *env = &s390_cpu->env;
+ #endif
  
-+    if (a2 & 0x3) {
-+        /* we either came here by lam or lamy, which have different lengths */
-+        s390_program_interrupt(env, PGM_SPECIFICATION, ILEN_AUTO, ra);
-+    }
-+
-     for (i = r1;; i = (i + 1) % 16) {
-         env->aregs[i] = cpu_ldl_data_ra(env, a2, ra);
-         a2 += 4;
-@@ -709,6 +714,10 @@ void HELPER(stam)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
-     uintptr_t ra = GETPC();
-     int i;
+         cpu_synchronize_state(cpu);
+@@ -2127,6 +2130,9 @@ CpuInfoList *qmp_query_cpus(Error **errp)
+ #elif defined(TARGET_TRICORE)
+         info->value->arch = CPU_INFO_ARCH_TRICORE;
+         info->value->u.tricore.PC = env->PC;
++#elif defined(TARGET_S390X)
++        info->value->arch = CPU_INFO_ARCH_S390;
++        info->value->u.s390.cpu_state = env->cpu_state;
+ #else
+         info->value->arch = CPU_INFO_ARCH_OTHER;
+ #endif
+diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
+index a85a149c6d..5f8168f0f0 100644
+--- a/hw/intc/s390_flic.c
++++ b/hw/intc/s390_flic.c
+@@ -192,8 +192,8 @@ static void qemu_s390_flic_notify(uint32_t type)
+         cs->interrupt_request |= CPU_INTERRUPT_HARD;
  
-+    if (a2 & 0x3) {
-+        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
-+    }
-+
-     for (i = r1;; i = (i + 1) % 16) {
-         cpu_stl_data_ra(env, a2, env->aregs[i], ra);
-         a2 += 4;
-@@ -1620,6 +1629,10 @@ void HELPER(lctlg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
-     uint64_t src = a2;
-     uint32_t i;
+         /* ignore CPUs that are not sleeping */
+-        if (s390_cpu_get_state(cpu) != CPU_STATE_OPERATING &&
+-            s390_cpu_get_state(cpu) != CPU_STATE_LOAD) {
++        if (s390_cpu_get_state(cpu) != S390_CPU_STATE_OPERATING &&
++            s390_cpu_get_state(cpu) != S390_CPU_STATE_LOAD) {
+             continue;
+         }
  
-+    if (src & 0x7) {
-+        s390_program_interrupt(env, PGM_SPECIFICATION, 6, ra);
-+    }
-+
-     for (i = r1;; i = (i + 1) % 16) {
-         uint64_t val = cpu_ldq_data_ra(env, src, ra);
-         if (env->cregs[i] != val && i >= 9 && i <= 11) {
-@@ -1650,6 +1663,10 @@ void HELPER(lctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
-     uint64_t src = a2;
-     uint32_t i;
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 4abbe89847..4d0c3deba6 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -368,7 +368,7 @@ static void s390_machine_reset(void)
  
-+    if (src & 0x3) {
-+        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
-+    }
-+
-     for (i = r1;; i = (i + 1) % 16) {
-         uint32_t val = cpu_ldl_data_ra(env, src, ra);
-         if ((uint32_t)env->cregs[i] != val && i >= 9 && i <= 11) {
-@@ -1677,6 +1694,10 @@ void HELPER(stctg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
-     uint64_t dest = a2;
-     uint32_t i;
- 
-+    if (dest & 0x7) {
-+        s390_program_interrupt(env, PGM_SPECIFICATION, 6, ra);
-+    }
-+
-     for (i = r1;; i = (i + 1) % 16) {
-         cpu_stq_data_ra(env, dest, env->cregs[i], ra);
-         dest += sizeof(uint64_t);
-@@ -1693,6 +1714,10 @@ void HELPER(stctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
-     uint64_t dest = a2;
-     uint32_t i;
- 
-+    if (dest & 0x3) {
-+        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
-+    }
-+
-     for (i = r1;; i = (i + 1) % 16) {
-         cpu_stl_data_ra(env, dest, env->cregs[i], ra);
-         dest += sizeof(uint32_t);
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 5aea3bbca6..7d39ab350d 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -4062,7 +4062,6 @@ static ExitStatus op_stidp(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
-     tcg_gen_ld_i64(o->out, cpu_env, offsetof(CPUS390XState, cpuid));
--    tcg_gen_qemu_st_i64(o->out, o->addr1, get_mem_index(s), MO_TEQ | MO_ALIGN);
-     return NO_EXIT;
+     /* all cpus are stopped - configure and start the ipl cpu only */
+     s390_ipl_prepare_cpu(ipl_cpu);
+-    s390_cpu_set_state(CPU_STATE_OPERATING, ipl_cpu);
++    s390_cpu_set_state(S390_CPU_STATE_OPERATING, ipl_cpu);
  }
  
-@@ -5220,18 +5219,42 @@ static void wout_m1_16(DisasContext *s, DisasFields *f, DisasOps *o)
- }
- #define SPEC_wout_m1_16 0
+ static void s390_machine_device_plug(HotplugHandler *hotplug_dev,
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 0262b9f20b..94d560ed13 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -410,10 +410,12 @@
+ # An enumeration of cpu types that enable additional information during
+ # @query-cpus.
+ #
++# @s390: since 2.12
++#
+ # Since: 2.6
+ ##
+ { 'enum': 'CpuInfoArch',
+-  'data': ['x86', 'sparc', 'ppc', 'mips', 'tricore', 'other' ] }
++  'data': ['x86', 'sparc', 'ppc', 'mips', 'tricore', 's390', 'other' ] }
  
-+#ifndef CONFIG_USER_ONLY
-+static void wout_m1_16a(DisasContext *s, DisasFields *f, DisasOps *o)
-+{
-+    tcg_gen_qemu_st_tl(o->out, o->addr1, get_mem_index(s), MO_TEUW | MO_ALIGN);
-+}
-+#define SPEC_wout_m1_16a 0
-+#endif
-+
- static void wout_m1_32(DisasContext *s, DisasFields *f, DisasOps *o)
- {
-     tcg_gen_qemu_st32(o->out, o->addr1, get_mem_index(s));
- }
- #define SPEC_wout_m1_32 0
+ ##
+ # @CpuInfo:
+@@ -452,6 +454,7 @@
+             'ppc': 'CpuInfoPPC',
+             'mips': 'CpuInfoMIPS',
+             'tricore': 'CpuInfoTricore',
++            's390': 'CpuInfoS390',
+             'other': 'CpuInfoOther' } }
  
-+#ifndef CONFIG_USER_ONLY
-+static void wout_m1_32a(DisasContext *s, DisasFields *f, DisasOps *o)
-+{
-+    tcg_gen_qemu_st_tl(o->out, o->addr1, get_mem_index(s), MO_TEUL | MO_ALIGN);
-+}
-+#define SPEC_wout_m1_32a 0
-+#endif
-+
- static void wout_m1_64(DisasContext *s, DisasFields *f, DisasOps *o)
- {
-     tcg_gen_qemu_st64(o->out, o->addr1, get_mem_index(s));
- }
- #define SPEC_wout_m1_64 0
+ ##
+@@ -522,6 +525,29 @@
+ { 'struct': 'CpuInfoOther', 'data': { } }
  
-+#ifndef CONFIG_USER_ONLY
-+static void wout_m1_64a(DisasContext *s, DisasFields *f, DisasOps *o)
-+{
-+    tcg_gen_qemu_st_i64(o->out, o->addr1, get_mem_index(s), MO_TEQ | MO_ALIGN);
-+}
-+#define SPEC_wout_m1_64a 0
-+#endif
+ ##
++# @CpuS390State:
++#
++# An enumeration of cpu states that can be assumed by a virtual
++# S390 CPU
++#
++# Since: 2.12
++##
++{ 'enum': 'CpuS390State',
++  'prefix': 'S390_CPU_STATE',
++  'data': [ 'uninitialized', 'stopped', 'check-stop', 'operating', 'load' ] }
 +
- static void wout_m2_32(DisasContext *s, DisasFields *f, DisasOps *o)
- {
-     tcg_gen_qemu_st32(o->out, o->in2, get_mem_index(s));
-@@ -5657,6 +5680,15 @@ static void in2_m2_32u(DisasContext *s, DisasFields *f, DisasOps *o)
- }
- #define SPEC_in2_m2_32u 0
++##
++# @CpuInfoS390:
++#
++# Additional information about a virtual S390 CPU
++#
++# @cpu-state: the virtual CPU's state
++#
++# Since: 2.12
++##
++{ 'struct': 'CpuInfoS390', 'data': { 'cpu-state': 'CpuS390State' } }
++
++##
+ # @query-cpus:
+ #
+ # Returns a list of information about each virtual CPU.
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index 3e1be56536..f02ed19c70 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -61,8 +61,8 @@ static bool s390_cpu_has_work(CPUState *cs)
+     S390CPU *cpu = S390_CPU(cs);
  
-+#ifndef CONFIG_USER_ONLY
-+static void in2_m2_32ua(DisasContext *s, DisasFields *f, DisasOps *o)
-+{
-+    in2_a2(s, f, o);
-+    tcg_gen_qemu_ld_tl(o->in2, o->in2, get_mem_index(s), MO_TEUL | MO_ALIGN);
-+}
-+#define SPEC_in2_m2_32ua 0
-+#endif
-+
- static void in2_m2_64(DisasContext *s, DisasFields *f, DisasOps *o)
- {
-     in2_a2(s, f, o);
-@@ -5664,6 +5696,15 @@ static void in2_m2_64(DisasContext *s, DisasFields *f, DisasOps *o)
- }
- #define SPEC_in2_m2_64 0
+     /* STOPPED cpus can never wake up */
+-    if (s390_cpu_get_state(cpu) != CPU_STATE_LOAD &&
+-        s390_cpu_get_state(cpu) != CPU_STATE_OPERATING) {
++    if (s390_cpu_get_state(cpu) != S390_CPU_STATE_LOAD &&
++        s390_cpu_get_state(cpu) != S390_CPU_STATE_OPERATING) {
+         return false;
+     }
  
-+#ifndef CONFIG_USER_ONLY
-+static void in2_m2_64a(DisasContext *s, DisasFields *f, DisasOps *o)
-+{
-+    in2_a2(s, f, o);
-+    tcg_gen_qemu_ld_i64(o->in2, o->in2, get_mem_index(s), MO_TEQ | MO_ALIGN);
-+}
-+#define SPEC_in2_m2_64a 0
-+#endif
-+
- static void in2_mri2_16u(DisasContext *s, DisasFields *f, DisasOps *o)
+@@ -80,7 +80,7 @@ static void s390_cpu_load_normal(CPUState *s)
+     S390CPU *cpu = S390_CPU(s);
+     cpu->env.psw.addr = ldl_phys(s->as, 4) & PSW_MASK_ESA_ADDR;
+     cpu->env.psw.mask = PSW_MASK_32 | PSW_MASK_64;
+-    s390_cpu_set_state(CPU_STATE_OPERATING, cpu);
++    s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
+ }
+ #endif
+ 
+@@ -95,7 +95,7 @@ static void s390_cpu_reset(CPUState *s)
+     env->bpbc = false;
+     scc->parent_reset(s);
+     cpu->env.sigp_order = 0;
+-    s390_cpu_set_state(CPU_STATE_STOPPED, cpu);
++    s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
+ }
+ 
+ /* S390CPUClass::initial_reset() */
+@@ -138,7 +138,7 @@ static void s390_cpu_full_reset(CPUState *s)
+ 
+     scc->parent_reset(s);
+     cpu->env.sigp_order = 0;
+-    s390_cpu_set_state(CPU_STATE_STOPPED, cpu);
++    s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
+ 
+     memset(env, 0, offsetof(CPUS390XState, end_reset_fields));
+ 
+@@ -292,7 +292,7 @@ static void s390_cpu_initfn(Object *obj)
+     env->tod_basetime = 0;
+     env->tod_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, s390x_tod_timer, cpu);
+     env->cpu_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, s390x_cpu_timer, cpu);
+-    s390_cpu_set_state(CPU_STATE_STOPPED, cpu);
++    s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
+ #endif
+ }
+ 
+@@ -320,8 +320,8 @@ static unsigned s390_count_running_cpus(void)
+ 
+     CPU_FOREACH(cpu) {
+         uint8_t state = S390_CPU(cpu)->env.cpu_state;
+-        if (state == CPU_STATE_OPERATING ||
+-            state == CPU_STATE_LOAD) {
++        if (state == S390_CPU_STATE_OPERATING ||
++            state == S390_CPU_STATE_LOAD) {
+             if (!disabled_wait(cpu)) {
+                 nr_running++;
+             }
+@@ -360,13 +360,13 @@ unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU *cpu)
+     trace_cpu_set_state(CPU(cpu)->cpu_index, cpu_state);
+ 
+     switch (cpu_state) {
+-    case CPU_STATE_STOPPED:
+-    case CPU_STATE_CHECK_STOP:
++    case S390_CPU_STATE_STOPPED:
++    case S390_CPU_STATE_CHECK_STOP:
+         /* halt the cpu for common infrastructure */
+         s390_cpu_halt(cpu);
+         break;
+-    case CPU_STATE_OPERATING:
+-    case CPU_STATE_LOAD:
++    case S390_CPU_STATE_OPERATING:
++    case S390_CPU_STATE_LOAD:
+         /*
+          * Starting a CPU with a PSW WAIT bit set:
+          * KVM: handles this internally and triggers another WAIT exit.
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index d4641663ef..802324b3e2 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -141,12 +141,9 @@ struct CPUS390XState {
+      * architectures, there is a difference between a halt and a stop on s390.
+      * If all cpus are either stopped (including check stop) or in the disabled
+      * wait state, the vm can be shut down.
++     * The acceptable cpu_state values are defined in the CpuInfoS390State
++     * enum.
+      */
+-#define CPU_STATE_UNINITIALIZED        0x00
+-#define CPU_STATE_STOPPED              0x01
+-#define CPU_STATE_CHECK_STOP           0x02
+-#define CPU_STATE_OPERATING            0x03
+-#define CPU_STATE_LOAD                 0x04
+     uint8_t cpu_state;
+ 
+     /* currently processed sigp order */
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 83e4eaf45d..8ef509ece4 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -1880,16 +1880,16 @@ int kvm_s390_set_cpu_state(S390CPU *cpu, uint8_t cpu_state)
+     }
+ 
+     switch (cpu_state) {
+-    case CPU_STATE_STOPPED:
++    case S390_CPU_STATE_STOPPED:
+         mp_state.mp_state = KVM_MP_STATE_STOPPED;
+         break;
+-    case CPU_STATE_CHECK_STOP:
++    case S390_CPU_STATE_CHECK_STOP:
+         mp_state.mp_state = KVM_MP_STATE_CHECK_STOP;
+         break;
+-    case CPU_STATE_OPERATING:
++    case S390_CPU_STATE_OPERATING:
+         mp_state.mp_state = KVM_MP_STATE_OPERATING;
+         break;
+-    case CPU_STATE_LOAD:
++    case S390_CPU_STATE_LOAD:
+         mp_state.mp_state = KVM_MP_STATE_LOAD;
+         break;
+     default:
+diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
+index ac3f8e7dc2..5a7a9c4cfb 100644
+--- a/target/s390x/sigp.c
++++ b/target/s390x/sigp.c
+@@ -46,13 +46,13 @@ static void sigp_sense(S390CPU *dst_cpu, SigpInfo *si)
+     }
+ 
+     /* sensing without locks is racy, but it's the same for real hw */
+-    if (state != CPU_STATE_STOPPED && !ext_call) {
++    if (state != S390_CPU_STATE_STOPPED && !ext_call) {
+         si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
+     } else {
+         if (ext_call) {
+             status |= SIGP_STAT_EXT_CALL_PENDING;
+         }
+-        if (state == CPU_STATE_STOPPED) {
++        if (state == S390_CPU_STATE_STOPPED) {
+             status |= SIGP_STAT_STOPPED;
+         }
+         set_sigp_status(si, status);
+@@ -94,12 +94,12 @@ static void sigp_start(CPUState *cs, run_on_cpu_data arg)
+     S390CPU *cpu = S390_CPU(cs);
+     SigpInfo *si = arg.host_ptr;
+ 
+-    if (s390_cpu_get_state(cpu) != CPU_STATE_STOPPED) {
++    if (s390_cpu_get_state(cpu) != S390_CPU_STATE_STOPPED) {
+         si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
+         return;
+     }
+ 
+-    s390_cpu_set_state(CPU_STATE_OPERATING, cpu);
++    s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
+     si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
+ }
+ 
+@@ -108,14 +108,14 @@ static void sigp_stop(CPUState *cs, run_on_cpu_data arg)
+     S390CPU *cpu = S390_CPU(cs);
+     SigpInfo *si = arg.host_ptr;
+ 
+-    if (s390_cpu_get_state(cpu) != CPU_STATE_OPERATING) {
++    if (s390_cpu_get_state(cpu) != S390_CPU_STATE_OPERATING) {
+         si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
+         return;
+     }
+ 
+     /* disabled wait - sleeping in user space */
+     if (cs->halted) {
+-        s390_cpu_set_state(CPU_STATE_STOPPED, cpu);
++        s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
+     } else {
+         /* execute the stop function */
+         cpu->env.sigp_order = SIGP_STOP;
+@@ -130,17 +130,17 @@ static void sigp_stop_and_store_status(CPUState *cs, run_on_cpu_data arg)
+     SigpInfo *si = arg.host_ptr;
+ 
+     /* disabled wait - sleeping in user space */
+-    if (s390_cpu_get_state(cpu) == CPU_STATE_OPERATING && cs->halted) {
+-        s390_cpu_set_state(CPU_STATE_STOPPED, cpu);
++    if (s390_cpu_get_state(cpu) == S390_CPU_STATE_OPERATING && cs->halted) {
++        s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
+     }
+ 
+     switch (s390_cpu_get_state(cpu)) {
+-    case CPU_STATE_OPERATING:
++    case S390_CPU_STATE_OPERATING:
+         cpu->env.sigp_order = SIGP_STOP_STORE_STATUS;
+         cpu_inject_stop(cpu);
+         /* store will be performed in do_stop_interrup() */
+         break;
+-    case CPU_STATE_STOPPED:
++    case S390_CPU_STATE_STOPPED:
+         /* already stopped, just store the status */
+         cpu_synchronize_state(cs);
+         s390_store_status(cpu, S390_STORE_STATUS_DEF_ADDR, true);
+@@ -156,7 +156,7 @@ static void sigp_store_status_at_address(CPUState *cs, run_on_cpu_data arg)
+     uint32_t address = si->param & 0x7ffffe00u;
+ 
+     /* cpu has to be stopped */
+-    if (s390_cpu_get_state(cpu) != CPU_STATE_STOPPED) {
++    if (s390_cpu_get_state(cpu) != S390_CPU_STATE_STOPPED) {
+         set_sigp_status(si, SIGP_STAT_INCORRECT_STATE);
+         return;
+     }
+@@ -186,7 +186,7 @@ static void sigp_store_adtl_status(CPUState *cs, run_on_cpu_data arg)
+     }
+ 
+     /* cpu has to be stopped */
+-    if (s390_cpu_get_state(cpu) != CPU_STATE_STOPPED) {
++    if (s390_cpu_get_state(cpu) != S390_CPU_STATE_STOPPED) {
+         set_sigp_status(si, SIGP_STAT_INCORRECT_STATE);
+         return;
+     }
+@@ -229,17 +229,17 @@ static void sigp_restart(CPUState *cs, run_on_cpu_data arg)
+     SigpInfo *si = arg.host_ptr;
+ 
+     switch (s390_cpu_get_state(cpu)) {
+-    case CPU_STATE_STOPPED:
++    case S390_CPU_STATE_STOPPED:
+         /* the restart irq has to be delivered prior to any other pending irq */
+         cpu_synchronize_state(cs);
+         /*
+          * Set OPERATING (and unhalting) before loading the restart PSW.
+          * load_psw() will then properly halt the CPU again if necessary (TCG).
+          */
+-        s390_cpu_set_state(CPU_STATE_OPERATING, cpu);
++        s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
+         do_restart_interrupt(&cpu->env);
+         break;
+-    case CPU_STATE_OPERATING:
++    case S390_CPU_STATE_OPERATING:
+         cpu_inject_restart(cpu);
+         break;
+     }
+@@ -285,7 +285,7 @@ static void sigp_set_prefix(CPUState *cs, run_on_cpu_data arg)
+     }
+ 
+     /* cpu has to be stopped */
+-    if (s390_cpu_get_state(cpu) != CPU_STATE_STOPPED) {
++    if (s390_cpu_get_state(cpu) != S390_CPU_STATE_STOPPED) {
+         set_sigp_status(si, SIGP_STAT_INCORRECT_STATE);
+         return;
+     }
+@@ -318,7 +318,7 @@ static void sigp_cond_emergency(S390CPU *src_cpu, S390CPU *dst_cpu,
+     p_asn = dst_cpu->env.cregs[4] & 0xffff;  /* Primary ASN */
+     s_asn = dst_cpu->env.cregs[3] & 0xffff;  /* Secondary ASN */
+ 
+-    if (s390_cpu_get_state(dst_cpu) != CPU_STATE_STOPPED ||
++    if (s390_cpu_get_state(dst_cpu) != S390_CPU_STATE_STOPPED ||
+         (psw_mask & psw_int_mask) != psw_int_mask ||
+         (idle && psw_addr != 0) ||
+         (!idle && (asn == p_asn || asn == s_asn))) {
+@@ -435,7 +435,7 @@ static int sigp_set_architecture(S390CPU *cpu, uint32_t param,
+         if (cur_cpu == cpu) {
+             continue;
+         }
+-        if (s390_cpu_get_state(cur_cpu) != CPU_STATE_STOPPED) {
++        if (s390_cpu_get_state(cur_cpu) != S390_CPU_STATE_STOPPED) {
+             all_stopped = false;
+         }
+     }
+@@ -492,7 +492,7 @@ void do_stop_interrupt(CPUS390XState *env)
  {
-     in2_ri2(s, f, o);
+     S390CPU *cpu = s390_env_get_cpu(env);
+ 
+-    if (s390_cpu_set_state(CPU_STATE_STOPPED, cpu) == 0) {
++    if (s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu) == 0) {
+         qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
+     }
+     if (cpu->env.sigp_order == SIGP_STOP_STORE_STATUS) {
 -- 
 2.13.6
