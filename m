@@ -1,25 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eqfoy-0003OT-Vh
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:01:34 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eqfuX-0005Lv-1N
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:07:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eqfot-0008KA-9c
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:01:33 -0500
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:36129)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eqfot-0008Jr-3o
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:01:27 -0500
-Received: by mail-ot0-x242.google.com with SMTP id 108so3846264otv.3
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 06:01:26 -0800 (PST)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eqfuT-0002Tb-0y
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:07:16 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53256
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1eqfuS-0002TP-RW
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:07:12 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1RE5Ehe144258
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 09:07:12 -0500
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2gd8sp82cf-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 09:07:11 -0500
+Received: from localhost
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Tue, 27 Feb 2018 09:07:10 -0500
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Tue, 27 Feb 2018 09:07:03 -0500
 MIME-Version: 1.0
-In-Reply-To: <1519690504-37792-1-git-send-email-mjc@sifive.com>
-References: <1519690504-37792-1-git-send-email-mjc@sifive.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Feb 2018 14:01:05 +0000
-Message-ID: <CAFEAcA_0qNcikG2iLii=4zEPYvhz1koEbhCCrCXssdKYv06OJA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL] RISC-V QEMU Port Submission
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Message-Id: <1519740425-11270-1-git-send-email-stefanb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PULL v2 0/2] Merge tpm 2018/02/21 v2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +39,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, marcandre.lureau@redhat.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-On 27 February 2018 at 00:15, Michael Clark <mjc@sifive.com> wrote:
-> -----BEGIN PGP SIGNED MESSAGE-----
-> Hash: SHA1
->
-> The following changes since commit 0a773d55ac76c5aa89ed9187a3bc5af8c5c2a6d0:
->
->   maintainers: Add myself as a OpenBSD maintainer (2018-02-23 12:05:07 +0000)
->
-> are available in the git repository at:
->
->   https://github.com/riscv/riscv-qemu.git tags/riscv-qemu-upstream-v7
->
-> for you to fetch changes up to 170a9d412ca1eb3b7ae6f6c1ff86dcbdff0fd7a8:
->
->   RISC-V Build Infrastructure (2018-02-27 11:09:43 +1300)
->
-> - ----------------------------------------------------------------
-> QEMU RISC-V Emulation Support (RV64GC, RV32GC)
+This patch series adds a test case for the TPM TIS interface.
 
-Hi; thanks for this pull request. Unfortunately it seems to
-be missing Signed-off-by: tags. Every commit needs to have
-the Signed-off-by: tags from the people who contributed code to
-it, indicating that they're OK with the code going into QEMU.
-(If the work was done by and copyright a company then you don't
-need to provide signoffs from every person at the company who
-worked on the code if you don't want to.)
+   Stefan
 
-> The spike_v1.9
-> machine has been renamed to spike_v1.9.1 to match the privileged ISA
-> version and spike_v1.10 has been made the default machine.
+Merge remote-tracking branch 'remotes/kraxel/tags/ui-20180220-pull-request' into staging (2018-02-20 14:05:00 +0000)
 
-I'm confused about this. Generally QEMU boards should model
-hardware, and the board shouldn't care about the ISA versions.
-Versioned board names in QEMU generally follow _QEMU_'s versioning,
-and indicate that a board is identical to whatever we modelled
-in that earlier QEMU version, for VM migration compatibility.
-Board renames for minor ISA version bumps sounds like there's going
-to be a lot of churn and breakage -- is this stuff really ready?
-(Also, should we really have two different board source files
-for two different ISA versions? I would have expected these to
-share a source file to share code.)
+are available in the git repository at:
 
-I did a test build and there are some compile errors:
+  git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2018-02-21-2
 
-/home/pm215/qemu/linux-user/main.c:38:24: fatal error: target_elf.h:
-No such file or directory
- #include "target_elf.h"
-                        ^
-compilation terminated.
+for you to fetch changes up to adb0e917e6ee93631e40265ca145bc31cd3b6c9a:
 
-This is because your patchset has a clash with commit 542ca4349878a2e
-which has just merged to master, and refactors out an ifdef ladder,
-so now all targets supporting linux-user need to provide a
-linux-user/$ARCH/target_elf.h file. Could you fix that up and rebase,
-please?
+  tests: add test for TPM TIS device (2018-02-21 07:24:50 -0500)
 
-thanks
--- PMM
+----------------------------------------------------------------
+Merge tpm 2018/02/21 v2
+
+----------------------------------------------------------------
+Stefan Berger (2):
+      tests: Move common TPM test code into tpm-emu.c
+      tests: add test for TPM TIS device
+
+ MAINTAINERS            |   1 +
+ hw/tpm/tpm_tis.c       | 101 -----------------
+ include/hw/acpi/tpm.h  | 105 ++++++++++++++++++
+ tests/Makefile.include |   4 +-
+ tests/tpm-crb-test.c   | 174 +----------------------------
+ tests/tpm-emu.c        | 174 +++++++++++++++++++++++++++++
+ tests/tpm-emu.h        |  38 +++++++
+ tests/tpm-tis-test.c   | 486 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 8 files changed, 810 insertions(+), 273 deletions(-)
+ create mode 100644 tests/tpm-emu.c
+ create mode 100644 tests/tpm-emu.h
+ create mode 100644 tests/tpm-tis-test.c
+
+-- 
+2.5.5
