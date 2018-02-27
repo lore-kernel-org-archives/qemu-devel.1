@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1eqhQq-0001FY-53
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:44:47 -0500
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1eqhQs-0001IJ-Ev
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:44:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1eqhQo-0006hI-JN
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:44:44 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52478)
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1eqhQn-0006g1-8R
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:44:46 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56440)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
-	id 1eqhQo-0006gT-AH
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:44:42 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	id 1eqhQm-0006fK-Vj
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:44:41 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1RFhnxX084072
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 10:44:41 -0500
+	w1RFfKcJ113563
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 10:44:39 -0500
 Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gd9wbs0pw-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2gd9ejjew6-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 10:44:40 -0500
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 10:44:39 -0500
 Received: from localhost
 	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
-	Tue, 27 Feb 2018 10:44:39 -0500
+	Tue, 27 Feb 2018 10:44:38 -0500
 From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-Date: Tue, 27 Feb 2018 10:44:19 -0500
+Date: Tue, 27 Feb 2018 10:44:18 -0500
 In-Reply-To: <1519746259-27710-1-git-send-email-akrowiak@linux.vnet.ibm.com>
 References: <1519746259-27710-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-Message-Id: <1519746259-27710-6-git-send-email-akrowiak@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 5/5] s390x/cpumodel: Set up CPU model for AP
- device support
+Message-Id: <1519746259-27710-5-git-send-email-akrowiak@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 4/5] s390x/vfio: ap: Introduce VFIO AP device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,199 +40,243 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net, Tony Krowiak <akrowiak@linux.vnet.ibm.com>
 
-A new CPU model feature and two new CPU model facilities are
-introduced to support AP devices for a KVM guest.
+Introduces a VFIO based AP device. The device is defined via
+the QEMU command line by specifying:
 
-CPU model features:
+    -device vfio-ap,sysfsdev=<path-to-mediated-matrix-device>
 
-1. The KVM_S390_VM_CPU_FEAT_AP CPU model feature indicates that
-   AP facilities are installed. This feature will be enabled by
-   the kernel only if the AP facilities are installed on the linux
-   host. This feature must be turned on from userspace to access
-   AP devices from the KVM guest. The QEMU command line to turn
-   this feature looks something like this:
+The mediated matrix device is created by the VFIO AP device
+driver by writing a UUID to a sysfs attribute file (see
+docs/vfio-ap.txt). The mediated matrix device will be named
+after the UUID. Symbolic links to the $uuid are created in
+many places, so the path to the mediated matrix device $uuid
+can be specified in any of the following ways:
 
-	qemu-system-s390x ... -cpu xxx,ap=on
+/sys/devices/vfio_ap/matrix/$uuid
+/sys/devices/vfio_ap/matrix/mdev_supported_types/vfio_ap-passthrough/devices/$uuid
+/sys/bus/mdev/devices/$uuid
+/sys/bus/mdev/drivers/vfio_mdev/$uuid
 
-CPU model facilities:
-
-1. The S390_FEAT_AP_QUERY_CONFIG_INFO feature indicates the AP Query
-   Configuration Information (QCI) facility is installed. This feature
-   will be enabled by the kernel only if the QCI is installed on
-   the host. This facility will be set by QEMU only if the
-   KVM_S390_VM_CPU_FEAT_AP CPU model feature is turned on.
-   (see CPU model features above)
-
-2. The S390_FEAT_AP_FACILITY_TEST feature indicates that the AP
-   Test Facility (APFT) facility is installed. This feature will
-   be enabled by the kernel only if the APFT facility is installed
-   on the host. This facility will be set by QEMU for the KVM guest
-   only if the KVM_S390_VM_CPU_FEAT_AP CPU model feature is turned on.
-   (see CPU model features above)
+When the vfio-ap device is realized, it acquires and opens the
+VFIO iommu group to which the mediated matrix device is
+bound. This causes a VFIO group notification event to be
+signaled. The vfio_ap device driver's group notification
+handler will get called at which time the device driver
+will configure the the AP devices to which the guest will
+be granted access.
 
 Signed-off-by: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
 ---
- hw/vfio/ap.c                    |    9 +++++++++
- linux-headers/asm-s390/kvm.h    |    1 +
- target/s390x/cpu_features.c     |    3 +++
- target/s390x/cpu_features_def.h |    3 +++
- target/s390x/cpu_models.c       |   12 ++++++++++++
- target/s390x/gen-features.c     |    3 +++
- target/s390x/kvm.c              |    6 ++++++
- 7 files changed, 37 insertions(+), 0 deletions(-)
+ default-configs/s390x-softmmu.mak |    1 +
+ hw/vfio/Makefile.objs             |    1 +
+ hw/vfio/ap.c                      |  167 +++++++++++++++++++++++++++++++++++++
+ include/hw/vfio/vfio-common.h     |    1 +
+ 4 files changed, 170 insertions(+), 0 deletions(-)
+ create mode 100644 hw/vfio/ap.c
 
+diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
+index 2f4bfe7..0b784b6 100644
+--- a/default-configs/s390x-softmmu.mak
++++ b/default-configs/s390x-softmmu.mak
+@@ -9,3 +9,4 @@ CONFIG_S390_FLIC=y
+ CONFIG_S390_FLIC_KVM=$(CONFIG_KVM)
+ CONFIG_VFIO_CCW=$(CONFIG_LINUX)
+ CONFIG_WDT_DIAG288=y
++CONFIG_VFIO_AP=$(CONFIG_LINUX)
+diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
+index c3ab909..7300860 100644
+--- a/hw/vfio/Makefile.objs
++++ b/hw/vfio/Makefile.objs
+@@ -6,4 +6,5 @@ obj-$(CONFIG_SOFTMMU) += platform.o
+ obj-$(CONFIG_VFIO_XGMAC) += calxeda-xgmac.o
+ obj-$(CONFIG_VFIO_AMD_XGBE) += amd-xgbe.o
+ obj-$(CONFIG_SOFTMMU) += spapr.o
++obj-$(CONFIG_VFIO_AP) += ap.o
+ endif
 diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-index 8aa5221..b93f7d9 100644
---- a/hw/vfio/ap.c
+new file mode 100644
+index 0000000..8aa5221
+--- /dev/null
 +++ b/hw/vfio/ap.c
-@@ -19,6 +19,7 @@
- #include "hw/s390x/ap-device.h"
- #include "qemu/error-report.h"
- #include "qemu/queue.h"
-+#include "cpu.h"
- 
- #define VFIO_AP_DEVICE_TYPE      "vfio-ap"
- #define AP_SYSFSDEV_PROP_NAME    "sysfsdev"
-@@ -87,6 +88,14 @@ static void vfio_ap_realize(DeviceState *dev, Error **errp)
-     Error *local_err = NULL;
-     int ret;
- 
-+    if (!s390_has_feat(S390_FEAT_AP)) {
-+        error_setg(&local_err, "Invalid device configuration: ");
-+        error_append_hint(&local_err,
-+                          "Verify AP facilities are enabled for the guest"
-+                          "(ap=on)\n");
+@@ -0,0 +1,167 @@
++/*
++ * VFIO based AP matrix device assignment
++ *
++ * Copyright 2017 IBM Corp.
++ * Author(s): Tony Krowiak <akrowiak@linux.vnet.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or(at
++ * your option) any version. See the COPYING file in the top-level
++ * directory.
++ */
++
++#include <linux/vfio.h>
++#include <sys/ioctl.h>
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "hw/sysbus.h"
++#include "hw/vfio/vfio.h"
++#include "hw/vfio/vfio-common.h"
++#include "hw/s390x/ap-device.h"
++#include "qemu/error-report.h"
++#include "qemu/queue.h"
++
++#define VFIO_AP_DEVICE_TYPE      "vfio-ap"
++#define AP_SYSFSDEV_PROP_NAME    "sysfsdev"
++
++typedef struct VFIOAPDevice {
++    APDevice apdev;
++    VFIODevice vdev;
++    QTAILQ_ENTRY(VFIOAPDevice) sibling;
++} VFIOAPDevice;
++
++static void vfio_ap_compute_needs_reset(VFIODevice *vdev)
++{
++    vdev->needs_reset = false;
++}
++
++/*
++ * We don't need vfio_hot_reset_multi and vfio_eoi operations for
++ * vfio-ap-matrix device now.
++ */
++struct VFIODeviceOps vfio_ap_ops = {
++    .vfio_compute_needs_reset = vfio_ap_compute_needs_reset,
++};
++
++static QTAILQ_HEAD(, VFIOAPDevice) vfio_ap_devices =
++        QTAILQ_HEAD_INITIALIZER(vfio_ap_devices);
++
++static void vfio_put_device(VFIOAPDevice *apdev)
++{
++    g_free(apdev->vdev.name);
++    vfio_put_base_device(&apdev->vdev);
++}
++
++static VFIOGroup *vfio_ap_get_group(VFIOAPDevice *vapdev, Error **errp)
++{
++    char *tmp, group_path[PATH_MAX];
++    ssize_t len;
++    int groupid;
++
++    tmp = g_strdup_printf("%s/iommu_group", vapdev->vdev.sysfsdev);
++    len = readlink(tmp, group_path, sizeof(group_path));
++    g_free(tmp);
++
++    if (len <= 0 || len >= sizeof(group_path)) {
++        error_setg(errp, "%s: no iommu_group found for %s",
++                   VFIO_AP_DEVICE_TYPE, vapdev->vdev.sysfsdev);
++        return NULL;
++    }
++
++    group_path[len] = 0;
++
++    if (sscanf(basename(group_path), "%d", &groupid) != 1) {
++        error_setg(errp, "vfio: failed to read %s", group_path);
++        return NULL;
++    }
++
++    return vfio_get_group(groupid, &address_space_memory, errp);
++}
++
++static void vfio_ap_realize(DeviceState *dev, Error **errp)
++{
++    VFIODevice *vbasedev;
++    VFIOGroup *vfio_group;
++    APDevice *apdev = DO_UPCAST(APDevice, parent_obj, dev);
++    VFIOAPDevice *vapdev = DO_UPCAST(VFIOAPDevice, apdev, apdev);
++    char *mdevid;
++    Error *local_err = NULL;
++    int ret;
++
++    vfio_group = vfio_ap_get_group(vapdev, &local_err);
++    if (!vfio_group) {
 +        goto out_err;
 +    }
 +
-     vfio_group = vfio_ap_get_group(vapdev, &local_err);
-     if (!vfio_group) {
-         goto out_err;
-diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
-index 11def14..35a6d04 100644
---- a/linux-headers/asm-s390/kvm.h
-+++ b/linux-headers/asm-s390/kvm.h
-@@ -130,6 +130,7 @@ struct kvm_s390_vm_cpu_machine {
- #define KVM_S390_VM_CPU_FEAT_PFMFI	11
- #define KVM_S390_VM_CPU_FEAT_SIGPIF	12
- #define KVM_S390_VM_CPU_FEAT_KSS	13
-+#define KVM_S390_VM_CPU_FEAT_AP		14
- struct kvm_s390_vm_cpu_feat {
- 	__u64 feat[16];
- };
-diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-index a5619f2..65b91bd 100644
---- a/target/s390x/cpu_features.c
-+++ b/target/s390x/cpu_features.c
-@@ -36,8 +36,10 @@ static const S390FeatDef s390_features[] = {
-     FEAT_INIT("srs", S390_FEAT_TYPE_STFL, 9, "Sense-running-status facility"),
-     FEAT_INIT("csske", S390_FEAT_TYPE_STFL, 10, "Conditional-SSKE facility"),
-     FEAT_INIT("ctop", S390_FEAT_TYPE_STFL, 11, "Configuration-topology facility"),
-+    FEAT_INIT("qci", S390_FEAT_TYPE_STFL, 12, "Query AP Configuration facility"),
-     FEAT_INIT("ipter", S390_FEAT_TYPE_STFL, 13, "IPTE-range facility"),
-     FEAT_INIT("nonqks", S390_FEAT_TYPE_STFL, 14, "Nonquiescing key-setting facility"),
-+    FEAT_INIT("apft", S390_FEAT_TYPE_STFL, 15, "Adjunct Processor Facilities Test facility"),
-     FEAT_INIT("etf2", S390_FEAT_TYPE_STFL, 16, "Extended-translation facility 2"),
-     FEAT_INIT("msa-base", S390_FEAT_TYPE_STFL, 17, "Message-security-assist facility (excluding subfunctions)"),
-     FEAT_INIT("ldisp", S390_FEAT_TYPE_STFL, 18, "Long-displacement facility"),
-@@ -125,6 +127,7 @@ static const S390FeatDef s390_features[] = {
- 
-     FEAT_INIT("dateh2", S390_FEAT_TYPE_MISC, 0, "DAT-enhancement facility 2"),
-     FEAT_INIT("cmm", S390_FEAT_TYPE_MISC, 0, "Collaborative-memory-management facility"),
-+    FEAT_INIT("ap", S390_FEAT_TYPE_MISC, 1, "AP facilities installed"),
- 
-     FEAT_INIT("plo-cl", S390_FEAT_TYPE_PLO, 0, "PLO Compare and load (32 bit in general registers)"),
-     FEAT_INIT("plo-clg", S390_FEAT_TYPE_PLO, 1, "PLO Compare and load (64 bit in parameter list)"),
-diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
-index 7c5915c..8998b65 100644
---- a/target/s390x/cpu_features_def.h
-+++ b/target/s390x/cpu_features_def.h
-@@ -27,8 +27,10 @@ typedef enum {
-     S390_FEAT_SENSE_RUNNING_STATUS,
-     S390_FEAT_CONDITIONAL_SSKE,
-     S390_FEAT_CONFIGURATION_TOPOLOGY,
-+    S390_FEAT_AP_QUERY_CONFIG_INFO,
-     S390_FEAT_IPTE_RANGE,
-     S390_FEAT_NONQ_KEY_SETTING,
-+    S390_FEAT_AP_FACILITIES_TEST,
-     S390_FEAT_EXTENDED_TRANSLATION_2,
-     S390_FEAT_MSA,
-     S390_FEAT_LONG_DISPLACEMENT,
-@@ -118,6 +120,7 @@ typedef enum {
-     /* Misc */
-     S390_FEAT_DAT_ENH_2,
-     S390_FEAT_CMM,
-+    S390_FEAT_AP,
- 
-     /* PLO */
-     S390_FEAT_PLO_CL,
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 1d5f0da..35f91ea 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -770,6 +770,8 @@ static void check_consistency(const S390CPUModel *model)
-         { S390_FEAT_PRNO_TRNG_QRTCR, S390_FEAT_MSA_EXT_5 },
-         { S390_FEAT_PRNO_TRNG, S390_FEAT_MSA_EXT_5 },
-         { S390_FEAT_SIE_KSS, S390_FEAT_SIE_F2 },
-+        { S390_FEAT_AP_QUERY_CONFIG_INFO, S390_FEAT_AP },
-+        { S390_FEAT_AP_FACILITIES_TEST, S390_FEAT_AP },
-     };
-     int i;
- 
-@@ -900,6 +902,16 @@ void s390_realize_cpu_model(CPUState *cs, Error **errp)
-     cpu->model->cpu_id_format = max_model->cpu_id_format;
-     cpu->model->cpu_ver = max_model->cpu_ver;
- 
-+    /*
-+     * If the AP facilities are not installed on the guest, then it makes
-+     * no sense to enable the QCI or APFT facilities because they are only
-+     * needed by AP facilities.
-+     */
-+    if (!test_bit(S390_FEAT_AP, cpu->model->features)) {
-+        clear_bit(S390_FEAT_AP_QUERY_CONFIG_INFO, cpu->model->features);
-+        clear_bit(S390_FEAT_AP_FACILITIES_TEST, cpu->model->features);
++    vapdev->vdev.ops = &vfio_ap_ops;
++    vapdev->vdev.type = VFIO_DEVICE_TYPE_AP;
++    mdevid = basename(vapdev->vdev.sysfsdev);
++    vapdev->vdev.name = g_strdup_printf("%s", mdevid);
++    vapdev->vdev.dev = dev;
++    QLIST_FOREACH(vbasedev, &vfio_group->device_list, next) {
++        if (strcmp(vbasedev->name, vapdev->vdev.name) == 0) {
++            error_setg(&local_err,
++                       "%s: AP device %s has already been realized",
++                       VFIO_AP_DEVICE_TYPE, vapdev->vdev.name);
++            goto out_device_err;
++        }
 +    }
 +
-     check_consistency(cpu->model);
-     check_compatibility(max_model, cpu->model, errp);
-     if (*errp) {
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index 0cdbc15..2d01b52 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -447,6 +447,9 @@ static uint16_t full_GEN12_GA1[] = {
-     S390_FEAT_ADAPTER_INT_SUPPRESSION,
-     S390_FEAT_EDAT_2,
-     S390_FEAT_SIDE_EFFECT_ACCESS_ESOP2,
-+    S390_FEAT_AP,
-+    S390_FEAT_AP_QUERY_CONFIG_INFO,
-+    S390_FEAT_AP_FACILITIES_TEST,
- };
- 
- static uint16_t full_GEN12_GA2[] = {
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index e13c890..ae20ed8 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -2105,6 +2105,7 @@ static int kvm_to_feat[][2] = {
-     { KVM_S390_VM_CPU_FEAT_PFMFI, S390_FEAT_SIE_PFMFI},
-     { KVM_S390_VM_CPU_FEAT_SIGPIF, S390_FEAT_SIE_SIGPIF},
-     { KVM_S390_VM_CPU_FEAT_KSS, S390_FEAT_SIE_KSS},
-+    { KVM_S390_VM_CPU_FEAT_AP, S390_FEAT_AP},
- };
- 
- static int query_cpu_feat(S390FeatBitmap features)
-@@ -2214,6 +2215,11 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
-         error_setg(errp, "KVM: Error querying CPU features: %d", rc);
-         return;
-     }
-+    /* AP facilities support is required to enable QCI and APFT support */
-+    if (!test_bit(S390_FEAT_AP, model->features)) {
-+        clear_bit(S390_FEAT_AP_QUERY_CONFIG_INFO, model->features);
-+        clear_bit(S390_FEAT_AP_FACILITIES_TEST, model->features);
++    ret = vfio_get_device(vfio_group, mdevid, &vapdev->vdev, &local_err);
++    if (ret) {
++        goto out_device_err;
 +    }
-     /* get supported cpu subfunctions indicated via query / test bit */
-     rc = query_cpu_subfunc(model->features);
-     if (rc) {
++
++    QTAILQ_INSERT_TAIL(&vfio_ap_devices, vapdev, sibling);
++
++    return;
++
++out_device_err:
++    vfio_put_group(vfio_group);
++out_err:
++    error_propagate(errp, local_err);
++}
++
++static void vfio_ap_unrealize(DeviceState *dev, Error **errp)
++{
++    APDevice *apdev = DO_UPCAST(APDevice, parent_obj, dev);
++    VFIOAPDevice *vapdev = DO_UPCAST(VFIOAPDevice, apdev, apdev);
++    VFIOGroup *group = vapdev->vdev.group;
++
++    vfio_put_device(vapdev);
++    vfio_put_group(group);
++}
++
++static Property vfio_ap_properties[] = {
++    DEFINE_PROP_STRING(AP_SYSFSDEV_PROP_NAME, VFIOAPDevice, vdev.sysfsdev),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static const VMStateDescription vfio_ap_vmstate = {
++    .name = VFIO_AP_DEVICE_TYPE,
++    .unmigratable = 1,
++};
++
++static void vfio_ap_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->props = vfio_ap_properties;
++    dc->vmsd = &vfio_ap_vmstate;
++    dc->desc = "VFIO-based AP device assignment";
++    dc->realize = vfio_ap_realize;
++    dc->unrealize = vfio_ap_unrealize;
++}
++
++static const TypeInfo vfio_ap_info = {
++    .name = VFIO_AP_DEVICE_TYPE,
++    .parent = AP_DEVICE_TYPE,
++    .instance_size = sizeof(VFIOAPDevice),
++    .class_init = vfio_ap_class_init,
++};
++
++static void register_vfio_ap_type(void)
++{
++    type_register_static(&vfio_ap_info);
++}
++
++type_init(register_vfio_ap_type)
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index f3a2ac9..f1f22d9 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -46,6 +46,7 @@ enum {
+     VFIO_DEVICE_TYPE_PCI = 0,
+     VFIO_DEVICE_TYPE_PLATFORM = 1,
+     VFIO_DEVICE_TYPE_CCW = 2,
++    VFIO_DEVICE_TYPE_AP = 3,
+ };
+ 
+ typedef struct VFIOMmap {
 -- 
 1.7.1
