@@ -1,16 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eqfE9-0006K8-C4
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:23:30 -0500
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1eqfI2-0001ab-Jk
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:27:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eqfE8-0000QZ-Av
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:23:29 -0500
-From: Cornelia Huck <cohuck@redhat.com>
-Date: Tue, 27 Feb 2018 14:21:50 +0100
-Message-Id: <20180227132150.13847-27-cohuck@redhat.com>
-In-Reply-To: <20180227132150.13847-1-cohuck@redhat.com>
-References: <20180227132150.13847-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 26/26] s390x: remove s390_get_memslot_count
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1eqfHz-0002by-Nu
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:27:30 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53280
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
+	id 1eqfHz-0002bY-IA
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:27:27 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1RDOUWe105753
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 08:27:27 -0500
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2gd4hu9j7w-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 08:27:26 -0500
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
+	Tue, 27 Feb 2018 13:27:24 -0000
+References: <1519731154-3127-1-git-send-email-thuth@redhat.com>
+From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Date: Tue, 27 Feb 2018 14:27:19 +0100
+MIME-Version: 1.0
+In-Reply-To: <1519731154-3127-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Message-Id: <a4f94596-0ea9-a7bc-9603-bb8690d39e25@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/s390x: Add the possibility to specify
+ the netboot image on the command line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,120 +43,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, rth@twiddle.net, agraf@suse.de, david@redhat.com, thuth@redhat.com, Cornelia Huck <cohuck@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>
 
-Not needed anymore after removal of the memory hotplug code.
+On 27.02.2018 12:32, Thomas Huth wrote:
+> The file name of the netboot binary is currently hard-coded to
+> "s390-netboot.img", without a possibility for the user to select
+> an alternative firmware image here. That's unfortunate, especially
+> since the basics are already there: The filename is a property of
+> the s390-ipl device. So we just have to add a check whether the user
+> already provided the property and only set the default if the string
+> is still empty. Now it is possible to select a different firmware
+> image with "-global s390-ipl.netboot_fw=/path/to/s390-netboot.img".
+> While I sympathize with the concept, it will be a bit hard to consume
+since most of the QEMU instances will be started by libvirt and that has
+no provisions for this kind of firmware replacement. We could craft some
+s390-specific variety of the <loader> element.
+Another thing to consider is that, while the current netboot firmware
+doesn't rely on any special QEMU <-> loader interfaces, it might happen
+that QEMU and the network firmware must match similar to QEMU and the
+s390-ccw firmware image and I have no idea on how to ensure that.
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/s390x/s390-virtio-ccw.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 4abbe89..7b3fb5f 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -254,8 +254,10 @@ static void s390_init_ipl_dev(const char *kernel_filename,
+>      }
+>      qdev_prop_set_string(dev, "cmdline", kernel_cmdline);
+>      qdev_prop_set_string(dev, "firmware", firmware);
+Wouldn't it be consequent to allow firmware replacement? But then, see
+above.
+> -    qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
+>      qdev_prop_set_bit(dev, "enforce_bios", enforce_bios);
+> +    if (!strlen(object_property_get_str(new, "netboot_fw", &error_abort))) {
+> +        qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
+> +    }
+>      object_property_add_child(qdev_get_machine(), TYPE_S390_IPL,
+>                                new, NULL);
+>      object_unref(new);
+> 
 
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- include/hw/s390x/sclp.h  | 1 -
- target/s390x/cpu.c       | 9 ---------
- target/s390x/cpu.h       | 4 ----
- target/s390x/kvm-stub.c  | 5 -----
- target/s390x/kvm.c       | 5 -----
- target/s390x/kvm_s390x.h | 1 -
- 6 files changed, 25 deletions(-)
 
-diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
-index 476cbf78f2..f9db243484 100644
---- a/include/hw/s390x/sclp.h
-+++ b/include/hw/s390x/sclp.h
-@@ -35,7 +35,6 @@
- #define SCLP_FC_ASSIGN_ATTACH_READ_STOR         0xE00000000000ULL
- #define SCLP_STARTING_SUBINCREMENT_ID           0x10001
- #define SCLP_INCREMENT_UNIT                     0x10000
--#define MAX_AVAIL_SLOTS                         32
- #define MAX_STORAGE_INCREMENTS                  1020
- 
- /* CPU hotplug SCLP codes */
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index f02ed19c70..627002b225 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -437,15 +437,6 @@ void s390_cmma_reset(void)
-     }
- }
- 
--int s390_get_memslot_count(void)
--{
--    if (kvm_enabled()) {
--        return kvm_s390_get_memslot_count();
--    } else {
--        return MAX_AVAIL_SLOTS;
--    }
--}
--
- int s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t sch_id,
-                                 int vq, bool assign)
- {
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 5bd6de7e8e..c5ef930876 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -621,9 +621,6 @@ QEMU_BUILD_BUG_ON(sizeof(SysIB) != 4096);
- /* SIGP order code mask corresponding to bit positions 56-63 */
- #define SIGP_ORDER_MASK 0x000000ff
- 
--/* from s390-virtio-ccw */
--#define MAX_AVAIL_SLOTS              32
--
- /* machine check interruption code */
- 
- /* subclasses */
-@@ -695,7 +692,6 @@ int s390_get_clock(uint8_t *tod_high, uint64_t *tod_low);
- int s390_set_clock(uint8_t *tod_high, uint64_t *tod_low);
- void s390_crypto_reset(void);
- bool s390_get_squash_mcss(void);
--int s390_get_memslot_count(void);
- int s390_set_memory_limit(uint64_t new_limit, uint64_t *hw_limit);
- void s390_cmma_reset(void);
- void s390_enable_css_support(S390CPU *cpu);
-diff --git a/target/s390x/kvm-stub.c b/target/s390x/kvm-stub.c
-index 8cdcf83845..29b10542cc 100644
---- a/target/s390x/kvm-stub.c
-+++ b/target/s390x/kvm-stub.c
-@@ -84,11 +84,6 @@ void kvm_s390_cmma_reset(void)
- {
- }
- 
--int kvm_s390_get_memslot_count(void)
--{
--  return MAX_AVAIL_SLOTS;
--}
--
- void kvm_s390_reset_vcpu(S390CPU *cpu)
- {
- }
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 8ef509ece4..656aaea2cd 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -1854,11 +1854,6 @@ int kvm_s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t sch,
-     return kvm_vm_ioctl(kvm_state, KVM_IOEVENTFD, &kick);
- }
- 
--int kvm_s390_get_memslot_count(void)
--{
--    return kvm_check_extension(kvm_state, KVM_CAP_NR_MEMSLOTS);
--}
--
- int kvm_s390_get_ri(void)
- {
-     return cap_ri;
-diff --git a/target/s390x/kvm_s390x.h b/target/s390x/kvm_s390x.h
-index 7a3b862eea..c383bf4ee9 100644
---- a/target/s390x/kvm_s390x.h
-+++ b/target/s390x/kvm_s390x.h
-@@ -30,7 +30,6 @@ int kvm_s390_set_clock_ext(uint8_t *tod_high, uint64_t *tod_clock);
- void kvm_s390_enable_css_support(S390CPU *cpu);
- int kvm_s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t sch,
-                                     int vq, bool assign);
--int kvm_s390_get_memslot_count(void);
- int kvm_s390_cmma_active(void);
- void kvm_s390_cmma_reset(void);
- void kvm_s390_reset_vcpu(S390CPU *cpu);
 -- 
-2.13.6
+Regards,
+ Viktor Mihajlovski
