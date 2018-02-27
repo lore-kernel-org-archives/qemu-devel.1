@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eqfDG-0005S3-2e
+	(envelope-from <cohuck@redhat.com>) id 1eqfD9-0005MY-Cb
 	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:22:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eqfDF-0008NZ-8d
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:22:34 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eqfD3-0008IB-7N
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:22:27 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Tue, 27 Feb 2018 14:21:33 +0100
-Message-Id: <20180227132150.13847-10-cohuck@redhat.com>
+Date: Tue, 27 Feb 2018 14:21:31 +0100
+Message-Id: <20180227132150.13847-8-cohuck@redhat.com>
 In-Reply-To: <20180227132150.13847-1-cohuck@redhat.com>
 References: <20180227132150.13847-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 09/26] s390-ccw: print zipl boot menu
+Subject: [Qemu-devel] [PULL 07/26] s390-ccw: set up interactive boot menu
+ parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +25,123 @@ Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, rth@tw
 
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
 
-When the boot menu options are present and the guest's
-disk has been configured by the zipl tool, then the user
-will be presented with an interactive boot menu with
-labeled entries. An example of what the menu might look
-like:
-
-zIPL v1.37.1-build-20170714 interactive boot menu.
-
-0. default (linux-4.13.0)
-
-  1. linux-4.13.0
-  2. performance
-  3. kvm
+Reads boot menu flag and timeout values from the iplb and
+sets the respective fields for the menu.
 
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/menu.c | 33 ++++++++++++++++++++++++++++++++-
- 1 file changed, 32 insertions(+), 1 deletion(-)
+ pc-bios/s390-ccw/Makefile   |  2 +-
+ pc-bios/s390-ccw/main.c     | 24 ++++++++++++++++++++++++
+ pc-bios/s390-ccw/menu.c     | 22 ++++++++++++++++++++++
+ pc-bios/s390-ccw/s390-ccw.h |  3 +++
+ 4 files changed, 50 insertions(+), 1 deletion(-)
+ create mode 100644 pc-bios/s390-ccw/menu.c
 
-diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
-index c1d242fed1..730d44e36b 100644
---- a/pc-bios/s390-ccw/menu.c
-+++ b/pc-bios/s390-ccw/menu.c
-@@ -15,11 +15,42 @@
- static uint8_t flag;
- static uint64_t timeout;
+diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
+index 9f7904fc20..1712c2d95d 100644
+--- a/pc-bios/s390-ccw/Makefile
++++ b/pc-bios/s390-ccw/Makefile
+@@ -9,7 +9,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/s390-ccw)
  
--int menu_get_zipl_boot_index(const char *menu_data)
-+static int get_boot_index(int entries)
- {
-     return 0; /* implemented next patch */
+ .PHONY : all clean build-all
+ 
+-OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o libc.o
++OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o libc.o menu.o
+ QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
+ QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
+ QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index e41b264a6f..32ed70ebdd 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -18,6 +18,9 @@ IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+ static char loadparm[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+ QemuIplParameters qipl;
+ 
++#define LOADPARM_PROMPT "PROMPT  "
++#define LOADPARM_EMPTY  "........"
++
+ /*
+  * Priniciples of Operations (SA22-7832-09) chapter 17 requires that
+  * a subsystem-identification is at 184-187 and bytes 188-191 are zero
+@@ -74,6 +77,26 @@ static bool find_dev(Schib *schib, int dev_no)
+     return false;
  }
  
-+static void zipl_println(const char *data, size_t len)
++static void menu_setup(void)
 +{
-+    char buf[len + 2];
-+
-+    ebcdic_to_ascii(data, buf, len);
-+    buf[len] = '\n';
-+    buf[len + 1] = '\0';
-+
-+    sclp_print(buf);
-+}
-+
-+int menu_get_zipl_boot_index(const char *menu_data)
-+{
-+    size_t len;
-+    int entries;
-+
-+    /* Print and count all menu items, including the banner */
-+    for (entries = 0; *menu_data; entries++) {
-+        len = strlen(menu_data);
-+        zipl_println(menu_data, len);
-+        menu_data += len + 1;
-+
-+        if (entries < 2) {
-+            sclp_print("\n");
-+        }
++    if (memcmp(loadparm, LOADPARM_PROMPT, 8) == 0) {
++        menu_set_parms(QIPL_FLAG_BM_OPTS_CMD, 0);
++        return;
 +    }
 +
-+    sclp_print("\n");
-+    return get_boot_index(entries - 1); /* subtract 1 to exclude banner */
++    /* If loadparm was set to any other value, then do not enable menu */
++    if (memcmp(loadparm, LOADPARM_EMPTY, 8) != 0) {
++        return;
++    }
++
++    switch (iplb.pbt) {
++    case S390_IPL_TYPE_CCW:
++        menu_set_parms(qipl.qipl_flags & QIPL_FLAG_BM_OPTS_CMD,
++                       qipl.boot_menu_timeout);
++        return;
++    }
 +}
 +
- void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout)
+ static void virtio_setup(void)
  {
-     flag = boot_menu_flag;
+     Schib schib;
+@@ -117,6 +140,7 @@ static void virtio_setup(void)
+         default:
+             panic("List-directed IPL not supported yet!\n");
+         }
++        menu_setup();
+     } else {
+         for (ssid = 0; ssid < 0x3; ssid++) {
+             blk_schid.ssid = ssid;
+diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
+new file mode 100644
+index 0000000000..1ce33ddf3d
+--- /dev/null
++++ b/pc-bios/s390-ccw/menu.c
+@@ -0,0 +1,22 @@
++/*
++ * QEMU S390 Interactive Boot Menu
++ *
++ * Copyright 2018 IBM Corp.
++ * Author: Collin L. Walling <walling@linux.vnet.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or (at
++ * your option) any later version. See the COPYING file in the top-level
++ * directory.
++ */
++
++#include "libc.h"
++#include "s390-ccw.h"
++
++static uint8_t flag;
++static uint64_t timeout;
++
++void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout)
++{
++    flag = boot_menu_flag;
++    timeout = boot_menu_timeout;
++}
+diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+index 25d4d213ea..6cfd4b2183 100644
+--- a/pc-bios/s390-ccw/s390-ccw.h
++++ b/pc-bios/s390-ccw/s390-ccw.h
+@@ -84,6 +84,9 @@ ulong get_second(void);
+ /* bootmap.c */
+ void zipl_load(void);
+ 
++/* menu.c */
++void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout);
++
+ static inline void fill_hex(char *out, unsigned char val)
+ {
+     const char hex[] = "0123456789abcdef";
 -- 
 2.13.6
