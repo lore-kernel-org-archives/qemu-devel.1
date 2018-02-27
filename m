@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52329)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <bdrung+konstrukt.pb.local@profitbricks.com>)
-	id 1eqhlj-0001cS-46
+	id 1eqhlk-0001dF-59
 	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:06:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <bdrung+konstrukt.pb.local@profitbricks.com>)
-	id 1eqhlh-0002ky-Br
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:06:19 -0500
-Received: from mx1.profitbricks.com ([46.16.72.21]:34582)
+	id 1eqhld-0002j0-I3
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:06:20 -0500
+Received: from mx1.profitbricks.com ([46.16.72.21]:34576)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71)
 	(envelope-from <bdrung+konstrukt.pb.local@profitbricks.com>)
-	id 1eqhlh-0002kf-0G
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:06:17 -0500
+	id 1eqhld-0002i2-7a
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:06:13 -0500
 Received: from mail.pb.local (mail.pb.local [192.168.178.100])
-	by mx1.profitbricks.com (Postfix) with ESMTP id A01CB5F73A
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 16:06:14 +0000 (UTC)
+	by mx1.profitbricks.com (Postfix) with ESMTP id A703A5F73A
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 16:06:10 +0000 (UTC)
 From: Benjamin Drung <benjamin.drung@profitbricks.com>
-Date: Tue, 27 Feb 2018 17:06:02 +0100
-Message-Id: <20180227160602.30220-2-benjamin.drung@profitbricks.com>
-In-Reply-To: <20180227160602.30220-1-benjamin.drung@profitbricks.com>
+Date: Tue, 27 Feb 2018 17:06:01 +0100
+Message-Id: <20180227160602.30220-1-benjamin.drung@profitbricks.com>
+In-Reply-To: <a23480b8-c914-6274-52ec-29911cb4d2a5@amsat.org>
 References: <a23480b8-c914-6274-52ec-29911cb4d2a5@amsat.org>
-	<20180227160602.30220-1-benjamin.drung@profitbricks.com>
-Subject: [Qemu-devel] [PATCH 2/2] slirp: Add classless static routes support
- to DHCP server
+Subject: [Qemu-devel] [PATCH 1/2 v4] slirp: Add domainname option to slirp's
+ DHCP server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,303 +34,181 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, Eric Blake <eblake@redhat.com>
 Cc: qemu-devel@nongnu.org, Benjamin Drung <benjamin.drung@profitbricks.com>
 
-This patch will allow the user to specify classless static routes for
-the replies from the built-in DHCP server.
+This patch will allow the user to include the domainname option in
+replies from the built-in DHCP server.
 
 Signed-off-by: Benjamin Drung <benjamin.drung@profitbricks.com>
 ---
- net/slirp.c      | 65 +++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ net/slirp.c      | 12 +++++++++---
  qapi/net.json    |  4 ++++
- qemu-options.hx  | 13 +++++++++++-
- slirp/bootp.c    | 23 ++++++++++++++++++++
- slirp/bootp.h    |  2 ++
- slirp/libslirp.h |  9 +++++++-
- slirp/slirp.c    |  7 +++++-
- slirp/slirp.h    |  2 ++
- 8 files changed, 119 insertions(+), 6 deletions(-)
+ qemu-options.hx  |  7 +++++--
+ slirp/bootp.c    |  8 ++++++++
+ slirp/libslirp.h |  2 +-
+ slirp/slirp.c    |  4 +++-
+ slirp/slirp.h    |  1 +
+ 7 files changed, 31 insertions(+), 7 deletions(-)
 
 diff --git a/net/slirp.c b/net/slirp.c
-index 8c08e5644f..78df361485 100644
+index 8991816bbf..8c08e5644f 100644
 --- a/net/slirp.c
 +++ b/net/slirp.c
-@@ -158,7 +158,7 @@ static int net_slirp_init(NetClientState *peer, const char *model,
+@@ -157,7 +157,8 @@ static int net_slirp_init(NetClientState *peer, const char *model,
+                           const char *bootfile, const char *vdhcp_start,
                            const char *vnameserver, const char *vnameserver6,
                            const char *smb_export, const char *vsmbserver,
-                           const char **dnssearch, const char *vdomainname,
--                          Error **errp)
-+                          const StringList *vroutes, Error **errp)
+-                          const char **dnssearch, Error **errp)
++                          const char **dnssearch, const char *vdomainname,
++                          Error **errp)
  {
      /* default settings according to historic slirp */
      struct in_addr net  = { .s_addr = htonl(0x0a000200) }; /* 10.0.2.0 */
-@@ -177,8 +177,12 @@ static int net_slirp_init(NetClientState *peer, const char *model,
-     char buf[20];
-     uint32_t addr;
-     int shift;
-+    int i = 0;
-     char *end;
-+    unsigned int route_count = 0;
-     struct slirp_config_str *config;
-+    struct StaticRoute *routes = NULL;
-+    const StringList *iter;
- 
-     if (!ipv4 && (vnetwork || vhost || vnameserver)) {
-         error_setg(errp, "IPv4 disabled but netmask/host/dns provided");
-@@ -365,6 +369,58 @@ static int net_slirp_init(NetClientState *peer, const char *model,
-         return -1;
+@@ -359,6 +360,11 @@ static int net_slirp_init(NetClientState *peer, const char *model,
+         ip6_dns.s6_addr[15] |= 3;
      }
  
-+    iter = vroutes;
-+    while (iter) {
-+        route_count++;
-+        iter = iter->next;
++    if (vdomainname && !*vdomainname) {
++        error_setg(errp, "'domainname' parameter cannot be empty");
++        return -1;
 +    }
-+    routes = g_malloc(route_count * sizeof(StaticRoute));
 +
-+    iter = vroutes;
-+    while(iter != NULL) {
-+        char buf2[20];
-+        const char *gateway = iter->value->str;
-+        const char *mask;
-+        char *end;
-+        long mask_width;
-+
-+        // Split "subnet/mask:gateway" into its components
-+        if (get_str_sep(buf2, sizeof(buf2), &gateway, ':') < 0) {
-+            error_setg(errp, "Failed to parse route: No colon found in '%s'",
-+                       iter->value->str);
-+            return -1;
-+        }
-+        mask = buf2;
-+        if (get_str_sep(buf, sizeof(buf), &mask, '/') < 0) {
-+            error_setg(errp, "Failed to parse route: No slash found in '%s'",
-+                       mask);
-+            return -1;
-+        }
-+        if (!inet_aton(buf, &routes[i].subnet)) {
-+            error_setg(errp, "Failed to parse route subnet '%s'", buf);
-+            return -1;
-+        }
-+
-+        mask_width = strtol(mask, &end, 10);
-+        if (*end != '\0') {
-+            error_setg(errp,
-+                       "Failed to parse netmask '%s' (trailing chars)", mask);
-+            return -1;
-+        } else if (mask_width < 0 || mask_width > 32) {
-+            error_setg(errp,
-+                       "Invalid netmask provided (must be in range 0-32)");
-+            return -1;
-+        }
-+        routes[i].mask_width = (uint8_t)mask_width;
-+
-+        if (!inet_aton(gateway, &routes[i].gateway)) {
-+            error_setg(errp, "Failed to parse route gateway '%s'", gateway);
-+            return -1;
-+        }
-+
-+        iter = iter->next;
-+        i++;
-+    }
  
      nc = qemu_new_net_client(&net_slirp_info, peer, model, name);
  
-@@ -377,7 +433,8 @@ static int net_slirp_init(NetClientState *peer, const char *model,
+@@ -371,7 +377,7 @@ static int net_slirp_init(NetClientState *peer, const char *model,
      s->slirp = slirp_init(restricted, ipv4, net, mask, host,
                            ipv6, ip6_prefix, vprefix6_len, ip6_host,
                            vhostname, tftp_export, bootfile, dhcp,
--                          dns, ip6_dns, dnssearch, vdomainname, s);
-+                          dns, ip6_dns, dnssearch, vdomainname,
-+                          route_count, routes, s);
+-                          dns, ip6_dns, dnssearch, s);
++                          dns, ip6_dns, dnssearch, vdomainname, s);
      QTAILQ_INSERT_TAIL(&slirp_stacks, s, entry);
  
      for (config = slirp_configs; config; config = config->next) {
-@@ -409,6 +466,7 @@ static int net_slirp_init(NetClientState *peer, const char *model,
-     return 0;
- 
- error:
-+    g_free(routes);
-     qemu_del_net_client(nc);
-     return -1;
- }
-@@ -964,7 +1022,8 @@ int net_init_slirp(const Netdev *netdev, const char *name,
+@@ -958,7 +964,7 @@ int net_init_slirp(const Netdev *netdev, const char *name,
                           user->ipv6_host, user->hostname, user->tftp,
                           user->bootfile, user->dhcpstart,
                           user->dns, user->ipv6_dns, user->smb,
--                         user->smbserver, dnssearch, user->domainname, errp);
-+                         user->smbserver, dnssearch, user->domainname,
-+                         user->route, errp);
+-                         user->smbserver, dnssearch, errp);
++                         user->smbserver, dnssearch, user->domainname, errp);
  
      while (slirp_configs) {
          config = slirp_configs;
 diff --git a/qapi/net.json b/qapi/net.json
-index 9dfd34cafa..8a85debd92 100644
+index 1238ba5de1..9dfd34cafa 100644
 --- a/qapi/net.json
 +++ b/qapi/net.json
-@@ -163,6 +163,9 @@
- # @domainname: guest-visible domain name of the virtual nameserver
- #              (since 2.12)
+@@ -160,6 +160,9 @@
+ # @dnssearch: list of DNS suffixes to search, passed as DHCP option
+ #             to the guest
  #
-+# @route: guest-visible static classless route of the virtual nameserver
-+#         (since 2.12)
++# @domainname: guest-visible domain name of the virtual nameserver
++#              (since 2.12)
 +#
  # @ipv6-prefix: IPv6 network prefix (default is fec0::) (since
  #               2.6). The network prefix is given in the usual
  #               hexadecimal IPv6 address notation.
-@@ -201,6 +204,7 @@
+@@ -197,6 +200,7 @@
+     '*dhcpstart': 'str',
      '*dns':       'str',
      '*dnssearch': ['String'],
-     '*domainname': 'str',
-+    '*route':     ['String'],
++    '*domainname': 'str',
      '*ipv6-prefix':      'str',
      '*ipv6-prefixlen':   'int',
      '*ipv6-host':        'str',
 diff --git a/qemu-options.hx b/qemu-options.hx
-index c000ef454e..e4bb5919ab 100644
+index 8ccd5dcaa6..c000ef454e 100644
 --- a/qemu-options.hx
 +++ b/qemu-options.hx
-@@ -1907,7 +1907,7 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
+@@ -1906,8 +1906,8 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
+     "-netdev user,id=str[,ipv4[=on|off]][,net=addr[/mask]][,host=addr]\n"
      "         [,ipv6[=on|off]][,ipv6-net=addr[/int]][,ipv6-host=addr]\n"
      "         [,restrict=on|off][,hostname=host][,dhcpstart=addr]\n"
-     "         [,dns=addr][,ipv6-dns=addr][,dnssearch=domain][,domainname=domain]\n"
--    "         [,tftp=dir][,bootfile=f][,hostfwd=rule][,guestfwd=rule]"
-+    "         [,route=addr/mask:gateway][,tftp=dir][,bootfile=f][,hostfwd=rule][,guestfwd=rule]"
+-    "         [,dns=addr][,ipv6-dns=addr][,dnssearch=domain][,tftp=dir]\n"
+-    "         [,bootfile=f][,hostfwd=rule][,guestfwd=rule]"
++    "         [,dns=addr][,ipv6-dns=addr][,dnssearch=domain][,domainname=domain]\n"
++    "         [,tftp=dir][,bootfile=f][,hostfwd=rule][,guestfwd=rule]"
  #ifndef _WIN32
                                               "[,smb=dir[,smbserver=addr]]\n"
  #endif
-@@ -2119,6 +2119,17 @@ qemu -net user,dnssearch=mgmt.example.org,dnssearch=example.org [...]
- @item domainname=@var{domain}
- Specifies the client domain name reported by the built-in DHCP server.
+@@ -2116,6 +2116,9 @@ Example:
+ qemu -net user,dnssearch=mgmt.example.org,dnssearch=example.org [...]
+ @end example
  
-+@item route=@var{addr}/@var{mask}:@var{gateway}
-+Provides an entry for the classless static routes list sent by the built-in
-+DHCP server. More than one route can be transmitted by specifying
-+this option multiple times. If supported, this will cause the guest to
-+automatically set the given static routes instead of the given default gateway.
-+
-+Example:
-+@example
-+qemu -net user,route=10.0.2.0/24:10.0.2.2,route=192.168.0.0/16:10.0.2.2 [...]
-+@end example
++@item domainname=@var{domain}
++Specifies the client domain name reported by the built-in DHCP server.
 +
  @item tftp=@var{dir}
  When using the user mode network stack, activate a built-in TFTP
  server. The files in @var{dir} will be exposed as the root of a TFTP server.
 diff --git a/slirp/bootp.c b/slirp/bootp.c
-index 9e7b53ba94..a694a43189 100644
+index 5dd1a415b5..9e7b53ba94 100644
 --- a/slirp/bootp.c
 +++ b/slirp/bootp.c
-@@ -306,6 +306,29 @@ static void bootp_reply(Slirp *slirp, const struct bootp_t *bp)
+@@ -298,6 +298,14 @@ static void bootp_reply(Slirp *slirp, const struct bootp_t *bp)
              q += val;
          }
  
-+        if (slirp->route_count > 0) {
-+            uint8_t option_length = 0;
-+            uint8_t significant_octets;
-+
-+            for (int i = 0; i < slirp->route_count; i++) {
-+                significant_octets = slirp->routes[i].mask_width / 8
-+                                     + (slirp->routes[i].mask_width % 8 > 0);
-+                option_length += significant_octets + 5;
-+            }
-+
-+            *q++ = RFC3442_CLASSLESS_STATIC_ROUTE;
-+            *q++ = option_length;
-+            for (int i = 0; i < slirp->route_count; i++) {
-+                significant_octets = slirp->routes[i].mask_width / 8
-+                                     + (slirp->routes[i].mask_width % 8 > 0);
-+                *q++ = slirp->routes[i].mask_width;
-+                memcpy(q, &slirp->routes[i].subnet.s_addr, significant_octets);
-+                q += significant_octets;
-+                memcpy(q, &slirp->routes[i].gateway.s_addr, 4);
-+                q += 4;
-+            }
++        if (slirp->vdomainname) {
++            val = strlen(slirp->vdomainname);
++            *q++ = RFC1533_DOMAINNAME;
++            *q++ = val;
++            memcpy(q, slirp->vdomainname, val);
++            q += val;
 +        }
 +
          if (slirp->vdnssearch) {
              size_t spaceleft = sizeof(rbp->bp_vend) - (q - rbp->bp_vend);
              val = slirp->vdnssearch_len;
-diff --git a/slirp/bootp.h b/slirp/bootp.h
-index 394525733e..60bef4e80d 100644
---- a/slirp/bootp.h
-+++ b/slirp/bootp.h
-@@ -71,6 +71,8 @@
- #define RFC2132_RENEWAL_TIME    58
- #define RFC2132_REBIND_TIME     59
- 
-+#define RFC3442_CLASSLESS_STATIC_ROUTE	121
-+
- #define DHCPDISCOVER		1
- #define DHCPOFFER		2
- #define DHCPREQUEST		3
 diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index 740408a96e..3d2e395b08 100644
+index 540b3e5903..740408a96e 100644
 --- a/slirp/libslirp.h
 +++ b/slirp/libslirp.h
-@@ -5,6 +5,12 @@
- 
- typedef struct Slirp Slirp;
- 
-+typedef struct StaticRoute {
-+    struct in_addr subnet;
-+    uint8_t mask_width;
-+    struct in_addr gateway;
-+} StaticRoute;
-+
- int get_dns_addr(struct in_addr *pdns_addr);
- int get_dns6_addr(struct in6_addr *pdns6_addr, uint32_t *scope_id);
- 
-@@ -16,7 +22,8 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
+@@ -16,7 +16,7 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
                    const char *tftp_path, const char *bootfile,
                    struct in_addr vdhcp_start, struct in_addr vnameserver,
                    struct in6_addr vnameserver6, const char **vdnssearch,
--                  const char *vdomainname, void *opaque);
-+                  const char *vdomainname, unsigned int routes_count,
-+                  const StaticRoute *vroutes, void *opaque);
+-                  void *opaque);
++                  const char *vdomainname, void *opaque);
  void slirp_cleanup(Slirp *slirp);
  
  void slirp_pollfds_fill(GArray *pollfds, uint32_t *timeout);
 diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 4f29753444..4e5f249eeb 100644
+index 1cb6b07004..4f29753444 100644
 --- a/slirp/slirp.c
 +++ b/slirp/slirp.c
-@@ -286,7 +286,8 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
+@@ -286,7 +286,7 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
                    const char *tftp_path, const char *bootfile,
                    struct in_addr vdhcp_start, struct in_addr vnameserver,
                    struct in6_addr vnameserver6, const char **vdnssearch,
--                  const char *vdomainname, void *opaque)
-+                  const char *vdomainname, unsigned int route_count,
-+                  const StaticRoute *vroutes, void *opaque)
+-                  void *opaque)
++                  const char *vdomainname, void *opaque)
  {
      Slirp *slirp = g_malloc0(sizeof(Slirp));
  
-@@ -321,6 +322,9 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
+@@ -317,6 +317,7 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
+     }
+     slirp->tftp_prefix = g_strdup(tftp_path);
+     slirp->bootp_filename = g_strdup(bootfile);
++    slirp->vdomainname = g_strdup(vdomainname);
      slirp->vdhcp_startaddr = vdhcp_start;
      slirp->vnameserver_addr = vnameserver;
      slirp->vnameserver_addr6 = vnameserver6;
-+    slirp->route_count = route_count;
-+    slirp->routes = g_malloc(route_count * sizeof(StaticRoute));
-+    memcpy(slirp->routes, vroutes, route_count * sizeof(StaticRoute));
- 
-     if (vdnssearch) {
-         translate_dnssearch(slirp, vdnssearch);
-@@ -351,6 +355,7 @@ void slirp_cleanup(Slirp *slirp)
+@@ -349,6 +350,7 @@ void slirp_cleanup(Slirp *slirp)
+     g_free(slirp->vdnssearch);
      g_free(slirp->tftp_prefix);
      g_free(slirp->bootp_filename);
-     g_free(slirp->vdomainname);
-+    g_free(slirp->routes);
++    g_free(slirp->vdomainname);
      g_free(slirp);
  }
  
 diff --git a/slirp/slirp.h b/slirp/slirp.h
-index 10b410898a..3c81b7f7cc 100644
+index 06febfc78b..10b410898a 100644
 --- a/slirp/slirp.h
 +++ b/slirp/slirp.h
-@@ -194,6 +194,8 @@ struct Slirp {
+@@ -193,6 +193,7 @@ struct Slirp {
+     char *bootp_filename;
      size_t vdnssearch_len;
      uint8_t *vdnssearch;
-     char *vdomainname;
-+    unsigned int route_count;
-+    struct StaticRoute *routes;
++    char *vdomainname;
  
      /* tcp states */
      struct socket tcb;
