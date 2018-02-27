@@ -1,15 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eqkAc-0004QA-CP
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 13:40:11 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eqkDM-0005Jq-6O
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 13:43:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eqkAb-0008Bu-JC
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 13:40:10 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eqkDL-0000uL-Ci
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 13:43:00 -0500
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:45252)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eqkDL-0000u7-76
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 13:42:59 -0500
+Received: by mail-oi0-x241.google.com with SMTP id j79so13624913oib.12
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 10:42:58 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <7bb690382e3370aa1c1e047a84e36603c787ec0e.1519749987.git.alistair.francis@xilinx.com>
+References: <7bb690382e3370aa1c1e047a84e36603c787ec0e.1519749987.git.alistair.francis@xilinx.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Feb 2018 18:39:58 +0000
-Message-Id: <20180227183958.15167-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] linux-user: Report AArch64 FP16 support via
- hwcap bits
+Date: Tue, 27 Feb 2018 18:42:37 +0000
+Message-ID: <CAFEAcA95a3-Hjihk2OjfLGN=mb4gW7gxvf5he+mYDgRzdBSMJw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] MAINTAINERS: Update my email address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,36 +28,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>
 
-Set the appropriate Linux hwcap bits to tell the guest binary if we
-have implemented half-precision floating point support.
+On 27 February 2018 at 16:47, Alistair Francis
+<alistair.francis@xilinx.com> wrote:
+> I am leaving Xilinx, so to avoid having an email address that bouunces
+> update my maintainer address to point to my personal email address.
+>
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Signed-off-by: Alistair Francis <alistair@alistair23.me>
+> ---
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-This is intended to go after Alex's FP16 stuff since it
-uses the ARM_FEATURE_V8_FP16 bit that defines.
-There is as yet no kernel definition of an AArch32 hwcap
-bit to report FP16.
+Thanks -- I'll take this through the target-arm tree.
+Best of luck with whatever you're moving on to!
 
-Based-on: <20180227143852.11175-1-alex.bennee@linaro.org>
-
- linux-user/elfload.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 8bb9a2c3e8..80f1b32fbe 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -551,6 +551,8 @@ static uint32_t get_elf_hwcap(void)
-     GET_FEATURE(ARM_FEATURE_V8_SM3, ARM_HWCAP_A64_SM3);
-     GET_FEATURE(ARM_FEATURE_V8_SM4, ARM_HWCAP_A64_SM4);
-     GET_FEATURE(ARM_FEATURE_V8_SHA512, ARM_HWCAP_A64_SHA512);
-+    GET_FEATURE(ARM_FEATURE_V8_FP16,
-+                ARM_HWCAP_A64_FPHP | ARM_HWCAP_A64_ASIMDHP);
- #undef GET_FEATURE
- 
-     return hwcaps;
--- 
-2.16.2
+-- PMM
