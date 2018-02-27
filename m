@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eqbx7-0002B7-8u
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 04:53:42 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1eqbxG-0002Kk-4L
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 04:53:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eqbx5-0005Qd-0V
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 04:53:41 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:57666)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eqbx4-0005Pj-C2
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 04:53:38 -0500
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 27 Feb 2018 12:53:38 +0300
-Message-ID: <20180227095338.1060.27385.stgit@pasha-VirtualBox>
-In-Reply-To: <20180227095135.1060.36549.stgit@pasha-VirtualBox>
-References: <20180227095135.1060.36549.stgit@pasha-VirtualBox>
+	(envelope-from <arei.gonglei@huawei.com>) id 1eqbxC-0005UV-7z
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 04:53:50 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2259 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
+	id 1eqbxB-0005Sg-SH
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 04:53:46 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Tue, 27 Feb 2018 09:52:56 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA56A1AE@DGGEMA505-MBX.china.huawei.com>
+References: <1490624810-44752-1-git-send-email-agraf@suse.de>
+In-Reply-To: <1490624810-44752-1-git-send-email-agraf@suse.de>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v7 22/22] tcg: fix cpu_io_recompile
+Subject: Re: [Qemu-devel] [PATCH] i386: Allow monitor / mwait cpuid override
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,63 +28,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org
+To: Alexander Graf <agraf@suse.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>, Zhuangyanying <ann.zhuangyanying@huawei.com>
 
-cpu_io_recompile() function was broken by
-the commit 9b990ee5a3cc6aa38f81266fb0c6ef37a36c45b9. Instead of regenerating
-the block starting from PC of the original block, it just set the instruction
-counter for TCG. In most cases this was unnoticed, but in icount mode
-there was an exception for incorrect usage of CF_LAST_IO flag.
-This patch recovers recompilation of the original block and also
-configures translation for executing single IO instruction which
-caused a recompilation.
+Hi all,
 
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
----
- accel/tcg/translate-all.c |   18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
+Guests could achive good performance in 'Message Passing Workloads'=20
+scenarios when knowing the X86_FEATURE_MWAIT feature which is presented by =
+qemu.=20
+the reason is that after knowing that feature,=20
+the guest could use mwait method, which saves VMEXIT,=20
+to do idle, and achives high performace in latency-sensitive scenario.
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 67795cd..5ad1b91 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1728,7 +1728,8 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
-     CPUArchState *env = cpu->env_ptr;
- #endif
-     TranslationBlock *tb;
--    uint32_t n;
-+    uint32_t n, flags;
-+    target_ulong pc, cs_base;
- 
-     tb_lock();
-     tb = tb_find_pc(retaddr);
-@@ -1766,8 +1767,14 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
-         cpu_abort(cpu, "TB too big during recompile");
-     }
- 
--    /* Adjust the execution state of the next TB.  */
--    cpu->cflags_next_tb = curr_cflags() | CF_LAST_IO | n;
-+    pc = tb->pc;
-+    cs_base = tb->cs_base;
-+    flags = tb->flags;
-+    tb_phys_invalidate(tb, -1);
-+
-+    /* Execute one IO instruction without caching
-+       instead of creating large TB. */
-+    cpu->cflags_next_tb = curr_cflags() | CF_LAST_IO | CF_NOCACHE | 1;
- 
-     if (tb->cflags & CF_NOCACHE) {
-         if (tb->orig_tb) {
-@@ -1778,6 +1785,11 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
-         tb_remove(tb);
-     }
- 
-+    /* Generate new TB instead of the current one. */
-+    /* FIXME: In theory this could raise an exception.  In practice
-+       we have already translated the block once so it's probably ok.  */
-+    tb_gen_code(cpu, pc, cs_base, flags, curr_cflags() | CF_LAST_IO | n);
-+
-     /* TODO: If env->pc != tb->pc (i.e. the faulting instruction was not
-      * the first in the TB) then we end up generating a whole new TB and
-      *  repeating the fault, which is horribly inefficient.
+Is there any plan for this patch?=20
+
+Or May I send a updated version based on yours? @Alex?
+
+Thanks,
+-Gonglei
+
+
+> -----Original Message-----
+> From: Qemu-devel
+> [mailto:qemu-devel-bounces+arei.gonglei=3Dhuawei.com@nongnu.org] On
+> Behalf Of Alexander Graf
+> Sent: Monday, March 27, 2017 10:27 PM
+> To: qemu-devel@nongnu.org
+> Cc: Paolo Bonzini; Eduardo Habkost; Richard Henderson
+> Subject: [Qemu-devel] [PATCH] i386: Allow monitor / mwait cpuid override
+>=20
+> KVM allows trap and emulate (read: NOP) of the MONITOR and MWAIT
+> instructions. There is work undergoing to enable actual execution
+> of these inside of KVM, but nobody really wants to expose the feature
+> to the guest by default, as it would eat up all of the host CPU.
+>=20
+> So today there is no streamlined way to actually notify the guest that
+> it's ok to execute MONITOR / MWAIT, even when we want to explicitly
+> leave the guest in guest context.
+>=20
+> This patch adds a new -cpu parameter called "mwait" which - when
+> enabled - force enables the MONITOR / MWAIT CPUID flag, even when
+> the underlying accel framework does not explicitly advertise support.
+>=20
+> With that in place, we can explicitly allow users to specify that
+> they want have the guest execute MONITOR / MWAIT in its idle loop.
+>=20
+> Signed-off-by: Alexander Graf <agraf@suse.de>
+> ---
+>  target/i386/cpu.c | 5 +++++
+>  target/i386/cpu.h | 1 +
+>  2 files changed, 6 insertions(+)
+>=20
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 7aa7622..c44020b 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -3460,6 +3460,10 @@ static int x86_cpu_filter_features(X86CPU *cpu)
+>              x86_cpu_get_supported_feature_word(w, false);
+>          uint32_t requested_features =3D env->features[w];
+>          env->features[w] &=3D host_feat;
+> +        if (cpu->expose_monitor && (w =3D=3D FEAT_1_ECX)) {
+> +            /* Force monitor feature in */
+> +            env->features[w] |=3D CPUID_EXT_MONITOR;
+> +        }
+>          cpu->filtered_features[w] =3D requested_features &
+> ~env->features[w];
+>          if (cpu->filtered_features[w]) {
+>              rv =3D 1;
+> @@ -3988,6 +3992,7 @@ static Property x86_cpu_properties[] =3D {
+>      DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
+>      DEFINE_PROP_BOOL("enforce", X86CPU, enforce_cpuid, false),
+>      DEFINE_PROP_BOOL("kvm", X86CPU, expose_kvm, true),
+> +    DEFINE_PROP_BOOL("mwait", X86CPU, expose_monitor, false),
+>      DEFINE_PROP_UINT32("phys-bits", X86CPU, phys_bits, 0),
+>      DEFINE_PROP_BOOL("host-phys-bits", X86CPU, host_phys_bits, false),
+>      DEFINE_PROP_BOOL("fill-mtrr-mask", X86CPU, fill_mtrr_mask, true),
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 07401ad..7400d00 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1214,6 +1214,7 @@ struct X86CPU {
+>      bool check_cpuid;
+>      bool enforce_cpuid;
+>      bool expose_kvm;
+> +    bool expose_monitor;
+>      bool migratable;
+>      bool max_features; /* Enable all supported features automatically */
+>      uint32_t apic_id;
+> --
+> 1.8.5.6
+>=20
