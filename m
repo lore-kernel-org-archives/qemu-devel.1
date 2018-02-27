@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqnZ7-0004ur-Jg
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 17:17:42 -0500
+	(envelope-from <eblake@redhat.com>) id 1eqnaj-0005iN-V3
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 17:19:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqnZ3-0005Jb-KN
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 17:17:41 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35648 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1eqnaf-00060q-TG
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 17:19:21 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35674 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eqnZ3-0005Iz-Fd
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 17:17:37 -0500
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eqnaf-00060c-Mz
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 17:19:17 -0500
 References: <1518784641-43151-1-git-send-email-imammedo@redhat.com>
-	<1518784641-43151-9-git-send-email-imammedo@redhat.com>
+	<1518784641-43151-10-git-send-email-imammedo@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <39a0a6a7-5432-1ae8-f275-bd172ef15854@redhat.com>
-Date: Tue, 27 Feb 2018 16:17:20 -0600
+Message-ID: <e01c1c1f-d18b-62aa-9959-a0eb5ba9ba1a@redhat.com>
+Date: Tue, 27 Feb 2018 16:19:16 -0600
 MIME-Version: 1.0
-In-Reply-To: <1518784641-43151-9-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1518784641-43151-10-git-send-email-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 8/9] QMP: add set-numa-node command
+Subject: Re: [Qemu-devel] [PATCH v3 9/9] tests: functional tests for QMP
+ command set-numa-node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,53 +33,40 @@ To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 Cc: armbru@redhat.com, ehabkost@redhat.com, pkrempa@redhat.com, david@gibson.dropbear.id.au, peter.maydell@linaro.org, pbonzini@redhat.com, cohuck@redhat.com
 
 On 02/16/2018 06:37 AM, Igor Mammedov wrote:
-> Command is allowed to run only in preconfig stage and
-> will allow to configure numa mapping for CPUs depending
-> on possible CPUs layout (query-hotpluggable-cpus) for
-> given machine instance.
+>   * start QEMU with 2 unmapped cpus,
+>   * while in preconfig state
+>      * add 2 numa nodes
+>      * assign cpus to them
+>   * exit preconfig and in running state check that cpus
+>     are mapped correctly.
 > 
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 > ---
->   numa.c           |  5 +++++
->   qapi-schema.json | 14 ++++++++++++++
->   tests/qmp-test.c |  6 ++++++
->   3 files changed, 25 insertions(+)
+>   tests/numa-test.c | 71 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 71 insertions(+)
 > 
+> diff --git a/tests/numa-test.c b/tests/numa-test.c
+> index 68aca9c..11c2842 100644
+> --- a/tests/numa-test.c
+> +++ b/tests/numa-test.c
+> @@ -260,6 +260,76 @@ static void aarch64_numa_cpu(const void *data)
+>       g_free(cli);
+>   }
+>   
+> +static bool is_err(QDict *response)
+> +{
+> +    const char *desc = NULL;
+> +    QDict *error = qdict_get_qdict(response, "error");
+> +    if (error) {
+> +        desc = qdict_get_try_str(error, "desc");
+> +    }
+> +    QDECREF(response);
+> +    return !!desc;
 
-> +++ b/qapi-schema.json
-> @@ -3201,3 +3201,17 @@
->   # Since: 2.11
->   ##
->   { 'command': 'watchdog-set-action', 'data' : {'action': 'WatchdogAction'} }
-> +
-> +##
-> +# @set-numa-node:
-> +#
-> +# Runtime equivalent of '-numa' CLI option, available at
-> +# preconfigure stage to configure numa mapping before initializing
-> +# machine.
-> +#
-> +# Since 2.12
-> +##
-> +{ 'command': 'set-numa-node', 'boxed': true,
-> +  'data': 'NumaOptions',
-> +  'runstates': [ 'preconfig' ]
-> +}
-
-Oh, so you ARE trying to do fine-grained control of which commands are 
-valid in which states.  Still, would that be easier through a 
-three-state enum (or pair of bools) instead of making every client 
-enumerate an array of 'all states', 'all but preconfig', and 'preconfig 
-only'?
-
-Also, while preconfig is special (not every command can be made to run 
-during preconfig, so having the state rejection logic centralized makes 
-some sense), there are a lot fewer commands that are preconfig-only - 
-could those commands (just set-numa-node at the moment) be made to 
-perform state checks themselves rather than relying on centralized 
-logic, and then you still only need a single bool in the QAPI schema 
-(safe for preconfig, unsafe for preconfig in central logic; unsafe in 
-other states in a per-command code).
+Why are we duplicating this helper in more than one .c file?  If it is a 
+common task, it should be in a common file for code reuse.  And as 
+before, why are you returning false if the reply is an error but merely 
+lacked 'desc'?
 
 -- 
 Eric Blake, Principal Software Engineer
