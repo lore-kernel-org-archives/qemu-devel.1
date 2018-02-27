@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1eqhAD-0004iw-Rw
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:27:35 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eqhBr-000760-Kf
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:29:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1eqhAB-0003ih-7Q
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:27:33 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56192 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1eqhAB-0003i1-0v
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:27:31 -0500
-References: <20180226181758.26922-1-wei@redhat.com>
-	<20180226181758.26922-4-wei@redhat.com> <20180227115740.GD2847@work-vm>
-From: Wei Huang <wei@redhat.com>
-Message-ID: <8673e197-11d7-107f-8dea-5167f35f3d69@redhat.com>
-Date: Tue, 27 Feb 2018 09:27:19 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1eqhBq-0004vq-Oe
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:29:15 -0500
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:35135)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eqhBq-0004ut-J4
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:29:14 -0500
+Received: by mail-oi0-x242.google.com with SMTP id x10so10589700oig.2
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 07:29:14 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180227115740.GD2847@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V6 3/4] tests/migration: Add migration-test
- header file
+In-Reply-To: <20180217182323.25885-62-richard.henderson@linaro.org>
+References: <20180217182323.25885-1-richard.henderson@linaro.org>
+	<20180217182323.25885-62-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Feb 2018 15:28:53 +0000
+Message-ID: <CAFEAcA9V+NRVS+yEFXhsc7Qbfgg3TVPaMrPmOw4pv6gkLdxjfA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 61/67] target/arm: Implement SVE
+ Floating Point Unary Operations - Unpredicated Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,195 +30,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
+On 17 February 2018 at 18:23, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper.h        |  8 ++++++++
+>  target/arm/translate-sve.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+>  target/arm/vec_helper.c    | 20 ++++++++++++++++++++
+>  target/arm/sve.decode      |  5 +++++
+>  4 files changed, 76 insertions(+)
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-On 02/27/2018 05:57 AM, Dr. David Alan Gilbert wrote:
-> * Wei Huang (wei@redhat.com) wrote:
->> This patch moves the settings related migration-test from the
->> migration-test.c file to a seperate header file. It also renames the
->> x86-a-b-bootblock.s file extension from .s to .S, allowing gcc
->> pre-processor to include the C-style header file correctly.
->>
->> Signed-off-by: Wei Huang <wei@redhat.com>
->> Reviewed-by: Andrew Jones <drjones@redhat.com>
->> ---
->>  tests/migration-test.c                             | 28 +++++++++++-----------
->>  tests/migration/Makefile                           |  4 ++--
->>  tests/migration/migration-test.h                   | 18 ++++++++++++++
->>  .../{x86-a-b-bootblock.s => x86-a-b-bootblock.S}   |  7 +++---
->>  tests/migration/x86-a-b-bootblock.h                |  2 +-
->>  5 files changed, 39 insertions(+), 20 deletions(-)
->>  create mode 100644 tests/migration/migration-test.h
->>  rename tests/migration/{x86-a-b-bootblock.s => x86-a-b-bootblock.S} (94%)
->>
->> diff --git a/tests/migration-test.c b/tests/migration-test.c
->> index 74f9361bdd..c88b7e7a19 100644
->> --- a/tests/migration-test.c
->> +++ b/tests/migration-test.c
->> @@ -21,10 +21,10 @@
->>  #include "sysemu/sysemu.h"
->>  #include "hw/nvram/chrp_nvram.h"
->>  
->> -#define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
->> +#include "migration/migration-test.h"
->>  
->> -const unsigned start_address = 1024 * 1024;
->> -const unsigned end_address = 100 * 1024 * 1024;
->> +const unsigned start_address = TEST_MEM_START;
->> +const unsigned end_address = TEST_MEM_END;
->>  bool got_stop;
->>  
->>  #if defined(__linux__)
->> @@ -77,8 +77,8 @@ static bool ufd_version_check(void)
->>  
->>  static const char *tmpfs;
->>  
->> -/* A simple PC boot sector that modifies memory (1-100MB) quickly
->> - * outputting a 'B' every so often if it's still running.
->> +/* The boot file modifies memory area in [start_address, end_address)
->> + * repeatedly. It outputs a 'B' at a fixed rate while it's still running.
->>   */
->>  #include "tests/migration/x86-a-b-bootblock.h"
->>  
->> @@ -104,9 +104,8 @@ static void init_bootfile_ppc(const char *bootpath)
->>      memcpy(header->name, "common", 6);
->>      chrp_nvram_finish_partition(header, MIN_NVRAM_SIZE);
->>  
->> -    /* FW_MAX_SIZE is 4MB, but slof.bin is only 900KB,
->> -     * so let's modify memory between 1MB and 100MB
->> -     * to do like PC bootsector
->> +    /* FW_MAX_SIZE is 4MB, but slof.bin is only 900KB. So it is OK to modify
->> +     * memory between start_address and end_address like PC bootsector does.
->>       */
->>  
->>      sprintf(buf + 16,
->> @@ -263,11 +262,11 @@ static void wait_for_migration_pass(QTestState *who)
->>  static void check_guests_ram(QTestState *who)
->>  {
->>      /* Our ASM test will have been incrementing one byte from each page from
->> -     * 1MB to <100MB in order.
->> -     * This gives us a constraint that any page's byte should be equal or less
->> -     * than the previous pages byte (mod 256); and they should all be equal
->> -     * except for one transition at the point where we meet the incrementer.
->> -     * (We're running this with the guest stopped).
->> +     * start_address to < end_address in order. This gives us a constraint
->> +     * that any page's byte should be equal or less than the previous pages
->> +     * byte (mod 256); and they should all be equal except for one transition
->> +     * at the point where we meet the incrementer. (We're running this with
->> +     * the guest stopped).
-> 
-> No, please don't modify the other architectures.
-> 
-> It's OK for you to get the start/end value from the define in the header
-> but we can't assume they're movable; they're architecture specific
-> values that are chosen to fit where we know we have RAM.
-
-Drew didn't like the idea of having #define TEST_MEM_START/TEST_MEM_END
-in headerfile, and in the meanwhile, we still use 1MB/100MB in comments.
-Anyway we didn't modify the underneath semantic for other architectures.
-
-> 
-> Dave
-> 
->>       */
->>      unsigned address;
->>      uint8_t first_byte;
->> @@ -278,7 +277,8 @@ static void check_guests_ram(QTestState *who)
->>      qtest_memread(who, start_address, &first_byte, 1);
->>      last_byte = first_byte;
->>  
->> -    for (address = start_address + 4096; address < end_address; address += 4096)
->> +    for (address = start_address + TEST_MEM_PAGE_SIZE; address < end_address;
->> +         address += TEST_MEM_PAGE_SIZE)
->>      {
->>          uint8_t b;
->>          qtest_memread(who, address, &b, 1);
->> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
->> index 8fbedaa8b8..013b8d1f44 100644
->> --- a/tests/migration/Makefile
->> +++ b/tests/migration/Makefile
->> @@ -25,8 +25,8 @@ include $(SRC_PATH)/rules.mak
->>  
->>  x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
->>  
->> -x86-a-b-bootblock.h: x86-a-b-bootblock.s
->> -	$(x86_64_cross_prefix)as --32 -march=i486 $< -o x86.o
->> +x86-a-b-bootblock.h: x86-a-b-bootblock.S
->> +	$(x86_64_cross_prefix)gcc -m32 -march=i486 -c $< -o x86.o
->>  	$(x86_64_cross_prefix)objcopy -O binary x86.o x86.boot
->>  	dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124
->>  	echo "$$__note" > $@
->> diff --git a/tests/migration/migration-test.h b/tests/migration/migration-test.h
->> new file mode 100644
->> index 0000000000..48b59b3281
->> --- /dev/null
->> +++ b/tests/migration/migration-test.h
->> @@ -0,0 +1,18 @@
->> +/*
->> + * Copyright (c) 2018 Red Hat, Inc. and/or its affiliates
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
->> + * See the COPYING file in the top-level directory.
->> + */
->> +#ifndef _TEST_MIGRATION_H_
->> +#define _TEST_MIGRATION_H_
->> +
->> +/* Common */
->> +#define TEST_MEM_START      (1 * 1024 * 1024)
->> +#define TEST_MEM_END        (100 * 1024 * 1024)
->> +#define TEST_MEM_PAGE_SIZE  4096
->> +
->> +/* PPC */
->> +#define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
->> +
->> +#endif /* _TEST_MIGRATION_H_ */
->> diff --git a/tests/migration/x86-a-b-bootblock.s b/tests/migration/x86-a-b-bootblock.S
->> similarity index 94%
->> rename from tests/migration/x86-a-b-bootblock.s
->> rename to tests/migration/x86-a-b-bootblock.S
->> index 98dbfab084..08b51f9e7f 100644
->> --- a/tests/migration/x86-a-b-bootblock.s
->> +++ b/tests/migration/x86-a-b-bootblock.S
->> @@ -12,6 +12,7 @@
->>  #
->>  # Author: dgilbert@redhat.com
->>  
->> +#include "migration-test.h"
->>  
->>  .code16
->>  .org 0x7c00
->> @@ -45,11 +46,11 @@ start:             # at 0x7c00 ?
->>          mov $0, %bl
->>  mainloop:
->>          # Start from 1MB
->> -        mov $(1024*1024),%eax
->> +        mov $TEST_MEM_START,%eax
->>  innerloop:
->>          incb (%eax)
->> -        add $4096,%eax
->> -        cmp $(100*1024*1024),%eax
->> +        add $TEST_MEM_PAGE_SIZE,%eax
->> +        cmp $TEST_MEM_END,%eax
->>          jl innerloop
->>  
->>          inc %bl
->> diff --git a/tests/migration/x86-a-b-bootblock.h b/tests/migration/x86-a-b-bootblock.h
->> index 9e8e2e028b..44e4b99506 100644
->> --- a/tests/migration/x86-a-b-bootblock.h
->> +++ b/tests/migration/x86-a-b-bootblock.h
->> @@ -1,5 +1,5 @@
->>  /* This file is automatically generated from
->> - * tests/migration/x86-a-b-bootblock.s, edit that and then run
->> + * tests/migration/x86-a-b-bootblock.S, edit that and then run
->>   * "make x86-a-b-bootblock.h" inside tests/migration to update,
->>   * and then remember to send both in your patch submission.
->>   */
->> -- 
->> 2.14.3
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+thanks
+-- PMM
