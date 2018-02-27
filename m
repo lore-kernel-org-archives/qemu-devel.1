@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eqeZm-0001d8-Oi
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 07:41:47 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eqeaG-0001td-JS
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 07:42:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eqeZj-0001wc-M6
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 07:41:46 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <e56321ad-d08f-5061-b356-2bebae25dc98@redhat.com>
-References: <cover.1518711805.git.berto@igalia.com>
-	<894433c083e20bbb82e208ea8b067b13609dbc19.1518711805.git.berto@igalia.com>
-	<e56321ad-d08f-5061-b356-2bebae25dc98@redhat.com>
-Date: Tue, 27 Feb 2018 13:41:39 +0100
-Message-ID: <w518tbe4nb0.fsf@maestria.local.igalia.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eqeaF-0002Aj-Qh
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 07:42:16 -0500
+Received: from mail-ot0-x229.google.com ([2607:f8b0:4003:c0f::229]:32865)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eqeaF-0002AL-LI
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 07:42:15 -0500
+Received: by mail-ot0-x229.google.com with SMTP id y11so3639360otg.0
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 04:42:15 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC PATCH 1/2] qcow2: Allow checking and
- repairing corrupted internal snapshots
+In-Reply-To: <20180225175928.13101-1-laurent@vivier.eu>
+References: <20180225175928.13101-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Feb 2018 12:41:54 +0000
+Message-ID: <CAFEAcA_651iDZ=zSY7cmUX1UuacxXZoksdtK8XeH8cremvxwOg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/4] Linux user for 2.12 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,46 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
 
-On Mon 26 Feb 2018 02:40:08 PM CET, Max Reitz wrote:
->> +                        "L1 table is too large; snapshot table entry corrupted\n",
->> +                        (fix & BDRV_FIX_ERRORS) ? "Deleting" : "ERROR",
->> +                        sn->id_str, sn->name, sn->l1_size);
->> +                found_corruption = true;
->> +            }
+On 25 February 2018 at 17:59, Laurent Vivier <laurent@vivier.eu> wrote:
+> The following changes since commit 0a773d55ac76c5aa89ed9187a3bc5af8c5c2a6d0:
 >
-> This code assumes the snapshot table itself has been valid.  Why should
-> it be when it contains garbage entries?
+>   maintainers: Add myself as a OpenBSD maintainer (2018-02-23 12:05:07 +0000)
 >
->> +
->> +            if (found_corruption) {
->> +                result->corruptions++;
->> +                sn->l1_size = 0; /* Prevent this L1 table from being used */
->> +                if (fix & BDRV_FIX_ERRORS) {
->> +                    ret = qcow2_snapshot_delete(bs, sn->id_str, sn->name, NULL);
+> are available in the Git repository at:
 >
-> So calling this is actually very dangerous.  It modifies the snapshot
-> table which I wouldn't trust is actually just a snapshot table.  It
-> could intersect any other structure in the qcow2 image.  Yes, we do an
-> overlap check, but that only protects metadata, and I don't really
-> want to see an overlap check corruption when repairing the image;
-> especially since this means you cannot fix the corruption.
+>   git://github.com/vivier/qemu.git tags/linux-user-for-2.12-pull-request
+>
+> for you to fetch changes up to 45506bddba6fe73f61cf15fb682ffff73ce156c0:
+>
+>   linux-user: MIPS set cpu to r6 CPU if binary is R6 (2018-02-25 17:29:45 +0100)
+>
+> ----------------------------------------------------------------
+> This pull request includes new version of patches of the previous
+> one that were breaking some linux-user targets.
+> ----------------------------------------------------------------
 
-I think you're right. One thing that could be done is check that the
-area where the snapshot table is supposed to be doesn't overlap with any
-other data structures.
+Applied, thanks.
 
-> I don't quite know myself what to do instead, but I guess my main
-> point would be: Before any (potentially) destructive changes are made,
-> the user should have the chance of still opening the image read-only
-> and copying all the data off somewhere else.  Which of course again
-> means we shouldn't prevent the user from opening an image because a
-> snapshot is broken.
-
-Ok, you've convinced me. I'll see what I can come up with. I guess
-initially we can simply add checks for sn->l1_table_offset and
-sn->l1_size in the places where they're used.
-
-Berto
+-- PMM
