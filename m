@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eqm4n-00036O-4L
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 15:42:18 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eqm6R-0004NF-J9
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 15:44:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eqm4m-00043f-2o
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 15:42:17 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eqm6Q-0004bs-KK
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 15:43:59 -0500
 References: <20180223235142.21501-1-jsnow@redhat.com>
-	<20180223235142.21501-20-jsnow@redhat.com>
-	<2c7f82a8-8b19-4f2d-b6d5-3c77258edf91@redhat.com>
+	<20180223235142.21501-13-jsnow@redhat.com>
+	<6145ae58-a0e7-6262-e679-480936cda576@redhat.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <278d6e2a-dcea-07dc-af90-39b04cc9b9fe@redhat.com>
-Date: Tue, 27 Feb 2018 15:42:09 -0500
+Message-ID: <422b1804-42ba-d233-b683-eb621f047fc2@redhat.com>
+Date: Tue, 27 Feb 2018 15:43:53 -0500
 MIME-Version: 1.0
-In-Reply-To: <2c7f82a8-8b19-4f2d-b6d5-3c77258edf91@redhat.com>
+In-Reply-To: <6145ae58-a0e7-6262-e679-480936cda576@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v4 19/21] blockjobs: Expose manual property
+Subject: Re: [Qemu-devel] [RFC v4 12/21] blockjobs: ensure abort is called
+ for cancelled jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +31,58 @@ Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
 
 
 
-On 02/27/2018 03:16 PM, Eric Blake wrote:
+On 02/27/2018 02:49 PM, Eric Blake wrote:
 > On 02/23/2018 05:51 PM, John Snow wrote:
->> Expose the "manual" property via QAPI for the backup-related jobs.
->> As of this commit, this allows the management API to request the
->> "concluded" and "dismiss" semantics for backup jobs.
+>> Presently, even if a job is canceled post-completion as a result of
+>> a failing peer in a transaction, it will still call .commit because
+>> nothing has updated or changed its return code.
+>>
+>> The reason why this does not cause problems currently is because
+>> backup's implementation of .commit checks for cancellation itself.
+>>
+>> I'd like to simplify this contract:
+>>
+>> (1) Abort is called if the job/transaction fails
+>> (2) Commit is called if the job/transaction succeeds
+>>
+>> To this end: A job's return code, if 0, will be forcibly set as
+>> -ECANCELED if that job has already concluded. Remove the now
+>> redundant check in the backup job implementation.
+>>
+>> We need to check for cancellation in both block_job_completed
+>> AND block_job_completed_single, because jobs may be cancelled between
+>> those two calls; for instance in transactions.
+>>
+>> The check in block_job_completed could be removed, but there's no
+>> point in starting to attempt to succeed a transaction that we know
+>> in advance will fail.
+>>
+>> This does NOT affect mirror jobs that are "canceled" during their
+>> synchronous phase. The mirror job itself forcibly sets the canceled
+>> property to false prior to ceding control, so such cases will invoke
+>> the "commit" callback.
 >>
 >> Signed-off-by: John Snow <jsnow@redhat.com>
 >> ---
->> =C2=A0 blockdev.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 | 19 ++++++++++++++++---
->> =C2=A0 qapi/block-core.json | 32 ++++++++++++++++++++++++++------
->> =C2=A0 2 files changed, 42 insertions(+), 9 deletions(-)
->>
+>> =C2=A0 block/backup.c=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 +-
+>> =C2=A0 block/trace-events |=C2=A0 1 +
+>> =C2=A0 blockjob.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 19=
+ +++++++++++++++----
+>> =C2=A0 3 files changed, 17 insertions(+), 5 deletions(-)
 >=20
->> +++ b/qapi/block-core.json
->> @@ -1177,6 +1177,16 @@
->> =C2=A0 # @job-id: identifier for the newly-created block job. If
->> =C2=A0 #=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 omitted=
-, the device name will be used. (Since 2.7)
->> =C2=A0 #
->> +# @manual: True to use an expanded, more explicit job control flow.
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Jobs may tran=
-sition from a running state to a pending state,
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 where they mu=
-st be instructed to complete manually via
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 block-job-fin=
-alize.
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Jobs belongin=
-g to a transaction must either all or all not
->> use this
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 setting. Once=
- a transaction reaches a pending state,
->> issuing the
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 finalize comm=
-and to any one job in the transaction is
->> sufficient
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 to finalize t=
-he entire transaction.
->=20
-> The previous commit message talked about mixed-manual transactions, but
-> this seems to imply it is not possible.=C2=A0 I'm fine if we don't supp=
-ort
-> mixed-manual transactions, but wonder if it means any changes to the
-> series.
->=20
-> Otherwise looks reasonable from the UI point of view.
+> More lines of code, but the contract does seem simpler and useful for
+> the later patches.
 >=20
 
-Refactor hell.
+Unfortunately yes, but it would be less overall if more than Backup made
+use of commit/abort, which I anticipate in the future when I try to
+start switching jobs over to using the .prepare callback.
 
-The intent (and my belief) is that as of right now you CAN mix them. In
-earlier drafts, it was not always the case.
+It was just genuinely shocking to me that we'd call commit(), but backup
+secretly knew we wanted abort. That type of logic belongs in the core
+dispatch layer.
+
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
+
+Thanks for the reviews!
