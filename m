@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eqikl-00039D-2J
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:09:24 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eqil6-0003N4-IW
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:09:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eqikh-0003ru-Qq
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:09:22 -0500
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:32907)
+	(envelope-from <peter.maydell@linaro.org>) id 1eqil5-00043S-KN
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:09:44 -0500
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:43104)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eqikh-0003rN-Jd
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:09:19 -0500
-Received: by mail-pg0-x244.google.com with SMTP id g12so7755314pgs.0
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 09:09:19 -0800 (PST)
-References: <20180227143852.11175-1-alex.bennee@linaro.org>
-	<20180227143852.11175-15-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <19852743-3c93-9d0f-5ef6-8bf351a98ce7@linaro.org>
-Date: Tue, 27 Feb 2018 09:09:15 -0800
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eqil5-000438-E3
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:09:43 -0500
+Received: by mail-oi0-x243.google.com with SMTP id a207so13399229oii.10
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 09:09:43 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180227143852.11175-15-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 14/31] arm/translate-a64: add FP16
- FMULX/MLS/FMLA to simd_indexed
+In-Reply-To: <20180223232233.31482-1-frasse.iglesias@gmail.com>
+References: <20180223232233.31482-1-frasse.iglesias@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Feb 2018 17:09:22 +0000
+Message-ID: <CAFEAcA8bKM_Z9skCUE2HaF8zdca7YCAazxOXX-+dF5xC_xvGJw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] xilinx_spips: Update CS assertion
+ when striping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,63 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-arm@nongnu.org
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: Francisco Iglesias <frasse.iglesias@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>, Alistair Francis <alistai@xilinx.com>, Francisco Iglesias <francisco.iglesias@feimtech.se>
 
-On 02/27/2018 06:38 AM, Alex Bennée wrote:
-> @@ -11244,7 +11245,7 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
->          }
->          /* fall through */
->      case 0x9: /* FMUL, FMULX */
-> -        if (!extract32(size, 1, 1)) {
-> +        if (size == 1) {
->              unallocated_encoding(s);
->              return;
->          }
-
-This is still redundant, since size == 1 is handled...
-
-> @@ -11256,18 +11257,34 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
->      }
->  
->      if (is_fp) {
-> -        /* low bit of size indicates single/double */
-> -        size = extract32(size, 0, 1) ? 3 : 2;
-> -        if (size == 2) {
-> +        /* convert insn encoded size to TCGMemOp size */
-> +        switch (size) {
-> +        case 2: /* single precision */
-> +            size = MO_32;
->              index = h << 1 | l;
-> -        } else {
-> +            rm |= (m << 4);
-> +            break;
-> +        case 3: /* double precision */
-> +            size = MO_64;
->              if (l || !is_q) {
->                  unallocated_encoding(s);
->                  return;
->              }
->              index = h;
-> +            rm |= (m << 4);
-> +            break;
-> +        case 0: /* half precision */
-> +            size = MO_16;
-> +            index = h << 2 | l << 1 | m;
-> +            is_fp16 = true;
-> +            if (arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
-> +                break;
-> +            }
-> +            /* fallthru */
-> +        default: /* unallocated */
-> +            unallocated_encoding(s);
-> +            return;
->          }
-
-... here.  But it's not wrong and I can clean this up along with the additional
-changes I need to make to this function for fcmla support.  So,
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+On 23 February 2018 at 23:22, Francisco Iglesias
+<frasse.iglesias@gmail.com> wrote:
+> Hi,
+>
+> The first patch in this series attempts to correct the slave selection when
+> using the striping functionality in the QSPI. The second patch in the series
+> updates the QIOR/QIOR4 commands to use 8 dummy cycles in the QSPI for matching
+> Micron (Numonyx) flashes (the default target flash type of the QSPI).
+>
+> Best regards,
+> Francisco Iglesias
+>
+> Changelog:
+> v1 -> v2
+>   * Attempted to improve readability in the patch 'xilinx_spips: Enable only
+>     two slaves when reading/writing with stripe' when selecting chip selects.
+>
+>
+> Francisco Iglesias (2):
+>   xilinx_spips: Enable only two slaves when reading/writing with stripe
+>   xilinx_spips: Use 8 dummy cycles with the QIOR/QIOR4 commands
+>
+>  hw/ssi/xilinx_spips.c | 43 ++++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 38 insertions(+), 5 deletions(-)
 
 
-r~
+
+Applied to target-arm.next, thanks.
+
+-- PMM
