@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eqi6u-0001b1-CH
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:28:13 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eqi82-0002bc-Fd
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:29:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eqi6t-00054K-4z
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:28:12 -0500
-Date: Tue, 27 Feb 2018 17:27:59 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180227162759.GB5269@localhost.localdomain>
-References: <20180223235142.21501-1-jsnow@redhat.com>
-	<20180223235142.21501-6-jsnow@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1eqi7z-0005ZW-9G
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:29:22 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:40843)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eqi7z-0005Z6-1I
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:29:19 -0500
+Received: by mail-pg0-x241.google.com with SMTP id g2so7700080pgn.7
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 08:29:18 -0800 (PST)
+References: <20180217182323.25885-1-richard.henderson@linaro.org>
+	<20180217182323.25885-60-richard.henderson@linaro.org>
+	<CAFEAcA_q6Ca5JT-850hR43sSmPinvvb6W_s0y8mVyjyaHGeFdQ@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <078bc887-13c8-fb16-485a-69e55c2404cd@linaro.org>
+Date: Tue, 27 Feb 2018 08:29:14 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180223235142.21501-6-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v4 05/21] blockjobs: add state transition
- table
+In-Reply-To: <CAFEAcA_q6Ca5JT-850hR43sSmPinvvb6W_s0y8mVyjyaHGeFdQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 59/67] target/arm: Implement
+ SVE Floating Point Multiply Indexed Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,141 +33,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-Am 24.02.2018 um 00:51 hat John Snow geschrieben:
-> The state transition table has mostly been implied. We're about to make
-> it a bit more complex, so let's make the STM explicit instead.
+On 02/27/2018 07:18 AM, Peter Maydell wrote:
+> On 17 February 2018 at 18:23, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  target/arm/helper.h        | 14 ++++++++++
+>>  target/arm/translate-sve.c | 44 +++++++++++++++++++++++++++++++
+>>  target/arm/vec_helper.c    | 64 ++++++++++++++++++++++++++++++++++++++++++++++
+>>  target/arm/sve.decode      | 19 ++++++++++++++
+>>  4 files changed, 141 insertions(+)
 > 
-> Perform state transitions with a function that for now just asserts the
-> transition is appropriate.
+>> diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
+>> index ad5c29cdd5..e711a3217d 100644
+>> --- a/target/arm/vec_helper.c
+>> +++ b/target/arm/vec_helper.c
+>> @@ -24,6 +24,22 @@
+>>  #include "fpu/softfloat.h"
+>>
+>>
+>> +/* Note that vector data is stored in host-endian 64-bit chunks,
+>> +   so addressing units smaller than that needs a host-endian fixup.  */
+>> +#ifdef HOST_WORDS_BIGENDIAN
+>> +#define H1(x)   ((x) ^ 7)
+>> +#define H1_2(x) ((x) ^ 6)
+>> +#define H1_4(x) ((x) ^ 4)
+>> +#define H2(x)   ((x) ^ 3)
+>> +#define H4(x)   ((x) ^ 1)
+>> +#else
+>> +#define H1(x)   (x)
+>> +#define H1_2(x) (x)
+>> +#define H1_4(x) (x)
+>> +#define H2(x)   (x)
+>> +#define H4(x)   (x)
+>> +#endif
+>> +
 > 
-> Transitions:
-> Undefined -> Created: During job initialization.
-> Created   -> Running: Once the job is started.
->                       Jobs cannot transition from "Created" to "Paused"
->                       directly, but will instead synchronously transition
->                       to running to paused immediately.
-> Running   -> Paused:  Normal workflow for pauses.
-> Running   -> Ready:   Normal workflow for jobs reaching their sync point.
->                       (e.g. mirror)
-> Ready     -> Standby: Normal workflow for pausing ready jobs.
-> Paused    -> Running: Normal resume.
-> Standby   -> Ready:   Resume of a Standby job.
-> 
-> 
-> +---------+
-> |UNDEFINED|
-> +--+------+
->    |
-> +--v----+
-> |CREATED|
-> +--+----+
->    |
-> +--v----+     +------+
-> |RUNNING<----->PAUSED|
-> +--+----+     +------+
->    |
-> +--v--+       +-------+
-> |READY<------->STANDBY|
-> +-----+       +-------+
-> 
-> 
-> Notably, there is no state presently defined as of this commit that
-> deals with a job after the "running" or "ready" states, so this table
-> will be adjusted alongside the commits that introduce those states.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  block/trace-events |  3 +++
->  blockjob.c         | 42 ++++++++++++++++++++++++++++++++++++------
->  2 files changed, 39 insertions(+), 6 deletions(-)
-> 
-> diff --git a/block/trace-events b/block/trace-events
-> index 02dd80ff0c..b75a0c8409 100644
-> --- a/block/trace-events
-> +++ b/block/trace-events
-> @@ -4,6 +4,9 @@
->  bdrv_open_common(void *bs, const char *filename, int flags, const char *format_name) "bs %p filename \"%s\" flags 0x%x format_name \"%s\""
->  bdrv_lock_medium(void *bs, bool locked) "bs %p locked %d"
->  
-> +# blockjob.c
-> +block_job_state_transition(void *job,  int ret, const char *legal, const char *s0, const char *s1) "job %p (ret: %d) attempting %s transition (%s-->%s)"
-> +
->  # block/block-backend.c
->  blk_co_preadv(void *blk, void *bs, int64_t offset, unsigned int bytes, int flags) "blk %p bs %p offset %"PRId64" bytes %u flags 0x%x"
->  blk_co_pwritev(void *blk, void *bs, int64_t offset, unsigned int bytes, int flags) "blk %p bs %p offset %"PRId64" bytes %u flags 0x%x"
-> diff --git a/blockjob.c b/blockjob.c
-> index 1be9c20cff..d745b3bb69 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -28,6 +28,7 @@
->  #include "block/block.h"
->  #include "block/blockjob_int.h"
->  #include "block/block_int.h"
-> +#include "block/trace.h"
->  #include "sysemu/block-backend.h"
->  #include "qapi/error.h"
->  #include "qapi/qmp/qerror.h"
-> @@ -41,6 +42,34 @@
->   * block_job_enter. */
->  static QemuMutex block_job_mutex;
->  
-> +/* BlockJob State Transition Table */
-> +bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
-> +                                          /* U, C, R, P, Y, S */
-> +    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0},
+> I wasn't expecting to see these macros here. Don't we have them already?
 
-Even at the end of the series, this is the only use of
-BLOCK_JOB_STATUS_UNDEFINED.
+Not in this file.  Probably I should share these in a header...
 
-> +    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0},
-> +    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0},
-> +    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0},
-> +    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1},
-> +    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0},
-> +};
-> +
-> +static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
-> +{
-> +    BlockJobStatus s0 = job->status;
-> +    if (s0 == s1) {
-> +        return;
-> +    }
-> +    assert(s1 >= 0 && s1 <= BLOCK_JOB_STATUS__MAX);
-> +    trace_block_job_state_transition(job, job->ret, BlockJobSTT[s0][s1] ?
-> +                                     "allowed" : "disallowed",
-> +                                     qapi_enum_lookup(&BlockJobStatus_lookup,
-> +                                                      s0),
-> +                                     qapi_enum_lookup(&BlockJobStatus_lookup,
-> +                                                      s1));
-> +    assert(BlockJobSTT[s0][s1]);
-> +    job->status = s1;
-> +}
-> +
->  static void block_job_lock(void)
->  {
->      qemu_mutex_lock(&block_job_mutex);
-> @@ -320,7 +349,7 @@ void block_job_start(BlockJob *job)
->      job->pause_count--;
->      job->busy = true;
->      job->paused = false;
-> -    job->status = BLOCK_JOB_STATUS_RUNNING;
-> +    block_job_state_transition(job, BLOCK_JOB_STATUS_RUNNING);
->      bdrv_coroutine_enter(blk_bs(job->blk), job->co);
->  }
->  
-> @@ -704,6 +733,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
->      job->refcnt        = 1;
->      job->manual        = (flags & BLOCK_JOB_MANUAL);
->      job->status        = BLOCK_JOB_STATUS_CREATED;
-> +    block_job_state_transition(job, BLOCK_JOB_STATUS_CREATED);
 
-So did you intend to start with BLOCK_JOB_STATUS_UNDEFINED and then
-transition to BLOCK_JOB_STATUS_CREATED?
-
-Or should we completely remove BLOCK_JOB_STATUS_UNDEFINED, keep the
-initialisation and not call block_job_state_transition() here?
-
-Kevin
+r~
