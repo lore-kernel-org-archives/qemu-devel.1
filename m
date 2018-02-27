@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianfeng.tan@intel.com>) id 1eqX0e-0002nO-3f
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 23:37:01 -0500
+	(envelope-from <jianfeng.tan@intel.com>) id 1eqXIp-0005rC-5v
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 23:55:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianfeng.tan@intel.com>) id 1eqX0a-00044a-4Q
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 23:37:00 -0500
-Received: from mga12.intel.com ([192.55.52.136]:54886)
+	(envelope-from <jianfeng.tan@intel.com>) id 1eqXIm-0007RZ-3D
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 23:55:47 -0500
+Received: from mga18.intel.com ([134.134.136.126]:54674)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jianfeng.tan@intel.com>)
-	id 1eqX0Z-00041I-S4
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 23:36:56 -0500
+	id 1eqXIl-0007PN-PJ
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 23:55:44 -0500
 From: "Tan, Jianfeng" <jianfeng.tan@intel.com>
-Date: Tue, 27 Feb 2018 04:36:45 +0000
-Message-ID: <ED26CBA2FAD1BF48A8719AEF02201E3651452FF5@SHSMSX103.ccr.corp.intel.com>
+Date: Tue, 27 Feb 2018 04:55:37 +0000
+Message-ID: <ED26CBA2FAD1BF48A8719AEF02201E36514530D8@SHSMSX103.ccr.corp.intel.com>
 References: <1517842735-9011-1-git-send-email-jianfeng.tan@intel.com>
 	<1b6a1999-95bb-5eac-70e1-39e6ba5b22fc@redhat.com>
 	<6716e932-9ce5-3d97-41cb-f33ea94ad4ce@intel.com>
@@ -27,10 +27,11 @@ References: <1517842735-9011-1-git-send-email-jianfeng.tan@intel.com>
 	<20180208123018.5b3c9da7@redhat.com>
 	<ED26CBA2FAD1BF48A8719AEF02201E365144EAAB@SHSMSX103.ccr.corp.intel.com>
 	<20180226135549.34af5dbf@redhat.com>
-In-Reply-To: <20180226135549.34af5dbf@redhat.com>
+	<bfe718ca-3251-a87d-00e7-60a1dfa2da82@redhat.com>
+In-Reply-To: <bfe718ca-3251-a87d-00e7-60a1dfa2da82@redhat.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
 Subject: Re: [Qemu-devel] [RFC] exec: eliminate ram naming issue as migration
 List-Id: <qemu-devel.nongnu.org>
@@ -41,86 +42,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>
 
-
-
-> -----Original Message-----
-> From: Igor Mammedov [mailto:imammedo@redhat.com]
-> Sent: Monday, February 26, 2018 8:56 PM
-> To: Tan, Jianfeng
-> Cc: Paolo Bonzini; Jason Wang; Maxime Coquelin; qemu-devel@nongnu.org;
-> Michael S . Tsirkin
-> Subject: Re: [Qemu-devel] [RFC] exec: eliminate ram naming issue as
-> migration
->=20
-> On Sat, 24 Feb 2018 03:11:30 +0000
-> "Tan, Jianfeng" <jianfeng.tan@intel.com> wrote:
->=20
-> > > -----Original Message-----
-> > > From: Tan, Jianfeng
-> > > Sent: Saturday, February 24, 2018 11:08 AM
-> > > To: 'Igor Mammedov'
-> > > Cc: Paolo Bonzini; Jason Wang; Maxime Coquelin; qemu-
-> devel@nongnu.org;
-> > > Michael S . Tsirkin
-> > > Subject: RE: [Qemu-devel] [RFC] exec: eliminate ram naming issue as
-> > > migration
-> > >
-> > > Hi Igor and all,
-> > >
-> > > > -----Original Message-----
-> > > > From: Igor Mammedov [mailto:imammedo@redhat.com]
-> > > > Sent: Thursday, February 8, 2018 7:30 PM
-> > > > To: Tan, Jianfeng
-> > > > Cc: Paolo Bonzini; Jason Wang; Maxime Coquelin; qemu-
-> > > devel@nongnu.org;
-> > > > Michael S . Tsirkin
-> > > > Subject: Re: [Qemu-devel] [RFC] exec: eliminate ram naming issue as
-> > > > migration
-> > > >
-> > > [...]
-> > > > > > It could be solved by adding memdev option to machine,
-> > > > > > which would allow to specify backend object. And then on
-> > > > > > top make -mem-path alias new option to clean thing up.
-> > > > >
-> > > > > Do you mean?
-> > > > >
-> > > > > src vm: -m xG
-> > > > > dst vm: -m xG,memdev=3Dpc.ram -object memory-backend-
-> > > file,id=3Dpc.ram,size=3DxG,mem-path=3Dxxx,share=3Don ...
-> > > > Yep, I've meant something like it
-> > > >
-> > > > src vm: -m xG,memdev=3DSHARED_RAM -object memory-backend-
-> > > file,id=3DSHARED_RAM,size=3DxG,mem-path=3Dxxx,share=3Don
-> > > > dst vm: -m xG,memdev=3DSHARED_RAM -object memory-backend-
-> > > file,id=3DSHARED_RAM,size=3DxG,mem-path=3Dxxx,share=3Don
-> > >
-> > > After a second thought, I find adding a backend for nonnuma pc RAM is
-> > > roundabout way.
-> > >
-> > > And we actually have an existing way to add a file-backed RAM: commit
-> > > c902760fb25f ("Add option to use file backed guest memory"). Basicall=
-y,
-> this
-> > > commit adds two options, --mem-path and --mem-prealloc, without
-> specify
-> > > a backend explicitly.
-> > >
-> > > So how about just adding a new option --mem-share to decide if that's=
- a
-> > > private memory or shared memory? That seems much straightforward
-> way
-> Above options are legacy (which we can't remove for compat reasons),
-> their replacement is 'memory-backend-file' backend which has all of
-> the above including 'share' property.
-
-OK, such options are legacy. I've no idea of that. Thanks! That makes sense=
-.
-
->=20
-> So just add 'memdev' property to machine and reuse memory-backend-file
-> with it instead of duplicating functionality in the legacy code.
-
-To "-m" or "-machine"?
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGFvbG8gQm9uemluaSBb
+bWFpbHRvOnBib256aW5pQHJlZGhhdC5jb21dDQo+IFNlbnQ6IE1vbmRheSwgRmVicnVhcnkgMjYs
+IDIwMTggMTA6NDMgUE0NCj4gVG86IElnb3IgTWFtbWVkb3Y7IFRhbiwgSmlhbmZlbmcNCj4gQ2M6
+IEphc29uIFdhbmc7IE1heGltZSBDb3F1ZWxpbjsgcWVtdS1kZXZlbEBub25nbnUub3JnOyBNaWNo
+YWVsIFMgLg0KPiBUc2lya2luDQo+IFN1YmplY3Q6IFJlOiBbUWVtdS1kZXZlbF0gW1JGQ10gZXhl
+YzogZWxpbWluYXRlIHJhbSBuYW1pbmcgaXNzdWUgYXMNCj4gbWlncmF0aW9uDQo+IA0KPiBPbiAy
+Ni8wMi8yMDE4IDEzOjU1LCBJZ29yIE1hbW1lZG92IHdyb3RlOg0KPiA+Pj4gU28gaG93IGFib3V0
+IGp1c3QgYWRkaW5nIGEgbmV3IG9wdGlvbiAtLW1lbS1zaGFyZSB0byBkZWNpZGUgaWYgdGhhdCdz
+IGENCj4gPj4+IHByaXZhdGUgbWVtb3J5IG9yIHNoYXJlZCBtZW1vcnk/IFRoYXQgc2VlbXMgbXVj
+aCBzdHJhaWdodGZvcndhcmQNCj4gd2F5DQo+ID4gQWJvdmUgb3B0aW9ucyBhcmUgbGVnYWN5ICh3
+aGljaCB3ZSBjYW4ndCByZW1vdmUgZm9yIGNvbXBhdCByZWFzb25zKSwNCj4gPiB0aGVpciByZXBs
+YWNlbWVudCBpcyAnbWVtb3J5LWJhY2tlbmQtZmlsZScgYmFja2VuZCB3aGljaCBoYXMgYWxsIG9m
+DQo+ID4gdGhlIGFib3ZlIGluY2x1ZGluZyAnc2hhcmUnIHByb3BlcnR5Lg0KPiANCj4gTW9yZSBw
+cmVjaXNlbHksIHdlIGhhdmUgYWRkZWQgIi1vYmplY3QgbWVtb3J5LWJhY2tlbmQtZmlsZSIgdG8g
+YXZvaWQNCj4gcHJvbGlmZXJhdGlvbiBvZiBvcHRpb25zIHJlbGF0ZWQgdG8gbWVtb3J5LiAgQmVz
+aWRlcyB1bmlmeWluZyB0aGUgY2FzZXMNCj4gb2YgMSBhbmQgPjEgTlVNQSBub2RlLCB1c2luZyAt
+b2JqZWN0IGFsc28gaGFzIHRoZSBhZHZhbnRhZ2Ugb2YNCj4gc3VwcG9ydGluZyBtZW1vcnkgaG90
+cGx1Zy4NCj4gDQo+IFlvdSB3cm90ZSAiSSBmaW5kIGFkZGluZyBhIGJhY2tlbmQgZm9yIG5vbm51
+bWEgcGMgUkFNIGlzIHJvdW5kYWJvdXQgd2F5Ig0KPiBidXQgYmFzaWNhbGx5IHRoZSBjb21tYW5k
+IGxpbmUgc2F5cyAidGhpcyBWTSBoYXMgb25seSBvbmUgTlVNQSBub2RlLA0KPiBiYWNrZWQgYnkg
+dGhpcyBtZW1vcnkgb2JqZWN0IiB3aGljaCBpcyBhIHByZWNpc2UgZGVzY3JpcHRpb24gb2Ygd2hh
+dCB0aGUNCj4gVk0gbWVtb3J5IGxvb2tzIGxpa2UuDQo+IA0KPiA+IFNvIGp1c3QgYWRkICdtZW1k
+ZXYnIHByb3BlcnR5IHRvIG1hY2hpbmUgYW5kIHJldXNlIG1lbW9yeS1iYWNrZW5kLWZpbGUNCj4g
+PiB3aXRoIGl0IGluc3RlYWQgb2YgZHVwbGljYXRpbmcgZnVuY3Rpb25hbGl0eSBpbiB0aGUgbGVn
+YWN5IGNvZGUuDQo+IA0KPiBUaGF0IHdvdWxkIGhvd2V2ZXIgYWxzbyBoYXZlIGEgZGlmZmVyZW50
+IFJBTUJsb2NrIGlkLCBlZmZlY3RpdmVseQ0KPiBwcm9kdWNpbmcgdGhlIHNhbWUgb3V0cHV0IGFz
+ICItbnVtYSBub2RlLG1lbWRldj0uLi4iLg0KDQpJcyBpdCBwb3NzaWJsZSB0aGF0IHdlIGZvcmNl
+IHRoYXQgUkFNQmxvY2sgaWQgdG8gYmUgInBjLnJhbSI/DQoNCj4gDQo+IEkgdGhpbmsgdGhpcyBz
+aG91bGQgYmUgc29sdmVkIGF0IHRoZSBsaWJ2aXJ0IGxldmVsLiAgTGlidmlydCBzaG91bGQNCj4g
+d3JpdGUgaW4gdGhlIG1pZ3JhdGlvbiBYTUwgY29va2llIHdoZXRoZXIgdGhlIFZNIGlzIHVzaW5n
+IC1vYmplY3Qgb3INCj4gLW1lbS1wYXRoIHRvIGRlY2xhcmUgaXRzIG1lbW9yeSwgYW5kIG5ld2x5
+LXN0YXJ0ZWQgVk1zIHNob3VsZCBhbHdheXMgdXNlDQo+IC1vYmplY3QuICBUaGlzIHdvbid0IGZp
+eCB0aGUgcHJvYmxlbSBmb3IgVk1zIHRoYXQgYXJlIGFscmVhZHkgcnVubmluZywNCj4gYnV0IGl0
+IHdpbGwgZml4IGl0IHRoZSBuZXh0IHRpbWUgdGhleSBhcmUgc3RhcnRlZC4NCg0KSW4gdGhpcyBj
+YXNlLCB3ZSByZXR1cm4gdG8gdGhlIHN0YXJ0IHBvaW50IDotKQ0KDQpUaGFua3MsDQpKaWFuZmVu
+Zw0K
