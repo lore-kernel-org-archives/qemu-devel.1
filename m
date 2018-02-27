@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eqfDK-0005UJ-9l
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:22:39 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eqfDP-0005Xi-2G
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:22:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eqfDI-0008Pd-SS
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:22:38 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eqfDN-0008SN-Ro
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:22:43 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Tue, 27 Feb 2018 14:21:35 +0100
-Message-Id: <20180227132150.13847-12-cohuck@redhat.com>
+Date: Tue, 27 Feb 2018 14:21:37 +0100
+Message-Id: <20180227132150.13847-14-cohuck@redhat.com>
 In-Reply-To: <20180227132150.13847-1-cohuck@redhat.com>
 References: <20180227132150.13847-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 11/26] s390-ccw: set cp_receive mask only when
- needed and consume pending service irqs
+Subject: [Qemu-devel] [PULL 13/26] s390-ccw: interactive boot menu for scsi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,99 +24,112 @@ Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, rth@tw
 
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
 
-It is possible while waiting for multiple types of external
-interrupts that we might have pending irqs remaining between
-irq consumption and irq-type disabling. Those interrupts
-could potentially propagate to the guest after IPL completes
-and cause unwanted behavior.
+Interactive boot menu for scsi. This follows a similar procedure
+as the interactive menu for eckd dasd. An example follows:
 
-As it is today, the SCLP will only recognize write events that
-are enabled by the control program's send and receive masks. To
-limit the window for, and prevent further irqs from, ASCII
-console events (specifically keystrokes), we should only enable
-the control program's receive mask when we need it.
+    s390x Enumerated Boot Menu.
 
-While we're at it, remove assignment of the (non control program)
-send and receive masks, as those are actually set by the SCLP.
+    3 entries detected. Select from index 0 to 2.
 
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+[thuth: Added additional "break;" statement to avoid analyzer warnings]
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/menu.c     |  5 +++++
- pc-bios/s390-ccw/s390-ccw.h |  1 +
- pc-bios/s390-ccw/sclp.c     | 10 ++++------
- 3 files changed, 10 insertions(+), 6 deletions(-)
+ hw/s390x/ipl.c              |  2 ++
+ pc-bios/s390-ccw/bootmap.c  |  4 ++++
+ pc-bios/s390-ccw/main.c     |  1 +
+ pc-bios/s390-ccw/menu.c     | 20 ++++++++++++++++++++
+ pc-bios/s390-ccw/s390-ccw.h |  2 ++
+ 5 files changed, 29 insertions(+)
 
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index c12e460a7f..798e99aadf 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -247,6 +247,8 @@ static void s390_ipl_set_boot_menu(S390IPLState *ipl)
+             return;
+         }
+         break;
++    case S390_IPL_TYPE_QEMU_SCSI:
++        break;
+     default:
+         error_report("boot menu is not supported for this device type.");
+         return;
+diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+index ae93b552c9..29bfd8c875 100644
+--- a/pc-bios/s390-ccw/bootmap.c
++++ b/pc-bios/s390-ccw/bootmap.c
+@@ -568,6 +568,10 @@ static void ipl_scsi(void)
+     debug_print_int("program table entries", program_table_entries);
+     IPL_assert(program_table_entries != 0, "Empty Program Table");
+ 
++    if (menu_is_enabled_enum()) {
++        loadparm = menu_get_enum_boot_index(program_table_entries);
++    }
++
+     debug_print_int("loadparm", loadparm);
+     IPL_assert(loadparm <= MAX_TABLE_ENTRIES, "loadparm value greater than"
+                " maximum number of boot entries allowed");
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index a7473b0397..9d9f8cf4d3 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -92,6 +92,7 @@ static void menu_setup(void)
+ 
+     switch (iplb.pbt) {
+     case S390_IPL_TYPE_CCW:
++    case S390_IPL_TYPE_QEMU_SCSI:
+         menu_set_parms(qipl.qipl_flags & BOOT_MENU_FLAG_MASK,
+                        qipl.boot_menu_timeout);
+         return;
 diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
-index b99ff03298..8d55869448 100644
+index ee56939c21..96eec81e84 100644
 --- a/pc-bios/s390-ccw/menu.c
 +++ b/pc-bios/s390-ccw/menu.c
-@@ -11,6 +11,7 @@
+@@ -217,6 +217,21 @@ int menu_get_zipl_boot_index(const char *menu_data)
+     return get_boot_index(entries - 1); /* subtract 1 to exclude banner */
+ }
  
- #include "libc.h"
- #include "s390-ccw.h"
-+#include "sclp.h"
- 
- #define KEYCODE_NO_INP '\0'
- #define KEYCODE_ESCAPE '\033'
-@@ -116,8 +117,12 @@ static int get_index(void)
- 
-     memset(buf, 0, sizeof(buf));
- 
-+    sclp_set_write_mask(SCLP_EVENT_MASK_MSG_ASCII, SCLP_EVENT_MASK_MSG_ASCII);
 +
-     len = read_prompt(buf, sizeof(buf) - 1);
- 
-+    sclp_set_write_mask(0, SCLP_EVENT_MASK_MSG_ASCII);
++int menu_get_enum_boot_index(int entries)
++{
++    char tmp[4];
 +
-     /* If no input, boot default */
-     if (len == 0) {
-         return 0;
++    sclp_print("s390x Enumerated Boot Menu.\n\n");
++
++    sclp_print(uitoa(entries, tmp, sizeof(tmp)));
++    sclp_print(" entries detected. Select from boot index 0 to ");
++    sclp_print(uitoa(entries - 1, tmp, sizeof(tmp)));
++    sclp_print(".\n\n");
++
++    return get_boot_index(entries);
++}
++
+ void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout)
+ {
+     flag = boot_menu_flag;
+@@ -227,3 +242,8 @@ bool menu_is_enabled_zipl(void)
+ {
+     return flag & (QIPL_FLAG_BM_OPTS_CMD | QIPL_FLAG_BM_OPTS_ZIPL);
+ }
++
++bool menu_is_enabled_enum(void)
++{
++    return flag & QIPL_FLAG_BM_OPTS_CMD;
++}
 diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index aeba8b0a99..c4ddf9f228 100644
+index c4ddf9f228..fd18da22c6 100644
 --- a/pc-bios/s390-ccw/s390-ccw.h
 +++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -69,6 +69,7 @@ unsigned int get_loadparm_index(void);
+@@ -91,6 +91,8 @@ void zipl_load(void);
+ void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout);
+ int menu_get_zipl_boot_index(const char *menu_data);
+ bool menu_is_enabled_zipl(void);
++int menu_get_enum_boot_index(int entries);
++bool menu_is_enabled_enum(void);
  
- /* sclp.c */
- void sclp_print(const char *string);
-+void sclp_set_write_mask(uint32_t receive_mask, uint32_t send_mask);
- void sclp_setup(void);
- void sclp_get_loadparm_ascii(char *loadparm);
- int sclp_read(char *str, size_t count);
-diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
-index a2f25ebd4f..3836cb4716 100644
---- a/pc-bios/s390-ccw/sclp.c
-+++ b/pc-bios/s390-ccw/sclp.c
-@@ -46,23 +46,21 @@ static int sclp_service_call(unsigned int command, void *sccb)
-         return 0;
- }
- 
--static void sclp_set_write_mask(void)
-+void sclp_set_write_mask(uint32_t receive_mask, uint32_t send_mask)
+ static inline void fill_hex(char *out, unsigned char val)
  {
-     WriteEventMask *sccb = (void *)_sccb;
- 
-     sccb->h.length = sizeof(WriteEventMask);
-     sccb->mask_length = sizeof(unsigned int);
--    sccb->receive_mask = SCLP_EVENT_MASK_MSG_ASCII;
--    sccb->cp_receive_mask = SCLP_EVENT_MASK_MSG_ASCII;
--    sccb->send_mask = SCLP_EVENT_MASK_MSG_ASCII;
--    sccb->cp_send_mask = SCLP_EVENT_MASK_MSG_ASCII;
-+    sccb->cp_receive_mask = receive_mask;
-+    sccb->cp_send_mask = send_mask;
- 
-     sclp_service_call(SCLP_CMD_WRITE_EVENT_MASK, sccb);
- }
- 
- void sclp_setup(void)
- {
--    sclp_set_write_mask();
-+    sclp_set_write_mask(0, SCLP_EVENT_MASK_MSG_ASCII);
- }
- 
- long write(int fd, const void *str, size_t len)
 -- 
 2.13.6
