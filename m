@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=5899da973=anthony.perard@citrix.com>)
-	id 1eqimr-0004ez-T5
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:11:35 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eqing-0005It-VQ
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:12:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=5899da973=anthony.perard@citrix.com>)
-	id 1eqimo-0005Or-OI
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:11:33 -0500
-Received: from smtp.citrix.com ([66.165.176.89]:55862)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=5899da973=anthony.perard@citrix.com>)
-	id 1eqimo-0005Ne-F7
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:11:30 -0500
-Date: Tue, 27 Feb 2018 16:41:47 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20180227164147.GB1799@perard.uk.xensource.com>
-References: <20171207101812.23602-1-haozhong.zhang@intel.com>
-	<20171207101812.23602-4-haozhong.zhang@intel.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eqinf-0006Ga-W8
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:12:24 -0500
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:36835)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eqinf-0006GB-RJ
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:12:23 -0500
+Received: by mail-ot0-x242.google.com with SMTP id 108so4468919otv.3
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 09:12:23 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20171207101812.23602-4-haozhong.zhang@intel.com>
-Subject: Re: [Qemu-devel] [RFC QEMU PATCH v4 03/10] hostmem-xen: add a host
- memory backend for Xen
+In-Reply-To: <20180227104903.21353-6-linus.walleij@linaro.org>
+References: <20180227104903.21353-1-linus.walleij@linaro.org>
+	<20180227104903.21353-6-linus.walleij@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Feb 2018 17:12:02 +0000
+Message-ID: <CAFEAcA88tabmji-pa6HNBAyx8aXV7cX3z=S0iw-GTW2rBBgMDA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 5/5] arm/vexpress: Add proper display
+ connector emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,69 +30,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Haozhong Zhang <haozhong.zhang@intel.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Corey Minyard <cminyard@mvista.com>
 
-On Thu, Dec 07, 2017 at 06:18:05PM +0800, Haozhong Zhang wrote:
-> diff --git a/backends/hostmem.c b/backends/hostmem.c
-> index ee2c2d5bfd..ba13a52994 100644
-> --- a/backends/hostmem.c
-> +++ b/backends/hostmem.c
-> @@ -12,6 +12,7 @@
->  #include "qemu/osdep.h"
->  #include "sysemu/hostmem.h"
->  #include "hw/boards.h"
-> +#include "hw/xen/xen.h"
->  #include "qapi/error.h"
->  #include "qapi/visitor.h"
->  #include "qapi-types.h"
-> @@ -277,6 +278,14 @@ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
->              goto out;
->          }
->  
-> +        /*
-> +         * The backend storage of MEMORY_BACKEND_XEN is managed by Xen,
-> +         * so no further work in this function is needed.
-> +         */
-> +        if (xen_enabled() && !backend->mr.ram_block) {
-> +            goto out;
-> +        }
-> +
->          ptr = memory_region_get_ram_ptr(&backend->mr);
->          sz = memory_region_size(&backend->mr);
->  
-> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> index 66eace5a5c..dcbfce33d5 100644
-> --- a/hw/mem/pc-dimm.c
-> +++ b/hw/mem/pc-dimm.c
-> @@ -28,6 +28,7 @@
->  #include "sysemu/kvm.h"
->  #include "trace.h"
->  #include "hw/virtio/vhost.h"
-> +#include "hw/xen/xen.h"
->  
->  typedef struct pc_dimms_capacity {
->       uint64_t size;
-> @@ -108,7 +109,10 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
->      }
->  
->      memory_region_add_subregion(&hpms->mr, addr - hpms->base, mr);
-> -    vmstate_register_ram(vmstate_mr, dev);
-> +    /* memory-backend-xen is not backed by RAM. */
-> +    if (!xen_enabled()) {
+On 27 February 2018 at 10:49, Linus Walleij <linus.walleij@linaro.org> wrote:
+> This adds the SiI9022 and EDID I2C devices to the ARM Versatile
+> Express machine, and selects the two I2C devices necessary in the
+> arm-softmmy.mak configuration so everything will build smoothly.
+>
+> I am implementing proper handling of the graphics in the Linux
+> kernel and adding proper emulation of SiI9022 and EDID makes the
+> driver probe as nicely as before, retrieveing the resolutions
+> supported by the "QEMU monitor" and overall just working nice.
+>
+> The assignment of the SiI9022 at address 0x39 and the EDID
+> DDC I2C at address 0x50 is not strictly correct: the DDC I2C
+> is there all the time but in the actual component it only
+> appears once activated inside the SiI9022, so ideally it should
+> be added and removed to the bus by the SiI9022. However for this
+> purpose it works fine to just have it around.
 
-Is it possible to have the same condition as the one used in
-host_memory_backend_memory_complete? i.e. base on whether the memory
-region is mapped or not (backend->mr.ram_block).
+This last paragraph in the commit message can just be
+removed now the DDC I2C isn't created here, right?
 
-> +        vmstate_register_ram(vmstate_mr, dev);
-> +    }
->      numa_set_mem_node_id(addr, memory_region_size(mr), dimm->node);
->  
->  out:
-> -- 
-> 2.15.1
-> 
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
+> ChangeLog v1->v2:
+> - Only add the SII9022 now that it will by itself realize
+>   the DDCI2C as part of the bridge.
+> ---
+>  default-configs/arm-softmmu.mak | 2 ++
+>  hw/arm/vexpress.c               | 6 +++++-
+>  2 files changed, 7 insertions(+), 1 deletion(-)
 
--- 
-Anthony PERARD
+(if this is the only problem with the patchset I'll just fix
+it up in my tree)
+
+thanks
+-- PMM
