@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benjamin.drung@profitbricks.com>) id 1eqhv7-0004rw-6i
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:16:03 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eqhx1-0005fY-AM
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:18:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benjamin.drung@profitbricks.com>) id 1eqhv2-0006mR-Re
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:16:01 -0500
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:35337)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <benjamin.drung@profitbricks.com>)
-	id 1eqhv2-0006lx-Hl
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:15:56 -0500
-Received: by mail-wm0-x22b.google.com with SMTP id x7so22460305wmc.0
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 08:15:56 -0800 (PST)
-Message-ID: <1519748154.4922.9.camel@profitbricks.com>
-From: Benjamin Drung <benjamin.drung@profitbricks.com>
-Date: Tue, 27 Feb 2018 17:15:54 +0100
-In-Reply-To: <20180217211639.3nmuftec64455qor@var.youpi.perso.aquilenet.fr>
-References: <20180216125504.25955-1-benjamin.drung@profitbricks.com>
-	<20180217211639.3nmuftec64455qor@var.youpi.perso.aquilenet.fr>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 0/1] slirp: Add domainname option to
- slirp's DHCP server
+	(envelope-from <stefanha@gmail.com>) id 1eqhwy-0007ZN-3r
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:17:59 -0500
+Date: Tue, 27 Feb 2018 16:17:43 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180227161743.GC32480@stefanha-x1.localdomain>
+References: <20180226170313.8178-1-mreitz@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="L6iaP+gRLNZHKoI4"
+Content-Disposition: inline
+In-Reply-To: <20180226170313.8178-1-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [RFC] qemu-img: Drop BLK_ZERO from convert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +23,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@gnu.org>
-Cc: Jan Kiszka <jan.kiszka@siemens.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-Am Samstag, den 17.02.2018, 22:16 +0100 schrieb Samuel Thibault:
-> Hello,
-> 
-> Benjamin Drung, on ven. 16 févr. 2018 13:55:03 +0100, wrote:
-> > Or should the command line option be simpler, but how should it be
-> > specified
-> > then? Maybe
-> > 
-> >   -net
-> > staticroute=10.0.2.0/24via10.0.2.2,staticroute=192.168.0.0/16via10.
-> > 0.2.2
-> 
-> I guess 
-> 
-> >   -net
-> > staticroute=10.0.2.0/24:10.0.2.2,staticroute=192.168.0.0/16:10.0.2.
-> > 2
-> 
-> would be more mainstream.
 
-Okay. I used this syntax to implement the static route support. See the
-"slirp: Add classless static routes support to DHCP server" patch.
+--L6iaP+gRLNZHKoI4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> I'm also wondering to which extent we want to extend our dhcp server,
-> when a tap device can be used to plug (or proxy) an actual dhcp
-> serveR.
+On Mon, Feb 26, 2018 at 06:03:13PM +0100, Max Reitz wrote:
+> There are filesystems (among which is tmpfs) that have a hard time
+> reporting allocation status.  That is definitely a bug in them.
+>=20
+> However, there is no good reason why qemu-img convert should query the
+> allocation status in the first place.  It does zero detection by itself
+> anyway, so we can detect unallocated areas ourselves.
+>=20
+> Furthermore, if a filesystem driver has any sense, reading unallocated
+> data should take just as much time as lseek(SEEK_DATA) + memset().  So
+> the only overhead we introduce by dropping the manual lseek() call is a
+> memset() in the driver and a buffer_is_zero() in qemu-img, both of which
+> should be relatively quick.
 
-I am using slirp's DHCP server to test custom build live images
-locally. This should be simple to setup and run in contrast to our
-"real" production environment with real hardware and actual DHCP
-severs.
+This makes sense.  Which file systems did you test this patch on?
 
--- 
-Benjamin Drung
-System Developer
-Debian & Ubuntu Developer
+XFS, ext4, and tmpfs would be a good minimal test set to prove the
+patch.  Perhaps with two input files:
+1. A file that is mostly filled with data.
+2. A file that is only sparsely populated with data.
 
-ProfitBricks GmbH
-Greifswalder Str. 207
-D - 10405 Berlin
+The time taken should be comparable with the time before this patch.
 
-Email: benjamin.drung@profitbricks.com
-URL: https://www.profitbricks.de
+--L6iaP+gRLNZHKoI4
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Sitz der Gesellschaft: Berlin
-Registergericht: Amtsgericht Charlottenburg, HRB 125506 B
-Geschäftsführer: Achim Weiss, Matthias Steinberg
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJalYSnAAoJEJykq7OBq3PIbSYH/iCq5TNNYZZQGqGvxSw6HOax
+YBr0ZuBI2C2f+EeG0tlN5gr2s5yc6/U2xW3HImBC+s2QsaadrUqyOewaxUIqkGIk
+/cq/raUrz3KKhyjp8sm1hmWYN/A7PTC0CxvxkqOlvzcTHW7xT7DH8DEfr5aRirZS
+m4QW8dhMLAfBRz9ep5BGa9jhloGHjPN+NvyThH3yMu7E7ha+N0ObRa5JBAphrRvb
+7BV5/vCngrorH33y9ynGqTvdhQYpPTV7juYS6Sk5WztuTS5wv0vKIR6+mzyEPaqC
+04aG07QLLJAhFm59dxXFhlhd1tHRa6LF1w/dDrWgCo4vlY4kYxuFoJP5uBNe1PY=
+=9BTM
+-----END PGP SIGNATURE-----
+
+--L6iaP+gRLNZHKoI4--
