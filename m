@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eqeab-00026Z-Ec
+	(envelope-from <eric.auger@redhat.com>) id 1eqeab-00026v-Pf
 	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 07:42:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eqeaa-0002Jr-KD
+	(envelope-from <eric.auger@redhat.com>) id 1eqeaa-0002K1-VQ
 	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 07:42:37 -0500
 References: <1519303376-92875-1-git-send-email-imammedo@redhat.com>
-	<1519303376-92875-3-git-send-email-imammedo@redhat.com>
+	<1519303376-92875-4-git-send-email-imammedo@redhat.com>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <0f55eea6-24ca-b5ea-7e6b-89eb93b70393@redhat.com>
-Date: Tue, 27 Feb 2018 13:42:26 +0100
+Message-ID: <3540155b-ec90-81c7-1c56-05cf8f6976ba@redhat.com>
+Date: Tue, 27 Feb 2018 13:42:16 +0100
 MIME-Version: 1.0
-In-Reply-To: <1519303376-92875-3-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1519303376-92875-4-git-send-email-imammedo@redhat.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/9] pc: replace pm object initialization
- with one-liner in acpi_get_pm_info()
+Subject: Re: [Qemu-devel] [PATCH 3/9] acpi: reuse AcpiGenericAddress instead
+ of Acpi20GenericAddress
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,47 +27,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-Hi,
+Hi Igor,
 
 On 22/02/18 13:42, Igor Mammedov wrote:
-> next patch will need it before it gets to piix4/lpc branches
-> that initializes 'obj' now.
+> Drop duplicate in form of Acpi20GenericAddress and reuse
+> AcpiGenericAddress.
 > 
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Eric
 > ---
->  hw/i386/acpi-build.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
+>  include/hw/acpi/acpi-defs.h | 17 +++--------------
+>  1 file changed, 3 insertions(+), 14 deletions(-)
 > 
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index deb440f..b85fefe 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -128,7 +128,7 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
->  {
->      Object *piix = piix4_pm_find();
->      Object *lpc = ich9_lpc_find();
-> -    Object *obj = NULL;
-> +    Object *obj = piix ? piix : lpc;
->      QObject *o;
+> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> index 80c8099..9942bc5 100644
+> --- a/include/hw/acpi/acpi-defs.h
+> +++ b/include/hw/acpi/acpi-defs.h
+> @@ -40,18 +40,6 @@ enum {
+>      ACPI_FADT_F_LOW_POWER_S0_IDLE_CAPABLE,
+>  };
 >  
->      pm->force_rev1_fadt = false;
-> @@ -138,7 +138,6 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
->      if (piix) {
->          /* w2k requires FADT(rev1) or it won't boot, keep PC compatible */
->          pm->force_rev1_fadt = true;
-> -        obj = piix;
->          pm->cpu_hp_io_base = PIIX4_CPU_HOTPLUG_IO_BASE;
->          pm->pcihp_io_base =
->              object_property_get_uint(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
-> @@ -146,7 +145,6 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
->              object_property_get_uint(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
->      }
->      if (lpc) {
-> -        obj = lpc;
->          pm->cpu_hp_io_base = ICH9_CPU_HOTPLUG_IO_BASE;
->      }
->      assert(obj);
+> -/*
+> - * ACPI 2.0 Generic Address Space definition.
+> - */
+> -struct Acpi20GenericAddress {
+> -    uint8_t  address_space_id;
+> -    uint8_t  register_bit_width;
+> -    uint8_t  register_bit_offset;
+> -    uint8_t  reserved;
+> -    uint64_t address;
+> -} QEMU_PACKED;
+> -typedef struct Acpi20GenericAddress Acpi20GenericAddress;
+> -
+>  struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
+>      uint64_t signature;              /* ACPI signature, contains "RSD PTR " */
+>      uint8_t  checksum;               /* To make sum of struct == 0 */
+> @@ -167,7 +155,8 @@ struct AcpiGenericAddress {
+>      uint8_t space_id;        /* Address space where struct or register exists */
+>      uint8_t bit_width;       /* Size in bits of given register */
+>      uint8_t bit_offset;      /* Bit offset within the register */
+> -    uint8_t access_width;    /* Minimum Access size (ACPI 3.0) */
+> +    uint8_t access_width;    /* ACPI 3.0: Minimum Access size (ACPI 3.0),
+> +                                ACPI 2.0: Reserved, Table 5-1 */
+>      uint64_t address;        /* 64-bit address of struct or register */
+>  } QEMU_PACKED;
+>  
+> @@ -456,7 +445,7 @@ typedef struct AcpiGenericTimerTable AcpiGenericTimerTable;
+>  struct Acpi20Hpet {
+>      ACPI_TABLE_HEADER_DEF                    /* ACPI common table header */
+>      uint32_t           timer_block_id;
+> -    Acpi20GenericAddress addr;
+> +    struct AcpiGenericAddress addr;
+>      uint8_t            hpet_number;
+>      uint16_t           min_tick;
+>      uint8_t            page_protect;
 > 
