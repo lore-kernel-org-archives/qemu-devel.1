@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eqdjC-0004N5-2H
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 06:47:26 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eqdnD-0006kH-RA
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 06:51:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eqdjB-0004J6-6W
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 06:47:26 -0500
-Date: Tue, 27 Feb 2018 12:47:02 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180227114702.GA5269@localhost.localdomain>
-References: <20180222155922.9833-1-eblake@redhat.com>
-	<20180222155922.9833-3-eblake@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eqdnD-0005x5-00
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 06:51:35 -0500
+Received: from mail-oi0-x22a.google.com ([2607:f8b0:4003:c06::22a]:45936)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eqdnC-0005wy-RD
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 06:51:34 -0500
+Received: by mail-oi0-x22a.google.com with SMTP id j79so12624312oib.12
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 03:51:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180222155922.9833-3-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] qcow2: Document some maximum size
- constraints
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Feb 2018 11:51:13 +0000
+Message-ID: <CAFEAcA8Pu=SkYCPwCnRdKTEFPScsZhj4vJm0dTs+jV1jTWOAog@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] Proposal: deprecate and remove QEMU's unicore32 target
+ code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,30 +27,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, berto@igalia.com, Max Reitz <mreitz@redhat.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>, Richard Henderson <rth@twiddle.net>
 
-Am 22.02.2018 um 16:59 hat Eric Blake geschrieben:
-> Although off_t permits up to 63 bits (8EB) of file offsets, in
-> practice, we're going to hit other limits first.  Document some
-> of those limits in the qcow2 spec, and how choice of cluster size
-> can influence some of the limits.
-> 
-> While at it, notice that since we cannot map any virtual cluster
-> to any address higher than 64 PB (56 bits) (due to the L1/L2 field
-> encoding), it makes little sense to require the refcount table to
-> access host offsets beyond that point.  Mark the upper bits of
-> the refcount table entries as reserved, with no ill effects, since
-> it is unlikely that there are any existing images larger than 64PB
-> in the first place, and thus all existing images already have those
-> bits as 0.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+I propose that we deprecate and plan to remove the unicore32 code:
 
-I think it would be good to mention the exact reason for the 56 bits in
-the spec. Even this commit message is rather vague ('L1/L2 field
-encoding'), so if at some point someone wonders, if we couldn't simply
-extend the allowed range, they won't easily see that it's related to
-compressed clusters.
+ * It has had no changes since 2012 that were not tree-wide
+   maintenance/API changes/other global updates
+ * We dropped the linux-user unicore32 support in 2016 because of
+   a clash between the 'old ABI' that it was implementing and the
+   ABI that's actually in the upstream Linux kernel, and there have
+   been no moves to get this fixed so we could re-enable it, nor
+   any complaints when it went away
+ * Linux is now planning to drop unicore support
+   (https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1619640.html)
+ * there is apparently no upstream gcc support for the architecture
+ * nobody has ever reported a bug or problem to us about it
 
-Kevin
+Essentially, it seems to be a largely-inactive university R&D project,
+it's costing us in maintenance effort every time we have to touch it,
+and I don't think it has any real users.
+
+Does anybody disagree?
+
+If we go ahead with deprecating then we should:
+ * add a note to Changelog that we're deprecating the target
+ * ditto qemu-doc.texi's deprecation section
+ * patch hw/unicore32/puv3.c to warn on startup that it's deprecated
+ * remove it entirely for the 2.14 release
+
+We could also remove linux-user/unicore32 immediately, since
+the linux-user target has been disabled for some time.
+
+Possibly there are other target architectures we could reasonably
+deprecate-and-remove (though none of the other ones Linux is dropping
+in this round are ones we support)...
+
+thanks
+-- PMM
