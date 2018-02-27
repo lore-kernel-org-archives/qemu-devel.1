@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eqkzV-0003WR-5z
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:32:46 -0500
+	(envelope-from <eblake@redhat.com>) id 1eql20-0004mA-0o
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:35:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eqkzS-0004Yy-3d
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:32:45 -0500
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:40570)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eqkzR-0004YP-SC
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:32:42 -0500
-Received: by mail-pl0-x243.google.com with SMTP id i6so11994532plt.7
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 11:32:41 -0800 (PST)
-References: <20180220180325.29818-1-peter.maydell@linaro.org>
-	<20180220180325.29818-5-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <8410b0d4-5167-d51e-d508-df3000642806@linaro.org>
-Date: Tue, 27 Feb 2018 11:32:37 -0800
+	(envelope-from <eblake@redhat.com>) id 1eql1w-0005fM-7C
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:35:20 -0500
+References: <20180223235142.21501-1-jsnow@redhat.com>
+	<20180223235142.21501-9-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <46034cb1-d31e-ba4b-2474-f90c08bdfbfc@redhat.com>
+Date: Tue, 27 Feb 2018 13:34:58 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180220180325.29818-5-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180223235142.21501-9-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 04/19] target/arm: Define an IDAU interface
+Subject: Re: [Qemu-devel] [RFC v4 08/21] blockjobs: add ABORTING state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,35 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
 
-On 02/20/2018 10:03 AM, Peter Maydell wrote:
-> In v8M, the Implementation Defined Attribution Unit (IDAU) is
-> a small piece of hardware typically implemented in the SoC
-> which provides board or SoC specific security attribution
-> information for each address that the CPU performs MPU/SAU
-> checks on. For QEMU, we model this with a QOM interface which
-> is implemented by the board or SoC object and connected to
-> the CPU using a link property.
+On 02/23/2018 05:51 PM, John Snow wrote:
+> Add a new state ABORTING.
 > 
-> This commit defines the new interface class, adds the link
-> property to the CPU object, and makes the SAU checking
-> code call the IDAU interface if one is present.
+> This makes transitions from normative states to error states explicit
+> in the STM, and serves as a disambiguation for which states may complete
+> normally when normal end-states (CONCLUDED) are added in future commits.
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Notably, Paused/Standby jobs do not transition directly to aborting,
+> as they must wake up first and cooperate in their cancellation.
+> 
+> Transitions:
+> Running -> Aborting: can be cancelled or encounter an error
+> Ready   -> Aborting: can be cancelled or encounter an error
+> 
+> Verbs:
+> None. The job must finish cleaning itself up and report its final status.
+> 
+>               +---------+
+>               |UNDEFINED|
+>               +--+------+
+>                  |
+>               +--v----+
+>               |CREATED|
+>               +--+----+
+>                  |
+>               +--v----+     +------+
+>     +---------+RUNNING<----->PAUSED|
+>     |         +--+----+     +------+
+>     |            |
+>     |         +--v--+       +-------+
+>     +---------+READY<------->STANDBY|
+>     |         +-----+       +-------+
+>     |
+> +--v-----+
+> |ABORTING|
+> +--------+
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
-> An example of an object that implements the IDAU can be
-> found in the later patch "hw/arm/iotkit: Model Arm IOT Kit".
-> ---
->  target/arm/cpu.h    |  3 +++
->  target/arm/idau.h   | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  target/arm/cpu.c    | 15 +++++++++++++
->  target/arm/helper.c | 28 +++++++++++++++++++++---
->  4 files changed, 104 insertions(+), 3 deletions(-)
->  create mode 100644 target/arm/idau.h
+>   blockjob.c           | 31 ++++++++++++++++++-------------
+>   qapi/block-core.json |  7 ++++++-
+>   2 files changed, 24 insertions(+), 14 deletions(-)
+> 
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> +++ b/qapi/block-core.json
+> @@ -996,10 +996,15 @@
+>   # @standby: The job is ready, but paused. This is nearly identical to @paused.
+>   #           The job may return to @ready or otherwise be canceled.
+>   #
+> +# @aborting: The job is in the process of being aborted, and will finish with
+> +#            an error. The job will afterwards report that it is @concluded.
 
+@concluded isn't defined yet, but I'm okay with the minor future 
+reference, as it's less churn to get to the description that works at 
+the end of the series.
 
-r~
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
