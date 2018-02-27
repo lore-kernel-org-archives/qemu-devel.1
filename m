@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eqgPK-0003dT-5N
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:39:07 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eqgPK-0003dd-Bi
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:39:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eqgPI-0007yi-Ow
+	(envelope-from <alex.bennee@linaro.org>) id 1eqgPE-0007wZ-Ro
 	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:39:06 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:33642)
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:55604)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eqgPI-0007yL-FX
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:39:04 -0500
-Received: by mail-wr0-x242.google.com with SMTP id s5so25128497wra.0
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 06:39:04 -0800 (PST)
+	id 1eqgPE-0007vK-HD
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:39:00 -0500
+Received: by mail-wm0-x241.google.com with SMTP id q83so24621046wme.5
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 06:39:00 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 27 Feb 2018 14:38:27 +0000
-Message-Id: <20180227143852.11175-7-alex.bennee@linaro.org>
+Date: Tue, 27 Feb 2018 14:38:25 +0000
+Message-Id: <20180227143852.11175-5-alex.bennee@linaro.org>
 In-Reply-To: <20180227143852.11175-1-alex.bennee@linaro.org>
 References: <20180227143852.11175-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 06/31] arm/translate-a64: implement
- half-precision F(MIN|MAX)(V|NMV)
+Subject: [Qemu-devel] [PATCH v4 04/31] target/arm/cpu.h: add additional
+ float_status flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,238 +33,336 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: qemu-devel@nongnu.org, richard.henderson@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
 
-This implements the half-precision variants of the across vector
-reduction operations. This involves a re-factor of the reduction code
-which more closely matches the ARM ARM order (and handles 8 element
-reductions).
+Half-precision flush to zero behaviour is controlled by a separate
+FZ16 bit in the FPCR. To handle this we pass a pointer to
+fp_status_fp16 when working on half-precision operations. The value of
+the presented FPCR is calculated from an amalgam of the two when read.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
---
-v1
-  - dropped the advsimd_2a stuff
-v2
-  - fixed up checkpatch
-v3
-  - add TCG_CALL_NO_RWG to helper definitions
 ---
- target/arm/helper-a64.c    |  18 ++++++
- target/arm/helper-a64.h    |   4 ++
- target/arm/translate-a64.c | 142 ++++++++++++++++++++++++++++-----------------
- 3 files changed, 110 insertions(+), 54 deletions(-)
+v3
+  - add FPCR_[FZ/FZ16/DN] defines to cpu.h and use
+  - only propagate flag status to fp_status as they are ored later
+  - ensure dnan and round mode propagated to fp_status_fp16
+---
+ target/arm/cpu.h           | 32 ++++++++++++++++++++++------
+ target/arm/helper.c        | 26 ++++++++++++++++++-----
+ target/arm/translate-a64.c | 53 +++++++++++++++++++++++++---------------------
+ 3 files changed, 75 insertions(+), 36 deletions(-)
 
-diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
-index 10e08bdc1f..fddd5d242b 100644
---- a/target/arm/helper-a64.c
-+++ b/target/arm/helper-a64.c
-@@ -572,3 +572,21 @@ uint64_t HELPER(paired_cmpxchg64_be_parallel)(CPUARMState *env, uint64_t addr,
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 25f31a4e21..2b9740878b 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -538,19 +538,29 @@ typedef struct CPUARMState {
+         /* scratch space when Tn are not sufficient.  */
+         uint32_t scratch[8];
+ 
+-        /* fp_status is the "normal" fp status. standard_fp_status retains
+-         * values corresponding to the ARM "Standard FPSCR Value", ie
+-         * default-NaN, flush-to-zero, round-to-nearest and is used by
+-         * any operations (generally Neon) which the architecture defines
+-         * as controlled by the standard FPSCR value rather than the FPSCR.
++        /* There are a number of distinct float control structures:
++         *
++         *  fp_status: is the "normal" fp status.
++         *  fp_status_fp16: used for half-precision calculations
++         *  standard_fp_status : the ARM "Standard FPSCR Value"
++         *
++         * Half-precision operations are governed by a separate
++         * flush-to-zero control bit in FPSCR:FZ16. We pass a separate
++         * status structure to control this.
++         *
++         * The "Standard FPSCR", ie default-NaN, flush-to-zero,
++         * round-to-nearest and is used by any operations (generally
++         * Neon) which the architecture defines as controlled by the
++         * standard FPSCR value rather than the FPSCR.
+          *
+          * To avoid having to transfer exception bits around, we simply
+          * say that the FPSCR cumulative exception flags are the logical
+-         * OR of the flags in the two fp statuses. This relies on the
++         * OR of the flags in the three fp statuses. This relies on the
+          * only thing which needs to read the exception flags being
+          * an explicit FPSCR read.
+          */
+         float_status fp_status;
++        float_status fp_status_f16;
+         float_status standard_fp_status;
+ 
+         /* ZCR_EL[1-3] */
+@@ -1190,12 +1200,20 @@ static inline void xpsr_write(CPUARMState *env, uint32_t val, uint32_t mask)
+ uint32_t vfp_get_fpscr(CPUARMState *env);
+ void vfp_set_fpscr(CPUARMState *env, uint32_t val);
+ 
+-/* For A64 the FPSCR is split into two logically distinct registers,
++/* FPCR, Floating Point Control Register
++ * FPSR, Floating Poiht Status Register
++ *
++ * For A64 the FPSCR is split into two logically distinct registers,
+  * FPCR and FPSR. However since they still use non-overlapping bits
+  * we store the underlying state in fpscr and just mask on read/write.
+  */
+ #define FPSR_MASK 0xf800009f
+ #define FPCR_MASK 0x07f79f00
++
++#define FPCR_FZ16   (1 << 19)   /* ARMv8.2+, FP16 flush-to-zero */
++#define FPCR_FZ     (1 << 24)   /* Flush-to-zero enable bit */
++#define FPCR_DN     (1 << 25)   /* Default NaN enable bit */
++
+ static inline uint32_t vfp_get_fpsr(CPUARMState *env)
  {
-     return do_paired_cmpxchg64_be(env, addr, new_lo, new_hi, true, GETPC());
+     return vfp_get_fpscr(env) & FPSR_MASK;
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index c5bc69b961..f450eb200f 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -11103,6 +11103,7 @@ uint32_t HELPER(vfp_get_fpscr)(CPUARMState *env)
+             | (env->vfp.vec_stride << 20);
+     i = get_float_exception_flags(&env->vfp.fp_status);
+     i |= get_float_exception_flags(&env->vfp.standard_fp_status);
++    i |= get_float_exception_flags(&env->vfp.fp_status_f16);
+     fpscr |= vfp_exceptbits_from_host(i);
+     return fpscr;
  }
-+
-+/*
-+ * AdvSIMD half-precision
-+ */
-+
-+#define ADVSIMD_HELPER(name, suffix) HELPER(glue(glue(advsimd_, name), suffix))
-+
-+#define ADVSIMD_HALFOP(name) \
-+float16 ADVSIMD_HELPER(name, h)(float16 a, float16 b, void *fpstp) \
-+{ \
-+    float_status *fpst = fpstp; \
-+    return float16_ ## name(a, b, fpst);    \
-+}
-+
-+ADVSIMD_HALFOP(min)
-+ADVSIMD_HALFOP(max)
-+ADVSIMD_HALFOP(minnum)
-+ADVSIMD_HALFOP(maxnum)
-diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
-index 85d86741db..cb2a73124d 100644
---- a/target/arm/helper-a64.h
-+++ b/target/arm/helper-a64.h
-@@ -48,3 +48,7 @@ DEF_HELPER_FLAGS_4(paired_cmpxchg64_le_parallel, TCG_CALL_NO_WG,
- DEF_HELPER_FLAGS_4(paired_cmpxchg64_be, TCG_CALL_NO_WG, i64, env, i64, i64, i64)
- DEF_HELPER_FLAGS_4(paired_cmpxchg64_be_parallel, TCG_CALL_NO_WG,
-                    i64, env, i64, i64, i64)
-+DEF_HELPER_FLAGS_3(advsimd_maxh, TCG_CALL_NO_RWG, f16, f16, f16, ptr)
-+DEF_HELPER_FLAGS_3(advsimd_minh, TCG_CALL_NO_RWG, f16, f16, f16, ptr)
-+DEF_HELPER_FLAGS_3(advsimd_maxnumh, TCG_CALL_NO_RWG, f16, f16, f16, ptr)
-+DEF_HELPER_FLAGS_3(advsimd_minnumh, TCG_CALL_NO_RWG, f16, f16, f16, ptr)
+@@ -11160,16 +11161,31 @@ void HELPER(vfp_set_fpscr)(CPUARMState *env, uint32_t val)
+             break;
+         }
+         set_float_rounding_mode(i, &env->vfp.fp_status);
++        set_float_rounding_mode(i, &env->vfp.fp_status_f16);
+     }
+-    if (changed & (1 << 24)) {
+-        set_flush_to_zero((val & (1 << 24)) != 0, &env->vfp.fp_status);
+-        set_flush_inputs_to_zero((val & (1 << 24)) != 0, &env->vfp.fp_status);
++    if (changed & FPCR_FZ16) {
++        bool ftz_enabled = val & FPCR_FZ16;
++        set_flush_to_zero(ftz_enabled, &env->vfp.fp_status_f16);
++        set_flush_inputs_to_zero(ftz_enabled, &env->vfp.fp_status_f16);
++    }
++    if (changed & FPCR_FZ) {
++        bool ftz_enabled = val & FPCR_FZ;
++        set_flush_to_zero(ftz_enabled, &env->vfp.fp_status);
++        set_flush_inputs_to_zero(ftz_enabled, &env->vfp.fp_status);
++    }
++    if (changed & FPCR_DN) {
++        bool dnan_enabled = val & FPCR_DN;
++        set_default_nan_mode(dnan_enabled, &env->vfp.fp_status);
++        set_default_nan_mode(dnan_enabled, &env->vfp.fp_status_f16);
+     }
+-    if (changed & (1 << 25))
+-        set_default_nan_mode((val & (1 << 25)) != 0, &env->vfp.fp_status);
+ 
++    /* The exception flags are ORed together when we read fpscr so we
++     * only need to preserve the current state in one of our
++     * float_status values.
++     */
+     i = vfp_exceptbits_to_host(val);
+     set_float_exception_flags(i, &env->vfp.fp_status);
++    set_float_exception_flags(0, &env->vfp.fp_status_f16);
+     set_float_exception_flags(0, &env->vfp.standard_fp_status);
+ }
+ 
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 91c2b8ed11..ebaf4571ac 100644
+index 1c88539d62..2c64d2b3fe 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -5741,26 +5741,75 @@ static void disas_simd_zip_trn(DisasContext *s, uint32_t insn)
-     tcg_temp_free_i64(tcg_resh);
+@@ -637,16 +637,21 @@ static void write_fp_sreg(DisasContext *s, int reg, TCGv_i32 v)
+     tcg_temp_free_i64(tmp);
  }
  
--static void do_minmaxop(DisasContext *s, TCGv_i32 tcg_elt1, TCGv_i32 tcg_elt2,
--                        int opc, bool is_min, TCGv_ptr fpst)
--{
--    /* Helper function for disas_simd_across_lanes: do a single precision
--     * min/max operation on the specified two inputs,
--     * and return the result in tcg_elt1.
--     */
--    if (opc == 0xc) {
--        if (is_min) {
--            gen_helper_vfp_minnums(tcg_elt1, tcg_elt1, tcg_elt2, fpst);
--        } else {
--            gen_helper_vfp_maxnums(tcg_elt1, tcg_elt1, tcg_elt2, fpst);
--        }
-+/*
-+ * do_reduction_op helper
-+ *
-+ * This mirrors the Reduce() pseudocode in the ARM ARM. It is
-+ * important for correct NaN propagation that we do these
-+ * operations in exactly the order specified by the pseudocode.
-+ *
-+ * This is a recursive function, TCG temps should be freed by the
-+ * calling function once it is done with the values.
-+ */
-+static TCGv_i32 do_reduction_op(DisasContext *s, int fpopcode, int rn,
-+                                int esize, int size, int vmap, TCGv_ptr fpst)
-+{
-+    if (esize == size) {
-+        int element;
-+        TCGMemOp msize = esize == 16 ? MO_16 : MO_32;
-+        TCGv_i32 tcg_elem;
-+
-+        /* We should have one register left here */
-+        assert(ctpop8(vmap) == 1);
-+        element = ctz32(vmap);
-+        assert(element < 8);
-+
-+        tcg_elem = tcg_temp_new_i32();
-+        read_vec_element_i32(s, tcg_elem, rn, element, msize);
-+        return tcg_elem;
-     } else {
--        assert(opc == 0xf);
--        if (is_min) {
--            gen_helper_vfp_mins(tcg_elt1, tcg_elt1, tcg_elt2, fpst);
--        } else {
--            gen_helper_vfp_maxs(tcg_elt1, tcg_elt1, tcg_elt2, fpst);
-+        int bits = size / 2;
-+        int shift = ctpop8(vmap) / 2;
-+        int vmap_lo = (vmap >> shift) & vmap;
-+        int vmap_hi = (vmap & ~vmap_lo);
-+        TCGv_i32 tcg_hi, tcg_lo, tcg_res;
-+
-+        tcg_hi = do_reduction_op(s, fpopcode, rn, esize, bits, vmap_hi, fpst);
-+        tcg_lo = do_reduction_op(s, fpopcode, rn, esize, bits, vmap_lo, fpst);
-+        tcg_res = tcg_temp_new_i32();
-+
-+        switch (fpopcode) {
-+        case 0x0c: /* fmaxnmv half-precision */
-+            gen_helper_advsimd_maxnumh(tcg_res, tcg_lo, tcg_hi, fpst);
-+            break;
-+        case 0x0f: /* fmaxv half-precision */
-+            gen_helper_advsimd_maxh(tcg_res, tcg_lo, tcg_hi, fpst);
-+            break;
-+        case 0x1c: /* fminnmv half-precision */
-+            gen_helper_advsimd_minnumh(tcg_res, tcg_lo, tcg_hi, fpst);
-+            break;
-+        case 0x1f: /* fminv half-precision */
-+            gen_helper_advsimd_minh(tcg_res, tcg_lo, tcg_hi, fpst);
-+            break;
-+        case 0x2c: /* fmaxnmv */
-+            gen_helper_vfp_maxnums(tcg_res, tcg_lo, tcg_hi, fpst);
-+            break;
-+        case 0x2f: /* fmaxv */
-+            gen_helper_vfp_maxs(tcg_res, tcg_lo, tcg_hi, fpst);
-+            break;
-+        case 0x3c: /* fminnmv */
-+            gen_helper_vfp_minnums(tcg_res, tcg_lo, tcg_hi, fpst);
-+            break;
-+        case 0x3f: /* fminv */
-+            gen_helper_vfp_mins(tcg_res, tcg_lo, tcg_hi, fpst);
-+            break;
-+        default:
-+            g_assert_not_reached();
-         }
-+
-+        tcg_temp_free_i32(tcg_hi);
-+        tcg_temp_free_i32(tcg_lo);
-+        return tcg_res;
+-static TCGv_ptr get_fpstatus_ptr(void)
++static TCGv_ptr get_fpstatus_ptr(bool is_f16)
+ {
+     TCGv_ptr statusptr = tcg_temp_new_ptr();
+     int offset;
+ 
+-    /* In A64 all instructions (both FP and Neon) use the FPCR;
+-     * there is no equivalent of the A32 Neon "standard FPSCR value"
+-     * and all operations use vfp.fp_status.
++    /* In A64 all instructions (both FP and Neon) use the FPCR; there
++     * is no equivalent of the A32 Neon "standard FPSCR value".
++     * However half-precision operations operate under a different
++     * FZ16 flag and use vfp.fp_status_f16 instead of vfp.fp_status.
+      */
+-    offset = offsetof(CPUARMState, vfp.fp_status);
++    if (is_f16) {
++        offset = offsetof(CPUARMState, vfp.fp_status_f16);
++    } else {
++        offset = offsetof(CPUARMState, vfp.fp_status);
++    }
+     tcg_gen_addi_ptr(statusptr, cpu_env, offset);
+     return statusptr;
+ }
+@@ -4423,7 +4428,7 @@ static void handle_fp_compare(DisasContext *s, bool is_double,
+                               bool cmp_with_zero, bool signal_all_nans)
+ {
+     TCGv_i64 tcg_flags = tcg_temp_new_i64();
+-    TCGv_ptr fpst = get_fpstatus_ptr();
++    TCGv_ptr fpst = get_fpstatus_ptr(false);
+ 
+     if (is_double) {
+         TCGv_i64 tcg_vn, tcg_vm;
+@@ -4598,7 +4603,7 @@ static void handle_fp_1src_single(DisasContext *s, int opcode, int rd, int rn)
+     TCGv_i32 tcg_op;
+     TCGv_i32 tcg_res;
+ 
+-    fpst = get_fpstatus_ptr();
++    fpst = get_fpstatus_ptr(false);
+     tcg_op = read_fp_sreg(s, rn);
+     tcg_res = tcg_temp_new_i32();
+ 
+@@ -4660,7 +4665,7 @@ static void handle_fp_1src_double(DisasContext *s, int opcode, int rd, int rn)
+         return;
      }
- }
  
-@@ -5802,16 +5851,21 @@ static void disas_simd_across_lanes(DisasContext *s, uint32_t insn)
-         break;
-     case 0xc: /* FMAXNMV, FMINNMV */
-     case 0xf: /* FMAXV, FMINV */
--        if (!is_u || !is_q || extract32(size, 0, 1)) {
--            unallocated_encoding(s);
--            return;
--        }
--        /* Bit 1 of size field encodes min vs max, and actual size is always
--         * 32 bits: adjust the size variable so following code can rely on it
-+        /* Bit 1 of size field encodes min vs max and the actual size
-+         * depends on the encoding of the U bit. If not set (and FP16
-+         * enabled) then we do half-precision float instead of single
-+         * precision.
-          */
-         is_min = extract32(size, 1, 1);
-         is_fp = true;
--        size = 2;
-+        if (!is_u && arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
-+            size = 1;
-+        } else if (!is_u || !is_q || extract32(size, 0, 1)) {
-+            unallocated_encoding(s);
-+            return;
-+        } else {
-+            size = 2;
-+        }
+-    fpst = get_fpstatus_ptr();
++    fpst = get_fpstatus_ptr(false);
+     tcg_op = read_fp_dreg(s, rn);
+     tcg_res = tcg_temp_new_i64();
+ 
+@@ -4840,7 +4845,7 @@ static void handle_fp_2src_single(DisasContext *s, int opcode,
+     TCGv_ptr fpst;
+ 
+     tcg_res = tcg_temp_new_i32();
+-    fpst = get_fpstatus_ptr();
++    fpst = get_fpstatus_ptr(false);
+     tcg_op1 = read_fp_sreg(s, rn);
+     tcg_op2 = read_fp_sreg(s, rm);
+ 
+@@ -4893,7 +4898,7 @@ static void handle_fp_2src_double(DisasContext *s, int opcode,
+     TCGv_ptr fpst;
+ 
+     tcg_res = tcg_temp_new_i64();
+-    fpst = get_fpstatus_ptr();
++    fpst = get_fpstatus_ptr(false);
+     tcg_op1 = read_fp_dreg(s, rn);
+     tcg_op2 = read_fp_dreg(s, rm);
+ 
+@@ -4979,7 +4984,7 @@ static void handle_fp_3src_single(DisasContext *s, bool o0, bool o1,
+ {
+     TCGv_i32 tcg_op1, tcg_op2, tcg_op3;
+     TCGv_i32 tcg_res = tcg_temp_new_i32();
+-    TCGv_ptr fpst = get_fpstatus_ptr();
++    TCGv_ptr fpst = get_fpstatus_ptr(false);
+ 
+     tcg_op1 = read_fp_sreg(s, rn);
+     tcg_op2 = read_fp_sreg(s, rm);
+@@ -5017,7 +5022,7 @@ static void handle_fp_3src_double(DisasContext *s, bool o0, bool o1,
+ {
+     TCGv_i64 tcg_op1, tcg_op2, tcg_op3;
+     TCGv_i64 tcg_res = tcg_temp_new_i64();
+-    TCGv_ptr fpst = get_fpstatus_ptr();
++    TCGv_ptr fpst = get_fpstatus_ptr(false);
+ 
+     tcg_op1 = read_fp_dreg(s, rn);
+     tcg_op2 = read_fp_dreg(s, rm);
+@@ -5158,7 +5163,7 @@ static void handle_fpfpcvt(DisasContext *s, int rd, int rn, int opcode,
+     TCGv_ptr tcg_fpstatus;
+     TCGv_i32 tcg_shift;
+ 
+-    tcg_fpstatus = get_fpstatus_ptr();
++    tcg_fpstatus = get_fpstatus_ptr(false);
+ 
+     tcg_shift = tcg_const_i32(64 - scale);
+ 
+@@ -5870,7 +5875,7 @@ static void disas_simd_across_lanes(DisasContext *s, uint32_t insn)
+         TCGv_i32 tcg_elt1 = tcg_temp_new_i32();
+         TCGv_i32 tcg_elt2 = tcg_temp_new_i32();
+         TCGv_i32 tcg_elt3 = tcg_temp_new_i32();
+-        TCGv_ptr fpst = get_fpstatus_ptr();
++        TCGv_ptr fpst = get_fpstatus_ptr(false);
+ 
+         assert(esize == 32);
+         assert(elements == 4);
+@@ -6372,7 +6377,7 @@ static void disas_simd_scalar_pairwise(DisasContext *s, uint32_t insn)
+         }
+ 
+         size = extract32(size, 0, 1) ? 3 : 2;
+-        fpst = get_fpstatus_ptr();
++        fpst = get_fpstatus_ptr(false);
          break;
      default:
          unallocated_encoding(s);
-@@ -5868,38 +5922,18 @@ static void disas_simd_across_lanes(DisasContext *s, uint32_t insn)
+@@ -6864,7 +6869,7 @@ static void handle_simd_intfp_conv(DisasContext *s, int rd, int rn,
+                                    int fracbits, int size)
+ {
+     bool is_double = size == 3 ? true : false;
+-    TCGv_ptr tcg_fpst = get_fpstatus_ptr();
++    TCGv_ptr tcg_fpst = get_fpstatus_ptr(false);
+     TCGv_i32 tcg_shift = tcg_const_i32(fracbits);
+     TCGv_i64 tcg_int = tcg_temp_new_i64();
+     TCGMemOp mop = size | (is_signed ? MO_SIGN : 0);
+@@ -6980,7 +6985,7 @@ static void handle_simd_shift_fpint_conv(DisasContext *s, bool is_scalar,
  
-         }
-     } else {
--        /* Floating point ops which work on 32 bit (single) intermediates.
-+        /* Floating point vector reduction ops which work across 32
-+         * bit (single) or 16 bit (half-precision) intermediates.
-          * Note that correct NaN propagation requires that we do these
-          * operations in exactly the order specified by the pseudocode.
-          */
--        TCGv_i32 tcg_elt1 = tcg_temp_new_i32();
--        TCGv_i32 tcg_elt2 = tcg_temp_new_i32();
--        TCGv_i32 tcg_elt3 = tcg_temp_new_i32();
--        TCGv_ptr fpst = get_fpstatus_ptr(false);
--
--        assert(esize == 32);
--        assert(elements == 4);
--
--        read_vec_element(s, tcg_elt, rn, 0, MO_32);
--        tcg_gen_extrl_i64_i32(tcg_elt1, tcg_elt);
--        read_vec_element(s, tcg_elt, rn, 1, MO_32);
--        tcg_gen_extrl_i64_i32(tcg_elt2, tcg_elt);
--
--        do_minmaxop(s, tcg_elt1, tcg_elt2, opcode, is_min, fpst);
--
--        read_vec_element(s, tcg_elt, rn, 2, MO_32);
--        tcg_gen_extrl_i64_i32(tcg_elt2, tcg_elt);
--        read_vec_element(s, tcg_elt, rn, 3, MO_32);
--        tcg_gen_extrl_i64_i32(tcg_elt3, tcg_elt);
--
--        do_minmaxop(s, tcg_elt2, tcg_elt3, opcode, is_min, fpst);
--
--        do_minmaxop(s, tcg_elt1, tcg_elt2, opcode, is_min, fpst);
--
--        tcg_gen_extu_i32_i64(tcg_res, tcg_elt1);
--        tcg_temp_free_i32(tcg_elt1);
--        tcg_temp_free_i32(tcg_elt2);
--        tcg_temp_free_i32(tcg_elt3);
-+        TCGv_ptr fpst = get_fpstatus_ptr(size == MO_16);
-+        int fpopcode = opcode | is_min << 4 | is_u << 5;
-+        int vmap = (1 << elements) - 1;
-+        TCGv_i32 tcg_res32 = do_reduction_op(s, fpopcode, rn, esize,
-+                                             (is_q ? 128 : 64), vmap, fpst);
-+        tcg_gen_extu_i32_i64(tcg_res, tcg_res32);
-+        tcg_temp_free_i32(tcg_res32);
-         tcg_temp_free_ptr(fpst);
+     tcg_rmode = tcg_const_i32(arm_rmode_to_sf(FPROUNDING_ZERO));
+     gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
+-    tcg_fpstatus = get_fpstatus_ptr();
++    tcg_fpstatus = get_fpstatus_ptr(false);
+     tcg_shift = tcg_const_i32(fracbits);
+ 
+     if (is_double) {
+@@ -7326,7 +7331,7 @@ static void handle_3same_float(DisasContext *s, int size, int elements,
+                                int fpopcode, int rd, int rn, int rm)
+ {
+     int pass;
+-    TCGv_ptr fpst = get_fpstatus_ptr();
++    TCGv_ptr fpst = get_fpstatus_ptr(false);
+ 
+     for (pass = 0; pass < elements; pass++) {
+         if (size) {
+@@ -7790,7 +7795,7 @@ static void handle_2misc_fcmp_zero(DisasContext *s, int opcode,
+         return;
      }
  
+-    fpst = get_fpstatus_ptr();
++    fpst = get_fpstatus_ptr(false);
+ 
+     if (is_double) {
+         TCGv_i64 tcg_op = tcg_temp_new_i64();
+@@ -7897,7 +7902,7 @@ static void handle_2misc_reciprocal(DisasContext *s, int opcode,
+                                     int size, int rn, int rd)
+ {
+     bool is_double = (size == 3);
+-    TCGv_ptr fpst = get_fpstatus_ptr();
++    TCGv_ptr fpst = get_fpstatus_ptr(false);
+ 
+     if (is_double) {
+         TCGv_i64 tcg_op = tcg_temp_new_i64();
+@@ -8296,7 +8301,7 @@ static void disas_simd_scalar_two_reg_misc(DisasContext *s, uint32_t insn)
+     if (is_fcvt) {
+         tcg_rmode = tcg_const_i32(arm_rmode_to_sf(rmode));
+         gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
+-        tcg_fpstatus = get_fpstatus_ptr();
++        tcg_fpstatus = get_fpstatus_ptr(false);
+     } else {
+         tcg_rmode = NULL;
+         tcg_fpstatus = NULL;
+@@ -9516,7 +9521,7 @@ static void handle_simd_3same_pair(DisasContext *s, int is_q, int u, int opcode,
+ 
+     /* Floating point operations need fpst */
+     if (opcode >= 0x58) {
+-        fpst = get_fpstatus_ptr();
++        fpst = get_fpstatus_ptr(false);
+     } else {
+         fpst = NULL;
+     }
+@@ -10676,7 +10681,7 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
+     }
+ 
+     if (need_fpstatus) {
+-        tcg_fpstatus = get_fpstatus_ptr();
++        tcg_fpstatus = get_fpstatus_ptr(false);
+     } else {
+         tcg_fpstatus = NULL;
+     }
+@@ -11056,7 +11061,7 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
+     }
+ 
+     if (is_fp) {
+-        fpst = get_fpstatus_ptr();
++        fpst = get_fpstatus_ptr(false);
+     } else {
+         fpst = NULL;
+     }
 -- 
 2.15.1
