@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eqXzG-0004ag-Cj
+	(envelope-from <cota@braap.org>) id 1eqXzH-0004bZ-WB
 	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 00:39:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eqXzC-0000Pg-AC
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 00:39:38 -0500
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:51425)
+	(envelope-from <cota@braap.org>) id 1eqXzD-0000R6-6w
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 00:39:40 -0500
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:40001)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eqXzC-0000Ns-0y
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 00:39:34 -0500
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eqXzD-0000QK-1f
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 00:39:35 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Tue, 27 Feb 2018 00:39:10 -0500
-Message-Id: <1519709965-29833-2-git-send-email-cota@braap.org>
+Date: Tue, 27 Feb 2018 00:39:20 -0500
+Message-Id: <1519709965-29833-12-git-send-email-cota@braap.org>
 In-Reply-To: <1519709965-29833-1-git-send-email-cota@braap.org>
 References: <1519709965-29833-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 01/16] qht: require a default comparison
- function
+Subject: [Qemu-devel] [PATCH 11/16] translate-all: add page_collection
+ assertions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,271 +27,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-qht_lookup now uses the default cmp function. qht_lookup_custom is defined
-to retain the old behaviour, that is a cmp function is explicitly provided.
+The appended adds assertions to make sure we do not longjmp with page
+locks held. Some notes:
 
-qht_insert will gain use of the default cmp in the next patch.
+- user-mode has nothing to check, since page_locks are !user-mode only.
+
+- The checks only apply to page collections, since these have relatively
+  complex callers.
+
+- Some simple page_lock/unlock callers have been left unchecked --
+  namely page_lock_tb, tb_phys_invalidate and tb_link_page.
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/cpu-exec.c      |  4 ++--
- accel/tcg/translate-all.c | 16 +++++++++++++++-
- include/qemu/qht.h        | 23 +++++++++++++++++++----
- tests/qht-bench.c         | 14 +++++++-------
- tests/test-qht.c          | 15 ++++++++++-----
- util/qht.c                | 14 +++++++++++---
- 6 files changed, 64 insertions(+), 22 deletions(-)
+ accel/tcg/cpu-exec.c      |  1 +
+ accel/tcg/translate-all.c | 22 ++++++++++++++++++++++
+ include/exec/exec-all.h   |  8 ++++++++
+ 3 files changed, 31 insertions(+)
 
 diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index 280200f..ec57564 100644
+index 8c68727..7c83887 100644
 --- a/accel/tcg/cpu-exec.c
 +++ b/accel/tcg/cpu-exec.c
-@@ -293,7 +293,7 @@ struct tb_desc {
-     uint32_t trace_vcpu_dstate;
- };
+@@ -271,6 +271,7 @@ void cpu_exec_step_atomic(CPUState *cpu)
+         tcg_debug_assert(!have_mmap_lock());
+ #endif
+         tb_lock_reset();
++        assert_page_collection_locked(false);
+     }
  
--static bool tb_cmp(const void *p, const void *d)
-+static bool tb_lookup_cmp(const void *p, const void *d)
- {
-     const TranslationBlock *tb = p;
-     const struct tb_desc *desc = d;
-@@ -338,7 +338,7 @@ TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
-     phys_pc = get_page_addr_code(desc.env, pc);
-     desc.phys_page1 = phys_pc & TARGET_PAGE_MASK;
-     h = tb_hash_func(phys_pc, pc, flags, cf_mask, *cpu->trace_dstate);
--    return qht_lookup(&tb_ctx.htable, tb_cmp, &desc, h);
-+    return qht_lookup_custom(&tb_ctx.htable, tb_lookup_cmp, &desc, h);
- }
- 
- void tb_set_jmp_target(TranslationBlock *tb, int n, uintptr_t addr)
+     if (in_exclusive_region) {
 diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 67795cd..1cf10f8 100644
+index 07527d5..82832ef 100644
 --- a/accel/tcg/translate-all.c
 +++ b/accel/tcg/translate-all.c
-@@ -785,11 +785,25 @@ static inline void code_gen_alloc(size_t tb_size)
-     qemu_mutex_init(&tb_ctx.tb_lock);
- }
+@@ -605,6 +605,24 @@ void page_collection_unlock(struct page_collection *set)
+ { }
+ #else /* !CONFIG_USER_ONLY */
  
-+static bool tb_cmp(const void *ap, const void *bp)
-+{
-+    const TranslationBlock *a = ap;
-+    const TranslationBlock *b = bp;
++#ifdef CONFIG_DEBUG_TCG
++static __thread bool page_collection_locked;
 +
-+    return a->pc == b->pc &&
-+        a->cs_base == b->cs_base &&
-+        a->flags == b->flags &&
-+        (tb_cflags(a) & CF_HASH_MASK) == (tb_cflags(b) & CF_HASH_MASK) &&
-+        a->trace_vcpu_dstate == b->trace_vcpu_dstate &&
-+        a->page_addr[0] == b->page_addr[0] &&
-+        a->page_addr[1] == b->page_addr[1];
++void assert_page_collection_locked(bool val)
++{
++    tcg_debug_assert(page_collection_locked == val);
 +}
 +
- static void tb_htable_init(void)
- {
-     unsigned int mode = QHT_MODE_AUTO_RESIZE;
- 
--    qht_init(&tb_ctx.htable, CODE_GEN_HTABLE_SIZE, mode);
-+    qht_init(&tb_ctx.htable, tb_cmp, CODE_GEN_HTABLE_SIZE, mode);
- }
- 
- /* Must be called before using the QEMU cpus. 'tb_size' is the size
-diff --git a/include/qemu/qht.h b/include/qemu/qht.h
-index 531aa95..dd512bf 100644
---- a/include/qemu/qht.h
-+++ b/include/qemu/qht.h
-@@ -11,8 +11,11 @@
- #include "qemu/thread.h"
- #include "qemu/qdist.h"
- 
-+typedef bool (*qht_cmp_func_t)(const void *a, const void *b);
-+
- struct qht {
-     struct qht_map *map;
-+    qht_cmp_func_t cmp;
-     QemuMutex lock; /* serializes setters of ht->map */
-     unsigned int mode;
- };
-@@ -47,10 +50,12 @@ typedef void (*qht_iter_func_t)(struct qht *ht, void *p, uint32_t h, void *up);
- /**
-  * qht_init - Initialize a QHT
-  * @ht: QHT to be initialized
-+ * @cmp: default comparison function. Cannot be NULL.
-  * @n_elems: number of entries the hash table should be optimized for.
-  * @mode: bitmask with OR'ed QHT_MODE_*
-  */
--void qht_init(struct qht *ht, size_t n_elems, unsigned int mode);
-+void qht_init(struct qht *ht, qht_cmp_func_t cmp, size_t n_elems,
-+              unsigned int mode);
- 
- /**
-  * qht_destroy - destroy a previously initialized QHT
-@@ -78,7 +83,7 @@ void qht_destroy(struct qht *ht);
- bool qht_insert(struct qht *ht, void *p, uint32_t hash);
- 
- /**
-- * qht_lookup - Look up a pointer in a QHT
-+ * qht_lookup_custom - Look up a pointer using a custom comparison function.
-  * @ht: QHT to be looked up
-  * @func: function to compare existing pointers against @userp
-  * @userp: pointer to pass to @func
-@@ -94,8 +99,18 @@ bool qht_insert(struct qht *ht, void *p, uint32_t hash);
-  * Returns the corresponding pointer when a match is found.
-  * Returns NULL otherwise.
-  */
--void *qht_lookup(struct qht *ht, qht_lookup_func_t func, const void *userp,
--                 uint32_t hash);
-+void *qht_lookup_custom(struct qht *ht, qht_lookup_func_t func,
-+                        const void *userp, uint32_t hash);
-+
-+/**
-+ * qht_lookup - Look up a pointer in a QHT
-+ * @ht: QHT to be looked up
-+ * @userp: pointer to pass to @func
-+ * @hash: hash of the pointer to be looked up
-+ *
-+ * Calls qht_lookup_custom() using @ht's default comparison function.
-+ */
-+void *qht_lookup(struct qht *ht, const void *userp, uint32_t hash);
- 
- /**
-  * qht_remove - remove a pointer from the hash table
-diff --git a/tests/qht-bench.c b/tests/qht-bench.c
-index 4cabdfd..c94ac25 100644
---- a/tests/qht-bench.c
-+++ b/tests/qht-bench.c
-@@ -93,10 +93,10 @@ static void usage_complete(int argc, char *argv[])
-     exit(-1);
- }
- 
--static bool is_equal(const void *obj, const void *userp)
-+static bool is_equal(const void *ap, const void *bp)
- {
--    const long *a = obj;
--    const long *b = userp;
-+    const long *a = ap;
-+    const long *b = bp;
- 
-     return *a == *b;
- }
-@@ -150,7 +150,7 @@ static void do_rw(struct thread_info *info)
- 
-         p = &keys[info->r & (lookup_range - 1)];
-         hash = h(*p);
--        read = qht_lookup(&ht, is_equal, p, hash);
-+        read = qht_lookup(&ht, p, hash);
-         if (read) {
-             stats->rd++;
-         } else {
-@@ -162,7 +162,7 @@ static void do_rw(struct thread_info *info)
-         if (info->write_op) {
-             bool written = false;
- 
--            if (qht_lookup(&ht, is_equal, p, hash) == NULL) {
-+            if (qht_lookup(&ht, p, hash) == NULL) {
-                 written = qht_insert(&ht, p, hash);
-             }
-             if (written) {
-@@ -173,7 +173,7 @@ static void do_rw(struct thread_info *info)
-         } else {
-             bool removed = false;
- 
--            if (qht_lookup(&ht, is_equal, p, hash)) {
-+            if (qht_lookup(&ht, p, hash)) {
-                 removed = qht_remove(&ht, p, hash);
-             }
-             if (removed) {
-@@ -308,7 +308,7 @@ static void htable_init(void)
-     }
- 
-     /* initialize the hash table */
--    qht_init(&ht, qht_n_elems, qht_mode);
-+    qht_init(&ht, is_equal, qht_n_elems, qht_mode);
-     assert(init_size <= init_range);
- 
-     pr_params();
-diff --git a/tests/test-qht.c b/tests/test-qht.c
-index 9b7423a..f8f2886 100644
---- a/tests/test-qht.c
-+++ b/tests/test-qht.c
-@@ -13,10 +13,10 @@
- static struct qht ht;
- static int32_t arr[N * 2];
- 
--static bool is_equal(const void *obj, const void *userp)
-+static bool is_equal(const void *ap, const void *bp)
- {
--    const int32_t *a = obj;
--    const int32_t *b = userp;
-+    const int32_t *a = ap;
-+    const int32_t *b = bp;
- 
-     return *a == *b;
- }
-@@ -60,7 +60,12 @@ static void check(int a, int b, bool expected)
- 
-         val = i;
-         hash = i;
--        p = qht_lookup(&ht, is_equal, &val, hash);
-+        /* test both lookup variants; results should be the same */
-+        if (i % 2) {
-+            p = qht_lookup(&ht, &val, hash);
-+        } else {
-+            p = qht_lookup_custom(&ht, is_equal, &val, hash);
-+        }
-         g_assert_true(!!p == expected);
-     }
-     rcu_read_unlock();
-@@ -102,7 +107,7 @@ static void qht_do_test(unsigned int mode, size_t init_entries)
-     /* under KVM we might fetch stats from an uninitialized qht */
-     check_n(0);
- 
--    qht_init(&ht, 0, mode);
-+    qht_init(&ht, is_equal, 0, mode);
- 
-     check_n(0);
-     insert(0, N);
-diff --git a/util/qht.c b/util/qht.c
-index ff4d2e6..dcb3ee1 100644
---- a/util/qht.c
-+++ b/util/qht.c
-@@ -351,11 +351,14 @@ static struct qht_map *qht_map_create(size_t n_buckets)
-     return map;
- }
- 
--void qht_init(struct qht *ht, size_t n_elems, unsigned int mode)
-+void qht_init(struct qht *ht, qht_cmp_func_t cmp, size_t n_elems,
-+              unsigned int mode)
- {
-     struct qht_map *map;
-     size_t n_buckets = qht_elems_to_buckets(n_elems);
- 
-+    g_assert(cmp);
-+    ht->cmp = cmp;
-     ht->mode = mode;
-     qemu_mutex_init(&ht->lock);
-     map = qht_map_create(n_buckets);
-@@ -479,8 +482,8 @@ void *qht_lookup__slowpath(struct qht_bucket *b, qht_lookup_func_t func,
-     return ret;
- }
- 
--void *qht_lookup(struct qht *ht, qht_lookup_func_t func, const void *userp,
--                 uint32_t hash)
-+void *qht_lookup_custom(struct qht *ht, qht_lookup_func_t func,
-+                        const void *userp, uint32_t hash)
- {
-     struct qht_bucket *b;
-     struct qht_map *map;
-@@ -502,6 +505,11 @@ void *qht_lookup(struct qht *ht, qht_lookup_func_t func, const void *userp,
-     return qht_lookup__slowpath(b, func, userp, hash);
- }
- 
-+void *qht_lookup(struct qht *ht, const void *userp, uint32_t hash)
++static inline void set_page_collection_locked(bool val)
 +{
-+    return qht_lookup_custom(ht, ht->cmp, userp, hash);
++    page_collection_locked = val;
 +}
++#else
++static inline void set_page_collection_locked(bool val)
++{
++}
++#endif /* !CONFIG_DEBUG_TCG */
 +
- /* call with head->lock held */
- static bool qht_insert__locked(struct qht *ht, struct qht_map *map,
-                                struct qht_bucket *head, void *p, uint32_t hash,
+ static inline void page_lock(PageDesc *pd)
+ {
+     qemu_spin_lock(&pd->lock);
+@@ -677,6 +695,7 @@ static void do_page_entry_lock(struct page_entry *pe)
+     page_lock(pe->pd);
+     g_assert(!pe->locked);
+     pe->locked = true;
++    set_page_collection_locked(true);
+ }
+ 
+ static gboolean page_entry_lock(gpointer key, gpointer value, gpointer data)
+@@ -769,6 +788,7 @@ page_collection_lock(tb_page_addr_t start, tb_page_addr_t end)
+     set->tree = g_tree_new_full(tb_page_addr_cmp, NULL, NULL,
+                                 page_entry_destroy);
+     set->max = NULL;
++    assert_page_collection_locked(false);
+ 
+  retry:
+     g_tree_foreach(set->tree, page_entry_lock, NULL);
+@@ -787,6 +807,7 @@ page_collection_lock(tb_page_addr_t start, tb_page_addr_t end)
+                  page_trylock_add(set, tb->page_addr[1]))) {
+                 /* drop all locks, and reacquire in order */
+                 g_tree_foreach(set->tree, page_entry_unlock, NULL);
++                set_page_collection_locked(false);
+                 goto retry;
+             }
+         }
+@@ -799,6 +820,7 @@ void page_collection_unlock(struct page_collection *set)
+     /* entries are unlocked and freed via page_entry_destroy */
+     g_tree_destroy(set->tree);
+     g_free(set);
++    set_page_collection_locked(false);
+ }
+ 
+ #endif /* !CONFIG_USER_ONLY */
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index aeaa127..7911e69 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -431,6 +431,14 @@ void tb_lock(void);
+ void tb_unlock(void);
+ void tb_lock_reset(void);
+ 
++#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_DEBUG_TCG)
++void assert_page_collection_locked(bool val);
++#else
++static inline void assert_page_collection_locked(bool val)
++{
++}
++#endif
++
+ #if !defined(CONFIG_USER_ONLY)
+ 
+ struct MemoryRegion *iotlb_to_region(CPUState *cpu,
 -- 
 2.7.4
