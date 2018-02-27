@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eqgyD-0001TM-3f
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:15:15 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eqgyI-0001Xk-M1
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:15:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eqgy9-0005KJ-Nh
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:15:09 -0500
-Resent-Message-Id: <E1eqgy9-0005KJ-Nh@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21054)
+	(envelope-from <no-reply@patchew.org>) id 1eqgyC-0005La-5W
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:15:14 -0500
+Resent-Message-Id: <E1eqgyC-0005La-5W@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21129)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eqgy9-0005Jl-Fx
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:15:05 -0500
+	id 1eqgyB-0005LC-UR
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:15:08 -0500
 In-Reply-To: <20180227143852.11175-1-alex.bennee@linaro.org>
 Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151974446473.1194.2001157501558016219@bdbb90650ae5>
+Message-ID: <151974448615.1194.10842979715913868163@bdbb90650ae5>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
 From: no-reply@patchew.org
-Date: Tue, 27 Feb 2018 07:14:26 -0800 (PST)
+Date: Tue, 27 Feb 2018 07:14:47 -0800 (PST)
 Subject: Re: [Qemu-devel] [PATCH v4 00/31] Add ARMv8.2 half-precision
  functions
 List-Id: <qemu-devel.nongnu.org>
