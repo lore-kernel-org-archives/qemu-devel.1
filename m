@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eqh2V-00056p-Mq
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:19:39 -0500
+	(envelope-from <wei@redhat.com>) id 1eqh4r-00075j-DY
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:22:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eqh2P-0007Mr-Fg
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:19:35 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57140
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1eqh2P-0007Lw-AI
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:19:29 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1RFHa59032720
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 10:19:28 -0500
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gd8kqku1y-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 10:19:28 -0500
-Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Tue, 27 Feb 2018 08:19:27 -0700
-From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Tue, 27 Feb 2018 10:19:20 -0500
-Message-Id: <1519744760-12337-1-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH] s390-ccw: only print boot menu error if -boot
- menu=on was specified
+	(envelope-from <wei@redhat.com>) id 1eqh4o-0008Uw-JZ
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:22:01 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49662 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1eqh4o-0008Uc-D2
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:21:58 -0500
+References: <20180223215858.16987-1-wei@redhat.com>
+	<20180223215858.16987-3-wei@redhat.com> <20180226180110.GE2873@work-vm>
+	<3904e31b-8c66-b241-7369-1b479b683da8@redhat.com>
+	<20180227113841.GC2847@work-vm>
+From: Wei Huang <wei@redhat.com>
+Message-ID: <87398bbc-d017-75ba-8805-4e39dd75cc5d@redhat.com>
+Date: Tue, 27 Feb 2018 09:21:48 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180227113841.GC2847@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V5 2/4] tests/migration: Convert the boot
+ block compilation script into Makefile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,37 +31,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, cohuck@redhat.com, thuth@redhat.com, mihajlov@linux.vnet.ibm.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, quintela@redhat.com, drjones@redhat.com
 
-It is possible that certain QEMU configurations may not
-create an IPLB (such as when -kernel is provided). In
-this case, a misleading error message will be printed
-stating that the "boot menu is not supported for this
-device type".
 
-To amend this, only print this message iff boot menu=on
-was provided on the commandline. Otherwise, return silently.
 
-Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
----
- hw/s390x/ipl.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+On 02/27/2018 05:38 AM, Dr. David Alan Gilbert wrote:
+> * Wei Huang (wei@redhat.com) wrote:
+>>
+>>
+>> On 02/26/2018 12:01 PM, Dr. David Alan Gilbert wrote:
+>>> * Wei Huang (wei@redhat.com) wrote:
+>>>> The x86 boot block header currently is generated with a shell script.
+>>>> To better support other CPUs (e.g. aarch64), we convert the script
+>>>> into Makefile. This allows us to 1) support cross-compilation easily,
+>>>> and 2) avoid creating a script file for every architecture.
+>>>>
+>>>> Signed-off-by: Wei Huang <wei@redhat.com>
+>>>
+>>> But what happens if you're on a system that doesn't have the cross
+>>> compilers?  I found it's too easy to get stuck with it trying
+>>> to rebuild the header when there's no need.
+>>
+>> I think it is fine. If no cross compiler is present, NNN_cross_prefix
+>> won't find anything. So it ends up with using the gcc tools on host
+>> systems. Obviously the compilation will fail. This should become the
+>> problem to solve for whoever wants to do cross-compile. For us, we have
+>> done our part because the .h files have been provided.
+> 
+> But isn't it a problem for people just trying to make check?
 
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index 798e99a..c4addb5 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -250,7 +250,9 @@ static void s390_ipl_set_boot_menu(S390IPLState *ipl)
-     case S390_IPL_TYPE_QEMU_SCSI:
-         break;
-     default:
--        error_report("boot menu is not supported for this device type.");
-+        if (boot_menu) {
-+            error_report("boot menu is not supported for this device type.");
-+        }
-         return;
-     }
- 
--- 
-2.7.4
+"make check" doesn't invoke the Makefile in tests/migration/. This
+Makefile is only invoked when people manually run "make" or "make
+x86-a-b-bootblock.h" inside the tests/migration/ directory.
+
+> One of the things that convinced me to move it out of the makefile and
+> into a separate script was that it was too easy to get into a situation
+> where Make wanted to rebuild the headerilfe on a system.
+
+This could be potentially one concern. But the real reason behind this
+concern is the cross-compilation doesn't always work (it depends on the
+availability of cross-compiler tools). My argument is this problem also
+exists in the original script approach. As long as QEMU doesn't include
+tests/migration/Makefile in "make" or "make check", I think this rebuild
+headerfile situation won't happen.
+
+Also, using Makefile, we don't need to write a script for each single
+architecture. And it is easier to support cross-compilation detection
+(than script).
+
+Thanks,
+-Wei
+
+> 
+> Dave
+> 
+>>>
+>>> Dave
+>>>
+>>>> ---
+>>>>  tests/migration/Makefile                 | 36 ++++++++++++++++++++++++++++++++
+>>>>  tests/migration/rebuild-x86-bootblock.sh | 33 -----------------------------
+>>>>  tests/migration/x86-a-b-bootblock.h      |  2 +-
+>>>>  tests/migration/x86-a-b-bootblock.s      |  5 ++---
+>>>>  4 files changed, 39 insertions(+), 37 deletions(-)
+>>>>  create mode 100644 tests/migration/Makefile
+>>>>  delete mode 100755 tests/migration/rebuild-x86-bootblock.sh
+>>>>
+>>>> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
+>>>> new file mode 100644
+>>>> index 0000000000..8fbedaa8b8
+>>>> --- /dev/null
+>>>> +++ b/tests/migration/Makefile
+>>>> @@ -0,0 +1,36 @@
+>>>> +#
+>>>> +# Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
+>>>> +#
+>>>> +# Authors:
+>>>> +#   Dave Gilbert <dgilbert@redhat.com>
+>>>> +#
+>>>> +# This work is licensed under the terms of the GNU GPL, version 2 or later.
+>>>> +# See the COPYING file in the top-level directory.
+>>>> +#
+>>>> +export __note
+>>>> +override define __note
+>>>> +/* This file is automatically generated from
+>>>> + * tests/migration/$<, edit that and then run
+>>>> + * "make $@" inside tests/migration to update,
+>>>> + * and then remember to send both in your patch submission.
+>>>> + */
+>>>> +endef
+>>>> +
+>>>> +all: x86-a-b-bootblock.h
+>>>> +# Dummy command so that make thinks it has done something
+>>>> +	@true
+>>>> +
+>>>> +SRC_PATH=../..
+>>>> +include $(SRC_PATH)/rules.mak
+>>>> +
+>>>> +x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
+>>>> +
+>>>> +x86-a-b-bootblock.h: x86-a-b-bootblock.s
+>>>> +	$(x86_64_cross_prefix)as --32 -march=i486 $< -o x86.o
+>>>> +	$(x86_64_cross_prefix)objcopy -O binary x86.o x86.boot
+>>>> +	dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124
+>>>> +	echo "$$__note" > $@
+>>>> +	xxd -i x86.bootsect | sed -e 's/.*int.*//' >> $@
+>>>> +
+>>>> +clean:
+>>>> +	rm -f *.bootsect *.boot *.o
+>>>> diff --git a/tests/migration/rebuild-x86-bootblock.sh b/tests/migration/rebuild-x86-bootblock.sh
+>>>> deleted file mode 100755
+>>>> index 86cec5d284..0000000000
+>>>> --- a/tests/migration/rebuild-x86-bootblock.sh
+>>>> +++ /dev/null
+>>>> @@ -1,33 +0,0 @@
+>>>> -#!/bin/sh
+>>>> -# Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
+>>>> -# This work is licensed under the terms of the GNU GPL, version 2 or later.
+>>>> -# See the COPYING file in the top-level directory.
+>>>> -#
+>>>> -# Author: dgilbert@redhat.com
+>>>> -
+>>>> -ASMFILE=$PWD/tests/migration/x86-a-b-bootblock.s
+>>>> -HEADER=$PWD/tests/migration/x86-a-b-bootblock.h
+>>>> -
+>>>> -if [ ! -e "$ASMFILE" ]
+>>>> -then
+>>>> -  echo "Couldn't find $ASMFILE" >&2
+>>>> -  exit 1
+>>>> -fi
+>>>> -
+>>>> -ASM_WORK_DIR=$(mktemp -d --tmpdir X86BB.XXXXXX)
+>>>> -cd "$ASM_WORK_DIR" &&
+>>>> -as --32 -march=i486 "$ASMFILE" -o x86.o &&
+>>>> -objcopy -O binary x86.o x86.boot &&
+>>>> -dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124 &&
+>>>> -xxd -i x86.bootsect |
+>>>> -sed -e 's/.*int.*//' > x86.hex &&
+>>>> -cat - x86.hex <<HERE > "$HEADER"
+>>>> -/* This file is automatically generated from
+>>>> - * tests/migration/x86-a-b-bootblock.s, edit that and then run
+>>>> - * tests/migration/rebuild-x86-bootblock.sh to update,
+>>>> - * and then remember to send both in your patch submission.
+>>>> - */
+>>>> -HERE
+>>>> -
+>>>> -rm x86.hex x86.bootsect x86.boot x86.o
+>>>> -cd .. && rmdir "$ASM_WORK_DIR"
+>>>> diff --git a/tests/migration/x86-a-b-bootblock.h b/tests/migration/x86-a-b-bootblock.h
+>>>> index 78a151fe2a..9e8e2e028b 100644
+>>>> --- a/tests/migration/x86-a-b-bootblock.h
+>>>> +++ b/tests/migration/x86-a-b-bootblock.h
+>>>> @@ -1,6 +1,6 @@
+>>>>  /* This file is automatically generated from
+>>>>   * tests/migration/x86-a-b-bootblock.s, edit that and then run
+>>>> - * tests/migration/rebuild-x86-bootblock.sh to update,
+>>>> + * "make x86-a-b-bootblock.h" inside tests/migration to update,
+>>>>   * and then remember to send both in your patch submission.
+>>>>   */
+>>>>  unsigned char x86_bootsect[] = {
+>>>> diff --git a/tests/migration/x86-a-b-bootblock.s b/tests/migration/x86-a-b-bootblock.s
+>>>> index b1642641a7..98dbfab084 100644
+>>>> --- a/tests/migration/x86-a-b-bootblock.s
+>>>> +++ b/tests/migration/x86-a-b-bootblock.s
+>>>> @@ -3,9 +3,8 @@
+>>>>  #  range.
+>>>>  #  Outputs an initial 'A' on serial followed by repeated 'B's
+>>>>  #
+>>>> -# run   tests/migration/rebuild-x86-bootblock.sh
+>>>> -#   to regenerate the hex, and remember to include both the .h and .s
+>>>> -#   in any patches.
+>>>> +#  In tests/migration dir, run 'make x86-a-b-bootblock.h' to regenerate
+>>>> +#  the hex, and remember to include both the .h and .s in any patches.
+>>>>  #
+>>>>  # Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
+>>>>  # This work is licensed under the terms of the GNU GPL, version 2 or later.
+>>>> -- 
+>>>> 2.14.3
+>>>>
+>>> --
+>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
