@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eqXzG-0004aZ-9j
+	(envelope-from <cota@braap.org>) id 1eqXzK-0004dB-Kk
 	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 00:39:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eqXzC-0000Q6-Kw
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 00:39:38 -0500
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:47437)
+	(envelope-from <cota@braap.org>) id 1eqXzC-0000QW-ST
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 00:39:42 -0500
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:37953)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eqXzC-0000PS-Fk
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eqXzC-0000P0-M3
 	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 00:39:34 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Tue, 27 Feb 2018 00:39:14 -0500
-Message-Id: <1519709965-29833-6-git-send-email-cota@braap.org>
+Date: Tue, 27 Feb 2018 00:39:12 -0500
+Message-Id: <1519709965-29833-4-git-send-email-cota@braap.org>
 In-Reply-To: <1519709965-29833-1-git-send-email-cota@braap.org>
 References: <1519709965-29833-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 05/16] translate-all: iterate over TBs in a
- page with PAGE_FOR_EACH_TB
+Subject: [Qemu-devel] [PATCH 03/16] tcg: track TBs with per-region BST's
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,223 +26,577 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-This commit does several things, but to avoid churn I merged them all
-into the same commit. To wit:
+This paves the way for enabling scalable parallel generation of TCG code.
 
-- Use uintptr_t instead of TranslationBlock * for the list of TBs in a page.
-  Just like we did in (c37e6d7e "tcg: Use uintptr_t type for
-  jmp_list_{next|first} fields of TB"), the rationale is the same: these
-  are tagged pointers, not pointers. So use a more appropriate type.
+Instead of tracking TBs with a single binary search tree (BST), use a
+BST for each TCG region, protecting it with a lock. This is as scalable
+as it gets, since each TCG thread operates on a separate region.
 
-- Only check the least significant bit of the tagged pointers. Masking
-  with 3/~3 is unnecessary and confusing.
+The core of this change is the introduction of struct tcg_region_tree,
+which contains a pointer to a GTree and an associated lock to serialize
+accesses to it. We then allocate an array of tcg_region_tree's, adding
+the appropriate padding to avoid false sharing based on
+qemu_dcache_linesize.
 
-- Introduce the TB_FOR_EACH_TAGGED macro, and use it to define
-  PAGE_FOR_EACH_TB, which improves readability.
+Given a tc_ptr, we first find the corresponding region_tree. This
+is done by special-casing the first and last regions first, since they
+might be of size != region.size; otherwise we just divide the offset
+by region.stride. I was worried about this division (several dozen
+cycles of latency), but profiling shows that this is not a fast path.
+Note that region.stride is not required to be a power of two; it
+is only required to be a multiple of the host's page size.
 
-- Update tb_page_remove to use PAGE_FOR_EACH_TB. In case there
-  is a bug and we attempt to remove a TB that is not in the list, instead
-  of segfaulting (since the list is NULL-terminated) we will reach
-  g_assert_not_reached().
+Note that with this design we can also provide consistent snapshots
+about all region trees at once; for instance, tcg_tb_foreach
+acquires/releases all region_tree locks before/after iterating over them.
+For this reason we now drop tb_lock in dump_exec_info().
+
+As an alternative I considered implementing a concurrent BST, but this
+can be tricky to get right, offers no consistent snapshots of the BST,
+and performance and scalability-wise I don't think it could ever beat
+having separate GTrees, given that our workload is insert-mostly (all
+concurrent BST designs I've seen focus, understandably, on making
+lookups fast, which comes at the expense of convoluted, non-wait-free
+insertions/removals).
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/translate-all.c | 65 +++++++++++++++++++++++------------------------
- include/exec/exec-all.h   |  2 +-
- 2 files changed, 33 insertions(+), 34 deletions(-)
+ accel/tcg/cpu-exec.c      |   2 +-
+ accel/tcg/translate-all.c | 101 ++++--------------------
+ include/exec/exec-all.h   |   1 -
+ include/exec/tb-context.h |   1 -
+ tcg/tcg.c                 | 191 ++++++++++++++++++++++++++++++++++++++++++++++
+ tcg/tcg.h                 |   6 ++
+ 6 files changed, 213 insertions(+), 89 deletions(-)
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 20ad3fc..06aa905 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -103,7 +103,7 @@
- 
- typedef struct PageDesc {
-     /* list of TBs intersecting this ram page */
--    TranslationBlock *first_tb;
-+    uintptr_t first_tb;
- #ifdef CONFIG_SOFTMMU
-     /* in order to optimize self modifying code, we count the number
-        of lookups we do to a given page to use a bitmap */
-@@ -114,6 +114,18 @@ typedef struct PageDesc {
- #endif
- } PageDesc;
- 
-+/* list iterators for lists of tagged pointers in TranslationBlock */
-+#define TB_FOR_EACH_TAGGED(head, tb, n, field)                  \
-+    for (n = (head) & 1,                                        \
-+             tb = (TranslationBlock *)((head) & ~1);            \
-+         tb;                                                    \
-+         tb = (TranslationBlock *)tb->field[n],                 \
-+             n = (uintptr_t)tb & 1,                             \
-+             tb = (TranslationBlock *)((uintptr_t)tb & ~1))
-+
-+#define PAGE_FOR_EACH_TB(pagedesc, tb, n)                       \
-+    TB_FOR_EACH_TAGGED((pagedesc)->first_tb, tb, n, page_next)
-+
- /* In system mode we want L1_MAP to be based on ram offsets,
-    while in user mode we want it to be based on virtual addresses.  */
- #if !defined(CONFIG_USER_ONLY)
-@@ -818,7 +830,7 @@ static void page_flush_tb_1(int level, void **lp)
-         PageDesc *pd = *lp;
- 
-         for (i = 0; i < V_L2_SIZE; ++i) {
--            pd[i].first_tb = NULL;
-+            pd[i].first_tb = (uintptr_t)NULL;
-             invalidate_page_bitmap(pd + i);
-         }
-     } else {
-@@ -946,21 +958,21 @@ static void tb_page_check(void)
- 
- #endif /* CONFIG_USER_ONLY */
- 
--static inline void tb_page_remove(TranslationBlock **ptb, TranslationBlock *tb)
-+static inline void tb_page_remove(PageDesc *pd, TranslationBlock *tb)
- {
-     TranslationBlock *tb1;
-+    uintptr_t *pprev;
-     unsigned int n1;
- 
--    for (;;) {
--        tb1 = *ptb;
--        n1 = (uintptr_t)tb1 & 3;
--        tb1 = (TranslationBlock *)((uintptr_t)tb1 & ~3);
-+    pprev = &pd->first_tb;
-+    PAGE_FOR_EACH_TB(pd, tb1, n1) {
-         if (tb1 == tb) {
--            *ptb = tb1->page_next[n1];
--            break;
-+            *pprev = tb1->page_next[n1];
-+            return;
-         }
--        ptb = &tb1->page_next[n1];
-+        pprev = &tb1->page_next[n1];
-     }
-+    g_assert_not_reached();
- }
- 
- /* remove the TB from a list of TBs jumping to the n-th jump target of the TB */
-@@ -1048,12 +1060,12 @@ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr)
-     /* remove the TB from the page list */
-     if (tb->page_addr[0] != page_addr) {
-         p = page_find(tb->page_addr[0] >> TARGET_PAGE_BITS);
--        tb_page_remove(&p->first_tb, tb);
-+        tb_page_remove(p, tb);
-         invalidate_page_bitmap(p);
-     }
-     if (tb->page_addr[1] != -1 && tb->page_addr[1] != page_addr) {
-         p = page_find(tb->page_addr[1] >> TARGET_PAGE_BITS);
--        tb_page_remove(&p->first_tb, tb);
-+        tb_page_remove(p, tb);
-         invalidate_page_bitmap(p);
-     }
- 
-@@ -1084,10 +1096,7 @@ static void build_page_bitmap(PageDesc *p)
- 
-     p->code_bitmap = bitmap_new(TARGET_PAGE_SIZE);
- 
--    tb = p->first_tb;
--    while (tb != NULL) {
--        n = (uintptr_t)tb & 3;
--        tb = (TranslationBlock *)((uintptr_t)tb & ~3);
-+    PAGE_FOR_EACH_TB(p, tb, n) {
-         /* NOTE: this is subtle as a TB may span two physical pages */
-         if (n == 0) {
-             /* NOTE: tb_end may be after the end of the page, but
-@@ -1102,7 +1111,6 @@ static void build_page_bitmap(PageDesc *p)
-             tb_end = ((tb->pc + tb->size) & ~TARGET_PAGE_MASK);
-         }
-         bitmap_set(p->code_bitmap, tb_start, tb_end - tb_start);
--        tb = tb->page_next[n];
-     }
- }
- #endif
-@@ -1125,9 +1133,9 @@ static inline void tb_alloc_page(TranslationBlock *tb,
-     p = page_find_alloc(page_addr >> TARGET_PAGE_BITS, 1);
-     tb->page_next[n] = p->first_tb;
- #ifndef CONFIG_USER_ONLY
--    page_already_protected = p->first_tb != NULL;
-+    page_already_protected = p->first_tb != (uintptr_t)NULL;
- #endif
--    p->first_tb = (TranslationBlock *)((uintptr_t)tb | n);
-+    p->first_tb = (uintptr_t)tb | n;
-     invalidate_page_bitmap(p);
- 
- #if defined(CONFIG_USER_ONLY)
-@@ -1404,7 +1412,7 @@ void tb_invalidate_phys_range(tb_page_addr_t start, tb_page_addr_t end)
- void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
-                                    int is_cpu_write_access)
- {
--    TranslationBlock *tb, *tb_next;
-+    TranslationBlock *tb;
-     tb_page_addr_t tb_start, tb_end;
-     PageDesc *p;
-     int n;
-@@ -1435,11 +1443,7 @@ void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
-     /* we remove all the TBs in the range [start, end[ */
-     /* XXX: see if in some cases it could be faster to invalidate all
-        the code */
--    tb = p->first_tb;
--    while (tb != NULL) {
--        n = (uintptr_t)tb & 3;
--        tb = (TranslationBlock *)((uintptr_t)tb & ~3);
--        tb_next = tb->page_next[n];
-+    PAGE_FOR_EACH_TB(p, tb, n) {
-         /* NOTE: this is subtle as a TB may span two physical pages */
-         if (n == 0) {
-             /* NOTE: tb_end may be after the end of the page, but
-@@ -1476,7 +1480,6 @@ void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
- #endif /* TARGET_HAS_PRECISE_SMC */
-             tb_phys_invalidate(tb, -1);
-         }
--        tb = tb_next;
-     }
- #if !defined(CONFIG_USER_ONLY)
-     /* if no code remaining, no need to continue to use slow writes */
-@@ -1570,18 +1573,15 @@ static bool tb_invalidate_phys_page(tb_page_addr_t addr, uintptr_t pc)
-     }
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index ec57564..8c68727 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -222,7 +222,7 @@ static void cpu_exec_nocache(CPUState *cpu, int max_cycles,
  
      tb_lock();
--    tb = p->first_tb;
+     tb_phys_invalidate(tb, -1);
+-    tb_remove(tb);
++    tcg_tb_remove(tb);
+     tb_unlock();
+ }
+ #endif
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 1cf10f8..3a51d49 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -205,8 +205,6 @@ void tb_lock_reset(void)
+     }
+ }
+ 
+-static TranslationBlock *tb_find_pc(uintptr_t tc_ptr);
+-
+ void cpu_gen_init(void)
+ {
+     tcg_context_init(&tcg_init_ctx);
+@@ -375,13 +373,13 @@ bool cpu_restore_state(CPUState *cpu, uintptr_t host_pc)
+ 
+     if (check_offset < tcg_init_ctx.code_gen_buffer_size) {
+         tb_lock();
+-        tb = tb_find_pc(host_pc);
++        tb = tcg_tb_lookup(host_pc);
+         if (tb) {
+             cpu_restore_state_from_tb(cpu, tb, host_pc);
+             if (tb->cflags & CF_NOCACHE) {
+                 /* one-shot translation, invalidate it immediately */
+                 tb_phys_invalidate(tb, -1);
+-                tb_remove(tb);
++                tcg_tb_remove(tb);
+             }
+             r = true;
+         }
+@@ -731,48 +729,6 @@ static inline void *alloc_code_gen_buffer(void)
+ }
+ #endif /* USE_STATIC_CODE_GEN_BUFFER, WIN32, POSIX */
+ 
+-/* compare a pointer @ptr and a tb_tc @s */
+-static int ptr_cmp_tb_tc(const void *ptr, const struct tb_tc *s)
+-{
+-    if (ptr >= s->ptr + s->size) {
+-        return 1;
+-    } else if (ptr < s->ptr) {
+-        return -1;
+-    }
+-    return 0;
+-}
+-
+-static gint tb_tc_cmp(gconstpointer ap, gconstpointer bp)
+-{
+-    const struct tb_tc *a = ap;
+-    const struct tb_tc *b = bp;
+-
+-    /*
+-     * When both sizes are set, we know this isn't a lookup.
+-     * This is the most likely case: every TB must be inserted; lookups
+-     * are a lot less frequent.
+-     */
+-    if (likely(a->size && b->size)) {
+-        if (a->ptr > b->ptr) {
+-            return 1;
+-        } else if (a->ptr < b->ptr) {
+-            return -1;
+-        }
+-        /* a->ptr == b->ptr should happen only on deletions */
+-        g_assert(a->size == b->size);
+-        return 0;
+-    }
+-    /*
+-     * All lookups have either .size field set to 0.
+-     * From the glib sources we see that @ap is always the lookup key. However
+-     * the docs provide no guarantee, so we just mark this case as likely.
+-     */
+-    if (likely(a->size == 0)) {
+-        return ptr_cmp_tb_tc(a->ptr, b);
+-    }
+-    return ptr_cmp_tb_tc(b->ptr, a);
+-}
+-
+ static inline void code_gen_alloc(size_t tb_size)
+ {
+     tcg_ctx->code_gen_buffer_size = size_code_gen_buffer(tb_size);
+@@ -781,7 +737,6 @@ static inline void code_gen_alloc(size_t tb_size)
+         fprintf(stderr, "Could not allocate dynamic translator buffer\n");
+         exit(1);
+     }
+-    tb_ctx.tb_tree = g_tree_new(tb_tc_cmp);
+     qemu_mutex_init(&tb_ctx.tb_lock);
+ }
+ 
+@@ -842,14 +797,6 @@ static TranslationBlock *tb_alloc(target_ulong pc)
+     return tb;
+ }
+ 
+-/* Called with tb_lock held.  */
+-void tb_remove(TranslationBlock *tb)
+-{
+-    assert_tb_locked();
+-
+-    g_tree_remove(tb_ctx.tb_tree, &tb->tc);
+-}
+-
+ static inline void invalidate_page_bitmap(PageDesc *p)
+ {
+ #ifdef CONFIG_SOFTMMU
+@@ -914,10 +861,10 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
+     }
+ 
+     if (DEBUG_TB_FLUSH_GATE) {
+-        size_t nb_tbs = g_tree_nnodes(tb_ctx.tb_tree);
++        size_t nb_tbs = tcg_nb_tbs();
+         size_t host_size = 0;
+ 
+-        g_tree_foreach(tb_ctx.tb_tree, tb_host_size_iter, &host_size);
++        tcg_tb_foreach(tb_host_size_iter, &host_size);
+         printf("qemu: flush code_size=%zu nb_tbs=%zu avg_tb_size=%zu\n",
+                tcg_code_size(), nb_tbs, nb_tbs > 0 ? host_size / nb_tbs : 0);
+     }
+@@ -926,10 +873,6 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
+         cpu_tb_jmp_cache_clear(cpu);
+     }
+ 
+-    /* Increment the refcount first so that destroy acts as a reset */
+-    g_tree_ref(tb_ctx.tb_tree);
+-    g_tree_destroy(tb_ctx.tb_tree);
+-
+     qht_reset_size(&tb_ctx.htable, CODE_GEN_HTABLE_SIZE);
+     page_flush_tb();
+ 
+@@ -1409,7 +1352,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+      * through the physical hash table and physical page list.
+      */
+     tb_link_page(tb, phys_pc, phys_page2);
+-    g_tree_insert(tb_ctx.tb_tree, &tb->tc, tb);
++    tcg_tb_insert(tb);
+     return tb;
+ }
+ 
+@@ -1513,7 +1456,7 @@ void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
+                 current_tb = NULL;
+                 if (cpu->mem_io_pc) {
+                     /* now we have a real cpu fault */
+-                    current_tb = tb_find_pc(cpu->mem_io_pc);
++                    current_tb = tcg_tb_lookup(cpu->mem_io_pc);
+                 }
+             }
+             if (current_tb == tb &&
+@@ -1629,7 +1572,7 @@ static bool tb_invalidate_phys_page(tb_page_addr_t addr, uintptr_t pc)
+     tb = p->first_tb;
  #ifdef TARGET_HAS_PRECISE_SMC
--    if (tb && pc != 0) {
-+    if (p->first_tb && pc != 0) {
-         current_tb = tcg_tb_lookup(pc);
+     if (tb && pc != 0) {
+-        current_tb = tb_find_pc(pc);
++        current_tb = tcg_tb_lookup(pc);
      }
      if (cpu != NULL) {
          env = cpu->env_ptr;
-     }
+@@ -1672,18 +1615,6 @@ static bool tb_invalidate_phys_page(tb_page_addr_t addr, uintptr_t pc)
+ }
  #endif
--    while (tb != NULL) {
--        n = (uintptr_t)tb & 3;
--        tb = (TranslationBlock *)((uintptr_t)tb & ~3);
-+    PAGE_FOR_EACH_TB(p, tb, n) {
- #ifdef TARGET_HAS_PRECISE_SMC
-         if (current_tb == tb &&
-             (current_tb->cflags & CF_COUNT_MASK) != 1) {
-@@ -1598,9 +1598,8 @@ static bool tb_invalidate_phys_page(tb_page_addr_t addr, uintptr_t pc)
+ 
+-/*
+- * Find the TB 'tb' such that
+- * tb->tc.ptr <= tc_ptr < tb->tc.ptr + tb->tc.size
+- * Return NULL if not found.
+- */
+-static TranslationBlock *tb_find_pc(uintptr_t tc_ptr)
+-{
+-    struct tb_tc s = { .ptr = (void *)tc_ptr };
+-
+-    return g_tree_lookup(tb_ctx.tb_tree, &s);
+-}
+-
+ #if !defined(CONFIG_USER_ONLY)
+ void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr)
+ {
+@@ -1711,7 +1642,7 @@ void tb_check_watchpoint(CPUState *cpu)
+ {
+     TranslationBlock *tb;
+ 
+-    tb = tb_find_pc(cpu->mem_io_pc);
++    tb = tcg_tb_lookup(cpu->mem_io_pc);
+     if (tb) {
+         /* We can use retranslation to find the PC.  */
+         cpu_restore_state_from_tb(cpu, tb, cpu->mem_io_pc);
+@@ -1745,7 +1676,7 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+     uint32_t n;
+ 
+     tb_lock();
+-    tb = tb_find_pc(retaddr);
++    tb = tcg_tb_lookup(retaddr);
+     if (!tb) {
+         cpu_abort(cpu, "cpu_io_recompile: could not find TB for pc=%p",
+                   (void *)retaddr);
+@@ -1789,7 +1720,7 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+              * cpu_exec_nocache() */
+             tb_phys_invalidate(tb->orig_tb, -1);
          }
- #endif /* TARGET_HAS_PRECISE_SMC */
-         tb_phys_invalidate(tb, addr);
--        tb = tb->page_next[n];
+-        tb_remove(tb);
++        tcg_tb_remove(tb);
      }
--    p->first_tb = NULL;
-+    p->first_tb = (uintptr_t)NULL;
+ 
+     /* TODO: If env->pc != tb->pc (i.e. the faulting instruction was not
+@@ -1860,6 +1791,7 @@ static void print_qht_statistics(FILE *f, fprintf_function cpu_fprintf,
+ }
+ 
+ struct tb_tree_stats {
++    size_t nb_tbs;
+     size_t host_size;
+     size_t target_size;
+     size_t max_target_size;
+@@ -1873,6 +1805,7 @@ static gboolean tb_tree_stats_iter(gpointer key, gpointer value, gpointer data)
+     const TranslationBlock *tb = value;
+     struct tb_tree_stats *tst = data;
+ 
++    tst->nb_tbs++;
+     tst->host_size += tb->tc.size;
+     tst->target_size += tb->size;
+     if (tb->size > tst->max_target_size) {
+@@ -1896,10 +1829,8 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
+     struct qht_stats hst;
+     size_t nb_tbs;
+ 
+-    tb_lock();
+-
+-    nb_tbs = g_tree_nnodes(tb_ctx.tb_tree);
+-    g_tree_foreach(tb_ctx.tb_tree, tb_tree_stats_iter, &tst);
++    tcg_tb_foreach(tb_tree_stats_iter, &tst);
++    nb_tbs = tst.nb_tbs;
+     /* XXX: avoid using doubles ? */
+     cpu_fprintf(f, "Translation buffer state:\n");
+     /*
+@@ -1934,8 +1865,6 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
+     cpu_fprintf(f, "TB invalidate count %d\n", tb_ctx.tb_phys_invalidate_count);
+     cpu_fprintf(f, "TLB flush count     %zu\n", tlb_flush_count());
+     tcg_dump_info(f, cpu_fprintf);
+-
+-    tb_unlock();
+ }
+ 
+ void dump_opcount_info(FILE *f, fprintf_function cpu_fprintf)
+@@ -2203,7 +2132,7 @@ int page_unprotect(target_ulong address, uintptr_t pc)
+              * set the page to PAGE_WRITE and did the TB invalidate for us.
+              */
  #ifdef TARGET_HAS_PRECISE_SMC
-     if (current_tb_modified) {
-         /* Force execution of one insn next time.  */
+-            TranslationBlock *current_tb = tb_find_pc(pc);
++            TranslationBlock *current_tb = tcg_tb_lookup(pc);
+             if (current_tb) {
+                 current_tb_invalidated = tb_cflags(current_tb) & CF_INVALID;
+             }
 diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 17e08b3..5f7e65a 100644
+index e5afd2e..17e08b3 100644
 --- a/include/exec/exec-all.h
 +++ b/include/exec/exec-all.h
-@@ -356,7 +356,7 @@ struct TranslationBlock {
-     struct TranslationBlock *orig_tb;
-     /* first and second physical page containing code. The lower bit
-        of the pointer tells the index in page_next[] */
--    struct TranslationBlock *page_next[2];
-+    uintptr_t page_next[2];
-     tb_page_addr_t page_addr[2];
+@@ -401,7 +401,6 @@ static inline uint32_t curr_cflags(void)
+          | (use_icount ? CF_USE_ICOUNT : 0);
+ }
  
-     /* The following data are used to directly call another TB from
+-void tb_remove(TranslationBlock *tb);
+ void tb_flush(CPUState *cpu);
+ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr);
+ TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
+diff --git a/include/exec/tb-context.h b/include/exec/tb-context.h
+index 1d41202..d8472c8 100644
+--- a/include/exec/tb-context.h
++++ b/include/exec/tb-context.h
+@@ -31,7 +31,6 @@ typedef struct TBContext TBContext;
+ 
+ struct TBContext {
+ 
+-    GTree *tb_tree;
+     struct qht htable;
+     /* any access to the tbs or the page table must use this lock */
+     QemuMutex tb_lock;
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index bb24526..b471708 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -135,6 +135,12 @@ static TCGContext **tcg_ctxs;
+ static unsigned int n_tcg_ctxs;
+ TCGv_env cpu_env = 0;
+ 
++struct tcg_region_tree {
++    QemuMutex lock;
++    GTree *tree;
++    /* padding to avoid false sharing is computed at run-time */
++};
++
+ /*
+  * We divide code_gen_buffer into equally-sized "regions" that TCG threads
+  * dynamically allocate from as demand dictates. Given appropriate region
+@@ -158,6 +164,13 @@ struct tcg_region_state {
+ };
+ 
+ static struct tcg_region_state region;
++/*
++ * This is an array of struct tcg_region_tree's, with padding.
++ * We use void * to simplify the computation of region_trees[i]; each
++ * struct is found every tree_size bytes.
++ */
++static void *region_trees;
++static size_t tree_size;
+ static TCGRegSet tcg_target_available_regs[TCG_TYPE_COUNT];
+ static TCGRegSet tcg_target_call_clobber_regs;
+ 
+@@ -295,6 +308,180 @@ TCGLabel *gen_new_label(void)
+ 
+ #include "tcg-target.inc.c"
+ 
++/* compare a pointer @ptr and a tb_tc @s */
++static int ptr_cmp_tb_tc(const void *ptr, const struct tb_tc *s)
++{
++    if (ptr >= s->ptr + s->size) {
++        return 1;
++    } else if (ptr < s->ptr) {
++        return -1;
++    }
++    return 0;
++}
++
++static gint tb_tc_cmp(gconstpointer ap, gconstpointer bp)
++{
++    const struct tb_tc *a = ap;
++    const struct tb_tc *b = bp;
++
++    /*
++     * When both sizes are set, we know this isn't a lookup.
++     * This is the most likely case: every TB must be inserted; lookups
++     * are a lot less frequent.
++     */
++    if (likely(a->size && b->size)) {
++        if (a->ptr > b->ptr) {
++            return 1;
++        } else if (a->ptr < b->ptr) {
++            return -1;
++        }
++        /* a->ptr == b->ptr should happen only on deletions */
++        g_assert(a->size == b->size);
++        return 0;
++    }
++    /*
++     * All lookups have either .size field set to 0.
++     * From the glib sources we see that @ap is always the lookup key. However
++     * the docs provide no guarantee, so we just mark this case as likely.
++     */
++    if (likely(a->size == 0)) {
++        return ptr_cmp_tb_tc(a->ptr, b);
++    }
++    return ptr_cmp_tb_tc(b->ptr, a);
++}
++
++static void tcg_region_trees_init(void)
++{
++    size_t i;
++
++    tree_size = ROUND_UP(sizeof(struct tcg_region_tree), qemu_dcache_linesize);
++    region_trees = qemu_memalign(qemu_dcache_linesize, region.n * tree_size);
++    for (i = 0; i < region.n; i++) {
++        struct tcg_region_tree *rt = region_trees + i * tree_size;
++
++        qemu_mutex_init(&rt->lock);
++        rt->tree = g_tree_new(tb_tc_cmp);
++    }
++}
++
++static struct tcg_region_tree *tc_ptr_to_region_tree(void *p)
++{
++    size_t region_idx;
++
++    if (p < region.start_aligned) {
++        region_idx = 0;
++    } else {
++        ptrdiff_t offset = p - region.start_aligned;
++
++        if (offset > region.stride * (region.n - 1)) {
++            region_idx = region.n - 1;
++        } else {
++            region_idx = offset / region.stride;
++        }
++    }
++    return region_trees + region_idx * tree_size;
++}
++
++void tcg_tb_insert(TranslationBlock *tb)
++{
++    struct tcg_region_tree *rt = tc_ptr_to_region_tree(tb->tc.ptr);
++
++    qemu_mutex_lock(&rt->lock);
++    g_tree_insert(rt->tree, &tb->tc, tb);
++    qemu_mutex_unlock(&rt->lock);
++}
++
++void tcg_tb_remove(TranslationBlock *tb)
++{
++    struct tcg_region_tree *rt = tc_ptr_to_region_tree(tb->tc.ptr);
++
++    qemu_mutex_lock(&rt->lock);
++    g_tree_remove(rt->tree, &tb->tc);
++    qemu_mutex_unlock(&rt->lock);
++}
++
++/*
++ * Find the TB 'tb' such that
++ * tb->tc.ptr <= tc_ptr < tb->tc.ptr + tb->tc.size
++ * Return NULL if not found.
++ */
++TranslationBlock *tcg_tb_lookup(uintptr_t tc_ptr)
++{
++    struct tcg_region_tree *rt = tc_ptr_to_region_tree((void *)tc_ptr);
++    TranslationBlock *tb;
++    struct tb_tc s = { .ptr = (void *)tc_ptr };
++
++    qemu_mutex_lock(&rt->lock);
++    tb = g_tree_lookup(rt->tree, &s);
++    qemu_mutex_unlock(&rt->lock);
++    return tb;
++}
++
++static void tcg_region_tree_lock_all(void)
++{
++    size_t i;
++
++    for (i = 0; i < region.n; i++) {
++        struct tcg_region_tree *rt = region_trees + i * tree_size;
++
++        qemu_mutex_lock(&rt->lock);
++    }
++}
++
++static void tcg_region_tree_unlock_all(void)
++{
++    size_t i;
++
++    for (i = 0; i < region.n; i++) {
++        struct tcg_region_tree *rt = region_trees + i * tree_size;
++
++        qemu_mutex_unlock(&rt->lock);
++    }
++}
++
++void tcg_tb_foreach(GTraverseFunc func, gpointer user_data)
++{
++    size_t i;
++
++    tcg_region_tree_lock_all();
++    for (i = 0; i < region.n; i++) {
++        struct tcg_region_tree *rt = region_trees + i * tree_size;
++
++        g_tree_foreach(rt->tree, func, user_data);
++    }
++    tcg_region_tree_unlock_all();
++}
++
++size_t tcg_nb_tbs(void)
++{
++    size_t nb_tbs = 0;
++    size_t i;
++
++    tcg_region_tree_lock_all();
++    for (i = 0; i < region.n; i++) {
++        struct tcg_region_tree *rt = region_trees + i * tree_size;
++
++        nb_tbs += g_tree_nnodes(rt->tree);
++    }
++    tcg_region_tree_unlock_all();
++    return nb_tbs;
++}
++
++static void tcg_region_tree_reset_all(void)
++{
++    size_t i;
++
++    tcg_region_tree_lock_all();
++    for (i = 0; i < region.n; i++) {
++        struct tcg_region_tree *rt = region_trees + i * tree_size;
++
++        /* Increment the refcount first so that destroy acts as a reset */
++        g_tree_ref(rt->tree);
++        g_tree_destroy(rt->tree);
++    }
++    tcg_region_tree_unlock_all();
++}
++
+ static void tcg_region_bounds(size_t curr_region, void **pstart, void **pend)
+ {
+     void *start, *end;
+@@ -380,6 +567,8 @@ void tcg_region_reset_all(void)
+         g_assert(!err);
+     }
+     qemu_mutex_unlock(&region.lock);
++
++    tcg_region_tree_reset_all();
+ }
+ 
+ #ifdef CONFIG_USER_ONLY
+@@ -496,6 +685,8 @@ void tcg_region_init(void)
+         g_assert(!rc);
+     }
+ 
++    tcg_region_trees_init();
++
+     /* In user-mode we support only one ctx, so do the initial allocation now */
+ #ifdef CONFIG_USER_ONLY
+     {
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 9e2d909..8bf29cc 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -850,6 +850,12 @@ void tcg_region_reset_all(void);
+ size_t tcg_code_size(void);
+ size_t tcg_code_capacity(void);
+ 
++void tcg_tb_insert(TranslationBlock *tb);
++void tcg_tb_remove(TranslationBlock *tb);
++TranslationBlock *tcg_tb_lookup(uintptr_t tc_ptr);
++void tcg_tb_foreach(GTraverseFunc func, gpointer user_data);
++size_t tcg_nb_tbs(void);
++
+ /* user-mode: Called with tb_lock held.  */
+ static inline void *tcg_malloc(int size)
+ {
 -- 
 2.7.4
