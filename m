@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eqgrT-0003wQ-O2
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:08:18 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eqgsm-00058g-OL
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:09:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eqgrN-0001h9-Ke
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:08:11 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eqgsg-00026k-Qn
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:09:32 -0500
+Date: Tue, 27 Feb 2018 16:09:10 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180227160910.44e1a51c@redhat.com>
+In-Reply-To: <a431c9e9-5756-5fec-3bf5-716055202a5e@redhat.com>
 References: <1519303376-92875-1-git-send-email-imammedo@redhat.com>
-	<1519303376-92875-9-git-send-email-imammedo@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <9277c150-6830-8fb1-0092-4bdfd6ba0486@redhat.com>
-Date: Tue, 27 Feb 2018 16:07:49 +0100
+	<1519303376-92875-2-git-send-email-imammedo@redhat.com>
+	<a431c9e9-5756-5fec-3bf5-716055202a5e@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1519303376-92875-9-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 8/9] virt_arm: acpi: reuse common
- build_fadt()
+Subject: Re: [Qemu-devel] [PATCH 1/9] acpi: remove unused acpi-dsdt.aml
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,156 +24,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>
 
-Hi Igor,
-On 22/02/18 13:42, Igor Mammedov wrote:
-> Extend generic build_fadt() to support rev5.1 FADT
-> and reuse it for 'virt' board, it would allow to
-> phase out usage of AcpiFadtDescriptorRev5_1 and
-> later ACPI_FADT_COMMON_DEF.
-Oups sorry sent the R-b to fast. Some small comments below.
+On Tue, 27 Feb 2018 13:42:38 +0100
+Auger Eric <eric.auger@redhat.com> wrote:
+
+> Hi,
 > 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->  include/hw/acpi/acpi-defs.h | 12 ++----------
->  hw/acpi/aml-build.c         | 21 ++++++++++++++++++++-
->  hw/arm/virt-acpi-build.c    | 33 ++++++++++++---------------------
->  3 files changed, 34 insertions(+), 32 deletions(-)
+> On 22/02/18 13:42, Igor Mammedov wrote:
+> > SeaBIOS blob which is currently shipped with QEMU
+> > doesn't need acpi-dsdt.aml nor is able to use it
+> > and code that loaded it QEMU was removed by  
+> as code that loaded it in QEMU was removed by?
+Thanks, I'll fix it on respin.
+
+> > (commit 9fb7aaaf4c "pc: drop external DSDT loading")
+> > in 2013.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > CC: Gerd Hoffmann <kraxel@redhat.com>  
+> Otherwise
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
 > 
-> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-> index e0accc4..34e49dc 100644
-> --- a/include/hw/acpi/acpi-defs.h
-> +++ b/include/hw/acpi/acpi-defs.h
-> @@ -165,16 +165,6 @@ struct AcpiFadtDescriptorRev3 {
->  } QEMU_PACKED;
->  typedef struct AcpiFadtDescriptorRev3 AcpiFadtDescriptorRev3;
->  
-> -struct AcpiFadtDescriptorRev5_1 {
-> -    ACPI_FADT_COMMON_DEF
-> -    /* 64-bit Sleep Control register (ACPI 5.0) */
-> -    struct AcpiGenericAddress sleep_control;
-> -    /* 64-bit Sleep Status register (ACPI 5.0) */
-> -    struct AcpiGenericAddress sleep_status;
-> -} QEMU_PACKED;
-> -
-> -typedef struct AcpiFadtDescriptorRev5_1 AcpiFadtDescriptorRev5_1;
-> -
->  typedef struct AcpiFadtData {
->      struct AcpiGenericAddress pm1_cnt;   /* PM1a_CNT_BLK */
->      struct AcpiGenericAddress pm1_evt;   /* PM1a_EVT_BLK */
-> @@ -192,6 +182,8 @@ typedef struct AcpiFadtData {
->      uint8_t  rtc_century;      /* CENTURY */
->      uint16_t c2_latency;       /* P_LVL2_LAT */
->      uint16_t c3_latency;       /* P_LVL3_LAT */
-> +    uint16_t arm_boot_arch;    /* ARM_BOOT_ARCH */
-> +    uint8_t minor_ver;         /* FADT Minor Version */
->  
->      /*
->       * respective tables offsets within ACPI_BUILD_TABLE_FILE,
-> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-> index 17fb71b..5a33cd0 100644
-> --- a/hw/acpi/aml-build.c
-> +++ b/hw/acpi/aml-build.c
-
-nit: comment above needs to be extended to rev5.1 support
-> @@ -1755,7 +1755,14 @@ void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
->  
->      build_append_gas_from_struct(tbl, &f->reset_reg); /* RESET_REG */
->      build_append_int_noprefix(tbl, f->reset_val, 1); /* RESET_VALUE */
-> -    build_append_int_noprefix(tbl, 0, 3); /* Reserved, ACPI 3.0 */
-> +    /* Since ACPI 5.1 */
-> +    if ((f->rev >= 6) || ((f->rev == 5) && f->minor_ver > 0)) {
-> +        build_append_int_noprefix(tbl, f->arm_boot_arch, 2); /* ARM_BOOT_ARCH */
-> +        /* FADT Minor Version */
-> +        build_append_int_noprefix(tbl, f->minor_ver, 1);
-> +    } else {
-> +        build_append_int_noprefix(tbl, 0, 3); /* Reserved upto ACPI 5.0 */
-> +    }
->      build_append_int_noprefix(tbl, 0, 8); /* X_FIRMWARE_CTRL */
->  
->      /* XDSDT address to be filled by Guest linker at runtime */
-> @@ -1779,6 +1786,18 @@ void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
->      build_append_gas_from_struct(tbl, &f->gpe0_blk); /* X_GPE0_BLK */
->      build_append_gas(tbl, AML_AS_SYSTEM_MEMORY, 0 , 0, 0, 0); /* X_GPE1_BLK */
->  
-> +    if (f->rev <= 4) {
-> +        goto build_hdr;
-> +    }
-> +
-> +    /* SLEEP_CONTROL_REG */
-> +    build_append_gas(tbl, AML_AS_SYSTEM_MEMORY, 0 , 0, 0, 0);
-> +    /* SLEEP_STATUS_REG */
-> +    build_append_gas(tbl, AML_AS_SYSTEM_MEMORY, 0 , 0, 0, 0);
-
-what about Hypervisor Vendor Identity field (8 byte) in version 6.0?
-> +
-> +    /* TODO: extra fields need to be added to support revisions above rev5 */
-> +    assert(f->rev == 5);
-OK so can't we assert before the (f->rev >= 6) check above?
-
-Thanks
-
-Eric
-> +
->  build_hdr:
->      build_header(linker, tbl, (void *)(tbl->data + fadt_start),
->                   "FACP", tbl->len - fadt_start, f->rev, oem_id, oem_table_id);
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index b644da9..c7c6a57 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -654,39 +654,30 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->  static void build_fadt_rev5(GArray *table_data, BIOSLinker *linker,
->                              VirtMachineState *vms, unsigned dsdt_tbl_offset)
->  {
-> -    int fadt_start = table_data->len;
-> -    AcpiFadtDescriptorRev5_1 *fadt = acpi_data_push(table_data, sizeof(*fadt));
-> -    unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
-> -    uint16_t bootflags;
-> +    /* ACPI v5.1 */
-> +    AcpiFadtData fadt = {
-> +        .rev = 5,
-> +        .minor_ver = 1,
-> +        .flags = 1 << ACPI_FADT_F_HW_REDUCED_ACPI,
-> +        .xdsdt_tbl_offset = &dsdt_tbl_offset,
-> +    };
->  
->      switch (vms->psci_conduit) {
->      case QEMU_PSCI_CONDUIT_DISABLED:
-> -        bootflags = 0;
-> +        fadt.arm_boot_arch = 0;
->          break;
->      case QEMU_PSCI_CONDUIT_HVC:
-> -        bootflags = ACPI_FADT_ARM_PSCI_COMPLIANT | ACPI_FADT_ARM_PSCI_USE_HVC;
-> +        fadt.arm_boot_arch = ACPI_FADT_ARM_PSCI_COMPLIANT |
-> +                             ACPI_FADT_ARM_PSCI_USE_HVC;
->          break;
->      case QEMU_PSCI_CONDUIT_SMC:
-> -        bootflags = ACPI_FADT_ARM_PSCI_COMPLIANT;
-> +        fadt.arm_boot_arch = ACPI_FADT_ARM_PSCI_COMPLIANT;
->          break;
->      default:
->          g_assert_not_reached();
->      }
->  
-> -    /* Hardware Reduced = 1 and use PSCI 0.2+ */
-> -    fadt->flags = cpu_to_le32(1 << ACPI_FADT_F_HW_REDUCED_ACPI);
-> -    fadt->arm_boot_flags = cpu_to_le16(bootflags);
-> -
-> -    /* ACPI v5.1 (fadt->revision.fadt->minor_revision) */
-> -    fadt->minor_revision = 0x1;
-> -
-> -    /* DSDT address to be filled by Guest linker */
-> -    bios_linker_loader_add_pointer(linker,
-> -        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
-> -        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> -
-> -    build_header(linker, table_data, (void *)(table_data->data + fadt_start),
-> -                 "FACP", table_data->len - fadt_start, 5, NULL, NULL);
-> +    build_fadt(table_data, linker, &fadt, NULL, NULL);
->  }
->  
->  /* DSDT */
+> Thanks
 > 
+> Eric
+> > ---
+> >  Makefile              |   1 -
+> >  pc-bios/acpi-dsdt.aml | Bin 4405 -> 0 bytes
+> >  2 files changed, 1 deletion(-)
+> >  delete mode 100644 pc-bios/acpi-dsdt.aml
+> > 
+> > diff --git a/Makefile b/Makefile
+> > index 90e05ac..f3a4cf9 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -648,7 +648,6 @@ bepo    cz
+> >  ifdef INSTALL_BLOBS
+> >  BLOBS=bios.bin bios-256k.bin sgabios.bin vgabios.bin vgabios-cirrus.bin \
+> >  vgabios-stdvga.bin vgabios-vmware.bin vgabios-qxl.bin vgabios-virtio.bin \
+> > -acpi-dsdt.aml \
+> >  ppc_rom.bin openbios-sparc32 openbios-sparc64 openbios-ppc QEMU,tcx.bin QEMU,cgthree.bin \
+> >  pxe-e1000.rom pxe-eepro100.rom pxe-ne2k_pci.rom \
+> >  pxe-pcnet.rom pxe-rtl8139.rom pxe-virtio.rom \
+> > diff --git a/pc-bios/acpi-dsdt.aml b/pc-bios/acpi-dsdt.aml
+> > deleted file mode 100644
+> > index 558c10f51ccbbf9ec2f47a4a998a7055059a8963..0000000000000000000000000000000000000000
+> > GIT binary patch
+> > literal 0
+> > HcmV?d00001
+> > 
+> > literal 4405  
+> > zcmb7{O>f)C8OI;KNTx=#Ov$uk$9XY?b_=xIjb0q@_EJP5WkrsxFrpHqP*76NE}&CE  
+> > zqzSOzpn&5RO*WTe*G<u*ve0?^5!z#q`3UV-*rJF}QJ-hVlxK_$u;qa>|Kam8znLL9
+> > z<A?s>dJ#bTx_LkF0GjuGY(WhGo!+3koGWcQ9rFPU5B+94((<~g4WH$C9dAv`{m^gT  
+> > zZEJrW$A5|A$IoMJl)(Ns&a3@V^7|L@K9JFq{e&^9IOQm8M#H0x!0S}3=w`>a8*i9l  
+> > zMGe0XR&=-HYff+FBQoL^UcVI<n+xnWFBU<!u}c6mx@m3g#6Gb#3)?l@pr*I@_{5&;
+> > z#Tgm?=lKNy@f?7`Y?dceyma7Ch?1^<&1QdpC#wIrasZas-`*<LS>@%=&fLZ0Lo8-=
+> > z2|2%0`vJHO7J2;;UQ)-|gCMNeL^TdtX>}ZQ>$N1Pgb_W)N-Ls=$)m@-itRY~WHYgk
+> > zgX+BqrWEW?)FoC3!tE_lT@6}k^@E_hy_E!2ipVPzkypAAJ^BL$Apdw8JA0Oxf|hkN
+> > zXbsXi&~OfL^l_GN27^7ov3&C`59aWhLwfmMtLJY9eLvcCx1(^-fP`A&gqlWQ#LS5&
+> > z_E*O-9LM?DYzmXYSH~mx^T>vO|2H#*DO<8=Sc*kf_+yTS?9DqcX}p{p+4*D-kG#yi
+> > zb|d180Xv{$XK)dCIxy@<o~j1#hl>PNAErQ+8n3KJVco~H$7En{Z-6#s#%p5=&X1+|  
+> > z>%skMU4%Dqj4^z*PT^<HPDV28n4R#f8{BTI;^{1=ethujk0=Ux0^Ga?3*DgA)8G>@  
+> > zyarVauZe}V<Kx}wZd^0cwM;RGM?dcmJR}qgKaWeEhGmVdw6z2haP%@Q?MLtk^y~o)
+> > zk3PQD^ylV=;pX_@&&QKH#t?&sUZ29JSeA7h*5T1l_HN&uJ1#AsceGfh3=SFYnmfKX
+> > ze-#(NT@&+50P!S?b2^3B<~-vDTWf3I8Q&RTwzap$TO7yo4fv_alm4<B4CYDAc_<p8
+> > z?+N9w#kTgj@ws7H<wNe@GQHb-)pT?+n)o23J)-e_Uzii)!~m=8@Gv_Rrgkn2)8}z;  
+> > zg5DcPKhZIcg>jsYb+#sOA%+7j58pBiUkMT(uE)EZc=I=hhhb|Mzl_$me4&!?nw8e>  
+> > zrn?k)tz9iS(8fRw?snkyc5t5KZ$5k#v#U?yN%1MgInZJNd^U)+Nr_tgvleDJyAxVO
+> > zPWv%F!Kn)RgVL?v9+vVZzHHF#-SR=yHLN$FWK%oSQ8ZIwpzxryXxg(Ge)CX;b46Zg
+> > zSP;*+ADX6;JTX4^)VU|xo+|Q8P4P9NjA+U|QIaS2hTGy7TG*Z{@=Q$);fbc)6D4`3
+> > zS@1I<Y`Lcir;Oax6rO44QOcYd?wR%=!#z{ejPOi5k5cB$Dx6vFnVM!*PLwj|g2K7L  
+> > zJyXsFl@q1RX(^nR!fC0TC}mFkpyCLnoH>Ovr*fi{Ihn%A6i%jcqLexDH;OrNO!%zi  
+> > z70$fMiBjgo54$v<w!&$voG4|^MTHap`xqyk&qb9JrOa7SI137ALFGg#b1o^IOA6<b
+> > z%863ubQDfU;dE3^lrkr7#-#ZyDx5`?6Q#^qQaDQrXG!HmDRV9>oXZO5vdW24=5!TK  
+> > zSK)M3PLwj|io&^~aIUDFC}qx7g>zNmTva(y%AB|xl-BJ9h4X^SiBjfVQ#jWY&NY=2
+> > zrOdgmaIPzy>nbNone(E;c~RlKsB)r|IX4te+zyF%j(;^bR8EvK=Ou;nlEQgO<wPlS
+> > zURF3SE1Z{APLwj|6@~MP!g)pIL@9G#RXDFIoL5y&l!9~k>_^uO`jgU*EWn+e7WD5_  
+> > zEWB0eR-;?pa+f=I@RvWyJ!OYu+`;CiEbnf2?s)wi8uTm00?U7yg&aRY9KcIzV;Q`6
+> > zCiz!mc9@K*KBea2QFnpf=yXS7<8GMt+Vm$6i>qw;%L3#K{9WM*1%OT{c#v2UJ3Z<I
+> > zb<ZtEekX+AQJo#~mL-1Dm{OOxz7U1|P<uHRy}+$`zeDY(*_-FG<L2rIXRk`xt2}!Z
+> > z`$y-TG<((k{_NG^(H^mT=dv^X|43hx(${$U+PU<#_oT0#ruWaM$J5Rarmsus>pXq^  
+> > zT>AQZ($|Maw@suE&!;y<`g94=kqD<e-Q4HhET3#QFUFX<icK`TPP;%`LHD{B>@_qz  
+> > zV0*#s-WcMfm}eH?9)hk>GJY{)I`G1PBt~VzbmU(20$kE(UXx6W8+$q?xy%b%yZW%q
+> > z{)wleKHuy9jcpE}*<9c)y5YFHS*&<~ODl{%!&5$OWOp*J;^)+h)37m&ChTd<7T}A0
+> > zZU426&7a``5jTMQ$<uue9!|<%ACDd;4|&&Pn6TrAT5quPt5|z&@sb%&VyBmj+Chtt
+> > z+hW5DI+aRg8*mW1l?u2kQL9pg2WMw1+E%*`w$|W**tBCmxpiGQZHeN#C{81NEYv5W
+> > U_=PAMqG*c36NN8|mMC`Mf01wzJpcdz
+> >   
