@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eqiER-0007vr-Hl
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:36:00 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eqiFF-0008VB-Vw
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:36:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eqiEM-0000PH-Gs
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:35:59 -0500
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:37907)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eqiEM-0000Oo-9a
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:35:54 -0500
-Received: by mail-wr0-x234.google.com with SMTP id n7so25537470wrn.5
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 08:35:54 -0800 (PST)
-Date: Tue, 27 Feb 2018 16:35:51 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180227163551.GF32480@stefanha-x1.localdomain>
-References: <CANr0WEcfzA7aibMaGeKC2RVr=s2g0z4-R6ZaSjKtRFQiSu4XLQ@mail.gmail.com>
-	<473ee14f-a202-d283-afdf-01bb8d4d84e4@redhat.com>
-	<CANr0WEc6F0_-bKgG4EMgBCpMsw7t6sx_fV=A1VXqnzDzu51Qyw@mail.gmail.com>
-	<1cace15b-81b7-0217-72f9-92e451f370a3@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1eqiFC-0000jR-DM
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:36:50 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50396 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eqiFC-0000jJ-6W
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:36:46 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C4B184040073
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 16:36:45 +0000 (UTC)
+Date: Tue, 27 Feb 2018 17:36:39 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180227173639.7aeea5ce@redhat.com>
+In-Reply-To: <1518784641-43151-1-git-send-email-imammedo@redhat.com>
+References: <1518784641-43151-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="9ADF8FXzFeE7X4jE"
-Content-Disposition: inline
-In-Reply-To: <1cace15b-81b7-0217-72f9-92e451f370a3@redhat.com>
-Subject: Re: [Qemu-devel] QEMU GSoC 2018 Project Idea (Apply polling to QEMU
- NVMe)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/9] enable numa configuration before
+ machine_init() from QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,62 +33,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Huaicheng Li <huaicheng@cs.uchicago.edu>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
+To: qemu-devel@nongnu.org
 
+On Fri, 16 Feb 2018 13:37:12 +0100
+Igor Mammedov <imammedo@redhat.com> wrote:
 
---9ADF8FXzFeE7X4jE
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Eric,
 
-On Tue, Feb 27, 2018 at 12:04:48PM +0100, Paolo Bonzini wrote:
-> On 27/02/2018 10:05, Huaicheng Li wrote:
-> > Great to know that you'd like to mentor the project! If so, can we make=
- it
-> > an official project idea and put it on QEMU GSoC page?
->=20
-> Submissions need not come from the QEMU GSoC page.  You are free to
-> submit any idea that you think can be worthwhile.
+Adding you to CC list (git send-mail somehow haven't noticed you in cover letter).
 
-Please follow the process described here:
+Could you please look at QAPI/QMP parts of this series.
 
-https://wiki.qemu.org/Google_Summer_of_Code_2018#How_to_propose_a_custom_pr=
-oject_idea
-
-The project idea needs to be posted on the wiki page.
-
-Huaicheng & Paolo, please fill out this template so we can add it to the
-wiki page:
-
-=3D=3D=3D TITLE =3D=3D=3D
-
- '''Summary:''' Short description of the project
-
- Detailed description of the project.
-
- '''Links:'''
- * Wiki links to relevant material
- * External links to mailing lists or web sites
-
- '''Details:'''
- * Skill level: beginner or intermediate or advanced
- * Language: C
- * Mentor: Email address and IRC nick
- * Suggested by: Person who suggested the idea
-
---9ADF8FXzFeE7X4jE
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJalYjnAAoJEJykq7OBq3PIUbYIAMmxSnmT5vdm15qgAPUEYyiv
-0P7hzg4zcsUhLb1mGnOsPM1JzOcVxGJ+p51kcp9IKsFUdPU47jOZrfpOsqYL2kwH
-oOq0/90oUAQ9I/JOmFGSgjAEfgmlcJfVYBY3F5yE11ZVvKpDufg5kphXnc6Mdoam
-cCb58PM93NP03I0SOb6mEe31ihMwwY1tdt4kPE49p9WzjJIgSbRevpC4G4c7uvEH
-ucI7j/CQOWlUWGCI++Td7QppzyhWsDB/5E9mku/AjMz8V7wKpC+WieQvgUGoJ5U8
-y1eY8kdbTofKlFSR/Jg1E8YwGy6cAeMfiF9Gig4foYWEbSrJP/+m88fybA6bE7g=
-=19EH
------END PGP SIGNATURE-----
-
---9ADF8FXzFeE7X4jE--
+> v1->v3:
+>   * introduce PRECONFIG runstate with -preconfig option.
+>     it's cleaner to manage transitions and do checks
+>     than reusing existing PRELAUNCH state.
+>   * extend QAPI schema commands with 'runstates' keyword,
+>     so that it would be possible to specify in command definition
+>     when it is valid to execute.
+>     (python changes a bit hackery, since I have little to
+>      no idea how it should work)
+>   * add preconfig QMP and set-numa-node tests
+>   * make mutually exclusive -preconfig and -incoming options,
+>     for simplicity sake. Shouldn't be problem as target can
+>     be starter with pure CLI, since mapping on source is
+>     already known.
+>   * Drop HMP part and leave only QMP in preconfig state.
+> 
+> 
+> Series allows to configure NUMA mapping at runtime using QMP
+> interface. For that to happen it introduces a new '-preconfig' CLI option
+> which allows to pause QEMU before machine_init() is run and
+> adds new set-numa-node QMP command which in conjunction with
+> query-hotpluggable-cpus allows to configure NUMA mapping for cpus.
+> 
+> Later we can modify other commands to run early, for example device_add.
+> I recall SPAPR had problem when libvirt started QEMU with -S and, while it's
+> paused, added CPUs with device_add. Intent was to coldplug CPUs (but at that
+> stage it's considered hotplug already), so SPAPR had to work around the issue.
+> 
+> Example of configuration session:
+> $QEMU -smp 2 -preconfig ...
+> 
+> QMP:
+> # get CPUs layout for current target/machine/CLI
+> -> {'execute': 'query-hotpluggable-cpus' }  
+> <- {'return': [
+>        {'props': {'core-id': 0, 'thread-id': 0, 'socket-id': 1}, ... },
+>        {'props': {'core-id': 0, 'thread-id': 0, 'socket-id': 0}, ... }
+>    ]}
+> 
+> # configure 1st node
+> -> {'execute': 'set-numa-node', 'arguments': { 'type': 'node', 'nodeid': 0 } }  
+> <- {'return': {}}
+> -> {'execute': 'set-numa-node', 'arguments': { 'type': 'cpu',   
+>        'node-id': 0, 'core-id': 0, 'thread-id': 0, 'socket-id': 1, }
+>    }
+> <- {'return': {}}
+> 
+> # configure 2nd node
+> -> {'execute': 'set-numa-node', 'arguments': { 'type': 'node', 'nodeid': 1 } }
+> -> {'execute': 'set-numa-node', 'arguments': { 'type': 'cpu',  
+>        'node-id': 1, 'core-id': 0, 'thread-id': 0, 'socket-id': 0 }
+>    }
+> <- {'return': {}}
+> 
+> # [optional] verify configuration
+> -> {'execute': 'query-hotpluggable-cpus' }  
+> <- {'return': [
+>        {'props': {'core-id': 0, 'thread-id': 0, 'node-id': 0, 'socket-id': 1}, ... },
+>        {'props': {'core-id': 0, 'thread-id': 0, 'node-id': 1, 'socket-id': 0}, ... }
+>    ]}
+> 
+> 
+> Git tree:
+>     https://github.com/imammedo/qemu.git qmp_preconfig_v3
+> 
+> Ref to v1:
+>     https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg03583.html
+>     Message-Id: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
+>   
+> CC: eblake@redhat.com
+> CC: armbru@redhat.com
+> CC: ehabkost@redhat.com
+> CC: pkrempa@redhat.com
+> CC: david@gibson.dropbear.id.au
+> CC: peter.maydell@linaro.org
+> CC: pbonzini@redhat.com
+> CC: cohuck@redhat.com
+> 
+> 
+> Igor Mammedov (9):
+>   numa: postpone options post-processing till machine_run_board_init()
+>   numa: split out NumaOptions parsing into parse_NumaOptions()
+>   CLI: add -preconfig option
+>   HMP: disable monitor in preconfig state
+>   QAPI: allow to specify valid runstates per command
+>   tests: extend qmp test with pereconfig checks
+>   QMP: permit query-hotpluggable-cpus in preconfig state
+>   QMP: add set-numa-node command
+>   tests: functional tests for QMP command set-numa-node
+> 
+>  include/qapi/qmp/dispatch.h             |  5 ++-
+>  include/sysemu/numa.h                   |  2 +
+>  include/sysemu/sysemu.h                 |  1 +
+>  hw/core/machine.c                       |  5 ++-
+>  monitor.c                               | 32 +++++++++++++--
+>  numa.c                                  | 66 +++++++++++++++++++-----------
+>  qapi-schema.json                        | 32 +++++++++++++--
+>  qapi/qmp-dispatch.c                     | 39 ++++++++++++++++++
+>  qapi/qmp-registry.c                     |  4 +-
+>  qapi/run-state.json                     |  9 ++++-
+>  qemu-options.hx                         | 11 +++++
+>  qmp.c                                   |  5 +++
+>  scripts/qapi-commands.py                | 46 ++++++++++++++++-----
+>  scripts/qapi-introspect.py              |  2 +-
+>  scripts/qapi.py                         | 15 ++++---
+>  scripts/qapi2texi.py                    |  2 +-
+>  tests/numa-test.c                       | 71 +++++++++++++++++++++++++++++++++
+>  tests/qapi-schema/doc-good.out          |  4 +-
+>  tests/qapi-schema/ident-with-escape.out |  2 +-
+>  tests/qapi-schema/indented-expr.out     |  4 +-
+>  tests/qapi-schema/qapi-schema-test.out  | 18 ++++-----
+>  tests/qapi-schema/test-qapi.py          |  6 +--
+>  tests/qmp-test.c                        | 56 ++++++++++++++++++++++++++
+>  vl.c                                    | 35 +++++++++++++++-
+>  24 files changed, 401 insertions(+), 71 deletions(-)
+> 
