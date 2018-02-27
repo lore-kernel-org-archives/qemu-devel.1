@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqkT4-0002QZ-CN
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 13:59:16 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eqkT6-0002Qm-Hp
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 13:59:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqkT3-0000dU-Dh
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 13:59:14 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eqkT3-0000dp-Pu
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 13:59:15 -0500
 References: <20180223235142.21501-1-jsnow@redhat.com>
 	<20180223235142.21501-6-jsnow@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <fbfc54ab-1aba-97e3-0779-7675133ada71@redhat.com>
-Date: Tue, 27 Feb 2018 12:58:51 -0600
+	<20180227162759.GB5269@localhost.localdomain>
+	<0b9a7368-0425-8879-91db-3c1b3049912e@redhat.com>
+	<20180227170849.GC5269@localhost.localdomain>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <00eb295a-5ccd-ff7b-f11b-78b9ac2286ca@redhat.com>
+Date: Tue, 27 Feb 2018 13:58:57 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180223235142.21501-6-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180227170849.GC5269@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [RFC v4 05/21] blockjobs: add state transition
@@ -25,94 +28,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 02/23/2018 05:51 PM, John Snow wrote:
-> The state transition table has mostly been implied. We're about to make
-> it a bit more complex, so let's make the STM explicit instead.
+
+
+On 02/27/2018 12:08 PM, Kevin Wolf wrote:
+> Am 27.02.2018 um 17:45 hat John Snow geschrieben:
+>>
+>>
+>> On 02/27/2018 11:27 AM, Kevin Wolf wrote:
+>>> Am 24.02.2018 um 00:51 hat John Snow geschrieben:
+>>>> The state transition table has mostly been implied. We're about to make
+>>>> it a bit more complex, so let's make the STM explicit instead.
+>>>>
+>>>> Perform state transitions with a function that for now just asserts the
+>>>> transition is appropriate.
+>>>>
+>>>> Transitions:
+>>>> Undefined -> Created: During job initialization.
+>>>> Created   -> Running: Once the job is started.
+>>>>                       Jobs cannot transition from "Created" to "Paused"
+>>>>                       directly, but will instead synchronously transition
+>>>>                       to running to paused immediately.
+>>>> Running   -> Paused:  Normal workflow for pauses.
+>>>> Running   -> Ready:   Normal workflow for jobs reaching their sync point.
+>>>>                       (e.g. mirror)
+>>>> Ready     -> Standby: Normal workflow for pausing ready jobs.
+>>>> Paused    -> Running: Normal resume.
+>>>> Standby   -> Ready:   Resume of a Standby job.
+>>>>
+>>>>
+>>>> +---------+
+>>>> |UNDEFINED|
+>>>> +--+------+
+>>>>    |
+>>>> +--v----+
+>>>> |CREATED|
+>>>> +--+----+
+>>>>    |
+>>>> +--v----+     +------+
+>>>> |RUNNING<----->PAUSED|
+>>>> +--+----+     +------+
+>>>>    |
+>>>> +--v--+       +-------+
+>>>> |READY<------->STANDBY|
+>>>> +-----+       +-------+
+>>>>
+>>>>
+>>>> Notably, there is no state presently defined as of this commit that
+>>>> deals with a job after the "running" or "ready" states, so this table
+>>>> will be adjusted alongside the commits that introduce those states.
+>>>>
+>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>>> ---
+>>>>  block/trace-events |  3 +++
+>>>>  blockjob.c         | 42 ++++++++++++++++++++++++++++++++++++------
+>>>>  2 files changed, 39 insertions(+), 6 deletions(-)
+>>>>
+>>>> diff --git a/block/trace-events b/block/trace-events
+>>>> index 02dd80ff0c..b75a0c8409 100644
+>>>> --- a/block/trace-events
+>>>> +++ b/block/trace-events
+>>>> @@ -4,6 +4,9 @@
+>>>>  bdrv_open_common(void *bs, const char *filename, int flags, const char *format_name) "bs %p filename \"%s\" flags 0x%x format_name \"%s\""
+>>>>  bdrv_lock_medium(void *bs, bool locked) "bs %p locked %d"
+>>>>  
+>>>> +# blockjob.c
+>>>> +block_job_state_transition(void *job,  int ret, const char *legal, const char *s0, const char *s1) "job %p (ret: %d) attempting %s transition (%s-->%s)"
+>>>> +
+>>>>  # block/block-backend.c
+>>>>  blk_co_preadv(void *blk, void *bs, int64_t offset, unsigned int bytes, int flags) "blk %p bs %p offset %"PRId64" bytes %u flags 0x%x"
+>>>>  blk_co_pwritev(void *blk, void *bs, int64_t offset, unsigned int bytes, int flags) "blk %p bs %p offset %"PRId64" bytes %u flags 0x%x"
+>>>> diff --git a/blockjob.c b/blockjob.c
+>>>> index 1be9c20cff..d745b3bb69 100644
+>>>> --- a/blockjob.c
+>>>> +++ b/blockjob.c
+>>>> @@ -28,6 +28,7 @@
+>>>>  #include "block/block.h"
+>>>>  #include "block/blockjob_int.h"
+>>>>  #include "block/block_int.h"
+>>>> +#include "block/trace.h"
+>>>>  #include "sysemu/block-backend.h"
+>>>>  #include "qapi/error.h"
+>>>>  #include "qapi/qmp/qerror.h"
+>>>> @@ -41,6 +42,34 @@
+>>>>   * block_job_enter. */
+>>>>  static QemuMutex block_job_mutex;
+>>>>  
+>>>> +/* BlockJob State Transition Table */
+>>>> +bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
+>>>> +                                          /* U, C, R, P, Y, S */
+>>>> +    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0},
+>>>
+>>> Even at the end of the series, this is the only use of
+>>> BLOCK_JOB_STATUS_UNDEFINED.
+>>>
+>>>> +    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0},
+>>>> +    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0},
+>>>> +    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0},
+>>>> +    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1},
+>>>> +    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0},
+>>>> +};
+>>>> +
+>>>> +static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
+>>>> +{
+>>>> +    BlockJobStatus s0 = job->status;
+>>>> +    if (s0 == s1) {
+>>>> +        return;
+>>>> +    }
+>>>> +    assert(s1 >= 0 && s1 <= BLOCK_JOB_STATUS__MAX);
+>>>> +    trace_block_job_state_transition(job, job->ret, BlockJobSTT[s0][s1] ?
+>>>> +                                     "allowed" : "disallowed",
+>>>> +                                     qapi_enum_lookup(&BlockJobStatus_lookup,
+>>>> +                                                      s0),
+>>>> +                                     qapi_enum_lookup(&BlockJobStatus_lookup,
+>>>> +                                                      s1));
+>>>> +    assert(BlockJobSTT[s0][s1]);
+>>>> +    job->status = s1;
+>>>> +}
+>>>> +
+>>>>  static void block_job_lock(void)
+>>>>  {
+>>>>      qemu_mutex_lock(&block_job_mutex);
+>>>> @@ -320,7 +349,7 @@ void block_job_start(BlockJob *job)
+>>>>      job->pause_count--;
+>>>>      job->busy = true;
+>>>>      job->paused = false;
+>>>> -    job->status = BLOCK_JOB_STATUS_RUNNING;
+>>>> +    block_job_state_transition(job, BLOCK_JOB_STATUS_RUNNING);
+>>>>      bdrv_coroutine_enter(blk_bs(job->blk), job->co);
+>>>>  }
+>>>>  
+>>>> @@ -704,6 +733,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+>>>>      job->refcnt        = 1;
+>>>>      job->manual        = (flags & BLOCK_JOB_MANUAL);
+>>>>      job->status        = BLOCK_JOB_STATUS_CREATED;
+>>>> +    block_job_state_transition(job, BLOCK_JOB_STATUS_CREATED);
+>>>
+>>> So did you intend to start with BLOCK_JOB_STATUS_UNDEFINED and then
+>>> transition to BLOCK_JOB_STATUS_CREATED?
+>>>
+
+Oh, crud, yes. This is a refactoring issue that snuck in. I didn't even
+realize after your first mail because I believed so strongly that I had
+not done it this way.
+
+>>> Or should we completely remove BLOCK_JOB_STATUS_UNDEFINED, keep the
+>>> initialisation and not call block_job_state_transition() here?
+>>>
+>>> Kevin
+>>>
+>>
+>> We can do that;
+>>
+>> I had it start as "Undefined" because I liked how a g_new0() object will
+>> default to that state, so it felt "safe."
+>>
+>> On the negatives, it does mean that technically you COULD witness a job
+>> in this state if QEMU did something wrong, which would be confusing
+>> because you wouldn't be able to fix it via QMP.
 > 
-> Perform state transitions with a function that for now just asserts the
-> transition is appropriate.
+> I don't really mind which way you do it as long as the code seems
+> self-consistent. You could change the initialisation this way:
 > 
-> Transitions:
-> Undefined -> Created: During job initialization.
-
-Unless we use Created as the default state 0 for g_new0().
-
-> Created   -> Running: Once the job is started.
->                        Jobs cannot transition from "Created" to "Paused"
->                        directly, but will instead synchronously transition
->                        to running to paused immediately.
-> Running   -> Paused:  Normal workflow for pauses.
-> Running   -> Ready:   Normal workflow for jobs reaching their sync point.
->                        (e.g. mirror)
-> Ready     -> Standby: Normal workflow for pausing ready jobs.
-> Paused    -> Running: Normal resume.
-> Standby   -> Ready:   Resume of a Standby job.
+>     job->status        = BLOCK_JOB_STATUS_UNDEFINED;
+>     block_job_state_transition(job, BLOCK_JOB_STATUS_CREATED);
 > 
+> Or if you want to make use of the fact that g_new0() already results in
+> BLOCK_JOB_STATUS_UNDEFINED, you can omit the first line.
 > 
-> +---------+
-> |UNDEFINED|
-> +--+------+
->     |
-> +--v----+
-> |CREATED|
-> +--+----+
->     |
-> +--v----+     +------+
-> |RUNNING<----->PAUSED|
-> +--+----+     +------+
->     |
-> +--v--+       +-------+
-> |READY<------->STANDBY|
-> +-----+       +-------+
+> I'm also not strictly opposed to a CREATED -> CREATED transition, even
+> though it looks a bit odd. But then there is no reason to allow an
+> UNDEFINED -> CREATED transition that never happens in practice.
+> UNDEFINED would then be a completely unused state that could only be
+> active in the case of a bug.
 > 
+> Kevin
 > 
-> Notably, there is no state presently defined as of this commit that
-> deals with a job after the "running" or "ready" states, so this table
-> will be adjusted alongside the commits that introduce those states.
-
-The ascii-art tables help in this and other patches.  Thanks for 
-producing them.
-
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->   block/trace-events |  3 +++
->   blockjob.c         | 42 ++++++++++++++++++++++++++++++++++++------
->   2 files changed, 39 insertions(+), 6 deletions(-)
-> 
-
-> +static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
-> +{
-> +    BlockJobStatus s0 = job->status;
-> +    if (s0 == s1) {
-> +        return;
-> +    }
-> +    assert(s1 >= 0 && s1 <= BLOCK_JOB_STATUS__MAX);
-
-Or, if you keep the zero state distinct from valid states, this could be 
-'assert(s1 > 0 && ...)'
-
-> @@ -320,7 +349,7 @@ void block_job_start(BlockJob *job)
->       job->pause_count--;
->       job->busy = true;
->       job->paused = false;
-> -    job->status = BLOCK_JOB_STATUS_RUNNING;
-> +    block_job_state_transition(job, BLOCK_JOB_STATUS_RUNNING);
->       bdrv_coroutine_enter(blk_bs(job->blk), job->co);
->   }
->   
-> @@ -704,6 +733,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
->       job->refcnt        = 1;
->       job->manual        = (flags & BLOCK_JOB_MANUAL);
->       job->status        = BLOCK_JOB_STATUS_CREATED;
-> +    block_job_state_transition(job, BLOCK_JOB_STATUS_CREATED);
-
-Oops, missing a deletion of the job->status assignment line.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
