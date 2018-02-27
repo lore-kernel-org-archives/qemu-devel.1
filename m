@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eqjHU-0005nO-KU
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:43:13 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eqjKx-00070b-EO
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:46:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eqjHT-0008Cx-Ja
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:43:12 -0500
-Received: from mail-oi0-x22a.google.com ([2607:f8b0:4003:c06::22a]:45456)
+	(envelope-from <peter.maydell@linaro.org>) id 1eqjKw-0001Vy-CV
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:46:47 -0500
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:42371)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eqjHT-0008Cg-EN
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:43:11 -0500
-Received: by mail-oi0-x22a.google.com with SMTP id j79so13482240oib.12
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 09:43:11 -0800 (PST)
+	id 1eqjKw-0001VR-7W
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:46:46 -0500
+Received: by mail-oi0-x241.google.com with SMTP id c18so5145122oiy.9
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 09:46:46 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180227173234.GI32480@stefanha-x1.localdomain>
-References: <1519613598-12270-1-git-send-email-suhang16@mails.ucas.ac.cn>
-	<20180227173234.GI32480@stefanha-x1.localdomain>
+In-Reply-To: <20180227080724.13585-1-kraxel@redhat.com>
+References: <20180227080724.13585-1-kraxel@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Feb 2018 17:42:50 +0000
-Message-ID: <CAFEAcA9UftR-D5k9D2RrBUKvGWo_nC-+jfBKZAOjsHUAjyMs0A@mail.gmail.com>
+Date: Tue, 27 Feb 2018 17:46:25 +0000
+Message-ID: <CAFEAcA_k9pXrfkLQSSG5UTYOteMZEZXErMCh6-3Wgj42mGqrfw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 RFC] scripts/checkpatch.pl: add check
- for `while` and `for`
+Subject: Re: [Qemu-devel] [PULL 00/12] Ui 20180227 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Su Hang <suhang16@mails.ucas.ac.cn>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 27 February 2018 at 17:32, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> On Mon, Feb 26, 2018 at 10:53:18AM +0800, Su Hang wrote:
->> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
->> index 1b4b812e28fa..10c138344fa9 100755
->> --- a/scripts/checkpatch.pl
->> +++ b/scripts/checkpatch.pl
->> @@ -2353,7 +2353,8 @@ sub process {
->>               }
->>
->>  # check for missing bracing round if etc
+On 27 February 2018 at 08:07, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit 0a773d55ac76c5aa89ed9187a3bc5af8c5c2a6d0:
 >
-> Please fix the pre-existing typo in the comment:
+>   maintainers: Add myself as a OpenBSD maintainer (2018-02-23 12:05:07 +0000)
 >
-> s/round/around/
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/ui-20180227-pull-request
+>
+> for you to fetch changes up to 8742dcaf7bcfa1ef8720f34dab984f153c87c9f3:
+>
+>   curses: build as ui module (2018-02-26 15:10:12 +0100)
+>
+> ----------------------------------------------------------------
+> ui: add & use display registry, build some UIs as module.
+>
+> ----------------------------------------------------------------
 
-That's not really a typo IMHO -- both 'round' and 'around'
-seem fine to me here. (The OED entry for 'around' notes
-"There is variation with 'round' adv. and prep. in many of the
-senses below; in general 'around' is less usual in British usage",
-so some of this is US-vs-UK usage or personal idiolect.)
+Hi. This failed to build on my OpenBSD test box:
+
+  CC      qga/guest-agent-command-state.o
+In file included from /home/qemu/include/qemu/osdep.h:30:0,
+                 from /home/qemu/qga/guest-agent-command-state.c:12:
+./config-host.h:29:0: warning: "CONFIG_SDL" redefined
+ #define CONFIG_SDL m
+ ^
+./config-host.h:17:0: note: this is the location of the previous definition
+ #define CONFIG_SDL 1
+ ^
+
+(warning repeated for pretty much every object file)
+
+and then linking of the final executables failed with
+
+../audio/audio.o:(.data.rel.ro+0x0): undefined reference to `sdl_audio_driver'
 
 thanks
 -- PMM
