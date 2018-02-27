@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eqZjE-0000Te-Jq
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 02:31:13 -0500
+	(envelope-from <linus.walleij@linaro.org>) id 1eqZtY-00039X-5f
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 02:41:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eqZjB-0007KU-D9
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 02:31:12 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48332 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eqZjB-0007KD-85
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 02:31:09 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2EB288182D2E
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 07:31:05 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 27 Feb 2018 08:30:59 +0100
-Message-Id: <20180227073100.1911-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 0/1] Vga 20180227 patches
+	(envelope-from <linus.walleij@linaro.org>) id 1eqZtX-00028a-CO
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 02:41:52 -0500
+Received: from mail-io0-x22d.google.com ([2607:f8b0:4001:c06::22d]:45447)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <linus.walleij@linaro.org>)
+	id 1eqZtX-00028I-7G
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 02:41:51 -0500
+Received: by mail-io0-x22d.google.com with SMTP id m22so20166570iob.12
+	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 23:41:50 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <eff4f015-38ad-60e1-e1de-886bb4f93328@amsat.org>
+References: <20180217140051.22731-1-linus.walleij@linaro.org>
+	<20180217140051.22731-2-linus.walleij@linaro.org>
+	<eff4f015-38ad-60e1-e1de-886bb4f93328@amsat.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Tue, 27 Feb 2018 08:41:49 +0100
+Message-ID: <CACRpkdZLwbVr2O5__GpHt+y0pqpk3-j_AXD_qv5JQc3JZNRm7A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 2/3] hw/sii9022: Add support for
+ Silicon Image SII9022
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,34 +32,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-The following changes since commit 0a773d55ac76c5aa89ed9187a3bc5af8c5c2a6d0:
+On Sat, Feb 17, 2018 at 7:32 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
 
-  maintainers: Add myself as a OpenBSD maintainer (2018-02-23 12:05:07 +0000)
+> [Me]
+>> +#define DEBUG_SII9022 0
+>> +
+>> +#define DPRINTF(fmt, ...) \
+>> +    do { \
+>> +        if (DEBUG_SII9022) { \
+>> +            printf("sii9022: " fmt, ## __VA_ARGS__); \
+>> +        } \
+>> +    } while (0)
+>
+> Can you replace DPRINTF() by trace events?
 
-are available in the git repository at:
+Absolutely but which ones?
 
-  git://git.kraxel.org/qemu tags/vga-20180227-pull-request
+I do not feel senior enough to also invent new trace events
+for displays or I2C devices...
 
-for you to fetch changes up to 5643cc94ac1cbc23e1ba6b16b6a88e1ce7b3f6a9:
-
-  virtio-gpu-3d: add support for second capability set (v4) (2018-02-26 13:41:34 +0100)
-
-----------------------------------------------------------------
-virtio-gpu: add support for second capability set
-
-----------------------------------------------------------------
-
-Dave Airlie (1):
-  virtio-gpu-3d: add support for second capability set (v4)
-
- include/hw/virtio/virtio-gpu.h              |  2 +-
- include/standard-headers/linux/virtio_gpu.h |  1 +
- hw/display/virtio-gpu-3d.c                  | 15 +++++++++++++++
- hw/display/virtio-gpu.c                     |  7 ++++++-
- 4 files changed, 23 insertions(+), 2 deletions(-)
-
--- 
-2.9.3
+Yours,
+Linus Walleij
