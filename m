@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1eqcPb-00080D-KZ
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 05:23:09 -0500
+	(envelope-from <rpalethorpe@suse.com>) id 1eqdss-0000P2-IG
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 06:57:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1eqcPW-0000bT-Hy
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 05:23:07 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:45040)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liran.alon@oracle.com>)
-	id 1eqcPW-0000Yy-80
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 05:23:02 -0500
-From: Liran Alon <liran.alon@oracle.com>
-Date: Tue, 27 Feb 2018 12:22:12 +0200
-Message-Id: <1519726932-13833-1-git-send-email-liran.alon@oracle.com>
-Subject: [Qemu-devel] [PATCH] KVM: x86: Add support for save/load
- MSR_SMI_COUNT
+	(envelope-from <rpalethorpe@suse.com>) id 1eqdsr-0000C7-5m
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 06:57:26 -0500
+From: Richard Palethorpe <rpalethorpe@suse.com>
+Date: Tue, 27 Feb 2018 12:56:51 +0100
+Message-Id: <20180227115651.30762-3-rpalethorpe@suse.com>
+In-Reply-To: <20180227115651.30762-1-rpalethorpe@suse.com>
+References: <20180227115651.30762-1-rpalethorpe@suse.com>
+Subject: [Qemu-devel] [RFC PATCH 2/2] migrate: Tests for migrating to an
+ already used QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,153 +21,241 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, mtosatti@redhat.com, rth@twiddle.net, habkost@redhat.com, kvm@vger.kernel.org, Liran Alon <liran.alon@oracle.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc: berrange@redhat.com, qemu-block@nongnu.org, armbru@redhat.com, dgilbert@redhat.com, eblake@redhat.com, quintela@redhat.com, mreitz@redhat.com, Richard Palethorpe <rpalethorpe@suse.com>
 
-This MSR returns the number of #SMIs that occurred on
-CPU since boot.
-
-KVM commit 52797bf9a875 ("KVM: x86: Add emulation of MSR_SMI_COUNT")
-introduced support for emulating this MSR.
-
-This commit adds support for QEMU to save/load this
-MSR for migration purposes.
-
-Signed-off-by: Liran Alon <liran.alon@oracle.com>
-Reviewed-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Currently this appears to work for X86_64, but PPC64 fails due to some
+unexpected data on the serial port after migration. This probably requires
+quite a bit more work.
 ---
- target/i386/cpu.c     |  1 +
- target/i386/cpu.h     |  3 +++
- target/i386/kvm.c     | 13 +++++++++++++
- target/i386/machine.c | 20 ++++++++++++++++++++
- 4 files changed, 37 insertions(+)
+ tests/migration-test.c | 113 +++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 85 insertions(+), 28 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index b5e431e769da..ba9ec6a6116b 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -3645,6 +3645,7 @@ static void x86_cpu_reset(CPUState *s)
-     cpu_x86_update_cr0(env, 0x60000010);
-     env->a20_mask = ~0x0;
-     env->smbase = 0x30000;
-+    env->msr_smi_count = 0;
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 74f9361bdd..8217d2e83e 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -125,19 +125,17 @@ static void init_bootfile_ppc(const char *bootpath)
+  * we get an 'A' followed by an endless string of 'B's
+  * but on the destination we won't have the A.
+  */
+-static void wait_for_serial(const char *side)
++static void wait_for_serial(const char *side, gboolean started)
+ {
+     char *serialpath = g_strdup_printf("%s/%s", tmpfs, side);
+     FILE *serialfile = fopen(serialpath, "r");
+     const char *arch = qtest_get_arch();
+-    int started = (strcmp(side, "src_serial") == 0 &&
+-                   strcmp(arch, "ppc64") == 0) ? 0 : 1;
  
-     env->idt.limit = 0xffff;
-     env->gdt.limit = 0xffff;
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index faf39ec1ce77..254e557bb8fa 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1,3 +1,4 @@
+     g_free(serialpath);
+     do {
+         int readvalue = fgetc(serialfile);
+ 
+-        if (!started) {
++        if (!started && !strcmp(arch, "ppc64")) {
+             /* SLOF prints its banner before starting test,
+              * to ignore it, mark the start of the test with '_',
+              * ignore all characters until this marker
+@@ -358,16 +356,21 @@ static void migrate_set_capability(QTestState *who, const char *capability,
+     QDECREF(rsp);
+ }
+ 
+-static void migrate(QTestState *who, const char *uri)
++static void migrate(QTestState *who, const char *uri, gboolean incoming)
+ {
+     QDict *rsp;
++    const gchar *cmd_name = incoming ? "migrate-incoming" : "migrate";
+     gchar *cmd;
+ 
+-    cmd = g_strdup_printf("{ 'execute': 'migrate',"
++    cmd = g_strdup_printf("{ 'execute': '%s',"
+                           "'arguments': { 'uri': '%s' } }",
+-                          uri);
++                          cmd_name, uri);
+     rsp = qtest_qmp(who, cmd);
+     g_free(cmd);
++    while (qdict_haskey(rsp, "event")) {
++        QDECREF(rsp);
++        rsp = qtest_qmp_receive(who);
++    }
+     g_assert(qdict_haskey(rsp, "return"));
+     QDECREF(rsp);
+ }
+@@ -382,15 +385,22 @@ static void migrate_start_postcopy(QTestState *who)
+ }
+ 
+ static void test_migrate_start(QTestState **from, QTestState **to,
+-                               const char *uri)
++                               const char *uri, gboolean incoming)
+ {
+-    gchar *cmd_src, *cmd_dst;
++    gchar *cmd_src;
++    GString *cmd_dst = g_string_new(NULL);
+     char *bootpath = g_strdup_printf("%s/bootsect", tmpfs);
++    char *bootpath_dst;
+     const char *arch = qtest_get_arch();
+     const char *accel = "kvm:tcg";
+ 
+     got_stop = false;
+ 
++    if (incoming)
++        bootpath_dst = bootpath;
++    else
++        bootpath_dst = g_strdup_printf("%s/bootsect_dst", tmpfs);
 +
- /*
-  * i386 virtual CPU header
-  *
-@@ -359,6 +360,7 @@ typedef enum X86Seg {
- #define MSR_P6_PERFCTR0                 0xc1
+     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+         init_bootfile_x86(bootpath);
+         cmd_src = g_strdup_printf("-machine accel=%s -m 150M"
+@@ -398,12 +408,14 @@ static void test_migrate_start(QTestState **from, QTestState **to,
+                                   " -serial file:%s/src_serial"
+                                   " -drive file=%s,format=raw",
+                                   accel, tmpfs, bootpath);
+-        cmd_dst = g_strdup_printf("-machine accel=%s -m 150M"
+-                                  " -name target,debug-threads=on"
+-                                  " -serial file:%s/dest_serial"
+-                                  " -drive file=%s,format=raw"
+-                                  " -incoming %s",
+-                                  accel, tmpfs, bootpath, uri);
++        if (!incoming)
++            init_bootfile_x86(bootpath_dst);
++
++        g_string_printf(cmd_dst, "-machine accel=%s -m 150M"
++                        " -name target,debug-threads=on"
++                        " -serial file:%s/dest_serial"
++                        " -drive file=%s,format=raw",
++                        accel, tmpfs, bootpath_dst);
+     } else if (strcmp(arch, "ppc64") == 0) {
  
- #define MSR_IA32_SMBASE                 0x9e
-+#define MSR_SMI_COUNT                   0x34
- #define MSR_MTRRcap                     0xfe
- #define MSR_MTRRcap_VCNT                8
- #define MSR_MTRRcap_FIXRANGE_SUPPORT    (1 << 8)
-@@ -1123,6 +1125,7 @@ typedef struct CPUX86State {
- 
-     uint64_t pat;
-     uint32_t smbase;
-+    uint64_t msr_smi_count;
- 
-     uint32_t pkru;
- 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index ad4b159b28af..a53735f266c5 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -92,6 +92,7 @@ static bool has_msr_hv_stimer;
- static bool has_msr_hv_frequencies;
- static bool has_msr_xss;
- static bool has_msr_spec_ctrl;
-+static bool has_msr_smi_count;
- 
- static uint32_t has_architectural_pmu_version;
- static uint32_t num_architectural_pmu_gp_counters;
-@@ -1124,6 +1125,9 @@ static int kvm_get_supported_msrs(KVMState *s)
-                 case MSR_IA32_SMBASE:
-                     has_msr_smbase = true;
-                     break;
-+                case MSR_SMI_COUNT:
-+                    has_msr_smi_count = true;
-+                    break;
-                 case MSR_IA32_MISC_ENABLE:
-                     has_msr_misc_enable = true;
-                     break;
-@@ -1633,6 +1637,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-     if (has_msr_smbase) {
-         kvm_msr_entry_add(cpu, MSR_IA32_SMBASE, env->smbase);
+         /* On ppc64, the test only works with kvm-hv, but not with kvm-pr */
+@@ -416,22 +428,29 @@ static void test_migrate_start(QTestState **from, QTestState **to,
+                                   " -serial file:%s/src_serial"
+                                   " -drive file=%s,if=pflash,format=raw",
+                                   accel, tmpfs, bootpath);
+-        cmd_dst = g_strdup_printf("-machine accel=%s -m 256M"
+-                                  " -name target,debug-threads=on"
+-                                  " -serial file:%s/dest_serial"
+-                                  " -incoming %s",
+-                                  accel, tmpfs, uri);
++        g_string_printf(cmd_dst, "-machine accel=%s -m 256M"
++                        " -name target,debug-threads=on"
++                        " -serial file:%s/dest_serial",
++                        accel, tmpfs);
++        if (!incoming) {
++            g_string_append_printf(cmd_dst,
++                                   " -drive file=%s,if=pflash,format=raw",
++                                   bootpath);
++        }
+     } else {
+         g_assert_not_reached();
      }
-+    if (has_msr_smi_count) {
-+        kvm_msr_entry_add(cpu, MSR_SMI_COUNT, env->msr_smi_count);
-+    }
-     if (has_msr_bndcfgs) {
-         kvm_msr_entry_add(cpu, MSR_IA32_BNDCFGS, env->msr_bndcfgs);
-     }
-@@ -1979,6 +1986,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-     if (has_msr_smbase) {
-         kvm_msr_entry_add(cpu, MSR_IA32_SMBASE, 0);
-     }
-+    if (has_msr_smi_count) {
-+        kvm_msr_entry_add(cpu, MSR_SMI_COUNT, 0);
-+    }
-     if (has_msr_feature_control) {
-         kvm_msr_entry_add(cpu, MSR_IA32_FEATURE_CONTROL, 0);
-     }
-@@ -2205,6 +2215,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-         case MSR_IA32_SMBASE:
-             env->smbase = msrs[i].data;
-             break;
-+        case MSR_SMI_COUNT:
-+            env->msr_smi_count = msrs[i].data;
-+            break;
-         case MSR_IA32_FEATURE_CONTROL:
-             env->msr_ia32_feature_control = msrs[i].data;
-             break;
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 361c05aedfdc..9432496cbda8 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -395,6 +395,25 @@ static const VMStateDescription vmstate_msr_tsc_adjust = {
-     }
- };
  
-+static bool msr_smi_count_needed(void *opaque)
++    if (incoming)
++        g_string_append_printf(cmd_dst, " -incoming %s", uri);
++
+     g_free(bootpath);
+ 
+     *from = qtest_start(cmd_src);
+     g_free(cmd_src);
+ 
+-    *to = qtest_init(cmd_dst);
+-    g_free(cmd_dst);
++    *to = qtest_init(cmd_dst->str);
++    g_string_free(cmd_dst, TRUE);
+ }
+ 
+ static void test_migrate_end(QTestState *from, QTestState *to, bool test_dest)
+@@ -518,7 +537,7 @@ static void test_migrate(void)
+     char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
+     QTestState *from, *to;
+ 
+-    test_migrate_start(&from, &to, uri);
++    test_migrate_start(&from, &to, uri, TRUE);
+ 
+     migrate_set_capability(from, "postcopy-ram", "true");
+     migrate_set_capability(to, "postcopy-ram", "true");
+@@ -531,9 +550,9 @@ static void test_migrate(void)
+     migrate_set_parameter(from, "downtime-limit", "1");
+ 
+     /* Wait for the first serial output from the source */
+-    wait_for_serial("src_serial");
++    wait_for_serial("src_serial", FALSE);
+ 
+-    migrate(from, uri);
++    migrate(from, uri, FALSE);
+ 
+     wait_for_migration_pass(from);
+ 
+@@ -545,7 +564,7 @@ static void test_migrate(void)
+ 
+     qtest_qmp_eventwait(to, "RESUME");
+ 
+-    wait_for_serial("dest_serial");
++    wait_for_serial("dest_serial", TRUE);
+     wait_for_migration_complete(from);
+ 
+     g_free(uri);
+@@ -560,8 +579,8 @@ static void test_baddest(void)
+     const char *status;
+     bool failed;
+ 
+-    test_migrate_start(&from, &to, "tcp:0:0");
+-    migrate(from, "tcp:0:0");
++    test_migrate_start(&from, &to, "tcp:0:0", TRUE);
++    migrate(from, "tcp:0:0", FALSE);
+     do {
+         rsp = wait_command(from, "{ 'execute': 'query-migrate' }");
+         rsp_return = qdict_get_qdict(rsp, "return");
+@@ -584,6 +603,43 @@ static void test_baddest(void)
+     test_migrate_end(from, to, false);
+ }
+ 
++static void test_migrate_to_used(void)
 +{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
++    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
++    QTestState *from, *to;
 +
-+    return env->msr_smi_count != 0;
++    test_migrate_start(&from, &to, uri, FALSE);
++
++    migrate_set_capability(from, "postcopy-ram", "true");
++    migrate_set_capability(to, "postcopy-ram", "true");
++
++    migrate_set_parameter(from, "max-bandwidth", "100000000");
++    migrate_set_parameter(from, "downtime-limit", "1");
++
++    wait_for_serial("dest_serial", FALSE);
++    migrate(to, uri, TRUE);
++
++    wait_for_serial("src_serial", FALSE);
++    migrate(from, uri, FALSE);
++
++    wait_for_migration_pass(from);
++
++    migrate_start_postcopy(from);
++
++    if (!got_stop) {
++        qtest_qmp_eventwait(from, "STOP");
++    }
++
++    qtest_qmp_eventwait(to, "RESUME");
++
++    wait_for_serial("dest_serial", TRUE);
++    wait_for_migration_complete(from);
++
++    g_free(uri);
++
++    test_migrate_end(from, to, true);
 +}
 +
-+static const VMStateDescription vmstate_msr_smi_count = {
-+    .name = "cpu/msr_smi_count",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = msr_smi_count_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.msr_smi_count, X86CPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static bool tscdeadline_needed(void *opaque)
+ int main(int argc, char **argv)
  {
-     X86CPU *cpu = opaque;
-@@ -952,6 +971,7 @@ VMStateDescription vmstate_x86_cpu = {
-         &vmstate_avx512,
-         &vmstate_xss,
-         &vmstate_tsc_khz,
-+        &vmstate_msr_smi_count,
- #ifdef TARGET_X86_64
-         &vmstate_pkru,
- #endif
+     char template[] = "/tmp/migration-test-XXXXXX";
+@@ -604,6 +660,7 @@ int main(int argc, char **argv)
+     module_call_init(MODULE_INIT_QOM);
+ 
+     qtest_add_func("/migration/postcopy/unix", test_migrate);
++    qtest_add_func("/migration/postcopy/to_used", test_migrate_to_used);
+     qtest_add_func("/migration/deprecated", test_deprecated);
+     qtest_add_func("/migration/bad_dest", test_baddest);
+ 
 -- 
-1.9.1
+2.16.2
