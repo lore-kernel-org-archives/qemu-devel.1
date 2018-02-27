@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60804)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eqiFF-0008VB-Vw
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:36:51 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eqiFH-0008Vx-3U
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:36:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eqiFC-0000jR-DM
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:36:50 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50396 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eqiFC-0000jJ-6W
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:36:46 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C4B184040073
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 16:36:45 +0000 (UTC)
-Date: Tue, 27 Feb 2018 17:36:39 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180227173639.7aeea5ce@redhat.com>
-In-Reply-To: <1518784641-43151-1-git-send-email-imammedo@redhat.com>
-References: <1518784641-43151-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eqiFF-0000kI-U6
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:36:51 -0500
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:37181)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eqiFF-0000k5-OG
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:36:49 -0500
+Received: by mail-oi0-x244.google.com with SMTP id f186so13312176oig.4
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 08:36:49 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/9] enable numa configuration before
- machine_init() from QMP
+In-Reply-To: <0f4e15f8aafe82a7b36318c0689f49c974b3402a.1519406423.git.alistair.francis@xilinx.com>
+References: <cover.1519406423.git.alistair.francis@xilinx.com>
+	<0f4e15f8aafe82a7b36318c0689f49c974b3402a.1519406423.git.alistair.francis@xilinx.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Feb 2018 16:36:28 +0000
+Message-ID: <CAFEAcA_U98jy+v0qKDKvYqh4LidHE-hdzNz=FdGBRKSdeexPoA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v6 2/3] xlnx-zynqmp-rtc: Add basic time
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,130 +30,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-On Fri, 16 Feb 2018 13:37:12 +0100
-Igor Mammedov <imammedo@redhat.com> wrote:
+On 23 February 2018 at 17:21, Alistair Francis
+<alistair.francis@xilinx.com> wrote:
+> Allow the guest to determine the time set from the QEMU command line.
+>
+> This includes adding a trace event to debug the new time.
+>
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 
-Eric,
+Thanks for reworking this -- I think it looks simpler this way.
 
-Adding you to CC list (git send-mail somehow haven't noticed you in cover letter).
+> diff --git a/include/hw/timer/xlnx-zynqmp-rtc.h b/include/hw/timer/xlnx-zynqmp-rtc.h
+> index 87649836cc..2867563bdd 100644
+> --- a/include/hw/timer/xlnx-zynqmp-rtc.h
+> +++ b/include/hw/timer/xlnx-zynqmp-rtc.h
+> @@ -79,6 +79,9 @@ typedef struct XlnxZynqMPRTC {
+>      qemu_irq irq_rtc_int;
+>      qemu_irq irq_addr_error_int;
+>
+> +    struct tm current_tm;
+> +    uint32_t tick_offset;
+> +
 
-Could you please look at QAPI/QMP parts of this series.
+Do we need current_tm to be a struct field now?
 
-> v1->v3:
->   * introduce PRECONFIG runstate with -preconfig option.
->     it's cleaner to manage transitions and do checks
->     than reusing existing PRELAUNCH state.
->   * extend QAPI schema commands with 'runstates' keyword,
->     so that it would be possible to specify in command definition
->     when it is valid to execute.
->     (python changes a bit hackery, since I have little to
->      no idea how it should work)
->   * add preconfig QMP and set-numa-node tests
->   * make mutually exclusive -preconfig and -incoming options,
->     for simplicity sake. Shouldn't be problem as target can
->     be starter with pure CLI, since mapping on source is
->     already known.
->   * Drop HMP part and leave only QMP in preconfig state.
-> 
-> 
-> Series allows to configure NUMA mapping at runtime using QMP
-> interface. For that to happen it introduces a new '-preconfig' CLI option
-> which allows to pause QEMU before machine_init() is run and
-> adds new set-numa-node QMP command which in conjunction with
-> query-hotpluggable-cpus allows to configure NUMA mapping for cpus.
-> 
-> Later we can modify other commands to run early, for example device_add.
-> I recall SPAPR had problem when libvirt started QEMU with -S and, while it's
-> paused, added CPUs with device_add. Intent was to coldplug CPUs (but at that
-> stage it's considered hotplug already), so SPAPR had to work around the issue.
-> 
-> Example of configuration session:
-> $QEMU -smp 2 -preconfig ...
-> 
-> QMP:
-> # get CPUs layout for current target/machine/CLI
-> -> {'execute': 'query-hotpluggable-cpus' }  
-> <- {'return': [
->        {'props': {'core-id': 0, 'thread-id': 0, 'socket-id': 1}, ... },
->        {'props': {'core-id': 0, 'thread-id': 0, 'socket-id': 0}, ... }
->    ]}
-> 
-> # configure 1st node
-> -> {'execute': 'set-numa-node', 'arguments': { 'type': 'node', 'nodeid': 0 } }  
-> <- {'return': {}}
-> -> {'execute': 'set-numa-node', 'arguments': { 'type': 'cpu',   
->        'node-id': 0, 'core-id': 0, 'thread-id': 0, 'socket-id': 1, }
->    }
-> <- {'return': {}}
-> 
-> # configure 2nd node
-> -> {'execute': 'set-numa-node', 'arguments': { 'type': 'node', 'nodeid': 1 } }
-> -> {'execute': 'set-numa-node', 'arguments': { 'type': 'cpu',  
->        'node-id': 1, 'core-id': 0, 'thread-id': 0, 'socket-id': 0 }
->    }
-> <- {'return': {}}
-> 
-> # [optional] verify configuration
-> -> {'execute': 'query-hotpluggable-cpus' }  
-> <- {'return': [
->        {'props': {'core-id': 0, 'thread-id': 0, 'node-id': 0, 'socket-id': 1}, ... },
->        {'props': {'core-id': 0, 'thread-id': 0, 'node-id': 1, 'socket-id': 0}, ... }
->    ]}
-> 
-> 
-> Git tree:
->     https://github.com/imammedo/qemu.git qmp_preconfig_v3
-> 
-> Ref to v1:
->     https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg03583.html
->     Message-Id: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
->   
-> CC: eblake@redhat.com
-> CC: armbru@redhat.com
-> CC: ehabkost@redhat.com
-> CC: pkrempa@redhat.com
-> CC: david@gibson.dropbear.id.au
-> CC: peter.maydell@linaro.org
-> CC: pbonzini@redhat.com
-> CC: cohuck@redhat.com
-> 
-> 
-> Igor Mammedov (9):
->   numa: postpone options post-processing till machine_run_board_init()
->   numa: split out NumaOptions parsing into parse_NumaOptions()
->   CLI: add -preconfig option
->   HMP: disable monitor in preconfig state
->   QAPI: allow to specify valid runstates per command
->   tests: extend qmp test with pereconfig checks
->   QMP: permit query-hotpluggable-cpus in preconfig state
->   QMP: add set-numa-node command
->   tests: functional tests for QMP command set-numa-node
-> 
->  include/qapi/qmp/dispatch.h             |  5 ++-
->  include/sysemu/numa.h                   |  2 +
->  include/sysemu/sysemu.h                 |  1 +
->  hw/core/machine.c                       |  5 ++-
->  monitor.c                               | 32 +++++++++++++--
->  numa.c                                  | 66 +++++++++++++++++++-----------
->  qapi-schema.json                        | 32 +++++++++++++--
->  qapi/qmp-dispatch.c                     | 39 ++++++++++++++++++
->  qapi/qmp-registry.c                     |  4 +-
->  qapi/run-state.json                     |  9 ++++-
->  qemu-options.hx                         | 11 +++++
->  qmp.c                                   |  5 +++
->  scripts/qapi-commands.py                | 46 ++++++++++++++++-----
->  scripts/qapi-introspect.py              |  2 +-
->  scripts/qapi.py                         | 15 ++++---
->  scripts/qapi2texi.py                    |  2 +-
->  tests/numa-test.c                       | 71 +++++++++++++++++++++++++++++++++
->  tests/qapi-schema/doc-good.out          |  4 +-
->  tests/qapi-schema/ident-with-escape.out |  2 +-
->  tests/qapi-schema/indented-expr.out     |  4 +-
->  tests/qapi-schema/qapi-schema-test.out  | 18 ++++-----
->  tests/qapi-schema/test-qapi.py          |  6 +--
->  tests/qmp-test.c                        | 56 ++++++++++++++++++++++++++
->  vl.c                                    | 35 +++++++++++++++-
->  24 files changed, 401 insertions(+), 71 deletions(-)
-> 
+> @@ -143,6 +164,10 @@ static void rtc_reset(DeviceState *dev)
+>          register_reset(&s->regs_info[i]);
+>      }
+>
+> +    trace_xlnx_zynqmp_rtc_gettime(s->current_tm.tm_year, s->current_tm.tm_mon,
+> +                                  s->current_tm.tm_mday, s->current_tm.tm_hour,
+> +                                  s->current_tm.tm_min, s->current_tm.tm_sec);
+> +
+
+...this trace is in reset, and is the only place we read
+current_tm, except for...
+
+>      rtc_int_update_irq(s);
+>      addr_error_int_update_irq(s);
+>  }
+> @@ -178,14 +203,46 @@ static void rtc_init(Object *obj)
+>      sysbus_init_mmio(sbd, &s->iomem);
+>      sysbus_init_irq(sbd, &s->irq_rtc_int);
+>      sysbus_init_irq(sbd, &s->irq_addr_error_int);
+> +
+> +    qemu_get_timedate(&s->current_tm, 0);
+> +    s->tick_offset = mktimegm(&s->current_tm) -
+> +        qemu_clock_get_ns(rtc_clock) / NANOSECONDS_PER_SECOND;
+
+...this code in init, which could just use a local variable
+instead, since the trace in reset isn't really reporting
+interesting information any more (the value never changes, so
+you could trace it in init instead).
+
+> +}
+>
+
+thanks
+-- PMM
