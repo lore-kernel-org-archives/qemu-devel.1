@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eqeBi-0005l0-G5
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 07:16:55 -0500
+	(envelope-from <berto@igalia.com>) id 1eqeZm-0001d8-Oi
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 07:41:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eqeBh-0000LM-Jb
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 07:16:54 -0500
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:41497)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eqeBh-0000Kp-Cc
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 07:16:53 -0500
-Received: by mail-ot0-x242.google.com with SMTP id w38so3547695ota.8
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 04:16:53 -0800 (PST)
+	(envelope-from <berto@igalia.com>) id 1eqeZj-0001wc-M6
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 07:41:46 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <e56321ad-d08f-5061-b356-2bebae25dc98@redhat.com>
+References: <cover.1518711805.git.berto@igalia.com>
+	<894433c083e20bbb82e208ea8b067b13609dbc19.1518711805.git.berto@igalia.com>
+	<e56321ad-d08f-5061-b356-2bebae25dc98@redhat.com>
+Date: Tue, 27 Feb 2018 13:41:39 +0100
+Message-ID: <w518tbe4nb0.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20180217182323.25885-45-richard.henderson@linaro.org>
-References: <20180217182323.25885-1-richard.henderson@linaro.org>
-	<20180217182323.25885-45-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Feb 2018 12:16:32 +0000
-Message-ID: <CAFEAcA-9n_fF0Z7Z+W+2Tf_5n8unS6jXa67yNKBM-DqrzCpRwA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 44/67] target/arm: Implement
- SVE Memory Contiguous Load Group
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC PATCH 1/2] qcow2: Allow checking and
+ repairing corrupted internal snapshots
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +24,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On 17 February 2018 at 18:23, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Commit message should mention significant missing things
-like first-fault/non-fault handling. (In general I would prefer
-not to see so many patches which all have one-liner commit
-messages.)
-
-> +static void trans_LDFF1_zprr(DisasContext *s, arg_rprr_load *a, uint32_t insn)
-> +{
-> +    /* FIXME */
-> +    trans_LD_zprr(s, a, insn);
-> +}
-> +
-> +static void trans_LDNF1_zpri(DisasContext *s, arg_rpri_load *a, uint32_t insn)
-> +{
-> +    /* FIXME */
-> +    trans_LD_zpri(s, a, insn);
-> +}
-
-What are these FIXMEs for? Either they should be fixed, or expanded
-into longer comments describing what needs fixing. I assume it is
-the missing non-fault/first-fault behaviour...
-
-> diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-> index 42d14994a1..d2b3869c58 100644
-> --- a/target/arm/sve.decode
-> +++ b/target/arm/sve.decode
-> @@ -42,9 +42,12 @@
->  %tszimm16_shl  22:2 16:5 !function=tszimm_shl
+On Mon 26 Feb 2018 02:40:08 PM CET, Max Reitz wrote:
+>> +                        "L1 table is too large; snapshot table entry corrupted\n",
+>> +                        (fix & BDRV_FIX_ERRORS) ? "Deleting" : "ERROR",
+>> +                        sn->id_str, sn->name, sn->l1_size);
+>> +                found_corruption = true;
+>> +            }
 >
->  # Signed 8-bit immediate, optionally shifted left by 8.
-> -%sh8_i8s               5:9 !function=expand_imm_sh8s
-> +%sh8_i8s       5:9 !function=expand_imm_sh8s
->  # Unsigned 8-bit immediate, optionally shifted left by 8.
-> -%sh8_i8u               5:9 !function=expand_imm_sh8u
-> +%sh8_i8u       5:9 !function=expand_imm_sh8u
+> This code assumes the snapshot table itself has been valid.  Why should
+> it be when it contains garbage entries?
+>
+>> +
+>> +            if (found_corruption) {
+>> +                result->corruptions++;
+>> +                sn->l1_size = 0; /* Prevent this L1 table from being used */
+>> +                if (fix & BDRV_FIX_ERRORS) {
+>> +                    ret = qcow2_snapshot_delete(bs, sn->id_str, sn->name, NULL);
+>
+> So calling this is actually very dangerous.  It modifies the snapshot
+> table which I wouldn't trust is actually just a snapshot table.  It
+> could intersect any other structure in the qcow2 image.  Yes, we do an
+> overlap check, but that only protects metadata, and I don't really
+> want to see an overlap check corruption when repairing the image;
+> especially since this means you cannot fix the corruption.
 
+I think you're right. One thing that could be done is check that the
+area where the snapshot table is supposed to be doesn't overlap with any
+other data structures.
 
-More changes that should be squashed into earlier patch.
+> I don't quite know myself what to do instead, but I guess my main
+> point would be: Before any (potentially) destructive changes are made,
+> the user should have the chance of still opening the image read-only
+> and copying all the data off somewhere else.  Which of course again
+> means we shouldn't prevent the user from opening an image because a
+> snapshot is broken.
 
+Ok, you've convinced me. I'll see what I can come up with. I guess
+initially we can simply add checks for sn->l1_table_offset and
+sn->l1_size in the places where they're used.
 
-otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+Berto
