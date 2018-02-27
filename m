@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eqgPV-0003pX-DZ
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:39:22 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eqgPT-0003mg-D2
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:39:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eqgPU-000866-46
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:39:17 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:40643)
+	(envelope-from <alex.bennee@linaro.org>) id 1eqgPO-00082L-BC
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:39:15 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:32978)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eqgPT-00085a-RG
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:39:16 -0500
-Received: by mail-wm0-x242.google.com with SMTP id t6so15916985wmt.5
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 06:39:15 -0800 (PST)
+	id 1eqgPO-00081r-1c
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:39:10 -0500
+Received: by mail-wm0-x243.google.com with SMTP id s206so21986441wme.0
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 06:39:09 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 27 Feb 2018 14:38:38 +0000
-Message-Id: <20180227143852.11175-18-alex.bennee@linaro.org>
+Date: Tue, 27 Feb 2018 14:38:33 +0000
+Message-Id: <20180227143852.11175-13-alex.bennee@linaro.org>
 In-Reply-To: <20180227143852.11175-1-alex.bennee@linaro.org>
 References: <20180227143852.11175-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 17/31] arm/translate-a64: add FP16 FPRINTx
- to simd_two_reg_misc_fp16
+Subject: [Qemu-devel] [PATCH v4 12/31] arm/translate-a64: add FP16
+ FR[ECP/SQRT]S to simd_three_reg_same_fp16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,213 +31,169 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-arm@nongnu.org
-Cc: qemu-devel@nongnu.org, richard.henderson@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, richard.henderson@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>
 
-This adds the full range of half-precision floating point to integral
-instructions.
+As some of the constants here will also be needed
+elsewhere (specifically for the upcoming SVE support) we move them out
+to softfloat.h.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
 ---
 v3
-  - fix re-base conflicts
-  - move comment to previous commit
-  - don't double test is_scalar in unallocated checks
+  - move constants used for estimate to softfloat.h
 ---
- target/arm/helper-a64.c    |  22 ++++++++
- target/arm/helper-a64.h    |   2 +
- target/arm/translate-a64.c | 123 +++++++++++++++++++++++++++++++++++++++++++--
- 3 files changed, 142 insertions(+), 5 deletions(-)
+ include/fpu/softfloat.h    | 16 ++++++++++++----
+ target/arm/helper-a64.c    | 34 ++++++++++++++++++++++++++++++++++
+ target/arm/helper-a64.h    |  2 ++
+ target/arm/translate-a64.c |  6 ++++++
+ 4 files changed, 54 insertions(+), 4 deletions(-)
 
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index 9b7b5e34e2..27876e711c 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -306,8 +306,11 @@ static inline float16 float16_set_sign(float16 a, int sign)
+ }
+ 
+ #define float16_zero make_float16(0)
+-#define float16_one make_float16(0x3c00)
+ #define float16_half make_float16(0x3800)
++#define float16_one make_float16(0x3c00)
++#define float16_one_point_five make_float16(0x3e00)
++#define float16_two make_float16(0x4000)
++#define float16_three make_float16(0x4200)
+ #define float16_infinity make_float16(0x7c00)
+ 
+ /*----------------------------------------------------------------------------
+@@ -415,11 +418,13 @@ static inline float32 float32_set_sign(float32 a, int sign)
+ }
+ 
+ #define float32_zero make_float32(0)
+-#define float32_one make_float32(0x3f800000)
+ #define float32_half make_float32(0x3f000000)
++#define float32_one make_float32(0x3f800000)
++#define float32_one_point_five make_float32(0x3fc00000)
++#define float32_two make_float32(0x40000000)
++#define float32_three make_float32(0x40400000)
+ #define float32_infinity make_float32(0x7f800000)
+ 
+-
+ /*----------------------------------------------------------------------------
+ | The pattern for a default generated single-precision NaN.
+ *----------------------------------------------------------------------------*/
+@@ -526,9 +531,12 @@ static inline float64 float64_set_sign(float64 a, int sign)
+ }
+ 
+ #define float64_zero make_float64(0)
++#define float64_half make_float64(0x3fe0000000000000LL)
+ #define float64_one make_float64(0x3ff0000000000000LL)
++#define float64_one_point_five make_float64(0x3FF8000000000000ULL)
++#define float64_two make_float64(0x4000000000000000ULL)
++#define float64_three make_float64(0x4008000000000000ULL)
+ #define float64_ln2 make_float64(0x3fe62e42fefa39efLL)
+-#define float64_half make_float64(0x3fe0000000000000LL)
+ #define float64_infinity make_float64(0x7ff0000000000000LL)
+ 
+ /*----------------------------------------------------------------------------
 diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
-index 4d5ae96d8f..4fd28fdf48 100644
+index 1ef13abd76..8fdbe034f3 100644
 --- a/target/arm/helper-a64.c
 +++ b/target/arm/helper-a64.c
-@@ -745,3 +745,25 @@ uint32_t HELPER(advsimd_acgt_f16)(float16 a, float16 b, void *fpstp)
-     int compare = float16_compare(f0, f1, fpst);
-     return ADVSIMD_CMPRES(compare == float_relation_greater);
- }
+@@ -192,6 +192,10 @@ uint64_t HELPER(neon_cgt_f64)(float64 a, float64 b, void *fpstp)
+  * versions, these do a fully fused multiply-add or
+  * multiply-add-and-halve.
+  */
++#define float16_two make_float16(0x4000)
++#define float16_three make_float16(0x4200)
++#define float16_one_point_five make_float16(0x3e00)
 +
-+/* round to integral */
-+float16 HELPER(advsimd_rinth_exact)(float16 x, void *fp_status)
+ #define float32_two make_float32(0x40000000)
+ #define float32_three make_float32(0x40400000)
+ #define float32_one_point_five make_float32(0x3fc00000)
+@@ -200,6 +204,21 @@ uint64_t HELPER(neon_cgt_f64)(float64 a, float64 b, void *fpstp)
+ #define float64_three make_float64(0x4008000000000000ULL)
+ #define float64_one_point_five make_float64(0x3FF8000000000000ULL)
+ 
++float16 HELPER(recpsf_f16)(float16 a, float16 b, void *fpstp)
 +{
-+    return float16_round_to_int(x, fp_status);
-+}
++    float_status *fpst = fpstp;
 +
-+float16 HELPER(advsimd_rinth)(float16 x, void *fp_status)
-+{
-+    int old_flags = get_float_exception_flags(fp_status), new_flags;
-+    float16 ret;
++    a = float16_squash_input_denormal(a, fpst);
++    b = float16_squash_input_denormal(b, fpst);
 +
-+    ret = float16_round_to_int(x, fp_status);
-+
-+    /* Suppress any inexact exceptions the conversion produced */
-+    if (!(old_flags & float_flag_inexact)) {
-+        new_flags = get_float_exception_flags(fp_status);
-+        set_float_exception_flags(new_flags & ~float_flag_inexact, fp_status);
++    a = float16_chs(a);
++    if ((float16_is_infinity(a) && float16_is_zero(b)) ||
++        (float16_is_infinity(b) && float16_is_zero(a))) {
++        return float16_two;
 +    }
-+
-+    return ret;
++    return float16_muladd(a, b, float16_two, 0, fpst);
 +}
++
+ float32 HELPER(recpsf_f32)(float32 a, float32 b, void *fpstp)
+ {
+     float_status *fpst = fpstp;
+@@ -230,6 +249,21 @@ float64 HELPER(recpsf_f64)(float64 a, float64 b, void *fpstp)
+     return float64_muladd(a, b, float64_two, 0, fpst);
+ }
+ 
++float16 HELPER(rsqrtsf_f16)(float16 a, float16 b, void *fpstp)
++{
++    float_status *fpst = fpstp;
++
++    a = float16_squash_input_denormal(a, fpst);
++    b = float16_squash_input_denormal(b, fpst);
++
++    a = float16_chs(a);
++    if ((float16_is_infinity(a) && float16_is_zero(b)) ||
++        (float16_is_infinity(b) && float16_is_zero(a))) {
++        return float16_one_point_five;
++    }
++    return float16_muladd(a, b, float16_three, float_muladd_halve_result, fpst);
++}
++
+ float32 HELPER(rsqrtsf_f32)(float32 a, float32 b, void *fpstp)
+ {
+     float_status *fpst = fpstp;
 diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
-index 003ffa582f..bc8d5b105b 100644
+index 9c1a95594c..79012eee9d 100644
 --- a/target/arm/helper-a64.h
 +++ b/target/arm/helper-a64.h
-@@ -75,3 +75,5 @@ DEF_HELPER_3(advsimd_maxnum2h, i32, i32, i32, ptr)
- DEF_HELPER_3(advsimd_minnum2h, i32, i32, i32, ptr)
- DEF_HELPER_3(advsimd_mulx2h, i32, i32, i32, ptr)
- DEF_HELPER_4(advsimd_muladd2h, i32, i32, i32, i32, ptr)
-+DEF_HELPER_2(advsimd_rinth_exact, f16, f16, ptr)
-+DEF_HELPER_2(advsimd_rinth, f16, f16, ptr)
+@@ -29,8 +29,10 @@ DEF_HELPER_FLAGS_3(vfp_mulxd, TCG_CALL_NO_RWG, f64, f64, f64, ptr)
+ DEF_HELPER_FLAGS_3(neon_ceq_f64, TCG_CALL_NO_RWG, i64, i64, i64, ptr)
+ DEF_HELPER_FLAGS_3(neon_cge_f64, TCG_CALL_NO_RWG, i64, i64, i64, ptr)
+ DEF_HELPER_FLAGS_3(neon_cgt_f64, TCG_CALL_NO_RWG, i64, i64, i64, ptr)
++DEF_HELPER_FLAGS_3(recpsf_f16, TCG_CALL_NO_RWG, f16, f16, f16, ptr)
+ DEF_HELPER_FLAGS_3(recpsf_f32, TCG_CALL_NO_RWG, f32, f32, f32, ptr)
+ DEF_HELPER_FLAGS_3(recpsf_f64, TCG_CALL_NO_RWG, f64, f64, f64, ptr)
++DEF_HELPER_FLAGS_3(rsqrtsf_f16, TCG_CALL_NO_RWG, f16, f16, f16, ptr)
+ DEF_HELPER_FLAGS_3(rsqrtsf_f32, TCG_CALL_NO_RWG, f32, f32, f32, ptr)
+ DEF_HELPER_FLAGS_3(rsqrtsf_f64, TCG_CALL_NO_RWG, f64, f64, f64, ptr)
+ DEF_HELPER_FLAGS_1(neon_addlp_s8, TCG_CALL_NO_RWG_SE, i64, i64)
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 9c1892c49a..3c37eb99ff 100644
+index 0e2d298687..217e73ef58 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -11180,27 +11180,140 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
-  */
- static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
- {
--    int fpop, opcode, a;
-+    int fpop, opcode, a, u;
-+    int rn, rd;
-+    bool is_q;
-+    bool is_scalar;
-+    bool only_in_vector = false;
-+
-+    int pass;
-+    TCGv_i32 tcg_rmode = NULL;
-+    TCGv_ptr tcg_fpstatus = NULL;
-+    bool need_rmode = false;
-+    int rmode;
- 
-     if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
-         unallocated_encoding(s);
-         return;
-     }
- 
--    if (!fp_access_check(s)) {
--        return;
--    }
-+    rd = extract32(insn, 0, 5);
-+    rn = extract32(insn, 5, 5);
- 
--    opcode = extract32(insn, 12, 4);
-     a = extract32(insn, 23, 1);
-+    u = extract32(insn, 29, 1);
-+    is_scalar = extract32(insn, 28, 1);
-+    is_q = extract32(insn, 30, 1);
-+
-+    opcode = extract32(insn, 12, 5);
-     fpop = deposit32(opcode, 5, 1, a);
-+    fpop = deposit32(fpop, 6, 1, u);
- 
-     switch (fpop) {
-+    case 0x18: /* FRINTN */
-+        need_rmode = true;
-+        only_in_vector = true;
-+        rmode = FPROUNDING_TIEEVEN;
-+        break;
-+    case 0x19: /* FRINTM */
-+        need_rmode = true;
-+        only_in_vector = true;
-+        rmode = FPROUNDING_NEGINF;
-+        break;
-+    case 0x38: /* FRINTP */
-+        need_rmode = true;
-+        only_in_vector = true;
-+        rmode = FPROUNDING_POSINF;
-+        break;
-+    case 0x39: /* FRINTZ */
-+        need_rmode = true;
-+        only_in_vector = true;
-+        rmode = FPROUNDING_ZERO;
-+        break;
-+    case 0x58: /* FRINTA */
-+        need_rmode = true;
-+        only_in_vector = true;
-+        rmode = FPROUNDING_TIEAWAY;
-+        break;
-+    case 0x59: /* FRINTX */
-+    case 0x79: /* FRINTI */
-+        only_in_vector = true;
-+        /* current rounding mode */
-+        break;
-     default:
-         fprintf(stderr, "%s: insn %#04x fpop %#2x\n", __func__, insn, fpop);
-         g_assert_not_reached();
-     }
- 
-+
-+    /* Check additional constraints for the scalar encoding */
-+    if (is_scalar) {
-+        if (!is_q) {
-+            unallocated_encoding(s);
-+            return;
-+        }
-+        /* FRINTxx is only in the vector form */
-+        if (only_in_vector) {
-+            unallocated_encoding(s);
-+            return;
-+        }
-+    }
-+
-+    if (!fp_access_check(s)) {
-+        return;
-+    }
-+
-+    if (need_rmode) {
-+        tcg_fpstatus = get_fpstatus_ptr(true);
-+    }
-+
-+    if (need_rmode) {
-+        tcg_rmode = tcg_const_i32(arm_rmode_to_sf(rmode));
-+        gen_helper_set_rmode(tcg_rmode, tcg_rmode, tcg_fpstatus);
-+    }
-+
-+    if (is_scalar) {
-+        /* no operations yet */
-+    } else {
-+        for (pass = 0; pass < (is_q ? 8 : 4); pass++) {
-+            TCGv_i32 tcg_op = tcg_temp_new_i32();
-+            TCGv_i32 tcg_res = tcg_temp_new_i32();
-+
-+            read_vec_element_i32(s, tcg_op, rn, pass, MO_16);
-+
-+            switch (fpop) {
-+            case 0x18: /* FRINTN */
-+            case 0x19: /* FRINTM */
-+            case 0x38: /* FRINTP */
-+            case 0x39: /* FRINTZ */
-+            case 0x58: /* FRINTA */
-+            case 0x79: /* FRINTI */
-+                gen_helper_advsimd_rinth(tcg_res, tcg_op, tcg_fpstatus);
-+                break;
-+            case 0x59: /* FRINTX */
-+                gen_helper_advsimd_rinth_exact(tcg_res, tcg_op, tcg_fpstatus);
-+                break;
-+            default:
-+                g_assert_not_reached();
-+            }
-+
-+            write_vec_element_i32(s, tcg_res, rd, pass, MO_16);
-+
-+            tcg_temp_free_i32(tcg_res);
-+            tcg_temp_free_i32(tcg_op);
-+        }
-+
-+        clear_vec_high(s, is_q, rd);
-+    }
-+
-+    if (tcg_rmode) {
-+        gen_helper_set_rmode(tcg_rmode, tcg_rmode, tcg_fpstatus);
-+        tcg_temp_free_i32(tcg_rmode);
-+    }
-+
-+    if (tcg_fpstatus) {
-+        tcg_temp_free_ptr(tcg_fpstatus);
-+    }
- }
- 
- /* AdvSIMD scalar x indexed element
+@@ -10303,6 +10303,9 @@ static void disas_simd_three_reg_same_fp16(DisasContext *s, uint32_t insn)
+         case 0x6: /* FMAX */
+             gen_helper_advsimd_maxh(tcg_res, tcg_op1, tcg_op2, fpst);
+             break;
++        case 0x7: /* FRECPS */
++            gen_helper_recpsf_f16(tcg_res, tcg_op1, tcg_op2, fpst);
++            break;
+         case 0x8: /* FMINNM */
+             gen_helper_advsimd_minnumh(tcg_res, tcg_op1, tcg_op2, fpst);
+             break;
+@@ -10319,6 +10322,9 @@ static void disas_simd_three_reg_same_fp16(DisasContext *s, uint32_t insn)
+         case 0xe: /* FMIN */
+             gen_helper_advsimd_minh(tcg_res, tcg_op1, tcg_op2, fpst);
+             break;
++        case 0xf: /* FRSQRTS */
++            gen_helper_rsqrtsf_f16(tcg_res, tcg_op1, tcg_op2, fpst);
++            break;
+         case 0x13: /* FMUL */
+             gen_helper_advsimd_mulh(tcg_res, tcg_op1, tcg_op2, fpst);
+             break;
 -- 
 2.15.1
