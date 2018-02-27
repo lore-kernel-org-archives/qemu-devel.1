@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eqdVw-0003Rm-6u
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 06:33:44 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eqdb4-0005O5-RW
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 06:39:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eqdVs-0007CB-Uv
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 06:33:44 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54378 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1eqdb1-0001Sm-GD
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 06:39:02 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41904 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eqdVs-0007Bu-R5
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 06:33:40 -0500
-References: <1519709965-29833-1-git-send-email-cota@braap.org>
-	<1519709965-29833-14-git-send-email-cota@braap.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <957151ea-178c-f8a9-7875-1b26bf4a981b@redhat.com>
-Date: Tue, 27 Feb 2018 12:33:29 +0100
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eqdb1-0001Sf-Ah
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 06:38:59 -0500
+Date: Tue, 27 Feb 2018 11:38:41 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180227113841.GC2847@work-vm>
+References: <20180223215858.16987-1-wei@redhat.com>
+	<20180223215858.16987-3-wei@redhat.com>
+	<20180226180110.GE2873@work-vm>
+	<3904e31b-8c66-b241-7369-1b479b683da8@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1519709965-29833-14-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 13/16] translate-all: protect TB jumps with
- a per-destination-TB lock
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3904e31b-8c66-b241-7369-1b479b683da8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V5 2/4] tests/migration: Convert the boot
+ block compilation script into Makefile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +30,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>
+To: Wei Huang <wei@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, quintela@redhat.com, drjones@redhat.com
 
-On 27/02/2018 06:39, Emilio G. Cota wrote:
-> Using a hash table or a binary tree to keep track of the jumps
-> doesn't really pay off, not only due to the increased memory usage,
-> but also because most TBs have only 0 or 1 jumps to them. The maximum
-> number of jumps when booting debian-arm that I measured is 35, but
-> as we can see in the histogram below a TB with that many incoming jumps
-> is extremely rare; the average TB has 0.80 incoming jumps.
->=20
-> n_jumps: 379208; avg jumps/tb: 0.801099
-> dist: [0.0,1.0)|=E2=96=84=E2=96=88=E2=96=81=E2=96=81=E2=96=81=E2=96=81=E2=
-=96=81=E2=96=81=E2=96=81=E2=96=81=E2=96=81=E2=96=81=E2=96=81 =E2=96=81=E2=
-=96=81=E2=96=81=E2=96=81=E2=96=81=E2=96=81 =E2=96=81=E2=96=81=E2=96=81  =E2=
-=96=81=E2=96=81=E2=96=81     =E2=96=81|[34.0,35.0]
+* Wei Huang (wei@redhat.com) wrote:
+> 
+> 
+> On 02/26/2018 12:01 PM, Dr. David Alan Gilbert wrote:
+> > * Wei Huang (wei@redhat.com) wrote:
+> >> The x86 boot block header currently is generated with a shell script.
+> >> To better support other CPUs (e.g. aarch64), we convert the script
+> >> into Makefile. This allows us to 1) support cross-compilation easily,
+> >> and 2) avoid creating a script file for every architecture.
+> >>
+> >> Signed-off-by: Wei Huang <wei@redhat.com>
+> > 
+> > But what happens if you're on a system that doesn't have the cross
+> > compilers?  I found it's too easy to get stuck with it trying
+> > to rebuild the header when there's no need.
+> 
+> I think it is fine. If no cross compiler is present, NNN_cross_prefix
+> won't find anything. So it ends up with using the gcc tools on host
+> systems. Obviously the compilation will fail. This should become the
+> problem to solve for whoever wants to do cross-compile. For us, we have
+> done our part because the .h files have been provided.
 
-This makes sense, for example:
+But isn't it a problem for people just trying to make check?
+One of the things that convinced me to move it out of the makefile and
+into a separate script was that it was too easy to get into a situation
+where Make wanted to rebuild the headerilfe on a system.
 
-   while(...) {
-   }
+Dave
 
-2 basic blocks, 0 and 1 incoming jumps (avg 0.5)
-
-   if(...) {
-   }
-
-2 basic blocks, 0 and 1 incoming jumps (avg 0.5)
-
-   if(...) {
-   } else {
-   }
-
-3 basic blocks, 0, 1 and 1 incoming jumps (avg 0.66)
-
-So 0.8 is actually a lot. :)  The long tail is probably for switch
-statements.
-
-Paolo
+> > 
+> > Dave
+> > 
+> >> ---
+> >>  tests/migration/Makefile                 | 36 ++++++++++++++++++++++++++++++++
+> >>  tests/migration/rebuild-x86-bootblock.sh | 33 -----------------------------
+> >>  tests/migration/x86-a-b-bootblock.h      |  2 +-
+> >>  tests/migration/x86-a-b-bootblock.s      |  5 ++---
+> >>  4 files changed, 39 insertions(+), 37 deletions(-)
+> >>  create mode 100644 tests/migration/Makefile
+> >>  delete mode 100755 tests/migration/rebuild-x86-bootblock.sh
+> >>
+> >> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
+> >> new file mode 100644
+> >> index 0000000000..8fbedaa8b8
+> >> --- /dev/null
+> >> +++ b/tests/migration/Makefile
+> >> @@ -0,0 +1,36 @@
+> >> +#
+> >> +# Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
+> >> +#
+> >> +# Authors:
+> >> +#   Dave Gilbert <dgilbert@redhat.com>
+> >> +#
+> >> +# This work is licensed under the terms of the GNU GPL, version 2 or later.
+> >> +# See the COPYING file in the top-level directory.
+> >> +#
+> >> +export __note
+> >> +override define __note
+> >> +/* This file is automatically generated from
+> >> + * tests/migration/$<, edit that and then run
+> >> + * "make $@" inside tests/migration to update,
+> >> + * and then remember to send both in your patch submission.
+> >> + */
+> >> +endef
+> >> +
+> >> +all: x86-a-b-bootblock.h
+> >> +# Dummy command so that make thinks it has done something
+> >> +	@true
+> >> +
+> >> +SRC_PATH=../..
+> >> +include $(SRC_PATH)/rules.mak
+> >> +
+> >> +x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
+> >> +
+> >> +x86-a-b-bootblock.h: x86-a-b-bootblock.s
+> >> +	$(x86_64_cross_prefix)as --32 -march=i486 $< -o x86.o
+> >> +	$(x86_64_cross_prefix)objcopy -O binary x86.o x86.boot
+> >> +	dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124
+> >> +	echo "$$__note" > $@
+> >> +	xxd -i x86.bootsect | sed -e 's/.*int.*//' >> $@
+> >> +
+> >> +clean:
+> >> +	rm -f *.bootsect *.boot *.o
+> >> diff --git a/tests/migration/rebuild-x86-bootblock.sh b/tests/migration/rebuild-x86-bootblock.sh
+> >> deleted file mode 100755
+> >> index 86cec5d284..0000000000
+> >> --- a/tests/migration/rebuild-x86-bootblock.sh
+> >> +++ /dev/null
+> >> @@ -1,33 +0,0 @@
+> >> -#!/bin/sh
+> >> -# Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
+> >> -# This work is licensed under the terms of the GNU GPL, version 2 or later.
+> >> -# See the COPYING file in the top-level directory.
+> >> -#
+> >> -# Author: dgilbert@redhat.com
+> >> -
+> >> -ASMFILE=$PWD/tests/migration/x86-a-b-bootblock.s
+> >> -HEADER=$PWD/tests/migration/x86-a-b-bootblock.h
+> >> -
+> >> -if [ ! -e "$ASMFILE" ]
+> >> -then
+> >> -  echo "Couldn't find $ASMFILE" >&2
+> >> -  exit 1
+> >> -fi
+> >> -
+> >> -ASM_WORK_DIR=$(mktemp -d --tmpdir X86BB.XXXXXX)
+> >> -cd "$ASM_WORK_DIR" &&
+> >> -as --32 -march=i486 "$ASMFILE" -o x86.o &&
+> >> -objcopy -O binary x86.o x86.boot &&
+> >> -dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124 &&
+> >> -xxd -i x86.bootsect |
+> >> -sed -e 's/.*int.*//' > x86.hex &&
+> >> -cat - x86.hex <<HERE > "$HEADER"
+> >> -/* This file is automatically generated from
+> >> - * tests/migration/x86-a-b-bootblock.s, edit that and then run
+> >> - * tests/migration/rebuild-x86-bootblock.sh to update,
+> >> - * and then remember to send both in your patch submission.
+> >> - */
+> >> -HERE
+> >> -
+> >> -rm x86.hex x86.bootsect x86.boot x86.o
+> >> -cd .. && rmdir "$ASM_WORK_DIR"
+> >> diff --git a/tests/migration/x86-a-b-bootblock.h b/tests/migration/x86-a-b-bootblock.h
+> >> index 78a151fe2a..9e8e2e028b 100644
+> >> --- a/tests/migration/x86-a-b-bootblock.h
+> >> +++ b/tests/migration/x86-a-b-bootblock.h
+> >> @@ -1,6 +1,6 @@
+> >>  /* This file is automatically generated from
+> >>   * tests/migration/x86-a-b-bootblock.s, edit that and then run
+> >> - * tests/migration/rebuild-x86-bootblock.sh to update,
+> >> + * "make x86-a-b-bootblock.h" inside tests/migration to update,
+> >>   * and then remember to send both in your patch submission.
+> >>   */
+> >>  unsigned char x86_bootsect[] = {
+> >> diff --git a/tests/migration/x86-a-b-bootblock.s b/tests/migration/x86-a-b-bootblock.s
+> >> index b1642641a7..98dbfab084 100644
+> >> --- a/tests/migration/x86-a-b-bootblock.s
+> >> +++ b/tests/migration/x86-a-b-bootblock.s
+> >> @@ -3,9 +3,8 @@
+> >>  #  range.
+> >>  #  Outputs an initial 'A' on serial followed by repeated 'B's
+> >>  #
+> >> -# run   tests/migration/rebuild-x86-bootblock.sh
+> >> -#   to regenerate the hex, and remember to include both the .h and .s
+> >> -#   in any patches.
+> >> +#  In tests/migration dir, run 'make x86-a-b-bootblock.h' to regenerate
+> >> +#  the hex, and remember to include both the .h and .s in any patches.
+> >>  #
+> >>  # Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
+> >>  # This work is licensed under the terms of the GNU GPL, version 2 or later.
+> >> -- 
+> >> 2.14.3
+> >>
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
