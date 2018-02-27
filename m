@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34875)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eql20-0004mA-0o
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:35:23 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eql2G-0004vI-6d
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:35:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eql1w-0005fM-7C
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:35:20 -0500
-References: <20180223235142.21501-1-jsnow@redhat.com>
-	<20180223235142.21501-9-jsnow@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <46034cb1-d31e-ba4b-2474-f90c08bdfbfc@redhat.com>
-Date: Tue, 27 Feb 2018 13:34:58 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180223235142.21501-9-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v4 08/21] blockjobs: add ABORTING state
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eql2D-0005n9-3d
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:35:36 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58804
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
+	id 1eql2C-0005mJ-Pt
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:35:33 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1RJYc5Z043980
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 14:35:31 -0500
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2gdbcu5ujx-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 14:35:30 -0500
+Received: from localhost
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
+	Tue, 27 Feb 2018 12:35:27 -0700
+From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
+Date: Tue, 27 Feb 2018 14:35:21 -0500
+Message-Id: <1519760121-24594-1-git-send-email-walling@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2] s390/ipl: only print boot menu error if
+ -boot menu=on was specified
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,68 +37,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
+To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, thuth@redhat.com, mihajlov@linux.vnet.ibm.com
 
-On 02/23/2018 05:51 PM, John Snow wrote:
-> Add a new state ABORTING.
-> 
-> This makes transitions from normative states to error states explicit
-> in the STM, and serves as a disambiguation for which states may complete
-> normally when normal end-states (CONCLUDED) are added in future commits.
-> 
-> Notably, Paused/Standby jobs do not transition directly to aborting,
-> as they must wake up first and cooperate in their cancellation.
-> 
-> Transitions:
-> Running -> Aborting: can be cancelled or encounter an error
-> Ready   -> Aborting: can be cancelled or encounter an error
-> 
-> Verbs:
-> None. The job must finish cleaning itself up and report its final status.
-> 
->               +---------+
->               |UNDEFINED|
->               +--+------+
->                  |
->               +--v----+
->               |CREATED|
->               +--+----+
->                  |
->               +--v----+     +------+
->     +---------+RUNNING<----->PAUSED|
->     |         +--+----+     +------+
->     |            |
->     |         +--v--+       +-------+
->     +---------+READY<------->STANDBY|
->     |         +-----+       +-------+
->     |
-> +--v-----+
-> |ABORTING|
-> +--------+
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->   blockjob.c           | 31 ++++++++++++++++++-------------
->   qapi/block-core.json |  7 ++++++-
->   2 files changed, 24 insertions(+), 14 deletions(-)
-> 
+It is possible that certain QEMU configurations may not
+create an IPLB (such as when -kernel is provided). In
+this case, a misleading error message will be printed
+stating that the "boot menu is not supported for this
+device type".
 
-> +++ b/qapi/block-core.json
-> @@ -996,10 +996,15 @@
->   # @standby: The job is ready, but paused. This is nearly identical to @paused.
->   #           The job may return to @ready or otherwise be canceled.
->   #
-> +# @aborting: The job is in the process of being aborted, and will finish with
-> +#            an error. The job will afterwards report that it is @concluded.
+To amend this, only print this message iff boot menu=on
+was provided on the commandline. Otherwise, return silently.
 
-@concluded isn't defined yet, but I'm okay with the minor future 
-reference, as it's less churn to get to the description that works at 
-the end of the series.
+While we're at it, remove trailing periods from error
+messages.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+---
+ hw/s390x/ipl.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index 798e99a..d7fb33f 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -234,7 +234,7 @@ static void s390_ipl_set_boot_menu(S390IPLState *ipl)
+     if (!get_boot_device(0)) {
+         if (boot_menu) {
+             error_report("boot menu requires a bootindex to be specified for "
+-                         "the IPL device.");
++                         "the IPL device");
+         }
+         return;
+     }
+@@ -250,7 +250,9 @@ static void s390_ipl_set_boot_menu(S390IPLState *ipl)
+     case S390_IPL_TYPE_QEMU_SCSI:
+         break;
+     default:
+-        error_report("boot menu is not supported for this device type.");
++        if (boot_menu) {
++            error_report("boot menu is not supported for this device type");
++        }
+         return;
+     }
+ 
+@@ -263,13 +265,13 @@ static void s390_ipl_set_boot_menu(S390IPLState *ipl)
+     tmp = qemu_opt_get(opts, "splash-time");
+ 
+     if (tmp && qemu_strtoul(tmp, NULL, 10, &splash_time)) {
+-        error_report("splash-time is invalid, forcing it to 0.");
++        error_report("splash-time is invalid, forcing it to 0");
+         *timeout = 0;
+         return;
+     }
+ 
+     if (splash_time > 0xffffffff) {
+-        error_report("splash-time is too large, forcing it to max value.");
++        error_report("splash-time is too large, forcing it to max value");
+         *timeout = 0xffffffff;
+         return;
+     }
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.7.4
