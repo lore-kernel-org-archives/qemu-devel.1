@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eqh1R-0004FT-SX
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:18:30 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eqh2V-00056p-Mq
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:19:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eqh1Q-00071v-LZ
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:18:29 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:45336)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eqh1Q-00071g-GR
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:18:28 -0500
-Received: by mail-ot0-x244.google.com with SMTP id f11so4058680otj.12
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 07:18:28 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20180217182323.25885-60-richard.henderson@linaro.org>
-References: <20180217182323.25885-1-richard.henderson@linaro.org>
-	<20180217182323.25885-60-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Feb 2018 15:18:07 +0000
-Message-ID: <CAFEAcA_q6Ca5JT-850hR43sSmPinvvb6W_s0y8mVyjyaHGeFdQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 59/67] target/arm: Implement
- SVE Floating Point Multiply Indexed Group
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eqh2P-0007Mr-Fg
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:19:35 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57140
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
+	id 1eqh2P-0007Lw-AI
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:19:29 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1RFHa59032720
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 10:19:28 -0500
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2gd8kqku1y-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 10:19:28 -0500
+Received: from localhost
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
+	Tue, 27 Feb 2018 08:19:27 -0700
+From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
+Date: Tue, 27 Feb 2018 10:19:20 -0500
+Message-Id: <1519744760-12337-1-git-send-email-walling@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH] s390-ccw: only print boot menu error if -boot
+ menu=on was specified
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +37,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, thuth@redhat.com, mihajlov@linux.vnet.ibm.com
 
-On 17 February 2018 at 18:23, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/helper.h        | 14 ++++++++++
->  target/arm/translate-sve.c | 44 +++++++++++++++++++++++++++++++
->  target/arm/vec_helper.c    | 64 ++++++++++++++++++++++++++++++++++++++++++++++
->  target/arm/sve.decode      | 19 ++++++++++++++
->  4 files changed, 141 insertions(+)
+It is possible that certain QEMU configurations may not
+create an IPLB (such as when -kernel is provided). In
+this case, a misleading error message will be printed
+stating that the "boot menu is not supported for this
+device type".
 
-> diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
-> index ad5c29cdd5..e711a3217d 100644
-> --- a/target/arm/vec_helper.c
-> +++ b/target/arm/vec_helper.c
-> @@ -24,6 +24,22 @@
->  #include "fpu/softfloat.h"
->
->
-> +/* Note that vector data is stored in host-endian 64-bit chunks,
-> +   so addressing units smaller than that needs a host-endian fixup.  */
-> +#ifdef HOST_WORDS_BIGENDIAN
-> +#define H1(x)   ((x) ^ 7)
-> +#define H1_2(x) ((x) ^ 6)
-> +#define H1_4(x) ((x) ^ 4)
-> +#define H2(x)   ((x) ^ 3)
-> +#define H4(x)   ((x) ^ 1)
-> +#else
-> +#define H1(x)   (x)
-> +#define H1_2(x) (x)
-> +#define H1_4(x) (x)
-> +#define H2(x)   (x)
-> +#define H4(x)   (x)
-> +#endif
-> +
+To amend this, only print this message iff boot menu=on
+was provided on the commandline. Otherwise, return silently.
 
-I wasn't expecting to see these macros here. Don't we have them already?
+Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+---
+ hw/s390x/ipl.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Anyway
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index 798e99a..c4addb5 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -250,7 +250,9 @@ static void s390_ipl_set_boot_menu(S390IPLState *ipl)
+     case S390_IPL_TYPE_QEMU_SCSI:
+         break;
+     default:
+-        error_report("boot menu is not supported for this device type.");
++        if (boot_menu) {
++            error_report("boot menu is not supported for this device type.");
++        }
+         return;
+     }
+ 
+-- 
+2.7.4
