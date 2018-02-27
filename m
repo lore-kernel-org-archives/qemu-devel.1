@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eqk3t-0001vY-Rp
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 13:33:15 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eqkAc-0004QA-CP
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 13:40:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eqk3q-0005wD-Jg
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 13:33:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52654)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1eqk3q-0005vf-BM
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 13:33:10 -0500
-Date: Tue, 27 Feb 2018 11:32:51 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180227113251.3d24a58f@w520.home>
-In-Reply-To: <20180227085209.19151-1-kraxel@redhat.com>
-References: <20180227085209.19151-1-kraxel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 0/7] vfio: add display support
+	(envelope-from <pm215@archaic.org.uk>) id 1eqkAb-0008Bu-JC
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 13:40:10 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Feb 2018 18:39:58 +0000
+Message-Id: <20180227183958.15167-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] linux-user: Report AArch64 FP16 support via
+ hwcap bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,81 +18,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Tina Zhang <tina.zhang@intel.com>, intel-gvt-dev@lists.freedesktop.org, Kirti Wankhede <kwankhede@nvidia.com>, Laine Stump <laine@redhat.com>, Erik Skultety <eskultet@redhat.com>, libvir-list@redhat.com
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-[CC +libvirt]
+Set the appropriate Linux hwcap bits to tell the guest binary if we
+have implemented half-precision floating point support.
 
-On Tue, 27 Feb 2018 09:52:02 +0100
-Gerd Hoffmann <kraxel@redhat.com> wrote:
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+This is intended to go after Alex's FP16 stuff since it
+uses the ARM_FEATURE_V8_FP16 bit that defines.
+There is as yet no kernel definition of an AArch32 hwcap
+bit to report FP16.
 
-> This series adds support for a vgpu display to the qemu vfio code.
-> 
-> v5:
->  - rebase to latest master
->  - drop DeviceState->hotpluggable patch, use separate vfio-pci-display
->    device instead so we can use DeviceClass->hotpluggable.
+Based-on: <20180227143852.11175-1-alex.bennee@linaro.org>
 
-I can't imagine that management layers are going to be happy with this
-approach, it's one thing to have certain USB controllers where the
-version intimately tied to the machine chipset is not hotpluggable,
-while standalone versions are, but having a fork of an entirely
-standalone device for this purpose sounds very invasive.  What does the
-XML look like that would make libvirt select this option?  I'm still
-thinking that a separate display device, which vfio-pci can bind to as
-a device option, not affecting the hotplug-ability of the vfio-pci
-device itself is the correct, but clearly difficult, approach to this.
-I can't agree to a separate device unless libvirt is willing to sign up
-for enabling it.
+ linux-user/elfload.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Furthermore, if we take the separate device approach, shouldn't it be
-something like vfio-pci-nohotplug, where display is an option only for
-this version of the DeviceClass?  Thanks,
-
-Alex
-
->  - add vfio dma-buf patch.  Right now this can be tested with '-display
->    egl-headless' only.  gtk and spice support is almost ready for merge
->    and should follow soon.
-> 
-> cheers,
->   Gerd
-> 
-> Gerd Hoffmann (7):
->   linux-headers: update to 4.16-rc1
->   standard-headers: add drm/drm_fourcc.h
->   ui/pixman: add qemu_drm_format_to_pixman()
->   vfio/common: cleanup in vfio_region_finalize
->   vfio/display: core & wireup
->   vfio/display: adding region support
->   vfio/display: adding dmabuf support
-> 
->  hw/vfio/pci.h                                      |   4 +
->  include/hw/vfio/vfio-common.h                      |  22 ++
->  include/standard-headers/drm/drm_fourcc.h          | 411 +++++++++++++++++++++
->  include/standard-headers/linux/input-event-codes.h |   1 +
->  include/standard-headers/linux/input.h             |  11 +
->  include/standard-headers/linux/pci_regs.h          |  30 +-
->  include/standard-headers/linux/virtio_net.h        |  13 +
->  include/ui/qemu-pixman.h                           |   5 +
->  linux-headers/asm-powerpc/kvm.h                    |   2 +
->  linux-headers/asm-powerpc/unistd.h                 |   3 +
->  linux-headers/asm-s390/unistd.h                    | 401 +-------------------
->  linux-headers/asm-s390/unistd_32.h                 | 364 ++++++++++++++++++
->  linux-headers/asm-s390/unistd_64.h                 | 331 +++++++++++++++++
->  linux-headers/asm-x86/kvm_para.h                   |   4 +
->  linux-headers/linux/kvm.h                          |  90 +++++
->  linux-headers/linux/psci.h                         |   3 +
->  linux-headers/linux/vfio.h                         |  72 ++++
->  hw/vfio/common.c                                   |   7 +
->  hw/vfio/display.c                                  | 286 ++++++++++++++
->  hw/vfio/pci.c                                      |  30 ++
->  ui/qemu-pixman.c                                   |  22 ++
->  hw/vfio/Makefile.objs                              |   2 +-
->  scripts/update-linux-headers.sh                    |   7 +
->  23 files changed, 1710 insertions(+), 411 deletions(-)
->  create mode 100644 include/standard-headers/drm/drm_fourcc.h
->  create mode 100644 linux-headers/asm-s390/unistd_32.h
->  create mode 100644 linux-headers/asm-s390/unistd_64.h
->  create mode 100644 hw/vfio/display.c
-> 
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 8bb9a2c3e8..80f1b32fbe 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -551,6 +551,8 @@ static uint32_t get_elf_hwcap(void)
+     GET_FEATURE(ARM_FEATURE_V8_SM3, ARM_HWCAP_A64_SM3);
+     GET_FEATURE(ARM_FEATURE_V8_SM4, ARM_HWCAP_A64_SM4);
+     GET_FEATURE(ARM_FEATURE_V8_SHA512, ARM_HWCAP_A64_SHA512);
++    GET_FEATURE(ARM_FEATURE_V8_FP16,
++                ARM_HWCAP_A64_FPHP | ARM_HWCAP_A64_ASIMDHP);
+ #undef GET_FEATURE
+ 
+     return hwcaps;
+-- 
+2.16.2
