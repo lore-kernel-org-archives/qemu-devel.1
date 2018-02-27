@@ -1,27 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eqhQg-000177-AX
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:44:35 -0500
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1eqhQl-0001AK-Sy
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:44:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eqhQe-0006ZW-Sj
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:44:34 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33702 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eqhQe-0006Vc-L9
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:44:32 -0500
-Date: Tue, 27 Feb 2018 15:44:02 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180227154401.GA2848@work-vm>
-References: <20180215153955.3253-1-brijesh.singh@amd.com>
-	<20180215153955.3253-17-brijesh.singh@amd.com>
-	<20180216154702.GC2308@work-vm>
-	<8be03317-c192-fc4e-a4bd-0c9658e79f52@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8be03317-c192-fc4e-a4bd-0c9658e79f52@amd.com>
-Subject: Re: [Qemu-devel] [PATCH v9 16/29] sev/i386: add command to encrypt
- guest memory region
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1eqhQi-0006bs-OI
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:44:39 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33620)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
+	id 1eqhQi-0006bG-GP
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:44:36 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1RFbmwF122552
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 10:44:35 -0500
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2gd923kt5b-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 10:44:34 -0500
+Received: from localhost
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
+	Tue, 27 Feb 2018 10:44:33 -0500
+From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+Date: Tue, 27 Feb 2018 10:44:16 -0500
+In-Reply-To: <1519746259-27710-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+References: <1519746259-27710-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+Message-Id: <1519746259-27710-3-git-send-email-akrowiak@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 2/5] s390x/ap: base Adjunct Processor (AP)
+ object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,188 +38,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Markus Armbruster <armbru@redhat.com>, Bruce Rogers <brogers@suse.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, Borislav Petkov <bp@suse.de>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net, Tony Krowiak <akrowiak@linux.vnet.ibm.com>
 
-* Brijesh Singh (brijesh.singh@amd.com) wrote:
-> 
-> 
-> On 2/16/18 9:47 AM, Dr. David Alan Gilbert wrote:
-> > * Brijesh Singh (brijesh.singh@amd.com) wrote:
-> >> The KVM_SEV_LAUNCH_UPDATE_DATA command is used to encrypt a guest memory
-> >> region using the VM Encryption Key created using LAUNCH_START.
-> >>
-> >> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> >> Cc: Richard Henderson <rth@twiddle.net>
-> >> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> >> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> >> ---
-> >>  accel/kvm/kvm-all.c      |  2 ++
-> >>  include/sysemu/sev.h     |  1 +
-> >>  stubs/sev.c              |  5 +++++
-> >>  target/i386/sev.c        | 49 ++++++++++++++++++++++++++++++++++++++++++++++++
-> >>  target/i386/trace-events |  1 +
-> >>  5 files changed, 58 insertions(+)
-> >>
-> >> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> >> index 4468c8fe002c..4974c00c46fb 100644
-> >> --- a/accel/kvm/kvm-all.c
-> >> +++ b/accel/kvm/kvm-all.c
-> >> @@ -1679,6 +1679,8 @@ static int kvm_init(MachineState *ms)
-> >>          if (!kvm_state->memcrypt_handle) {
-> >>              goto err;
-> >>          }
-> >> +
-> >> +        kvm_state->memcrypt_encrypt_data = sev_encrypt_data;
-> >>      }
-> >>  
-> >>      ret = kvm_arch_init(ms, s);
-> >> diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
-> >> index 5c8c549b68ec..c16102b05ec4 100644
-> >> --- a/include/sysemu/sev.h
-> >> +++ b/include/sysemu/sev.h
-> >> @@ -69,5 +69,6 @@ struct SEVState {
-> >>  typedef struct SEVState SEVState;
-> >>  
-> >>  void *sev_guest_init(const char *id);
-> >> +int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len);
-> >>  
-> >>  #endif
-> >> diff --git a/stubs/sev.c b/stubs/sev.c
-> >> index 24c7b0c3e04d..74182bb545e2 100644
-> >> --- a/stubs/sev.c
-> >> +++ b/stubs/sev.c
-> >> @@ -15,6 +15,11 @@
-> >>  #include "qemu-common.h"
-> >>  #include "sysemu/sev.h"
-> >>  
-> >> +int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len)
-> >> +{
-> >> +    return 1;
-> >> +}
-> >> +
-> >>  SevState sev_get_current_state(void)
-> >>  {
-> >>      return SEV_STATE_UNINIT;
-> >> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> >> index 6f767084fd57..04a64b5bc61d 100644
-> >> --- a/target/i386/sev.c
-> >> +++ b/target/i386/sev.c
-> >> @@ -90,6 +90,12 @@ fw_error_to_str(int code)
-> >>      return sev_fw_errlist[code];
-> >>  }
-> >>  
-> >> +static bool
-> >> +sev_check_state(SevState state)
-> >> +{
-> >> +    return current_sev_guest_state == state ? true : false;
-> >> +}
-> >> +
-> >>  static void
-> >>  sev_set_guest_state(SevState new_state)
-> >>  {
-> >> @@ -466,6 +472,36 @@ sev_launch_start(SEVState *s)
-> >>      return 0;
-> >>  }
-> >>  
-> >> +static int
-> >> +sev_launch_update_data(uint8_t *addr, uint64_t len)
-> >> +{
-> >> +    int ret, fw_error;
-> >> +    struct kvm_sev_launch_update_data *update;
-> >> +
-> >> +    if (addr == NULL || len <= 0) {
-> >> +        return 1;
-> >> +    }
-> >> +
-> >> +    update = g_malloc0(sizeof(*update));
-> >> +    if (!update) {
-> >> +        return 1;
-> >> +    }
-> >>
-> > Keep checking for the g_malloc0 use - it will never return NULL;
-> > if you want it to be safe from running out of memory use g_try_malloc0
-> > otherwise you can just remove the !update check.
-> > Also it's better to use the g_new0 macro (or g_try_new0) - it's neater
-> > and avoids the whole sizeof thing.
-> > (You have that in a bunch of the patches)
-> 
-> I didn't realized that g_malloc0() will never return NULL. I checked
-> just glib doc,
+This patch introduces the base object for an AP device.
 
-Yes, all of the normal glib allocators assert on failure to allocate
-rather than returning NULL.   Our normal advice is to use
-g_new0/g_malloc0 for small items and you don't need to check it; but for
-anything large use the g_try_* variants, they do return NULL on a
-failure.
+Signed-off-by: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+---
+ hw/s390x/Makefile.objs       |    1 +
+ hw/s390x/ap-device.c         |   38 ++++++++++++++++++++++++++++++++++++++
+ include/hw/s390x/ap-device.h |   38 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 77 insertions(+), 0 deletions(-)
+ create mode 100644 hw/s390x/ap-device.c
+ create mode 100644 include/hw/s390x/ap-device.h
 
-> if v10 is needed then I can remove them all or can submit
-> a follow-up patch.
-
-If there are no other changes needed then it's fine as a followup;
-if you need to reroll anyway then lets tidy them all up.
-
-Dave
-
-> 
-> thanks
-> 
-> 
-> > Dave
-> >
-> >> +    update->uaddr = (__u64)addr;
-> >> +    update->len = len;
-> >> +    trace_kvm_sev_launch_update_data(addr, len);
-> >> +    ret = sev_ioctl(KVM_SEV_LAUNCH_UPDATE_DATA, update, &fw_error);
-> >> +    if (ret) {
-> >> +        error_report("%s: LAUNCH_UPDATE ret=%d fw_error=%d '%s'",
-> >> +                __func__, ret, fw_error, fw_error_to_str(fw_error));
-> >> +        goto err;
-> >> +    }
-> >> +
-> >> +err:
-> >> +    g_free(update);
-> >> +    return ret;
-> >> +}
-> >> +
-> >>  void *
-> >>  sev_guest_init(const char *id)
-> >>  {
-> >> @@ -540,6 +576,19 @@ err:
-> >>      return NULL;
-> >>  }
-> >>  
-> >> +int
-> >> +sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len)
-> >> +{
-> >> +    assert(handle);
-> >> +
-> >> +    /* if SEV is in update state then encrypt the data else do nothing */
-> >> +    if (sev_check_state(SEV_STATE_LUPDATE)) {
-> >> +        return sev_launch_update_data(ptr, len);
-> >> +    }
-> >> +
-> >> +    return 0;
-> >> +}
-> >> +
-> >>  static void
-> >>  sev_register_types(void)
-> >>  {
-> >> diff --git a/target/i386/trace-events b/target/i386/trace-events
-> >> index 9402251e9991..c0cd8e93217f 100644
-> >> --- a/target/i386/trace-events
-> >> +++ b/target/i386/trace-events
-> >> @@ -12,3 +12,4 @@ kvm_memcrypt_register_region(void *addr, size_t len) "addr %p len 0x%lu"
-> >>  kvm_memcrypt_unregister_region(void *addr, size_t len) "addr %p len 0x%lu"
-> >>  kvm_sev_change_state(const char *old, const char *new) "%s -> %s"
-> >>  kvm_sev_launch_start(int policy, void *session, void *pdh) "policy 0x%x session %p pdh %p"
-> >> +kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len 0x%" PRIu64
-> >> -- 
-> >> 2.14.3
-> >>
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
+index dc704b5..3247a07 100644
+--- a/hw/s390x/Makefile.objs
++++ b/hw/s390x/Makefile.objs
+@@ -17,3 +17,4 @@ obj-y += s390-stattrib.o
+ obj-$(CONFIG_KVM) += s390-skeys-kvm.o
+ obj-$(CONFIG_KVM) += s390-stattrib-kvm.o
+ obj-y += s390-ccw.o
++obj-y += ap-device.o
+diff --git a/hw/s390x/ap-device.c b/hw/s390x/ap-device.c
+new file mode 100644
+index 0000000..dda0d74
+--- /dev/null
++++ b/hw/s390x/ap-device.c
+@@ -0,0 +1,38 @@
++/*
++ * Adjunct Processor (AP) matrix device
++ *
++ * Copyright 2017 IBM Corp.
++ * Author(s): Tony Krowiak <akrowiak@linux.vnet.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or (at
++ * your option) any later version. See the COPYING file in the top-level
++ * directory.
++ */
++#include "qemu/osdep.h"
++#include "qemu/module.h"
++#include "qapi/error.h"
++#include "hw/qdev.h"
++#include "hw/s390x/ap-device.h"
++
++static void ap_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->desc = "AP device class";
++}
++
++static const TypeInfo ap_device_info = {
++    .name = AP_DEVICE_TYPE,
++    .parent = TYPE_DEVICE,
++    .instance_size = sizeof(APDevice),
++    .class_size = sizeof(APDeviceClass),
++    .class_init = ap_class_init,
++    .abstract = true,
++};
++
++static void ap_device_register(void)
++{
++    type_register_static(&ap_device_info);
++}
++
++type_init(ap_device_register)
+diff --git a/include/hw/s390x/ap-device.h b/include/hw/s390x/ap-device.h
+new file mode 100644
+index 0000000..64fb343
+--- /dev/null
++++ b/include/hw/s390x/ap-device.h
+@@ -0,0 +1,38 @@
++/*
++ * Adjunct Processor (AP) matrix device interfaces
++ *
++ * Copyright 2017 IBM Corp.
++ * Author(s): Tony Krowiak <akrowiak@linux.vnet.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or (at
++ * your option) any later version. See the COPYING file in the top-level
++ * directory.
++ */
++#ifndef HW_S390X_AP_DEVICE_H
++#define HW_S390X_AP_DEVICE_H
++
++#define AP_DEVICE_TYPE       "ap-device"
++
++typedef struct APDevice {
++    DeviceState parent_obj;
++} APDevice;
++
++typedef struct APDeviceClass {
++    DeviceClass parent_class;
++} APDeviceClass;
++
++static inline APDevice *to_ap_dev(DeviceState *dev)
++{
++    return container_of(dev, APDevice, parent_obj);
++}
++
++#define AP_DEVICE(obj) \
++    OBJECT_CHECK(APDevice, (obj), AP_DEVICE_TYPE)
++
++#define AP_DEVICE_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(APDeviceClass, (obj), AP_DEVICE_TYPE)
++
++#define AP_DEVICE_CLASS(klass) \
++    OBJECT_CLASS_CHECK(APDeviceClass, (klass), AP_DEVICE_TYPE)
++
++#endif /* HW_S390X_AP_DEVICE_H */
+-- 
+1.7.1
