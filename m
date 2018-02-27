@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eqbTE-0000VD-Rp
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 04:22:49 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eqbau-0002lr-QL
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 04:30:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eqbTB-00054T-No
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 04:22:48 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eqbaq-00028t-C0
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 04:30:44 -0500
+Date: Tue, 27 Feb 2018 10:30:18 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180227103018.38eef220.cohuck@redhat.com>
+In-Reply-To: <1519641757-12396-1-git-send-email-thuth@redhat.com>
 References: <1519641757-12396-1-git-send-email-thuth@redhat.com>
-	<1519641757-12396-7-git-send-email-thuth@redhat.com>
-	<20180226194857.01ce4a8c.cohuck@redhat.com>
-	<b6664df2-eec4-7e35-1498-be27b5cc3e79@linux.vnet.ibm.com>
-	<dcfd4bf5-fd36-52cc-8b66-87a68e80cc48@linux.vnet.ibm.com>
-	<20180227101240.761cc93f.cohuck@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <06458ee3-030e-5635-1893-004adedf6151@redhat.com>
-Date: Tue, 27 Feb 2018 10:22:26 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180227101240.761cc93f.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PULL-for-s390x 06/14] s390-ccw:
- parse and set boot menu options
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL-for-s390x 00/14] s390-ccw firmware update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +22,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-On 27.02.2018 10:12, Cornelia Huck wrote:
-> On Mon, 26 Feb 2018 14:44:45 -0500
-> "Collin L. Walling" <walling@linux.vnet.ibm.com> wrote:
->=20
->> On 02/26/2018 02:29 PM, Collin L. Walling wrote:
->>> On 02/26/2018 01:48 PM, Cornelia Huck wrote: =20
->>>> On Mon, 26 Feb 2018 11:42:29 +0100
->>>> Thomas Huth <thuth@redhat.com> wrote:
-[...]
->>>>> +=C2=A0=C2=A0=C2=A0 switch (ipl->iplb.pbt) {
->>>>> +=C2=A0=C2=A0=C2=A0 case S390_IPL_TYPE_CCW:
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
->>>>> +=C2=A0=C2=A0=C2=A0 default:
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("boot menu=
- is not supported for this device=20
->>>>> type."); =20
->>>> If I specify both a bootindex for a device and a -kernel parameter, =
-I
->>>> get this error message. Looks a tad odd, but not sure how to avoid i=
-t. =20
->>>
->>> Hmm... perhaps an additional check if no IPLB, then skip trying to se=
-t
->>> any boot menu data?
-[...]
-> How shall we proceed? I'd be willing to pull this now and then apply
-> fixups on top, or we can have a respin. Thomas?
+On Mon, 26 Feb 2018 11:42:23 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-Since this is about a change in hw/s390x/ and not about
-pc-bios/s390-ccw/ (i.e. no need to rebuild the firmware binaries for
-this), I think I'd rather prefer a fix-up patch on top instead of a re-sp=
-in.
+>  Hi Cornelia!
+> 
+> The following changes since commit 0a773d55ac76c5aa89ed9187a3bc5af8c5c2a6d0:
+> 
+>   maintainers: Add myself as a OpenBSD maintainer (2018-02-23 12:05:07 +0000)
+> 
+> are available in the git repository at:
+> 
+>   https://github.com/huth/qemu.git tags/s390-ccw-bios-2018-02-26
+> 
+> for you to fetch changes up to 9c050f3d15697c4c84c9d6aa7af779a273b71d87:
+> 
+>   pc-bios/s390: Rebuild the s390x firmware images with the boot menu changes (2018-02-26 11:10:30 +0100)
+> 
+> ----------------------------------------------------------------
+> Boot menu patches by Collin L. Walling
+> ----------------------------------------------------------------
+> 
+> Collin L. Walling (13):
+>       s390-ccw: refactor boot map table code
+>       s390-ccw: refactor eckd_block_num to use CHS
+>       s390-ccw: refactor IPL structs
+>       s390-ccw: update libc
+>       s390-ccw: move auxiliary IPL data to separate location
+>       s390-ccw: parse and set boot menu options
+>       s390-ccw: set up interactive boot menu parameters
+>       s390-ccw: read stage2 boot loader data to find menu
+>       s390-ccw: print zipl boot menu
+>       s390-ccw: read user input for boot index via the SCLP console
+>       s390-ccw: set cp_receive mask only when needed and consume pending service irqs
+>       s390-ccw: use zipl values when no boot menu options are present
+>       s390-ccw: interactive boot menu for scsi
+> 
+> Thomas Huth (1):
+>       pc-bios/s390: Rebuild the s390x firmware images with the boot menu changes
+> 
+>  hw/s390x/ipl.c              |  77 +++++++++++++-
+>  hw/s390x/ipl.h              |  31 +++++-
+>  pc-bios/s390-ccw.img        | Bin 26416 -> 34568 bytes
+>  pc-bios/s390-ccw/Makefile   |   2 +-
+>  pc-bios/s390-ccw/bootmap.c  | 184 +++++++++++++++++++++++---------
+>  pc-bios/s390-ccw/bootmap.h  |  91 ++++++++++------
+>  pc-bios/s390-ccw/iplb.h     |  24 ++++-
+>  pc-bios/s390-ccw/libc.c     |  88 ++++++++++++++++
+>  pc-bios/s390-ccw/libc.h     |  37 ++++++-
+>  pc-bios/s390-ccw/main.c     |  49 ++++++---
+>  pc-bios/s390-ccw/menu.c     | 249 ++++++++++++++++++++++++++++++++++++++++++++
+>  pc-bios/s390-ccw/s390-ccw.h |  10 ++
+>  pc-bios/s390-ccw/sclp.c     |  39 ++++---
+>  pc-bios/s390-ccw/virtio.c   |   2 +-
+>  pc-bios/s390-netboot.img    | Bin 83864 -> 83776 bytes
+>  15 files changed, 757 insertions(+), 126 deletions(-)
+>  create mode 100644 pc-bios/s390-ccw/libc.c
+>  create mode 100644 pc-bios/s390-ccw/menu.c
+>  mode change 100755 => 100644 pc-bios/s390-netboot.img
 
- Thomas
+Thanks, pulled into s390-next.
