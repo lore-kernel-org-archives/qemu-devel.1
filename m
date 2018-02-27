@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eqg8H-0003lC-9V
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:21:30 -0500
+	(envelope-from <mst@redhat.com>) id 1eqgCI-00059c-0h
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:25:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eqg8G-0008N9-4P
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:21:29 -0500
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:41078)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eqg8F-0008Mu-Vt
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:21:28 -0500
-Received: by mail-oi0-x242.google.com with SMTP id g5so6805106oiy.8
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 06:21:27 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1eqgCE-0001hX-QX
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:25:37 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47440 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eqgCE-0001hI-JG
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:25:34 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 78F55EAE80
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 14:25:31 +0000 (UTC)
+Date: Tue, 27 Feb 2018 16:25:20 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180227162211-mutt-send-email-mst@kernel.org>
+References: <20180216131625.9639-1-dgilbert@redhat.com>
+	<20180216131625.9639-16-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180217182323.25885-53-richard.henderson@linaro.org>
-References: <20180217182323.25885-1-richard.henderson@linaro.org>
-	<20180217182323.25885-53-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Feb 2018 14:21:06 +0000
-Message-ID: <CAFEAcA_ocCQF9Ha45kKiBAQLAHr4jOYGcdArqDgYGDLfQL87Vg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 52/67] target/arm: Implement
- SVE store vector/predicate register
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180216131625.9639-16-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 15/29] vhost+postcopy: Send address back
+ to qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,122 +34,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, marcandre.lureau@redhat.com, peterx@redhat.com, imammedo@redhat.com, quintela@redhat.com, aarcange@redhat.com
 
-On 17 February 2018 at 18:23, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On Fri, Feb 16, 2018 at 01:16:11PM +0000, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> We need a better way, but at the moment we need the address of the
+> mappings sent back to qemu so it can interpret the messages on the
+> userfaultfd it reads.
+> 
+> This is done as a 3 stage set:
+>    QEMU -> client
+>       set_mem_table
+> 
+>    mmap stuff, get addresses
+> 
+>    client -> qemu
+>        here are the addresses
+> 
+>    qemu -> client
+>        OK - now you can use them
+> 
+> That ensures that qemu has registered the new addresses in it's
+> userfault code before the client starts accessing them.
+> 
+> Note: We don't ask for the default 'ack' reply since we've got our own.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > ---
->  target/arm/translate-sve.c | 101 +++++++++++++++++++++++++++++++++++++++++++++
->  target/arm/sve.decode      |   6 +++
->  2 files changed, 107 insertions(+)
->
-> diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-> index b000a2482e..9c724980a0 100644
-> --- a/target/arm/translate-sve.c
-> +++ b/target/arm/translate-sve.c
-> @@ -3501,6 +3501,95 @@ static void do_ldr(DisasContext *s, uint32_t vofs, uint32_t len,
->      tcg_temp_free_i64(t0);
->  }
->
-> +/* Similarly for stores.  */
-> +static void do_str(DisasContext *s, uint32_t vofs, uint32_t len,
-> +                   int rn, int imm)
-> +{
-> +    uint32_t len_align = QEMU_ALIGN_DOWN(len, 8);
-> +    uint32_t len_remain = len % 8;
-> +    uint32_t nparts = len / 8 + ctpop8(len_remain);
-> +    int midx = get_mem_index(s);
-> +    TCGv_i64 addr, t0;
-> +
-> +    addr = tcg_temp_new_i64();
-> +    t0 = tcg_temp_new_i64();
-> +
-> +    /* Note that unpredicated load/store of vector/predicate registers
-> +     * are defined as a stream of bytes, which equates to little-endian
-> +     * operations on larger quantities.  There is no nice way to force
-> +     * a little-endian load for aarch64_be-linux-user out of line.
-
-"store" in this case, I assume.
-
-> +     *
-> +     * Attempt to keep code expansion to a minimum by limiting the
-> +     * amount of unrolling done.
-> +     */
-> +    if (nparts <= 4) {
-> +        int i;
-> +
-> +        for (i = 0; i < len_align; i += 8) {
-> +            tcg_gen_ld_i64(t0, cpu_env, vofs + i);
-> +            tcg_gen_addi_i64(addr, cpu_reg_sp(s, rn), imm + i);
-> +            tcg_gen_qemu_st_i64(t0, addr, midx, MO_LEQ);
-> +        }
-> +    } else {
-> +        TCGLabel *loop = gen_new_label();
-> +        TCGv_ptr i = TCGV_NAT_TO_PTR(glue(tcg_const_local_, ptr)(0));
-> +        TCGv_ptr src;
-> +
-> +        gen_set_label(loop);
-> +
-> +        src = tcg_temp_new_ptr();
-> +        tcg_gen_add_ptr(src, cpu_env, i);
-> +        tcg_gen_ld_i64(t0, src, vofs);
-> +
-> +        /* Minimize the number of local temps that must be re-read from
-> +         * the stack each iteration.  Instead, re-compute values other
-> +         * than the loop counter.
+>  contrib/libvhost-user/libvhost-user.c | 24 ++++++++++++-
+>  docs/interop/vhost-user.txt           |  9 +++++
+>  hw/virtio/trace-events                |  1 +
+>  hw/virtio/vhost-user.c                | 67 +++++++++++++++++++++++++++++++++--
+>  4 files changed, 98 insertions(+), 3 deletions(-)
+> 
+> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+> index a18bc74a7c..e02e5d6f46 100644
+> --- a/contrib/libvhost-user/libvhost-user.c
+> +++ b/contrib/libvhost-user/libvhost-user.c
+> @@ -491,10 +491,32 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
+>                     dev_region->mmap_addr);
+>          }
+>  
+> +        /* Return the address to QEMU so that it can translate the ufd
+> +         * fault addresses back.
 > +         */
-> +        tcg_gen_addi_ptr(src, i, imm);
-> +#if UINTPTR_MAX == UINT32_MAX
-> +        tcg_gen_extu_i32_i64(addr, TCGV_PTR_TO_NAT(src));
-> +        tcg_gen_add_i64(addr, addr, cpu_reg_sp(s, rn));
-> +#else
-> +        tcg_gen_add_i64(addr, TCGV_PTR_TO_NAT(src), cpu_reg_sp(s, rn));
-> +#endif
-
-We should be able to avoid the ifdef with more support for tcg_*_ptr
-ops (similar to an earlier patch in the series).
-
-> +        tcg_temp_free_ptr(src);
-> +
-> +        tcg_gen_qemu_st_i64(t0, addr, midx, MO_LEQ);
-> +
-> +        tcg_gen_addi_ptr(i, i, 8);
-> +
-> +        glue(tcg_gen_brcondi_, ptr)(TCG_COND_LTU, TCGV_PTR_TO_NAT(i),
-> +                                   len_align, loop);
-> +        tcg_temp_free_ptr(i);
+> +        msg_region->userspace_addr = (uintptr_t)(mmap_addr +
+> +                                                 dev_region->mmap_offset);
+>          close(vmsg->fds[i]);
+>      }
+>  
+> -    /* TODO: Get address back to QEMU */
+> +    /* Send the message back to qemu with the addresses filled in */
+> +    vmsg->fd_num = 0;
+> +    if (!vu_message_write(dev, dev->sock, vmsg)) {
+> +        vu_panic(dev, "failed to respond to set-mem-table for postcopy");
+> +        return false;
 > +    }
 > +
-> +    /* Predicate register stores can be any multiple of 2.  */
-> +    if (len_remain) {
-> +        tcg_gen_ld_i64(t0, cpu_env, vofs + len_align);
-> +        tcg_gen_addi_i64(addr, cpu_reg_sp(s, rn), imm + len_align);
+> +    /* Wait for QEMU to confirm that it's registered the handler for the
+> +     * faults.
+> +     */
+> +    if (!vu_message_read(dev, dev->sock, vmsg) ||
+> +        vmsg->size != sizeof(vmsg->payload.u64) ||
+> +        vmsg->payload.u64 != 0) {
+> +        vu_panic(dev, "failed to receive valid ack for postcopy set-mem-table");
+> +        return false;
+> +    }
 > +
-> +        switch (len_remain) {
-> +        case 2:
-> +        case 4:
-> +        case 8:
-> +            tcg_gen_qemu_st_i64(t0, addr, midx, MO_LE | ctz32(len_remain));
-> +            break;
+> +    /* OK, now we can go and register the memory and generate faults */
+>      for (i = 0; i < dev->nregions; i++) {
+>          VuDevRegion *dev_region = &dev->regions[i];
+>  #ifdef UFFDIO_REGISTER
+> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+> index bdec9ec0e8..5bbcab2cc4 100644
+> --- a/docs/interop/vhost-user.txt
+> +++ b/docs/interop/vhost-user.txt
+> @@ -454,12 +454,21 @@ Master message types
+>        Id: 5
+>        Equivalent ioctl: VHOST_SET_MEM_TABLE
+>        Master payload: memory regions description
+> +      Slave payload: (postcopy only) memory regions description
+>  
+>        Sets the memory map regions on the slave so it can translate the vring
+>        addresses. In the ancillary data there is an array of file descriptors
+>        for each memory mapped region. The size and ordering of the fds matches
+>        the number and ordering of memory regions.
+>  
+> +      When postcopy-listening has been received,
+
+Which message is this?
+
+> SET_MEM_TABLE replies with
+> +      the bases of the memory mapped regions to the master.  It must have mmap'd
+> +      the regions but not yet accessed them and should not yet generate a userfault
+> +      event. Note NEED_REPLY_MASK is not set in this case.
+> +      QEMU will then reply back to the list of mappings with an empty
+> +      VHOST_USER_SET_MEM_TABLE as an acknolwedgment; only upon reception of this
+> +      message may the guest start accessing the memory and generating faults.
 > +
-> +        case 6:
-> +            tcg_gen_qemu_st_i64(t0, addr, midx, MO_LEUL);
-> +            tcg_gen_addi_i64(addr, addr, 4);
-> +            tcg_gen_shri_i64(addr, addr, 32);
-> +            tcg_gen_qemu_st_i64(t0, addr, midx, MO_LEUW);
-> +            break;
+>   * VHOST_USER_SET_LOG_BASE
+>  
+>        Id: 6
+
+As you say yourself, this is probably the best we can do for now,
+but it's not ideal. So I think it's a good idea to isolate this
+behind a separate protocol feature bit. For now it will be required
+for postcopy, when it's fixed in kernel we can drop it
+cleanly.
+
+
+> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> index 06ec03d6e7..05d18ada77 100644
+> --- a/hw/virtio/trace-events
+> +++ b/hw/virtio/trace-events
+> @@ -8,6 +8,7 @@ vhost_section(const char *name, int r) "%s:%d"
+>  
+>  # hw/virtio/vhost-user.c
+>  vhost_user_postcopy_listen(void) ""
+> +vhost_user_set_mem_table_postcopy(uint64_t client_addr, uint64_t qhva, int reply_i, int region_i) "client:0x%"PRIx64" for hva: 0x%"PRIx64" reply %d region %d"
+>  
+>  # hw/virtio/virtio.c
+>  virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index 64f4b3b3f9..a060442cb9 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -159,6 +159,7 @@ struct vhost_user {
+>      int slave_fd;
+>      NotifierWithReturn postcopy_notifier;
+>      struct PostCopyFD  postcopy_fd;
+> +    uint64_t           postcopy_client_bases[VHOST_MEMORY_MAX_NREGIONS];
+>      /* True once we've entered postcopy_listen */
+>      bool               postcopy_listen;
+>  };
+> @@ -328,12 +329,15 @@ static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t base,
+>  static int vhost_user_set_mem_table_postcopy(struct vhost_dev *dev,
+>                                               struct vhost_memory *mem)
+>  {
+> +    struct vhost_user *u = dev->opaque;
+>      int fds[VHOST_MEMORY_MAX_NREGIONS];
+>      int i, fd;
+>      size_t fd_num = 0;
+>      bool reply_supported = virtio_has_feature(dev->protocol_features,
+>                                                VHOST_USER_PROTOCOL_F_REPLY_ACK);
+> -    /* TODO: Add actual postcopy differences */
+> +    VhostUserMsg msg_reply;
+> +    int region_i, msg_i;
 > +
-> +        default:
-> +            g_assert_not_reached();
+>      VhostUserMsg msg = {
+>          .hdr.request = VHOST_USER_SET_MEM_TABLE,
+>          .hdr.flags = VHOST_USER_VERSION,
+> @@ -380,6 +384,64 @@ static int vhost_user_set_mem_table_postcopy(struct vhost_dev *dev,
+>          return -1;
+>      }
+>  
+> +    if (vhost_user_read(dev, &msg_reply) < 0) {
+> +        return -1;
+> +    }
+> +
+> +    if (msg_reply.hdr.request != VHOST_USER_SET_MEM_TABLE) {
+> +        error_report("%s: Received unexpected msg type."
+> +                     "Expected %d received %d", __func__,
+> +                     VHOST_USER_SET_MEM_TABLE, msg_reply.hdr.request);
+> +        return -1;
+> +    }
+> +    /* We're using the same structure, just reusing one of the
+> +     * fields, so it should be the same size.
+> +     */
+> +    if (msg_reply.hdr.size != msg.hdr.size) {
+> +        error_report("%s: Unexpected size for postcopy reply "
+> +                     "%d vs %d", __func__, msg_reply.hdr.size, msg.hdr.size);
+> +        return -1;
+> +    }
+> +
+> +    memset(u->postcopy_client_bases, 0,
+> +           sizeof(uint64_t) * VHOST_MEMORY_MAX_NREGIONS);
+> +
+> +    /* They're in the same order as the regions that were sent
+> +     * but some of the regions were skipped (above) if they
+> +     * didn't have fd's
+> +    */
+> +    for (msg_i = 0, region_i = 0;
+> +         region_i < dev->mem->nregions;
+> +        region_i++) {
+> +        if (msg_i < fd_num &&
+> +            msg_reply.payload.memory.regions[msg_i].guest_phys_addr ==
+> +            dev->mem->regions[region_i].guest_phys_addr) {
+> +            u->postcopy_client_bases[region_i] =
+> +                msg_reply.payload.memory.regions[msg_i].userspace_addr;
+> +            trace_vhost_user_set_mem_table_postcopy(
+> +                msg_reply.payload.memory.regions[msg_i].userspace_addr,
+> +                msg.payload.memory.regions[msg_i].userspace_addr,
+> +                msg_i, region_i);
+> +            msg_i++;
 > +        }
 > +    }
-> +    tcg_temp_free_i64(addr);
-> +    tcg_temp_free_i64(t0);
-> +}
+> +    if (msg_i != fd_num) {
+> +        error_report("%s: postcopy reply not fully consumed "
+> +                     "%d vs %zd",
+> +                     __func__, msg_i, fd_num);
+> +        return -1;
+> +    }
+> +    /* Now we've registered this with the postcopy code, we ack to the client,
+> +     * because now we're in the position to be able to deal with any faults
+> +     * it generates.
+> +     */
+> +    /* TODO: Use this for failure cases as well with a bad value */
+> +    msg.hdr.size = sizeof(msg.payload.u64);
+> +    msg.payload.u64 = 0; /* OK */
+> +    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
+> +        return -1;
+> +    }
 > +
->  #undef ptr
-
-thanks
--- PMM
+>      if (reply_supported) {
+>          return process_message_reply(dev, &msg);
+>      }
+> @@ -396,7 +458,8 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
+>      size_t fd_num = 0;
+>      bool do_postcopy = u->postcopy_listen && u->postcopy_fd.handler;
+>      bool reply_supported = virtio_has_feature(dev->protocol_features,
+> -                                              VHOST_USER_PROTOCOL_F_REPLY_ACK);
+> +                                          VHOST_USER_PROTOCOL_F_REPLY_ACK) &&
+> +                                          !do_postcopy;
+>  
+>      if (do_postcopy) {
+>          /* Postcopy has enough differences that it's best done in it's own
+> -- 
+> 2.14.3
