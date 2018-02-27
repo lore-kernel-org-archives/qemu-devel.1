@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqlfZ-0007W1-Ev
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 15:16:14 -0500
+	(envelope-from <bounces@canonical.com>) id 1eqlfj-0007ce-Rp
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 15:16:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqlfY-0007ap-FW
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 15:16:13 -0500
-References: <20180223235142.21501-1-jsnow@redhat.com>
-	<20180223235142.21501-20-jsnow@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2c7f82a8-8b19-4f2d-b6d5-3c77258edf91@redhat.com>
-Date: Tue, 27 Feb 2018 14:16:05 -0600
+	(envelope-from <bounces@canonical.com>) id 1eqlfe-0007e9-W2
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 15:16:23 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57520)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eqlfe-0007da-Ps
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 15:16:18 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eqlfd-0007B6-If
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 20:16:17 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 652122E80CF
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 20:16:17 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180223235142.21501-20-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v4 19/21] blockjobs: Expose manual property
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 27 Feb 2018 20:09:38 -0000
+From: =?utf-8?q?=C3=89ric_Hoffman?= <1673976@bugs.launchpad.net>
+Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151976217879.11446.18123808891645469917.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1673976] Re: linux-user clone() can't handle
+ glibc posix_spawn() (causes locale-gen to assert)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +37,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 02/23/2018 05:51 PM, John Snow wrote:
-> Expose the "manual" property via QAPI for the backup-related jobs.
-> As of this commit, this allows the management API to request the
-> "concluded" and "dismiss" semantics for backup jobs.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->   blockdev.c           | 19 ++++++++++++++++---
->   qapi/block-core.json | 32 ++++++++++++++++++++++++++------
->   2 files changed, 42 insertions(+), 9 deletions(-)
-> 
+This should probably be put under 'glibc', since this is really an issue
+with that package, which is fixed by the way since Oct 2017.
 
-> +++ b/qapi/block-core.json
-> @@ -1177,6 +1177,16 @@
->   # @job-id: identifier for the newly-created block job. If
->   #          omitted, the device name will be used. (Since 2.7)
->   #
-> +# @manual: True to use an expanded, more explicit job control flow.
-> +#          Jobs may transition from a running state to a pending state,
-> +#          where they must be instructed to complete manually via
-> +#          block-job-finalize.
-> +#          Jobs belonging to a transaction must either all or all not use this
-> +#          setting. Once a transaction reaches a pending state, issuing the
-> +#          finalize command to any one job in the transaction is sufficient
-> +#          to finalize the entire transaction.
+https://sourceware.org/git/?p=3Dglibc.git;a=3Dcommit;h=3Dfe05e1cb6d64dba617=
+2249c79526f1e9af8f2bfd
 
-The previous commit message talked about mixed-manual transactions, but 
-this seems to imply it is not possible.  I'm fine if we don't support 
-mixed-manual transactions, but wonder if it means any changes to the series.
+This should also be backported to 17.10
 
-Otherwise looks reasonable from the UI point of view.
+-- =
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1673976
+
+Title:
+  linux-user clone() can't handle glibc posix_spawn() (causes locale-gen
+  to assert)
+
+Status in QEMU:
+  New
+
+Bug description:
+  I'm running a command (locale-gen) inside of an armv7h chroot mounted
+  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
+  chroot file system and I get a core dump.
+
+  locale-gen
+  Generating locales...
+  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
+360: __spawnix: Assertion `ec >=3D 0' failed.
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
+ localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
+le
+
+  I've done this same thing successfully for years, but this breakage
+  has appeared some time in the last 3 or so months. Possibly with the
+  update to qemu version 2.8.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
