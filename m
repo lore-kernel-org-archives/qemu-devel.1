@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1eqalw-00056b-Uq
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 03:38:06 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eqanD-0005zb-5z
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 03:39:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1eqalt-0001CJ-No
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 03:38:04 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36416 helo=mx1.redhat.com)
+	(envelope-from <kraxel@redhat.com>) id 1eqanC-0001q9-30
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 03:39:23 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38858 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1eqalt-0001BE-Fd
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 03:38:01 -0500
-Date: Tue, 27 Feb 2018 09:37:55 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180227083755.amsnva7e32mybkpi@kamzik.brq.redhat.com>
-References: <20180226181758.26922-1-wei@redhat.com>
-	<20180226181758.26922-5-wei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180226181758.26922-5-wei@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V6 4/4] tests: Add migration test for
- aarch64
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eqanB-0001o9-U8
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 03:39:22 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D0AF4404008D
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 08:39:20 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 27 Feb 2018 09:39:17 +0100
+Message-Id: <20180227083919.12339-4-kraxel@redhat.com>
+In-Reply-To: <20180227083919.12339-1-kraxel@redhat.com>
+References: <20180227083919.12339-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 3/5] usb-mtp: Support delete of mtp objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,324 +29,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Huang <wei@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, dgilbert@redhat.com, quintela@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Bandan Das <bsd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Mon, Feb 26, 2018 at 12:17:58PM -0600, Wei Huang wrote:
-> This patch adds migration test support for aarch64. The test code, which
-> implements the same functionality as x86, is booted as a kernel in qemu.
-> Here are the design choices we make for aarch64:
-> 
->  * We choose this -kernel approach because aarch64 QEMU doesn't provide a
->    built-in fw like x86 does. So instead of relying on a boot loader, we
->    use -kernel approach for aarch64.
->  * The serial output is sent to PL011 directly.
->  * The physical memory base for mach-virt machine is 0x40000000. We change
->    the start_address and end_address for aarch64.
-> 
-> In addition to providing the binary, this patch also includes the source
-> code and the build script in tests/migration/. So users can change the
-> source and/or re-compile the binary as they wish.
-> 
-> Signed-off-by: Wei Huang <wei@redhat.com>
-> ---
->  tests/Makefile.include               |  1 +
->  tests/migration-test.c               | 46 +++++++++++++++++++---
->  tests/migration/Makefile             | 12 +++++-
->  tests/migration/aarch64-a-b-kernel.S | 75 ++++++++++++++++++++++++++++++++++++
->  tests/migration/aarch64-a-b-kernel.h | 19 +++++++++
->  tests/migration/migration-test.h     |  9 +++++
->  6 files changed, 154 insertions(+), 8 deletions(-)
->  create mode 100644 tests/migration/aarch64-a-b-kernel.S
->  create mode 100644 tests/migration/aarch64-a-b-kernel.h
-> 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 577eb573a2..538173866c 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -372,6 +372,7 @@ check-qtest-arm-y += tests/sdhci-test$(EXESUF)
->  check-qtest-aarch64-y = tests/numa-test$(EXESUF)
->  check-qtest-aarch64-y += tests/sdhci-test$(EXESUF)
->  check-qtest-aarch64-y += tests/boot-serial-test$(EXESUF)
-> +check-qtest-aarch64-y += tests/migration-test$(EXESUF)
->  
->  check-qtest-microblazeel-y = $(check-qtest-microblaze-y)
->  
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index c88b7e7a19..9cc98445b0 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -11,6 +11,7 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include <sys/utsname.h>
->  
->  #include "libqtest.h"
->  #include "qapi/qmp/qdict.h"
-> @@ -23,8 +24,8 @@
->  
->  #include "migration/migration-test.h"
->  
-> -const unsigned start_address = TEST_MEM_START;
-> -const unsigned end_address = TEST_MEM_END;
-> +unsigned start_address = TEST_MEM_START;
-> +unsigned end_address = TEST_MEM_END;
->  bool got_stop;
->  
->  #if defined(__linux__)
-> @@ -81,12 +82,13 @@ static const char *tmpfs;
->   * repeatedly. It outputs a 'B' at a fixed rate while it's still running.
->   */
->  #include "tests/migration/x86-a-b-bootblock.h"
-> +#include "tests/migration/aarch64-a-b-kernel.h"
->  
-> -static void init_bootfile_x86(const char *bootpath)
-> +static void init_bootfile(const char *bootpath, void *content)
->  {
->      FILE *bootfile = fopen(bootpath, "wb");
->  
-> -    g_assert_cmpint(fwrite(x86_bootsect, 512, 1, bootfile), ==, 1);
-> +    g_assert_cmpint(fwrite(content, 512, 1, bootfile), ==, 1);
->      fclose(bootfile);
->  }
->  
-> @@ -392,7 +394,7 @@ static void test_migrate_start(QTestState **from, QTestState **to,
->      got_stop = false;
->  
->      if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
-> -        init_bootfile_x86(bootpath);
-> +        init_bootfile(bootpath, x86_bootsect);
->          cmd_src = g_strdup_printf("-machine accel=%s -m 150M"
->                                    " -name source,debug-threads=on"
->                                    " -serial file:%s/src_serial"
-> @@ -421,6 +423,38 @@ static void test_migrate_start(QTestState **from, QTestState **to,
->                                    " -serial file:%s/dest_serial"
->                                    " -incoming %s",
->                                    accel, tmpfs, uri);
-> +    } else if (strcmp(arch, "aarch64") == 0) {
-> +        const char *cpu;
-> +        const char *gic_ver;
-> +        struct utsname utsname;
-> +
-> +        /* kvm and tcg need different cpu and gic-version configs */
-> +        if (access("/dev/kvm", F_OK) == 0 && uname(&utsname) == 0 &&
-> +            strcmp(utsname.machine, "aarch64") == 0) {
-> +            accel = "kvm";
-> +            cpu = "host";
-> +            gic_ver = "host";
-> +        } else {
-> +            accel = "tcg";
-> +            cpu = "cortex-a57";
-> +            gic_ver = "2";
-> +        }
-> +
-> +        init_bootfile(bootpath, aarch64_kernel);
-> +        cmd_src = g_strdup_printf("-machine virt,accel=%s,gic-version=%s "
-> +                                  "-name vmsource,debug-threads=on -cpu %s "
-> +                                  "-m 150M -serial file:%s/src_serial "
-> +                                  "-kernel %s ",
-> +                                  accel, gic_ver, cpu, tmpfs, bootpath);
-> +        cmd_dst = g_strdup_printf("-machine virt,accel=%s,gic-version=%s "
-> +                                  "-name vmdest,debug-threads=on -cpu %s "
-> +                                  "-m 150M -serial file:%s/dest_serial "
-> +                                  "-kernel %s "
-> +                                  "-incoming %s ",
-> +                                  accel, gic_ver, cpu, tmpfs, bootpath, uri);
-> +
-> +        start_address = ARM_TEST_MEM_START;
-> +        end_address = ARM_TEST_MEM_END;
+From: Bandan Das <bsd@redhat.com>
 
-How about enforcing the kernel size requirement?
+Write of existing objects by the initiator is acheived by
+making a temporary buffer with the new changes, deleting the
+old file and then writing a new file with the same name.
 
-           g_assert(sizeof(aarch64_kernel) <= ARM_TEST_MAX_KERNEL_SIZE);
+Also, add a "readonly" property which needs to be set to false
+for deletion to work.
 
->      } else {
->          g_assert_not_reached();
->      }
-> @@ -505,7 +539,7 @@ static void test_deprecated(void)
->  {
->      QTestState *from;
->  
-> -    from = qtest_start("");
-> +    from = qtest_start("-machine none");
->  
->      deprecated_set_downtime(from, 0.12345);
->      deprecated_set_speed(from, "12345");
-> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
-> index 013b8d1f44..1324427a93 100644
-> --- a/tests/migration/Makefile
-> +++ b/tests/migration/Makefile
-> @@ -16,7 +16,7 @@ override define __note
->   */
->  endef
->  
-> -all: x86-a-b-bootblock.h
-> +all: x86-a-b-bootblock.h aarch64-a-b-kernel.h
->  # Dummy command so that make thinks it has done something
->  	@true
->  
-> @@ -24,6 +24,7 @@ SRC_PATH=../..
->  include $(SRC_PATH)/rules.mak
->  
->  x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
-> +aarch64_cross_prefix := $(call find-cross-prefix,aarch64)
->  
->  x86-a-b-bootblock.h: x86-a-b-bootblock.S
->  	$(x86_64_cross_prefix)gcc -m32 -march=i486 -c $< -o x86.o
-> @@ -32,5 +33,12 @@ x86-a-b-bootblock.h: x86-a-b-bootblock.S
->  	echo "$$__note" > $@
->  	xxd -i x86.bootsect | sed -e 's/.*int.*//' >> $@
->  
-> +aarch64-a-b-kernel.h: aarch64-a-b-kernel.S
-> +	$(aarch64_cross_prefix)gcc -o aarch64.elf -nostdlib \
-> +		-Wl,--build-id=none $<
-> +	$(aarch64_cross_prefix)objcopy -O binary aarch64.elf aarch64.kernel
-> +	echo "$$__note" > $@
-> +	xxd -i aarch64.kernel | sed -e 's/.*int.*//' >> $@
-> +
->  clean:
-> -	rm -f *.bootsect *.boot *.o
-> +	rm -f *.bootsect *.boot *.o *.elf *.kernel
-> diff --git a/tests/migration/aarch64-a-b-kernel.S b/tests/migration/aarch64-a-b-kernel.S
-> new file mode 100644
-> index 0000000000..eec8f44f16
-> --- /dev/null
-> +++ b/tests/migration/aarch64-a-b-kernel.S
-> @@ -0,0 +1,75 @@
-> +#
-> +# Copyright (c) 2018 Red Hat, Inc. and/or its affiliates
-> +#
-> +# Author:
-> +#   Wei Huang <wei@redhat.com>
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2 or later.
-> +# See the COPYING file in the top-level directory.
-> +#
-> +# Note: Please make sure the compiler compiles the assembly code below with
-> +# pc-relative address. Also the branch instructions should use relative
-> +# addresses only.
-> +
-> +#include "migration-test.h"
-> +
-> +.section .text
-> +
-> +        .globl  _start
-> +
-> +_start:
-> +        /* disable MMU to use phys mem address */
-> +        mrs     x0, sctlr_el1
-> +        bic     x0, x0, #(1<<0)
-> +        msr     sctlr_el1, x0
-> +        isb
-> +
-> +        /* traverse test memory region */
-> +        mov     x0, #ARM_TEST_MEM_START
-> +        mov     x1, #ARM_TEST_MEM_END
-> +
-> +        /* output char 'A' to PL011 */
-> +        mov     w3, 'A'
-> +        mov     x2, #ARM_MACH_VIRT_UART
-> +        strb    w3, [x2]
-> +
-> +        /* clean up memory */
-> +        mov     w3, #0
-> +        mov     x4, x0
-> +clean:
-> +        strb    w3, [x4]
-> +        add     x4, x4, #TEST_MEM_PAGE_SIZE
-> +        cmp     x4, x1
-> +        ble     clean
-> +
-> +        /* w5 keeps a counter so we can limit the output speed */
-> +        mov     w5, #0
-> +
-> +        /* main body */
-> +mainloop:
-> +        mov     x4, x0
-> +
-> +innerloop:
-> +        /* clean cache because el2 might still cache guest data under KVM */
-> +        dc      civac, x4
-> +
-> +        /* increment the first byte of each page by 1 */
-> +        ldrb    w3, [x4]
-> +        add     w3, w3, #1
-> +        and     w3, w3, #0xff
-> +        strb    w3, [x4]
-> +
-> +        add     x4, x4, #TEST_MEM_PAGE_SIZE
-> +        cmp     x4, x1
-> +        blt     innerloop
-> +
-> +        add     w5, w5, #1
-> +        and     w5, w5, #0xff
-> +        cmp     w5, #0
-> +        bne     mainloop
-> +
-> +        /* output char 'B' to PL011 */
-> +        mov     w3, 'B'
-> +        strb    w3, [x2]
-> +
-> +        b       mainloop
-> diff --git a/tests/migration/aarch64-a-b-kernel.h b/tests/migration/aarch64-a-b-kernel.h
-> new file mode 100644
-> index 0000000000..53b44d3e99
-> --- /dev/null
-> +++ b/tests/migration/aarch64-a-b-kernel.h
-> @@ -0,0 +1,19 @@
-> +/* This file is automatically generated from
-> + * tests/migration/aarch64-a-b-kernel.S, edit that and then run
-> + * "make aarch64-a-b-kernel.h" inside tests/migration to update,
-> + * and then remember to send both in your patch submission.
-> + */
-> +unsigned char aarch64_kernel[] = {
-> +  0x00, 0x10, 0x38, 0xd5, 0x00, 0xf8, 0x7f, 0x92, 0x00, 0x10, 0x18, 0xd5,
-> +  0xdf, 0x3f, 0x03, 0xd5, 0x00, 0x02, 0xa8, 0xd2, 0x01, 0xc8, 0xa8, 0xd2,
-> +  0x23, 0x08, 0x80, 0x52, 0x02, 0x20, 0xa1, 0xd2, 0x43, 0x00, 0x00, 0x39,
-> +  0x03, 0x00, 0x80, 0x52, 0xe4, 0x03, 0x00, 0xaa, 0x83, 0x00, 0x00, 0x39,
-> +  0x84, 0x04, 0x40, 0x91, 0x9f, 0x00, 0x01, 0xeb, 0xad, 0xff, 0xff, 0x54,
-> +  0x05, 0x00, 0x80, 0x52, 0xe4, 0x03, 0x00, 0xaa, 0x24, 0x7e, 0x0b, 0xd5,
-> +  0x83, 0x00, 0x40, 0x39, 0x63, 0x04, 0x00, 0x11, 0x63, 0x1c, 0x00, 0x12,
-> +  0x83, 0x00, 0x00, 0x39, 0x84, 0x04, 0x40, 0x91, 0x9f, 0x00, 0x01, 0xeb,
-> +  0x2b, 0xff, 0xff, 0x54, 0xa5, 0x04, 0x00, 0x11, 0xa5, 0x1c, 0x00, 0x12,
-> +  0xbf, 0x00, 0x00, 0x71, 0x81, 0xfe, 0xff, 0x54, 0x43, 0x08, 0x80, 0x52,
-> +  0x43, 0x00, 0x00, 0x39, 0xf1, 0xff, 0xff, 0x17
-> +};
-> +
-> diff --git a/tests/migration/migration-test.h b/tests/migration/migration-test.h
-> index 48b59b3281..65ae48b929 100644
-> --- a/tests/migration/migration-test.h
-> +++ b/tests/migration/migration-test.h
-> @@ -15,4 +15,13 @@
->  /* PPC */
->  #define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
->  
-> +/* AArch64 */
-> +#define ARM_MACH_VIRT_UART  0x09000000
-> +/* AArch64 kernel load address is 0x40080000. It should be safe to start the
-> + * test memory at 0x40000000 + TEST_MEM_START, which literally creates a 512KB
-> + * space to host the kernel binary.
-> + */
+Signed-off-by: Bandan Das <bsd@redhat.com>
+Message-id: 20180223164829.29683-4-bsd@redhat.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/usb/dev-mtp.c | 123 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 123 insertions(+)
 
-I'd maybe change the wording and provide a define needed for enforcing
-the kernel size requirement:
-
-/* The AArch64 kernel load address is the RAM base address (0x40000000)
- * plus the arm64 kernel load offset (0x80000). Starting the test memory
- * at the 1M offset, like x86 does, gives the kernel 512K of space.
- */
-#define ARM_TEST_MAX_KERNEL_SIZE (512*1024)
-
-> +#define ARM_TEST_MEM_START  (0x40000000 + TEST_MEM_START)
-> +#define ARM_TEST_MEM_END    (0x40000000 + TEST_MEM_END)
-> +
->  #endif /* _TEST_MIGRATION_H_ */
-> -- 
-> 2.14.3
-> 
->
-
-Otherwise
+diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+index 63f8f3b90b..5ef77f3e9f 100644
+--- a/hw/usb/dev-mtp.c
++++ b/hw/usb/dev-mtp.c
+@@ -46,6 +46,7 @@ enum mtp_code {
+     CMD_GET_OBJECT_HANDLES         = 0x1007,
+     CMD_GET_OBJECT_INFO            = 0x1008,
+     CMD_GET_OBJECT                 = 0x1009,
++    CMD_DELETE_OBJECT              = 0x100b,
+     CMD_GET_PARTIAL_OBJECT         = 0x101b,
+     CMD_GET_OBJECT_PROPS_SUPPORTED = 0x9801,
+     CMD_GET_OBJECT_PROP_DESC       = 0x9802,
+@@ -62,6 +63,8 @@ enum mtp_code {
+     RES_INVALID_STORAGE_ID         = 0x2008,
+     RES_INVALID_OBJECT_HANDLE      = 0x2009,
+     RES_INVALID_OBJECT_FORMAT_CODE = 0x200b,
++    RES_STORE_READ_ONLY            = 0x200e,
++    RES_PARTIAL_DELETE             = 0x2012,
+     RES_SPEC_BY_FORMAT_UNSUPPORTED = 0x2014,
+     RES_INVALID_PARENT_OBJECT      = 0x201a,
+     RES_INVALID_PARAMETER          = 0x201d,
+@@ -172,6 +175,7 @@ struct MTPState {
+     MTPControl   *result;
+     uint32_t     session;
+     uint32_t     next_handle;
++    bool         readonly;
  
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+     QTAILQ_HEAD(, MTPObject) objects;
+ #ifdef CONFIG_INOTIFY1
+@@ -799,6 +803,7 @@ static MTPData *usb_mtp_get_device_info(MTPState *s, MTPControl *c)
+         CMD_GET_NUM_OBJECTS,
+         CMD_GET_OBJECT_HANDLES,
+         CMD_GET_OBJECT_INFO,
++        CMD_DELETE_OBJECT,
+         CMD_GET_OBJECT,
+         CMD_GET_PARTIAL_OBJECT,
+         CMD_GET_OBJECT_PROPS_SUPPORTED,
+@@ -1113,6 +1118,116 @@ static MTPData *usb_mtp_get_object_prop_value(MTPState *s, MTPControl *c,
+     return d;
+ }
+ 
++/* Return correct return code for a delete event */
++enum {
++    ALL_DELETE,
++    PARTIAL_DELETE,
++    READ_ONLY,
++};
++
++/* Assumes that children, if any, have been already freed */
++static void usb_mtp_object_free_one(MTPState *s, MTPObject *o)
++{
++#ifndef CONFIG_INOTIFY1
++    assert(o->nchildren == 0);
++    QTAILQ_REMOVE(&s->objects, o, next);
++    g_free(o->name);
++    g_free(o->path);
++    g_free(o);
++#endif
++}
++
++static int usb_mtp_deletefn(MTPState *s, MTPObject *o, uint32_t trans)
++{
++    MTPObject *iter, *iter2;
++    bool partial_delete = false;
++    bool success = false;
++
++    /*
++     * TODO: Add support for Protection Status
++     */
++
++    QLIST_FOREACH(iter, &o->children, list) {
++        if (iter->format == FMT_ASSOCIATION) {
++            QLIST_FOREACH(iter2, &iter->children, list) {
++                usb_mtp_deletefn(s, iter2, trans);
++            }
++        }
++    }
++
++    if (o->format == FMT_UNDEFINED_OBJECT) {
++        if (remove(o->path)) {
++            partial_delete = true;
++        } else {
++            usb_mtp_object_free_one(s, o);
++            success = true;
++        }
++    }
++
++    if (o->format == FMT_ASSOCIATION) {
++        if (rmdir(o->path)) {
++            partial_delete = true;
++        } else {
++            usb_mtp_object_free_one(s, o);
++            success = true;
++        }
++    }
++
++    if (success && partial_delete) {
++        return PARTIAL_DELETE;
++    }
++    if (!success && partial_delete) {
++        return READ_ONLY;
++    }
++    return ALL_DELETE;
++}
++
++static void usb_mtp_object_delete(MTPState *s, uint32_t handle,
++                                  uint32_t format_code, uint32_t trans)
++{
++    MTPObject *o;
++    int ret;
++
++    /* Return error if store is read-only */
++    if (!FLAG_SET(s, MTP_FLAG_WRITABLE)) {
++        usb_mtp_queue_result(s, RES_STORE_READ_ONLY,
++                             trans, 0, 0, 0, 0);
++        return;
++    }
++
++    if (format_code != 0) {
++        usb_mtp_queue_result(s, RES_SPEC_BY_FORMAT_UNSUPPORTED,
++                             trans, 0, 0, 0, 0);
++        return;
++    }
++
++    if (handle == 0xFFFFFFF) {
++        o = QTAILQ_FIRST(&s->objects);
++    } else {
++        o = usb_mtp_object_lookup(s, handle);
++    }
++    if (o == NULL) {
++        usb_mtp_queue_result(s, RES_INVALID_OBJECT_HANDLE,
++                             trans, 0, 0, 0, 0);
++        return;
++    }
++
++    ret = usb_mtp_deletefn(s, o, trans);
++    if (ret == PARTIAL_DELETE) {
++        usb_mtp_queue_result(s, RES_PARTIAL_DELETE,
++                             trans, 0, 0, 0, 0);
++        return;
++    } else if (ret == READ_ONLY) {
++        usb_mtp_queue_result(s, RES_STORE_READ_ONLY, trans,
++                             0, 0, 0, 0);
++        return;
++    } else {
++        usb_mtp_queue_result(s, RES_OK, trans,
++                             0, 0, 0, 0);
++        return;
++    }
++}
++
+ static void usb_mtp_command(MTPState *s, MTPControl *c)
+ {
+     MTPData *data_in = NULL;
+@@ -1239,6 +1354,9 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
+             return;
+         }
+         break;
++    case CMD_DELETE_OBJECT:
++        usb_mtp_object_delete(s, c->argv[0], c->argv[1], c->trans);
++        return;
+     case CMD_GET_PARTIAL_OBJECT:
+         o = usb_mtp_object_lookup(s, c->argv[0]);
+         if (o == NULL) {
+@@ -1545,6 +1663,10 @@ static void usb_mtp_realize(USBDevice *dev, Error **errp)
+             return;
+         }
+         s->desc = strrchr(s->root, '/');
++        /* Mark store as RW */
++        if (!s->readonly) {
++            s->flags |= (1 << MTP_FLAG_WRITABLE);
++        }
+         if (s->desc && s->desc[0]) {
+             s->desc = g_strdup(s->desc + 1);
+         } else {
+@@ -1567,6 +1689,7 @@ static const VMStateDescription vmstate_usb_mtp = {
+ static Property mtp_properties[] = {
+     DEFINE_PROP_STRING("x-root", MTPState, root),
+     DEFINE_PROP_STRING("desc", MTPState, desc),
++    DEFINE_PROP_BOOL("readonly", MTPState, readonly, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+-- 
+2.9.3
