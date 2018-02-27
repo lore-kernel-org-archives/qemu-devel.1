@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eqhVf-0005LY-HF
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:49:44 -0500
+	(envelope-from <sorear2@gmail.com>) id 1eqhWZ-0006GY-1e
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:50:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eqhVe-0001gl-6u
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:49:43 -0500
-Date: Tue, 27 Feb 2018 16:49:20 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180227164920.047b4885@redhat.com>
-In-Reply-To: <9277c150-6830-8fb1-0092-4bdfd6ba0486@redhat.com>
-References: <1519303376-92875-1-git-send-email-imammedo@redhat.com>
-	<1519303376-92875-9-git-send-email-imammedo@redhat.com>
-	<9277c150-6830-8fb1-0092-4bdfd6ba0486@redhat.com>
+	(envelope-from <sorear2@gmail.com>) id 1eqhWX-0002PB-QF
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:50:39 -0500
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:45766)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sorear2@gmail.com>) id 1eqhWX-0002NR-IU
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:50:37 -0500
+Received: by mail-lf0-x244.google.com with SMTP id x196so28193199lfd.12
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 07:50:37 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 8/9] virt_arm: acpi: reuse common
- build_fadt()
+In-Reply-To: <CAFEAcA_0qNcikG2iLii=4zEPYvhz1koEbhCCrCXssdKYv06OJA@mail.gmail.com>
+References: <1519690504-37792-1-git-send-email-mjc@sifive.com>
+	<CAFEAcA_0qNcikG2iLii=4zEPYvhz1koEbhCCrCXssdKYv06OJA@mail.gmail.com>
+From: "Stef O'Rear" <sorear2@gmail.com>
+Date: Tue, 27 Feb 2018 07:50:34 -0800
+Message-ID: <CADJ6UvPQMDq_RES_u6WUmXHsita+On4oLu-V=emp3MnmmzjHhQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [patches] Re:  [PULL] RISC-V QEMU Port Submission
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,164 +28,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: patches@groups.riscv.org
+Cc: Michael Clark <mjc@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
-On Tue, 27 Feb 2018 16:07:49 +0100
-Auger Eric <eric.auger@redhat.com> wrote:
+On Tue, Feb 27, 2018 at 6:01 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 27 February 2018 at 00:15, Michael Clark <mjc@sifive.com> wrote:
+>> -----BEGIN PGP SIGNED MESSAGE-----
+>> Hash: SHA1
+>>
+>> The following changes since commit 0a773d55ac76c5aa89ed9187a3bc5af8c5c2a6d0:
+>>
+>>   maintainers: Add myself as a OpenBSD maintainer (2018-02-23 12:05:07 +0000)
+>>
+>> are available in the git repository at:
+>>
+>>   https://github.com/riscv/riscv-qemu.git tags/riscv-qemu-upstream-v7
+>>
+>> for you to fetch changes up to 170a9d412ca1eb3b7ae6f6c1ff86dcbdff0fd7a8:
+>>
+>>   RISC-V Build Infrastructure (2018-02-27 11:09:43 +1300)
+>>
+>> - ----------------------------------------------------------------
+>> QEMU RISC-V Emulation Support (RV64GC, RV32GC)
+>
+> Hi; thanks for this pull request. Unfortunately it seems to
+> be missing Signed-off-by: tags. Every commit needs to have
+> the Signed-off-by: tags from the people who contributed code to
+> it, indicating that they're OK with the code going into QEMU.
+> (If the work was done by and copyright a company then you don't
+> need to provide signoffs from every person at the company who
+> worked on the code if you don't want to.)
 
-> Hi Igor,
-> On 22/02/18 13:42, Igor Mammedov wrote:
-> > Extend generic build_fadt() to support rev5.1 FADT
-> > and reuse it for 'virt' board, it would allow to
-> > phase out usage of AcpiFadtDescriptorRev5_1 and
-> > later ACPI_FADT_COMMON_DEF.  
-> Oups sorry sent the R-b to fast. Some small comments below.
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> >  include/hw/acpi/acpi-defs.h | 12 ++----------
-> >  hw/acpi/aml-build.c         | 21 ++++++++++++++++++++-
-> >  hw/arm/virt-acpi-build.c    | 33 ++++++++++++---------------------
-> >  3 files changed, 34 insertions(+), 32 deletions(-)
-> > 
-> > diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-> > index e0accc4..34e49dc 100644
-> > --- a/include/hw/acpi/acpi-defs.h
-> > +++ b/include/hw/acpi/acpi-defs.h
-> > @@ -165,16 +165,6 @@ struct AcpiFadtDescriptorRev3 {
-> >  } QEMU_PACKED;
-> >  typedef struct AcpiFadtDescriptorRev3 AcpiFadtDescriptorRev3;
-> >  
-> > -struct AcpiFadtDescriptorRev5_1 {
-> > -    ACPI_FADT_COMMON_DEF
-> > -    /* 64-bit Sleep Control register (ACPI 5.0) */
-> > -    struct AcpiGenericAddress sleep_control;
-> > -    /* 64-bit Sleep Status register (ACPI 5.0) */
-> > -    struct AcpiGenericAddress sleep_status;
-> > -} QEMU_PACKED;
-> > -
-> > -typedef struct AcpiFadtDescriptorRev5_1 AcpiFadtDescriptorRev5_1;
-> > -
-> >  typedef struct AcpiFadtData {
-> >      struct AcpiGenericAddress pm1_cnt;   /* PM1a_CNT_BLK */
-> >      struct AcpiGenericAddress pm1_evt;   /* PM1a_EVT_BLK */
-> > @@ -192,6 +182,8 @@ typedef struct AcpiFadtData {
-> >      uint8_t  rtc_century;      /* CENTURY */
-> >      uint16_t c2_latency;       /* P_LVL2_LAT */
-> >      uint16_t c3_latency;       /* P_LVL3_LAT */
-> > +    uint16_t arm_boot_arch;    /* ARM_BOOT_ARCH */
-> > +    uint8_t minor_ver;         /* FADT Minor Version */
-> >  
-> >      /*
-> >       * respective tables offsets within ACPI_BUILD_TABLE_FILE,
-> > diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-> > index 17fb71b..5a33cd0 100644
-> > --- a/hw/acpi/aml-build.c
-> > +++ b/hw/acpi/aml-build.c  
-> 
-> nit: comment above needs to be extended to rev5.1 support
-Thanks, I'll fix it up on respin.
+I'll add mine.
 
-> > @@ -1755,7 +1755,14 @@ void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
-> >  
-> >      build_append_gas_from_struct(tbl, &f->reset_reg); /* RESET_REG */
-> >      build_append_int_noprefix(tbl, f->reset_val, 1); /* RESET_VALUE */
-> > -    build_append_int_noprefix(tbl, 0, 3); /* Reserved, ACPI 3.0 */
-> > +    /* Since ACPI 5.1 */
-> > +    if ((f->rev >= 6) || ((f->rev == 5) && f->minor_ver > 0)) {
-> > +        build_append_int_noprefix(tbl, f->arm_boot_arch, 2); /* ARM_BOOT_ARCH */
-> > +        /* FADT Minor Version */
-> > +        build_append_int_noprefix(tbl, f->minor_ver, 1);
-> > +    } else {
-> > +        build_append_int_noprefix(tbl, 0, 3); /* Reserved upto ACPI 5.0 */
-> > +    }
-> >      build_append_int_noprefix(tbl, 0, 8); /* X_FIRMWARE_CTRL */
-> >  
-> >      /* XDSDT address to be filled by Guest linker at runtime */
-> > @@ -1779,6 +1786,18 @@ void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
-> >      build_append_gas_from_struct(tbl, &f->gpe0_blk); /* X_GPE0_BLK */
-> >      build_append_gas(tbl, AML_AS_SYSTEM_MEMORY, 0 , 0, 0, 0); /* X_GPE1_BLK */
-> >  
-> > +    if (f->rev <= 4) {
-> > +        goto build_hdr;
-> > +    }
-> > +
-> > +    /* SLEEP_CONTROL_REG */
-> > +    build_append_gas(tbl, AML_AS_SYSTEM_MEMORY, 0 , 0, 0, 0);
-> > +    /* SLEEP_STATUS_REG */
-> > +    build_append_gas(tbl, AML_AS_SYSTEM_MEMORY, 0 , 0, 0, 0);  
-> 
-> what about Hypervisor Vendor Identity field (8 byte) in version 6.0?
-not supported yet, hence assert below.
-When it's added we should update assert to the next supported revision.
+>> The spike_v1.9
+>> machine has been renamed to spike_v1.9.1 to match the privileged ISA
+>> version and spike_v1.10 has been made the default machine.
+>
+> I'm confused about this. Generally QEMU boards should model
+> hardware, and the board shouldn't care about the ISA versions.
 
-> > +
-> > +    /* TODO: extra fields need to be added to support revisions above rev5 */
-> > +    assert(f->rev == 5);  
-> OK so can't we assert before the (f->rev >= 6) check above?
-> 
-> Thanks
-> 
-> Eric
-> > +
-> >  build_hdr:
-> >      build_header(linker, tbl, (void *)(tbl->data + fadt_start),
-> >                   "FACP", tbl->len - fadt_start, f->rev, oem_id, oem_table_id);
-> > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> > index b644da9..c7c6a57 100644
-> > --- a/hw/arm/virt-acpi-build.c
-> > +++ b/hw/arm/virt-acpi-build.c
-> > @@ -654,39 +654,30 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-> >  static void build_fadt_rev5(GArray *table_data, BIOSLinker *linker,
-> >                              VirtMachineState *vms, unsigned dsdt_tbl_offset)
-> >  {
-> > -    int fadt_start = table_data->len;
-> > -    AcpiFadtDescriptorRev5_1 *fadt = acpi_data_push(table_data, sizeof(*fadt));
-> > -    unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
-> > -    uint16_t bootflags;
-> > +    /* ACPI v5.1 */
-> > +    AcpiFadtData fadt = {
-> > +        .rev = 5,
-> > +        .minor_ver = 1,
-> > +        .flags = 1 << ACPI_FADT_F_HW_REDUCED_ACPI,
-> > +        .xdsdt_tbl_offset = &dsdt_tbl_offset,
-> > +    };
-> >  
-> >      switch (vms->psci_conduit) {
-> >      case QEMU_PSCI_CONDUIT_DISABLED:
-> > -        bootflags = 0;
-> > +        fadt.arm_boot_arch = 0;
-> >          break;
-> >      case QEMU_PSCI_CONDUIT_HVC:
-> > -        bootflags = ACPI_FADT_ARM_PSCI_COMPLIANT | ACPI_FADT_ARM_PSCI_USE_HVC;
-> > +        fadt.arm_boot_arch = ACPI_FADT_ARM_PSCI_COMPLIANT |
-> > +                             ACPI_FADT_ARM_PSCI_USE_HVC;
-> >          break;
-> >      case QEMU_PSCI_CONDUIT_SMC:
-> > -        bootflags = ACPI_FADT_ARM_PSCI_COMPLIANT;
-> > +        fadt.arm_boot_arch = ACPI_FADT_ARM_PSCI_COMPLIANT;
-> >          break;
-> >      default:
-> >          g_assert_not_reached();
-> >      }
-> >  
-> > -    /* Hardware Reduced = 1 and use PSCI 0.2+ */
-> > -    fadt->flags = cpu_to_le32(1 << ACPI_FADT_F_HW_REDUCED_ACPI);
-> > -    fadt->arm_boot_flags = cpu_to_le16(bootflags);
-> > -
-> > -    /* ACPI v5.1 (fadt->revision.fadt->minor_revision) */
-> > -    fadt->minor_revision = 0x1;
-> > -
-> > -    /* DSDT address to be filled by Guest linker */
-> > -    bios_linker_loader_add_pointer(linker,
-> > -        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
-> > -        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> > -
-> > -    build_header(linker, table_data, (void *)(table_data->data + fadt_start),
-> > -                 "FACP", table_data->len - fadt_start, 5, NULL, NULL);
-> > +    build_fadt(table_data, linker, &fadt, NULL, NULL);
-> >  }
-> >  
-> >  /* DSDT */
-> >   
+The spike boards model the Berkeley architectural simulator "spike"
+(https://github.com/riscv/riscv-isa-sim), which does not have a formal
+release process or version numbers so we are using the ISA version as
+a proxy for spike's version.
+
+When physical boards are released with full documentation I presume we
+will be adding board definitions for them, and they will imply
+specific ISA versions.
+
+> Versioned board names in QEMU generally follow _QEMU_'s versioning,
+> and indicate that a board is identical to whatever we modelled
+> in that earlier QEMU version, for VM migration compatibility.
+
+In this case we're handling two logically distinct boards.  We could
+combine them and implement a parameter; I was having trouble finding a
+suitable example to follow earlier but it looks like gic-version in
+hw/arm/virt.c is one.  This seems like a bad thing to change this late
+in the review though?
+
+> Board renames for minor ISA version bumps sounds like there's going
+> to be a lot of churn and breakage -- is this stuff really ready?
+> (Also, should we really have two different board source files
+> for two different ISA versions? I would have expected these to
+> share a source file to share code.)
+
+1.10 is the version we have committed to long term support for; it
+matches all public hardware the upstream Linux port, so it seems
+appropriate to use for QEMU.
+
+1.9.1 was the version supported by riscv-qemu at the time Michael
+Clark took over maintainership; we have not removed support for it
+because we cannot prove that there is nobody depending on it, although
+I do not use it myself and do not know anyone else who does, so I
+would not personably object to removing it if that were required.
+
+Combining spike_v1.10 and spike_v1.9.1 would also be an option amenable to us.
+
+-s
