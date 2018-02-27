@@ -1,30 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eqi82-0002bc-Fd
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:29:23 -0500
+	(envelope-from <eblake@redhat.com>) id 1eqi8Y-00036i-BQ
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:29:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eqi7z-0005ZW-9G
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:29:22 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:40843)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eqi7z-0005Z6-1I
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:29:19 -0500
-Received: by mail-pg0-x241.google.com with SMTP id g2so7700080pgn.7
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 08:29:18 -0800 (PST)
-References: <20180217182323.25885-1-richard.henderson@linaro.org>
-	<20180217182323.25885-60-richard.henderson@linaro.org>
-	<CAFEAcA_q6Ca5JT-850hR43sSmPinvvb6W_s0y8mVyjyaHGeFdQ@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <078bc887-13c8-fb16-485a-69e55c2404cd@linaro.org>
-Date: Tue, 27 Feb 2018 08:29:14 -0800
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_q6Ca5JT-850hR43sSmPinvvb6W_s0y8mVyjyaHGeFdQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 59/67] target/arm: Implement
- SVE Floating Point Multiply Indexed Group
+	(envelope-from <eblake@redhat.com>) id 1eqi8U-0005kC-Tj
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:29:54 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Tue, 27 Feb 2018 10:29:40 -0600
+Message-Id: <20180227162944.17343-1-eblake@redhat.com>
+In-Reply-To: <20180227155514.16721-1-eblake@redhat.com>
+References: <20180227155514.16721-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 1/5] qcow2: Prefer byte-based calls into
+ bs->file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,48 +20,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: berto@igalia.com, qemu-block@nongnu.org, kwolf@redhat.com, Max Reitz <mreitz@redhat.com>
 
-On 02/27/2018 07:18 AM, Peter Maydell wrote:
-> On 17 February 2018 at 18:23, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
->>  target/arm/helper.h        | 14 ++++++++++
->>  target/arm/translate-sve.c | 44 +++++++++++++++++++++++++++++++
->>  target/arm/vec_helper.c    | 64 ++++++++++++++++++++++++++++++++++++++++++++++
->>  target/arm/sve.decode      | 19 ++++++++++++++
->>  4 files changed, 141 insertions(+)
-> 
->> diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
->> index ad5c29cdd5..e711a3217d 100644
->> --- a/target/arm/vec_helper.c
->> +++ b/target/arm/vec_helper.c
->> @@ -24,6 +24,22 @@
->>  #include "fpu/softfloat.h"
->>
->>
->> +/* Note that vector data is stored in host-endian 64-bit chunks,
->> +   so addressing units smaller than that needs a host-endian fixup.  */
->> +#ifdef HOST_WORDS_BIGENDIAN
->> +#define H1(x)   ((x) ^ 7)
->> +#define H1_2(x) ((x) ^ 6)
->> +#define H1_4(x) ((x) ^ 4)
->> +#define H2(x)   ((x) ^ 3)
->> +#define H4(x)   ((x) ^ 1)
->> +#else
->> +#define H1(x)   (x)
->> +#define H1_2(x) (x)
->> +#define H1_4(x) (x)
->> +#define H2(x)   (x)
->> +#define H4(x)   (x)
->> +#endif
->> +
-> 
-> I wasn't expecting to see these macros here. Don't we have them already?
+We had only three sector-based stragglers left; convert them to use
+our preferred byte-based accesses.
 
-Not in this file.  Probably I should share these in a header...
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
+---
+v2: indentation fix
+---
+ block/qcow2-cluster.c  | 5 ++---
+ block/qcow2-refcount.c | 6 +++---
+ 2 files changed, 5 insertions(+), 6 deletions(-)
 
-r~
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index e406b0f3b9e..85be7d5e340 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1615,13 +1615,12 @@ int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset)
+         }
+
+         BLKDBG_EVENT(bs->file, BLKDBG_READ_COMPRESSED);
+-        ret = bdrv_read(bs->file, coffset >> 9, s->cluster_data,
+-                        nb_csectors);
++        ret = bdrv_pread(bs->file, coffset, s->cluster_data, csize);
+         if (ret < 0) {
+             return ret;
+         }
+         if (decompress_buffer(s->cluster_cache, s->cluster_size,
+-                              s->cluster_data + sector_offset, csize) < 0) {
++                              s->cluster_data, csize) < 0) {
+             return -EIO;
+         }
+         s->cluster_cache_offset = coffset;
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index d46b69d7f34..28afbb1b5ea 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -2310,8 +2310,8 @@ write_refblocks:
+         on_disk_refblock = (void *)((char *) *refcount_table +
+                                     refblock_index * s->cluster_size);
+
+-        ret = bdrv_write(bs->file, refblock_offset / BDRV_SECTOR_SIZE,
+-                         on_disk_refblock, s->cluster_sectors);
++        ret = bdrv_pwrite(bs->file, refblock_offset, on_disk_refblock,
++                          s->cluster_size);
+         if (ret < 0) {
+             fprintf(stderr, "ERROR writing refblock: %s\n", strerror(-ret));
+             goto fail;
+@@ -2533,7 +2533,7 @@ fail:
+  * - 0 if writing to this offset will not affect the mentioned metadata
+  * - a positive QCow2MetadataOverlap value indicating one overlapping section
+  * - a negative value (-errno) indicating an error while performing a check,
+- *   e.g. when bdrv_read failed on QCOW2_OL_INACTIVE_L2
++ *   e.g. when bdrv_pread failed on QCOW2_OL_INACTIVE_L2
+  */
+ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
+                                  int64_t size)
+-- 
+2.14.3
