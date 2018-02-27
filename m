@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqgI4-0007t8-9K
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:31:37 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eqgMx-0001is-EZ
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:36:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqgI3-00059q-C7
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:31:36 -0500
-References: <20180222155922.9833-1-eblake@redhat.com>
-	<20180222155922.9833-3-eblake@redhat.com>
-	<20180227114702.GA5269@localhost.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9264d585-dc54-b116-b96c-190ec1bf2562@redhat.com>
-Date: Tue, 27 Feb 2018 08:31:21 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1eqgMw-00072B-Ao
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:36:39 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:41740)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eqgMw-00071j-1Y
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:36:38 -0500
+Received: by mail-ot0-x241.google.com with SMTP id w38so3938317ota.8
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 06:36:37 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180227114702.GA5269@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] qcow2: Document some maximum size
- constraints
+In-Reply-To: <20180217182323.25885-54-richard.henderson@linaro.org>
+References: <20180217182323.25885-1-richard.henderson@linaro.org>
+	<20180217182323.25885-54-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Feb 2018 14:36:16 +0000
+Message-ID: <CAFEAcA8Zt6S2x=bZ6Vxs8T07D6fpMGoYZP38csaKvKsYjyvjxA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 53/67] target/arm: Implement SVE scatter
+ stores
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +30,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, berto@igalia.com, Max Reitz <mreitz@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 02/27/2018 05:47 AM, Kevin Wolf wrote:
-> Am 22.02.2018 um 16:59 hat Eric Blake geschrieben:
->> Although off_t permits up to 63 bits (8EB) of file offsets, in
->> practice, we're going to hit other limits first.  Document some
->> of those limits in the qcow2 spec, and how choice of cluster size
->> can influence some of the limits.
->>
->> While at it, notice that since we cannot map any virtual cluster
->> to any address higher than 64 PB (56 bits) (due to the L1/L2 field
->> encoding), it makes little sense to require the refcount table to
->> access host offsets beyond that point.  Mark the upper bits of
->> the refcount table entries as reserved, with no ill effects, since
->> it is unlikely that there are any existing images larger than 64PB
->> in the first place, and thus all existing images already have those
->> bits as 0.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
-> 
-> I think it would be good to mention the exact reason for the 56 bits in
-> the spec. Even this commit message is rather vague ('L1/L2 field
-> encoding'), so if at some point someone wonders, if we couldn't simply
-> extend the allowed range, they won't easily see that it's related to
-> compressed clusters.
+On 17 February 2018 at 18:23, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper-sve.h    | 41 ++++++++++++++++++++++++++
+>  target/arm/sve_helper.c    | 62 ++++++++++++++++++++++++++++++++++++++++
+>  target/arm/translate-sve.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++
+>  target/arm/sve.decode      | 39 +++++++++++++++++++++++++
+>  4 files changed, 213 insertions(+)
 
-Note that L1 and L2 fields both stop at bit 55 currently, but do have 
-room for expansion up to bit 61; so all three limits (if we include 
-refcount table in the set capped at bit 55 for now) could be raised 
-simultaneously if we find 64P too small in the future.
 
-Compressed clusters are also related, but there, the limit is even 
-smaller - with 2M clusters, a compressed cluster must reside within the 
-first 512T of host offsets, and there are no free bits available for 
-allowing additional compressed cluster storage without making an 
-incompatible change of how compressed clusters are represented.
+> diff --git a/target/arm/sve.decode b/target/arm/sve.decode
+> index 5d8e1481d7..edd9340c02 100644
+> --- a/target/arm/sve.decode
+> +++ b/target/arm/sve.decode
+> @@ -81,6 +81,7 @@
+>  &rpri_load     rd pg rn imm dtype nreg
+>  &rprr_store    rd pg rn rm msz esz nreg
+>  &rpri_store    rd pg rn imm msz esz nreg
+> +&rprr_scatter_store    rd pg rn rm esz msz xs scale
+>
+>  ###########################################################################
+>  # Named instruction formats.  These are generally used to
+> @@ -199,6 +200,8 @@
+>  @rpri_store_msz     ....... msz:2 .. . imm:s4 ... pg:3 rn:5 rd:5    &rpri_store
+>  @rprr_store_esz_n0  ....... ..    esz:2  rm:5 ... pg:3 rn:5 rd:5 \
+>                     &rprr_store nreg=0
+> +@rprr_scatter_store ....... msz:2 ..     rm:5 ... pg:3 rn:5 rd:5 \
+> +                   &rprr_scatter_store
+>
+>  ###########################################################################
+>  # Instruction patterns.  Grouped according to the SVE encodingindex.xhtml.
+> @@ -832,3 +835,39 @@ ST_zpri            1110010 .. nreg:2 1.... 111 ... ..... ..... \
+>  # SVE store multiple structures (scalar plus scalar)         (nreg != 0)
+>  ST_zprr                1110010 msz:2 nreg:2 ..... 011 ... ..... ..... \
+>                 @rprr_store esz=%size_23
+> +
+> +# SVE 32-bit scatter store (scalar plus 32-bit scaled offsets)
+> +# Require msz > 0 && msz <= esz.
+> +ST1_zprz       1110010 .. 11 ..... 100 ... ..... ..... \
+> +               @rprr_scatter_store xs=0 esz=2 scale=1
+> +ST1_zprz       1110010 .. 11 ..... 110 ... ..... ..... \
+> +               @rprr_scatter_store xs=1 esz=2 scale=1
+> +
+> +# SVE 32-bit scatter store (scalar plus 32-bit unscaled offsets)
+> +# Require msz <= esz.
+> +ST1_zprz       1110010 .. 10 ..... 100 ... ..... ..... \
+> +               @rprr_scatter_store xs=0 esz=2 scale=0
+> +ST1_zprz       1110010 .. 10 ..... 110 ... ..... ..... \
+> +               @rprr_scatter_store xs=1 esz=2 scale=0
+> +
+> +# SVE 64-bit scatter store (scalar plus 64-bit scaled offset)
+> +# Require msz > 0
+> +ST1_zprz       1110010 .. 01 ..... 101 ... ..... ..... \
+> +               @rprr_scatter_store xs=2 esz=3 scale=1
+> +
+> +# SVE 64-bit scatter store (scalar plus 64-bit unscaled offset)
+> +ST1_zprz       1110010 .. 00 ..... 101 ... ..... ..... \
+> +               @rprr_scatter_store xs=2 esz=3 scale=0
+> +
+> +# SVE 64-bit scatter store (scalar plus unpacked 32-bit scaled offset)
+> +# Require msz > 0
+> +ST1_zprz       1110010 .. 01 ..... 100 ... ..... ..... \
+> +               @rprr_scatter_store xs=0 esz=3 scale=1
+> +ST1_zprz       1110010 .. 01 ..... 110 ... ..... ..... \
+> +               @rprr_scatter_store xs=1 esz=3 scale=1
+> +
+> +# SVE 64-bit scatter store (scalar plus unpacked 32-bit unscaled offset)
+> +ST1_zprz       1110010 .. 00 ..... 100 ... ..... ..... \
+> +               @rprr_scatter_store xs=0 esz=3 scale=0
+> +ST1_zprz       1110010 .. 00 ..... 110 ... ..... ..... \
+> +               @rprr_scatter_store xs=1 esz=3 scale=0
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+
+Could you write all these with the 'scale=n' part picked up from bit 21,
+rather than one pattern for scale=0 and one for scale=1 ?
+
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
