@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eqiFH-0008Vx-3U
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:36:52 -0500
+	(envelope-from <eblake@redhat.com>) id 1eqiFN-0000A3-Hh
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:37:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eqiFF-0000kI-U6
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:36:51 -0500
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:37181)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eqiFF-0000k5-OG
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:36:49 -0500
-Received: by mail-oi0-x244.google.com with SMTP id f186so13312176oig.4
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 08:36:49 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1eqiFM-0000nc-Oh
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:36:57 -0500
+References: <20180223235142.21501-1-jsnow@redhat.com>
+	<20180223235142.21501-3-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a4831e75-76c5-1bfc-7be5-f9ed1eb785dd@redhat.com>
+Date: Tue, 27 Feb 2018 10:36:53 -0600
 MIME-Version: 1.0
-In-Reply-To: <0f4e15f8aafe82a7b36318c0689f49c974b3402a.1519406423.git.alistair.francis@xilinx.com>
-References: <cover.1519406423.git.alistair.francis@xilinx.com>
-	<0f4e15f8aafe82a7b36318c0689f49c974b3402a.1519406423.git.alistair.francis@xilinx.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Feb 2018 16:36:28 +0000
-Message-ID: <CAFEAcA_U98jy+v0qKDKvYqh4LidHE-hdzNz=FdGBRKSdeexPoA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 2/3] xlnx-zynqmp-rtc: Add basic time
- support
+In-Reply-To: <20180223235142.21501-3-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v4 02/21] blockjobs: model single jobs as
+ transactions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +25,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
 
-On 23 February 2018 at 17:21, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> Allow the guest to determine the time set from the QEMU command line.
->
-> This includes adding a trace event to debug the new time.
->
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+On 02/23/2018 05:51 PM, John Snow wrote:
+> model all independent jobs as single job transactions.
+> 
+> It's one less case we have to worry about when we add more states to the
+> transition machine. This way, we can just treat all job lifetimes exactly
+> the same. This helps tighten assertions of the STM graph and removes some
+> conditionals that would have been needed in the coming commits adding a
+> more explicit job lifetime management API.
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
 
-Thanks for reworking this -- I think it looks simpler this way.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> diff --git a/include/hw/timer/xlnx-zynqmp-rtc.h b/include/hw/timer/xlnx-zynqmp-rtc.h
-> index 87649836cc..2867563bdd 100644
-> --- a/include/hw/timer/xlnx-zynqmp-rtc.h
-> +++ b/include/hw/timer/xlnx-zynqmp-rtc.h
-> @@ -79,6 +79,9 @@ typedef struct XlnxZynqMPRTC {
->      qemu_irq irq_rtc_int;
->      qemu_irq irq_addr_error_int;
->
-> +    struct tm current_tm;
-> +    uint32_t tick_offset;
+> @@ -729,6 +727,17 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+>               return NULL;
+>           }
+>       }
 > +
-
-Do we need current_tm to be a struct field now?
-
-> @@ -143,6 +164,10 @@ static void rtc_reset(DeviceState *dev)
->          register_reset(&s->regs_info[i]);
->      }
->
-> +    trace_xlnx_zynqmp_rtc_gettime(s->current_tm.tm_year, s->current_tm.tm_mon,
-> +                                  s->current_tm.tm_mday, s->current_tm.tm_hour,
-> +                                  s->current_tm.tm_min, s->current_tm.tm_sec);
+> +    /* Single jobs are modeled as single-job transactions for sake of
+> +     * consolidating the job management logic */
+> +    if (!txn) {
+> +        txn = block_job_txn_new();
+> +        block_job_txn_add_job(txn, job);
+> +        block_job_txn_unref(txn);
+> +    } else {
+> +        block_job_txn_add_job(txn, job);
+> +    }
 > +
+>       return job;
 
-...this trace is in reset, and is the only place we read
-current_tm, except for...
-
->      rtc_int_update_irq(s);
->      addr_error_int_update_irq(s);
->  }
-> @@ -178,14 +203,46 @@ static void rtc_init(Object *obj)
->      sysbus_init_mmio(sbd, &s->iomem);
->      sysbus_init_irq(sbd, &s->irq_rtc_int);
->      sysbus_init_irq(sbd, &s->irq_addr_error_int);
-> +
-> +    qemu_get_timedate(&s->current_tm, 0);
-> +    s->tick_offset = mktimegm(&s->current_tm) -
-> +        qemu_clock_get_ns(rtc_clock) / NANOSECONDS_PER_SECOND;
-
-...this code in init, which could just use a local variable
-instead, since the trace in reset isn't really reporting
-interesting information any more (the value never changes, so
-you could trace it in init instead).
-
-> +}
->
-
-thanks
--- PMM
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
