@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqgXR-000317-Up
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:47:31 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eqgY3-0003Vr-8o
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:48:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqgXQ-0006zn-PQ
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:47:29 -0500
-References: <20180224154033.29559-1-mreitz@redhat.com>
-	<20180224154033.29559-4-mreitz@redhat.com>
-	<abd5ed7a-d5ee-028c-1cd5-208161f88beb@redhat.com>
-	<fb3756be-e002-8b47-921f-80a5ce332721@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <01bf42f6-971d-1a28-eeb4-61063ae62bd7@redhat.com>
-Date: Tue, 27 Feb 2018 08:47:20 -0600
+	(envelope-from <alex.bennee@linaro.org>) id 1eqgY0-0001Ai-Oz
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:48:07 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:55736)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1eqgY0-000163-GK
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:48:04 -0500
+Received: by mail-wm0-x244.google.com with SMTP id q83so24679729wme.5
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 06:48:04 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Tue, 27 Feb 2018 14:38:44 +0000
+Message-Id: <20180227143852.11175-24-alex.bennee@linaro.org>
+In-Reply-To: <20180227143852.11175-1-alex.bennee@linaro.org>
+References: <20180227143852.11175-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <fb3756be-e002-8b47-921f-80a5ce332721@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 3/7] qapi: Replace qobject_to_X(o) by
- qobject_to(o, X)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4 23/31] arm/translate-a64: add FP16 FRECPE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,103 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Alberto Garcia <berto@igalia.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-arm@nongnu.org
+Cc: qemu-devel@nongnu.org, richard.henderson@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
 
-On 02/26/2018 06:01 AM, Max Reitz wrote:
+Now we have added f16 during the re-factoring we can simply call the
+helper.
 
->>> +++ b/block.c
->>> @@ -1457,7 +1457,7 @@ static QDict *parse_json_filename(const char
->>> *filename, Error **errp)
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>  =C2=A0 -=C2=A0=C2=A0=C2=A0 options =3D qobject_to_qdict(options_obj)=
-;
->>> +=C2=A0=C2=A0=C2=A0 options =3D qobject_to(options_obj, QDict);
->>
->> Bikeshedding - would it read any easier as:
->>
->> options =3D qobject_to(QDict, options_obj);
->>
->> ?=C2=A0 If so, your Coccinelle script can be touched up, and patch 2/7=
- swaps
->> argument order around, so it would be tolerable but still slightly
->> busywork to regenerate the series.=C2=A0 But I'm not strongly attached=
- to
->> either order, and so I'm also willing to take this as-is (especially
->> since that's less work), if no one else has a strong opinion that
->> swapping order would aid legibility.
->=20
-> Well, same for me. :-)
->=20
-> In a template/generic language, we'd write the type first (e.g.
-> qobject_cast<QDict>(options_obj)).  But maybe we'd write the object
-> first, too (e.g. options_obj.cast<QDict>()).  And the current order of
-> the arguments follows the order in the name ("qobject" options_obj "to"
-> QDict).  But maybe it's more natural to read it as "qobject to" QDict
-> "applied to" options_obj.
->=20
-> I don't know either.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/translate-a64.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Okay, after looking for existing uses of type names in macro calls, I see=
-:
-
-qemu/compiler.h:
-
-#ifndef container_of
-#define container_of(ptr, type, member) ({                      \
-         const typeof(((type *) 0)->member) *__mptr =3D (ptr);     \
-         (type *) ((char *) __mptr - offsetof(type, member));})
-#endif
-
-/* Convert from a base type to a parent type, with compile time=20
-checking.  */
-#ifdef __GNUC__
-#define DO_UPCAST(type, field, dev) ( __extension__ ( { \
-     char __attribute__((unused)) offset_must_be_zero[ \
-         -offsetof(type, field)]; \
-     container_of(dev, type, field);}))
-#else
-#define DO_UPCAST(type, field, dev) container_of(dev, type, field)
-#endif
-
-#define typeof_field(type, field) typeof(((type *)0)->field)
-
-
-qapi/clone-visitor.h:
-
-/*
-  * Deep-clone QAPI object @src of the given @type, and return the result=
-.
-  *
-  * Not usable on QAPI scalars (integers, strings, enums), nor on a
-  * QAPI object that references the 'any' type.  Safe when @src is NULL.
-  */
-#define QAPI_CLONE(type, src)                                           \
-
-/*
-  * Copy deep clones of @type members from @src to @dst.
-  *
-  * Not usable on QAPI scalars (integers, strings, enums), nor on a
-  * QAPI object that references the 'any' type.
-  */
-#define QAPI_CLONE_MEMBERS(type, dst, src)                              \
-
-
-2 out of 3 macros in compiler.h put the type name first, and=20
-container_of() puts it in the middle of 3.  It's even weirder because=20
-DO_UPCAST(t, f, d) calls container_of(d, t, f), where the inconsistency=20
-makes it a mental struggle to figure out how to read the two macros side=20
-by side, compared to if we had just been consistent.  Meanwhile, all of=20
-the macros in qapi put the type name first.
-
-So at this point, I'm 70:30 in favor of doing the rename to have=20
-qobject_to(type, obj) for consistency with majority of other macros that=20
-take a type name (type names are already unusual as arguments to macros,=20
-whether or not the macro is named with ALL_CAPS).  (Sorry, I know that=20
-means more busy work for you, if you agree with my reasoning)
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 9f2c3682dc..50b4fa4ce4 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -11311,6 +11311,8 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
+     case 0x6d: /* FCMLE (zero) */
+         handle_2misc_fcmp_zero(s, fpop, is_scalar, 0, is_q, MO_16, rn, rd);
+         return;
++    case 0x3d: /* FRECPE */
++        break;
+     case 0x18: /* FRINTN */
+         need_rmode = true;
+         only_in_vector = true;
+@@ -11431,6 +11433,9 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
+         case 0x3b: /* FCVTZS */
+             gen_helper_advsimd_f16tosinth(tcg_res, tcg_op, tcg_fpstatus);
+             break;
++        case 0x3d: /* FRECPE */
++            gen_helper_recpe_f16(tcg_res, tcg_op, tcg_fpstatus);
++            break;
+         case 0x5a: /* FCVTNU */
+         case 0x5b: /* FCVTMU */
+         case 0x5c: /* FCVTAU */
+@@ -11466,6 +11471,9 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
+             case 0x3b: /* FCVTZS */
+                 gen_helper_advsimd_f16tosinth(tcg_res, tcg_op, tcg_fpstatus);
+                 break;
++            case 0x3d: /* FRECPE */
++                gen_helper_recpe_f16(tcg_res, tcg_op, tcg_fpstatus);
++                break;
+             case 0x5a: /* FCVTNU */
+             case 0x5b: /* FCVTMU */
+             case 0x5c: /* FCVTAU */
+-- 
+2.15.1
