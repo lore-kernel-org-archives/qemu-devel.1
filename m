@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eqj8j-0001vh-VU
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:34:10 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eqjAz-0003LB-H2
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:36:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eqj8g-00025G-1d
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:34:10 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60434 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1eqjAv-0003Gz-Ix
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:36:29 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54750 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eqj8f-000257-Sq
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:34:05 -0500
-Date: Tue, 27 Feb 2018 17:34:03 +0000
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eqjAv-0003Go-Ee
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:36:25 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 07E5387ABA
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 17:36:25 +0000 (UTC)
+Received: from localhost (ovpn-117-84.ams2.redhat.com [10.36.117.84])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A8AEC111DCF0
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 17:36:24 +0000 (UTC)
+Date: Tue, 27 Feb 2018 17:36:23 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180227173403.GJ32480@stefanha-x1.localdomain>
-References: <20180226030326.20219-1-famz@redhat.com>
+Message-ID: <20180227173623.GK32480@stefanha-x1.localdomain>
+References: <20180222163901.14095-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="EVh9lyqKgK19OcEf"
+	protocol="application/pgp-signature"; boundary="Tv3+oRj6D9L8lW+H"
 Content-Disposition: inline
-In-Reply-To: <20180226030326.20219-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 0/2] Add git-publish config file
+In-Reply-To: <20180222163901.14095-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] simpletrace: fix timestamp argument type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,56 +36,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@gmail.com, f4bug@amsat.org, pbonzini@redhat.com, eblake@redhat.com, mdroth@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
 
 
---EVh9lyqKgK19OcEf
-Content-Type: text/plain; charset=iso-8859-1
+--Tv3+oRj6D9L8lW+H
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 26, 2018 at 11:03:24AM +0800, Fam Zheng wrote:
-> v4: Fix prefixes. [Stefan]
->     Keep rich profiles. [Paolo]
+On Thu, Feb 22, 2018 at 04:39:01PM +0000, Stefan Hajnoczi wrote:
+> The timestamp argument to a trace event method is documented as follows:
 >=20
-> v3: Fix trivial hunk placement. [Michael]
->     Fix PPC sub-list. [Michael]
+>   The method can also take a timestamp argument before the trace event
+>   arguments:
 >=20
-> v2: Add README paragraph [Marc-Andr=E9, Stefan]
->     Fix 'trivial' profile [Marc-Andr=E9]
->     Rename profiles [Stefan]
+>     def runstate_set(self, timestamp, new_state):
+>         ...
 >=20
-> Fam Zheng (2):
->   Add a git-publish configuration file
->   README: Document 'git-publish' workflow
+>   Timestamps have the uint64_t type and are in nanoseconds.
 >=20
->  .gitpublish | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  README      | 31 ++++++++++++++++++++++++++++++-
->  2 files changed, 81 insertions(+), 1 deletion(-)
->  create mode 100644 .gitpublish
+> In reality methods with a timestamp argument actually receive a tuple
+> like (123456789,) as the timestamp argument.  This is due to a bug in
+> simpletrace.py.
 >=20
-> --=20
-> 2.14.3
+> This patch unpacks the tuple so that methods receive the correct
+> timestamp argument type.
 >=20
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  scripts/simpletrace.py | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
+The patchew error was bogus.
+
+Thanks, applied to my tracing tree:
+https://github.com/stefanha/qemu/commits/tracing
 
 Stefan
 
---EVh9lyqKgK19OcEf
+--Tv3+oRj6D9L8lW+H
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJalZaLAAoJEJykq7OBq3PIrJsIAL6zKeJhA6U7jtPs+69CHZcP
-zFzolWG+VmfB3si0hXE8JbcJJFmr74IqolqRT93aAGWZ2Zic0nvsgPdZfzk6KkRk
-xyN/tTqZYj1aGNbFiryiliB3llQvPsidPWtCY4xCUW0o+n4FbJTC+7iVckBXfQTT
-L8LTCZTdiALC1Ui8QdVLaUY/OecFpJXC5xOTliRC1ykZuG/coMtQpyuxrTaez9DR
-j+Ho0db4VChIh11x7566cLoJ6DVcSFUotatSUYVPuJPABHli84fzD7AJh4ELzHS6
-4PI7Yh2kB4pfB6I5FytsKcQvZczwvnVhMVyY6tJ1qWZQSgwtMeykFHjSsAQB6bg=
-=W9PV
+iQEcBAEBAgAGBQJalZcXAAoJEJykq7OBq3PI5WsIAK7hxtFBPInKd32mMQB1BdX4
+bx3HBqUFxmTN4Dk6ONzHgMptlGRmKyCD/K8rU0BQSD9FiZpHdExLtEZPxZ2csvF/
+NLHzQO6pqD8G4Tcium9ukXZz0kTg14f/mLBbbWGTDoAt5BxTyLe0CGqfUBxYhrDI
+tyE4Xtjw5DfS4u/GtxNEtSaskkFrUXoHqBt/odB4TNJzMc4PDGwbD7Fi5NTx0vJT
+HIzhzeei7chJZ052pC6PMHt7cy907qsH02BGOVDz5wzRFvmZ3PObo2dw6ACsdiLc
+UwyqKXiOebMU0r0NnLvingNE+HdrQ5pNQ1GsMP0ivUMCT4cloGz0y4Kr7Gz+PZQ=
+=q1Qd
 -----END PGP SIGNATURE-----
 
---EVh9lyqKgK19OcEf--
+--Tv3+oRj6D9L8lW+H--
