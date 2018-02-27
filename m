@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eqcGg-0002yt-8Y
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 05:13:55 -0500
+	(envelope-from <david@redhat.com>) id 1eqcI9-0004EF-VE
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 05:15:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eqcGf-0005G1-EX
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 05:13:54 -0500
-Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:44543)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eqcGf-0005Fn-9N
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 05:13:53 -0500
-Received: by mail-oi0-x233.google.com with SMTP id b8so12441108oib.11
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 02:13:53 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1519421985-18185-1-git-send-email-stefanb@linux.vnet.ibm.com>
-References: <1519421985-18185-1-git-send-email-stefanb@linux.vnet.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Feb 2018 10:13:31 +0000
-Message-ID: <CAFEAcA84G9BW8bikXYLuu=m6Ca2WRmMH3VXwYvX_x32xJtQVuQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v1 0/2] Merge tpm 2018/02/21 v1
+	(envelope-from <david@redhat.com>) id 1eqcI3-0006CU-9y
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 05:15:25 -0500
+From: David Hildenbrand <david@redhat.com>
+Date: Tue, 27 Feb 2018 11:14:58 +0100
+Message-Id: <20180227101458.13750-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] numa: we don't implement NUMA for s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +17,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+To: qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>
 
-On 23 February 2018 at 21:39, Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
-> This patch series adds a test case for the TPM TIS interface.
->
->    Stefan
->
-> The following changes since commit a6e0344fa0e09413324835ae122c4cadd7890231:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20180220-pull-request' into staging (2018-02-20 14:05:00 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/stefanberger/qemu-tpm.git tpm-pull-2018-02-21
->
-> for you to fetch changes up to adb0e917e6ee93631e40265ca145bc31cd3b6c9a:
->
->   tests: add test for TPM TIS device (2018-02-21 07:24:50 -0500)
->
+Right now it is possible to crash QEMU for s390x by providing e.g.
+    -numa node,nodeid=0,cpus=0-1
 
-Hi. This doesn't appear to be a signed tag; my scripts complain
+Problem is, that numa.c uses mc->cpu_index_to_instance_props as an
+indicator whether NUMA is supported by a machine type. We don't
+implement NUMA for s390x ("topology") yet. However we need
+mc->cpu_index_to_instance_props for query-cpus.
 
-error: remotes/stefanberger/tpm-pull-2018-02-21: cannot verify a
-non-tag object of type commit.
+So let's fix this case by also checking for mc->get_default_cpu_node_id,
+which will be needed by machine_set_cpu_numa_node().
 
-thanks
--- PMM
+qemu-system-s390x: -numa node,nodeid=0,cpus=0-1: NUMA is not supported by
+                   this machine-type
+
+While at it, make s390_cpu_index_to_props() look like on other
+architectures.
+
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/s390x/s390-virtio-ccw.c | 6 ++++--
+ numa.c                     | 2 +-
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 4abbe89847..9b402eebde 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -391,9 +391,11 @@ static void s390_machine_device_unplug_request(HotplugHandler *hotplug_dev,
+ static CpuInstanceProperties s390_cpu_index_to_props(MachineState *machine,
+                                                      unsigned cpu_index)
+ {
+-    g_assert(machine->possible_cpus && cpu_index < machine->possible_cpus->len);
++    MachineClass *mc = MACHINE_GET_CLASS(ms);
++    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(ms);
+ 
+-    return machine->possible_cpus->cpus[cpu_index].props;
++    assert(cpu_index < possible_cpus->len);
++    return possible_cpus->cpus[cpu_index].props;
+ }
+ 
+ static const CPUArchIdList *s390_possible_cpu_arch_ids(MachineState *ms)
+diff --git a/numa.c b/numa.c
+index 7e0e789b02..103b93f5cb 100644
+--- a/numa.c
++++ b/numa.c
+@@ -80,7 +80,7 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+         return;
+     }
+ 
+-    if (!mc->cpu_index_to_instance_props) {
++    if (!mc->cpu_index_to_instance_props || !mc->get_default_cpu_node_id) {
+         error_report("NUMA is not supported by this machine-type");
+         exit(1);
+     }
+-- 
+2.14.3
