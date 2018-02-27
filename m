@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eqivJ-0001wm-VH
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:20:19 -0500
+	(envelope-from <prvs=5899da973=anthony.perard@citrix.com>)
+	id 1eqixS-0003iG-J1
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:22:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eqivG-0003Nm-6z
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:20:17 -0500
-Received: from mail-ot0-x22e.google.com ([2607:f8b0:4003:c0f::22e]:35313)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eqivG-0003NL-1K
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:20:14 -0500
-Received: by mail-ot0-x22e.google.com with SMTP id w2so1924053otg.2
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 09:20:13 -0800 (PST)
+	(envelope-from <prvs=5899da973=anthony.perard@citrix.com>)
+	id 1eqixN-00052D-Le
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:22:30 -0500
+Received: from smtp.citrix.com ([66.165.176.89]:53239)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=5899da973=anthony.perard@citrix.com>)
+	id 1eqixN-00051g-FW
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:22:25 -0500
+Date: Tue, 27 Feb 2018 17:22:23 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20180227172223.GD1799@perard.uk.xensource.com>
+References: <20171207101030.22364-1-haozhong.zhang@intel.com>
+	<20171207101812.23602-1-haozhong.zhang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20180227104903.21353-5-linus.walleij@linaro.org>
-References: <20180227104903.21353-1-linus.walleij@linaro.org>
-	<20180227104903.21353-5-linus.walleij@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Feb 2018 17:19:52 +0000
-Message-ID: <CAFEAcA9YnM9uKvdce8PrDLBYVaSiW07_9z0E0Moe0RZnxpeRrg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 4/5] hw/sii9022: Add support for Silicon
- Image SII9022
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20171207101812.23602-1-haozhong.zhang@intel.com>
+Subject: Re: [Qemu-devel] [RFC QEMU PATCH v4 00/10] Implement vNVDIMM for
+ Xen HVM guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +31,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Corey Minyard <cminyard@mvista.com>
+To: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 27 February 2018 at 10:49, Linus Walleij <linus.walleij@linaro.org> wrote:
-> This adds support for emulating the Silicon Image SII9022 DVI/HDMI
-> bridge. It's not very clever right now, it just acknowledges
-> the switch into DDC I2C mode and back. Combining this with the
-> existing DDC I2C emulation gives the right behavior on the Versatile
-> Express emulation passing through the QEMU EDID to the emulated
-> platform.
->
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+On Thu, Dec 07, 2017 at 06:18:02PM +0800, Haozhong Zhang wrote:
+> This is the QEMU part patches that works with the associated Xen
+> patches to enable vNVDIMM support for Xen HVM domains. Xen relies on
+> QEMU to build guest NFIT and NVDIMM namespace devices, and allocate
+> guest address space for vNVDIMM devices.
 
-> +typedef struct sii9022_state {
-> +    I2CSlave parent_obj;
-> +    uint8_t ptr;
-> +    bool addr_byte;
-> +    bool ddc_req;
-> +    bool ddc_skip_finish;
-> +    bool ddc;
-> +} sii9022_state;
+I've got other question, and maybe possible improvements.
 
-> +static void sii9022_reset(DeviceState *dev)
-> +{
-> +    sii9022_state *s = SII9022(dev);
-> +
-> +    s->ptr = 0;
-> +    s->addr_byte = false;
+When QEMU build the ACPI tables, it also initialize some MemoryRegion,
+which use more guest memory. Do you know if those regions are used with
+your patch series on Xen? Otherwise, we could try to avoid their
+creation with this:
+In xenfv_machine_options()
+m->rom_file_has_mr = false;
+(setting this in xen_hvm_init() would probably be better, but I havn't
+try)
 
-I asked about reset before -- can we just add
-     s->ddc_req = false;
-     s->ddc_skip_finish = false;
-     s->ddc = false;
+If this is possible, libxl would not need to allocate more memory for
+the guest (dm_acpi_size).
 
-?
-
-thanks
--- PMM
+-- 
+Anthony PERARD
