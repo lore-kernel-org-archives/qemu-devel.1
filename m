@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1eqhQs-0001IJ-Ev
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:44:49 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eqhVf-0005LY-HF
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:49:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1eqhQn-0006g1-8R
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:44:46 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56440)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
-	id 1eqhQm-0006fK-Vj
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:44:41 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1RFfKcJ113563
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 10:44:39 -0500
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gd9ejjew6-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 10:44:39 -0500
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
-	Tue, 27 Feb 2018 10:44:38 -0500
-From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-Date: Tue, 27 Feb 2018 10:44:18 -0500
-In-Reply-To: <1519746259-27710-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-References: <1519746259-27710-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-Message-Id: <1519746259-27710-5-git-send-email-akrowiak@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 4/5] s390x/vfio: ap: Introduce VFIO AP device
+	(envelope-from <imammedo@redhat.com>) id 1eqhVe-0001gl-6u
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:49:43 -0500
+Date: Tue, 27 Feb 2018 16:49:20 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180227164920.047b4885@redhat.com>
+In-Reply-To: <9277c150-6830-8fb1-0092-4bdfd6ba0486@redhat.com>
+References: <1519303376-92875-1-git-send-email-imammedo@redhat.com>
+	<1519303376-92875-9-git-send-email-imammedo@redhat.com>
+	<9277c150-6830-8fb1-0092-4bdfd6ba0486@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 8/9] virt_arm: acpi: reuse common
+ build_fadt()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,246 +25,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net, Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-Introduces a VFIO based AP device. The device is defined via
-the QEMU command line by specifying:
+On Tue, 27 Feb 2018 16:07:49 +0100
+Auger Eric <eric.auger@redhat.com> wrote:
 
-    -device vfio-ap,sysfsdev=<path-to-mediated-matrix-device>
+> Hi Igor,
+> On 22/02/18 13:42, Igor Mammedov wrote:
+> > Extend generic build_fadt() to support rev5.1 FADT
+> > and reuse it for 'virt' board, it would allow to
+> > phase out usage of AcpiFadtDescriptorRev5_1 and
+> > later ACPI_FADT_COMMON_DEF.  
+> Oups sorry sent the R-b to fast. Some small comments below.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> >  include/hw/acpi/acpi-defs.h | 12 ++----------
+> >  hw/acpi/aml-build.c         | 21 ++++++++++++++++++++-
+> >  hw/arm/virt-acpi-build.c    | 33 ++++++++++++---------------------
+> >  3 files changed, 34 insertions(+), 32 deletions(-)
+> > 
+> > diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> > index e0accc4..34e49dc 100644
+> > --- a/include/hw/acpi/acpi-defs.h
+> > +++ b/include/hw/acpi/acpi-defs.h
+> > @@ -165,16 +165,6 @@ struct AcpiFadtDescriptorRev3 {
+> >  } QEMU_PACKED;
+> >  typedef struct AcpiFadtDescriptorRev3 AcpiFadtDescriptorRev3;
+> >  
+> > -struct AcpiFadtDescriptorRev5_1 {
+> > -    ACPI_FADT_COMMON_DEF
+> > -    /* 64-bit Sleep Control register (ACPI 5.0) */
+> > -    struct AcpiGenericAddress sleep_control;
+> > -    /* 64-bit Sleep Status register (ACPI 5.0) */
+> > -    struct AcpiGenericAddress sleep_status;
+> > -} QEMU_PACKED;
+> > -
+> > -typedef struct AcpiFadtDescriptorRev5_1 AcpiFadtDescriptorRev5_1;
+> > -
+> >  typedef struct AcpiFadtData {
+> >      struct AcpiGenericAddress pm1_cnt;   /* PM1a_CNT_BLK */
+> >      struct AcpiGenericAddress pm1_evt;   /* PM1a_EVT_BLK */
+> > @@ -192,6 +182,8 @@ typedef struct AcpiFadtData {
+> >      uint8_t  rtc_century;      /* CENTURY */
+> >      uint16_t c2_latency;       /* P_LVL2_LAT */
+> >      uint16_t c3_latency;       /* P_LVL3_LAT */
+> > +    uint16_t arm_boot_arch;    /* ARM_BOOT_ARCH */
+> > +    uint8_t minor_ver;         /* FADT Minor Version */
+> >  
+> >      /*
+> >       * respective tables offsets within ACPI_BUILD_TABLE_FILE,
+> > diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+> > index 17fb71b..5a33cd0 100644
+> > --- a/hw/acpi/aml-build.c
+> > +++ b/hw/acpi/aml-build.c  
+> 
+> nit: comment above needs to be extended to rev5.1 support
+Thanks, I'll fix it up on respin.
 
-The mediated matrix device is created by the VFIO AP device
-driver by writing a UUID to a sysfs attribute file (see
-docs/vfio-ap.txt). The mediated matrix device will be named
-after the UUID. Symbolic links to the $uuid are created in
-many places, so the path to the mediated matrix device $uuid
-can be specified in any of the following ways:
+> > @@ -1755,7 +1755,14 @@ void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
+> >  
+> >      build_append_gas_from_struct(tbl, &f->reset_reg); /* RESET_REG */
+> >      build_append_int_noprefix(tbl, f->reset_val, 1); /* RESET_VALUE */
+> > -    build_append_int_noprefix(tbl, 0, 3); /* Reserved, ACPI 3.0 */
+> > +    /* Since ACPI 5.1 */
+> > +    if ((f->rev >= 6) || ((f->rev == 5) && f->minor_ver > 0)) {
+> > +        build_append_int_noprefix(tbl, f->arm_boot_arch, 2); /* ARM_BOOT_ARCH */
+> > +        /* FADT Minor Version */
+> > +        build_append_int_noprefix(tbl, f->minor_ver, 1);
+> > +    } else {
+> > +        build_append_int_noprefix(tbl, 0, 3); /* Reserved upto ACPI 5.0 */
+> > +    }
+> >      build_append_int_noprefix(tbl, 0, 8); /* X_FIRMWARE_CTRL */
+> >  
+> >      /* XDSDT address to be filled by Guest linker at runtime */
+> > @@ -1779,6 +1786,18 @@ void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
+> >      build_append_gas_from_struct(tbl, &f->gpe0_blk); /* X_GPE0_BLK */
+> >      build_append_gas(tbl, AML_AS_SYSTEM_MEMORY, 0 , 0, 0, 0); /* X_GPE1_BLK */
+> >  
+> > +    if (f->rev <= 4) {
+> > +        goto build_hdr;
+> > +    }
+> > +
+> > +    /* SLEEP_CONTROL_REG */
+> > +    build_append_gas(tbl, AML_AS_SYSTEM_MEMORY, 0 , 0, 0, 0);
+> > +    /* SLEEP_STATUS_REG */
+> > +    build_append_gas(tbl, AML_AS_SYSTEM_MEMORY, 0 , 0, 0, 0);  
+> 
+> what about Hypervisor Vendor Identity field (8 byte) in version 6.0?
+not supported yet, hence assert below.
+When it's added we should update assert to the next supported revision.
 
-/sys/devices/vfio_ap/matrix/$uuid
-/sys/devices/vfio_ap/matrix/mdev_supported_types/vfio_ap-passthrough/devices/$uuid
-/sys/bus/mdev/devices/$uuid
-/sys/bus/mdev/drivers/vfio_mdev/$uuid
-
-When the vfio-ap device is realized, it acquires and opens the
-VFIO iommu group to which the mediated matrix device is
-bound. This causes a VFIO group notification event to be
-signaled. The vfio_ap device driver's group notification
-handler will get called at which time the device driver
-will configure the the AP devices to which the guest will
-be granted access.
-
-Signed-off-by: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
----
- default-configs/s390x-softmmu.mak |    1 +
- hw/vfio/Makefile.objs             |    1 +
- hw/vfio/ap.c                      |  167 +++++++++++++++++++++++++++++++++++++
- include/hw/vfio/vfio-common.h     |    1 +
- 4 files changed, 170 insertions(+), 0 deletions(-)
- create mode 100644 hw/vfio/ap.c
-
-diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
-index 2f4bfe7..0b784b6 100644
---- a/default-configs/s390x-softmmu.mak
-+++ b/default-configs/s390x-softmmu.mak
-@@ -9,3 +9,4 @@ CONFIG_S390_FLIC=y
- CONFIG_S390_FLIC_KVM=$(CONFIG_KVM)
- CONFIG_VFIO_CCW=$(CONFIG_LINUX)
- CONFIG_WDT_DIAG288=y
-+CONFIG_VFIO_AP=$(CONFIG_LINUX)
-diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
-index c3ab909..7300860 100644
---- a/hw/vfio/Makefile.objs
-+++ b/hw/vfio/Makefile.objs
-@@ -6,4 +6,5 @@ obj-$(CONFIG_SOFTMMU) += platform.o
- obj-$(CONFIG_VFIO_XGMAC) += calxeda-xgmac.o
- obj-$(CONFIG_VFIO_AMD_XGBE) += amd-xgbe.o
- obj-$(CONFIG_SOFTMMU) += spapr.o
-+obj-$(CONFIG_VFIO_AP) += ap.o
- endif
-diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-new file mode 100644
-index 0000000..8aa5221
---- /dev/null
-+++ b/hw/vfio/ap.c
-@@ -0,0 +1,167 @@
-+/*
-+ * VFIO based AP matrix device assignment
-+ *
-+ * Copyright 2017 IBM Corp.
-+ * Author(s): Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or(at
-+ * your option) any version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#include <linux/vfio.h>
-+#include <sys/ioctl.h>
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/sysbus.h"
-+#include "hw/vfio/vfio.h"
-+#include "hw/vfio/vfio-common.h"
-+#include "hw/s390x/ap-device.h"
-+#include "qemu/error-report.h"
-+#include "qemu/queue.h"
-+
-+#define VFIO_AP_DEVICE_TYPE      "vfio-ap"
-+#define AP_SYSFSDEV_PROP_NAME    "sysfsdev"
-+
-+typedef struct VFIOAPDevice {
-+    APDevice apdev;
-+    VFIODevice vdev;
-+    QTAILQ_ENTRY(VFIOAPDevice) sibling;
-+} VFIOAPDevice;
-+
-+static void vfio_ap_compute_needs_reset(VFIODevice *vdev)
-+{
-+    vdev->needs_reset = false;
-+}
-+
-+/*
-+ * We don't need vfio_hot_reset_multi and vfio_eoi operations for
-+ * vfio-ap-matrix device now.
-+ */
-+struct VFIODeviceOps vfio_ap_ops = {
-+    .vfio_compute_needs_reset = vfio_ap_compute_needs_reset,
-+};
-+
-+static QTAILQ_HEAD(, VFIOAPDevice) vfio_ap_devices =
-+        QTAILQ_HEAD_INITIALIZER(vfio_ap_devices);
-+
-+static void vfio_put_device(VFIOAPDevice *apdev)
-+{
-+    g_free(apdev->vdev.name);
-+    vfio_put_base_device(&apdev->vdev);
-+}
-+
-+static VFIOGroup *vfio_ap_get_group(VFIOAPDevice *vapdev, Error **errp)
-+{
-+    char *tmp, group_path[PATH_MAX];
-+    ssize_t len;
-+    int groupid;
-+
-+    tmp = g_strdup_printf("%s/iommu_group", vapdev->vdev.sysfsdev);
-+    len = readlink(tmp, group_path, sizeof(group_path));
-+    g_free(tmp);
-+
-+    if (len <= 0 || len >= sizeof(group_path)) {
-+        error_setg(errp, "%s: no iommu_group found for %s",
-+                   VFIO_AP_DEVICE_TYPE, vapdev->vdev.sysfsdev);
-+        return NULL;
-+    }
-+
-+    group_path[len] = 0;
-+
-+    if (sscanf(basename(group_path), "%d", &groupid) != 1) {
-+        error_setg(errp, "vfio: failed to read %s", group_path);
-+        return NULL;
-+    }
-+
-+    return vfio_get_group(groupid, &address_space_memory, errp);
-+}
-+
-+static void vfio_ap_realize(DeviceState *dev, Error **errp)
-+{
-+    VFIODevice *vbasedev;
-+    VFIOGroup *vfio_group;
-+    APDevice *apdev = DO_UPCAST(APDevice, parent_obj, dev);
-+    VFIOAPDevice *vapdev = DO_UPCAST(VFIOAPDevice, apdev, apdev);
-+    char *mdevid;
-+    Error *local_err = NULL;
-+    int ret;
-+
-+    vfio_group = vfio_ap_get_group(vapdev, &local_err);
-+    if (!vfio_group) {
-+        goto out_err;
-+    }
-+
-+    vapdev->vdev.ops = &vfio_ap_ops;
-+    vapdev->vdev.type = VFIO_DEVICE_TYPE_AP;
-+    mdevid = basename(vapdev->vdev.sysfsdev);
-+    vapdev->vdev.name = g_strdup_printf("%s", mdevid);
-+    vapdev->vdev.dev = dev;
-+    QLIST_FOREACH(vbasedev, &vfio_group->device_list, next) {
-+        if (strcmp(vbasedev->name, vapdev->vdev.name) == 0) {
-+            error_setg(&local_err,
-+                       "%s: AP device %s has already been realized",
-+                       VFIO_AP_DEVICE_TYPE, vapdev->vdev.name);
-+            goto out_device_err;
-+        }
-+    }
-+
-+    ret = vfio_get_device(vfio_group, mdevid, &vapdev->vdev, &local_err);
-+    if (ret) {
-+        goto out_device_err;
-+    }
-+
-+    QTAILQ_INSERT_TAIL(&vfio_ap_devices, vapdev, sibling);
-+
-+    return;
-+
-+out_device_err:
-+    vfio_put_group(vfio_group);
-+out_err:
-+    error_propagate(errp, local_err);
-+}
-+
-+static void vfio_ap_unrealize(DeviceState *dev, Error **errp)
-+{
-+    APDevice *apdev = DO_UPCAST(APDevice, parent_obj, dev);
-+    VFIOAPDevice *vapdev = DO_UPCAST(VFIOAPDevice, apdev, apdev);
-+    VFIOGroup *group = vapdev->vdev.group;
-+
-+    vfio_put_device(vapdev);
-+    vfio_put_group(group);
-+}
-+
-+static Property vfio_ap_properties[] = {
-+    DEFINE_PROP_STRING(AP_SYSFSDEV_PROP_NAME, VFIOAPDevice, vdev.sysfsdev),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static const VMStateDescription vfio_ap_vmstate = {
-+    .name = VFIO_AP_DEVICE_TYPE,
-+    .unmigratable = 1,
-+};
-+
-+static void vfio_ap_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->props = vfio_ap_properties;
-+    dc->vmsd = &vfio_ap_vmstate;
-+    dc->desc = "VFIO-based AP device assignment";
-+    dc->realize = vfio_ap_realize;
-+    dc->unrealize = vfio_ap_unrealize;
-+}
-+
-+static const TypeInfo vfio_ap_info = {
-+    .name = VFIO_AP_DEVICE_TYPE,
-+    .parent = AP_DEVICE_TYPE,
-+    .instance_size = sizeof(VFIOAPDevice),
-+    .class_init = vfio_ap_class_init,
-+};
-+
-+static void register_vfio_ap_type(void)
-+{
-+    type_register_static(&vfio_ap_info);
-+}
-+
-+type_init(register_vfio_ap_type)
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index f3a2ac9..f1f22d9 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -46,6 +46,7 @@ enum {
-     VFIO_DEVICE_TYPE_PCI = 0,
-     VFIO_DEVICE_TYPE_PLATFORM = 1,
-     VFIO_DEVICE_TYPE_CCW = 2,
-+    VFIO_DEVICE_TYPE_AP = 3,
- };
- 
- typedef struct VFIOMmap {
--- 
-1.7.1
+> > +
+> > +    /* TODO: extra fields need to be added to support revisions above rev5 */
+> > +    assert(f->rev == 5);  
+> OK so can't we assert before the (f->rev >= 6) check above?
+> 
+> Thanks
+> 
+> Eric
+> > +
+> >  build_hdr:
+> >      build_header(linker, tbl, (void *)(tbl->data + fadt_start),
+> >                   "FACP", tbl->len - fadt_start, f->rev, oem_id, oem_table_id);
+> > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> > index b644da9..c7c6a57 100644
+> > --- a/hw/arm/virt-acpi-build.c
+> > +++ b/hw/arm/virt-acpi-build.c
+> > @@ -654,39 +654,30 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+> >  static void build_fadt_rev5(GArray *table_data, BIOSLinker *linker,
+> >                              VirtMachineState *vms, unsigned dsdt_tbl_offset)
+> >  {
+> > -    int fadt_start = table_data->len;
+> > -    AcpiFadtDescriptorRev5_1 *fadt = acpi_data_push(table_data, sizeof(*fadt));
+> > -    unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
+> > -    uint16_t bootflags;
+> > +    /* ACPI v5.1 */
+> > +    AcpiFadtData fadt = {
+> > +        .rev = 5,
+> > +        .minor_ver = 1,
+> > +        .flags = 1 << ACPI_FADT_F_HW_REDUCED_ACPI,
+> > +        .xdsdt_tbl_offset = &dsdt_tbl_offset,
+> > +    };
+> >  
+> >      switch (vms->psci_conduit) {
+> >      case QEMU_PSCI_CONDUIT_DISABLED:
+> > -        bootflags = 0;
+> > +        fadt.arm_boot_arch = 0;
+> >          break;
+> >      case QEMU_PSCI_CONDUIT_HVC:
+> > -        bootflags = ACPI_FADT_ARM_PSCI_COMPLIANT | ACPI_FADT_ARM_PSCI_USE_HVC;
+> > +        fadt.arm_boot_arch = ACPI_FADT_ARM_PSCI_COMPLIANT |
+> > +                             ACPI_FADT_ARM_PSCI_USE_HVC;
+> >          break;
+> >      case QEMU_PSCI_CONDUIT_SMC:
+> > -        bootflags = ACPI_FADT_ARM_PSCI_COMPLIANT;
+> > +        fadt.arm_boot_arch = ACPI_FADT_ARM_PSCI_COMPLIANT;
+> >          break;
+> >      default:
+> >          g_assert_not_reached();
+> >      }
+> >  
+> > -    /* Hardware Reduced = 1 and use PSCI 0.2+ */
+> > -    fadt->flags = cpu_to_le32(1 << ACPI_FADT_F_HW_REDUCED_ACPI);
+> > -    fadt->arm_boot_flags = cpu_to_le16(bootflags);
+> > -
+> > -    /* ACPI v5.1 (fadt->revision.fadt->minor_revision) */
+> > -    fadt->minor_revision = 0x1;
+> > -
+> > -    /* DSDT address to be filled by Guest linker */
+> > -    bios_linker_loader_add_pointer(linker,
+> > -        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
+> > -        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+> > -
+> > -    build_header(linker, table_data, (void *)(table_data->data + fadt_start),
+> > -                 "FACP", table_data->len - fadt_start, 5, NULL, NULL);
+> > +    build_fadt(table_data, linker, &fadt, NULL, NULL);
+> >  }
+> >  
+> >  /* DSDT */
+> >   
