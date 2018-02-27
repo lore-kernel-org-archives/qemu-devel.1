@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54804)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linus.walleij@linaro.org>) id 1eqcoz-0006Q5-Qk
+	(envelope-from <linus.walleij@linaro.org>) id 1eqcow-0006MO-H9
 	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 05:49:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linus.walleij@linaro.org>) id 1eqcox-0004El-1Q
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 05:49:21 -0500
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:39074)
+	(envelope-from <linus.walleij@linaro.org>) id 1eqcov-0004DW-81
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 05:49:18 -0500
+Received: from mail-lf0-x234.google.com ([2a00:1450:4010:c07::234]:33090)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <linus.walleij@linaro.org>)
-	id 1eqcow-0004Do-QZ
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 05:49:18 -0500
-Received: by mail-lf0-x243.google.com with SMTP id f75so21788873lfg.6
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 02:49:18 -0800 (PST)
+	id 1eqcou-0004Cw-Sf
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 05:49:17 -0500
+Received: by mail-lf0-x234.google.com with SMTP id o145so23588954lff.0
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 02:49:16 -0800 (PST)
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 27 Feb 2018 11:49:03 +0100
-Message-Id: <20180227104903.21353-6-linus.walleij@linaro.org>
+Date: Tue, 27 Feb 2018 11:49:02 +0100
+Message-Id: <20180227104903.21353-5-linus.walleij@linaro.org>
 In-Reply-To: <20180227104903.21353-1-linus.walleij@linaro.org>
 References: <20180227104903.21353-1-linus.walleij@linaro.org>
-Subject: [Qemu-devel] [PATCH 5/5] arm/vexpress: Add proper display connector
- emulation
+Subject: [Qemu-devel] [PATCH 4/5] hw/sii9022: Add support for Silicon Image
+ SII9022
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,76 +30,247 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-arm@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Corey Minyard <cminyard@mvista.com>, Linus Walleij <linus.walleij@linaro.org>
 
-This adds the SiI9022 and EDID I2C devices to the ARM Versatile
-Express machine, and selects the two I2C devices necessary in the
-arm-softmmy.mak configuration so everything will build smoothly.
-
-I am implementing proper handling of the graphics in the Linux
-kernel and adding proper emulation of SiI9022 and EDID makes the
-driver probe as nicely as before, retrieveing the resolutions
-supported by the "QEMU monitor" and overall just working nice.
-
-The assignment of the SiI9022 at address 0x39 and the EDID
-DDC I2C at address 0x50 is not strictly correct: the DDC I2C
-is there all the time but in the actual component it only
-appears once activated inside the SiI9022, so ideally it should
-be added and removed to the bus by the SiI9022. However for this
-purpose it works fine to just have it around.
+This adds support for emulating the Silicon Image SII9022 DVI/HDMI
+bridge. It's not very clever right now, it just acknowledges
+the switch into DDC I2C mode and back. Combining this with the
+existing DDC I2C emulation gives the right behavior on the Versatile
+Express emulation passing through the QEMU EDID to the emulated
+platform.
 
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
 ChangeLog v1->v2:
-- Only add the SII9022 now that it will by itself realize
-  the DDCI2C as part of the bridge.
+- Update license to GPLv2 or later + SPDX identifier
+- Instantiate the DDC I2C as part of the class realization so
+  we do not need to add the DDC "on the side" in machines
+  using SII9022.
+- Switch to using trace events instead of debug prints.
 ---
- default-configs/arm-softmmu.mak | 2 ++
- hw/arm/vexpress.c               | 6 +++++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ hw/display/Makefile.objs |   1 +
+ hw/display/sii9022.c     | 188 +++++++++++++++++++++++++++++++++++++++++++++++
+ hw/display/trace-events  |   5 ++
+ 3 files changed, 194 insertions(+)
+ create mode 100644 hw/display/sii9022.c
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index ca34cf446242..54f855d07206 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -21,6 +21,8 @@ CONFIG_STELLARIS_INPUT=y
- CONFIG_STELLARIS_ENET=y
- CONFIG_SSD0303=y
- CONFIG_SSD0323=y
-+CONFIG_DDC=y
-+CONFIG_SII9022=y
- CONFIG_ADS7846=y
- CONFIG_MAX111X=y
- CONFIG_SSI=y
-diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
-index dc5928ae1ab5..9fad79177a19 100644
---- a/hw/arm/vexpress.c
-+++ b/hw/arm/vexpress.c
-@@ -29,6 +29,7 @@
- #include "hw/arm/arm.h"
- #include "hw/arm/primecell.h"
- #include "hw/devices.h"
+diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+index d3a4cb396eb9..3c7c75b94da5 100644
+--- a/hw/display/Makefile.objs
++++ b/hw/display/Makefile.objs
+@@ -3,6 +3,7 @@ common-obj-$(CONFIG_VGA_CIRRUS) += cirrus_vga.o
+ common-obj-$(CONFIG_G364FB) += g364fb.o
+ common-obj-$(CONFIG_JAZZ_LED) += jazz_led.o
+ common-obj-$(CONFIG_PL110) += pl110.o
++common-obj-$(CONFIG_SII9022) += sii9022.o
+ common-obj-$(CONFIG_SSD0303) += ssd0303.o
+ common-obj-$(CONFIG_SSD0323) += ssd0323.o
+ common-obj-$(CONFIG_XEN) += xenfb.o
+diff --git a/hw/display/sii9022.c b/hw/display/sii9022.c
+new file mode 100644
+index 000000000000..b019ac0ca880
+--- /dev/null
++++ b/hw/display/sii9022.c
+@@ -0,0 +1,188 @@
++/*
++ * Silicon Image SiI9022
++ *
++ * This is a pretty hollow emulation: all we do is acknowledge that we
++ * exist (chip ID) and confirm that we get switched over into DDC mode
++ * so the emulated host can proceed to read out EDID data. All subsequent
++ * set-up of connectors etc will be acknowledged and ignored.
++ *
++ * Copyright (C) 2018 Linus Walleij
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
 +#include "hw/i2c/i2c.h"
- #include "net/net.h"
- #include "sysemu/sysemu.h"
- #include "hw/boards.h"
-@@ -537,6 +538,7 @@ static void vexpress_common_init(MachineState *machine)
-     uint32_t sys_id;
-     DriveInfo *dinfo;
-     pflash_t *pflash0;
-+    I2CBus *i2c;
-     ram_addr_t vram_size, sram_size;
-     MemoryRegion *sysmem = get_system_memory();
-     MemoryRegion *vram = g_new(MemoryRegion, 1);
-@@ -628,7 +630,9 @@ static void vexpress_common_init(MachineState *machine)
-     sysbus_create_simple("sp804", map[VE_TIMER01], pic[2]);
-     sysbus_create_simple("sp804", map[VE_TIMER23], pic[3]);
- 
--    /* VE_SERIALDVI: not modelled */
-+    dev = sysbus_create_simple("versatile_i2c", map[VE_SERIALDVI], NULL);
-+    i2c = (I2CBus *)qdev_get_child_bus(dev, "i2c");
-+    i2c_create_slave(i2c, "sii9022", 0x39);
- 
-     sysbus_create_simple("pl031", map[VE_RTC], pic[4]); /* RTC */
- 
++#include "hw/i2c/i2c-ddc.h"
++#include "trace.h"
++
++#define SII9022_SYS_CTRL_DATA 0x1a
++#define SII9022_SYS_CTRL_PWR_DWN 0x10
++#define SII9022_SYS_CTRL_AV_MUTE 0x08
++#define SII9022_SYS_CTRL_DDC_BUS_REQ 0x04
++#define SII9022_SYS_CTRL_DDC_BUS_GRTD 0x02
++#define SII9022_SYS_CTRL_OUTPUT_MODE 0x01
++#define SII9022_SYS_CTRL_OUTPUT_HDMI 1
++#define SII9022_SYS_CTRL_OUTPUT_DVI 0
++#define SII9022_REG_CHIPID 0x1b
++#define SII9022_INT_ENABLE 0x3c
++#define SII9022_INT_STATUS 0x3d
++#define SII9022_INT_STATUS_HOTPLUG 0x01;
++#define SII9022_INT_STATUS_PLUGGED 0x04;
++
++#define TYPE_SII9022 "sii9022"
++#define SII9022(obj) OBJECT_CHECK(sii9022_state, (obj), TYPE_SII9022)
++
++typedef struct sii9022_state {
++    I2CSlave parent_obj;
++    uint8_t ptr;
++    bool addr_byte;
++    bool ddc_req;
++    bool ddc_skip_finish;
++    bool ddc;
++} sii9022_state;
++
++static const VMStateDescription vmstate_sii9022 = {
++    .name = "sii9022",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_I2C_SLAVE(parent_obj, sii9022_state),
++        VMSTATE_UINT8(ptr, sii9022_state),
++        VMSTATE_BOOL(addr_byte, sii9022_state),
++        VMSTATE_BOOL(ddc_req, sii9022_state),
++        VMSTATE_BOOL(ddc_skip_finish, sii9022_state),
++        VMSTATE_BOOL(ddc, sii9022_state),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static int sii9022_event(I2CSlave *i2c, enum i2c_event event)
++{
++    sii9022_state *s = SII9022(i2c);
++
++    switch (event) {
++    case I2C_START_SEND:
++        s->addr_byte = true;
++        break;
++    case I2C_START_RECV:
++        break;
++    case I2C_FINISH:
++        break;
++    case I2C_NACK:
++        break;
++    }
++
++    return 0;
++}
++
++static int sii9022_rx(I2CSlave *i2c)
++{
++    sii9022_state *s = SII9022(i2c);
++    uint8_t res = 0x00;
++
++    switch (s->ptr) {
++    case SII9022_SYS_CTRL_DATA:
++        if (s->ddc_req) {
++            /* Acknowledge DDC bus request */
++            res = SII9022_SYS_CTRL_DDC_BUS_GRTD | SII9022_SYS_CTRL_DDC_BUS_REQ;
++        }
++        break;
++    case SII9022_REG_CHIPID:
++        res = 0xb0;
++        break;
++    case SII9022_INT_STATUS:
++        /* Something is cold-plugged in, no interrupts */
++        res = SII9022_INT_STATUS_PLUGGED;
++        break;
++    default:
++        break;
++    }
++
++    trace_sii9022_read_reg(s->ptr, res);
++    s->ptr++;
++
++    return res;
++}
++
++static int sii9022_tx(I2CSlave *i2c, uint8_t data)
++{
++    sii9022_state *s = SII9022(i2c);
++
++    if (s->addr_byte) {
++        s->ptr = data;
++        s->addr_byte = false;
++        return 0;
++    }
++
++    switch (s->ptr) {
++    case SII9022_SYS_CTRL_DATA:
++        if (data & SII9022_SYS_CTRL_DDC_BUS_REQ) {
++            s->ddc_req = true;
++            if (data & SII9022_SYS_CTRL_DDC_BUS_GRTD) {
++                s->ddc = true;
++                /* Skip this finish since we just switched to DDC */
++                s->ddc_skip_finish = true;
++                trace_sii9022_switch_mode("DDC");
++            }
++        } else {
++            s->ddc_req = false;
++            s->ddc = false;
++            trace_sii9022_switch_mode("normal");
++        }
++        break;
++    default:
++        break;
++    }
++
++    trace_sii9022_write_reg(s->ptr, data);
++    s->ptr++;
++
++    return 0;
++}
++
++static void sii9022_reset(DeviceState *dev)
++{
++    sii9022_state *s = SII9022(dev);
++
++    s->ptr = 0;
++    s->addr_byte = false;
++}
++
++static void sii9022_realize(DeviceState *dev, Error **errp)
++{
++    I2CBus *bus;
++
++    bus = I2C_BUS(qdev_get_parent_bus(dev));
++    i2c_create_slave(bus, TYPE_I2CDDC, 0x50);
++}
++
++static void sii9022_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    I2CSlaveClass *k = I2C_SLAVE_CLASS(klass);
++
++    k->event = sii9022_event;
++    k->recv = sii9022_rx;
++    k->send = sii9022_tx;
++    dc->reset = sii9022_reset;
++    dc->realize = sii9022_realize;
++    dc->vmsd = &vmstate_sii9022;
++}
++
++static const TypeInfo sii9022_info = {
++    .name          = TYPE_SII9022,
++    .parent        = TYPE_I2C_SLAVE,
++    .instance_size = sizeof(sii9022_state),
++    .class_init    = sii9022_class_init,
++};
++
++static void sii9022_register_types(void)
++{
++    type_register_static(&sii9022_info);
++}
++
++type_init(sii9022_register_types)
+diff --git a/hw/display/trace-events b/hw/display/trace-events
+index da498c1def45..5a48c6cb6a6d 100644
+--- a/hw/display/trace-events
++++ b/hw/display/trace-events
+@@ -132,3 +132,8 @@ vga_cirrus_read_io(uint32_t addr, uint32_t val) "addr 0x%x, val 0x%x"
+ vga_cirrus_write_io(uint32_t addr, uint32_t val) "addr 0x%x, val 0x%x"
+ vga_cirrus_read_blt(uint32_t offset, uint32_t val) "offset 0x%x, val 0x%x"
+ vga_cirrus_write_blt(uint32_t offset, uint32_t val) "offset 0x%x, val 0x%x"
++
++# hw/display/sii9022.c
++sii9022_read_reg(uint8_t addr, uint8_t val) "addr 0x%02x, val 0x%02x"
++sii9022_write_reg(uint8_t addr, uint8_t val) "addr 0x%02x, val 0x%02x"
++sii9022_switch_mode(const char *mode) "mode: %s"
 -- 
 2.14.3
