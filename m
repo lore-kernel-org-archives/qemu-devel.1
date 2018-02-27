@@ -1,40 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1eqfI2-0001ab-Jk
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:27:31 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eqfQu-0001EC-2I
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:36:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1eqfHz-0002by-Nu
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:27:30 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53280
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
-	id 1eqfHz-0002bY-IA
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:27:27 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w1RDOUWe105753
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 08:27:27 -0500
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2gd4hu9j7w-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 08:27:26 -0500
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
-	Tue, 27 Feb 2018 13:27:24 -0000
-References: <1519731154-3127-1-git-send-email-thuth@redhat.com>
-From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Date: Tue, 27 Feb 2018 14:27:19 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1eqfQt-0007Cs-5r
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:36:40 -0500
+Received: from mail-ot0-x22d.google.com ([2607:f8b0:4003:c0f::22d]:36995)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eqfQt-0007Bs-0R
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:36:39 -0500
+Received: by mail-ot0-x22d.google.com with SMTP id t2so3776308otj.4
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 05:36:38 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1519731154-3127-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Message-Id: <a4f94596-0ea9-a7bc-9603-bb8690d39e25@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/s390x: Add the possibility to specify
- the netboot image on the command line
+In-Reply-To: <20180217182323.25885-47-richard.henderson@linaro.org>
+References: <20180217182323.25885-1-richard.henderson@linaro.org>
+	<20180217182323.25885-47-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Feb 2018 13:36:17 +0000
+Message-ID: <CAFEAcA8e_Co6raEiq876ByLnkin1Vbv4-Xa6krGG1MRgbVCuzg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 46/67] target/arm: Implement
+ SVE load and broadcast quadword
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,52 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 27.02.2018 12:32, Thomas Huth wrote:
-> The file name of the netboot binary is currently hard-coded to
-> "s390-netboot.img", without a possibility for the user to select
-> an alternative firmware image here. That's unfortunate, especially
-> since the basics are already there: The filename is a property of
-> the s390-ipl device. So we just have to add a check whether the user
-> already provided the property and only set the default if the string
-> is still empty. Now it is possible to select a different firmware
-> image with "-global s390-ipl.netboot_fw=/path/to/s390-netboot.img".
-> While I sympathize with the concept, it will be a bit hard to consume
-since most of the QEMU instances will be started by libvirt and that has
-no provisions for this kind of firmware replacement. We could craft some
-s390-specific variety of the <loader> element.
-Another thing to consider is that, while the current netboot firmware
-doesn't rely on any special QEMU <-> loader interfaces, it might happen
-that QEMU and the network firmware must match similar to QEMU and the
-s390-ccw firmware image and I have no idea on how to ensure that.
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On 17 February 2018 at 18:23, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  hw/s390x/s390-virtio-ccw.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 4abbe89..7b3fb5f 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -254,8 +254,10 @@ static void s390_init_ipl_dev(const char *kernel_filename,
->      }
->      qdev_prop_set_string(dev, "cmdline", kernel_cmdline);
->      qdev_prop_set_string(dev, "firmware", firmware);
-Wouldn't it be consequent to allow firmware replacement? But then, see
-above.
-> -    qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
->      qdev_prop_set_bit(dev, "enforce_bios", enforce_bios);
-> +    if (!strlen(object_property_get_str(new, "netboot_fw", &error_abort))) {
-> +        qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
+>  target/arm/translate-sve.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++
+>  target/arm/sve.decode      |  9 ++++++++
+>  2 files changed, 60 insertions(+)
+
+> +static void trans_LD1RQ_zprr(DisasContext *s, arg_rprr_load *a, uint32_t insn)
+> +{
+> +    TCGv_i64 addr;
+> +    int msz = dtype_msz(a->dtype);
+> +
+> +    if (a->rm == 31) {
+> +        unallocated_encoding(s);
+> +        return;
 > +    }
->      object_property_add_child(qdev_get_machine(), TYPE_S390_IPL,
->                                new, NULL);
->      object_unref(new);
-> 
+> +
+> +    addr = new_tmp_a64(s);
+> +    tcg_gen_shli_i64(addr, cpu_reg(s, a->rm), msz);
+> +    tcg_gen_add_i64(addr, addr, cpu_reg_sp(s, a->rn));
+> +    do_ldrq(s, a->rd, a->pg, addr, msz);
+> +}
+> +
+> +static void trans_LD1RQ_zpri(DisasContext *s, arg_rpri_load *a, uint32_t insn)
+> +{
+> +    TCGv_i64 addr = new_tmp_a64(s);
+> +
+> +    tcg_gen_addi_i64(addr, cpu_reg_sp(s, a->rn), a->imm * 16);
 
+It confused me initially here that the calculation of the offset
+for the +immediate and the +scalar cases isn't the same, but that
+is indeed what the architecture does. Maybe
+       /* Unlike LD1RQ_zprr, offset scaling is constant rather
+        * than based on msz.
+        */
+?
 
--- 
-Regards,
- Viktor Mihajlovski
+> +    do_ldrq(s, a->rd, a->pg, addr, dtype_msz(a->dtype));
+> +}
+>
+
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
