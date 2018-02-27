@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1erQTH-0002Cz-DD
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:50:16 -0500
+	(envelope-from <no-reply@patchew.org>) id 1erQY3-0008Rq-Id
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:55:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1erQTD-0007b2-EX
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:50:15 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55280 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1erQTD-0007af-8a
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:50:11 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C9A1FEAEA0
-	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 15:50:10 +0000 (UTC)
-Date: Thu, 1 Mar 2018 15:50:01 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180301155001.GR14643@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180301084438.13594-1-peterx@redhat.com>
-	<20180301084438.13594-12-peterx@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1erQXz-0001Cx-Lv
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:55:11 -0500
+Resent-Message-Id: <E1erQXz-0001Cx-Lv@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21003)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1erQXz-0001Cl-Dy
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:55:07 -0500
+In-Reply-To: <20180227115651.30762-1-rpalethorpe@suse.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151974766909.1236.5318664746675054623@bdbb90650ae5>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180301084438.13594-12-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 11/15] qio: non-default context for TLS
- handshake
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 27 Feb 2018 08:07:51 -0800 (PST)
+Subject: Re: [Qemu-devel] [RFC PATCH 0/2] Increase usability of external
+ snapshots
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,63 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: rpalethorpe@suse.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com, armbru@redhat.com, dgilbert@redhat.com, mreitz@redhat.com
 
-On Thu, Mar 01, 2018 at 04:44:34PM +0800, Peter Xu wrote:
-> qio_channel_tls_handshake_full() is introduced to allow the TLS to be
-> run on a non-default context.  Still, no functional change.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  include/io/channel-tls.h | 17 ++++++++++++++++
->  io/channel-tls.c         | 51 +++++++++++++++++++++++++++++++++++-------------
->  2 files changed, 54 insertions(+), 14 deletions(-)
-> 
-
->  static void qio_channel_tls_handshake_task(QIOChannelTLS *ioc,
-> -                                           QIOTask *task)
-> +                                           QIOTask *task,
-> +                                           GMainContext *context)
->  {
->      Error *err = NULL;
->      QCryptoTLSSessionHandshakeStatus status;
-> @@ -171,6 +177,11 @@ static void qio_channel_tls_handshake_task(QIOChannelTLS *ioc,
->          qio_task_complete(task);
->      } else {
->          GIOCondition condition;
-> +        QIOChannelTLSData *data = g_new0(typeof(*data), 1);
-> +
-> +        data->task = task;
-> +        data->context = context;
-
-The 'context' reference is only valid for as long as the caller
-exists. So you need to acquire a reference on 'context' here....
-
-
-> @@ -191,20 +203,23 @@ static gboolean qio_channel_tls_handshake_io(QIOChannel *ioc,
->                                               GIOCondition condition,
->                                               gpointer user_data)
->  {
-> -    QIOTask *task = user_data;
-> +    QIOChannelTLSData *data = user_data;
-> +    QIOTask *task = data->task;
-> +    GMainContext *context = data->context;
->      QIOChannelTLS *tioc = QIO_CHANNEL_TLS(
->          qio_task_get_source(task));
->  
-> -    qio_channel_tls_handshake_task(
-> -       tioc, task);
-
-> +    g_free(data);
-> +    qio_channel_tls_handshake_task(tioc, task, context);
-
-And release the reference on context here.
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMjI3MTE1NjUxLjMwNzYyLTEtcnBhbGV0aG9ycGVAc3VzZS5jb20KU3Vi
+amVjdDogW1FlbXUtZGV2ZWxdIFtSRkMgUEFUQ0ggMC8yXSBJbmNyZWFzZSB1c2FiaWxpdHkgb2Yg
+ZXh0ZXJuYWwgc25hcHNob3RzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
+CgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1s
+KQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
+b3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
+ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
+SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
+Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
+aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
+PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
+YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
+Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAg
+ICAgICBwYXRjaGV3LzE1MTk3MjY5MzItMTM4MzMtMS1naXQtc2VuZC1lbWFpbC1saXJhbi5hbG9u
+QG9yYWNsZS5jb20gLT4gcGF0Y2hldy8xNTE5NzI2OTMyLTEzODMzLTEtZ2l0LXNlbmQtZW1haWwt
+bGlyYW4uYWxvbkBvcmFjbGUuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcv
+MjAxODAyMjcxMTU2NTEuMzA3NjItMS1ycGFsZXRob3JwZUBzdXNlLmNvbSAtPiBwYXRjaGV3LzIw
+MTgwMjI3MTE1NjUxLjMwNzYyLTEtcnBhbGV0aG9ycGVAc3VzZS5jb20KU3dpdGNoZWQgdG8gYSBu
+ZXcgYnJhbmNoICd0ZXN0JwpjYWM3NjExYWFhIG1pZ3JhdGU6IFRlc3RzIGZvciBtaWdyYXRpbmcg
+dG8gYW4gYWxyZWFkeSB1c2VkIFFFTVUKZTFkZjk0NmU5OCBtaWdyYXRlOiBBbGxvdyBpbmNvbWlu
+ZyBtaWdyYXRpb24gd2l0aG91dCBkZWZlcgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcg
+UEFUQ0ggMS8yOiBtaWdyYXRlOiBBbGxvdyBpbmNvbWluZyBtaWdyYXRpb24gd2l0aG91dCBkZWZl
+ci4uLgpDaGVja2luZyBQQVRDSCAyLzI6IG1pZ3JhdGU6IFRlc3RzIGZvciBtaWdyYXRpbmcgdG8g
+YW4gYWxyZWFkeSB1c2VkIFFFTVUuLi4KRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZv
+ciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojOTc6IEZJTEU6IHRlc3RzL21pZ3JhdGlvbi10
+ZXN0LmM6NDExOgorICAgICAgICBpZiAoIWluY29taW5nKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7
+fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTMwOiBGSUxF
+OiB0ZXN0cy9taWdyYXRpb24tdGVzdC5jOjQ0NDoKKyAgICBpZiAoaW5jb21pbmcpClsuLi5dCgpF
+UlJPUjogTWlzc2luZyBTaWduZWQtb2ZmLWJ5OiBsaW5lKHMpCgp0b3RhbDogMyBlcnJvcnMsIDAg
+d2FybmluZ3MsIDIxMiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBj
+b2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
+dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
+ZGV2ZWxAZnJlZWxpc3RzLm9yZw==
