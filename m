@@ -1,23 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1eqYpS-0003Vo-Ar
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 01:33:35 -0500
+	(envelope-from <thuth@redhat.com>) id 1eqZ0Y-0007Mo-C1
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 01:45:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1eqYpO-0008Vo-Ct
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 01:33:34 -0500
-Received: from [45.249.212.32] (port=45090 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1eqYpO-0008Uc-0D
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 01:33:30 -0500
-From: Jay Zhou <jianjay.zhou@huawei.com>
-Date: Tue, 27 Feb 2018 14:33:00 +0800
-Message-ID: <2944dd3e127245716bcbbf7ab2ef9b41b19d35ca.1519712347.git.arei.gonglei@huawei.com>
-In-Reply-To: <cover.1519712347.git.arei.gonglei@huawei.com>
-References: <cover.1519712347.git.arei.gonglei@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v8 4/4] cryptodev-vhost-user: set the key length
+	(envelope-from <thuth@redhat.com>) id 1eqZ0S-00059e-Mo
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 01:45:02 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue, 27 Feb 2018 07:44:44 +0100
+Message-Id: <1519713884-2346-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] tests/libqos: Check for valid dev pointer when
+ looking for PCI devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +19,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, pbonzini@redhat.com, weidong.huang@huawei.com, stefanha@redhat.com, jianjay.zhou@huawei.com, pasic@linux.vnet.ibm.com, longpeng2@huawei.com, xin.zeng@intel.com, roy.fan.zhang@intel.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com
+Cc: qemu-trivial@nongnu.org
 
-From: Gonglei <arei.gonglei@huawei.com>
+dev could be NULL if the PCI device can not be found due to some
+reasons, so we must not dereference the pointer in this case.
 
-Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- backends/cryptodev-vhost-user.c       | 4 ++++
- include/sysemu/cryptodev-vhost-user.h | 3 +++
- 2 files changed, 7 insertions(+)
+ tests/libqos/virtio-pci.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/backends/cryptodev-vhost-user.c b/backends/cryptodev-vhost-user.c
-index 9cd06c4..862d4f2 100644
---- a/backends/cryptodev-vhost-user.c
-+++ b/backends/cryptodev-vhost-user.c
-@@ -224,6 +224,10 @@ static void cryptodev_vhost_user_init(
-                          1u << VIRTIO_CRYPTO_SERVICE_MAC;
-     backend->conf.cipher_algo_l = 1u << VIRTIO_CRYPTO_CIPHER_AES_CBC;
-     backend->conf.hash_algo = 1u << VIRTIO_CRYPTO_HASH_SHA1;
-+
-+    backend->conf.max_size = UINT64_MAX;
-+    backend->conf.max_cipher_key_len = VHOST_USER_MAX_CIPHER_KEY_LEN;
-+    backend->conf.max_auth_key_len = VHOST_USER_MAX_AUTH_KEY_LEN;
+diff --git a/tests/libqos/virtio-pci.c b/tests/libqos/virtio-pci.c
+index 7ac15c0..550dede 100644
+--- a/tests/libqos/virtio-pci.c
++++ b/tests/libqos/virtio-pci.c
+@@ -315,7 +315,9 @@ QVirtioPCIDevice *qvirtio_pci_device_find(QPCIBus *bus, uint16_t device_type)
+     qvirtio_pci_foreach(bus, device_type, false, 0,
+                         qvirtio_pci_assign_device, &dev);
+ 
+-    dev->vdev.bus = &qvirtio_pci;
++    if (dev) {
++        dev->vdev.bus = &qvirtio_pci;
++    }
+ 
+     return dev;
  }
- 
- static int64_t cryptodev_vhost_user_sym_create_session(
-diff --git a/include/sysemu/cryptodev-vhost-user.h b/include/sysemu/cryptodev-vhost-user.h
-index 937217b..6debf53 100644
---- a/include/sysemu/cryptodev-vhost-user.h
-+++ b/include/sysemu/cryptodev-vhost-user.h
-@@ -23,6 +23,9 @@
- #ifndef CRYPTODEV_VHOST_USER_H
- #define CRYPTODEV_VHOST_USER_H
- 
-+#define VHOST_USER_MAX_AUTH_KEY_LEN    512
-+#define VHOST_USER_MAX_CIPHER_KEY_LEN  64
-+
- 
- /**
-  * cryptodev_vhost_user_get_vhost:
 -- 
 1.8.3.1
