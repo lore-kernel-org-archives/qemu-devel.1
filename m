@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1eqi9L-0003yq-VH
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:30:45 -0500
+	(envelope-from <eblake@redhat.com>) id 1eqiBD-0005VF-Pq
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:32:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1eqi9K-0006TO-VW
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:30:43 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58542 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1eqi9K-0006Sc-QC
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:30:42 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C22A1402243B
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 16:30:41 +0000 (UTC)
-References: <20180216172910.8549-1-maxime.coquelin@redhat.com>
-	<20180216172910.8549-3-maxime.coquelin@redhat.com>
-	<20180227165057-mutt-send-email-mst@kernel.org>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <840e4a8a-41ba-f89e-5a8f-faff519205fb@redhat.com>
-Date: Tue, 27 Feb 2018 17:30:34 +0100
+	(envelope-from <eblake@redhat.com>) id 1eqiB9-0007Lh-T7
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:32:39 -0500
+References: <20180223235142.21501-1-jsnow@redhat.com>
+	<20180223235142.21501-2-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3101da11-6577-3687-8333-9e35e5a8a01d@redhat.com>
+Date: Tue, 27 Feb 2018 10:32:28 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180227165057-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180223235142.21501-2-jsnow@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 2/5] vhost-user: Introduce new request to
- send virtio device status
+Subject: Re: [Qemu-devel] [RFC v4 01/21] blockjobs: fix set-speed kick
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,61 +24,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: stefanha@redhat.com, mlureau@redhat.com, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
 
-
-
-On 02/27/2018 04:01 PM, Michael S. Tsirkin wrote:
-> On Fri, Feb 16, 2018 at 06:29:07PM +0100, Maxime Coquelin wrote:
->> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
->> index 9fcf48d611..daa452bd36 100644
->> --- a/docs/interop/vhost-user.txt
->> +++ b/docs/interop/vhost-user.txt
->> @@ -368,6 +368,7 @@ Protocol features
->>   #define VHOST_USER_PROTOCOL_F_MTU            4
->>   #define VHOST_USER_PROTOCOL_F_SLAVE_REQ      5
->>   #define VHOST_USER_PROTOCOL_F_CROSS_ENDIAN   6
->> +#define VHOST_USER_PROTOCOL_F_VIRTIO_STATUS  7
->>   
->>   Master message types
->>   --------------------
->> @@ -663,6 +664,19 @@ Master message types
->>         field, and slaves MUST NOT accept SET_CONFIG for read-only
->>         configuration space fields unless the live migration bit is set.
->>   
->> +* VHOST_USER_SET_VIRTIO_STATUS
->> +
->> +      Id: 26
->> +      Equivalent ioctl: N/A
->> +      Master payload: u64
->> +      Slave payload: N/A
->> +
->> +      Sent by the vhost-user master to notify of virtio device status change.
->> +      The payload is a u64 representing the virtio device status as defined in
->> +      the virtio specification.
->> +      The request should be sent only when VHOST_USER_PROTOCOL_F_VIRTIO_STATUS
->> +      protocol feature has been negotiated.
->> +
->>   Slave message types
->>   -------------------
->>   
+On 02/23/2018 05:51 PM, John Snow wrote:
+> If speed is '0' it's not actually "less than" the previous speed.
+> Kick the job in this case too.
 > 
-> So for now backend was only activated after DRIVER_OK. Does this message
-> mean that we must send updates such as _DRIVER as well?
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>   blockjob.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 
-Yes, even if I don't see a use for _ACKNOWLEDGE and _DRIVER today.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> Further, this is kind of one-way, but there are several cases where device
-> modifies the status.  One is NEEDS_RESET. Another is clearing
-> of FEATURES_OK.
+> 
+> diff --git a/blockjob.c b/blockjob.c
+> index 3f52f29f75..24833ef30f 100644
+> --- a/blockjob.c
+> +++ b/blockjob.c
+> @@ -499,7 +499,7 @@ void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp)
+>       }
+>   
+>       job->speed = speed;
+> -    if (speed <= old_speed) {
+> +    if (speed && speed <= old_speed) {
+>           return;
+>       }
+>   
+> 
 
-Do you mean we should also notify the backend in case of NEEDS_RESET, or
-clearing of FEATURES_OK?
-
-Or you mean we should provide a way for the backend to update the device
-status, e.g. by having a slave-initiated VHOST_USER_SET_VIRTIO_STATUS
-request?
-
-Thanks,
-Maxime
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
