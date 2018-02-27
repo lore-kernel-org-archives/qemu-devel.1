@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eqoVd-0004n7-KZ
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 18:18:10 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eqodd-0006Rf-I8
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 18:26:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eqoVc-0007TY-KX
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 18:18:09 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170922171323.10348-1-f4bug@amsat.org>
-	<20171009132112.GA5553@toto>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4b2297e8-3db9-2ddc-dbaa-16c9e372a571@amsat.org>
-Date: Tue, 27 Feb 2018 20:18:01 -0300
-MIME-Version: 1.0
-In-Reply-To: <20171009132112.GA5553@toto>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 0/7] Generalize MDIO framework
+	(envelope-from <richard.henderson@linaro.org>) id 1eqoda-0003P9-ED
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 18:26:25 -0500
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:43408)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eqoda-0003Ne-66
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 18:26:22 -0500
+Received: by mail-pl0-x241.google.com with SMTP id f23-v6so341773plr.10
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 15:26:22 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Tue, 27 Feb 2018 15:26:18 -0800
+Message-Id: <20180227232618.2908-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH] decodetree: Propagate return value from
+ translate subroutines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +25,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Grant Likely <grant.likely@arm.com>, Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-Hi Edgar,
+Allow the translate subroutines to return false for invalid insns.
 
-On 10/09/2017 10:21 AM, Edgar E. Iglesias wrote:
-> On Fri, Sep 22, 2017 at 02:13:16PM -0300, Philippe Mathieu-Daudé wrote:
->> Hi,
->>
->> I have a follow up series using multiples PHY on the MDIO bus based on this
->> series.
-> 
-> Hi Philippe!
-> 
-> I think this is a good improvement compared to todays state.
-> It may make sense to have the generic mdio bus functions in mdio.c
-> and specific phy models in separate files, thoughts?
+At present we can of course invoke an invalid insn exception from within
+the translate subroutine, but in the short term this consolidates code.
+In the long term it would allow the decodetree language to support
+overlapping patterns for ISA extensions.
 
-I'm sorry I missed your mail and noticed it today since this thread got
-awakened with Alistair's reviews.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
 
-I'll raise this series priority in my TODO and respin with Grant correct
-S-o-b, Alistair comments addressed and split MDIO/PHY as you suggested.
+Since this makes an ABI change to the translate functions called by the
+decode function, let's make it now before there are any in-tree users.
 
-After spending 2 months with the SD bus, I now fill more confident to
-rework the MDIO bus and think of unit testing and tracing.
+My SVE branch over-decodes in quite a lot of cases -- e.g. things like
+the 2-bit size field must be 1-3 for fp operands, and so size==0 is
+unallocated.  Returning false for these cases allows the actual call
+to unallocated_encoding to be done in one place instead of hundreds.
 
-Regards,
+Longer term, I'm thinking of how to handle decode of overlapping ISA
+extensions.  One could allow (specific) overlapping patterns and
+prioritize them in some way (e.g. first in file is first matched).
+My thought is that trans_insn_a would check a cpu feature bit and
+return false if not enabled.  Then trans_insn_b would be given its
+chance to handle the insn.
 
-Phil.
 
->>
->> Grant's previous work:
->> http://lists.nongnu.org/archive/html/qemu-devel/2013-02/msg00257.html
->>
->> "There is more work to be done, particularly in moving to the common GPIO api,
->>  but that work can be done as a follow on patch series."
->>
->> Grant Likely (7):
->>   hw/mdio: Generalize etraxfs MDIO bitbanging emulation
->>   hw/mdio: Add PHY register definition
->>   hw/mdio: Generalize phy initialization routine
->>   hw/mdio: Mask out read-only bits.
->>   hw/mdio: Refactor bitbanging state machine
->>   hw/mdio: Add VMState support
->>   hw/mdio: Use bitbang core for smc91c111 network device
->>
->>  include/hw/net/mdio.h   | 124 +++++++++++++++++++++
->>  hw/net/etraxfs_eth.c    | 291 +-----------------------------------------------
->>  hw/net/mdio.c           | 280 ++++++++++++++++++++++++++++++++++++++++++++++
->>  hw/net/smc91c111.c      |  27 ++++-
->>  hw/net/xilinx_axienet.c | 189 +------------------------------
->>  hw/net/Makefile.objs    |   2 +
->>  6 files changed, 438 insertions(+), 475 deletions(-)
->>  create mode 100644 include/hw/net/mdio.h
->>  create mode 100644 hw/net/mdio.c
->>
->> -- 
->> 2.14.1
->>
+r~
+---
+ scripts/decodetree.py | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/scripts/decodetree.py b/scripts/decodetree.py
+index 6a33f8f8dd..41301c84aa 100755
+--- a/scripts/decodetree.py
++++ b/scripts/decodetree.py
+@@ -461,7 +461,7 @@ class Pattern(General):
+         global translate_prefix
+         output('typedef ', self.base.base.struct_name(),
+                ' arg_', self.name, ';\n')
+-        output(translate_scope, 'void ', translate_prefix, '_', self.name,
++        output(translate_scope, 'bool ', translate_prefix, '_', self.name,
+                '(DisasContext *ctx, arg_', self.name,
+                ' *a, ', insntype, ' insn);\n')
+ 
+@@ -474,9 +474,8 @@ class Pattern(General):
+             output(ind, self.base.extract_name(), '(&u.f_', arg, ', insn);\n')
+         for n, f in self.fields.items():
+             output(ind, 'u.f_', arg, '.', n, ' = ', f.str_extract(), ';\n')
+-        output(ind, translate_prefix, '_', self.name,
++        output(ind, 'return ', translate_prefix, '_', self.name,
+                '(ctx, &u.f_', arg, ', insn);\n')
+-        output(ind, 'return true;\n')
+ # end Pattern
+ 
+ 
+-- 
+2.14.3
