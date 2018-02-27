@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eqih1-0001SY-Hg
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:05:32 -0500
+	(envelope-from <prvs=5899da973=anthony.perard@citrix.com>)
+	id 1eqijB-0002Dm-IA
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:07:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eqigy-0001j8-BV
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:05:31 -0500
-Date: Tue, 27 Feb 2018 18:04:58 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180227180458.64ea3d61.cohuck@redhat.com>
-In-Reply-To: <1519746259-27710-5-git-send-email-akrowiak@linux.vnet.ibm.com>
-References: <1519746259-27710-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1519746259-27710-5-git-send-email-akrowiak@linux.vnet.ibm.com>
+	(envelope-from <prvs=5899da973=anthony.perard@citrix.com>)
+	id 1eqij8-0002zj-Cn
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:07:45 -0500
+Received: from smtp.citrix.com ([66.165.176.89]:55877)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=5899da973=anthony.perard@citrix.com>)
+	id 1eqij8-0002yt-5M
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 12:07:42 -0500
+Date: Tue, 27 Feb 2018 16:37:28 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20180227163728.GA1799@perard.uk.xensource.com>
+References: <20171207101812.23602-1-haozhong.zhang@intel.com>
+	<20171207101812.23602-3-haozhong.zhang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] s390x/vfio: ap: Introduce VFIO AP
- device
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20171207101812.23602-3-haozhong.zhang@intel.com>
+Subject: Re: [Qemu-devel] [RFC QEMU PATCH v4 02/10] xen-hvm: create the
+ hotplug memory region on Xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,90 +31,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
+To: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Tue, 27 Feb 2018 10:44:18 -0500
-Tony Krowiak <akrowiak@linux.vnet.ibm.com> wrote:
-
-> Introduces a VFIO based AP device. The device is defined via
-> the QEMU command line by specifying:
+On Thu, Dec 07, 2017 at 06:18:04PM +0800, Haozhong Zhang wrote:
+> The guest physical address of vNVDIMM is allocated from the hotplug
+> memory region, which is not created when QEMU is used as Xen device
+> model. In order to use vNVDIMM for Xen HVM domains, this commit reuses
+> the code for pc machine type to create the hotplug memory region for
+> Xen HVM domains.
 > 
->     -device vfio-ap,sysfsdev=<path-to-mediated-matrix-device>
-> 
-> The mediated matrix device is created by the VFIO AP device
-> driver by writing a UUID to a sysfs attribute file (see
-> docs/vfio-ap.txt). The mediated matrix device will be named
-> after the UUID. Symbolic links to the $uuid are created in
-> many places, so the path to the mediated matrix device $uuid
-> can be specified in any of the following ways:
-> 
-> /sys/devices/vfio_ap/matrix/$uuid
-> /sys/devices/vfio_ap/matrix/mdev_supported_types/vfio_ap-passthrough/devices/$uuid
-> /sys/bus/mdev/devices/$uuid
-> /sys/bus/mdev/drivers/vfio_mdev/$uuid
-> 
-> When the vfio-ap device is realized, it acquires and opens the
-> VFIO iommu group to which the mediated matrix device is
-> bound. This causes a VFIO group notification event to be
-> signaled. The vfio_ap device driver's group notification
-> handler will get called at which time the device driver
-> will configure the the AP devices to which the guest will
-> be granted access.
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
 > ---
->  default-configs/s390x-softmmu.mak |    1 +
->  hw/vfio/Makefile.objs             |    1 +
->  hw/vfio/ap.c                      |  167 +++++++++++++++++++++++++++++++++++++
->  include/hw/vfio/vfio-common.h     |    1 +
->  4 files changed, 170 insertions(+), 0 deletions(-)
->  create mode 100644 hw/vfio/ap.c
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> ---
+>  hw/i386/pc.c          | 86 ++++++++++++++++++++++++++++-----------------------
+>  hw/i386/xen/xen-hvm.c |  2 ++
+>  include/hw/i386/pc.h  |  1 +
+>  3 files changed, 51 insertions(+), 38 deletions(-)
 > 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 186545d2a4..9f46c8df79 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1315,6 +1315,53 @@ void xen_load_linux(PCMachineState *pcms)
+>      pcms->fw_cfg = fw_cfg;
+>  }
+>  
+> +void pc_memory_hotplug_init(PCMachineState *pcms, MemoryRegion *system_memory)
 
-> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-> new file mode 100644
-> index 0000000..8aa5221
-> --- /dev/null
-> +++ b/hw/vfio/ap.c
-> @@ -0,0 +1,167 @@
-> +/*
-> + * VFIO based AP matrix device assignment
-> + *
-> + * Copyright 2017 IBM Corp.
+It might be better to have a separate patch which move the code into a function.
 
-Happy new year?
-
-[Also the other new files, here and in the Linux part.]
-
-> + * Author(s): Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or(at
-> + * your option) any version. See the COPYING file in the top-level
-
-That probably should be "any later version" (I'm not even sure what GPL
-v1 says :)
-
-And I just noticed that the vfio-ccw code has the same problem...
-
-> + * directory.
-> + */
+> +{
+> +    MachineState *machine = MACHINE(pcms);
+> +    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+> +    ram_addr_t hotplug_mem_size = machine->maxram_size - machine->ram_size;
 > +
-> +#include <linux/vfio.h>
-> +#include <sys/ioctl.h>
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "hw/sysbus.h"
-> +#include "hw/vfio/vfio.h"
-> +#include "hw/vfio/vfio-common.h"
-> +#include "hw/s390x/ap-device.h"
-> +#include "qemu/error-report.h"
-> +#include "qemu/queue.h"
+> +    if (!pcmc->has_reserved_memory || machine->ram_size >= machine->maxram_size)
+> +        return;
 > +
-> +#define VFIO_AP_DEVICE_TYPE      "vfio-ap"
-> +#define AP_SYSFSDEV_PROP_NAME    "sysfsdev"
+> +    if (memory_region_size(&pcms->hotplug_memory.mr)) {
 
-Using a #define for a property name seems unusual (and I think it
-decreases readability).
+This new check looks like to catch programming error, rather than user
+error. Would it be better to be an assert instead?
 
-Otherwise, looks fine (on first read-through).
+> +        error_report("hotplug memory region has been initialized");
+> +        exit(EXIT_FAILURE);
+> +    }
+> +
+
+-- 
+Anthony PERARD
