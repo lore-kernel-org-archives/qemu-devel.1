@@ -1,39 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianfeng.tan@intel.com>) id 1eqXIp-0005rC-5v
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 23:55:48 -0500
+	(envelope-from <cota@braap.org>) id 1eqXzG-0004aU-8W
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 00:39:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianfeng.tan@intel.com>) id 1eqXIm-0007RZ-3D
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 23:55:47 -0500
-Received: from mga18.intel.com ([134.134.136.126]:54674)
+	(envelope-from <cota@braap.org>) id 1eqXzC-0000Qb-SB
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 00:39:38 -0500
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:49779)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianfeng.tan@intel.com>)
-	id 1eqXIl-0007PN-PJ
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 23:55:44 -0500
-From: "Tan, Jianfeng" <jianfeng.tan@intel.com>
-Date: Tue, 27 Feb 2018 04:55:37 +0000
-Message-ID: <ED26CBA2FAD1BF48A8719AEF02201E36514530D8@SHSMSX103.ccr.corp.intel.com>
-References: <1517842735-9011-1-git-send-email-jianfeng.tan@intel.com>
-	<1b6a1999-95bb-5eac-70e1-39e6ba5b22fc@redhat.com>
-	<6716e932-9ce5-3d97-41cb-f33ea94ad4ce@intel.com>
-	<502bbdba-0c35-e35a-6600-dfca739d0ea3@redhat.com>
-	<20180205181521.47232aa4@redhat.com>
-	<5155622d-cc49-d24c-7a7d-24ebb9ca2331@redhat.com>
-	<ED26CBA2FAD1BF48A8719AEF02201E36514317E8@SHSMSX103.ccr.corp.intel.com>
-	<20180207130635.4033f8b8@redhat.com>
-	<8474af94-7bff-a7b5-e316-b8a0e332467e@intel.com>
-	<20180208105111.7a776513@redhat.com>
-	<53186984-2111-ed5e-0d47-65db12f22ea3@intel.com>
-	<20180208123018.5b3c9da7@redhat.com>
-	<ED26CBA2FAD1BF48A8719AEF02201E365144EAAB@SHSMSX103.ccr.corp.intel.com>
-	<20180226135549.34af5dbf@redhat.com>
-	<bfe718ca-3251-a87d-00e7-60a1dfa2da82@redhat.com>
-In-Reply-To: <bfe718ca-3251-a87d-00e7-60a1dfa2da82@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC] exec: eliminate ram naming issue as migration
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eqXzC-0000PD-NN
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 00:39:34 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Tue, 27 Feb 2018 00:39:13 -0500
+Message-Id: <1519709965-29833-5-git-send-email-cota@braap.org>
+In-Reply-To: <1519709965-29833-1-git-send-email-cota@braap.org>
+References: <1519709965-29833-1-git-send-email-cota@braap.org>
+Subject: [Qemu-devel] [PATCH 04/16] tcg: move
+ tb_ctx.tb_phys_invalidate_count to tcg_ctx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,42 +24,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGFvbG8gQm9uemluaSBb
-bWFpbHRvOnBib256aW5pQHJlZGhhdC5jb21dDQo+IFNlbnQ6IE1vbmRheSwgRmVicnVhcnkgMjYs
-IDIwMTggMTA6NDMgUE0NCj4gVG86IElnb3IgTWFtbWVkb3Y7IFRhbiwgSmlhbmZlbmcNCj4gQ2M6
-IEphc29uIFdhbmc7IE1heGltZSBDb3F1ZWxpbjsgcWVtdS1kZXZlbEBub25nbnUub3JnOyBNaWNo
-YWVsIFMgLg0KPiBUc2lya2luDQo+IFN1YmplY3Q6IFJlOiBbUWVtdS1kZXZlbF0gW1JGQ10gZXhl
-YzogZWxpbWluYXRlIHJhbSBuYW1pbmcgaXNzdWUgYXMNCj4gbWlncmF0aW9uDQo+IA0KPiBPbiAy
-Ni8wMi8yMDE4IDEzOjU1LCBJZ29yIE1hbW1lZG92IHdyb3RlOg0KPiA+Pj4gU28gaG93IGFib3V0
-IGp1c3QgYWRkaW5nIGEgbmV3IG9wdGlvbiAtLW1lbS1zaGFyZSB0byBkZWNpZGUgaWYgdGhhdCdz
-IGENCj4gPj4+IHByaXZhdGUgbWVtb3J5IG9yIHNoYXJlZCBtZW1vcnk/IFRoYXQgc2VlbXMgbXVj
-aCBzdHJhaWdodGZvcndhcmQNCj4gd2F5DQo+ID4gQWJvdmUgb3B0aW9ucyBhcmUgbGVnYWN5ICh3
-aGljaCB3ZSBjYW4ndCByZW1vdmUgZm9yIGNvbXBhdCByZWFzb25zKSwNCj4gPiB0aGVpciByZXBs
-YWNlbWVudCBpcyAnbWVtb3J5LWJhY2tlbmQtZmlsZScgYmFja2VuZCB3aGljaCBoYXMgYWxsIG9m
-DQo+ID4gdGhlIGFib3ZlIGluY2x1ZGluZyAnc2hhcmUnIHByb3BlcnR5Lg0KPiANCj4gTW9yZSBw
-cmVjaXNlbHksIHdlIGhhdmUgYWRkZWQgIi1vYmplY3QgbWVtb3J5LWJhY2tlbmQtZmlsZSIgdG8g
-YXZvaWQNCj4gcHJvbGlmZXJhdGlvbiBvZiBvcHRpb25zIHJlbGF0ZWQgdG8gbWVtb3J5LiAgQmVz
-aWRlcyB1bmlmeWluZyB0aGUgY2FzZXMNCj4gb2YgMSBhbmQgPjEgTlVNQSBub2RlLCB1c2luZyAt
-b2JqZWN0IGFsc28gaGFzIHRoZSBhZHZhbnRhZ2Ugb2YNCj4gc3VwcG9ydGluZyBtZW1vcnkgaG90
-cGx1Zy4NCj4gDQo+IFlvdSB3cm90ZSAiSSBmaW5kIGFkZGluZyBhIGJhY2tlbmQgZm9yIG5vbm51
-bWEgcGMgUkFNIGlzIHJvdW5kYWJvdXQgd2F5Ig0KPiBidXQgYmFzaWNhbGx5IHRoZSBjb21tYW5k
-IGxpbmUgc2F5cyAidGhpcyBWTSBoYXMgb25seSBvbmUgTlVNQSBub2RlLA0KPiBiYWNrZWQgYnkg
-dGhpcyBtZW1vcnkgb2JqZWN0IiB3aGljaCBpcyBhIHByZWNpc2UgZGVzY3JpcHRpb24gb2Ygd2hh
-dCB0aGUNCj4gVk0gbWVtb3J5IGxvb2tzIGxpa2UuDQo+IA0KPiA+IFNvIGp1c3QgYWRkICdtZW1k
-ZXYnIHByb3BlcnR5IHRvIG1hY2hpbmUgYW5kIHJldXNlIG1lbW9yeS1iYWNrZW5kLWZpbGUNCj4g
-PiB3aXRoIGl0IGluc3RlYWQgb2YgZHVwbGljYXRpbmcgZnVuY3Rpb25hbGl0eSBpbiB0aGUgbGVn
-YWN5IGNvZGUuDQo+IA0KPiBUaGF0IHdvdWxkIGhvd2V2ZXIgYWxzbyBoYXZlIGEgZGlmZmVyZW50
-IFJBTUJsb2NrIGlkLCBlZmZlY3RpdmVseQ0KPiBwcm9kdWNpbmcgdGhlIHNhbWUgb3V0cHV0IGFz
-ICItbnVtYSBub2RlLG1lbWRldj0uLi4iLg0KDQpJcyBpdCBwb3NzaWJsZSB0aGF0IHdlIGZvcmNl
-IHRoYXQgUkFNQmxvY2sgaWQgdG8gYmUgInBjLnJhbSI/DQoNCj4gDQo+IEkgdGhpbmsgdGhpcyBz
-aG91bGQgYmUgc29sdmVkIGF0IHRoZSBsaWJ2aXJ0IGxldmVsLiAgTGlidmlydCBzaG91bGQNCj4g
-d3JpdGUgaW4gdGhlIG1pZ3JhdGlvbiBYTUwgY29va2llIHdoZXRoZXIgdGhlIFZNIGlzIHVzaW5n
-IC1vYmplY3Qgb3INCj4gLW1lbS1wYXRoIHRvIGRlY2xhcmUgaXRzIG1lbW9yeSwgYW5kIG5ld2x5
-LXN0YXJ0ZWQgVk1zIHNob3VsZCBhbHdheXMgdXNlDQo+IC1vYmplY3QuICBUaGlzIHdvbid0IGZp
-eCB0aGUgcHJvYmxlbSBmb3IgVk1zIHRoYXQgYXJlIGFscmVhZHkgcnVubmluZywNCj4gYnV0IGl0
-IHdpbGwgZml4IGl0IHRoZSBuZXh0IHRpbWUgdGhleSBhcmUgc3RhcnRlZC4NCg0KSW4gdGhpcyBj
-YXNlLCB3ZSByZXR1cm4gdG8gdGhlIHN0YXJ0IHBvaW50IDotKQ0KDQpUaGFua3MsDQpKaWFuZmVu
-Zw0K
+Thereby making it per-TCGContext. Once we remove tb_lock, this will
+avoid an atomic increment every time a TB is invalidated.
+
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+---
+ accel/tcg/translate-all.c |  5 +++--
+ include/exec/tb-context.h |  1 -
+ tcg/tcg.c                 | 14 ++++++++++++++
+ tcg/tcg.h                 |  3 +++
+ 4 files changed, 20 insertions(+), 3 deletions(-)
+
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 3a51d49..20ad3fc 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -1072,7 +1072,8 @@ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr)
+     /* suppress any remaining jumps to this TB */
+     tb_jmp_unlink(tb);
+ 
+-    tb_ctx.tb_phys_invalidate_count++;
++    atomic_set(&tcg_ctx->tb_phys_invalidate_count,
++               tcg_ctx->tb_phys_invalidate_count + 1);
+ }
+ 
+ #ifdef CONFIG_SOFTMMU
+@@ -1862,7 +1863,7 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
+     cpu_fprintf(f, "\nStatistics:\n");
+     cpu_fprintf(f, "TB flush count      %u\n",
+                 atomic_read(&tb_ctx.tb_flush_count));
+-    cpu_fprintf(f, "TB invalidate count %d\n", tb_ctx.tb_phys_invalidate_count);
++    cpu_fprintf(f, "TB invalidate count %zu\n", tcg_tb_phys_invalidate_count());
+     cpu_fprintf(f, "TLB flush count     %zu\n", tlb_flush_count());
+     tcg_dump_info(f, cpu_fprintf);
+ }
+diff --git a/include/exec/tb-context.h b/include/exec/tb-context.h
+index d8472c8..8c9b49c 100644
+--- a/include/exec/tb-context.h
++++ b/include/exec/tb-context.h
+@@ -37,7 +37,6 @@ struct TBContext {
+ 
+     /* statistics */
+     unsigned tb_flush_count;
+-    int tb_phys_invalidate_count;
+ };
+ 
+ extern TBContext tb_ctx;
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index b471708..a7b596e 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -791,6 +791,20 @@ size_t tcg_code_capacity(void)
+     return capacity;
+ }
+ 
++size_t tcg_tb_phys_invalidate_count(void)
++{
++    unsigned int n_ctxs = atomic_read(&n_tcg_ctxs);
++    unsigned int i;
++    size_t total = 0;
++
++    for (i = 0; i < n_ctxs; i++) {
++        const TCGContext *s = atomic_read(&tcg_ctxs[i]);
++
++        total += atomic_read(&s->tb_phys_invalidate_count);
++    }
++    return total;
++}
++
+ /* pool based memory allocation */
+ void *tcg_malloc_internal(TCGContext *s, int size)
+ {
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 8bf29cc..9dd9448 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -694,6 +694,8 @@ struct TCGContext {
+     /* Threshold to flush the translated code buffer.  */
+     void *code_gen_highwater;
+ 
++    size_t tb_phys_invalidate_count;
++
+     /* Track which vCPU triggers events */
+     CPUState *cpu;                      /* *_trans */
+ 
+@@ -852,6 +854,7 @@ size_t tcg_code_capacity(void);
+ 
+ void tcg_tb_insert(TranslationBlock *tb);
+ void tcg_tb_remove(TranslationBlock *tb);
++size_t tcg_tb_phys_invalidate_count(void);
+ TranslationBlock *tcg_tb_lookup(uintptr_t tc_ptr);
+ void tcg_tb_foreach(GTraverseFunc func, gpointer user_data);
+ size_t tcg_nb_tbs(void);
+-- 
+2.7.4
