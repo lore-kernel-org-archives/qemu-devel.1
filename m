@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqhZN-0000OO-Lv
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:53:34 -0500
+	(envelope-from <eblake@redhat.com>) id 1eqhbH-0002Es-Dp
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:55:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqhZJ-0004VO-Qq
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:53:33 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33962 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eqhZJ-0004Rt-Mg
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:53:29 -0500
-References: <20180211093607.27351-1-armbru@redhat.com>
-	<20180211093607.27351-8-armbru@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1eqhbG-0005hh-LB
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 10:55:31 -0500
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <addfee56-eb31-49b0-5321-d898ad1ed0a2@redhat.com>
-Date: Tue, 27 Feb 2018 09:53:22 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180211093607.27351-8-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 07/29] qapi: Turn generators into modules
+Date: Tue, 27 Feb 2018 09:55:09 -0600
+Message-Id: <20180227155514.16721-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/5] minor compression improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +17,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
+To: qemu-devel@nongnu.org
+Cc: berto@igalia.com, qemu-block@nongnu.org, kwolf@redhat.com
 
-On 02/11/2018 03:35 AM, Markus Armbruster wrote:
-> The next commit will introduce a common driver program for all
-> generators.  The generators need to be modules for that.  qapi2texi.py
-> already is.  Make the other generators follow suit.
->=20
-> The changes are actually trivial.  Obvious in the diffs once you view
-> them with whitespace changes ignored.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->   scripts/qapi-commands.py   | 43 ++++++++++++++++++--------------
->   scripts/qapi-event.py      | 43 ++++++++++++++++++--------------
->   scripts/qapi-introspect.py | 54 ++++++++++++++++++++++---------------=
----
->   scripts/qapi-types.py      | 56 ++++++++++++++++++++++---------------=
-----
->   scripts/qapi-visit.py      | 62 +++++++++++++++++++++++++------------=
----------
->   5 files changed, 143 insertions(+), 115 deletions(-)
+In v4:
+- patch 2 has even more wording tweaks [Kevin]
+- patch 3 is new [Berto]
+- patch 5 fixes an off-by-one [Berto]
 
-Urgh. One annoyance of this patch is that if you switch to another=20
-branch without the patch, leftover .pyc files in the source tree can=20
-cause weird errors until you 'rm -f scripts/qapi/*.pyc':
+Eric Blake (5):
+  qcow2: Prefer byte-based calls into bs->file
+  qcow2: Document some maximum size constraints
+  qcow2: Reduce REFT_OFFSET_MASK
+  qcow2: Don't allow overflow during cluster allocation
+  qcow2: Avoid memory over-allocation on compressed images
 
-$ make -j3
-   GEN     config-host.h
-   GEN     qmp-commands.h
-   GEN     qapi-types.h
-Traceback (most recent call last):
-   File "/home/eblake/qemu/scripts/qapi-commands.py", line 225, in <modul=
-e>
-     class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
-NameError: name 'QAPISchemaVisitor' is not defined
-Traceback (most recent call last):
-   File "/home/eblake/qemu/scripts/qapi-types.py", line 168, in <module>
-     class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
-NameError: name 'QAPISchemaVisitor' is not defined
-make: *** [Makefile:522: qapi-types.h] Error 1
-make: *** Waiting for unfinished jobs....
-make: *** [Makefile:537: qmp-commands.h] Error 1
+ docs/interop/qcow2.txt | 38 +++++++++++++++++++++++++++++++++++---
+ block/qcow2.h          |  8 +++++++-
+ block/qcow2-cluster.c  | 32 ++++++++++++++++++++------------
+ block/qcow2-refcount.c | 27 +++++++++++++++++----------
+ block/qcow2.c          |  2 +-
+ 5 files changed, 80 insertions(+), 27 deletions(-)
 
-Not a show-stopper, but annoying when toggling between branches.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+-- 
+2.14.3
