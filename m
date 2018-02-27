@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqlJC-0006aD-FH
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:53:07 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eqlJo-0006yT-7N
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:53:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqlJB-0006ti-MX
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:53:06 -0500
-References: <20180223235142.21501-1-jsnow@redhat.com>
-	<20180223235142.21501-15-jsnow@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <24631f89-f682-bee5-2024-77d191a18e43@redhat.com>
-Date: Tue, 27 Feb 2018 13:52:53 -0600
+	(envelope-from <richard.henderson@linaro.org>) id 1eqlJj-00071y-Bj
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:53:44 -0500
+Received: from mail-pf0-x22c.google.com ([2607:f8b0:400e:c00::22c]:37169)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eqlJj-00071i-4H
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:53:39 -0500
+Received: by mail-pf0-x22c.google.com with SMTP id s24so10732pfm.4
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 11:53:38 -0800 (PST)
+References: <20180220180325.29818-1-peter.maydell@linaro.org>
+	<20180220180325.29818-6-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <e7da74d2-ee08-a000-2914-4760a371f96b@linaro.org>
+Date: Tue, 27 Feb 2018 11:53:35 -0800
 MIME-Version: 1.0
-In-Reply-To: <20180223235142.21501-15-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180220180325.29818-6-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v4 14/21] blockjobs: add block_job_txn_apply
- function
+Subject: Re: [Qemu-devel] [PATCH 05/19] armv7m: Forward idau property to CPU
+ object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +32,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On 02/23/2018 05:51 PM, John Snow wrote:
-> Simply apply a function transaction-wide.
-> A few more uses of this in forthcoming patches.
+On 02/20/2018 10:03 AM, Peter Maydell wrote:
+> Create an "idau" property on the armv7m container object which
+> we can forward to the CPU object. Annoyingly, we can't use
+> object_property_add_alias() because the CPU object we want to
+> forward to doesn't exist until the armv7m container is realized.
 > 
-> Signed-off-by: John Snow <jsnow@redhat.com>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->   blockjob.c | 24 +++++++++++++++---------
->   1 file changed, 15 insertions(+), 9 deletions(-)
-> 
+>  include/hw/arm/armv7m.h | 3 +++
+>  hw/arm/armv7m.c         | 7 +++++++
+>  2 files changed, 10 insertions(+)
 
-> @@ -565,13 +577,7 @@ static void block_job_completed_txn_success(BlockJob *job)
->           }
->       }
->       /* We are the last completed job, commit the transaction. */
-> -    QLIST_FOREACH_SAFE(other_job, &txn->jobs, txn_list, next) {
-> -        ctx = blk_get_aio_context(other_job->blk);
-> -        aio_context_acquire(ctx);
-> -        assert(other_job->ret == 0);
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-We lost this assertion.  Hopefully that doesn't matter in the long run.
 
-> -        block_job_completed_single(other_job);
-> -        aio_context_release(ctx);
-> -    }
-> +    block_job_txn_apply(txn, block_job_completed_single);
->   }
->   
->   /* Assumes the block_job_mutex is held */
-> 
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+r~
