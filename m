@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eqgY6-0003Z1-76
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:48:13 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eqgY7-0003ZH-Gx
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:48:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eqgY3-0001MZ-2t
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:48:10 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:33907)
+	(envelope-from <alex.bennee@linaro.org>) id 1eqgY4-0001SU-HE
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:48:11 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:51333)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eqgY2-0001Gv-Jn
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:48:06 -0500
-Received: by mail-wr0-x244.google.com with SMTP id m5so25156792wrg.1
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 06:48:06 -0800 (PST)
+	id 1eqgY4-0001OA-4f
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 09:48:08 -0500
+Received: by mail-wm0-x243.google.com with SMTP id h21so24575179wmd.1
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 06:48:07 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 27 Feb 2018 14:38:40 +0000
-Message-Id: <20180227143852.11175-20-alex.bennee@linaro.org>
+Date: Tue, 27 Feb 2018 14:38:45 +0000
+Message-Id: <20180227143852.11175-25-alex.bennee@linaro.org>
 In-Reply-To: <20180227143852.11175-1-alex.bennee@linaro.org>
 References: <20180227143852.11175-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 19/31] arm/translate-a64: add FP16 FCMxx
- (zero) to simd_two_reg_misc_fp16
+Subject: [Qemu-devel] [PATCH v4 24/31] arm/translate-a64: add FP16 FRCPX to
+ simd_two_reg_misc_fp16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,146 +33,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: qemu-devel@nongnu.org, richard.henderson@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
 
-I re-use the existing handle_2misc_fcmp_zero handler and tweak it
-slightly to deal with the half-precision case.
+We go with the localised helper.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v3
-  - use size directly wuth read/write_vec_element
-  - drop unneeded break
-  - WIP: mess with calculating maxpasses
----
- target/arm/translate-a64.c | 80 +++++++++++++++++++++++++++++++++-------------
- 1 file changed, 57 insertions(+), 23 deletions(-)
+ target/arm/helper-a64.c    | 29 +++++++++++++++++++++++++++++
+ target/arm/helper-a64.h    |  1 +
+ target/arm/translate-a64.c |  4 ++++
+ 3 files changed, 34 insertions(+)
 
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index 722fff2349..92a0d55a9c 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -356,6 +356,35 @@ uint64_t HELPER(neon_addlp_u16)(uint64_t a)
+ }
+ 
+ /* Floating-point reciprocal exponent - see FPRecpX in ARM ARM */
++float16 HELPER(frecpx_f16)(float16 a, void *fpstp)
++{
++    float_status *fpst = fpstp;
++    uint16_t val16, sbit;
++    int16_t exp;
++
++    if (float16_is_any_nan(a)) {
++        float16 nan = a;
++        if (float16_is_signaling_nan(a, fpst)) {
++            float_raise(float_flag_invalid, fpst);
++            nan = float16_maybe_silence_nan(a, fpst);
++        }
++        if (fpst->default_nan_mode) {
++            nan = float16_default_nan(fpst);
++        }
++        return nan;
++    }
++
++    val16 = float16_val(a);
++    sbit = 0x8000 & val16;
++    exp = extract32(val16, 10, 5);
++
++    if (exp == 0) {
++        return make_float16(deposit32(sbit, 10, 5, 0x1e));
++    } else {
++        return make_float16(deposit32(sbit, 10, 5, ~exp));
++    }
++}
++
+ float32 HELPER(frecpx_f32)(float32 a, void *fpstp)
+ {
+     float_status *fpst = fpstp;
+diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
+index 32931b17c6..339323fc3d 100644
+--- a/target/arm/helper-a64.h
++++ b/target/arm/helper-a64.h
+@@ -41,6 +41,7 @@ DEF_HELPER_FLAGS_1(neon_addlp_s16, TCG_CALL_NO_RWG_SE, i64, i64)
+ DEF_HELPER_FLAGS_1(neon_addlp_u16, TCG_CALL_NO_RWG_SE, i64, i64)
+ DEF_HELPER_FLAGS_2(frecpx_f64, TCG_CALL_NO_RWG, f64, f64, ptr)
+ DEF_HELPER_FLAGS_2(frecpx_f32, TCG_CALL_NO_RWG, f32, f32, ptr)
++DEF_HELPER_FLAGS_2(frecpx_f16, TCG_CALL_NO_RWG, f16, f16, ptr)
+ DEF_HELPER_FLAGS_2(fcvtx_f64_to_f32, TCG_CALL_NO_RWG, f32, f64, env)
+ DEF_HELPER_FLAGS_3(crc32_64, TCG_CALL_NO_RWG_SE, i64, i64, i64, i32)
+ DEF_HELPER_FLAGS_3(crc32c_64, TCG_CALL_NO_RWG_SE, i64, i64, i64, i32)
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 046079b1b3..9c02f1e23c 100644
+index 50b4fa4ce4..715dc4333d 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -7821,14 +7821,14 @@ static void handle_2misc_fcmp_zero(DisasContext *s, int opcode,
-                                    bool is_scalar, bool is_u, bool is_q,
-                                    int size, int rn, int rd)
- {
--    bool is_double = (size == 3);
-+    bool is_double = (size == MO_64);
-     TCGv_ptr fpst;
- 
-     if (!fp_access_check(s)) {
+@@ -11312,6 +11312,7 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
+         handle_2misc_fcmp_zero(s, fpop, is_scalar, 0, is_q, MO_16, rn, rd);
          return;
-     }
- 
--    fpst = get_fpstatus_ptr(false);
-+    fpst = get_fpstatus_ptr(size == MO_16);
- 
-     if (is_double) {
-         TCGv_i64 tcg_op = tcg_temp_new_i64();
-@@ -7880,34 +7880,57 @@ static void handle_2misc_fcmp_zero(DisasContext *s, int opcode,
-         bool swap = false;
-         int pass, maxpasses;
- 
--        switch (opcode) {
--        case 0x2e: /* FCMLT (zero) */
--            swap = true;
--            /* fall through */
--        case 0x2c: /* FCMGT (zero) */
--            genfn = gen_helper_neon_cgt_f32;
--            break;
--        case 0x2d: /* FCMEQ (zero) */
--            genfn = gen_helper_neon_ceq_f32;
--            break;
--        case 0x6d: /* FCMLE (zero) */
--            swap = true;
--            /* fall through */
--        case 0x6c: /* FCMGE (zero) */
--            genfn = gen_helper_neon_cge_f32;
--            break;
--        default:
--            g_assert_not_reached();
-+        if (size == MO_16) {
-+            switch (opcode) {
-+            case 0x2e: /* FCMLT (zero) */
-+                swap = true;
-+                /* fall through */
-+            case 0x2c: /* FCMGT (zero) */
-+                genfn = gen_helper_advsimd_cgt_f16;
-+                break;
-+            case 0x2d: /* FCMEQ (zero) */
-+                genfn = gen_helper_advsimd_ceq_f16;
-+                break;
-+            case 0x6d: /* FCMLE (zero) */
-+                swap = true;
-+                /* fall through */
-+            case 0x6c: /* FCMGE (zero) */
-+                genfn = gen_helper_advsimd_cge_f16;
-+                break;
-+            default:
-+                g_assert_not_reached();
-+            }
-+        } else {
-+            switch (opcode) {
-+            case 0x2e: /* FCMLT (zero) */
-+                swap = true;
-+                /* fall through */
-+            case 0x2c: /* FCMGT (zero) */
-+                genfn = gen_helper_neon_cgt_f32;
-+                break;
-+            case 0x2d: /* FCMEQ (zero) */
-+                genfn = gen_helper_neon_ceq_f32;
-+                break;
-+            case 0x6d: /* FCMLE (zero) */
-+                swap = true;
-+                /* fall through */
-+            case 0x6c: /* FCMGE (zero) */
-+                genfn = gen_helper_neon_cge_f32;
-+                break;
-+            default:
-+                g_assert_not_reached();
-+            }
-         }
- 
-         if (is_scalar) {
-             maxpasses = 1;
-         } else {
--            maxpasses = is_q ? 4 : 2;
-+            int vector_size = 8 << is_q;
-+            maxpasses = vector_size >> size;
-         }
- 
-         for (pass = 0; pass < maxpasses; pass++) {
--            read_vec_element_i32(s, tcg_op, rn, pass, MO_32);
-+            read_vec_element_i32(s, tcg_op, rn, pass, size);
-             if (swap) {
-                 genfn(tcg_res, tcg_zero, tcg_op, fpst);
-             } else {
-@@ -7916,7 +7939,7 @@ static void handle_2misc_fcmp_zero(DisasContext *s, int opcode,
-             if (is_scalar) {
-                 write_fp_sreg(s, rd, tcg_res);
-             } else {
--                write_vec_element_i32(s, tcg_res, rd, pass, MO_32);
-+                write_vec_element_i32(s, tcg_res, rd, pass, size);
-             }
-         }
-         tcg_temp_free_i32(tcg_res);
-@@ -11209,7 +11232,18 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
-     fpop = deposit32(opcode, 5, 1, a);
-     fpop = deposit32(fpop, 6, 1, u);
- 
-+    rd = extract32(insn, 0, 5);
-+    rn = extract32(insn, 5, 5);
-+
-     switch (fpop) {
-+    break;
-+    case 0x2c: /* FCMGT (zero) */
-+    case 0x2d: /* FCMEQ (zero) */
-+    case 0x2e: /* FCMLT (zero) */
-+    case 0x6c: /* FCMGE (zero) */
-+    case 0x6d: /* FCMLE (zero) */
-+        handle_2misc_fcmp_zero(s, fpop, is_scalar, 0, is_q, MO_16, rn, rd);
-+        return;
+     case 0x3d: /* FRECPE */
++    case 0x3f: /* FRECPX */
+         break;
      case 0x18: /* FRINTN */
          need_rmode = true;
-         only_in_vector = true;
+@@ -11436,6 +11437,9 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
+         case 0x3d: /* FRECPE */
+             gen_helper_recpe_f16(tcg_res, tcg_op, tcg_fpstatus);
+             break;
++        case 0x3f: /* FRECPX */
++            gen_helper_frecpx_f16(tcg_res, tcg_op, tcg_fpstatus);
++            break;
+         case 0x5a: /* FCVTNU */
+         case 0x5b: /* FCVTMU */
+         case 0x5c: /* FCVTAU */
 -- 
 2.15.1
