@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eqfDK-0005UH-8u
+	(envelope-from <cohuck@redhat.com>) id 1eqfDK-0005UJ-9l
 	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:22:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eqfDH-0008OI-22
+	(envelope-from <cohuck@redhat.com>) id 1eqfDI-0008Pd-SS
 	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:22:38 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Tue, 27 Feb 2018 14:21:34 +0100
-Message-Id: <20180227132150.13847-11-cohuck@redhat.com>
+Date: Tue, 27 Feb 2018 14:21:35 +0100
+Message-Id: <20180227132150.13847-12-cohuck@redhat.com>
 In-Reply-To: <20180227132150.13847-1-cohuck@redhat.com>
 References: <20180227132150.13847-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 10/26] s390-ccw: read user input for boot index
- via the SCLP console
+Subject: [Qemu-devel] [PULL 11/26] s390-ccw: set cp_receive mask only when
+ needed and consume pending service irqs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,258 +25,99 @@ Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, rth@tw
 
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
 
-Implements an sclp_read function to capture input from the
-console and a wrapper function that handles parsing certain
-characters and adding input to a buffer. The input is checked
-for any erroneous values and is handled appropriately.
+It is possible while waiting for multiple types of external
+interrupts that we might have pending irqs remaining between
+irq consumption and irq-type disabling. Those interrupts
+could potentially propagate to the guest after IPL completes
+and cause unwanted behavior.
 
-A prompt will persist until input is entered or the timeout
-expires (if one was set). Example:
+As it is today, the SCLP will only recognize write events that
+are enabled by the control program's send and receive masks. To
+limit the window for, and prevent further irqs from, ASCII
+console events (specifically keystrokes), we should only enable
+the control program's receive mask when we need it.
 
-      Please choose (default will boot in 10 seconds):
-
-Correct input will boot the respective boot index. If the
-user's input is empty, 0, or if the timeout expires, then
-the default zipl entry will be chosen. If the input is
-within the range of available boot entries, then the
-selection will be booted. Any erroneous input will cancel
-the timeout and re-prompt the user.
+While we're at it, remove assignment of the (non control program)
+send and receive masks, as those are actually set by the SCLP.
 
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/menu.c     | 149 +++++++++++++++++++++++++++++++++++++++++++-
- pc-bios/s390-ccw/s390-ccw.h |   2 +
- pc-bios/s390-ccw/sclp.c     |  19 ++++++
- pc-bios/s390-ccw/virtio.c   |   2 +-
- 4 files changed, 170 insertions(+), 2 deletions(-)
+ pc-bios/s390-ccw/menu.c     |  5 +++++
+ pc-bios/s390-ccw/s390-ccw.h |  1 +
+ pc-bios/s390-ccw/sclp.c     | 10 ++++------
+ 3 files changed, 10 insertions(+), 6 deletions(-)
 
 diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
-index 730d44e36b..b99ff03298 100644
+index b99ff03298..8d55869448 100644
 --- a/pc-bios/s390-ccw/menu.c
 +++ b/pc-bios/s390-ccw/menu.c
-@@ -12,12 +12,159 @@
+@@ -11,6 +11,7 @@
+ 
  #include "libc.h"
  #include "s390-ccw.h"
++#include "sclp.h"
  
-+#define KEYCODE_NO_INP '\0'
-+#define KEYCODE_ESCAPE '\033'
-+#define KEYCODE_BACKSP '\177'
-+#define KEYCODE_ENTER  '\r'
-+
-+#define TOD_CLOCK_MILLISECOND   0x3e8000
-+
-+#define LOW_CORE_EXTERNAL_INT_ADDR   0x86
-+#define CLOCK_COMPARATOR_INT         0X1004
-+
- static uint8_t flag;
- static uint64_t timeout;
+ #define KEYCODE_NO_INP '\0'
+ #define KEYCODE_ESCAPE '\033'
+@@ -116,8 +117,12 @@ static int get_index(void)
  
-+static inline void enable_clock_int(void)
-+{
-+    uint64_t tmp = 0;
-+
-+    asm volatile(
-+        "stctg      0,0,%0\n"
-+        "oi         6+%0, 0x8\n"
-+        "lctlg      0,0,%0"
-+        : : "Q" (tmp) : "memory"
-+    );
-+}
-+
-+static inline void disable_clock_int(void)
-+{
-+    uint64_t tmp = 0;
-+
-+    asm volatile(
-+        "stctg      0,0,%0\n"
-+        "ni         6+%0, 0xf7\n"
-+        "lctlg      0,0,%0"
-+        : : "Q" (tmp) : "memory"
-+    );
-+}
-+
-+static inline void set_clock_comparator(uint64_t time)
-+{
-+    asm volatile("sckc %0" : : "Q" (time));
-+}
-+
-+static inline bool check_clock_int(void)
-+{
-+    uint16_t *code = (uint16_t *)LOW_CORE_EXTERNAL_INT_ADDR;
-+
-+    consume_sclp_int();
-+
-+    return *code == CLOCK_COMPARATOR_INT;
-+}
-+
-+static int read_prompt(char *buf, size_t len)
-+{
-+    char inp[2] = {};
-+    uint8_t idx = 0;
-+    uint64_t time;
-+
-+    if (timeout) {
-+        time = get_clock() + timeout * TOD_CLOCK_MILLISECOND;
-+        set_clock_comparator(time);
-+        enable_clock_int();
-+        timeout = 0;
-+    }
-+
-+    while (!check_clock_int()) {
-+
-+        sclp_read(inp, 1); /* Process only one character at a time */
-+
-+        switch (inp[0]) {
-+        case KEYCODE_NO_INP:
-+        case KEYCODE_ESCAPE:
-+            continue;
-+        case KEYCODE_BACKSP:
-+            if (idx > 0) {
-+                buf[--idx] = 0;
-+                sclp_print("\b \b");
-+            }
-+            continue;
-+        case KEYCODE_ENTER:
-+            disable_clock_int();
-+            return idx;
-+        default:
-+            /* Echo input and add to buffer */
-+            if (idx < len) {
-+                buf[idx++] = inp[0];
-+                sclp_print(inp);
-+            }
-+        }
-+    }
-+
-+    disable_clock_int();
-+    *buf = 0;
-+
-+    return 0;
-+}
-+
-+static int get_index(void)
-+{
-+    char buf[11];
-+    int len;
-+    int i;
-+
-+    memset(buf, 0, sizeof(buf));
-+
-+    len = read_prompt(buf, sizeof(buf) - 1);
-+
-+    /* If no input, boot default */
-+    if (len == 0) {
-+        return 0;
-+    }
-+
-+    /* Check for erroneous input */
-+    for (i = 0; i < len; i++) {
-+        if (!isdigit(buf[i])) {
-+            return -1;
-+        }
-+    }
-+
-+    return atoui(buf);
-+}
-+
-+static void boot_menu_prompt(bool retry)
-+{
-+    char tmp[11];
-+
-+    if (retry) {
-+        sclp_print("\nError: undefined configuration"
-+                   "\nPlease choose:\n");
-+    } else if (timeout > 0) {
-+        sclp_print("Please choose (default will boot in ");
-+        sclp_print(uitoa(timeout / 1000, tmp, sizeof(tmp)));
-+        sclp_print(" seconds):\n");
-+    } else {
-+        sclp_print("Please choose:\n");
-+    }
-+}
-+
- static int get_boot_index(int entries)
- {
--    return 0; /* implemented next patch */
-+    int boot_index;
-+    bool retry = false;
-+    char tmp[5];
-+
-+    do {
-+        boot_menu_prompt(retry);
-+        boot_index = get_index();
-+        retry = true;
-+    } while (boot_index < 0 || boot_index >= entries);
-+
-+    sclp_print("\nBooting entry #");
-+    sclp_print(uitoa(boot_index, tmp, sizeof(tmp)));
-+
-+    return boot_index;
- }
+     memset(buf, 0, sizeof(buf));
  
- static void zipl_println(const char *data, size_t len)
++    sclp_set_write_mask(SCLP_EVENT_MASK_MSG_ASCII, SCLP_EVENT_MASK_MSG_ASCII);
++
+     len = read_prompt(buf, sizeof(buf) - 1);
+ 
++    sclp_set_write_mask(0, SCLP_EVENT_MASK_MSG_ASCII);
++
+     /* If no input, boot default */
+     if (len == 0) {
+         return 0;
 diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index c0dd37f7ba..aeba8b0a99 100644
+index aeba8b0a99..c4ddf9f228 100644
 --- a/pc-bios/s390-ccw/s390-ccw.h
 +++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -71,6 +71,7 @@ unsigned int get_loadparm_index(void);
+@@ -69,6 +69,7 @@ unsigned int get_loadparm_index(void);
+ 
+ /* sclp.c */
  void sclp_print(const char *string);
++void sclp_set_write_mask(uint32_t receive_mask, uint32_t send_mask);
  void sclp_setup(void);
  void sclp_get_loadparm_ascii(char *loadparm);
-+int sclp_read(char *str, size_t count);
- 
- /* virtio.c */
- unsigned long virtio_load_direct(ulong rec_list1, ulong rec_list2,
-@@ -79,6 +80,7 @@ bool virtio_is_supported(SubChannelId schid);
- void virtio_blk_setup_device(SubChannelId schid);
- int virtio_read(ulong sector, void *load_addr);
- int enable_mss_facility(void);
-+u64 get_clock(void);
- ulong get_second(void);
- 
- /* bootmap.c */
+ int sclp_read(char *str, size_t count);
 diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
-index e6a089889a..a2f25ebd4f 100644
+index a2f25ebd4f..3836cb4716 100644
 --- a/pc-bios/s390-ccw/sclp.c
 +++ b/pc-bios/s390-ccw/sclp.c
-@@ -119,3 +119,22 @@ void sclp_get_loadparm_ascii(char *loadparm)
-         ebcdic_to_ascii((char *) sccb->loadparm, loadparm, 8);
-     }
- }
-+
-+int sclp_read(char *str, size_t count)
-+{
-+    ReadEventData *sccb = (void *)_sccb;
-+    char *buf = (char *)(&sccb->ebh) + 7;
-+
-+    /* If count exceeds max buffer size, then restrict it to the max size */
-+    if (count > SCCB_SIZE - 8) {
-+        count = SCCB_SIZE - 8;
-+    }
-+
-+    sccb->h.length = SCCB_SIZE;
-+    sccb->h.function_code = SCLP_UNCONDITIONAL_READ;
-+
-+    sclp_service_call(SCLP_CMD_READ_EVENT_DATA, sccb);
-+    memcpy(str, buf, count);
-+
-+    return sccb->ebh.length - 7;
-+}
-diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-index c890a0330b..817e7f56ea 100644
---- a/pc-bios/s390-ccw/virtio.c
-+++ b/pc-bios/s390-ccw/virtio.c
-@@ -176,7 +176,7 @@ void vring_send_buf(VRing *vr, void *p, int len, int flags)
-     }
+@@ -46,23 +46,21 @@ static int sclp_service_call(unsigned int command, void *sccb)
+         return 0;
  }
  
--static u64 get_clock(void)
-+u64 get_clock(void)
+-static void sclp_set_write_mask(void)
++void sclp_set_write_mask(uint32_t receive_mask, uint32_t send_mask)
  {
-     u64 r;
+     WriteEventMask *sccb = (void *)_sccb;
  
+     sccb->h.length = sizeof(WriteEventMask);
+     sccb->mask_length = sizeof(unsigned int);
+-    sccb->receive_mask = SCLP_EVENT_MASK_MSG_ASCII;
+-    sccb->cp_receive_mask = SCLP_EVENT_MASK_MSG_ASCII;
+-    sccb->send_mask = SCLP_EVENT_MASK_MSG_ASCII;
+-    sccb->cp_send_mask = SCLP_EVENT_MASK_MSG_ASCII;
++    sccb->cp_receive_mask = receive_mask;
++    sccb->cp_send_mask = send_mask;
+ 
+     sclp_service_call(SCLP_CMD_WRITE_EVENT_MASK, sccb);
+ }
+ 
+ void sclp_setup(void)
+ {
+-    sclp_set_write_mask();
++    sclp_set_write_mask(0, SCLP_EVENT_MASK_MSG_ASCII);
+ }
+ 
+ long write(int fd, const void *str, size_t len)
 -- 
 2.13.6
