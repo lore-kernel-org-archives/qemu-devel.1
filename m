@@ -1,17 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqi8b-0003Ag-JV
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:29:59 -0500
+	(envelope-from <maxime.coquelin@redhat.com>) id 1eqi9L-0003yq-VH
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:30:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqi8a-0005o3-54
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:29:57 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Tue, 27 Feb 2018 10:29:44 -0600
-Message-Id: <20180227162944.17343-5-eblake@redhat.com>
-In-Reply-To: <20180227155514.16721-1-eblake@redhat.com>
-References: <20180227155514.16721-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 5/5] qcow2: Avoid memory over-allocation on
- compressed images
+	(envelope-from <maxime.coquelin@redhat.com>) id 1eqi9K-0006TO-VW
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:30:43 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58542 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1eqi9K-0006Sc-QC
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 11:30:42 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C22A1402243B
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 16:30:41 +0000 (UTC)
+References: <20180216172910.8549-1-maxime.coquelin@redhat.com>
+	<20180216172910.8549-3-maxime.coquelin@redhat.com>
+	<20180227165057-mutt-send-email-mst@kernel.org>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-ID: <840e4a8a-41ba-f89e-5a8f-faff519205fb@redhat.com>
+Date: Tue, 27 Feb 2018 17:30:34 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180227165057-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 2/5] vhost-user: Introduce new request to
+ send virtio device status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,139 +37,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berto@igalia.com, qemu-block@nongnu.org, kwolf@redhat.com, Max Reitz <mreitz@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: stefanha@redhat.com, mlureau@redhat.com, qemu-devel@nongnu.org
 
-When reading a compressed image, we were allocating s->cluster_data
-to 32*cluster_size + 512 (possibly over 64 megabytes, for an image
-with 2M clusters).  Let's check out the history:
 
-Back when qcow2 was first written, we used s->cluster_data for
-everything, including copy_sectors() and encryption, where we want
-to operate on more than one cluster at once.  Obviously, at that
-point, the buffer had to be aligned for other users, even though
-compression itself doesn't require any alignment (the fact that
-the compressed data generally starts mid-sector means that aligning
-our buffer buys us nothing - either the protocol already supports
-byte-based access into whatever offset we want, or we are already
-using a bounce buffer to read a full sector, and copying into
-our destination no longer requires alignment).
 
-But commit 1b9f1491 (v1.1!) changed things to allocate parallel
-buffers on demand rather than sharing a single buffer, for encryption
-and COW, leaving compression as the final client of s->cluster_data.
-That use was still preserved, because if a single compressed cluster
-is read more than once, we reuse the cache instead of decompressing
-it a second time (someday, we may come up with better caching to
-avoid wasting repeated decompressions while still being more parallel,
-but that is a task for another patch; the XXX comment in
-qcow2_co_preadv for QCOW2_CLUSTER_COMPRESSED is telling).
+On 02/27/2018 04:01 PM, Michael S. Tsirkin wrote:
+> On Fri, Feb 16, 2018 at 06:29:07PM +0100, Maxime Coquelin wrote:
+>> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+>> index 9fcf48d611..daa452bd36 100644
+>> --- a/docs/interop/vhost-user.txt
+>> +++ b/docs/interop/vhost-user.txt
+>> @@ -368,6 +368,7 @@ Protocol features
+>>   #define VHOST_USER_PROTOCOL_F_MTU            4
+>>   #define VHOST_USER_PROTOCOL_F_SLAVE_REQ      5
+>>   #define VHOST_USER_PROTOCOL_F_CROSS_ENDIAN   6
+>> +#define VHOST_USER_PROTOCOL_F_VIRTIO_STATUS  7
+>>   
+>>   Master message types
+>>   --------------------
+>> @@ -663,6 +664,19 @@ Master message types
+>>         field, and slaves MUST NOT accept SET_CONFIG for read-only
+>>         configuration space fields unless the live migration bit is set.
+>>   
+>> +* VHOST_USER_SET_VIRTIO_STATUS
+>> +
+>> +      Id: 26
+>> +      Equivalent ioctl: N/A
+>> +      Master payload: u64
+>> +      Slave payload: N/A
+>> +
+>> +      Sent by the vhost-user master to notify of virtio device status change.
+>> +      The payload is a u64 representing the virtio device status as defined in
+>> +      the virtio specification.
+>> +      The request should be sent only when VHOST_USER_PROTOCOL_F_VIRTIO_STATUS
+>> +      protocol feature has been negotiated.
+>> +
+>>   Slave message types
+>>   -------------------
+>>   
+> 
+> So for now backend was only activated after DRIVER_OK. Does this message
+> mean that we must send updates such as _DRIVER as well?
 
-Much later, in commit de82815d (v2.2), we noticed that a 64M
-allocation is prone to failure, so we switched over to a graceful
-memory allocation error message.  Elsewhere in the code, we do
-g_malloc(2 * cluster_size) without ever checking for failure, but
-even 4M starts to be large enough that trying to be nice is worth
-the effort, so we want to keep that aspect.
+Yes, even if I don't see a use for _ACKNOWLEDGE and _DRIVER today.
 
-Then even later, in 3e4c7052 (2.11), we realized that allocating
-a large buffer up front for every qcow2 image is expensive, and
-switched to lazy allocation only for images that actually had
-compressed clusters.  But in the process, we never even bothered
-to check whether what we were allocating still made sense in its
-new context!
+> Further, this is kind of one-way, but there are several cases where device
+> modifies the status.  One is NEEDS_RESET. Another is clearing
+> of FEATURES_OK.
 
-So, it's time to cut back on the waste.  A compressed cluster
-written by qemu will NEVER occupy more than an uncompressed
-cluster, but based on mid-sector alignment, we may still need
-to read 1 cluster + 1 sector in order to recover enough bytes
-for the decompression.  But third-party producers of qcow2 may
-not be as smart, and gzip DOES document that because the
-compression stream adds metadata, and because of the pigeonhole
-principle, there are worst case scenarios where attempts to
-compress will actually inflate an image, by up to 0.015% (or 62
-sectors larger for an unfortunate 2M compression).  In fact,
-the qcow2 spec permits an all-ones sector count, plus a full
-sector containing the initial offset, for a maximum read of
-2 full clusters; and thanks to the way decompression works,
-even though such a value is probably too large for the actual
-compressed data, it really doesn't matter if we read too much
-(gzip ignores slop, once it has decoded a full cluster).  So
-it's easier to just allocate cluster_data to be as large as we
-can ever possibly see; even if it still wastes up to 2M on any
-image created by qcow2, that's still an improvment of 60M less
-waste than pre-patch.
+Do you mean we should also notify the backend in case of NEEDS_RESET, or
+clearing of FEATURES_OK?
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
+Or you mean we should provide a way for the backend to update the device
+status, e.g. by having a slave-initiated VHOST_USER_SET_VIRTIO_STATUS
+request?
 
----
-v4: fix off-by-one in assertion and commit message [Berto]
-v3: tighten allocation [Berto]
-v2: actually check allocation failure (previous version meant
-to use g_malloc, but ended up posted with g_try_malloc without
-checking); add assertions outside of conditional, improve
-commit message to better match reality now that qcow2 spec bug
-has been fixed
----
- block/qcow2-cluster.c | 27 ++++++++++++++++++---------
- block/qcow2.c         |  2 +-
- 2 files changed, 19 insertions(+), 10 deletions(-)
-
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 85be7d5e340..1f7f00cbea2 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -1598,20 +1598,29 @@ int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset)
-         sector_offset = coffset & 511;
-         csize = nb_csectors * 512 - sector_offset;
-
--        /* Allocate buffers on first decompress operation, most images are
--         * uncompressed and the memory overhead can be avoided.  The buffers
--         * are freed in .bdrv_close().
-+        /* Allocate buffers on the first decompress operation; most
-+         * images are uncompressed and the memory overhead can be
-+         * avoided.  The buffers are freed in .bdrv_close().  qemu
-+         * never writes an inflated cluster, and gzip itself never
-+         * inflates a problematic cluster by more than 0.015%, but the
-+         * qcow2 format allows up to 1 byte short of 2 full clusters
-+         * when including the sector containing offset.  gzip ignores
-+         * trailing slop, so just allocate that much up front rather
-+         * than reject third-party images with overlarge csize.
-          */
-+        assert(!!s->cluster_data == !!s->cluster_cache);
-+        assert(csize <= 2 * s->cluster_size);
-         if (!s->cluster_data) {
--            /* one more sector for decompressed data alignment */
--            s->cluster_data = qemu_try_blockalign(bs->file->bs,
--                    QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size + 512);
-+            s->cluster_data = g_try_malloc(2 * s->cluster_size);
-             if (!s->cluster_data) {
-                 return -ENOMEM;
-             }
--        }
--        if (!s->cluster_cache) {
--            s->cluster_cache = g_malloc(s->cluster_size);
-+            s->cluster_cache = g_try_malloc(s->cluster_size);
-+            if (!s->cluster_cache) {
-+                g_free(s->cluster_data);
-+                s->cluster_data = NULL;
-+                return -ENOMEM;
-+            }
-         }
-
-         BLKDBG_EVENT(bs->file, BLKDBG_READ_COMPRESSED);
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 288b5299d80..6ad3436e0e5 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2103,7 +2103,7 @@ static void qcow2_close(BlockDriverState *bs)
-     g_free(s->image_backing_format);
-
-     g_free(s->cluster_cache);
--    qemu_vfree(s->cluster_data);
-+    g_free(s->cluster_data);
-     qcow2_refcount_close(bs);
-     qcow2_free_snapshots(bs);
- }
--- 
-2.14.3
+Thanks,
+Maxime
