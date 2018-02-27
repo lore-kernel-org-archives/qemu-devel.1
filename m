@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eqdVA-0002yZ-D3
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 06:32:57 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eqdVw-0003Rm-6u
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 06:33:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eqdV7-0006pO-3G
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 06:32:56 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 27 Feb 2018 12:32:34 +0100
-Message-Id: <1519731154-3127-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/s390x: Add the possibility to specify the
- netboot image on the command line
+	(envelope-from <pbonzini@redhat.com>) id 1eqdVs-0007CB-Uv
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 06:33:44 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54378 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eqdVs-0007Bu-R5
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 06:33:40 -0500
+References: <1519709965-29833-1-git-send-email-cota@braap.org>
+	<1519709965-29833-14-git-send-email-cota@braap.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <957151ea-178c-f8a9-7875-1b26bf4a981b@redhat.com>
+Date: Tue, 27 Feb 2018 12:33:29 +0100
+MIME-Version: 1.0
+In-Reply-To: <1519709965-29833-14-git-send-email-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 13/16] translate-all: protect TB jumps with
+ a per-destination-TB lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,38 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>
 
-The file name of the netboot binary is currently hard-coded to
-"s390-netboot.img", without a possibility for the user to select
-an alternative firmware image here. That's unfortunate, especially
-since the basics are already there: The filename is a property of
-the s390-ipl device. So we just have to add a check whether the user
-already provided the property and only set the default if the string
-is still empty. Now it is possible to select a different firmware
-image with "-global s390-ipl.netboot_fw=/path/to/s390-netboot.img".
+On 27/02/2018 06:39, Emilio G. Cota wrote:
+> Using a hash table or a binary tree to keep track of the jumps
+> doesn't really pay off, not only due to the increased memory usage,
+> but also because most TBs have only 0 or 1 jumps to them. The maximum
+> number of jumps when booting debian-arm that I measured is 35, but
+> as we can see in the histogram below a TB with that many incoming jumps
+> is extremely rare; the average TB has 0.80 incoming jumps.
+>=20
+> n_jumps: 379208; avg jumps/tb: 0.801099
+> dist: [0.0,1.0)|=E2=96=84=E2=96=88=E2=96=81=E2=96=81=E2=96=81=E2=96=81=E2=
+=96=81=E2=96=81=E2=96=81=E2=96=81=E2=96=81=E2=96=81=E2=96=81 =E2=96=81=E2=
+=96=81=E2=96=81=E2=96=81=E2=96=81=E2=96=81 =E2=96=81=E2=96=81=E2=96=81  =E2=
+=96=81=E2=96=81=E2=96=81     =E2=96=81|[34.0,35.0]
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/s390x/s390-virtio-ccw.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+This makes sense, for example:
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 4abbe89..7b3fb5f 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -254,8 +254,10 @@ static void s390_init_ipl_dev(const char *kernel_filename,
-     }
-     qdev_prop_set_string(dev, "cmdline", kernel_cmdline);
-     qdev_prop_set_string(dev, "firmware", firmware);
--    qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
-     qdev_prop_set_bit(dev, "enforce_bios", enforce_bios);
-+    if (!strlen(object_property_get_str(new, "netboot_fw", &error_abort))) {
-+        qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
-+    }
-     object_property_add_child(qdev_get_machine(), TYPE_S390_IPL,
-                               new, NULL);
-     object_unref(new);
--- 
-1.8.3.1
+   while(...) {
+   }
+
+2 basic blocks, 0 and 1 incoming jumps (avg 0.5)
+
+   if(...) {
+   }
+
+2 basic blocks, 0 and 1 incoming jumps (avg 0.5)
+
+   if(...) {
+   } else {
+   }
+
+3 basic blocks, 0, 1 and 1 incoming jumps (avg 0.66)
+
+So 0.8 is actually a lot. :)  The long tail is probably for switch
+statements.
+
+Paolo
