@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55108)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eqkWf-0005OZ-Rg
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:02:58 -0500
+	(envelope-from <thuth@redhat.com>) id 1eqkYO-0006j5-Cr
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:04:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eqkWf-0002Ud-1c
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:02:57 -0500
-Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:46841)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eqkWe-0002UQ-SA
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:02:56 -0500
-Received: by mail-oi0-x22f.google.com with SMTP id x12so13672072oie.13
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 11:02:56 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1eqkYJ-0003we-GP
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:04:44 -0500
+References: <1519731154-3127-1-git-send-email-thuth@redhat.com>
+	<a4f94596-0ea9-a7bc-9603-bb8690d39e25@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <d2c6e712-f668-99e8-c4b1-d8bad31cbdca@redhat.com>
+Date: Tue, 27 Feb 2018 20:04:17 +0100
 MIME-Version: 1.0
-In-Reply-To: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
-References: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Feb 2018 19:02:35 +0000
-Message-ID: <CAFEAcA9KzitEO21Rgh8Azip+gVJjyobzNbk8sHuQf-ngg+Jjxg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v9 00/14] ARM SMMUv3 Emulation Support
+In-Reply-To: <a4f94596-0ea9-a7bc-9603-bb8690d39e25@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/s390x: Add the possibility to specify
+ the netboot image on the command line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>
+To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>
 
-On 17 February 2018 at 18:46, Eric Auger <eric.auger@redhat.com> wrote:
-> This series implements the emulation code for ARM SMMUv3.
->
-> SMMUv3 gets instantiated by adding ",iommu=smmuv3" to the virt
-> machine option.
->
-> VHOST integration will be handled in a separate series. VFIO
-> integration is not targeted at the moment. Only stage 1 and
-> AArch64 PTW are supported.
->
-> Main changes since v8:
-> - fix mingw compilation (qemu/log.h)
-> - put gpl v2 license on all files to respect initial license
-> - change proto of smmu_ptw* to clarify inputs/outputs and
->   prepare for iotlb emulation
-> - fix hash table lookup
-> - cleanup access type handling during ptw
-> - cleanup reset infra (parent_reset)
-> - replace some inline functions by macros
-> - fix some CMD fields
-> - increment cmdq cons only after cmd execution
-> - replace some remaining error_report by qemu_log_mask
+On 27.02.2018 14:27, Viktor Mihajlovski wrote:
+> On 27.02.2018 12:32, Thomas Huth wrote:
+>> The file name of the netboot binary is currently hard-coded to
+>> "s390-netboot.img", without a possibility for the user to select
+>> an alternative firmware image here. That's unfortunate, especially
+>> since the basics are already there: The filename is a property of
+>> the s390-ipl device. So we just have to add a check whether the user
+>> already provided the property and only set the default if the string
+>> is still empty. Now it is possible to select a different firmware
+>> image with "-global s390-ipl.netboot_fw=3D/path/to/s390-netboot.img".
+>> While I sympathize with the concept, it will be a bit hard to consume
+> since most of the QEMU instances will be started by libvirt and that ha=
+s
+> no provisions for this kind of firmware replacement. We could craft som=
+e
+> s390-specific variety of the <loader> element.
+> Another thing to consider is that, while the current netboot firmware
+> doesn't rely on any special QEMU <-> loader interfaces, it might happen
+> that QEMU and the network firmware must match similar to QEMU and the
+> s390-ccw firmware image and I have no idea on how to ensure that.
 
-What state is this series in now? Is it "seems ready to
-go, needs review"? Are you hoping it might get in for 2.12,
-or targeting 2.13 ?
+Sure, the normal user likely does not (and should not have to) care
+about this, and this patch also has not been written with libvirt in
+mind. It's rather meant for QEMU developer convenience: When I'm
+changing the code in pc-bios/s390-ccw/ and compiling new images there, I
+want to use the binary pc-bios/s390-ccw/s390-netboot.img, and not the
+pre-built image pc-bios/s390-netboot.img. So there must be a way to
+specify my own images somehow...
 
-thanks
--- PMM
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  hw/s390x/s390-virtio-ccw.c | 4 +++-
+>>  1 file changed, 3 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+>> index 4abbe89..7b3fb5f 100644
+>> --- a/hw/s390x/s390-virtio-ccw.c
+>> +++ b/hw/s390x/s390-virtio-ccw.c
+>> @@ -254,8 +254,10 @@ static void s390_init_ipl_dev(const char *kernel_=
+filename,
+>>      }
+>>      qdev_prop_set_string(dev, "cmdline", kernel_cmdline);
+>>      qdev_prop_set_string(dev, "firmware", firmware);
+> Wouldn't it be consequent to allow firmware replacement? But then, see
+> above.
+
+You can already override the main firmware file name with the "-bios"
+parameter of QEMU, so there's no real need to change this here.
+
+ Thomas
