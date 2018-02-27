@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eqklw-0004pi-6Q
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:18:45 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eqkmW-0005Bb-I6
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:19:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eqkls-0004LM-9Q
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:18:44 -0500
-Date: Tue, 27 Feb 2018 20:18:19 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180227201819.7818a548.cohuck@redhat.com>
-In-Reply-To: <1519744760-12337-1-git-send-email-walling@linux.vnet.ibm.com>
-References: <1519744760-12337-1-git-send-email-walling@linux.vnet.ibm.com>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eqkmV-0004YT-Qu
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:19:20 -0500
+References: <20180223112933.4135-1-mark.cave-ayland@ilande.co.uk>
+	<CAFEAcA-6KuJe17cHNVUzaKT30uv7bBS52ctoNxS0u9Mfp_HtXg@mail.gmail.com>
+	<7f968a6f-e647-e4dd-0ce5-54b2d63c6eb7@ilande.co.uk>
+	<CAFEAcA83KywfXUqUJaFVRGGhUeC5hkjPG67oTaz0G=XzMHWNeg@mail.gmail.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <47a562f8-f764-9b26-a563-857d3d94183c@ilande.co.uk>
+Date: Tue, 27 Feb 2018 19:19:02 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAFEAcA83KywfXUqUJaFVRGGhUeC5hkjPG67oTaz0G=XzMHWNeg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390-ccw: only print boot menu error if
- -boot menu=on was specified
+Subject: Re: [Qemu-devel] [PATCH] loader: don't perform overlapping address
+ check for memory region ROM images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,46 +27,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, thuth@redhat.com, mihajlov@linux.vnet.ibm.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
 
-On Tue, 27 Feb 2018 10:19:20 -0500
-"Collin L. Walling" <walling@linux.vnet.ibm.com> wrote:
+On 23/02/18 18:53, Peter Maydell wrote:
 
-Nit: make the prefix s390x/ipl:, as this is not directly in the bios.
-
-> It is possible that certain QEMU configurations may not
-> create an IPLB (such as when -kernel is provided). In
-> this case, a misleading error message will be printed
-> stating that the "boot menu is not supported for this
-> device type".
+>> I can do, although I don't have any outstanding SPARC patches (just PPC ones
+>> for the moment) so it would just be a single commit PR. Is that okay?
 > 
-> To amend this, only print this message iff boot menu=on
-> was provided on the commandline. Otherwise, return silently.
-> 
-> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-> ---
->  hw/s390x/ipl.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 798e99a..c4addb5 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -250,7 +250,9 @@ static void s390_ipl_set_boot_menu(S390IPLState *ipl)
->      case S390_IPL_TYPE_QEMU_SCSI:
->          break;
->      default:
-> -        error_report("boot menu is not supported for this device type.");
-> +        if (boot_menu) {
-> +            error_report("boot menu is not supported for this device type.");
-> +        }
->          return;
->      }
->  
+> Yeah, it's less effort for me to apply a pull than a patch in some
+> ways...
 
-This change makes sense and works as I'd expect (although the message
-is still slightly odd in the -kernel case, but I can't think of
-anything better.)
+Done. I've also sent a v2 with your R-B added so your R-B tag should 
+also appear in the patch when it eventually gets applied to qemu-stable.
 
-Will you also do a followup removing the trailing punctuation? :)
+
+ATB,
+
+Mark.
