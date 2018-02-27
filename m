@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eqZwE-00047o-27
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 02:44:39 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eqa5T-0005lz-Dd
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 02:54:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eqZwC-0002ro-QS
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 02:44:38 -0500
-Date: Tue, 27 Feb 2018 15:44:13 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180227074413.GB21035@lemon.usersys.redhat.com>
-References: <20180122220806.22154-1-mreitz@redhat.com>
-	<20180122220806.22154-6-mreitz@redhat.com>
+	(envelope-from <jasowang@redhat.com>) id 1eqa5Q-0006gO-CF
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 02:54:11 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43422 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eqa5Q-0006fu-5g
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 02:54:08 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 49ACF402243B
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 07:53:54 +0000 (UTC)
+References: <1519208316-18812-1-git-send-email-thuth@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <682373ad-c888-37ca-9442-eb3d5213eb4a@redhat.com>
+Date: Tue, 27 Feb 2018 15:53:45 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180122220806.22154-6-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 05/16] block/mirror: Convert to
- coroutines
+In-Reply-To: <1519208316-18812-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 0/7] Improvements and clean-ups related
+ to -net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,87 +34,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On Mon, 01/22 23:07, Max Reitz wrote:
-> @@ -101,7 +105,7 @@ static BlockErrorAction mirror_error_action(MirrorBlockJob *s, bool read,
->      }
->  }
->  
-> -static void mirror_iteration_done(MirrorOp *op, int ret)
-> +static void coroutine_fn mirror_iteration_done(MirrorOp *op, int ret)
->  {
->      MirrorBlockJob *s = op->s;
->      struct iovec *iov;
 
-I think we want s/qemu_coroutine_enter/aio_co_wake/ in mirror_iteration_done().
-As an AIO callback before, this didn't matter, but now we are in an terminating
-coroutine, so it is pointless to defer the termination, or even risky in that we
-are in a aio_context_acquire/release section, but have already decremented
-s->in_flight, which is fishy.
 
-> @@ -138,9 +142,8 @@ static void mirror_iteration_done(MirrorOp *op, int ret)
->      }
->  }
->  
-> -static void mirror_write_complete(void *opaque, int ret)
-> +static void coroutine_fn mirror_write_complete(MirrorOp *op, int ret)
->  {
-> -    MirrorOp *op = opaque;
->      MirrorBlockJob *s = op->s;
->  
->      aio_context_acquire(blk_get_aio_context(s->common.blk));
-> @@ -157,9 +160,8 @@ static void mirror_write_complete(void *opaque, int ret)
->      aio_context_release(blk_get_aio_context(s->common.blk));
->  }
->  
-> -static void mirror_read_complete(void *opaque, int ret)
-> +static void coroutine_fn mirror_read_complete(MirrorOp *op, int ret)
->  {
-> -    MirrorOp *op = opaque;
->      MirrorBlockJob *s = op->s;
->  
->      aio_context_acquire(blk_get_aio_context(s->common.blk));
-> @@ -174,8 +176,11 @@ static void mirror_read_complete(void *opaque, int ret)
->  
->          mirror_iteration_done(op, ret);
->      } else {
-> -        blk_aio_pwritev(s->target, op->offset, &op->qiov,
-> -                        0, mirror_write_complete, op);
-> +        int ret;
+On 2018=E5=B9=B402=E6=9C=8821=E6=97=A5 18:18, Thomas Huth wrote:
+> "-net" is a legacy option that often causes confusion and
+> misconfigurations for the users, since most people are not aware
+> of the underlying "vlan" (i.e. hub) concept that is used for this
+> parameter. The prefered way of configuring your network stack is
+> to use "--netdev" instead, which gives you a clean 1:1 connection
+> between your emulated guest hardware and the host network backend.
+>
+> However, there are two reasons why we could not completely deprecate
+> "-net" yet:
+>
+> 1) Convenience:
+> In some cases, it's more convenient to use "-net" instead of "--netdev"=
+,
+> e.g. if you just want to have a "tap" network connection, it's faster
+> to type "-net nic -net tap" instead of "--device e1000,netdev=3Dn1
+> --netdev tap,id=3Dn1".
+>
+> 2) On-board NICs:
+> Currently the "-net nic" parameter is the only way to configure on-
+> board NICs on certain (embedded) machines via the nd_table[] array.
+>
+> So beside some generic clean-ups and removal of code that has been
+> marked as deprecated since QEMU 2.10 already, this patch series intro-
+> duces a new parameter "--nic" (in patch 7) which should be able to re-
+> place "-net" in the long run completely: This new convenience parameter
+> can be used to configure the default/on-board guest HW together with a
+> host network backend in a very compact way. To configure a tap backend
+> for the default NIC, you just have to type "--nic tap" here for example=
+.
+>
+> Note that "-net" itself is not marked as deprecated yet - that is
+> subject to a later patch, since it likely needs some additional
+> discussion first (or we might rather want to wait for some more
+> releases first until --nic has been properly established instead)...
+>
+> v3:
+> - Changed the comments in qapi/net.json in patch 5/7 according
+>    to the suggestion from Eric. Dropped the Reviewed-bys from this
+>    patch since the text changed a bit now.
+> - Dropped the final patch 8 with the updates to qemu-doc about
+>    making -net less prominent. I'll resubmit that patch together
+>    with a patch that deprecates "-net" in a separate patch series
+>    instead (which will likely both need some more discussion first).
+>
+> v2:
+> - Renamed "-n" to "--nic" (suggested by Paolo)
+> - Improved the QAPI comment about the removal of 'dump (suggested by Er=
+ic)
+> - exit(0) instead of exit(1) after showing the "-netdev help" (Eric)
+> - Improved the documenation for hubport a little bit (suggested by Paol=
+o)
+>
+> Thomas Huth (7):
+>    net: Move error reporting from net_init_client/netdev to the calling
+>      site
+>    net: List available netdevs with "-netdev help"
+>    net: Only show vhost-user in the help text if CONFIG_POSIX is define=
+d
+>    net: Make net_client_init() static
+>    net: Remove the deprecated way of dumping network packets
+>    net: Remove the deprecated 'host_net_add' and 'host_net_remove' HMP
+>      commands
+>    net: Add a new convenience option "--nic" to configure
+>      default/on-board NICs
+>
+>   hmp-commands.hx         |  30 ------
+>   hmp.h                   |   3 -
+>   include/net/net.h       |   4 +-
+>   include/sysemu/sysemu.h |   1 +
+>   monitor.c               |  61 ------------
+>   net/dump.c              | 102 +--------------------
+>   net/net.c               | 239 +++++++++++++++++++++++----------------=
+---------
+>   qapi/net.json           |  29 ++----
+>   qemu-doc.texi           |  16 ----
+>   qemu-options.hx         |  48 +++++++---
+>   tests/test-hmp.c        |   2 -
+>   vl.c                    |  10 +-
+>   12 files changed, 170 insertions(+), 375 deletions(-)
+>
 
-s/ret/ret2/ or drop the definition?
-because ret is already the paramter of the function.
+Applied.
 
-> +
-> +        ret = blk_co_pwritev(s->target, op->offset,
-> +                             op->qiov.size, &op->qiov, 0);
-> +        mirror_write_complete(op, ret);
->      }
->      aio_context_release(blk_get_aio_context(s->common.blk));
->  }
-
-<snip>
-
-> +static void coroutine_fn mirror_co_discard(void *opaque)
-> +{
-> +    MirrorOp *op = opaque;
-> +    int ret;
-> +
-> +    op->s->in_flight++;
-> +    op->s->bytes_in_flight += op->bytes;
-> +    *op->bytes_handled = op->bytes;
-> +
-> +    ret = blk_co_pdiscard(op->s->target, op->offset, op->bytes);
-> +    mirror_write_complete(op, ret);
->  }
->  
->  static unsigned mirror_perform(MirrorBlockJob *s, int64_t offset,
->                                 unsigned bytes, MirrorMethod mirror_method)
-
-Doesn't mirror_perform need coroutine_fn annotation too?
-
->  {
-
-Fam
+Thanks
