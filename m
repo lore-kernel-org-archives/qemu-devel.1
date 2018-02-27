@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqkst-00083m-Oz
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:25:56 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eqkvt-0001W4-2l
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:29:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eqkss-0000K0-Ms
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:25:55 -0500
-References: <20180223235142.21501-1-jsnow@redhat.com>
-	<20180223235142.21501-8-jsnow@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <14553f87-de62-8da5-752b-febc0e815dab@redhat.com>
-Date: Tue, 27 Feb 2018 13:25:40 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1eqkvs-0002F6-3G
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:29:01 -0500
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:45552)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eqkvr-0002Ej-Tk
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 14:29:00 -0500
+Received: by mail-oi0-x241.google.com with SMTP id j79so13730679oib.12
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 11:28:59 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180223235142.21501-8-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v4 07/21] blockjobs: add block_job_verb
- permission table
+In-Reply-To: <20180227083919.12339-1-kraxel@redhat.com>
+References: <20180227083919.12339-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Feb 2018 19:28:38 +0000
+Message-ID: <CAFEAcA8_dhX2ULBv+14Rs=3bU8Z56jgd=_U_Xg9368D0c2Fp8g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/5] Usb 20180227 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,67 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 02/23/2018 05:51 PM, John Snow wrote:
-> Which commands ("verbs") are appropriate for jobs in which state is
-> also somewhat burdensome to keep track of.
-> 
-> As of this commit, it looks rather useless, but begins to look more
-> interesting the more states we add to the STM table.
-> 
-> A recurring theme is that no verb will apply to an 'undefined' job.
+On 27 February 2018 at 08:39, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit 0a773d55ac76c5aa89ed9187a3bc5af8c5c2a6d0:
+>
+>   maintainers: Add myself as a OpenBSD maintainer (2018-02-23 12:05:07 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/usb-20180227-pull-request
+>
+> for you to fetch changes up to 53735bef108c5ccddf0f8a65cde4da53a48dbd47:
+>
+>   usb-mtp: Advertise SendObjectInfo for write support (2018-02-26 12:18:36 +0100)
+>
+> ----------------------------------------------------------------
+> usb: add mtp write support.
+>
+> ----------------------------------------------------------------
+>
+> Bandan Das (5):
+>   usb-mtp: Add one more argument when building results
+>   usb-mtp: print parent path in IN_IGNORED trace fn
+>   usb-mtp: Support delete of mtp objects
+>   usb-mtp: Introduce write support for MTP objects
+>   usb-mtp: Advertise SendObjectInfo for write support
+>
+>  hw/usb/dev-mtp.c | 471 +++++++++++++++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 441 insertions(+), 30 deletions(-)
 
-Back to the argument of whether we even want that state.
+Applied, thanks.
 
-> 
-> =======
-> Changes
-> =======
-> 
-> (1)
-> 
-> To facilitate "nice" error checking, all five major block-job verb
-> interfaces in blockjob.c now support an errp parameter:
-> 
-> - block_job_user_cancel is added as a new interface.
-> - block_job_user_pause gains an errp paramter
-> - block_job_user_resume gains an errp parameter
-> - block_job_set_speed already had an errp parameter.
-> - block_job_complete already had an errp parameter.
-> 
-> (2)
-> 
-> block-job-pause and block-job-resume will no longer no-op when trying
-> to pause an already paused job, or trying to resume a job that isn't
-> paused. These functions will now report that they did not perform the
-> action requested because it was not possible.
-> 
-> iotests have been adjusted to address this new behavior.
-
-Seems reasonable.  Hopefully shouldn't trip up libvirt too badly (if 
-libvirt attempted a redundant job transition that used to silently 
-succeed and now fails, the failure message should be pretty obvious that 
-it was a no-op attempt).
-
-> 
-> (3)
-> 
-> block-job-complete doesn't worry about checking !block_job_started,
-> because the permission table guards against this.
-> 
-> (4)
-> 
-> test-bdrv-drain's job implementation needs to announce that it is
-> 'ready' now, in order to be completed.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+-- PMM
