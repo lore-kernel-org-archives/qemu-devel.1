@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eqTTT-0004De-HF
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 19:50:32 -0500
+	(envelope-from <mjc@sifive.com>) id 1eqTn2-0000LK-KG
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 20:10:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eqTTQ-0005vd-GR
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 19:50:31 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46486 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eqTTQ-0005tp-9z
-	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 19:50:28 -0500
-Date: Tue, 27 Feb 2018 02:50:08 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180227024325-mutt-send-email-mst@kernel.org>
-References: <1517915299-15349-1-git-send-email-wei.w.wang@intel.com>
-	<1517915299-15349-4-git-send-email-wei.w.wang@intel.com>
-	<20180209121517.GD2428@work-vm> <5A938E93.5020502@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5A938E93.5020502@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] virtio-balloon: add a timer to
- limit the free page report waiting time
+	(envelope-from <mjc@sifive.com>) id 1eqTmz-0000bT-C1
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 20:10:44 -0500
+Received: from mail-pg0-x233.google.com ([2607:f8b0:400e:c05::233]:38558)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eqTmz-0000bC-5f
+	for qemu-devel@nongnu.org; Mon, 26 Feb 2018 20:10:41 -0500
+Received: by mail-pg0-x233.google.com with SMTP id l24so6895802pgc.5
+	for <qemu-devel@nongnu.org>; Mon, 26 Feb 2018 17:10:40 -0800 (PST)
+From: Michael Clark <mjc@sifive.com>
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Message-Id: <CF70F9DF-6D1E-4541-9BD6-9131BDC832FC@sifive.com>
+Date: Tue, 27 Feb 2018 14:10:34 +1300
+Subject: [Qemu-devel] QEMU Status Update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +27,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com
+To: RISC-V Software Developers <sw-dev@lists.riscv.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-On Mon, Feb 26, 2018 at 12:35:31PM +0800, Wei Wang wrote:
-> On 02/09/2018 08:15 PM, Dr. David Alan Gilbert wrote:
-> > * Wei Wang (wei.w.wang@intel.com) wrote:
-> > > This patch adds a timer to limit the time that host waits for the free
-> > > page hints reported by the guest. Users can specify the time in ms via
-> > > "free-page-wait-time" command line option. If a user doesn't specify a
-> > > time, host waits till the guest finishes reporting all the free page
-> > > hints. The policy (wait for all the free page hints to be reported or
-> > > use a time limit) is determined by the orchestration layer.
-> > That's kind of a get-out; but there's at least two problems:
-> >     a) With a timeout of 0 (the default) we might hang forever waiting
-> >        for the guest; broken guests are just too common, we can't do
-> >        that.
-> >     b) Even if we were going to do that, you'd have to make sure that
-> >        migrate_cancel provided a way out.
-> >     c) How does that work during a savevm snapshot or when the guest is
-> >        stopped?
-> >     d) OK, the timer gives us some safety (except c); but how does the
-> >        orchestration layer ever come up with a 'safe' value for it?
-> >        Unless we can suggest a safe value that the orchestration layer
-> >        can use, or a way they can work it out, then they just wont use
-> >        it.
-> > 
-> 
-> Hi Dave,
-> 
-> Sorry for my late response. Please see below:
-> 
-> a) I think people would just kill the guest if it is broken.
+Hi Folks,
 
-There's no way to know whether it's broken.
+Just a quick update regarding the process of submitting the RISC-V QEMU =
+port upstream for inclusion in the QEMU 2.12 release this coming April.
 
-> We can also
-> change the default timeout value, for example 1 second, which is enough for
-> the free page reporting.
+We=E2=80=99ve just submitted our first pull request after receiving =
+positive feedback from the v6 patch series submitted last week. We =
+recently contacted contributors in response to feedback from Red Hat, to =
+relicense the code as GPLv2+ which is the main change in this most =
+recent v7 patch series:
 
-There's no way to know whether it's enough.
+- http://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg06489.html
+- http://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg05778.html
+- http://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg06132.html
 
-> b) How about changing it this way: if timeout happens, host sends a stop
-> command to the guest, and makes virtio_balloon_poll_free_page_hints()
-> "return" immediately (without getting the guest's acknowledge). The "return"
-> basically goes back to the migration_thread function:
-> while (s->state == MIGRATION_STATUS_ACTIVE ||
->            s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-> ...
-> }
-> 
-> migration_cancel sets the state to MIGRATION_CANCELLING, so it will stop the
-> migration process.
-> 
-> c) This optimization needs the guest to report. If the guest is stopped, it
-> wouldn't work. How about adding a check of "RUN_STATE" before going into the
-> optimization?
-> 
-> d) Yes. Normally it is faster to wait for the guest to report all the free
-> pages. Probably, we can just hardcode a value (e.g. 1s) for now (instead of
-> making it configurable by users), this is used to handle the case that the
-> guest is broken. What would you think?
-> 
-> Best,
-> Wei
+I=E2=80=99d also like to take this opportunity to point out the =
+riscv-qemu wiki where we have moved some of the documentation for the =
+port:
 
-I think all this is premature optimization. It is not at all clear that
-anything is gained by delaying migration. Just ask for hints and start
-sending pages immediately.  If guest tells us a page is free before it's
-sent, we can skip sending it.  OTOH if migration is taking less time to
-complete than it takes for guest to respond, then we are better off just
-ignoring the hint.
+- https://github.com/riscv/riscv-qemu/wiki
 
--- 
-MST
+We no longer have a custom README.md in the repo given the code-base is =
+now based on upstream QEMU. I=E2=80=99ve added wiki links to SiFive=E2=80=99=
+s freedom-u-sdk which creates build recipes to create qemu and a =
+bootable buildroot-based linux image that will run on the freedom U =
+series VC707 FPGA, SiFive=E2=80=99s new HiFive Unleashed board and of =
+course riscv-qemu. I=E2=80=99ve also added links to the Fedora RISC-V =
+Architecture page and the Debian RISC-V Architecture page which have =
+additional links to RISC-V Linux packages and root images.
+
+With the current version of riscv-qemu we are able to run Privileged ISA =
+v1.9.1 riscv-linux/bbl, on the spike_v1.9.1 machine, Privileged ISA =
+v1.10 riscv-linux/bbl on the spike_v1.10 and virt machines, HiFive1 =
+binaries on the sifive_e300 machine and we have working MTTCG-enabled =
+SMP on the virt machine thanks to work done by Stefan O=E2=80=99Rear and =
+Richard Henderson on thread-safe atomics.
+
+There is still a lot of future development work that we can switch our =
+attention to once the port is upstream. This is a non-exhaustive list, =
+just to give you an idea of future work that needs to be done:
+
+- Allow on-the-fly =E2=80=98misa=E2=80=99 changes, perhaps with =
+translation cache flushing
+	- Currently the misa flag is read-only
+- Support the rules being discussed for enabling and disabling misa C =
+flag
+	- Currently QEMU allows instruction fetches on half-word =
+(16-bit) boundaries when C is disabled
+- Disable MMU when misa S flag is not set
+	- Currently QEMU allows configuring of the MMU on the E-series =
+machine
+	- This works because E-series code does not touch the satp =
+register
+- Add vendor specific cpu models such as =E2=80=99sifive-e31=E2=80=99, =
+=E2=80=99sifive-e51=E2=80=99, =E2=80=99sifive-u54=E2=80=99, etc
+	- Currently we have =E2=80=98generic-imacs=E2=80=99, =
+=E2=80=98generic-imafdcsu=E2=80=99, etc
+- Improve device support
+	- FIFO and interrupt mode support for the SiFive UART along with =
+Linux driver
+	- PCI host (GPEX) for the =E2=80=98virt=E2=80=99 machine to =
+enable virtio-pci
+	- SPI and GPIO devices for the SiFive boards
+	- Add generic GPIO based power-off and reset
+	- Implement HTIF queuing and fix 32-bit support
+- Privileged ISA v1.10 and v1.11
+	- Add support for TSR, TW and TVM flags (priv v1.10)
+	- Add Hypervisor support (draft priv v1.11)
+
+Thanks to everyone who helped with patch review, testing, patches and =
+pull requests. I=E2=80=99d also like to give special thanks to Sagar who =
+did a huge amount of the original work on the port.=20
+
+Note: I=E2=80=99m explicitly cross-posting as this email is relevant to =
+both the RISC-V software development community and the QEMU development =
+community.
+
+Regards,
+Michael.=
