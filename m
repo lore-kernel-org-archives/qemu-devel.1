@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eqegw-0006Mv-Qp
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 07:49:12 -0500
+	(envelope-from <liliang.opensource@gmail.com>) id 1eqezh-0001us-I8
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:08:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eqegv-00059u-RN
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 07:49:10 -0500
-References: <1519303376-92875-1-git-send-email-imammedo@redhat.com>
-	<1519303376-92875-5-git-send-email-imammedo@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <4c3fb706-41e8-0b2f-f2b9-25f0ef60b90d@redhat.com>
-Date: Tue, 27 Feb 2018 13:48:45 +0100
+	(envelope-from <liliang.opensource@gmail.com>) id 1eqezd-0008SD-JZ
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:08:33 -0500
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:44307)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liliang.opensource@gmail.com>)
+	id 1eqezd-0008Rr-Cu
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 08:08:29 -0500
+Received: by mail-pf0-x242.google.com with SMTP id 17so7906230pfw.11
+	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 05:08:29 -0800 (PST)
+From: Liang Li <liliang.opensource@gmail.com>
+Date: Tue, 27 Feb 2018 21:08:22 +0800
+Message-ID: <20180227130820.GA11350@localhost>
+References: <1517915299-15349-1-git-send-email-wei.w.wang@intel.com>
+	<1517915299-15349-4-git-send-email-wei.w.wang@intel.com>
+	<20180209121517.GD2428@work-vm> <5A938E93.5020502@intel.com>
+	<20180227024325-mutt-send-email-mst@kernel.org>
+	<5A952EA7.8010708@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1519303376-92875-5-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/9] acpi: add build_append_gas() helper
- for Generic Address Structure
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5A952EA7.8010708@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] virtio-balloon: add a timer to
+ limit the free page report waiting time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,90 +34,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, mst@redhat.com
 
-Hi,
-
-On 22/02/18 13:42, Igor Mammedov wrote:
-> it will help to add Generic Address Structure to ACPI tables
-> without using packed C structures and avoid endianness
-> issues as API doesn't need an explicit conversion.
+On Tue, Feb 27, 2018 at 06:10:47PM +0800, Wei Wang wrote:
+> On 02/27/2018 08:50 AM, Michael S. Tsirkin wrote:
+> > On Mon, Feb 26, 2018 at 12:35:31PM +0800, Wei Wang wrote:
+> > > On 02/09/2018 08:15 PM, Dr. David Alan Gilbert wrote:
+> > > > * Wei Wang (wei.w.wang@intel.com) wrote:
+> > 
+> > I think all this is premature optimization. It is not at all clear that
+> > anything is gained by delaying migration. Just ask for hints and start
+> > sending pages immediately.  If guest tells us a page is free before it's
+> > sent, we can skip sending it.  OTOH if migration is taking less time to
+> > complete than it takes for guest to respond, then we are better off just
+> > ignoring the hint.
 > 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks
-
-Eric
-> ---
->  include/hw/acpi/aml-build.h | 20 ++++++++++++++++++++
->  hw/acpi/aml-build.c         | 16 ++++++++++++++++
->  2 files changed, 36 insertions(+)
+> OK, I'll try to create a thread for the free page optimization. We create
+> the thread to poll for free pages at the beginning of the bulk stage, and
+> stops at the end of bulk stage.
+> There are also comments about postcopy support with this feature, I plan to
+> leave that as the second step (that support seems not urgent for now).
 > 
-> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-> index 88d0738..8692ccc 100644
-> --- a/include/hw/acpi/aml-build.h
-> +++ b/include/hw/acpi/aml-build.h
-> @@ -78,6 +78,15 @@ typedef enum {
->  } AmlUpdateRule;
->  
->  typedef enum {
-> +    AML_AS_SYSTEM_MEMORY = 0X00,
-> +    AML_AS_SYSTEM_IO = 0X01,
-> +    AML_AS_PCI_CONFIG = 0X02,
-> +    AML_AS_EMBEDDED_CTRL = 0X03,
-> +    AML_AS_SMBUS = 0X04,
-> +    AML_AS_FFH = 0X7F,
-> +} AmlAddressSpace;
-> +
-> +typedef enum {
->      AML_SYSTEM_MEMORY = 0X00,
->      AML_SYSTEM_IO = 0X01,
->      AML_PCI_CONFIG = 0X02,
-> @@ -389,6 +398,17 @@ int
->  build_append_named_dword(GArray *array, const char *name_format, ...)
->  GCC_FMT_ATTR(2, 3);
->  
-> +void build_append_gas(GArray *table, AmlAddressSpace as,
-> +                      uint8_t bit_width, uint8_t bit_offset,
-> +                      uint8_t access_width, uint64_t address);
-> +
-> +static inline void
-> +build_append_gas_from_struct(GArray *table, const struct AcpiGenericAddress *s)
-> +{
-> +    build_append_gas(table, s->space_id, s->bit_width, s->bit_offset,
-> +                     s->access_width, s->address);
-> +}
-> +
->  void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
->                         uint64_t len, int node, MemoryAffinityFlags flags);
->  
-> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-> index 36a6cc4..3fef5f6 100644
-> --- a/hw/acpi/aml-build.c
-> +++ b/hw/acpi/aml-build.c
-> @@ -258,6 +258,22 @@ static void build_append_int(GArray *table, uint64_t value)
->      }
->  }
->  
-> +/* Generic Address Structure (GAS)
-> + * ACPI 2.0/3.0: 5.2.3.1 Generic Address Structure
-> + * 2.0 compat note:
-> + *    @access_width must be 0, see ACPI 2.0:Table 5-1
-> + */
-> +void build_append_gas(GArray *table, AmlAddressSpace as,
-> +                      uint8_t bit_width, uint8_t bit_offset,
-> +                      uint8_t access_width, uint64_t address)
-> +{
-> +    build_append_int_noprefix(table, as, 1);
-> +    build_append_int_noprefix(table, bit_width, 1);
-> +    build_append_int_noprefix(table, bit_offset, 1);
-> +    build_append_int_noprefix(table, access_width, 1);
-> +    build_append_int_noprefix(table, address, 8);
-> +}
-> +
->  /*
->   * Build NAME(XXXX, 0x00000000) where 0x00000000 is encoded as a dword,
->   * and return the offset to 0x00000000 for runtime patching.
 > 
+> Best,
+> Wei
+
+you can make use the current migration thread instead of creating a new one.
+
+Liang
