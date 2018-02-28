@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1er0tK-0002Xg-SD
+	(envelope-from <kraxel@redhat.com>) id 1er0tK-0002Xi-SE
 	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:31:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1er0tF-0000UU-RX
+	(envelope-from <kraxel@redhat.com>) id 1er0tG-0000WX-UW
 	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:31:26 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53950 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60196 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1er0tF-0000Tc-Ku
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:31:21 -0500
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1er0tG-0000VL-PO
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:31:22 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 28 Feb 2018 13:31:10 +0100
-Message-Id: <20180228123110.6507-10-kraxel@redhat.com>
+Date: Wed, 28 Feb 2018 13:31:08 +0100
+Message-Id: <20180228123110.6507-8-kraxel@redhat.com>
 In-Reply-To: <20180228123110.6507-1-kraxel@redhat.com>
 References: <20180228123110.6507-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 9/9] vfio/display: adding dmabuf support
+Subject: [Qemu-devel] [PATCH v6 7/9] vfio/display: core & wireup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,242 +26,146 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alex Williamson <alex.williamson@redhat.com>, Tina Zhang <tina.zhang@intel.com>, intel-gvt-dev@lists.freedesktop.org, Kirti Wankhede <kwankhede@nvidia.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Wire up dmabuf-based display.
+Infrastructure for display support.  Must be enabled
+using 'display' property.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/hw/vfio/vfio-common.h |  14 ++++
- hw/vfio/display.c             | 166 +++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 178 insertions(+), 2 deletions(-)
+ hw/vfio/pci.h         |  4 ++++
+ hw/vfio/display.c     | 56 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/vfio/pci.c         | 10 +++++++++
+ hw/vfio/Makefile.objs |  2 +-
+ 4 files changed, 71 insertions(+), 1 deletion(-)
+ create mode 100644 hw/vfio/display.c
 
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index fc8ae14fb7..994e780d51 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -26,6 +26,7 @@
- #include "exec/memory.h"
- #include "qemu/queue.h"
- #include "qemu/notify.h"
-+#include "ui/console.h"
- #ifdef CONFIG_LINUX
- #include <linux/vfio.h>
- #endif
-@@ -142,12 +143,25 @@ typedef struct VFIOGroup {
-     QLIST_ENTRY(VFIOGroup) container_next;
- } VFIOGroup;
+diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+index f4aa13e021..a846cf6237 100644
+--- a/hw/vfio/pci.h
++++ b/hw/vfio/pci.h
+@@ -133,6 +133,7 @@ typedef struct VFIOPCIDevice {
+ #define VFIO_FEATURE_ENABLE_IGD_OPREGION_BIT 2
+ #define VFIO_FEATURE_ENABLE_IGD_OPREGION \
+                                 (1 << VFIO_FEATURE_ENABLE_IGD_OPREGION_BIT)
++    OnOffAuto display;
+     int32_t bootindex;
+     uint32_t igd_gms;
+     OffAutoPCIBAR msix_relo;
+@@ -174,4 +175,7 @@ int vfio_pci_igd_opregion_init(VFIOPCIDevice *vdev,
+                                struct vfio_region_info *info,
+                                Error **errp);
  
-+typedef struct VFIODMABuf {
-+    QemuDmaBuf buf;
-+    uint32_t pos_x, pos_y;
-+    uint32_t hot_x, hot_y;
-+    int dmabuf_id;
-+    QTAILQ_ENTRY(VFIODMABuf) next;
-+} VFIODMABuf;
++int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp);
++void vfio_display_finalize(VFIOPCIDevice *vdev);
 +
- typedef struct VFIODisplay {
-     QemuConsole *con;
-     struct {
-         VFIORegion buffer;
-         DisplaySurface *surface;
-     } region;
-+    struct {
-+        QTAILQ_HEAD(, VFIODMABuf) bufs;
-+        VFIODMABuf *primary;
-+        VFIODMABuf *cursor;
-+    } dmabuf;
- } VFIODisplay;
- 
- void vfio_put_base_device(VFIODevice *vbasedev);
+ #endif /* HW_VFIO_VFIO_PCI_H */
 diff --git a/hw/vfio/display.c b/hw/vfio/display.c
-index f6acbacc79..053d3ab67a 100644
---- a/hw/vfio/display.c
+new file mode 100644
+index 0000000000..3e997f8a44
+--- /dev/null
 +++ b/hw/vfio/display.c
-@@ -19,6 +19,168 @@
- #include "qapi/error.h"
- #include "pci.h"
- 
-+#ifndef DRM_PLANE_TYPE_PRIMARY
-+# define DRM_PLANE_TYPE_PRIMARY 1
-+# define DRM_PLANE_TYPE_CURSOR  2
-+#endif
+@@ -0,0 +1,56 @@
++/*
++ * display support for mdev based vgpu devices
++ *
++ * Copyright Red Hat, Inc. 2017
++ *
++ * Authors:
++ *    Gerd Hoffmann
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
++ */
 +
-+static VFIODMABuf *vfio_display_get_dmabuf(VFIOPCIDevice *vdev,
-+                                           uint32_t plane_type)
++#include "qemu/osdep.h"
++#include <linux/vfio.h>
++#include <sys/ioctl.h>
++
++#include "sysemu/sysemu.h"
++#include "ui/console.h"
++#include "qapi/error.h"
++#include "pci.h"
++
++int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp)
 +{
-+    VFIODisplay *dpy = vdev->dpy;
-+    struct vfio_device_gfx_plane_info plane;
-+    VFIODMABuf *dmabuf;
-+    int fd, ret;
++    struct vfio_device_gfx_plane_info probe;
++    int ret;
 +
-+    memset(&plane, 0, sizeof(plane));
-+    plane.argsz = sizeof(plane);
-+    plane.flags = VFIO_GFX_PLANE_TYPE_DMABUF;
-+    plane.drm_plane_type = plane_type;
-+    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_QUERY_GFX_PLANE, &plane);
-+    if (ret < 0) {
-+        return NULL;
-+    }
-+    if (!plane.drm_format || !plane.size) {
-+        return NULL;
-+    }
-+
-+    QTAILQ_FOREACH(dmabuf, &dpy->dmabuf.bufs, next) {
-+        if (dmabuf->dmabuf_id == plane.dmabuf_id) {
-+            /* found in list, move to head, return it */
-+            QTAILQ_REMOVE(&dpy->dmabuf.bufs, dmabuf, next);
-+            QTAILQ_INSERT_HEAD(&dpy->dmabuf.bufs, dmabuf, next);
-+            if (plane_type == DRM_PLANE_TYPE_CURSOR) {
-+                dmabuf->pos_x      = plane.x_pos;
-+                dmabuf->pos_y      = plane.y_pos;
-+            }
-+            return dmabuf;
-+        }
-+    }
-+
-+    fd = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_GET_GFX_DMABUF, &plane.dmabuf_id);
-+    if (fd < 0) {
-+        return NULL;
-+    }
-+
-+    dmabuf = g_new0(VFIODMABuf, 1);
-+    dmabuf->dmabuf_id  = plane.dmabuf_id;
-+    dmabuf->buf.width  = plane.width;
-+    dmabuf->buf.height = plane.height;
-+    dmabuf->buf.stride = plane.stride;
-+    dmabuf->buf.fourcc = plane.drm_format;
-+    dmabuf->buf.fd     = fd;
-+    if (plane_type == DRM_PLANE_TYPE_CURSOR) {
-+        dmabuf->pos_x      = plane.x_pos;
-+        dmabuf->pos_y      = plane.y_pos;
-+        dmabuf->hot_x      = plane.x_hot;
-+        dmabuf->hot_y      = plane.y_hot;
-+    }
-+
-+    QTAILQ_INSERT_HEAD(&dpy->dmabuf.bufs, dmabuf, next);
-+    return dmabuf;
-+}
-+
-+static void vfio_display_free_one_dmabuf(VFIODisplay *dpy, VFIODMABuf *dmabuf)
-+{
-+    QTAILQ_REMOVE(&dpy->dmabuf.bufs, dmabuf, next);
-+    dpy_gl_release_dmabuf(dpy->con, &dmabuf->buf);
-+    close(dmabuf->buf.fd);
-+    g_free(dmabuf);
-+}
-+
-+static void vfio_display_free_dmabufs(VFIOPCIDevice *vdev)
-+{
-+    VFIODisplay *dpy = vdev->dpy;
-+    VFIODMABuf *dmabuf, *tmp;
-+    uint32_t keep = 5;
-+
-+    QTAILQ_FOREACH_SAFE(dmabuf, &dpy->dmabuf.bufs, next, tmp) {
-+        if (keep > 0) {
-+            keep--;
-+            continue;
-+        }
-+        assert(dmabuf != dpy->dmabuf.primary);
-+        vfio_display_free_one_dmabuf(dpy, dmabuf);
-+    }
-+}
-+
-+static void vfio_display_dmabuf_update(void *opaque)
-+{
-+    VFIOPCIDevice *vdev = opaque;
-+    VFIODisplay *dpy = vdev->dpy;
-+    VFIODMABuf *primary, *cursor;
-+    bool free_bufs = false;
-+
-+    primary = vfio_display_get_dmabuf(vdev, DRM_PLANE_TYPE_PRIMARY);
-+    if (primary == NULL) {
-+        return;
-+    }
-+
-+    if (dpy->dmabuf.primary != primary) {
-+        dpy->dmabuf.primary = primary;
-+        qemu_console_resize(dpy->con,
-+                            primary->buf.width, primary->buf.height);
-+        dpy_gl_scanout_dmabuf(dpy->con, &primary->buf);
-+        free_bufs = true;
-+    }
-+
-+    cursor = vfio_display_get_dmabuf(vdev, DRM_PLANE_TYPE_CURSOR);
-+    if (dpy->dmabuf.cursor != cursor) {
-+        dpy->dmabuf.cursor = cursor;
-+        if (cursor) {
-+            bool have_hot = (cursor->hot_x != 0xffffffff &&
-+                             cursor->hot_y != 0xffffffff);
-+            dpy_gl_cursor_dmabuf(dpy->con, &cursor->buf, have_hot,
-+                                 cursor->hot_x, cursor->hot_y);
-+        } else {
-+            dpy_gl_cursor_dmabuf(dpy->con, NULL, false, 0, 0);
-+        }
-+        free_bufs = true;
-+    }
-+    if (cursor != NULL) {
-+        dpy_gl_cursor_position(dpy->con,
-+                               cursor->pos_x,
-+                               cursor->pos_y);
-+    }
-+
-+    dpy_gl_update(dpy->con, 0, 0, primary->buf.width, primary->buf.height);
-+
-+    if (free_bufs) {
-+        vfio_display_free_dmabufs(vdev);
-+    }
-+}
-+
-+static const GraphicHwOps vfio_display_dmabuf_ops = {
-+    .gfx_update = vfio_display_dmabuf_update,
-+};
-+
-+static int vfio_display_dmabuf_init(VFIOPCIDevice *vdev, Error **errp)
-+{
-+    if (!display_opengl) {
-+        error_setg(errp, "vfio-display-dmabuf: opengl not available");
++    memset(&probe, 0, sizeof(probe));
++    probe.argsz = sizeof(probe);
++    probe.flags = VFIO_GFX_PLANE_TYPE_PROBE | VFIO_GFX_PLANE_TYPE_DMABUF;
++    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_QUERY_GFX_PLANE, &probe);
++    if (ret == 0) {
++        error_setg(errp, "vfio-display: dmabuf support not implemented yet");
 +        return -1;
 +    }
 +
-+    vdev->dpy = g_new0(VFIODisplay, 1);
-+    vdev->dpy->con = graphic_console_init(DEVICE(vdev), 0,
-+                                          &vfio_display_dmabuf_ops,
-+                                          vdev);
-+    return 0;
++    memset(&probe, 0, sizeof(probe));
++    probe.argsz = sizeof(probe);
++    probe.flags = VFIO_GFX_PLANE_TYPE_PROBE | VFIO_GFX_PLANE_TYPE_REGION;
++    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_QUERY_GFX_PLANE, &probe);
++    if (ret == 0) {
++        error_setg(errp, "vfio-display: region support not implemented yet");
++        return -1;
++    }
++
++    if (vdev->display == ON_OFF_AUTO_AUTO) {
++        /* not an error in automatic mode */
++        return 0;
++    }
++
++    error_setg(errp, "vfio: device doesn't support any (known) display method");
++    return -1;
 +}
 +
-+static void vfio_display_dmabuf_exit(VFIODisplay *dpy)
++void vfio_display_finalize(VFIOPCIDevice *vdev)
 +{
-+    VFIODMABuf *dmabuf;
-+
-+    if (QTAILQ_EMPTY(&dpy->dmabuf.bufs)) {
-+        return;
-+    }
-+
-+    while ((dmabuf = QTAILQ_FIRST(&dpy->dmabuf.bufs)) != NULL) {
-+        vfio_display_free_one_dmabuf(dpy, dmabuf);
-+    }
 +}
-+
- /* ---------------------------------------------------------------------- */
- 
- static void vfio_display_region_update(void *opaque)
-@@ -136,8 +298,7 @@ int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp)
-     probe.flags = VFIO_GFX_PLANE_TYPE_PROBE | VFIO_GFX_PLANE_TYPE_DMABUF;
-     ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_QUERY_GFX_PLANE, &probe);
-     if (ret == 0) {
--        error_setg(errp, "vfio-display: dmabuf support not implemented yet");
--        return -1;
-+        return vfio_display_dmabuf_init(vdev, errp);
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 033cc8dea1..20f93bef74 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -3015,6 +3015,13 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+         }
      }
  
-     memset(&probe, 0, sizeof(probe));
-@@ -163,6 +324,7 @@ void vfio_display_finalize(VFIOPCIDevice *vdev)
-         return;
++    if (vdev->display != ON_OFF_AUTO_OFF) {
++        ret = vfio_display_probe(vdev, errp);
++        if (ret) {
++            goto out_teardown;
++        }
++    }
++
+     vfio_register_err_notifier(vdev);
+     vfio_register_req_notifier(vdev);
+     vfio_setup_resetfn_quirk(vdev);
+@@ -3035,6 +3042,7 @@ static void vfio_instance_finalize(Object *obj)
+     VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pci_dev);
+     VFIOGroup *group = vdev->vbasedev.group;
  
-     graphic_console_close(vdev->dpy->con);
-+    vfio_display_dmabuf_exit(vdev->dpy);
-     vfio_display_region_exit(vdev->dpy);
-     g_free(vdev->dpy);
- }
++    vfio_display_finalize(vdev);
+     vfio_bars_finalize(vdev);
+     g_free(vdev->emulated_config_bits);
+     g_free(vdev->rom);
+@@ -3123,6 +3131,8 @@ static void vfio_instance_init(Object *obj)
+ static Property vfio_pci_dev_properties[] = {
+     DEFINE_PROP_PCI_HOST_DEVADDR("host", VFIOPCIDevice, host),
+     DEFINE_PROP_STRING("sysfsdev", VFIOPCIDevice, vbasedev.sysfsdev),
++    DEFINE_PROP_ON_OFF_AUTO("display", VFIOPCIDevice,
++                            display, ON_OFF_AUTO_AUTO),
+     DEFINE_PROP_UINT32("x-intx-mmap-timeout-ms", VFIOPCIDevice,
+                        intx.mmap_timeout, 1100),
+     DEFINE_PROP_BIT("x-vga", VFIOPCIDevice, features,
+diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
+index c3ab9097f1..a2e7a0a7cf 100644
+--- a/hw/vfio/Makefile.objs
++++ b/hw/vfio/Makefile.objs
+@@ -1,6 +1,6 @@
+ ifeq ($(CONFIG_LINUX), y)
+ obj-$(CONFIG_SOFTMMU) += common.o
+-obj-$(CONFIG_PCI) += pci.o pci-quirks.o
++obj-$(CONFIG_PCI) += pci.o pci-quirks.o display.o
+ obj-$(CONFIG_VFIO_CCW) += ccw.o
+ obj-$(CONFIG_SOFTMMU) += platform.o
+ obj-$(CONFIG_VFIO_XGMAC) += calxeda-xgmac.o
 -- 
 2.9.3
