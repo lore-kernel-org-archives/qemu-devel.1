@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abdallah.bouassida@lauterbach.com>)
-	id 1eqzV8-0003dY-Lv
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 06:02:29 -0500
+	(envelope-from <david@redhat.com>) id 1eqzVP-0003rl-EY
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 06:02:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abdallah.bouassida@lauterbach.com>)
-	id 1eqzV4-0007Nl-NS
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 06:02:22 -0500
-Received: from smtp1.lauterbach.com ([62.154.241.196]:53912)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abdallah.bouassida@lauterbach.com>)
-	id 1eqzV4-0007GH-Cm
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 06:02:18 -0500
-Received: from unknown (HELO localhost.localdomain)
-	(Authenticated_SSL:abouassida@[41.224.44.126])
-	(envelope-sender <abdallah.bouassida@lauterbach.com>)
-	by smtp1.lauterbach.com (qmail-ldap-1.03) with ECDHE-RSA-AES256-SHA
-	encrypted SMTP
-	for <qemu-devel@nongnu.org>; 28 Feb 2018 11:02:00 -0000
-From: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-Date: Wed, 28 Feb 2018 12:01:25 +0100
-Message-Id: <1519815685-29200-5-git-send-email-abdallah.bouassida@lauterbach.com>
-In-Reply-To: <1519815685-29200-1-git-send-email-abdallah.bouassida@lauterbach.com>
-References: <1519815685-29200-1-git-send-email-abdallah.bouassida@lauterbach.com>
+	(envelope-from <david@redhat.com>) id 1eqzVK-0007h2-IR
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 06:02:39 -0500
+References: <1519731154-3127-1-git-send-email-thuth@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <3e8dd204-a07d-00bd-84f3-813dc35c18cd@redhat.com>
+Date: Wed, 28 Feb 2018 12:02:16 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 4/4] target/arm: Add arm_gdb_set_sysreg()
- callback
+In-Reply-To: <1519731154-3127-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] hw/s390x: Add the possibility
+ to specify the netboot image on the command line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,98 +24,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: qemu-arm@nongnu.org, khaled.jmal@lauterbach.com, Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
 
-This is a callback to set the cp-regs registered by the dynamic XML.
+On 27.02.2018 12:32, Thomas Huth wrote:
+> The file name of the netboot binary is currently hard-coded to
+> "s390-netboot.img", without a possibility for the user to select
+> an alternative firmware image here. That's unfortunate, especially
+> since the basics are already there: The filename is a property of
+> the s390-ipl device. So we just have to add a check whether the user
+> already provided the property and only set the default if the string
+> is still empty. Now it is possible to select a different firmware
+> image with "-global s390-ipl.netboot_fw=/path/to/s390-netboot.img".
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/s390x/s390-virtio-ccw.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 4abbe89..7b3fb5f 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -254,8 +254,10 @@ static void s390_init_ipl_dev(const char *kernel_filename,
+>      }
+>      qdev_prop_set_string(dev, "cmdline", kernel_cmdline);
+>      qdev_prop_set_string(dev, "firmware", firmware);
+> -    qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
+>      qdev_prop_set_bit(dev, "enforce_bios", enforce_bios);
+> +    if (!strlen(object_property_get_str(new, "netboot_fw", &error_abort))) {
 
-Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
----
->> Some of our customers need to connect to Qemu using our tool TRACE32® 
->> via GDB,
->> and for some use case they need to have write access to some particular 
->> cpregs.
->> So, it will be nice to have this capability!
->> Usually, a user won't modify these registers unless he knows what he is 
->> doing!
+Isn't it the case that object_property_get_str() can return also NULL?
 
-> I also still don't really like using write_raw_cp_reg() here --
-> it will bypass some behaviour you want and in some cases will
-> just break the emulation because invariants we assume will
-> hold no longer hold. It would be a lot lot safer to not
-> provide write access at all, only read access.
+(looking at s390_ipl_set_loadparm())
 
-Adding to that our customers may need this write access, our tool TRACE32®
-needs this also in some particular cases. For example: temporary disabling MMU
-to do a physical memory access.
-
- target/arm/cpu.h     |  2 ++
- target/arm/gdbstub.c | 21 ++++++++++++++++++++-
- target/arm/helper.c  |  2 +-
- 3 files changed, 23 insertions(+), 2 deletions(-)
-
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 0e35f64..f4fea98 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -2120,6 +2120,8 @@ static inline bool cp_access_ok(int current_el,
- /* Raw read of a coprocessor register (as needed for migration, etc) */
- uint64_t read_raw_cp_reg(CPUARMState *env, const ARMCPRegInfo *ri);
- 
-+void write_raw_cp_reg(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t v);
-+
- /**
-  * write_list_to_cpustate
-  * @cpu: ARMCPU
-diff --git a/target/arm/gdbstub.c b/target/arm/gdbstub.c
-index e08ad79..57bd418 100644
---- a/target/arm/gdbstub.c
-+++ b/target/arm/gdbstub.c
-@@ -183,12 +183,31 @@ static int arm_gdb_get_sysreg(CPUARMState *env, uint8_t *buf, int reg)
-     return 0;
- }
- 
-+static int arm_gdb_set_sysreg(CPUARMState *env, uint8_t *buf, int reg)
-+{
-+    ARMCPU *cpu = arm_env_get_cpu(env);
-+    const ARMCPRegInfo *ri;
-+    uint32_t key;
-+    uint32_t tmp;
-+
-+    tmp = ldl_p(buf);
-+    key = cpu->dyn_xml.cpregs_keys[reg];
-+    ri = get_arm_cp_reginfo(arm_env_get_cpu(env)->cp_regs, key);
-+    if (ri) {
-+        if (!(ri->type & ARM_CP_CONST)) {
-+            write_raw_cp_reg(env, ri, tmp);
-+            return cpreg_field_is_64bit(ri) ? 8 : 4;
-+        }
-+    }
-+    return 0;
-+}
-+
- void arm_register_gdb_regs_for_features(CPUState *cs)
- {
-     int n;
- 
-     n = arm_gen_dynamic_xml(cs);
--    gdb_register_coprocessor(cs, arm_gdb_get_sysreg, NULL,
-+    gdb_register_coprocessor(cs, arm_gdb_get_sysreg, arm_gdb_set_sysreg,
-                              n, "system-registers.xml", 0);
- 
- }
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 1594ec45..4a4afbf 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -200,7 +200,7 @@ uint64_t read_raw_cp_reg(CPUARMState *env, const ARMCPRegInfo *ri)
-     }
- }
- 
--static void write_raw_cp_reg(CPUARMState *env, const ARMCPRegInfo *ri,
-+void write_raw_cp_reg(CPUARMState *env, const ARMCPRegInfo *ri,
-                              uint64_t v)
- {
-     /* Raw write of a coprocessor register (as needed for migration, etc).
+> +        qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
+> +    }
+>      object_property_add_child(qdev_get_machine(), TYPE_S390_IPL,
+>                                new, NULL);
+>      object_unref(new);
+> 
 -- 
-2.7.4
+
+Thanks,
+
+David / dhildenb
