@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1er8PY-0000YF-8K
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:33:16 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1er8Pd-0000bO-1y
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:33:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1er8PW-000236-CJ
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:33:12 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1er8Pa-000293-Fi
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:33:17 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Wed, 28 Feb 2018 20:32:38 +0000
-Message-Id: <20180228203243.1413-8-mark.cave-ayland@ilande.co.uk>
+Date: Wed, 28 Feb 2018 20:32:40 +0000
+Message-Id: <20180228203243.1413-10-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20180228203243.1413-1-mark.cave-ayland@ilande.co.uk>
 References: <20180228203243.1413-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCHv3 07/12] mac_oldworld: use object link to pass
- heathrow PIC object to macio
+Subject: [Qemu-devel] [PATCHv3 09/12] openpic: move OpenPIC state and
+ related definitions to openpic.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,109 +22,382 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-Also switch macio_oldworld_realize() over to use it rather than using the pic_mem
-memory region directly.
+This is to faciliate access to OpenPICState when wiring up the PIC to the macio
+controller.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/misc/macio/macio.c         | 14 ++++++++++----
- hw/ppc/mac_oldworld.c         |  8 +++++---
- include/hw/misc/macio/macio.h |  2 ++
- 3 files changed, 17 insertions(+), 7 deletions(-)
+ hw/intc/openpic.c        | 157 ----------------------------------------------
+ include/hw/ppc/openpic.h | 159 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 158 insertions(+), 158 deletions(-)
 
-diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-index 4e502ede2e..d4c1d190c4 100644
---- a/hw/misc/macio/macio.c
-+++ b/hw/misc/macio/macio.c
-@@ -31,6 +31,7 @@
- #include "hw/ppc/mac_dbdma.h"
- #include "hw/char/escc.h"
- #include "hw/misc/macio/macio.h"
-+#include "hw/intc/heathrow_pic.h"
+diff --git a/hw/intc/openpic.c b/hw/intc/openpic.c
+index 9159a06f07..811cee9b26 100644
+--- a/hw/intc/openpic.c
++++ b/hw/intc/openpic.c
+@@ -63,10 +63,6 @@ static int get_current_cpu(void);
+         } \
+     } while (0)
  
- /*
-  * The mac-io has two interfaces to the ESCC. One is called "escc-legacy",
-@@ -167,10 +168,10 @@ static void macio_oldworld_realize(PCIDevice *d, Error **errp)
-                                 sysbus_mmio_get_region(sysbus_dev, 0));
-     pmac_format_nvram_partition(&os->nvram, os->nvram.size);
+-#define MAX_CPU     32
+-#define MAX_MSI     8
+-#define VID         0x03 /* MPIC version ID */
+-
+ /* OpenPIC capability flags */
+ #define OPENPIC_FLAG_IDR_CRIT     (1 << 0)
+ #define OPENPIC_FLAG_ILR          (2 << 0)
+@@ -85,35 +81,6 @@ static int get_current_cpu(void);
+ #define OPENPIC_CPU_REG_START        0x20000
+ #define OPENPIC_CPU_REG_SIZE         0x100 + ((MAX_CPU - 1) * 0x1000)
  
--    if (s->pic_mem) {
--        /* Heathrow PIC */
--        memory_region_add_subregion(&s->bar, 0x00000, s->pic_mem);
--    }
-+    /* Heathrow PIC */
-+    sysbus_dev = SYS_BUS_DEVICE(os->pic);
-+    memory_region_add_subregion(&s->bar, 0x0,
-+                                sysbus_mmio_get_region(sysbus_dev, 0));
+-/* Raven */
+-#define RAVEN_MAX_CPU      2
+-#define RAVEN_MAX_EXT     48
+-#define RAVEN_MAX_IRQ     64
+-#define RAVEN_MAX_TMR      OPENPIC_MAX_TMR
+-#define RAVEN_MAX_IPI      OPENPIC_MAX_IPI
+-
+-/* KeyLargo */
+-#define KEYLARGO_MAX_CPU  4
+-#define KEYLARGO_MAX_EXT  64
+-#define KEYLARGO_MAX_IPI  4
+-#define KEYLARGO_MAX_IRQ  (64 + KEYLARGO_MAX_IPI)
+-#define KEYLARGO_MAX_TMR  0
+-#define KEYLARGO_IPI_IRQ  (KEYLARGO_MAX_EXT) /* First IPI IRQ */
+-/* Timers don't exist but this makes the code happy... */
+-#define KEYLARGO_TMR_IRQ  (KEYLARGO_IPI_IRQ + KEYLARGO_MAX_IPI)
+-
+-/* Interrupt definitions */
+-#define RAVEN_FE_IRQ     (RAVEN_MAX_EXT)     /* Internal functional IRQ */
+-#define RAVEN_ERR_IRQ    (RAVEN_MAX_EXT + 1) /* Error IRQ */
+-#define RAVEN_TMR_IRQ    (RAVEN_MAX_EXT + 2) /* First timer IRQ */
+-#define RAVEN_IPI_IRQ    (RAVEN_TMR_IRQ + RAVEN_MAX_TMR) /* First IPI IRQ */
+-/* First doorbell IRQ */
+-#define RAVEN_DBL_IRQ    (RAVEN_IPI_IRQ + (RAVEN_MAX_CPU * RAVEN_MAX_IPI))
+-
+-typedef struct FslMpicInfo {
+-    int max_ext;
+-} FslMpicInfo;
+-
+ static FslMpicInfo fsl_mpic_20 = {
+     .max_ext = 12,
+ };
+@@ -211,55 +178,6 @@ static void openpic_cpu_write_internal(void *opaque, hwaddr addr,
+                                        uint32_t val, int idx);
+ static void openpic_reset(DeviceState *d);
  
-     /* IDE buses */
-     for (i = 0; i < ARRAY_SIZE(os->ide); i++) {
-@@ -208,6 +209,11 @@ static void macio_oldworld_init(Object *obj)
+-typedef enum IRQType {
+-    IRQ_TYPE_NORMAL = 0,
+-    IRQ_TYPE_FSLINT,        /* FSL internal interrupt -- level only */
+-    IRQ_TYPE_FSLSPECIAL,    /* FSL timer/IPI interrupt, edge, no polarity */
+-} IRQType;
+-
+-/* Round up to the nearest 64 IRQs so that the queue length
+- * won't change when moving between 32 and 64 bit hosts.
+- */
+-#define IRQQUEUE_SIZE_BITS ((OPENPIC_MAX_IRQ + 63) & ~63)
+-
+-typedef struct IRQQueue {
+-    unsigned long *queue;
+-    int32_t queue_size; /* Only used for VMSTATE_BITMAP */
+-    int next;
+-    int priority;
+-} IRQQueue;
+-
+-typedef struct IRQSource {
+-    uint32_t ivpr;  /* IRQ vector/priority register */
+-    uint32_t idr;   /* IRQ destination register */
+-    uint32_t destmask; /* bitmap of CPU destinations */
+-    int last_cpu;
+-    int output;     /* IRQ level, e.g. OPENPIC_OUTPUT_INT */
+-    int pending;    /* TRUE if IRQ is pending */
+-    IRQType type;
+-    bool level:1;   /* level-triggered */
+-    bool nomask:1;  /* critical interrupts ignore mask on some FSL MPICs */
+-} IRQSource;
+-
+-#define IVPR_MASK_SHIFT       31
+-#define IVPR_MASK_MASK        (1U << IVPR_MASK_SHIFT)
+-#define IVPR_ACTIVITY_SHIFT   30
+-#define IVPR_ACTIVITY_MASK    (1U << IVPR_ACTIVITY_SHIFT)
+-#define IVPR_MODE_SHIFT       29
+-#define IVPR_MODE_MASK        (1U << IVPR_MODE_SHIFT)
+-#define IVPR_POLARITY_SHIFT   23
+-#define IVPR_POLARITY_MASK    (1U << IVPR_POLARITY_SHIFT)
+-#define IVPR_SENSE_SHIFT      22
+-#define IVPR_SENSE_MASK       (1U << IVPR_SENSE_SHIFT)
+-
+-#define IVPR_PRIORITY_MASK     (0xFU << 16)
+-#define IVPR_PRIORITY(_ivprr_) ((int)(((_ivprr_) & IVPR_PRIORITY_MASK) >> 16))
+-#define IVPR_VECTOR(opp, _ivprr_) ((_ivprr_) & (opp)->vector_mask)
+-
+-/* IDR[EP/CI] are only for FSL MPIC prior to v4.0 */
+-#define IDR_EP      0x80000000  /* external pin */
+-#define IDR_CI      0x40000000  /* critical interrupt */
+-
+ /* Convert between openpic clock ticks and nanosecs.  In the hardware the clock
+    frequency is driven by board inputs to the PIC which the PIC would then
+    divide by 4 or 8.  For now hard code to 25MZ.
+@@ -275,81 +193,6 @@ static inline uint64_t ticks_to_ns(uint64_t ticks)
+     return ticks * OPENPIC_TIMER_NS_PER_TICK;
+ }
  
-     qdev_init_gpio_out(DEVICE(obj), os->irqs, ARRAY_SIZE(os->irqs));
+-typedef struct OpenPICTimer {
+-    uint32_t tccr;  /* Global timer current count register */
+-    uint32_t tbcr;  /* Global timer base count register */
+-    int                   n_IRQ;
+-    bool                  qemu_timer_active; /* Is the qemu_timer is running? */
+-    struct QEMUTimer     *qemu_timer;
+-    struct OpenPICState  *opp;          /* Device timer is part of. */
+-    /* The QEMU_CLOCK_VIRTUAL time (in ns) corresponding to the last
+-       current_count written or read, only defined if qemu_timer_active. */
+-    uint64_t              origin_time;
+-} OpenPICTimer;
+-
+-typedef struct OpenPICMSI {
+-    uint32_t msir;   /* Shared Message Signaled Interrupt Register */
+-} OpenPICMSI;
+-
+-typedef struct IRQDest {
+-    int32_t ctpr; /* CPU current task priority */
+-    IRQQueue raised;
+-    IRQQueue servicing;
+-    qemu_irq *irqs;
+-
+-    /* Count of IRQ sources asserting on non-INT outputs */
+-    uint32_t outputs_active[OPENPIC_OUTPUT_NB];
+-} IRQDest;
+-
+-#define OPENPIC(obj) OBJECT_CHECK(OpenPICState, (obj), TYPE_OPENPIC)
+-
+-typedef struct OpenPICState {
+-    /*< private >*/
+-    SysBusDevice parent_obj;
+-    /*< public >*/
+-
+-    MemoryRegion mem;
+-
+-    /* Behavior control */
+-    FslMpicInfo *fsl;
+-    uint32_t model;
+-    uint32_t flags;
+-    uint32_t nb_irqs;
+-    uint32_t vid;
+-    uint32_t vir; /* Vendor identification register */
+-    uint32_t vector_mask;
+-    uint32_t tfrr_reset;
+-    uint32_t ivpr_reset;
+-    uint32_t idr_reset;
+-    uint32_t brr1;
+-    uint32_t mpic_mode_mask;
+-
+-    /* Sub-regions */
+-    MemoryRegion sub_io_mem[6];
+-
+-    /* Global registers */
+-    uint32_t frr; /* Feature reporting register */
+-    uint32_t gcr; /* Global configuration register  */
+-    uint32_t pir; /* Processor initialization register */
+-    uint32_t spve; /* Spurious vector register */
+-    uint32_t tfrr; /* Timer frequency reporting register */
+-    /* Source registers */
+-    IRQSource src[OPENPIC_MAX_IRQ];
+-    /* Local registers per output pin */
+-    IRQDest dst[MAX_CPU];
+-    uint32_t nb_cpus;
+-    /* Timer registers */
+-    OpenPICTimer timers[OPENPIC_MAX_TMR];
+-    uint32_t max_tmr;
+-
+-    /* Shared MSI registers */
+-    OpenPICMSI msi[MAX_MSI];
+-    uint32_t max_irq;
+-    uint32_t irq_ipi0;
+-    uint32_t irq_tim0;
+-    uint32_t irq_msi;
+-} OpenPICState;
+-
+ static inline void IRQ_setbit(IRQQueue *q, int n_IRQ)
+ {
+     set_bit(n_IRQ, q->queue);
+diff --git a/include/hw/ppc/openpic.h b/include/hw/ppc/openpic.h
+index 693e981965..5eb982197d 100644
+--- a/include/hw/ppc/openpic.h
++++ b/include/hw/ppc/openpic.h
+@@ -2,10 +2,13 @@
+ #define OPENPIC_H
  
-+    object_property_add_link(obj, "pic", TYPE_HEATHROW,
-+                             (Object **) &os->pic,
-+                             qdev_prop_allow_set_link_before_realize,
-+                             0, NULL);
+ #include "qemu-common.h"
++#include "hw/sysbus.h"
+ #include "hw/qdev-core.h"
+ #include "qom/cpu.h"
+ 
+-#define TYPE_OPENPIC "openpic"
++#define MAX_CPU     32
++#define MAX_MSI     8
++#define VID         0x03 /* MPIC version ID */
+ 
+ /* OpenPIC have 5 outputs per CPU connected and one IRQ out single output */
+ enum {
+@@ -28,4 +31,158 @@ enum {
+ #define OPENPIC_MAX_IRQ     (OPENPIC_MAX_SRC + OPENPIC_MAX_IPI + \
+                              OPENPIC_MAX_TMR)
+ 
++/* Raven */
++#define RAVEN_MAX_CPU      2
++#define RAVEN_MAX_EXT     48
++#define RAVEN_MAX_IRQ     64
++#define RAVEN_MAX_TMR      OPENPIC_MAX_TMR
++#define RAVEN_MAX_IPI      OPENPIC_MAX_IPI
 +
-     object_initialize(&os->nvram, sizeof(os->nvram), TYPE_MACIO_NVRAM);
-     dev = DEVICE(&os->nvram);
-     qdev_prop_set_uint32(dev, "size", 0x2000);
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index 5903ff47d3..3ac5b19073 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -93,7 +93,7 @@ static void ppc_heathrow_init(MachineState *machine)
-     uint32_t kernel_base, initrd_base, cmdline_base = 0;
-     int32_t kernel_size, initrd_size;
-     PCIBus *pci_bus;
--    PCIDevice *macio;
-+    OldWorldMacIOState *macio;
-     MACIOIDEState *macio_ide;
-     DeviceState *dev, *pic_dev;
-     SysBusDevice *sbd;
-@@ -271,7 +271,7 @@ static void ppc_heathrow_init(MachineState *machine)
-     ide_drive_get(hd, ARRAY_SIZE(hd));
- 
-     /* MacIO */
--    macio = pci_create(pci_bus, -1, TYPE_OLDWORLD_MACIO);
-+    macio = OLDWORLD_MACIO(pci_create(pci_bus, -1, TYPE_OLDWORLD_MACIO));
-     dev = DEVICE(macio);
-     qdev_connect_gpio_out(dev, 0, pic[0x12]); /* CUDA */
-     qdev_connect_gpio_out(dev, 1, pic[0x10]); /* ESCC-B */
-@@ -281,8 +281,10 @@ static void ppc_heathrow_init(MachineState *machine)
-     qdev_connect_gpio_out(dev, 5, pic[0x0E]); /* IDE-1 */
-     qdev_connect_gpio_out(dev, 6, pic[0x03]); /* IDE-1 DMA */
-     qdev_prop_set_uint64(dev, "frequency", tbfreq);
-+    object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
-+                             &error_abort);
-     sbd = SYS_BUS_DEVICE(pic_dev);
--    macio_init(macio, sysbus_mmio_get_region(sbd, 0));
-+    macio_init(PCI_DEVICE(macio), sysbus_mmio_get_region(sbd, 0));
- 
-     macio_ide = MACIO_IDE(object_resolve_path_component(OBJECT(macio),
-                                                         "ide[0]"));
-diff --git a/include/hw/misc/macio/macio.h b/include/hw/misc/macio/macio.h
-index e1e249f898..843c114c07 100644
---- a/include/hw/misc/macio/macio.h
-+++ b/include/hw/misc/macio/macio.h
-@@ -26,6 +26,7 @@
- #ifndef MACIO_H
- #define MACIO_H
- 
-+#include "hw/intc/heathrow_pic.h"
- #include "hw/misc/macio/cuda.h"
- #include "hw/ppc/mac_dbdma.h"
- 
-@@ -54,6 +55,7 @@ typedef struct OldWorldMacIOState {
-     MacIOState parent_obj;
-     /*< public >*/
- 
-+    HeathrowState *pic;
-     qemu_irq irqs[7];
- 
-     MacIONVRAMState nvram;
++/* KeyLargo */
++#define KEYLARGO_MAX_CPU  4
++#define KEYLARGO_MAX_EXT  64
++#define KEYLARGO_MAX_IPI  4
++#define KEYLARGO_MAX_IRQ  (64 + KEYLARGO_MAX_IPI)
++#define KEYLARGO_MAX_TMR  0
++#define KEYLARGO_IPI_IRQ  (KEYLARGO_MAX_EXT) /* First IPI IRQ */
++/* Timers don't exist but this makes the code happy... */
++#define KEYLARGO_TMR_IRQ  (KEYLARGO_IPI_IRQ + KEYLARGO_MAX_IPI)
++
++/* Interrupt definitions */
++#define RAVEN_FE_IRQ     (RAVEN_MAX_EXT)     /* Internal functional IRQ */
++#define RAVEN_ERR_IRQ    (RAVEN_MAX_EXT + 1) /* Error IRQ */
++#define RAVEN_TMR_IRQ    (RAVEN_MAX_EXT + 2) /* First timer IRQ */
++#define RAVEN_IPI_IRQ    (RAVEN_TMR_IRQ + RAVEN_MAX_TMR) /* First IPI IRQ */
++/* First doorbell IRQ */
++#define RAVEN_DBL_IRQ    (RAVEN_IPI_IRQ + (RAVEN_MAX_CPU * RAVEN_MAX_IPI))
++
++typedef struct FslMpicInfo {
++    int max_ext;
++} FslMpicInfo;
++
++typedef enum IRQType {
++    IRQ_TYPE_NORMAL = 0,
++    IRQ_TYPE_FSLINT,        /* FSL internal interrupt -- level only */
++    IRQ_TYPE_FSLSPECIAL,    /* FSL timer/IPI interrupt, edge, no polarity */
++} IRQType;
++
++/* Round up to the nearest 64 IRQs so that the queue length
++ * won't change when moving between 32 and 64 bit hosts.
++ */
++#define IRQQUEUE_SIZE_BITS ((OPENPIC_MAX_IRQ + 63) & ~63)
++
++typedef struct IRQQueue {
++    unsigned long *queue;
++    int32_t queue_size; /* Only used for VMSTATE_BITMAP */
++    int next;
++    int priority;
++} IRQQueue;
++
++typedef struct IRQSource {
++    uint32_t ivpr;  /* IRQ vector/priority register */
++    uint32_t idr;   /* IRQ destination register */
++    uint32_t destmask; /* bitmap of CPU destinations */
++    int last_cpu;
++    int output;     /* IRQ level, e.g. OPENPIC_OUTPUT_INT */
++    int pending;    /* TRUE if IRQ is pending */
++    IRQType type;
++    bool level:1;   /* level-triggered */
++    bool nomask:1;  /* critical interrupts ignore mask on some FSL MPICs */
++} IRQSource;
++
++#define IVPR_MASK_SHIFT       31
++#define IVPR_MASK_MASK        (1U << IVPR_MASK_SHIFT)
++#define IVPR_ACTIVITY_SHIFT   30
++#define IVPR_ACTIVITY_MASK    (1U << IVPR_ACTIVITY_SHIFT)
++#define IVPR_MODE_SHIFT       29
++#define IVPR_MODE_MASK        (1U << IVPR_MODE_SHIFT)
++#define IVPR_POLARITY_SHIFT   23
++#define IVPR_POLARITY_MASK    (1U << IVPR_POLARITY_SHIFT)
++#define IVPR_SENSE_SHIFT      22
++#define IVPR_SENSE_MASK       (1U << IVPR_SENSE_SHIFT)
++
++#define IVPR_PRIORITY_MASK     (0xFU << 16)
++#define IVPR_PRIORITY(_ivprr_) ((int)(((_ivprr_) & IVPR_PRIORITY_MASK) >> 16))
++#define IVPR_VECTOR(opp, _ivprr_) ((_ivprr_) & (opp)->vector_mask)
++
++/* IDR[EP/CI] are only for FSL MPIC prior to v4.0 */
++#define IDR_EP      0x80000000  /* external pin */
++#define IDR_CI      0x40000000  /* critical interrupt */
++
++typedef struct OpenPICTimer {
++    uint32_t tccr;  /* Global timer current count register */
++    uint32_t tbcr;  /* Global timer base count register */
++    int                   n_IRQ;
++    bool                  qemu_timer_active; /* Is the qemu_timer is running? */
++    struct QEMUTimer     *qemu_timer;
++    struct OpenPICState  *opp;          /* Device timer is part of. */
++    /* The QEMU_CLOCK_VIRTUAL time (in ns) corresponding to the last
++       current_count written or read, only defined if qemu_timer_active. */
++    uint64_t              origin_time;
++} OpenPICTimer;
++
++typedef struct OpenPICMSI {
++    uint32_t msir;   /* Shared Message Signaled Interrupt Register */
++} OpenPICMSI;
++
++typedef struct IRQDest {
++    int32_t ctpr; /* CPU current task priority */
++    IRQQueue raised;
++    IRQQueue servicing;
++    qemu_irq *irqs;
++
++    /* Count of IRQ sources asserting on non-INT outputs */
++    uint32_t outputs_active[OPENPIC_OUTPUT_NB];
++} IRQDest;
++
++#define TYPE_OPENPIC "openpic"
++#define OPENPIC(obj) OBJECT_CHECK(OpenPICState, (obj), TYPE_OPENPIC)
++
++typedef struct OpenPICState {
++    /*< private >*/
++    SysBusDevice parent_obj;
++    /*< public >*/
++
++    MemoryRegion mem;
++
++    /* Behavior control */
++    FslMpicInfo *fsl;
++    uint32_t model;
++    uint32_t flags;
++    uint32_t nb_irqs;
++    uint32_t vid;
++    uint32_t vir; /* Vendor identification register */
++    uint32_t vector_mask;
++    uint32_t tfrr_reset;
++    uint32_t ivpr_reset;
++    uint32_t idr_reset;
++    uint32_t brr1;
++    uint32_t mpic_mode_mask;
++
++    /* Sub-regions */
++    MemoryRegion sub_io_mem[6];
++
++    /* Global registers */
++    uint32_t frr; /* Feature reporting register */
++    uint32_t gcr; /* Global configuration register  */
++    uint32_t pir; /* Processor initialization register */
++    uint32_t spve; /* Spurious vector register */
++    uint32_t tfrr; /* Timer frequency reporting register */
++    /* Source registers */
++    IRQSource src[OPENPIC_MAX_IRQ];
++    /* Local registers per output pin */
++    IRQDest dst[MAX_CPU];
++    uint32_t nb_cpus;
++    /* Timer registers */
++    OpenPICTimer timers[OPENPIC_MAX_TMR];
++    uint32_t max_tmr;
++
++    /* Shared MSI registers */
++    OpenPICMSI msi[MAX_MSI];
++    uint32_t max_irq;
++    uint32_t irq_ipi0;
++    uint32_t irq_tim0;
++    uint32_t irq_msi;
++} OpenPICState;
++
+ #endif /* OPENPIC_H */
 -- 
 2.11.0
