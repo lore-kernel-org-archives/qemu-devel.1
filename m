@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1er1CS-0006FS-GY
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:51:13 -0500
+	(envelope-from <peterx@redhat.com>) id 1er1Dh-0006yj-JJ
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:52:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1er1CM-0001eM-L4
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:51:12 -0500
-Resent-Message-Id: <E1er1CM-0001eM-L4@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21058)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1er1CM-0001RL-Bc
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:51:06 -0500
-In-Reply-To: <20180228123110.6507-1-kraxel@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151982223322.1245.4175399650248516911@bdbb90650ae5>
+	(envelope-from <peterx@redhat.com>) id 1er1De-00028Y-Fr
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:52:29 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35468 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1er1De-00028O-9Z
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:52:26 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D15194075166
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 12:52:25 +0000 (UTC)
+Date: Wed, 28 Feb 2018 20:52:16 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180228125216.GH27381@xz-mi>
+References: <20180228050633.7410-1-peterx@redhat.com>
+	<20180228050633.7410-8-peterx@redhat.com>
+	<20180228092511.GG31550@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 28 Feb 2018 04:50:35 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v6 0/9] vfio: add display support
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180228092511.GG31550@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 07/14] qio/chardev: update net listener
+ gcontext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +36,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, alex.williamson@redhat.com, intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com, tina.zhang@intel.com
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMjI4MTIzMTEwLjY1MDctMS1rcmF4ZWxAcmVkaGF0LmNvbQpTdWJqZWN0
-OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY2IDAvOV0gdmZpbzogYWRkIGRpc3BsYXkgc3VwcG9ydAoK
-PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3Rh
-bD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNv
-bW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGlu
-ICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBs
-b2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0
-PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAg
-ICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0
-ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4
-NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hl
-dy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDIy
-ODEyMzExMC42NTA3LTEta3JheGVsQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MDIyODEyMzEx
-MC42NTA3LTEta3JheGVsQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
-JwoyYWRkNmUyOTQxIHZmaW8vZGlzcGxheTogYWRkaW5nIGRtYWJ1ZiBzdXBwb3J0CmNjZGY0MWQy
-OTIgdmZpby9kaXNwbGF5OiBhZGRpbmcgcmVnaW9uIHN1cHBvcnQKN2U3MGFiZGZhMiB2ZmlvL2Rp
-c3BsYXk6IGNvcmUgJiB3aXJldXAKOWNkYmVhZjJiYiB2ZmlvL2NvbW1vbjogY2xlYW51cCBpbiB2
-ZmlvX3JlZ2lvbl9maW5hbGl6ZQpmYjdiOGQzMmY0IHNlY29uZGFyeS12Z2E6IHByb3Blcmx5IGNs
-b3NlIFFlbXVDb25zb2xlIG9uIHVucGx1Zwo3NTE2N2M3N2QzIGNvbnNvbGU6IG1pbmltYWwgaG90
-cGx1ZyBzdXBvcnQKYzdmMWVjOTk4OSB1aS9waXhtYW46IGFkZCBxZW11X2RybV9mb3JtYXRfdG9f
-cGl4bWFuKCkKMzk2NzI3MDUyMSBzdGFuZGFyZC1oZWFkZXJzOiBhZGQgZHJtL2RybV9mb3VyY2Mu
-aAo0OWVmYjJiMTk4IGxpbnV4LWhlYWRlcnM6IHVwZGF0ZSB0byA0LjE2LXJjMQoKPT09IE9VVFBV
-VCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS85OiBsaW51eC1oZWFkZXJzOiB1cGRhdGUgdG8g
-NC4xNi1yYzEuLi4KQ2hlY2tpbmcgUEFUQ0ggMi85OiBzdGFuZGFyZC1oZWFkZXJzOiBhZGQgZHJt
-L2RybV9mb3VyY2MuaC4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNDUzOiBG
-SUxFOiBzY3JpcHRzL3VwZGF0ZS1saW51eC1oZWFkZXJzLnNoOjE1ODoKK2NwX3BvcnRhYmxlICIk
-dG1wZGlyL2luY2x1ZGUvZHJtL2RybV9mb3VyY2MuaCIgIiRvdXRwdXQvaW5jbHVkZS9zdGFuZGFy
-ZC1oZWFkZXJzL2RybSIKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNDMzIGxpbmVzIGNo
-ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFU
-Q0ggMy85OiB1aS9waXhtYW46IGFkZCBxZW11X2RybV9mb3JtYXRfdG9fcGl4bWFuKCkuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggNC85OiBjb25zb2xlOiBtaW5pbWFsIGhvdHBsdWcgc3Vwb3J0Li4uCldBUk5J
-Tkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM4MjogRklMRTogdWkvY29uc29sZS5jOjE4Nzk6
-CisgICAgICAgIHMtPnVpX3RpbWVyID0gdGltZXJfbmV3X21zKFFFTVVfQ0xPQ0tfUkVBTFRJTUUs
-IGRweV9zZXRfdWlfaW5mb190aW1lciwgcyk7Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
-IDEzMiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-CkNoZWNraW5nIFBBVENIIDUvOTogc2Vjb25kYXJ5LXZnYTogcHJvcGVybHkgY2xvc2UgUWVtdUNv
-bnNvbGUgb24gdW5wbHVnLi4uCkNoZWNraW5nIFBBVENIIDYvOTogdmZpby9jb21tb246IGNsZWFu
-dXAgaW4gdmZpb19yZWdpb25fZmluYWxpemUuLi4KQ2hlY2tpbmcgUEFUQ0ggNy85OiB2ZmlvL2Rp
-c3BsYXk6IGNvcmUgJiB3aXJldXAuLi4KQ2hlY2tpbmcgUEFUQ0ggOC85OiB2ZmlvL2Rpc3BsYXk6
-IGFkZGluZyByZWdpb24gc3VwcG9ydC4uLgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3Nhcnkg
-Zm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxNDM6IEZJTEU6IGh3L3ZmaW8vZGlzcGxh
-eS5jOjE2MjoKKyAgICBpZiAoIXZkZXYtPmRweSkKWy4uLl0KCnRvdGFsOiAxIGVycm9ycywgMCB3
-YXJuaW5ncywgMTUzIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDkvOTogdmZpby9kaXNwbGF5OiBhZGRpbmcgZG1hYnVm
-IHN1cHBvcnQuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
-LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Wed, Feb 28, 2018 at 09:25:11AM +0000, Daniel P. Berrang=C3=A9 wrote:
+> On Wed, Feb 28, 2018 at 01:06:26PM +0800, Peter Xu wrote:
+> > TCP chardevs can be using QIO network listeners working in the
+> > background when in listening mode.  However the network listeners are
+> > always running in main context.  This can race with chardevs that are
+> > running in non-main contexts.
+> >=20
+> > To solve this: firstly introduce qio_net_listener_set_context() to al=
+low
+> > caller to set gcontext for network listeners.  Then call it in
+> > tcp_chr_update_read_handler(), with the newly cached gcontext.
+> >=20
+> > It's fairly straightforward after we have introduced some net listene=
+r
+> > helper functions - basically we unregister the GSources and add them
+> > back with the correct context.
+> >=20
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  chardev/char-socket.c     |  9 +++++++++
+> >  include/io/net-listener.h | 12 ++++++++++++
+> >  io/net-listener.c         |  7 +++++++
+> >  3 files changed, 28 insertions(+)
+> >=20
+> > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> > index 43a2cc2c1c..8f0935cd15 100644
+> > --- a/chardev/char-socket.c
+> > +++ b/chardev/char-socket.c
+> > @@ -559,6 +559,15 @@ static void tcp_chr_update_read_handler(Chardev =
+*chr)
+> >  {
+> >      SocketChardev *s =3D SOCKET_CHARDEV(chr);
+> > =20
+> > +    if (s->listener) {
+> > +        /*
+> > +         * It's possible that chardev context is changed in
+> > +         * qemu_chr_be_update_read_handlers().  Reset it for QIO net
+> > +         * listener if there is.
+> > +         */
+> > +        qio_net_listener_set_context(s->listener, chr->gcontext);
+> > +    }
+> > +
+> >      if (!s->connected) {
+> >          return;
+> >      }
+> > diff --git a/include/io/net-listener.h b/include/io/net-listener.h
+> > index 566be283b3..39dede9d6f 100644
+> > --- a/include/io/net-listener.h
+> > +++ b/include/io/net-listener.h
+> > @@ -106,6 +106,18 @@ int qio_net_listener_open_sync(QIONetListener *l=
+istener,
+> >                                 SocketAddress *addr,
+> >                                 Error **errp);
+> > =20
+> > +/**
+> > + * qio_net_listener_set_context:
+> > + * @listener: the net listener object
+> > + * @context: the context that we'd like to bind the sources to
+> > + *
+> > + * This helper does not do anything but moves existing net listener
+> > + * sources from the old one to the new one.  It can be seen as a
+> > + * no-operation if there is no listening source at all.
+> > + */
+> > +void qio_net_listener_set_context(QIONetListener *listener,
+> > +                                  GMainContext *context);
+>=20
+> I don't think this is a good design. The GMainContext should be provide=
+d
+> to the qio_net_listener_set_client_func method immediately, not updated
+> after the fact
+
+After the patches, this is qio_net_listener_set_client_func_full():
+
+void qio_net_listener_set_client_func_full(QIONetListener *listener,
+                                           QIONetListenerClientFunc func,
+                                           gpointer data,
+                                           GDestroyNotify notify,
+                                           GMainContext *context)
+{
+    if (listener->io_notify) {
+        listener->io_notify(listener->io_data);
+    }
+    listener->io_func =3D func;
+    listener->io_data =3D data;
+    listener->io_notify =3D notify;
+
+    qio_net_listener_sources_clear(listener);
+    qio_net_listener_sources_update(listener, context);
+}
+
+This is qio_net_listener_set_context():
+
+void qio_net_listener_set_context(QIONetListener *listener,
+                                  GMainContext *context)
+{
+    qio_net_listener_sources_clear(listener);
+    qio_net_listener_sources_update(listener, context);
+}
+
+So... Basically qio_net_listener_set_context() is just a simplified
+version of qio_net_listener_set_client_func_full(), but without
+passing in the funcs again.  So do you mean that I can just avoid
+introducing this function and call
+qio_net_listener_set_client_func_full() directly?
+
+Thanks,
+
+--=20
+Peter Xu
