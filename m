@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1er90Y-0001aU-Ml
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:28 -0500
+	(envelope-from <Babu.Moger@amd.com>) id 1er91h-0002cG-QU
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:12:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1er90U-0006BY-GW
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:26 -0500
-Received: from mail-dm3nam03on0058.outbound.protection.outlook.com
-	([104.47.41.58]:25985
-	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
+	(envelope-from <Babu.Moger@amd.com>) id 1er91d-0007t0-OW
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:12:37 -0500
+Received: from mail-sn1nam02on0045.outbound.protection.outlook.com
+	([104.47.36.45]:40416
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1er90U-00068d-8e
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:22 -0500
-From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Wed, 28 Feb 2018 15:10:27 -0600
-Message-Id: <20180228211028.83970-28-brijesh.singh@amd.com>
-In-Reply-To: <20180228211028.83970-1-brijesh.singh@amd.com>
-References: <20180228211028.83970-1-brijesh.singh@amd.com>
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1er91d-0007rG-Gk
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:12:33 -0500
+From: "Moger, Babu" <Babu.Moger@amd.com>
+Date: Wed, 28 Feb 2018 21:12:29 +0000
+Message-ID: <CY4PR12MB17686A4901388CD9C88A8D7D95C70@CY4PR12MB1768.namprd12.prod.outlook.com>
+References: <1519439425-27883-1-git-send-email-babu.moger@amd.com>
+	<1519439425-27883-2-git-send-email-babu.moger@amd.com>
+	<20180228173813.GA8418@flask>
+In-Reply-To: <20180228173813.GA8418@flask>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v10 27/28] sev/i386: add sev_get_capabilities()
+Subject: Re: [Qemu-devel] [PATCH v2 1/5] target/i386: Fix a minor typo found
+ while reviwing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,157 +32,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
+To: =?iso-8859-2?Q?Radim_Kr=E8m=E1=F8?= <rkrcmar@redhat.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pixo@polepetko.eu" <pixo@polepetko.eu>, "Hook, Gary" <Gary.Hook@amd.com>
 
-The function can be used to get the current SEV capabilities.
-The capabilities include platform diffie-hellman key (pdh) and certificate
-chain. The key can be provided to the external entities which wants to
-establish a trusted channel between SEV firmware and guest owner.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
----
- target/i386/monitor.c  | 10 ++++++-
- target/i386/sev-stub.c |  5 ++++
- target/i386/sev.c      | 78 ++++++++++++++++++++++++++++++++++++++++++++++++++
- target/i386/sev_i386.h |  1 +
- 4 files changed, 93 insertions(+), 1 deletion(-)
+> -----Original Message-----
+> From: Radim Kr=E8m=E1=F8 [mailto:rkrcmar@redhat.com]
+> Sent: Wednesday, February 28, 2018 11:38 AM
+> To: Moger, Babu <Babu.Moger@amd.com>
+> Cc: pbonzini@redhat.com; rth@twiddle.net; ehabkost@redhat.com;
+> mtosatti@redhat.com; qemu-devel@nongnu.org; kvm@vger.kernel.org;
+> pixo@polepetko.eu; Hook, Gary <Gary.Hook@amd.com>
+> Subject: Re: [PATCH v2 1/5] target/i386: Fix a minor typo found while
+> reviwing
+>=20
+> 2018-02-23 21:30-0500, Babu Moger:
+> > Changed KVM_CPUID_FLAG_SIGNIFCANT_INDEX to
+> KVM_CPUID_FLAG_SIGNIFICANT_INDEX
+> >
+> > Signed-off-by: Babu Moger <babu.moger@amd.com>
+> > ---
+> >  linux-headers/asm-x86/kvm.h | 2 +-
+> >  target/i386/kvm.c           | 2 +-
+> >  2 files changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
+> > index f3a9604..6aec661 100644
+> > --- a/linux-headers/asm-x86/kvm.h
+> > +++ b/linux-headers/asm-x86/kvm.h
+> > @@ -220,7 +220,7 @@ struct kvm_cpuid_entry2 {
+> >  	__u32 padding[3];
+> >  };
+> >
+> > -#define KVM_CPUID_FLAG_SIGNIFCANT_INDEX		(1 << 0)
+>=20
+> The typo is in the original kernel header and we periodically copy it
+> over with scripts/update-linux-headers.sh, so this change would only add
+> overhead in the long run.
 
-diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-index 1b55dd0fff88..b914915d9171 100644
---- a/target/i386/monitor.c
-+++ b/target/i386/monitor.c
-@@ -740,5 +740,13 @@ SevLaunchMeasureInfo *qmp_query_sev_launch_measure(Error **errp)
- 
- SevCapability *qmp_query_sev_capabilities(Error **errp)
- {
--    return NULL;
-+    SevCapability *data;
-+
-+    data = sev_get_capabilities();
-+    if (!data) {
-+        error_setg(errp, "SEV feature is not available");
-+        return NULL;
-+    }
-+
-+    return data;
- }
-diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
-index 2f61c32ec975..59a003a4ebe6 100644
---- a/target/i386/sev-stub.c
-+++ b/target/i386/sev-stub.c
-@@ -44,3 +44,8 @@ char *sev_get_launch_measurement(void)
- {
-     return NULL;
- }
-+
-+SevCapability *sev_get_capabilities(void)
-+{
-+    return NULL;
-+}
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index ad94eeace1b0..20279177cdcd 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -421,6 +421,84 @@ sev_get_info(void)
-     return info;
- }
- 
-+static int
-+sev_get_pdh_info(int fd, guchar **pdh, size_t *pdh_len, guchar **cert_chain,
-+                 size_t *cert_chain_len)
-+{
-+    guchar *pdh_data, *cert_chain_data;
-+    struct sev_user_data_pdh_cert_export export = {};
-+    int err, r;
-+
-+    /* query the certificate length */
-+    r = sev_platform_ioctl(fd, SEV_PDH_CERT_EXPORT, &export, &err);
-+    if (r < 0) {
-+        if (err != SEV_RET_INVALID_LEN) {
-+            error_report("failed to export PDH cert ret=%d fw_err=%d (%s)",
-+                         r, err, fw_error_to_str(err));
-+            return 1;
-+        }
-+    }
-+
-+    pdh_data = g_new(guchar, export.pdh_cert_len);
-+    cert_chain_data = g_new(guchar, export.cert_chain_len);
-+    export.pdh_cert_address = (unsigned long)pdh_data;
-+    export.cert_chain_address = (unsigned long)cert_chain_data;
-+
-+    r = sev_platform_ioctl(fd, SEV_PDH_CERT_EXPORT, &export, &err);
-+    if (r < 0) {
-+        error_report("failed to export PDH cert ret=%d fw_err=%d (%s)",
-+                     r, err, fw_error_to_str(err));
-+        goto e_free;
-+    }
-+
-+    *pdh = pdh_data;
-+    *pdh_len = export.pdh_cert_len;
-+    *cert_chain = cert_chain_data;
-+    *cert_chain_len = export.cert_chain_len;
-+    return 0;
-+
-+e_free:
-+    g_free(pdh_data);
-+    g_free(cert_chain_data);
-+    return 1;
-+}
-+
-+SevCapability *
-+sev_get_capabilities(void)
-+{
-+    SevCapability *cap;
-+    guchar *pdh_data, *cert_chain_data;
-+    size_t pdh_len = 0, cert_chain_len = 0;
-+    uint32_t ebx;
-+    int fd;
-+
-+    fd = open(DEFAULT_SEV_DEVICE, O_RDWR);
-+    if (fd < 0) {
-+        error_report("%s: Failed to open %s '%s'", __func__,
-+                     DEFAULT_SEV_DEVICE, strerror(errno));
-+        return NULL;
-+    }
-+
-+    if (sev_get_pdh_info(fd, &pdh_data, &pdh_len,
-+                         &cert_chain_data, &cert_chain_len)) {
-+        return NULL;
-+    }
-+
-+    cap = g_new0(SevCapability, 1);
-+    cap->pdh = g_base64_encode(pdh_data, pdh_len);
-+    cap->cert_chain = g_base64_encode(cert_chain_data, cert_chain_len);
-+
-+    host_cpuid(0x8000001F, 0, NULL, &ebx, NULL, NULL);
-+    cap->cbitpos = ebx & 0x3f;
-+    cap->reduced_phys_bits = (ebx  >> 6) & 0x3f;
-+
-+    g_free(pdh_data);
-+    g_free(cert_chain_data);
-+
-+    close(fd);
-+    return cap;
-+}
-+
- static int
- sev_read_file_base64(const char *filename, guchar **data, gsize *len)
- {
-diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
-index 2ecca66f6e64..cc89e273ccf6 100644
---- a/target/i386/sev_i386.h
-+++ b/target/i386/sev_i386.h
-@@ -43,6 +43,7 @@ extern SevInfo *sev_get_info(void);
- extern uint32_t sev_get_cbit_position(void);
- extern uint32_t sev_get_reduced_phys_bits(void);
- extern char *sev_get_launch_measurement(void);
-+extern SevCapability *sev_get_capabilities(void);
- 
- typedef struct QSevGuestInfo QSevGuestInfo;
- typedef struct QSevGuestInfoClass QSevGuestInfoClass;
--- 
-2.14.3
+Yes. I see that now.
+
+>=20
+> I'd keep the typo.
+
+Sure. I will drop this patch. Let me not complicate things.
+
+>=20
+> (The alternative is to add KVM_CPUID_FLAG_SIGNIFICANT_INDEX to the
+> linux
+>  header, so there would be both variants and use the correct one here.)
+>=20
+> Thanks.
+>=20
+> > +#define KVM_CPUID_FLAG_SIGNIFICANT_INDEX	(1 << 0)
+> >  #define KVM_CPUID_FLAG_STATEFUL_FUNC		(1 << 1)
+> >  #define KVM_CPUID_FLAG_STATE_READ_NEXT		(1 << 2)
+> >
+> > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> > index ad4b159..85856b6 100644
+> > --- a/target/i386/kvm.c
+> > +++ b/target/i386/kvm.c
+> > @@ -844,7 +844,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+> >                      break;
+> >                  }
+> >                  c->function =3D i;
+> > -                c->flags =3D KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+> > +                c->flags =3D KVM_CPUID_FLAG_SIGNIFICANT_INDEX;
+> >                  c->index =3D j;
+> >                  cpu_x86_cpuid(env, i, j, &c->eax, &c->ebx, &c->ecx, &c=
+->edx);
+> >
+> > --
+> > 1.8.3.1
+> >
