@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55849)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1er91h-0002cG-QU
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:12:38 -0500
+	(envelope-from <Babu.Moger@amd.com>) id 1er99S-0001AR-OX
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:20:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1er91d-0007t0-OW
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:12:37 -0500
-Received: from mail-sn1nam02on0045.outbound.protection.outlook.com
-	([104.47.36.45]:40416
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	(envelope-from <Babu.Moger@amd.com>) id 1er99P-0001ld-Ax
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:20:38 -0500
+Received: from mail-dm3nam03on0064.outbound.protection.outlook.com
+	([104.47.41.64]:31232
+	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1er91d-0007rG-Gk
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:12:33 -0500
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1er99P-0001kK-2z
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:20:35 -0500
 From: "Moger, Babu" <Babu.Moger@amd.com>
-Date: Wed, 28 Feb 2018 21:12:29 +0000
-Message-ID: <CY4PR12MB17686A4901388CD9C88A8D7D95C70@CY4PR12MB1768.namprd12.prod.outlook.com>
+Date: Wed, 28 Feb 2018 21:20:32 +0000
+Message-ID: <CY4PR12MB17689DD425516CB53270EE6995C70@CY4PR12MB1768.namprd12.prod.outlook.com>
 References: <1519439425-27883-1-git-send-email-babu.moger@amd.com>
 	<1519439425-27883-2-git-send-email-babu.moger@amd.com>
 	<20180228173813.GA8418@flask>
-In-Reply-To: <20180228173813.GA8418@flask>
+	<8df70311-a3fd-f27f-6054-9076fc3f23e3@redhat.com>
+In-Reply-To: <8df70311-a3fd-f27f-6054-9076fc3f23e3@redhat.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
 Subject: Re: [Qemu-devel] [PATCH v2 1/5] target/i386: Fix a minor typo found
  while reviwing
@@ -32,76 +33,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-2?Q?Radim_Kr=E8m=E1=F8?= <rkrcmar@redhat.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pixo@polepetko.eu" <pixo@polepetko.eu>, "Hook, Gary" <Gary.Hook@amd.com>
+To: Eric Blake <eblake@redhat.com>, =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "Hook,
+	Gary" <Gary.Hook@amd.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "pixo@polepetko.eu" <pixo@polepetko.eu>, "rth@twiddle.net" <rth@twiddle.net>
 
-
-> -----Original Message-----
-> From: Radim Kr=E8m=E1=F8 [mailto:rkrcmar@redhat.com]
-> Sent: Wednesday, February 28, 2018 11:38 AM
-> To: Moger, Babu <Babu.Moger@amd.com>
-> Cc: pbonzini@redhat.com; rth@twiddle.net; ehabkost@redhat.com;
-> mtosatti@redhat.com; qemu-devel@nongnu.org; kvm@vger.kernel.org;
-> pixo@polepetko.eu; Hook, Gary <Gary.Hook@amd.com>
-> Subject: Re: [PATCH v2 1/5] target/i386: Fix a minor typo found while
-> reviwing
->=20
-> 2018-02-23 21:30-0500, Babu Moger:
-> > Changed KVM_CPUID_FLAG_SIGNIFCANT_INDEX to
-> KVM_CPUID_FLAG_SIGNIFICANT_INDEX
-> >
-> > Signed-off-by: Babu Moger <babu.moger@amd.com>
-> > ---
-> >  linux-headers/asm-x86/kvm.h | 2 +-
-> >  target/i386/kvm.c           | 2 +-
-> >  2 files changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
-> > index f3a9604..6aec661 100644
-> > --- a/linux-headers/asm-x86/kvm.h
-> > +++ b/linux-headers/asm-x86/kvm.h
-> > @@ -220,7 +220,7 @@ struct kvm_cpuid_entry2 {
-> >  	__u32 padding[3];
-> >  };
-> >
-> > -#define KVM_CPUID_FLAG_SIGNIFCANT_INDEX		(1 << 0)
->=20
-> The typo is in the original kernel header and we periodically copy it
-> over with scripts/update-linux-headers.sh, so this change would only add
-> overhead in the long run.
-
-Yes. I see that now.
-
->=20
-> I'd keep the typo.
-
-Sure. I will drop this patch. Let me not complicate things.
-
->=20
-> (The alternative is to add KVM_CPUID_FLAG_SIGNIFICANT_INDEX to the
-> linux
->  header, so there would be both variants and use the correct one here.)
->=20
-> Thanks.
->=20
-> > +#define KVM_CPUID_FLAG_SIGNIFICANT_INDEX	(1 << 0)
-> >  #define KVM_CPUID_FLAG_STATEFUL_FUNC		(1 << 1)
-> >  #define KVM_CPUID_FLAG_STATE_READ_NEXT		(1 << 2)
-> >
-> > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> > index ad4b159..85856b6 100644
-> > --- a/target/i386/kvm.c
-> > +++ b/target/i386/kvm.c
-> > @@ -844,7 +844,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-> >                      break;
-> >                  }
-> >                  c->function =3D i;
-> > -                c->flags =3D KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
-> > +                c->flags =3D KVM_CPUID_FLAG_SIGNIFICANT_INDEX;
-> >                  c->index =3D j;
-> >                  cpu_x86_cpuid(env, i, j, &c->eax, &c->ebx, &c->ecx, &c=
-->edx);
-> >
-> > --
-> > 1.8.3.1
-> >
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEVyaWMgQmxha2UgW21haWx0
+bzplYmxha2VAcmVkaGF0LmNvbV0NCj4gU2VudDogV2VkbmVzZGF5LCBGZWJydWFyeSAyOCwgMjAx
+OCAxMjo0OSBQTQ0KPiBUbzogUmFkaW0gS3LEjW3DocWZIDxya3JjbWFyQHJlZGhhdC5jb20+OyBN
+b2dlciwgQmFidQ0KPiA8QmFidS5Nb2dlckBhbWQuY29tPg0KPiBDYzogZWhhYmtvc3RAcmVkaGF0
+LmNvbTsga3ZtQHZnZXIua2VybmVsLm9yZzsgbXRvc2F0dGlAcmVkaGF0LmNvbTsNCj4gSG9vaywg
+R2FyeSA8R2FyeS5Ib29rQGFtZC5jb20+OyBxZW11LWRldmVsQG5vbmdudS5vcmc7DQo+IHBib256
+aW5pQHJlZGhhdC5jb207IHBpeG9AcG9sZXBldGtvLmV1OyBydGhAdHdpZGRsZS5uZXQNCj4gU3Vi
+amVjdDogUmU6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMS81XSB0YXJnZXQvaTM4NjogRml4IGEg
+bWlub3IgdHlwbw0KPiBmb3VuZCB3aGlsZSByZXZpd2luZw0KPiANCj4gT24gMDIvMjgvMjAxOCAx
+MTozOCBBTSwgUmFkaW0gS3LEjW3DocWZIHdyb3RlOg0KPiA+IDIwMTgtMDItMjMgMjE6MzAtMDUw
+MCwgQmFidSBNb2dlcjoNCj4gDQo+IEluIHRoZSBzdWJqZWN0IGxpbmU6IHMvcmV2aXdpbmcvcmV2
+aWV3aW5nLyAgW0l0J3MgbmV2ZXIgYSBnb29kIHNpZ24gd2hlbg0KPiBhIGZpeCBjbGFpbWluZyB0
+byBmaXggYSB0eXBvIGludHJvZHVjZXMgYSB0eXBvIDspIF0NCg0KR29vZCBjYXRjaCBFcmljLiBT
+b3JyeSBhYm91dCB0aGF0LiAgV2UgZG9u4oCZdCBuZWVkIHRoaXMgcGF0Y2ggYW55bW9yZS4gVGhh
+bmtzLg0KDQo+IA0KPiBPciBnbyBmb3IgYSBzaG9ydGVyIHN1YmplY3Q6DQo+ICAgdGFyZ2V0L2kz
+ODY6IEZpeCBhIG1pbm9yIHR5cG8NCj4gDQo+ID4+IENoYW5nZWQgS1ZNX0NQVUlEX0ZMQUdfU0lH
+TklGQ0FOVF9JTkRFWCB0bw0KPiBLVk1fQ1BVSURfRkxBR19TSUdOSUZJQ0FOVF9JTkRFWA0KPiA+
+Pg0KPiA+PiBTaWduZWQtb2ZmLWJ5OiBCYWJ1IE1vZ2VyIDxiYWJ1Lm1vZ2VyQGFtZC5jb20+DQo+
+ID4+IC0tLQ0KPiAtLQ0KPiBFcmljIEJsYWtlLCBQcmluY2lwYWwgU29mdHdhcmUgRW5naW5lZXIN
+Cj4gUmVkIEhhdCwgSW5jLiAgICAgICAgICAgKzEtOTE5LTMwMS0zMjY2DQo+IFZpcnR1YWxpemF0
+aW9uOiAgcWVtdS5vcmcgfCBsaWJ2aXJ0Lm9yZw0K
