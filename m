@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1er5m5-0003gv-JY
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 12:44:18 -0500
+	(envelope-from <kwolf@redhat.com>) id 1er5o9-0004VL-Mg
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 12:46:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1er5m2-00074e-GM
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 12:44:17 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36940 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1er5m2-00074S-9t
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 12:44:14 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BE4AA8D6F1
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 17:43:53 +0000 (UTC)
-Date: Wed, 28 Feb 2018 17:43:50 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180228174349.GJ2981@work-vm>
-References: <20180228050633.7410-1-peterx@redhat.com>
-	<20180228050633.7410-5-peterx@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1er5o8-0008M5-Ed
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 12:46:25 -0500
+Date: Wed, 28 Feb 2018 18:46:16 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180228174616.GJ4855@localhost.localdomain>
+References: <20180223235142.21501-1-jsnow@redhat.com>
+	<20180223235142.21501-17-jsnow@redhat.com>
+	<f475702e-fd2b-c1f2-ae32-4d34791f67ce@redhat.com>
+	<048dacc1-b256-778f-4c8a-e5662cb587e6@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20180228050633.7410-5-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 04/14] migration: let incoming side use
- thread context
+In-Reply-To: <048dacc1-b256-778f-4c8a-e5662cb587e6@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC v4 16/21] blockjobs: add waiting status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,125 +26,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
 
-* Peter Xu (peterx@redhat.com) wrote:
-> The old incoming migration is running in main thread and default
-> gcontext.  With the new qio_channel_add_watch_full() we can now let it
-> run in the thread's own gcontext (if there is one).
-> 
-> Currently this patch does nothing alone.  But when any of the incoming
-> migration is run in another iothread (e.g., the upcoming migrate-recover
-> command), this patch will bind the incoming logic to the iothread
-> instead of the main thread (which may already get page faulted and
-> hanged).
+Am 27.02.2018 um 21:50 hat John Snow geschrieben:
+>=20
+>=20
+> On 02/27/2018 03:00 PM, Eric Blake wrote:
+> > On 02/23/2018 05:51 PM, John Snow wrote:
+> >> For jobs that are stuck waiting on others in a transaction, it would
+> >> be nice to know that they are no longer "running" in that sense, but
+> >> instead are waiting on other jobs in the transaction.
+> >>
+> >> Jobs that are "waiting" in this sense cannot be meaningfully altered
+> >> any longer as they have left their running loop. The only meaningful
+> >> user verb for jobs in this state is "cancel," which will cancel the
+> >> whole transaction, too.
+> >>
+> >> Transitions:
+> >> Running -> Waiting:=A0=A0 Normal transition.
+> >> Ready=A0=A0 -> Waiting:=A0=A0 Normal transition.
+> >> Waiting -> Aborting:=A0 Transactional cancellation.
+> >> Waiting -> Concluded: Normal transition.
+> >>
+> >> Removed Transitions:
+> >> Running -> Concluded: Jobs must go to WAITING first.
+> >> Ready=A0=A0 -> Concluded: Jobs must go to WAITING fisrt.
+> >=20
+> > s/fisrt/first/
+> >=20
+> >> +++ b/blockjob.c
+> >=20
+> >> @@ -3934,6 +3938,29 @@
+> >> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 'offset': 'int',
+> >> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 'speed' : 'int' } }
+> >> =A0 +##
+> >> +# @BLOCK_JOB_WAITING:
+> >> +#
+> >> +# Emitted when a block job that is part of a transction has stopped
+> >> work and is
+> >=20
+> > s/transction/transaction/
+> >=20
+> >> +# waiting for other jobs in the transaction to reach the same state=
+.
+> >=20
+> > Is this event emitted only for 'new-style' transactions (old drivers
+> > will never see it, because they don't request new style), or always (=
+old
+> > drivers will see, but presumably ignore, it)?
+> >=20
+>=20
+> ...! Actually, I meant to remove the WAITING *event* entirely, this is =
+a
+> mistake.
+>=20
+> It's purely an informational state that clients likely cannot make any
+> real use of, because regardless of old or new style, jobs will
+> transition automatically to "PENDING."
+>=20
+> That said, old or new, the state is visible from query-block-jobs.
 
-Does this make any difference to the Postcopy listener thread, which
-takes over reading from the main thread once in postcopy mode?
-(See savevm.c:postcopy_ram_listen_thread).
+It means that the block job isn't working any more, which could possibly
+be useful information.
 
-Dave
+Umm... When mirror transitions into WAITING, it stops working, but
+doesn't change the graph yet. Isn't that a problem? Currently it doesn't
+cause bugs because mirror doesn't support transactions, but we should
+design things so that mirror could become transactionable later on.
 
-> RDMA is not considered for now since it's not even using the QIO APIs at
-> all.
-> 
-> CC: Juan Quintela <quintela@redhat.com>
-> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> CC: Laurent Vivier <lvivier@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  migration/exec.c   | 11 ++++++-----
->  migration/fd.c     | 11 ++++++-----
->  migration/socket.c | 12 +++++++-----
->  3 files changed, 19 insertions(+), 15 deletions(-)
-> 
-> diff --git a/migration/exec.c b/migration/exec.c
-> index 0bc5a427dd..f401fc005e 100644
-> --- a/migration/exec.c
-> +++ b/migration/exec.c
-> @@ -55,6 +55,7 @@ void exec_start_incoming_migration(const char *command, Error **errp)
->  {
->      QIOChannel *ioc;
->      const char *argv[] = { "/bin/sh", "-c", command, NULL };
-> +    GSource *source;
->  
->      trace_migration_exec_incoming(command);
->      ioc = QIO_CHANNEL(qio_channel_command_new_spawn(argv,
-> @@ -65,9 +66,9 @@ void exec_start_incoming_migration(const char *command, Error **errp)
->      }
->  
->      qio_channel_set_name(ioc, "migration-exec-incoming");
-> -    qio_channel_add_watch(ioc,
-> -                          G_IO_IN,
-> -                          exec_accept_incoming_migration,
-> -                          NULL,
-> -                          NULL);
-> +    source = qio_channel_add_watch_full(ioc, G_IO_IN,
-> +                                        exec_accept_incoming_migration,
-> +                                        NULL, NULL,
-> +                                        g_main_context_get_thread_default());
-> +    g_source_unref(source);
->  }
-> diff --git a/migration/fd.c b/migration/fd.c
-> index cd06182d1e..9c593eb3ff 100644
-> --- a/migration/fd.c
-> +++ b/migration/fd.c
-> @@ -55,6 +55,7 @@ void fd_start_incoming_migration(const char *infd, Error **errp)
->  {
->      QIOChannel *ioc;
->      int fd;
-> +    GSource *source;
->  
->      fd = strtol(infd, NULL, 0);
->      trace_migration_fd_incoming(fd);
-> @@ -66,9 +67,9 @@ void fd_start_incoming_migration(const char *infd, Error **errp)
->      }
->  
->      qio_channel_set_name(QIO_CHANNEL(ioc), "migration-fd-incoming");
-> -    qio_channel_add_watch(ioc,
-> -                          G_IO_IN,
-> -                          fd_accept_incoming_migration,
-> -                          NULL,
-> -                          NULL);
-> +    source = qio_channel_add_watch_full(ioc, G_IO_IN,
-> +                                        fd_accept_incoming_migration,
-> +                                        NULL, NULL,
-> +                                        g_main_context_get_thread_default());
-> +    g_source_unref(source);
->  }
-> diff --git a/migration/socket.c b/migration/socket.c
-> index e090097077..82c330083c 100644
-> --- a/migration/socket.c
-> +++ b/migration/socket.c
-> @@ -164,6 +164,7 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
->                                              Error **errp)
->  {
->      QIOChannelSocket *listen_ioc = qio_channel_socket_new();
-> +    GSource *source;
->  
->      qio_channel_set_name(QIO_CHANNEL(listen_ioc),
->                           "migration-socket-listener");
-> @@ -173,11 +174,12 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
->          return;
->      }
->  
-> -    qio_channel_add_watch(QIO_CHANNEL(listen_ioc),
-> -                          G_IO_IN,
-> -                          socket_accept_incoming_migration,
-> -                          listen_ioc,
-> -                          (GDestroyNotify)object_unref);
-> +    source = qio_channel_add_watch_full(QIO_CHANNEL(listen_ioc), G_IO_IN,
-> +                                        socket_accept_incoming_migration,
-> +                                        listen_ioc,
-> +                                        (GDestroyNotify)object_unref,
-> +                                        g_main_context_get_thread_default());
-> +    g_source_unref(source);
->  }
->  
->  void tcp_start_incoming_migration(const char *host_port, Error **errp)
-> -- 
-> 2.14.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+I suppose one way to achieve this would be that mirror only transitions
+into WAITING when the whole transaction is ready to move forward. In
+this case, block-job-complete wouldn't tell mirror any more to actually
+complete, but just to signal that the user is ready to have this job
+completed.
+
+Essentially this would split READY in two: The first state is when the
+job has completed the bulk job and waits for the user, and the second
+state is after the user sent block-job-complete. The second state
+automatically transitions into WAITING as soon as all other jobs in the
+transaction are either WAITING or in the second READY state.
+
+Alternatively, mirror jobs could stay active in the WAITING phase, which
+would then become the second READY phase. In this case, the state
+machine would stay as it is, just the semantics of WAITING would change.
+
+The result is either way that the WAITING event becomes uninteresting,
+so after all I think I agree with completely removing it.
+
+Kevin
