@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1er2fg-0004gP-4R
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:25:29 -0500
+	(envelope-from <imammedo@redhat.com>) id 1er2fl-0004lD-27
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:25:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1er2ff-0001uN-1X
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:25:28 -0500
+	(envelope-from <imammedo@redhat.com>) id 1er2ff-0001uT-2C
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:25:33 -0500
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Wed, 28 Feb 2018 15:23:45 +0100
-Message-Id: <1519827835-239519-1-git-send-email-imammedo@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 00/10] generalize build_fadt()
+Date: Wed, 28 Feb 2018 15:23:46 +0100
+Message-Id: <1519827835-239519-2-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1519827835-239519-1-git-send-email-imammedo@redhat.com>
+References: <1519827835-239519-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 01/10] acpi: remove unused acpi-dsdt.aml
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,66 +22,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Auger Eric <eric.auger@redhat.com>, qemu-arm@nongnu.org
 
+SeaBIOS blob which is currently shipped with QEMU
+doesn't need acpi-dsdt.aml nor is able to use it
+and code that loaded it in QEMU was removed by
+(commit 9fb7aaaf4c "pc: drop external DSDT loading")
+in 2013.
 
-v2:
-  * fix typo in "acpi: remove unused acpi-dsdt.aml"
-  * split ACPI_PORT_SMI_CMD into separate cleanup patch
-  * s/pm1_/pm1a_/, s/c2_latency/plvl2_lat/, s/c3_latency/plvl3_lat/
-    and fix conflicts in followup patches caused by renaming
-  * conditional FIRMWARE_CTRL, DSDT patching is introduced in
-    the patch that makes build_fadt() generic instead of earlier
-    "pc: acpi: isolate FADT specific data into AcpiFadtData structure"
-  * update comment to mention that build_fadt() supports 5.1 revision
- =20
-
-
-Series first cleanups ACPI code around build_fadt() and then
-converts current packed structure approach to a build_append_FOO()
-API, getting rid of error prone explicit endianness conversions
-in code and making build_fadt() look more like APCI table declaration
-from spec, which should be easier to read/maintain. After that
-build_fadt() becomes generic enough that we could drop ARM specific
-implementation and reuse generic build_fadt(), reducing code
-duplication.
-
-PS: tested only x86 which has make check coverage,
-    ARM was only slightly tested.=20
-
-git tree for testing:
-  https://github.com/imammedo/qemu.git fadt_refactoring_v2
-
-CC: "Michael S. Tsirkin" <mst@redhat.com>=20
-CC: Shannon Zhao <zhaoshenglong@huawei.com>=20
-CC: Auger Eric <eric.auger@redhat.com>
-CC: qemu-devel@nongnu.org=20
-CC: qemu-arm@nongnu.org=20
-
-Igor Mammedov (10):
-  acpi: remove unused acpi-dsdt.aml
-  pc: replace pm object initialization with one-liner in
-    acpi_get_pm_info()
-  acpi: reuse AcpiGenericAddress instead of Acpi20GenericAddress
-  acpi: add build_append_gas() helper for Generic Address Structure
-  acpi: move ACPI_PORT_SMI_CMD define to header it belongs to
-  pc: acpi: isolate FADT specific data into AcpiFadtData structure
-  pc: acpi: use build_append_foo() API to construct FADT
-  acpi: move build_fadt() from i386 specific to generic ACPI source
-  virt_arm: acpi: reuse common build_fadt()
-  tests: acpi: don't read all fields in test_acpi_fadt_table()
-
- include/hw/acpi/acpi-defs.h | 136 ++++++++----------------------
- include/hw/acpi/aml-build.h |  23 ++++++
- include/hw/isa/apm.h        |   3 +
- Makefile                    |   1 -
- hw/acpi/aml-build.c         | 140 +++++++++++++++++++++++++++++++
- hw/arm/virt-acpi-build.c    |  39 ++++-----
- hw/i386/acpi-build.c        | 196 ++++++++++++++------------------------=
-------
- hw/isa/apm.c                |   1 -
- pc-bios/acpi-dsdt.aml       | Bin 4405 -> 0 bytes
- tests/bios-tables-test.c    |  82 ++++--------------
- 10 files changed, 294 insertions(+), 327 deletions(-)
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+---
+ Makefile              |   1 -
+ pc-bios/acpi-dsdt.aml | Bin 4405 -> 0 bytes
+ 2 files changed, 1 deletion(-)
  delete mode 100644 pc-bios/acpi-dsdt.aml
 
---=20
+diff --git a/Makefile b/Makefile
+index 90e05ac..f3a4cf9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -648,7 +648,6 @@ bepo    cz
+ ifdef INSTALL_BLOBS
+ BLOBS=bios.bin bios-256k.bin sgabios.bin vgabios.bin vgabios-cirrus.bin \
+ vgabios-stdvga.bin vgabios-vmware.bin vgabios-qxl.bin vgabios-virtio.bin \
+-acpi-dsdt.aml \
+ ppc_rom.bin openbios-sparc32 openbios-sparc64 openbios-ppc QEMU,tcx.bin QEMU,cgthree.bin \
+ pxe-e1000.rom pxe-eepro100.rom pxe-ne2k_pci.rom \
+ pxe-pcnet.rom pxe-rtl8139.rom pxe-virtio.rom \
+diff --git a/pc-bios/acpi-dsdt.aml b/pc-bios/acpi-dsdt.aml
+deleted file mode 100644
+index 558c10f51ccbbf9ec2f47a4a998a7055059a8963..0000000000000000000000000000000000000000
+GIT binary patch
+literal 0
+HcmV?d00001
+
+literal 4405
+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
+U_=PAMqG*c36NN8|mMC`Mf01wzJpcdz
+
+-- 
 2.7.4
