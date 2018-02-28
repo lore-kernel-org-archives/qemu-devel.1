@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1er90Q-0001Qh-0o
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:19 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1er90T-0001UG-KH
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1er90M-0005vV-BZ
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:17 -0500
-Received: from mail-sn1nam02on0081.outbound.protection.outlook.com
-	([104.47.36.81]:17351
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	(envelope-from <brijesh.singh@amd.com>) id 1er90P-00061I-Nc
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:21 -0500
+Received: from mail-dm3nam03on0047.outbound.protection.outlook.com
+	([104.47.41.47]:38389
+	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1er90M-0005tr-14
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:14 -0500
+	id 1er90P-0005yl-GA
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:17 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Wed, 28 Feb 2018 15:10:20 -0600
-Message-Id: <20180228211028.83970-21-brijesh.singh@amd.com>
+Date: Wed, 28 Feb 2018 15:10:23 -0600
+Message-ID: <20180228211028.83970-24-brijesh.singh@amd.com>
 In-Reply-To: <20180228211028.83970-1-brijesh.singh@amd.com>
 References: <20180228211028.83970-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v10 20/28] hw/i386: set ram_debug_ops when
- memory encryption is enabled
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v10 23/28] qmp: add query-sev-launch-measure
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +31,110 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>
 
-When memory encryption is enabled, the guest RAM and boot flash ROM will
-contain the encrypted data. By setting the debug ops allow us to invoke
-encryption APIs when accessing the memory for the debug purposes.
+The command can be used by libvirt to retrieve the measurement of SEV guest=
+.
+This measurement is a signature of the memory contents that was encrypted
+through the LAUNCH_UPDATE_DATA.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- hw/i386/pc.c       | 9 +++++++++
- hw/i386/pc_sysfw.c | 6 ++++++
- 2 files changed, 15 insertions(+)
+ monitor.c             |  7 +++++++
+ qapi-schema.json      | 29 +++++++++++++++++++++++++++++
+ target/i386/monitor.c | 17 +++++++++++++++++
+ 3 files changed, 53 insertions(+)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 55e69d66fe6f..53ddecef369c 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1360,6 +1360,15 @@ void pc_memory_init(PCMachineState *pcms,
-         e820_add_entry(0x100000000ULL, pcms->above_4g_mem_size, E820_RAM);
+diff --git a/monitor.c b/monitor.c
+index 356d550aaf2d..d0ebd5906d9d 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -984,6 +984,7 @@ static void qmp_unregister_commands_hack(void)
+ #ifndef TARGET_I386
+     qmp_unregister_command(&qmp_commands, "rtc-reset-reinjection");
+     qmp_unregister_command(&qmp_commands, "query-sev");
++    qmp_unregister_command(&qmp_commands, "query-sev-launch-measure");
+ #endif
+ #ifndef TARGET_S390X
+     qmp_unregister_command(&qmp_commands, "dump-skeys");
+@@ -4164,6 +4165,12 @@ SevInfo *qmp_query_sev(Error **errp)
+     error_setg(errp, QERR_FEATURE_DISABLED, "query-sev");
+     return NULL;
+ }
++
++SevLaunchMeasureInfo *qmp_query_sev_launch_measure(Error **errp)
++{
++    error_setg(errp, QERR_FEATURE_DISABLED, "query-sev-launch-measure");
++    return NULL;
++}
+ #endif
+=20
+ #ifndef TARGET_S390X
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 467a06460ead..facf2138df6b 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -3250,3 +3250,32 @@
+ #
+ ##
+ { 'command': 'query-sev', 'returns': 'SevInfo' }
++
++##
++# @SevLaunchMeasureInfo:
++#
++# SEV Guest Launch measurement information
++#
++# @data: the measurement value encoded in base64
++#
++# Since: 2.12
++#
++##
++{ 'struct': 'SevLaunchMeasureInfo', 'data': {'data': 'str'} }
++
++##
++# @query-sev-launch-measure:
++#
++# Query the SEV guest launch information.
++#
++# Returns: The @SevLaunchMeasureInfo for the guest
++#
++# Since: 2.12
++#
++# Example:
++#
++# -> { "execute": "query-sev-launch-measure" }
++# <- { "return": { "data": "4l8LXeNlSPUDlXPJG5966/8%YZ" } }
++#
++##
++{ 'command': 'query-sev-launch-measure', 'returns': 'SevLaunchMeasureInfo'=
+ }
+diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+index 64d459f80f0c..577d50eebaaa 100644
+--- a/target/i386/monitor.c
++++ b/target/i386/monitor.c
+@@ -720,3 +720,20 @@ void hmp_info_sev(Monitor *mon, const QDict *qdict)
+         monitor_printf(mon, "SEV is not enabled\n");
      }
- 
-+    /*
-+     * When memory encryption is enabled, the guest RAM will be encrypted with
-+     * a guest unique key. Set the debug ops so that any debug access to the
-+     * guest RAM will go through the memory encryption APIs.
-+     */
-+    if (kvm_memcrypt_enabled()) {
-+        kvm_memcrypt_set_debug_ops(ram);
+ }
++
++SevLaunchMeasureInfo *qmp_query_sev_launch_measure(Error **errp)
++{
++    char *data;
++    SevLaunchMeasureInfo *info;
++
++    data =3D sev_get_launch_measurement();
++    if (!data) {
++        error_setg(errp, "Measurement is not available");
++        return NULL;
 +    }
 +
-     if (!pcmc->has_reserved_memory &&
-         (machine->ram_slots ||
-          (machine->maxram_size > machine->ram_size))) {
-diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index 73ac783f2055..845240f97293 100644
---- a/hw/i386/pc_sysfw.c
-+++ b/hw/i386/pc_sysfw.c
-@@ -181,6 +181,12 @@ static void pc_system_flash_init(MemoryRegion *rom_memory)
-                     error_report("failed to encrypt pflash rom");
-                     exit(1);
-                 }
++    info =3D g_malloc0(sizeof(*info));
++    info->data =3D data;
 +
-+                /*
-+                 * The pflash ROM is encrypted, set the debug ops so that any
-+                 * debug accesses will use memory encryption APIs.
-+                 */
-+                kvm_memcrypt_set_debug_ops(flash_mem);
-             }
-         }
-     }
--- 
++    return info;
++}
+--=20
 2.14.3
