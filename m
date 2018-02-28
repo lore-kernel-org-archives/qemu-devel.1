@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1er90S-0001Sp-0R
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:21 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1er90M-0001Mo-CK
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1er90N-0005yC-Tw
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:19 -0500
-Received: from mail-sn1nam02on0057.outbound.protection.outlook.com
-	([104.47.36.57]:26791
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	(envelope-from <brijesh.singh@amd.com>) id 1er90I-0005pG-0s
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:14 -0500
+Received: from mail-dm3nam03on0076.outbound.protection.outlook.com
+	([104.47.41.76]:5440
+	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1er90N-0005wc-Kn
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:15 -0500
+	id 1er90H-0005nz-A5
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:09 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Wed, 28 Feb 2018 15:10:21 -0600
-Message-Id: <20180228211028.83970-22-brijesh.singh@amd.com>
+Date: Wed, 28 Feb 2018 15:10:15 -0600
+Message-Id: <20180228211028.83970-16-brijesh.singh@amd.com>
 In-Reply-To: <20180228211028.83970-1-brijesh.singh@amd.com>
 References: <20180228211028.83970-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v10 21/28] sev/i386: add debug encrypt and
- decrypt commands
+Subject: [Qemu-devel] [PATCH v10 15/28] sev/i386: add command to create
+ launch memory encryption context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,138 +32,139 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
 
-KVM_SEV_DBG_DECRYPT and KVM_SEV_DBG_ENCRYPT commands are used for
-decrypting and encrypting guest memory region. The command works only if
-the guest policy allows the debugging.
+The KVM_SEV_LAUNCH_START command creates a new VM encryption key (VEK).
+The encryption key created with the command will be used for encrypting
+the bootstrap images (such as guest bios).
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Richard Henderson <rth@twiddle.net>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- accel/kvm/kvm-all.c      |  1 +
- stubs/sev.c              |  4 ++++
- target/i386/sev.c        | 57 ++++++++++++++++++++++++++++++++++++++++++++++++
- target/i386/trace-events |  1 +
- 4 files changed, 63 insertions(+)
+ target/i386/sev.c        | 86 ++++++++++++++++++++++++++++++++++++++++++++++++
+ target/i386/trace-events |  2 ++
+ 2 files changed, 88 insertions(+)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 4974c00c46fb..f53d4ca503b0 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -1681,6 +1681,7 @@ static int kvm_init(MachineState *ms)
-         }
- 
-         kvm_state->memcrypt_encrypt_data = sev_encrypt_data;
-+        kvm_state->memcrypt_debug_ops = sev_set_debug_ops;
-     }
- 
-     ret = kvm_arch_init(ms, s);
-diff --git a/stubs/sev.c b/stubs/sev.c
-index 2e20f3b73a5b..73f5c7f93a67 100644
---- a/stubs/sev.c
-+++ b/stubs/sev.c
-@@ -15,6 +15,10 @@
- #include "qemu-common.h"
- #include "sysemu/sev.h"
- 
-+void sev_set_debug_ops(void *handle, MemoryRegion *mr)
-+{
-+}
-+
- int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len)
- {
-     return 1;
 diff --git a/target/i386/sev.c b/target/i386/sev.c
-index c341257fcc14..23c2b6183f33 100644
+index 8ee6159b2bfc..b867ffbc0eae 100644
 --- a/target/i386/sev.c
 +++ b/target/i386/sev.c
-@@ -24,6 +24,7 @@
- #define DEFAULT_SEV_DEVICE      "/dev/sev"
+@@ -100,6 +100,17 @@ fw_error_to_str(int code)
+     return sev_fw_errlist[code];
+ }
  
- static SEVState *sev_state;
-+static MemoryRegionRAMReadWriteOps  sev_ops;
- 
- static const char *const sev_fw_errlist[] = {
-     "",
-@@ -600,6 +601,46 @@ sev_vm_state_change(void *opaque, int running, RunState state)
-     }
++static void
++sev_set_guest_state(SevState new_state)
++{
++    assert(new_state < SEV_STATE__MAX);
++    assert(sev_state);
++
++    trace_kvm_sev_change_state(SevState_str(sev_state->state),
++                               SevState_str(new_state));
++    sev_state->state = new_state;
++}
++
+ static void
+ sev_ram_block_added(RAMBlockNotifier *n, void *host, size_t size)
+ {
+@@ -400,6 +411,75 @@ sev_get_info(void)
+     return info;
  }
  
 +static int
-+sev_dbg_enc_dec(uint8_t *dst, const uint8_t *src, uint32_t len, bool write)
++sev_read_file_base64(const char *filename, guchar **data, gsize *len)
 +{
-+    int ret, error;
-+    struct kvm_sev_dbg dbg;
++    gsize sz;
++    gchar *base64;
++    GError *error = NULL;
 +
-+    dbg.src_uaddr = (unsigned long)src;
-+    dbg.dst_uaddr = (unsigned long)dst;
-+    dbg.len = len;
-+
-+    trace_kvm_sev_debug(write ? "encrypt" : "decrypt", src, dst, len);
-+    ret = sev_ioctl(sev_state->sev_fd,
-+                    write ? KVM_SEV_DBG_ENCRYPT : KVM_SEV_DBG_DECRYPT,
-+                    &dbg, &error);
-+    if (ret) {
-+        error_report("%s (%s) %#llx->%#llx+%#x ret=%d fw_error=%d '%s'",
-+                     __func__, write ? "write" : "read", dbg.src_uaddr,
-+                     dbg.dst_uaddr, dbg.len, ret, error,
-+                     fw_error_to_str(error));
++    if (!g_file_get_contents(filename, &base64, &sz, &error)) {
++        error_report("failed to read '%s' (%s)", filename, error->message);
++        return -1;
 +    }
 +
-+    return ret;
++    *data = g_base64_decode(base64, len);
++    return 0;
 +}
 +
 +static int
-+sev_mem_read(uint8_t *dst, const uint8_t *src, uint32_t len, MemTxAttrs attrs)
++sev_launch_start(SEVState *s)
 +{
-+    assert(attrs.debug);
++    gsize sz;
++    int ret = 1;
++    int fw_error;
++    QSevGuestInfo *sev = s->sev_info;
++    struct kvm_sev_launch_start *start;
++    guchar *session = NULL, *dh_cert = NULL;
 +
-+    return sev_dbg_enc_dec(dst, src, len, false);
-+}
++    start = g_new0(struct kvm_sev_launch_start, 1);
 +
-+static int
-+sev_mem_write(uint8_t *dst, const uint8_t *src, uint32_t len, MemTxAttrs attrs)
-+{
-+    assert(attrs.debug);
++    start->handle = object_property_get_int(OBJECT(sev), "handle",
++                                            &error_abort);
++    start->policy = object_property_get_int(OBJECT(sev), "policy",
++                                            &error_abort);
++    if (sev->session_file) {
++        if (sev_read_file_base64(sev->session_file, &session, &sz) < 0) {
++            return 1;
++        }
++        start->session_uaddr = (unsigned long)session;
++        start->session_len = sz;
++    }
 +
-+    return sev_dbg_enc_dec(dst, src, len, true);
++    if (sev->dh_cert_file) {
++        if (sev_read_file_base64(sev->dh_cert_file, &dh_cert, &sz) < 0) {
++            return 1;
++        }
++        start->dh_uaddr = (unsigned long)dh_cert;
++        start->dh_len = sz;
++    }
++
++    trace_kvm_sev_launch_start(start->policy, session, dh_cert);
++    ret = sev_ioctl(s->sev_fd, KVM_SEV_LAUNCH_START, start, &fw_error);
++    if (ret < 0) {
++        error_report("%s: LAUNCH_START ret=%d fw_error=%d '%s'",
++                __func__, ret, fw_error, fw_error_to_str(fw_error));
++        return 1;
++    }
++
++    object_property_set_int(OBJECT(sev), start->handle, "handle",
++                            &error_abort);
++    sev_set_guest_state(SEV_STATE_LUPDATE);
++    s->handle = start->handle;
++    s->policy = start->policy;
++
++    g_free(start);
++    g_free(session);
++    g_free(dh_cert);
++
++    return 0;
 +}
 +
  void *
  sev_guest_init(const char *id)
  {
-@@ -703,6 +744,22 @@ sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len)
-     return 0;
- }
+@@ -473,6 +553,12 @@ sev_guest_init(const char *id)
+         goto err;
+     }
  
-+void
-+sev_set_debug_ops(void *handle, MemoryRegion *mr)
-+{
-+    SEVState *s = (SEVState *)handle;
-+
-+    /* If policy does not allow debug then no need to register ops */
-+    if (s->policy & SEV_POLICY_NODBG) {
-+        return;
++    ret = sev_launch_start(s);
++    if (ret) {
++        error_report("%s: failed to create encryption context", __func__);
++        goto err;
 +    }
 +
-+    sev_ops.read = sev_mem_read;
-+    sev_ops.write = sev_mem_write;
-+
-+    memory_region_set_ram_debug_ops(mr, &sev_ops);
-+}
-+
- static void
- sev_register_types(void)
- {
+     ram_block_notifier_add(&sev_ram_notifier);
+ 
+     return s;
 diff --git a/target/i386/trace-events b/target/i386/trace-events
-index b1fbde6e40fe..00aa6e98d810 100644
+index ffa3d2250425..9402251e9991 100644
 --- a/target/i386/trace-events
 +++ b/target/i386/trace-events
-@@ -15,3 +15,4 @@ kvm_sev_launch_start(int policy, void *session, void *pdh) "policy 0x%x session
- kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len 0x%" PRIu64
- kvm_sev_launch_measurement(const char *value) "data %s"
- kvm_sev_launch_finish(void) ""
-+kvm_sev_debug(const char *op, const uint8_t *src, uint8_t *dst, int len) "(%s) src %p dst %p len %d"
+@@ -10,3 +10,5 @@ kvm_x86_update_msi_routes(int num) "Updated %d MSI routes"
+ kvm_sev_init(void) ""
+ kvm_memcrypt_register_region(void *addr, size_t len) "addr %p len 0x%lu"
+ kvm_memcrypt_unregister_region(void *addr, size_t len) "addr %p len 0x%lu"
++kvm_sev_change_state(const char *old, const char *new) "%s -> %s"
++kvm_sev_launch_start(int policy, void *session, void *pdh) "policy 0x%x session %p pdh %p"
 -- 
 2.14.3
