@@ -1,22 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1er8SL-00035j-AT
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:36:06 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1er8Sn-0003Tn-8h
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:36:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1er8SK-0003ay-AB
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:36:05 -0500
-References: <20180223235142.21501-1-jsnow@redhat.com>
-	<20180223235142.21501-12-jsnow@redhat.com>
-	<20180228155337.GE4855@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <d88d1e84-bd70-e060-c3c6-29bcf419fd1a@redhat.com>
-Date: Wed, 28 Feb 2018 15:35:42 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180228155337.GE4855@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v4 11/21] blockjobs: add block_job_dismiss
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1er8Sk-0003lT-4x
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:36:33 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Wed, 28 Feb 2018 20:32:43 +0000
+Message-Id: <20180228203243.1413-13-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20180228203243.1413-1-mark.cave-ayland@ilande.co.uk>
+References: <20180228203243.1413-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCHv3 12/12] macio: remove macio_init() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,78 +19,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
+Move the remaining comment into macio.c for reference, then remove the
+macio_init() function and instantiate the macio devices for both Old World
+and New World machines via qdev_init_nofail() directly.
 
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ hw/misc/macio/macio.c | 11 +++--------
+ hw/ppc/mac_newworld.c |  4 +---
+ hw/ppc/mac_oldworld.c |  4 +---
+ 3 files changed, 5 insertions(+), 14 deletions(-)
 
-On 02/28/2018 10:53 AM, Kevin Wolf wrote:
-> Am 24.02.2018 um 00:51 hat John Snow geschrieben:
->> For jobs that have reached their CONCLUDED state, prior to having their
->> last reference put down (meaning jobs that have completed successfully,
->> unsuccessfully, or have been canceled), allow the user to dismiss the
->> job's lingering status report via block-job-dismiss.
->>
->> This gives management APIs the chance to conclusively determine if a job
->> failed or succeeded, even if the event broadcast was missed.
->>
->> Note that jobs do not yet linger in any such state, they are freed
->> immediately upon reaching this previously-unnamed state. such a state is
->> added immediately in the next commit.
->>
->> Verbs:
->> Dismiss: operates on CONCLUDED jobs only.
-> 
-> You want to insert an empty line here.
-> 
-
-Don't tell me what I want.
-
-(Seriously though, what the heck is wrong with my script? When I go to
-edit this commend message there *IS* a newline here. This has been
-happening a bit lately and I haven't really had the chance to catch it
-happening in action yet... sorry.)
-
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  block/trace-events       |  1 +
->>  blockdev.c               | 14 ++++++++++++++
->>  blockjob.c               | 34 ++++++++++++++++++++++++++++++++--
->>  include/block/blockjob.h |  9 +++++++++
->>  qapi/block-core.json     | 24 +++++++++++++++++++++++-
->>  5 files changed, 79 insertions(+), 3 deletions(-)
-> 
->> @@ -841,6 +865,9 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
->>          block_job_txn_add_job(txn, job);
->>      }
->>  
->> +    /* For the expanded job control STM, grab an extra
->> +     * reference for finalize() to put down */
-> 
-> Do you mean dismiss()?
-> 
-
-Sure. We'll say yes.
-
->> +    block_job_ref(job);
->>      return job;
->>  }
->>  
->> @@ -859,6 +886,9 @@ void block_job_pause_all(void)
->>  
->>  void block_job_early_fail(BlockJob *job)
->>  {
->> +    /* One for creation, one for finalize() */
-> 
-> And here?
-> 
-
-Sure. We'll say yes again.
-
->> +    assert(job->status == BLOCK_JOB_STATUS_CREATED);
->> +    block_job_unref(job);
->>      block_job_unref(job);
->>  }
-> 
-> Kevin
-> 
+diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+index f71ed61819..af1bd46b4b 100644
+--- a/hw/misc/macio/macio.c
++++ b/hw/misc/macio/macio.c
+@@ -33,6 +33,9 @@
+ #include "hw/misc/macio/macio.h"
+ #include "hw/intc/heathrow_pic.h"
+ 
++/* Note: this code is strongly inspirated from the corresponding code
++ * in PearPC */
++
+ /*
+  * The mac-io has two interfaces to the ESCC. One is called "escc-legacy",
+  * while the other one is the normal, current ESCC interface.
+@@ -442,11 +445,3 @@ static void macio_register_types(void)
+ }
+ 
+ type_init(macio_register_types)
+-
+-void macio_init(PCIDevice *d,
+-                MemoryRegion *pic_mem)
+-{
+-    /* Note: this code is strongly inspirated from the corresponding code
+-       in PearPC */
+-    qdev_init_nofail(DEVICE(d));
+-}
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index c7960ab67a..a749e2565d 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -160,7 +160,6 @@ static void ppc_core99_init(MachineState *machine)
+     MacIONVRAMState *nvr;
+     int bios_size, ndrv_size;
+     uint8_t *ndrv_file;
+-    MemoryRegion *pic_mem;
+     int ppc_boot_device;
+     DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
+     void *fw_cfg;
+@@ -337,7 +336,6 @@ static void ppc_core99_init(MachineState *machine)
+     qdev_prop_set_uint32(pic_dev, "model", OPENPIC_MODEL_KEYLARGO);
+     qdev_init_nofail(pic_dev);
+     s = SYS_BUS_DEVICE(pic_dev);
+-    pic_mem = s->mmio[0].memory;
+     k = 0;
+     for (i = 0; i < smp_cpus; i++) {
+         for (j = 0; j < OPENPIC_OUTPUT_NB; j++) {
+@@ -381,7 +379,7 @@ static void ppc_core99_init(MachineState *machine)
+     qdev_prop_set_uint64(dev, "frequency", tbfreq);
+     object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
+                              &error_abort);
+-    macio_init(PCI_DEVICE(macio), pic_mem);
++    qdev_init_nofail(dev);
+ 
+     /* We only emulate 2 out of 3 IDE controllers for now */
+     ide_drive_get(hd, ARRAY_SIZE(hd));
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 3ac5b19073..935493c966 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -96,7 +96,6 @@ static void ppc_heathrow_init(MachineState *machine)
+     OldWorldMacIOState *macio;
+     MACIOIDEState *macio_ide;
+     DeviceState *dev, *pic_dev;
+-    SysBusDevice *sbd;
+     BusState *adb_bus;
+     int bios_size, ndrv_size;
+     uint8_t *ndrv_file;
+@@ -283,8 +282,7 @@ static void ppc_heathrow_init(MachineState *machine)
+     qdev_prop_set_uint64(dev, "frequency", tbfreq);
+     object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
+                              &error_abort);
+-    sbd = SYS_BUS_DEVICE(pic_dev);
+-    macio_init(PCI_DEVICE(macio), sysbus_mmio_get_region(sbd, 0));
++    qdev_init_nofail(dev);
+ 
+     macio_ide = MACIO_IDE(object_resolve_path_component(OBJECT(macio),
+                                                         "ide[0]"));
+-- 
+2.11.0
