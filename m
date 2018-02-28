@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1er0gV-0008Ru-H8
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:18:12 -0500
+	(envelope-from <berto@igalia.com>) id 1er0hF-0000ii-1z
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:18:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1er0gR-0002bK-T4
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:18:11 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34640 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1er0gR-0002bG-Nm
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:18:07 -0500
-Date: Wed, 28 Feb 2018 13:18:06 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180228121806.wbp4lyqwrt62mgpq@sirius.home.kraxel.org>
-References: <20180227080724.13585-1-kraxel@redhat.com>
-	<CAFEAcA_k9pXrfkLQSSG5UTYOteMZEZXErMCh6-3Wgj42mGqrfw@mail.gmail.com>
-	<20180228062634.eh3xknbo7oosi5fo@sirius.home.kraxel.org>
-	<CAFEAcA-uvP2U_83bsiBE7ujEyZVBUiHDmQVzk3f872HRLq5A9Q@mail.gmail.com>
+	(envelope-from <berto@igalia.com>) id 1er0hA-0002mf-7c
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:18:57 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20180227162944.17343-3-eblake@redhat.com>
+References: <20180227155514.16721-1-eblake@redhat.com>
+	<20180227162944.17343-3-eblake@redhat.com>
+Date: Wed, 28 Feb 2018 13:18:48 +0100
+Message-ID: <w51sh9lpas7.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-uvP2U_83bsiBE7ujEyZVBUiHDmQVzk3f872HRLq5A9Q@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 00/12] Ui 20180227 patches
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 3/5] qcow2: Reduce REFT_OFFSET_MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,16 +22,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, Max Reitz <mreitz@redhat.com>
 
-> > I think modularizing SDL isn't that easy then.
-> > Can you just drop the "sdl: build as ui module" patch?
-> 
-> I can't drop patches from signed pull requests -- you need
-> to respin it.
+On Tue 27 Feb 2018 05:29:42 PM CET, Eric Blake wrote:
+> Match our code to the spec change in the previous patch - there's
+> no reason for the refcount table to allow larger offsets than the
+> L1/L2 tables. In practice, no image has more than 64PB of
+> allocated clusters anyways, as anything beyond that can't be
+> expressed via L2 mappings to host offsets.
+>
+> Suggested-by: Alberto Garcia <berto@igalia.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-Ah, right, that would invalidate the signature.  Pull resent.
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-cheers,
-  Gerd
+Berto
