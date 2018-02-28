@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1er69o-000783-Lq
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:08:53 -0500
+	(envelope-from <rkrcmar@redhat.com>) id 1er6Ae-0007sh-W0
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:09:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1er69n-00089k-DL
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:08:48 -0500
-References: <20180224154033.29559-1-mreitz@redhat.com>
-	<20180224154033.29559-4-mreitz@redhat.com>
-	<abd5ed7a-d5ee-028c-1cd5-208161f88beb@redhat.com>
-	<fb3756be-e002-8b47-921f-80a5ce332721@redhat.com>
-	<01bf42f6-971d-1a28-eeb4-61063ae62bd7@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <8b6cb74b-6335-3ee2-0dc3-ff5604704608@redhat.com>
-Date: Wed, 28 Feb 2018 19:08:38 +0100
+	(envelope-from <rkrcmar@redhat.com>) id 1er6Aa-0000dZ-Vz
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:09:40 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47512 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkrcmar@redhat.com>) id 1er6Aa-0000cP-PF
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:09:36 -0500
+Date: Wed, 28 Feb 2018 19:08:59 +0100
+From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Message-ID: <20180228180858.GB8418@flask>
+References: <1519439425-27883-1-git-send-email-babu.moger@amd.com>
+	<1519439425-27883-3-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <01bf42f6-971d-1a28-eeb4-61063ae62bd7@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ViAtEvbQggVyVBoccQSXfulnAu3oUkui3"
-Subject: Re: [Qemu-devel] [PATCH v3 3/7] qapi: Replace qobject_to_X(o) by
- qobject_to(o, X)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1519439425-27883-3-git-send-email-babu.moger@amd.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] target/i386: Populate AMD Processor
+ Cache Information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,164 +28,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Alberto Garcia <berto@igalia.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Babu Moger <babu.moger@amd.com>
+Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, pixo@polepetko.eu, Gary.Hook@amd.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ViAtEvbQggVyVBoccQSXfulnAu3oUkui3
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Alberto Garcia <berto@igalia.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-ID: <8b6cb74b-6335-3ee2-0dc3-ff5604704608@redhat.com>
-Subject: Re: [PATCH v3 3/7] qapi: Replace qobject_to_X(o) by qobject_to(o, X)
-References: <20180224154033.29559-1-mreitz@redhat.com>
- <20180224154033.29559-4-mreitz@redhat.com>
- <abd5ed7a-d5ee-028c-1cd5-208161f88beb@redhat.com>
- <fb3756be-e002-8b47-921f-80a5ce332721@redhat.com>
- <01bf42f6-971d-1a28-eeb4-61063ae62bd7@redhat.com>
-In-Reply-To: <01bf42f6-971d-1a28-eeb4-61063ae62bd7@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+2018-02-23 21:30-0500, Babu Moger:
+> From: Stanislav Lanci <pixo@polepetko.eu>
+> 
+> Adds information about cache size and topology from cpuid 0x8000001D leaf
+> for different cache types on AMD processors.
+> 
+> Signed-off-by: Stanislav Lanci <pixo@polepetko.eu>
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> ---
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> @@ -3590,6 +3594,78 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>              *edx = 0;
+>          }
+>          break;
+> +    case 0x8000001D: /* AMD TOPOEXT cache info */
+> +        if (cpu->cache_info_passthrough) {
+> +            host_cpuid(index, count, eax, ebx, ecx, edx);
+> +            break;
+> +        } else if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) {
+> +            *eax = 0;
+> +            switch (count) {
+> +            case 0: /* L1 dcache info */
+> +                *eax |= CPUID_4_TYPE_DCACHE | \
+> +                        CPUID_4_LEVEL(1) | \
+> +                        CPUID_4_SELF_INIT_LEVEL | \
+> +                        ((cs->nr_threads - 1) << 14);
 
-On 2018-02-27 15:47, Eric Blake wrote:
-> On 02/26/2018 06:01 AM, Max Reitz wrote:
->=20
->>>> +++ b/block.c
->>>> @@ -1457,7 +1457,7 @@ static QDict *parse_json_filename(const char
->>>> *filename, Error **errp)
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return =
-NULL;
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>> =C2=A0=C2=A0 -=C2=A0=C2=A0=C2=A0 options =3D qobject_to_qdict(option=
-s_obj);
->>>> +=C2=A0=C2=A0=C2=A0 options =3D qobject_to(options_obj, QDict);
->>>
->>> Bikeshedding - would it read any easier as:
->>>
->>> options =3D qobject_to(QDict, options_obj);
->>>
->>> ?=C2=A0 If so, your Coccinelle script can be touched up, and patch 2/=
-7 swaps
->>> argument order around, so it would be tolerable but still slightly
->>> busywork to regenerate the series.=C2=A0 But I'm not strongly attache=
-d to
->>> either order, and so I'm also willing to take this as-is (especially
->>> since that's less work), if no one else has a strong opinion that
->>> swapping order would aid legibility.
->>
->> Well, same for me. :-)
->>
->> In a template/generic language, we'd write the type first (e.g.
->> qobject_cast<QDict>(options_obj)).=C2=A0 But maybe we'd write the obje=
-ct
->> first, too (e.g. options_obj.cast<QDict>()).=C2=A0 And the current ord=
-er of
->> the arguments follows the order in the name ("qobject" options_obj "to=
-"
->> QDict).=C2=A0 But maybe it's more natural to read it as "qobject to" Q=
-Dict
->> "applied to" options_obj.
->>
->> I don't know either.
->=20
-> Okay, after looking for existing uses of type names in macro calls, I s=
-ee:
->=20
-> qemu/compiler.h:
->=20
-> #ifndef container_of
-> #define container_of(ptr, type, member) ({=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 \
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const typeof(((type *) 0)->m=
-ember) *__mptr =3D (ptr);=C2=A0=C2=A0=C2=A0=C2=A0 \
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (type *) ((char *) __mptr - =
-offsetof(type, member));})
-> #endif
->=20
-> /* Convert from a base type to a parent type, with compile time
-> checking.=C2=A0 */
-> #ifdef __GNUC__
-> #define DO_UPCAST(type, field, dev) ( __extension__ ( { \
-> =C2=A0=C2=A0=C2=A0 char __attribute__((unused)) offset_must_be_zero[ \
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -offsetof(type, field)]; \
-> =C2=A0=C2=A0=C2=A0 container_of(dev, type, field);}))
-> #else
-> #define DO_UPCAST(type, field, dev) container_of(dev, type, field)
-> #endif
->=20
-> #define typeof_field(type, field) typeof(((type *)0)->field)
->=20
->=20
-> qapi/clone-visitor.h:
->=20
-> /*
-> =C2=A0* Deep-clone QAPI object @src of the given @type, and return the =
-result.
-> =C2=A0*
-> =C2=A0* Not usable on QAPI scalars (integers, strings, enums), nor on a=
+CPUID_4 uses the same format even for bits 25-14, so this would look
+better with a macro.
 
-> =C2=A0* QAPI object that references the 'any' type.=C2=A0 Safe when @sr=
-c is NULL.
-> =C2=A0*/
-> #define QAPI_CLONE(type, src)=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 \
->=20
-> /*
-> =C2=A0* Copy deep clones of @type members from @src to @dst.
-> =C2=A0*
-> =C2=A0* Not usable on QAPI scalars (integers, strings, enums), nor on a=
+> +                *ebx = (L1D_LINE_SIZE - 1) | \
+> +                       ((L1D_PARTITIONS - 1) << 12) | \
+> +                       ((L1D_ASSOCIATIVITY - 1) << 22);
+> +                *ecx = L1D_SETS - 1;
 
-> =C2=A0* QAPI object that references the 'any' type.
-> =C2=A0*/
-> #define QAPI_CLONE_MEMBERS(type, dst, src)=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 \
->=20
->=20
-> 2 out of 3 macros in compiler.h put the type name first, and
-> container_of() puts it in the middle of 3.=C2=A0 It's even weirder beca=
-use
-> DO_UPCAST(t, f, d) calls container_of(d, t, f), where the inconsistency=
+These numbers seem to have the same meaning as CPUID 4, but have
+conflicting values.
 
-> makes it a mental struggle to figure out how to read the two macros sid=
-e
-> by side, compared to if we had just been consistent.=C2=A0 Meanwhile, a=
-ll of
-> the macros in qapi put the type name first.
->=20
-> So at this point, I'm 70:30 in favor of doing the rename to have
-> qobject_to(type, obj) for consistency with majority of other macros tha=
-t
-> take a type name (type names are already unusual as arguments to macros=
-,
-> whether or not the macro is named with ALL_CAPS).=C2=A0 (Sorry, I know =
-that
-> means more busy work for you, if you agree with my reasoning)
+I think we should not expose CPUID 4 with AMD CPUs or at least when they
+have CPUID_EXT3_TOPOEXT (the latter is easier wrt. compatibility).
 
-I agree, because it means I have a decision. :-)
+> +                *edx = 0;
+> +                break;
+> +            case 1: /* L1 icache info */
+> +                *eax |= CPUID_4_TYPE_ICACHE | \
+> +                        CPUID_4_LEVEL(1) | \
+> +                        CPUID_4_SELF_INIT_LEVEL | \
+> +                        ((cs->nr_threads - 1) << 14);
+> +                *ebx = (L1I_LINE_SIZE - 1) | \
+> +                       ((L1I_PARTITIONS - 1) << 12) | \
+> +                       ((L1I_ASSOCIATIVITY_AMD - 1) << 22);
+> +                *ecx = L1I_SETS_AMD - 1;
+> +                *edx = 0;
+> +                break;
+> +            case 2: /* L2 cache info */
+> +                *eax |= CPUID_4_TYPE_UNIFIED | \
+> +                        CPUID_4_LEVEL(2) | \
+> +                        CPUID_4_SELF_INIT_LEVEL | \
+> +                        ((cs->nr_threads - 1) << 14);
+> +                *ebx = (L2_LINE_SIZE - 1) | \
+> +                       ((L2_PARTITIONS - 1) << 12) | \
+> +                       ((L2_ASSOCIATIVITY_AMD - 1) << 22);
+> +                *ecx = L2_SETS_AMD - 1;
+> +                *edx = CPUID_4_INCLUSIVE;
+> +                break;
+> +            case 3: /* L3 cache info */
+> +                if (!cpu->enable_l3_cache) {
+> +                    *eax = 0;
+> +                    *ebx = 0;
+> +                    *ecx = 0;
+> +                    *edx = 0;
+> +                    break;
+> +                }
+> +                *eax |= CPUID_4_TYPE_UNIFIED | \
+> +                        CPUID_4_LEVEL(3) | \
+> +                        CPUID_4_SELF_INIT_LEVEL | \
+> +                        ((cs->nr_cores * cs->nr_threads - 1) << 14);
 
-Max
+This number seems to be the only difference that isn't just a difference
+constant.  It tempts me to merge the cases for 4 and 0x8000001D as it
+seems that vendors try to be compatible.
 
+> +                *ebx = (L3_N_LINE_SIZE - 1) | \
+> +                       ((L3_N_PARTITIONS - 1) << 12) | \
+> +                       ((L3_N_ASSOCIATIVITY - 1) << 22);
+> +                *ecx = L3_N_SETS_AMD - 1;
+> +                *edx = CPUID_4_NO_INVD_SHARING;
+> +                break;
+> +            default: /* end of info */
+> +                *eax = 0;
+> +                *ebx = 0;
+> +                *ecx = 0;
+> +                *edx = 0;
+> +                break;
+> +            }
+> +        } else {
+> +            *eax = 0;
+> +            *ebx = 0;
+> +            *ecx = 0;
+> +            *edx = 0;
+> +        }
+> +        break;
+>      case 0xC0000000:
+>          *eax = env->cpuid_xlevel2;
+>          *ebx = 0;
 
---ViAtEvbQggVyVBoccQSXfulnAu3oUkui3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+The numbers looks like real hardware,
 
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqW8CYSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AMTEH/j0Oog0TYk9oUA2FxyaJlaTcSXFgkWA5
-jOFn6thEy7ROEqYQEGTsY02AymMiCge8DKuLVLZp8K/1+HMtWJtxsPb+qtc/2od3
-oSmdPWqiS5pk04flMS1iTA7WrFlmpE09EAoCFSl+1TKA1HiIrrGyb5rs/Zc6hR09
-cS/AtwmmePiAXPhlDwNKDcD8ZLS8uSKLmT7tKao9K4qzxiNnv+zQLHNaYrT9B3FO
-PE0nZUnHNlBnlGhGN2scU9aR1TCY4qFQ91KhgOQMIlBdHqsqP+toVN+RcwrYsbkQ
-YDhpmqLOJqK7HIfhCPU/YFAo67nimH++in5B76mo3kvPeY7VJxtMjwE=
-=u45F
------END PGP SIGNATURE-----
-
---ViAtEvbQggVyVBoccQSXfulnAu3oUkui3--
+thanks.
