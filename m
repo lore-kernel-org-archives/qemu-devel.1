@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59984)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1er44H-0006Z1-UN
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:54:59 -0500
+	(envelope-from <mreitz@redhat.com>) id 1er459-0007Mi-7N
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:55:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1er44D-0003iI-2W
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:54:58 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39630 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1er44C-0003i0-T2
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:54:53 -0500
-Date: Wed, 28 Feb 2018 16:54:44 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180228165444.3e74e083@redhat.com>
-In-Reply-To: <ef81e2f1-1c6a-82ad-86fd-fab56ab92c78@redhat.com>
-References: <1518784641-43151-1-git-send-email-imammedo@redhat.com>
-	<1518784641-43151-4-git-send-email-imammedo@redhat.com>
-	<ef81e2f1-1c6a-82ad-86fd-fab56ab92c78@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1er458-0004Ii-0i
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:55:51 -0500
+References: <20180122220806.22154-1-mreitz@redhat.com>
+	<20180122220806.22154-16-mreitz@redhat.com>
+	<20180227093809.GF25412@lemon.usersys.redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <6f735a6c-2946-29b5-dd3b-664711d10722@redhat.com>
+Date: Wed, 28 Feb 2018 16:55:32 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/9] CLI: add -preconfig option
+In-Reply-To: <20180227093809.GF25412@lemon.usersys.redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="VH7Z0s3DcCX8AF9344Ta3vthPVrDZG14L"
+Subject: Re: [Qemu-devel] [PATCH v2 15/16] block/mirror: Add copy mode QAPI
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,94 +26,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, pkrempa@redhat.com, ehabkost@redhat.com, cohuck@redhat.com, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Tue, 27 Feb 2018 14:39:22 -0600
-Eric Blake <eblake@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VH7Z0s3DcCX8AF9344Ta3vthPVrDZG14L
+From: Max Reitz <mreitz@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <6f735a6c-2946-29b5-dd3b-664711d10722@redhat.com>
+Subject: Re: [PATCH v2 15/16] block/mirror: Add copy mode QAPI interface
+References: <20180122220806.22154-1-mreitz@redhat.com>
+ <20180122220806.22154-16-mreitz@redhat.com>
+ <20180227093809.GF25412@lemon.usersys.redhat.com>
+In-Reply-To: <20180227093809.GF25412@lemon.usersys.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 02/16/2018 06:37 AM, Igor Mammedov wrote:
-> > Option allows to pause QEMU at new RUN_STATE_PRECONFIG time,
-> > which would allow to configure QEMU from QMP before machine
-> > jumps into board initialization code machine_run_board_init().  
-> 
-> Grammar suggestion:
-> 
-> This option allows pausing QEMU in the new RUN_STATE_PRECONFIG state, 
-> allowing the configuration of QEMU from QMP before the machine jumps 
-> into board initialization code of machine_run_board_init().
-> 
-> > 
-> > Intent is to allow management to query machine state and
-> > additionally configure it using previous query results
-> > within one QEMU instance (i.e. eliminate need to start QEMU
-> > twice, 1st to query board specific parameters and 2nd for
-> > for actual VM start using query result for additional
-> > parameters).
-> > 
-> > Initially it's planned to be used for configuring numa
-> > topology depending on cpu layout.  
-> 
-> It may be worth mentioning in the commit message how this differs from 
-> -S, and what the QMP client must do to get the guest started in this 
-> mode to enter the normal lifecycle that it used to have when using -S.
-> 
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> >   include/sysemu/sysemu.h |  1 +
-> >   qapi/run-state.json     |  3 ++-
-> >   qemu-options.hx         | 11 +++++++++++
-> >   qmp.c                   |  5 +++++
-> >   vl.c                    | 35 ++++++++++++++++++++++++++++++++++-
-> >   5 files changed, 53 insertions(+), 2 deletions(-)
-> >   
-> 
-> > +++ b/qapi/run-state.json
-> > @@ -49,12 +49,13 @@
-> >   # @colo: guest is paused to save/restore VM state under colo checkpoint,
-> >   #        VM can not get into this state unless colo capability is enabled
-> >   #        for migration. (since 2.8)
-> > +# @preconfig: QEMU is paused before machine is created.  
-> 
-> Needs a '(since 2.12)' tag.  Probably also be worth mentioning that this 
-> state is only visible for clients that pass the new CLI option.
-> 
-> > +++ b/qemu-options.hx
-> > @@ -3283,6 +3283,17 @@ STEXI
-> >   Run the emulation in single step mode.
-> >   ETEXI
-> >   
-> > +DEF("preconfig", 0, QEMU_OPTION_preconfig, \
-> > +    "-preconfig      pause QEMU before machine is initialized\n",
-> > +    QEMU_ARCH_ALL)
-> > +STEXI
-> > +@item -preconfig
-> > +@findex -preconfig
-> > +Pause QEMU for interactive configuration before machine is created,
-> > +which allows to query and configure properties affecting machine
-> > +initialization. Use QMP command 'cont' to exit paused state.  
-> 
-> Pause QEMU for interactive configuration before the machine is created, 
-> which allows querying and configuring properties that will affect 
-> machine initialization.  Use the QMP command 'cont' to exit the 
-> preconfig state.
-Thanks,
-I'll fix all of above on respin.
+On 2018-02-27 10:38, Fam Zheng wrote:
+> On Mon, 01/22 23:08, Max Reitz wrote:
+>> This patch allows the user to specify whether to use active or only
+>> passive mode for mirror block jobs.  Currently, this setting will rema=
+in
+>=20
+> I think you want s/passive/background/ in the whole patch.
 
-> Hmm - can you also transition from preconfig to the normal paused state 
-> via 'stop', which you would do to emit other commands that you used to 
-> issue between the older 'qemu -S' and the 'cont'?
-Both -preconfig and -S could be used together on CLI to
-achieve above effect, where 'cont' would transition state
-to the next requested state (i.e. if -S specified QEMU will do
-second pause where it used to do and if there is no -S on
-CLI machine will start to execute guest code).
+Errr, yes.
 
-I'm not sure about suggested 'stop' behavior though,
-wouldn't it be confusing since it would actually do
-something beside pausing and from already paused state
-at that?
-I've opted for adding as little as possible of new behavior,
-and 'cont' looked like a reasonable choice.
- 
+Max
+
+>> constant for the duration of the entire block job.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  qapi/block-core.json      | 11 +++++++++--
+>>  include/block/block_int.h |  4 +++-
+>>  block/mirror.c            | 12 +++++++-----
+>>  blockdev.c                |  9 ++++++++-
+>>  4 files changed, 27 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index ba1fd736f5..5fafa5fcac 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -1573,6 +1573,9 @@
+>>  #         written. Both will result in identical contents.
+>>  #         Default is true. (Since 2.4)
+>>  #
+>> +# @copy-mode: when to copy data to the destination; defaults to 'pass=
+ive'
+>> +#             (Since: 2.12)
+>> +#
+>>  # Since: 1.3
+>>  ##
+>>  { 'struct': 'DriveMirror',
+>> @@ -1582,7 +1585,7 @@
+>>              '*speed': 'int', '*granularity': 'uint32',
+>>              '*buf-size': 'int', '*on-source-error': 'BlockdevOnError'=
+,
+>>              '*on-target-error': 'BlockdevOnError',
+>> -            '*unmap': 'bool' } }
+>> +            '*unmap': 'bool', '*copy-mode': 'MirrorCopyMode' } }
+>> =20
+>>  ##
+>>  # @BlockDirtyBitmap:
+>> @@ -1761,6 +1764,9 @@
+>>  #                    above @device. If this option is not given, a no=
+de name is
+>>  #                    autogenerated. (Since: 2.9)
+>>  #
+>> +# @copy-mode: when to copy data to the destination; defaults to 'pass=
+ive'
+>> +#             (Since: 2.12)
+>> +#
+>>  # Returns: nothing on success.
+>>  #
+>>  # Since: 2.6
+>> @@ -1781,7 +1787,8 @@
+>>              '*speed': 'int', '*granularity': 'uint32',
+>>              '*buf-size': 'int', '*on-source-error': 'BlockdevOnError'=
+,
+>>              '*on-target-error': 'BlockdevOnError',
+>> -            '*filter-node-name': 'str' } }
+>> +            '*filter-node-name': 'str',
+>> +            '*copy-mode': 'MirrorCopyMode' } }
+>> =20
+>>  ##
+>>  # @block_set_io_throttle:
+>> diff --git a/include/block/block_int.h b/include/block/block_int.h
+>> index 03f3fdd129..1fda4d3d43 100644
+>> --- a/include/block/block_int.h
+>> +++ b/include/block/block_int.h
+>> @@ -948,6 +948,7 @@ void commit_active_start(const char *job_id, Block=
+DriverState *bs,
+>>   * @filter_node_name: The node name that should be assigned to the fi=
+lter
+>>   * driver that the mirror job inserts into the graph above @bs. NULL =
+means that
+>>   * a node name should be autogenerated.
+>> + * @copy_mode: When to trigger writes to the target.
+>>   * @errp: Error object.
+>>   *
+>>   * Start a mirroring operation on @bs.  Clusters that are allocated
+>> @@ -961,7 +962,8 @@ void mirror_start(const char *job_id, BlockDriverS=
+tate *bs,
+>>                    MirrorSyncMode mode, BlockMirrorBackingMode backing=
+_mode,
+>>                    BlockdevOnError on_source_error,
+>>                    BlockdevOnError on_target_error,
+>> -                  bool unmap, const char *filter_node_name, Error **e=
+rrp);
+>> +                  bool unmap, const char *filter_node_name,
+>> +                  MirrorCopyMode copy_mode, Error **errp);
+>> =20
+>>  /*
+>>   * backup_job_create:
+>> diff --git a/block/mirror.c b/block/mirror.c
+>> index 83082adb64..3b23886a5a 100644
+>> --- a/block/mirror.c
+>> +++ b/block/mirror.c
+>> @@ -1409,7 +1409,7 @@ static void mirror_start_job(const char *job_id,=
+ BlockDriverState *bs,
+>>                               const BlockJobDriver *driver,
+>>                               bool is_none_mode, BlockDriverState *bas=
+e,
+>>                               bool auto_complete, const char *filter_n=
+ode_name,
+>> -                             bool is_mirror,
+>> +                             bool is_mirror, MirrorCopyMode copy_mode=
+,
+>>                               Error **errp)
+>>  {
+>>      MirrorBlockJob *s;
+>> @@ -1515,7 +1515,7 @@ static void mirror_start_job(const char *job_id,=
+ BlockDriverState *bs,
+>>      s->on_target_error =3D on_target_error;
+>>      s->is_none_mode =3D is_none_mode;
+>>      s->backing_mode =3D backing_mode;
+>> -    s->copy_mode =3D MIRROR_COPY_MODE_BACKGROUND;
+>> +    s->copy_mode =3D copy_mode;
+>>      s->base =3D base;
+>>      s->granularity =3D granularity;
+>>      s->buf_size =3D ROUND_UP(buf_size, granularity);
+>> @@ -1582,7 +1582,8 @@ void mirror_start(const char *job_id, BlockDrive=
+rState *bs,
+>>                    MirrorSyncMode mode, BlockMirrorBackingMode backing=
+_mode,
+>>                    BlockdevOnError on_source_error,
+>>                    BlockdevOnError on_target_error,
+>> -                  bool unmap, const char *filter_node_name, Error **e=
+rrp)
+>> +                  bool unmap, const char *filter_node_name,
+>> +                  MirrorCopyMode copy_mode, Error **errp)
+>>  {
+>>      bool is_none_mode;
+>>      BlockDriverState *base;
+>> @@ -1597,7 +1598,7 @@ void mirror_start(const char *job_id, BlockDrive=
+rState *bs,
+>>                       speed, granularity, buf_size, backing_mode,
+>>                       on_source_error, on_target_error, unmap, NULL, N=
+ULL,
+>>                       &mirror_job_driver, is_none_mode, base, false,
+>> -                     filter_node_name, true, errp);
+>> +                     filter_node_name, true, copy_mode, errp);
+>>  }
+>> =20
+>>  void commit_active_start(const char *job_id, BlockDriverState *bs,
+>> @@ -1620,7 +1621,8 @@ void commit_active_start(const char *job_id, Blo=
+ckDriverState *bs,
+>>                       MIRROR_LEAVE_BACKING_CHAIN,
+>>                       on_error, on_error, true, cb, opaque,
+>>                       &commit_active_job_driver, false, base, auto_com=
+plete,
+>> -                     filter_node_name, false, &local_err);
+>> +                     filter_node_name, false, MIRROR_COPY_MODE_BACKGR=
+OUND,
+>=20
+> I think for active commit, MIRROR_COPY_MODE_WRITE_BLOCKING is more appe=
+aling?
+> Can be a task for another day, though.
+
+Hmm...  In theory a good point.  But in practice we currently still do
+the write to both the overlay and the backing file, so it has the same
+issues as normal mirroring.
+
+But for active commit, we have the interesting property that one write
+would actually be sufficient: We could only do the write to the backing
+file, and then punch a hole into the overlay so that the backing file
+data shines through.  So if we did that, we should really do
+MIRROR_COPY_MODE_WRITE_BLOCKING.
+
+But we currently don't, so I'd rather keep it in background mode until
+we do that. :-)
+
+Max
+
+
+--VH7Z0s3DcCX8AF9344Ta3vthPVrDZG14L
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqW0PQSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AG3YH/0uUuxWeWEn5/xebsRmSjBd1TGW8Gq4q
+Vpq8/V6VTBli1Y13t/TQp4TP09W4HO/g5JpvrJfAq3F3MPlJBYBhN0FR8Tl01eZP
+zeR1Nmm5RcutQbvS9QyVpoIpBIuzIqiorNcJ63pE227WBMGQaFJMGmUTUOVHqj0Q
+WzePIUdlQlppVzEovaapoK2ZGtylanh5krCotJe60SM+dxqJpyE8GCJgcEtQHb98
+88netRUSIImPbQ6O1OkjogK6dlzVGTrVeG17v7tI/mTq3WvP3qJ36C7OAhJJ5Oxn
+rDEw/MziU9kgI/SZg3ez/8B9tR9j3gxpUI6aVS4LgnjUUXSM/eOh1cI=
+=1Ras
+-----END PGP SIGNATURE-----
+
+--VH7Z0s3DcCX8AF9344Ta3vthPVrDZG14L--
