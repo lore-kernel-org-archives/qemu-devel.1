@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1er7SB-0003Ye-Nr
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:52 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1er7SD-0003am-DH
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1er7S8-0006Sq-3B
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:51 -0500
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:45704)
+	(envelope-from <richard.henderson@linaro.org>) id 1er7SC-0006Wa-Io
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:53 -0500
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:35866)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1er7S7-0006SU-TM
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:48 -0500
-Received: by mail-pg0-x243.google.com with SMTP id i133so1317508pgc.12
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 11:31:47 -0800 (PST)
+	id 1er7SC-0006W3-Ch
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:52 -0500
+Received: by mail-pf0-x241.google.com with SMTP id 68so1415700pfx.3
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 11:31:52 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 28 Feb 2018 11:31:22 -0800
-Message-Id: <20180228193125.20577-14-richard.henderson@linaro.org>
+Date: Wed, 28 Feb 2018 11:31:25 -0800
+Message-Id: <20180228193125.20577-17-richard.henderson@linaro.org>
 In-Reply-To: <20180228193125.20577-1-richard.henderson@linaro.org>
 References: <20180228193125.20577-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 13/16] target/arm: Decode aa32 armv8.3 3-same
+Subject: [Qemu-devel] [PATCH v3 16/16] target/arm: Enable ARM_FEATURE_V8_FCMA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +29,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org
 
+Enable it for the "any" CPU used by *-linux-user.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 68 insertions(+)
+ target/arm/cpu.c   | 1 +
+ target/arm/cpu64.c | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 9169b6b367..45513c9d86 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -7680,6 +7680,68 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-     return 0;
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index ca5fb1162a..452bc32f10 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1651,6 +1651,7 @@ static void arm_any_initfn(Object *obj)
+     set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
+     set_feature(&cpu->env, ARM_FEATURE_CRC);
+     set_feature(&cpu->env, ARM_FEATURE_V8_RDM);
++    set_feature(&cpu->env, ARM_FEATURE_V8_FCMA);
+     cpu->midr = 0xffffffff;
  }
- 
-+/* Advanced SIMD three registers of the same length extension.
-+ *  31           25    23  22    20   16   12  11   10   9    8        3     0
-+ * +---------------+-----+---+-----+----+----+---+----+---+----+---------+----+
-+ * | 1 1 1 1 1 1 0 | op1 | D | op2 | Vn | Vd | 1 | o3 | 0 | o4 | N Q M U | Vm |
-+ * +---------------+-----+---+-----+----+----+---+----+---+----+---------+----+
-+ */
-+static int disas_neon_insn_3same_ext(DisasContext *s, uint32_t insn)
-+{
-+    gen_helper_gvec_3_ptr *fn_gvec_ptr;
-+    int rd, rn, rm, rot, size, opr_sz;
-+    TCGv_ptr fpst;
-+    bool q;
-+
-+    q = extract32(insn, 6, 1);
-+    VFP_DREG_D(rd, insn);
-+    VFP_DREG_N(rn, insn);
-+    VFP_DREG_M(rm, insn);
-+    if ((rd | rn | rm) & q) {
-+        return 1;
-+    }
-+
-+    if ((insn & 0xfe200f10) == 0xfc200800) {
-+        /* VCMLA -- 1111 110R R.1S .... .... 1000 ...0 .... */
-+        size = extract32(insn, 20, 1);
-+        rot = extract32(insn, 23, 2);
-+        if (!arm_dc_feature(s, ARM_FEATURE_V8_FCMA)
-+            || (!size && !arm_dc_feature(s, ARM_FEATURE_V8_FP16))) {
-+            return 1;
-+        }
-+        fn_gvec_ptr = size ? gen_helper_gvec_fcmlas : gen_helper_gvec_fcmlah;
-+    } else if ((insn & 0xfea00f10) == 0xfc800800) {
-+        /* VCADD -- 1111 110R 1.0S .... .... 1000 ...0 .... */
-+        size = extract32(insn, 20, 1);
-+        rot = extract32(insn, 24, 1);
-+        if (!arm_dc_feature(s, ARM_FEATURE_V8_FCMA)
-+            || (!size && !arm_dc_feature(s, ARM_FEATURE_V8_FP16))) {
-+            return 1;
-+        }
-+        fn_gvec_ptr = size ? gen_helper_gvec_fcadds : gen_helper_gvec_fcaddh;
-+    } else {
-+        return 1;
-+    }
-+
-+    if (s->fp_excp_el) {
-+        gen_exception_insn(s, 4, EXCP_UDEF,
-+                           syn_fp_access_trap(1, 0xe, false), s->fp_excp_el);
-+        return 0;
-+    }
-+    if (!s->vfp_enabled) {
-+        return 1;
-+    }
-+
-+    opr_sz = (1 + q) * 8;
-+    fpst = get_fpstatus_ptr(1);
-+    tcg_gen_gvec_3_ptr(vfp_reg_offset(1, rd),
-+                       vfp_reg_offset(1, rn),
-+                       vfp_reg_offset(1, rm), fpst,
-+                       opr_sz, opr_sz, rot, fn_gvec_ptr);
-+    tcg_temp_free_ptr(fpst);
-+    return 0;
-+}
-+
- static int disas_coproc_insn(DisasContext *s, uint32_t insn)
- {
-     int cpnum, is64, crn, crm, opc1, opc2, isread, rt, rt2;
-@@ -8424,6 +8486,12 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                     }
-                 }
-             }
-+        } else if ((insn & 0x0e000a00) == 0x0c000800
-+                   && arm_dc_feature(s, ARM_FEATURE_V8)) {
-+            if (disas_neon_insn_3same_ext(s, insn)) {
-+                goto illegal_op;
-+            }
-+            return;
-         } else if ((insn & 0x0fe00000) == 0x0c400000) {
-             /* Coprocessor double register transfer.  */
-             ARCH(5TE);
+ #endif
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 7246866e7d..4228713b19 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -232,6 +232,7 @@ static void aarch64_any_initfn(Object *obj)
+     set_feature(&cpu->env, ARM_FEATURE_CRC);
+     set_feature(&cpu->env, ARM_FEATURE_V8_RDM);
+     set_feature(&cpu->env, ARM_FEATURE_V8_FP16);
++    set_feature(&cpu->env, ARM_FEATURE_V8_FCMA);
+     cpu->ctr = 0x80038003; /* 32 byte I and D cacheline size, VIPT icache */
+     cpu->dcz_blocksize = 7; /*  512 bytes */
+ }
 -- 
 2.14.3
