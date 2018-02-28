@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1er6nA-0004Tl-4O
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:49:28 -0500
+	(envelope-from <berrange@redhat.com>) id 1er6nb-0004iD-6f
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:49:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1er6n7-0005pz-3C
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:49:28 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54956 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1er6nY-00063p-68
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:49:55 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43422 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1er6n6-0005pN-UT
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:49:25 -0500
-References: <1519439425-27883-1-git-send-email-babu.moger@amd.com>
-	<1519439425-27883-2-git-send-email-babu.moger@amd.com>
-	<20180228173813.GA8418@flask>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8df70311-a3fd-f27f-6054-9076fc3f23e3@redhat.com>
-Date: Wed, 28 Feb 2018 12:49:13 -0600
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1er6nY-00063f-1W
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:49:52 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9356440FB659
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 18:49:51 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Wed, 28 Feb 2018 18:49:47 +0000
+Message-Id: <20180228184947.12317-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180228173813.GA8418@flask>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/5] target/i386: Fix a minor typo found
- while reviwing
+Subject: [Qemu-devel] [PATCH v2] crypto: ensure we use a predictable TLS
+ priority setting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +31,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Babu Moger <babu.moger@amd.com>
-Cc: ehabkost@redhat.com, kvm@vger.kernel.org, mtosatti@redhat.com, Gary.Hook@amd.com, qemu-devel@nongnu.org, pbonzini@redhat.com, pixo@polepetko.eu, rth@twiddle.net
+To: qemu-devel@nongnu.org
 
-On 02/28/2018 11:38 AM, Radim Kr=C4=8Dm=C3=A1=C5=99 wrote:
-> 2018-02-23 21:30-0500, Babu Moger:
+The TLS test cert generation relies on a fixed set of algorithms that are
+only usable under GNUTLS' default priority setting. When building QEMU
+with a custom distro specific priority setting, this can cause the TLS
+tests to fail. By forcing the tests to always use "NORMAL" priority we
+can make them more robust.
 
-In the subject line: s/reviwing/reviewing/  [It's never a good sign when=20
-a fix claiming to fix a typo introduces a typo ;) ]
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
 
-Or go for a shorter subject:
-  target/i386: Fix a minor typo
+Changed in v2:
 
->> Changed KVM_CPUID_FLAG_SIGNIFCANT_INDEX to KVM_CPUID_FLAG_SIGNIFICANT_=
-INDEX
->>
->> Signed-off-by: Babu Moger <babu.moger@amd.com>
->> ---
+ - Fix both test cases which use TLS creds !
+
+ tests/test-crypto-tlssession.c | 1 +
+ tests/test-io-channel-tls.c    | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/tests/test-crypto-tlssession.c b/tests/test-crypto-tlssessio=
+n.c
+index 1a4a066d76..82f21c27f2 100644
+--- a/tests/test-crypto-tlssession.c
++++ b/tests/test-crypto-tlssession.c
+@@ -75,6 +75,7 @@ static QCryptoTLSCreds *test_tls_creds_create(QCryptoTL=
+SCredsEndpoint endpoint,
+                      "server" : "client"),
+         "dir", certdir,
+         "verify-peer", "yes",
++        "priority", "NORMAL",
+         /* We skip initial sanity checks here because we
+          * want to make sure that problems are being
+          * detected at the TLS session validation stage,
+diff --git a/tests/test-io-channel-tls.c b/tests/test-io-channel-tls.c
+index a210d01ba5..47ba603e8d 100644
+--- a/tests/test-io-channel-tls.c
++++ b/tests/test-io-channel-tls.c
+@@ -78,6 +78,7 @@ static QCryptoTLSCreds *test_tls_creds_create(QCryptoTL=
+SCredsEndpoint endpoint,
+                      "server" : "client"),
+         "dir", certdir,
+         "verify-peer", "yes",
++        "priority", "NORMAL",
+         /* We skip initial sanity checks here because we
+          * want to make sure that problems are being
+          * detected at the TLS session validation stage,
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.14.3
