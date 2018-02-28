@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1er67V-0004wK-TM
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:06:28 -0500
+	(envelope-from <mreitz@redhat.com>) id 1er69K-0006WA-4C
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:08:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1er67U-0004v5-F7
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:06:25 -0500
+	(envelope-from <mreitz@redhat.com>) id 1er69J-0007aB-0H
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:08:18 -0500
+References: <20180226170313.8178-1-mreitz@redhat.com>
+	<20180227161743.GC32480@stefanha-x1.localdomain>
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 28 Feb 2018 19:05:07 +0100
-Message-Id: <20180228180507.3964-17-mreitz@redhat.com>
-In-Reply-To: <20180228180507.3964-1-mreitz@redhat.com>
-References: <20180228180507.3964-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 16/16] iotests: Add test for active mirroring
+Message-ID: <f0f0f6a0-bf09-8561-5c81-87d38ebef168@redhat.com>
+Date: Wed, 28 Feb 2018 19:08:09 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180227161743.GC32480@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="qGUCl9YDnRZhwsH6S0CGUmfXIO1xxDKDh"
+Subject: Re: [Qemu-devel] [RFC] qemu-img: Drop BLK_ZERO from convert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,166 +24,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/151     | 120 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/151.out |   5 ++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 126 insertions(+)
- create mode 100755 tests/qemu-iotests/151
- create mode 100644 tests/qemu-iotests/151.out
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--qGUCl9YDnRZhwsH6S0CGUmfXIO1xxDKDh
+From: Max Reitz <mreitz@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ qemu-devel@nongnu.org
+Message-ID: <f0f0f6a0-bf09-8561-5c81-87d38ebef168@redhat.com>
+Subject: Re: [Qemu-devel] [RFC] qemu-img: Drop BLK_ZERO from convert
+References: <20180226170313.8178-1-mreitz@redhat.com>
+ <20180227161743.GC32480@stefanha-x1.localdomain>
+In-Reply-To: <20180227161743.GC32480@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/tests/qemu-iotests/151 b/tests/qemu-iotests/151
-new file mode 100755
-index 0000000000..8d8e050f98
---- /dev/null
-+++ b/tests/qemu-iotests/151
-@@ -0,0 +1,120 @@
-+#!/usr/bin/env python
-+#
-+# Tests for active mirroring
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import os
-+import iotests
-+from iotests import qemu_img
-+
-+source_img = os.path.join(iotests.test_dir, 'source.' + iotests.imgfmt)
-+target_img = os.path.join(iotests.test_dir, 'target.' + iotests.imgfmt)
-+
-+class TestActiveMirror(iotests.QMPTestCase):
-+    image_len = 128 * 1024 * 1024 # MB
-+    potential_writes_in_flight = True
-+
-+    def setUp(self):
-+        qemu_img('create', '-f', iotests.imgfmt, source_img, '128M')
-+        qemu_img('create', '-f', iotests.imgfmt, target_img, '128M')
-+
-+        blk_source = {'id': 'source',
-+                      'if': 'none',
-+                      'node-name': 'source-node',
-+                      'driver': iotests.imgfmt,
-+                      'file': {'driver': 'file',
-+                               'filename': source_img}}
-+
-+        blk_target = {'node-name': 'target-node',
-+                      'driver': iotests.imgfmt,
-+                      'file': {'driver': 'file',
-+                               'filename': target_img}}
-+
-+        self.vm = iotests.VM()
-+        self.vm.add_drive_raw(self.qmp_to_opts(blk_source))
-+        self.vm.add_blockdev(self.qmp_to_opts(blk_target))
-+        self.vm.add_device('virtio-blk,drive=source')
-+        self.vm.launch()
-+
-+    def tearDown(self):
-+        self.vm.shutdown()
-+
-+        if not self.potential_writes_in_flight:
-+            self.assertTrue(iotests.compare_images(source_img, target_img),
-+                            'mirror target does not match source')
-+
-+        os.remove(source_img)
-+        os.remove(target_img)
-+
-+    def doActiveIO(self, sync_source_and_target):
-+        # Fill the source image
-+        self.vm.hmp_qemu_io('source',
-+                            'write -P 1 0 %i' % self.image_len);
-+
-+        # Start some background requests
-+        for offset in range(1 * self.image_len / 8, 3 * self.image_len / 8, 1024 * 1024):
-+            self.vm.hmp_qemu_io('source', 'aio_write -P 2 %i 1M' % offset)
-+        for offset in range(2 * self.image_len / 8, 3 * self.image_len / 8, 1024 * 1024):
-+            self.vm.hmp_qemu_io('source', 'aio_write -z %i 1M' % offset)
-+
-+        # Start the block job
-+        result = self.vm.qmp('blockdev-mirror',
-+                             job_id='mirror',
-+                             filter_node_name='mirror-node',
-+                             device='source-node',
-+                             target='target-node',
-+                             sync='full',
-+                             copy_mode='write-blocking')
-+        self.assert_qmp(result, 'return', {})
-+
-+        # Start some more requests
-+        for offset in range(3 * self.image_len / 8, 5 * self.image_len / 8, 1024 * 1024):
-+            self.vm.hmp_qemu_io('source', 'aio_write -P 3 %i 1M' % offset)
-+        for offset in range(4 * self.image_len / 8, 5 * self.image_len / 8, 1024 * 1024):
-+            self.vm.hmp_qemu_io('source', 'aio_write -z %i 1M' % offset)
-+
-+        # Wait for the READY event
-+        self.wait_ready(drive='mirror')
-+
-+        # Now start some final requests; all of these (which land on
-+        # the source) should be settled using the active mechanism.
-+        # The mirror code itself asserts that the source BDS's dirty
-+        # bitmap will stay clean between READY and COMPLETED.
-+        for offset in range(5 * self.image_len / 8, 7 * self.image_len / 8, 1024 * 1024):
-+            self.vm.hmp_qemu_io('source', 'aio_write -P 3 %i 1M' % offset)
-+        for offset in range(6 * self.image_len / 8, 7 * self.image_len / 8, 1024 * 1024):
-+            self.vm.hmp_qemu_io('source', 'aio_write -z %i 1M' % offset)
-+
-+        if sync_source_and_target:
-+            # If source and target should be in sync after the mirror,
-+            # we have to flush before completion
-+            self.vm.hmp_qemu_io('source', 'aio_flush')
-+            self.potential_writes_in_flight = False
-+
-+        self.complete_and_wait(drive='mirror', wait_ready=False)
-+
-+    def testActiveIO(self):
-+        self.doActiveIO(False)
-+
-+    def testActiveIOFlushed(self):
-+        self.doActiveIO(True)
-+
-+
-+
-+if __name__ == '__main__':
-+    iotests.main(supported_fmts=['qcow2', 'raw'])
-diff --git a/tests/qemu-iotests/151.out b/tests/qemu-iotests/151.out
-new file mode 100644
-index 0000000000..fbc63e62f8
---- /dev/null
-+++ b/tests/qemu-iotests/151.out
-@@ -0,0 +1,5 @@
-+..
-+----------------------------------------------------------------------
-+Ran 2 tests
-+
-+OK
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index a2dfe79d86..92b4f00bd8 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -157,6 +157,7 @@
- 148 rw auto quick
- 149 rw auto sudo
- 150 rw auto quick
-+151 rw auto
- 152 rw auto quick
- 153 rw auto quick
- 154 rw auto backing quick
--- 
-2.14.3
+On 2018-02-27 17:17, Stefan Hajnoczi wrote:
+> On Mon, Feb 26, 2018 at 06:03:13PM +0100, Max Reitz wrote:
+>> There are filesystems (among which is tmpfs) that have a hard time
+>> reporting allocation status.  That is definitely a bug in them.
+>>
+>> However, there is no good reason why qemu-img convert should query the=
+
+>> allocation status in the first place.  It does zero detection by itsel=
+f
+>> anyway, so we can detect unallocated areas ourselves.
+>>
+>> Furthermore, if a filesystem driver has any sense, reading unallocated=
+
+>> data should take just as much time as lseek(SEEK_DATA) + memset().  So=
+
+>> the only overhead we introduce by dropping the manual lseek() call is =
+a
+>> memset() in the driver and a buffer_is_zero() in qemu-img, both of whi=
+ch
+>> should be relatively quick.
+>=20
+> This makes sense.  Which file systems did you test this patch on?
+
+On tmpfs and xfs, so far.
+
+> XFS, ext4, and tmpfs would be a good minimal test set to prove the
+> patch.  Perhaps with two input files:
+> 1. A file that is mostly filled with data.
+> 2. A file that is only sparsely populated with data.
+
+And probably with vmdk, which (by default) forbids querying any areas
+larger than 64 kB.
+
+> The time taken should be comparable with the time before this patch.
+
+Yep, I'll do some benchmarks.
+
+Max
+
+
+--qGUCl9YDnRZhwsH6S0CGUmfXIO1xxDKDh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqW8AkSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AQGYH/A75iAWsUkwxF/EECKO54DjOy0pzVNAd
+RKiyKNvG2jlYoWRppo5PIVDBX+Q1DdqKvGPMCUhFZAI7R8ESmz2t7MBkgyTm7AKS
+3JpR/yf7TWw4Ykwmnjw0QXAgACljrpIWcpvvTLhmS8oFEx1ZTlLORP3456Rmo3Fy
+Evc7nWHPa48ieQQzew/ikWqu8ya2nrN0BS6YqExhekkTF4rseE5UVkHMt5/DTAue
+3lHlgEXkv3zL2fPEYNjmQtI2UyyOdcIrLkO+3xrTHrZZzTcd93+cbbycOGoLOrwP
+yggLqmN31AjHJyEIoP4El4YI734xe2y2dt0I5nV3KgRNJJAQovUTapk=
+=Kr4I
+-----END PGP SIGNATURE-----
+
+--qGUCl9YDnRZhwsH6S0CGUmfXIO1xxDKDh--
