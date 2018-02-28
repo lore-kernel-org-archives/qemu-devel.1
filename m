@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1erAF3-00078l-H0
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 17:30:48 -0500
+	(envelope-from <alistai@xilinx.com>) id 1erAK4-0000FG-5N
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 17:35:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1erAEj-0006Cm-CA
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 17:30:29 -0500
-Resent-Message-Id: <E1erAEj-0006Cm-CA@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21062)
+	(envelope-from <alistai@xilinx.com>) id 1erAJz-0006Fe-6Z
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 17:35:40 -0500
+Received: from mail-by2nam03on0046.outbound.protection.outlook.com
+	([104.47.42.46]:13344
+	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1erAEi-0006At-Pb
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 17:30:09 -0500
-In-Reply-To: <20180228221609.11265-1-jcmvbkbc@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151985699506.1281.8288356011284082883@bdbb90650ae5>
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1erAJy-0006BC-7L
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 17:35:34 -0500
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Wed, 28 Feb 2018 14:30:44 -0800
+Message-ID: <000b7176df121bd34c3329c45b93dc79d5f4f3ff.1519856998.git.alistair.francis@xilinx.com>
+In-Reply-To: <cover.1519856998.git.alistair.francis@xilinx.com>
+References: <cover.1519856998.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 28 Feb 2018 14:29:56 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 00/11] linux-user support for
- target/xtensa
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2 1/5] timer: Initial commit of
+ xlnx-pmu-iomod-pit device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,154 +28,343 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jcmvbkbc@gmail.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMjI4MjIxNjA5LjExMjY1LTEtamNtdmJrYmNAZ21haWwuY29tClN1Ympl
-Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMDAvMTFdIGxpbnV4LXVzZXIgc3VwcG9ydCBmb3Ig
-dGFyZ2V0L3h0ZW5zYQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFT
-RT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFp
-bGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRo
-bSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJB
-U0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4v
-JHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBz
-aG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
-ayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChu
-KzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5n
-IDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dp
-dGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAg
-cGF0Y2hldy8xNTE5NzA5OTY1LTI5ODMzLTEtZ2l0LXNlbmQtZW1haWwtY290YUBicmFhcC5vcmcg
-LT4gcGF0Y2hldy8xNTE5NzA5OTY1LTI5ODMzLTEtZ2l0LXNlbmQtZW1haWwtY290YUBicmFhcC5v
-cmcKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDIyODIyMTYwOS4xMTI2
-NS0xLWpjbXZia2JjQGdtYWlsLmNvbSAtPiBwYXRjaGV3LzIwMTgwMjI4MjIxNjA5LjExMjY1LTEt
-amNtdmJrYmNAZ21haWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZGNjY2Fh
-ZmU0NyBNQUlOVEFJTkVSUzogZml4IFc6IGFkZHJlc3MgZm9yIHh0ZW5zYQplOThiYjM5MzI4IHFl
-bXUtYmluZm10LWNvbmYuc2g6IGFkZCBxZW11LXh0ZW5zYQpjNzZkN2ZhMzM3IHRhcmdldC94dGVu
-c2E6IGFkZCBsaW51eC11c2VyIHN1cHBvcnQKNjIzZDMzNTUzMCBsaW51eC11c2VyOiBkcm9wIHVu
-dXNlZCB0YXJnZXRfbXN5bmMgZnVuY3Rpb24KYTQ4MjQzNTc2MyBsaW51eC11c2VyOiBmaXggdGFy
-Z2V0X21wcm90ZWN0L3RhcmdldF9tdW5tYXAgZXJyb3IgcmV0dXJuIHZhbHVlcwoxYTU4MTVmOTkz
-IGxpbnV4LXVzZXI6IGZpeCBhc3NlcnRpb24gaW4gc2htZHQKYzEyNjU3MmZhZiBsaW51eC11c2Vy
-OiBmaXggbW1hcC9tdW5tYXAvbXByb3RlY3QvbXJlbWFwL3NobWF0CjYzOTRmMmNhZmYgdGFyZ2V0
-L3h0ZW5zYTogc3VwcG9ydCBNVFRDRwpiZDJmYTNlMTJjIHRhcmdldC94dGVuc2E6IHVzZSBjb3Jy
-ZWN0IG51bWJlciBvZiByZWdpc3RlcnMgaW4gZ2Ric3R1Ygo3YzU3NTkzYmU2IHRhcmdldC94dGVu
-c2E6IG1hcmsgcmVnaXN0ZXIgd2luZG93cyBpbiB0aGUgZHVtcAoyNDQzNjY3YjVjIHRhcmdldC94
-dGVuc2E6IGR1bXAgY29ycmVjdCBwaHlzaWNhbCByZWdpc3RlcnMKCj09PSBPVVRQVVQgQkVHSU4g
-PT09CkNoZWNraW5nIFBBVENIIDEvMTE6IHRhcmdldC94dGVuc2E6IGR1bXAgY29ycmVjdCBwaHlz
-aWNhbCByZWdpc3RlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xMTogdGFyZ2V0L3h0ZW5zYTogbWFy
-ayByZWdpc3RlciB3aW5kb3dzIGluIHRoZSBkdW1wLi4uCkNoZWNraW5nIFBBVENIIDMvMTE6IHRh
-cmdldC94dGVuc2E6IHVzZSBjb3JyZWN0IG51bWJlciBvZiByZWdpc3RlcnMgaW4gZ2Ric3R1Yi4u
-LgpDaGVja2luZyBQQVRDSCA0LzExOiB0YXJnZXQveHRlbnNhOiBzdXBwb3J0IE1UVENHLi4uCkNo
-ZWNraW5nIFBBVENIIDUvMTE6IGxpbnV4LXVzZXI6IGZpeCBtbWFwL211bm1hcC9tcHJvdGVjdC9t
-cmVtYXAvc2htYXQuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8xMTogbGludXgtdXNlcjogZml4IGFzc2Vy
-dGlvbiBpbiBzaG1kdC4uLgpDaGVja2luZyBQQVRDSCA3LzExOiBsaW51eC11c2VyOiBmaXggdGFy
-Z2V0X21wcm90ZWN0L3RhcmdldF9tdW5tYXAgZXJyb3IgcmV0dXJuIHZhbHVlcy4uLgpDaGVja2lu
-ZyBQQVRDSCA4LzExOiBsaW51eC11c2VyOiBkcm9wIHVudXNlZCB0YXJnZXRfbXN5bmMgZnVuY3Rp
-b24uLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xMTogdGFyZ2V0L3h0ZW5zYTogYWRkIGxpbnV4LXVzZXIg
-c3VwcG9ydC4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM2Nzc6
-IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6MTM5NjoKKyNkZWZpbmUgVEFSR0VUX01B
-UF9GSVhFRF5JMHgxMF5JXkkvKiBJbnRlcnByZXQgYWRkciBleGFjdGx5ICovJAoKRVJST1I6IGNv
-ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNjc4OiBGSUxFOiBsaW51eC11c2VyL3N5
-c2NhbGxfZGVmcy5oOjEzOTc6CisjZGVmaW5lIFRBUkdFVF9NQVBfQU5PTllNT1VTXkkweDA4MDBe
-SV5JLyogZG9uJ3QgdXNlIGEgZmlsZSAqLyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2
-ZXIgdXNlIHRhYnMKIzY3OTogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoxMzk4Ogor
-I2RlZmluZSBUQVJHRVRfTUFQX0dST1dTRE9XTl5JMHgxMDAwXkleSS8qIHN0YWNrLWxpa2Ugc2Vn
-bWVudCAqLyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzY4MDog
-RklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoxMzk5OgorI2RlZmluZSBUQVJHRVRfTUFQ
-X0RFTllXUklURV5JMHgyMDAwXkleSS8qIEVUWFRCU1kgKi8kCgpFUlJPUjogY29kZSBpbmRlbnQg
-c2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM2ODE6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZz
-Lmg6MTQwMDoKKyNkZWZpbmUgVEFSR0VUX01BUF9FWEVDVVRBQkxFXkkweDQwMDBeSV5JLyogbWFy
-ayBpdCBhcyBhbiBleGVjdXRhYmxlICovJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZl
-ciB1c2UgdGFicwojNjgyOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjE0MDE6Cisj
-ZGVmaW5lIFRBUkdFVF9NQVBfTE9DS0VEXkkweDgwMDBeSV5JLyogcGFnZXMgYXJlIGxvY2tlZCAq
-LyQKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM2ODM6IEZJTEU6IGxpbnV4LXVz
-ZXIvc3lzY2FsbF9kZWZzLmg6MTQwMjoKKyNkZWZpbmUgVEFSR0VUX01BUF9OT1JFU0VSVkUJMHgw
-NDAwCQkvKiBkb24ndCBjaGVjayBmb3IgcmVzZXJ2YXRpb25zICovCgpFUlJPUjogY29kZSBpbmRl
-bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM2ODM6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9k
-ZWZzLmg6MTQwMjoKKyNkZWZpbmUgVEFSR0VUX01BUF9OT1JFU0VSVkVeSTB4MDQwMF5JXkkvKiBk
-b24ndCBjaGVjayBmb3IgcmVzZXJ2YXRpb25zICovJAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNo
-YXJhY3RlcnMKIzY4NDogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoxNDAzOgorI2Rl
-ZmluZSBUQVJHRVRfTUFQX1BPUFVMQVRFCTB4MTAwMDAJCS8qIHBvcHVsYXRlIChwcmVmYXVsdCkg
-cGFnZXRhYmxlcyAqLwoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
-Njg0OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjE0MDM6CisjZGVmaW5lIFRBUkdF
-VF9NQVBfUE9QVUxBVEVeSTB4MTAwMDBeSV5JLyogcG9wdWxhdGUgKHByZWZhdWx0KSBwYWdldGFi
-bGVzICovJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNjg1OiBG
-SUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjE0MDQ6CisjZGVmaW5lIFRBUkdFVF9NQVBf
-Tk9OQkxPQ0teSTB4MjAwMDBeSV5JLyogZG8gbm90IGJsb2NrIG9uIElPICovJAoKRVJST1I6IGNv
-ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNjg2OiBGSUxFOiBsaW51eC11c2VyL3N5
-c2NhbGxfZGVmcy5oOjE0MDU6CisjZGVmaW5lIFRBUkdFVF9NQVBfU1RBQ0teSTB4NDAwMDAkCgpX
-QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojODQ4OiBGSUxFOiBsaW51eC11c2VyL3h0
-ZW5zYS9zeXNjYWxsX25yLmg6ODc6CisjZGVmaW5lIFRBUkdFVF9OUl91dGltZSAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICA2NCAgICAgLyogZ2xpYmMgMi4zLjMgPz8gKi8KCldBUk5JTkc6
-IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM5NTA6IEZJTEU6IGxpbnV4LXVzZXIveHRlbnNhL3N5
-c2NhbGxfbnIuaDoxODk6CisjZGVmaW5lIFRBUkdFVF9OUl9yZXNlcnZlZDE1MiAgICAgICAgICAg
-ICAgICAgICAgICAgIDE1MiAgICAgLyogc2V0X3RocmVhZF9hcmVhICovCgpXQVJOSU5HOiBsaW5l
-IG92ZXIgODAgY2hhcmFjdGVycwojOTUxOiBGSUxFOiBsaW51eC11c2VyL3h0ZW5zYS9zeXNjYWxs
-X25yLmg6MTkwOgorI2RlZmluZSBUQVJHRVRfTlJfcmVzZXJ2ZWQxNTMgICAgICAgICAgICAgICAg
-ICAgICAgICAxNTMgICAgIC8qIGdldF90aHJlYWRfYXJlYSAqLwoKV0FSTklORzogbGluZSBvdmVy
-IDgwIGNoYXJhY3RlcnMKIzE2Njk6IEZJTEU6IGxpbnV4LXVzZXIveHRlbnNhL3Rlcm1iaXRzLmg6
-MjkyOgorI2RlZmluZSBUQVJHRVRfVENTQlJLUCAgICAgX0lPVygnVCcsIDM3LCBpbnQpICAgLyog
-TmVlZGVkIGZvciBQT1NJWCB0Y3NlbmRicmVhaygpKi8KCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hh
-cmFjdGVycwojMTY3OTogRklMRTogbGludXgtdXNlci94dGVuc2EvdGVybWJpdHMuaDozMDI6Cisj
-ZGVmaW5lIFRBUkdFVF9USU9DR1BUTiAgICBfSU9SKCdUJywweDMwLCB1bnNpZ25lZCBpbnQpIC8q
-IEdldCBQdHkgTnVtYmVyIChvZiBwdHktbXV4IGRldmljZSkgKi8KCkVSUk9SOiBzcGFjZSByZXF1
-aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzE2Nzk6IEZJTEU6IGxpbnV4LXVzZXIveHRl
-bnNhL3Rlcm1iaXRzLmg6MzAyOgorI2RlZmluZSBUQVJHRVRfVElPQ0dQVE4gICAgX0lPUignVCcs
-MHgzMCwgdW5zaWduZWQgaW50KSAvKiBHZXQgUHR5IE51bWJlciAob2YgcHR5LW11eCBkZXZpY2Up
-ICovCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSBy
-ZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzE2ODA6IEZJTEU6IGxpbnV4LXVzZXIv
-eHRlbnNhL3Rlcm1iaXRzLmg6MzAzOgorI2RlZmluZSBUQVJHRVRfVElPQ1NQVExDSyAgX0lPVygn
-VCcsMHgzMSwgaW50KSAgLyogTG9jay91bmxvY2sgUHR5ICovCiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTY4MTog
-RklMRTogbGludXgtdXNlci94dGVuc2EvdGVybWJpdHMuaDozMDQ6CisjZGVmaW5lIFRBUkdFVF9U
-SU9DR0RFViAgICBfSU9SKCdUJywweDMyLCB1bnNpZ25lZCBpbnQpIC8qIEdldCBwcmltYXJ5IGRl
-dmljZSBub2RlIG9mIC9kZXYvY29uc29sZSAqLwoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVy
-IHRoYXQgJywnIChjdHg6VnhWKQojMTY4MTogRklMRTogbGludXgtdXNlci94dGVuc2EvdGVybWJp
-dHMuaDozMDQ6CisjZGVmaW5lIFRBUkdFVF9USU9DR0RFViAgICBfSU9SKCdUJywweDMyLCB1bnNp
-Z25lZCBpbnQpIC8qIEdldCBwcmltYXJ5IGRldmljZSBub2RlIG9mIC9kZXYvY29uc29sZSAqLwog
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpXQVJOSU5HOiBsaW5lIG92ZXIg
-ODAgY2hhcmFjdGVycwojMTY4MjogRklMRTogbGludXgtdXNlci94dGVuc2EvdGVybWJpdHMuaDoz
-MDU6CisjZGVmaW5lIFRBUkdFVF9USU9DU0lHICAgICBfSU9XKCdUJywweDM2LCBpbnQpICAvKiBH
-ZW5lcmF0ZSBzaWduYWwgb24gUHR5IHNsYXZlICovCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0
-ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiMxNjgyOiBGSUxFOiBsaW51eC11c2VyL3h0ZW5zYS90ZXJt
-Yml0cy5oOjMwNToKKyNkZWZpbmUgVEFSR0VUX1RJT0NTSUcgICAgIF9JT1coJ1QnLDB4MzYsIGlu
-dCkgIC8qIEdlbmVyYXRlIHNpZ25hbCBvbiBQdHkgc2xhdmUgKi8KICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgXgoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE2
-OTU6IEZJTEU6IGxpbnV4LXVzZXIveHRlbnNhL3Rlcm1iaXRzLmg6MzE4OgorI2RlZmluZSBUQVJH
-RVRfVElPQ1NFUkdFVExTUiAgIF9JT1IoJ1QnLCA4OSwgdW5zaWduZWQgaW50KSAvKiBHZXQgbGlu
-ZSBzdGF0dXMgcmVnLiAqLwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE2OTc6
-IEZJTEU6IGxpbnV4LXVzZXIveHRlbnNhL3Rlcm1iaXRzLmg6MzIwOgorIyBkZWZpbmUgVEFSR0VU
-X1RJT0NTRVJfVEVNVCAgICAweDAxICAgICAgICAgICAgLyogVHJhbnNtaXR0ZXIgcGh5c2ljYWxs
-eSBlbXB0eSAqLwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE3MDM6IEZJTEU6
-IGxpbnV4LXVzZXIveHRlbnNhL3Rlcm1iaXRzLmg6MzI2OgorI2RlZmluZSBUQVJHRVRfVElPQ01J
-V0FJVCAgX0lPKCdUJywgOTIpIC8qIHdhaXQgZm9yIGEgY2hhbmdlIG9uIHNlcmlhbCBpbnB1dCBs
-aW5lKHMpICovCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTcwNDogRklMRTog
-bGludXgtdXNlci94dGVuc2EvdGVybWJpdHMuaDozMjc6CisjZGVmaW5lIFRBUkdFVF9USU9DR0lD
-T1VOVCAweDU0NUQgIC8qIHJlYWQgc2VyaWFsIHBvcnQgaW5saW5lIGludGVycnVwdCBjb3VudHMg
-Ki8KCnRvdGFsOiAxNiBlcnJvcnMsIDExIHdhcm5pbmdzLCAyMTkwIGxpbmVzIGNoZWNrZWQKCllv
-dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDEwLzEx
-OiBxZW11LWJpbmZtdC1jb25mLnNoOiBhZGQgcWVtdS14dGVuc2EuLi4KV0FSTklORzogbGluZSBv
-dmVyIDgwIGNoYXJhY3RlcnMKIzM1OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6
-MTAzOgoreHRlbnNhX21hZ2ljPSdceDdmRUxGXHgwMVx4MDFceDAxXHgwMFx4MDBceDAwXHgwMFx4
-MDBceDAwXHgwMFx4MDBceDAwXHgwMlx4MDBceDVlXHgwMCcKCkVSUk9SOiBsaW5lIG92ZXIgOTAg
-Y2hhcmFjdGVycwojMzY6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDoxMDQ6Cit4
-dGVuc2FfbWFzaz0nXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4MDBceGZmXHhmZlx4ZmZc
-eGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmVceGZmXHhmZlx4ZmYnCgpXQVJOSU5HOiBsaW5lIG92ZXIg
-ODAgY2hhcmFjdGVycwojMzk6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDoxMDc6
-Cit4dGVuc2FlYl9tYWdpYz0nXHg3ZkVMRlx4MDFceDAyXHgwMVx4MDBceDAwXHgwMFx4MDBceDAw
-XHgwMFx4MDBceDAwXHgwMFx4MDBceDAyXHgwMFx4NWUnCgpFUlJPUjogbGluZSBvdmVyIDkwIGNo
-YXJhY3RlcnMKIzQwOiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6MTA4OgoreHRl
-bnNhZWJfbWFzaz0nXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4MDBceGZmXHhmZlx4ZmZc
-eGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZlXHhmZlx4ZmYnCgp0b3RhbDogMiBlcnJvcnMsIDIg
-d2FybmluZ3MsIDI2IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDExLzExOiBNQUlOVEFJTkVSUzogZml4IFc6IGFkZHJl
-c3MgZm9yIHh0ZW5zYS4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
-d2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
-dGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+---
+V2:
+ - Use UINT32_MAX and uint64_t in xlnx_iomod_pit_ctr_pr()
+ - Name frequency varaible frequency_hz
+ - Shorten R_MAX #define
+
+ include/hw/timer/xlnx-pmu-iomod-pit.h |  58 ++++++++
+ hw/timer/xlnx-pmu-iomod-pit.c         | 241 ++++++++++++++++++++++++++++++++++
+ hw/timer/Makefile.objs                |   2 +
+ 3 files changed, 301 insertions(+)
+ create mode 100644 include/hw/timer/xlnx-pmu-iomod-pit.h
+ create mode 100644 hw/timer/xlnx-pmu-iomod-pit.c
+
+diff --git a/include/hw/timer/xlnx-pmu-iomod-pit.h b/include/hw/timer/xlnx-pmu-iomod-pit.h
+new file mode 100644
+index 0000000000..75cac6bedd
+--- /dev/null
++++ b/include/hw/timer/xlnx-pmu-iomod-pit.h
+@@ -0,0 +1,58 @@
++/*
++ * QEMU model of Xilinx I/O Module PIT
++ *
++ * Copyright (c) 2013 Xilinx Inc
++ * Written by Edgar E. Iglesias <edgar.iglesias@xilinx.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/ptimer.h"
++
++#define TYPE_XLNX_ZYNQMP_IOMODULE_PIT "xlnx.pmu_iomodule_pit"
++
++#define XLNX_ZYNQMP_IOMODULE_PIT(obj) \
++     OBJECT_CHECK(XlnxPMUPIT, (obj), TYPE_XLNX_ZYNQMP_IOMODULE_PIT)
++
++#define XLNX_ZYNQMP_IOMOD_PIT_R_MAX (0x08 + 1)
++
++typedef struct XlnxPMUPIT {
++    SysBusDevice parent_obj;
++    MemoryRegion iomem;
++
++    QEMUBH *bh;
++    ptimer_state *ptimer;
++
++    qemu_irq irq;
++    /* IRQ to pulse out when present timer hits zero */
++    qemu_irq hit_out;
++
++    /* Counter in Pre-Scalar(ps) Mode */
++    uint32_t ps_counter;
++    /* ps_mode irq-in to enable/disable pre-scalar */
++    bool ps_enable;
++    /* State var to remember hit_in level */
++    bool ps_level;
++
++    uint32_t frequency_hz;
++
++    uint32_t regs[XLNX_ZYNQMP_IOMOD_PIT_R_MAX];
++    RegisterInfo regs_info[XLNX_ZYNQMP_IOMOD_PIT_R_MAX];
++} XlnxPMUPIT;
+diff --git a/hw/timer/xlnx-pmu-iomod-pit.c b/hw/timer/xlnx-pmu-iomod-pit.c
+new file mode 100644
+index 0000000000..a6bdc5211d
+--- /dev/null
++++ b/hw/timer/xlnx-pmu-iomod-pit.c
+@@ -0,0 +1,241 @@
++/*
++ * QEMU model of Xilinx I/O Module PIT
++ *
++ * Copyright (c) 2013 Xilinx Inc
++ * Written by Edgar E. Iglesias <edgar.iglesias@xilinx.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/sysbus.h"
++#include "hw/ptimer.h"
++#include "hw/register.h"
++#include "qemu/main-loop.h"
++#include "qemu/log.h"
++#include "qapi/error.h"
++#include "hw/timer/xlnx-pmu-iomod-pit.h"
++
++#ifndef XLNX_ZYNQMP_IOMODULE_PIT_ERR_DEBUG
++#define XLNX_ZYNQMP_IOMODULE_PIT_ERR_DEBUG 0
++#endif
++
++REG32(PIT_PRELOAD, 0x00)
++REG32(PIT_COUNTER, 0x04)
++REG32(PIT_CONTROL, 0x08)
++    FIELD(PIT_CONTROL, PRELOAD, 1, 1)
++    FIELD(PIT_CONTROL, EN, 0, 1)
++
++static uint64_t xlnx_iomod_pit_ctr_pr(RegisterInfo *reg, uint64_t val)
++{
++    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(reg->opaque);
++    uint64_t ret;
++
++    if (s->ps_enable) {
++        ret = s->ps_counter;
++    } else {
++        ret = ptimer_get_count(s->ptimer);
++    }
++
++    return ret & UINT32_MAX;
++}
++
++static void xlnx_iomod_pit_control_pw(RegisterInfo *reg, uint64_t val)
++{
++    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(reg->opaque);
++
++    ptimer_stop(s->ptimer);
++
++    if (val & R_PIT_CONTROL_EN_MASK) {
++        if (s->ps_enable) {
++            /* pre-scalar mode do-Nothing here */
++            s->ps_counter = s->regs[R_PIT_PRELOAD];
++        } else {
++            ptimer_set_limit(s->ptimer, s->regs[R_PIT_PRELOAD], 1);
++            ptimer_run(s->ptimer, !(val & R_PIT_CONTROL_PRELOAD_MASK));
++
++        }
++    }
++}
++
++static const RegisterAccessInfo xlnx_iomod_pit_regs_info[] = {
++    { .name = "PIT_PRELOAD",  .addr = A_PIT_PRELOAD,
++        .ro = 0xffffffff,
++    },{ .name = "PIT_COUNTER",  .addr = A_PIT_COUNTER,
++        .ro = 0xffffffff,
++        .post_read = xlnx_iomod_pit_ctr_pr,
++    },{ .name = "PIT_CONTROL",  .addr = A_PIT_CONTROL,
++        .rsvd = 0xfffffffc,
++        .post_write = xlnx_iomod_pit_control_pw,
++    }
++};
++
++static void xlnx_iomod_pit_timer_hit(void *opaque)
++{
++    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(opaque);
++
++    qemu_irq_pulse(s->irq);
++
++    /* hit_out to make another pit move it's counter in pre-scalar mode. */
++    qemu_irq_pulse(s->hit_out);
++}
++
++static void xlnx_iomod_pit_ps_config(void *opaque, int n, int level)
++{
++    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(opaque);
++
++    s->ps_enable = level;
++}
++
++static void xlnx_iomod_pit_ps_hit_in(void *opaque, int n, int level)
++{
++    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(opaque);
++
++    if (!ARRAY_FIELD_EX32(s->regs, PIT_CONTROL, EN)) {
++        /* PIT disabled */
++        return;
++    }
++
++    /* Count only on positive edge */
++    if (!s->ps_level && level) {
++        if (s->ps_counter) {
++            s->ps_counter--;
++        }
++        s->ps_level = level;
++    } else {
++        /* Not on positive edge */
++        s->ps_level = level;
++        return;
++    }
++
++    /* If timer expires, try to preload or stop */
++    if (s->ps_counter == 0) {
++        xlnx_iomod_pit_timer_hit(opaque);
++
++        /* Check for pit preload/one-shot mode */
++        if (ARRAY_FIELD_EX32(s->regs, PIT_CONTROL, PRELOAD)) {
++            /* Preload Mode, Reload the ps_counter */
++            s->ps_counter = s->regs[R_PIT_PRELOAD];
++        } else {
++            /* One-Shot mode, turn off the timer */
++            s->regs[R_PIT_CONTROL] &= ~R_PIT_CONTROL_PRELOAD_MASK;
++        }
++    }
++}
++
++static void xlnx_iomod_pit_reset(DeviceState *dev)
++{
++    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(dev);
++    unsigned int i;
++
++    for (i = 0; i < ARRAY_SIZE(s->regs_info); ++i) {
++        register_reset(&s->regs_info[i]);
++    }
++
++    s->ps_level = false;
++}
++
++static const MemoryRegionOps xlnx_iomod_pit_ops = {
++    .read = register_read_memory,
++    .write = register_write_memory,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4,
++    },
++};
++
++static void xlnx_iomod_pit_realize(DeviceState *dev, Error **errp)
++{
++    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(dev);
++
++    s->bh = qemu_bh_new(xlnx_iomod_pit_timer_hit, s);
++    s->ptimer = ptimer_init(s->bh, PTIMER_POLICY_DEFAULT);
++    ptimer_set_freq(s->ptimer, s->frequency_hz);
++
++    /* IRQ out to pulse when present timer expires/reloads */
++    qdev_init_gpio_out_named(dev, &s->hit_out, "ps_hit_out", 1);
++
++    /* IRQ in to enable pre-scalar mode. Routed from gpo1 */
++    qdev_init_gpio_in_named(dev, xlnx_iomod_pit_ps_config, "ps_config", 1);
++
++    /* hit_out of neighbouring PIT is received as hit_in */
++    qdev_init_gpio_in_named(dev, xlnx_iomod_pit_ps_hit_in, "ps_hit_in", 1);
++}
++
++static void xlnx_iomod_pit_init(Object *obj)
++{
++    XlnxPMUPIT *s = XLNX_ZYNQMP_IOMODULE_PIT(obj);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    RegisterInfoArray *reg_array;
++
++    memory_region_init(&s->iomem, obj, TYPE_XLNX_ZYNQMP_IOMODULE_PIT,
++                       XLNX_ZYNQMP_IOMOD_PIT_R_MAX * 4);
++    reg_array =
++        register_init_block32(DEVICE(obj), xlnx_iomod_pit_regs_info,
++                              ARRAY_SIZE(xlnx_iomod_pit_regs_info),
++                              s->regs_info, s->regs,
++                              &xlnx_iomod_pit_ops,
++                              XLNX_ZYNQMP_IOMODULE_PIT_ERR_DEBUG,
++                              XLNX_ZYNQMP_IOMOD_PIT_R_MAX * 4);
++    memory_region_add_subregion(&s->iomem,
++                                0x0,
++                                &reg_array->mem);
++    sysbus_init_mmio(sbd, &s->iomem);
++    sysbus_init_irq(sbd, &s->irq);
++}
++
++static const VMStateDescription vmstate_xlnx_iomod_pit = {
++    .name = TYPE_XLNX_ZYNQMP_IOMODULE_PIT,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_END_OF_LIST(),
++    }
++};
++
++static Property xlnx_iomod_pit_properties[] = {
++    DEFINE_PROP_UINT32("frequency", XlnxPMUPIT, frequency_hz, 66000000),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void xlnx_iomod_pit_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->reset = xlnx_iomod_pit_reset;
++    dc->realize = xlnx_iomod_pit_realize;
++    dc->props = xlnx_iomod_pit_properties;
++    dc->vmsd = &vmstate_xlnx_iomod_pit;
++}
++
++static const TypeInfo xlnx_iomod_pit_info = {
++    .name          = TYPE_XLNX_ZYNQMP_IOMODULE_PIT,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(XlnxPMUPIT),
++    .class_init    = xlnx_iomod_pit_class_init,
++    .instance_init = xlnx_iomod_pit_init,
++};
++
++static void xlnx_iomod_pit_register_types(void)
++{
++    type_register_static(&xlnx_iomod_pit_info);
++}
++
++type_init(xlnx_iomod_pit_register_types)
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+index 8c19eac3b6..805c480cad 100644
+--- a/hw/timer/Makefile.objs
++++ b/hw/timer/Makefile.objs
+@@ -43,3 +43,5 @@ common-obj-$(CONFIG_ASPEED_SOC) += aspeed_timer.o
+ common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
+ common-obj-$(CONFIG_CMSDK_APB_TIMER) += cmsdk-apb-timer.o
+ common-obj-$(CONFIG_MSF2) += mss-timer.o
++
++common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-pmu-iomod-pit.o
+-- 
+2.14.1
