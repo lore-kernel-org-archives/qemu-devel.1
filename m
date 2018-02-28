@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eqwbl-0006T0-OF
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 02:57:02 -0500
+	(envelope-from <darren.kenny@oracle.com>) id 1eqwfo-0007ac-5W
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 03:01:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eqwbi-0003MD-M4
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 02:57:01 -0500
-Received: from mga11.intel.com ([192.55.52.93]:1861)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1eqwbi-0003Ln-D8
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 02:56:58 -0500
-Date: Wed, 28 Feb 2018 15:56:54 +0800
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-ID: <20180228075654.gv22h2zd73peuyxm@hz-desktop>
-References: <20171207101812.23602-1-haozhong.zhang@intel.com>
-	<20171207101812.23602-4-haozhong.zhang@intel.com>
-	<20180227164147.GB1799@perard.uk.xensource.com>
+	(envelope-from <darren.kenny@oracle.com>) id 1eqwfi-0005A2-0A
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 03:01:12 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:35118)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
+	id 1eqwfh-00058m-PQ
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 03:01:05 -0500
+Date: Wed, 28 Feb 2018 08:00:42 +0000
+From: Darren Kenny <darren.kenny@oracle.com>
+Message-ID: <20180228080042.5d6rr4incivrurk3@starbug-vm.ie.oracle.com>
+References: <1519788689-11967-1-git-send-email-suhang16@mails.ucas.ac.cn>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20180227164147.GB1799@perard.uk.xensource.com>
-Subject: Re: [Qemu-devel] [RFC QEMU PATCH v4 03/10] hostmem-xen: add a host
- memory backend for Xen
+In-Reply-To: <1519788689-11967-1-git-send-email-suhang16@mails.ucas.ac.cn>
+Subject: Re: [Qemu-devel] [PATCH v3] scripts/checkpatch.pl: add check for
+ `while` and `for`
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Su Hang <suhang16@mails.ucas.ac.cn>
+Cc: thuth@redhat.com, eblake@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
-On 02/27/18 16:41 +0000, Anthony PERARD wrote:
-> On Thu, Dec 07, 2017 at 06:18:05PM +0800, Haozhong Zhang wrote:
-> > diff --git a/backends/hostmem.c b/backends/hostmem.c
-> > index ee2c2d5bfd..ba13a52994 100644
-> > --- a/backends/hostmem.c
-> > +++ b/backends/hostmem.c
-> > @@ -12,6 +12,7 @@
-> >  #include "qemu/osdep.h"
-> >  #include "sysemu/hostmem.h"
-> >  #include "hw/boards.h"
-> > +#include "hw/xen/xen.h"
-> >  #include "qapi/error.h"
-> >  #include "qapi/visitor.h"
-> >  #include "qapi-types.h"
-> > @@ -277,6 +278,14 @@ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
-> >              goto out;
-> >          }
-> >  
-> > +        /*
-> > +         * The backend storage of MEMORY_BACKEND_XEN is managed by Xen,
-> > +         * so no further work in this function is needed.
-> > +         */
-> > +        if (xen_enabled() && !backend->mr.ram_block) {
-> > +            goto out;
-> > +        }
-> > +
-> >          ptr = memory_region_get_ram_ptr(&backend->mr);
-> >          sz = memory_region_size(&backend->mr);
-> >  
-> > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> > index 66eace5a5c..dcbfce33d5 100644
-> > --- a/hw/mem/pc-dimm.c
-> > +++ b/hw/mem/pc-dimm.c
-> > @@ -28,6 +28,7 @@
-> >  #include "sysemu/kvm.h"
-> >  #include "trace.h"
-> >  #include "hw/virtio/vhost.h"
-> > +#include "hw/xen/xen.h"
-> >  
-> >  typedef struct pc_dimms_capacity {
-> >       uint64_t size;
-> > @@ -108,7 +109,10 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
-> >      }
-> >  
-> >      memory_region_add_subregion(&hpms->mr, addr - hpms->base, mr);
-> > -    vmstate_register_ram(vmstate_mr, dev);
-> > +    /* memory-backend-xen is not backed by RAM. */
-> > +    if (!xen_enabled()) {
-> 
-> Is it possible to have the same condition as the one used in
-> host_memory_backend_memory_complete? i.e. base on whether the memory
-> region is mapped or not (backend->mr.ram_block).
+On Wed, Feb 28, 2018 at 11:31:29AM +0800, Su Hang wrote:
+>Adding check for `while` and `for` statements, which condition has more than
+>one line.
+>
+>The former checkpatch.pl can check `if` statement, which condition has more
+>than one line, whether block misses brace round, like this:
+>'''
+>if (cond1 ||
+>    cond2)
+>    statement;
+>'''
+>But it doesn't do the same check for `for` and `while` statements.
+>
+>Using `(?:...)` instead of `(...)` in regex pattern catch.
+>Because `(?:...)` is faster and avoids unwanted side-effect.
+>
+>Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+>Suggested-by: Eric Blake <eblake@redhat.com>
+>Suggested-by: Thomas Huth <thuth@redhat.com>
+>Signed-off-by: Su Hang <suhang16@mails.ucas.ac.cn>
+>---
+> scripts/checkpatch.pl | 6 +++---
+> 1 file changed, 3 insertions(+), 3 deletions(-)
+>
+>diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+>index 10c138344fa9..bed1dbbd54d1 100755
+>--- a/scripts/checkpatch.pl
+>+++ b/scripts/checkpatch.pl
+>@@ -2352,9 +2352,9 @@ sub process {
+> 			}
+> 		}
+>
+>-# check for missing bracing round if etc
+>-		if ($line =~ /(^.*)\b(for|while|if)\b/ &&
+>-			$line !~ /\#\s*(for|while|if)/) {
+>+# check for missing bracing around if etc
+>+		if ($line =~ /(^.*)\b(?:for|while|if)\b/ &&
+>+			$line !~ /\#\s*(?:for|while|if)/) {
 
-Like "if (!xen_enabled() || backend->mr.ram_block))"? No, it will mute
-the abortion (vmstate_register_ram --> qemu_ram_set_idstr ) caused by
-the case that !backend->mr.ram_block in the non-xen environment.
+It's a nit, but for readability I would suggest indenting the line
+above an extra tab or two to make it clear that it is part of the
+condition rather than the block. (You can see other instances of
+this in the file).
 
-Haozhong
+Otherwise:
 
-> 
-> > +        vmstate_register_ram(vmstate_mr, dev);
-> > +    }
-> >      numa_set_mem_node_id(addr, memory_region_size(mr), dimm->node);
-> >  
-> >  out:
-> > -- 
-> > 2.15.1
-> > 
-> 
-> -- 
-> Anthony PERARD
+Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+
+Thanks,
+
+Darren.
+
+
+> 			my ($level, $endln, @chunks) =
+> 				ctx_statement_full($linenr, $realcnt, 1);
+>                         if ($dbg_adv_apw) {
+>-- 
+>2.7.4
+>
+>
