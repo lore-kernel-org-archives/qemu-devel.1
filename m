@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1er90T-0001UG-KH
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:23 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1er90W-0001Xm-Fx
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1er90P-00061I-Nc
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:21 -0500
-Received: from mail-dm3nam03on0047.outbound.protection.outlook.com
-	([104.47.41.47]:38389
+	(envelope-from <brijesh.singh@amd.com>) id 1er90S-00066U-BX
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:24 -0500
+Received: from mail-dm3nam03on0060.outbound.protection.outlook.com
+	([104.47.41.60]:17929
 	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1er90P-0005yl-GA
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:17 -0500
+	id 1er90S-00064W-2C
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:20 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Wed, 28 Feb 2018 15:10:23 -0600
-Message-ID: <20180228211028.83970-24-brijesh.singh@amd.com>
+Date: Wed, 28 Feb 2018 15:10:25 -0600
+Message-Id: <20180228211028.83970-26-brijesh.singh@amd.com>
 In-Reply-To: <20180228211028.83970-1-brijesh.singh@amd.com>
 References: <20180228211028.83970-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v10 23/28] qmp: add query-sev-launch-measure
- command
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v10 25/28] cpu/i386: populate CPUID 0x8000_001F
+ when SEV is active
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,110 +30,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
 
-The command can be used by libvirt to retrieve the measurement of SEV guest=
-.
-This measurement is a signature of the memory contents that was encrypted
-through the LAUNCH_UPDATE_DATA.
+When SEV is enabled, CPUID 0x8000_001F should provide additional
+information regarding the feature (such as which page table bit is used
+to mark the pages as encrypted etc).
 
-Cc: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
+The details for memory encryption CPUID is available in AMD APM
+(https://support.amd.com/TechDocs/24594.pdf) Section E.4.17
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- monitor.c             |  7 +++++++
- qapi-schema.json      | 29 +++++++++++++++++++++++++++++
- target/i386/monitor.c | 17 +++++++++++++++++
- 3 files changed, 53 insertions(+)
+ target/i386/cpu.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/monitor.c b/monitor.c
-index 356d550aaf2d..d0ebd5906d9d 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -984,6 +984,7 @@ static void qmp_unregister_commands_hack(void)
- #ifndef TARGET_I386
-     qmp_unregister_command(&qmp_commands, "rtc-reset-reinjection");
-     qmp_unregister_command(&qmp_commands, "query-sev");
-+    qmp_unregister_command(&qmp_commands, "query-sev-launch-measure");
- #endif
- #ifndef TARGET_S390X
-     qmp_unregister_command(&qmp_commands, "dump-skeys");
-@@ -4164,6 +4165,12 @@ SevInfo *qmp_query_sev(Error **errp)
-     error_setg(errp, QERR_FEATURE_DISABLED, "query-sev");
-     return NULL;
- }
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index b5e431e769da..7a3cec59402b 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -26,6 +26,7 @@
+ #include "sysemu/hvf.h"
+ #include "sysemu/cpus.h"
+ #include "kvm_i386.h"
++#include "sev_i386.h"
+ 
+ #include "qemu/error-report.h"
+ #include "qemu/option.h"
+@@ -3612,6 +3613,13 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+         *ecx = 0;
+         *edx = 0;
+         break;
++    case 0x8000001F:
++        *eax = sev_enabled() ? 0x2 : 0;
++        *ebx = sev_get_cbit_position();
++        *ebx |= sev_get_reduced_phys_bits() << 6;
++        *ecx = 0;
++        *edx = 0;
++        break;
+     default:
+         /* reserved values: zero */
+         *eax = 0;
+@@ -4041,6 +4049,11 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+         if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
+             x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
+         }
 +
-+SevLaunchMeasureInfo *qmp_query_sev_launch_measure(Error **errp)
-+{
-+    error_setg(errp, QERR_FEATURE_DISABLED, "query-sev-launch-measure");
-+    return NULL;
-+}
- #endif
-=20
- #ifndef TARGET_S390X
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 467a06460ead..facf2138df6b 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -3250,3 +3250,32 @@
- #
- ##
- { 'command': 'query-sev', 'returns': 'SevInfo' }
-+
-+##
-+# @SevLaunchMeasureInfo:
-+#
-+# SEV Guest Launch measurement information
-+#
-+# @data: the measurement value encoded in base64
-+#
-+# Since: 2.12
-+#
-+##
-+{ 'struct': 'SevLaunchMeasureInfo', 'data': {'data': 'str'} }
-+
-+##
-+# @query-sev-launch-measure:
-+#
-+# Query the SEV guest launch information.
-+#
-+# Returns: The @SevLaunchMeasureInfo for the guest
-+#
-+# Since: 2.12
-+#
-+# Example:
-+#
-+# -> { "execute": "query-sev-launch-measure" }
-+# <- { "return": { "data": "4l8LXeNlSPUDlXPJG5966/8%YZ" } }
-+#
-+##
-+{ 'command': 'query-sev-launch-measure', 'returns': 'SevLaunchMeasureInfo'=
- }
-diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-index 64d459f80f0c..577d50eebaaa 100644
---- a/target/i386/monitor.c
-+++ b/target/i386/monitor.c
-@@ -720,3 +720,20 @@ void hmp_info_sev(Monitor *mon, const QDict *qdict)
-         monitor_printf(mon, "SEV is not enabled\n");
++        /* SEV requires CPUID[0x8000001F] */
++        if (sev_enabled()) {
++            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001F);
++        }
      }
- }
-+
-+SevLaunchMeasureInfo *qmp_query_sev_launch_measure(Error **errp)
-+{
-+    char *data;
-+    SevLaunchMeasureInfo *info;
-+
-+    data =3D sev_get_launch_measurement();
-+    if (!data) {
-+        error_setg(errp, "Measurement is not available");
-+        return NULL;
-+    }
-+
-+    info =3D g_malloc0(sizeof(*info));
-+    info->data =3D data;
-+
-+    return info;
-+}
---=20
+ 
+     /* Set cpuid_*level* based on cpuid_min_*level, if not explicitly set */
+-- 
 2.14.3
