@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1er0pp-0008Gl-Ro
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:27:50 -0500
+	(envelope-from <kraxel@redhat.com>) id 1er0tK-0002Xc-QL
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:31:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1er0po-00079Z-Tx
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:27:49 -0500
-Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:40957)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1er0po-00079C-OO
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:27:48 -0500
-Received: by mail-ot0-x232.google.com with SMTP id l12so2029398otj.7
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 04:27:48 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1519815685-29200-5-git-send-email-abdallah.bouassida@lauterbach.com>
-References: <1519815685-29200-1-git-send-email-abdallah.bouassida@lauterbach.com>
-	<1519815685-29200-5-git-send-email-abdallah.bouassida@lauterbach.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 28 Feb 2018 12:27:27 +0000
-Message-ID: <CAFEAcA-Q+_87n3-s5TnJK=90FJFL=MAA_3VDN4OQxBEvxbFOkA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] target/arm: Add
- arm_gdb_set_sysreg() callback
+	(envelope-from <kraxel@redhat.com>) id 1er0tH-0000Wf-21
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:31:26 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60208 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1er0tG-0000Vj-Tb
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:31:22 -0500
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 28 Feb 2018 13:31:07 +0100
+Message-Id: <20180228123110.6507-7-kraxel@redhat.com>
+In-Reply-To: <20180228123110.6507-1-kraxel@redhat.com>
+References: <20180228123110.6507-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 6/9] vfio/common: cleanup in
+ vfio_region_finalize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +24,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Khaled Jmal <khaled.jmal@lauterbach.com>
+To: qemu-devel@nongnu.org
+Cc: Alex Williamson <alex.williamson@redhat.com>, Tina Zhang <tina.zhang@intel.com>, intel-gvt-dev@lists.freedesktop.org, Kirti Wankhede <kwankhede@nvidia.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On 28 February 2018 at 11:01, Abdallah Bouassida
-<abdallah.bouassida@lauterbach.com> wrote:
-> This is a callback to set the cp-regs registered by the dynamic XML.
->
-> Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-> ---
->>> Some of our customers need to connect to Qemu using our tool TRACE32=C2=
-=AE
->>> via GDB,
->>> and for some use case they need to have write access to some particular
->>> cpregs.
->>> So, it will be nice to have this capability!
->>> Usually, a user won't modify these registers unless he knows what he is
->>> doing!
->
->> I also still don't really like using write_raw_cp_reg() here --
->> it will bypass some behaviour you want and in some cases will
->> just break the emulation because invariants we assume will
->> hold no longer hold. It would be a lot lot safer to not
->> provide write access at all, only read access.
->
-> Adding to that our customers may need this write access, our tool TRACE32=
-=C2=AE
-> needs this also in some particular cases. For example: temporary disablin=
-g MMU
-> to do a physical memory access.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/vfio/common.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-By clearing the SCTLR bit? That's a good example of a case that
-won't work reliably. If you clear the SCTLR.M bit via raw_write
-this will not perform the tlb_flush() that it needs to, which
-means that if anything does a memory access via the QEMU TLB
-it may get the wrong cached results. If you always clear the
-bit, do one gdb memory access then set the bit then it will
-probably not run into problems but you're walking on thin ice.
-
-thanks
--- PMM
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index f895e3c335..6a8203a532 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -858,6 +858,13 @@ void vfio_region_finalize(VFIORegion *region)
+     g_free(region->mmaps);
+ 
+     trace_vfio_region_finalize(region->vbasedev->name, region->nr);
++
++    region->mem = NULL;
++    region->mmaps = NULL;
++    region->nr_mmaps = 0;
++    region->size = 0;
++    region->flags = 0;
++    region->nr = 0;
+ }
+ 
+ void vfio_region_mmaps_set_enabled(VFIORegion *region, bool enabled)
+-- 
+2.9.3
