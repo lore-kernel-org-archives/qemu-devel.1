@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40135)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <abdallah.bouassida@lauterbach.com>)
-	id 1eqzV4-0003ac-4G
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 06:02:19 -0500
+	id 1eqzV2-0003aD-4q
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 06:02:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <abdallah.bouassida@lauterbach.com>)
-	id 1eqzUy-0007Kl-D5
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 06:02:18 -0500
-Received: from smtp1.lauterbach.com ([62.154.241.196]:51694)
+	id 1eqzUx-0007KF-9q
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 06:02:16 -0500
+Received: from smtp1.lauterbach.com ([62.154.241.196]:40468)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <abdallah.bouassida@lauterbach.com>)
-	id 1eqzUy-0007Cp-1Y
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 06:02:12 -0500
+	id 1eqzUw-0007C0-Vd
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 06:02:11 -0500
 Received: from unknown (HELO localhost.localdomain)
 	(Authenticated_SSL:abouassida@[41.224.44.126])
 	(envelope-sender <abdallah.bouassida@lauterbach.com>)
 	by smtp1.lauterbach.com (qmail-ldap-1.03) with ECDHE-RSA-AES256-SHA
 	encrypted SMTP
-	for <qemu-devel@nongnu.org>; 28 Feb 2018 11:01:54 -0000
+	for <qemu-devel@nongnu.org>; 28 Feb 2018 11:01:51 -0000
 From: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-Date: Wed, 28 Feb 2018 12:01:22 +0100
-Message-Id: <1519815685-29200-2-git-send-email-abdallah.bouassida@lauterbach.com>
-In-Reply-To: <1519815685-29200-1-git-send-email-abdallah.bouassida@lauterbach.com>
-References: <1519815685-29200-1-git-send-email-abdallah.bouassida@lauterbach.com>
-Subject: [Qemu-devel] [PATCH v3 1/4] target/arm: Add "ARM_CP_NO_GDB" as a
- new bit field for ARMCPRegInfo type
+Date: Wed, 28 Feb 2018 12:01:21 +0100
+Message-Id: <1519815685-29200-1-git-send-email-abdallah.bouassida@lauterbach.com>
+Subject: [Qemu-devel] [PATCH v3 0/4] target/arm: Add a dynamic
+ XML-description of the cp-registers to GDB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,48 +34,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
 Cc: qemu-arm@nongnu.org, khaled.jmal@lauterbach.com, Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
 
-This is a preparation for the coming feature of creating dynamically an XML
-description for the ARM sysregs.
-A register has ARM_CP_NO_GDB enabled will not be shown in the dynamic XML.
-This bit is enabled automatically when creating CP_ANY wildcard aliases.
-This bit could be enabled manually for any register we want to remove from the
-dynamic XML description.
+The last exchange:
+https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg03618.html
 
-Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
----
- target/arm/cpu.h    | 3 ++-
- target/arm/helper.c | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+- Add a new "ARM_CP_NO_GDB" bit field and enable it when creating CP_ANY
+  wildcard aliases.
+- Add "_S" suffix to the secure version of a sysreg and fix the reg names that
+  were manually containing (S) or (NS).
+- Add the XML dynamic generation and add a callback to read these sysregs.
+- Add a callback to set these sysregs (I put this as a separate patch as
+  we still discussing if we'll give a write access for these sysregs from GDB).
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 8c839fa..92cfe4c 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1776,10 +1776,11 @@ static inline uint64_t cpreg_to_kvm_id(uint32_t cpregid)
- #define ARM_LAST_SPECIAL         ARM_CP_DC_ZVA
- #define ARM_CP_FPU               0x1000
- #define ARM_CP_SVE               0x2000
-+#define ARM_CP_NO_GDB            0x4000
- /* Used only as a terminator for ARMCPRegInfo lists */
- #define ARM_CP_SENTINEL          0xffff
- /* Mask of only the flag bits in a type field */
--#define ARM_CP_FLAG_MASK         0x30ff
-+#define ARM_CP_FLAG_MASK         0x70ff
- 
- /* Valid values for ARMCPRegInfo state field, indicating which of
-  * the AArch32 and AArch64 execution states this register is visible in.
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index c5bc69b..bdd212f 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -5663,7 +5663,7 @@ static void add_cpreg_to_hashtable(ARMCPU *cpu, const ARMCPRegInfo *r,
-     if (((r->crm == CP_ANY) && crm != 0) ||
-         ((r->opc1 == CP_ANY) && opc1 != 0) ||
-         ((r->opc2 == CP_ANY) && opc2 != 0)) {
--        r2->type |= ARM_CP_ALIAS;
-+        r2->type |= ARM_CP_ALIAS | ARM_CP_NO_GDB;
-     }
- 
-     /* Check that raw accesses are either forbidden or handled. Note that
+@Peter: Intresting advises from your last review, Thanks a lot ;)
+
+
+Abdallah Bouassida (4):
+  target/arm: Add "ARM_CP_NO_GDB" as a new bit field for ARMCPRegInfo
+    type
+  target/arm: Add "_S" suffix to the secure version of a sysreg
+  target/arm: Add the XML dynamic generation
+  target/arm: Add arm_gdb_set_sysreg() callback
+
+ gdbstub.c            |   7 ++++
+ include/qom/cpu.h    |   9 +++-
+ target/arm/cpu.c     |   3 ++
+ target/arm/cpu.h     |  22 +++++++++-
+ target/arm/gdbstub.c | 116 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ target/arm/helper.c  |  35 ++++++++++------
+ 6 files changed, 177 insertions(+), 15 deletions(-)
+
 -- 
 2.7.4
