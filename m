@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1er2jH-00081h-NM
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:29:12 -0500
+	(envelope-from <eblake@redhat.com>) id 1er2sJ-0006Jy-MA
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:38:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1er2jG-00036F-Ns
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:29:11 -0500
-References: <20180122220806.22154-1-mreitz@redhat.com>
-	<20180122220806.22154-11-mreitz@redhat.com>
-	<20180227085910.GB25412@lemon.usersys.redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <d5ba0730-2b53-a2bf-aaa8-1a87bece1031@redhat.com>
-Date: Wed, 28 Feb 2018 15:28:53 +0100
+	(envelope-from <eblake@redhat.com>) id 1er2sI-0006cg-QE
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:38:31 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58590 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1er2sI-0006cR-Kh
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:38:30 -0500
+References: <20180228133912.21496-1-idgar@virtualoco.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <59f157f9-b20e-3d68-7fa6-e97210b92c6e@redhat.com>
+Date: Wed, 28 Feb 2018 08:38:18 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180227085910.GB25412@lemon.usersys.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="hDcfy2BW64QCiGPOTzJsPYmBy27W391OZ"
-Subject: Re: [Qemu-devel] [PATCH v2 10/16] hbitmap: Add @advance param to
- hbitmap_iter_next()
+In-Reply-To: <20180228133912.21496-1-idgar@virtualoco.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] vmgenid: allow VM Generation ID
+ modification via QMP/HMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,111 +28,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Or Idgar <idgar@virtualoco.com>, ben@skyportsystems.com, dgilbert@redhat.com, mst@redhat.com, imammedo@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
+Cc: oidgar@redhat.com, ghammer@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hDcfy2BW64QCiGPOTzJsPYmBy27W391OZ
-From: Max Reitz <mreitz@redhat.com>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <d5ba0730-2b53-a2bf-aaa8-1a87bece1031@redhat.com>
-Subject: Re: [PATCH v2 10/16] hbitmap: Add @advance param to
- hbitmap_iter_next()
-References: <20180122220806.22154-1-mreitz@redhat.com>
- <20180122220806.22154-11-mreitz@redhat.com>
- <20180227085910.GB25412@lemon.usersys.redhat.com>
-In-Reply-To: <20180227085910.GB25412@lemon.usersys.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 02/28/2018 07:39 AM, Or Idgar wrote:
+> From: Or Idgar <oidgar@redhat.com>
+> 
+> This patch allow changing the Virtual Machine Generation
 
-On 2018-02-27 09:59, Fam Zheng wrote:
-> On Mon, 01/22 23:08, Max Reitz wrote:
->> diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
->> index 9091c639b3..2a2aa5bd43 100644
->> --- a/tests/test-hbitmap.c
->> +++ b/tests/test-hbitmap.c
->> @@ -46,7 +46,7 @@ static void hbitmap_test_check(TestHBitmapData *data=
-,
->> =20
->>      i =3D first;
->>      for (;;) {
->> -        next =3D hbitmap_iter_next(&hbi);
->> +        next =3D hbitmap_iter_next(&hbi, true);
->>          if (next < 0) {
->>              next =3D data->size;
->>          }
->> @@ -435,25 +435,25 @@ static void test_hbitmap_iter_granularity(TestHB=
-itmapData *data,
->>      /* Note that hbitmap_test_check has to be invoked manually in thi=
-s test.  */
->>      hbitmap_test_init(data, 131072 << 7, 7);
->>      hbitmap_iter_init(&hbi, data->hb, 0);
->> -    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
->> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
->> =20
->>      hbitmap_test_set(data, ((L2 + L1 + 1) << 7) + 8, 8);
->>      hbitmap_iter_init(&hbi, data->hb, 0);
->> -    g_assert_cmpint(hbitmap_iter_next(&hbi), =3D=3D, (L2 + L1 + 1) <<=
- 7);
->> -    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
->> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), =3D=3D, (L2 + L1 +=
- 1) << 7);
->> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
->> =20
->>      hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
->> -    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
->> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
->> =20
->>      hbitmap_test_set(data, (131072 << 7) - 8, 8);
->>      hbitmap_iter_init(&hbi, data->hb, 0);
->> -    g_assert_cmpint(hbitmap_iter_next(&hbi), =3D=3D, (L2 + L1 + 1) <<=
- 7);
->> -    g_assert_cmpint(hbitmap_iter_next(&hbi), =3D=3D, 131071 << 7);
->> -    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
->> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), =3D=3D, (L2 + L1 +=
- 1) << 7);
->> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), =3D=3D, 131071 << =
-7);
->> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
->> =20
->>      hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
->> -    g_assert_cmpint(hbitmap_iter_next(&hbi), =3D=3D, 131071 << 7);
->> -    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
->> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), =3D=3D, 131071 << =
-7);
->> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
->>  }
->=20
-> Please add tests for advance=3Dfalse too.
+s/allow/allows/
 
-:C
+> ID through QMP/HMP while the vm guest is running.
 
-But writing tests is so hard!  And then most of the time you even find
-bugs in your own code.  Which makes it even harder... O:-)
+That's the description of "what" the patch is doing, but not the "why" - 
+you want to give some justification why this is useful.  Especially since...
 
-Will do.
+> As the definition block of VMGENID in ACPI includes the
+> "Notify" method, we can use it to notify the guest about
+> ID changes.
+> 
+> QMP command example:
+>      { "execute": "set-vm-generation-id",
+>            "arguments": {
+>                "guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
+>            }
+>      }
+> 
+> HMP command example:
+>      set-vm-generation-id 324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87
+> 
+> This patch is based off an earlier version by
+> Igor Mammedov (imammedo@redhat.com)
+> 
+> Signed-off-by: Or Idgar <oidgar@redhat.com>
+> Reviewed-by: Gal Hammer <ghammer@redhat.com>
+> ---
 
-Max
+> +++ b/docs/specs/vmgenid.txt
+> @@ -240,6 +240,7 @@ The property may be queried via QMP/HMP:
+>     (QEMU) query-vm-generation-id
+>     {"return": {"guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"}}
+>   
+> -Setting of this parameter is intentionally left out from the QMP/HMP
+> -interfaces.  There are no known use cases for changing the GUID once QEMU is
+> -running, and adding this capability would greatly increase the complexity.
 
+...the old docs said no known use exists.  Obviously, you wouldn't be 
+adding this unless you had a use case, so please describe that use case 
+as the "why".
 
---hDcfy2BW64QCiGPOTzJsPYmBy27W391OZ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> +Also, the property may be set via QMP/HMP:
+> +
+> +  (QEMU) set-vm-generation-id guid=ee6726ce-73b4-4a8b-863c-708f26515847
+> +  {"return": {}}
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index 4afd57c..4524669 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -1871,5 +1871,18 @@ ETEXI
+>       },
+>   
+>   STEXI
+> +@item set-vm-generation-id @var{uuid}
 
------BEGIN PGP SIGNATURE-----
+HMP commands are generally named with _ rather than -; and are geared 
+for easy human consumption (abbreviation is permitted), so I might have 
+named the HMP version set_vm_genid.
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqWvKUSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A3isIALKzLQNxS/WKn2LBSGHzbYcd3keDCeQy
-VJ7kBpfF2GYIFQ3mrzS7T8YTwn4r3iX31JxTqG/yCarcKGmHB0uNjz2quYO7vM+X
-wRxQYtraAqO4afSuPdkWzF9OuVy/ijHw9J6nGL3/zkLBf8YQV7EJrKwNup1FmPnc
-behdyESnPLXRTZO+c8yBTShK6f8PDjpurNcFCvPJklRq+pctyhduqP+YQ1kZLnWU
-ryr9xTbgjee+imCSjQ5dAFaAWuMB+/b4/bSPRZU5RKtnJ9fkiOzCWZr0W9bIhMfb
-ItN6G6oTMxE2E21lMzr4Gtf5uQ1bYVryb/pgNRzuXAFnRhPAGtXWbO0=
-=dBVX
------END PGP SIGNATURE-----
+> +++ b/qapi-schema.json
+> @@ -3193,6 +3193,17 @@
+>   { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
+>   
+>   ##
+> +# @set-vm-generation-id:
+> +#
+> +# Set Virtual Machine Generation ID
+> +#
+> +# @guid: new GUID to set as Virtual Machine Generation ID
+> +#
+> +# Since 2.12
+> +##
+> +{ 'command': 'set-vm-generation-id', 'data': { 'guid': 'str' } }
+> +
 
---hDcfy2BW64QCiGPOTzJsPYmBy27W391OZ--
+The QMP portion looks reasonable.  However, without a why, I'm reluctant 
+to give R-b.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
