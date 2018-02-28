@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1er48A-0000rz-33
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:58:58 -0500
+	(envelope-from <kwolf@redhat.com>) id 1er4Em-00057S-IM
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 11:05:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1er485-000623-7n
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:58:58 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33364 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1er485-00061n-2x
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:58:53 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C4521A27F2
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 15:58:51 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 28 Feb 2018 16:58:39 +0100
-Message-Id: <20180228155839.24886-1-marcandre.lureau@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1er4Ei-0001kF-Ib
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 11:05:48 -0500
+Date: Wed, 28 Feb 2018 17:05:18 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180228160518.GF4855@localhost.localdomain>
+References: <20180223235142.21501-1-jsnow@redhat.com>
+	<20180223235142.21501-13-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] docs/vmcoreinfo: detail unsupported host
- format behaviour
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180223235142.21501-13-jsnow@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v4 12/21] blockjobs: ensure abort is called
+ for cancelled jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,29 +24,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-block@nongnu.org, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
 
-Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- docs/specs/vmcoreinfo.txt | 4 ++++
- 1 file changed, 4 insertions(+)
+Am 24.02.2018 um 00:51 hat John Snow geschrieben:
+> Presently, even if a job is canceled post-completion as a result of
+> a failing peer in a transaction, it will still call .commit because
+> nothing has updated or changed its return code.
+> 
+> The reason why this does not cause problems currently is because
+> backup's implementation of .commit checks for cancellation itself.
+> 
+> I'd like to simplify this contract:
+> 
+> (1) Abort is called if the job/transaction fails
+> (2) Commit is called if the job/transaction succeeds
+> 
+> To this end: A job's return code, if 0, will be forcibly set as
+> -ECANCELED if that job has already concluded. Remove the now
+> redundant check in the backup job implementation.
 
-diff --git a/docs/specs/vmcoreinfo.txt b/docs/specs/vmcoreinfo.txt
-index 821261067f..bcbca6fe47 100644
---- a/docs/specs/vmcoreinfo.txt
-+++ b/docs/specs/vmcoreinfo.txt
-@@ -29,6 +29,10 @@ processing of entry values.
- A write of 0 in guest_format will disable further processing of
- vmcoreinfo entry values & content.
-=20
-+You may write a guest_format that is not supported by the host, in
-+which case the entry data can be ignored by qemu (but you may still
-+access it through a debugger, via vmcoreinfo_realize::vmcoreinfo_state).
-+
- Format & content
- ****************
-=20
---=20
-2.16.1.73.g5832b7e9f2
+Thanks, another fix that addresses a comment I made on an earlier patch!
+
+> We need to check for cancellation in both block_job_completed
+> AND block_job_completed_single, because jobs may be cancelled between
+> those two calls; for instance in transactions.
+> 
+> The check in block_job_completed could be removed, but there's no
+> point in starting to attempt to succeed a transaction that we know
+> in advance will fail.
+> 
+> This does NOT affect mirror jobs that are "canceled" during their
+> synchronous phase. The mirror job itself forcibly sets the canceled
+> property to false prior to ceding control, so such cases will invoke
+> the "commit" callback.
+
+Which is a sign that mirror is abusing the interface. But yes, we need
+to keep it working.
+
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  block/backup.c     |  2 +-
+>  block/trace-events |  1 +
+>  blockjob.c         | 19 +++++++++++++++----
+>  3 files changed, 17 insertions(+), 5 deletions(-)
+> 
+> diff --git a/block/backup.c b/block/backup.c
+> index 7e254dabff..453cd62c24 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -206,7 +206,7 @@ static void backup_cleanup_sync_bitmap(BackupBlockJob *job, int ret)
+>      BdrvDirtyBitmap *bm;
+>      BlockDriverState *bs = blk_bs(job->common.blk);
+>  
+> -    if (ret < 0 || block_job_is_cancelled(&job->common)) {
+> +    if (ret < 0) {
+>          /* Merge the successor back into the parent, delete nothing. */
+>          bm = bdrv_reclaim_dirty_bitmap(bs, job->sync_bitmap, NULL);
+>          assert(bm);
+> diff --git a/block/trace-events b/block/trace-events
+> index 266afd9e99..5e531e0310 100644
+> --- a/block/trace-events
+> +++ b/block/trace-events
+> @@ -5,6 +5,7 @@ bdrv_open_common(void *bs, const char *filename, int flags, const char *format_n
+>  bdrv_lock_medium(void *bs, bool locked) "bs %p locked %d"
+>  
+>  # blockjob.c
+> +block_job_completed(void *job, int ret, int jret) "job %p ret %d corrected ret %d"
+>  block_job_state_transition(void *job,  int ret, const char *legal, const char *s0, const char *s1) "job %p (ret: %d) attempting %s transition (%s-->%s)"
+>  block_job_apply_verb(void *job, const char *state, const char *verb, const char *legal) "job %p in state %s; applying verb %s (%s)"
+>  
+> diff --git a/blockjob.c b/blockjob.c
+> index 4d29391673..ef17dea004 100644
+> --- a/blockjob.c
+> +++ b/blockjob.c
+> @@ -384,13 +384,22 @@ void block_job_start(BlockJob *job)
+>      bdrv_coroutine_enter(blk_bs(job->blk), job->co);
+>  }
+>  
+> +static void block_job_update_rc(BlockJob *job)
+> +{
+> +    if (!job->ret && block_job_is_cancelled(job)) {
+> +        job->ret = -ECANCELED;
+> +    }
+> +    if (job->ret) {
+> +        block_job_state_transition(job, BLOCK_JOB_STATUS_ABORTING);
+> +    }
+> +}
+> +
+>  static void block_job_completed_single(BlockJob *job)
+>  {
+>      assert(job->completed);
+>  
+> -    if (job->ret || block_job_is_cancelled(job)) {
+> -        block_job_state_transition(job, BLOCK_JOB_STATUS_ABORTING);
+> -    }
+> +    /* Ensure abort is called for late-transactional failures */
+> +    block_job_update_rc(job);
+>  
+>      if (!job->ret) {
+>          if (job->driver->commit) {
+> @@ -898,7 +907,9 @@ void block_job_completed(BlockJob *job, int ret)
+>      assert(blk_bs(job->blk)->job == job);
+>      job->completed = true;
+>      job->ret = ret;
+> -    if (ret < 0 || block_job_is_cancelled(job)) {
+> +    block_job_update_rc(job);
+
+Hmm... We are transitioning to ABORTED here now. This means that in
+block_job_completed_single() we get an ABORTED -> ABORTED transition.
+A bit ugly, but not really a problem. If you decide to remove the
+s0 == s1 special case in block_job_state_transition(), you'll need to
+allow this transition in the table.
+
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
