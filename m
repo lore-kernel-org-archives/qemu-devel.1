@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1er1Tg-0006rw-Ck
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:09:10 -0500
+	(envelope-from <mreitz@redhat.com>) id 1er1Y5-0000Fu-L9
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:13:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1er1Tb-0000bh-Cs
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:09:00 -0500
-Received: from latin.grep.be ([2a01:4f8:140:52e5::2]:36908)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wouter@grep.be>) id 1er1Tb-0000YA-1h
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:08:55 -0500
-Date: Wed, 28 Feb 2018 14:08:16 +0100
-From: Wouter Verhelst <w@uter.be>
-Message-ID: <20180228130816.GA19355@grep.be>
-References: <20161214150840.10899-1-alex@alex.org.uk>
-	<c2faa919-65c6-d5a3-508d-2f069f2ba61e@redhat.com>
-	<1e3244d2-daea-6f3f-f852-642bdf216e17@virtuozzo.com>
-	<d1e7c1c5-622c-ff78-4aec-ce62b0273d24@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d1e7c1c5-622c-ff78-4aec-ce62b0273d24@redhat.com>
-Subject: Re: [Qemu-devel] [Nbd] [PATCH] Further tidy-up on block status
+	(envelope-from <mreitz@redhat.com>) id 1er1Y4-0001vi-Na
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:13:33 -0500
+From: Max Reitz <mreitz@redhat.com>
+Date: Wed, 28 Feb 2018 14:13:15 +0100
+Message-Id: <20180228131315.30194-3-mreitz@redhat.com>
+In-Reply-To: <20180228131315.30194-1-mreitz@redhat.com>
+References: <20180228131315.30194-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/2] iotests: Test preallocated truncate of 2G
+ image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,102 +20,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Alex Bligh <alex@alex.org.uk>, nbd list <nbd@other.debian.org>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Pavel Borzenkov <pborzenkov@virtuozzo.com>, stefanha@redhat.com, "Denis V . Lunev" <den@openvz.org>, Markus Pargmann <mpa@pengutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, qemu-stable@nongnu.org
 
-Hi,
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ tests/qemu-iotests/106     | 24 ++++++++++++++++++++++++
+ tests/qemu-iotests/106.out | 10 ++++++++++
+ 2 files changed, 34 insertions(+)
 
-Sorry, I forgot to reply to this earlier.
-
-On Fri, Feb 16, 2018 at 10:10:59AM -0600, Eric Blake wrote:
-> On 02/16/2018 07:53 AM, Vladimir Sementsov-Ogievskiy wrote:
-> > Good idea. But it would be tricky thing to maintain backward
-> > compatibility with published versions of virtuozzo product. And finally
-> > our implementation would be more complex because of this simplification.
-> 
-> > Hm. Finally, you suggested several changes (including already merged
-> > 56c77720 :( ). Suggestions are logical. But if they will be accepted, we
-> > (Virtuozzo) will have to invent tricky hard-to-maintain code, to
-> > distinguish by third factors our already published versions.
-
-Hrm. I wasn't aware you'd already published those versions; if you had
-told us, we could've reviewed the spec at that point and either merge it
-or update it to incorporate whatever changes you think seem like they
-are necessary.
-
-Note that the section "Experimental extensions" contains the following
-wording:
-
-    In addition to the normative elements of the specification set out
-    herein, various experimental non-normative extensions have been
-    proposed. These may not be implemented in any known server or
-    client, and are subject to change at any point. A full
-    implementation may require changes to the specifications, or cause
-    the specifications to be withdrawn altogether.
-
-    [...]
-
-    Implementors of these extensions are strongly suggested to contact
-    the mailinglist in order to help fine-tune the specifications before
-    committing to a particular implementation.
-
-i.e., what's in an "extension-" branch can be described as "we're
-thinking about it and it will probably happen as written, but we're not
-entirely sure yet". The idea behind this is that we don't want to limit
-ourselves to things that haven't been implemented (but that the fact of
-"implementing something" causes it to get written into stone, sortof).
-
-This is different from how most standards bodies work, I'm sure, but it
-seemed to work so far, and I wish you had let us know that the work you
-were doing was about to be reaching customers. Anyway.
-
-[...]
-> Also, the Virtuozzo product hasn't been mentioned on the NBD list, and while
-> you are preparing patches to the public qemu based on the Virtuozzo product,
-> I'm not sure if there is a public repository for the existing Virtuozzo
-> product out in the wild.  Is your product using NBD_OPT_LIST_META_CONTEXT,
-> or _just_ NBD_OPT_SET_META_CONTEXT?
-
-+1. What's published currently?
-
-[...]
-> Or, we can revert the change in commit 56c77720, and keep
-> NBD_REPLY_TYPE_BLOCK_STATUS at 5 (it leaves a hole in the NBD_REPLY_TYPE
-> numbering, where 3 and 4 might be filled in by other future extensions, or
-> permanently skipped).  This works IF there are no OTHER incompatible changes
-> made to the rest of the block status extension as part of promoting it to
-> current (where we still haven't finished that debate, given my question on
-> whether 32-bit lengths and colon-separated namespace:leaf in a single string
-> is the best representation).
-> 
-> So, I'd like some feedback from Alex or Wouter on which alternatives seem
-> nicest at this point.
-
-I'm thinking that reverting at least the number change seems like a good
-idea. If Vladimir can shed some light on what's been published so far,
-we can see what damage has been done and try to limit further damage.
-
-It makes no sense to ignore that the spec has been implemented; the
-whole point of writing a spec is so that third parties can implement it
-and be compatible. If we ignore that just because there was a
-misunderstanding, then I think we're throwing away the kid with the
-bathwater.
-
-Since I don't think a gap in numbers is that much of a problem, I'm
-happy reverting the renumbering part of 56c77720 and keep it at 5. I'd
-also like to know what it is exactly that Virtuozzo implemented, so we
-can update the extension-blockstatus (if necessary) and then merge that
-to master.
-
-However, for future reference, Vladimir, I would prefer it if you could
-give us a heads-up if you're getting close to releasing something to
-the public that's still in an experimental branch, so that we can make
-updates if necessary and merge it to master.
-
-Thanks,
-
+diff --git a/tests/qemu-iotests/106 b/tests/qemu-iotests/106
+index bfe71f4e60..5e51f88a78 100755
+--- a/tests/qemu-iotests/106
++++ b/tests/qemu-iotests/106
+@@ -86,6 +86,30 @@ for growth_mode in falloc full off; do
+     $QEMU_IMG resize -f "$IMGFMT" --shrink --preallocation=$growth_mode "$TEST_IMG" -${GROWTH_SIZE}K
+ done
+ 
++echo
++echo '=== Testing image growth on 2G empty image ==='
++
++for growth_mode in falloc full; do
++    echo
++    echo "--- growth_mode=$growth_mode ---"
++
++    # Maybe we want to do an lseek() to the end of the file before the
++    # preallocation; if the file has a length of 2 GB, that would
++    # return an integer that overflows to negative when put into a
++    # plain int.  We should use the correct type for the result, and
++    # this tests we do.
++
++    _make_test_img 2G
++    $QEMU_IMG resize -f "$IMGFMT" --preallocation=$growth_mode "$TEST_IMG" +${GROWTH_SIZE}K
++
++    actual_size=$($QEMU_IMG info -f "$IMGFMT" "$TEST_IMG" | grep 'disk size')
++    actual_size=$(echo "$actual_size" | sed -e 's/^[^0-9]*\([0-9]\+\).*$/\1/')
++
++    if [ $actual_size -lt $GROWTH_SIZE ]; then
++        echo "ERROR: Image should have at least ${GROWTH_SIZE}K, but has ${actual_size}K"
++    fi
++done
++
+ # success, all done
+ echo '*** done'
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/106.out b/tests/qemu-iotests/106.out
+index 0a42312301..c459957660 100644
+--- a/tests/qemu-iotests/106.out
++++ b/tests/qemu-iotests/106.out
+@@ -47,4 +47,14 @@ qemu-img: Preallocation can only be used for growing images
+ 
+ --- growth_mode=off ---
+ Image resized.
++
++=== Testing image growth on 2G empty image ===
++
++--- growth_mode=falloc ---
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2147483648
++Image resized.
++
++--- growth_mode=full ---
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2147483648
++Image resized.
+ *** done
 -- 
-Could you people please use IRC like normal people?!?
-
-  -- Amaya Rodrigo Sastre, trying to quiet down the buzz in the DebConf 2008
-     Hacklab
+2.14.3
