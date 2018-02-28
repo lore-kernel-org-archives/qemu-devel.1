@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1er0tL-0002Y6-M0
+	(envelope-from <kraxel@redhat.com>) id 1er0tL-0002YA-Oj
 	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:31:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1er0tK-0000Z9-0L
+	(envelope-from <kraxel@redhat.com>) id 1er0tF-0000UK-RJ
 	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:31:27 -0500
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:33237)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1er0tJ-0000YO-Rm
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:31:25 -0500
-Received: by mail-oi0-x242.google.com with SMTP id j81so1634043oia.0
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 04:31:25 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1518185725-69559-1-git-send-email-wanpengli@tencent.com>
-References: <1518185725-69559-1-git-send-email-wanpengli@tencent.com>
-From: Wanpeng Li <kernellwp@gmail.com>
-Date: Wed, 28 Feb 2018 20:31:24 +0800
-Message-ID: <CANRm+CyaGM+SnFo_iQv2whFb_2p3F3k=pCABzQXBCA9auwqqXQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] target-i386: add KVM_HINTS_DEDICATED
- performance hint
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35070 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1er0tF-0000Tg-LA
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:31:21 -0500
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 28 Feb 2018 13:31:04 +0100
+Message-Id: <20180228123110.6507-4-kraxel@redhat.com>
+In-Reply-To: <20180228123110.6507-1-kraxel@redhat.com>
+References: <20180228123110.6507-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 3/9] ui/pixman: add
+ qemu_drm_format_to_pixman()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,103 +24,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kvm <kvm@vger.kernel.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Alex Williamson <alex.williamson@redhat.com>, Tina Zhang <tina.zhang@intel.com>, intel-gvt-dev@lists.freedesktop.org, Kirti Wankhede <kwankhede@nvidia.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Ping,
-2018-02-09 22:15 GMT+08:00 Wanpeng Li <kernellwp@gmail.com>:
-> From: Wanpeng Li <wanpengli@tencent.com>
->
-> Add KVM_HINTS_DEDICATED performance hint, guest checks this feature bit
-> to determine if they run on dedicated vCPUs, allowing optimizations such
-> as usage of qspinlocks.
->
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
-> v1 -> v2:
->  * add a new feature word
->
->  target/i386/cpu.c | 14 ++++++++++++++
->  target/i386/cpu.h |  3 +++
->  target/i386/kvm.c |  4 ++++
->  3 files changed, 21 insertions(+)
->
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index d70954b..e2974ad 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -358,6 +358,20 @@ static FeatureWordInfo feature_word_info[FEATURE_WOR=
-DS] =3D {
->          .cpuid_eax =3D KVM_CPUID_FEATURES, .cpuid_reg =3D R_EAX,
->          .tcg_features =3D TCG_KVM_FEATURES,
->      },
-> +    [FEAT_KVM_HINTS] =3D {
-> +        .feat_names =3D {
-> +            "hint-dedicated", NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +        },
-> +        .cpuid_eax =3D KVM_CPUID_FEATURES, .cpuid_reg =3D R_EDX,
-> +        .tcg_features =3D TCG_KVM_FEATURES,
-> +    },
->      [FEAT_HYPERV_EAX] =3D {
->          .feat_names =3D {
->              NULL /* hv_msr_vp_runtime_access */, NULL /* hv_msr_time_ref=
-count_access */,
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index f91e37d..9f73692 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -475,6 +475,7 @@ typedef enum FeatureWord {
->      FEAT_8000_0008_EBX, /* CPUID[8000_0008].EBX */
->      FEAT_C000_0001_EDX, /* CPUID[C000_0001].EDX */
->      FEAT_KVM,           /* CPUID[4000_0001].EAX (KVM_CPUID_FEATURES) */
-> +    FEAT_KVM_HINTS,     /* CPUID[4000_0001].EDX */
->      FEAT_HYPERV_EAX,    /* CPUID[4000_0003].EAX */
->      FEAT_HYPERV_EBX,    /* CPUID[4000_0003].EBX */
->      FEAT_HYPERV_EDX,    /* CPUID[4000_0003].EDX */
-> @@ -670,6 +671,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
->  #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumul=
-ation Single Precision */
->  #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
->
-> +#define KVM_HINTS_DEDICATED (1U << 0)
-> +
->  #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Predic=
-tion Barrier */
->
->  #define CPUID_XSAVE_XSAVEOPT   (1U << 0)
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index ad4b159..44ee524 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -383,6 +383,9 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, ui=
-nt32_t function,
->          if (!kvm_irqchip_in_kernel()) {
->              ret &=3D ~(1U << KVM_FEATURE_PV_UNHALT);
->          }
-> +    } else if (function =3D=3D KVM_CPUID_FEATURES && reg =3D=3D R_EDX) {
-> +        ret |=3D KVM_HINTS_DEDICATED;
-> +        found =3D 1;
->      }
->
->      /* fallback for older kernels */
-> @@ -801,6 +804,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->          c =3D &cpuid_data.entries[cpuid_i++];
->          c->function =3D KVM_CPUID_FEATURES | kvm_base;
->          c->eax =3D env->features[FEAT_KVM];
-> +        c->edx =3D env->features[FEAT_KVM_HINTS];
->      }
->
->      cpu_x86_cpuid(env, 0, 0, &limit, &unused, &unused, &unused);
-> --
-> 2.7.4
->
+Map drm fourcc codes to pixman formats.
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ include/ui/qemu-pixman.h |  5 +++++
+ ui/qemu-pixman.c         | 22 ++++++++++++++++++++++
+ 2 files changed, 27 insertions(+)
+
+diff --git a/include/ui/qemu-pixman.h b/include/ui/qemu-pixman.h
+index 4a67e01232..b7c82d17fc 100644
+--- a/include/ui/qemu-pixman.h
++++ b/include/ui/qemu-pixman.h
+@@ -33,6 +33,8 @@
+ # define PIXMAN_BE_r8g8b8a8   PIXMAN_r8g8b8a8
+ # define PIXMAN_BE_x8b8g8r8   PIXMAN_x8b8g8r8
+ # define PIXMAN_BE_a8b8g8r8   PIXMAN_a8b8g8r8
++# define PIXMAN_LE_r8g8b8     PIXMAN_b8g8r8
++# define PIXMAN_LE_a8r8g8b8   PIXMAN_b8g8r8a8
+ # define PIXMAN_LE_x8r8g8b8   PIXMAN_b8g8r8x8
+ #else
+ # define PIXMAN_BE_r8g8b8     PIXMAN_b8g8r8
+@@ -44,6 +46,8 @@
+ # define PIXMAN_BE_r8g8b8a8   PIXMAN_a8b8g8r8
+ # define PIXMAN_BE_x8b8g8r8   PIXMAN_r8g8b8x8
+ # define PIXMAN_BE_a8b8g8r8   PIXMAN_r8g8b8a8
++# define PIXMAN_LE_r8g8b8     PIXMAN_r8g8b8
++# define PIXMAN_LE_a8r8g8b8   PIXMAN_a8r8g8b8
+ # define PIXMAN_LE_x8r8g8b8   PIXMAN_x8r8g8b8
+ #endif
+ 
+@@ -51,6 +55,7 @@
+ 
+ PixelFormat qemu_pixelformat_from_pixman(pixman_format_code_t format);
+ pixman_format_code_t qemu_default_pixman_format(int bpp, bool native_endian);
++pixman_format_code_t qemu_drm_format_to_pixman(uint32_t drm_format);
+ int qemu_pixman_get_type(int rshift, int gshift, int bshift);
+ pixman_format_code_t qemu_pixman_get_format(PixelFormat *pf);
+ bool qemu_pixman_check_format(DisplayChangeListener *dcl,
+diff --git a/ui/qemu-pixman.c b/ui/qemu-pixman.c
+index 6e591ab821..3e52abd92d 100644
+--- a/ui/qemu-pixman.c
++++ b/ui/qemu-pixman.c
+@@ -6,6 +6,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "ui/console.h"
++#include "standard-headers/drm/drm_fourcc.h"
+ 
+ PixelFormat qemu_pixelformat_from_pixman(pixman_format_code_t format)
+ {
+@@ -88,6 +89,27 @@ pixman_format_code_t qemu_default_pixman_format(int bpp, bool native_endian)
+     return 0;
+ }
+ 
++/* Note: drm is little endian, pixman is native endian */
++pixman_format_code_t qemu_drm_format_to_pixman(uint32_t drm_format)
++{
++    static const struct {
++        uint32_t drm_format;
++        pixman_format_code_t pixman;
++    } map[] = {
++        { DRM_FORMAT_RGB888,   PIXMAN_LE_r8g8b8   },
++        { DRM_FORMAT_ARGB8888, PIXMAN_LE_a8r8g8b8 },
++        { DRM_FORMAT_XRGB8888, PIXMAN_LE_x8r8g8b8 }
++    };
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(map); i++) {
++        if (drm_format == map[i].drm_format) {
++            return map[i].pixman;
++        }
++    }
++    return 0;
++}
++
+ int qemu_pixman_get_type(int rshift, int gshift, int bshift)
+ {
+     int type = PIXMAN_TYPE_OTHER;
+-- 
+2.9.3
