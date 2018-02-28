@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1er8cU-0004Ke-B2
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:46:35 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1er8jV-00008U-0G
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:53:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1er8cR-0003zR-8q
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:46:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51664)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1er8cQ-0003ys-Vx
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:46:31 -0500
-From: Alex Williamson <alex.williamson@redhat.com>
-Date: Wed, 28 Feb 2018 13:46:20 -0700
-Message-ID: <20180228204620.26629.74688.stgit@gimli.home>
-In-Reply-To: <20180228201837.26629.3346.stgit@gimli.home>
-References: <20180228201837.26629.3346.stgit@gimli.home>
+	(envelope-from <richard.henderson@linaro.org>) id 1er8jQ-0008MA-L2
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:53:49 -0500
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:38834)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1er8jQ-0008Lc-Dy
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:53:44 -0500
+Received: by mail-pf0-x244.google.com with SMTP id d26so1502954pfn.5
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 12:53:44 -0800 (PST)
+References: <1519709965-29833-1-git-send-email-cota@braap.org>
+	<1519709965-29833-4-git-send-email-cota@braap.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <27f68fa5-a4ad-fbcf-3167-0f26a2a6aeda@linaro.org>
+Date: Wed, 28 Feb 2018 12:53:39 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1519709965-29833-4-git-send-email-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 5/5] vfio/quirks: Enable ioeventfd quirks to be
- handled by vfio directly
+Subject: Re: [Qemu-devel] [PATCH 03/16] tcg: track TBs with per-region BST's
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,127 +31,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org, alex.williamson@redhat.com, peterx@redhat.com, eric.auger@redhat.com
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-With vfio ioeventfd support, we can program vfio-pci to perform a
-specified BAR write when an eventfd is triggered.  This allows the
-KVM ioeventfd to be wired directly to vfio-pci, entirely avoiding
-userspace handling for these events.  On the same micro-benchmark
-where the ioeventfd got us to almost 90% of performance versus
-disabling the GeForce quirks, this gets us to within 95%.
+On 02/26/2018 09:39 PM, Emilio G. Cota wrote:
+> This paves the way for enabling scalable parallel generation of TCG code.
+> 
+> Instead of tracking TBs with a single binary search tree (BST), use a
+> BST for each TCG region, protecting it with a lock. This is as scalable
+> as it gets, since each TCG thread operates on a separate region.
+> 
+> The core of this change is the introduction of struct tcg_region_tree,
+> which contains a pointer to a GTree and an associated lock to serialize
+> accesses to it. We then allocate an array of tcg_region_tree's, adding
+> the appropriate padding to avoid false sharing based on
+> qemu_dcache_linesize.
+> 
+> Given a tc_ptr, we first find the corresponding region_tree. This
+> is done by special-casing the first and last regions first, since they
+> might be of size != region.size; otherwise we just divide the offset
+> by region.stride. I was worried about this division (several dozen
+> cycles of latency), but profiling shows that this is not a fast path.
+> Note that region.stride is not required to be a power of two; it
+> is only required to be a multiple of the host's page size.
+> 
+> Note that with this design we can also provide consistent snapshots
+> about all region trees at once; for instance, tcg_tb_foreach
+> acquires/releases all region_tree locks before/after iterating over them.
+> For this reason we now drop tb_lock in dump_exec_info().
+> 
+> As an alternative I considered implementing a concurrent BST, but this
+> can be tricky to get right, offers no consistent snapshots of the BST,
+> and performance and scalability-wise I don't think it could ever beat
+> having separate GTrees, given that our workload is insert-mostly (all
+> concurrent BST designs I've seen focus, understandably, on making
+> lookups fast, which comes at the expense of convoluted, non-wait-free
+> insertions/removals).
+> 
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  accel/tcg/cpu-exec.c      |   2 +-
+>  accel/tcg/translate-all.c | 101 ++++--------------------
+>  include/exec/exec-all.h   |   1 -
+>  include/exec/tb-context.h |   1 -
+>  tcg/tcg.c                 | 191 ++++++++++++++++++++++++++++++++++++++++++++++
+>  tcg/tcg.h                 |   6 ++
+>  6 files changed, 213 insertions(+), 89 deletions(-)
 
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- hw/vfio/pci-quirks.c |   45 +++++++++++++++++++++++++++++++++++++++------
- hw/vfio/pci.h        |    1 +
- 2 files changed, 40 insertions(+), 6 deletions(-)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-index e01e2f0f69df..561fa6ea321d 100644
---- a/hw/vfio/pci-quirks.c
-+++ b/hw/vfio/pci-quirks.c
-@@ -16,6 +16,7 @@
- #include "qemu/range.h"
- #include "qapi/error.h"
- #include "qapi/visitor.h"
-+#include <sys/ioctl.h>
- #include "hw/nvram/fw_cfg.h"
- #include "pci.h"
- #include "trace.h"
-@@ -287,13 +288,31 @@ static VFIOQuirk *vfio_quirk_alloc(int nr_mem)
-     return quirk;
- }
- 
--static void vfio_ioeventfd_exit(VFIOIOEventFD *ioeventfd)
-+static void vfio_ioeventfd_exit(VFIOPCIDevice *vdev, VFIOIOEventFD *ioeventfd)
- {
-     QLIST_REMOVE(ioeventfd, next);
-+
-     memory_region_del_eventfd(ioeventfd->mr, ioeventfd->addr, ioeventfd->size,
-                               ioeventfd->match_data, ioeventfd->data,
-                               &ioeventfd->e);
--    qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e), NULL, NULL, NULL);
-+
-+    if (ioeventfd->vfio) {
-+        struct vfio_device_ioeventfd vfio_ioeventfd;
-+
-+        vfio_ioeventfd.argsz = sizeof(vfio_ioeventfd);
-+        vfio_ioeventfd.flags = ioeventfd->size;
-+        vfio_ioeventfd.data = ioeventfd->data;
-+        vfio_ioeventfd.offset = ioeventfd->region->fd_offset +
-+                                ioeventfd->region_addr;
-+        vfio_ioeventfd.fd = -1;
-+
-+        ioctl(vdev->vbasedev.fd, VFIO_DEVICE_IOEVENTFD, &vfio_ioeventfd);
-+
-+    } else {
-+        qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e),
-+                            NULL, NULL, NULL);
-+    }
-+
-     event_notifier_cleanup(&ioeventfd->e);
-     g_free(ioeventfd);
- }
-@@ -304,7 +323,7 @@ static void vfio_drop_dynamic_eventfds(VFIOPCIDevice *vdev, VFIOQuirk *quirk)
- 
-     QLIST_FOREACH_SAFE(ioeventfd, &quirk->ioeventfds, next, tmp) {
-         if (ioeventfd->dynamic) {
--            vfio_ioeventfd_exit(ioeventfd);
-+            vfio_ioeventfd_exit(vdev, ioeventfd);
-         }
-     }
- }
-@@ -326,6 +345,7 @@ static VFIOIOEventFD *vfio_ioeventfd_init(VFIOPCIDevice *vdev,
-                                           hwaddr region_addr, bool dynamic)
- {
-     VFIOIOEventFD *ioeventfd = g_malloc0(sizeof(*ioeventfd));
-+    struct vfio_device_ioeventfd vfio_ioeventfd;
- 
-     if (event_notifier_init(&ioeventfd->e, 0)) {
-         g_free(ioeventfd);
-@@ -349,8 +369,21 @@ static VFIOIOEventFD *vfio_ioeventfd_init(VFIOPCIDevice *vdev,
-     ioeventfd->region = region;
-     ioeventfd->region_addr = region_addr;
- 
--    qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e),
--                        vfio_ioeventfd_handler, NULL, ioeventfd);
-+    vfio_ioeventfd.argsz = sizeof(vfio_ioeventfd);
-+    vfio_ioeventfd.flags = ioeventfd->size;
-+    vfio_ioeventfd.data = ioeventfd->data;
-+    vfio_ioeventfd.offset = ioeventfd->region->fd_offset +
-+                            ioeventfd->region_addr;
-+    vfio_ioeventfd.fd = event_notifier_get_fd(&ioeventfd->e);
-+
-+    ioeventfd->vfio = !ioctl(vdev->vbasedev.fd,
-+                             VFIO_DEVICE_IOEVENTFD, &vfio_ioeventfd);
-+
-+    if (!ioeventfd->vfio) {
-+        qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e),
-+                            vfio_ioeventfd_handler, NULL, ioeventfd);
-+    }
-+
-     memory_region_add_eventfd(ioeventfd->mr, ioeventfd->addr,
-                               ioeventfd->size, ioeventfd->match_data,
-                               ioeventfd->data, &ioeventfd->e);
-@@ -1820,7 +1853,7 @@ void vfio_bar_quirk_exit(VFIOPCIDevice *vdev, int nr)
- 
-     QLIST_FOREACH(quirk, &bar->quirks, next) {
-         while (!QLIST_EMPTY(&quirk->ioeventfds)) {
--            vfio_ioeventfd_exit(QLIST_FIRST(&quirk->ioeventfds));
-+            vfio_ioeventfd_exit(vdev, QLIST_FIRST(&quirk->ioeventfds));
-         }
- 
-         for (i = 0; i < quirk->nr_mem; i++) {
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index de651993b57a..26c06e92ec26 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -35,6 +35,7 @@ typedef struct VFIOIOEventFD {
-     hwaddr region_addr;
-     bool match_data;
-     bool dynamic;
-+    bool vfio;
- } VFIOIOEventFD;
- 
- typedef struct VFIOQuirk {
+
+r~
