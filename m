@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1er0ff-0007mI-Um
+	(envelope-from <kraxel@redhat.com>) id 1er0ff-0007mK-VU
 	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:17:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1er0fc-0002Ft-OT
+	(envelope-from <kraxel@redhat.com>) id 1er0fc-0002Gn-Ub
 	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:17:19 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53594 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36616 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1er0fc-0002FD-K8
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1er0fc-0002F3-Lw
 	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:17:16 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AE1A88D744
+	by mx1.redhat.com (Postfix) with ESMTPS id ADD6F8185332
 	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 12:17:10 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 28 Feb 2018 13:16:58 +0100
-Message-Id: <20180228121703.20816-7-kraxel@redhat.com>
+Date: Wed, 28 Feb 2018 13:16:57 +0100
+Message-Id: <20180228121703.20816-6-kraxel@redhat.com>
 In-Reply-To: <20180228121703.20816-1-kraxel@redhat.com>
 References: <20180228121703.20816-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 06/11] console: add and use
- qemu_display_find_default
+Subject: [Qemu-devel] [PULL 05/11] egl-headless: switch over to new display
+ registry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,84 +33,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Using the new display registry instead of #ifdefs in vl.c.
-
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20180221131537.31341-7-kraxel@redhat.com
+Message-id: 20180221131537.31341-6-kraxel@redhat.com
 ---
- include/ui/console.h |  1 +
- ui/console.c         | 19 +++++++++++++++++++
- vl.c                 | 15 +++++----------
- 3 files changed, 25 insertions(+), 10 deletions(-)
+ include/ui/console.h |  3 ---
+ ui/egl-headless.c    | 20 +++++++++++++++++++-
+ vl.c                 | 12 ------------
+ 3 files changed, 19 insertions(+), 16 deletions(-)
 
 diff --git a/include/ui/console.h b/include/ui/console.h
-index 94726cf190..3a53db9360 100644
+index 3ea6cf0870..94726cf190 100644
 --- a/include/ui/console.h
 +++ b/include/ui/console.h
-@@ -441,6 +441,7 @@ struct QemuDisplay {
+@@ -456,7 +456,4 @@ int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp);
+ /* input.c */
+ int index_from_key(const char *key, size_t key_length);
+ 
+-/* egl-headless.c */
+-void egl_headless_init(DisplayOptions *opts);
+-
+ #endif
+diff --git a/ui/egl-headless.c b/ui/egl-headless.c
+index b33e0b21fd..7c877122d3 100644
+--- a/ui/egl-headless.c
++++ b/ui/egl-headless.c
+@@ -164,7 +164,12 @@ static const DisplayChangeListenerOps egl_ops = {
+     .dpy_gl_update           = egl_scanout_flush,
  };
  
- void qemu_display_register(QemuDisplay *ui);
-+bool qemu_display_find_default(DisplayOptions *opts);
- void qemu_display_early_init(DisplayOptions *opts);
- void qemu_display_init(DisplayState *ds, DisplayOptions *opts);
- 
-diff --git a/ui/console.c b/ui/console.c
-index a11b120fc8..25d342cdcb 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -2188,6 +2188,25 @@ void qemu_display_register(QemuDisplay *ui)
-     dpys[ui->type] = ui;
- }
- 
-+bool qemu_display_find_default(DisplayOptions *opts)
+-void egl_headless_init(DisplayOptions *opts)
++static void early_egl_headless_init(DisplayOptions *opts)
 +{
-+    static DisplayType prio[] = {
-+        DISPLAY_TYPE_GTK,
-+        DISPLAY_TYPE_SDL,
-+        DISPLAY_TYPE_COCOA
-+    };
-+    int i;
-+
-+    for (i = 0; i < ARRAY_SIZE(prio); i++) {
-+        if (dpys[prio[i]] == NULL) {
-+            continue;
-+        }
-+        opts->type = prio[i];
-+        return true;
-+    }
-+    return false;
++    display_opengl = 1;
 +}
 +
- void qemu_display_early_init(DisplayOptions *opts)
++static void egl_headless_init(DisplayState *ds, DisplayOptions *opts)
  {
-     assert(opts->type < DISPLAY_TYPE__MAX);
+     QemuConsole *con;
+     egl_dpy *edpy;
+@@ -188,3 +193,16 @@ void egl_headless_init(DisplayOptions *opts)
+         register_displaychangelistener(&edpy->dcl);
+     }
+ }
++
++static QemuDisplay qemu_display_egl = {
++    .type       = DISPLAY_TYPE_EGL_HEADLESS,
++    .early_init = early_egl_headless_init,
++    .init       = egl_headless_init,
++};
++
++static void register_egl(void)
++{
++    qemu_display_register(&qemu_display_egl);
++}
++
++type_init(register_egl);
 diff --git a/vl.c b/vl.c
-index 47c953f8dc..59e56593f8 100644
+index 2b4af34fbb..47c953f8dc 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -4285,17 +4285,12 @@ int main(int argc, char **argv, char **envp)
-     }
- #endif
-     if (dpy.type == DISPLAY_TYPE_DEFAULT && !display_remote) {
--#if defined(CONFIG_GTK)
--        dpy.type = DISPLAY_TYPE_GTK;
--#elif defined(CONFIG_SDL)
--        dpy.type = DISPLAY_TYPE_SDL;
--#elif defined(CONFIG_COCOA)
--        dpy.type = DISPLAY_TYPE_COCOA;
--#elif defined(CONFIG_VNC)
--        vnc_parse("localhost:0,to=99,id=default", &error_abort);
+@@ -2153,13 +2153,7 @@ static void parse_display(const char *p)
+             exit(1);
+         }
+     } else if (strstart(p, "egl-headless", &opts)) {
+-#ifdef CONFIG_OPENGL_DMABUF
+-        display_opengl = 1;
+         dpy.type = DISPLAY_TYPE_EGL_HEADLESS;
 -#else
--        dpy.type = DISPLAY_TYPE_NONE;
-+        if (!qemu_display_find_default(&dpy)) {
-+            dpy.type = DISPLAY_TYPE_NONE;
-+#if defined(CONFIG_VNC)
-+            vnc_parse("localhost:0,to=99,id=default", &error_abort);
- #endif
-+        }
+-        error_report("egl support is disabled");
+-        exit(1);
+-#endif
+     } else if (strstart(p, "curses", &opts)) {
+         dpy.type = DISPLAY_TYPE_CURSES;
+     } else if (strstart(p, "gtk", &opts)) {
+@@ -4659,12 +4653,6 @@ int main(int argc, char **argv, char **envp)
+         qemu_spice_display_init();
      }
-     if (dpy.type == DISPLAY_TYPE_DEFAULT) {
-         dpy.type = DISPLAY_TYPE_NONE;
+ 
+-#ifdef CONFIG_OPENGL_DMABUF
+-    if (dpy.type == DISPLAY_TYPE_EGL_HEADLESS) {
+-        egl_headless_init(&dpy);
+-    }
+-#endif
+-
+     if (foreach_device_config(DEV_GDB, gdbserver_start) < 0) {
+         exit(1);
+     }
 -- 
 2.9.3
