@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1er37n-0005cd-LT
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:54:32 -0500
+	(envelope-from <mreitz@redhat.com>) id 1er3BG-0007rc-Lf
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:58:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1er37m-00008r-SM
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:54:31 -0500
-Date: Wed, 28 Feb 2018 15:54:17 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180228145417.GB4855@localhost.localdomain>
-References: <20180223235142.21501-1-jsnow@redhat.com>
-	<20180223235142.21501-9-jsnow@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1er3BF-00056l-Op
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:58:06 -0500
+References: <20180122220806.22154-1-mreitz@redhat.com>
+	<20180122220806.22154-12-mreitz@redhat.com>
+	<20180227090639.GC25412@lemon.usersys.redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <4aa6ecd3-616a-a1f1-b874-ec19fdf930fc@redhat.com>
+Date: Wed, 28 Feb 2018 15:57:49 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180223235142.21501-9-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v4 08/21] blockjobs: add ABORTING state
+In-Reply-To: <20180227090639.GC25412@lemon.usersys.redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="1Biny5C7QzMHZooOY3vu0Mbhq0xMSjkwS"
+Subject: Re: [Qemu-devel] [PATCH v2 11/16] block/dirty-bitmap: Add
+ bdrv_dirty_iter_next_area
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,75 +26,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Am 24.02.2018 um 00:51 hat John Snow geschrieben:
-> Add a new state ABORTING.
-> 
-> This makes transitions from normative states to error states explicit
-> in the STM, and serves as a disambiguation for which states may complete
-> normally when normal end-states (CONCLUDED) are added in future commits.
-> 
-> Notably, Paused/Standby jobs do not transition directly to aborting,
-> as they must wake up first and cooperate in their cancellation.
-> 
-> Transitions:
-> Running -> Aborting: can be cancelled or encounter an error
-> Ready   -> Aborting: can be cancelled or encounter an error
-> 
-> Verbs:
-> None. The job must finish cleaning itself up and report its final status.
-> 
->              +---------+
->              |UNDEFINED|
->              +--+------+
->                 |
->              +--v----+
->              |CREATED|
->              +--+----+
->                 |
->              +--v----+     +------+
->    +---------+RUNNING<----->PAUSED|
->    |         +--+----+     +------+
->    |            |
->    |         +--v--+       +-------+
->    +---------+READY<------->STANDBY|
->    |         +-----+       +-------+
->    |
-> +--v-----+
-> |ABORTING|
-> +--------+
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--1Biny5C7QzMHZooOY3vu0Mbhq0xMSjkwS
+From: Max Reitz <mreitz@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <4aa6ecd3-616a-a1f1-b874-ec19fdf930fc@redhat.com>
+Subject: Re: [PATCH v2 11/16] block/dirty-bitmap: Add
+ bdrv_dirty_iter_next_area
+References: <20180122220806.22154-1-mreitz@redhat.com>
+ <20180122220806.22154-12-mreitz@redhat.com>
+ <20180227090639.GC25412@lemon.usersys.redhat.com>
+In-Reply-To: <20180227090639.GC25412@lemon.usersys.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> @@ -383,6 +384,10 @@ static void block_job_completed_single(BlockJob *job)
->  {
->      assert(job->completed);
->  
-> +    if (job->ret || block_job_is_cancelled(job)) {
-> +        block_job_state_transition(job, BLOCK_JOB_STATUS_ABORTING);
-> +    }
-> +
->      if (!job->ret) {
->          if (job->driver->commit) {
->              job->driver->commit(job);
+On 2018-02-27 10:06, Fam Zheng wrote:
+> On Mon, 01/22 23:08, Max Reitz wrote:
+>> This new function allows to look for a consecutively dirty area in a
+>> dirty bitmap.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  include/block/dirty-bitmap.h |  2 ++
+>>  block/dirty-bitmap.c         | 51 +++++++++++++++++++++++++++++++++++=
++++++++++
+>>  2 files changed, 53 insertions(+)
+>>
+>> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap=
+=2Eh
+>> index a591c27213..35f3ccc44c 100644
+>> --- a/include/block/dirty-bitmap.h
+>> +++ b/include/block/dirty-bitmap.h
+>> @@ -79,6 +79,8 @@ void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *b=
+itmap,
+>>  void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
+>>                                      int64_t offset, int64_t bytes);
+>>  int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
+>> +bool bdrv_dirty_iter_next_area(BdrvDirtyBitmapIter *iter, uint64_t ma=
+x_offset,
+>> +                               uint64_t *offset, int *bytes);
+>>  void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t offset);
+>>  int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
+>>  int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
+>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+>> index 50564fa1e2..484b5dda43 100644
+>> --- a/block/dirty-bitmap.c
+>> +++ b/block/dirty-bitmap.c
+>> @@ -501,6 +501,57 @@ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter =
+*iter)
+>>      return hbitmap_iter_next(&iter->hbi, true);
+>>  }
+>> =20
+>> +/**
+>> + * Return the next consecutively dirty area in the dirty bitmap
+>> + * belonging to the given iterator @iter.
+>> + *
+>> + * @max_offset: Maximum value that may be returned for
+>> + *              *offset + *bytes
+>> + * @offset:     Will contain the start offset of the next dirty area
+>> + * @bytes:      Will contain the length of the next dirty area
+>> + *
+>> + * Returns: True if a dirty area could be found before max_offset
+>> + *          (which means that *offset and *bytes then contain valid
+>> + *          values), false otherwise.
+>=20
+> Also document the change to the iter cursor depending on the return val=
+ue?
 
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Good point, since it may be unexpected that it isn't advanced if
+max_offset would be exceeded.
 
-But I do have a question about the code below the new lines: I wonder
-where job->ret is set to an error value? I can clearly see that the job
-is marked as cancelled, so your added code should be working, but
-looking at the block job code, it looks to me as if the jobs were
-completing with job->cancelled = true and job->ret = 0.
+Max
 
-For block_job_completed_single(), this means that we would call the
-.commit callback and .cb with a success return code, while sending a
-CANCELLED event on QMP.
 
-Of course, the only job type that supports transactions is the backup
-job, and that one seems to compensate for this by explicitly checking
-block_job_is_cancelled() in its .commit implementation, but is that
-really how things should be working?
+--1Biny5C7QzMHZooOY3vu0Mbhq0xMSjkwS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Kevin
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqWw20SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A+8wH/20glRtiD17RAkSvku9P8XRqU+5KQcbS
+IbbLqgNgmeMHaQQIy/n7O6Sl+UNXm4ZRZmb7xTFMw1qB621c0655PgXUIddk7mCN
+T4o2l981EJlQRwiEdG/h2I4DSAHfPZOg+fiW7bh40dXzS7O+AQjcxwPAaka3LpZB
+6lcJMqNtvPt2xVOrNNHYmWRWFYIfslJym+BBYOU/hgHJ6H25JdKvA4rs25/OcT5y
+x7ERStcHSo+pKd0sl0M6l0w+BOnPAY43jIqkffXTorVcKvRwS8sR71tKhOhpWy6U
+h76ti2Sea6Z2T78ZhABFz8RH00pb6y7qc3YyGyuQl9FEBACb6Z7I2ME=
+=g89g
+-----END PGP SIGNATURE-----
+
+--1Biny5C7QzMHZooOY3vu0Mbhq0xMSjkwS--
