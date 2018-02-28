@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eqzAk-0008Fh-Vp
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 05:41:20 -0500
+	(envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1eqzV2-0003aE-5B
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 06:02:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eqzAh-0005fa-TC
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 05:41:19 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44482 helo=mx1.redhat.com)
+	(envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1eqzV0-0007Lb-NA
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 06:02:16 -0500
+Received: from smtp1.lauterbach.com ([62.154.241.196]:41065)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eqzAh-0005fG-IS
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 05:41:15 -0500
-Date: Wed, 28 Feb 2018 11:41:11 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180228114111.62689e8c@redhat.com>
-In-Reply-To: <CAHNT7Nsc+Ovbm1ZZKv75FfN78tudWYgPqu3SsUzCv1XtG0ZMhw@mail.gmail.com>
-References: <1519690504-37792-1-git-send-email-mjc@sifive.com>
-	<CAFEAcA_0qNcikG2iLii=4zEPYvhz1koEbhCCrCXssdKYv06OJA@mail.gmail.com>
-	<20180227170018.6e4a3b0d@redhat.com>
-	<CAHNT7Nsc+Ovbm1ZZKv75FfN78tudWYgPqu3SsUzCv1XtG0ZMhw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [patches] Re:  [PULL] RISC-V QEMU Port Submission
+	(Exim 4.71) (envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1eqzV0-0007Df-CL
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 06:02:14 -0500
+Received: from unknown (HELO localhost.localdomain)
+	(Authenticated_SSL:abouassida@[41.224.44.126])
+	(envelope-sender <abdallah.bouassida@lauterbach.com>)
+	by smtp1.lauterbach.com (qmail-ldap-1.03) with ECDHE-RSA-AES256-SHA
+	encrypted SMTP
+	for <qemu-devel@nongnu.org>; 28 Feb 2018 11:01:56 -0000
+From: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+Date: Wed, 28 Feb 2018 12:01:23 +0100
+Message-Id: <1519815685-29200-3-git-send-email-abdallah.bouassida@lauterbach.com>
+In-Reply-To: <1519815685-29200-1-git-send-email-abdallah.bouassida@lauterbach.com>
+References: <1519815685-29200-1-git-send-email-abdallah.bouassida@lauterbach.com>
+Subject: [Qemu-devel] [PATCH v3 2/4] target/arm: Add "_S" suffix to the
+ secure version of a sysreg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,103 +33,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: RISC-V Patches <patches@groups.riscv.org>, Peter Maydell <peter.maydell@linaro.org>, Palmer Dabbelt <palmer@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: qemu-arm@nongnu.org, khaled.jmal@lauterbach.com, Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
 
-On Wed, 28 Feb 2018 13:41:25 +1300
-Michael Clark <mjc@sifive.com> wrote:
+This is a preparation for the coming feature of creating dynamically an XML
+description for the ARM sysregs.
+Add "_S" suffix to the secure version of sysregs that have both S and NS views
+Replace (S) and (NS) by _S and _NS for the register that are manually defined,
+so all the registers follow the same convention.
 
-> On Wed, Feb 28, 2018 at 5:00 AM, Igor Mammedov <imammedo@redhat.com> wrote:
-> 
-> > On Tue, 27 Feb 2018 14:01:05 +0000
-> > Peter Maydell <peter.maydell@linaro.org> wrote:
-> >  
-> > > On 27 February 2018 at 00:15, Michael Clark <mjc@sifive.com> wrote:  
-> > > > -----BEGIN PGP SIGNED MESSAGE-----
-> > > > Hash: SHA1
-> > > >
-> > > > The following changes since commit 0a773d55ac76c5aa89ed9187a3bc5a  
-> > f8c5c2a6d0:  
-> > > >
-> > > >   maintainers: Add myself as a OpenBSD maintainer (2018-02-23 12:05:07  
-> > +0000)  
-> > > >
-> > > > are available in the git repository at:
-> > > >
-> > > >   https://github.com/riscv/riscv-qemu.git tags/riscv-qemu-upstream-v7
-> > > >
-> > > > for you to fetch changes up to 170a9d412ca1eb3b7ae6f6c1ff86dc  
-> > bdff0fd7a8:  
-> > > >
-> > > >   RISC-V Build Infrastructure (2018-02-27 11:09:43 +1300)
-> > > >
-> > > > - ----------------------------------------------------------------
-> > > > QEMU RISC-V Emulation Support (RV64GC, RV32GC)  
-> > >
-> > > Hi; thanks for this pull request. Unfortunately it seems to
-> > > be missing Signed-off-by: tags. Every commit needs to have
-> > > the Signed-off-by: tags from the people who contributed code to
-> > > it, indicating that they're OK with the code going into QEMU.
-> > > (If the work was done by and copyright a company then you don't
-> > > need to provide signoffs from every person at the company who
-> > > worked on the code if you don't want to.)
-> > >  
-> > > > The spike_v1.9
-> > > > machine has been renamed to spike_v1.9.1 to match the privileged ISA
-> > > > version and spike_v1.10 has been made the default machine.  
-> > >
-> > > I'm confused about this. Generally QEMU boards should model
-> > > hardware, and the board shouldn't care about the ISA versions.
-> > > Versioned board names in QEMU generally follow _QEMU_'s versioning,
-> > > and indicate that a board is identical to whatever we modelled
-> > > in that earlier QEMU version, for VM migration compatibility.
-> > > Board renames for minor ISA version bumps sounds like there's going
-> > > to be a lot of churn and breakage -- is this stuff really ready?
-> > > (Also, should we really have two different board source files
-> > > for two different ISA versions? I would have expected these to
-> > > share a source file to share code.)
-> > >
-> > > I did a test build and there are some compile errors:
-> > >
-> > > /home/pm215/qemu/linux-user/main.c:38:24: fatal error: target_elf.h:
-> > > No such file or directory
-> > >  #include "target_elf.h"
-> > >                         ^
-> > > compilation terminated.
-> > >
-> > > This is because your patchset has a clash with commit 542ca4349878a2e
-> > > which has just merged to master, and refactors out an ifdef ladder,
-> > > so now all targets supporting linux-user need to provide a
-> > > linux-user/$ARCH/target_elf.h file. Could you fix that up and rebase,
-> > > please?  
-> > also '[PATCH v7 03/23] RISC-V CPU Core Definition' still hasn't addressed
-> > comment http://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06412.html
-> > which isn't fixed since it was first pointed out (v4).
-> >
-> > I'd prefer that being fixed before merge so another people
-> > won't have to clean it up later after original authors,
-> > When they try to generalize cpu_type -> cpu_model conversion.
-> >  
-> 
-> I re-read the email and it doesn't seem clear what you want us to do.
-> I changed the CPU suffix to a prefix as you requested. The rest of the CPU
-> initialisation is "modelled" on arm not sh4.
-Not addressed comment is not related to CPU suffix, it's a separate issue.
+Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+---
+ target/arm/helper.c | 31 ++++++++++++++++++++-----------
+ 1 file changed, 20 insertions(+), 11 deletions(-)
 
-I haven't had time to clean up that part of ARM cpu initialization yet,
-so it still uses old approach, but you've been pointed to right
-approach rather early (v4) but ignored it.
-
-There is no point to use legacy approach with new patches
-that could block other people and would force them to cleanup
-before doing what they intended to do.
-
-I've pointed to sh4 as example that you should use for new CPU
-types internalization. Beside making RISC-V consistent with
-direction that part of code moves to, it will also simplify patch.
-
-Please ask if something still unclear.
-
-> If you want to make a pull request, please use this branch:
-> 
-> - https://github.com/riscv/riscv-qemu/tree/qemu-upstream-v7
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index bdd212f..1594ec45 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -694,12 +694,12 @@ static const ARMCPRegInfo cp_reginfo[] = {
+      * the secure register to be properly reset and migrated. There is also no
+      * v8 EL1 version of the register so the non-secure instance stands alone.
+      */
+-    { .name = "FCSEIDR(NS)",
++    { .name = "FCSEIDR_NS",
+       .cp = 15, .opc1 = 0, .crn = 13, .crm = 0, .opc2 = 0,
+       .access = PL1_RW, .secure = ARM_CP_SECSTATE_NS,
+       .fieldoffset = offsetof(CPUARMState, cp15.fcseidr_ns),
+       .resetvalue = 0, .writefn = fcse_write, .raw_writefn = raw_write, },
+-    { .name = "FCSEIDR(S)",
++    { .name = "FCSEIDR_S",
+       .cp = 15, .opc1 = 0, .crn = 13, .crm = 0, .opc2 = 0,
+       .access = PL1_RW, .secure = ARM_CP_SECSTATE_S,
+       .fieldoffset = offsetof(CPUARMState, cp15.fcseidr_s),
+@@ -715,7 +715,7 @@ static const ARMCPRegInfo cp_reginfo[] = {
+       .access = PL1_RW, .secure = ARM_CP_SECSTATE_NS,
+       .fieldoffset = offsetof(CPUARMState, cp15.contextidr_el[1]),
+       .resetvalue = 0, .writefn = contextidr_write, .raw_writefn = raw_write, },
+-    { .name = "CONTEXTIDR(S)", .state = ARM_CP_STATE_AA32,
++    { .name = "CONTEXTIDR_S", .state = ARM_CP_STATE_AA32,
+       .cp = 15, .opc1 = 0, .crn = 13, .crm = 0, .opc2 = 1,
+       .access = PL1_RW, .secure = ARM_CP_SECSTATE_S,
+       .fieldoffset = offsetof(CPUARMState, cp15.contextidr_s),
+@@ -1966,7 +1966,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
+                                    cp15.c14_timer[GTIMER_PHYS].ctl),
+       .writefn = gt_phys_ctl_write, .raw_writefn = raw_write,
+     },
+-    { .name = "CNTP_CTL(S)",
++    { .name = "CNTP_CTL_S",
+       .cp = 15, .crn = 14, .crm = 2, .opc1 = 0, .opc2 = 1,
+       .secure = ARM_CP_SECSTATE_S,
+       .type = ARM_CP_IO | ARM_CP_ALIAS, .access = PL1_RW | PL0_R,
+@@ -2005,7 +2005,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
+       .accessfn = gt_ptimer_access,
+       .readfn = gt_phys_tval_read, .writefn = gt_phys_tval_write,
+     },
+-    { .name = "CNTP_TVAL(S)",
++    { .name = "CNTP_TVAL_S",
+       .cp = 15, .crn = 14, .crm = 2, .opc1 = 0, .opc2 = 0,
+       .secure = ARM_CP_SECSTATE_S,
+       .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_R,
+@@ -2059,7 +2059,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
+       .accessfn = gt_ptimer_access,
+       .writefn = gt_phys_cval_write, .raw_writefn = raw_write,
+     },
+-    { .name = "CNTP_CVAL(S)", .cp = 15, .crm = 14, .opc1 = 2,
++    { .name = "CNTP_CVAL_S", .cp = 15, .crm = 14, .opc1 = 2,
+       .secure = ARM_CP_SECSTATE_S,
+       .access = PL1_RW | PL0_R,
+       .type = ARM_CP_64BIT | ARM_CP_IO | ARM_CP_ALIAS,
+@@ -5562,7 +5562,8 @@ CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
+ 
+ static void add_cpreg_to_hashtable(ARMCPU *cpu, const ARMCPRegInfo *r,
+                                    void *opaque, int state, int secstate,
+-                                   int crm, int opc1, int opc2)
++                                   int crm, int opc1, int opc2,
++                                   const char *name)
+ {
+     /* Private utility function for define_one_arm_cp_reg_with_opaque():
+      * add a single reginfo struct to the hash table.
+@@ -5572,6 +5573,7 @@ static void add_cpreg_to_hashtable(ARMCPU *cpu, const ARMCPRegInfo *r,
+     int is64 = (r->type & ARM_CP_64BIT) ? 1 : 0;
+     int ns = (secstate & ARM_CP_SECSTATE_NS) ? 1 : 0;
+ 
++    r2->name = name;
+     /* Reset the secure state to the specific incoming state.  This is
+      * necessary as the register may have been defined with both states.
+      */
+@@ -5803,19 +5805,26 @@ void define_one_arm_cp_reg_with_opaque(ARMCPU *cpu,
+                         /* Under AArch32 CP registers can be common
+                          * (same for secure and non-secure world) or banked.
+                          */
++                        const char *name;
++                        GString *s;
++
+                         switch (r->secure) {
+                         case ARM_CP_SECSTATE_S:
+                         case ARM_CP_SECSTATE_NS:
+                             add_cpreg_to_hashtable(cpu, r, opaque, state,
+-                                                   r->secure, crm, opc1, opc2);
++                                                   r->secure, crm, opc1, opc2,
++                                                   r->name);
+                             break;
+                         default:
++                            s = g_string_new(r->name);
++                            g_string_append_printf(s, "_S");
++                            name = g_string_free(s, false);
+                             add_cpreg_to_hashtable(cpu, r, opaque, state,
+                                                    ARM_CP_SECSTATE_S,
+-                                                   crm, opc1, opc2);
++                                                   crm, opc1, opc2, name);
+                             add_cpreg_to_hashtable(cpu, r, opaque, state,
+                                                    ARM_CP_SECSTATE_NS,
+-                                                   crm, opc1, opc2);
++                                                   crm, opc1, opc2, r->name);
+                             break;
+                         }
+                     } else {
+@@ -5823,7 +5832,7 @@ void define_one_arm_cp_reg_with_opaque(ARMCPU *cpu,
+                          * of AArch32 */
+                         add_cpreg_to_hashtable(cpu, r, opaque, state,
+                                                ARM_CP_SECSTATE_NS,
+-                                               crm, opc1, opc2);
++                                               crm, opc1, opc2, r->name);
+                     }
+                 }
+             }
+-- 
+2.7.4
