@@ -1,26 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1er7S4-0003Q7-1D
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:44 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1er7S5-0003Ra-BZ
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1er7S3-0006P5-D5
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:44 -0500
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:40672)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1er7S3-0006OR-6j
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:43 -0500
-Received: by mail-pl0-x242.google.com with SMTP id i6-v6so2117587plt.7
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 11:31:43 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 28 Feb 2018 11:31:19 -0800
-Message-Id: <20180228193125.20577-11-richard.henderson@linaro.org>
-In-Reply-To: <20180228193125.20577-1-richard.henderson@linaro.org>
-References: <20180228193125.20577-1-richard.henderson@linaro.org>
+	(envelope-from <borntraeger@de.ibm.com>) id 1er7S1-0006Mc-8d
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:45 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49016
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1er7S1-0006L1-3C
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:41 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w1SJT7HR091949
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 14:31:38 -0500
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2gdwyynty6-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 14:31:38 -0500
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 28 Feb 2018 19:31:36 -0000
+References: <1519407778-23095-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+	<1519407778-23095-4-git-send-email-imbrenda@linux.vnet.ibm.com>
+	<20180226175751.2d8e5f05.cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed, 28 Feb 2018 20:31:32 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 10/16] target/arm: Add ARM_FEATURE_V8_FCMA
+In-Reply-To: <20180226175751.2d8e5f05.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <bd560bfd-1bf6-3806-ffaf-3627776f1912@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v4 3/3] s390x/sclp: extend SCLP event masks
+ to 64 bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +45,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-Not enabled anywhere yet.
+h
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/cpu.h     | 1 +
- linux-user/elfload.c | 1 +
- 2 files changed, 2 insertions(+)
+On 02/26/2018 05:57 PM, Cornelia Huck wrote:
+> On Fri, 23 Feb 2018 18:42:58 +0100
+> Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> wrote:
+> 
+>> Extend the SCLP event masks to 64 bits.
+>>
+>> Notice that using any of the new bits results in a state that cannot be
+>> migrated to an older version.
+>>
+>> Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+>> ---
+>>  hw/s390x/event-facility.c         | 56 ++++++++++++++++++++++++++++++---------
+>>  include/hw/s390x/event-facility.h |  2 +-
+>>  2 files changed, 45 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+>> index e04ed9f..c3e39ee 100644
+>> --- a/hw/s390x/event-facility.c
+>> +++ b/hw/s390x/event-facility.c
+>> @@ -30,7 +30,7 @@ struct SCLPEventFacility {
+>>      SysBusDevice parent_obj;
+>>      SCLPEventsBus sbus;
+>>      /* guest's receive mask */
+>> -    sccb_mask_t receive_mask;
+>> +    uint32_t receive_mask_pieces[2];
+>>      /*
+>>       * when false, we keep the same broken, backwards compatible behaviour as
+>>       * before, allowing only masks of size exactly 4; when true, we implement
+>> @@ -42,6 +42,18 @@ struct SCLPEventFacility {
+>>      uint16_t mask_length;
+>>  };
+>>  
+>> +static inline sccb_mask_t make_receive_mask(SCLPEventFacility *ef)
+>> +{
+>> +    return ((sccb_mask_t)ef->receive_mask_pieces[0]) << 32 |
+>> +                         ef->receive_mask_pieces[1];
+>> +}
+>> +
+>> +static inline void store_receive_mask(SCLPEventFacility *ef, sccb_mask_t val)
+>> +{
+>> +    ef->receive_mask_pieces[1] = val;
+>> +    ef->receive_mask_pieces[0] = val >> 32;
+>> +}
+>> +
+> 
+> Hm... how are all those values actually defined in the architecture?
+> You pass around some values internally (which are supposedly in host
+> endian) and then and/or them with the receive mask here. Are they
+> compared byte-for-byte? 32-bit-for-32-bit?
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 7c8e87544a..f67f357724 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1429,6 +1429,7 @@ enum arm_features {
-     ARM_FEATURE_V8_SM4, /* implements SM4 part of v8 Crypto Extensions */
-     ARM_FEATURE_V8_RDM, /* implements v8.1 simd round multiply */
-     ARM_FEATURE_V8_FP16, /* implements v8.2 half-precision float */
-+    ARM_FEATURE_V8_FCMA, /* has complex number part of v8.3 extensions.  */
- };
- 
- static inline int arm_feature(CPUARMState *env, int feature)
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 63cadae1b4..3ead6ed807 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -552,6 +552,7 @@ static uint32_t get_elf_hwcap(void)
-     GET_FEATURE(ARM_FEATURE_V8_SM4, ARM_HWCAP_A64_SM4);
-     GET_FEATURE(ARM_FEATURE_V8_SHA512, ARM_HWCAP_A64_SHA512);
-     GET_FEATURE(ARM_FEATURE_V8_RDM, ARM_HWCAP_A64_ASIMDRDM);
-+    GET_FEATURE(ARM_FEATURE_V8_FCMA, ARM_HWCAP_A64_FCMA);
- #undef GET_FEATURE
- 
-     return hwcaps;
--- 
-2.14.3
+Its a bitfield in ibm byte order. the length is a multitude of bytes.
+
+
+> 
+> I'm also not a fan of the _pieces suffix - reminds me of Dwarf pieces :)
+> 
