@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1er30M-0000BT-3e
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:46:51 -0500
+	(envelope-from <idgar@virtualoco.com>) id 1er29I-0007C4-Bm
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:52:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1er30J-0001ko-2r
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:46:50 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38144 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1er30I-0001kG-Tb
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:46:46 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DE31540FB647
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 14:46:42 +0000 (UTC)
-References: <20180228140652.31933-1-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a770c9fa-3a6b-c1be-2d5a-de1cb8d70292@redhat.com>
-Date: Wed, 28 Feb 2018 08:46:38 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180228140652.31933-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] crypto: ensure we use a predictable TLS
- priority setting
+	(envelope-from <idgar@virtualoco.com>) id 1er29D-0001hb-Ar
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:52:00 -0500
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21328)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <idgar@virtualoco.com>)
+	id 1er29D-0001g8-2T
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:51:55 -0500
+From: Or Idgar <idgar@virtualoco.com>
+Date: Wed, 28 Feb 2018 15:36:13 +0200
+Message-Id: <20180228133613.21037-1-idgar@virtualoco.com>
+Subject: [Qemu-devel] [PATCH] vmgenid: allow VM Generation ID modification
+ via QMP/HMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,41 +23,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
+To: ben@skyportsystems.com, dgilbert@redhat.com, mst@redhat.com, imammendo@redhat.com, eblake@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
+Cc: oidgar@redhat.com, idgar@virtualoco.com, ghammer@redhat.com
 
-On 02/28/2018 08:06 AM, Daniel P. Berrang=C3=A9 wrote:
-> The TLS test cert generation relies on a fixed set of algorithms that a=
-re
-> only usable under GNUTLS' default priority setting. When building QEMU
-> with a custom distro specific priority setting, this can cause the TLS
-> tests to fail. By forcing the tests to always use "NORMAL" priority we
-> can make them more robust.
->=20
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
->   tests/test-crypto-tlssession.c | 1 +
->   1 file changed, 1 insertion(+)
+From: Or Idgar <oidgar@redhat.com>
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+This patch allow changing the Virtual Machine Generation
+ID through QMP/HMP while the vm guest is running.
+As the definition block of VMGENID in ACPI includes the
+"Notify" method, we can use it to notify the guest about
+ID changes.
 
->=20
-> diff --git a/tests/test-crypto-tlssession.c b/tests/test-crypto-tlssess=
-ion.c
-> index 1a4a066d76..82f21c27f2 100644
-> --- a/tests/test-crypto-tlssession.c
-> +++ b/tests/test-crypto-tlssession.c
-> @@ -75,6 +75,7 @@ static QCryptoTLSCreds *test_tls_creds_create(QCrypto=
-TLSCredsEndpoint endpoint,
->                        "server" : "client"),
->           "dir", certdir,
->           "verify-peer", "yes",
-> +        "priority", "NORMAL",
->           /* We skip initial sanity checks here because we
->            * want to make sure that problems are being
->            * detected at the TLS session validation stage,
->=20
+QMP command example:
+    { "execute": "set-vm-generation-id",
+          "arguments": {
+              "guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
+          }
+    }
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+HMP command example:
+    set-vm-generation-id 324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87
+
+This patch is based off an earlier version by
+Igor Mammedov (imammedo@redhat.com)
+
+Signed-off-by: Or Idgar <oidgar@redhat.com>
+Reviewed-by: Gal Hammer <ghammer@redhat.com>
+---
+ docs/specs/vmgenid.txt |  7 ++++---
+ hmp-commands.hx        | 13 +++++++++++++
+ hmp.c                  | 10 ++++++++++
+ hmp.h                  |  1 +
+ hw/acpi/vmgenid.c      | 10 ++++++++++
+ qapi-schema.json       | 11 +++++++++++
+ tests/vmgenid-test.c   | 31 +++++++++++++++++++++++++++++++
+ 7 files changed, 80 insertions(+), 3 deletions(-)
+
+diff --git a/docs/specs/vmgenid.txt b/docs/specs/vmgenid.txt
+index aa9f518..04443de 100644
+--- a/docs/specs/vmgenid.txt
++++ b/docs/specs/vmgenid.txt
+@@ -240,6 +240,7 @@ The property may be queried via QMP/HMP:
+   (QEMU) query-vm-generation-id
+   {"return": {"guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"}}
+ 
+-Setting of this parameter is intentionally left out from the QMP/HMP
+-interfaces.  There are no known use cases for changing the GUID once QEMU is
+-running, and adding this capability would greatly increase the complexity.
++Also, the property may be set via QMP/HMP:
++
++  (QEMU) set-vm-generation-id guid=ee6726ce-73b4-4a8b-863c-708f26515847
++  {"return": {}}
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 4afd57c..4524669 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1871,5 +1871,18 @@ ETEXI
+     },
+ 
+ STEXI
++@item set-vm-generation-id @var{uuid}
++Set Virtual Machine Generation ID counter to @var{guid}
++ETEXI
++
++    {
++        .name       = "set-vm-generation-id",
++        .args_type  = "guid:s",
++        .params     = "guid",
++        .help       = "Set Virtual Machine Generation ID counter",
++        .cmd        = hmp_set_vm_generation_id,
++    },
++
++STEXI
+ @end table
+ ETEXI
+diff --git a/hmp.c b/hmp.c
+index 35a7041..73f9b00 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -2901,6 +2901,16 @@ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict)
+     qapi_free_GuidInfo(info);
+ }
+ 
++void hmp_set_vm_generation_id(Monitor *mon, const QDict *qdict)
++{
++    Error *errp = NULL;
++    const char *guid = qdict_get_str(qdict, "guid");
++
++    qmp_set_vm_generation_id(guid, &errp);
++    if (errp)
++        hmp_handle_error(mon, &errp);
++}
++
+ void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict)
+ {
+     Error *err = NULL;
+diff --git a/hmp.h b/hmp.h
+index a6f56b1..8cc74d5 100644
+--- a/hmp.h
++++ b/hmp.h
+@@ -147,5 +147,6 @@ void hmp_info_ramblock(Monitor *mon, const QDict *qdict);
+ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+ void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
++void hmp_set_vm_generation_id(Monitor *mon, const QDict *qdict);
+ 
+ #endif
+diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+index 105044f..5319d70 100644
+--- a/hw/acpi/vmgenid.c
++++ b/hw/acpi/vmgenid.c
+@@ -129,6 +129,16 @@ void vmgenid_add_fw_cfg(VmGenIdState *vms, FWCfgState *s, GArray *guid)
+                              ARRAY_SIZE(vms->vmgenid_addr_le), false);
+ }
+ 
++void qmp_set_vm_generation_id(const char *guid, Error **errp)
++{
++    Object *obj = find_vmgenid_dev();
++
++    if (!obj) {
++        return;
++    }
++    object_property_set_str(obj, guid, VMGENID_GUID, errp);
++}
++
+ static void vmgenid_update_guest(VmGenIdState *vms)
+ {
+     Object *obj = object_resolve_path_type("", TYPE_ACPI_DEVICE_IF, NULL);
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 1845795..c2ab733 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -3193,6 +3193,17 @@
+ { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
+ 
+ ##
++# @set-vm-generation-id:
++#
++# Set Virtual Machine Generation ID
++#
++# @guid: new GUID to set as Virtual Machine Generation ID
++#
++# Since 2.12
++##
++{ 'command': 'set-vm-generation-id', 'data': { 'guid': 'str' } }
++
++##
+ # @watchdog-set-action:
+ #
+ # Set watchdog action
+diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+index 5a86b40..544cf0f 100644
+--- a/tests/vmgenid-test.c
++++ b/tests/vmgenid-test.c
+@@ -130,6 +130,24 @@ static void read_guid_from_monitor(QemuUUID *guid)
+     QDECREF(rsp);
+ }
+ 
++static void set_guid_via_monitor(QemuUUID *guid)
++{
++    QDict *rsp, *rsp_ret;
++    char command[256];
++    char *guid_str;
++
++    guid_str = qemu_uuid_unparse_strdup(guid);
++    sprintf(command, "{ 'execute': 'set-vm-generation-id', 'arguments': \
++                      { 'guid': '%s' } }",
++            guid_str);
++    free(guid_str);
++    rsp = qmp(command);
++    if (qdict_haskey(rsp, "return")) {
++        rsp_ret = qdict_get_qdict(rsp, "return");
++        g_assert(qdict_size(rsp_ret) == 0);
++    }
++}
++
+ static char disk[] = "tests/vmgenid-test-disk-XXXXXX";
+ 
+ #define GUID_CMD(guid)                          \
+@@ -182,6 +200,17 @@ static void vmgenid_query_monitor_test(void)
+     qtest_quit(global_qtest);
+ }
+ 
++static void vmgenid_set_monitor_test(void)
++{
++    QemuUUID expected, measured;
++
++    global_qtest = qtest_startf(GUID_CMD(VGID_GUID));
++    qemu_uuid_generate(&expected);
++    set_guid_via_monitor(&expected);
++    read_guid_from_monitor(&measured);
++    g_assert(memcmp(measured.data, expected.data, sizeof(measured.data)) == 0);
++}
++
+ int main(int argc, char **argv)
+ {
+     int ret;
+@@ -199,6 +228,8 @@ int main(int argc, char **argv)
+                    vmgenid_set_guid_auto_test);
+     qtest_add_func("/vmgenid/vmgenid/query-monitor",
+                    vmgenid_query_monitor_test);
++    qtest_add_func("/vmgenid/vmgenid/set-guid-qmp",
++                   vmgenid_set_monitor_test);
+     ret = g_test_run();
+     boot_sector_cleanup(disk);
+ 
+-- 
+2.9.5
