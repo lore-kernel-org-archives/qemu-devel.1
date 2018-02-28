@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49169)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1er6Tq-0001Kc-TG
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:29:31 -0500
+	(envelope-from <kwolf@redhat.com>) id 1er6Wx-00049M-6x
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:32:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1er6Tp-0006x9-VJ
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:29:30 -0500
-Date: Wed, 28 Feb 2018 19:29:15 +0100
+	(envelope-from <kwolf@redhat.com>) id 1er6Ww-0001IA-IQ
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:32:43 -0500
+Date: Wed, 28 Feb 2018 19:32:29 +0100
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180228182915.GO4855@localhost.localdomain>
-References: <20180223235142.21501-1-jsnow@redhat.com>
-	<20180223235142.21501-22-jsnow@redhat.com>
-	<3dfe950d-6e46-fc41-d91a-3a6c4a6a4df1@redhat.com>
+Message-ID: <20180228183229.GP4855@localhost.localdomain>
+References: <151948268391.967.15904941335963452518@bdbb90650ae5>
+	<6afb67e2-791f-ca17-4028-906f6f01abfa@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3dfe950d-6e46-fc41-d91a-3a6c4a6a4df1@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v4 21/21] blockjobs: add manual_mgmt option
- to transactions
+In-Reply-To: <6afb67e2-791f-ca17-4028-906f6f01abfa@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v4 00/21] blockjobs: add explicit job
+ management
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +24,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org, pkrempa@redhat.com, jtc@redhat.com
 
-Am 27.02.2018 um 21:24 hat Eric Blake geschrieben:
-> On 02/23/2018 05:51 PM, John Snow wrote:
-> > This allows us to easily force the option for all jobs belonging
-> > to a transaction to ensure consistency with how all those jobs
-> > will be handled.
-> > 
-> > This is purely a convenience.
-> > 
-> > Signed-off-by: John Snow <jsnow@redhat.com>
-> > ---
-> 
-> > +++ b/qapi/transaction.json
-> > @@ -79,7 +79,8 @@
-> >   ##
-> >   { 'struct': 'TransactionProperties',
-> >     'data': {
-> > -       '*completion-mode': 'ActionCompletionMode'
-> > +       '*completion-mode': 'ActionCompletionMode',
-> > +       '*manual-mgmt': 'bool'
-> 
-> Missing QAPI documentation (what you have elsewhere in the C code can
-> probably be copied here, though).
-> 
-> The UI aspect makes sense (I can declare one manual at the transaction level
-> instead of multiple manual declarations per member level within the
-> transaction).
+Am 27.02.2018 um 22:01 hat John Snow geschrieben:
+> All false positives unless someone really would like to advocate for me
+> to change the format of the table.
 
-I'm not so sure if I like the interface, it duplicates functionality in
-two places.
-
-At th very least I would make job creation without BLOCK_JOB_MANUAL an
-error if the transaction requires it instead of silently overriding the
-option that was given to the individual job. But honestly, it might be
-better to just leave this one away.
+Agreed, this isn't going to stop the series. Changing the format of the
+table would make it much harder to read.
 
 Kevin
