@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1er3Xs-0002SI-BV
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:21:29 -0500
+	(envelope-from <bounces@canonical.com>) id 1er3hJ-0005FG-PO
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:31:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1er3Xp-0000Dh-2v
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:21:28 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60330 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1er3Xo-00008Z-SP
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:21:25 -0500
-Date: Wed, 28 Feb 2018 16:21:08 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180228162108.20706176@redhat.com>
-In-Reply-To: <20180228133912.21496-1-idgar@virtualoco.com>
-References: <20180228133912.21496-1-idgar@virtualoco.com>
+	(envelope-from <bounces@canonical.com>) id 1er3hD-0005Zl-Up
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:31:13 -0500
+Received: from indium.canonical.com ([91.189.90.7]:42710)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1er3hD-0005Yj-OQ
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:31:07 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1er3hB-0005Qv-Ny
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 15:31:05 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id CE8D52E81C6
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 15:31:02 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] vmgenid: allow VM Generation ID
- modification via QMP/HMP
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 28 Feb 2018 15:16:34 -0000
+From: =?utf-8?q?=C3=89ric_Hoffman?= <1673976@bugs.launchpad.net>
+Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151983099458.19178.6959593003536192298.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1673976] Re: linux-user clone() can't handle
+ glibc posix_spawn() (causes locale-gen to assert)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,222 +37,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Or Idgar <idgar@virtualoco.com>
-Cc: ben@skyportsystems.com, dgilbert@redhat.com, mst@redhat.com, eblake@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, oidgar@redhat.com, ghammer@redhat.com
+To: qemu-devel@nongnu.org
 
-On Wed, 28 Feb 2018 15:39:12 +0200
-Or Idgar <idgar@virtualoco.com> wrote:
+Ok, thank you for clearing that up.
 
-> From: Or Idgar <oidgar@redhat.com>
-> 
-> This patch allow changing the Virtual Machine Generation
-> ID through QMP/HMP while the vm guest is running.
-> As the definition block of VMGENID in ACPI includes the
-> "Notify" method, we can use it to notify the guest about
-> ID changes.
-> 
-> QMP command example:
->     { "execute": "set-vm-generation-id",
->           "arguments": {
->               "guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
->           }
->     }
-> 
-> HMP command example:
->     set-vm-generation-id 324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87
-> 
-> This patch is based off an earlier version by
-> Igor Mammedov (imammedo@redhat.com)
-> 
-> Signed-off-by: Or Idgar <oidgar@redhat.com>
-> Reviewed-by: Gal Hammer <ghammer@redhat.com>
-> ---
-> 
-> changes in v2:
-> - sending to imammedo@redhat.com instead imammendo@redhat.com
-> 
->  docs/specs/vmgenid.txt |  7 ++++---
->  hmp-commands.hx        | 13 +++++++++++++
->  hmp.c                  | 10 ++++++++++
->  hmp.h                  |  1 +
->  hw/acpi/vmgenid.c      | 10 ++++++++++
->  qapi-schema.json       | 11 +++++++++++
->  tests/vmgenid-test.c   | 31 +++++++++++++++++++++++++++++++
->  7 files changed, 80 insertions(+), 3 deletions(-)
-> 
-> diff --git a/docs/specs/vmgenid.txt b/docs/specs/vmgenid.txt
-> index aa9f518..04443de 100644
-> --- a/docs/specs/vmgenid.txt
-> +++ b/docs/specs/vmgenid.txt
-> @@ -240,6 +240,7 @@ The property may be queried via QMP/HMP:
->    (QEMU) query-vm-generation-id
->    {"return": {"guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"}}
->  
-> -Setting of this parameter is intentionally left out from the QMP/HMP
-> -interfaces.  There are no known use cases for changing the GUID once QEMU is
-> -running, and adding this capability would greatly increase the complexity.
-Since you are dropping /intentionally left out/
-could you add rationale why it's needed now (usecase)?
+I'm noticing in 4b4d4056bb154 this comment:
 
-> +Also, the property may be set via QMP/HMP:
-s/Also: the/The /
+"...we just make explicit use of the fact the the child and parent run
+in the same VM, so the child can write an error code to a field of the
+posix_spawn_args struct instead of sending it through a pipe.  To ensure
+that this mechanism really works, the parent initializes the field to -1
+and the child writes 0 before execing."
 
-> +
-> +  (QEMU) set-vm-generation-id guid=ee6726ce-73b4-4a8b-863c-708f26515847
-> +  {"return": {}}
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index 4afd57c..4524669 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -1871,5 +1871,18 @@ ETEXI
->      },
->  
->  STEXI
-> +@item set-vm-generation-id @var{uuid}
-> +Set Virtual Machine Generation ID counter to @var{guid}
-> +ETEXI
-> +
-> +    {
-> +        .name       = "set-vm-generation-id",
-> +        .args_type  = "guid:s",
-> +        .params     = "guid",
-> +        .help       = "Set Virtual Machine Generation ID counter",
-> +        .cmd        = hmp_set_vm_generation_id,
-> +    },
-> +
-> +STEXI
->  @end table
->  ETEXI
-> diff --git a/hmp.c b/hmp.c
-> index 35a7041..73f9b00 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -2901,6 +2901,16 @@ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict)
->      qapi_free_GuidInfo(info);
->  }
->  
-> +void hmp_set_vm_generation_id(Monitor *mon, const QDict *qdict)
-> +{
-> +    Error *errp = NULL;
-> +    const char *guid = qdict_get_str(qdict, "guid");
-> +
-> +    qmp_set_vm_generation_id(guid, &errp);
-> +    if (errp)
-> +        hmp_handle_error(mon, &errp);
-> +}
-> +
->  void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict)
->  {
->      Error *err = NULL;
-> diff --git a/hmp.h b/hmp.h
-> index a6f56b1..8cc74d5 100644
-> --- a/hmp.h
-> +++ b/hmp.h
-> @@ -147,5 +147,6 @@ void hmp_info_ramblock(Monitor *mon, const QDict *qdict);
->  void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
->  void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
->  void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
-> +void hmp_set_vm_generation_id(Monitor *mon, const QDict *qdict);
->  
->  #endif
-> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-> index 105044f..5319d70 100644
-> --- a/hw/acpi/vmgenid.c
-> +++ b/hw/acpi/vmgenid.c
-> @@ -129,6 +129,16 @@ void vmgenid_add_fw_cfg(VmGenIdState *vms, FWCfgState *s, GArray *guid)
->                               ARRAY_SIZE(vms->vmgenid_addr_le), false);
->  }
->  
-> +void qmp_set_vm_generation_id(const char *guid, Error **errp)
-> +{
-> +    Object *obj = find_vmgenid_dev();
-> +
-> +    if (!obj) {
-> +        return;
-maybe return error so that libvirt won't have to wonder whether command succeeded or not
+So, if the child fail to execute, that error code field of the
+posix_spawn_args struct will remain -1.  Would this ensure that QEMU
+return error in case of failing exec?
 
-> +    }
-> +    object_property_set_str(obj, guid, VMGENID_GUID, errp);
-> +}
-> +
->  static void vmgenid_update_guest(VmGenIdState *vms)
->  {
->      Object *obj = object_resolve_path_type("", TYPE_ACPI_DEVICE_IF, NULL);
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 1845795..c2ab733 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -3193,6 +3193,17 @@
->  { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
->  
->  ##
-> +# @set-vm-generation-id:
-> +#
-> +# Set Virtual Machine Generation ID
-> +#
-> +# @guid: new GUID to set as Virtual Machine Generation ID
-> +#
-> +# Since 2.12
-> +##
-> +{ 'command': 'set-vm-generation-id', 'data': { 'guid': 'str' } }
-> +
-> +##
->  # @watchdog-set-action:
->  #
->  # Set watchdog action
-> diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-> index 5a86b40..544cf0f 100644
-> --- a/tests/vmgenid-test.c
-> +++ b/tests/vmgenid-test.c
-> @@ -130,6 +130,24 @@ static void read_guid_from_monitor(QemuUUID *guid)
->      QDECREF(rsp);
->  }
->  
-> +static void set_guid_via_monitor(QemuUUID *guid)
-> +{
-> +    QDict *rsp, *rsp_ret;
-> +    char command[256];
-> +    char *guid_str;
-> +
-> +    guid_str = qemu_uuid_unparse_strdup(guid);
-> +    sprintf(command, "{ 'execute': 'set-vm-generation-id', 'arguments': \
-> +                      { 'guid': '%s' } }",
-> +            guid_str);
-> +    free(guid_str);
-> +    rsp = qmp(command);
-> +    if (qdict_haskey(rsp, "return")) {
-> +        rsp_ret = qdict_get_qdict(rsp, "return");
-> +        g_assert(qdict_size(rsp_ret) == 0);
-> +    }
-> +}
-> +
->  static char disk[] = "tests/vmgenid-test-disk-XXXXXX";
->  
->  #define GUID_CMD(guid)                          \
-> @@ -182,6 +200,17 @@ static void vmgenid_query_monitor_test(void)
->      qtest_quit(global_qtest);
->  }
->  
-> +static void vmgenid_set_monitor_test(void)
-> +{
-> +    QemuUUID expected, measured;
-> +
-> +    global_qtest = qtest_startf(GUID_CMD(VGID_GUID));
-> +    qemu_uuid_generate(&expected);
-> +    set_guid_via_monitor(&expected);
-> +    read_guid_from_monitor(&measured);
-> +    g_assert(memcmp(measured.data, expected.data, sizeof(measured.data)) == 0);
-> +}
-> +
->  int main(int argc, char **argv)
->  {
->      int ret;
-> @@ -199,6 +228,8 @@ int main(int argc, char **argv)
->                     vmgenid_set_guid_auto_test);
->      qtest_add_func("/vmgenid/vmgenid/query-monitor",
->                     vmgenid_query_monitor_test);
-> +    qtest_add_func("/vmgenid/vmgenid/set-guid-qmp",
-> +                   vmgenid_set_monitor_test);
->      ret = g_test_run();
->      boot_sector_cleanup(disk);
->  
+Best Regards,
+Eric
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1673976
+
+Title:
+  linux-user clone() can't handle glibc posix_spawn() (causes locale-gen
+  to assert)
+
+Status in QEMU:
+  New
+
+Bug description:
+  I'm running a command (locale-gen) inside of an armv7h chroot mounted
+  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
+  chroot file system and I get a core dump.
+
+  locale-gen
+  Generating locales...
+  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
+360: __spawnix: Assertion `ec >=3D 0' failed.
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
+ localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
+le
+
+  I've done this same thing successfully for years, but this breakage
+  has appeared some time in the last 3 or so months. Possibly with the
+  update to qemu version 2.8.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
