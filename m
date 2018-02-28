@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1er0ff-0007mH-VS
+	(envelope-from <kraxel@redhat.com>) id 1er0ff-0007mJ-VH
 	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:17:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1er0fc-0002Ge-Tx
+	(envelope-from <kraxel@redhat.com>) id 1er0fc-0002Gb-TK
 	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:17:19 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59642 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59560 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1er0fc-0002F8-Me
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1er0fc-0002FA-Me
 	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:17:16 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 49394402291E
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 12:17:11 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 28 Feb 2018 13:16:52 +0100
-Message-Id: <20180228121703.20816-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 00/11] Ui 20180228 patches
+Date: Wed, 28 Feb 2018 13:16:55 +0100
+Message-Id: <20180228121703.20816-4-kraxel@redhat.com>
+In-Reply-To: <20180228121703.20816-1-kraxel@redhat.com>
+References: <20180228121703.20816-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 03/11] cocoa: switch over to new display registry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +24,81 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-The following changes since commit 0a773d55ac76c5aa89ed9187a3bc5af8c5c2a6d0:
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: 20180221131537.31341-4-kraxel@redhat.com
+---
+ include/ui/console.h | 12 ------------
+ vl.c                 |  3 ---
+ ui/cocoa.m           | 14 +++++++++++++-
+ 3 files changed, 13 insertions(+), 16 deletions(-)
 
-  maintainers: Add myself as a OpenBSD maintainer (2018-02-23 12:05:07 +0000)
-
-are available in the git repository at:
-
-  git://git.kraxel.org/qemu tags/ui-20180228-pull-request
-
-for you to fetch changes up to 6b59af25063d9affb433b4febb8d706a62713680:
-
-  curses: build as ui module (2018-02-28 07:21:44 +0100)
-
-----------------------------------------------------------------
-ui: add & use display registry, build some UIs as module.
-
-----------------------------------------------------------------
-
-Gerd Hoffmann (11):
-  console: add qemu display registry, add gtk
-  sdl: switch over to new display registry
-  cocoa: switch over to new display registry
-  curses: switch over to new display registry
-  egl-headless: switch over to new display registry
-  console: add and use qemu_display_find_default
-  console: add ui module loading support
-  configure: add X11 vars to config-host.mak
-  configure: opengl doesn't depend on x11
-  gtk: build as ui module
-  curses: build as ui module
-
- configure             | 27 +++++++++++--------
- include/qemu/module.h |  1 +
- include/ui/console.h  | 75 ++++++++-------------------------------------------
- ui/console.c          | 59 ++++++++++++++++++++++++++++++++++++++++
- ui/curses.c           | 14 +++++++++-
- ui/egl-headless.c     | 20 +++++++++++++-
- ui/gtk.c              | 17 ++++++++++--
- ui/sdl.c              | 24 +++++++++--------
- ui/sdl2.c             | 17 ++++++++++--
- vl.c                  | 74 ++++++++------------------------------------------
- ui/Makefile.objs      | 28 ++++++++++++-------
- ui/cocoa.m            | 14 +++++++++-
- 12 files changed, 204 insertions(+), 166 deletions(-)
-
+diff --git a/include/ui/console.h b/include/ui/console.h
+index cb86e6a0dd..f8c462106a 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -444,18 +444,6 @@ void qemu_display_register(QemuDisplay *ui);
+ void qemu_display_early_init(DisplayOptions *opts);
+ void qemu_display_init(DisplayState *ds, DisplayOptions *opts);
+ 
+-/* cocoa.m */
+-#ifdef CONFIG_COCOA
+-void cocoa_display_init(DisplayState *ds, DisplayOptions *opts);
+-#else
+-static inline void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
+-{
+-    /* This must never be called if CONFIG_COCOA is disabled */
+-    error_report("Cocoa support is disabled");
+-    abort();
+-}
+-#endif
+-
+ /* vnc.c */
+ void vnc_display_init(const char *id);
+ void vnc_display_open(const char *id, Error **errp);
+diff --git a/vl.c b/vl.c
+index 45900ba7e6..2c3cb4651c 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4654,9 +4654,6 @@ int main(int argc, char **argv, char **envp)
+     case DISPLAY_TYPE_CURSES:
+         curses_display_init(ds, &dpy);
+         break;
+-    case DISPLAY_TYPE_COCOA:
+-        cocoa_display_init(ds, &dpy);
+-        break;
+     default:
+         qemu_display_init(ds, &dpy);
+         break;
+diff --git a/ui/cocoa.m b/ui/cocoa.m
+index 90d9aa57ea..8b0dce90cb 100644
+--- a/ui/cocoa.m
++++ b/ui/cocoa.m
+@@ -1683,7 +1683,7 @@ static void addRemovableDevicesMenuItems(void)
+     qapi_free_BlockInfoList(pointerToFree);
+ }
+ 
+-void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
++static void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
+ {
+     COCOA_DEBUG("qemu_cocoa: cocoa_display_init\n");
+ 
+@@ -1713,3 +1713,15 @@ void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
+      */
+     addRemovableDevicesMenuItems();
+ }
++
++static QemuDisplay qemu_display_cocoa = {
++    .type       = DISPLAY_TYPE_COCOA,
++    .init       = cocoa_display_init,
++};
++
++static void register_cocoa(void)
++{
++    qemu_display_register(&qemu_display_cocoa);
++}
++
++type_init(register_cocoa);
 -- 
 2.9.3
