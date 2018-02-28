@@ -1,28 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1er1ql-0008A3-C4
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:32:52 -0500
+	(envelope-from <arnd@arndb.de>) id 1er1s9-0000Yu-U5
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:34:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1er1qg-0001PJ-Qs
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:32:50 -0500
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:55084)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1er1qg-0001Os-KT
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:32:46 -0500
-Received: by mail-wm0-x230.google.com with SMTP id z81so4989652wmb.4
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 05:32:46 -0800 (PST)
-References: <20180227143852.11175-1-alex.bennee@linaro.org>
-	<CAFEAcA8LEG=bzXrj3etTdf_q3-AcMVfCCqSGQ2OkXUPGBHkMBQ@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA8LEG=bzXrj3etTdf_q3-AcMVfCCqSGQ2OkXUPGBHkMBQ@mail.gmail.com>
-Date: Wed, 28 Feb 2018 13:32:43 +0000
-Message-ID: <87woyxutms.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v4 00/31] Add ARMv8.2
- half-precision functions
+	(envelope-from <arnd@arndb.de>) id 1er1s3-0001tR-VR
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:34:17 -0500
+Received: from mout.kundenserver.de ([212.227.126.133]:45029)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <arnd@arndb.de>) id 1er1s3-0001ss-Lb
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:34:11 -0500
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Wed, 28 Feb 2018 14:33:49 +0100
+Message-Id: <20180228133357.1848600-1-arnd@arndb.de>
+Subject: [Qemu-devel] [PATCH] fw_cfg: avoid unused function warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +21,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Gabriel Somlo <somlo@cmu.edu>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Vasyl Gomonovych <gomonovych@gmail.com>, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org
 
+The newly introduced fw_cfg_dma_transfer() function is unused when
+CONFIG_CRASH_CORE is disabled:
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+drivers/firmware/qemu_fw_cfg.c:89:16: error: 'fw_cfg_dma_transfer' defined but not used [-Werror=unused-function]
+ static ssize_t fw_cfg_dma_transfer(void *address, u32 length, u32 control)
 
-> On 27 February 2018 at 14:38, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
->> A few minor fixes and a chunk of Richard's r-b tags. Now all that is
->> left is:
->>
->>   patch 0014/arm translate a64 add FP16 FMULX MLS FMLA to simd.patch nee=
-ds review
->>
->> Otherwise see comments bellow --- for other changes
->>
->
-> Thanks -- applied to target-arm.next. Some caveats:
->
-> (1) we can fix the nit RTH noted about FMULX later
->
-> (2) I notice that there's no patch here that adds the linux-user/elfload.c
-> code to set a hwcap for the guest program to indicate FP16 presence.
-> Presumably there is such a hwcap?
+This moves it into the #ifdef section that hides its caller to avoid the
+warning.
 
-I'd missed it as risu doesn't need it. I see rth has sent a patch so
-I'll read up on it and see if I can extend vector-benchmark to use it to
-detect FP16.
+Fixes: 47e78bfb5426 ("fw_cfg: write vmcoreinfo details")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/firmware/qemu_fw_cfg.c | 60 +++++++++++++++++++++---------------------
+ 1 file changed, 30 insertions(+), 30 deletions(-)
 
->
-> (3) Is this complete fp16 support or are there still more pieces to come?
-> I'm assuming it's all done...
-
-All AArch64 is done. I'm not sure how much AArch32 is needed for SVE
-support. The ARM ARM says "When this feature is implemented it is
-implemented in both Advanced SIMD and floating-point, and in AArch64 and
-AArch32 states." but I think it is legal to have a 64 bit only CPU
-without AArch32?
-
-Unfortunately the magic I used to extract all the AArch64 HP
-instructions from the ASL doesn't work on the AArch32 definitions which
-put important differentiating notes in different places.
-
-Once I've got the list I'll document it so we don't forget...
-
->
-> (4) I've split the "add new ARM_V8_FP16 feature bit to the enum"
-> and "enable the feature on the 'any' CPU" parts of patch 2, so
-> we can do the latter at the end. If there is still missing parts
-> to fp16 then we can drop the enable-feature half of that
-> for the moment.
-
-I guess that depends on if we model any AArch64 only CPUs?
-
->
-> thanks
-> -- PMM
-
-
---
-Alex Benn=C3=A9e
+diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cfg.c
+index 3015e77aebca..f002bb40519b 100644
+--- a/drivers/firmware/qemu_fw_cfg.c
++++ b/drivers/firmware/qemu_fw_cfg.c
+@@ -66,6 +66,36 @@ static void fw_cfg_sel_endianness(u16 key)
+ 		iowrite16(key, fw_cfg_reg_ctrl);
+ }
+ 
++/* read chunk of given fw_cfg blob (caller responsible for sanity-check) */
++static ssize_t fw_cfg_read_blob(u16 key,
++				void *buf, loff_t pos, size_t count)
++{
++	u32 glk = -1U;
++	acpi_status status;
++
++	/* If we have ACPI, ensure mutual exclusion against any potential
++	 * device access by the firmware, e.g. via AML methods:
++	 */
++	status = acpi_acquire_global_lock(ACPI_WAIT_FOREVER, &glk);
++	if (ACPI_FAILURE(status) && status != AE_NOT_CONFIGURED) {
++		/* Should never get here */
++		WARN(1, "fw_cfg_read_blob: Failed to lock ACPI!\n");
++		memset(buf, 0, count);
++		return -EINVAL;
++	}
++
++	mutex_lock(&fw_cfg_dev_lock);
++	fw_cfg_sel_endianness(key);
++	while (pos-- > 0)
++		ioread8(fw_cfg_reg_data);
++	ioread8_rep(fw_cfg_reg_data, buf, count);
++	mutex_unlock(&fw_cfg_dev_lock);
++
++	acpi_release_global_lock(glk);
++	return count;
++}
++
++#ifdef CONFIG_CRASH_CORE
+ static inline bool fw_cfg_dma_enabled(void)
+ {
+ 	return (fw_cfg_rev & FW_CFG_VERSION_DMA) && fw_cfg_reg_dma;
+@@ -124,36 +154,6 @@ static ssize_t fw_cfg_dma_transfer(void *address, u32 length, u32 control)
+ 	return ret;
+ }
+ 
+-/* read chunk of given fw_cfg blob (caller responsible for sanity-check) */
+-static ssize_t fw_cfg_read_blob(u16 key,
+-				void *buf, loff_t pos, size_t count)
+-{
+-	u32 glk = -1U;
+-	acpi_status status;
+-
+-	/* If we have ACPI, ensure mutual exclusion against any potential
+-	 * device access by the firmware, e.g. via AML methods:
+-	 */
+-	status = acpi_acquire_global_lock(ACPI_WAIT_FOREVER, &glk);
+-	if (ACPI_FAILURE(status) && status != AE_NOT_CONFIGURED) {
+-		/* Should never get here */
+-		WARN(1, "fw_cfg_read_blob: Failed to lock ACPI!\n");
+-		memset(buf, 0, count);
+-		return -EINVAL;
+-	}
+-
+-	mutex_lock(&fw_cfg_dev_lock);
+-	fw_cfg_sel_endianness(key);
+-	while (pos-- > 0)
+-		ioread8(fw_cfg_reg_data);
+-	ioread8_rep(fw_cfg_reg_data, buf, count);
+-	mutex_unlock(&fw_cfg_dev_lock);
+-
+-	acpi_release_global_lock(glk);
+-	return count;
+-}
+-
+-#ifdef CONFIG_CRASH_CORE
+ /* write chunk of given fw_cfg blob (caller responsible for sanity-check) */
+ static ssize_t fw_cfg_write_blob(u16 key,
+ 				 void *buf, loff_t pos, size_t count)
+-- 
+2.9.0
