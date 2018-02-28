@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1er7L3-0008S1-S4
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:24:30 -0500
+	(envelope-from <jsnow@redhat.com>) id 1er7Mm-0000qu-Ey
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:26:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1er7L3-0002x8-1P
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:24:29 -0500
+	(envelope-from <jsnow@redhat.com>) id 1er7Ml-0003hs-Fd
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:26:16 -0500
 References: <20180223235142.21501-1-jsnow@redhat.com>
-	<20180223235142.21501-22-jsnow@redhat.com>
-	<3dfe950d-6e46-fc41-d91a-3a6c4a6a4df1@redhat.com>
-	<20180228182915.GO4855@localhost.localdomain>
+	<20180223235142.21501-9-jsnow@redhat.com>
+	<20180228145417.GB4855@localhost.localdomain>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <49305409-e541-d0c2-4088-4929530c9f1b@redhat.com>
-Date: Wed, 28 Feb 2018 14:24:20 -0500
+Message-ID: <d4742fe4-6fa0-0491-02f4-f0acddde7e79@redhat.com>
+Date: Wed, 28 Feb 2018 14:26:00 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180228182915.GO4855@localhost.localdomain>
+In-Reply-To: <20180228145417.GB4855@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v4 21/21] blockjobs: add manual_mgmt option
- to transactions
+Subject: Re: [Qemu-devel] [RFC v4 08/21] blockjobs: add ABORTING state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,56 +25,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: qemu-block@nongnu.org, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
 
 
-On 02/28/2018 01:29 PM, Kevin Wolf wrote:
-> Am 27.02.2018 um 21:24 hat Eric Blake geschrieben:
->> On 02/23/2018 05:51 PM, John Snow wrote:
->>> This allows us to easily force the option for all jobs belonging
->>> to a transaction to ensure consistency with how all those jobs
->>> will be handled.
->>>
->>> This is purely a convenience.
->>>
->>> Signed-off-by: John Snow <jsnow@redhat.com>
->>> ---
+On 02/28/2018 09:54 AM, Kevin Wolf wrote:
+> Am 24.02.2018 um 00:51 hat John Snow geschrieben:
+>> Add a new state ABORTING.
 >>
->>> +++ b/qapi/transaction.json
->>> @@ -79,7 +79,8 @@
->>>   ##
->>>   { 'struct': 'TransactionProperties',
->>>     'data': {
->>> -       '*completion-mode': 'ActionCompletionMode'
->>> +       '*completion-mode': 'ActionCompletionMode',
->>> +       '*manual-mgmt': 'bool'
+>> This makes transitions from normative states to error states explicit
+>> in the STM, and serves as a disambiguation for which states may complete
+>> normally when normal end-states (CONCLUDED) are added in future commits.
 >>
->> Missing QAPI documentation (what you have elsewhere in the C code can
->> probably be copied here, though).
+>> Notably, Paused/Standby jobs do not transition directly to aborting,
+>> as they must wake up first and cooperate in their cancellation.
 >>
->> The UI aspect makes sense (I can declare one manual at the transaction level
->> instead of multiple manual declarations per member level within the
->> transaction).
+>> Transitions:
+>> Running -> Aborting: can be cancelled or encounter an error
+>> Ready   -> Aborting: can be cancelled or encounter an error
+>>
+>> Verbs:
+>> None. The job must finish cleaning itself up and report its final status.
+>>
+>>              +---------+
+>>              |UNDEFINED|
+>>              +--+------+
+>>                 |
+>>              +--v----+
+>>              |CREATED|
+>>              +--+----+
+>>                 |
+>>              +--v----+     +------+
+>>    +---------+RUNNING<----->PAUSED|
+>>    |         +--+----+     +------+
+>>    |            |
+>>    |         +--v--+       +-------+
+>>    +---------+READY<------->STANDBY|
+>>    |         +-----+       +-------+
+>>    |
+>> +--v-----+
+>> |ABORTING|
+>> +--------+
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
 > 
-> I'm not so sure if I like the interface, it duplicates functionality in
-> two places.
+>> @@ -383,6 +384,10 @@ static void block_job_completed_single(BlockJob *job)
+>>  {
+>>      assert(job->completed);
+>>  
+>> +    if (job->ret || block_job_is_cancelled(job)) {
+>> +        block_job_state_transition(job, BLOCK_JOB_STATUS_ABORTING);
+>> +    }
+>> +
+>>      if (!job->ret) {
+>>          if (job->driver->commit) {
+>>              job->driver->commit(job);
 > 
-> At th very least I would make job creation without BLOCK_JOB_MANUAL an
-> error if the transaction requires it instead of silently overriding the
-> option that was given to the individual job. But honestly, it might be
-> better to just leave this one away.
+> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+> 
+> But I do have a question about the code below the new lines: I wonder
+> where job->ret is set to an error value? I can clearly see that the job
+> is marked as cancelled, so your added code should be working, but
+> looking at the block job code, it looks to me as if the jobs were
+> completing with job->cancelled = true and job->ret = 0.
+> 
+> For block_job_completed_single(), this means that we would call the
+> .commit callback and .cb with a success return code, while sending a
+> CANCELLED event on QMP.
+> 
+> Of course, the only job type that supports transactions is the backup
+> job, and that one seems to compensate for this by explicitly checking
+> block_job_is_cancelled() in its .commit implementation, but is that
+> really how things should be working?
 > 
 > Kevin
 > 
 
-Sure, I put it in the trailing position here because I see it as
-optional. I don't like the idea of having to specify manual for each and
-every item in a transaction, but if mixed-mode is possible then this is
-less important.
-
-I'll leave it off for now, but I will always fondly remember it, and
-then maybe try to sneak it back in for v6.
-
---js
+You re-discovered the same nonsensical thing that I discovered, which
+led to patch 12.
