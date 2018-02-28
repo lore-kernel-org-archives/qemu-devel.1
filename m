@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1er7Pf-0002My-My
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:29:16 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1er7Rs-0003FE-MK
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1er7Pb-0005BM-IE
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:29:15 -0500
-References: <20180223235142.21501-1-jsnow@redhat.com>
-	<20180223235142.21501-10-jsnow@redhat.com>
-	<20180228153743.GC4855@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <1129c06d-1d3d-6568-bfb1-e12e3e84ee34@redhat.com>
-Date: Wed, 28 Feb 2018 14:29:08 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1er7Rq-0006EV-Hn
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:32 -0500
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:43932)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1er7Rq-0006E3-Bt
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:30 -0500
+Received: by mail-pf0-x241.google.com with SMTP id z14so1408329pfe.10
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 11:31:30 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Wed, 28 Feb 2018 11:31:10 -0800
+Message-Id: <20180228193125.20577-2-richard.henderson@linaro.org>
+In-Reply-To: <20180228193125.20577-1-richard.henderson@linaro.org>
+References: <20180228193125.20577-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180228153743.GC4855@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v4 09/21] blockjobs: add CONCLUDED state
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 01/16] target/arm: Add ARM_FEATURE_V8_RDM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org
 
+Not enabled anywhere yet.
 
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/cpu.h     | 1 +
+ linux-user/elfload.c | 1 +
+ 2 files changed, 2 insertions(+)
 
-On 02/28/2018 10:37 AM, Kevin Wolf wrote:
-> Am 24.02.2018 um 00:51 hat John Snow geschrieben:
->> add a new state "CONCLUDED" that identifies a job that has ceased all
->> operations. The wording was chosen to avoid any phrasing that might
->> imply success, error, or cancellation. The task has simply ceased all
->> operation and can never again perform any work.
->>
->> ("finished", "done", and "completed" might all imply success.)
->>
->> Transitions:
->> Running  -> Concluded: normal completion
->> Ready    -> Concluded: normal completion
->> Aborting -> Concluded: error and cancellations
->>
->> Verbs:
->> None as of this commit. (a future commit adds 'dismiss')
->>
->>              +---------+
->>              |UNDEFINED|
->>              +--+------+
->>                 |
->>              +--v----+
->>              |CREATED|
->>              +--+----+
->>                 |
->>              +--v----+     +------+
->>    +---------+RUNNING<----->PAUSED|
->>    |         +--+-+--+     +------+
->>    |            | |
->>    |            | +------------------+
->>    |            |                    |
->>    |         +--v--+       +-------+ |
->>    +---------+READY<------->STANDBY| |
->>    |         +--+--+       +-------+ |
->>    |            |                    |
->> +--v-----+   +--v------+             |
->> |ABORTING+--->CONCLUDED<-------------+
->> +--------+   +---------+
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
-> 
->> +static void block_job_event_concluded(BlockJob *job)
->> +{
->> +    if (block_job_is_internal(job) || !job->manual) {
->> +        return;
->> +    }
->> +    block_job_state_transition(job, BLOCK_JOB_STATUS_CONCLUDED);
->> +}
-> 
-> I don't understand why internal or automatic jobs should follow a
-> different state machine. Sure, they won't be in this state for long
-
-The very simple answer is because I overlooked this change from when I
-did implement separate graphs for the old and new models.
-
-> because the job is immediately unref'ed. Though if someone holds an
-> additional reference, it might be visible - I would consider this a bug
-> fix because otherwise the job stays in READY and continues to accept the
-> verbs for that state.
-> 
-> Kevin
-> 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 2b9740878b..7c8e87544a 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1427,6 +1427,7 @@ enum arm_features {
+     ARM_FEATURE_V8_SHA3, /* implements SHA3 part of v8 Crypto Extensions */
+     ARM_FEATURE_V8_SM3, /* implements SM3 part of v8 Crypto Extensions */
+     ARM_FEATURE_V8_SM4, /* implements SM4 part of v8 Crypto Extensions */
++    ARM_FEATURE_V8_RDM, /* implements v8.1 simd round multiply */
+     ARM_FEATURE_V8_FP16, /* implements v8.2 half-precision float */
+ };
+ 
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 8bb9a2c3e8..63cadae1b4 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -551,6 +551,7 @@ static uint32_t get_elf_hwcap(void)
+     GET_FEATURE(ARM_FEATURE_V8_SM3, ARM_HWCAP_A64_SM3);
+     GET_FEATURE(ARM_FEATURE_V8_SM4, ARM_HWCAP_A64_SM4);
+     GET_FEATURE(ARM_FEATURE_V8_SHA512, ARM_HWCAP_A64_SHA512);
++    GET_FEATURE(ARM_FEATURE_V8_RDM, ARM_HWCAP_A64_ASIMDRDM);
+ #undef GET_FEATURE
+ 
+     return hwcaps;
+-- 
+2.14.3
