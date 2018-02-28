@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1er0Fy-00017e-QV
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 06:50:47 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1er0IW-00029B-1B
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 06:53:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1er0Fu-0006WL-NN
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 06:50:46 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34218 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1er0Fu-0006Va-Is
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 06:50:42 -0500
-References: <1490624810-44752-1-git-send-email-agraf@suse.de>
-	<33183CC9F5247A488A2544077AF19020DA56A1AE@DGGEMA505-MBX.china.huawei.com>
-	<b5b23b57-8f66-3774-3a45-e42fd7edae96@suse.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <aa78a250-5a88-300d-e935-aaeb8a69748b@redhat.com>
-Date: Wed, 28 Feb 2018 12:50:33 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1er0IV-00085p-2d
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 06:53:24 -0500
+Received: from mail-oi0-x229.google.com ([2607:f8b0:4003:c06::229]:39580)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1er0IU-00085a-MW
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 06:53:22 -0500
+Received: by mail-oi0-x229.google.com with SMTP id t185so1536328oif.6
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 03:53:22 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <b5b23b57-8f66-3774-3a45-e42fd7edae96@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] i386: Allow monitor / mwait cpuid override
+In-Reply-To: <CAHNT7Nv04hScm7QDtJMhFZeB=WOyOQ6HW1J-xOEO11GM1xFqyA@mail.gmail.com>
+References: <1519690504-37792-1-git-send-email-mjc@sifive.com>
+	<CAFEAcA_0qNcikG2iLii=4zEPYvhz1koEbhCCrCXssdKYv06OJA@mail.gmail.com>
+	<CADJ6UvPQMDq_RES_u6WUmXHsita+On4oLu-V=emp3MnmmzjHhQ@mail.gmail.com>
+	<CAHNT7Nv04hScm7QDtJMhFZeB=WOyOQ6HW1J-xOEO11GM1xFqyA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 28 Feb 2018 11:53:01 +0000
+Message-ID: <CAFEAcA-kUW+cKPiwzkhLm=+3f-HnkeOCURR73JkFNtd9LE-ABA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [patches] Re: [PULL] RISC-V QEMU Port Submission
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +31,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Graf <agraf@suse.de>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>, Zhuangyanying <ann.zhuangyanying@huawei.com>
+To: Michael Clark <mjc@sifive.com>
+Cc: Stef O'Rear <sorear2@gmail.com>, RISC-V Patches <patches@groups.riscv.org>, Palmer Dabbelt <palmer@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-On 28/02/2018 00:55, Alexander Graf wrote:
-> 
-> 
-> On 27.02.18 10:52, Gonglei (Arei) wrote:
->> Hi all,
->>
->> Guests could achive good performance in 'Message Passing Workloads' 
->> scenarios when knowing the X86_FEATURE_MWAIT feature which is presented by qemu. 
->> the reason is that after knowing that feature, 
->> the guest could use mwait method, which saves VMEXIT, 
->> to do idle, and achives high performace in latency-sensitive scenario.
->>
->> Is there any plan for this patch? 
->>
->> Or May I send a updated version based on yours? @Alex?
-> 
-> Oh, did I drop the ball on this one? If that's the case, sure, go ahead.
+On 28 February 2018 at 00:09, Michael Clark <mjc@sifive.com> wrote:
+> I've just talked to SiFive about this. They have agreed that we can remove
+> the sifive_e300 and sifive_u500 boards from the patch series that we are
+> going to submit upstream again later this week or early next week. These
+> machines and their devices are pretty easy for us to maintain in the riscv
+> or a sifive repo. This trims the number of machines from 5 to 3 and lets us
+> remove the SiFiveUART and SiFivePRCI from the next patch series we are
+> going to submit. e.g. v8
 
-Hi, it is probably best to implement this feature based on the
-HINT_DEDICATED cpuid bit that Wanpeng Li is adding.
+Models of boards which people actively want and are using are fine
+(though indeed you can save them for a later round of patches if you
+like). And it sounds like the 1.9.1 stuff is genuinely wanted, so
+thanks for the clarification there. What I want to avoid is boards
+going into QEMU just because you happened to have them already. Once
+a board model goes into QEMU it's a commitment to supporting it for
+the long term, and getting rid of it again is hard.
 
-Paolo
+> However I'm inclined to leave it as it is, at this point. It is not
+> something that we can't change in the future once the code is in-tree.
+
+With my 'upstream dev' hat on, I tend to be suspicious of this
+line of argument, because in a lot of cases what tends to happen
+is that the code for some new target or device goes in-tree, and
+then the people who worked on submitting it disappear, or never
+actually do get round to refactoring[*]. You get more leeway for
+making this argument the longer you've been around and participating
+in QEMU development, because then you have a track record of
+following up on things.
+
+[*] in fact we're currently discussing deleting support for
+a couple of target architectures that were basically "once the
+code went into mainline nothing further was ever done to it except
+global-refactorings and other tree wide maintenance by other
+QEMU developers".
+
+thanks
+-- PMM
