@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1er7S6-0003SG-6k
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:47 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1er7S8-0003V7-B4
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1er7S4-0006Qj-Tj
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:46 -0500
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:39549)
+	(envelope-from <richard.henderson@linaro.org>) id 1er7S6-0006S5-Lz
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:48 -0500
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:46445)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1er7S4-0006Pw-MM
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:44 -0500
-Received: by mail-pl0-x242.google.com with SMTP id s13-v6so2119297plq.6
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 11:31:44 -0800 (PST)
+	id 1er7S6-0006RO-Eh
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:46 -0500
+Received: by mail-pg0-x243.google.com with SMTP id r26so1321600pgv.13
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 11:31:46 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 28 Feb 2018 11:31:20 -0800
-Message-Id: <20180228193125.20577-12-richard.henderson@linaro.org>
+Date: Wed, 28 Feb 2018 11:31:21 -0800
+Message-Id: <20180228193125.20577-13-richard.henderson@linaro.org>
 In-Reply-To: <20180228193125.20577-1-richard.henderson@linaro.org>
 References: <20180228193125.20577-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 11/16] target/arm: Decode aa64 armv8.3 fcadd
+Subject: [Qemu-devel] [PATCH v3 12/16] target/arm: Decode aa64 armv8.3 fcmla
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,144 +29,207 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.h        |  7 ++++
- target/arm/translate-a64.c | 48 ++++++++++++++++++++++-
- target/arm/vec_helper.c    | 97 ++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 151 insertions(+), 1 deletion(-)
+ target/arm/helper.h        |  11 ++++
+ target/arm/translate-a64.c |  94 +++++++++++++++++++++++++---
+ target/arm/vec_helper.c    | 149 +++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 246 insertions(+), 8 deletions(-)
 
 diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 7f0d3b2d84..1e2d7025de 100644
+index 1e2d7025de..0d2094f2be 100644
 --- a/target/arm/helper.h
 +++ b/target/arm/helper.h
-@@ -578,6 +578,13 @@ DEF_HELPER_FLAGS_5(gvec_qrdmlah_s32, TCG_CALL_NO_RWG,
- DEF_HELPER_FLAGS_5(gvec_qrdmlsh_s32, TCG_CALL_NO_RWG,
+@@ -585,6 +585,17 @@ DEF_HELPER_FLAGS_5(gvec_fcadds, TCG_CALL_NO_RWG,
+ DEF_HELPER_FLAGS_5(gvec_fcaddd, TCG_CALL_NO_RWG,
                     void, ptr, ptr, ptr, ptr, i32)
  
-+DEF_HELPER_FLAGS_5(gvec_fcaddh, TCG_CALL_NO_RWG,
++DEF_HELPER_FLAGS_5(gvec_fcmlah, TCG_CALL_NO_RWG,
 +                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_fcadds, TCG_CALL_NO_RWG,
++DEF_HELPER_FLAGS_5(gvec_fcmlah_idx, TCG_CALL_NO_RWG,
 +                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_fcaddd, TCG_CALL_NO_RWG,
++DEF_HELPER_FLAGS_5(gvec_fcmlas, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(gvec_fcmlas_idx, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(gvec_fcmlad, TCG_CALL_NO_RWG,
 +                   void, ptr, ptr, ptr, ptr, i32)
 +
  #ifdef TARGET_AARCH64
  #include "helper-a64.h"
  #endif
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index e4d2d548ba..efed4fd9d2 100644
+index efed4fd9d2..31ff0479e6 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -713,6 +713,21 @@ static void gen_gvec_op3_env(DisasContext *s, bool is_q, int rd,
-                        is_q ? 16 : 8, vec_full_reg_size(s), 0, fn);
- }
- 
-+/* Expand a 3-operand + fpstatus pointer + simd data value operation using
-+ * an out-of-line helper.
-+ */
-+static void gen_gvec_op3_fpst(DisasContext *s, bool is_q, int rd, int rn,
-+                              int rm, bool is_fp16, int data,
-+                              gen_helper_gvec_3_ptr *fn)
-+{
-+    TCGv_ptr fpst = get_fpstatus_ptr(is_fp16);
-+    tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, rd),
-+                       vec_full_reg_offset(s, rn),
-+                       vec_full_reg_offset(s, rm), fpst,
-+                       is_q ? 16 : 8, vec_full_reg_size(s), data, fn);
-+    tcg_temp_free_ptr(fpst);
-+}
-+
- /* Set ZF and NF based on a 64 bit result. This is alas fiddlier
-  * than the 32 bit equivalent.
-  */
-@@ -10816,7 +10831,7 @@ static void disas_simd_three_reg_same_extra(DisasContext *s, uint32_t insn)
-     int size = extract32(insn, 22, 2);
-     bool u = extract32(insn, 29, 1);
-     bool is_q = extract32(insn, 30, 1);
--    int feature;
-+    int feature, rot;
- 
-     switch (u * 16 + opcode) {
-     case 0x10: /* SQRDMLAH (vector) */
-@@ -10827,6 +10842,16 @@ static void disas_simd_three_reg_same_extra(DisasContext *s, uint32_t insn)
+@@ -10842,6 +10842,10 @@ static void disas_simd_three_reg_same_extra(DisasContext *s, uint32_t insn)
          }
          feature = ARM_FEATURE_V8_RDM;
          break;
-+    case 0xc: /* FCADD, #90 */
-+    case 0xe: /* FCADD, #270 */
-+        if (size == 0
-+            || (size == 1 && !arm_dc_feature(s, ARM_FEATURE_V8_FP16))
-+            || (size == 3 && !is_q)) {
-+            unallocated_encoding(s);
-+            return;
-+        }
-+        feature = ARM_FEATURE_V8_FCMA;
-+        break;
-     default:
-         unallocated_encoding(s);
-         return;
-@@ -10866,6 +10891,27 @@ static void disas_simd_three_reg_same_extra(DisasContext *s, uint32_t insn)
++    case 0x8: /* FCMLA, #0 */
++    case 0x9: /* FCMLA, #90 */
++    case 0xa: /* FCMLA, #180 */
++    case 0xb: /* FCMLA, #270 */
+     case 0xc: /* FCADD, #90 */
+     case 0xe: /* FCADD, #270 */
+         if (size == 0
+@@ -10891,6 +10895,29 @@ static void disas_simd_three_reg_same_extra(DisasContext *s, uint32_t insn)
          }
          return;
  
-+    case 0xc: /* FCADD, #90 */
-+    case 0xe: /* FCADD, #270 */
-+        rot = extract32(opcode, 1, 1);
++    case 0x8: /* FCMLA, #0 */
++    case 0x9: /* FCMLA, #90 */
++    case 0xa: /* FCMLA, #180 */
++    case 0xb: /* FCMLA, #270 */
++        rot = extract32(opcode, 0, 2);
 +        switch (size) {
 +        case 1:
-+            gen_gvec_op3_fpst(s, is_q, rd, rn, rm, size == 1, rot,
-+                              gen_helper_gvec_fcaddh);
++            gen_gvec_op3_fpst(s, is_q, rd, rn, rm, true, rot,
++                              gen_helper_gvec_fcmlah);
 +            break;
 +        case 2:
-+            gen_gvec_op3_fpst(s, is_q, rd, rn, rm, size == 1, rot,
-+                              gen_helper_gvec_fcadds);
++            gen_gvec_op3_fpst(s, is_q, rd, rn, rm, false, rot,
++                              gen_helper_gvec_fcmlas);
 +            break;
 +        case 3:
-+            gen_gvec_op3_fpst(s, is_q, rd, rn, rm, size == 1, rot,
-+                              gen_helper_gvec_fcaddd);
++            gen_gvec_op3_fpst(s, is_q, rd, rn, rm, false, rot,
++                              gen_helper_gvec_fcmlad);
 +            break;
 +        default:
 +            g_assert_not_reached();
 +        }
 +        return;
 +
+     case 0xc: /* FCADD, #90 */
+     case 0xe: /* FCADD, #270 */
+         rot = extract32(opcode, 1, 1);
+@@ -11993,7 +12020,7 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
+     int rn = extract32(insn, 5, 5);
+     int rd = extract32(insn, 0, 5);
+     bool is_long = false;
+-    bool is_fp = false;
++    int is_fp = 0;
+     bool is_fp16 = false;
+     int index;
+     TCGv_ptr fpst;
+@@ -12031,7 +12058,7 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
+     case 0x05: /* FMLS */
+     case 0x09: /* FMUL */
+     case 0x19: /* FMULX */
+-        is_fp = true;
++        is_fp = 1;
+         break;
+     case 0x1d: /* SQRDMLAH */
+     case 0x1f: /* SQRDMLSH */
+@@ -12040,20 +12067,28 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
+             return;
+         }
+         break;
++    case 0x11: /* FCMLA #0 */
++    case 0x13: /* FCMLA #90 */
++    case 0x15: /* FCMLA #180 */
++    case 0x17: /* FCMLA #270 */
++        if (!arm_dc_feature(s, ARM_FEATURE_V8_FCMA)) {
++            unallocated_encoding(s);
++            return;
++        }
++        is_fp = 2;
++        break;
      default:
-         g_assert_not_reached();
+         unallocated_encoding(s);
+         return;
      }
+ 
+-    if (is_fp) {
++    switch (is_fp) {
++    case 1: /* normal fp */
+         /* convert insn encoded size to TCGMemOp size */
+         switch (size) {
+         case 0: /* half-precision */
+-            if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
+-                unallocated_encoding(s);
+-                return;
+-            }
+             size = MO_16;
++            is_fp16 = true;
+             break;
+         case MO_32: /* single precision */
+         case MO_64: /* double precision */
+@@ -12062,13 +12097,39 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
+             unallocated_encoding(s);
+             return;
+         }
+-    } else {
++        break;
++
++    case 2: /* complex fp */
++        /* Each indexable element is a complex pair.  */
++        size <<= 1;
++        switch (size) {
++        case MO_32:
++            if (h && !is_q) {
++                unallocated_encoding(s);
++                return;
++            }
++            is_fp16 = true;
++            break;
++        case MO_64:
++            break;
++        default:
++            unallocated_encoding(s);
++            return;
++        }
++        break;
++
++    default: /* integer */
+         switch (size) {
+         case MO_8:
+         case MO_64:
+             unallocated_encoding(s);
+             return;
+         }
++        break;
++    }
++    if (is_fp16 && !arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
++        unallocated_encoding(s);
++        return;
+     }
+ 
+     /* Given TCGMemOp size, adjust register and indexing.  */
+@@ -12102,6 +12163,23 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
+         fpst = NULL;
+     }
+ 
++    switch (16 * u + opcode) {
++    case 0x11: /* FCMLA #0 */
++    case 0x13: /* FCMLA #90 */
++    case 0x15: /* FCMLA #180 */
++    case 0x17: /* FCMLA #270 */
++        tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, rd),
++                           vec_full_reg_offset(s, rn),
++                           vec_reg_offset(s, rm, index, size), fpst,
++                           is_q ? 16 : 8, vec_full_reg_size(s),
++                           extract32(insn, 13, 2), /* rot */
++                           size == MO_64
++                           ? gen_helper_gvec_fcmlas_idx
++                           : gen_helper_gvec_fcmlah_idx);
++        tcg_temp_free_ptr(fpst);
++        return;
++    }
++
+     if (size == 3) {
+         TCGv_i64 tcg_idx = tcg_temp_new_i64();
+         int pass;
 diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
-index 3072df4d77..a868ca6aac 100644
+index a868ca6aac..d81eb7730d 100644
 --- a/target/arm/vec_helper.c
 +++ b/target/arm/vec_helper.c
-@@ -22,8 +22,21 @@
- #include "exec/exec-all.h"
- #include "exec/helper-proto.h"
- #include "tcg/tcg-gvec-desc.h"
-+#include "fpu/softfloat.h"
- 
- 
-+/* Note that vector data is stored in host-endian 64-bit chunks,
-+   so addressing units smaller than that needs a host-endian fixup.  */
-+#ifdef HOST_WORDS_BIGENDIAN
-+#define H1(x)  ((x) ^ 7)
-+#define H2(x)  ((x) ^ 3)
-+#define H4(x)  ((x) ^ 1)
-+#else
-+#define H1(x)  (x)
-+#define H2(x)  (x)
-+#define H4(x)  (x)
-+#endif
-+
- #define SET_QC() env->vfp.xregs[ARM_VFP_FPSCR] |= CPSR_Q
- 
- static void clear_tail(void *vd, uintptr_t opr_sz, uintptr_t max_sz)
-@@ -181,3 +194,87 @@ void HELPER(gvec_qrdmlsh_s32)(void *vd, void *vn, void *vm,
+@@ -278,3 +278,152 @@ void HELPER(gvec_fcaddd)(void *vd, void *vn, void *vm,
      }
      clear_tail(d, opr_sz, simd_maxsz(desc));
  }
 +
-+void HELPER(gvec_fcaddh)(void *vd, void *vn, void *vm,
++void HELPER(gvec_fcmlah)(void *vd, void *vn, void *vm,
 +                         void *vfpst, uint32_t desc)
 +{
 +    uintptr_t opr_sz = simd_oprsz(desc);
@@ -177,8 +237,9 @@ index 3072df4d77..a868ca6aac 100644
 +    float16 *n = vn;
 +    float16 *m = vm;
 +    float_status *fpst = vfpst;
-+    uint32_t neg_real = extract32(desc, SIMD_DATA_SHIFT, 1);
-+    uint32_t neg_imag = neg_real ^ 1;
++    intptr_t flip = extract32(desc, SIMD_DATA_SHIFT, 1);
++    uint32_t neg_imag = extract32(desc, SIMD_DATA_SHIFT + 1, 1);
++    uint32_t neg_real = flip ^ neg_imag;
 +    uintptr_t i;
 +
 +    /* Shift boolean to the sign bit so we can xor to negate.  */
@@ -186,18 +247,49 @@ index 3072df4d77..a868ca6aac 100644
 +    neg_imag <<= 15;
 +
 +    for (i = 0; i < opr_sz / 2; i += 2) {
-+        float16 e0 = n[H2(i)];
-+        float16 e1 = m[H2(i + 1)] ^ neg_imag;
-+        float16 e2 = n[H2(i + 1)];
-+        float16 e3 = m[H2(i)] ^ neg_real;
++        float16 e1 = n[H2(i + flip)];
++        float16 e2 = m[H2(i + flip)] ^ neg_real;
++        float16 e3 = e1;
++        float16 e4 = m[H2(i + 1 - flip)] ^ neg_imag;
 +
-+        d[H2(i)] = float16_add(e0, e1, fpst);
-+        d[H2(i + 1)] = float16_add(e2, e3, fpst);
++        d[H2(i)] = float16_muladd(e1, e2, d[H2(i)], 0, fpst);
++        d[H2(i + 1)] = float16_muladd(e3, e4, d[H2(i + 1)], 0, fpst);
 +    }
 +    clear_tail(d, opr_sz, simd_maxsz(desc));
 +}
 +
-+void HELPER(gvec_fcadds)(void *vd, void *vn, void *vm,
++void HELPER(gvec_fcmlah_idx)(void *vd, void *vn, void *vm,
++                             void *vfpst, uint32_t desc)
++{
++    uintptr_t opr_sz = simd_oprsz(desc);
++    float16 *d = vd;
++    float16 *n = vn;
++    float16 *m = vm;
++    float_status *fpst = vfpst;
++    intptr_t flip = extract32(desc, SIMD_DATA_SHIFT, 1);
++    uint32_t neg_imag = extract32(desc, SIMD_DATA_SHIFT + 1, 1);
++    uint32_t neg_real = flip ^ neg_imag;
++    uintptr_t i;
++    float16 e2 = m[H2(flip)];
++    float16 e4 = m[H2(1 - flip)];
++
++    /* Shift boolean to the sign bit so we can xor to negate.  */
++    neg_real <<= 15;
++    neg_imag <<= 15;
++    e2 ^= neg_real;
++    e4 ^= neg_imag;
++
++    for (i = 0; i < opr_sz / 2; i += 2) {
++        float16 e1 = n[H2(i + flip)];
++        float16 e3 = e1;
++
++        d[H2(i)] = float16_muladd(e1, e2, d[H2(i)], 0, fpst);
++        d[H2(i + 1)] = float16_muladd(e3, e4, d[H2(i + 1)], 0, fpst);
++    }
++    clear_tail(d, opr_sz, simd_maxsz(desc));
++}
++
++void HELPER(gvec_fcmlas)(void *vd, void *vn, void *vm,
 +                         void *vfpst, uint32_t desc)
 +{
 +    uintptr_t opr_sz = simd_oprsz(desc);
@@ -205,8 +297,9 @@ index 3072df4d77..a868ca6aac 100644
 +    float32 *n = vn;
 +    float32 *m = vm;
 +    float_status *fpst = vfpst;
-+    uint32_t neg_real = extract32(desc, SIMD_DATA_SHIFT, 1);
-+    uint32_t neg_imag = neg_real ^ 1;
++    intptr_t flip = extract32(desc, SIMD_DATA_SHIFT, 1);
++    uint32_t neg_imag = extract32(desc, SIMD_DATA_SHIFT + 1, 1);
++    uint32_t neg_real = flip ^ neg_imag;
 +    uintptr_t i;
 +
 +    /* Shift boolean to the sign bit so we can xor to negate.  */
@@ -214,18 +307,49 @@ index 3072df4d77..a868ca6aac 100644
 +    neg_imag <<= 31;
 +
 +    for (i = 0; i < opr_sz / 4; i += 2) {
-+        float32 e0 = n[H4(i)];
-+        float32 e1 = m[H4(i + 1)] ^ neg_imag;
-+        float32 e2 = n[H4(i + 1)];
-+        float32 e3 = m[H4(i)] ^ neg_real;
++        float32 e1 = n[H4(i + flip)];
++        float32 e2 = m[H4(i + flip)] ^ neg_real;
++        float32 e3 = e1;
++        float32 e4 = m[H4(i + 1 - flip)] ^ neg_imag;
 +
-+        d[H4(i)] = float32_add(e0, e1, fpst);
-+        d[H4(i + 1)] = float32_add(e2, e3, fpst);
++        d[H4(i)] = float32_muladd(e1, e2, d[H4(i)], 0, fpst);
++        d[H4(i + 1)] = float32_muladd(e3, e4, d[H4(i + 1)], 0, fpst);
 +    }
 +    clear_tail(d, opr_sz, simd_maxsz(desc));
 +}
 +
-+void HELPER(gvec_fcaddd)(void *vd, void *vn, void *vm,
++void HELPER(gvec_fcmlas_idx)(void *vd, void *vn, void *vm,
++                             void *vfpst, uint32_t desc)
++{
++    uintptr_t opr_sz = simd_oprsz(desc);
++    float32 *d = vd;
++    float32 *n = vn;
++    float32 *m = vm;
++    float_status *fpst = vfpst;
++    intptr_t flip = extract32(desc, SIMD_DATA_SHIFT, 1);
++    uint32_t neg_imag = extract32(desc, SIMD_DATA_SHIFT + 1, 1);
++    uint32_t neg_real = flip ^ neg_imag;
++    uintptr_t i;
++    float32 e2 = m[H4(flip)];
++    float32 e4 = m[H4(1 - flip)];
++
++    /* Shift boolean to the sign bit so we can xor to negate.  */
++    neg_real <<= 31;
++    neg_imag <<= 31;
++    e2 ^= neg_real;
++    e4 ^= neg_imag;
++
++    for (i = 0; i < opr_sz / 4; i += 2) {
++        float32 e1 = n[H4(i + flip)];
++        float32 e3 = e1;
++
++        d[H4(i)] = float32_muladd(e1, e2, d[H4(i)], 0, fpst);
++        d[H4(i + 1)] = float32_muladd(e3, e4, d[H4(i + 1)], 0, fpst);
++    }
++    clear_tail(d, opr_sz, simd_maxsz(desc));
++}
++
++void HELPER(gvec_fcmlad)(void *vd, void *vn, void *vm,
 +                         void *vfpst, uint32_t desc)
 +{
 +    uintptr_t opr_sz = simd_oprsz(desc);
@@ -233,8 +357,9 @@ index 3072df4d77..a868ca6aac 100644
 +    float64 *n = vn;
 +    float64 *m = vm;
 +    float_status *fpst = vfpst;
-+    uint64_t neg_real = extract64(desc, SIMD_DATA_SHIFT, 1);
-+    uint64_t neg_imag = neg_real ^ 1;
++    intptr_t flip = extract32(desc, SIMD_DATA_SHIFT, 1);
++    uint64_t neg_imag = extract32(desc, SIMD_DATA_SHIFT + 1, 1);
++    uint64_t neg_real = flip ^ neg_imag;
 +    uintptr_t i;
 +
 +    /* Shift boolean to the sign bit so we can xor to negate.  */
@@ -242,13 +367,13 @@ index 3072df4d77..a868ca6aac 100644
 +    neg_imag <<= 63;
 +
 +    for (i = 0; i < opr_sz / 8; i += 2) {
-+        float64 e0 = n[i];
-+        float64 e1 = m[i + 1] ^ neg_imag;
-+        float64 e2 = n[i + 1];
-+        float64 e3 = m[i] ^ neg_real;
++        float64 e1 = n[i + flip];
++        float64 e2 = m[i + flip] ^ neg_real;
++        float64 e3 = e1;
++        float64 e4 = m[i + 1 - flip] ^ neg_imag;
 +
-+        d[i] = float64_add(e0, e1, fpst);
-+        d[i + 1] = float64_add(e2, e3, fpst);
++        d[i] = float64_muladd(e1, e2, d[i], 0, fpst);
++        d[i + 1] = float64_muladd(e3, e4, d[i + 1], 0, fpst);
 +    }
 +    clear_tail(d, opr_sz, simd_maxsz(desc));
 +}
