@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58439)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eqwTD-0004J0-6F
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 02:48:12 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1eqwbl-0006T0-OF
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 02:57:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eqwT9-0008Ni-5E
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 02:48:11 -0500
-Received: from mga01.intel.com ([192.55.52.88]:9561)
+	(envelope-from <haozhong.zhang@intel.com>) id 1eqwbi-0003MD-M4
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 02:57:01 -0500
+Received: from mga11.intel.com ([192.55.52.93]:1861)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1eqwT8-0008N8-SE
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 02:48:07 -0500
-Date: Wed, 28 Feb 2018 15:47:58 +0800
+	id 1eqwbi-0003Ln-D8
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 02:56:58 -0500
+Date: Wed, 28 Feb 2018 15:56:54 +0800
 From: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-ID: <20180228074758.kjjaoyt3xg3q5imt@hz-desktop>
+Message-ID: <20180228075654.gv22h2zd73peuyxm@hz-desktop>
 References: <20171207101812.23602-1-haozhong.zhang@intel.com>
-	<20171207101812.23602-3-haozhong.zhang@intel.com>
-	<20180227163728.GA1799@perard.uk.xensource.com>
+	<20171207101812.23602-4-haozhong.zhang@intel.com>
+	<20180227164147.GB1799@perard.uk.xensource.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180227163728.GA1799@perard.uk.xensource.com>
-Subject: Re: [Qemu-devel] [RFC QEMU PATCH v4 02/10] xen-hvm: create the
- hotplug memory region on Xen
+In-Reply-To: <20180227164147.GB1799@perard.uk.xensource.com>
+Subject: Re: [Qemu-devel] [RFC QEMU PATCH v4 03/10] hostmem-xen: add a host
+ memory backend for Xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,69 +31,76 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 02/27/18 16:37 +0000, Anthony PERARD wrote:
-> On Thu, Dec 07, 2017 at 06:18:04PM +0800, Haozhong Zhang wrote:
-> > The guest physical address of vNVDIMM is allocated from the hotplug
-> > memory region, which is not created when QEMU is used as Xen device
-> > model. In order to use vNVDIMM for Xen HVM domains, this commit reuses
-> > the code for pc machine type to create the hotplug memory region for
-> > Xen HVM domains.
-> > 
-> > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> > ---
-> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Richard Henderson <rth@twiddle.net>
-> > Cc: Eduardo Habkost <ehabkost@redhat.com>
-> > Cc: Stefano Stabellini <sstabellini@kernel.org>
-> > Cc: Anthony Perard <anthony.perard@citrix.com>
-> > ---
-> >  hw/i386/pc.c          | 86 ++++++++++++++++++++++++++++-----------------------
-> >  hw/i386/xen/xen-hvm.c |  2 ++
-> >  include/hw/i386/pc.h  |  1 +
-> >  3 files changed, 51 insertions(+), 38 deletions(-)
-> > 
-> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> > index 186545d2a4..9f46c8df79 100644
-> > --- a/hw/i386/pc.c
-> > +++ b/hw/i386/pc.c
-> > @@ -1315,6 +1315,53 @@ void xen_load_linux(PCMachineState *pcms)
-> >      pcms->fw_cfg = fw_cfg;
-> >  }
+On 02/27/18 16:41 +0000, Anthony PERARD wrote:
+> On Thu, Dec 07, 2017 at 06:18:05PM +0800, Haozhong Zhang wrote:
+> > diff --git a/backends/hostmem.c b/backends/hostmem.c
+> > index ee2c2d5bfd..ba13a52994 100644
+> > --- a/backends/hostmem.c
+> > +++ b/backends/hostmem.c
+> > @@ -12,6 +12,7 @@
+> >  #include "qemu/osdep.h"
+> >  #include "sysemu/hostmem.h"
+> >  #include "hw/boards.h"
+> > +#include "hw/xen/xen.h"
+> >  #include "qapi/error.h"
+> >  #include "qapi/visitor.h"
+> >  #include "qapi-types.h"
+> > @@ -277,6 +278,14 @@ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
+> >              goto out;
+> >          }
 > >  
-> > +void pc_memory_hotplug_init(PCMachineState *pcms, MemoryRegion *system_memory)
-> 
-> It might be better to have a separate patch which move the code into a function.
-
-will move it to a separate patch
-
-> 
-> > +{
-> > +    MachineState *machine = MACHINE(pcms);
-> > +    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
-> > +    ram_addr_t hotplug_mem_size = machine->maxram_size - machine->ram_size;
+> > +        /*
+> > +         * The backend storage of MEMORY_BACKEND_XEN is managed by Xen,
+> > +         * so no further work in this function is needed.
+> > +         */
+> > +        if (xen_enabled() && !backend->mr.ram_block) {
+> > +            goto out;
+> > +        }
 > > +
-> > +    if (!pcmc->has_reserved_memory || machine->ram_size >= machine->maxram_size)
-> > +        return;
-> > +
-> > +    if (memory_region_size(&pcms->hotplug_memory.mr)) {
+> >          ptr = memory_region_get_ram_ptr(&backend->mr);
+> >          sz = memory_region_size(&backend->mr);
+> >  
+> > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> > index 66eace5a5c..dcbfce33d5 100644
+> > --- a/hw/mem/pc-dimm.c
+> > +++ b/hw/mem/pc-dimm.c
+> > @@ -28,6 +28,7 @@
+> >  #include "sysemu/kvm.h"
+> >  #include "trace.h"
+> >  #include "hw/virtio/vhost.h"
+> > +#include "hw/xen/xen.h"
+> >  
+> >  typedef struct pc_dimms_capacity {
+> >       uint64_t size;
+> > @@ -108,7 +109,10 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+> >      }
+> >  
+> >      memory_region_add_subregion(&hpms->mr, addr - hpms->base, mr);
+> > -    vmstate_register_ram(vmstate_mr, dev);
+> > +    /* memory-backend-xen is not backed by RAM. */
+> > +    if (!xen_enabled()) {
 > 
-> This new check looks like to catch programming error, rather than user
-> error. Would it be better to be an assert instead?
+> Is it possible to have the same condition as the one used in
+> host_memory_backend_memory_complete? i.e. base on whether the memory
+> region is mapped or not (backend->mr.ram_block).
 
-Well, this was a debugging check and I forgot to remove it before
-sending the patch. I'll drop it in the next version.
+Like "if (!xen_enabled() || backend->mr.ram_block))"? No, it will mute
+the abortion (vmstate_register_ram --> qemu_ram_set_idstr ) caused by
+the case that !backend->mr.ram_block in the non-xen environment.
 
-Thanks,
 Haozhong
 
 > 
-> > +        error_report("hotplug memory region has been initialized");
-> > +        exit(EXIT_FAILURE);
+> > +        vmstate_register_ram(vmstate_mr, dev);
 > > +    }
-> > +
+> >      numa_set_mem_node_id(addr, memory_region_size(mr), dimm->node);
+> >  
+> >  out:
+> > -- 
+> > 2.15.1
+> > 
 > 
 > -- 
 > Anthony PERARD
