@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1erYWK-0000Fk-6e
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 19:25:57 -0500
+	(envelope-from <no-reply@patchew.org>) id 1erYer-0002GM-OZ
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 19:34:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1erYWH-0000pQ-2w
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 19:25:56 -0500
-Received: from mail-sn1nam01on0058.outbound.protection.outlook.com
-	([104.47.32.58]:36841
-	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	(envelope-from <no-reply@patchew.org>) id 1erYep-0008Eu-DY
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 19:34:45 -0500
+Resent-Message-Id: <E1erYep-0008Eu-DY@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21088)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1erYWG-0000oz-OS
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 19:25:52 -0500
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 1 Mar 2018 16:20:57 -0800
-Message-ID: <e2a29860b0eb2591e16a83178e305828d1b0b730.1519950018.git.alistair.francis@xilinx.com>
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1erYep-0008Dt-6K
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 19:34:43 -0500
+In-Reply-To: <20180228203243.1413-1-mark.cave-ayland@ilande.co.uk>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151985086501.1281.16555082640835552734@bdbb90650ae5>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v1 1/1] target/arm: Fix the A53 L2CTLR typo
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 28 Feb 2018 12:47:46 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCHv3 00/12] macio: remove legacy macio_init()
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com
+To: mark.cave-ayland@ilande.co.uk
+Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-The cortex A53 TRM specifices that bits 24 and 25 of the L2CTLR register
-specify the number of cores present and not the number of processors. We
-have correctly been reporting the number of cores, so just fix the
-comment to match the TRM.
-
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
----
-
- target/arm/cpu64.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 9743bdc8c3..aac1746efe 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -42,7 +42,7 @@ static inline void unset_feature(CPUARMState *env, int feature)
- #ifndef CONFIG_USER_ONLY
- static uint64_t a57_a53_l2ctlr_read(CPUARMState *env, const ARMCPRegInfo *ri)
- {
--    /* Number of processors is in [25:24]; otherwise we RAZ */
-+    /* Number of cores is in [25:24]; otherwise we RAZ */
-     return (smp_cpus - 1) << 24;
- }
- #endif
--- 
-2.14.1
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMjI4MjAzMjQzLjE0MTMtMS1tYXJrLmNhdmUtYXlsYW5kQGlsYW5kZS5j
+by51awpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIdjMgMDAvMTJdIG1hY2lvOiByZW1vdmUg
+bGVnYWN5IG1hY2lvX2luaXQoKSBmdW5jdGlvbgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
+IS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNF
+Li4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0
+IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2Nh
+bCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0l
+SCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hl
+Y2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4i
+CiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0
+Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAg
+ICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVO
+RCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQK
+RnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRh
+dGVdICAgICAgICAgICAgcGF0Y2hldy8xNTE5NzA5OTY1LTI5ODMzLTEtZ2l0LXNlbmQtZW1haWwt
+Y290YUBicmFhcC5vcmcgLT4gcGF0Y2hldy8xNTE5NzA5OTY1LTI5ODMzLTEtZ2l0LXNlbmQtZW1h
+aWwtY290YUBicmFhcC5vcmcKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4
+MDIyODIwMzI0My4xNDEzLTEtbWFyay5jYXZlLWF5bGFuZEBpbGFuZGUuY28udWsgLT4gcGF0Y2hl
+dy8yMDE4MDIyODIwMzI0My4xNDEzLTEtbWFyay5jYXZlLWF5bGFuZEBpbGFuZGUuY28udWsKU3dp
+dGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoxNzJkZTEyZmQzIG1hY2lvOiByZW1vdmUgbWFj
+aW9faW5pdCgpIGZ1bmN0aW9uCjBlOWI1ZjkyYmQgbWFjaW86IG1vdmUgc2V0dGluZyBvZiBDVURB
+IHRpbWViYXNlIGZyZXF1ZW5jeSB0byBtYWNpb19jb21tb25fcmVhbGl6ZSgpCmNiNzliOTg0Nzkg
+bWFjX25ld3dvcmxkOiB1c2Ugb2JqZWN0IGxpbmsgdG8gcGFzcyBPcGVuUElDIG9iamVjdCB0byBt
+YWNpbwo5MDQyYjljZGZkIG9wZW5waWM6IG1vdmUgT3BlblBJQyBzdGF0ZSBhbmQgcmVsYXRlZCBk
+ZWZpbml0aW9ucyB0byBvcGVucGljLmgKZGJiOGVjZWUxMyBvcGVucGljOiBtb3ZlIEtWTS1zcGVj
+aWZpYyBkZWNsYXJhdGlvbnMgaW50byBzZXBhcmF0ZSBvcGVucGljX2t2bS5oIGZpbGUKNjJjYzIx
+MTM1MyBtYWNfb2xkd29ybGQ6IHVzZSBvYmplY3QgbGluayB0byBwYXNzIGhlYXRocm93IFBJQyBv
+YmplY3QgdG8gbWFjaW8KMWZlMzYzMzJmOCBtYWNpbzogbW92ZSBtYWNpbyByZWxhdGVkIHN0cnVj
+dHVyZXMgYW5kIGRlZmluZXMgaW50byBzZXBhcmF0ZSBtYWNpby5oIGZpbGUKMmU5YTZmMDUxOCBo
+ZWF0aHJvdzogY2hhbmdlIGhlYXRocm93X3BpY19pbml0KCkgdG8gcmV0dXJuIHRoZSBoZWF0aHJv
+dyBkZXZpY2UKNmRiZjQ1ZDhlMyBoZWF0aHJvdzogY29udmVydCB0byB0cmFjZS1ldmVudHMKYjEw
+OWMyODcxOSBoZWF0aHJvdzogUU9NaWZ5IGhlYXRocm93IFBJQwo1ZWUwMDJhNTljIG1hY2lvOiBt
+b3ZlIEVTQ0MgZGV2aWNlIHdpdGhpbiB0aGUgbWFjaW8gZGV2aWNlCjRkNDI2YjE1ZmQgbWFjaW86
+IGVtYmVkIERCRE1BIGRldmljZSBkaXJlY3RseSB3aXRoaW4gbWFjaW8KCj09PSBPVVRQVVQgQkVH
+SU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTI6IG1hY2lvOiBlbWJlZCBEQkRNQSBkZXZpY2UgZGly
+ZWN0bHkgd2l0aGluIG1hY2lvLi4uCkNoZWNraW5nIFBBVENIIDIvMTI6IG1hY2lvOiBtb3ZlIEVT
+Q0MgZGV2aWNlIHdpdGhpbiB0aGUgbWFjaW8gZGV2aWNlLi4uCkNoZWNraW5nIFBBVENIIDMvMTI6
+IGhlYXRocm93OiBRT01pZnkgaGVhdGhyb3cgUElDLi4uCkNoZWNraW5nIFBBVENIIDQvMTI6IGhl
+YXRocm93OiBjb252ZXJ0IHRvIHRyYWNlLWV2ZW50cy4uLgpDaGVja2luZyBQQVRDSCA1LzEyOiBo
+ZWF0aHJvdzogY2hhbmdlIGhlYXRocm93X3BpY19pbml0KCkgdG8gcmV0dXJuIHRoZSBoZWF0aHJv
+dyBkZXZpY2UuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8xMjogbWFjaW86IG1vdmUgbWFjaW8gcmVsYXRl
+ZCBzdHJ1Y3R1cmVzIGFuZCBkZWZpbmVzIGludG8gc2VwYXJhdGUgbWFjaW8uaCBmaWxlLi4uCkNo
+ZWNraW5nIFBBVENIIDcvMTI6IG1hY19vbGR3b3JsZDogdXNlIG9iamVjdCBsaW5rIHRvIHBhc3Mg
+aGVhdGhyb3cgUElDIG9iamVjdCB0byBtYWNpby4uLgpDaGVja2luZyBQQVRDSCA4LzEyOiBvcGVu
+cGljOiBtb3ZlIEtWTS1zcGVjaWZpYyBkZWNsYXJhdGlvbnMgaW50byBzZXBhcmF0ZSBvcGVucGlj
+X2t2bS5oIGZpbGUuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xMjogb3BlbnBpYzogbW92ZSBPcGVuUElD
+IHN0YXRlIGFuZCByZWxhdGVkIGRlZmluaXRpb25zIHRvIG9wZW5waWMuaC4uLgpFUlJPUjogImZv
+byAqIGJhciIgc2hvdWxkIGJlICJmb28gKmJhciIKIzI0OTogRklMRTogaW5jbHVkZS9ody9wcGMv
+b3BlbnBpYy5oOjU3OgorI2RlZmluZSBSQVZFTl9EQkxfSVJRICAgIChSQVZFTl9JUElfSVJRICsg
+KFJBVkVOX01BWF9DUFUgKiBSQVZFTl9NQVhfSVBJKSkKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJu
+aW5ncywgMzUzIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
+bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
+IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
+TkVSUy4KCkNoZWNraW5nIFBBVENIIDEwLzEyOiBtYWNfbmV3d29ybGQ6IHVzZSBvYmplY3QgbGlu
+ayB0byBwYXNzIE9wZW5QSUMgb2JqZWN0IHRvIG1hY2lvLi4uCkNoZWNraW5nIFBBVENIIDExLzEy
+OiBtYWNpbzogbW92ZSBzZXR0aW5nIG9mIENVREEgdGltZWJhc2UgZnJlcXVlbmN5IHRvIG1hY2lv
+X2NvbW1vbl9yZWFsaXplKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMTI6IG1hY2lvOiByZW1vdmUg
+bWFjaW9faW5pdCgpIGZ1bmN0aW9uLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5k
+IGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
+YnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
+Y2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
