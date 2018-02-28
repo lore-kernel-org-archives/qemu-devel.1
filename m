@@ -1,18 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arnd@arndb.de>) id 1er1s9-0000Yu-U5
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:34:18 -0500
+	(envelope-from <berrange@redhat.com>) id 1er1sh-0000uR-GW
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:34:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arnd@arndb.de>) id 1er1s3-0001tR-VR
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:34:17 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:45029)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arnd@arndb.de>) id 1er1s3-0001ss-Lb
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:34:11 -0500
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Wed, 28 Feb 2018 14:33:49 +0100
-Message-Id: <20180228133357.1848600-1-arnd@arndb.de>
-Subject: [Qemu-devel] [PATCH] fw_cfg: avoid unused function warning
+	(envelope-from <berrange@redhat.com>) id 1er1sg-00027k-I5
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:34:51 -0500
+Date: Wed, 28 Feb 2018 13:34:34 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180228133434.GL17774@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180228131315.30194-1-mreitz@redhat.com>
+	<20180228131315.30194-2-mreitz@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180228131315.30194-2-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] block/file-posix: Fix fully
+ preallocated truncate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,101 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gabriel Somlo <somlo@cmu.edu>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Vasyl Gomonovych <gomonovych@gmail.com>, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org
 
-The newly introduced fw_cfg_dma_transfer() function is unused when
-CONFIG_CRASH_CORE is disabled:
+On Wed, Feb 28, 2018 at 02:13:14PM +0100, Max Reitz wrote:
+> Storing the lseek() result in an int results in it overflowing when the
+> file is at least 2 GB big.  Then, we have a 50 % chance of the result
+> being "negative" and thus thinking an error occurred when actually
+> everything went just fine.
+> 
+> So we should use the correct type for storing the result: off_t.
+> 
+> Reported-by: Daniel P. Berrange <berrange@redhat.com>
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1549231
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  block/file-posix.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index f1591c3849..90c25864a0 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -1697,6 +1697,7 @@ static int raw_regular_truncate(int fd, int64_t offset, PreallocMode prealloc,
+>      case PREALLOC_MODE_FULL:
+>      {
+>          int64_t num = 0, left = offset - current_length;
+> +        off_t seek_result;
+>  
+>          /*
+>           * Knowing the final size from the beginning could allow the file
+> @@ -1711,8 +1712,8 @@ static int raw_regular_truncate(int fd, int64_t offset, PreallocMode prealloc,
+>  
+>          buf = g_malloc0(65536);
+>  
+> -        result = lseek(fd, current_length, SEEK_SET);
+> -        if (result < 0) {
+> +        seek_result = lseek(fd, current_length, SEEK_SET);
+> +        if (seek_result < 0) {
 
-drivers/firmware/qemu_fw_cfg.c:89:16: error: 'fw_cfg_dma_transfer' defined but not used [-Werror=unused-function]
- static ssize_t fw_cfg_dma_transfer(void *address, u32 length, u32 control)
+off_t is an unsigned type, so this comparison to "< 0" is bogus - only the
+exact value (off_t)-1 indicates an error. So this needs to be
 
-This moves it into the #ifdef section that hides its caller to avoid the
-warning.
+   if (seek_result == (off_t)-1) {
+      ...
+   }
 
-Fixes: 47e78bfb5426 ("fw_cfg: write vmcoreinfo details")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/firmware/qemu_fw_cfg.c | 60 +++++++++++++++++++++---------------------
- 1 file changed, 30 insertions(+), 30 deletions(-)
 
-diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cfg.c
-index 3015e77aebca..f002bb40519b 100644
---- a/drivers/firmware/qemu_fw_cfg.c
-+++ b/drivers/firmware/qemu_fw_cfg.c
-@@ -66,6 +66,36 @@ static void fw_cfg_sel_endianness(u16 key)
- 		iowrite16(key, fw_cfg_reg_ctrl);
- }
- 
-+/* read chunk of given fw_cfg blob (caller responsible for sanity-check) */
-+static ssize_t fw_cfg_read_blob(u16 key,
-+				void *buf, loff_t pos, size_t count)
-+{
-+	u32 glk = -1U;
-+	acpi_status status;
-+
-+	/* If we have ACPI, ensure mutual exclusion against any potential
-+	 * device access by the firmware, e.g. via AML methods:
-+	 */
-+	status = acpi_acquire_global_lock(ACPI_WAIT_FOREVER, &glk);
-+	if (ACPI_FAILURE(status) && status != AE_NOT_CONFIGURED) {
-+		/* Should never get here */
-+		WARN(1, "fw_cfg_read_blob: Failed to lock ACPI!\n");
-+		memset(buf, 0, count);
-+		return -EINVAL;
-+	}
-+
-+	mutex_lock(&fw_cfg_dev_lock);
-+	fw_cfg_sel_endianness(key);
-+	while (pos-- > 0)
-+		ioread8(fw_cfg_reg_data);
-+	ioread8_rep(fw_cfg_reg_data, buf, count);
-+	mutex_unlock(&fw_cfg_dev_lock);
-+
-+	acpi_release_global_lock(glk);
-+	return count;
-+}
-+
-+#ifdef CONFIG_CRASH_CORE
- static inline bool fw_cfg_dma_enabled(void)
- {
- 	return (fw_cfg_rev & FW_CFG_VERSION_DMA) && fw_cfg_reg_dma;
-@@ -124,36 +154,6 @@ static ssize_t fw_cfg_dma_transfer(void *address, u32 length, u32 control)
- 	return ret;
- }
- 
--/* read chunk of given fw_cfg blob (caller responsible for sanity-check) */
--static ssize_t fw_cfg_read_blob(u16 key,
--				void *buf, loff_t pos, size_t count)
--{
--	u32 glk = -1U;
--	acpi_status status;
--
--	/* If we have ACPI, ensure mutual exclusion against any potential
--	 * device access by the firmware, e.g. via AML methods:
--	 */
--	status = acpi_acquire_global_lock(ACPI_WAIT_FOREVER, &glk);
--	if (ACPI_FAILURE(status) && status != AE_NOT_CONFIGURED) {
--		/* Should never get here */
--		WARN(1, "fw_cfg_read_blob: Failed to lock ACPI!\n");
--		memset(buf, 0, count);
--		return -EINVAL;
--	}
--
--	mutex_lock(&fw_cfg_dev_lock);
--	fw_cfg_sel_endianness(key);
--	while (pos-- > 0)
--		ioread8(fw_cfg_reg_data);
--	ioread8_rep(fw_cfg_reg_data, buf, count);
--	mutex_unlock(&fw_cfg_dev_lock);
--
--	acpi_release_global_lock(glk);
--	return count;
--}
--
--#ifdef CONFIG_CRASH_CORE
- /* write chunk of given fw_cfg blob (caller responsible for sanity-check) */
- static ssize_t fw_cfg_write_blob(u16 key,
- 				 void *buf, loff_t pos, size_t count)
+Regards,
+Daniel
 -- 
-2.9.0
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
