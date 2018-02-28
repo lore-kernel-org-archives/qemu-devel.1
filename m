@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1er5AW-0002R5-VV
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 12:05:29 -0500
+	(envelope-from <mreitz@redhat.com>) id 1er5CD-00039K-Pa
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 12:07:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1er5AS-0007cP-0H
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 12:05:28 -0500
-Date: Wed, 28 Feb 2018 18:04:54 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180228170454.GI4855@localhost.localdomain>
-References: <20180223235142.21501-1-jsnow@redhat.com>
-	<20180223235142.21501-16-jsnow@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1er5CC-0000F5-RF
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 12:07:13 -0500
+From: Max Reitz <mreitz@redhat.com>
+References: <20180122220806.22154-1-mreitz@redhat.com>
+	<20180122220806.22154-6-mreitz@redhat.com>
+	<20180227074413.GB21035@lemon.usersys.redhat.com>
+	<2c81d46d-434d-d9bb-86b4-9a644bf0284a@redhat.com>
+Message-ID: <9ce789eb-89b9-4a16-087e-977673d2c717@redhat.com>
+Date: Wed, 28 Feb 2018 18:07:03 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180223235142.21501-16-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v4 15/21] blockjobs: add prepare callback
+In-Reply-To: <2c81d46d-434d-d9bb-86b4-9a644bf0284a@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="P3Ihea5aVFIcriWKkluKlHZnDcaYYA388"
+Subject: Re: [Qemu-devel] [PATCH v2 05/16] block/mirror: Convert to
+ coroutines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,77 +27,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Am 24.02.2018 um 00:51 hat John Snow geschrieben:
-> Some jobs upon finalization may need to perform some work that can
-> still fail. If these jobs are part of a transaction, it's important
-> that these callbacks fail the entire transaction.
-> 
-> We allow for a new callback in addition to commit/abort/clean that
-> allows us the opportunity to have fairly late-breaking failures
-> in the transactional process.
-> 
-> The expected flow is:
-> 
-> - All jobs in a transaction converge to the WAITING state
->   (added in a forthcoming commit)
-> - All jobs prepare to call either commit/abort
-> - If any job fails, is canceled, or fails preparation, all jobs
->   call their .abort callback.
-> - All jobs enter the PENDING state, awaiting manual intervention
->   (also added in a forthcoming commit)
-> - block-job-finalize is issued by the user/management layer
-> - All jobs call their commit callbacks.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--P3Ihea5aVFIcriWKkluKlHZnDcaYYA388
+From: Max Reitz <mreitz@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <9ce789eb-89b9-4a16-087e-977673d2c717@redhat.com>
+Subject: Re: [PATCH v2 05/16] block/mirror: Convert to coroutines
+References: <20180122220806.22154-1-mreitz@redhat.com>
+ <20180122220806.22154-6-mreitz@redhat.com>
+ <20180227074413.GB21035@lemon.usersys.redhat.com>
+ <2c81d46d-434d-d9bb-86b4-9a644bf0284a@redhat.com>
+In-Reply-To: <2c81d46d-434d-d9bb-86b4-9a644bf0284a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-You almost made me believe the scary thought that we need transactional
-graph modifications, but after writing half of the reply, I think it's
-just that your order here is wrong.
+On 2018-02-28 15:13, Max Reitz wrote:
+> On 2018-02-27 08:44, Fam Zheng wrote:
+>> On Mon, 01/22 23:07, Max Reitz wrote:
+>>> @@ -101,7 +105,7 @@ static BlockErrorAction mirror_error_action(Mirro=
+rBlockJob *s, bool read,
+>>>      }
+>>>  }
+>>> =20
+>>> -static void mirror_iteration_done(MirrorOp *op, int ret)
+>>> +static void coroutine_fn mirror_iteration_done(MirrorOp *op, int ret=
+)
+>>>  {
+>>>      MirrorBlockJob *s =3D op->s;
+>>>      struct iovec *iov;
+>>
+>> I think we want s/qemu_coroutine_enter/aio_co_wake/ in mirror_iteratio=
+n_done().
+>> As an AIO callback before, this didn't matter, but now we are in an te=
+rminating
+>> coroutine, so it is pointless to defer the termination, or even risky =
+in that we
+>> are in a aio_context_acquire/release section, but have already decreme=
+nted
+>> s->in_flight, which is fishy.
+>=20
+> I guess I'll still do the replacement, regardless of whether the next
+> patch overwrites it again...
 
-So .prepare is the last thing in the whole process that is allowed to
-fail. Graph manipulations such as bdrv_replace_node() can fail. Graph
-manipulations can also only be made in response to block-job-finalize
-because the management layer must be aware of them. Take them together
-and you have a problem.
+Maybe I don't.  Doing this breaks iotest 041 because the
+assert(data.done) in bdrv_co_yield_to_drain() fails.
 
-Didn't we already establish earlier that .prepare/.commit/.abort must be
-called together and cannot be separated by waiting for a QMP command
-because of locking and things?
+Not sure why that is, but under the circumstance I guess it's best to
+just pretend this never happened, continue to use qemu_coroutine_enter()
+and just replace it in the next patch.
 
-So if you go to PENDING first, then wait for block-job-finalize and only
-then call .prepare/.commit/.abort, we should be okay for both problems.
+As for in_flight: What is the issue there?  We mostly need that to know
+how many I/O requests are actually running, that is, how much buffer
+space is used, how many I/O is done concurrently, etc. (and later we
+need the in-flight information so that we don't access the target in
+overlapping areas concurrently).  But it doesn't seem to be about how
+many coroutines there are.
 
-And taking a look at the final state, that seems to be what you do, so
-in the end, it's probably just the commit message that needs a fix.
+So as long as the s->in_flight decrement is done in the same critical
+section as the op is deleted, we should be good...?
 
->  blockjob.c                   | 34 +++++++++++++++++++++++++++++++---
->  include/block/blockjob_int.h | 10 ++++++++++
->  2 files changed, 41 insertions(+), 3 deletions(-)
-> 
-> diff --git a/blockjob.c b/blockjob.c
-> index 8f02c03880..1c010ec100 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -394,6 +394,18 @@ static void block_job_update_rc(BlockJob *job)
->      }
->  }
->  
-> +static int block_job_prepare(BlockJob *job)
-> +{
-> +    if (job->ret) {
-> +        goto out;
-> +    }
-> +    if (job->driver->prepare) {
-> +        job->ret = job->driver->prepare(job);
-> +    }
-> + out:
-> +    return job->ret;
-> +}
+Max
 
-Why not just if (job->ret == 0 && job->driver->prepare) and save the
-goto?
 
-Kevin
+--P3Ihea5aVFIcriWKkluKlHZnDcaYYA388
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqW4bcSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AKA8H/3jHMJUW+EGqhQczRXngid4jpaytJXLC
+K7DR+vmhRokcWFf003wuWcQLDBOfjwwTvGBR1warpA2cmlgjrWQv5Z8wdoQw45rh
+gGMPJtUAKMZFCvkaQp5dqCeZ+nl67ixOhW+W+wqz6Km856mcxfiWodyo0rE5ydzz
+qbyjBNVHXVnSz9OhsWNfVMp3AJHEmBMRwZGDe1StVc5Sm6Z5PxeyWm+0UOe1OjHV
+P5ev/Weh09mc1ENZ5UBIPp6LlvBIpTrt2bcWUljxoZLOqvAdsMSy/opWQUD2a8mj
+lIcGAuD8AXuzqaVk58eRiuES74b8zC4cHuJbuBBJVoapqZznvaD3nSc=
+=Jq3r
+-----END PGP SIGNATURE-----
+
+--P3Ihea5aVFIcriWKkluKlHZnDcaYYA388--
