@@ -1,15 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1er1Y5-0000Ft-Ad
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:13:35 -0500
+	(envelope-from <peterx@redhat.com>) id 1er1aM-00026A-6a
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:15:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1er1Y4-0001vd-HG
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:13:33 -0500
-From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 28 Feb 2018 14:13:13 +0100
-Message-Id: <20180228131315.30194-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/2] block/file-posix: Fix fully preallocated
- truncate
+	(envelope-from <peterx@redhat.com>) id 1er1aG-0002ap-9Z
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:15:54 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35930 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1er1aG-0002af-5Q
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:15:48 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D2C864075166
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 13:15:47 +0000 (UTC)
+Date: Wed, 28 Feb 2018 21:15:37 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180228131537.GM27381@xz-mi>
+References: <20180228050633.7410-1-peterx@redhat.com>
+	<20180228050633.7410-11-peterx@redhat.com>
+	<20180228091659.GD31550@redhat.com> <20180228125400.GI27381@xz-mi>
+	<20180228130744.GI17774@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180228130744.GI17774@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 10/14] qio: refcount QIOTask
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,29 +36,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, qemu-stable@nongnu.org
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Fully preallocated truncation has a 50 % chance of working on images
-files over file-posix.  It works if $SIZE % 4G < 2G, and it fails
-otherwise.  To make things even more interesting, often you would not
-even notice because qemu reported success even though it did nothing
-(because after the successful lseek(), errno was still 0, so when the
-file-posix driver tried to return a negative error code, it actually
-reported success).
+On Wed, Feb 28, 2018 at 01:07:44PM +0000, Daniel P. Berrang=C3=A9 wrote:
+> On Wed, Feb 28, 2018 at 08:54:00PM +0800, Peter Xu wrote:
+> > On Wed, Feb 28, 2018 at 09:16:59AM +0000, Daniel P. Berrang=C3=A9 wro=
+te:
+> > > On Wed, Feb 28, 2018 at 01:06:29PM +0800, Peter Xu wrote:
+> > > > It will be used in multiple threads in follow-up patches.  Let it=
+ start
+> > > > to have refcounts.
+> > > >=20
+> > > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > > ---
+> > > >  include/io/task.h |  3 +++
+> > > >  io/task.c         | 23 ++++++++++++++++++++++-
+> > > >  2 files changed, 25 insertions(+), 1 deletion(-)
+> > > >=20
+> > > > diff --git a/include/io/task.h b/include/io/task.h
+> > > > index 9dbe3758d7..c6acd6489c 100644
+> > > > --- a/include/io/task.h
+> > > > +++ b/include/io/task.h
+> > > > @@ -322,4 +322,7 @@ gpointer qio_task_get_result_pointer(QIOTask =
+*task);
+> > > >   */
+> > > >  Object *qio_task_get_source(QIOTask *task);
+> > > > =20
+> > > > +void qio_task_ref(QIOTask *task);
+> > > > +void qio_task_unref(QIOTask *task);
+> > >=20
+> > > It should just be turned back into a QObject as it was originally,
+> > > so we get refcounting for free.
+> >=20
+> > Could you point me the commit that has the original code?  I would be
+> > glad to revert to that, or yeah I can switch to QObject too.  Thanks,
+>=20
+> It was never actually committed - it was just that way during initial
+> review but was suggested to be simplified as ref counting wasn't needed=
+.
+>=20
+> That all said, having now seen the later parts of this patch series, I
+> don't think we would need todo this at all, because we should not be
+> exposing the GTask to callers and thus the refcounting question goes aw=
+ay
 
-This issue is fixed by patch 1 in this series.  Thanks to Daniel for
-reporting!
+Indeed.  I suppose that means you like my proposal in the other
+thread.  But I'll wait for your explicit acknowledgement in that too.
 
+Thanks,
 
-Max Reitz (2):
-  block/file-posix: Fix fully preallocated truncate
-  iotests: Test preallocated truncate of 2G image
-
- block/file-posix.c         |  5 +++--
- tests/qemu-iotests/106     | 24 ++++++++++++++++++++++++
- tests/qemu-iotests/106.out | 10 ++++++++++
- 3 files changed, 37 insertions(+), 2 deletions(-)
-
--- 
-2.14.3
+--=20
+Peter Xu
