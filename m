@@ -1,29 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57225)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1er8MY-00082k-NM
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:30:07 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1er8PW-0000Wr-4v
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:33:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1er8MV-0008NL-HO
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:30:06 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45174 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1er8MV-0008Mb-C7
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:30:03 -0500
-References: <20161214150840.10899-1-alex@alex.org.uk>
-	<c2faa919-65c6-d5a3-508d-2f069f2ba61e@redhat.com>
-	<1e3244d2-daea-6f3f-f852-642bdf216e17@virtuozzo.com>
-	<d1e7c1c5-622c-ff78-4aec-ce62b0273d24@redhat.com>
-	<20180228130816.GA19355@grep.be>
-	<cf2357b2-deed-46d3-3306-5eabf0a0abae@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e3bb6152-cb7f-baf9-91fa-bdd3c90ffab1@redhat.com>
-Date: Wed, 28 Feb 2018 14:29:46 -0600
-MIME-Version: 1.0
-In-Reply-To: <cf2357b2-deed-46d3-3306-5eabf0a0abae@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Nbd] [PATCH] Further tidy-up on block status
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1er8PS-00020F-UI
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:33:10 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Wed, 28 Feb 2018 20:32:32 +0000
+Message-Id: <20180228203243.1413-2-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20180228203243.1413-1-mark.cave-ayland@ilande.co.uk>
+References: <20180228203243.1413-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCHv3 01/12] macio: embed DBDMA device directly
+ within macio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,20 +20,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wouter Verhelst <w@uter.be>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Alex Bligh <alex@alex.org.uk>, nbd list <nbd@other.debian.org>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Pavel Borzenkov <pborzenkov@virtuozzo.com>, stefanha@redhat.com, "Denis V . Lunev" <den@openvz.org>, Markus Pargmann <mpa@pengutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-On 02/28/2018 02:26 PM, Eric Blake wrote:
+The current recommendation is to embed subdevices directly within their container
+device, so do this for the DBDMA device.
 
-> 
-> Okay, I've gone ahead and reverted the renumbering; NBD_INFO_BLOCK_SIZE 
-> is back to 5
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ hw/misc/macio/macio.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-It helps if I don't copy-and-paste the wrong thing.  NBD_INFO_BLOCK_SIZE 
-remains 3 (as it has always been), NBD_REPLY_TYPE_BLOCK_STATUS is 
-reverted back to 5 (undoing part of commit 56c77720).
-
+diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+index 024f8557ab..7174135c8b 100644
+--- a/hw/misc/macio/macio.c
++++ b/hw/misc/macio/macio.c
+@@ -42,7 +42,7 @@ typedef struct MacIOState
+ 
+     MemoryRegion bar;
+     CUDAState cuda;
+-    DBDMAState *dbdma;
++    DBDMAState dbdma;
+     MemoryRegion *pic_mem;
+     MemoryRegion *escc_mem;
+     uint64_t frequency;
+@@ -129,12 +129,12 @@ static void macio_common_realize(PCIDevice *d, Error **errp)
+     SysBusDevice *sysbus_dev;
+     Error *err = NULL;
+ 
+-    object_property_set_bool(OBJECT(s->dbdma), true, "realized", &err);
++    object_property_set_bool(OBJECT(&s->dbdma), true, "realized", &err);
+     if (err) {
+         error_propagate(errp, err);
+         return;
+     }
+-    sysbus_dev = SYS_BUS_DEVICE(s->dbdma);
++    sysbus_dev = SYS_BUS_DEVICE(&s->dbdma);
+     memory_region_add_subregion(&s->bar, 0x08000,
+                                 sysbus_mmio_get_region(sysbus_dev, 0));
+ 
+@@ -161,7 +161,7 @@ static void macio_realize_ide(MacIOState *s, MACIOIDEState *ide,
+     sysbus_connect_irq(sysbus_dev, 0, irq0);
+     sysbus_connect_irq(sysbus_dev, 1, irq1);
+     qdev_prop_set_uint32(DEVICE(ide), "channel", dmaid);
+-    object_property_set_link(OBJECT(ide), OBJECT(s->dbdma), "dbdma", errp);
++    object_property_set_link(OBJECT(ide), OBJECT(&s->dbdma), "dbdma", errp);
+     macio_ide_register_dma(ide);
+ 
+     object_property_set_bool(OBJECT(ide), true, "realized", errp);
+@@ -344,8 +344,9 @@ static void macio_instance_init(Object *obj)
+     qdev_set_parent_bus(DEVICE(&s->cuda), sysbus_get_default());
+     object_property_add_child(obj, "cuda", OBJECT(&s->cuda), NULL);
+ 
+-    s->dbdma = MAC_DBDMA(object_new(TYPE_MAC_DBDMA));
+-    object_property_add_child(obj, "dbdma", OBJECT(s->dbdma), NULL);
++    object_initialize(&s->dbdma, sizeof(s->dbdma), TYPE_MAC_DBDMA);
++    qdev_set_parent_bus(DEVICE(&s->dbdma), sysbus_get_default());
++    object_property_add_child(obj, "dbdma", OBJECT(&s->dbdma), NULL);
+ }
+ 
+ static const VMStateDescription vmstate_macio_oldworld = {
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.11.0
