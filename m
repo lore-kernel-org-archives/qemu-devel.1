@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1er2Jr-0003PI-3C
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:02:59 -0500
+	(envelope-from <berrange@redhat.com>) id 1er2Nr-00050e-Fe
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:07:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1er2Jp-0000sH-UR
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:02:55 -0500
-Date: Wed, 28 Feb 2018 14:02:42 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180228140242.GP17774@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180228131315.30194-1-mreitz@redhat.com>
-	<20180228131315.30194-3-mreitz@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1er2Nl-0002PZ-Rx
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:07:03 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39926 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1er2Nl-0002PT-N6
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:06:57 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 61C588182D01
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 14:06:54 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Wed, 28 Feb 2018 14:06:52 +0000
+Message-Id: <20180228140652.31933-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180228131315.30194-3-mreitz@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/2] iotests: Test preallocated truncate of
- 2G image
+Subject: [Qemu-devel] [PATCH] crypto: ensure we use a predictable TLS
+ priority setting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,86 +31,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Wed, Feb 28, 2018 at 02:13:15PM +0100, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/106     | 24 ++++++++++++++++++++++++
->  tests/qemu-iotests/106.out | 10 ++++++++++
->  2 files changed, 34 insertions(+)
->=20
-> diff --git a/tests/qemu-iotests/106 b/tests/qemu-iotests/106
-> index bfe71f4e60..5e51f88a78 100755
-> --- a/tests/qemu-iotests/106
-> +++ b/tests/qemu-iotests/106
-> @@ -86,6 +86,30 @@ for growth_mode in falloc full off; do
->      $QEMU_IMG resize -f "$IMGFMT" --shrink --preallocation=3D$growth_m=
-ode "$TEST_IMG" -${GROWTH_SIZE}K
->  done
-> =20
-> +echo
-> +echo '=3D=3D=3D Testing image growth on 2G empty image =3D=3D=3D'
-> +
-> +for growth_mode in falloc full; do
-> +    echo
-> +    echo "--- growth_mode=3D$growth_mode ---"
-> +
-> +    # Maybe we want to do an lseek() to the end of the file before the
-> +    # preallocation; if the file has a length of 2 GB, that would
-> +    # return an integer that overflows to negative when put into a
-> +    # plain int.  We should use the correct type for the result, and
-> +    # this tests we do.
-> +
-> +    _make_test_img 2G
-> +    $QEMU_IMG resize -f "$IMGFMT" --preallocation=3D$growth_mode "$TES=
-T_IMG" +${GROWTH_SIZE}K
-> +
-> +    actual_size=3D$($QEMU_IMG info -f "$IMGFMT" "$TEST_IMG" | grep 'di=
-sk size')
-> +    actual_size=3D$(echo "$actual_size" | sed -e 's/^[^0-9]*\([0-9]\+\=
-).*$/\1/')
-> +
-> +    if [ $actual_size -lt $GROWTH_SIZE ]; then
-> +        echo "ERROR: Image should have at least ${GROWTH_SIZE}K, but h=
-as ${actual_size}K"
-> +    fi
-> +done
-> +
->  # success, all done
->  echo '*** done'
->  rm -f $seq.full
-> diff --git a/tests/qemu-iotests/106.out b/tests/qemu-iotests/106.out
-> index 0a42312301..c459957660 100644
-> --- a/tests/qemu-iotests/106.out
-> +++ b/tests/qemu-iotests/106.out
-> @@ -47,4 +47,14 @@ qemu-img: Preallocation can only be used for growing=
- images
-> =20
->  --- growth_mode=3Doff ---
->  Image resized.
-> +
-> +=3D=3D=3D Testing image growth on 2G empty image =3D=3D=3D
-> +
-> +--- growth_mode=3Dfalloc ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2147483648
-> +Image resized.
-> +
-> +--- growth_mode=3Dfull ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2147483648
-> +Image resized.
->  *** done
+The TLS test cert generation relies on a fixed set of algorithms that are
+only usable under GNUTLS' default priority setting. When building QEMU
+with a custom distro specific priority setting, this can cause the TLS
+tests to fail. By forcing the tests to always use "NORMAL" priority we
+can make them more robust.
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
+ tests/test-crypto-tlssession.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-
-Regards,
-Daniel
+diff --git a/tests/test-crypto-tlssession.c b/tests/test-crypto-tlssessio=
+n.c
+index 1a4a066d76..82f21c27f2 100644
+--- a/tests/test-crypto-tlssession.c
++++ b/tests/test-crypto-tlssession.c
+@@ -75,6 +75,7 @@ static QCryptoTLSCreds *test_tls_creds_create(QCryptoTL=
+SCredsEndpoint endpoint,
+                      "server" : "client"),
+         "dir", certdir,
+         "verify-peer", "yes",
++        "priority", "NORMAL",
+         /* We skip initial sanity checks here because we
+          * want to make sure that problems are being
+          * detected at the TLS session validation stage,
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+2.14.3
