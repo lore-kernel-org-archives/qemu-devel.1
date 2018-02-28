@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1er90Q-0001Qk-2V
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:19 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1er90I-0001JQ-Hv
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1er90L-0005uo-Th
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:17 -0500
-Received: from mail-sn1nam02on0081.outbound.protection.outlook.com
-	([104.47.36.81]:17351
+	(envelope-from <brijesh.singh@amd.com>) id 1er90E-0005l0-MF
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:10 -0500
+Received: from mail-sn1nam02on0070.outbound.protection.outlook.com
+	([104.47.36.70]:44829
 	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1er90L-0005tr-LD
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:13 -0500
+	id 1er90E-0005jA-Df
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:06 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Wed, 28 Feb 2018 15:10:19 -0600
-Message-Id: <20180228211028.83970-20-brijesh.singh@amd.com>
+Date: Wed, 28 Feb 2018 15:10:12 -0600
+Message-Id: <20180228211028.83970-13-brijesh.singh@amd.com>
 In-Reply-To: <20180228211028.83970-1-brijesh.singh@amd.com>
 References: <20180228211028.83970-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v10 19/28] sev/i386: finalize the SEV guest
- launch flow
+Subject: [Qemu-devel] [PATCH v10 12/28] sev/i386: register the guest memory
+ range which may contain encrypted data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,73 +32,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
 
-SEV launch flow requires us to issue LAUNCH_FINISH command before guest
-is ready to run.
+When SEV is enabled, the hardware encryption engine uses a tweak such
+that the two identical plaintext at different location will have a
+different ciphertexts. So swapping or moving a ciphertexts of two guest
+pages will not result in plaintexts being swapped. Hence relocating
+a physical backing pages of the SEV guest will require some additional
+steps in KVM driver. The KVM_MEMORY_ENCRYPT_{UN,}REG_REGION ioctl can be
+used to register/unregister the guest memory region which may contain the
+encrypted data. KVM driver will internally handle the relocating physical
+backing pages of registered memory regions.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Richard Henderson <rth@twiddle.net>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- target/i386/sev.c        | 29 +++++++++++++++++++++++++++++
- target/i386/trace-events |  1 +
- 2 files changed, 30 insertions(+)
+ target/i386/sev.c        | 41 +++++++++++++++++++++++++++++++++++++++++
+ target/i386/trace-events |  2 ++
+ 2 files changed, 43 insertions(+)
 
 diff --git a/target/i386/sev.c b/target/i386/sev.c
-index a61c100ef47b..c341257fcc14 100644
+index 80569f4bcf49..8ee6159b2bfc 100644
 --- a/target/i386/sev.c
 +++ b/target/i386/sev.c
-@@ -572,6 +572,34 @@ static Notifier sev_machine_done_notify = {
-     .notify = sev_launch_get_measure,
- };
+@@ -100,6 +100,45 @@ fw_error_to_str(int code)
+     return sev_fw_errlist[code];
+ }
  
 +static void
-+sev_launch_finish(SEVState *s)
++sev_ram_block_added(RAMBlockNotifier *n, void *host, size_t size)
 +{
-+    int ret, error;
++    int r;
++    struct kvm_enc_region range;
 +
-+    trace_kvm_sev_launch_finish();
-+    ret = sev_ioctl(sev_state->sev_fd, KVM_SEV_LAUNCH_FINISH, 0, &error);
-+    if (ret) {
-+        error_report("%s: LAUNCH_FINISH ret=%d fw_error=%d '%s'",
-+                     __func__, ret, error, fw_error_to_str(error));
-+        exit(1);
++    range.addr = (__u64)host;
++    range.size = size;
++
++    trace_kvm_memcrypt_register_region(host, size);
++    r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_REG_REGION, &range);
++    if (r) {
++        error_report("%s: failed to register region (%p+%#lx)",
++                     __func__, host, size);
 +    }
-+
-+    sev_set_guest_state(SEV_STATE_RUNNING);
 +}
 +
 +static void
-+sev_vm_state_change(void *opaque, int running, RunState state)
++sev_ram_block_removed(RAMBlockNotifier *n, void *host, size_t size)
 +{
-+    SEVState *s = opaque;
++    int r;
++    struct kvm_enc_region range;
 +
-+    if (running) {
-+        if (!sev_check_state(SEV_STATE_RUNNING)) {
-+            sev_launch_finish(s);
-+        }
++    range.addr = (__u64)host;
++    range.size = size;
++
++    trace_kvm_memcrypt_unregister_region(host, size);
++    r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_UNREG_REGION, &range);
++    if (r) {
++        error_report("%s: failed to unregister region (%p+%#lx)",
++                     __func__, host, size);
 +    }
 +}
 +
- void *
- sev_guest_init(const char *id)
++static struct RAMBlockNotifier sev_ram_notifier = {
++    .ram_block_added = sev_ram_block_added,
++    .ram_block_removed = sev_ram_block_removed,
++};
++
+ static void
+ qsev_guest_finalize(Object *obj)
  {
-@@ -653,6 +681,7 @@ sev_guest_init(const char *id)
+@@ -434,6 +473,8 @@ sev_guest_init(const char *id)
+         goto err;
+     }
  
-     ram_block_notifier_add(&sev_ram_notifier);
-     qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
-+    qemu_add_vm_change_state_handler(sev_vm_state_change, s);
- 
++    ram_block_notifier_add(&sev_ram_notifier);
++
      return s;
  err:
+     g_free(sev_state);
 diff --git a/target/i386/trace-events b/target/i386/trace-events
-index f7a1a1e6b85c..b1fbde6e40fe 100644
+index 797b716751b7..ffa3d2250425 100644
 --- a/target/i386/trace-events
 +++ b/target/i386/trace-events
-@@ -14,3 +14,4 @@ kvm_sev_change_state(const char *old, const char *new) "%s -> %s"
- kvm_sev_launch_start(int policy, void *session, void *pdh) "policy 0x%x session %p pdh %p"
- kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len 0x%" PRIu64
- kvm_sev_launch_measurement(const char *value) "data %s"
-+kvm_sev_launch_finish(void) ""
+@@ -8,3 +8,5 @@ kvm_x86_update_msi_routes(int num) "Updated %d MSI routes"
+ 
+ # target/i386/sev.c
+ kvm_sev_init(void) ""
++kvm_memcrypt_register_region(void *addr, size_t len) "addr %p len 0x%lu"
++kvm_memcrypt_unregister_region(void *addr, size_t len) "addr %p len 0x%lu"
 -- 
 2.14.3
