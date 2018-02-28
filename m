@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1erA3e-00059C-Oc
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 17:18:49 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1erA8F-0000if-6L
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 17:23:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1erA3U-00061Q-3q
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 17:18:42 -0500
-Received: from mail-cys01nam02on062d.outbound.protection.outlook.com
-	([2a01:111:f400:fe45::62d]:34256
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1erA3T-0005zn-Kq
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 17:18:31 -0500
-From: "Moger, Babu" <Babu.Moger@amd.com>
-Date: Wed, 28 Feb 2018 22:18:27 +0000
-Message-ID: <CY4PR12MB1768464C5ABB828EEA45166B95C70@CY4PR12MB1768.namprd12.prod.outlook.com>
-References: <1519439425-27883-1-git-send-email-babu.moger@amd.com>
-	<1519439425-27883-4-git-send-email-babu.moger@amd.com>
-	<20180228182420.GC8418@flask>
-In-Reply-To: <20180228182420.GC8418@flask>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <richard.henderson@linaro.org>) id 1erA81-0004iI-TQ
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 17:23:27 -0500
+Received: from mail-pl0-x230.google.com ([2607:f8b0:400e:c01::230]:36620)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1erA81-0004gK-1k
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 17:23:13 -0500
+Received: by mail-pl0-x230.google.com with SMTP id 61-v6so2399118plf.3
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 14:23:12 -0800 (PST)
+References: <1519709965-29833-1-git-send-email-cota@braap.org>
+	<1519709965-29833-9-git-send-email-cota@braap.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <f9409454-7524-454b-c45e-4793a8db6b54@linaro.org>
+Date: Wed, 28 Feb 2018 14:23:09 -0800
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] target/i386: Add support for
- CPUID_8000_001E for AMD
+In-Reply-To: <1519709965-29833-9-git-send-email-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 08/16] translate-all: work page-by-page in
+ tb_invalidate_phys_range_1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,67 +32,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-2?Q?Radim_Kr=E8m=E1=F8?= <rkrcmar@redhat.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pixo@polepetko.eu" <pixo@polepetko.eu>, "Hook, Gary" <Gary.Hook@amd.com>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+
+On 02/26/2018 09:39 PM, Emilio G. Cota wrote:
+> So that we pass a same-page range to tb_invalidate_phys_page_range,
+> instead of always passing an end address that could be on a different
+> page.
+> 
+> As discussed with Peter Maydell on the list [1], tb_invalidate_phys_page_range
+> doesn't actually do much with 'end', which explains why we have never
+> hit a bug despite going against what the comment on top of
+> tb_invalidate_phys_page_range requires:
+> 
+>> * Invalidate all TBs which intersect with the target physical address range
+>> * [start;end[. NOTE: start and end must refer to the *same* physical page.
+> The appended honours the comment, which avoids confusion.
+> 
+> While at it, rework the loop into a for loop, which is less error prone
+> (e.g. "continue" won't result in an infinite loop).
+> 
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg09165.html
+> 
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
-> -----Original Message-----
-> From: Radim Kr=E8m=E1=F8 [mailto:rkrcmar@redhat.com]
-> Sent: Wednesday, February 28, 2018 12:24 PM
-> To: Moger, Babu <Babu.Moger@amd.com>
-> Cc: pbonzini@redhat.com; rth@twiddle.net; ehabkost@redhat.com;
-> mtosatti@redhat.com; qemu-devel@nongnu.org; kvm@vger.kernel.org;
-> pixo@polepetko.eu; Hook, Gary <Gary.Hook@amd.com>
-> Subject: Re: [PATCH v2 3/5] target/i386: Add support for CPUID_8000_001E
-> for AMD
->=20
-> 2018-02-23 21:30-0500, Babu Moger:
-> > From: Stanislav Lanci <pixo@polepetko.eu>
-> >
-> > Populate threads/core_id/apic_ids/socket_id when CPUID_EXT3_TOPOEXT
-> > feature is supported. This is required to support hyperthreading
-> > feature on AMD CPUS. These are supported via CPUID_8000_001E
-> extended
-> > functions.
-> >
-> > Signed-off-by: Stanislav Lanci <pixo@polepetko.eu>
-> > Signed-off-by: Babu Moger <babu.moger@amd.com>
-> > ---
-> >  target/i386/cpu.c | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> >
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index a5a480e..191e850 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -3666,6 +3666,14 @@ void cpu_x86_cpuid(CPUX86State *env,
-> uint32_t index, uint32_t count,
-> >              *edx =3D 0;
-> >          }
-> >          break;
-> > +    case 0x8000001E:
-> > +        if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) {
-> > +            *eax =3D cpu->apic_id;
-> > +            *ebx =3D (cs->nr_threads - 1) << 8 | cpu->core_id;
->=20
-> Do we somewhere assert that AMD cannot have cpu->core_id > 255?
-> (qemu does allow weird configurations.)
-
-I don't see specific assert on core_id.   But, I see that qemu does not all=
-ow nr_cores more than 255.
-Also I see that core_id is iterated based on nr_cores.  If you strongly bel=
-ieve we need to add assert here, I will add it.=20
-Let me know.
-=20
-> Thanks.
->=20
-> > +            *ecx =3D cpu->socket_id;
-> > +            *edx =3D 0;
-> > +        }
-> > +        break;
-> >      case 0xC0000000:
-> >          *eax =3D env->cpuid_xlevel2;
-> >          *ebx =3D 0;
-> > --
-> > 1.8.3.1
-> >
+r~
