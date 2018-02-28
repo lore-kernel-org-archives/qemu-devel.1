@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1equxr-000147-Qw
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 01:11:44 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eqvCQ-0002xD-4x
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 01:26:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1equxn-00028D-SC
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 01:11:43 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39146 helo=mx1.redhat.com)
+	(envelope-from <kraxel@redhat.com>) id 1eqvCN-0001eU-11
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 01:26:46 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39348 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1equxn-00027l-NJ
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 01:11:39 -0500
-References: <CAFEAcA8Pu=SkYCPwCnRdKTEFPScsZhj4vJm0dTs+jV1jTWOAog@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <0304e590-ab51-649b-7cee-bb7c5be6f5e4@redhat.com>
-Date: Wed, 28 Feb 2018 07:11:30 +0100
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eqvCM-0001e4-Se
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 01:26:42 -0500
+Date: Wed, 28 Feb 2018 07:26:34 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180228062634.eh3xknbo7oosi5fo@sirius.home.kraxel.org>
+References: <20180227080724.13585-1-kraxel@redhat.com>
+	<CAFEAcA_k9pXrfkLQSSG5UTYOteMZEZXErMCh6-3Wgj42mGqrfw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8Pu=SkYCPwCnRdKTEFPScsZhj4vJm0dTs+jV1jTWOAog@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Deprecate tilegx ? (was: Proposal: deprecate and
- remove QEMU's unicore32 target code)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_k9pXrfkLQSSG5UTYOteMZEZXErMCh6-3Wgj42mGqrfw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 00/12] Ui 20180227 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +27,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>, Richard Henderson <rth@twiddle.net>, Chen Gang <xili_gchen_5257@hotmail.com>, Chen Gang <gang.chen.5i5j@gmail.com>Richard Henderson <rth@twiddle.net>, Chen Gang <chengang@emindsoft.com.cn>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 27.02.2018 12:51, Peter Maydell wrote:
-> I propose that we deprecate and plan to remove the unicore32 code:
-[...]
-> Essentially, it seems to be a largely-inactive university R&D project,
-> it's costing us in maintenance effort every time we have to touch it,
-> and I don't think it has any real users.
->
-> Does anybody disagree?
->=20
-> If we go ahead with deprecating then we should:
->  * add a note to Changelog that we're deprecating the target
->  * ditto qemu-doc.texi's deprecation section
->  * patch hw/unicore32/puv3.c to warn on startup that it's deprecated
->  * remove it entirely for the 2.14 release
->=20
-> We could also remove linux-user/unicore32 immediately, since
-> the linux-user target has been disabled for some time.
+  Hi,
 
-Sounds reasonable to me, but let's wait a week or two for feedback from
-Guan Xuetao.
+> Hi. This failed to build on my OpenBSD test box:
+> 
+>   CC      qga/guest-agent-command-state.o
+> In file included from /home/qemu/include/qemu/osdep.h:30:0,
+>                  from /home/qemu/qga/guest-agent-command-state.c:12:
+> ./config-host.h:29:0: warning: "CONFIG_SDL" redefined
+>  #define CONFIG_SDL m
+>  ^
+> ./config-host.h:17:0: note: this is the location of the previous definition
+>  #define CONFIG_SDL 1
+>  ^
+> 
+> (warning repeated for pretty much every object file)
+> 
+> and then linking of the final executables failed with
+> 
+> ../audio/audio.o:(.data.rel.ro+0x0): undefined reference to `sdl_audio_driver'
 
-> Possibly there are other target architectures we could reasonably
-> deprecate-and-remove (though none of the other ones Linux is dropping
-> in this round are ones we support)...
+Oh, right, there is sdl audio, completely forgot about that ...
 
-I'd vote for marking tilegx as deprecated, too, since we even do not
-have an active maintainer for that CPU core (at least I did not spot one
-in our MAINTAINERS file). Opinions?
+(this probably triggers on openbsd because sdl audio is the default
+there).
 
- Thomas
+I think modularizing SDL isn't that easy then.
+Can you just drop the "sdl: build as ui module" patch?
+
+cheers,
+  Gerd
