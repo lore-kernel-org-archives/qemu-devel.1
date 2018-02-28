@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1er0mu-0005ox-69
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:24:49 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1er0pp-0008Gl-Ro
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:27:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1er0mp-0005jG-82
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:24:48 -0500
-References: <1519731154-3127-1-git-send-email-thuth@redhat.com>
-	<3e8dd204-a07d-00bd-84f3-813dc35c18cd@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7f36d2d3-df76-9627-8976-ff06a6729ef1@redhat.com>
-Date: Wed, 28 Feb 2018 13:24:35 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1er0po-00079Z-Tx
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:27:49 -0500
+Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:40957)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1er0po-00079C-OO
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:27:48 -0500
+Received: by mail-ot0-x232.google.com with SMTP id l12so2029398otj.7
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 04:27:48 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <3e8dd204-a07d-00bd-84f3-813dc35c18cd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <1519815685-29200-5-git-send-email-abdallah.bouassida@lauterbach.com>
+References: <1519815685-29200-1-git-send-email-abdallah.bouassida@lauterbach.com>
+	<1519815685-29200-5-git-send-email-abdallah.bouassida@lauterbach.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 28 Feb 2018 12:27:27 +0000
+Message-ID: <CAFEAcA-Q+_87n3-s5TnJK=90FJFL=MAA_3VDN4OQxBEvxbFOkA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] hw/s390x: Add the possibility
- to specify the netboot image on the command line
+Subject: Re: [Qemu-devel] [PATCH v3 4/4] target/arm: Add
+ arm_gdb_set_sysreg() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,49 +31,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+To: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Khaled Jmal <khaled.jmal@lauterbach.com>
 
-On 28.02.2018 12:02, David Hildenbrand wrote:
-> On 27.02.2018 12:32, Thomas Huth wrote:
->> The file name of the netboot binary is currently hard-coded to
->> "s390-netboot.img", without a possibility for the user to select
->> an alternative firmware image here. That's unfortunate, especially
->> since the basics are already there: The filename is a property of
->> the s390-ipl device. So we just have to add a check whether the user
->> already provided the property and only set the default if the string
->> is still empty. Now it is possible to select a different firmware
->> image with "-global s390-ipl.netboot_fw=3D/path/to/s390-netboot.img".
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  hw/s390x/s390-virtio-ccw.c | 4 +++-
->>  1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index 4abbe89..7b3fb5f 100644
->> --- a/hw/s390x/s390-virtio-ccw.c
->> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -254,8 +254,10 @@ static void s390_init_ipl_dev(const char *kernel_=
-filename,
->>      }
->>      qdev_prop_set_string(dev, "cmdline", kernel_cmdline);
->>      qdev_prop_set_string(dev, "firmware", firmware);
->> -    qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
->>      qdev_prop_set_bit(dev, "enforce_bios", enforce_bios);
->> +    if (!strlen(object_property_get_str(new, "netboot_fw", &error_abo=
-rt))) {
->=20
-> Isn't it the case that object_property_get_str() can return also NULL?
->=20
-> (looking at s390_ipl_set_loadparm())
+On 28 February 2018 at 11:01, Abdallah Bouassida
+<abdallah.bouassida@lauterbach.com> wrote:
+> This is a callback to set the cp-regs registered by the dynamic XML.
+>
+> Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+> ---
+>>> Some of our customers need to connect to Qemu using our tool TRACE32=C2=
+=AE
+>>> via GDB,
+>>> and for some use case they need to have write access to some particular
+>>> cpregs.
+>>> So, it will be nice to have this capability!
+>>> Usually, a user won't modify these registers unless he knows what he is
+>>> doing!
+>
+>> I also still don't really like using write_raw_cp_reg() here --
+>> it will bypass some behaviour you want and in some cases will
+>> just break the emulation because invariants we assume will
+>> hold no longer hold. It would be a lot lot safer to not
+>> provide write access at all, only read access.
+>
+> Adding to that our customers may need this write access, our tool TRACE32=
+=C2=AE
+> needs this also in some particular cases. For example: temporary disablin=
+g MMU
+> to do a physical memory access.
 
-It can return NULL in case of errors (e.g. the property is not a string
-or not available at all). In this case, we know that the property is a
-string and that it is available, so IMHO no need to check for NULL here.
+By clearing the SCTLR bit? That's a good example of a case that
+won't work reliably. If you clear the SCTLR.M bit via raw_write
+this will not perform the tlb_flush() that it needs to, which
+means that if anything does a memory access via the QEMU TLB
+it may get the wrong cached results. If you always clear the
+bit, do one gdb memory access then set the bit then it will
+probably not run into problems but you're walking on thin ice.
 
-Not sure why s390_ipl_set_loadparm() explicitely checks for this ...
-maybe this was originally required to support the old s390-virtio
-(non-ccw) machine, too?
-
- Thomas
+thanks
+-- PMM
