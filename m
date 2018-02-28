@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1er1Sk-00069O-Sr
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:08:08 -0500
+	(envelope-from <wouter@grep.be>) id 1er1Tg-0006rw-Ck
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:09:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1er1Sj-0000Hp-Rm
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:08:02 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35768 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1er1Sj-0000HA-Mi
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:08:01 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7EA924075166
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 13:07:57 +0000 (UTC)
-Date: Wed, 28 Feb 2018 13:07:44 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180228130744.GI17774@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180228050633.7410-1-peterx@redhat.com>
-	<20180228050633.7410-11-peterx@redhat.com>
-	<20180228091659.GD31550@redhat.com> <20180228125400.GI27381@xz-mi>
+	(envelope-from <wouter@grep.be>) id 1er1Tb-0000bh-Cs
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:09:00 -0500
+Received: from latin.grep.be ([2a01:4f8:140:52e5::2]:36908)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wouter@grep.be>) id 1er1Tb-0000YA-1h
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:08:55 -0500
+Date: Wed, 28 Feb 2018 14:08:16 +0100
+From: Wouter Verhelst <w@uter.be>
+Message-ID: <20180228130816.GA19355@grep.be>
+References: <20161214150840.10899-1-alex@alex.org.uk>
+	<c2faa919-65c6-d5a3-508d-2f069f2ba61e@redhat.com>
+	<1e3244d2-daea-6f3f-f852-642bdf216e17@virtuozzo.com>
+	<d1e7c1c5-622c-ff78-4aec-ce62b0273d24@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180228125400.GI27381@xz-mi>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 10/14] qio: refcount QIOTask
+In-Reply-To: <d1e7c1c5-622c-ff78-4aec-ce62b0273d24@redhat.com>
+Subject: Re: [Qemu-devel] [Nbd] [PATCH] Further tidy-up on block status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,54 +29,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Alex Bligh <alex@alex.org.uk>, nbd list <nbd@other.debian.org>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Pavel Borzenkov <pborzenkov@virtuozzo.com>, stefanha@redhat.com, "Denis V . Lunev" <den@openvz.org>, Markus Pargmann <mpa@pengutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 
-On Wed, Feb 28, 2018 at 08:54:00PM +0800, Peter Xu wrote:
-> On Wed, Feb 28, 2018 at 09:16:59AM +0000, Daniel P. Berrang=C3=A9 wrote=
-:
-> > On Wed, Feb 28, 2018 at 01:06:29PM +0800, Peter Xu wrote:
-> > > It will be used in multiple threads in follow-up patches.  Let it s=
-tart
-> > > to have refcounts.
-> > >=20
-> > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > ---
-> > >  include/io/task.h |  3 +++
-> > >  io/task.c         | 23 ++++++++++++++++++++++-
-> > >  2 files changed, 25 insertions(+), 1 deletion(-)
-> > >=20
-> > > diff --git a/include/io/task.h b/include/io/task.h
-> > > index 9dbe3758d7..c6acd6489c 100644
-> > > --- a/include/io/task.h
-> > > +++ b/include/io/task.h
-> > > @@ -322,4 +322,7 @@ gpointer qio_task_get_result_pointer(QIOTask *t=
-ask);
-> > >   */
-> > >  Object *qio_task_get_source(QIOTask *task);
-> > > =20
-> > > +void qio_task_ref(QIOTask *task);
-> > > +void qio_task_unref(QIOTask *task);
-> >=20
-> > It should just be turned back into a QObject as it was originally,
-> > so we get refcounting for free.
->=20
-> Could you point me the commit that has the original code?  I would be
-> glad to revert to that, or yeah I can switch to QObject too.  Thanks,
+Hi,
 
-It was never actually committed - it was just that way during initial
-review but was suggested to be simplified as ref counting wasn't needed.
+Sorry, I forgot to reply to this earlier.
 
-That all said, having now seen the later parts of this patch series, I
-don't think we would need todo this at all, because we should not be
-exposing the GTask to callers and thus the refcounting question goes away
+On Fri, Feb 16, 2018 at 10:10:59AM -0600, Eric Blake wrote:
+> On 02/16/2018 07:53 AM, Vladimir Sementsov-Ogievskiy wrote:
+> > Good idea. But it would be tricky thing to maintain backward
+> > compatibility with published versions of virtuozzo product. And finally
+> > our implementation would be more complex because of this simplification.
+> 
+> > Hm. Finally, you suggested several changes (including already merged
+> > 56c77720 :( ). Suggestions are logical. But if they will be accepted, we
+> > (Virtuozzo) will have to invent tricky hard-to-maintain code, to
+> > distinguish by third factors our already published versions.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Hrm. I wasn't aware you'd already published those versions; if you had
+told us, we could've reviewed the spec at that point and either merge it
+or update it to incorporate whatever changes you think seem like they
+are necessary.
+
+Note that the section "Experimental extensions" contains the following
+wording:
+
+    In addition to the normative elements of the specification set out
+    herein, various experimental non-normative extensions have been
+    proposed. These may not be implemented in any known server or
+    client, and are subject to change at any point. A full
+    implementation may require changes to the specifications, or cause
+    the specifications to be withdrawn altogether.
+
+    [...]
+
+    Implementors of these extensions are strongly suggested to contact
+    the mailinglist in order to help fine-tune the specifications before
+    committing to a particular implementation.
+
+i.e., what's in an "extension-" branch can be described as "we're
+thinking about it and it will probably happen as written, but we're not
+entirely sure yet". The idea behind this is that we don't want to limit
+ourselves to things that haven't been implemented (but that the fact of
+"implementing something" causes it to get written into stone, sortof).
+
+This is different from how most standards bodies work, I'm sure, but it
+seemed to work so far, and I wish you had let us know that the work you
+were doing was about to be reaching customers. Anyway.
+
+[...]
+> Also, the Virtuozzo product hasn't been mentioned on the NBD list, and while
+> you are preparing patches to the public qemu based on the Virtuozzo product,
+> I'm not sure if there is a public repository for the existing Virtuozzo
+> product out in the wild.  Is your product using NBD_OPT_LIST_META_CONTEXT,
+> or _just_ NBD_OPT_SET_META_CONTEXT?
+
++1. What's published currently?
+
+[...]
+> Or, we can revert the change in commit 56c77720, and keep
+> NBD_REPLY_TYPE_BLOCK_STATUS at 5 (it leaves a hole in the NBD_REPLY_TYPE
+> numbering, where 3 and 4 might be filled in by other future extensions, or
+> permanently skipped).  This works IF there are no OTHER incompatible changes
+> made to the rest of the block status extension as part of promoting it to
+> current (where we still haven't finished that debate, given my question on
+> whether 32-bit lengths and colon-separated namespace:leaf in a single string
+> is the best representation).
+> 
+> So, I'd like some feedback from Alex or Wouter on which alternatives seem
+> nicest at this point.
+
+I'm thinking that reverting at least the number change seems like a good
+idea. If Vladimir can shed some light on what's been published so far,
+we can see what damage has been done and try to limit further damage.
+
+It makes no sense to ignore that the spec has been implemented; the
+whole point of writing a spec is so that third parties can implement it
+and be compatible. If we ignore that just because there was a
+misunderstanding, then I think we're throwing away the kid with the
+bathwater.
+
+Since I don't think a gap in numbers is that much of a problem, I'm
+happy reverting the renumbering part of 56c77720 and keep it at 5. I'd
+also like to know what it is exactly that Virtuozzo implemented, so we
+can update the extension-blockstatus (if necessary) and then merge that
+to master.
+
+However, for future reference, Vladimir, I would prefer it if you could
+give us a heads-up if you're getting close to releasing something to
+the public that's still in an experimental branch, so that we can make
+updates if necessary and merge it to master.
+
+Thanks,
+
+-- 
+Could you people please use IRC like normal people?!?
+
+  -- Amaya Rodrigo Sastre, trying to quiet down the buzz in the DebConf 2008
+     Hacklab
