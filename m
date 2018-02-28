@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1erA1t-0003Vk-Nz
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 17:17:02 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1erA1w-0003Xs-0Q
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 17:17:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1erA1n-0003at-AU
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 17:16:53 -0500
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:40823)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1erA1p-0003eb-DO
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 17:16:55 -0500
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:37412)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1erA1m-0003ZJ-RF
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 17:16:47 -0500
-Received: by mail-lf0-x241.google.com with SMTP id 37so5868712lfs.7
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 14:16:46 -0800 (PST)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1erA1o-0003cF-T6
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 17:16:49 -0500
+Received: by mail-lf0-x244.google.com with SMTP id y19so5880349lfd.4
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 14:16:48 -0800 (PST)
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Wed, 28 Feb 2018 14:16:08 -0800
-Message-Id: <20180228221609.11265-11-jcmvbkbc@gmail.com>
+Date: Wed, 28 Feb 2018 14:16:09 -0800
+Message-Id: <20180228221609.11265-12-jcmvbkbc@gmail.com>
 In-Reply-To: <20180228221609.11265-1-jcmvbkbc@gmail.com>
 References: <20180228221609.11265-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 10/11] qemu-binfmt-conf.sh: add qemu-xtensa
+Subject: [Qemu-devel] [PATCH v2 11/11] MAINTAINERS: fix W: address for xtensa
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,49 +26,25 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Max Filippov <jcmvbkbc@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-Register qemu-xtensa and qemu-xtensaeb for transparent linux userspace
-emulation.
-
-Cc: Riku Voipio <riku.voipio@iki.fi>
-Cc: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- scripts/qemu-binfmt-conf.sh | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index ea5a7487457c..4efc5812aaa9 100755
---- a/scripts/qemu-binfmt-conf.sh
-+++ b/scripts/qemu-binfmt-conf.sh
-@@ -1,10 +1,10 @@
- #!/bin/sh
--# enable automatic i386/ARM/M68K/MIPS/SPARC/PPC/s390/HPPA
-+# enable automatic i386/ARM/M68K/MIPS/SPARC/PPC/s390/HPPA/Xtensa
- # program execution by the kernel
+diff --git a/MAINTAINERS b/MAINTAINERS
+index a334a25e5df0..33c4ef0935dc 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -279,7 +279,7 @@ T: git git://github.com/ehabkost/qemu.git x86-next
  
- qemu_target_list="i386 i486 alpha arm armeb sparc32plus ppc ppc64 ppc64le m68k \
- mips mipsel mipsn32 mipsn32el mips64 mips64el \
--sh4 sh4eb s390x aarch64 aarch64_be hppa"
-+sh4 sh4eb s390x aarch64 aarch64_be hppa xtensa xtensaeb"
- 
- i386_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
- i386_mask='\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-@@ -100,6 +100,14 @@ hppa_magic='\x7f\x45\x4c\x46\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00
- hppa_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
- hppa_family=hppa
- 
-+xtensa_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x5e\x00'
-+xtensa_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-+xtensa_family=xtensa
-+
-+xtensaeb_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x5e'
-+xtensaeb_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
-+xtensaeb_family=xtensaeb
-+
- qemu_get_family() {
-     cpu=${HOST_ARCH:-$(uname -m)}
-     case "$cpu" in
+ Xtensa
+ M: Max Filippov <jcmvbkbc@gmail.com>
+-W: http://wiki.osll.spb.ru/doku.php?id=etc:users:jcmvbkbc:qemu-target-xtensa
++W: http://wiki.osll.ru/doku.php?id=etc:users:jcmvbkbc:qemu-target-xtensa
+ S: Maintained
+ F: target/xtensa/
+ F: hw/xtensa/
 -- 
 2.11.0
