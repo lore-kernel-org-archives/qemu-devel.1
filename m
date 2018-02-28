@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46670)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eqpoG-0006zy-6v
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 19:41:29 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eqqCL-0002Og-I4
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 20:06:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eqpoE-0000Be-PN
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 19:41:28 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:46938)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eqpoE-0000BE-I7
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 19:41:26 -0500
-Received: by mail-ot0-x244.google.com with SMTP id g97so674921otg.13
-	for <qemu-devel@nongnu.org>; Tue, 27 Feb 2018 16:41:26 -0800 (PST)
+	(envelope-from <dgibson@ozlabs.org>) id 1eqqCI-000169-Du
+	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 20:06:21 -0500
+Date: Wed, 28 Feb 2018 11:42:47 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180228004247.GA11706@umbus.fritz.box>
+References: <151974496089.17040.8929640429507724311.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20180227170018.6e4a3b0d@redhat.com>
-References: <1519690504-37792-1-git-send-email-mjc@sifive.com>
-	<CAFEAcA_0qNcikG2iLii=4zEPYvhz1koEbhCCrCXssdKYv06OJA@mail.gmail.com>
-	<20180227170018.6e4a3b0d@redhat.com>
-From: Michael Clark <mjc@sifive.com>
-Date: Wed, 28 Feb 2018 13:41:25 +1300
-Message-ID: <CAHNT7Nsc+Ovbm1ZZKv75FfN78tudWYgPqu3SsUzCv1XtG0ZMhw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [patches] Re:  [PULL] RISC-V QEMU Port Submission
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="MGYHOYXEY6WxJCY8"
+Content-Disposition: inline
+In-Reply-To: <151974496089.17040.8929640429507724311.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH 0/2] spapr: fix migration of old guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,85 +23,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: RISC-V Patches <patches@groups.riscv.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Lukas Doktor <ldoktor@redhat.com>
 
-On Wed, Feb 28, 2018 at 5:00 AM, Igor Mammedov <imammedo@redhat.com> wrote:
 
-> On Tue, 27 Feb 2018 14:01:05 +0000
-> Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> > On 27 February 2018 at 00:15, Michael Clark <mjc@sifive.com> wrote:
-> > > -----BEGIN PGP SIGNED MESSAGE-----
-> > > Hash: SHA1
-> > >
-> > > The following changes since commit 0a773d55ac76c5aa89ed9187a3bc5a
-> f8c5c2a6d0:
-> > >
-> > >   maintainers: Add myself as a OpenBSD maintainer (2018-02-23 12:05:07
-> +0000)
-> > >
-> > > are available in the git repository at:
-> > >
-> > >   https://github.com/riscv/riscv-qemu.git tags/riscv-qemu-upstream-v7
-> > >
-> > > for you to fetch changes up to 170a9d412ca1eb3b7ae6f6c1ff86dc
-> bdff0fd7a8:
-> > >
-> > >   RISC-V Build Infrastructure (2018-02-27 11:09:43 +1300)
-> > >
-> > > - ----------------------------------------------------------------
-> > > QEMU RISC-V Emulation Support (RV64GC, RV32GC)
-> >
-> > Hi; thanks for this pull request. Unfortunately it seems to
-> > be missing Signed-off-by: tags. Every commit needs to have
-> > the Signed-off-by: tags from the people who contributed code to
-> > it, indicating that they're OK with the code going into QEMU.
-> > (If the work was done by and copyright a company then you don't
-> > need to provide signoffs from every person at the company who
-> > worked on the code if you don't want to.)
-> >
-> > > The spike_v1.9
-> > > machine has been renamed to spike_v1.9.1 to match the privileged ISA
-> > > version and spike_v1.10 has been made the default machine.
-> >
-> > I'm confused about this. Generally QEMU boards should model
-> > hardware, and the board shouldn't care about the ISA versions.
-> > Versioned board names in QEMU generally follow _QEMU_'s versioning,
-> > and indicate that a board is identical to whatever we modelled
-> > in that earlier QEMU version, for VM migration compatibility.
-> > Board renames for minor ISA version bumps sounds like there's going
-> > to be a lot of churn and breakage -- is this stuff really ready?
-> > (Also, should we really have two different board source files
-> > for two different ISA versions? I would have expected these to
-> > share a source file to share code.)
-> >
-> > I did a test build and there are some compile errors:
-> >
-> > /home/pm215/qemu/linux-user/main.c:38:24: fatal error: target_elf.h:
-> > No such file or directory
-> >  #include "target_elf.h"
-> >                         ^
-> > compilation terminated.
-> >
-> > This is because your patchset has a clash with commit 542ca4349878a2e
-> > which has just merged to master, and refactors out an ifdef ladder,
-> > so now all targets supporting linux-user need to provide a
-> > linux-user/$ARCH/target_elf.h file. Could you fix that up and rebase,
-> > please?
-> also '[PATCH v7 03/23] RISC-V CPU Core Definition' still hasn't addressed
-> comment http://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06412.html
-> which isn't fixed since it was first pointed out (v4).
->
-> I'd prefer that being fixed before merge so another people
-> won't have to clean it up later after original authors,
-> When they try to generalize cpu_type -> cpu_model conversion.
->
+--MGYHOYXEY6WxJCY8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I re-read the email and it doesn't seem clear what you want us to do. I
-changed the CPU suffix to a prefix as you requested. The rest of the CPU
-initialisation is "modelled" on arm not sh4.
+On Tue, Feb 27, 2018 at 04:22:40PM +0100, Greg Kurz wrote:
+> Recent VSMT work broke migration of old guests as reported in this BZ:
+>=20
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1549087
+>=20
+> Patch 1 fixes the issue, while patch 2 is a tentative code reorg to
+> ensure VSMT is set before anyone tries to use spapr->vsmt.
 
-If you want to make a pull request, please use this branch:
+Nice job tracking this down.  Applied to ppc-for-2.12.
 
-- https://github.com/riscv/riscv-qemu/tree/qemu-upstream-v7
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--MGYHOYXEY6WxJCY8
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqV+wQACgkQbDjKyiDZ
+s5IY7g/8C0v4zwYk7kLxTostQF5hxlFPCHYxgtB70UANCZLhIJQnvO8iiR1lZJ5+
+8AcK1bOm97M9+t7lVByjBxCz9nTxsAOtK2TK1TrX+G1xTNZVbMST2ZkCaMvE/EEi
+SWvTogrfSLwWmogv8ofUQb6Eoi+Nhk3qJ7b49qqQSXUoRwDLgTLTSym0MEy6ZEP4
+XiJ6NZNfpO6gP5L/+qjuETgAJwiV/2+3qMOM3nARaPXCmup2pyIkZ8+2kqc3dkQ5
+pH16AGl8sg1F5AXSw/roiRfh4If08v/2eK7z8U/nDKbT96ozYsN/zv1tdYxVQfzY
+bxxftw/M5X7sOZ4AtXgFEdRN5lRcDghxluAWJ7Q9p8yT+3nBS5Y3zReIwl4Twabo
+ZGEb52n9e5TBnx5ELKjdbH3o8rDumjHo1VvBUK7JELeGZ1VC+7K4+Yv4q4omHV/0
+KQMZFto58WyvvNxoeC5WuvLROB05VMQezK9VklHCkouaUYalW7GCIRex3FvlfyzF
+e8ZfOHgq6048IOXrD/He7fJhZH/y2WGpG2vYDt0rW2YxE8Mz26qMtKXCxiOdG3Rg
+VwcMML+HA61Bj7dBrm8mbi1e7s5rz5Z2/mDPQdtKUzO4UaMCuFH9pN3mWgo7tn6W
+FMELxuJ/TsnMJQDKCp2EPCRCcFq247Zor/ofgtyAcgiLkasS9ZM=
+=S8/Z
+-----END PGP SIGNATURE-----
+
+--MGYHOYXEY6WxJCY8--
