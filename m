@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1er8bY-0003Y6-Bg
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:45:37 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1er8bp-0003le-6c
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:45:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1er8bV-0002oT-7A
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:45:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54120)
+	(envelope-from <alex.williamson@redhat.com>) id 1er8bm-00030v-2V
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:45:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59788)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1er8bU-0002o3-Tt
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:45:33 -0500
+	id 1er8bl-00030M-Sj
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:45:49 -0500
 From: Alex Williamson <alex.williamson@redhat.com>
-Date: Wed, 28 Feb 2018 13:45:23 -0700
-Message-ID: <20180228204523.26629.68401.stgit@gimli.home>
+Date: Wed, 28 Feb 2018 13:45:37 -0700
+Message-ID: <20180228204537.26629.49502.stgit@gimli.home>
 In-Reply-To: <20180228201837.26629.3346.stgit@gimli.home>
 References: <20180228201837.26629.3346.stgit@gimli.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 1/5] vfio/quirks: Add common quirk alloc helper
+Subject: [Qemu-devel] [PATCH 2/5] vfio/quirks: Add quirk reset callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,137 +30,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kvm@vger.kernel.org, alex.williamson@redhat.com, peterx@redhat.com, eric.auger@redhat.com
 
-This will later be used to include list initialization.
+Quirks can be self modifying, provide a hook to allow them to cleanup
+on device reset if desired.
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- hw/vfio/pci-quirks.c |   48 +++++++++++++++++++++---------------------------
- 1 file changed, 21 insertions(+), 27 deletions(-)
+ hw/vfio/pci-quirks.c |   15 +++++++++++++++
+ hw/vfio/pci.c        |    2 ++
+ hw/vfio/pci.h        |    2 ++
+ 3 files changed, 19 insertions(+)
 
 diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-index e5779a7ad35b..cc3a74ed992a 100644
+index cc3a74ed992a..f0947cbf152f 100644
 --- a/hw/vfio/pci-quirks.c
 +++ b/hw/vfio/pci-quirks.c
-@@ -275,6 +275,15 @@ static const MemoryRegionOps vfio_ati_3c3_quirk = {
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
- 
-+static VFIOQuirk *vfio_quirk_alloc(int nr_mem)
+@@ -1694,6 +1694,21 @@ void vfio_bar_quirk_finalize(VFIOPCIDevice *vdev, int nr)
+ /*
+  * Reset quirks
+  */
++void vfio_quirk_reset(VFIOPCIDevice *vdev)
 +{
-+    VFIOQuirk *quirk = g_new0(VFIOQuirk, 1);
-+    quirk->mem = g_new0(MemoryRegion, nr_mem);
-+    quirk->nr_mem = nr_mem;
++    int i;
 +
-+    return quirk;
++    for (i = 0; i < PCI_ROM_SLOT; i++) {
++        VFIOQuirk *quirk;
++        VFIOBAR *bar = &vdev->bars[i];
++
++        QLIST_FOREACH(quirk, &bar->quirks, next) {
++            if (quirk->reset) {
++                quirk->reset(vdev, quirk);
++            }
++        }
++    }
 +}
+ 
+ /*
+  * AMD Radeon PCI config reset, based on Linux:
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 033cc8dea1b9..e412fa8dc705 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -2185,6 +2185,8 @@ static void vfio_pci_post_reset(VFIOPCIDevice *vdev)
+                          vdev->vbasedev.name, nr);
+         }
+     }
 +
- static void vfio_vga_probe_ati_3c3_quirk(VFIOPCIDevice *vdev)
- {
-     VFIOQuirk *quirk;
-@@ -288,9 +297,7 @@ static void vfio_vga_probe_ati_3c3_quirk(VFIOPCIDevice *vdev)
-         return;
-     }
++    vfio_quirk_reset(vdev);
+ }
  
--    quirk = g_malloc0(sizeof(*quirk));
--    quirk->mem = g_new0(MemoryRegion, 1);
--    quirk->nr_mem = 1;
-+    quirk = vfio_quirk_alloc(1);
+ static bool vfio_pci_host_match(PCIHostDeviceAddress *addr, const char *name)
+diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+index f4aa13e021fa..0be41a70be1d 100644
+--- a/hw/vfio/pci.h
++++ b/hw/vfio/pci.h
+@@ -29,6 +29,7 @@ typedef struct VFIOQuirk {
+     void *data;
+     int nr_mem;
+     MemoryRegion *mem;
++    void (*reset)(struct VFIOPCIDevice *vdev, struct VFIOQuirk *quirk);
+ } VFIOQuirk;
  
-     memory_region_init_io(quirk->mem, OBJECT(vdev), &vfio_ati_3c3_quirk, vdev,
-                           "vfio-ati-3c3-quirk", 1);
-@@ -323,9 +330,7 @@ static void vfio_probe_ati_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-         return;
-     }
+ typedef struct VFIOBAR {
+@@ -165,6 +166,7 @@ void vfio_bar_quirk_exit(VFIOPCIDevice *vdev, int nr);
+ void vfio_bar_quirk_finalize(VFIOPCIDevice *vdev, int nr);
+ void vfio_setup_resetfn_quirk(VFIOPCIDevice *vdev);
+ int vfio_add_virt_caps(VFIOPCIDevice *vdev, Error **errp);
++void vfio_quirk_reset(VFIOPCIDevice *vdev);
  
--    quirk = g_malloc0(sizeof(*quirk));
--    quirk->mem = g_new0(MemoryRegion, 2);
--    quirk->nr_mem = 2;
-+    quirk = vfio_quirk_alloc(2);
-     window = quirk->data = g_malloc0(sizeof(*window) +
-                                      sizeof(VFIOConfigWindowMatch));
-     window->vdev = vdev;
-@@ -371,10 +376,9 @@ static void vfio_probe_ati_bar2_quirk(VFIOPCIDevice *vdev, int nr)
-         return;
-     }
+ extern const PropertyInfo qdev_prop_nv_gpudirect_clique;
  
--    quirk = g_malloc0(sizeof(*quirk));
-+    quirk = vfio_quirk_alloc(1);
-     mirror = quirk->data = g_malloc0(sizeof(*mirror));
--    mirror->mem = quirk->mem = g_new0(MemoryRegion, 1);
--    quirk->nr_mem = 1;
-+    mirror->mem = quirk->mem;
-     mirror->vdev = vdev;
-     mirror->offset = 0x4000;
-     mirror->bar = nr;
-@@ -548,10 +552,8 @@ static void vfio_vga_probe_nvidia_3d0_quirk(VFIOPCIDevice *vdev)
-         return;
-     }
- 
--    quirk = g_malloc0(sizeof(*quirk));
-+    quirk = vfio_quirk_alloc(2);
-     quirk->data = data = g_malloc0(sizeof(*data));
--    quirk->mem = g_new0(MemoryRegion, 2);
--    quirk->nr_mem = 2;
-     data->vdev = vdev;
- 
-     memory_region_init_io(&quirk->mem[0], OBJECT(vdev), &vfio_nvidia_3d4_quirk,
-@@ -667,9 +669,7 @@ static void vfio_probe_nvidia_bar5_quirk(VFIOPCIDevice *vdev, int nr)
-         return;
-     }
- 
--    quirk = g_malloc0(sizeof(*quirk));
--    quirk->mem = g_new0(MemoryRegion, 4);
--    quirk->nr_mem = 4;
-+    quirk = vfio_quirk_alloc(4);
-     bar5 = quirk->data = g_malloc0(sizeof(*bar5) +
-                                    (sizeof(VFIOConfigWindowMatch) * 2));
-     window = &bar5->window;
-@@ -762,10 +762,9 @@ static void vfio_probe_nvidia_bar0_quirk(VFIOPCIDevice *vdev, int nr)
-         return;
-     }
- 
--    quirk = g_malloc0(sizeof(*quirk));
-+    quirk = vfio_quirk_alloc(1);
-     mirror = quirk->data = g_malloc0(sizeof(*mirror));
--    mirror->mem = quirk->mem = g_new0(MemoryRegion, 1);
--    quirk->nr_mem = 1;
-+    mirror->mem = quirk->mem;
-     mirror->vdev = vdev;
-     mirror->offset = 0x88000;
-     mirror->bar = nr;
-@@ -781,10 +780,9 @@ static void vfio_probe_nvidia_bar0_quirk(VFIOPCIDevice *vdev, int nr)
- 
-     /* The 0x1800 offset mirror only seems to get used by legacy VGA */
-     if (vdev->vga) {
--        quirk = g_malloc0(sizeof(*quirk));
-+        quirk = vfio_quirk_alloc(1);
-         mirror = quirk->data = g_malloc0(sizeof(*mirror));
--        mirror->mem = quirk->mem = g_new0(MemoryRegion, 1);
--        quirk->nr_mem = 1;
-+        mirror->mem = quirk->mem;
-         mirror->vdev = vdev;
-         mirror->offset = 0x1800;
-         mirror->bar = nr;
-@@ -945,9 +943,7 @@ static void vfio_probe_rtl8168_bar2_quirk(VFIOPCIDevice *vdev, int nr)
-         return;
-     }
- 
--    quirk = g_malloc0(sizeof(*quirk));
--    quirk->mem = g_new0(MemoryRegion, 2);
--    quirk->nr_mem = 2;
-+    quirk = vfio_quirk_alloc(2);
-     quirk->data = rtl = g_malloc0(sizeof(*rtl));
-     rtl->vdev = vdev;
- 
-@@ -1507,9 +1503,7 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-     }
- 
-     /* Setup our quirk to munge GTT addresses to the VM allocated buffer */
--    quirk = g_malloc0(sizeof(*quirk));
--    quirk->mem = g_new0(MemoryRegion, 2);
--    quirk->nr_mem = 2;
-+    quirk = vfio_quirk_alloc(2);
-     igd = quirk->data = g_malloc0(sizeof(*igd));
-     igd->vdev = vdev;
-     igd->index = ~0;
