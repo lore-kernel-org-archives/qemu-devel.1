@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1er4ev-0004iZ-DX
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 11:32:53 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1er4u0-0000fi-9E
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 11:48:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1er4eu-0007R5-GD
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 11:32:49 -0500
-Date: Wed, 28 Feb 2018 17:32:22 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180228163222.GH4855@localhost.localdomain>
-References: <20180223235142.21501-1-jsnow@redhat.com>
-	<20180223235142.21501-15-jsnow@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180223235142.21501-15-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v4 14/21] blockjobs: add block_job_txn_apply
- function
+	(envelope-from <richard.henderson@linaro.org>) id 1er4ty-00072Q-9A
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 11:48:24 -0500
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:34236)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1er4ty-0006zg-39
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 11:48:22 -0500
+Received: by mail-pf0-x241.google.com with SMTP id j20so1224463pfi.1
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 08:48:20 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Wed, 28 Feb 2018 08:48:12 -0800
+Message-Id: <20180228164816.24110-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [RISU 0/3] ARM additions for v8.1-simd and v8.3-compnum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +24,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org
 
-Am 24.02.2018 um 00:51 hat John Snow geschrieben:
-> Simply apply a function transaction-wide.
-> A few more uses of this in forthcoming patches.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  blockjob.c | 24 +++++++++++++++---------
->  1 file changed, 15 insertions(+), 9 deletions(-)
-> 
-> diff --git a/blockjob.c b/blockjob.c
-> index 431ce9c220..8f02c03880 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -467,6 +467,19 @@ static void block_job_cancel_async(BlockJob *job)
->      job->cancelled = true;
->  }
->  
-> +static void block_job_txn_apply(BlockJobTxn *txn, void fn(BlockJob *))
-> +{
-> +    AioContext *ctx;
-> +    BlockJob *job, *next;
-> +
-> +    QLIST_FOREACH_SAFE(job, &txn->jobs, txn_list, next) {
-> +        ctx = blk_get_aio_context(job->blk);
-> +        aio_context_acquire(ctx);
-> +        fn(job);
-> +        aio_context_release(ctx);
-> +    }
-> +}
-> +
->  static void block_job_do_dismiss(BlockJob *job)
->  {
->      assert(job);
-> @@ -552,9 +565,8 @@ static void block_job_completed_txn_abort(BlockJob *job)
->  
->  static void block_job_completed_txn_success(BlockJob *job)
->  {
-> -    AioContext *ctx;
->      BlockJobTxn *txn = job->txn;
-> -    BlockJob *other_job, *next;
-> +    BlockJob *other_job;
->      /*
->       * Successful completion, see if there are other running jobs in this
->       * txn.
-> @@ -565,13 +577,7 @@ static void block_job_completed_txn_success(BlockJob *job)
->          }
->      }
->      /* We are the last completed job, commit the transaction. */
-> -    QLIST_FOREACH_SAFE(other_job, &txn->jobs, txn_list, next) {
-> -        ctx = blk_get_aio_context(other_job->blk);
-> -        aio_context_acquire(ctx);
-> -        assert(other_job->ret == 0);
+I've rebased these onto master.  There don't seem to be any
+consistent examples of how extensions are to be named in this
+new group-enabled world, but it's my opinion that the bike
+shed should be green.
 
-Can we just move the assertion up a few lines (after checking
-other_job->completed) instead of removing it?
+Since fp16 support is not yet present on the AArch32 side,
+I have disabled generation of those instructions here.
 
-> -        block_job_completed_single(other_job);
-> -        aio_context_release(ctx);
-> -    }
-> +    block_job_txn_apply(txn, block_job_completed_single);
->  }
 
-Kevin
+r~
+
+
+Richard Henderson (3):
+  Add aa64 sqrdml[as]h
+  Add aa64 fcadd + fcmla
+  Add arm and thumb vqrdml[as]h, vcadd, vcmla
+
+ aarch64.risu | 37 +++++++++++++++++++++++++++++++++++++
+ arm.risu     | 25 +++++++++++++++++++++++++
+ thumb.risu   | 25 +++++++++++++++++++++++++
+ 3 files changed, 87 insertions(+)
+
+-- 
+2.14.3
