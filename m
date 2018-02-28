@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1er40a-0004FL-RK
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:51:09 -0500
+	(envelope-from <kwolf@redhat.com>) id 1er43H-0005ma-58
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:53:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1er40W-0001e4-By
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:51:08 -0500
-Received: from indium.canonical.com ([91.189.90.7]:53836)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1er40W-0001dS-51
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:51:04 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1er40U-0002Wn-F9
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 15:51:02 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 71BBD2E80D0
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 15:51:02 +0000 (UTC)
+	(envelope-from <kwolf@redhat.com>) id 1er43G-0003Hl-D7
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:53:55 -0500
+Date: Wed, 28 Feb 2018 16:53:37 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180228155337.GE4855@localhost.localdomain>
+References: <20180223235142.21501-1-jsnow@redhat.com>
+	<20180223235142.21501-12-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 28 Feb 2018 15:39:46 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151983238635.19532.1417893228923555537.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1673976] Re: linux-user clone() can't handle
- glibc posix_spawn() (causes locale-gen to assert)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180223235142.21501-12-jsnow@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v4 11/21] blockjobs: add block_job_dismiss
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,40 +23,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-block@nongnu.org, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
 
-Commit fe05e1cb6d64db changed that, so args.err is initialized to zero.
+Am 24.02.2018 um 00:51 hat John Snow geschrieben:
+> For jobs that have reached their CONCLUDED state, prior to having their
+> last reference put down (meaning jobs that have completed successfully,
+> unsuccessfully, or have been canceled), allow the user to dismiss the
+> job's lingering status report via block-job-dismiss.
+> 
+> This gives management APIs the chance to conclusively determine if a job
+> failed or succeeded, even if the event broadcast was missed.
+> 
+> Note that jobs do not yet linger in any such state, they are freed
+> immediately upon reaching this previously-unnamed state. such a state is
+> added immediately in the next commit.
+> 
+> Verbs:
+> Dismiss: operates on CONCLUDED jobs only.
 
--- =
+You want to insert an empty line here.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1673976
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  block/trace-events       |  1 +
+>  blockdev.c               | 14 ++++++++++++++
+>  blockjob.c               | 34 ++++++++++++++++++++++++++++++++--
+>  include/block/blockjob.h |  9 +++++++++
+>  qapi/block-core.json     | 24 +++++++++++++++++++++++-
+>  5 files changed, 79 insertions(+), 3 deletions(-)
 
-Title:
-  linux-user clone() can't handle glibc posix_spawn() (causes locale-gen
-  to assert)
+> @@ -841,6 +865,9 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+>          block_job_txn_add_job(txn, job);
+>      }
+>  
+> +    /* For the expanded job control STM, grab an extra
+> +     * reference for finalize() to put down */
 
-Status in QEMU:
-  New
+Do you mean dismiss()?
 
-Bug description:
-  I'm running a command (locale-gen) inside of an armv7h chroot mounted
-  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
-  chroot file system and I get a core dump.
+> +    block_job_ref(job);
+>      return job;
+>  }
+>  
+> @@ -859,6 +886,9 @@ void block_job_pause_all(void)
+>  
+>  void block_job_early_fail(BlockJob *job)
+>  {
+> +    /* One for creation, one for finalize() */
 
-  locale-gen
-  Generating locales...
-  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
-360: __spawnix: Assertion `ec >=3D 0' failed.
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
- localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
-le
+And here?
 
-  I've done this same thing successfully for years, but this breakage
-  has appeared some time in the last 3 or so months. Possibly with the
-  update to qemu version 2.8.
+> +    assert(job->status == BLOCK_JOB_STATUS_CREATED);
+> +    block_job_unref(job);
+>      block_job_unref(job);
+>  }
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
+Kevin
