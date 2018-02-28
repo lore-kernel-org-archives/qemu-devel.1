@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eqtEw-00017z-Hd
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 23:21:15 -0500
+	(envelope-from <peterx@redhat.com>) id 1eqtx7-0007uv-Eb
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 00:06:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eqtEv-0000Px-JW
-	for qemu-devel@nongnu.org; Tue, 27 Feb 2018 23:21:14 -0500
-References: <20180223152640.11459-1-pbonzini@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <40eb9ea9-f539-436f-d146-1bd848ebe24d@redhat.com>
-Date: Tue, 27 Feb 2018 23:21:07 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180223152640.11459-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 0/5] atapi: change unlimited recursion
- to while loop
+	(envelope-from <peterx@redhat.com>) id 1eqtx4-0000bs-Aj
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 00:06:53 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49506 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eqtx4-0000bU-6T
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 00:06:50 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0EDD4402291E
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 05:06:47 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Wed, 28 Feb 2018 13:06:20 +0800
+Message-Id: <20180228050633.7410-2-peterx@redhat.com>
+In-Reply-To: <20180228050633.7410-1-peterx@redhat.com>
+References: <20180228050633.7410-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH 01/14] chardev: fix leak in
+ tcp_chr_telnet_init_io()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +30,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, peterx@redhat.com, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
+Need to free TCPChardevTelnetInit when session established.
 
+Since at it, switch to use G_SOURCE_* macros.
 
-On 02/23/2018 10:26 AM, Paolo Bonzini wrote:
-> Real hardware doesn't have an unlimited stack, so the unlimited
-> recursion in the ATAPI code smells a bit.  In fact, the call to
-> ide_transfer_start easily becomes a tail call with a small change
-> to the code (patch 4).  The remaining four patches move code around
-> so as to the turn the call back to ide_atapi_cmd_reply_end into
-> another tail call, and then convert the (double) tail recursion into
-> a while loop.
-> 
-> I'm not sure how this can be tested, apart from adding a READ CD
-> test to ahci-test (which I don't really have time for now, hence
-> the RFC tag).  The existing AHCI tests still pass, so patches 1-3
-> aren't complete crap.
-> 
-> Paolo
-> 
-> Paolo Bonzini (5):
->   ide: push call to end_transfer_func out of start_transfer callback
->   ide: push end_transfer callback to ide_transfer_halt
->   ide: make ide_transfer_stop idempotent
->   atapi: call ide_set_irq before ide_transfer_start
->   ide: introduce ide_transfer_start_norecurse
-> 
->  hw/ide/ahci.c             | 12 +++++++-----
->  hw/ide/atapi.c            | 37 ++++++++++++++++++++-----------------
->  hw/ide/core.c             | 37 +++++++++++++++++++++++--------------
->  include/hw/ide/internal.h |  3 +++
->  4 files changed, 53 insertions(+), 36 deletions(-)
-> 
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ chardev/char-socket.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-ACK receipt, I will get to this soon, sorry!
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index bdd6cff5f6..43a2cc2c1c 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -591,19 +591,23 @@ static gboolean tcp_chr_telnet_init_io(QIOChannel *ioc,
+             ret = 0;
+         } else {
+             tcp_chr_disconnect(init->chr);
+-            return FALSE;
++            goto end;
+         }
+     }
+     init->buflen -= ret;
+ 
+     if (init->buflen == 0) {
+         tcp_chr_connect(init->chr);
+-        return FALSE;
++        goto end;
+     }
+ 
+     memmove(init->buf, init->buf + ret, init->buflen);
+ 
+-    return TRUE;
++    return G_SOURCE_CONTINUE;
++
++end:
++    g_free(init);
++    return G_SOURCE_REMOVE;
+ }
+ 
+ static void tcp_chr_telnet_init(Chardev *chr)
+-- 
+2.14.3
