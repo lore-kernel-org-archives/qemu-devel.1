@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1er8Sr-0003Z5-Qq
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:36:39 -0500
+	(envelope-from <mjc@sifive.com>) id 1er8WL-0006zI-TW
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:40:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1er8Sq-0003on-Mw
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:36:37 -0500
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Wed, 28 Feb 2018 20:32:41 +0000
-Message-Id: <20180228203243.1413-11-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20180228203243.1413-1-mark.cave-ayland@ilande.co.uk>
-References: <20180228203243.1413-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCHv3 10/12] mac_newworld: use object link to pass
- OpenPIC object to macio
+	(envelope-from <mjc@sifive.com>) id 1er8WK-0006U2-6X
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:40:13 -0500
+Received: from mail-oi0-x232.google.com ([2607:f8b0:4003:c06::232]:37597)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1er8WJ-0006Tp-TJ
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:40:12 -0500
+Received: by mail-oi0-x232.google.com with SMTP id f186so2820156oig.4
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 12:40:11 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-kUW+cKPiwzkhLm=+3f-HnkeOCURR73JkFNtd9LE-ABA@mail.gmail.com>
+References: <1519690504-37792-1-git-send-email-mjc@sifive.com>
+	<CAFEAcA_0qNcikG2iLii=4zEPYvhz1koEbhCCrCXssdKYv06OJA@mail.gmail.com>
+	<CADJ6UvPQMDq_RES_u6WUmXHsita+On4oLu-V=emp3MnmmzjHhQ@mail.gmail.com>
+	<CAHNT7Nv04hScm7QDtJMhFZeB=WOyOQ6HW1J-xOEO11GM1xFqyA@mail.gmail.com>
+	<CAFEAcA-kUW+cKPiwzkhLm=+3f-HnkeOCURR73JkFNtd9LE-ABA@mail.gmail.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Thu, 1 Mar 2018 09:40:10 +1300
+Message-ID: <CAHNT7NuUj=cB99yDWLMw67YV=JNyXVBJJMzrTwSzNxBGNvaVCw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [patches] Re: [PULL] RISC-V QEMU Port Submission
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,155 +31,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Stef O'Rear <sorear2@gmail.com>, RISC-V Patches <patches@groups.riscv.org>, Palmer Dabbelt <palmer@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-Also switch macio_newworld_realize() over to use it rather than using the pic_mem
-memory region directly.
+On Thu, Mar 1, 2018 at 12:53 AM, Peter Maydell <peter.maydell@linaro.org>
+wrote:
 
-Now that both Old World and New World macio devices no longer make use of the
-pic_mem memory region directly, we can remove it.
+> On 28 February 2018 at 00:09, Michael Clark <mjc@sifive.com> wrote:
+> > I've just talked to SiFive about this. They have agreed that we can
+> remove
+> > the sifive_e300 and sifive_u500 boards from the patch series that we are
+> > going to submit upstream again later this week or early next week. These
+> > machines and their devices are pretty easy for us to maintain in the
+> riscv
+> > or a sifive repo. This trims the number of machines from 5 to 3 and lets
+> us
+> > remove the SiFiveUART and SiFivePRCI from the next patch series we are
+> > going to submit. e.g. v8
+>
+> Models of boards which people actively want and are using are fine
+> (though indeed you can save them for a later round of patches if you
+> like). And it sounds like the 1.9.1 stuff is genuinely wanted, so
+> thanks for the clarification there. What I want to avoid is boards
+> going into QEMU just because you happened to have them already. Once
+> a board model goes into QEMU it's a commitment to supporting it for
+> the long term, and getting rid of it again is hard.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/misc/macio/macio.c         | 14 +++++++++-----
- hw/ppc/mac_newworld.c         | 20 +++++++++++---------
- include/hw/misc/macio/macio.h |  4 +++-
- 3 files changed, 23 insertions(+), 15 deletions(-)
 
-diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-index d4c1d190c4..e5288f1084 100644
---- a/hw/misc/macio/macio.c
-+++ b/hw/misc/macio/macio.c
-@@ -279,10 +279,10 @@ static void macio_newworld_realize(PCIDevice *d, Error **errp)
-     sysbus_connect_irq(sysbus_dev, 0, ns->irqs[cur_irq++]);
-     sysbus_connect_irq(sysbus_dev, 1, ns->irqs[cur_irq++]);
- 
--    if (s->pic_mem) {
--        /* OpenPIC */
--        memory_region_add_subregion(&s->bar, 0x40000, s->pic_mem);
--    }
-+    /* OpenPIC */
-+    sysbus_dev = SYS_BUS_DEVICE(ns->pic);
-+    memory_region_add_subregion(&s->bar, 0x40000,
-+                                sysbus_mmio_get_region(sysbus_dev, 0));
- 
-     /* IDE buses */
-     for (i = 0; i < ARRAY_SIZE(ns->ide); i++) {
-@@ -311,6 +311,11 @@ static void macio_newworld_init(Object *obj)
- 
-     qdev_init_gpio_out(DEVICE(obj), ns->irqs, ARRAY_SIZE(ns->irqs));
- 
-+    object_property_add_link(obj, "pic", TYPE_OPENPIC,
-+                             (Object **) &ns->pic,
-+                             qdev_prop_allow_set_link_before_realize,
-+                             0, NULL);
-+
-     for (i = 0; i < 2; i++) {
-         macio_init_ide(s, &ns->ide[i], sizeof(ns->ide[i]), i);
-     }
-@@ -441,7 +446,6 @@ void macio_init(PCIDevice *d,
- {
-     MacIOState *macio_state = MACIO(d);
- 
--    macio_state->pic_mem = pic_mem;
-     /* Note: this code is strongly inspirated from the corresponding code
-        in PearPC */
-     qdev_prop_set_uint64(DEVICE(&macio_state->cuda), "timebase-frequency",
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index 396216954e..c7960ab67a 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -154,7 +154,7 @@ static void ppc_core99_init(MachineState *machine)
-     hwaddr kernel_base, initrd_base, cmdline_base = 0;
-     long kernel_size, initrd_size;
-     PCIBus *pci_bus;
--    PCIDevice *macio;
-+    NewWorldMacIOState *macio;
-     MACIOIDEState *macio_ide;
-     BusState *adb_bus;
-     MacIONVRAMState *nvr;
-@@ -166,7 +166,7 @@ static void ppc_core99_init(MachineState *machine)
-     void *fw_cfg;
-     int machine_arch;
-     SysBusDevice *s;
--    DeviceState *dev;
-+    DeviceState *dev, *pic_dev;
-     int *token = g_new(int, 1);
-     hwaddr nvram_addr = 0xFFF04000;
-     uint64_t tbfreq;
-@@ -333,10 +333,10 @@ static void ppc_core99_init(MachineState *machine)
- 
-     pic = g_new0(qemu_irq, 64);
- 
--    dev = qdev_create(NULL, TYPE_OPENPIC);
--    qdev_prop_set_uint32(dev, "model", OPENPIC_MODEL_KEYLARGO);
--    qdev_init_nofail(dev);
--    s = SYS_BUS_DEVICE(dev);
-+    pic_dev = qdev_create(NULL, TYPE_OPENPIC);
-+    qdev_prop_set_uint32(pic_dev, "model", OPENPIC_MODEL_KEYLARGO);
-+    qdev_init_nofail(pic_dev);
-+    s = SYS_BUS_DEVICE(pic_dev);
-     pic_mem = s->mmio[0].memory;
-     k = 0;
-     for (i = 0; i < smp_cpus; i++) {
-@@ -346,7 +346,7 @@ static void ppc_core99_init(MachineState *machine)
-     }
- 
-     for (i = 0; i < 64; i++) {
--        pic[i] = qdev_get_gpio_in(dev, i);
-+        pic[i] = qdev_get_gpio_in(pic_dev, i);
-     }
- 
-     if (PPC_INPUT(env) == PPC_FLAGS_INPUT_970) {
-@@ -369,7 +369,7 @@ static void ppc_core99_init(MachineState *machine)
-     }
- 
-     /* MacIO */
--    macio = pci_create(pci_bus, -1, TYPE_NEWWORLD_MACIO);
-+    macio = NEWWORLD_MACIO(pci_create(pci_bus, -1, TYPE_NEWWORLD_MACIO));
-     dev = DEVICE(macio);
-     qdev_connect_gpio_out(dev, 0, pic[0x19]); /* CUDA */
-     qdev_connect_gpio_out(dev, 1, pic[0x24]); /* ESCC-B */
-@@ -379,7 +379,9 @@ static void ppc_core99_init(MachineState *machine)
-     qdev_connect_gpio_out(dev, 5, pic[0x0e]); /* IDE */
-     qdev_connect_gpio_out(dev, 6, pic[0x03]); /* IDE DMA */
-     qdev_prop_set_uint64(dev, "frequency", tbfreq);
--    macio_init(macio, pic_mem);
-+    object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
-+                             &error_abort);
-+    macio_init(PCI_DEVICE(macio), pic_mem);
- 
-     /* We only emulate 2 out of 3 IDE controllers for now */
-     ide_drive_get(hd, ARRAY_SIZE(hd));
-diff --git a/include/hw/misc/macio/macio.h b/include/hw/misc/macio/macio.h
-index 843c114c07..4528282b36 100644
---- a/include/hw/misc/macio/macio.h
-+++ b/include/hw/misc/macio/macio.h
-@@ -29,6 +29,7 @@
- #include "hw/intc/heathrow_pic.h"
- #include "hw/misc/macio/cuda.h"
- #include "hw/ppc/mac_dbdma.h"
-+#include "hw/ppc/openpic.h"
- 
- #define TYPE_MACIO "macio"
- #define MACIO(obj) OBJECT_CHECK(MacIOState, (obj), TYPE_MACIO)
-@@ -42,7 +43,6 @@ typedef struct MacIOState {
-     CUDAState cuda;
-     DBDMAState dbdma;
-     ESCCState escc;
--    MemoryRegion *pic_mem;
-     uint64_t frequency;
- } MacIOState;
- 
-@@ -70,6 +70,8 @@ typedef struct NewWorldMacIOState {
-     /*< private >*/
-     MacIOState parent_obj;
-     /*< public >*/
-+
-+    OpenPICState *pic;
-     qemu_irq irqs[7];
-     MACIOIDEState ide[2];
- } NewWorldMacIOState;
--- 
-2.11.0
+Most folk in the community at large are interested in the 'spike' and
+'virt' machines. Well, the linux distributors are currently targetting
+'virt' as it has working network and block storage.
+
+It's mostly SiFive customers that are interested in the SiFive machines.
+
+SiFive do intend to submit their machines upstream however we've decided
+that we want to review the naming of the machine/board/SOC in light of
+several new models, as there are infact more MCU/SOC models than are
+currently represented in the RISC-V QEMU port (E21, E31, E51, U54, U54MC).
+Those are the SOCs and then there are boards like the HiFive1, the LoFive,
+the HiFive Unleashed and several others (the 7th RISC-V Foundation Workshop
+had an electronic badge with the FE310 designed by antmicro). SiFive might
+like to review the naming and re-jig the SOC / board relationship.
+Presently we created two generic boards to represent the MMU-less E-series
+(sifive_e300) and the U-series (sifive_u500) however that doesn't cover the
+E21 and E51. As well as silicon, there are soft-cores, including soft-cores
+from other vendors (who have not yet submitted anything to the QEMU port).
+After reflecting on this we don't think the naming of the two sifive
+machines is quite right and they are not yet complete emulations. The
+sifive_u500
+is supposed to model the HiFive Unleashed however we don't have device
+emulation for all of the hardware widgets yet, and some of the drivers are
+not yet in upstream Linux. Linus essentially accepted the generic core,
+which is what we are now suggesting for QEMU. We are totally happy to
+submit them if folk don't mind us potentially renaming them later. This is
+2 patches for 2 machines and 2 or 3 devices. It would reduce the patch
+series from 23 patches to 18 patches and we'd maintain the 5 files and
+associated headers out-of tree until things firm up. The core of the port
+is pretty solid as Fedora have build stage 4 images using SMP on the 'virt'
+machine.
+
+
+> > However I'm inclined to leave it as it is, at this point. It is not
+> > something that we can't change in the future once the code is in-tree.
+>
+> With my 'upstream dev' hat on, I tend to be suspicious of this
+> line of argument, because in a lot of cases what tends to happen
+> is that the code for some new target or device goes in-tree, and
+> then the people who worked on submitting it disappear, or never
+> actually do get round to refactoring[*]. You get more leeway for
+> making this argument the longer you've been around and participating
+> in QEMU development, because then you have a track record of
+> following up on things.
+>
+> [*] in fact we're currently discussing deleting support for
+> a couple of target architectures that were basically "once the
+> code went into mainline nothing further was ever done to it except
+> global-refactorings and other tree wide maintenance by other
+> QEMU developers".
+
+
+I might explore coalescing the two spike boards before the v8 spin then.
+
+I was thinking about using a global to enable the backwards compatibility
+mode. It seems -global is for driver properties? Is it appropriate to use a
+global property to change the behaviour of a machine?
+
+Okay, I see raspi.c contains raspi, raspi 2, raspi 3, and it just defines
+multiple machines in the same file and passes a version number to routines
+that are shared. We could go with that approach.
