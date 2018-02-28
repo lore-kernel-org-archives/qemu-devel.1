@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1er6tV-0007de-IU
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:56:02 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1er6xi-0000Qa-Qh
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:00:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1er6tS-0002MT-Gd
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:56:01 -0500
-Resent-Message-Id: <E1er6tS-0002MT-Gd@eggs.gnu.org>
-In-Reply-To: <20180228180507.3964-1-mreitz@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151984413109.1257.6148072391316912931@bdbb90650ae5>
+	(envelope-from <dgilbert@redhat.com>) id 1er6xc-0004pT-HU
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:00:22 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51260 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1er6xc-0004p3-99
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:00:16 -0500
+Date: Wed, 28 Feb 2018 19:00:03 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180228190003.GM2981@work-vm>
+References: <1519810529-4034-1-git-send-email-hejianet@gmail.com>
+	<1519810529-4034-2-git-send-email-hejianet@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 28 Feb 2018 10:55:33 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 00/16] block/mirror: Add active-sync
- mirroring
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1519810529-4034-2-git-send-email-hejianet@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] vhost: fix incorrect check in
+ vhost_verify_ring_mappings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,32 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mreitz@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.comfamz@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, jsnow@redhat.com
+To: Jia He <hejianet@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Jia He <jia.he@hxt-semitech.com>
 
-SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgZG9ja2VyLWJ1aWxkQG1pbi1nbGliIGJ1aWxkIHRlc3Qu
-IFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cu
-IElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNl
-IGl0CmxvY2FsbHkuCgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxODAyMjgxODA1MDcuMzk2
-NC0xLW1yZWl0ekByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMDAv
-MTZdIGJsb2NrL21pcnJvcjogQWRkIGFjdGl2ZS1zeW5jIG1pcnJvcmluZwoKPT09IFRFU1QgU0NS
-SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApzZXQgLWUKZ2l0IHN1Ym1vZHVsZSB1cGRhdGUgLS1p
-bml0IGR0YwojIExldCBkb2NrZXIgdGVzdHMgZHVtcCBlbnZpcm9ubWVudCBpbmZvCmV4cG9ydCBT
-SE9XX0VOVj0xCmV4cG9ydCBKPTgKdGltZSBtYWtlIGRvY2tlci10ZXN0LWJ1aWxkQG1pbi1nbGli
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0CmVycm9yOiBSUEMgZmFpbGVkOyBjdXJsIDE4IHRyYW5zZmVyIGNs
-b3NlZCB3aXRoIG91dHN0YW5kaW5nIHJlYWQgZGF0YSByZW1haW5pbmcKZmF0YWw6IFRoZSByZW1v
-dGUgZW5kIGh1bmcgdXAgdW5leHBlY3RlZGx5CmVycm9yOiBDb3VsZCBub3QgZmV0Y2ggM2M4Y2Y1
-YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApUcmFjZWJhY2sgKG1vc3QgcmVjZW50
-IGNhbGwgbGFzdCk6CiAgRmlsZSAiL3Vzci9iaW4vcGF0Y2hldyIsIGxpbmUgNDQyLCBpbiB0ZXN0
-X29uZQogICAgZ2l0X2Nsb25lX3JlcG8oY2xvbmUsIHJbInJlcG8iXSwgclsiaGVhZCJdLCBsb2dm
-KQogIEZpbGUgIi91c3IvYmluL3BhdGNoZXciLCBsaW5lIDQ4LCBpbiBnaXRfY2xvbmVfcmVwbwog
-ICAgc3Rkb3V0PWxvZ2YsIHN0ZGVycj1sb2dmKQogIEZpbGUgIi91c3IvbGliNjQvcHl0aG9uMy42
-L3N1YnByb2Nlc3MucHkiLCBsaW5lIDI5MSwgaW4gY2hlY2tfY2FsbAogICAgcmFpc2UgQ2FsbGVk
-UHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6
-IENvbW1hbmQgJ1snZ2l0JywgJ3JlbW90ZScsICdhZGQnLCAnLWYnLCAnLS1taXJyb3I9ZmV0Y2gn
-LCAnM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NCcsICdodHRwczovL2dp
-dGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBz
-dGF0dXMgMS4KCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
-W2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
-ZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+* Jia He (hejianet@gmail.com) wrote:
+> In commit 0ca1fd2d6878 ("vhost: Simplify ring verification checks"),
+> it checks the virtqueue desc mapping for 3 times.
+> 
+> Fixed: commit 0ca1fd2d6878 ("vhost: Simplify ring verification checks")
+> Signed-off-by: Jia He <jia.he@hxt-semitech.com>
+
+Oops, well spotted; copy & paste strikes again.
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  hw/virtio/vhost.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index 00f2512..bbf6c0c 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -359,7 +359,7 @@ static int vhost_verify_ring_mappings(struct vhost_dev *dev,
+>  
+>          j++;
+>          r = vhost_verify_ring_part_mapping(
+> -                vq->desc, vq->desc_phys, vq->desc_size,
+> +                vq->avail, vq->avail_phys, vq->avail_size,
+>                  reg_hva, reg_gpa, reg_size);
+>          if (r) {
+>              break;
+> @@ -367,7 +367,7 @@ static int vhost_verify_ring_mappings(struct vhost_dev *dev,
+>  
+>          j++;
+>          r = vhost_verify_ring_part_mapping(
+> -                vq->desc, vq->desc_phys, vq->desc_size,
+> +                vq->used, vq->used_phys, vq->used_size,
+>                  reg_hva, reg_gpa, reg_size);
+>          if (r) {
+>              break;
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
