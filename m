@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1er5Z2-0007dL-2p
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 12:30:49 -0500
+	(envelope-from <rkrcmar@redhat.com>) id 1er5h5-000273-Qv
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 12:39:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1er5Yy-0004AL-4c
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 12:30:48 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58494)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1er5Yx-000492-Rx
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 12:30:44 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1er5Yu-0002AE-LS
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 17:30:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8C2102E80CC
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 17:30:40 +0000 (UTC)
+	(envelope-from <rkrcmar@redhat.com>) id 1er5h2-0004Ws-Nr
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 12:39:07 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46070 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkrcmar@redhat.com>) id 1er5h2-0004WS-Hv
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 12:39:04 -0500
+Date: Wed, 28 Feb 2018 18:38:13 +0100
+From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Message-ID: <20180228173813.GA8418@flask>
+References: <1519439425-27883-1-git-send-email-babu.moger@amd.com>
+	<1519439425-27883-2-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 28 Feb 2018 17:19:13 -0000
-From: John Arbuckle <programmingkidx@gmail.com>
-Reply-To: Bug 1751494 <1751494@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151949814019.828.11043064332951500017.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151983835400.12304.10792429089946153626.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1751494] Re: tag-target.inc.c:3495:no such
- instruction: `xgetbv'
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1519439425-27883-2-git-send-email-babu.moger@amd.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/5] target/i386: Fix a minor typo found
+ while reviwing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +28,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Babu Moger <babu.moger@amd.com>
+Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, pixo@polepetko.eu, Gary.Hook@amd.com
 
-The exact commit that causes this problem is this:
+2018-02-23 21:30-0500, Babu Moger:
+> Changed KVM_CPUID_FLAG_SIGNIFCANT_INDEX to KVM_CPUID_FLAG_SIGNIFICANT_INDEX
+> 
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> ---
+>  linux-headers/asm-x86/kvm.h | 2 +-
+>  target/i386/kvm.c           | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
+> index f3a9604..6aec661 100644
+> --- a/linux-headers/asm-x86/kvm.h
+> +++ b/linux-headers/asm-x86/kvm.h
+> @@ -220,7 +220,7 @@ struct kvm_cpuid_entry2 {
+>  	__u32 padding[3];
+>  };
+>  
+> -#define KVM_CPUID_FLAG_SIGNIFCANT_INDEX		(1 << 0)
 
-commit 770c2fc7bb70804ae9869995fd02dadd6d7656ac
-tcg/i386: Add vector operations
+The typo is in the original kernel header and we periodically copy it
+over with scripts/update-linux-headers.sh, so this change would only add
+overhead in the long run.
 
--- =
+I'd keep the typo.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1751494
+(The alternative is to add KVM_CPUID_FLAG_SIGNIFICANT_INDEX to the linux
+ header, so there would be both variants and use the correct one here.)
 
-Title:
-  tag-target.inc.c:3495:no such instruction: `xgetbv'
+Thanks.
 
-Status in QEMU:
-  New
-
-Bug description:
-  While building QEMU on Mac OS 10.6.8 I saw this error message:
-  tag-target.inc.c:3495:no such instruction: `xgetbv'
-  In the file tcg/i386/tcg-target.inc.c at line 3495 is where the issue is =
-located. This is the problem code:
-  asm ("xgetbv" : "=3Da" (xcrl), "=3Dd" (xcrh) : "c" (0));
-
-  https://github.com/asmjit/asmjit/issues/78
-  According to the above link, another project also experienced this proble=
-m on Mac OS X. The fix was to replace the name of the instruction with the =
-encoded form '.byte 0x0F, 0x01, 0xd0'. =
-
-
-  Host info:
-  Mac OS 10.6.8
-  GCC 5.2.0
-
-  Additional information:
-  This may be a gcc issue. I have compiled QEMU on Mac OS 10.12 and didn't =
-experience any issues. The compiler used was Apple's clang.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1751494/+subscriptions
+> +#define KVM_CPUID_FLAG_SIGNIFICANT_INDEX	(1 << 0)
+>  #define KVM_CPUID_FLAG_STATEFUL_FUNC		(1 << 1)
+>  #define KVM_CPUID_FLAG_STATE_READ_NEXT		(1 << 2)
+>  
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index ad4b159..85856b6 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -844,7 +844,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>                      break;
+>                  }
+>                  c->function = i;
+> -                c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+> +                c->flags = KVM_CPUID_FLAG_SIGNIFICANT_INDEX;
+>                  c->index = j;
+>                  cpu_x86_cpuid(env, i, j, &c->eax, &c->ebx, &c->ecx, &c->edx);
+>  
+> -- 
+> 1.8.3.1
+> 
