@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1er90G-0001GU-1D
+	(envelope-from <brijesh.singh@amd.com>) id 1er90G-0001GV-1P
 	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1er90B-0005gy-Ay
+	(envelope-from <brijesh.singh@amd.com>) id 1er90B-0005hC-LO
 	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:07 -0500
 Received: from mail-dm3nam03on0040.outbound.protection.outlook.com
 	([104.47.41.40]:59821
 	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1er90B-0005fB-1W
+	id 1er90B-0005fB-Bc
 	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:03 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Wed, 28 Feb 2018 15:10:09 -0600
-Message-ID: <20180228211028.83970-10-brijesh.singh@amd.com>
+Date: Wed, 28 Feb 2018 15:10:10 -0600
+Message-Id: <20180228211028.83970-11-brijesh.singh@amd.com>
 In-Reply-To: <20180228211028.83970-1-brijesh.singh@amd.com>
 References: <20180228211028.83970-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v10 09/28] qmp: add query-sev command
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v10 10/28] include: add psp-sev.h header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,141 +29,167 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
 
-The QMP query command can used to retrieve the SEV information when
-memory encryption is enabled on AMD platform.
+The header file provide the ioctl command and structure to communicate
+with /dev/sev device.
 
-Cc: Eric Blake <eblake@redhat.com>
-Cc: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- monitor.c             |  7 ++++++
- qapi-schema.json      | 61 +++++++++++++++++++++++++++++++++++++++++++++++=
-++++
- target/i386/monitor.c |  8 +++++++
- 3 files changed, 76 insertions(+)
+ linux-headers/linux/psp-sev.h | 142 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 142 insertions(+)
+ create mode 100644 linux-headers/linux/psp-sev.h
 
-diff --git a/monitor.c b/monitor.c
-index d77edc4bb692..356d550aaf2d 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -983,6 +983,7 @@ static void qmp_unregister_commands_hack(void)
- #endif
- #ifndef TARGET_I386
-     qmp_unregister_command(&qmp_commands, "rtc-reset-reinjection");
-+    qmp_unregister_command(&qmp_commands, "query-sev");
- #endif
- #ifndef TARGET_S390X
-     qmp_unregister_command(&qmp_commands, "dump-skeys");
-@@ -4157,6 +4158,12 @@ void qmp_rtc_reset_reinjection(Error **errp)
- {
-     error_setg(errp, QERR_FEATURE_DISABLED, "rtc-reset-reinjection");
- }
+diff --git a/linux-headers/linux/psp-sev.h b/linux-headers/linux/psp-sev.h
+new file mode 100644
+index 000000000000..33e247471ae0
+--- /dev/null
++++ b/linux-headers/linux/psp-sev.h
+@@ -0,0 +1,142 @@
++/*
++ * Userspace interface for AMD Secure Encrypted Virtualization (SEV)
++ * platform management commands.
++ *
++ * Copyright (C) 2016-2017 Advanced Micro Devices, Inc.
++ *
++ * Author: Brijesh Singh <brijesh.singh@amd.com>
++ *
++ * SEV spec 0.14 is available at:
++ * http://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pdf
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
 +
-+SevInfo *qmp_query_sev(Error **errp)
-+{
-+    error_setg(errp, QERR_FEATURE_DISABLED, "query-sev");
-+    return NULL;
-+}
- #endif
-=20
- #ifndef TARGET_S390X
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 0262b9f20bc6..467a06460ead 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -3189,3 +3189,64 @@
- # Since: 2.11
- ##
- { 'command': 'watchdog-set-action', 'data' : {'action': 'WatchdogAction'} =
-}
++#ifndef __PSP_SEV_USER_H__
++#define __PSP_SEV_USER_H__
 +
-+##
-+# @SevState:
-+#
-+# An enumeration of SEV state information used during @query-sev.
-+#
-+# Since: 2.12
-+##
-+{ 'enum': 'SevState',
-+  'data': ['uninit', 'lupdate', 'lsecret', 'running', 'supdate', 'rupdate'=
- ] }
++#include <linux/types.h>
 +
-+##
-+# @SevInfo:
-+#
-+# Information about Secure Encrypted Virtualization (SEV) support
-+#
-+# @enabled: true if SEV is active
-+#
-+# @api-major: SEV API major version
-+#
-+# @api-minor: SEV API minor version
-+#
-+# @build-id: SEV FW build id
-+#
-+# @policy: SEV policy value
-+#
-+# @state: SEV guest state
-+#
-+# @handle: SEV firmware handle
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'SevInfo',
-+    'data': { 'enabled': 'bool',
-+              'api-major': 'uint8',
-+              'api-minor' : 'uint8',
-+              'build-id' : 'uint8',
-+              'policy' : 'uint32',
-+              'state' : 'SevState',
-+              'handle' : 'uint32'
-+            }
-+}
++/**
++ * SEV platform commands
++ */
++enum {
++	SEV_FACTORY_RESET = 0,
++	SEV_PLATFORM_STATUS,
++	SEV_PEK_GEN,
++	SEV_PEK_CSR,
++	SEV_PDH_GEN,
++	SEV_PDH_CERT_EXPORT,
++	SEV_PEK_CERT_IMPORT,
 +
-+##
-+# @query-sev:
-+#
-+# Returns information about SEV
-+#
-+# Returns: @SevInfo
-+#
-+# Since: 2.12
-+#
-+# Example:
-+#
-+# -> { "execute": "query-sev" }
-+# <- { "return": { "enabled": true, "api-major" : 0, "api-minor" : 0,
-+#                  "build-id" : 0, "policy" : 0, "state" : "running",
-+#                  "handle" : 1 } }
-+#
-+##
-+{ 'command': 'query-sev', 'returns': 'SevInfo' }
-diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-index 55ea10deb8ef..f429b1fc5383 100644
---- a/target/i386/monitor.c
-+++ b/target/i386/monitor.c
-@@ -30,6 +30,8 @@
- #include "hw/i386/pc.h"
- #include "sysemu/kvm.h"
- #include "hmp.h"
-+#include "sev_i386.h"
-+#include "qmp-commands.h"
-=20
-=20
- static void print_pte(Monitor *mon, CPUArchState *env, hwaddr addr,
-@@ -665,3 +667,9 @@ void hmp_info_io_apic(Monitor *mon, const QDict *qdict)
-         ioapic_dump_state(mon, qdict);
-     }
- }
++	SEV_MAX,
++};
 +
-+SevInfo *qmp_query_sev(Error **errp)
-+{
-+    error_setg(errp, "SEV feature is not available");
-+    return NULL;
-+}
---=20
++/**
++ * SEV Firmware status code
++ */
++typedef enum {
++	SEV_RET_SUCCESS = 0,
++	SEV_RET_INVALID_PLATFORM_STATE,
++	SEV_RET_INVALID_GUEST_STATE,
++	SEV_RET_INAVLID_CONFIG,
++	SEV_RET_INVALID_LEN,
++	SEV_RET_ALREADY_OWNED,
++	SEV_RET_INVALID_CERTIFICATE,
++	SEV_RET_POLICY_FAILURE,
++	SEV_RET_INACTIVE,
++	SEV_RET_INVALID_ADDRESS,
++	SEV_RET_BAD_SIGNATURE,
++	SEV_RET_BAD_MEASUREMENT,
++	SEV_RET_ASID_OWNED,
++	SEV_RET_INVALID_ASID,
++	SEV_RET_WBINVD_REQUIRED,
++	SEV_RET_DFFLUSH_REQUIRED,
++	SEV_RET_INVALID_GUEST,
++	SEV_RET_INVALID_COMMAND,
++	SEV_RET_ACTIVE,
++	SEV_RET_HWSEV_RET_PLATFORM,
++	SEV_RET_HWSEV_RET_UNSAFE,
++	SEV_RET_UNSUPPORTED,
++	SEV_RET_MAX,
++} sev_ret_code;
++
++/**
++ * struct sev_user_data_status - PLATFORM_STATUS command parameters
++ *
++ * @major: major API version
++ * @minor: minor API version
++ * @state: platform state
++ * @flags: platform config flags
++ * @build: firmware build id for API version
++ * @guest_count: number of active guests
++ */
++struct sev_user_data_status {
++	__u8 api_major;				/* Out */
++	__u8 api_minor;				/* Out */
++	__u8 state;				/* Out */
++	__u32 flags;				/* Out */
++	__u8 build;				/* Out */
++	__u32 guest_count;			/* Out */
++} __attribute__((packed));
++
++/**
++ * struct sev_user_data_pek_csr - PEK_CSR command parameters
++ *
++ * @address: PEK certificate chain
++ * @length: length of certificate
++ */
++struct sev_user_data_pek_csr {
++	__u64 address;				/* In */
++	__u32 length;				/* In/Out */
++} __attribute__((packed));
++
++/**
++ * struct sev_user_data_cert_import - PEK_CERT_IMPORT command parameters
++ *
++ * @pek_address: PEK certificate chain
++ * @pek_len: length of PEK certificate
++ * @oca_address: OCA certificate chain
++ * @oca_len: length of OCA certificate
++ */
++struct sev_user_data_pek_cert_import {
++	__u64 pek_cert_address;			/* In */
++	__u32 pek_cert_len;			/* In */
++	__u64 oca_cert_address;			/* In */
++	__u32 oca_cert_len;			/* In */
++} __attribute__((packed));
++
++/**
++ * struct sev_user_data_pdh_cert_export - PDH_CERT_EXPORT command parameters
++ *
++ * @pdh_address: PDH certificate address
++ * @pdh_len: length of PDH certificate
++ * @cert_chain_address: PDH certificate chain
++ * @cert_chain_len: length of PDH certificate chain
++ */
++struct sev_user_data_pdh_cert_export {
++	__u64 pdh_cert_address;			/* In */
++	__u32 pdh_cert_len;			/* In/Out */
++	__u64 cert_chain_address;		/* In */
++	__u32 cert_chain_len;			/* In/Out */
++} __attribute__((packed));
++
++/**
++ * struct sev_issue_cmd - SEV ioctl parameters
++ *
++ * @cmd: SEV commands to execute
++ * @opaque: pointer to the command structure
++ * @error: SEV FW return code on failure
++ */
++struct sev_issue_cmd {
++	__u32 cmd;				/* In */
++	__u64 data;				/* In */
++	__u32 error;				/* Out */
++} __attribute__((packed));
++
++#define SEV_IOC_TYPE		'S'
++#define SEV_ISSUE_CMD	_IOWR(SEV_IOC_TYPE, 0x0, struct sev_issue_cmd)
++
++#endif /* __PSP_USER_SEV_H */
+-- 
 2.14.3
