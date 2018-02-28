@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1er0tK-0002Xb-Pm
+	(envelope-from <kernellwp@gmail.com>) id 1er0tL-0002Y6-M0
 	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:31:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1er0tF-0000U4-PM
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:31:26 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37226 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1er0tF-0000Td-Jp
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:31:21 -0500
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 28 Feb 2018 13:31:09 +0100
-Message-Id: <20180228123110.6507-9-kraxel@redhat.com>
-In-Reply-To: <20180228123110.6507-1-kraxel@redhat.com>
-References: <20180228123110.6507-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 8/9] vfio/display: adding region support
+	(envelope-from <kernellwp@gmail.com>) id 1er0tK-0000Z9-0L
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:31:27 -0500
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:33237)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1er0tJ-0000YO-Rm
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 07:31:25 -0500
+Received: by mail-oi0-x242.google.com with SMTP id j81so1634043oia.0
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 04:31:25 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <1518185725-69559-1-git-send-email-wanpengli@tencent.com>
+References: <1518185725-69559-1-git-send-email-wanpengli@tencent.com>
+From: Wanpeng Li <kernellwp@gmail.com>
+Date: Wed, 28 Feb 2018 20:31:24 +0800
+Message-ID: <CANRm+CyaGM+SnFo_iQv2whFb_2p3F3k=pCABzQXBCA9auwqqXQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] target-i386: add KVM_HINTS_DEDICATED
+ performance hint
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,187 +29,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alex Williamson <alex.williamson@redhat.com>, Tina Zhang <tina.zhang@intel.com>, intel-gvt-dev@lists.freedesktop.org, Kirti Wankhede <kwankhede@nvidia.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: kvm <kvm@vger.kernel.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-Wire up region-based display.
-
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/vfio/pci.h                 |   1 +
- include/hw/vfio/vfio-common.h |   8 +++
- hw/vfio/display.c             | 116 +++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 123 insertions(+), 2 deletions(-)
-
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index a846cf6237..629c875701 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -148,6 +148,7 @@ typedef struct VFIOPCIDevice {
-     bool no_kvm_msi;
-     bool no_kvm_msix;
-     bool no_geforce_quirks;
-+    VFIODisplay *dpy;
- } VFIOPCIDevice;
- 
- uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len);
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index f3a2ac9fee..fc8ae14fb7 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -142,6 +142,14 @@ typedef struct VFIOGroup {
-     QLIST_ENTRY(VFIOGroup) container_next;
- } VFIOGroup;
- 
-+typedef struct VFIODisplay {
-+    QemuConsole *con;
-+    struct {
-+        VFIORegion buffer;
-+        DisplaySurface *surface;
-+    } region;
-+} VFIODisplay;
-+
- void vfio_put_base_device(VFIODevice *vbasedev);
- void vfio_disable_irqindex(VFIODevice *vbasedev, int index);
- void vfio_unmask_single_irqindex(VFIODevice *vbasedev, int index);
-diff --git a/hw/vfio/display.c b/hw/vfio/display.c
-index 3e997f8a44..f6acbacc79 100644
---- a/hw/vfio/display.c
-+++ b/hw/vfio/display.c
-@@ -19,6 +19,113 @@
- #include "qapi/error.h"
- #include "pci.h"
- 
-+/* ---------------------------------------------------------------------- */
-+
-+static void vfio_display_region_update(void *opaque)
-+{
-+    VFIOPCIDevice *vdev = opaque;
-+    VFIODisplay *dpy = vdev->dpy;
-+    struct vfio_device_gfx_plane_info plane = {
-+        .argsz = sizeof(plane),
-+        .flags = VFIO_GFX_PLANE_TYPE_REGION
-+    };
-+    pixman_format_code_t format;
-+    int ret;
-+
-+    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_QUERY_GFX_PLANE, &plane);
-+    if (ret < 0) {
-+        error_report("ioctl VFIO_DEVICE_QUERY_GFX_PLANE: %s",
-+                     strerror(errno));
-+        return;
-+    }
-+    if (!plane.drm_format || !plane.size) {
-+        return;
-+    }
-+    format = qemu_drm_format_to_pixman(plane.drm_format);
-+    if (!format) {
-+        return;
-+    }
-+
-+    if (dpy->region.buffer.size &&
-+        dpy->region.buffer.nr != plane.region_index) {
-+        /* region changed */
-+        vfio_region_exit(&dpy->region.buffer);
-+        vfio_region_finalize(&dpy->region.buffer);
-+        dpy->region.surface = NULL;
-+    }
-+
-+    if (dpy->region.surface &&
-+        (surface_width(dpy->region.surface) != plane.width ||
-+         surface_height(dpy->region.surface) != plane.height ||
-+         surface_format(dpy->region.surface) != format)) {
-+        /* size changed */
-+        dpy->region.surface = NULL;
-+    }
-+
-+    if (!dpy->region.buffer.size) {
-+        /* mmap region */
-+        ret = vfio_region_setup(OBJECT(vdev), &vdev->vbasedev,
-+                                &dpy->region.buffer,
-+                                plane.region_index,
-+                                "display");
-+        if (ret != 0) {
-+            error_report("%s: vfio_region_setup(%d): %s",
-+                         __func__, plane.region_index, strerror(-ret));
-+            goto err;
-+        }
-+        ret = vfio_region_mmap(&dpy->region.buffer);
-+        if (ret != 0) {
-+            error_report("%s: vfio_region_mmap(%d): %s", __func__,
-+                         plane.region_index, strerror(-ret));
-+            goto err;
-+        }
-+        assert(dpy->region.buffer.mmaps[0].mmap != NULL);
-+    }
-+
-+    if (dpy->region.surface == NULL) {
-+        /* create surface */
-+        dpy->region.surface = qemu_create_displaysurface_from
-+            (plane.width, plane.height, format,
-+             plane.stride, dpy->region.buffer.mmaps[0].mmap);
-+        dpy_gfx_replace_surface(dpy->con, dpy->region.surface);
-+    }
-+
-+    /* full screen update */
-+    dpy_gfx_update(dpy->con, 0, 0,
-+                   surface_width(dpy->region.surface),
-+                   surface_height(dpy->region.surface));
-+    return;
-+
-+err:
-+    vfio_region_exit(&dpy->region.buffer);
-+    vfio_region_finalize(&dpy->region.buffer);
-+}
-+
-+static const GraphicHwOps vfio_display_region_ops = {
-+    .gfx_update = vfio_display_region_update,
-+};
-+
-+static int vfio_display_region_init(VFIOPCIDevice *vdev, Error **errp)
-+{
-+    vdev->dpy = g_new0(VFIODisplay, 1);
-+    vdev->dpy->con = graphic_console_init(DEVICE(vdev), 0,
-+                                          &vfio_display_region_ops,
-+                                          vdev);
-+    return 0;
-+}
-+
-+static void vfio_display_region_exit(VFIODisplay *dpy)
-+{
-+    if (!dpy->region.buffer.size) {
-+        return;
-+    }
-+
-+    vfio_region_exit(&dpy->region.buffer);
-+    vfio_region_finalize(&dpy->region.buffer);
-+}
-+
-+/* ---------------------------------------------------------------------- */
-+
- int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp)
- {
-     struct vfio_device_gfx_plane_info probe;
-@@ -38,8 +145,7 @@ int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp)
-     probe.flags = VFIO_GFX_PLANE_TYPE_PROBE | VFIO_GFX_PLANE_TYPE_REGION;
-     ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_QUERY_GFX_PLANE, &probe);
-     if (ret == 0) {
--        error_setg(errp, "vfio-display: region support not implemented yet");
--        return -1;
-+        return vfio_display_region_init(vdev, errp);
-     }
- 
-     if (vdev->display == ON_OFF_AUTO_AUTO) {
-@@ -53,4 +159,10 @@ int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp)
- 
- void vfio_display_finalize(VFIOPCIDevice *vdev)
- {
-+    if (!vdev->dpy)
-+        return;
-+
-+    graphic_console_close(vdev->dpy->con);
-+    vfio_display_region_exit(vdev->dpy);
-+    g_free(vdev->dpy);
- }
--- 
-2.9.3
+Ping,
+2018-02-09 22:15 GMT+08:00 Wanpeng Li <kernellwp@gmail.com>:
+> From: Wanpeng Li <wanpengli@tencent.com>
+>
+> Add KVM_HINTS_DEDICATED performance hint, guest checks this feature bit
+> to determine if they run on dedicated vCPUs, allowing optimizations such
+> as usage of qspinlocks.
+>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+> v1 -> v2:
+>  * add a new feature word
+>
+>  target/i386/cpu.c | 14 ++++++++++++++
+>  target/i386/cpu.h |  3 +++
+>  target/i386/kvm.c |  4 ++++
+>  3 files changed, 21 insertions(+)
+>
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index d70954b..e2974ad 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -358,6 +358,20 @@ static FeatureWordInfo feature_word_info[FEATURE_WOR=
+DS] =3D {
+>          .cpuid_eax =3D KVM_CPUID_FEATURES, .cpuid_reg =3D R_EAX,
+>          .tcg_features =3D TCG_KVM_FEATURES,
+>      },
+> +    [FEAT_KVM_HINTS] =3D {
+> +        .feat_names =3D {
+> +            "hint-dedicated", NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +        },
+> +        .cpuid_eax =3D KVM_CPUID_FEATURES, .cpuid_reg =3D R_EDX,
+> +        .tcg_features =3D TCG_KVM_FEATURES,
+> +    },
+>      [FEAT_HYPERV_EAX] =3D {
+>          .feat_names =3D {
+>              NULL /* hv_msr_vp_runtime_access */, NULL /* hv_msr_time_ref=
+count_access */,
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index f91e37d..9f73692 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -475,6 +475,7 @@ typedef enum FeatureWord {
+>      FEAT_8000_0008_EBX, /* CPUID[8000_0008].EBX */
+>      FEAT_C000_0001_EDX, /* CPUID[C000_0001].EDX */
+>      FEAT_KVM,           /* CPUID[4000_0001].EAX (KVM_CPUID_FEATURES) */
+> +    FEAT_KVM_HINTS,     /* CPUID[4000_0001].EDX */
+>      FEAT_HYPERV_EAX,    /* CPUID[4000_0003].EAX */
+>      FEAT_HYPERV_EBX,    /* CPUID[4000_0003].EBX */
+>      FEAT_HYPERV_EDX,    /* CPUID[4000_0003].EDX */
+> @@ -670,6 +671,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+>  #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumul=
+ation Single Precision */
+>  #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
+>
+> +#define KVM_HINTS_DEDICATED (1U << 0)
+> +
+>  #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Predic=
+tion Barrier */
+>
+>  #define CPUID_XSAVE_XSAVEOPT   (1U << 0)
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index ad4b159..44ee524 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -383,6 +383,9 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, ui=
+nt32_t function,
+>          if (!kvm_irqchip_in_kernel()) {
+>              ret &=3D ~(1U << KVM_FEATURE_PV_UNHALT);
+>          }
+> +    } else if (function =3D=3D KVM_CPUID_FEATURES && reg =3D=3D R_EDX) {
+> +        ret |=3D KVM_HINTS_DEDICATED;
+> +        found =3D 1;
+>      }
+>
+>      /* fallback for older kernels */
+> @@ -801,6 +804,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>          c =3D &cpuid_data.entries[cpuid_i++];
+>          c->function =3D KVM_CPUID_FEATURES | kvm_base;
+>          c->eax =3D env->features[FEAT_KVM];
+> +        c->edx =3D env->features[FEAT_KVM_HINTS];
+>      }
+>
+>      cpu_x86_cpuid(env, 0, 0, &limit, &unused, &unused, &unused);
+> --
+> 2.7.4
+>
