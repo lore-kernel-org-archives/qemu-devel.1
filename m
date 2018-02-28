@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1er6KY-00081l-DA
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:19:55 -0500
+	(envelope-from <stefanha@redhat.com>) id 1er6KZ-00082o-Cw
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:19:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1er6KX-0000hG-Fx
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:19:54 -0500
+	(envelope-from <stefanha@redhat.com>) id 1er6KY-0000i5-E2
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:19:55 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed, 28 Feb 2018 18:19:43 +0000
-Message-Id: <20180228181946.22958-2-stefanha@redhat.com>
+Date: Wed, 28 Feb 2018 18:19:44 +0000
+Message-Id: <20180228181946.22958-3-stefanha@redhat.com>
 In-Reply-To: <20180228181946.22958-1-stefanha@redhat.com>
 References: <20180228181946.22958-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/4] block: add aio_wait_bh_oneshot()
+Subject: [Qemu-devel] [PATCH v2 2/4] virtio-blk: fix race between
+ .ioeventfd_stop() and vq handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,76 +23,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-Sometimes it's necessary for the main loop thread to run a BH in an
-IOThread and wait for its completion.  This primitive is useful during
-startup/shutdown to synchronize and avoid race conditions.
+If the main loop thread invokes .ioeventfd_stop() just as the vq handler
+function begins in the IOThread then the handler may lose the race for
+the AioContext lock.  By the time the vq handler is able to acquire the
+AioContext lock the ioeventfd has already been removed and the handler
+isn't supposed to run anymore!
+
+Use the new aio_wait_bh_oneshot() function to perform ioeventfd removal
+from within the IOThread.  This way no races with the vq handler are
+possible.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/block/aio-wait.h | 13 +++++++++++++
- util/aio-wait.c          | 31 +++++++++++++++++++++++++++++++
- 2 files changed, 44 insertions(+)
+ hw/block/dataplane/virtio-blk.c | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
 
-diff --git a/include/block/aio-wait.h b/include/block/aio-wait.h
-index a48c744fa8..f7a3972200 100644
---- a/include/block/aio-wait.h
-+++ b/include/block/aio-wait.h
-@@ -113,4 +113,17 @@ typedef struct {
-  */
- void aio_wait_kick(AioWait *wait);
- 
-+/**
-+ * aio_wait_bh_oneshot:
-+ * @ctx: the aio context
-+ * @cb: the BH callback function
-+ * @opaque: user data for the BH callback function
-+ *
-+ * Run a BH in @ctx and wait for it to complete.
-+ *
-+ * Must be called from the main loop thread with @ctx acquired exactly once.
-+ * Note that main loop event processing may occur.
-+ */
-+void aio_wait_bh_oneshot(AioContext *ctx, QEMUBHFunc *cb, void *opaque);
-+
- #endif /* QEMU_AIO_WAIT */
-diff --git a/util/aio-wait.c b/util/aio-wait.c
-index a487cdb852..975afddf4c 100644
---- a/util/aio-wait.c
-+++ b/util/aio-wait.c
-@@ -38,3 +38,34 @@ void aio_wait_kick(AioWait *wait)
-         aio_bh_schedule_oneshot(qemu_get_aio_context(), dummy_bh_cb, NULL);
-     }
+diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-blk.c
+index 2cb990997e..d3bb09bc4e 100644
+--- a/hw/block/dataplane/virtio-blk.c
++++ b/hw/block/dataplane/virtio-blk.c
+@@ -229,6 +229,22 @@ int virtio_blk_data_plane_start(VirtIODevice *vdev)
+     return -ENOSYS;
  }
-+
-+typedef struct {
-+    AioWait wait;
-+    bool done;
-+    QEMUBHFunc *cb;
-+    void *opaque;
-+} AioWaitBHData;
-+
-+/* Context: BH in IOThread */
-+static void aio_wait_bh(void *opaque)
+ 
++/* Stop notifications for new requests from guest.
++ *
++ * Context: BH in IOThread
++ */
++static void virtio_blk_data_plane_stop_bh(void *opaque)
 +{
-+    AioWaitBHData *data = opaque;
++    VirtIOBlockDataPlane *s = opaque;
++    unsigned i;
 +
-+    data->cb(data->opaque);
++    for (i = 0; i < s->conf->num_queues; i++) {
++        VirtQueue *vq = virtio_get_queue(s->vdev, i);
 +
-+    data->done = true;
-+    aio_wait_kick(&data->wait);
++        virtio_queue_aio_set_host_notifier_handler(vq, s->ctx, NULL);
++    }
 +}
 +
-+void aio_wait_bh_oneshot(AioContext *ctx, QEMUBHFunc *cb, void *opaque)
-+{
-+    AioWaitBHData data = {
-+        .cb = cb,
-+        .opaque = opaque,
-+    };
-+
-+    assert(qemu_get_current_aio_context() == qemu_get_aio_context());
-+
-+    aio_bh_schedule_oneshot(ctx, aio_wait_bh, &data);
-+    AIO_WAIT_WHILE(&data.wait, ctx, !data.done);
-+}
+ /* Context: QEMU global mutex held */
+ void virtio_blk_data_plane_stop(VirtIODevice *vdev)
+ {
+@@ -253,13 +269,7 @@ void virtio_blk_data_plane_stop(VirtIODevice *vdev)
+     trace_virtio_blk_data_plane_stop(s);
+ 
+     aio_context_acquire(s->ctx);
+-
+-    /* Stop notifications for new requests from guest */
+-    for (i = 0; i < nvqs; i++) {
+-        VirtQueue *vq = virtio_get_queue(s->vdev, i);
+-
+-        virtio_queue_aio_set_host_notifier_handler(vq, s->ctx, NULL);
+-    }
++    aio_wait_bh_oneshot(s->ctx, virtio_blk_data_plane_stop_bh, s);
+ 
+     /* Drain and switch bs back to the QEMU main loop */
+     blk_set_aio_context(s->conf->conf.blk, qemu_get_aio_context());
 -- 
 2.14.3
