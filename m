@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1er908-000182-0c
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:01 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1er90A-0001CI-G5
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1er903-0005Qt-Oq
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:10:59 -0500
-Received: from mail-dm3nam03on0050.outbound.protection.outlook.com
-	([104.47.41.50]:20864
-	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
+	(envelope-from <brijesh.singh@amd.com>) id 1er906-0005Yk-Bu
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:11:02 -0500
+Received: from mail-sn1nam02on0055.outbound.protection.outlook.com
+	([104.47.36.55]:37280
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1er903-0005Oa-Dx
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:10:55 -0500
+	id 1er905-0005WK-SP
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 16:10:58 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Wed, 28 Feb 2018 15:10:02 -0600
-Message-Id: <20180228211028.83970-3-brijesh.singh@amd.com>
+Date: Wed, 28 Feb 2018 15:10:04 -0600
+Message-Id: <20180228211028.83970-5-brijesh.singh@amd.com>
 In-Reply-To: <20180228211028.83970-1-brijesh.singh@amd.com>
 References: <20180228211028.83970-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v10 02/28] exec: add ram_debug_ops support
+Subject: [Qemu-devel] [PATCH v10 04/28] monitor/i386: use debug APIs when
+ accessing guest memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,202 +32,365 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
 
-Currently, the guest memory access for the debug purpose is performed
-using the memcpy(). Lets extend the 'struct MemoryRegion' to include
-ram_debug_ops callbacks. The ram_debug_ops can be used to override
-memcpy() with something else.
-
-The feature can be used by encrypted guest -- which can register
-callbacks to override memcpy() with memory encryption/decryption APIs.
-
-a typical usage:
-
-mem_read(uint8_t *dst, uint8_t *src, uint32_t len, MemTxAttrs *attrs);
-mem_write(uint8_t *dst, uint8_t *src, uint32_t len, MemTxAttrs *attrs);
-
-MemoryRegionRAMReadWriteOps ops;
-ops.read = mem_read;
-ops.write = mem_write;
-
-memory_region_init_ram(mem, NULL, "memory", size, NULL);
-memory_region_set_ram_debug_ops(mem, ops);
+Updates HMP commands to use the debug version of APIs when accessing the
+guest memory.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
 Cc: Richard Henderson <rth@twiddle.net>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- exec.c                | 43 ++++++++++++++++++++++++++++++++-----------
- include/exec/memory.h | 30 +++++++++++++++++++++++++++++-
- 2 files changed, 61 insertions(+), 12 deletions(-)
+ cpus.c                |  2 +-
+ disas.c               |  2 +-
+ monitor.c             |  6 +++---
+ target/i386/helper.c  | 14 ++++++------
+ target/i386/monitor.c | 60 +++++++++++++++++++++++++++------------------------
+ 5 files changed, 44 insertions(+), 40 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index 4d8addb263a0..4408cd26c989 100644
---- a/exec.c
-+++ b/exec.c
-@@ -3054,7 +3054,11 @@ static MemTxResult flatview_write_continue(FlatView *fv, hwaddr addr,
-         } else {
-             /* RAM case */
-             ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l, false);
--            memcpy(ptr, buf, l);
-+            if (attrs.debug && mr->ram_debug_ops) {
-+                mr->ram_debug_ops->write(ptr, buf, l, attrs);
-+            } else {
-+                memcpy(ptr, buf, l);
-+            }
-             invalidate_and_set_dirty(mr, addr1, l);
-         }
- 
-@@ -3152,7 +3156,11 @@ MemTxResult flatview_read_continue(FlatView *fv, hwaddr addr,
-         } else {
-             /* RAM case */
-             ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l, false);
--            memcpy(buf, ptr, l);
-+            if (attrs.debug && mr->ram_debug_ops) {
-+                mr->ram_debug_ops->read(buf, ptr, l, attrs);
-+            } else {
-+                memcpy(buf, ptr, l);
-+            }
-         }
- 
-         if (release_lock) {
-@@ -3226,7 +3234,8 @@ enum write_rom_type {
- };
- 
- static inline void cpu_physical_memory_write_rom_internal(AddressSpace *as,
--    hwaddr addr, const uint8_t *buf, int len, enum write_rom_type type)
-+    hwaddr addr, const uint8_t *buf, int len, MemTxAttrs attrs,
-+    enum write_rom_type type)
+diff --git a/cpus.c b/cpus.c
+index f298b659f467..fdd40d9e8ead 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -2214,7 +2214,7 @@ void qmp_pmemsave(int64_t addr, int64_t size, const char *filename,
+         l = sizeof(buf);
+         if (l > size)
+             l = size;
+-        cpu_physical_memory_read(addr, buf, l);
++        cpu_physical_memory_read_debug(addr, buf, l);
+         if (fwrite(buf, 1, l, f) != l) {
+             error_setg(errp, QERR_IO_ERROR);
+             goto exit;
+diff --git a/disas.c b/disas.c
+index d4ad1089efb3..fcedbf263302 100644
+--- a/disas.c
++++ b/disas.c
+@@ -586,7 +586,7 @@ static int
+ physical_read_memory(bfd_vma memaddr, bfd_byte *myaddr, int length,
+                      struct disassemble_info *info)
  {
-     hwaddr l;
-     uint8_t *ptr;
-@@ -3246,7 +3255,11 @@ static inline void cpu_physical_memory_write_rom_internal(AddressSpace *as,
-             ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
-             switch (type) {
-             case WRITE_DATA:
--                memcpy(ptr, buf, l);
-+                if (mr->ram_debug_ops) {
-+                    mr->ram_debug_ops->write(ptr, buf, l, attrs);
-+                } else {
-+                    memcpy(ptr, buf, l);
-+                }
-                 invalidate_and_set_dirty(mr, addr1, l);
-                 break;
-             case FLUSH_CACHE:
-@@ -3265,7 +3278,9 @@ static inline void cpu_physical_memory_write_rom_internal(AddressSpace *as,
- void cpu_physical_memory_write_rom(AddressSpace *as, hwaddr addr,
-                                    const uint8_t *buf, int len)
- {
--    cpu_physical_memory_write_rom_internal(as, addr, buf, len, WRITE_DATA);
-+    cpu_physical_memory_write_rom_internal(as, addr, buf, len,
-+                                           MEMTXATTRS_UNSPECIFIED,
-+                                           WRITE_DATA);
+-    cpu_physical_memory_read(memaddr, myaddr, length);
++    cpu_physical_memory_read_debug(memaddr, myaddr, length);
+     return 0;
  }
  
- void cpu_flush_icache_range(hwaddr start, int len)
-@@ -3280,8 +3295,9 @@ void cpu_flush_icache_range(hwaddr start, int len)
-         return;
-     }
+diff --git a/monitor.c b/monitor.c
+index 373bb8d1c371..d77edc4bb692 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1361,7 +1361,7 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
+         if (l > line_size)
+             l = line_size;
+         if (is_physical) {
+-            cpu_physical_memory_read(addr, buf, l);
++            cpu_physical_memory_read_debug(addr, buf, l);
+         } else {
+             if (cpu_memory_rw_debug(cs, addr, buf, l, 0) < 0) {
+                 monitor_printf(mon, " Cannot access memory\n");
+@@ -1567,8 +1567,8 @@ static void hmp_sum(Monitor *mon, const QDict *qdict)
  
--    cpu_physical_memory_write_rom_internal(&address_space_memory,
--                                           start, NULL, len, FLUSH_CACHE);
-+    cpu_physical_memory_write_rom_internal(&address_space_memory, start, NULL,
-+                                           len, MEMTXATTRS_UNSPECIFIED,
-+                                           FLUSH_CACHE);
- }
+     sum = 0;
+     for(addr = start; addr < (start + size); addr++) {
+-        uint8_t val = address_space_ldub(&address_space_memory, addr,
+-                                         MEMTXATTRS_UNSPECIFIED, NULL);
++        uint8_t val;
++        cpu_physical_memory_read_debug(addr, &val, 1);
+         /* BSD sum algorithm ('sum' Unix command) */
+         sum = (sum >> 1) | (sum << 15);
+         sum += val;
+diff --git a/target/i386/helper.c b/target/i386/helper.c
+index 9fba146b7fb0..58fb6eec562a 100644
+--- a/target/i386/helper.c
++++ b/target/i386/helper.c
+@@ -757,7 +757,7 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+             if (la57) {
+                 pml5e_addr = ((env->cr[3] & ~0xfff) +
+                         (((addr >> 48) & 0x1ff) << 3)) & a20_mask;
+-                pml5e = x86_ldq_phys(cs, pml5e_addr);
++                pml5e = ldq_phys_debug(cs, pml5e_addr);
+                 if (!(pml5e & PG_PRESENT_MASK)) {
+                     return -1;
+                 }
+@@ -767,7 +767,7 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
  
- typedef struct {
-@@ -3596,6 +3612,10 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
-         page = addr & TARGET_PAGE_MASK;
-         phys_addr = cpu_get_phys_page_attrs_debug(cpu, page, &attrs);
-         asidx = cpu_asidx_from_attrs(cpu, attrs);
-+
-+        /* set debug attrs to indicate memory access is from the debugger */
-+        attrs.debug = 1;
-+
-         /* if no physical page mapped, return an error */
-         if (phys_addr == -1)
+             pml4e_addr = ((pml5e & PG_ADDRESS_MASK) +
+                     (((addr >> 39) & 0x1ff) << 3)) & a20_mask;
+-            pml4e = x86_ldq_phys(cs, pml4e_addr);
++            pml4e = ldq_phys_debug(cs, pml4e_addr);
+             if (!(pml4e & PG_PRESENT_MASK)) {
+                 return -1;
+             }
+@@ -788,14 +788,14 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+         {
+             pdpe_addr = ((env->cr[3] & ~0x1f) + ((addr >> 27) & 0x18)) &
+                 a20_mask;
+-            pdpe = x86_ldq_phys(cs, pdpe_addr);
++            pdpe = ldq_phys_debug(cs, pdpe_addr);
+             if (!(pdpe & PG_PRESENT_MASK))
+                 return -1;
+         }
+ 
+         pde_addr = ((pdpe & PG_ADDRESS_MASK) +
+                     (((addr >> 21) & 0x1ff) << 3)) & a20_mask;
+-        pde = x86_ldq_phys(cs, pde_addr);
++        pde = ldq_phys_debug(cs, pde_addr);
+         if (!(pde & PG_PRESENT_MASK)) {
              return -1;
-@@ -3604,13 +3624,14 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
-             l = len;
-         phys_addr += (addr & ~TARGET_PAGE_MASK);
-         if (is_write) {
--            cpu_physical_memory_write_rom(cpu->cpu_ases[asidx].as,
--                                          phys_addr, buf, l);
-+            cpu_physical_memory_write_rom_internal(cpu->cpu_ases[asidx].as,
-+                                                   phys_addr, buf, l, attrs,
-+                                                   WRITE_DATA);
-         } else {
-             address_space_rw(cpu->cpu_ases[asidx].as, phys_addr,
--                             MEMTXATTRS_UNSPECIFIED,
--                             buf, l, 0);
-+                             attrs, buf, l, 0);
          }
-+
-         len -= l;
-         buf += l;
-         addr += l;
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 15e81113bac9..4a18bb3b38ec 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -223,6 +223,18 @@ typedef struct IOMMUMemoryRegionClass {
- typedef struct CoalescedMemoryRange CoalescedMemoryRange;
- typedef struct MemoryRegionIoeventfd MemoryRegionIoeventfd;
+@@ -808,7 +808,7 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+             pte_addr = ((pde & PG_ADDRESS_MASK) +
+                         (((addr >> 12) & 0x1ff) << 3)) & a20_mask;
+             page_size = 4096;
+-            pte = x86_ldq_phys(cs, pte_addr);
++            pte = ldq_phys_debug(cs, pte_addr);
+         }
+         if (!(pte & PG_PRESENT_MASK)) {
+             return -1;
+@@ -818,7 +818,7 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
  
-+/* Memory Region RAM debug callback */
-+typedef struct MemoryRegionRAMReadWriteOps MemoryRegionRAMReadWriteOps;
-+
-+struct MemoryRegionRAMReadWriteOps {
-+    /* Write data into guest memory */
-+    int (*write) (uint8_t *dest, const uint8_t *src,
-+                  uint32_t len, MemTxAttrs attrs);
-+    /* Read data from guest memory */
-+    int (*read) (uint8_t *dest, const uint8_t *src,
-+                 uint32_t len, MemTxAttrs attrs);
-+};
-+
- struct MemoryRegion {
-     Object parent_obj;
+         /* page directory entry */
+         pde_addr = ((env->cr[3] & ~0xfff) + ((addr >> 20) & 0xffc)) & a20_mask;
+-        pde = x86_ldl_phys(cs, pde_addr);
++        pde = ldl_phys_debug(cs, pde_addr);
+         if (!(pde & PG_PRESENT_MASK))
+             return -1;
+         if ((pde & PG_PSE_MASK) && (env->cr[4] & CR4_PSE_MASK)) {
+@@ -827,7 +827,7 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+         } else {
+             /* page directory entry */
+             pte_addr = ((pde & ~0xfff) + ((addr >> 10) & 0xffc)) & a20_mask;
+-            pte = x86_ldl_phys(cs, pte_addr);
++            pte = ldl_phys_debug(cs, pte_addr);
+             if (!(pte & PG_PRESENT_MASK)) {
+                 return -1;
+             }
+diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+index 75429129fde0..55ea10deb8ef 100644
+--- a/target/i386/monitor.c
++++ b/target/i386/monitor.c
+@@ -68,7 +68,7 @@ static void tlb_info_32(Monitor *mon, CPUArchState *env)
  
-@@ -262,6 +274,7 @@ struct MemoryRegion {
-     const char *name;
-     unsigned ioeventfd_nb;
-     MemoryRegionIoeventfd *ioeventfds;
-+    const MemoryRegionRAMReadWriteOps *ram_debug_ops;
- };
+     pgd = env->cr[3] & ~0xfff;
+     for(l1 = 0; l1 < 1024; l1++) {
+-        cpu_physical_memory_read(pgd + l1 * 4, &pde, 4);
++        cpu_physical_memory_read_debug(pgd + l1 * 4, &pde, 4);
+         pde = le32_to_cpu(pde);
+         if (pde & PG_PRESENT_MASK) {
+             if ((pde & PG_PSE_MASK) && (env->cr[4] & CR4_PSE_MASK)) {
+@@ -76,7 +76,8 @@ static void tlb_info_32(Monitor *mon, CPUArchState *env)
+                 print_pte(mon, env, (l1 << 22), pde, ~((1 << 21) - 1));
+             } else {
+                 for(l2 = 0; l2 < 1024; l2++) {
+-                    cpu_physical_memory_read((pde & ~0xfff) + l2 * 4, &pte, 4);
++                    cpu_physical_memory_read_debug((pde & ~0xfff) + l2 * 4,
++                                                   &pte, 4);
+                     pte = le32_to_cpu(pte);
+                     if (pte & PG_PRESENT_MASK) {
+                         print_pte(mon, env, (l1 << 22) + (l2 << 12),
+@@ -97,12 +98,12 @@ static void tlb_info_pae32(Monitor *mon, CPUArchState *env)
  
- struct IOMMUMemoryRegion {
-@@ -655,6 +668,21 @@ void memory_region_init_rom_device_nomigrate(MemoryRegion *mr,
-                                              uint64_t size,
-                                              Error **errp);
+     pdp_addr = env->cr[3] & ~0x1f;
+     for (l1 = 0; l1 < 4; l1++) {
+-        cpu_physical_memory_read(pdp_addr + l1 * 8, &pdpe, 8);
++        cpu_physical_memory_read_debug(pdp_addr + l1 * 8, &pdpe, 8);
+         pdpe = le64_to_cpu(pdpe);
+         if (pdpe & PG_PRESENT_MASK) {
+             pd_addr = pdpe & 0x3fffffffff000ULL;
+             for (l2 = 0; l2 < 512; l2++) {
+-                cpu_physical_memory_read(pd_addr + l2 * 8, &pde, 8);
++                cpu_physical_memory_read_debug(pd_addr + l2 * 8, &pde, 8);
+                 pde = le64_to_cpu(pde);
+                 if (pde & PG_PRESENT_MASK) {
+                     if (pde & PG_PSE_MASK) {
+@@ -112,7 +113,8 @@ static void tlb_info_pae32(Monitor *mon, CPUArchState *env)
+                     } else {
+                         pt_addr = pde & 0x3fffffffff000ULL;
+                         for (l3 = 0; l3 < 512; l3++) {
+-                            cpu_physical_memory_read(pt_addr + l3 * 8, &pte, 8);
++                            cpu_physical_memory_read_debug(pt_addr + l3 * 8,
++                                                           &pte, 8);
+                             pte = le64_to_cpu(pte);
+                             if (pte & PG_PRESENT_MASK) {
+                                 print_pte(mon, env, (l1 << 30) + (l2 << 21)
+@@ -137,7 +139,7 @@ static void tlb_info_la48(Monitor *mon, CPUArchState *env,
+     uint64_t pdp_addr, pd_addr, pt_addr;
  
-+/**
-+ * memory_region_set_ram_debug_ops: Set debug access ops for a given memory
-+ * region.
-+ *
-+ * @mr: the #MemoryRegion to be initialized
-+ * @ops: a function that will be used for when accessing @target region during
-+ *       debug
-+ */
-+static inline void
-+memory_region_set_ram_debug_ops(MemoryRegion *mr,
-+                                const MemoryRegionRAMReadWriteOps *ops)
-+{
-+    mr->ram_debug_ops = ops;
-+}
-+
- /**
-  * memory_region_init_reservation: Initialize a memory region that reserves
-  *                                 I/O space.
-@@ -1938,7 +1966,7 @@ MemTxResult flatview_read(FlatView *fv, hwaddr addr, MemTxAttrs attrs,
-     void *ptr;
-     MemoryRegion *mr;
+     for (l1 = 0; l1 < 512; l1++) {
+-        cpu_physical_memory_read(pml4_addr + l1 * 8, &pml4e, 8);
++        cpu_physical_memory_read_debug(pml4_addr + l1 * 8, &pml4e, 8);
+         pml4e = le64_to_cpu(pml4e);
+         if (!(pml4e & PG_PRESENT_MASK)) {
+             continue;
+@@ -145,7 +147,7 @@ static void tlb_info_la48(Monitor *mon, CPUArchState *env,
  
--    if (__builtin_constant_p(len)) {
-+    if (__builtin_constant_p(len) && !attrs.debug) {
-         if (len) {
-             rcu_read_lock();
-             l = len;
+         pdp_addr = pml4e & 0x3fffffffff000ULL;
+         for (l2 = 0; l2 < 512; l2++) {
+-            cpu_physical_memory_read(pdp_addr + l2 * 8, &pdpe, 8);
++            cpu_physical_memory_read_debug(pdp_addr + l2 * 8, &pdpe, 8);
+             pdpe = le64_to_cpu(pdpe);
+             if (!(pdpe & PG_PRESENT_MASK)) {
+                 continue;
+@@ -160,7 +162,7 @@ static void tlb_info_la48(Monitor *mon, CPUArchState *env,
+ 
+             pd_addr = pdpe & 0x3fffffffff000ULL;
+             for (l3 = 0; l3 < 512; l3++) {
+-                cpu_physical_memory_read(pd_addr + l3 * 8, &pde, 8);
++                cpu_physical_memory_read_debug(pd_addr + l3 * 8, &pde, 8);
+                 pde = le64_to_cpu(pde);
+                 if (!(pde & PG_PRESENT_MASK)) {
+                     continue;
+@@ -175,9 +177,7 @@ static void tlb_info_la48(Monitor *mon, CPUArchState *env,
+ 
+                 pt_addr = pde & 0x3fffffffff000ULL;
+                 for (l4 = 0; l4 < 512; l4++) {
+-                    cpu_physical_memory_read(pt_addr
+-                            + l4 * 8,
+-                            &pte, 8);
++                    cpu_physical_memory_read_debug(pt_addr + l4 * 8, &pte, 8);
+                     pte = le64_to_cpu(pte);
+                     if (pte & PG_PRESENT_MASK) {
+                         print_pte(mon, env, (l0 << 48) + (l1 << 39) +
+@@ -198,7 +198,7 @@ static void tlb_info_la57(Monitor *mon, CPUArchState *env)
+ 
+     pml5_addr = env->cr[3] & 0x3fffffffff000ULL;
+     for (l0 = 0; l0 < 512; l0++) {
+-        cpu_physical_memory_read(pml5_addr + l0 * 8, &pml5e, 8);
++        cpu_physical_memory_read_debug(pml5_addr + l0 * 8, &pml5e, 8);
+         pml5e = le64_to_cpu(pml5e);
+         if (pml5e & PG_PRESENT_MASK) {
+             tlb_info_la48(mon, env, l0, pml5e & 0x3fffffffff000ULL);
+@@ -273,7 +273,7 @@ static void mem_info_32(Monitor *mon, CPUArchState *env)
+     last_prot = 0;
+     start = -1;
+     for(l1 = 0; l1 < 1024; l1++) {
+-        cpu_physical_memory_read(pgd + l1 * 4, &pde, 4);
++        cpu_physical_memory_read_debug(pgd + l1 * 4, &pde, 4);
+         pde = le32_to_cpu(pde);
+         end = l1 << 22;
+         if (pde & PG_PRESENT_MASK) {
+@@ -282,7 +282,8 @@ static void mem_info_32(Monitor *mon, CPUArchState *env)
+                 mem_print(mon, &start, &last_prot, end, prot);
+             } else {
+                 for(l2 = 0; l2 < 1024; l2++) {
+-                    cpu_physical_memory_read((pde & ~0xfff) + l2 * 4, &pte, 4);
++                    cpu_physical_memory_read_debug((pde & ~0xfff) + l2 * 4,
++                                                   &pte, 4);
+                     pte = le32_to_cpu(pte);
+                     end = (l1 << 22) + (l2 << 12);
+                     if (pte & PG_PRESENT_MASK) {
+@@ -315,13 +316,13 @@ static void mem_info_pae32(Monitor *mon, CPUArchState *env)
+     last_prot = 0;
+     start = -1;
+     for (l1 = 0; l1 < 4; l1++) {
+-        cpu_physical_memory_read(pdp_addr + l1 * 8, &pdpe, 8);
++        cpu_physical_memory_read_debug(pdp_addr + l1 * 8, &pdpe, 8);
+         pdpe = le64_to_cpu(pdpe);
+         end = l1 << 30;
+         if (pdpe & PG_PRESENT_MASK) {
+             pd_addr = pdpe & 0x3fffffffff000ULL;
+             for (l2 = 0; l2 < 512; l2++) {
+-                cpu_physical_memory_read(pd_addr + l2 * 8, &pde, 8);
++                cpu_physical_memory_read_debug(pd_addr + l2 * 8, &pde, 8);
+                 pde = le64_to_cpu(pde);
+                 end = (l1 << 30) + (l2 << 21);
+                 if (pde & PG_PRESENT_MASK) {
+@@ -332,7 +333,8 @@ static void mem_info_pae32(Monitor *mon, CPUArchState *env)
+                     } else {
+                         pt_addr = pde & 0x3fffffffff000ULL;
+                         for (l3 = 0; l3 < 512; l3++) {
+-                            cpu_physical_memory_read(pt_addr + l3 * 8, &pte, 8);
++                            cpu_physical_memory_read_debug(pt_addr + l3 * 8,
++                                                           &pte, 8);
+                             pte = le64_to_cpu(pte);
+                             end = (l1 << 30) + (l2 << 21) + (l3 << 12);
+                             if (pte & PG_PRESENT_MASK) {
+@@ -371,13 +373,13 @@ static void mem_info_la48(Monitor *mon, CPUArchState *env)
+     last_prot = 0;
+     start = -1;
+     for (l1 = 0; l1 < 512; l1++) {
+-        cpu_physical_memory_read(pml4_addr + l1 * 8, &pml4e, 8);
++        cpu_physical_memory_read_debug(pml4_addr + l1 * 8, &pml4e, 8);
+         pml4e = le64_to_cpu(pml4e);
+         end = l1 << 39;
+         if (pml4e & PG_PRESENT_MASK) {
+             pdp_addr = pml4e & 0x3fffffffff000ULL;
+             for (l2 = 0; l2 < 512; l2++) {
+-                cpu_physical_memory_read(pdp_addr + l2 * 8, &pdpe, 8);
++                cpu_physical_memory_read_debug(pdp_addr + l2 * 8, &pdpe, 8);
+                 pdpe = le64_to_cpu(pdpe);
+                 end = (l1 << 39) + (l2 << 30);
+                 if (pdpe & PG_PRESENT_MASK) {
+@@ -389,7 +391,8 @@ static void mem_info_la48(Monitor *mon, CPUArchState *env)
+                     } else {
+                         pd_addr = pdpe & 0x3fffffffff000ULL;
+                         for (l3 = 0; l3 < 512; l3++) {
+-                            cpu_physical_memory_read(pd_addr + l3 * 8, &pde, 8);
++                            cpu_physical_memory_read_debug(pd_addr + l3 * 8,
++                                                           &pde, 8);
+                             pde = le64_to_cpu(pde);
+                             end = (l1 << 39) + (l2 << 30) + (l3 << 21);
+                             if (pde & PG_PRESENT_MASK) {
+@@ -401,9 +404,9 @@ static void mem_info_la48(Monitor *mon, CPUArchState *env)
+                                 } else {
+                                     pt_addr = pde & 0x3fffffffff000ULL;
+                                     for (l4 = 0; l4 < 512; l4++) {
+-                                        cpu_physical_memory_read(pt_addr
+-                                                                 + l4 * 8,
+-                                                                 &pte, 8);
++                                        cpu_physical_memory_read_debug(pt_addr
++                                                                  + l4 * 8,
++                                                                  &pte, 8);
+                                         pte = le64_to_cpu(pte);
+                                         end = (l1 << 39) + (l2 << 30) +
+                                             (l3 << 21) + (l4 << 12);
+@@ -448,7 +451,7 @@ static void mem_info_la57(Monitor *mon, CPUArchState *env)
+     last_prot = 0;
+     start = -1;
+     for (l0 = 0; l0 < 512; l0++) {
+-        cpu_physical_memory_read(pml5_addr + l0 * 8, &pml5e, 8);
++        cpu_physical_memory_read_debug(pml5_addr + l0 * 8, &pml5e, 8);
+         pml5e = le64_to_cpu(pml5e);
+         end = l0 << 48;
+         if (!(pml5e & PG_PRESENT_MASK)) {
+@@ -459,7 +462,7 @@ static void mem_info_la57(Monitor *mon, CPUArchState *env)
+ 
+         pml4_addr = pml5e & 0x3fffffffff000ULL;
+         for (l1 = 0; l1 < 512; l1++) {
+-            cpu_physical_memory_read(pml4_addr + l1 * 8, &pml4e, 8);
++            cpu_physical_memory_read_debug(pml4_addr + l1 * 8, &pml4e, 8);
+             pml4e = le64_to_cpu(pml4e);
+             end = (l0 << 48) + (l1 << 39);
+             if (!(pml4e & PG_PRESENT_MASK)) {
+@@ -470,7 +473,7 @@ static void mem_info_la57(Monitor *mon, CPUArchState *env)
+ 
+             pdp_addr = pml4e & 0x3fffffffff000ULL;
+             for (l2 = 0; l2 < 512; l2++) {
+-                cpu_physical_memory_read(pdp_addr + l2 * 8, &pdpe, 8);
++                cpu_physical_memory_read_debug(pdp_addr + l2 * 8, &pdpe, 8);
+                 pdpe = le64_to_cpu(pdpe);
+                 end = (l0 << 48) + (l1 << 39) + (l2 << 30);
+                 if (pdpe & PG_PRESENT_MASK) {
+@@ -489,7 +492,7 @@ static void mem_info_la57(Monitor *mon, CPUArchState *env)
+ 
+                 pd_addr = pdpe & 0x3fffffffff000ULL;
+                 for (l3 = 0; l3 < 512; l3++) {
+-                    cpu_physical_memory_read(pd_addr + l3 * 8, &pde, 8);
++                    cpu_physical_memory_read_debug(pd_addr + l3 * 8, &pde, 8);
+                     pde = le64_to_cpu(pde);
+                     end = (l0 << 48) + (l1 << 39) + (l2 << 30) + (l3 << 21);
+                     if (pde & PG_PRESENT_MASK) {
+@@ -508,7 +511,8 @@ static void mem_info_la57(Monitor *mon, CPUArchState *env)
+ 
+                     pt_addr = pde & 0x3fffffffff000ULL;
+                     for (l4 = 0; l4 < 512; l4++) {
+-                        cpu_physical_memory_read(pt_addr + l4 * 8, &pte, 8);
++                        cpu_physical_memory_read_debug(pt_addr + l4 * 8,
++                                                       &pte, 8);
+                         pte = le64_to_cpu(pte);
+                         end = (l0 << 48) + (l1 << 39) + (l2 << 30) +
+                             (l3 << 21) + (l4 << 12);
 -- 
 2.14.3
