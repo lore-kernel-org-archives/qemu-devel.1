@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1er2GE-00010Q-6q
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:59:11 -0500
+	(envelope-from <berrange@redhat.com>) id 1er2H2-0001Ti-Rv
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:00:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1er2GD-0006qp-B4
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:59:10 -0500
-Date: Wed, 28 Feb 2018 13:58:50 +0000
+	(envelope-from <berrange@redhat.com>) id 1er2H1-0007EF-Fc
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 09:00:00 -0500
+Date: Wed, 28 Feb 2018 13:59:49 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180228135850.GN17774@redhat.com>
+Message-ID: <20180228135949.GO17774@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20180228131315.30194-1-mreitz@redhat.com>
 	<20180228131315.30194-2-mreitz@redhat.com>
+	<20180228133434.GL17774@redhat.com>
+	<1fc55643-7ca6-26a5-7e2e-7d6b09a43a13@redhat.com>
+	<20180228135305.GM17774@redhat.com>
+	<86d7e709-6981-822d-9849-7af38e7453ce@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180228131315.30194-2-mreitz@redhat.com>
+In-Reply-To: <86d7e709-6981-822d-9849-7af38e7453ce@redhat.com>
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH 1/2] block/file-posix: Fix fully
  preallocated truncate
@@ -29,50 +33,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Max Reitz <mreitz@redhat.com>
 Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org
 
-On Wed, Feb 28, 2018 at 02:13:14PM +0100, Max Reitz wrote:
-> Storing the lseek() result in an int results in it overflowing when the
-> file is at least 2 GB big.  Then, we have a 50 % chance of the result
-> being "negative" and thus thinking an error occurred when actually
-> everything went just fine.
+On Wed, Feb 28, 2018 at 02:55:22PM +0100, Max Reitz wrote:
+> On 2018-02-28 14:53, Daniel P. Berrang=C3=A9 wrote:
+> > On Wed, Feb 28, 2018 at 02:45:49PM +0100, Max Reitz wrote:
+> >> On 2018-02-28 14:34, Daniel P. Berrang=C3=A9 wrote:
+> >>> On Wed, Feb 28, 2018 at 02:13:14PM +0100, Max Reitz wrote:
+> >>>> Storing the lseek() result in an int results in it overflowing whe=
+n the
+> >>>> file is at least 2 GB big.  Then, we have a 50 % chance of the res=
+ult
+> >>>> being "negative" and thus thinking an error occurred when actually
+> >>>> everything went just fine.
+> >>>>
+> >>>> So we should use the correct type for storing the result: off_t.
+> >>>>
+> >>>> Reported-by: Daniel P. Berrange <berrange@redhat.com>
+> >>>> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1549231
+> >>>> Cc: qemu-stable@nongnu.org
+> >>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> >>>> ---
+> >>>>  block/file-posix.c | 5 +++--
+> >>>>  1 file changed, 3 insertions(+), 2 deletions(-)
+> >>>>
+> >>>> diff --git a/block/file-posix.c b/block/file-posix.c
+> >>>> index f1591c3849..90c25864a0 100644
+> >>>> --- a/block/file-posix.c
+> >>>> +++ b/block/file-posix.c
+> >>>> @@ -1697,6 +1697,7 @@ static int raw_regular_truncate(int fd, int6=
+4_t offset, PreallocMode prealloc,
+> >>>>      case PREALLOC_MODE_FULL:
+> >>>>      {
+> >>>>          int64_t num =3D 0, left =3D offset - current_length;
+> >>>> +        off_t seek_result;
+> >>>> =20
+> >>>>          /*
+> >>>>           * Knowing the final size from the beginning could allow =
+the file
+> >>>> @@ -1711,8 +1712,8 @@ static int raw_regular_truncate(int fd, int6=
+4_t offset, PreallocMode prealloc,
+> >>>> =20
+> >>>>          buf =3D g_malloc0(65536);
+> >>>> =20
+> >>>> -        result =3D lseek(fd, current_length, SEEK_SET);
+> >>>> -        if (result < 0) {
+> >>>> +        seek_result =3D lseek(fd, current_length, SEEK_SET);
+> >>>> +        if (seek_result < 0) {
+> >>>
+> >>> off_t is an unsigned type, so this comparison to "< 0" is bogus - o=
+nly the
+> >>> exact value (off_t)-1 indicates an error. So this needs to be
+> >>>
+> >>>    if (seek_result =3D=3D (off_t)-1) {
+> >>>       ...
+> >>>    }
+> >>
+> >> Hmmm... On my system, it appears to be a long int[1].  And
+> >> find_allocation() does an off_t < 0 comparison already.  And
+> >> "man 0p sys_types.h" says "blkcnt_t and off_t shall be signed intege=
+r
+> >> types."
+> >=20
+> > Hmm, that's odd then - lseek man page explicitly said it must be cast=
+,
+> > which suggested to me it could be unsigned:
+> >=20
+> >    RETURN VALUE
+> >        Upon successful completion, lseek() returns the resulting offs=
+et  loca=E2=80=90
+> >        tion  as  measured  in bytes from the beginning of the file.  =
+On error,
+> >        the value (off_t) -1 is returned and  errno  is  set  to  indi=
+cate  the
+> >        error.
+> >=20
+> > CC'ing Eric for the "official" POSIX answer....
 >=20
-> So we should use the correct type for storing the result: off_t.
+> But it also says (under NOTES):
 >=20
-> Reported-by: Daniel P. Berrange <berrange@redhat.com>
-> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1549231
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  block/file-posix.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->=20
-> diff --git a/block/file-posix.c b/block/file-posix.c
-> index f1591c3849..90c25864a0 100644
-> --- a/block/file-posix.c
-> +++ b/block/file-posix.c
-> @@ -1697,6 +1697,7 @@ static int raw_regular_truncate(int fd, int64_t o=
-ffset, PreallocMode prealloc,
->      case PREALLOC_MODE_FULL:
->      {
->          int64_t num =3D 0, left =3D offset - current_length;
-> +        off_t seek_result;
-> =20
->          /*
->           * Knowing the final size from the beginning could allow the f=
-ile
-> @@ -1711,8 +1712,8 @@ static int raw_regular_truncate(int fd, int64_t o=
-ffset, PreallocMode prealloc,
-> =20
->          buf =3D g_malloc0(65536);
-> =20
-> -        result =3D lseek(fd, current_length, SEEK_SET);
-> -        if (result < 0) {
-> +        seek_result =3D lseek(fd, current_length, SEEK_SET);
-> +        if (seek_result < 0) {
->              result =3D -errno;
->              error_setg_errno(errp, -result,
->                               "Failed to seek to the old end of file");
+> The off_t data type is a signed integer data type specified by POSIX.1.
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Ok, lets ignore my comments then -the "< 0" vs "!=3D -1" difference is
+harmless given this.
 
 Regards,
 Daniel
