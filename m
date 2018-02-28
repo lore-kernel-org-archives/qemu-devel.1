@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1er1h5-0005GC-3w
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:22:52 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1er1ql-0008A3-C4
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:32:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1er1h1-00056E-4G
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:22:51 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33332 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1er1h0-000561-Vr
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:22:47 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 94F8F402290A
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 13:22:46 +0000 (UTC)
-Date: Wed, 28 Feb 2018 13:22:37 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180228132237.GK17774@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180228050633.7410-1-peterx@redhat.com>
-	<20180228050633.7410-15-peterx@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1er1qg-0001PJ-Qs
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:32:50 -0500
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:55084)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1er1qg-0001Os-KT
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 08:32:46 -0500
+Received: by mail-wm0-x230.google.com with SMTP id z81so4989652wmb.4
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 05:32:46 -0800 (PST)
+References: <20180227143852.11175-1-alex.bennee@linaro.org>
+	<CAFEAcA8LEG=bzXrj3etTdf_q3-AcMVfCCqSGQ2OkXUPGBHkMBQ@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA8LEG=bzXrj3etTdf_q3-AcMVfCCqSGQ2OkXUPGBHkMBQ@mail.gmail.com>
+Date: Wed, 28 Feb 2018 13:32:43 +0000
+Message-ID: <87woyxutms.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180228050633.7410-15-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 14/14] qio/chardev: specify gcontext for
- TLS handshake
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v4 00/31] Add ARMv8.2
+ half-precision functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,69 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, Feb 28, 2018 at 01:06:33PM +0800, Peter Xu wrote:
-> We allow the TLS code to be run with non-default gcontext by providing a
-> new qio_channel_tls_handshake_full() API.
-> 
-> With the new API, we can re-setup the TLS handshake GSource by calling
-> it again with the correct gcontext.  Any call to the function will clean
-> up existing GSource tasks, and re-setup using the new gcontext.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  chardev/char-socket.c    | 30 +++++++++++++---
->  include/io/channel-tls.h | 22 +++++++++++-
->  io/channel-tls.c         | 91 ++++++++++++++++++++++++++++++++++++++++--------
->  3 files changed, 123 insertions(+), 20 deletions(-)
-> 
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index 164a64ff34..406d33c04f 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -72,6 +72,9 @@ typedef struct {
->  
->  static gboolean socket_reconnect_timeout(gpointer opaque);
->  static void tcp_chr_telnet_init(Chardev *chr);
-> +static void tcp_chr_tls_handshake_setup(Chardev *chr,
-> +                                        QIOChannelTLS *tioc,
-> +                                        GMainContext *context);
->  
->  static void tcp_chr_reconn_timer_cancel(SocketChardev *s)
->  {
-> @@ -570,6 +573,7 @@ static void tcp_chr_telnet_destroy(SocketChardev *s)
->  static void tcp_chr_update_read_handler(Chardev *chr)
->  {
->      SocketChardev *s = SOCKET_CHARDEV(chr);
-> +    QIOChannelTLS *tioc;
->  
->      if (s->listener) {
->          /*
-> @@ -589,6 +593,17 @@ static void tcp_chr_update_read_handler(Chardev *chr)
->          qio_task_context_set(s->thread_task, chr->gcontext);
->      }
->  
-> +    tioc = (QIOChannelTLS *)object_dynamic_cast(OBJECT(s->ioc),
-> +                                                TYPE_QIO_CHANNEL_TLS);
-> +    if (tioc) {
-> +        /*
-> +         * TLS session enabled; reconfigure things up.  Note that, if
-> +         * there is existing handshake task, it'll be cleaned up first
-> +         * in QIO code.
-> +         */
-> +        tcp_chr_tls_handshake_setup(chr, tioc, chr->gcontext);
-> +    }
 
-This is crazy - we should not be looking at specific implementations of
-the channel. If the TLS object needs to use a specific GMainContext we
-should make sure that is done right from the start and not try to change
-the GMainContext on the fly.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> On 27 February 2018 at 14:38, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+>> A few minor fixes and a chunk of Richard's r-b tags. Now all that is
+>> left is:
+>>
+>>   patch 0014/arm translate a64 add FP16 FMULX MLS FMLA to simd.patch nee=
+ds review
+>>
+>> Otherwise see comments bellow --- for other changes
+>>
+>
+> Thanks -- applied to target-arm.next. Some caveats:
+>
+> (1) we can fix the nit RTH noted about FMULX later
+>
+> (2) I notice that there's no patch here that adds the linux-user/elfload.c
+> code to set a hwcap for the guest program to indicate FP16 presence.
+> Presumably there is such a hwcap?
+
+I'd missed it as risu doesn't need it. I see rth has sent a patch so
+I'll read up on it and see if I can extend vector-benchmark to use it to
+detect FP16.
+
+>
+> (3) Is this complete fp16 support or are there still more pieces to come?
+> I'm assuming it's all done...
+
+All AArch64 is done. I'm not sure how much AArch32 is needed for SVE
+support. The ARM ARM says "When this feature is implemented it is
+implemented in both Advanced SIMD and floating-point, and in AArch64 and
+AArch32 states." but I think it is legal to have a 64 bit only CPU
+without AArch32?
+
+Unfortunately the magic I used to extract all the AArch64 HP
+instructions from the ASL doesn't work on the AArch32 definitions which
+put important differentiating notes in different places.
+
+Once I've got the list I'll document it so we don't forget...
+
+>
+> (4) I've split the "add new ARM_V8_FP16 feature bit to the enum"
+> and "enable the feature on the 'any' CPU" parts of patch 2, so
+> we can do the latter at the end. If there is still missing parts
+> to fp16 then we can drop the enable-feature half of that
+> for the moment.
+
+I guess that depends on if we model any AArch64 only CPUs?
+
+>
+> thanks
+> -- PMM
+
+
+--
+Alex Benn=C3=A9e
