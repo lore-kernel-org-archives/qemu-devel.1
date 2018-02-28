@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1er3Io-0002lA-26
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:05:55 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1er3J1-0002tL-RH
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:06:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1er3Ij-0004A1-V3
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:05:54 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38494 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1er3Ij-00049j-QZ
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:05:49 -0500
-References: <1518185725-69559-1-git-send-email-wanpengli@tencent.com>
-	<CANRm+CyaGM+SnFo_iQv2whFb_2p3F3k=pCABzQXBCA9auwqqXQ@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c4ed1f8b-e3bc-cdeb-aac2-8536ce0c4eea@redhat.com>
-Date: Wed, 28 Feb 2018 16:05:46 +0100
+	(envelope-from <ben@skyportsystems.com>) id 1er3Iz-0004Q8-HL
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:06:07 -0500
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:55219)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
+	id 1er3Iz-0004Ph-4C
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 10:06:05 -0500
+Received: by mail-wm0-x22d.google.com with SMTP id z81so5576783wmb.4
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 07:06:04 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CANRm+CyaGM+SnFo_iQv2whFb_2p3F3k=pCABzQXBCA9auwqqXQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] target-i386: add KVM_HINTS_DEDICATED
- performance hint
+In-Reply-To: <20180228133613.21037-1-idgar@virtualoco.com>
+References: <20180228133613.21037-1-idgar@virtualoco.com>
+From: Benjamin Warren <ben@skyportsystems.com>
+Date: Wed, 28 Feb 2018 07:06:03 -0800
+Message-ID: <CAFtH1GVAs2M6=qvR-OwHAeSxCN0-WcOZB00KXvKoEMSs8691FQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] vmgenid: allow VM Generation ID
+ modification via QMP/HMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,122 +29,226 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wanpeng Li <kernellwp@gmail.com>, kvm <kvm@vger.kernel.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
-Cc: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Or Idgar <idgar@virtualoco.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, imammendo@redhat.com, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, oidgar@redhat.com, Gal Hammer <ghammer@redhat.com>
 
-On 28/02/2018 13:31, Wanpeng Li wrote:
-> Ping,
-> 2018-02-09 22:15 GMT+08:00 Wanpeng Li <kernellwp@gmail.com>:
->> From: Wanpeng Li <wanpengli@tencent.com>
->>
->> Add KVM_HINTS_DEDICATED performance hint, guest checks this feature bi=
-t
->> to determine if they run on dedicated vCPUs, allowing optimizations su=
-ch
->> as usage of qspinlocks.
+On Wed, Feb 28, 2018 at 5:36 AM, Or Idgar <idgar@virtualoco.com> wrote:
 
-Eduardo is still on vacation; the patch is okay but the KVM parts are
-still in kvm/queue, so I'm just waiting for him (Radim owns the KVM tree
-right now).  Feel free to post any patch on top of it.  You can add
+> From: Or Idgar <oidgar@redhat.com>
+>
+> This patch allow changing the Virtual Machine Generation
+> ID through QMP/HMP while the vm guest is running.
+> As the definition block of VMGENID in ACPI includes the
+> "Notify" method, we can use it to notify the guest about
+> ID changes.
+>
+> Ditto what Eric says.  What is your use case?  Setting was intentionally
+left out in order to keep things simple.  There were other concerns (I
+believe about migration) that will need to be revisited, but only if this
+feature extension is really needed.
 
-Based-on: <1518185725-69559-1-git-send-email-wanpengli@tencent.com>
 
-when you post anything needing KVM_HINTS_DEDICATED, that way patchew can
-apply your series and test it correctly.
-
-Thanks,
-
-Paolo
-
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
->> Cc: Eduardo Habkost <ehabkost@redhat.com>
->> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
->> ---
->> v1 -> v2:
->>  * add a new feature word
->>
->>  target/i386/cpu.c | 14 ++++++++++++++
->>  target/i386/cpu.h |  3 +++
->>  target/i386/kvm.c |  4 ++++
->>  3 files changed, 21 insertions(+)
->>
->> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index d70954b..e2974ad 100644
->> --- a/target/i386/cpu.c
->> +++ b/target/i386/cpu.c
->> @@ -358,6 +358,20 @@ static FeatureWordInfo feature_word_info[FEATURE_=
-WORDS] =3D {
->>          .cpuid_eax =3D KVM_CPUID_FEATURES, .cpuid_reg =3D R_EAX,
->>          .tcg_features =3D TCG_KVM_FEATURES,
->>      },
->> +    [FEAT_KVM_HINTS] =3D {
->> +        .feat_names =3D {
->> +            "hint-dedicated", NULL, NULL, NULL,
->> +            NULL, NULL, NULL, NULL,
->> +            NULL, NULL, NULL, NULL,
->> +            NULL, NULL, NULL, NULL,
->> +            NULL, NULL, NULL, NULL,
->> +            NULL, NULL, NULL, NULL,
->> +            NULL, NULL, NULL, NULL,
->> +            NULL, NULL, NULL, NULL,
->> +        },
->> +        .cpuid_eax =3D KVM_CPUID_FEATURES, .cpuid_reg =3D R_EDX,
->> +        .tcg_features =3D TCG_KVM_FEATURES,
->> +    },
->>      [FEAT_HYPERV_EAX] =3D {
->>          .feat_names =3D {
->>              NULL /* hv_msr_vp_runtime_access */, NULL /* hv_msr_time_=
-refcount_access */,
->> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
->> index f91e37d..9f73692 100644
->> --- a/target/i386/cpu.h
->> +++ b/target/i386/cpu.h
->> @@ -475,6 +475,7 @@ typedef enum FeatureWord {
->>      FEAT_8000_0008_EBX, /* CPUID[8000_0008].EBX */
->>      FEAT_C000_0001_EDX, /* CPUID[C000_0001].EDX */
->>      FEAT_KVM,           /* CPUID[4000_0001].EAX (KVM_CPUID_FEATURES) =
-*/
->> +    FEAT_KVM_HINTS,     /* CPUID[4000_0001].EDX */
->>      FEAT_HYPERV_EAX,    /* CPUID[4000_0003].EAX */
->>      FEAT_HYPERV_EBX,    /* CPUID[4000_0003].EBX */
->>      FEAT_HYPERV_EDX,    /* CPUID[4000_0003].EDX */
->> @@ -670,6 +671,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
->>  #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accu=
-mulation Single Precision */
->>  #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control=
- */
->>
->> +#define KVM_HINTS_DEDICATED (1U << 0)
->> +
->>  #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Pre=
-diction Barrier */
->>
->>  #define CPUID_XSAVE_XSAVEOPT   (1U << 0)
->> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->> index ad4b159..44ee524 100644
->> --- a/target/i386/kvm.c
->> +++ b/target/i386/kvm.c
->> @@ -383,6 +383,9 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s,=
- uint32_t function,
->>          if (!kvm_irqchip_in_kernel()) {
->>              ret &=3D ~(1U << KVM_FEATURE_PV_UNHALT);
->>          }
->> +    } else if (function =3D=3D KVM_CPUID_FEATURES && reg =3D=3D R_EDX=
-) {
->> +        ret |=3D KVM_HINTS_DEDICATED;
->> +        found =3D 1;
->>      }
->>
->>      /* fallback for older kernels */
->> @@ -801,6 +804,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->>          c =3D &cpuid_data.entries[cpuid_i++];
->>          c->function =3D KVM_CPUID_FEATURES | kvm_base;
->>          c->eax =3D env->features[FEAT_KVM];
->> +        c->edx =3D env->features[FEAT_KVM_HINTS];
->>      }
->>
->>      cpu_x86_cpuid(env, 0, 0, &limit, &unused, &unused, &unused);
->> --
->> 2.7.4
->>
+> QMP command example:
+>     { "execute": "set-vm-generation-id",
+>           "arguments": {
+>               "guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
+>           }
+>     }
+>
+> HMP command example:
+>     set-vm-generation-id 324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87
+>
+> This patch is based off an earlier version by
+> Igor Mammedov (imammedo@redhat.com)
+>
+> Signed-off-by: Or Idgar <oidgar@redhat.com>
+> Reviewed-by: Gal Hammer <ghammer@redhat.com>
+> ---
+>  docs/specs/vmgenid.txt |  7 ++++---
+>  hmp-commands.hx        | 13 +++++++++++++
+>  hmp.c                  | 10 ++++++++++
+>  hmp.h                  |  1 +
+>  hw/acpi/vmgenid.c      | 10 ++++++++++
+>  qapi-schema.json       | 11 +++++++++++
+>  tests/vmgenid-test.c   | 31 +++++++++++++++++++++++++++++++
+>  7 files changed, 80 insertions(+), 3 deletions(-)
+>
+> diff --git a/docs/specs/vmgenid.txt b/docs/specs/vmgenid.txt
+> index aa9f518..04443de 100644
+> --- a/docs/specs/vmgenid.txt
+> +++ b/docs/specs/vmgenid.txt
+> @@ -240,6 +240,7 @@ The property may be queried via QMP/HMP:
+>    (QEMU) query-vm-generation-id
+>    {"return": {"guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"}}
+>
+> -Setting of this parameter is intentionally left out from the QMP/HMP
+> -interfaces.  There are no known use cases for changing the GUID once QEMU
+> is
+> -running, and adding this capability would greatly increase the complexity.
+> +Also, the property may be set via QMP/HMP:
+> +
+> +  (QEMU) set-vm-generation-id guid=ee6726ce-73b4-4a8b-863c-708f26515847
+> +  {"return": {}}
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index 4afd57c..4524669 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -1871,5 +1871,18 @@ ETEXI
+>      },
+>
+>  STEXI
+> +@item set-vm-generation-id @var{uuid}
+> +Set Virtual Machine Generation ID counter to @var{guid}
+> +ETEXI
+> +
+> +    {
+> +        .name       = "set-vm-generation-id",
+> +        .args_type  = "guid:s",
+> +        .params     = "guid",
+> +        .help       = "Set Virtual Machine Generation ID counter",
+> +        .cmd        = hmp_set_vm_generation_id,
+> +    },
+> +
+> +STEXI
+>  @end table
+>  ETEXI
+> diff --git a/hmp.c b/hmp.c
+> index 35a7041..73f9b00 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -2901,6 +2901,16 @@ void hmp_info_vm_generation_id(Monitor *mon, const
+> QDict *qdict)
+>      qapi_free_GuidInfo(info);
+>  }
+>
+> +void hmp_set_vm_generation_id(Monitor *mon, const QDict *qdict)
+> +{
+> +    Error *errp = NULL;
+> +    const char *guid = qdict_get_str(qdict, "guid");
+> +
+> +    qmp_set_vm_generation_id(guid, &errp);
+> +    if (errp)
+> +        hmp_handle_error(mon, &errp);
+> +}
+> +
+>  void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict)
+>  {
+>      Error *err = NULL;
+> diff --git a/hmp.h b/hmp.h
+> index a6f56b1..8cc74d5 100644
+> --- a/hmp.h
+> +++ b/hmp.h
+> @@ -147,5 +147,6 @@ void hmp_info_ramblock(Monitor *mon, const QDict
+> *qdict);
+>  void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+>  void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+>  void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
+> +void hmp_set_vm_generation_id(Monitor *mon, const QDict *qdict);
+>
+>  #endif
+> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+> index 105044f..5319d70 100644
+> --- a/hw/acpi/vmgenid.c
+> +++ b/hw/acpi/vmgenid.c
+> @@ -129,6 +129,16 @@ void vmgenid_add_fw_cfg(VmGenIdState *vms,
+> FWCfgState *s, GArray *guid)
+>                               ARRAY_SIZE(vms->vmgenid_addr_le), false);
+>  }
+>
+> +void qmp_set_vm_generation_id(const char *guid, Error **errp)
+> +{
+> +    Object *obj = find_vmgenid_dev();
+> +
+> +    if (!obj) {
+> +        return;
+> +    }
+> +    object_property_set_str(obj, guid, VMGENID_GUID, errp);
+> +}
+> +
+>  static void vmgenid_update_guest(VmGenIdState *vms)
+>  {
+>      Object *obj = object_resolve_path_type("", TYPE_ACPI_DEVICE_IF, NULL);
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 1845795..c2ab733 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -3193,6 +3193,17 @@
+>  { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
+>
+>  ##
+> +# @set-vm-generation-id:
+> +#
+> +# Set Virtual Machine Generation ID
+> +#
+> +# @guid: new GUID to set as Virtual Machine Generation ID
+> +#
+> +# Since 2.12
+> +##
+> +{ 'command': 'set-vm-generation-id', 'data': { 'guid': 'str' } }
+> +
+> +##
+>  # @watchdog-set-action:
+>  #
+>  # Set watchdog action
+> diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+> index 5a86b40..544cf0f 100644
+> --- a/tests/vmgenid-test.c
+> +++ b/tests/vmgenid-test.c
+> @@ -130,6 +130,24 @@ static void read_guid_from_monitor(QemuUUID *guid)
+>      QDECREF(rsp);
+>  }
+>
+> +static void set_guid_via_monitor(QemuUUID *guid)
+> +{
+> +    QDict *rsp, *rsp_ret;
+> +    char command[256];
+> +    char *guid_str;
+> +
+> +    guid_str = qemu_uuid_unparse_strdup(guid);
+> +    sprintf(command, "{ 'execute': 'set-vm-generation-id', 'arguments': \
+> +                      { 'guid': '%s' } }",
+> +            guid_str);
+> +    free(guid_str);
+> +    rsp = qmp(command);
+> +    if (qdict_haskey(rsp, "return")) {
+> +        rsp_ret = qdict_get_qdict(rsp, "return");
+> +        g_assert(qdict_size(rsp_ret) == 0);
+> +    }
+> +}
+> +
+>  static char disk[] = "tests/vmgenid-test-disk-XXXXXX";
+>
+>  #define GUID_CMD(guid)                          \
+> @@ -182,6 +200,17 @@ static void vmgenid_query_monitor_test(void)
+>      qtest_quit(global_qtest);
+>  }
+>
+> +static void vmgenid_set_monitor_test(void)
+> +{
+> +    QemuUUID expected, measured;
+> +
+> +    global_qtest = qtest_startf(GUID_CMD(VGID_GUID));
+> +    qemu_uuid_generate(&expected);
+> +    set_guid_via_monitor(&expected);
+> +    read_guid_from_monitor(&measured);
+> +    g_assert(memcmp(measured.data, expected.data, sizeof(measured.data))
+> == 0);
+> +}
+> +
+>  int main(int argc, char **argv)
+>  {
+>      int ret;
+> @@ -199,6 +228,8 @@ int main(int argc, char **argv)
+>                     vmgenid_set_guid_auto_test);
+>      qtest_add_func("/vmgenid/vmgenid/query-monitor",
+>                     vmgenid_query_monitor_test);
+> +    qtest_add_func("/vmgenid/vmgenid/set-guid-qmp",
+> +                   vmgenid_set_monitor_test);
+>      ret = g_test_run();
+>      boot_sector_cleanup(disk);
+>
+> --
+> 2.9.5
+>
+>
+>
