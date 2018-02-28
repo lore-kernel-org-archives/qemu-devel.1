@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1er4u0-0000fj-9p
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 11:48:25 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1er4u1-0000g3-Fr
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 11:48:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1er4tx-00071u-Me
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 11:48:24 -0500
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:46105)
+	(envelope-from <richard.henderson@linaro.org>) id 1er4tz-00073p-1M
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 11:48:25 -0500
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:39019)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1er4tx-00070k-Gv
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 11:48:21 -0500
-Received: by mail-pf0-x243.google.com with SMTP id z10so1209847pfh.13
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 08:48:21 -0800 (PST)
+	id 1er4ty-00072W-SM
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 11:48:22 -0500
+Received: by mail-pg0-x244.google.com with SMTP id w16so253009pgv.6
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 08:48:22 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 28 Feb 2018 08:48:13 -0800
-Message-Id: <20180228164816.24110-2-richard.henderson@linaro.org>
+Date: Wed, 28 Feb 2018 08:48:14 -0800
+Message-Id: <20180228164816.24110-3-richard.henderson@linaro.org>
 In-Reply-To: <20180228164816.24110-1-richard.henderson@linaro.org>
 References: <20180228164816.24110-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [RISU 1/3] Add aa64 sqrdml[as]h
+Subject: [Qemu-devel] [PATCH] decodetree: Propagate return value from
+ translate subroutines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +30,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org
 
+Allow the translate subroutines to return false for invalid insns.
+
+At present we can of course invoke an invalid insn exception from within
+the translate subroutine, but in the short term this consolidates code.
+In the long term it would allow the decodetree language to support
+overlapping patterns for ISA extensions.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- aarch64.risu | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
 
-diff --git a/aarch64.risu b/aarch64.risu
-index 02e9183..c1a29f6 100644
---- a/aarch64.risu
-+++ b/aarch64.risu
-@@ -2932,6 +2932,30 @@ FCVTZUsi A64_V sf:1 0011110 type:2 1 11 001 000000 rn:5 rd:5 \
- # UnallocatedEncoding: type >= 2
- FCVTZUsi_RES A64_V sf:1 0011110 1 type:1 1 11 001 000000 rn:5 rd:5
+Since this makes an ABI change to the translate functions called by the
+decode function, let's make it now before there are any in-tree users.
+
+My SVE branch over-decodes in quite a lot of cases -- e.g. things like
+the 2-bit size field must be 1-3 for fp operands, and so size==0 is
+unallocated.  Returning false for these cases allows the actual call
+to unallocated_encoding to be done in one place instead of hundreds.
+
+Longer term, I'm thinking of how to handle decode of overlapping ISA
+extensions.  One could allow (specific) overlapping patterns and
+prioritize them in some way (e.g. first in file is first matched).
+My thought is that trans_insn_a would check a cpu feature bit and
+return false if not enabled.  Then trans_insn_b would be given its
+chance to handle the insn.
+
+
+r~
+---
+ scripts/decodetree.py | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/scripts/decodetree.py b/scripts/decodetree.py
+index 6a33f8f8dd..41301c84aa 100755
+--- a/scripts/decodetree.py
++++ b/scripts/decodetree.py
+@@ -461,7 +461,7 @@ class Pattern(General):
+         global translate_prefix
+         output('typedef ', self.base.base.struct_name(),
+                ' arg_', self.name, ';\n')
+-        output(translate_scope, 'void ', translate_prefix, '_', self.name,
++        output(translate_scope, 'bool ', translate_prefix, '_', self.name,
+                '(DisasContext *ctx, arg_', self.name,
+                ' *a, ', insntype, ' insn);\n')
  
-+#
-+# AdvSIMD v8.1 extensions
-+#
-+
-+@v8_1_simd
-+
-+# SQRDMLAH (vector, scalar)
-+SQRDMLAHvs  A64_V81  01111110 size:2 0 rm:5 100001 rn:5 rd:5
-+# SQRDMLAH (vector, vector)
-+SQRDMLAHv   A64_V81  0 q:1 101110 size:2 0 rm:5 100001 rn:5 rd:5
-+# SQRDMLAH (element, scalar)
-+SQRDMLAHse  A64_V81  01111111 size:2 l:1 m:1 rm:4 1101 h:1 0 rn:5 rd:5
-+# SQRDMLAH (element, vector)
-+SQRDMLAHve  A64_V81  0 q:1 101111 size:2 l:1 m:1 rm:4 1101 h:1 0 rn:5 rd:5
-+
-+# SQRDMLSH (vector, scalar)
-+SQRDMLSHvs  A64_V81  01111110 size:2 0 rm:5 100011 rn:5 rd:5
-+# SQRDMLSH (vector, vector)
-+SQRDMLSHv   A64_V81  0 q:1 101110 size:2 0 rm:5 100011 rn:5 rd:5
-+# SQRDMLSH (element, scalar)
-+SQRDMLSHse  A64_V81  01111111 size:2 l:1 m:1 rm:4 1111 h:1 0 rn:5 rd:5
-+# SQRDMLSH (element, vector)
-+SQRDMLSHve  A64_V81  0 q:1 101111 size:2 l:1 m:1 rm:4 1111 h:1 0 rn:5 rd:5
-+
- @
- # End of:
- # Data processing - SIMD and floating point
+@@ -474,9 +474,8 @@ class Pattern(General):
+             output(ind, self.base.extract_name(), '(&u.f_', arg, ', insn);\n')
+         for n, f in self.fields.items():
+             output(ind, 'u.f_', arg, '.', n, ' = ', f.str_extract(), ';\n')
+-        output(ind, translate_prefix, '_', self.name,
++        output(ind, 'return ', translate_prefix, '_', self.name,
+                '(ctx, &u.f_', arg, ', insn);\n')
+-        output(ind, 'return true;\n')
+ # end Pattern
+ 
+ 
 -- 
 2.14.3
