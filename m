@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1er7oC-0002ix-UN
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:54:39 -0500
+	(envelope-from <jsnow@redhat.com>) id 1er7yV-0005G0-BL
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:05:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1er7o8-0002iv-2Z
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:54:37 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46682 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1er7o7-0002iD-TG
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:54:32 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 478C38424D
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 19:54:21 +0000 (UTC)
-Date: Wed, 28 Feb 2018 19:54:03 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180228195403.GO2981@work-vm>
-References: <20180216131625.9639-1-dgilbert@redhat.com>
-	<20180216131625.9639-2-dgilbert@redhat.com>
-	<20180228063701.GT18962@xz-mi>
+	(envelope-from <jsnow@redhat.com>) id 1er7yU-0002G2-Bq
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 15:05:15 -0500
+References: <20180223235142.21501-1-jsnow@redhat.com>
+	<20180223235142.21501-11-jsnow@redhat.com>
+	<20180228154253.GD4855@localhost.localdomain>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <7be3f519-991b-e17d-0c9a-da192f81621d@redhat.com>
+Date: Wed, 28 Feb 2018 15:04:51 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180228063701.GT18962@xz-mi>
-Subject: Re: [Qemu-devel] [PATCH v3 01/29] migrate: Update
- ram_block_discard_range for shared
+In-Reply-To: <20180228154253.GD4855@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v4 10/21] blockjobs: add NULL state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,126 +25,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, marcandre.lureau@redhat.com, imammedo@redhat.com, mst@redhat.com, quintela@redhat.com, aarcange@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Fri, Feb 16, 2018 at 01:15:57PM +0000, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > The choice of call to discard a block is getting more complicated
-> > for other cases.   We use fallocate PUNCH_HOLE in any file cases;
-> > it works for both hugepage and for tmpfs.
-> > We use the DONTNEED for non-hugepage cases either where they're
-> > anonymous or where they're private.
-> > 
-> > Care should be taken when trying other backing files.
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  exec.c       | 60 ++++++++++++++++++++++++++++++++++++++++++++++--------------
-> >  trace-events |  3 ++-
-> >  2 files changed, 48 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/exec.c b/exec.c
-> > index e8d7b335b6..b1bb477776 100644
-> > --- a/exec.c
-> > +++ b/exec.c
-> > @@ -3702,6 +3702,7 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
-> >      }
-> >  
-> >      if ((start + length) <= rb->used_length) {
-> > +        bool need_madvise, need_fallocate;
-> >          uint8_t *host_endaddr = host_startaddr + length;
-> >          if ((uintptr_t)host_endaddr & (rb->page_size - 1)) {
-> >              error_report("ram_block_discard_range: Unaligned end address: %p",
-> > @@ -3711,29 +3712,60 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
-> >  
-> >          errno = ENOTSUP; /* If we are missing MADVISE etc */
-> >  
-> > -        if (rb->page_size == qemu_host_page_size) {
-> > -#if defined(CONFIG_MADVISE)
-> > -            /* Note: We need the madvise MADV_DONTNEED behaviour of definitely
-> > -             * freeing the page.
-> > -             */
-> > -            ret = madvise(host_startaddr, length, MADV_DONTNEED);
-> > -#endif
-> > -        } else {
-> > -            /* Huge page case  - unfortunately it can't do DONTNEED, but
-> > -             * it can do the equivalent by FALLOC_FL_PUNCH_HOLE in the
-> > -             * huge page file.
-> > +        /* The logic here is messy;
-> > +         *    madvise DONTNEED fails for hugepages
-> > +         *    fallocate works on hugepages and shmem
-> > +         */
-> > +        need_madvise = (rb->page_size == qemu_host_page_size);
-> > +        need_fallocate = rb->fd != -1;
-> > +        if (need_fallocate) {
-> > +            /* For a file, this causes the area of the file to be zero'd
-> > +             * if read, and for hugetlbfs also causes it to be unmapped
-> > +             * so a userfault will trigger.
-> >               */
-> >  #ifdef CONFIG_FALLOCATE_PUNCH_HOLE
-> >              ret = fallocate(rb->fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
-> >                              start, length);
-> > +            if (ret) {
-> > +                ret = -errno;
-> > +                error_report("ram_block_discard_range: Failed to fallocate "
-> > +                             "%s:%" PRIx64 " +%zx (%d)",
-> > +                             rb->idstr, start, length, ret);
-> > +                goto err;
-> > +            }
-> > +#else
-> > +            ret = -ENOSYS;
-> > +            error_report("ram_block_discard_range: fallocate not available/file"
-> > +                         "%s:%" PRIx64 " +%zx (%d)",
-> > +                         rb->idstr, start, length, ret);
-> > +            goto err;
-> >  #endif
-> >          }
-> > -        if (ret) {
-> > -            ret = -errno;
-> > -            error_report("ram_block_discard_range: Failed to discard range "
-> > +        if (need_madvise) {
-> > +            /* For normal RAM this causes it to be unmapped,
-> > +             * for shared memory it causes the local mapping to disappear
-> > +             * and to fall back on the file contents (which we just
-> > +             * fallocate'd away).
-> > +             */
-> > +#if defined(CONFIG_MADVISE)
-> > +            ret =  madvise(host_startaddr, length, MADV_DONTNEED);
-> > +            if (ret) {
-> > +                ret = -errno;
-> > +                error_report("ram_block_discard_range: Failed to discard range "
-> > +                             "%s:%" PRIx64 " +%zx (%d)",
-> > +                             rb->idstr, start, length, ret);
-> > +                goto err;
-> > +            }
-> > +#else
-> > +            ret = -ENOSYS;
-> > +            error_report("ram_block_discard_range: MADVISE not available"
-> >                           "%s:%" PRIx64 " +%zx (%d)",
-> >                           rb->idstr, start, length, ret);
-> > +            goto err;
-> > +#endif
-> >          }
-> > +        trace_ram_block_discard_range(rb->idstr, host_startaddr,
-> > +                                      need_madvise, need_fallocate, ret);
+
+
+On 02/28/2018 10:42 AM, Kevin Wolf wrote:
+> Am 24.02.2018 um 00:51 hat John Snow geschrieben:
+>> Add a new state that specifically demarcates when we begin to permanently
+>> demolish a job after it has performed all work. This makes the transition
+>> explicit in the STM table and highlights conditions under which a job may
+>> be demolished.
+>>
+>>
+>> Transitions:
+>> Created   -> Null: Early failure event before the job is started
+>> Concluded -> Null: Standard transition.
+>>
+>> Verbs:
+>> None. This should not ever be visible to the monitor.
+>>
+>>              +---------+
+>>              |UNDEFINED|
+>>              +--+------+
+>>                 |
+>>              +--v----+
+>>              |CREATED+------------------+
+>>              +--+----+                  |
+>>                 |                       |
+>>              +--v----+     +------+     |
+>>    +---------+RUNNING<----->PAUSED|     |
+>>    |         +--+-+--+     +------+     |
+>>    |            | |                     |
+>>    |            | +------------------+  |
+>>    |            |                    |  |
+>>    |         +--v--+       +-------+ |  |
+>>    +---------+READY<------->STANDBY| |  |
+>>    |         +--+--+       +-------+ |  |
+>>    |            |                    |  |
+>> +--v-----+   +--v------+             |  |
+>> |ABORTING+--->CONCLUDED<-------------+  |
+>> +--------+   +--+------+                |
+>>                 |                       |
+>>              +--v-+                     |
+>>              |NULL<---------------------+
+>>              +----+
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
 > 
-> Nit: worth to log the length too if it's named as "range"?
-
-Done.
-
-> Either with/without:
+> The commit message does not match the code:
 > 
-> Reviewed-by: Peter Xu <peterx@redhat.com>
-
-Thanks.
-
-Dave
-
+>> @@ -423,6 +424,7 @@ static void block_job_completed_single(BlockJob *job)
+>>      QLIST_REMOVE(job, txn_list);
+>>      block_job_txn_unref(job->txn);
+>>      block_job_event_concluded(job);
+>> +    block_job_state_transition(job, BLOCK_JOB_STATUS_NULL);
+>>      block_job_unref(job);
+>>  }
+>>  
+>> @@ -734,9 +736,6 @@ static void block_job_event_completed(BlockJob *job, const char *msg)
+>>  
+>>  static void block_job_event_concluded(BlockJob *job)
+>>  {
+>> -    if (block_job_is_internal(job) || !job->manual) {
+>> -        return;
+>> -    }
+>>      block_job_state_transition(job, BLOCK_JOB_STATUS_CONCLUDED);
+>>  }
 > 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Any job that transition to NULL goes first through CONCLUDED. There is
+> no way to reach NULL directly from CREATED.
+> 
+
+Ah, that's true... I was trying to think of the case in which we do an
+early uninit, but actually we just dismantle the job without having it
+go to "null" first. I guess I found that edge case and then never did
+anything about it except acknowledge it in the graph.
+
+Something to fix...
+
+> The second hunk addresses my comment in the previous patch, so it should
+> probably be squashed in there.
+> 
+> Kevin
+> 
