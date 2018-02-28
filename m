@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eqyER-0002tP-H4
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 04:41:04 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eqyNl-0004j3-4w
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 04:50:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eqyEQ-0002E8-Ew
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 04:41:03 -0500
-Date: Wed, 28 Feb 2018 09:40:37 +0000
+	(envelope-from <stefanha@redhat.com>) id 1eqyNi-0006NF-1t
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 04:50:41 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55440 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eqyNh-0006N7-ST
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 04:50:37 -0500
+Date: Wed, 28 Feb 2018 09:50:30 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180228094037.GA13990@stefanha-x1.localdomain>
-References: <20180220131014.8998-1-stefanha@redhat.com>
-	<20180223082044.GB31530@lemon.usersys.redhat.com>
-	<20180227153025.GA32480@stefanha-x1.localdomain>
-	<20180228015813.GC21336@lemon.usersys.redhat.com>
+Message-ID: <20180228095030.GB13990@stefanha-x1.localdomain>
+References: <1519613598-12270-1-git-send-email-suhang16@mails.ucas.ac.cn>
+	<20180227173234.GI32480@stefanha-x1.localdomain>
+	<CAFEAcA9UftR-D5k9D2RrBUKvGWo_nC-+jfBKZAOjsHUAjyMs0A@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="6c2NcOVqGQ03X4Wi"
+	protocol="application/pgp-signature"; boundary="Pd0ReVV5GZGQvF3a"
 Content-Disposition: inline
-In-Reply-To: <20180228015813.GC21336@lemon.usersys.redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] vl: introduce vm_shutdown()
+In-Reply-To: <CAFEAcA9UftR-D5k9D2RrBUKvGWo_nC-+jfBKZAOjsHUAjyMs0A@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 RFC] scripts/checkpatch.pl: add check
+ for `while` and `for`
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,104 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Kevin Wolf <kwolf@redhat.com>, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Su Hang <suhang16@mails.ucas.ac.cn>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
 
---6c2NcOVqGQ03X4Wi
+--Pd0ReVV5GZGQvF3a
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 28, 2018 at 09:58:13AM +0800, Fam Zheng wrote:
-> On Tue, 02/27 15:30, Stefan Hajnoczi wrote:
-> > On Fri, Feb 23, 2018 at 04:20:44PM +0800, Fam Zheng wrote:
-> > > On Tue, 02/20 13:10, Stefan Hajnoczi wrote:
-> > > > 1. virtio_scsi_handle_cmd_vq() racing with iothread_stop_all() hits=
- the
-> > > >    virtio_scsi_ctx_check() assertion failure because the BDS AioCon=
-text
-> > > >    has been modified by iothread_stop_all().
-> > >=20
-> > > Does this patch fix the issue completely? IIUC virtio_scsi_handle_cmd=
- can
-> > > already be entered at the time of main thread calling virtio_scsi_cle=
-ar_aio(),
-> > > so this race condition still exists:
-> > >=20
-> > >   main thread                           iothread
-> > > ---------------------------------------------------------------------=
---------
-> > >   vm_shutdown
-> > >     ...
-> > >       virtio_bus_stop_ioeventfd
-> > >         virtio_scsi_dataplane_stop
-> > >                                         aio_poll()
-> > >                                           ...
-> > >                                             virtio_scsi_data_plane_ha=
-ndle_cmd()
-> > >           aio_context_acquire(s->ctx)
-> > >                                               virtio_scsi_acquire(s).=
-enter
-> > >           virtio_scsi_clear_aio()
-> > >           aio_context_release(s->ctx)
-> > >                                               virtio_scsi_acquire(s).=
-return
-> > >                                               virtio_scsi_handle_cmd_=
-vq()
-> > >                                                 ...
-> > >                                                   virtqueue_pop()
-> > >=20
-> > > Is it possible that the above virtqueue_pop() still returns one eleme=
-nt that was
-> > > queued before vm_shutdown() was called?
-> >=20
-> > No, it can't because virtio_scsi_clear_aio() invokes
-> > virtio_queue_host_notifier_aio_read(&vq->host_notifier) to process the
-> > virtqueue.  By the time we get back to iothread's
-> > virtio_scsi_data_plane_handle_cmd() the virtqueue is already empty.
-> >=20
-> > Vcpus have been paused so no additional elements can slip into the
-> > virtqueue.
+On Tue, Feb 27, 2018 at 05:42:50PM +0000, Peter Maydell wrote:
+> On 27 February 2018 at 17:32, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> > On Mon, Feb 26, 2018 at 10:53:18AM +0800, Su Hang wrote:
+> >> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> >> index 1b4b812e28fa..10c138344fa9 100755
+> >> --- a/scripts/checkpatch.pl
+> >> +++ b/scripts/checkpatch.pl
+> >> @@ -2353,7 +2353,8 @@ sub process {
+> >>               }
+> >>
+> >>  # check for missing bracing round if etc
+> >
+> > Please fix the pre-existing typo in the comment:
+> >
+> > s/round/around/
 >=20
-> So there is:
->=20
-> static void virtio_queue_host_notifier_aio_read(EventNotifier *n)
-> {
->     VirtQueue *vq =3D container_of(n, VirtQueue, host_notifier);
->     if (event_notifier_test_and_clear(n)) {
->         virtio_queue_notify_aio_vq(vq);
->     }
-> }
->=20
-> Guest kicks after adding an element to VQ, but we check ioeventfd before =
-trying
-> virtqueue_pop(). Is that a problem? If VCPUs are paused after enqueuing b=
-ut
-> before kicking VQ, the ioeventfd is not set, the virtqueue is not process=
-ed
-> here.
+> That's not really a typo IMHO -- both 'round' and 'around'
+> seem fine to me here. (The OED entry for 'around' notes
+> "There is variation with 'round' adv. and prep. in many of the
+> senses below; in general 'around' is less usual in British usage",
+> so some of this is US-vs-UK usage or personal idiolect.)
 
-You are right.
-
-This race condition also affects the existing 'stop' command, where
-ioeventfd is disabled in the same way.  I'll send a v2 with a patch to
-fix this.
+Thanks!  I hear British people use it frequently but thought it was a
+colloquialism that isn't used in written form, innit? :)  I stand
+corrected.
 
 Stefan
 
---6c2NcOVqGQ03X4Wi
+--Pd0ReVV5GZGQvF3a
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJalnkVAAoJEJykq7OBq3PIMFEH/2WKrDA5hAzaisCet46NpBSq
-XTMmMOBIi7VUgE3sAcbCKKxYEIeUgkAU6zbm0EiXeP0jP/MZvtgc8W/ABXWPiLEh
-gWP6xNGdhzk6mj36fLRRNCNbvZf7y6IY6GwSVHdU9IvZ+UNrzf7oLHb80LZWiRDz
-06gbWHzbDklDpems8eID3RzYXBiCVtxxgIPcvoxtIL5+SFjq24o0KUGLsB9CLh9S
-FnOMI7ri4XpUHwEFFr560vU2ToeGkZjnZVH4oBcf6L/+jUmtbGDb4IC9zH5xNYCE
-oc/z/w9A35lRp3umSNKLRlgryk182GVejfJb0wIZikEMPDFdhGsurSs80dU76Ck=
-=VsKp
+iQEcBAEBAgAGBQJalntmAAoJEJykq7OBq3PIExAH/jjxoEteGRxZpr8T9nlItGCR
+qLzOYv4T386w7J/hopwjXGip7dk52SD+LrHwEMEWWon83qL6qnsHiyeijEkmV4Jh
+UhbXMV5BcUj92Wb/fn5FsHXjZ5Fk5Tbpi9Xo5E4l3eWjgh//xe66hDiC/13oMhNA
+inWEWSW1AIUUruO/UXiQe7gZlUxmGhAHFsA4bONub9WDPktIMSIjoUTzlpPiMB3y
+VFUhkdfsfAy4fKVlIQ/+xP5uBw/GtrKz3YmneIryUOWJCcqo/eBGR/wTpzB4Oy01
+/ZKWnf/Io8QXFmr9s+sNsXSfoNmdB+jVhXNWMy8gon+UP1zSeL7IMYwtqbpiPR0=
+=3LbA
 -----END PGP SIGNATURE-----
 
---6c2NcOVqGQ03X4Wi--
+--Pd0ReVV5GZGQvF3a--
