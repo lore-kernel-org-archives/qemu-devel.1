@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1er7Rs-0003FH-Nm
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:33 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1er7Ru-0003Fi-9z
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1er7Ro-0006Df-TH
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:32 -0500
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:43934)
+	(envelope-from <richard.henderson@linaro.org>) id 1er7Rt-0006Gf-DT
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:34 -0500
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:44306)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1er7Ro-0006D9-NC
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:28 -0500
-Received: by mail-pf0-x244.google.com with SMTP id z14so1408308pfe.10
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 11:31:28 -0800 (PST)
+	id 1er7Rt-0006Fq-8d
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 14:31:33 -0500
+Received: by mail-pl0-x242.google.com with SMTP id w21-v6so2114153plp.11
+	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 11:31:33 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 28 Feb 2018 11:31:09 -0800
-Message-Id: <20180228193125.20577-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 00/16] ARM v8.1 simd + v8.3 complex insns
+Date: Wed, 28 Feb 2018 11:31:12 -0800
+Message-Id: <20180228193125.20577-4-richard.henderson@linaro.org>
+In-Reply-To: <20180228193125.20577-1-richard.henderson@linaro.org>
+References: <20180228193125.20577-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v3 03/16] target/arm: Refactor
+ disas_simd_indexed size checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +30,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org
 
-I believe I've incorporated all of Peter's feedback from v2.
-This is based on target-arm.next, which now contains Alex's fp16 work.
+The integer size check was already outside of the opcode switch;
+move the floating-point size check outside as well.  Unify the
+size vs index adjustment between fp and integer paths.
 
-Re-tested our standard aarch64 risu tests with -cpu cortex-a57,
-and against the new risu tests I posted this morning for aa64 and aa32.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/translate-a64.c | 65 +++++++++++++++++++++++-----------------------
+ 1 file changed, 32 insertions(+), 33 deletions(-)
 
-
-r~
-
-
-Richard Henderson (16):
-  target/arm: Add ARM_FEATURE_V8_RDM
-  target/arm: Refactor disas_simd_indexed decode
-  target/arm: Refactor disas_simd_indexed size checks
-  target/arm: Decode aa64 armv8.1 scalar three same extra
-  target/arm: Decode aa64 armv8.1 three same extra
-  target/arm: Decode aa64 armv8.1 scalar/vector x indexed element
-  target/arm: Decode aa32 armv8.1 three same
-  target/arm: Decode aa32 armv8.1 two reg and a scalar
-  target/arm: Enable ARM_FEATURE_V8_RDM
-  target/arm: Add ARM_FEATURE_V8_FCMA
-  target/arm: Decode aa64 armv8.3 fcadd
-  target/arm: Decode aa64 armv8.3 fcmla
-  target/arm: Decode aa32 armv8.3 3-same
-  target/arm: Decode aa32 armv8.3 2-reg-index
-  target/arm: Decode t32 simd 3reg and 2reg_scalar extension
-  target/arm: Enable ARM_FEATURE_V8_FCMA
-
- target/arm/cpu.h           |   2 +
- target/arm/helper.h        |  31 +++
- linux-user/elfload.c       |   2 +
- target/arm/cpu.c           |   2 +
- target/arm/cpu64.c         |   2 +
- target/arm/translate-a64.c | 514 ++++++++++++++++++++++++++++++++++++---------
- target/arm/translate.c     | 275 +++++++++++++++++++++---
- target/arm/vec_helper.c    | 429 +++++++++++++++++++++++++++++++++++++
- target/arm/Makefile.objs   |   2 +-
- 9 files changed, 1133 insertions(+), 126 deletions(-)
- create mode 100644 target/arm/vec_helper.c
-
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index fc928b61f6..cbb4510e3a 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -11820,10 +11820,6 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
+     case 0x05: /* FMLS */
+     case 0x09: /* FMUL */
+     case 0x19: /* FMULX */
+-        if (size == 1) {
+-            unallocated_encoding(s);
+-            return;
+-        }
+         is_fp = true;
+         break;
+     default:
+@@ -11834,45 +11830,48 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
+     if (is_fp) {
+         /* convert insn encoded size to TCGMemOp size */
+         switch (size) {
+-        case 2: /* single precision */
+-            size = MO_32;
+-            index = h << 1 | l;
+-            rm |= (m << 4);
+-            break;
+-        case 3: /* double precision */
+-            size = MO_64;
+-            if (l || !is_q) {
++        case 0: /* half-precision */
++            if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
+                 unallocated_encoding(s);
+                 return;
+             }
+-            index = h;
+-            rm |= (m << 4);
+-            break;
+-        case 0: /* half precision */
+             size = MO_16;
+-            index = h << 2 | l << 1 | m;
+-            is_fp16 = true;
+-            if (arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
+-                break;
+-            }
+-            /* fallthru */
+-        default: /* unallocated */
+-            unallocated_encoding(s);
+-            return;
+-        }
+-    } else {
+-        switch (size) {
+-        case 1:
+-            index = h << 2 | l << 1 | m;
+             break;
+-        case 2:
+-            index = h << 1 | l;
+-            rm |= (m << 4);
++        case MO_32: /* single precision */
++        case MO_64: /* double precision */
+             break;
+         default:
+             unallocated_encoding(s);
+             return;
+         }
++    } else {
++        switch (size) {
++        case MO_8:
++        case MO_64:
++            unallocated_encoding(s);
++            return;
++        }
++    }
++
++    /* Given TCGMemOp size, adjust register and indexing.  */
++    switch (size) {
++    case MO_16:
++        index = h << 2 | l << 1 | m;
++        break;
++    case MO_32:
++        index = h << 1 | l;
++        rm |= m << 4;
++        break;
++    case MO_64:
++        if (l || !is_q) {
++            unallocated_encoding(s);
++            return;
++        }
++        index = h;
++        rm |= m << 4;
++        break;
++    default:
++        g_assert_not_reached();
+     }
+ 
+     if (!fp_access_check(s)) {
 -- 
 2.14.3
