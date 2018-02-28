@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1er5xm-0007ff-Sw
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 12:56:23 -0500
+	(envelope-from <wei@redhat.com>) id 1er63k-0001s2-Jd
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:02:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1er5xm-00069p-1V
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 12:56:22 -0500
-Date: Wed, 28 Feb 2018 18:55:56 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180228175556.GK4855@localhost.localdomain>
-References: <20180223235142.21501-1-jsnow@redhat.com>
-	<20180223235142.21501-18-jsnow@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180223235142.21501-18-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v4 17/21] blockjobs: add PENDING status and
- event
+	(envelope-from <wei@redhat.com>) id 1er63j-00026M-3v
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:02:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38472)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1er63i-000260-RE
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 13:02:31 -0500
+From: Wei Huang <wei@redhat.com>
+Date: Wed, 28 Feb 2018 12:02:12 -0600
+Message-Id: <20180228180215.25470-2-wei@redhat.com>
+In-Reply-To: <20180228180215.25470-1-wei@redhat.com>
+References: <20180228180215.25470-1-wei@redhat.com>
+Subject: [Qemu-devel] [PATCH V7 1/4] rules: Move cross compilation auto
+ detection functions to rules.mak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,67 +24,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, peter.maydell@linaro.org, quintela@redhat.com, drjones@redhat.com
 
-Am 24.02.2018 um 00:51 hat John Snow geschrieben:
-> For jobs utilizing the new manual workflow, we intend to prohibit
-> them from modifying the block graph until the management layer provides
-> an explicit ACK via block-job-finalize to move the process forward.
-> 
-> To distinguish this runstate from "ready" or "waiting," we add a new
-> "pending" event.
-> 
-> For now, the transition from PENDING to CONCLUDED/ABORTING is automatic,
-> but a future commit will add the explicit block-job-finalize step.
-> 
-> Transitions:
-> Waiting -> Pending:   Normal transition.
-> Pending -> Concluded: Normal transition.
-> Pending -> Aborting:  Late transactional failures and cancellations.
-> 
-> Removed Transitions:
-> Waiting -> Concluded: Jobs must go to PENDING first.
-> 
-> Verbs:
-> Cancel: Can be applied to a pending job.
-> 
->              +---------+
->              |UNDEFINED|
->              +--+------+
->                 |
->              +--v----+
->              |CREATED+-----------------+
->              +--+----+                 |
->                 |                      |
->              +--+----+     +------+    |
->    +---------+RUNNING<----->PAUSED|    |
->    |         +--+-+--+     +------+    |
->    |            | |                    |
->    |            | +------------------+ |
->    |            |                    | |
->    |         +--v--+       +-------+ | |
->    +---------+READY<------->STANDBY| | |
->    |         +--+--+       +-------+ | |
->    |            |                    | |
->    |         +--v----+               | |
->    +---------+WAITING+---------------+ |
->    |         +--+----+                 |
->    |            |                      |
->    |         +--v----+                 |
->    +---------+PENDING|                 |
->    |         +--+----+                 |
->    |            |                      |
-> +--v-----+   +--v------+               |
-> |ABORTING+--->CONCLUDED|               |
-> +--------+   +--+------+               |
->                 |                      |
->              +--v-+                    |
->              |NULL+--------------------+
->              +----+
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
+This patch moves the auto detection functions for cross compilation from
+roms/Makefile to rules.mak. So the functions can be shared among Makefiles
+in QEMU.
 
-Your diagram lost two arrow heads in this commit. :-)
+Signed-off-by: Wei Huang <wei@redhat.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+---
+ roms/Makefile | 24 +++++++-----------------
+ rules.mak     | 15 +++++++++++++++
+ 2 files changed, 22 insertions(+), 17 deletions(-)
 
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+diff --git a/roms/Makefile b/roms/Makefile
+index b5e5a69e91..e972c65333 100644
+--- a/roms/Makefile
++++ b/roms/Makefile
+@@ -21,23 +21,6 @@ pxe-rom-virtio   efi-rom-virtio   : DID := 1000
+ pxe-rom-vmxnet3  efi-rom-vmxnet3  : VID := 15ad
+ pxe-rom-vmxnet3  efi-rom-vmxnet3  : DID := 07b0
+ 
+-#
+-# cross compiler auto detection
+-#
+-path := $(subst :, ,$(PATH))
+-system := $(shell uname -s | tr "A-Z" "a-z")
+-
+-# first find cross binutils in path
+-find-cross-ld = $(firstword $(wildcard $(patsubst %,%/$(1)-*$(system)*-ld,$(path))))
+-# then check we have cross gcc too
+-find-cross-gcc = $(firstword $(wildcard $(patsubst %ld,%gcc,$(call find-cross-ld,$(1)))))
+-# finally strip off path + toolname so we get the prefix
+-find-cross-prefix = $(subst gcc,,$(notdir $(call find-cross-gcc,$(1))))
+-
+-powerpc64_cross_prefix := $(call find-cross-prefix,powerpc64)
+-powerpc_cross_prefix := $(call find-cross-prefix,powerpc)
+-x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
+-
+ # tag our seabios builds
+ SEABIOS_EXTRAVERSION="-prebuilt.qemu-project.org"
+ 
+@@ -66,6 +49,13 @@ default:
+ 	@echo "  skiboot        -- update skiboot.lid"
+ 	@echo "  u-boot.e500    -- update u-boot.e500"
+ 
++SRC_PATH=..
++include $(SRC_PATH)/rules.mak
++
++powerpc64_cross_prefix := $(call find-cross-prefix,powerpc64)
++powerpc_cross_prefix := $(call find-cross-prefix,powerpc)
++x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
++
+ bios: build-seabios-config-seabios-128k build-seabios-config-seabios-256k
+ 	cp seabios/builds/seabios-128k/bios.bin ../pc-bios/bios.bin
+ 	cp seabios/builds/seabios-256k/bios.bin ../pc-bios/bios-256k.bin
+diff --git a/rules.mak b/rules.mak
+index 6e943335f3..ef8adee3f8 100644
+--- a/rules.mak
++++ b/rules.mak
+@@ -62,6 +62,21 @@ expand-objs = $(strip $(sort $(filter %.o,$1)) \
+                   $(foreach o,$(filter %.mo,$1),$($o-objs)) \
+                   $(filter-out %.o %.mo,$1))
+ 
++# Cross compilation auto detection. Use find-cross-prefix to detect the
++# target archtecture's prefix, and then append it to the build tool or pass
++# it to CROSS_COMPILE directly. Here is one example:
++#      x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
++#      $(x86_64_cross_prefix)gcc -c test.c -o test.o
++#      make -C testdir CROSS_COMPILE=$(x86_64_cross_prefix)
++cross-search-path := $(subst :, ,$(PATH))
++cross-host-system := $(shell uname -s | tr "A-Z" "a-z")
++
++find-cross-ld = $(firstword $(wildcard $(patsubst \
++                    %,%/$(1)-*$(cross-host-system)*-ld,$(cross-search-path))))
++find-cross-gcc = $(firstword $(wildcard \
++                    $(patsubst %ld,%gcc,$(call find-cross-ld,$(1)))))
++find-cross-prefix = $(subst gcc,,$(notdir $(call find-cross-gcc,$(1))))
++
+ %.o: %.c
+ 	$(call quiet-command,$(CC) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
+ 	       $(QEMU_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) \
+-- 
+2.14.3
