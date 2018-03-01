@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1erMes-0005kr-U0
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:46:00 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1erMds-0004nr-RE
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:44:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1erMep-0003w6-HI
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:45:58 -0500
-Date: Thu, 1 Mar 2018 11:45:44 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180301114543.GC2994@work-vm>
-References: <20180228195320.165230-1-borntraeger@de.ibm.com>
-	<79f7059b-f2d3-a758-6bb9-29433b31b313@redhat.com>
-	<20180301092442.GA2994@work-vm>
-	<aef0a651-4d04-13b1-76a6-0c1efb6c9e04@de.ibm.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1erMds-00024Z-4H
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:44:56 -0500
+Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:39195)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1erMdr-00023c-Um
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:44:56 -0500
+Received: by mail-ot0-x232.google.com with SMTP id h8so5275075oti.6
+	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 03:44:55 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <aef0a651-4d04-13b1-76a6-0c1efb6c9e04@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] s390/kvm: implement clearing part of
- IPL clear
+In-Reply-To: <CAFEAcA8-D=f-kAKMB+cj91ffUW2MD0wDQt0XA_3gVec=YDBfkg@mail.gmail.com>
+References: <20180223154613.2096-1-alex.bennee@linaro.org>
+	<CAFEAcA8-D=f-kAKMB+cj91ffUW2MD0wDQt0XA_3gVec=YDBfkg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 1 Mar 2018 11:44:34 +0000
+Message-ID: <CAFEAcA_4jEgbJfk7HzeaYoFm53FopV=8RO9K=uY0H8L74-zrJw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH REPOST v1 0/8] Group support and random
+ clean-ups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,144 +30,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
 
-* Christian Borntraeger (borntraeger@de.ibm.com) wrote:
->=20
->=20
-> On 03/01/2018 10:24 AM, Dr. David Alan Gilbert wrote:
-> > * Thomas Huth (thuth@redhat.com) wrote:
-> >> On 28.02.2018 20:53, Christian Borntraeger wrote:
-> >>> When a guests reboots with diagnose 308 subcode 3 it requests the mem=
-ory
-> >>> to be cleared. We did not do it so far. This does not only violate the
-> >>> architecture, it also misses the chance to free up that memory on
-> >>> reboot, which would help on host memory over commitment.  By using
-> >>> ram_block_discard_range we can cover both cases.
-> >>
-> >> Sounds like a good idea. I wonder whether that release_all_ram()
-> >> function should maybe rather reside in exec.c, so that other machines
-> >> that want to clear all RAM at reset time can use it, too?
-> >>
-> >>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> >>> ---
-> >>>  target/s390x/kvm.c | 19 +++++++++++++++++++
-> >>>  1 file changed, 19 insertions(+)
-> >>>
-> >>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> >>> index 8f3a422288..2e145ad5c3 100644
-> >>> --- a/target/s390x/kvm.c
-> >>> +++ b/target/s390x/kvm.c
-> >>> @@ -34,6 +34,8 @@
-> >>>  #include "qapi/error.h"
-> >>>  #include "qemu/error-report.h"
-> >>>  #include "qemu/timer.h"
-> >>> +#include "qemu/rcu_queue.h"
-> >>> +#include "sysemu/cpus.h"
-> >>>  #include "sysemu/sysemu.h"
-> >>>  #include "sysemu/hw_accel.h"
-> >>>  #include "hw/boards.h"
-> >>> @@ -41,6 +43,7 @@
-> >>>  #include "sysemu/device_tree.h"
-> >>>  #include "exec/gdbstub.h"
-> >>>  #include "exec/address-spaces.h"
-> >>> +#include "exec/ram_addr.h"
-> >>>  #include "trace.h"
-> >>>  #include "qapi-event.h"
-> >>>  #include "hw/s390x/s390-pci-inst.h"
-> >>> @@ -1841,6 +1844,14 @@ static int kvm_arch_handle_debug_exit(S390CPU =
-*cpu)
-> >>>      return ret;
-> >>>  }
-> >>> =20
-> >>> +static void release_all_rams(void)
-> >>
-> >> s/rams/ram/ maybe?
-> >>
-> >>> +{
-> >>> +    struct RAMBlock *rb;
-> >>> +
-> >>> +    QLIST_FOREACH_RCU(rb, &ram_list.blocks, next)
-> >>> +        ram_block_discard_range(rb, 0, rb->used_length);
-> >>
-> >> From a coding style point of view, I think there should be curly braces
-> >> around ram_block_discard_range() ?
-> >=20
-> > I think this might break if it happens during a postcopy migrate.
-> > The destination CPU is running, so it can do a reboot at just the wrong
-> > time; and then the pages (that are protected by userfaultfd) would get
-> > deallocated and trigger userfaultfd requests if accessed.
->=20
-> Yes, userfaultd/postcopy is really fragile and relies on things that are =
-not
-> necessarily true (e.g. virito-balloon can also invalidate pages).
+On 23 February 2018 at 18:23, Peter Maydell <peter.maydell@linaro.org> wrote:
+> I've pushed all but 3 and 5 to risu master. I don't actually
+> object to patch 5 and will probably push that too, but I figure we
+> could have the conversation first :-)
 
-That's why we use qemu_balloon_inhibit around postcopy to stop
-ballooning; I'm not aware of anything else that does the same.
+I added the missing patterns and pushed patch 3 and have
+(per irc conversation) dropped 5.
 
-> The right thing here would be to actually terminate the postcopy migrate =
-but
-> return it as "successful" (since we are going to clear that RAM anyway). =
-Do=20
-> you see a good way to achieve that?
-
-There's no current mechanism to do it; I think it would have to involve
-some interaction with the source as well though to tell it that you
-didn't need that area of RAM anyway.
-
-However, there are more problems:
-  a) Even forgetting the userfault problem, this is racy since during
-postcopy you're still receiving blocks from the source at the same time;
-so some of the area that you've discarded might get overwritten by data
-=66rom the source.
-
-  b) Your release_all_rams seems to do all RAM Blocks - won't that nuke
-any ROMs as well? Or maybe even flash?
-
-  c) In a normal precopy migration, I think you may also get old data;
-Paolo said that an MADV_DONTNEED won't cause the dirty flags to be set,
-so if the migrate has already sent the data for a page, and then this
-happens, before the CPUs are stopped during the migration, when you
-restart on the destination you'll have the old data.
-
-Dave
-
->=20
-> >=20
-> > Dave
-> >=20
-> >>> +}
-> >>> +
-> >>>  int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
-> >>>  {
-> >>>      S390CPU *cpu =3D S390_CPU(cs);
-> >>> @@ -1853,6 +1864,14 @@ int kvm_arch_handle_exit(CPUState *cs, struct =
-kvm_run *run)
-> >>>              ret =3D handle_intercept(cpu);
-> >>>              break;
-> >>>          case KVM_EXIT_S390_RESET:
-> >>> +            if (run->s390_reset_flags & KVM_S390_RESET_CLEAR) {
-> >>> +                /*
-> >>> +                 * We will stop other CPUs anyway, avoid spurious cr=
-ashes and
-> >>> +                 * get all CPUs out. The reset will take care of the=
- resume.
-> >>> +                 */
-> >>> +                pause_all_vcpus();
-> >>> +                release_all_rams();
-> >>> +            }
-> >>>              s390_reipl_request();
-> >>>              break;
-> >>>          case KVM_EXIT_S390_TSCH:
-> >>>
-> >>
-> >> Apart from the cosmetic nits, patch looks good to me.
-> >>
-> >>  Thomas
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- PMM
