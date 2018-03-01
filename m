@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erU6u-0000tB-IW
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 14:43:25 -0500
+	(envelope-from <eblake@redhat.com>) id 1erU6p-0000pk-Cs
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 14:43:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erU6r-0007da-G7
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 14:43:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55824)
+	(envelope-from <eblake@redhat.com>) id 1erU6o-0007Xl-Dh
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 14:43:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40834)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1erU6r-0007br-8I
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 14:43:21 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7A48C5F7B1
-	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 19:43:20 +0000 (UTC)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1erU6o-0007WV-5D
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 14:43:18 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Thu,  1 Mar 2018 13:42:30 -0600
-Message-Id: <20180301194245.29854-16-eblake@redhat.com>
+Date: Thu,  1 Mar 2018 13:42:26 -0600
+Message-Id: <20180301194245.29854-12-eblake@redhat.com>
 In-Reply-To: <20180301194245.29854-1-eblake@redhat.com>
 References: <20180301194245.29854-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 15/30] qapi: Record 'include' directives in
- parse tree
+Subject: [Qemu-devel] [PULL 11/30] qapi: Improve include file name reporting
+ in error messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,99 +28,103 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
 From: Markus Armbruster <armbru@redhat.com>
 
-The parse tree is a list of expressions.  Except include expressions
-currently get replaced by the included file's parse tree.
+Error messages print absolute file names of included files even if the
+user gave a relative one on the command line:
 
-Instead of throwing away the include expression, keep it with the file
-name expanded so you don't have to track the including file's
-directory to make sense of it.
+    $ PYTHONPATH=3Dscripts python -B tests/qapi-schema/test-qapi.py tests=
+/qapi-schema/include-cycle.json
+    In file included from tests/qapi-schema/include-cycle.json:1:
+    In file included from /work/armbru/qemu/tests/qapi-schema/include-cyc=
+le-b.json:1:
+    /work/armbru/qemu/tests/qapi-schema/include-cycle-c.json:1: Inclusion=
+ loop for include-cycle.json
 
-A future commit will put this include expression to use.
+Improve this to
+
+    In file included from tests/qapi-schema/include-cycle.json:1:
+    In file included from tests/qapi-schema/include-cycle-b.json:1:
+    tests/qapi-schema/include-cycle-c.json:1: Inclusion loop for include-=
+cycle.json
+
+The error message when an include file can't be opened prints the
+include directive's file name, which is relative to the including
+file.  Change this to print the file name relative to the working
+directory.  Visible in tests/qapi-schema/include-no-file.err.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20180211093607.27351-16-armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-[eblake: fix check of expr after assignment]
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20180211093607.27351-12-armbru@redhat.com>
+Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- scripts/qapi/common.py | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+ scripts/qapi/common.py                | 12 ++++++------
+ tests/qapi-schema/include-no-file.err |  2 +-
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 1d0d30f9ece..961331a210c 100644
+index 47673928dcc..bfa9bfec01d 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -290,8 +290,11 @@ class QAPISchemaParser(object):
+@@ -259,9 +259,8 @@ class QAPIDoc(object):
+ class QAPISchemaParser(object):
+
+     def __init__(self, fp, previously_included=3D[], incl_info=3DNone):
+-        abs_fname =3D os.path.abspath(fp.name)
+         self.fname =3D fp.name
+-        previously_included.append(abs_fname)
++        previously_included.append(os.path.abspath(fp.name))
+         self.incl_info =3D incl_info
+         self.src =3D fp.read()
+         if self.src =3D=3D '' or self.src[-1] !=3D '\n':
+@@ -292,7 +291,7 @@ class QAPISchemaParser(object):
                  if not isinstance(include, str):
                      raise QAPISemError(info,
                                         "Value of 'include' must be a str=
 ing")
--                exprs_include =3D self._include(include, info,
--                                              os.path.dirname(self.fname=
-),
-+                incl_fname =3D os.path.join(os.path.dirname(self.fname),
-+                                          include)
-+                self.exprs.append({'expr': {'include': incl_fname},
-+                                   'info': info})
-+                exprs_include =3D self._include(include, info, incl_fnam=
-e,
-                                               previously_included)
-                 if exprs_include:
-                     self.exprs.extend(exprs_include.exprs)
-@@ -326,8 +329,7 @@ class QAPISchemaParser(object):
-                 "Documentation for '%s' is not followed by the definitio=
-n"
+-                self._include(include, info, os.path.dirname(abs_fname),
++                self._include(include, info, os.path.dirname(self.fname)=
+,
+                               previously_included)
+             elif "pragma" in expr:
+                 self.reject_expr_doc(cur_doc)
+@@ -325,7 +324,8 @@ class QAPISchemaParser(object):
                  % doc.symbol)
 
--    def _include(self, include, info, base_dir, previously_included):
--        incl_fname =3D os.path.join(base_dir, include)
-+    def _include(self, include, info, incl_fname, previously_included):
-         incl_abs_fname =3D os.path.abspath(incl_fname)
+     def _include(self, include, info, base_dir, previously_included):
+-        incl_abs_fname =3D os.path.join(base_dir, include)
++        incl_fname =3D os.path.join(base_dir, include)
++        incl_abs_fname =3D os.path.abspath(incl_fname)
          # catch inclusion cycle
          inf =3D info
-@@ -893,6 +895,9 @@ def check_exprs(exprs):
-         info =3D expr_elem['info']
-         doc =3D expr_elem.get('doc')
-
-+        if 'include' in expr:
-+            continue
-+
-         if not doc and doc_required:
-             raise QAPISemError(info,
-                                "Expression missing documentation comment=
-")
-@@ -932,6 +937,9 @@ def check_exprs(exprs):
-     # Try again for hidden UnionKind enum
-     for expr_elem in exprs:
-         expr =3D expr_elem['expr']
-+
-+        if 'include' in expr:
-+            continue
-         if 'union' in expr and not discriminator_find_enum_define(expr):
-             name =3D '%sKind' % expr['union']
-         elif 'alternate' in expr:
-@@ -947,6 +955,8 @@ def check_exprs(exprs):
-         info =3D expr_elem['info']
-         doc =3D expr_elem.get('doc')
-
-+        if 'include' in expr:
-+            continue
-         if 'enum' in expr:
-             check_enum(expr, info)
-         elif 'union' in expr:
-@@ -1667,6 +1677,8 @@ class QAPISchema(object):
-                 self._def_command(expr, info, doc)
-             elif 'event' in expr:
-                 self._def_event(expr, info, doc)
-+            elif 'include' in expr:
-+                pass
-             else:
-                 assert False
-
+         while inf:
+@@ -337,9 +337,9 @@ class QAPISchemaParser(object):
+         if incl_abs_fname in previously_included:
+             return
+         try:
+-            fobj =3D open(incl_abs_fname, 'r')
++            fobj =3D open(incl_fname, 'r')
+         except IOError as e:
+-            raise QAPISemError(info, '%s: %s' % (e.strerror, include))
++            raise QAPISemError(info, '%s: %s' % (e.strerror, incl_fname)=
+)
+         exprs_include =3D QAPISchemaParser(fobj, previously_included, in=
+fo)
+         self.exprs.extend(exprs_include.exprs)
+         self.docs.extend(exprs_include.docs)
+diff --git a/tests/qapi-schema/include-no-file.err b/tests/qapi-schema/in=
+clude-no-file.err
+index d5b9b22d85d..e42bcf4bc1a 100644
+--- a/tests/qapi-schema/include-no-file.err
++++ b/tests/qapi-schema/include-no-file.err
+@@ -1 +1 @@
+-tests/qapi-schema/include-no-file.json:1: No such file or directory: inc=
+lude-no-file-sub.json
++tests/qapi-schema/include-no-file.json:1: No such file or directory: tes=
+ts/qapi-schema/include-no-file-sub.json
 --=20
 2.14.3
