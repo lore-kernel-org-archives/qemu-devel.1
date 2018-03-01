@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erVJe-0004he-0g
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 16:00:38 -0500
+	(envelope-from <eblake@redhat.com>) id 1erVM5-0005ge-AS
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 16:03:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erVJZ-00027c-VB
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 16:00:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36238)
+	(envelope-from <eblake@redhat.com>) id 1erVM4-0003zZ-0t
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 16:03:09 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57402 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1erVJZ-00026U-ON
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 16:00:33 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1erVM3-0003zH-O1
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 16:03:07 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AD171C057F87
-	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 21:00:32 +0000 (UTC)
-References: <151993767396.1299.15660444397103345250@bdbb90650ae5>
+	by mx1.redhat.com (Postfix) with ESMTPS id 53A924040856
+	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 21:02:55 +0000 (UTC)
+Received: from red.redhat.com (ovpn-122-122.rdu2.redhat.com [10.10.122.122])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 1DDC72026E04
+	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 21:02:50 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <06c1a363-0005-5a53-7099-cbeaad18cf37@redhat.com>
-Date: Thu, 1 Mar 2018 15:00:23 -0600
-MIME-Version: 1.0
-In-Reply-To: <151993767396.1299.15660444397103345250@bdbb90650ae5>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 00/30] QAPI patches for 2018-03-01
+Date: Thu,  1 Mar 2018 15:02:45 -0600
+Message-Id: <20180301210249.14872-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PULL 0/4] nbd patches for 2018-03-01
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,31 +31,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: famz@redhat.com
 
-On 03/01/2018 02:54 PM, no-reply@patchew.org wrote:
-> Hi,
-> 
-> This series failed build test on s390x host. Please find the details below.
-> 
-> Type: series
-> Message-id: 20180301194245.29854-1-eblake@redhat.com
-> Subject: [Qemu-devel] [PULL 00/30] QAPI patches for 2018-03-01
-> 
+The following changes since commit 0dc8ae5e8e693737dfe65ba02d0c6eccb58a9c67:
 
->    CC      s390x-softmmu/hw/s390x/s390-skeys-kvm.o
->    CC      s390x-softmmu/hw/s390x/s390-stattrib-kvm.o
->    CC      sh4eb-softmmu/memory.o
->    CC      s390x-softmmu/hw/s390x/s390-ccw.o
->    CC      s390x-softmmu/target/s390x/cpu.o
-> /var/tmp/patchew-tester-tmp-u79v_jwg/src/target/s390x/cpu.c:38:10: fatal error: qapi-visit.h: No such file or directory
->   #include "qapi-visit.h"
->            ^~~~~~~~~~~~~~
+  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180301-v2' into staging (2018-03-01 17:08:16 +0000)
 
-Real problem introduced by this series, looks like I get to rebase and 
-send v2.
+are available in the Git repository at:
+
+  git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2018-03-01
+
+for you to fetch changes up to 28fb494f9b8827c6087d515e20a3c78baaf443cc:
+
+  nbd/client: fix error messages in nbd_handle_reply_err (2018-03-01 14:48:23 -0600)
+
+----------------------------------------------------------------
+nbd patches for 2018-03-01
+
+- Eric Blake: nbd: Honor server's advertised minimum block size
+- Vladimir Sementsov-Ogievskiy: partial: nbd block status base:allocation
+
+----------------------------------------------------------------
+Eric Blake (1):
+      nbd: Honor server's advertised minimum block size
+
+Vladimir Sementsov-Ogievskiy (3):
+      nbd: change indenting in nbd.h
+      nbd: BLOCK_STATUS constants
+      nbd/client: fix error messages in nbd_handle_reply_err
+
+ include/block/nbd.h | 53 ++++++++++++++++++++++++++++++++++++++++++-----------
+ block/nbd-client.c  |  3 ---
+ block/nbd.c         |  2 ++
+ nbd/client.c        | 24 ++++++++++++------------
+ nbd/common.c        | 10 ++++++++++
+ nbd/server.c        |  4 ++--
+ nbd/trace-events    |  8 ++++----
+ 7 files changed, 72 insertions(+), 32 deletions(-)
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.14.3
