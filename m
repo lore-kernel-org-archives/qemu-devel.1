@@ -1,17 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1erRCJ-0006jN-JS
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:36:50 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1erRCN-0006mg-BF
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:36:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1erRCH-0002wD-Hi
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:36:47 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1erRCL-00031B-RS
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:36:51 -0500
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  1 Mar 2018 17:36:17 +0100
-Message-Id: <20180301163619.21072-7-pbonzini@redhat.com>
+Date: Thu,  1 Mar 2018 17:36:18 +0100
+Message-Id: <20180301163619.21072-8-pbonzini@redhat.com>
 In-Reply-To: <20180301163619.21072-1-pbonzini@redhat.com>
 References: <20180301163619.21072-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 6/8] qed: make bdrv_qed_do_open a coroutine_fn
+Subject: [Qemu-devel] [PATCH 7/8] block: convert bdrv_invalidate_cache
+ callback to coroutine_fn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,84 +24,253 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com
 
-It is called from qed_invalidate_cache in coroutine context (incoming
-migration runs in a coroutine), so it's cleaner if metadata is always
-loaded from a coroutine.
+QED's bdrv_invalidate_cache implementation would like to reuse functions
+that acquire/release the metadata locks.  Call it from coroutine context
+to simplify the logic.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <1516279431-30424-5-git-send-email-pbonzini@redhat.com>
+Message-Id: <1516279431-30424-6-git-send-email-pbonzini@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/qed.c | 40 +++++++++++++++++++++++++++++++++++++---
- 1 file changed, 37 insertions(+), 3 deletions(-)
+ block.c                   | 41 +++++++++++++++++++++++++++++++++++++----
+ block/iscsi.c             |  6 +++---
+ block/nfs.c               |  6 +++---
+ block/qcow2.c             |  7 +++++--
+ block/qed.c               | 13 +++++--------
+ block/rbd.c               |  6 +++---
+ include/block/block_int.h |  3 ++-
+ 7 files changed, 58 insertions(+), 24 deletions(-)
 
-diff --git a/block/qed.c b/block/qed.c
-index dd31c5046e..d379c8c2f0 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -381,8 +381,9 @@ static void bdrv_qed_init_state(BlockDriverState *bs)
-     qemu_co_queue_init(&s->allocating_write_reqs);
+diff --git a/block.c b/block.c
+index e713fe3d00..b72ed976fd 100644
+--- a/block.c
++++ b/block.c
+@@ -4211,7 +4211,8 @@ void bdrv_init_with_whitelist(void)
+     bdrv_init();
  }
  
--static int bdrv_qed_do_open(BlockDriverState *bs, QDict *options, int flags,
--                            Error **errp)
-+/* Called with table_lock held.  */
-+static int coroutine_fn bdrv_qed_do_open(BlockDriverState *bs, QDict *options,
-+                                         int flags, Error **errp)
+-void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
++static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
++                                                  Error **errp)
  {
-     BDRVQEDState *s = bs->opaque;
-     QEDHeader le_header;
-@@ -513,9 +514,35 @@ out:
+     BdrvChild *child, *parent;
+     uint64_t perm, shared_perm;
+@@ -4227,7 +4228,7 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
+     }
+ 
+     QLIST_FOREACH(child, &bs->children, next) {
+-        bdrv_invalidate_cache(child->bs, &local_err);
++        bdrv_co_invalidate_cache(child->bs, &local_err);
+         if (local_err) {
+             error_propagate(errp, local_err);
+             return;
+@@ -4257,8 +4258,8 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
+     }
+     bdrv_set_perm(bs, perm, shared_perm);
+ 
+-    if (bs->drv->bdrv_invalidate_cache) {
+-        bs->drv->bdrv_invalidate_cache(bs, &local_err);
++    if (bs->drv->bdrv_co_invalidate_cache) {
++        bs->drv->bdrv_co_invalidate_cache(bs, &local_err);
+         if (local_err) {
+             bs->open_flags |= BDRV_O_INACTIVE;
+             error_propagate(errp, local_err);
+@@ -4284,6 +4285,38 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
+     }
+ }
+ 
++typedef struct InvalidateCacheCo {
++    BlockDriverState *bs;
++    Error **errp;
++    bool done;
++} InvalidateCacheCo;
++
++static void coroutine_fn bdrv_invalidate_cache_co_entry(void *opaque)
++{
++    InvalidateCacheCo *ico = opaque;
++    bdrv_co_invalidate_cache(ico->bs, ico->errp);
++    ico->done = true;
++}
++
++void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
++{
++    Coroutine *co;
++    InvalidateCacheCo ico = {
++        .bs = bs,
++        .done = false,
++        .errp = errp
++    };
++
++    if (qemu_in_coroutine()) {
++        /* Fast-path if already in coroutine context */
++        bdrv_invalidate_cache_co_entry(&ico);
++    } else {
++        co = qemu_coroutine_create(bdrv_invalidate_cache_co_entry, &ico);
++        qemu_coroutine_enter(co);
++        BDRV_POLL_WHILE(bs, !ico.done);
++    }
++}
++
+ void bdrv_invalidate_cache_all(Error **errp)
+ {
+     BlockDriverState *bs;
+diff --git a/block/iscsi.c b/block/iscsi.c
+index 662f441997..10e2eef03c 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -2168,8 +2168,8 @@ static int iscsi_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
+     return 0;
+ }
+ 
+-static void iscsi_invalidate_cache(BlockDriverState *bs,
+-                                   Error **errp)
++static void coroutine_fn iscsi_co_invalidate_cache(BlockDriverState *bs,
++                                                   Error **errp)
+ {
+     IscsiLun *iscsilun = bs->opaque;
+     iscsi_allocmap_invalidate(iscsilun);
+@@ -2200,7 +2200,7 @@ static BlockDriver bdrv_iscsi = {
+     .create_opts            = &iscsi_create_opts,
+     .bdrv_reopen_prepare    = iscsi_reopen_prepare,
+     .bdrv_reopen_commit     = iscsi_reopen_commit,
+-    .bdrv_invalidate_cache  = iscsi_invalidate_cache,
++    .bdrv_co_invalidate_cache = iscsi_co_invalidate_cache,
+ 
+     .bdrv_getlength  = iscsi_getlength,
+     .bdrv_get_info   = iscsi_get_info,
+diff --git a/block/nfs.c b/block/nfs.c
+index ce6e195a41..68d822b6ff 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -876,8 +876,8 @@ static void nfs_refresh_filename(BlockDriverState *bs, QDict *options)
+ }
+ 
+ #ifdef LIBNFS_FEATURE_PAGECACHE
+-static void nfs_invalidate_cache(BlockDriverState *bs,
+-                                 Error **errp)
++static void coroutine_fn nfs_co_invalidate_cache(BlockDriverState *bs,
++                                                 Error **errp)
+ {
+     NFSClient *client = bs->opaque;
+     nfs_pagecache_invalidate(client->context, client->fh);
+@@ -910,7 +910,7 @@ static BlockDriver bdrv_nfs = {
+     .bdrv_refresh_filename          = nfs_refresh_filename,
+ 
+ #ifdef LIBNFS_FEATURE_PAGECACHE
+-    .bdrv_invalidate_cache          = nfs_invalidate_cache,
++    .bdrv_co_invalidate_cache       = nfs_co_invalidate_cache,
+ #endif
+ };
+ 
+diff --git a/block/qcow2.c b/block/qcow2.c
+index b5410c5b00..33e260a381 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2119,7 +2119,8 @@ static void qcow2_close(BlockDriverState *bs)
+     qcow2_free_snapshots(bs);
+ }
+ 
+-static void qcow2_invalidate_cache(BlockDriverState *bs, Error **errp)
++static void coroutine_fn qcow2_co_invalidate_cache(BlockDriverState *bs,
++                                                   Error **errp)
+ {
+     BDRVQcow2State *s = bs->opaque;
+     int flags = s->flags;
+@@ -2142,7 +2143,9 @@ static void qcow2_invalidate_cache(BlockDriverState *bs, Error **errp)
+     options = qdict_clone_shallow(bs->options);
+ 
+     flags &= ~BDRV_O_INACTIVE;
++    qemu_co_mutex_lock(&s->lock);
+     ret = qcow2_do_open(bs, options, flags, &local_err);
++    qemu_co_mutex_unlock(&s->lock);
+     QDECREF(options);
+     if (local_err) {
+         error_propagate(errp, local_err);
+@@ -4383,7 +4386,7 @@ BlockDriver bdrv_qcow2 = {
+     .bdrv_change_backing_file   = qcow2_change_backing_file,
+ 
+     .bdrv_refresh_limits        = qcow2_refresh_limits,
+-    .bdrv_invalidate_cache      = qcow2_invalidate_cache,
++    .bdrv_co_invalidate_cache   = qcow2_co_invalidate_cache,
+     .bdrv_inactivate            = qcow2_inactivate,
+ 
+     .create_opts         = &qcow2_create_opts,
+diff --git a/block/qed.c b/block/qed.c
+index d379c8c2f0..7da553035e 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -1549,7 +1549,8 @@ static int bdrv_qed_change_backing_file(BlockDriverState *bs,
      return ret;
  }
  
-+typedef struct QEDOpenCo {
-+    BlockDriverState *bs;
-+    QDict *options;
-+    int flags;
-+    Error **errp;
-+    int ret;
-+} QEDOpenCo;
-+
-+static void coroutine_fn bdrv_qed_open_entry(void *opaque)
-+{
-+    QEDOpenCo *qoc = opaque;
-+    BDRVQEDState *s = qoc->bs->opaque;
-+
-+    qemu_co_mutex_lock(&s->table_lock);
-+    qoc->ret = bdrv_qed_do_open(qoc->bs, qoc->options, qoc->flags, qoc->errp);
-+    qemu_co_mutex_unlock(&s->table_lock);
-+}
-+
- static int bdrv_qed_open(BlockDriverState *bs, QDict *options, int flags,
-                          Error **errp)
+-static void bdrv_qed_invalidate_cache(BlockDriverState *bs, Error **errp)
++static void coroutine_fn bdrv_qed_co_invalidate_cache(BlockDriverState *bs,
++                                                      Error **errp)
  {
-+    QEDOpenCo qoc = {
-+        .bs = bs,
-+        .options = options,
-+        .flags = flags,
-+        .errp = errp,
-+        .ret = -EINPROGRESS
-+    };
-+
-     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file,
-                                false, errp);
-     if (!bs->file) {
-@@ -523,7 +550,14 @@ static int bdrv_qed_open(BlockDriverState *bs, QDict *options, int flags,
-     }
+     BDRVQEDState *s = bs->opaque;
+     Error *local_err = NULL;
+@@ -1558,13 +1559,9 @@ static void bdrv_qed_invalidate_cache(BlockDriverState *bs, Error **errp)
+     bdrv_qed_close(bs);
  
      bdrv_qed_init_state(bs);
--    return bdrv_qed_do_open(bs, options, flags, errp);
-+    if (qemu_in_coroutine()) {
-+        bdrv_qed_open_entry(&qoc);
-+    } else {
-+        qemu_coroutine_enter(qemu_coroutine_create(bdrv_qed_open_entry, &qoc));
-+        BDRV_POLL_WHILE(bs, qoc.ret == -EINPROGRESS);
-+    }
-+    BDRV_POLL_WHILE(bs, qoc.ret == -EINPROGRESS);
-+    return qoc.ret;
- }
+-    if (qemu_in_coroutine()) {
+-        qemu_co_mutex_lock(&s->table_lock);
+-    }
++    qemu_co_mutex_lock(&s->table_lock);
+     ret = bdrv_qed_do_open(bs, NULL, bs->open_flags, &local_err);
+-    if (qemu_in_coroutine()) {
+-        qemu_co_mutex_unlock(&s->table_lock);
+-    }
++    qemu_co_mutex_unlock(&s->table_lock);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         error_prepend(errp, "Could not reopen qed layer: ");
+@@ -1639,7 +1636,7 @@ static BlockDriver bdrv_qed = {
+     .bdrv_get_info            = bdrv_qed_get_info,
+     .bdrv_refresh_limits      = bdrv_qed_refresh_limits,
+     .bdrv_change_backing_file = bdrv_qed_change_backing_file,
+-    .bdrv_invalidate_cache    = bdrv_qed_invalidate_cache,
++    .bdrv_co_invalidate_cache = bdrv_qed_co_invalidate_cache,
+     .bdrv_check               = bdrv_qed_check,
+     .bdrv_detach_aio_context  = bdrv_qed_detach_aio_context,
+     .bdrv_attach_aio_context  = bdrv_qed_attach_aio_context,
+diff --git a/block/rbd.c b/block/rbd.c
+index c7dd32e213..c1275c1ec9 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -1093,8 +1093,8 @@ static BlockAIOCB *qemu_rbd_aio_pdiscard(BlockDriverState *bs,
+ #endif
  
- static void bdrv_qed_refresh_limits(BlockDriverState *bs, Error **errp)
+ #ifdef LIBRBD_SUPPORTS_INVALIDATE
+-static void qemu_rbd_invalidate_cache(BlockDriverState *bs,
+-                                      Error **errp)
++static void coroutine_fn qemu_rbd_co_invalidate_cache(BlockDriverState *bs,
++                                                      Error **errp)
+ {
+     BDRVRBDState *s = bs->opaque;
+     int r = rbd_invalidate_cache(s->image);
+@@ -1160,7 +1160,7 @@ static BlockDriver bdrv_rbd = {
+     .bdrv_snapshot_list     = qemu_rbd_snap_list,
+     .bdrv_snapshot_goto     = qemu_rbd_snap_rollback,
+ #ifdef LIBRBD_SUPPORTS_INVALIDATE
+-    .bdrv_invalidate_cache  = qemu_rbd_invalidate_cache,
++    .bdrv_co_invalidate_cache = qemu_rbd_co_invalidate_cache,
+ #endif
+ };
+ 
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index f80683ded2..10064d2a2f 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -216,7 +216,8 @@ struct BlockDriver {
+     /*
+      * Invalidate any cached meta-data.
+      */
+-    void (*bdrv_invalidate_cache)(BlockDriverState *bs, Error **errp);
++    void coroutine_fn (*bdrv_co_invalidate_cache)(BlockDriverState *bs,
++                                                  Error **errp);
+     int (*bdrv_inactivate)(BlockDriverState *bs);
+ 
+     /*
 -- 
 2.14.3
