@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1erK3e-00031O-JN
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 03:59:24 -0500
+	(envelope-from <tina.zhang@intel.com>) id 1erK48-0003Ul-U8
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 03:59:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1erK3c-0004s4-SL
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 03:59:22 -0500
-References: <1519827835-239519-1-git-send-email-imammedo@redhat.com>
-	<1519827835-239519-11-git-send-email-imammedo@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <f73ea65f-dbab-b575-fd76-e772b576d865@redhat.com>
-Date: Thu, 1 Mar 2018 09:59:07 +0100
+	(envelope-from <tina.zhang@intel.com>) id 1erK44-00053b-T3
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 03:59:53 -0500
+Received: from mga18.intel.com ([134.134.136.126]:53953)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tina.zhang@intel.com>)
+	id 1erK44-000520-F5
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 03:59:48 -0500
+From: "Zhang, Tina" <tina.zhang@intel.com>
+Date: Thu, 1 Mar 2018 08:59:43 +0000
+Message-ID: <237F54289DF84E4997F34151298ABEBC7C6F0557@SHSMSX101.ccr.corp.intel.com>
+References: <20180228123110.6507-1-kraxel@redhat.com>
+	<20180228123110.6507-10-kraxel@redhat.com>
+In-Reply-To: <20180228123110.6507-10-kraxel@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <1519827835-239519-11-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 10/10] tests: acpi: don't read all
- fields in test_acpi_fadt_table()
+Subject: Re: [Qemu-devel] [PATCH v6 9/9] vfio/display: adding dmabuf support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,261 +29,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Alex Williamson <alex.williamson@redhat.com>, "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>, Kirti Wankhede <kwankhede@nvidia.com>
 
-Hi Igor,
-
-On 28/02/18 15:23, Igor Mammedov wrote:
-> there is no point to read fields here but not actually
-> checking them so drop it and read only header + dsdt/facs
-> addresses since it's needed later to fetch that tables.
-> 
-> With this cleanup we can get rid of AcpiFadtDescriptorRev3/
-> ACPI_FADT_COMMON_DEF which have no users left.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-My only comment is you could have removed include/hw/acpi/acpi-defs.h
-defs in a separate subsequent patch after updating the test stuff. Besides,
-
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Eric
-> ---
->  include/hw/acpi/acpi-defs.h | 81 --------------------------------------------
->  tests/bios-tables-test.c    | 82 ++++++++++-----------------------------------
->  2 files changed, 18 insertions(+), 145 deletions(-)
-> 
-> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-> index fe15e95..5955eb4 100644
-> --- a/include/hw/acpi/acpi-defs.h
-> +++ b/include/hw/acpi/acpi-defs.h
-> @@ -75,82 +75,6 @@ struct AcpiTableHeader {
->  } QEMU_PACKED;
->  typedef struct AcpiTableHeader AcpiTableHeader;
->  
-> -/*
-> - * ACPI Fixed ACPI Description Table (FADT)
-> - */
-> -#define ACPI_FADT_COMMON_DEF /* FADT common definition */ \
-> -    ACPI_TABLE_HEADER_DEF    /* ACPI common table header */ \
-> -    uint32_t firmware_ctrl;  /* Physical address of FACS */ \
-> -    uint32_t dsdt;         /* Physical address of DSDT */ \
-> -    uint8_t  model;        /* System Interrupt Model */ \
-> -    uint8_t  reserved1;    /* Reserved */ \
-> -    uint16_t sci_int;      /* System vector of SCI interrupt */ \
-> -    uint32_t smi_cmd;      /* Port address of SMI command port */ \
-> -    uint8_t  acpi_enable;  /* Value to write to smi_cmd to enable ACPI */ \
-> -    uint8_t  acpi_disable; /* Value to write to smi_cmd to disable ACPI */ \
-> -    /* Value to write to SMI CMD to enter S4BIOS state */ \
-> -    uint8_t  S4bios_req; \
-> -    uint8_t  reserved2;    /* Reserved - must be zero */ \
-> -    /* Port address of Power Mgt 1a acpi_event Reg Blk */ \
-> -    uint32_t pm1a_evt_blk; \
-> -    /* Port address of Power Mgt 1b acpi_event Reg Blk */ \
-> -    uint32_t pm1b_evt_blk; \
-> -    uint32_t pm1a_cnt_blk; /* Port address of Power Mgt 1a Control Reg Blk */ \
-> -    uint32_t pm1b_cnt_blk; /* Port address of Power Mgt 1b Control Reg Blk */ \
-> -    uint32_t pm2_cnt_blk;  /* Port address of Power Mgt 2 Control Reg Blk */ \
-> -    uint32_t pm_tmr_blk;   /* Port address of Power Mgt Timer Ctrl Reg Blk */ \
-> -    /* Port addr of General Purpose acpi_event 0 Reg Blk */ \
-> -    uint32_t gpe0_blk; \
-> -    /* Port addr of General Purpose acpi_event 1 Reg Blk */ \
-> -    uint32_t gpe1_blk; \
-> -    uint8_t  pm1_evt_len;  /* Byte length of ports at pm1_x_evt_blk */ \
-> -    uint8_t  pm1_cnt_len;  /* Byte length of ports at pm1_x_cnt_blk */ \
-> -    uint8_t  pm2_cnt_len;  /* Byte Length of ports at pm2_cnt_blk */ \
-> -    uint8_t  pm_tmr_len;   /* Byte Length of ports at pm_tm_blk */ \
-> -    uint8_t  gpe0_blk_len; /* Byte Length of ports at gpe0_blk */ \
-> -    uint8_t  gpe1_blk_len; /* Byte Length of ports at gpe1_blk */ \
-> -    uint8_t  gpe1_base;    /* Offset in gpe model where gpe1 events start */ \
-> -    uint8_t  reserved3;    /* Reserved */ \
-> -    uint16_t plvl2_lat;    /* Worst case HW latency to enter/exit C2 state */ \
-> -    uint16_t plvl3_lat;    /* Worst case HW latency to enter/exit C3 state */ \
-> -    uint16_t flush_size;   /* Size of area read to flush caches */ \
-> -    uint16_t flush_stride; /* Stride used in flushing caches */ \
-> -    uint8_t  duty_offset;  /* Bit location of duty cycle field in p_cnt reg */ \
-> -    uint8_t  duty_width;   /* Bit width of duty cycle field in p_cnt reg */ \
-> -    uint8_t  day_alrm;     /* Index to day-of-month alarm in RTC CMOS RAM */ \
-> -    uint8_t  mon_alrm;     /* Index to month-of-year alarm in RTC CMOS RAM */ \
-> -    uint8_t  century;      /* Index to century in RTC CMOS RAM */ \
-> -    /* IA-PC Boot Architecture Flags (see below for individual flags) */ \
-> -    uint16_t boot_flags; \
-> -    uint8_t reserved;    /* Reserved, must be zero */ \
-> -    /* Miscellaneous flag bits (see below for individual flags) */ \
-> -    uint32_t flags; \
-> -    /* 64-bit address of the Reset register */ \
-> -    struct AcpiGenericAddress reset_register; \
-> -    /* Value to write to the reset_register port to reset the system */ \
-> -    uint8_t reset_value; \
-> -    /* ARM-Specific Boot Flags (see below for individual flags) (ACPI 5.1) */ \
-> -    uint16_t arm_boot_flags; \
-> -    uint8_t minor_revision;  /* FADT Minor Revision (ACPI 5.1) */ \
-> -    uint64_t x_facs;          /* 64-bit physical address of FACS */ \
-> -    uint64_t x_dsdt;          /* 64-bit physical address of DSDT */ \
-> -    /* 64-bit Extended Power Mgt 1a Event Reg Blk address */ \
-> -    struct AcpiGenericAddress xpm1a_event_block; \
-> -    /* 64-bit Extended Power Mgt 1b Event Reg Blk address */ \
-> -    struct AcpiGenericAddress xpm1b_event_block; \
-> -    /* 64-bit Extended Power Mgt 1a Control Reg Blk address */ \
-> -    struct AcpiGenericAddress xpm1a_control_block; \
-> -    /* 64-bit Extended Power Mgt 1b Control Reg Blk address */ \
-> -    struct AcpiGenericAddress xpm1b_control_block; \
-> -    /* 64-bit Extended Power Mgt 2 Control Reg Blk address */ \
-> -    struct AcpiGenericAddress xpm2_control_block; \
-> -    /* 64-bit Extended Power Mgt Timer Ctrl Reg Blk address */ \
-> -    struct AcpiGenericAddress xpm_timer_block; \
-> -    /* 64-bit Extended General Purpose Event 0 Reg Blk address */ \
-> -    struct AcpiGenericAddress xgpe0_block; \
-> -    /* 64-bit Extended General Purpose Event 1 Reg Blk address */ \
-> -    struct AcpiGenericAddress xgpe1_block; \
-> -
->  struct AcpiGenericAddress {
->      uint8_t space_id;        /* Address space where struct or register exists */
->      uint8_t bit_width;       /* Size in bits of given register */
-> @@ -160,11 +84,6 @@ struct AcpiGenericAddress {
->      uint64_t address;        /* 64-bit address of struct or register */
->  } QEMU_PACKED;
->  
-> -struct AcpiFadtDescriptorRev3 {
-> -    ACPI_FADT_COMMON_DEF
-> -} QEMU_PACKED;
-> -typedef struct AcpiFadtDescriptorRev3 AcpiFadtDescriptorRev3;
-> -
->  typedef struct AcpiFadtData {
->      struct AcpiGenericAddress pm1a_cnt;   /* PM1a_CNT_BLK */
->      struct AcpiGenericAddress pm1a_evt;   /* PM1a_EVT_BLK */
-> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-> index 65b271a..cd753ff 100644
-> --- a/tests/bios-tables-test.c
-> +++ b/tests/bios-tables-test.c
-> @@ -29,7 +29,8 @@ typedef struct {
->      uint32_t rsdp_addr;
->      AcpiRsdpDescriptor rsdp_table;
->      AcpiRsdtDescriptorRev1 rsdt_table;
-> -    AcpiFadtDescriptorRev3 fadt_table;
-> +    uint32_t dsdt_addr;
-> +    uint32_t facs_addr;
->      AcpiFacsDescriptorRev1 facs_table;
->      uint32_t *rsdt_tables_addr;
->      int rsdt_tables_nr;
-> @@ -127,71 +128,18 @@ static void test_acpi_rsdt_table(test_data *data)
->      data->rsdt_tables_nr = tables_nr;
->  }
->  
-> -static void test_acpi_fadt_table(test_data *data)
-> +static void fadt_fetch_facs_and_dsdt_ptrs(test_data *data)
->  {
-> -    AcpiFadtDescriptorRev3 *fadt_table = &data->fadt_table;
->      uint32_t addr;
-> +    AcpiTableHeader hdr;
->  
->      /* FADT table comes first */
->      addr = le32_to_cpu(data->rsdt_tables_addr[0]);
-> -    ACPI_READ_TABLE_HEADER(fadt_table, addr);
-> -
-> -    ACPI_READ_FIELD(fadt_table->firmware_ctrl, addr);
-> -    ACPI_READ_FIELD(fadt_table->dsdt, addr);
-> -    ACPI_READ_FIELD(fadt_table->model, addr);
-> -    ACPI_READ_FIELD(fadt_table->reserved1, addr);
-> -    ACPI_READ_FIELD(fadt_table->sci_int, addr);
-> -    ACPI_READ_FIELD(fadt_table->smi_cmd, addr);
-> -    ACPI_READ_FIELD(fadt_table->acpi_enable, addr);
-> -    ACPI_READ_FIELD(fadt_table->acpi_disable, addr);
-> -    ACPI_READ_FIELD(fadt_table->S4bios_req, addr);
-> -    ACPI_READ_FIELD(fadt_table->reserved2, addr);
-> -    ACPI_READ_FIELD(fadt_table->pm1a_evt_blk, addr);
-> -    ACPI_READ_FIELD(fadt_table->pm1b_evt_blk, addr);
-> -    ACPI_READ_FIELD(fadt_table->pm1a_cnt_blk, addr);
-> -    ACPI_READ_FIELD(fadt_table->pm1b_cnt_blk, addr);
-> -    ACPI_READ_FIELD(fadt_table->pm2_cnt_blk, addr);
-> -    ACPI_READ_FIELD(fadt_table->pm_tmr_blk, addr);
-> -    ACPI_READ_FIELD(fadt_table->gpe0_blk, addr);
-> -    ACPI_READ_FIELD(fadt_table->gpe1_blk, addr);
-> -    ACPI_READ_FIELD(fadt_table->pm1_evt_len, addr);
-> -    ACPI_READ_FIELD(fadt_table->pm1_cnt_len, addr);
-> -    ACPI_READ_FIELD(fadt_table->pm2_cnt_len, addr);
-> -    ACPI_READ_FIELD(fadt_table->pm_tmr_len, addr);
-> -    ACPI_READ_FIELD(fadt_table->gpe0_blk_len, addr);
-> -    ACPI_READ_FIELD(fadt_table->gpe1_blk_len, addr);
-> -    ACPI_READ_FIELD(fadt_table->gpe1_base, addr);
-> -    ACPI_READ_FIELD(fadt_table->reserved3, addr);
-> -    ACPI_READ_FIELD(fadt_table->plvl2_lat, addr);
-> -    ACPI_READ_FIELD(fadt_table->plvl3_lat, addr);
-> -    ACPI_READ_FIELD(fadt_table->flush_size, addr);
-> -    ACPI_READ_FIELD(fadt_table->flush_stride, addr);
-> -    ACPI_READ_FIELD(fadt_table->duty_offset, addr);
-> -    ACPI_READ_FIELD(fadt_table->duty_width, addr);
-> -    ACPI_READ_FIELD(fadt_table->day_alrm, addr);
-> -    ACPI_READ_FIELD(fadt_table->mon_alrm, addr);
-> -    ACPI_READ_FIELD(fadt_table->century, addr);
-> -    ACPI_READ_FIELD(fadt_table->boot_flags, addr);
-> -    ACPI_READ_FIELD(fadt_table->reserved, addr);
-> -    ACPI_READ_FIELD(fadt_table->flags, addr);
-> -    ACPI_READ_GENERIC_ADDRESS(fadt_table->reset_register, addr);
-> -    ACPI_READ_FIELD(fadt_table->reset_value, addr);
-> -    ACPI_READ_FIELD(fadt_table->arm_boot_flags, addr);
-> -    ACPI_READ_FIELD(fadt_table->minor_revision, addr);
-> -    ACPI_READ_FIELD(fadt_table->x_facs, addr);
-> -    ACPI_READ_FIELD(fadt_table->x_dsdt, addr);
-> -    ACPI_READ_GENERIC_ADDRESS(fadt_table->xpm1a_event_block, addr);
-> -    ACPI_READ_GENERIC_ADDRESS(fadt_table->xpm1b_event_block, addr);
-> -    ACPI_READ_GENERIC_ADDRESS(fadt_table->xpm1a_control_block, addr);
-> -    ACPI_READ_GENERIC_ADDRESS(fadt_table->xpm1b_control_block, addr);
-> -    ACPI_READ_GENERIC_ADDRESS(fadt_table->xpm2_control_block, addr);
-> -    ACPI_READ_GENERIC_ADDRESS(fadt_table->xpm_timer_block, addr);
-> -    ACPI_READ_GENERIC_ADDRESS(fadt_table->xgpe0_block, addr);
-> -    ACPI_READ_GENERIC_ADDRESS(fadt_table->xgpe1_block, addr);
-> -
-> -    ACPI_ASSERT_CMP(fadt_table->signature, "FACP");
-> -    g_assert(!acpi_calc_checksum((uint8_t *)fadt_table,
-> -                                 le32_to_cpu(fadt_table->length)));
-> +    ACPI_READ_TABLE_HEADER(&hdr, addr);
-> +    ACPI_ASSERT_CMP(hdr.signature, "FACP");
-> +
-> +    ACPI_READ_FIELD(data->facs_addr, addr);
-> +    ACPI_READ_FIELD(data->dsdt_addr, addr);
->  }
->  
->  static void sanitize_fadt_ptrs(test_data *data)
-> @@ -206,6 +154,12 @@ static void sanitize_fadt_ptrs(test_data *data)
->              continue;
->          }
->  
-> +        /* check original FADT checksum before sanitizing table */
-> +        g_assert(!(uint8_t)(
-> +            acpi_calc_checksum((uint8_t *)sdt, sizeof(AcpiTableHeader)) +
-> +            acpi_calc_checksum((uint8_t *)sdt->aml, sdt->aml_len)
-> +        ));
-> +
->          /* sdt->aml field offset := spec offset - header size */
->          memset(sdt->aml + 0, 0, 4); /* sanitize FIRMWARE_CTRL(36) ptr */
->          memset(sdt->aml + 4, 0, 4); /* sanitize DSDT(40) ptr */
-> @@ -226,7 +180,7 @@ static void sanitize_fadt_ptrs(test_data *data)
->  static void test_acpi_facs_table(test_data *data)
->  {
->      AcpiFacsDescriptorRev1 *facs_table = &data->facs_table;
-> -    uint32_t addr = le32_to_cpu(data->fadt_table.firmware_ctrl);
-> +    uint32_t addr = le32_to_cpu(data->facs_addr);
->  
->      ACPI_READ_FIELD(facs_table->signature, addr);
->      ACPI_READ_FIELD(facs_table->length, addr);
-> @@ -265,7 +219,7 @@ static void fetch_table(AcpiSdtTable *sdt_table, uint32_t addr)
->  static void test_acpi_dsdt_table(test_data *data)
->  {
->      AcpiSdtTable dsdt_table;
-> -    uint32_t addr = le32_to_cpu(data->fadt_table.dsdt);
-> +    uint32_t addr = le32_to_cpu(data->dsdt_addr);
->  
->      fetch_table(&dsdt_table, addr);
->      ACPI_ASSERT_CMP(dsdt_table.header.signature, "DSDT");
-> @@ -674,7 +628,7 @@ static void test_acpi_one(const char *params, test_data *data)
->      test_acpi_rsdp_address(data);
->      test_acpi_rsdp_table(data);
->      test_acpi_rsdt_table(data);
-> -    test_acpi_fadt_table(data);
-> +    fadt_fetch_facs_and_dsdt_ptrs(data);
->      test_acpi_facs_table(data);
->      test_acpi_dsdt_table(data);
->      fetch_rsdt_referenced_tables(data);
-> 
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogaW50ZWwtZ3Z0LWRldiBb
+bWFpbHRvOmludGVsLWd2dC1kZXYtYm91bmNlc0BsaXN0cy5mcmVlZGVza3RvcC5vcmddIE9uDQo+
+IEJlaGFsZiBPZiBHZXJkIEhvZmZtYW5uDQo+IFNlbnQ6IFdlZG5lc2RheSwgRmVicnVhcnkgMjgs
+IDIwMTggODozMSBQTQ0KPiBUbzogcWVtdS1kZXZlbEBub25nbnUub3JnDQo+IENjOiBBbGV4IFdp
+bGxpYW1zb24gPGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tPjsgR2VyZCBIb2ZmbWFubg0KPiA8
+a3JheGVsQHJlZGhhdC5jb20+OyBpbnRlbC1ndnQtZGV2QGxpc3RzLmZyZWVkZXNrdG9wLm9yZzsg
+S2lydGkgV2Fua2hlZGUNCj4gPGt3YW5raGVkZUBudmlkaWEuY29tPjsgWmhhbmcsIFRpbmEgPHRp
+bmEuemhhbmdAaW50ZWwuY29tPg0KPiBTdWJqZWN0OiBbUEFUQ0ggdjYgOS85XSB2ZmlvL2Rpc3Bs
+YXk6IGFkZGluZyBkbWFidWYgc3VwcG9ydA0KPiANCj4gV2lyZSB1cCBkbWFidWYtYmFzZWQgZGlz
+cGxheS4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEdlcmQgSG9mZm1hbm4gPGtyYXhlbEByZWRoYXQu
+Y29tPg0KPiAtLS0NClBsZWFzZSBzZWUgbXkgY29tbWVudHMgYmVsb3cuDQpUZXN0ZWQtYnk6IFRp
+bmEgWmhhbmcgPHRpbmEuemhhbmdAaW50ZWwuY29tPg0KDQo+ICBpbmNsdWRlL2h3L3ZmaW8vdmZp
+by1jb21tb24uaCB8ICAxNCArKysrDQo+ICBody92ZmlvL2Rpc3BsYXkuYyAgICAgICAgICAgICB8
+IDE2Ng0KPiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0NCj4gIDIg
+ZmlsZXMgY2hhbmdlZCwgMTc4IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+IA0KPiBk
+aWZmIC0tZ2l0IGEvaW5jbHVkZS9ody92ZmlvL3ZmaW8tY29tbW9uLmggYi9pbmNsdWRlL2h3L3Zm
+aW8vdmZpby1jb21tb24uaA0KPiBpbmRleCBmYzhhZTE0ZmI3Li45OTRlNzgwZDUxIDEwMDY0NA0K
+PiAtLS0gYS9pbmNsdWRlL2h3L3ZmaW8vdmZpby1jb21tb24uaA0KPiArKysgYi9pbmNsdWRlL2h3
+L3ZmaW8vdmZpby1jb21tb24uaA0KPiBAQCAtMjYsNiArMjYsNyBAQA0KPiAgI2luY2x1ZGUgImV4
+ZWMvbWVtb3J5LmgiDQo+ICAjaW5jbHVkZSAicWVtdS9xdWV1ZS5oIg0KPiAgI2luY2x1ZGUgInFl
+bXUvbm90aWZ5LmgiDQo+ICsjaW5jbHVkZSAidWkvY29uc29sZS5oIg0KPiAgI2lmZGVmIENPTkZJ
+R19MSU5VWA0KPiAgI2luY2x1ZGUgPGxpbnV4L3ZmaW8uaD4NCj4gICNlbmRpZg0KPiBAQCAtMTQy
+LDEyICsxNDMsMjUgQEAgdHlwZWRlZiBzdHJ1Y3QgVkZJT0dyb3VwIHsNCj4gICAgICBRTElTVF9F
+TlRSWShWRklPR3JvdXApIGNvbnRhaW5lcl9uZXh0OyAgfSBWRklPR3JvdXA7DQo+IA0KPiArdHlw
+ZWRlZiBzdHJ1Y3QgVkZJT0RNQUJ1ZiB7DQo+ICsgICAgUWVtdURtYUJ1ZiBidWY7DQo+ICsgICAg
+dWludDMyX3QgcG9zX3gsIHBvc195Ow0KPiArICAgIHVpbnQzMl90IGhvdF94LCBob3RfeTsNCj4g
+KyAgICBpbnQgZG1hYnVmX2lkOw0KPiArICAgIFFUQUlMUV9FTlRSWShWRklPRE1BQnVmKSBuZXh0
+Ow0KPiArfSBWRklPRE1BQnVmOw0KPiArDQo+ICB0eXBlZGVmIHN0cnVjdCBWRklPRGlzcGxheSB7
+DQo+ICAgICAgUWVtdUNvbnNvbGUgKmNvbjsNCj4gICAgICBzdHJ1Y3Qgew0KPiAgICAgICAgICBW
+RklPUmVnaW9uIGJ1ZmZlcjsNCj4gICAgICAgICAgRGlzcGxheVN1cmZhY2UgKnN1cmZhY2U7DQo+
+ICAgICAgfSByZWdpb247DQo+ICsgICAgc3RydWN0IHsNCj4gKyAgICAgICAgUVRBSUxRX0hFQUQo
+LCBWRklPRE1BQnVmKSBidWZzOw0KPiArICAgICAgICBWRklPRE1BQnVmICpwcmltYXJ5Ow0KPiAr
+ICAgICAgICBWRklPRE1BQnVmICpjdXJzb3I7DQo+ICsgICAgfSBkbWFidWY7DQo+ICB9IFZGSU9E
+aXNwbGF5Ow0KPiANCj4gIHZvaWQgdmZpb19wdXRfYmFzZV9kZXZpY2UoVkZJT0RldmljZSAqdmJh
+c2VkZXYpOyBkaWZmIC0tZ2l0DQo+IGEvaHcvdmZpby9kaXNwbGF5LmMgYi9ody92ZmlvL2Rpc3Bs
+YXkuYyBpbmRleCBmNmFjYmFjYzc5Li4wNTNkM2FiNjdhIDEwMDY0NA0KPiAtLS0gYS9ody92Zmlv
+L2Rpc3BsYXkuYw0KPiArKysgYi9ody92ZmlvL2Rpc3BsYXkuYw0KPiBAQCAtMTksNiArMTksMTY4
+IEBADQo+ICAjaW5jbHVkZSAicWFwaS9lcnJvci5oIg0KPiAgI2luY2x1ZGUgInBjaS5oIg0KPiAN
+Cj4gKyNpZm5kZWYgRFJNX1BMQU5FX1RZUEVfUFJJTUFSWQ0KPiArIyBkZWZpbmUgRFJNX1BMQU5F
+X1RZUEVfUFJJTUFSWSAxDQo+ICsjIGRlZmluZSBEUk1fUExBTkVfVFlQRV9DVVJTT1IgIDINCj4g
+KyNlbmRpZg0KPiArDQo+ICtzdGF0aWMgVkZJT0RNQUJ1ZiAqdmZpb19kaXNwbGF5X2dldF9kbWFi
+dWYoVkZJT1BDSURldmljZSAqdmRldiwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICB1aW50MzJfdCBwbGFuZV90eXBlKSB7DQo+ICsgICAgVkZJT0Rpc3BsYXkg
+KmRweSA9IHZkZXYtPmRweTsNCj4gKyAgICBzdHJ1Y3QgdmZpb19kZXZpY2VfZ2Z4X3BsYW5lX2lu
+Zm8gcGxhbmU7DQo+ICsgICAgVkZJT0RNQUJ1ZiAqZG1hYnVmOw0KPiArICAgIGludCBmZCwgcmV0
+Ow0KPiArDQo+ICsgICAgbWVtc2V0KCZwbGFuZSwgMCwgc2l6ZW9mKHBsYW5lKSk7DQo+ICsgICAg
+cGxhbmUuYXJnc3ogPSBzaXplb2YocGxhbmUpOw0KPiArICAgIHBsYW5lLmZsYWdzID0gVkZJT19H
+RlhfUExBTkVfVFlQRV9ETUFCVUY7DQo+ICsgICAgcGxhbmUuZHJtX3BsYW5lX3R5cGUgPSBwbGFu
+ZV90eXBlOw0KPiArICAgIHJldCA9IGlvY3RsKHZkZXYtPnZiYXNlZGV2LmZkLCBWRklPX0RFVklD
+RV9RVUVSWV9HRlhfUExBTkUsICZwbGFuZSk7DQo+ICsgICAgaWYgKHJldCA8IDApIHsNCj4gKyAg
+ICAgICAgcmV0dXJuIE5VTEw7DQo+ICsgICAgfQ0KPiArICAgIGlmICghcGxhbmUuZHJtX2Zvcm1h
+dCB8fCAhcGxhbmUuc2l6ZSkgew0KPiArICAgICAgICByZXR1cm4gTlVMTDsNCj4gKyAgICB9DQo+
+ICsNCj4gKyAgICBRVEFJTFFfRk9SRUFDSChkbWFidWYsICZkcHktPmRtYWJ1Zi5idWZzLCBuZXh0
+KSB7DQo+ICsgICAgICAgIGlmIChkbWFidWYtPmRtYWJ1Zl9pZCA9PSBwbGFuZS5kbWFidWZfaWQp
+IHsNCj4gKyAgICAgICAgICAgIC8qIGZvdW5kIGluIGxpc3QsIG1vdmUgdG8gaGVhZCwgcmV0dXJu
+IGl0ICovDQo+ICsgICAgICAgICAgICBRVEFJTFFfUkVNT1ZFKCZkcHktPmRtYWJ1Zi5idWZzLCBk
+bWFidWYsIG5leHQpOw0KPiArICAgICAgICAgICAgUVRBSUxRX0lOU0VSVF9IRUFEKCZkcHktPmRt
+YWJ1Zi5idWZzLCBkbWFidWYsIG5leHQpOw0KPiArICAgICAgICAgICAgaWYgKHBsYW5lX3R5cGUg
+PT0gRFJNX1BMQU5FX1RZUEVfQ1VSU09SKSB7DQo+ICsgICAgICAgICAgICAgICAgZG1hYnVmLT5w
+b3NfeCAgICAgID0gcGxhbmUueF9wb3M7DQo+ICsgICAgICAgICAgICAgICAgZG1hYnVmLT5wb3Nf
+eSAgICAgID0gcGxhbmUueV9wb3M7DQpCZXR0ZXIgYWxzbyB1cGRhdGUgcGxhbmUueF9ob3QgYW5k
+IHBsYW5lLnlfaG90IGhlcmUuDQpUaGUgInBvc194IiwgInBvc195IiwgImhvdF94IiBhbmQgImhv
+dF95IiBmaWVsZHMgd291bGQgYmUgdXBkYXRlZCB3aXRoIGVhY2ggdGltZSBWRklPX0RFVklDRV9R
+VUVSWV9HRlhfUExBTkUgaXMgaW52b2tlZCwgYWx0aG91Z2ggZG1hYnVmIG9iamVjdCBtYXkgYmUg
+cmV1c2VkLg0KDQpCUiwNClRpbmENCj4gKyAgICAgICAgICAgIH0NCj4gKyAgICAgICAgICAgIHJl
+dHVybiBkbWFidWY7DQo+ICsgICAgICAgIH0NCj4gKyAgICB9DQo+ICsNCj4gKyAgICBmZCA9IGlv
+Y3RsKHZkZXYtPnZiYXNlZGV2LmZkLCBWRklPX0RFVklDRV9HRVRfR0ZYX0RNQUJVRiwNCj4gJnBs
+YW5lLmRtYWJ1Zl9pZCk7DQo+ICsgICAgaWYgKGZkIDwgMCkgew0KPiArICAgICAgICByZXR1cm4g
+TlVMTDsNCj4gKyAgICB9DQo+ICsNCj4gKyAgICBkbWFidWYgPSBnX25ldzAoVkZJT0RNQUJ1Ziwg
+MSk7DQo+ICsgICAgZG1hYnVmLT5kbWFidWZfaWQgID0gcGxhbmUuZG1hYnVmX2lkOw0KPiArICAg
+IGRtYWJ1Zi0+YnVmLndpZHRoICA9IHBsYW5lLndpZHRoOw0KPiArICAgIGRtYWJ1Zi0+YnVmLmhl
+aWdodCA9IHBsYW5lLmhlaWdodDsNCj4gKyAgICBkbWFidWYtPmJ1Zi5zdHJpZGUgPSBwbGFuZS5z
+dHJpZGU7DQo+ICsgICAgZG1hYnVmLT5idWYuZm91cmNjID0gcGxhbmUuZHJtX2Zvcm1hdDsNCj4g
+KyAgICBkbWFidWYtPmJ1Zi5mZCAgICAgPSBmZDsNCj4gKyAgICBpZiAocGxhbmVfdHlwZSA9PSBE
+Uk1fUExBTkVfVFlQRV9DVVJTT1IpIHsNCj4gKyAgICAgICAgZG1hYnVmLT5wb3NfeCAgICAgID0g
+cGxhbmUueF9wb3M7DQo+ICsgICAgICAgIGRtYWJ1Zi0+cG9zX3kgICAgICA9IHBsYW5lLnlfcG9z
+Ow0KPiArICAgICAgICBkbWFidWYtPmhvdF94ICAgICAgPSBwbGFuZS54X2hvdDsNCj4gKyAgICAg
+ICAgZG1hYnVmLT5ob3RfeSAgICAgID0gcGxhbmUueV9ob3Q7DQo+ICsgICAgfQ0KPiArDQo+ICsg
+ICAgUVRBSUxRX0lOU0VSVF9IRUFEKCZkcHktPmRtYWJ1Zi5idWZzLCBkbWFidWYsIG5leHQpOw0K
+PiArICAgIHJldHVybiBkbWFidWY7DQo+ICt9DQo+ICsNCj4gK3N0YXRpYyB2b2lkIHZmaW9fZGlz
+cGxheV9mcmVlX29uZV9kbWFidWYoVkZJT0Rpc3BsYXkgKmRweSwgVkZJT0RNQUJ1Zg0KPiArKmRt
+YWJ1Zikgew0KPiArICAgIFFUQUlMUV9SRU1PVkUoJmRweS0+ZG1hYnVmLmJ1ZnMsIGRtYWJ1Ziwg
+bmV4dCk7DQo+ICsgICAgZHB5X2dsX3JlbGVhc2VfZG1hYnVmKGRweS0+Y29uLCAmZG1hYnVmLT5i
+dWYpOw0KPiArICAgIGNsb3NlKGRtYWJ1Zi0+YnVmLmZkKTsNCj4gKyAgICBnX2ZyZWUoZG1hYnVm
+KTsNCj4gK30NCj4gKw0KPiArc3RhdGljIHZvaWQgdmZpb19kaXNwbGF5X2ZyZWVfZG1hYnVmcyhW
+RklPUENJRGV2aWNlICp2ZGV2KSB7DQo+ICsgICAgVkZJT0Rpc3BsYXkgKmRweSA9IHZkZXYtPmRw
+eTsNCj4gKyAgICBWRklPRE1BQnVmICpkbWFidWYsICp0bXA7DQo+ICsgICAgdWludDMyX3Qga2Vl
+cCA9IDU7DQo+ICsNCj4gKyAgICBRVEFJTFFfRk9SRUFDSF9TQUZFKGRtYWJ1ZiwgJmRweS0+ZG1h
+YnVmLmJ1ZnMsIG5leHQsIHRtcCkgew0KPiArICAgICAgICBpZiAoa2VlcCA+IDApIHsNCj4gKyAg
+ICAgICAgICAgIGtlZXAtLTsNCj4gKyAgICAgICAgICAgIGNvbnRpbnVlOw0KPiArICAgICAgICB9
+DQo+ICsgICAgICAgIGFzc2VydChkbWFidWYgIT0gZHB5LT5kbWFidWYucHJpbWFyeSk7DQo+ICsg
+ICAgICAgIHZmaW9fZGlzcGxheV9mcmVlX29uZV9kbWFidWYoZHB5LCBkbWFidWYpOw0KPiArICAg
+IH0NCj4gK30NCj4gKw0KPiArc3RhdGljIHZvaWQgdmZpb19kaXNwbGF5X2RtYWJ1Zl91cGRhdGUo
+dm9pZCAqb3BhcXVlKSB7DQo+ICsgICAgVkZJT1BDSURldmljZSAqdmRldiA9IG9wYXF1ZTsNCj4g
+KyAgICBWRklPRGlzcGxheSAqZHB5ID0gdmRldi0+ZHB5Ow0KPiArICAgIFZGSU9ETUFCdWYgKnBy
+aW1hcnksICpjdXJzb3I7DQo+ICsgICAgYm9vbCBmcmVlX2J1ZnMgPSBmYWxzZTsNCj4gKw0KPiAr
+ICAgIHByaW1hcnkgPSB2ZmlvX2Rpc3BsYXlfZ2V0X2RtYWJ1Zih2ZGV2LCBEUk1fUExBTkVfVFlQ
+RV9QUklNQVJZKTsNCj4gKyAgICBpZiAocHJpbWFyeSA9PSBOVUxMKSB7DQo+ICsgICAgICAgIHJl
+dHVybjsNCj4gKyAgICB9DQo+ICsNCj4gKyAgICBpZiAoZHB5LT5kbWFidWYucHJpbWFyeSAhPSBw
+cmltYXJ5KSB7DQo+ICsgICAgICAgIGRweS0+ZG1hYnVmLnByaW1hcnkgPSBwcmltYXJ5Ow0KPiAr
+ICAgICAgICBxZW11X2NvbnNvbGVfcmVzaXplKGRweS0+Y29uLA0KPiArICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIHByaW1hcnktPmJ1Zi53aWR0aCwgcHJpbWFyeS0+YnVmLmhlaWdodCk7DQo+
+ICsgICAgICAgIGRweV9nbF9zY2Fub3V0X2RtYWJ1ZihkcHktPmNvbiwgJnByaW1hcnktPmJ1Zik7
+DQo+ICsgICAgICAgIGZyZWVfYnVmcyA9IHRydWU7DQo+ICsgICAgfQ0KPiArDQo+ICsgICAgY3Vy
+c29yID0gdmZpb19kaXNwbGF5X2dldF9kbWFidWYodmRldiwgRFJNX1BMQU5FX1RZUEVfQ1VSU09S
+KTsNCj4gKyAgICBpZiAoZHB5LT5kbWFidWYuY3Vyc29yICE9IGN1cnNvcikgew0KPiArICAgICAg
+ICBkcHktPmRtYWJ1Zi5jdXJzb3IgPSBjdXJzb3I7DQo+ICsgICAgICAgIGlmIChjdXJzb3IpIHsN
+Cj4gKyAgICAgICAgICAgIGJvb2wgaGF2ZV9ob3QgPSAoY3Vyc29yLT5ob3RfeCAhPSAweGZmZmZm
+ZmZmICYmDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGN1cnNvci0+aG90X3kgIT0g
+MHhmZmZmZmZmZik7DQo+ICsgICAgICAgICAgICBkcHlfZ2xfY3Vyc29yX2RtYWJ1ZihkcHktPmNv
+biwgJmN1cnNvci0+YnVmLCBoYXZlX2hvdCwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIGN1cnNvci0+aG90X3gsIGN1cnNvci0+aG90X3kpOw0KPiArICAgICAgICB9IGVsc2Ug
+ew0KPiArICAgICAgICAgICAgZHB5X2dsX2N1cnNvcl9kbWFidWYoZHB5LT5jb24sIE5VTEwsIGZh
+bHNlLCAwLCAwKTsNCj4gKyAgICAgICAgfQ0KPiArICAgICAgICBmcmVlX2J1ZnMgPSB0cnVlOw0K
+PiArICAgIH0NCj4gKyAgICBpZiAoY3Vyc29yICE9IE5VTEwpIHsNCj4gKyAgICAgICAgZHB5X2ds
+X2N1cnNvcl9wb3NpdGlvbihkcHktPmNvbiwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBjdXJzb3ItPnBvc194LA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGN1
+cnNvci0+cG9zX3kpOw0KPiArICAgIH0NCj4gKw0KPiArICAgIGRweV9nbF91cGRhdGUoZHB5LT5j
+b24sIDAsIDAsIHByaW1hcnktPmJ1Zi53aWR0aCwNCj4gKyBwcmltYXJ5LT5idWYuaGVpZ2h0KTsN
+Cj4gKw0KPiArICAgIGlmIChmcmVlX2J1ZnMpIHsNCj4gKyAgICAgICAgdmZpb19kaXNwbGF5X2Zy
+ZWVfZG1hYnVmcyh2ZGV2KTsNCj4gKyAgICB9DQo+ICt9DQo+ICsNCj4gK3N0YXRpYyBjb25zdCBH
+cmFwaGljSHdPcHMgdmZpb19kaXNwbGF5X2RtYWJ1Zl9vcHMgPSB7DQo+ICsgICAgLmdmeF91cGRh
+dGUgPSB2ZmlvX2Rpc3BsYXlfZG1hYnVmX3VwZGF0ZSwgfTsNCj4gKw0KPiArc3RhdGljIGludCB2
+ZmlvX2Rpc3BsYXlfZG1hYnVmX2luaXQoVkZJT1BDSURldmljZSAqdmRldiwgRXJyb3IgKiplcnJw
+KQ0KPiArew0KPiArICAgIGlmICghZGlzcGxheV9vcGVuZ2wpIHsNCj4gKyAgICAgICAgZXJyb3Jf
+c2V0ZyhlcnJwLCAidmZpby1kaXNwbGF5LWRtYWJ1Zjogb3BlbmdsIG5vdCBhdmFpbGFibGUiKTsN
+Cj4gKyAgICAgICAgcmV0dXJuIC0xOw0KPiArICAgIH0NCj4gKw0KPiArICAgIHZkZXYtPmRweSA9
+IGdfbmV3MChWRklPRGlzcGxheSwgMSk7DQo+ICsgICAgdmRldi0+ZHB5LT5jb24gPSBncmFwaGlj
+X2NvbnNvbGVfaW5pdChERVZJQ0UodmRldiksIDAsDQo+ICsgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAmdmZpb19kaXNwbGF5X2RtYWJ1Zl9vcHMsDQo+ICsgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2ZGV2KTsNCj4gKyAgICByZXR1cm4g
+MDsNCj4gK30NCj4gKw0KPiArc3RhdGljIHZvaWQgdmZpb19kaXNwbGF5X2RtYWJ1Zl9leGl0KFZG
+SU9EaXNwbGF5ICpkcHkpIHsNCj4gKyAgICBWRklPRE1BQnVmICpkbWFidWY7DQo+ICsNCj4gKyAg
+ICBpZiAoUVRBSUxRX0VNUFRZKCZkcHktPmRtYWJ1Zi5idWZzKSkgew0KPiArICAgICAgICByZXR1
+cm47DQo+ICsgICAgfQ0KPiArDQo+ICsgICAgd2hpbGUgKChkbWFidWYgPSBRVEFJTFFfRklSU1Qo
+JmRweS0+ZG1hYnVmLmJ1ZnMpKSAhPSBOVUxMKSB7DQo+ICsgICAgICAgIHZmaW9fZGlzcGxheV9m
+cmVlX29uZV9kbWFidWYoZHB5LCBkbWFidWYpOw0KPiArICAgIH0NCj4gK30NCj4gKw0KPiAgLyog
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLSAqLw0KPiANCj4gIHN0YXRpYyB2b2lkIHZmaW9fZGlzcGxheV9yZWdpb25f
+dXBkYXRlKHZvaWQgKm9wYXF1ZSkgQEAgLTEzNiw4ICsyOTgsNyBAQA0KPiBpbnQgdmZpb19kaXNw
+bGF5X3Byb2JlKFZGSU9QQ0lEZXZpY2UgKnZkZXYsIEVycm9yICoqZXJycCkNCj4gICAgICBwcm9i
+ZS5mbGFncyA9IFZGSU9fR0ZYX1BMQU5FX1RZUEVfUFJPQkUgfA0KPiBWRklPX0dGWF9QTEFORV9U
+WVBFX0RNQUJVRjsNCj4gICAgICByZXQgPSBpb2N0bCh2ZGV2LT52YmFzZWRldi5mZCwgVkZJT19E
+RVZJQ0VfUVVFUllfR0ZYX1BMQU5FLCAmcHJvYmUpOw0KPiAgICAgIGlmIChyZXQgPT0gMCkgew0K
+PiAtICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJ2ZmlvLWRpc3BsYXk6IGRtYWJ1ZiBzdXBwb3J0
+IG5vdCBpbXBsZW1lbnRlZCB5ZXQiKTsNCj4gLSAgICAgICAgcmV0dXJuIC0xOw0KPiArICAgICAg
+ICByZXR1cm4gdmZpb19kaXNwbGF5X2RtYWJ1Zl9pbml0KHZkZXYsIGVycnApOw0KPiAgICAgIH0N
+Cj4gDQo+ICAgICAgbWVtc2V0KCZwcm9iZSwgMCwgc2l6ZW9mKHByb2JlKSk7DQo+IEBAIC0xNjMs
+NiArMzI0LDcgQEAgdm9pZCB2ZmlvX2Rpc3BsYXlfZmluYWxpemUoVkZJT1BDSURldmljZSAqdmRl
+dikNCj4gICAgICAgICAgcmV0dXJuOw0KPiANCj4gICAgICBncmFwaGljX2NvbnNvbGVfY2xvc2Uo
+dmRldi0+ZHB5LT5jb24pOw0KPiArICAgIHZmaW9fZGlzcGxheV9kbWFidWZfZXhpdCh2ZGV2LT5k
+cHkpOw0KPiAgICAgIHZmaW9fZGlzcGxheV9yZWdpb25fZXhpdCh2ZGV2LT5kcHkpOw0KPiAgICAg
+IGdfZnJlZSh2ZGV2LT5kcHkpOw0KPiAgfQ0KPiAtLQ0KPiAyLjkuMw0KPiANCj4gX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18NCj4gaW50ZWwtZ3Z0LWRldiBt
+YWlsaW5nIGxpc3QNCj4gaW50ZWwtZ3Z0LWRldkBsaXN0cy5mcmVlZGVza3RvcC5vcmcNCj4gaHR0
+cHM6Ly9saXN0cy5mcmVlZGVza3RvcC5vcmcvbWFpbG1hbi9saXN0aW5mby9pbnRlbC1ndnQtZGV2
+DQo=
