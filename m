@@ -1,41 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1erRYI-00015N-HU
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:59:31 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1erRaU-00030g-EI
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 12:01:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1erRYF-0003q5-Cc
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:59:30 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38046
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1erRYF-0003pO-0j
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:59:27 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w21GxAeG137194
-	for <qemu-devel@nongnu.org>; Thu, 1 Mar 2018 11:59:26 -0500
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2gem4ecafq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 11:59:21 -0500
-Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Thu, 1 Mar 2018 11:59:20 -0500
-References: <20180223132311.26555-1-marcandre.lureau@redhat.com>
-	<20180223132311.26555-7-marcandre.lureau@redhat.com>
-	<4dc45713-b15d-0db5-d72e-ccb007cd2487@redhat.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Thu, 1 Mar 2018 11:59:16 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1erRaO-00054u-U1
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 12:01:46 -0500
+Received: from mail-pg0-x234.google.com ([2607:f8b0:400e:c05::234]:42464)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1erRaO-00054V-Lg
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 12:01:40 -0500
+Received: by mail-pg0-x234.google.com with SMTP id y8so2545279pgr.9
+	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 09:01:40 -0800 (PST)
+References: <20180228164816.24110-1-richard.henderson@linaro.org>
+	<20180228164816.24110-3-richard.henderson@linaro.org>
+	<CAFEAcA_SsRZAsTvUjSYHQcGMUYUDFvr0jdVBdjdczssDmExPgg@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7599a4e6-a0bf-961e-6272-a3835b202c15@linaro.org>
+Date: Thu, 1 Mar 2018 09:01:35 -0800
 MIME-Version: 1.0
-In-Reply-To: <4dc45713-b15d-0db5-d72e-ccb007cd2487@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <b1eb7e49-f2ba-6115-79b1-a299af8e5032@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [edk2] [PATCH 6/7] ovmf: link with Tcg2ConfigDxe
- module
+In-Reply-To: <CAFEAcA_SsRZAsTvUjSYHQcGMUYUDFvr0jdVBdjdczssDmExPgg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] decodetree: Propagate return value from
+ translate subroutines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,85 +33,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, marcandre.lureau@redhat.com, edk2-devel@lists.01.org
-Cc: pjones@redhat.com, jiewen.yao@intel.com, qemu-devel@nongnu.org, javierm@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 02/26/2018 04:58 AM, Laszlo Ersek wrote:
-> On 02/23/18 14:23, marcandre.lureau@redhat.com wrote:
->> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On 03/01/2018 03:59 AM, Peter Maydell wrote:
+> On 28 February 2018 at 16:48, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>> Allow the translate subroutines to return false for invalid insns.
 >>
->> The module allows to tweak and interact with the TPM. Note that many
->> actions are broken due to implementation of qemu TPM (providing it's
->> own ACPI table), and the lack of PPI implementation.
+>> At present we can of course invoke an invalid insn exception from within
+>> the translate subroutine, but in the short term this consolidates code.
+>> In the long term it would allow the decodetree language to support
+>> overlapping patterns for ISA extensions.
 >>
->> CC: Laszlo Ersek <lersek@redhat.com>
->> CC: Stefan Berger <stefanb@linux.vnet.ibm.com>
->> Contributed-under: TianoCore Contribution Agreement 1.0
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 >> ---
->>   OvmfPkg/OvmfPkgX64.dsc | 2 ++
->>   OvmfPkg/OvmfPkgX64.fdf | 1 +
->>   2 files changed, 3 insertions(+)
 >>
->> diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
->> index 9bd0709f98..2281bd5ff8 100644
->> --- a/OvmfPkg/OvmfPkgX64.dsc
->> +++ b/OvmfPkg/OvmfPkgX64.dsc
->> @@ -669,6 +669,8 @@
->>         NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSh=
-a1.inf
->>         NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLib=
-Sha256.inf
->>     }
->> +
->> +  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
->>   !endif
->>  =20
->>   !if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
->> diff --git a/OvmfPkg/OvmfPkgX64.fdf b/OvmfPkg/OvmfPkgX64.fdf
->> index b8dd7ecae4..985404850f 100644
->> --- a/OvmfPkg/OvmfPkgX64.fdf
->> +++ b/OvmfPkg/OvmfPkgX64.fdf
->> @@ -399,6 +399,7 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/Va=
-riableRuntimeDxe.inf
->>  =20
->>   !if $(TPM2_ENABLE) =3D=3D TRUE
->>   INF  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
->> +INF  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
->>   !endif
->>  =20
->>   ####################################################################=
-############
+>> Since this makes an ABI change to the translate functions called by the
+>> decode function, let's make it now before there are any in-tree users.
 >>
-> Please drop this patch.
->
-> In my earlier investigation I wrote, Tcg2ConfigDxe "[p]rovides a Setup
-> TUI interface to configure the TPM. IIUC, it can also save the
-> configured TPM type for subsequent boots (see Tcg2ConfigPei.inf above)".
->
-> The INF file itself says "This module is only for reference only, each
-> platform should have its own setup page."
->
-> And Jiewen wrote earlier, "Tcg2ConfigPei/Dxe are platform sample driver.
-> A platform may have its own version based upon platform requirement. Fo=
-r
-> example, if a platform supports fTPM, it may use another Tcg2Config dri=
-ver."
->
-> Given that OVMF lacks PEI-phase variable access, and that I consequentl=
-y
-> suggested cloning, and seriously trimming, Tcg2ConfigPei, it makes no
-> sense to include an HII dialog that sets a variable for PEI phase
-> consumption. Also, as you say, many of the exposed operations are broke=
-n
-> due to lack of PPI support. So let's just postpone the inclusion of thi=
-s
-> driver, for now.
+>> My SVE branch over-decodes in quite a lot of cases -- e.g. things like
+>> the 2-bit size field must be 1-3 for fp operands, and so size==0 is
+>> unallocated.  Returning false for these cases allows the actual call
+>> to unallocated_encoding to be done in one place instead of hundreds.
+>>
+>> Longer term, I'm thinking of how to handle decode of overlapping ISA
+>> extensions.  One could allow (specific) overlapping patterns and
+>> prioritize them in some way (e.g. first in file is first matched).
+>> My thought is that trans_insn_a would check a cpu feature bit and
+>> return false if not enabled.  Then trans_insn_b would be given its
+>> chance to handle the insn.
+> 
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> 
+> I'll put this into target-arm.next, unless you'd prefer it to go
+> in via some other route.
 
-Just FYI: The PPI support for the OS requires ACPI and, as it is=20
-currently implemented, SMF where UEFI variables are manipulated. Some=20
-menu items in the TPM 2 menu (also TPM 1.2) also require these UEFI=20
-variables of the PPI interface so that UEFI can react on the menu=20
-choices upon re.
+That's fine.  Thanks!
 
-    Stefan
+
+r~
