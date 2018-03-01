@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1erTkv-0007lC-Rj
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 14:20:43 -0500
+	(envelope-from <eblake@redhat.com>) id 1erTlk-0000AX-Hh
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 14:21:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1erTks-0005xG-BZ
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 14:20:41 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52252)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1erTks-0005wm-4f
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 14:20:38 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1erTkp-0003f8-TI
-	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 19:20:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4F09D2E80DD
-	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 19:20:35 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1erTlj-0006S5-Kp
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 14:21:32 -0500
+References: <cover.1519921268.git.berto@igalia.com>
+	<a43af2b339e60ad2e97de86c7646d35ff7e7b7e1.1519921268.git.berto@igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6065c0da-41fa-f1a3-e3ba-d0509b275150@redhat.com>
+Date: Thu, 1 Mar 2018 13:21:08 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 01 Mar 2018 19:15:15 -0000
-From: Peter Ogden <1749393@bugs.launchpad.net>
-Reply-To: Bug 1749393 <1749393@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151859702399.9461.6832978283203997178.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151993171514.18524.1746524681739251283.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1749393] Re: sbrk() not working under qemu-user
- with a PIE-compiled binary?
+In-Reply-To: <a43af2b339e60ad2e97de86c7646d35ff7e7b7e1.1519921268.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/7] qcow2: Generalize
+ validate_table_offset() into qcow2_validate_table()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,67 +25,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-This appears to be a problem in all PIE-compiled executables that use
-sbrk in qemu-user due to the way that position-independent code gets
-mmapped into adjacent ranges meaning there is no room for expansion.
-I've hacked my version of QEMU to force the program binary to mmap in a
-different range allowing for the region to be resized which fixes this
-issue. I don't know the most appropriate way to determine what range to
-use in generate though.
+On 03/01/2018 10:27 AM, Alberto Garcia wrote:
+> This function checks that the offset and size of a table are valid.
+> 
+> While the offset checks are fine, the size check is too generic, since
+> it only verifies that the total size in bytes fits in a 64-bit
+> integer. In practice all tables used in qcow2 have much smaller size
+> limits, so the size needs to be checked again for each table using its
+> actual limit.
+> 
+> This patch generalizes this function by allowing the caller to specify
+> the maximum size for that table. In addition to that it allows passing
+> an Error variable.
+> 
+> The function is also renamed and made public since we're going to use
+> it in other parts of the code.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
 
--- =
+> +int qcow2_validate_table(BlockDriverState *bs, uint64_t offset,
+> +                         uint64_t entries, size_t entry_len,
+> +                         int64_t max_size_bytes, const char *table_name,
+> +                         Error **errp)
+>   {
+>       BDRVQcow2State *s = bs->opaque;
+> -    uint64_t size;
+> +
+> +    if (entries > max_size_bytes / entry_len) {
+> +        error_setg(errp, "%s too large", table_name);
+> +        return -EFBIG;
+> +    }
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1749393
+EFBIG "File too large".  Would EOVERFLOW "Value too large for defined 
+data type" make any more sense?  But that's bikeshedding; I'm okay with 
+your choice.
 
-Title:
-  sbrk() not working under qemu-user with a PIE-compiled binary?
 
-Status in QEMU:
-  New
+>   
+>       /* read the level 1 table */
+> -    if (header.l1_size > QCOW_MAX_L1_SIZE / sizeof(uint64_t)) {
+> -        error_setg(errp, "Active L1 table too large");
+> -        ret = -EFBIG;
+> +    ret = qcow2_validate_table(bs, header.l1_table_offset,
+> +                               header.l1_size, sizeof(uint64_t),
+> +                               QCOW_MAX_L1_SIZE, "Active L1 table", errp);
+> +    if (ret < 0) {
 
-Bug description:
-  In Debian unstable, we recently switched bash to be a PIE-compiled
-  binary (for hardening). Unfortunately this resulted in bash being
-  broken when run under qemu-user (for all target architectures, host
-  being amd64 for me).
+At any rate, it looks like we were already using EFBIG.
 
-  $ sudo chroot /srv/chroots/sid-i386/ qemu-i386-static /bin/bash
-  bash: xmalloc: .././shell.c:1709: cannot allocate 10 bytes (0 bytes alloc=
-ated)
+I also like that you consolidated more checking into the common function.
 
-  bash has its own malloc implementation based on sbrk():
-  https://git.savannah.gnu.org/cgit/bash.git/tree/lib/malloc/malloc.c
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-  When we disable this internal implementation and rely on glibc's
-  malloc, then everything is fine. But it might be that glibc has a
-  fallback when sbrk() is not working properly and it might hide the
-  underlying problem in qemu-user.
-
-  This issue has also been reported to the bash upstream author and he sugg=
-ested that the issue might be in qemu-user so I'm opening a ticket here. He=
-re's the discussion with the bash upstream author:
-  https://lists.gnu.org/archive/html/bug-bash/2018-02/threads.html#00080
-
-  You can find the problematic bash binary in that .deb file:
-  http://snapshot.debian.org/archive/debian/20180206T154716Z/pool/main/b/ba=
-sh/bash_4.4.18-1_i386.deb
-
-  The version of qemu I have been using is 2.11 (Debian package qemu-
-  user-static version 1:2.11+dfsg-1) but I have had reports that the
-  problem is reproducible with older versions (back to 2.8 at least).
-
-  Here are the related Debian bug reports:
-  https://bugs.debian.org/889869
-  https://bugs.debian.org/865599
-
-  It's worth noting that bash used to have this problem (when compiled as a=
- PIE binary) even when run directly but then something got fixed in the ker=
-nel and now the problem only appears when run under qemu-user:
-  https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1518483
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1749393/+subscriptions
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
