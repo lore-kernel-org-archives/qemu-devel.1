@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tina.zhang@intel.com>) id 1erK48-0003Ul-U8
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 03:59:54 -0500
+	(envelope-from <david@redhat.com>) id 1erKPe-0001gT-RY
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:22:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tina.zhang@intel.com>) id 1erK44-00053b-T3
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 03:59:53 -0500
-Received: from mga18.intel.com ([134.134.136.126]:53953)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tina.zhang@intel.com>)
-	id 1erK44-000520-F5
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 03:59:48 -0500
-From: "Zhang, Tina" <tina.zhang@intel.com>
-Date: Thu, 1 Mar 2018 08:59:43 +0000
-Message-ID: <237F54289DF84E4997F34151298ABEBC7C6F0557@SHSMSX101.ccr.corp.intel.com>
-References: <20180228123110.6507-1-kraxel@redhat.com>
-	<20180228123110.6507-10-kraxel@redhat.com>
-In-Reply-To: <20180228123110.6507-10-kraxel@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <david@redhat.com>) id 1erKPY-0002Z7-Hm
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:22:06 -0500
+References: <20180228195320.165230-1-borntraeger@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <0d560e4e-6686-7801-6523-1bff7d035976@redhat.com>
+Date: Thu, 1 Mar 2018 10:21:50 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v6 9/9] vfio/display: adding dmabuf support
+In-Reply-To: <20180228195320.165230-1-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/1] s390/kvm: implement clearing part of
+ IPL clear
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,163 +24,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Alex Williamson <alex.williamson@redhat.com>, "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>, Kirti Wankhede <kwankhede@nvidia.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogaW50ZWwtZ3Z0LWRldiBb
-bWFpbHRvOmludGVsLWd2dC1kZXYtYm91bmNlc0BsaXN0cy5mcmVlZGVza3RvcC5vcmddIE9uDQo+
-IEJlaGFsZiBPZiBHZXJkIEhvZmZtYW5uDQo+IFNlbnQ6IFdlZG5lc2RheSwgRmVicnVhcnkgMjgs
-IDIwMTggODozMSBQTQ0KPiBUbzogcWVtdS1kZXZlbEBub25nbnUub3JnDQo+IENjOiBBbGV4IFdp
-bGxpYW1zb24gPGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tPjsgR2VyZCBIb2ZmbWFubg0KPiA8
-a3JheGVsQHJlZGhhdC5jb20+OyBpbnRlbC1ndnQtZGV2QGxpc3RzLmZyZWVkZXNrdG9wLm9yZzsg
-S2lydGkgV2Fua2hlZGUNCj4gPGt3YW5raGVkZUBudmlkaWEuY29tPjsgWmhhbmcsIFRpbmEgPHRp
-bmEuemhhbmdAaW50ZWwuY29tPg0KPiBTdWJqZWN0OiBbUEFUQ0ggdjYgOS85XSB2ZmlvL2Rpc3Bs
-YXk6IGFkZGluZyBkbWFidWYgc3VwcG9ydA0KPiANCj4gV2lyZSB1cCBkbWFidWYtYmFzZWQgZGlz
-cGxheS4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEdlcmQgSG9mZm1hbm4gPGtyYXhlbEByZWRoYXQu
-Y29tPg0KPiAtLS0NClBsZWFzZSBzZWUgbXkgY29tbWVudHMgYmVsb3cuDQpUZXN0ZWQtYnk6IFRp
-bmEgWmhhbmcgPHRpbmEuemhhbmdAaW50ZWwuY29tPg0KDQo+ICBpbmNsdWRlL2h3L3ZmaW8vdmZp
-by1jb21tb24uaCB8ICAxNCArKysrDQo+ICBody92ZmlvL2Rpc3BsYXkuYyAgICAgICAgICAgICB8
-IDE2Ng0KPiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0NCj4gIDIg
-ZmlsZXMgY2hhbmdlZCwgMTc4IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+IA0KPiBk
-aWZmIC0tZ2l0IGEvaW5jbHVkZS9ody92ZmlvL3ZmaW8tY29tbW9uLmggYi9pbmNsdWRlL2h3L3Zm
-aW8vdmZpby1jb21tb24uaA0KPiBpbmRleCBmYzhhZTE0ZmI3Li45OTRlNzgwZDUxIDEwMDY0NA0K
-PiAtLS0gYS9pbmNsdWRlL2h3L3ZmaW8vdmZpby1jb21tb24uaA0KPiArKysgYi9pbmNsdWRlL2h3
-L3ZmaW8vdmZpby1jb21tb24uaA0KPiBAQCAtMjYsNiArMjYsNyBAQA0KPiAgI2luY2x1ZGUgImV4
-ZWMvbWVtb3J5LmgiDQo+ICAjaW5jbHVkZSAicWVtdS9xdWV1ZS5oIg0KPiAgI2luY2x1ZGUgInFl
-bXUvbm90aWZ5LmgiDQo+ICsjaW5jbHVkZSAidWkvY29uc29sZS5oIg0KPiAgI2lmZGVmIENPTkZJ
-R19MSU5VWA0KPiAgI2luY2x1ZGUgPGxpbnV4L3ZmaW8uaD4NCj4gICNlbmRpZg0KPiBAQCAtMTQy
-LDEyICsxNDMsMjUgQEAgdHlwZWRlZiBzdHJ1Y3QgVkZJT0dyb3VwIHsNCj4gICAgICBRTElTVF9F
-TlRSWShWRklPR3JvdXApIGNvbnRhaW5lcl9uZXh0OyAgfSBWRklPR3JvdXA7DQo+IA0KPiArdHlw
-ZWRlZiBzdHJ1Y3QgVkZJT0RNQUJ1ZiB7DQo+ICsgICAgUWVtdURtYUJ1ZiBidWY7DQo+ICsgICAg
-dWludDMyX3QgcG9zX3gsIHBvc195Ow0KPiArICAgIHVpbnQzMl90IGhvdF94LCBob3RfeTsNCj4g
-KyAgICBpbnQgZG1hYnVmX2lkOw0KPiArICAgIFFUQUlMUV9FTlRSWShWRklPRE1BQnVmKSBuZXh0
-Ow0KPiArfSBWRklPRE1BQnVmOw0KPiArDQo+ICB0eXBlZGVmIHN0cnVjdCBWRklPRGlzcGxheSB7
-DQo+ICAgICAgUWVtdUNvbnNvbGUgKmNvbjsNCj4gICAgICBzdHJ1Y3Qgew0KPiAgICAgICAgICBW
-RklPUmVnaW9uIGJ1ZmZlcjsNCj4gICAgICAgICAgRGlzcGxheVN1cmZhY2UgKnN1cmZhY2U7DQo+
-ICAgICAgfSByZWdpb247DQo+ICsgICAgc3RydWN0IHsNCj4gKyAgICAgICAgUVRBSUxRX0hFQUQo
-LCBWRklPRE1BQnVmKSBidWZzOw0KPiArICAgICAgICBWRklPRE1BQnVmICpwcmltYXJ5Ow0KPiAr
-ICAgICAgICBWRklPRE1BQnVmICpjdXJzb3I7DQo+ICsgICAgfSBkbWFidWY7DQo+ICB9IFZGSU9E
-aXNwbGF5Ow0KPiANCj4gIHZvaWQgdmZpb19wdXRfYmFzZV9kZXZpY2UoVkZJT0RldmljZSAqdmJh
-c2VkZXYpOyBkaWZmIC0tZ2l0DQo+IGEvaHcvdmZpby9kaXNwbGF5LmMgYi9ody92ZmlvL2Rpc3Bs
-YXkuYyBpbmRleCBmNmFjYmFjYzc5Li4wNTNkM2FiNjdhIDEwMDY0NA0KPiAtLS0gYS9ody92Zmlv
-L2Rpc3BsYXkuYw0KPiArKysgYi9ody92ZmlvL2Rpc3BsYXkuYw0KPiBAQCAtMTksNiArMTksMTY4
-IEBADQo+ICAjaW5jbHVkZSAicWFwaS9lcnJvci5oIg0KPiAgI2luY2x1ZGUgInBjaS5oIg0KPiAN
-Cj4gKyNpZm5kZWYgRFJNX1BMQU5FX1RZUEVfUFJJTUFSWQ0KPiArIyBkZWZpbmUgRFJNX1BMQU5F
-X1RZUEVfUFJJTUFSWSAxDQo+ICsjIGRlZmluZSBEUk1fUExBTkVfVFlQRV9DVVJTT1IgIDINCj4g
-KyNlbmRpZg0KPiArDQo+ICtzdGF0aWMgVkZJT0RNQUJ1ZiAqdmZpb19kaXNwbGF5X2dldF9kbWFi
-dWYoVkZJT1BDSURldmljZSAqdmRldiwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICB1aW50MzJfdCBwbGFuZV90eXBlKSB7DQo+ICsgICAgVkZJT0Rpc3BsYXkg
-KmRweSA9IHZkZXYtPmRweTsNCj4gKyAgICBzdHJ1Y3QgdmZpb19kZXZpY2VfZ2Z4X3BsYW5lX2lu
-Zm8gcGxhbmU7DQo+ICsgICAgVkZJT0RNQUJ1ZiAqZG1hYnVmOw0KPiArICAgIGludCBmZCwgcmV0
-Ow0KPiArDQo+ICsgICAgbWVtc2V0KCZwbGFuZSwgMCwgc2l6ZW9mKHBsYW5lKSk7DQo+ICsgICAg
-cGxhbmUuYXJnc3ogPSBzaXplb2YocGxhbmUpOw0KPiArICAgIHBsYW5lLmZsYWdzID0gVkZJT19H
-RlhfUExBTkVfVFlQRV9ETUFCVUY7DQo+ICsgICAgcGxhbmUuZHJtX3BsYW5lX3R5cGUgPSBwbGFu
-ZV90eXBlOw0KPiArICAgIHJldCA9IGlvY3RsKHZkZXYtPnZiYXNlZGV2LmZkLCBWRklPX0RFVklD
-RV9RVUVSWV9HRlhfUExBTkUsICZwbGFuZSk7DQo+ICsgICAgaWYgKHJldCA8IDApIHsNCj4gKyAg
-ICAgICAgcmV0dXJuIE5VTEw7DQo+ICsgICAgfQ0KPiArICAgIGlmICghcGxhbmUuZHJtX2Zvcm1h
-dCB8fCAhcGxhbmUuc2l6ZSkgew0KPiArICAgICAgICByZXR1cm4gTlVMTDsNCj4gKyAgICB9DQo+
-ICsNCj4gKyAgICBRVEFJTFFfRk9SRUFDSChkbWFidWYsICZkcHktPmRtYWJ1Zi5idWZzLCBuZXh0
-KSB7DQo+ICsgICAgICAgIGlmIChkbWFidWYtPmRtYWJ1Zl9pZCA9PSBwbGFuZS5kbWFidWZfaWQp
-IHsNCj4gKyAgICAgICAgICAgIC8qIGZvdW5kIGluIGxpc3QsIG1vdmUgdG8gaGVhZCwgcmV0dXJu
-IGl0ICovDQo+ICsgICAgICAgICAgICBRVEFJTFFfUkVNT1ZFKCZkcHktPmRtYWJ1Zi5idWZzLCBk
-bWFidWYsIG5leHQpOw0KPiArICAgICAgICAgICAgUVRBSUxRX0lOU0VSVF9IRUFEKCZkcHktPmRt
-YWJ1Zi5idWZzLCBkbWFidWYsIG5leHQpOw0KPiArICAgICAgICAgICAgaWYgKHBsYW5lX3R5cGUg
-PT0gRFJNX1BMQU5FX1RZUEVfQ1VSU09SKSB7DQo+ICsgICAgICAgICAgICAgICAgZG1hYnVmLT5w
-b3NfeCAgICAgID0gcGxhbmUueF9wb3M7DQo+ICsgICAgICAgICAgICAgICAgZG1hYnVmLT5wb3Nf
-eSAgICAgID0gcGxhbmUueV9wb3M7DQpCZXR0ZXIgYWxzbyB1cGRhdGUgcGxhbmUueF9ob3QgYW5k
-IHBsYW5lLnlfaG90IGhlcmUuDQpUaGUgInBvc194IiwgInBvc195IiwgImhvdF94IiBhbmQgImhv
-dF95IiBmaWVsZHMgd291bGQgYmUgdXBkYXRlZCB3aXRoIGVhY2ggdGltZSBWRklPX0RFVklDRV9R
-VUVSWV9HRlhfUExBTkUgaXMgaW52b2tlZCwgYWx0aG91Z2ggZG1hYnVmIG9iamVjdCBtYXkgYmUg
-cmV1c2VkLg0KDQpCUiwNClRpbmENCj4gKyAgICAgICAgICAgIH0NCj4gKyAgICAgICAgICAgIHJl
-dHVybiBkbWFidWY7DQo+ICsgICAgICAgIH0NCj4gKyAgICB9DQo+ICsNCj4gKyAgICBmZCA9IGlv
-Y3RsKHZkZXYtPnZiYXNlZGV2LmZkLCBWRklPX0RFVklDRV9HRVRfR0ZYX0RNQUJVRiwNCj4gJnBs
-YW5lLmRtYWJ1Zl9pZCk7DQo+ICsgICAgaWYgKGZkIDwgMCkgew0KPiArICAgICAgICByZXR1cm4g
-TlVMTDsNCj4gKyAgICB9DQo+ICsNCj4gKyAgICBkbWFidWYgPSBnX25ldzAoVkZJT0RNQUJ1Ziwg
-MSk7DQo+ICsgICAgZG1hYnVmLT5kbWFidWZfaWQgID0gcGxhbmUuZG1hYnVmX2lkOw0KPiArICAg
-IGRtYWJ1Zi0+YnVmLndpZHRoICA9IHBsYW5lLndpZHRoOw0KPiArICAgIGRtYWJ1Zi0+YnVmLmhl
-aWdodCA9IHBsYW5lLmhlaWdodDsNCj4gKyAgICBkbWFidWYtPmJ1Zi5zdHJpZGUgPSBwbGFuZS5z
-dHJpZGU7DQo+ICsgICAgZG1hYnVmLT5idWYuZm91cmNjID0gcGxhbmUuZHJtX2Zvcm1hdDsNCj4g
-KyAgICBkbWFidWYtPmJ1Zi5mZCAgICAgPSBmZDsNCj4gKyAgICBpZiAocGxhbmVfdHlwZSA9PSBE
-Uk1fUExBTkVfVFlQRV9DVVJTT1IpIHsNCj4gKyAgICAgICAgZG1hYnVmLT5wb3NfeCAgICAgID0g
-cGxhbmUueF9wb3M7DQo+ICsgICAgICAgIGRtYWJ1Zi0+cG9zX3kgICAgICA9IHBsYW5lLnlfcG9z
-Ow0KPiArICAgICAgICBkbWFidWYtPmhvdF94ICAgICAgPSBwbGFuZS54X2hvdDsNCj4gKyAgICAg
-ICAgZG1hYnVmLT5ob3RfeSAgICAgID0gcGxhbmUueV9ob3Q7DQo+ICsgICAgfQ0KPiArDQo+ICsg
-ICAgUVRBSUxRX0lOU0VSVF9IRUFEKCZkcHktPmRtYWJ1Zi5idWZzLCBkbWFidWYsIG5leHQpOw0K
-PiArICAgIHJldHVybiBkbWFidWY7DQo+ICt9DQo+ICsNCj4gK3N0YXRpYyB2b2lkIHZmaW9fZGlz
-cGxheV9mcmVlX29uZV9kbWFidWYoVkZJT0Rpc3BsYXkgKmRweSwgVkZJT0RNQUJ1Zg0KPiArKmRt
-YWJ1Zikgew0KPiArICAgIFFUQUlMUV9SRU1PVkUoJmRweS0+ZG1hYnVmLmJ1ZnMsIGRtYWJ1Ziwg
-bmV4dCk7DQo+ICsgICAgZHB5X2dsX3JlbGVhc2VfZG1hYnVmKGRweS0+Y29uLCAmZG1hYnVmLT5i
-dWYpOw0KPiArICAgIGNsb3NlKGRtYWJ1Zi0+YnVmLmZkKTsNCj4gKyAgICBnX2ZyZWUoZG1hYnVm
-KTsNCj4gK30NCj4gKw0KPiArc3RhdGljIHZvaWQgdmZpb19kaXNwbGF5X2ZyZWVfZG1hYnVmcyhW
-RklPUENJRGV2aWNlICp2ZGV2KSB7DQo+ICsgICAgVkZJT0Rpc3BsYXkgKmRweSA9IHZkZXYtPmRw
-eTsNCj4gKyAgICBWRklPRE1BQnVmICpkbWFidWYsICp0bXA7DQo+ICsgICAgdWludDMyX3Qga2Vl
-cCA9IDU7DQo+ICsNCj4gKyAgICBRVEFJTFFfRk9SRUFDSF9TQUZFKGRtYWJ1ZiwgJmRweS0+ZG1h
-YnVmLmJ1ZnMsIG5leHQsIHRtcCkgew0KPiArICAgICAgICBpZiAoa2VlcCA+IDApIHsNCj4gKyAg
-ICAgICAgICAgIGtlZXAtLTsNCj4gKyAgICAgICAgICAgIGNvbnRpbnVlOw0KPiArICAgICAgICB9
-DQo+ICsgICAgICAgIGFzc2VydChkbWFidWYgIT0gZHB5LT5kbWFidWYucHJpbWFyeSk7DQo+ICsg
-ICAgICAgIHZmaW9fZGlzcGxheV9mcmVlX29uZV9kbWFidWYoZHB5LCBkbWFidWYpOw0KPiArICAg
-IH0NCj4gK30NCj4gKw0KPiArc3RhdGljIHZvaWQgdmZpb19kaXNwbGF5X2RtYWJ1Zl91cGRhdGUo
-dm9pZCAqb3BhcXVlKSB7DQo+ICsgICAgVkZJT1BDSURldmljZSAqdmRldiA9IG9wYXF1ZTsNCj4g
-KyAgICBWRklPRGlzcGxheSAqZHB5ID0gdmRldi0+ZHB5Ow0KPiArICAgIFZGSU9ETUFCdWYgKnBy
-aW1hcnksICpjdXJzb3I7DQo+ICsgICAgYm9vbCBmcmVlX2J1ZnMgPSBmYWxzZTsNCj4gKw0KPiAr
-ICAgIHByaW1hcnkgPSB2ZmlvX2Rpc3BsYXlfZ2V0X2RtYWJ1Zih2ZGV2LCBEUk1fUExBTkVfVFlQ
-RV9QUklNQVJZKTsNCj4gKyAgICBpZiAocHJpbWFyeSA9PSBOVUxMKSB7DQo+ICsgICAgICAgIHJl
-dHVybjsNCj4gKyAgICB9DQo+ICsNCj4gKyAgICBpZiAoZHB5LT5kbWFidWYucHJpbWFyeSAhPSBw
-cmltYXJ5KSB7DQo+ICsgICAgICAgIGRweS0+ZG1hYnVmLnByaW1hcnkgPSBwcmltYXJ5Ow0KPiAr
-ICAgICAgICBxZW11X2NvbnNvbGVfcmVzaXplKGRweS0+Y29uLA0KPiArICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIHByaW1hcnktPmJ1Zi53aWR0aCwgcHJpbWFyeS0+YnVmLmhlaWdodCk7DQo+
-ICsgICAgICAgIGRweV9nbF9zY2Fub3V0X2RtYWJ1ZihkcHktPmNvbiwgJnByaW1hcnktPmJ1Zik7
-DQo+ICsgICAgICAgIGZyZWVfYnVmcyA9IHRydWU7DQo+ICsgICAgfQ0KPiArDQo+ICsgICAgY3Vy
-c29yID0gdmZpb19kaXNwbGF5X2dldF9kbWFidWYodmRldiwgRFJNX1BMQU5FX1RZUEVfQ1VSU09S
-KTsNCj4gKyAgICBpZiAoZHB5LT5kbWFidWYuY3Vyc29yICE9IGN1cnNvcikgew0KPiArICAgICAg
-ICBkcHktPmRtYWJ1Zi5jdXJzb3IgPSBjdXJzb3I7DQo+ICsgICAgICAgIGlmIChjdXJzb3IpIHsN
-Cj4gKyAgICAgICAgICAgIGJvb2wgaGF2ZV9ob3QgPSAoY3Vyc29yLT5ob3RfeCAhPSAweGZmZmZm
-ZmZmICYmDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGN1cnNvci0+aG90X3kgIT0g
-MHhmZmZmZmZmZik7DQo+ICsgICAgICAgICAgICBkcHlfZ2xfY3Vyc29yX2RtYWJ1ZihkcHktPmNv
-biwgJmN1cnNvci0+YnVmLCBoYXZlX2hvdCwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIGN1cnNvci0+aG90X3gsIGN1cnNvci0+aG90X3kpOw0KPiArICAgICAgICB9IGVsc2Ug
-ew0KPiArICAgICAgICAgICAgZHB5X2dsX2N1cnNvcl9kbWFidWYoZHB5LT5jb24sIE5VTEwsIGZh
-bHNlLCAwLCAwKTsNCj4gKyAgICAgICAgfQ0KPiArICAgICAgICBmcmVlX2J1ZnMgPSB0cnVlOw0K
-PiArICAgIH0NCj4gKyAgICBpZiAoY3Vyc29yICE9IE5VTEwpIHsNCj4gKyAgICAgICAgZHB5X2ds
-X2N1cnNvcl9wb3NpdGlvbihkcHktPmNvbiwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBjdXJzb3ItPnBvc194LA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGN1
-cnNvci0+cG9zX3kpOw0KPiArICAgIH0NCj4gKw0KPiArICAgIGRweV9nbF91cGRhdGUoZHB5LT5j
-b24sIDAsIDAsIHByaW1hcnktPmJ1Zi53aWR0aCwNCj4gKyBwcmltYXJ5LT5idWYuaGVpZ2h0KTsN
-Cj4gKw0KPiArICAgIGlmIChmcmVlX2J1ZnMpIHsNCj4gKyAgICAgICAgdmZpb19kaXNwbGF5X2Zy
-ZWVfZG1hYnVmcyh2ZGV2KTsNCj4gKyAgICB9DQo+ICt9DQo+ICsNCj4gK3N0YXRpYyBjb25zdCBH
-cmFwaGljSHdPcHMgdmZpb19kaXNwbGF5X2RtYWJ1Zl9vcHMgPSB7DQo+ICsgICAgLmdmeF91cGRh
-dGUgPSB2ZmlvX2Rpc3BsYXlfZG1hYnVmX3VwZGF0ZSwgfTsNCj4gKw0KPiArc3RhdGljIGludCB2
-ZmlvX2Rpc3BsYXlfZG1hYnVmX2luaXQoVkZJT1BDSURldmljZSAqdmRldiwgRXJyb3IgKiplcnJw
-KQ0KPiArew0KPiArICAgIGlmICghZGlzcGxheV9vcGVuZ2wpIHsNCj4gKyAgICAgICAgZXJyb3Jf
-c2V0ZyhlcnJwLCAidmZpby1kaXNwbGF5LWRtYWJ1Zjogb3BlbmdsIG5vdCBhdmFpbGFibGUiKTsN
-Cj4gKyAgICAgICAgcmV0dXJuIC0xOw0KPiArICAgIH0NCj4gKw0KPiArICAgIHZkZXYtPmRweSA9
-IGdfbmV3MChWRklPRGlzcGxheSwgMSk7DQo+ICsgICAgdmRldi0+ZHB5LT5jb24gPSBncmFwaGlj
-X2NvbnNvbGVfaW5pdChERVZJQ0UodmRldiksIDAsDQo+ICsgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAmdmZpb19kaXNwbGF5X2RtYWJ1Zl9vcHMsDQo+ICsgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2ZGV2KTsNCj4gKyAgICByZXR1cm4g
-MDsNCj4gK30NCj4gKw0KPiArc3RhdGljIHZvaWQgdmZpb19kaXNwbGF5X2RtYWJ1Zl9leGl0KFZG
-SU9EaXNwbGF5ICpkcHkpIHsNCj4gKyAgICBWRklPRE1BQnVmICpkbWFidWY7DQo+ICsNCj4gKyAg
-ICBpZiAoUVRBSUxRX0VNUFRZKCZkcHktPmRtYWJ1Zi5idWZzKSkgew0KPiArICAgICAgICByZXR1
-cm47DQo+ICsgICAgfQ0KPiArDQo+ICsgICAgd2hpbGUgKChkbWFidWYgPSBRVEFJTFFfRklSU1Qo
-JmRweS0+ZG1hYnVmLmJ1ZnMpKSAhPSBOVUxMKSB7DQo+ICsgICAgICAgIHZmaW9fZGlzcGxheV9m
-cmVlX29uZV9kbWFidWYoZHB5LCBkbWFidWYpOw0KPiArICAgIH0NCj4gK30NCj4gKw0KPiAgLyog
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLSAqLw0KPiANCj4gIHN0YXRpYyB2b2lkIHZmaW9fZGlzcGxheV9yZWdpb25f
-dXBkYXRlKHZvaWQgKm9wYXF1ZSkgQEAgLTEzNiw4ICsyOTgsNyBAQA0KPiBpbnQgdmZpb19kaXNw
-bGF5X3Byb2JlKFZGSU9QQ0lEZXZpY2UgKnZkZXYsIEVycm9yICoqZXJycCkNCj4gICAgICBwcm9i
-ZS5mbGFncyA9IFZGSU9fR0ZYX1BMQU5FX1RZUEVfUFJPQkUgfA0KPiBWRklPX0dGWF9QTEFORV9U
-WVBFX0RNQUJVRjsNCj4gICAgICByZXQgPSBpb2N0bCh2ZGV2LT52YmFzZWRldi5mZCwgVkZJT19E
-RVZJQ0VfUVVFUllfR0ZYX1BMQU5FLCAmcHJvYmUpOw0KPiAgICAgIGlmIChyZXQgPT0gMCkgew0K
-PiAtICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJ2ZmlvLWRpc3BsYXk6IGRtYWJ1ZiBzdXBwb3J0
-IG5vdCBpbXBsZW1lbnRlZCB5ZXQiKTsNCj4gLSAgICAgICAgcmV0dXJuIC0xOw0KPiArICAgICAg
-ICByZXR1cm4gdmZpb19kaXNwbGF5X2RtYWJ1Zl9pbml0KHZkZXYsIGVycnApOw0KPiAgICAgIH0N
-Cj4gDQo+ICAgICAgbWVtc2V0KCZwcm9iZSwgMCwgc2l6ZW9mKHByb2JlKSk7DQo+IEBAIC0xNjMs
-NiArMzI0LDcgQEAgdm9pZCB2ZmlvX2Rpc3BsYXlfZmluYWxpemUoVkZJT1BDSURldmljZSAqdmRl
-dikNCj4gICAgICAgICAgcmV0dXJuOw0KPiANCj4gICAgICBncmFwaGljX2NvbnNvbGVfY2xvc2Uo
-dmRldi0+ZHB5LT5jb24pOw0KPiArICAgIHZmaW9fZGlzcGxheV9kbWFidWZfZXhpdCh2ZGV2LT5k
-cHkpOw0KPiAgICAgIHZmaW9fZGlzcGxheV9yZWdpb25fZXhpdCh2ZGV2LT5kcHkpOw0KPiAgICAg
-IGdfZnJlZSh2ZGV2LT5kcHkpOw0KPiAgfQ0KPiAtLQ0KPiAyLjkuMw0KPiANCj4gX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18NCj4gaW50ZWwtZ3Z0LWRldiBt
-YWlsaW5nIGxpc3QNCj4gaW50ZWwtZ3Z0LWRldkBsaXN0cy5mcmVlZGVza3RvcC5vcmcNCj4gaHR0
-cHM6Ly9saXN0cy5mcmVlZGVza3RvcC5vcmcvbWFpbG1hbi9saXN0aW5mby9pbnRlbC1ndnQtZGV2
-DQo=
+On 28.02.2018 20:53, Christian Borntraeger wrote:
+> When a guests reboots with diagnose 308 subcode 3 it requests the memor=
+y
+> to be cleared. We did not do it so far. This does not only violate the
+> architecture, it also misses the chance to free up that memory on
+> reboot, which would help on host memory over commitment.  By using
+> ram_block_discard_range we can cover both cases.
+>=20
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  target/s390x/kvm.c | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
+>=20
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index 8f3a422288..2e145ad5c3 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -34,6 +34,8 @@
+>  #include "qapi/error.h"
+>  #include "qemu/error-report.h"
+>  #include "qemu/timer.h"
+> +#include "qemu/rcu_queue.h"
+> +#include "sysemu/cpus.h"
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/hw_accel.h"
+>  #include "hw/boards.h"
+> @@ -41,6 +43,7 @@
+>  #include "sysemu/device_tree.h"
+>  #include "exec/gdbstub.h"
+>  #include "exec/address-spaces.h"
+> +#include "exec/ram_addr.h"
+>  #include "trace.h"
+>  #include "qapi-event.h"
+>  #include "hw/s390x/s390-pci-inst.h"
+> @@ -1841,6 +1844,14 @@ static int kvm_arch_handle_debug_exit(S390CPU *c=
+pu)
+>      return ret;
+>  }
+> =20
+> +static void release_all_rams(void)
+> +{
+> +    struct RAMBlock *rb;
+> +
+> +    QLIST_FOREACH_RCU(rb, &ram_list.blocks, next)
+> +        ram_block_discard_range(rb, 0, rb->used_length);
+> +}
+> +
+>  int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+>  {
+>      S390CPU *cpu =3D S390_CPU(cs);
+> @@ -1853,6 +1864,14 @@ int kvm_arch_handle_exit(CPUState *cs, struct kv=
+m_run *run)
+>              ret =3D handle_intercept(cpu);
+>              break;
+>          case KVM_EXIT_S390_RESET:
+> +            if (run->s390_reset_flags & KVM_S390_RESET_CLEAR) {
+> +                /*
+> +                 * We will stop other CPUs anyway, avoid spurious cras=
+hes and
+> +                 * get all CPUs out. The reset will take care of the r=
+esume.
+> +                 */
+> +                pause_all_vcpus();
+> +                release_all_rams();
+> +            }
+
+Hm, I have a patch lying around that tries to match pause/resume calls,
+and only starts all CPUs again, once the last resume is called. (I
+assume that there is the chance for a race between 2 callers of
+pause/resume - you think it cannot happen, but as pause_all_vcpus() will
+temporarily give up the qemu mutex, bad things can happen).
+
+Can't we communicate that information to our ipl device and do the
+clearing during the reset?
+
+>              s390_reipl_request();
+>              break;
+>          case KVM_EXIT_S390_TSCH:
+>=20
+
+
+--=20
+
+Thanks,
+
+David / dhildenb
