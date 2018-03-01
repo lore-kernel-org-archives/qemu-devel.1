@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1erKyA-0006Ji-K4
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:57:47 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1erKz4-00075K-4v
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:58:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1erKy5-0005L8-Oq
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:57:46 -0500
-References: <20180213202701.15858-1-eblake@redhat.com>
-	<20180213202701.15858-10-eblake@redhat.com>
-	<20180214120525.GB4766@localhost.localdomain>
-	<afb56cfd-4f42-07e5-9a65-d929b2ea9916@redhat.com>
-	<20180223170525.GF3470@localhost.localdomain>
-	<010d7d4e-c6d1-f8fb-8c4c-7aa0b19a94b7@redhat.com>
-	<20180226140518.GA5106@localhost.localdomain>
-	<1724b4e9-ff78-9725-286e-6886704f7f13@virtuozzo.com>
-	<20180301094808.GA4862@localhost.localdomain>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <b83cc168-7af5-3bd1-550e-3ce4cbda102a@virtuozzo.com>
-Date: Thu, 1 Mar 2018 12:57:23 +0300
+	(envelope-from <dgilbert@redhat.com>) id 1erKyz-0005uk-By
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:58:42 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43166 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1erKyz-0005tE-7O
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:58:37 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 125D44084FEC
+	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 09:58:33 +0000 (UTC)
+Date: Thu, 1 Mar 2018 09:58:24 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180301095824.GB2994@work-vm>
+References: <20180228050633.7410-1-peterx@redhat.com>
+	<20180228050633.7410-5-peterx@redhat.com>
+	<20180228174349.GJ2981@work-vm> <20180301025312.GN27381@xz-mi>
 MIME-Version: 1.0
-In-Reply-To: <20180301094808.GA4862@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v8 09/21] null: Switch to
- .bdrv_co_block_status()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180301025312.GN27381@xz-mi>
+Subject: Re: [Qemu-devel] [PATCH 04/14] migration: let incoming side use
+ thread context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,53 +35,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-01.03.2018 12:48, Kevin Wolf wrote:
-> Am 01.03.2018 um 08:25 hat Vladimir Sementsov-Ogievskiy geschrieben:
->> 26.02.2018 17:05, Kevin Wolf wrote:
->>> Essentially, assuming a simple backing chain 'base <- overlay', we got
->>> these combinations to represent in NBD (with my suggestion of the flags
->>> to use):
->>>
->>> 1. Cluster allocated in overlay
->>>      a. non-zero data                         0
->>>      b. explicit zeroes                       0 or ZERO
->>> 2. Cluster marked zero in overlay           HOLE | ZERO
->>> 3. Cluster preallocated/zero in overlay     ZERO
->>> 4. Cluster unallocated in overlay
->>>      a. Cluster allocated in base (non-zero)  HOLE
->>>      b. Cluster allocated in base (zero)      HOLE or HOLE | ZERO
->>>      c. Cluster marked zero in base           HOLE | ZERO
->>>      d. Cluster preallocated/zero in base     HOLE | ZERO
->>>      e. Cluster unallocated in base           HOLE | ZERO
->>>
->>> Instead of 'base' you can read 'anywhere in the backing chain' and the
->>> flags should stay the same.
->> I think only "anywhere in the backing chain" is valid here. Otherwise,
->> semantics of bdrv_is_allocated would differ for NBD and for not-NBD.
-> This was meant as a mapping from cases to flags, not the other way
-> round, so really doesn't say anything about the cases where the block is
-> allocated further down the chain.
->
-> But yes, it shouldn't make a difference where in the backing chain a
-> block is allocated, so these cases are the same as 4.
->
->> I think, if bdrv_is_allocated returns false, it means that we can skip
->> this region in copying process, am I right?
-> -ENOCONTEXT? Which copying process?
->
-> There are cases where you want to copy such regions, and other cases
-> where you want to skip them. It depends on the use case. For example,
-> 'qemu-img convert' skips them with -B (because the backing file is
-> reused), but not without -B (which creates a full copy).
->
-> Kevin
+* Peter Xu (peterx@redhat.com) wrote:
+> On Wed, Feb 28, 2018 at 05:43:50PM +0000, Dr. David Alan Gilbert wrote:
+> > * Peter Xu (peterx@redhat.com) wrote:
+> > > The old incoming migration is running in main thread and default
+> > > gcontext.  With the new qio_channel_add_watch_full() we can now let it
+> > > run in the thread's own gcontext (if there is one).
+> > > 
+> > > Currently this patch does nothing alone.  But when any of the incoming
+> > > migration is run in another iothread (e.g., the upcoming migrate-recover
+> > > command), this patch will bind the incoming logic to the iothread
+> > > instead of the main thread (which may already get page faulted and
+> > > hanged).
+> > 
+> > Does this make any difference to the Postcopy listener thread, which
+> > takes over reading from the main thread once in postcopy mode?
+> > (See savevm.c:postcopy_ram_listen_thread).
+> 
+> It should not.  It should only affect when use sends a
+> "migrate-recover" with "run-oob=true".  The rest should be the same as
+> before.  And since the postcopy ram load thread is a standalone thread
+> with its own initial thread stack (so it's not really in a gmainloop),
+> I can hardly tell how that can be affected since it'll always use its
+> own thread stack.
 
-Hm, I thought that bdrv_is_allocated loops through backings, but it 
-doesn't, sorry.
+OK, I think that's the bit I was worrying about; just since it was
+another thread that ended up reading from the fd originally handled
+by the incoming side main thread.
 
--- 
-Best regards,
-Vladimir
+Dave
+
+> Or, have I missed anything?
+> 
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
