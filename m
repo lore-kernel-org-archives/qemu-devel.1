@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1erNnU-0000Xa-3L
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:58:57 -0500
+	(envelope-from <cohuck@redhat.com>) id 1erNnY-0000aC-N8
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:59:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1erNnT-0005UA-1D
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:58:56 -0500
+	(envelope-from <cohuck@redhat.com>) id 1erNnX-0005XF-Kq
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:59:00 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Thu,  1 Mar 2018 13:58:09 +0100
-Message-Id: <20180301125830.24377-7-cohuck@redhat.com>
+Date: Thu,  1 Mar 2018 13:58:10 +0100
+Message-Id: <20180301125830.24377-8-cohuck@redhat.com>
 In-Reply-To: <20180301125830.24377-1-cohuck@redhat.com>
 References: <20180301125830.24377-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL v2 06/27] s390-ccw: parse and set boot menu
- options
+Subject: [Qemu-devel] [PULL v2 07/27] s390-ccw: set up interactive boot menu
+ parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,165 +25,123 @@ Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, rth@tw
 
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
 
-Set boot menu options for an s390 guest and store them in
-the iplb. These options are set via the QEMU command line
-option:
-
-    -boot menu=on|off[,splash-time=X]
-
-or via the libvirt domain xml:
-
-    <os>
-      <bootmenu enable='yes|no' timeout='X'/>
-    </os>
-
-Where X represents some positive integer representing
-milliseconds.
-
-Any value set for loadparm will override all boot menu options.
-If loadparm=PROMPT, then the menu will be enabled without a
-timeout.
+Reads boot menu flag and timeout values from the iplb and
+sets the respective fields for the menu.
 
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/s390x/ipl.c          | 52 +++++++++++++++++++++++++++++++++++++++++++++++++
- hw/s390x/ipl.h          |  9 +++++++--
- pc-bios/s390-ccw/iplb.h |  9 +++++++--
- 3 files changed, 66 insertions(+), 4 deletions(-)
+ pc-bios/s390-ccw/Makefile   |  2 +-
+ pc-bios/s390-ccw/main.c     | 24 ++++++++++++++++++++++++
+ pc-bios/s390-ccw/menu.c     | 22 ++++++++++++++++++++++
+ pc-bios/s390-ccw/s390-ccw.h |  3 +++
+ 4 files changed, 50 insertions(+), 1 deletion(-)
+ create mode 100644 pc-bios/s390-ccw/menu.c
 
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index 79f5a58adb..ee2039dc69 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -23,6 +23,9 @@
- #include "hw/s390x/ebcdic.h"
- #include "ipl.h"
- #include "qemu/error-report.h"
-+#include "qemu/config-file.h"
-+#include "qemu/cutils.h"
-+#include "qemu/option.h"
+diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
+index 9f7904fc20..1712c2d95d 100644
+--- a/pc-bios/s390-ccw/Makefile
++++ b/pc-bios/s390-ccw/Makefile
+@@ -9,7 +9,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/s390-ccw)
  
- #define KERN_IMAGE_START                0x010000UL
- #define KERN_PARM_AREA                  0x010480UL
-@@ -219,6 +222,54 @@ static Property s390_ipl_properties[] = {
-     DEFINE_PROP_END_OF_LIST(),
- };
+ .PHONY : all clean build-all
  
-+static void s390_ipl_set_boot_menu(S390IPLState *ipl)
-+{
-+    QemuOptsList *plist = qemu_find_opts("boot-opts");
-+    QemuOpts *opts = QTAILQ_FIRST(&plist->head);
-+    uint8_t *flags = &ipl->qipl.qipl_flags;
-+    uint32_t *timeout = &ipl->qipl.boot_menu_timeout;
-+    const char *tmp;
-+    unsigned long splash_time = 0;
+-OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o libc.o
++OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o libc.o menu.o
+ QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
+ QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
+ QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index e41b264a6f..32ed70ebdd 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -18,6 +18,9 @@ IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+ static char loadparm[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+ QemuIplParameters qipl;
+ 
++#define LOADPARM_PROMPT "PROMPT  "
++#define LOADPARM_EMPTY  "........"
 +
-+    if (!get_boot_device(0)) {
-+        if (boot_menu) {
-+            error_report("boot menu requires a bootindex to be specified for "
-+                         "the IPL device.");
-+        }
-+        return;
-+    }
-+
-+    switch (ipl->iplb.pbt) {
-+    case S390_IPL_TYPE_CCW:
-+        break;
-+    default:
-+        error_report("boot menu is not supported for this device type.");
-+        return;
-+    }
-+
-+    if (!boot_menu) {
-+        return;
-+    }
-+
-+    *flags |= QIPL_FLAG_BM_OPTS_CMD;
-+
-+    tmp = qemu_opt_get(opts, "splash-time");
-+
-+    if (tmp && qemu_strtoul(tmp, NULL, 10, &splash_time)) {
-+        error_report("splash-time is invalid, forcing it to 0.");
-+        *timeout = 0;
-+        return;
-+    }
-+
-+    if (splash_time > 0xffffffff) {
-+        error_report("splash-time is too large, forcing it to max value.");
-+        *timeout = 0xffffffff;
-+        return;
-+    }
-+
-+    *timeout = cpu_to_be32(splash_time);
-+}
-+
- static bool s390_gen_initial_iplb(S390IPLState *ipl)
- {
-     DeviceState *dev_st;
-@@ -435,6 +486,7 @@ void s390_ipl_prepare_cpu(S390CPU *cpu)
-         }
-         ipl->qipl.netboot_start_addr = cpu_to_be64(ipl->start_addr);
-     }
-+    s390_ipl_set_boot_menu(ipl);
-     s390_ipl_prepare_qipl(cpu);
+ /*
+  * Priniciples of Operations (SA22-7832-09) chapter 17 requires that
+  * a subsystem-identification is at 184-187 and bytes 188-191 are zero
+@@ -74,6 +77,26 @@ static bool find_dev(Schib *schib, int dev_no)
+     return false;
  }
  
-diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
-index 5cc3b770d4..d6c6f75b76 100644
---- a/hw/s390x/ipl.h
-+++ b/hw/s390x/ipl.h
-@@ -91,6 +91,9 @@ void s390_reipl_request(void);
- 
- #define QIPL_ADDRESS  0xcc
- 
-+/* Boot Menu flags */
-+#define QIPL_FLAG_BM_OPTS_CMD   0x80
++static void menu_setup(void)
++{
++    if (memcmp(loadparm, LOADPARM_PROMPT, 8) == 0) {
++        menu_set_parms(QIPL_FLAG_BM_OPTS_CMD, 0);
++        return;
++    }
 +
- /*
-  * The QEMU IPL Parameters will be stored at absolute address
-  * 204 (0xcc) which means it is 32-bit word aligned but not
-@@ -104,9 +107,11 @@ void s390_reipl_request(void);
-  * in pc-bios/s390-ccw/iplb.h.
-  */
- struct QemuIplParameters {
--    uint8_t  reserved1[4];
-+    uint8_t  qipl_flags;
-+    uint8_t  reserved1[3];
-     uint64_t netboot_start_addr;
--    uint8_t  reserved2[16];
-+    uint32_t boot_menu_timeout;
-+    uint8_t  reserved2[12];
- } QEMU_PACKED;
- typedef struct QemuIplParameters QemuIplParameters;
- 
-diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
-index 31d2934762..832bb94440 100644
---- a/pc-bios/s390-ccw/iplb.h
-+++ b/pc-bios/s390-ccw/iplb.h
-@@ -74,14 +74,19 @@ extern IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
- 
- #define QIPL_ADDRESS  0xcc
- 
-+/* Boot Menu flags */
-+#define QIPL_FLAG_BM_OPTS_CMD   0x80
++    /* If loadparm was set to any other value, then do not enable menu */
++    if (memcmp(loadparm, LOADPARM_EMPTY, 8) != 0) {
++        return;
++    }
 +
- /*
-  * This definition must be kept in sync with the defininition
-  * in hw/s390x/ipl.h
-  */
- struct QemuIplParameters {
--    uint8_t  reserved1[4];
-+    uint8_t  qipl_flags;
-+    uint8_t  reserved1[3];
-     uint64_t netboot_start_addr;
--    uint8_t  reserved2[16];
-+    uint32_t boot_menu_timeout;
-+    uint8_t  reserved2[12];
- } __attribute__ ((packed));
- typedef struct QemuIplParameters QemuIplParameters;
++    switch (iplb.pbt) {
++    case S390_IPL_TYPE_CCW:
++        menu_set_parms(qipl.qipl_flags & QIPL_FLAG_BM_OPTS_CMD,
++                       qipl.boot_menu_timeout);
++        return;
++    }
++}
++
+ static void virtio_setup(void)
+ {
+     Schib schib;
+@@ -117,6 +140,7 @@ static void virtio_setup(void)
+         default:
+             panic("List-directed IPL not supported yet!\n");
+         }
++        menu_setup();
+     } else {
+         for (ssid = 0; ssid < 0x3; ssid++) {
+             blk_schid.ssid = ssid;
+diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
+new file mode 100644
+index 0000000000..1ce33ddf3d
+--- /dev/null
++++ b/pc-bios/s390-ccw/menu.c
+@@ -0,0 +1,22 @@
++/*
++ * QEMU S390 Interactive Boot Menu
++ *
++ * Copyright 2018 IBM Corp.
++ * Author: Collin L. Walling <walling@linux.vnet.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or (at
++ * your option) any later version. See the COPYING file in the top-level
++ * directory.
++ */
++
++#include "libc.h"
++#include "s390-ccw.h"
++
++static uint8_t flag;
++static uint64_t timeout;
++
++void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout)
++{
++    flag = boot_menu_flag;
++    timeout = boot_menu_timeout;
++}
+diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+index 25d4d213ea..6cfd4b2183 100644
+--- a/pc-bios/s390-ccw/s390-ccw.h
++++ b/pc-bios/s390-ccw/s390-ccw.h
+@@ -84,6 +84,9 @@ ulong get_second(void);
+ /* bootmap.c */
+ void zipl_load(void);
  
++/* menu.c */
++void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout);
++
+ static inline void fill_hex(char *out, unsigned char val)
+ {
+     const char hex[] = "0123456789abcdef";
 -- 
 2.13.6
