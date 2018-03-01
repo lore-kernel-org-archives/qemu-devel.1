@@ -1,38 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1erET7-0007Jx-8r
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 22:01:20 -0500
+	(envelope-from <thuth@redhat.com>) id 1erFMx-0000DT-4e
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 22:59:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1erET2-00079b-To
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 22:01:17 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58816)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1erET2-00077w-Le
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 22:01:12 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w212xqsB075956
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 22:01:08 -0500
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ge6wr4k5h-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 28 Feb 2018 22:01:08 -0500
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Wed, 28 Feb 2018 22:01:06 -0500
-Date: Thu, 1 Mar 2018 11:01:01 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20180227173251.17025-1-cohuck@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1erFMu-0007JS-3A
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 22:58:59 -0500
+References: <20180228195320.165230-1-borntraeger@de.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <79f7059b-f2d3-a758-6bb9-29433b31b313@redhat.com>
+Date: Thu, 1 Mar 2018 04:58:44 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180227173251.17025-1-cohuck@redhat.com>
-Message-Id: <20180301030101.GD5506@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] vfio-ccw: license text should indicate GPL
- v2 or later
+In-Reply-To: <20180228195320.165230-1-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] s390/kvm: implement clearing part of
+ IPL clear
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,42 +24,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-* Cornelia Huck <cohuck@redhat.com> [2018-02-27 18:32:51 +0100]:
+On 28.02.2018 20:53, Christian Borntraeger wrote:
+> When a guests reboots with diagnose 308 subcode 3 it requests the memory
+> to be cleared. We did not do it so far. This does not only violate the
+> architecture, it also misses the chance to free up that memory on
+> reboot, which would help on host memory over commitment.  By using
+> ram_block_discard_range we can cover both cases.
 
-> The license text currently specifies "any version" of the GPL. It
-> is unlikely that GPL v1 was ever intended; change this to the
-> standard "or any later version" text.
-> 
-> Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> Cc: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-> Cc: Pierre Morel <pmorel@linux.vnet.ibm.com>
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Sounds like a good idea. I wonder whether that release_all_ram()
+function should maybe rather reside in exec.c, so that other machines
+that want to clear all RAM at reset time can use it, too?
+
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  hw/vfio/ccw.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  target/s390x/kvm.c | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
 > 
-> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> index 16713f2c52..4e5855741a 100644
-> --- a/hw/vfio/ccw.c
-> +++ b/hw/vfio/ccw.c
-> @@ -6,8 +6,8 @@
->   *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
->   *            Pierre Morel <pmorel@linux.vnet.ibm.com>
->   *
-> - * This work is licensed under the terms of the GNU GPL, version 2 or(at
-> - * your option) any version. See the COPYING file in the top-level
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
-> + * your option) any later version. See the COPYING file in the top-level
->   * directory.
->   */
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index 8f3a422288..2e145ad5c3 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -34,6 +34,8 @@
+>  #include "qapi/error.h"
+>  #include "qemu/error-report.h"
+>  #include "qemu/timer.h"
+> +#include "qemu/rcu_queue.h"
+> +#include "sysemu/cpus.h"
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/hw_accel.h"
+>  #include "hw/boards.h"
+> @@ -41,6 +43,7 @@
+>  #include "sysemu/device_tree.h"
+>  #include "exec/gdbstub.h"
+>  #include "exec/address-spaces.h"
+> +#include "exec/ram_addr.h"
+>  #include "trace.h"
+>  #include "qapi-event.h"
+>  #include "hw/s390x/s390-pci-inst.h"
+> @@ -1841,6 +1844,14 @@ static int kvm_arch_handle_debug_exit(S390CPU *cpu)
+>      return ret;
+>  }
+>  
+> +static void release_all_rams(void)
+
+s/rams/ram/ maybe?
+
+> +{
+> +    struct RAMBlock *rb;
+> +
+> +    QLIST_FOREACH_RCU(rb, &ram_list.blocks, next)
+> +        ram_block_discard_range(rb, 0, rb->used_length);
+
+>From a coding style point of view, I think there should be curly braces
+around ram_block_discard_range() ?
+
+> +}
+> +
+>  int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+>  {
+>      S390CPU *cpu = S390_CPU(cs);
+> @@ -1853,6 +1864,14 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+>              ret = handle_intercept(cpu);
+>              break;
+>          case KVM_EXIT_S390_RESET:
+> +            if (run->s390_reset_flags & KVM_S390_RESET_CLEAR) {
+> +                /*
+> +                 * We will stop other CPUs anyway, avoid spurious crashes and
+> +                 * get all CPUs out. The reset will take care of the resume.
+> +                 */
+> +                pause_all_vcpus();
+> +                release_all_rams();
+> +            }
+>              s390_reipl_request();
+>              break;
+>          case KVM_EXIT_S390_TSCH:
 > 
-Dunno why the word 'later' is missing... could be some copy/paste
-mistake.
 
-Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Apart from the cosmetic nits, patch looks good to me.
 
--- 
-Dong Jia Shi
+ Thomas
