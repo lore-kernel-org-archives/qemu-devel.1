@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1erNq3-000321-S5
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:01:42 -0500
+	(envelope-from <cohuck@redhat.com>) id 1erNqe-0003Za-O2
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:02:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1erNpz-0006sE-B1
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:01:35 -0500
-Resent-Message-Id: <E1erNpz-0006sE-B1@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21104)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1erNpy-0006qj-RJ
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:01:31 -0500
-In-Reply-To: <20180301112403.12487-1-peter.maydell@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151990926291.1290.9842237231347453757@bdbb90650ae5>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 1 Mar 2018 05:01:03 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/42] target-arm queue
+	(envelope-from <cohuck@redhat.com>) id 1erNqZ-00072p-10
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:02:12 -0500
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Thu,  1 Mar 2018 14:01:34 +0100
+Message-Id: <20180301130201.24666-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PULL v2 00/27] s390x updates (and friends)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,143 +18,77 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, rth@twiddle.net, agraf@suse.de, david@redhat.com, thuth@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMzAxMTEyNDAzLjEyNDg3LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3Jn
-ClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC80Ml0gdGFyZ2V0LWFybSBxdWV1ZQoKPT09
-IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0k
-KGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
-cyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1p
-dHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRj
-b21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cg
-LW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVt
-YWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAg
-ZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRm
-YWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4Nzgy
-MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1w
-cm9qZWN0L3FlbXUKICAgNTExNmMzMzFjNi4uMjk2M2Q3ODIwNCAgbWFzdGVyICAgICAtPiBtYXN0
-ZXIKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDMwMTExMjQwMy4xMjQ4
-Ny0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMTgwMzAxMTEyNDAzLjEy
-NDg3LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
-dGVzdCcKYjhkODIwZGE4ZSBNQUlOVEFJTkVSUzogVXBkYXRlIG15IGVtYWlsIGFkZHJlc3MKZmFm
-ZWZlZWRlOCBsaW51eC11c2VyOiBSZXBvcnQgQUFyY2g2NCBGUDE2IHN1cHBvcnQgdmlhIGh3Y2Fw
-IGJpdHMKMWU0N2YwYzhkMCB0YXJnZXQvYXJtOiBFbmFibGUgQVJNX1Y4X0ZQMTYgZmVhdHVyZSBi
-aXQgZm9yIHRoZSBBQXJjaDY0ICJhbnkiIENQVQphMWQ3ODYwMWQzIGFybS90cmFuc2xhdGUtYTY0
-OiBhZGQgYWxsIHNpbmdsZSBvcCBGUDE2IHRvIGhhbmRsZV9mcF8xc3JjX2hhbGYKZWYxYWVlY2Q0
-YiBhcm0vdHJhbnNsYXRlLWE2NDogaW1wbGVtZW50IHNpbWRfc2NhbGFyX3RocmVlX3JlZ19zYW1l
-X2ZwMTYKNmYyODM2ZDQ4NSBhcm0vdHJhbnNsYXRlLWE2NDogYWRkIGFsbCBGUDE2IG9wcyBpbiBz
-aW1kX3NjYWxhcl9wYWlyd2lzZQphMzUyOTFmMzQ5IGFybS90cmFuc2xhdGUtYTY0OiBhZGQgRlAx
-NiBGTU9WIHRvIHNpbWRfbW9kX2ltbQowYTI3Y2JiNGVkIGFybS90cmFuc2xhdGUtYTY0OiBhZGQg
-RlAxNiBGUlNRUlRFIHRvIHNpbWRfdHdvX3JlZ19taXNjX2ZwMTYKMGE0NDFiN2RhNCBhcm0vaGVs
-cGVyLmM6IHJlLWZhY3RvciByc3FydGUgYW5kIGFkZCByc3FydGVfZjE2CmRhMmUwZmM0NGEgYXJt
-L3RyYW5zbGF0ZS1hNjQ6IGFkZCBGUDE2IEZTUVJUIHRvIHNpbWRfdHdvX3JlZ19taXNjX2ZwMTYK
-NGNlZjIzNjlkMiBhcm0vdHJhbnNsYXRlLWE2NDogYWRkIEZQMTYgRlJDUFggdG8gc2ltZF90d29f
-cmVnX21pc2NfZnAxNgoxYjRmMWFiOTgwIGFybS90cmFuc2xhdGUtYTY0OiBhZGQgRlAxNiBGUkVD
-UEUKNzNhOWU5NzAzNiBhcm0vaGVscGVyLmM6IHJlLWZhY3RvciByZWNwZSBhbmQgYWRkIHJlY2Vw
-ZV9mMTYKOTBiYTRiZDhjMiBhcm0vdHJhbnNsYXRlLWE2NDogYWRkIEZQMTYgRk5FRy9GQUJTIHRv
-IHNpbWRfdHdvX3JlZ19taXNjX2ZwMTYKNzNmZDg1ZWQyYiBhcm0vdHJhbnNsYXRlLWE2NDogYWRk
-IEZQMTYgU0NWVEYvVUNWRlQgdG8gc2ltZF90d29fcmVnX21pc2NfZnAxNgpmMTljYzVhMTgzIGFy
-bS90cmFuc2xhdGUtYTY0OiBhZGQgRlAxNiBGQ014eCAoemVybykgdG8gc2ltZF90d29fcmVnX21p
-c2NfZnAxNgo2NWYzOTZlNTg5IGFybS90cmFuc2xhdGUtYTY0OiBhZGQgRkNWVHh4IHRvIHNpbWRf
-dHdvX3JlZ19taXNjX2ZwMTYKMGUyNDIxNGFiNSBhcm0vdHJhbnNsYXRlLWE2NDogYWRkIEZQMTYg
-RlBSSU5UeCB0byBzaW1kX3R3b19yZWdfbWlzY19mcDE2CmYxOTZjZTZmZTYgYXJtL3RyYW5zbGF0
-ZS1hNjQ6IGluaXRpYWwgZGVjb2RlIGZvciBzaW1kX3R3b19yZWdfbWlzY19mcDE2CjM0ZDA2NTk1
-ZTcgYXJtL3RyYW5zbGF0ZS1hNjQ6IGFkZCBGUDE2IHgyIG9wcyBmb3Igc2ltZF9pbmRleGVkCjFj
-YmIwNTMwZDYgYXJtL3RyYW5zbGF0ZS1hNjQ6IGFkZCBGUDE2IEZNVUxYL01MUy9GTUxBIHRvIHNp
-bWRfaW5kZXhlZAoyNzg0ZDgyZWQ2IGFybS90cmFuc2xhdGUtYTY0OiBhZGQgRlAxNiBwYWlyd2lz
-ZSBvcHMgc2ltZF90aHJlZV9yZWdfc2FtZV9mcDE2CmQzODRjZGQyODEgYXJtL3RyYW5zbGF0ZS1h
-NjQ6IGFkZCBGUDE2IEZSW0VDUC9TUVJUXVMgdG8gc2ltZF90aHJlZV9yZWdfc2FtZV9mcDE2Cjhm
-OGE2Y2U0NDggYXJtL3RyYW5zbGF0ZS1hNjQ6IGFkZCBGUDE2IEZNVUxBL1gvUyB0byBzaW1kX3Ro
-cmVlX3JlZ19zYW1lX2ZwMTYKMTI2OTE2YmM4OSBhcm0vdHJhbnNsYXRlLWE2NDogYWRkIEZQMTYg
-RltBXUNbRVEvR0UvR1RdIHRvIHNpbWRfdGhyZWVfcmVnX3NhbWVfZnAxNgo0MTczMzYyZDlhIGFy
-bS90cmFuc2xhdGUtYTY0OiBhZGQgRlAxNiBGQUREL0ZBQkQvRlNVQi9GTVVML0ZESVYgdG8gc2lt
-ZF90aHJlZV9yZWdfc2FtZV9mcDE2CjkzM2NkNDgwMTIgYXJtL3RyYW5zbGF0ZS1hNjQ6IGluaXRp
-YWwgZGVjb2RlIGZvciBzaW1kX3RocmVlX3JlZ19zYW1lX2ZwMTYKYjk5MGRiNDZhNCBhcm0vdHJh
-bnNsYXRlLWE2NDogaGFuZGxlXzNzYW1lXzY0IGNvbW1lbnQgZml4CmQzNWJmYzZkZGQgYXJtL3Ry
-YW5zbGF0ZS1hNjQ6IGltcGxlbWVudCBoYWxmLXByZWNpc2lvbiBGKE1JTnxNQVgpKFZ8Tk1WKQpm
-N2I1MDQzZDhlIHRhcmdldC9hcm0vaGVscGVyOiBwYXNzIGV4cGxpY2l0IGZwc3QgdG8gc2V0X3Jt
-b2RlCmY0OTQyY2M3YzggdGFyZ2V0L2FybS9jcHUuaDogYWRkIGFkZGl0aW9uYWwgZmxvYXRfc3Rh
-dHVzIGZsYWdzCjhmMmEwZjU1NzUgdGFyZ2V0L2FybS9jcHUuaDogdXBkYXRlIGNvbW1lbnQgZm9y
-IGhhbGYtcHJlY2lzaW9uIHZhbHVlcwozMDU5ZjU5MDZkIHRhcmdldC9hcm0vY3B1NjQ6IGludHJv
-ZHVjZSBBUk1fVjhfRlAxNiBmZWF0dXJlIGJpdAphYWMyNWYyN2JlIGluY2x1ZGUvZXhlYy9oZWxw
-ZXItaGVhZC5oOiBzdXBwb3J0IGYxNiBpbiBoZWxwZXIgY2FsbHMKNTk5OGNlMWUyNCBhcm0vdmV4
-cHJlc3M6IEFkZCBwcm9wZXIgZGlzcGxheSBjb25uZWN0b3IgZW11bGF0aW9uCmNkNzM0MTMxYjIg
-aHcvc2lpOTAyMjogQWRkIHN1cHBvcnQgZm9yIFNpbGljb24gSW1hZ2UgU0lJOTAyMgo5NGI5NDVj
-MjRkIGh3L2kyYy1kZGM6IERvIG5vdCBmYWlsIHdyaXRlcwpmYjY2NDc3ZDM1IGkyYzogTW92ZSB0
-aGUgYnVzIGNsYXNzIHRvIGkyYy5oCjk2YjZkOTk4MDYgaTJjOiBGaXggc29tZSBicmFjZSBzdHls
-ZSBpc3N1ZXMKNmZkZDc2MDAzZSB4aWxpbnhfc3BpcHM6IFVzZSA4IGR1bW15IGN5Y2xlcyB3aXRo
-IHRoZSBRSU9SL1FJT1I0IGNvbW1hbmRzCjBhNjNkMTRlYWEgeGlsaW54X3NwaXBzOiBFbmFibGUg
-b25seSB0d28gc2xhdmVzIHdoZW4gcmVhZGluZy93cml0aW5nIHdpdGggc3RyaXBlCjNhNTQxMjI3
-N2UgaHc6IHJlZ2lzdGVyOiBSdW4gcG9zdF93cml0ZSBob29rIG9uIHJlc2V0Cgo9PT0gT1VUUFVU
-IEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzQyOiBodzogcmVnaXN0ZXI6IFJ1biBwb3N0X3dy
-aXRlIGhvb2sgb24gcmVzZXQuLi4KQ2hlY2tpbmcgUEFUQ0ggMi80MjogeGlsaW54X3NwaXBzOiBF
-bmFibGUgb25seSB0d28gc2xhdmVzIHdoZW4gcmVhZGluZy93cml0aW5nIHdpdGggc3RyaXBlLi4u
-CkNoZWNraW5nIFBBVENIIDMvNDI6IHhpbGlueF9zcGlwczogVXNlIDggZHVtbXkgY3ljbGVzIHdp
-dGggdGhlIFFJT1IvUUlPUjQgY29tbWFuZHMuLi4KQ2hlY2tpbmcgUEFUQ0ggNC80MjogaTJjOiBG
-aXggc29tZSBicmFjZSBzdHlsZSBpc3N1ZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggNS80MjogaTJjOiBN
-b3ZlIHRoZSBidXMgY2xhc3MgdG8gaTJjLmguLi4KQ2hlY2tpbmcgUEFUQ0ggNi80MjogaHcvaTJj
-LWRkYzogRG8gbm90IGZhaWwgd3JpdGVzLi4uCkNoZWNraW5nIFBBVENIIDcvNDI6IGh3L3NpaTkw
-MjI6IEFkZCBzdXBwb3J0IGZvciBTaWxpY29uIEltYWdlIFNJSTkwMjIuLi4KQ2hlY2tpbmcgUEFU
-Q0ggOC80MjogYXJtL3ZleHByZXNzOiBBZGQgcHJvcGVyIGRpc3BsYXkgY29ubmVjdG9yIGVtdWxh
-dGlvbi4uLgpDaGVja2luZyBQQVRDSCA5LzQyOiBpbmNsdWRlL2V4ZWMvaGVscGVyLWhlYWQuaDog
-c3VwcG9ydCBmMTYgaW4gaGVscGVyIGNhbGxzLi4uCkNoZWNraW5nIFBBVENIIDEwLzQyOiB0YXJn
-ZXQvYXJtL2NwdTY0OiBpbnRyb2R1Y2UgQVJNX1Y4X0ZQMTYgZmVhdHVyZSBiaXQuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMTEvNDI6IHRhcmdldC9hcm0vY3B1Lmg6IHVwZGF0ZSBjb21tZW50IGZvciBoYWxm
-LXByZWNpc2lvbiB2YWx1ZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvNDI6IHRhcmdldC9hcm0vY3B1
-Lmg6IGFkZCBhZGRpdGlvbmFsIGZsb2F0X3N0YXR1cyBmbGFncy4uLgpDaGVja2luZyBQQVRDSCAx
-My80MjogdGFyZ2V0L2FybS9oZWxwZXI6IHBhc3MgZXhwbGljaXQgZnBzdCB0byBzZXRfcm1vZGUu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMTQvNDI6IGFybS90cmFuc2xhdGUtYTY0OiBpbXBsZW1lbnQgaGFs
-Zi1wcmVjaXNpb24gRihNSU58TUFYKShWfE5NVikuLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvNDI6IGFy
-bS90cmFuc2xhdGUtYTY0OiBoYW5kbGVfM3NhbWVfNjQgY29tbWVudCBmaXguLi4KQ2hlY2tpbmcg
-UEFUQ0ggMTYvNDI6IGFybS90cmFuc2xhdGUtYTY0OiBpbml0aWFsIGRlY29kZSBmb3Igc2ltZF90
-aHJlZV9yZWdfc2FtZV9mcDE2Li4uCkNoZWNraW5nIFBBVENIIDE3LzQyOiBhcm0vdHJhbnNsYXRl
-LWE2NDogYWRkIEZQMTYgRkFERC9GQUJEL0ZTVUIvRk1VTC9GRElWIHRvIHNpbWRfdGhyZWVfcmVn
-X3NhbWVfZnAxNi4uLgpDaGVja2luZyBQQVRDSCAxOC80MjogYXJtL3RyYW5zbGF0ZS1hNjQ6IGFk
-ZCBGUDE2IEZbQV1DW0VRL0dFL0dUXSB0byBzaW1kX3RocmVlX3JlZ19zYW1lX2ZwMTYuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMTkvNDI6IGFybS90cmFuc2xhdGUtYTY0OiBhZGQgRlAxNiBGTVVMQS9YL1Mg
-dG8gc2ltZF90aHJlZV9yZWdfc2FtZV9mcDE2Li4uCkNoZWNraW5nIFBBVENIIDIwLzQyOiBhcm0v
-dHJhbnNsYXRlLWE2NDogYWRkIEZQMTYgRlJbRUNQL1NRUlRdUyB0byBzaW1kX3RocmVlX3JlZ19z
-YW1lX2ZwMTYuLi4KQ2hlY2tpbmcgUEFUQ0ggMjEvNDI6IGFybS90cmFuc2xhdGUtYTY0OiBhZGQg
-RlAxNiBwYWlyd2lzZSBvcHMgc2ltZF90aHJlZV9yZWdfc2FtZV9mcDE2Li4uCkNoZWNraW5nIFBB
-VENIIDIyLzQyOiBhcm0vdHJhbnNsYXRlLWE2NDogYWRkIEZQMTYgRk1VTFgvTUxTL0ZNTEEgdG8g
-c2ltZF9pbmRleGVkLi4uCkNoZWNraW5nIFBBVENIIDIzLzQyOiBhcm0vdHJhbnNsYXRlLWE2NDog
-YWRkIEZQMTYgeDIgb3BzIGZvciBzaW1kX2luZGV4ZWQuLi4KQ2hlY2tpbmcgUEFUQ0ggMjQvNDI6
-IGFybS90cmFuc2xhdGUtYTY0OiBpbml0aWFsIGRlY29kZSBmb3Igc2ltZF90d29fcmVnX21pc2Nf
-ZnAxNi4uLgpDaGVja2luZyBQQVRDSCAyNS80MjogYXJtL3RyYW5zbGF0ZS1hNjQ6IGFkZCBGUDE2
-IEZQUklOVHggdG8gc2ltZF90d29fcmVnX21pc2NfZnAxNi4uLgpDaGVja2luZyBQQVRDSCAyNi80
-MjogYXJtL3RyYW5zbGF0ZS1hNjQ6IGFkZCBGQ1ZUeHggdG8gc2ltZF90d29fcmVnX21pc2NfZnAx
-Ni4uLgpDaGVja2luZyBQQVRDSCAyNy80MjogYXJtL3RyYW5zbGF0ZS1hNjQ6IGFkZCBGUDE2IEZD
-TXh4ICh6ZXJvKSB0byBzaW1kX3R3b19yZWdfbWlzY19mcDE2Li4uCkNoZWNraW5nIFBBVENIIDI4
-LzQyOiBhcm0vdHJhbnNsYXRlLWE2NDogYWRkIEZQMTYgU0NWVEYvVUNWRlQgdG8gc2ltZF90d29f
-cmVnX21pc2NfZnAxNi4uLgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgdGhhdCBjbG9z
-ZSBwYXJlbnRoZXNpcyAnKScKIzI4OiBGSUxFOiB0YXJnZXQvYXJtL2hlbHBlci5jOjExMzA1Ogor
-RkxPQVRfQ09OVlMoc2ksIGgsIDE2LCApCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDIw
-OCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
-dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
-dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpD
-aGVja2luZyBQQVRDSCAyOS80MjogYXJtL3RyYW5zbGF0ZS1hNjQ6IGFkZCBGUDE2IEZORUcvRkFC
-UyB0byBzaW1kX3R3b19yZWdfbWlzY19mcDE2Li4uCkNoZWNraW5nIFBBVENIIDMwLzQyOiBhcm0v
-aGVscGVyLmM6IHJlLWZhY3RvciByZWNwZSBhbmQgYWRkIHJlY2VwZV9mMTYuLi4KQ2hlY2tpbmcg
-UEFUQ0ggMzEvNDI6IGFybS90cmFuc2xhdGUtYTY0OiBhZGQgRlAxNiBGUkVDUEUuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMzIvNDI6IGFybS90cmFuc2xhdGUtYTY0OiBhZGQgRlAxNiBGUkNQWCB0byBzaW1k
-X3R3b19yZWdfbWlzY19mcDE2Li4uCkNoZWNraW5nIFBBVENIIDMzLzQyOiBhcm0vdHJhbnNsYXRl
-LWE2NDogYWRkIEZQMTYgRlNRUlQgdG8gc2ltZF90d29fcmVnX21pc2NfZnAxNi4uLgpDaGVja2lu
-ZyBQQVRDSCAzNC80MjogYXJtL2hlbHBlci5jOiByZS1mYWN0b3IgcnNxcnRlIGFuZCBhZGQgcnNx
-cnRlX2YxNi4uLgpDaGVja2luZyBQQVRDSCAzNS80MjogYXJtL3RyYW5zbGF0ZS1hNjQ6IGFkZCBG
-UDE2IEZSU1FSVEUgdG8gc2ltZF90d29fcmVnX21pc2NfZnAxNi4uLgpDaGVja2luZyBQQVRDSCAz
-Ni80MjogYXJtL3RyYW5zbGF0ZS1hNjQ6IGFkZCBGUDE2IEZNT1YgdG8gc2ltZF9tb2RfaW1tLi4u
-CkNoZWNraW5nIFBBVENIIDM3LzQyOiBhcm0vdHJhbnNsYXRlLWE2NDogYWRkIGFsbCBGUDE2IG9w
-cyBpbiBzaW1kX3NjYWxhcl9wYWlyd2lzZS4uLgpDaGVja2luZyBQQVRDSCAzOC80MjogYXJtL3Ry
-YW5zbGF0ZS1hNjQ6IGltcGxlbWVudCBzaW1kX3NjYWxhcl90aHJlZV9yZWdfc2FtZV9mcDE2Li4u
-CkNoZWNraW5nIFBBVENIIDM5LzQyOiBhcm0vdHJhbnNsYXRlLWE2NDogYWRkIGFsbCBzaW5nbGUg
-b3AgRlAxNiB0byBoYW5kbGVfZnBfMXNyY19oYWxmLi4uCkNoZWNraW5nIFBBVENIIDQwLzQyOiB0
-YXJnZXQvYXJtOiBFbmFibGUgQVJNX1Y4X0ZQMTYgZmVhdHVyZSBiaXQgZm9yIHRoZSBBQXJjaDY0
-ICJhbnkiIENQVS4uLgpDaGVja2luZyBQQVRDSCA0MS80MjogbGludXgtdXNlcjogUmVwb3J0IEFB
-cmNoNjQgRlAxNiBzdXBwb3J0IHZpYSBod2NhcCBiaXRzLi4uCkNoZWNraW5nIFBBVENIIDQyLzQy
-OiBNQUlOVEFJTkVSUzogVXBkYXRlIG15IGVtYWlsIGFkZHJlc3MuLi4KPT09IE9VVFBVVCBFTkQg
-PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0
-ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
-IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+The following changes since commit 0a773d55ac76c5aa89ed9187a3bc5af8c5c2a6d0:
+
+  maintainers: Add myself as a OpenBSD maintainer (2018-02-23 12:05:07 +0000)
+
+are available in the git repository at:
+
+  git://github.com/cohuck/qemu tags/s390x-20180301-v2
+
+for you to fetch changes up to be8b49de2491145a7aad3201803327b6f568cbd3:
+
+  s390x/tcg: fix loading 31bit PSWs with the highest bit set (2018-03-01 13:23:09 +0100)
+
+----------------------------------------------------------------
+- add query-cpus-fast and deprecate query-cpus, while adding s390 cpu
+  information
+- remove s390x memory hotplug implementation, which is not useable in
+  this form
+- add boot menu support in the s390-ccw bios
+- expose s390x guest crash information
+- fixes and cleaups
+
+----------------------------------------------------------------
+
+Christian Borntraeger (1):
+  s390x/cpu: expose the guest crash information
+
+Collin L. Walling (13):
+  s390-ccw: refactor boot map table code
+  s390-ccw: refactor eckd_block_num to use CHS
+  s390-ccw: refactor IPL structs
+  s390-ccw: update libc
+  s390-ccw: move auxiliary IPL data to separate location
+  s390-ccw: parse and set boot menu options
+  s390-ccw: set up interactive boot menu parameters
+  s390-ccw: read stage2 boot loader data to find menu
+  s390-ccw: print zipl boot menu
+  s390-ccw: read user input for boot index via the SCLP console
+  s390-ccw: set cp_receive mask only when needed and consume pending
+    service irqs
+  s390-ccw: use zipl values when no boot menu options are present
+  s390-ccw: interactive boot menu for scsi
+
+Cornelia Huck (1):
+  s390x: remove s390_get_memslot_count
+
+David Hildenbrand (4):
+  s390x/tcg: fix disabling/enabling DAT
+  s390x/tcg: add various alignment checks
+  s390x/sclp: remove memory hotplug support
+  s390x/tcg: fix loading 31bit PSWs with the highest bit set
+
+Dr. David Alan Gilbert (1):
+  s390/stattrib: Make SaveVMHandlers data static
+
+Halil Pasic (1):
+  s390x/cpumodel: document S390FeatDef.bit not applicable
+
+Luiz Capitulino (1):
+  qmp: add query-cpus-fast
+
+Thomas Huth (1):
+  pc-bios/s390: Rebuild the s390x firmware images with the boot menu
+    changes
+
+Viktor Mihajlovski (4):
+  qmp: expose s390-specific CPU info
+  qmp: add architecture specific cpu data for query-cpus-fast
+  qemu-doc: deprecate query-cpus
+  hmp: change hmp_info_cpus to use query-cpus-fast
+
+-- 
+2.13.6
