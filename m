@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1erQ5A-000367-39
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:25:22 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1erQ63-0003Y3-2U
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:26:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1erQ53-00082u-1c
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:25:20 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1erQ5z-0000wW-SA
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:26:15 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47234 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1erQ5z-0000uv-LY
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:26:11 -0500
+Date: Thu, 1 Mar 2018 15:26:00 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180301152559.GG2994@work-vm>
+References: <20180228180215.25470-1-wei@redhat.com>
+	<20180228180215.25470-4-wei@redhat.com>
+	<20180301094844.ckysyow5pppqf3if@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-References: <20180301135856.22698-1-rjones@redhat.com>
-	<20180301135856.22698-2-rjones@redhat.com>
-In-Reply-To: <20180301135856.22698-2-rjones@redhat.com>
-From: Nir Soffer <nirsof@gmail.com>
-Date: Thu, 01 Mar 2018 15:24:48 +0000
-Message-ID: <CAMr-obsJtVe9h5CjQ1PkjBdrQhKBRP0RUAA2f3cQ7p_-2MG-EA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] block: curl: Allow arbitrary HTTP
- request headers to be set.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180301094844.ckysyow5pppqf3if@kamzik.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V7 3/4] tests/migration: Add migration-test
+ header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,222 +29,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: jcody@redhat.com, kwolf@redhat.com, qemu-block@nongnu.org, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, armbru@redhat.com, mreitz@redhat.com, "derez@redhat.com" <derez@redhat.com>
+To: Andrew Jones <drjones@redhat.com>
+Cc: Wei Huang <wei@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, quintela@redhat.com
 
-On Thu, Mar 1, 2018 at 4:00 PM Richard W.M. Jones <rjones@redhat.com> wrote=
-:
+* Andrew Jones (drjones@redhat.com) wrote:
+> On Wed, Feb 28, 2018 at 12:02:14PM -0600, Wei Huang wrote:
+> > This patch moves the settings related migration-test from the
+> > migration-test.c file to a seperate header file. It also renames the
+> > x86-a-b-bootblock.s file extension from .s to .S, allowing gcc
+> > pre-processor to include the C-style header file correctly.
+> > 
+> > Signed-off-by: Wei Huang <wei@redhat.com>
+> > ---
+> >  tests/migration-test.c                             | 34 +++++++++++++---------
+> >  tests/migration/Makefile                           |  4 +--
+> >  tests/migration/migration-test.h                   | 22 ++++++++++++++
+> >  .../{x86-a-b-bootblock.s => x86-a-b-bootblock.S}   |  7 +++--
+> >  tests/migration/x86-a-b-bootblock.h                |  2 +-
+> >  5 files changed, 49 insertions(+), 20 deletions(-)
+> >  create mode 100644 tests/migration/migration-test.h
+> >  rename tests/migration/{x86-a-b-bootblock.s => x86-a-b-bootblock.S} (94%)
+> > 
+> > diff --git a/tests/migration-test.c b/tests/migration-test.c
+> > index 74f9361bdd..12c04a9648 100644
+> > --- a/tests/migration-test.c
+> > +++ b/tests/migration-test.c
+> > @@ -21,10 +21,10 @@
+> >  #include "sysemu/sysemu.h"
+> >  #include "hw/nvram/chrp_nvram.h"
+> >  
+> > -#define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
+> > +#include "migration/migration-test.h"
+> >  
+> > -const unsigned start_address = 1024 * 1024;
+> > -const unsigned end_address = 100 * 1024 * 1024;
+> > +unsigned start_address;
+> > +unsigned end_address;
+> >  bool got_stop;
+> >  
+> >  #if defined(__linux__)
+> > @@ -77,8 +77,8 @@ static bool ufd_version_check(void)
+> >  
+> >  static const char *tmpfs;
+> >  
+> > -/* A simple PC boot sector that modifies memory (1-100MB) quickly
+> > - * outputting a 'B' every so often if it's still running.
+> > +/* The boot file modifies memory area in [start_address, end_address)
+> > + * repeatedly. It outputs a 'B' at a fixed rate while it's still running.
+> >   */
+> >  #include "tests/migration/x86-a-b-bootblock.h"
+> >  
+> > @@ -104,9 +104,8 @@ static void init_bootfile_ppc(const char *bootpath)
+> >      memcpy(header->name, "common", 6);
+> >      chrp_nvram_finish_partition(header, MIN_NVRAM_SIZE);
+> >  
+> > -    /* FW_MAX_SIZE is 4MB, but slof.bin is only 900KB,
+> > -     * so let's modify memory between 1MB and 100MB
+> > -     * to do like PC bootsector
+> > +    /* FW_MAX_SIZE is 4MB, but slof.bin is only 900KB. So it is OK to modify
+> > +     * memory between start_address and end_address like PC bootsector does.
+> 
+> This comment reads a bit strange now that it starts with explicit sizes
+> and then uses generic terms. I think I'd move the comment to the header
+> file where PPC_TEST_MEM_START/END are defined, tweaking it a bit. Also,
+> the same g_assert enforcement done for AArch64 could be applied to PPC,
+> but with a max kernel size of 100K. Even PC could get an assert, but with
+> a max kernel size of 1M.
 
-> Allow arbitrary HTTP request headers to be set, like this:
->
->   qemu-img create -f qcow2 \
->       -b 'json:{ "file.driver":"http",
->                  "file.url":"http://192.168.0.249/scratch/test.img",
->                  "file.header": ["Authorization: letmein"] }' \
->
+IMHO the easiest solution here is just to leave the ppc comments alone;
+if ppc wants to change it they can do.
 
-Since oVirt 4.2, you don't need the Authorization header.
+Dave
 
-In any version, the Authorization header was used only
-in by the proxy (running on engine host). You really want
-to access the host directly and not the proxy, unless you
-cannot access the host.
-
-Authorization in ovirt works like this now:
-
-1. User start a transfer operation using engine API/UI
-2. Engine creates a ticket authorizing the operation on a some host and
-    in ovirt-imageio-proxy
-3. Engine returns random transfter url and proxy url to the user.
-4. User can access the the image via the transfer or proxy url
-5. User finish the operation via engine API/UI
-6. Engine remove the tickets, invalidating the transfer/proxy urls
-
-So the only thing qemu-img needs is a url.
-
-Other issue that you need to consider is that you cannot
-create images via the http. Images are created only via
-engine API/UI. What ovirt-imageio give you is a way to
-read and write data to existing image. The url you get is
-mostly like an open file descriptor you can use with read()
-and write().
-
-Note that you cannot access yet a chain of image via a url, since
-ovirt generate a random url per image in a chain. For example,
-if you have this chain:
-
-base-img <- top-image (top)
-
-oVirt will provide these urls to access a single image of the chain:
-https://host.address:54322/images/random-id1 (top-image)
-https://host.address:54322/images/random-id
-<https://host.address:54322/images/random-id1>2 (base-image)
-
-So qemu will not be able to consume the chain, as the base image
-is not available at https://host.address:54322/images/
-<https://host.address:54322/images/random-id1>base-imge
-
-We plan to support this use case in 4.3, by using a ticket-per-chain
-instead of ticker-per-image.
-
-In this case oVirt will generate this url:
-
-https://host.address:54322/images/random-id1/top-image
-
-And the base image will be accessible at:
-https://host.address:54322/images/random-id1/base-image
-
-Nir
-
-
->       test.qcow2
->
-> which adds the =E2=80=98Authorization: letmein=E2=80=99 header to the out=
-going request
-> for the backing file.  Multiple headers can be set, and curl built-in
-> headers can be removed (using "Header:").
->
-> Note this uses the same format as curl's CURLOPT_HTTPHEADER, thus
-> pulling in curl API guarantees into qemu, but curl has had very strong
-> API backward compatibility since the start of the project.
->
-
-But otherwise, supporting custom headers may be useful for other
-use cases.
-
-
->
-> Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
-> ---
->  block/curl.c         | 21 ++++++++++++++++++++-
->  qapi/block-core.json | 10 ++++++++--
->  2 files changed, 28 insertions(+), 3 deletions(-)
->
-> diff --git a/block/curl.c b/block/curl.c
-> index aa42535783..972673ba5c 100644
-> --- a/block/curl.c
-> +++ b/block/curl.c
-> @@ -83,6 +83,7 @@ static CURLMcode __curl_multi_socket_action(CURLM
-> *multi_handle,
->  #define CURL_BLOCK_OPT_TIMEOUT "timeout"
->  #define CURL_BLOCK_OPT_COOKIE    "cookie"
->  #define CURL_BLOCK_OPT_COOKIE_SECRET "cookie-secret"
-> +#define CURL_BLOCK_OPT_HEADER_PATTERN "header."
->  #define CURL_BLOCK_OPT_USERNAME "username"
->  #define CURL_BLOCK_OPT_PASSWORD_SECRET "password-secret"
->  #define CURL_BLOCK_OPT_PROXY_USERNAME "proxy-username"
-> @@ -134,6 +135,7 @@ typedef struct BDRVCURLState {
->      bool sslverify;
->      uint64_t timeout;
->      char *cookie;
-> +    struct curl_slist *headers;
->      bool accept_range;
->      AioContext *aio_context;
->      QemuMutex mutex;
-> @@ -486,6 +488,9 @@ static int curl_init_state(BDRVCURLState *s, CURLStat=
-e
-> *state)
->          if (s->cookie) {
->              curl_easy_setopt(state->curl, CURLOPT_COOKIE, s->cookie);
->          }
-> +        if (s->headers) {
-> +            curl_easy_setopt(state->curl, CURLOPT_HTTPHEADER, s->headers=
-);
-> +        }
->          curl_easy_setopt(state->curl, CURLOPT_TIMEOUT, (long)s->timeout)=
-;
->          curl_easy_setopt(state->curl, CURLOPT_WRITEFUNCTION,
->                           (void *)curl_read_cb);
-> @@ -680,7 +685,7 @@ static int curl_open(BlockDriverState *bs, QDict
-> *options, int flags,
->      double d;
->      const char *secretid;
->      const char *protocol_delimiter;
-> -    int ret;
-> +    int i, nr, ret;
->
->
->      if (flags & BDRV_O_RDWR) {
-> @@ -740,6 +745,18 @@ static int curl_open(BlockDriverState *bs, QDict
-> *options, int flags,
->          s->cookie =3D g_strdup(cookie);
->      }
->
-> +    s->headers =3D NULL;
-> +    nr =3D qdict_array_entries(options, CURL_BLOCK_OPT_HEADER_PATTERN);
-> +    for (i =3D 0; i < nr; ++i) {
-> +        char key[32];
-> +        const char *header;
-> +
-> +        snprintf(key, sizeof key, CURL_BLOCK_OPT_HEADER_PATTERN "%d", i)=
-;
-> +        header =3D qdict_get_str(options, key);
-> +        s->headers =3D curl_slist_append(s->headers, header);
-> +        qdict_del(options, key);
-> +    }
-> +
->      file =3D qemu_opt_get(opts, CURL_BLOCK_OPT_URL);
->      if (file =3D=3D NULL) {
->          error_setg(errp, "curl block driver requires an 'url' option");
-> @@ -847,6 +864,7 @@ out:
->      state->curl =3D NULL;
->  out_noclean:
->      qemu_mutex_destroy(&s->mutex);
-> +    curl_slist_free_all(s->headers);
->      g_free(s->cookie);
->      g_free(s->url);
->      g_free(s->username);
-> @@ -945,6 +963,7 @@ static void curl_close(BlockDriverState *bs)
->      curl_detach_aio_context(bs);
->      qemu_mutex_destroy(&s->mutex);
->
-> +    curl_slist_free_all(s->headers);
->      g_free(s->cookie);
->      g_free(s->url);
->      g_free(s->username);
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 5c5921bfb7..ca1ebdbef1 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -3047,12 +3047,15 @@
->  # @cookie-secret: ID of a QCryptoSecret object providing the cookie data
-> in a
->  #                 secure way. See @cookie for the format. (since 2.10)
->  #
-> +# @header:      List of HTTP request headers, see CURLOPT_HTTPHEADER(3).
-> +#
->  # Since: 2.9
->  ##
->  { 'struct': 'BlockdevOptionsCurlHttp',
->    'base': 'BlockdevOptionsCurlBase',
->    'data': { '*cookie': 'str',
-> -            '*cookie-secret': 'str'} }
-> +            '*cookie-secret': 'str',
-> +            '*header': [ 'str' ] } }
->
->  ##
->  # @BlockdevOptionsCurlHttps:
-> @@ -3070,13 +3073,16 @@
->  # @cookie-secret: ID of a QCryptoSecret object providing the cookie data
-> in a
->  #                 secure way. See @cookie for the format. (since 2.10)
->  #
-> +# @header:      List of HTTP request headers, see CURLOPT_HTTPHEADER(3).
-> +#
->  # Since: 2.9
->  ##
->  { 'struct': 'BlockdevOptionsCurlHttps',
->    'base': 'BlockdevOptionsCurlBase',
->    'data': { '*cookie': 'str',
->              '*sslverify': 'bool',
-> -            '*cookie-secret': 'str'} }
-> +            '*cookie-secret': 'str',
-> +            '*header': [ 'str' ] } }
->
->  ##
->  # @BlockdevOptionsCurlFtp:
-> --
-> 2.13.2
->
->
->
+> 
+> >       */
+> >  
+> >      sprintf(buf + 16,
+> > @@ -263,11 +262,11 @@ static void wait_for_migration_pass(QTestState *who)
+> >  static void check_guests_ram(QTestState *who)
+> >  {
+> >      /* Our ASM test will have been incrementing one byte from each page from
+> > -     * 1MB to <100MB in order.
+> > -     * This gives us a constraint that any page's byte should be equal or less
+> > -     * than the previous pages byte (mod 256); and they should all be equal
+> > -     * except for one transition at the point where we meet the incrementer.
+> > -     * (We're running this with the guest stopped).
+> > +     * start_address to < end_address in order. This gives us a constraint
+> > +     * that any page's byte should be equal or less than the previous pages
+> > +     * byte (mod 256); and they should all be equal except for one transition
+> > +     * at the point where we meet the incrementer. (We're running this with
+> > +     * the guest stopped).
+> >       */
+> >      unsigned address;
+> >      uint8_t first_byte;
+> > @@ -278,7 +277,8 @@ static void check_guests_ram(QTestState *who)
+> >      qtest_memread(who, start_address, &first_byte, 1);
+> >      last_byte = first_byte;
+> >  
+> > -    for (address = start_address + 4096; address < end_address; address += 4096)
+> > +    for (address = start_address + TEST_MEM_PAGE_SIZE; address < end_address;
+> > +         address += TEST_MEM_PAGE_SIZE)
+> >      {
+> >          uint8_t b;
+> >          qtest_memread(who, address, &b, 1);
+> > @@ -404,6 +404,9 @@ static void test_migrate_start(QTestState **from, QTestState **to,
+> >                                    " -drive file=%s,format=raw"
+> >                                    " -incoming %s",
+> >                                    accel, tmpfs, bootpath, uri);
+> > +
+> > +        start_address = X86_TEST_MEM_START;
+> > +        end_address = X86_TEST_MEM_END;
+> >      } else if (strcmp(arch, "ppc64") == 0) {
+> >  
+> >          /* On ppc64, the test only works with kvm-hv, but not with kvm-pr */
+> > @@ -421,6 +424,9 @@ static void test_migrate_start(QTestState **from, QTestState **to,
+> >                                    " -serial file:%s/dest_serial"
+> >                                    " -incoming %s",
+> >                                    accel, tmpfs, uri);
+> > +
+> > +        start_address = PPC_TEST_MEM_START;
+> > +        end_address = PPC_TEST_MEM_END;
+> >      } else {
+> >          g_assert_not_reached();
+> >      }
+> > diff --git a/tests/migration/Makefile b/tests/migration/Makefile
+> > index 8fbedaa8b8..013b8d1f44 100644
+> > --- a/tests/migration/Makefile
+> > +++ b/tests/migration/Makefile
+> > @@ -25,8 +25,8 @@ include $(SRC_PATH)/rules.mak
+> >  
+> >  x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
+> >  
+> > -x86-a-b-bootblock.h: x86-a-b-bootblock.s
+> > -	$(x86_64_cross_prefix)as --32 -march=i486 $< -o x86.o
+> > +x86-a-b-bootblock.h: x86-a-b-bootblock.S
+> > +	$(x86_64_cross_prefix)gcc -m32 -march=i486 -c $< -o x86.o
+> >  	$(x86_64_cross_prefix)objcopy -O binary x86.o x86.boot
+> >  	dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124
+> >  	echo "$$__note" > $@
+> > diff --git a/tests/migration/migration-test.h b/tests/migration/migration-test.h
+> > new file mode 100644
+> > index 0000000000..06c46a2fe0
+> > --- /dev/null
+> > +++ b/tests/migration/migration-test.h
+> > @@ -0,0 +1,22 @@
+> > +/*
+> > + * Copyright (c) 2018 Red Hat, Inc. and/or its affiliates
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> > + * See the COPYING file in the top-level directory.
+> > + */
+> > +#ifndef _TEST_MIGRATION_H_
+> > +#define _TEST_MIGRATION_H_
+> > +
+> > +/* Common */
+> > +#define TEST_MEM_PAGE_SIZE 4096
+> > +
+> > +/* x86 */
+> > +#define X86_TEST_MEM_START (1 * 1024 * 1024)
+> > +#define X86_TEST_MEM_END   (100 * 1024 * 1024)
+> > +
+> > +/* PPC */
+> > +#define PPC_TEST_MEM_START (1 * 1024 * 1024)
+> > +#define PPC_TEST_MEM_END   (100 * 1024 * 1024)
+> > +#define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
+> > +
+> > +#endif /* _TEST_MIGRATION_H_ */
+> > diff --git a/tests/migration/x86-a-b-bootblock.s b/tests/migration/x86-a-b-bootblock.S
+> > similarity index 94%
+> > rename from tests/migration/x86-a-b-bootblock.s
+> > rename to tests/migration/x86-a-b-bootblock.S
+> > index 98dbfab084..a4da995a89 100644
+> > --- a/tests/migration/x86-a-b-bootblock.s
+> > +++ b/tests/migration/x86-a-b-bootblock.S
+> > @@ -12,6 +12,7 @@
+> >  #
+> >  # Author: dgilbert@redhat.com
+> >  
+> > +#include "migration-test.h"
+> >  
+> >  .code16
+> >  .org 0x7c00
+> > @@ -45,11 +46,11 @@ start:             # at 0x7c00 ?
+> >          mov $0, %bl
+> >  mainloop:
+> >          # Start from 1MB
+> > -        mov $(1024*1024),%eax
+> > +        mov $X86_TEST_MEM_START,%eax
+> >  innerloop:
+> >          incb (%eax)
+> > -        add $4096,%eax
+> > -        cmp $(100*1024*1024),%eax
+> > +        add $TEST_MEM_PAGE_SIZE,%eax
+> > +        cmp $X86_TEST_MEM_END,%eax
+> >          jl innerloop
+> >  
+> >          inc %bl
+> > diff --git a/tests/migration/x86-a-b-bootblock.h b/tests/migration/x86-a-b-bootblock.h
+> > index 9e8e2e028b..44e4b99506 100644
+> > --- a/tests/migration/x86-a-b-bootblock.h
+> > +++ b/tests/migration/x86-a-b-bootblock.h
+> > @@ -1,5 +1,5 @@
+> >  /* This file is automatically generated from
+> > - * tests/migration/x86-a-b-bootblock.s, edit that and then run
+> > + * tests/migration/x86-a-b-bootblock.S, edit that and then run
+> >   * "make x86-a-b-bootblock.h" inside tests/migration to update,
+> >   * and then remember to send both in your patch submission.
+> >   */
+> > -- 
+> > 2.14.3
+> > 
+> >
+> 
+> I added a new suggestion to this patch, but it's not a deal breaker for
+> me, so
+> 
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
