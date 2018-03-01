@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36075)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erO8x-0003eo-U8
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:21:15 -0500
+	(envelope-from <mst@redhat.com>) id 1erOK3-0006h7-Td
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:32:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erO8o-0001kh-8w
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:21:07 -0500
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:37442)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1erO8n-0001k1-Vu
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:20:58 -0500
-Received: by mail-ot0-x241.google.com with SMTP id t2so5519272otj.4
-	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 05:20:57 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1erOK0-0008DM-PO
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:32:35 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44392 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1erOK0-0008D5-Iv
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:32:32 -0500
+Date: Thu, 1 Mar 2018 15:32:22 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180301152451-mutt-send-email-mst@kernel.org>
+References: <1519900322-30263-1-git-send-email-yi.l.liu@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20180228193125.20577-17-richard.henderson@linaro.org>
-References: <20180228193125.20577-1-richard.henderson@linaro.org>
-	<20180228193125.20577-17-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 1 Mar 2018 13:20:36 +0000
-Message-ID: <CAFEAcA_o86z59NmYJhbdLbZnvZ0kdAuSRqLrwrVkysS_+EDqqQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v3 16/16] target/arm: Enable
- ARM_FEATURE_V8_FCMA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1519900322-30263-1-git-send-email-yi.l.liu@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v3 00/12] Introduce new iommu notifier
+ framework for virt-SVA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +27,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, pbonzini@redhat.com, alex.williamson@redhat.com, eric.auger.pro@gmail.com
 
-On 28 February 2018 at 19:31, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Enable it for the "any" CPU used by *-linux-user.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/cpu.c   | 1 +
->  target/arm/cpu64.c | 1 +
->  2 files changed, 2 insertions(+)
->
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index ca5fb1162a..452bc32f10 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -1651,6 +1651,7 @@ static void arm_any_initfn(Object *obj)
->      set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
->      set_feature(&cpu->env, ARM_FEATURE_CRC);
->      set_feature(&cpu->env, ARM_FEATURE_V8_RDM);
-> +    set_feature(&cpu->env, ARM_FEATURE_V8_FCMA);
->      cpu->midr = 0xffffffff;
->  }
->  #endif
-> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> index 7246866e7d..4228713b19 100644
-> --- a/target/arm/cpu64.c
-> +++ b/target/arm/cpu64.c
-> @@ -232,6 +232,7 @@ static void aarch64_any_initfn(Object *obj)
->      set_feature(&cpu->env, ARM_FEATURE_CRC);
->      set_feature(&cpu->env, ARM_FEATURE_V8_RDM);
->      set_feature(&cpu->env, ARM_FEATURE_V8_FP16);
-> +    set_feature(&cpu->env, ARM_FEATURE_V8_FCMA);
->      cpu->ctr = 0x80038003; /* 32 byte I and D cacheline size, VIPT icache */
->      cpu->dcz_blocksize = 7; /*  512 bytes */
->  }
-> --
+On Thu, Mar 01, 2018 at 06:31:50PM +0800, Liu, Yi L wrote:
+> This patchset is to introduce a notifier framework for virt-SVA.
+> You may find virt-SVA design details from the link below.
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg04925.html
+> 
+> SVA is short for Shared Virtual Addressing. This is also called Shared
+> Virtual Memory in previous patchsets. However, SVM is confusing as it
+> can also be short for Secure Virtual Machine. So this patchset use
+> Shared Virtual Addressing instead of Shared Virtual Memory. And it
+> would be applied in future (SVA)related patch series as well.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Just as a matter of naming, it might be a good idea to just call
+this feature "PASID support". QEMU only cares about the mechanism,
+now about how applications use it.
 
-We should be setting some hwcap bits in linux-user for these new feature
-bits (and RDM), right?
 
-thanks
--- PMM
+> Qemu has an existing notifier framework based on MemoryRegion, which
+> are used for MAP/UNMAP. However, it is not well suited for virt-SVA.
+> Reasons are as below:
+> - virt-SVA works along with PT = 1
+> - if PT = 1 IOMMU MR are disabled so MR notifier are not registered
+> - new notifiers do not fit nicely in this framework as they need to be
+>   registered even if PT = 1
+> - need a new framework to attach the new notifiers
+> - Additional background can be got from:
+>   https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg04931.html
+> 
+> So a new iommu notifier framework is needed. This patchset introduces
+> a notifier framework based on IOMMUSVAContext. IOMMUSVAContext is
+> introduced to be an abstract of virt-SVA operations in Qemu.
+> 
+> Patch Overview:
+> * 1 - 2: rename existing naming, the IOMMU MemoryRegion Notifier
+>          framework
+> * 3 - 4: introduce SVA notifier framework based on IOMMUSVAContext
+> * 5 - 7: introduce PCISVAOps and expose the SVA notfier framework
+>          through hw/pci layer
+> * 8 - 12: show the usage of SVA notifier in Intel vIOMMU emulator
+> 
+> [v2->v3 changes]
+> * Rephrase the cover letter
+> * Follow David's suggestion, take emulated SVA capable device
+>   into consideration
+> * renaming IOMMUObject to be IOMMUSVAContext
+> * Expose SVA nofitier registeration through hw/pci layer
+> * rename the file hw/core/iommu.c to be hw/core/pasid.c
+>          include/hw/core/iommu.h to be include/hw/core/pasid.h
+> * use SVA instead of SVM in patchset
+> * rename patchset title, previous is "Introduce new iommu notifier framework"
+> 
+> v2 link:
+> https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg04553.html
+> 
+> [v1->v2 changes]
+> * Rephrase the cover letter
+> * Re-sort the sequence of the patches
+> * Split the patch to introduce IOMMUObject and AddressSpaceOps
+> * Address two missed list init spotted by Auger Eric
+> 
+> v1 link:
+> http://qemu-devel.nongnu.narkive.com/XhqBQ8wc/resend-patch-0-6-introduce-new-iommu-notifier-framework
+> 
+> Original patchset from Peter Xu can be found in the link below.
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg05360.html
+> 
+> Comments and suggestions are always welcomed, thanks.
+> 
+> Liu, Yi L (10):
+>   vfio: rename GuestIOMMU to be GuestIOMMUMR
+>   vfio/pci: add notify framework based on IOMMUSVAContext
+>   hw/pci: introduce PCISVAOps to PCIDevice
+>   vfio/pci: provide vfio_pci_sva_ops instance
+>   vfio/pci: register sva notifier
+>   hw/pci: introduce pci_device_notify_iommu()
+>   intel_iommu: record assigned devices in a list
+>   intel_iommu: bind guest pasid table to host
+>   intel_iommu: add framework for PASID AddressSpace management
+>   intel_iommu: bind device to PASID tagged AddressSpace
+> 
+> Peter Xu (2):
+>   memory: rename existing iommu notifier to be iommu mr notifier
+>   hw/core: introduce IOMMUSVAContext for virt-SVA
+> 
+>  hw/alpha/typhoon.c             |   2 +-
+>  hw/core/Makefile.objs          |   1 +
+>  hw/core/pasid.c                |  64 ++++++++++
+>  hw/hppa/dino.c                 |   2 +-
+>  hw/i386/amd_iommu.c            |   8 +-
+>  hw/i386/intel_iommu.c          | 272 +++++++++++++++++++++++++++++++++++++----
+>  hw/i386/intel_iommu_internal.h |  10 ++
+>  hw/pci-host/ppce500.c          |   2 +-
+>  hw/pci-host/prep.c             |   2 +-
+>  hw/pci-host/sabre.c            |   2 +-
+>  hw/pci/pci.c                   |  85 ++++++++++++-
+>  hw/ppc/spapr_iommu.c           |   8 +-
+>  hw/ppc/spapr_pci.c             |   2 +-
+>  hw/s390x/s390-pci-bus.c        |   6 +-
+>  hw/vfio/common.c               |  28 +++--
+>  hw/vfio/pci.c                  |  84 +++++++++++++
+>  hw/virtio/vhost.c              |  10 +-
+>  include/exec/memory.h          |  55 +++++----
+>  include/hw/core/pasid.h        | 110 +++++++++++++++++
+>  include/hw/i386/intel_iommu.h  |  43 ++++++-
+>  include/hw/pci/pci.h           |  33 ++++-
+>  include/hw/pci/pci_bus.h       |   1 +
+>  include/hw/vfio/vfio-common.h  |  19 ++-
+>  include/hw/virtio/vhost.h      |   4 +-
+>  memory.c                       |  37 +++---
+>  25 files changed, 774 insertions(+), 116 deletions(-)
+>  create mode 100644 hw/core/pasid.c
+>  create mode 100644 include/hw/core/pasid.h
+> 
+> -- 
+> 1.9.1
