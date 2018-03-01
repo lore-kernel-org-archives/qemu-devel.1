@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1erQnn-0002Qr-Pt
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:11:34 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1erQq9-0003Le-2b
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:13:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1erQnm-00038f-Fv
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:11:27 -0500
-Date: Thu, 1 Mar 2018 16:11:18 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180301161118.GW14643@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180301135856.22698-1-rjones@redhat.com>
-	<20180301135856.22698-2-rjones@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1erQq8-00056s-5o
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:13:53 -0500
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:42564)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1erQq8-000560-0P
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:13:52 -0500
+Received: by mail-ot0-x243.google.com with SMTP id l5so6033456otf.9
+	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 08:13:51 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180301135856.22698-2-rjones@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] block: curl: Allow arbitrary HTTP
- request headers to be set.
+In-Reply-To: <1519815685-29200-2-git-send-email-abdallah.bouassida@lauterbach.com>
+References: <1519815685-29200-1-git-send-email-abdallah.bouassida@lauterbach.com>
+	<1519815685-29200-2-git-send-email-abdallah.bouassida@lauterbach.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 1 Mar 2018 16:13:30 +0000
+Message-ID: <CAFEAcA80d1AF=32Ds7GcfrxzHyywjueRMKMex0euwsFFwbfB-g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] target/arm: Add "ARM_CP_NO_GDB" as
+ a new bit field for ARMCPRegInfo type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,94 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: jcody@redhat.com, kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com, mreitz@redhat.com
+To: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Khaled Jmal <khaled.jmal@lauterbach.com>
 
-On Thu, Mar 01, 2018 at 01:58:55PM +0000, Richard W.M. Jones wrote:
-> Allow arbitrary HTTP request headers to be set, like this:
->=20
->   qemu-img create -f qcow2 \
->       -b 'json:{ "file.driver":"http",
->                  "file.url":"http://192.168.0.249/scratch/test.img",
->                  "file.header": ["Authorization: letmein"] }' \
->       test.qcow2
->=20
-> which adds the =E2=80=98Authorization: letmein=E2=80=99 header to the o=
-utgoing request
-> for the backing file.  Multiple headers can be set, and curl built-in
-> headers can be removed (using "Header:").
->=20
-> Note this uses the same format as curl's CURLOPT_HTTPHEADER, thus
-> pulling in curl API guarantees into qemu, but curl has had very strong
-> API backward compatibility since the start of the project.
-
-It doesn't appear like there's anything really curl specific about
-this - isn't   'Key: value' just the standard HTTP format (minus the
-\r\n line ending of course.  IOW, I don't see any problem with using
-this format.
-
->=20
-> Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+On 28 February 2018 at 11:01, Abdallah Bouassida
+<abdallah.bouassida@lauterbach.com> wrote:
+> This is a preparation for the coming feature of creating dynamically an XML
+> description for the ARM sysregs.
+> A register has ARM_CP_NO_GDB enabled will not be shown in the dynamic XML.
+> This bit is enabled automatically when creating CP_ANY wildcard aliases.
+> This bit could be enabled manually for any register we want to remove from the
+> dynamic XML description.
+>
+> Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
 > ---
->  block/curl.c         | 21 ++++++++++++++++++++-
->  qapi/block-core.json | 10 ++++++++--
->  2 files changed, 28 insertions(+), 3 deletions(-)
->=20
+>  target/arm/cpu.h    | 3 ++-
+>  target/arm/helper.c | 2 +-
+>  2 files changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 8c839fa..92cfe4c 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -1776,10 +1776,11 @@ static inline uint64_t cpreg_to_kvm_id(uint32_t cpregid)
+>  #define ARM_LAST_SPECIAL         ARM_CP_DC_ZVA
+>  #define ARM_CP_FPU               0x1000
+>  #define ARM_CP_SVE               0x2000
+> +#define ARM_CP_NO_GDB            0x4000
+>  /* Used only as a terminator for ARMCPRegInfo lists */
+>  #define ARM_CP_SENTINEL          0xffff
+>  /* Mask of only the flag bits in a type field */
+> -#define ARM_CP_FLAG_MASK         0x30ff
+> +#define ARM_CP_FLAG_MASK         0x70ff
+>
+>  /* Valid values for ARMCPRegInfo state field, indicating which of
+>   * the AArch32 and AArch64 execution states this register is visible in.
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index c5bc69b..bdd212f 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -5663,7 +5663,7 @@ static void add_cpreg_to_hashtable(ARMCPU *cpu, const ARMCPRegInfo *r,
+>      if (((r->crm == CP_ANY) && crm != 0) ||
+>          ((r->opc1 == CP_ANY) && opc1 != 0) ||
+>          ((r->opc2 == CP_ANY) && opc2 != 0)) {
+> -        r2->type |= ARM_CP_ALIAS;
+> +        r2->type |= ARM_CP_ALIAS | ARM_CP_NO_GDB;
+>      }
+>
+>      /* Check that raw accesses are either forbidden or handled. Note that
+> --
+> 2.7.4
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 5c5921bfb7..ca1ebdbef1 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -3047,12 +3047,15 @@
->  # @cookie-secret: ID of a QCryptoSecret object providing the cookie da=
-ta in a
->  #                 secure way. See @cookie for the format. (since 2.10)
->  #
-> +# @header:      List of HTTP request headers, see CURLOPT_HTTPHEADER(3=
-).
-
-Put  a '(since 2.12)' anntation on end of the docs for this new field
-
-> +#
->  # Since: 2.9
->  ##
->  { 'struct': 'BlockdevOptionsCurlHttp',
->    'base': 'BlockdevOptionsCurlBase',
->    'data': { '*cookie': 'str',
-> -            '*cookie-secret': 'str'} }
-> +            '*cookie-secret': 'str',
-> +            '*header': [ 'str' ] } }
-> =20
->  ##
->  # @BlockdevOptionsCurlHttps:
-> @@ -3070,13 +3073,16 @@
->  # @cookie-secret: ID of a QCryptoSecret object providing the cookie da=
-ta in a
->  #                 secure way. See @cookie for the format. (since 2.10)
->  #
-> +# @header:      List of HTTP request headers, see CURLOPT_HTTPHEADER(3=
-).
-
-Same here about version annotation.
-
-> +#
->  # Since: 2.9
->  ##
->  { 'struct': 'BlockdevOptionsCurlHttps',
->    'base': 'BlockdevOptionsCurlBase',
->    'data': { '*cookie': 'str',
->              '*sslverify': 'bool',
-> -            '*cookie-secret': 'str'} }
-> +            '*cookie-secret': 'str',
-> +            '*header': [ 'str' ] } }
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+thanks
+-- PMM
