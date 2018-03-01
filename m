@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1erNsC-00051X-Gi
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:03:49 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1erNsS-0005J2-NP
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:04:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1erNs6-0007s5-V6
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:03:48 -0500
-From: Cornelia Huck <cohuck@redhat.com>
-Date: Thu,  1 Mar 2018 14:02:01 +0100
-Message-Id: <20180301130201.24666-28-cohuck@redhat.com>
-In-Reply-To: <20180301130201.24666-1-cohuck@redhat.com>
-References: <20180301130201.24666-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL v2 27/27] s390x/tcg: fix loading 31bit PSWs with
- the highest bit set
+	(envelope-from <peter.maydell@linaro.org>) id 1erNsO-0007yy-MR
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:04:04 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:43610)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1erNsO-0007ym-H5
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:04:00 -0500
+Received: by mail-ot0-x244.google.com with SMTP id m22so5447397otf.10
+	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 05:04:00 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <1519883168-22092-1-git-send-email-thuth@redhat.com>
+References: <1519883168-22092-1-git-send-email-thuth@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 1 Mar 2018 13:03:39 +0000
+Message-ID: <CAFEAcA9Q9+sK5S1BREuCAVp4J5tU_mexDZU9nBuett3W7bQp-Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/arm: Use more CONFIG switches to decide
+ which object files should be linked
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,45 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, rth@twiddle.net, agraf@suse.de, david@redhat.com, thuth@redhat.com, Cornelia Huck <cohuck@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+On 1 March 2018 at 05:46, Thomas Huth <thuth@redhat.com> wrote:
+> A lot of ARM object files are linked into the executable unconditionally,
+> even though we have corresponding CONFIG switches like CONFIG_PXA2XX or
+> CONFIG_OMAP. We should make sure to use these switches in the Makefile so
+> that the users can disable certain unwanted boards and devices more easily.
+> Also introduce the new switch CONFIG_STRONGARM to be able to disable the
+> "Collie" machine if it is not wanted.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  default-configs/arm-softmmu.mak |  2 ++
+>  hw/arm/Makefile.objs            | 26 +++++++++++++++++---------
+>  2 files changed, 19 insertions(+), 9 deletions(-)
+>
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index ca34cf4..43f382a 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -133,3 +133,5 @@ CONFIG_GPIO_KEY=y
+>  CONFIG_MSF2=y
+>  CONFIG_FW_CFG_DMA=y
+>  CONFIG_XILINX_AXI=y
+> +
+> +CONFIG_STRONGARM=y
+> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+> index 1c896ba..5e1e0a9 100644
+> --- a/hw/arm/Makefile.objs
+> +++ b/hw/arm/Makefile.objs
+> @@ -1,15 +1,23 @@
+> -obj-y += boot.o collie.o exynos4_boards.o gumstix.o highbank.o
+> -obj-$(CONFIG_DIGIC) += digic_boards.o
+> -obj-y += integratorcp.o mainstone.o musicpal.o nseries.o
+> -obj-y += omap_sx1.o palm.o realview.o spitz.o stellaris.o
+> -obj-y += tosa.o versatilepb.o vexpress.o virt.o xilinx_zynq.o z2.o
+> +obj-y += boot.o virt.o sysbus-fdt.o
+>  obj-$(CONFIG_ACPI) += virt-acpi-build.o
+> -obj-y += netduino2.o
+> -obj-y += sysbus-fdt.o
+> +obj-$(CONFIG_ARM_V7M) += highbank.o netduino2.o vexpress.o
 
-Let's also put the 31-bit hack in front of the REAL MMU, otherwise right
-now we get errors when loading a PSW where the highest bit is set (e.g.
-via s390-netboot.img). The highest bit is not masked away, therefore we
-inject addressing exceptions into the guest.
+This is definitely wrong -- highbank and vexpress are not V7M
+platforms. Netduino2 is a v7M platform, but I don't think we
+should be making it conditional on ARM_V7M -- we have per-board
+configs for other boards, so you'd have a CONFIG_NETDUINO2 here
+if you wanted it.
 
-The proper fix will later be to do all address wrapping before accessing
-the MMU - so we won't get any "wrong" entries in there (which makes
-flushing also easier). But that will require more work (wrapping in
-load_psw, wrapping when incrementing the PC, wrapping every memory
-access).
+> +obj-$(CONFIG_ASPEED_SOC) += integratorcp.o musicpal.o versatilepb.o
 
-This fixes the tests/pxe-test test.
+This is wrong too -- none of these are aspeed-based devices.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20180301120826.6847-1-david@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- target/s390x/excp_helper.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-index 411051edc3..dfee221111 100644
---- a/target/s390x/excp_helper.c
-+++ b/target/s390x/excp_helper.c
-@@ -107,6 +107,10 @@ int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr orig_vaddr, int size,
-             return 1;
-         }
-     } else if (mmu_idx == MMU_REAL_IDX) {
-+        /* 31-Bit mode */
-+        if (!(env->psw.mask & PSW_MASK_64)) {
-+            vaddr &= 0x7fffffff;
-+        }
-         if (mmu_translate_real(env, vaddr, rw, &raddr, &prot)) {
-             return 1;
-         }
--- 
-2.13.6
+thanks
+-- PMM
