@@ -1,44 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1erN13-0004Kk-Td
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:08:55 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1erN2S-0005cA-0J
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:10:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1erN10-0000VD-9S
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:08:53 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59018
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1erN10-0000Up-51
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:08:50 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w21C6A50080083
-	for <qemu-devel@nongnu.org>; Thu, 1 Mar 2018 07:08:49 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gedth91xh-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 07:08:49 -0500
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 1 Mar 2018 12:08:46 -0000
-References: <20180228195320.165230-1-borntraeger@de.ibm.com>
-	<79f7059b-f2d3-a758-6bb9-29433b31b313@redhat.com>
-	<20180301092442.GA2994@work-vm>
-	<aef0a651-4d04-13b1-76a6-0c1efb6c9e04@de.ibm.com>
-	<20180301114543.GC2994@work-vm>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 1 Mar 2018 13:08:41 +0100
+	(envelope-from <vsementsov@virtuozzo.com>) id 1erN2L-0001QR-LM
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:10:19 -0500
+References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
+	<20180226165723.17818-1-eblake@redhat.com>
+	<20180226165723.17818-3-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <0d8f572a-b099-75f9-c161-09226564a4aa@virtuozzo.com>
+Date: Thu, 1 Mar 2018 15:10:01 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180301114543.GC2994@work-vm>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180226165723.17818-3-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <69654fb2-f5ba-c23b-f6f5-1b559692cf37@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] s390/kvm: implement clearing part of
- IPL clear
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] nbd/client: fix error messages in
+ nbd_handle_reply_err
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,162 +26,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+
+26.02.2018 19:57, Eric Blake wrote:
+> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>
+> 1. NBD_REP_ERR_INVALID is not only about length, so, make message more
+>     general
+>
+> 2. hex format is not very good: it's hard to read something like
+>     "option a (set meta context)", so switch to dec.
+>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Message-Id: <1518702707-7077-6-git-send-email-vsementsov@virtuozzo.com>
+> [eblake: expand scope of patch: ALL uses of nbd_opt_lookup are now
+> decimal, all uses of nbd_rep_lookup are prefixed hex]
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+
+one thought: isn't it better to have all NBD constants in dec, like in spec?
+
+> ---
+>   nbd/client.c     | 20 ++++++++++----------
+>   nbd/server.c     |  4 ++--
+>   nbd/trace-events |  8 ++++----
+>   3 files changed, 16 insertions(+), 16 deletions(-)
+>
+> diff --git a/nbd/client.c b/nbd/client.c
+> index 89f80f95905..756e110f895 100644
+> --- a/nbd/client.c
+> +++ b/nbd/client.c
+> @@ -180,22 +180,22 @@ static int nbd_handle_reply_err(QIOChannel *ioc, NBDOptionReply *reply,
+>           goto cleanup;
+>
+>       case NBD_REP_ERR_POLICY:
+> -        error_setg(errp, "Denied by server for option %" PRIx32 " (%s)",
+> +        error_setg(errp, "Denied by server for option %" PRIu32 " (%s)",
+>                      reply->option, nbd_opt_lookup(reply->option));
+>           break;
+>
+>       case NBD_REP_ERR_INVALID:
+> -        error_setg(errp, "Invalid data length for option %" PRIx32 " (%s)",
+> +        error_setg(errp, "Invalid parameters for option %" PRIu32 " (%s)",
+>                      reply->option, nbd_opt_lookup(reply->option));
+>           break;
+>
+>       case NBD_REP_ERR_PLATFORM:
+> -        error_setg(errp, "Server lacks support for option %" PRIx32 " (%s)",
+> +        error_setg(errp, "Server lacks support for option %" PRIu32 " (%s)",
+>                      reply->option, nbd_opt_lookup(reply->option));
+>           break;
+>
+>       case NBD_REP_ERR_TLS_REQD:
+> -        error_setg(errp, "TLS negotiation required before option %" PRIx32
+> +        error_setg(errp, "TLS negotiation required before option %" PRIu32
+>                      " (%s)", reply->option, nbd_opt_lookup(reply->option));
+>           break;
+>
+> @@ -204,17 +204,17 @@ static int nbd_handle_reply_err(QIOChannel *ioc, NBDOptionReply *reply,
+>           break;
+>
+>       case NBD_REP_ERR_SHUTDOWN:
+> -        error_setg(errp, "Server shutting down before option %" PRIx32 " (%s)",
+> +        error_setg(errp, "Server shutting down before option %" PRIu32 " (%s)",
+>                      reply->option, nbd_opt_lookup(reply->option));
+>           break;
+>
+>       case NBD_REP_ERR_BLOCK_SIZE_REQD:
+> -        error_setg(errp, "Server requires INFO_BLOCK_SIZE for option %" PRIx32
+> +        error_setg(errp, "Server requires INFO_BLOCK_SIZE for option %" PRIu32
+>                      " (%s)", reply->option, nbd_opt_lookup(reply->option));
+>           break;
+>
+>       default:
+> -        error_setg(errp, "Unknown error code when asking for option %" PRIx32
+> +        error_setg(errp, "Unknown error code when asking for option %" PRIu32
+>                      " (%s)", reply->option, nbd_opt_lookup(reply->option));
+>           break;
+>       }
+> @@ -378,8 +378,8 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
+>               return 1;
+>           }
+>           if (reply.type != NBD_REP_INFO) {
+> -            error_setg(errp, "unexpected reply type %" PRIx32
+> -                       " (%s), expected %x",
+> +            error_setg(errp, "unexpected reply type 0x%" PRIx32
+> +                       " (%s), expected 0x%x",
+>                          reply.type, nbd_rep_lookup(reply.type), NBD_REP_INFO);
+>               nbd_send_opt_abort(ioc);
+>               return -1;
+> @@ -534,7 +534,7 @@ static int nbd_request_simple_option(QIOChannel *ioc, int opt, Error **errp)
+>
+>       if (reply.type != NBD_REP_ACK) {
+>           error_setg(errp, "Server answered option %d (%s) with unexpected "
+> -                   "reply %" PRIx32 " (%s)", opt, nbd_opt_lookup(opt),
+> +                   "reply 0x%" PRIx32 " (%s)", opt, nbd_opt_lookup(opt),
+>                      reply.type, nbd_rep_lookup(reply.type));
+>           nbd_send_opt_abort(ioc);
+>           return -1;
+> diff --git a/nbd/server.c b/nbd/server.c
+> index 112e3f69dff..4990a5826e6 100644
+> --- a/nbd/server.c
+> +++ b/nbd/server.c
+> @@ -806,7 +806,7 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
+>
+>               default:
+>                   ret = nbd_opt_drop(client, NBD_REP_ERR_UNSUP, errp,
+> -                                   "Unsupported option 0x%" PRIx32 " (%s)",
+> +                                   "Unsupported option %" PRIu32 " (%s)",
+>                                      option, nbd_opt_lookup(option));
+>                   break;
+>               }
+> @@ -822,7 +822,7 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
+>                                                           errp);
+>
+>               default:
+> -                error_setg(errp, "Unsupported option 0x%" PRIx32 " (%s)",
+> +                error_setg(errp, "Unsupported option %" PRIu32 " (%s)",
+>                              option, nbd_opt_lookup(option));
+>                   return -EINVAL;
+>               }
+> diff --git a/nbd/trace-events b/nbd/trace-events
+> index 2b8268ce8c3..ac19a366aac 100644
+> --- a/nbd/trace-events
+> +++ b/nbd/trace-events
+> @@ -1,7 +1,7 @@
+>   # nbd/client.c
+>   nbd_send_option_request(uint32_t opt, const char *name, uint32_t len) "Sending option request %" PRIu32" (%s), len %" PRIu32
+> -nbd_receive_option_reply(uint32_t option, const char *optname, uint32_t type, const char *typename, uint32_t length) "Received option reply 0x%" PRIx32" (%s), type 0x%" PRIx32" (%s), len %" PRIu32
+> -nbd_reply_err_unsup(uint32_t option, const char *name) "server doesn't understand request 0x%" PRIx32 " (%s), attempting fallback"
+> +nbd_receive_option_reply(uint32_t option, const char *optname, uint32_t type, const char *typename, uint32_t length) "Received option reply %" PRIu32" (%s), type 0x%" PRIx32" (%s), len %" PRIu32
+> +nbd_reply_err_unsup(uint32_t option, const char *name) "server doesn't understand request %" PRIu32 " (%s), attempting fallback"
+>   nbd_opt_go_start(const char *name) "Attempting NBD_OPT_GO for export '%s'"
+>   nbd_opt_go_success(void) "Export is good to go"
+>   nbd_opt_go_info_unknown(int info, const char *name) "Ignoring unknown info %d (%s)"
+> @@ -33,7 +33,7 @@ nbd_receive_structured_reply_chunk(uint16_t flags, uint16_t type, const char *na
+>   nbd_unknown_error(int err) "Squashing unexpected error %d to EINVAL"
+>
+>   # nbd/server.c
+> -nbd_negotiate_send_rep_len(uint32_t opt, const char *optname, uint32_t type, const char *typename, uint32_t len) "Reply opt=0x%" PRIx32 " (%s), type=0x%" PRIx32 " (%s), len=%" PRIu32
+> +nbd_negotiate_send_rep_len(uint32_t opt, const char *optname, uint32_t type, const char *typename, uint32_t len) "Reply opt=%" PRIu32 " (%s), type=0x%" PRIx32 " (%s), len=%" PRIu32
+>   nbd_negotiate_send_rep_err(const char *msg) "sending error message \"%s\""
+>   nbd_negotiate_send_rep_list(const char *name, const char *desc) "Advertising export name '%s' description '%s'"
+>   nbd_negotiate_handle_export_name(void) "Checking length"
+> @@ -46,7 +46,7 @@ nbd_negotiate_handle_starttls(void) "Setting up TLS"
+>   nbd_negotiate_handle_starttls_handshake(void) "Starting TLS handshake"
+>   nbd_negotiate_options_flags(uint32_t flags) "Received client flags 0x%" PRIx32
+>   nbd_negotiate_options_check_magic(uint64_t magic) "Checking opts magic 0x%" PRIx64
+> -nbd_negotiate_options_check_option(uint32_t option, const char *name) "Checking option 0x%" PRIx32 " (%s)"
+> +nbd_negotiate_options_check_option(uint32_t option, const char *name) "Checking option %" PRIu32 " (%s)"
+>   nbd_negotiate_begin(void) "Beginning negotiation"
+>   nbd_negotiate_old_style(uint64_t size, unsigned flags) "advertising size %" PRIu64 " and flags 0x%x"
+>   nbd_negotiate_new_style_size_flags(uint64_t size, unsigned flags) "advertising size %" PRIu64 " and flags 0x%x"
 
 
-
-On 03/01/2018 12:45 PM, Dr. David Alan Gilbert wrote:
-> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
->>
->>
->> On 03/01/2018 10:24 AM, Dr. David Alan Gilbert wrote:
->>> * Thomas Huth (thuth@redhat.com) wrote:
->>>> On 28.02.2018 20:53, Christian Borntraeger wrote:
->>>>> When a guests reboots with diagnose 308 subcode 3 it requests the memory
->>>>> to be cleared. We did not do it so far. This does not only violate the
->>>>> architecture, it also misses the chance to free up that memory on
->>>>> reboot, which would help on host memory over commitment.  By using
->>>>> ram_block_discard_range we can cover both cases.
->>>>
->>>> Sounds like a good idea. I wonder whether that release_all_ram()
->>>> function should maybe rather reside in exec.c, so that other machines
->>>> that want to clear all RAM at reset time can use it, too?
->>>>
->>>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>>>> ---
->>>>>  target/s390x/kvm.c | 19 +++++++++++++++++++
->>>>>  1 file changed, 19 insertions(+)
->>>>>
->>>>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
->>>>> index 8f3a422288..2e145ad5c3 100644
->>>>> --- a/target/s390x/kvm.c
->>>>> +++ b/target/s390x/kvm.c
->>>>> @@ -34,6 +34,8 @@
->>>>>  #include "qapi/error.h"
->>>>>  #include "qemu/error-report.h"
->>>>>  #include "qemu/timer.h"
->>>>> +#include "qemu/rcu_queue.h"
->>>>> +#include "sysemu/cpus.h"
->>>>>  #include "sysemu/sysemu.h"
->>>>>  #include "sysemu/hw_accel.h"
->>>>>  #include "hw/boards.h"
->>>>> @@ -41,6 +43,7 @@
->>>>>  #include "sysemu/device_tree.h"
->>>>>  #include "exec/gdbstub.h"
->>>>>  #include "exec/address-spaces.h"
->>>>> +#include "exec/ram_addr.h"
->>>>>  #include "trace.h"
->>>>>  #include "qapi-event.h"
->>>>>  #include "hw/s390x/s390-pci-inst.h"
->>>>> @@ -1841,6 +1844,14 @@ static int kvm_arch_handle_debug_exit(S390CPU *cpu)
->>>>>      return ret;
->>>>>  }
->>>>>  
->>>>> +static void release_all_rams(void)
->>>>
->>>> s/rams/ram/ maybe?
->>>>
->>>>> +{
->>>>> +    struct RAMBlock *rb;
->>>>> +
->>>>> +    QLIST_FOREACH_RCU(rb, &ram_list.blocks, next)
->>>>> +        ram_block_discard_range(rb, 0, rb->used_length);
->>>>
->>>> From a coding style point of view, I think there should be curly braces
->>>> around ram_block_discard_range() ?
->>>
->>> I think this might break if it happens during a postcopy migrate.
->>> The destination CPU is running, so it can do a reboot at just the wrong
->>> time; and then the pages (that are protected by userfaultfd) would get
->>> deallocated and trigger userfaultfd requests if accessed.
->>
->> Yes, userfaultd/postcopy is really fragile and relies on things that are not
->> necessarily true (e.g. virito-balloon can also invalidate pages).
-> 
-> That's why we use qemu_balloon_inhibit around postcopy to stop
-> ballooning; I'm not aware of anything else that does the same.
-
-we also have at least the pte_unused thing in mm/rmap.c that clearly
-predates userfaultfd. We might need to look into this as well....
-
-> 
->> The right thing here would be to actually terminate the postcopy migrate but
->> return it as "successful" (since we are going to clear that RAM anyway). Do 
->> you see a good way to achieve that?
-> 
-> There's no current mechanism to do it; I think it would have to involve
-> some interaction with the source as well though to tell it that you
-> didn't need that area of RAM anyway.
-> 
-> However, there are more problems:
->   a) Even forgetting the userfault problem, this is racy since during
-> postcopy you're still receiving blocks from the source at the same time;
-> so some of the area that you've discarded might get overwritten by data
-> from the source.
-
-So how do you handle the case when the target system writes to memory
-that is still in flight? Can we build on that mechanism?
-> 
->   b) Your release_all_rams seems to do all RAM Blocks - won't that nuke
-> any ROMs as well? Or maybe even flash?
-
-ROMs loaded with load_elf (like our s390-ccw.img) are reloaded on every reset.
-See rom_reset in /hw/core/loader.c
-
-Is this different with the x86 bios?
-
-
-> 
->   c) In a normal precopy migration, I think you may also get old data;
-> Paolo said that an MADV_DONTNEED won't cause the dirty flags to be set,
-> so if the migrate has already sent the data for a page, and then this
-> happens, before the CPUs are stopped during the migration, when you
-> restart on the destination you'll have the old data.
-
-Yes, looks like we might get non-cleared data. Could we maybe combine fixing
-and optimizing: we can stop tranmitting the memory and do a clean
-startup on the target side. In other words could we actually use the
-reset clear trigger to speed up migration?
-
-
-
-> 
-> Dave
-> 
->>
->>>
->>> Dave
->>>
->>>>> +}
->>>>> +
->>>>>  int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
->>>>>  {
->>>>>      S390CPU *cpu = S390_CPU(cs);
->>>>> @@ -1853,6 +1864,14 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
->>>>>              ret = handle_intercept(cpu);
->>>>>              break;
->>>>>          case KVM_EXIT_S390_RESET:
->>>>> +            if (run->s390_reset_flags & KVM_S390_RESET_CLEAR) {
->>>>> +                /*
->>>>> +                 * We will stop other CPUs anyway, avoid spurious crashes and
->>>>> +                 * get all CPUs out. The reset will take care of the resume.
->>>>> +                 */
->>>>> +                pause_all_vcpus();
->>>>> +                release_all_rams();
->>>>> +            }
->>>>>              s390_reipl_request();
->>>>>              break;
->>>>>          case KVM_EXIT_S390_TSCH:
->>>>>
->>>>
->>>> Apart from the cosmetic nits, patch looks good to me.
->>>>
->>>>  Thomas
->>> --
->>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->>>
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+-- 
+Best regards,
+Vladimir
