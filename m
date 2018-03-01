@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erLD9-0003T1-Qm
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:13:16 -0500
+	(envelope-from <kwolf@redhat.com>) id 1erLDz-0004NL-Dy
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:14:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erLD8-0001xw-TM
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:13:15 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:44577)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1erLD8-0001xM-O9
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:13:14 -0500
-Received: by mail-ot0-x243.google.com with SMTP id 79so5067277oth.11
-	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 02:13:14 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1erLDy-0002Lw-C7
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:14:07 -0500
+Date: Thu, 1 Mar 2018 11:13:55 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180301101355.GD4862@localhost.localdomain>
+References: <20180213202701.15858-1-eblake@redhat.com>
+	<20180213202701.15858-10-eblake@redhat.com>
+	<20180214120525.GB4766@localhost.localdomain>
+	<afb56cfd-4f42-07e5-9a65-d929b2ea9916@redhat.com>
+	<20180223170525.GF3470@localhost.localdomain>
+	<010d7d4e-c6d1-f8fb-8c4c-7aa0b19a94b7@redhat.com>
+	<20180226140518.GA5106@localhost.localdomain>
+	<1724b4e9-ff78-9725-286e-6886704f7f13@virtuozzo.com>
+	<20180301094808.GA4862@localhost.localdomain>
+	<b83cc168-7af5-3bd1-550e-3ce4cbda102a@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20180227132150.13847-1-cohuck@redhat.com>
-References: <20180227132150.13847-1-cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 1 Mar 2018 10:12:53 +0000
-Message-ID: <CAFEAcA9=59C4NcFTCf489iYttbw56BTLufb5Ee3VnnhQr8xiwg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/26] s390x updates (and friends)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b83cc168-7af5-3bd1-550e-3ce4cbda102a@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v8 09/21] null: Switch to
+ .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +32,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 27 February 2018 at 13:21, Cornelia Huck <cohuck@redhat.com> wrote:
-> The following changes since commit 0a773d55ac76c5aa89ed9187a3bc5af8c5c2a6d0:
->
->   maintainers: Add myself as a OpenBSD maintainer (2018-02-23 12:05:07 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/cohuck/qemu tags/s390x-20180227
->
-> for you to fetch changes up to eae9f29130f3ed40ad77f40a3bae4b9ebff28907:
->
->   Merge tag 'tags/s390-ccw-bios-2018-02-26' into s390-next (2018-02-27 13:54:37 +0100)
->
-> ----------------------------------------------------------------
-> - add query-cpus-fast and deprecate query-cpus, while adding s390 cpu
->   information
-> - remove s390x memory hotplug implementation, which is not useable in
->   this form
-> - add boot menu support in the s390-ccw bios
-> - expose s390x guest crash information
-> - fixes and cleaups
->
-> ----------------------------------------------------------------
+Am 01.03.2018 um 10:57 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> 01.03.2018 12:48, Kevin Wolf wrote:
+> > Am 01.03.2018 um 08:25 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> > > 26.02.2018 17:05, Kevin Wolf wrote:
+> > > > Essentially, assuming a simple backing chain 'base <- overlay', we got
+> > > > these combinations to represent in NBD (with my suggestion of the flags
+> > > > to use):
+> > > > 
+> > > > 1. Cluster allocated in overlay
+> > > >      a. non-zero data                         0
+> > > >      b. explicit zeroes                       0 or ZERO
+> > > > 2. Cluster marked zero in overlay           HOLE | ZERO
+> > > > 3. Cluster preallocated/zero in overlay     ZERO
+> > > > 4. Cluster unallocated in overlay
+> > > >      a. Cluster allocated in base (non-zero)  HOLE
+> > > >      b. Cluster allocated in base (zero)      HOLE or HOLE | ZERO
+> > > >      c. Cluster marked zero in base           HOLE | ZERO
+> > > >      d. Cluster preallocated/zero in base     HOLE | ZERO
+> > > >      e. Cluster unallocated in base           HOLE | ZERO
+> > > > 
+> > > > Instead of 'base' you can read 'anywhere in the backing chain' and the
+> > > > flags should stay the same.
+> > > I think only "anywhere in the backing chain" is valid here. Otherwise,
+> > > semantics of bdrv_is_allocated would differ for NBD and for not-NBD.
+> > This was meant as a mapping from cases to flags, not the other way
+> > round, so really doesn't say anything about the cases where the block is
+> > allocated further down the chain.
+> > 
+> > But yes, it shouldn't make a difference where in the backing chain a
+> > block is allocated, so these cases are the same as 4.
+> > 
+> > > I think, if bdrv_is_allocated returns false, it means that we can skip
+> > > this region in copying process, am I right?
+> > -ENOCONTEXT? Which copying process?
+> > 
+> > There are cases where you want to copy such regions, and other cases
+> > where you want to skip them. It depends on the use case. For example,
+> > 'qemu-img convert' skips them with -B (because the backing file is
+> > reused), but not without -B (which creates a full copy).
+> > 
+> > Kevin
+> 
+> Hm, I thought that bdrv_is_allocated loops through backings, but it doesn't,
+> sorry.
 
-Something seems to be broken here: this failed 'make check' on
-most hosts with
-TEST: tests/pxe-test... (pid=48288)
-  /s390x/pxe/ipv4/s390-ccw-virtio/virtio-net-ccw:                      **
-ERROR:/home/pm215/qemu/tests/boot-sector.c:158:boot_sector_test:
-assertion failed (signature == SIGNATURE): (0x00000000 == 0x0000dead)
+That would be bdrv_is_allocated_above() with a NULL base.
 
-and just failed without an error on the rest (with the exception of
-my Linux box, where that test hung entirely with qemu-system-s390x
-using 100% of cpu).
-
-thanks
--- PMM
+Kevin
