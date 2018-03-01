@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1erL62-0005FL-HJ
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:05:56 -0500
+	(envelope-from <kraxel@redhat.com>) id 1erL62-0005Fy-VH
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:06:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1erL5z-00051z-Hh
+	(envelope-from <kraxel@redhat.com>) id 1erL5z-00052S-P0
 	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:05:54 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42158 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60230 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1erL5z-00051Z-Cv
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1erL5z-00051o-KZ
 	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:05:51 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 483AD40FB657
+	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 10:05:51 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  1 Mar 2018 11:05:45 +0100
-Message-Id: <20180301100547.18962-12-kraxel@redhat.com>
+Date: Thu,  1 Mar 2018 11:05:36 +0100
+Message-Id: <20180301100547.18962-3-kraxel@redhat.com>
 In-Reply-To: <20180301100547.18962-1-kraxel@redhat.com>
 References: <20180301100547.18962-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 11/13] ui/curses: build as module
+Subject: [Qemu-devel] [PATCH v2 02/13] sdl: switch over to new display
+ registry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,80 +31,170 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>
-
-Also drop curses libs from libs_softmmu.  Add CURSES_{CFLAGS,LIBS}
-variables so we can use them for linking the curses module.
-
-Also make target/unicore32/helper.o depend on curses which uses curses
-directly for some reason ...
+Cc: Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- configure                      | 6 +++---
- target/unicore32/Makefile.objs | 4 ++++
- ui/Makefile.objs               | 6 +++++-
- 3 files changed, 12 insertions(+), 4 deletions(-)
+ include/ui/console.h | 19 -------------------
+ ui/sdl.c             | 24 +++++++++++++-----------
+ ui/sdl2.c            | 17 +++++++++++++++--
+ vl.c                 | 15 +--------------
+ 4 files changed, 29 insertions(+), 46 deletions(-)
 
-diff --git a/configure b/configure
-index 8074fc5001..5ecd538617 100755
---- a/configure
-+++ b/configure
-@@ -3269,8 +3269,6 @@ EOF
-       unset IFS
-       if compile_prog "$curses_inc" "$curses_lib" ; then
-         curses_found=yes
--        QEMU_CFLAGS="$curses_inc $QEMU_CFLAGS"
--        libs_softmmu="$curses_lib $libs_softmmu"
-         break
-       fi
-     done
-@@ -6038,7 +6036,9 @@ if test "$cocoa" = "yes" ; then
-   echo "CONFIG_COCOA=y" >> $config_host_mak
- fi
- if test "$curses" = "yes" ; then
--  echo "CONFIG_CURSES=y" >> $config_host_mak
-+  echo "CONFIG_CURSES=m" >> $config_host_mak
-+  echo "CURSES_CFLAGS=$curses_inc" >> $config_host_mak
-+  echo "CURSES_LIBS=$curses_lib" >> $config_host_mak
- fi
- if test "$pipe2" = "yes" ; then
-   echo "CONFIG_PIPE2=y" >> $config_host_mak
-diff --git a/target/unicore32/Makefile.objs b/target/unicore32/Makefile.objs
-index 6b41b1e9ef..35d8bf530d 100644
---- a/target/unicore32/Makefile.objs
-+++ b/target/unicore32/Makefile.objs
-@@ -2,3 +2,7 @@ obj-y += translate.o op_helper.o helper.o cpu.o
- obj-y += ucf64_helper.o
+diff --git a/include/ui/console.h b/include/ui/console.h
+index 817f9b9bcc..cb86e6a0dd 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -444,25 +444,6 @@ void qemu_display_register(QemuDisplay *ui);
+ void qemu_display_early_init(DisplayOptions *opts);
+ void qemu_display_init(DisplayState *ds, DisplayOptions *opts);
  
- obj-$(CONFIG_SOFTMMU) += softmmu.o
+-/* sdl.c */
+-#ifdef CONFIG_SDL
+-void sdl_display_early_init(DisplayOptions *opts);
+-void sdl_display_init(DisplayState *ds, DisplayOptions *opts);
+-#else
+-static inline void sdl_display_early_init(DisplayOptions *opts)
+-{
+-    /* This must never be called if CONFIG_SDL is disabled */
+-    error_report("SDL support is disabled");
+-    abort();
+-}
+-static inline void sdl_display_init(DisplayState *ds, DisplayOptions *opts)
+-{
+-    /* This must never be called if CONFIG_SDL is disabled */
+-    error_report("SDL support is disabled");
+-    abort();
+-}
+-#endif
+-
+ /* cocoa.m */
+ #ifdef CONFIG_COCOA
+ void cocoa_display_init(DisplayState *ds, DisplayOptions *opts);
+diff --git a/ui/sdl.c b/ui/sdl.c
+index c4ae7ab05d..a5fd503c25 100644
+--- a/ui/sdl.c
++++ b/ui/sdl.c
+@@ -901,17 +901,7 @@ static const DisplayChangeListenerOps dcl_ops = {
+     .dpy_cursor_define    = sdl_mouse_define,
+ };
+ 
+-void sdl_display_early_init(DisplayOptions *opts)
+-{
+-    if (opts->has_gl && opts->gl) {
+-        fprintf(stderr,
+-                "SDL1 display code has no opengl support.\n"
+-                "Please recompile qemu with SDL2, using\n"
+-                "./configure --enable-sdl --with-sdlabi=2.0\n");
+-    }
+-}
+-
+-void sdl_display_init(DisplayState *ds, DisplayOptions *o)
++static void sdl1_display_init(DisplayState *ds, DisplayOptions *o)
+ {
+     int flags;
+     uint8_t data = 0;
+@@ -1023,3 +1013,15 @@ void sdl_display_init(DisplayState *ds, DisplayOptions *o)
+ 
+     atexit(sdl_cleanup);
+ }
 +
-+# Huh? Uses curses directly instead of using ui/console.h interfaces ...
-+helper.o-cflags := $(CURSES_CFLAGS)
-+helper.o-libs := $(CURSES_LIBS)
-diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index 49223b0573..a37232762b 100644
---- a/ui/Makefile.objs
-+++ b/ui/Makefile.objs
-@@ -13,7 +13,6 @@ common-obj-$(CONFIG_LINUX) += input-linux.o
- common-obj-$(CONFIG_SPICE) += spice-core.o spice-input.o spice-display.o
- common-obj-$(CONFIG_SDL) += sdl.mo
- common-obj-$(CONFIG_COCOA) += cocoa.o
--common-obj-$(CONFIG_CURSES) += curses.o
- common-obj-$(CONFIG_VNC) += $(vnc-obj-y)
- common-obj-$(call lnot,$(CONFIG_VNC)) += vnc-stubs.o
- 
-@@ -39,6 +38,11 @@ gtk.mo-objs := gtk.o
- gtk.mo-cflags := $(GTK_CFLAGS) $(VTE_CFLAGS)
- gtk.mo-libs := $(GTK_LIBS) $(VTE_LIBS)
- 
-+common-obj-$(CONFIG_CURSES) += curses.mo
-+curses.mo-objs := curses.o
-+curses.mo-cflags := $(CURSES_CFLAGS)
-+curses.mo-libs := $(CURSES_LIBS)
++static QemuDisplay qemu_display_sdl1 = {
++    .type       = DISPLAY_TYPE_SDL,
++    .init       = sdl1_display_init,
++};
 +
- ifeq ($(CONFIG_OPENGL),y)
- common-obj-y += shader.o
- common-obj-y += console-gl.o
++static void register_sdl1(void)
++{
++    qemu_display_register(&qemu_display_sdl1);
++}
++
++type_init(register_sdl1);
+diff --git a/ui/sdl2.c b/ui/sdl2.c
+index b5a0fa1d13..83b917fa37 100644
+--- a/ui/sdl2.c
++++ b/ui/sdl2.c
+@@ -751,7 +751,7 @@ static const DisplayChangeListenerOps dcl_gl_ops = {
+ };
+ #endif
+ 
+-void sdl_display_early_init(DisplayOptions *o)
++static void sdl2_display_early_init(DisplayOptions *o)
+ {
+     assert(o->type == DISPLAY_TYPE_SDL);
+     if (o->has_gl && o->gl) {
+@@ -761,7 +761,7 @@ void sdl_display_early_init(DisplayOptions *o)
+     }
+ }
+ 
+-void sdl_display_init(DisplayState *ds, DisplayOptions *o)
++static void sdl2_display_init(DisplayState *ds, DisplayOptions *o)
+ {
+     int flags;
+     uint8_t data = 0;
+@@ -861,3 +861,16 @@ void sdl_display_init(DisplayState *ds, DisplayOptions *o)
+ 
+     atexit(sdl_cleanup);
+ }
++
++static QemuDisplay qemu_display_sdl2 = {
++    .type       = DISPLAY_TYPE_SDL,
++    .early_init = sdl2_display_early_init,
++    .init       = sdl2_display_init,
++};
++
++static void register_sdl1(void)
++{
++    qemu_display_register(&qemu_display_sdl2);
++}
++
++type_init(register_sdl1);
+diff --git a/vl.c b/vl.c
+index 70458ba708..45900ba7e6 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2085,7 +2085,6 @@ static void parse_display(const char *p)
+     const char *opts;
+ 
+     if (strstart(p, "sdl", &opts)) {
+-#ifdef CONFIG_SDL
+         dpy.type = DISPLAY_TYPE_SDL;
+         while (*opts) {
+             const char *nextopt;
+@@ -2146,10 +2145,6 @@ static void parse_display(const char *p)
+             }
+             opts = nextopt;
+         }
+-#else
+-        error_report("SDL support is disabled");
+-        exit(1);
+-#endif
+     } else if (strstart(p, "vnc", &opts)) {
+         if (*opts == '=') {
+             vnc_parse(opts + 1, &error_fatal);
+@@ -4327,12 +4322,7 @@ int main(int argc, char **argv, char **envp)
+                      "ignoring option");
+     }
+ 
+-    if (dpy.type == DISPLAY_TYPE_SDL) {
+-        sdl_display_early_init(&dpy);
+-    } else {
+-        qemu_display_early_init(&dpy);
+-    }
+-
++    qemu_display_early_init(&dpy);
+     qemu_console_early_init();
+ 
+     if (dpy.has_gl && dpy.gl && display_opengl == 0) {
+@@ -4664,9 +4654,6 @@ int main(int argc, char **argv, char **envp)
+     case DISPLAY_TYPE_CURSES:
+         curses_display_init(ds, &dpy);
+         break;
+-    case DISPLAY_TYPE_SDL:
+-        sdl_display_init(ds, &dpy);
+-        break;
+     case DISPLAY_TYPE_COCOA:
+         cocoa_display_init(ds, &dpy);
+         break;
 -- 
 2.9.3
