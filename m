@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1erNnH-0000JD-Rj
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:58:46 -0500
+	(envelope-from <cohuck@redhat.com>) id 1erNnN-0000Od-EQ
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:58:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1erNnG-0005OQ-Jm
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:58:43 -0500
+	(envelope-from <cohuck@redhat.com>) id 1erNnL-0005R7-T0
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:58:49 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Thu,  1 Mar 2018 13:58:05 +0100
-Message-Id: <20180301125830.24377-3-cohuck@redhat.com>
+Date: Thu,  1 Mar 2018 13:58:07 +0100
+Message-Id: <20180301125830.24377-5-cohuck@redhat.com>
 In-Reply-To: <20180301125830.24377-1-cohuck@redhat.com>
 References: <20180301125830.24377-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL v2 02/27] s390-ccw: refactor eckd_block_num to
- use CHS
+Subject: [Qemu-devel] [PULL v2 04/27] s390-ccw: update libc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,130 +24,318 @@ Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, rth@tw
 
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
 
-Add new cylinder/head/sector struct. Use it to calculate
-eckd block numbers instead of a BootMapPointer (which used
-eckd chs anyway).
+Moved:
+  memcmp from bootmap.h to libc.h (renamed from _memcmp)
+  strlen from sclp.c to libc.h (renamed from _strlen)
+
+Added C standard functions:
+  isdigit
+
+Added non C-standard function:
+  uitoa
+  atoui
 
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/bootmap.c | 28 ++++++++++++++--------------
- pc-bios/s390-ccw/bootmap.h |  8 ++++++--
- 2 files changed, 20 insertions(+), 16 deletions(-)
+ pc-bios/s390-ccw/Makefile  |  2 +-
+ pc-bios/s390-ccw/bootmap.c |  4 +--
+ pc-bios/s390-ccw/bootmap.h | 16 +--------
+ pc-bios/s390-ccw/libc.c    | 88 ++++++++++++++++++++++++++++++++++++++++++++++
+ pc-bios/s390-ccw/libc.h    | 37 +++++++++++++++++--
+ pc-bios/s390-ccw/main.c    | 17 +--------
+ pc-bios/s390-ccw/sclp.c    | 10 +-----
+ 7 files changed, 129 insertions(+), 45 deletions(-)
+ create mode 100644 pc-bios/s390-ccw/libc.c
 
+diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
+index 6d0c2ee691..9f7904fc20 100644
+--- a/pc-bios/s390-ccw/Makefile
++++ b/pc-bios/s390-ccw/Makefile
+@@ -9,7 +9,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/s390-ccw)
+ 
+ .PHONY : all clean build-all
+ 
+-OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o
++OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o libc.o
+ QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
+ QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
+ QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
 diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index a4eaf24c8d..9534f56060 100644
+index a94638db2c..092fb355fe 100644
 --- a/pc-bios/s390-ccw/bootmap.c
 +++ b/pc-bios/s390-ccw/bootmap.c
-@@ -95,32 +95,32 @@ static inline void verify_boot_info(BootInfo *bip)
-                "Bad block size in zIPL section of the 1st record.");
+@@ -506,7 +506,7 @@ static bool is_iso_bc_entry_compatible(IsoBcSection *s)
+                     "Failed to read image sector 0");
+ 
+     /* Checking bytes 8 - 32 for S390 Linux magic */
+-    return !_memcmp(magic_sec + 8, linux_s390_magic, 24);
++    return !memcmp(magic_sec + 8, linux_s390_magic, 24);
  }
  
--static block_number_t eckd_block_num(BootMapPointer *p)
-+static block_number_t eckd_block_num(EckdCHS *chs)
- {
-     const uint64_t sectors = virtio_get_sectors();
-     const uint64_t heads = virtio_get_heads();
--    const uint64_t cylinder = p->eckd.cylinder
--                            + ((p->eckd.head & 0xfff0) << 12);
--    const uint64_t head = p->eckd.head & 0x000f;
-+    const uint64_t cylinder = chs->cylinder
-+                            + ((chs->head & 0xfff0) << 12);
-+    const uint64_t head = chs->head & 0x000f;
-     const block_number_t block = sectors * heads * cylinder
-                                + sectors * head
--                               + p->eckd.sector
-+                               + chs->sector
-                                - 1; /* block nr starts with zero */
-     return block;
- }
+ /* Location of the current sector of the directory */
+@@ -635,7 +635,7 @@ static uint32_t find_iso_bc(void)
+         if (vd->type == VOL_DESC_TYPE_BOOT) {
+             IsoVdElTorito *et = &vd->vd.boot;
  
- static bool eckd_valid_address(BootMapPointer *p)
- {
--    const uint64_t head = p->eckd.head & 0x000f;
-+    const uint64_t head = p->eckd.chs.head & 0x000f;
- 
-     if (head >= virtio_get_heads()
--        ||  p->eckd.sector > virtio_get_sectors()
--        ||  p->eckd.sector <= 0) {
-+        ||  p->eckd.chs.sector > virtio_get_sectors()
-+        ||  p->eckd.chs.sector <= 0) {
-         return false;
-     }
- 
-     if (!virtio_guessed_disk_nature() &&
--        eckd_block_num(p) >= virtio_get_blocks()) {
-+        eckd_block_num(&p->eckd.chs) >= virtio_get_blocks()) {
-         return false;
-     }
- 
-@@ -140,7 +140,7 @@ static block_number_t load_eckd_segments(block_number_t blk, uint64_t *address)
-     do {
-         more_data = false;
-         for (j = 0;; j++) {
--            block_nr = eckd_block_num((void *)&(bprs[j].xeckd));
-+            block_nr = eckd_block_num(&bprs[j].xeckd.bptr.chs);
-             if (is_null_block_number(block_nr)) { /* end of chunk */
-                 break;
+-            if (!_memcmp(&et->el_torito[0], el_torito_magic, 32)) {
++            if (!memcmp(&et->el_torito[0], el_torito_magic, 32)) {
+                 return bswap32(et->bc_offset);
              }
-@@ -198,7 +198,7 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr)
-     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-     read_block(bmt_block_nr, sec, "Cannot read Boot Map Table");
- 
--    block_nr = eckd_block_num(&bmt->entry[loadparm]);
-+    block_nr = eckd_block_num(&bmt->entry[loadparm].xeckd.bptr.chs);
-     IPL_assert(block_nr != -1, "Cannot find Boot Map Table Entry");
- 
-     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-@@ -206,7 +206,7 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr)
- 
-     for (i = 0; bms->entry[i].type == BOOT_SCRIPT_LOAD; i++) {
-         address = bms->entry[i].address.load_address;
--        block_nr = eckd_block_num(&(bms->entry[i].blkptr));
-+        block_nr = eckd_block_num(&bms->entry[i].blkptr.xeckd.bptr.chs);
- 
-         do {
-             block_nr = load_eckd_segments(block_nr, &address);
-@@ -239,7 +239,7 @@ static void ipl_eckd_cdl(void)
-                "Non-ECKD device type in zIPL section of IPL2 record.");
- 
-     /* save pointer to Boot Map Table */
--    bmt_block_nr = eckd_block_num(&mbr->blockptr);
-+    bmt_block_nr = eckd_block_num(&mbr->blockptr.xeckd.bptr.chs);
- 
-     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-     read_block(2, vlbl, "Cannot read Volume Label at block 2");
-@@ -300,7 +300,7 @@ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
-     verify_boot_info(bip);
- 
-     /* save pointer to Boot Map Table */
--    bmt_block_nr = eckd_block_num((void *)&bip->bp.ipl.bm_ptr.eckd.bptr);
-+    bmt_block_nr = eckd_block_num(&bip->bp.ipl.bm_ptr.eckd.bptr.chs);
- 
-     run_eckd_boot_script(bmt_block_nr);
-     /* no return */
+         }
 diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
-index 486c0f34f1..b361084073 100644
+index 4bd95cd4d2..4cf7e1e463 100644
 --- a/pc-bios/s390-ccw/bootmap.h
 +++ b/pc-bios/s390-ccw/bootmap.h
-@@ -32,10 +32,14 @@ typedef struct FbaBlockPtr {
-     uint16_t blockct;
- } __attribute__ ((packed)) FbaBlockPtr;
+@@ -328,20 +328,6 @@ static inline bool magic_match(const void *data, const void *magic)
+     return *((uint32_t *)data) == *((uint32_t *)magic);
+ }
  
--typedef struct EckdBlockPtr {
--    uint16_t cylinder; /* cylinder/head/sector is an address of the block */
-+typedef struct EckdCHS {
-+    uint16_t cylinder;
-     uint16_t head;
-     uint8_t sector;
-+} __attribute__ ((packed)) EckdCHS;
+-static inline int _memcmp(const void *s1, const void *s2, size_t n)
+-{
+-    int i;
+-    const uint8_t *p1 = s1, *p2 = s2;
+-
+-    for (i = 0; i < n; i++) {
+-        if (p1[i] != p2[i]) {
+-            return p1[i] > p2[i] ? 1 : -1;
+-        }
+-    }
+-
+-    return 0;
+-}
+-
+ static inline uint32_t iso_733_to_u32(uint64_t x)
+ {
+     return (uint32_t)x;
+@@ -434,7 +420,7 @@ const uint8_t vol_desc_magic[] = "CD001";
+ 
+ static inline bool is_iso_vd_valid(IsoVolDesc *vd)
+ {
+-    return !_memcmp(&vd->ident[0], vol_desc_magic, 5) &&
++    return !memcmp(&vd->ident[0], vol_desc_magic, 5) &&
+            vd->version == 0x1 &&
+            vd->type <= VOL_DESC_TYPE_PARTITION;
+ }
+diff --git a/pc-bios/s390-ccw/libc.c b/pc-bios/s390-ccw/libc.c
+new file mode 100644
+index 0000000000..38ea77d7aa
+--- /dev/null
++++ b/pc-bios/s390-ccw/libc.c
+@@ -0,0 +1,88 @@
++/*
++ * libc-style definitions and functions
++ *
++ * Copyright 2018 IBM Corp.
++ * Author(s): Collin L. Walling <walling@linux.vnet.ibm.com>
++ *
++ * This code is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; either version 2 of the License, or (at your
++ * option) any later version.
++ */
 +
-+typedef struct EckdBlockPtr {
-+    EckdCHS chs; /* cylinder/head/sector is an address of the block */
-     uint16_t size;
-     uint8_t count; /* (size_in_blocks-1);
-                     * it's 0 for TablePtr, ScriptPtr, and SectionPtr */
++#include "libc.h"
++#include "s390-ccw.h"
++
++/**
++ * atoui:
++ * @str: the string to be converted.
++ *
++ * Given a string @str, convert it to an integer. Leading spaces are
++ * ignored. Any other non-numerical value will terminate the conversion
++ * and return 0. This function only handles numbers between 0 and
++ * UINT64_MAX inclusive.
++ *
++ * Returns: an integer converted from the string @str, or the number 0
++ * if an error occurred.
++ */
++uint64_t atoui(const char *str)
++{
++    int val = 0;
++
++    if (!str || !str[0]) {
++        return 0;
++    }
++
++    while (*str == ' ') {
++        str++;
++    }
++
++    while (*str) {
++        if (!isdigit(*str)) {
++            break;
++        }
++        val = val * 10 + *str - '0';
++        str++;
++    }
++
++    return val;
++}
++
++/**
++ * uitoa:
++ * @num: an integer (base 10) to be converted.
++ * @str: a pointer to a string to store the conversion.
++ * @len: the length of the passed string.
++ *
++ * Given an integer @num, convert it to a string. The string @str must be
++ * allocated beforehand. The resulting string will be null terminated and
++ * returned. This function only handles numbers between 0 and UINT64_MAX
++ * inclusive.
++ *
++ * Returns: the string @str of the converted integer @num
++ */
++char *uitoa(uint64_t num, char *str, size_t len)
++{
++    size_t num_idx = 1; /* account for NUL */
++    uint64_t tmp = num;
++
++    IPL_assert(str != NULL, "uitoa: no space allocated to store string");
++
++    /* Count indices of num */
++    while ((tmp /= 10) != 0) {
++        num_idx++;
++    }
++
++    /* Check if we have enough space for num and NUL */
++    IPL_assert(len > num_idx, "uitoa: array too small for conversion");
++
++    str[num_idx--] = '\0';
++
++    /* Convert int to string */
++    while (num_idx >= 0) {
++        str[num_idx--] = num % 10 + '0';
++        num /= 10;
++    }
++
++    return str;
++}
+diff --git a/pc-bios/s390-ccw/libc.h b/pc-bios/s390-ccw/libc.h
+index 0142ea8e7b..63ece70c6b 100644
+--- a/pc-bios/s390-ccw/libc.h
++++ b/pc-bios/s390-ccw/libc.h
+@@ -1,6 +1,8 @@
+ /*
+  * libc-style definitions and functions
+  *
++ * Copyright (c) 2013 Alexander Graf <agraf@suse.de>
++ *
+  * This code is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU General Public License as published by the
+  * Free Software Foundation; either version 2 of the License, or (at your
+@@ -19,7 +21,7 @@ typedef unsigned long long uint64_t;
+ 
+ static inline void *memset(void *s, int c, size_t n)
+ {
+-    int i;
++    size_t i;
+     unsigned char *p = s;
+ 
+     for (i = 0; i < n; i++) {
+@@ -33,7 +35,7 @@ static inline void *memcpy(void *s1, const void *s2, size_t n)
+ {
+     uint8_t *dest = s1;
+     const uint8_t *src = s2;
+-    int i;
++    size_t i;
+ 
+     for (i = 0; i < n; i++) {
+         dest[i] = src[i];
+@@ -42,4 +44,35 @@ static inline void *memcpy(void *s1, const void *s2, size_t n)
+     return s1;
+ }
+ 
++static inline int memcmp(const void *s1, const void *s2, size_t n)
++{
++    size_t i;
++    const uint8_t *p1 = s1, *p2 = s2;
++
++    for (i = 0; i < n; i++) {
++        if (p1[i] != p2[i]) {
++            return p1[i] > p2[i] ? 1 : -1;
++        }
++    }
++
++    return 0;
++}
++
++static inline size_t strlen(const char *str)
++{
++    size_t i;
++    for (i = 0; *str; i++) {
++        str++;
++    }
++    return i;
++}
++
++static inline int isdigit(int c)
++{
++    return (c >= '0') && (c <= '9');
++}
++
++uint64_t atoui(const char *str);
++char *uitoa(uint64_t num, char *str, size_t len);
++
+ #endif
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index 401e9dbb5f..e857ce4f60 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -40,22 +40,7 @@ void panic(const char *string)
+ 
+ unsigned int get_loadparm_index(void)
+ {
+-    const char *lp = loadparm;
+-    int i;
+-    unsigned int idx = 0;
+-
+-    for (i = 0; i < 8; i++) {
+-        char c = lp[i];
+-
+-        if (c < '0' || c > '9') {
+-            break;
+-        }
+-
+-        idx *= 10;
+-        idx += c - '0';
+-    }
+-
+-    return idx;
++    return atoui(loadparm);
+ }
+ 
+ static bool find_dev(Schib *schib, int dev_no)
+diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
+index 90d1bc3147..e6a089889a 100644
+--- a/pc-bios/s390-ccw/sclp.c
++++ b/pc-bios/s390-ccw/sclp.c
+@@ -65,14 +65,6 @@ void sclp_setup(void)
+     sclp_set_write_mask();
+ }
+ 
+-static int _strlen(const char *str)
+-{
+-    int i;
+-    for (i = 0; *str; i++)
+-        str++;
+-    return i;
+-}
+-
+ long write(int fd, const void *str, size_t len)
+ {
+     WriteEventData *sccb = (void *)_sccb;
+@@ -113,7 +105,7 @@ long write(int fd, const void *str, size_t len)
+ 
+ void sclp_print(const char *str)
+ {
+-    write(1, str, _strlen(str));
++    write(1, str, strlen(str));
+ }
+ 
+ void sclp_get_loadparm_ascii(char *loadparm)
 -- 
 2.13.6
