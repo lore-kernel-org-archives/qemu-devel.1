@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1erR46-0008BT-H3
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:28:20 -0500
+	(envelope-from <berto@igalia.com>) id 1erR46-0008BU-HI
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:28:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1erR41-0004K5-GU
+	(envelope-from <berto@igalia.com>) id 1erR41-0004Jc-Ff
 	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:28:18 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Thu,  1 Mar 2018 18:27:13 +0200
-Message-Id: <ab74e13d0484aad82a8d36e962835aa2f68e1172.1519921268.git.berto@igalia.com>
+Date: Thu,  1 Mar 2018 18:27:09 +0200
+Message-Id: <d58bbc353563bb9c83ffe90faaa36fadf683e332.1519921268.git.berto@igalia.com>
 In-Reply-To: <cover.1519921268.git.berto@igalia.com>
 References: <cover.1519921268.git.berto@igalia.com>
 In-Reply-To: <cover.1519921268.git.berto@igalia.com>
 References: <cover.1519921268.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 7/7] qcow2: Make qemu-img check detect
- corrupted L1 tables in snapshots
+Subject: [Qemu-devel] [PATCH 3/7] qcow2: Check L1 table parameters in
+ qcow2_expand_zero_clusters()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,100 +25,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-'qemu-img check' cannot detect if a snapshot's L1 table is corrupted.
-This patch checks the table's offset and size and reports corruption
-if the values are not valid.
+This function iterates over all snapshots of a qcow2 file in order to
+expand all zero clusters, but it does not validate the snapshots' L1
+tables first.
 
-This patch doesn't add code to fix that corruption yet, only to detect
-and report it.
+We now have a function to take care of this, so let's use it.
+
+We can also take the opportunity to replace the sector-based
+bdrv_read() with bdrv_pread().
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2-refcount.c     | 14 ++++++++++++++
+ block/qcow2-cluster.c      | 20 +++++++++++++-------
  tests/qemu-iotests/080     |  2 ++
- tests/qemu-iotests/080.out | 20 ++++++++++++++++++++
- 3 files changed, 36 insertions(+)
+ tests/qemu-iotests/080.out |  2 ++
+ 3 files changed, 17 insertions(+), 7 deletions(-)
 
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index dcb96e2b16..b1828d6fce 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -2019,6 +2019,20 @@ static int calculate_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-     /* snapshots */
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index e406b0f3b9..40167ac09c 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -2092,11 +2092,18 @@ int qcow2_expand_zero_clusters(BlockDriverState *bs,
+     }
+ 
      for (i = 0; i < s->nb_snapshots; i++) {
-         sn = s->snapshots + i;
-+        if (offset_into_cluster(s, sn->l1_table_offset)) {
-+            fprintf(stderr, "ERROR snapshot %s (%s) l1_offset=%#" PRIx64 ": "
-+                    "L1 table is not cluster aligned; snapshot table entry "
-+                    "corrupted\n", sn->id_str, sn->name, sn->l1_table_offset);
-+            res->corruptions++;
-+            continue;
+-        int l1_sectors = DIV_ROUND_UP(s->snapshots[i].l1_size *
+-                                      sizeof(uint64_t), BDRV_SECTOR_SIZE);
++        int l1_size2;
++        uint64_t *new_l1_table;
+ 
+-        uint64_t *new_l1_table =
+-            g_try_realloc(l1_table, l1_sectors * BDRV_SECTOR_SIZE);
++        ret = qcow2_validate_table(bs, s->snapshots[i].l1_table_offset,
++                                   s->snapshots[i].l1_size, sizeof(uint64_t),
++                                   QCOW_MAX_L1_SIZE, "", NULL);
++        if (ret < 0) {
++            return ret;
 +        }
-+        if (sn->l1_size > QCOW_MAX_L1_SIZE / sizeof(uint64_t)) {
-+            fprintf(stderr, "ERROR snapshot %s (%s) l1_size=%#" PRIx32 ": "
-+                    "L1 table is too large; snapshot table entry corrupted\n",
-+                    sn->id_str, sn->name, sn->l1_size);
-+            res->corruptions++;
-+            continue;
-+        }
-         ret = check_refcounts_l1(bs, res, refcount_table, nb_clusters,
-                                  sn->l1_table_offset, sn->l1_size, 0, fix);
++
++        l1_size2 = s->snapshots[i].l1_size * sizeof(uint64_t);
++        new_l1_table = g_try_realloc(l1_table, l1_size2);
+ 
+         if (!new_l1_table) {
+             ret = -ENOMEM;
+@@ -2105,9 +2112,8 @@ int qcow2_expand_zero_clusters(BlockDriverState *bs,
+ 
+         l1_table = new_l1_table;
+ 
+-        ret = bdrv_read(bs->file,
+-                        s->snapshots[i].l1_table_offset / BDRV_SECTOR_SIZE,
+-                        (void *)l1_table, l1_sectors);
++        ret = bdrv_pread(bs->file, s->snapshots[i].l1_table_offset,
++                         l1_table, l1_size2);
          if (ret < 0) {
+             goto fail;
+         }
 diff --git a/tests/qemu-iotests/080 b/tests/qemu-iotests/080
-index f8e7d6f4df..4dbe68e950 100755
+index 6a10e7defa..5622604f83 100755
 --- a/tests/qemu-iotests/080
 +++ b/tests/qemu-iotests/080
-@@ -182,6 +182,7 @@ poke_file "$TEST_IMG" "$offset_snap1_l1_offset" "\x00\x00\x00\x00\x00\x40\x02\x0
-            -c 'write 0 4k'; } 2>&1 | _filter_qemu_io | _filter_testdir
- { $QEMU_IMG snapshot -a test $TEST_IMG; } 2>&1 | _filter_testdir
- { $QEMU_IMG snapshot -d test $TEST_IMG; } 2>&1 | _filter_testdir
-+_check_test_img
+@@ -177,6 +177,7 @@ _make_test_img 64M
+ { $QEMU_IMG snapshot -c test $TEST_IMG; } 2>&1 | _filter_testdir
+ poke_file "$TEST_IMG" "$offset_snap1_l1_offset" "\x00\x00\x00\x00\x00\x40\x02\x00"
+ { $QEMU_IMG convert -s test $TEST_IMG $TEST_IMG.snap; } 2>&1 | _filter_testdir
++{ $QEMU_IMG amend -o compat=0.10 $TEST_IMG; } 2>&1 | _filter_testdir
  
  echo
  echo "== Invalid snapshot L1 table size =="
-@@ -195,6 +196,7 @@ poke_file "$TEST_IMG" "$offset_snap1_l1_size" "\x10\x00\x00\x00"
-            -c 'write 0 4k'; } 2>&1 | _filter_qemu_io | _filter_testdir
- { $QEMU_IMG snapshot -a test $TEST_IMG; } 2>&1 | _filter_testdir
- { $QEMU_IMG snapshot -d test $TEST_IMG; } 2>&1 | _filter_testdir
-+_check_test_img
+@@ -185,6 +186,7 @@ _make_test_img 64M
+ { $QEMU_IMG snapshot -c test $TEST_IMG; } 2>&1 | _filter_testdir
+ poke_file "$TEST_IMG" "$offset_snap1_l1_size" "\x10\x00\x00\x00"
+ { $QEMU_IMG convert -s test $TEST_IMG $TEST_IMG.snap; } 2>&1 | _filter_testdir
++{ $QEMU_IMG amend -o compat=0.10 $TEST_IMG; } 2>&1 | _filter_testdir
  
  # success, all done
  echo "*** done"
 diff --git a/tests/qemu-iotests/080.out b/tests/qemu-iotests/080.out
-index f16fd59053..2dad7f46a0 100644
+index f0d9038d55..5d9030ab93 100644
 --- a/tests/qemu-iotests/080.out
 +++ b/tests/qemu-iotests/080.out
-@@ -69,6 +69,16 @@ Failed to flush the refcount block cache: Invalid argument
- write failed: Invalid argument
- qemu-img: Could not apply snapshot 'test': Failed to load snapshot: Invalid argument
- qemu-img: Could not delete snapshot 'test': Snapshot L1 table offset invalid
-+ERROR snapshot 1 (test) l1_offset=0x400200: L1 table is not cluster aligned; snapshot table entry corrupted
-+Leaked cluster 4 refcount=2 reference=1
-+Leaked cluster 5 refcount=2 reference=1
-+Leaked cluster 6 refcount=1 reference=0
-+
-+1 errors were found on the image.
-+Data may be corrupted, or further writes to the image may corrupt it.
-+
-+3 leaked clusters were found on the image.
-+This means waste of disk space, but no harm to data.
+@@ -64,10 +64,12 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ wrote 512/512 bytes at offset 0
+ 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ qemu-img: Failed to load snapshot: Snapshot L1 table offset invalid
++qemu-img: Error while amending options: Invalid argument
  
  == Invalid snapshot L1 table size ==
  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-@@ -80,4 +90,14 @@ Failed to flush the refcount block cache: File too large
- write failed: File too large
- qemu-img: Could not apply snapshot 'test': Failed to load snapshot: File too large
- qemu-img: Could not delete snapshot 'test': Snapshot L1 table too large
-+ERROR snapshot 1 (test) l1_size=0x10000000: L1 table is too large; snapshot table entry corrupted
-+Leaked cluster 4 refcount=2 reference=1
-+Leaked cluster 5 refcount=2 reference=1
-+Leaked cluster 6 refcount=1 reference=0
-+
-+1 errors were found on the image.
-+Data may be corrupted, or further writes to the image may corrupt it.
-+
-+3 leaked clusters were found on the image.
-+This means waste of disk space, but no harm to data.
+ wrote 512/512 bytes at offset 0
+ 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ qemu-img: Failed to load snapshot: Snapshot L1 table too large
++qemu-img: Error while amending options: File too large
  *** done
 -- 
 2.11.0
