@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1erQwv-0006Ho-Te
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:20:55 -0500
+	(envelope-from <berto@igalia.com>) id 1erR46-0008BV-HA
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:28:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1erQws-0008Lc-JG
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:20:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56172)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1erQws-0008LE-9o
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:20:50 -0500
-Date: Thu, 1 Mar 2018 09:20:46 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180301092046.7cb959d8@w520.home>
-In-Reply-To: <1519888086-4207-1-git-send-email-jusual@mail.ru>
-References: <1519888086-4207-1-git-send-email-jusual@mail.ru>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] use g_path_get_basename instead of basename
+	(envelope-from <berto@igalia.com>) id 1erR41-0004K8-HK
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:28:18 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Thu,  1 Mar 2018 18:27:10 +0200
+Message-Id: <39f9a5666cc50c3733d01d4d01fb514a5a5da9a5.1519921268.git.berto@igalia.com>
+In-Reply-To: <cover.1519921268.git.berto@igalia.com>
+References: <cover.1519921268.git.berto@igalia.com>
+In-Reply-To: <cover.1519921268.git.berto@igalia.com>
+References: <cover.1519921268.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH 4/7] qcow2: Check snapshot L1 tables in
+ qcow2_check_metadata_overlap()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,261 +22,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova via Qemu-devel <qemu-devel@nongnu.org>
-Cc: Julia Suvorova <jusual@mail.ru>, Stefan Hajnoczi <stefanha@gmail.com>, Jim Mussared <jim@groklearning.com>, Cornelia Huck <cohuck@redhat.com>, Joel Stanley <joel@jms.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On Thu,  1 Mar 2018 10:08:06 +0300
-Julia Suvorova via Qemu-devel <qemu-devel@nongnu.org> wrote:
+The inactive-l2 overlap check iterates uses the L1 tables from all
+snapshots, but it does not validate them first.
 
-> basename(3) and dirname(3) modify their argument and may return
-> pointers to statically allocated memory which may be overwritten by
-> subsequent calls.
-> g_path_get_basename and g_path_get_dirname have no such issues, and
-> therefore more preferable.
+We now have a function to take care of this, so let's use it.
 
-I think it's quite a bit arguable whether it's preferable, afaict there
-are no bugs fixed here.  The basic functions are being used correctly
-and are more conservative of memory usage than the glib variants.  In
-several cases below the basic functions seem far more efficient and we
-don't need to worry about freeing unnecessarily allocated memory, the
-diffstat seems to attest to this.  Is the inefficiency and possibility
-of leaking unintentionally allocated memory a statistical improvement
-over the claimed perils of these absolutely standard and well known
-functions?
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block/qcow2-refcount.c     | 10 +++++++++-
+ tests/qemu-iotests/080     |  4 ++++
+ tests/qemu-iotests/080.out |  4 ++++
+ 3 files changed, 17 insertions(+), 1 deletion(-)
 
-I know mine is a losing battle against glib, but the changelog might as
-well just say "Succumb to glib" because I fail to see that there's
-actually an improvement here.  If Paolo wants to take this,
-
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
-
-Thanks,
-Alex
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index d46b69d7f3..dcb96e2b16 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -2614,9 +2614,17 @@ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
+             uint64_t l1_ofs = s->snapshots[i].l1_table_offset;
+             uint32_t l1_sz  = s->snapshots[i].l1_size;
+             uint64_t l1_sz2 = l1_sz * sizeof(uint64_t);
+-            uint64_t *l1 = g_try_malloc(l1_sz2);
++            uint64_t *l1;
+             int ret;
  
-> Signed-off-by: Julia Suvorova <jusual@mail.ru>
-> ---
->  fsdev/virtfs-proxy-helper.c |  6 +++++-
->  hw/s390x/s390-ccw.c         | 17 +++++++++++------
->  hw/vfio/ccw.c               |  7 +++++--
->  hw/vfio/pci.c               |  6 ++++--
->  hw/vfio/platform.c          |  6 ++++--
->  qemu-io.c                   |  8 +++++++-
->  qemu-nbd.c                  |  5 ++++-
->  qga/commands-posix.c        |  4 ++--
->  8 files changed, 42 insertions(+), 17 deletions(-)
-> 
-> diff --git a/fsdev/virtfs-proxy-helper.c b/fsdev/virtfs-proxy-helper.c
-> index 8e48500..da3452f 100644
-> --- a/fsdev/virtfs-proxy-helper.c
-> +++ b/fsdev/virtfs-proxy-helper.c
-> @@ -787,6 +787,8 @@ error:
->  
->  static void usage(char *prog)
->  {
-> +    char *base_filename = g_path_get_basename(prog);
-> +
->      fprintf(stderr, "usage: %s\n"
->              " -p|--path <path> 9p path to export\n"
->              " {-f|--fd <socket-descriptor>} socket file descriptor to be used\n"
-> @@ -795,7 +797,9 @@ static void usage(char *prog)
->              " access to this socket\n"
->              " \tNote: -s & -f can not be used together\n"
->              " [-n|--nodaemon] Run as a normal program\n",
-> -            basename(prog));
-> +            base_filename);
-> +
-> +    g_free(base_filename);
->  }
->  
->  static int process_reply(int sock, int type,
-> diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
-> index 7fc1c60..460dbab 100644
-> --- a/hw/s390x/s390-ccw.c
-> +++ b/hw/s390x/s390-ccw.c
-> @@ -34,7 +34,7 @@ static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
->                                    Error **errp)
->  {
->      unsigned int cssid, ssid, devid;
-> -    char dev_path[PATH_MAX] = {0}, *tmp;
-> +    char dev_path[PATH_MAX] = {0}, *dir_name, *dir_path;
->  
->      if (!sysfsdev) {
->          error_setg(errp, "No host device provided");
-> @@ -48,18 +48,23 @@ static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
->          return;
->      }
->  
-> -    cdev->mdevid = g_strdup(basename(dev_path));
-> +    cdev->mdevid = g_path_get_basename(dev_path);
->  
-> -    tmp = basename(dirname(dev_path));
-> -    if (sscanf(tmp, "%2x.%1x.%4x", &cssid, &ssid, &devid) != 3) {
-> -        error_setg_errno(errp, errno, "Failed to read %s", tmp);
-> -        return;
-> +    dir_path = g_path_get_dirname(dev_path);
-> +    dir_name = g_path_get_basename(dir_path);
-> +    if (sscanf(dir_name, "%2x.%1x.%4x", &cssid, &ssid, &devid) != 3) {
-> +        error_setg_errno(errp, errno, "Failed to read %s", dir_name);
-> +        goto out;
->      }
->  
->      cdev->hostid.cssid = cssid;
->      cdev->hostid.ssid = ssid;
->      cdev->hostid.devid = devid;
->      cdev->hostid.valid = true;
-> +
-> +out:
-> +    g_free(dir_path);
-> +    g_free(dir_name);
->  }
->  
->  static void s390_ccw_realize(S390CCWDevice *cdev, char *sysfsdev, Error **errp)
-> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> index 16713f2..c0566a9 100644
-> --- a/hw/vfio/ccw.c
-> +++ b/hw/vfio/ccw.c
-> @@ -300,7 +300,7 @@ static void vfio_put_device(VFIOCCWDevice *vcdev)
->  
->  static VFIOGroup *vfio_ccw_get_group(S390CCWDevice *cdev, Error **errp)
->  {
-> -    char *tmp, group_path[PATH_MAX];
-> +    char *tmp, *group_name, group_path[PATH_MAX];
->      ssize_t len;
->      int groupid;
->  
-> @@ -317,10 +317,13 @@ static VFIOGroup *vfio_ccw_get_group(S390CCWDevice *cdev, Error **errp)
->  
->      group_path[len] = 0;
->  
-> -    if (sscanf(basename(group_path), "%d", &groupid) != 1) {
-> +    group_name = g_path_get_basename(group_path);
-> +    if (sscanf(group_name, "%d", &groupid) != 1) {
->          error_setg(errp, "vfio: failed to read %s", group_path);
-> +        g_free(group_name);
->          return NULL;
->      }
-> +    g_free(group_name);
->  
->      return vfio_get_group(groupid, &address_space_memory, errp);
->  }
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 033cc8d..ba03136 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -2807,7 +2807,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->          return;
->      }
->  
-> -    vdev->vbasedev.name = g_strdup(basename(vdev->vbasedev.sysfsdev));
-> +    vdev->vbasedev.name = g_path_get_basename(vdev->vbasedev.sysfsdev);
->      vdev->vbasedev.ops = &vfio_pci_ops;
->      vdev->vbasedev.type = VFIO_DEVICE_TYPE_PCI;
->      vdev->vbasedev.dev = &vdev->pdev.qdev;
-> @@ -2824,11 +2824,13 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->  
->      group_path[len] = 0;
->  
-> -    group_name = basename(group_path);
-> +    group_name = g_path_get_basename(group_path);
->      if (sscanf(group_name, "%d", &groupid) != 1) {
->          error_setg_errno(errp, errno, "failed to read %s", group_path);
-> +        g_free(group_name);
->          goto error;
->      }
-> +    g_free(group_name);
->  
->      trace_vfio_realize(vdev->vbasedev.name, groupid);
->  
-> diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
-> index 0d4bc0a..15dbae8 100644
-> --- a/hw/vfio/platform.c
-> +++ b/hw/vfio/platform.c
-> @@ -561,7 +561,7 @@ static int vfio_base_device_init(VFIODevice *vbasedev, Error **errp)
->      /* @sysfsdev takes precedence over @host */
->      if (vbasedev->sysfsdev) {
->          g_free(vbasedev->name);
-> -        vbasedev->name = g_strdup(basename(vbasedev->sysfsdev));
-> +        vbasedev->name = g_path_get_basename(vbasedev->sysfsdev);
->      } else {
->          if (!vbasedev->name || strchr(vbasedev->name, '/')) {
->              error_setg(errp, "wrong host device name");
-> @@ -590,11 +590,13 @@ static int vfio_base_device_init(VFIODevice *vbasedev, Error **errp)
->  
->      group_path[len] = 0;
->  
-> -    group_name = basename(group_path);
-> +    group_name = g_path_get_basename(group_path);
->      if (sscanf(group_name, "%d", &groupid) != 1) {
->          error_setg_errno(errp, errno, "failed to read %s", group_path);
-> +        g_free(group_name);
->          return -errno;
->      }
-> +    g_free(group_name);
->  
->      trace_vfio_platform_base_device_init(vbasedev->name, groupid);
->  
-> diff --git a/qemu-io.c b/qemu-io.c
-> index 2c00ea0..1de5fc7 100644
-> --- a/qemu-io.c
-> +++ b/qemu-io.c
-> @@ -308,6 +308,11 @@ static char *get_prompt(void)
->      return prompt;
->  }
->  
-> +static void free_progname(void)
-> +{
-> +    g_free(progname);
-> +}
-> +
->  static void GCC_FMT_ATTR(2, 3) readline_printf_func(void *opaque,
->                                                      const char *fmt, ...)
->  {
-> @@ -504,7 +509,8 @@ int main(int argc, char **argv)
->  #endif
->  
->      module_call_init(MODULE_INIT_TRACE);
-> -    progname = basename(argv[0]);
-> +    progname = g_path_get_basename(argv[0]);
-> +    atexit(free_progname);
->      qemu_init_exec_dir(argv[0]);
->  
->      qcrypto_init(&error_fatal);
-> diff --git a/qemu-nbd.c b/qemu-nbd.c
-> index ed5d9b5..36bafe7 100644
-> --- a/qemu-nbd.c
-> +++ b/qemu-nbd.c
-> @@ -893,8 +893,11 @@ int main(int argc, char **argv)
->      }
->  
->      if (device != NULL && sockpath == NULL) {
-> +        char *base_filename = g_path_get_basename(device);
-> +
->          sockpath = g_malloc(128);
-> -        snprintf(sockpath, 128, SOCKET_PATH, basename(device));
-> +        snprintf(sockpath, 128, SOCKET_PATH, base_filename);
-> +        g_free(base_filename);
->      }
->  
->      server = qio_net_listener_new();
-> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-> index 9670614..53a29e3 100644
-> --- a/qga/commands-posix.c
-> +++ b/qga/commands-posix.c
-> @@ -808,7 +808,7 @@ static char *get_pci_driver(char const *syspath, int pathlen, Error **errp)
->      len = readlink(dpath, buf, sizeof(buf) - 1);
->      if (len != -1) {
->          buf[len] = 0;
-> -        driver = g_strdup(basename(buf));
-> +        driver = g_path_get_basename(buf);
->      }
->      g_free(dpath);
->      g_free(path);
-> @@ -1053,7 +1053,7 @@ static void build_guest_fsinfo_for_device(char const *devpath,
->      }
->  
->      if (!fs->name) {
-> -        fs->name = g_strdup(basename(syspath));
-> +        fs->name = g_path_get_basename(syspath);
->      }
->  
->      g_debug("  parse sysfs path '%s'", syspath);
++            ret = qcow2_validate_table(bs, l1_ofs, l1_sz, sizeof(uint64_t),
++                                       QCOW_MAX_L1_SIZE, "", NULL);
++            if (ret < 0) {
++                return ret;
++            }
++
++            l1 = g_try_malloc(l1_sz2);
++
+             if (l1_sz2 && l1 == NULL) {
+                 return -ENOMEM;
+             }
+diff --git a/tests/qemu-iotests/080 b/tests/qemu-iotests/080
+index 5622604f83..018f815697 100755
+--- a/tests/qemu-iotests/080
++++ b/tests/qemu-iotests/080
+@@ -178,6 +178,8 @@ _make_test_img 64M
+ poke_file "$TEST_IMG" "$offset_snap1_l1_offset" "\x00\x00\x00\x00\x00\x40\x02\x00"
+ { $QEMU_IMG convert -s test $TEST_IMG $TEST_IMG.snap; } 2>&1 | _filter_testdir
+ { $QEMU_IMG amend -o compat=0.10 $TEST_IMG; } 2>&1 | _filter_testdir
++{ $QEMU_IO -c "open -o overlap-check.inactive-l2=on $TEST_IMG" \
++           -c 'write 0 4k'; } 2>&1 | _filter_qemu_io | _filter_testdir
+ 
+ echo
+ echo "== Invalid snapshot L1 table size =="
+@@ -187,6 +189,8 @@ _make_test_img 64M
+ poke_file "$TEST_IMG" "$offset_snap1_l1_size" "\x10\x00\x00\x00"
+ { $QEMU_IMG convert -s test $TEST_IMG $TEST_IMG.snap; } 2>&1 | _filter_testdir
+ { $QEMU_IMG amend -o compat=0.10 $TEST_IMG; } 2>&1 | _filter_testdir
++{ $QEMU_IO -c "open -o overlap-check.inactive-l2=on $TEST_IMG" \
++           -c 'write 0 4k'; } 2>&1 | _filter_qemu_io | _filter_testdir
+ 
+ # success, all done
+ echo "*** done"
+diff --git a/tests/qemu-iotests/080.out b/tests/qemu-iotests/080.out
+index 5d9030ab93..cf8f863be2 100644
+--- a/tests/qemu-iotests/080.out
++++ b/tests/qemu-iotests/080.out
+@@ -65,6 +65,8 @@ wrote 512/512 bytes at offset 0
+ 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ qemu-img: Failed to load snapshot: Snapshot L1 table offset invalid
+ qemu-img: Error while amending options: Invalid argument
++Failed to flush the refcount block cache: Invalid argument
++write failed: Invalid argument
+ 
+ == Invalid snapshot L1 table size ==
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+@@ -72,4 +74,6 @@ wrote 512/512 bytes at offset 0
+ 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ qemu-img: Failed to load snapshot: Snapshot L1 table too large
+ qemu-img: Error while amending options: File too large
++Failed to flush the refcount block cache: File too large
++write failed: File too large
+ *** done
+-- 
+2.11.0
