@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1erMDR-0000N8-Mo
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:17:38 -0500
+	(envelope-from <laurent@vivier.eu>) id 1erMFk-0001Oz-4E
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:20:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1erMDN-0005JX-JX
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:17:37 -0500
-References: <20180227132150.13847-1-cohuck@redhat.com>
-	<CAFEAcA9=59C4NcFTCf489iYttbw56BTLufb5Ee3VnnhQr8xiwg@mail.gmail.com>
-	<20180301112702.1812057c.cohuck@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <0f981ba8-d711-2b9e-942a-c124fc9dd5cf@redhat.com>
-Date: Thu, 1 Mar 2018 12:17:12 +0100
+	(envelope-from <laurent@vivier.eu>) id 1erMFf-0006CK-6B
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:20:00 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:37035)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1erMFe-0006Bx-SL
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:19:55 -0500
+References: <1c105562-7933-d6bf-1071-6836ad8b6e40@vivier.eu>
+	<20180301111500.15717-1-shea@shealevy.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <eba1112a-2aa2-781a-9597-7fe71eb50540@vivier.eu>
+Date: Thu, 1 Mar 2018 12:19:50 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180301112702.1812057c.cohuck@redhat.com>
+In-Reply-To: <20180301111500.15717-1-shea@shealevy.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/26] s390x updates (and friends)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4] linux-user: Support f_flags in statfs
+ when available.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,65 +29,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Shea Levy <shea@shealevy.com>, qemu-devel@nongnu.org
 
-On 01.03.2018 11:27, Cornelia Huck wrote:
-> On Thu, 1 Mar 2018 10:12:53 +0000
-> Peter Maydell <peter.maydell@linaro.org> wrote:
->=20
->> On 27 February 2018 at 13:21, Cornelia Huck <cohuck@redhat.com> wrote:
->>> The following changes since commit 0a773d55ac76c5aa89ed9187a3bc5af8c5=
-c2a6d0:
->>>
->>>   maintainers: Add myself as a OpenBSD maintainer (2018-02-23 12:05:0=
-7 +0000)
->>>
->>> are available in the git repository at:
->>>
->>>   git://github.com/cohuck/qemu tags/s390x-20180227
->>>
->>> for you to fetch changes up to eae9f29130f3ed40ad77f40a3bae4b9ebff289=
-07:
->>>
->>>   Merge tag 'tags/s390-ccw-bios-2018-02-26' into s390-next (2018-02-2=
-7 13:54:37 +0100)
->>>
->>> ----------------------------------------------------------------
->>> - add query-cpus-fast and deprecate query-cpus, while adding s390 cpu
->>>   information
->>> - remove s390x memory hotplug implementation, which is not useable in
->>>   this form
->>> - add boot menu support in the s390-ccw bios
->>> - expose s390x guest crash information
->>> - fixes and cleaups
->>>
->>> ---------------------------------------------------------------- =20
->>
->> Something seems to be broken here: this failed 'make check' on
->> most hosts with
->> TEST: tests/pxe-test... (pid=3D48288)
->>   /s390x/pxe/ipv4/s390-ccw-virtio/virtio-net-ccw:                     =
- **
->> ERROR:/home/pm215/qemu/tests/boot-sector.c:158:boot_sector_test:
->> assertion failed (signature =3D=3D SIGNATURE): (0x00000000 =3D=3D 0x00=
-00dead)
->>
->> and just failed without an error on the rest (with the exception of
->> my Linux box, where that test hung entirely with qemu-system-s390x
->> using 100% of cpu).
->>
->> thanks
->> -- PMM
->=20
-> Hm, smells bootloader patches related... Thomas?
-FWIW, I just bisected the issue and it's not due to the bootloader
-changes, but due to this one:
+Le 01/03/2018 à 12:15, Shea Levy a écrit :
+> Signed-off-by: Shea Levy <shea@shealevy.com>
+> ---
+>  linux-user/syscall.c      |  5 +++++
+>  linux-user/syscall_defs.h | 41 +++++++++++++++++++----------------------
+>  2 files changed, 24 insertions(+), 22 deletions(-)
+> 
 
- f26852aa31d49bf83a8defd65538137a2f9da82c is the first bad commit
- commit f26852aa31d49bf83a8defd65538137a2f9da82c
- Author: David Hildenbrand <david@redhat.com>
- Date:   Tue Feb 13 17:12:40 2018 +0100
- Subject: s390x/tcg: fix disabling/enabling DAT
-
-  Thomas
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
