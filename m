@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erNWD-0001e6-D1
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:41:06 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1erNZT-0002mk-EH
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:44:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erNWC-00029i-Lo
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:41:05 -0500
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:33958)
+	(envelope-from <peter.maydell@linaro.org>) id 1erNZS-0003sT-Im
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:44:27 -0500
+Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:36551)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1erNWC-00029S-Fb
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:41:04 -0500
-Received: by mail-oi0-x244.google.com with SMTP id c83so4360718oib.1
-	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 04:41:04 -0800 (PST)
+	id 1erNZS-0003r6-Dn
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:44:26 -0500
+Received: by mail-ot0-x230.google.com with SMTP id 108so5407627otv.3
+	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 04:44:26 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <4d63ab53-f056-9f86-4317-9565f1d8a792@linaro.org>
+In-Reply-To: <7b95391b-2ef8-b664-5d23-15db04841e6b@linaro.org>
 References: <20180220180325.29818-1-peter.maydell@linaro.org>
-	<20180220180325.29818-7-peter.maydell@linaro.org>
-	<4d63ab53-f056-9f86-4317-9565f1d8a792@linaro.org>
+	<20180220180325.29818-16-peter.maydell@linaro.org>
+	<7b95391b-2ef8-b664-5d23-15db04841e6b@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 1 Mar 2018 12:40:43 +0000
-Message-ID: <CAFEAcA9hDqrRNfMurJb5uJeyqVqyEHhz2cOQ74vZWKbiyoh8Fg@mail.gmail.com>
+Date: Thu, 1 Mar 2018 12:44:05 +0000
+Message-ID: <CAFEAcA_xh+_3Uy1M9Uc8N+O-_MKoGcmn+JqHBgD5rXinV_Vv_w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 06/19] target/arm: Define init-svtor
- property for the reset secure VTOR value
+Subject: Re: [Qemu-devel] [PATCH 15/19] hw/misc/iotkit-secctl: Arm IoT Kit
+ security controller initial skeleton
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,19 +34,14 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Richard Henderson <richard.henderson@linaro.org>
 Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-On 27 February 2018 at 20:18, Richard Henderson
+On 27 February 2018 at 21:44, Richard Henderson
 <richard.henderson@linaro.org> wrote:
 > On 02/20/2018 10:03 AM, Peter Maydell wrote:
->> +        env->v7m.vecbase[M_REG_S] = cpu->init_svtor;
+>> +        r >>= 8 * (addr & 3);
+>> +        r &= (1 << (size * 8)) - 1;
 >
-> Perhaps & ~0x3f here; that part of the field is RES0.
->
-> That said, if the only setter of this property is within qemu code, and not
-> from the command line, then I suppose it doesn't matter in practice.
+> extract32(r, (addr & 3) * 8, size * 8) ?
 
-Bits 6..0 are RES0, not just 5..0. I've added "& 0xffffff80"
-(to match how we do the masking in the VTOR write code path in
-armv7m_nvic.c).
+Good idea, that's much clearer.
 
-thanks
 -- PMM
