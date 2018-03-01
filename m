@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1erMLC-00059l-KC
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:25:39 -0500
+	(envelope-from <no-reply@patchew.org>) id 1erMLl-0005hs-M2
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:26:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1erML8-0000CV-N5
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:25:38 -0500
-Received: from smtp1.mail.ru ([94.100.179.111]:56134)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1erML8-0000C2-9n
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:25:34 -0500
-References: <1519888086-4207-1-git-send-email-jusual@mail.ru>
-	<CAJ+F1CJVyrK5PtpavMKuGwus9RC_KDjx9i2csduW9JMdV8tRbg@mail.gmail.com>
-	<20180301115916.634904f3.cohuck@redhat.com>
-From: Julia Suvorova <jusual@mail.ru>
-Message-ID: <61a53a4e-abf9-4515-4368-f60b325316b6@mail.ru>
-Date: Thu, 1 Mar 2018 14:25:22 +0300
+	(envelope-from <no-reply@patchew.org>) id 1erMLh-0000Ri-My
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:26:13 -0500
+Resent-Message-Id: <E1erMLh-0000Ri-My@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21106)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1erMLh-0000RG-EV
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:26:09 -0500
+In-Reply-To: <20180301111500.15717-1-shea@shealevy.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151990353923.1290.10953339670258359182@bdbb90650ae5>
 MIME-Version: 1.0
-In-Reply-To: <20180301115916.634904f3.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] use g_path_get_basename instead of basename
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 1 Mar 2018 03:25:40 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v4] linux-user: Support f_flags in statfs
+ when available.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +29,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, Jim Mussared <jim@groklearning.com>, Joel Stanley <joel@jms.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: shea@shealevy.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, laurent@vivier.eu
 
-
-
-On 01.03.2018 13:59, Cornelia Huck wrote:
-> On Thu, 1 Mar 2018 10:47:42 +0100
-> Marc-André Lureau <marcandre.lureau@gmail.com> wrote:
-> 
->> Hi
->>
->> On Thu, Mar 1, 2018 at 8:08 AM, Julia Suvorova via Qemu-devel
->> <qemu-devel@nongnu.org> wrote:
->>> basename(3) and dirname(3) modify their argument and may return
->>> pointers to statically allocated memory which may be overwritten by
->>> subsequent calls.
->>> g_path_get_basename and g_path_get_dirname have no such issues, and
->>> therefore more preferable.
->>>
->>> Signed-off-by: Julia Suvorova <jusual@mail.ru>  
->>
->> What about adding a warning for basename()/dirname() usage in
->> scripts/checkpatch.pl ?
-> 
-> +1 to that.
-> 
-
-Ok. I'll prepare a separate patch for that.
-Thanks for the review.
-
->>
->> Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-> 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> 
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMzAxMTExNTAwLjE1NzE3LTEtc2hlYUBzaGVhbGV2eS5jb20KU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NF0gbGludXgtdXNlcjogU3VwcG9ydCBmX2ZsYWdzIGlu
+IHN0YXRmcyB3aGVuIGF2YWlsYWJsZS4KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
+L2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwg
+d2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1y
+ZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5n
+IFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAg
+aWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
+IC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkK
+ICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09
+CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20g
+aHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAg
+ICAgICAgICAgIHBhdGNoZXcvMjAxODAzMDExMTE1MDAuMTU3MTctMS1zaGVhQHNoZWFsZXZ5LmNv
+bSAtPiBwYXRjaGV3LzIwMTgwMzAxMTExNTAwLjE1NzE3LTEtc2hlYUBzaGVhbGV2eS5jb20KU3dp
+dGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4NmMwYzQ5NWY5IGxpbnV4LXVzZXI6IFN1cHBv
+cnQgZl9mbGFncyBpbiBzdGF0ZnMgd2hlbiBhdmFpbGFibGUuCgo9PT0gT1VUUFVUIEJFR0lOID09
+PQpDaGVja2luZyBQQVRDSCAxLzE6IGxpbnV4LXVzZXI6IFN1cHBvcnQgZl9mbGFncyBpbiBzdGF0
+ZnMgd2hlbiBhdmFpbGFibGUuLi4uCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNl
+IHRhYnMKIzU1OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjIyMTM6CiteSWludDMy
+X3ReSV5JXklmX2ZsYWdzOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRh
+YnMKIzU2OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjIyMTQ6CiteSWludDMyX3Re
+SV5JXklmX3NwYXJlWzVdOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRh
+YnMKIzY1OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjIyMzA6CiteSWFiaV9sb25n
+XkleSWZfZmxhZ3M7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
+NjY6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6MjIzMToKK15JYWJpX2xvbmdeSV5J
+Zl9zcGFyZVs1XTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM3
+NTogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoyMjQ3OgorXkl1aW50MzJfdF5JZl9m
+bGFnczskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM3NjogRklM
+RTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoyMjQ4OgorXkl1aW50MzJfdF5JZl9zcGFyZVs1
+XTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM4NTogRklMRTog
+bGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoyMjY0OgorXklhYmlfbG9uZyBmX2ZsYWdzOyQKCkVS
+Uk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzg2OiBGSUxFOiBsaW51eC11
+c2VyL3N5c2NhbGxfZGVmcy5oOjIyNjU6CiteSWFiaV9sb25nIGZfc3BhcmVbNF07JAoKRVJST1I6
+IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojOTU6IEZJTEU6IGxpbnV4LXVzZXIv
+c3lzY2FsbF9kZWZzLmg6MjI3OToKK15JYWJpX2xvbmcgZl9mbGFnczskCgpFUlJPUjogY29kZSBp
+bmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM5NjogRklMRTogbGludXgtdXNlci9zeXNjYWxs
+X2RlZnMuaDoyMjgwOgorXklhYmlfbG9uZyBmX3NwYXJlWzRdOyQKCkVSUk9SOiBjb2RlIGluZGVu
+dCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzEyNjogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2Rl
+ZnMuaDoyMzI1OgorXkl1aW50MzJfdCBmX2ZsYWdzOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91
+bGQgbmV2ZXIgdXNlIHRhYnMKIzEyNzogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoy
+MzI2OgorXkl1aW50MzJfdCBmX3NwYXJlWzRdOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQg
+bmV2ZXIgdXNlIHRhYnMKIzEzNjogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoyMzQw
+OgorXkl1aW50MzJfdCBmX2ZsYWdzOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIg
+dXNlIHRhYnMKIzEzNzogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoyMzQxOgorXkl1
+aW50MzJfdCBmX3NwYXJlWzRdOyQKCnRvdGFsOiAxNCBlcnJvcnMsIDAgd2FybmluZ3MsIDExMiBs
+aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
+dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
+bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0g
+T1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVt
+YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9y
+Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3Rz
+Lm9yZw==
