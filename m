@@ -1,45 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52030)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1erNQe-0007e1-NC
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:35:22 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1erMgD-0005vv-NH
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:47:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1erNQb-0007sA-IP
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:35:20 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39464)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1erNQb-0007rr-9s
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:35:17 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w21CYMYj062689
-	for <qemu-devel@nongnu.org>; Thu, 1 Mar 2018 07:35:16 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gednqj4b1-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 07:35:15 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 1 Mar 2018 12:35:12 -0000
-References: <20180228195320.165230-1-borntraeger@de.ibm.com>
-	<79f7059b-f2d3-a758-6bb9-29433b31b313@redhat.com>
-	<20180301092442.GA2994@work-vm>
-	<aef0a651-4d04-13b1-76a6-0c1efb6c9e04@de.ibm.com>
-	<20180301114543.GC2994@work-vm>
-	<69654fb2-f5ba-c23b-f6f5-1b559692cf37@de.ibm.com>
-	<20180301122854.GD2994@work-vm>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 1 Mar 2018 13:35:08 +0100
+	(envelope-from <aik@ozlabs.ru>) id 1erMgA-0005RO-IH
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:47:21 -0500
+Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:37122)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1erMgA-0005RA-78
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:47:18 -0500
+Received: by mail-io0-x242.google.com with SMTP id d71so6811117iog.4
+	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 03:47:17 -0800 (PST)
+References: <20180226082259.40293-1-aik@ozlabs.ru>
+	<20180301035910.GC2264@umbus.fritz.box>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <ae263ebe-d0d2-3b1d-b2ac-200772eb9154@ozlabs.ru>
+Date: Thu, 1 Mar 2018 22:47:10 +1100
 MIME-Version: 1.0
-In-Reply-To: <20180301122854.GD2994@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <416dbf71-c311-1f40-baa6-414cdf220f4d@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] s390/kvm: implement clearing part of
- IPL clear
+In-Reply-To: <20180301035910.GC2264@umbus.fritz.box>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="X5cfR2jBuUK3IS7hsl4bnTjsViH9LFp3A"
+Subject: Re: [Qemu-devel] [PATCH qemu v2] qmp: Add qom-list-properties to
+ list QOM object properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,168 +31,276 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Andrea Bolognani <abologna@redhat.com>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--X5cfR2jBuUK3IS7hsl4bnTjsViH9LFp3A
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Andrea Bolognani <abologna@redhat.com>
+Message-ID: <ae263ebe-d0d2-3b1d-b2ac-200772eb9154@ozlabs.ru>
+Subject: Re: [PATCH qemu v2] qmp: Add qom-list-properties to list QOM object
+ properties
+References: <20180226082259.40293-1-aik@ozlabs.ru>
+ <20180301035910.GC2264@umbus.fritz.box>
+In-Reply-To: <20180301035910.GC2264@umbus.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-
-On 03/01/2018 01:28 PM, Dr. David Alan Gilbert wrote:
-> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
+On 01/03/18 14:59, David Gibson wrote:
+> On Mon, Feb 26, 2018 at 07:22:59PM +1100, Alexey Kardashevskiy wrote:
+>> There is already 'device-list-properties' which does most of the job,
+>> however it does not handle everything returned by qom-list-types such
+>> as machines as they inherit directly from TYPE_OBJECT and not TYPE_DEV=
+ICE.
+>> It does not handle abstract classes either.
 >>
+>> This adds a new qom-list-properties command which prints properties
+>> of a specific class and its instance. It is pretty much a simplified c=
+opy
+>> of the device-list-properties handler.
 >>
->> On 03/01/2018 12:45 PM, Dr. David Alan Gilbert wrote:
->>> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
->>>>
->>>>
->>>> On 03/01/2018 10:24 AM, Dr. David Alan Gilbert wrote:
->>>>> * Thomas Huth (thuth@redhat.com) wrote:
->>>>>> On 28.02.2018 20:53, Christian Borntraeger wrote:
->>>>>>> When a guests reboots with diagnose 308 subcode 3 it requests the memory
->>>>>>> to be cleared. We did not do it so far. This does not only violate the
->>>>>>> architecture, it also misses the chance to free up that memory on
->>>>>>> reboot, which would help on host memory over commitment.  By using
->>>>>>> ram_block_discard_range we can cover both cases.
->>>>>>
->>>>>> Sounds like a good idea. I wonder whether that release_all_ram()
->>>>>> function should maybe rather reside in exec.c, so that other machines
->>>>>> that want to clear all RAM at reset time can use it, too?
->>>>>>
->>>>>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>>>>>> ---
->>>>>>>  target/s390x/kvm.c | 19 +++++++++++++++++++
->>>>>>>  1 file changed, 19 insertions(+)
->>>>>>>
->>>>>>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
->>>>>>> index 8f3a422288..2e145ad5c3 100644
->>>>>>> --- a/target/s390x/kvm.c
->>>>>>> +++ b/target/s390x/kvm.c
->>>>>>> @@ -34,6 +34,8 @@
->>>>>>>  #include "qapi/error.h"
->>>>>>>  #include "qemu/error-report.h"
->>>>>>>  #include "qemu/timer.h"
->>>>>>> +#include "qemu/rcu_queue.h"
->>>>>>> +#include "sysemu/cpus.h"
->>>>>>>  #include "sysemu/sysemu.h"
->>>>>>>  #include "sysemu/hw_accel.h"
->>>>>>>  #include "hw/boards.h"
->>>>>>> @@ -41,6 +43,7 @@
->>>>>>>  #include "sysemu/device_tree.h"
->>>>>>>  #include "exec/gdbstub.h"
->>>>>>>  #include "exec/address-spaces.h"
->>>>>>> +#include "exec/ram_addr.h"
->>>>>>>  #include "trace.h"
->>>>>>>  #include "qapi-event.h"
->>>>>>>  #include "hw/s390x/s390-pci-inst.h"
->>>>>>> @@ -1841,6 +1844,14 @@ static int kvm_arch_handle_debug_exit(S390CPU *cpu)
->>>>>>>      return ret;
->>>>>>>  }
->>>>>>>  
->>>>>>> +static void release_all_rams(void)
->>>>>>
->>>>>> s/rams/ram/ maybe?
->>>>>>
->>>>>>> +{
->>>>>>> +    struct RAMBlock *rb;
->>>>>>> +
->>>>>>> +    QLIST_FOREACH_RCU(rb, &ram_list.blocks, next)
->>>>>>> +        ram_block_discard_range(rb, 0, rb->used_length);
->>>>>>
->>>>>> From a coding style point of view, I think there should be curly braces
->>>>>> around ram_block_discard_range() ?
->>>>>
->>>>> I think this might break if it happens during a postcopy migrate.
->>>>> The destination CPU is running, so it can do a reboot at just the wrong
->>>>> time; and then the pages (that are protected by userfaultfd) would get
->>>>> deallocated and trigger userfaultfd requests if accessed.
->>>>
->>>> Yes, userfaultd/postcopy is really fragile and relies on things that are not
->>>> necessarily true (e.g. virito-balloon can also invalidate pages).
->>>
->>> That's why we use qemu_balloon_inhibit around postcopy to stop
->>> ballooning; I'm not aware of anything else that does the same.
+>> Since it creates an object instance, device properties should appear
+>> in the output as they are copied to QOM properties at the instance_ini=
+t
+>> hook.
 >>
->> we also have at least the pte_unused thing in mm/rmap.c that clearly
->> predates userfaultfd. We might need to look into this as well....
-> 
-> I've not come across that; what does that do?
-
-It can drop a page on page out if the page is no longer of value. It is used by
-the CMMA (guest page hinting) code of s390x.
-
-see kernel mm/rmap.c
-
-
-static bool try_to_unmap_one(struct page *page, struct vm_area_struct *vma,
-                     unsigned long address, void *arg)
-{
-[...]
-                } else if (pte_unused(pteval)) {
-                        /*
-                         * The guest indicated that the page content is of no
-                         * interest anymore. Simply discard the pte, vmscan
-                         * will take care of the rest.
-                         */
-			dec_mm_counter(mm, mm_counter(page));
-                        /* We have to invalidate as we cleared the pte */
-                        mmu_notifier_invalidate_range(mm, address,
-                                                      address + PAGE_SIZE);
-                } else if (IS_ENABLED(CONFIG_MIGRATION) &&
-                                (flags & (TTU_MIGRATION|TTU_SPLIT_FREEZE))) {
-[...]
-
-
-> 
->>>
->>>> The right thing here would be to actually terminate the postcopy migrate but
->>>> return it as "successful" (since we are going to clear that RAM anyway). Do 
->>>> you see a good way to achieve that?
->>>
->>> There's no current mechanism to do it; I think it would have to involve
->>> some interaction with the source as well though to tell it that you
->>> didn't need that area of RAM anyway.
->>>
->>> However, there are more problems:
->>>   a) Even forgetting the userfault problem, this is racy since during
->>> postcopy you're still receiving blocks from the source at the same time;
->>> so some of the area that you've discarded might get overwritten by data
->>> from the source.
+>> This adds a object_class_property_iter_init() helper to allow class
+>> properties enumeration uses it in the new QMP command to allow propert=
+ies
+>> listing for abstract classes.
 >>
->> So how do you handle the case when the target system writes to memory
->> that is still in flight? Can we build on that mechanism?
-> 
-> Once we've entered postcopy, a page is basically in one of two states:
->    a) Not yet received - i.e. marked absent with MADV_DONTNEED;  if the
-> guest tries to write to it then it'll block with userfault and ask the
-> source for the page; so the write wont happen until the page arrives.
->    b) Received - we've already got the page from the source; the source
-> never resends a page (once in postcopy) so now the destination can just
-> write to the page.
-> 
-> Once in postcopy, a page is received at most once (i.e. if it's not
-> been received during precopy).
-> 
-> I can imagine two ways of curing it:
->    a) Simple but slow;  just read all the pages before doing the
-> discard,  this forces it to wait for the pages to be received.
->    b) More complex but fast;  Add a message on the return path to the
-> source telling it that you're going to discard a range; the source then
-> marks it's notes as cleared for those pages and then sends some form of
-> ack, and at that point you drop it.
-
-this looks like the most promising approach, but some work.
-
-> 
-> A 3rd; incomplete way; would be just to drop the userfaultfd on the
-> destination for the RAMBlocks that are being cleared;  but this does
-> leave the source state in a bit of a mess.
-> 
-> 
->>>   b) Your release_all_rams seems to do all RAM Blocks - won't that nuke
->>> any ROMs as well? Or maybe even flash?
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> ---
+>> Changes:
+>> v2:
+>> * added abstract classes support, now things like "pci-device" or
+>> "spapr-machine" show properties, previously these would produce
+>> an "abstract class" error
+>> ---
+>>  qapi-schema.json     | 29 +++++++++++++++++++++++++++++
+>>  include/qom/object.h | 16 ++++++++++++++++
+>>  qmp.c                | 49 +++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>>  qom/object.c         |  7 +++++++
+>>  4 files changed, 101 insertions(+)
 >>
->> ROMs loaded with load_elf (like our s390-ccw.img) are reloaded on every reset.
->> See rom_reset in /hw/core/loader.c
-> 
-> Ah, so this is happening after your reset code you've added?
+>> diff --git a/qapi-schema.json b/qapi-schema.json
+>> index 0262b9f..fa5f189 100644
+>> --- a/qapi-schema.json
+>> +++ b/qapi-schema.json
+>> @@ -1455,6 +1455,35 @@
+>>    'returns': [ 'DevicePropertyInfo' ] }
+>> =20
+>>  ##
+>> +# @QOMPropertyInfo:
+>> +#
+>> +# Information about object properties.
+>> +#
+>> +# @name: the name of the property
+>> +# @type: the typename of the property
+>> +# @description: if specified, the description of the property.
+>> +#
+>> +# Since: 2.12
+>> +##
+>> +{ 'struct': 'QOMPropertyInfo',
+>> +  'data': { 'name': 'str', 'type': 'str', '*description': 'str' } }
+>=20
+> So, this has identical contents to DevicePropertyInfo, and is very
+> similar to ObjectPropertyInfo.  Is there any way we could consolidate
+> those types?
 
-Yes, I am stopping all CPU, clear the memory. And then I call system_reset.
+Sure, I can get rid of DevicePropertyInfo in favour of QOMPropertyInfo, I=
+
+am just not sure if this typename is visible anywhere in the QMP protocol=
+=2E
+I'll post v3 in minutes.
+
+
+>=20
+>> +##
+>> +# @qom-list-properties:
+>> +#
+>> +# List properties associated with a QOM object.
+>> +#
+>> +# @typename: the type name of an object
+>> +#
+>> +# Returns: a list of QOMPropertyInfo describing object properties
+>> +#
+>> +# Since: 2.12
+>> +##
+>> +{ 'command': 'qom-list-properties',
+>> +  'data': { 'typename': 'str'},
+>> +  'returns': [ 'QOMPropertyInfo' ] }
+>> +
+>> +##
+>>  # @xen-set-global-dirty-log:
+>>  #
+>>  # Enable or disable the global dirty log mode.
+>> diff --git a/include/qom/object.h b/include/qom/object.h
+>> index dc73d59..ef07d78 100644
+>> --- a/include/qom/object.h
+>> +++ b/include/qom/object.h
+>> @@ -1017,6 +1017,22 @@ void object_property_iter_init(ObjectPropertyIt=
+erator *iter,
+>>                                 Object *obj);
+>> =20
+>>  /**
+>> + * object_class_property_iter_init:
+>> + * @klass: the class
+>> + *
+>> + * Initializes an iterator for traversing all properties
+>> + * registered against an object class and all parent classes.
+>> + *
+>> + * It is forbidden to modify the property list while iterating,
+>> + * whether removing or adding properties.
+>> + *
+>> + * This can be used on abstract classes as it does not create a tempo=
+rary
+>> + * instance.
+>> + */
+>> +void object_class_property_iter_init(ObjectPropertyIterator *iter,
+>> +                                     ObjectClass *klass);
+>> +
+>> +/**
+>>   * object_property_iter_next:
+>>   * @iter: the iterator instance
+>>   *
+>> diff --git a/qmp.c b/qmp.c
+>> index 793f6f3..151d3d7 100644
+>> --- a/qmp.c
+>> +++ b/qmp.c
+>> @@ -576,6 +576,55 @@ DevicePropertyInfoList *qmp_device_list_propertie=
+s(const char *typename,
+>>      return prop_list;
+>>  }
+>> =20
+>> +QOMPropertyInfoList *qmp_qom_list_properties(const char *typename,
+>> +                                             Error **errp)
+>> +{
+>> +    ObjectClass *klass;
+>> +    Object *obj =3D NULL;
+>> +    ObjectProperty *prop;
+>> +    ObjectPropertyIterator iter;
+>> +    QOMPropertyInfoList *prop_list =3D NULL;
+>> +
+>> +    klass =3D object_class_by_name(typename);
+>> +    if (klass =3D=3D NULL) {
+>> +        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
+>> +                  "Class '%s' not found", typename);
+>> +        return NULL;
+>> +    }
+>> +
+>> +    klass =3D object_class_dynamic_cast(klass, TYPE_OBJECT);
+>> +    if (klass =3D=3D NULL) {
+>> +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "typename", TY=
+PE_OBJECT);
+>> +        return NULL;
+>> +    }
+>> +
+>> +    if (object_class_is_abstract(klass)) {
+>> +        object_class_property_iter_init(&iter, klass);
+>=20
+> I like the idea of adding abstract classes in principle, but I'm a
+> little concerned about the effect of this in practice, because it only
+> lists class properties.
+>> Although nearly all properties in qemu *should* be class properties,
+> they're nearly all defined as instance properties in practice.  AFAICT
+> this is just because most people didn't get the memo on class
+> properties and how to use them.
+>=20
+> Just listing class properties in general might be ok - it would
+> encourage people to move things to class properties if they should
+> be.  However listing class properties in some cases and all properties
+> in other sounds like a recipe for confusion.
+
+This lists all properties one can get for a specific type. For an abstrac=
+t
+class, an instance cannot be created, hence only class properties are
+listed. Quite straight forward imho.
+
+
+
+
+>> +    } else {
+>> +        obj =3D object_new(typename);
+>> +        object_property_iter_init(&iter, obj);
+>> +    }
+>> +    while ((prop =3D object_property_iter_next(&iter))) {
+>> +        QOMPropertyInfo *info;
+>> +        QOMPropertyInfoList *entry;
+>> +
+>> +        info =3D g_malloc0(sizeof(*info));
+>> +        info->name =3D g_strdup(prop->name);
+>> +        info->type =3D g_strdup(prop->type);
+>> +        info->has_description =3D !!prop->description;
+>> +        info->description =3D g_strdup(prop->description);
+>> +
+>> +        entry =3D g_malloc0(sizeof(*entry));
+>> +        entry->value =3D info;
+>> +        entry->next =3D prop_list;
+>> +        prop_list =3D entry;
+>> +    }
+>> +
+>> +    object_unref(obj);
+>> +
+>> +    return prop_list;
+>> +}
+>> +
+>>  CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
+>>  {
+>>      return arch_query_cpu_definitions(errp);
+>> diff --git a/qom/object.c b/qom/object.c
+>> index 5dcee46..e7978bd 100644
+>> --- a/qom/object.c
+>> +++ b/qom/object.c
+>> @@ -1037,6 +1037,13 @@ ObjectProperty *object_property_iter_next(Objec=
+tPropertyIterator *iter)
+>>      return val;
+>>  }
+>> =20
+>> +void object_class_property_iter_init(ObjectPropertyIterator *iter,
+>> +                                     ObjectClass *klass)
+>> +{
+>> +    g_hash_table_iter_init(&iter->iter, klass->properties);
+>> +    iter->nextclass =3D klass;
+>> +}
+>> +
+>>  ObjectProperty *object_class_property_find(ObjectClass *klass, const =
+char *name,
+>>                                             Error **errp)
+>>  {
+>=20
+
+
+--=20
+Alexey
+
+
+--X5cfR2jBuUK3IS7hsl4bnTjsViH9LFp3A
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJCBAEBCAAsFiEEZSrPibrORRTHQ99dhhM92CvBILkFAlqX6D4OHGFpa0Bvemxh
+YnMucnUACgkQhhM92CvBILk5hg/8DZdpUlENMOXq4EWJP86wlPW0DC6FMrjIq1fm
+gX1u1LuzUerd/3W2c764Oi/uWAC64x9M0XJhKAyZ4HungV96JQ+5vy5GOOf0BJU+
+o0zwATJNKiUQcO+NgX0Ohi/oc3MWDNRGiwnCZAc1lmyxh2WWwflltIMAZPV/3lIh
+3aTgMmq1AoKXIf6PNPOC4WBq2eH36h1AbVYMIEqupSfFpb3htoM5559Onq61/A1D
+16lrvDg+bc5sXgqBhyTTwfEb2uSlJIS2otetRPoCbciLZodGL+LhvwhLBkX43qJ+
++ixVRwgiWhoXUiU+PkLxHhPMFi0ADI4I4eYrcEMN149Kqkflve/Ah4KptuE+YA3w
+B/Baz3w/GJbiLfD21jRqgYuD7b8RdzGd8xFqebjcMHakaUyP3RnnzYi7Fzin1erj
+07pLDfAVJfdtVyH+jG0UiWJe7aDy08H680mgHC4GEFB2/5FQLe2zNddsCM8hPJuO
+F/3r5iVvMhrSOdlMaNFqP2HS05+gurYSownv/1EIQjxuNRXG2GGFmcqwlKA+73Ib
+5zad8AfWag8EZNXZYfwlFIrnVVvWOrggeNLDOG5zuCEKHguxyTQlx9/HDbzILHs1
+WszwP7FSCfxNWQcmjhh4W42JEyC01Z+tGE2uKVxRQqpfWqP4ttq2kQJ1dzm4+JwL
+kWOYq5I=
+=v60/
+-----END PGP SIGNATURE-----
+
+--X5cfR2jBuUK3IS7hsl4bnTjsViH9LFp3A--
