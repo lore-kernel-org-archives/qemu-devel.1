@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1erMFr-0001Ry-G0
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:20:13 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1erMHl-0002hZ-3s
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:22:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1erMFm-0006Id-IZ
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:20:07 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46696 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1erMHg-0007Cb-7D
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:22:05 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46780 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1erMFm-0006IU-D3
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:20:02 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1erMHg-0007C5-2o
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:22:00 -0500
 References: <1519888086-4207-1-git-send-email-jusual@mail.ru>
+	<CAJ+F1CJVyrK5PtpavMKuGwus9RC_KDjx9i2csduW9JMdV8tRbg@mail.gmail.com>
+	<20180301115916.634904f3.cohuck@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <63219f38-05e9-5154-81a8-034d0994761d@redhat.com>
-Date: Thu, 1 Mar 2018 12:19:58 +0100
+Message-ID: <f24ccad5-af69-9c3d-fd9f-b1c1ea6a70c6@redhat.com>
+Date: Thu, 1 Mar 2018 12:21:57 +0100
 MIME-Version: 1.0
-In-Reply-To: <1519888086-4207-1-git-send-email-jusual@mail.ru>
+In-Reply-To: <20180301115916.634904f3.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -27,32 +29,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova <jusual@mail.ru>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Jim Mussared <jim@groklearning.com>, Joel Stanley <joel@jms.id.au>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: Julia Suvorova <jusual@mail.ru>, QEMU <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, Jim Mussared <jim@groklearning.com>, Joel Stanley <joel@jms.id.au>, Richard Henderson <rth@twiddle.net>
 
-On 01/03/2018 08:08, Julia Suvorova wrote:
-> +static void free_progname(void)
-> +{
-> +    g_free(progname);
-> +}
-> +
->  static void GCC_FMT_ATTR(2, 3) readline_printf_func(void *opaque,
->                                                      const char *fmt, ...)
->  {
-> @@ -504,7 +509,8 @@ int main(int argc, char **argv)
->  #endif
->  
->      module_call_init(MODULE_INIT_TRACE);
-> -    progname = basename(argv[0]);
-> +    progname = g_path_get_basename(argv[0]);
-> +    atexit(free_progname);
+On 01/03/2018 11:59, Cornelia Huck wrote:
+>>>
+>>> Signed-off-by: Julia Suvorova <jusual@mail.ru>  
+>> What about adding a warning for basename()/dirname() usage in
+>> scripts/checkpatch.pl ?
+> +1 to that.
+> 
 
-This atexit is not needed; memory is always freed on exit.  But, it's
-good that you thought about it!
+Good idea indeed.  Julia, would you like to send a second patch that
+adds the warning?
 
-I can queue this patch for merging once I get an ack from Alex
-Williamson (VFIO).
-
-Thanks,
+There are already some examples (__FUNCTION__, strto*, signal, etc.)
+that you can take inspiration from.
 
 Paolo
