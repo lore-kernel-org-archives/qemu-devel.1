@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1erMHl-0002hZ-3s
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:22:05 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1erMJp-0003fd-RA
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:24:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1erMHg-0007Cb-7D
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:22:05 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46780 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1erMHg-0007C5-2o
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:22:00 -0500
-References: <1519888086-4207-1-git-send-email-jusual@mail.ru>
-	<CAJ+F1CJVyrK5PtpavMKuGwus9RC_KDjx9i2csduW9JMdV8tRbg@mail.gmail.com>
-	<20180301115916.634904f3.cohuck@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f24ccad5-af69-9c3d-fd9f-b1c1ea6a70c6@redhat.com>
-Date: Thu, 1 Mar 2018 12:21:57 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1erMJo-00084N-KF
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:24:13 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46698)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1erMJo-00082m-AT
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:24:12 -0500
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1erMJg-0000X7-Hc
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:24:04 +0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu,  1 Mar 2018 11:23:21 +0000
+Message-Id: <20180301112403.12487-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180301115916.634904f3.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] use g_path_get_basename instead of basename
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/42] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,21 +28,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: Julia Suvorova <jusual@mail.ru>, QEMU <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, Jim Mussared <jim@groklearning.com>, Joel Stanley <joel@jms.id.au>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-On 01/03/2018 11:59, Cornelia Huck wrote:
->>>
->>> Signed-off-by: Julia Suvorova <jusual@mail.ru>  
->> What about adding a warning for basename()/dirname() usage in
->> scripts/checkpatch.pl ?
-> +1 to that.
-> 
+Arm queue -- I have more stuff pending but I prefer to push
+this first lot out and keep the pull below 50 patches.
+Most of this is Alex's FP16 support work.
 
-Good idea indeed.  Julia, would you like to send a second patch that
-adds the warning?
+-- PMM
 
-There are already some examples (__FUNCTION__, strto*, signal, etc.)
-that you can take inspiration from.
 
-Paolo
+The following changes since commit 6697439794f72b3501ee16bb95d16854f9981421:
+
+  Merge remote-tracking branch 'remotes/kraxel/tags/usb-20180227-pull-request' into staging (2018-02-27 17:50:46 +0000)
+
+are available in the Git repository at:
+
+  git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20180301
+
+for you to fetch changes up to c22e580c2ad1cccef582e1490e732f254d4ac064:
+
+  MAINTAINERS: Update my email address (2018-03-01 11:13:59 +0000)
+
+----------------------------------------------------------------
+target-arm queue:
+ * update MAINTAINERS for Alistair's new email address
+ * add Arm v8.2 FP16 arithmetic extension for linux-user
+ * implement display connector emulation for vexpress board
+ * xilinx_spips: Enable only two slaves when reading/writing with stripe
+ * xilinx_spips: Use 8 dummy cycles with the QIOR/QIOR4 commands
+ * hw: register: Run post_write hook on reset
+
+----------------------------------------------------------------
+Alex Bennée (31):
+      include/exec/helper-head.h: support f16 in helper calls
+      target/arm/cpu64: introduce ARM_V8_FP16 feature bit
+      target/arm/cpu.h: update comment for half-precision values
+      target/arm/cpu.h: add additional float_status flags
+      target/arm/helper: pass explicit fpst to set_rmode
+      arm/translate-a64: implement half-precision F(MIN|MAX)(V|NMV)
+      arm/translate-a64: handle_3same_64 comment fix
+      arm/translate-a64: initial decode for simd_three_reg_same_fp16
+      arm/translate-a64: add FP16 FADD/FABD/FSUB/FMUL/FDIV to simd_three_reg_same_fp16
+      arm/translate-a64: add FP16 F[A]C[EQ/GE/GT] to simd_three_reg_same_fp16
+      arm/translate-a64: add FP16 FMULA/X/S to simd_three_reg_same_fp16
+      arm/translate-a64: add FP16 FR[ECP/SQRT]S to simd_three_reg_same_fp16
+      arm/translate-a64: add FP16 pairwise ops simd_three_reg_same_fp16
+      arm/translate-a64: add FP16 FMULX/MLS/FMLA to simd_indexed
+      arm/translate-a64: add FP16 x2 ops for simd_indexed
+      arm/translate-a64: initial decode for simd_two_reg_misc_fp16
+      arm/translate-a64: add FP16 FPRINTx to simd_two_reg_misc_fp16
+      arm/translate-a64: add FCVTxx to simd_two_reg_misc_fp16
+      arm/translate-a64: add FP16 FCMxx (zero) to simd_two_reg_misc_fp16
+      arm/translate-a64: add FP16 SCVTF/UCVFT to simd_two_reg_misc_fp16
+      arm/translate-a64: add FP16 FNEG/FABS to simd_two_reg_misc_fp16
+      arm/helper.c: re-factor recpe and add recepe_f16
+      arm/translate-a64: add FP16 FRECPE
+      arm/translate-a64: add FP16 FRCPX to simd_two_reg_misc_fp16
+      arm/translate-a64: add FP16 FSQRT to simd_two_reg_misc_fp16
+      arm/helper.c: re-factor rsqrte and add rsqrte_f16
+      arm/translate-a64: add FP16 FRSQRTE to simd_two_reg_misc_fp16
+      arm/translate-a64: add FP16 FMOV to simd_mod_imm
+      arm/translate-a64: add all FP16 ops in simd_scalar_pairwise
+      arm/translate-a64: implement simd_scalar_three_reg_same_fp16
+      arm/translate-a64: add all single op FP16 to handle_fp_1src_half
+
+Alistair Francis (2):
+      hw: register: Run post_write hook on reset
+      MAINTAINERS: Update my email address
+
+Corey Minyard (2):
+      i2c: Fix some brace style issues
+      i2c: Move the bus class to i2c.h
+
+Francisco Iglesias (2):
+      xilinx_spips: Enable only two slaves when reading/writing with stripe
+      xilinx_spips: Use 8 dummy cycles with the QIOR/QIOR4 commands
+
+Linus Walleij (3):
+      hw/i2c-ddc: Do not fail writes
+      hw/sii9022: Add support for Silicon Image SII9022
+      arm/vexpress: Add proper display connector emulation
+
+Peter Maydell (2):
+      target/arm: Enable ARM_V8_FP16 feature bit for the AArch64 "any" CPU
+      linux-user: Report AArch64 FP16 support via hwcap bits
+
+ hw/display/Makefile.objs        |    1 +
+ include/exec/helper-head.h      |    3 +
+ include/fpu/softfloat.h         |   18 +-
+ include/hw/i2c/i2c.h            |   23 +-
+ include/hw/register.h           |    6 +-
+ target/arm/cpu.h                |   34 +-
+ target/arm/helper-a64.h         |   33 +
+ target/arm/helper.h             |   14 +-
+ hw/arm/vexpress.c               |    6 +-
+ hw/core/register.c              |    8 +
+ hw/display/sii9022.c            |  191 ++++++
+ hw/i2c/core.c                   |   18 -
+ hw/i2c/i2c-ddc.c                |    4 +-
+ hw/ssi/xilinx_spips.c           |   43 +-
+ linux-user/elfload.c            |    2 +
+ target/arm/cpu64.c              |    1 +
+ target/arm/helper-a64.c         |  269 +++++++++
+ target/arm/helper.c             |  481 ++++++++-------
+ target/arm/translate-a64.c      | 1266 +++++++++++++++++++++++++++++++++------
+ target/arm/translate.c          |   12 +-
+ MAINTAINERS                     |   12 +-
+ default-configs/arm-softmmu.mak |    2 +
+ hw/display/trace-events         |    5 +
+ 23 files changed, 1981 insertions(+), 471 deletions(-)
+ create mode 100644 hw/display/sii9022.c
