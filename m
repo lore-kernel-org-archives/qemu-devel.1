@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1erX5T-0000Jb-UY
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 17:54:10 -0500
+	(envelope-from <cota@braap.org>) id 1erX5Q-0000JE-GA
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 17:54:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1erX5P-0004sb-2G
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 17:54:07 -0500
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:38465)
+	(envelope-from <cota@braap.org>) id 1erX5M-0004oC-N6
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 17:54:04 -0500
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:44289)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1erX5O-0004re-PT
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 17:54:02 -0500
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1erX5M-0004ks-Hf
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 17:54:00 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu,  1 Mar 2018 17:53:58 -0500
-Message-Id: <1519944838-12430-15-git-send-email-cota@braap.org>
+Date: Thu,  1 Mar 2018 17:53:45 -0500
+Message-Id: <1519944838-12430-2-git-send-email-cota@braap.org>
 In-Reply-To: <1519944838-12430-1-git-send-email-cota@braap.org>
 References: <1519944838-12430-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCHv1 14/14] target/openrisc: convert to
- TranslatorOps
+Subject: [Qemu-devel] [PATCHv1 01/14] translator: merge max_insns into
+ DisasContextBase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,241 +25,289 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Stafford Horne <shorne@gmail.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>
 
-Notes:
+While at it, use int for both num_insns and max_insns to make
+sure we have same-type comparisons.
 
-- Changed the num_insns test in insn_start to check for
-  dc->base.num_insns > 1, since when tb_start is first
-  called in a TB, base.num_insns is already set to 1.
-
-- Removed DISAS_NEXT from the switch in tb_stop; use
-  DISAS_TOO_MANY instead.
-
-- Added an assert_not_reached on tb_stop for DISAS_NEXT
-  and the default case.
-
-- Merged the two separate log_target_disas calls into the
-  disas_log op.
-
-Cc: Stafford Horne <shorne@gmail.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/openrisc/translate.c | 163 +++++++++++++++++++++-----------------------
- 1 file changed, 79 insertions(+), 84 deletions(-)
+ include/exec/translator.h  |  8 ++++----
+ accel/tcg/translator.c     | 21 ++++++++++-----------
+ target/alpha/translate.c   |  6 ++----
+ target/arm/translate-a64.c |  8 +++-----
+ target/arm/translate.c     |  9 +++------
+ target/hppa/translate.c    |  7 ++-----
+ target/i386/translate.c    |  5 +----
+ target/ppc/translate.c     |  5 ++---
+ 8 files changed, 27 insertions(+), 42 deletions(-)
 
-diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index b37414f..7cf29cd 100644
---- a/target/openrisc/translate.c
-+++ b/target/openrisc/translate.c
-@@ -1520,46 +1520,22 @@ static void disas_openrisc_insn(DisasContext *dc, OpenRISCCPU *cpu)
-     }
- }
+diff --git a/include/exec/translator.h b/include/exec/translator.h
+index e2dc2a0..71e7b2c 100644
+--- a/include/exec/translator.h
++++ b/include/exec/translator.h
+@@ -58,6 +58,7 @@ typedef enum DisasJumpType {
+  *           disassembly).
+  * @is_jmp: What instruction to disassemble next.
+  * @num_insns: Number of translated instructions (including current).
++ * @max_insns: Maximum number of instructions to be translated in this TB.
+  * @singlestep_enabled: "Hardware" single stepping enabled.
+  *
+  * Architecture-agnostic disassembly context.
+@@ -67,7 +68,8 @@ typedef struct DisasContextBase {
+     target_ulong pc_first;
+     target_ulong pc_next;
+     DisasJumpType is_jmp;
+-    unsigned int num_insns;
++    int num_insns;
++    int max_insns;
+     bool singlestep_enabled;
+ } DisasContextBase;
  
--void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-+static void openrisc_tr_init_disas_context(DisasContextBase *dcb, CPUState *cs)
+@@ -76,7 +78,6 @@ typedef struct DisasContextBase {
+  * @init_disas_context:
+  *      Initialize the target-specific portions of DisasContext struct.
+  *      The generic DisasContextBase has already been initialized.
+- *      Return max_insns, modified as necessary by db->tb->flags.
+  *
+  * @tb_start:
+  *      Emit any code required before the start of the main loop,
+@@ -106,8 +107,7 @@ typedef struct DisasContextBase {
+  *      Print instruction disassembly to log.
+  */
+ typedef struct TranslatorOps {
+-    int (*init_disas_context)(DisasContextBase *db, CPUState *cpu,
+-                              int max_insns);
++    void (*init_disas_context)(DisasContextBase *db, CPUState *cpu);
+     void (*tb_start)(DisasContextBase *db, CPUState *cpu);
+     void (*insn_start)(DisasContextBase *db, CPUState *cpu);
+     bool (*breakpoint_check)(DisasContextBase *db, CPUState *cpu,
+diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
+index 23c6602..0f9dca9 100644
+--- a/accel/tcg/translator.c
++++ b/accel/tcg/translator.c
+@@ -34,8 +34,6 @@ void translator_loop_temp_check(DisasContextBase *db)
+ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
+                      CPUState *cpu, TranslationBlock *tb)
  {
-+    DisasContext *dc = container_of(dcb, DisasContext, base);
-     CPUOpenRISCState *env = cs->env_ptr;
--    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
--    struct DisasContext ctx, *dc = &ctx;
--    uint32_t pc_start;
--    uint32_t next_page_start;
--    int num_insns;
 -    int max_insns;
 -
--    pc_start = tb->pc;
--
--    dc->base.tb = tb;
--    dc->base.singlestep_enabled = cs->singlestep_enabled;
--    dc->base.pc_next = pc_start;
--    dc->base.is_jmp = DISAS_NEXT;
-+    int bound;
+     /* Initialize DisasContext */
+     db->tb = tb;
+     db->pc_first = tb->pc;
+@@ -45,18 +43,18 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
+     db->singlestep_enabled = cpu->singlestep_enabled;
  
--    dc->mem_idx = cpu_mmu_index(&cpu->env, false);
-+    dc->mem_idx = cpu_mmu_index(env, false);
-     dc->tb_flags = dc->base.tb->flags;
-     dc->delayed_branch = (dc->tb_flags & TB_FLAGS_DFLAG) != 0;
-+    bound = -(dc->base.pc_first | TARGET_PAGE_MASK) / 4;
-+    dc->base.max_insns = MIN(dc->base.max_insns, bound);
-+}
- 
--    next_page_start = (pc_start & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
--    num_insns = 0;
--    max_insns = tb_cflags(tb) & CF_COUNT_MASK;
--
+     /* Instruction counting */
+-    max_insns = tb_cflags(db->tb) & CF_COUNT_MASK;
 -    if (max_insns == 0) {
 -        max_insns = CF_COUNT_MASK;
--    }
++    db->max_insns = tb_cflags(db->tb) & CF_COUNT_MASK;
++    if (db->max_insns == 0) {
++        db->max_insns = CF_COUNT_MASK;
+     }
 -    if (max_insns > TCG_MAX_INSNS) {
 -        max_insns = TCG_MAX_INSNS;
--    }
--
--    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
--        && qemu_log_in_addr_range(pc_start)) {
--        qemu_log_lock();
--        qemu_log("----------------\n");
--        qemu_log("IN: %s\n", lookup_symbol(pc_start));
--    }
--
--    gen_tb_start(tb);
-+static void openrisc_tr_tb_start(DisasContextBase *db, CPUState *cs)
-+{
-+    DisasContext *dc = container_of(db, DisasContext, base);
- 
-     /* Allow the TCG optimizer to see that R0 == 0,
-        when it's true, which is the common case.  */
-@@ -1568,50 +1544,55 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-     } else {
-         cpu_R[0] = cpu_R0;
++    if (db->max_insns > TCG_MAX_INSNS) {
++        db->max_insns = TCG_MAX_INSNS;
      }
-+}
- 
--    do {
--        tcg_gen_insn_start(dc->base.pc_next, (dc->delayed_branch ? 1 : 0)
--			   | (num_insns ? 2 : 0));
--        num_insns++;
-+static void openrisc_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
-+{
-+    DisasContext *dc = container_of(dcbase, DisasContext, base);
- 
--        if (unlikely(cpu_breakpoint_test(cs, dc->base.pc_next, BP_ANY))) {
--            tcg_gen_movi_tl(cpu_pc, dc->base.pc_next);
--            gen_exception(dc, EXCP_DEBUG);
--            dc->base.is_jmp = DISAS_NORETURN;
--            /* The address covered by the breakpoint must be included in
--               [tb->pc, tb->pc + tb->size) in order to for it to be
--               properly cleared -- thus we increment the PC here so that
--               the logic setting tb->size below does the right thing.  */
--            dc->base.pc_next += 4;
--            break;
--        }
-+    tcg_gen_insn_start(dc->base.pc_next, (dc->delayed_branch ? 1 : 0)
-+                       | (dc->base.num_insns > 1 ? 2 : 0));
-+}
- 
--        if (num_insns == max_insns && (tb_cflags(tb) & CF_LAST_IO)) {
--            gen_io_start();
--        }
--        disas_openrisc_insn(dc, cpu);
--        dc->base.pc_next += 4;
--
--        /* delay slot */
--        if (dc->delayed_branch) {
--            dc->delayed_branch--;
--            if (!dc->delayed_branch) {
--                tcg_gen_mov_tl(cpu_pc, jmp_pc);
--                tcg_gen_discard_tl(jmp_pc);
--                dc->base.is_jmp = DISAS_UPDATE;
--                break;
--            }
-+static bool openrisc_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
-+                                         const CPUBreakpoint *bp)
-+{
-+    DisasContext *dc = container_of(dcbase, DisasContext, base);
-+
-+    tcg_gen_movi_tl(cpu_pc, dc->base.pc_next);
-+    gen_exception(dc, EXCP_DEBUG);
-+    dc->base.is_jmp = DISAS_NORETURN;
-+    /* The address covered by the breakpoint must be included in
-+       [tb->pc, tb->pc + tb->size) in order to for it to be
-+       properly cleared -- thus we increment the PC here so that
-+       the logic setting tb->size below does the right thing.  */
-+    dc->base.pc_next += 4;
-+    return true;
-+}
-+
-+static void openrisc_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
-+{
-+    DisasContext *dc = container_of(dcbase, DisasContext, base);
-+    OpenRISCCPU *cpu = OPENRISC_CPU(cs);
-+
-+    disas_openrisc_insn(dc, cpu);
-+    dc->base.pc_next += 4;
-+
-+    /* delay slot */
-+    if (dc->delayed_branch) {
-+        dc->delayed_branch--;
-+        if (!dc->delayed_branch) {
-+            tcg_gen_mov_tl(cpu_pc, jmp_pc);
-+            tcg_gen_discard_tl(jmp_pc);
-+            dc->base.is_jmp = DISAS_UPDATE;
-+            return;
-         }
--    } while (!dc->base.is_jmp
--             && !tcg_op_buf_full()
--             && !dc->base.singlestep_enabled
--             && !singlestep
--             && (dc->base.pc_next < next_page_start)
--             && num_insns < max_insns);
--
--    if (tb_cflags(tb) & CF_LAST_IO) {
--        gen_io_end();
+     if (db->singlestep_enabled || singlestep) {
+-        max_insns = 1;
++        db->max_insns = 1;
      }
-+}
-+
-+static void openrisc_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
-+{
-+    DisasContext *dc = container_of(dcbase, DisasContext, base);
  
-     if ((dc->tb_flags & TB_FLAGS_DFLAG ? 1 : 0) != (dc->delayed_branch != 0)) {
-         tcg_gen_movi_i32(cpu_dflag, dc->delayed_branch != 0);
-@@ -1626,10 +1607,9 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-         gen_exception(dc, EXCP_DEBUG);
-     } else {
-         switch (dc->base.is_jmp) {
--        case DISAS_NEXT:
-+        case DISAS_TOO_MANY:
-             gen_goto_tb(dc, 0, dc->base.pc_next);
+-    max_insns = ops->init_disas_context(db, cpu, max_insns);
++    ops->init_disas_context(db, cpu);
+     tcg_debug_assert(db->is_jmp == DISAS_NEXT);  /* no early exit */
+ 
+     /* Reset the temp count so that we can identify leaks */
+@@ -95,7 +93,8 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
+            update db->pc_next and db->is_jmp to indicate what should be
+            done next -- either exiting this loop or locate the start of
+            the next instruction.  */
+-        if (db->num_insns == max_insns && (tb_cflags(db->tb) & CF_LAST_IO)) {
++        if (db->num_insns == db->max_insns
++            && (tb_cflags(db->tb) & CF_LAST_IO)) {
+             /* Accept I/O on the last instruction.  */
+             gen_io_start();
+             ops->translate_insn(db, cpu);
+@@ -111,7 +110,7 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
+ 
+         /* Stop translation if the output buffer is full,
+            or we have executed all of the allowed instructions.  */
+-        if (tcg_op_buf_full() || db->num_insns >= max_insns) {
++        if (tcg_op_buf_full() || db->num_insns >= db->max_insns) {
+             db->is_jmp = DISAS_TOO_MANY;
              break;
--        default:
-         case DISAS_NORETURN:
-         case DISAS_JUMP:
-         case DISAS_TB_JUMP:
-@@ -1639,20 +1619,35 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-                to find the next TB */
-             tcg_gen_exit_tb(0);
-             break;
-+        default:
-+            g_assert_not_reached();
          }
-     }
-+}
- 
--    gen_tb_end(tb, num_insns);
-+static void openrisc_tr_disas_log(const DisasContextBase *dcbase, CPUState *cs)
-+{
-+    DisasContext *s = container_of(dcbase, DisasContext, base);
- 
--    tb->size = dc->base.pc_next - pc_start;
--    tb->icount = num_insns;
-+    qemu_log("IN: %s\n", lookup_symbol(s->base.pc_first));
-+    log_target_disas(cs, s->base.pc_first, s->base.tb->size);
-+}
- 
--    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
--        && qemu_log_in_addr_range(pc_start)) {
--        log_target_disas(cs, pc_start, tb->size);
--        qemu_log("\n");
--        qemu_log_unlock();
--    }
-+static const TranslatorOps openrisc_tr_ops = {
-+    .init_disas_context = openrisc_tr_init_disas_context,
-+    .tb_start           = openrisc_tr_tb_start,
-+    .insn_start         = openrisc_tr_insn_start,
-+    .breakpoint_check   = openrisc_tr_breakpoint_check,
-+    .translate_insn     = openrisc_tr_translate_insn,
-+    .tb_stop            = openrisc_tr_tb_stop,
-+    .disas_log          = openrisc_tr_disas_log,
-+};
-+
-+void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-+{
-+    DisasContext ctx;
-+
-+    translator_loop(&openrisc_tr_ops, &ctx.base, cs, tb);
+diff --git a/target/alpha/translate.c b/target/alpha/translate.c
+index 73a1b5e..15eca71 100644
+--- a/target/alpha/translate.c
++++ b/target/alpha/translate.c
+@@ -2919,8 +2919,7 @@ static DisasJumpType translate_one(DisasContext *ctx, uint32_t insn)
+     return ret;
  }
  
- void openrisc_cpu_dump_state(CPUState *cs, FILE *f,
+-static int alpha_tr_init_disas_context(DisasContextBase *dcbase,
+-                                       CPUState *cpu, int max_insns)
++static void alpha_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cpu)
+ {
+     DisasContext *ctx = container_of(dcbase, DisasContext, base);
+     CPUAlphaState *env = cpu->env_ptr;
+@@ -2959,8 +2958,7 @@ static int alpha_tr_init_disas_context(DisasContextBase *dcbase,
+         mask = TARGET_PAGE_MASK;
+     }
+     bound = -(ctx->base.pc_first | mask) / 4;
+-
+-    return MIN(max_insns, bound);
++    ctx->base.max_insns = MIN(ctx->base.max_insns, bound);
+ }
+ 
+ static void alpha_tr_tb_start(DisasContextBase *db, CPUState *cpu)
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 1c88539..55f00a6 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -12009,8 +12009,8 @@ static void disas_a64_insn(CPUARMState *env, DisasContext *s)
+     free_tmp_a64(s);
+ }
+ 
+-static int aarch64_tr_init_disas_context(DisasContextBase *dcbase,
+-                                         CPUState *cpu, int max_insns)
++static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
++                                          CPUState *cpu)
+ {
+     DisasContext *dc = container_of(dcbase, DisasContext, base);
+     CPUARMState *env = cpu->env_ptr;
+@@ -12073,11 +12073,9 @@ static int aarch64_tr_init_disas_context(DisasContextBase *dcbase,
+     if (dc->ss_active) {
+         bound = 1;
+     }
+-    max_insns = MIN(max_insns, bound);
++    dc->base.max_insns = MIN(dc->base.max_insns, bound);
+ 
+     init_tmp_a64_array(dc);
+-
+-    return max_insns;
+ }
+ 
+ static void aarch64_tr_tb_start(DisasContextBase *db, CPUState *cpu)
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 1270022..9284975 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -11975,8 +11975,7 @@ static bool insn_crosses_page(CPUARMState *env, DisasContext *s)
+     return !thumb_insn_is_16bit(s, insn);
+ }
+ 
+-static int arm_tr_init_disas_context(DisasContextBase *dcbase,
+-                                     CPUState *cs, int max_insns)
++static void arm_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+ {
+     DisasContext *dc = container_of(dcbase, DisasContext, base);
+     CPUARMState *env = cs->env_ptr;
+@@ -12038,14 +12037,14 @@ static int arm_tr_init_disas_context(DisasContextBase *dcbase,
+ 
+     /* If architectural single step active, limit to 1.  */
+     if (is_singlestepping(dc)) {
+-        max_insns = 1;
++        dc->base.max_insns = 1;
+     }
+ 
+     /* ARM is a fixed-length ISA.  Bound the number of insns to execute
+        to those left on the page.  */
+     if (!dc->thumb) {
+         int bound = (dc->next_page_start - dc->base.pc_first) / 4;
+-        max_insns = MIN(max_insns, bound);
++        dc->base.max_insns = MIN(dc->base.max_insns, bound);
+     }
+ 
+     cpu_F0s = tcg_temp_new_i32();
+@@ -12056,8 +12055,6 @@ static int arm_tr_init_disas_context(DisasContextBase *dcbase,
+     cpu_V1 = cpu_F1d;
+     /* FIXME: cpu_M0 can probably be the same as cpu_V0.  */
+     cpu_M0 = tcg_temp_new_i64();
+-
+-    return max_insns;
+ }
+ 
+ static void arm_tr_tb_start(DisasContextBase *dcbase, CPUState *cpu)
+diff --git a/target/hppa/translate.c b/target/hppa/translate.c
+index 6499b39..1afca76 100644
+--- a/target/hppa/translate.c
++++ b/target/hppa/translate.c
+@@ -4685,8 +4685,7 @@ static DisasJumpType translate_one(DisasContext *ctx, uint32_t insn)
+     return gen_illegal(ctx);
+ }
+ 
+-static int hppa_tr_init_disas_context(DisasContextBase *dcbase,
+-                                      CPUState *cs, int max_insns)
++static void hppa_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+ {
+     DisasContext *ctx = container_of(dcbase, DisasContext, base);
+     int bound;
+@@ -4716,14 +4715,12 @@ static int hppa_tr_init_disas_context(DisasContextBase *dcbase,
+ 
+     /* Bound the number of instructions by those left on the page.  */
+     bound = -(ctx->base.pc_first | TARGET_PAGE_MASK) / 4;
+-    bound = MIN(max_insns, bound);
++    ctx->base.max_insns = MIN(ctx->base.max_insns, bound);
+ 
+     ctx->ntempr = 0;
+     ctx->ntempl = 0;
+     memset(ctx->tempr, 0, sizeof(ctx->tempr));
+     memset(ctx->templ, 0, sizeof(ctx->templ));
+-
+-    return bound;
+ }
+ 
+ static void hppa_tr_tb_start(DisasContextBase *dcbase, CPUState *cs)
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 0135415..a462913 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -8400,8 +8400,7 @@ void tcg_x86_init(void)
+     }
+ }
+ 
+-static int i386_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cpu,
+-                                      int max_insns)
++static void i386_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cpu)
+ {
+     DisasContext *dc = container_of(dcbase, DisasContext, base);
+     CPUX86State *env = cpu->env_ptr;
+@@ -8468,8 +8467,6 @@ static int i386_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cpu,
+     cpu_ptr0 = tcg_temp_new_ptr();
+     cpu_ptr1 = tcg_temp_new_ptr();
+     cpu_cc_srcT = tcg_temp_local_new();
+-
+-    return max_insns;
+ }
+ 
+ static void i386_tr_tb_start(DisasContextBase *db, CPUState *cpu)
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 0a0c090..b5a0dd7 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -7207,8 +7207,7 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
+ #endif
+ }
+ 
+-static int ppc_tr_init_disas_context(DisasContextBase *dcbase,
+-                                     CPUState *cs, int max_insns)
++static void ppc_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+ {
+     DisasContext *ctx = container_of(dcbase, DisasContext, base);
+     CPUPPCState *env = cs->env_ptr;
+@@ -7274,7 +7273,7 @@ static int ppc_tr_init_disas_context(DisasContextBase *dcbase,
+ #endif
+ 
+     bound = -(ctx->base.pc_first | TARGET_PAGE_MASK) / 4;
+-    return MIN(max_insns, bound);
++    ctx->base.max_insns = MIN(ctx->base.max_insns, bound);
+ }
+ 
+ static void ppc_tr_tb_start(DisasContextBase *db, CPUState *cs)
 -- 
 2.7.4
