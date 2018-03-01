@@ -1,22 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1erL25-0001Lv-LB
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:01:54 -0500
+	(envelope-from <frederic.konrad@adacore.com>) id 1erL2y-00028x-Ng
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:02:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1erL1z-0001DU-Ro
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:01:49 -0500
-Date: Thu, 1 Mar 2018 11:01:34 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180301100134.GB4862@localhost.localdomain>
-References: <20180223235142.21501-1-jsnow@redhat.com>
-	<20180223235142.21501-19-jsnow@redhat.com>
-	<20180228181553.GL4855@localhost.localdomain>
-	<24618453-fd43-de12-1e14-2fc9ed2c4b8b@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <24618453-fd43-de12-1e14-2fc9ed2c4b8b@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v4 18/21] blockjobs: add block-job-finalize
+	(envelope-from <frederic.konrad@adacore.com>) id 1erL2t-000263-TJ
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:02:44 -0500
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Date: Thu,  1 Mar 2018 11:02:16 +0100
+Message-Id: <1519898536-19027-1-git-send-email-frederic.konrad@adacore.com>
+Subject: [Qemu-devel] [PATCH] grlib_apbuart: always enable tx and rx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +17,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: jcd@tribudubois.net, chouteau@adacore.com, mark.cave-ayland@ilande.co.uk, qemu-trivial@nongnu.org, frederic.konrad@adacore.com
 
-Am 28.02.2018 um 20:14 hat John Snow geschrieben:
-> 
-> 
-> On 02/28/2018 01:15 PM, Kevin Wolf wrote:
-> > Is it because you want to avoid that the user picks an automatic job for
-> > completing the mixed transaction?
-> 
-> I wanted to avoid the case that a job without the manual property would
-> be stuck "pending" -- which I have defined to mean that it is waiting on
-> an authorization from the user -- which isn't really true: it's waiting
-> on its peers in the transaction to receive that authorization.
-> 
-> It would indeed be simpler to just let them stick around in PENDING like
-> their peers, but it felt like a hacky way to allow mixed-mode
-> transactions -- like they had been promoted for just a subset of their
-> lifetime.
-> 
-> So, mostly it was a semantic decision and not a functional one based on
-> what I considered "WAITING" to mean vs "PENDING".
-> 
-> If the definitions (and documentation) are adjusted it can be changed
-> for the simpler layout if it seems just as good from the API
-> perspective. (It's certainly better implementationally, as you say.)
+We often use a bootloader for this board. So lets set the uart in a state
+which it can emit characters as if we were using a bootloader.
 
-I actually like it better conceptually, too, because I think of WAITING
-as a state that waits for jobs in earlier states (i.e. RUNNING/READY
-usually) and then everything moves forward together. Also waiting for
-jobs that are already in a later state like PENDING, but only for
-automatic jobs, makes the mental model more complex (or maybe it's just
-me...).
+Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+---
+ hw/char/grlib_apbuart.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Kevin
+diff --git a/hw/char/grlib_apbuart.c b/hw/char/grlib_apbuart.c
+index bac11be..a8020ea 100644
+--- a/hw/char/grlib_apbuart.c
++++ b/hw/char/grlib_apbuart.c
+@@ -265,8 +265,8 @@ static void grlib_apbuart_reset(DeviceState *d)
+ 
+     /* Transmitter FIFO and shift registers are always empty in QEMU */
+     uart->status =  UART_TRANSMIT_FIFO_EMPTY | UART_TRANSMIT_SHIFT_EMPTY;
+-    /* Everything is off */
+-    uart->control = 0;
++    /* Enable Tx and Rx as the bootloader would do */
++    uart->control = UART_RECEIVE_ENABLE | UART_TRANSMIT_ENABLE;
+     /* Flush receive FIFO */
+     uart->len = 0;
+     uart->current = 0;
+-- 
+1.8.3.1
