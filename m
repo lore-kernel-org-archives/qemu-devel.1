@@ -1,28 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1erNmx-00004r-T0
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:58:25 -0500
+	(envelope-from <cohuck@redhat.com>) id 1erNnB-0000Dm-0R
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:58:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1erNmu-0005Cy-Qe
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:58:23 -0500
-Date: Thu, 1 Mar 2018 12:58:12 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180301125811.GF2994@work-vm>
-References: <20180228195320.165230-1-borntraeger@de.ibm.com>
-	<79f7059b-f2d3-a758-6bb9-29433b31b313@redhat.com>
-	<20180301092442.GA2994@work-vm>
-	<aef0a651-4d04-13b1-76a6-0c1efb6c9e04@de.ibm.com>
-	<20180301114543.GC2994@work-vm>
-	<69654fb2-f5ba-c23b-f6f5-1b559692cf37@de.ibm.com>
-	<20180301122854.GD2994@work-vm>
-	<416dbf71-c311-1f40-baa6-414cdf220f4d@de.ibm.com>
-	<fa1fed0b-4c7d-068e-01d3-cd34aa9d6864@de.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fa1fed0b-4c7d-068e-01d3-cd34aa9d6864@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] s390/kvm: implement clearing part of
- IPL clear
+	(envelope-from <cohuck@redhat.com>) id 1erNn7-0005I5-Va
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:58:37 -0500
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Thu,  1 Mar 2018 13:58:03 +0100
+Message-Id: <20180301125830.24377-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PULL v2 00/27] s390x updates (and friends)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,143 +17,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: peter.maydell@linaro.org
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, rth@twiddle.net, agraf@suse.de, david@redhat.com, thuth@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-* Christian Borntraeger (borntraeger@de.ibm.com) wrote:
-> 
-> 
-> On 03/01/2018 01:35 PM, Christian Borntraeger wrote:
-> > 
-> > 
-> > On 03/01/2018 01:28 PM, Dr. David Alan Gilbert wrote:
-> >> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
-> >>>
-> >>>
-> >>> On 03/01/2018 12:45 PM, Dr. David Alan Gilbert wrote:
-> >>>> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
-> >>>>>
-> >>>>>
-> >>>>> On 03/01/2018 10:24 AM, Dr. David Alan Gilbert wrote:
-> >>>>>> * Thomas Huth (thuth@redhat.com) wrote:
-> >>>>>>> On 28.02.2018 20:53, Christian Borntraeger wrote:
-> >>>>>>>> When a guests reboots with diagnose 308 subcode 3 it requests the memory
-> >>>>>>>> to be cleared. We did not do it so far. This does not only violate the
-> >>>>>>>> architecture, it also misses the chance to free up that memory on
-> >>>>>>>> reboot, which would help on host memory over commitment.  By using
-> >>>>>>>> ram_block_discard_range we can cover both cases.
-> >>>>>>>
-> >>>>>>> Sounds like a good idea. I wonder whether that release_all_ram()
-> >>>>>>> function should maybe rather reside in exec.c, so that other machines
-> >>>>>>> that want to clear all RAM at reset time can use it, too?
-> >>>>>>>
-> >>>>>>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> >>>>>>>> ---
-> >>>>>>>>  target/s390x/kvm.c | 19 +++++++++++++++++++
-> >>>>>>>>  1 file changed, 19 insertions(+)
-> >>>>>>>>
-> >>>>>>>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> >>>>>>>> index 8f3a422288..2e145ad5c3 100644
-> >>>>>>>> --- a/target/s390x/kvm.c
-> >>>>>>>> +++ b/target/s390x/kvm.c
-> >>>>>>>> @@ -34,6 +34,8 @@
-> >>>>>>>>  #include "qapi/error.h"
-> >>>>>>>>  #include "qemu/error-report.h"
-> >>>>>>>>  #include "qemu/timer.h"
-> >>>>>>>> +#include "qemu/rcu_queue.h"
-> >>>>>>>> +#include "sysemu/cpus.h"
-> >>>>>>>>  #include "sysemu/sysemu.h"
-> >>>>>>>>  #include "sysemu/hw_accel.h"
-> >>>>>>>>  #include "hw/boards.h"
-> >>>>>>>> @@ -41,6 +43,7 @@
-> >>>>>>>>  #include "sysemu/device_tree.h"
-> >>>>>>>>  #include "exec/gdbstub.h"
-> >>>>>>>>  #include "exec/address-spaces.h"
-> >>>>>>>> +#include "exec/ram_addr.h"
-> >>>>>>>>  #include "trace.h"
-> >>>>>>>>  #include "qapi-event.h"
-> >>>>>>>>  #include "hw/s390x/s390-pci-inst.h"
-> >>>>>>>> @@ -1841,6 +1844,14 @@ static int kvm_arch_handle_debug_exit(S390CPU *cpu)
-> >>>>>>>>      return ret;
-> >>>>>>>>  }
-> >>>>>>>>  
-> >>>>>>>> +static void release_all_rams(void)
-> >>>>>>>
-> >>>>>>> s/rams/ram/ maybe?
-> >>>>>>>
-> >>>>>>>> +{
-> >>>>>>>> +    struct RAMBlock *rb;
-> >>>>>>>> +
-> >>>>>>>> +    QLIST_FOREACH_RCU(rb, &ram_list.blocks, next)
-> >>>>>>>> +        ram_block_discard_range(rb, 0, rb->used_length);
-> >>>>>>>
-> >>>>>>> From a coding style point of view, I think there should be curly braces
-> >>>>>>> around ram_block_discard_range() ?
-> >>>>>>
-> >>>>>> I think this might break if it happens during a postcopy migrate.
-> >>>>>> The destination CPU is running, so it can do a reboot at just the wrong
-> >>>>>> time; and then the pages (that are protected by userfaultfd) would get
-> >>>>>> deallocated and trigger userfaultfd requests if accessed.
-> >>>>>
-> >>>>> Yes, userfaultd/postcopy is really fragile and relies on things that are not
-> >>>>> necessarily true (e.g. virito-balloon can also invalidate pages).
-> >>>>
-> >>>> That's why we use qemu_balloon_inhibit around postcopy to stop
-> >>>> ballooning; I'm not aware of anything else that does the same.
-> >>>
-> >>> we also have at least the pte_unused thing in mm/rmap.c that clearly
-> >>> predates userfaultfd. We might need to look into this as well....
-> >>
-> >> I've not come across that; what does that do?
-> > 
-> > It can drop a page on page out if the page is no longer of value. It is used by
-> > the CMMA (guest page hinting) code of s390x.
-> > 
-> > see kernel mm/rmap.c
-> > 
-> > 
-> > static bool try_to_unmap_one(struct page *page, struct vm_area_struct *vma,
-> >                      unsigned long address, void *arg)
-> > {
-> > [...]
-> >                 } else if (pte_unused(pteval)) {
-> >                         /*
-> >                          * The guest indicated that the page content is of no
-> >                          * interest anymore. Simply discard the pte, vmscan
-> >                          * will take care of the rest.
-> >                          */
-> > 			dec_mm_counter(mm, mm_counter(page));
-> >                         /* We have to invalidate as we cleared the pte */
-> >                         mmu_notifier_invalidate_range(mm, address,
-> >                                                       address + PAGE_SIZE);
-> >                 } else if (IS_ENABLED(CONFIG_MIGRATION) &&
-> >                                 (flags & (TTU_MIGRATION|TTU_SPLIT_FREEZE))) {
-> > [...]
-> > 
-> > 
-> 
-> Maybe something like this in the kernel
-> 
-> diff --git a/mm/rmap.c b/mm/rmap.c
-> index 47db27f8049e..9bdf4d448987 100644
-> --- a/mm/rmap.c
-> +++ b/mm/rmap.c
-> @@ -1483,7 +1483,7 @@ static bool try_to_unmap_one(struct page *page, struct vm_area_struct *vma,
->                                 set_pte_at(mm, address, pvmw.pte, pteval);
->                         }
->  
-> -               } else if (pte_unused(pteval)) {
-> +               } else if (pte_unused(pteval) && !vma->vm_userfaultfd_ctx.ctx) {
->                         /*
->                          * The guest indicated that the page content is of no
->                          * interest anymore. Simply discard the pte, vmscan
-> 
-> 
-> could help?
+The following changes since commit 0a773d55ac76c5aa89ed9187a3bc5af8c5c2a6d0:
 
-I guess so, but please check with aarcange; I don't know the mm code.
+  maintainers: Add myself as a OpenBSD maintainer (2018-02-23 12:05:07 +0000)
 
-Dave
+are available in the git repository at:
 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+  git://github.com/cohuck/qemu tags/s390x-20180301-v2
+
+for you to fetch changes up to be8b49de2491145a7aad3201803327b6f568cbd3:
+
+  s390x/tcg: fix loading 31bit PSWs with the highest bit set (2018-03-01 13:23:09 +0100)
+
+----------------------------------------------------------------
+- add query-cpus-fast and deprecate query-cpus, while adding s390 cpu
+  information
+- remove s390x memory hotplug implementation, which is not useable in
+  this form
+- add boot menu support in the s390-ccw bios
+- expose s390x guest crash information
+- fixes and cleaups
+
+----------------------------------------------------------------
+
+Christian Borntraeger (1):
+  s390x/cpu: expose the guest crash information
+
+Collin L. Walling (13):
+  s390-ccw: refactor boot map table code
+  s390-ccw: refactor eckd_block_num to use CHS
+  s390-ccw: refactor IPL structs
+  s390-ccw: update libc
+  s390-ccw: move auxiliary IPL data to separate location
+  s390-ccw: parse and set boot menu options
+  s390-ccw: set up interactive boot menu parameters
+  s390-ccw: read stage2 boot loader data to find menu
+  s390-ccw: print zipl boot menu
+  s390-ccw: read user input for boot index via the SCLP console
+  s390-ccw: set cp_receive mask only when needed and consume pending
+    service irqs
+  s390-ccw: use zipl values when no boot menu options are present
+  s390-ccw: interactive boot menu for scsi
+
+Cornelia Huck (1):
+  s390x: remove s390_get_memslot_count
+
+David Hildenbrand (4):
+  s390x/tcg: fix disabling/enabling DAT
+  s390x/tcg: add various alignment checks
+  s390x/sclp: remove memory hotplug support
+  s390x/tcg: fix loading 31bit PSWs with the highest bit set
+
+Dr. David Alan Gilbert (1):
+  s390/stattrib: Make SaveVMHandlers data static
+
+Halil Pasic (1):
+  s390x/cpumodel: document S390FeatDef.bit not applicable
+
+Luiz Capitulino (1):
+  qmp: add query-cpus-fast
+
+Thomas Huth (1):
+  pc-bios/s390: Rebuild the s390x firmware images with the boot menu
+    changes
+
+Viktor Mihajlovski (4):
+  qmp: expose s390-specific CPU info
+  qmp: add architecture specific cpu data for query-cpus-fast
+  qemu-doc: deprecate query-cpus
+  hmp: change hmp_info_cpus to use query-cpus-fast
+
+-- 
+2.13.6
