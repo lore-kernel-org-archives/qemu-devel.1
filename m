@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1erEIb-0004v4-5N
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 21:50:26 -0500
+	(envelope-from <peterx@redhat.com>) id 1erELT-0005m2-Hg
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 21:53:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1erEIZ-0004DV-Ek
-	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 21:50:25 -0500
-Date: Thu, 1 Mar 2018 10:50:04 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180301025004.GJ21336@lemon.usersys.redhat.com>
-References: <20180122220806.22154-1-mreitz@redhat.com>
-	<20180122220806.22154-6-mreitz@redhat.com>
-	<20180227074413.GB21035@lemon.usersys.redhat.com>
-	<2c81d46d-434d-d9bb-86b4-9a644bf0284a@redhat.com>
-	<9ce789eb-89b9-4a16-087e-977673d2c717@redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1erELO-00079K-Ld
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 21:53:23 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52110 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1erELO-00078d-HQ
+	for qemu-devel@nongnu.org; Wed, 28 Feb 2018 21:53:18 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 181B840FB646
+	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 02:53:18 +0000 (UTC)
+Date: Thu, 1 Mar 2018 10:53:12 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180301025312.GN27381@xz-mi>
+References: <20180228050633.7410-1-peterx@redhat.com>
+	<20180228050633.7410-5-peterx@redhat.com>
+	<20180228174349.GJ2981@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <9ce789eb-89b9-4a16-087e-977673d2c717@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 05/16] block/mirror: Convert to
- coroutines
+In-Reply-To: <20180228174349.GJ2981@work-vm>
+Subject: Re: [Qemu-devel] [PATCH 04/14] migration: let incoming side use
+ thread context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,50 +35,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-On Wed, 02/28 18:07, Max Reitz wrote:
-> On 2018-02-28 15:13, Max Reitz wrote:
-> > On 2018-02-27 08:44, Fam Zheng wrote:
-> >> On Mon, 01/22 23:07, Max Reitz wrote:
-> >>> @@ -101,7 +105,7 @@ static BlockErrorAction mirror_error_action(MirrorBlockJob *s, bool read,
-> >>>      }
-> >>>  }
-> >>>  
-> >>> -static void mirror_iteration_done(MirrorOp *op, int ret)
-> >>> +static void coroutine_fn mirror_iteration_done(MirrorOp *op, int ret)
-> >>>  {
-> >>>      MirrorBlockJob *s = op->s;
-> >>>      struct iovec *iov;
-> >>
-> >> I think we want s/qemu_coroutine_enter/aio_co_wake/ in mirror_iteration_done().
-> >> As an AIO callback before, this didn't matter, but now we are in an terminating
-> >> coroutine, so it is pointless to defer the termination, or even risky in that we
-> >> are in a aio_context_acquire/release section, but have already decremented
-> >> s->in_flight, which is fishy.
+On Wed, Feb 28, 2018 at 05:43:50PM +0000, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > The old incoming migration is running in main thread and default
+> > gcontext.  With the new qio_channel_add_watch_full() we can now let it
+> > run in the thread's own gcontext (if there is one).
 > > 
-> > I guess I'll still do the replacement, regardless of whether the next
-> > patch overwrites it again...
+> > Currently this patch does nothing alone.  But when any of the incoming
+> > migration is run in another iothread (e.g., the upcoming migrate-recover
+> > command), this patch will bind the incoming logic to the iothread
+> > instead of the main thread (which may already get page faulted and
+> > hanged).
 > 
-> Maybe I don't.  Doing this breaks iotest 041 because the
-> assert(data.done) in bdrv_co_yield_to_drain() fails.
-> 
-> Not sure why that is, but under the circumstance I guess it's best to
-> just pretend this never happened, continue to use qemu_coroutine_enter()
-> and just replace it in the next patch.
-> 
-> As for in_flight: What is the issue there?  We mostly need that to know
-> how many I/O requests are actually running, that is, how much buffer
-> space is used, how many I/O is done concurrently, etc. (and later we
-> need the in-flight information so that we don't access the target in
-> overlapping areas concurrently).  But it doesn't seem to be about how
-> many coroutines there are.
-> 
-> So as long as the s->in_flight decrement is done in the same critical
-> section as the op is deleted, we should be good...?
+> Does this make any difference to the Postcopy listener thread, which
+> takes over reading from the main thread once in postcopy mode?
+> (See savevm.c:postcopy_ram_listen_thread).
 
-I don't have a specific problem in my mind but is just generally concerned about
-the "if (s->in_flight == 0)" checks around mirror_exit.
+It should not.  It should only affect when use sends a
+"migrate-recover" with "run-oob=true".  The rest should be the same as
+before.  And since the postcopy ram load thread is a standalone thread
+with its own initial thread stack (so it's not really in a gmainloop),
+I can hardly tell how that can be affected since it'll always use its
+own thread stack.
 
-Fam
+Or, have I missed anything?
+
+-- 
+Peter Xu
