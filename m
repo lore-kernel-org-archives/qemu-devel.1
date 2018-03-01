@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1erNrP-0004IW-Qs
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:03:07 -0500
+	(envelope-from <cohuck@redhat.com>) id 1erNrX-0004RR-OW
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:03:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1erNrO-0007Rv-UQ
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:02:59 -0500
+	(envelope-from <cohuck@redhat.com>) id 1erNrW-0007XG-Et
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:03:07 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Thu,  1 Mar 2018 14:01:51 +0100
-Message-Id: <20180301130201.24666-18-cohuck@redhat.com>
+Date: Thu,  1 Mar 2018 14:01:52 +0100
+Message-Id: <20180301130201.24666-19-cohuck@redhat.com>
 In-Reply-To: <20180301130201.24666-1-cohuck@redhat.com>
 References: <20180301130201.24666-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL v2 17/27] s390x/tcg: fix disabling/enabling DAT
+Subject: [Qemu-devel] [PULL v2 18/27] s390x/tcg: add various alignment checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,92 +24,229 @@ Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, rth@tw
 
 From: David Hildenbrand <david@redhat.com>
 
-Currently, all memory accesses go via the MMU of the address space
-(primary, secondary, ...). This is bad, because we don't flush the TLB
-when disabling/enabling DAT. So we could add a tlb flush. However it
-is easier to simply select the MMU we already have in place for real
-memory access.
+Let's add proper alignment checks for a handful of instructions that
+require a SPECIFICATION exception in case alignment is violated.
 
-All we have to do is point at the right MMU and allow to execute these
-pages.
+Introduce new wout/in functions. As we are right now only using them for
+privileged instructions, we have to add ugly ifdefs to silence
+compilers.
+
+Convert STORE CPU ID right away to make use of the wout function.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20180213161240.19891-1-david@redhat.com>
+Message-Id: <20180215103822.15179-1-david@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-[CH: get rid of tabs]
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/cpu.h        |  7 ++++++-
- target/s390x/mmu_helper.c |  2 +-
- target/s390x/translate.c  | 10 +++++++---
- 3 files changed, 14 insertions(+), 5 deletions(-)
+ target/s390x/insn-data.def | 16 ++++++++--------
+ target/s390x/mem_helper.c  | 25 +++++++++++++++++++++++++
+ target/s390x/translate.c   | 43 ++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 75 insertions(+), 9 deletions(-)
 
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 09ec8a9b76..d4641663ef 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -312,11 +312,12 @@ extern const struct VMStateDescription vmstate_s390_cpu;
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 621e10d615..157619403d 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -1000,13 +1000,13 @@
+     /* ??? Not implemented - is it necessary? */
+     C(0xb204, SCK,     S,     Z,   0, 0, 0, 0, 0, 0)
+ /* SET CLOCK COMPARATOR */
+-    C(0xb206, SCKC,    S,     Z,   0, m2_64, 0, 0, sckc, 0)
++    C(0xb206, SCKC,    S,     Z,   0, m2_64a, 0, 0, sckc, 0)
+ /* SET CLOCK PROGRAMMABLE FIELD */
+     C(0x0107, SCKPF,   E,     Z,   0, 0, 0, 0, sckpf, 0)
+ /* SET CPU TIMER */
+-    C(0xb208, SPT,     S,     Z,   0, m2_64, 0, 0, spt, 0)
++    C(0xb208, SPT,     S,     Z,   0, m2_64a, 0, 0, spt, 0)
+ /* SET PREFIX */
+-    C(0xb210, SPX,     S,     Z,   0, m2_32u, 0, 0, spx, 0)
++    C(0xb210, SPX,     S,     Z,   0, m2_32ua, 0, 0, spx, 0)
+ /* SET PSW KEY FROM ADDRESS */
+     C(0xb20a, SPKA,    S,     Z,   0, a2, 0, 0, spka, 0)
+ /* SET STORAGE KEY EXTENDED */
+@@ -1021,20 +1021,20 @@
+ /* STORE CLOCK EXTENDED */
+     C(0xb278, STCKE,   S,     Z,   0, a2, 0, 0, stcke, 0)
+ /* STORE CLOCK COMPARATOR */
+-    C(0xb207, STCKC,   S,     Z,   la2, 0, new, m1_64, stckc, 0)
++    C(0xb207, STCKC,   S,     Z,   la2, 0, new, m1_64a, stckc, 0)
+ /* STORE CONTROL */
+     C(0xb600, STCTL,   RS_a,  Z,   0, a2, 0, 0, stctl, 0)
+     C(0xeb25, STCTG,   RSY_a, Z,   0, a2, 0, 0, stctg, 0)
+ /* STORE CPU ADDRESS */
+-    C(0xb212, STAP,    S,     Z,   la2, 0, new, m1_16, stap, 0)
++    C(0xb212, STAP,    S,     Z,   la2, 0, new, m1_16a, stap, 0)
+ /* STORE CPU ID */
+-    C(0xb202, STIDP,   S,     Z,   la2, 0, new, 0, stidp, 0)
++    C(0xb202, STIDP,   S,     Z,   la2, 0, new, m1_64a, stidp, 0)
+ /* STORE CPU TIMER */
+-    C(0xb209, STPT,    S,     Z,   la2, 0, new, m1_64, stpt, 0)
++    C(0xb209, STPT,    S,     Z,   la2, 0, new, m1_64a, stpt, 0)
+ /* STORE FACILITY LIST */
+     C(0xb2b1, STFL,    S,     Z,   0, 0, 0, 0, stfl, 0)
+ /* STORE PREFIX */
+-    C(0xb211, STPX,    S,     Z,   la2, 0, new, m1_32, stpx, 0)
++    C(0xb211, STPX,    S,     Z,   la2, 0, new, m1_32a, stpx, 0)
+ /* STORE SYSTEM INFORMATION */
+     C(0xb27d, STSI,    S,     Z,   0, a2, 0, 0, stsi, 0)
+ /* STORE THEN AND SYSTEM MASK */
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 427b795a78..d5291b246e 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -693,6 +693,11 @@ void HELPER(lam)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+     uintptr_t ra = GETPC();
+     int i;
  
- #define FLAG_MASK_PSW_SHIFT     31
- #define FLAG_MASK_PER           (PSW_MASK_PER    >> FLAG_MASK_PSW_SHIFT)
-+#define FLAG_MASK_DAT           (PSW_MASK_DAT    >> FLAG_MASK_PSW_SHIFT)
- #define FLAG_MASK_PSTATE        (PSW_MASK_PSTATE >> FLAG_MASK_PSW_SHIFT)
- #define FLAG_MASK_ASC           (PSW_MASK_ASC    >> FLAG_MASK_PSW_SHIFT)
- #define FLAG_MASK_64            (PSW_MASK_64     >> FLAG_MASK_PSW_SHIFT)
- #define FLAG_MASK_32            (PSW_MASK_32     >> FLAG_MASK_PSW_SHIFT)
--#define FLAG_MASK_PSW		(FLAG_MASK_PER | FLAG_MASK_PSTATE \
-+#define FLAG_MASK_PSW           (FLAG_MASK_PER | FLAG_MASK_DAT | FLAG_MASK_PSTATE \
-                                 | FLAG_MASK_ASC | FLAG_MASK_64 | FLAG_MASK_32)
- 
- /* Control register 0 bits */
-@@ -340,6 +341,10 @@ extern const struct VMStateDescription vmstate_s390_cpu;
- 
- static inline int cpu_mmu_index(CPUS390XState *env, bool ifetch)
- {
-+    if (!(env->psw.mask & PSW_MASK_DAT)) {
-+        return MMU_REAL_IDX;
++    if (a2 & 0x3) {
++        /* we either came here by lam or lamy, which have different lengths */
++        s390_program_interrupt(env, PGM_SPECIFICATION, ILEN_AUTO, ra);
 +    }
 +
-     switch (env->psw.mask & PSW_MASK_ASC) {
-     case PSW_ASC_PRIMARY:
-         return MMU_PRIMARY_IDX;
-diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index f477cc006a..23fb2e7501 100644
---- a/target/s390x/mmu_helper.c
-+++ b/target/s390x/mmu_helper.c
-@@ -544,7 +544,7 @@ int mmu_translate_real(CPUS390XState *env, target_ulong raddr, int rw,
- {
-     const bool lowprot_enabled = env->cregs[0] & CR0_LOWPROT;
+     for (i = r1;; i = (i + 1) % 16) {
+         env->aregs[i] = cpu_ldl_data_ra(env, a2, ra);
+         a2 += 4;
+@@ -709,6 +714,10 @@ void HELPER(stam)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+     uintptr_t ra = GETPC();
+     int i;
  
--    *flags = PAGE_READ | PAGE_WRITE;
-+    *flags = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-     if (is_low_address(raddr & TARGET_PAGE_MASK) && lowprot_enabled) {
-         /* see comment in mmu_translate() how this works */
-         *flags |= PAGE_WRITE_INV;
++    if (a2 & 0x3) {
++        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
++    }
++
+     for (i = r1;; i = (i + 1) % 16) {
+         cpu_stl_data_ra(env, a2, env->aregs[i], ra);
+         a2 += 4;
+@@ -1620,6 +1629,10 @@ void HELPER(lctlg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+     uint64_t src = a2;
+     uint32_t i;
+ 
++    if (src & 0x7) {
++        s390_program_interrupt(env, PGM_SPECIFICATION, 6, ra);
++    }
++
+     for (i = r1;; i = (i + 1) % 16) {
+         uint64_t val = cpu_ldq_data_ra(env, src, ra);
+         if (env->cregs[i] != val && i >= 9 && i <= 11) {
+@@ -1650,6 +1663,10 @@ void HELPER(lctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+     uint64_t src = a2;
+     uint32_t i;
+ 
++    if (src & 0x3) {
++        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
++    }
++
+     for (i = r1;; i = (i + 1) % 16) {
+         uint32_t val = cpu_ldl_data_ra(env, src, ra);
+         if ((uint32_t)env->cregs[i] != val && i >= 9 && i <= 11) {
+@@ -1677,6 +1694,10 @@ void HELPER(stctg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+     uint64_t dest = a2;
+     uint32_t i;
+ 
++    if (dest & 0x7) {
++        s390_program_interrupt(env, PGM_SPECIFICATION, 6, ra);
++    }
++
+     for (i = r1;; i = (i + 1) % 16) {
+         cpu_stq_data_ra(env, dest, env->cregs[i], ra);
+         dest += sizeof(uint64_t);
+@@ -1693,6 +1714,10 @@ void HELPER(stctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+     uint64_t dest = a2;
+     uint32_t i;
+ 
++    if (dest & 0x3) {
++        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
++    }
++
+     for (i = r1;; i = (i + 1) % 16) {
+         cpu_stl_data_ra(env, dest, env->cregs[i], ra);
+         dest += sizeof(uint32_t);
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index b470d691d3..5aea3bbca6 100644
+index 5aea3bbca6..7d39ab350d 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -252,13 +252,17 @@ static inline uint64_t ld_code4(CPUS390XState *env, uint64_t pc)
- 
- static int get_mem_index(DisasContext *s)
+@@ -4062,7 +4062,6 @@ static ExitStatus op_stidp(DisasContext *s, DisasOps *o)
  {
-+    if (!(s->tb->flags & FLAG_MASK_DAT)) {
-+        return MMU_REAL_IDX;
-+    }
+     check_privileged(s);
+     tcg_gen_ld_i64(o->out, cpu_env, offsetof(CPUS390XState, cpuid));
+-    tcg_gen_qemu_st_i64(o->out, o->addr1, get_mem_index(s), MO_TEQ | MO_ALIGN);
+     return NO_EXIT;
+ }
+ 
+@@ -5220,18 +5219,42 @@ static void wout_m1_16(DisasContext *s, DisasFields *f, DisasOps *o)
+ }
+ #define SPEC_wout_m1_16 0
+ 
++#ifndef CONFIG_USER_ONLY
++static void wout_m1_16a(DisasContext *s, DisasFields *f, DisasOps *o)
++{
++    tcg_gen_qemu_st_tl(o->out, o->addr1, get_mem_index(s), MO_TEUW | MO_ALIGN);
++}
++#define SPEC_wout_m1_16a 0
++#endif
 +
-     switch (s->tb->flags & FLAG_MASK_ASC) {
-     case PSW_ASC_PRIMARY >> FLAG_MASK_PSW_SHIFT:
--        return 0;
-+        return MMU_PRIMARY_IDX;
-     case PSW_ASC_SECONDARY >> FLAG_MASK_PSW_SHIFT:
--        return 1;
-+        return MMU_SECONDARY_IDX;
-     case PSW_ASC_HOME >> FLAG_MASK_PSW_SHIFT:
--        return 2;
-+        return MMU_HOME_IDX;
-     default:
-         tcg_abort();
-         break;
+ static void wout_m1_32(DisasContext *s, DisasFields *f, DisasOps *o)
+ {
+     tcg_gen_qemu_st32(o->out, o->addr1, get_mem_index(s));
+ }
+ #define SPEC_wout_m1_32 0
+ 
++#ifndef CONFIG_USER_ONLY
++static void wout_m1_32a(DisasContext *s, DisasFields *f, DisasOps *o)
++{
++    tcg_gen_qemu_st_tl(o->out, o->addr1, get_mem_index(s), MO_TEUL | MO_ALIGN);
++}
++#define SPEC_wout_m1_32a 0
++#endif
++
+ static void wout_m1_64(DisasContext *s, DisasFields *f, DisasOps *o)
+ {
+     tcg_gen_qemu_st64(o->out, o->addr1, get_mem_index(s));
+ }
+ #define SPEC_wout_m1_64 0
+ 
++#ifndef CONFIG_USER_ONLY
++static void wout_m1_64a(DisasContext *s, DisasFields *f, DisasOps *o)
++{
++    tcg_gen_qemu_st_i64(o->out, o->addr1, get_mem_index(s), MO_TEQ | MO_ALIGN);
++}
++#define SPEC_wout_m1_64a 0
++#endif
++
+ static void wout_m2_32(DisasContext *s, DisasFields *f, DisasOps *o)
+ {
+     tcg_gen_qemu_st32(o->out, o->in2, get_mem_index(s));
+@@ -5657,6 +5680,15 @@ static void in2_m2_32u(DisasContext *s, DisasFields *f, DisasOps *o)
+ }
+ #define SPEC_in2_m2_32u 0
+ 
++#ifndef CONFIG_USER_ONLY
++static void in2_m2_32ua(DisasContext *s, DisasFields *f, DisasOps *o)
++{
++    in2_a2(s, f, o);
++    tcg_gen_qemu_ld_tl(o->in2, o->in2, get_mem_index(s), MO_TEUL | MO_ALIGN);
++}
++#define SPEC_in2_m2_32ua 0
++#endif
++
+ static void in2_m2_64(DisasContext *s, DisasFields *f, DisasOps *o)
+ {
+     in2_a2(s, f, o);
+@@ -5664,6 +5696,15 @@ static void in2_m2_64(DisasContext *s, DisasFields *f, DisasOps *o)
+ }
+ #define SPEC_in2_m2_64 0
+ 
++#ifndef CONFIG_USER_ONLY
++static void in2_m2_64a(DisasContext *s, DisasFields *f, DisasOps *o)
++{
++    in2_a2(s, f, o);
++    tcg_gen_qemu_ld_i64(o->in2, o->in2, get_mem_index(s), MO_TEQ | MO_ALIGN);
++}
++#define SPEC_in2_m2_64a 0
++#endif
++
+ static void in2_mri2_16u(DisasContext *s, DisasFields *f, DisasOps *o)
+ {
+     in2_ri2(s, f, o);
 -- 
 2.13.6
