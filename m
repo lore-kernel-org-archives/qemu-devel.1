@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1erLnY-0005p3-U6
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:50:53 -0500
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1erLnc-0005si-64
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:50:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1erLnU-0000Ev-64
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:50:52 -0500
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1erLnW-0000FY-Gj
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:50:56 -0500
 Received: from mga14.intel.com ([192.55.52.115]:7359)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
-	id 1erLnT-00006Y-Q1
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:50:48 -0500
+	id 1erLnW-00006Y-4K
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:50:50 -0500
 From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Date: Thu,  1 Mar 2018 18:33:33 +0800
-Message-Id: <1519900415-30314-11-git-send-email-yi.l.liu@linux.intel.com>
+Date: Thu,  1 Mar 2018 18:33:34 +0800
+Message-Id: <1519900415-30314-12-git-send-email-yi.l.liu@linux.intel.com>
 In-Reply-To: <1519900415-30314-1-git-send-email-yi.l.liu@linux.intel.com>
 References: <1519900415-30314-1-git-send-email-yi.l.liu@linux.intel.com>
-Subject: [Qemu-devel] [PATCH v3 10/12] intel_iommu: bind guest pasid table
- to host
+Subject: [Qemu-devel] [PATCH v3 11/12] intel_iommu: add framework for PASID
+ AddressSpace management
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,124 +28,104 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, mst@redhat.com, david@gibson.dropbear.id.au
 Cc: pbonzini@redhat.com, alex.williamson@redhat.com, eric.auger.pro@gmail.com, yi.l.liu@intel.com, peterx@redhat.com, kevin.tian@intel.com, jasowang@redhat.com, "Liu, Yi L" <yi.l.liu@linux.intel.com>
 
-For assigned SVA capable devices, needs to bind guest pasid table
-to host. Intel vIOMMU emulator captures device selective context
-cache flush, and propagate the guest pasid table pointer to host,
-in host iommu driver configs the guest pasid table pointer in its
-translation structure.
+This patch introduces a framework to manage PASID tagged AddressSpace
+in Intel vIOMMU emulator. PASID tagged AddressSpace is an address sapce
+which is an abstract of guest process address space in Qemu. The
+management framework is as below:
+
+         s->pasid_as_list
+              /|\ \
+             / | \ \
+     pasid_as_node  ...
+        /|\ \
+       / | \ \
+  device ...
+
+There is a list to store all the PASID tagged AddressSpace, and each
+PASID tagged AddressSpace has a device list behind it. This is due to
+the fact that a PASID tagged AddressSpace can have multiple devices
+binded.
 
 Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
 ---
- hw/i386/intel_iommu.c | 69 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 69 insertions(+)
+ hw/i386/intel_iommu.c         |  1 +
+ include/hw/i386/intel_iommu.h | 24 ++++++++++++++++++++++++
+ 2 files changed, 25 insertions(+)
 
 diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 978f47a..d92a66d 100644
+index d92a66d..b8e8dbb 100644
 --- a/hw/i386/intel_iommu.c
 +++ b/hw/i386/intel_iommu.c
-@@ -37,6 +37,10 @@
- #include "kvm_i386.h"
- #include "trace.h"
- 
-+static bool vtd_device_is_assigned(IntelIOMMUState *s,
-+                                   PCIBus *bus,
-+                                   uint16_t devfn);
-+
- static void vtd_define_quad(IntelIOMMUState *s, hwaddr addr, uint64_t val,
-                             uint64_t wmask, uint64_t w1cmask)
- {
-@@ -1255,6 +1259,20 @@ static void vtd_context_global_invalidate(IntelIOMMUState *s)
-     vtd_iommu_replay_all(s);
- }
- 
-+static uint64_t vtd_get_pasid_table_from_context(VTDContextEntry *ce)
-+{
-+    uint64_t pasidt_addr = ce->hi;
-+    /* TODO: TBD */
-+    return pasidt_addr;
-+}
-+
-+static uint32_t vtd_get_pasidt_size_from_context(VTDContextEntry *ce)
-+{
-+    uint32_t pasidt_size = ce->hi;
-+    /* TODO: TBD */
-+    return pasidt_size;
-+}
-+
- /* Do a context-cache device-selective invalidation.
-  * @func_mask: FM field after shifting
-  */
-@@ -1291,6 +1309,11 @@ static void vtd_context_device_invalidate(IntelIOMMUState *s,
-     if (vtd_bus) {
-         devfn = VTD_SID_TO_DEVFN(source_id);
-         for (devfn_it = 0; devfn_it < PCI_DEVFN_MAX; ++devfn_it) {
-+            VTDContextEntry ce;
-+            int ret = 0;
-+            uint64_t pasidt_addr;
-+            uint32_t size;
-+
-             vtd_as = vtd_bus->dev_as[devfn_it];
-             if (vtd_as && ((devfn_it & mask) == (devfn & mask))) {
-                 trace_vtd_inv_desc_cc_device(bus_n, VTD_PCI_SLOT(devfn_it),
-@@ -1311,6 +1334,26 @@ static void vtd_context_device_invalidate(IntelIOMMUState *s,
-                  * happened.
-                  */
-                 memory_region_iommu_replay_all(&vtd_as->iommu);
-+
-+                /*
-+                 * If device is SVA capable assigned device, needs
-+                 * to bind guest pasid table to host
-+                 *
-+                 */
-+                if (!vtd_device_is_assigned(s, vtd_as->bus, devfn_it)) {
-+                    continue;
-+                }
-+
-+                ret = vtd_dev_to_context_entry(s, bus_n,
-+                                               vtd_as->devfn, &ce);
-+                if (ret) {
-+                    continue;
-+                }
-+
-+                pasidt_addr = vtd_get_pasid_table_from_context(&ce);
-+                size = vtd_get_pasidt_size_from_context(&ce);
-+                pci_device_sva_bind_pasid_table(vtd_as->bus, devfn_it,
-+                                                pasidt_addr, size);
-             }
-         }
+@@ -3174,6 +3174,7 @@ static void vtd_realize(DeviceState *dev, Error **errp)
      }
-@@ -3046,6 +3089,32 @@ static int vtd_device_notify(PCIBus *bus,
-     return 0;
- }
  
-+static bool vtd_device_is_assigned(IntelIOMMUState *s,
-+                                   PCIBus *bus,
-+                                   uint16_t devfn)
-+{
-+    VTDAddressSpace *vtd_as;
-+    IntelIOMMUAssignedDeviceNode *node = NULL;
-+    IntelIOMMUAssignedDeviceNode *next_node = NULL;
+     QLIST_INIT(&s->notifiers_list);
++    QLIST_INIT(&s->pasid_as_list);
+     memset(s->vtd_as_by_bus_num, 0, sizeof(s->vtd_as_by_bus_num));
+     memory_region_init_io(&s->csrmem, OBJECT(s), &vtd_mem_ops, s,
+                           "intel_iommu", DMAR_REG_SIZE);
+diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+index 0b6dc32..c45dbfe 100644
+--- a/include/hw/i386/intel_iommu.h
++++ b/include/hw/i386/intel_iommu.h
+@@ -61,6 +61,7 @@ typedef struct VTDContextEntry VTDContextEntry;
+ typedef struct VTDContextCacheEntry VTDContextCacheEntry;
+ typedef struct IntelIOMMUState IntelIOMMUState;
+ typedef struct VTDAddressSpace VTDAddressSpace;
++typedef struct VTDPASIDAddressSpace VTDPASIDAddressSpace;
+ typedef struct VTDIOTLBEntry VTDIOTLBEntry;
+ typedef struct VTDBus VTDBus;
+ typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
+@@ -69,6 +70,8 @@ typedef struct VTDIrq VTDIrq;
+ typedef struct VTD_MSIMessage VTD_MSIMessage;
+ typedef struct IntelIOMMUMRNotifierNode IntelIOMMUMRNotifierNode;
+ typedef struct IntelIOMMUAssignedDeviceNode IntelIOMMUAssignedDeviceNode;
++typedef struct IntelPASIDNode IntelPASIDNode;
++typedef struct VTDDeviceNode VTDDeviceNode;
+ 
+ /* Context-Entry */
+ struct VTDContextEntry {
+@@ -84,6 +87,20 @@ struct VTDContextCacheEntry {
+     struct VTDContextEntry context_entry;
+ };
+ 
++struct VTDDeviceNode {
++    PCIBus *bus;
++    uint8_t devfn;
++    QLIST_ENTRY(VTDDeviceNode) next;
++};
 +
-+    vtd_as = vtd_find_add_as(s, bus, devfn, false);
++struct VTDPASIDAddressSpace {
++    AddressSpace as;
++    IOMMUSVAContext sva_ctx;
++    IntelIOMMUState *iommu_state;
++    /* list of devices binded to a pasid tagged address space */
++    QLIST_HEAD(, VTDDeviceNode) device_list;
++};
 +
-+    if (vtd_as == NULL) {
-+        /*
-+         * If vtd_as is NULL, return false for safe
-+         */
-+        return false;
-+    }
+ struct VTDAddressSpace {
+     PCIBus *bus;
+     uint8_t devfn;
+@@ -264,6 +281,11 @@ struct IntelIOMMUAssignedDeviceNode {
+     QLIST_ENTRY(IntelIOMMUAssignedDeviceNode) next;
+ };
+ 
++struct IntelPASIDNode {
++    VTDPASIDAddressSpace *pasid_as;
++    QLIST_ENTRY(IntelPASIDNode) next;
++};
 +
-+    QLIST_FOREACH_SAFE(node, &s->assigned_device_list, next, next_node) {
-+        if (node->vtd_as == vtd_as) {
-+            return true;
-+        }
-+    }
-+
-+    return false;
-+}
-+
- static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
- {
-     X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
+ /* The iommu (DMAR) device state struct */
+ struct IntelIOMMUState {
+     X86IOMMUState x86_iommu;
+@@ -304,6 +326,8 @@ struct IntelIOMMUState {
+     QLIST_HEAD(, IntelIOMMUMRNotifierNode) notifiers_list;
+     /* list of assigned devices */
+     QLIST_HEAD(, IntelIOMMUAssignedDeviceNode) assigned_device_list;
++    /* list of pasid tagged address space */
++    QLIST_HEAD(, IntelPASIDNode) pasid_as_list;
+ 
+     /* interrupt remapping */
+     bool intr_enabled;              /* Whether guest enabled IR */
 -- 
 1.9.1
