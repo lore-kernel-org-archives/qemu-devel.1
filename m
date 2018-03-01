@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erStJ-0006W2-ML
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 13:25:18 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1erTEB-0007xh-0e
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 13:46:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erStI-0000om-Qn
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 13:25:17 -0500
-References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
-	<20180226165723.17818-1-eblake@redhat.com>
-	<20180226165723.17818-3-eblake@redhat.com>
-	<0d8f572a-b099-75f9-c161-09226564a4aa@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <271c677b-901f-fe44-e02f-e196cf28c2d9@redhat.com>
-Date: Thu, 1 Mar 2018 12:25:08 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1erTEA-0004JU-5r
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 13:46:51 -0500
+Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:42647)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1erTE9-0004Ik-W3
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 13:46:50 -0500
+Received: by mail-ot0-x230.google.com with SMTP id l5so6506590otf.9
+	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 10:46:49 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <0d8f572a-b099-75f9-c161-09226564a4aa@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] nbd/client: fix error messages in
- nbd_handle_reply_err
+In-Reply-To: <20180301130201.24666-1-cohuck@redhat.com>
+References: <20180301130201.24666-1-cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 1 Mar 2018 18:46:28 +0000
+Message-ID: <CAFEAcA8WdYgxEZ2LmDh=y3Q39k9waYYwx6DRRR41NeuTvXoKKQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 00/27] s390x updates (and friends)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-On 03/01/2018 06:10 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 26.02.2018 19:57, Eric Blake wrote:
->> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>
->> 1. NBD_REP_ERR_INVALID is not only about length, so, make message more
->> =C2=A0=C2=A0=C2=A0 general
->>
->> 2. hex format is not very good: it's hard to read something like
->> =C2=A0=C2=A0=C2=A0 "option a (set meta context)", so switch to dec.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> Message-Id: <1518702707-7077-6-git-send-email-vsementsov@virtuozzo.com=
+On 1 March 2018 at 13:01, Cornelia Huck <cohuck@redhat.com> wrote:
+> The following changes since commit 0a773d55ac76c5aa89ed9187a3bc5af8c5c2a6d0:
 >
->> [eblake: expand scope of patch: ALL uses of nbd_opt_lookup are now
->> decimal, all uses of nbd_rep_lookup are prefixed hex]
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->=20
-> one thought: isn't it better to have all NBD constants in dec, like in=20
-> spec?
+>   maintainers: Add myself as a OpenBSD maintainer (2018-02-23 12:05:07 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/cohuck/qemu tags/s390x-20180301-v2
+>
+> for you to fetch changes up to be8b49de2491145a7aad3201803327b6f568cbd3:
+>
+>   s390x/tcg: fix loading 31bit PSWs with the highest bit set (2018-03-01 13:23:09 +0100)
+>
+> ----------------------------------------------------------------
+> - add query-cpus-fast and deprecate query-cpus, while adding s390 cpu
+>   information
+> - remove s390x memory hotplug implementation, which is not useable in
+>   this form
+> - add boot menu support in the s390-ccw bios
+> - expose s390x guest crash information
+> - fixes and cleaups
+>
 
-Sure, I can make that change.
+Applied, thanks.
 
->> @@ -378,8 +378,8 @@ static int nbd_opt_go(QIOChannel *ioc, const char=20
->> *wantname,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 return 1;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (reply.type =
-!=3D NBD_REP_INFO) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 er=
-ror_setg(errp, "unexpected reply type %" PRIx32
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 " (%s), e=
-xpected %x",
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 er=
-ror_setg(errp, "unexpected reply type 0x%" PRIx32
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 " (%s), e=
-xpected 0x%x",
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-reply.type, nbd_rep_lookup(reply.type),=20
->> NBD_REP_INFO);
-
-That is, I'll respin with this and other nbd_rep_lookup()s using decimal=20
-output.
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+-- PMM
