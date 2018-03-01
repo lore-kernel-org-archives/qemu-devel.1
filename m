@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1erKp4-00027o-6a
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:48:25 -0500
+	(envelope-from <drjones@redhat.com>) id 1erKpX-0002Sv-31
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:48:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1erKp0-0000ej-DC
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:48:22 -0500
-Date: Thu, 1 Mar 2018 10:48:08 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180301094808.GA4862@localhost.localdomain>
-References: <20180213202701.15858-1-eblake@redhat.com>
-	<20180213202701.15858-10-eblake@redhat.com>
-	<20180214120525.GB4766@localhost.localdomain>
-	<afb56cfd-4f42-07e5-9a65-d929b2ea9916@redhat.com>
-	<20180223170525.GF3470@localhost.localdomain>
-	<010d7d4e-c6d1-f8fb-8c4c-7aa0b19a94b7@redhat.com>
-	<20180226140518.GA5106@localhost.localdomain>
-	<1724b4e9-ff78-9725-286e-6886704f7f13@virtuozzo.com>
+	(envelope-from <drjones@redhat.com>) id 1erKpU-0000v8-0b
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:48:51 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38560 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1erKpT-0000ut-R3
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:48:47 -0500
+Date: Thu, 1 Mar 2018 10:48:44 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180301094844.ckysyow5pppqf3if@kamzik.brq.redhat.com>
+References: <20180228180215.25470-1-wei@redhat.com>
+	<20180228180215.25470-4-wei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1724b4e9-ff78-9725-286e-6886704f7f13@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v8 09/21] null: Switch to
- .bdrv_co_block_status()
+In-Reply-To: <20180228180215.25470-4-wei@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V7 3/4] tests/migration: Add migration-test
+ header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +28,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Wei Huang <wei@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, dgilbert@redhat.com, quintela@redhat.com
 
-Am 01.03.2018 um 08:25 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 26.02.2018 17:05, Kevin Wolf wrote:
-> > Essentially, assuming a simple backing chain 'base <- overlay', we got
-> > these combinations to represent in NBD (with my suggestion of the flags
-> > to use):
-> > 
-> > 1. Cluster allocated in overlay
-> >     a. non-zero data                         0
-> >     b. explicit zeroes                       0 or ZERO
-> > 2. Cluster marked zero in overlay           HOLE | ZERO
-> > 3. Cluster preallocated/zero in overlay     ZERO
-> > 4. Cluster unallocated in overlay
-> >     a. Cluster allocated in base (non-zero)  HOLE
-> >     b. Cluster allocated in base (zero)      HOLE or HOLE | ZERO
-> >     c. Cluster marked zero in base           HOLE | ZERO
-> >     d. Cluster preallocated/zero in base     HOLE | ZERO
-> >     e. Cluster unallocated in base           HOLE | ZERO
-> > 
-> > Instead of 'base' you can read 'anywhere in the backing chain' and the
-> > flags should stay the same.
+On Wed, Feb 28, 2018 at 12:02:14PM -0600, Wei Huang wrote:
+> This patch moves the settings related migration-test from the
+> migration-test.c file to a seperate header file. It also renames the
+> x86-a-b-bootblock.s file extension from .s to .S, allowing gcc
+> pre-processor to include the C-style header file correctly.
 > 
-> I think only "anywhere in the backing chain" is valid here. Otherwise,
-> semantics of bdrv_is_allocated would differ for NBD and for not-NBD.
+> Signed-off-by: Wei Huang <wei@redhat.com>
+> ---
+>  tests/migration-test.c                             | 34 +++++++++++++---------
+>  tests/migration/Makefile                           |  4 +--
+>  tests/migration/migration-test.h                   | 22 ++++++++++++++
+>  .../{x86-a-b-bootblock.s => x86-a-b-bootblock.S}   |  7 +++--
+>  tests/migration/x86-a-b-bootblock.h                |  2 +-
+>  5 files changed, 49 insertions(+), 20 deletions(-)
+>  create mode 100644 tests/migration/migration-test.h
+>  rename tests/migration/{x86-a-b-bootblock.s => x86-a-b-bootblock.S} (94%)
+> 
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index 74f9361bdd..12c04a9648 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -21,10 +21,10 @@
+>  #include "sysemu/sysemu.h"
+>  #include "hw/nvram/chrp_nvram.h"
+>  
+> -#define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
+> +#include "migration/migration-test.h"
+>  
+> -const unsigned start_address = 1024 * 1024;
+> -const unsigned end_address = 100 * 1024 * 1024;
+> +unsigned start_address;
+> +unsigned end_address;
+>  bool got_stop;
+>  
+>  #if defined(__linux__)
+> @@ -77,8 +77,8 @@ static bool ufd_version_check(void)
+>  
+>  static const char *tmpfs;
+>  
+> -/* A simple PC boot sector that modifies memory (1-100MB) quickly
+> - * outputting a 'B' every so often if it's still running.
+> +/* The boot file modifies memory area in [start_address, end_address)
+> + * repeatedly. It outputs a 'B' at a fixed rate while it's still running.
+>   */
+>  #include "tests/migration/x86-a-b-bootblock.h"
+>  
+> @@ -104,9 +104,8 @@ static void init_bootfile_ppc(const char *bootpath)
+>      memcpy(header->name, "common", 6);
+>      chrp_nvram_finish_partition(header, MIN_NVRAM_SIZE);
+>  
+> -    /* FW_MAX_SIZE is 4MB, but slof.bin is only 900KB,
+> -     * so let's modify memory between 1MB and 100MB
+> -     * to do like PC bootsector
+> +    /* FW_MAX_SIZE is 4MB, but slof.bin is only 900KB. So it is OK to modify
+> +     * memory between start_address and end_address like PC bootsector does.
 
-This was meant as a mapping from cases to flags, not the other way
-round, so really doesn't say anything about the cases where the block is
-allocated further down the chain.
+This comment reads a bit strange now that it starts with explicit sizes
+and then uses generic terms. I think I'd move the comment to the header
+file where PPC_TEST_MEM_START/END are defined, tweaking it a bit. Also,
+the same g_assert enforcement done for AArch64 could be applied to PPC,
+but with a max kernel size of 100K. Even PC could get an assert, but with
+a max kernel size of 1M.
 
-But yes, it shouldn't make a difference where in the backing chain a
-block is allocated, so these cases are the same as 4.
+>       */
+>  
+>      sprintf(buf + 16,
+> @@ -263,11 +262,11 @@ static void wait_for_migration_pass(QTestState *who)
+>  static void check_guests_ram(QTestState *who)
+>  {
+>      /* Our ASM test will have been incrementing one byte from each page from
+> -     * 1MB to <100MB in order.
+> -     * This gives us a constraint that any page's byte should be equal or less
+> -     * than the previous pages byte (mod 256); and they should all be equal
+> -     * except for one transition at the point where we meet the incrementer.
+> -     * (We're running this with the guest stopped).
+> +     * start_address to < end_address in order. This gives us a constraint
+> +     * that any page's byte should be equal or less than the previous pages
+> +     * byte (mod 256); and they should all be equal except for one transition
+> +     * at the point where we meet the incrementer. (We're running this with
+> +     * the guest stopped).
+>       */
+>      unsigned address;
+>      uint8_t first_byte;
+> @@ -278,7 +277,8 @@ static void check_guests_ram(QTestState *who)
+>      qtest_memread(who, start_address, &first_byte, 1);
+>      last_byte = first_byte;
+>  
+> -    for (address = start_address + 4096; address < end_address; address += 4096)
+> +    for (address = start_address + TEST_MEM_PAGE_SIZE; address < end_address;
+> +         address += TEST_MEM_PAGE_SIZE)
+>      {
+>          uint8_t b;
+>          qtest_memread(who, address, &b, 1);
+> @@ -404,6 +404,9 @@ static void test_migrate_start(QTestState **from, QTestState **to,
+>                                    " -drive file=%s,format=raw"
+>                                    " -incoming %s",
+>                                    accel, tmpfs, bootpath, uri);
+> +
+> +        start_address = X86_TEST_MEM_START;
+> +        end_address = X86_TEST_MEM_END;
+>      } else if (strcmp(arch, "ppc64") == 0) {
+>  
+>          /* On ppc64, the test only works with kvm-hv, but not with kvm-pr */
+> @@ -421,6 +424,9 @@ static void test_migrate_start(QTestState **from, QTestState **to,
+>                                    " -serial file:%s/dest_serial"
+>                                    " -incoming %s",
+>                                    accel, tmpfs, uri);
+> +
+> +        start_address = PPC_TEST_MEM_START;
+> +        end_address = PPC_TEST_MEM_END;
+>      } else {
+>          g_assert_not_reached();
+>      }
+> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
+> index 8fbedaa8b8..013b8d1f44 100644
+> --- a/tests/migration/Makefile
+> +++ b/tests/migration/Makefile
+> @@ -25,8 +25,8 @@ include $(SRC_PATH)/rules.mak
+>  
+>  x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
+>  
+> -x86-a-b-bootblock.h: x86-a-b-bootblock.s
+> -	$(x86_64_cross_prefix)as --32 -march=i486 $< -o x86.o
+> +x86-a-b-bootblock.h: x86-a-b-bootblock.S
+> +	$(x86_64_cross_prefix)gcc -m32 -march=i486 -c $< -o x86.o
+>  	$(x86_64_cross_prefix)objcopy -O binary x86.o x86.boot
+>  	dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124
+>  	echo "$$__note" > $@
+> diff --git a/tests/migration/migration-test.h b/tests/migration/migration-test.h
+> new file mode 100644
+> index 0000000000..06c46a2fe0
+> --- /dev/null
+> +++ b/tests/migration/migration-test.h
+> @@ -0,0 +1,22 @@
+> +/*
+> + * Copyright (c) 2018 Red Hat, Inc. and/or its affiliates
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +#ifndef _TEST_MIGRATION_H_
+> +#define _TEST_MIGRATION_H_
+> +
+> +/* Common */
+> +#define TEST_MEM_PAGE_SIZE 4096
+> +
+> +/* x86 */
+> +#define X86_TEST_MEM_START (1 * 1024 * 1024)
+> +#define X86_TEST_MEM_END   (100 * 1024 * 1024)
+> +
+> +/* PPC */
+> +#define PPC_TEST_MEM_START (1 * 1024 * 1024)
+> +#define PPC_TEST_MEM_END   (100 * 1024 * 1024)
+> +#define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
+> +
+> +#endif /* _TEST_MIGRATION_H_ */
+> diff --git a/tests/migration/x86-a-b-bootblock.s b/tests/migration/x86-a-b-bootblock.S
+> similarity index 94%
+> rename from tests/migration/x86-a-b-bootblock.s
+> rename to tests/migration/x86-a-b-bootblock.S
+> index 98dbfab084..a4da995a89 100644
+> --- a/tests/migration/x86-a-b-bootblock.s
+> +++ b/tests/migration/x86-a-b-bootblock.S
+> @@ -12,6 +12,7 @@
+>  #
+>  # Author: dgilbert@redhat.com
+>  
+> +#include "migration-test.h"
+>  
+>  .code16
+>  .org 0x7c00
+> @@ -45,11 +46,11 @@ start:             # at 0x7c00 ?
+>          mov $0, %bl
+>  mainloop:
+>          # Start from 1MB
+> -        mov $(1024*1024),%eax
+> +        mov $X86_TEST_MEM_START,%eax
+>  innerloop:
+>          incb (%eax)
+> -        add $4096,%eax
+> -        cmp $(100*1024*1024),%eax
+> +        add $TEST_MEM_PAGE_SIZE,%eax
+> +        cmp $X86_TEST_MEM_END,%eax
+>          jl innerloop
+>  
+>          inc %bl
+> diff --git a/tests/migration/x86-a-b-bootblock.h b/tests/migration/x86-a-b-bootblock.h
+> index 9e8e2e028b..44e4b99506 100644
+> --- a/tests/migration/x86-a-b-bootblock.h
+> +++ b/tests/migration/x86-a-b-bootblock.h
+> @@ -1,5 +1,5 @@
+>  /* This file is automatically generated from
+> - * tests/migration/x86-a-b-bootblock.s, edit that and then run
+> + * tests/migration/x86-a-b-bootblock.S, edit that and then run
+>   * "make x86-a-b-bootblock.h" inside tests/migration to update,
+>   * and then remember to send both in your patch submission.
+>   */
+> -- 
+> 2.14.3
+> 
+>
 
-> I think, if bdrv_is_allocated returns false, it means that we can skip
-> this region in copying process, am I right?
+I added a new suggestion to this patch, but it's not a deal breaker for
+me, so
 
--ENOCONTEXT? Which copying process?
-
-There are cases where you want to copy such regions, and other cases
-where you want to skip them. It depends on the use case. For example,
-'qemu-img convert' skips them with -B (because the backing file is
-reused), but not without -B (which creates a full copy).
-
-Kevin
+Reviewed-by: Andrew Jones <drjones@redhat.com>
