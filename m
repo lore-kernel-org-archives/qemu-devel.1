@@ -1,19 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1erR46-0008BX-ID
+	(envelope-from <berto@igalia.com>) id 1erR46-0008BS-H4
 	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:28:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1erR41-0004Jo-Dq
+	(envelope-from <berto@igalia.com>) id 1erR41-0004Ja-DY
 	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:28:18 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Thu,  1 Mar 2018 18:27:08 +0200
-Message-Id: <867f70a315f3b30aca22ab6ae90555bfa8e79c20.1519921268.git.berto@igalia.com>
-In-Reply-To: <cover.1519921268.git.berto@igalia.com>
-References: <cover.1519921268.git.berto@igalia.com>
-In-Reply-To: <cover.1519921268.git.berto@igalia.com>
-References: <cover.1519921268.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 2/7] qcow2: Check L1 table offset in
- qcow2_snapshot_load_tmp()
+Date: Thu,  1 Mar 2018 18:27:06 +0200
+Message-Id: <cover.1519921268.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH 0/7] Add checks for corruption in the snapshot
+ table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,76 +21,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-This function checks that the size of a snapshot's L1 table is not too
-large, but it doesn't validate the offset.
+Hey ho!
 
-We now have a function to take care of this, so let's use it.
+As we have already discussed in the mailing list, the offset and size
+values of snapshots' L1 tables are almost never validated in the QEMU
+code.
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- block/qcow2-snapshot.c     |  8 +++++---
- tests/qemu-iotests/080     | 10 +++++++++-
- tests/qemu-iotests/080.out |  8 +++++++-
- 3 files changed, 21 insertions(+), 5 deletions(-)
+One way to deal with this is to validate them when the image is being
+opened (in qcow2_read_snapshots()) and return an error if there's
+anything wrong. However this would render the image unusable because
+we wouldn't be able to try to recover data using the active table as
+we can do now.
 
-diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-index 44243e0e95..98bb039295 100644
---- a/block/qcow2-snapshot.c
-+++ b/block/qcow2-snapshot.c
-@@ -704,9 +704,11 @@ int qcow2_snapshot_load_tmp(BlockDriverState *bs,
-     sn = &s->snapshots[snapshot_index];
- 
-     /* Allocate and read in the snapshot's L1 table */
--    if (sn->l1_size > QCOW_MAX_L1_SIZE / sizeof(uint64_t)) {
--        error_setg(errp, "Snapshot L1 table too large");
--        return -EFBIG;
-+    ret = qcow2_validate_table(bs, sn->l1_table_offset, sn->l1_size,
-+                               sizeof(uint64_t), QCOW_MAX_L1_SIZE,
-+                               "Snapshot L1 table", errp);
-+    if (ret < 0) {
-+        return ret;
-     }
-     new_l1_bytes = sn->l1_size * sizeof(uint64_t);
-     new_l1_table = qemu_try_blockalign(bs->file->bs,
-diff --git a/tests/qemu-iotests/080 b/tests/qemu-iotests/080
-index 1c2bd85742..6a10e7defa 100755
---- a/tests/qemu-iotests/080
-+++ b/tests/qemu-iotests/080
-@@ -171,7 +171,15 @@ poke_file "$TEST_IMG" "$offset_l2_table_0" "\x80\x00\x00\xff\xff\xff\x00\x00"
- { $QEMU_IMG snapshot -c test $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
- 
- echo
--echo "== Invalid snapshot L1 table =="
-+echo "== Invalid snapshot L1 table offset =="
-+_make_test_img 64M
-+{ $QEMU_IO -c "write 0 512" $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
-+{ $QEMU_IMG snapshot -c test $TEST_IMG; } 2>&1 | _filter_testdir
-+poke_file "$TEST_IMG" "$offset_snap1_l1_offset" "\x00\x00\x00\x00\x00\x40\x02\x00"
-+{ $QEMU_IMG convert -s test $TEST_IMG $TEST_IMG.snap; } 2>&1 | _filter_testdir
-+
-+echo
-+echo "== Invalid snapshot L1 table size =="
- _make_test_img 64M
- { $QEMU_IO -c "write 0 512" $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
- { $QEMU_IMG snapshot -c test $TEST_IMG; } 2>&1 | _filter_testdir
-diff --git a/tests/qemu-iotests/080.out b/tests/qemu-iotests/080.out
-index 4c7790c9ee..f0d9038d55 100644
---- a/tests/qemu-iotests/080.out
-+++ b/tests/qemu-iotests/080.out
-@@ -59,7 +59,13 @@ wrote 512/512 bytes at offset 0
- qemu-img: Could not create snapshot 'test': -27 (File too large)
- qemu-img: Could not create snapshot 'test': -11 (Resource temporarily unavailable)
- 
--== Invalid snapshot L1 table ==
-+== Invalid snapshot L1 table offset ==
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+wrote 512/512 bytes at offset 0
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+qemu-img: Failed to load snapshot: Snapshot L1 table offset invalid
-+
-+== Invalid snapshot L1 table size ==
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+Another possibility is to refuse opening the image but add a way to
+fix it using 'qemu-img check'. But this would be a destructive
+operation, and knowing that the image is already corrupted we can't
+guarantee that we wouldn't be corrupting it even more.
+
+So although having a way to repair this kind of corruption would be
+nice, we should still allow the user to try to open the image and read
+data from it without requiring a potentially destructive operation
+first.
+
+So this series simply validates the snapshots' L1 tables in the places
+where they are actually used. We already have a function to do this
+kind of checks so we only need to call it.
+
+Regards,
+
+Berto
+
+Alberto Garcia (7):
+  qcow2: Generalize validate_table_offset() into qcow2_validate_table()
+  qcow2: Check L1 table offset in qcow2_snapshot_load_tmp()
+  qcow2: Check L1 table parameters in qcow2_expand_zero_clusters()
+  qcow2: Check snapshot L1 tables in qcow2_check_metadata_overlap()
+  qcow2: Check snapshot L1 table in qcow2_snapshot_goto()
+  qcow2: Check snapshot L1 table in qcow2_snapshot_delete()
+  qcow2: Make qemu-img check detect corrupted L1 tables in snapshots
+
+ block/qcow2-cluster.c      | 20 +++++++-----
+ block/qcow2-refcount.c     | 24 ++++++++++++++-
+ block/qcow2-snapshot.c     | 21 +++++++++++--
+ block/qcow2.c              | 77 ++++++++++++++++++----------------------------
+ block/qcow2.h              | 10 +++---
+ tests/qemu-iotests/080     | 22 ++++++++++++-
+ tests/qemu-iotests/080.out | 54 ++++++++++++++++++++++++++------
+ 7 files changed, 155 insertions(+), 73 deletions(-)
+
 -- 
 2.11.0
