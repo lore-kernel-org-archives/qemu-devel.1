@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erQ8Y-0004vj-OL
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:28:56 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1erQ8i-00050V-VG
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:29:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erQ8X-00021k-IP
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:28:50 -0500
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:43130)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1erQ8X-00021N-BM
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:28:49 -0500
-Received: by mail-oi0-x242.google.com with SMTP id a207so4733840oii.10
-	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 07:28:49 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1erQ8f-000241-1M
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:29:00 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47330 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1erQ8e-00023p-RX
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:28:56 -0500
+Date: Thu, 1 Mar 2018 15:28:51 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180301152850.GH2994@work-vm>
+References: <20180228180215.25470-1-wei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-pUMgUnR0cWd9j7n0EyTeXkMTzhPQU_fqhyaXy1hMfxw@mail.gmail.com>
-References: <20180228193125.20577-1-richard.henderson@linaro.org>
-	<20180228193125.20577-13-richard.henderson@linaro.org>
-	<CAFEAcA-pUMgUnR0cWd9j7n0EyTeXkMTzhPQU_fqhyaXy1hMfxw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 1 Mar 2018 15:28:28 +0000
-Message-ID: <CAFEAcA-FOV6JSaZrhD+FZ-T46n_e--suEDbha5EXAEPyW5YAEw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 12/16] target/arm: Decode aa64 armv8.3
- fcmla
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180228180215.25470-1-wei@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V7 0/4] tests: Add migration test for
+ aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,137 +27,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Wei Huang <wei@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, quintela@redhat.com, drjones@redhat.com
 
-On 1 March 2018 at 13:33, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 28 February 2018 at 19:31, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
->>  target/arm/helper.h        |  11 ++++
->>  target/arm/translate-a64.c |  94 +++++++++++++++++++++++++---
->>  target/arm/vec_helper.c    | 149 +++++++++++++++++++++++++++++++++++++++++++++
->>  3 files changed, 246 insertions(+), 8 deletions(-)
->>
->> diff --git a/target/arm/helper.h b/target/arm/helper.h
->> index 1e2d7025de..0d2094f2be 100644
->> --- a/target/arm/helper.h
->> +++ b/target/arm/helper.h
->> @@ -585,6 +585,17 @@ DEF_HELPER_FLAGS_5(gvec_fcadds, TCG_CALL_NO_RWG,
->>  DEF_HELPER_FLAGS_5(gvec_fcaddd, TCG_CALL_NO_RWG,
->>                     void, ptr, ptr, ptr, ptr, i32)
->>
->> +DEF_HELPER_FLAGS_5(gvec_fcmlah, TCG_CALL_NO_RWG,
->> +                   void, ptr, ptr, ptr, ptr, i32)
->> +DEF_HELPER_FLAGS_5(gvec_fcmlah_idx, TCG_CALL_NO_RWG,
->> +                   void, ptr, ptr, ptr, ptr, i32)
->> +DEF_HELPER_FLAGS_5(gvec_fcmlas, TCG_CALL_NO_RWG,
->> +                   void, ptr, ptr, ptr, ptr, i32)
->> +DEF_HELPER_FLAGS_5(gvec_fcmlas_idx, TCG_CALL_NO_RWG,
->> +                   void, ptr, ptr, ptr, ptr, i32)
->> +DEF_HELPER_FLAGS_5(gvec_fcmlad, TCG_CALL_NO_RWG,
->> +                   void, ptr, ptr, ptr, ptr, i32)
->> +
->>  #ifdef TARGET_AARCH64
->>  #include "helper-a64.h"
->>  #endif
->> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
->> index efed4fd9d2..31ff0479e6 100644
->> --- a/target/arm/translate-a64.c
->> +++ b/target/arm/translate-a64.c
->> @@ -10842,6 +10842,10 @@ static void disas_simd_three_reg_same_extra(DisasContext *s, uint32_t insn)
->>          }
->>          feature = ARM_FEATURE_V8_RDM;
->>          break;
->> +    case 0x8: /* FCMLA, #0 */
->> +    case 0x9: /* FCMLA, #90 */
->> +    case 0xa: /* FCMLA, #180 */
->> +    case 0xb: /* FCMLA, #270 */
->>      case 0xc: /* FCADD, #90 */
->>      case 0xe: /* FCADD, #270 */
->>          if (size == 0
->> @@ -10891,6 +10895,29 @@ static void disas_simd_three_reg_same_extra(DisasContext *s, uint32_t insn)
->>          }
->>          return;
->>
->> +    case 0x8: /* FCMLA, #0 */
->> +    case 0x9: /* FCMLA, #90 */
->> +    case 0xa: /* FCMLA, #180 */
->> +    case 0xb: /* FCMLA, #270 */
->> +        rot = extract32(opcode, 0, 2);
->> +        switch (size) {
->> +        case 1:
->> +            gen_gvec_op3_fpst(s, is_q, rd, rn, rm, true, rot,
->> +                              gen_helper_gvec_fcmlah);
->> +            break;
->> +        case 2:
->> +            gen_gvec_op3_fpst(s, is_q, rd, rn, rm, false, rot,
->> +                              gen_helper_gvec_fcmlas);
->> +            break;
->> +        case 3:
->> +            gen_gvec_op3_fpst(s, is_q, rd, rn, rm, false, rot,
->> +                              gen_helper_gvec_fcmlad);
->> +            break;
->> +        default:
->> +            g_assert_not_reached();
->> +        }
->> +        return;
->> +
->>      case 0xc: /* FCADD, #90 */
->>      case 0xe: /* FCADD, #270 */
->>          rot = extract32(opcode, 1, 1);
->
-> Shouldn't there be a feature check on ARM_FEATURE_V8_FCMA somewhere
-> in the three_reg_same_extra code path?
->
->
->> diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
->> index a868ca6aac..d81eb7730d 100644
->> --- a/target/arm/vec_helper.c
->> +++ b/target/arm/vec_helper.c
->> @@ -278,3 +278,152 @@ void HELPER(gvec_fcaddd)(void *vd, void *vn, void *vm,
->>      }
->>      clear_tail(d, opr_sz, simd_maxsz(desc));
->>  }
->> +
->> +void HELPER(gvec_fcmlah)(void *vd, void *vn, void *vm,
->> +                         void *vfpst, uint32_t desc)
->> +{
->> +    uintptr_t opr_sz = simd_oprsz(desc);
->> +    float16 *d = vd;
->> +    float16 *n = vn;
->> +    float16 *m = vm;
->> +    float_status *fpst = vfpst;
->> +    intptr_t flip = extract32(desc, SIMD_DATA_SHIFT, 1);
->> +    uint32_t neg_imag = extract32(desc, SIMD_DATA_SHIFT + 1, 1);
->> +    uint32_t neg_real = flip ^ neg_imag;
->> +    uintptr_t i;
->> +
->> +    /* Shift boolean to the sign bit so we can xor to negate.  */
->> +    neg_real <<= 15;
->> +    neg_imag <<= 15;
->> +
->> +    for (i = 0; i < opr_sz / 2; i += 2) {
->> +        float16 e1 = n[H2(i + flip)];
->> +        float16 e2 = m[H2(i + flip)] ^ neg_real;
->> +        float16 e3 = e1;
->> +        float16 e4 = m[H2(i + 1 - flip)] ^ neg_imag;
->
-> These don't match up with the element1 ... element4 in the
-> Arm ARM pseudocode. It's e2 and e4 that are always the same,
-> not e1 and e3. Ditto in the other functions.
+* Wei Huang (wei@redhat.com) wrote:
+> This patchset adds a migration test for aarch64. It leverages
+> Dave Gilbert's recent patch "tests/migration: Add source to PC boot block"
+> to create a new test case for aarch64.
 
-Specifically I think:
- this code    pseudocode
-   e1          element2
-   e2          element1
-   e3          element4
-   e4          element2
+Other than Drew's comment about the ppc comment; I'm happy with this.
 
-So if we renumber these to match the pseudocode
+Dave
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+> V6->V7:
+>  * Define test memory start/end addresses for all architectures
+>  * Check aarch64 kernel binary size, limit under 512KB
+> 
+> V5->V6:
+>  * Add Reviewed-by to patch 1-3
+>  * Add more design notes in patch 4 (aarch64 assembly compilation, bin space)
+> 
+> V4->V5:
+>  * Extract cross compilation detection code into rules.mak for sharing
+>  * Minor comment and code revision in migration-test.c & aarch64-a-b-kernel.S
+>  
+> V3->V4:
+>  * Rename .s to .S, allowing assembly to include C-style header file
+>  * Move test defines into a new migration-test.h file
+>  * Use different cpu & gic settings for kvm and tcg modes on aarch64
+>  * Clean up aarch64-a-b-kernel.S based on Andrew Jones' comments
+>  
+> V2->V3:
+>  * Convert build script to Makefile
+>  * Add cross-compilation support
+>  * Fix CPU type for "tcg" machine type
+>  * Revise asm code and the compilation process from asm to header file
+> 
+> V1->V2:
+>  * Similar to Dave Gilbert's recent changes to migration-test, we
+>    provide the test source and a build script in V2.
+>  * aarch64 kernel blob is defined as "unsigned char" because the source
+>    is now provided in V2.
+>  * Add "-machine none" to test_deprecated() because aarch64 doesn't have
+>    a default machine type.
+> 
+> RFC->V1:
+>  * aarch64 kernel blob is defined as an uint32_t array
+>  * The test code is re-written to address a data caching issue under KVM.
+>    Tests passed under both x86 and aarch64.
+>  * Re-use init_bootfile_x86() for both x86 and aarch64
+>  * Other minor fixes
+> 
+> Thanks,
+> -Wei
+> 
+> Wei Huang (4):
+>   rules: Move cross compilation auto detection functions to rules.mak
+>   tests/migration: Convert the boot block compilation script into
+>     Makefile
+>   tests/migration: Add migration-test header file
+>   tests: Add migration test for aarch64
+> 
+>  roms/Makefile                                      | 24 ++-----
+>  rules.mak                                          | 15 +++++
+>  tests/Makefile.include                             |  1 +
+>  tests/migration-test.c                             | 78 +++++++++++++++++-----
+>  tests/migration/Makefile                           | 44 ++++++++++++
+>  tests/migration/aarch64-a-b-kernel.S               | 75 +++++++++++++++++++++
+>  tests/migration/aarch64-a-b-kernel.h               | 19 ++++++
+>  tests/migration/migration-test.h                   | 31 +++++++++
+>  tests/migration/rebuild-x86-bootblock.sh           | 33 ---------
+>  .../{x86-a-b-bootblock.s => x86-a-b-bootblock.S}   | 12 ++--
+>  tests/migration/x86-a-b-bootblock.h                |  4 +-
+>  11 files changed, 260 insertions(+), 76 deletions(-)
+>  create mode 100644 tests/migration/Makefile
+>  create mode 100644 tests/migration/aarch64-a-b-kernel.S
+>  create mode 100644 tests/migration/aarch64-a-b-kernel.h
+>  create mode 100644 tests/migration/migration-test.h
+>  delete mode 100755 tests/migration/rebuild-x86-bootblock.sh
+>  rename tests/migration/{x86-a-b-bootblock.s => x86-a-b-bootblock.S} (88%)
+> 
+> -- 
+> 2.14.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
