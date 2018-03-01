@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1erKVu-0004Wb-Cm
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:28:35 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1erKgA-0006Xr-E7
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:39:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1erKVp-000588-D7
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:28:34 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:48047)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1erKVp-00057i-2y
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:28:29 -0500
-References: <20180228221609.11265-1-jcmvbkbc@gmail.com>
-	<20180228221609.11265-9-jcmvbkbc@gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <9d0eb30c-dc09-5154-a902-a317eaa58900@vivier.eu>
-Date: Thu, 1 Mar 2018 10:28:01 +0100
+	(envelope-from <eric.auger@redhat.com>) id 1erKg9-0002aW-3p
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:39:10 -0500
+References: <1519827835-239519-1-git-send-email-imammedo@redhat.com>
+	<1519827835-239519-10-git-send-email-imammedo@redhat.com>
+	<986e15d2-47cd-be73-da0f-39874b38a325@redhat.com>
+	<20180301102153.0a07f96c@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <ad05c82f-eb31-694d-4688-ae250287cfd6@redhat.com>
+Date: Thu, 1 Mar 2018 10:38:52 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180228221609.11265-9-jcmvbkbc@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 08/11] linux-user: drop unused
- target_msync function
+In-Reply-To: <20180301102153.0a07f96c@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 09/10] virt_arm: acpi: reuse common
+ build_fadt()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +26,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org
 
-Le 28/02/2018 à 23:16, Max Filippov a écrit :
-> target_msync is not used, remove its declaration and implementation.
+
+
+On 01/03/18 10:21, Igor Mammedov wrote:
+> On Thu, 1 Mar 2018 09:51:14 +0100
+> Auger Eric <eric.auger@redhat.com> wrote:
 > 
-> Cc: Riku Voipio <riku.voipio@iki.fi>
-> Cc: Laurent Vivier <laurent@vivier.eu>
-> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
-> ---
->  linux-user/mmap.c | 17 -----------------
->  linux-user/qemu.h |  1 -
->  2 files changed, 18 deletions(-)
+>> Hi,
+>> On 28/02/18 15:23, Igor Mammedov wrote:
+>>> Extend generic build_fadt() to support rev5.1 FADT
+>>> and reuse it for 'virt' board, it would allow to
+>>> phase out usage of AcpiFadtDescriptorRev5_1 and
+>>> later ACPI_FADT_COMMON_DEF.
+>>>
+>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>>> ---
+>>> v2:
+>>>   - update comment to mention that build_fadt() supports 5.1 revision
+>>> ---
+>>>  include/hw/acpi/acpi-defs.h | 12 ++----------
+>>>  hw/acpi/aml-build.c         | 23 +++++++++++++++++++++--
+>>>  hw/arm/virt-acpi-build.c    | 33 ++++++++++++---------------------
+>>>  3 files changed, 35 insertions(+), 33 deletions(-)
+>>>
+>>> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+>>> index 3fb0ace..fe15e95 100644
+>>> --- a/include/hw/acpi/acpi-defs.h
+>>> +++ b/include/hw/acpi/acpi-defs.h
+>>> @@ -165,16 +165,6 @@ struct AcpiFadtDescriptorRev3 {
+>>>  } QEMU_PACKED;
+>>>  typedef struct AcpiFadtDescriptorRev3 AcpiFadtDescriptorRev3;
+>>>  
+>>> -struct AcpiFadtDescriptorRev5_1 {
+>>> -    ACPI_FADT_COMMON_DEF
+>>> -    /* 64-bit Sleep Control register (ACPI 5.0) */
+>>> -    struct AcpiGenericAddress sleep_control;
+>>> -    /* 64-bit Sleep Status register (ACPI 5.0) */
+>>> -    struct AcpiGenericAddress sleep_status;
+>>> -} QEMU_PACKED;
+>>> -
+>>> -typedef struct AcpiFadtDescriptorRev5_1 AcpiFadtDescriptorRev5_1;
+>>> -
+>>>  typedef struct AcpiFadtData {
+>>>      struct AcpiGenericAddress pm1a_cnt;   /* PM1a_CNT_BLK */
+>>>      struct AcpiGenericAddress pm1a_evt;   /* PM1a_EVT_BLK */
+>>> @@ -192,6 +182,8 @@ typedef struct AcpiFadtData {
+>>>      uint8_t  rtc_century;      /* CENTURY */
+>>>      uint16_t plvl2_lat;        /* P_LVL2_LAT */
+>>>      uint16_t plvl3_lat;        /* P_LVL3_LAT */
+>>> +    uint16_t arm_boot_arch;    /* ARM_BOOT_ARCH */
+>>> +    uint8_t minor_ver;         /* FADT Minor Version */
+>>>  
+>>>      /*
+>>>       * respective tables offsets within ACPI_BUILD_TABLE_FILE,
+>>> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+>>> index 8f45298..3fa557c 100644
+>>> --- a/hw/acpi/aml-build.c
+>>> +++ b/hw/acpi/aml-build.c
+>>> @@ -1679,7 +1679,7 @@ void build_slit(GArray *table_data, BIOSLinker *linker)
+>>>                   table_data->len - slit_start, 1, NULL, NULL);
+>>>  }
+>>>  
+>>> -/* build rev1/rev3 FADT */
+>>> +/* build rev1/rev3/rev5.1 FADT */
+>>>  void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
+>>>                  const char *oem_id, const char *oem_table_id)
+>>>  {
+>>> @@ -1755,7 +1755,14 @@ void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
+>>>  
+>>>      build_append_gas_from_struct(tbl, &f->reset_reg); /* RESET_REG */
+>>>      build_append_int_noprefix(tbl, f->reset_val, 1); /* RESET_VALUE */
+>>> -    build_append_int_noprefix(tbl, 0, 3); /* Reserved, ACPI 3.0 */
+I meant we could have assert(f->rev < 6) here
+>>> +    /* Since ACPI 5.1 */
+>>> +    if ((f->rev >= 6) || ((f->rev == 5) && f->minor_ver > 0)) {
+and remove (f->rev >= 6) as in any case rev6 is not supported
+(Hypervisor Vendor Identity field (8 byte) not duly added).
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Or do I miss something?
+
+Thanks
+
+Eric
+>>> +        build_append_int_noprefix(tbl, f->arm_boot_arch, 2); /* ARM_BOOT_ARCH */
+>>> +        /* FADT Minor Version */
+>>> +        build_append_int_noprefix(tbl, f->minor_ver, 1);
+>>> +    } else {
+>>> +        build_append_int_noprefix(tbl, 0, 3); /* Reserved upto ACPI 5.0 */
+>>> +    }
+>>>      build_append_int_noprefix(tbl, 0, 8); /* X_FIRMWARE_CTRL */
+>>>  
+>>>      /* XDSDT address to be filled by Guest linker at runtime */
+>>> @@ -1779,6 +1786,18 @@ void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
+>>>      build_append_gas_from_struct(tbl, &f->gpe0_blk); /* X_GPE0_BLK */
+>>>      build_append_gas(tbl, AML_AS_SYSTEM_MEMORY, 0 , 0, 0, 0); /* X_GPE1_BLK */
+>>>  
+>>> +    if (f->rev <= 4) {
+>>> +        goto build_hdr;
+>>> +    }
+>>> +
+>>> +    /* SLEEP_CONTROL_REG */
+>>> +    build_append_gas(tbl, AML_AS_SYSTEM_MEMORY, 0 , 0, 0, 0);
+>>> +    /* SLEEP_STATUS_REG */
+>>> +    build_append_gas(tbl, AML_AS_SYSTEM_MEMORY, 0 , 0, 0, 0);
+>>> +
+>>> +    /* TODO: extra fields need to be added to support revisions above rev5 */
+>>> +    assert(f->rev == 5);  
+>> My previous comment about asserting here if f->rev != 5 and previous
+>> (f->rev >= 6) check was skipped but that's not a big deal.
+> I've thought that I've replied to comment,
+> maybe I just didn't get meaning behind question?
+> So I'll try to explain again.
+> 
+> If we reach this point rev must be 5, so f->rev >= 6 would be confusing
+> at this point. When v6 support is added this assert should be moved after
+> v6 stuff and condition is amended to f->rev == 6.
+> 
+>  
+>> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Thanks!
+> 
+>>
+>> Thanks
+>>
+>> Eric
+>>> +
+>>>  build_hdr:
+>>>      build_header(linker, tbl, (void *)(tbl->data + fadt_start),
+>>>                   "FACP", tbl->len - fadt_start, f->rev, oem_id, oem_table_id);
+>>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+>>> index b644da9..c7c6a57 100644
+>>> --- a/hw/arm/virt-acpi-build.c
+>>> +++ b/hw/arm/virt-acpi-build.c
+>>> @@ -654,39 +654,30 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>>>  static void build_fadt_rev5(GArray *table_data, BIOSLinker *linker,
+>>>                              VirtMachineState *vms, unsigned dsdt_tbl_offset)
+>>>  {
+>>> -    int fadt_start = table_data->len;
+>>> -    AcpiFadtDescriptorRev5_1 *fadt = acpi_data_push(table_data, sizeof(*fadt));
+>>> -    unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
+>>> -    uint16_t bootflags;
+>>> +    /* ACPI v5.1 */
+>>> +    AcpiFadtData fadt = {
+>>> +        .rev = 5,
+>>> +        .minor_ver = 1,
+>>> +        .flags = 1 << ACPI_FADT_F_HW_REDUCED_ACPI,
+>>> +        .xdsdt_tbl_offset = &dsdt_tbl_offset,
+>>> +    };
+>>>  
+>>>      switch (vms->psci_conduit) {
+>>>      case QEMU_PSCI_CONDUIT_DISABLED:
+>>> -        bootflags = 0;
+>>> +        fadt.arm_boot_arch = 0;
+>>>          break;
+>>>      case QEMU_PSCI_CONDUIT_HVC:
+>>> -        bootflags = ACPI_FADT_ARM_PSCI_COMPLIANT | ACPI_FADT_ARM_PSCI_USE_HVC;
+>>> +        fadt.arm_boot_arch = ACPI_FADT_ARM_PSCI_COMPLIANT |
+>>> +                             ACPI_FADT_ARM_PSCI_USE_HVC;
+>>>          break;
+>>>      case QEMU_PSCI_CONDUIT_SMC:
+>>> -        bootflags = ACPI_FADT_ARM_PSCI_COMPLIANT;
+>>> +        fadt.arm_boot_arch = ACPI_FADT_ARM_PSCI_COMPLIANT;
+>>>          break;
+>>>      default:
+>>>          g_assert_not_reached();
+>>>      }
+>>>  
+>>> -    /* Hardware Reduced = 1 and use PSCI 0.2+ */
+>>> -    fadt->flags = cpu_to_le32(1 << ACPI_FADT_F_HW_REDUCED_ACPI);
+>>> -    fadt->arm_boot_flags = cpu_to_le16(bootflags);
+>>> -
+>>> -    /* ACPI v5.1 (fadt->revision.fadt->minor_revision) */
+>>> -    fadt->minor_revision = 0x1;
+>>> -
+>>> -    /* DSDT address to be filled by Guest linker */
+>>> -    bios_linker_loader_add_pointer(linker,
+>>> -        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
+>>> -        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+>>> -
+>>> -    build_header(linker, table_data, (void *)(table_data->data + fadt_start),
+>>> -                 "FACP", table_data->len - fadt_start, 5, NULL, NULL);
+>>> +    build_fadt(table_data, linker, &fadt, NULL, NULL);
+>>>  }
+>>>  
+>>>  /* DSDT */
+>>>   
+> 
