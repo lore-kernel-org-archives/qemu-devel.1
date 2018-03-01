@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1erN2S-0005cA-0J
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:10:24 -0500
+	(envelope-from <cohuck@redhat.com>) id 1erNDy-0002aI-W1
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:22:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1erN2L-0001QR-LM
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:10:19 -0500
-References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
-	<20180226165723.17818-1-eblake@redhat.com>
-	<20180226165723.17818-3-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <0d8f572a-b099-75f9-c161-09226564a4aa@virtuozzo.com>
-Date: Thu, 1 Mar 2018 15:10:01 +0300
+	(envelope-from <cohuck@redhat.com>) id 1erNDu-0008NL-Up
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:22:14 -0500
+Date: Thu, 1 Mar 2018 13:21:48 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180301132148.3ea75777.cohuck@redhat.com>
+In-Reply-To: <0f981ba8-d711-2b9e-942a-c124fc9dd5cf@redhat.com>
+References: <20180227132150.13847-1-cohuck@redhat.com>
+	<CAFEAcA9=59C4NcFTCf489iYttbw56BTLufb5Ee3VnnhQr8xiwg@mail.gmail.com>
+	<20180301112702.1812057c.cohuck@redhat.com>
+	<0f981ba8-d711-2b9e-942a-c124fc9dd5cf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180226165723.17818-3-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] nbd/client: fix error messages in
- nbd_handle_reply_err
+Subject: Re: [Qemu-devel] [PULL 00/26] s390x updates (and friends)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,160 +25,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, David Hildenbrand <david@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-26.02.2018 19:57, Eric Blake wrote:
-> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->
-> 1. NBD_REP_ERR_INVALID is not only about length, so, make message more
->     general
->
-> 2. hex format is not very good: it's hard to read something like
->     "option a (set meta context)", so switch to dec.
->
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Message-Id: <1518702707-7077-6-git-send-email-vsementsov@virtuozzo.com>
-> [eblake: expand scope of patch: ALL uses of nbd_opt_lookup are now
-> decimal, all uses of nbd_rep_lookup are prefixed hex]
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+On Thu, 1 Mar 2018 12:17:12 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-one thought: isn't it better to have all NBD constants in dec, like in spec?
+> On 01.03.2018 11:27, Cornelia Huck wrote:
+> > On Thu, 1 Mar 2018 10:12:53 +0000
+> > Peter Maydell <peter.maydell@linaro.org> wrote:
+> >   
+> >> On 27 February 2018 at 13:21, Cornelia Huck <cohuck@redhat.com> wrote:  
+> >>> The following changes since commit 0a773d55ac76c5aa89ed9187a3bc5af8c5c2a6d0:
+> >>>
+> >>>   maintainers: Add myself as a OpenBSD maintainer (2018-02-23 12:05:07 +0000)
+> >>>
+> >>> are available in the git repository at:
+> >>>
+> >>>   git://github.com/cohuck/qemu tags/s390x-20180227
+> >>>
+> >>> for you to fetch changes up to eae9f29130f3ed40ad77f40a3bae4b9ebff28907:
+> >>>
+> >>>   Merge tag 'tags/s390-ccw-bios-2018-02-26' into s390-next (2018-02-27 13:54:37 +0100)
+> >>>
+> >>> ----------------------------------------------------------------
+> >>> - add query-cpus-fast and deprecate query-cpus, while adding s390 cpu
+> >>>   information
+> >>> - remove s390x memory hotplug implementation, which is not useable in
+> >>>   this form
+> >>> - add boot menu support in the s390-ccw bios
+> >>> - expose s390x guest crash information
+> >>> - fixes and cleaups
+> >>>
+> >>> ----------------------------------------------------------------    
+> >>
+> >> Something seems to be broken here: this failed 'make check' on
+> >> most hosts with
+> >> TEST: tests/pxe-test... (pid=48288)
+> >>   /s390x/pxe/ipv4/s390-ccw-virtio/virtio-net-ccw:                      **
+> >> ERROR:/home/pm215/qemu/tests/boot-sector.c:158:boot_sector_test:
+> >> assertion failed (signature == SIGNATURE): (0x00000000 == 0x0000dead)
+> >>
+> >> and just failed without an error on the rest (with the exception of
+> >> my Linux box, where that test hung entirely with qemu-system-s390x
+> >> using 100% of cpu).
+> >>
+> >> thanks
+> >> -- PMM  
+> > 
+> > Hm, smells bootloader patches related... Thomas?  
+> FWIW, I just bisected the issue and it's not due to the bootloader
+> changes, but due to this one:
+> 
+>  f26852aa31d49bf83a8defd65538137a2f9da82c is the first bad commit
+>  commit f26852aa31d49bf83a8defd65538137a2f9da82c
+>  Author: David Hildenbrand <david@redhat.com>
+>  Date:   Tue Feb 13 17:12:40 2018 +0100
+>  Subject: s390x/tcg: fix disabling/enabling DAT
 
-> ---
->   nbd/client.c     | 20 ++++++++++----------
->   nbd/server.c     |  4 ++--
->   nbd/trace-events |  8 ++++----
->   3 files changed, 16 insertions(+), 16 deletions(-)
->
-> diff --git a/nbd/client.c b/nbd/client.c
-> index 89f80f95905..756e110f895 100644
-> --- a/nbd/client.c
-> +++ b/nbd/client.c
-> @@ -180,22 +180,22 @@ static int nbd_handle_reply_err(QIOChannel *ioc, NBDOptionReply *reply,
->           goto cleanup;
->
->       case NBD_REP_ERR_POLICY:
-> -        error_setg(errp, "Denied by server for option %" PRIx32 " (%s)",
-> +        error_setg(errp, "Denied by server for option %" PRIu32 " (%s)",
->                      reply->option, nbd_opt_lookup(reply->option));
->           break;
->
->       case NBD_REP_ERR_INVALID:
-> -        error_setg(errp, "Invalid data length for option %" PRIx32 " (%s)",
-> +        error_setg(errp, "Invalid parameters for option %" PRIu32 " (%s)",
->                      reply->option, nbd_opt_lookup(reply->option));
->           break;
->
->       case NBD_REP_ERR_PLATFORM:
-> -        error_setg(errp, "Server lacks support for option %" PRIx32 " (%s)",
-> +        error_setg(errp, "Server lacks support for option %" PRIu32 " (%s)",
->                      reply->option, nbd_opt_lookup(reply->option));
->           break;
->
->       case NBD_REP_ERR_TLS_REQD:
-> -        error_setg(errp, "TLS negotiation required before option %" PRIx32
-> +        error_setg(errp, "TLS negotiation required before option %" PRIu32
->                      " (%s)", reply->option, nbd_opt_lookup(reply->option));
->           break;
->
-> @@ -204,17 +204,17 @@ static int nbd_handle_reply_err(QIOChannel *ioc, NBDOptionReply *reply,
->           break;
->
->       case NBD_REP_ERR_SHUTDOWN:
-> -        error_setg(errp, "Server shutting down before option %" PRIx32 " (%s)",
-> +        error_setg(errp, "Server shutting down before option %" PRIu32 " (%s)",
->                      reply->option, nbd_opt_lookup(reply->option));
->           break;
->
->       case NBD_REP_ERR_BLOCK_SIZE_REQD:
-> -        error_setg(errp, "Server requires INFO_BLOCK_SIZE for option %" PRIx32
-> +        error_setg(errp, "Server requires INFO_BLOCK_SIZE for option %" PRIu32
->                      " (%s)", reply->option, nbd_opt_lookup(reply->option));
->           break;
->
->       default:
-> -        error_setg(errp, "Unknown error code when asking for option %" PRIx32
-> +        error_setg(errp, "Unknown error code when asking for option %" PRIu32
->                      " (%s)", reply->option, nbd_opt_lookup(reply->option));
->           break;
->       }
-> @@ -378,8 +378,8 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
->               return 1;
->           }
->           if (reply.type != NBD_REP_INFO) {
-> -            error_setg(errp, "unexpected reply type %" PRIx32
-> -                       " (%s), expected %x",
-> +            error_setg(errp, "unexpected reply type 0x%" PRIx32
-> +                       " (%s), expected 0x%x",
->                          reply.type, nbd_rep_lookup(reply.type), NBD_REP_INFO);
->               nbd_send_opt_abort(ioc);
->               return -1;
-> @@ -534,7 +534,7 @@ static int nbd_request_simple_option(QIOChannel *ioc, int opt, Error **errp)
->
->       if (reply.type != NBD_REP_ACK) {
->           error_setg(errp, "Server answered option %d (%s) with unexpected "
-> -                   "reply %" PRIx32 " (%s)", opt, nbd_opt_lookup(opt),
-> +                   "reply 0x%" PRIx32 " (%s)", opt, nbd_opt_lookup(opt),
->                      reply.type, nbd_rep_lookup(reply.type));
->           nbd_send_opt_abort(ioc);
->           return -1;
-> diff --git a/nbd/server.c b/nbd/server.c
-> index 112e3f69dff..4990a5826e6 100644
-> --- a/nbd/server.c
-> +++ b/nbd/server.c
-> @@ -806,7 +806,7 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
->
->               default:
->                   ret = nbd_opt_drop(client, NBD_REP_ERR_UNSUP, errp,
-> -                                   "Unsupported option 0x%" PRIx32 " (%s)",
-> +                                   "Unsupported option %" PRIu32 " (%s)",
->                                      option, nbd_opt_lookup(option));
->                   break;
->               }
-> @@ -822,7 +822,7 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
->                                                           errp);
->
->               default:
-> -                error_setg(errp, "Unsupported option 0x%" PRIx32 " (%s)",
-> +                error_setg(errp, "Unsupported option %" PRIu32 " (%s)",
->                              option, nbd_opt_lookup(option));
->                   return -EINVAL;
->               }
-> diff --git a/nbd/trace-events b/nbd/trace-events
-> index 2b8268ce8c3..ac19a366aac 100644
-> --- a/nbd/trace-events
-> +++ b/nbd/trace-events
-> @@ -1,7 +1,7 @@
->   # nbd/client.c
->   nbd_send_option_request(uint32_t opt, const char *name, uint32_t len) "Sending option request %" PRIu32" (%s), len %" PRIu32
-> -nbd_receive_option_reply(uint32_t option, const char *optname, uint32_t type, const char *typename, uint32_t length) "Received option reply 0x%" PRIx32" (%s), type 0x%" PRIx32" (%s), len %" PRIu32
-> -nbd_reply_err_unsup(uint32_t option, const char *name) "server doesn't understand request 0x%" PRIx32 " (%s), attempting fallback"
-> +nbd_receive_option_reply(uint32_t option, const char *optname, uint32_t type, const char *typename, uint32_t length) "Received option reply %" PRIu32" (%s), type 0x%" PRIx32" (%s), len %" PRIu32
-> +nbd_reply_err_unsup(uint32_t option, const char *name) "server doesn't understand request %" PRIu32 " (%s), attempting fallback"
->   nbd_opt_go_start(const char *name) "Attempting NBD_OPT_GO for export '%s'"
->   nbd_opt_go_success(void) "Export is good to go"
->   nbd_opt_go_info_unknown(int info, const char *name) "Ignoring unknown info %d (%s)"
-> @@ -33,7 +33,7 @@ nbd_receive_structured_reply_chunk(uint16_t flags, uint16_t type, const char *na
->   nbd_unknown_error(int err) "Squashing unexpected error %d to EINVAL"
->
->   # nbd/server.c
-> -nbd_negotiate_send_rep_len(uint32_t opt, const char *optname, uint32_t type, const char *typename, uint32_t len) "Reply opt=0x%" PRIx32 " (%s), type=0x%" PRIx32 " (%s), len=%" PRIu32
-> +nbd_negotiate_send_rep_len(uint32_t opt, const char *optname, uint32_t type, const char *typename, uint32_t len) "Reply opt=%" PRIu32 " (%s), type=0x%" PRIx32 " (%s), len=%" PRIu32
->   nbd_negotiate_send_rep_err(const char *msg) "sending error message \"%s\""
->   nbd_negotiate_send_rep_list(const char *name, const char *desc) "Advertising export name '%s' description '%s'"
->   nbd_negotiate_handle_export_name(void) "Checking length"
-> @@ -46,7 +46,7 @@ nbd_negotiate_handle_starttls(void) "Setting up TLS"
->   nbd_negotiate_handle_starttls_handshake(void) "Starting TLS handshake"
->   nbd_negotiate_options_flags(uint32_t flags) "Received client flags 0x%" PRIx32
->   nbd_negotiate_options_check_magic(uint64_t magic) "Checking opts magic 0x%" PRIx64
-> -nbd_negotiate_options_check_option(uint32_t option, const char *name) "Checking option 0x%" PRIx32 " (%s)"
-> +nbd_negotiate_options_check_option(uint32_t option, const char *name) "Checking option %" PRIu32 " (%s)"
->   nbd_negotiate_begin(void) "Beginning negotiation"
->   nbd_negotiate_old_style(uint64_t size, unsigned flags) "advertising size %" PRIu64 " and flags 0x%x"
->   nbd_negotiate_new_style_size_flags(uint64_t size, unsigned flags) "advertising size %" PRIu64 " and flags 0x%x"
-
-
--- 
-Best regards,
-Vladimir
+David already sent "s390x/tcg: fix loading 31bit PSWs with the highest
+bit set", I'll think I'll queue on top and resend (after testing).
