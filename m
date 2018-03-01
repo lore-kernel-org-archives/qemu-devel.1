@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erRMM-0007Bh-37
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:47:12 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1erRMo-0007WT-E6
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:47:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erRML-0001wh-Cp
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:47:10 -0500
-Received: from mail-oi0-x235.google.com ([2607:f8b0:4003:c06::235]:45188)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1erRML-0001w5-0a
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:47:09 -0500
-Received: by mail-oi0-x235.google.com with SMTP id j79so4936456oib.12
-	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 08:47:08 -0800 (PST)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1erRMk-00027G-CC
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:47:38 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1519883168-22092-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA9Q9+sK5S1BREuCAVp4J5tU_mexDZU9nBuett3W7bQp-Q@mail.gmail.com>
+	<8459fa75-826e-b42b-a002-e45b309d9e4b@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <182bb517-2fe2-f993-68bd-6b53d753738f@amsat.org>
+Date: Thu, 1 Mar 2018 13:47:31 -0300
 MIME-Version: 1.0
-In-Reply-To: <1519815685-29200-4-git-send-email-abdallah.bouassida@lauterbach.com>
-References: <1519815685-29200-1-git-send-email-abdallah.bouassida@lauterbach.com>
-	<1519815685-29200-4-git-send-email-abdallah.bouassida@lauterbach.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 1 Mar 2018 16:46:47 +0000
-Message-ID: <CAFEAcA8B6TeDUCSmPxG4YJ_1pZSHVf5KA7tOgsO+Jqnme0bnWQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 3/4] target/arm: Add the XML dynamic
- generation
+In-Reply-To: <8459fa75-826e-b42b-a002-e45b309d9e4b@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] hw/arm: Use more CONFIG
+ switches to decide which object files should be linked
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,32 +30,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Khaled Jmal <khaled.jmal@lauterbach.com>
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 28 February 2018 at 11:01, Abdallah Bouassida
-<abdallah.bouassida@lauterbach.com> wrote:
-> Generate an XML description for the cp-regs.
-> Register these regs with the gdb_register_coprocessor().
-> Add arm_gdb_get_sysreg() to use it as a callback to read those regs.
->
-> Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-> ---
+Hi Thomas,
 
-> +void arm_register_gdb_regs_for_features(CPUState *cs)
-> +{
-> +    int n;
-> +
-> +    n = arm_gen_dynamic_xml(cs);
-> +    gdb_register_coprocessor(cs, arm_gdb_get_sysreg, NULL,
-> +                             n, "system-registers.xml", 0);
-> +
-> +}
+On 03/01/2018 11:13 AM, Thomas Huth wrote:
+> On 01.03.2018 14:03, Peter Maydell wrote:
+>> On 1 March 2018 at 05:46, Thomas Huth <thuth@redhat.com> wrote:
+>>> A lot of ARM object files are linked into the executable unconditionally,
+>>> even though we have corresponding CONFIG switches like CONFIG_PXA2XX or
+>>> CONFIG_OMAP. We should make sure to use these switches in the Makefile so
+>>> that the users can disable certain unwanted boards and devices more easily.
+>>> Also introduce the new switch CONFIG_STRONGARM to be able to disable the
+>>> "Collie" machine if it is not wanted.
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>  default-configs/arm-softmmu.mak |  2 ++
+>>>  hw/arm/Makefile.objs            | 26 +++++++++++++++++---------
+>>>  2 files changed, 19 insertions(+), 9 deletions(-)
+>>>
+>>> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+>>> index ca34cf4..43f382a 100644
+>>> --- a/default-configs/arm-softmmu.mak
+>>> +++ b/default-configs/arm-softmmu.mak
+>>> @@ -133,3 +133,5 @@ CONFIG_GPIO_KEY=y
+>>>  CONFIG_MSF2=y
+>>>  CONFIG_FW_CFG_DMA=y
+>>>  CONFIG_XILINX_AXI=y
+>>> +
+>>> +CONFIG_STRONGARM=y
+>>> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+>>> index 1c896ba..5e1e0a9 100644
+>>> --- a/hw/arm/Makefile.objs
+>>> +++ b/hw/arm/Makefile.objs
+>>> @@ -1,15 +1,23 @@
+>>> -obj-y += boot.o collie.o exynos4_boards.o gumstix.o highbank.o
+>>> -obj-$(CONFIG_DIGIC) += digic_boards.o
+>>> -obj-y += integratorcp.o mainstone.o musicpal.o nseries.o
+>>> -obj-y += omap_sx1.o palm.o realview.o spitz.o stellaris.o
+>>> -obj-y += tosa.o versatilepb.o vexpress.o virt.o xilinx_zynq.o z2.o
+>>> +obj-y += boot.o virt.o sysbus-fdt.o
+>>>  obj-$(CONFIG_ACPI) += virt-acpi-build.o
+>>> -obj-y += netduino2.o
+>>> -obj-y += sysbus-fdt.o
+>>> +obj-$(CONFIG_ARM_V7M) += highbank.o netduino2.o vexpress.o
+>>
+>> This is definitely wrong -- highbank and vexpress are not V7M
+>> platforms.
+> 
+> Ooops, sorry, seems like I mixed up V7M with v7-A :-(
+> 
+>> Netduino2 is a v7M platform, but I don't think we
+>> should be making it conditional on ARM_V7M -- we have per-board
+>> configs for other boards, so you'd have a CONFIG_NETDUINO2 here
+>> if you wanted it.
+> 
+> OK, I think I'll simply introduce proper config switches for all three
+> boards.
+> 
+>>> +obj-$(CONFIG_ASPEED_SOC) += integratorcp.o musicpal.o versatilepb.o
+>>
+>> This is wrong too -- none of these are aspeed-based devices.
+> 
+> *facepalm* ... looks like I grep'ed that wrong (I was searching for
+> "arm926" IIRC) ... I'll add proper config switches for those boards, too.
 
-Have you tried writing to a sysreg from the debugger without
-your patch 4 applied? I suspect you'll find it crashes because
-of the NULL pointer you're passing here, and you'll need a
-dummy write function.
+I went on this path some time ago, but stopped it after hearing, while
+distributor are interested in shorten the binary size (reduce code
+coverage for security...), the upstream project prefer to always compile
+most of his code (easier to test).
 
-thanks
--- PMM
+Except show few missing includes, this is true there is not big win
+using those CONFIG selectors, since very few devices are not compiled
+(all ARM cores are always compiled).
+
+I pushed the WIP series in case you find it useful:
+https://github.com/philmd/qemu/commits/armeb-softmmu-wip
+
+Regards,
+
+Phil.
