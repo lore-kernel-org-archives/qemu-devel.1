@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1erX5Q-0000J6-EP
+	(envelope-from <cota@braap.org>) id 1erX5Q-0000J8-FO
 	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 17:54:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1erX5M-0004of-T5
+	(envelope-from <cota@braap.org>) id 1erX5M-0004p2-Vp
 	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 17:54:04 -0500
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:45911)
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:39909)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1erX5M-0004nI-Mj
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1erX5M-0004lW-Ov
 	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 17:54:00 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu,  1 Mar 2018 17:53:49 -0500
-Message-Id: <1519944838-12430-6-git-send-email-cota@braap.org>
+Date: Thu,  1 Mar 2018 17:53:46 -0500
+Message-Id: <1519944838-12430-3-git-send-email-cota@braap.org>
 In-Reply-To: <1519944838-12430-1-git-send-email-cota@braap.org>
 References: <1519944838-12430-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCHv1 05/14] target/sparc: convert to TranslatorOps
+Subject: [Qemu-devel] [PATCHv1 02/14] target/sh4: convert to TranslatorOps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,233 +24,235 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-Notes:
+This was fairly straightforward since it had already been converted
+to DisasContextBase; just had to add TARGET_TOO_MANY to the switch
+in tb_stop.
 
-- Moved the cross-page check from the end of translate_insn to
-  init_disas_context.
-
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Cc: Aurelien Jarno <aurelien@aurel32.net>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/sparc/translate.c | 174 +++++++++++++++++++++++------------------------
- 1 file changed, 86 insertions(+), 88 deletions(-)
+ target/sh4/translate.c | 171 +++++++++++++++++++++++++------------------------
+ 1 file changed, 86 insertions(+), 85 deletions(-)
 
-diff --git a/target/sparc/translate.c b/target/sparc/translate.c
-index 374f98d..1f8f96e 100644
---- a/target/sparc/translate.c
-+++ b/target/sparc/translate.c
-@@ -5732,99 +5732,91 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
-     }
+diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+index 012156b..58bdfeb 100644
+--- a/target/sh4/translate.c
++++ b/target/sh4/translate.c
+@@ -2258,126 +2258,127 @@ static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
  }
+ #endif
  
--void gen_intermediate_code(CPUState *cs, TranslationBlock * tb)
-+static void sparc_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+-void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
++static void sh4_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
  {
-+    DisasContext *dc = container_of(dcbase, DisasContext, base);
-     CPUSPARCState *env = cs->env_ptr;
--    DisasContext dc1, *dc = &dc1;
++    DisasContext *ctx = container_of(dcbase, DisasContext, base);
+     CPUSH4State *env = cs->env_ptr;
+-    DisasContext ctx;
+-    target_ulong pc_start;
+-    int num_insns;
 -    int max_insns;
--    unsigned int insn;
 -
--    memset(dc, 0, sizeof(DisasContext));
--    dc->base.tb = tb;
--    dc->base.pc_first = tb->pc;
--    dc->base.pc_next = tb->pc;
--    dc->base.is_jmp = DISAS_NEXT;
--    dc->base.num_insns = 0;
--    dc->base.singlestep_enabled = cs->singlestep_enabled;
+-    pc_start = tb->pc;
+-    ctx.base.pc_next = pc_start;
+-    ctx.tbflags = (uint32_t)tb->flags;
+-    ctx.envflags = tb->flags & TB_FLAG_ENVFLAGS_MASK;
+-    ctx.base.is_jmp = DISAS_NEXT;
+-    ctx.memidx = (ctx.tbflags & (1u << SR_MD)) == 0 ? 1 : 0;
 +    int bound;
- 
-     dc->pc = dc->base.pc_first;
--    dc->npc = (target_ulong) tb->cs_base;
-+    dc->npc = (target_ulong)dc->base.tb->cs_base;
-     dc->cc_op = CC_OP_DYNAMIC;
--    dc->mem_idx = tb->flags & TB_FLAG_MMU_MASK;
-+    dc->mem_idx = dc->base.tb->flags & TB_FLAG_MMU_MASK;
-     dc->def = &env->def;
--    dc->fpu_enabled = tb_fpu_enabled(tb->flags);
--    dc->address_mask_32bit = tb_am_enabled(tb->flags);
-+    dc->fpu_enabled = tb_fpu_enabled(dc->base.tb->flags);
-+    dc->address_mask_32bit = tb_am_enabled(dc->base.tb->flags);
- #ifndef CONFIG_USER_ONLY
--    dc->supervisor = (tb->flags & TB_FLAG_SUPER) != 0;
-+    dc->supervisor = (dc->base.tb->flags & TB_FLAG_SUPER) != 0;
- #endif
- #ifdef TARGET_SPARC64
-     dc->fprs_dirty = 0;
--    dc->asi = (tb->flags >> TB_FLAG_ASI_SHIFT) & 0xff;
-+    dc->asi = (dc->base.tb->flags >> TB_FLAG_ASI_SHIFT) & 0xff;
- #ifndef CONFIG_USER_ONLY
--    dc->hypervisor = (tb->flags & TB_FLAG_HYPER) != 0;
-+    dc->hypervisor = (dc->base.tb->flags & TB_FLAG_HYPER) != 0;
- #endif
- #endif
-+    /*
-+     * if we reach a page boundary, we stop generation so that the
-+     * PC of a TT_TFAULT exception is always in the right page
-+     */
-+    bound = -(dc->base.pc_first | TARGET_PAGE_MASK) / 4;
-+    dc->base.max_insns = MIN(dc->base.max_insns, bound);
-+}
- 
++
++    ctx->tbflags = (uint32_t)ctx->base.tb->flags;
++    ctx->envflags = ctx->base.tb->flags & TB_FLAG_ENVFLAGS_MASK;
++    ctx->memidx = (ctx->tbflags & (1u << SR_MD)) == 0 ? 1 : 0;
+     /* We don't know if the delayed pc came from a dynamic or static branch,
+        so assume it is a dynamic branch.  */
+-    ctx.delayed_pc = -1; /* use delayed pc from env pointer */
+-    ctx.base.tb = tb;
+-    ctx.base.singlestep_enabled = cs->singlestep_enabled;
+-    ctx.features = env->features;
+-    ctx.has_movcal = (ctx.tbflags & TB_FLAG_PENDING_MOVCA);
+-    ctx.gbank = ((ctx.tbflags & (1 << SR_MD)) &&
+-                 (ctx.tbflags & (1 << SR_RB))) * 0x10;
+-    ctx.fbank = ctx.tbflags & FPSCR_FR ? 0x10 : 0;
+-
 -    max_insns = tb_cflags(tb) & CF_COUNT_MASK;
 -    if (max_insns == 0) {
 -        max_insns = CF_COUNT_MASK;
 -    }
--    if (max_insns > TCG_MAX_INSNS) {
--        max_insns = TCG_MAX_INSNS;
--    }
--    if (dc->base.singlestep_enabled || singlestep) {
+-    max_insns = MIN(max_insns, TCG_MAX_INSNS);
++    ctx->delayed_pc = -1; /* use delayed pc from env pointer */
++    ctx->features = env->features;
++    ctx->has_movcal = (ctx->tbflags & TB_FLAG_PENDING_MOVCA);
++    ctx->gbank = ((ctx->tbflags & (1 << SR_MD)) &&
++                  (ctx->tbflags & (1 << SR_RB))) * 0x10;
++    ctx->fbank = ctx->tbflags & FPSCR_FR ? 0x10 : 0;
+ 
+     /* Since the ISA is fixed-width, we can bound by the number
+        of instructions remaining on the page.  */
+-    num_insns = -(ctx.base.pc_next | TARGET_PAGE_MASK) / 2;
+-    max_insns = MIN(max_insns, num_insns);
+-
+-    /* Single stepping means just that.  */
+-    if (ctx.base.singlestep_enabled || singlestep) {
 -        max_insns = 1;
 -    }
-+static void sparc_tr_tb_start(DisasContextBase *db, CPUState *cs)
-+{
-+}
- 
+-
 -    gen_tb_start(tb);
--    do {
--        if (dc->npc & JUMP_PC) {
--            assert(dc->jump_pc[1] == dc->pc + 4);
--            tcg_gen_insn_start(dc->pc, dc->jump_pc[0] | JUMP_PC);
--        } else {
--            tcg_gen_insn_start(dc->pc, dc->npc);
--        }
--        dc->base.num_insns++;
-+static void sparc_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
-+{
-+    DisasContext *dc = container_of(dcbase, DisasContext, base);
- 
--        if (unlikely(cpu_breakpoint_test(cs, dc->base.pc_next, BP_ANY))) {
--            if (dc->pc != dc->base.pc_first) {
--                save_state(dc);
--            }
--            gen_helper_debug(cpu_env);
--            tcg_gen_exit_tb(0);
--            dc->base.is_jmp = DISAS_NORETURN;
--            dc->base.pc_next += 4;
--            goto exit_gen_loop;
--        }
-+    if (dc->npc & JUMP_PC) {
-+        assert(dc->jump_pc[1] == dc->pc + 4);
-+        tcg_gen_insn_start(dc->pc, dc->jump_pc[0] | JUMP_PC);
-+    } else {
-+        tcg_gen_insn_start(dc->pc, dc->npc);
-+    }
+-    num_insns = 0;
++    bound = -(ctx->base.pc_next | TARGET_PAGE_MASK) / 2;
++    ctx->base.max_insns = MIN(ctx->base.max_insns, bound);
 +}
  
--        if (dc->base.num_insns == max_insns && (tb_cflags(tb) & CF_LAST_IO)) {
++static void sh4_tr_tb_start(DisasContextBase *dcbase, CPUState *cs)
++{
+ #ifdef CONFIG_USER_ONLY
+-    if (ctx.tbflags & GUSA_MASK) {
+-        num_insns = decode_gusa(&ctx, env, &max_insns);
++    DisasContext *ctx = container_of(dcbase, DisasContext, base);
++    CPUSH4State *env = cs->env_ptr;
++
++    if (ctx->tbflags & GUSA_MASK) {
++        ctx->base.num_insns = decode_gusa(ctx, env, &ctx->base.max_insns);
+     }
+ #endif
++}
+ 
+-    while (ctx.base.is_jmp == DISAS_NEXT
+-           && num_insns < max_insns
+-           && !tcg_op_buf_full()) {
+-        tcg_gen_insn_start(ctx.base.pc_next, ctx.envflags);
+-        num_insns++;
++static void sh4_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
++{
++    DisasContext *ctx = container_of(dcbase, DisasContext, base);
+ 
+-        if (unlikely(cpu_breakpoint_test(cs, ctx.base.pc_next, BP_ANY))) {
+-            /* We have hit a breakpoint - make sure PC is up-to-date */
+-            gen_save_cpu_state(&ctx, true);
+-            gen_helper_debug(cpu_env);
+-            ctx.base.is_jmp = DISAS_NORETURN;
+-            /* The address covered by the breakpoint must be included in
+-               [tb->pc, tb->pc + tb->size) in order to for it to be
+-               properly cleared -- thus we increment the PC here so that
+-               the logic setting tb->size below does the right thing.  */
+-            ctx.base.pc_next += 2;
+-            break;
+-        }
++    tcg_gen_insn_start(ctx->base.pc_next, ctx->envflags);
++}
+ 
+-        if (num_insns == max_insns && (tb_cflags(tb) & CF_LAST_IO)) {
 -            gen_io_start();
 -        }
-+static bool sparc_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
-+                                      const CPUBreakpoint *bp)
++static bool sh4_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
++                                    const CPUBreakpoint *bp)
 +{
-+    DisasContext *dc = container_of(dcbase, DisasContext, base);
++    DisasContext *ctx = container_of(dcbase, DisasContext, base);
  
--        insn = cpu_ldl_code(env, dc->pc);
--        dc->base.pc_next += 4;
-+    if (dc->pc != dc->base.pc_first) {
-+        save_state(dc);
-+    }
-+    gen_helper_debug(cpu_env);
-+    tcg_gen_exit_tb(0);
-+    dc->base.is_jmp = DISAS_NORETURN;
-+    /* update pc_next so that the current instruction is included in tb->size */
-+    dc->base.pc_next += 4;
-+    return true;
-+}
- 
--        disas_sparc_insn(dc, insn);
-+static void sparc_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
-+{
-+    DisasContext *dc = container_of(dcbase, DisasContext, base);
-+    CPUSPARCState *env = cs->env_ptr;
-+    unsigned int insn;
- 
--        if (dc->base.is_jmp == DISAS_NORETURN) {
--            break;
--        }
--        /* if the next PC is different, we abort now */
--        if (dc->pc != dc->base.pc_next) {
--            break;
--        }
--        /* if we reach a page boundary, we stop generation so that the
--           PC of a TT_TFAULT exception is always in the right page */
--        if ((dc->pc & (TARGET_PAGE_SIZE - 1)) == 0)
--            break;
--    } while (!tcg_op_buf_full() &&
--             (dc->pc - dc->base.pc_first) < (TARGET_PAGE_SIZE - 32) &&
--             dc->base.num_insns < max_insns);
-+    insn = cpu_ldl_code(env, dc->pc);
-+    dc->base.pc_next += 4;
-+    disas_sparc_insn(dc, insn);
- 
-- exit_gen_loop:
+-        ctx.opcode = cpu_lduw_code(env, ctx.base.pc_next);
+-	decode_opc(&ctx);
+-        ctx.base.pc_next += 2;
+-    }
 -    if (tb_cflags(tb) & CF_LAST_IO) {
 -        gen_io_end();
-+    if (dc->base.is_jmp == DISAS_NORETURN) {
-+        return;
-+    }
-+    if (dc->pc != dc->base.pc_next) {
-+        dc->base.is_jmp = DISAS_TOO_MANY;
-     }
+-    }
++    /* We have hit a breakpoint - make sure PC is up-to-date */
++    gen_save_cpu_state(ctx, true);
++    gen_helper_debug(cpu_env);
++    ctx->base.is_jmp = DISAS_NORETURN;
++    /* The address covered by the breakpoint must be included in
++       [tb->pc, tb->pc + tb->size) in order to for it to be
++       properly cleared -- thus we increment the PC here so that
++       the logic setting tb->size below does the right thing.  */
++    ctx->base.pc_next += 2;
++    return true;
 +}
 +
-+static void sparc_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
++static void sh4_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
 +{
-+    DisasContext *dc = container_of(dcbase, DisasContext, base);
++    CPUSH4State *env = cs->env_ptr;
++    DisasContext *ctx = container_of(dcbase, DisasContext, base);
+ 
+-    if (ctx.tbflags & GUSA_EXCLUSIVE) {
++    ctx->opcode = cpu_lduw_code(env, ctx->base.pc_next);
++    decode_opc(ctx);
++    ctx->base.pc_next += 2;
++}
 +
-     if (dc->base.is_jmp != DISAS_NORETURN) {
-         if (dc->pc != DYNAMIC_PC &&
-             (dc->npc != DYNAMIC_PC && dc->npc != JUMP_PC)) {
-@@ -5838,23 +5830,29 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock * tb)
++static void sh4_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
++{
++    DisasContext *ctx = container_of(dcbase, DisasContext, base);
++
++    if (ctx->tbflags & GUSA_EXCLUSIVE) {
+         /* Ending the region of exclusivity.  Clear the bits.  */
+-        ctx.envflags &= ~GUSA_MASK;
++        ctx->envflags &= ~GUSA_MASK;
+     }
+ 
+-    switch (ctx.base.is_jmp) {
++    switch (ctx->base.is_jmp) {
+     case DISAS_STOP:
+-        gen_save_cpu_state(&ctx, true);
+-        if (ctx.base.singlestep_enabled) {
++        gen_save_cpu_state(ctx, true);
++        if (ctx->base.singlestep_enabled) {
+             gen_helper_debug(cpu_env);
+         } else {
              tcg_gen_exit_tb(0);
          }
+         break;
+     case DISAS_NEXT:
+-        gen_save_cpu_state(&ctx, false);
+-        gen_goto_tb(&ctx, 0, ctx.base.pc_next);
++    case DISAS_TOO_MANY:
++        gen_save_cpu_state(ctx, false);
++        gen_goto_tb(ctx, 0, ctx->base.pc_next);
+         break;
+     case DISAS_NORETURN:
+         break;
+     default:
+         g_assert_not_reached();
      }
--    gen_tb_end(tb, dc->base.num_insns);
--
--    tb->size = dc->base.pc_next - dc->base.pc_first;
--    tb->icount = dc->base.num_insns;
--
--#ifdef DEBUG_DISAS
--    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
--        && qemu_log_in_addr_range(dc->base.pc_first)) {
--        qemu_log_lock();
--        qemu_log("--------------\n");
--        qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
--        log_target_disas(cs, dc->base.pc_first,
--                         dc->base.pc_next - dc->base.pc_first);
--        qemu_log("\n");
--        qemu_log_unlock();
--    }
--#endif
 +}
-+
-+static void sparc_tr_disas_log(const DisasContextBase *dcbase, CPUState *cpu)
+ 
+-    gen_tb_end(tb, num_insns);
++static void sh4_tr_disas_log(const DisasContextBase *dcbase, CPUState *cs)
 +{
-+    qemu_log("IN: %s\n", lookup_symbol(dcbase->pc_first));
-+    log_target_disas(cpu, dcbase->pc_first, dcbase->tb->size);
++    qemu_log("IN:\n");  /* , lookup_symbol(dcbase->pc_first)); */
++    log_target_disas(cs, dcbase->pc_first, dcbase->tb->size);
 +}
-+
-+static const TranslatorOps sparc_tr_ops = {
-+    .init_disas_context = sparc_tr_init_disas_context,
-+    .tb_start           = sparc_tr_tb_start,
-+    .insn_start         = sparc_tr_insn_start,
-+    .breakpoint_check   = sparc_tr_breakpoint_check,
-+    .translate_insn     = sparc_tr_translate_insn,
-+    .tb_stop            = sparc_tr_tb_stop,
-+    .disas_log          = sparc_tr_disas_log,
+ 
+-    tb->size = ctx.base.pc_next - pc_start;
+-    tb->icount = num_insns;
++static const TranslatorOps sh4_tr_ops = {
++    .init_disas_context = sh4_tr_init_disas_context,
++    .tb_start           = sh4_tr_tb_start,
++    .insn_start         = sh4_tr_insn_start,
++    .breakpoint_check   = sh4_tr_breakpoint_check,
++    .translate_insn     = sh4_tr_translate_insn,
++    .tb_stop            = sh4_tr_tb_stop,
++    .disas_log          = sh4_tr_disas_log,
 +};
 +
 +void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
 +{
-+    DisasContext dc = {};
-+
-+    translator_loop(&sparc_tr_ops, &dc.base, cs, tb);
++    DisasContext ctx;
+ 
+-#ifdef DEBUG_DISAS
+-    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
+-        && qemu_log_in_addr_range(pc_start)) {
+-        qemu_log_lock();
+-	qemu_log("IN:\n");	/* , lookup_symbol(pc_start)); */
+-        log_target_disas(cs, pc_start, ctx.base.pc_next - pc_start);
+-	qemu_log("\n");
+-        qemu_log_unlock();
+-    }
+-#endif
++    translator_loop(&sh4_tr_ops, &ctx.base, cs, tb);
  }
  
- void sparc_tcg_init(void)
+ void restore_state_to_opc(CPUSH4State *env, TranslationBlock *tb,
 -- 
 2.7.4
