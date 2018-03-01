@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1erMkt-0007qa-Dr
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:52:15 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1erMpZ-0003ch-OX
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:57:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1erMks-0007lV-AX
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:52:11 -0500
-References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
-	<1518702707-7077-10-git-send-email-vsementsov@virtuozzo.com>
-	<8e580b8b-1614-9c83-4ac9-48f5d3cff3dc@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <b17a3d26-5f55-da0a-f083-159ebdf749b7@virtuozzo.com>
-Date: Thu, 1 Mar 2018 14:51:41 +0300
+	(envelope-from <haozhong.zhang@intel.com>) id 1erMpV-0001ak-Cw
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:57:01 -0500
+Received: from mga04.intel.com ([192.55.52.120]:62692)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1erMpV-0001ZJ-1m
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:56:57 -0500
+Date: Thu, 1 Mar 2018 19:56:51 +0800
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Message-ID: <20180301115651.tyzptkekkxb2p4rl@hz-desktop>
+References: <20180228040300.8914-1-haozhong.zhang@intel.com>
+	<20180228040300.8914-2-haozhong.zhang@intel.com>
+	<20180301114212.0cc843b3@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <8e580b8b-1614-9c83-4ac9-48f5d3cff3dc@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 9/9] iotests: new test 206 for NBD
- BLOCK_STATUS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180301114212.0cc843b3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] hw/acpi-build: build SRAT memory
+ affinity structures for DIMM devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,112 +30,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, mst@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Richard Henderson <rth@twiddle.net>
 
-17.02.2018 00:02, Eric Blake wrote:
-> On 02/15/2018 07:51 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->> =C2=A0 tests/qemu-iotests/206=C2=A0=C2=A0=C2=A0=C2=A0 | 34 +++++++++++++=
-+++++++++++++++++++++
->> =C2=A0 tests/qemu-iotests/206.out |=C2=A0 2 ++
->> =C2=A0 tests/qemu-iotests/group=C2=A0=C2=A0 |=C2=A0 1 +
->> =C2=A0 3 files changed, 37 insertions(+)
->> =C2=A0 create mode 100644 tests/qemu-iotests/206
->> =C2=A0 create mode 100644 tests/qemu-iotests/206.out
->
-> It's a race! Kevin already has test 206 and 207 claimed in his pending=20
-> series:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg02363.html
-> Whoever loses gets to rebase and renumber (or the maintainer on their=20
-> behalf) ;)
+On 03/01/18 11:42 +0100, Igor Mammedov wrote:
+> On Wed, 28 Feb 2018 12:02:58 +0800
+> Haozhong Zhang <haozhong.zhang@intel.com> wrote:
+> 
+> > ACPI 6.2A Table 5-129 "SPA Range Structure" requires the proximity
+> > domain of a NVDIMM SPA range must match with corresponding entry in
+> > SRAT table.
+> > 
+> > The address ranges of vNVDIMM in QEMU are allocated from the
+> > hot-pluggable address space, which is entirely covered by one SRAT
+> > memory affinity structure. However, users can set the vNVDIMM
+> > proximity domain in NFIT SPA range structure by the 'node' property of
+> > '-device nvdimm' to a value different than the one in the above SRAT
+> > memory affinity structure.
+> > 
+> > In order to solve such proximity domain mismatch, this patch builds
+> > one SRAT memory affinity structure for each static-plugged DIMM device,
+> s/static-plugged/present at boot/
+> since after hotplug and following reset SRAT will be recreated
+> and include hotplugged DIMMs as well.
 
+Ah yes, I'll fix the message in the next version.
 
-is there any simple method to get a number for new test? Any way to=20
-avoid such situations?
+> 
+> > including both PC-DIMM and NVDIMM, with the proximity domain specified
+> > in '-device pc-dimm' or '-device nvdimm'.
+> > 
+> > The remaining hot-pluggable address space is covered by one or multiple
+> > SRAT memory affinity structures with the proximity domain of the last
+> > node as before.
+> > 
+> > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> > ---
+> >  hw/i386/acpi-build.c     | 50 ++++++++++++++++++++++++++++++++++++++++++++----
+> >  hw/mem/pc-dimm.c         |  8 ++++++++
+> >  include/hw/mem/pc-dimm.h | 10 ++++++++++
+> >  3 files changed, 64 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > index deb440f286..a88de06d8f 100644
+> > --- a/hw/i386/acpi-build.c
+> > +++ b/hw/i386/acpi-build.c
+> > @@ -2323,6 +2323,49 @@ build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+> >  #define HOLE_640K_START  (640 * 1024)
+> >  #define HOLE_640K_END   (1024 * 1024)
+> >  
+> > +static void build_srat_hotpluggable_memory(GArray *table_data, uint64_t base,
+> > +                                           uint64_t len, int default_node)
+> > +{
+> > +    GSList *dimms = pc_dimm_get_device_list();
+> > +    GSList *ent = dimms;
+> > +    PCDIMMDevice *dev;
+> > +    Object *obj;
+> > +    uint64_t end = base + len, addr, size;
+> > +    int node;
+> > +    AcpiSratMemoryAffinity *numamem;
+> > +
+> > +    while (base < end) {
+> It's just matter of taste but wouldn't 'for' loop be better here?
+> One can see start, end and next step from the begging.
 
->
->>
->> diff --git a/tests/qemu-iotests/206 b/tests/qemu-iotests/206
->> new file mode 100644
->
-> Oops, you forgot to mark this executable.=C2=A0 And oops, I forgot to fla=
-g=20
-> that on test 205.=C2=A0 Other inconsistent tests: 096, 124, 129, 132, 136=
-,=20
-> 139, 148, 152, 163. Separate cleanup patch coming up soon.
->
->> index 0000000000..259e991ec6
->> --- /dev/null
->> +++ b/tests/qemu-iotests/206
->> @@ -0,0 +1,34 @@
->> +#!/usr/bin/env python
->> +#
->> +# Tests for NBD BLOCK_STATUS extension
->> +#
->
->> +import iotests
->> +from iotests import qemu_img_create, qemu_io, qemu_img_verbose,=20
->> qemu_nbd, \
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 file_path
->> +
->> +iotests.verify_image_format(supported_fmts=3D['qcow2'])
->
-> Don't we also need to blacklist v2 files (and only operate on v3 or=20
-> newer), since the behavior of zero clusters is much worse on v2 images?
+will switch to a for loop
 
-hm. I think if test passed, all is ok. qemu-img creates good enough=20
-image to pass the test..
+> 
+> > +        numamem = acpi_data_push(table_data, sizeof *numamem);
+> > +
+> > +        if (!ent) {
+> > +            build_srat_memory(numamem, base, end - base, default_node,
+> > +                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+> > +            break;
+> > +        }
+> > +
+> > +        dev = PC_DIMM(ent->data);
+> > +        obj = OBJECT(dev);
+> > +        addr = object_property_get_uint(obj, PC_DIMM_ADDR_PROP, NULL);
+> > +        size = object_property_get_uint(obj, PC_DIMM_SIZE_PROP, NULL);
+> > +        node = object_property_get_uint(obj, PC_DIMM_NODE_PROP, NULL);
+> > +
+> > +        if (base < addr) {
+> > +            build_srat_memory(numamem, base, addr - base, default_node,
+> > +                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+> > +            numamem = acpi_data_push(table_data, sizeof *numamem);
+> > +        }
+> > +        build_srat_memory(numamem, addr, size, node,
+> > +                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED |
+> Is NVDIMM hotplug supported in QEMU?
+> If not we might need make MEM_AFFINITY_HOTPLUGGABLE conditional too.
 
->
->> +
->> +disk, nbd_sock =3D file_path('disk', 'nbd-sock')
->> +nbd_uri =3D 'nbd+unix:///exp?socket=3D' + nbd_sock
->> +
->> +qemu_img_create('-f', iotests.imgfmt, disk, '1M')
->> +qemu_io('-f', iotests.imgfmt, '-c', 'write 0 512K', disk)
->
-> Hopefully large enough for all the major filesystems with sparse=20
-> support to show half-data, half-hole, and not run into any weird=20
-> issues where granularity differences between filesystems change the=20
-> outcome.
->
->> +
->> +qemu_nbd('-k', nbd_sock, '-x', 'exp', '-f', iotests.imgfmt, disk)
->> +qemu_img_verbose('map', '-f', 'raw', '--output=3Djson', nbd_uri)
->> diff --git a/tests/qemu-iotests/206.out b/tests/qemu-iotests/206.out
->> new file mode 100644
->> index 0000000000..0d29724e84
->> --- /dev/null
->> +++ b/tests/qemu-iotests/206.out
->> @@ -0,0 +1,2 @@
->> +[{ "start": 0, "length": 524288, "depth": 0, "zero": false, "data":=20
->> true},
->> +{ "start": 524288, "length": 524288, "depth": 0, "zero": true,=20
->> "data": false}]
->
-> But definite evidence of getting block status over NBD! Progress!
->
-> And kudos for producing an .out file that I can actually read and=20
-> reproduce without the aid of python (in contrast to the more=20
-> "unit-test"-y ones like 205, where we had a big long side-discussion=20
-> about that. No need to repeat it here).
->
->> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
->> index a2dfe79d86..2c3925566a 100644
->> --- a/tests/qemu-iotests/group
->> +++ b/tests/qemu-iotests/group
->> @@ -202,3 +202,4 @@
->> =C2=A0 203 rw auto
->> =C2=A0 204 rw auto quick
->> =C2=A0 205 rw auto quick
->> +206 rw auto quick
->>
->
+Yes, it's supported.
 
+> 
+> > +                          (object_dynamic_cast(obj, TYPE_NVDIMM) ?
+> > +                           MEM_AFFINITY_NON_VOLATILE : 0));
+> it might be cleaner without inline flags duplication
+> 
+>   flags = MEM_AFFINITY_ENABLED;
+>   ...
+>   if (!ent) {
+>       flags |= MEM_AFFINITY_HOTPLUGGABLE
+>   }
+>   ...
+>   if (PCDIMMDeviceInfo::hotpluggable) { // see ***
+>       flags |= MEM_AFFINITY_HOTPLUGGABLE
+>   }
+>   ...
+>   if (object_dynamic_cast(obj, TYPE_NVDIMM))
+>       flags |= MEM_AFFINITY_NON_VOLATILE
+>   }
 
---=20
-Best regards,
-Vladimir
+I'm fine for such changes, except ***
+
+[..]
+> > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> > index 6e74b61cb6..9fd901e87a 100644
+> > --- a/hw/mem/pc-dimm.c
+> > +++ b/hw/mem/pc-dimm.c
+> > @@ -276,6 +276,14 @@ static int pc_dimm_built_list(Object *obj, void *opaque)
+> >      return 0;
+> >  }
+> >  
+> > +GSList *pc_dimm_get_device_list(void)
+> > +{
+> > +    GSList *list = NULL;
+> > +
+> > +    object_child_foreach(qdev_get_machine(), pc_dimm_built_list, &list);
+> > +    return list;
+> > +}
+> (***)
+> see http://lists.gnu.org/archive/html/qemu-ppc/2018-02/msg00271.html
+> You could do that in separate patch, so that it won't matter
+> whose patch got merged first and it won't affect the rest of patches.
+
+Sure, I can separate this part, but I would still like to use a list
+of PCDIMMDevice rather than a list of MemoryDeviceInfo. The latter
+would need to be extended to include NVDIMM information (e.g., adding
+a NVDIMMDeviceInfo to the union).
+
+Haozhong
+
+> 
+> 
+> >  uint64_t pc_dimm_get_free_addr(uint64_t address_space_start,
+> >                                 uint64_t address_space_size,
+> >                                 uint64_t *hint, uint64_t align, uint64_t size,
+> > diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+> > index d83b957829..4cf5cc49e9 100644
+> > --- a/include/hw/mem/pc-dimm.h
+> > +++ b/include/hw/mem/pc-dimm.h
+> > @@ -100,4 +100,14 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+> >                           MemoryRegion *mr, uint64_t align, Error **errp);
+> >  void pc_dimm_memory_unplug(DeviceState *dev, MemoryHotplugState *hpms,
+> >                             MemoryRegion *mr);
+> > +
+> > +/*
+> > + * Return a list of DeviceState of pc-dimm and nvdimm devices. The
+> > + * list is sorted in the ascendant order of the base address of
+> > + * devices.
+> > + *
+> > + * Note: callers are responsible to free the list.
+> > + */
+> > +GSList *pc_dimm_get_device_list(void);
+> > +
+> >  #endif
+> 
