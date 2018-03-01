@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erQq9-0003Le-2b
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:13:53 -0500
+	(envelope-from <mst@redhat.com>) id 1erQtD-0004ad-KI
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:17:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erQq8-00056s-5o
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:13:53 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:42564)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1erQq8-000560-0P
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:13:52 -0500
-Received: by mail-ot0-x243.google.com with SMTP id l5so6033456otf.9
-	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 08:13:51 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1erQt8-0006OS-8o
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:17:03 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56124 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1erQt8-0006OI-2z
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:16:58 -0500
+Date: Thu, 1 Mar 2018 18:16:48 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180301181601-mutt-send-email-mst@kernel.org>
+References: <cover.1519714706.git.jianjay.zhou@huawei.com>
+	<bf09c8b0049f97485615916e91af556119475db8.1519714706.git.jianjay.zhou@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <1519815685-29200-2-git-send-email-abdallah.bouassida@lauterbach.com>
-References: <1519815685-29200-1-git-send-email-abdallah.bouassida@lauterbach.com>
-	<1519815685-29200-2-git-send-email-abdallah.bouassida@lauterbach.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 1 Mar 2018 16:13:30 +0000
-Message-ID: <CAFEAcA80d1AF=32Ds7GcfrxzHyywjueRMKMex0euwsFFwbfB-g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 1/4] target/arm: Add "ARM_CP_NO_GDB" as
- a new bit field for ARMCPRegInfo type
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bf09c8b0049f97485615916e91af556119475db8.1519714706.git.jianjay.zhou@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v8 2/2] vhost: used_memslots refactoring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +27,299 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Khaled Jmal <khaled.jmal@lauterbach.com>
+To: Jay Zhou <jianjay.zhou@huawei.com>
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, arei.gonglei@huawei.com, liuzhe13@huawei.com
 
-On 28 February 2018 at 11:01, Abdallah Bouassida
-<abdallah.bouassida@lauterbach.com> wrote:
-> This is a preparation for the coming feature of creating dynamically an XML
-> description for the ARM sysregs.
-> A register has ARM_CP_NO_GDB enabled will not be shown in the dynamic XML.
-> This bit is enabled automatically when creating CP_ANY wildcard aliases.
-> This bit could be enabled manually for any register we want to remove from the
-> dynamic XML description.
->
-> Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+On Tue, Feb 27, 2018 at 03:10:05PM +0800, Jay Zhou wrote:
+> Used_memslots is shared by vhost kernel and user, it is equal to
+> dev->mem->nregions, which is correct for vhost kernel, but not for
+> vhost user, the latter one uses memory regions that have file
+> descriptor. E.g. a VM has a vhost-user NIC and 8(vhost user memslot
+> upper limit) memory slots, it will be failed to hotplug a new DIMM
+> device since vhost_has_free_slot() finds no free slot left. It
+> should be successful if only part of memory slots have file
+> descriptor, so setting used memslots for vhost-user and
+> vhost-kernel respectively.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+> Signed-off-by: Liuzhe <liuzhe13@huawei.com>
+
+make check fails with this patch, I dropped it for now.
+
 > ---
->  target/arm/cpu.h    | 3 ++-
->  target/arm/helper.c | 2 +-
->  2 files changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 8c839fa..92cfe4c 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -1776,10 +1776,11 @@ static inline uint64_t cpreg_to_kvm_id(uint32_t cpregid)
->  #define ARM_LAST_SPECIAL         ARM_CP_DC_ZVA
->  #define ARM_CP_FPU               0x1000
->  #define ARM_CP_SVE               0x2000
-> +#define ARM_CP_NO_GDB            0x4000
->  /* Used only as a terminator for ARMCPRegInfo lists */
->  #define ARM_CP_SENTINEL          0xffff
->  /* Mask of only the flag bits in a type field */
-> -#define ARM_CP_FLAG_MASK         0x30ff
-> +#define ARM_CP_FLAG_MASK         0x70ff
->
->  /* Valid values for ARMCPRegInfo state field, indicating which of
->   * the AArch32 and AArch64 execution states this register is visible in.
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index c5bc69b..bdd212f 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -5663,7 +5663,7 @@ static void add_cpreg_to_hashtable(ARMCPU *cpu, const ARMCPRegInfo *r,
->      if (((r->crm == CP_ANY) && crm != 0) ||
->          ((r->opc1 == CP_ANY) && opc1 != 0) ||
->          ((r->opc2 == CP_ANY) && opc2 != 0)) {
-> -        r2->type |= ARM_CP_ALIAS;
-> +        r2->type |= ARM_CP_ALIAS | ARM_CP_NO_GDB;
+>  hw/virtio/vhost-backend.c         | 15 +++++++-
+>  hw/virtio/vhost-user.c            | 77 ++++++++++++++++++++++++++-------------
+>  hw/virtio/vhost.c                 | 13 +++----
+>  include/hw/virtio/vhost-backend.h |  6 ++-
+>  4 files changed, 75 insertions(+), 36 deletions(-)
+> 
+> diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
+> index 7f09efa..59def69 100644
+> --- a/hw/virtio/vhost-backend.c
+> +++ b/hw/virtio/vhost-backend.c
+> @@ -15,6 +15,8 @@
+>  #include "hw/virtio/vhost-backend.h"
+>  #include "qemu/error-report.h"
+>  
+> +static unsigned int vhost_kernel_used_memslots;
+> +
+>  static int vhost_kernel_call(struct vhost_dev *dev, unsigned long int request,
+>                               void *arg)
+>  {
+> @@ -62,6 +64,11 @@ static int vhost_kernel_memslots_limit(struct vhost_dev *dev)
+>      return limit;
+>  }
+>  
+> +static bool vhost_kernel_has_free_memslots(struct vhost_dev *dev)
+> +{
+> +    return vhost_kernel_used_memslots < vhost_kernel_memslots_limit(dev);
+> +}
+> +
+>  static int vhost_kernel_net_set_backend(struct vhost_dev *dev,
+>                                          struct vhost_vring_file *file)
+>  {
+> @@ -233,11 +240,16 @@ static void vhost_kernel_set_iotlb_callback(struct vhost_dev *dev,
+>          qemu_set_fd_handler((uintptr_t)dev->opaque, NULL, NULL, NULL);
+>  }
+>  
+> +static void vhost_kernel_set_used_memslots(struct vhost_dev *dev)
+> +{
+> +    vhost_kernel_used_memslots = dev->mem->nregions;
+> +}
+> +
+>  static const VhostOps kernel_ops = {
+>          .backend_type = VHOST_BACKEND_TYPE_KERNEL,
+>          .vhost_backend_init = vhost_kernel_init,
+>          .vhost_backend_cleanup = vhost_kernel_cleanup,
+> -        .vhost_backend_memslots_limit = vhost_kernel_memslots_limit,
+> +        .vhost_backend_has_free_memslots = vhost_kernel_has_free_memslots,
+>          .vhost_net_set_backend = vhost_kernel_net_set_backend,
+>          .vhost_scsi_set_endpoint = vhost_kernel_scsi_set_endpoint,
+>          .vhost_scsi_clear_endpoint = vhost_kernel_scsi_clear_endpoint,
+> @@ -264,6 +276,7 @@ static const VhostOps kernel_ops = {
+>  #endif /* CONFIG_VHOST_VSOCK */
+>          .vhost_set_iotlb_callback = vhost_kernel_set_iotlb_callback,
+>          .vhost_send_device_iotlb_msg = vhost_kernel_send_device_iotlb_msg,
+> +        .vhost_set_used_memslots = vhost_kernel_set_used_memslots,
+>  };
+>  
+>  int vhost_set_backend_type(struct vhost_dev *dev, VhostBackendType backend_type)
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index 6eb9798..f732c80 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -147,6 +147,8 @@ static VhostUserMsg m __attribute__ ((unused));
+>  /* The version of the protocol we support */
+>  #define VHOST_USER_VERSION    (0x1)
+>  
+> +static bool vhost_user_free_memslots = true;
+> +
+>  struct vhost_user {
+>      CharBackend *chr;
+>      int slave_fd;
+> @@ -314,12 +316,43 @@ static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t base,
+>      return 0;
+>  }
+>  
+> +static int vhost_user_prepare_msg(struct vhost_dev *dev, VhostUserMemory *mem,
+> +                                  int *fds)
+> +{
+> +    int i, fd;
+> +
+> +    vhost_user_free_memslots = true;
+> +    for (i = 0, mem->nregions = 0; i < dev->mem->nregions; ++i) {
+> +        struct vhost_memory_region *reg = dev->mem->regions + i;
+> +        ram_addr_t offset;
+> +        MemoryRegion *mr;
+> +
+> +        assert((uintptr_t)reg->userspace_addr == reg->userspace_addr);
+> +        mr = memory_region_from_host((void *)(uintptr_t)reg->userspace_addr,
+> +                                     &offset);
+> +        fd = memory_region_get_fd(mr);
+> +        if (fd > 0) {
+> +            if (mem->nregions == VHOST_MEMORY_MAX_NREGIONS) {
+> +                vhost_user_free_memslots = false;
+> +                return -1;
+> +            }
+> +
+> +            mem->regions[mem->nregions].userspace_addr = reg->userspace_addr;
+> +            mem->regions[mem->nregions].memory_size = reg->memory_size;
+> +            mem->regions[mem->nregions].guest_phys_addr = reg->guest_phys_addr;
+> +            mem->regions[mem->nregions].mmap_offset = offset;
+> +            fds[mem->nregions++] = fd;
+> +        }
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+>  static int vhost_user_set_mem_table(struct vhost_dev *dev,
+>                                      struct vhost_memory *mem)
+>  {
+>      int fds[VHOST_MEMORY_MAX_NREGIONS];
+> -    int i, fd;
+> -    size_t fd_num = 0;
+> +    size_t fd_num;
+>      bool reply_supported = virtio_has_feature(dev->protocol_features,
+>                                                VHOST_USER_PROTOCOL_F_REPLY_ACK);
+>  
+> @@ -332,29 +365,12 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
+>          msg.hdr.flags |= VHOST_USER_NEED_REPLY_MASK;
 >      }
->
->      /* Check that raw accesses are either forbidden or handled. Note that
-> --
-> 2.7.4
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+>  
+> -    for (i = 0; i < dev->mem->nregions; ++i) {
+> -        struct vhost_memory_region *reg = dev->mem->regions + i;
+> -        ram_addr_t offset;
+> -        MemoryRegion *mr;
+> -
+> -        assert((uintptr_t)reg->userspace_addr == reg->userspace_addr);
+> -        mr = memory_region_from_host((void *)(uintptr_t)reg->userspace_addr,
+> -                                     &offset);
+> -        fd = memory_region_get_fd(mr);
+> -        if (fd > 0) {
+> -            if (fd_num == VHOST_MEMORY_MAX_NREGIONS) {
+> -                error_report("Failed preparing vhost-user memory table msg");
+> -                return -1;
+> -            }
+> -            msg.payload.memory.regions[fd_num].userspace_addr = reg->userspace_addr;
+> -            msg.payload.memory.regions[fd_num].memory_size  = reg->memory_size;
+> -            msg.payload.memory.regions[fd_num].guest_phys_addr = reg->guest_phys_addr;
+> -            msg.payload.memory.regions[fd_num].mmap_offset = offset;
+> -            fds[fd_num++] = fd;
+> -        }
+> +    if (vhost_user_prepare_msg(dev, &msg.payload.memory, fds) < 0) {
+> +        error_report("Failed preparing vhost-user memory table msg");
+> +        return -1;
+>      }
+>  
+> -    msg.payload.memory.nregions = fd_num;
+> +    fd_num = msg.payload.memory.nregions;
+>  
+>      if (!fd_num) {
+>          error_report("Failed initializing vhost-user memory map, "
+> @@ -870,9 +886,9 @@ static int vhost_user_get_vq_index(struct vhost_dev *dev, int idx)
+>      return idx;
+>  }
+>  
+> -static int vhost_user_memslots_limit(struct vhost_dev *dev)
+> +static bool vhost_user_has_free_memslots(struct vhost_dev *dev)
+>  {
+> -    return VHOST_MEMORY_MAX_NREGIONS;
+> +    return vhost_user_free_memslots;
+>  }
+>  
+>  static bool vhost_user_requires_shm_log(struct vhost_dev *dev)
+> @@ -1054,11 +1070,19 @@ static int vhost_user_set_config(struct vhost_dev *dev, const uint8_t *data,
+>      return 0;
+>  }
+>  
+> +static void vhost_user_set_used_memslots(struct vhost_dev *dev)
+> +{
+> +    int fds[VHOST_MEMORY_MAX_NREGIONS];
+> +    VhostUserMsg msg;
+> +
+> +    vhost_user_prepare_msg(dev, &msg.payload.memory, fds);
+> +}
+> +
+>  const VhostOps user_ops = {
+>          .backend_type = VHOST_BACKEND_TYPE_USER,
+>          .vhost_backend_init = vhost_user_init,
+>          .vhost_backend_cleanup = vhost_user_cleanup,
+> -        .vhost_backend_memslots_limit = vhost_user_memslots_limit,
+> +        .vhost_backend_has_free_memslots = vhost_user_has_free_memslots,
+>          .vhost_set_log_base = vhost_user_set_log_base,
+>          .vhost_set_mem_table = vhost_user_set_mem_table,
+>          .vhost_set_vring_addr = vhost_user_set_vring_addr,
+> @@ -1082,4 +1106,5 @@ const VhostOps user_ops = {
+>          .vhost_send_device_iotlb_msg = vhost_user_send_device_iotlb_msg,
+>          .vhost_get_config = vhost_user_get_config,
+>          .vhost_set_config = vhost_user_set_config,
+> +        .vhost_set_used_memslots = vhost_user_set_used_memslots,
+>  };
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index 4a583a3..7f17de9 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -44,20 +44,19 @@
+>  static struct vhost_log *vhost_log;
+>  static struct vhost_log *vhost_log_shm;
+>  
+> -static unsigned int used_memslots;
+>  static QLIST_HEAD(, vhost_dev) vhost_devices =
+>      QLIST_HEAD_INITIALIZER(vhost_devices);
+>  
+>  bool vhost_has_free_slot(void)
+>  {
+> -    unsigned int slots_limit = ~0U;
+>      struct vhost_dev *hdev;
+>  
+>      QLIST_FOREACH(hdev, &vhost_devices, entry) {
+> -        unsigned int r = hdev->vhost_ops->vhost_backend_memslots_limit(hdev);
+> -        slots_limit = MIN(slots_limit, r);
+> +        if (!hdev->vhost_ops->vhost_backend_has_free_memslots(hdev)) {
+> +            return false;
+> +        }
+>      }
+> -    return slots_limit > used_memslots;
+> +    return true;
+>  }
+>  
+>  static void vhost_dev_sync_region(struct vhost_dev *dev,
+> @@ -442,7 +441,7 @@ static void vhost_commit(MemoryListener *listener)
+>                         dev->n_mem_sections * sizeof dev->mem->regions[0];
+>      dev->mem = g_realloc(dev->mem, regions_size);
+>      dev->mem->nregions = dev->n_mem_sections;
+> -    used_memslots = dev->mem->nregions;
+> +    dev->vhost_ops->vhost_set_used_memslots(dev);
+>      for (i = 0; i < dev->n_mem_sections; i++) {
+>          struct vhost_memory_region *cur_vmr = dev->mem->regions + i;
+>          struct MemoryRegionSection *mrs = dev->mem_sections + i;
+> @@ -1186,7 +1185,7 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+>      memory_listener_register(&hdev->memory_listener, &address_space_memory);
+>      QLIST_INSERT_HEAD(&vhost_devices, hdev, entry);
+>  
+> -    if (used_memslots > hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
+> +    if (!hdev->vhost_ops->vhost_backend_has_free_memslots(hdev)) {
+>          error_report("vhost backend memory slots limit is less"
+>                  " than current number of present memory slots");
+>          r = -1;
+> diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
+> index 592254f..2eac224 100644
+> --- a/include/hw/virtio/vhost-backend.h
+> +++ b/include/hw/virtio/vhost-backend.h
+> @@ -36,7 +36,7 @@ struct vhost_iotlb_msg;
+>  
+>  typedef int (*vhost_backend_init)(struct vhost_dev *dev, void *opaque);
+>  typedef int (*vhost_backend_cleanup)(struct vhost_dev *dev);
+> -typedef int (*vhost_backend_memslots_limit)(struct vhost_dev *dev);
+> +typedef bool (*vhost_backend_has_free_memslots)(struct vhost_dev *dev);
+>  
+>  typedef int (*vhost_net_set_backend_op)(struct vhost_dev *dev,
+>                                  struct vhost_vring_file *file);
+> @@ -94,12 +94,13 @@ typedef int (*vhost_set_config_op)(struct vhost_dev *dev, const uint8_t *data,
+>                                     uint32_t flags);
+>  typedef int (*vhost_get_config_op)(struct vhost_dev *dev, uint8_t *config,
+>                                     uint32_t config_len);
+> +typedef void (*vhost_set_used_memslots_op)(struct vhost_dev *dev);
+>  
+>  typedef struct VhostOps {
+>      VhostBackendType backend_type;
+>      vhost_backend_init vhost_backend_init;
+>      vhost_backend_cleanup vhost_backend_cleanup;
+> -    vhost_backend_memslots_limit vhost_backend_memslots_limit;
+> +    vhost_backend_has_free_memslots vhost_backend_has_free_memslots;
+>      vhost_net_set_backend_op vhost_net_set_backend;
+>      vhost_net_set_mtu_op vhost_net_set_mtu;
+>      vhost_scsi_set_endpoint_op vhost_scsi_set_endpoint;
+> @@ -130,6 +131,7 @@ typedef struct VhostOps {
+>      vhost_send_device_iotlb_msg_op vhost_send_device_iotlb_msg;
+>      vhost_get_config_op vhost_get_config;
+>      vhost_set_config_op vhost_set_config;
+> +    vhost_set_used_memslots_op vhost_set_used_memslots;
+>  } VhostOps;
+>  
+>  extern const VhostOps user_ops;
+> -- 
+> 1.8.3.1
+> 
