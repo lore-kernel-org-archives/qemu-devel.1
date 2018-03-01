@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erUcE-0002vX-O9
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 15:15:47 -0500
+	(envelope-from <eblake@redhat.com>) id 1erUfM-0004qR-W5
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 15:19:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erUcD-0001Np-Fg
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 15:15:46 -0500
-References: <20180301011413.11531-1-famz@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1erUfI-0004Vu-AU
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 15:19:00 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54340 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1erUfI-0004U7-5t
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 15:18:56 -0500
+References: <20180226082259.40293-1-aik@ozlabs.ru>
+	<20180301035910.GC2264@umbus.fritz.box>
+	<ae263ebe-d0d2-3b1d-b2ac-200772eb9154@ozlabs.ru>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <588236fe-472d-a028-a448-e2a6aba84697@redhat.com>
-Date: Thu, 1 Mar 2018 14:15:20 -0600
+Message-ID: <2dad9d81-c83f-d6fb-30a6-380a8cdb70bc@redhat.com>
+Date: Thu, 1 Mar 2018 14:18:53 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180301011413.11531-1-famz@redhat.com>
+In-Reply-To: <ae263ebe-d0d2-3b1d-b2ac-200772eb9154@ozlabs.ru>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] iotests: Skip test for ENOMEM error
+Subject: Re: [Qemu-devel] [PATCH qemu v2] qmp: Add qom-list-properties to
+ list QOM object properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Andrea Bolognani <abologna@redhat.com>
 
-On 02/28/2018 07:14 PM, Fam Zheng wrote:
-> The AFL image is to exercise the code validating image size, which
-> doesn't work on 32 bit or when out of memory (there is a large
-> allocation before the interesting point). So check that and skip the
-> test, instead of faking the result.
-> 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->   tests/qemu-iotests/059 | 5 ++---
->   1 file changed, 2 insertions(+), 3 deletions(-)
+On 03/01/2018 05:47 AM, Alexey Kardashevskiy wrote:
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+>>> +##
+>>> +{ 'struct': 'QOMPropertyInfo',
+>>> +  'data': { 'name': 'str', 'type': 'str', '*description': 'str' } }
+>>
+>> So, this has identical contents to DevicePropertyInfo, and is very
+>> similar to ObjectPropertyInfo.  Is there any way we could consolidate
+>> those types?
+> 
+> Sure, I can get rid of DevicePropertyInfo in favour of QOMPropertyInfo, I
+> am just not sure if this typename is visible anywhere in the QMP protocol.
 
-> 
-> diff --git a/tests/qemu-iotests/059 b/tests/qemu-iotests/059
-> index 40f89eae18..530bbbe6ce 100755
-> --- a/tests/qemu-iotests/059
-> +++ b/tests/qemu-iotests/059
-> @@ -152,9 +152,8 @@ done
->   echo
->   echo "=== Testing afl image with a very large capacity ==="
->   _use_sample_img afl9.vmdk.bz2
-> -# The sed makes this test pass on machines with little RAM
-> -# (and also with 32 bit builds)
-> -_img_info | sed -e 's/Cannot allocate memory/Invalid argument/'
-> +_img_info | grep -q 'Cannot allocate memory' && _notrun "Insufficent memory, skipped test"
-> +_img_info
->   _cleanup_test_img
->   
->   # success, all done
-> 
+Introspection doesn't expose type names; you are free to change those at 
+will (clients like libvirt that parse introspection merely get a list of 
+members and types, regardless of what typename those members belonged to).
+
 
 -- 
 Eric Blake, Principal Software Engineer
