@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42355)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erL5i-0004uq-Ti
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:05:36 -0500
+	(envelope-from <kraxel@redhat.com>) id 1erL62-0005FK-HU
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:05:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erL5f-0004gX-55
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:05:34 -0500
-Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:36101)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1erL5f-0004fn-0C
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:05:31 -0500
-Received: by mail-oi0-x234.google.com with SMTP id u73so4067852oie.3
-	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 02:05:30 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20180301105030.2b716e68@redhat.com>
-References: <000e01d3afad$b9a13830$2ce3a890$@codeaurora.org>
-	<20180227104708.GA11391@cbox>
-	<ac329e1b1f5265a805916ab4f8708f9d@codeaurora.org>
-	<20180227124604.GA2373@cbox>
-	<20180227132131.fipafmnb56a7fj76@kamzik.brq.redhat.com>
-	<20180301105030.2b716e68@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 1 Mar 2018 10:05:09 +0000
-Message-ID: <CAFEAcA9yaU745Asy--jM0nu8FDJ62CEXSH_TKa-ZZfC16qye6w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm]  VCPU hotplug on KVM/ARM
+	(envelope-from <kraxel@redhat.com>) id 1erL5y-00050z-OM
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:05:54 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60226 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1erL5y-00050O-JO
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:05:50 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3C57940FB657
+	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 10:05:50 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu,  1 Mar 2018 11:05:43 +0100
+Message-Id: <20180301100547.18962-10-kraxel@redhat.com>
+In-Reply-To: <20180301100547.18962-1-kraxel@redhat.com>
+References: <20180301100547.18962-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 09/13] configure: opengl doesn't depend on
+ x11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,18 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Andrew Jones <drjones@redhat.com>, bthakur@codeaurora.org, Christoffer Dall <cdall@cs.columbia.edu>, Christoffer Dall <cdall@kernel.org>, QEMU Developers <qemu-devel@nongnu.org>, Christoffer Dall <christofferdall@christofferdall.dk>, qemu-arm <qemu-arm@nongnu.org>, kvmarm@lists.cs.columbia.edu
+To: qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On 1 March 2018 at 09:50, Igor Mammedov <imammedo@redhat.com> wrote:
-> In QEMU on x86 (and I think ppc, s390 as well), we create vCPUs on demand.
->
-> It would be nice if ARM would be able to do that too,
-> so that it could take advantage of the same code.
+So remove x11 from pkg-config check and don't
+add x11 cflags/libs to opengl cflags/libs.
 
-It's not clear to me how that would work, given that for
-instance the interrupt controller wants to know up-front
-how many CPUs it has to deal with.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ configure | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-thanks
--- PMM
+diff --git a/configure b/configure
+index f6dc1c92b3..ab1ba9c47d 100755
+--- a/configure
++++ b/configure
+@@ -3768,9 +3768,9 @@ libs_softmmu="$libs_softmmu $fdt_libs"
+ 
+ if test "$opengl" != "no" ; then
+   opengl_pkgs="epoxy libdrm gbm"
+-  if $pkg_config $opengl_pkgs x11; then
+-    opengl_cflags="$($pkg_config --cflags $opengl_pkgs) $x11_cflags"
+-    opengl_libs="$($pkg_config --libs $opengl_pkgs) $x11_libs"
++  if $pkg_config $opengl_pkgs; then
++    opengl_cflags="$($pkg_config --cflags $opengl_pkgs)"
++    opengl_libs="$($pkg_config --libs $opengl_pkgs)"
+     opengl=yes
+     if test "$gtk" = "yes" && $pkg_config --exists "$gtkpackage >= 3.16"; then
+         gtk_gl="yes"
+-- 
+2.9.3
