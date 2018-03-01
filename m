@@ -1,21 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53581)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1erRYB-0000zN-R5
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:59:25 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1erRYI-00015N-HU
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:59:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1erRYA-0003io-SB
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:59:23 -0500
-Date: Thu, 1 Mar 2018 16:59:00 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180301165859.GJ2994@work-vm>
-References: <20180227115651.30762-1-rpalethorpe@suse.com>
-	<20180227115651.30762-2-rpalethorpe@suse.com>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1erRYF-0003q5-Cc
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:59:30 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38046
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1erRYF-0003pO-0j
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:59:27 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w21GxAeG137194
+	for <qemu-devel@nongnu.org>; Thu, 1 Mar 2018 11:59:26 -0500
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2gem4ecafq-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 11:59:21 -0500
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Thu, 1 Mar 2018 11:59:20 -0500
+References: <20180223132311.26555-1-marcandre.lureau@redhat.com>
+	<20180223132311.26555-7-marcandre.lureau@redhat.com>
+	<4dc45713-b15d-0db5-d72e-ccb007cd2487@redhat.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Thu, 1 Mar 2018 11:59:16 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180227115651.30762-2-rpalethorpe@suse.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 1/2] migrate: Allow incoming migration
- without defer
+In-Reply-To: <4dc45713-b15d-0db5-d72e-ccb007cd2487@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <b1eb7e49-f2ba-6115-79b1-a299af8e5032@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [edk2] [PATCH 6/7] ovmf: link with Tcg2ConfigDxe
+ module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,92 +44,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Palethorpe <rpalethorpe@suse.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, qemu-block@nongnu.org, armbru@redhat.com, eblake@redhat.com, quintela@redhat.com, mreitz@redhat.com
+To: Laszlo Ersek <lersek@redhat.com>, marcandre.lureau@redhat.com, edk2-devel@lists.01.org
+Cc: pjones@redhat.com, jiewen.yao@intel.com, qemu-devel@nongnu.org, javierm@redhat.com
 
-* Richard Palethorpe (rpalethorpe@suse.com) wrote:
-> Allow a QEMU instance which has been started and used without the "-incoming"
-> flag to accept an incoming migration with the "migrate-incoming" QMP
-> command. This allows the user to dump the VM state to an external file then
-> revert to that state at a later time without restarting QEMU.
-> ---
->  migration/migration.c | 12 +++++-------
->  vl.c                  |  2 ++
->  2 files changed, 7 insertions(+), 7 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 0aa596f867..05595a4cec 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1321,14 +1321,14 @@ void migrate_del_blocker(Error *reason)
->  void qmp_migrate_incoming(const char *uri, Error **errp)
->  {
->      Error *local_err = NULL;
-> -    static bool once = true;
->  
-> -    if (!deferred_incoming) {
-> -        error_setg(errp, "For use with '-incoming defer'");
-> +    if (runstate_check(RUN_STATE_INMIGRATE)) {
-> +        error_setg(errp, "The incoming migration has already been started");
->          return;
->      }
-> -    if (!once) {
-> -        error_setg(errp, "The incoming migration has already been started");
-> +
-> +    if (!deferred_incoming) {
-> +        vm_stop(RUN_STATE_INMIGRATE);
->      }
->  
->      qemu_start_incoming_migration(uri, &local_err);
-> @@ -1337,8 +1337,6 @@ void qmp_migrate_incoming(const char *uri, Error **errp)
->          error_propagate(errp, local_err);
->          return;
->      }
-> -
-> -    once = false;
->  }
+On 02/26/2018 04:58 AM, Laszlo Ersek wrote:
+> On 02/23/18 14:23, marcandre.lureau@redhat.com wrote:
+>> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>
+>> The module allows to tweak and interact with the TPM. Note that many
+>> actions are broken due to implementation of qemu TPM (providing it's
+>> own ACPI table), and the lack of PPI implementation.
+>>
+>> CC: Laszlo Ersek <lersek@redhat.com>
+>> CC: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>> Contributed-under: TianoCore Contribution Agreement 1.0
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> ---
+>>   OvmfPkg/OvmfPkgX64.dsc | 2 ++
+>>   OvmfPkg/OvmfPkgX64.fdf | 1 +
+>>   2 files changed, 3 insertions(+)
+>>
+>> diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
+>> index 9bd0709f98..2281bd5ff8 100644
+>> --- a/OvmfPkg/OvmfPkgX64.dsc
+>> +++ b/OvmfPkg/OvmfPkgX64.dsc
+>> @@ -669,6 +669,8 @@
+>>         NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSh=
+a1.inf
+>>         NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLib=
+Sha256.inf
+>>     }
+>> +
+>> +  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
+>>   !endif
+>>  =20
+>>   !if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
+>> diff --git a/OvmfPkg/OvmfPkgX64.fdf b/OvmfPkg/OvmfPkgX64.fdf
+>> index b8dd7ecae4..985404850f 100644
+>> --- a/OvmfPkg/OvmfPkgX64.fdf
+>> +++ b/OvmfPkg/OvmfPkgX64.fdf
+>> @@ -399,6 +399,7 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/Va=
+riableRuntimeDxe.inf
+>>  =20
+>>   !if $(TPM2_ENABLE) =3D=3D TRUE
+>>   INF  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
+>> +INF  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
+>>   !endif
+>>  =20
+>>   ####################################################################=
+############
+>>
+> Please drop this patch.
+>
+> In my earlier investigation I wrote, Tcg2ConfigDxe "[p]rovides a Setup
+> TUI interface to configure the TPM. IIUC, it can also save the
+> configured TPM type for subsequent boots (see Tcg2ConfigPei.inf above)".
+>
+> The INF file itself says "This module is only for reference only, each
+> platform should have its own setup page."
+>
+> And Jiewen wrote earlier, "Tcg2ConfigPei/Dxe are platform sample driver.
+> A platform may have its own version based upon platform requirement. Fo=
+r
+> example, if a platform supports fTPM, it may use another Tcg2Config dri=
+ver."
+>
+> Given that OVMF lacks PEI-phase variable access, and that I consequentl=
+y
+> suggested cloning, and seriously trimming, Tcg2ConfigPei, it makes no
+> sense to include an HII dialog that sets a variable for PEI phase
+> consumption. Also, as you say, many of the exposed operations are broke=
+n
+> due to lack of PPI support. So let's just postpone the inclusion of thi=
+s
+> driver, for now.
 
-That's...interesting.  I think it will work, but I bet there's a whole
-bunch of corner cases [many of which loadvm will hit as well!].
-For starters there's probably devices that are active and still looking
-at RAM, even though vm_stop is in place (hopefully none of them are
-writing to it, but I wouldn't actually trust them).  Also, you probably
-need to inactivate the block devices?
+Just FYI: The PPI support for the OS requires ACPI and, as it is=20
+currently implemented, SMF where UEFI variables are manipulated. Some=20
+menu items in the TPM 2 menu (also TPM 1.2) also require these UEFI=20
+variables of the PPI interface so that UEFI can react on the menu=20
+choices upon re.
 
-Also, I think this means there's no protection against this happening
-during an outgoing migration (which has an existing check to make sure
-you can't start an outgoing migration while an incoming one is waiting).
-
->  bool migration_is_blocked(Error **errp)
-> diff --git a/vl.c b/vl.c
-> index 9e7235df6d..a91eda039e 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -634,6 +634,7 @@ static const RunStateTransition runstate_transitions_def[] = {
->      { RUN_STATE_PAUSED, RUN_STATE_POSTMIGRATE },
->      { RUN_STATE_PAUSED, RUN_STATE_PRELAUNCH },
->      { RUN_STATE_PAUSED, RUN_STATE_COLO},
-> +    { RUN_STATE_PAUSED, RUN_STATE_INMIGRATE },
->  
->      { RUN_STATE_POSTMIGRATE, RUN_STATE_RUNNING },
->      { RUN_STATE_POSTMIGRATE, RUN_STATE_FINISH_MIGRATE },
-> @@ -665,6 +666,7 @@ static const RunStateTransition runstate_transitions_def[] = {
->      { RUN_STATE_RUNNING, RUN_STATE_WATCHDOG },
->      { RUN_STATE_RUNNING, RUN_STATE_GUEST_PANICKED },
->      { RUN_STATE_RUNNING, RUN_STATE_COLO},
-> +    { RUN_STATE_RUNNING, RUN_STATE_INMIGRATE },
-
-Experience suggests that you'll find out the hard way that there's other
-states you'll need to allow or check for.
-For example, do you want to be able to loadvm from a GUEST_PANICKED or
-PRELAUNCH state?
-
-Dave
-
->      { RUN_STATE_SAVE_VM, RUN_STATE_RUNNING },
->  
-> -- 
-> 2.16.2
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+    Stefan
