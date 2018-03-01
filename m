@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erSs3-0005Yc-W8
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 13:24:00 -0500
+	(envelope-from <eblake@redhat.com>) id 1erStJ-0006W2-ML
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 13:25:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erSs2-00084b-Sc
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 13:23:59 -0500
+	(envelope-from <eblake@redhat.com>) id 1erStI-0000om-Qn
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 13:25:17 -0500
 References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
-	<1518702707-7077-10-git-send-email-vsementsov@virtuozzo.com>
-	<8e580b8b-1614-9c83-4ac9-48f5d3cff3dc@redhat.com>
-	<b17a3d26-5f55-da0a-f083-159ebdf749b7@virtuozzo.com>
+	<20180226165723.17818-1-eblake@redhat.com>
+	<20180226165723.17818-3-eblake@redhat.com>
+	<0d8f572a-b099-75f9-c161-09226564a4aa@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <14411a5e-5970-4f2a-2d75-cd86e8a8197f@redhat.com>
-Date: Thu, 1 Mar 2018 12:23:43 -0600
+Message-ID: <271c677b-901f-fe44-e02f-e196cf28c2d9@redhat.com>
+Date: Thu, 1 Mar 2018 12:25:08 -0600
 MIME-Version: 1.0
-In-Reply-To: <b17a3d26-5f55-da0a-f083-159ebdf749b7@virtuozzo.com>
+In-Reply-To: <0d8f572a-b099-75f9-c161-09226564a4aa@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 9/9] iotests: new test 206 for NBD
- BLOCK_STATUS
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] nbd/client: fix error messages in
+ nbd_handle_reply_err
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,36 +27,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-On 03/01/2018 05:51 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 17.02.2018 00:02, Eric Blake wrote:
->> On 02/15/2018 07:51 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
->
->>> ---
->>> =C2=A0 tests/qemu-iotests/206=C2=A0=C2=A0=C2=A0=C2=A0 | 34 ++++++++++=
-++++++++++++++++++++++++
->>> =C2=A0 tests/qemu-iotests/206.out |=C2=A0 2 ++
->>> =C2=A0 tests/qemu-iotests/group=C2=A0=C2=A0 |=C2=A0 1 +
->>> =C2=A0 3 files changed, 37 insertions(+)
->>> =C2=A0 create mode 100644 tests/qemu-iotests/206
->>> =C2=A0 create mode 100644 tests/qemu-iotests/206.out
+On 03/01/2018 06:10 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 26.02.2018 19:57, Eric Blake wrote:
+>> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 >>
->> It's a race! Kevin already has test 206 and 207 claimed in his pending=
-=20
->> series:
->> https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg02363.html
->> Whoever loses gets to rebase and renumber (or the maintainer on their=20
->> behalf) ;)
+>> 1. NBD_REP_ERR_INVALID is not only about length, so, make message more
+>> =C2=A0=C2=A0=C2=A0 general
+>>
+>> 2. hex format is not very good: it's hard to read something like
+>> =C2=A0=C2=A0=C2=A0 "option a (set meta context)", so switch to dec.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> Message-Id: <1518702707-7077-6-git-send-email-vsementsov@virtuozzo.com=
+>
+>> [eblake: expand scope of patch: ALL uses of nbd_opt_lookup are now
+>> decimal, all uses of nbd_rep_lookup are prefixed hex]
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
 >=20
->=20
-> is there any simple method to get a number for new test? Any way to=20
-> avoid such situations?
+> one thought: isn't it better to have all NBD constants in dec, like in=20
+> spec?
 
-Short of searching the mailing list for what numbers have already been=20
-mentioned, not really.
+Sure, I can make that change.
+
+>> @@ -378,8 +378,8 @@ static int nbd_opt_go(QIOChannel *ioc, const char=20
+>> *wantname,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 return 1;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (reply.type =
+!=3D NBD_REP_INFO) {
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 er=
+ror_setg(errp, "unexpected reply type %" PRIx32
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 " (%s), e=
+xpected %x",
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 er=
+ror_setg(errp, "unexpected reply type 0x%" PRIx32
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 " (%s), e=
+xpected 0x%x",
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+reply.type, nbd_rep_lookup(reply.type),=20
+>> NBD_REP_INFO);
+
+That is, I'll respin with this and other nbd_rep_lookup()s using decimal=20
+output.
+
 
 --=20
 Eric Blake, Principal Software Engineer
