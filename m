@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erNsS-0005J2-NP
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:04:12 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1erNy7-00023F-LQ
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:09:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erNsO-0007yy-MR
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:04:04 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:43610)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1erNsO-0007ym-H5
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:04:00 -0500
-Received: by mail-ot0-x244.google.com with SMTP id m22so5447397otf.10
-	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 05:04:00 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1519883168-22092-1-git-send-email-thuth@redhat.com>
-References: <1519883168-22092-1-git-send-email-thuth@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 1 Mar 2018 13:03:39 +0000
-Message-ID: <CAFEAcA9Q9+sK5S1BREuCAVp4J5tU_mexDZU9nBuett3W7bQp-Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/arm: Use more CONFIG switches to decide
- which object files should be linked
+	(envelope-from <aik@ozlabs.ru>) id 1erNy3-0002DG-8f
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:09:55 -0500
+Received: from ozlabs.ru ([107.173.13.209]:41608)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <aik@ozlabs.ru>) id 1erNy2-0002Ba-VM
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:09:51 -0500
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Fri,  2 Mar 2018 00:09:39 +1100
+Message-Id: <20180301130939.15875-3-aik@ozlabs.ru>
+In-Reply-To: <20180301130939.15875-1-aik@ozlabs.ru>
+References: <20180301130939.15875-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu v3 2/2] qmp: Add qom-list-properties to
+ list QOM object properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +24,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Andrea Bolognani <abologna@redhat.com>
 
-On 1 March 2018 at 05:46, Thomas Huth <thuth@redhat.com> wrote:
-> A lot of ARM object files are linked into the executable unconditionally,
-> even though we have corresponding CONFIG switches like CONFIG_PXA2XX or
-> CONFIG_OMAP. We should make sure to use these switches in the Makefile so
-> that the users can disable certain unwanted boards and devices more easily.
-> Also introduce the new switch CONFIG_STRONGARM to be able to disable the
-> "Collie" machine if it is not wanted.
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  default-configs/arm-softmmu.mak |  2 ++
->  hw/arm/Makefile.objs            | 26 +++++++++++++++++---------
->  2 files changed, 19 insertions(+), 9 deletions(-)
->
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index ca34cf4..43f382a 100644
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -133,3 +133,5 @@ CONFIG_GPIO_KEY=y
->  CONFIG_MSF2=y
->  CONFIG_FW_CFG_DMA=y
->  CONFIG_XILINX_AXI=y
-> +
-> +CONFIG_STRONGARM=y
-> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-> index 1c896ba..5e1e0a9 100644
-> --- a/hw/arm/Makefile.objs
-> +++ b/hw/arm/Makefile.objs
-> @@ -1,15 +1,23 @@
-> -obj-y += boot.o collie.o exynos4_boards.o gumstix.o highbank.o
-> -obj-$(CONFIG_DIGIC) += digic_boards.o
-> -obj-y += integratorcp.o mainstone.o musicpal.o nseries.o
-> -obj-y += omap_sx1.o palm.o realview.o spitz.o stellaris.o
-> -obj-y += tosa.o versatilepb.o vexpress.o virt.o xilinx_zynq.o z2.o
-> +obj-y += boot.o virt.o sysbus-fdt.o
->  obj-$(CONFIG_ACPI) += virt-acpi-build.o
-> -obj-y += netduino2.o
-> -obj-y += sysbus-fdt.o
-> +obj-$(CONFIG_ARM_V7M) += highbank.o netduino2.o vexpress.o
+There is already 'device-list-properties' which does most of the job,
+however it does not handle everything returned by qom-list-types such
+as machines as they inherit directly from TYPE_OBJECT and not TYPE_DEVICE.
+It does not handle abstract classes either.
 
-This is definitely wrong -- highbank and vexpress are not V7M
-platforms. Netduino2 is a v7M platform, but I don't think we
-should be making it conditional on ARM_V7M -- we have per-board
-configs for other boards, so you'd have a CONFIG_NETDUINO2 here
-if you wanted it.
+This adds a new qom-list-properties command which prints properties
+of a specific class and its instance. It is pretty much a simplified copy
+of the device-list-properties handler.
 
-> +obj-$(CONFIG_ASPEED_SOC) += integratorcp.o musicpal.o versatilepb.o
+Since it creates an object instance, device properties should appear
+in the output as they are copied to QOM properties at the instance_init
+hook.
 
-This is wrong too -- none of these are aspeed-based devices.
+This adds a object_class_property_iter_init() helper to allow class
+properties enumeration uses it in the new QMP command to allow properties
+listing for abstract classes.
 
-thanks
--- PMM
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+Changes:
+v3:
+* Used ObjectPropertyInfo instead of QOMPropertyInfo
+
+v2:
+* added abstract classes support, now things like "pci-device" or
+"spapr-machine" show properties, previously these would produce
+an "abstract class" error
+
+# Conflicts:
+#	qapi-schema.json
+---
+ qapi-schema.json     | 15 +++++++++++++++
+ include/qom/object.h | 16 ++++++++++++++++
+ qmp.c                | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+ qom/object.c         |  7 +++++++
+ 4 files changed, 87 insertions(+)
+
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 87327e5..32e836f 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -1442,6 +1442,21 @@
+   'returns': [ 'ObjectPropertyInfo' ] }
+ 
+ ##
++# @qom-list-properties:
++#
++# List properties associated with a QOM object.
++#
++# @typename: the type name of an object
++#
++# Returns: a list of ObjectPropertyInfo describing object properties
++#
++# Since: 2.12
++##
++{ 'command': 'qom-list-properties',
++  'data': { 'typename': 'str'},
++  'returns': [ 'ObjectPropertyInfo' ] }
++
++##
+ # @xen-set-global-dirty-log:
+ #
+ # Enable or disable the global dirty log mode.
+diff --git a/include/qom/object.h b/include/qom/object.h
+index dc73d59..ef07d78 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -1017,6 +1017,22 @@ void object_property_iter_init(ObjectPropertyIterator *iter,
+                                Object *obj);
+ 
+ /**
++ * object_class_property_iter_init:
++ * @klass: the class
++ *
++ * Initializes an iterator for traversing all properties
++ * registered against an object class and all parent classes.
++ *
++ * It is forbidden to modify the property list while iterating,
++ * whether removing or adding properties.
++ *
++ * This can be used on abstract classes as it does not create a temporary
++ * instance.
++ */
++void object_class_property_iter_init(ObjectPropertyIterator *iter,
++                                     ObjectClass *klass);
++
++/**
+  * object_property_iter_next:
+  * @iter: the iterator instance
+  *
+diff --git a/qmp.c b/qmp.c
+index 8a74038..1f15f68 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -576,6 +576,55 @@ ObjectPropertyInfoList *qmp_device_list_properties(const char *typename,
+     return prop_list;
+ }
+ 
++ObjectPropertyInfoList *qmp_qom_list_properties(const char *typename,
++                                             Error **errp)
++{
++    ObjectClass *klass;
++    Object *obj = NULL;
++    ObjectProperty *prop;
++    ObjectPropertyIterator iter;
++    ObjectPropertyInfoList *prop_list = NULL;
++
++    klass = object_class_by_name(typename);
++    if (klass == NULL) {
++        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
++                  "Class '%s' not found", typename);
++        return NULL;
++    }
++
++    klass = object_class_dynamic_cast(klass, TYPE_OBJECT);
++    if (klass == NULL) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "typename", TYPE_OBJECT);
++        return NULL;
++    }
++
++    if (object_class_is_abstract(klass)) {
++        object_class_property_iter_init(&iter, klass);
++    } else {
++        obj = object_new(typename);
++        object_property_iter_init(&iter, obj);
++    }
++    while ((prop = object_property_iter_next(&iter))) {
++        ObjectPropertyInfo *info;
++        ObjectPropertyInfoList *entry;
++
++        info = g_malloc0(sizeof(*info));
++        info->name = g_strdup(prop->name);
++        info->type = g_strdup(prop->type);
++        info->has_description = !!prop->description;
++        info->description = g_strdup(prop->description);
++
++        entry = g_malloc0(sizeof(*entry));
++        entry->value = info;
++        entry->next = prop_list;
++        prop_list = entry;
++    }
++
++    object_unref(obj);
++
++    return prop_list;
++}
++
+ CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
+ {
+     return arch_query_cpu_definitions(errp);
+diff --git a/qom/object.c b/qom/object.c
+index 5dcee46..e7978bd 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -1037,6 +1037,13 @@ ObjectProperty *object_property_iter_next(ObjectPropertyIterator *iter)
+     return val;
+ }
+ 
++void object_class_property_iter_init(ObjectPropertyIterator *iter,
++                                     ObjectClass *klass)
++{
++    g_hash_table_iter_init(&iter->iter, klass->properties);
++    iter->nextclass = klass;
++}
++
+ ObjectProperty *object_class_property_find(ObjectClass *klass, const char *name,
+                                            Error **errp)
+ {
+-- 
+2.11.0
