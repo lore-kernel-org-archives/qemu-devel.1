@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1erQ8i-00050V-VG
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:29:02 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1erQC7-0007Zj-IJ
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:32:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1erQ8f-000241-1M
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:29:00 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47330 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1erQC6-0004Hs-HD
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:32:31 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50566 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1erQ8e-00023p-RX
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:28:56 -0500
-Date: Thu, 1 Mar 2018 15:28:51 +0000
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1erQC6-0004HT-C2
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 10:32:30 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 48B134040852
+	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 15:32:26 +0000 (UTC)
+Date: Thu, 1 Mar 2018 15:32:19 +0000
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180301152850.GH2994@work-vm>
-References: <20180228180215.25470-1-wei@redhat.com>
+Message-ID: <20180301153218.GI2994@work-vm>
+References: <20180228164937.18450-1-dgilbert@redhat.com>
+	<20180301070150.GQ27381@xz-mi>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180228180215.25470-1-wei@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V7 0/4] tests: Add migration test for
- aarch64
+In-Reply-To: <20180301070150.GQ27381@xz-mi>
+Subject: Re: [Qemu-devel] [PATCH] migration: Fix block failure cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +33,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Huang <wei@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, quintela@redhat.com, drjones@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 
-* Wei Huang (wei@redhat.com) wrote:
-> This patchset adds a migration test for aarch64. It leverages
-> Dave Gilbert's recent patch "tests/migration: Add source to PC boot block"
-> to create a new test case for aarch64.
+* Peter Xu (peterx@redhat.com) wrote:
+> On Wed, Feb 28, 2018 at 04:49:37PM +0000, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > This fixes a couple of cases where the block migration capability
+> > doesn't get cleared when a migration failed.
+> > 
+> > 1) When block migration is compiled out:
+> >   (qemu) migrate -d -b  "exec:cat > /dev/null"
+> >   QEMU compiled without old-style (blk/-b, inc/-i) block migration
+> >   Use drive_mirror+NBD instead.
+> >   (qemu) migrate_set_capability xbzrle off
+> >   QEMU compiled without old-style (blk/-b, inc/-i) block migration
+> >   Use drive_mirror+NBD instead.
+> > 
+> >   This corresponds to https://bugzilla.redhat.com/show_bug.cgi?id=1550022
+> > 
+> > 2) When a migration with a bad protocol is tried:
+> >   (qemu) migrate -d -b "foo:bah"
+> >   Parameter 'uri' expects a valid migration protocol
+> >   (qemu) info migrate_capabilities
+> >   xbzrle: off
+> >   rdma-pin-all: off
+> >   auto-converge: off
+> >   zero-blocks: off
+> >   compress: off
+> >   events: off
+> >   postcopy-ram: off
+> >   x-colo: off
+> >   release-ram: off
+> >   block: on   <<<<<<-----
+> >   return-path: off
+> >   pause-before-switchover: off
+> >   x-multifd: off
+> > 
+> > Fixes: 2833c59b947
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  migration/migration.c | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index b913b98803..da0e4a1f56 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -1391,11 +1391,12 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+> >              return;
+> >          }
+> >          migrate_set_block_enabled(true, &local_err);
+> > +        s->must_remove_block_options = true;
+> >          if (local_err) {
+> >              error_propagate(errp, local_err);
+> > +            block_cleanup_parameters(s);
+> >              return;
+> >          }
+> > -        s->must_remove_block_options = true;
+> >      }
+> >  
+> >      if (has_inc && inc) {
+> > @@ -1417,11 +1418,10 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+> >      } else if (strstart(uri, "fd:", &p)) {
+> >          fd_start_outgoing_migration(s, p, &local_err);
+> >      } else {
+> > -        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "uri",
+> > +        error_setg(&local_err, QERR_INVALID_PARAMETER_VALUE, "uri",
+> >                     "a valid migration protocol");
+> >          migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+> >                            MIGRATION_STATUS_FAILED);
+> > -        return;
+> >      }
+> >  
+> >      if (local_err) {
+> > -- 
+> > 2.14.3
+> > 
+> 
+> Ouch...
+> 
+> Instead it seems to be my fault in 4a84214ebe ("migration: provide
+> migrate_caps_check()", 2017-07-18).  For now I cannot understand why I
+> did that before since it's obviously strange if without this
+> squashed...
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 0aa596f867..88ed9375aa 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -747,13 +747,15 @@ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
+>  {
+>      MigrationState *s = migrate_get_current();
+>      MigrationCapabilityStatusList *cap;
+> +    bool cap_list[MIGRATION_CAPABILITY__MAX];
+>  
+>      if (migration_is_setup_or_active(s->state)) {
+>          error_setg(errp, QERR_MIGRATION_ACTIVE);
+>          return;
+>      }
+>  
+> -    if (!migrate_caps_check(s->enabled_capabilities, params, errp)) {
+> +    memcpy(cap_list, s->enabled_capabilities, sizeof(cap_list));
+> +    if (!migrate_caps_check(cap_list, params, errp)) {
+>          return;
+>      }
 
-Other than Drew's comment about the ppc comment; I'm happy with this.
+> 
+> Otherwise I'll get:
+> 
+> (qemu) migrate_set_capability postcopy-ram on                                  
+> (qemu) migrate_set_capability compress on                                      
+> Postcopy is not currently compatible with compression                          
+> (qemu) info migrate_capabilities       
+> xbzrle: off                            
+> rdma-pin-all: off                      
+> auto-converge: off                     
+> zero-blocks: off                       
+> compress: on         <------------------------- :(
+> events: off                            
+> postcopy-ram: on                       
+> x-colo: off                            
+> release-ram: off                       
+> block: off                             
+> return-path: off                       
+> pause-before-switchover: off           
+> x-multifd: off
+>  
+> And it looks very likely that this should solve the block bug too.
+
+Yes, it looks like it should - but it doesn't solve the 2nd of my cases;
+so we also need the 2nd half of my change.
+
+> (So I think either I got a brain fart last July, or now...)
+
+Of course it's the combination of two bugs :-)
 
 Dave
 
-> V6->V7:
->  * Define test memory start/end addresses for all architectures
->  * Check aarch64 kernel binary size, limit under 512KB
-> 
-> V5->V6:
->  * Add Reviewed-by to patch 1-3
->  * Add more design notes in patch 4 (aarch64 assembly compilation, bin space)
-> 
-> V4->V5:
->  * Extract cross compilation detection code into rules.mak for sharing
->  * Minor comment and code revision in migration-test.c & aarch64-a-b-kernel.S
->  
-> V3->V4:
->  * Rename .s to .S, allowing assembly to include C-style header file
->  * Move test defines into a new migration-test.h file
->  * Use different cpu & gic settings for kvm and tcg modes on aarch64
->  * Clean up aarch64-a-b-kernel.S based on Andrew Jones' comments
->  
-> V2->V3:
->  * Convert build script to Makefile
->  * Add cross-compilation support
->  * Fix CPU type for "tcg" machine type
->  * Revise asm code and the compilation process from asm to header file
-> 
-> V1->V2:
->  * Similar to Dave Gilbert's recent changes to migration-test, we
->    provide the test source and a build script in V2.
->  * aarch64 kernel blob is defined as "unsigned char" because the source
->    is now provided in V2.
->  * Add "-machine none" to test_deprecated() because aarch64 doesn't have
->    a default machine type.
-> 
-> RFC->V1:
->  * aarch64 kernel blob is defined as an uint32_t array
->  * The test code is re-written to address a data caching issue under KVM.
->    Tests passed under both x86 and aarch64.
->  * Re-use init_bootfile_x86() for both x86 and aarch64
->  * Other minor fixes
-> 
 > Thanks,
-> -Wei
-> 
-> Wei Huang (4):
->   rules: Move cross compilation auto detection functions to rules.mak
->   tests/migration: Convert the boot block compilation script into
->     Makefile
->   tests/migration: Add migration-test header file
->   tests: Add migration test for aarch64
-> 
->  roms/Makefile                                      | 24 ++-----
->  rules.mak                                          | 15 +++++
->  tests/Makefile.include                             |  1 +
->  tests/migration-test.c                             | 78 +++++++++++++++++-----
->  tests/migration/Makefile                           | 44 ++++++++++++
->  tests/migration/aarch64-a-b-kernel.S               | 75 +++++++++++++++++++++
->  tests/migration/aarch64-a-b-kernel.h               | 19 ++++++
->  tests/migration/migration-test.h                   | 31 +++++++++
->  tests/migration/rebuild-x86-bootblock.sh           | 33 ---------
->  .../{x86-a-b-bootblock.s => x86-a-b-bootblock.S}   | 12 ++--
->  tests/migration/x86-a-b-bootblock.h                |  4 +-
->  11 files changed, 260 insertions(+), 76 deletions(-)
->  create mode 100644 tests/migration/Makefile
->  create mode 100644 tests/migration/aarch64-a-b-kernel.S
->  create mode 100644 tests/migration/aarch64-a-b-kernel.h
->  create mode 100644 tests/migration/migration-test.h
->  delete mode 100755 tests/migration/rebuild-x86-bootblock.sh
->  rename tests/migration/{x86-a-b-bootblock.s => x86-a-b-bootblock.S} (88%)
 > 
 > -- 
-> 2.14.3
-> 
+> Peter Xu
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
