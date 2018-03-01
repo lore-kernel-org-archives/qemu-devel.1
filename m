@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1erS7S-0006zY-6J
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 12:35:54 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1erS8Y-0007co-So
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 12:37:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1erS7N-0002I6-8Q
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 12:35:50 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <cover.1516650109.git.alistair.francis@xilinx.com>
-	<3a974495bbab40c66cf3f1edc9fbfcee31f3a178.1516650109.git.alistair.francis@xilinx.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <44924025-264f-c7a4-c1ce-7c6f0cdd9bb0@amsat.org>
-Date: Thu, 1 Mar 2018 14:35:35 -0300
-MIME-Version: 1.0
-In-Reply-To: <3a974495bbab40c66cf3f1edc9fbfcee31f3a178.1516650109.git.alistair.francis@xilinx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 3/9] xlnx-zynqmp-pmu: Add the CPU and
- memory
+	(envelope-from <jcmvbkbc@gmail.com>) id 1erS8X-0002ZJ-Ld
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 12:36:58 -0500
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Thu,  1 Mar 2018 09:36:36 -0800
+Message-Id: <20180301173636.19082-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH v3 05/11] linux-user: fix
+ mmap/munmap/mprotect/mremap/shmat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,154 +18,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
-Cc: alistair23@gmail.com, qemu-arm@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Max Filippov <jcmvbkbc@gmail.com>, qemu-stable@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-Hi Alistair, Edgar,
+In linux-user QEMU that runs for a target with TARGET_ABI_BITS bigger
+than L1_MAP_ADDR_SPACE_BITS an assertion in page_set_flags fires when
+mmap, munmap, mprotect, mremap or shmat is called for an address outside
+the guest address space. mmap and mprotect should return ENOMEM in such
+case.
 
-On 01/22/2018 04:43 PM, Alistair Francis wrote:
-> Connect the MicroBlaze CPU and the ROM and RAM memory regions.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> ---
-> 
-> V6:
->  - Pass initrd instead of kernel to microblaze_load_kernel()
-> V4:
->  - Remove the ZCU102 name
-> V2:
->  - Fix the pmu-cpu name
->  - Use err and errp for CPU realise instead of error_fatal
-> 
->  hw/microblaze/xlnx-zynqmp-pmu.c | 70 +++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 68 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
-> index ac0f78928a..145837b372 100644
-> --- a/hw/microblaze/xlnx-zynqmp-pmu.c
-> +++ b/hw/microblaze/xlnx-zynqmp-pmu.c
-> @@ -18,8 +18,11 @@
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
->  #include "qemu-common.h"
-> +#include "exec/address-spaces.h"
->  #include "hw/boards.h"
-> +#include "hw/qdev-properties.h"
->  #include "cpu.h"
-> +#include "boot.h"
->  
->  /* Define the PMU device */
->  
-> @@ -27,21 +30,56 @@
->  #define XLNX_ZYNQMP_PMU_SOC(obj) OBJECT_CHECK(XlnxZynqMPPMUSoCState, (obj), \
->                                                TYPE_XLNX_ZYNQMP_PMU_SOC)
->  
-> +#define XLNX_ZYNQMP_PMU_ROM_SIZE    0x8000
-> +#define XLNX_ZYNQMP_PMU_ROM_ADDR    0xFFD00000
-> +#define XLNX_ZYNQMP_PMU_RAM_ADDR    0xFFDC0000
-> +
->  typedef struct XlnxZynqMPPMUSoCState {
->      /*< private >*/
->      DeviceState parent_obj;
->  
->      /*< public >*/
-> +    MicroBlazeCPU cpu;
->  }  XlnxZynqMPPMUSoCState;
->  
->  static void xlnx_zynqmp_pmu_soc_init(Object *obj)
->  {
-> +    XlnxZynqMPPMUSoCState *s = XLNX_ZYNQMP_PMU_SOC(obj);
->  
-> +    object_initialize(&s->cpu, sizeof(s->cpu),
-> +                      TYPE_MICROBLAZE_CPU);
-> +    object_property_add_child(obj, "pmu-cpu", OBJECT(&s->cpu),
-> +                              &error_abort);
->  }
->  
->  static void xlnx_zynqmp_pmu_soc_realize(DeviceState *dev, Error **errp)
->  {
-> -
-> +    XlnxZynqMPPMUSoCState *s = XLNX_ZYNQMP_PMU_SOC(dev);
-> +    Error *err = NULL;
-> +
-> +    object_property_set_uint(OBJECT(&s->cpu), XLNX_ZYNQMP_PMU_ROM_ADDR,
-> +                             "base-vectors", &error_abort);
-> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-stack-protection",
-> +                             &error_abort);
-> +    object_property_set_uint(OBJECT(&s->cpu), 0, "use-fpu", &error_abort);
-> +    object_property_set_uint(OBJECT(&s->cpu), 0, "use-hw-mul", &error_abort);
-> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-barrel",
-> +                             &error_abort);
-> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-msr-instr",
-> +                             &error_abort);
-> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-pcmp-instr",
-> +                             &error_abort);
-> +    object_property_set_bool(OBJECT(&s->cpu), false, "use-mmu", &error_abort);
-> +    object_property_set_bool(OBJECT(&s->cpu), true, "endianness",
-> +                             &error_abort);
-> +    object_property_set_str(OBJECT(&s->cpu), "8.40.b", "version",
-> +                            &error_abort);
-> +    object_property_set_uint(OBJECT(&s->cpu), 0, "pvr", &error_abort);
-> +    object_property_set_bool(OBJECT(&s->cpu), true, "realized", &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
->  }
->  
->  static void xlnx_zynqmp_pmu_soc_class_init(ObjectClass *oc, void *data)
-> @@ -70,7 +108,35 @@ type_init(xlnx_zynqmp_pmu_soc_register_types)
->  
->  static void xlnx_zynqmp_pmu_init(MachineState *machine)
->  {
-> -
-> +    XlnxZynqMPPMUSoCState *pmu = g_new0(XlnxZynqMPPMUSoCState, 1);
-> +    MemoryRegion *address_space_mem = get_system_memory();
-> +    MemoryRegion *pmu_rom = g_new(MemoryRegion, 1);
-> +    MemoryRegion *pmu_ram = g_new(MemoryRegion, 1);
-> +
-> +    /* Create the ROM */
-> +    memory_region_init_rom(pmu_rom, NULL, "xlnx-zynqmp-pmu.rom",
-> +                           XLNX_ZYNQMP_PMU_ROM_SIZE, &error_fatal);
-> +    memory_region_add_subregion(address_space_mem, XLNX_ZYNQMP_PMU_ROM_ADDR,
-> +                                pmu_rom);
-> +
-> +    /* Create the RAM */
+Introduce macro guest_range_valid that verifies if address range is
+within guest address space and does not wrap around. Use that macro in
+mmap/munmap/mprotect/mremap/shmat for error checking.
 
-A bit late, but we maybe want a check such:
+Cc: qemu-stable@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>
+Cc: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+Changes v2->v3:
+- fix comparison in guest_valid: it must be 'less' to preserve the existing
+  functionality, not 'less or equal'.
+- fix guest_range_valid: it may not use guest_valid, because single range
+  that occupies all of the guest address space is valid.
 
-       if (machine->ram_size > 128 * K_BYTE) {
-           warn_report("shrinking RAM to 128kB");
-           machine->ram_size = 128 * K_BYTE;
-       }
+These changes fix assertion in page_check_range called from open_self_maps.
 
-> +    memory_region_init_ram(pmu_ram, NULL, "xlnx-zynqmp-pmu.ram",
-> +                           machine->ram_size, &error_fatal);
-> +    memory_region_add_subregion(address_space_mem, XLNX_ZYNQMP_PMU_RAM_ADDR,
-> +                                pmu_ram);
-> +
-> +    /* Create the PMU device */
-> +    object_initialize(pmu, sizeof(XlnxZynqMPPMUSoCState), TYPE_XLNX_ZYNQMP_PMU_SOC);
-> +    object_property_add_child(OBJECT(machine), "pmu", OBJECT(pmu),
-> +                              &error_abort);
-> +    object_property_set_bool(OBJECT(pmu), true, "realized", &error_fatal);
-> +
-> +    /* Load the kernel */
-> +    microblaze_load_kernel(&pmu->cpu, XLNX_ZYNQMP_PMU_RAM_ADDR,
-> +                           machine->ram_size,
-> +                           machine->initrd_filename,
-> +                           machine->dtb,
-> +                           NULL);
->  }
->  
->  static void xlnx_zynqmp_pmu_machine_init(MachineClass *mc)
-> 
+ include/exec/cpu-all.h  |  2 +-
+ include/exec/cpu_ldst.h | 12 +++++++-----
+ linux-user/mmap.c       | 20 +++++++++++++++-----
+ linux-user/syscall.c    |  3 +++
+ 4 files changed, 26 insertions(+), 11 deletions(-)
 
-and here:
-
-       mc->default_ram_size = 128 * K_BYTE,
-
-Regards,
-
-Phil.
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index 0b141683f095..12bd049997ac 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -160,7 +160,7 @@ extern int have_guest_base;
+ extern unsigned long reserved_va;
+ 
+ #define GUEST_ADDR_MAX (reserved_va ? reserved_va : \
+-                                    (1ul << TARGET_VIRT_ADDR_SPACE_BITS) - 1)
++                        (2ul << (TARGET_VIRT_ADDR_SPACE_BITS - 1)) - 1)
+ #else
+ 
+ #include "exec/hwaddr.h"
+diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
+index 191f2e962a3c..6528fd829ffe 100644
+--- a/include/exec/cpu_ldst.h
++++ b/include/exec/cpu_ldst.h
+@@ -53,14 +53,16 @@
+ 
+ #if HOST_LONG_BITS <= TARGET_VIRT_ADDR_SPACE_BITS
+ #define h2g_valid(x) 1
++#define guest_valid(x) 1
+ #else
+-#define h2g_valid(x) ({ \
+-    unsigned long __guest = (unsigned long)(x) - guest_base; \
+-    (__guest < (1ul << TARGET_VIRT_ADDR_SPACE_BITS)) && \
+-    (!reserved_va || (__guest < reserved_va)); \
+-})
++#define h2g_valid(x) guest_valid((unsigned long)(x) - guest_base)
++#define guest_valid(x) ((x) < GUEST_ADDR_MAX)
+ #endif
+ 
++#define guest_range_valid(start, len) \
++    ({unsigned long l = (len); \
++     l <= GUEST_ADDR_MAX && (start) <= GUEST_ADDR_MAX - l; })
++
+ #define h2g_nocheck(x) ({ \
+     unsigned long __ret = (unsigned long)(x) - guest_base; \
+     (abi_ulong)__ret; \
+diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+index 0fbfd6dff20d..df81f9b803b6 100644
+--- a/linux-user/mmap.c
++++ b/linux-user/mmap.c
+@@ -80,8 +80,9 @@ int target_mprotect(abi_ulong start, abi_ulong len, int prot)
+         return -EINVAL;
+     len = TARGET_PAGE_ALIGN(len);
+     end = start + len;
+-    if (end < start)
+-        return -EINVAL;
++    if (!guest_range_valid(start, len)) {
++        return -ENOMEM;
++    }
+     prot &= PROT_READ | PROT_WRITE | PROT_EXEC;
+     if (len == 0)
+         return 0;
+@@ -481,8 +482,8 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
+ 	 * It can fail only on 64-bit host with 32-bit target.
+ 	 * On any other target/host host mmap() handles this error correctly.
+ 	 */
+-        if ((unsigned long)start + len - 1 > (abi_ulong) -1) {
+-            errno = EINVAL;
++        if (!guest_range_valid(start, len)) {
++            errno = ENOMEM;
+             goto fail;
+         }
+ 
+@@ -622,8 +623,10 @@ int target_munmap(abi_ulong start, abi_ulong len)
+     if (start & ~TARGET_PAGE_MASK)
+         return -EINVAL;
+     len = TARGET_PAGE_ALIGN(len);
+-    if (len == 0)
++    if (len == 0 || !guest_range_valid(start, len)) {
+         return -EINVAL;
++    }
++
+     mmap_lock();
+     end = start + len;
+     real_start = start & qemu_host_page_mask;
+@@ -678,6 +681,13 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
+     int prot;
+     void *host_addr;
+ 
++    if (!guest_range_valid(old_addr, old_size) ||
++        ((flags & MREMAP_FIXED) &&
++         !guest_range_valid(new_addr, new_size))) {
++        errno = ENOMEM;
++        return -1;
++    }
++
+     mmap_lock();
+ 
+     if (flags & MREMAP_FIXED) {
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index e24f43c4a259..79245e73784f 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -4900,6 +4900,9 @@ static inline abi_ulong do_shmat(CPUArchState *cpu_env,
+             return -TARGET_EINVAL;
+         }
+     }
++    if (!guest_range_valid(shmaddr, shm_info.shm_segsz)) {
++        return -TARGET_EINVAL;
++    }
+ 
+     mmap_lock();
+ 
+-- 
+2.11.0
