@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1erNql-0003eL-Hi
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:02:25 -0500
+	(envelope-from <cohuck@redhat.com>) id 1erNqs-0003lo-Ib
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:02:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1erNqi-00076a-Gl
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:02:19 -0500
+	(envelope-from <cohuck@redhat.com>) id 1erNqq-0007Ae-7G
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:02:26 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Thu,  1 Mar 2018 14:01:37 +0100
-Message-Id: <20180301130201.24666-4-cohuck@redhat.com>
+Date: Thu,  1 Mar 2018 14:01:40 +0100
+Message-Id: <20180301130201.24666-7-cohuck@redhat.com>
 In-Reply-To: <20180301130201.24666-1-cohuck@redhat.com>
 References: <20180301130201.24666-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL v2 03/27] s390-ccw: refactor IPL structs
+Subject: [Qemu-devel] [PULL v2 06/27] s390-ccw: parse and set boot menu
+ options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,118 +25,165 @@ Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, rth@tw
 
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
 
-ECKD DASDs have different IPL structures for CDL and LDL
-formats. The current Ipl1 and Ipl2 structs follow the CDL
-format, so we prepend "EckdCdl" to them. Boot info for LDL
-has been moved to a new struct: EckdLdlIpl1.
+Set boot menu options for an s390 guest and store them in
+the iplb. These options are set via the QEMU command line
+option:
+
+    -boot menu=on|off[,splash-time=X]
+
+or via the libvirt domain xml:
+
+    <os>
+      <bootmenu enable='yes|no' timeout='X'/>
+    </os>
+
+Where X represents some positive integer representing
+milliseconds.
+
+Any value set for loadparm will override all boot menu options.
+If loadparm=PROMPT, then the menu will be enabled without a
+timeout.
 
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/bootmap.c | 12 ++++++------
- pc-bios/s390-ccw/bootmap.h | 37 +++++++++++++++++++++----------------
- 2 files changed, 27 insertions(+), 22 deletions(-)
+ hw/s390x/ipl.c          | 52 +++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/s390x/ipl.h          |  9 +++++++--
+ pc-bios/s390-ccw/iplb.h |  9 +++++++--
+ 3 files changed, 66 insertions(+), 4 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index 9534f56060..a94638db2c 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -221,7 +221,7 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr)
- static void ipl_eckd_cdl(void)
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index 79f5a58adb..ee2039dc69 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -23,6 +23,9 @@
+ #include "hw/s390x/ebcdic.h"
+ #include "ipl.h"
+ #include "qemu/error-report.h"
++#include "qemu/config-file.h"
++#include "qemu/cutils.h"
++#include "qemu/option.h"
+ 
+ #define KERN_IMAGE_START                0x010000UL
+ #define KERN_PARM_AREA                  0x010480UL
+@@ -219,6 +222,54 @@ static Property s390_ipl_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
++static void s390_ipl_set_boot_menu(S390IPLState *ipl)
++{
++    QemuOptsList *plist = qemu_find_opts("boot-opts");
++    QemuOpts *opts = QTAILQ_FIRST(&plist->head);
++    uint8_t *flags = &ipl->qipl.qipl_flags;
++    uint32_t *timeout = &ipl->qipl.boot_menu_timeout;
++    const char *tmp;
++    unsigned long splash_time = 0;
++
++    if (!get_boot_device(0)) {
++        if (boot_menu) {
++            error_report("boot menu requires a bootindex to be specified for "
++                         "the IPL device.");
++        }
++        return;
++    }
++
++    switch (ipl->iplb.pbt) {
++    case S390_IPL_TYPE_CCW:
++        break;
++    default:
++        error_report("boot menu is not supported for this device type.");
++        return;
++    }
++
++    if (!boot_menu) {
++        return;
++    }
++
++    *flags |= QIPL_FLAG_BM_OPTS_CMD;
++
++    tmp = qemu_opt_get(opts, "splash-time");
++
++    if (tmp && qemu_strtoul(tmp, NULL, 10, &splash_time)) {
++        error_report("splash-time is invalid, forcing it to 0.");
++        *timeout = 0;
++        return;
++    }
++
++    if (splash_time > 0xffffffff) {
++        error_report("splash-time is too large, forcing it to max value.");
++        *timeout = 0xffffffff;
++        return;
++    }
++
++    *timeout = cpu_to_be32(splash_time);
++}
++
+ static bool s390_gen_initial_iplb(S390IPLState *ipl)
  {
-     XEckdMbr *mbr;
--    Ipl2 *ipl2 = (void *)sec;
-+    EckdCdlIpl2 *ipl2 = (void *)sec;
-     IplVolumeLabel *vlbl = (void *)sec;
-     block_number_t bmt_block_nr;
- 
-@@ -231,7 +231,7 @@ static void ipl_eckd_cdl(void)
-     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-     read_block(1, ipl2, "Cannot read IPL2 record at block 1");
- 
--    mbr = &ipl2->u.x.mbr;
-+    mbr = &ipl2->mbr;
-     IPL_assert(magic_match(mbr, ZIPL_MAGIC), "No zIPL section in IPL2 record.");
-     IPL_assert(block_size_ok(mbr->blockptr.xeckd.bptr.size),
-                "Bad block size in zIPL section of IPL2 record.");
-@@ -281,7 +281,7 @@ static void print_eckd_ldl_msg(ECKD_IPL_mode_t mode)
- static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
- {
-     block_number_t bmt_block_nr;
--    BootInfo *bip = (void *)(sec + 0x70); /* BootInfo is MBR for LDL */
-+    EckdLdlIpl1 *ipl1 = (void *)sec;
- 
-     if (mode != ECKD_LDL_UNLABELED) {
-         print_eckd_ldl_msg(mode);
-@@ -292,15 +292,15 @@ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
-     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-     read_block(0, sec, "Cannot read block 0 to grab boot info.");
-     if (mode == ECKD_LDL_UNLABELED) {
--        if (!magic_match(bip->magic, ZIPL_MAGIC)) {
-+        if (!magic_match(ipl1->bip.magic, ZIPL_MAGIC)) {
-             return; /* not applicable layout */
+     DeviceState *dev_st;
+@@ -435,6 +486,7 @@ void s390_ipl_prepare_cpu(S390CPU *cpu)
          }
-         sclp_print("unlabeled LDL.\n");
+         ipl->qipl.netboot_start_addr = cpu_to_be64(ipl->start_addr);
      }
--    verify_boot_info(bip);
-+    verify_boot_info(&ipl1->bip);
++    s390_ipl_set_boot_menu(ipl);
+     s390_ipl_prepare_qipl(cpu);
+ }
  
-     /* save pointer to Boot Map Table */
--    bmt_block_nr = eckd_block_num(&bip->bp.ipl.bm_ptr.eckd.bptr.chs);
-+    bmt_block_nr = eckd_block_num(&ipl1->bip.bp.ipl.bm_ptr.eckd.bptr.chs);
+diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+index 5cc3b770d4..d6c6f75b76 100644
+--- a/hw/s390x/ipl.h
++++ b/hw/s390x/ipl.h
+@@ -91,6 +91,9 @@ void s390_reipl_request(void);
  
-     run_eckd_boot_script(bmt_block_nr);
-     /* no return */
-diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
-index b361084073..4bd95cd4d2 100644
---- a/pc-bios/s390-ccw/bootmap.h
-+++ b/pc-bios/s390-ccw/bootmap.h
-@@ -239,22 +239,27 @@ typedef struct BootInfo {          /* @ 0x70, record #0    */
-     } bp;
- } __attribute__ ((packed)) BootInfo; /* see also XEckdMbr   */
+ #define QIPL_ADDRESS  0xcc
  
--typedef struct Ipl1 {
--    unsigned char key[4]; /* == "IPL1" */
--    unsigned char data[24];
--} __attribute__((packed)) Ipl1;
--
--typedef struct Ipl2 {
--    unsigned char key[4]; /* == "IPL2" */
--    union {
--        unsigned char data[144];
--        struct {
--            unsigned char reserved1[92-4];
--            XEckdMbr mbr;
--            unsigned char reserved2[144-(92-4)-sizeof(XEckdMbr)];
--        } x;
--    } u;
--} __attribute__((packed)) Ipl2;
-+/*
-+ * Structs for IPL
-+ */
-+#define STAGE2_BLK_CNT_MAX  24 /* Stage 1b can load up to 24 blocks */
++/* Boot Menu flags */
++#define QIPL_FLAG_BM_OPTS_CMD   0x80
 +
-+typedef struct EckdCdlIpl1 {
-+    uint8_t key[4]; /* == "IPL1" */
-+    uint8_t data[24];
-+} __attribute__((packed)) EckdCdlIpl1;
-+
-+typedef struct EckdCdlIpl2 {
-+    uint8_t key[4]; /* == "IPL2" */
-+    uint8_t reserved0[88];
-+    XEckdMbr mbr;
-+    uint8_t reserved[24];
-+} __attribute__((packed)) EckdCdlIpl2;
-+
-+typedef struct EckdLdlIpl1 {
-+    uint8_t reserved[112];
-+    BootInfo bip; /* BootInfo is MBR for LDL */
-+} __attribute__((packed)) EckdLdlIpl1;
+ /*
+  * The QEMU IPL Parameters will be stored at absolute address
+  * 204 (0xcc) which means it is 32-bit word aligned but not
+@@ -104,9 +107,11 @@ void s390_reipl_request(void);
+  * in pc-bios/s390-ccw/iplb.h.
+  */
+ struct QemuIplParameters {
+-    uint8_t  reserved1[4];
++    uint8_t  qipl_flags;
++    uint8_t  reserved1[3];
+     uint64_t netboot_start_addr;
+-    uint8_t  reserved2[16];
++    uint32_t boot_menu_timeout;
++    uint8_t  reserved2[12];
+ } QEMU_PACKED;
+ typedef struct QemuIplParameters QemuIplParameters;
  
- typedef struct IplVolumeLabel {
-     unsigned char key[4]; /* == "VOL1" */
+diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
+index 31d2934762..832bb94440 100644
+--- a/pc-bios/s390-ccw/iplb.h
++++ b/pc-bios/s390-ccw/iplb.h
+@@ -74,14 +74,19 @@ extern IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+ 
+ #define QIPL_ADDRESS  0xcc
+ 
++/* Boot Menu flags */
++#define QIPL_FLAG_BM_OPTS_CMD   0x80
++
+ /*
+  * This definition must be kept in sync with the defininition
+  * in hw/s390x/ipl.h
+  */
+ struct QemuIplParameters {
+-    uint8_t  reserved1[4];
++    uint8_t  qipl_flags;
++    uint8_t  reserved1[3];
+     uint64_t netboot_start_addr;
+-    uint8_t  reserved2[16];
++    uint32_t boot_menu_timeout;
++    uint8_t  reserved2[12];
+ } __attribute__ ((packed));
+ typedef struct QemuIplParameters QemuIplParameters;
+ 
 -- 
 2.13.6
