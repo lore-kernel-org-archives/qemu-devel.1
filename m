@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34021)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1erMK6-0003vJ-7T
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:24:31 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1erMK8-0003xr-8E
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:24:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1erMK5-0008E6-9T
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:24:30 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46720)
+	(envelope-from <pm215@archaic.org.uk>) id 1erMK7-0008Et-7v
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:24:32 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46724)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1erMK5-0008DQ-1X
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:24:29 -0500
+	id 1erMK6-0008EX-W2
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:24:31 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1erMK3-0000fm-TM
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:24:27 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1erMK6-0000gV-1z
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:24:30 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  1 Mar 2018 11:23:54 +0000
-Message-Id: <20180301112403.12487-34-peter.maydell@linaro.org>
+Date: Thu,  1 Mar 2018 11:23:57 +0000
+Message-Id: <20180301112403.12487-37-peter.maydell@linaro.org>
 In-Reply-To: <20180301112403.12487-1-peter.maydell@linaro.org>
 References: <20180301112403.12487-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 33/42] arm/translate-a64: add FP16 FSQRT to
- simd_two_reg_misc_fp16
+Subject: [Qemu-devel] [PULL 36/42] arm/translate-a64: add FP16 FMOV to
+ simd_mod_imm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,68 +35,80 @@ To: qemu-devel@nongnu.org
 
 From: Alex Bennée <alex.bennee@linaro.org>
 
+Only one half-precision instruction has been added to this group.
+
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20180227143852.11175-26-alex.bennee@linaro.org
+Message-id: 20180227143852.11175-29-alex.bennee@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper-a64.h    |  1 +
- target/arm/helper-a64.c    | 13 +++++++++++++
- target/arm/translate-a64.c |  5 +++++
- 3 files changed, 19 insertions(+)
+ target/arm/translate-a64.c | 35 +++++++++++++++++++++++++----------
+ 1 file changed, 25 insertions(+), 10 deletions(-)
 
-diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
-index 339323fc3d..ef4ddfe9d8 100644
---- a/target/arm/helper-a64.h
-+++ b/target/arm/helper-a64.h
-@@ -80,3 +80,4 @@ DEF_HELPER_2(advsimd_rinth_exact, f16, f16, ptr)
- DEF_HELPER_2(advsimd_rinth, f16, f16, ptr)
- DEF_HELPER_2(advsimd_f16tosinth, i32, f16, ptr)
- DEF_HELPER_2(advsimd_f16touinth, i32, f16, ptr)
-+DEF_HELPER_2(sqrt_f16, f16, f16, ptr)
-diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
-index 92a0d55a9c..afb25ad20c 100644
---- a/target/arm/helper-a64.c
-+++ b/target/arm/helper-a64.c
-@@ -828,3 +828,16 @@ uint32_t HELPER(advsimd_f16touinth)(float16 a, void *fpstp)
-     }
-     return float16_to_uint16(a, fpst);
- }
-+
-+/*
-+ * Square Root and Reciprocal square root
-+ */
-+
-+float16 HELPER(sqrt_f16)(float16 a, void *fpstp)
-+{
-+    float_status *s = fpstp;
-+
-+    return float16_sqrt(a, s);
-+}
-+
-+
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 715dc4333d..1096ff48ac 100644
+index 86231b33bb..7c2bc05b92 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -11388,6 +11388,8 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
-     case 0x6f: /* FNEG */
-         need_fpst = false;
-         break;
-+    case 0x7f: /* FSQRT (vector) */
-+        break;
-     default:
-         fprintf(stderr, "%s: insn %#04x fpop %#2x\n", __func__, insn, fpop);
-         g_assert_not_reached();
-@@ -11502,6 +11504,9 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
-             case 0x6f: /* FNEG */
-                 tcg_gen_xori_i32(tcg_res, tcg_op, 0x8000);
-                 break;
-+            case 0x7f: /* FSQRT */
-+                gen_helper_sqrt_f16(tcg_res, tcg_op, tcg_fpstatus);
-+                break;
-             default:
-                 g_assert_not_reached();
+@@ -6234,6 +6234,8 @@ static void disas_simd_copy(DisasContext *s, uint32_t insn)
+  *   MVNI - move inverted (shifted) imm into register
+  *   ORR  - bitwise OR of (shifted) imm with register
+  *   BIC  - bitwise clear of (shifted) imm with register
++ * With ARMv8.2 we also have:
++ *   FMOV half-precision
+  */
+ static void disas_simd_mod_imm(DisasContext *s, uint32_t insn)
+ {
+@@ -6248,8 +6250,11 @@ static void disas_simd_mod_imm(DisasContext *s, uint32_t insn)
+     uint64_t imm = 0;
+ 
+     if (o2 != 0 || ((cmode == 0xf) && is_neg && !is_q)) {
+-        unallocated_encoding(s);
+-        return;
++        /* Check for FMOV (vector, immediate) - half-precision */
++        if (!(arm_dc_feature(s, ARM_FEATURE_V8_FP16) && o2 && cmode == 0xf)) {
++            unallocated_encoding(s);
++            return;
++        }
+     }
+ 
+     if (!fp_access_check(s)) {
+@@ -6307,19 +6312,29 @@ static void disas_simd_mod_imm(DisasContext *s, uint32_t insn)
+                     imm |= 0x4000000000000000ULL;
+                 }
+             } else {
+-                imm = (abcdefgh & 0x3f) << 19;
+-                if (abcdefgh & 0x80) {
+-                    imm |= 0x80000000;
+-                }
+-                if (abcdefgh & 0x40) {
+-                    imm |= 0x3e000000;
++                if (o2) {
++                    /* FMOV (vector, immediate) - half-precision */
++                    imm = vfp_expand_imm(MO_16, abcdefgh);
++                    /* now duplicate across the lanes */
++                    imm = bitfield_replicate(imm, 16);
+                 } else {
+-                    imm |= 0x40000000;
++                    imm = (abcdefgh & 0x3f) << 19;
++                    if (abcdefgh & 0x80) {
++                        imm |= 0x80000000;
++                    }
++                    if (abcdefgh & 0x40) {
++                        imm |= 0x3e000000;
++                    } else {
++                        imm |= 0x40000000;
++                    }
++                    imm |= (imm << 32);
+                 }
+-                imm |= (imm << 32);
              }
+         }
+         break;
++    default:
++        fprintf(stderr, "%s: cmode_3_1: %x\n", __func__, cmode_3_1);
++        g_assert_not_reached();
+     }
+ 
+     if (cmode_3_1 != 7 && is_neg) {
 -- 
 2.16.2
