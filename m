@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1erR59-0000gy-DQ
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:29:24 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1erR64-0001Xq-Lx
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:30:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1erR58-0005DI-9K
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:29:23 -0500
-Date: Thu, 1 Mar 2018 16:29:08 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20180301162908.GL2787@redhat.com>
-References: <20180301135856.22698-1-rjones@redhat.com>
-	<20180301135856.22698-2-rjones@redhat.com>
-	<20180301161118.GW14643@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1erR61-0005hH-UF
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:30:20 -0500
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:41223)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1erR61-0005fD-0j
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:30:17 -0500
+Received: by mail-oi0-x244.google.com with SMTP id g5so4900919oiy.8
+	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 08:30:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180301161118.GW14643@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] block: curl: Allow arbitrary HTTP
- request headers to be set.
+In-Reply-To: <1519815685-29200-3-git-send-email-abdallah.bouassida@lauterbach.com>
+References: <1519815685-29200-1-git-send-email-abdallah.bouassida@lauterbach.com>
+	<1519815685-29200-3-git-send-email-abdallah.bouassida@lauterbach.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 1 Mar 2018 16:29:55 +0000
+Message-ID: <CAFEAcA8hSz-WUsAo2J3VJWSQTg4_ueX8RgAhAG15wvjBeRf4tQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] target/arm: Add "_S" suffix to the
+ secure version of a sysreg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,75 +30,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: jcody@redhat.com, kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com, mreitz@redhat.com
+To: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Khaled Jmal <khaled.jmal@lauterbach.com>
 
-On Thu, Mar 01, 2018 at 04:11:18PM +0000, Daniel P. Berrang=C3=A9 wrote:
-> On Thu, Mar 01, 2018 at 01:58:55PM +0000, Richard W.M. Jones wrote:
-> > Allow arbitrary HTTP request headers to be set, like this:
-> >=20
-> >   qemu-img create -f qcow2 \
-> >       -b 'json:{ "file.driver":"http",
-> >                  "file.url":"http://192.168.0.249/scratch/test.img",
-> >                  "file.header": ["Authorization: letmein"] }' \
-> >       test.qcow2
-> >=20
-> > which adds the =E2=80=98Authorization: letmein=E2=80=99 header to the=
- outgoing request
-> > for the backing file.  Multiple headers can be set, and curl built-in
-> > headers can be removed (using "Header:").
-> >=20
-> > Note this uses the same format as curl's CURLOPT_HTTPHEADER, thus
-> > pulling in curl API guarantees into qemu, but curl has had very stron=
-g
-> > API backward compatibility since the start of the project.
->=20
-> It doesn't appear like there's anything really curl specific about
-> this - isn't   'Key: value' just the standard HTTP format (minus the
-> \r\n line ending of course.  IOW, I don't see any problem with using
-> this format.
+On 28 February 2018 at 11:01, Abdallah Bouassida
+<abdallah.bouassida@lauterbach.com> wrote:
+> This is a preparation for the coming feature of creating dynamically an XML
+> description for the ARM sysregs.
+> Add "_S" suffix to the secure version of sysregs that have both S and NS views
+> Replace (S) and (NS) by _S and _NS for the register that are manually defined,
+> so all the registers follow the same convention.
+>
+> Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+> ---
+>  target/arm/helper.c | 31 ++++++++++++++++++++-----------
+>  1 file changed, 20 insertions(+), 11 deletions(-)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index bdd212f..1594ec45 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -694,12 +694,12 @@ static const ARMCPRegInfo cp_reginfo[] = {
+>       * the secure register to be properly reset and migrated. There is also no
+>       * v8 EL1 version of the register so the non-secure instance stands alone.
+>       */
+> -    { .name = "FCSEIDR(NS)",
+> +    { .name = "FCSEIDR_NS",
 
-I'm going to withdraw this patch is it's not needed.  However this
-does introduce a dependency on curl because of this from
-CURLOPT_HTTPHEADER(3):
+I think this should just be "FCSEIDR", because the convention we
+seem to be going with is "_S" for the secure banked register, and
+no suffix for the non-secure banked register.
 
-                                                        "If  you  add  a
-   header that is otherwise generated and used by libcurl internally, you=
-r
-   added one will be used instead. If you add a header with no content  a=
-s
-   in  'Accept:'  (no data on the right side of the colon), the internall=
-y
-   used header will get disabled. With this option you can add  new  head=
-=E2=80=90
-   ers,  replace  internal  headers  and remove internal headers. To add =
-a
-   header with no content (nothing to the right side of  the  colon),  us=
-e
-   the form 'MyHeader;' (note the ending semicolon)."
+> @@ -5562,7 +5562,8 @@ CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
+>
+>  static void add_cpreg_to_hashtable(ARMCPU *cpu, const ARMCPRegInfo *r,
+>                                     void *opaque, int state, int secstate,
+> -                                   int crm, int opc1, int opc2)
+> +                                   int crm, int opc1, int opc2,
+> +                                   const char *name)
+>  {
+>      /* Private utility function for define_one_arm_cp_reg_with_opaque():
+>       * add a single reginfo struct to the hash table.
+> @@ -5572,6 +5573,7 @@ static void add_cpreg_to_hashtable(ARMCPU *cpu, const ARMCPRegInfo *r,
+>      int is64 = (r->type & ARM_CP_64BIT) ? 1 : 0;
+>      int ns = (secstate & ARM_CP_SECSTATE_NS) ? 1 : 0;
+>
+> +    r2->name = name;
+>      /* Reset the secure state to the specific incoming state.  This is
+>       * necessary as the register may have been defined with both states.
+>       */
+> @@ -5803,19 +5805,26 @@ void define_one_arm_cp_reg_with_opaque(ARMCPU *cpu,
+>                          /* Under AArch32 CP registers can be common
+>                           * (same for secure and non-secure world) or banked.
+>                           */
+> +                        const char *name;
+> +                        GString *s;
+> +
+>                          switch (r->secure) {
+>                          case ARM_CP_SECSTATE_S:
+>                          case ARM_CP_SECSTATE_NS:
+>                              add_cpreg_to_hashtable(cpu, r, opaque, state,
+> -                                                   r->secure, crm, opc1, opc2);
+> +                                                   r->secure, crm, opc1, opc2,
+> +                                                   r->name);
+>                              break;
+>                          default:
+> +                            s = g_string_new(r->name);
+> +                            g_string_append_printf(s, "_S");
+> +                            name = g_string_free(s, false);
 
-> > diff --git a/qapi/block-core.json b/qapi/block-core.json
-> > index 5c5921bfb7..ca1ebdbef1 100644
-> > --- a/qapi/block-core.json
-> > +++ b/qapi/block-core.json
-> > @@ -3047,12 +3047,15 @@
-> >  # @cookie-secret: ID of a QCryptoSecret object providing the cookie =
-data in a
-> >  #                 secure way. See @cookie for the format. (since 2.1=
-0)
-> >  #
-> > +# @header:      List of HTTP request headers, see CURLOPT_HTTPHEADER=
-(3).
->=20
-> Put  a '(since 2.12)' anntation on end of the docs for this new field
+You can do this more simply with just
+     name = g_strdup_printf("%s_S", r->name);
 
-Will change the second patch accordingly, thanks.
+You only need to use the g_string APIs when you're appending to the
+same string multiple times; if you're creating the entire string in
+one go this is simpler.
 
-Rich.
+>                              add_cpreg_to_hashtable(cpu, r, opaque, state,
+>                                                     ARM_CP_SECSTATE_S,
+> -                                                   crm, opc1, opc2);
+> +                                                   crm, opc1, opc2, name);
+>                              add_cpreg_to_hashtable(cpu, r, opaque, state,
+>                                                     ARM_CP_SECSTATE_NS,
+> -                                                   crm, opc1, opc2);
+> +                                                   crm, opc1, opc2, r->name);
+>                              break;
+>                          }
+>                      } else {
 
---=20
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rj=
-ones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-libguestfs lets you edit virtual machines.  Supports shell scripting,
-bindings from many languages.  http://libguestfs.org
+This means we're going to have the hashtable entries be a mix of
+structs that point to constant strings and structs that point to
+dynamically allocated strings. That's OK right now, because you
+can't dynamically construct and delete Arm CPU objects. But if/when
+we add support for that (eg for cpu hotplug) it'll mean memory leaks.
+I think the simplest approach is that:
+ * in add_cpreg_to_hashtable() instead of r2->name = name we should
+   r2->name = g_strdup(name);
+ * the code here which allocates memory for the _S variant name
+   should then do a g_free(name) once it's called add_cpreg_to_hashtable()
+
+Then disposal of hashtable entries (when we write it) will be simple:
+always free r->name.
+
+thanks
+-- PMM
