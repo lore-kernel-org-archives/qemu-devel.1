@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erNfK-0005ot-N8
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:50:31 -0500
+	(envelope-from <cohuck@redhat.com>) id 1erNiq-000794-WD
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:54:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erNfJ-0001W0-VD
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:50:30 -0500
-Received: from mail-oi0-x229.google.com ([2607:f8b0:4003:c06::229]:34141)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1erNfJ-0001Vn-QH
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:50:29 -0500
-Received: by mail-oi0-x229.google.com with SMTP id c83so4379523oib.1
-	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 04:50:29 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1erNin-00031M-Ta
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:54:09 -0500
+Date: Thu, 1 Mar 2018 13:54:01 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180301135401.48d46997.cohuck@redhat.com>
+In-Reply-To: <20180301120826.6847-1-david@redhat.com>
+References: <20180301120826.6847-1-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180221113012.2ee836fb@redhat.com>
-References: <20180220180325.29818-1-peter.maydell@linaro.org>
-	<20180220180325.29818-20-peter.maydell@linaro.org>
-	<20180221113012.2ee836fb@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 1 Mar 2018 12:50:08 +0000
-Message-ID: <CAFEAcA-i9LF26THZz8+RbJ0sv4iq9HJJ-aK2d_BrT=wu2BVavQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 19/19] mps2-an505: New board model: MPS2
- with AN505 Cortex-M33 FPGA image
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/tcg: fix loading 31bit PSWs with
+ the highest bit set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,24 +23,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>
 
-On 21 February 2018 at 10:30, Igor Mammedov <imammedo@redhat.com> wrote:
-> On Tue, 20 Feb 2018 18:03:25 +0000
-> Peter Maydell <peter.maydell@linaro.org> wrote:
->
+On Thu,  1 Mar 2018 13:08:26 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
->> +typedef struct {
->> +    MachineClass parent;
->> +    MPS2TZFPGAType fpga_type;
->> +    const char *cpu_model;
-> I don't see it used in this patch, should it be removed?
->
+> Let's also put the 31-bit hack in front of the REAL MMU, otherwise right
+> now we get errors when loading a PSW where the highest bit is set (e.g.
+> via s390-netboot.img). The highest bit is not masked away, therefore we
+> inject addressing exceptions into the guest.
+> 
+> The proper fix will later be to do all address wrapping before accessing
+> the MMU - so we won't get any "wrong" entries in there (which makes
+> flushing also easier). But that will require more work (wrapping in
+> load_psw, wrapping when incrementing the PC, wrapping every memory
+> access).
+> 
+> This fixes the tests/pxe-test test.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/excp_helper.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+> index 411051edc3..dfee221111 100644
+> --- a/target/s390x/excp_helper.c
+> +++ b/target/s390x/excp_helper.c
+> @@ -107,6 +107,10 @@ int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr orig_vaddr, int size,
+>              return 1;
+>          }
+>      } else if (mmu_idx == MMU_REAL_IDX) {
+> +        /* 31-Bit mode */
+> +        if (!(env->psw.mask & PSW_MASK_64)) {
+> +            vaddr &= 0x7fffffff;
+> +        }
+>          if (mmu_translate_real(env, vaddr, rw, &raddr, &prot)) {
+>              return 1;
+>          }
 
-You're right; this was a leftover from when I started out
-with something that looked more like hw/arm/mps2.c. I'll just
-delete the struct member.
-
-thanks
--- PMM
+Thanks, queued to s390-next.
