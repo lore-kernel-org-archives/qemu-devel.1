@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1erHi6-0005pb-Be
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 01:28:59 -0500
+	(envelope-from <bounces@canonical.com>) id 1erHjw-0006Yt-1R
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 01:30:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1erHi3-0001SY-6Q
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 01:28:58 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55984 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1erHi3-0001Qm-0p
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 01:28:55 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 51E2B40FB657
-	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 06:28:36 +0000 (UTC)
-Date: Thu, 1 Mar 2018 14:28:26 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180301062826.GP27381@xz-mi>
-References: <20180228050633.7410-1-peterx@redhat.com>
-	<20180228050633.7410-15-peterx@redhat.com>
-	<20180228132237.GK17774@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1erHjs-0002xz-Ti
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 01:30:52 -0500
+Received: from indium.canonical.com ([91.189.90.7]:43682)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1erHjs-0002xd-O6
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 01:30:48 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1erHjr-0003yz-5c
+	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 06:30:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 28EB12E80CD
+	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 06:30:47 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180228132237.GK17774@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 14/14] qio/chardev: specify gcontext for
- TLS handshake
+Date: Thu, 01 Mar 2018 06:16:54 -0000
+From: Samuel Delarosbil <1658141@bugs.launchpad.net>
+Reply-To: Bug 1658141 <1658141@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170120163946.25029.76236.malonedeb@wampee.canonical.com>
+Message-Id: <151988501420.12878.3703732104667301757.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1658141] Re: QEMU's default msrs handling causes
+ Windows 10 64 bit to crash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,95 +37,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Wed, Feb 28, 2018 at 01:22:37PM +0000, Daniel P. Berrang=C3=A9 wrote:
-> On Wed, Feb 28, 2018 at 01:06:33PM +0800, Peter Xu wrote:
-> > We allow the TLS code to be run with non-default gcontext by providin=
-g a
-> > new qio_channel_tls_handshake_full() API.
-> >=20
-> > With the new API, we can re-setup the TLS handshake GSource by callin=
-g
-> > it again with the correct gcontext.  Any call to the function will cl=
-ean
-> > up existing GSource tasks, and re-setup using the new gcontext.
-> >=20
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  chardev/char-socket.c    | 30 +++++++++++++---
-> >  include/io/channel-tls.h | 22 +++++++++++-
-> >  io/channel-tls.c         | 91 ++++++++++++++++++++++++++++++++++++++=
-++--------
-> >  3 files changed, 123 insertions(+), 20 deletions(-)
-> >=20
-> > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> > index 164a64ff34..406d33c04f 100644
-> > --- a/chardev/char-socket.c
-> > +++ b/chardev/char-socket.c
-> > @@ -72,6 +72,9 @@ typedef struct {
-> > =20
-> >  static gboolean socket_reconnect_timeout(gpointer opaque);
-> >  static void tcp_chr_telnet_init(Chardev *chr);
-> > +static void tcp_chr_tls_handshake_setup(Chardev *chr,
-> > +                                        QIOChannelTLS *tioc,
-> > +                                        GMainContext *context);
-> > =20
-> >  static void tcp_chr_reconn_timer_cancel(SocketChardev *s)
-> >  {
-> > @@ -570,6 +573,7 @@ static void tcp_chr_telnet_destroy(SocketChardev =
-*s)
-> >  static void tcp_chr_update_read_handler(Chardev *chr)
-> >  {
-> >      SocketChardev *s =3D SOCKET_CHARDEV(chr);
-> > +    QIOChannelTLS *tioc;
-> > =20
-> >      if (s->listener) {
-> >          /*
-> > @@ -589,6 +593,17 @@ static void tcp_chr_update_read_handler(Chardev =
-*chr)
-> >          qio_task_context_set(s->thread_task, chr->gcontext);
-> >      }
-> > =20
-> > +    tioc =3D (QIOChannelTLS *)object_dynamic_cast(OBJECT(s->ioc),
-> > +                                                TYPE_QIO_CHANNEL_TLS=
-);
-> > +    if (tioc) {
-> > +        /*
-> > +         * TLS session enabled; reconfigure things up.  Note that, i=
-f
-> > +         * there is existing handshake task, it'll be cleaned up fir=
-st
-> > +         * in QIO code.
-> > +         */
-> > +        tcp_chr_tls_handshake_setup(chr, tioc, chr->gcontext);
-> > +    }
->=20
-> This is crazy - we should not be looking at specific implementations of
-> the channel. If the TLS object needs to use a specific GMainContext we
-> should make sure that is done right from the start and not try to chang=
-e
-> the GMainContext on the fly.
+It appears this bug affects me too with very similar symptons, but this
+time, it's while launching the recently released game "Puyo Poyo Tetris"
+using Steam in the guest VM.
 
-I'm not sure whether I can do it since current code has already let
-the chardev frontends depend on the backends, so we cannot simply let
-it be reverted (setup context basically means we need to have the
-frontend be inited before backends since the context is now
-frontend-specific).
+-- =
 
-However I'm thinking maybe I can postpone some of the chardev
-initialization process after everything has been setup.  Then it'll
-look like:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1658141
 
-- init chardev backends, phase 1 (e.g., only create chardevs but
-  postpone open)
-- init chardev frontends (e.g., monitors)
-- init chardev backends, phase 2 (e.g., do the real socket open work)
+Title:
+  QEMU's default msrs handling causes Windows 10 64 bit to crash
 
-Actually I already spotted an existing user of it
-(muxes_realize_notify).  Maybe I can do similar thing to postpone some
-of the socket chardev operations after machine init finished.  Thanks,
+Status in QEMU:
+  New
 
---=20
-Peter Xu
+Bug description:
+  Wine uses QEMU to run its conformance test suite on Windows virtual
+  machines. Wine's conformance tests check the behavior of various
+  Windows APIs and verify that they behave as expected.
+
+  One such test checks handling of exceptions down. When run on Windows 10 =
+64 bit in QEMU it triggers a "KMOD_EXCEPTION_NOT_HANDLED" BSOD in the VM. S=
+ee:
+  https://bugs.winehq.org/show_bug.cgi?id=3D40240
+
+  =
+
+  To reproduce this bug:
+  * Pick a Windows 10 64 bit VM on an Intel host.
+
+  * Start the VM. I'm pretty sure any qemu command will do but here's what =
+I used:
+    qemu-system-x86_64 -machine pc-i440fx-2.1,accel=3Dkvm -cpu core2duo,+nx=
+ -m 2048 -hda /var/lib/libvirt/images/wtbw1064.qcow2
+
+  * Grab the attached source code. The tar file is a bit big at 85KB
+  because I had to include some Wine headers. However the source file
+  proper, exception.c, is only 85 lines, including the LGPL header.
+
+  * Compile the source code with MinGW by typing 'make'. This produces a
+  32 bit exception.exe executable. I'll attach it for good measure.
+
+  * Put exception.exe on the VM and run it.
+
+  =
+
+  After investigation it turns out this happens:
+   * Only for Windows 10 64 bit guests. Windows 10 32 bit and older Windows=
+ versions are unaffected.
+
+   * Only on Intel hosts. At least both my Xeon E3-1226 v3 and i7-4790K
+  hosts are impacted but not my Opteron 6128 one.
+
+   * It does not seem to depend on the emulated CPU type: on the Intel host=
+s this happened with both =
+
+  core2duo,nx and 'copy the host configuration' and did not depend on the n=
+umber of emulated cpus/cores.
+
+   * This happened with both QEMU 2.1 and 2.7, and both the 3.16.0 and
+  4.8.11 Linux kernels, both on Debian 8.6 and Debian Testing.
+
+  =
+
+  After searching for quite some time I discovered that the kvm kernel modu=
+le was sneaking the following messages into /var/log/syslog precisely when =
+the BSOD happens:
+
+  Dec 16 13:43:48 vm3 kernel: [  191.624802] kvm [2064]: vcpu0, guest rIP: =
+0xfffff803cb3c0bf3 kvm_set_msr_common: MSR_IA32_DEBUGCTLMSR 0x1, nop
+  Dec 16 13:43:48 vm3 kernel: [  191.624835] kvm [2064]: vcpu0, guest rIP: =
+0xfffff803cb3c0c5c unhandled rdmsr: 0x1c9
+
+  A search on the Internet turned up a post suggesting to change kvm's
+  ignore_msrs setting:
+
+     echo 1 >/sys/module/kvm/parameters/ignore_msrs
+
+  https://www.reddit.com/r/VFIO/comments/42dj7n/some_games_crash_to_biosboo=
+t_on_launch/
+
+  This does actually work and provides a workaround at least.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1658141/+subscriptions
