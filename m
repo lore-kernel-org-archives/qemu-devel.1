@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1erMY4-0008K2-HD
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:38:57 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1erMjL-0006Yv-4i
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:50:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1erMY3-0005UE-KJ
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:38:56 -0500
-References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
-	<1518702707-7077-6-git-send-email-vsementsov@virtuozzo.com>
-	<6f4c0fa6-78f5-13a9-bdd7-d24da479fc72@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <2e169d7b-29fa-37a7-efe3-32772c966d8e@virtuozzo.com>
-Date: Thu, 1 Mar 2018 14:38:40 +0300
+	(envelope-from <peter.maydell@linaro.org>) id 1erMjK-0006zJ-FG
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:50:35 -0500
+Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:35298)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1erMjK-0006yz-A0
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:50:34 -0500
+Received: by mail-ot0-x22a.google.com with SMTP id w2so5296132otg.2
+	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 03:50:34 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <6f4c0fa6-78f5-13a9-bdd7-d24da479fc72@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 5/9] nbd/client: fix error messages in
- nbd_handle_reply_err
+In-Reply-To: <20180228164816.24110-1-richard.henderson@linaro.org>
+References: <20180228164816.24110-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 1 Mar 2018 11:50:13 +0000
+Message-ID: <CAFEAcA_--27=va-PEtWporwmF23TueP-j=g0MMbF9ZW4L4K29A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [RISU 0/3] ARM additions for v8.1-simd
+ and v8.3-compnum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,35 +29,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-16.02.2018 20:38, Eric Blake wrote:
-> On 02/15/2018 07:51 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 1. NBD_REP_ERR_INVALID is not only about length, so, make message more
->> =C2=A0=C2=A0=C2=A0 general
->>
->> 2. hex format is not very good: it's hard to read something like
->> =C2=A0=C2=A0=C2=A0 "option a (set meta context)", so switch to dec.
+On 28 February 2018 at 16:48, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> I've rebased these onto master.  There don't seem to be any
+> consistent examples of how extensions are to be named in this
+> new group-enabled world, but it's my opinion that the bike
+> shed should be green.
 >
-> It would be okay as option 0xa; I also want to be sure we match the=20
-> output in server traces with the output in client traces; for example,=20
-> I found:
->
-> nbd/server.c-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "Unsupported option 0x%"=20
-> PRIx32 " (%s)",
-> nbd/server.c:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 option, nbd_opt_lookup(option));
->
-> So we want consistency through all the call sites, before this patch=20
-> is ready to go, although I agree we need it.
->
+> Since fp16 support is not yet present on the AArch32 side,
+> I have disabled generation of those instructions here.
 
-I think, decimal format for NBD constants is better, as it used in the spec=
-.
+Applied to risu master, thanks.
 
---=20
-Best regards,
-Vladimir
+-- PMM
