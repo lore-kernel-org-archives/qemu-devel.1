@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42642)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erOLY-000822-3T
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:34:09 -0500
+	(envelope-from <jianjay.zhou@huawei.com>) id 1erOYH-0002js-Tk
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:47:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erOLW-0000TX-U9
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:34:08 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:35313)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1erOLW-0000TI-Od
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:34:06 -0500
-Received: by mail-ot0-x244.google.com with SMTP id w2so5552024otg.2
-	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 05:34:06 -0800 (PST)
+	(envelope-from <jianjay.zhou@huawei.com>) id 1erOYE-00018N-QZ
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:47:17 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2092 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
+	id 1erOYE-00017S-EW
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 08:47:14 -0500
+From: Jay Zhou <jianjay.zhou@huawei.com>
+Date: Thu, 1 Mar 2018 21:46:27 +0800
+Message-ID: <cover.1519910384.git.arei.gonglei@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20180228193125.20577-13-richard.henderson@linaro.org>
-References: <20180228193125.20577-1-richard.henderson@linaro.org>
-	<20180228193125.20577-13-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 1 Mar 2018 13:33:45 +0000
-Message-ID: <CAFEAcA-pUMgUnR0cWd9j7n0EyTeXkMTzhPQU_fqhyaXy1hMfxw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 12/16] target/arm: Decode aa64 armv8.3
- fcmla
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH RESEND v8 0/4] cryptodev: add vhost support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,125 +24,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, pbonzini@redhat.com, weidong.huang@huawei.com, stefanha@redhat.com, jianjay.zhou@huawei.com, pasic@linux.vnet.ibm.com, longpeng2@huawei.com, xin.zeng@intel.com, roy.fan.zhang@intel.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com
 
-On 28 February 2018 at 19:31, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/helper.h        |  11 ++++
->  target/arm/translate-a64.c |  94 +++++++++++++++++++++++++---
->  target/arm/vec_helper.c    | 149 +++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 246 insertions(+), 8 deletions(-)
->
-> diff --git a/target/arm/helper.h b/target/arm/helper.h
-> index 1e2d7025de..0d2094f2be 100644
-> --- a/target/arm/helper.h
-> +++ b/target/arm/helper.h
-> @@ -585,6 +585,17 @@ DEF_HELPER_FLAGS_5(gvec_fcadds, TCG_CALL_NO_RWG,
->  DEF_HELPER_FLAGS_5(gvec_fcaddd, TCG_CALL_NO_RWG,
->                     void, ptr, ptr, ptr, ptr, i32)
->
-> +DEF_HELPER_FLAGS_5(gvec_fcmlah, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(gvec_fcmlah_idx, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(gvec_fcmlas, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(gvec_fcmlas_idx, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(gvec_fcmlad, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +
->  #ifdef TARGET_AARCH64
->  #include "helper-a64.h"
->  #endif
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index efed4fd9d2..31ff0479e6 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -10842,6 +10842,10 @@ static void disas_simd_three_reg_same_extra(DisasContext *s, uint32_t insn)
->          }
->          feature = ARM_FEATURE_V8_RDM;
->          break;
-> +    case 0x8: /* FCMLA, #0 */
-> +    case 0x9: /* FCMLA, #90 */
-> +    case 0xa: /* FCMLA, #180 */
-> +    case 0xb: /* FCMLA, #270 */
->      case 0xc: /* FCADD, #90 */
->      case 0xe: /* FCADD, #270 */
->          if (size == 0
-> @@ -10891,6 +10895,29 @@ static void disas_simd_three_reg_same_extra(DisasContext *s, uint32_t insn)
->          }
->          return;
->
-> +    case 0x8: /* FCMLA, #0 */
-> +    case 0x9: /* FCMLA, #90 */
-> +    case 0xa: /* FCMLA, #180 */
-> +    case 0xb: /* FCMLA, #270 */
-> +        rot = extract32(opcode, 0, 2);
-> +        switch (size) {
-> +        case 1:
-> +            gen_gvec_op3_fpst(s, is_q, rd, rn, rm, true, rot,
-> +                              gen_helper_gvec_fcmlah);
-> +            break;
-> +        case 2:
-> +            gen_gvec_op3_fpst(s, is_q, rd, rn, rm, false, rot,
-> +                              gen_helper_gvec_fcmlas);
-> +            break;
-> +        case 3:
-> +            gen_gvec_op3_fpst(s, is_q, rd, rn, rm, false, rot,
-> +                              gen_helper_gvec_fcmlad);
-> +            break;
-> +        default:
-> +            g_assert_not_reached();
-> +        }
-> +        return;
-> +
->      case 0xc: /* FCADD, #90 */
->      case 0xe: /* FCADD, #270 */
->          rot = extract32(opcode, 1, 1);
+From: Gonglei <arei.gonglei@huawei.com>
 
-Shouldn't there be a feature check on ARM_FEATURE_V8_FCMA somewhere
-in the three_reg_same_extra code path?
+I posted the RFC verion a few months ago for DPDK
+vhost-crypto implmention, and now it's time to send
+the formal version. Because we need an user space scheme
+for better performance.
 
+The vhost user crypto server side patches had been
+sent to DPDK community, pls see
 
-> diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
-> index a868ca6aac..d81eb7730d 100644
-> --- a/target/arm/vec_helper.c
-> +++ b/target/arm/vec_helper.c
-> @@ -278,3 +278,152 @@ void HELPER(gvec_fcaddd)(void *vd, void *vn, void *vm,
->      }
->      clear_tail(d, opr_sz, simd_maxsz(desc));
->  }
-> +
-> +void HELPER(gvec_fcmlah)(void *vd, void *vn, void *vm,
-> +                         void *vfpst, uint32_t desc)
-> +{
-> +    uintptr_t opr_sz = simd_oprsz(desc);
-> +    float16 *d = vd;
-> +    float16 *n = vn;
-> +    float16 *m = vm;
-> +    float_status *fpst = vfpst;
-> +    intptr_t flip = extract32(desc, SIMD_DATA_SHIFT, 1);
-> +    uint32_t neg_imag = extract32(desc, SIMD_DATA_SHIFT + 1, 1);
-> +    uint32_t neg_real = flip ^ neg_imag;
-> +    uintptr_t i;
-> +
-> +    /* Shift boolean to the sign bit so we can xor to negate.  */
-> +    neg_real <<= 15;
-> +    neg_imag <<= 15;
-> +
-> +    for (i = 0; i < opr_sz / 2; i += 2) {
-> +        float16 e1 = n[H2(i + flip)];
-> +        float16 e2 = m[H2(i + flip)] ^ neg_real;
-> +        float16 e3 = e1;
-> +        float16 e4 = m[H2(i + 1 - flip)] ^ neg_imag;
+[PATCH v2 00/10] lib/librte_vhost: introduce new vhost user
+crypto backend support
+https://dpdk.org/ml/archives/dev/2018-February/091594.html
 
-These don't match up with the element1 ... element4 in the
-Arm ARM pseudocode. It's e2 and e4 that are always the same,
-not e1 and e3. Ditto in the other functions.
+You also can get virtio-crypto polling mode driver from:
 
-thanks
--- PMM
+[PATCH v2 0/7] crypto: add virtio poll mode driver
+http://dpdk.org/ml/archives/dev/2018-February/091410.html
+
+v8:
+  - make cryptodev-vhost.c complied linux independently
+  - move CONFIG_VHOST_CRYPTO to host makefile
+v7:
+  - make virtio crypto enabled on non-Linux
+  - fix format-string issues
+  - fix error reported by clang
+  - fix a typo when setting length of cipher key
+  - rebased on the master
+v6:
+  - Fix compile error about backends/cryptodev-vhost-user.o and rebase on
+    the master
+v5:
+  - squash [PATCH v4 5/5] into previous patches [Michael]
+v4:
+  - "[PATCH v4 5/5] cryptodev-vhost-user: depend on CONFIG_VHOST_CRYPTO
+    and CONFIG_VHOST_USER" newly added to fix compilation dependency [Michael]
+v3:
+  - New added vhost user messages should be sent only when feature
+    has been successfully negotiated [Michael]
+v2:
+  - Fix compile error on mingw32
+
+Gonglei (4):
+  cryptodev: add vhost-user as a new cryptodev backend
+  cryptodev: add vhost support
+  cryptodev-vhost-user: add crypto session handler
+  cryptodev-vhost-user: set the key length
+
+ backends/Makefile.objs                |   6 +
+ backends/cryptodev-builtin.c          |   1 +
+ backends/cryptodev-vhost-user.c       | 377 ++++++++++++++++++++++++++++++++++
+ backends/cryptodev-vhost.c            | 347 +++++++++++++++++++++++++++++++
+ configure                             |  15 ++
+ docs/interop/vhost-user.txt           |  26 +++
+ hw/virtio/vhost-user.c                | 104 ++++++++++
+ hw/virtio/virtio-crypto.c             |  70 +++++++
+ include/hw/virtio/vhost-backend.h     |   8 +
+ include/hw/virtio/virtio-crypto.h     |   1 +
+ include/sysemu/cryptodev-vhost-user.h |  47 +++++
+ include/sysemu/cryptodev-vhost.h      | 154 ++++++++++++++
+ include/sysemu/cryptodev.h            |   8 +
+ qemu-options.hx                       |  21 ++
+ vl.c                                  |   6 +
+ 15 files changed, 1191 insertions(+)
+ create mode 100644 backends/cryptodev-vhost-user.c
+ create mode 100644 backends/cryptodev-vhost.c
+ create mode 100644 include/sysemu/cryptodev-vhost-user.h
+ create mode 100644 include/sysemu/cryptodev-vhost.h
+
+--
+1.8.3.1
