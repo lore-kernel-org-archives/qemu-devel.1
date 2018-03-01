@@ -1,33 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47849)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1erSYf-0007W2-V5
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 13:04:02 -0500
+	(envelope-from <huaicheng@cs.uchicago.edu>) id 1erShz-0001mQ-6V
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 13:13:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1erSYd-0002wK-AJ
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 13:03:57 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:44872)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1erSYd-0002vi-0i
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 13:03:55 -0500
-Received: by mail-wr0-x244.google.com with SMTP id v65so7501032wrc.11
-	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 10:03:54 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <cover.1519856998.git.alistair.francis@xilinx.com>
-	<938a6b79c658dcdba39ed5b7f5a36806b25b655f.1519856998.git.alistair.francis@xilinx.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <31e618dc-23ac-6e8a-76ed-ccad0bdc121a@amsat.org>
-Date: Thu, 1 Mar 2018 15:03:52 -0300
+	(envelope-from <huaicheng@cs.uchicago.edu>) id 1erShu-0000eH-W0
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 13:13:35 -0500
+Received: from mx.cs.uchicago.edu ([128.135.164.214]:37284)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <huaicheng@cs.uchicago.edu>)
+	id 1erShu-0000e3-OU
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 13:13:30 -0500
+Received: from localhost (localhost [127.0.0.1])
+	by mx.cs.uchicago.edu (Postfix) with ESMTP id C45B55FE0A
+	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 12:13:29 -0600 (CST)
+Received: from mx.cs.uchicago.edu ([127.0.0.1])
+	by localhost (mx.cs.uchicago.edu [127.0.0.1]) (amavisd-new, port 10024)
+	with LMTP id p08ob2iMxmKQ for <qemu-devel@nongnu.org>;
+	Thu,  1 Mar 2018 12:13:29 -0600 (CST)
+Received: from mail-ua0-f171.google.com (mail-ua0-f171.google.com
+	[209.85.217.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by mx.cs.uchicago.edu (Postfix) with ESMTPSA id 0406C5FAA4
+	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 12:13:29 -0600 (CST)
+Received: by mail-ua0-f171.google.com with SMTP id c14so4470530uak.7
+	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 10:13:28 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <938a6b79c658dcdba39ed5b7f5a36806b25b655f.1519856998.git.alistair.francis@xilinx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] xlnx-zynqmp-pmu: Connect the IOMOD
- GPI/GPO devices
+In-Reply-To: <20180227163551.GF32480@stefanha-x1.localdomain>
+References: <CANr0WEcfzA7aibMaGeKC2RVr=s2g0z4-R6ZaSjKtRFQiSu4XLQ@mail.gmail.com>
+	<473ee14f-a202-d283-afdf-01bb8d4d84e4@redhat.com>
+	<CANr0WEc6F0_-bKgG4EMgBCpMsw7t6sx_fV=A1VXqnzDzu51Qyw@mail.gmail.com>
+	<1cace15b-81b7-0217-72f9-92e451f370a3@redhat.com>
+	<20180227163551.GF32480@stefanha-x1.localdomain>
+From: Huaicheng Li <huaicheng@cs.uchicago.edu>
+Date: Thu, 1 Mar 2018 12:12:44 -0600
+Message-ID: <CANr0WEexCCzfRWsr=34vje5mW-8N=sm42tyccA=_CEDuROFtOA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] QEMU GSoC 2018 Project Idea (Apply polling to QEMU
+ NVMe)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,151 +46,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
-Cc: alistair23@gmail.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On 02/28/2018 07:32 PM, Alistair Francis wrote:
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> ---
-> 
->  hw/microblaze/xlnx-zynqmp-pmu.c | 77 +++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 75 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
-> index 35a2314ffb..fa5f0bfcf1 100644
-> --- a/hw/microblaze/xlnx-zynqmp-pmu.c
-> +++ b/hw/microblaze/xlnx-zynqmp-pmu.c
-> @@ -27,6 +27,7 @@
->  #include "hw/intc/xlnx-zynqmp-ipi.h"
->  #include "hw/intc/xlnx-pmu-iomod-intc.h"
->  #include "hw/timer/xlnx-pmu-iomod-pit.h"
-> +#include "hw/gpio/xlnx-pmu-iomod-gp.h"
->  
->  /* Define the PMU device */
->  
-> @@ -43,6 +44,9 @@
->  #define XLNX_ZYNQMP_PMU_NUM_IPIS    4
->  #define XLNX_ZYNQMP_PMU_NUM_PITS    4
->  
-> +#define XLNX_ZYNQMP_PMU_NUM_IOMOD_GPIS    4
-> +#define XLNX_ZYNQMP_PMU_NUM_IOMOD_GPOS    4
-> +
->  static const uint64_t ipi_addr[XLNX_ZYNQMP_PMU_NUM_IPIS] = {
->      0xFF340000, 0xFF350000, 0xFF360000, 0xFF370000,
->  };
-> @@ -57,6 +61,17 @@ static const uint64_t pit_irq[XLNX_ZYNQMP_PMU_NUM_PITS] = {
->      3, 4, 5, 6,
->  };
->  
-> +static const uint64_t iomod_gpi_addr[XLNX_ZYNQMP_PMU_NUM_IOMOD_GPIS] = {
-> +    0xFFD40020, 0xFFD40024, 0xFFD40028, 0xFFD4002C,
-> +};
-> +static const uint64_t iomod_gpi_irq[XLNX_ZYNQMP_PMU_NUM_IOMOD_GPIS] = {
-> +    11, 12, 13, 14,
-> +};
-> +
-> +static const uint64_t iomod_gpo_addr[XLNX_ZYNQMP_PMU_NUM_IOMOD_GPOS] = {
-> +    0xFFD40010, 0xFFD40014, 0xFFD40018, 0xFFD4001C,
-> +};
-> +
->  typedef struct XlnxZynqMPPMUSoCState {
->      /*< private >*/
->      DeviceState parent_obj;
-> @@ -156,6 +171,8 @@ static void xlnx_zynqmp_pmu_init(MachineState *machine)
->      MemoryRegion *pmu_rom = g_new(MemoryRegion, 1);
->      MemoryRegion *pmu_ram = g_new(MemoryRegion, 1);
->      XlnxZynqMPIPI *ipi[XLNX_ZYNQMP_PMU_NUM_IPIS];
-> +    XlnxPMUIOGPIO *iomod_gpi[XLNX_ZYNQMP_PMU_NUM_IOMOD_GPIS];
-> +    XlnxPMUIOGPIO *iomod_gpo[XLNX_ZYNQMP_PMU_NUM_IOMOD_GPOS];
->      XlnxPMUPIT *pit[XLNX_ZYNQMP_PMU_NUM_PITS];
->      qemu_irq irq[32];
->      qemu_irq tmp_irq;
-> @@ -197,10 +214,60 @@ static void xlnx_zynqmp_pmu_init(MachineState *machine)
->          sysbus_connect_irq(SYS_BUS_DEVICE(ipi[i]), 0, irq[ipi_irq[i]]);
->      }
->  
-> +    /* Create and connect the IOMOD GPI device */
-> +    for (i = 0; i < XLNX_ZYNQMP_PMU_NUM_IOMOD_GPIS; i++) {
-> +        iomod_gpi[i] = g_new0(XlnxPMUIOGPIO, 1);
-> +        object_initialize(iomod_gpi[i], sizeof(XlnxPMUIOGPIO),
-> +                          TYPE_XLNX_ZYNQMP_IOMOD_GPIO);
-> +        qdev_set_parent_bus(DEVICE(iomod_gpi[i]), sysbus_get_default());
-> +    }
-> +
-> +    for (i = 0; i < XLNX_ZYNQMP_PMU_NUM_IOMOD_GPIS; i++) {
-> +        object_property_set_bool(OBJECT(iomod_gpi[i]), true, "input",
-> +                                 &error_abort);
-> +        object_property_set_uint(OBJECT(iomod_gpi[i]), 0x20, "size",
-> +                                 &error_abort);
+Hi Stefan,
 
-I previously misread this, you are initializing the 4 GPIs as GPI0, it
-may be cleaner to add an index property to select the correct GPI
-RegisterAccessInfo, or add a 'reserved' bitmask property and use a
-generic GPI.
-In particular GPI3 is read-only.
+Paolo and I have filled the template. And Paolo has helped update the wiki
+with this proposed project idea.
 
-> +        object_property_set_bool(OBJECT(iomod_gpi[i]), true, "realized",
-> +                                 &error_abort);
-> +        sysbus_mmio_map(SYS_BUS_DEVICE(iomod_gpi[i]), 0, iomod_gpi_addr[i]);
-> +        sysbus_connect_irq(SYS_BUS_DEVICE(iomod_gpi[i]), 0,
-> +                           irq[iomod_gpi_irq[i]]);
-> +        /* The other GPIO lines connect to the ARM side of the SoC. When we
-> +         * have a way to model MicroBlaze QEMU and ARM QEMU together we can
-> +         * connect the GPIO lines.
-> +         */
-> +    }
-> +
-> +    /* Create and connect the IOMOD GPO device */
-> +    for (i = 0; i < XLNX_ZYNQMP_PMU_NUM_IOMOD_GPOS; i++) {
-> +        iomod_gpo[i] = g_new0(XlnxPMUIOGPIO, 1);
-> +        object_initialize(iomod_gpo[i], sizeof(XlnxPMUIOGPIO),
-> +                          TYPE_XLNX_ZYNQMP_IOMOD_GPIO);
-> +        qdev_set_parent_bus(DEVICE(iomod_gpo[i]), sysbus_get_default());
-> +    }
-> +
-> +    for (i = 0; i < XLNX_ZYNQMP_PMU_NUM_IOMOD_GPOS; i++) {
-> +        object_property_set_bool(OBJECT(iomod_gpo[i]), false, "input",
-> +                                 &error_abort);
-> +        if (i) {
-> +            object_property_set_uint(OBJECT(iomod_gpo[i]), 0x20, "size",
-> +                                     &error_abort);
-> +        } else {
-> +            object_property_set_uint(OBJECT(iomod_gpo[i]), 0x09, "size",
-> +                                     &error_abort);
-> +        }
-> +            object_property_set_uint(OBJECT(iomod_gpo[i]), 0x00, "gpo-init",
-> +                                     &error_abort);
+Thanks.
 
-Ditto, the 4 GPOs are initialized as GPO0 (and GPO3 is write-only, we
-could use GUEST_ERROR reports).
+Best,
+Huaicheng
 
-> +        object_property_set_bool(OBJECT(iomod_gpo[i]), true, "realized",
-> +                                 &error_abort);
-> +        sysbus_mmio_map(SYS_BUS_DEVICE(iomod_gpo[i]), 0, iomod_gpo_addr[i]);
-> +    }
-> +
->      /* Create and connect the IOMOD PIT devices */
->      for (i = 0; i < XLNX_ZYNQMP_PMU_NUM_PITS; i++) {
->          pit[i] = g_new0(XlnxPMUPIT, 1);
-> -        object_initialize(pit[i], sizeof(XlnxPMUPIT), TYPE_XLNX_ZYNQMP_IOMODULE_PIT);
-> +        object_initialize(pit[i], sizeof(XlnxPMUPIT),
-> +                          TYPE_XLNX_ZYNQMP_IOMODULE_PIT);
->          qdev_set_parent_bus(DEVICE(pit[i]), sysbus_get_default());
->      }
->  
-> @@ -219,7 +286,13 @@ static void xlnx_zynqmp_pmu_init(MachineState *machine)
->      tmp_irq = qdev_get_gpio_in_named(DEVICE(pit[2]), "ps_hit_in", 0);
->      qdev_connect_gpio_out_named(DEVICE(pit[3]), "ps_hit_out", 0, tmp_irq);
->  
-> -    /* TODO: PIT0 and PIT2 "ps_config" GPIO goes to The GPO1 device. */
-> +    /* GP01 goes into PIT0 */
-> +    tmp_irq = qdev_get_gpio_in_named(DEVICE(pit[0]), "ps_config", 0);
-> +    qdev_connect_gpio_out(DEVICE(iomod_gpo[1]), 2, tmp_irq);
-> +
-> +    /* GP01 goes into PIT2 */
-> +    tmp_irq = qdev_get_gpio_in_named(DEVICE(pit[2]), "ps_config", 0);
-> +    qdev_connect_gpio_out(DEVICE(iomod_gpo[1]), 6, tmp_irq);
->  
->      /* Load the kernel */
->      microblaze_load_kernel(&pmu->cpu, XLNX_ZYNQMP_PMU_RAM_ADDR,
-> 
+
+On Tue, Feb 27, 2018 at 10:35 AM, Stefan Hajnoczi <stefanha@gmail.com>
+wrote:
+
+> On Tue, Feb 27, 2018 at 12:04:48PM +0100, Paolo Bonzini wrote:
+> > On 27/02/2018 10:05, Huaicheng Li wrote:
+> > > Great to know that you'd like to mentor the project! If so, can we
+> make it
+> > > an official project idea and put it on QEMU GSoC page?
+> >
+> > Submissions need not come from the QEMU GSoC page.  You are free to
+> > submit any idea that you think can be worthwhile.
+>
+> Please follow the process described here:
+>
+> https://wiki.qemu.org/Google_Summer_of_Code_2018#How_to_
+> propose_a_custom_project_idea
+>
+> The project idea needs to be posted on the wiki page.
+>
+> Huaicheng & Paolo, please fill out this template so we can add it to the
+> wiki page:
+>
+> === TITLE ===
+>
+>  '''Summary:''' Short description of the project
+>
+>  Detailed description of the project.
+>
+>  '''Links:'''
+>  * Wiki links to relevant material
+>  * External links to mailing lists or web sites
+>
+>  '''Details:'''
+>  * Skill level: beginner or intermediate or advanced
+>  * Language: C
+>  * Mentor: Email address and IRC nick
+>  * Suggested by: Person who suggested the idea
+>
