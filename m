@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erVM8-0005ix-FF
+	(envelope-from <eblake@redhat.com>) id 1erVM8-0005ia-8i
 	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 16:03:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erVM7-00042E-BZ
+	(envelope-from <eblake@redhat.com>) id 1erVM6-00041n-PL
 	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 16:03:12 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Thu,  1 Mar 2018 15:02:46 -0600
-Message-Id: <20180301210249.14872-2-eblake@redhat.com>
+Date: Thu,  1 Mar 2018 15:02:49 -0600
+Message-Id: <20180301210249.14872-5-eblake@redhat.com>
 In-Reply-To: <20180301210249.14872-1-eblake@redhat.com>
 References: <20180301210249.14872-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 1/4] nbd: Honor server's advertised minimum
- block size
+Subject: [Qemu-devel] [PULL 4/4] nbd/client: fix error messages in
+ nbd_handle_reply_err
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,74 +21,169 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-Commit 79ba8c98 (v2.7) changed the setting of request_alignment
-to occur only during bdrv_refresh_limits(), rather than at at
-bdrv_open() time; but at the time, NBD was unaffected, because
-it still used sector-based callbacks, so the block layer
-defaulted NBD to use 512 request_alignment.
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Later, commit 70c4fb26 (also v2.7) changed NBD to use byte-based
-callbacks, without setting request_alignment.  This resulted in
-NBD using request_alignment of 1, which works great when the
-server supports it (as is the case for qemu-nbd), but falls apart
-miserably if the server requires alignment (but only if qemu
-actually sends a sub-sector request; qemu-io can do it, but
-most qemu operations still perform on sectors or larger).
+1. NBD_REP_ERR_INVALID is not only about length, so, make message more
+   general
 
-Even later, the NBD protocol was updated to document that clients
-should learn the server's minimum alignment during NBD_OPT_GO;
-and recommended that clients should assume a minimum size of 512
-unless the server understands NBD_OPT_GO and replied with a smaller
-size.  Commit 081dd1fe (v2.10) attempted to do that, by assigning
-request_alignment to whatever was learned from the server; but
-it has two flaws: the assignment is done during bdrv_open() so
-it gets unconditionally wiped out back to 1 during any later
-bdrv_refresh_limits(); and the code is not using a default of 512
-when the server did not report a minimum size.
+2. hex format is not very good: it's hard to read something like
+   "option a (set meta context)", so switch to dec.
 
-Fix these issues by moving the assignment to request_alignment
-to the right function, and by using a sane default when the
-server does not advertise a minimum size.
-
-CC: qemu-stable@nongnu.org
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-Id: <1518702707-7077-6-git-send-email-vsementsov@virtuozzo.com>
+[eblake: expand scope of patch: ALL uses of nbd_opt_lookup and
+nbd_rep_lookup are now decimal]
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180215032905.27146-1-eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>
 ---
- block/nbd-client.c | 3 ---
- block/nbd.c        | 2 ++
- 2 files changed, 2 insertions(+), 3 deletions(-)
+ nbd/client.c     | 24 ++++++++++++------------
+ nbd/server.c     |  4 ++--
+ nbd/trace-events |  8 ++++----
+ 3 files changed, 18 insertions(+), 18 deletions(-)
 
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index 9206652e45c..7b68499b76a 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -846,9 +846,6 @@ int nbd_client_init(BlockDriverState *bs,
-     if (client->info.flags & NBD_FLAG_SEND_WRITE_ZEROES) {
-         bs->supported_zero_flags |= BDRV_REQ_MAY_UNMAP;
+diff --git a/nbd/client.c b/nbd/client.c
+index 89f80f95905..9c3fe4aaa67 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -158,14 +158,14 @@ static int nbd_handle_reply_err(QIOChannel *ioc, NBDOptionReply *reply,
+
+     if (reply->length) {
+         if (reply->length > NBD_MAX_BUFFER_SIZE) {
+-            error_setg(errp, "server error 0x%" PRIx32
++            error_setg(errp, "server error %" PRIu32
+                        " (%s) message is too long",
+                        reply->type, nbd_rep_lookup(reply->type));
+             goto cleanup;
+         }
+         msg = g_malloc(reply->length + 1);
+         if (nbd_read(ioc, msg, reply->length, errp) < 0) {
+-            error_prepend(errp, "failed to read option error 0x%" PRIx32
++            error_prepend(errp, "failed to read option error %" PRIu32
+                           " (%s) message: ",
+                           reply->type, nbd_rep_lookup(reply->type));
+             goto cleanup;
+@@ -180,22 +180,22 @@ static int nbd_handle_reply_err(QIOChannel *ioc, NBDOptionReply *reply,
+         goto cleanup;
+
+     case NBD_REP_ERR_POLICY:
+-        error_setg(errp, "Denied by server for option %" PRIx32 " (%s)",
++        error_setg(errp, "Denied by server for option %" PRIu32 " (%s)",
+                    reply->option, nbd_opt_lookup(reply->option));
+         break;
+
+     case NBD_REP_ERR_INVALID:
+-        error_setg(errp, "Invalid data length for option %" PRIx32 " (%s)",
++        error_setg(errp, "Invalid parameters for option %" PRIu32 " (%s)",
+                    reply->option, nbd_opt_lookup(reply->option));
+         break;
+
+     case NBD_REP_ERR_PLATFORM:
+-        error_setg(errp, "Server lacks support for option %" PRIx32 " (%s)",
++        error_setg(errp, "Server lacks support for option %" PRIu32 " (%s)",
+                    reply->option, nbd_opt_lookup(reply->option));
+         break;
+
+     case NBD_REP_ERR_TLS_REQD:
+-        error_setg(errp, "TLS negotiation required before option %" PRIx32
++        error_setg(errp, "TLS negotiation required before option %" PRIu32
+                    " (%s)", reply->option, nbd_opt_lookup(reply->option));
+         break;
+
+@@ -204,17 +204,17 @@ static int nbd_handle_reply_err(QIOChannel *ioc, NBDOptionReply *reply,
+         break;
+
+     case NBD_REP_ERR_SHUTDOWN:
+-        error_setg(errp, "Server shutting down before option %" PRIx32 " (%s)",
++        error_setg(errp, "Server shutting down before option %" PRIu32 " (%s)",
+                    reply->option, nbd_opt_lookup(reply->option));
+         break;
+
+     case NBD_REP_ERR_BLOCK_SIZE_REQD:
+-        error_setg(errp, "Server requires INFO_BLOCK_SIZE for option %" PRIx32
++        error_setg(errp, "Server requires INFO_BLOCK_SIZE for option %" PRIu32
+                    " (%s)", reply->option, nbd_opt_lookup(reply->option));
+         break;
+
+     default:
+-        error_setg(errp, "Unknown error code when asking for option %" PRIx32
++        error_setg(errp, "Unknown error code when asking for option %" PRIu32
+                    " (%s)", reply->option, nbd_opt_lookup(reply->option));
+         break;
      }
--    if (client->info.min_block > bs->bl.request_alignment) {
--        bs->bl.request_alignment = client->info.min_block;
--    }
+@@ -378,8 +378,8 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
+             return 1;
+         }
+         if (reply.type != NBD_REP_INFO) {
+-            error_setg(errp, "unexpected reply type %" PRIx32
+-                       " (%s), expected %x",
++            error_setg(errp, "unexpected reply type %" PRIu32
++                       " (%s), expected %u",
+                        reply.type, nbd_rep_lookup(reply.type), NBD_REP_INFO);
+             nbd_send_opt_abort(ioc);
+             return -1;
+@@ -534,7 +534,7 @@ static int nbd_request_simple_option(QIOChannel *ioc, int opt, Error **errp)
 
-     qemu_co_mutex_init(&client->send_mutex);
-     qemu_co_queue_init(&client->free_sema);
-diff --git a/block/nbd.c b/block/nbd.c
-index ef81a9f53ba..69b5fd5e8fa 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -474,8 +474,10 @@ static int nbd_co_flush(BlockDriverState *bs)
- static void nbd_refresh_limits(BlockDriverState *bs, Error **errp)
- {
-     NBDClientSession *s = nbd_get_client_session(bs);
-+    uint32_t min = s->info.min_block;
-     uint32_t max = MIN_NON_ZERO(NBD_MAX_BUFFER_SIZE, s->info.max_block);
+     if (reply.type != NBD_REP_ACK) {
+         error_setg(errp, "Server answered option %d (%s) with unexpected "
+-                   "reply %" PRIx32 " (%s)", opt, nbd_opt_lookup(opt),
++                   "reply %" PRIu32 " (%s)", opt, nbd_opt_lookup(opt),
+                    reply.type, nbd_rep_lookup(reply.type));
+         nbd_send_opt_abort(ioc);
+         return -1;
+diff --git a/nbd/server.c b/nbd/server.c
+index 112e3f69dff..4990a5826e6 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -806,7 +806,7 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
 
-+    bs->bl.request_alignment = min ? min : BDRV_SECTOR_SIZE;
-     bs->bl.max_pdiscard = max;
-     bs->bl.max_pwrite_zeroes = max;
-     bs->bl.max_transfer = max;
+             default:
+                 ret = nbd_opt_drop(client, NBD_REP_ERR_UNSUP, errp,
+-                                   "Unsupported option 0x%" PRIx32 " (%s)",
++                                   "Unsupported option %" PRIu32 " (%s)",
+                                    option, nbd_opt_lookup(option));
+                 break;
+             }
+@@ -822,7 +822,7 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
+                                                         errp);
+
+             default:
+-                error_setg(errp, "Unsupported option 0x%" PRIx32 " (%s)",
++                error_setg(errp, "Unsupported option %" PRIu32 " (%s)",
+                            option, nbd_opt_lookup(option));
+                 return -EINVAL;
+             }
+diff --git a/nbd/trace-events b/nbd/trace-events
+index 2b8268ce8c3..0d03edc967d 100644
+--- a/nbd/trace-events
++++ b/nbd/trace-events
+@@ -1,7 +1,7 @@
+ # nbd/client.c
+ nbd_send_option_request(uint32_t opt, const char *name, uint32_t len) "Sending option request %" PRIu32" (%s), len %" PRIu32
+-nbd_receive_option_reply(uint32_t option, const char *optname, uint32_t type, const char *typename, uint32_t length) "Received option reply 0x%" PRIx32" (%s), type 0x%" PRIx32" (%s), len %" PRIu32
+-nbd_reply_err_unsup(uint32_t option, const char *name) "server doesn't understand request 0x%" PRIx32 " (%s), attempting fallback"
++nbd_receive_option_reply(uint32_t option, const char *optname, uint32_t type, const char *typename, uint32_t length) "Received option reply %" PRIu32" (%s), type %" PRIu32" (%s), len %" PRIu32
++nbd_reply_err_unsup(uint32_t option, const char *name) "server doesn't understand request %" PRIu32 " (%s), attempting fallback"
+ nbd_opt_go_start(const char *name) "Attempting NBD_OPT_GO for export '%s'"
+ nbd_opt_go_success(void) "Export is good to go"
+ nbd_opt_go_info_unknown(int info, const char *name) "Ignoring unknown info %d (%s)"
+@@ -33,7 +33,7 @@ nbd_receive_structured_reply_chunk(uint16_t flags, uint16_t type, const char *na
+ nbd_unknown_error(int err) "Squashing unexpected error %d to EINVAL"
+
+ # nbd/server.c
+-nbd_negotiate_send_rep_len(uint32_t opt, const char *optname, uint32_t type, const char *typename, uint32_t len) "Reply opt=0x%" PRIx32 " (%s), type=0x%" PRIx32 " (%s), len=%" PRIu32
++nbd_negotiate_send_rep_len(uint32_t opt, const char *optname, uint32_t type, const char *typename, uint32_t len) "Reply opt=%" PRIu32 " (%s), type=%" PRIu32 " (%s), len=%" PRIu32
+ nbd_negotiate_send_rep_err(const char *msg) "sending error message \"%s\""
+ nbd_negotiate_send_rep_list(const char *name, const char *desc) "Advertising export name '%s' description '%s'"
+ nbd_negotiate_handle_export_name(void) "Checking length"
+@@ -46,7 +46,7 @@ nbd_negotiate_handle_starttls(void) "Setting up TLS"
+ nbd_negotiate_handle_starttls_handshake(void) "Starting TLS handshake"
+ nbd_negotiate_options_flags(uint32_t flags) "Received client flags 0x%" PRIx32
+ nbd_negotiate_options_check_magic(uint64_t magic) "Checking opts magic 0x%" PRIx64
+-nbd_negotiate_options_check_option(uint32_t option, const char *name) "Checking option 0x%" PRIx32 " (%s)"
++nbd_negotiate_options_check_option(uint32_t option, const char *name) "Checking option %" PRIu32 " (%s)"
+ nbd_negotiate_begin(void) "Beginning negotiation"
+ nbd_negotiate_old_style(uint64_t size, unsigned flags) "advertising size %" PRIu64 " and flags 0x%x"
+ nbd_negotiate_new_style_size_flags(uint64_t size, unsigned flags) "advertising size %" PRIu64 " and flags 0x%x"
 -- 
 2.14.3
