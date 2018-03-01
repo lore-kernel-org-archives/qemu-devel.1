@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1erJug-0003OU-56
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 03:50:07 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1erJvz-0004bJ-Af
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 03:51:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1erJub-0000Mq-9F
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 03:50:06 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41666 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1erJub-0000Me-3g
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 03:50:01 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A556B404084B
-	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 08:50:00 +0000 (UTC)
-Date: Thu, 1 Mar 2018 16:49:50 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180301084950.GR27381@xz-mi>
-References: <20180228050633.7410-1-peterx@redhat.com>
-	<20180228050633.7410-14-peterx@redhat.com>
-	<20180228092356.GF31550@redhat.com> <20180228130526.GK27381@xz-mi>
-	<20180228132024.GJ17774@redhat.com>
+	(envelope-from <eric.auger@redhat.com>) id 1erJvy-0001EC-6c
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 03:51:27 -0500
+References: <1519827835-239519-1-git-send-email-imammedo@redhat.com>
+	<1519827835-239519-10-git-send-email-imammedo@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <986e15d2-47cd-be73-da0f-39874b38a325@redhat.com>
+Date: Thu, 1 Mar 2018 09:51:14 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180228132024.GJ17774@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 13/14] qio: allow threaded qiotask to
- switch contexts
+In-Reply-To: <1519827835-239519-10-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 09/10] virt_arm: acpi: reuse common
+ build_fadt()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,62 +24,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org
 
-On Wed, Feb 28, 2018 at 01:20:24PM +0000, Daniel P. Berrang=C3=A9 wrote:
-> On Wed, Feb 28, 2018 at 09:05:26PM +0800, Peter Xu wrote:
-> > On Wed, Feb 28, 2018 at 09:23:56AM +0000, Daniel P. Berrang=C3=A9 wro=
-te:
-> > > On Wed, Feb 28, 2018 at 01:06:32PM +0800, Peter Xu wrote:
-> > > > This is the part of work to allow the QIOTask to use a different
-> > > > gcontext rather than the default main gcontext, by providing
-> > > > qio_task_context_set() API.
-> > > >=20
-> > > > We have done some work before on doing similar things to add non-=
-default
-> > > > gcontext support.  The general idea is that we delete the old GSo=
-urce
-> > > > from the main context, then re-add a new one to the new context w=
-hen
-> > > > context changed to a non-default one.  However this trick won't w=
-ork
-> > > > easily for threaded QIOTasks since we can't easily stop a real th=
-read
-> > > > and re-setup the whole thing from the very beginning.
-> > >=20
-> > > I think this entire usage pattern is really broken. We should not
-> > > provide a way to change the GMainContext on an existing task. We
-> > > should always just set the correct GMainContxt right from the start=
-.
-> > > This will avoid much of the complexity you're introducing into this
-> > > patch series, and avoid having to expose GTasks to the callers of
-> > > the async methods at all.
-> >=20
-> > Yeah I agree with you that the threaded QIO patches are complicated.
-> > Then how about I introduce:
-> >=20
-> > - qio_task_thread_new(): to create QIO task and its thread (but not
-> >                          running)
-> > - qio_task_thread_run(): to run the thread
-> >=20
-> > Then I can setup the context correctly between the two in some way.
-> >=20
-> > After that, qio_task_run_in_thread() will be two calls of above two
-> > APIs.
->=20
-> I don't see why it is not enough to just pass the right GMainContext
-> into qio_task_run_in_thread() immediately. There should not be any
-> need to split this into two parts. ALl that's needed here is for the
-> completion callback to rnu in the right context, which just means
-> passing the GMainContext from qio_task_run_in_thread, through to
-> qio_task_thread_worker via QIOTaskThreadData. Changing the GMainContext
-> after the thread is already created/running is not something we should
-> try todo.
+Hi,
+On 28/02/18 15:23, Igor Mammedov wrote:
+> Extend generic build_fadt() to support rev5.1 FADT
+> and reuse it for 'virt' board, it would allow to
+> phase out usage of AcpiFadtDescriptorRev5_1 and
+> later ACPI_FADT_COMMON_DEF.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> v2:
+>   - update comment to mention that build_fadt() supports 5.1 revision
+> ---
+>  include/hw/acpi/acpi-defs.h | 12 ++----------
+>  hw/acpi/aml-build.c         | 23 +++++++++++++++++++++--
+>  hw/arm/virt-acpi-build.c    | 33 ++++++++++++---------------------
+>  3 files changed, 35 insertions(+), 33 deletions(-)
+> 
+> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> index 3fb0ace..fe15e95 100644
+> --- a/include/hw/acpi/acpi-defs.h
+> +++ b/include/hw/acpi/acpi-defs.h
+> @@ -165,16 +165,6 @@ struct AcpiFadtDescriptorRev3 {
+>  } QEMU_PACKED;
+>  typedef struct AcpiFadtDescriptorRev3 AcpiFadtDescriptorRev3;
+>  
+> -struct AcpiFadtDescriptorRev5_1 {
+> -    ACPI_FADT_COMMON_DEF
+> -    /* 64-bit Sleep Control register (ACPI 5.0) */
+> -    struct AcpiGenericAddress sleep_control;
+> -    /* 64-bit Sleep Status register (ACPI 5.0) */
+> -    struct AcpiGenericAddress sleep_status;
+> -} QEMU_PACKED;
+> -
+> -typedef struct AcpiFadtDescriptorRev5_1 AcpiFadtDescriptorRev5_1;
+> -
+>  typedef struct AcpiFadtData {
+>      struct AcpiGenericAddress pm1a_cnt;   /* PM1a_CNT_BLK */
+>      struct AcpiGenericAddress pm1a_evt;   /* PM1a_EVT_BLK */
+> @@ -192,6 +182,8 @@ typedef struct AcpiFadtData {
+>      uint8_t  rtc_century;      /* CENTURY */
+>      uint16_t plvl2_lat;        /* P_LVL2_LAT */
+>      uint16_t plvl3_lat;        /* P_LVL3_LAT */
+> +    uint16_t arm_boot_arch;    /* ARM_BOOT_ARCH */
+> +    uint8_t minor_ver;         /* FADT Minor Version */
+>  
+>      /*
+>       * respective tables offsets within ACPI_BUILD_TABLE_FILE,
+> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+> index 8f45298..3fa557c 100644
+> --- a/hw/acpi/aml-build.c
+> +++ b/hw/acpi/aml-build.c
+> @@ -1679,7 +1679,7 @@ void build_slit(GArray *table_data, BIOSLinker *linker)
+>                   table_data->len - slit_start, 1, NULL, NULL);
+>  }
+>  
+> -/* build rev1/rev3 FADT */
+> +/* build rev1/rev3/rev5.1 FADT */
+>  void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
+>                  const char *oem_id, const char *oem_table_id)
+>  {
+> @@ -1755,7 +1755,14 @@ void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
+>  
+>      build_append_gas_from_struct(tbl, &f->reset_reg); /* RESET_REG */
+>      build_append_int_noprefix(tbl, f->reset_val, 1); /* RESET_VALUE */
+> -    build_append_int_noprefix(tbl, 0, 3); /* Reserved, ACPI 3.0 */
+> +    /* Since ACPI 5.1 */
+> +    if ((f->rev >= 6) || ((f->rev == 5) && f->minor_ver > 0)) {
+> +        build_append_int_noprefix(tbl, f->arm_boot_arch, 2); /* ARM_BOOT_ARCH */
+> +        /* FADT Minor Version */
+> +        build_append_int_noprefix(tbl, f->minor_ver, 1);
+> +    } else {
+> +        build_append_int_noprefix(tbl, 0, 3); /* Reserved upto ACPI 5.0 */
+> +    }
+>      build_append_int_noprefix(tbl, 0, 8); /* X_FIRMWARE_CTRL */
+>  
+>      /* XDSDT address to be filled by Guest linker at runtime */
+> @@ -1779,6 +1786,18 @@ void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
+>      build_append_gas_from_struct(tbl, &f->gpe0_blk); /* X_GPE0_BLK */
+>      build_append_gas(tbl, AML_AS_SYSTEM_MEMORY, 0 , 0, 0, 0); /* X_GPE1_BLK */
+>  
+> +    if (f->rev <= 4) {
+> +        goto build_hdr;
+> +    }
+> +
+> +    /* SLEEP_CONTROL_REG */
+> +    build_append_gas(tbl, AML_AS_SYSTEM_MEMORY, 0 , 0, 0, 0);
+> +    /* SLEEP_STATUS_REG */
+> +    build_append_gas(tbl, AML_AS_SYSTEM_MEMORY, 0 , 0, 0, 0);
+> +
+> +    /* TODO: extra fields need to be added to support revisions above rev5 */
+> +    assert(f->rev == 5);
+My previous comment about asserting here if f->rev != 5 and previous
+(f->rev >= 6) check was skipped but that's not a big deal.
 
-I dropped patches 9-14 in version two and rewrote as you suggested, by
-introducing a chardev machine done notifier.  Please have a looks.  Thank=
-s,
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
---=20
-Peter Xu
+Thanks
+
+Eric
+> +
+>  build_hdr:
+>      build_header(linker, tbl, (void *)(tbl->data + fadt_start),
+>                   "FACP", tbl->len - fadt_start, f->rev, oem_id, oem_table_id);
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index b644da9..c7c6a57 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -654,39 +654,30 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>  static void build_fadt_rev5(GArray *table_data, BIOSLinker *linker,
+>                              VirtMachineState *vms, unsigned dsdt_tbl_offset)
+>  {
+> -    int fadt_start = table_data->len;
+> -    AcpiFadtDescriptorRev5_1 *fadt = acpi_data_push(table_data, sizeof(*fadt));
+> -    unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
+> -    uint16_t bootflags;
+> +    /* ACPI v5.1 */
+> +    AcpiFadtData fadt = {
+> +        .rev = 5,
+> +        .minor_ver = 1,
+> +        .flags = 1 << ACPI_FADT_F_HW_REDUCED_ACPI,
+> +        .xdsdt_tbl_offset = &dsdt_tbl_offset,
+> +    };
+>  
+>      switch (vms->psci_conduit) {
+>      case QEMU_PSCI_CONDUIT_DISABLED:
+> -        bootflags = 0;
+> +        fadt.arm_boot_arch = 0;
+>          break;
+>      case QEMU_PSCI_CONDUIT_HVC:
+> -        bootflags = ACPI_FADT_ARM_PSCI_COMPLIANT | ACPI_FADT_ARM_PSCI_USE_HVC;
+> +        fadt.arm_boot_arch = ACPI_FADT_ARM_PSCI_COMPLIANT |
+> +                             ACPI_FADT_ARM_PSCI_USE_HVC;
+>          break;
+>      case QEMU_PSCI_CONDUIT_SMC:
+> -        bootflags = ACPI_FADT_ARM_PSCI_COMPLIANT;
+> +        fadt.arm_boot_arch = ACPI_FADT_ARM_PSCI_COMPLIANT;
+>          break;
+>      default:
+>          g_assert_not_reached();
+>      }
+>  
+> -    /* Hardware Reduced = 1 and use PSCI 0.2+ */
+> -    fadt->flags = cpu_to_le32(1 << ACPI_FADT_F_HW_REDUCED_ACPI);
+> -    fadt->arm_boot_flags = cpu_to_le16(bootflags);
+> -
+> -    /* ACPI v5.1 (fadt->revision.fadt->minor_revision) */
+> -    fadt->minor_revision = 0x1;
+> -
+> -    /* DSDT address to be filled by Guest linker */
+> -    bios_linker_loader_add_pointer(linker,
+> -        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
+> -        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+> -
+> -    build_header(linker, table_data, (void *)(table_data->data + fadt_start),
+> -                 "FACP", table_data->len - fadt_start, 5, NULL, NULL);
+> +    build_fadt(table_data, linker, &fadt, NULL, NULL);
+>  }
+>  
+>  /* DSDT */
+> 
