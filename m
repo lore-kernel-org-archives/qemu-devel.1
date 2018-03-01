@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1erNoQ-0001XK-0d
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:59:55 -0500
+	(envelope-from <cohuck@redhat.com>) id 1erNoS-0001a7-I7
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:59:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1erNoO-00060U-Vb
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:59:54 -0500
+	(envelope-from <cohuck@redhat.com>) id 1erNoR-00061Y-Lz
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 07:59:56 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Thu,  1 Mar 2018 13:58:24 +0100
-Message-Id: <20180301125830.24377-22-cohuck@redhat.com>
+Date: Thu,  1 Mar 2018 13:58:25 +0100
+Message-Id: <20180301125830.24377-23-cohuck@redhat.com>
 In-Reply-To: <20180301125830.24377-1-cohuck@redhat.com>
 References: <20180301125830.24377-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL v2 21/27] qmp: add architecture specific cpu
- data for query-cpus-fast
+Subject: [Qemu-devel] [PULL v2 22/27] qemu-doc: deprecate query-cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,124 +24,48 @@ Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, rth@tw
 
 From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 
-The s390 CPU state can be retrieved without interrupting the
-VM execution. Extendend the CpuInfoFast union with architecture
-specific data and an implementation for s390.
-
-Return data looks like this:
- [
-   {"thread-id":64301,"props":{"core-id":0},
-    "arch":"s390","cpu-state":"operating",
-    "qom-path":"/machine/unattached/device[0]","cpu-index":0},
-   {"thread-id":64302,"props":{"core-id":1},
-    "arch":"s390","cpu-state":"operating",
-    "qom-path":"/machine/unattached/device[1]","cpu-index":1}
-]
+Start the deprecation period for QAPI query-cpus (replaced by
+query-cpus-fast) beginning with 2.12.0.
 
 Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1518797321-28356-4-git-send-email-mihajlov@linux.vnet.ibm.com>
+Message-Id: <1518797321-28356-5-git-send-email-mihajlov@linux.vnet.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- cpus.c           | 10 ++++++++++
- qapi-schema.json | 25 ++++++++++++++++++-------
- 2 files changed, 28 insertions(+), 7 deletions(-)
+ qapi-schema.json | 4 ++++
+ qemu-doc.texi    | 4 ++++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/cpus.c b/cpus.c
-index 6df6660ccf..af678264f6 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -2166,6 +2166,10 @@ CpuInfoFastList *qmp_query_cpus_fast(Error **errp)
-     MachineClass *mc = MACHINE_GET_CLASS(ms);
-     CpuInfoFastList *head = NULL, *cur_item = NULL;
-     CPUState *cpu;
-+#if defined(TARGET_S390X)
-+    S390CPU *s390_cpu;
-+    CPUS390XState *env;
-+#endif
- 
-     CPU_FOREACH(cpu) {
-         CpuInfoFastList *info = g_malloc0(sizeof(*info));
-@@ -2183,6 +2187,12 @@ CpuInfoFastList *qmp_query_cpus_fast(Error **errp)
-             info->value->props = props;
-         }
- 
-+#if defined(TARGET_S390X)
-+        s390_cpu = S390_CPU(cpu);
-+        env = &s390_cpu->env;
-+        info->value->arch = CPU_INFO_ARCH_S390;
-+        info->value->u.s390.cpu_state = env->cpu_state;
-+#endif
-         if (!cur_item) {
-             head = cur_item = info;
-         } else {
 diff --git a/qapi-schema.json b/qapi-schema.json
-index 815f072876..e6ca63f718 100644
+index e6ca63f718..cd98a94388 100644
 --- a/qapi-schema.json
 +++ b/qapi-schema.json
-@@ -408,7 +408,7 @@
- # @CpuInfoArch:
+@@ -587,6 +587,10 @@
+ #       ]
+ #    }
  #
- # An enumeration of cpu types that enable additional information during
--# @query-cpus.
-+# @query-cpus and @query-cpus-fast.
- #
- # @s390: since 2.12
- #
-@@ -604,12 +604,24 @@
- # @props: properties describing to which node/socket/core/thread
- #         virtual CPU belongs to, provided if supported by board
- #
-+# @arch: architecture of the cpu, which determines which additional fields
-+#        will be listed
++# Notes: This interface is deprecated (since 2.12.0), and it is strongly
++#        recommended that you avoid using it. Use @query-cpus-fast to
++#        obtain information about virtual CPUs.
 +#
- # Since: 2.12
- #
  ##
--{ 'struct': 'CpuInfoFast',
--  'data': {'cpu-index': 'int', 'qom-path': 'str',
--           'thread-id': 'int', '*props': 'CpuInstanceProperties' } }
-+{ 'union': 'CpuInfoFast',
-+  'base': {'cpu-index': 'int', 'qom-path': 'str',
-+           'thread-id': 'int', '*props': 'CpuInstanceProperties',
-+           'arch': 'CpuInfoArch' },
-+  'discriminator': 'arch',
-+  'data': { 'x86': 'CpuInfoOther',
-+            'sparc': 'CpuInfoOther',
-+            'ppc': 'CpuInfoOther',
-+            'mips': 'CpuInfoOther',
-+            'tricore': 'CpuInfoOther',
-+            's390': 'CpuInfoS390',
-+            'other': 'CpuInfoOther' } }
+ { 'command': 'query-cpus', 'returns': ['CpuInfo'] }
  
- ##
- # @query-cpus-fast:
-@@ -620,9 +632,6 @@
- #
- # Returns: list of @CpuInfoFast
- #
--# Notes: The CPU architecture name is not returned by query-cpus-fast.
--#        Use query-target to retrieve that information.
--#
- # Since: 2.12
- #
- # Example:
-@@ -637,6 +646,7 @@
- #                 "socket-id": 0
- #             },
- #             "qom-path": "/machine/unattached/device[0]",
-+#             "arch":"x86",
- #             "cpu-index": 0
- #         },
- #         {
-@@ -647,6 +657,7 @@
- #                 "socket-id": 1
- #             },
- #             "qom-path": "/machine/unattached/device[2]",
-+#             "arch":"x86",
- #             "cpu-index": 1
- #         }
- #     ]
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 8e3556976b..b3c2763624 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2762,6 +2762,10 @@ by the ``convert -l snapshot_param'' argument instead.
+ "autoload" parameter is now ignored. All bitmaps are automatically loaded
+ from qcow2 images.
+ 
++@subsection query-cpus (since 2.12.0)
++
++The ``query-cpus'' command is replaced by the ``query-cpus-fast'' command.
++
+ @section System emulator human monitor commands
+ 
+ @subsection host_net_add (since 2.10.0)
 -- 
 2.13.6
