@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49225)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1erRLL-0006HZ-0d
+	(envelope-from <mst@redhat.com>) id 1erRLL-0006Hd-12
 	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:46:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1erRLI-000107-Ow
+	(envelope-from <mst@redhat.com>) id 1erRLJ-00010p-AA
 	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:46:07 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54614 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40602 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1erRLI-0000zY-Hi
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:46:04 -0500
-Date: Thu, 1 Mar 2018 18:46:02 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1erRLJ-00010I-4S
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:46:05 -0500
+Date: Thu, 1 Mar 2018 18:46:04 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1519922735-29054-8-git-send-email-mst@redhat.com>
+Message-ID: <1519922735-29054-9-git-send-email-mst@redhat.com>
 References: <1519922735-29054-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1519922735-29054-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 07/13] vhost: avoid to start/stop virtqueue
- which is not ready
+Subject: [Qemu-devel] [PULL 08/13] vhost: fix incorrect check in
+ vhost_verify_ring_mappings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +28,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jia He <hejianet@gmail.com>, Jia He <jia.he@hxt-semitech.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jia He <hejianet@gmail.com>, Jia He <jia.he@hxt-semitech.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
 From: Jia He <hejianet@gmail.com>
 
-In our Armv8a server, we try to configure the vhost scsi but fail
-to boot up the guest (-machine virt-2.10). The guest's boot failure
-is very early, even earlier than grub.
+In commit 0ca1fd2d6878 ("vhost: Simplify ring verification checks"),
+it checks the virtqueue desc mapping for 3 times.
 
-There are 3 virtqueues (ctrl, event and cmd) for virtio scsi device,
-but ovmf and seabios will only set the physical address for the 3rd
-one (cmd). Then in vhost_virtqueue_start(), virtio_queue_get_desc_addr
-will be 0 for ctrl and event vq when qemu negotiates with ovmf. So
-vhost_memory_map fails with ENOMEM.
-
-This patch just fixs it by early quitting the virtqueue start/stop
-when virtio_queue_get_desc_addr is 0.
-
-Btw, after guest kernel starts, all the 3 queues will be initialized
-and set address correctly.
-
-Already tested on Arm64 and X86_64 qemu.
-
+Fixed: commit 0ca1fd2d6878 ("vhost: Simplify ring verification checks")
 Signed-off-by: Jia He <jia.he@hxt-semitech.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/virtio/vhost.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ hw/virtio/vhost.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 4a583a3..d02d12a 100644
+index d02d12a..d8d0ef9 100644
 --- a/hw/virtio/vhost.c
 +++ b/hw/virtio/vhost.c
-@@ -345,6 +345,10 @@ static int vhost_verify_ring_mappings(struct vhost_dev *dev,
-     for (i = 0; i < dev->nvqs; ++i) {
-         struct vhost_virtqueue *vq = dev->vqs + i;
+@@ -359,7 +359,7 @@ static int vhost_verify_ring_mappings(struct vhost_dev *dev,
  
-+        if (vq->desc_phys == 0) {
-+            continue;
-+        }
-+
-         j = 0;
+         j++;
          r = vhost_verify_ring_part_mapping(
-                 vq->desc, vq->desc_phys, vq->desc_size,
-@@ -881,6 +885,11 @@ static int vhost_virtqueue_start(struct vhost_dev *dev,
-     };
-     struct VirtQueue *vvq = virtio_get_queue(vdev, idx);
+-                vq->desc, vq->desc_phys, vq->desc_size,
++                vq->avail, vq->avail_phys, vq->avail_size,
+                 reg_hva, reg_gpa, reg_size);
+         if (r) {
+             break;
+@@ -367,7 +367,7 @@ static int vhost_verify_ring_mappings(struct vhost_dev *dev,
  
-+    a = virtio_queue_get_desc_addr(vdev, idx);
-+    if (a == 0) {
-+        /* Queue might not be ready for start */
-+        return 0;
-+    }
- 
-     vq->num = state.num = virtio_queue_get_num(vdev, idx);
-     r = dev->vhost_ops->vhost_set_vring_num(dev, &state);
-@@ -906,7 +915,7 @@ static int vhost_virtqueue_start(struct vhost_dev *dev,
-     }
- 
-     vq->desc_size = s = l = virtio_queue_get_desc_size(vdev, idx);
--    vq->desc_phys = a = virtio_queue_get_desc_addr(vdev, idx);
-+    vq->desc_phys = a;
-     vq->desc = vhost_memory_map(dev, a, &l, 0);
-     if (!vq->desc || l != s) {
-         r = -ENOMEM;
-@@ -989,6 +998,13 @@ static void vhost_virtqueue_stop(struct vhost_dev *dev,
-         .index = vhost_vq_index,
-     };
-     int r;
-+    int a;
-+
-+    a = virtio_queue_get_desc_addr(vdev, idx);
-+    if (a == 0) {
-+        /* Don't stop the virtqueue which might have not been started */
-+        return;
-+    }
- 
-     r = dev->vhost_ops->vhost_get_vring_base(dev, &state);
-     if (r < 0) {
+         j++;
+         r = vhost_verify_ring_part_mapping(
+-                vq->desc, vq->desc_phys, vq->desc_size,
++                vq->used, vq->used_phys, vq->used_size,
+                 reg_hva, reg_gpa, reg_size);
+         if (r) {
+             break;
 -- 
 MST
