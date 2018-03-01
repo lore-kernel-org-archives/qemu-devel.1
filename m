@@ -1,27 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erVM5-0005ge-AS
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 16:03:10 -0500
+	(envelope-from <eblake@redhat.com>) id 1erVM7-0005hl-Fs
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 16:03:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erVM4-0003zZ-0t
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 16:03:09 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57402 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1erVM3-0003zH-O1
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 16:03:07 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 53A924040856
-	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 21:02:55 +0000 (UTC)
-Received: from red.redhat.com (ovpn-122-122.rdu2.redhat.com [10.10.122.122])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1DDC72026E04
-	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 21:02:50 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1erVM6-00041O-6z
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 16:03:11 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Thu,  1 Mar 2018 15:02:45 -0600
-Message-Id: <20180301210249.14872-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 0/4] nbd patches for 2018-03-01
+Date: Thu,  1 Mar 2018 15:02:48 -0600
+Message-Id: <20180301210249.14872-4-eblake@redhat.com>
+In-Reply-To: <20180301210249.14872-1-eblake@redhat.com>
+References: <20180301210249.14872-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PULL 3/4] nbd: BLOCK_STATUS constants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +20,153 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-The following changes since commit 0dc8ae5e8e693737dfe65ba02d0c6eccb58a9c67:
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180301-v2' into staging (2018-03-01 17:08:16 +0000)
+Expose the new constants and structs that will be used by both
+server and client implementations of NBD_CMD_BLOCK_STATUS (the
+command is currently experimental at
+https://github.com/NetworkBlockDevice/nbd/blob/extension-blockstatus/doc/proto.md
+but will hopefully be stabilized soon).
 
-are available in the Git repository at:
-
-  git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2018-03-01
-
-for you to fetch changes up to 28fb494f9b8827c6087d515e20a3c78baaf443cc:
-
-  nbd/client: fix error messages in nbd_handle_reply_err (2018-03-01 14:48:23 -0600)
-
-----------------------------------------------------------------
-nbd patches for 2018-03-01
-
-- Eric Blake: nbd: Honor server's advertised minimum block size
-- Vladimir Sementsov-Ogievskiy: partial: nbd block status base:allocation
-
-----------------------------------------------------------------
-Eric Blake (1):
-      nbd: Honor server's advertised minimum block size
-
-Vladimir Sementsov-Ogievskiy (3):
-      nbd: change indenting in nbd.h
-      nbd: BLOCK_STATUS constants
-      nbd/client: fix error messages in nbd_handle_reply_err
-
- include/block/nbd.h | 53 ++++++++++++++++++++++++++++++++++++++++++-----------
- block/nbd-client.c  |  3 ---
- block/nbd.c         |  2 ++
- nbd/client.c        | 24 ++++++++++++------------
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-Id: <1518702707-7077-4-git-send-email-vsementsov@virtuozzo.com>
+[eblake: split from larger patch on server implementation]
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ include/block/nbd.h | 31 +++++++++++++++++++++++++++++++
  nbd/common.c        | 10 ++++++++++
- nbd/server.c        |  4 ++--
- nbd/trace-events    |  8 ++++----
- 7 files changed, 72 insertions(+), 32 deletions(-)
+ 2 files changed, 41 insertions(+)
 
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index ef1698914ba..495564c73a4 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -41,6 +41,12 @@ struct NBDOptionReply {
+ } QEMU_PACKED;
+ typedef struct NBDOptionReply NBDOptionReply;
+
++typedef struct NBDOptionReplyMetaContext {
++    NBDOptionReply h; /* h.type = NBD_REP_META_CONTEXT, h.length > 4 */
++    uint32_t context_id;
++    /* meta context name follows */
++} QEMU_PACKED NBDOptionReplyMetaContext;
++
+ /* Transmission phase structs
+  *
+  * Note: these are _NOT_ the same as the network representation of an NBD
+@@ -105,6 +111,19 @@ typedef struct NBDStructuredError {
+     uint16_t message_length;
+ } QEMU_PACKED NBDStructuredError;
+
++/* Header of NBD_REPLY_TYPE_BLOCK_STATUS */
++typedef struct NBDStructuredMeta {
++    NBDStructuredReplyChunk h; /* h.length >= 12 (at least one extent) */
++    uint32_t context_id;
++    /* extents follows */
++} QEMU_PACKED NBDStructuredMeta;
++
++/* Extent chunk for NBD_REPLY_TYPE_BLOCK_STATUS */
++typedef struct NBDExtent {
++    uint32_t length;
++    uint32_t flags; /* NBD_STATE_* */
++} QEMU_PACKED NBDExtent;
++
+ /* Transmission (export) flags: sent from server to client during handshake,
+    but describe what will happen during transmission */
+ #define NBD_FLAG_HAS_FLAGS         (1 << 0) /* Flags are there */
+@@ -136,6 +155,8 @@ typedef struct NBDStructuredError {
+ #define NBD_OPT_INFO              (6)
+ #define NBD_OPT_GO                (7)
+ #define NBD_OPT_STRUCTURED_REPLY  (8)
++#define NBD_OPT_LIST_META_CONTEXT (9)
++#define NBD_OPT_SET_META_CONTEXT  (10)
+
+ /* Option reply types. */
+ #define NBD_REP_ERR(value) ((UINT32_C(1) << 31) | (value))
+@@ -143,6 +164,7 @@ typedef struct NBDStructuredError {
+ #define NBD_REP_ACK             (1)    /* Data sending finished. */
+ #define NBD_REP_SERVER          (2)    /* Export description. */
+ #define NBD_REP_INFO            (3)    /* NBD_OPT_INFO/GO. */
++#define NBD_REP_META_CONTEXT    (4)    /* NBD_OPT_{LIST,SET}_META_CONTEXT */
+
+ #define NBD_REP_ERR_UNSUP           NBD_REP_ERR(1)  /* Unknown option */
+ #define NBD_REP_ERR_POLICY          NBD_REP_ERR(2)  /* Server denied */
+@@ -163,6 +185,8 @@ typedef struct NBDStructuredError {
+ #define NBD_CMD_FLAG_FUA        (1 << 0) /* 'force unit access' during write */
+ #define NBD_CMD_FLAG_NO_HOLE    (1 << 1) /* don't punch hole on zero run */
+ #define NBD_CMD_FLAG_DF         (1 << 2) /* don't fragment structured read */
++#define NBD_CMD_FLAG_REQ_ONE    (1 << 3) /* only one extent in BLOCK_STATUS
++                                          * reply chunk */
+
+ /* Supported request types */
+ enum {
+@@ -173,6 +197,7 @@ enum {
+     NBD_CMD_TRIM = 4,
+     /* 5 reserved for failed experiment NBD_CMD_CACHE */
+     NBD_CMD_WRITE_ZEROES = 6,
++    NBD_CMD_BLOCK_STATUS = 7,
+ };
+
+ #define NBD_DEFAULT_PORT	10809
+@@ -200,9 +225,15 @@ enum {
+ #define NBD_REPLY_TYPE_NONE          0
+ #define NBD_REPLY_TYPE_OFFSET_DATA   1
+ #define NBD_REPLY_TYPE_OFFSET_HOLE   2
++#define NBD_REPLY_TYPE_BLOCK_STATUS  5
+ #define NBD_REPLY_TYPE_ERROR         NBD_REPLY_ERR(1)
+ #define NBD_REPLY_TYPE_ERROR_OFFSET  NBD_REPLY_ERR(2)
+
++/* Flags for extents (NBDExtent.flags) of NBD_REPLY_TYPE_BLOCK_STATUS,
++ * for base:allocation meta context */
++#define NBD_STATE_HOLE (1 << 0)
++#define NBD_STATE_ZERO (1 << 1)
++
+ static inline bool nbd_reply_type_is_error(int type)
+ {
+     return type & (1 << 15);
+diff --git a/nbd/common.c b/nbd/common.c
+index 6295526dd14..8c95c1d606e 100644
+--- a/nbd/common.c
++++ b/nbd/common.c
+@@ -75,6 +75,10 @@ const char *nbd_opt_lookup(uint32_t opt)
+         return "go";
+     case NBD_OPT_STRUCTURED_REPLY:
+         return "structured reply";
++    case NBD_OPT_LIST_META_CONTEXT:
++        return "list meta context";
++    case NBD_OPT_SET_META_CONTEXT:
++        return "set meta context";
+     default:
+         return "<unknown>";
+     }
+@@ -90,6 +94,8 @@ const char *nbd_rep_lookup(uint32_t rep)
+         return "server";
+     case NBD_REP_INFO:
+         return "info";
++    case NBD_REP_META_CONTEXT:
++        return "meta context";
+     case NBD_REP_ERR_UNSUP:
+         return "unsupported";
+     case NBD_REP_ERR_POLICY:
+@@ -144,6 +150,8 @@ const char *nbd_cmd_lookup(uint16_t cmd)
+         return "trim";
+     case NBD_CMD_WRITE_ZEROES:
+         return "write zeroes";
++    case NBD_CMD_BLOCK_STATUS:
++        return "block status";
+     default:
+         return "<unknown>";
+     }
+@@ -159,6 +167,8 @@ const char *nbd_reply_type_lookup(uint16_t type)
+         return "data";
+     case NBD_REPLY_TYPE_OFFSET_HOLE:
+         return "hole";
++    case NBD_REPLY_TYPE_BLOCK_STATUS:
++        return "block status";
+     case NBD_REPLY_TYPE_ERROR:
+         return "generic error";
+     case NBD_REPLY_TYPE_ERROR_OFFSET:
 -- 
 2.14.3
