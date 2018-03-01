@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1erRLL-0006Hd-12
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:46:08 -0500
+	(envelope-from <mst@redhat.com>) id 1erRLN-0006KK-A6
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:46:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1erRLJ-00010p-AA
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:46:07 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40602 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1erRLM-00015N-BY
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:46:09 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57144 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1erRLJ-00010I-4S
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:46:05 -0500
-Date: Thu, 1 Mar 2018 18:46:04 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1erRLM-00014Q-2s
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:46:08 -0500
+Date: Thu, 1 Mar 2018 18:46:07 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1519922735-29054-9-git-send-email-mst@redhat.com>
+Message-ID: <1519922735-29054-14-git-send-email-mst@redhat.com>
 References: <1519922735-29054-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1519922735-29054-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 08/13] vhost: fix incorrect check in
- vhost_verify_ring_mappings
+Subject: [Qemu-devel] [PULL 13/13] cryptodev-vhost-user: set the key length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +27,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jia He <hejianet@gmail.com>, Jia He <jia.he@hxt-semitech.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Gonglei <arei.gonglei@huawei.com>
 
-From: Jia He <hejianet@gmail.com>
+From: Gonglei <arei.gonglei@huawei.com>
 
-In commit 0ca1fd2d6878 ("vhost: Simplify ring verification checks"),
-it checks the virtqueue desc mapping for 3 times.
-
-Fixed: commit 0ca1fd2d6878 ("vhost: Simplify ring verification checks")
-Signed-off-by: Jia He <jia.he@hxt-semitech.com>
+Signed-off-by: Gonglei <arei.gonglei@huawei.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/virtio/vhost.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/sysemu/cryptodev-vhost-user.h | 3 +++
+ backends/cryptodev-vhost-user.c       | 4 ++++
+ 2 files changed, 7 insertions(+)
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index d02d12a..d8d0ef9 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -359,7 +359,7 @@ static int vhost_verify_ring_mappings(struct vhost_dev *dev,
+diff --git a/include/sysemu/cryptodev-vhost-user.h b/include/sysemu/cryptodev-vhost-user.h
+index 937217b..6debf53 100644
+--- a/include/sysemu/cryptodev-vhost-user.h
++++ b/include/sysemu/cryptodev-vhost-user.h
+@@ -23,6 +23,9 @@
+ #ifndef CRYPTODEV_VHOST_USER_H
+ #define CRYPTODEV_VHOST_USER_H
  
-         j++;
-         r = vhost_verify_ring_part_mapping(
--                vq->desc, vq->desc_phys, vq->desc_size,
-+                vq->avail, vq->avail_phys, vq->avail_size,
-                 reg_hva, reg_gpa, reg_size);
-         if (r) {
-             break;
-@@ -367,7 +367,7 @@ static int vhost_verify_ring_mappings(struct vhost_dev *dev,
++#define VHOST_USER_MAX_AUTH_KEY_LEN    512
++#define VHOST_USER_MAX_CIPHER_KEY_LEN  64
++
  
-         j++;
-         r = vhost_verify_ring_part_mapping(
--                vq->desc, vq->desc_phys, vq->desc_size,
-+                vq->used, vq->used_phys, vq->used_size,
-                 reg_hva, reg_gpa, reg_size);
-         if (r) {
-             break;
+ /**
+  * cryptodev_vhost_user_get_vhost:
+diff --git a/backends/cryptodev-vhost-user.c b/backends/cryptodev-vhost-user.c
+index 9cd06c4..862d4f2 100644
+--- a/backends/cryptodev-vhost-user.c
++++ b/backends/cryptodev-vhost-user.c
+@@ -224,6 +224,10 @@ static void cryptodev_vhost_user_init(
+                          1u << VIRTIO_CRYPTO_SERVICE_MAC;
+     backend->conf.cipher_algo_l = 1u << VIRTIO_CRYPTO_CIPHER_AES_CBC;
+     backend->conf.hash_algo = 1u << VIRTIO_CRYPTO_HASH_SHA1;
++
++    backend->conf.max_size = UINT64_MAX;
++    backend->conf.max_cipher_key_len = VHOST_USER_MAX_CIPHER_KEY_LEN;
++    backend->conf.max_auth_key_len = VHOST_USER_MAX_AUTH_KEY_LEN;
+ }
+ 
+ static int64_t cryptodev_vhost_user_sym_create_session(
 -- 
 MST
