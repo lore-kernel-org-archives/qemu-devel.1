@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1erMJu-0003iW-S3
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:24:19 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1erMJv-0003jl-Th
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:24:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1erMJs-00086K-QH
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:24:18 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46704)
+	(envelope-from <pm215@archaic.org.uk>) id 1erMJu-00087k-G2
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:24:19 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46706)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1erMJs-00085k-Hy
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:24:16 -0500
+	id 1erMJu-00086z-7C
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:24:18 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1erMJr-0000b1-Kr
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:24:15 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1erMJt-0000bn-7W
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:24:17 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  1 Mar 2018 11:23:37 +0000
-Message-Id: <20180301112403.12487-17-peter.maydell@linaro.org>
+Date: Thu,  1 Mar 2018 11:23:39 +0000
+Message-Id: <20180301112403.12487-19-peter.maydell@linaro.org>
 In-Reply-To: <20180301112403.12487-1-peter.maydell@linaro.org>
 References: <20180301112403.12487-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 16/42] arm/translate-a64: initial decode for
- simd_three_reg_same_fp16
+Subject: [Qemu-devel] [PULL 18/42] arm/translate-a64: add FP16
+ F[A]C[EQ/GE/GT] to simd_three_reg_same_fp16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,110 +35,128 @@ To: qemu-devel@nongnu.org
 
 From: Alex Bennée <alex.bennee@linaro.org>
 
-This is the initial decode skeleton for the Advanced SIMD three same
-instruction group.
-
-The fprintf is purely to aid debugging as the additional instructions
-are added. It will be removed once the group is complete.
+These use the generic float16_compare functionality which in turn uses
+the common float_compare code from the softfloat re-factor.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20180227143852.11175-9-alex.bennee@linaro.org
+Message-id: 20180227143852.11175-11-alex.bennee@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate-a64.c | 73 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 73 insertions(+)
+ target/arm/helper-a64.h    |  5 +++++
+ target/arm/helper-a64.c    | 49 ++++++++++++++++++++++++++++++++++++++++++++++
+ target/arm/translate-a64.c | 15 ++++++++++++++
+ 3 files changed, 69 insertions(+)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 5dd54b7ac4..4828457b5b 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -10228,6 +10228,78 @@ static void disas_simd_three_reg_same(DisasContext *s, uint32_t insn)
-     }
- }
- 
+diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
+index bac9469426..1cf40bda5e 100644
+--- a/target/arm/helper-a64.h
++++ b/target/arm/helper-a64.h
+@@ -56,3 +56,8 @@ DEF_HELPER_3(advsimd_addh, f16, f16, f16, ptr)
+ DEF_HELPER_3(advsimd_subh, f16, f16, f16, ptr)
+ DEF_HELPER_3(advsimd_mulh, f16, f16, f16, ptr)
+ DEF_HELPER_3(advsimd_divh, f16, f16, f16, ptr)
++DEF_HELPER_3(advsimd_ceq_f16, i32, f16, f16, ptr)
++DEF_HELPER_3(advsimd_cge_f16, i32, f16, f16, ptr)
++DEF_HELPER_3(advsimd_cgt_f16, i32, f16, f16, ptr)
++DEF_HELPER_3(advsimd_acge_f16, i32, f16, f16, ptr)
++DEF_HELPER_3(advsimd_acgt_f16, i32, f16, f16, ptr)
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index 931a6d3c34..d0b284fec4 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -594,3 +594,52 @@ ADVSIMD_HALFOP(min)
+ ADVSIMD_HALFOP(max)
+ ADVSIMD_HALFOP(minnum)
+ ADVSIMD_HALFOP(maxnum)
++
 +/*
-+ * Advanced SIMD three same (ARMv8.2 FP16 variants)
-+ *
-+ *  31  30  29  28       24 23  22 21 20  16 15 14 13    11 10  9    5 4    0
-+ * +---+---+---+-----------+---------+------+-----+--------+---+------+------+
-+ * | 0 | Q | U | 0 1 1 1 0 | a | 1 0 |  Rm  | 0 0 | opcode | 1 |  Rn  |  Rd  |
-+ * +---+---+---+-----------+---------+------+-----+--------+---+------+------+
-+ *
-+ * This includes FMULX, FCMEQ (register), FRECPS, FRSQRTS, FCMGE
-+ * (register), FACGE, FABD, FCMGT (register) and FACGT.
-+ *
++ * Floating point comparisons produce an integer result. Softfloat
++ * routines return float_relation types which we convert to the 0/-1
++ * Neon requires.
 + */
-+static void disas_simd_three_reg_same_fp16(DisasContext *s, uint32_t insn)
++
++#define ADVSIMD_CMPRES(test) (test) ? 0xffff : 0
++
++uint32_t HELPER(advsimd_ceq_f16)(float16 a, float16 b, void *fpstp)
 +{
-+    int opcode, fpopcode;
-+    int is_q, u, a, rm, rn, rd;
-+    int datasize, elements;
-+    int pass;
-+    TCGv_ptr fpst;
-+
-+    if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
-+        unallocated_encoding(s);
-+        return;
-+    }
-+
-+    if (!fp_access_check(s)) {
-+        return;
-+    }
-+
-+    /* For these floating point ops, the U, a and opcode bits
-+     * together indicate the operation.
-+     */
-+    opcode = extract32(insn, 11, 3);
-+    u = extract32(insn, 29, 1);
-+    a = extract32(insn, 23, 1);
-+    is_q = extract32(insn, 30, 1);
-+    rm = extract32(insn, 16, 5);
-+    rn = extract32(insn, 5, 5);
-+    rd = extract32(insn, 0, 5);
-+
-+    fpopcode = opcode | (a << 3) |  (u << 4);
-+    datasize = is_q ? 128 : 64;
-+    elements = datasize / 16;
-+
-+    fpst = get_fpstatus_ptr(true);
-+
-+    for (pass = 0; pass < elements; pass++) {
-+        TCGv_i32 tcg_op1 = tcg_temp_new_i32();
-+        TCGv_i32 tcg_op2 = tcg_temp_new_i32();
-+        TCGv_i32 tcg_res = tcg_temp_new_i32();
-+
-+        read_vec_element_i32(s, tcg_op1, rn, pass, MO_16);
-+        read_vec_element_i32(s, tcg_op2, rm, pass, MO_16);
-+
-+        switch (fpopcode) {
-+        default:
-+            fprintf(stderr, "%s: insn %#04x, fpop %#2x @ %#" PRIx64 "\n",
-+                    __func__, insn, fpopcode, s->pc);
-+            g_assert_not_reached();
-+        }
-+
-+        write_vec_element_i32(s, tcg_res, rd, pass, MO_16);
-+        tcg_temp_free_i32(tcg_res);
-+        tcg_temp_free_i32(tcg_op1);
-+        tcg_temp_free_i32(tcg_op2);
-+    }
-+
-+    tcg_temp_free_ptr(fpst);
-+
-+    clear_vec_high(s, is_q, rd);
++    float_status *fpst = fpstp;
++    int compare = float16_compare_quiet(a, b, fpst);
++    return ADVSIMD_CMPRES(compare == float_relation_equal);
 +}
 +
- static void handle_2misc_widening(DisasContext *s, int opcode, bool is_q,
-                                   int size, int rn, int rd)
- {
-@@ -11975,6 +12047,7 @@ static const AArch64DecodeTable data_proc_simd[] = {
-     { 0xce000000, 0xff808000, disas_crypto_four_reg },
-     { 0xce800000, 0xffe00000, disas_crypto_xar },
-     { 0xce408000, 0xffe0c000, disas_crypto_three_reg_imm2 },
-+    { 0x0e400400, 0x9f60c400, disas_simd_three_reg_same_fp16 },
-     { 0x00000000, 0x00000000, NULL }
- };
- 
++uint32_t HELPER(advsimd_cge_f16)(float16 a, float16 b, void *fpstp)
++{
++    float_status *fpst = fpstp;
++    int compare = float16_compare(a, b, fpst);
++    return ADVSIMD_CMPRES(compare == float_relation_greater ||
++                          compare == float_relation_equal);
++}
++
++uint32_t HELPER(advsimd_cgt_f16)(float16 a, float16 b, void *fpstp)
++{
++    float_status *fpst = fpstp;
++    int compare = float16_compare(a, b, fpst);
++    return ADVSIMD_CMPRES(compare == float_relation_greater);
++}
++
++uint32_t HELPER(advsimd_acge_f16)(float16 a, float16 b, void *fpstp)
++{
++    float_status *fpst = fpstp;
++    float16 f0 = float16_abs(a);
++    float16 f1 = float16_abs(b);
++    int compare = float16_compare(f0, f1, fpst);
++    return ADVSIMD_CMPRES(compare == float_relation_greater ||
++                          compare == float_relation_equal);
++}
++
++uint32_t HELPER(advsimd_acgt_f16)(float16 a, float16 b, void *fpstp)
++{
++    float_status *fpst = fpstp;
++    float16 f0 = float16_abs(a);
++    float16 f1 = float16_abs(b);
++    int compare = float16_compare(f0, f1, fpst);
++    return ADVSIMD_CMPRES(compare == float_relation_greater);
++}
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index f8770ee1e9..fb74dc1c45 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -10289,6 +10289,9 @@ static void disas_simd_three_reg_same_fp16(DisasContext *s, uint32_t insn)
+         case 0x2: /* FADD */
+             gen_helper_advsimd_addh(tcg_res, tcg_op1, tcg_op2, fpst);
+             break;
++        case 0x4: /* FCMEQ */
++            gen_helper_advsimd_ceq_f16(tcg_res, tcg_op1, tcg_op2, fpst);
++            break;
+         case 0x6: /* FMAX */
+             gen_helper_advsimd_maxh(tcg_res, tcg_op1, tcg_op2, fpst);
+             break;
+@@ -10304,6 +10307,12 @@ static void disas_simd_three_reg_same_fp16(DisasContext *s, uint32_t insn)
+         case 0x13: /* FMUL */
+             gen_helper_advsimd_mulh(tcg_res, tcg_op1, tcg_op2, fpst);
+             break;
++        case 0x14: /* FCMGE */
++            gen_helper_advsimd_cge_f16(tcg_res, tcg_op1, tcg_op2, fpst);
++            break;
++        case 0x15: /* FACGE */
++            gen_helper_advsimd_acge_f16(tcg_res, tcg_op1, tcg_op2, fpst);
++            break;
+         case 0x17: /* FDIV */
+             gen_helper_advsimd_divh(tcg_res, tcg_op1, tcg_op2, fpst);
+             break;
+@@ -10311,6 +10320,12 @@ static void disas_simd_three_reg_same_fp16(DisasContext *s, uint32_t insn)
+             gen_helper_advsimd_subh(tcg_res, tcg_op1, tcg_op2, fpst);
+             tcg_gen_andi_i32(tcg_res, tcg_res, 0x7fff);
+             break;
++        case 0x1c: /* FCMGT */
++            gen_helper_advsimd_cgt_f16(tcg_res, tcg_op1, tcg_op2, fpst);
++            break;
++        case 0x1d: /* FACGT */
++            gen_helper_advsimd_acgt_f16(tcg_res, tcg_op1, tcg_op2, fpst);
++            break;
+         default:
+             fprintf(stderr, "%s: insn %#04x, fpop %#2x @ %#" PRIx64 "\n",
+                     __func__, insn, fpopcode, s->pc);
 -- 
 2.16.2
