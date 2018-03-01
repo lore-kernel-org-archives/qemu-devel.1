@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erMpi-0003k3-6G
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:57:11 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1erMsO-000615-LJ
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:59:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erMph-0001iA-Hl
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:57:10 -0500
-Received: from mail-oi0-x231.google.com ([2607:f8b0:4003:c06::231]:33927)
+	(envelope-from <peter.maydell@linaro.org>) id 1erMsN-0003Cp-S1
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:59:56 -0500
+Received: from mail-ot0-x22f.google.com ([2607:f8b0:4003:c0f::22f]:34518)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1erMph-0001hq-BX
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:57:09 -0500
-Received: by mail-oi0-x231.google.com with SMTP id c83so4275054oib.1
-	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 03:57:09 -0800 (PST)
+	id 1erMsN-0003CV-Mv
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 06:59:55 -0500
+Received: by mail-ot0-x22f.google.com with SMTP id n74so5323100ota.1
+	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 03:59:55 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <cover.1519755964.git.alistair.francis@xilinx.com>
-References: <cover.1519755964.git.alistair.francis@xilinx.com>
+In-Reply-To: <20180228164816.24110-3-richard.henderson@linaro.org>
+References: <20180228164816.24110-1-richard.henderson@linaro.org>
+	<20180228164816.24110-3-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 1 Mar 2018 11:56:48 +0000
-Message-ID: <CAFEAcA8LhdPTLmsx5n+HhUr1r9u8gr3s5HkOwcb4ZxYdbHe4qw@mail.gmail.com>
+Date: Thu, 1 Mar 2018 11:59:34 +0000
+Message-ID: <CAFEAcA_SsRZAsTvUjSYHQcGMUYUDFvr0jdVBdjdczssDmExPgg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v7 0/3] Add and connect the ZynqMP RTC
+Subject: Re: [Qemu-devel] [PATCH] decodetree: Propagate return value from
+ translate subroutines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 27 February 2018 at 18:52, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> V7:
->  - Move the current_tm to the init() function
+On 28 February 2018 at 16:48, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Allow the translate subroutines to return false for invalid insns.
 >
-> V6:
->  - Migrate tick_offset and add a pre_save call
+> At present we can of course invoke an invalid insn exception from within
+> the translate subroutine, but in the short term this consolidates code.
+> In the long term it would allow the decodetree language to support
+> overlapping patterns for ISA extensions.
 >
-> V5:
->  - Recalculate tick_offset after migration
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
 >
-> V4:
->  - Use the RegisterAccessInfo .unimp functionality
+> Since this makes an ABI change to the translate functions called by the
+> decode function, let's make it now before there are any in-tree users.
 >
-> V3:
->  - Store an offset value
->  - Use mktimegm()
->  - Log unimplemented writes
+> My SVE branch over-decodes in quite a lot of cases -- e.g. things like
+> the 2-bit size field must be 1-3 for fp operands, and so size==0 is
+> unallocated.  Returning false for these cases allows the actual call
+> to unallocated_encoding to be done in one place instead of hundreds.
 >
-> V2:
->  - Delete unused realise function
->  - Add cover letter
->  - Convert DB_PRINT() macro to trace
->
->
-> Alistair Francis (3):
->   xlnx-zynqmp-rtc: Initial commit
->   xlnx-zynqmp-rtc: Add basic time support
->   xlnx-zynqmp: Connect the RTC device
+> Longer term, I'm thinking of how to handle decode of overlapping ISA
+> extensions.  One could allow (specific) overlapping patterns and
+> prioritize them in some way (e.g. first in file is first matched).
+> My thought is that trans_insn_a would check a cpu feature bit and
+> return false if not enabled.  Then trans_insn_b would be given its
+> chance to handle the insn.
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
+I'll put this into target-arm.next, unless you'd prefer it to go
+in via some other route.
 
-Applied to target-arm.next, thanks.
-
+thanks
 -- PMM
