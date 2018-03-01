@@ -1,40 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1erImk-0001qi-7l
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 02:37:52 -0500
+	(envelope-from <famz@redhat.com>) id 1erJ3E-0005uz-D8
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 02:54:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1erImh-0000Od-4m
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 02:37:50 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36190)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1erImg-0000O0-Sn
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 02:37:47 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w217Z2d4064549
-	for <qemu-devel@nongnu.org>; Thu, 1 Mar 2018 02:37:45 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ge97crc6n-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 02:37:45 -0500
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 1 Mar 2018 07:37:42 -0000
-References: <20180228195320.165230-1-borntraeger@de.ibm.com>
-	<79f7059b-f2d3-a758-6bb9-29433b31b313@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 1 Mar 2018 08:37:39 +0100
-MIME-Version: 1.0
-In-Reply-To: <79f7059b-f2d3-a758-6bb9-29433b31b313@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <2e5c45db-889f-200a-03d1-954a119ec336@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] s390/kvm: implement clearing part of
- IPL clear
+	(envelope-from <famz@redhat.com>) id 1erJ39-0001Ap-Ga
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 02:54:52 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40556 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1erJ39-0001A2-Bw
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 02:54:47 -0500
+From: Fam Zheng <famz@redhat.com>
+Date: Thu,  1 Mar 2018 15:54:28 +0800
+Message-Id: <20180301075428.17320-2-famz@redhat.com>
+In-Reply-To: <20180301075428.17320-1-famz@redhat.com>
+References: <20180301075428.17320-1-famz@redhat.com>
+Subject: [Qemu-devel] [PULL 1/1] block/nvme: fix Coverity reports
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,97 +23,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
+From: Paolo Bonzini <pbonzini@redhat.com>
 
+1) string not null terminated in sysfs_find_group_file
 
-On 03/01/2018 04:58 AM, Thomas Huth wrote:
-> On 28.02.2018 20:53, Christian Borntraeger wrote:
->> When a guests reboots with diagnose 308 subcode 3 it requests the memory
->> to be cleared. We did not do it so far. This does not only violate the
->> architecture, it also misses the chance to free up that memory on
->> reboot, which would help on host memory over commitment.  By using
->> ram_block_discard_range we can cover both cases.
-> 
-> Sounds like a good idea. I wonder whether that release_all_ram()
-> function should maybe rather reside in exec.c, so that other machines
-> that want to clear all RAM at reset time can use it, too?
+2) NULL pointer dereference and dead local variable in nvme_init.
 
-You already added Paolo, David - good.
-I am open to that. As an alternative we can certainly move this function
-from s390x/kvm.c to exec.c at a later point in time if a 2nd user comes along.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
 
-> 
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->>  target/s390x/kvm.c | 19 +++++++++++++++++++
->>  1 file changed, 19 insertions(+)
->>
->> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
->> index 8f3a422288..2e145ad5c3 100644
->> --- a/target/s390x/kvm.c
->> +++ b/target/s390x/kvm.c
->> @@ -34,6 +34,8 @@
->>  #include "qapi/error.h"
->>  #include "qemu/error-report.h"
->>  #include "qemu/timer.h"
->> +#include "qemu/rcu_queue.h"
->> +#include "sysemu/cpus.h"
->>  #include "sysemu/sysemu.h"
->>  #include "sysemu/hw_accel.h"
->>  #include "hw/boards.h"
->> @@ -41,6 +43,7 @@
->>  #include "sysemu/device_tree.h"
->>  #include "exec/gdbstub.h"
->>  #include "exec/address-spaces.h"
->> +#include "exec/ram_addr.h"
->>  #include "trace.h"
->>  #include "qapi-event.h"
->>  #include "hw/s390x/s390-pci-inst.h"
->> @@ -1841,6 +1844,14 @@ static int kvm_arch_handle_debug_exit(S390CPU *cpu)
->>      return ret;
->>  }
->>  
->> +static void release_all_rams(void)
-> 
-> s/rams/ram/ maybe?
+Message-Id: <20180213015240.9352-1-famz@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ block/nvme.c        | 10 +++++++---
+ util/vfio-helpers.c |  2 +-
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
-yes.
-> 
->> +{
->> +    struct RAMBlock *rb;
->> +
->> +    QLIST_FOREACH_RCU(rb, &ram_list.blocks, next)
->> +        ram_block_discard_range(rb, 0, rb->used_length);
-> 
-> From a coding style point of view, I think there should be curly braces
-> around ram_block_discard_range() ?
-
-yes.
-> 
->> +}
->> +
->>  int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
->>  {
->>      S390CPU *cpu = S390_CPU(cs);
->> @@ -1853,6 +1864,14 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
->>              ret = handle_intercept(cpu);
->>              break;
->>          case KVM_EXIT_S390_RESET:
->> +            if (run->s390_reset_flags & KVM_S390_RESET_CLEAR) {
->> +                /*
->> +                 * We will stop other CPUs anyway, avoid spurious crashes and
->> +                 * get all CPUs out. The reset will take care of the resume.
->> +                 */
->> +                pause_all_vcpus();
->> +                release_all_rams();
->> +            }
->>              s390_reipl_request();
->>              break;
->>          case KVM_EXIT_S390_TSCH:
->>
-> 
-> Apart from the cosmetic nits, patch looks good to me.
-
-Thanks. Will wait with the resend till Paolo,David have some comments.
+diff --git a/block/nvme.c b/block/nvme.c
+index 10bffbbf2f..75078022f6 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -645,7 +645,7 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+     aio_set_event_notifier(bdrv_get_aio_context(bs), &s->irq_notifier,
+                            false, nvme_handle_event, nvme_poll_cb);
+ 
+-    nvme_identify(bs, namespace, errp);
++    nvme_identify(bs, namespace, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         ret = -EIO;
+@@ -666,8 +666,12 @@ fail_queue:
+     nvme_free_queue_pair(bs, s->queues[0]);
+ fail:
+     g_free(s->queues);
+-    qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
+-    qemu_vfio_close(s->vfio);
++    if (s->regs) {
++        qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
++    }
++    if (s->vfio) {
++        qemu_vfio_close(s->vfio);
++    }
+     event_notifier_cleanup(&s->irq_notifier);
+     return ret;
+ }
+diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
+index f478b68400..006674c916 100644
+--- a/util/vfio-helpers.c
++++ b/util/vfio-helpers.c
+@@ -104,7 +104,7 @@ static char *sysfs_find_group_file(const char *device, Error **errp)
+     char *path = NULL;
+ 
+     sysfs_link = g_strdup_printf("/sys/bus/pci/devices/%s/iommu_group", device);
+-    sysfs_group = g_malloc(PATH_MAX);
++    sysfs_group = g_malloc0(PATH_MAX);
+     if (readlink(sysfs_link, sysfs_group, PATH_MAX - 1) == -1) {
+         error_setg_errno(errp, errno, "Failed to find iommu group sysfs path");
+         goto out;
+-- 
+2.14.3
