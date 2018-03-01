@@ -1,33 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1erR6Q-0001pu-6y
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:30:47 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1erRC5-0006Vx-BR
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:36:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1erR6L-0005qs-0P
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:30:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47480)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1erR6K-0005qd-Pb
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:30:36 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1erR6J-0002OP-R4
-	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 16:30:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BE05F2E80CB
-	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 16:30:35 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 01 Mar 2018 16:25:08 -0000
-From: Leonid Myravjev <1752646@bugs.launchpad.net>
-Reply-To: Bug 1752646 <1752646@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <151992150884.16342.3804061030016543.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1752646] [NEW] Freezing VNC screen on some the
- UEFI framebuffer applications
+	(envelope-from <paolo.bonzini@gmail.com>) id 1erRC0-0002b4-2u
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:36:33 -0500
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu,  1 Mar 2018 17:36:11 +0100
+Message-Id: <20180301163619.21072-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/8] Call check and invalidate_cache from
+ coroutine context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,88 +20,66 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com
 
-Public bug reported:
+Check and invalidate_cache share some parts of the implementation
+with the regular I/O path.  This is sometimes complicated because the
+I/O path wants to use a CoMutex but that is not possible outside coroutine
+context.  By moving things to coroutine context, we can remove special
+cases.  In fact, invalidate_cache is already called from coroutine context
+because incoming migration is placed in a coroutine.
 
-Hi folks!
+I'm including two patches from Stefan to rename the bdrv_create callback
+to bdrv_co_create, because it is already called from coroutine context.
+The name is now bdrv_co_create_opts, with bdrv_co_create reserved for
+the QAPI-based version that Kevin is working on.
 
-I use TianCore (UEFI) formware on the qemu (master version last commit a6e0=
-344).
-When kernel/linux is start, it using UEFI Framebuffer. Then I run UEFI appl=
-ication (which writes directly to the framebuffer) my VNS screen is freezin=
-g. Then I restart vnclient I see only one frame.
+qcow2 still has cache flushing in non-coroutine context, coming from
+qcow2_reopen_prepare->qcow2_update_options_prepare,
+qcow2_close->qcow2_inactivate and several dirty bitmap functions.
 
-When I run application, I getting in the file hw/display/vga.c on
-function 'vga_ioport_write' some commands, it change "s->ar_index" from
-0x20 -> 0x10
+Paolo
 
-In the function vga_update_display:
-1751         if (!(s->ar_index & 0x20)) {
-1752             graphic_mode =3D GMODE_BLANK;
-1753         } else {
+v3->v4: added patch 4, patch 3 has to go before it
 
-And I got GMODE_BLANK mode. If I patch it:
-1751         if (0) {
+Paolo Bonzini (6):
+  qcow2: introduce qcow2_write_caches and qcow2_flush_caches
+  qcow2: fix flushing after dirty bitmap metadata writes
+  qcow2: make qcow2_do_open a coroutine_fn
+  qed: make bdrv_qed_do_open a coroutine_fn
+  block: convert bdrv_invalidate_cache callback to coroutine_fn
+  block: convert bdrv_check callback to coroutine_fn
 
-my VNC not freezing.
+Stefan Hajnoczi (2):
+  block: rename .bdrv_create() to .bdrv_co_create_opts()
+  qcow2: make qcow2_co_create2() a coroutine_fn
 
->From "Hardware Level VGA and SVGA Video Programming Information Page" I
-saw, what ar_index is 0x3C0 (Attribute Controller Data Write Register),
-0x20(5-bit) is PAS -- Palette Address Source
+ block.c                   |  88 ++++++++++++++++++++++++++++++----
+ block/crypto.c            |   8 ++--
+ block/file-posix.c        |  15 +++---
+ block/file-win32.c        |   5 +-
+ block/gluster.c           |  12 ++---
+ block/iscsi.c             |  13 ++---
+ block/nfs.c               |  11 +++--
+ block/parallels.c         |  24 ++++++----
+ block/qcow.c              |   5 +-
+ block/qcow2-bitmap.c      |   4 +-
+ block/qcow2-refcount.c    |  28 +++++++++++
+ block/qcow2.c             | 118 +++++++++++++++++++++++++++++++---------------
+ block/qcow2.h             |   2 +
+ block/qed-check.c         |   1 +
+ block/qed-table.c         |  26 ++++------
+ block/qed.c               |  72 +++++++++++++++++++++-------
+ block/raw-format.c        |   5 +-
+ block/rbd.c               |  12 +++--
+ block/sheepdog.c          |  10 ++--
+ block/ssh.c               |   5 +-
+ block/vdi.c               |  11 +++--
+ block/vhdx.c              |  12 +++--
+ block/vmdk.c              |  12 +++--
+ block/vpc.c               |   5 +-
+ include/block/block_int.h |  11 +++--
+ 25 files changed, 358 insertions(+), 157 deletions(-)
 
-If there is a output via the UEFI framebuffer, does the difference have
-a PAS or not? Why do we need to pause the output if the PAS is exposed?
-Especially when the application outputs via framebuffer.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: framebuffer uefi vga
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1752646
-
-Title:
-  Freezing VNC screen on some the UEFI framebuffer applications
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hi folks!
-
-  I use TianCore (UEFI) formware on the qemu (master version last commit a6=
-e0344).
-  When kernel/linux is start, it using UEFI Framebuffer. Then I run UEFI ap=
-plication (which writes directly to the framebuffer) my VNS screen is freez=
-ing. Then I restart vnclient I see only one frame.
-
-  When I run application, I getting in the file hw/display/vga.c on
-  function 'vga_ioport_write' some commands, it change "s->ar_index"
-  from 0x20 -> 0x10
-
-  In the function vga_update_display:
-  1751         if (!(s->ar_index & 0x20)) {
-  1752             graphic_mode =3D GMODE_BLANK;
-  1753         } else {
-
-  And I got GMODE_BLANK mode. If I patch it:
-  1751         if (0) {
-
-  my VNC not freezing.
-
-  From "Hardware Level VGA and SVGA Video Programming Information Page"
-  I saw, what ar_index is 0x3C0 (Attribute Controller Data Write
-  Register), 0x20(5-bit) is PAS -- Palette Address Source
-
-  If there is a output via the UEFI framebuffer, does the difference
-  have a PAS or not? Why do we need to pause the output if the PAS is
-  exposed? Especially when the application outputs via framebuffer.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1752646/+subscriptions
+-- 
+2.14.3
