@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1erKpX-0002Sv-31
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:48:52 -0500
+	(envelope-from <imammedo@redhat.com>) id 1erKrR-0003rN-Qu
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:50:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1erKpU-0000v8-0b
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:48:51 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38560 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1erKpT-0000ut-R3
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:48:47 -0500
-Date: Thu, 1 Mar 2018 10:48:44 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180301094844.ckysyow5pppqf3if@kamzik.brq.redhat.com>
-References: <20180228180215.25470-1-wei@redhat.com>
-	<20180228180215.25470-4-wei@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1erKrQ-0001ke-Ph
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 04:50:49 -0500
+Date: Thu, 1 Mar 2018 10:50:30 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180301105030.2b716e68@redhat.com>
+In-Reply-To: <20180227132131.fipafmnb56a7fj76@kamzik.brq.redhat.com>
+References: <000e01d3afad$b9a13830$2ce3a890$@codeaurora.org>
+	<20180227104708.GA11391@cbox>
+	<ac329e1b1f5265a805916ab4f8708f9d@codeaurora.org>
+	<20180227124604.GA2373@cbox>
+	<20180227132131.fipafmnb56a7fj76@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180228180215.25470-4-wei@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V7 3/4] tests/migration: Add migration-test
- header file
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] VCPU hotplug on KVM/ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,212 +26,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Huang <wei@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, dgilbert@redhat.com, quintela@redhat.com
+To: Andrew Jones <drjones@redhat.com>
+Cc: Christoffer Dall <cdall@kernel.org>, bthakur@codeaurora.org, Christoffer Dall <cdall@cs.columbia.edu>, qemu-devel@nongnu.org, Christoffer Dall <christofferdall@christofferdall.dk>, qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 28, 2018 at 12:02:14PM -0600, Wei Huang wrote:
-> This patch moves the settings related migration-test from the
-> migration-test.c file to a seperate header file. It also renames the
-> x86-a-b-bootblock.s file extension from .s to .S, allowing gcc
-> pre-processor to include the C-style header file correctly.
+On Tue, 27 Feb 2018 14:21:31 +0100
+Andrew Jones <drjones@redhat.com> wrote:
+
+> On Tue, Feb 27, 2018 at 01:46:04PM +0100, Christoffer Dall wrote:
+> > On Tue, Feb 27, 2018 at 05:34:28PM +0530, bthakur@codeaurora.org wrote:  
+> > > Hi Christoffer,
+> > > 
+> > > Thanks for your reply.
+> > > 
+> > > On 2018-02-27 16:17, Christoffer Dall wrote:  
+> > > >Hi Bhupinder,
+> > > >
+> > > >On Tue, Feb 27, 2018 at 03:01:17PM +0530, bthakur@codeaurora.org wrote:  
+> > > >>I hope it is the right forum to post my query.
+> > > >>
+> > > >>
+> > > >>
+> > > >>I am currently looking at the possibility of adding a new VCPU to a
+> > > >>running
+> > > >>guest VM in KVM/ARM. I see that currently, it is not allowed to add a
+> > > >>new
+> > > >>VCPU to a guest VM, if it is already initialized. The first check in
+> > > >>kvm_arch_vcpu_create() returns failure if it is already initialized.
+> > > >>  
+> > > >
+> > > >This would require a major rework of a lot of logic surrounding the GIC
+> > > >and other parts of KVM initialization.
+> > > >  
+> > > >>
+> > > >>
+> > > >>There was some work done in QEMU to add support for VCPU hotplug:
+> > > >>https://lists.gnu.org/archive/html/qemu-arm/2017-05/msg00404.html
+> > > >>
+> > > >>
+> > > >>
+> > > >>But I am looking at the KVM side for enabling adding a new VCPU. If you
+> > > >>can
+> > > >>point me to any relevant work/resources, which I can refer to then it
+> > > >>will
+> > > >>help me.
+> > > >>  
+> > > >
+> > > >I don't have any specific pointers, but I was always told that the way
+> > > >we were going to do CPU hotplug would be to instantiate a large number
+> > > >of VCPUs, and hotplug would be equivalent to turning on a VCPU which was
+> > > >previously powered off.
+> > > >
+> > > >Is this not still a feasible solution?  
+> > > It should be a feasible solution provided the guest VM is not able to
+> > > control the onlining/offlining of VCPUs. It should be controlled by the
+> > > Host.
+> > >   
+> > 
+> > KVM could simply refuse to turn on some of the CPUs unless given
+> > permission from host userspace.
+> >   
+> > > >
+> > > >How does VCPU hotplug work on x86?  
+> > > On x86, you can add a vcpu through libvirt setvcpu command and it shows up
+> > > in the guest VM as a new CPU if you do lscpu.
+> > >   
+> > 
+> > Sure, but what is the mechanism, does x86 qemu actually call
+> > KVM_CREATE_VCPU, or is this also a question of turning on already
+> > created vcpus ?
+In QEMU on x86 (and I think ppc, s390 as well), we create vCPUs on demand.
+
+It would be nice if ARM would be able to do that too,
+so that it could take advantage of the same code.
+
+ 
+> CC'ing Igor and qemu-devel
 > 
-> Signed-off-by: Wei Huang <wei@redhat.com>
-> ---
->  tests/migration-test.c                             | 34 +++++++++++++---------
->  tests/migration/Makefile                           |  4 +--
->  tests/migration/migration-test.h                   | 22 ++++++++++++++
->  .../{x86-a-b-bootblock.s => x86-a-b-bootblock.S}   |  7 +++--
->  tests/migration/x86-a-b-bootblock.h                |  2 +-
->  5 files changed, 49 insertions(+), 20 deletions(-)
->  create mode 100644 tests/migration/migration-test.h
->  rename tests/migration/{x86-a-b-bootblock.s => x86-a-b-bootblock.S} (94%)
+> drew
 > 
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index 74f9361bdd..12c04a9648 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -21,10 +21,10 @@
->  #include "sysemu/sysemu.h"
->  #include "hw/nvram/chrp_nvram.h"
->  
-> -#define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
-> +#include "migration/migration-test.h"
->  
-> -const unsigned start_address = 1024 * 1024;
-> -const unsigned end_address = 100 * 1024 * 1024;
-> +unsigned start_address;
-> +unsigned end_address;
->  bool got_stop;
->  
->  #if defined(__linux__)
-> @@ -77,8 +77,8 @@ static bool ufd_version_check(void)
->  
->  static const char *tmpfs;
->  
-> -/* A simple PC boot sector that modifies memory (1-100MB) quickly
-> - * outputting a 'B' every so often if it's still running.
-> +/* The boot file modifies memory area in [start_address, end_address)
-> + * repeatedly. It outputs a 'B' at a fixed rate while it's still running.
->   */
->  #include "tests/migration/x86-a-b-bootblock.h"
->  
-> @@ -104,9 +104,8 @@ static void init_bootfile_ppc(const char *bootpath)
->      memcpy(header->name, "common", 6);
->      chrp_nvram_finish_partition(header, MIN_NVRAM_SIZE);
->  
-> -    /* FW_MAX_SIZE is 4MB, but slof.bin is only 900KB,
-> -     * so let's modify memory between 1MB and 100MB
-> -     * to do like PC bootsector
-> +    /* FW_MAX_SIZE is 4MB, but slof.bin is only 900KB. So it is OK to modify
-> +     * memory between start_address and end_address like PC bootsector does.
-
-This comment reads a bit strange now that it starts with explicit sizes
-and then uses generic terms. I think I'd move the comment to the header
-file where PPC_TEST_MEM_START/END are defined, tweaking it a bit. Also,
-the same g_assert enforcement done for AArch64 could be applied to PPC,
-but with a max kernel size of 100K. Even PC could get an assert, but with
-a max kernel size of 1M.
-
->       */
->  
->      sprintf(buf + 16,
-> @@ -263,11 +262,11 @@ static void wait_for_migration_pass(QTestState *who)
->  static void check_guests_ram(QTestState *who)
->  {
->      /* Our ASM test will have been incrementing one byte from each page from
-> -     * 1MB to <100MB in order.
-> -     * This gives us a constraint that any page's byte should be equal or less
-> -     * than the previous pages byte (mod 256); and they should all be equal
-> -     * except for one transition at the point where we meet the incrementer.
-> -     * (We're running this with the guest stopped).
-> +     * start_address to < end_address in order. This gives us a constraint
-> +     * that any page's byte should be equal or less than the previous pages
-> +     * byte (mod 256); and they should all be equal except for one transition
-> +     * at the point where we meet the incrementer. (We're running this with
-> +     * the guest stopped).
->       */
->      unsigned address;
->      uint8_t first_byte;
-> @@ -278,7 +277,8 @@ static void check_guests_ram(QTestState *who)
->      qtest_memread(who, start_address, &first_byte, 1);
->      last_byte = first_byte;
->  
-> -    for (address = start_address + 4096; address < end_address; address += 4096)
-> +    for (address = start_address + TEST_MEM_PAGE_SIZE; address < end_address;
-> +         address += TEST_MEM_PAGE_SIZE)
->      {
->          uint8_t b;
->          qtest_memread(who, address, &b, 1);
-> @@ -404,6 +404,9 @@ static void test_migrate_start(QTestState **from, QTestState **to,
->                                    " -drive file=%s,format=raw"
->                                    " -incoming %s",
->                                    accel, tmpfs, bootpath, uri);
-> +
-> +        start_address = X86_TEST_MEM_START;
-> +        end_address = X86_TEST_MEM_END;
->      } else if (strcmp(arch, "ppc64") == 0) {
->  
->          /* On ppc64, the test only works with kvm-hv, but not with kvm-pr */
-> @@ -421,6 +424,9 @@ static void test_migrate_start(QTestState **from, QTestState **to,
->                                    " -serial file:%s/dest_serial"
->                                    " -incoming %s",
->                                    accel, tmpfs, uri);
-> +
-> +        start_address = PPC_TEST_MEM_START;
-> +        end_address = PPC_TEST_MEM_END;
->      } else {
->          g_assert_not_reached();
->      }
-> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
-> index 8fbedaa8b8..013b8d1f44 100644
-> --- a/tests/migration/Makefile
-> +++ b/tests/migration/Makefile
-> @@ -25,8 +25,8 @@ include $(SRC_PATH)/rules.mak
->  
->  x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
->  
-> -x86-a-b-bootblock.h: x86-a-b-bootblock.s
-> -	$(x86_64_cross_prefix)as --32 -march=i486 $< -o x86.o
-> +x86-a-b-bootblock.h: x86-a-b-bootblock.S
-> +	$(x86_64_cross_prefix)gcc -m32 -march=i486 -c $< -o x86.o
->  	$(x86_64_cross_prefix)objcopy -O binary x86.o x86.boot
->  	dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124
->  	echo "$$__note" > $@
-> diff --git a/tests/migration/migration-test.h b/tests/migration/migration-test.h
-> new file mode 100644
-> index 0000000000..06c46a2fe0
-> --- /dev/null
-> +++ b/tests/migration/migration-test.h
-> @@ -0,0 +1,22 @@
-> +/*
-> + * Copyright (c) 2018 Red Hat, Inc. and/or its affiliates
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +#ifndef _TEST_MIGRATION_H_
-> +#define _TEST_MIGRATION_H_
-> +
-> +/* Common */
-> +#define TEST_MEM_PAGE_SIZE 4096
-> +
-> +/* x86 */
-> +#define X86_TEST_MEM_START (1 * 1024 * 1024)
-> +#define X86_TEST_MEM_END   (100 * 1024 * 1024)
-> +
-> +/* PPC */
-> +#define PPC_TEST_MEM_START (1 * 1024 * 1024)
-> +#define PPC_TEST_MEM_END   (100 * 1024 * 1024)
-> +#define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
-> +
-> +#endif /* _TEST_MIGRATION_H_ */
-> diff --git a/tests/migration/x86-a-b-bootblock.s b/tests/migration/x86-a-b-bootblock.S
-> similarity index 94%
-> rename from tests/migration/x86-a-b-bootblock.s
-> rename to tests/migration/x86-a-b-bootblock.S
-> index 98dbfab084..a4da995a89 100644
-> --- a/tests/migration/x86-a-b-bootblock.s
-> +++ b/tests/migration/x86-a-b-bootblock.S
-> @@ -12,6 +12,7 @@
->  #
->  # Author: dgilbert@redhat.com
->  
-> +#include "migration-test.h"
->  
->  .code16
->  .org 0x7c00
-> @@ -45,11 +46,11 @@ start:             # at 0x7c00 ?
->          mov $0, %bl
->  mainloop:
->          # Start from 1MB
-> -        mov $(1024*1024),%eax
-> +        mov $X86_TEST_MEM_START,%eax
->  innerloop:
->          incb (%eax)
-> -        add $4096,%eax
-> -        cmp $(100*1024*1024),%eax
-> +        add $TEST_MEM_PAGE_SIZE,%eax
-> +        cmp $X86_TEST_MEM_END,%eax
->          jl innerloop
->  
->          inc %bl
-> diff --git a/tests/migration/x86-a-b-bootblock.h b/tests/migration/x86-a-b-bootblock.h
-> index 9e8e2e028b..44e4b99506 100644
-> --- a/tests/migration/x86-a-b-bootblock.h
-> +++ b/tests/migration/x86-a-b-bootblock.h
-> @@ -1,5 +1,5 @@
->  /* This file is automatically generated from
-> - * tests/migration/x86-a-b-bootblock.s, edit that and then run
-> + * tests/migration/x86-a-b-bootblock.S, edit that and then run
->   * "make x86-a-b-bootblock.h" inside tests/migration to update,
->   * and then remember to send both in your patch submission.
->   */
-> -- 
-> 2.14.3
-> 
->
-
-I added a new suggestion to this patch, but it's not a deal breaker for
-me, so
-
-Reviewed-by: Andrew Jones <drjones@redhat.com>
