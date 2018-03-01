@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1erL62-0005FI-Ge
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:05:56 -0500
+	(envelope-from <kraxel@redhat.com>) id 1erL62-0005FN-Ho
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:05:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1erL5y-00050T-Bn
+	(envelope-from <kraxel@redhat.com>) id 1erL5z-00052E-Ky
 	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:05:54 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60224 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42160 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1erL5y-000504-7i
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:05:50 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1erL5z-00051h-H5
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 05:05:51 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D798D40FB650
-	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 10:05:49 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 261A417CEF3
+	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 10:05:51 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  1 Mar 2018 11:05:42 +0100
-Message-Id: <20180301100547.18962-9-kraxel@redhat.com>
+Date: Thu,  1 Mar 2018 11:05:40 +0100
+Message-Id: <20180301100547.18962-7-kraxel@redhat.com>
 In-Reply-To: <20180301100547.18962-1-kraxel@redhat.com>
 References: <20180301100547.18962-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 08/13] configure: add X11 vars to
- config-host.mak
+Subject: [Qemu-devel] [PATCH v2 06/13] console: add and use
+ qemu_display_find_default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +31,85 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Simplifies handling the X11 dependency,
-also makes ui/Makefile.objs more readable.
+Using the new display registry instead of #ifdefs in vl.c.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- configure        | 10 ++++++++--
- ui/Makefile.objs |  5 ++++-
- 2 files changed, 12 insertions(+), 3 deletions(-)
+ include/ui/console.h |  1 +
+ ui/console.c         | 19 +++++++++++++++++++
+ vl.c                 | 15 +++++----------
+ 3 files changed, 25 insertions(+), 10 deletions(-)
 
-diff --git a/configure b/configure
-index 39f3a43001..f6dc1c92b3 100755
---- a/configure
-+++ b/configure
-@@ -2509,9 +2509,8 @@ fi
+diff --git a/include/ui/console.h b/include/ui/console.h
+index 94726cf190..3a53db9360 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -441,6 +441,7 @@ struct QemuDisplay {
+ };
  
- ##########################################
- # X11 probe
--x11_cflags=
--x11_libs=-lX11
- if $pkg_config --exists "x11"; then
-+    have_x11=yes
-     x11_cflags=$($pkg_config --cflags x11)
-     x11_libs=$($pkg_config --libs x11)
- fi
-@@ -2544,6 +2543,7 @@ if test "$gtk" != "no"; then
-         gtk_libs=$($pkg_config --libs $gtkpackage)
-         gtk_version=$($pkg_config --modversion $gtkpackage)
-         if $pkg_config --exists "$gtkx11package >= $gtkversion"; then
-+            need_x11=yes
-             gtk_cflags="$gtk_cflags $x11_cflags"
-             gtk_libs="$gtk_libs $x11_libs"
-         fi
-@@ -2912,6 +2912,7 @@ if test "$sdl" = "yes" ; then
- int main(void) { return 0; }
- EOF
-   if compile_prog "$sdl_cflags $x11_cflags" "$sdl_libs $x11_libs" ; then
-+    need_x11=yes
-     sdl_cflags="$sdl_cflags $x11_cflags"
-     sdl_libs="$sdl_libs $x11_libs"
-   fi
-@@ -6024,6 +6025,11 @@ if test "$modules" = "yes"; then
-   echo "CONFIG_STAMP=_$( (echo $qemu_version; echo $pkgversion; cat $0) | $shacmd - | cut -f1 -d\ )" >> $config_host_mak
-   echo "CONFIG_MODULES=y" >> $config_host_mak
- fi
-+if test "$have_x11" = "yes" -a "$need_x11" = "yes"; then
-+  echo "CONFIG_X11=y" >> $config_host_mak
-+  echo "X11_CFLAGS=$x11_cflags" >> $config_host_mak
-+  echo "X11_LIBS=$x11_libs" >> $config_host_mak
-+fi
- if test "$sdl" = "yes" ; then
-   echo "CONFIG_SDL=y" >> $config_host_mak
-   echo "CONFIG_SDLABI=$sdlabi" >> $config_host_mak
-diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index ced7d91a63..9b725b07aa 100644
---- a/ui/Makefile.objs
-+++ b/ui/Makefile.objs
-@@ -17,7 +17,10 @@ common-obj-$(CONFIG_CURSES) += curses.o
- common-obj-$(CONFIG_VNC) += $(vnc-obj-y)
- common-obj-$(call lnot,$(CONFIG_VNC)) += vnc-stubs.o
- common-obj-$(CONFIG_GTK) += gtk.o
--common-obj-$(if $(CONFIG_WIN32),n,$(if $(CONFIG_SDL),y,$(CONFIG_GTK))) += x_keymap.o
+ void qemu_display_register(QemuDisplay *ui);
++bool qemu_display_find_default(DisplayOptions *opts);
+ void qemu_display_early_init(DisplayOptions *opts);
+ void qemu_display_init(DisplayState *ds, DisplayOptions *opts);
+ 
+diff --git a/ui/console.c b/ui/console.c
+index a11b120fc8..25d342cdcb 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -2188,6 +2188,25 @@ void qemu_display_register(QemuDisplay *ui)
+     dpys[ui->type] = ui;
+ }
+ 
++bool qemu_display_find_default(DisplayOptions *opts)
++{
++    static DisplayType prio[] = {
++        DISPLAY_TYPE_GTK,
++        DISPLAY_TYPE_SDL,
++        DISPLAY_TYPE_COCOA
++    };
++    int i;
 +
-+common-obj-$(CONFIG_X11) += x_keymap.o
-+x_keymap.o-cflags := $(X11_CFLAGS)
-+x_keymap.o-libs := $(X11_LIBS)
- 
- ifeq ($(CONFIG_SDLABI),1.2)
- sdl.mo-objs := sdl.o sdl_zoom.o
++    for (i = 0; i < ARRAY_SIZE(prio); i++) {
++        if (dpys[prio[i]] == NULL) {
++            continue;
++        }
++        opts->type = prio[i];
++        return true;
++    }
++    return false;
++}
++
+ void qemu_display_early_init(DisplayOptions *opts)
+ {
+     assert(opts->type < DISPLAY_TYPE__MAX);
+diff --git a/vl.c b/vl.c
+index 47c953f8dc..59e56593f8 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4285,17 +4285,12 @@ int main(int argc, char **argv, char **envp)
+     }
+ #endif
+     if (dpy.type == DISPLAY_TYPE_DEFAULT && !display_remote) {
+-#if defined(CONFIG_GTK)
+-        dpy.type = DISPLAY_TYPE_GTK;
+-#elif defined(CONFIG_SDL)
+-        dpy.type = DISPLAY_TYPE_SDL;
+-#elif defined(CONFIG_COCOA)
+-        dpy.type = DISPLAY_TYPE_COCOA;
+-#elif defined(CONFIG_VNC)
+-        vnc_parse("localhost:0,to=99,id=default", &error_abort);
+-#else
+-        dpy.type = DISPLAY_TYPE_NONE;
++        if (!qemu_display_find_default(&dpy)) {
++            dpy.type = DISPLAY_TYPE_NONE;
++#if defined(CONFIG_VNC)
++            vnc_parse("localhost:0,to=99,id=default", &error_abort);
+ #endif
++        }
+     }
+     if (dpy.type == DISPLAY_TYPE_DEFAULT) {
+         dpy.type = DISPLAY_TYPE_NONE;
 -- 
 2.9.3
