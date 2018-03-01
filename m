@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1erQik-0000EO-G2
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:06:19 -0500
+	(envelope-from <berrange@redhat.com>) id 1erQjp-0000oW-1K
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:07:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1erQig-00082V-EU
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:06:14 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54340 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1erQjk-0000J1-T3
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:07:21 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53338 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1erQig-00080l-8J
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:06:10 -0500
-Date: Thu, 1 Mar 2018 17:06:06 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180301170606.3e7e30f3@redhat.com>
-In-Reply-To: <20180301131237.2oaiu3cioagtovhw@hz-desktop>
-References: <20180228040300.8914-1-haozhong.zhang@intel.com>
-	<20180228040300.8914-2-haozhong.zhang@intel.com>
-	<20180301114212.0cc843b3@redhat.com>
-	<20180301115651.tyzptkekkxb2p4rl@hz-desktop>
-	<20180301140107.39f30ab5@redhat.com>
-	<20180301131237.2oaiu3cioagtovhw@hz-desktop>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1erQjk-0000IG-NV
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 11:07:16 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3B361814F0CF
+	for <qemu-devel@nongnu.org>; Thu,  1 Mar 2018 16:07:13 +0000 (UTC)
+Date: Thu, 1 Mar 2018 16:07:06 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180301160706.GV14643@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180301084438.13594-1-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] hw/acpi-build: build SRAT memory
- affinity structures for DIMM devices
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180301084438.13594-1-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 00/15] qio: general non-default
+ GMainContext support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,186 +34,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Haozhong Zhang <haozhong.zhang@intel.com>
-Cc: qemu-devel@nongnu.org, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, mst@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Richard Henderson <rth@twiddle.net>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Thu, 1 Mar 2018 21:12:37 +0800
-Haozhong Zhang <haozhong.zhang@intel.com> wrote:
+On Thu, Mar 01, 2018 at 04:44:23PM +0800, Peter Xu wrote:
+> This is another preparation work for monitor OOB seires.
+> 
+> V1: http://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg06972.html
+> 
+> V2 rewrote the bottom half of the code.  The first 8 patches are
+> mostly the same, but I rewrote the last patches to solve both TLS and
+> reconnect use cases by introducing a machine_done hook for chardevs in
+> general.  So if I copy the problems:
+> 
+> - migration
+>   - incoming side: still always running on main context, while we need
+>     to be able to run some command in OOB thread [1]
+> - tcp chardev (non-tcp chardevs should all support non-NULL context now)
+>   - server listening mode: QIO net listener used [2]
+>   - TELNET session: an isolated GSource used (tcp_chr_telnet_init) [3]
+>   - when "reconnect=N" is used, QIO threaded task is used [4]
+>   - TLS session: QIO tls handshake is used (tcp_chr_tls_init) [5]
+> 
+> Problem [1-3] are still fixed in the old way, but [4-5] now are fixed
+> by using the new machine_done notifier.
 
-> On 03/01/18 14:01 +0100, Igor Mammedov wrote:
-> > On Thu, 1 Mar 2018 19:56:51 +0800
-> > Haozhong Zhang <haozhong.zhang@intel.com> wrote:
-> >   
-> > > On 03/01/18 11:42 +0100, Igor Mammedov wrote:  
-> > > > On Wed, 28 Feb 2018 12:02:58 +0800
-> > > > Haozhong Zhang <haozhong.zhang@intel.com> wrote:
-> > > >     
-> > > > > ACPI 6.2A Table 5-129 "SPA Range Structure" requires the proximity
-> > > > > domain of a NVDIMM SPA range must match with corresponding entry in
-> > > > > SRAT table.
-> > > > > 
-> > > > > The address ranges of vNVDIMM in QEMU are allocated from the
-> > > > > hot-pluggable address space, which is entirely covered by one SRAT
-> > > > > memory affinity structure. However, users can set the vNVDIMM
-> > > > > proximity domain in NFIT SPA range structure by the 'node' property of
-> > > > > '-device nvdimm' to a value different than the one in the above SRAT
-> > > > > memory affinity structure.
-> > > > > 
-> > > > > In order to solve such proximity domain mismatch, this patch builds
-> > > > > one SRAT memory affinity structure for each static-plugged DIMM device,    
-> > > > s/static-plugged/present at boot/
-> > > > since after hotplug and following reset SRAT will be recreated
-> > > > and include hotplugged DIMMs as well.    
-> > > 
-> > > Ah yes, I'll fix the message in the next version.
-> > >   
-> > > >     
-> > > > > including both PC-DIMM and NVDIMM, with the proximity domain specified
-> > > > > in '-device pc-dimm' or '-device nvdimm'.
-> > > > > 
-> > > > > The remaining hot-pluggable address space is covered by one or multiple
-> > > > > SRAT memory affinity structures with the proximity domain of the last
-> > > > > node as before.
-> > > > > 
-> > > > > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> > > > > ---
-> > > > >  hw/i386/acpi-build.c     | 50 ++++++++++++++++++++++++++++++++++++++++++++----
-> > > > >  hw/mem/pc-dimm.c         |  8 ++++++++
-> > > > >  include/hw/mem/pc-dimm.h | 10 ++++++++++
-> > > > >  3 files changed, 64 insertions(+), 4 deletions(-)
-> > > > > 
-> > > > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > > > > index deb440f286..a88de06d8f 100644
-> > > > > --- a/hw/i386/acpi-build.c
-> > > > > +++ b/hw/i386/acpi-build.c
-> > > > > @@ -2323,6 +2323,49 @@ build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
-> > > > >  #define HOLE_640K_START  (640 * 1024)
-> > > > >  #define HOLE_640K_END   (1024 * 1024)
-> > > > >  
-> > > > > +static void build_srat_hotpluggable_memory(GArray *table_data, uint64_t base,
-> > > > > +                                           uint64_t len, int default_node)
-> > > > > +{
-> > > > > +    GSList *dimms = pc_dimm_get_device_list();
-> > > > > +    GSList *ent = dimms;
-> > > > > +    PCDIMMDevice *dev;
-> > > > > +    Object *obj;
-> > > > > +    uint64_t end = base + len, addr, size;
-> > > > > +    int node;
-> > > > > +    AcpiSratMemoryAffinity *numamem;
-> > > > > +
-> > > > > +    while (base < end) {    
-> > > > It's just matter of taste but wouldn't 'for' loop be better here?
-> > > > One can see start, end and next step from the begging.    
-> > > 
-> > > will switch to a for loop
-> > >   
-> > > >     
-> > > > > +        numamem = acpi_data_push(table_data, sizeof *numamem);
-> > > > > +
-> > > > > +        if (!ent) {
-> > > > > +            build_srat_memory(numamem, base, end - base, default_node,
-> > > > > +                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
-> > > > > +            break;
-> > > > > +        }
-> > > > > +
-> > > > > +        dev = PC_DIMM(ent->data);
-> > > > > +        obj = OBJECT(dev);
-> > > > > +        addr = object_property_get_uint(obj, PC_DIMM_ADDR_PROP, NULL);
-> > > > > +        size = object_property_get_uint(obj, PC_DIMM_SIZE_PROP, NULL);
-> > > > > +        node = object_property_get_uint(obj, PC_DIMM_NODE_PROP, NULL);
-> > > > > +
-> > > > > +        if (base < addr) {
-> > > > > +            build_srat_memory(numamem, base, addr - base, default_node,
-> > > > > +                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
-> > > > > +            numamem = acpi_data_push(table_data, sizeof *numamem);
-> > > > > +        }
-> > > > > +        build_srat_memory(numamem, addr, size, node,
-> > > > > +                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED |    
-> > > > Is NVDIMM hotplug supported in QEMU?
-> > > > If not we might need make MEM_AFFINITY_HOTPLUGGABLE conditional too.    
-> > > 
-> > > Yes, it's supported.
-> > >   
-> > > >     
-> > > > > +                          (object_dynamic_cast(obj, TYPE_NVDIMM) ?
-> > > > > +                           MEM_AFFINITY_NON_VOLATILE : 0));    
-> > > > it might be cleaner without inline flags duplication
-> > > > 
-> > > >   flags = MEM_AFFINITY_ENABLED;
-> > > >   ...
-> > > >   if (!ent) {
-> > > >       flags |= MEM_AFFINITY_HOTPLUGGABLE
-> > > >   }
-> > > >   ...
-> > > >   if (PCDIMMDeviceInfo::hotpluggable) { // see ***
-> > > >       flags |= MEM_AFFINITY_HOTPLUGGABLE
-> > > >   }
-> > > >   ...
-> > > >   if (object_dynamic_cast(obj, TYPE_NVDIMM))
-> > > >       flags |= MEM_AFFINITY_NON_VOLATILE
-> > > >   }    
-> > > 
-> > > I'm fine for such changes, except ***
-> > > 
-> > > [..]  
-> > > > > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> > > > > index 6e74b61cb6..9fd901e87a 100644
-> > > > > --- a/hw/mem/pc-dimm.c
-> > > > > +++ b/hw/mem/pc-dimm.c
-> > > > > @@ -276,6 +276,14 @@ static int pc_dimm_built_list(Object *obj, void *opaque)
-> > > > >      return 0;
-> > > > >  }
-> > > > >  
-> > > > > +GSList *pc_dimm_get_device_list(void)
-> > > > > +{
-> > > > > +    GSList *list = NULL;
-> > > > > +
-> > > > > +    object_child_foreach(qdev_get_machine(), pc_dimm_built_list, &list);
-> > > > > +    return list;
-> > > > > +}    
-> > > > (***)
-> > > > see http://lists.gnu.org/archive/html/qemu-ppc/2018-02/msg00271.html
-> > > > You could do that in separate patch, so that it won't matter
-> > > > whose patch got merged first and it won't affect the rest of patches.    
-> > > 
-> > > Sure, I can separate this part, but I would still like to use a list
-> > > of PCDIMMDevice rather than a list of MemoryDeviceInfo. The latter
-> > > would need to be extended to include NVDIMM information (e.g., adding
-> > > a NVDIMMDeviceInfo to the union).  
-> > You don't have to add NVDIMMDeviceInfo until there would be
-> > need to expose NVDIMM specific information.  
-> 
-> Well, I need to know whether a memory device is NVDIMM in order to
-> decide whether the non-volatile flag is need in SRAT.
-Maybe we should add NVDIMMDeviceInfo after all,
-extra benefit of it would be that HMP 'info memory-devices' and
-QMP query-memory-devices would show correct device type.
+The QIO code changes all look good to me know, aside from minor
+comments. I really dislike all of the chardev stuff though. I
+think it makes the chardev code even harder to follow & rationalize
+behaviour of.
 
-We can do something like this for starters
+If you post a v3 series contaning just the qio/ directory changes,
+I'd queue those patches, while we discuss chardev stuff more.
 
-+##
-+# @NVDIMMDeviceInfo:
-+#
-+# 'nvdimm' device state information
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'NVDIMMDeviceInfo',
-+   'base': 'PCDIMMDeviceInfo',
-+   'data': {}
-+}
+I struggle to suggest better approach, because its any missing
+context of how the changes are going to be used, presumably by
+patch series yet to be posted. 
 
-and later extend 'data' section with nvdimm specific data when necessary
- 
-> > qmp_pc_dimm_device_list() API is sufficient in this case
-> > (modulo missing sorting).  
-> 
-> sorting is not a big issue and can be easily added by using
-> pc_dimm_built_list in qmp_pc_dimm_device_list().
-> 
-> Haozhong
-> 
-> > 
-> > Suggestion has been made to keep number of public APIs that do
-> > almost the same at minimum.  
-> 
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
