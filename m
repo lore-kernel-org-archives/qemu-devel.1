@@ -1,40 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.vnet.ibm.com>) id 1ermeM-0007GS-2Z
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 10:31:11 -0500
+	(envelope-from <eblake@redhat.com>) id 1ermfU-0007nJ-9L
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 10:32:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.vnet.ibm.com>) id 1ermeI-0000bM-Rq
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 10:31:10 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41242
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.vnet.ibm.com>)
-	id 1ermeI-0000ag-L3
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 10:31:06 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w22FTH33127500
-	for <qemu-devel@nongnu.org>; Fri, 2 Mar 2018 10:31:02 -0500
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2gf8ww12st-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 10:31:02 -0500
-Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <alifm@linux.vnet.ibm.com>;
-	Fri, 2 Mar 2018 10:31:01 -0500
-References: <079a5da7-6586-b974-6b99-e5de055b1bd1@linux.vnet.ibm.com>
-	<20180302092318.GA6026@stefanha-x1.localdomain>
-From: Farhan Ali <alifm@linux.vnet.ibm.com>
-Date: Fri, 2 Mar 2018 10:30:57 -0500
+	(envelope-from <eblake@redhat.com>) id 1ermfR-00010o-09
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 10:32:20 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41572 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ermfQ-00010e-Qf
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 10:32:16 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3B0D88D753
+	for <qemu-devel@nongnu.org>; Fri,  2 Mar 2018 15:32:13 +0000 (UTC)
+Received: from red.redhat.com (ovpn-122-122.rdu2.redhat.com [10.10.122.122])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E1D2320A846E
+	for <qemu-devel@nongnu.org>; Fri,  2 Mar 2018 15:32:08 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Fri,  2 Mar 2018 09:31:34 -0600
+Message-Id: <20180302153205.9107-1-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180302092318.GA6026@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <6a3461c2-368d-1aa1-5b86-a6a602251829@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [BUG] I/O thread segfault for QEMU on s390x
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v3 00/30] QAPI patches for 2018-03-01
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,97 +33,272 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mreitz@redhat.com, famz@redhat.com, QEMU Developers <qemu-devel@nongnu.org>, "open list:virtio-ccw" <qemu-s390x@nongnu.org>
+To: qemu-devel@nongnu.org
 
+The following changes since commit 2e7b766594e17f786a6b2e5be690bc5b43ce60=
+36:
 
+  Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2018-03-01' i=
+nto staging (2018-03-02 12:39:13 +0000)
 
-On 03/02/2018 04:23 AM, Stefan Hajnoczi wrote:
-> On Thu, Mar 01, 2018 at 09:33:35AM -0500, Farhan Ali wrote:
->> Hi,
->>
->> I have been noticing some segfaults for QEMU on s390x, and I have been
->> hitting this issue quite reliably (at least once in 10 runs of a test case).
->> The qemu version is 2.11.50, and I have systemd created coredumps
->> when this happens.
->>
->> Here is a back trace of the segfaulting thread:
-> The backtrace looks normal.
-> 
-> Please post the QEMU command-line and the details of the segfault (which
-> memory access faulted?).
-> 
+are available in the Git repository at:
 
+  git://repo.or.cz/qemu/ericb.git tags/pull-qapi-2018-03-01-v3
 
-I was able to create another crash today and here is the qemu comand line
+for you to fetch changes up to cfe6a7fc6da20349ef62966c437f18ed6c49fcd5:
 
-/usr/bin/qemu-kvm -name guest=sles,debug-threads=on \
--S -object 
-secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-2-sles/master-key.aes 
-\
--machine s390-ccw-virtio-2.12,accel=kvm,usb=off,dump-guest-core=off \
--m 4096 -realtime mlock=off -smp 8,sockets=8,cores=1,threads=1 \
--object iothread,id=iothread1 -object iothread,id=iothread2 -uuid 
-b83a596b-3a1a-4ac9-9f3e-d9a4032ee52c \
--display none -no-user-config -nodefaults -chardev 
-socket,id=charmonitor,path=/var/lib/libvirt/qemu/domain-2-sles/monitor.sock,server,nowait 
+  qapi: Don't create useless directory qapi-generated (2018-03-02 09:01:4=
+0 -0600)
 
--mon chardev=charmonitor,id=monitor,mode=control -rtc base=utc 
--no-shutdown \
--boot strict=on -drive 
-file=/dev/mapper/360050763998b0883980000002400002b,format=raw,if=none,id=drive-virtio-disk0,cache=none,aio=native 
--device 
-virtio-blk-ccw,iothread=iothread1,scsi=off,devno=fe.0.0001,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1 
--drive 
-file=/dev/mapper/360050763998b0883980000002800002f,format=raw,if=none,id=drive-virtio-disk1,cache=none,aio=native 
--device 
-virtio-blk-ccw,iothread=iothread2,scsi=off,devno=fe.0.0002,drive=drive-virtio-disk1,id=virtio-disk1 
--netdev tap,fd=24,id=hostnet0,vhost=on,vhostfd=26 -device 
-virtio-net-ccw,netdev=hostnet0,id=net0,mac=02:38:a6:36:e8:1f,devno=fe.0.0000 
--chardev pty,id=charconsole0 -device 
-sclpconsole,chardev=charconsole0,id=console0 -device 
-virtio-balloon-ccw,id=balloon0,devno=fe.3.ffba -msg timestamp=on
+v3: (attempt to) fix warnings about empty .o files on OSX toolchain [Pete=
+r]
+(sending just the changed patch)
 
+----------------------------------------------------------------
+qapi patches for 2018-03-01
 
-This the latest back trace on the segfaulting thread, and it seems to 
-segfault in swapcontext.
+- Markus Armbruster: Modularize generated QAPI code
 
-Program terminated with signal SIGSEGV, Segmentation fault.
-#0  0x000003ff8595202c in swapcontext () from /lib64/libc.so.6
+----------------------------------------------------------------
+Eric Blake (1):
+      watchdog: Consolidate QAPI into single file
 
+Markus Armbruster (29):
+      Include qapi/qmp/qerror.h exactly where needed
+      qapi: Streamline boilerplate comment generation
+      qapi: Generate up-to-date copyright notice
+      qapi: Rename variable holding the QAPISchemaGenFOOVisitor
+      qapi: New classes QAPIGenC, QAPIGenH, QAPIGenDoc
+      qapi: Reduce use of global variables in generators some
+      qapi: Turn generators into modules
+      qapi-gen: New common driver for code and doc generators
+      qapi-gen: Convert from getopt to argparse
+      qapi: Touch generated files only when they change
+      qapi: Improve include file name reporting in error messages
+      qapi/common: Eliminate QAPISchema.exprs
+      qapi: Lift error reporting from QAPISchema.__init__() to callers
+      qapi: Concentrate QAPISchemaParser.exprs updates in .__init__()
+      qapi: Record 'include' directives in parse tree
+      qapi: Generate in source order
+      qapi: Record 'include' directives in intermediate representation
+      qapi: Rename generated qmp-marshal.c to qmp-commands.c
+      qapi: Make code-generating visitors use QAPIGen more
+      qapi/types qapi/visit: Generate built-in stuff into separate files
+      qapi/common: Fix guardname() for funny filenames
+      qapi: Generate separate .h, .c for each module
+      Include less of the generated modular QAPI headers
+      qapi: Empty out qapi-schema.json
+      docs/devel/writing-qmp-commands: Update for modular QAPI
+      docs: Correct outdated information on QAPI
+      qapi: Move qapi-schema.json to qapi/, rename generated files
+      Fix up dangling references to qmp-commands.* in comment and doc
+      qapi: Don't create useless directory qapi-generated
 
-This is the remaining back trace:
+ docs/devel/qapi-code-gen.txt                       | 124 ++++---
+ docs/devel/writing-qmp-commands.txt                |  39 +--
+ docs/interop/qmp-intro.txt                         |   3 +-
+ docs/xen-save-devices-state.txt                    |   3 +-
+ tests/qapi-schema/doc-good.texi                    |   3 +-
+ configure                                          |   1 -
+ Makefile                                           | 233 ++++++++++---
+ Makefile.objs                                      |  80 ++++-
+ qapi-schema.json =3D> qapi/misc.json                 | 105 +-----
+ qapi/qapi-schema.json                              |  95 ++++++
+ qapi/run-state.json                                |   9 +
+ include/qapi/visitor.h                             |   2 +-
+ scripts/qapi-gen.py                                |  57 ++++
+ scripts/qapi/__init__.py                           |   0
+ scripts/{qapi-commands.py =3D> qapi/commands.py}     | 155 ++++-----
+ scripts/{qapi.py =3D> qapi/common.py}                | 375 +++++++++++++=
+--------
+ scripts/{qapi2texi.py =3D> qapi/doc.py}              |  92 +++--
+ scripts/{qapi-event.py =3D> qapi/events.py}          | 128 +++----
+ scripts/{qapi-introspect.py =3D> qapi/introspect.py} | 123 +++----
+ scripts/{qapi-types.py =3D> qapi/types.py}           | 185 ++++------
+ scripts/{qapi-visit.py =3D> qapi/visit.py}           | 189 ++++-------
+ crypto/cipherpriv.h                                |   2 +-
+ include/block/block.h                              |   2 +-
+ include/block/dirty-bitmap.h                       |   2 +-
+ include/block/nbd.h                                |   2 +-
+ include/chardev/char.h                             |   1 +
+ include/crypto/cipher.h                            |   2 +-
+ include/crypto/hash.h                              |   2 +-
+ include/crypto/hmac.h                              |   2 +-
+ include/crypto/secret.h                            |   1 +
+ include/crypto/tlscreds.h                          |   1 +
+ include/hw/block/block.h                           |   2 +-
+ include/hw/block/fdc.h                             |   2 +-
+ include/hw/ppc/spapr_drc.h                         |   1 +
+ include/hw/qdev-properties.h                       |   2 +
+ include/io/dns-resolver.h                          |   1 +
+ include/migration/colo.h                           |   2 +-
+ include/migration/failover.h                       |   2 +-
+ include/migration/global_state.h                   |   1 +
+ include/monitor/monitor.h                          |   1 +
+ include/net/filter.h                               |   1 +
+ include/net/net.h                                  |   2 +-
+ include/qapi/clone-visitor.h                       |   1 -
+ include/qapi/error.h                               |   2 +-
+ include/qapi/qmp/qobject.h                         |   2 +-
+ include/qemu/sockets.h                             |   2 +-
+ include/qemu/throttle.h                            |   2 +-
+ include/qom/cpu.h                                  |   1 +
+ include/qom/object.h                               |   2 +-
+ include/sysemu/arch_init.h                         |   2 +-
+ include/sysemu/balloon.h                           |   2 +-
+ include/sysemu/dump.h                              |   2 +
+ include/sysemu/hostmem.h                           |   1 +
+ include/sysemu/replay.h                            |   2 +
+ include/sysemu/sysemu.h                            |   1 +
+ include/sysemu/tpm.h                               |   1 +
+ include/sysemu/watchdog.h                          |   2 +-
+ include/ui/console.h                               |   1 +
+ include/ui/input.h                                 |   2 +-
+ migration/migration.h                              |   1 +
+ migration/ram.h                                    |   2 +-
+ net/tap_int.h                                      |   2 +-
+ replication.h                                      |   1 +
+ ui/vnc.h                                           |   1 +
+ vl.c                                               |   8 +-
+ arch_init.c                                        |   2 +-
+ backends/cryptodev.c                               |   1 -
+ backends/hostmem.c                                 |   3 +-
+ balloon.c                                          |   2 +-
+ block.c                                            |   2 -
+ block/block-backend.c                              |   2 +-
+ block/crypto.c                                     |   2 +-
+ block/iscsi.c                                      |   2 +-
+ block/nbd.c                                        |   2 +-
+ block/nfs.c                                        |   2 +-
+ block/qapi.c                                       |   4 +-
+ block/qcow2.c                                      |   4 +-
+ block/quorum.c                                     |   2 +-
+ block/sheepdog.c                                   |   2 +-
+ block/ssh.c                                        |   2 +-
+ block/throttle-groups.c                            |   2 +-
+ block/write-threshold.c                            |   4 +-
+ blockdev-nbd.c                                     |   2 +-
+ blockdev.c                                         |   5 +-
+ blockjob.c                                         |   2 +-
+ chardev/char-fe.c                                  |   2 +-
+ chardev/char-ringbuf.c                             |   2 +-
+ chardev/char-socket.c                              |   1 +
+ chardev/char.c                                     |   4 +-
+ cpus.c                                             |   4 +-
+ dump.c                                             |   4 +-
+ hmp.c                                              |  12 +-
+ hw/acpi/core.c                                     |   4 +-
+ hw/acpi/cpu.c                                      |   2 +-
+ hw/acpi/memory_hotplug.c                           |   2 +-
+ hw/acpi/vmgenid.c                                  |   2 +-
+ hw/block/block.c                                   |   1 +
+ hw/block/hd-geometry.c                             |   1 +
+ hw/char/virtio-console.c                           |   2 +-
+ hw/core/machine.c                                  |   2 +-
+ hw/core/qdev.c                                     |   2 +-
+ hw/i386/pc.c                                       |   2 +-
+ hw/i386/xen/xen-hvm.c                              |   2 +-
+ hw/ipmi/ipmi.c                                     |   2 +-
+ hw/mem/nvdimm.c                                    |   1 -
+ hw/net/rocker/qmp-norocker.c                       |   2 +-
+ hw/net/rocker/rocker.c                             |   2 +-
+ hw/net/rocker/rocker_fp.c                          |   2 +-
+ hw/net/rocker/rocker_of_dpa.c                      |   2 +-
+ hw/net/virtio-net.c                                |   2 +-
+ hw/pci/pci-stub.c                                  |   2 +-
+ hw/pci/pci.c                                       |   2 +-
+ hw/ppc/spapr_rtas.c                                |   1 -
+ hw/ppc/spapr_rtc.c                                 |   2 +-
+ hw/s390x/s390-skeys.c                              |   2 +-
+ hw/timer/mc146818rtc.c                             |   4 +-
+ hw/tpm/tpm_emulator.c                              |   1 +
+ hw/tpm/tpm_passthrough.c                           |   1 +
+ hw/virtio/virtio-balloon.c                         |   2 +-
+ hw/watchdog/watchdog.c                             |   4 +-
+ io/channel-socket.c                                |   1 +
+ io/dns-resolver.c                                  |   1 +
+ iothread.c                                         |   2 +-
+ migration/colo-failover.c                          |   2 +-
+ migration/colo.c                                   |   2 +-
+ migration/migration.c                              |   4 +-
+ migration/ram.c                                    |   2 +-
+ migration/savevm.c                                 |   3 +-
+ monitor.c                                          |   8 +-
+ net/colo-compare.c                                 |   1 -
+ net/filter-buffer.c                                |   2 +-
+ net/filter-mirror.c                                |   1 -
+ net/filter-rewriter.c                              |   1 -
+ net/net.c                                          |   4 +-
+ net/vhost-user.c                                   |   2 +-
+ numa.c                                             |   4 +-
+ qdev-monitor.c                                     |   2 +-
+ qemu-img.c                                         |   2 +-
+ qga/commands-posix.c                               |   2 +-
+ qga/commands-win32.c                               |   2 +-
+ qga/commands.c                                     |   2 +-
+ qga/main.c                                         |   2 +-
+ qmp.c                                              |  18 +-
+ qom/object.c                                       |   2 +-
+ qom/object_interfaces.c                            |   2 +-
+ replay/replay-input.c                              |   1 +
+ stubs/tpm.c                                        |   3 +-
+ stubs/uuid.c                                       |   2 +-
+ stubs/vmgenid.c                                    |   2 +-
+ stubs/xen-hvm.c                                    |   2 +-
+ target/arm/monitor.c                               |   3 +-
+ target/i386/cpu.c                                  |   4 +-
+ target/s390x/cpu.c                                 |   3 +-
+ target/s390x/kvm.c                                 |   1 -
+ target/s390x/sigp.c                                |   1 +
+ tests/qmp-test.c                                   |   3 +-
+ tests/test-char.c                                  |   2 +-
+ tests/{test-qmp-commands.c =3D> test-qmp-cmds.c}     |   2 +-
+ tests/test-qmp-event.c                             |   3 +-
+ tests/test-qobject-input-visitor.c                 |   8 +-
+ tests/test-visitor-serialization.c                 |   1 -
+ tpm.c                                              |   5 +-
+ trace/qmp.c                                        |   2 +-
+ ui/console.c                                       |   2 +-
+ ui/gtk.c                                           |   2 +-
+ ui/input-legacy.c                                  |   2 +-
+ ui/input.c                                         |   2 +-
+ ui/spice-core.c                                    |   4 +-
+ ui/vnc.c                                           |   4 +-
+ util/qemu-config.c                                 |   2 +-
+ util/qemu-sockets.c                                |   2 +-
+ .gitignore                                         |  80 ++++-
+ qga/Makefile.objs                                  |   2 +-
+ tests/.gitignore                                   |   9 +-
+ tests/Makefile.include                             |  70 ++--
+ tests/qapi-schema/comments.out                     |   3 +-
+ tests/qapi-schema/doc-bad-section.out              |   5 +-
+ tests/qapi-schema/doc-good.out                     |  33 +-
+ tests/qapi-schema/empty.out                        |   2 +-
+ tests/qapi-schema/event-case.out                   |   3 +-
+ tests/qapi-schema/ident-with-escape.out            |   7 +-
+ tests/qapi-schema/include-no-file.err              |   2 +-
+ tests/qapi-schema/include-relpath.out              |   7 +-
+ tests/qapi-schema/include-repetition.out           |  12 +-
+ tests/qapi-schema/include-simple.out               |   5 +-
+ tests/qapi-schema/indented-expr.out                |   3 +-
+ tests/qapi-schema/qapi-schema-test.out             | 321 +++++++++------=
+---
+ tests/qapi-schema/test-qapi.py                     |  19 +-
+ ui/cocoa.m                                         |   2 +-
+ 189 files changed, 1576 insertions(+), 1363 deletions(-)
+ rename qapi-schema.json =3D> qapi/misc.json (95%)
+ create mode 100644 qapi/qapi-schema.json
+ create mode 100755 scripts/qapi-gen.py
+ create mode 100644 scripts/qapi/__init__.py
+ rename scripts/{qapi-commands.py =3D> qapi/commands.py} (67%)
+ rename scripts/{qapi.py =3D> qapi/common.py} (89%)
+ rename scripts/{qapi2texi.py =3D> qapi/doc.py} (78%)
+ mode change 100755 =3D> 100644
+ rename scripts/{qapi-event.py =3D> qapi/events.py} (61%)
+ rename scripts/{qapi-introspect.py =3D> qapi/introspect.py} (71%)
+ rename scripts/{qapi-types.py =3D> qapi/types.py} (53%)
+ rename scripts/{qapi-visit.py =3D> qapi/visit.py} (64%)
+ rename tests/{test-qmp-commands.c =3D> test-qmp-cmds.c} (99%)
 
-#0  0x000003ff8595202c in swapcontext () from /lib64/libc.so.6
-#1  0x000002aa33b45566 in qemu_coroutine_new () at 
-util/coroutine-ucontext.c:164
-#2  0x000002aa33b43eac in qemu_coroutine_create 
-(entry=entry@entry=0x2aa33a94c98 <blk_aio_write_entry>, 
-opaque=opaque@entry=0x3ff74018be0) at util/qemu-coroutine.c:76
-#3  0x000002aa33a954da in blk_aio_prwv (blk=0x2aa4f0efda0, 
-offset=<optimized out>, bytes=<optimized out>, qiov=0x3ff74019080, 
-co_entry=co_entry@entry=0x2aa33a94c98 <blk_aio_write_entry>, flags=0,
-     cb=0x2aa338c62e8 <virtio_blk_rw_complete>, opaque=0x3ff74019020) at 
-block/block-backend.c:1299
-#4  0x000002aa33a9563e in blk_aio_pwritev (blk=<optimized out>, 
-offset=<optimized out>, qiov=<optimized out>, flags=<optimized out>, 
-cb=<optimized out>, opaque=0x3ff74019020) at block/block-backend.c:1400
-#5  0x000002aa338c6a38 in submit_requests (niov=<optimized out>, 
-num_reqs=1, start=<optimized out>, mrb=0x3ff831fe6e0, blk=<optimized 
-out>) at /usr/src/debug/qemu-2.11.50/hw/block/virtio-blk.c:369
-#6  virtio_blk_submit_multireq (blk=<optimized out>, 
-mrb=mrb@entry=0x3ff831fe6e0) at 
-/usr/src/debug/qemu-2.11.50/hw/block/virtio-blk.c:426
-#7  0x000002aa338c7b78 in virtio_blk_handle_vq (s=0x2aa4f2507c8, 
-vq=0x3ff869df010) at /usr/src/debug/qemu-2.11.50/hw/block/virtio-blk.c:620
-#8  0x000002aa338ebdf2 in virtio_queue_notify_aio_vq (vq=0x3ff869df010) 
-at /usr/src/debug/qemu-2.11.50/hw/virtio/virtio.c:1515
-#9  0x000002aa33b2df46 in aio_dispatch_handlers 
-(ctx=ctx@entry=0x2aa4f0ca050) at util/aio-posix.c:406
-#10 0x000002aa33b2eb50 in aio_poll (ctx=0x2aa4f0ca050, 
-blocking=blocking@entry=true) at util/aio-posix.c:692
-#11 0x000002aa33957f6a in iothread_run (opaque=0x2aa4f0c9630) at 
-iothread.c:60
-#12 0x000003ff86987e82 in start_thread () from /lib64/libpthread.so.0
-#13 0x000003ff85a11596 in thread_start () from /lib64/libc.so.6
-Backtrace stopped: previous frame identical to this frame (corrupt stack?)
+--=20
+2.14.3
