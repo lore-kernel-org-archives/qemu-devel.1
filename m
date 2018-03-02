@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erXnS-0000Zg-6J
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 18:39:35 -0500
+	(envelope-from <alistai@xilinx.com>) id 1erYWK-0000Fk-6e
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 19:25:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erXnR-0003q7-Ay
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 18:39:34 -0500
-References: <cover.1519921268.git.berto@igalia.com>
-	<d58bbc353563bb9c83ffe90faaa36fadf683e332.1519921268.git.berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1c6863d4-1e0f-bed5-ac3f-8a48606a0a69@redhat.com>
-Date: Thu, 1 Mar 2018 17:39:08 -0600
+	(envelope-from <alistai@xilinx.com>) id 1erYWH-0000pQ-2w
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 19:25:56 -0500
+Received: from mail-sn1nam01on0058.outbound.protection.outlook.com
+	([104.47.32.58]:36841
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1erYWG-0000oz-OS
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 19:25:52 -0500
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Thu, 1 Mar 2018 16:20:57 -0800
+Message-ID: <e2a29860b0eb2591e16a83178e305828d1b0b730.1519950018.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <d58bbc353563bb9c83ffe90faaa36fadf683e332.1519921268.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/7] qcow2: Check L1 table parameters in
- qcow2_expand_zero_clusters()
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v1 1/1] target/arm: Fix the A53 L2CTLR typo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,35 +25,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com
 
-On 03/01/2018 10:27 AM, Alberto Garcia wrote:
-> This function iterates over all snapshots of a qcow2 file in order to
-> expand all zero clusters, but it does not validate the snapshots' L1
-> tables first.
-> 
-> We now have a function to take care of this, so let's use it.
-> 
-> We can also take the opportunity to replace the sector-based
-> bdrv_read() with bdrv_pread().
+The cortex A53 TRM specifices that bits 24 and 25 of the L2CTLR register
+specify the number of cores present and not the number of processors. We
+have correctly been reporting the number of cores, so just fix the
+comment to match the TRM.
 
-Doesn't my pending patch do that as well?
-https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06799.html
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+---
 
-I guess it remains to be seen in what order these patches are merged.
+ target/arm/cpu64.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->   block/qcow2-cluster.c      | 20 +++++++++++++-------
->   tests/qemu-iotests/080     |  2 ++
->   tests/qemu-iotests/080.out |  2 ++
->   3 files changed, 17 insertions(+), 7 deletions(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 9743bdc8c3..aac1746efe 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -42,7 +42,7 @@ static inline void unset_feature(CPUARMState *env, int feature)
+ #ifndef CONFIG_USER_ONLY
+ static uint64_t a57_a53_l2ctlr_read(CPUARMState *env, const ARMCPRegInfo *ri)
+ {
+-    /* Number of processors is in [25:24]; otherwise we RAZ */
++    /* Number of cores is in [25:24]; otherwise we RAZ */
+     return (smp_cpus - 1) << 24;
+ }
+ #endif
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.14.1
