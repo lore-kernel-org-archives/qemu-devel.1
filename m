@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erjxf-0002Ag-Ma
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 07:38:56 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1erjz4-00031h-0w
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 07:40:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erjxe-00021K-AW
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 07:38:55 -0500
-Received: from mail-ot0-x22f.google.com ([2607:f8b0:4003:c0f::22f]:42444)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1erjxe-0001zO-5I
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 07:38:54 -0500
-Received: by mail-ot0-x22f.google.com with SMTP id l5so8559246otf.9
-	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 04:38:53 -0800 (PST)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1erjz2-0003wr-Tb
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 07:40:21 -0500
+References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
+	<1518702707-7077-2-git-send-email-vsementsov@virtuozzo.com>
+	<b4c52fa6-67a3-da9d-b4e1-bfdc21ee9a88@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <73c70336-ad2e-8889-b668-930170cf5209@virtuozzo.com>
+Date: Fri, 2 Mar 2018 15:40:09 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180302013007.11827-1-eblake@redhat.com>
-References: <20180302013007.11827-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 2 Mar 2018 12:38:32 +0000
-Message-ID: <CAFEAcA94aLXy8Zy5hjLMH5=x3LG5Z5icpzYJ+tHazFw3YQ_d4Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/30] QAPI patches for 2018-03-01
+In-Reply-To: <b4c52fa6-67a3-da9d-b4e1-bfdc21ee9a88@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 1/9] nbd/server: add nbd_opt_invalid helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,92 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On 2 March 2018 at 01:29, Eric Blake <eblake@redhat.com> wrote:
-> The following changes since commit 0dc8ae5e8e693737dfe65ba02d0c6eccb58a9c67:
+16.02.2018 01:01, Eric Blake wrote:
+> On 02/15/2018 07:51 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> NBD_REP_ERR_INVALID is often parameter to nbd_opt_drop and it would
+>> be used more in following patches. So, let's add a helper.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>> =C2=A0 nbd/server.c | 50 ++++++++++++++++++++++++++++++++++++-----------=
+---
+>> =C2=A0 1 file changed, 36 insertions(+), 14 deletions(-)
 >
->   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180301-v2' into staging (2018-03-01 17:08:16 +0000)
+> More than twice the lines added compared to what was removed, so it's=20
+> a tough call whether this refactoring makes a common pattern easier or=20
+> just adds burden in tracing what gets executed, just to remove a=20
+> parameter.=C2=A0 I'm not opposed to the patch, but want to see how it hel=
+ps=20
+> the rest of the series.
 >
-> are available in the Git repository at:
+> At any rate, the conversion itself is done correctly, so if we keep=20
+> the patch, it has earned:
 >
->   git://repo.or.cz/qemu/ericb.git tags/pull-qapi-2018-03-01-v2
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 >
-> for you to fetch changes up to 76b2baeed38089c19f69c7117b8eaa64b0e7d227:
 >
->   qapi: Don't create useless directory qapi-generated (2018-03-01 19:16:40 -0600)
+>> =C2=A0 +static int GCC_FMT_ATTR(4, 5)
+>> +nbd_opt_drop(NBDClient *client, uint32_t type, Error **errp,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 const char *fmt, ...)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 int ret;
+>> +=C2=A0=C2=A0=C2=A0 va_list va;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 va_start(va, fmt);
+>> +=C2=A0=C2=A0=C2=A0 ret =3D nbd_opt_vdrop(client, type, errp, fmt, va);
+>> +=C2=A0=C2=A0=C2=A0 va_end(va);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 return ret;
+>> +}
+>> +
+>> +static int GCC_FMT_ATTR(3, 4)
+>> +nbd_opt_invalid(NBDClient *client, Error **errp, const char *fmt, ...)
 >
-> v2: fix rebase on top of s390x work so that build is successful
-> (if I do it right, I'm sending just the changed patches)
+> No documentation comments?
 >
-> Again, this series will be a conflict magnet due to content motion
-> from qapi-schema.json to qapi/misc.json; hopefully, the level of
-> rebasing required is not too painful
->
-> ----------------------------------------------------------------
-> qapi patches for 2018-03-01
->
-> - Markus Armbruster: Modularize generated QAPI code
->
+the function is obvious and is near to nbd_opt_vdrop.. do we really want=20
+a comment? And, then, what about seprate comment for nbd_opt_drop?
 
-This produces a huge pile of warnings from my OSX toolchain.
-
-When running ar on libqemuutil.a:
-  AR      libqemuutil.a
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib:
-file: libqemuutil.a(qapi-types.o) has no symbols
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib:
-file: libqemuutil.a(qapi-visit.o) has no symbols
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib:
-file: libqemuutil.a(qapi-events.o) has no symbols
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib:
-file: libqemuutil.a(qapi-events-common.o) has no symbols
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib:
-file: libqemuutil.a(qapi-events-crypto.o) has no symbols
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib:
-file: libqemuutil.a(qapi-events-introspect.o) has no symbols
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib:
-file: libqemuutil.a(qapi-events-rocker.o) has no symbols
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib:
-file: libqemuutil.a(qapi-events-sockets.o) has no symbols
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib:
-file: libqemuutil.a(qapi-events-tpm.o) has no symbols
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib:
-file: libqemuutil.a(qapi-events-trace.o) has no symbols
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib:
-file: libqemuutil.a(qapi-events-transaction.o) has no symbols
-
-On every link of a binary:
-warning: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/nm:
-no name list
-warning: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/nm:
-no name list
-warning: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/nm:
-no name list
-warning: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/nm:
-no name list
-warning: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/nm:
-no name list
-warning: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/nm:
-no name list
-warning: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/nm:
-no name list
-warning: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/nm:
-no name list
-warning: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/nm:
-no name list
-warning: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/nm:
-no name list
-warning: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/nm:
-no name list
-
-I think these are related -- nm complains once for every .o file in the archive
-that doesn't have any symbols in it.
-
-I had a look at the autogenerated .c files on my Linux build, and they
-seem to consist only of a bunch of #includes. Why are we not generating
-any code here?
-
-thanks
--- PMM
+--=20
+Best regards,
+Vladimir
