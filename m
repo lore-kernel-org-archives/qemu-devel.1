@@ -1,33 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ercpW-0000ge-LC
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 00:02:03 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1erdnU-0000e3-PO
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ercpT-00014T-J3
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 00:02:02 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55732 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ercpT-00014M-EE
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 00:01:59 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EB9FB4075168
-	for <qemu-devel@nongnu.org>; Fri,  2 Mar 2018 05:01:58 +0000 (UTC)
-Date: Fri, 2 Mar 2018 13:01:51 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180302050151.GD27381@xz-mi>
-References: <20180301084438.13594-1-peterx@redhat.com>
-	<20180301084438.13594-11-peterx@redhat.com>
-	<20180301154844.GQ14643@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1erdnT-0003vm-PE
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:00 -0500
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Fri,  2 Mar 2018 17:03:26 +1100
+Message-Id: <20180302060350.24330-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180301154844.GQ14643@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 10/15] qio: non-default context for
- async conn
+Subject: [Qemu-devel] [PULL 00/24] ppc-for-2.12 queue 20180302
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,51 +20,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, groug@kaod.org, surajjs@au1.ibm.com, mark.cave-ayland@ilande.co.uk, David Gibson <david@gibson.dropbear.id.au>
 
-On Thu, Mar 01, 2018 at 03:48:44PM +0000, Daniel P. Berrang=C3=A9 wrote:
-> On Thu, Mar 01, 2018 at 04:44:33PM +0800, Peter Xu wrote:
-> > We have worked on qio_task_run_in_thread() already.  Further, let
-> > qio_channel_socket_connect_async() pass that context to it.
-> >=20
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  chardev/char-socket.c          | 4 ++--
-> >  include/io/channel-socket.h    | 4 +++-
-> >  io/channel-socket.c            | 5 +++--
-> >  migration/socket.c             | 3 ++-
-> >  tests/test-io-channel-socket.c | 2 +-
-> >  5 files changed, 11 insertions(+), 7 deletions(-)
->=20
-> > diff --git a/include/io/channel-socket.h b/include/io/channel-socket.=
-h
-> > index 53801f6042..90f7227397 100644
-> > --- a/include/io/channel-socket.h
-> > +++ b/include/io/channel-socket.h
-> > @@ -101,6 +101,7 @@ int qio_channel_socket_connect_sync(QIOChannelSoc=
-ket *ioc,
-> >   * @callback: the function to invoke on completion
-> >   * @opaque: user data to pass to @callback
-> >   * @destroy: the function to free @opaque
-> > + * @context: the context to run the async task
-> >   *
-> >   * Attempt to connect to the address @addr. This method
-> >   * will run in the background so the caller will regain
-> > @@ -113,7 +114,8 @@ void qio_channel_socket_connect_async(QIOChannelS=
-ocket *ioc,
-> >                                        SocketAddress *addr,
-> >                                        QIOTaskFunc callback,
-> >                                        gpointer opaque,
-> > -                                      GDestroyNotify destroy);
-> > +                                      GDestroyNotify destroy,
-> > +                                      GMainContext *context);
->=20
-> If you're going to add a GMainContext() to connect_async, then please
-> also do it for listen_async and dgram_async at the same time, so we
-> remain consistent in API design.
+The following changes since commit 0dc8ae5e8e693737dfe65ba02d0c6eccb58a9c=
+67:
 
-Sure.  Thanks,
+  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180301-v2' in=
+to staging (2018-03-01 17:08:16 +0000)
 
---=20
-Peter Xu
+are available in the Git repository at:
+
+  git://github.com/dgibson/qemu.git tags/ppc-for-2.12-20180302
+
+for you to fetch changes up to 57ae75b2e401f1d04f37a8cd26212eb3134c51a6:
+
+  hw/ppc/spapr,e500: Use new property "stdout-path" for boot console (201=
+8-03-02 12:24:44 +1100)
+
+----------------------------------------------------------------
+ppc patch queue 2018-03-02
+
+Here's the next batch of accumulated spapr and ppc patches.
+Highlights are:
+    * New Sam460ex machine type
+    * Yet more fixes related to vcpu id allocation for spapr
+    * Numerous macio cleanupsr
+    * Some enhancements to the Spectre/Meltdown fixes for pseries,
+      allowing use of a better mitigation for indirect branch based
+      exploits
+    * New pseries machine types with Spectre/Meltdown mitigations
+      enabled (stop gap until libvirt and management understands the
+      machine options)
+    * A handful of other fixes
+
+----------------------------------------------------------------
+BALATON Zoltan (2):
+      ppc440: Add emulation of plb-pcix controller found in some 440 SoCs
+      ppc: Add aCube Sam460ex board
+
+Greg Kurz (3):
+      spapr: fix missing CPU core nodes in DT when running with TCG
+      spapr: register dummy ICPs later
+      spapr: harden code that depends on VSMT
+
+Mark Cave-Ayland (12):
+      macio: embed DBDMA device directly within macio
+      macio: move ESCC device within the macio device
+      heathrow: QOMify heathrow PIC
+      heathrow: convert to trace-events
+      heathrow: change heathrow_pic_init() to return the heathrow device
+      macio: move macio related structures and defines into separate maci=
+o.h file
+      mac_oldworld: use object link to pass heathrow PIC object to macio
+      openpic: move KVM-specific declarations into separate openpic_kvm.h=
+ file
+      openpic: move OpenPIC state and related definitions to openpic.h
+      mac_newworld: use object link to pass OpenPIC object to macio
+      macio: move setting of CUDA timebase frequency to macio_common_real=
+ize()
+      macio: remove macio_init() function
+
+Nikunj A Dadhania (1):
+      hw/ppc/spapr,e500: Use new property "stdout-path" for boot console
+
+Suraj Jitindar Singh (6):
+      target/ppc: Check mask when setting cap_ppc_safe_indirect_branch
+      ppc/spapr-caps: Add support for custom spapr_capabilities
+      ppc/spapr-caps: Convert cap-cfpc to custom spapr-cap
+      ppc/spapr-caps: Convert cap-sbbc to custom spapr-cap
+      ppc/spapr-caps: Convert cap-ibs to custom spapr-cap
+      ppc/spapr-caps: Define the pseries-2.12-sxxm machine type
+
+ Makefile                           |   2 +-
+ default-configs/ppc-softmmu.mak    |   2 +
+ default-configs/ppcemb-softmmu.mak |   1 +
+ hw/intc/heathrow_pic.c             | 166 +++++-----
+ hw/intc/openpic.c                  | 157 ----------
+ hw/intc/openpic_kvm.c              |   1 +
+ hw/intc/trace-events               |   5 +
+ hw/misc/macio/macio.c              | 150 +++++----
+ hw/ppc/Makefile.objs               |   3 +-
+ hw/ppc/e500.c                      |   8 +
+ hw/ppc/mac.h                       |  10 +-
+ hw/ppc/mac_newworld.c              |  56 ++--
+ hw/ppc/mac_oldworld.c              |  50 ++-
+ hw/ppc/ppc440_pcix.c               | 528 +++++++++++++++++++++++++++++++=
++
+ hw/ppc/sam460ex.c                  | 603 +++++++++++++++++++++++++++++++=
+++++++
+ hw/ppc/spapr.c                     | 176 ++++++-----
+ hw/ppc/spapr_caps.c                | 132 +++++---
+ hw/ppc/spapr_hcall.c               |   5 +-
+ hw/ppc/trace-events                |   8 +
+ include/hw/intc/heathrow_pic.h     |  49 +++
+ include/hw/misc/macio/macio.h      |  79 +++++
+ include/hw/ppc/openpic.h           | 160 +++++++++-
+ include/hw/ppc/openpic_kvm.h       |   7 +
+ include/hw/ppc/spapr.h             |   5 +-
+ pc-bios/canyonlands.dtb            | Bin 0 -> 9779 bytes
+ pc-bios/canyonlands.dts            | 566 +++++++++++++++++++++++++++++++=
++++
+ target/ppc/kvm-stub.c              |   2 +-
+ target/ppc/kvm.c                   |   6 +-
+ tests/qom-test.c                   |   7 +
+ tests/test-hmp.c                   |   3 +-
+ 30 files changed, 2423 insertions(+), 524 deletions(-)
+ create mode 100644 hw/ppc/ppc440_pcix.c
+ create mode 100644 hw/ppc/sam460ex.c
+ create mode 100644 include/hw/intc/heathrow_pic.h
+ create mode 100644 include/hw/misc/macio/macio.h
+ create mode 100644 include/hw/ppc/openpic_kvm.h
+ create mode 100644 pc-bios/canyonlands.dtb
+ create mode 100644 pc-bios/canyonlands.dts
