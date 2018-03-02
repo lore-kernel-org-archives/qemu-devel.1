@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erqii-0003VV-Rm
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 14:51:58 -0500
+	(envelope-from <eblake@redhat.com>) id 1erqiw-0003a8-U2
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 14:52:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erqig-0007nU-25
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 14:51:56 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51658 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1erqiu-000844-1R
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 14:52:10 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36268 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1erqif-0007mY-Rc
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 14:51:53 -0500
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1erqit-00083O-QF
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 14:52:07 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1F7E787ABA
-	for <qemu-devel@nongnu.org>; Fri,  2 Mar 2018 19:51:49 +0000 (UTC)
-Received: from red.redhat.com (ovpn-122-122.rdu2.redhat.com [10.10.122.122])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C6DBD1C72E
-	for <qemu-devel@nongnu.org>; Fri,  2 Mar 2018 19:51:44 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 55B464023112
+	for <qemu-devel@nongnu.org>; Fri,  2 Mar 2018 19:52:07 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Fri,  2 Mar 2018 13:51:12 -0600
-Message-Id: <20180302195143.31678-1-eblake@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v4 00/30] QAPI patches for 2018-03-01
+Date: Fri,  2 Mar 2018 13:51:35 -0600
+Message-Id: <20180302195143.31678-24-eblake@redhat.com>
+In-Reply-To: <20180302195143.31678-1-eblake@redhat.com>
+References: <20180302195143.31678-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PULL v4 23/30] qapi: Generate separate .h,
+ .c for each module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,270 +31,556 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>
 
-The following changes since commit 136c67e07869227b21b3f627316e03679ce7b7=
-38:
+From: Markus Armbruster <armbru@redhat.com>
 
-  Merge remote-tracking branch 'remotes/bkoppelmann/tags/pull-tricore-201=
-8-03-02' into staging (2018-03-02 16:56:20 +0000)
+Our qapi-schema.json is composed of modules connected by include
+directives, but the generated code is monolithic all the same: one
+qapi-types.h with all the types, one qapi-visit.h with all the
+visitors, and so forth.  These monolithic headers get included all
+over the place.  In my "build everything" tree, adding a QAPI type
+recompiles about 4800 out of 5100 objects.
 
-are available in the Git repository at:
+We wouldn't write such monolithic headers by hand.  It stands to
+reason that we shouldn't generate them, either.
 
-  git://repo.or.cz/qemu/ericb.git tags/pull-qapi-2018-03-01-v4
+Split up generated qapi-types.h to mirror the schema's modular
+structure: one header per module.  Name the main module's header
+qapi-types.h, and sub-module D/B.json's header D/qapi-types-B.h.
 
-for you to fetch changes up to 418b1d0ae3a2cc992659f626a2a3f11944e0b259:
+Mirror the schema's includes in the headers, so that qapi-types.h gets
+you everything exactly as before.  If you need less, you can include
+one or more of the sub-module headers.  To be exploited shortly.
 
-  qapi: Don't create useless directory qapi-generated (2018-03-02 13:48:2=
-6 -0600)
+Split up qapi-types.c, qapi-visit.h, qapi-visit.c, qmp-commands.h,
+qmp-commands.c, qapi-event.h, qapi-event.c the same way.
+qmp-introspect.h, qmp-introspect.c and qapi.texi remain monolithic.
 
-v4: another attempt at silencing OSX warnings on empty .o [Peter]
-(sending just the changed patches)
+The split of qmp-commands.c duplicates static helper function
+qmp_marshal_output_str() in qapi-commands-char.c and
+qapi-commands-misc.c.  This happens when commands returning the same
+type occur in multiple modules.  Not worth avoiding.
 
-----------------------------------------------------------------
-qapi patches for 2018-03-01
+Since I'm going to rename qapi-event.[ch] to qapi-events.[ch], and
+qmp-commands.[ch] to qapi-commands.[ch], name the shards that way
+already, to reduce churn.  This requires temporary hacks in
+commands.py and events.py.  Similarly, c_name() must temporarily
+be taught to munge '/' in common.py.  They'll go away with the rename.
 
-- Markus Armbruster: Modularize generated QAPI code
-
-----------------------------------------------------------------
-Eric Blake (1):
-      watchdog: Consolidate QAPI into single file
-
-Markus Armbruster (29):
-      Include qapi/qmp/qerror.h exactly where needed
-      qapi: Streamline boilerplate comment generation
-      qapi: Generate up-to-date copyright notice
-      qapi: Rename variable holding the QAPISchemaGenFOOVisitor
-      qapi: New classes QAPIGenC, QAPIGenH, QAPIGenDoc
-      qapi: Reduce use of global variables in generators some
-      qapi: Turn generators into modules
-      qapi-gen: New common driver for code and doc generators
-      qapi-gen: Convert from getopt to argparse
-      qapi: Touch generated files only when they change
-      qapi: Improve include file name reporting in error messages
-      qapi/common: Eliminate QAPISchema.exprs
-      qapi: Lift error reporting from QAPISchema.__init__() to callers
-      qapi: Concentrate QAPISchemaParser.exprs updates in .__init__()
-      qapi: Record 'include' directives in parse tree
-      qapi: Generate in source order
-      qapi: Record 'include' directives in intermediate representation
-      qapi: Rename generated qmp-marshal.c to qmp-commands.c
-      qapi: Make code-generating visitors use QAPIGen more
-      qapi/types qapi/visit: Generate built-in stuff into separate files
-      qapi/common: Fix guardname() for funny filenames
-      qapi: Generate separate .h, .c for each module
-      Include less of the generated modular QAPI headers
-      qapi: Empty out qapi-schema.json
-      docs/devel/writing-qmp-commands: Update for modular QAPI
-      docs: Correct outdated information on QAPI
-      qapi: Move qapi-schema.json to qapi/, rename generated files
-      Fix up dangling references to qmp-commands.* in comment and doc
-      qapi: Don't create useless directory qapi-generated
-
- docs/devel/qapi-code-gen.txt                       | 124 ++++---
- docs/devel/writing-qmp-commands.txt                |  39 +--
- docs/interop/qmp-intro.txt                         |   3 +-
- docs/xen-save-devices-state.txt                    |   3 +-
- tests/qapi-schema/doc-good.texi                    |   3 +-
- configure                                          |   1 -
- Makefile                                           | 233 +++++++++----
- Makefile.objs                                      |  80 ++++-
- qapi-schema.json =3D> qapi/misc.json                 | 105 +-----
- qapi/qapi-schema.json                              |  95 ++++++
- qapi/run-state.json                                |   9 +
- include/qapi/visitor.h                             |   2 +-
- scripts/qapi-gen.py                                |  57 ++++
- scripts/qapi/__init__.py                           |   0
- scripts/{qapi-commands.py =3D> qapi/commands.py}     | 155 ++++-----
- scripts/{qapi.py =3D> qapi/common.py}                | 362 +++++++++++++=
---------
- scripts/{qapi2texi.py =3D> qapi/doc.py}              |  92 +++---
- scripts/{qapi-event.py =3D> qapi/events.py}          | 128 +++-----
- scripts/{qapi-introspect.py =3D> qapi/introspect.py} | 123 +++----
- scripts/{qapi-types.py =3D> qapi/types.py}           | 185 ++++-------
- scripts/{qapi-visit.py =3D> qapi/visit.py}           | 189 ++++-------
- crypto/cipherpriv.h                                |   2 +-
- include/block/block.h                              |   2 +-
- include/block/dirty-bitmap.h                       |   2 +-
- include/block/nbd.h                                |   2 +-
- include/chardev/char.h                             |   1 +
- include/crypto/cipher.h                            |   2 +-
- include/crypto/hash.h                              |   2 +-
- include/crypto/hmac.h                              |   2 +-
- include/crypto/secret.h                            |   1 +
- include/crypto/tlscreds.h                          |   1 +
- include/hw/block/block.h                           |   2 +-
- include/hw/block/fdc.h                             |   2 +-
- include/hw/ppc/spapr_drc.h                         |   1 +
- include/hw/qdev-properties.h                       |   2 +
- include/io/dns-resolver.h                          |   1 +
- include/migration/colo.h                           |   2 +-
- include/migration/failover.h                       |   2 +-
- include/migration/global_state.h                   |   1 +
- include/monitor/monitor.h                          |   1 +
- include/net/filter.h                               |   1 +
- include/net/net.h                                  |   2 +-
- include/qapi/clone-visitor.h                       |   1 -
- include/qapi/error.h                               |   2 +-
- include/qapi/qmp/qobject.h                         |   2 +-
- include/qemu/sockets.h                             |   2 +-
- include/qemu/throttle.h                            |   2 +-
- include/qom/cpu.h                                  |   1 +
- include/qom/object.h                               |   2 +-
- include/sysemu/arch_init.h                         |   2 +-
- include/sysemu/balloon.h                           |   2 +-
- include/sysemu/dump.h                              |   2 +
- include/sysemu/hostmem.h                           |   1 +
- include/sysemu/replay.h                            |   2 +
- include/sysemu/sysemu.h                            |   1 +
- include/sysemu/tpm.h                               |   1 +
- include/sysemu/watchdog.h                          |   2 +-
- include/ui/console.h                               |   1 +
- include/ui/input.h                                 |   2 +-
- migration/migration.h                              |   1 +
- migration/ram.h                                    |   2 +-
- net/tap_int.h                                      |   2 +-
- replication.h                                      |   1 +
- ui/vnc.h                                           |   1 +
- vl.c                                               |   8 +-
- arch_init.c                                        |   2 +-
- backends/cryptodev.c                               |   1 -
- backends/hostmem.c                                 |   3 +-
- balloon.c                                          |   2 +-
- block.c                                            |   2 -
- block/block-backend.c                              |   2 +-
- block/crypto.c                                     |   2 +-
- block/iscsi.c                                      |   2 +-
- block/nbd.c                                        |   2 +-
- block/nfs.c                                        |   2 +-
- block/qapi.c                                       |   4 +-
- block/qcow2.c                                      |   4 +-
- block/quorum.c                                     |   2 +-
- block/sheepdog.c                                   |   2 +-
- block/ssh.c                                        |   2 +-
- block/throttle-groups.c                            |   2 +-
- block/write-threshold.c                            |   4 +-
- blockdev-nbd.c                                     |   2 +-
- blockdev.c                                         |   5 +-
- blockjob.c                                         |   2 +-
- chardev/char-fe.c                                  |   2 +-
- chardev/char-ringbuf.c                             |   2 +-
- chardev/char-socket.c                              |   1 +
- chardev/char.c                                     |   4 +-
- cpus.c                                             |   4 +-
- dump.c                                             |   4 +-
- hmp.c                                              |  12 +-
- hw/acpi/core.c                                     |   4 +-
- hw/acpi/cpu.c                                      |   2 +-
- hw/acpi/memory_hotplug.c                           |   2 +-
- hw/acpi/vmgenid.c                                  |   2 +-
- hw/block/block.c                                   |   1 +
- hw/block/hd-geometry.c                             |   1 +
- hw/char/virtio-console.c                           |   2 +-
- hw/core/machine.c                                  |   2 +-
- hw/core/qdev.c                                     |   2 +-
- hw/i386/pc.c                                       |   2 +-
- hw/i386/xen/xen-hvm.c                              |   2 +-
- hw/ipmi/ipmi.c                                     |   2 +-
- hw/mem/nvdimm.c                                    |   1 -
- hw/net/rocker/qmp-norocker.c                       |   2 +-
- hw/net/rocker/rocker.c                             |   2 +-
- hw/net/rocker/rocker_fp.c                          |   2 +-
- hw/net/rocker/rocker_of_dpa.c                      |   2 +-
- hw/net/virtio-net.c                                |   2 +-
- hw/pci/pci-stub.c                                  |   2 +-
- hw/pci/pci.c                                       |   2 +-
- hw/ppc/spapr_rtas.c                                |   1 -
- hw/ppc/spapr_rtc.c                                 |   2 +-
- hw/s390x/s390-skeys.c                              |   2 +-
- hw/timer/mc146818rtc.c                             |   4 +-
- hw/tpm/tpm_emulator.c                              |   1 +
- hw/tpm/tpm_passthrough.c                           |   1 +
- hw/virtio/virtio-balloon.c                         |   2 +-
- hw/watchdog/watchdog.c                             |   4 +-
- io/channel-socket.c                                |   1 +
- io/dns-resolver.c                                  |   1 +
- iothread.c                                         |   2 +-
- migration/colo-failover.c                          |   2 +-
- migration/colo.c                                   |   2 +-
- migration/migration.c                              |   4 +-
- migration/ram.c                                    |   2 +-
- migration/savevm.c                                 |   3 +-
- monitor.c                                          |   8 +-
- net/colo-compare.c                                 |   1 -
- net/filter-buffer.c                                |   2 +-
- net/filter-mirror.c                                |   1 -
- net/filter-rewriter.c                              |   1 -
- net/net.c                                          |   4 +-
- net/vhost-user.c                                   |   2 +-
- numa.c                                             |   4 +-
- qdev-monitor.c                                     |   2 +-
- qemu-img.c                                         |   2 +-
- qga/commands-posix.c                               |   2 +-
- qga/commands-win32.c                               |   2 +-
- qga/commands.c                                     |   2 +-
- qga/main.c                                         |   2 +-
- qmp.c                                              |  18 +-
- qom/object.c                                       |   2 +-
- qom/object_interfaces.c                            |   2 +-
- replay/replay-input.c                              |   1 +
- stubs/tpm.c                                        |   3 +-
- stubs/uuid.c                                       |   2 +-
- stubs/vmgenid.c                                    |   2 +-
- stubs/xen-hvm.c                                    |   2 +-
- target/arm/monitor.c                               |   3 +-
- target/i386/cpu.c                                  |   4 +-
- target/s390x/cpu.c                                 |   3 +-
- target/s390x/kvm.c                                 |   1 -
- target/s390x/sigp.c                                |   1 +
- tests/qmp-test.c                                   |   3 +-
- tests/test-char.c                                  |   2 +-
- tests/{test-qmp-commands.c =3D> test-qmp-cmds.c}     |   2 +-
- tests/test-qmp-event.c                             |   3 +-
- tests/test-qobject-input-visitor.c                 |   8 +-
- tests/test-visitor-serialization.c                 |   1 -
- tpm.c                                              |   5 +-
- trace/qmp.c                                        |   2 +-
- ui/console.c                                       |   2 +-
- ui/gtk.c                                           |   2 +-
- ui/input-legacy.c                                  |   2 +-
- ui/input.c                                         |   2 +-
- ui/spice-core.c                                    |   4 +-
- ui/vnc.c                                           |   4 +-
- util/qemu-config.c                                 |   2 +-
- util/qemu-sockets.c                                |   2 +-
- .gitignore                                         |  80 ++++-
- qga/Makefile.objs                                  |   2 +-
- tests/.gitignore                                   |   9 +-
- tests/Makefile.include                             |  70 ++--
- tests/qapi-schema/comments.out                     |   3 +-
- tests/qapi-schema/doc-bad-section.out              |   5 +-
- tests/qapi-schema/doc-good.out                     |  33 +-
- tests/qapi-schema/empty.out                        |   2 +-
- tests/qapi-schema/event-case.out                   |   3 +-
- tests/qapi-schema/ident-with-escape.out            |   7 +-
- tests/qapi-schema/include-no-file.err              |   2 +-
- tests/qapi-schema/include-relpath.out              |   7 +-
- tests/qapi-schema/include-repetition.out           |  12 +-
- tests/qapi-schema/include-simple.out               |   5 +-
- tests/qapi-schema/indented-expr.out                |   3 +-
- tests/qapi-schema/qapi-schema-test.out             | 321 +++++++++------=
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20180211093607.27351-23-armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+[eblake: declare a dummy variable in each .c file, to shut up OSX
+toolchain warnings about empty .o files, including hacking c_name()]
+Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qapi-schema/test-qapi.py                     |  19 +-
- ui/cocoa.m                                         |   2 +-
- 189 files changed, 1570 insertions(+), 1356 deletions(-)
- rename qapi-schema.json =3D> qapi/misc.json (95%)
- create mode 100644 qapi/qapi-schema.json
- create mode 100755 scripts/qapi-gen.py
- create mode 100644 scripts/qapi/__init__.py
- rename scripts/{qapi-commands.py =3D> qapi/commands.py} (67%)
- rename scripts/{qapi.py =3D> qapi/common.py} (89%)
- rename scripts/{qapi2texi.py =3D> qapi/doc.py} (78%)
- mode change 100755 =3D> 100644
- rename scripts/{qapi-event.py =3D> qapi/events.py} (61%)
- rename scripts/{qapi-introspect.py =3D> qapi/introspect.py} (71%)
- rename scripts/{qapi-types.py =3D> qapi/types.py} (53%)
- rename scripts/{qapi-visit.py =3D> qapi/visit.py} (64%)
- rename tests/{test-qmp-commands.c =3D> test-qmp-cmds.c} (99%)
+ Makefile                 | 120 +++++++++++++++++++++++++++++++++++++++++++++++
+ Makefile.objs            |  65 ++++++++++++++++++++++++-
+ scripts/qapi/commands.py |  35 +++++++++-----
+ scripts/qapi/common.py   |  33 +++++++++++--
+ scripts/qapi/events.py   |  19 ++++++--
+ .gitignore               |  60 ++++++++++++++++++++++++
+ 6 files changed, 310 insertions(+), 22 deletions(-)
 
---=20
+diff --git a/Makefile b/Makefile
+index 494ae382794..b12fcd5d8ff 100644
+--- a/Makefile
++++ b/Makefile
+@@ -92,10 +92,70 @@ include $(SRC_PATH)/rules.mak
+ GENERATED_FILES = qemu-version.h config-host.h qemu-options.def
+ GENERATED_FILES += qapi-builtin-types.h qapi-builtin-types.c
+ GENERATED_FILES += qapi-types.h qapi-types.c
++GENERATED_FILES += qapi/qapi-types-block-core.h qapi/qapi-types-block-core.c
++GENERATED_FILES += qapi/qapi-types-block.h qapi/qapi-types-block.c
++GENERATED_FILES += qapi/qapi-types-char.h qapi/qapi-types-char.c
++GENERATED_FILES += qapi/qapi-types-common.h qapi/qapi-types-common.c
++GENERATED_FILES += qapi/qapi-types-crypto.h qapi/qapi-types-crypto.c
++GENERATED_FILES += qapi/qapi-types-introspect.h qapi/qapi-types-introspect.c
++GENERATED_FILES += qapi/qapi-types-migration.h qapi/qapi-types-migration.c
++GENERATED_FILES += qapi/qapi-types-net.h qapi/qapi-types-net.c
++GENERATED_FILES += qapi/qapi-types-rocker.h qapi/qapi-types-rocker.c
++GENERATED_FILES += qapi/qapi-types-run-state.h qapi/qapi-types-run-state.c
++GENERATED_FILES += qapi/qapi-types-sockets.h qapi/qapi-types-sockets.c
++GENERATED_FILES += qapi/qapi-types-tpm.h qapi/qapi-types-tpm.c
++GENERATED_FILES += qapi/qapi-types-trace.h qapi/qapi-types-trace.c
++GENERATED_FILES += qapi/qapi-types-transaction.h qapi/qapi-types-transaction.c
++GENERATED_FILES += qapi/qapi-types-ui.h qapi/qapi-types-ui.c
+ GENERATED_FILES += qapi-builtin-visit.h qapi-builtin-visit.c
+ GENERATED_FILES += qapi-visit.h qapi-visit.c
++GENERATED_FILES += qapi/qapi-visit-block-core.h qapi/qapi-visit-block-core.c
++GENERATED_FILES += qapi/qapi-visit-block.h qapi/qapi-visit-block.c
++GENERATED_FILES += qapi/qapi-visit-char.h qapi/qapi-visit-char.c
++GENERATED_FILES += qapi/qapi-visit-common.h qapi/qapi-visit-common.c
++GENERATED_FILES += qapi/qapi-visit-crypto.h qapi/qapi-visit-crypto.c
++GENERATED_FILES += qapi/qapi-visit-introspect.h qapi/qapi-visit-introspect.c
++GENERATED_FILES += qapi/qapi-visit-migration.h qapi/qapi-visit-migration.c
++GENERATED_FILES += qapi/qapi-visit-net.h qapi/qapi-visit-net.c
++GENERATED_FILES += qapi/qapi-visit-rocker.h qapi/qapi-visit-rocker.c
++GENERATED_FILES += qapi/qapi-visit-run-state.h qapi/qapi-visit-run-state.c
++GENERATED_FILES += qapi/qapi-visit-sockets.h qapi/qapi-visit-sockets.c
++GENERATED_FILES += qapi/qapi-visit-tpm.h qapi/qapi-visit-tpm.c
++GENERATED_FILES += qapi/qapi-visit-trace.h qapi/qapi-visit-trace.c
++GENERATED_FILES += qapi/qapi-visit-transaction.h qapi/qapi-visit-transaction.c
++GENERATED_FILES += qapi/qapi-visit-ui.h qapi/qapi-visit-ui.c
+ GENERATED_FILES += qmp-commands.h qmp-commands.c
++GENERATED_FILES += qapi/qapi-commands-block-core.h qapi/qapi-commands-block-core.c
++GENERATED_FILES += qapi/qapi-commands-block.h qapi/qapi-commands-block.c
++GENERATED_FILES += qapi/qapi-commands-char.h qapi/qapi-commands-char.c
++GENERATED_FILES += qapi/qapi-commands-common.h qapi/qapi-commands-common.c
++GENERATED_FILES += qapi/qapi-commands-crypto.h qapi/qapi-commands-crypto.c
++GENERATED_FILES += qapi/qapi-commands-introspect.h qapi/qapi-commands-introspect.c
++GENERATED_FILES += qapi/qapi-commands-migration.h qapi/qapi-commands-migration.c
++GENERATED_FILES += qapi/qapi-commands-net.h qapi/qapi-commands-net.c
++GENERATED_FILES += qapi/qapi-commands-rocker.h qapi/qapi-commands-rocker.c
++GENERATED_FILES += qapi/qapi-commands-run-state.h qapi/qapi-commands-run-state.c
++GENERATED_FILES += qapi/qapi-commands-sockets.h qapi/qapi-commands-sockets.c
++GENERATED_FILES += qapi/qapi-commands-tpm.h qapi/qapi-commands-tpm.c
++GENERATED_FILES += qapi/qapi-commands-trace.h qapi/qapi-commands-trace.c
++GENERATED_FILES += qapi/qapi-commands-transaction.h qapi/qapi-commands-transaction.c
++GENERATED_FILES += qapi/qapi-commands-ui.h qapi/qapi-commands-ui.c
+ GENERATED_FILES += qapi-event.h qapi-event.c
++GENERATED_FILES += qapi/qapi-events-block-core.h qapi/qapi-events-block-core.c
++GENERATED_FILES += qapi/qapi-events-block.h qapi/qapi-events-block.c
++GENERATED_FILES += qapi/qapi-events-char.h qapi/qapi-events-char.c
++GENERATED_FILES += qapi/qapi-events-common.h qapi/qapi-events-common.c
++GENERATED_FILES += qapi/qapi-events-crypto.h qapi/qapi-events-crypto.c
++GENERATED_FILES += qapi/qapi-events-introspect.h qapi/qapi-events-introspect.c
++GENERATED_FILES += qapi/qapi-events-migration.h qapi/qapi-events-migration.c
++GENERATED_FILES += qapi/qapi-events-net.h qapi/qapi-events-net.c
++GENERATED_FILES += qapi/qapi-events-rocker.h qapi/qapi-events-rocker.c
++GENERATED_FILES += qapi/qapi-events-run-state.h qapi/qapi-events-run-state.c
++GENERATED_FILES += qapi/qapi-events-sockets.h qapi/qapi-events-sockets.c
++GENERATED_FILES += qapi/qapi-events-tpm.h qapi/qapi-events-tpm.c
++GENERATED_FILES += qapi/qapi-events-trace.h qapi/qapi-events-trace.c
++GENERATED_FILES += qapi/qapi-events-transaction.h qapi/qapi-events-transaction.c
++GENERATED_FILES += qapi/qapi-events-ui.h qapi/qapi-events-ui.c
+ GENERATED_FILES += qmp-introspect.c qmp-introspect.h
+ GENERATED_FILES += qapi-doc.texi
+
+@@ -524,10 +584,70 @@ qapi-modules = $(SRC_PATH)/qapi-schema.json $(SRC_PATH)/qapi/common.json \
+
+ qapi-builtin-types.c qapi-builtin-types.h \
+ qapi-types.c qapi-types.h \
++qapi/qapi-types-block-core.c qapi/qapi-types-block-core.h \
++qapi/qapi-types-block.c qapi/qapi-types-block.h \
++qapi/qapi-types-char.c qapi/qapi-types-char.h \
++qapi/qapi-types-common.c qapi/qapi-types-common.h \
++qapi/qapi-types-crypto.c qapi/qapi-types-crypto.h \
++qapi/qapi-types-introspect.c qapi/qapi-types-introspect.h \
++qapi/qapi-types-migration.c qapi/qapi-types-migration.h \
++qapi/qapi-types-net.c qapi/qapi-types-net.h \
++qapi/qapi-types-rocker.c qapi/qapi-types-rocker.h \
++qapi/qapi-types-run-state.c qapi/qapi-types-run-state.h \
++qapi/qapi-types-sockets.c qapi/qapi-types-sockets.h \
++qapi/qapi-types-tpm.c qapi/qapi-types-tpm.h \
++qapi/qapi-types-trace.c qapi/qapi-types-trace.h \
++qapi/qapi-types-transaction.c qapi/qapi-types-transaction.h \
++qapi/qapi-types-ui.c qapi/qapi-types-ui.h \
+ qapi-builtin-visit.c qapi-builtin-visit.h \
+ qapi-visit.c qapi-visit.h \
++qapi/qapi-visit-block-core.c qapi/qapi-visit-block-core.h \
++qapi/qapi-visit-block.c qapi/qapi-visit-block.h \
++qapi/qapi-visit-char.c qapi/qapi-visit-char.h \
++qapi/qapi-visit-common.c qapi/qapi-visit-common.h \
++qapi/qapi-visit-crypto.c qapi/qapi-visit-crypto.h \
++qapi/qapi-visit-introspect.c qapi/qapi-visit-introspect.h \
++qapi/qapi-visit-migration.c qapi/qapi-visit-migration.h \
++qapi/qapi-visit-net.c qapi/qapi-visit-net.h \
++qapi/qapi-visit-rocker.c qapi/qapi-visit-rocker.h \
++qapi/qapi-visit-run-state.c qapi/qapi-visit-run-state.h \
++qapi/qapi-visit-sockets.c qapi/qapi-visit-sockets.h \
++qapi/qapi-visit-tpm.c qapi/qapi-visit-tpm.h \
++qapi/qapi-visit-trace.c qapi/qapi-visit-trace.h \
++qapi/qapi-visit-transaction.c qapi/qapi-visit-transaction.h \
++qapi/qapi-visit-ui.c qapi/qapi-visit-ui.h \
+ qmp-commands.h qmp-commands.c \
++qapi/qapi-commands-block-core.c qapi/qapi-commands-block-core.h \
++qapi/qapi-commands-block.c qapi/qapi-commands-block.h \
++qapi/qapi-commands-char.c qapi/qapi-commands-char.h \
++qapi/qapi-commands-common.c qapi/qapi-commands-common.h \
++qapi/qapi-commands-crypto.c qapi/qapi-commands-crypto.h \
++qapi/qapi-commands-introspect.c qapi/qapi-commands-introspect.h \
++qapi/qapi-commands-migration.c qapi/qapi-commands-migration.h \
++qapi/qapi-commands-net.c qapi/qapi-commands-net.h \
++qapi/qapi-commands-rocker.c qapi/qapi-commands-rocker.h \
++qapi/qapi-commands-run-state.c qapi/qapi-commands-run-state.h \
++qapi/qapi-commands-sockets.c qapi/qapi-commands-sockets.h \
++qapi/qapi-commands-tpm.c qapi/qapi-commands-tpm.h \
++qapi/qapi-commands-trace.c qapi/qapi-commands-trace.h \
++qapi/qapi-commands-transaction.c qapi/qapi-commands-transaction.h \
++qapi/qapi-commands-ui.c qapi/qapi-commands-ui.h \
+ qapi-event.c qapi-event.h \
++qapi/qapi-events-block-core.c qapi/qapi-events-block-core.h \
++qapi/qapi-events-block.c qapi/qapi-events-block.h \
++qapi/qapi-events-char.c qapi/qapi-events-char.h \
++qapi/qapi-events-common.c qapi/qapi-events-common.h \
++qapi/qapi-events-crypto.c qapi/qapi-events-crypto.h \
++qapi/qapi-events-introspect.c qapi/qapi-events-introspect.h \
++qapi/qapi-events-migration.c qapi/qapi-events-migration.h \
++qapi/qapi-events-net.c qapi/qapi-events-net.h \
++qapi/qapi-events-rocker.c qapi/qapi-events-rocker.h \
++qapi/qapi-events-run-state.c qapi/qapi-events-run-state.h \
++qapi/qapi-events-sockets.c qapi/qapi-events-sockets.h \
++qapi/qapi-events-tpm.c qapi/qapi-events-tpm.h \
++qapi/qapi-events-trace.c qapi/qapi-events-trace.h \
++qapi/qapi-events-transaction.c qapi/qapi-events-transaction.h \
++qapi/qapi-events-ui.c qapi/qapi-events-ui.h \
+ qmp-introspect.h qmp-introspect.c \
+ qapi-doc.texi: \
+ qapi-gen-timestamp ;
+diff --git a/Makefile.objs b/Makefile.objs
+index 2ace9c13b9d..5dc7a13c726 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -3,8 +3,56 @@
+ stub-obj-y = stubs/ crypto/
+ util-obj-y = util/ qobject/ qapi/
+ util-obj-y += qapi-builtin-types.o
++util-obj-y += qapi-types.o
++util-obj-y += qapi/qapi-types-block-core.o
++util-obj-y += qapi/qapi-types-block.o
++util-obj-y += qapi/qapi-types-char.o
++util-obj-y += qapi/qapi-types-common.o
++util-obj-y += qapi/qapi-types-crypto.o
++util-obj-y += qapi/qapi-types-introspect.o
++util-obj-y += qapi/qapi-types-migration.o
++util-obj-y += qapi/qapi-types-net.o
++util-obj-y += qapi/qapi-types-rocker.o
++util-obj-y += qapi/qapi-types-run-state.o
++util-obj-y += qapi/qapi-types-sockets.o
++util-obj-y += qapi/qapi-types-tpm.o
++util-obj-y += qapi/qapi-types-trace.o
++util-obj-y += qapi/qapi-types-transaction.o
++util-obj-y += qapi/qapi-types-ui.o
+ util-obj-y += qapi-builtin-visit.o
+-util-obj-y += qmp-introspect.o qapi-types.o qapi-visit.o qapi-event.o
++util-obj-y += qapi-visit.o
++util-obj-y += qapi/qapi-visit-block-core.o
++util-obj-y += qapi/qapi-visit-block.o
++util-obj-y += qapi/qapi-visit-char.o
++util-obj-y += qapi/qapi-visit-common.o
++util-obj-y += qapi/qapi-visit-crypto.o
++util-obj-y += qapi/qapi-visit-introspect.o
++util-obj-y += qapi/qapi-visit-migration.o
++util-obj-y += qapi/qapi-visit-net.o
++util-obj-y += qapi/qapi-visit-rocker.o
++util-obj-y += qapi/qapi-visit-run-state.o
++util-obj-y += qapi/qapi-visit-sockets.o
++util-obj-y += qapi/qapi-visit-tpm.o
++util-obj-y += qapi/qapi-visit-trace.o
++util-obj-y += qapi/qapi-visit-transaction.o
++util-obj-y += qapi/qapi-visit-ui.o
++util-obj-y += qapi-event.o
++util-obj-y += qapi/qapi-events-block-core.o
++util-obj-y += qapi/qapi-events-block.o
++util-obj-y += qapi/qapi-events-char.o
++util-obj-y += qapi/qapi-events-common.o
++util-obj-y += qapi/qapi-events-crypto.o
++util-obj-y += qapi/qapi-events-introspect.o
++util-obj-y += qapi/qapi-events-migration.o
++util-obj-y += qapi/qapi-events-net.o
++util-obj-y += qapi/qapi-events-rocker.o
++util-obj-y += qapi/qapi-events-run-state.o
++util-obj-y += qapi/qapi-events-sockets.o
++util-obj-y += qapi/qapi-events-tpm.o
++util-obj-y += qapi/qapi-events-trace.o
++util-obj-y += qapi/qapi-events-transaction.o
++util-obj-y += qapi/qapi-events-ui.o
++util-obj-y += qmp-introspect.o
+
+ chardev-obj-y = chardev/
+
+@@ -81,6 +129,21 @@ common-obj-$(CONFIG_FDT) += device_tree.o
+ # qapi
+
+ common-obj-y += qmp-commands.o
++common-obj-y += qapi/qapi-commands-block-core.o
++common-obj-y += qapi/qapi-commands-block.o
++common-obj-y += qapi/qapi-commands-char.o
++common-obj-y += qapi/qapi-commands-common.o
++common-obj-y += qapi/qapi-commands-crypto.o
++common-obj-y += qapi/qapi-commands-introspect.o
++common-obj-y += qapi/qapi-commands-migration.o
++common-obj-y += qapi/qapi-commands-net.o
++common-obj-y += qapi/qapi-commands-rocker.o
++common-obj-y += qapi/qapi-commands-run-state.o
++common-obj-y += qapi/qapi-commands-sockets.o
++common-obj-y += qapi/qapi-commands-tpm.o
++common-obj-y += qapi/qapi-commands-trace.o
++common-obj-y += qapi/qapi-commands-transaction.o
++common-obj-y += qapi/qapi-commands-ui.o
+ common-obj-y += qmp-introspect.o
+ common-obj-y += qmp.o hmp.o
+ endif
+diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+index 46757db771d..a43bccb1902 100644
+--- a/scripts/qapi/commands.py
++++ b/scripts/qapi/commands.py
+@@ -223,14 +223,24 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds)
+     return ret
+
+
+-class QAPISchemaGenCommandVisitor(QAPISchemaMonolithicCVisitor):
++class QAPISchemaGenCommandVisitor(QAPISchemaModularCVisitor):
+
+     def __init__(self, prefix):
+-        QAPISchemaMonolithicCVisitor.__init__(
+-            self, prefix, 'qmp-commands',
++        QAPISchemaModularCVisitor.__init__(
++            self, prefix, 'qapi-commands',
+             ' * Schema-defined QAPI/QMP commands', __doc__)
+         self._regy = ''
+-        self._visited_ret_types = set()
++        self._visited_ret_types = {}
++
++    # Temporary HACK:
++    def _module_basename(self, what, name):
++        basename = QAPISchemaModularCVisitor._module_basename(self, what, name)
++        if name == self._main_module:
++            return re.sub(r'qapi-commands', 'qmp-commands', basename)
++        return basename
++
++    def _begin_module(self, name):
++        self._visited_ret_types[self._genc] = set()
+         self._genc.add(mcgen('''
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+@@ -246,26 +256,29 @@ class QAPISchemaGenCommandVisitor(QAPISchemaMonolithicCVisitor):
+ #include "%(prefix)sqmp-commands.h"
+
+ ''',
+-                             prefix=prefix))
++                             prefix=self._prefix))
+         self._genh.add(mcgen('''
+ #include "%(prefix)sqapi-types.h"
+ #include "qapi/qmp/dispatch.h"
+
+-void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
+ ''',
+-                             prefix=prefix,
+-                             c_prefix=c_name(prefix, protect=False)))
++                             prefix=self._prefix))
+
+     def visit_end(self):
+-        self._genc.add(gen_registry(self._regy, self._prefix))
++        (genc, genh) = self._module[self._main_module]
++        genh.add(mcgen('''
++void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
++''',
++                       c_prefix=c_name(self._prefix, protect=False)))
++        genc.add(gen_registry(self._regy, self._prefix))
+
+     def visit_command(self, name, info, arg_type, ret_type,
+                       gen, success_response, boxed):
+         if not gen:
+             return
+         self._genh.add(gen_command_decl(name, arg_type, boxed, ret_type))
+-        if ret_type and ret_type not in self._visited_ret_types:
+-            self._visited_ret_types.add(ret_type)
++        if ret_type and ret_type not in self._visited_ret_types[self._genc]:
++            self._visited_ret_types[self._genc].add(ret_type)
+             self._genc.add(gen_marshal_output(ret_type))
+         self._genh.add(gen_marshal_decl(name))
+         self._genc.add(gen_marshal(name, arg_type, boxed, ret_type))
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 069ec3715d7..e0b88f18965 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -1775,10 +1775,11 @@ def c_enum_const(type_name, const_name, prefix=None):
+         type_name = prefix
+     return camel_to_upper(type_name) + '_' + c_name(const_name, False).upper()
+
++# Temporary HACK for '/':
+ if hasattr(str, 'maketrans'):
+-    c_name_trans = str.maketrans('.-', '__')
++    c_name_trans = str.maketrans('.-/', '___')
+ else:
+-    c_name_trans = string.maketrans('.-', '__')
++    c_name_trans = string.maketrans('.-/', '___')
+
+
+ # Map @name to a valid C identifier.
+@@ -2035,6 +2036,13 @@ class QAPIGenC(QAPIGen):
+ ''',
+                      blurb=self._blurb, copyright=self._copyright)
+
++    def _bottom(self, fname):
++        return mcgen('''
++/* Dummy declaration to prevent empty .o file */
++char dummy_%(name)s;
++''',
++                     name=c_name(fname))
++
+
+ class QAPIGenH(QAPIGenC):
+
+@@ -2073,13 +2081,20 @@ class QAPISchemaModularCVisitor(QAPISchemaVisitor):
+         self._blurb = blurb
+         self._pydoc = pydoc
+         self._module = {}
++        self._main_module = None
+
+     def _module_basename(self, what, name):
+         if name is None:
+             return re.sub(r'-', '-builtin-', what)
+-        return self._prefix + what
++        basename = os.path.join(os.path.dirname(name),
++                                self._prefix + what)
++        if name == self._main_module:
++            return basename
++        return basename + '-' + os.path.splitext(os.path.basename(name))[0]
+
+     def _add_module(self, name, blurb):
++        if self._main_module is None and name is not None:
++            self._main_module = name
+         genc = QAPIGenC(blurb, self._pydoc)
+         genh = QAPIGenH(blurb, self._pydoc)
+         self._module[name] = (genc, genh)
+@@ -2088,7 +2103,7 @@ class QAPISchemaModularCVisitor(QAPISchemaVisitor):
+     def _set_module(self, name):
+         self._genc, self._genh = self._module[name]
+
+-    def write(self, output_dir, opt_builtins):
++    def write(self, output_dir, opt_builtins=False):
+         for name in self._module:
+             if name is None and not opt_builtins:
+                 continue
+@@ -2101,7 +2116,15 @@ class QAPISchemaModularCVisitor(QAPISchemaVisitor):
+         pass
+
+     def visit_module(self, name):
+-        if len(self._module) != 1:
++        if name in self._module:
++            self._set_module(name)
+             return
+         self._add_module(name, self._blurb)
+         self._begin_module(name)
++
++    def visit_include(self, name, info):
++        basename = self._module_basename(self._what, name)
++        self._genh.preamble_add(mcgen('''
++#include "%(basename)s.h"
++''',
++                                      basename=basename))
+diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
+index 81ab3abb309..1e0b990f356 100644
+--- a/scripts/qapi/events.py
++++ b/scripts/qapi/events.py
+@@ -148,14 +148,23 @@ out:
+     return ret
+
+
+-class QAPISchemaGenEventVisitor(QAPISchemaMonolithicCVisitor):
++class QAPISchemaGenEventVisitor(QAPISchemaModularCVisitor):
+
+     def __init__(self, prefix):
+-        QAPISchemaMonolithicCVisitor.__init__(
+-            self, prefix, 'qapi-event',
++        QAPISchemaModularCVisitor.__init__(
++            self, prefix, 'qapi-events',
+             ' * Schema-defined QAPI/QMP events', __doc__)
+         self._enum_name = c_name(prefix + 'QAPIEvent', protect=False)
+         self._event_names = []
++
++    # Temporary HACK:
++    def _module_basename(self, what, name):
++        basename = QAPISchemaModularCVisitor._module_basename(self, what, name)
++        if name == self._main_module:
++            return re.sub(r'qapi-events', 'qapi-event', basename)
++        return basename
++
++    def _begin_module(self, name):
+         self._genc.add(mcgen('''
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+@@ -167,13 +176,13 @@ class QAPISchemaGenEventVisitor(QAPISchemaMonolithicCVisitor):
+ #include "qapi/qmp-event.h"
+
+ ''',
+-                             prefix=prefix))
++                             prefix=self._prefix))
+         self._genh.add(mcgen('''
+ #include "qapi/util.h"
+ #include "%(prefix)sqapi-types.h"
+
+ ''',
+-                             prefix=prefix))
++                             prefix=self._prefix))
+
+     def visit_end(self):
+         self._genh.add(gen_enum(self._enum_name, self._event_names))
+diff --git a/.gitignore b/.gitignore
+index 9477a08b6b3..42c57998fd5 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -31,7 +31,67 @@
+ /qapi-gen-timestamp
+ /qapi-builtin-types.[ch]
+ /qapi-builtin-visit.[ch]
++/qapi/qapi-commands-block-core.[ch]
++/qapi/qapi-commands-block.[ch]
++/qapi/qapi-commands-char.[ch]
++/qapi/qapi-commands-common.[ch]
++/qapi/qapi-commands-crypto.[ch]
++/qapi/qapi-commands-introspect.[ch]
++/qapi/qapi-commands-migration.[ch]
++/qapi/qapi-commands-net.[ch]
++/qapi/qapi-commands-rocker.[ch]
++/qapi/qapi-commands-run-state.[ch]
++/qapi/qapi-commands-sockets.[ch]
++/qapi/qapi-commands-tpm.[ch]
++/qapi/qapi-commands-trace.[ch]
++/qapi/qapi-commands-transaction.[ch]
++/qapi/qapi-commands-ui.[ch]
++/qapi/qapi-events-block-core.[ch]
++/qapi/qapi-events-block.[ch]
++/qapi/qapi-events-char.[ch]
++/qapi/qapi-events-common.[ch]
++/qapi/qapi-events-crypto.[ch]
++/qapi/qapi-events-introspect.[ch]
++/qapi/qapi-events-migration.[ch]
++/qapi/qapi-events-net.[ch]
++/qapi/qapi-events-rocker.[ch]
++/qapi/qapi-events-run-state.[ch]
++/qapi/qapi-events-sockets.[ch]
++/qapi/qapi-events-tpm.[ch]
++/qapi/qapi-events-trace.[ch]
++/qapi/qapi-events-transaction.[ch]
++/qapi/qapi-events-ui.[ch]
++/qapi/qapi-types-block-core.[ch]
++/qapi/qapi-types-block.[ch]
++/qapi/qapi-types-char.[ch]
++/qapi/qapi-types-common.[ch]
++/qapi/qapi-types-crypto.[ch]
++/qapi/qapi-types-introspect.[ch]
++/qapi/qapi-types-migration.[ch]
++/qapi/qapi-types-net.[ch]
++/qapi/qapi-types-rocker.[ch]
++/qapi/qapi-types-run-state.[ch]
++/qapi/qapi-types-sockets.[ch]
++/qapi/qapi-types-tpm.[ch]
++/qapi/qapi-types-trace.[ch]
++/qapi/qapi-types-transaction.[ch]
++/qapi/qapi-types-ui.[ch]
+ /qapi-types.[ch]
++/qapi/qapi-visit-block-core.[ch]
++/qapi/qapi-visit-block.[ch]
++/qapi/qapi-visit-char.[ch]
++/qapi/qapi-visit-common.[ch]
++/qapi/qapi-visit-crypto.[ch]
++/qapi/qapi-visit-introspect.[ch]
++/qapi/qapi-visit-migration.[ch]
++/qapi/qapi-visit-net.[ch]
++/qapi/qapi-visit-rocker.[ch]
++/qapi/qapi-visit-run-state.[ch]
++/qapi/qapi-visit-sockets.[ch]
++/qapi/qapi-visit-tpm.[ch]
++/qapi/qapi-visit-trace.[ch]
++/qapi/qapi-visit-transaction.[ch]
++/qapi/qapi-visit-ui.[ch]
+ /qapi-visit.[ch]
+ /qapi-event.[ch]
+ /qapi-doc.texi
+-- 
 2.14.3
