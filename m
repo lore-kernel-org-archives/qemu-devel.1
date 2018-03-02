@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1erbev-0000Xb-R8
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 22:47:05 -0500
+	(envelope-from <jbaron@akamai.com>) id 1erbf5-0000c9-Tr
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 22:47:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1erbeq-0000os-ND
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 22:47:01 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53934 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1erbeq-0000oS-Is
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 22:46:56 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1A8904075168
-	for <qemu-devel@nongnu.org>; Fri,  2 Mar 2018 03:46:56 +0000 (UTC)
-Date: Fri, 2 Mar 2018 11:46:45 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180302034645.GU27381@xz-mi>
-References: <20180301084438.13594-1-peterx@redhat.com>
-	<20180301084438.13594-2-peterx@redhat.com>
-	<4fc6fbe7-5b7e-fa04-7f99-9740e00a928a@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4fc6fbe7-5b7e-fa04-7f99-9740e00a928a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 01/15] chardev: fix leak in
- tcp_chr_telnet_init_io()
+	(envelope-from <jbaron@akamai.com>) id 1erbf1-0000zb-Ui
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 22:47:11 -0500
+Received: from mx0a-00190b01.pphosted.com ([2620:100:9001:583::1]:47326)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jbaron@akamai.com>) id 1erbf1-0000z2-L9
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 22:47:07 -0500
+From: Jason Baron <jbaron@akamai.com>
+Date: Thu,  1 Mar 2018 22:46:34 -0500
+Message-Id: <ee94e55496562390786ad924f750de1cf3472644.1519961667.git.jbaron@akamai.com>
+In-Reply-To: <cover.1519961667.git.jbaron@akamai.com>
+References: <cover.1519961667.git.jbaron@akamai.com>
+In-Reply-To: <cover.1519961667.git.jbaron@akamai.com>
+References: <cover.1519961667.git.jbaron@akamai.com>
+Subject: [Qemu-devel] [PATCH 2/4] rocker: drop local duplex definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,60 +25,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: mst@redhat.com
+Cc: jasowang@redhat.com, qemu-devel@nongnu.org, Jiri Pirko <jiri@resnulli.us>, virtio-dev@lists.oasis-open.org
 
-On Thu, Mar 01, 2018 at 06:39:34PM +0100, Paolo Bonzini wrote:
-> On 01/03/2018 09:44, Peter Xu wrote:
-> > Need to free TCPChardevTelnetInit when session established.
-> > 
-> > Since at it, switch to use G_SOURCE_* macros.
-> > 
-> > Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  chardev/char-socket.c | 10 +++++++---
-> >  1 file changed, 7 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> > index bdd6cff5f6..43a2cc2c1c 100644
-> > --- a/chardev/char-socket.c
-> > +++ b/chardev/char-socket.c
-> > @@ -591,19 +591,23 @@ static gboolean tcp_chr_telnet_init_io(QIOChannel *ioc,
-> >              ret = 0;
-> >          } else {
-> >              tcp_chr_disconnect(init->chr);
-> > -            return FALSE;
-> > +            goto end;
-> >          }
-> >      }
-> >      init->buflen -= ret;
-> >  
-> >      if (init->buflen == 0) {
-> >          tcp_chr_connect(init->chr);
-> > -        return FALSE;
-> > +        goto end;
-> >      }
-> >  
-> >      memmove(init->buf, init->buf + ret, init->buflen);
-> >  
-> > -    return TRUE;
-> > +    return G_SOURCE_CONTINUE;
-> > +
-> > +end:
-> > +    g_free(init);
-> > +    return G_SOURCE_REMOVE;
-> >  }
-> >  
-> >  static void tcp_chr_telnet_init(Chardev *chr)
-> > 
-> 
-> Queued, thanks (but it's okay if you post it again in v3, because I'm
-> not sure I'll be able to send a pull request tomorrow).
+Make use of duplex definitions from net/eth.h.
 
-Sure, thanks.
+Signed-off-by: Jason Baron <jbaron@akamai.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Jiri Pirko <jiri@resnulli.us>
+Cc: virtio-dev@lists.oasis-open.org
+---
+ hw/net/rocker/rocker_fp.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-I believe this is an equivalent "r-b" if I repost. :)
-
+diff --git a/hw/net/rocker/rocker_fp.c b/hw/net/rocker/rocker_fp.c
+index 4b3c984..13a14a0 100644
+--- a/hw/net/rocker/rocker_fp.c
++++ b/hw/net/rocker/rocker_fp.c
+@@ -16,17 +16,13 @@
+ 
+ #include "qemu/osdep.h"
+ #include "net/clients.h"
++#include "net/eth.h"
+ 
+ #include "rocker.h"
+ #include "rocker_hw.h"
+ #include "rocker_fp.h"
+ #include "rocker_world.h"
+ 
+-enum duplex {
+-    DUPLEX_HALF = 0,
+-    DUPLEX_FULL
+-};
+-
+ struct fp_port {
+     Rocker *r;
+     World *world;
 -- 
-Peter Xu
+2.7.4
