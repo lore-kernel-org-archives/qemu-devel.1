@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eriWi-00032h-RH
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:07:02 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eriWk-00033O-C3
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:07:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eriWh-0004x9-SJ
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:07:00 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46768)
+	(envelope-from <pm215@archaic.org.uk>) id 1eriWj-0004ye-6b
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:07:02 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46770)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1eriWh-0004w4-MI
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:06:59 -0500
+	id 1eriWi-0004wk-VU
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:07:01 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1eriWg-0001OJ-Aq
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:06:58 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1eriWh-0001Oo-OW
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:06:59 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  2 Mar 2018 11:06:25 +0000
-Message-Id: <20180302110640.28004-25-peter.maydell@linaro.org>
+Date: Fri,  2 Mar 2018 11:06:27 +0000
+Message-Id: <20180302110640.28004-27-peter.maydell@linaro.org>
 In-Reply-To: <20180302110640.28004-1-peter.maydell@linaro.org>
 References: <20180302110640.28004-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 24/39] target/arm: Add ARM_FEATURE_V8_RDM
+Subject: [Qemu-devel] [PULL 26/39] target/arm: Refactor disas_simd_indexed
+ size checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,41 +32,110 @@ To: qemu-devel@nongnu.org
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Not enabled anywhere yet.
+The integer size check was already outside of the opcode switch;
+move the floating-point size check outside as well.  Unify the
+size vs index adjustment between fp and integer paths.
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20180228193125.20577-2-richard.henderson@linaro.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20180228193125.20577-4-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h     | 1 +
- linux-user/elfload.c | 1 +
- 2 files changed, 2 insertions(+)
+ target/arm/translate-a64.c | 65 +++++++++++++++++++++++-----------------------
+ 1 file changed, 32 insertions(+), 33 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 72b5668377..c4d6992f1d 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1433,6 +1433,7 @@ enum arm_features {
-     ARM_FEATURE_V8_SHA3, /* implements SHA3 part of v8 Crypto Extensions */
-     ARM_FEATURE_V8_SM3, /* implements SM3 part of v8 Crypto Extensions */
-     ARM_FEATURE_V8_SM4, /* implements SM4 part of v8 Crypto Extensions */
-+    ARM_FEATURE_V8_RDM, /* implements v8.1 simd round multiply */
-     ARM_FEATURE_V8_FP16, /* implements v8.2 half-precision float */
- };
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index fc928b61f6..cbb4510e3a 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -11820,10 +11820,6 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
+     case 0x05: /* FMLS */
+     case 0x09: /* FMUL */
+     case 0x19: /* FMULX */
+-        if (size == 1) {
+-            unallocated_encoding(s);
+-            return;
+-        }
+         is_fp = true;
+         break;
+     default:
+@@ -11834,45 +11830,48 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
+     if (is_fp) {
+         /* convert insn encoded size to TCGMemOp size */
+         switch (size) {
+-        case 2: /* single precision */
+-            size = MO_32;
+-            index = h << 1 | l;
+-            rm |= (m << 4);
+-            break;
+-        case 3: /* double precision */
+-            size = MO_64;
+-            if (l || !is_q) {
++        case 0: /* half-precision */
++            if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
+                 unallocated_encoding(s);
+                 return;
+             }
+-            index = h;
+-            rm |= (m << 4);
+-            break;
+-        case 0: /* half precision */
+             size = MO_16;
+-            index = h << 2 | l << 1 | m;
+-            is_fp16 = true;
+-            if (arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
+-                break;
+-            }
+-            /* fallthru */
+-        default: /* unallocated */
+-            unallocated_encoding(s);
+-            return;
+-        }
+-    } else {
+-        switch (size) {
+-        case 1:
+-            index = h << 2 | l << 1 | m;
+             break;
+-        case 2:
+-            index = h << 1 | l;
+-            rm |= (m << 4);
++        case MO_32: /* single precision */
++        case MO_64: /* double precision */
+             break;
+         default:
+             unallocated_encoding(s);
+             return;
+         }
++    } else {
++        switch (size) {
++        case MO_8:
++        case MO_64:
++            unallocated_encoding(s);
++            return;
++        }
++    }
++
++    /* Given TCGMemOp size, adjust register and indexing.  */
++    switch (size) {
++    case MO_16:
++        index = h << 2 | l << 1 | m;
++        break;
++    case MO_32:
++        index = h << 1 | l;
++        rm |= m << 4;
++        break;
++    case MO_64:
++        if (l || !is_q) {
++            unallocated_encoding(s);
++            return;
++        }
++        index = h;
++        rm |= m << 4;
++        break;
++    default:
++        g_assert_not_reached();
+     }
  
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 6689089cd2..3a55fb33a8 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -553,6 +553,7 @@ static uint32_t get_elf_hwcap(void)
-     GET_FEATURE(ARM_FEATURE_V8_SHA512, ARM_HWCAP_A64_SHA512);
-     GET_FEATURE(ARM_FEATURE_V8_FP16,
-                 ARM_HWCAP_A64_FPHP | ARM_HWCAP_A64_ASIMDHP);
-+    GET_FEATURE(ARM_FEATURE_V8_RDM, ARM_HWCAP_A64_ASIMDRDM);
- #undef GET_FEATURE
- 
-     return hwcaps;
+     if (!fp_access_check(s)) {
 -- 
 2.16.2
