@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1erYwQ-0007oE-IY
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 19:52:55 -0500
+	(envelope-from <famz@redhat.com>) id 1erZ2B-0000sj-PZ
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 19:58:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1erYwM-0007sN-P1
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 19:52:54 -0500
-Received: from mail-vk0-f66.google.com ([209.85.213.66]:45109)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <fzheng@redhat.com>) id 1erYwM-0007qz-J8
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 19:52:50 -0500
-Received: by mail-vk0-f66.google.com with SMTP id k187so4848535vke.12
-	for <qemu-devel@nongnu.org>; Thu, 01 Mar 2018 16:52:49 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9i+kAt4HgT-sfzJ+R491r5wjJwGkBRsPKwzoE2ZT5ibA@mail.gmail.com>
-References: <20180301112403.12487-1-peter.maydell@linaro.org>
-	<151990924540.1290.18181910407458585370@bdbb90650ae5>
-	<CAFEAcA9i+kAt4HgT-sfzJ+R491r5wjJwGkBRsPKwzoE2ZT5ibA@mail.gmail.com>
+	(envelope-from <famz@redhat.com>) id 1erZ2B-00065d-1l
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 19:58:51 -0500
+Date: Fri, 2 Mar 2018 08:58:26 +0800
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 2 Mar 2018 08:52:08 +0800
-Message-ID: <CAK1Eb9nWGBxFvXrKKktbm0RcrKWFcgGKDUh97ag1-VtJ_45BCg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/42] target-arm queue
+Message-ID: <20180302005826.GI21198@lemon.usersys.redhat.com>
+References: <20180228181946.22958-1-stefanha@redhat.com>
+	<20180301011517.GH21336@lemon.usersys.redhat.com>
+	<20180301145446.GA30789@stefanha-x1.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180301145446.GA30789@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] vl: introduce vm_shutdown()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +24,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-On Thu, Mar 1, 2018 at 10:45 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 1 March 2018 at 13:00,  <no-reply@patchew.org> wrote:
->> Hi,
->>
->> This series seems to have some coding style problems. See output below for
->> more information:
->>
->> Type: series
->> Message-id: 20180301112403.12487-1-peter.maydell@linaro.org
->> Subject: [Qemu-devel] [PULL 00/42] target-arm queue
->
-> Fam -- any idea why patchew sent two checkpatch-issues emails for
-> this patchset ? The Message-IDs are:
-> <151990924540.1290.18181910407458585370@bdbb90650ae5>
-> <151990926291.1290.9842237231347453757@bdbb90650ae5>
+On Thu, 03/01 14:54, Stefan Hajnoczi wrote:
+> On Thu, Mar 01, 2018 at 09:15:17AM +0800, Fam Zheng wrote:
+> > On Wed, 02/28 18:19, Stefan Hajnoczi wrote:
+> > > v2:
+> > >  * Tackle the .ioeventfd_stop() vs vq handler race by removing the ioeventfd
+> > >    from a BH in the IOThread [Fam]
+> > > 
+> > > There are several race conditions in virtio-blk/virtio-scsi dataplane code.
+> > > This patch series addresses them, see the commit description for details on the
+> > > individual cases.
+> > 
+> > This doesn't apply to master. Which branch is it based off?
+> 
+> Sorry, I was going to look up the Based-on: syntax and then forgot.  I'm
+> not sure where it's documented, here is a guess at how it works:
+> 
+> Based-on: "[PATCH v3 0/5] block: fix blk_aio_*() segfault when blk->root == NULL" <20180216165015.30715-1-stefanha@redhat.com>
 
-A bug in patchew. The server dispatched the checkpatch task to two testers
-when they asked for more work to do. One of them shouldn't happen.
-I've worked around this in the config
-(filtering the task into only one tester) now.
+Sorry for the poor documentation of Patchew, we should improve the situation
+soon:
 
-I created an issue.
+Based-on: <20180216165015.30715-1-stefanha@redhat.com>
+([PATCH v3 0/5] block: fix blk_aio_*() segfault when blk->root == NULL)
 
-https://github.com/patchew-project/patchew/issues/63
+(Only the "Based-on:" line matters)
 
 Fam
