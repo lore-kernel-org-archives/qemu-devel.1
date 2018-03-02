@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eriSA-0001Wh-ER
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:02:19 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eriWS-0002ki-If
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:06:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eriS6-0002cL-Hq
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:02:18 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33166 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eriS6-0002bo-Cy
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:02:14 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 75B61E44B5
-	for <qemu-devel@nongnu.org>; Fri,  2 Mar 2018 11:02:13 +0000 (UTC)
-Date: Fri, 2 Mar 2018 11:02:09 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180302110209.GE26972@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180301084438.13594-1-peterx@redhat.com>
-	<20180301084438.13594-9-peterx@redhat.com>
-	<20180301154638.GO14643@redhat.com>
-	<ca243953-2f86-f73a-c3c3-95335f94bba2@redhat.com>
+	(envelope-from <pm215@archaic.org.uk>) id 1eriWR-0004k3-8X
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:06:44 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46746)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1eriWR-0004jE-04
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:06:43 -0500
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1eriWP-0001IH-6s
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:06:41 +0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri,  2 Mar 2018 11:06:01 +0000
+Message-Id: <20180302110640.28004-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ca243953-2f86-f73a-c3c3-95335f94bba2@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 08/15] chardev: allow telnet gsource to
- switch gcontext
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/39] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,45 +28,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Thu, Mar 01, 2018 at 06:16:53PM +0100, Paolo Bonzini wrote:
-> On 01/03/2018 16:46, Daniel P. Berrang=C3=A9 wrote:
-> > On Thu, Mar 01, 2018 at 04:44:31PM +0800, Peter Xu wrote:
-> >> It was originally created by qio_channel_add_watch() so it's always
-> >> assigning the task to main context.  Now we use the new API called
-> >> qio_channel_add_watch_source() so that we get the GSource handle rat=
-her
-> >> than the tag ID.
-> >>
-> >> Meanwhile, caching the gsource in SocketChardev.telnet_source so tha=
-t we
-> >> can also do dynamic context switch when update read handlers.
-> > I don't see why we would ever want to dynamically switch the
-> > GMainContext in use while in middle of reading the telnet greeting.
->=20
-> Maybe because the remote client hangs in the middle of the telnet
-> greeting?  The user of the Chardev can't know that the initial handshak=
-e
-> hasn't been done yet.
+Second pull request of the week; mostly RTH's support for some
+new-in-v8.1/v8.3 instructions, and my v8M board model.
 
-NB, the chardev will emit the CHR_EVENT_OPENED event once the connection
-is successfully established, which includes completion of the telnet
-and/or TLS handshake.
+thanks
+-- PMM
 
-I'm just not seeing what code in QEMU would actually trigger a decision
-to change the GMainContext, in between the accept() of the socket, and
-the CHR_EVENT_OPENED, since we don't tell anyone that the accept() has
-actually taken place - they first they'll know of a new client being
-connected is when the CHR_EVENT_OPENED is emitted.
+The following changes since commit 427cbc7e4136a061628cb4315cc8182ea36d772f:
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2018-03-01 18:46:41 +0000)
+
+are available in the Git repository at:
+
+  git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20180302
+
+for you to fetch changes up to e66a67bf28e1b4fce2e3d72a2610dbd48d9d3078:
+
+  target/arm: Enable ARM_FEATURE_V8_FCMA (2018-03-02 11:03:45 +0000)
+
+----------------------------------------------------------------
+target-arm queue:
+ * implement FCMA and RDM v8.1 and v8.3 instructions
+ * enable Cortex-M33 v8M core, and provide new mps2-an505 board model
+   that uses it
+ * decodetree: Propagate return value from translate subroutines
+ * xlnx-zynqmp: Implement the RTC device
+
+----------------------------------------------------------------
+Alistair Francis (3):
+      xlnx-zynqmp-rtc: Initial commit
+      xlnx-zynqmp-rtc: Add basic time support
+      xlnx-zynqmp: Connect the RTC device
+
+Peter Maydell (19):
+      loader: Add new load_ramdisk_as()
+      hw/arm/boot: Honour CPU's address space for image loads
+      hw/arm/armv7m: Honour CPU's address space for image loads
+      target/arm: Define an IDAU interface
+      armv7m: Forward idau property to CPU object
+      target/arm: Define init-svtor property for the reset secure VTOR value
+      armv7m: Forward init-svtor property to CPU object
+      target/arm: Add Cortex-M33
+      hw/misc/unimp: Move struct to header file
+      include/hw/or-irq.h: Add missing include guard
+      qdev: Add new qdev_init_gpio_in_named_with_opaque()
+      hw/core/split-irq: Device that splits IRQ lines
+      hw/misc/mps2-fpgaio: FPGA control block for MPS2 AN505
+      hw/misc/tz-ppc: Model TrustZone peripheral protection controller
+      hw/misc/iotkit-secctl: Arm IoT Kit security controller initial skeleton
+      hw/misc/iotkit-secctl: Add handling for PPCs
+      hw/misc/iotkit-secctl: Add remaining simple registers
+      hw/arm/iotkit: Model Arm IOT Kit
+      mps2-an505: New board model: MPS2 with AN505 Cortex-M33 FPGA image
+
+Richard Henderson (17):
+      decodetree: Propagate return value from translate subroutines
+      target/arm: Add ARM_FEATURE_V8_RDM
+      target/arm: Refactor disas_simd_indexed decode
+      target/arm: Refactor disas_simd_indexed size checks
+      target/arm: Decode aa64 armv8.1 scalar three same extra
+      target/arm: Decode aa64 armv8.1 three same extra
+      target/arm: Decode aa64 armv8.1 scalar/vector x indexed element
+      target/arm: Decode aa32 armv8.1 three same
+      target/arm: Decode aa32 armv8.1 two reg and a scalar
+      target/arm: Enable ARM_FEATURE_V8_RDM
+      target/arm: Add ARM_FEATURE_V8_FCMA
+      target/arm: Decode aa64 armv8.3 fcadd
+      target/arm: Decode aa64 armv8.3 fcmla
+      target/arm: Decode aa32 armv8.3 3-same
+      target/arm: Decode aa32 armv8.3 2-reg-index
+      target/arm: Decode t32 simd 3reg and 2reg_scalar extension
+      target/arm: Enable ARM_FEATURE_V8_FCMA
+
+ hw/arm/Makefile.objs               |   2 +
+ hw/core/Makefile.objs              |   1 +
+ hw/misc/Makefile.objs              |   4 +
+ hw/timer/Makefile.objs             |   1 +
+ target/arm/Makefile.objs           |   2 +-
+ include/hw/arm/armv7m.h            |   5 +
+ include/hw/arm/iotkit.h            | 109 ++++++
+ include/hw/arm/xlnx-zynqmp.h       |   2 +
+ include/hw/core/split-irq.h        |  57 +++
+ include/hw/irq.h                   |   4 +-
+ include/hw/loader.h                |  12 +-
+ include/hw/misc/iotkit-secctl.h    | 103 ++++++
+ include/hw/misc/mps2-fpgaio.h      |  43 +++
+ include/hw/misc/tz-ppc.h           | 101 ++++++
+ include/hw/misc/unimp.h            |  10 +
+ include/hw/or-irq.h                |   5 +
+ include/hw/qdev-core.h             |  30 +-
+ include/hw/timer/xlnx-zynqmp-rtc.h |  86 +++++
+ target/arm/cpu.h                   |   8 +
+ target/arm/helper.h                |  31 ++
+ target/arm/idau.h                  |  61 ++++
+ hw/arm/armv7m.c                    |  35 +-
+ hw/arm/boot.c                      | 119 ++++---
+ hw/arm/iotkit.c                    | 598 +++++++++++++++++++++++++++++++
+ hw/arm/mps2-tz.c                   | 503 ++++++++++++++++++++++++++
+ hw/arm/xlnx-zynqmp.c               |  14 +
+ hw/core/loader.c                   |   8 +-
+ hw/core/qdev.c                     |   8 +-
+ hw/core/split-irq.c                |  89 +++++
+ hw/misc/iotkit-secctl.c            | 704 +++++++++++++++++++++++++++++++++++++
+ hw/misc/mps2-fpgaio.c              | 176 ++++++++++
+ hw/misc/tz-ppc.c                   | 302 ++++++++++++++++
+ hw/misc/unimp.c                    |  10 -
+ hw/timer/xlnx-zynqmp-rtc.c         | 272 ++++++++++++++
+ linux-user/elfload.c               |   2 +
+ target/arm/cpu.c                   |  66 +++-
+ target/arm/cpu64.c                 |   2 +
+ target/arm/helper.c                |  28 +-
+ target/arm/translate-a64.c         | 514 +++++++++++++++++++++------
+ target/arm/translate.c             | 275 +++++++++++++--
+ target/arm/vec_helper.c            | 429 ++++++++++++++++++++++
+ default-configs/arm-softmmu.mak    |   5 +
+ hw/misc/trace-events               |  24 ++
+ hw/timer/trace-events              |   3 +
+ scripts/decodetree.py              |   5 +-
+ 45 files changed, 4668 insertions(+), 200 deletions(-)
+ create mode 100644 include/hw/arm/iotkit.h
+ create mode 100644 include/hw/core/split-irq.h
+ create mode 100644 include/hw/misc/iotkit-secctl.h
+ create mode 100644 include/hw/misc/mps2-fpgaio.h
+ create mode 100644 include/hw/misc/tz-ppc.h
+ create mode 100644 include/hw/timer/xlnx-zynqmp-rtc.h
+ create mode 100644 target/arm/idau.h
+ create mode 100644 hw/arm/iotkit.c
+ create mode 100644 hw/arm/mps2-tz.c
+ create mode 100644 hw/core/split-irq.c
+ create mode 100644 hw/misc/iotkit-secctl.c
+ create mode 100644 hw/misc/mps2-fpgaio.c
+ create mode 100644 hw/misc/tz-ppc.c
+ create mode 100644 hw/timer/xlnx-zynqmp-rtc.c
+ create mode 100644 target/arm/vec_helper.c
