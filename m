@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1ern0X-000131-My
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 10:54:07 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ernDE-0005fP-47
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:07:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1ern0V-0001gb-C6
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 10:54:05 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33578 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1ernDB-0001pC-04
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:07:12 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42514 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1ern0V-0001g8-5x
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 10:54:03 -0500
-References: <20180228180215.25470-1-wei@redhat.com>
-	<20180228180215.25470-3-wei@redhat.com>
-	<3787bc96-7371-49ac-18b1-76f9cd144037@redhat.com>
-From: Wei Huang <wei@redhat.com>
-Message-ID: <b6c02231-7ff8-3159-d82b-8635df957e69@redhat.com>
-Date: Fri, 2 Mar 2018 09:54:01 -0600
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ernDA-0001p4-Rg
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:07:08 -0500
+References: <1519900415-30314-1-git-send-email-yi.l.liu@linux.intel.com>
+	<1519900415-30314-9-git-send-email-yi.l.liu@linux.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f06bee8b-646d-e9e8-d2e6-78cdddb76ab1@redhat.com>
+Date: Fri, 2 Mar 2018 17:06:56 +0100
 MIME-Version: 1.0
-In-Reply-To: <3787bc96-7371-49ac-18b1-76f9cd144037@redhat.com>
+In-Reply-To: <1519900415-30314-9-git-send-email-yi.l.liu@linux.intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V7 2/4] tests/migration: Convert the boot
- block compilation script into Makefile
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 08/12] hw/pci: introduce
+ pci_device_notify_iommu()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,98 +29,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, drjones@redhat.com, dgilbert@redhat.com, quintela@redhat.com
+To: "Liu, Yi L" <yi.l.liu@linux.intel.com>, qemu-devel@nongnu.org, mst@redhat.com, david@gibson.dropbear.id.au
+Cc: alex.williamson@redhat.com, eric.auger.pro@gmail.com, yi.l.liu@intel.com, peterx@redhat.com, kevin.tian@intel.com, jasowang@redhat.com
 
+On 01/03/2018 11:33, Liu, Yi L wrote:
+> +    pci_device_notify_iommu(pdev, PCI_NTY_DEV_ADD);
+> +
+>      pci_setup_sva_ops(pdev, &vfio_pci_sva_ops);
+> =20
+>      return;
+> @@ -3134,6 +3136,7 @@ static void vfio_exitfn(PCIDevice *pdev)
+>  {
+>      VFIOPCIDevice *vdev =3D DO_UPCAST(VFIOPCIDevice, pdev, pdev);
+> =20
+> +    pci_device_notify_iommu(pdev, PCI_NTY_DEV_DEL);
 
+Please make the names longer: PCI_IOMMU_NOTIFY_DEVICE_ADDED and
+PCI_IOMMU_NOTIFY_DEVICE_REMOVED.  (This is independent of my other
+remark, about doing this in generic PCI code for all devices that
+register SVA ops).
 
-On 03/02/2018 09:25 AM, Laurent Vivier wrote:
-> On 28/02/2018 19:02, Wei Huang wrote:
->> The x86 boot block header currently is generated with a shell script.
->> To better support other CPUs (e.g. aarch64), we convert the script
->> into Makefile. This allows us to 1) support cross-compilation easily,
->> and 2) avoid creating a script file for every architecture.
->>
->> Signed-off-by: Wei Huang <wei@redhat.com>
->> Reviewed-by: Andrew Jones <drjones@redhat.com>
->> ---
->>  tests/migration/Makefile                 | 36 ++++++++++++++++++++++++++++++++
->>  tests/migration/rebuild-x86-bootblock.sh | 33 -----------------------------
->>  tests/migration/x86-a-b-bootblock.h      |  2 +-
->>  tests/migration/x86-a-b-bootblock.s      |  5 ++---
->>  4 files changed, 39 insertions(+), 37 deletions(-)
->>  create mode 100644 tests/migration/Makefile
->>  delete mode 100755 tests/migration/rebuild-x86-bootblock.sh
->>
->> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
->> new file mode 100644
->> index 0000000000..8fbedaa8b8
->> --- /dev/null
->> +++ b/tests/migration/Makefile
->> @@ -0,0 +1,36 @@
->> +#
->> +# Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
->> +#
->> +# Authors:
->> +#   Dave Gilbert <dgilbert@redhat.com>
->> +#
->> +# This work is licensed under the terms of the GNU GPL, version 2 or later.
->> +# See the COPYING file in the top-level directory.
->> +#
->> +export __note
->> +override define __note
->> +/* This file is automatically generated from
->> + * tests/migration/$<, edit that and then run
->> + * "make $@" inside tests/migration to update,
->> + * and then remember to send both in your patch submission.
->> + */
->> +endef
->> +
->> +all: x86-a-b-bootblock.h
->> +# Dummy command so that make thinks it has done something
->> +	@true
->> +
->> +SRC_PATH=../..
->> +include $(SRC_PATH)/rules.mak
-> 
-> does it work in not in-tree build?
+Thanks,
 
-Yes, I tried it with a out-of-tree build and it worked. More
-specifically, because .h file (e.g. x86-a-b-bootblock.h) is provided,
-this Makefile is disjoint from the main build system and it has to be
-invoked explicitly. So it won't be affected by out-of-tree build.
-
-> 
->> +
->> +x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
->> +
->> +x86-a-b-bootblock.h: x86-a-b-bootblock.s
->> +	$(x86_64_cross_prefix)as --32 -march=i486 $< -o x86.o
->> +	$(x86_64_cross_prefix)objcopy -O binary x86.o x86.boot
->> +	dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124
->> +	echo "$$__note" > $@
->> +	xxd -i x86.bootsect | sed -e 's/.*int.*//' >> $@
-> 
-> To be really in the spirit of a makefile, you should have a rule by target:
-> 
-> x86.o: x86-a-b-bootblock.s
-> 	$(x86_64_cross_prefix)as --32 -march=i486 $< -o x86.o
-> 
-> x86.boot: x86.o
-> 	$(x86_64_cross_prefix)objcopy -O binary x86.o x86.boot
-> 
-> x86.bootsect: x86.boot
-> 	dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124
-> 
-> x86-a-b-bootblock.h: x86.bootsect
-> 	echo "$$__note" > header.tmp
-> 	xxd -i x86.bootsect | sed -e 's/.*int.*//' >> header.tmp
-> 	mv header.tmp $@
-> 
-
-It is cleaner, I agree. But it will make the Makefile quite bulky
-(remember that we have to do the same for aarch64 and others).
-
-> Thanks,
-> Laurent
-> 
+Paolo
