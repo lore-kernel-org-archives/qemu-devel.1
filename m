@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1erhPe-0001Hb-Pe
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 04:55:41 -0500
+	(envelope-from <david@redhat.com>) id 1erhad-0003X5-K5
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 05:07:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1erhPb-0001Bl-OS
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 04:55:38 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59184 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1erhPb-0001BD-IR
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 04:55:35 -0500
-References: <1519981484-15528-1-git-send-email-jianjay.zhou@huawei.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <8de44f32-0f0a-e02e-74a3-a04e8e9dc658@redhat.com>
-Date: Fri, 2 Mar 2018 17:55:12 +0800
+	(envelope-from <david@redhat.com>) id 1erhaa-0008Gj-Gs
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 05:06:59 -0500
+References: <1519944838-12430-1-git-send-email-cota@braap.org>
+	<1519944838-12430-13-git-send-email-cota@braap.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <83a59320-8539-2511-3665-2d3141b65857@redhat.com>
+Date: Fri, 2 Mar 2018 11:06:37 +0100
 MIME-Version: 1.0
-In-Reply-To: <1519981484-15528-1-git-send-email-jianjay.zhou@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1519944838-12430-13-git-send-email-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5] tap: setting error appropriately when
- calling net_init_tap_one()
+Subject: Re: [Qemu-devel] [PATCHv1 12/14] target/s390x: convert to
+ TranslatorOps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,105 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jay Zhou <jianjay.zhou@huawei.com>, qemu-devel@nongnu.org
-Cc: weidong.huang@huawei.com, mst@redhat.com, arei.gonglei@huawei.com, imammedo@redhat.com, wangxinxin.wang@huawei.com
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org
+
+On 01.03.2018 23:53, Emilio G. Cota wrote:
+> Note: I looked into dropping dc->do_debug. However, I don't see
+> an easy way to do it given that TOO_MANY is also valid
+> when we just translate more than max_insns. Thus, the check
+> for do_debug in "case DISAS_PC_CC_UPDATED" would still need
+> additional state to know whether or not we came from
+> breakpoint_check.
+
+Looks much cleaner! The do_debug() thing is fine for now.
 
 
+> -        if (unlikely(cpu_breakpoint_test(cs, dc.base.pc_next, BP_ANY))=
+) {
+> -            status =3D DISAS_PC_STALE;
+> -            do_debug =3D true;
+> -            /* The address covered by the breakpoint must be included =
+in
+> -               [tb->pc, tb->pc + tb->size) in order to for it to be
+> -               properly cleared -- thus we increment the PC here so th=
+at
+> -               the logic setting tb->size below does the right thing. =
+ */
+> -            dc.base.pc_next +=3D 2;
+> -            break;
+> -        }
+> +    dc->base.is_jmp =3D DISAS_PC_STALE;
+> +    dc->do_debug =3D true;
+> +    /* The address covered by the breakpoint must be included in
+> +       [tb->pc, tb->pc + tb->size) in order to for it to be
+> +       properly cleared -- thus we increment the PC here so that
+> +       the logic setting tb->size below does the right thing.  */
+> +    dc->base.pc_next +=3D 2;
 
-On 2018=E5=B9=B403=E6=9C=8802=E6=97=A5 17:04, Jay Zhou wrote:
-> If netdev_add tap,id=3Dnet0,...,vhost=3Don failed in net_init_tap_one()=
-,
-> the followed up device_add virtio-net-pci,netdev=3Dnet0 will fail
-> too, prints:
->
->     TUNSETOFFLOAD ioctl() failed: Bad file descriptor TUNSETOFFLOAD
->     ioctl() failed: Bad file descriptor
->
-> The reason is that the fd of tap is closed when error occured after
-> calling net_init_tap_one().
->
-> The fd should be closed when calling net_init_tap_one failed:
->     - if tap_set_sndbuf() failed
->     - if tap_set_sndbuf() succeeded but vhost failed to open or
->       initialize with vhostforce flag on
->     - with wrong vhost command line parameter
-> The fd should not be closed just because vhost failed to open or
-> initialize but without vhostforce flag. So the followed up
-> device_add can fall back to userspace virtio successfully.
->
-> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-> Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> Suggested-by: Jason Wang <jasowang@redhat.com>
-> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
-> ---
->   include/net/vhost_net.h |  3 +++
->   net/tap.c               | 22 +++++++++++++++++-----
->   2 files changed, 20 insertions(+), 5 deletions(-)
->
-> diff --git a/include/net/vhost_net.h b/include/net/vhost_net.h
-> index afc1499..77e4739 100644
-> --- a/include/net/vhost_net.h
-> +++ b/include/net/vhost_net.h
-> @@ -4,6 +4,9 @@
->   #include "net/net.h"
->   #include "hw/virtio/vhost-backend.h"
->  =20
-> +#define VHOST_NET_INIT_FAILED \
-> +    "vhost-net requested but could not be initialized"
-> +
->   struct vhost_net;
->   typedef struct vhost_net VHostNetState;
->  =20
-> diff --git a/net/tap.c b/net/tap.c
-> index 979e622..2b3a36f 100644
-> --- a/net/tap.c
-> +++ b/net/tap.c
-> @@ -686,14 +686,23 @@ static void net_init_tap_one(const NetdevTapOptio=
-ns *tap, NetClientState *peer,
->           if (vhostfdname) {
->               vhostfd =3D monitor_fd_param(cur_mon, vhostfdname, &err);
->               if (vhostfd =3D=3D -1) {
-> -                error_propagate(errp, err);
-> +                if (tap->has_vhostforce && tap->vhostforce) {
-> +                    error_propagate(errp, err);
-> +                } else {
-> +                    warn_report_err(err);
-> +                }
->                   return;
->               }
->           } else {
->               vhostfd =3D open("/dev/vhost-net", O_RDWR);
->               if (vhostfd < 0) {
-> -                error_setg_errno(errp, errno,
-> -                                 "tap: open vhost char device failed")=
-;
-> +                if (tap->has_vhostforce && tap->vhostforce) {
-> +                    error_setg_errno(errp, errno,
-> +                                     "tap: open vhost char device fail=
-ed");
-> +                } else {
-> +                    warn_report("tap: open vhost char device failed: %=
-s",
-> +                                strerror(errno));
-> +                }
->                   return;
->               }
->               fcntl(vhostfd, F_SETFL, O_NONBLOCK);
-> @@ -702,8 +711,11 @@ static void net_init_tap_one(const NetdevTapOption=
-s *tap, NetClientState *peer,
->  =20
->           s->vhost_net =3D vhost_net_init(&options);
->           if (!s->vhost_net) {
-> -            error_setg(errp,
-> -                       "vhost-net requested but could not be initializ=
-ed");
-> +            if (tap->has_vhostforce && tap->vhostforce) {
-> +                error_setg(errp, VHOST_NET_INIT_FAILED);
-> +            } else {
-> +                warn_report(VHOST_NET_INIT_FAILED);
-> +            }
->               return;
->           }
->       } else if (vhostfdname) {
+This comment is now wrong. ("the logic in translator_loop()" ?)
 
-Applied, thanks.
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+
+Gave this series a quick test:
+
+kvm-unit-tests pass (you need to rebase to have all tests passing),
+fedora 27 boots
+
+--=20
+
+Thanks,
+
+David / dhildenb
