@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erksi-00086o-AQ
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:37:53 -0500
+	(envelope-from <stefanha@gmail.com>) id 1erktk-0000H0-1Q
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:38:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erksf-0004Wj-40
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:37:52 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37596 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1erkse-0004WT-Tf
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:37:49 -0500
-References: <20180301130939.15875-1-aik@ozlabs.ru>
-	<20180301130939.15875-2-aik@ozlabs.ru>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3986fcf2-844d-bc49-d297-960f788c3941@redhat.com>
-Date: Fri, 2 Mar 2018 07:37:31 -0600
+	(envelope-from <stefanha@gmail.com>) id 1erktj-000508-1L
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:38:56 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180301130939.15875-2-aik@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v3 1/2] qmp: Merge ObjectPropertyInfo
- and DevicePropertyInfo
+In-Reply-To: <1513690383-27269-1-git-send-email-sochin.jiang@huawei.com>
+References: <1513690383-27269-1-git-send-email-sochin.jiang@huawei.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Fri, 2 Mar 2018 13:38:52 +0000
+Message-ID: <CAJSP0QW1OKnRwwvxvmYaBQ3uLgvU-p9_RQqMLqj7ydwOKyevMw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] virtio-blk: notify guest
+ directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +22,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, Andrea Bolognani <abologna@redhat.com>
+To: "sochin.jiang" <sochin.jiang@huawei.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, Yi Fang <eric.fangyi@huawei.com>, Sergio Lopez <slp@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 03/01/2018 07:09 AM, Alexey Kardashevskiy wrote:
-> ObjectPropertyInfo is more generic and only missing @description.
-> This adds a description to ObjectPropertyInfo and removes
-> DevicePropertyInfo so the resulting ObjectPropertyInfo can be used
-> elsewhere.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
->   qapi-schema.json | 23 +++++------------------
->   qdev-monitor.c   |  6 +++---
->   qmp.c            | 20 ++++++++++----------
->   3 files changed, 18 insertions(+), 31 deletions(-)
-> 
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 0262b9f..87327e5 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -1266,10 +1266,12 @@
->   #        3) A link type in the form 'link<subtype>' where subtype is a qdev
->   #           device type name.  Link properties form the device model graph.
->   #
-> +# @description: if specified, the description of the property.
+On Tue, Dec 19, 2017 at 1:33 PM, sochin.jiang <sochin.jiang@huawei.com> wrote:
+>  Till now, we've already notify guest as a batch mostly, an
+>  extra BH won't decrease guest interrupts much, but cause a
+>  significant notification loss. Generally, we could have 15%
+>  or so performance lost in single queue IO models, as I tested.
 
-Missing a '(since 2.12)' tag.
+Recent performance testing has shown that virtio-blk can underperform
+virtio-scsi due to the extra latency added by the BH.
 
-> +#
->   # Since: 1.2
->   ##
->   { 'struct': 'ObjectPropertyInfo',
-> -  'data': { 'name': 'str', 'type': 'str' } }
-> +  'data': { 'name': 'str', 'type': 'str', '*description': 'str' } }
->   
-> +++ b/qmp.c
-> @@ -463,12 +463,12 @@ ObjectTypeInfoList *qmp_qom_list_types(bool has_implements,
->    *
->    * The caller must free the return value.
->    */
-> -static DevicePropertyInfo *make_device_property_info(ObjectClass *klass,
-> -                                                     const char *name,
-> -                                                     const char *default_type,
-> -                                                     const char *description)
-> +static ObjectPropertyInfo *make_device_property_info(ObjectClass *klass,
-> +                                                  const char *name,
-> +                                                  const char *default_type,
-> +                                                  const char *description)
+The virtqueue EVENT_IDX feature mitigates interrupts when the guest
+interrupt handler has not had a chance to run yet.  Therefore, virtio
+already offers one level of interrupt mitigation and the BH adds
+additional latency on top.
 
-Why the indentation change?
+The BH helps when the guest services interrupts very quickly
+(defeating EVENT_IDX mitigation) and therefore the device raises
+additional interrupts.  Network drivers in Linux solve this using
+NAPI, where the driver disables interrupts during periods of high
+completion rates.  We could do the same inside the guest driver and it
+would not suffer from BH latency.
 
-> @@ -508,14 +508,14 @@ static DevicePropertyInfo *make_device_property_info(ObjectClass *klass,
->       return info;
->   }
->   
-> -DevicePropertyInfoList *qmp_device_list_properties(const char *typename,
-> -                                                   Error **errp)
-> +ObjectPropertyInfoList *qmp_device_list_properties(const char *typename,
-> +                                                Error **errp)
+I now think that this patch would benefit most cases, although it may
+harm the case mentioned above without further patches to the
+virtio_blk.ko guest driver.
 
-and again
+Please resend the patch with fio benchmark output in the commit
+description and the issue I raised fixed:
 
-Otherwise looks okay
+> @@ -75,7 +67,12 @@ static void notify_guest_bh(void *opaque)
+>      }
+>  }
+>
+> -/* Context: QEMU global mutex held */
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Please keep this doc comment for virtio_blk_data_plane_create().
+
+Thanks,
+Stefan
