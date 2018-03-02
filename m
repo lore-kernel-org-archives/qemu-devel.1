@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erll3-00032Z-JX
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 09:34:02 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1erllQ-0003Dl-F1
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 09:34:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1erll0-0001jz-CS
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 09:34:01 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39542 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1erll0-0001jE-7o
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 09:33:58 -0500
-References: <1519998711-73430-1-git-send-email-mjc@sifive.com>
-	<1519998711-73430-24-git-send-email-mjc@sifive.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4506959a-8d32-039a-f0e3-c864fd44ace6@redhat.com>
-Date: Fri, 2 Mar 2018 08:33:47 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1erllP-0001qM-E9
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 09:34:24 -0500
+Received: from mail-ot0-x22f.google.com ([2607:f8b0:4003:c0f::22f]:35010)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1erllP-0001qD-8q
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 09:34:23 -0500
+Received: by mail-ot0-x22f.google.com with SMTP id w2so8882588otg.2
+	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 06:34:23 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1519998711-73430-24-git-send-email-mjc@sifive.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 23/23] RISC-V Build Infrastructure
+In-Reply-To: <ef125528-3e7a-5009-31aa-a3a8e8fd7ca2@redhat.com>
+References: <20180302013007.11827-1-eblake@redhat.com>
+	<CAFEAcA94aLXy8Zy5hjLMH5=x3LG5Z5icpzYJ+tHazFw3YQ_d4Q@mail.gmail.com>
+	<ef125528-3e7a-5009-31aa-a3a8e8fd7ca2@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 2 Mar 2018 14:34:02 +0000
+Message-ID: <CAFEAcA8aRNRt8L1BD0tFyUzw5XZri_qWF2yo79wOUai4KbjAcw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 00/30] QAPI patches for 2018-03-01
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +30,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 03/02/2018 07:51 AM, Michael Clark wrote:
-> This adds RISC-V into the build system enabling the following targets:
-> 
-> - riscv32-softmmu
-> - riscv64-softmmu
-> - riscv32-linux-user
-> - riscv64-linux-user
-> 
-> This adds defaults configs for RISC-V, enables the build for the RISC-V
-> CPU core, hardware, and Linux User Emulation. The 'qemu-binfmt-conf.sh'
-> script is updated to add the RISC-V ELF magic.
-> 
-> Expected checkpatch errors for consistency reasons:
-> 
-> ERROR: line over 90 characters
-> FILE: scripts/qemu-binfmt-conf.sh
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Signed-off-by: Michael Clark <mjc@sifive.com>
-> ---
->   arch_init.c                            |  2 ++
->   configure                              | 13 +++++++++++++
->   cpus.c                                 |  6 ++++++
->   default-configs/riscv32-linux-user.mak |  1 +
->   default-configs/riscv32-softmmu.mak    |  4 ++++
->   default-configs/riscv64-linux-user.mak |  1 +
->   default-configs/riscv64-softmmu.mak    |  4 ++++
->   hw/riscv/Makefile.objs                 | 11 +++++++++++
->   include/sysemu/arch_init.h             |  1 +
->   qapi-schema.json                       | 17 ++++++++++++++++-
+On 2 March 2018 at 14:05, Eric Blake <eblake@redhat.com> wrote:
+> On 03/02/2018 06:38 AM, Peter Maydell wrote:
+>> This produces a huge pile of warnings from my OSX toolchain.
+>>
+>> When running ar on libqemuutil.a:
+>>    AR      libqemuutil.a
+>>
+>> /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib:
+>> file: libqemuutil.a(qapi-types.o) has no symbols
+>
+>
+> Part of this change was moving the location of the generated ./qapi-types.c
+> to qapi/qapi-types.c.  Could it be that you are doing an incremental build,
+> rather than a clean build, and the compiler is picking up the stale version
+> of the file rather than its new location?
 
-Will need rebasing to modify qapi/misc.json if my pending PULL request 
-issues get resolved first:
+I am doing an incremental build, yes. That needs to work, not break...
 
-https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg00469.html
+>> I had a look at the autogenerated .c files on my Linux build, and they
+>> seem to consist only of a bunch of #includes. Why are we not generating
+>> any code here?
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> But I just checked, and at least for qapi/qapi-types.c, the generated file
+> IS just a list of includes; and in fact, it looks like all of the mentioned
+> files are in that boat (for example, qapi/transaction.json has no events, so
+> qapi/qapi-events-transaction.c being empty makes sense).
+
+> I know that some compilers are picky about that.
+
+Yes, I think this is what is causing the problem.
+
+> Is a typedef enough to
+> cause the compiler to have something to compile without warnings?
+
+Given that the warnings are coming from nm and ranlib, anything that
+doesn't actually cause a symbol to be put into the .o file isn't going
+to be enough I suspect.
+
+> If so,
+> does this patch solve things?  If it does, I'll squash it in the right place
+> within the series and submit a v3 pull request.
+>
+> diff --git i/scripts/qapi/common.py w/scripts/qapi/common.py
+> index 077e0fde4f4..aed32646c00 100644
+> --- i/scripts/qapi/common.py
+> +++ w/scripts/qapi/common.py
+> @@ -2035,6 +2035,13 @@ class QAPIGenC(QAPIGen):
+>  ''',
+>                       blurb=self._blurb, copyright=self._copyright)
+>
+> +    def _bottom(self, fname):
+> +        return mcgen('''
+> +/* Dummy typedef to prevent empty .o file */
+> +typedef int %(name)s;
+> +''',
+> +                     name=c_name(fname))
+> +
+>
+>  class QAPIGenH(QAPIGenC):
+
+I just tested this, and it isn't sufficient.
+
+thanks
+-- PMM
