@@ -1,24 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1ermaB-00051f-G6
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 10:26:52 -0500
+	(envelope-from <alifm@linux.vnet.ibm.com>) id 1ermeM-0007GS-2Z
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 10:31:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1erma8-0005Lt-AI
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 10:26:51 -0500
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:33857)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1erma8-0005Lg-4W
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 10:26:48 -0500
-Received: by mail-oi0-x241.google.com with SMTP id c83so7288615oib.1
-	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 07:26:48 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-From: minyard@acm.org
-Date: Fri,  2 Mar 2018 09:26:37 -0600
-Message-Id: <1520004397-28521-3-git-send-email-minyard@acm.org>
-In-Reply-To: <1520004397-28521-1-git-send-email-minyard@acm.org>
-References: <1520004397-28521-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH v2 2/2] ipmi: Use proper struct reference for
- BT vmstate
+	(envelope-from <alifm@linux.vnet.ibm.com>) id 1ermeI-0000bM-Rq
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 10:31:10 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41242
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alifm@linux.vnet.ibm.com>)
+	id 1ermeI-0000ag-L3
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 10:31:06 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w22FTH33127500
+	for <qemu-devel@nongnu.org>; Fri, 2 Mar 2018 10:31:02 -0500
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2gf8ww12st-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 10:31:02 -0500
+Received: from localhost
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.vnet.ibm.com>;
+	Fri, 2 Mar 2018 10:31:01 -0500
+References: <079a5da7-6586-b974-6b99-e5de055b1bd1@linux.vnet.ibm.com>
+	<20180302092318.GA6026@stefanha-x1.localdomain>
+From: Farhan Ali <alifm@linux.vnet.ibm.com>
+Date: Fri, 2 Mar 2018 10:30:57 -0500
+MIME-Version: 1.0
+In-Reply-To: <20180302092318.GA6026@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <6a3461c2-368d-1aa1-5b86-a6a602251829@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [BUG] I/O thread segfault for QEMU on s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,104 +43,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Corey Minyard <cminyard@mvista.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mreitz@redhat.com, famz@redhat.com, QEMU Developers <qemu-devel@nongnu.org>, "open list:virtio-ccw" <qemu-s390x@nongnu.org>
 
-From: Corey Minyard <cminyard@mvista.com>
 
-The vmstate for isa_ipmi_bt was referencing into the bt structure,
-instead create a bt structure separate and use that.
 
-The version 1 of the BT transfer was fairly broken, if a migration
-occured during an IPMI operation, it is likely the migration would
-be corrupted because I misunderstood the VMSTATE_VBUFFER_UINT32()
-handling, I thought it handled transferring the length field,
-too.  So I just remove support for that.  I doubt anyone is using
-it at this point.
+On 03/02/2018 04:23 AM, Stefan Hajnoczi wrote:
+> On Thu, Mar 01, 2018 at 09:33:35AM -0500, Farhan Ali wrote:
+>> Hi,
+>>
+>> I have been noticing some segfaults for QEMU on s390x, and I have been
+>> hitting this issue quite reliably (at least once in 10 runs of a test case).
+>> The qemu version is 2.11.50, and I have systemd created coredumps
+>> when this happens.
+>>
+>> Here is a back trace of the segfaulting thread:
+> The backtrace looks normal.
+> 
+> Please post the QEMU command-line and the details of the segfault (which
+> memory access faulted?).
+> 
 
-This also removes the transfer of use_irq, since that should come
-from configuration.
 
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- hw/ipmi/isa_ipmi_bt.c | 61 ++++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 48 insertions(+), 13 deletions(-)
+I was able to create another crash today and here is the qemu comand line
 
-diff --git a/hw/ipmi/isa_ipmi_bt.c b/hw/ipmi/isa_ipmi_bt.c
-index e946030..b64dce2 100644
---- a/hw/ipmi/isa_ipmi_bt.c
-+++ b/hw/ipmi/isa_ipmi_bt.c
-@@ -450,22 +450,57 @@ static void isa_ipmi_bt_realize(DeviceState *dev, Error **errp)
-     isa_register_ioport(isadev, &iib->bt.io, iib->bt.io_base);
- }
- 
--static const VMStateDescription vmstate_ISAIPMIBTDevice = {
--    .name = TYPE_IPMI_INTERFACE,
-+static int ipmi_bt_vmstate_post_load(void *opaque, int version)
-+{
-+    IPMIBT *ib = opaque;
-+
-+    /* Make sure all the values are sane. */
-+    if (ib->outpos >= MAX_IPMI_MSG_SIZE || ib->outlen >= MAX_IPMI_MSG_SIZE ||
-+        ib->outpos >= ib->outlen) {
-+        ib->outpos = 0;
-+        ib->outlen = 0;
-+    }
-+
-+    if (ib->inlen >= MAX_IPMI_MSG_SIZE) {
-+        ib->inlen = 0;
-+    }
-+
-+    return 0;
-+}
-+
-+const VMStateDescription vmstate_IPMIBT = {
-+    .name = TYPE_IPMI_INTERFACE_PREFIX "bt",
-     .version_id = 1,
-     .minimum_version_id = 1,
-+    .post_load = ipmi_bt_vmstate_post_load,
-+    .fields      = (VMStateField[]) {
-+        VMSTATE_BOOL(obf_irq_set, IPMIBT),
-+        VMSTATE_BOOL(atn_irq_set, IPMIBT),
-+        VMSTATE_BOOL(irqs_enabled, IPMIBT),
-+        VMSTATE_UINT32(outpos, IPMIBT),
-+        VMSTATE_UINT32(outlen, IPMIBT),
-+        VMSTATE_UINT8_ARRAY(outmsg, IPMIBT, MAX_IPMI_MSG_SIZE),
-+        VMSTATE_UINT32(inlen, IPMIBT),
-+        VMSTATE_UINT8_ARRAY(inmsg, IPMIBT, MAX_IPMI_MSG_SIZE),
-+        VMSTATE_UINT8(control_reg, IPMIBT),
-+        VMSTATE_UINT8(mask_reg, IPMIBT),
-+        VMSTATE_UINT8(waiting_rsp, IPMIBT),
-+        VMSTATE_UINT8(waiting_seq, IPMIBT),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static const VMStateDescription vmstate_ISAIPMIBTDevice = {
-+    .name = TYPE_IPMI_INTERFACE_PREFIX "isa-bt",
-+    .version_id = 2,
-+    .minimum_version_id = 2,
-+    /*
-+     * Version 1 had messed up the array transfer, it's not even usable
-+     * because it used VMSTATE_VBUFFER_UINT32, but it did not transfer
-+     * the buffer length, so random things would happen.
-+     */
-     .fields      = (VMStateField[]) {
--        VMSTATE_BOOL(bt.obf_irq_set, ISAIPMIBTDevice),
--        VMSTATE_BOOL(bt.atn_irq_set, ISAIPMIBTDevice),
--        VMSTATE_BOOL(bt.use_irq, ISAIPMIBTDevice),
--        VMSTATE_BOOL(bt.irqs_enabled, ISAIPMIBTDevice),
--        VMSTATE_UINT32(bt.outpos, ISAIPMIBTDevice),
--        VMSTATE_VBUFFER_UINT32(bt.outmsg, ISAIPMIBTDevice, 1, NULL, bt.outlen),
--        VMSTATE_VBUFFER_UINT32(bt.inmsg, ISAIPMIBTDevice, 1, NULL, bt.inlen),
--        VMSTATE_UINT8(bt.control_reg, ISAIPMIBTDevice),
--        VMSTATE_UINT8(bt.mask_reg, ISAIPMIBTDevice),
--        VMSTATE_UINT8(bt.waiting_rsp, ISAIPMIBTDevice),
--        VMSTATE_UINT8(bt.waiting_seq, ISAIPMIBTDevice),
-+        VMSTATE_STRUCT(bt, ISAIPMIBTDevice, 1, vmstate_IPMIBT, IPMIBT),
-         VMSTATE_END_OF_LIST()
-     }
- };
--- 
-2.7.4
+/usr/bin/qemu-kvm -name guest=sles,debug-threads=on \
+-S -object 
+secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-2-sles/master-key.aes 
+\
+-machine s390-ccw-virtio-2.12,accel=kvm,usb=off,dump-guest-core=off \
+-m 4096 -realtime mlock=off -smp 8,sockets=8,cores=1,threads=1 \
+-object iothread,id=iothread1 -object iothread,id=iothread2 -uuid 
+b83a596b-3a1a-4ac9-9f3e-d9a4032ee52c \
+-display none -no-user-config -nodefaults -chardev 
+socket,id=charmonitor,path=/var/lib/libvirt/qemu/domain-2-sles/monitor.sock,server,nowait 
+
+-mon chardev=charmonitor,id=monitor,mode=control -rtc base=utc 
+-no-shutdown \
+-boot strict=on -drive 
+file=/dev/mapper/360050763998b0883980000002400002b,format=raw,if=none,id=drive-virtio-disk0,cache=none,aio=native 
+-device 
+virtio-blk-ccw,iothread=iothread1,scsi=off,devno=fe.0.0001,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1 
+-drive 
+file=/dev/mapper/360050763998b0883980000002800002f,format=raw,if=none,id=drive-virtio-disk1,cache=none,aio=native 
+-device 
+virtio-blk-ccw,iothread=iothread2,scsi=off,devno=fe.0.0002,drive=drive-virtio-disk1,id=virtio-disk1 
+-netdev tap,fd=24,id=hostnet0,vhost=on,vhostfd=26 -device 
+virtio-net-ccw,netdev=hostnet0,id=net0,mac=02:38:a6:36:e8:1f,devno=fe.0.0000 
+-chardev pty,id=charconsole0 -device 
+sclpconsole,chardev=charconsole0,id=console0 -device 
+virtio-balloon-ccw,id=balloon0,devno=fe.3.ffba -msg timestamp=on
+
+
+This the latest back trace on the segfaulting thread, and it seems to 
+segfault in swapcontext.
+
+Program terminated with signal SIGSEGV, Segmentation fault.
+#0  0x000003ff8595202c in swapcontext () from /lib64/libc.so.6
+
+
+This is the remaining back trace:
+
+#0  0x000003ff8595202c in swapcontext () from /lib64/libc.so.6
+#1  0x000002aa33b45566 in qemu_coroutine_new () at 
+util/coroutine-ucontext.c:164
+#2  0x000002aa33b43eac in qemu_coroutine_create 
+(entry=entry@entry=0x2aa33a94c98 <blk_aio_write_entry>, 
+opaque=opaque@entry=0x3ff74018be0) at util/qemu-coroutine.c:76
+#3  0x000002aa33a954da in blk_aio_prwv (blk=0x2aa4f0efda0, 
+offset=<optimized out>, bytes=<optimized out>, qiov=0x3ff74019080, 
+co_entry=co_entry@entry=0x2aa33a94c98 <blk_aio_write_entry>, flags=0,
+     cb=0x2aa338c62e8 <virtio_blk_rw_complete>, opaque=0x3ff74019020) at 
+block/block-backend.c:1299
+#4  0x000002aa33a9563e in blk_aio_pwritev (blk=<optimized out>, 
+offset=<optimized out>, qiov=<optimized out>, flags=<optimized out>, 
+cb=<optimized out>, opaque=0x3ff74019020) at block/block-backend.c:1400
+#5  0x000002aa338c6a38 in submit_requests (niov=<optimized out>, 
+num_reqs=1, start=<optimized out>, mrb=0x3ff831fe6e0, blk=<optimized 
+out>) at /usr/src/debug/qemu-2.11.50/hw/block/virtio-blk.c:369
+#6  virtio_blk_submit_multireq (blk=<optimized out>, 
+mrb=mrb@entry=0x3ff831fe6e0) at 
+/usr/src/debug/qemu-2.11.50/hw/block/virtio-blk.c:426
+#7  0x000002aa338c7b78 in virtio_blk_handle_vq (s=0x2aa4f2507c8, 
+vq=0x3ff869df010) at /usr/src/debug/qemu-2.11.50/hw/block/virtio-blk.c:620
+#8  0x000002aa338ebdf2 in virtio_queue_notify_aio_vq (vq=0x3ff869df010) 
+at /usr/src/debug/qemu-2.11.50/hw/virtio/virtio.c:1515
+#9  0x000002aa33b2df46 in aio_dispatch_handlers 
+(ctx=ctx@entry=0x2aa4f0ca050) at util/aio-posix.c:406
+#10 0x000002aa33b2eb50 in aio_poll (ctx=0x2aa4f0ca050, 
+blocking=blocking@entry=true) at util/aio-posix.c:692
+#11 0x000002aa33957f6a in iothread_run (opaque=0x2aa4f0c9630) at 
+iothread.c:60
+#12 0x000003ff86987e82 in start_thread () from /lib64/libpthread.so.0
+#13 0x000003ff85a11596 in thread_start () from /lib64/libc.so.6
+Backtrace stopped: previous frame identical to this frame (corrupt stack?)
