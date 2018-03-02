@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ercnB-0008FP-Ea
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 23:59:38 -0500
+	(envelope-from <peterx@redhat.com>) id 1ercpW-0000ge-LC
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 00:02:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ercn8-0008To-Dl
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 23:59:37 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38762 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1ercpT-00014T-J3
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 00:02:02 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55732 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ercn8-0008TZ-97
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 23:59:34 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ercpT-00014M-EE
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 00:01:59 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4DB1B4040859
-	for <qemu-devel@nongnu.org>; Fri,  2 Mar 2018 04:59:23 +0000 (UTC)
-Date: Fri, 2 Mar 2018 12:59:12 +0800
+	by mx1.redhat.com (Postfix) with ESMTPS id EB9FB4075168
+	for <qemu-devel@nongnu.org>; Fri,  2 Mar 2018 05:01:58 +0000 (UTC)
+Date: Fri, 2 Mar 2018 13:01:51 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180302045912.GC27381@xz-mi>
+Message-ID: <20180302050151.GD27381@xz-mi>
 References: <20180301084438.13594-1-peterx@redhat.com>
-	<20180301084438.13594-7-peterx@redhat.com>
-	<9d61e6c0-8439-23d6-761b-ef3d993e9ac0@redhat.com>
+	<20180301084438.13594-11-peterx@redhat.com>
+	<20180301154844.GQ14643@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <9d61e6c0-8439-23d6-761b-ef3d993e9ac0@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 06/15] qio: store gsources for net
- listeners
+In-Reply-To: <20180301154844.GQ14643@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 10/15] qio: non-default context for
+ async conn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,50 +36,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Thu, Mar 01, 2018 at 06:12:57PM +0100, Paolo Bonzini wrote:
-> On 01/03/2018 09:44, Peter Xu wrote:
-> > Originally we were storing the GSources tag IDs.  That'll be not enough
-> > if we are going to support non-default gcontext for QIO code.  Switch to
-> > GSources without changing anything real.  Now we still always pass in
-> > NULL, which means the default gcontext.
-> > 
+On Thu, Mar 01, 2018 at 03:48:44PM +0000, Daniel P. Berrang=C3=A9 wrote:
+> On Thu, Mar 01, 2018 at 04:44:33PM +0800, Peter Xu wrote:
+> > We have worked on qio_task_run_in_thread() already.  Further, let
+> > qio_channel_socket_connect_async() pass that context to it.
+> >=20
 > > Signed-off-by: Peter Xu <peterx@redhat.com>
 > > ---
-> >  include/io/net-listener.h | 21 ++++++++++++++--
-> >  io/net-listener.c         | 62 +++++++++++++++++++++++++++++------------------
-> >  2 files changed, 58 insertions(+), 25 deletions(-)
-> > 
-> > diff --git a/include/io/net-listener.h b/include/io/net-listener.h
-> > index 56d6da7a76..566be283b3 100644
-> > --- a/include/io/net-listener.h
-> > +++ b/include/io/net-listener.h
-> > @@ -53,7 +53,7 @@ struct QIONetListener {
-> >  
-> >      char *name;
-> >      QIOChannelSocket **sioc;
-> > -    gulong *io_tag;
-> > +    GSource **io_source;
-> >      size_t nsioc;
-> >  
-> >      bool connected;
-> > @@ -120,17 +120,34 @@ void qio_net_listener_add(QIONetListener *listener,
-> >                            QIOChannelSocket *sioc);
-> >  
-> >  /**
-> > - * qio_net_listener_set_client_func:
-> > + * qio_net_listener_set_client_func_full:
-> >   * @listener: the network listener object
-> >   * @func: the callback function
-> >   * @data: opaque data to pass to @func
-> >   * @notify: callback to free @data
-> > + * @context: the context that the sources will be bound to
-> 
-> Please add a note like "if %NULL, the default context will be used".
+> >  chardev/char-socket.c          | 4 ++--
+> >  include/io/channel-socket.h    | 4 +++-
+> >  io/channel-socket.c            | 5 +++--
+> >  migration/socket.c             | 3 ++-
+> >  tests/test-io-channel-socket.c | 2 +-
+> >  5 files changed, 11 insertions(+), 7 deletions(-)
+>=20
+> > diff --git a/include/io/channel-socket.h b/include/io/channel-socket.=
+h
+> > index 53801f6042..90f7227397 100644
+> > --- a/include/io/channel-socket.h
+> > +++ b/include/io/channel-socket.h
+> > @@ -101,6 +101,7 @@ int qio_channel_socket_connect_sync(QIOChannelSoc=
+ket *ioc,
+> >   * @callback: the function to invoke on completion
+> >   * @opaque: user data to pass to @callback
+> >   * @destroy: the function to free @opaque
+> > + * @context: the context to run the async task
+> >   *
+> >   * Attempt to connect to the address @addr. This method
+> >   * will run in the background so the caller will regain
+> > @@ -113,7 +114,8 @@ void qio_channel_socket_connect_async(QIOChannelS=
+ocket *ioc,
+> >                                        SocketAddress *addr,
+> >                                        QIOTaskFunc callback,
+> >                                        gpointer opaque,
+> > -                                      GDestroyNotify destroy);
+> > +                                      GDestroyNotify destroy,
+> > +                                      GMainContext *context);
+>=20
+> If you're going to add a GMainContext() to connect_async, then please
+> also do it for listen_async and dgram_async at the same time, so we
+> remain consistent in API design.
 
-Fixed this one too (and for both patches, I kept Dan's r-b).  Thanks,
+Sure.  Thanks,
 
--- 
+--=20
 Peter Xu
