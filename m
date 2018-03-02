@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1erZlm-00006k-Di
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 20:46:00 -0500
+	(envelope-from <jianjay.zhou@huawei.com>) id 1erZvt-0002EM-D4
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 20:56:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1erZli-0004gV-GP
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 20:45:58 -0500
-Date: Fri, 2 Mar 2018 12:45:46 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180302014546.GD13135@umbus.fritz.box>
-References: <20180213102258.26145-1-david.engraf@sysgo.com>
-	<20180215093600.18505-1-david.engraf@sysgo.com>
+	(envelope-from <jianjay.zhou@huawei.com>) id 1erZvq-0005lZ-8D
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 20:56:25 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2261 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
+	id 1erZvp-0005dO-Jq
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 20:56:22 -0500
+From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+Date: Fri, 2 Mar 2018 01:55:49 +0000
+Message-ID: <B2D15215269B544CADD246097EACE7473ABBA1E9@DGGEMM505-MBS.china.huawei.com>
+References: <cover.1519714706.git.jianjay.zhou@huawei.com>
+	<bf09c8b0049f97485615916e91af556119475db8.1519714706.git.jianjay.zhou@huawei.com>
+	<20180301181601-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180301181601-mutt-send-email-mst@kernel.org>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="0/kgSOzhNoDC5T3a"
-Content-Disposition: inline
-In-Reply-To: <20180215093600.18505-1-david.engraf@sysgo.com>
-Subject: Re: [Qemu-devel] [PATCH v3] PPC: e500: Fix duplicate kernel load
- and device tree overlap
+Subject: Re: [Qemu-devel] [PATCH v8 2/2] vhost: used_memslots refactoring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,245 +30,351 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Engraf <david.engraf@sysgo.com>
-Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "imammedo@redhat.com" <imammedo@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "Liuzhe (Ahriy, Euler)" <liuzhe13@huawei.com>
 
 
---0/kgSOzhNoDC5T3a
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 15, 2018 at 10:36:00AM +0100, David Engraf wrote:
-> This patch fixes an incorrect behavior when the -kernel argument has been
-> specified without -bios. In this case the kernel was loaded twice. At add=
-ress
-> 32M as a raw image and afterwards by load_elf/load_uimage at the
-> corresponding load address. In this case the region for the device tree a=
-nd
-> the raw kernel image may overlap.
+> -----Original Message-----
+> From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> Sent: Friday, March 02, 2018 12:17 AM
+> To: Zhoujian (jay) <jianjay.zhou@huawei.com>
+> Cc: qemu-devel@nongnu.org; imammedo@redhat.com; Huangweidong (C)
+> <weidong.huang@huawei.com>; wangxin (U) <wangxinxin.wang@huawei.com>; Gon=
+glei
+> (Arei) <arei.gonglei@huawei.com>; Liuzhe (Ahriy, Euler) <liuzhe13@huawei.=
+com>
+> Subject: Re: [PATCH v8 2/2] vhost: used_memslots refactoring
 >=20
-> The patch fixes the behavior by loading the kernel image once with
-> load_elf/load_uimage and skips loading the raw image.
+> On Tue, Feb 27, 2018 at 03:10:05PM +0800, Jay Zhou wrote:
+> > Used_memslots is shared by vhost kernel and user, it is equal to
+> > dev->mem->nregions, which is correct for vhost kernel, but not for
+> > vhost user, the latter one uses memory regions that have file
+> > descriptor. E.g. a VM has a vhost-user NIC and 8(vhost user memslot
+> > upper limit) memory slots, it will be failed to hotplug a new DIMM
+> > device since vhost_has_free_slot() finds no free slot left. It should
+> > be successful if only part of memory slots have file descriptor, so
+> > setting used memslots for vhost-user and vhost-kernel respectively.
+> >
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+> > Signed-off-by: Liuzhe <liuzhe13@huawei.com>
 >=20
-> When here do not use bios_name/size for the kernel and use a more generic
-> name called payload_name/size.
+> make check fails with this patch, I dropped it for now.
+
+Maybe something updated on the master tree affects this patch, will
+look into and resolve.
+
+Regards,
+Jay
+
 >=20
-> New in v3: dtb must be stored between kernel and initrd because Linux can
->            handle the dtb only within the first 64MB. Add a comment to
->            clarify the behavior.
->=20
-> Signed-off-by: David Engraf <david.engraf@sysgo.com>
-
-Sorry I've taken so long to reply to this.  It looks fine to me,
-however, other changes mean it longer quite applies to the
-ppc-for-2.12 tree.  Can you fix that up and repost please.
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
->  hw/ppc/e500.c | 116 +++++++++++++++++++++++++++++++++++-----------------=
-------
->  1 file changed, 70 insertions(+), 46 deletions(-)
->=20
-> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-> index c4fe06ea2a..414c4beaab 100644
-> --- a/hw/ppc/e500.c
-> +++ b/hw/ppc/e500.c
-> @@ -784,8 +784,10 @@ void ppce500_init(MachineState *machine, PPCE500Para=
-ms *params)
->      int initrd_size =3D 0;
->      hwaddr cur_base =3D 0;
->      char *filename;
-> +    const char *payload_name;
-> +    bool kernel_as_payload;
->      hwaddr bios_entry =3D 0;
-> -    target_long bios_size;
-> +    target_long payload_size;
->      struct boot_info *boot_info;
->      int dt_size;
->      int i;
-> @@ -913,11 +915,6 @@ void ppce500_init(MachineState *machine, PPCE500Para=
-ms *params)
->      /* Register spinning region */
->      sysbus_create_simple("e500-spin", params->spin_base, NULL);
-> =20
-> -    if (cur_base < (32 * 1024 * 1024)) {
-> -        /* u-boot occupies memory up to 32MB, so load blobs above */
-> -        cur_base =3D (32 * 1024 * 1024);
-> -    }
-> -
->      if (params->has_mpc8xxx_gpio) {
->          qemu_irq poweroff_irq;
-> =20
-> @@ -952,8 +949,61 @@ void ppce500_init(MachineState *machine, PPCE500Para=
-ms *params)
->                                      sysbus_mmio_get_region(s, 0));
->      }
-> =20
-> -    /* Load kernel. */
-> -    if (machine->kernel_filename) {
-> +    /*
-> +     * Smart firmware defaults ahead!
-> +     *
-> +     * We follow the following table to select which payload we execute.
-> +     *
-> +     *  -kernel | -bios | payload
-> +     * ---------+-------+---------
-> +     *     N    |   Y   | u-boot
-> +     *     N    |   N   | u-boot
-> +     *     Y    |   Y   | u-boot
-> +     *     Y    |   N   | kernel
-> +     *
-> +     * This ensures backwards compatibility with how we used to expose
-> +     * -kernel to users but allows them to run through u-boot as well.
-> +     */
-> +    kernel_as_payload =3D false;
-> +    if (bios_name =3D=3D NULL) {
-> +        if (machine->kernel_filename) {
-> +            payload_name =3D machine->kernel_filename;
-> +            kernel_as_payload =3D true;
-> +        } else {
-> +            payload_name =3D "u-boot.e500";
-> +        }
-> +    } else {
-> +        payload_name =3D bios_name;
-> +    }
-> +
-> +    filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, payload_name);
-> +
-> +    payload_size =3D load_elf(filename, NULL, NULL, &bios_entry, &loadad=
-dr, NULL,
-> +                            1, PPC_ELF_MACHINE, 0, 0);
-> +    if (payload_size < 0) {
-> +        /*
-> +         * Hrm. No ELF image? Try a uImage, maybe someone is giving us an
-> +         * ePAPR compliant kernel
-> +         */
-> +        payload_size =3D load_uimage(filename, &bios_entry, &loadaddr, N=
-ULL,
-> +                                   NULL, NULL);
-> +        if (payload_size < 0) {
-> +            fprintf(stderr, "qemu: could not load firmware '%s'\n", file=
-name);
-> +            exit(1);
-> +        }
-> +    }
-> +
-> +    g_free(filename);
-> +
-> +    if (kernel_as_payload) {
-> +        kernel_base =3D loadaddr;
-> +        kernel_size =3D payload_size;
-> +    }
-> +
-> +    cur_base =3D loadaddr + payload_size;
-> +
-> +    /* Load bare kernel only if no bios/u-boot has been provided */
-> +    if (machine->kernel_filename && !kernel_as_payload) {
->          kernel_base =3D cur_base;
->          kernel_size =3D load_image_targphys(machine->kernel_filename,
->                                            cur_base,
-> @@ -967,6 +1017,11 @@ void ppce500_init(MachineState *machine, PPCE500Par=
-ams *params)
->          cur_base +=3D kernel_size;
->      }
-> =20
-> +    if (cur_base < (32 * 1024 * 1024)) {
-> +        /* u-boot occupies memory up to 32MB, so load blobs above */
-> +        cur_base =3D (32 * 1024 * 1024);
-> +    }
-> +
->      /* Load initrd. */
->      if (machine->initrd_filename) {
->          initrd_base =3D (cur_base + INITRD_LOAD_PAD) & ~INITRD_PAD_MASK;
-> @@ -983,47 +1038,16 @@ void ppce500_init(MachineState *machine, PPCE500Pa=
-rams *params)
->      }
-> =20
->      /*
-> -     * Smart firmware defaults ahead!
-> -     *
-> -     * We follow the following table to select which payload we execute.
-> -     *
-> -     *  -kernel | -bios | payload
-> -     * ---------+-------+---------
-> -     *     N    |   Y   | u-boot
-> -     *     N    |   N   | u-boot
-> -     *     Y    |   Y   | u-boot
-> -     *     Y    |   N   | kernel
-> -     *
-> -     * This ensures backwards compatibility with how we used to expose
-> -     * -kernel to users but allows them to run through u-boot as well.
-> +     * Reserve space for dtb behind the kernel image because Linux has a=
- bug
-> +     * where it can only handle the dtb if it's within the first 64MB of=
- where
-> +     * <kernel> starts. dtb cannot not reach initrd_base because INITRD_=
-LOAD_PAD
-> +     * ensures enough space between kernel and initrd.
->       */
-> -    if (bios_name =3D=3D NULL) {
-> -        if (machine->kernel_filename) {
-> -            bios_name =3D machine->kernel_filename;
-> -        } else {
-> -            bios_name =3D "u-boot.e500";
-> -        }
-> -    }
-> -    filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
-> -
-> -    bios_size =3D load_elf(filename, NULL, NULL, &bios_entry, &loadaddr,=
- NULL,
-> -                         1, PPC_ELF_MACHINE, 0, 0);
-> -    if (bios_size < 0) {
-> -        /*
-> -         * Hrm. No ELF image? Try a uImage, maybe someone is giving us an
-> -         * ePAPR compliant kernel
-> -         */
-> -        kernel_size =3D load_uimage(filename, &bios_entry, &loadaddr, NU=
-LL,
-> -                                  NULL, NULL);
-> -        if (kernel_size < 0) {
-> -            fprintf(stderr, "qemu: could not load firmware '%s'\n", file=
-name);
-> +    dt_base =3D (loadaddr + payload_size + DTC_LOAD_PAD) & ~DTC_PAD_MASK;
-> +    if (dt_base + DTB_MAX_SIZE > ram_size) {
-> +            fprintf(stderr, "qemu: not enough memory for device tree\n");
->              exit(1);
-> -        }
->      }
-> -    g_free(filename);
-> -
-> -    /* Reserve space for dtb */
-> -    dt_base =3D (loadaddr + bios_size + DTC_LOAD_PAD) & ~DTC_PAD_MASK;
-> =20
->      dt_size =3D ppce500_prep_device_tree(machine, params, dt_base,
->                                         initrd_base, initrd_size,
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---0/kgSOzhNoDC5T3a
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqYrMoACgkQbDjKyiDZ
-s5JTYRAAwKiXn6t/elULLlWNZzabUMRayPqKcvJc1fE8xSeATkTHQW8Zi6DVcLKD
-nJ1zynivpaCv4LlXOu9vduJ/CNoLvynWLEQap/bRo13/1v6uEiS5olqN/g7CnHdE
-NLOohYo3H9N+xAdpCSt65ZEm5OdrKUGbJ/wRG+Lsjd0/Mqzg2X1XpuRkIi2cKENn
-q0WHjHrXF09yLvIC00r8WSagzE8mOOOuX49jZnDzJ58tYzPnVUWaqpsjW8Q+Y8HY
-YxKohLLg/4V0FZ33vu+kep2Xsu5vxamWR83pDjD5w8iV0z30oOZj+THILD1sJ2Gw
-BxWEd/u5ltucY8bhA+pKokifNobLWqG3d19VjV7MnMGme+Em4GN+AH4oe/zbh4Kv
-eZHNRMLIcGDsJLP0K4u4kGW7jFX2BaNOFQrhcUx8YQchJ8AApjxwqtMMj+M9IGJL
-NqQCY7MPCffoyazVasVBGUgk4aUFiTSE06GUe0nOeLSf41MLeHxtPFeSDtLdCOGt
-DDvfANE9wrytEofZq73PEORROoxz5ZwT63utBTbW2w+4qTHbftSrqOefIoCURr6J
-O6HBs2BlfRu7ho0t8vo6gKeFuGQ2GE+uhiw6TGTKVkDQVQIP21pJfakktHnfmpVr
-ZSFS5O8cmiN7ylUGf/rB3t9b0AWvzzyHaFjWoJnL/9uUODcN8og=
-=k1QL
------END PGP SIGNATURE-----
-
---0/kgSOzhNoDC5T3a--
+> > ---
+> >  hw/virtio/vhost-backend.c         | 15 +++++++-
+> >  hw/virtio/vhost-user.c            | 77 ++++++++++++++++++++++++++-----=
+----
+> ----
+> >  hw/virtio/vhost.c                 | 13 +++----
+> >  include/hw/virtio/vhost-backend.h |  6 ++-
+> >  4 files changed, 75 insertions(+), 36 deletions(-)
+> >
+> > diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
+> > index 7f09efa..59def69 100644
+> > --- a/hw/virtio/vhost-backend.c
+> > +++ b/hw/virtio/vhost-backend.c
+> > @@ -15,6 +15,8 @@
+> >  #include "hw/virtio/vhost-backend.h"
+> >  #include "qemu/error-report.h"
+> >
+> > +static unsigned int vhost_kernel_used_memslots;
+> > +
+> >  static int vhost_kernel_call(struct vhost_dev *dev, unsigned long int
+> request,
+> >                               void *arg)  { @@ -62,6 +64,11 @@ static
+> > int vhost_kernel_memslots_limit(struct vhost_dev *dev)
+> >      return limit;
+> >  }
+> >
+> > +static bool vhost_kernel_has_free_memslots(struct vhost_dev *dev) {
+> > +    return vhost_kernel_used_memslots <
+> > +vhost_kernel_memslots_limit(dev); }
+> > +
+> >  static int vhost_kernel_net_set_backend(struct vhost_dev *dev,
+> >                                          struct vhost_vring_file
+> > *file)  { @@ -233,11 +240,16 @@ static void
+> > vhost_kernel_set_iotlb_callback(struct vhost_dev *dev,
+> >          qemu_set_fd_handler((uintptr_t)dev->opaque, NULL, NULL,
+> > NULL);  }
+> >
+> > +static void vhost_kernel_set_used_memslots(struct vhost_dev *dev) {
+> > +    vhost_kernel_used_memslots =3D dev->mem->nregions; }
+> > +
+> >  static const VhostOps kernel_ops =3D {
+> >          .backend_type =3D VHOST_BACKEND_TYPE_KERNEL,
+> >          .vhost_backend_init =3D vhost_kernel_init,
+> >          .vhost_backend_cleanup =3D vhost_kernel_cleanup,
+> > -        .vhost_backend_memslots_limit =3D vhost_kernel_memslots_limit,
+> > +        .vhost_backend_has_free_memslots =3D
+> > + vhost_kernel_has_free_memslots,
+> >          .vhost_net_set_backend =3D vhost_kernel_net_set_backend,
+> >          .vhost_scsi_set_endpoint =3D vhost_kernel_scsi_set_endpoint,
+> >          .vhost_scsi_clear_endpoint =3D
+> > vhost_kernel_scsi_clear_endpoint, @@ -264,6 +276,7 @@ static const
+> > VhostOps kernel_ops =3D {  #endif /* CONFIG_VHOST_VSOCK */
+> >          .vhost_set_iotlb_callback =3D vhost_kernel_set_iotlb_callback,
+> >          .vhost_send_device_iotlb_msg =3D
+> > vhost_kernel_send_device_iotlb_msg,
+> > +        .vhost_set_used_memslots =3D vhost_kernel_set_used_memslots,
+> >  };
+> >
+> >  int vhost_set_backend_type(struct vhost_dev *dev, VhostBackendType
+> > backend_type) diff --git a/hw/virtio/vhost-user.c
+> > b/hw/virtio/vhost-user.c index 6eb9798..f732c80 100644
+> > --- a/hw/virtio/vhost-user.c
+> > +++ b/hw/virtio/vhost-user.c
+> > @@ -147,6 +147,8 @@ static VhostUserMsg m __attribute__ ((unused));
+> >  /* The version of the protocol we support */
+> >  #define VHOST_USER_VERSION    (0x1)
+> >
+> > +static bool vhost_user_free_memslots =3D true;
+> > +
+> >  struct vhost_user {
+> >      CharBackend *chr;
+> >      int slave_fd;
+> > @@ -314,12 +316,43 @@ static int vhost_user_set_log_base(struct vhost_d=
+ev
+> *dev, uint64_t base,
+> >      return 0;
+> >  }
+> >
+> > +static int vhost_user_prepare_msg(struct vhost_dev *dev, VhostUserMemo=
+ry
+> *mem,
+> > +                                  int *fds) {
+> > +    int i, fd;
+> > +
+> > +    vhost_user_free_memslots =3D true;
+> > +    for (i =3D 0, mem->nregions =3D 0; i < dev->mem->nregions; ++i) {
+> > +        struct vhost_memory_region *reg =3D dev->mem->regions + i;
+> > +        ram_addr_t offset;
+> > +        MemoryRegion *mr;
+> > +
+> > +        assert((uintptr_t)reg->userspace_addr =3D=3D reg->userspace_ad=
+dr);
+> > +        mr =3D memory_region_from_host((void *)(uintptr_t)reg-
+> >userspace_addr,
+> > +                                     &offset);
+> > +        fd =3D memory_region_get_fd(mr);
+> > +        if (fd > 0) {
+> > +            if (mem->nregions =3D=3D VHOST_MEMORY_MAX_NREGIONS) {
+> > +                vhost_user_free_memslots =3D false;
+> > +                return -1;
+> > +            }
+> > +
+> > +            mem->regions[mem->nregions].userspace_addr =3D reg-
+> >userspace_addr;
+> > +            mem->regions[mem->nregions].memory_size =3D reg->memory_si=
+ze;
+> > +            mem->regions[mem->nregions].guest_phys_addr =3D reg-
+> >guest_phys_addr;
+> > +            mem->regions[mem->nregions].mmap_offset =3D offset;
+> > +            fds[mem->nregions++] =3D fd;
+> > +        }
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> > +
+> >  static int vhost_user_set_mem_table(struct vhost_dev *dev,
+> >                                      struct vhost_memory *mem)  {
+> >      int fds[VHOST_MEMORY_MAX_NREGIONS];
+> > -    int i, fd;
+> > -    size_t fd_num =3D 0;
+> > +    size_t fd_num;
+> >      bool reply_supported =3D virtio_has_feature(dev->protocol_features=
+,
+> >
+> > VHOST_USER_PROTOCOL_F_REPLY_ACK);
+> >
+> > @@ -332,29 +365,12 @@ static int vhost_user_set_mem_table(struct vhost_=
+dev
+> *dev,
+> >          msg.hdr.flags |=3D VHOST_USER_NEED_REPLY_MASK;
+> >      }
+> >
+> > -    for (i =3D 0; i < dev->mem->nregions; ++i) {
+> > -        struct vhost_memory_region *reg =3D dev->mem->regions + i;
+> > -        ram_addr_t offset;
+> > -        MemoryRegion *mr;
+> > -
+> > -        assert((uintptr_t)reg->userspace_addr =3D=3D reg->userspace_ad=
+dr);
+> > -        mr =3D memory_region_from_host((void *)(uintptr_t)reg-
+> >userspace_addr,
+> > -                                     &offset);
+> > -        fd =3D memory_region_get_fd(mr);
+> > -        if (fd > 0) {
+> > -            if (fd_num =3D=3D VHOST_MEMORY_MAX_NREGIONS) {
+> > -                error_report("Failed preparing vhost-user memory table
+> msg");
+> > -                return -1;
+> > -            }
+> > -            msg.payload.memory.regions[fd_num].userspace_addr =3D reg-
+> >userspace_addr;
+> > -            msg.payload.memory.regions[fd_num].memory_size  =3D reg-
+> >memory_size;
+> > -            msg.payload.memory.regions[fd_num].guest_phys_addr =3D reg=
+-
+> >guest_phys_addr;
+> > -            msg.payload.memory.regions[fd_num].mmap_offset =3D offset;
+> > -            fds[fd_num++] =3D fd;
+> > -        }
+> > +    if (vhost_user_prepare_msg(dev, &msg.payload.memory, fds) < 0) {
+> > +        error_report("Failed preparing vhost-user memory table msg");
+> > +        return -1;
+> >      }
+> >
+> > -    msg.payload.memory.nregions =3D fd_num;
+> > +    fd_num =3D msg.payload.memory.nregions;
+> >
+> >      if (!fd_num) {
+> >          error_report("Failed initializing vhost-user memory map, "
+> > @@ -870,9 +886,9 @@ static int vhost_user_get_vq_index(struct vhost_dev
+> *dev, int idx)
+> >      return idx;
+> >  }
+> >
+> > -static int vhost_user_memslots_limit(struct vhost_dev *dev)
+> > +static bool vhost_user_has_free_memslots(struct vhost_dev *dev)
+> >  {
+> > -    return VHOST_MEMORY_MAX_NREGIONS;
+> > +    return vhost_user_free_memslots;
+> >  }
+> >
+> >  static bool vhost_user_requires_shm_log(struct vhost_dev *dev) @@
+> > -1054,11 +1070,19 @@ static int vhost_user_set_config(struct vhost_dev =
+*dev,
+> const uint8_t *data,
+> >      return 0;
+> >  }
+> >
+> > +static void vhost_user_set_used_memslots(struct vhost_dev *dev) {
+> > +    int fds[VHOST_MEMORY_MAX_NREGIONS];
+> > +    VhostUserMsg msg;
+> > +
+> > +    vhost_user_prepare_msg(dev, &msg.payload.memory, fds); }
+> > +
+> >  const VhostOps user_ops =3D {
+> >          .backend_type =3D VHOST_BACKEND_TYPE_USER,
+> >          .vhost_backend_init =3D vhost_user_init,
+> >          .vhost_backend_cleanup =3D vhost_user_cleanup,
+> > -        .vhost_backend_memslots_limit =3D vhost_user_memslots_limit,
+> > +        .vhost_backend_has_free_memslots =3D
+> > + vhost_user_has_free_memslots,
+> >          .vhost_set_log_base =3D vhost_user_set_log_base,
+> >          .vhost_set_mem_table =3D vhost_user_set_mem_table,
+> >          .vhost_set_vring_addr =3D vhost_user_set_vring_addr, @@ -1082,=
+4
+> > +1106,5 @@ const VhostOps user_ops =3D {
+> >          .vhost_send_device_iotlb_msg =3D vhost_user_send_device_iotlb_=
+msg,
+> >          .vhost_get_config =3D vhost_user_get_config,
+> >          .vhost_set_config =3D vhost_user_set_config,
+> > +        .vhost_set_used_memslots =3D vhost_user_set_used_memslots,
+> >  };
+> > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c index
+> > 4a583a3..7f17de9 100644
+> > --- a/hw/virtio/vhost.c
+> > +++ b/hw/virtio/vhost.c
+> > @@ -44,20 +44,19 @@
+> >  static struct vhost_log *vhost_log;
+> >  static struct vhost_log *vhost_log_shm;
+> >
+> > -static unsigned int used_memslots;
+> >  static QLIST_HEAD(, vhost_dev) vhost_devices =3D
+> >      QLIST_HEAD_INITIALIZER(vhost_devices);
+> >
+> >  bool vhost_has_free_slot(void)
+> >  {
+> > -    unsigned int slots_limit =3D ~0U;
+> >      struct vhost_dev *hdev;
+> >
+> >      QLIST_FOREACH(hdev, &vhost_devices, entry) {
+> > -        unsigned int r =3D hdev->vhost_ops-
+> >vhost_backend_memslots_limit(hdev);
+> > -        slots_limit =3D MIN(slots_limit, r);
+> > +        if (!hdev->vhost_ops->vhost_backend_has_free_memslots(hdev)) {
+> > +            return false;
+> > +        }
+> >      }
+> > -    return slots_limit > used_memslots;
+> > +    return true;
+> >  }
+> >
+> >  static void vhost_dev_sync_region(struct vhost_dev *dev, @@ -442,7
+> > +441,7 @@ static void vhost_commit(MemoryListener *listener)
+> >                         dev->n_mem_sections * sizeof dev->mem->regions[=
+0];
+> >      dev->mem =3D g_realloc(dev->mem, regions_size);
+> >      dev->mem->nregions =3D dev->n_mem_sections;
+> > -    used_memslots =3D dev->mem->nregions;
+> > +    dev->vhost_ops->vhost_set_used_memslots(dev);
+> >      for (i =3D 0; i < dev->n_mem_sections; i++) {
+> >          struct vhost_memory_region *cur_vmr =3D dev->mem->regions + i;
+> >          struct MemoryRegionSection *mrs =3D dev->mem_sections + i; @@
+> > -1186,7 +1185,7 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opa=
+que,
+> >      memory_listener_register(&hdev->memory_listener,
+> &address_space_memory);
+> >      QLIST_INSERT_HEAD(&vhost_devices, hdev, entry);
+> >
+> > -    if (used_memslots > hdev->vhost_ops-
+> >vhost_backend_memslots_limit(hdev)) {
+> > +    if (!hdev->vhost_ops->vhost_backend_has_free_memslots(hdev)) {
+> >          error_report("vhost backend memory slots limit is less"
+> >                  " than current number of present memory slots");
+> >          r =3D -1;
+> > diff --git a/include/hw/virtio/vhost-backend.h
+> > b/include/hw/virtio/vhost-backend.h
+> > index 592254f..2eac224 100644
+> > --- a/include/hw/virtio/vhost-backend.h
+> > +++ b/include/hw/virtio/vhost-backend.h
+> > @@ -36,7 +36,7 @@ struct vhost_iotlb_msg;
+> >
+> >  typedef int (*vhost_backend_init)(struct vhost_dev *dev, void
+> > *opaque);  typedef int (*vhost_backend_cleanup)(struct vhost_dev
+> > *dev); -typedef int (*vhost_backend_memslots_limit)(struct vhost_dev
+> > *dev);
+> > +typedef bool (*vhost_backend_has_free_memslots)(struct vhost_dev
+> > +*dev);
+> >
+> >  typedef int (*vhost_net_set_backend_op)(struct vhost_dev *dev,
+> >                                  struct vhost_vring_file *file); @@
+> > -94,12 +94,13 @@ typedef int (*vhost_set_config_op)(struct vhost_dev *d=
+ev,
+> const uint8_t *data,
+> >                                     uint32_t flags);  typedef int
+> > (*vhost_get_config_op)(struct vhost_dev *dev, uint8_t *config,
+> >                                     uint32_t config_len);
+> > +typedef void (*vhost_set_used_memslots_op)(struct vhost_dev *dev);
+> >
+> >  typedef struct VhostOps {
+> >      VhostBackendType backend_type;
+> >      vhost_backend_init vhost_backend_init;
+> >      vhost_backend_cleanup vhost_backend_cleanup;
+> > -    vhost_backend_memslots_limit vhost_backend_memslots_limit;
+> > +    vhost_backend_has_free_memslots vhost_backend_has_free_memslots;
+> >      vhost_net_set_backend_op vhost_net_set_backend;
+> >      vhost_net_set_mtu_op vhost_net_set_mtu;
+> >      vhost_scsi_set_endpoint_op vhost_scsi_set_endpoint; @@ -130,6
+> > +131,7 @@ typedef struct VhostOps {
+> >      vhost_send_device_iotlb_msg_op vhost_send_device_iotlb_msg;
+> >      vhost_get_config_op vhost_get_config;
+> >      vhost_set_config_op vhost_set_config;
+> > +    vhost_set_used_memslots_op vhost_set_used_memslots;
+> >  } VhostOps;
+> >
+> >  extern const VhostOps user_ops;
+> > --
+> > 1.8.3.1
+> >
