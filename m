@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eriCp-00026f-CO
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 05:46:28 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1eriDu-0002dk-Nx
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 05:47:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eriCm-0000zO-76
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 05:46:27 -0500
-Resent-Message-Id: <E1eriCm-0000zO-76@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21061)
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1eriDr-0001si-Cx
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 05:47:34 -0500
+Received: from mail.uni-paderborn.de ([131.234.142.9]:47270)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eriCl-0000xk-UZ
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 05:46:24 -0500
-In-Reply-To: <1519987399-19160-1-git-send-email-jusual@mail.ru>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151998755913.1314.1200286372629865537@bdbb90650ae5>
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1eriDr-0001sP-5P
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 05:47:31 -0500
+References: <20180301155619.8640-1-david.brenken@efs-auto.org>
+	<20180301155619.8640-2-david.brenken@efs-auto.org>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <23022a84-0948-b6a2-1b11-857504838338@mail.uni-paderborn.de>
+Date: Fri, 2 Mar 2018 11:47:29 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 2 Mar 2018 02:46:00 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2] checkpatch: add a warning for
- basename/dirname
+In-Reply-To: <20180301155619.8640-2-david.brenken@efs-auto.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] tricore: added some missing cpu
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +30,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, stefanha@gmail.com, jim@groklearning.com, cohuck@redhat.com, joel@jms.id.au, marcandre.lureau@redhat.com, pbonzini@redhat.com, jusual@mail.ru
+To: David Brenken <david.brenken@efs-auto.org>, qemu-devel@nongnu.org
+Cc: Florian Artmeier <florian.artmeier@efs-auto.de>, David Brenken <david.brenken@efs-auto.de>, Georg Hofstetter <georg.hofstetter@efs-auto.de>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MTk5ODczOTktMTkxNjAtMS1naXQtc2VuZC1lbWFpbC1qdXN1YWxAbWFpbC5y
-dQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyXSBjaGVja3BhdGNoOiBhZGQgYSB3YXJu
-aW5nIGZvciBiYXNlbmFtZS9kaXJuYW1lCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
-bi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8
-IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
-cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
-ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
-IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
-CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9t
-IGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogICAwZGM4YWU1ZThlLi40
-MjdjYmM3ZTQxICBtYXN0ZXIgICAgIC0+IG1hc3RlcgogKiBbbmV3IHRhZ10gICAgICAgICAgICAg
-ICBwYXRjaGV3LzE1MTk5ODczOTktMTkxNjAtMS1naXQtc2VuZC1lbWFpbC1qdXN1YWxAbWFpbC5y
-dSAtPiBwYXRjaGV3LzE1MTk5ODczOTktMTkxNjAtMS1naXQtc2VuZC1lbWFpbC1qdXN1YWxAbWFp
-bC5ydQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmMxYmU1YzM4NTQgY2hlY2twYXRj
-aDogYWRkIGEgd2FybmluZyBmb3IgYmFzZW5hbWUvZGlybmFtZQoKPT09IE9VVFBVVCBCRUdJTiA9
-PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBjaGVja3BhdGNoOiBhZGQgYSB3YXJuaW5nIGZvciBiYXNl
-bmFtZS9kaXJuYW1lLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMjI6IEZJTEU6
-IHNjcmlwdHMvY2hlY2twYXRjaC5wbDoyNTg5OgorCQkJV0FSTigiY29uc2lkZXIgdXNpbmcgZ19w
-YXRoX2dldF8kMSgpIGluIHByZWZlcmVuY2UgdG8gZ19zdHJkdXAoJDEoKSlcbiIgLiAkaGVyZWN1
-cnIpOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMSBsaW5lcyBjaGVja2VkCgpZb3Vy
-IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRl
-c3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
-bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5
-b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+On 03/01/2018 04:56 PM, David Brenken wrote:
+> From: David Brenken <david.brenken@efs-auto.de>
+> 
+> Signed-off-by: David Brenken <david.brenken@efs-auto.de>
+> Signed-off-by: Florian Artmeier <florian.artmeier@efs-auto.de>
+> Signed-off-by: Georg Hofstetter <georg.hofstetter@efs-auto.de>
+> ---
+>  target/tricore/translate.c       | 27 +++++++++++++++++++++++++++
+>  target/tricore/tricore-opcodes.h |  3 +++
+>  2 files changed, 30 insertions(+)
+
+A more descriptive commit message would be nice. Which instructions have
+been added?
+
+Cheers,
+Bastian
