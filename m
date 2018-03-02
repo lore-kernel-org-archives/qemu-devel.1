@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1erov1-0006MK-5x
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:56:32 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1erow5-0007Jm-GO
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:57:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eroux-00035d-W6
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:56:31 -0500
-Received: from mail-by2nam03on0044.outbound.protection.outlook.com
-	([104.47.42.44]:55785
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1eroux-00034T-LQ
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:56:27 -0500
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 2 Mar 2018 09:51:39 -0800
-Message-ID: <dd2e727a124d1c02b2f52f338e8ebc4a6438b8ab.1520013048.git.alistair.francis@xilinx.com>
-In-Reply-To: <cover.1520013048.git.alistair.francis@xilinx.com>
-References: <cover.1520013048.git.alistair.francis@xilinx.com>
+	(envelope-from <ben@skyportsystems.com>) id 1erow4-0003xE-Dc
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:57:37 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:51515)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
+	id 1erow4-0003wB-2d
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:57:36 -0500
+Received: by mail-wm0-x243.google.com with SMTP id h21so4700962wmd.1
+	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 09:57:35 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 2/2] hw/arm: Set the core count for Xilinx's
- ZynqMP
+In-Reply-To: <20180302105709.GD26972@redhat.com>
+References: <20180302083720.25137-1-idgar@virtualoco.com>
+	<20180302105709.GD26972@redhat.com>
+From: Benjamin Warren <ben@skyportsystems.com>
+Date: Fri, 2 Mar 2018 09:57:33 -0800
+Message-ID: <CAFtH1GUd3Y5wBYQBf6W2xn3_sC1jBHwZXPBYmsaFRc48nSPSPA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] vmgenid: allow VM Generation ID
+ modification via QMP/HMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +31,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Or Idgar <idgar@virtualoco.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, Gal Hammer <ghammer@redhat.com>, Or Idgar <oridgar@gmail.com>
 
-Set the ARM CPU core count property for the A53's attached to the Xilnx
-ZynqMP machine.
+On Fri, Mar 2, 2018 at 2:57 AM, Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m>
+wrote:
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
+> On Fri, Mar 02, 2018 at 10:37:20AM +0200, Or Idgar wrote:
+> > From: Or Idgar <oridgar@gmail.com>
+> >
+> > This patch allow changing the Virtual Machine Generation
+> > ID through QMP/HMP while the vm guest is running.
+> > the spec (http://go.microsoft.com/fwlink/?LinkId=3D260709)
+> > mentions that "when the generation ID changes, execute an
+> > ACPI Notify operation on the generation ID device".
+> > To test it we need the ability to set the generation ID
+> > online. QMP/HMP allows that.
+>
+> If we want to test vmgenid, why don't we simply trigger one of
+> the mgmt actions that are required to change vmgenid. eg do a
+> savevm, followed by a loadvm to restore from snapshot. This would
+> be better testing of the real world usage of this feature.
+>
+> I agree.  Verifying functionality in a Windows guest is tricky, but in
+Linux you can build and load this (old and badly written) device driver:
 
- hw/arm/xlnx-zynqmp.c | 2 ++
- 1 file changed, 2 insertions(+)
+https://github.com/ben-skyportsystems/vmgenid-test
 
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index 69227fd4c9..465796e97c 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -282,6 +282,8 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-                                  s->virt, "has_el2", NULL);
-         object_property_set_int(OBJECT(&s->apu_cpu[i]), GIC_BASE_ADDR,
-                                 "reset-cbar", &error_abort);
-+        object_property_set_int(OBJECT(&s->apu_cpu[i]), num_apus,
-+                                "core-count", &error_abort);
-         object_property_set_bool(OBJECT(&s->apu_cpu[i]), true, "realized",
-                                  &err);
-         if (err) {
--- 
-2.14.1
+You should see the 'notices' number increment after restoring a snapshot.
+
+Regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/
+> dberrange :|
+> |: https://libvirt.org         -o-
+> https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/
+> dberrange :|
+>
+
+regards,
+Ben
