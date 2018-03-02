@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1errCB-0006hb-So
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 15:22:24 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1errrX-0002bi-7e
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 16:05:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1errC8-00064G-Oi
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 15:22:23 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42970 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1errC8-00063z-KV
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 15:22:20 -0500
-Date: Fri, 2 Mar 2018 22:22:19 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180302222015-mutt-send-email-mst@kernel.org>
-References: <cover.1519961667.git.jbaron@akamai.com>
-	<c9d3cf2fbc3c64bb28e0438185d85d95b2088127.1519961667.git.jbaron@akamai.com>
-	<7fc612d0-9610-9b07-d054-bb1438898f47@redhat.com>
-	<c01a1ccd-a864-00a8-edf9-4a16c5dd6c32@akamai.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1errrU-0005Ms-2Y
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 16:05:07 -0500
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:33205)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1errrT-0005MT-Qv
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 16:05:03 -0500
+Received: by mail-wm0-x236.google.com with SMTP id s206so4608130wme.0
+	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 13:05:02 -0800 (PST)
+References: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
+	<1516112253-14480-13-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA_9WhO31ZWTT_OK-ruO+PNFR+nBCUbEyTgbnDZbz7Xm9w@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA_9WhO31ZWTT_OK-ruO+PNFR+nBCUbEyTgbnDZbz7Xm9w@mail.gmail.com>
+Date: Fri, 02 Mar 2018 21:04:59 +0000
+Message-ID: <87o9k6ur2c.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <c01a1ccd-a864-00a8-edf9-4a16c5dd6c32@akamai.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/4] virtio-net: add linkspeed and duplex
- settings to virtio-net
+Subject: Re: [Qemu-devel] [PULL 12/51] build-sys: compile with -Og or -O1
+ when --enable-debug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +32,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Baron <jbaron@akamai.com>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
-
-On Fri, Mar 02, 2018 at 11:59:00AM -0500, Jason Baron wrote:
-> On 03/02/2018 02:14 AM, Jason Wang wrote:
-> >=20
-> >=20
-> > On 2018=E5=B9=B403=E6=9C=8802=E6=97=A5 11:46, Jason Baron wrote:
-> >> Although linkspeed and duplex can be set in a linux guest via 'ethto=
-ol
-> >> -s',
-> >> this requires custom ethtool commands for virtio-net by default.
-> >>
-> >> Introduce a new feature flag, VIRTIO_NET_F_SPEED_DUPLEX, which allow=
-s
-> >> the hypervisor to export a linkspeed and duplex setting. The user ca=
-n
-> >> subsequently overwrite it later if desired via: 'ethtool -s'.
-> >>
-> >> Linkspeed and duplex settings can be set as:
-> >> '-device virtio-net,speed=3D10000,duplex=3Dfull'
-> >=20
-> > I was thinking whether or not it's better to decide the duplex by the
-> > type of backends.
-> >=20
-> > E.g userspace and vhost-kernel implement a in fact half duplex. But d=
-pdk
-> > implement a full duplex.
->=20
-> Interesting - could this be derived only from the backend 'type'. IE:
-> NET_CLIENT_DRIVER_TAP, NET_CLIENT_DRIVER_VHOST_USER...
->=20
->=20
-> I was also thinking this could be specified as 'duplex=3Dbackend', in
-> addition to the proposed 'duplex=3Dfull' or 'duplex=3Dhalf'?
->=20
-> Thanks,
->=20
-> -Jason
-
-I'd say it would make more sense to teach backends to obey what's
-specified by the user. E.g. if vhost gets a duplex config,
-create two threads.
-
-But I think all that's for future, we can just fake it for
-now - the current uses don't seem to particularly care about whether
-virtio actually is or isn't a duplex.
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
 
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-> >=20
-> > Thanks
-> >=20
-> >>
-> >> where speed is [0...INT_MAX], and duplex is ["half"|"full"].
-> >>
-> >> Signed-off-by: Jason Baron<jbaron@akamai.com>
-> >> Cc: "Michael S. Tsirkin"<mst@redhat.com>
-> >> Cc: Jason Wang<jasowang@redhat.com>
-> >> Cc:virtio-dev@lists.oasis-open.org
-> >> ---
-> >=20
+> On 16 January 2018 at 14:16, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>
+>> When --enable-debug is turned on, configure doesn't set -O level, and
+>> uses default compiler -O0 level, which is slow.
+>>
+>> Instead, use -Og if supported by the compiler (optimize debugging
+>> experience), or -O1 (keeps code somewhat debuggable and works around
+>> compiler bugs).
+>
+> This gives me a noticeably worse debug experience (using -Og),
+> because gdb shows a lot more "<optimised out>" variables and
+> function arguments. (I've been mildly irritated by this for
+> the last few weeks and only just figured out why this was
+> happening.)
+
+I was wondering why my:
+
+   ./configure --enable-debug --enable-debug-tcg --extra-cflags=3D"-O0 -g3"=
+ --target-list=3Daarch64-linux-user
+
+builds where showing that.
+
+> Can we go back to the previous behaviour, please ? I don't
+> care if the build is slow if I'm debugging, but I really do
+> care that I don't have my variables and arguments all
+> optimised away by the compiler so I can't tell what's going on.
+
++1
+
+There is a lot of other stuff enabled when debugging which slows stuff
+down anyway.
+
+--
+Alex Benn=C3=A9e
