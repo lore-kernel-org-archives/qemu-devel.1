@@ -1,15 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1erikb-0007V3-Tf
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:21:23 -0500
+	(envelope-from <stefanha@redhat.com>) id 1erisX-0006IU-Fk
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:29:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1erikX-0004tr-QO
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:21:21 -0500
-From: Alberto Garcia <berto@igalia.com>
-Date: Fri,  2 Mar 2018 13:20:50 +0200
-Message-Id: <20180302112050.26670-1-berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v3] iotests: Tweak 030 in order to trigger a
- race condition with parallel jobs
+	(envelope-from <stefanha@redhat.com>) id 1erisU-0005CD-BG
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:29:33 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47018 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1erisU-0005AU-4e
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:29:30 -0500
+Date: Fri, 2 Mar 2018 11:29:11 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180302112911.GE6026@stefanha-x1.localdomain>
+References: <1519788689-11967-1-git-send-email-suhang16@mails.ucas.ac.cn>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="a1QUDc0q7S3U7/Jg"
+Content-Disposition: inline
+In-Reply-To: <1519788689-11967-1-git-send-email-suhang16@mails.ucas.ac.cn>
+Subject: Re: [Qemu-devel] [PATCH v3] scripts/checkpatch.pl: add check for
+ `while` and `for`
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,136 +28,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Su Hang <suhang16@mails.ucas.ac.cn>
+Cc: thuth@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-This patch tweaks TestParallelOps in iotest 030 so it allocates data
-in smaller regions (256KB/512KB instead of 512KB/1MB) and the
-block-stream job in test_stream_commit() only needs to copy data that
-is at the very end of the image.
 
-This way when the block-stream job is awakened it will finish right
-away without any chance of being stopped by block_job_sleep_ns(). This
-triggers the bug that was fixed by 3d5d319e1221082974711af1d09d82f07
-and is therefore a more useful test case for parallel block jobs.
+--a1QUDc0q7S3U7/Jg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-After this patch the aforementiond bug can also be reproduced with the
-test_stream_parallel() test case.
+On Wed, Feb 28, 2018 at 11:31:29AM +0800, Su Hang wrote:
+> Adding check for `while` and `for` statements, which condition has more t=
+han
+> one line.
+>=20
+> The former checkpatch.pl can check `if` statement, which condition has mo=
+re
+> than one line, whether block misses brace round, like this:
+> '''
+> if (cond1 ||
+>     cond2)
+>     statement;
+> '''
+> But it doesn't do the same check for `for` and `while` statements.
+>=20
+> Using `(?:...)` instead of `(...)` in regex pattern catch.
+> Because `(?:...)` is faster and avoids unwanted side-effect.
 
-Since with this change the stream job in test_stream_commit() finishes
-early, this patch introduces a similar test case where both jobs are
-slowed down so they can actually run in parallel.
+This patch doesn't apply to qemu.git/master because it's based on your
+v2 patch.
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
----
+Please send a single v4 patch that combines v2 and v3 changes and can be
+applied to qemu.git/master.
 
-This patch was sent already in December but it seems to have been
-forgotten. v3 is the same as v2 but with a typo fixed in the commit
-message.
+You can use "git rebase -i origin/master" to combine changes and put
+them onto the latest origin/master.  See the "fixup" and "squash"
+commands in git-rebase(1)'s interactive mode for combining patches.
 
----
- tests/qemu-iotests/030     | 48 +++++++++++++++++++++++++++++++++++++++-------
- tests/qemu-iotests/030.out |  4 ++--
- 2 files changed, 43 insertions(+), 9 deletions(-)
+Thanks!
 
-diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-index 457984b8e9..44ad1e311f 100755
---- a/tests/qemu-iotests/030
-+++ b/tests/qemu-iotests/030
-@@ -156,7 +156,7 @@ class TestSingleDrive(iotests.QMPTestCase):
- class TestParallelOps(iotests.QMPTestCase):
-     num_ops = 4 # Number of parallel block-stream operations
-     num_imgs = num_ops * 2 + 1
--    image_len = num_ops * 1024 * 1024
-+    image_len = num_ops * 512 * 1024
-     imgs = []
- 
-     def setUp(self):
-@@ -177,12 +177,12 @@ class TestParallelOps(iotests.QMPTestCase):
- 
-         # Put data into the images we are copying data from
-         for i in range(self.num_imgs / 2):
--            img_index = i * 2 + 1
--            # Alternate between 512k and 1M.
-+            img_index = self.num_imgs - i * 2 - 2
-+            # Alternate between 256KB and 512KB.
-             # This way jobs will not finish in the same order they were created
--            num_kb = 512 + 512 * (i % 2)
-+            num_kb = 256 + 256 * (i % 2)
-             qemu_io('-f', iotests.imgfmt,
--                    '-c', 'write -P %d %d %d' % (i, i*1024*1024, num_kb * 1024),
-+                    '-c', 'write -P 0xFF %dk %dk' % (i * 512, num_kb),
-                     self.imgs[img_index])
- 
-         # Attach the drive to the VM
-@@ -318,12 +318,14 @@ class TestParallelOps(iotests.QMPTestCase):
-         self.wait_until_completed(drive='commit-drive0')
- 
-     # Test a block-stream and a block-commit job in parallel
--    def test_stream_commit(self):
-+    # Here the stream job is supposed to finish quickly in order to reproduce
-+    # the scenario that triggers the bug fixed in 3d5d319e1221082974711af1d09
-+    def test_stream_commit_1(self):
-         self.assertLessEqual(8, self.num_imgs)
-         self.assert_no_active_block_jobs()
- 
-         # Stream from node0 into node2
--        result = self.vm.qmp('block-stream', device='node2', job_id='node2')
-+        result = self.vm.qmp('block-stream', device='node2', base_node='node0', job_id='node2')
-         self.assert_qmp(result, 'return', {})
- 
-         # Commit from the active layer into node3
-@@ -348,6 +350,38 @@ class TestParallelOps(iotests.QMPTestCase):
- 
-         self.assert_no_active_block_jobs()
- 
-+    # This is similar to test_stream_commit_1 but both jobs are slowed
-+    # down so they can run in parallel for a little while.
-+    def test_stream_commit_2(self):
-+        self.assertLessEqual(8, self.num_imgs)
-+        self.assert_no_active_block_jobs()
-+
-+        # Stream from node0 into node4
-+        result = self.vm.qmp('block-stream', device='node4', base_node='node0', job_id='node4', speed=1024*1024)
-+        self.assert_qmp(result, 'return', {})
-+
-+        # Commit from the active layer into node5
-+        result = self.vm.qmp('block-commit', device='drive0', base=self.imgs[5], speed=1024*1024)
-+        self.assert_qmp(result, 'return', {})
-+
-+        # Wait for all jobs to be finished.
-+        pending_jobs = ['node4', 'drive0']
-+        while len(pending_jobs) > 0:
-+            for event in self.vm.get_qmp_events(wait=True):
-+                if event['event'] == 'BLOCK_JOB_COMPLETED':
-+                    node_name = self.dictpath(event, 'data/device')
-+                    self.assertTrue(node_name in pending_jobs)
-+                    self.assert_qmp_absent(event, 'data/error')
-+                    pending_jobs.remove(node_name)
-+                if event['event'] == 'BLOCK_JOB_READY':
-+                    self.assert_qmp(event, 'data/device', 'drive0')
-+                    self.assert_qmp(event, 'data/type', 'commit')
-+                    self.assert_qmp_absent(event, 'data/error')
-+                    self.assertTrue('drive0' in pending_jobs)
-+                    self.vm.qmp('block-job-complete', device='drive0')
-+
-+        self.assert_no_active_block_jobs()
-+
-     # Test the base_node parameter
-     def test_stream_base_node_name(self):
-         self.assert_no_active_block_jobs()
-diff --git a/tests/qemu-iotests/030.out b/tests/qemu-iotests/030.out
-index 391c8573ca..42314e9c00 100644
---- a/tests/qemu-iotests/030.out
-+++ b/tests/qemu-iotests/030.out
-@@ -1,5 +1,5 @@
--.......................
-+........................
- ----------------------------------------------------------------------
--Ran 23 tests
-+Ran 24 tests
- 
- OK
--- 
-2.11.0
+> Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Suggested-by: Eric Blake <eblake@redhat.com>
+> Suggested-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Su Hang <suhang16@mails.ucas.ac.cn>
+> ---
+>  scripts/checkpatch.pl | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index 10c138344fa9..bed1dbbd54d1 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -2352,9 +2352,9 @@ sub process {
+>  			}
+>  		}
+> =20
+> -# check for missing bracing round if etc
+> -		if ($line =3D~ /(^.*)\b(for|while|if)\b/ &&
+> -			$line !~ /\#\s*(for|while|if)/) {
+> +# check for missing bracing around if etc
+> +		if ($line =3D~ /(^.*)\b(?:for|while|if)\b/ &&
+> +			$line !~ /\#\s*(?:for|while|if)/) {
+>  			my ($level, $endln, @chunks) =3D
+>  				ctx_statement_full($linenr, $realcnt, 1);
+>                          if ($dbg_adv_apw) {
+> --=20
+> 2.7.4
+>=20
+
+--a1QUDc0q7S3U7/Jg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJamTWHAAoJEJykq7OBq3PIPFcH/0q438giVt/KOrVEzjETuzc9
+67jd+6HqvwWRqwH2n37i6T34BnJe+l69+VV/0iKiFXIzccBaoOy4vJI3kbdKZ59V
+OMeoyIrT5aRMDudtTgy7m+wVAV6AFPc4dzCAyH9ldh9msnPcypZp/tmzIXTTGmVb
+BfUtFY1GM+6L1ArgvtxqstQgizKQwzUs9GWDHv6rK4kwze3GrsAszLQwcbIBwOUQ
+SRno2J06qmOS5C5DzZbjZOWhdnS4TOgTPsckXBbGlpn7B4YuxMNiHZLwYaUrgG8V
+GgLRpfLLFxcYKBxDKPofcA/sxEXmCuDp0IYm0rmRg4c/M/RKR8wLIPxV4wGk9E8=
+=312w
+-----END PGP SIGNATURE-----
+
+--a1QUDc0q7S3U7/Jg--
