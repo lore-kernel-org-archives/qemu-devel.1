@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1ergdO-00069S-EG
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 04:05:47 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1erge6-0006WC-SI
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 04:06:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1ergdK-0008Bs-D0
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 04:05:46 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2608 helo=huawei.com)
+	(envelope-from <wei.w.wang@intel.com>) id 1erge4-0000Fi-IB
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 04:06:30 -0500
+Received: from mga05.intel.com ([192.55.52.43]:56819)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1ergdK-00089Y-0c
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 04:05:42 -0500
-From: Jay Zhou <jianjay.zhou@huawei.com>
-Date: Fri, 2 Mar 2018 17:04:44 +0800
-Message-ID: <1519981484-15528-1-git-send-email-jianjay.zhou@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v5] tap: setting error appropriately when
- calling net_init_tap_one()
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1erge4-0000EQ-9H
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 04:06:28 -0500
+From: Wei Wang <wei.w.wang@intel.com>
+Date: Fri,  2 Mar 2018 16:47:30 +0800
+Message-Id: <1519980450-3404-4-git-send-email-wei.w.wang@intel.com>
+In-Reply-To: <1519980450-3404-1-git-send-email-wei.w.wang@intel.com>
+References: <1519980450-3404-1-git-send-email-wei.w.wang@intel.com>
+Subject: [Qemu-devel] [PATCH v3 3/3] migration: use the free page hint
+ feature from balloon
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,95 +25,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jasowang@redhat.com, mst@redhat.com, imammedo@redhat.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, arei.gonglei@huawei.com, jianjay.zhou@huawei.com
+To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com
+Cc: pbonzini@redhat.com, wei.w.wang@intel.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-If netdev_add tap,id=net0,...,vhost=on failed in net_init_tap_one(),
-the followed up device_add virtio-net-pci,netdev=net0 will fail
-too, prints:
+Start the free page optimization when the bulk stage starts. In case the
+guest is slow in reporting, actively stops it when the bulk stage ends.
+The optimization avoids sending guest free pages during the bulk stage.
+Currently, the optimization is added to precopy only.
 
-   TUNSETOFFLOAD ioctl() failed: Bad file descriptor TUNSETOFFLOAD
-   ioctl() failed: Bad file descriptor
-
-The reason is that the fd of tap is closed when error occured after
-calling net_init_tap_one().
-
-The fd should be closed when calling net_init_tap_one failed:
-   - if tap_set_sndbuf() failed
-   - if tap_set_sndbuf() succeeded but vhost failed to open or
-     initialize with vhostforce flag on
-   - with wrong vhost command line parameter
-The fd should not be closed just because vhost failed to open or
-initialize but without vhostforce flag. So the followed up
-device_add can fall back to userspace virtio successfully.
-
-Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Suggested-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+CC: Juan Quintela <quintela@redhat.com>
+CC: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/net/vhost_net.h |  3 +++
- net/tap.c               | 22 +++++++++++++++++-----
- 2 files changed, 20 insertions(+), 5 deletions(-)
+ migration/ram.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/vhost_net.h b/include/net/vhost_net.h
-index afc1499..77e4739 100644
---- a/include/net/vhost_net.h
-+++ b/include/net/vhost_net.h
-@@ -4,6 +4,9 @@
- #include "net/net.h"
- #include "hw/virtio/vhost-backend.h"
+diff --git a/migration/ram.c b/migration/ram.c
+index 769a0f6..f6af7e6 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -51,6 +51,7 @@
+ #include "qemu/rcu_queue.h"
+ #include "migration/colo.h"
+ #include "migration/block.h"
++#include "sysemu/balloon.h"
  
-+#define VHOST_NET_INIT_FAILED \
-+    "vhost-net requested but could not be initialized"
-+
- struct vhost_net;
- typedef struct vhost_net VHostNetState;
+ /***********************************************************/
+ /* ram save/restore */
+@@ -208,6 +209,8 @@ struct RAMState {
+     uint32_t last_version;
+     /* We are in the first round */
+     bool ram_bulk_stage;
++    /* The free pages optimization feature is supported */
++    bool free_page_support;
+     /* How many times we have dirty too many pages */
+     int dirty_rate_high_cnt;
+     /* these variables are used for bitmap sync */
+@@ -775,7 +778,7 @@ unsigned long migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
+     unsigned long *bitmap = rb->bmap;
+     unsigned long next;
  
-diff --git a/net/tap.c b/net/tap.c
-index 979e622..2b3a36f 100644
---- a/net/tap.c
-+++ b/net/tap.c
-@@ -686,14 +686,23 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
-         if (vhostfdname) {
-             vhostfd = monitor_fd_param(cur_mon, vhostfdname, &err);
-             if (vhostfd == -1) {
--                error_propagate(errp, err);
-+                if (tap->has_vhostforce && tap->vhostforce) {
-+                    error_propagate(errp, err);
-+                } else {
-+                    warn_report_err(err);
-+                }
-                 return;
-             }
-         } else {
-             vhostfd = open("/dev/vhost-net", O_RDWR);
-             if (vhostfd < 0) {
--                error_setg_errno(errp, errno,
--                                 "tap: open vhost char device failed");
-+                if (tap->has_vhostforce && tap->vhostforce) {
-+                    error_setg_errno(errp, errno,
-+                                     "tap: open vhost char device failed");
-+                } else {
-+                    warn_report("tap: open vhost char device failed: %s",
-+                                strerror(errno));
-+                }
-                 return;
-             }
-             fcntl(vhostfd, F_SETFL, O_NONBLOCK);
-@@ -702,8 +711,11 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
- 
-         s->vhost_net = vhost_net_init(&options);
-         if (!s->vhost_net) {
--            error_setg(errp,
--                       "vhost-net requested but could not be initialized");
-+            if (tap->has_vhostforce && tap->vhostforce) {
-+                error_setg(errp, VHOST_NET_INIT_FAILED);
-+            } else {
-+                warn_report(VHOST_NET_INIT_FAILED);
+-    if (rs->ram_bulk_stage && start > 0) {
++    if (rs->ram_bulk_stage && start > 0 && !rs->free_page_support) {
+         next = start + 1;
+     } else {
+         next = find_next_bit(bitmap, size, start);
+@@ -1225,6 +1228,10 @@ static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss, bool *again)
+             /* Flag that we've looped */
+             pss->complete_round = true;
+             rs->ram_bulk_stage = false;
++            if (rs->free_page_support) {
++                balloon_free_page_stop();
++                rs->free_page_support = false;
 +            }
-             return;
+             if (migrate_use_xbzrle()) {
+                 /* If xbzrle is on, stop using the data compression at this
+                  * point. In theory, xbzrle can do better than compression.
+@@ -1656,6 +1663,8 @@ static void ram_state_reset(RAMState *rs)
+     rs->last_page = 0;
+     rs->last_version = ram_list.version;
+     rs->ram_bulk_stage = true;
++    rs->free_page_support = balloon_free_page_support() &
++                            !migration_in_postcopy();
+ }
+ 
+ #define MAX_WAIT 50 /* ms, half buffered_file limit */
+@@ -2235,6 +2244,11 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
+             return -1;
          }
-     } else if (vhostfdname) {
+     }
++
++    if ((*rsp)->free_page_support) {
++        balloon_free_page_start();
++    }
++
+     (*rsp)->f = f;
+ 
+     rcu_read_lock();
+@@ -2329,6 +2343,9 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+ 
+     ret = qemu_file_get_error(f);
+     if (ret < 0) {
++        if (rs->ram_bulk_stage && rs->free_page_support) {
++                balloon_free_page_stop();
++        }
+         return ret;
+     }
+ 
 -- 
 1.8.3.1
