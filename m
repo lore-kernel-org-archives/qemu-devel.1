@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1erppz-00012A-Kl
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 13:55:25 -0500
+	(envelope-from <kwolf@redhat.com>) id 1erpq1-00015F-Ua
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 13:55:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1erppy-0002eQ-5Z
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 13:55:23 -0500
+	(envelope-from <kwolf@redhat.com>) id 1erppz-0002gB-Hd
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 13:55:26 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  2 Mar 2018 19:54:11 +0100
-Message-Id: <20180302185448.6314-1-kwolf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/37] Block layer patches
+Date: Fri,  2 Mar 2018 19:54:18 +0100
+Message-Id: <20180302185448.6314-8-kwolf@redhat.com>
+In-Reply-To: <20180302185448.6314-1-kwolf@redhat.com>
+References: <20180302185448.6314-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 07/37] iscsi: Switch iscsi_allocmap_update() to
+ byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,126 +23,227 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-The following changes since commit 86f4c7e05b1c44dbe1b329a51f311f10aef6ff=
-34:
+From: Eric Blake <eblake@redhat.com>
 
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
-80302' into staging (2018-03-02 14:37:10 +0000)
+We are gradually converting to byte-based interfaces, as they are
+easier to reason about than sector-based.  Convert all uses of
+the allocmap (no semantic change).  Callers that already had bytes
+available are simpler, and callers that now scale to bytes will be
+easier to switch to byte-based in the future.
 
-are available in the git repository at:
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/iscsi.c | 90 +++++++++++++++++++++++++++++------------------------------
+ 1 file changed, 44 insertions(+), 46 deletions(-)
 
-  git://repo.or.cz/qemu/kevin.git tags/for-upstream
-
-for you to fetch changes up to 9d9b4b640f9e583ff4b24dc762630945f3ccc16d:
-
-  Merge remote-tracking branch 'mreitz/tags/pull-block-2018-03-02' into q=
-ueue-block (2018-03-02 18:45:03 +0100)
-
-----------------------------------------------------------------
-Block layer patches
-
-----------------------------------------------------------------
-Alberto Garcia (3):
-      specs/qcow2: Fix documentation of the compressed cluster descriptor
-      docs: document how to use the l2-cache-entry-size parameter
-      qcow2: Replace align_offset() with ROUND_UP()
-
-Anton Nefedov (2):
-      block: fix write with zero flag set and iovector provided
-      iotest 033: add misaligned write-zeroes test via truncate
-
-Eric Blake (21):
-      block: Add .bdrv_co_block_status() callback
-      nvme: Drop pointless .bdrv_co_get_block_status()
-      block: Switch passthrough drivers to .bdrv_co_block_status()
-      file-posix: Switch to .bdrv_co_block_status()
-      gluster: Switch to .bdrv_co_block_status()
-      iscsi: Switch cluster_sectors to byte-based
-      iscsi: Switch iscsi_allocmap_update() to byte-based
-      iscsi: Switch to .bdrv_co_block_status()
-      null: Switch to .bdrv_co_block_status()
-      parallels: Switch to .bdrv_co_block_status()
-      qcow: Switch to .bdrv_co_block_status()
-      qcow2: Switch to .bdrv_co_block_status()
-      qed: Switch to .bdrv_co_block_status()
-      raw: Switch to .bdrv_co_block_status()
-      sheepdog: Switch to .bdrv_co_block_status()
-      vdi: Avoid bitrot of debugging code
-      vdi: Switch to .bdrv_co_block_status()
-      vmdk: Switch to .bdrv_co_block_status()
-      vpc: Switch to .bdrv_co_block_status()
-      vvfat: Switch to .bdrv_co_block_status()
-      block: Drop unused .bdrv_co_get_block_status()
-
-Kevin Wolf (2):
-      block: test blk_aio_flush() with blk->root =3D=3D NULL
-      Merge remote-tracking branch 'mreitz/tags/pull-block-2018-03-02' in=
-to queue-block
-
-Max Reitz (4):
-      qemu-img: Make resize error message more general
-      block/ssh: Pull ssh_grow_file() from ssh_create()
-      block/ssh: Make ssh_grow_file() blocking
-      block/ssh: Add basic .bdrv_truncate()
-
-Stefan Hajnoczi (6):
-      aio: rename aio_context_in_iothread() to in_aio_context_home_thread=
-()
-      block: extract AIO_WAIT_WHILE() from BlockDriverState
-      block: add BlockBackend->in_flight counter
-      Revert "IDE: Do not flush empty CDROM drives"
-      block: rename .bdrv_create() to .bdrv_co_create_opts()
-      qcow2: make qcow2_co_create2() a coroutine_fn
-
- docs/interop/qcow2.txt     |  16 ++++-
- docs/qcow2-cache.txt       |  46 ++++++++++++-
- block/qcow2.h              |   6 --
- include/block/aio-wait.h   | 116 ++++++++++++++++++++++++++++++++
- include/block/aio.h        |   7 +-
- include/block/block.h      |  54 ++++-----------
- include/block/block_int.h  |  61 ++++++++++-------
- block.c                    |  11 ++-
- block/blkdebug.c           |  20 +++---
- block/block-backend.c      |  60 +++++++++++++++--
- block/commit.c             |   2 +-
- block/crypto.c             |   8 +--
- block/file-posix.c         |  79 +++++++++++-----------
- block/file-win32.c         |   5 +-
- block/gluster.c            |  83 ++++++++++++-----------
- block/io.c                 |  98 +++++++++++----------------
- block/iscsi.c              | 164 ++++++++++++++++++++++++---------------=
-------
- block/mirror.c             |   2 +-
- block/nfs.c                |   5 +-
- block/null.c               |  23 ++++---
- block/nvme.c               |  14 ----
- block/parallels.c          |  28 +++++---
- block/qcow.c               |  32 +++++----
- block/qcow2-bitmap.c       |   4 +-
- block/qcow2-cluster.c      |   4 +-
- block/qcow2-refcount.c     |   4 +-
- block/qcow2-snapshot.c     |  10 +--
- block/qcow2.c              |  60 +++++++++--------
- block/qed.c                |  82 ++++++++---------------
- block/raw-format.c         |  21 +++---
- block/rbd.c                |   6 +-
- block/sheepdog.c           |  36 +++++-----
- block/ssh.c                |  66 +++++++++++++++---
- block/throttle.c           |   2 +-
- block/vdi.c                |  50 +++++++-------
- block/vhdx.c               |   5 +-
- block/vmdk.c               |  43 +++++-------
- block/vpc.c                |  50 +++++++-------
- block/vvfat.c              |  16 ++---
- hw/ide/core.c              |  10 +--
- qemu-img.c                 |   2 +-
- tests/test-block-backend.c |  82 +++++++++++++++++++++++
- util/aio-wait.c            |  40 +++++++++++
- tests/Makefile.include     |   2 +
- tests/qemu-iotests/033     |  29 ++++++++
- tests/qemu-iotests/033.out |  13 ++++
- util/Makefile.objs         |   2 +-
- 47 files changed, 973 insertions(+), 606 deletions(-)
- create mode 100644 include/block/aio-wait.h
- create mode 100644 tests/test-block-backend.c
- create mode 100644 util/aio-wait.c
+diff --git a/block/iscsi.c b/block/iscsi.c
+index 3414c21c7f..d2b0466775 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -458,24 +458,22 @@ static int iscsi_allocmap_init(IscsiLun *iscsilun, int open_flags)
+ }
+ 
+ static void
+-iscsi_allocmap_update(IscsiLun *iscsilun, int64_t sector_num,
+-                      int nb_sectors, bool allocated, bool valid)
++iscsi_allocmap_update(IscsiLun *iscsilun, int64_t offset,
++                      int64_t bytes, bool allocated, bool valid)
+ {
+     int64_t cl_num_expanded, nb_cls_expanded, cl_num_shrunk, nb_cls_shrunk;
+-    int cluster_sectors = iscsilun->cluster_size >> BDRV_SECTOR_BITS;
+ 
+     if (iscsilun->allocmap == NULL) {
+         return;
+     }
+     /* expand to entirely contain all affected clusters */
+-    assert(cluster_sectors);
+-    cl_num_expanded = sector_num / cluster_sectors;
+-    nb_cls_expanded = DIV_ROUND_UP(sector_num + nb_sectors,
+-                                   cluster_sectors) - cl_num_expanded;
++    assert(iscsilun->cluster_size);
++    cl_num_expanded = offset / iscsilun->cluster_size;
++    nb_cls_expanded = DIV_ROUND_UP(offset + bytes,
++                                   iscsilun->cluster_size) - cl_num_expanded;
+     /* shrink to touch only completely contained clusters */
+-    cl_num_shrunk = DIV_ROUND_UP(sector_num, cluster_sectors);
+-    nb_cls_shrunk = (sector_num + nb_sectors) / cluster_sectors
+-                      - cl_num_shrunk;
++    cl_num_shrunk = DIV_ROUND_UP(offset, iscsilun->cluster_size);
++    nb_cls_shrunk = (offset + bytes) / iscsilun->cluster_size - cl_num_shrunk;
+     if (allocated) {
+         bitmap_set(iscsilun->allocmap, cl_num_expanded, nb_cls_expanded);
+     } else {
+@@ -498,26 +496,26 @@ iscsi_allocmap_update(IscsiLun *iscsilun, int64_t sector_num,
+ }
+ 
+ static void
+-iscsi_allocmap_set_allocated(IscsiLun *iscsilun, int64_t sector_num,
+-                             int nb_sectors)
++iscsi_allocmap_set_allocated(IscsiLun *iscsilun, int64_t offset,
++                             int64_t bytes)
+ {
+-    iscsi_allocmap_update(iscsilun, sector_num, nb_sectors, true, true);
++    iscsi_allocmap_update(iscsilun, offset, bytes, true, true);
+ }
+ 
+ static void
+-iscsi_allocmap_set_unallocated(IscsiLun *iscsilun, int64_t sector_num,
+-                               int nb_sectors)
++iscsi_allocmap_set_unallocated(IscsiLun *iscsilun, int64_t offset,
++                               int64_t bytes)
+ {
+     /* Note: if cache.direct=on the fifth argument to iscsi_allocmap_update
+      * is ignored, so this will in effect be an iscsi_allocmap_set_invalid.
+      */
+-    iscsi_allocmap_update(iscsilun, sector_num, nb_sectors, false, true);
++    iscsi_allocmap_update(iscsilun, offset, bytes, false, true);
+ }
+ 
+-static void iscsi_allocmap_set_invalid(IscsiLun *iscsilun, int64_t sector_num,
+-                                       int nb_sectors)
++static void iscsi_allocmap_set_invalid(IscsiLun *iscsilun, int64_t offset,
++                                       int64_t bytes)
+ {
+-    iscsi_allocmap_update(iscsilun, sector_num, nb_sectors, false, false);
++    iscsi_allocmap_update(iscsilun, offset, bytes, false, false);
+ }
+ 
+ static void iscsi_allocmap_invalidate(IscsiLun *iscsilun)
+@@ -531,34 +529,30 @@ static void iscsi_allocmap_invalidate(IscsiLun *iscsilun)
+ }
+ 
+ static inline bool
+-iscsi_allocmap_is_allocated(IscsiLun *iscsilun, int64_t sector_num,
+-                            int nb_sectors)
++iscsi_allocmap_is_allocated(IscsiLun *iscsilun, int64_t offset,
++                            int64_t bytes)
+ {
+     unsigned long size;
+     if (iscsilun->allocmap == NULL) {
+         return true;
+     }
+     assert(iscsilun->cluster_size);
+-    size = DIV_ROUND_UP(sector_num + nb_sectors,
+-                        iscsilun->cluster_size >> BDRV_SECTOR_BITS);
++    size = DIV_ROUND_UP(offset + bytes, iscsilun->cluster_size);
+     return !(find_next_bit(iscsilun->allocmap, size,
+-                           sector_num * BDRV_SECTOR_SIZE /
+-                           iscsilun->cluster_size) == size);
++                           offset / iscsilun->cluster_size) == size);
+ }
+ 
+ static inline bool iscsi_allocmap_is_valid(IscsiLun *iscsilun,
+-                                           int64_t sector_num, int nb_sectors)
++                                           int64_t offset, int64_t bytes)
+ {
+     unsigned long size;
+     if (iscsilun->allocmap_valid == NULL) {
+         return false;
+     }
+     assert(iscsilun->cluster_size);
+-    size = DIV_ROUND_UP(sector_num + nb_sectors,
+-                        iscsilun->cluster_size >> BDRV_SECTOR_BITS);
++    size = DIV_ROUND_UP(offset + bytes, iscsilun->cluster_size);
+     return (find_next_zero_bit(iscsilun->allocmap_valid, size,
+-                               sector_num * BDRV_SECTOR_SIZE /
+-                               iscsilun->cluster_size) == size);
++                               offset / iscsilun->cluster_size) == size);
+ }
+ 
+ static int coroutine_fn
+@@ -640,14 +634,16 @@ retry:
+     }
+ 
+     if (iTask.status != SCSI_STATUS_GOOD) {
+-        iscsi_allocmap_set_invalid(iscsilun, sector_num, nb_sectors);
++        iscsi_allocmap_set_invalid(iscsilun, sector_num * BDRV_SECTOR_SIZE,
++                                   nb_sectors * BDRV_SECTOR_SIZE);
+         error_report("iSCSI WRITE10/16 failed at lba %" PRIu64 ": %s", lba,
+                      iTask.err_str);
+         r = iTask.err_code;
+         goto out_unlock;
+     }
+ 
+-    iscsi_allocmap_set_allocated(iscsilun, sector_num, nb_sectors);
++    iscsi_allocmap_set_allocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
++                                 nb_sectors * BDRV_SECTOR_SIZE);
+ 
+ out_unlock:
+     qemu_mutex_unlock(&iscsilun->mutex);
+@@ -747,9 +743,11 @@ retry:
+     }
+ 
+     if (ret & BDRV_BLOCK_ZERO) {
+-        iscsi_allocmap_set_unallocated(iscsilun, sector_num, *pnum);
++        iscsi_allocmap_set_unallocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
++                                       *pnum * BDRV_SECTOR_SIZE);
+     } else {
+-        iscsi_allocmap_set_allocated(iscsilun, sector_num, *pnum);
++        iscsi_allocmap_set_allocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
++                                     *pnum * BDRV_SECTOR_SIZE);
+     }
+ 
+     if (*pnum > nb_sectors) {
+@@ -789,15 +787,19 @@ static int coroutine_fn iscsi_co_readv(BlockDriverState *bs,
+     /* if cache.direct is off and we have a valid entry in our allocation map
+      * we can skip checking the block status and directly return zeroes if
+      * the request falls within an unallocated area */
+-    if (iscsi_allocmap_is_valid(iscsilun, sector_num, nb_sectors) &&
+-        !iscsi_allocmap_is_allocated(iscsilun, sector_num, nb_sectors)) {
++    if (iscsi_allocmap_is_valid(iscsilun, sector_num * BDRV_SECTOR_SIZE,
++                                nb_sectors * BDRV_SECTOR_SIZE) &&
++        !iscsi_allocmap_is_allocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
++                                     nb_sectors * BDRV_SECTOR_SIZE)) {
+             qemu_iovec_memset(iov, 0, 0x00, iov->size);
+             return 0;
+     }
+ 
+     if (nb_sectors >= ISCSI_CHECKALLOC_THRES &&
+-        !iscsi_allocmap_is_valid(iscsilun, sector_num, nb_sectors) &&
+-        !iscsi_allocmap_is_allocated(iscsilun, sector_num, nb_sectors)) {
++        !iscsi_allocmap_is_valid(iscsilun, sector_num * BDRV_SECTOR_SIZE,
++                                 nb_sectors * BDRV_SECTOR_SIZE) &&
++        !iscsi_allocmap_is_allocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
++                                     nb_sectors * BDRV_SECTOR_SIZE)) {
+         int pnum;
+         BlockDriverState *file;
+         /* check the block status from the beginning of the cluster
+@@ -1160,8 +1162,7 @@ retry:
+         goto retry;
+     }
+ 
+-    iscsi_allocmap_set_invalid(iscsilun, offset >> BDRV_SECTOR_BITS,
+-                               bytes >> BDRV_SECTOR_BITS);
++    iscsi_allocmap_set_invalid(iscsilun, offset, bytes);
+ 
+     if (iTask.status == SCSI_STATUS_CHECK_CONDITION) {
+         /* the target might fail with a check condition if it
+@@ -1274,8 +1275,7 @@ retry:
+     }
+ 
+     if (iTask.status != SCSI_STATUS_GOOD) {
+-        iscsi_allocmap_set_invalid(iscsilun, offset >> BDRV_SECTOR_BITS,
+-                                   bytes >> BDRV_SECTOR_BITS);
++        iscsi_allocmap_set_invalid(iscsilun, offset, bytes);
+         error_report("iSCSI WRITESAME10/16 failed at lba %" PRIu64 ": %s",
+                      lba, iTask.err_str);
+         r = iTask.err_code;
+@@ -1283,11 +1283,9 @@ retry:
+     }
+ 
+     if (flags & BDRV_REQ_MAY_UNMAP) {
+-        iscsi_allocmap_set_invalid(iscsilun, offset >> BDRV_SECTOR_BITS,
+-                                   bytes >> BDRV_SECTOR_BITS);
++        iscsi_allocmap_set_invalid(iscsilun, offset, bytes);
+     } else {
+-        iscsi_allocmap_set_allocated(iscsilun, offset >> BDRV_SECTOR_BITS,
+-                                     bytes >> BDRV_SECTOR_BITS);
++        iscsi_allocmap_set_allocated(iscsilun, offset, bytes);
+     }
+ 
+ out_unlock:
+-- 
+2.13.6
