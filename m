@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1erdnc-0000kJ-T8
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:14 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1erdnY-0000f0-2u
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1erdna-00045L-G6
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:08 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1erdnW-0003z5-Jk
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:04 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  2 Mar 2018 17:03:50 +1100
-Message-Id: <20180302060350.24330-25-david@gibson.dropbear.id.au>
+Date: Fri,  2 Mar 2018 17:03:39 +1100
+Message-Id: <20180302060350.24330-14-david@gibson.dropbear.id.au>
 In-Reply-To: <20180302060350.24330-1-david@gibson.dropbear.id.au>
 References: <20180302060350.24330-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 24/24] hw/ppc/spapr,
- e500: Use new property "stdout-path" for boot console
+Subject: [Qemu-devel] [PULL 13/24] openpic: move KVM-specific declarations
+ into separate openpic_kvm.h file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,62 +21,87 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, groug@kaod.org, surajjs@au1.ibm.com, mark.cave-ayland@ilande.co.uk, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, groug@kaod.org, surajjs@au1.ibm.com, mark.cave-ayland@ilande.co.uk, David Gibson <david@gibson.dropbear.id.au>
 
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Linux kernel commit 2a9d832cc9aae21ea827520fef635b6c49a06c6d
-(of: Add bindings for chosen node, stdout-path) deprecated chosen property
-"linux,stdout-path" and "stdout".
+This is needed before the next patch because the target-dependent kvm stub
+uses the existing kvm_openpic_connect_vcpu() declaration, making it impossible
+to move the device-specific declarations into the same file without breaking
+ppc-linux-user compilation.
 
-Introduce the new property "stdout-path" and continue supporting the older
-property to remain compatible with existing/older firmware. This older property
-can be deprecated after 5 years.
-
-Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/e500.c  | 7 +++++++
- hw/ppc/spapr.c | 7 +++++++
- 2 files changed, 14 insertions(+)
+ hw/intc/openpic_kvm.c        | 1 +
+ hw/ppc/e500.c                | 1 +
+ include/hw/ppc/openpic.h     | 3 ---
+ include/hw/ppc/openpic_kvm.h | 7 +++++++
+ target/ppc/kvm-stub.c        | 2 +-
+ 5 files changed, 10 insertions(+), 4 deletions(-)
+ create mode 100644 include/hw/ppc/openpic_kvm.h
 
+diff --git a/hw/intc/openpic_kvm.c b/hw/intc/openpic_kvm.c
+index fa83420254..f1a59e5a85 100644
+--- a/hw/intc/openpic_kvm.c
++++ b/hw/intc/openpic_kvm.c
+@@ -30,6 +30,7 @@
+ #include "exec/address-spaces.h"
+ #include "hw/hw.h"
+ #include "hw/ppc/openpic.h"
++#include "hw/ppc/openpic_kvm.h"
+ #include "hw/pci/msi.h"
+ #include "hw/sysbus.h"
+ #include "sysemu/kvm.h"
 diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index 13a34f50b7..ef541a00be 100644
+index a40d3ec3e3..13a34f50b7 100644
 --- a/hw/ppc/e500.c
 +++ b/hw/ppc/e500.c
-@@ -120,7 +120,14 @@ static void dt_serial_create(void *fdt, unsigned long long offset,
-     qemu_fdt_setprop_string(fdt, "/aliases", alias, ser);
+@@ -29,6 +29,7 @@
+ #include "kvm_ppc.h"
+ #include "sysemu/device_tree.h"
+ #include "hw/ppc/openpic.h"
++#include "hw/ppc/openpic_kvm.h"
+ #include "hw/ppc/ppc.h"
+ #include "hw/loader.h"
+ #include "elf.h"
+diff --git a/include/hw/ppc/openpic.h b/include/hw/ppc/openpic.h
+index e55ce546aa..693e981965 100644
+--- a/include/hw/ppc/openpic.h
++++ b/include/hw/ppc/openpic.h
+@@ -28,7 +28,4 @@ enum {
+ #define OPENPIC_MAX_IRQ     (OPENPIC_MAX_SRC + OPENPIC_MAX_IPI + \
+                              OPENPIC_MAX_TMR)
  
-     if (defcon) {
-+        /*
-+         * "linux,stdout-path" and "stdout" properties are deprecated by linux
-+         * kernel. New platforms should only use the "stdout-path" property. Set
-+         * the new property and continue using older property to remain
-+         * compatible with the existing firmware.
-+         */
-         qemu_fdt_setprop_string(fdt, "/chosen", "linux,stdout-path", ser);
-+        qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", ser);
-     }
- }
+-#define TYPE_KVM_OPENPIC "kvm-openpic"
+-int kvm_openpic_connect_vcpu(DeviceState *d, CPUState *cs);
+-
+ #endif /* OPENPIC_H */
+diff --git a/include/hw/ppc/openpic_kvm.h b/include/hw/ppc/openpic_kvm.h
+new file mode 100644
+index 0000000000..9ef4215257
+--- /dev/null
++++ b/include/hw/ppc/openpic_kvm.h
+@@ -0,0 +1,7 @@
++#ifndef OPENPIC_KVM_H
++#define OPENPIC_KVM_H
++
++#define TYPE_KVM_OPENPIC "kvm-openpic"
++int kvm_openpic_connect_vcpu(DeviceState *d, CPUState *cs);
++
++#endif /* OPENPIC_KVM_H */
+diff --git a/target/ppc/kvm-stub.c b/target/ppc/kvm-stub.c
+index efeafca1df..b8aa97f2d4 100644
+--- a/target/ppc/kvm-stub.c
++++ b/target/ppc/kvm-stub.c
+@@ -12,7 +12,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "cpu.h"
+-#include "hw/ppc/openpic.h"
++#include "hw/ppc/openpic_kvm.h"
  
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 1b6ddd827e..7e1c858566 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1053,7 +1053,14 @@ static void spapr_dt_chosen(sPAPRMachineState *spapr, void *fdt)
-     }
- 
-     if (!spapr->has_graphics && stdout_path) {
-+        /*
-+         * "linux,stdout-path" and "stdout" properties are deprecated by linux
-+         * kernel. New platforms should only use the "stdout-path" property. Set
-+         * the new property and continue using older property to remain
-+         * compatible with the existing firmware.
-+         */
-         _FDT(fdt_setprop_string(fdt, chosen, "linux,stdout-path", stdout_path));
-+        _FDT(fdt_setprop_string(fdt, chosen, "stdout-path", stdout_path));
-     }
- 
-     spapr_dt_ov5_platform_support(fdt, chosen);
+ int kvm_openpic_connect_vcpu(DeviceState *d, CPUState *cs)
+ {
 -- 
 2.14.3
