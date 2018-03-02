@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eriuS-00080w-1Z
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:31:33 -0500
+	(envelope-from <prvs=592ad6921=anthony.perard@citrix.com>)
+	id 1erjCb-0007ez-LY
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:50:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eriuO-0007Uf-Ua
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:31:32 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47064 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eriuO-0007UU-P3
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:31:28 -0500
-Date: Fri, 2 Mar 2018 11:31:19 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180302113118.GC3154@work-vm>
-References: <20180228211028.83970-1-brijesh.singh@amd.com>
-	<20180228211028.83970-15-brijesh.singh@amd.com>
+	(envelope-from <prvs=592ad6921=anthony.perard@citrix.com>)
+	id 1erjCY-00062Z-JJ
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:50:17 -0500
+Received: from smtp.citrix.com ([66.165.176.89]:20866)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=592ad6921=anthony.perard@citrix.com>)
+	id 1erjCY-00060Y-Bh
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:50:14 -0500
+Date: Fri, 2 Mar 2018 11:50:09 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20180302115009.GF1799@perard.uk.xensource.com>
+References: <20171207101812.23602-1-haozhong.zhang@intel.com>
+	<20171207101812.23602-4-haozhong.zhang@intel.com>
+	<20180227164147.GB1799@perard.uk.xensource.com>
+	<20180228075654.gv22h2zd73peuyxm@hz-desktop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20180228211028.83970-15-brijesh.singh@amd.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v10 14/28] hmp: add 'info sev' command
+In-Reply-To: <20180228075654.gv22h2zd73peuyxm@hz-desktop>
+Subject: Re: [Qemu-devel] [RFC QEMU PATCH v4 03/10] hostmem-xen: add a host
+ memory backend for Xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,120 +33,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>
-Cc: qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>
+To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-* Brijesh Singh (brijesh.singh@amd.com) wrote:
-> The command can be used to show the SEV information when memory
-> encryption is enabled on AMD platform.
->=20
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: "Daniel P. Berrang=E9" <berrange@redhat.com>
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->=20
-> Hi Dave,
->=20
-> I updated the patch to address your comment on making this x86 specific=
-, but
-> still kept your R-b, if you don't agree with changes then let me know.
+On Wed, Feb 28, 2018 at 03:56:54PM +0800, Haozhong Zhang wrote:
+> On 02/27/18 16:41 +0000, Anthony PERARD wrote:
+> > On Thu, Dec 07, 2017 at 06:18:05PM +0800, Haozhong Zhang wrote:
+> > > @@ -108,7 +109,10 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+> > >      }
+> > >  
+> > >      memory_region_add_subregion(&hpms->mr, addr - hpms->base, mr);
+> > > -    vmstate_register_ram(vmstate_mr, dev);
+> > > +    /* memory-backend-xen is not backed by RAM. */
+> > > +    if (!xen_enabled()) {
+> > 
+> > Is it possible to have the same condition as the one used in
+> > host_memory_backend_memory_complete? i.e. base on whether the memory
+> > region is mapped or not (backend->mr.ram_block).
+> 
+> Like "if (!xen_enabled() || backend->mr.ram_block))"? No, it will mute
+> the abortion (vmstate_register_ram --> qemu_ram_set_idstr ) caused by
+> the case that !backend->mr.ram_block in the non-xen environment.
 
-Yes, that's fine, thanks.
+In non-xen environment, vmstate_register_ram() will be called, because
+!xen_enabled() is true, it would not matter if there is a ram_block or
+not.
 
+But if there is a memory-backend that can run in a xen environment that
+have a ram_block, vmstate_register_ram would not be called in the
+origial patch, but if we use (!xen_enabled() || vmstate_mr->ram_block)
+as condition then vmstate_register_ram will be called.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Is this make sense?
 
-Dave
+> > > +        vmstate_register_ram(vmstate_mr, dev);
+> > > +    }
+> > >      numa_set_mem_node_id(addr, memory_region_size(mr), dimm->node);
+> > >  
+> > >  out:
 
-
-> thanks
->=20
->  hmp-commands-info.hx  | 16 ++++++++++++++++
->  hmp.h                 |  1 +
->  target/i386/monitor.c | 20 ++++++++++++++++++++
->  3 files changed, 37 insertions(+)
->=20
-> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> index ad590a4ffb2b..ddfcd5adcca6 100644
-> --- a/hmp-commands-info.hx
-> +++ b/hmp-commands-info.hx
-> @@ -867,6 +867,22 @@ Display the amount of initially allocated and pres=
-ent hotpluggable (if
->  enabled) memory in bytes.
->  ETEXI
-> =20
-> +#if defined(TARGET_I386)
-> +    {
-> +        .name       =3D "sev",
-> +        .args_type  =3D "",
-> +        .params     =3D "",
-> +        .help       =3D "show SEV information",
-> +        .cmd        =3D hmp_info_sev,
-> +    },
-> +#endif
-> +
-> +STEXI
-> +@item info sev
-> +@findex info sev
-> +Show SEV information.
-> +ETEXI
-> +
->  STEXI
->  @end table
->  ETEXI
-> diff --git a/hmp.h b/hmp.h
-> index 1143db44a760..4ca1a77b2c1f 100644
-> --- a/hmp.h
-> +++ b/hmp.h
-> @@ -146,5 +146,6 @@ void hmp_info_ramblock(Monitor *mon, const QDict *q=
-dict);
->  void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
->  void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
->  void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
-> +void hmp_info_sev(Monitor *mon, const QDict *qdict);
-> =20
->  #endif
-> diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-> index e2f02c4be95c..e664030dbd72 100644
-> --- a/target/i386/monitor.c
-> +++ b/target/i386/monitor.c
-> @@ -29,6 +29,7 @@
->  #include "qapi/qmp/qdict.h"
->  #include "hw/i386/pc.h"
->  #include "sysemu/kvm.h"
-> +#include "sysemu/sev.h"
->  #include "hmp.h"
->  #include "sev_i386.h"
->  #include "qmp-commands.h"
-> @@ -680,3 +681,22 @@ SevInfo *qmp_query_sev(Error **errp)
-> =20
->      return info;
->  }
-> +
-> +void hmp_info_sev(Monitor *mon, const QDict *qdict)
-> +{
-> +    SevInfo *info =3D sev_get_info();
-> +
-> +    if (info && info->enabled) {
-> +        monitor_printf(mon, "handle: %d\n", info->handle);
-> +        monitor_printf(mon, "state: %s\n", SevState_str(info->state));
-> +        monitor_printf(mon, "build: %d\n", info->build_id);
-> +        monitor_printf(mon, "api version: %d.%d\n",
-> +                       info->api_major, info->api_minor);
-> +        monitor_printf(mon, "debug: %s\n",
-> +                       info->policy & SEV_POLICY_NODBG ? "off" : "on")=
-;
-> +        monitor_printf(mon, "key-sharing: %s\n",
-> +                       info->policy & SEV_POLICY_NOKS ? "off" : "on");
-> +    } else {
-> +        monitor_printf(mon, "SEV is not enabled\n");
-> +    }
-> +}
-> --=20
-> 2.14.3
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- 
+Anthony PERARD
