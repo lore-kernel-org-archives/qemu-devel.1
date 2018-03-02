@@ -1,16 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1erpqx-00027U-Ji
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 13:56:24 -0500
+	(envelope-from <kwolf@redhat.com>) id 1erpr1-0002AV-8s
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 13:56:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1erpqw-0003Wu-QE
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 13:56:23 -0500
+	(envelope-from <kwolf@redhat.com>) id 1erpqz-0003Xq-Ra
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 13:56:27 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  2 Mar 2018 19:54:47 +0100
-Message-Id: <20180302185448.6314-37-kwolf@redhat.com>
+Date: Fri,  2 Mar 2018 19:54:48 +0100
+Message-Id: <20180302185448.6314-38-kwolf@redhat.com>
 In-Reply-To: <20180302185448.6314-1-kwolf@redhat.com>
 References: <20180302185448.6314-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 36/37] block/ssh: Add basic .bdrv_truncate()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 37/37] qcow2: Replace align_offset() with
+ ROUND_UP()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,61 +26,231 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Max Reitz <mreitz@redhat.com>
+From: Alberto Garcia <berto@igalia.com>
 
-libssh2 does not seem to offer real truncation support, so we can only
-grow files -- but that is better than nothing.
+The align_offset() function is equivalent to the ROUND_UP() macro so
+there's no need to use the former. The ROUND_UP() name is also a bit
+more explicit.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20180214204915.7980-4-mreitz@redhat.com
+This patch uses ROUND_UP() instead of the slower QEMU_ALIGN_UP()
+because align_offset() already requires that the second parameter is a
+power of two.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Message-id: 20180215131008.5153-1-berto@igalia.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/ssh.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ block/qcow2.h          |  6 ------
+ block/qcow2-bitmap.c   |  4 ++--
+ block/qcow2-cluster.c  |  4 ++--
+ block/qcow2-refcount.c |  4 ++--
+ block/qcow2-snapshot.c | 10 +++++-----
+ block/qcow2.c          | 14 +++++++-------
+ 6 files changed, 18 insertions(+), 24 deletions(-)
 
-diff --git a/block/ssh.c b/block/ssh.c
-index 4bcf10334f..80a8b40dfa 100644
---- a/block/ssh.c
-+++ b/block/ssh.c
-@@ -1220,6 +1220,29 @@ static int64_t ssh_getlength(BlockDriverState *bs)
-     return length;
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 883802241f..1a84cc77b0 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -480,12 +480,6 @@ static inline int offset_to_l2_slice_index(BDRVQcow2=
+State *s, int64_t offset)
+     return (offset >> s->cluster_bits) & (s->l2_slice_size - 1);
  }
- 
-+static int ssh_truncate(BlockDriverState *bs, int64_t offset,
-+                        PreallocMode prealloc, Error **errp)
-+{
-+    BDRVSSHState *s = bs->opaque;
-+
-+    if (prealloc != PREALLOC_MODE_OFF) {
-+        error_setg(errp, "Unsupported preallocation mode '%s'",
-+                   PreallocMode_str(prealloc));
-+        return -ENOTSUP;
-+    }
-+
-+    if (offset < s->attrs.filesize) {
-+        error_setg(errp, "ssh driver does not support shrinking files");
-+        return -ENOTSUP;
-+    }
-+
-+    if (offset == s->attrs.filesize) {
-+        return 0;
-+    }
-+
-+    return ssh_grow_file(s, offset, errp);
-+}
-+
- static BlockDriver bdrv_ssh = {
-     .format_name                  = "ssh",
-     .protocol_name                = "ssh",
-@@ -1232,6 +1255,7 @@ static BlockDriver bdrv_ssh = {
-     .bdrv_co_readv                = ssh_co_readv,
-     .bdrv_co_writev               = ssh_co_writev,
-     .bdrv_getlength               = ssh_getlength,
-+    .bdrv_truncate                = ssh_truncate,
-     .bdrv_co_flush_to_disk        = ssh_co_flush,
-     .create_opts                  = &ssh_create_opts,
- };
--- 
+=20
+-static inline int64_t align_offset(int64_t offset, int n)
+-{
+-    offset =3D (offset + n - 1) & ~(n - 1);
+-    return offset;
+-}
+-
+ static inline int64_t qcow2_vm_state_offset(BDRVQcow2State *s)
+ {
+     return (int64_t)s->l1_vm_state_index << (s->cluster_bits + s->l2_bit=
+s);
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index 4f6fd863ea..5127276f90 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -413,8 +413,8 @@ static inline void bitmap_dir_entry_to_be(Qcow2Bitmap=
+DirEntry *entry)
+=20
+ static inline int calc_dir_entry_size(size_t name_size, size_t extra_dat=
+a_size)
+ {
+-    return align_offset(sizeof(Qcow2BitmapDirEntry) +
+-                        name_size + extra_data_size, 8);
++    int size =3D sizeof(Qcow2BitmapDirEntry) + name_size + extra_data_si=
+ze;
++    return ROUND_UP(size, 8);
+ }
+=20
+ static inline int dir_entry_size(Qcow2BitmapDirEntry *entry)
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index e406b0f3b9..98908c4264 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -126,11 +126,11 @@ int qcow2_grow_l1_table(BlockDriverState *bs, uint6=
+4_t min_size,
+=20
+     new_l1_size2 =3D sizeof(uint64_t) * new_l1_size;
+     new_l1_table =3D qemu_try_blockalign(bs->file->bs,
+-                                       align_offset(new_l1_size2, 512));
++                                       ROUND_UP(new_l1_size2, 512));
+     if (new_l1_table =3D=3D NULL) {
+         return -ENOMEM;
+     }
+-    memset(new_l1_table, 0, align_offset(new_l1_size2, 512));
++    memset(new_l1_table, 0, ROUND_UP(new_l1_size2, 512));
+=20
+     if (s->l1_size) {
+         memcpy(new_l1_table, s->l1_table, s->l1_size * sizeof(uint64_t))=
+;
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index d46b69d7f3..126cca3276 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -1204,7 +1204,7 @@ int qcow2_update_snapshot_refcount(BlockDriverState=
+ *bs,
+      * l1_table_offset when it is the current s->l1_table_offset! Be car=
+eful
+      * when changing this! */
+     if (l1_table_offset !=3D s->l1_table_offset) {
+-        l1_table =3D g_try_malloc0(align_offset(l1_size2, 512));
++        l1_table =3D g_try_malloc0(ROUND_UP(l1_size2, 512));
+         if (l1_size2 && l1_table =3D=3D NULL) {
+             ret =3D -ENOMEM;
+             goto fail;
+@@ -2553,7 +2553,7 @@ int qcow2_check_metadata_overlap(BlockDriverState *=
+bs, int ign, int64_t offset,
+     }
+=20
+     /* align range to test to cluster boundaries */
+-    size =3D align_offset(offset_into_cluster(s, offset) + size, s->clus=
+ter_size);
++    size =3D ROUND_UP(offset_into_cluster(s, offset) + size, s->cluster_=
+size);
+     offset =3D start_of_cluster(s, offset);
+=20
+     if ((chk & QCOW2_OL_ACTIVE_L1) && s->l1_size) {
+diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
+index 44243e0e95..cee25f582b 100644
+--- a/block/qcow2-snapshot.c
++++ b/block/qcow2-snapshot.c
+@@ -66,7 +66,7 @@ int qcow2_read_snapshots(BlockDriverState *bs)
+=20
+     for(i =3D 0; i < s->nb_snapshots; i++) {
+         /* Read statically sized part of the snapshot header */
+-        offset =3D align_offset(offset, 8);
++        offset =3D ROUND_UP(offset, 8);
+         ret =3D bdrv_pread(bs->file, offset, &h, sizeof(h));
+         if (ret < 0) {
+             goto fail;
+@@ -155,7 +155,7 @@ static int qcow2_write_snapshots(BlockDriverState *bs=
+)
+     offset =3D 0;
+     for(i =3D 0; i < s->nb_snapshots; i++) {
+         sn =3D s->snapshots + i;
+-        offset =3D align_offset(offset, 8);
++        offset =3D ROUND_UP(offset, 8);
+         offset +=3D sizeof(h);
+         offset +=3D sizeof(extra);
+         offset +=3D strlen(sn->id_str);
+@@ -215,7 +215,7 @@ static int qcow2_write_snapshots(BlockDriverState *bs=
+)
+         assert(id_str_size <=3D UINT16_MAX && name_size <=3D UINT16_MAX)=
+;
+         h.id_str_size =3D cpu_to_be16(id_str_size);
+         h.name_size =3D cpu_to_be16(name_size);
+-        offset =3D align_offset(offset, 8);
++        offset =3D ROUND_UP(offset, 8);
+=20
+         ret =3D bdrv_pwrite(bs->file, offset, &h, sizeof(h));
+         if (ret < 0) {
+@@ -441,7 +441,7 @@ int qcow2_snapshot_create(BlockDriverState *bs, QEMUS=
+napshotInfo *sn_info)
+     /* The VM state isn't needed any more in the active L1 table; in fac=
+t, it
+      * hurts by causing expensive COW for the next snapshot. */
+     qcow2_cluster_discard(bs, qcow2_vm_state_offset(s),
+-                          align_offset(sn->vm_state_size, s->cluster_siz=
+e),
++                          ROUND_UP(sn->vm_state_size, s->cluster_size),
+                           QCOW2_DISCARD_NEVER, false);
+=20
+ #ifdef DEBUG_ALLOC
+@@ -710,7 +710,7 @@ int qcow2_snapshot_load_tmp(BlockDriverState *bs,
+     }
+     new_l1_bytes =3D sn->l1_size * sizeof(uint64_t);
+     new_l1_table =3D qemu_try_blockalign(bs->file->bs,
+-                                       align_offset(new_l1_bytes, 512));
++                                       ROUND_UP(new_l1_bytes, 512));
+     if (new_l1_table =3D=3D NULL) {
+         return -ENOMEM;
+     }
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 7cf3c1518a..0397506b39 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1379,7 +1379,7 @@ static int qcow2_do_open(BlockDriverState *bs, QDic=
+t *options, int flags,
+=20
+     if (s->l1_size > 0) {
+         s->l1_table =3D qemu_try_blockalign(bs->file->bs,
+-            align_offset(s->l1_size * sizeof(uint64_t), 512));
++            ROUND_UP(s->l1_size * sizeof(uint64_t), 512));
+         if (s->l1_table =3D=3D NULL) {
+             error_setg(errp, "Could not allocate L1 table");
+             ret =3D -ENOMEM;
+@@ -2642,19 +2642,19 @@ static int64_t qcow2_calc_prealloc_size(int64_t t=
+otal_size,
+ {
+     int64_t meta_size =3D 0;
+     uint64_t nl1e, nl2e;
+-    int64_t aligned_total_size =3D align_offset(total_size, cluster_size=
+);
++    int64_t aligned_total_size =3D ROUND_UP(total_size, cluster_size);
+=20
+     /* header: 1 cluster */
+     meta_size +=3D cluster_size;
+=20
+     /* total size of L2 tables */
+     nl2e =3D aligned_total_size / cluster_size;
+-    nl2e =3D align_offset(nl2e, cluster_size / sizeof(uint64_t));
++    nl2e =3D ROUND_UP(nl2e, cluster_size / sizeof(uint64_t));
+     meta_size +=3D nl2e * sizeof(uint64_t);
+=20
+     /* total size of L1 tables */
+     nl1e =3D nl2e * sizeof(uint64_t) / cluster_size;
+-    nl1e =3D align_offset(nl1e, cluster_size / sizeof(uint64_t));
++    nl1e =3D ROUND_UP(nl1e, cluster_size / sizeof(uint64_t));
+     meta_size +=3D nl1e * sizeof(uint64_t);
+=20
+     /* total size of refcount table and blocks */
+@@ -3710,8 +3710,8 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *op=
+ts, BlockDriverState *in_bs,
+     has_backing_file =3D !!optstr;
+     g_free(optstr);
+=20
+-    virtual_size =3D align_offset(qemu_opt_get_size_del(opts, BLOCK_OPT_=
+SIZE, 0),
+-                                cluster_size);
++    virtual_size =3D qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0);
++    virtual_size =3D ROUND_UP(virtual_size, cluster_size);
+=20
+     /* Check that virtual disk size is valid */
+     l2_tables =3D DIV_ROUND_UP(virtual_size / cluster_size,
+@@ -3731,7 +3731,7 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *op=
+ts, BlockDriverState *in_bs,
+             goto err;
+         }
+=20
+-        virtual_size =3D align_offset(ssize, cluster_size);
++        virtual_size =3D ROUND_UP(ssize, cluster_size);
+=20
+         if (has_backing_file) {
+             /* We don't how much of the backing chain is shared by the i=
+nput
+--=20
 2.13.6
