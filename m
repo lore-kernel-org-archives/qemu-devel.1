@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1erl8F-0007be-Ur
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:53:59 -0500
+	(envelope-from <mjc@sifive.com>) id 1erl8K-0007iS-Gc
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:54:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1erl8E-0002Cd-K1
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:53:56 -0500
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:41187)
+	(envelope-from <mjc@sifive.com>) id 1erl8I-0002DQ-M1
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:54:00 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:41943)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1erl8E-0002CI-Cr
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:53:54 -0500
-Received: by mail-pl0-x244.google.com with SMTP id k8-v6so5726269pli.8
-	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 05:53:54 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1erl8I-0002DL-Cn
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:53:58 -0500
+Received: by mail-pg0-x242.google.com with SMTP id q27so3801501pgn.8
+	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 05:53:58 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Sat,  3 Mar 2018 02:51:41 +1300
-Message-Id: <1519998711-73430-14-git-send-email-mjc@sifive.com>
+Date: Sat,  3 Mar 2018 02:51:42 +1300
+Message-Id: <1519998711-73430-15-git-send-email-mjc@sifive.com>
 In-Reply-To: <1519998711-73430-1-git-send-email-mjc@sifive.com>
 References: <1519998711-73430-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v8 13/23] RISC-V HART Array
+Subject: [Qemu-devel] [PATCH v8 14/23] SiFive RISC-V CLINT Block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,32 +26,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
+Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>, Stefan O'Rear <sorear2@gmail.com>
 
-Holds the state of a heterogenous array of RISC-V hardware threads.
+The CLINT (Core Local Interruptor) device provides real-time clock, timer
+and interprocessor interrupts based on SiFive's CLINT specification.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Acked-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Sagar Karandikar <sagark@eecs.berkeley.edu>
+Signed-off-by: Stefan O'Rear <sorear2@gmail.com>
+Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- hw/riscv/riscv_hart.c         | 89 +++++++++++++++++++++++++++++++++++++++++++
- include/hw/riscv/riscv_hart.h | 39 +++++++++++++++++++
- 2 files changed, 128 insertions(+)
- create mode 100644 hw/riscv/riscv_hart.c
- create mode 100644 include/hw/riscv/riscv_hart.h
+ hw/riscv/sifive_clint.c         | 254 ++++++++++++++++++++++++++++++++++++++++
+ include/hw/riscv/sifive_clint.h |  50 ++++++++
+ 2 files changed, 304 insertions(+)
+ create mode 100644 hw/riscv/sifive_clint.c
+ create mode 100644 include/hw/riscv/sifive_clint.h
 
-diff --git a/hw/riscv/riscv_hart.c b/hw/riscv/riscv_hart.c
+diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
 new file mode 100644
-index 0000000..14e3c18
+index 0000000..4893453
 --- /dev/null
-+++ b/hw/riscv/riscv_hart.c
-@@ -0,0 +1,89 @@
++++ b/hw/riscv/sifive_clint.c
+@@ -0,0 +1,254 @@
 +/*
-+ * QEMU RISCV Hart Array
++ * SiFive CLINT (Core Local Interruptor)
 + *
++ * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
 + * Copyright (c) 2017 SiFive, Inc.
 + *
-+ * Holds the state of a heterogenous array of RISC-V harts
++ * This provides real-time clock, timer and interprocessor interrupts.
 + *
 + * This program is free software; you can redistribute it and/or modify it
 + * under the terms and conditions of the GNU General Public License,
@@ -67,86 +71,249 @@ index 0000000..14e3c18
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qapi/error.h"
++#include "qemu/error-report.h"
 +#include "hw/sysbus.h"
 +#include "target/riscv/cpu.h"
-+#include "hw/riscv/riscv_hart.h"
++#include "hw/riscv/sifive_clint.h"
++#include "qemu/timer.h"
 +
-+static Property riscv_harts_props[] = {
-+    DEFINE_PROP_UINT32("num-harts", RISCVHartArrayState, num_harts, 1),
-+    DEFINE_PROP_STRING("cpu-type", RISCVHartArrayState, cpu_type),
++/* See: riscv-pk/machine/sbi_entry.S and arch/riscv/kernel/time.c */
++#define TIMER_FREQ (10 * 1000 * 1000)
++
++static uint64_t cpu_riscv_read_rtc(void)
++{
++    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL), TIMER_FREQ,
++                    NANOSECONDS_PER_SECOND);
++}
++
++/*
++ * Called when timecmp is written to update the QEMU timer or immediately
++ * trigger timer interrupt if mtimecmp <= current timer value.
++ */
++static void sifive_clint_write_timecmp(RISCVCPU *cpu, uint64_t value)
++{
++    uint64_t next;
++    uint64_t diff;
++
++    uint64_t rtc_r = cpu_riscv_read_rtc();
++
++    cpu->env.timecmp = value;
++    if (cpu->env.timecmp <= rtc_r) {
++        /* if we're setting an MTIMECMP value in the "past",
++           immediately raise the timer interrupt */
++        riscv_set_local_interrupt(cpu, MIP_MTIP, 1);
++        return;
++    }
++
++    /* otherwise, set up the future timer interrupt */
++    riscv_set_local_interrupt(cpu, MIP_MTIP, 0);
++    diff = cpu->env.timecmp - rtc_r;
++    /* back to ns (note args switched in muldiv64) */
++    next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
++        muldiv64(diff, NANOSECONDS_PER_SECOND, TIMER_FREQ);
++    timer_mod(cpu->env.timer, next);
++}
++
++/*
++ * Callback used when the timer set using timer_mod expires.
++ * Should raise the timer interrupt line
++ */
++static void sifive_clint_timer_cb(void *opaque)
++{
++    RISCVCPU *cpu = opaque;
++    riscv_set_local_interrupt(cpu, MIP_MTIP, 1);
++}
++
++/* CPU wants to read rtc or timecmp register */
++static uint64_t sifive_clint_read(void *opaque, hwaddr addr, unsigned size)
++{
++    SiFiveCLINTState *clint = opaque;
++    if (addr >= clint->sip_base &&
++        addr < clint->sip_base + (clint->num_harts << 2)) {
++        size_t hartid = (addr - clint->sip_base) >> 2;
++        CPUState *cpu = qemu_get_cpu(hartid);
++        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
++        if (!env) {
++            error_report("clint: invalid timecmp hartid: %zu", hartid);
++        } else if ((addr & 0x3) == 0) {
++            return (env->mip & MIP_MSIP) > 0;
++        } else {
++            error_report("clint: invalid read: %08x", (uint32_t)addr);
++            return 0;
++        }
++    } else if (addr >= clint->timecmp_base &&
++        addr < clint->timecmp_base + (clint->num_harts << 3)) {
++        size_t hartid = (addr - clint->timecmp_base) >> 3;
++        CPUState *cpu = qemu_get_cpu(hartid);
++        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
++        if (!env) {
++            error_report("clint: invalid timecmp hartid: %zu", hartid);
++        } else if ((addr & 0x7) == 0) {
++            /* timecmp_lo */
++            uint64_t timecmp = env->timecmp;
++            return timecmp & 0xFFFFFFFF;
++        } else if ((addr & 0x7) == 4) {
++            /* timecmp_hi */
++            uint64_t timecmp = env->timecmp;
++            return (timecmp >> 32) & 0xFFFFFFFF;
++        } else {
++            error_report("clint: invalid read: %08x", (uint32_t)addr);
++            return 0;
++        }
++    } else if (addr == clint->time_base) {
++        /* time_lo */
++        return cpu_riscv_read_rtc() & 0xFFFFFFFF;
++    } else if (addr == clint->time_base + 4) {
++        /* time_hi */
++        return (cpu_riscv_read_rtc() >> 32) & 0xFFFFFFFF;
++    }
++
++    error_report("clint: invalid read: %08x", (uint32_t)addr);
++    return 0;
++}
++
++/* CPU wrote to rtc or timecmp register */
++static void sifive_clint_write(void *opaque, hwaddr addr, uint64_t value,
++        unsigned size)
++{
++    SiFiveCLINTState *clint = opaque;
++
++    if (addr >= clint->sip_base &&
++        addr < clint->sip_base + (clint->num_harts << 2)) {
++        size_t hartid = (addr - clint->sip_base) >> 2;
++        CPUState *cpu = qemu_get_cpu(hartid);
++        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
++        if (!env) {
++            error_report("clint: invalid timecmp hartid: %zu", hartid);
++        } else if ((addr & 0x3) == 0) {
++            riscv_set_local_interrupt(RISCV_CPU(cpu), MIP_MSIP, value != 0);
++        } else {
++            error_report("clint: invalid sip write: %08x", (uint32_t)addr);
++        }
++        return;
++    } else if (addr >= clint->timecmp_base &&
++        addr < clint->timecmp_base + (clint->num_harts << 3)) {
++        size_t hartid = (addr - clint->timecmp_base) >> 3;
++        CPUState *cpu = qemu_get_cpu(hartid);
++        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
++        if (!env) {
++            error_report("clint: invalid timecmp hartid: %zu", hartid);
++        } else if ((addr & 0x7) == 0) {
++            /* timecmp_lo */
++            uint64_t timecmp = env->timecmp;
++            sifive_clint_write_timecmp(RISCV_CPU(cpu),
++                timecmp << 32 | (value & 0xFFFFFFFF));
++            return;
++        } else if ((addr & 0x7) == 4) {
++            /* timecmp_hi */
++            uint64_t timecmp = env->timecmp;
++            sifive_clint_write_timecmp(RISCV_CPU(cpu),
++                value << 32 | (timecmp & 0xFFFFFFFF));
++        } else {
++            error_report("clint: invalid timecmp write: %08x", (uint32_t)addr);
++        }
++        return;
++    } else if (addr == clint->time_base) {
++        /* time_lo */
++        error_report("clint: time_lo write not implemented");
++        return;
++    } else if (addr == clint->time_base + 4) {
++        /* time_hi */
++        error_report("clint: time_hi write not implemented");
++        return;
++    }
++
++    error_report("clint: invalid write: %08x", (uint32_t)addr);
++}
++
++static const MemoryRegionOps sifive_clint_ops = {
++    .read = sifive_clint_read,
++    .write = sifive_clint_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4
++    }
++};
++
++static Property sifive_clint_properties[] = {
++    DEFINE_PROP_UINT32("num-harts", SiFiveCLINTState, num_harts, 0),
++    DEFINE_PROP_UINT32("sip-base", SiFiveCLINTState, sip_base, 0),
++    DEFINE_PROP_UINT32("timecmp-base", SiFiveCLINTState, timecmp_base, 0),
++    DEFINE_PROP_UINT32("time-base", SiFiveCLINTState, time_base, 0),
++    DEFINE_PROP_UINT32("aperture-size", SiFiveCLINTState, aperture_size, 0),
 +    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void riscv_harts_cpu_reset(void *opaque)
++static void sifive_clint_realize(DeviceState *dev, Error **errp)
 +{
-+    RISCVCPU *cpu = opaque;
-+    cpu_reset(CPU(cpu));
++    SiFiveCLINTState *s = SIFIVE_CLINT(dev);
++    memory_region_init_io(&s->mmio, OBJECT(dev), &sifive_clint_ops, s,
++                          TYPE_SIFIVE_CLINT, s->aperture_size);
++    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
 +}
 +
-+static void riscv_harts_realize(DeviceState *dev, Error **errp)
-+{
-+    RISCVHartArrayState *s = RISCV_HART_ARRAY(dev);
-+    Error *err = NULL;
-+    int n;
-+
-+    s->harts = g_new0(RISCVCPU, s->num_harts);
-+
-+    for (n = 0; n < s->num_harts; n++) {
-+
-+        object_initialize(&s->harts[n], sizeof(RISCVCPU), s->cpu_type);
-+        s->harts[n].env.mhartid = n;
-+        object_property_add_child(OBJECT(s), "harts[*]", OBJECT(&s->harts[n]),
-+                                  &error_abort);
-+        qemu_register_reset(riscv_harts_cpu_reset, &s->harts[n]);
-+        object_property_set_bool(OBJECT(&s->harts[n]), true,
-+                                 "realized", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+    }
-+}
-+
-+static void riscv_harts_class_init(ObjectClass *klass, void *data)
++static void sifive_clint_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->props = riscv_harts_props;
-+    dc->realize = riscv_harts_realize;
++    dc->realize = sifive_clint_realize;
++    dc->props = sifive_clint_properties;
 +}
 +
-+static void riscv_harts_init(Object *obj)
-+{
-+    /* RISCVHartArrayState *s = SIFIVE_COREPLEX(obj); */
-+}
-+
-+static const TypeInfo riscv_harts_info = {
-+    .name          = TYPE_RISCV_HART_ARRAY,
++static const TypeInfo sifive_clint_info = {
++    .name          = TYPE_SIFIVE_CLINT,
 +    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(RISCVHartArrayState),
-+    .instance_init = riscv_harts_init,
-+    .class_init    = riscv_harts_class_init,
++    .instance_size = sizeof(SiFiveCLINTState),
++    .class_init    = sifive_clint_class_init,
 +};
 +
-+static void riscv_harts_register_types(void)
++static void sifive_clint_register_types(void)
 +{
-+    type_register_static(&riscv_harts_info);
++    type_register_static(&sifive_clint_info);
 +}
 +
-+type_init(riscv_harts_register_types)
-diff --git a/include/hw/riscv/riscv_hart.h b/include/hw/riscv/riscv_hart.h
-new file mode 100644
-index 0000000..0671d88
---- /dev/null
-+++ b/include/hw/riscv/riscv_hart.h
-@@ -0,0 +1,39 @@
++type_init(sifive_clint_register_types)
++
++
 +/*
-+ * QEMU RISC-V Hart Array interface
++ * Create CLINT device.
++ */
++DeviceState *sifive_clint_create(hwaddr addr, hwaddr size, uint32_t num_harts,
++    uint32_t sip_base, uint32_t timecmp_base, uint32_t time_base)
++{
++    int i;
++    for (i = 0; i < num_harts; i++) {
++        CPUState *cpu = qemu_get_cpu(i);
++        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
++        if (!env) {
++            continue;
++        }
++        env->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
++                                  &sifive_clint_timer_cb, cpu);
++        env->timecmp = 0;
++    }
++
++    DeviceState *dev = qdev_create(NULL, TYPE_SIFIVE_CLINT);
++    qdev_prop_set_uint32(dev, "num-harts", num_harts);
++    qdev_prop_set_uint32(dev, "sip-base", sip_base);
++    qdev_prop_set_uint32(dev, "timecmp-base", timecmp_base);
++    qdev_prop_set_uint32(dev, "time-base", time_base);
++    qdev_prop_set_uint32(dev, "aperture-size", size);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, addr);
++    return dev;
++}
+diff --git a/include/hw/riscv/sifive_clint.h b/include/hw/riscv/sifive_clint.h
+new file mode 100644
+index 0000000..aaa2a58
+--- /dev/null
++++ b/include/hw/riscv/sifive_clint.h
+@@ -0,0 +1,50 @@
++/*
++ * SiFive CLINT (Core Local Interruptor) interface
 + *
++ * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
 + * Copyright (c) 2017 SiFive, Inc.
-+ *
-+ * Holds the state of a heterogenous array of RISC-V harts
 + *
 + * This program is free software; you can redistribute it and/or modify it
 + * under the terms and conditions of the GNU General Public License,
@@ -161,23 +328,35 @@ index 0000000..0671d88
 + * this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#ifndef HW_RISCV_HART_H
-+#define HW_RISCV_HART_H
++#ifndef HW_SIFIVE_CLINT_H
++#define HW_SIFIVE_CLINT_H
 +
-+#define TYPE_RISCV_HART_ARRAY "riscv.hart_array"
++#define TYPE_SIFIVE_CLINT "riscv.sifive.clint"
 +
-+#define RISCV_HART_ARRAY(obj) \
-+    OBJECT_CHECK(RISCVHartArrayState, (obj), TYPE_RISCV_HART_ARRAY)
++#define SIFIVE_CLINT(obj) \
++    OBJECT_CHECK(SiFiveCLINTState, (obj), TYPE_SIFIVE_CLINT)
 +
-+typedef struct RISCVHartArrayState {
++typedef struct SiFiveCLINTState {
 +    /*< private >*/
 +    SysBusDevice parent_obj;
 +
 +    /*< public >*/
++    MemoryRegion mmio;
 +    uint32_t num_harts;
-+    char *cpu_type;
-+    RISCVCPU *harts;
-+} RISCVHartArrayState;
++    uint32_t sip_base;
++    uint32_t timecmp_base;
++    uint32_t time_base;
++    uint32_t aperture_size;
++} SiFiveCLINTState;
++
++DeviceState *sifive_clint_create(hwaddr addr, hwaddr size, uint32_t num_harts,
++    uint32_t sip_base, uint32_t timecmp_base, uint32_t time_base);
++
++enum {
++    SIFIVE_SIP_BASE     = 0x0,
++    SIFIVE_TIMECMP_BASE = 0x4000,
++    SIFIVE_TIME_BASE    = 0xBFF8
++};
 +
 +#endif
 -- 
