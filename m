@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1erpqP-0001W9-Ax
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 13:55:50 -0500
+	(envelope-from <kwolf@redhat.com>) id 1erpqW-0001ec-Gt
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 13:55:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1erpqO-00033m-82
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 13:55:49 -0500
+	(envelope-from <kwolf@redhat.com>) id 1erpqV-00036U-IX
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 13:55:56 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  2 Mar 2018 19:54:32 +0100
-Message-Id: <20180302185448.6314-22-kwolf@redhat.com>
+Date: Fri,  2 Mar 2018 19:54:34 +0100
+Message-Id: <20180302185448.6314-24-kwolf@redhat.com>
 In-Reply-To: <20180302185448.6314-1-kwolf@redhat.com>
 References: <20180302185448.6314-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 21/37] block: Drop unused
- .bdrv_co_get_block_status()
+Subject: [Qemu-devel] [PULL 23/37] iotest 033: add misaligned write-zeroes
+ test via truncate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,111 +23,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Eric Blake <eblake@redhat.com>
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-We are gradually moving away from sector-based interfaces, towards
-byte-based.  Now that all drivers have been updated to provide the
-byte-based .bdrv_co_block_status(), we can delete the sector-based
-interface.
+This new test case only makes sense for qcow2 while iotest 033 is generic;
+however it matches the test purpose perfectly and also 033 contains those
+do_test() tricks to pass the alignment, which won't look nice being
+duplicated in other tests or moved to the common code.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/block_int.h |  3 ---
- block/io.c                | 50 ++++++++++-------------------------------------
- 2 files changed, 10 insertions(+), 43 deletions(-)
+ tests/qemu-iotests/033     | 29 +++++++++++++++++++++++++++++
+ tests/qemu-iotests/033.out | 13 +++++++++++++
+ 2 files changed, 42 insertions(+)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index bf2598856c..5ae7738cf8 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -215,9 +215,6 @@ struct BlockDriver {
-      * as well as non-NULL pnum, map, and file; in turn, the driver
-      * must return an error or set pnum to an aligned non-zero value.
-      */
--    int64_t coroutine_fn (*bdrv_co_get_block_status)(BlockDriverState *bs,
--        int64_t sector_num, int nb_sectors, int *pnum,
--        BlockDriverState **file);
-     int coroutine_fn (*bdrv_co_block_status)(BlockDriverState *bs,
-         bool want_zero, int64_t offset, int64_t bytes, int64_t *pnum,
-         int64_t *map, BlockDriverState **file);
-diff --git a/block/io.c b/block/io.c
-index 5bae79f282..4c3dba0973 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1963,7 +1963,7 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+diff --git a/tests/qemu-iotests/033 b/tests/qemu-iotests/033
+index 2cdfd1397a..a1d8357331 100755
+--- a/tests/qemu-iotests/033
++++ b/tests/qemu-iotests/033
+@@ -64,6 +64,9 @@ do_test()
+ 	} | $QEMU_IO $IO_EXTRA_ARGS
+ }
  
-     /* Must be non-NULL or bdrv_getlength() would have failed */
-     assert(bs->drv);
--    if (!bs->drv->bdrv_co_get_block_status && !bs->drv->bdrv_co_block_status) {
-+    if (!bs->drv->bdrv_co_block_status) {
-         *pnum = bytes;
-         ret = BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
-         if (offset + bytes == total_size) {
-@@ -1981,53 +1981,23 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
++echo
++echo "=== Test aligned and misaligned write zeroes operations ==="
++
+ for write_zero_cmd in "write -z" "aio_write -z"; do
+ for align in 512 4k; do
+ 	echo
+@@ -102,7 +105,33 @@ for align in 512 4k; do
+ done
+ done
  
-     /* Round out to request_alignment boundaries */
-     align = bs->bl.request_alignment;
--    if (bs->drv->bdrv_co_get_block_status && align < BDRV_SECTOR_SIZE) {
--        align = BDRV_SECTOR_SIZE;
--    }
-     aligned_offset = QEMU_ALIGN_DOWN(offset, align);
-     aligned_bytes = ROUND_UP(offset + bytes, align) - aligned_offset;
++
++# Trigger truncate that would shrink qcow2 L1 table, which is done by
++#   clearing one entry (8 bytes) with bdrv_co_pwrite_zeroes()
++
++echo
++echo "=== Test misaligned write zeroes via truncate ==="
++echo
++
++# any size will do, but the smaller the size the smaller the required image
++CLUSTER_SIZE=$((4 * 1024))
++L2_COVERAGE=$(($CLUSTER_SIZE * $CLUSTER_SIZE / 8))
++_make_test_img $(($L2_COVERAGE * 2))
++
++do_test 512 "write -P 1 0 0x200" "$TEST_IMG" | _filter_qemu_io
++# next L2 table
++do_test 512 "write -P 1 $L2_COVERAGE 0x200" "$TEST_IMG" | _filter_qemu_io
++
++# only interested in qcow2 here; also other formats might respond with
++#  "not supported" error message
++if [ $IMGFMT = "qcow2" ]; then
++    do_test 512 "truncate $L2_COVERAGE" "$TEST_IMG" | _filter_qemu_io
++fi
++
++do_test 512 "read -P 1 0 0x200" "$TEST_IMG" | _filter_qemu_io
++
+ # success, all done
++echo
+ echo "*** done"
+ rm -f $seq.full
+ status=0
+diff --git a/tests/qemu-iotests/033.out b/tests/qemu-iotests/033.out
+index 95929eff70..9683f6b290 100644
+--- a/tests/qemu-iotests/033.out
++++ b/tests/qemu-iotests/033.out
+@@ -1,6 +1,8 @@
+ QA output created by 033
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
  
--    if (bs->drv->bdrv_co_get_block_status) {
--        int count; /* sectors */
--        int64_t longret;
--
--        assert(QEMU_IS_ALIGNED(aligned_offset | aligned_bytes,
--                               BDRV_SECTOR_SIZE));
--        /*
--         * The contract allows us to return pnum smaller than bytes, even
--         * if the next query would see the same status; we truncate the
--         * request to avoid overflowing the driver's 32-bit interface.
--         */
--        longret = bs->drv->bdrv_co_get_block_status(
--            bs, aligned_offset >> BDRV_SECTOR_BITS,
--            MIN(INT_MAX, aligned_bytes) >> BDRV_SECTOR_BITS, &count,
--            &local_file);
--        if (longret < 0) {
--            assert(INT_MIN <= longret);
--            ret = longret;
--            goto out;
--        }
--        if (longret & BDRV_BLOCK_OFFSET_VALID) {
--            local_map = longret & BDRV_BLOCK_OFFSET_MASK;
--        }
--        ret = longret & ~BDRV_BLOCK_OFFSET_MASK;
--        *pnum = count * BDRV_SECTOR_SIZE;
--    } else {
--        ret = bs->drv->bdrv_co_block_status(bs, want_zero, aligned_offset,
--                                            aligned_bytes, pnum, &local_map,
--                                            &local_file);
--        if (ret < 0) {
--            *pnum = 0;
--            goto out;
--        }
--        assert(*pnum); /* The block driver must make progress */
-+    ret = bs->drv->bdrv_co_block_status(bs, want_zero, aligned_offset,
-+                                        aligned_bytes, pnum, &local_map,
-+                                        &local_file);
-+    if (ret < 0) {
-+        *pnum = 0;
-+        goto out;
-     }
++=== Test aligned and misaligned write zeroes operations ===
++
+ == preparing image ==
+ wrote 1024/1024 bytes at offset 512
+ 1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -164,4 +166,15 @@ read 512/512 bytes at offset 512
+ read 3072/3072 bytes at offset 1024
+ 3 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
-     /*
--     * The driver's result must be a multiple of request_alignment.
-+     * The driver's result must be a non-zero multiple of request_alignment.
-      * Clamp pnum and adjust map to original request.
-      */
--    assert(QEMU_IS_ALIGNED(*pnum, align) && align > offset - aligned_offset);
-+    assert(*pnum && QEMU_IS_ALIGNED(*pnum, align) &&
-+           align > offset - aligned_offset);
-     *pnum -= offset - aligned_offset;
-     if (*pnum > bytes) {
-         *pnum = bytes;
++
++=== Test misaligned write zeroes via truncate ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=4194304
++wrote 512/512 bytes at offset 0
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset 2097152
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 512/512 bytes at offset 0
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
+ *** done
 -- 
 2.13.6
