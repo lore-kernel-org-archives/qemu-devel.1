@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1ernWx-0004hb-4p
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:27:36 -0500
+	(envelope-from <Babu.Moger@amd.com>) id 1erntA-0002Wb-QJ
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:50:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1ernWu-0007l9-1b
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:27:35 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43096 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1ernWt-0007ky-Ry
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:27:31 -0500
-References: <20180228180215.25470-1-wei@redhat.com>
-	<20180228180215.25470-2-wei@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <ca21f795-dae7-d6b5-44f1-ef8ba792ac04@redhat.com>
-Date: Fri, 2 Mar 2018 17:27:18 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180228180215.25470-2-wei@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <Babu.Moger@amd.com>) id 1ernt5-0004SC-Gm
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:50:32 -0500
+Received: from mail-co1nam03on0084.outbound.protection.outlook.com
+	([104.47.40.84]:18796
+	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1ernt4-0004Js-VS
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:50:27 -0500
+From: "Moger, Babu" <Babu.Moger@amd.com>
+Date: Fri, 2 Mar 2018 16:50:22 +0000
+Message-ID: <CY4PR12MB176846DD3940EBD867E29CA895C50@CY4PR12MB1768.namprd12.prod.outlook.com>
+References: <1519439425-27883-1-git-send-email-babu.moger@amd.com>
+	<1519439425-27883-3-git-send-email-babu.moger@amd.com>
+	<20180228180858.GB8418@flask>
+	<CY4PR12MB17687EBCC5940ACFEB3E4D7C95C60@CY4PR12MB1768.namprd12.prod.outlook.com>
+	<20180301195616.GA29001@flask>
+In-Reply-To: <20180301195616.GA29001@flask>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V7 1/4] rules: Move cross compilation auto
- detection functions to rules.mak
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] target/i386: Populate AMD Processor
+ Cache Information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,106 +34,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Huang <wei@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, drjones@redhat.com, dgilbert@redhat.com, quintela@redhat.com
+To: =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pixo@polepetko.eu" <pixo@polepetko.eu>, "Hook, Gary" <Gary.Hook@amd.com>
 
-On 28/02/2018 19:02, Wei Huang wrote:
-> This patch moves the auto detection functions for cross compilation from
-> roms/Makefile to rules.mak. So the functions can be shared among Makefiles
-> in QEMU.
-> 
-> Signed-off-by: Wei Huang <wei@redhat.com>
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-> ---
->  roms/Makefile | 24 +++++++-----------------
->  rules.mak     | 15 +++++++++++++++
->  2 files changed, 22 insertions(+), 17 deletions(-)
-> 
-> diff --git a/roms/Makefile b/roms/Makefile
-> index b5e5a69e91..e972c65333 100644
-> --- a/roms/Makefile
-> +++ b/roms/Makefile
-> @@ -21,23 +21,6 @@ pxe-rom-virtio   efi-rom-virtio   : DID := 1000
->  pxe-rom-vmxnet3  efi-rom-vmxnet3  : VID := 15ad
->  pxe-rom-vmxnet3  efi-rom-vmxnet3  : DID := 07b0
->  
-> -#
-> -# cross compiler auto detection
-> -#
-> -path := $(subst :, ,$(PATH))
-> -system := $(shell uname -s | tr "A-Z" "a-z")
-> -
-> -# first find cross binutils in path
-> -find-cross-ld = $(firstword $(wildcard $(patsubst %,%/$(1)-*$(system)*-ld,$(path))))
-> -# then check we have cross gcc too
-> -find-cross-gcc = $(firstword $(wildcard $(patsubst %ld,%gcc,$(call find-cross-ld,$(1)))))
-> -# finally strip off path + toolname so we get the prefix
-> -find-cross-prefix = $(subst gcc,,$(notdir $(call find-cross-gcc,$(1))))
-> -
-> -powerpc64_cross_prefix := $(call find-cross-prefix,powerpc64)
-> -powerpc_cross_prefix := $(call find-cross-prefix,powerpc)
-> -x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
-> -
->  # tag our seabios builds
->  SEABIOS_EXTRAVERSION="-prebuilt.qemu-project.org"
->  
-> @@ -66,6 +49,13 @@ default:
->  	@echo "  skiboot        -- update skiboot.lid"
->  	@echo "  u-boot.e500    -- update u-boot.e500"
->  
-> +SRC_PATH=..
-> +include $(SRC_PATH)/rules.mak
-> +
-> +powerpc64_cross_prefix := $(call find-cross-prefix,powerpc64)
-> +powerpc_cross_prefix := $(call find-cross-prefix,powerpc)
-> +x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
-> +
->  bios: build-seabios-config-seabios-128k build-seabios-config-seabios-256k
->  	cp seabios/builds/seabios-128k/bios.bin ../pc-bios/bios.bin
->  	cp seabios/builds/seabios-256k/bios.bin ../pc-bios/bios-256k.bin
-> diff --git a/rules.mak b/rules.mak
-> index 6e943335f3..ef8adee3f8 100644
-> --- a/rules.mak
-> +++ b/rules.mak
-> @@ -62,6 +62,21 @@ expand-objs = $(strip $(sort $(filter %.o,$1)) \
->                    $(foreach o,$(filter %.mo,$1),$($o-objs)) \
->                    $(filter-out %.o %.mo,$1))
->  
-> +# Cross compilation auto detection. Use find-cross-prefix to detect the
-> +# target archtecture's prefix, and then append it to the build tool or pass
-> +# it to CROSS_COMPILE directly. Here is one example:
-> +#      x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
-> +#      $(x86_64_cross_prefix)gcc -c test.c -o test.o
-> +#      make -C testdir CROSS_COMPILE=$(x86_64_cross_prefix)
-> +cross-search-path := $(subst :, ,$(PATH))
-> +cross-host-system := $(shell uname -s | tr "A-Z" "a-z")
-> +
-> +find-cross-ld = $(firstword $(wildcard $(patsubst \
-> +                    %,%/$(1)-*$(cross-host-system)*-ld,$(cross-search-path))))
-> +find-cross-gcc = $(firstword $(wildcard \
-> +                    $(patsubst %ld,%gcc,$(call find-cross-ld,$(1)))))
-> +find-cross-prefix = $(subst gcc,,$(notdir $(call find-cross-gcc,$(1))))
-> +
->  %.o: %.c
->  	$(call quiet-command,$(CC) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
->  	       $(QEMU_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) \
-> 
-
-With this patch, "make slof" fails:
-
-  git submodule init roms/SLOF
-  git submodule update roms/SLOF
-  cd roms
-  make slof
-...
-make[4]: Entering directory
-'/home/lvivier/Projects/qemu-upstream/roms/SLOF/lib/libnvram'
-	[CC]	Makefile.dep
-powerpc64-linux-gnu-ar: nvram.o: No such file or directory
-make[4]: *** [Makefile:31: ../libnvram.a] Error 1
-
-Perhaps rules.mak defines values inherited by SLOF makefiles that are
-incompatible?
-
-Thanks,
-Laurent
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUmFkaW0gS3LEjW3DocWZ
+IFttYWlsdG86cmtyY21hckByZWRoYXQuY29tXQ0KPiBTZW50OiBUaHVyc2RheSwgTWFyY2ggMSwg
+MjAxOCAxOjU2IFBNDQo+IFRvOiBNb2dlciwgQmFidSA8QmFidS5Nb2dlckBhbWQuY29tPg0KPiBD
+YzogcGJvbnppbmlAcmVkaGF0LmNvbTsgcnRoQHR3aWRkbGUubmV0OyBlaGFia29zdEByZWRoYXQu
+Y29tOw0KPiBtdG9zYXR0aUByZWRoYXQuY29tOyBxZW11LWRldmVsQG5vbmdudS5vcmc7IGt2bUB2
+Z2VyLmtlcm5lbC5vcmc7DQo+IHBpeG9AcG9sZXBldGtvLmV1OyBIb29rLCBHYXJ5IDxHYXJ5Lkhv
+b2tAYW1kLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MiAyLzVdIHRhcmdldC9pMzg2OiBQ
+b3B1bGF0ZSBBTUQgUHJvY2Vzc29yIENhY2hlDQo+IEluZm9ybWF0aW9uDQo+IA0KPiAyMDE4LTAz
+LTAxIDE1OjU1KzAwMDAsIE1vZ2VyLCBCYWJ1Og0KPiA+IFJhZGltLCBUaGFua3MgZm9yIHlvdXIg
+Y29tbWVudHMuIEkgYW0gd29ya2luZyBvbiB0aGUgY2hhbmdlcy4NCj4gPiBCdXQsIEkgbmVlZCBm
+ZXcgY2xhcmlmaWNhdGlvbnMgb24geW91ciBjb21tZW50cy4gUGxlYXNlIHNlZSBpbmxpbmUuDQo+
+ID4NCj4gPiA+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4gPiBGcm9tOiBSYWRpbSBL
+csSNbcOhxZkgW21haWx0bzpya3JjbWFyQHJlZGhhdC5jb21dDQo+ID4gPiBTZW50OiBXZWRuZXNk
+YXksIEZlYnJ1YXJ5IDI4LCAyMDE4IDEyOjA5IFBNDQo+ID4gPiBUbzogTW9nZXIsIEJhYnUgPEJh
+YnUuTW9nZXJAYW1kLmNvbT4NCj4gPiA+IENjOiBwYm9uemluaUByZWRoYXQuY29tOyBydGhAdHdp
+ZGRsZS5uZXQ7IGVoYWJrb3N0QHJlZGhhdC5jb207DQo+ID4gPiBtdG9zYXR0aUByZWRoYXQuY29t
+OyBxZW11LWRldmVsQG5vbmdudS5vcmc7IGt2bUB2Z2VyLmtlcm5lbC5vcmc7DQo+ID4gPiBwaXhv
+QHBvbGVwZXRrby5ldTsgSG9vaywgR2FyeSA8R2FyeS5Ib29rQGFtZC5jb20+DQo+ID4gPiBTdWJq
+ZWN0OiBSZTogW1BBVENIIHYyIDIvNV0gdGFyZ2V0L2kzODY6IFBvcHVsYXRlIEFNRCBQcm9jZXNz
+b3IgQ2FjaGUNCj4gPiA+IEluZm9ybWF0aW9uDQo+ID4gPg0KPiA+ID4gMjAxOC0wMi0yMyAyMToz
+MC0wNTAwLCBCYWJ1IE1vZ2VyOg0KPiA+ID4gPiBGcm9tOiBTdGFuaXNsYXYgTGFuY2kgPHBpeG9A
+cG9sZXBldGtvLmV1Pg0KPiA+ID4gPg0KPiA+ID4gPiBBZGRzIGluZm9ybWF0aW9uIGFib3V0IGNh
+Y2hlIHNpemUgYW5kIHRvcG9sb2d5IGZyb20gY3B1aWQgMHg4MDAwMDAxRA0KPiA+ID4gbGVhZg0K
+PiA+ID4gPiBmb3IgZGlmZmVyZW50IGNhY2hlIHR5cGVzIG9uIEFNRCBwcm9jZXNzb3JzLg0KPiA+
+ID4gPg0KPiA+ID4gPiBTaWduZWQtb2ZmLWJ5OiBTdGFuaXNsYXYgTGFuY2kgPHBpeG9AcG9sZXBl
+dGtvLmV1Pg0KPiA+ID4gPiBTaWduZWQtb2ZmLWJ5OiBCYWJ1IE1vZ2VyIDxiYWJ1Lm1vZ2VyQGFt
+ZC5jb20+DQo+ID4gPiA+IC0tLQ0KPiA+ID4gPiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L2kzODYvY3B1
+LmMgYi90YXJnZXQvaTM4Ni9jcHUuYw0KPiA+ID4gPiBAQCAtMzU5MCw2ICszNTk0LDc4IEBAIHZv
+aWQgY3B1X3g4Nl9jcHVpZChDUFVYODZTdGF0ZSAqZW52LA0KPiA+ID4gPiArICAgICAgICAgICAg
+ICAgICplYnggPSAoTDFEX0xJTkVfU0laRSAtIDEpIHwgXA0KPiA+ID4gPiArICAgICAgICAgICAg
+ICAgICAgICAgICAoKEwxRF9QQVJUSVRJT05TIC0gMSkgPDwgMTIpIHwgXA0KPiA+ID4gPiArICAg
+ICAgICAgICAgICAgICAgICAgICAoKEwxRF9BU1NPQ0lBVElWSVRZIC0gMSkgPDwgMjIpOw0KPiA+
+ID4gPiArICAgICAgICAgICAgICAgICplY3ggPSBMMURfU0VUUyAtIDE7DQo+ID4gPg0KPiA+ID4g
+VGhlc2UgbnVtYmVycyBzZWVtIHRvIGhhdmUgdGhlIHNhbWUgbWVhbmluZyBhcyBDUFVJRCA0LCBi
+dXQgaGF2ZQ0KPiA+ID4gY29uZmxpY3RpbmcgdmFsdWVzLg0KPiA+DQo+ID4gSSBhbSBub3Qgc3Vy
+ZSBhYm91dCBjb25mbGljdGluZyB2YWx1ZXMuIExvb2tpbmcgYXQgdGhlIHNwZWNzKHBhZ2UgNzgN
+Cj4gQ1BVSURfRm44MDAwMDAxRF9FQlhfeDAwKQ0KPiA+DQo+IGh0dHBzOi8vc3VwcG9ydC5hbWQu
+Y29tL1RlY2hEb2NzLzU0OTQ1X1BQUl9GYW1pbHlfMTdoX01vZGVsc18wMGgtDQo+IDBGaC5wZGYN
+Cj4gPiAgSXQgbG9va3MgY29ycmVjdCB0byBtZS4NCj4gDQo+IEkgYWdyZWUuICBNeSBjb21tZW50
+IGlzIG1pc3BsYWNlZCAtLSBpdCBzaG91bGQgaGF2ZSBiZWVuIHVuZGVyIHRoZSBwbGFjZQ0KPiB0
+aGF0IHVzZXMgKl9BTUQgbWFjcm9zLg0KPiANCj4gSSB3YW50ZWQgdG8gcG9pbnQgb3V0IHRoYXQg
+Q1BVSUQgaW4gUUVNVSBpcyB2ZXJ5IEludGVsLWZvY3VzZWQgYW5kDQo+IGFsd2F5cyBjb250YWlu
+cyBDUFVJRCBsZWFmIDQsIHdoaWNoIGhhcyBmaWVsZHMgb2YgdGhlIHZlcnkgc2FtZSBtZWFuaW5n
+LA0KPiBidXQgd2l0aCBkaWZmZXJlbnQgdmFsdWVzLg0KPiANCj4gPiA+IEkgdGhpbmsgd2Ugc2hv
+dWxkIG5vdCBleHBvc2UgQ1BVSUQgNCB3aXRoIEFNRCBDUFVzIG9yIGF0IGxlYXN0IHdoZW4NCj4g
+dGhleQ0KPiA+ID4gaGF2ZSBDUFVJRF9FWFQzX1RPUE9FWFQgKHRoZSBsYXR0ZXIgaXMgZWFzaWVy
+IHdydC4gY29tcGF0aWJpbGl0eSkuDQo+ID4NCj4gPiBDYW4geW91IHBsZWFzZSBlbGFib3JhdGUg
+b24gdGhlc2UgY29tbWVudHM/DQo+ID4gRGlkIHlvdSBtZWFuIHdlIHNob3VsZCByZW1vdmUgdGhl
+IGNoZWNrIENQVUlEX0VYVDNfVE9QT0VYVCBhbmQNCj4gcmVtb3ZlIGFsbCBDUFVJRCA0IHJlZmVy
+ZW5jZXM/DQo+IA0KPiBDUFVJRCA0IHNob3VsZCBoYXZlIG5ldmVyIGJlZW4gcHJlc2VudCB3aGVu
+IGVtdWxhdGluZyBBTUQgQ1BVcywgYnV0IGl0J3MNCj4gd29yc2Ugbm93IHRoYXQgdGhlIG51bWJl
+cnMgYXJlIGNvbmZsaWN0aW5nLg0KPiANCj4gSSBtZWFudCB0byBoaWRlIENQVUlEIDQgZm9yIGFs
+bCBBTUQgQ1BVcyBvbiBmdXR1cmUgbWFjaGluZSB0eXBlcywgb3IgYXQNCj4gbGVhc3Qgd2hlbiBD
+UFVJRF9FWFQzX1RPUE9FWFQgaXMgZW5hYmxlZC4NCg0KU29ycnksIEkgdGhpbmsgSSBjcmVhdGVk
+IHNvbWUgY29uZnVzaW9uIGhlcmUgYnkgdXNpbmcgQ1BVSUQgNCBkZWZpbml0aW9ucyB3aGljaCBh
+cmUNCm1vc3RseSBmb3IgaW50ZWwuICBMZXQgbWUgcmV3b3JrIG9uIHRoaXMuIEkgd2lsbCByZXBv
+c3QgdGhlIHBhdGNoZXMuICBUaGFua3MgZm9yIHRoZQ0KZmVlZGJhY2suDQoNCj4gDQo+IEtlZXBp
+bmcgdGhlIGN1cnJlbnQgbG9naWMgbm90IGEgYmlnIHByb2JsZW0gYXMgQ1BVSUQgNCBzaG91bGQg
+bmV2ZXIgYmUNCj4gdXNlZCBieSBvcGVyYXRpbmcgc3lzdGVtcyBvbiBBTUQgbm9yIHRydXN0ZWQg
+aW5zaWRlIGEgVk0uICBCcmluZ2luZyB0aGUNCj4gZW11bGF0aW9uIGNsb3NlciB0byByZWFsIHN0
+YXRlIHdvdWxkIGJlIG5pY2UsIGJ1dCB0aGlzIGNhbiBkZWZpbml0ZWx5IGJlDQo+IGRvbmUgbGF0
+ZXIgKGFrYSBuZXZlcikuDQo+IA0KPiA+ID4gVGhlIG51bWJlcnMgbG9va3MgbGlrZSByZWFsIGhh
+cmR3YXJlLA0KPiA+DQo+ID4gRG8geW91IHdhbnQgbWUgdG8gY2hhbmdlIGFueXRoaW5nIGhlcmU/
+DQo+IA0KPiBObywgSSB3YXMganVzdCBjb21tZW5kaW5nLA0KPiANCj4gdGhhbmtzLg0K
