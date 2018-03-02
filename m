@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ereUH-0001ZD-VJ
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:48:15 -0500
+	(envelope-from <jasowang@redhat.com>) id 1erejy-0004aY-6x
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 02:04:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ereUE-0005t5-SJ
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:48:14 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47542 helo=mx1.redhat.com)
+	(envelope-from <jasowang@redhat.com>) id 1erejv-0001Mt-2m
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 02:04:26 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58340 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ereUE-0005st-Mm
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:48:10 -0500
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1ereju-0001Mh-Uk
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 02:04:23 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3D2758182D1E
-	for <qemu-devel@nongnu.org>; Fri,  2 Mar 2018 06:48:10 +0000 (UTC)
-Date: Fri, 2 Mar 2018 14:48:04 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180302064804.GJ27381@xz-mi>
-References: <20180301084438.13594-1-peterx@redhat.com>
-	<20180301160706.GV14643@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id A4918407519A
+	for <qemu-devel@nongnu.org>; Fri,  2 Mar 2018 07:04:11 +0000 (UTC)
+References: <1519293517-19582-1-git-send-email-thuth@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <e63db61d-37fe-3cf1-98bb-d9c504459b23@redhat.com>
+Date: Fri, 2 Mar 2018 15:04:03 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180301160706.GV14643@redhat.com>
+In-Reply-To: <1519293517-19582-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 00/15] qio: general non-default
- GMainContext support
+Subject: Re: [Qemu-devel] [PATCH] hw/net: Remove unnecessary header includes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,52 +33,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-On Thu, Mar 01, 2018 at 04:07:06PM +0000, Daniel P. Berrang=C3=A9 wrote:
-> On Thu, Mar 01, 2018 at 04:44:23PM +0800, Peter Xu wrote:
-> > This is another preparation work for monitor OOB seires.
-> >=20
-> > V1: http://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg06972.=
-html
-> >=20
-> > V2 rewrote the bottom half of the code.  The first 8 patches are
-> > mostly the same, but I rewrote the last patches to solve both TLS and
-> > reconnect use cases by introducing a machine_done hook for chardevs i=
-n
-> > general.  So if I copy the problems:
-> >=20
-> > - migration
-> >   - incoming side: still always running on main context, while we nee=
-d
-> >     to be able to run some command in OOB thread [1]
-> > - tcp chardev (non-tcp chardevs should all support non-NULL context n=
-ow)
-> >   - server listening mode: QIO net listener used [2]
-> >   - TELNET session: an isolated GSource used (tcp_chr_telnet_init) [3=
-]
-> >   - when "reconnect=3DN" is used, QIO threaded task is used [4]
-> >   - TLS session: QIO tls handshake is used (tcp_chr_tls_init) [5]
-> >=20
-> > Problem [1-3] are still fixed in the old way, but [4-5] now are fixed
-> > by using the new machine_done notifier.
->=20
-> The QIO code changes all look good to me know, aside from minor
-> comments. I really dislike all of the chardev stuff though. I
-> think it makes the chardev code even harder to follow & rationalize
-> behaviour of.
->=20
-> If you post a v3 series contaning just the qio/ directory changes,
-> I'd queue those patches, while we discuss chardev stuff more.
->=20
-> I struggle to suggest better approach, because its any missing
-> context of how the changes are going to be used, presumably by
-> patch series yet to be posted.=20
 
-Yeah I think I'll split the series into two.
 
-Thank you and Paolo for the quick review comments!
+On 2018=E5=B9=B402=E6=9C=8822=E6=97=A5 17:58, Thomas Huth wrote:
+> Headers like "hw/loader.h" and "qemu/sockets.h" are not needed in
+> the hw/net/*.c files. And Some other headers are included via other
+> headers already, so we can drop them, too.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>   hw/net/e1000.c     | 1 -
+>   hw/net/lance.c     | 3 ---
+>   hw/net/ne2000.c    | 2 --
+>   hw/net/pcnet-pci.c | 1 -
+>   hw/net/pcnet.c     | 1 -
+>   hw/net/rtl8139.c   | 2 --
+>   hw/net/xgmac.c     | 1 -
+>   7 files changed, 11 deletions(-)
+>
+> diff --git a/hw/net/e1000.c b/hw/net/e1000.c
+> index 804ec08..c7f1695 100644
+> --- a/hw/net/e1000.c
+> +++ b/hw/net/e1000.c
+> @@ -30,7 +30,6 @@
+>   #include "hw/pci/pci.h"
+>   #include "net/net.h"
+>   #include "net/checksum.h"
+> -#include "hw/loader.h"
+>   #include "sysemu/sysemu.h"
+>   #include "sysemu/dma.h"
+>   #include "qemu/iov.h"
+> diff --git a/hw/net/lance.c b/hw/net/lance.c
+> index 0028bc5..a08d5ac 100644
+> --- a/hw/net/lance.c
+> +++ b/hw/net/lance.c
+> @@ -36,10 +36,7 @@
+>    */
+>  =20
+>   #include "qemu/osdep.h"
+> -#include "hw/sysbus.h"
+> -#include "net/net.h"
+>   #include "qemu/timer.h"
+> -#include "qemu/sockets.h"
+>   #include "hw/sparc/sparc32_dma.h"
+>   #include "hw/net/lance.h"
+>   #include "trace.h"
+> diff --git a/hw/net/ne2000.c b/hw/net/ne2000.c
+> index 687ef84..3a9fc89 100644
+> --- a/hw/net/ne2000.c
+> +++ b/hw/net/ne2000.c
+> @@ -23,10 +23,8 @@
+>    */
+>   #include "qemu/osdep.h"
+>   #include "hw/pci/pci.h"
+> -#include "net/net.h"
+>   #include "net/eth.h"
+>   #include "ne2000.h"
+> -#include "hw/loader.h"
+>   #include "sysemu/sysemu.h"
+>  =20
+>   /* debug NE2000 card */
+> diff --git a/hw/net/pcnet-pci.c b/hw/net/pcnet-pci.c
+> index 0ae5ca4..70dc8b3 100644
+> --- a/hw/net/pcnet-pci.c
+> +++ b/hw/net/pcnet-pci.c
+> @@ -30,7 +30,6 @@
+>   #include "qemu/osdep.h"
+>   #include "hw/pci/pci.h"
+>   #include "net/net.h"
+> -#include "hw/loader.h"
+>   #include "qemu/timer.h"
+>   #include "sysemu/dma.h"
+>   #include "sysemu/sysemu.h"
+> diff --git a/hw/net/pcnet.c b/hw/net/pcnet.c
+> index 606b05c..0c44554 100644
+> --- a/hw/net/pcnet.c
+> +++ b/hw/net/pcnet.c
+> @@ -40,7 +40,6 @@
+>   #include "net/net.h"
+>   #include "net/eth.h"
+>   #include "qemu/timer.h"
+> -#include "qemu/sockets.h"
+>   #include "sysemu/sysemu.h"
+>   #include "trace.h"
+>  =20
+> diff --git a/hw/net/rtl8139.c b/hw/net/rtl8139.c
+> index 1cc95b8..46daa16 100644
+> --- a/hw/net/rtl8139.c
+> +++ b/hw/net/rtl8139.c
+> @@ -58,9 +58,7 @@
+>   #include "qemu/timer.h"
+>   #include "net/net.h"
+>   #include "net/eth.h"
+> -#include "hw/loader.h"
+>   #include "sysemu/sysemu.h"
+> -#include "qemu/iov.h"
+>  =20
+>   /* debug RTL8139 card */
+>   //#define DEBUG_RTL8139 1
+> diff --git a/hw/net/xgmac.c b/hw/net/xgmac.c
+> index 0843bf1..fa00156 100644
+> --- a/hw/net/xgmac.c
+> +++ b/hw/net/xgmac.c
+> @@ -28,7 +28,6 @@
+>   #include "hw/sysbus.h"
+>   #include "qemu/log.h"
+>   #include "net/net.h"
+> -#include "net/checksum.h"
+>  =20
+>   #ifdef DEBUG_XGMAC
+>   #define DEBUGF_BRK(message, args...) do { \
 
---=20
-Peter Xu
+Applied.
+
+Thanks
