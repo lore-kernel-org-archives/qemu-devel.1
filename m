@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1erbwI-0003b1-Nz
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 23:04:59 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1erbxJ-0004EJ-NO
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 23:06:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1erbwE-0006g6-O0
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 23:04:58 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37376 helo=mx1.redhat.com)
+	(envelope-from <dgibson@ozlabs.org>) id 1erbxF-0007NL-SJ
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 23:06:01 -0500
+Received: from ozlabs.org ([103.22.144.67]:47033)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1erbwE-0006fo-Is
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 23:04:54 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 158D24022905
-	for <qemu-devel@nongnu.org>; Fri,  2 Mar 2018 04:04:44 +0000 (UTC)
-Date: Fri, 2 Mar 2018 12:04:30 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180302040430.GY27381@xz-mi>
-References: <20180301084438.13594-1-peterx@redhat.com>
-	<20180301084438.13594-6-peterx@redhat.com>
-	<20180301104717.GB14643@redhat.com> <20180302035852.GX27381@xz-mi>
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1erbxF-0007GC-5M
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 23:05:57 -0500
+Date: Fri, 2 Mar 2018 13:05:45 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180302020545.GE13135@umbus.fritz.box>
+References: <20180301130939.15875-1-aik@ozlabs.ru>
+	<20180301130939.15875-3-aik@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="DqhR8hV3EnoxUkKN"
 Content-Disposition: inline
-In-Reply-To: <20180302035852.GX27381@xz-mi>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 05/15] qio: refactor net listener source
- operations
+In-Reply-To: <20180301130939.15875-3-aik@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu v3 2/2] qmp: Add qom-list-properties
+ to list QOM object properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,36 +29,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Andrea Bolognani <abologna@redhat.com>
 
-On Fri, Mar 02, 2018 at 11:58:52AM +0800, Peter Xu wrote:
-> On Thu, Mar 01, 2018 at 10:47:17AM +0000, Daniel P. Berrang=C3=A9 wrote=
-:
-> > On Thu, Mar 01, 2018 at 04:44:28PM +0800, Peter Xu wrote:
-> > > Three functions are abstracted from the old code:
-> > >=20
-> > > - qio_net_listener_source_add(): create one source for listener
-> > > - qio_net_listener_sources_clear(): unset existing net lister sourc=
-es
-> > > - qio_net_listener_sources_update(): setup all sources for listener
-> > >=20
-> > > Use them where possible.
-> > >=20
-> > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > ---
-> > >  io/net-listener.c | 82 +++++++++++++++++++++++++++----------------=
-------------
-> > >  1 file changed, 41 insertions(+), 41 deletions(-)
-> >=20
-> > This patch can be dropped since nothing else in the series now
-> > depends on it.
+
+--DqhR8hV3EnoxUkKN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Mar 02, 2018 at 12:09:39AM +1100, Alexey Kardashevskiy wrote:
+> There is already 'device-list-properties' which does most of the job,
+> however it does not handle everything returned by qom-list-types such
+> as machines as they inherit directly from TYPE_OBJECT and not TYPE_DEVICE.
+> It does not handle abstract classes either.
 >=20
-> Do you think it's still acceptable even as a cleanup?  Thanks,
+> This adds a new qom-list-properties command which prints properties
+> of a specific class and its instance. It is pretty much a simplified copy
+> of the device-list-properties handler.
+>=20
+> Since it creates an object instance, device properties should appear
+> in the output as they are copied to QOM properties at the instance_init
+> hook.
+>=20
+> This adds a object_class_property_iter_init() helper to allow class
+> properties enumeration uses it in the new QMP command to allow properties
+> listing for abstract classes.
+>=20
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+> Changes:
+> v3:
+> * Used ObjectPropertyInfo instead of QOMPropertyInfo
+>=20
+> v2:
+> * added abstract classes support, now things like "pci-device" or
+> "spapr-machine" show properties, previously these would produce
+> an "abstract class" error
+>=20
+> # Conflicts:
+> #	qapi-schema.json
+> ---
+>  qapi-schema.json     | 15 +++++++++++++++
+>  include/qom/object.h | 16 ++++++++++++++++
+>  qmp.c                | 49 ++++++++++++++++++++++++++++++++++++++++++++++=
++++
+>  qom/object.c         |  7 +++++++
+>  4 files changed, 87 insertions(+)
+>=20
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 87327e5..32e836f 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -1442,6 +1442,21 @@
+>    'returns': [ 'ObjectPropertyInfo' ] }
+> =20
+>  ##
+> +# @qom-list-properties:
+> +#
+> +# List properties associated with a QOM object.
+> +#
+> +# @typename: the type name of an object
+> +#
+> +# Returns: a list of ObjectPropertyInfo describing object properties
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'command': 'qom-list-properties',
+> +  'data': { 'typename': 'str'},
+> +  'returns': [ 'ObjectPropertyInfo' ] }
+> +
+> +##
+>  # @xen-set-global-dirty-log:
+>  #
+>  # Enable or disable the global dirty log mode.
+> diff --git a/include/qom/object.h b/include/qom/object.h
+> index dc73d59..ef07d78 100644
+> --- a/include/qom/object.h
+> +++ b/include/qom/object.h
+> @@ -1017,6 +1017,22 @@ void object_property_iter_init(ObjectPropertyItera=
+tor *iter,
+>                                 Object *obj);
+> =20
+>  /**
+> + * object_class_property_iter_init:
+> + * @klass: the class
+> + *
+> + * Initializes an iterator for traversing all properties
+> + * registered against an object class and all parent classes.
+> + *
+> + * It is forbidden to modify the property list while iterating,
+> + * whether removing or adding properties.
+> + *
+> + * This can be used on abstract classes as it does not create a temporary
+> + * instance.
+> + */
+> +void object_class_property_iter_init(ObjectPropertyIterator *iter,
+> +                                     ObjectClass *klass);
+> +
+> +/**
+>   * object_property_iter_next:
+>   * @iter: the iterator instance
+>   *
+> diff --git a/qmp.c b/qmp.c
+> index 8a74038..1f15f68 100644
+> --- a/qmp.c
+> +++ b/qmp.c
+> @@ -576,6 +576,55 @@ ObjectPropertyInfoList *qmp_device_list_properties(c=
+onst char *typename,
+>      return prop_list;
+>  }
+> =20
+> +ObjectPropertyInfoList *qmp_qom_list_properties(const char *typename,
+> +                                             Error **errp)
+> +{
+> +    ObjectClass *klass;
+> +    Object *obj =3D NULL;
+> +    ObjectProperty *prop;
+> +    ObjectPropertyIterator iter;
+> +    ObjectPropertyInfoList *prop_list =3D NULL;
+> +
+> +    klass =3D object_class_by_name(typename);
+> +    if (klass =3D=3D NULL) {
+> +        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
+> +                  "Class '%s' not found", typename);
+> +        return NULL;
+> +    }
+> +
+> +    klass =3D object_class_dynamic_cast(klass, TYPE_OBJECT);
+> +    if (klass =3D=3D NULL) {
+> +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "typename", TYPE_=
+OBJECT);
+> +        return NULL;
+> +    }
+> +
+> +    if (object_class_is_abstract(klass)) {
+> +        object_class_property_iter_init(&iter, klass);
 
-Ah, and patch 6 actually depends on it (currently).  For sure I can do
-some rebase work to drop current one, but IMHO I would prefer to keep
-both there.  Thanks,
+I remain a bit concerned about the subtle difference in behaviour
+between abstract and non-abstract classes.
+
+> +    } else {
+> +        obj =3D object_new(typename);
+> +        object_property_iter_init(&iter, obj);
+> +    }
+> +    while ((prop =3D object_property_iter_next(&iter))) {
+> +        ObjectPropertyInfo *info;
+> +        ObjectPropertyInfoList *entry;
+> +
+> +        info =3D g_malloc0(sizeof(*info));
+> +        info->name =3D g_strdup(prop->name);
+> +        info->type =3D g_strdup(prop->type);
+> +        info->has_description =3D !!prop->description;
+> +        info->description =3D g_strdup(prop->description);
+> +
+> +        entry =3D g_malloc0(sizeof(*entry));
+> +        entry->value =3D info;
+> +        entry->next =3D prop_list;
+> +        prop_list =3D entry;
+> +    }
+> +
+> +    object_unref(obj);
+> +
+> +    return prop_list;
+> +}
+> +
+>  CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
+>  {
+>      return arch_query_cpu_definitions(errp);
+> diff --git a/qom/object.c b/qom/object.c
+> index 5dcee46..e7978bd 100644
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -1037,6 +1037,13 @@ ObjectProperty *object_property_iter_next(ObjectPr=
+opertyIterator *iter)
+>      return val;
+>  }
+> =20
+> +void object_class_property_iter_init(ObjectPropertyIterator *iter,
+> +                                     ObjectClass *klass)
+> +{
+> +    g_hash_table_iter_init(&iter->iter, klass->properties);
+> +    iter->nextclass =3D klass;
+> +}
+> +
+>  ObjectProperty *object_class_property_find(ObjectClass *klass, const cha=
+r *name,
+>                                             Error **errp)
+>  {
 
 --=20
-Peter Xu
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--DqhR8hV3EnoxUkKN
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqYsXcACgkQbDjKyiDZ
+s5LrJBAAuAyPpddDvzq9nhjZxjgDq1wGUSIRoOOX4gkpRiamUSh7176BJz/xqpPp
+pWDn4ZterZuA8600nfkxBmmU5UaJRTi/TzB0oR3mV4EONZIrFtFhiQGOoDA7kS6n
+Q+eMcTBJUYwY7Ard7nFQHbDhEWzWe1kWHtRg9lG2M3a+TW1sL7/QdBKz5n+5kI2J
+O+XlJ/E6QkvcedkuuA9SwokdxnRF/1wkAFBUwlGx+oRp49fCzHp77gJLpdxx17E5
+5GaKMC1Pr2GOslNvx53AOPlDPuXuXZwwCttovZIEcNucZT9TXbMx20WURWCfvHxt
+MNt24BC1PiLPY/Dd6XDlQrtQ7LbyTqOF+7wlF/HSHzUKHcZbdgn3fEuSLPuxyQwO
+ceIBJOmC0+/RflAVL7i3RxNSXMVWjE4Eex+dhrl2G/ppa6QovBZEf6YrwzrUeTvO
+BKpe5N2T65mn+5hueEIe/r41hNc4yfx92Bppf7FLbzwqDQkIXXjQ7IxzcCs+4oen
+NGZyQ+vI1BjkkYv/421QH178Qe5GxYouFDBHoSN/v1EPp6YPVA1lymCg5CbXgHEU
+kDx+lbpRwEOiyhJL8AOESLyTjwhmp/OqpLQqw0hMV2aHL8JcAkRQpOuunmvh3DeU
+fot+ir2wRomSOLHXEdMtQ5riin+JVd0x5SCRoS559uCoRLl2N7E=
+=uLvi
+-----END PGP SIGNATURE-----
+
+--DqhR8hV3EnoxUkKN--
