@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jbaron@akamai.com>) id 1ero1U-00062K-TB
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:59:09 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eroAa-00033d-3l
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:08:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jbaron@akamai.com>) id 1ero1R-0002X6-1b
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:59:08 -0500
-Received: from mx0a-00190b01.pphosted.com ([2620:100:9001:583::1]:55116)
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eroAW-0006Uq-2r
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:08:32 -0500
+Received: from mail-he1eur01on0123.outbound.protection.outlook.com
+	([104.47.0.123]:51289
+	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jbaron@akamai.com>) id 1ero1Q-0002Wq-Nz
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:59:04 -0500
-References: <cover.1519961667.git.jbaron@akamai.com>
-	<c9d3cf2fbc3c64bb28e0438185d85d95b2088127.1519961667.git.jbaron@akamai.com>
-	<7fc612d0-9610-9b07-d054-bb1438898f47@redhat.com>
-From: Jason Baron <jbaron@akamai.com>
-Message-ID: <c01a1ccd-a864-00a8-edf9-4a16c5dd6c32@akamai.com>
-Date: Fri, 2 Mar 2018 11:59:00 -0500
+	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
+	id 1eroAV-0006Re-E9
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:08:28 -0500
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Date: Fri,  2 Mar 2018 20:08:15 +0300
+Message-Id: <1520010495-58172-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <7fc612d0-9610-9b07-d054-bb1438898f47@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/4] virtio-net: add linkspeed and duplex
- settings to virtio-net
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] ide: fix invalid TRIM range abortion for macio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +26,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, mst@redhat.com
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+To: qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, mark.cave-ayland@ilande.co.uk, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-On 03/02/2018 02:14 AM, Jason Wang wrote:
->=20
->=20
-> On 2018=E5=B9=B403=E6=9C=8802=E6=97=A5 11:46, Jason Baron wrote:
->> Although linkspeed and duplex can be set in a linux guest via 'ethtool
->> -s',
->> this requires custom ethtool commands for virtio-net by default.
->>
->> Introduce a new feature flag, VIRTIO_NET_F_SPEED_DUPLEX, which allows
->> the hypervisor to export a linkspeed and duplex setting. The user can
->> subsequently overwrite it later if desired via: 'ethtool -s'.
->>
->> Linkspeed and duplex settings can be set as:
->> '-device virtio-net,speed=3D10000,duplex=3Dfull'
->=20
-> I was thinking whether or not it's better to decide the duplex by the
-> type of backends.
->=20
-> E.g userspace and vhost-kernel implement a in fact half duplex. But dpd=
-k
-> implement a full duplex.
+commit 947858b0 "ide: abort TRIM operation for invalid range"
+is incorrect for macio; just ide_dma_error() without doing a callback
+is not enough for that errorpath.
 
-Interesting - could this be derived only from the backend 'type'. IE:
-NET_CLIENT_DRIVER_TAP, NET_CLIENT_DRIVER_VHOST_USER...
+Instead, pass -EINVAL to the callback and handle it there
+(see related motivation for read/write in 58ac32113).
 
+It will however catch possible EINVAL from the block layer too.
 
-I was also thinking this could be specified as 'duplex=3Dbackend', in
-addition to the proposed 'duplex=3Dfull' or 'duplex=3Dhalf'?
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+---
+ hw/ide/core.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
-Thanks,
-
--Jason
-
->=20
-> Thanks
->=20
->>
->> where speed is [0...INT_MAX], and duplex is ["half"|"full"].
->>
->> Signed-off-by: Jason Baron<jbaron@akamai.com>
->> Cc: "Michael S. Tsirkin"<mst@redhat.com>
->> Cc: Jason Wang<jasowang@redhat.com>
->> Cc:virtio-dev@lists.oasis-open.org
->> ---
->=20
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index 257b429..54510d4 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -402,7 +402,6 @@ typedef struct TrimAIOCB {
+     QEMUIOVector *qiov;
+     BlockAIOCB *aiocb;
+     int i, j;
+-    bool is_invalid;
+ } TrimAIOCB;
+ 
+ static void trim_aio_cancel(BlockAIOCB *acb)
+@@ -430,11 +429,8 @@ static void ide_trim_bh_cb(void *opaque)
+ {
+     TrimAIOCB *iocb = opaque;
+ 
+-    if (iocb->is_invalid) {
+-        ide_dma_error(iocb->s);
+-    } else {
+-        iocb->common.cb(iocb->common.opaque, iocb->ret);
+-    }
++    iocb->common.cb(iocb->common.opaque, iocb->ret);
++
+     qemu_bh_delete(iocb->bh);
+     iocb->bh = NULL;
+     qemu_aio_unref(iocb);
+@@ -462,7 +458,7 @@ static void ide_issue_trim_cb(void *opaque, int ret)
+                 }
+ 
+                 if (!ide_sect_range_ok(s, sector, count)) {
+-                    iocb->is_invalid = true;
++                    iocb->ret = -EINVAL;
+                     goto done;
+                 }
+ 
+@@ -502,7 +498,6 @@ BlockAIOCB *ide_issue_trim(
+     iocb->qiov = qiov;
+     iocb->i = -1;
+     iocb->j = 0;
+-    iocb->is_invalid = false;
+     ide_issue_trim_cb(iocb, 0);
+     return &iocb->common;
+ }
+@@ -848,6 +843,12 @@ static void ide_dma_cb(void *opaque, int ret)
+     if (ret == -ECANCELED) {
+         return;
+     }
++
++    if (ret == -EINVAL) {
++        ide_dma_error(s);
++        return;
++    }
++
+     if (ret < 0) {
+         if (ide_handle_rw_error(s, -ret, ide_dma_cmd_to_retry(s->dma_cmd))) {
+             s->bus->dma->aiocb = NULL;
+-- 
+2.7.4
