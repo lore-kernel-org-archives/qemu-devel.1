@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ernQm-0003BD-Ry
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:21:13 -0500
+	(envelope-from <lvivier@redhat.com>) id 1ernWx-0004hb-4p
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:27:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ernQl-0005Pj-Q6
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:21:12 -0500
-References: <20180227020550.GA5602@localhost>
-	<29318663-84ef-f603-8ba2-6f1fe0fe3387@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <000d9a00-7d66-f8e4-0760-04a7e246ed75@redhat.com>
-Date: Fri, 2 Mar 2018 11:20:55 -0500
+	(envelope-from <lvivier@redhat.com>) id 1ernWu-0007l9-1b
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:27:35 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43096 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1ernWt-0007ky-Ry
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:27:31 -0500
+References: <20180228180215.25470-1-wei@redhat.com>
+	<20180228180215.25470-2-wei@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <ca21f795-dae7-d6b5-44f1-ef8ba792ac04@redhat.com>
+Date: Fri, 2 Mar 2018 17:27:18 +0100
 MIME-Version: 1.0
-In-Reply-To: <29318663-84ef-f603-8ba2-6f1fe0fe3387@redhat.com>
+In-Reply-To: <20180228180215.25470-2-wei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 resend] block/mirror: change the
- semantic of 'force' of block-job-cancel
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V7 1/4] rules: Move cross compilation auto
+ detection functions to rules.mak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,74 +29,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Liang Li <liliang.opensource@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Huaitong Han <huanhuaitong@didichuxing.com>, Liang Li <liliangleo@didichuxing.com>
+To: Wei Huang <wei@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, drjones@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 
+On 28/02/2018 19:02, Wei Huang wrote:
+> This patch moves the auto detection functions for cross compilation from
+> roms/Makefile to rules.mak. So the functions can be shared among Makefiles
+> in QEMU.
+> 
+> Signed-off-by: Wei Huang <wei@redhat.com>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  roms/Makefile | 24 +++++++-----------------
+>  rules.mak     | 15 +++++++++++++++
+>  2 files changed, 22 insertions(+), 17 deletions(-)
+> 
+> diff --git a/roms/Makefile b/roms/Makefile
+> index b5e5a69e91..e972c65333 100644
+> --- a/roms/Makefile
+> +++ b/roms/Makefile
+> @@ -21,23 +21,6 @@ pxe-rom-virtio   efi-rom-virtio   : DID := 1000
+>  pxe-rom-vmxnet3  efi-rom-vmxnet3  : VID := 15ad
+>  pxe-rom-vmxnet3  efi-rom-vmxnet3  : DID := 07b0
+>  
+> -#
+> -# cross compiler auto detection
+> -#
+> -path := $(subst :, ,$(PATH))
+> -system := $(shell uname -s | tr "A-Z" "a-z")
+> -
+> -# first find cross binutils in path
+> -find-cross-ld = $(firstword $(wildcard $(patsubst %,%/$(1)-*$(system)*-ld,$(path))))
+> -# then check we have cross gcc too
+> -find-cross-gcc = $(firstword $(wildcard $(patsubst %ld,%gcc,$(call find-cross-ld,$(1)))))
+> -# finally strip off path + toolname so we get the prefix
+> -find-cross-prefix = $(subst gcc,,$(notdir $(call find-cross-gcc,$(1))))
+> -
+> -powerpc64_cross_prefix := $(call find-cross-prefix,powerpc64)
+> -powerpc_cross_prefix := $(call find-cross-prefix,powerpc)
+> -x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
+> -
+>  # tag our seabios builds
+>  SEABIOS_EXTRAVERSION="-prebuilt.qemu-project.org"
+>  
+> @@ -66,6 +49,13 @@ default:
+>  	@echo "  skiboot        -- update skiboot.lid"
+>  	@echo "  u-boot.e500    -- update u-boot.e500"
+>  
+> +SRC_PATH=..
+> +include $(SRC_PATH)/rules.mak
+> +
+> +powerpc64_cross_prefix := $(call find-cross-prefix,powerpc64)
+> +powerpc_cross_prefix := $(call find-cross-prefix,powerpc)
+> +x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
+> +
+>  bios: build-seabios-config-seabios-128k build-seabios-config-seabios-256k
+>  	cp seabios/builds/seabios-128k/bios.bin ../pc-bios/bios.bin
+>  	cp seabios/builds/seabios-256k/bios.bin ../pc-bios/bios-256k.bin
+> diff --git a/rules.mak b/rules.mak
+> index 6e943335f3..ef8adee3f8 100644
+> --- a/rules.mak
+> +++ b/rules.mak
+> @@ -62,6 +62,21 @@ expand-objs = $(strip $(sort $(filter %.o,$1)) \
+>                    $(foreach o,$(filter %.mo,$1),$($o-objs)) \
+>                    $(filter-out %.o %.mo,$1))
+>  
+> +# Cross compilation auto detection. Use find-cross-prefix to detect the
+> +# target archtecture's prefix, and then append it to the build tool or pass
+> +# it to CROSS_COMPILE directly. Here is one example:
+> +#      x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
+> +#      $(x86_64_cross_prefix)gcc -c test.c -o test.o
+> +#      make -C testdir CROSS_COMPILE=$(x86_64_cross_prefix)
+> +cross-search-path := $(subst :, ,$(PATH))
+> +cross-host-system := $(shell uname -s | tr "A-Z" "a-z")
+> +
+> +find-cross-ld = $(firstword $(wildcard $(patsubst \
+> +                    %,%/$(1)-*$(cross-host-system)*-ld,$(cross-search-path))))
+> +find-cross-gcc = $(firstword $(wildcard \
+> +                    $(patsubst %ld,%gcc,$(call find-cross-ld,$(1)))))
+> +find-cross-prefix = $(subst gcc,,$(notdir $(call find-cross-gcc,$(1))))
+> +
+>  %.o: %.c
+>  	$(call quiet-command,$(CC) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
+>  	       $(QEMU_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) \
+> 
 
+With this patch, "make slof" fails:
 
-On 03/02/2018 10:39 AM, Eric Blake wrote:
-> On 02/26/2018 08:05 PM, Liang Li wrote:
->> When doing drive mirror to a low speed shared storage, if there was he=
-avy
->> BLK IO write workload in VM after the 'ready' event, drive mirror
->> block job
->> can't be canceled immediately, it would keep running until the heavy
->> BLK IO
->> workload stopped in the VM.
->>
->> Libvirt depends on the current block-job-cancel semantics, which is th=
-at
->> when used without a flag after the 'ready' event, the command blocks
->> until data is in sync.=C2=A0 However, these semantics are awkward in o=
-ther
->> situations, for example, people may use drive mirror for realtime
->> backups while still wanting to use block live migration.=C2=A0 Libvirt=
- cannot
->> start a block live migration while another drive mirror is in progress=
-,
->> but the user would rather abandon the backup attempt as broken and
->> proceed with the live migration than be stuck waiting for the current
->> drive mirror backup to finish.
->>
->> The drive-mirror command already includes a 'force' flag, which libvir=
-t
->> does not use, although it documented the flag as only being useful to
->> quit a job which is paused.=C2=A0 However, since quitting a paused job=
- has
->> the same effect as abandoning a backup in a non-paused job (namely, th=
-e
->> destination file is not in sync, and the command completes immediately=
-),
->> we can just improve the documentation to make the force flag obviously
->> useful.
->=20
-> How does this interact with John's ongoing work to redo block job
-> semantics:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06167.html
->=20
->>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Jeff Cody <jcody@redhat.com>
->> Cc: Kevin Wolf <kwolf@redhat.com>
->> Cc: Max Reitz <mreitz@redhat.com>
->> Cc: Eric Blake <eblake@redhat.com>
->> Cc: John Snow <jsnow@redhat.com>
->> Reported-by: Huaitong Han <huanhuaitong@didichuxing.com>
->> Signed-off-by: Huaitong Han <huanhuaitong@didichuxing.com>
->> Signed-off-by: Liang Li <liliangleo@didichuxing.com>
->> ---
->=20
-> But in isolation, the patch looks reasonable to me.
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
+  git submodule init roms/SLOF
+  git submodule update roms/SLOF
+  cd roms
+  make slof
+...
+make[4]: Entering directory
+'/home/lvivier/Projects/qemu-upstream/roms/SLOF/lib/libnvram'
+	[CC]	Makefile.dep
+powerpc64-linux-gnu-ar: nvram.o: No such file or directory
+make[4]: *** [Makefile:31: ../libnvram.a] Error 1
 
-In fairness, this patch hit the list before mine did, so...
+Perhaps rules.mak defines values inherited by SLOF makefiles that are
+incompatible?
 
-I think it'll be OK to accommodate -- I think. It just changes the
-nature of how fast the cancellation happens in mirror, which shouldn't
-muck around with the general flow of job management in general. I think.
-
-Famous last words.
-
---js
+Thanks,
+Laurent
