@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1erdnY-0000fk-Po
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:07 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1erdnZ-0000g1-44
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1erdnW-0003zA-JY
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:04 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1erdnW-0003zM-O5
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:05 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  2 Mar 2018 17:03:36 +1100
-Message-Id: <20180302060350.24330-11-david@gibson.dropbear.id.au>
+Date: Fri,  2 Mar 2018 17:03:31 +1100
+Message-Id: <20180302060350.24330-6-david@gibson.dropbear.id.au>
 In-Reply-To: <20180302060350.24330-1-david@gibson.dropbear.id.au>
 References: <20180302060350.24330-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 10/24] heathrow: change heathrow_pic_init() to
- return the heathrow device
+Subject: [Qemu-devel] [PULL 05/24] spapr: harden code that depends on VSMT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,109 +22,216 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, groug@kaod.org, surajjs@au1.ibm.com, mark.cave-ayland@ilande.co.uk, David Gibson <david@gibson.dropbear.id.au>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+From: Greg Kurz <groug@kaod.org>
 
-This enables the device to be made available during the setup of the Old World
-machine. In order to pass back the previous set of IRQs we temporarily introduce
-a new pic_irqs parameter until it can be removed.
+VSMT must be set in order to compute VCPU ids. This means that the
+following functions must not be called before spapr_set_vsmt_mode()
+was called:
+- spapr_vcpu_id()
+- spapr_is_thread0_in_vcore()
+- xics_max_server_number()
 
-An additional benefit of this change is that it is also possible to remove the
-pic_mem pointer used for macio by accessing the memory region via sysbus.
+We had a recent regression where the latter would be called before VSMT
+was set, and broke migration of some old machine types. This patch
+adds assert() in the above functions to avoid problems in the future.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Also, since VSMT is really a CPU related thing, spapr_set_vsmt_mode() is
+now called from spapr_init_cpus(), just before the first VSMT user.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/heathrow_pic.c | 10 ++++++----
- hw/ppc/mac.h           |  4 ++--
- hw/ppc/mac_oldworld.c  |  9 +++++----
- 3 files changed, 13 insertions(+), 10 deletions(-)
+ hw/ppc/spapr.c | 144 ++++++++++++++++++++++++++++++---------------------------
+ 1 file changed, 75 insertions(+), 69 deletions(-)
 
-diff --git a/hw/intc/heathrow_pic.c b/hw/intc/heathrow_pic.c
-index 5fd2b33a12..393fdd7326 100644
---- a/hw/intc/heathrow_pic.c
-+++ b/hw/intc/heathrow_pic.c
-@@ -170,13 +170,15 @@ static void heathrow_reset(DeviceState *d)
- static void heathrow_init(Object *obj)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 3f1c5c5133..1c2703cb6b 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -105,12 +105,14 @@
+  */
+ static int spapr_vcpu_id(sPAPRMachineState *spapr, int cpu_index)
  {
-     HeathrowState *s = HEATHROW(obj);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
- 
-     memory_region_init_io(&s->mem, OBJECT(s), &heathrow_ops, s,
-                           "heathrow-pic", 0x1000);
-+    sysbus_init_mmio(sbd, &s->mem);
++    assert(spapr->vsmt);
+     return
+         (cpu_index / smp_threads) * spapr->vsmt + cpu_index % smp_threads;
+ }
+ static bool spapr_is_thread0_in_vcore(sPAPRMachineState *spapr,
+                                       PowerPCCPU *cpu)
+ {
++    assert(spapr->vsmt);
+     return spapr_get_vcpu_id(cpu) % spapr->vsmt == 0;
  }
  
--qemu_irq *heathrow_pic_init(MemoryRegion **pmem,
--                            int nb_cpus, qemu_irq **irqs)
-+DeviceState *heathrow_pic_init(int nb_cpus, qemu_irq **irqs,
-+                               qemu_irq **pic_irqs)
+@@ -177,6 +179,7 @@ static void pre_2_10_vmstate_unregister_dummy_icp(int i)
+ 
+ static int xics_max_server_number(sPAPRMachineState *spapr)
  {
-     DeviceState *d;
-     HeathrowState *s;
-@@ -188,9 +190,9 @@ qemu_irq *heathrow_pic_init(MemoryRegion **pmem,
-     /* only 1 CPU */
-     s->irqs = irqs[0];
- 
--    *pmem = &s->mem;
-+    *pic_irqs = qemu_allocate_irqs(heathrow_set_irq, s, HEATHROW_NUM_IRQS);
- 
--    return qemu_allocate_irqs(heathrow_set_irq, s, HEATHROW_NUM_IRQS);
-+    return d;
++    assert(spapr->vsmt);
+     return DIV_ROUND_UP(max_cpus * spapr->vsmt, smp_threads);
  }
  
- static void heathrow_class_init(ObjectClass *oc, void *data)
-diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
-index 261b519aa5..5b5fffdff3 100644
---- a/hw/ppc/mac.h
-+++ b/hw/ppc/mac.h
-@@ -79,8 +79,8 @@ void macio_init(PCIDevice *dev,
-                 MemoryRegion *pic_mem);
+@@ -2220,73 +2223,6 @@ static CPUArchId *spapr_find_cpu_slot(MachineState *ms, uint32_t id, int *idx)
+     return &ms->possible_cpus->cpus[index];
+ }
  
- /* Heathrow PIC */
--qemu_irq *heathrow_pic_init(MemoryRegion **pmem,
--                            int nb_cpus, qemu_irq **irqs);
-+DeviceState *heathrow_pic_init(int nb_cpus, qemu_irq **irqs,
-+                               qemu_irq **pic_irqs);
+-static void spapr_init_cpus(sPAPRMachineState *spapr)
+-{
+-    MachineState *machine = MACHINE(spapr);
+-    MachineClass *mc = MACHINE_GET_CLASS(machine);
+-    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(machine);
+-    const char *type = spapr_get_cpu_core_type(machine->cpu_type);
+-    const CPUArchIdList *possible_cpus;
+-    int boot_cores_nr = smp_cpus / smp_threads;
+-    int i;
+-
+-    possible_cpus = mc->possible_cpu_arch_ids(machine);
+-    if (mc->has_hotpluggable_cpus) {
+-        if (smp_cpus % smp_threads) {
+-            error_report("smp_cpus (%u) must be multiple of threads (%u)",
+-                         smp_cpus, smp_threads);
+-            exit(1);
+-        }
+-        if (max_cpus % smp_threads) {
+-            error_report("max_cpus (%u) must be multiple of threads (%u)",
+-                         max_cpus, smp_threads);
+-            exit(1);
+-        }
+-    } else {
+-        if (max_cpus != smp_cpus) {
+-            error_report("This machine version does not support CPU hotplug");
+-            exit(1);
+-        }
+-        boot_cores_nr = possible_cpus->len;
+-    }
+-
+-    if (smc->pre_2_10_has_unused_icps) {
+-        int i;
+-
+-        for (i = 0; i < xics_max_server_number(spapr); i++) {
+-            /* Dummy entries get deregistered when real ICPState objects
+-             * are registered during CPU core hotplug.
+-             */
+-            pre_2_10_vmstate_register_dummy_icp(i);
+-        }
+-    }
+-
+-    for (i = 0; i < possible_cpus->len; i++) {
+-        int core_id = i * smp_threads;
+-
+-        if (mc->has_hotpluggable_cpus) {
+-            spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_CPU,
+-                                   spapr_vcpu_id(spapr, core_id));
+-        }
+-
+-        if (i < boot_cores_nr) {
+-            Object *core  = object_new(type);
+-            int nr_threads = smp_threads;
+-
+-            /* Handle the partially filled core for older machine types */
+-            if ((i + 1) * smp_threads >= smp_cpus) {
+-                nr_threads = smp_cpus - i * smp_threads;
+-            }
+-
+-            object_property_set_int(core, nr_threads, "nr-threads",
+-                                    &error_fatal);
+-            object_property_set_int(core, core_id, CPU_CORE_PROP_CORE_ID,
+-                                    &error_fatal);
+-            object_property_set_bool(core, true, "realized", &error_fatal);
+-        }
+-    }
+-}
+-
+ static void spapr_set_vsmt_mode(sPAPRMachineState *spapr, Error **errp)
+ {
+     Error *local_err = NULL;
+@@ -2359,6 +2295,78 @@ out:
+     error_propagate(errp, local_err);
+ }
  
- /* Grackle PCI */
- #define TYPE_GRACKLE_PCI_HOST_BRIDGE "grackle-pcihost"
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index 4401ce5af2..06a61220cb 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -94,11 +94,11 @@ static void ppc_heathrow_init(MachineState *machine)
-     PCIBus *pci_bus;
-     PCIDevice *macio;
-     MACIOIDEState *macio_ide;
--    DeviceState *dev;
-+    DeviceState *dev, *pic_dev;
-+    SysBusDevice *sbd;
-     BusState *adb_bus;
-     int bios_size, ndrv_size;
-     uint8_t *ndrv_file;
--    MemoryRegion *pic_mem;
-     uint16_t ppc_boot_device;
-     DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
-     void *fw_cfg;
-@@ -257,7 +257,7 @@ static void ppc_heathrow_init(MachineState *machine)
-         error_report("Only 6xx bus is supported on heathrow machine");
-         exit(1);
++static void spapr_init_cpus(sPAPRMachineState *spapr)
++{
++    MachineState *machine = MACHINE(spapr);
++    MachineClass *mc = MACHINE_GET_CLASS(machine);
++    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(machine);
++    const char *type = spapr_get_cpu_core_type(machine->cpu_type);
++    const CPUArchIdList *possible_cpus;
++    int boot_cores_nr = smp_cpus / smp_threads;
++    int i;
++
++    possible_cpus = mc->possible_cpu_arch_ids(machine);
++    if (mc->has_hotpluggable_cpus) {
++        if (smp_cpus % smp_threads) {
++            error_report("smp_cpus (%u) must be multiple of threads (%u)",
++                         smp_cpus, smp_threads);
++            exit(1);
++        }
++        if (max_cpus % smp_threads) {
++            error_report("max_cpus (%u) must be multiple of threads (%u)",
++                         max_cpus, smp_threads);
++            exit(1);
++        }
++    } else {
++        if (max_cpus != smp_cpus) {
++            error_report("This machine version does not support CPU hotplug");
++            exit(1);
++        }
++        boot_cores_nr = possible_cpus->len;
++    }
++
++    /* VSMT must be set in order to be able to compute VCPU ids, ie to
++     * call xics_max_server_number() or spapr_vcpu_id().
++     */
++    spapr_set_vsmt_mode(spapr, &error_fatal);
++
++    if (smc->pre_2_10_has_unused_icps) {
++        int i;
++
++        for (i = 0; i < xics_max_server_number(spapr); i++) {
++            /* Dummy entries get deregistered when real ICPState objects
++             * are registered during CPU core hotplug.
++             */
++            pre_2_10_vmstate_register_dummy_icp(i);
++        }
++    }
++
++    for (i = 0; i < possible_cpus->len; i++) {
++        int core_id = i * smp_threads;
++
++        if (mc->has_hotpluggable_cpus) {
++            spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_CPU,
++                                   spapr_vcpu_id(spapr, core_id));
++        }
++
++        if (i < boot_cores_nr) {
++            Object *core  = object_new(type);
++            int nr_threads = smp_threads;
++
++            /* Handle the partially filled core for older machine types */
++            if ((i + 1) * smp_threads >= smp_cpus) {
++                nr_threads = smp_cpus - i * smp_threads;
++            }
++
++            object_property_set_int(core, nr_threads, "nr-threads",
++                                    &error_fatal);
++            object_property_set_int(core, core_id, CPU_CORE_PROP_CORE_ID,
++                                    &error_fatal);
++            object_property_set_bool(core, true, "realized", &error_fatal);
++        }
++    }
++}
++
+ /* pSeries LPAR / sPAPR hardware init */
+ static void spapr_machine_init(MachineState *machine)
+ {
+@@ -2486,8 +2494,6 @@ static void spapr_machine_init(MachineState *machine)
      }
--    pic = heathrow_pic_init(&pic_mem, 1, heathrow_irqs);
-+    pic_dev = heathrow_pic_init(1, heathrow_irqs, &pic);
-     pci_bus = pci_grackle_init(0xfec00000, pic,
-                                get_system_memory(),
-                                get_system_io());
-@@ -280,7 +280,8 @@ static void ppc_heathrow_init(MachineState *machine)
-     qdev_connect_gpio_out(dev, 5, pic[0x0E]); /* IDE-1 */
-     qdev_connect_gpio_out(dev, 6, pic[0x03]); /* IDE-1 DMA */
-     qdev_prop_set_uint64(dev, "frequency", tbfreq);
--    macio_init(macio, pic_mem);
-+    sbd = SYS_BUS_DEVICE(pic_dev);
-+    macio_init(macio, sysbus_mmio_get_region(sbd, 0));
  
-     macio_ide = MACIO_IDE(object_resolve_path_component(OBJECT(macio),
-                                                         "ide[0]"));
+     /* init CPUs */
+-    spapr_set_vsmt_mode(spapr, &error_fatal);
+-
+     spapr_init_cpus(spapr);
+ 
+     if (kvm_enabled()) {
 -- 
 2.14.3
