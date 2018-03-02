@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erleS-0000f6-Es
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 09:27:13 -0500
+	(envelope-from <eblake@redhat.com>) id 1erll3-00032Z-JX
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 09:34:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erleR-0007s6-8Y
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 09:27:12 -0500
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:41430)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1erleR-0007rw-28
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 09:27:11 -0500
-Received: by mail-ot0-x241.google.com with SMTP id w38so8851685ota.8
-	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 06:27:11 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1erll0-0001jz-CS
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 09:34:01 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39542 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1erll0-0001jE-7o
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 09:33:58 -0500
+References: <1519998711-73430-1-git-send-email-mjc@sifive.com>
+	<1519998711-73430-24-git-send-email-mjc@sifive.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4506959a-8d32-039a-f0e3-c864fd44ace6@redhat.com>
+Date: Fri, 2 Mar 2018 08:33:47 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180302060350.24330-1-david@gibson.dropbear.id.au>
-References: <20180302060350.24330-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 2 Mar 2018 14:26:49 +0000
-Message-ID: <CAFEAcA9ZRSX9FBwaiA8Th3mrO4KSOaDPqnH5F==5xNESOf+Dwg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/24] ppc-for-2.12 queue 20180302
+In-Reply-To: <1519998711-73430-24-git-send-email-mjc@sifive.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 23/23] RISC-V Build Infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, surajjs@au1.ibm.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-On 2 March 2018 at 06:03, David Gibson <david@gibson.dropbear.id.au> wrote:
-> The following changes since commit 0dc8ae5e8e693737dfe65ba02d0c6eccb58a9c=
-67:
->
->   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180301-v2' in=
-to staging (2018-03-01 17:08:16 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-2.12-20180302
->
-> for you to fetch changes up to 57ae75b2e401f1d04f37a8cd26212eb3134c51a6:
->
->   hw/ppc/spapr,e500: Use new property "stdout-path" for boot console (201=
-8-03-02 12:24:44 +1100)
->
-> ----------------------------------------------------------------
-> ppc patch queue 2018-03-02
->
-> Here's the next batch of accumulated spapr and ppc patches.
-> Highlights are:
->     * New Sam460ex machine type
->     * Yet more fixes related to vcpu id allocation for spapr
->     * Numerous macio cleanupsr
->     * Some enhancements to the Spectre/Meltdown fixes for pseries,
->       allowing use of a better mitigation for indirect branch based
->       exploits
->     * New pseries machine types with Spectre/Meltdown mitigations
->       enabled (stop gap until libvirt and management understands the
->       machine options)
->     * A handful of other fixes
->
+On 03/02/2018 07:51 AM, Michael Clark wrote:
+> This adds RISC-V into the build system enabling the following targets:
+> 
+> - riscv32-softmmu
+> - riscv64-softmmu
+> - riscv32-linux-user
+> - riscv64-linux-user
+> 
+> This adds defaults configs for RISC-V, enables the build for the RISC-V
+> CPU core, hardware, and Linux User Emulation. The 'qemu-binfmt-conf.sh'
+> script is updated to add the RISC-V ELF magic.
+> 
+> Expected checkpatch errors for consistency reasons:
+> 
+> ERROR: line over 90 characters
+> FILE: scripts/qemu-binfmt-conf.sh
+> 
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Sagar Karandikar <sagark@eecs.berkeley.edu>
+> Signed-off-by: Michael Clark <mjc@sifive.com>
+> ---
+>   arch_init.c                            |  2 ++
+>   configure                              | 13 +++++++++++++
+>   cpus.c                                 |  6 ++++++
+>   default-configs/riscv32-linux-user.mak |  1 +
+>   default-configs/riscv32-softmmu.mak    |  4 ++++
+>   default-configs/riscv64-linux-user.mak |  1 +
+>   default-configs/riscv64-softmmu.mak    |  4 ++++
+>   hw/riscv/Makefile.objs                 | 11 +++++++++++
+>   include/sysemu/arch_init.h             |  1 +
+>   qapi-schema.json                       | 17 ++++++++++++++++-
 
-Hi. This generates a compile error from some compilers in my test set
-(I think just the older gccs):
+Will need rebasing to modify qapi/misc.json if my pending PULL request 
+issues get resolved first:
 
-/home/petmay01/linaro/qemu-for-merges/hw/ppc/ppc440_uc.c: In function
-=E2=80=98ppc460ex_pcie_realize=E2=80=99:
-/home/petmay01/linaro/qemu-for-merges/hw/ppc/ppc440_uc.c:1054:5:
-error: =E2=80=98id=E2=80=99 may be used uninitialized in this function
-[-Werror=3Dmaybe-uninitialized]
-     snprintf(buf, sizeof(buf), "pcie%d-io", id);
-     ^
-cc1: all warnings being treated as errors
+https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg00469.html
 
-Looks like a valid complaint to me -- the realize function
-should check that dcrn_base was set to a valid value, fail
-realize if it wasn't, and have a 'default:' case in the
-switch with g_assert_not_reached().
-
-thanks
--- PMM
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
