@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1erdnY-0000f0-2u
+	(envelope-from <dgibson@ozlabs.org>) id 1erdnY-0000f2-4Q
 	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1erdnW-0003z5-Jk
+	(envelope-from <dgibson@ozlabs.org>) id 1erdnT-0003vx-Pw
 	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:04 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  2 Mar 2018 17:03:39 +1100
-Message-Id: <20180302060350.24330-14-david@gibson.dropbear.id.au>
+Date: Fri,  2 Mar 2018 17:03:30 +1100
+Message-Id: <20180302060350.24330-5-david@gibson.dropbear.id.au>
 In-Reply-To: <20180302060350.24330-1-david@gibson.dropbear.id.au>
 References: <20180302060350.24330-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 13/24] openpic: move KVM-specific declarations
- into separate openpic_kvm.h file
+Subject: [Qemu-devel] [PULL 04/24] spapr: register dummy ICPs later
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,85 +22,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, groug@kaod.org, surajjs@au1.ibm.com, mark.cave-ayland@ilande.co.uk, David Gibson <david@gibson.dropbear.id.au>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+From: Greg Kurz <groug@kaod.org>
 
-This is needed before the next patch because the target-dependent kvm stub
-uses the existing kvm_openpic_connect_vcpu() declaration, making it impossible
-to move the device-specific declarations into the same file without breaking
-ppc-linux-user compilation.
+Some older machine types create more ICPs than needed. We hence
+need to register up to xics_max_server_number() dummy ICPs to
+accomodate the migration of these machine types.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Recent VSMT rework changed xics_max_server_number() to return
+
+    DIV_ROUND_UP(max_cpus * spapr->vsmt, smp_threads)
+
+instead of
+
+    DIV_ROUND_UP(max_cpus * kvmppc_smt_threads(), smp_threads);
+
+The change is okay but it requires spapr->vsmt to be set, which
+isn't the case with the current code. This causes the formula to
+return zero and we don't create dummy ICPs. This breaks migration
+of older guests as reported here:
+
+    https://bugzilla.redhat.com/show_bug.cgi?id=1549087
+
+The dummy ICP workaround doesn't really have a dependency on XICS
+itself. But it does depend on proper VCPU id numbering and it must
+be applied before creating vCPUs (ie, creating real ICPs). So this
+patch moves the workaround to spapr_init_cpus(), which already
+assumes VSMT to be set.
+
+Fixes: 72194664c8a1 ("spapr: use spapr->vsmt to compute VCPU ids")
+Reported-by: Lukas Doktor <ldoktor@redhat.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/openpic_kvm.c        | 1 +
- hw/ppc/e500.c                | 1 +
- include/hw/ppc/openpic.h     | 3 ---
- include/hw/ppc/openpic_kvm.h | 7 +++++++
- target/ppc/kvm-stub.c        | 2 +-
- 5 files changed, 10 insertions(+), 4 deletions(-)
- create mode 100644 include/hw/ppc/openpic_kvm.h
+ hw/ppc/spapr.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/hw/intc/openpic_kvm.c b/hw/intc/openpic_kvm.c
-index fa83420254..f1a59e5a85 100644
---- a/hw/intc/openpic_kvm.c
-+++ b/hw/intc/openpic_kvm.c
-@@ -30,6 +30,7 @@
- #include "exec/address-spaces.h"
- #include "hw/hw.h"
- #include "hw/ppc/openpic.h"
-+#include "hw/ppc/openpic_kvm.h"
- #include "hw/pci/msi.h"
- #include "hw/sysbus.h"
- #include "sysemu/kvm.h"
-diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index a40d3ec3e3..13a34f50b7 100644
---- a/hw/ppc/e500.c
-+++ b/hw/ppc/e500.c
-@@ -29,6 +29,7 @@
- #include "kvm_ppc.h"
- #include "sysemu/device_tree.h"
- #include "hw/ppc/openpic.h"
-+#include "hw/ppc/openpic_kvm.h"
- #include "hw/ppc/ppc.h"
- #include "hw/loader.h"
- #include "elf.h"
-diff --git a/include/hw/ppc/openpic.h b/include/hw/ppc/openpic.h
-index e55ce546aa..693e981965 100644
---- a/include/hw/ppc/openpic.h
-+++ b/include/hw/ppc/openpic.h
-@@ -28,7 +28,4 @@ enum {
- #define OPENPIC_MAX_IRQ     (OPENPIC_MAX_SRC + OPENPIC_MAX_IPI + \
-                              OPENPIC_MAX_TMR)
- 
--#define TYPE_KVM_OPENPIC "kvm-openpic"
--int kvm_openpic_connect_vcpu(DeviceState *d, CPUState *cs);
--
- #endif /* OPENPIC_H */
-diff --git a/include/hw/ppc/openpic_kvm.h b/include/hw/ppc/openpic_kvm.h
-new file mode 100644
-index 0000000000..9ef4215257
---- /dev/null
-+++ b/include/hw/ppc/openpic_kvm.h
-@@ -0,0 +1,7 @@
-+#ifndef OPENPIC_KVM_H
-+#define OPENPIC_KVM_H
-+
-+#define TYPE_KVM_OPENPIC "kvm-openpic"
-+int kvm_openpic_connect_vcpu(DeviceState *d, CPUState *cs);
-+
-+#endif /* OPENPIC_KVM_H */
-diff --git a/target/ppc/kvm-stub.c b/target/ppc/kvm-stub.c
-index efeafca1df..b8aa97f2d4 100644
---- a/target/ppc/kvm-stub.c
-+++ b/target/ppc/kvm-stub.c
-@@ -12,7 +12,7 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "cpu.h"
--#include "hw/ppc/openpic.h"
-+#include "hw/ppc/openpic_kvm.h"
- 
- int kvm_openpic_connect_vcpu(DeviceState *d, CPUState *cs)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index d6fd0e666e..3f1c5c5133 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -183,7 +183,6 @@ static int xics_max_server_number(sPAPRMachineState *spapr)
+ static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
  {
+     sPAPRMachineState *spapr = SPAPR_MACHINE(machine);
+-    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(machine);
+ 
+     if (kvm_enabled()) {
+         if (machine_kernel_irqchip_allowed(machine) &&
+@@ -205,17 +204,6 @@ static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
+             return;
+         }
+     }
+-
+-    if (smc->pre_2_10_has_unused_icps) {
+-        int i;
+-
+-        for (i = 0; i < xics_max_server_number(spapr); i++) {
+-            /* Dummy entries get deregistered when real ICPState objects
+-             * are registered during CPU core hotplug.
+-             */
+-            pre_2_10_vmstate_register_dummy_icp(i);
+-        }
+-    }
+ }
+ 
+ static int spapr_fixup_cpu_smt_dt(void *fdt, int offset, PowerPCCPU *cpu,
+@@ -2236,6 +2224,7 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
+ {
+     MachineState *machine = MACHINE(spapr);
+     MachineClass *mc = MACHINE_GET_CLASS(machine);
++    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(machine);
+     const char *type = spapr_get_cpu_core_type(machine->cpu_type);
+     const CPUArchIdList *possible_cpus;
+     int boot_cores_nr = smp_cpus / smp_threads;
+@@ -2261,6 +2250,17 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
+         boot_cores_nr = possible_cpus->len;
+     }
+ 
++    if (smc->pre_2_10_has_unused_icps) {
++        int i;
++
++        for (i = 0; i < xics_max_server_number(spapr); i++) {
++            /* Dummy entries get deregistered when real ICPState objects
++             * are registered during CPU core hotplug.
++             */
++            pre_2_10_vmstate_register_dummy_icp(i);
++        }
++    }
++
+     for (i = 0; i < possible_cpus->len; i++) {
+         int core_id = i * smp_threads;
+ 
 -- 
 2.14.3
