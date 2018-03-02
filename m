@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1ergCu-0003F3-PN
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 03:38:25 -0500
+	(envelope-from <idgar@virtualoco.com>) id 1ergDo-0003r1-Uv
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 03:39:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1ergCr-0003EZ-Kj
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 03:38:24 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2385 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1ergCr-0003DU-2L
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 03:38:21 -0500
-From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-Date: Fri, 2 Mar 2018 08:38:09 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7473ABBA7E5@DGGEMM505-MBS.china.huawei.com>
-References: <1517921624-14756-1-git-send-email-jianjay.zhou@huawei.com>
-	<f7db96ba-8c02-d26e-3b75-56a81c0e3c47@redhat.com>
-In-Reply-To: <f7db96ba-8c02-d26e-3b75-56a81c0e3c47@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4] tap: setting error appropriately when
- calling net_init_tap_one()
+	(envelope-from <idgar@virtualoco.com>) id 1ergDl-00049E-OQ
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 03:39:20 -0500
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21364)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <idgar@virtualoco.com>)
+	id 1ergDl-00041Z-Fh
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 03:39:17 -0500
+From: Or Idgar <idgar@virtualoco.com>
+Date: Fri,  2 Mar 2018 10:37:20 +0200
+Message-Id: <20180302083720.25137-1-idgar@virtualoco.com>
+Subject: [Qemu-devel] [PATCH v3] vmgenid: allow VM Generation ID
+ modification via QMP/HMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +23,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>
+To: ben@skyportsystems.com, dgilbert@redhat.com, mst@redhat.com, imammedo@redhat.com, eblake@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
+Cc: idgar@virtualoco.com, ghammer@redhat.com, Or Idgar <oridgar@gmail.com>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFzb24gV2FuZyBbbWFp
-bHRvOmphc293YW5nQHJlZGhhdC5jb21dDQo+IFNlbnQ6IEZyaWRheSwgTWFyY2ggMDIsIDIwMTgg
-MjozMCBQTQ0KPiBUbzogWmhvdWppYW4gKGpheSkgPGppYW5qYXkuemhvdUBodWF3ZWkuY29tPjsg
-cWVtdS1kZXZlbEBub25nbnUub3JnDQo+IENjOiBIdWFuZ3dlaWRvbmcgKEMpIDx3ZWlkb25nLmh1
-YW5nQGh1YXdlaS5jb20+OyBtc3RAcmVkaGF0LmNvbTsgR29uZ2xlaQ0KPiAoQXJlaSkgPGFyZWku
-Z29uZ2xlaUBodWF3ZWkuY29tPjsgaW1hbW1lZG9AcmVkaGF0LmNvbTsgd2FuZ3hpbiAoVSkNCj4g
-PHdhbmd4aW54aW4ud2FuZ0BodWF3ZWkuY29tPg0KPiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxd
-IFtQQVRDSCB2NF0gdGFwOiBzZXR0aW5nIGVycm9yIGFwcHJvcHJpYXRlbHkgd2hlbg0KPiBjYWxs
-aW5nIG5ldF9pbml0X3RhcF9vbmUoKQ0KPiANCj4gDQo+IA0KPiBPbiAyMDE45bm0MDLmnIgwNuaX
-pSAyMDo1MywgSmF5IFpob3Ugd3JvdGU6DQo+ID4gSWYgbmV0ZGV2X2FkZCB0YXAsaWQ9bmV0MCwu
-Li4sdmhvc3Q9b24gZmFpbGVkIGluIG5ldF9pbml0X3RhcF9vbmUoKSwNCj4gPiB0aGUgZm9sbG93
-ZWQgdXAgZGV2aWNlX2FkZCB2aXJ0aW8tbmV0LXBjaSxuZXRkZXY9bmV0MCB3aWxsIGZhaWwgdG9v
-LA0KPiA+IHByaW50czoNCj4gPg0KPiA+ICAgICBUVU5TRVRPRkZMT0FEIGlvY3RsKCkgZmFpbGVk
-OiBCYWQgZmlsZSBkZXNjcmlwdG9yIFRVTlNFVE9GRkxPQUQNCj4gPiAgICAgaW9jdGwoKSBmYWls
-ZWQ6IEJhZCBmaWxlIGRlc2NyaXB0b3INCj4gPg0KPiA+IFRoZSByZWFzb24gaXMgdGhhdCB0aGUg
-ZmQgb2YgdGFwIGlzIGNsb3NlZCB3aGVuIGVycm9yIG9jY3VyZWQgYWZ0ZXINCj4gPiBjYWxsaW5n
-IG5ldF9pbml0X3RhcF9vbmUoKS4NCj4gPg0KPiA+IFRoZSBmZCBzaG91bGQgYmUgY2xvc2VkIHdo
-ZW4gY2FsbGluZyBuZXRfaW5pdF90YXBfb25lIGZhaWxlZDoNCj4gPiAgICAgLSBpZiB0YXBfc2V0
-X3NuZGJ1ZigpIGZhaWxlZA0KPiA+ICAgICAtIGlmIHRhcF9zZXRfc25kYnVmKCkgc3VjY2VlZGVk
-IGJ1dCB2aG9zdCBmYWlsZWQgdG8gb3BlbiBvcg0KPiA+ICAgICAgIGluaXRpYWxpemUgd2l0aCB2
-aG9zdGZvcmNlIGZsYWcgb24gVGhlIGZkIHNob3VsZCBub3QgYmUgY2xvc2VkDQo+ID4ganVzdCBi
-ZWNhdXNlIHZob3N0IGZhaWxlZCB0byBvcGVuIG9yIGluaXRpYWxpemUgYnV0IHdpdGhvdXQgdmhv
-c3Rmb3JjZQ0KPiA+IGZsYWcuIFNvIHRoZSBmb2xsb3dlZCB1cCBkZXZpY2VfYWRkIGNhbiBmYWxs
-IGJhY2sgdG8gdXNlcnNwYWNlIHZpcnRpbw0KPiA+IHN1Y2Nlc3NmdWxseS4NCj4gPg0KPiA+IFN1
-Z2dlc3RlZC1ieTogTWljaGFlbCBTLiBUc2lya2luIDxtc3RAcmVkaGF0LmNvbT4NCj4gPiBTdWdn
-ZXN0ZWQtYnk6IElnb3IgTWFtbWVkb3YgPGltYW1tZWRvQHJlZGhhdC5jb20+DQo+ID4gU3VnZ2Vz
-dGVkLWJ5OiBKYXNvbiBXYW5nIDxqYXNvd2FuZ0ByZWRoYXQuY29tPg0KPiA+IFNpZ25lZC1vZmYt
-Ynk6IEpheSBaaG91IDxqaWFuamF5Lnpob3VAaHVhd2VpLmNvbT4NCj4gPiAtLS0NCj4gPiB2NDog
-LSByZWR1Y2UgZHVwbGljYXRpb24NCj4gPiAgICAgIC0gY2xvc2UgdGhlIGZkIGJ5IGNhbGxlcg0K
-PiA+ICAgICAgLSB0d2VhayB0aGUgdGl0bGUNCj4gPg0KPiA+IHYzOiAtIHNldCBlcnJwIGFwcHJv
-cHJpYXRlbHkNCj4gPiAtLS0NCj4gPiAgIGluY2x1ZGUvbmV0L3Zob3N0X25ldC5oIHwgIDMgKysr
-DQo+ID4gICBuZXQvdGFwLmMgICAgICAgICAgICAgICB8IDI0ICsrKysrKysrKysrKysrKysrKy0t
-LS0tLQ0KPiA+ICAgMiBmaWxlcyBjaGFuZ2VkLCAyMSBpbnNlcnRpb25zKCspLCA2IGRlbGV0aW9u
-cygtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvbmV0L3Zob3N0X25ldC5oIGIvaW5j
-bHVkZS9uZXQvdmhvc3RfbmV0LmggaW5kZXgNCj4gPiBhZmMxNDk5Li43N2U0NzM5IDEwMDY0NA0K
-PiA+IC0tLSBhL2luY2x1ZGUvbmV0L3Zob3N0X25ldC5oDQo+ID4gKysrIGIvaW5jbHVkZS9uZXQv
-dmhvc3RfbmV0LmgNCj4gPiBAQCAtNCw2ICs0LDkgQEANCj4gPiAgICNpbmNsdWRlICJuZXQvbmV0
-LmgiDQo+ID4gICAjaW5jbHVkZSAiaHcvdmlydGlvL3Zob3N0LWJhY2tlbmQuaCINCj4gPg0KPiA+
-ICsjZGVmaW5lIFZIT1NUX05FVF9JTklUX0ZBSUxFRCBcDQo+ID4gKyAgICAidmhvc3QtbmV0IHJl
-cXVlc3RlZCBidXQgY291bGQgbm90IGJlIGluaXRpYWxpemVkIg0KPiA+ICsNCj4gPiAgIHN0cnVj
-dCB2aG9zdF9uZXQ7DQo+ID4gICB0eXBlZGVmIHN0cnVjdCB2aG9zdF9uZXQgVkhvc3ROZXRTdGF0
-ZTsNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9uZXQvdGFwLmMgYi9uZXQvdGFwLmMNCj4gPiBpbmRl
-eCA5NzllNjIyLi4xNGQyMzBmIDEwMDY0NA0KPiA+IC0tLSBhL25ldC90YXAuYw0KPiA+ICsrKyBi
-L25ldC90YXAuYw0KPiA+IEBAIC02ODYsMTQgKzY4NiwyMyBAQCBzdGF0aWMgdm9pZCBuZXRfaW5p
-dF90YXBfb25lKGNvbnN0IE5ldGRldlRhcE9wdGlvbnMNCj4gKnRhcCwgTmV0Q2xpZW50U3RhdGUg
-KnBlZXIsDQo+ID4gICAgICAgICAgIGlmICh2aG9zdGZkbmFtZSkgew0KPiA+ICAgICAgICAgICAg
-ICAgdmhvc3RmZCA9IG1vbml0b3JfZmRfcGFyYW0oY3VyX21vbiwgdmhvc3RmZG5hbWUsICZlcnIp
-Ow0KPiA+ICAgICAgICAgICAgICAgaWYgKHZob3N0ZmQgPT0gLTEpIHsNCj4gPiAtICAgICAgICAg
-ICAgICAgIGVycm9yX3Byb3BhZ2F0ZShlcnJwLCBlcnIpOw0KPiA+ICsgICAgICAgICAgICAgICAg
-aWYgKHRhcC0+aGFzX3Zob3N0Zm9yY2UgJiYgdGFwLT52aG9zdGZvcmNlKSB7DQo+ID4gKyAgICAg
-ICAgICAgICAgICAgICAgZXJyb3JfcHJvcGFnYXRlKGVycnAsIGVycik7DQo+ID4gKyAgICAgICAg
-ICAgICAgICB9IGVsc2Ugew0KPiA+ICsgICAgICAgICAgICAgICAgICAgIHdhcm5fcmVwb3J0X2Vy
-cihlcnIpOw0KPiA+ICsgICAgICAgICAgICAgICAgfQ0KPiA+ICAgICAgICAgICAgICAgICAgIHJl
-dHVybjsNCj4gPiAgICAgICAgICAgICAgIH0NCj4gPiAgICAgICAgICAgfSBlbHNlIHsNCj4gPiAg
-ICAgICAgICAgICAgIHZob3N0ZmQgPSBvcGVuKCIvZGV2L3Zob3N0LW5ldCIsIE9fUkRXUik7DQo+
-ID4gICAgICAgICAgICAgICBpZiAodmhvc3RmZCA8IDApIHsNCj4gPiAtICAgICAgICAgICAgICAg
-IGVycm9yX3NldGdfZXJybm8oZXJycCwgZXJybm8sDQo+ID4gLSAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICJ0YXA6IG9wZW4gdmhvc3QgY2hhciBkZXZpY2UgZmFpbGVkIik7DQo+ID4g
-KyAgICAgICAgICAgICAgICBpZiAodGFwLT5oYXNfdmhvc3Rmb3JjZSAmJiB0YXAtPnZob3N0Zm9y
-Y2UpIHsNCj4gPiArICAgICAgICAgICAgICAgICAgICBlcnJvcl9zZXRnX2Vycm5vKGVycnAsIGVy
-cm5vLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgInRhcDogb3Bl
-biB2aG9zdCBjaGFyIGRldmljZSBmYWlsZWQiKTsNCj4gPiArICAgICAgICAgICAgICAgIH0gZWxz
-ZSB7DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgd2Fybl9yZXBvcnQoInRhcDogb3BlbiB2aG9z
-dCBjaGFyIGRldmljZSBmYWlsZWQ6ICVzIiwNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBzdHJlcnJvcihlcnJubykpOw0KPiA+ICsgICAgICAgICAgICAgICAgfQ0KPiA+ICAg
-ICAgICAgICAgICAgICAgIHJldHVybjsNCj4gPiAgICAgICAgICAgICAgIH0NCj4gPiAgICAgICAg
-ICAgICAgIGZjbnRsKHZob3N0ZmQsIEZfU0VURkwsIE9fTk9OQkxPQ0spOyBAQCAtNzAyLDEyICs3
-MTEsMTUNCj4gPiBAQCBzdGF0aWMgdm9pZCBuZXRfaW5pdF90YXBfb25lKGNvbnN0IE5ldGRldlRh
-cE9wdGlvbnMgKnRhcCwNCj4gPiBOZXRDbGllbnRTdGF0ZSAqcGVlciwNCj4gPg0KPiA+ICAgICAg
-ICAgICBzLT52aG9zdF9uZXQgPSB2aG9zdF9uZXRfaW5pdCgmb3B0aW9ucyk7DQo+ID4gICAgICAg
-ICAgIGlmICghcy0+dmhvc3RfbmV0KSB7DQo+ID4gLSAgICAgICAgICAgIGVycm9yX3NldGcoZXJy
-cCwNCj4gPiAtICAgICAgICAgICAgICAgICAgICAgICAidmhvc3QtbmV0IHJlcXVlc3RlZCBidXQg
-Y291bGQgbm90IGJlIGluaXRpYWxpemVkIik7DQo+ID4gKyAgICAgICAgICAgIGlmICh0YXAtPmhh
-c192aG9zdGZvcmNlICYmIHRhcC0+dmhvc3Rmb3JjZSkgew0KPiA+ICsgICAgICAgICAgICAgICAg
-ZXJyb3Jfc2V0ZyhlcnJwLCBWSE9TVF9ORVRfSU5JVF9GQUlMRUQpOw0KPiA+ICsgICAgICAgICAg
-ICB9IGVsc2Ugew0KPiA+ICsgICAgICAgICAgICAgICAgd2Fybl9yZXBvcnQoVkhPU1RfTkVUX0lO
-SVRfRkFJTEVEKTsNCj4gPiArICAgICAgICAgICAgfQ0KPiA+ICAgICAgICAgICAgICAgcmV0dXJu
-Ow0KPiA+ICAgICAgICAgICB9DQo+ID4gICAgICAgfSBlbHNlIGlmICh2aG9zdGZkbmFtZSkgew0K
-PiA+IC0gICAgICAgIGVycm9yX3NldGcoZXJycCwgInZob3N0ZmQocyk9IGlzIG5vdCB2YWxpZCB3
-aXRob3V0IHZob3N0Iik7DQo+ID4gKyAgICAgICAgd2Fybl9yZXBvcnQoInZob3N0ZmQocyk9IGlz
-IG5vdCB2YWxpZCB3aXRob3V0IHZob3N0Iik7DQo+IA0KPiBEbyB3ZSBuZWVkIHRvIGtlZXAgdGhl
-IGVycm9yIGhlcmUgY29uc2lkZXIgaXQgd2FzIGEgd3JvbmcgY29tbWFuZCBsaW5lDQo+IHBhcmFt
-ZXRlcj8NCg0KRmFpciBlbm91Z2gsIHRoYW5rcyENCg0KUmVnYXJkcywNCkpheQ0KDQo+IA0KPiBU
-aGFua3MNCj4gDQo+ID4gICAgICAgfQ0KPiA+ICAgfQ0KPiA+DQoNCg==
+From: Or Idgar <oridgar@gmail.com>
+
+This patch allow changing the Virtual Machine Generation
+ID through QMP/HMP while the vm guest is running.
+the spec (http://go.microsoft.com/fwlink/?LinkId=260709)
+mentions that "when the generation ID changes, execute an
+ACPI Notify operation on the generation ID device".
+To test it we need the ability to set the generation ID
+online. QMP/HMP allows that.
+
+QMP command example:
+    { "execute": "set-vm-generation-id",
+          "arguments": {
+              "guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
+          }
+    }
+
+HMP command example:
+    set-vm-generation-id 324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87
+
+This patch is based off an earlier version by
+Igor Mammedov (imammedo@redhat.com)
+
+Signed-off-by: Or Idgar <oridgar@gmail.com>
+Reviewed-by: Gal Hammer <ghammer@redhat.com>
+---
+
+Changes in v3:
+- Explaining why we need this patch in the commit message.
+
+ docs/specs/vmgenid.txt |  7 ++++---
+ hmp-commands.hx        | 13 +++++++++++++
+ hmp.c                  | 10 ++++++++++
+ hmp.h                  |  1 +
+ hw/acpi/vmgenid.c      | 10 ++++++++++
+ qapi-schema.json       | 11 +++++++++++
+ tests/vmgenid-test.c   | 31 +++++++++++++++++++++++++++++++
+ 7 files changed, 80 insertions(+), 3 deletions(-)
+
+diff --git a/docs/specs/vmgenid.txt b/docs/specs/vmgenid.txt
+index aa9f518..04443de 100644
+--- a/docs/specs/vmgenid.txt
++++ b/docs/specs/vmgenid.txt
+@@ -240,6 +240,7 @@ The property may be queried via QMP/HMP:
+   (QEMU) query-vm-generation-id
+   {"return": {"guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"}}
+ 
+-Setting of this parameter is intentionally left out from the QMP/HMP
+-interfaces.  There are no known use cases for changing the GUID once QEMU is
+-running, and adding this capability would greatly increase the complexity.
++Also, the property may be set via QMP/HMP:
++
++  (QEMU) set-vm-generation-id guid=ee6726ce-73b4-4a8b-863c-708f26515847
++  {"return": {}}
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 4afd57c..4524669 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1871,5 +1871,18 @@ ETEXI
+     },
+ 
+ STEXI
++@item set-vm-generation-id @var{uuid}
++Set Virtual Machine Generation ID counter to @var{guid}
++ETEXI
++
++    {
++        .name       = "set-vm-generation-id",
++        .args_type  = "guid:s",
++        .params     = "guid",
++        .help       = "Set Virtual Machine Generation ID counter",
++        .cmd        = hmp_set_vm_generation_id,
++    },
++
++STEXI
+ @end table
+ ETEXI
+diff --git a/hmp.c b/hmp.c
+index 35a7041..73f9b00 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -2901,6 +2901,16 @@ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict)
+     qapi_free_GuidInfo(info);
+ }
+ 
++void hmp_set_vm_generation_id(Monitor *mon, const QDict *qdict)
++{
++    Error *errp = NULL;
++    const char *guid = qdict_get_str(qdict, "guid");
++
++    qmp_set_vm_generation_id(guid, &errp);
++    if (errp)
++        hmp_handle_error(mon, &errp);
++}
++
+ void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict)
+ {
+     Error *err = NULL;
+diff --git a/hmp.h b/hmp.h
+index a6f56b1..8cc74d5 100644
+--- a/hmp.h
++++ b/hmp.h
+@@ -147,5 +147,6 @@ void hmp_info_ramblock(Monitor *mon, const QDict *qdict);
+ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+ void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
++void hmp_set_vm_generation_id(Monitor *mon, const QDict *qdict);
+ 
+ #endif
+diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+index 105044f..5319d70 100644
+--- a/hw/acpi/vmgenid.c
++++ b/hw/acpi/vmgenid.c
+@@ -129,6 +129,16 @@ void vmgenid_add_fw_cfg(VmGenIdState *vms, FWCfgState *s, GArray *guid)
+                              ARRAY_SIZE(vms->vmgenid_addr_le), false);
+ }
+ 
++void qmp_set_vm_generation_id(const char *guid, Error **errp)
++{
++    Object *obj = find_vmgenid_dev();
++
++    if (!obj) {
++        return;
++    }
++    object_property_set_str(obj, guid, VMGENID_GUID, errp);
++}
++
+ static void vmgenid_update_guest(VmGenIdState *vms)
+ {
+     Object *obj = object_resolve_path_type("", TYPE_ACPI_DEVICE_IF, NULL);
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 1845795..c2ab733 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -3193,6 +3193,17 @@
+ { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
+ 
+ ##
++# @set-vm-generation-id:
++#
++# Set Virtual Machine Generation ID
++#
++# @guid: new GUID to set as Virtual Machine Generation ID
++#
++# Since 2.12
++##
++{ 'command': 'set-vm-generation-id', 'data': { 'guid': 'str' } }
++
++##
+ # @watchdog-set-action:
+ #
+ # Set watchdog action
+diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+index 5a86b40..544cf0f 100644
+--- a/tests/vmgenid-test.c
++++ b/tests/vmgenid-test.c
+@@ -130,6 +130,24 @@ static void read_guid_from_monitor(QemuUUID *guid)
+     QDECREF(rsp);
+ }
+ 
++static void set_guid_via_monitor(QemuUUID *guid)
++{
++    QDict *rsp, *rsp_ret;
++    char command[256];
++    char *guid_str;
++
++    guid_str = qemu_uuid_unparse_strdup(guid);
++    sprintf(command, "{ 'execute': 'set-vm-generation-id', 'arguments': \
++                      { 'guid': '%s' } }",
++            guid_str);
++    free(guid_str);
++    rsp = qmp(command);
++    if (qdict_haskey(rsp, "return")) {
++        rsp_ret = qdict_get_qdict(rsp, "return");
++        g_assert(qdict_size(rsp_ret) == 0);
++    }
++}
++
+ static char disk[] = "tests/vmgenid-test-disk-XXXXXX";
+ 
+ #define GUID_CMD(guid)                          \
+@@ -182,6 +200,17 @@ static void vmgenid_query_monitor_test(void)
+     qtest_quit(global_qtest);
+ }
+ 
++static void vmgenid_set_monitor_test(void)
++{
++    QemuUUID expected, measured;
++
++    global_qtest = qtest_startf(GUID_CMD(VGID_GUID));
++    qemu_uuid_generate(&expected);
++    set_guid_via_monitor(&expected);
++    read_guid_from_monitor(&measured);
++    g_assert(memcmp(measured.data, expected.data, sizeof(measured.data)) == 0);
++}
++
+ int main(int argc, char **argv)
+ {
+     int ret;
+@@ -199,6 +228,8 @@ int main(int argc, char **argv)
+                    vmgenid_set_guid_auto_test);
+     qtest_add_func("/vmgenid/vmgenid/query-monitor",
+                    vmgenid_query_monitor_test);
++    qtest_add_func("/vmgenid/vmgenid/set-guid-qmp",
++                   vmgenid_set_monitor_test);
+     ret = g_test_run();
+     boot_sector_cleanup(disk);
+ 
+-- 
+2.9.5
