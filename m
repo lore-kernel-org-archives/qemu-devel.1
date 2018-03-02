@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ermzu-0000M8-1G
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 10:53:26 -0500
+	(envelope-from <wei@redhat.com>) id 1ern0X-000131-My
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 10:54:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ermzr-0001WO-0B
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 10:53:26 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55678 helo=mx1.redhat.com)
+	(envelope-from <wei@redhat.com>) id 1ern0V-0001gb-C6
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 10:54:05 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33578 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ermzq-0001WJ-Rc
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 10:53:22 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5C4AF4023112
-	for <qemu-devel@nongnu.org>; Fri,  2 Mar 2018 15:53:22 +0000 (UTC)
-References: <20180301084438.13594-1-peterx@redhat.com>
-	<20180301084438.13594-4-peterx@redhat.com>
-	<2c8bac11-9f90-f79b-7b08-77f94a196c3a@redhat.com>
-	<20180302154424.GG26972@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8d991abc-a37e-8e6f-68fc-6e3bd52bd98a@redhat.com>
-Date: Fri, 2 Mar 2018 16:53:19 +0100
+	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1ern0V-0001g8-5x
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 10:54:03 -0500
+References: <20180228180215.25470-1-wei@redhat.com>
+	<20180228180215.25470-3-wei@redhat.com>
+	<3787bc96-7371-49ac-18b1-76f9cd144037@redhat.com>
+From: Wei Huang <wei@redhat.com>
+Message-ID: <b6c02231-7ff8-3159-d82b-8635df957e69@redhat.com>
+Date: Fri, 2 Mar 2018 09:54:01 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180302154424.GG26972@redhat.com>
+In-Reply-To: <3787bc96-7371-49ac-18b1-76f9cd144037@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 03/15] qio: introduce
- qio_channel_add_watch_{full|source}
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V7 2/4] tests/migration: Convert the boot
+ block compilation script into Makefile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,34 +30,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, drjones@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 
-On 02/03/2018 16:44, Daniel P. Berrang=C3=A9 wrote:
->> Just a small thing, this is a bit inconsistent with the rest of the
->> GSource API, where the g_source_attach is usually left to the caller
->> when a function returns GSource *.
-> The APIs which return a GSource in glib typically don't even set the
-> callback function - we already cover that scenario with the
-> qio_channel_create_watch APIs.
->=20
-> GLib doesn't typically have APIs which return a GSource after the
-> mix of creating the watch, setting callback & attaching to context.
 
-True, on the other hand it's annoying for qio_channel_create_watch
-because of the function pointer case.  So I suggested a mix of creating
-the watch and setting the callback.
 
-Having a function that takes a GMainContext and returns a tag is fine, to=
-o.
+On 03/02/2018 09:25 AM, Laurent Vivier wrote:
+> On 28/02/2018 19:02, Wei Huang wrote:
+>> The x86 boot block header currently is generated with a shell script.
+>> To better support other CPUs (e.g. aarch64), we convert the script
+>> into Makefile. This allows us to 1) support cross-compilation easily,
+>> and 2) avoid creating a script file for every architecture.
+>>
+>> Signed-off-by: Wei Huang <wei@redhat.com>
+>> Reviewed-by: Andrew Jones <drjones@redhat.com>
+>> ---
+>>  tests/migration/Makefile                 | 36 ++++++++++++++++++++++++++++++++
+>>  tests/migration/rebuild-x86-bootblock.sh | 33 -----------------------------
+>>  tests/migration/x86-a-b-bootblock.h      |  2 +-
+>>  tests/migration/x86-a-b-bootblock.s      |  5 ++---
+>>  4 files changed, 39 insertions(+), 37 deletions(-)
+>>  create mode 100644 tests/migration/Makefile
+>>  delete mode 100755 tests/migration/rebuild-x86-bootblock.sh
+>>
+>> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
+>> new file mode 100644
+>> index 0000000000..8fbedaa8b8
+>> --- /dev/null
+>> +++ b/tests/migration/Makefile
+>> @@ -0,0 +1,36 @@
+>> +#
+>> +# Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
+>> +#
+>> +# Authors:
+>> +#   Dave Gilbert <dgilbert@redhat.com>
+>> +#
+>> +# This work is licensed under the terms of the GNU GPL, version 2 or later.
+>> +# See the COPYING file in the top-level directory.
+>> +#
+>> +export __note
+>> +override define __note
+>> +/* This file is automatically generated from
+>> + * tests/migration/$<, edit that and then run
+>> + * "make $@" inside tests/migration to update,
+>> + * and then remember to send both in your patch submission.
+>> + */
+>> +endef
+>> +
+>> +all: x86-a-b-bootblock.h
+>> +# Dummy command so that make thinks it has done something
+>> +	@true
+>> +
+>> +SRC_PATH=../..
+>> +include $(SRC_PATH)/rules.mak
+> 
+> does it work in not in-tree build?
 
-Paolo
+Yes, I tried it with a out-of-tree build and it worked. More
+specifically, because .h file (e.g. x86-a-b-bootblock.h) is provided,
+this Makefile is disjoint from the main build system and it has to be
+invoked explicitly. So it won't be affected by out-of-tree build.
 
-> They all just return the watch ID value.
->=20
-> So I think this proposal is ok as it is as there's no real precedence.
->=20
-> Alternatively we could simply do without this API entirely. It is
-> trivial enough for the code that needs a GSource to get iuse the
-> normal qio_channel_add_watch|watch_full APIs, and then lookup the
-> GSource themselves - only one extra line of code in the callers.
+> 
+>> +
+>> +x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
+>> +
+>> +x86-a-b-bootblock.h: x86-a-b-bootblock.s
+>> +	$(x86_64_cross_prefix)as --32 -march=i486 $< -o x86.o
+>> +	$(x86_64_cross_prefix)objcopy -O binary x86.o x86.boot
+>> +	dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124
+>> +	echo "$$__note" > $@
+>> +	xxd -i x86.bootsect | sed -e 's/.*int.*//' >> $@
+> 
+> To be really in the spirit of a makefile, you should have a rule by target:
+> 
+> x86.o: x86-a-b-bootblock.s
+> 	$(x86_64_cross_prefix)as --32 -march=i486 $< -o x86.o
+> 
+> x86.boot: x86.o
+> 	$(x86_64_cross_prefix)objcopy -O binary x86.o x86.boot
+> 
+> x86.bootsect: x86.boot
+> 	dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124
+> 
+> x86-a-b-bootblock.h: x86.bootsect
+> 	echo "$$__note" > header.tmp
+> 	xxd -i x86.bootsect | sed -e 's/.*int.*//' >> header.tmp
+> 	mv header.tmp $@
+> 
+
+It is cleaner, I agree. But it will make the Makefile quite bulky
+(remember that we have to do the same for aarch64 and others).
+
+> Thanks,
+> Laurent
+> 
