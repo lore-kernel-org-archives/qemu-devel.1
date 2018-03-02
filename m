@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eriWr-0003BF-Ij
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:07:10 -0500
+	(envelope-from <david.engraf@sysgo.com>) id 1eriao-0006xR-H7
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:11:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eriWn-00054e-Nt
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:07:09 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46778)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1eriWn-00053X-GP
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:07:05 -0500
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1eriWm-0001QX-KJ
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:07:04 +0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  2 Mar 2018 11:06:34 +0000
-Message-Id: <20180302110640.28004-34-peter.maydell@linaro.org>
-In-Reply-To: <20180302110640.28004-1-peter.maydell@linaro.org>
-References: <20180302110640.28004-1-peter.maydell@linaro.org>
+	(envelope-from <david.engraf@sysgo.com>) id 1eriak-0006Ic-F7
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:11:14 -0500
+References: <20180213102258.26145-1-david.engraf@sysgo.com>
+	<20180215093600.18505-1-david.engraf@sysgo.com>
+	<20180302014546.GD13135@umbus.fritz.box>
+	<be9b719c-b1cf-8e82-3799-fca9e5fe896e@sysgo.com>
+	<93d89925-b0c9-e974-f45e-064598b507c0@ilande.co.uk>
+From: David Engraf <david.engraf@sysgo.com>
+Message-ID: <460e409f-a587-129f-cdeb-1fd84e8f5a38@sysgo.com>
+Date: Fri, 2 Mar 2018 12:11:07 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 33/39] target/arm: Add ARM_FEATURE_V8_FCMA
+In-Reply-To: <93d89925-b0c9-e974-f45e-064598b507c0@ilande.co.uk>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3] PPC: e500: Fix duplicate
+ kernel load and device tree overlap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +28,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-From: Richard Henderson <richard.henderson@linaro.org>
+Am 02.03.2018 um 10:11 schrieb Mark Cave-Ayland:
+> On 02/03/18 08:53, David Engraf wrote:
+>=20
+>> Am 02.03.2018 um 02:45 schrieb David Gibson:
+>>> On Thu, Feb 15, 2018 at 10:36:00AM +0100, David Engraf wrote:
+>>>> This patch fixes an incorrect behavior when the -kernel argument has=
+=20
+>>>> been
+>>>> specified without -bios. In this case the kernel was loaded twice.=20
+>>>> At address
+>>>> 32M as a raw image and afterwards by load_elf/load_uimage at the
+>>>> corresponding load address. In this case the region for the device=20
+>>>> tree and
+>>>> the raw kernel image may overlap.
+>>>>
+>>>> The patch fixes the behavior by loading the kernel image once with
+>>>> load_elf/load_uimage and skips loading the raw image.
+>>>>
+>>>> When here do not use bios_name/size for the kernel and use a more=20
+>>>> generic
+>>>> name called payload_name/size.
+>>>>
+>>>> New in v3: dtb must be stored between kernel and initrd because=20
+>>>> Linux can
+>>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 handle the dtb only within the fir=
+st 64MB. Add a comment to
+>>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 clarify the behavior.
+>>>>
+>>>> Signed-off-by: David Engraf <david.engraf@sysgo.com>
+>>>
+>>> Sorry I've taken so long to reply to this.=A0 It looks fine to me,
+>>> however, other changes mean it longer quite applies to the
+>>> ppc-for-2.12 tree.=A0 Can you fix that up and repost please.
+>>
+>> What other changes do you mean? In v3 I just restored the old behavior=
+=20
+>> by putting the dtb right after the kernel image. This behavior has=20
+>> been changed by mistake in v1/v2. v3 now uses the correct storage=20
+>> location again.
+>=20
+> Hi David,
+>=20
+> I think what David means is that when he tried to apply your v3 patch t=
+o=20
+> his ppc-for-2.12 tree at=20
+> https://github.com/dgibson/qemu/commits/ppc-for-2.12 using git-am then=20
+> it failed - presumably because someone else has made other changes to=20
+> that code since you submitted your v3 patch.
+>=20
+> Please can you submit a v4 rebased on top of the current ppc-for-2.12=20
+> branch?
 
-Not enabled anywhere yet.
+Hi Mark,
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20180228193125.20577-11-richard.henderson@linaro.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/cpu.h     | 1 +
- linux-user/elfload.c | 1 +
- 2 files changed, 2 insertions(+)
+thanks for the info. I will provide an updated version.
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index c4d6992f1d..8dd6b788df 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1435,6 +1435,7 @@ enum arm_features {
-     ARM_FEATURE_V8_SM4, /* implements SM4 part of v8 Crypto Extensions */
-     ARM_FEATURE_V8_RDM, /* implements v8.1 simd round multiply */
-     ARM_FEATURE_V8_FP16, /* implements v8.2 half-precision float */
-+    ARM_FEATURE_V8_FCMA, /* has complex number part of v8.3 extensions.  */
- };
- 
- static inline int arm_feature(CPUARMState *env, int feature)
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 3a55fb33a8..e3689c658a 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -554,6 +554,7 @@ static uint32_t get_elf_hwcap(void)
-     GET_FEATURE(ARM_FEATURE_V8_FP16,
-                 ARM_HWCAP_A64_FPHP | ARM_HWCAP_A64_ASIMDHP);
-     GET_FEATURE(ARM_FEATURE_V8_RDM, ARM_HWCAP_A64_ASIMDRDM);
-+    GET_FEATURE(ARM_FEATURE_V8_FCMA, ARM_HWCAP_A64_FCMA);
- #undef GET_FEATURE
- 
-     return hwcaps;
--- 
-2.16.2
+Best regards
+- David
