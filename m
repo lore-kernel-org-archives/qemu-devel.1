@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1erdnY-0000f2-4Q
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:06 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1erdnY-0000fj-Pm
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1erdnT-0003vx-Pw
+	(envelope-from <dgibson@ozlabs.org>) id 1erdnW-0003yq-Ek
 	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:04 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  2 Mar 2018 17:03:30 +1100
-Message-Id: <20180302060350.24330-5-david@gibson.dropbear.id.au>
+Date: Fri,  2 Mar 2018 17:03:35 +1100
+Message-Id: <20180302060350.24330-10-david@gibson.dropbear.id.au>
 In-Reply-To: <20180302060350.24330-1-david@gibson.dropbear.id.au>
 References: <20180302060350.24330-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 04/24] spapr: register dummy ICPs later
+Subject: [Qemu-devel] [PULL 09/24] heathrow: convert to trace-events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,96 +22,100 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, groug@kaod.org, surajjs@au1.ibm.com, mark.cave-ayland@ilande.co.uk, David Gibson <david@gibson.dropbear.id.au>
 
-From: Greg Kurz <groug@kaod.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Some older machine types create more ICPs than needed. We hence
-need to register up to xics_max_server_number() dummy ICPs to
-accomodate the migration of these machine types.
-
-Recent VSMT rework changed xics_max_server_number() to return
-
-    DIV_ROUND_UP(max_cpus * spapr->vsmt, smp_threads)
-
-instead of
-
-    DIV_ROUND_UP(max_cpus * kvmppc_smt_threads(), smp_threads);
-
-The change is okay but it requires spapr->vsmt to be set, which
-isn't the case with the current code. This causes the formula to
-return zero and we don't create dummy ICPs. This breaks migration
-of older guests as reported here:
-
-    https://bugzilla.redhat.com/show_bug.cgi?id=1549087
-
-The dummy ICP workaround doesn't really have a dependency on XICS
-itself. But it does depend on proper VCPU id numbering and it must
-be applied before creating vCPUs (ie, creating real ICPs). So this
-patch moves the workaround to spapr_init_cpus(), which already
-assumes VSMT to be set.
-
-Fixes: 72194664c8a1 ("spapr: use spapr->vsmt to compute VCPU ids")
-Reported-by: Lukas Doktor <ldoktor@redhat.com>
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+ hw/intc/heathrow_pic.c | 32 +++++++++++---------------------
+ hw/intc/trace-events   |  5 +++++
+ 2 files changed, 16 insertions(+), 21 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index d6fd0e666e..3f1c5c5133 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -183,7 +183,6 @@ static int xics_max_server_number(sPAPRMachineState *spapr)
- static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
- {
-     sPAPRMachineState *spapr = SPAPR_MACHINE(machine);
--    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(machine);
+diff --git a/hw/intc/heathrow_pic.c b/hw/intc/heathrow_pic.c
+index 7bf44e0d86..5fd2b33a12 100644
+--- a/hw/intc/heathrow_pic.c
++++ b/hw/intc/heathrow_pic.c
+@@ -26,16 +26,7 @@
+ #include "hw/hw.h"
+ #include "hw/ppc/mac.h"
+ #include "hw/intc/heathrow_pic.h"
+-
+-/* debug PIC */
+-//#define DEBUG_PIC
+-
+-#ifdef DEBUG_PIC
+-#define PIC_DPRINTF(fmt, ...)                                   \
+-    do { printf("PIC: " fmt , ## __VA_ARGS__); } while (0)
+-#else
+-#define PIC_DPRINTF(fmt, ...)
+-#endif
++#include "trace.h"
  
-     if (kvm_enabled()) {
-         if (machine_kernel_irqchip_allowed(machine) &&
-@@ -205,17 +204,6 @@ static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
-             return;
+ static inline int heathrow_check_irq(HeathrowPICState *pic)
+ {
+@@ -61,7 +52,7 @@ static void heathrow_write(void *opaque, hwaddr addr,
+     unsigned int n;
+ 
+     n = ((addr & 0xfff) - 0x10) >> 4;
+-    PIC_DPRINTF("writel: " TARGET_FMT_plx " %u: %08x\n", addr, n, value);
++    trace_heathrow_write(addr, n, value);
+     if (n >= 2)
+         return;
+     pic = &s->pics[n];
+@@ -109,7 +100,7 @@ static uint64_t heathrow_read(void *opaque, hwaddr addr,
+             break;
          }
      }
--
--    if (smc->pre_2_10_has_unused_icps) {
--        int i;
--
--        for (i = 0; i < xics_max_server_number(spapr); i++) {
--            /* Dummy entries get deregistered when real ICPState objects
--             * are registered during CPU core hotplug.
--             */
--            pre_2_10_vmstate_register_dummy_icp(i);
--        }
--    }
+-    PIC_DPRINTF("readl: " TARGET_FMT_plx " %u: %08x\n", addr, n, value);
++    trace_heathrow_read(addr, n, value);
+     return value;
  }
  
- static int spapr_fixup_cpu_smt_dt(void *fdt, int offset, PowerPCCPU *cpu,
-@@ -2236,6 +2224,7 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
- {
-     MachineState *machine = MACHINE(spapr);
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-+    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(machine);
-     const char *type = spapr_get_cpu_core_type(machine->cpu_type);
-     const CPUArchIdList *possible_cpus;
-     int boot_cores_nr = smp_cpus / smp_threads;
-@@ -2261,6 +2250,17 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
-         boot_cores_nr = possible_cpus->len;
-     }
+@@ -124,24 +115,23 @@ static void heathrow_set_irq(void *opaque, int num, int level)
+     HeathrowState *s = opaque;
+     HeathrowPICState *pic;
+     unsigned int irq_bit;
++    int last_level;
  
-+    if (smc->pre_2_10_has_unused_icps) {
-+        int i;
+-#if defined(DEBUG)
+-    {
+-        static int last_level[64];
+-        if (last_level[num] != level) {
+-            PIC_DPRINTF("set_irq: num=0x%02x level=%d\n", num, level);
+-            last_level[num] = level;
+-        }
+-    }
+-#endif
+     pic = &s->pics[1 - (num >> 5)];
+     irq_bit = 1 << (num & 0x1f);
++    last_level = (pic->levels & irq_bit) ? 1 : 0;
 +
-+        for (i = 0; i < xics_max_server_number(spapr); i++) {
-+            /* Dummy entries get deregistered when real ICPState objects
-+             * are registered during CPU core hotplug.
-+             */
-+            pre_2_10_vmstate_register_dummy_icp(i);
-+        }
+     if (level) {
+         pic->events |= irq_bit & ~pic->level_triggered;
+         pic->levels |= irq_bit;
+     } else {
+         pic->levels &= ~irq_bit;
+     }
++
++    if (last_level != level) {
++        trace_heathrow_set_irq(num, level);
 +    }
 +
-     for (i = 0; i < possible_cpus->len; i++) {
-         int core_id = i * smp_threads;
+     heathrow_update_irq(s);
+ }
  
+diff --git a/hw/intc/trace-events b/hw/intc/trace-events
+index 4092d2825e..55e8c2570c 100644
+--- a/hw/intc/trace-events
++++ b/hw/intc/trace-events
+@@ -186,3 +186,8 @@ nvic_complete_irq(int irq, bool secure) "NVIC complete IRQ %d (secure %d)"
+ nvic_set_irq_level(int irq, int level) "NVIC external irq %d level set to %d"
+ nvic_sysreg_read(uint64_t addr, uint32_t value, unsigned size) "NVIC sysreg read addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
+ nvic_sysreg_write(uint64_t addr, uint32_t value, unsigned size) "NVIC sysreg write addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
++
++# hw/intc/heathrow_pic.c
++heathrow_write(uint64_t addr, unsigned int n, uint64_t value) "0x%"PRIx64" %u: 0x%"PRIx64
++heathrow_read(uint64_t addr, unsigned int n, uint64_t value) "0x%"PRIx64" %u: 0x%"PRIx64
++heathrow_set_irq(int num, int level) "set_irq: num=0x%02x level=%d"
 -- 
 2.14.3
