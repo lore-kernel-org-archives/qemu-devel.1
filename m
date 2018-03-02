@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erl3Y-0004wL-Fu
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:49:05 -0500
+	(envelope-from <eblake@redhat.com>) id 1erl42-0005BA-Mx
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:49:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1erl3X-0008Ro-Mm
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:49:04 -0500
-Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:46351)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1erl3X-0008Ra-HI
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:49:03 -0500
-Received: by mail-ot0-x232.google.com with SMTP id g97so8733484otg.13
-	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 05:49:03 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20180301210249.14872-1-eblake@redhat.com>
-References: <20180301210249.14872-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 2 Mar 2018 13:48:42 +0000
-Message-ID: <CAFEAcA-HNekDVjbY5qyG4hOQ51JwN2XJSkYqo8bBq4ntqf06Ew@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/4] nbd patches for 2018-03-01
+	(envelope-from <eblake@redhat.com>) id 1erl41-0000CZ-T7
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:49:34 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Fri,  2 Mar 2018 07:49:17 -0600
+Message-Id: <20180302134917.25526-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH] iotests: Mark all tests executable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +17,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mreitz@redhat.com
 
-On 1 March 2018 at 21:02, Eric Blake <eblake@redhat.com> wrote:
-> The following changes since commit 0dc8ae5e8e693737dfe65ba02d0c6eccb58a9c67:
->
->   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180301-v2' into staging (2018-03-01 17:08:16 +0000)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2018-03-01
->
-> for you to fetch changes up to 28fb494f9b8827c6087d515e20a3c78baaf443cc:
->
->   nbd/client: fix error messages in nbd_handle_reply_err (2018-03-01 14:48:23 -0600)
->
-> ----------------------------------------------------------------
-> nbd patches for 2018-03-01
->
-> - Eric Blake: nbd: Honor server's advertised minimum block size
-> - Vladimir Sementsov-Ogievskiy: partial: nbd block status base:allocation
->
-> ----------------------------------------------------------------
-> Eric Blake (1):
->       nbd: Honor server's advertised minimum block size
->
-> Vladimir Sementsov-Ogievskiy (3):
->       nbd: change indenting in nbd.h
->       nbd: BLOCK_STATUS constants
->       nbd/client: fix error messages in nbd_handle_reply_err
+The majority of our iotests have the executable bit set; fix the
+few outliers for consistency.
 
-Applied, thanks.
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
 
--- PMM
+Let's see if patchew groks this one :)
+
+ tests/qemu-iotests/096 | 0
+ tests/qemu-iotests/129 | 0
+ tests/qemu-iotests/132 | 0
+ tests/qemu-iotests/136 | 0
+ tests/qemu-iotests/139 | 0
+ tests/qemu-iotests/148 | 0
+ tests/qemu-iotests/152 | 0
+ tests/qemu-iotests/163 | 0
+ tests/qemu-iotests/205 | 0
+ 9 files changed, 0 insertions(+), 0 deletions(-)
+ mode change 100644 => 100755 tests/qemu-iotests/096
+ mode change 100644 => 100755 tests/qemu-iotests/129
+ mode change 100644 => 100755 tests/qemu-iotests/132
+ mode change 100644 => 100755 tests/qemu-iotests/136
+ mode change 100644 => 100755 tests/qemu-iotests/139
+ mode change 100644 => 100755 tests/qemu-iotests/148
+ mode change 100644 => 100755 tests/qemu-iotests/152
+ mode change 100644 => 100755 tests/qemu-iotests/163
+ mode change 100644 => 100755 tests/qemu-iotests/205
+
+diff --git a/tests/qemu-iotests/096 b/tests/qemu-iotests/096
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/129 b/tests/qemu-iotests/129
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/132 b/tests/qemu-iotests/132
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/136 b/tests/qemu-iotests/136
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/139 b/tests/qemu-iotests/139
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/148 b/tests/qemu-iotests/148
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/152 b/tests/qemu-iotests/152
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/163 b/tests/qemu-iotests/163
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/205 b/tests/qemu-iotests/205
+old mode 100644
+new mode 100755
+-- 
+2.14.3
