@@ -1,41 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1erhFH-0007KE-RE
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 04:44:57 -0500
+	(envelope-from <jasowang@redhat.com>) id 1erhPe-0001Hb-Pe
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 04:55:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1erhFE-0001b6-Mq
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 04:44:55 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60812
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1erhFE-0001aj-FZ
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 04:44:52 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w229i5gC045864
-	for <qemu-devel@nongnu.org>; Fri, 2 Mar 2018 04:44:51 -0500
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gf3p29dcq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 04:44:51 -0500
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 2 Mar 2018 09:44:49 -0000
-References: <1519407778-23095-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-	<1519407778-23095-4-git-send-email-imbrenda@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 2 Mar 2018 10:44:46 +0100
+	(envelope-from <jasowang@redhat.com>) id 1erhPb-0001Bl-OS
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 04:55:38 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59184 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1erhPb-0001BD-IR
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 04:55:35 -0500
+References: <1519981484-15528-1-git-send-email-jianjay.zhou@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <8de44f32-0f0a-e02e-74a3-a04e8e9dc658@redhat.com>
+Date: Fri, 2 Mar 2018 17:55:12 +0800
 MIME-Version: 1.0
-In-Reply-To: <1519407778-23095-4-git-send-email-imbrenda@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1519981484-15528-1-git-send-email-jianjay.zhou@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <90dab7d2-be2a-4ab6-ed08-4ce8cac5664f@de.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 3/3] s390x/sclp: extend
- SCLP event masks to 64 bits
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5] tap: setting error appropriately when
+ calling net_init_tap_one()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,186 +28,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, cohuck@redhat.com
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Jay Zhou <jianjay.zhou@huawei.com>, qemu-devel@nongnu.org
+Cc: weidong.huang@huawei.com, mst@redhat.com, arei.gonglei@huawei.com, imammedo@redhat.com, wangxinxin.wang@huawei.com
 
 
 
-On 02/23/2018 06:42 PM, Claudio Imbrenda wrote:
-> Extend the SCLP event masks to 64 bits.
-> 
-> Notice that using any of the new bits results in a state that cannot be
-> migrated to an older version.
-> 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+On 2018=E5=B9=B403=E6=9C=8802=E6=97=A5 17:04, Jay Zhou wrote:
+> If netdev_add tap,id=3Dnet0,...,vhost=3Don failed in net_init_tap_one()=
+,
+> the followed up device_add virtio-net-pci,netdev=3Dnet0 will fail
+> too, prints:
+>
+>     TUNSETOFFLOAD ioctl() failed: Bad file descriptor TUNSETOFFLOAD
+>     ioctl() failed: Bad file descriptor
+>
+> The reason is that the fd of tap is closed when error occured after
+> calling net_init_tap_one().
+>
+> The fd should be closed when calling net_init_tap_one failed:
+>     - if tap_set_sndbuf() failed
+>     - if tap_set_sndbuf() succeeded but vhost failed to open or
+>       initialize with vhostforce flag on
+>     - with wrong vhost command line parameter
+> The fd should not be closed just because vhost failed to open or
+> initialize but without vhostforce flag. So the followed up
+> device_add can fall back to userspace virtio successfully.
+>
+> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Suggested-by: Jason Wang <jasowang@redhat.com>
+> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
 > ---
->  hw/s390x/event-facility.c         | 56 ++++++++++++++++++++++++++++++---------
->  include/hw/s390x/event-facility.h |  2 +-
->  2 files changed, 45 insertions(+), 13 deletions(-)
-> 
-> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-> index e04ed9f..c3e39ee 100644
-> --- a/hw/s390x/event-facility.c
-> +++ b/hw/s390x/event-facility.c
-> @@ -30,7 +30,7 @@ struct SCLPEventFacility {
->      SysBusDevice parent_obj;
->      SCLPEventsBus sbus;
->      /* guest's receive mask */
-> -    sccb_mask_t receive_mask;
-> +    uint32_t receive_mask_pieces[2];
-
-
-Before the change, we basically use be32_to_cpu to transfer the byte field into a cpu
-endianess value. In the end it is actually a bitfield, but for compat we need to keep
-he reversal. So it will be hard to get this fixed without some kind of ugliness.
-
-Does it make sense to make the sccb_mask_t a union of an uint64_t and the pieces?
-
-
-
->      /*
->       * when false, we keep the same broken, backwards compatible behaviour as
->       * before, allowing only masks of size exactly 4; when true, we implement
-> @@ -42,6 +42,18 @@ struct SCLPEventFacility {
->      uint16_t mask_length;
->  };
-> 
-> +static inline sccb_mask_t make_receive_mask(SCLPEventFacility *ef)
-> +{
-> +    return ((sccb_mask_t)ef->receive_mask_pieces[0]) << 32 |
-> +                         ef->receive_mask_pieces[1];
-> +}
+>   include/net/vhost_net.h |  3 +++
+>   net/tap.c               | 22 +++++++++++++++++-----
+>   2 files changed, 20 insertions(+), 5 deletions(-)
+>
+> diff --git a/include/net/vhost_net.h b/include/net/vhost_net.h
+> index afc1499..77e4739 100644
+> --- a/include/net/vhost_net.h
+> +++ b/include/net/vhost_net.h
+> @@ -4,6 +4,9 @@
+>   #include "net/net.h"
+>   #include "hw/virtio/vhost-backend.h"
+>  =20
+> +#define VHOST_NET_INIT_FAILED \
+> +    "vhost-net requested but could not be initialized"
 > +
-> +static inline void store_receive_mask(SCLPEventFacility *ef, sccb_mask_t val)
-> +{
-> +    ef->receive_mask_pieces[1] = val;
-> +    ef->receive_mask_pieces[0] = val >> 32;
-> +}
-> +
->  /* return true if any child has event pending set */
->  static bool event_pending(SCLPEventFacility *ef)
->  {
-> @@ -54,7 +66,7 @@ static bool event_pending(SCLPEventFacility *ef)
->          event = DO_UPCAST(SCLPEvent, qdev, qdev);
->          event_class = SCLP_EVENT_GET_CLASS(event);
->          if (event->event_pending &&
-> -            event_class->get_send_mask() & ef->receive_mask) {
-> +            event_class->get_send_mask() & make_receive_mask(ef)) {
->              return true;
->          }
->      }
-> @@ -252,7 +264,7 @@ static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
->          goto out;
->      }
-> 
-> -    sclp_cp_receive_mask = ef->receive_mask;
-> +    sclp_cp_receive_mask = make_receive_mask(ef);
-> 
->      /* get active selection mask */
->      switch (sccb->h.function_code) {
-> @@ -262,7 +274,7 @@ static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
->      case SCLP_SELECTIVE_READ:
->          copy_mask((uint8_t *)&sclp_active_selection_mask, (uint8_t *)&red->mask,
->                    sizeof(sclp_active_selection_mask), ef->mask_length);
-> -        sclp_active_selection_mask = be32_to_cpu(sclp_active_selection_mask);
-> +        sclp_active_selection_mask = be64_to_cpu(sclp_active_selection_mask);
->          if (!sclp_cp_receive_mask ||
->              (sclp_active_selection_mask & ~sclp_cp_receive_mask)) {
->              sccb->h.response_code =
-> @@ -294,21 +306,22 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
->      }
-> 
->      /*
-> -     * Note: We currently only support masks up to 4 byte length;
-> -     *       the remainder is filled up with zeroes. Linux uses
-> -     *       a 4 byte mask length.
-> +     * Note: We currently only support masks up to 8 byte length;
-> +     *       the remainder is filled up with zeroes. Older Linux
-> +     *       kernels use a 4 byte mask length, newer ones can use both
-> +     *       8 or 4 depending on what is available on the host.
->       */
-> 
->      /* keep track of the guest's capability masks */
->      copy_mask((uint8_t *)&tmp_mask, WEM_CP_RECEIVE_MASK(we_mask, mask_length),
->                sizeof(tmp_mask), mask_length);
-> -    ef->receive_mask = be32_to_cpu(tmp_mask);
-> +    store_receive_mask(ef, be64_to_cpu(tmp_mask));
-> 
->      /* return the SCLP's capability masks to the guest */
-> -    tmp_mask = cpu_to_be32(get_host_receive_mask(ef));
-> +    tmp_mask = cpu_to_be64(get_host_receive_mask(ef));
->      copy_mask(WEM_RECEIVE_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
->                mask_length, sizeof(tmp_mask));
-> -    tmp_mask = cpu_to_be32(get_host_send_mask(ef));
-> +    tmp_mask = cpu_to_be64(get_host_send_mask(ef));
->      copy_mask(WEM_SEND_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
->                mask_length, sizeof(tmp_mask));
-> 
-> @@ -369,6 +382,13 @@ static void command_handler(SCLPEventFacility *ef, SCCB *sccb, uint64_t code)
->      }
->  }
-> 
-> +static bool vmstate_event_facility_mask64_needed(void *opaque)
-> +{
-> +    SCLPEventFacility *ef = opaque;
-> +
-> +    return ef->receive_mask_pieces[1] != 0;
-> +}
-> +
->  static bool vmstate_event_facility_mask_length_needed(void *opaque)
->  {
->      SCLPEventFacility *ef = opaque;
-> @@ -376,6 +396,17 @@ static bool vmstate_event_facility_mask_length_needed(void *opaque)
->      return ef->allow_all_mask_sizes;
->  }
-> 
-> +static const VMStateDescription vmstate_event_facility_mask64 = {
-> +    .name = "vmstate-event-facility/mask64",
-> +    .version_id = 0,
-> +    .minimum_version_id = 0,
-> +    .needed = vmstate_event_facility_mask64_needed,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT32(receive_mask_pieces[1], SCLPEventFacility),
-> +        VMSTATE_END_OF_LIST()
-> +     }
-> +};
-> +
->  static const VMStateDescription vmstate_event_facility_mask_length = {
->      .name = "vmstate-event-facility/mask_length",
->      .version_id = 0,
-> @@ -392,10 +423,11 @@ static const VMStateDescription vmstate_event_facility = {
->      .version_id = 0,
->      .minimum_version_id = 0,
->      .fields = (VMStateField[]) {
-> -        VMSTATE_UINT32(receive_mask, SCLPEventFacility),
-> +        VMSTATE_UINT32(receive_mask_pieces[0], SCLPEventFacility),
->          VMSTATE_END_OF_LIST()
->       },
->      .subsections = (const VMStateDescription * []) {
-> +        &vmstate_event_facility_mask64,
->          &vmstate_event_facility_mask_length,
->          NULL
->       }
-> @@ -447,7 +479,7 @@ static void reset_event_facility(DeviceState *dev)
->  {
->      SCLPEventFacility *sdev = EVENT_FACILITY(dev);
-> 
-> -    sdev->receive_mask = 0;
-> +    store_receive_mask(sdev, 0);
->  }
-> 
->  static void init_event_facility_class(ObjectClass *klass, void *data)
-> diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
-> index 0e2b761..06ba4ea 100644
-> --- a/include/hw/s390x/event-facility.h
-> +++ b/include/hw/s390x/event-facility.h
-> @@ -73,7 +73,7 @@ typedef struct WriteEventMask {
->  #define WEM_RECEIVE_MASK(wem, mask_len) ((wem)->masks + 2 * (mask_len))
->  #define WEM_SEND_MASK(wem, mask_len) ((wem)->masks + 3 * (mask_len))
-> 
-> -typedef uint32_t sccb_mask_t;
-> +typedef uint64_t sccb_mask_t;
-> 
->  typedef struct EventBufferHeader {
->      uint16_t length;
-> 
+>   struct vhost_net;
+>   typedef struct vhost_net VHostNetState;
+>  =20
+> diff --git a/net/tap.c b/net/tap.c
+> index 979e622..2b3a36f 100644
+> --- a/net/tap.c
+> +++ b/net/tap.c
+> @@ -686,14 +686,23 @@ static void net_init_tap_one(const NetdevTapOptio=
+ns *tap, NetClientState *peer,
+>           if (vhostfdname) {
+>               vhostfd =3D monitor_fd_param(cur_mon, vhostfdname, &err);
+>               if (vhostfd =3D=3D -1) {
+> -                error_propagate(errp, err);
+> +                if (tap->has_vhostforce && tap->vhostforce) {
+> +                    error_propagate(errp, err);
+> +                } else {
+> +                    warn_report_err(err);
+> +                }
+>                   return;
+>               }
+>           } else {
+>               vhostfd =3D open("/dev/vhost-net", O_RDWR);
+>               if (vhostfd < 0) {
+> -                error_setg_errno(errp, errno,
+> -                                 "tap: open vhost char device failed")=
+;
+> +                if (tap->has_vhostforce && tap->vhostforce) {
+> +                    error_setg_errno(errp, errno,
+> +                                     "tap: open vhost char device fail=
+ed");
+> +                } else {
+> +                    warn_report("tap: open vhost char device failed: %=
+s",
+> +                                strerror(errno));
+> +                }
+>                   return;
+>               }
+>               fcntl(vhostfd, F_SETFL, O_NONBLOCK);
+> @@ -702,8 +711,11 @@ static void net_init_tap_one(const NetdevTapOption=
+s *tap, NetClientState *peer,
+>  =20
+>           s->vhost_net =3D vhost_net_init(&options);
+>           if (!s->vhost_net) {
+> -            error_setg(errp,
+> -                       "vhost-net requested but could not be initializ=
+ed");
+> +            if (tap->has_vhostforce && tap->vhostforce) {
+> +                error_setg(errp, VHOST_NET_INIT_FAILED);
+> +            } else {
+> +                warn_report(VHOST_NET_INIT_FAILED);
+> +            }
+>               return;
+>           }
+>       } else if (vhostfdname) {
+
+Applied, thanks.
