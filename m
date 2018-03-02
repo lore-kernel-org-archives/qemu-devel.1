@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ernLk-00013k-Tc
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:16:02 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ernNz-0001rd-0f
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:18:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ernLh-0002tD-Ow
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:16:00 -0500
-Date: Fri, 2 Mar 2018 19:15:37 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20180302161536.GA2454@rkaganb.sw.ru>
-References: <20180227115651.30762-1-rpalethorpe@suse.com>
+	(envelope-from <alistair23@gmail.com>) id 1ernNx-0003ch-Vo
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:18:18 -0500
+Received: from mail-lf0-x235.google.com ([2a00:1450:4010:c07::235]:43319)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1ernNx-0003bc-OA
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:18:17 -0500
+Received: by mail-lf0-x235.google.com with SMTP id q69so14072567lfi.10
+	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 08:18:17 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180227115651.30762-1-rpalethorpe@suse.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH 0/2] Increase usability of
- external snapshots
+In-Reply-To: <CAFEAcA-RUbtzQSSvyqbG=-PD3kbui1=OdTiY2=rjWtrSVOg2aA@mail.gmail.com>
+References: <e2a29860b0eb2591e16a83178e305828d1b0b730.1519950018.git.alistair.francis@xilinx.com>
+	<CAKmqyKOcSA0wqWrsRMXMv2E+Jb+MnYkD_h16NbEmxYohVJoj-w@mail.gmail.com>
+	<CAFEAcA__BbzvYOxOEQ0iydLJf0WQDDTnaivMWyY2UJeLAcy7HQ@mail.gmail.com>
+	<CAFEAcA-RUbtzQSSvyqbG=-PD3kbui1=OdTiY2=rjWtrSVOg2aA@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 2 Mar 2018 08:17:45 -0800
+Message-ID: <CAKmqyKOHvvGj+DQOX8CmmeN8-ac4KOAZVCi+384TjVDpYDf6=Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] target/arm: Fix the A53 L2CTLR typo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,28 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Palethorpe <rpalethorpe@suse.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, armbru@redhat.com, dgilbert@redhat.com, mreitz@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On Tue, Feb 27, 2018 at 12:56:49PM +0100, Richard Palethorpe wrote:
-> Following on from the discussion about creating savevm/loadvm QMP
-> equivalents. I decided to take the advice given that we should use external
-> snapshots. However reverting to a snapshot currently requires QEMU to be
-> restarted with "-incoming".  Restarting QEMU requires a fair bit of
-> book keeping to be done by the management application and may take
-> measurably more time.
+On Fri, Mar 2, 2018 at 2:35 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 2 March 2018 at 10:29, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> On 2 March 2018 at 04:34, Alistair Francis <alistair23@gmail.com> wrote:
+>>>     target/arm: Report the number of cores in the cluster
+>>>
+>>>     Previously we assumed that we only has a single cluster, which meant we
+>>>     could get away with reporting smp_cpus to the guest. There are cases
+>>>     where we have two clusters (Xilinx's ZynqMP is a good example) so
+>>>     reporting the number of smp_cpus is incorrect. Instead count the cores
+>>>     in the cluster.
+>
+>> This seems a bit ad-hoc (it will give the wrong answer if we have
+>> two clusters both of the same kind of CPU, for instance).
+>> Maybe it would be better to have a "cluster-size" property on
+>> the CPU (with the default being number of cores in whole system) ?
+>
+> ...though I think "cluster size" isn't quite the right name --
+> if you have a big.LITTLE cluster with 2xA57 and 2xA53, there are
+> 4 cores in the cluster but I think reading the TRM that the cores
+> will report 2 in the L2CTLR.
 
-AFAICT "-incoming" is not the only reason for starting QEMU anew.  The
-block devices will need to be pointed at different nodes in the backing
-chains.  Moreover the snapshot you're reverting to may have been taken
-at a point where the VM had different configuration than it has now.
+Hmmm... I would have thought cluster size is correct enough. The only
+other option I can think of is "processor size" or "core size"?
 
-So the management application will need to do a lot of bookkeeping stuff
-anyway, and it'll probably have harder time applying all of the
-configuration changes to a live QEMU instance.
+Alistair
 
-Is the cost of killing the old QEMU process and starting a new one big
-enough to be worth all the hassle?
-
-Thanks,
-Roman.
+>
+> thanks
+> -- PMM
