@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eroXM-0003ZZ-9G
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:32:05 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eroZr-0005Ra-QZ
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:34:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eroXH-0005Sg-8r
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:32:04 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43762 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eroXH-0005SY-4q
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:31:59 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6937A40FB658
-	for <qemu-devel@nongnu.org>; Fri,  2 Mar 2018 17:31:47 +0000 (UTC)
-References: <20180302155110.5481-1-pbonzini@redhat.com>
-	<20180302155110.5481-2-pbonzini@redhat.com>
-	<bde2777c-3631-e445-e249-5c91677a3225@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <74696081-7305-1ae3-977f-2727ccf17db5@redhat.com>
-Date: Fri, 2 Mar 2018 18:31:41 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1eroZr-0006Mn-2p
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:34:39 -0500
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:42785)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eroZq-0006MW-UU
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:34:39 -0500
+Received: by mail-ot0-x242.google.com with SMTP id l5so9382146otf.9
+	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 09:34:38 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <bde2777c-3631-e445-e249-5c91677a3225@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] net: add e1000e model to the "simple"
- -net/-nic options
+In-Reply-To: <e63c2c456e5b24f1ab493e4dd8a40091bbad9ca0.1520010339.git.alistair.francis@xilinx.com>
+References: <cover.1520010339.git.alistair.francis@xilinx.com>
+	<e63c2c456e5b24f1ab493e4dd8a40091bbad9ca0.1520010339.git.alistair.francis@xilinx.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 2 Mar 2018 17:34:17 +0000
+Message-ID: <CAFEAcA_41mZnGOKw0ybo4f=_LWPJCN5=0TjJsCkgKy_KL73Z6g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] hw/arm: Set the core count for
+ Xilinx's ZynqMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,42 +30,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: jasowang@redhat.com
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>
 
-On 02/03/2018 18:19, Thomas Huth wrote:
-> On 02.03.2018 16:51, Paolo Bonzini wrote:
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>  hw/pci/pci.c | 2 ++
->>  1 file changed, 2 insertions(+)
->>
->> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
->> index e006b6ac71..af3c85a46f 100644
->> --- a/hw/pci/pci.c
->> +++ b/hw/pci/pci.c
->> @@ -1822,6 +1822,7 @@ static const char * const pci_nic_models[] =3D {
->>      "i82559er",
->>      "rtl8139",
->>      "e1000",
->> +    "e1000e",
->>      "pcnet",
->>      "virtio",
->>      "sungem",
->> @@ -1835,6 +1836,7 @@ static const char * const pci_nic_names[] =3D {
->>      "i82559er",
->>      "rtl8139",
->>      "e1000",
->> +    "e1000e",
->>      "pcnet",
->>      "virtio-net-pci",
->>      "sungem",
->=20
-> I think it would be better and more consisten to finally fix this mess
-> and automatically allow all devices in the category
-> DEVICE_CATEGORY_NETWORK that are derived from TYPE_PCI_DEVICE, instead
-> of manually maintaining this list here...?
+On 2 March 2018 at 17:06, Alistair Francis <alistair.francis@xilinx.com> wrote:
+> Set the ARM CPU core count property for the A53's attached to the Xilnx
+> ZynqMP machine.
+>
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> ---
+>
+>  hw/arm/xlnx-zynqmp.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+> index 69227fd4c9..465796e97c 100644
+> --- a/hw/arm/xlnx-zynqmp.c
+> +++ b/hw/arm/xlnx-zynqmp.c
+> @@ -282,6 +282,8 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+>                                   s->virt, "has_el2", NULL);
+>          object_property_set_int(OBJECT(&s->apu_cpu[i]), GIC_BASE_ADDR,
+>                                  "reset-cbar", &error_abort);
+> +        object_property_set_int(OBJECT(&s->apu_cpu[i]), num_apus,
+> +                                "core-count", &error_abort);
+>          object_property_set_bool(OBJECT(&s->apu_cpu[i]), true, "realized",
+>                                   &err);
+>          if (err) {
 
-Yeah, that would make sense too (virtio would be special cased).  Thanks!
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Paolo
+thanks
+-- PMM
