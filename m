@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1erl8c-00082R-Nq
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:54:20 -0500
+	(envelope-from <mjc@sifive.com>) id 1erl8f-000851-9D
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:54:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1erl8a-0002KS-MP
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:54:18 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:41944)
+	(envelope-from <mjc@sifive.com>) id 1erl8e-0002LK-2b
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:54:21 -0500
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:36049)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1erl8a-0002KK-E2
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:54:16 -0500
-Received: by mail-pg0-x242.google.com with SMTP id q27so3801787pgn.8
-	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 05:54:16 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1erl8d-0002L7-Q5
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:54:19 -0500
+Received: by mail-pg0-x243.google.com with SMTP id i14so3814326pgv.3
+	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 05:54:19 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Sat,  3 Mar 2018 02:51:47 +1300
-Message-Id: <1519998711-73430-20-git-send-email-mjc@sifive.com>
+Date: Sat,  3 Mar 2018 02:51:48 +1300
+Message-Id: <1519998711-73430-21-git-send-email-mjc@sifive.com>
 In-Reply-To: <1519998711-73430-1-git-send-email-mjc@sifive.com>
 References: <1519998711-73430-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v8 19/23] SiFive RISC-V UART Device
+Subject: [Qemu-devel] [PATCH v8 20/23] SiFive RISC-V PRCI Block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,36 +26,33 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>, Stefan O'Rear <sorear2@gmail.com>
+Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
 
-QEMU model of the UART on the SiFive E300 and U500 series SOCs.
-BBL supports the SiFive UART for early console access via the SBI
-(Supervisor Binary Interface) and the linux kernel SBI console.
-
-The SiFive UART implements the pre qom legacy interface consistent
-with the 16550a UART in 'hw/char/serial.c'.
+Simple model of the PRCI  (Power, Reset, Clock, Interrupt) to emulate
+register reads made by the SDK BSP.
 
 Acked-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Stefan O'Rear <sorear2@gmail.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- hw/riscv/sifive_uart.c         | 176 +++++++++++++++++++++++++++++++++++++++++
- include/hw/riscv/sifive_uart.h |  71 +++++++++++++++++
- 2 files changed, 247 insertions(+)
- create mode 100644 hw/riscv/sifive_uart.c
- create mode 100644 include/hw/riscv/sifive_uart.h
+ hw/riscv/sifive_prci.c         | 89 ++++++++++++++++++++++++++++++++++++++++++
+ include/hw/riscv/sifive_prci.h | 37 ++++++++++++++++++
+ 2 files changed, 126 insertions(+)
+ create mode 100644 hw/riscv/sifive_prci.c
+ create mode 100644 include/hw/riscv/sifive_prci.h
 
-diff --git a/hw/riscv/sifive_uart.c b/hw/riscv/sifive_uart.c
+diff --git a/hw/riscv/sifive_prci.c b/hw/riscv/sifive_prci.c
 new file mode 100644
-index 0000000..b0c3798
+index 0000000..0910ea3
 --- /dev/null
-+++ b/hw/riscv/sifive_uart.c
-@@ -0,0 +1,176 @@
++++ b/hw/riscv/sifive_prci.c
+@@ -0,0 +1,89 @@
 +/*
-+ * QEMU model of the UART on the SiFive E300 and U500 series SOCs.
++ * QEMU SiFive PRCI (Power, Reset, Clock, Interrupt)
 + *
-+ * Copyright (c) 2016 Stefan O'Rear
++ * Copyright (c) 2017 SiFive, Inc.
++ *
++ * Simple model of the PRCI to emulate register reads made by the SDK BSP
 + *
 + * This program is free software; you can redistribute it and/or modify it
 + * under the terms and conditions of the GNU General Public License,
@@ -71,105 +68,33 @@ index 0000000..b0c3798
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qapi/error.h"
 +#include "hw/sysbus.h"
-+#include "chardev/char.h"
-+#include "chardev/char-fe.h"
 +#include "target/riscv/cpu.h"
-+#include "hw/riscv/sifive_uart.h"
++#include "hw/riscv/sifive_prci.h"
 +
-+/*
-+ * Not yet implemented:
-+ *
-+ * Transmit FIFO using "qemu/fifo8.h"
-+ * SIFIVE_UART_IE_TXWM interrupts
-+ * SIFIVE_UART_IE_RXWM interrupts must honor fifo watermark
-+ * Rx FIFO watermark interrupt trigger threshold
-+ * Tx FIFO watermark interrupt trigger threshold.
-+ */
++/* currently implements enough to mock freedom-e-sdk BSP clock programming */
 +
-+static void update_irq(SiFiveUARTState *s)
++static uint64_t sifive_prci_read(void *opaque, hwaddr addr, unsigned int size)
 +{
-+    int cond = 0;
-+    if ((s->ie & SIFIVE_UART_IE_RXWM) && s->rx_fifo_len) {
-+        cond = 1;
++    if (addr == 0 /* PRCI_HFROSCCFG */) {
++        return 1 << 31; /* ROSC_RDY */
 +    }
-+    if (cond) {
-+        qemu_irq_raise(s->irq);
-+    } else {
-+        qemu_irq_lower(s->irq);
++    if (addr == 8 /* PRCI_PLLCFG    */) {
++        return 1 << 31; /* PLL_LOCK */
 +    }
-+}
-+
-+static uint64_t
-+uart_read(void *opaque, hwaddr addr, unsigned int size)
-+{
-+    SiFiveUARTState *s = opaque;
-+    unsigned char r;
-+    switch (addr) {
-+    case SIFIVE_UART_RXFIFO:
-+        if (s->rx_fifo_len) {
-+            r = s->rx_fifo[0];
-+            memmove(s->rx_fifo, s->rx_fifo + 1, s->rx_fifo_len - 1);
-+            s->rx_fifo_len--;
-+            qemu_chr_fe_accept_input(&s->chr);
-+            update_irq(s);
-+            return r;
-+        }
-+        return 0x80000000;
-+
-+    case SIFIVE_UART_TXFIFO:
-+        return 0; /* Should check tx fifo */
-+    case SIFIVE_UART_IE:
-+        return s->ie;
-+    case SIFIVE_UART_IP:
-+        return s->rx_fifo_len ? SIFIVE_UART_IP_RXWM : 0;
-+    case SIFIVE_UART_TXCTRL:
-+        return s->txctrl;
-+    case SIFIVE_UART_RXCTRL:
-+        return s->rxctrl;
-+    case SIFIVE_UART_DIV:
-+        return s->div;
-+    }
-+
-+    hw_error("%s: bad read: addr=0x%x\n",
-+        __func__, (int)addr);
++    hw_error("%s: read: addr=0x%x\n", __func__, (int)addr);
 +    return 0;
 +}
 +
-+static void
-+uart_write(void *opaque, hwaddr addr,
++static void sifive_prci_write(void *opaque, hwaddr addr,
 +           uint64_t val64, unsigned int size)
 +{
-+    SiFiveUARTState *s = opaque;
-+    uint32_t value = val64;
-+    unsigned char ch = value;
-+
-+    switch (addr) {
-+    case SIFIVE_UART_TXFIFO:
-+        qemu_chr_fe_write(&s->chr, &ch, 1);
-+        return;
-+    case SIFIVE_UART_IE:
-+        s->ie = val64;
-+        update_irq(s);
-+        return;
-+    case SIFIVE_UART_TXCTRL:
-+        s->txctrl = val64;
-+        return;
-+    case SIFIVE_UART_RXCTRL:
-+        s->rxctrl = val64;
-+        return;
-+    case SIFIVE_UART_DIV:
-+        s->div = val64;
-+        return;
-+    }
-+    hw_error("%s: bad write: addr=0x%x v=0x%x\n",
-+        __func__, (int)addr, (int)value);
++    /* discard writes */
 +}
 +
-+static const MemoryRegionOps uart_ops = {
-+    .read = uart_read,
-+    .write = uart_write,
++static const MemoryRegionOps sifive_prci_ops = {
++    .read = sifive_prci_read,
++    .write = sifive_prci_write,
 +    .endianness = DEVICE_NATIVE_ENDIAN,
 +    .valid = {
 +        .min_access_size = 4,
@@ -177,67 +102,49 @@ index 0000000..b0c3798
 +    }
 +};
 +
-+static void uart_rx(void *opaque, const uint8_t *buf, int size)
++static void sifive_prci_init(Object *obj)
 +{
-+    SiFiveUARTState *s = opaque;
++    SiFivePRCIState *s = SIFIVE_PRCI(obj);
 +
-+    /* Got a byte.  */
-+    if (s->rx_fifo_len >= sizeof(s->rx_fifo)) {
-+        printf("WARNING: UART dropped char.\n");
-+        return;
-+    }
-+    s->rx_fifo[s->rx_fifo_len++] = *buf;
-+
-+    update_irq(s);
++    memory_region_init_io(&s->mmio, obj, &sifive_prci_ops, s,
++                          TYPE_SIFIVE_PRCI, 0x8000);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
 +}
 +
-+static int uart_can_rx(void *opaque)
-+{
-+    SiFiveUARTState *s = opaque;
++static const TypeInfo sifive_prci_info = {
++    .name          = TYPE_SIFIVE_PRCI,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(SiFivePRCIState),
++    .instance_init = sifive_prci_init,
++};
 +
-+    return s->rx_fifo_len < sizeof(s->rx_fifo);
++static void sifive_prci_register_types(void)
++{
++    type_register_static(&sifive_prci_info);
 +}
 +
-+static void uart_event(void *opaque, int event)
-+{
-+}
++type_init(sifive_prci_register_types)
 +
-+static int uart_be_change(void *opaque)
-+{
-+    SiFiveUARTState *s = opaque;
-+
-+    qemu_chr_fe_set_handlers(&s->chr, uart_can_rx, uart_rx, uart_event,
-+        uart_be_change, s, NULL, true);
-+
-+    return 0;
-+}
 +
 +/*
-+ * Create UART device.
++ * Create PRCI device.
 + */
-+SiFiveUARTState *sifive_uart_create(MemoryRegion *address_space, hwaddr base,
-+    Chardev *chr, qemu_irq irq)
++DeviceState *sifive_prci_create(hwaddr addr)
 +{
-+    SiFiveUARTState *s = g_malloc0(sizeof(SiFiveUARTState));
-+    s->irq = irq;
-+    qemu_chr_fe_init(&s->chr, chr, &error_abort);
-+    qemu_chr_fe_set_handlers(&s->chr, uart_can_rx, uart_rx, uart_event,
-+        uart_be_change, s, NULL, true);
-+    memory_region_init_io(&s->mmio, NULL, &uart_ops, s,
-+                          TYPE_SIFIVE_UART, SIFIVE_UART_MAX);
-+    memory_region_add_subregion(address_space, base, &s->mmio);
-+    return s;
++    DeviceState *dev = qdev_create(NULL, TYPE_SIFIVE_PRCI);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, addr);
++    return dev;
 +}
-diff --git a/include/hw/riscv/sifive_uart.h b/include/hw/riscv/sifive_uart.h
+diff --git a/include/hw/riscv/sifive_prci.h b/include/hw/riscv/sifive_prci.h
 new file mode 100644
-index 0000000..504f18a
+index 0000000..b6f4c48
 --- /dev/null
-+++ b/include/hw/riscv/sifive_uart.h
-@@ -0,0 +1,71 @@
++++ b/include/hw/riscv/sifive_prci.h
+@@ -0,0 +1,37 @@
 +/*
-+ * SiFive UART interface
++ * QEMU SiFive PRCI (Power, Reset, Clock, Interrupt) interface
 + *
-+ * Copyright (c) 2016 Stefan O'Rear
 + * Copyright (c) 2017 SiFive, Inc.
 + *
 + * This program is free software; you can redistribute it and/or modify it
@@ -253,56 +160,23 @@ index 0000000..504f18a
 + * this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#ifndef HW_SIFIVE_UART_H
-+#define HW_SIFIVE_UART_H
++#ifndef HW_SIFIVE_PRCI_H
++#define HW_SIFIVE_PRCI_H
 +
-+enum {
-+    SIFIVE_UART_TXFIFO        = 0,
-+    SIFIVE_UART_RXFIFO        = 4,
-+    SIFIVE_UART_TXCTRL        = 8,
-+    SIFIVE_UART_TXMARK        = 10,
-+    SIFIVE_UART_RXCTRL        = 12,
-+    SIFIVE_UART_RXMARK        = 14,
-+    SIFIVE_UART_IE            = 16,
-+    SIFIVE_UART_IP            = 20,
-+    SIFIVE_UART_DIV           = 24,
-+    SIFIVE_UART_MAX           = 32
-+};
++#define TYPE_SIFIVE_PRCI "riscv.sifive.prci"
 +
-+enum {
-+    SIFIVE_UART_IE_TXWM       = 1, /* Transmit watermark interrupt enable */
-+    SIFIVE_UART_IE_RXWM       = 2  /* Receive watermark interrupt enable */
-+};
++#define SIFIVE_PRCI(obj) \
++    OBJECT_CHECK(SiFivePRCIState, (obj), TYPE_SIFIVE_PRCI)
 +
-+enum {
-+    SIFIVE_UART_IP_TXWM       = 1, /* Transmit watermark interrupt pending */
-+    SIFIVE_UART_IP_RXWM       = 2  /* Receive watermark interrupt pending */
-+};
-+
-+#define TYPE_SIFIVE_UART "riscv.sifive.uart"
-+
-+#define SIFIVE_UART(obj) \
-+    OBJECT_CHECK(SiFiveUARTState, (obj), TYPE_SIFIVE_UART)
-+
-+typedef struct SiFiveUARTState {
++typedef struct SiFivePRCIState {
 +    /*< private >*/
 +    SysBusDevice parent_obj;
 +
 +    /*< public >*/
-+    qemu_irq irq;
 +    MemoryRegion mmio;
-+    CharBackend chr;
-+    uint8_t rx_fifo[8];
-+    unsigned int rx_fifo_len;
-+    uint32_t ie;
-+    uint32_t ip;
-+    uint32_t txctrl;
-+    uint32_t rxctrl;
-+    uint32_t div;
-+} SiFiveUARTState;
++} SiFivePRCIState;
 +
-+SiFiveUARTState *sifive_uart_create(MemoryRegion *address_space, hwaddr base,
-+    Chardev *chr, qemu_irq irq);
++DeviceState *sifive_prci_create(hwaddr addr);
 +
 +#endif
 -- 
