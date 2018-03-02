@@ -1,41 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ergpR-0004pI-RY
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 04:18:15 -0500
+	(envelope-from <stefanha@redhat.com>) id 1erguq-0006Ci-Ki
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 04:23:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ergpO-0007Rl-El
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 04:18:13 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55712
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1ergpO-0007RS-89
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 04:18:10 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w229Erwn106710
-	for <qemu-devel@nongnu.org>; Fri, 2 Mar 2018 04:18:09 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gf3p28h33-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 04:18:09 -0500
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 2 Mar 2018 09:18:06 -0000
-References: <1519407778-23095-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-	<1519407778-23095-3-git-send-email-imbrenda@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 2 Mar 2018 10:18:03 +0100
+	(envelope-from <stefanha@redhat.com>) id 1ergun-0003YY-C2
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 04:23:48 -0500
+Date: Fri, 2 Mar 2018 09:23:18 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180302092318.GA6026@stefanha-x1.localdomain>
+References: <079a5da7-6586-b974-6b99-e5de055b1bd1@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <1519407778-23095-3-git-send-email-imbrenda@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <85bf913f-9179-0bab-932f-cda765b48007@de.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 2/3] s390x/sclp: clean up
- sclp masks
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="+HP7ph2BbKc20aGI"
+Content-Disposition: inline
+In-Reply-To: <079a5da7-6586-b974-6b99-e5de055b1bd1@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [BUG] I/O thread segfault for QEMU on s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,227 +23,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, cohuck@redhat.com
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Farhan Ali <alifm@linux.vnet.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mreitz@redhat.com, famz@redhat.com, QEMU Developers <qemu-devel@nongnu.org>, "open list:virtio-ccw" <qemu-s390x@nongnu.org>
 
 
+--+HP7ph2BbKc20aGI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 02/23/2018 06:42 PM, Claudio Imbrenda wrote:
-> Introduce an sccb_mask_t to be used for SCLP event masks instead of just
-> unsigned int or uint32_t. This will allow later to extend the mask with
-> more ease.
-> 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-Certainly a sane cleanup, especially the use if the SCLP_EVMASK.
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+On Thu, Mar 01, 2018 at 09:33:35AM -0500, Farhan Ali wrote:
+> Hi,
+>=20
+> I have been noticing some segfaults for QEMU on s390x, and I have been
+> hitting this issue quite reliably (at least once in 10 runs of a test cas=
+e).
+> The qemu version is 2.11.50, and I have systemd created coredumps
+> when this happens.
+>=20
+> Here is a back trace of the segfaulting thread:
 
-> ---
->  hw/char/sclpconsole-lm.c          |  4 ++--
->  hw/char/sclpconsole.c             |  4 ++--
->  hw/s390x/event-facility.c         | 20 ++++++++++----------
->  hw/s390x/sclpcpu.c                |  4 ++--
->  hw/s390x/sclpquiesce.c            |  4 ++--
->  include/hw/s390x/event-facility.h | 22 +++++++++++++---------
->  6 files changed, 31 insertions(+), 27 deletions(-)
-> 
-> diff --git a/hw/char/sclpconsole-lm.c b/hw/char/sclpconsole-lm.c
-> index c500bda..cc4d70a 100644
-> --- a/hw/char/sclpconsole-lm.c
-> +++ b/hw/char/sclpconsole-lm.c
-> @@ -102,12 +102,12 @@ static bool can_handle_event(uint8_t type)
->      return type == SCLP_EVENT_MESSAGE || type == SCLP_EVENT_PMSGCMD;
->  }
-> 
-> -static unsigned int send_mask(void)
-> +static sccb_mask_t send_mask(void)
->  {
->      return SCLP_EVENT_MASK_OP_CMD | SCLP_EVENT_MASK_PMSGCMD;
->  }
-> 
-> -static unsigned int receive_mask(void)
-> +static sccb_mask_t receive_mask(void)
->  {
->      return SCLP_EVENT_MASK_MSG | SCLP_EVENT_MASK_PMSGCMD;
->  }
-> diff --git a/hw/char/sclpconsole.c b/hw/char/sclpconsole.c
-> index d0265df..ec9db13 100644
-> --- a/hw/char/sclpconsole.c
-> +++ b/hw/char/sclpconsole.c
-> @@ -83,12 +83,12 @@ static bool can_handle_event(uint8_t type)
->      return type == SCLP_EVENT_ASCII_CONSOLE_DATA;
->  }
-> 
-> -static unsigned int send_mask(void)
-> +static sccb_mask_t send_mask(void)
->  {
->      return SCLP_EVENT_MASK_MSG_ASCII;
->  }
-> 
-> -static unsigned int receive_mask(void)
-> +static sccb_mask_t receive_mask(void)
->  {
->      return SCLP_EVENT_MASK_MSG_ASCII;
->  }
-> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-> index 9233892..e04ed9f 100644
-> --- a/hw/s390x/event-facility.c
-> +++ b/hw/s390x/event-facility.c
-> @@ -29,8 +29,8 @@ typedef struct SCLPEventsBus {
->  struct SCLPEventFacility {
->      SysBusDevice parent_obj;
->      SCLPEventsBus sbus;
-> -    /* guest' receive mask */
-> -    unsigned int receive_mask;
-> +    /* guest's receive mask */
-> +    sccb_mask_t receive_mask;
->      /*
->       * when false, we keep the same broken, backwards compatible behaviour as
->       * before, allowing only masks of size exactly 4; when true, we implement
-> @@ -61,9 +61,9 @@ static bool event_pending(SCLPEventFacility *ef)
->      return false;
->  }
-> 
-> -static unsigned int get_host_send_mask(SCLPEventFacility *ef)
-> +static sccb_mask_t get_host_send_mask(SCLPEventFacility *ef)
->  {
-> -    unsigned int mask;
-> +    sccb_mask_t mask;
->      BusChild *kid;
->      SCLPEventClass *child;
-> 
-> @@ -77,9 +77,9 @@ static unsigned int get_host_send_mask(SCLPEventFacility *ef)
->      return mask;
->  }
-> 
-> -static unsigned int get_host_receive_mask(SCLPEventFacility *ef)
-> +static sccb_mask_t get_host_receive_mask(SCLPEventFacility *ef)
->  {
-> -    unsigned int mask;
-> +    sccb_mask_t mask;
->      BusChild *kid;
->      SCLPEventClass *child;
-> 
-> @@ -189,7 +189,7 @@ out:
->  }
-> 
->  static uint16_t handle_sccb_read_events(SCLPEventFacility *ef, SCCB *sccb,
-> -                                        unsigned int mask)
-> +                                        sccb_mask_t mask)
->  {
->      uint16_t rc;
->      int slen;
-> @@ -242,8 +242,8 @@ static void copy_mask(uint8_t *dst, uint8_t *src, uint16_t dst_len,
-> 
->  static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
->  {
-> -    unsigned int sclp_active_selection_mask;
-> -    unsigned int sclp_cp_receive_mask;
-> +    sccb_mask_t sclp_active_selection_mask;
-> +    sccb_mask_t sclp_cp_receive_mask;
-> 
->      ReadEventData *red = (ReadEventData *) sccb;
-> 
-> @@ -285,7 +285,7 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
->  {
->      WriteEventMask *we_mask = (WriteEventMask *) sccb;
->      uint16_t mask_length = be16_to_cpu(we_mask->mask_length);
-> -    uint32_t tmp_mask;
-> +    sccb_mask_t tmp_mask;
-> 
->      if (!mask_length || (mask_length > SCLP_EVENT_MASK_LEN_MAX) ||
->          ((mask_length != 4) && !ef->allow_all_mask_sizes)) {
-> diff --git a/hw/s390x/sclpcpu.c b/hw/s390x/sclpcpu.c
-> index 3ee890b..50c021b 100644
-> --- a/hw/s390x/sclpcpu.c
-> +++ b/hw/s390x/sclpcpu.c
-> @@ -37,12 +37,12 @@ void raise_irq_cpu_hotplug(void)
->      sclp_service_interrupt(0);
->  }
-> 
-> -static unsigned int send_mask(void)
-> +static sccb_mask_t send_mask(void)
->  {
->      return SCLP_EVENT_MASK_CONFIG_MGT_DATA;
->  }
-> 
-> -static unsigned int receive_mask(void)
-> +static sccb_mask_t receive_mask(void)
->  {
->      return 0;
->  }
-> diff --git a/hw/s390x/sclpquiesce.c b/hw/s390x/sclpquiesce.c
-> index 0241643..1c8f5c9 100644
-> --- a/hw/s390x/sclpquiesce.c
-> +++ b/hw/s390x/sclpquiesce.c
-> @@ -28,12 +28,12 @@ static bool can_handle_event(uint8_t type)
->      return type == SCLP_EVENT_SIGNAL_QUIESCE;
->  }
-> 
-> -static unsigned int send_mask(void)
-> +static sccb_mask_t send_mask(void)
->  {
->      return SCLP_EVENT_MASK_SIGNAL_QUIESCE;
->  }
-> 
-> -static unsigned int receive_mask(void)
-> +static sccb_mask_t receive_mask(void)
->  {
->      return 0;
->  }
-> diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
-> index 5119b9b..0e2b761 100644
-> --- a/include/hw/s390x/event-facility.h
-> +++ b/include/hw/s390x/event-facility.h
-> @@ -28,12 +28,14 @@
->  #define SCLP_EVENT_SIGNAL_QUIESCE               0x1d
-> 
->  /* SCLP event masks */
-> -#define SCLP_EVENT_MASK_SIGNAL_QUIESCE          0x00000008
-> -#define SCLP_EVENT_MASK_MSG_ASCII               0x00000040
-> -#define SCLP_EVENT_MASK_CONFIG_MGT_DATA         0x10000000
-> -#define SCLP_EVENT_MASK_OP_CMD                  0x80000000
-> -#define SCLP_EVENT_MASK_MSG                     0x40000000
-> -#define SCLP_EVENT_MASK_PMSGCMD                 0x00800000
-> +#define SCLP_EVMASK(T)  (1ULL << (sizeof(sccb_mask_t) * 8 - (T)))
-> +
-> +#define SCLP_EVENT_MASK_OP_CMD          SCLP_EVMASK(SCLP_EVENT_OPRTNS_COMMAND)
-> +#define SCLP_EVENT_MASK_MSG             SCLP_EVMASK(SCLP_EVENT_MESSAGE)
-> +#define SCLP_EVENT_MASK_CONFIG_MGT_DATA SCLP_EVMASK(SCLP_EVENT_CONFIG_MGT_DATA)
-> +#define SCLP_EVENT_MASK_PMSGCMD         SCLP_EVMASK(SCLP_EVENT_PMSGCMD)
-> +#define SCLP_EVENT_MASK_MSG_ASCII       SCLP_EVMASK(SCLP_EVENT_ASCII_CONSOLE_DATA)
-> +#define SCLP_EVENT_MASK_SIGNAL_QUIESCE  SCLP_EVMASK(SCLP_EVENT_SIGNAL_QUIESCE)
-> 
->  #define SCLP_UNCONDITIONAL_READ                 0x00
->  #define SCLP_SELECTIVE_READ                     0x01
-> @@ -71,6 +73,8 @@ typedef struct WriteEventMask {
->  #define WEM_RECEIVE_MASK(wem, mask_len) ((wem)->masks + 2 * (mask_len))
->  #define WEM_SEND_MASK(wem, mask_len) ((wem)->masks + 3 * (mask_len))
-> 
-> +typedef uint32_t sccb_mask_t;
-> +
->  typedef struct EventBufferHeader {
->      uint16_t length;
->      uint8_t  type;
-> @@ -160,7 +164,7 @@ typedef struct WriteEventData {
->  typedef struct ReadEventData {
->      SCCBHeader h;
->      union {
-> -        uint32_t mask;
-> +        sccb_mask_t mask;
->          EventBufferHeader ebh;
->      };
->  } QEMU_PACKED ReadEventData;
-> @@ -177,10 +181,10 @@ typedef struct SCLPEventClass {
->      int (*exit)(SCLPEvent *event);
-> 
->      /* get SCLP's send mask */
-> -    unsigned int (*get_send_mask)(void);
-> +    sccb_mask_t (*get_send_mask)(void);
-> 
->      /* get SCLP's receive mask */
-> -    unsigned int (*get_receive_mask)(void);
-> +    sccb_mask_t (*get_receive_mask)(void);
-> 
->      int (*read_event_data)(SCLPEvent *event, EventBufferHeader *evt_buf_hdr,
->                             int *slen);
-> 
+The backtrace looks normal.
+
+Please post the QEMU command-line and the details of the segfault (which
+memory access faulted?).
+
+> #0  0x000003ffafed202c in swapcontext () from /lib64/libc.so.6
+> #1  0x000002aa355c02ee in qemu_coroutine_new () at
+> util/coroutine-ucontext.c:164
+> #2  0x000002aa355bec34 in qemu_coroutine_create
+> (entry=3Dentry@entry=3D0x2aa3550f7a8 <blk_aio_read_entry>,
+> opaque=3Dopaque@entry=3D0x3ffa002afa0) at util/qemu-coroutine.c:76
+> #3  0x000002aa35510262 in blk_aio_prwv (blk=3D0x2aa65fbefa0, offset=3D<op=
+timized
+> out>, bytes=3D<optimized out>, qiov=3D0x3ffa002a9c0,
+> co_entry=3Dco_entry@entry=3D0x2aa3550f7a8 <blk_aio_read_entry>, flags=3D0,
+>     cb=3D0x2aa35340a50 <virtio_blk_rw_complete>, opaque=3D0x3ffa002a960) =
+at
+> block/block-backend.c:1299
+> #4  0x000002aa35510376 in blk_aio_preadv (blk=3D<optimized out>,
+> offset=3D<optimized out>, qiov=3D<optimized out>, flags=3D<optimized out>,
+> cb=3D<optimized out>, opaque=3D0x3ffa002a960) at block/block-backend.c:13=
+92
+> #5  0x000002aa3534114e in submit_requests (niov=3D<optimized out>,
+> num_reqs=3D<optimized out>, start=3D<optimized out>, mrb=3D<optimized out=
+>,
+> blk=3D<optimized out>) at
+> /usr/src/debug/qemu-2.11.50/hw/block/virtio-blk.c:372
+> #6  virtio_blk_submit_multireq (blk=3D<optimized out>,
+> mrb=3Dmrb@entry=3D0x3ffad77e640) at
+> /usr/src/debug/qemu-2.11.50/hw/block/virtio-blk.c:402
+> #7  0x000002aa353422e0 in virtio_blk_handle_vq (s=3D0x2aa6611e7d8,
+> vq=3D0x3ffb0f5f010) at /usr/src/debug/qemu-2.11.50/hw/block/virtio-blk.c:=
+620
+> #8  0x000002aa3536655a in virtio_queue_notify_aio_vq
+> (vq=3Dvq@entry=3D0x3ffb0f5f010) at
+> /usr/src/debug/qemu-2.11.50/hw/virtio/virtio.c:1515
+> #9  0x000002aa35366cd6 in virtio_queue_notify_aio_vq (vq=3D0x3ffb0f5f010)=
+ at
+> /usr/src/debug/qemu-2.11.50/hw/virtio/virtio.c:1511
+> #10 virtio_queue_host_notifier_aio_poll (opaque=3D0x3ffb0f5f078) at
+> /usr/src/debug/qemu-2.11.50/hw/virtio/virtio.c:2409
+> #11 0x000002aa355a8ba4 in run_poll_handlers_once
+> (ctx=3Dctx@entry=3D0x2aa65f99310) at util/aio-posix.c:497
+> #12 0x000002aa355a9b74 in run_poll_handlers (max_ns=3D<optimized out>,
+> ctx=3D0x2aa65f99310) at util/aio-posix.c:534
+> #13 try_poll_mode (blocking=3Dtrue, ctx=3D0x2aa65f99310) at util/aio-posi=
+x.c:562
+> #14 aio_poll (ctx=3D0x2aa65f99310, blocking=3Dblocking@entry=3Dtrue) at
+> util/aio-posix.c:602
+> #15 0x000002aa353d2d0a in iothread_run (opaque=3D0x2aa65f990f0) at
+> iothread.c:60
+> #16 0x000003ffb0f07e82 in start_thread () from /lib64/libpthread.so.0
+> #17 0x000003ffaff91596 in thread_start () from /lib64/libc.so.6
+>=20
+>=20
+> I don't have much knowledge about i/o threads and the block layer code in
+> QEMU, so I would like to report to the community about this issue.
+> I believe this very similar to the bug that I reported upstream couple of
+> days ago
+> (https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg04452.html).
+>=20
+> Any help would be greatly appreciated.
+>=20
+> Thanks
+> Farhan
+>=20
+
+--+HP7ph2BbKc20aGI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJamRgGAAoJEJykq7OBq3PI/+EH/R/cAJDMD+oDd/B+tK9u3n3E
+KZdSeMO3/D9fkxZblUq+GpNix5+OtXZy1ca66GiiYq52yuJ+gf0pYgMyZGUq3DuZ
+Om2emUDq5W9+YpyLX9Cc7UxvOHxcDxWLv+nOm9gq+HWf+yEhoy7j0IxVh3bXmJf0
+1lv3gAnYWbE/P0ANMJAY4LFdDU+ZaaONLKksOH+tXM+PsJgKolKi/7UJO/AWyiwx
+XHtlAQo7GJyznAoJtWBiKQ9tK10WrnFv6JchwtoVLliFyFKNOOZhvK2vTyC32lLB
+NL4XtmCjJ3d4yDI+GGI3RjRxh3pOroH7e5Y6Wc5WQLZxfZv3CnEUUysJ6cZmXvI=
+=phVF
+-----END PGP SIGNATURE-----
+
+--+HP7ph2BbKc20aGI--
