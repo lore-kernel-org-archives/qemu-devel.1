@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1erdnf-0000mI-8S
+	(envelope-from <dgibson@ozlabs.org>) id 1erdng-0000mN-Gk
 	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1erdna-000451-96
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:11 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1erdnc-0004A4-PM
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:12 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  2 Mar 2018 17:03:40 +1100
-Message-Id: <20180302060350.24330-15-david@gibson.dropbear.id.au>
+Date: Fri,  2 Mar 2018 17:03:48 +1100
+Message-Id: <20180302060350.24330-23-david@gibson.dropbear.id.au>
 In-Reply-To: <20180302060350.24330-1-david@gibson.dropbear.id.au>
 References: <20180302060350.24330-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 14/24] openpic: move OpenPIC state and related
- definitions to openpic.h
+Subject: [Qemu-devel] [PULL 22/24] ppc/spapr-caps: Convert cap-ibs to custom
+ spapr-cap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,387 +21,200 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, groug@kaod.org, surajjs@au1.ibm.com, mark.cave-ayland@ilande.co.uk, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, groug@kaod.org, surajjs@au1.ibm.com, mark.cave-ayland@ilande.co.uk, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-This is to faciliate access to OpenPICState when wiring up the PIC to the macio
-controller.
+Convert cap-ibs (indirect branch speculation) to a custom spapr-cap
+type.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+All tristate caps have now been converted to custom spapr-caps, so
+remove the remaining support for them.
+
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+[dwg: Don't explicitly list "?"/help option, trust convention]
+[dwg: Fold tristate removal into here, to not break bisect]
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/openpic.c        | 157 ----------------------------------------------
- include/hw/ppc/openpic.h | 159 ++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 158 insertions(+), 158 deletions(-)
+ hw/ppc/spapr_caps.c    | 81 ++++++++++----------------------------------------
+ hw/ppc/spapr_hcall.c   |  5 +++-
+ include/hw/ppc/spapr.h |  5 +++-
+ target/ppc/kvm.c       |  6 ++--
+ 4 files changed, 28 insertions(+), 69 deletions(-)
 
-diff --git a/hw/intc/openpic.c b/hw/intc/openpic.c
-index 9159a06f07..811cee9b26 100644
---- a/hw/intc/openpic.c
-+++ b/hw/intc/openpic.c
-@@ -63,10 +63,6 @@ static int get_current_cpu(void);
-         } \
-     } while (0)
- 
--#define MAX_CPU     32
--#define MAX_MSI     8
--#define VID         0x03 /* MPIC version ID */
--
- /* OpenPIC capability flags */
- #define OPENPIC_FLAG_IDR_CRIT     (1 << 0)
- #define OPENPIC_FLAG_ILR          (2 << 0)
-@@ -85,35 +81,6 @@ static int get_current_cpu(void);
- #define OPENPIC_CPU_REG_START        0x20000
- #define OPENPIC_CPU_REG_SIZE         0x100 + ((MAX_CPU - 1) * 0x1000)
- 
--/* Raven */
--#define RAVEN_MAX_CPU      2
--#define RAVEN_MAX_EXT     48
--#define RAVEN_MAX_IRQ     64
--#define RAVEN_MAX_TMR      OPENPIC_MAX_TMR
--#define RAVEN_MAX_IPI      OPENPIC_MAX_IPI
--
--/* KeyLargo */
--#define KEYLARGO_MAX_CPU  4
--#define KEYLARGO_MAX_EXT  64
--#define KEYLARGO_MAX_IPI  4
--#define KEYLARGO_MAX_IRQ  (64 + KEYLARGO_MAX_IPI)
--#define KEYLARGO_MAX_TMR  0
--#define KEYLARGO_IPI_IRQ  (KEYLARGO_MAX_EXT) /* First IPI IRQ */
--/* Timers don't exist but this makes the code happy... */
--#define KEYLARGO_TMR_IRQ  (KEYLARGO_IPI_IRQ + KEYLARGO_MAX_IPI)
--
--/* Interrupt definitions */
--#define RAVEN_FE_IRQ     (RAVEN_MAX_EXT)     /* Internal functional IRQ */
--#define RAVEN_ERR_IRQ    (RAVEN_MAX_EXT + 1) /* Error IRQ */
--#define RAVEN_TMR_IRQ    (RAVEN_MAX_EXT + 2) /* First timer IRQ */
--#define RAVEN_IPI_IRQ    (RAVEN_TMR_IRQ + RAVEN_MAX_TMR) /* First IPI IRQ */
--/* First doorbell IRQ */
--#define RAVEN_DBL_IRQ    (RAVEN_IPI_IRQ + (RAVEN_MAX_CPU * RAVEN_MAX_IPI))
--
--typedef struct FslMpicInfo {
--    int max_ext;
--} FslMpicInfo;
--
- static FslMpicInfo fsl_mpic_20 = {
-     .max_ext = 12,
- };
-@@ -211,55 +178,6 @@ static void openpic_cpu_write_internal(void *opaque, hwaddr addr,
-                                        uint32_t val, int idx);
- static void openpic_reset(DeviceState *d);
- 
--typedef enum IRQType {
--    IRQ_TYPE_NORMAL = 0,
--    IRQ_TYPE_FSLINT,        /* FSL internal interrupt -- level only */
--    IRQ_TYPE_FSLSPECIAL,    /* FSL timer/IPI interrupt, edge, no polarity */
--} IRQType;
--
--/* Round up to the nearest 64 IRQs so that the queue length
-- * won't change when moving between 32 and 64 bit hosts.
-- */
--#define IRQQUEUE_SIZE_BITS ((OPENPIC_MAX_IRQ + 63) & ~63)
--
--typedef struct IRQQueue {
--    unsigned long *queue;
--    int32_t queue_size; /* Only used for VMSTATE_BITMAP */
--    int next;
--    int priority;
--} IRQQueue;
--
--typedef struct IRQSource {
--    uint32_t ivpr;  /* IRQ vector/priority register */
--    uint32_t idr;   /* IRQ destination register */
--    uint32_t destmask; /* bitmap of CPU destinations */
--    int last_cpu;
--    int output;     /* IRQ level, e.g. OPENPIC_OUTPUT_INT */
--    int pending;    /* TRUE if IRQ is pending */
--    IRQType type;
--    bool level:1;   /* level-triggered */
--    bool nomask:1;  /* critical interrupts ignore mask on some FSL MPICs */
--} IRQSource;
--
--#define IVPR_MASK_SHIFT       31
--#define IVPR_MASK_MASK        (1U << IVPR_MASK_SHIFT)
--#define IVPR_ACTIVITY_SHIFT   30
--#define IVPR_ACTIVITY_MASK    (1U << IVPR_ACTIVITY_SHIFT)
--#define IVPR_MODE_SHIFT       29
--#define IVPR_MODE_MASK        (1U << IVPR_MODE_SHIFT)
--#define IVPR_POLARITY_SHIFT   23
--#define IVPR_POLARITY_MASK    (1U << IVPR_POLARITY_SHIFT)
--#define IVPR_SENSE_SHIFT      22
--#define IVPR_SENSE_MASK       (1U << IVPR_SENSE_SHIFT)
--
--#define IVPR_PRIORITY_MASK     (0xFU << 16)
--#define IVPR_PRIORITY(_ivprr_) ((int)(((_ivprr_) & IVPR_PRIORITY_MASK) >> 16))
--#define IVPR_VECTOR(opp, _ivprr_) ((_ivprr_) & (opp)->vector_mask)
--
--/* IDR[EP/CI] are only for FSL MPIC prior to v4.0 */
--#define IDR_EP      0x80000000  /* external pin */
--#define IDR_CI      0x40000000  /* critical interrupt */
--
- /* Convert between openpic clock ticks and nanosecs.  In the hardware the clock
-    frequency is driven by board inputs to the PIC which the PIC would then
-    divide by 4 or 8.  For now hard code to 25MZ.
-@@ -275,81 +193,6 @@ static inline uint64_t ticks_to_ns(uint64_t ticks)
-     return ticks * OPENPIC_TIMER_NS_PER_TICK;
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index f75d6ff211..c09febcf12 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -89,65 +89,6 @@ static void spapr_cap_set_bool(Object *obj, Visitor *v, const char *name,
+     spapr->eff.caps[cap->index] = value ? SPAPR_CAP_ON : SPAPR_CAP_OFF;
  }
  
--typedef struct OpenPICTimer {
--    uint32_t tccr;  /* Global timer current count register */
--    uint32_t tbcr;  /* Global timer base count register */
--    int                   n_IRQ;
--    bool                  qemu_timer_active; /* Is the qemu_timer is running? */
--    struct QEMUTimer     *qemu_timer;
--    struct OpenPICState  *opp;          /* Device timer is part of. */
--    /* The QEMU_CLOCK_VIRTUAL time (in ns) corresponding to the last
--       current_count written or read, only defined if qemu_timer_active. */
--    uint64_t              origin_time;
--} OpenPICTimer;
+-static void spapr_cap_get_tristate(Object *obj, Visitor *v, const char *name,
+-                                   void *opaque, Error **errp)
+-{
+-    sPAPRCapabilityInfo *cap = opaque;
+-    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+-    char *val = NULL;
+-    uint8_t value = spapr_get_cap(spapr, cap->index);
 -
--typedef struct OpenPICMSI {
--    uint32_t msir;   /* Shared Message Signaled Interrupt Register */
--} OpenPICMSI;
+-    switch (value) {
+-    case SPAPR_CAP_BROKEN:
+-        val = g_strdup("broken");
+-        break;
+-    case SPAPR_CAP_WORKAROUND:
+-        val = g_strdup("workaround");
+-        break;
+-    case SPAPR_CAP_FIXED:
+-        val = g_strdup("fixed");
+-        break;
+-    default:
+-        error_setg(errp, "Invalid value (%d) for cap-%s", value, cap->name);
+-        return;
+-    }
 -
--typedef struct IRQDest {
--    int32_t ctpr; /* CPU current task priority */
--    IRQQueue raised;
--    IRQQueue servicing;
--    qemu_irq *irqs;
+-    visit_type_str(v, name, &val, errp);
+-    g_free(val);
+-}
 -
--    /* Count of IRQ sources asserting on non-INT outputs */
--    uint32_t outputs_active[OPENPIC_OUTPUT_NB];
--} IRQDest;
+-static void spapr_cap_set_tristate(Object *obj, Visitor *v, const char *name,
+-                                   void *opaque, Error **errp)
+-{
+-    sPAPRCapabilityInfo *cap = opaque;
+-    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+-    char *val;
+-    Error *local_err = NULL;
+-    uint8_t value;
 -
--#define OPENPIC(obj) OBJECT_CHECK(OpenPICState, (obj), TYPE_OPENPIC)
+-    visit_type_str(v, name, &val, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        return;
+-    }
 -
--typedef struct OpenPICState {
--    /*< private >*/
--    SysBusDevice parent_obj;
--    /*< public >*/
+-    if (!strcasecmp(val, "broken")) {
+-        value = SPAPR_CAP_BROKEN;
+-    } else if (!strcasecmp(val, "workaround")) {
+-        value = SPAPR_CAP_WORKAROUND;
+-    } else if (!strcasecmp(val, "fixed")) {
+-        value = SPAPR_CAP_FIXED;
+-    } else {
+-        error_setg(errp, "Invalid capability mode \"%s\" for cap-%s", val,
+-                   cap->name);
+-        goto out;
+-    }
 -
--    MemoryRegion mem;
--
--    /* Behavior control */
--    FslMpicInfo *fsl;
--    uint32_t model;
--    uint32_t flags;
--    uint32_t nb_irqs;
--    uint32_t vid;
--    uint32_t vir; /* Vendor identification register */
--    uint32_t vector_mask;
--    uint32_t tfrr_reset;
--    uint32_t ivpr_reset;
--    uint32_t idr_reset;
--    uint32_t brr1;
--    uint32_t mpic_mode_mask;
--
--    /* Sub-regions */
--    MemoryRegion sub_io_mem[6];
--
--    /* Global registers */
--    uint32_t frr; /* Feature reporting register */
--    uint32_t gcr; /* Global configuration register  */
--    uint32_t pir; /* Processor initialization register */
--    uint32_t spve; /* Spurious vector register */
--    uint32_t tfrr; /* Timer frequency reporting register */
--    /* Source registers */
--    IRQSource src[OPENPIC_MAX_IRQ];
--    /* Local registers per output pin */
--    IRQDest dst[MAX_CPU];
--    uint32_t nb_cpus;
--    /* Timer registers */
--    OpenPICTimer timers[OPENPIC_MAX_TMR];
--    uint32_t max_tmr;
--
--    /* Shared MSI registers */
--    OpenPICMSI msi[MAX_MSI];
--    uint32_t max_irq;
--    uint32_t irq_ipi0;
--    uint32_t irq_tim0;
--    uint32_t irq_msi;
--} OpenPICState;
--
- static inline void IRQ_setbit(IRQQueue *q, int n_IRQ)
+-    spapr->cmd_line_caps[cap->index] = true;
+-    spapr->eff.caps[cap->index] = value;
+-out:
+-    g_free(val);
+-}
+ 
+ static void  spapr_cap_get_string(Object *obj, Visitor *v, const char *name,
+                                   void *opaque, Error **errp)
+@@ -286,16 +227,25 @@ static void cap_safe_bounds_check_apply(sPAPRMachineState *spapr, uint8_t val,
+     }
+ }
+ 
++sPAPRCapPossible cap_ibs_possible = {
++    .num = 4,
++    /* Note workaround only maintained for compatibility */
++    .vals = {"broken", "workaround", "fixed-ibs", "fixed-ccd"},
++    .help = "broken - no protection, fixed-ibs - indirect branch serialisation, fixed-ccd - cache count disabled",
++};
++
+ static void cap_safe_indirect_branch_apply(sPAPRMachineState *spapr,
+                                            uint8_t val, Error **errp)
  {
-     set_bit(n_IRQ, q->queue);
-diff --git a/include/hw/ppc/openpic.h b/include/hw/ppc/openpic.h
-index 693e981965..5eb982197d 100644
---- a/include/hw/ppc/openpic.h
-+++ b/include/hw/ppc/openpic.h
-@@ -2,10 +2,13 @@
- #define OPENPIC_H
++    uint8_t kvm_val = kvmppc_get_cap_safe_indirect_branch();
++
+     if (val == SPAPR_CAP_WORKAROUND) { /* Can only be Broken or Fixed */
+-        error_setg(errp, "Requested safe indirect branch capability level \"workaround\" not valid, try cap-ibs=fixed");
++        error_setg(errp, "Requested safe indirect branch capability level \"workaround\" not valid, try cap-ibs=%s", cap_ibs_possible.vals[kvm_val]);
+     } else if (tcg_enabled() && val) {
+         /* TODO - for now only allow broken for TCG */
+         error_setg(errp, "Requested safe indirect branch capability level not supported by tcg, try a different value for cap-ibs");
+-    } else if (kvm_enabled() && (val > kvmppc_get_cap_safe_indirect_branch())) {
+-        error_setg(errp, "Requested safe indirect branch capability level not supported by kvm, try a different value for cap-ibs");
++    } else if (kvm_enabled() && val && (val != kvm_val)) {
++        error_setg(errp, "Requested safe indirect branch capability level not supported by kvm, try cap-ibs=%s", cap_ibs_possible.vals[kvm_val]);
+     }
+ }
  
- #include "qemu-common.h"
-+#include "hw/sysbus.h"
- #include "hw/qdev-core.h"
- #include "qom/cpu.h"
+@@ -351,11 +301,12 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+     },
+     [SPAPR_CAP_IBS] = {
+         .name = "ibs",
+-        .description = "Indirect Branch Serialisation (broken, fixed)",
++        .description = "Indirect Branch Speculation (broken, fixed-ibs, fixed-ccd)",
+         .index = SPAPR_CAP_IBS,
+-        .get = spapr_cap_get_tristate,
+-        .set = spapr_cap_set_tristate,
++        .get = spapr_cap_get_string,
++        .set = spapr_cap_set_string,
+         .type = "string",
++        .possible = &cap_ibs_possible,
+         .apply = cap_safe_indirect_branch_apply,
+     },
+ };
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 1986560480..16bccdd5c0 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1705,7 +1705,10 @@ static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
+     }
  
--#define TYPE_OPENPIC "openpic"
-+#define MAX_CPU     32
-+#define MAX_MSI     8
-+#define VID         0x03 /* MPIC version ID */
+     switch (safe_indirect_branch) {
+-    case SPAPR_CAP_FIXED:
++    case SPAPR_CAP_FIXED_CCD:
++        characteristics |= H_CPU_CHAR_CACHE_COUNT_DIS;
++        break;
++    case SPAPR_CAP_FIXED_IBS:
+         characteristics |= H_CPU_CHAR_BCCTRL_SERIALISED;
+         break;
+     default: /* broken */
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 36942b378d..d60b7c6d7a 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -75,10 +75,12 @@ typedef enum {
+ /* Bool Caps */
+ #define SPAPR_CAP_OFF                   0x00
+ #define SPAPR_CAP_ON                    0x01
+-/* Broken | Workaround | Fixed Caps */
++/* Custom Caps */
+ #define SPAPR_CAP_BROKEN                0x00
+ #define SPAPR_CAP_WORKAROUND            0x01
+ #define SPAPR_CAP_FIXED                 0x02
++#define SPAPR_CAP_FIXED_IBS             0x02
++#define SPAPR_CAP_FIXED_CCD             0x03
  
- /* OpenPIC have 5 outputs per CPU connected and one IRQ out single output */
- enum {
-@@ -28,4 +31,158 @@ enum {
- #define OPENPIC_MAX_IRQ     (OPENPIC_MAX_SRC + OPENPIC_MAX_IPI + \
-                              OPENPIC_MAX_TMR)
+ typedef struct sPAPRCapabilities sPAPRCapabilities;
+ struct sPAPRCapabilities {
+@@ -313,6 +315,7 @@ struct sPAPRMachineState {
+ #define H_CPU_CHAR_L1D_THREAD_PRIV              PPC_BIT(4)
+ #define H_CPU_CHAR_HON_BRANCH_HINTS             PPC_BIT(5)
+ #define H_CPU_CHAR_THR_RECONF_TRIG              PPC_BIT(6)
++#define H_CPU_CHAR_CACHE_COUNT_DIS              PPC_BIT(7)
+ #define H_CPU_BEHAV_FAVOUR_SECURITY             PPC_BIT(0)
+ #define H_CPU_BEHAV_L1D_FLUSH_PR                PPC_BIT(1)
+ #define H_CPU_BEHAV_BNDS_CHK_SPEC_BAR           PPC_BIT(2)
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 2c183f61e2..79a436a384 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -2494,8 +2494,10 @@ static void kvmppc_get_cpu_characteristics(KVMState *s)
+         cap_ppc_safe_bounds_check = 1;
+     }
+     /* Parse and set cap_ppc_safe_indirect_branch */
+-    if (c.character & c.character_mask & H_CPU_CHAR_BCCTRL_SERIALISED) {
+-        cap_ppc_safe_indirect_branch = 2;
++    if (c.character & c.character_mask & H_CPU_CHAR_CACHE_COUNT_DIS) {
++        cap_ppc_safe_indirect_branch = SPAPR_CAP_FIXED_CCD;
++    } else if (c.character & c.character_mask & H_CPU_CHAR_BCCTRL_SERIALISED) {
++        cap_ppc_safe_indirect_branch = SPAPR_CAP_FIXED_IBS;
+     }
+ }
  
-+/* Raven */
-+#define RAVEN_MAX_CPU      2
-+#define RAVEN_MAX_EXT     48
-+#define RAVEN_MAX_IRQ     64
-+#define RAVEN_MAX_TMR      OPENPIC_MAX_TMR
-+#define RAVEN_MAX_IPI      OPENPIC_MAX_IPI
-+
-+/* KeyLargo */
-+#define KEYLARGO_MAX_CPU  4
-+#define KEYLARGO_MAX_EXT  64
-+#define KEYLARGO_MAX_IPI  4
-+#define KEYLARGO_MAX_IRQ  (64 + KEYLARGO_MAX_IPI)
-+#define KEYLARGO_MAX_TMR  0
-+#define KEYLARGO_IPI_IRQ  (KEYLARGO_MAX_EXT) /* First IPI IRQ */
-+/* Timers don't exist but this makes the code happy... */
-+#define KEYLARGO_TMR_IRQ  (KEYLARGO_IPI_IRQ + KEYLARGO_MAX_IPI)
-+
-+/* Interrupt definitions */
-+#define RAVEN_FE_IRQ     (RAVEN_MAX_EXT)     /* Internal functional IRQ */
-+#define RAVEN_ERR_IRQ    (RAVEN_MAX_EXT + 1) /* Error IRQ */
-+#define RAVEN_TMR_IRQ    (RAVEN_MAX_EXT + 2) /* First timer IRQ */
-+#define RAVEN_IPI_IRQ    (RAVEN_TMR_IRQ + RAVEN_MAX_TMR) /* First IPI IRQ */
-+/* First doorbell IRQ */
-+#define RAVEN_DBL_IRQ    (RAVEN_IPI_IRQ + (RAVEN_MAX_CPU * RAVEN_MAX_IPI))
-+
-+typedef struct FslMpicInfo {
-+    int max_ext;
-+} FslMpicInfo;
-+
-+typedef enum IRQType {
-+    IRQ_TYPE_NORMAL = 0,
-+    IRQ_TYPE_FSLINT,        /* FSL internal interrupt -- level only */
-+    IRQ_TYPE_FSLSPECIAL,    /* FSL timer/IPI interrupt, edge, no polarity */
-+} IRQType;
-+
-+/* Round up to the nearest 64 IRQs so that the queue length
-+ * won't change when moving between 32 and 64 bit hosts.
-+ */
-+#define IRQQUEUE_SIZE_BITS ((OPENPIC_MAX_IRQ + 63) & ~63)
-+
-+typedef struct IRQQueue {
-+    unsigned long *queue;
-+    int32_t queue_size; /* Only used for VMSTATE_BITMAP */
-+    int next;
-+    int priority;
-+} IRQQueue;
-+
-+typedef struct IRQSource {
-+    uint32_t ivpr;  /* IRQ vector/priority register */
-+    uint32_t idr;   /* IRQ destination register */
-+    uint32_t destmask; /* bitmap of CPU destinations */
-+    int last_cpu;
-+    int output;     /* IRQ level, e.g. OPENPIC_OUTPUT_INT */
-+    int pending;    /* TRUE if IRQ is pending */
-+    IRQType type;
-+    bool level:1;   /* level-triggered */
-+    bool nomask:1;  /* critical interrupts ignore mask on some FSL MPICs */
-+} IRQSource;
-+
-+#define IVPR_MASK_SHIFT       31
-+#define IVPR_MASK_MASK        (1U << IVPR_MASK_SHIFT)
-+#define IVPR_ACTIVITY_SHIFT   30
-+#define IVPR_ACTIVITY_MASK    (1U << IVPR_ACTIVITY_SHIFT)
-+#define IVPR_MODE_SHIFT       29
-+#define IVPR_MODE_MASK        (1U << IVPR_MODE_SHIFT)
-+#define IVPR_POLARITY_SHIFT   23
-+#define IVPR_POLARITY_MASK    (1U << IVPR_POLARITY_SHIFT)
-+#define IVPR_SENSE_SHIFT      22
-+#define IVPR_SENSE_MASK       (1U << IVPR_SENSE_SHIFT)
-+
-+#define IVPR_PRIORITY_MASK     (0xFU << 16)
-+#define IVPR_PRIORITY(_ivprr_) ((int)(((_ivprr_) & IVPR_PRIORITY_MASK) >> 16))
-+#define IVPR_VECTOR(opp, _ivprr_) ((_ivprr_) & (opp)->vector_mask)
-+
-+/* IDR[EP/CI] are only for FSL MPIC prior to v4.0 */
-+#define IDR_EP      0x80000000  /* external pin */
-+#define IDR_CI      0x40000000  /* critical interrupt */
-+
-+typedef struct OpenPICTimer {
-+    uint32_t tccr;  /* Global timer current count register */
-+    uint32_t tbcr;  /* Global timer base count register */
-+    int                   n_IRQ;
-+    bool                  qemu_timer_active; /* Is the qemu_timer is running? */
-+    struct QEMUTimer     *qemu_timer;
-+    struct OpenPICState  *opp;          /* Device timer is part of. */
-+    /* The QEMU_CLOCK_VIRTUAL time (in ns) corresponding to the last
-+       current_count written or read, only defined if qemu_timer_active. */
-+    uint64_t              origin_time;
-+} OpenPICTimer;
-+
-+typedef struct OpenPICMSI {
-+    uint32_t msir;   /* Shared Message Signaled Interrupt Register */
-+} OpenPICMSI;
-+
-+typedef struct IRQDest {
-+    int32_t ctpr; /* CPU current task priority */
-+    IRQQueue raised;
-+    IRQQueue servicing;
-+    qemu_irq *irqs;
-+
-+    /* Count of IRQ sources asserting on non-INT outputs */
-+    uint32_t outputs_active[OPENPIC_OUTPUT_NB];
-+} IRQDest;
-+
-+#define TYPE_OPENPIC "openpic"
-+#define OPENPIC(obj) OBJECT_CHECK(OpenPICState, (obj), TYPE_OPENPIC)
-+
-+typedef struct OpenPICState {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+    /*< public >*/
-+
-+    MemoryRegion mem;
-+
-+    /* Behavior control */
-+    FslMpicInfo *fsl;
-+    uint32_t model;
-+    uint32_t flags;
-+    uint32_t nb_irqs;
-+    uint32_t vid;
-+    uint32_t vir; /* Vendor identification register */
-+    uint32_t vector_mask;
-+    uint32_t tfrr_reset;
-+    uint32_t ivpr_reset;
-+    uint32_t idr_reset;
-+    uint32_t brr1;
-+    uint32_t mpic_mode_mask;
-+
-+    /* Sub-regions */
-+    MemoryRegion sub_io_mem[6];
-+
-+    /* Global registers */
-+    uint32_t frr; /* Feature reporting register */
-+    uint32_t gcr; /* Global configuration register  */
-+    uint32_t pir; /* Processor initialization register */
-+    uint32_t spve; /* Spurious vector register */
-+    uint32_t tfrr; /* Timer frequency reporting register */
-+    /* Source registers */
-+    IRQSource src[OPENPIC_MAX_IRQ];
-+    /* Local registers per output pin */
-+    IRQDest dst[MAX_CPU];
-+    uint32_t nb_cpus;
-+    /* Timer registers */
-+    OpenPICTimer timers[OPENPIC_MAX_TMR];
-+    uint32_t max_tmr;
-+
-+    /* Shared MSI registers */
-+    OpenPICMSI msi[MAX_MSI];
-+    uint32_t max_irq;
-+    uint32_t irq_ipi0;
-+    uint32_t irq_tim0;
-+    uint32_t irq_msi;
-+} OpenPICState;
-+
- #endif /* OPENPIC_H */
 -- 
 2.14.3
