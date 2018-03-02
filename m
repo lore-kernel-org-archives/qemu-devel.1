@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1erotl-0005KP-HN
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:55:14 -0500
+	(envelope-from <alistai@xilinx.com>) id 1erov1-0006MI-4p
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:56:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1eroth-0001NG-Fr
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:55:13 -0500
-Date: Fri, 2 Mar 2018 18:55:07 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <CAFEAcA9ZRSX9FBwaiA8Th3mrO4KSOaDPqnH5F==5xNESOf+Dwg@mail.gmail.com>
-Message-ID: <alpine.BSF.2.21.1803021853180.78982@zero.eik.bme.hu>
-References: <20180302060350.24330-1-david@gibson.dropbear.id.au>
-	<CAFEAcA9ZRSX9FBwaiA8Th3mrO4KSOaDPqnH5F==5xNESOf+Dwg@mail.gmail.com>
+	(envelope-from <alistai@xilinx.com>) id 1eroux-00035X-Vj
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:56:31 -0500
+Received: from mail-sn1nam02on0042.outbound.protection.outlook.com
+	([104.47.36.42]:41904
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1eroux-00034W-Jb
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:56:27 -0500
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Fri, 2 Mar 2018 09:51:34 -0800
+Message-ID: <cover.1520013048.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 00/24] ppc-for-2.12 queue 20180302
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2 0/2] Add a property to set the ARM CPU core
+ count
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,63 +26,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, surajjs@au1.ibm.com, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com
 
-On Fri, 2 Mar 2018, Peter Maydell wrote:
-> On 2 March 2018 at 06:03, David Gibson <david@gibson.dropbear.id.au> wr=
-ote:
->> The following changes since commit 0dc8ae5e8e693737dfe65ba02d0c6eccb58=
-a9c67:
->>
->>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180301-v2'=
- into staging (2018-03-01 17:08:16 +0000)
->>
->> are available in the Git repository at:
->>
->>   git://github.com/dgibson/qemu.git tags/ppc-for-2.12-20180302
->>
->> for you to fetch changes up to 57ae75b2e401f1d04f37a8cd26212eb3134c51a=
-6:
->>
->>   hw/ppc/spapr,e500: Use new property "stdout-path" for boot console (=
-2018-03-02 12:24:44 +1100)
->>
->> ----------------------------------------------------------------
->> ppc patch queue 2018-03-02
->>
->> Here's the next batch of accumulated spapr and ppc patches.
->> Highlights are:
->>     * New Sam460ex machine type
->>     * Yet more fixes related to vcpu id allocation for spapr
->>     * Numerous macio cleanupsr
->>     * Some enhancements to the Spectre/Meltdown fixes for pseries,
->>       allowing use of a better mitigation for indirect branch based
->>       exploits
->>     * New pseries machine types with Spectre/Meltdown mitigations
->>       enabled (stop gap until libvirt and management understands the
->>       machine options)
->>     * A handful of other fixes
->>
->
-> Hi. This generates a compile error from some compilers in my test set
-> (I think just the older gccs):
->
-> /home/petmay01/linaro/qemu-for-merges/hw/ppc/ppc440_uc.c: In function
-> =E2=80=98ppc460ex_pcie_realize=E2=80=99:
-> /home/petmay01/linaro/qemu-for-merges/hw/ppc/ppc440_uc.c:1054:5:
-> error: =E2=80=98id=E2=80=99 may be used uninitialized in this function
-> [-Werror=3Dmaybe-uninitialized]
->     snprintf(buf, sizeof(buf), "pcie%d-io", id);
->     ^
-> cc1: all warnings being treated as errors
->
-> Looks like a valid complaint to me -- the realize function
-> should check that dcrn_base was set to a valid value, fail
-> realize if it wasn't, and have a 'default:' case in the
-> switch with g_assert_not_reached().
 
-I've sent an updated patch (v3) that should fix this.
+Add an ARM CPU property which allows us to set the ARM CPU core count.
 
-Thank you,
-BALATON Zoltan
+V2:
+ - Fix commit message and title.
+ - Move the core_count default setting logic to the arm_cpu_realize()
+   function.
+
+
+Alistair Francis (2):
+  target/arm: Add a core count property
+  hw/arm: Set the core count for Xilinx's ZynqMP
+
+ target/arm/cpu.h     | 5 +++++
+ hw/arm/xlnx-zynqmp.c | 2 ++
+ target/arm/cpu.c     | 6 ++++++
+ target/arm/cpu64.c   | 6 ++++--
+ 4 files changed, 17 insertions(+), 2 deletions(-)
+
+-- 
+2.14.1
