@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1erZvt-0002EM-D4
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 20:56:27 -0500
+	(envelope-from <peterx@redhat.com>) id 1erbcD-00082a-20
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 22:44:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1erZvq-0005lZ-8D
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 20:56:25 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2261 helo=huawei.com)
+	(envelope-from <peterx@redhat.com>) id 1erbc8-0006il-4x
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 22:44:13 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53904 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1erZvp-0005dO-Jq
-	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 20:56:22 -0500
-From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-Date: Fri, 2 Mar 2018 01:55:49 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7473ABBA1E9@DGGEMM505-MBS.china.huawei.com>
-References: <cover.1519714706.git.jianjay.zhou@huawei.com>
-	<bf09c8b0049f97485615916e91af556119475db8.1519714706.git.jianjay.zhou@huawei.com>
-	<20180301181601-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20180301181601-mutt-send-email-mst@kernel.org>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1erbc7-0006hf-VS
+	for qemu-devel@nongnu.org; Thu, 01 Mar 2018 22:44:08 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BDBE640FB658
+	for <qemu-devel@nongnu.org>; Fri,  2 Mar 2018 03:43:56 +0000 (UTC)
+Date: Fri, 2 Mar 2018 11:43:48 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180302034348.GT27381@xz-mi>
+References: <20180228164937.18450-1-dgilbert@redhat.com>
+	<20180301070150.GQ27381@xz-mi> <20180301153218.GI2994@work-vm>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v8 2/2] vhost: used_memslots refactoring
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180301153218.GI2994@work-vm>
+Subject: Re: [Qemu-devel] [PATCH] migration: Fix block failure cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,351 +33,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "imammedo@redhat.com" <imammedo@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "Liuzhe (Ahriy, Euler)" <liuzhe13@huawei.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 
-
-
-> -----Original Message-----
-> From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> Sent: Friday, March 02, 2018 12:17 AM
-> To: Zhoujian (jay) <jianjay.zhou@huawei.com>
-> Cc: qemu-devel@nongnu.org; imammedo@redhat.com; Huangweidong (C)
-> <weidong.huang@huawei.com>; wangxin (U) <wangxinxin.wang@huawei.com>; Gon=
-glei
-> (Arei) <arei.gonglei@huawei.com>; Liuzhe (Ahriy, Euler) <liuzhe13@huawei.=
-com>
-> Subject: Re: [PATCH v8 2/2] vhost: used_memslots refactoring
->=20
-> On Tue, Feb 27, 2018 at 03:10:05PM +0800, Jay Zhou wrote:
-> > Used_memslots is shared by vhost kernel and user, it is equal to
-> > dev->mem->nregions, which is correct for vhost kernel, but not for
-> > vhost user, the latter one uses memory regions that have file
-> > descriptor. E.g. a VM has a vhost-user NIC and 8(vhost user memslot
-> > upper limit) memory slots, it will be failed to hotplug a new DIMM
-> > device since vhost_has_free_slot() finds no free slot left. It should
-> > be successful if only part of memory slots have file descriptor, so
-> > setting used memslots for vhost-user and vhost-kernel respectively.
-> >
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
-> > Signed-off-by: Liuzhe <liuzhe13@huawei.com>
->=20
-> make check fails with this patch, I dropped it for now.
-
-Maybe something updated on the master tree affects this patch, will
-look into and resolve.
-
-Regards,
-Jay
-
->=20
-> > ---
-> >  hw/virtio/vhost-backend.c         | 15 +++++++-
-> >  hw/virtio/vhost-user.c            | 77 ++++++++++++++++++++++++++-----=
-----
-> ----
-> >  hw/virtio/vhost.c                 | 13 +++----
-> >  include/hw/virtio/vhost-backend.h |  6 ++-
-> >  4 files changed, 75 insertions(+), 36 deletions(-)
-> >
-> > diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
-> > index 7f09efa..59def69 100644
-> > --- a/hw/virtio/vhost-backend.c
-> > +++ b/hw/virtio/vhost-backend.c
-> > @@ -15,6 +15,8 @@
-> >  #include "hw/virtio/vhost-backend.h"
-> >  #include "qemu/error-report.h"
-> >
-> > +static unsigned int vhost_kernel_used_memslots;
-> > +
-> >  static int vhost_kernel_call(struct vhost_dev *dev, unsigned long int
-> request,
-> >                               void *arg)  { @@ -62,6 +64,11 @@ static
-> > int vhost_kernel_memslots_limit(struct vhost_dev *dev)
-> >      return limit;
-> >  }
-> >
-> > +static bool vhost_kernel_has_free_memslots(struct vhost_dev *dev) {
-> > +    return vhost_kernel_used_memslots <
-> > +vhost_kernel_memslots_limit(dev); }
-> > +
-> >  static int vhost_kernel_net_set_backend(struct vhost_dev *dev,
-> >                                          struct vhost_vring_file
-> > *file)  { @@ -233,11 +240,16 @@ static void
-> > vhost_kernel_set_iotlb_callback(struct vhost_dev *dev,
-> >          qemu_set_fd_handler((uintptr_t)dev->opaque, NULL, NULL,
-> > NULL);  }
-> >
-> > +static void vhost_kernel_set_used_memslots(struct vhost_dev *dev) {
-> > +    vhost_kernel_used_memslots =3D dev->mem->nregions; }
-> > +
-> >  static const VhostOps kernel_ops =3D {
-> >          .backend_type =3D VHOST_BACKEND_TYPE_KERNEL,
-> >          .vhost_backend_init =3D vhost_kernel_init,
-> >          .vhost_backend_cleanup =3D vhost_kernel_cleanup,
-> > -        .vhost_backend_memslots_limit =3D vhost_kernel_memslots_limit,
-> > +        .vhost_backend_has_free_memslots =3D
-> > + vhost_kernel_has_free_memslots,
-> >          .vhost_net_set_backend =3D vhost_kernel_net_set_backend,
-> >          .vhost_scsi_set_endpoint =3D vhost_kernel_scsi_set_endpoint,
-> >          .vhost_scsi_clear_endpoint =3D
-> > vhost_kernel_scsi_clear_endpoint, @@ -264,6 +276,7 @@ static const
-> > VhostOps kernel_ops =3D {  #endif /* CONFIG_VHOST_VSOCK */
-> >          .vhost_set_iotlb_callback =3D vhost_kernel_set_iotlb_callback,
-> >          .vhost_send_device_iotlb_msg =3D
-> > vhost_kernel_send_device_iotlb_msg,
-> > +        .vhost_set_used_memslots =3D vhost_kernel_set_used_memslots,
-> >  };
-> >
-> >  int vhost_set_backend_type(struct vhost_dev *dev, VhostBackendType
-> > backend_type) diff --git a/hw/virtio/vhost-user.c
-> > b/hw/virtio/vhost-user.c index 6eb9798..f732c80 100644
-> > --- a/hw/virtio/vhost-user.c
-> > +++ b/hw/virtio/vhost-user.c
-> > @@ -147,6 +147,8 @@ static VhostUserMsg m __attribute__ ((unused));
-> >  /* The version of the protocol we support */
-> >  #define VHOST_USER_VERSION    (0x1)
-> >
-> > +static bool vhost_user_free_memslots =3D true;
-> > +
-> >  struct vhost_user {
-> >      CharBackend *chr;
-> >      int slave_fd;
-> > @@ -314,12 +316,43 @@ static int vhost_user_set_log_base(struct vhost_d=
-ev
-> *dev, uint64_t base,
-> >      return 0;
-> >  }
-> >
-> > +static int vhost_user_prepare_msg(struct vhost_dev *dev, VhostUserMemo=
-ry
-> *mem,
-> > +                                  int *fds) {
-> > +    int i, fd;
-> > +
-> > +    vhost_user_free_memslots =3D true;
-> > +    for (i =3D 0, mem->nregions =3D 0; i < dev->mem->nregions; ++i) {
-> > +        struct vhost_memory_region *reg =3D dev->mem->regions + i;
-> > +        ram_addr_t offset;
-> > +        MemoryRegion *mr;
-> > +
-> > +        assert((uintptr_t)reg->userspace_addr =3D=3D reg->userspace_ad=
-dr);
-> > +        mr =3D memory_region_from_host((void *)(uintptr_t)reg-
-> >userspace_addr,
-> > +                                     &offset);
-> > +        fd =3D memory_region_get_fd(mr);
-> > +        if (fd > 0) {
-> > +            if (mem->nregions =3D=3D VHOST_MEMORY_MAX_NREGIONS) {
-> > +                vhost_user_free_memslots =3D false;
-> > +                return -1;
-> > +            }
-> > +
-> > +            mem->regions[mem->nregions].userspace_addr =3D reg-
-> >userspace_addr;
-> > +            mem->regions[mem->nregions].memory_size =3D reg->memory_si=
-ze;
-> > +            mem->regions[mem->nregions].guest_phys_addr =3D reg-
-> >guest_phys_addr;
-> > +            mem->regions[mem->nregions].mmap_offset =3D offset;
-> > +            fds[mem->nregions++] =3D fd;
-> > +        }
-> > +    }
-> > +
-> > +    return 0;
-> > +}
-> > +
-> >  static int vhost_user_set_mem_table(struct vhost_dev *dev,
-> >                                      struct vhost_memory *mem)  {
-> >      int fds[VHOST_MEMORY_MAX_NREGIONS];
-> > -    int i, fd;
-> > -    size_t fd_num =3D 0;
-> > +    size_t fd_num;
-> >      bool reply_supported =3D virtio_has_feature(dev->protocol_features=
-,
-> >
-> > VHOST_USER_PROTOCOL_F_REPLY_ACK);
-> >
-> > @@ -332,29 +365,12 @@ static int vhost_user_set_mem_table(struct vhost_=
-dev
-> *dev,
-> >          msg.hdr.flags |=3D VHOST_USER_NEED_REPLY_MASK;
-> >      }
-> >
-> > -    for (i =3D 0; i < dev->mem->nregions; ++i) {
-> > -        struct vhost_memory_region *reg =3D dev->mem->regions + i;
-> > -        ram_addr_t offset;
-> > -        MemoryRegion *mr;
-> > -
-> > -        assert((uintptr_t)reg->userspace_addr =3D=3D reg->userspace_ad=
-dr);
-> > -        mr =3D memory_region_from_host((void *)(uintptr_t)reg-
-> >userspace_addr,
-> > -                                     &offset);
-> > -        fd =3D memory_region_get_fd(mr);
-> > -        if (fd > 0) {
-> > -            if (fd_num =3D=3D VHOST_MEMORY_MAX_NREGIONS) {
-> > -                error_report("Failed preparing vhost-user memory table
-> msg");
-> > -                return -1;
-> > -            }
-> > -            msg.payload.memory.regions[fd_num].userspace_addr =3D reg-
-> >userspace_addr;
-> > -            msg.payload.memory.regions[fd_num].memory_size  =3D reg-
-> >memory_size;
-> > -            msg.payload.memory.regions[fd_num].guest_phys_addr =3D reg=
--
-> >guest_phys_addr;
-> > -            msg.payload.memory.regions[fd_num].mmap_offset =3D offset;
-> > -            fds[fd_num++] =3D fd;
-> > -        }
-> > +    if (vhost_user_prepare_msg(dev, &msg.payload.memory, fds) < 0) {
-> > +        error_report("Failed preparing vhost-user memory table msg");
-> > +        return -1;
-> >      }
-> >
-> > -    msg.payload.memory.nregions =3D fd_num;
-> > +    fd_num =3D msg.payload.memory.nregions;
-> >
-> >      if (!fd_num) {
-> >          error_report("Failed initializing vhost-user memory map, "
-> > @@ -870,9 +886,9 @@ static int vhost_user_get_vq_index(struct vhost_dev
-> *dev, int idx)
-> >      return idx;
-> >  }
-> >
-> > -static int vhost_user_memslots_limit(struct vhost_dev *dev)
-> > +static bool vhost_user_has_free_memslots(struct vhost_dev *dev)
+On Thu, Mar 01, 2018 at 03:32:19PM +0000, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > On Wed, Feb 28, 2018 at 04:49:37PM +0000, Dr. David Alan Gilbert (git) wrote:
+> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > > 
+> > > This fixes a couple of cases where the block migration capability
+> > > doesn't get cleared when a migration failed.
+> > > 
+> > > 1) When block migration is compiled out:
+> > >   (qemu) migrate -d -b  "exec:cat > /dev/null"
+> > >   QEMU compiled without old-style (blk/-b, inc/-i) block migration
+> > >   Use drive_mirror+NBD instead.
+> > >   (qemu) migrate_set_capability xbzrle off
+> > >   QEMU compiled without old-style (blk/-b, inc/-i) block migration
+> > >   Use drive_mirror+NBD instead.
+> > > 
+> > >   This corresponds to https://bugzilla.redhat.com/show_bug.cgi?id=1550022
+> > > 
+> > > 2) When a migration with a bad protocol is tried:
+> > >   (qemu) migrate -d -b "foo:bah"
+> > >   Parameter 'uri' expects a valid migration protocol
+> > >   (qemu) info migrate_capabilities
+> > >   xbzrle: off
+> > >   rdma-pin-all: off
+> > >   auto-converge: off
+> > >   zero-blocks: off
+> > >   compress: off
+> > >   events: off
+> > >   postcopy-ram: off
+> > >   x-colo: off
+> > >   release-ram: off
+> > >   block: on   <<<<<<-----
+> > >   return-path: off
+> > >   pause-before-switchover: off
+> > >   x-multifd: off
+> > > 
+> > > Fixes: 2833c59b947
+> > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > ---
+> > >  migration/migration.c | 6 +++---
+> > >  1 file changed, 3 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/migration/migration.c b/migration/migration.c
+> > > index b913b98803..da0e4a1f56 100644
+> > > --- a/migration/migration.c
+> > > +++ b/migration/migration.c
+> > > @@ -1391,11 +1391,12 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+> > >              return;
+> > >          }
+> > >          migrate_set_block_enabled(true, &local_err);
+> > > +        s->must_remove_block_options = true;
+> > >          if (local_err) {
+> > >              error_propagate(errp, local_err);
+> > > +            block_cleanup_parameters(s);
+> > >              return;
+> > >          }
+> > > -        s->must_remove_block_options = true;
+> > >      }
+> > >  
+> > >      if (has_inc && inc) {
+> > > @@ -1417,11 +1418,10 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+> > >      } else if (strstart(uri, "fd:", &p)) {
+> > >          fd_start_outgoing_migration(s, p, &local_err);
+> > >      } else {
+> > > -        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "uri",
+> > > +        error_setg(&local_err, QERR_INVALID_PARAMETER_VALUE, "uri",
+> > >                     "a valid migration protocol");
+> > >          migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+> > >                            MIGRATION_STATUS_FAILED);
+> > > -        return;
+> > >      }
+> > >  
+> > >      if (local_err) {
+> > > -- 
+> > > 2.14.3
+> > > 
+> > 
+> > Ouch...
+> > 
+> > Instead it seems to be my fault in 4a84214ebe ("migration: provide
+> > migrate_caps_check()", 2017-07-18).  For now I cannot understand why I
+> > did that before since it's obviously strange if without this
+> > squashed...
+> > 
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index 0aa596f867..88ed9375aa 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -747,13 +747,15 @@ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
 > >  {
-> > -    return VHOST_MEMORY_MAX_NREGIONS;
-> > +    return vhost_user_free_memslots;
-> >  }
-> >
-> >  static bool vhost_user_requires_shm_log(struct vhost_dev *dev) @@
-> > -1054,11 +1070,19 @@ static int vhost_user_set_config(struct vhost_dev =
-*dev,
-> const uint8_t *data,
-> >      return 0;
-> >  }
-> >
-> > +static void vhost_user_set_used_memslots(struct vhost_dev *dev) {
-> > +    int fds[VHOST_MEMORY_MAX_NREGIONS];
-> > +    VhostUserMsg msg;
-> > +
-> > +    vhost_user_prepare_msg(dev, &msg.payload.memory, fds); }
-> > +
-> >  const VhostOps user_ops =3D {
-> >          .backend_type =3D VHOST_BACKEND_TYPE_USER,
-> >          .vhost_backend_init =3D vhost_user_init,
-> >          .vhost_backend_cleanup =3D vhost_user_cleanup,
-> > -        .vhost_backend_memslots_limit =3D vhost_user_memslots_limit,
-> > +        .vhost_backend_has_free_memslots =3D
-> > + vhost_user_has_free_memslots,
-> >          .vhost_set_log_base =3D vhost_user_set_log_base,
-> >          .vhost_set_mem_table =3D vhost_user_set_mem_table,
-> >          .vhost_set_vring_addr =3D vhost_user_set_vring_addr, @@ -1082,=
-4
-> > +1106,5 @@ const VhostOps user_ops =3D {
-> >          .vhost_send_device_iotlb_msg =3D vhost_user_send_device_iotlb_=
-msg,
-> >          .vhost_get_config =3D vhost_user_get_config,
-> >          .vhost_set_config =3D vhost_user_set_config,
-> > +        .vhost_set_used_memslots =3D vhost_user_set_used_memslots,
-> >  };
-> > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c index
-> > 4a583a3..7f17de9 100644
-> > --- a/hw/virtio/vhost.c
-> > +++ b/hw/virtio/vhost.c
-> > @@ -44,20 +44,19 @@
-> >  static struct vhost_log *vhost_log;
-> >  static struct vhost_log *vhost_log_shm;
-> >
-> > -static unsigned int used_memslots;
-> >  static QLIST_HEAD(, vhost_dev) vhost_devices =3D
-> >      QLIST_HEAD_INITIALIZER(vhost_devices);
-> >
-> >  bool vhost_has_free_slot(void)
-> >  {
-> > -    unsigned int slots_limit =3D ~0U;
-> >      struct vhost_dev *hdev;
-> >
-> >      QLIST_FOREACH(hdev, &vhost_devices, entry) {
-> > -        unsigned int r =3D hdev->vhost_ops-
-> >vhost_backend_memslots_limit(hdev);
-> > -        slots_limit =3D MIN(slots_limit, r);
-> > +        if (!hdev->vhost_ops->vhost_backend_has_free_memslots(hdev)) {
-> > +            return false;
-> > +        }
+> >      MigrationState *s = migrate_get_current();
+> >      MigrationCapabilityStatusList *cap;
+> > +    bool cap_list[MIGRATION_CAPABILITY__MAX];
+> >  
+> >      if (migration_is_setup_or_active(s->state)) {
+> >          error_setg(errp, QERR_MIGRATION_ACTIVE);
+> >          return;
 > >      }
-> > -    return slots_limit > used_memslots;
-> > +    return true;
-> >  }
-> >
-> >  static void vhost_dev_sync_region(struct vhost_dev *dev, @@ -442,7
-> > +441,7 @@ static void vhost_commit(MemoryListener *listener)
-> >                         dev->n_mem_sections * sizeof dev->mem->regions[=
-0];
-> >      dev->mem =3D g_realloc(dev->mem, regions_size);
-> >      dev->mem->nregions =3D dev->n_mem_sections;
-> > -    used_memslots =3D dev->mem->nregions;
-> > +    dev->vhost_ops->vhost_set_used_memslots(dev);
-> >      for (i =3D 0; i < dev->n_mem_sections; i++) {
-> >          struct vhost_memory_region *cur_vmr =3D dev->mem->regions + i;
-> >          struct MemoryRegionSection *mrs =3D dev->mem_sections + i; @@
-> > -1186,7 +1185,7 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opa=
-que,
-> >      memory_listener_register(&hdev->memory_listener,
-> &address_space_memory);
-> >      QLIST_INSERT_HEAD(&vhost_devices, hdev, entry);
-> >
-> > -    if (used_memslots > hdev->vhost_ops-
-> >vhost_backend_memslots_limit(hdev)) {
-> > +    if (!hdev->vhost_ops->vhost_backend_has_free_memslots(hdev)) {
-> >          error_report("vhost backend memory slots limit is less"
-> >                  " than current number of present memory slots");
-> >          r =3D -1;
-> > diff --git a/include/hw/virtio/vhost-backend.h
-> > b/include/hw/virtio/vhost-backend.h
-> > index 592254f..2eac224 100644
-> > --- a/include/hw/virtio/vhost-backend.h
-> > +++ b/include/hw/virtio/vhost-backend.h
-> > @@ -36,7 +36,7 @@ struct vhost_iotlb_msg;
-> >
-> >  typedef int (*vhost_backend_init)(struct vhost_dev *dev, void
-> > *opaque);  typedef int (*vhost_backend_cleanup)(struct vhost_dev
-> > *dev); -typedef int (*vhost_backend_memslots_limit)(struct vhost_dev
-> > *dev);
-> > +typedef bool (*vhost_backend_has_free_memslots)(struct vhost_dev
-> > +*dev);
-> >
-> >  typedef int (*vhost_net_set_backend_op)(struct vhost_dev *dev,
-> >                                  struct vhost_vring_file *file); @@
-> > -94,12 +94,13 @@ typedef int (*vhost_set_config_op)(struct vhost_dev *d=
-ev,
-> const uint8_t *data,
-> >                                     uint32_t flags);  typedef int
-> > (*vhost_get_config_op)(struct vhost_dev *dev, uint8_t *config,
-> >                                     uint32_t config_len);
-> > +typedef void (*vhost_set_used_memslots_op)(struct vhost_dev *dev);
-> >
-> >  typedef struct VhostOps {
-> >      VhostBackendType backend_type;
-> >      vhost_backend_init vhost_backend_init;
-> >      vhost_backend_cleanup vhost_backend_cleanup;
-> > -    vhost_backend_memslots_limit vhost_backend_memslots_limit;
-> > +    vhost_backend_has_free_memslots vhost_backend_has_free_memslots;
-> >      vhost_net_set_backend_op vhost_net_set_backend;
-> >      vhost_net_set_mtu_op vhost_net_set_mtu;
-> >      vhost_scsi_set_endpoint_op vhost_scsi_set_endpoint; @@ -130,6
-> > +131,7 @@ typedef struct VhostOps {
-> >      vhost_send_device_iotlb_msg_op vhost_send_device_iotlb_msg;
-> >      vhost_get_config_op vhost_get_config;
-> >      vhost_set_config_op vhost_set_config;
-> > +    vhost_set_used_memslots_op vhost_set_used_memslots;
-> >  } VhostOps;
-> >
-> >  extern const VhostOps user_ops;
-> > --
-> > 1.8.3.1
-> >
+> >  
+> > -    if (!migrate_caps_check(s->enabled_capabilities, params, errp)) {
+> > +    memcpy(cap_list, s->enabled_capabilities, sizeof(cap_list));
+> > +    if (!migrate_caps_check(cap_list, params, errp)) {
+> >          return;
+> >      }
+> 
+> > 
+> > Otherwise I'll get:
+> > 
+> > (qemu) migrate_set_capability postcopy-ram on                                  
+> > (qemu) migrate_set_capability compress on                                      
+> > Postcopy is not currently compatible with compression                          
+> > (qemu) info migrate_capabilities       
+> > xbzrle: off                            
+> > rdma-pin-all: off                      
+> > auto-converge: off                     
+> > zero-blocks: off                       
+> > compress: on         <------------------------- :(
+> > events: off                            
+> > postcopy-ram: on                       
+> > x-colo: off                            
+> > release-ram: off                       
+> > block: off                             
+> > return-path: off                       
+> > pause-before-switchover: off           
+> > x-multifd: off
+> >  
+> > And it looks very likely that this should solve the block bug too.
+> 
+> Yes, it looks like it should - but it doesn't solve the 2nd of my cases;
+> so we also need the 2nd half of my change.
+> 
+> > (So I think either I got a brain fart last July, or now...)
+> 
+> Of course it's the combination of two bugs :-)
+
+Ah sure. :)
+
+Please just let me know if you want me to post a patch, or I'll assume
+you'll handle this together in the next post (and thanks anyways :)
+
+-- 
+Peter Xu
