@@ -1,29 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1erobI-0006l9-Uh
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:36:10 -0500
+	(envelope-from <aarcange@redhat.com>) id 1eroil-0000PY-Jn
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:43:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1erobH-00073U-Ri
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:36:08 -0500
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:40119)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1erobH-00072y-Ix
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:36:07 -0500
-Received: by mail-lf0-x244.google.com with SMTP id 37so14434884lfs.7
-	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 09:36:07 -0800 (PST)
-MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <CAFEAcA-P9R-4epwwx-ccPrkJxJDRZ9G-FErnLDEdD8PsDH3uSw@mail.gmail.com>
-References: <cover.1520010339.git.alistair.francis@xilinx.com>
-	<94eef4a24e618d73f9f23a88dd270123d48954d4.1520010339.git.alistair.francis@xilinx.com>
-	<CAFEAcA-P9R-4epwwx-ccPrkJxJDRZ9G-FErnLDEdD8PsDH3uSw@mail.gmail.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 2 Mar 2018 09:35:35 -0800
-Message-ID: <CAKmqyKP7QWG+QXYUaAYsSg0KAP1xLeT=i44OKex8G0DcxSqDqg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 1/2] target/arm: Add a cluster size
- property
+	(envelope-from <aarcange@redhat.com>) id 1eroih-00034z-K3
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:43:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45192)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aarcange@redhat.com>) id 1eroih-00033E-DL
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 12:43:47 -0500
+From: Andrea Arcangeli <aarcange@redhat.com>
+Date: Fri,  2 Mar 2018 18:43:42 +0100
+Message-Id: <20180302174343.5421-1-aarcange@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/1] FOLL_NOWAIT and get_user_pages_unlocked
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,103 +21,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Al Viro <viro@zeniv.linux.org.uk>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, linux-mm@kvack.org
 
-On Fri, Mar 2, 2018 at 9:31 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 2 March 2018 at 17:06, Alistair Francis <alistair.francis@xilinx.com> wrote:
->
-> Subject should say "core count" rather than "cluster size" ?
+Hello,
 
-Yes, that was left over. I'll fix.
+KVM is hanging on postcopy live migration.
 
->
->> The cortex A53 TRM specifices that bits 24 and 25 of the L2CTLR register
->
-> "specifies"
->
->> specify the number of cores present and not the number of processors. To
->
-> "the number of cores in the processor, not the total number of cores
-> in the system".
+David tracked it down to commit
+ce53053ce378c21e7ffc45241fd67d6ee79daa2b and the problem is pretty
+obvious then.
 
-Fixed these.
+Either we teach get_user_pages_locked/unlocked to handle FOLL_NOWAIT
+(so faultin_nopage works right even when the nonblocking pointer is
+not NULL) or we need to revert part of commit
+ce53053ce378c21e7ffc45241fd67d6ee79daa2b and keep using FOLL_NOWAIT
+only as parameter to get_user_pages (which won't ever set nonblocking
+pointer to non-NULL). I suppose the former approach is preferred to be
+more robust.
 
->
->> report this correctly on machines with multiple CPU clusters (ARM's
->> big.LITTLE or Xilinx's ZynqMP) we need to allow the machine to overwrite
->> this value. To do this let's add an optional property.
->>
->> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
->> ---
->>
->>  target/arm/cpu.h   |  5 +++++
->>  target/arm/cpu.c   |  1 +
->>  target/arm/cpu64.c | 11 +++++++++--
->>  3 files changed, 15 insertions(+), 2 deletions(-)
->>
->> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
->> index 8dd6b788df..3fa8fdad21 100644
->> --- a/target/arm/cpu.h
->> +++ b/target/arm/cpu.h
->> @@ -745,6 +745,11 @@ struct ARMCPU {
->>      /* Uniprocessor system with MP extensions */
->>      bool mp_is_up;
->>
->> +    /* Specify the number of cores in this CPU cluster. Used for the L2CTLR
->> +     * register.
->> +     */
->> +    int32_t core_count;
->> +
->>      /* The instance init functions for implementation-specific subclasses
->>       * set these fields to specify the implementation-dependent values of
->>       * various constant registers and reset values of non-constant
->> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
->> index 6b77aaa445..7a17ba1418 100644
->> --- a/target/arm/cpu.c
->> +++ b/target/arm/cpu.c
->> @@ -1765,6 +1765,7 @@ static Property arm_cpu_properties[] = {
->>      DEFINE_PROP_UINT64("mp-affinity", ARMCPU,
->>                          mp_affinity, ARM64_AFFINITY_INVALID),
->>      DEFINE_PROP_INT32("node-id", ARMCPU, node_id, CPU_UNSET_NUMA_NODE_ID),
->> +    DEFINE_PROP_INT32("core-count", ARMCPU, core_count, -1),
->>      DEFINE_PROP_END_OF_LIST()
->>  };
->>
->> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
->> index 4228713b19..5e5ae44aeb 100644
->> --- a/target/arm/cpu64.c
->> +++ b/target/arm/cpu64.c
->> @@ -42,8 +42,15 @@ static inline void unset_feature(CPUARMState *env, int feature)
->>  #ifndef CONFIG_USER_ONLY
->>  static uint64_t a57_a53_l2ctlr_read(CPUARMState *env, const ARMCPRegInfo *ri)
->>  {
->> -    /* Number of processors is in [25:24]; otherwise we RAZ */
->> -    return (smp_cpus - 1) << 24;
->> +    ARMCPU *cpu = arm_env_get_cpu(env);
->> +
->> +    /* Number of cores is in [25:24]; otherwise we RAZ */
->> +    if (cpu->core_count == -1) {
->> +        /* No core_count specified, default to smp_cpus. */
->> +        return (smp_cpus - 1) << 24;
->> +    } else {
->> +        return (cpu->core_count - 1) << 24;
->> +    }
->>  }
->>  #endif
->
-> I think having arm_cpu_realizefn do
->     if (cpu->core_count == -1) {
->         cpu->core_count = smp_cpus;
->     }
->
-> would be neater than doing that check when the register is read.
+Thanks,
+Andrea
 
-Ok will fix. I'll send a V2 out straight away, as today is my last day
-and it'd be great if I could get this done.
+Andrea Arcangeli (1):
+  mm: gup: teach get_user_pages_unlocked to handle FOLL_NOWAIT
 
-Alistair
-
->
-> thanks
-> -- PMM
+ mm/gup.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
