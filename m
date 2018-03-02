@@ -1,34 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eriep-0002RI-V5
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:15:24 -0500
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1erifm-0003Jo-U9
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:16:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eriel-0000dX-Lj
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:15:23 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46810 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eriel-0000dM-GI
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:15:19 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2E82E4040858
-	for <qemu-devel@nongnu.org>; Fri,  2 Mar 2018 11:15:19 +0000 (UTC)
-References: <20180301084438.13594-1-peterx@redhat.com>
-	<20180301084438.13594-4-peterx@redhat.com>
-	<2c8bac11-9f90-f79b-7b08-77f94a196c3a@redhat.com>
-	<20180302035418.GV27381@xz-mi>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <773346dc-0f78-6cbc-0b07-5ece999cef29@redhat.com>
-Date: Fri, 2 Mar 2018 12:15:09 +0100
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1erifi-0000rg-Rt
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:16:22 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41932
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
+	id 1erifi-0000rU-Li
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 06:16:18 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w22BFgQU064190
+	for <qemu-devel@nongnu.org>; Fri, 2 Mar 2018 06:16:18 -0500
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2gf2j2ygwg-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 06:16:17 -0500
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
+	Fri, 2 Mar 2018 11:16:16 -0000
+References: <20180227173251.17025-1-cohuck@redhat.com>
+From: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Date: Fri, 2 Mar 2018 12:16:12 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180302035418.GV27381@xz-mi>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180227173251.17025-1-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 03/15] qio: introduce
- qio_channel_add_watch_{full|source}
+Message-Id: <81bfac47-1e89-6ca2-aa10-32e1b0d5a86e@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] vfio-ccw: license text should indicate GPL
+ v2 or later
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,48 +43,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: Alex Williamson <alex.williamson@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
 
-On 02/03/2018 04:54, Peter Xu wrote:
-> On Thu, Mar 01, 2018 at 06:13:06PM +0100, Paolo Bonzini wrote:
->> On 01/03/2018 09:44, Peter Xu wrote:
->>> + * qio_channel_add_watch_source:
->>> + * @ioc: the channel object
->>> + * @condition: the I/O condition to monitor
->>> + * @func: callback to invoke when the source becomes ready
->>> + * @user_data: opaque data to pass to @func
->>> + * @notify: callback to free @user_data
->>> + * @context: gcontext to bind the source to
->>> + *
->>> + * Similar as qio_channel_add_watch(), but allows to specify context
->>> + * to run the watch source, meanwhile return the GSource object
->>> + * instead of tag ID, with the GSource referenced already.
->>> + *
->>> + * Note: callers is responsible to unref the source when not needed.
->>> + *
->>> + * Returns: the source pointer
->>> + */
->>> +GSource *qio_channel_add_watch_source(QIOChannel *ioc,
->>> +                                      GIOCondition condition,
->>> +                                      QIOChannelFunc func,
->>> +                                      gpointer user_data,
->>> +                                      GDestroyNotify notify,
->>> +                                      GMainContext *context);
->>>  
->>
->> Just a small thing, this is a bit inconsistent with the rest of the
->> GSource API, where the g_source_attach is usually left to the caller
->> when a function returns GSource *.
->>
->> You might therefore name it instead qio_channel_create_watch, for
->> consistency with g_io_{add,create}_watch, and remove the "context" argument.
-> 
-> Looks like there is already a qio_channel_create_watch() (io/channel.c).
-> 
-> How about qio_channel_create_watch_attached()?  Or... anything better?
+On 27/02/2018 18:32, Cornelia Huck wrote:
+> The license text currently specifies "any version" of the GPL. It
+> is unlikely that GPL v1 was ever intended; change this to the
+> standard "or any later version" text.
+>
+> Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> Cc: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> Cc: Pierre Morel <pmorel@linux.vnet.ibm.com>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>   hw/vfio/ccw.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+> index 16713f2c52..4e5855741a 100644
+> --- a/hw/vfio/ccw.c
+> +++ b/hw/vfio/ccw.c
+> @@ -6,8 +6,8 @@
+>    *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+>    *            Pierre Morel <pmorel@linux.vnet.ibm.com>
+>    *
+> - * This work is licensed under the terms of the GNU GPL, version 2 or(=
+at
+> - * your option) any version. See the COPYING file in the top-level
+> + * This work is licensed under the terms of the GNU GPL, version 2 or =
+(at
+> + * your option) any later version. See the COPYING file in the top-lev=
+el
+>    * directory.
+>    */
+>
 
-I would add the g_source_set_callback call (and arguments) to
-qio_channel_create_watch and leave the g_source_attach to the caller.
+Acked-by: Pierre Morel<pmorel@linux.vnet.ibm.com>
 
-Paolo
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
