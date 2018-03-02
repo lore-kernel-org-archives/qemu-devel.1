@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1erdnX-0000ej-Ju
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:05 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1erdnY-0000fl-Py
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1erdnW-0003yd-AF
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:03 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1erdnW-0003yx-Hr
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 01:04:04 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  2 Mar 2018 17:03:32 +1100
-Message-Id: <20180302060350.24330-7-david@gibson.dropbear.id.au>
+Date: Fri,  2 Mar 2018 17:03:38 +1100
+Message-Id: <20180302060350.24330-13-david@gibson.dropbear.id.au>
 In-Reply-To: <20180302060350.24330-1-david@gibson.dropbear.id.au>
 References: <20180302060350.24330-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 06/24] macio: embed DBDMA device directly within
- macio
+Subject: [Qemu-devel] [PULL 12/24] mac_oldworld: use object link to pass
+ heathrow PIC object to macio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +25,110 @@ Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, groug@kaod.org, surajjs@au1.ibm.
 
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-The current recommendation is to embed subdevices directly within their container
-device, so do this for the DBDMA device.
+Also switch macio_oldworld_realize() over to use it rather than using the pic_mem
+memory region directly.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/misc/macio/macio.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ hw/misc/macio/macio.c         | 14 ++++++++++----
+ hw/ppc/mac_oldworld.c         |  8 +++++---
+ include/hw/misc/macio/macio.h |  2 ++
+ 3 files changed, 17 insertions(+), 7 deletions(-)
 
 diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-index 024f8557ab..7174135c8b 100644
+index 4e502ede2e..d4c1d190c4 100644
 --- a/hw/misc/macio/macio.c
 +++ b/hw/misc/macio/macio.c
-@@ -42,7 +42,7 @@ typedef struct MacIOState
+@@ -31,6 +31,7 @@
+ #include "hw/ppc/mac_dbdma.h"
+ #include "hw/char/escc.h"
+ #include "hw/misc/macio/macio.h"
++#include "hw/intc/heathrow_pic.h"
  
-     MemoryRegion bar;
-     CUDAState cuda;
--    DBDMAState *dbdma;
-+    DBDMAState dbdma;
-     MemoryRegion *pic_mem;
-     MemoryRegion *escc_mem;
-     uint64_t frequency;
-@@ -129,12 +129,12 @@ static void macio_common_realize(PCIDevice *d, Error **errp)
-     SysBusDevice *sysbus_dev;
-     Error *err = NULL;
- 
--    object_property_set_bool(OBJECT(s->dbdma), true, "realized", &err);
-+    object_property_set_bool(OBJECT(&s->dbdma), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-     }
--    sysbus_dev = SYS_BUS_DEVICE(s->dbdma);
-+    sysbus_dev = SYS_BUS_DEVICE(&s->dbdma);
-     memory_region_add_subregion(&s->bar, 0x08000,
+ /*
+  * The mac-io has two interfaces to the ESCC. One is called "escc-legacy",
+@@ -167,10 +168,10 @@ static void macio_oldworld_realize(PCIDevice *d, Error **errp)
                                  sysbus_mmio_get_region(sysbus_dev, 0));
+     pmac_format_nvram_partition(&os->nvram, os->nvram.size);
  
-@@ -161,7 +161,7 @@ static void macio_realize_ide(MacIOState *s, MACIOIDEState *ide,
-     sysbus_connect_irq(sysbus_dev, 0, irq0);
-     sysbus_connect_irq(sysbus_dev, 1, irq1);
-     qdev_prop_set_uint32(DEVICE(ide), "channel", dmaid);
--    object_property_set_link(OBJECT(ide), OBJECT(s->dbdma), "dbdma", errp);
-+    object_property_set_link(OBJECT(ide), OBJECT(&s->dbdma), "dbdma", errp);
-     macio_ide_register_dma(ide);
+-    if (s->pic_mem) {
+-        /* Heathrow PIC */
+-        memory_region_add_subregion(&s->bar, 0x00000, s->pic_mem);
+-    }
++    /* Heathrow PIC */
++    sysbus_dev = SYS_BUS_DEVICE(os->pic);
++    memory_region_add_subregion(&s->bar, 0x0,
++                                sysbus_mmio_get_region(sysbus_dev, 0));
  
-     object_property_set_bool(OBJECT(ide), true, "realized", errp);
-@@ -344,8 +344,9 @@ static void macio_instance_init(Object *obj)
-     qdev_set_parent_bus(DEVICE(&s->cuda), sysbus_get_default());
-     object_property_add_child(obj, "cuda", OBJECT(&s->cuda), NULL);
+     /* IDE buses */
+     for (i = 0; i < ARRAY_SIZE(os->ide); i++) {
+@@ -208,6 +209,11 @@ static void macio_oldworld_init(Object *obj)
  
--    s->dbdma = MAC_DBDMA(object_new(TYPE_MAC_DBDMA));
--    object_property_add_child(obj, "dbdma", OBJECT(s->dbdma), NULL);
-+    object_initialize(&s->dbdma, sizeof(s->dbdma), TYPE_MAC_DBDMA);
-+    qdev_set_parent_bus(DEVICE(&s->dbdma), sysbus_get_default());
-+    object_property_add_child(obj, "dbdma", OBJECT(&s->dbdma), NULL);
- }
+     qdev_init_gpio_out(DEVICE(obj), os->irqs, ARRAY_SIZE(os->irqs));
  
- static const VMStateDescription vmstate_macio_oldworld = {
++    object_property_add_link(obj, "pic", TYPE_HEATHROW,
++                             (Object **) &os->pic,
++                             qdev_prop_allow_set_link_before_realize,
++                             0, NULL);
++
+     object_initialize(&os->nvram, sizeof(os->nvram), TYPE_MACIO_NVRAM);
+     dev = DEVICE(&os->nvram);
+     qdev_prop_set_uint32(dev, "size", 0x2000);
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 5903ff47d3..3ac5b19073 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -93,7 +93,7 @@ static void ppc_heathrow_init(MachineState *machine)
+     uint32_t kernel_base, initrd_base, cmdline_base = 0;
+     int32_t kernel_size, initrd_size;
+     PCIBus *pci_bus;
+-    PCIDevice *macio;
++    OldWorldMacIOState *macio;
+     MACIOIDEState *macio_ide;
+     DeviceState *dev, *pic_dev;
+     SysBusDevice *sbd;
+@@ -271,7 +271,7 @@ static void ppc_heathrow_init(MachineState *machine)
+     ide_drive_get(hd, ARRAY_SIZE(hd));
+ 
+     /* MacIO */
+-    macio = pci_create(pci_bus, -1, TYPE_OLDWORLD_MACIO);
++    macio = OLDWORLD_MACIO(pci_create(pci_bus, -1, TYPE_OLDWORLD_MACIO));
+     dev = DEVICE(macio);
+     qdev_connect_gpio_out(dev, 0, pic[0x12]); /* CUDA */
+     qdev_connect_gpio_out(dev, 1, pic[0x10]); /* ESCC-B */
+@@ -281,8 +281,10 @@ static void ppc_heathrow_init(MachineState *machine)
+     qdev_connect_gpio_out(dev, 5, pic[0x0E]); /* IDE-1 */
+     qdev_connect_gpio_out(dev, 6, pic[0x03]); /* IDE-1 DMA */
+     qdev_prop_set_uint64(dev, "frequency", tbfreq);
++    object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
++                             &error_abort);
+     sbd = SYS_BUS_DEVICE(pic_dev);
+-    macio_init(macio, sysbus_mmio_get_region(sbd, 0));
++    macio_init(PCI_DEVICE(macio), sysbus_mmio_get_region(sbd, 0));
+ 
+     macio_ide = MACIO_IDE(object_resolve_path_component(OBJECT(macio),
+                                                         "ide[0]"));
+diff --git a/include/hw/misc/macio/macio.h b/include/hw/misc/macio/macio.h
+index e1e249f898..843c114c07 100644
+--- a/include/hw/misc/macio/macio.h
++++ b/include/hw/misc/macio/macio.h
+@@ -26,6 +26,7 @@
+ #ifndef MACIO_H
+ #define MACIO_H
+ 
++#include "hw/intc/heathrow_pic.h"
+ #include "hw/misc/macio/cuda.h"
+ #include "hw/ppc/mac_dbdma.h"
+ 
+@@ -54,6 +55,7 @@ typedef struct OldWorldMacIOState {
+     MacIOState parent_obj;
+     /*< public >*/
+ 
++    HeathrowState *pic;
+     qemu_irq irqs[7];
+ 
+     MacIONVRAMState nvram;
 -- 
 2.14.3
