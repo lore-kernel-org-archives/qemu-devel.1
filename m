@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1erjRG-0008EZ-3r
+	(envelope-from <balaton@eik.bme.hu>) id 1erjRG-0008Eb-G0
 	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 07:05:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1erjRB-00004w-GG
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 07:05:25 -0500
-Message-Id: <e185e6a4172237432fb08bd1c616ab670f818cbb.1519991414.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1519991414.git.balaton@eik.bme.hu>
-References: <cover.1519991414.git.balaton@eik.bme.hu>
+	(envelope-from <balaton@eik.bme.hu>) id 1erjRB-000052-Gs
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 07:05:26 -0500
+Message-Id: <cover.1519991414.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Fri, 02 Mar 2018 12:50:14 +0100
-Subject: [Qemu-devel] [PATCH v2 1/2] roms: Added git submodule for
- u-boot-sam460 (firmware for sam460ex)
+Subject: [Qemu-devel] [PATCH v2 0/2] Firmware blob and git submodule for
+ Sam460ex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,63 +21,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Jeff Cody <jcody@redhat.com>
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
-v2: Fixed submodule and added Makefile rules to build binary
+This is v2 of the firmware image for the ppc sam460ex machine type in
+case you choose to add it with external git repo first. In case you
+decide not to add it either as external git nor as a mirrored or
+copied to QEMU repo then probably some wiki page should be updated to
+point to a binary image for the machine to be usable but I'm not sure
+how to do that. Please advise which of the above options should be
+followed.
 
-.gitmodules          | 3 +++
- roms/Makefile        | 7 +++++++
- roms/u-boot-sam460ex | 1 +
- 3 files changed, 11 insertions(+)
+Thank you,
+BALATON Zoltan
+
+BALATON Zoltan (2):
+  roms: Added git submodule for u-boot-sam460 (firmware for sam460ex)
+  pc-bios: Added u-boot-sam460 firmware binary
+
+ .gitmodules                        |   3 +++
+ Makefile                           |   2 +-
+ pc-bios/u-boot-sam460-20100605.bin | Bin 0 -> 524288 bytes
+ roms/Makefile                      |   7 +++++++
+ roms/u-boot-sam460ex               |   1 +
+ 5 files changed, 12 insertions(+), 1 deletion(-)
+ create mode 100755 pc-bios/u-boot-sam460-20100605.bin
  create mode 160000 roms/u-boot-sam460ex
 
-diff --git a/.gitmodules b/.gitmodules
-index 7a8282d..b76fb45 100644
---- a/.gitmodules
-+++ b/.gitmodules
-@@ -43,3 +43,6 @@
- [submodule "roms/seabios-hppa"]
- 	path = roms/seabios-hppa
- 	url = git://github.com/hdeller/seabios-hppa.git
-+[submodule "roms/u-boot-sam460ex"]
-+	path = roms/u-boot-sam460ex
-+	url = git://github.com/zbalaton/u-boot-sam460ex
-diff --git a/roms/Makefile b/roms/Makefile
-index b5e5a69..02b69fb 100644
---- a/roms/Makefile
-+++ b/roms/Makefile
-@@ -65,6 +65,7 @@ default:
- 	@echo "  slof           -- update slof.bin"
- 	@echo "  skiboot        -- update skiboot.lid"
- 	@echo "  u-boot.e500    -- update u-boot.e500"
-+	@echo "  u-boot.sam460  -- update u-boot.sam460"
- 
- bios: build-seabios-config-seabios-128k build-seabios-config-seabios-256k
- 	cp seabios/builds/seabios-128k/bios.bin ../pc-bios/bios.bin
-@@ -147,6 +148,11 @@ u-boot.e500:
- 	$(powerpc_cross_prefix)strip u-boot/build.e500/u-boot -o \
- 		../pc-bios/u-boot.e500
- 
-+u-boot.sam460:
-+	$(MAKE) -C u-boot-sam460ex Sam460ex_config
-+	$(MAKE) -C u-boot-sam460ex CROSS_COMPILE=$(powerpc_cross_prefix)
-+	cp u-boot-sam460ex/u-boot.bin ../pc-bios/u-boot-sam460-20100605.bin
-+
- skiboot:
- 	$(MAKE) -C skiboot CROSS=$(powerpc64_cross_prefix)
- 	cp skiboot/skiboot.lid ../pc-bios/skiboot.lid
-@@ -160,4 +166,5 @@ clean:
- 	$(MAKE) -C ipxe/src veryclean
- 	$(MAKE) -C SLOF clean
- 	rm -rf u-boot/build.e500
-+	$(MAKE) -C u-boot-sam460ex distclean
- 	$(MAKE) -C skiboot clean
-diff --git a/roms/u-boot-sam460ex b/roms/u-boot-sam460ex
-new file mode 160000
-index 0000000..119aa27
---- /dev/null
-+++ b/roms/u-boot-sam460ex
-@@ -0,0 +1 @@
-+Subproject commit 119aa277f74a4a2d3f7ab6c9471292308eba14e4
 -- 
 2.7.6
