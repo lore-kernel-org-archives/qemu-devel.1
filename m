@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ernyl-0004iz-Ho
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:56:20 -0500
+	(envelope-from <jbaron@akamai.com>) id 1ero1U-00062K-TB
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:59:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ernyk-0001JO-Ko
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:56:19 -0500
-Received: from mail-ot0-x22e.google.com ([2607:f8b0:4003:c0f::22e]:33870)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ernyk-0001Ic-Ds
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:56:18 -0500
-Received: by mail-ot0-x22e.google.com with SMTP id n74so9301994ota.1
-	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 08:56:18 -0800 (PST)
+	(envelope-from <jbaron@akamai.com>) id 1ero1R-0002X6-1b
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:59:08 -0500
+Received: from mx0a-00190b01.pphosted.com ([2620:100:9001:583::1]:55116)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jbaron@akamai.com>) id 1ero1Q-0002Wq-Nz
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:59:04 -0500
+References: <cover.1519961667.git.jbaron@akamai.com>
+	<c9d3cf2fbc3c64bb28e0438185d85d95b2088127.1519961667.git.jbaron@akamai.com>
+	<7fc612d0-9610-9b07-d054-bb1438898f47@redhat.com>
+From: Jason Baron <jbaron@akamai.com>
+Message-ID: <c01a1ccd-a864-00a8-edf9-4a16c5dd6c32@akamai.com>
+Date: Fri, 2 Mar 2018 11:59:00 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180302153205.9107-1-eblake@redhat.com>
-References: <20180302153205.9107-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 2 Mar 2018 16:55:53 +0000
-Message-ID: <CAFEAcA_bJRe-iWra+8othHo0xo1TYjKp3mmU2TF1Buab1==7LQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v3 00/30] QAPI patches for 2018-03-01
+In-Reply-To: <7fc612d0-9610-9b07-d054-bb1438898f47@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/4] virtio-net: add linkspeed and duplex
+ settings to virtio-net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +30,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Jason Wang <jasowang@redhat.com>, mst@redhat.com
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
 
-On 2 March 2018 at 15:31, Eric Blake <eblake@redhat.com> wrote:
-> The following changes since commit 2e7b766594e17f786a6b2e5be690bc5b43ce6036:
->
->   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2018-03-01' into staging (2018-03-02 12:39:13 +0000)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/ericb.git tags/pull-qapi-2018-03-01-v3
->
-> for you to fetch changes up to cfe6a7fc6da20349ef62966c437f18ed6c49fcd5:
->
->   qapi: Don't create useless directory qapi-generated (2018-03-02 09:01:40 -0600)
->
-> v3: (attempt to) fix warnings about empty .o files on OSX toolchain [Peter]
-> (sending just the changed patch)
->
-> ----------------------------------------------------------------
-> qapi patches for 2018-03-01
->
-> - Markus Armbruster: Modularize generated QAPI code
->
+On 03/02/2018 02:14 AM, Jason Wang wrote:
+>=20
+>=20
+> On 2018=E5=B9=B403=E6=9C=8802=E6=97=A5 11:46, Jason Baron wrote:
+>> Although linkspeed and duplex can be set in a linux guest via 'ethtool
+>> -s',
+>> this requires custom ethtool commands for virtio-net by default.
+>>
+>> Introduce a new feature flag, VIRTIO_NET_F_SPEED_DUPLEX, which allows
+>> the hypervisor to export a linkspeed and duplex setting. The user can
+>> subsequently overwrite it later if desired via: 'ethtool -s'.
+>>
+>> Linkspeed and duplex settings can be set as:
+>> '-device virtio-net,speed=3D10000,duplex=3Dfull'
+>=20
+> I was thinking whether or not it's better to decide the duplex by the
+> type of backends.
+>=20
+> E.g userspace and vhost-kernel implement a in fact half duplex. But dpd=
+k
+> implement a full duplex.
 
-As I suspected, this isn't sufficient to silence the warnings.
+Interesting - could this be derived only from the backend 'type'. IE:
+NET_CLIENT_DRIVER_TAP, NET_CLIENT_DRIVER_VHOST_USER...
 
-thanks
--- PMM
+
+I was also thinking this could be specified as 'duplex=3Dbackend', in
+addition to the proposed 'duplex=3Dfull' or 'duplex=3Dhalf'?
+
+Thanks,
+
+-Jason
+
+>=20
+> Thanks
+>=20
+>>
+>> where speed is [0...INT_MAX], and duplex is ["half"|"full"].
+>>
+>> Signed-off-by: Jason Baron<jbaron@akamai.com>
+>> Cc: "Michael S. Tsirkin"<mst@redhat.com>
+>> Cc: Jason Wang<jasowang@redhat.com>
+>> Cc:virtio-dev@lists.oasis-open.org
+>> ---
+>=20
