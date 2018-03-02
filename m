@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ernNz-0001rd-0f
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:18:20 -0500
+	(envelope-from <slp@redhat.com>) id 1ernQ4-0002m5-RL
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:20:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ernNx-0003ch-Vo
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:18:18 -0500
-Received: from mail-lf0-x235.google.com ([2a00:1450:4010:c07::235]:43319)
+	(envelope-from <slp@redhat.com>) id 1ernQ1-0004zY-4p
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:20:28 -0500
+Received: from mail-wr0-f193.google.com ([209.85.128.193]:37031)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1ernNx-0003bc-OA
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:18:17 -0500
-Received: by mail-lf0-x235.google.com with SMTP id q69so14072567lfi.10
-	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 08:18:17 -0800 (PST)
+	(Exim 4.71) (envelope-from <slp@redhat.com>) id 1ernQ0-0004z1-TQ
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 11:20:25 -0500
+Received: by mail-wr0-f193.google.com with SMTP id z12so10667678wrg.4
+	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 08:20:24 -0800 (PST)
+Date: Fri, 2 Mar 2018 17:20:21 +0100
+From: Sergio Lopez <slp@redhat.com>
+Message-ID: <20180302162021.5iyghu5by2qyw6uy@dritchie>
+References: <1513690383-27269-1-git-send-email-sochin.jiang@huawei.com>
+	<CAJSP0QW1OKnRwwvxvmYaBQ3uLgvU-p9_RQqMLqj7ydwOKyevMw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-RUbtzQSSvyqbG=-PD3kbui1=OdTiY2=rjWtrSVOg2aA@mail.gmail.com>
-References: <e2a29860b0eb2591e16a83178e305828d1b0b730.1519950018.git.alistair.francis@xilinx.com>
-	<CAKmqyKOcSA0wqWrsRMXMv2E+Jb+MnYkD_h16NbEmxYohVJoj-w@mail.gmail.com>
-	<CAFEAcA__BbzvYOxOEQ0iydLJf0WQDDTnaivMWyY2UJeLAcy7HQ@mail.gmail.com>
-	<CAFEAcA-RUbtzQSSvyqbG=-PD3kbui1=OdTiY2=rjWtrSVOg2aA@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 2 Mar 2018 08:17:45 -0800
-Message-ID: <CAKmqyKOHvvGj+DQOX8CmmeN8-ac4KOAZVCi+384TjVDpYDf6=Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] target/arm: Fix the A53 L2CTLR typo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJSP0QW1OKnRwwvxvmYaBQ3uLgvU-p9_RQqMLqj7ydwOKyevMw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] virtio-blk: notify guest
+ directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,35 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "sochin.jiang" <sochin.jiang@huawei.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, Yi Fang <eric.fangyi@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Fri, Mar 2, 2018 at 2:35 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 2 March 2018 at 10:29, Peter Maydell <peter.maydell@linaro.org> wrote:
->> On 2 March 2018 at 04:34, Alistair Francis <alistair23@gmail.com> wrote:
->>>     target/arm: Report the number of cores in the cluster
->>>
->>>     Previously we assumed that we only has a single cluster, which meant we
->>>     could get away with reporting smp_cpus to the guest. There are cases
->>>     where we have two clusters (Xilinx's ZynqMP is a good example) so
->>>     reporting the number of smp_cpus is incorrect. Instead count the cores
->>>     in the cluster.
->
->> This seems a bit ad-hoc (it will give the wrong answer if we have
->> two clusters both of the same kind of CPU, for instance).
->> Maybe it would be better to have a "cluster-size" property on
->> the CPU (with the default being number of cores in whole system) ?
->
-> ...though I think "cluster size" isn't quite the right name --
-> if you have a big.LITTLE cluster with 2xA57 and 2xA53, there are
-> 4 cores in the cluster but I think reading the TRM that the cores
-> will report 2 in the L2CTLR.
+On Fri, Mar 02, 2018 at 01:38:52PM +0000, Stefan Hajnoczi wrote:
+> On Tue, Dec 19, 2017 at 1:33 PM, sochin.jiang <sochin.jiang@huawei.com> wrote:
+> >  Till now, we've already notify guest as a batch mostly, an
+> >  extra BH won't decrease guest interrupts much, but cause a
+> >  significant notification loss. Generally, we could have 15%
+> >  or so performance lost in single queue IO models, as I tested.
+> 
+> Recent performance testing has shown that virtio-blk can underperform
+> virtio-scsi due to the extra latency added by the BH.
+> 
+> The virtqueue EVENT_IDX feature mitigates interrupts when the guest
+> interrupt handler has not had a chance to run yet.  Therefore, virtio
+> already offers one level of interrupt mitigation and the BH adds
+> additional latency on top.
 
-Hmmm... I would have thought cluster size is correct enough. The only
-other option I can think of is "processor size" or "core size"?
+FWIW, I'm writing a patch that disables the BH (notifying after each completion
+instead) when EVENT_IDX is present. I'll send both the patch and some fio
+numbers next week.
 
-Alistair
-
->
-> thanks
-> -- PMM
+Sergio.
