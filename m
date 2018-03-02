@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1erfMt-0006xs-C9
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 02:44:40 -0500
+	(envelope-from <peterx@redhat.com>) id 1erfTS-0008LP-W2
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 02:51:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1erfMq-0002FX-8e
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 02:44:39 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59266 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1erfTP-00063C-U2
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 02:51:27 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59374 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1erfMq-0002Dr-3J
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 02:44:36 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1erfTP-00062U-OL
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 02:51:23 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DD1B240FB65B
-	for <qemu-devel@nongnu.org>; Fri,  2 Mar 2018 07:44:24 +0000 (UTC)
-Date: Fri, 2 Mar 2018 15:44:08 +0800
+	by mx1.redhat.com (Postfix) with ESMTPS id 3ED4640FB659
+	for <qemu-devel@nongnu.org>; Fri,  2 Mar 2018 07:51:23 +0000 (UTC)
+Date: Fri, 2 Mar 2018 15:51:07 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180302074408.GL27381@xz-mi>
+Message-ID: <20180302075107.GM27381@xz-mi>
 References: <20180216131625.9639-1-dgilbert@redhat.com>
-	<20180216131625.9639-20-dgilbert@redhat.com>
+	<20180216131625.9639-21-dgilbert@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180216131625.9639-20-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 19/29] postcopy: wake shared
+In-Reply-To: <20180216131625.9639-21-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 20/29] postcopy:
+ postcopy_notify_shared_wake
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,99 +37,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, marcandre.lureau@redhat.com, imammedo@redhat.com, mst@redhat.com, quintela@redhat.com, aarcange@redhat.com
 
-On Fri, Feb 16, 2018 at 01:16:15PM +0000, Dr. David Alan Gilbert (git) wrote:
+On Fri, Feb 16, 2018 at 01:16:16PM +0000, Dr. David Alan Gilbert (git) wrote:
 > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> Send a 'wake' request on a userfaultfd for a shared process.
-> The address in the clients address space is specified together
-> with the RAMBlock it was resolved to.
-
-I think it's "providing a helper to send WAKE to uffd" rather than
-really sending it.
-
-Otherwise it looks good to me.  Thanks,
-
+> Add a hook to allow a client userfaultfd to be 'woken'
+> when a page arrives, and a walker that calls that
+> hook for relevant clients given a RAMBlock and offset.
 > 
 > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > ---
->  migration/postcopy-ram.c | 26 ++++++++++++++++++++++++++
->  migration/postcopy-ram.h |  6 ++++++
->  migration/trace-events   |  1 +
->  3 files changed, 33 insertions(+)
+>  migration/postcopy-ram.c | 16 ++++++++++++++++
+>  migration/postcopy-ram.h | 10 ++++++++++
+>  2 files changed, 26 insertions(+)
 > 
 > diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index 277ff749a0..67deae7e1c 100644
+> index 67deae7e1c..879711968c 100644
 > --- a/migration/postcopy-ram.c
 > +++ b/migration/postcopy-ram.c
-> @@ -534,6 +534,25 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
->      return 0;
+> @@ -824,6 +824,22 @@ static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
+>      return ret;
 >  }
 >  
-> +int postcopy_wake_shared(struct PostCopyFD *pcfd,
-> +                         uint64_t client_addr,
-> +                         RAMBlock *rb)
+> +int postcopy_notify_shared_wake(RAMBlock *rb, uint64_t offset)
 > +{
-> +    size_t pagesize = qemu_ram_pagesize(rb);
-> +    struct uffdio_range range;
-> +    int ret;
-> +    trace_postcopy_wake_shared(client_addr, qemu_ram_get_idstr(rb));
-> +    range.start = client_addr & ~(pagesize - 1);
-> +    range.len = pagesize;
-> +    ret = ioctl(pcfd->fd, UFFDIO_WAKE, &range);
-> +    if (ret) {
-> +        error_report("%s: Failed to wake: %zx in %s (%s)",
-> +                     __func__, (size_t)client_addr, qemu_ram_get_idstr(rb),
-> +                     strerror(errno));
+> +    int i;
+> +    MigrationIncomingState *mis = migration_incoming_get_current();
+> +    GArray *pcrfds = mis->postcopy_remote_fds;
+> +
+> +    for (i = 0; i < pcrfds->len; i++) {
+> +        struct PostCopyFD *cur = &g_array_index(pcrfds, struct PostCopyFD, i);
+> +        int ret = cur->waker(cur, rb, offset);
+> +        if (ret) {
+> +            return ret;
+> +        }
 > +    }
-> +    return ret;
+> +    return 0;
 > +}
 > +
+
+We should know that which FD needs what pages, right?  If with that
+information, we can only notify the ones who have page faulted on
+exactly the same page?  Otherwise we do UFFDIO_WAKE once for each
+client when a page is ready, even if the clients have not page faulted
+at all?
+
+But for the first version, I think it's fine.  And I believe if we
+maintain the faulted addresses we need some way to sync between the
+wake thread and fault thread too.  And I totally have no idea on how
+this difference will be any kind of bottle neck at all, since I guess
+the network link should still be the postcopy bottleneck considering
+that 10g is mostly what we have now (or even, 1g).
+
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
 >  /*
->   * Callback from shared fault handlers to ask for a page,
->   * the page must be specified by a RAMBlock and an offset in that rb
-> @@ -951,6 +970,13 @@ void *postcopy_get_tmp_page(MigrationIncomingState *mis)
->      return NULL;
->  }
->  
-> +int postcopy_wake_shared(struct PostCopyFD *pcfd,
-> +                         uint64_t client_addr,
-> +                         RAMBlock *rb)
-> +{
-> +    assert(0);
-> +    return -1;
-> +}
->  #endif
->  
->  /* ------------------------------------------------------------------------- */
+>   * Place a host page (from) at (host) atomically
+>   * returns 0 on success
 > diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
-> index 4c63f20df4..2e3dd844d5 100644
+> index 2e3dd844d5..2b71cf958e 100644
 > --- a/migration/postcopy-ram.h
 > +++ b/migration/postcopy-ram.h
-> @@ -162,6 +162,12 @@ struct PostCopyFD {
+> @@ -146,6 +146,10 @@ struct PostCopyFD;
+>  
+>  /* ufd is a pointer to the struct uffd_msg *TODO: more Portable! */
+>  typedef int (*pcfdhandler)(struct PostCopyFD *pcfd, void *ufd);
+> +/* Notification to wake, either on place or on reception of
+> + * a fault on something that's already arrived (race)
+> + */
+> +typedef int (*pcfdwake)(struct PostCopyFD *pcfd, RAMBlock *rb, uint64_t offset);
+>  
+>  struct PostCopyFD {
+>      int fd;
+> @@ -153,6 +157,8 @@ struct PostCopyFD {
+>      void *data;
+>      /* Handler to be called whenever we get a poll event */
+>      pcfdhandler handler;
+> +    /* Notification to wake shared client */
+> +    pcfdwake waker;
+>      /* A string to use in error messages */
+>      const char *idstr;
+>  };
+> @@ -162,6 +168,10 @@ struct PostCopyFD {
 >   */
 >  void postcopy_register_shared_ufd(struct PostCopyFD *pcfd);
 >  void postcopy_unregister_shared_ufd(struct PostCopyFD *pcfd);
-> +/* Notify a client ufd that a page is available
-> + * Note: The 'client_address' is in the address space of the client
-> + * program not QEMU
+> +/* Call each of the shared 'waker's registerd telling them of
+> + * availability of a block.
 > + */
-> +int postcopy_wake_shared(struct PostCopyFD *pcfd, uint64_t client_addr,
-> +                         RAMBlock *rb);
->  /* Callback from shared fault handlers to ask for a page */
->  int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb,
->                                   uint64_t client_addr, uint64_t offset);
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 7c910b5479..b0acaaa8a0 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -199,6 +199,7 @@ postcopy_ram_incoming_cleanup_entry(void) ""
->  postcopy_ram_incoming_cleanup_exit(void) ""
->  postcopy_ram_incoming_cleanup_join(void) ""
->  postcopy_request_shared_page(const char *sharer, const char *rb, uint64_t rb_offset) "for %s in %s offset 0x%"PRIx64
-> +postcopy_wake_shared(uint64_t client_addr, const char *rb) "at 0x%"PRIx64" in %s"
->  
->  save_xbzrle_page_skipping(void) ""
->  save_xbzrle_page_overflow(void) ""
+> +int postcopy_notify_shared_wake(RAMBlock *rb, uint64_t offset);
+>  /* Notify a client ufd that a page is available
+>   * Note: The 'client_address' is in the address space of the client
+>   * program not QEMU
 > -- 
 > 2.14.3
 > 
