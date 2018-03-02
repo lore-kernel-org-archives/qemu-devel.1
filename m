@@ -1,28 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1erkhT-0003rm-KX
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:26:16 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1erkqT-0006x5-NW
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:35:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1erkhS-0007r5-DZ
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:26:15 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:34497)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1erkhS-0007qs-6k
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:26:14 -0500
-Received: by mail-ot0-x244.google.com with SMTP id n74so8697526ota.1
-	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 05:26:13 -0800 (PST)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1erkqQ-0003JL-FB
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:35:33 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50056)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1erkqQ-0003J1-3R
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 08:35:30 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w22DXlwt090170
+	for <qemu-devel@nongnu.org>; Fri, 2 Mar 2018 08:35:28 -0500
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2gf543pcyh-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 08:35:28 -0500
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Fri, 2 Mar 2018 06:35:26 -0700
+References: <20180223132311.26555-1-marcandre.lureau@redhat.com>
+	<20180223132311.26555-7-marcandre.lureau@redhat.com>
+	<4dc45713-b15d-0db5-d72e-ccb007cd2487@redhat.com>
+	<b1eb7e49-f2ba-6115-79b1-a299af8e5032@linux.vnet.ibm.com>
+	<9b615ca0-bc5a-e160-928d-07042b93e9a0@redhat.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Fri, 2 Mar 2018 08:35:21 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180228222627.GA3575@flamenco>
-References: <1519690504-37792-1-git-send-email-mjc@sifive.com>
-	<CAFEAcA_0qNcikG2iLii=4zEPYvhz1koEbhCCrCXssdKYv06OJA@mail.gmail.com>
-	<CADJ6UvPQMDq_RES_u6WUmXHsita+On4oLu-V=emp3MnmmzjHhQ@mail.gmail.com>
-	<CAHNT7Nv04hScm7QDtJMhFZeB=WOyOQ6HW1J-xOEO11GM1xFqyA@mail.gmail.com>
-	<20180228222627.GA3575@flamenco>
-From: Michael Clark <mjc@sifive.com>
-Date: Sat, 3 Mar 2018 02:26:12 +1300
-Message-ID: <CAHNT7NsPog=OLcU-RuVQQVpYk2n9nvHM453YLdDZocu8h0HYDQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [patches] Re: [PULL] RISC-V QEMU Port Submission
+In-Reply-To: <9b615ca0-bc5a-e160-928d-07042b93e9a0@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <a6b41731-afc9-eeab-6467-2bbd1f3b93a9@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [edk2] [PATCH 6/7] ovmf: link with Tcg2ConfigDxe
+ module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +45,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: Stef O'Rear <sorear2@gmail.com>, RISC-V Patches <patches@groups.riscv.org>, Palmer Dabbelt <palmer@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: Laszlo Ersek <lersek@redhat.com>, marcandre.lureau@redhat.com, edk2-devel@lists.01.org
+Cc: pjones@redhat.com, jiewen.yao@intel.com, qemu-devel@nongnu.org, javierm@redhat.com
 
-On Thu, Mar 1, 2018 at 11:26 AM, Emilio G. Cota <cota@braap.org> wrote:
-
-> On Wed, Feb 28, 2018 at 13:09:11 +1300, Michael Clark wrote:
-> > BTW somewhat coincidentally, the binary translator I wrote; RV8, which is
-> > practicaly twice as fast as QEMU only supports privileged ISA v1.9.1 and
-> I
-> > personally want to keep binary compatiblity with it.
-> (snip)
-> > - https://rv8.io/
-> > - https://rv8.io/bench
-> > - https://anarch128.org/~mclark/rv8-carrv.pdf
-> > - https://anarch128.org/~mclark/rv8-slides.pdf
+On 03/02/2018 06:12 AM, Laszlo Ersek wrote:
+> On 03/01/18 17:59, Stefan Berger wrote:
+>> On 02/26/2018 04:58 AM, Laszlo Ersek wrote:
+>>> On 02/23/18 14:23, marcandre.lureau@redhat.com wrote:
+>>>> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>>>
+>>>> The module allows to tweak and interact with the TPM. Note that many
+>>>> actions are broken due to implementation of qemu TPM (providing it's
+>>>> own ACPI table), and the lack of PPI implementation.
+>>>>
+>>>> CC: Laszlo Ersek <lersek@redhat.com>
+>>>> CC: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>>>> Contributed-under: TianoCore Contribution Agreement 1.0
+>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>>> ---
+>>>>    OvmfPkg/OvmfPkgX64.dsc | 2 ++
+>>>>    OvmfPkg/OvmfPkgX64.fdf | 1 +
+>>>>    2 files changed, 3 insertions(+)
+>>>>
+>>>> diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
+>>>> index 9bd0709f98..2281bd5ff8 100644
+>>>> --- a/OvmfPkg/OvmfPkgX64.dsc
+>>>> +++ b/OvmfPkg/OvmfPkgX64.dsc
+>>>> @@ -669,6 +669,8 @@
+>>>>        =20
+>>>> NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1.inf
+>>>>        =20
+>>>> NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha256=
+.inf
+>>>>      }
+>>>> +
+>>>> +  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
+>>>>    !endif
+>>>>      !if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
+>>>> diff --git a/OvmfPkg/OvmfPkgX64.fdf b/OvmfPkg/OvmfPkgX64.fdf
+>>>> index b8dd7ecae4..985404850f 100644
+>>>> --- a/OvmfPkg/OvmfPkgX64.fdf
+>>>> +++ b/OvmfPkg/OvmfPkgX64.fdf
+>>>> @@ -399,6 +399,7 @@ INF
+>>>> MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+>>>>      !if $(TPM2_ENABLE) =3D=3D TRUE
+>>>>    INF  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
+>>>> +INF  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
+>>>>    !endif
+>>>>    =20
+>>>> ####################################################################=
+############
+>>>>
+>>>>
+>>> Please drop this patch.
+>>>
+>>> In my earlier investigation I wrote, Tcg2ConfigDxe "[p]rovides a Setu=
+p
+>>> TUI interface to configure the TPM. IIUC, it can also save the
+>>> configured TPM type for subsequent boots (see Tcg2ConfigPei.inf above=
+)".
+>>>
+>>> The INF file itself says "This module is only for reference only, eac=
+h
+>>> platform should have its own setup page."
+>>>
+>>> And Jiewen wrote earlier, "Tcg2ConfigPei/Dxe are platform sample driv=
+er.
+>>> A platform may have its own version based upon platform requirement. =
+For
+>>> example, if a platform supports fTPM, it may use another Tcg2Config
+>>> driver."
+>>>
+>>> Given that OVMF lacks PEI-phase variable access, and that I consequen=
+tly
+>>> suggested cloning, and seriously trimming, Tcg2ConfigPei, it makes no
+>>> sense to include an HII dialog that sets a variable for PEI phase
+>>> consumption. Also, as you say, many of the exposed operations are bro=
+ken
+>>> due to lack of PPI support. So let's just postpone the inclusion of t=
+his
+>>> driver, for now.
+>> Just FYI: The PPI support for the OS requires ACPI
+> OK
 >
-> What QEMU versions did you use for those comparisons? I wonder if
-> the recent indirect branch handling improvements were included in those
-> (this work was merged in 2.10 for aarch64). Also, 2.7 is quite a bit
-> faster than previous versions for user-mode due to the use of QHT,
-> although you probably used a later version.
+>> and, as it is
+>> currently implemented, SMF where UEFI variables are manipulated.
+> (I assume s/SMF/SMM/)
+
+correct.
 >
+> You are correct to write "as it is currently implemented". My point in
+> my previous email(s) was that QEMU should generate the ACPI payload
+> needed by the OS, for queueing PPI opcodes (i.e. OVMF should install
+> QEMU's AML, *not* the sample AML code in SecurityPkg). In turn the AML
+> from QEMU should queue the PPI opcodes in the custom register block of
+> the TPM device (which is anyway the only NVRAM-emulation possibility
+> under SeaBIOS).
 
-Yes I noticed indirect branch handling was very slow in the QEMU verison I
-tested. I have highly optimised assembly stubs that implement a direct
-mapped translation cache and translation cache miss fallback to C code that
-does a fast hash map lookup.
+We can emulate other NVRAM as well. It is a possibility and provides the=20
+flexibility of setting flags per implemented PPI code indicating whether=20
+the firmware implements the codes and sysfs entries in Linux can then=20
+show what is actually supported. If you write code '23' into sysfs and=20
+ACPI has no clue whether the firmware implements '23', then you may=20
+reboot for nothing and start wondering what is going on because the=20
+effect isn't there. Also I don't think we'll implement the same set of=20
+commands in both firmwares that we would want to hard-code the checking=20
+for implemented code in ACPI produced by the firmware.
 
-
-> BTW after the merge you might want to look into optimizing indirect
-> branches (and cross-page direct jumps in softmmu) for riscv in qemu.
-> See examples with
->         $ git log -Stcg_gen_lookup_and_goto_ptr
 >
+> Given that the PPI opcodes will henceforth not be stored in a UEFI
+> variable under OVMF either, the SMM requirement in the AML falls away
+> completely.
 
-It was qemu-2.7.50 (late 2016). The benchmarks were generated mid last year.
+I would not modify that code but keep what is there right now and write=20
+some glue code around it: Upon reboot detect what PPI code has been set,=20
+if any, and write it into the UEFI variable. Then existing UEFI code=20
+reads the variable (stemming either from OS or a menu operation) and=20
+acts upon it. That keeps much of the existing code unmodified, which I=20
+find appealing. Also the code for the menu wouldn't have to be modified.
 
-I can run the benchmarks again... Has it doubled in speed?
+>
+> Retrieving the PPI opcodes for processing from the custom MMIO register
+> block of the TPM device, after reboot, as opposed to reading them out o=
+f
+> a UEFI variable, will take custom code in OVMF. We'll get there.
 
-Note: I don't even have a register allocator. I've assigned RISC-V RVC
-register to hard registers (compiler optimises to choose compressable
-registers first) and the remainder are in spill slots that in many cases
-can be embedded as memory operands in the x86_64 translation. i.e. no
-explicit reload, we let the micro-architecture crack these into micro-ops,
-as they help to keep up code density.
+That custom MMIO register block could, in the worst case, be assigned a=20
+different purpose in a future spec...
 
-I think I can get close to double again with tiered optimization and a good
-register allocator (lift RISC-V asm to SSA form). It's also a hotspot
-interpreter, which is definately faster than compiling all code, as I
-benchmarked it. It profiles and only translates hot paths, so code that
-only runs a few iterations is not translated. When I did eager transaltion
-I got a slow-down.
+   Stefan
+>
+>> Some
+>> menu items in the TPM 2 menu (also TPM 1.2) also require these UEFI
+>> variables of the PPI interface so that UEFI can react on the menu
+>> choices upon re.
+> (I assume s/re/reboot/)
+>
+> In "SecurityPkg/Tcg/Tcg2Config/Tcg2Config.vfr" (which is the "Visual
+> Form Representation" of the dialog we're talking about), I see three
+> variable references. The structures for those are defined in
+> "SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigNvData.h":
+>
+> - TCG2_CONFIGURATION_INFO
+> - TCG2_CONFIGURATION
+> - TCG2_VERSION
+>
+> I think the last two are irrelevant under OVMF / QEMU (fixed version 2
+> TPM, and ACPI comes from QEMU -- consistent with my other comments for
+> the PEI phase modules).
+>
+> TCG2_CONFIGURATION_INFO looks more complex, so perhaps we'll have to
+> scavenge its handling for OVMF. However, it seems that
+> TCG2_CONFIGURATION_INFO is not needed in the PEI phase.
+>
+> ... Understand this right: I'd be bursting from joy if OVMF had
+> PEI-phase r/o variable access. I got that feature working for QEMU. But
+> all my attempts to upstream the work failed (apparently because I'm not
+> willing to develop a parallel "fake" for Xen -- on Xen, NVRAM/pflash
+> doesn't even exist, so even if the PEI variable service existed on Xen,
+> it would have zero chance to return valid data.)
+>
+> Laszlo
+>
