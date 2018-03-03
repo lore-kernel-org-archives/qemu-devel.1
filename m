@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anatoly.trosinenko@gmail.com>) id 1es7p5-0004Di-AF
-	for qemu-devel@nongnu.org; Sat, 03 Mar 2018 09:07:40 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1es7rE-0005NO-GS
+	for qemu-devel@nongnu.org; Sat, 03 Mar 2018 09:09:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anatoly.trosinenko@gmail.com>) id 1es7p4-0002jN-B3
-	for qemu-devel@nongnu.org; Sat, 03 Mar 2018 09:07:39 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1es7r9-0003GJ-He
+	for qemu-devel@nongnu.org; Sat, 03 Mar 2018 09:09:52 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:50840)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1es7r9-0003GB-8P
+	for qemu-devel@nongnu.org; Sat, 03 Mar 2018 09:09:47 -0500
+Received: by mail-wm0-x242.google.com with SMTP id w128so8088638wmw.0
+	for <qemu-devel@nongnu.org>; Sat, 03 Mar 2018 06:09:47 -0800 (PST)
+References: <20171228180814.9749-1-lukeshu@lukeshu.com>
+	<20171228180814.9749-11-lukeshu@lukeshu.com>
+	<CAFEAcA9joyBcXSOqDu=hWRUZPKA1wEKMpYhRr5+p0YCKQOs5Kw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <3befdaff-0a84-d2ff-25b9-2df8018c7697@linaro.org>
+Date: Sat, 3 Mar 2018 06:09:43 -0800
 MIME-Version: 1.0
-In-Reply-To: <efe4a642-a220-5a40-b1e0-769a4216389d@twiddle.net>
-References: <20180127134908.24095-1-anatoly.trosinenko@gmail.com>
-	<20180127134908.24095-2-anatoly.trosinenko@gmail.com>
-	<aab013fb-5ada-6ee5-d038-0277d8ef0b24@weilnetz.de>
-	<CAE5jQCfxjM9ykBCes0oDhrc0B6g8AC5Se39sXBsbZo=-dKQpyg@mail.gmail.com>
-	<CAE5jQCe8O3BT=6SDdm2p7J_wxgzZTcqhyS1mfnEr=4tci9fipg@mail.gmail.com>
-	<efe4a642-a220-5a40-b1e0-769a4216389d@twiddle.net>
-From: Anatoly Trosinenko <anatoly.trosinenko@gmail.com>
-Date: Sat, 3 Mar 2018 17:07:37 +0300
-Message-ID: <CAE5jQCcCA=3kkVa=5eMZs-BGAM_p4fZG+GPu1SmQMg7_sPAH5Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/1] tci: eliminate UB due to unaligned
- reads
+In-Reply-To: <CAFEAcA9joyBcXSOqDu=hWRUZPKA1wEKMpYhRr5+p0YCKQOs5Kw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 10/10] linux-user: init_guest_space: Try to
+ make ARM space+commpage continuous
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +33,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, Stefan Weil <sw@weilnetz.de>, qemu-trivial@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, Luke Shumaker <lukeshu@lukeshu.com>
+Cc: Luke Shumaker <lukeshu@parabola.nu>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>, Paul Brook <paul@codesourcery.com>
 
-Can rewriting TCI in such a way that every operation is aligned at 4- or
-even 8-byte boundary fix the situation or are there some more serious
-problems?
+On 03/02/2018 06:13 AM, Peter Maydell wrote:
+> Does anybody know why we allow the user to specify
+> it on the command line? (git revision history doesn't help, it just says
+> there's been a -pagesize argument since commit 54936004fddc5 in 2003,
+> right back when mmap emulation was first added...)
 
-2018-03-03 16:57 GMT+03:00 Richard Henderson <rth@twiddle.net>:
+I *think* it is to allow two different hosts with different page sizes to
+achieve the same memory layout, so that tcg traces are more easily compared, to
+root out bugs in the second host's tcg backend.
 
-> On 03/03/2018 12:54 AM, Anatoly Trosinenko wrote:
-> > Ping.
-> > Patchwork link: http://patchwork.ozlabs.org/patch/866732/
-> > <http://patchwork.ozlabs.org/patch/866732/>
-> > Patchew link:
-> > http://patchew.org/QEMU/20180127134908.24095-1-
-> anatoly.trosinenko@gmail.com/
-> > <http://patchew.org/QEMU/20180127134908.24095-1-
-> anatoly.trosinenko@gmail.com/>
-> >
-> > The code in tcg/tci.c reads some data from TCI bytecode through
-> > pointer dereferencing. As far as I know unaligned reads in such a way a=
-re
-> > undefined behavior and compiling with -fsanitize=3Dundefined enumerated
-> > them as such at run-time.
->
-> This is exactly one of the reasons why I have urged for TCI to be
-> abandoned.
->
-> While your patch works, it is *enormously* inefficient for hosts that
-> require it.
->
->
-> r~
->
+That's the only thing that I've used it for, anyway.
 
 
-
---=20
-=D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
-=D0=90=D0=BD=D0=B0=D1=82=D0=BE=D0=BB=D0=B8=D0=B9 =D0=A2=D1=80=D0=BE=D1=81=
-=D0=B8=D0=BD=D0=B5=D0=BD=D0=BA=D0=BE
-e-mail: anatoly.trosinenko@gmail.com
+r~
