@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1esHIO-0006w3-Py
-	for qemu-devel@nongnu.org; Sat, 03 Mar 2018 19:14:34 -0500
+	(envelope-from <bounces@canonical.com>) id 1esHVl-0006B9-Va
+	for qemu-devel@nongnu.org; Sat, 03 Mar 2018 19:28:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1esHIN-0000aP-IJ
-	for qemu-devel@nongnu.org; Sat, 03 Mar 2018 19:14:32 -0500
+	(envelope-from <bounces@canonical.com>) id 1esHVi-0007GO-RB
+	for qemu-devel@nongnu.org; Sat, 03 Mar 2018 19:28:21 -0500
+Received: from indium.canonical.com ([91.189.90.7]:56350)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1esHVi-0007G2-KQ
+	for qemu-devel@nongnu.org; Sat, 03 Mar 2018 19:28:18 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1esH5C-0001i4-FY
+	for <qemu-devel@nongnu.org>; Sun, 04 Mar 2018 00:00:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4F3D82E8054
+	for <qemu-devel@nongnu.org>; Sun,  4 Mar 2018 00:00:54 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAHQ1cqEDDz5ni-+MfQp7dE0x_b51=JwgU-fwS4Y+AkyDyLpxRQ@mail.gmail.com>
-References: <20180213170712.18239-1-andrew.smirnov@gmail.com>
-	<20180213170712.18239-2-andrew.smirnov@gmail.com>
-	<20180213200450-mutt-send-email-mst@kernel.org>
-	<CAHQ1cqEpeq+M6bVTBLd6dvN7=h-s_bPTXRx_GaoMFhhpq2gTpA@mail.gmail.com>
-	<20180214000837-mutt-send-email-mst@kernel.org>
-	<CAHQ1cqEDDz5ni-+MfQp7dE0x_b51=JwgU-fwS4Y+AkyDyLpxRQ@mail.gmail.com>
-From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Sat, 3 Mar 2018 15:25:55 -0800
-Message-ID: <CAHQ1cqGKSJcV5warB_mHUHvikGdAUST-otPUXzHhLwR2KV=SPw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 1/3] pci: Add support for Designware IP
- block
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 03 Mar 2018 23:55:16 -0000
+From: schmittlauch <t.schmittlauch+ubuntu@orlives.de>
+Reply-To: Bug 1753186 <1753186@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <152012131660.6957.17826936817192816521.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1753186] [NEW] qemu-nbd: always first snapshot
+ loaded from VDI images with snapshots
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,120 +36,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "open list:ARM" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: qemu-devel@nongnu.org
 
-On Tue, Feb 13, 2018 at 2:47 PM, Andrey Smirnov
-<andrew.smirnov@gmail.com> wrote:
-> On Tue, Feb 13, 2018 at 2:15 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
->> On Tue, Feb 13, 2018 at 12:24:40PM -0800, Andrey Smirnov wrote:
->>> On Tue, Feb 13, 2018 at 10:13 AM, Michael S. Tsirkin <mst@redhat.com> wrote:
->>> > On Tue, Feb 13, 2018 at 09:07:10AM -0800, Andrey Smirnov wrote:
->>> >> +static void designware_pcie_root_class_init(ObjectClass *klass, void *data)
->>> >> +{
->>> >> +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
->>> >> +    DeviceClass *dc = DEVICE_CLASS(klass);
->>> >> +
->>> >> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
->>> >> +
->>> >> +    k->vendor_id = PCI_VENDOR_ID_SYNOPSYS;
->>> >> +    k->device_id = 0xABCD;
->>> >> +    k->revision = 0;
->>> >> +    k->class_id = PCI_CLASS_BRIDGE_PCI;
->>> >> +    k->is_express = true;
->>> >> +    k->is_bridge = true;
->>> >> +    k->exit = pci_bridge_exitfn;
->>> >> +    k->realize = designware_pcie_root_realize;
->>> >> +    k->config_read = designware_pcie_root_config_read;
->>> >> +    k->config_write = designware_pcie_root_config_write;
->>> >> +
->>> >> +    dc->reset = pci_bridge_reset;
->>> >> +    /*
->>> >> +     * PCI-facing part of the host bridge, not usable without the
->>> >> +     * host-facing part, which can't be device_add'ed, yet.
->>> >> +     */
->>> >> +    dc->user_creatable = false;
->>> >> +    dc->vmsd = &vmstate_designware_pcie_root;
->>> >> +}
->>> >> +
->>> >> +static uint64_t designware_pcie_host_mmio_read(void *opaque, hwaddr addr,
->>> >> +                                               unsigned int size)
->>> >> +{
->>> >> +    PCIHostState *pci = PCI_HOST_BRIDGE(opaque);
->>> >> +    PCIDevice *device = pci_find_device(pci->bus, 0, 0);
->>> >> +
->>> >> +    return pci_host_config_read_common(device,
->>> >> +                                       addr,
->>> >> +                                       pci_config_size(device),
->>> >> +                                       size);
->>> >> +}
->>> >> +
->>> >> +static void designware_pcie_host_mmio_write(void *opaque, hwaddr addr,
->>> >> +                                            uint64_t val, unsigned int size)
->>> >> +{
->>> >> +    PCIHostState *pci = PCI_HOST_BRIDGE(opaque);
->>> >> +    PCIDevice *device = pci_find_device(pci->bus, 0, 0);
->>> >> +
->>> >> +    return pci_host_config_write_common(device,
->>> >> +                                        addr,
->>> >> +                                        pci_config_size(device),
->>> >> +                                        val, size);
->>> >> +}
->>> >> +
->>> >> +static const MemoryRegionOps designware_pci_mmio_ops = {
->>> >> +    .read       = designware_pcie_host_mmio_read,
->>> >> +    .write      = designware_pcie_host_mmio_write,
->>> >> +    .endianness = DEVICE_NATIVE_ENDIAN,
->>> >> +    .impl = {
->>> >> +        /*
->>> >> +         * Our device would not work correctly if the guest was doing
->>> >> +         * unaligned access. This might not be a limitation on the real
->>> >> +         * device but in practice there is no reason for a guest to access
->>> >> +         * this device unaligned.
->>> >> +         */
->>> >> +        .min_access_size = 4,
->>> >> +        .max_access_size = 4,
->>> >> +        .unaligned = false,
->>> >> +    },
->>> >> +};
->>> >
->>> > Could you pls add some comments explaining why is DEVICE_NATIVE_ENDIAN
->>> > appropriate here?  Most of these cases are plain "we never bothered
->>> > about cross-endian setups". Some are "there's a mix of different
->>> > endian-ness values, need to handle in a special way".
->>> >
->>> > I suspect you really need DEVICE_LITTLE_ENDIAN.
->>> >
->>>
->>> That MemoryRegion corresponds to a register file permanently mapped
->>> into CPU's address space, so my assumption is that SoC designers will
->>> wire it according to CPUs endianness be it big or little. I am not
->>> aware of any big-endian CPU based SoC on the market using Designware's
->>> IP block, so I don't think there are any precedent confirming or
->>> denying correctness of my assumption. IMHO, this is also the reason
->>> why all of Linux driver code for that IP assumes little endianness.
->>
->> IMHO if Linux driver code does cpu_to_le then it seems best to be
->> consistent with that.
->>
->
-> Well, all of the DW code does so implicitly by using readl()/writel()
-> helpers which will perform cpu_to_le/le_to_cpu under the hood. But is
-> seems to me that it could be either because the access does have to be
-> LE always or simply because readl()/writel() are goto memory helpers
-> on ARM/LE-platforms.
->
-> FWIW: Somewhat similar precedent of MIPS/Boston machine can serve as
-> counter-example to my assumption, since Xilinx PCIE IP there seem to
-> be wired to be LE despite being attached to BE CPU.
->
+Public bug reported:
 
-Michael, Peter:
+When mounting a virtual box disk image of a VM with snapshots, always
+the state of the first snapshot is shown.
 
-Just in case we are in an accidental deadlock waiting on each other,
-my assumption is that this patch in particular and the rest in the
-series are good as is to be applied. Please let me know if any changes
-need to be made and I'll submit v7.
+How to reproduce:
+1. Create a new VirtualBox VM or use an existing one, while choosing VDI as=
+ the disk image format.
+2. Create a snapshot of the VM.
+3. Modify the file system from within the VM enough that differences to the=
+ snapshotted version are apparent.
+4. Create another snapshot.
+5. Shut down the VM.
+6. Mount the partition from the disk image with `qemu-nbd -c /dev/nbd0 /pat=
+h/to/disk.vdi; mount /dev/nbd0pX /mnt`
 
-Thanks,
-Andrey Smirnov
+Expected result: The mounted disk image shall represent the latest state of=
+ the VM
+Actual result: The mounted disk image represents the VM state at the first =
+snapshot
+
+version information: qemu-nbd-2.11.1(openSUSE Tumbleweed)
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1753186
+
+Title:
+  qemu-nbd: always first snapshot loaded from VDI images with snapshots
+
+Status in QEMU:
+  New
+
+Bug description:
+  When mounting a virtual box disk image of a VM with snapshots, always
+  the state of the first snapshot is shown.
+
+  How to reproduce:
+  1. Create a new VirtualBox VM or use an existing one, while choosing VDI =
+as the disk image format.
+  2. Create a snapshot of the VM.
+  3. Modify the file system from within the VM enough that differences to t=
+he snapshotted version are apparent.
+  4. Create another snapshot.
+  5. Shut down the VM.
+  6. Mount the partition from the disk image with `qemu-nbd -c /dev/nbd0 /p=
+ath/to/disk.vdi; mount /dev/nbd0pX /mnt`
+
+  Expected result: The mounted disk image shall represent the latest state =
+of the VM
+  Actual result: The mounted disk image represents the VM state at the firs=
+t snapshot
+
+  version information: qemu-nbd-2.11.1(openSUSE Tumbleweed)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1753186/+subscriptions
