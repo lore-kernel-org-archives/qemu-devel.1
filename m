@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1erx3X-0004zp-Fa
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 21:37:52 -0500
+	(envelope-from <mjc@sifive.com>) id 1erxBn-0007gU-Q5
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 21:46:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1erx3V-0008Ak-Tu
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 21:37:51 -0500
-Received: from mail-ot0-x22e.google.com ([2607:f8b0:4003:c0f::22e]:33852)
+	(envelope-from <mjc@sifive.com>) id 1erxBm-0001pU-Hh
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 21:46:23 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:41509)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1erx3V-0008A8-Mr
-	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 21:37:49 -0500
-Received: by mail-ot0-x22e.google.com with SMTP id n74so10478576ota.1
-	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 18:37:49 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1erxBm-0001oc-9s
+	for qemu-devel@nongnu.org; Fri, 02 Mar 2018 21:46:22 -0500
+Received: by mail-ot0-x244.google.com with SMTP id w38so10474546ota.8
+	for <qemu-devel@nongnu.org>; Fri, 02 Mar 2018 18:46:22 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <4506959a-8d32-039a-f0e3-c864fd44ace6@redhat.com>
-References: <1519998711-73430-1-git-send-email-mjc@sifive.com>
-	<1519998711-73430-24-git-send-email-mjc@sifive.com>
-	<4506959a-8d32-039a-f0e3-c864fd44ace6@redhat.com>
+In-Reply-To: <CAFEAcA_kTXTs9z-v3Zow8r52QFrWPwQ3YSjhZOzPr6aj8jdSJQ@mail.gmail.com>
+References: <1519998942-73622-1-git-send-email-mjc@sifive.com>
+	<CAFEAcA_kTXTs9z-v3Zow8r52QFrWPwQ3YSjhZOzPr6aj8jdSJQ@mail.gmail.com>
 From: Michael Clark <mjc@sifive.com>
-Date: Sat, 3 Mar 2018 15:37:47 +1300
-Message-ID: <CAHNT7NsGeLU8rzfJBBrKxuD9WffHRNcF=mUrgGXzWF=2Qz2FdA@mail.gmail.com>
+Date: Sat, 3 Mar 2018 15:46:21 +1300
+Message-ID: <CAHNT7Nt72aUwGAGfV0zYya_WH3qXipk6XnLbfDPytMXMTLSJ-Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v8 23/23] RISC-V Build Infrastructure
+Subject: Re: [Qemu-devel] [PULL] RISC-V QEMU Port Submission v8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +28,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
 Cc: QEMU Developers <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-Let me know if you have a branch for me to pull and rebase against.
+On Sat, Mar 3, 2018 at 3:22 AM, Peter Maydell <peter.maydell@linaro.org>
+wrote:
 
-We are passing all build and make check tests in travis (except for a
-couple of build timeouts because we are hitting the default 50 minute
-timeout)
+> On 2 March 2018 at 13:55, Michael Clark <mjc@sifive.com> wrote:
+> >
+> > *** Changelog ***
+> >
+> > v8
+> >
+> > - - Added linux-user/riscv/target_elf.h during rebase
+> > - - Make resetvec configurable and clear mpp and mie on reset
+> > - - Use SiFive E31, E51, U34 and U54 cores in SiFive machines
+> > - - Define SiFive E31, E51, U34 and U54 cores
+> > - - Refactor CPU core definition in preparation for vendor cores
+> > - - Prevent S or U mode unless S or U extensions are present
+> > - - SiFive E Series cores have no MMU
+> > - - SiFive E Series cores have U mode
+> > - - Make privileged ISA v1.10 implicit in CPU types
+> > - - Remove DRAM_BASE and EXT_IO_BASE as they vary by machine
+> > - - Correctly handle mtvec and stvec alignment with respect to RVC
+> > - - Print more machine mode state in riscv_cpu_dump_state
+> > - - Make riscv_isa_string use compact extension order method
+> > - - Fix bug introduced in v6 RISCV_CPU_TYPE_NAME macro change
+> > - - Parameterize spike v1.9.1 config string
+> > - - Coalesce spike_v1.9.1 and spike_v1.10 machines
+> > - - Rename sifive_e300 to sifive_e, and sifive_u500 to sifive_u
+>
+> Please don't send pull requests until after patches have been put
+> on list and been reviewed. A minor update to a pullreq is OK if
+> it's something like a trivial compiler fix or just dropping some
+> patches that had problems, but if you have this many changes that
+> deserves a fresh patchset to be sent to the list for review.
+>
+> (For the QEMU workflow, a pull request isn't a request for patch
+> review, it's a statement that patches have all had review and
+> are ready to go into master immediately.)
 
-https://travis-ci.org/riscv/riscv-qemu/builds/348234736
 
-On Sat, Mar 3, 2018 at 3:33 AM, Eric Blake <eblake@redhat.com> wrote:
+My apoligies. I won't do this again.
 
-> On 03/02/2018 07:51 AM, Michael Clark wrote:
->
->> This adds RISC-V into the build system enabling the following targets:
->>
->> - riscv32-softmmu
->> - riscv64-softmmu
->> - riscv32-linux-user
->> - riscv64-linux-user
->>
->> This adds defaults configs for RISC-V, enables the build for the RISC-V
->> CPU core, hardware, and Linux User Emulation. The 'qemu-binfmt-conf.sh'
->> script is updated to add the RISC-V ELF magic.
->>
->> Expected checkpatch errors for consistency reasons:
->>
->> ERROR: line over 90 characters
->> FILE: scripts/qemu-binfmt-conf.sh
->>
->> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->> Signed-off-by: Sagar Karandikar <sagark@eecs.berkeley.edu>
->> Signed-off-by: Michael Clark <mjc@sifive.com>
->> ---
->>   arch_init.c                            |  2 ++
->>   configure                              | 13 +++++++++++++
->>   cpus.c                                 |  6 ++++++
->>   default-configs/riscv32-linux-user.mak |  1 +
->>   default-configs/riscv32-softmmu.mak    |  4 ++++
->>   default-configs/riscv64-linux-user.mak |  1 +
->>   default-configs/riscv64-softmmu.mak    |  4 ++++
->>   hw/riscv/Makefile.objs                 | 11 +++++++++++
->>   include/sysemu/arch_init.h             |  1 +
->>   qapi-schema.json                       | 17 ++++++++++++++++-
->>
->
-> Will need rebasing to modify qapi/misc.json if my pending PULL request
-> issues get resolved first:
->
-> https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg00469.html
->
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
->
+I have some very very minor cleanups that do not affect logic, but perhaps
+we could address this after getting approval to make a pull request for v8.
+
+My qemu-devel branch holds changes against the latest rebase:
+
+- https://github.com/michaeljclark/riscv-qemu/tree/qemu-devel
+
+Someone raised timebase frequency on the RISC-V sw-dev and after looking at
+the code I noticed we had a hard-coded value for a few of the constants we
+put in device tree, and i spotted a missed rename. I'm going to have to
+learn about the qemu-devel process for trivial fixes...
+
+Thanks for bearing with me, and my apologies for not following QEMU
+workflow ettiquite with the v8 series. the tag is locked down and signed in
+any case.
+
+Regards,
+Michael.
