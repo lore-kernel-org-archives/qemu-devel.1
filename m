@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yvugenfi@redhat.com>) id 1esTKa-00053u-Ob
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 08:05:38 -0500
+	(envelope-from <nia.alarie@gmail.com>) id 1esTyK-0004oj-UW
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 08:46:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yvugenfi@redhat.com>) id 1esTKX-0004px-Es
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 08:05:36 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35050 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yvugenfi@redhat.com>) id 1esTKX-0004pR-2Z
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 08:05:33 -0500
-From: Yan Vugenfirer <yvugenfi@redhat.com>
-Message-Id: <258F88CA-D946-4804-A65D-2EA0790A66AF@redhat.com>
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Date: Sun, 4 Mar 2018 15:05:22 +0200
-In-Reply-To: <20180302221831-mutt-send-email-mst@kernel.org>
-References: <cover.1519961667.git.jbaron@akamai.com>
-	<c9d3cf2fbc3c64bb28e0438185d85d95b2088127.1519961667.git.jbaron@akamai.com>
-	<7fc612d0-9610-9b07-d054-bb1438898f47@redhat.com>
-	<20180302221831-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain;
-	charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH 4/4] virtio-net: add linkspeed
- and duplex settings to virtio-net
+	(envelope-from <nia.alarie@gmail.com>) id 1esTyH-0006VG-Sv
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 08:46:41 -0500
+From: Nia Alarie <nia.alarie@gmail.com>
+Date: Sun,  4 Mar 2018 13:45:48 +0000
+Message-Id: <20180304134548.19498-1-nia.alarie@gmail.com>
+Subject: [Qemu-devel] [PATCH] s390x/sclpconsole: Remove dead code - make
+ _error functions void
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +18,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, Jason Baron <jbaron@akamai.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, borntraeger@de.ibm.com, cohuck@redhat.com, rth@twiddle.net, stefanha@gmail.com, jim@groklearning.com, joel@jms.id.au, Nia Alarie <nia.alarie@gmail.com>
 
+These functions always return 0. By changing their return type to
+void, some dead code can be removed.
 
+Signed-off-by: Nia Alarie <nia.alarie@gmail.com>
+---
+ hw/char/sclpconsole-lm.c          | 3 +--
+ hw/char/sclpconsole.c             | 3 +--
+ hw/s390x/event-facility.c         | 6 +-----
+ hw/s390x/virtio-ccw.c             | 6 +++---
+ hw/s390x/virtio-ccw.h             | 2 +-
+ include/hw/s390x/event-facility.h | 2 +-
+ 6 files changed, 8 insertions(+), 14 deletions(-)
 
-> On 2 Mar 2018, at 22:19, Michael S. Tsirkin <mst@redhat.com> wrote:
->=20
-> On Fri, Mar 02, 2018 at 03:14:01PM +0800, Jason Wang wrote:
->>=20
->>=20
->> On 2018=E5=B9=B403=E6=9C=8802=E6=97=A5 11:46, Jason Baron wrote:
->>> Although linkspeed and duplex can be set in a linux guest via =
-'ethtool -s',
->>> this requires custom ethtool commands for virtio-net by default.
->>>=20
->>> Introduce a new feature flag, VIRTIO_NET_F_SPEED_DUPLEX, which =
-allows
->>> the hypervisor to export a linkspeed and duplex setting. The user =
-can
->>> subsequently overwrite it later if desired via: 'ethtool -s'.
->>>=20
->>> Linkspeed and duplex settings can be set as:
->>> '-device virtio-net,speed=3D10000,duplex=3Dfull'
->>=20
->> I was thinking whether or not it's better to decide the duplex by the =
-type
->> of backends.
->>=20
->> E.g userspace and vhost-kernel implement a in fact half duplex. But =
-dpdk
->> implement a full duplex.
->>=20
->> Thanks
->=20
-> OTOH it's a priority for some people to be able to support migration
-> between different backend types. Breaking that won't be nice.
-
-I think that in this case we need a way to update the settings of link =
-speed and link duplex (maybe add QMP command). Migration between =
-different backend types should cause link down\link up events. And this =
-is a time for a driver to re-read the settings and update the OS.
-
-Best regards,
-Yan.
-
->=20
->>>=20
->>> where speed is [0...INT_MAX], and duplex is ["half"|"full"].
->>>=20
->>> Signed-off-by: Jason Baron<jbaron@akamai.com>
->>> Cc: "Michael S. Tsirkin"<mst@redhat.com>
->>> Cc: Jason Wang<jasowang@redhat.com>
->>> Cc:virtio-dev@lists.oasis-open.org
->>> ---
->=20
-> ---------------------------------------------------------------------
-> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+diff --git a/hw/char/sclpconsole-lm.c b/hw/char/sclpconsole-lm.c
+index c500bdaf29..7a02db54b8 100644
+--- a/hw/char/sclpconsole-lm.c
++++ b/hw/char/sclpconsole-lm.c
+@@ -318,9 +318,8 @@ static int console_init(SCLPEvent *event)
+     return 0;
+ }
+ 
+-static int console_exit(SCLPEvent *event)
++static void console_exit(SCLPEvent *event)
+ {
+-    return 0;
+ }
+ 
+ static void console_reset(DeviceState *dev)
+diff --git a/hw/char/sclpconsole.c b/hw/char/sclpconsole.c
+index d0265dfa7a..e2a80dd2dd 100644
+--- a/hw/char/sclpconsole.c
++++ b/hw/char/sclpconsole.c
+@@ -246,9 +246,8 @@ static void console_reset(DeviceState *dev)
+    scon->notify = false;
+ }
+ 
+-static int console_exit(SCLPEvent *event)
++static void console_exit(SCLPEvent *event)
+ {
+-    return 0;
+ }
+ 
+ static Property console_properties[] = {
+diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+index 155a69467b..4263d28012 100644
+--- a/hw/s390x/event-facility.c
++++ b/hw/s390x/event-facility.c
+@@ -436,11 +436,7 @@ static void event_unrealize(DeviceState *qdev, Error **errp)
+     SCLPEvent *event = SCLP_EVENT(qdev);
+     SCLPEventClass *child = SCLP_EVENT_GET_CLASS(event);
+     if (child->exit) {
+-        int rc = child->exit(event);
+-        if (rc < 0) {
+-            error_setg(errp, "SCLP event exit failed.");
+-            return;
+-        }
++        child->exit(event);
+     }
+ }
+ 
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index 8f7fbc2ab7..0773818a82 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -752,7 +752,7 @@ out_err:
+     g_free(sch);
+ }
+ 
+-static int virtio_ccw_exit(VirtioCcwDevice *dev)
++static void virtio_ccw_exit(VirtioCcwDevice *dev)
+ {
+     CcwDevice *ccw_dev = CCW_DEVICE(dev);
+     SubchDev *sch = ccw_dev->sch;
+@@ -765,7 +765,6 @@ static int virtio_ccw_exit(VirtioCcwDevice *dev)
+         release_indicator(&dev->routes.adapter, dev->indicators);
+         dev->indicators = NULL;
+     }
+-    return 0;
+ }
+ 
+ static void virtio_ccw_net_realize(VirtioCcwDevice *ccw_dev, Error **errp)
+@@ -1710,7 +1709,8 @@ static int virtio_ccw_busdev_exit(DeviceState *dev)
+     VirtioCcwDevice *_dev = (VirtioCcwDevice *)dev;
+     VirtIOCCWDeviceClass *_info = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
+ 
+-    return _info->exit(_dev);
++    _info->exit(_dev);
++    return 0;
+ }
+ 
+ static void virtio_ccw_busdev_unplug(HotplugHandler *hotplug_dev,
+diff --git a/hw/s390x/virtio-ccw.h b/hw/s390x/virtio-ccw.h
+index 3905f3a3d6..8ffe7fe095 100644
+--- a/hw/s390x/virtio-ccw.h
++++ b/hw/s390x/virtio-ccw.h
+@@ -76,7 +76,7 @@ typedef struct VirtioCcwDevice VirtioCcwDevice;
+ typedef struct VirtIOCCWDeviceClass {
+     CCWDeviceClass parent_class;
+     void (*realize)(VirtioCcwDevice *dev, Error **errp);
+-    int (*exit)(VirtioCcwDevice *dev);
++    void (*exit)(VirtioCcwDevice *dev);
+ } VirtIOCCWDeviceClass;
+ 
+ /* Performance improves when virtqueue kick processing is decoupled from the
+diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
+index 5119b9b7f0..833f12a5e7 100644
+--- a/include/hw/s390x/event-facility.h
++++ b/include/hw/s390x/event-facility.h
+@@ -174,7 +174,7 @@ typedef struct SCLPEvent {
+ typedef struct SCLPEventClass {
+     DeviceClass parent_class;
+     int (*init)(SCLPEvent *event);
+-    int (*exit)(SCLPEvent *event);
++    void (*exit)(SCLPEvent *event);
+ 
+     /* get SCLP's send mask */
+     unsigned int (*get_send_mask)(void);
+-- 
+2.16.2
