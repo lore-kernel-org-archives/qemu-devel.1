@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1esXVP-0003FR-Nm
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 12:33:05 -0500
+	(envelope-from <thuth@redhat.com>) id 1esYGA-0001JD-CA
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 13:21:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1esXVL-0006QZ-Gf
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 12:33:03 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:45039)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1esXVL-0006P7-7k
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 12:32:59 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Sun,  4 Mar 2018 18:32:31 +0100
-Message-Id: <20180304173232.22814-5-laurent@vivier.eu>
-In-Reply-To: <20180304173232.22814-1-laurent@vivier.eu>
-References: <20180304173232.22814-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 4/5] softfloat: use floatx80_infinity in
- softfloat
+	(envelope-from <thuth@redhat.com>) id 1esYG6-0007JO-D4
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 13:21:22 -0500
+References: <96ce9600-c1e3-c3d6-5c3d-7d30cf799e04@fransdb.nl>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <bf227ff2-d45a-a279-568f-c60968a0aa09@redhat.com>
+Date: Sun, 4 Mar 2018 19:21:09 +0100
+MIME-Version: 1.0
+In-Reply-To: <96ce9600-c1e3-c3d6-5c3d-7d30cf799e04@fransdb.nl>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Problem compiling qemu-2.11.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,210 +23,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Laurent Vivier <laurent@vivier.eu>
+To: Frans de Boer <frans@fransdb.nl>, qemu-devel@nongnu.org, qemu-stable <qemu-stable@nongnu.org>
 
-Since f3218a8 ("softfloat: add floatx80 constants")
-floatx80_infinity is defined but never used.
+On 04.03.2018 12:15, Frans de Boer wrote:
+> LS,
+>=20
+> I try to compile qemu and get the next error message:
+>=20
+> mnt/rhome/frans-tw/data/projects/linux/kernel/qemu/qemu-2.11.1/util/mem=
+fd.c:40:12:
+> error: static declaration of =E2=80=98memfd_create=E2=80=99 follows non=
+-static declaration
+> =C2=A0static int memfd_create(const char *name, unsigned int flags)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ^~~~=
+~~~~~~~~
+> In file included from /usr/include/bits/mman-linux.h:115:0,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 from /usr/include/bits/mman.h:45,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 from /usr/include/sys/mman.h:41,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 from
+> /mnt/rhome/frans-tw/data/projects/linux/kernel/qemu/qemu-2.11.1/include=
+/sysemu/os-posix.h:29,
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 from
+> /mnt/rhome/frans-tw/data/projects/linux/kernel/qemu/qemu-2.11.1/include=
+/qemu/osdep.h:104,
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 from
+> /mnt/rhome/frans-tw/data/projects/linux/kernel/qemu/qemu-2.11.1/util/me=
+mfd.c:28:
+>=20
+> /usr/include/bits/mman-shared.h:46:5: note: previous declaration of
+> =E2=80=98memfd_create=E2=80=99 was here
+> =C2=A0int memfd_create (const char *__name, unsigned int __flags) __THR=
+OW;
+>=20
+> I use the newest Tumbleweed of openSuse with the gcc 7.3.0 compiler sui=
+te.
+>=20
+> Suggestions?
 
-This patch updates floatx80 functions to use
-this definition.
+Not sure, but it sounds like you need this patch on top:
 
-This allows to define a different default Infinity
-value on m68k: the m68k FPU defines infinity with
-all bits set to zero in the mantissa.
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D75e5b70e6b5dcc4f221=
+9992
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20180224201802.911-4-laurent@vivier.eu>
----
- fpu/softfloat-specialize.h | 14 ++++++++++++++
- fpu/softfloat.c            | 39 +++++++++++++++++++++++++--------------
- include/fpu/softfloat.h    | 13 +++++++++++--
- 3 files changed, 50 insertions(+), 16 deletions(-)
-
-diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
-index 46126e9e0a..9ccb59422c 100644
---- a/fpu/softfloat-specialize.h
-+++ b/fpu/softfloat-specialize.h
-@@ -177,6 +177,20 @@ floatx80 floatx80_default_nan(float_status *status)
-     return r;
- }
- 
-+/*----------------------------------------------------------------------------
-+| The pattern for a default generated extended double-precision inf.
-+*----------------------------------------------------------------------------*/
-+
-+#define floatx80_infinity_high 0x7FFF
-+#if defined(TARGET_M68K)
-+#define floatx80_infinity_low  LIT64(0x0000000000000000)
-+#else
-+#define floatx80_infinity_low  LIT64(0x8000000000000000)
-+#endif
-+
-+const floatx80 floatx80_infinity
-+    = make_floatx80_init(floatx80_infinity_high, floatx80_infinity_low);
-+
- /*----------------------------------------------------------------------------
- | The pattern for a default generated quadruple-precision NaN.
- *----------------------------------------------------------------------------*/
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index fb4853682e..e124df9f7e 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -2636,7 +2636,9 @@ floatx80 roundAndPackFloatx80(int8_t roundingPrecision, flag zSign,
-                ) {
-                 return packFloatx80( zSign, 0x7FFE, ~ roundMask );
-             }
--            return packFloatx80( zSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
-+            return packFloatx80(zSign,
-+                                floatx80_infinity_high,
-+                                floatx80_infinity_low);
-         }
-         if ( zExp <= 0 ) {
-             isTiny =
-@@ -3182,7 +3184,9 @@ floatx80 float32_to_floatx80(float32 a, float_status *status)
-         if (aSig) {
-             return commonNaNToFloatx80(float32ToCommonNaN(a, status), status);
-         }
--        return packFloatx80( aSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
-+        return packFloatx80(aSign,
-+                            floatx80_infinity_high,
-+                            floatx80_infinity_low);
-     }
-     if ( aExp == 0 ) {
-         if ( aSig == 0 ) return packFloatx80( aSign, 0, 0 );
-@@ -4037,7 +4041,9 @@ floatx80 float64_to_floatx80(float64 a, float_status *status)
-         if (aSig) {
-             return commonNaNToFloatx80(float64ToCommonNaN(a, status), status);
-         }
--        return packFloatx80( aSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
-+        return packFloatx80(aSign,
-+                            floatx80_infinity_high,
-+                            floatx80_infinity_low);
-     }
-     if ( aExp == 0 ) {
-         if ( aSig == 0 ) return packFloatx80( aSign, 0, 0 );
-@@ -4549,10 +4555,7 @@ int64_t floatx80_to_int64(floatx80 a, float_status *status)
-     if ( shiftCount <= 0 ) {
-         if ( shiftCount ) {
-             float_raise(float_flag_invalid, status);
--            if (    ! aSign
--                 || (    ( aExp == 0x7FFF )
--                      && ( aSig != LIT64( 0x8000000000000000 ) ) )
--               ) {
-+            if (!aSign || floatx80_is_any_nan(a)) {
-                 return LIT64( 0x7FFFFFFFFFFFFFFF );
-             }
-             return (int64_t) LIT64( 0x8000000000000000 );
-@@ -4858,7 +4861,9 @@ static floatx80 addFloatx80Sigs(floatx80 a, floatx80 b, flag zSign,
-             if ((uint64_t)(bSig << 1)) {
-                 return propagateFloatx80NaN(a, b, status);
-             }
--            return packFloatx80( zSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
-+            return packFloatx80(zSign,
-+                                floatx80_infinity_high,
-+                                floatx80_infinity_low);
-         }
-         if ( aExp == 0 ) ++expDiff;
-         shift64ExtraRightJamming( aSig, 0, - expDiff, &aSig, &zSig1 );
-@@ -4933,7 +4938,8 @@ static floatx80 subFloatx80Sigs(floatx80 a, floatx80 b, flag zSign,
-         if ((uint64_t)(bSig << 1)) {
-             return propagateFloatx80NaN(a, b, status);
-         }
--        return packFloatx80( zSign ^ 1, 0x7FFF, LIT64( 0x8000000000000000 ) );
-+        return packFloatx80(zSign ^ 1, floatx80_infinity_high,
-+                            floatx80_infinity_low);
-     }
-     if ( aExp == 0 ) ++expDiff;
-     shift128RightJamming( aSig, 0, - expDiff, &aSig, &zSig1 );
-@@ -5038,7 +5044,8 @@ floatx80 floatx80_mul(floatx80 a, floatx80 b, float_status *status)
-             return propagateFloatx80NaN(a, b, status);
-         }
-         if ( ( bExp | bSig ) == 0 ) goto invalid;
--        return packFloatx80( zSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
-+        return packFloatx80(zSign, floatx80_infinity_high,
-+                                   floatx80_infinity_low);
-     }
-     if ( bExp == 0x7FFF ) {
-         if ((uint64_t)(bSig << 1)) {
-@@ -5049,7 +5056,8 @@ floatx80 floatx80_mul(floatx80 a, floatx80 b, float_status *status)
-             float_raise(float_flag_invalid, status);
-             return floatx80_default_nan(status);
-         }
--        return packFloatx80( zSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
-+        return packFloatx80(zSign, floatx80_infinity_high,
-+                                   floatx80_infinity_low);
-     }
-     if ( aExp == 0 ) {
-         if ( aSig == 0 ) return packFloatx80( zSign, 0, 0 );
-@@ -5103,7 +5111,8 @@ floatx80 floatx80_div(floatx80 a, floatx80 b, float_status *status)
-             }
-             goto invalid;
-         }
--        return packFloatx80( zSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
-+        return packFloatx80(zSign, floatx80_infinity_high,
-+                                   floatx80_infinity_low);
-     }
-     if ( bExp == 0x7FFF ) {
-         if ((uint64_t)(bSig << 1)) {
-@@ -5119,7 +5128,8 @@ floatx80 floatx80_div(floatx80 a, floatx80 b, float_status *status)
-                 return floatx80_default_nan(status);
-             }
-             float_raise(float_flag_divbyzero, status);
--            return packFloatx80( zSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
-+            return packFloatx80(zSign, floatx80_infinity_high,
-+                                       floatx80_infinity_low);
-         }
-         normalizeFloatx80Subnormal( bSig, &bExp, &bSig );
-     }
-@@ -5942,7 +5952,8 @@ floatx80 float128_to_floatx80(float128 a, float_status *status)
-         if ( aSig0 | aSig1 ) {
-             return commonNaNToFloatx80(float128ToCommonNaN(a, status), status);
-         }
--        return packFloatx80( aSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
-+        return packFloatx80(aSign, floatx80_infinity_high,
-+                                   floatx80_infinity_low);
-     }
-     if ( aExp == 0 ) {
-         if ( ( aSig0 | aSig1 ) == 0 ) return packFloatx80( aSign, 0, 0 );
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index fa4fae224f..36626a501b 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -572,6 +572,11 @@ float32 floatx80_to_float32(floatx80, float_status *status);
- float64 floatx80_to_float64(floatx80, float_status *status);
- float128 floatx80_to_float128(floatx80, float_status *status);
- 
-+/*----------------------------------------------------------------------------
-+| The pattern for an extended double-precision inf.
-+*----------------------------------------------------------------------------*/
-+extern const floatx80 floatx80_infinity;
-+
- /*----------------------------------------------------------------------------
- | Software IEC/IEEE extended double-precision operations.
- *----------------------------------------------------------------------------*/
-@@ -612,7 +617,12 @@ static inline floatx80 floatx80_chs(floatx80 a)
- 
- static inline int floatx80_is_infinity(floatx80 a)
- {
--    return (a.high & 0x7fff) == 0x7fff && a.low == 0x8000000000000000LL;
-+#if defined(TARGET_M68K)
-+    return (a.high & 0x7fff) == floatx80_infinity.high && !(a.low << 1);
-+#else
-+    return (a.high & 0x7fff) == floatx80_infinity.high &&
-+                       a.low == floatx80_infinity.low;
-+#endif
- }
- 
- static inline int floatx80_is_neg(floatx80 a)
-@@ -655,7 +665,6 @@ static inline bool floatx80_invalid_encoding(floatx80 a)
- #define floatx80_ln2 make_floatx80(0x3ffe, 0xb17217f7d1cf79acLL)
- #define floatx80_pi make_floatx80(0x4000, 0xc90fdaa22168c235LL)
- #define floatx80_half make_floatx80(0x3ffe, 0x8000000000000000LL)
--#define floatx80_infinity make_floatx80(0x7fff, 0x8000000000000000LL)
- 
- /*----------------------------------------------------------------------------
- | Returns the fraction bits of the extended double-precision floating-point
--- 
-2.14.3
+ HTH,
+  Thomas
