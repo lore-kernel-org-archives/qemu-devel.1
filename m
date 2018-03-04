@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1esXVP-0003FS-OF
+	(envelope-from <laurent@vivier.eu>) id 1esXVP-0003FR-Nm
 	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 12:33:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1esXVL-0006Qr-Ju
+	(envelope-from <laurent@vivier.eu>) id 1esXVL-0006QZ-Gf
 	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 12:33:03 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:49461)
+Received: from mout.kundenserver.de ([217.72.192.74]:45039)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1esXVL-0006PD-9j
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1esXVL-0006P7-7k
 	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 12:32:59 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Sun,  4 Mar 2018 18:32:32 +0100
-Message-Id: <20180304173232.22814-6-laurent@vivier.eu>
+Date: Sun,  4 Mar 2018 18:32:31 +0100
+Message-Id: <20180304173232.22814-5-laurent@vivier.eu>
 In-Reply-To: <20180304173232.22814-1-laurent@vivier.eu>
 References: <20180304173232.22814-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 5/5] target/m68k: add fscale, fgetman and fgetexp
+Subject: [Qemu-devel] [PULL 4/5] softfloat: use floatx80_infinity in
+ softfloat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,255 +27,207 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, Laurent Vivier <laurent@vivier.eu>
 
-Using local m68k floatx80_getman(), floatx80_getexp(), floatx80_scale()
-[copied from previous:
-Written by Andreas Grabher for Previous, NeXT Computer Emulator.]
+Since f3218a8 ("softfloat: add floatx80 constants")
+floatx80_infinity is defined but never used.
+
+This patch updates floatx80 functions to use
+this definition.
+
+This allows to define a different default Infinity
+value on m68k: the m68k FPU defines infinity with
+all bits set to zero in the mantissa.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20180224201802.911-5-laurent@vivier.eu>
+Message-Id: <20180224201802.911-4-laurent@vivier.eu>
 ---
- target/m68k/fpu_helper.c |  15 +++++
- target/m68k/helper.h     |   3 +
- target/m68k/softfloat.c  | 144 +++++++++++++++++++++++++++++++++++++++++++++++
- target/m68k/softfloat.h  |   3 +
- target/m68k/translate.c  |   9 +++
- 5 files changed, 174 insertions(+)
+ fpu/softfloat-specialize.h | 14 ++++++++++++++
+ fpu/softfloat.c            | 39 +++++++++++++++++++++++++--------------
+ include/fpu/softfloat.h    | 13 +++++++++++--
+ 3 files changed, 50 insertions(+), 16 deletions(-)
 
-diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
-index 8286228b81..cdb9b50462 100644
---- a/target/m68k/fpu_helper.c
-+++ b/target/m68k/fpu_helper.c
-@@ -542,3 +542,18 @@ void HELPER(frem)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
- 
-     make_quotient(env, res->d);
+diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
+index 46126e9e0a..9ccb59422c 100644
+--- a/fpu/softfloat-specialize.h
++++ b/fpu/softfloat-specialize.h
+@@ -177,6 +177,20 @@ floatx80 floatx80_default_nan(float_status *status)
+     return r;
  }
-+
-+void HELPER(fgetexp)(CPUM68KState *env, FPReg *res, FPReg *val)
-+{
-+    res->d = floatx80_getexp(val->d, &env->fp_status);
-+}
-+
-+void HELPER(fgetman)(CPUM68KState *env, FPReg *res, FPReg *val)
-+{
-+    res->d = floatx80_getman(val->d, &env->fp_status);
-+}
-+
-+void HELPER(fscale)(CPUM68KState *env, FPReg *res, FPReg *val0, FPReg *val1)
-+{
-+    res->d = floatx80_scale(val1->d, val0->d, &env->fp_status);
-+}
-diff --git a/target/m68k/helper.h b/target/m68k/helper.h
-index 76a0590c9c..c348dced3a 100644
---- a/target/m68k/helper.h
-+++ b/target/m68k/helper.h
-@@ -65,6 +65,9 @@ DEF_HELPER_3(fmovemd_st_postinc, i32, env, i32, i32)
- DEF_HELPER_3(fmovemd_ld_postinc, i32, env, i32, i32)
- DEF_HELPER_4(fmod, void, env, fp, fp, fp)
- DEF_HELPER_4(frem, void, env, fp, fp, fp)
-+DEF_HELPER_3(fgetexp, void, env, fp, fp)
-+DEF_HELPER_3(fgetman, void, env, fp, fp)
-+DEF_HELPER_4(fscale, void, env, fp, fp, fp)
  
- DEF_HELPER_3(mac_move, void, env, i32, i32)
- DEF_HELPER_3(macmulf, i64, env, i32, i32)
-diff --git a/target/m68k/softfloat.c b/target/m68k/softfloat.c
-index 8c77757b4e..9cb141900c 100644
---- a/target/m68k/softfloat.c
-+++ b/target/m68k/softfloat.c
-@@ -22,6 +22,19 @@
- #include "softfloat.h"
- #include "fpu/softfloat-macros.h"
- 
-+static floatx80 propagateFloatx80NaNOneArg(floatx80 a, float_status *status)
-+{
-+    if (floatx80_is_signaling_nan(a, status)) {
-+        float_raise(float_flag_invalid, status);
-+    }
++/*----------------------------------------------------------------------------
++| The pattern for a default generated extended double-precision inf.
++*----------------------------------------------------------------------------*/
 +
-+    if (status->default_nan_mode) {
-+        return floatx80_default_nan(status);
-+    }
++#define floatx80_infinity_high 0x7FFF
++#if defined(TARGET_M68K)
++#define floatx80_infinity_low  LIT64(0x0000000000000000)
++#else
++#define floatx80_infinity_low  LIT64(0x8000000000000000)
++#endif
 +
-+    return floatx80_maybe_silence_nan(a, status);
-+}
++const floatx80 floatx80_infinity
++    = make_floatx80_init(floatx80_infinity_high, floatx80_infinity_low);
 +
  /*----------------------------------------------------------------------------
-  | Returns the modulo remainder of the extended double-precision floating-point
-  | value `a' with respect to the corresponding value `b'.
-@@ -103,3 +116,134 @@ floatx80 floatx80_mod(floatx80 a, floatx80 b, float_status *status)
-         normalizeRoundAndPackFloatx80(
-             80, zSign, bExp + expDiff, aSig0, aSig1, status);
- }
-+
-+/*----------------------------------------------------------------------------
-+ | Returns the mantissa of the extended double-precision floating-point
-+ | value `a'.
-+ *----------------------------------------------------------------------------*/
-+
-+floatx80 floatx80_getman(floatx80 a, float_status *status)
-+{
-+    flag aSign;
-+    int32_t aExp;
-+    uint64_t aSig;
-+
-+    aSig = extractFloatx80Frac(a);
-+    aExp = extractFloatx80Exp(a);
-+    aSign = extractFloatx80Sign(a);
-+
-+    if (aExp == 0x7FFF) {
-+        if ((uint64_t) (aSig << 1)) {
-+            return propagateFloatx80NaNOneArg(a , status);
-+        }
-+        float_raise(float_flag_invalid , status);
-+        return floatx80_default_nan(status);
-+    }
-+
-+    if (aExp == 0) {
-+        if (aSig == 0) {
-+            return packFloatx80(aSign, 0, 0);
-+        }
-+        normalizeFloatx80Subnormal(aSig, &aExp, &aSig);
-+    }
-+
-+    return roundAndPackFloatx80(status->floatx80_rounding_precision, aSign,
-+                                0x3FFF, aSig, 0, status);
-+}
-+
-+/*----------------------------------------------------------------------------
-+ | Returns the exponent of the extended double-precision floating-point
-+ | value `a' as an extended double-precision value.
-+ *----------------------------------------------------------------------------*/
-+
-+floatx80 floatx80_getexp(floatx80 a, float_status *status)
-+{
-+    flag aSign;
-+    int32_t aExp;
-+    uint64_t aSig;
-+
-+    aSig = extractFloatx80Frac(a);
-+    aExp = extractFloatx80Exp(a);
-+    aSign = extractFloatx80Sign(a);
-+
-+    if (aExp == 0x7FFF) {
-+        if ((uint64_t) (aSig << 1)) {
-+            return propagateFloatx80NaNOneArg(a , status);
-+        }
-+        float_raise(float_flag_invalid , status);
-+        return floatx80_default_nan(status);
-+    }
-+
-+    if (aExp == 0) {
-+        if (aSig == 0) {
-+            return packFloatx80(aSign, 0, 0);
-+        }
-+        normalizeFloatx80Subnormal(aSig, &aExp, &aSig);
-+    }
-+
-+    return int32_to_floatx80(aExp - 0x3FFF, status);
-+}
-+
-+/*----------------------------------------------------------------------------
-+ | Scales extended double-precision floating-point value in operand `a' by
-+ | value `b'. The function truncates the value in the second operand 'b' to
-+ | an integral value and adds that value to the exponent of the operand 'a'.
-+ | The operation performed according to the IEC/IEEE Standard for Binary
-+ | Floating-Point Arithmetic.
-+ *----------------------------------------------------------------------------*/
-+
-+floatx80 floatx80_scale(floatx80 a, floatx80 b, float_status *status)
-+{
-+    flag aSign, bSign;
-+    int32_t aExp, bExp, shiftCount;
-+    uint64_t aSig, bSig;
-+
-+    aSig = extractFloatx80Frac(a);
-+    aExp = extractFloatx80Exp(a);
-+    aSign = extractFloatx80Sign(a);
-+    bSig = extractFloatx80Frac(b);
-+    bExp = extractFloatx80Exp(b);
-+    bSign = extractFloatx80Sign(b);
-+
-+    if (bExp == 0x7FFF) {
-+        if ((uint64_t) (bSig << 1) ||
-+            ((aExp == 0x7FFF) && (uint64_t) (aSig << 1))) {
-+            return propagateFloatx80NaN(a, b, status);
-+        }
-+        float_raise(float_flag_invalid , status);
-+        return floatx80_default_nan(status);
-+    }
-+    if (aExp == 0x7FFF) {
-+        if ((uint64_t) (aSig << 1)) {
-+            return propagateFloatx80NaN(a, b, status);
-+        }
-+        return packFloatx80(aSign, floatx80_infinity.high,
-+                            floatx80_infinity.low);
-+    }
-+    if (aExp == 0) {
-+        if (aSig == 0) {
-+            return packFloatx80(aSign, 0, 0);
-+        }
-+        if (bExp < 0x3FFF) {
-+            return a;
-+        }
-+        normalizeFloatx80Subnormal(aSig, &aExp, &aSig);
-+    }
-+
-+    if (bExp < 0x3FFF) {
-+        return a;
-+    }
-+
-+    if (0x400F < bExp) {
-+        aExp = bSign ? -0x6001 : 0xE000;
-+        return roundAndPackFloatx80(status->floatx80_rounding_precision,
-+                                    aSign, aExp, aSig, 0, status);
-+    }
-+
-+    shiftCount = 0x403E - bExp;
-+    bSig >>= shiftCount;
-+    aExp = bSign ? (aExp - bSig) : (aExp + bSig);
-+
-+    return roundAndPackFloatx80(status->floatx80_rounding_precision,
-+                                aSign, aExp, aSig, 0, status);
-+}
-diff --git a/target/m68k/softfloat.h b/target/m68k/softfloat.h
-index 8d8ca0fc45..78fbc0cd0c 100644
---- a/target/m68k/softfloat.h
-+++ b/target/m68k/softfloat.h
-@@ -23,4 +23,7 @@
- #include "fpu/softfloat.h"
+ | The pattern for a default generated quadruple-precision NaN.
+ *----------------------------------------------------------------------------*/
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index fb4853682e..e124df9f7e 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -2636,7 +2636,9 @@ floatx80 roundAndPackFloatx80(int8_t roundingPrecision, flag zSign,
+                ) {
+                 return packFloatx80( zSign, 0x7FFE, ~ roundMask );
+             }
+-            return packFloatx80( zSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
++            return packFloatx80(zSign,
++                                floatx80_infinity_high,
++                                floatx80_infinity_low);
+         }
+         if ( zExp <= 0 ) {
+             isTiny =
+@@ -3182,7 +3184,9 @@ floatx80 float32_to_floatx80(float32 a, float_status *status)
+         if (aSig) {
+             return commonNaNToFloatx80(float32ToCommonNaN(a, status), status);
+         }
+-        return packFloatx80( aSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
++        return packFloatx80(aSign,
++                            floatx80_infinity_high,
++                            floatx80_infinity_low);
+     }
+     if ( aExp == 0 ) {
+         if ( aSig == 0 ) return packFloatx80( aSign, 0, 0 );
+@@ -4037,7 +4041,9 @@ floatx80 float64_to_floatx80(float64 a, float_status *status)
+         if (aSig) {
+             return commonNaNToFloatx80(float64ToCommonNaN(a, status), status);
+         }
+-        return packFloatx80( aSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
++        return packFloatx80(aSign,
++                            floatx80_infinity_high,
++                            floatx80_infinity_low);
+     }
+     if ( aExp == 0 ) {
+         if ( aSig == 0 ) return packFloatx80( aSign, 0, 0 );
+@@ -4549,10 +4555,7 @@ int64_t floatx80_to_int64(floatx80 a, float_status *status)
+     if ( shiftCount <= 0 ) {
+         if ( shiftCount ) {
+             float_raise(float_flag_invalid, status);
+-            if (    ! aSign
+-                 || (    ( aExp == 0x7FFF )
+-                      && ( aSig != LIT64( 0x8000000000000000 ) ) )
+-               ) {
++            if (!aSign || floatx80_is_any_nan(a)) {
+                 return LIT64( 0x7FFFFFFFFFFFFFFF );
+             }
+             return (int64_t) LIT64( 0x8000000000000000 );
+@@ -4858,7 +4861,9 @@ static floatx80 addFloatx80Sigs(floatx80 a, floatx80 b, flag zSign,
+             if ((uint64_t)(bSig << 1)) {
+                 return propagateFloatx80NaN(a, b, status);
+             }
+-            return packFloatx80( zSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
++            return packFloatx80(zSign,
++                                floatx80_infinity_high,
++                                floatx80_infinity_low);
+         }
+         if ( aExp == 0 ) ++expDiff;
+         shift64ExtraRightJamming( aSig, 0, - expDiff, &aSig, &zSig1 );
+@@ -4933,7 +4938,8 @@ static floatx80 subFloatx80Sigs(floatx80 a, floatx80 b, flag zSign,
+         if ((uint64_t)(bSig << 1)) {
+             return propagateFloatx80NaN(a, b, status);
+         }
+-        return packFloatx80( zSign ^ 1, 0x7FFF, LIT64( 0x8000000000000000 ) );
++        return packFloatx80(zSign ^ 1, floatx80_infinity_high,
++                            floatx80_infinity_low);
+     }
+     if ( aExp == 0 ) ++expDiff;
+     shift128RightJamming( aSig, 0, - expDiff, &aSig, &zSig1 );
+@@ -5038,7 +5044,8 @@ floatx80 floatx80_mul(floatx80 a, floatx80 b, float_status *status)
+             return propagateFloatx80NaN(a, b, status);
+         }
+         if ( ( bExp | bSig ) == 0 ) goto invalid;
+-        return packFloatx80( zSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
++        return packFloatx80(zSign, floatx80_infinity_high,
++                                   floatx80_infinity_low);
+     }
+     if ( bExp == 0x7FFF ) {
+         if ((uint64_t)(bSig << 1)) {
+@@ -5049,7 +5056,8 @@ floatx80 floatx80_mul(floatx80 a, floatx80 b, float_status *status)
+             float_raise(float_flag_invalid, status);
+             return floatx80_default_nan(status);
+         }
+-        return packFloatx80( zSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
++        return packFloatx80(zSign, floatx80_infinity_high,
++                                   floatx80_infinity_low);
+     }
+     if ( aExp == 0 ) {
+         if ( aSig == 0 ) return packFloatx80( zSign, 0, 0 );
+@@ -5103,7 +5111,8 @@ floatx80 floatx80_div(floatx80 a, floatx80 b, float_status *status)
+             }
+             goto invalid;
+         }
+-        return packFloatx80( zSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
++        return packFloatx80(zSign, floatx80_infinity_high,
++                                   floatx80_infinity_low);
+     }
+     if ( bExp == 0x7FFF ) {
+         if ((uint64_t)(bSig << 1)) {
+@@ -5119,7 +5128,8 @@ floatx80 floatx80_div(floatx80 a, floatx80 b, float_status *status)
+                 return floatx80_default_nan(status);
+             }
+             float_raise(float_flag_divbyzero, status);
+-            return packFloatx80( zSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
++            return packFloatx80(zSign, floatx80_infinity_high,
++                                       floatx80_infinity_low);
+         }
+         normalizeFloatx80Subnormal( bSig, &bExp, &bSig );
+     }
+@@ -5942,7 +5952,8 @@ floatx80 float128_to_floatx80(float128 a, float_status *status)
+         if ( aSig0 | aSig1 ) {
+             return commonNaNToFloatx80(float128ToCommonNaN(a, status), status);
+         }
+-        return packFloatx80( aSign, 0x7FFF, LIT64( 0x8000000000000000 ) );
++        return packFloatx80(aSign, floatx80_infinity_high,
++                                   floatx80_infinity_low);
+     }
+     if ( aExp == 0 ) {
+         if ( ( aSig0 | aSig1 ) == 0 ) return packFloatx80( aSign, 0, 0 );
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index fa4fae224f..36626a501b 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -572,6 +572,11 @@ float32 floatx80_to_float32(floatx80, float_status *status);
+ float64 floatx80_to_float64(floatx80, float_status *status);
+ float128 floatx80_to_float128(floatx80, float_status *status);
  
- floatx80 floatx80_mod(floatx80 a, floatx80 b, float_status *status);
-+floatx80 floatx80_getman(floatx80 a, float_status *status);
-+floatx80 floatx80_getexp(floatx80 a, float_status *status);
-+floatx80 floatx80_scale(floatx80 a, floatx80 b, float_status *status);
- #endif
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index f8db26fa8e..dbb24f8d84 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -5072,6 +5072,12 @@ DISAS_INSN(fpu)
-     case 0x5e: /* fdneg */
-         gen_helper_fdneg(cpu_env, cpu_dest, cpu_src);
-         break;
-+    case 0x1e: /* fgetexp */
-+        gen_helper_fgetexp(cpu_env, cpu_dest, cpu_src);
-+        break;
-+    case 0x1f: /* fgetman */
-+        gen_helper_fgetman(cpu_env, cpu_dest, cpu_src);
-+        break;
-     case 0x20: /* fdiv */
-         gen_helper_fdiv(cpu_env, cpu_dest, cpu_src, cpu_dest);
-         break;
-@@ -5108,6 +5114,9 @@ DISAS_INSN(fpu)
-     case 0x25: /* frem */
-         gen_helper_frem(cpu_env, cpu_dest, cpu_src, cpu_dest);
-         break;
-+    case 0x26: /* fscale */
-+        gen_helper_fscale(cpu_env, cpu_dest, cpu_src, cpu_dest);
-+        break;
-     case 0x27: /* fsglmul */
-         gen_helper_fsglmul(cpu_env, cpu_dest, cpu_src, cpu_dest);
-         break;
++/*----------------------------------------------------------------------------
++| The pattern for an extended double-precision inf.
++*----------------------------------------------------------------------------*/
++extern const floatx80 floatx80_infinity;
++
+ /*----------------------------------------------------------------------------
+ | Software IEC/IEEE extended double-precision operations.
+ *----------------------------------------------------------------------------*/
+@@ -612,7 +617,12 @@ static inline floatx80 floatx80_chs(floatx80 a)
+ 
+ static inline int floatx80_is_infinity(floatx80 a)
+ {
+-    return (a.high & 0x7fff) == 0x7fff && a.low == 0x8000000000000000LL;
++#if defined(TARGET_M68K)
++    return (a.high & 0x7fff) == floatx80_infinity.high && !(a.low << 1);
++#else
++    return (a.high & 0x7fff) == floatx80_infinity.high &&
++                       a.low == floatx80_infinity.low;
++#endif
+ }
+ 
+ static inline int floatx80_is_neg(floatx80 a)
+@@ -655,7 +665,6 @@ static inline bool floatx80_invalid_encoding(floatx80 a)
+ #define floatx80_ln2 make_floatx80(0x3ffe, 0xb17217f7d1cf79acLL)
+ #define floatx80_pi make_floatx80(0x4000, 0xc90fdaa22168c235LL)
+ #define floatx80_half make_floatx80(0x3ffe, 0x8000000000000000LL)
+-#define floatx80_infinity make_floatx80(0x7fff, 0x8000000000000000LL)
+ 
+ /*----------------------------------------------------------------------------
+ | Returns the fraction bits of the extended double-precision floating-point
 -- 
 2.14.3
