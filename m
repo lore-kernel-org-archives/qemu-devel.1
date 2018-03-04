@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frans@fransdb.nl>) id 1esRcg-0006u7-Kf
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 06:16:11 -0500
+	(envelope-from <yvugenfi@redhat.com>) id 1esTKa-00053u-Ob
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 08:05:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frans@fransdb.nl>) id 1esRcd-0007Rh-IK
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 06:16:10 -0500
-Received: from fransdb.nl ([80.101.31.146]:60366 helo=pubserv1.fransdb.nl)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <frans@fransdb.nl>) id 1esRcd-0007NQ-Av
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 06:16:07 -0500
-Received: from localhost (localhost [127.0.0.1])
-	by pubserv1.fransdb.nl (Postfix) with ESMTP id 2FEBF42275
-	for <qemu-devel@nongnu.org>; Sun,  4 Mar 2018 12:15:40 +0100 (CET)
-Received: from pubserv1.fransdb.nl ([127.0.0.1])
-	by localhost (pubserv1.fransdb.nl [127.0.0.1]) (amavisd-new, port 10024)
-	with LMTP id FSPf8cB6H-Wi for <qemu-devel@nongnu.org>;
-	Sun,  4 Mar 2018 12:15:37 +0100 (CET)
-Received: from [192.168.101.128] (unknown [192.168.0.13])
-	by pubserv1.fransdb.nl (Postfix) with ESMTP id C5AAA41844
-	for <qemu-devel@nongnu.org>; Sun,  4 Mar 2018 12:15:36 +0100 (CET)
-From: Frans de Boer <frans@fransdb.nl>
-Message-ID: <96ce9600-c1e3-c3d6-5c3d-7d30cf799e04@fransdb.nl>
-Date: Sun, 4 Mar 2018 12:15:36 +0100
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Language: nl
+	(envelope-from <yvugenfi@redhat.com>) id 1esTKX-0004px-Es
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 08:05:36 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35050 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yvugenfi@redhat.com>) id 1esTKX-0004pR-2Z
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 08:05:33 -0500
+From: Yan Vugenfirer <yvugenfi@redhat.com>
+Message-Id: <258F88CA-D946-4804-A65D-2EA0790A66AF@redhat.com>
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Date: Sun, 4 Mar 2018 15:05:22 +0200
+In-Reply-To: <20180302221831-mutt-send-email-mst@kernel.org>
+References: <cover.1519961667.git.jbaron@akamai.com>
+	<c9d3cf2fbc3c64bb28e0438185d85d95b2088127.1519961667.git.jbaron@akamai.com>
+	<7fc612d0-9610-9b07-d054-bb1438898f47@redhat.com>
+	<20180302221831-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain;
+	charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Problem compiling qemu-2.1.1
+Subject: Re: [Qemu-devel] [virtio-dev] [PATCH 4/4] virtio-net: add linkspeed
+ and duplex settings to virtio-net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,38 +31,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Jason Baron <jbaron@akamai.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
 
-LS,
 
-I try to compile qemu and get the next error message:
 
-mnt/rhome/frans-tw/data/projects/linux/kernel/qemu/qemu-2.11.1/util/memfd=
-.c:40:12:=20
-error: static declaration of =E2=80=98memfd_create=E2=80=99 follows non-s=
-tatic declaration
-  static int memfd_create(const char *name, unsigned int flags)
-             ^~~~~~~~~~~~
-In file included from /usr/include/bits/mman-linux.h:115:0,
-                  from /usr/include/bits/mman.h:45,
-                  from /usr/include/sys/mman.h:41,
-                  from=20
-/mnt/rhome/frans-tw/data/projects/linux/kernel/qemu/qemu-2.11.1/include/s=
-ysemu/os-posix.h:29,
-                  from=20
-/mnt/rhome/frans-tw/data/projects/linux/kernel/qemu/qemu-2.11.1/include/q=
-emu/osdep.h:104,
-                  from=20
-/mnt/rhome/frans-tw/data/projects/linux/kernel/qemu/qemu-2.11.1/util/memf=
-d.c:28:
-/usr/include/bits/mman-shared.h:46:5: note: previous declaration of=20
-=E2=80=98memfd_create=E2=80=99 was here
-  int memfd_create (const char *__name, unsigned int __flags) __THROW;
+> On 2 Mar 2018, at 22:19, Michael S. Tsirkin <mst@redhat.com> wrote:
+>=20
+> On Fri, Mar 02, 2018 at 03:14:01PM +0800, Jason Wang wrote:
+>>=20
+>>=20
+>> On 2018=E5=B9=B403=E6=9C=8802=E6=97=A5 11:46, Jason Baron wrote:
+>>> Although linkspeed and duplex can be set in a linux guest via =
+'ethtool -s',
+>>> this requires custom ethtool commands for virtio-net by default.
+>>>=20
+>>> Introduce a new feature flag, VIRTIO_NET_F_SPEED_DUPLEX, which =
+allows
+>>> the hypervisor to export a linkspeed and duplex setting. The user =
+can
+>>> subsequently overwrite it later if desired via: 'ethtool -s'.
+>>>=20
+>>> Linkspeed and duplex settings can be set as:
+>>> '-device virtio-net,speed=3D10000,duplex=3Dfull'
+>>=20
+>> I was thinking whether or not it's better to decide the duplex by the =
+type
+>> of backends.
+>>=20
+>> E.g userspace and vhost-kernel implement a in fact half duplex. But =
+dpdk
+>> implement a full duplex.
+>>=20
+>> Thanks
+>=20
+> OTOH it's a priority for some people to be able to support migration
+> between different backend types. Breaking that won't be nice.
 
-I use the newest Tumbleweed of openSuse with the gcc 7.3.0 compiler suite=
-.
+I think that in this case we need a way to update the settings of link =
+speed and link duplex (maybe add QMP command). Migration between =
+different backend types should cause link down\link up events. And this =
+is a time for a driver to re-read the settings and update the OS.
 
-Suggestions?
+Best regards,
+Yan.
 
-Regards,
-Frans.
+>=20
+>>>=20
+>>> where speed is [0...INT_MAX], and duplex is ["half"|"full"].
+>>>=20
+>>> Signed-off-by: Jason Baron<jbaron@akamai.com>
+>>> Cc: "Michael S. Tsirkin"<mst@redhat.com>
+>>> Cc: Jason Wang<jasowang@redhat.com>
+>>> Cc:virtio-dev@lists.oasis-open.org
+>>> ---
+>=20
+> ---------------------------------------------------------------------
+> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
