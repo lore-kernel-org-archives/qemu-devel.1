@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1esktf-0004s8-A1
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 02:51:00 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1eskwC-0005lc-Pb
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 02:53:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1esktc-0002PM-5g
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 02:50:59 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35192 helo=mx1.redhat.com)
+	(envelope-from <haozhong.zhang@intel.com>) id 1eskw9-0005KR-El
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 02:53:36 -0500
+Received: from mga17.intel.com ([192.55.52.151]:16839)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1esktc-0002OM-0s
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 02:50:56 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E9CAF8182D3A
-	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 07:50:54 +0000 (UTC)
-Date: Mon, 5 Mar 2018 08:50:53 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180305075053.o3pporh23eeq3wdz@sirius.home.kraxel.org>
-References: <1520234280-19410-1-git-send-email-thuth@redhat.com>
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1eskw9-0005K3-68
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 02:53:33 -0500
+Date: Mon, 5 Mar 2018 15:53:28 +0800
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Message-ID: <20180305075328.6i77el735gnqf3gt@hz-desktop>
+References: <20171207101812.23602-1-haozhong.zhang@intel.com>
+	<20171207101812.23602-4-haozhong.zhang@intel.com>
+	<20180227164147.GB1799@perard.uk.xensource.com>
+	<20180228075654.gv22h2zd73peuyxm@hz-desktop>
+	<20180302115009.GF1799@perard.uk.xensource.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1520234280-19410-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] Allow to specify a display ID whith the
- screendump command
+In-Reply-To: <20180302115009.GF1799@perard.uk.xensource.com>
+Subject: Re: [Qemu-devel] [RFC QEMU PATCH v4 03/10] hostmem-xen: add a host
+ memory backend for Xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,37 +32,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, Jiri Denemark <jdenemar@redhat.com>
+To: Anthony PERARD <anthony.perard@citrix.com>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-> -void qmp_screendump(const char *filename, Error **errp)
-> +void qmp_screendump(const char *filename, bool has_id, const char *id,
-> +                    Error **errp)
->  {
->      QemuConsole *con = qemu_console_lookup_by_index(0);
->      DisplaySurface *surface;
-> +    DeviceState *dev;
-> +
-> +    if (has_id) {
-> +        dev = qdev_find_recursive(sysbus_get_default(), id);
-> +        if (!dev) {
-> +            error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
-> +                      "Device '%s' not found", id);
-> +            return;
-> +        }
-> +        con = qemu_console_lookup_by_device(dev, 0);
+On 03/02/18 11:50 +0000, Anthony PERARD wrote:
+> On Wed, Feb 28, 2018 at 03:56:54PM +0800, Haozhong Zhang wrote:
+> > On 02/27/18 16:41 +0000, Anthony PERARD wrote:
+> > > On Thu, Dec 07, 2017 at 06:18:05PM +0800, Haozhong Zhang wrote:
+> > > > @@ -108,7 +109,10 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+> > > >      }
+> > > >  
+> > > >      memory_region_add_subregion(&hpms->mr, addr - hpms->base, mr);
+> > > > -    vmstate_register_ram(vmstate_mr, dev);
+> > > > +    /* memory-backend-xen is not backed by RAM. */
+> > > > +    if (!xen_enabled()) {
+> > > 
+> > > Is it possible to have the same condition as the one used in
+> > > host_memory_backend_memory_complete? i.e. base on whether the memory
+> > > region is mapped or not (backend->mr.ram_block).
+> > 
+> > Like "if (!xen_enabled() || backend->mr.ram_block))"? No, it will mute
+> > the abortion (vmstate_register_ram --> qemu_ram_set_idstr ) caused by
+> > the case that !backend->mr.ram_block in the non-xen environment.
+> 
+> In non-xen environment, vmstate_register_ram() will be called, because
+> !xen_enabled() is true, it would not matter if there is a ram_block or
+> not.
 
-I'd suggest to name this 'device', because this is what it actually is.
-While being at it you should also add a 'head' parameter (second arg of
-qemu_console_lookup_by_device()), for devices like virtio-vga which can
-support multiple heads.
+Sorry, I really meant 'if (backend->mr.ram_block)', which may mute the
+abortion in non-xen environment. 'if (!xen_enabled())' keeps the
+original semantics in non-xen environment, so it's unlikely to break
+the non-xen usage.
 
->      if (con == NULL) {
->          error_setg(errp, "There is no QemuConsole I can screendump from.");
+Haozhong
 
-This might also be refined to say something like 'device $name is not a
-display device' in case qemu_console_lookup_by_device() failed.
-
+> 
+> But if there is a memory-backend that can run in a xen environment that
+> have a ram_block, vmstate_register_ram would not be called in the
+> origial patch, but if we use (!xen_enabled() || vmstate_mr->ram_block)
+> as condition then vmstate_register_ram will be called.
+> 
+> Is this make sense?
+> 
+> > > > +        vmstate_register_ram(vmstate_mr, dev);
+> > > > +    }
+> > > >      numa_set_mem_node_id(addr, memory_region_size(mr), dimm->node);
+> > > >  
+> > > >  out:
+> 
 > -- 
-> 1.8.3.1
+> Anthony PERARD
 > 
