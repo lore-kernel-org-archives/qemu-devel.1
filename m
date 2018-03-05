@@ -1,42 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1esvFm-00085g-Rk
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 13:54:31 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1esvGt-0000WL-JX
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 13:55:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1esvFi-0004Or-S8
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 13:54:30 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34016)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1esvFi-0004Of-Iw
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 13:54:26 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w25IsNLK084376
-	for <qemu-devel@nongnu.org>; Mon, 5 Mar 2018 13:54:25 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gha18cmvn-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 13:54:24 -0500
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 5 Mar 2018 18:54:17 -0000
-References: <079a5da7-6586-b974-6b99-e5de055b1bd1@linux.vnet.ibm.com>
-	<20180302092318.GA6026@stefanha-x1.localdomain>
-	<6a3461c2-368d-1aa1-5b86-a6a602251829@linux.vnet.ibm.com>
-	<20180305110356.GF7910@stefanha-x1.localdomain>
-	<12e1269c-6eae-a400-cc00-2c5c8e4bb8f9@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 5 Mar 2018 19:54:12 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1esvGs-0004pZ-OF
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 13:55:39 -0500
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:42897)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1esvGs-0004pO-IT
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 13:55:38 -0500
+Received: by mail-oi0-x243.google.com with SMTP id c18so12848935oiy.9
+	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 10:55:38 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <12e1269c-6eae-a400-cc00-2c5c8e4bb8f9@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Message-Id: <c4c4c483-d7aa-7361-774e-254c5517468b@de.ibm.com>
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [BUG] I/O thread segfault for QEMU on s390x
+In-Reply-To: <20180305094006.21446-1-stefanha@redhat.com>
+References: <20180305094006.21446-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 5 Mar 2018 18:55:17 +0000
+Message-ID: <CAFEAcA_D95VQ7br5Bf9N1M9Pq5ykwHzkVYjzr7DszqSXr_1DkA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/6] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,86 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Farhan Ali <alifm@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mreitz@redhat.com, famz@redhat.com, QEMU Developers <qemu-devel@nongnu.org>, "open list:virtio-ccw" <qemu-s390x@nongnu.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 
-DQoNCk9uIDAzLzA1LzIwMTggMDc6NDUgUE0sIEZhcmhhbiBBbGkgd3JvdGU6DQo+IA0KPiAN
-Cj4gT24gMDMvMDUvMjAxOCAwNjowMyBBTSwgU3RlZmFuIEhham5vY3ppIHdyb3RlOg0KPj4g
-UGxlYXNlIGluY2x1ZGUgdGhlIGZvbGxvd2luZyBnZGIgb3V0cHV0Og0KPj4NCj4+IKCgIChn
-ZGIpIGRpc2FzIHN3YXBjb250ZXh0DQo+PiCgoCAoZ2RiKSBpIHINCj4+DQo+PiBUaGF0IHdh
-eSBpdCdzIHBvc3NpYmxlIHRvIHNlZSB3aGljaCBpbnN0cnVjdGlvbiBmYXVsdGVkIGFuZCB3
-aGljaA0KPj4gcmVnaXN0ZXJzIHdlcmUgYmVpbmcgYWNjZXNzZWQuDQo+IA0KPiANCj4gaGVy
-ZSBpcyB0aGUgZGlzYXMgb3V0IGZvciBzd2FwY29udGV4dCwgdGhpcyBpcyBvbiBhIGNvcmVk
-dW1wIHdpdGggZGVidWdnaW5nIHN5bWJvbHMgZW5hYmxlZCBmb3IgcWVtdS4gU28gdGhlIGFk
-ZHJlc3NlcyBmcm9tIHRoZSBwcmV2aW91cyBkdW1wIGlzIGEgbGl0dGxlIGRpZmZlcmVudC4N
-Cj4gDQo+IA0KPiAoZ2RiKSBkaXNhcyBzd2FwY29udGV4dA0KPiBEdW1wIG9mIGFzc2VtYmxl
-ciBjb2RlIGZvciBmdW5jdGlvbiBzd2FwY29udGV4dDoNCj4goKAgMHgwMDAwMDNmZjkwNzUx
-ZmI4IDwrMD46oKCgIGxncqCgoCAlcjEsJXIyDQo+IKCgIDB4MDAwMDAzZmY5MDc1MWZiYyA8
-KzQ+OqCgoCBsZ3KgoKAgJXIwLCVyMw0KPiCgoCAweDAwMDAwM2ZmOTA3NTFmYzAgPCs4Pjqg
-oKAgc3RmcGOgoKAgMjQ4KCVyMSkNCj4goKAgMHgwMDAwMDNmZjkwNzUxZmM0IDwrMTI+OqCg
-oCBzdGSgoKAgJWYwLDI1NiglcjEpDQo+IKCgIDB4MDAwMDAzZmY5MDc1MWZjOCA8KzE2Pjqg
-oKAgc3RkoKCgICVmMSwyNjQoJXIxKQ0KPiCgoCAweDAwMDAwM2ZmOTA3NTFmY2MgPCsyMD46
-oKCgIHN0ZKCgoCAlZjIsMjcyKCVyMSkNCj4goKAgMHgwMDAwMDNmZjkwNzUxZmQwIDwrMjQ+
-OqCgoCBzdGSgoKAgJWYzLDI4MCglcjEpDQo+IKCgIDB4MDAwMDAzZmY5MDc1MWZkNCA8KzI4
-PjqgoKAgc3RkoKCgICVmNCwyODgoJXIxKQ0KPiCgoCAweDAwMDAwM2ZmOTA3NTFmZDggPCsz
-Mj46oKCgIHN0ZKCgoCAlZjUsMjk2KCVyMSkNCj4goKAgMHgwMDAwMDNmZjkwNzUxZmRjIDwr
-MzY+OqCgoCBzdGSgoKAgJWY2LDMwNCglcjEpDQo+IKCgIDB4MDAwMDAzZmY5MDc1MWZlMCA8
-KzQwPjqgoKAgc3RkoKCgICVmNywzMTIoJXIxKQ0KPiCgoCAweDAwMDAwM2ZmOTA3NTFmZTQg
-PCs0ND46oKCgIHN0ZKCgoCAlZjgsMzIwKCVyMSkNCj4goKAgMHgwMDAwMDNmZjkwNzUxZmU4
-IDwrNDg+OqCgoCBzdGSgoKAgJWY5LDMyOCglcjEpDQo+IKCgIDB4MDAwMDAzZmY5MDc1MWZl
-YyA8KzUyPjqgoKAgc3RkoKCgICVmMTAsMzM2KCVyMSkNCj4goKAgMHgwMDAwMDNmZjkwNzUx
-ZmYwIDwrNTY+OqCgoCBzdGSgoKAgJWYxMSwzNDQoJXIxKQ0KPiCgoCAweDAwMDAwM2ZmOTA3
-NTFmZjQgPCs2MD46oKCgIHN0ZKCgoCAlZjEyLDM1MiglcjEpDQo+IKCgIDB4MDAwMDAzZmY5
-MDc1MWZmOCA8KzY0PjqgoKAgc3RkoKCgICVmMTMsMzYwKCVyMSkNCj4goKAgMHgwMDAwMDNm
-ZjkwNzUxZmZjIDwrNjg+OqCgoCBzdGSgoKAgJWYxNCwzNjgoJXIxKQ0KPiCgoCAweDAwMDAw
-M2ZmOTA3NTIwMDAgPCs3Mj46oKCgIHN0ZKCgoCAlZjE1LDM3NiglcjEpDQo+IKCgIDB4MDAw
-MDAzZmY5MDc1MjAwNCA8Kzc2PjqgoKAgc2xncqCgoCAlcjIsJXIyDQo+IKCgIDB4MDAwMDAz
-ZmY5MDc1MjAwOCA8KzgwPjqgoKAgc3RhbaCgoCAlYTAsJWExNSwxODQoJXIxKQ0KPiCgoCAw
-eDAwMDAwM2ZmOTA3NTIwMGMgPCs4ND46oKCgIHN0bWegoKAgJXIwLCVyMTUsNTYoJXIxKQ0K
-PiCgoCAweDAwMDAwM2ZmOTA3NTIwMTIgPCs5MD46oKCgIGxhoKCgICVyMiwyDQo+IKCgIDB4
-MDAwMDAzZmY5MDc1MjAxNiA8Kzk0PjqgoKAgbGdyoKCgICVyNSwlcjANCj4goKAgMHgwMDAw
-MDNmZjkwNzUyMDFhIDwrOTg+OqCgoCBsYaCgoCAlcjMsMzg0KCVyNSkNCj4goKAgMHgwMDAw
-MDNmZjkwNzUyMDFlIDwrMTAyPjqgoKAgbGGgoKAgJXI0LDM4NCglcjEpDQo+IKCgIDB4MDAw
-MDAzZmY5MDc1MjAyMiA8KzEwNj46oKCgIGxnaGmgoKAgJXI1LDgNCj4goKAgMHgwMDAwMDNm
-ZjkwNzUyMDI2IDwrMTEwPjqgoKAgc3ZjoKCgIDE3NQ0KDQpzeXNfcnRfc2lncHJvY21hc2su
-IHIwIHNob3VsZCBub3QgYmUgY2hhbmdlZCBieSB0aGUgc3lzdGVtIGNhbGwuDQoNCj4goKAg
-MHgwMDAwMDNmZjkwNzUyMDI4IDwrMTEyPjqgoKAgbGdyoKCgICVyNSwlcjANCj4gPT4gMHgw
-MDAwMDNmZjkwNzUyMDJjIDwrMTE2PjqgoKAgbGZwY6CgoCAyNDgoJXI1KQ0KDQpzbyByNSBp
-cyB6ZXJvIGFuZCBpdCB3YXMgbG9hZGVkIGZyb20gcjAuIHIwIHdhcyBsb2FkZWQgZnJvbSBy
-MyAod2hpY2ggaXMgdGhlIDJuZCBwYXJhbWV0ZXIgdG8gdGhpcw0KZnVuY3Rpb24pLiBOb3cg
-dGhpcyBpcyBvZGQuDQoNCj4goKAgMHgwMDAwMDNmZjkwNzUyMDMwIDwrMTIwPjqgoKAgbGSg
-oKAgJWYwLDI1NiglcjUpDQo+IKCgIDB4MDAwMDAzZmY5MDc1MjAzNCA8KzEyND46oKCgIGxk
-oKCgICVmMSwyNjQoJXI1KQ0KPiCgoCAweDAwMDAwM2ZmOTA3NTIwMzggPCsxMjg+OqCgoCBs
-ZKCgoCAlZjIsMjcyKCVyNSkNCj4goKAgMHgwMDAwMDNmZjkwNzUyMDNjIDwrMTMyPjqgoKAg
-bGSgoKAgJWYzLDI4MCglcjUpDQo+IKCgIDB4MDAwMDAzZmY5MDc1MjA0MCA8KzEzNj46oKCg
-IGxkoKCgICVmNCwyODgoJXI1KQ0KPiCgoCAweDAwMDAwM2ZmOTA3NTIwNDQgPCsxNDA+OqCg
-oCBsZKCgoCAlZjUsMjk2KCVyNSkNCj4goKAgMHgwMDAwMDNmZjkwNzUyMDQ4IDwrMTQ0Pjqg
-oKAgbGSgoKAgJWY2LDMwNCglcjUpDQo+IKCgIDB4MDAwMDAzZmY5MDc1MjA0YyA8KzE0OD46
-oKCgIGxkoKCgICVmNywzMTIoJXI1KQ0KPiCgoCAweDAwMDAwM2ZmOTA3NTIwNTAgPCsxNTI+
-OqCgoCBsZKCgoCAlZjgsMzIwKCVyNSkNCj4goKAgMHgwMDAwMDNmZjkwNzUyMDU0IDwrMTU2
-PjqgoKAgbGSgoKAgJWY5LDMyOCglcjUpDQo+IKCgIDB4MDAwMDAzZmY5MDc1MjA1OCA8KzE2
-MD46oKCgIGxkoKCgICVmMTAsMzM2KCVyNSkNCj4goKAgMHgwMDAwMDNmZjkwNzUyMDVjIDwr
-MTY0PjqgoKAgbGSgoKAgJWYxMSwzNDQoJXI1KQ0KPiCgoCAweDAwMDAwM2ZmOTA3NTIwNjAg
-PCsxNjg+OqCgoCBsZKCgoCAlZjEyLDM1MiglcjUpDQo+IKCgIDB4MDAwMDAzZmY5MDc1MjA2
-NCA8KzE3Mj46oKCgIGxkoKCgICVmMTMsMzYwKCVyNSkNCj4goKAgMHgwMDAwMDNmZjkwNzUy
-MDY4IDwrMTc2PjqgoKAgbGSgoKAgJWYxNCwzNjgoJXI1KQ0KPiCgoCAweDAwMDAwM2ZmOTA3
-NTIwNmMgPCsxODA+OqCgoCBsZKCgoCAlZjE1LDM3NiglcjUpDQo+IKCgIDB4MDAwMDAzZmY5
-MDc1MjA3MCA8KzE4ND46oKCgIGxhbaCgoCAlYTIsJWExNSwxOTIoJXI1KQ0KPiCgoCAweDAw
-MDAwM2ZmOTA3NTIwNzQgPCsxODg+OqCgoCBsbWegoKAgJXIwLCVyMTUsNTYoJXI1KQ0KPiCg
-oCAweDAwMDAwM2ZmOTA3NTIwN2EgPCsxOTQ+OqCgoCBicqCgoCAlcjE0DQo+IEVuZCBvZiBh
-c3NlbWJsZXIgZHVtcC4NCj4gDQo+IChnZGIpIGkgcg0KPiByMKCgoKCgoKCgoKCgoCAweDCg
-oKAgMA0KPiByMaCgoKCgoKCgoKCgoCAweDNmZjhmZTdkZTQwoKCgIDQzOTYxNjU4ODE0MDgN
-Cj4gcjKgoKCgoKCgoKCgoKAgMHgwoKCgIDANCj4gcjOgoKCgoKCgoKCgoKAgMHgzZmY4ZmU3
-ZTFjMKCgoCA0Mzk2MTY1ODgyMzA0DQo+IHI0oKCgoKCgoKCgoKCgIDB4M2ZmOGZlN2RmYzCg
-oKAgNDM5NjE2NTg4MTc5Mg0KPiByNaCgoKCgoKCgoKCgoCAweDCgoKAgMA0KPiByNqCgoKCg
-oKCgoKCgoCAweGZmZmZmZmZmODgwMDQ4ODCgoKAgMTg0NDY3NDQwNzE2OTYzMDQyNTYNCj4g
-cjegoKCgoKCgoKCgoKAgMHgzZmY4ODAwMDllMKCgoCA0Mzk2MDMzMjQ3NzEyDQo+IHI4oKCg
-oKCgoKCgoKCgIDB4MjdmZjg5MDAwoKCgIDEwNzM2OTMwODE2DQo+IHI5oKCgoKCgoKCgoKCg
-IDB4M2ZmODgwMDE0NjCgoKAgNDM5NjAzMzI1MDQwMA0KPiByMTCgoKCgoKCgoKCgoCAweDEw
-MDCgoKAgNDA5Ng0KPiByMTGgoKCgoKCgoKCgoCAweDEyNjFiZTCgoKAgMTkyNzQ3MjANCj4g
-cjEyoKCgoKCgoKCgoKAgMHgzZmY4ODAwMWUwMKCgoCA0Mzk2MDMzMjUyODY0DQo+IHIxM6Cg
-oKCgoKCgoKCgIDB4MTRkMGJjMKCgoCAyMTgyNjQ5Ng0KPiByMTSgoKCgoKCgoKCgoCAweDEz
-MTJhYzigoKAgMTk5OTk0MzINCj4gcjE1oKCgoKCgoKCgoKAgMHgzZmY4ZmU3ZGM4MKCgoCA0
-Mzk2MTY1ODgwOTYwDQo+IHBjoKCgoKCgoKCgoKCgIDB4M2ZmOTA3NTIwMmOgoKAgMHgzZmY5
-MDc1MjAyYyA8c3dhcGNvbnRleHQrMTE2Pg0KPiBjY6CgoKCgoKCgoKCgoCAweDKgoKAgMg0K
-DQo=
+On 5 March 2018 at 09:40, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> The following changes since commit 136c67e07869227b21b3f627316e03679ce7b738:
+>
+>   Merge remote-tracking branch 'remotes/bkoppelmann/tags/pull-tricore-2018-03-02' into staging (2018-03-02 16:56:20 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/stefanha/qemu.git tags/block-pull-request
+>
+> for you to fetch changes up to 23500c6a9409efc80d696aede0629bfbe7556a90:
+>
+>   README: Document 'git-publish' workflow (2018-03-05 09:03:17 +0000)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+> Mostly patches that are only indirectly related to the block layer, but I've
+> reviewed them and there is no maintainer.
+>
+> ----------------------------------------------------------------
+>
+> Fam Zheng (2):
+>   Add a git-publish configuration file
+>   README: Document 'git-publish' workflow
+>
+> Su Hang (3):
+>   util/uri.c: Coding style check, Only whitespace involved
+>   util/uri.c: remove brackets that wrap `return` statement's content.
+>   util/uri.c: wrap single statement blocks with braces {}
+>
+> Thomas Huth (1):
+>   tests/libqos: Check for valid dev pointer when looking for PCI devices
+>
+>  tests/libqos/virtio-pci.c |    4 +-
+>  util/uri.c                | 1733 ++++++++++++++++++++++++---------------------
+>  .gitpublish               |   51 ++
+>  README                    |   31 +-
+>  4 files changed, 1014 insertions(+), 805 deletions(-)
+>  create mode 100644 .gitpublish
+
+Applied, thanks.
+
+-- PMM
