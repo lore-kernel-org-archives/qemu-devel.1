@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1eslgM-0008CY-8E
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:41:19 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eslnm-0003qm-H1
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:48:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1eslgJ-0007F4-1U
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:41:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54756)
+	(envelope-from <kraxel@redhat.com>) id 1eslnj-0003am-BV
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:48:58 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55944 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1eslgI-0007EW-Qb
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:41:14 -0500
-Date: Mon, 5 Mar 2018 08:41:11 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20180305084111.GM2450@redhat.com>
-References: <1519998711-73430-1-git-send-email-mjc@sifive.com>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="xgyAXRrhYN0wYx8y"
-Content-Disposition: inline
-In-Reply-To: <1519998711-73430-1-git-send-email-mjc@sifive.com>
-Subject: Re: [Qemu-devel] [PATCH v8 00/23] RISC-V QEMU Port Submission
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eslnj-0003Yv-37
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:48:55 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4EC8A40FB653
+	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 08:48:51 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon,  5 Mar 2018 09:48:43 +0100
+Message-Id: <20180305084844.18222-13-kraxel@redhat.com>
+In-Reply-To: <20180305084844.18222-1-kraxel@redhat.com>
+References: <20180305084844.18222-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 12/13] audio: rename CONFIG_* to CONFIG_AUDIO_*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,65 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
+This avoids a name clash for CONFIG_SDL, which is used by both sdl video
+support and sdl audio support.  It also more clear that this is a audio
+driver configuration.
 
---xgyAXRrhYN0wYx8y
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-
-The attached patch is also needed to avoid crashes during various
-math-heavy test suites.
-
-Rich.
-
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-p2v converts physical machines to virtual machines.  Boot with a
-live CD or over the network (PXE) and turn machines into KVM guests.
-http://libguestfs.org/virt-v2v
-
---xgyAXRrhYN0wYx8y
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="0001-softfloat-fix-crash-on-int-conversion-of-SNaN.patch"
-
->From 8465cbda688cdc65dfe4037608c14cac087eae03 Mon Sep 17 00:00:00 2001
-From: Stef O'Rear <sorear2@gmail.com>
-Date: Sat, 3 Mar 2018 03:46:00 -0800
-Subject: [PATCH] softfloat: fix crash on int conversion of SNaN
-
-Signed-off-by: Stef O'Rear <sorear2@gmail.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: 20180301100547.18962-13-kraxel@redhat.com
 ---
- fpu/softfloat.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ configure           |  2 +-
+ audio/audio_int.h   |  2 +-
+ audio/Makefile.objs | 12 ++++++------
+ 3 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index e7fb0d357a..1da1db377e 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -1342,6 +1342,8 @@ static int64_t round_to_int_and_pack(FloatParts in, int rmode,
-     switch (p.cls) {
-     case float_class_snan:
-     case float_class_qnan:
-+    case float_class_dnan:
-+    case float_class_msnan:
-         return max;
-     case float_class_inf:
-         return p.sign ? min : max;
-@@ -1430,6 +1432,8 @@ static uint64_t round_to_uint_and_pack(FloatParts in, int rmode, uint64_t max,
-     switch (p.cls) {
-     case float_class_snan:
-     case float_class_qnan:
-+    case float_class_dnan:
-+    case float_class_msnan:
-         s->float_exception_flags = orig_flags | float_flag_invalid;
-         return max;
-     case float_class_inf:
+diff --git a/configure b/configure
+index e651533466..269add1187 100755
+--- a/configure
++++ b/configure
+@@ -5981,7 +5981,7 @@ if test "$cap_ng" = "yes" ; then
+ fi
+ echo "CONFIG_AUDIO_DRIVERS=$audio_drv_list" >> $config_host_mak
+ for drv in $audio_drv_list; do
+-    def=CONFIG_$(echo $drv | LC_ALL=C tr '[a-z]' '[A-Z]')
++    def=CONFIG_AUDIO_$(echo $drv | LC_ALL=C tr '[a-z]' '[A-Z]')
+     echo "$def=y" >> $config_host_mak
+ done
+ echo "ALSA_LIBS=$alsa_libs" >> $config_host_mak
+diff --git a/audio/audio_int.h b/audio/audio_int.h
+index 5b25da0a37..700bd43143 100644
+--- a/audio/audio_int.h
++++ b/audio/audio_int.h
+@@ -25,7 +25,7 @@
+ #ifndef QEMU_AUDIO_INT_H
+ #define QEMU_AUDIO_INT_H
+ 
+-#ifdef CONFIG_COREAUDIO
++#ifdef CONFIG_AUDIO_COREAUDIO
+ #define FLOAT_MIXENG
+ /* #define RECIPROCAL */
+ #endif
+diff --git a/audio/Makefile.objs b/audio/Makefile.objs
+index 8a5ede6e2b..f6ce5c6744 100644
+--- a/audio/Makefile.objs
++++ b/audio/Makefile.objs
+@@ -1,11 +1,11 @@
+ common-obj-y = audio.o noaudio.o wavaudio.o mixeng.o
+-common-obj-$(CONFIG_SDL) += sdlaudio.o
+-common-obj-$(CONFIG_OSS) += ossaudio.o
++common-obj-$(CONFIG_AUDIO_SDL) += sdlaudio.o
++common-obj-$(CONFIG_AUDIO_OSS) += ossaudio.o
+ common-obj-$(CONFIG_SPICE) += spiceaudio.o
+-common-obj-$(CONFIG_COREAUDIO) += coreaudio.o
+-common-obj-$(CONFIG_ALSA) += alsaaudio.o
+-common-obj-$(CONFIG_DSOUND) += dsoundaudio.o
+-common-obj-$(CONFIG_PA) += paaudio.o
++common-obj-$(CONFIG_AUDIO_COREAUDIO) += coreaudio.o
++common-obj-$(CONFIG_AUDIO_ALSA) += alsaaudio.o
++common-obj-$(CONFIG_AUDIO_DSOUND) += dsoundaudio.o
++common-obj-$(CONFIG_AUDIO_PA) += paaudio.o
+ common-obj-$(CONFIG_AUDIO_PT_INT) += audio_pt_int.o
+ common-obj-$(CONFIG_AUDIO_WIN_INT) += audio_win_int.o
+ common-obj-y += wavcapture.o
 -- 
-2.15.1
-
-
---xgyAXRrhYN0wYx8y--
+2.9.3
