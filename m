@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1esj63-0004zx-7S
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 00:55:40 -0500
+	(envelope-from <yulei.zhang@intel.com>) id 1esj64-000501-CZ
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 00:55:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1esj60-0008FJ-FT
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 00:55:39 -0500
+	(envelope-from <yulei.zhang@intel.com>) id 1esj62-0008Fs-U6
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 00:55:40 -0500
 Received: from mga06.intel.com ([134.134.136.31]:54640)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yulei.zhang@intel.com>)
-	id 1esj60-0008E6-6c
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 00:55:36 -0500
+	id 1esj62-0008E6-GR
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 00:55:38 -0500
 From: Yulei Zhang <yulei.zhang@intel.com>
-Date: Mon,  5 Mar 2018 14:00:50 +0800
-Message-Id: <1520229653-10658-2-git-send-email-yulei.zhang@intel.com>
+Date: Mon,  5 Mar 2018 14:00:52 +0800
+Message-Id: <1520229653-10658-4-git-send-email-yulei.zhang@intel.com>
 In-Reply-To: <1520229653-10658-1-git-send-email-yulei.zhang@intel.com>
 References: <1520229653-10658-1-git-send-email-yulei.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH V3 1/4] vfio: introduce a new VFIO subregion
- for mdev device migration support
+Subject: [Qemu-devel] [PATCH V3 3/4] vfio: Add struct vfio_vmstate_info to
+ introduce put/get callback funtion for vfio device status save/restore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,87 +28,198 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kevin.tian@intel.com, zhenyuw@linux.intel.com, kwankhede@nvidia.com, alex.williamson@redhat.com, Yulei Zhang <yulei.zhang@intel.com>
 
-New VFIO sub region VFIO_REGION_SUBTYPE_DEVICE_STATE is added
-to fetch and restore the status of mdev device vGPU during the
-live migration.
+Introduce vfio_device_put/vfio_device_get funtion for vfio device state
+save/restore usage.
+
+For VFIO pci device status migrate, on the source side with
+funtion vfio_device_put to save the following states
+1. pci configuration space addr0~addr5
+2. pci configuration space msi_addr msi_data
+3. pci device status fetch from device driver
+
+And on the target side with funtion vfio_device_get to restore
+the same states
+1. re-setup the pci bar configuration
+2. re-setup the pci device msi configuration
+3. restore the pci device status
 
 Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
 ---
- hw/vfio/pci.c              | 14 +++++++++++++-
- hw/vfio/pci.h              |  1 +
- linux-headers/linux/vfio.h |  9 ++++++---
- 3 files changed, 20 insertions(+), 4 deletions(-)
+ hw/vfio/pci.c              | 137 +++++++++++++++++++++++++++++++++++++++++++++
+ linux-headers/linux/vfio.h |   3 +
+ 2 files changed, 140 insertions(+)
 
 diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 31e1edf..2fe20e4 100644
+index 3e2289c..c1676cf 100644
 --- a/hw/vfio/pci.c
 +++ b/hw/vfio/pci.c
-@@ -37,6 +37,7 @@
+@@ -2982,6 +2982,123 @@ static void vfio_vm_change_state_handler(void *pv, int running, RunState state)
+     vbasedev->device_state = dev_state;
+ }
  
- static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
- static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
-+static VMStateDescription vfio_pci_vmstate;
- 
- /*
-  * Disabling BAR mmaping can be slow, but toggling it around INTx can
-@@ -2813,6 +2814,17 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
-         vfio_vga_quirk_setup(vdev);
-     }
- 
-+    struct vfio_region_info *device_state;
-+    /* device state region setup */
-+    if (!vfio_get_dev_region_info(&vdev->vbasedev,
-+                VFIO_REGION_TYPE_PCI_VENDOR_TYPE | PCI_VENDOR_ID_INTEL,
-+                VFIO_REGION_SUBTYPE_DEVICE_STATE, &device_state)) {
-+        memcpy(&vdev->device_state, device_state,
-+               sizeof(struct vfio_region_info));
-+        g_free(device_state);
-+        vfio_pci_vmstate.unmigratable = 0;
++static int vfio_device_put(QEMUFile *f, void *pv, size_t size,
++                           VMStateField *field, QJSON *vmdesc)
++{
++    VFIOPCIDevice *vdev = pv;
++    PCIDevice *pdev = &vdev->pdev;
++    int sz = vdev->device_state.size - VFIO_DEVICE_STATE_OFFSET;
++    uint8_t *buf = NULL;
++    uint32_t msi_cfg, msi_lo, msi_hi, msi_data, bar_cfg, i;
++    bool msi_64bit;
++
++    for (i = 0; i < PCI_ROM_SLOT; i++) {
++        bar_cfg = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, 4);
++        qemu_put_be32(f, bar_cfg);
 +    }
 +
-     for (i = 0; i < PCI_ROM_SLOT; i++) {
-         vfio_bar_quirk_setup(vdev, i);
-     }
-@@ -2994,7 +3006,7 @@ static Property vfio_pci_dev_properties[] = {
++    msi_cfg = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS, 2);
++    msi_64bit = !!(msi_cfg & PCI_MSI_FLAGS_64BIT);
++
++    msi_lo = pci_default_read_config(pdev,
++                                     pdev->msi_cap + PCI_MSI_ADDRESS_LO, 4);
++    qemu_put_be32(f, msi_lo);
++
++    if (msi_64bit) {
++        msi_hi = pci_default_read_config(pdev,
++                                         pdev->msi_cap + PCI_MSI_ADDRESS_HI,
++                                         4);
++        qemu_put_be32(f, msi_hi);
++    }
++
++    msi_data = pci_default_read_config(pdev,
++               pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
++               2);
++    qemu_put_be32(f, msi_data);
++
++    buf = g_malloc(sz);
++    if (buf == NULL) {
++        error_report("vfio: Failed to allocate memory for migrate");
++        goto exit;
++    }
++
++    if (pread(vdev->vbasedev.fd, buf, sz,
++              vdev->device_state.offset + VFIO_DEVICE_STATE_OFFSET) != sz) {
++        error_report("vfio: Failed to read Device State Region");
++        goto exit;
++    }
++
++    qemu_put_buffer(f, buf, sz);
++
++exit:
++    g_free(buf);
++
++    return 0;
++}
++
++static int vfio_device_get(QEMUFile *f, void *pv,
++                           size_t size, VMStateField *field)
++{
++    VFIOPCIDevice *vdev = pv;
++    PCIDevice *pdev = &vdev->pdev;
++    int sz = vdev->device_state.size - VFIO_DEVICE_STATE_OFFSET;
++    uint8_t *buf = NULL;
++    uint32_t ctl, msi_lo, msi_hi, msi_data, bar_cfg, i;
++    bool msi_64bit;
++
++    /* retore pci bar configuration */
++    ctl = pci_default_read_config(pdev, PCI_COMMAND, 2);
++    vfio_pci_write_config(pdev, PCI_COMMAND,
++                          ctl & (!(PCI_COMMAND_IO | PCI_COMMAND_MEMORY)), 2);
++    for (i = 0; i < PCI_ROM_SLOT; i++) {
++        bar_cfg = qemu_get_be32(f);
++        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, bar_cfg, 4);
++    }
++    vfio_pci_write_config(pdev, PCI_COMMAND,
++                          ctl | PCI_COMMAND_IO | PCI_COMMAND_MEMORY, 2);
++
++    /* restore msi configuration */
++    ctl = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS, 2);
++    msi_64bit = !!(ctl & PCI_MSI_FLAGS_64BIT);
++
++    vfio_pci_write_config(&vdev->pdev,
++                          pdev->msi_cap + PCI_MSI_FLAGS,
++                          ctl & (!PCI_MSI_FLAGS_ENABLE), 2);
++
++    msi_lo = qemu_get_be32(f);
++    vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_LO, msi_lo, 4);
++
++    if (msi_64bit) {
++        msi_hi = qemu_get_be32(f);
++        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_HI,
++                              msi_hi, 4);
++    }
++    msi_data = qemu_get_be32(f);
++    vfio_pci_write_config(pdev,
++              pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
++              msi_data, 2);
++
++    vfio_pci_write_config(&vdev->pdev, pdev->msi_cap + PCI_MSI_FLAGS,
++                          ctl | PCI_MSI_FLAGS_ENABLE, 2);
++
++    buf = g_malloc(sz);
++    if (buf == NULL) {
++        error_report("vfio: Failed to allocate memory for migrate");
++        return -1;
++    }
++
++    qemu_get_buffer(f, buf, sz);
++    if (pwrite(vdev->vbasedev.fd, buf, sz,
++               vdev->device_state.offset + VFIO_DEVICE_STATE_OFFSET) != sz) {
++        error_report("vfio: Failed to write Device State Region");
++        return -1;
++    }
++
++    g_free(buf);
++
++    return 0;
++}
++
+ static void vfio_instance_init(Object *obj)
+ {
+     PCIDevice *pci_dev = PCI_DEVICE(obj);
+@@ -3026,9 +3143,29 @@ static Property vfio_pci_dev_properties[] = {
      DEFINE_PROP_END_OF_LIST(),
  };
  
--static const VMStateDescription vfio_pci_vmstate = {
-+static VMStateDescription vfio_pci_vmstate = {
++static const VMStateInfo vfio_vmstate_info = {
++    .name = "vfio-state",
++    .get = vfio_device_get,
++    .put = vfio_device_put,
++};
++
+ static VMStateDescription vfio_pci_vmstate = {
      .name = "vfio-pci",
      .unmigratable = 1,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        {
++            .name         = "vfio dev",
++            .version_id   = 0,
++            .field_exists = NULL,
++            .size         = 0,
++            .info         = &vfio_vmstate_info,
++            .flags        = VMS_SINGLE,
++            .offset       = 0,
++         },
++        VMSTATE_END_OF_LIST()
++    },
  };
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index a8366bb..6a1d26e 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -116,6 +116,7 @@ typedef struct VFIOPCIDevice {
-     VFIOBAR bars[PCI_NUM_REGIONS - 1]; /* No ROM */
-     VFIOVGA *vga; /* 0xa0000, 0x3b0, 0x3c0 */
-     void *igd_opregion;
-+    struct vfio_region_info device_state;
-     PCIHostDeviceAddress host;
-     EventNotifier err_notifier;
-     EventNotifier req_notifier;
+ 
+ static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
 diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index 4e7ab4c..c3b8e4a 100644
+index 4ddeebc..4451a8f 100644
 --- a/linux-headers/linux/vfio.h
 +++ b/linux-headers/linux/vfio.h
-@@ -296,9 +296,12 @@ struct vfio_region_info_cap_type {
- #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
+@@ -303,6 +303,9 @@ struct vfio_region_info_cap_type {
+ /* Mdev sub-type for device state save and restore */
+ #define VFIO_REGION_SUBTYPE_DEVICE_STATE	(4)
  
- /* 8086 Vendor sub-types */
--#define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION	(1)
--#define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
--#define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
-+#define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION		(1)
-+#define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG		(2)
-+#define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG		(3)
++/* Offset in region to save device state */
++#define VFIO_DEVICE_STATE_OFFSET	1
 +
-+/* Mdev sub-type for device state save and restore */
-+#define VFIO_REGION_SUBTYPE_DEVICE_STATE	(4)
+ #define VFIO_DEVICE_START	0
+ #define VFIO_DEVICE_STOP	1
  
- /**
-  * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
 -- 
 2.7.4
