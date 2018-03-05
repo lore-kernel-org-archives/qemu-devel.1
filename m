@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42355)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rpalethorpe@suse.de>) id 1ess7c-0004zM-B5
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:33:54 -0500
+	(envelope-from <eblake@redhat.com>) id 1essBA-0006G7-EV
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:37:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rpalethorpe@suse.de>) id 1ess7Z-0002kt-JX
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:33:52 -0500
-References: <20180227115651.30762-1-rpalethorpe@suse.com>
-	<20180227115651.30762-2-rpalethorpe@suse.com>
-	<20180301165859.GJ2994@work-vm>
-From: Richard Palethorpe <rpalethorpe@suse.de>
-Reply-To: rpalethorpe@suse.de
-In-reply-to: <20180301165859.GJ2994@work-vm>
-Date: Mon, 05 Mar 2018 16:33:37 +0100
-Message-ID: <87efkywn8u.fsf@rpws.prws.suse.cz>
+	(envelope-from <eblake@redhat.com>) id 1essB7-0004Qw-O8
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:37:32 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55304 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1essB7-0004QF-I8
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:37:29 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 23AE7400187D
+	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 15:37:24 +0000 (UTC)
+References: <1520248105-10053-1-git-send-email-thuth@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5483b6f9-32ac-4d20-9e21-c784a639c62c@redhat.com>
+Date: Mon, 5 Mar 2018 09:37:18 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC PATCH 1/2] migrate: Allow incoming migration
- without defer
+In-Reply-To: <1520248105-10053-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] Allow to specify a display device ID
+ and head whith the screendump command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,116 +34,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: " Dr. David Alan Gilbert " <dgilbert@redhat.com>
-Cc: rpalethorpe@suse.de, qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com, berrange@redhat.com, eblake@redhat.com, mreitz@redhat.com, quintela@redhat.com
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Jiri Denemark <jdenemar@redhat.com>
 
-hello David,
+On 03/05/2018 05:08 AM, Thomas Huth wrote:
 
-Dr. David Alan Gilbert writes:
+In the subject line: s/whith/with/
 
-> * Richard Palethorpe (rpalethorpe@suse.com) wrote:
->> Allow a QEMU instance which has been started and used without the "-incoming"
->> flag to accept an incoming migration with the "migrate-incoming" QMP
->> command. This allows the user to dump the VM state to an external file then
->> revert to that state at a later time without restarting QEMU.
->> ---
->>  migration/migration.c | 12 +++++-------
->>  vl.c                  |  2 ++
->>  2 files changed, 7 insertions(+), 7 deletions(-)
->>
->> diff --git a/migration/migration.c b/migration/migration.c
->> index 0aa596f867..05595a4cec 100644
->> --- a/migration/migration.c
->> +++ b/migration/migration.c
->> @@ -1321,14 +1321,14 @@ void migrate_del_blocker(Error *reason)
->>  void qmp_migrate_incoming(const char *uri, Error **errp)
->>  {
->>      Error *local_err = NULL;
->> -    static bool once = true;
->>
->> -    if (!deferred_incoming) {
->> -        error_setg(errp, "For use with '-incoming defer'");
->> +    if (runstate_check(RUN_STATE_INMIGRATE)) {
->> +        error_setg(errp, "The incoming migration has already been started");
->>          return;
->>      }
->> -    if (!once) {
->> -        error_setg(errp, "The incoming migration has already been started");
->> +
->> +    if (!deferred_incoming) {
->> +        vm_stop(RUN_STATE_INMIGRATE);
->>      }
->>
->>      qemu_start_incoming_migration(uri, &local_err);
->> @@ -1337,8 +1337,6 @@ void qmp_migrate_incoming(const char *uri, Error **errp)
->>          error_propagate(errp, local_err);
->>          return;
->>      }
->> -
->> -    once = false;
->>  }
->
-> That's...interesting.  I think it will work, but I bet there's a whole
-> bunch of corner cases [many of which loadvm will hit as well!].
+Also, it's rather long (over 75 characters, while typical messages are=20
+under 65, since it is nice to still fit in 80 columns even when 'git=20
+log' adds indentation), better might be:
 
-It wouldn't surprise me if we have hit some of those corner cases with
-our extensive use of loadvm :-) Unfortunately I don't have much data to
-show what went wrong though.
+qapi: Add parameters to screendump
 
-> For starters there's probably devices that are active and still looking
-> at RAM, even though vm_stop is in place (hopefully none of them are
-> writing to it, but I wouldn't actually trust them).
+then go into details about the parameters in the commit body
 
-I suppose that might be a showstopper.
+> QEMU's screendump command can only take dumps from the primary display.
+> When using multiple VGA cards, there is no way to get a dump from a
+> secondary card or other display heads yet. So let's add an 'device' and
+> a 'head' parameter to the HMP and QMP commands to be able to specify
+> alternative devices and heads with the screendump command, too.
+>=20
+> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>   v3:
+>   - Drop redundant qemu_console_lookup_by_index(0);
+>   - Remove trailing "." from error message
+>=20
 
-> Also, you probably
-> need to inactivate the block devices?
+> +++ b/qapi/ui.json
+> @@ -77,6 +77,10 @@
+>   #
+>   # @filename: the path of a new PPM file to store the image
+>   #
+> +# @device: ID of the display device that should be used (since 2.12)
 
-They are at least flushed by vm_stop. I would expect the user to
-recreate them, or at least recreate the active layer before starting the
-migration.
+Worth mentioning how the default value is computed?
 
->
-> Also, I think this means there's no protection against this happening
-> during an outgoing migration (which has an existing check to make sure
-> you can't start an outgoing migration while an incoming one is waiting).
->
->>  bool migration_is_blocked(Error **errp)
->> diff --git a/vl.c b/vl.c
->> index 9e7235df6d..a91eda039e 100644
->> --- a/vl.c
->> +++ b/vl.c
->> @@ -634,6 +634,7 @@ static const RunStateTransition runstate_transitions_def[] = {
->>      { RUN_STATE_PAUSED, RUN_STATE_POSTMIGRATE },
->>      { RUN_STATE_PAUSED, RUN_STATE_PRELAUNCH },
->>      { RUN_STATE_PAUSED, RUN_STATE_COLO},
->> +    { RUN_STATE_PAUSED, RUN_STATE_INMIGRATE },
->>
->>      { RUN_STATE_POSTMIGRATE, RUN_STATE_RUNNING },
->>      { RUN_STATE_POSTMIGRATE, RUN_STATE_FINISH_MIGRATE },
->> @@ -665,6 +666,7 @@ static const RunStateTransition runstate_transitions_def[] = {
->>      { RUN_STATE_RUNNING, RUN_STATE_WATCHDOG },
->>      { RUN_STATE_RUNNING, RUN_STATE_GUEST_PANICKED },
->>      { RUN_STATE_RUNNING, RUN_STATE_COLO},
->> +    { RUN_STATE_RUNNING, RUN_STATE_INMIGRATE },
->
-> Experience suggests that you'll find out the hard way that there's other
-> states you'll need to allow or check for.
-> For example, do you want to be able to loadvm from a GUEST_PANICKED or
-> PRELAUNCH state?
+> +#
+> +# @head: head to use in case the device supports multiple heads (since=
+ 2.12)
+> +#
+>   # Returns: Nothing on success
+>   #
+>   # Since: 0.14.0
+> @@ -88,7 +92,8 @@
+>   # <- { "return": {} }
+>   #
+>   ##
+> -{ 'command': 'screendump', 'data': {'filename': 'str'} }
+> +{ 'command': 'screendump',
+> +  'data': {'filename': 'str', '*device': 'str', '*head': 'int'} }
+>  =20
 
-Yes, I would add GUEST_PANICKED at least.
+QAPI changes are reasonable from a UI point of view.
 
->
-> Dave
->
->>      { RUN_STATE_SAVE_VM, RUN_STATE_RUNNING },
->>
->> --
->> 2.16.2
->>
+> +    } else {
+> +        if (has_head) {
+> +            error_setg(errp, "'head' must be specified together with '=
+device'");
 
+This isn't documented.
 
---
-Thank you,
-Richard.
+> +            return;
+> +        }
+> +        con =3D qemu_console_lookup_by_index(0);
+> +        if (!con) {
+> +            error_setg(errp, "There is no console to take a screendump=
+ from");
+> +            return;
+> +        }
+>       }
+>  =20
+>       graphic_hw_update(con);
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
