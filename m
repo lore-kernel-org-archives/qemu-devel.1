@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49557)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esxWc-0004X5-C7
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:20:03 -0500
+	id 1esxWg-0004cT-Kw
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:20:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esxWb-0001hZ-Im
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:20:02 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:32817)
+	id 1esxWd-0001j0-DM
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:20:06 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:38776)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esxWb-0001gs-Ce
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:20:01 -0500
-Received: by mail-wm0-x242.google.com with SMTP id s206so15056368wme.0
-	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 13:20:01 -0800 (PST)
+	id 1esxWd-0001ie-3s
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:20:03 -0500
+Received: by mail-wm0-x242.google.com with SMTP id z9so18275321wmb.3
+	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 13:20:03 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon,  5 Mar 2018 18:19:20 -0300
-Message-Id: <20180305211928.466-15-f4bug@amsat.org>
+Date: Mon,  5 Mar 2018 18:19:21 -0300
+Message-Id: <20180305211928.466-16-f4bug@amsat.org>
 In-Reply-To: <20180305211928.466-1-f4bug@amsat.org>
 References: <20180305211928.466-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH v2 14/22] hw/mips/malta: Code movement
+Subject: [Qemu-devel] [RFC PATCH v2 15/22] hw/isa/superio: Factor out the
+ FDC37M817 Super I/O from mips_malta.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,51 +37,146 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Marcel Apfelbaum <marcel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alexey Kardashevskiy <aik@ozlabs.ru>, Thomas Huth <thuth@redhat.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>
 
-Move the SouthBridge peripherals first, and keep the Super I/O
-peripherals last.
-
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/mips/mips_malta.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ include/hw/isa/superio.h |  2 ++
+ hw/isa/isa-superio.c     | 20 ++++++++++++++++++++
+ hw/mips/mips_malta.c     | 35 ++++++++++-------------------------
+ 3 files changed, 32 insertions(+), 25 deletions(-)
 
+diff --git a/include/hw/isa/superio.h b/include/hw/isa/superio.h
+index 3dd5448f8c..b47aac3cf8 100644
+--- a/include/hw/isa/superio.h
++++ b/include/hw/isa/superio.h
+@@ -54,4 +54,6 @@ typedef struct ISASuperIOClass {
+     ISASuperIOFuncs ide;
+ } ISASuperIOClass;
+ 
++#define TYPE_FDC37M81X_SUPERIO  "fdc37m81x-superio"
++
+ #endif /* HW_ISA_SUPERIO_H */
+diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
+index 88d254a602..f1f699fc2f 100644
+--- a/hw/isa/isa-superio.c
++++ b/hw/isa/isa-superio.c
+@@ -182,9 +182,29 @@ static const TypeInfo isa_superio_type_info = {
+     .class_init = isa_superio_class_init,
+ };
+ 
++/* SMS FDC37M817 Super I/O */
++static void fdc37m81x_class_init(ObjectClass *klass, void *data)
++{
++    ISASuperIOClass *sc = ISA_SUPERIO_CLASS(klass);
++
++    sc->serial.count = 2; /* NS16C550A */
++    sc->parallel.count = 1;
++    sc->floppy.count = 1; /* SMSC 82077AA Compatible */
++    sc->ide.count = 0;
++}
++
++static const TypeInfo fdc37m81x_type_info = {
++    .name          = TYPE_FDC37M81X_SUPERIO,
++    .parent        = TYPE_ISA_SUPERIO,
++    .instance_size = sizeof(ISASuperIODevice),
++    .class_size    = sizeof(ISASuperIOClass),
++    .class_init    = fdc37m81x_class_init,
++};
++
+ static void isa_superio_register_types(void)
+ {
+     type_register_static(&isa_superio_type_info);
++    type_register_static(&fdc37m81x_type_info);
+ }
+ 
+ type_init(isa_superio_register_types)
 diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index cd7bd0eef6..9e0724ca5a 100644
+index 9e0724ca5a..f6513a4fd5 100644
 --- a/hw/mips/mips_malta.c
 +++ b/hw/mips/mips_malta.c
-@@ -1062,10 +1062,6 @@ void mips_malta_init(MachineState *machine)
-         memory_region_add_subregion(system_memory, 512 << 20, ram_low_postio);
-     }
+@@ -27,14 +27,12 @@
+ #include "cpu.h"
+ #include "hw/hw.h"
+ #include "hw/i386/pc.h"
++#include "hw/isa/superio.h"
+ #include "hw/dma/i8257.h"
+ #include "hw/char/serial.h"
+-#include "hw/char/parallel.h"
+-#include "hw/block/fdc.h"
+ #include "net/net.h"
+ #include "hw/boards.h"
+ #include "hw/i2c/smbus.h"
+-#include "sysemu/block-backend.h"
+ #include "hw/block/flash.h"
+ #include "hw/mips/mips.h"
+ #include "hw/mips/cpudevs.h"
+@@ -47,7 +45,6 @@
+ #include "hw/loader.h"
+ #include "elf.h"
+ #include "hw/timer/mc146818rtc.h"
+-#include "hw/input/i8042.h"
+ #include "hw/timer/i8254.h"
+ #include "sysemu/blockdev.h"
+ #include "exec/address-spaces.h"
+@@ -1005,10 +1002,8 @@ void mips_malta_init(MachineState *machine)
+     qemu_irq cbus_irq, i8259_irq;
+     int piix4_devfn;
+     I2CBus *smbus;
+-    int i;
+     DriveInfo *dinfo;
+     DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
+-    DriveInfo *fd[MAX_FD];
+     int fl_idx = 0;
+     int fl_sectors = bios_size >> 16;
+     int be;
+@@ -1023,15 +1018,6 @@ void mips_malta_init(MachineState *machine)
  
--    /* generate SPD EEPROM data */
--    generate_eeprom_spd(&smbus_eeprom_buf[0 * 256], ram_size);
--    generate_eeprom_serial(&smbus_eeprom_buf[6 * 256]);
+     qdev_init_nofail(dev);
+ 
+-    /* Make sure the first 3 serial ports are associated with a device. */
+-    for(i = 0; i < 3; i++) {
+-        if (!serial_hds[i]) {
+-            char label[32];
+-            snprintf(label, sizeof(label), "serial%d", i);
+-            serial_hds[i] = qemu_chr_new(label, "null");
+-        }
+-    }
 -
- #ifdef TARGET_WORDS_BIGENDIAN
-     be = 1;
+     /* create CPU */
+     mips_create_cpu(s, machine->cpu_type, &cbus_irq, &i8259_irq);
+ 
+@@ -1067,7 +1053,14 @@ void mips_malta_init(MachineState *machine)
  #else
-@@ -1208,15 +1204,19 @@ void mips_malta_init(MachineState *machine)
-     pci_create_simple(pci_bus, piix4_devfn + 2, "piix4-usb-uhci");
-     smbus = piix4_pm_init(pci_bus, piix4_devfn + 3, 0x1100,
-                           isa_get_irq(NULL, 9), NULL, 0, NULL);
--    smbus_eeprom_init(smbus, 8, smbus_eeprom_buf, smbus_eeprom_size);
--    g_free(smbus_eeprom_buf);
-     pit = i8254_pit_init(isa_bus, 0x40, 0, NULL);
-     i8257_dma_init(isa_bus, 0);
-+    mc146818_rtc_init(isa_bus, 2000, NULL);
+     be = 0;
+ #endif
 +
-+    /* generate SPD EEPROM data */
-+    generate_eeprom_spd(&smbus_eeprom_buf[0 * 256], ram_size);
-+    generate_eeprom_serial(&smbus_eeprom_buf[6 * 256]);
-+    smbus_eeprom_init(smbus, 8, smbus_eeprom_buf, smbus_eeprom_size);
-+    g_free(smbus_eeprom_buf);
+     /* FPGA */
++
++    /* Make sure the second serial port is associated with a device. */
++    if (!serial_hds[2]) {
++        serial_hds[2] = qemu_chr_new("fpga-uart", "null");
++    }
++
+     /* The CBUS UART is attached to the MIPS CPU INT2 pin, ie interrupt 4 */
+     malta_fpga_init(system_memory, FPGA_ADDRESS, cbus_irq, serial_hds[2]);
  
-     /* Super I/O */
-     isa_create_simple(isa_bus, TYPE_I8042);
+@@ -1214,16 +1207,8 @@ void mips_malta_init(MachineState *machine)
+     smbus_eeprom_init(smbus, 8, smbus_eeprom_buf, smbus_eeprom_size);
+     g_free(smbus_eeprom_buf);
  
--    mc146818_rtc_init(isa_bus, 2000, NULL);
-     serial_hds_isa_init(isa_bus, 0, 2);
-     parallel_hds_isa_init(isa_bus, 1);
+-    /* Super I/O */
+-    isa_create_simple(isa_bus, TYPE_I8042);
+-
+-    serial_hds_isa_init(isa_bus, 0, 2);
+-    parallel_hds_isa_init(isa_bus, 1);
+-
+-    for(i = 0; i < MAX_FD; i++) {
+-        fd[i] = drive_get(IF_FLOPPY, 0, i);
+-    }
+-    fdctrl_init_isa(isa_bus, fd);
++    /* Super I/O: SMS FDC37M817 */
++    isa_create_simple(isa_bus, TYPE_FDC37M81X_SUPERIO);
  
+     /* Network card */
+     network_init(pci_bus);
 -- 
 2.16.2
