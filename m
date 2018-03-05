@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1est7k-0000WM-K7
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 11:38:05 -0500
+	(envelope-from <stefanha@redhat.com>) id 1est7x-0000bs-IF
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 11:38:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1est7h-0003mE-GE
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 11:38:04 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58014 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1est7h-0003m0-CF
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 11:38:01 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 29C6D405CC2D
-	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 16:37:57 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon,  5 Mar 2018 17:37:48 +0100
-Message-Id: <1520267868-31778-1-git-send-email-thuth@redhat.com>
+	(envelope-from <stefanha@redhat.com>) id 1est7w-00041k-I3
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 11:38:17 -0500
+Date: Mon, 5 Mar 2018 16:38:05 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180305163805.GA26426@stefanha-x1.localdomain>
+References: <1513385953-5466-1-git-send-email-deepa.srinivasan@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4] qapi: Add device ID and head parameters to
- screendump
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="n8g4imXOkfNTN/H1"
+Content-Disposition: inline
+In-Reply-To: <1513385953-5466-1-git-send-email-deepa.srinivasan@oracle.com>
+Subject: Re: [Qemu-devel] [PATCH v2] block: Fix qemu crash when using
+ scsi-block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,140 +24,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Jiri Denemark <jdenemar@redhat.com>
+To: Deepa Srinivasan <deepa.srinivasan@oracle.com>
+Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mark.kanda@oracle.com, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 
-QEMU's screendump command can only take dumps from the primary display.
-When using multiple VGA cards, there is no way to get a dump from a
-secondary card or other display heads yet. So let's add an 'device' and
-a 'head' parameter to the HMP and QMP commands to be able to specify
-alternative devices and heads with the screendump command, too.
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- v4:
- - Improved the documentation of the parameters in ui.json a little bit
-   (according to the suggestions from Eric)
+--n8g4imXOkfNTN/H1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- hmp-commands.hx |  7 ++++---
- hmp.c           |  4 +++-
- qapi/ui.json    | 10 +++++++++-
- ui/console.c    | 24 +++++++++++++++++++-----
- 4 files changed, 35 insertions(+), 10 deletions(-)
+On Fri, Dec 15, 2017 at 04:59:13PM -0800, Deepa Srinivasan wrote:
+> Starting qemu with the following arguments causes qemu to segfault:
+> ... -device lsi,id=3Dlsi0 -drive file=3Discsi:<...>,format=3Draw,if=3Dnon=
+e,node-name=3D
+> iscsi1 -device scsi-block,bus=3Dlsi0.0,id=3D<...>,drive=3Discsi1
+>=20
+> This patch fixes blk_aio_ioctl() so it does not pass stack addresses to
+> blk_aio_ioctl_entry() which may be invoked after blk_aio_ioctl() returns.=
+ More
+> details about the bug follow.
+>=20
+> blk_aio_ioctl() invokes blk_aio_prwv() with blk_aio_ioctl_entry as the
+> coroutine parameter. blk_aio_prwv() ultimately calls aio_co_enter().
+>=20
+> When blk_aio_ioctl() is executed from within a coroutine context (e.g.
+> iscsi_bh_cb()), aio_co_enter() adds the coroutine (blk_aio_ioctl_entry) to
+> the current coroutine's wakeup queue. blk_aio_ioctl() then returns.
+>=20
+> When blk_aio_ioctl_entry() executes later, it accesses an invalid pointer:
+> ....
+>     BlkRwCo *rwco =3D &acb->rwco;
+>=20
+>     rwco->ret =3D blk_co_ioctl(rwco->blk, rwco->offset,
+>                              rwco->qiov->iov[0].iov_base);  <--- qiov is
+>                                                                  invalid =
+here
+> ...
+>=20
+> In the case when blk_aio_ioctl() is called from a non-coroutine context,
+> blk_aio_ioctl_entry() executes immediately. But if bdrv_co_ioctl() calls
+> qemu_coroutine_yield(), blk_aio_ioctl() will return. When the coroutine
+> execution is complete, control returns to blk_aio_ioctl_entry() after the=
+ call
+> to blk_co_ioctl(). There is no invalid reference after this point, but the
+> function is still holding on to invalid pointers.
+>=20
+> The fix is to change blk_aio_prwv() to accept a void pointer for the IO b=
+uffer
+> rather than a QEMUIOVector. blk_aio_prwv() passes this through in BlkRwCo=
+ and the
+> coroutine function casts it to QEMUIOVector or uses the void pointer dire=
+ctly.
+>=20
+> Signed-off-by: Deepa Srinivasan <deepa.srinivasan@oracle.com>
+> Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+> Reviewed-by: Mark Kanda <mark.kanda@oracle.com>
+> ---
+>  block/block-backend.c | 51 +++++++++++++++++++++++++--------------------=
+------
+>  1 file changed, 25 insertions(+), 26 deletions(-)
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 964eb51..1723cbe 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -253,9 +253,10 @@ ETEXI
-=20
-     {
-         .name       =3D "screendump",
--        .args_type  =3D "filename:F",
--        .params     =3D "filename",
--        .help       =3D "save screen into PPM image 'filename'",
-+        .args_type  =3D "filename:F,device:s?,head:i?",
-+        .params     =3D "filename [device [head]]",
-+        .help       =3D "save screen from head 'head' of display device =
-'device' "
-+                      "into PPM image 'filename'",
-         .cmd        =3D hmp_screendump,
-     },
-=20
-diff --git a/hmp.c b/hmp.c
-index 016cb5c..ba9e299 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -2140,9 +2140,11 @@ err_out:
- void hmp_screendump(Monitor *mon, const QDict *qdict)
- {
-     const char *filename =3D qdict_get_str(qdict, "filename");
-+    const char *id =3D qdict_get_try_str(qdict, "device");
-+    int64_t head =3D qdict_get_try_int(qdict, "head", 0);
-     Error *err =3D NULL;
-=20
--    qmp_screendump(filename, &err);
-+    qmp_screendump(filename, id !=3D NULL, id, id !=3D NULL, head, &err)=
-;
-     hmp_handle_error(mon, &err);
- }
-=20
-diff --git a/qapi/ui.json b/qapi/ui.json
-index 3e82f25..5d01ad4 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -77,6 +77,13 @@
- #
- # @filename: the path of a new PPM file to store the image
- #
-+# @device: ID of the display device that should be dumped. If this param=
-eter
-+#          is missing, the primary display will be used. (Since 2.12)
-+#
-+# @head: head to use in case the device supports multiple heads. If this
-+#        parameter is missing, head #0 will be used. Also note that the =
-head
-+#        can only be specified in conjunction with the device ID. (Since=
- 2.12)
-+#
- # Returns: Nothing on success
- #
- # Since: 0.14.0
-@@ -88,7 +95,8 @@
- # <- { "return": {} }
- #
- ##
--{ 'command': 'screendump', 'data': {'filename': 'str'} }
-+{ 'command': 'screendump',
-+  'data': {'filename': 'str', '*device': 'str', '*head': 'int'} }
-=20
- ##
- # =3D=3D Spice
-diff --git a/ui/console.c b/ui/console.c
-index 6a1f499..f2794c7 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -344,14 +344,28 @@ write_err:
-     goto out;
- }
-=20
--void qmp_screendump(const char *filename, Error **errp)
-+void qmp_screendump(const char *filename, bool has_device, const char *d=
-evice,
-+                    bool has_head, int64_t head, Error **errp)
- {
--    QemuConsole *con =3D qemu_console_lookup_by_index(0);
-+    QemuConsole *con;
-     DisplaySurface *surface;
-=20
--    if (con =3D=3D NULL) {
--        error_setg(errp, "There is no QemuConsole I can screendump from.=
-");
--        return;
-+    if (has_device) {
-+        con =3D qemu_console_lookup_by_device_name(device, has_head ? he=
-ad : 0,
-+                                                 errp);
-+        if (!con) {
-+            return;
-+        }
-+    } else {
-+        if (has_head) {
-+            error_setg(errp, "'head' must be specified together with 'de=
-vice'");
-+            return;
-+        }
-+        con =3D qemu_console_lookup_by_index(0);
-+        if (!con) {
-+            error_setg(errp, "There is no console to take a screendump f=
-rom");
-+            return;
-+        }
-     }
-=20
-     graphic_hw_update(con);
---=20
-1.8.3.1
+There has been no activity after pings, I'm merging this now although
+technically it should go via Kevin's tree.
+
+Thanks, applied to my block-next tree:
+https://github.com/stefanha/qemu/commits/block-next
+
+Stefan
+
+--n8g4imXOkfNTN/H1
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJanXJtAAoJEJykq7OBq3PIReAH/3eyY5Lckb5sBj+l+7qQRHEc
+n4YtZMA27Nr/vl8Os//9z100Bu71bz/Rjaf+KlElc2TJ9Ux0EHjj9t6Ns1oSss2O
+41sDDhI2XhOVb76D4NYROjPfw3ct0E2jKKXSXoTNcm1Lc9uNWiAR+4zJqefnvqeg
+gXWP2TwqFKnsUkQZ9mtVRWCYW0l0WvGjRxqIAyvkIb+ANnWKB/oqLnfImTRfjKGJ
+dF3vVwmWxtrp8a8EKC3lAQqKLdErnANfktoLESOenF9Zxgpj1Zux3g3Bt0bOvojy
+nOIxvQyaNhU5UvmuVDUWNQHpKYmkw7HLsr+wV3D4ySAI6WC0Ieq+CQB8vjOUu6c=
+=16YS
+-----END PGP SIGNATURE-----
+
+--n8g4imXOkfNTN/H1--
