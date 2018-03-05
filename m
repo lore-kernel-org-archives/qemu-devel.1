@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1esddC-0005pb-IT
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 19:05:31 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1esdgF-0007ka-Iv
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 19:08:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1esdd9-0002Yh-DB
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 19:05:30 -0500
-Date: Mon, 5 Mar 2018 10:55:57 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180304235557.GB2650@umbus.fritz.box>
-References: <20180302060350.24330-1-david@gibson.dropbear.id.au>
-	<CAFEAcA9ZRSX9FBwaiA8Th3mrO4KSOaDPqnH5F==5xNESOf+Dwg@mail.gmail.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1esdgC-0003vt-Bd
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 19:08:39 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:50592)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1esdgC-0003vO-48
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 19:08:36 -0500
+Received: by mail-wm0-x242.google.com with SMTP id w128so12639725wmw.0
+	for <qemu-devel@nongnu.org>; Sun, 04 Mar 2018 16:08:35 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1520200587-14681-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1520200587-14681-2-git-send-email-stefanb@linux.vnet.ibm.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <3d403de3-5c4a-4d10-64a5-2ed2f3254a93@amsat.org>
+Date: Sun, 4 Mar 2018 21:08:32 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="eJnRUKwClWJh1Khz"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9ZRSX9FBwaiA8Th3mrO4KSOaDPqnH5F==5xNESOf+Dwg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 00/24] ppc-for-2.12 queue 20180302
+In-Reply-To: <1520200587-14681-2-git-send-email-stefanb@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/5] tpm: convert tpm_crb.c to use
+ trace-events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,93 +36,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, surajjs@au1.ibm.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, dgilbert@redhat.com
 
+On 03/04/2018 06:56 PM, Stefan Berger wrote:
+> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 
---eJnRUKwClWJh1Khz
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-On Fri, Mar 02, 2018 at 02:26:49PM +0000, Peter Maydell wrote:
-> On 2 March 2018 at 06:03, David Gibson <david@gibson.dropbear.id.au> wrot=
-e:
-> > The following changes since commit 0dc8ae5e8e693737dfe65ba02d0c6eccb58a=
-9c67:
-> >
-> >   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180301-v2' =
-into staging (2018-03-01 17:08:16 +0000)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://github.com/dgibson/qemu.git tags/ppc-for-2.12-20180302
-> >
-> > for you to fetch changes up to 57ae75b2e401f1d04f37a8cd26212eb3134c51a6:
-> >
-> >   hw/ppc/spapr,e500: Use new property "stdout-path" for boot console (2=
-018-03-02 12:24:44 +1100)
-> >
-> > ----------------------------------------------------------------
-> > ppc patch queue 2018-03-02
-> >
-> > Here's the next batch of accumulated spapr and ppc patches.
-> > Highlights are:
-> >     * New Sam460ex machine type
-> >     * Yet more fixes related to vcpu id allocation for spapr
-> >     * Numerous macio cleanupsr
-> >     * Some enhancements to the Spectre/Meltdown fixes for pseries,
-> >       allowing use of a better mitigation for indirect branch based
-> >       exploits
-> >     * New pseries machine types with Spectre/Meltdown mitigations
-> >       enabled (stop gap until libvirt and management understands the
-> >       machine options)
-> >     * A handful of other fixes
-> >
->=20
-> Hi. This generates a compile error from some compilers in my test set
-> (I think just the older gccs):
->=20
-> /home/petmay01/linaro/qemu-for-merges/hw/ppc/ppc440_uc.c: In function
-> =E2=80=98ppc460ex_pcie_realize=E2=80=99:
-> /home/petmay01/linaro/qemu-for-merges/hw/ppc/ppc440_uc.c:1054:5:
-> error: =E2=80=98id=E2=80=99 may be used uninitialized in this function
-> [-Werror=3Dmaybe-uninitialized]
->      snprintf(buf, sizeof(buf), "pcie%d-io", id);
->      ^
-> cc1: all warnings being treated as errors
->=20
-> Looks like a valid complaint to me -- the realize function
-> should check that dcrn_base was set to a valid value, fail
-> realize if it wasn't, and have a 'default:' case in the
-> switch with g_assert_not_reached().
-
-Bother.  I wonder why my compiler didn't catch that.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---eJnRUKwClWJh1Khz
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqch4wACgkQbDjKyiDZ
-s5I8gw/+NQcD5RejtNEnXYqyclM5heuy2lE8bBYgWf0qXzDiPgwUSBZJY6a4rNDw
-j/+cGDmS/Xnuw8RNfzpvjIioM3Q3F51BW+kUgJR26NineZlAtNcPgyjOxUEiKgO2
-mYsDgUmZppIJW6cEmjwipiJsvzAIqk6wySe5BQB4Ne6Lju40l6d8ponaEPRNQp/8
-x+ciKrpKgRyK7Iiv6V1BNZ3BagEHDDCfZ0J4npKPhVT6GQMJwXImJ3Dc9s3LKmO0
-KmcMso+HaWQ5CnQrEI5D+725YsaNAUjIE6SoLwzUUQUykChZHG0XuFm1LVJV2SpF
-lG8arq61CR3YW1DuRmG11hcjmsTz8nrLGD8p2XJSESnUCYS+1Hya6/CuudsiPRTW
-pS75Lh5wYFSGm4bHukuXpwBANrElFvGBVQAvRBUhkwRoS6V3kAAfrUkfXNKEzjxJ
-DdyFtGXAjN0fLJkeDsLuXhvf7D6OSnOFLSfFnvkMOo1rzqZJ5ewQLyZdCLPiftlH
-LuyH8/dqx6FRdU7GPOoBj83WaYH9ss/whkyjkONvjDzbUkItN0XZyg6l0jq3zZNq
-jrUUgGtL/q5VFkvwiFdhA1vb/JzqZSLY69PFVNVkvnuqk5cVbTujvxVEa4UAkeI4
-g1ZfL+pHDF5H1Orl0fGRcicqqol2cenz3jMTSO6dJOepA0L/SjY=
-=5c+H
------END PGP SIGNATURE-----
-
---eJnRUKwClWJh1Khz--
+> ---
+>  Makefile.objs       |  1 +
+>  hw/tpm/tpm_crb.c    | 17 +++++------------
+>  hw/tpm/trace-events |  5 +++++
+>  3 files changed, 11 insertions(+), 12 deletions(-)
+>  create mode 100644 hw/tpm/trace-events
+> 
+> diff --git a/Makefile.objs b/Makefile.objs
+> index 5dc1348..72c3d8c 100644
+> --- a/Makefile.objs
+> +++ b/Makefile.objs
+> @@ -162,6 +162,7 @@ trace-events-subdirs += hw/alpha
+>  trace-events-subdirs += hw/hppa
+>  trace-events-subdirs += hw/xen
+>  trace-events-subdirs += hw/ide
+> +trace-events-subdirs += hw/tpm
+>  trace-events-subdirs += ui
+>  trace-events-subdirs += audio
+>  trace-events-subdirs += net
+> diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
+> index b5b8256..d8917cb 100644
+> --- a/hw/tpm/tpm_crb.c
+> +++ b/hw/tpm/tpm_crb.c
+> @@ -29,6 +29,7 @@
+>  #include "sysemu/reset.h"
+>  #include "tpm_int.h"
+>  #include "tpm_util.h"
+> +#include "trace.h"
+>  
+>  typedef struct CRBState {
+>      DeviceState parent_obj;
+> @@ -44,14 +45,6 @@ typedef struct CRBState {
+>  
+>  #define CRB(obj) OBJECT_CHECK(CRBState, (obj), TYPE_TPM_CRB)
+>  
+> -#define DEBUG_CRB 0
+> -
+> -#define DPRINTF(fmt, ...) do {                  \
+> -        if (DEBUG_CRB) {                        \
+> -            printf(fmt, ## __VA_ARGS__);        \
+> -        }                                       \
+> -    } while (0)
+> -
+>  #define CRB_INTF_TYPE_CRB_ACTIVE 0b1
+>  #define CRB_INTF_VERSION_CRB 0b1
+>  #define CRB_INTF_CAP_LOCALITY_0_ONLY 0b0
+> @@ -91,8 +84,8 @@ static uint64_t tpm_crb_mmio_read(void *opaque, hwaddr addr,
+>      unsigned offset = addr & 3;
+>      uint32_t val = *(uint32_t *)regs >> (8 * offset);
+>  
+> -    DPRINTF("CRB read 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32 "\n",
+> -            addr, size, val);
+> +    trace_tpm_crb_mmio_read(addr, size, val);
+> +
+>      return val;
+>  }
+>  
+> @@ -100,8 +93,8 @@ static void tpm_crb_mmio_write(void *opaque, hwaddr addr,
+>                                 uint64_t val, unsigned size)
+>  {
+>      CRBState *s = CRB(opaque);
+> -    DPRINTF("CRB write 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx64 "\n",
+> -            addr, size, val);
+> +
+> +    trace_tpm_crb_mmio_write(addr, size, val);
+>  
+>      switch (addr) {
+>      case A_CRB_CTRL_REQ:
+> diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
+> new file mode 100644
+> index 0000000..336b06d
+> --- /dev/null
+> +++ b/hw/tpm/trace-events
+> @@ -0,0 +1,5 @@
+> +# See docs/devel/tracing.txt for syntax documentation.
+> +
+> +# hw/tpm/tpm_crb.c
+> +tpm_crb_mmio_read(uint64_t addr, unsigned size, uint32_t val) "CRB read 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
+> +tpm_crb_mmio_write(uint64_t addr, unsigned size, uint32_t val) "CRB write 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
+> 
