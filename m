@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eslnn-0003rP-OS
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:49:00 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eslnj-0003b5-OO
+	(envelope-from <kraxel@redhat.com>) id 1eslnm-0003qs-Hc
 	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:48:59 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55950 helo=mx1.redhat.com)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <kraxel@redhat.com>) id 1eslnj-0003aR-AR
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:48:58 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36726 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eslnj-0003a5-HW
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eslnj-0003Yz-3P
 	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:48:55 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B67E5410FBA1
-	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 08:48:51 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon,  5 Mar 2018 09:48:38 +0100
-Message-Id: <20180305084844.18222-8-kraxel@redhat.com>
+Date: Mon,  5 Mar 2018 09:48:34 +0100
+Message-Id: <20180305084844.18222-4-kraxel@redhat.com>
 In-Reply-To: <20180305084844.18222-1-kraxel@redhat.com>
 References: <20180305084844.18222-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 07/13] console: add ui module loading support
+Subject: [Qemu-devel] [PULL 03/13] cocoa: switch over to new display registry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +24,81 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-
-If a requested user interface is not available, try loading it as
-module, simliar to block layer modules.  Needed to keep things working
-when followup patches start to build user interfaces as modules.
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20180301100547.18962-8-kraxel@redhat.com
+Message-id: 20180301100547.18962-4-kraxel@redhat.com
 ---
- Makefile.objs         | 1 +
- include/qemu/module.h | 1 +
- ui/console.c          | 6 ++++++
- 3 files changed, 8 insertions(+)
+ include/ui/console.h | 12 ------------
+ vl.c                 |  3 ---
+ ui/cocoa.m           | 14 +++++++++++++-
+ 3 files changed, 13 insertions(+), 16 deletions(-)
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 5dc134818c..57ca6d908b 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -56,6 +56,7 @@ common-obj-y += hw/
- common-obj-y += replay/
+diff --git a/include/ui/console.h b/include/ui/console.h
+index cb86e6a0dd..f8c462106a 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -444,18 +444,6 @@ void qemu_display_register(QemuDisplay *ui);
+ void qemu_display_early_init(DisplayOptions *opts);
+ void qemu_display_init(DisplayState *ds, DisplayOptions *opts);
  
- common-obj-y += ui/
-+common-obj-m += ui/
- common-obj-y += bt-host.o bt-vhci.o
- bt-host.o-cflags := $(BLUEZ_CFLAGS)
+-/* cocoa.m */
+-#ifdef CONFIG_COCOA
+-void cocoa_display_init(DisplayState *ds, DisplayOptions *opts);
+-#else
+-static inline void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
+-{
+-    /* This must never be called if CONFIG_COCOA is disabled */
+-    error_report("Cocoa support is disabled");
+-    abort();
+-}
+-#endif
+-
+ /* vnc.c */
+ void vnc_display_init(const char *id);
+ void vnc_display_open(const char *id, Error **errp);
+diff --git a/vl.c b/vl.c
+index 5b2410d564..377140ebd9 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4667,9 +4667,6 @@ int main(int argc, char **argv, char **envp)
+     case DISPLAY_TYPE_CURSES:
+         curses_display_init(ds, &dpy);
+         break;
+-    case DISPLAY_TYPE_COCOA:
+-        cocoa_display_init(ds, &dpy);
+-        break;
+     default:
+         qemu_display_init(ds, &dpy);
+         break;
+diff --git a/ui/cocoa.m b/ui/cocoa.m
+index 90d9aa57ea..8b0dce90cb 100644
+--- a/ui/cocoa.m
++++ b/ui/cocoa.m
+@@ -1683,7 +1683,7 @@ static void addRemovableDevicesMenuItems(void)
+     qapi_free_BlockInfoList(pointerToFree);
+ }
  
-diff --git a/include/qemu/module.h b/include/qemu/module.h
-index 56dd218205..9fea75aaeb 100644
---- a/include/qemu/module.h
-+++ b/include/qemu/module.h
-@@ -53,6 +53,7 @@ typedef enum {
- #define trace_init(function) module_init(function, MODULE_INIT_TRACE)
+-void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
++static void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
+ {
+     COCOA_DEBUG("qemu_cocoa: cocoa_display_init\n");
  
- #define block_module_load_one(lib) module_load_one("block-", lib)
-+#define ui_module_load_one(lib) module_load_one("ui-", lib)
- 
- void register_module_init(void (*fn)(void), module_init_type type);
- void register_dso_module_init(void (*fn)(void), module_init_type type);
-diff --git a/ui/console.c b/ui/console.c
-index 25d342cdcb..78efab269a 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -2199,6 +2199,9 @@ bool qemu_display_find_default(DisplayOptions *opts)
- 
-     for (i = 0; i < ARRAY_SIZE(prio); i++) {
-         if (dpys[prio[i]] == NULL) {
-+            ui_module_load_one(DisplayType_lookup.array[prio[i]]);
-+        }
-+        if (dpys[prio[i]] == NULL) {
-             continue;
-         }
-         opts->type = prio[i];
-@@ -2214,6 +2217,9 @@ void qemu_display_early_init(DisplayOptions *opts)
-         return;
-     }
-     if (dpys[opts->type] == NULL) {
-+        ui_module_load_one(DisplayType_lookup.array[opts->type]);
-+    }
-+    if (dpys[opts->type] == NULL) {
-         error_report("Display '%s' is not available.",
-                      DisplayType_lookup.array[opts->type]);
-         exit(1);
+@@ -1713,3 +1713,15 @@ void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
+      */
+     addRemovableDevicesMenuItems();
+ }
++
++static QemuDisplay qemu_display_cocoa = {
++    .type       = DISPLAY_TYPE_COCOA,
++    .init       = cocoa_display_init,
++};
++
++static void register_cocoa(void)
++{
++    qemu_display_register(&qemu_display_cocoa);
++}
++
++type_init(register_cocoa);
 -- 
 2.9.3
