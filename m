@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1esgYC-0006x2-Ky
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 22:12:36 -0500
+	(envelope-from <jasowang@redhat.com>) id 1esgYJ-00070k-8B
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 22:12:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1esgYB-0005Up-0F
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 22:12:32 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57204 helo=mx1.redhat.com)
+	(envelope-from <jasowang@redhat.com>) id 1esgYH-0005Zn-JK
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 22:12:39 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49382 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1esgYA-0005UN-Po
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 22:12:30 -0500
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1esgYH-0005ZQ-Dx
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 22:12:37 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon,  5 Mar 2018 11:12:00 +0800
-Message-Id: <1520219524-17160-6-git-send-email-jasowang@redhat.com>
+Date: Mon,  5 Mar 2018 11:12:01 +0800
+Message-Id: <1520219524-17160-7-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1520219524-17160-1-git-send-email-jasowang@redhat.com>
 References: <1520219524-17160-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 5/9] net: Remove the deprecated way of dumping
- network packets
+Subject: [Qemu-devel] [PULL 6/9] net: Remove the deprecated 'host_net_add'
+ and 'host_net_remove' HMP commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,309 +29,298 @@ Cc: Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>
 
 From: Thomas Huth <thuth@redhat.com>
 
-"-net dump" has been marked as deprecated since QEMU v2.10, since it
-only works with the deprecated 'vlan' parameter (or hubs). Network
-dumping should be done with "-object filter-dump" nowadays instead.
-Since nobody complained so far about the deprecation message, let's
-finally get rid of "-net dump" now.
+They are deprecated since QEMU v2.10, and so far nobody complained that
+these commands are still necessary for any reason - and since you can use
+'netdev_add' and 'netdev_remove' instead, there also should not be any
+real reason. Since they are also standing in the way for the upcoming
+'vlan' clean-up, it's now time to remove them.
 
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- net/dump.c      | 102 ++------------------------------------------------------
- net/net.c       |   9 +----
- qapi/net.json   |  29 ++++------------
- qemu-doc.texi   |   6 ----
- qemu-options.hx |   8 -----
- 5 files changed, 9 insertions(+), 145 deletions(-)
+ hmp-commands.hx  | 30 ------------------
+ hmp.h            |  3 --
+ monitor.c        | 61 ------------------------------------
+ net/net.c        | 94 --------------------------------------------------------
+ qemu-doc.texi    | 10 ------
+ tests/test-hmp.c |  2 --
+ 6 files changed, 200 deletions(-)
 
-diff --git a/net/dump.c b/net/dump.c
-index 15df9a4..f16c354 100644
---- a/net/dump.c
-+++ b/net/dump.c
-@@ -109,7 +109,7 @@ static int net_dump_state_init(DumpState *s, const char *filename,
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index d26eb41..964eb51 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1291,36 +1291,6 @@ Inject PCIe AER error
+ ETEXI
  
-     fd = open(filename, O_CREAT | O_TRUNC | O_WRONLY | O_BINARY, 0644);
-     if (fd < 0) {
--        error_setg_errno(errp, errno, "-net dump: can't open %s", filename);
-+        error_setg_errno(errp, errno, "net dump: can't open %s", filename);
-         return -1;
+     {
+-        .name       = "host_net_add",
+-        .args_type  = "device:s,opts:s?",
+-        .params     = "tap|user|socket|vde|netmap|bridge|vhost-user|dump [options]",
+-        .help       = "add host VLAN client (deprecated, use netdev_add instead)",
+-        .cmd        = hmp_host_net_add,
+-        .command_completion = host_net_add_completion,
+-    },
+-
+-STEXI
+-@item host_net_add
+-@findex host_net_add
+-Add host VLAN client. Deprecated, please use @code{netdev_add} instead.
+-ETEXI
+-
+-    {
+-        .name       = "host_net_remove",
+-        .args_type  = "vlan_id:i,device:s",
+-        .params     = "vlan_id name",
+-        .help       = "remove host VLAN client (deprecated, use netdev_del instead)",
+-        .cmd        = hmp_host_net_remove,
+-        .command_completion = host_net_remove_completion,
+-    },
+-
+-STEXI
+-@item host_net_remove
+-@findex host_net_remove
+-Remove host VLAN client. Deprecated, please use @code{netdev_del} instead.
+-ETEXI
+-
+-    {
+         .name       = "netdev_add",
+         .args_type  = "netdev:O",
+         .params     = "[user|tap|socket|vde|bridge|hubport|netmap|vhost-user],id=str[,prop=value][,...]",
+diff --git a/hmp.h b/hmp.h
+index 1143db4..b897338 100644
+--- a/hmp.h
++++ b/hmp.h
+@@ -132,9 +132,6 @@ void migrate_set_capability_completion(ReadLineState *rs, int nb_args,
+                                        const char *str);
+ void migrate_set_parameter_completion(ReadLineState *rs, int nb_args,
+                                       const char *str);
+-void host_net_add_completion(ReadLineState *rs, int nb_args, const char *str);
+-void host_net_remove_completion(ReadLineState *rs, int nb_args,
+-                                const char *str);
+ void delvm_completion(ReadLineState *rs, int nb_args, const char *str);
+ void loadvm_completion(ReadLineState *rs, int nb_args, const char *str);
+ void hmp_rocker(Monitor *mon, const QDict *qdict);
+diff --git a/monitor.c b/monitor.c
+index 308a3d9..70eb1b9 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -3581,67 +3581,6 @@ void migrate_set_parameter_completion(ReadLineState *rs, int nb_args,
      }
- 
-@@ -122,7 +122,7 @@ static int net_dump_state_init(DumpState *s, const char *filename,
-     hdr.linktype = 1;
- 
-     if (write(fd, &hdr, sizeof(hdr)) < sizeof(hdr)) {
--        error_setg_errno(errp, errno, "-net dump write error");
-+        error_setg_errno(errp, errno, "net dump write error");
-         close(fd);
-         return -1;
-     }
-@@ -136,104 +136,6 @@ static int net_dump_state_init(DumpState *s, const char *filename,
-     return 0;
  }
  
--/* Dumping via VLAN netclient */
--
--struct DumpNetClient {
--    NetClientState nc;
--    DumpState ds;
--};
--typedef struct DumpNetClient DumpNetClient;
--
--static ssize_t dumpclient_receive(NetClientState *nc, const uint8_t *buf,
--                                  size_t size)
+-void host_net_add_completion(ReadLineState *rs, int nb_args, const char *str)
 -{
--    DumpNetClient *dc = DO_UPCAST(DumpNetClient, nc, nc);
--    struct iovec iov = {
--        .iov_base = (void *)buf,
--        .iov_len = size
--    };
--
--    return dump_receive_iov(&dc->ds, &iov, 1);
--}
--
--static ssize_t dumpclient_receive_iov(NetClientState *nc,
--                                      const struct iovec *iov, int cnt)
--{
--    DumpNetClient *dc = DO_UPCAST(DumpNetClient, nc, nc);
--
--    return dump_receive_iov(&dc->ds, iov, cnt);
--}
--
--static void dumpclient_cleanup(NetClientState *nc)
--{
--    DumpNetClient *dc = DO_UPCAST(DumpNetClient, nc, nc);
--
--    dump_cleanup(&dc->ds);
--}
--
--static NetClientInfo net_dump_info = {
--    .type = NET_CLIENT_DRIVER_DUMP,
--    .size = sizeof(DumpNetClient),
--    .receive = dumpclient_receive,
--    .receive_iov = dumpclient_receive_iov,
--    .cleanup = dumpclient_cleanup,
--};
--
--int net_init_dump(const Netdev *netdev, const char *name,
--                  NetClientState *peer, Error **errp)
--{
--    int len, rc;
--    const char *file;
--    char def_file[128];
--    const NetdevDumpOptions *dump;
--    NetClientState *nc;
--    DumpNetClient *dnc;
--
--    assert(netdev->type == NET_CLIENT_DRIVER_DUMP);
--    dump = &netdev->u.dump;
--
--    assert(peer);
--
--    error_report("'-net dump' is deprecated. "
--                 "Please use '-object filter-dump' instead.");
--
--    if (dump->has_file) {
--        file = dump->file;
--    } else {
--        int id;
--        int ret;
--
--        ret = net_hub_id_for_client(peer, &id);
--        assert(ret == 0); /* peer must be on a hub */
--
--        snprintf(def_file, sizeof(def_file), "qemu-vlan%d.pcap", id);
--        file = def_file;
+-    int i;
+-    size_t len;
+-    if (nb_args != 2) {
+-        return;
 -    }
--
--    if (dump->has_len) {
--        if (dump->len > INT_MAX) {
--            error_setg(errp, "invalid length: %"PRIu64, dump->len);
--            return -1;
+-    len = strlen(str);
+-    readline_set_completion_index(rs, len);
+-    for (i = 0; host_net_devices[i]; i++) {
+-        if (!strncmp(host_net_devices[i], str, len)) {
+-            readline_add_completion(rs, host_net_devices[i]);
 -        }
--        len = dump->len;
--    } else {
--        len = 65536;
 -    }
--
--    nc = qemu_new_net_client(&net_dump_info, peer, "dump", name);
--    snprintf(nc->info_str, sizeof(nc->info_str),
--             "dump to %s (len=%d)", file, len);
--
--    dnc = DO_UPCAST(DumpNetClient, nc, nc);
--    rc = net_dump_state_init(&dnc->ds, file, len, errp);
--    if (rc) {
--        qemu_del_net_client(nc);
--    }
--    return rc;
 -}
 -
--/* Dumping via filter */
+-void host_net_remove_completion(ReadLineState *rs, int nb_args, const char *str)
+-{
+-    NetClientState *ncs[MAX_QUEUE_NUM];
+-    int count, i, len;
 -
- #define TYPE_FILTER_DUMP "filter-dump"
- 
- #define FILTER_DUMP(obj) \
+-    len = strlen(str);
+-    readline_set_completion_index(rs, len);
+-    if (nb_args == 2) {
+-        count = qemu_find_net_clients_except(NULL, ncs,
+-                                             NET_CLIENT_DRIVER_NONE,
+-                                             MAX_QUEUE_NUM);
+-        for (i = 0; i < MIN(count, MAX_QUEUE_NUM); i++) {
+-            int id;
+-            char name[16];
+-
+-            if (net_hub_id_for_client(ncs[i], &id)) {
+-                continue;
+-            }
+-            snprintf(name, sizeof(name), "%d", id);
+-            if (!strncmp(str, name, len)) {
+-                readline_add_completion(rs, name);
+-            }
+-        }
+-        return;
+-    } else if (nb_args == 3) {
+-        count = qemu_find_net_clients_except(NULL, ncs,
+-                                             NET_CLIENT_DRIVER_NIC,
+-                                             MAX_QUEUE_NUM);
+-        for (i = 0; i < MIN(count, MAX_QUEUE_NUM); i++) {
+-            int id;
+-            const char *name;
+-
+-            if (ncs[i]->info->type == NET_CLIENT_DRIVER_HUBPORT ||
+-                net_hub_id_for_client(ncs[i], &id)) {
+-                continue;
+-            }
+-            name = ncs[i]->name;
+-            if (!strncmp(str, name, len)) {
+-                readline_add_completion(rs, name);
+-            }
+-        }
+-        return;
+-    }
+-}
+-
+ static void vm_completion(ReadLineState *rs, const char *str)
+ {
+     size_t len;
 diff --git a/net/net.c b/net/net.c
-index dd80f1b..cbd553d 100644
+index cbd553d..2d05808 100644
 --- a/net/net.c
 +++ b/net/net.c
-@@ -63,7 +63,6 @@ static QTAILQ_HEAD(, NetClientState) net_clients;
- const char *host_net_devices[] = {
-     "tap",
-     "socket",
--    "dump",
- #ifdef CONFIG_NET_BRIDGE
-     "bridge",
- #endif
-@@ -967,7 +966,6 @@ static int (* const net_client_init_fun[NET_CLIENT_DRIVER__MAX])(
- #ifdef CONFIG_NETMAP
-         [NET_CLIENT_DRIVER_NETMAP]    = net_init_netmap,
- #endif
--        [NET_CLIENT_DRIVER_DUMP]      = net_init_dump,
- #ifdef CONFIG_NET_BRIDGE
-         [NET_CLIENT_DRIVER_BRIDGE]    = net_init_bridge,
- #endif
-@@ -993,8 +991,7 @@ static int net_client_init1(const void *object, bool is_netdev, Error **errp)
-         netdev = object;
-         name = netdev->id;
+@@ -60,25 +60,6 @@
+ static VMChangeStateEntry *net_change_state_entry;
+ static QTAILQ_HEAD(, NetClientState) net_clients;
  
--        if (netdev->type == NET_CLIENT_DRIVER_DUMP ||
--            netdev->type == NET_CLIENT_DRIVER_NIC ||
-+        if (netdev->type == NET_CLIENT_DRIVER_NIC ||
-             !net_client_init_fun[netdev->type]) {
-             error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "type",
-                        "a netdev backend type");
-@@ -1036,10 +1033,6 @@ static int net_client_init1(const void *object, bool is_netdev, Error **errp)
-             legacy.type = NET_CLIENT_DRIVER_VDE;
-             legacy.u.vde = opts->u.vde;
-             break;
--        case NET_LEGACY_OPTIONS_TYPE_DUMP:
--            legacy.type = NET_CLIENT_DRIVER_DUMP;
--            legacy.u.dump = opts->u.dump;
--            break;
-         case NET_LEGACY_OPTIONS_TYPE_BRIDGE:
-             legacy.type = NET_CLIENT_DRIVER_BRIDGE;
-             legacy.u.bridge = opts->u.bridge;
-diff --git a/qapi/net.json b/qapi/net.json
-index 1238ba5..9117c56 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -39,8 +39,8 @@
- #
- # Add a network backend.
- #
--# @type: the type of network backend.  Current valid values are 'user', 'tap',
--#        'vde', 'socket', 'dump' and 'bridge'
-+# @type: the type of network backend. Possible values are listed in
-+#        NetClientDriver (excluding 'none' and 'nic')
- #
- # @id: the name of the new network backend
- #
-@@ -372,23 +372,6 @@
-     '*mode':  'uint16' } }
- 
- ##
--# @NetdevDumpOptions:
--#
--# Dump VLAN network traffic to a file.
--#
--# @len: per-packet size limit (64k default). Understands [TGMKkb]
--# suffixes.
--#
--# @file: dump file path (default is qemu-vlan0.pcap)
--#
--# Since: 1.2
--##
--{ 'struct': 'NetdevDumpOptions',
--  'data': {
--    '*len':  'size',
--    '*file': 'str' } }
+-const char *host_net_devices[] = {
+-    "tap",
+-    "socket",
+-#ifdef CONFIG_NET_BRIDGE
+-    "bridge",
+-#endif
+-#ifdef CONFIG_NETMAP
+-    "netmap",
+-#endif
+-#ifdef CONFIG_SLIRP
+-    "user",
+-#endif
+-#ifdef CONFIG_VDE
+-    "vde",
+-#endif
+-    "vhost-user",
+-    NULL,
+-};
 -
--##
- # @NetdevBridgeOptions:
- #
- # Connect a host TAP network interface to a host bridge device.
-@@ -466,9 +449,11 @@
- # Available netdev drivers.
- #
- # Since: 2.7
-+#
-+# 'dump' - removed with 2.12
- ##
- { 'enum': 'NetClientDriver',
--  'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde', 'dump',
-+  'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
-             'bridge', 'hubport', 'netmap', 'vhost-user' ] }
+ /***********************************************************/
+ /* network device redirectors */
  
- ##
-@@ -495,7 +480,6 @@
-     'l2tpv3':   'NetdevL2TPv3Options',
-     'socket':   'NetdevSocketOptions',
-     'vde':      'NetdevVdeOptions',
--    'dump':     'NetdevDumpOptions',
-     'bridge':   'NetdevBridgeOptions',
-     'hubport':  'NetdevHubPortOptions',
-     'netmap':   'NetdevNetmapOptions',
-@@ -530,7 +514,7 @@
- ##
- { 'enum': 'NetLegacyOptionsType',
-   'data': ['none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
--           'dump', 'bridge', 'netmap', 'vhost-user'] }
-+           'bridge', 'netmap', 'vhost-user'] }
+@@ -1174,81 +1155,6 @@ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
+     return ret;
+ }
  
- ##
- # @NetLegacyOptions:
-@@ -550,7 +534,6 @@
-     'l2tpv3':   'NetdevL2TPv3Options',
-     'socket':   'NetdevSocketOptions',
-     'vde':      'NetdevVdeOptions',
--    'dump':     'NetdevDumpOptions',
-     'bridge':   'NetdevBridgeOptions',
-     'netmap':   'NetdevNetmapOptions',
-     'vhost-user': 'NetdevVhostUserOptions' } }
+-
+-static int net_host_check_device(const char *device)
+-{
+-    int i;
+-    for (i = 0; host_net_devices[i]; i++) {
+-        if (!strncmp(host_net_devices[i], device,
+-                     strlen(host_net_devices[i]))) {
+-            return 1;
+-        }
+-    }
+-
+-    return 0;
+-}
+-
+-void hmp_host_net_add(Monitor *mon, const QDict *qdict)
+-{
+-    const char *device = qdict_get_str(qdict, "device");
+-    const char *opts_str = qdict_get_try_str(qdict, "opts");
+-    Error *local_err = NULL;
+-    QemuOpts *opts;
+-    static bool warned;
+-
+-    if (!warned && !qtest_enabled()) {
+-        error_report("host_net_add is deprecated, use netdev_add instead");
+-        warned = true;
+-    }
+-
+-    if (!net_host_check_device(device)) {
+-        monitor_printf(mon, "invalid host network device %s\n", device);
+-        return;
+-    }
+-
+-    opts = qemu_opts_parse_noisily(qemu_find_opts("net"),
+-                                   opts_str ? opts_str : "", false);
+-    if (!opts) {
+-        return;
+-    }
+-
+-    qemu_opt_set(opts, "type", device, &error_abort);
+-
+-    net_client_init(opts, false, &local_err);
+-    if (local_err) {
+-        error_report_err(local_err);
+-        monitor_printf(mon, "adding host network device %s failed\n", device);
+-    }
+-}
+-
+-void hmp_host_net_remove(Monitor *mon, const QDict *qdict)
+-{
+-    NetClientState *nc;
+-    int vlan_id = qdict_get_int(qdict, "vlan_id");
+-    const char *device = qdict_get_str(qdict, "device");
+-    static bool warned;
+-
+-    if (!warned && !qtest_enabled()) {
+-        error_report("host_net_remove is deprecated, use netdev_del instead");
+-        warned = true;
+-    }
+-
+-    nc = net_hub_find_client_by_name(vlan_id, device);
+-    if (!nc) {
+-        error_report("Host network device '%s' on hub '%d' not found",
+-                     device, vlan_id);
+-        return;
+-    }
+-    if (nc->info->type == NET_CLIENT_DRIVER_NIC) {
+-        error_report("invalid host network device '%s'", device);
+-        return;
+-    }
+-
+-    qemu_del_net_client(nc->peer);
+-    qemu_del_net_client(nc);
+-    qemu_opts_del(qemu_opts_find(qemu_find_opts("net"), device));
+-}
+-
+ void netdev_add(QemuOpts *opts, Error **errp)
+ {
+     net_client_init(opts, true, errp);
 diff --git a/qemu-doc.texi b/qemu-doc.texi
-index b3c2763..0453ad9 100644
+index 0453ad9..4fcc85a 100644
 --- a/qemu-doc.texi
 +++ b/qemu-doc.texi
-@@ -2707,12 +2707,6 @@ that can be specified with the ``-device'' parameter.
- The drive addr argument is replaced by the the addr argument
- that can be specified with the ``-device'' parameter.
+@@ -2760,16 +2760,6 @@ from qcow2 images.
  
--@subsection -net dump (since 2.10.0)
--
--The ``--net dump'' argument is now replaced with the
--``-object filter-dump'' argument which works in combination
--with the modern ``-netdev`` backends instead.
--
- @subsection -usbdevice (since 2.10.0)
+ The ``query-cpus'' command is replaced by the ``query-cpus-fast'' command.
  
- The ``-usbdevice DEV'' argument is now a synonym for setting
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 5781599..9ce0cfe 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -2009,8 +2009,6 @@ DEF("net", HAS_ARG, QEMU_OPTION_net,
-     "                configure or create an on-board (or machine default) NIC and\n"
-     "                connect it either to VLAN 'n' or the netdev 'nd' (for pluggable\n"
-     "                NICs please use '-device devtype,netdev=nd' instead)\n"
--    "-net dump[,vlan=n][,file=f][,len=n]\n"
--    "                dump traffic on vlan 'n' to file 'f' (max n bytes per packet)\n"
-     "-net none       use it alone to have zero network devices. If no -net option\n"
-     "                is provided, the default is '-net nic -net user'\n"
-     "-net ["
-@@ -2458,12 +2456,6 @@ qemu -m 512 -object memory-backend-file,id=mem,size=512M,mem-path=/hugetlbfs,sha
-      -device virtio-net-pci,netdev=net0
- @end example
- 
--@item -net dump[,vlan=@var{n}][,file=@var{file}][,len=@var{len}]
--Dump network traffic on VLAN @var{n} to file @var{file} (@file{qemu-vlan0.pcap} by default).
--At most @var{len} bytes (64k by default) per packet are stored. The file format is
--libpcap, so it can be analyzed with tools such as tcpdump or Wireshark.
--Note: For devices created with '-netdev', use '-object filter-dump,...' instead.
+-@section System emulator human monitor commands
 -
- @item -net none
- Indicate that no network devices should be configured. It is used to
- override the default configuration (@option{-net nic -net user}) which
+-@subsection host_net_add (since 2.10.0)
+-
+-The ``host_net_add'' command is replaced by the ``netdev_add'' command.
+-
+-@subsection host_net_remove (since 2.10.0)
+-
+-The ``host_net_remove'' command is replaced by the ``netdev_del'' command.
+-
+ @section System emulator devices
+ 
+ @subsection ivshmem (since 2.6.0)
+diff --git a/tests/test-hmp.c b/tests/test-hmp.c
+index 5b7e447..5352c9c 100644
+--- a/tests/test-hmp.c
++++ b/tests/test-hmp.c
+@@ -37,10 +37,8 @@ static const char *hmp_cmds[] = {
+     "dump-guest-memory /dev/null 0 4096",
+     "dump-guest-memory /dev/null",
+     "gdbserver",
+-    "host_net_add user id=net0",
+     "hostfwd_add tcp::43210-:43210",
+     "hostfwd_remove tcp::43210-:43210",
+-    "host_net_remove 0 net0",
+     "i /w 0",
+     "log all",
+     "log none",
 -- 
 2.7.4
