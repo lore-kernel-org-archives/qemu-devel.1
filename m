@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1esf5I-00010B-8u
+	(envelope-from <dgibson@ozlabs.org>) id 1esf5I-000109-4D
 	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 20:38:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1esf5H-0003hx-41
+	(envelope-from <dgibson@ozlabs.org>) id 1esf5H-0003i8-48
 	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 20:38:36 -0500
-Date: Mon, 5 Mar 2018 12:27:55 +1100
+Date: Mon, 5 Mar 2018 12:38:24 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180305012755.GC2650@umbus.fritz.box>
-References: <20180302214826.1671E7456D8@zero.eik.bme.hu>
+Message-ID: <20180305013824.GF2650@umbus.fritz.box>
+References: <20180303130226.26906-1-nia.alarie@gmail.com>
+	<20180304235152.GA2650@umbus.fritz.box>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="2JFBq9zoW8cOFH7v"
+	protocol="application/pgp-signature"; boundary="oPmsXEqKQNHCSXW7"
 Content-Disposition: inline
-In-Reply-To: <20180302214826.1671E7456D8@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH] ppc440_uc: Fix unintialized variable
- warning with older gcc
+In-Reply-To: <20180304235152.GA2650@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [PATCH] PPC: e500: Add check for NULL return value
+ from qemu_find_file.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +25,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: Nia Alarie <nia.alarie@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, agraf@suse.de, stefanha@gmail.com, jim@groklearning.com, joel@jms.id.au
 
 
---2JFBq9zoW8cOFH7v
+--oPmsXEqKQNHCSXW7
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 02, 2018 at 10:43:23PM +0100, BALATON Zoltan wrote:
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-
-Applied, and rebased so we don't get bisection breakage.
-
-> ---
->  hw/ppc/ppc440_uc.c | 3 +++
->  1 file changed, 3 insertions(+)
+On Mon, Mar 05, 2018 at 10:51:52AM +1100, David Gibson wrote:
+> On Sat, Mar 03, 2018 at 01:02:26PM +0000, Nia Alarie wrote:
+> > This prints a message and exits if the e500 BIOS firmware can't
+> > be found, to avoid dereferencing a null pointer.
+> >=20
+> > Signed-off-by: Nia Alarie <nia.alarie@gmail.com>
 >=20
-> diff --git a/hw/ppc/ppc440_uc.c b/hw/ppc/ppc440_uc.c
-> index 4e2523a..976ab2b 100644
-> --- a/hw/ppc/ppc440_uc.c
-> +++ b/hw/ppc/ppc440_uc.c
-> @@ -1050,6 +1050,9 @@ static void ppc460ex_pcie_realize(DeviceState *dev,=
- Error **errp)
->      case DCRN_PCIE1_BASE:
->          id =3D 1;
->          break;
-> +    default:
-> +        error_setg(errp, "invalid PCIe DCRN base");
-> +        return;
->      }
->      snprintf(buf, sizeof(buf), "pcie%d-io", id);
->      memory_region_init(&s->iomem, OBJECT(s), buf, UINT64_MAX);
+> Applied to ppc-for-2.12, thanks.
+
+Sorry, I take that back.  This has been obsoleted by other changes to
+the e500 image load path.
+>=20
+> > ---
+> >  hw/ppc/e500.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> >=20
+> > diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+> > index a40d3ec3e3..6ce03d6ff4 100644
+> > --- a/hw/ppc/e500.c
+> > +++ b/hw/ppc/e500.c
+> > @@ -1005,6 +1005,10 @@ void ppce500_init(MachineState *machine, PPCE500=
+Params *params)
+> >          }
+> >      }
+> >      filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+> > +    if (!filename) {
+> > +        error_report("Could not find firmware '%s'", bios_name);
+> > +        exit(1);
+> > +    }
+> > =20
+> >      bios_size =3D load_elf(filename, NULL, NULL, &bios_entry, &loadadd=
+r, NULL,
+> >                           1, PPC_ELF_MACHINE, 0, 0);
+>=20
+
+
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -64,24 +77,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---2JFBq9zoW8cOFH7v
+--oPmsXEqKQNHCSXW7
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqcnRsACgkQbDjKyiDZ
-s5K9Ug/9FRGtfzGNQnZza6fZ1+Upz+Zzws0WHjfNjLJBAvwAXptbkU+aqHxbdKt7
-AYfraYKM0bmZIgXLp1AnpA91cJ411ZZtebRES7XrP/uDBM6SabOhBcwAMVdgZd92
-5KtC5tO9lAwa4tm+AHy/VjClSSQKYZuOaHUOeC6bxgzi7qMuqLYv7AjErVayA/Sl
-t/1Lb5pWaPkSoOWN5C7NEzEhuk3yZH6Xu5whyNiFhcuwQQgCq2Ianb2iR9HT/g5b
-ksLXwPL1b1aeaWVBw4q8SM8vvDPabwa5gzI+Dhktw1Mwih5wHTex2jhxXeEZw1i/
-rWNmOevky/Shoi1Kh4eX2ImiiT+HeWOpVbJrFtbEVljz96kvfcIfoN+WkF8ywUV6
-rik5B4EAb8bnOF0he6JSNltsyWRVkp2mOdLijlBvFUOEatxlEViHYnKdtO89AMFg
-MurA/YMEth5DAfYSD+ZrPWMoX9Qz2FY6nBPPTCb6/2sLyomieonv67G1hRZ+TdYW
-9X3Q2Ym9zRDgXZO9sEmestGg8DzUf3/+h52Kcl96Pk/TP6OobK0faQPjAB7Yk2FZ
-xCCzXxHPe5BA08Al8660f6f7+xVv1IvDc78u1VAZbW1cEcL4xu+Ccc763uCp1/Rp
-on7YNl79ONgkBqnvtZQHZDCFr4nHZ6bQNs5VUDRwpks6R059GLg=
-=K2Jd
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqcn48ACgkQbDjKyiDZ
+s5Jk9RAAz96bWOHTRw4Flbw2L1+++O1KkLmjkHOvadiy1tWaaUpyr5seiBcPjQo+
+JiCbAYXkCUeQTxju2wfvxOgjU/fpDpFt7t+qB4IaylaBzCXdCqPYV6qJZmTmjwtL
+QF/jBg3p9xkgMDk+0ypsloB2Au1djUb+ILGxDOfR/2Q8XhWfkgvGmChErPLUsiNl
+wX6DIaa2glyUEF7HUmOZqKCViODgWSqXrTI2jgmtK4WT+yioZYlZJkX5H1E7XDyl
+2MYjJ+0BfT9d+XNFbz0EWup1FHmzqnFUsXcm0lr9j2AgZesbh46dBBvR6DvVLLNi
+65/lMhy/VK7wIm8nnc6693BpaMIOsrAjyXXE2fBvp/KSRVSRFiQRXnku/GfW8Bn0
+LQBkLwMY3B9tFAaybBubiQvtc27SZmwWfngcci17uhtz2qTll13LStsuUNWvA3x0
+PvsHR8+97tFocBVkUM3cWArIohkxRJIzmQfRttM7XGiOiWvVGTEmDaThHACIt31K
+EiB0aouieHL3f0bFnZP1yOCfsCOb4W04OM01Px51xTDoiCcE9skJE6jt6cw5qDns
+AJltlvRNSrCSuAXw7XYELA6iFPeRco6DFHDlyh0pipueNMLuyAdOaZEk4dBj9HrS
+gbNHsPOubD/V2AlwpQMs+7h7EpDChrHtEn7WXLr9CxivppuV2Bo=
+=IIQO
 -----END PGP SIGNATURE-----
 
---2JFBq9zoW8cOFH7v--
+--oPmsXEqKQNHCSXW7--
