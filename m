@@ -1,27 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57649)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1esuP4-0000L7-6d
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 13:00:08 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1esuTZ-0002rw-W3
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 13:04:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1esuP0-0002FI-D5
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 13:00:02 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38704 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1esuP0-0002FB-8P
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 12:59:58 -0500
-Date: Mon, 5 Mar 2018 17:59:44 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180305175944.GC17368@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180305172951.2150-1-marcandre.lureau@redhat.com>
-	<20180305172951.2150-5-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180305172951.2150-5-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/4] qapi: generate a literal qobject for
- introspection
+	(envelope-from <vsementsov@virtuozzo.com>) id 1esuTW-0003xp-0e
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 13:04:41 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon,  5 Mar 2018 21:04:33 +0300
+Message-Id: <20180305180433.106408-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH] nbd/server: fix space read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +17,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: pbonzini@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-On Mon, Mar 05, 2018 at 06:29:51PM +0100, Marc-Andr=C3=A9 Lureau wrote:
-> Replace the generated json string with a literal qobject. The later is
-> easier to deal with, at run time as well as compile time: adding #if
-> conditionals will be easier than in a json string.
->=20
-> The output of query-qmp-schema is not changed.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  scripts/qapi/introspect.py         | 76 +++++++++++++++++-------------
->  monitor.c                          |  2 +-
->  tests/test-qobject-input-visitor.c | 11 +++--
->  docs/devel/qapi-code-gen.txt       | 29 ++++++++----
->  4 files changed, 70 insertions(+), 48 deletions(-)
->=20
-> diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-> index f66c397fb0..4df730377f 100644
-> --- a/scripts/qapi/introspect.py
-> +++ b/scripts/qapi/introspect.py
+In case of io error in nbd_co_send_sparse_read we should not
+"goto reply:", as it is fatal error and common behavior is
+disconnect in this case. We should not try to send client an
+error reply, representing channel-io error on previous try to
+send a reply.
 
+Fix this by handle block-status error in nbd_co_send_sparse_read,
+so nbd_co_send_sparse_read fails only on io error. Then just skip
+common "reply:" code path in nbd_trip.
 
->      elif isinstance(obj, dict):
-> -        elts =3D ['"%s": %s' % (key.replace('"', r'\"'),
-> -                              to_json(obj[key], level + 1))
-> -                for key in sorted(obj.keys())]
-> -        ret =3D '{' + ', '.join(elts) + '}'
-> +        elts =3D []
-> +        for key, value in sorted(obj.iteritems()):
+Note: nbd_co_send_structured_error is moved without changes to be
+called from nbd_co_send_sparse_read.
 
-s/iteritems/items/  for dual Python 2+3 compatibility  which is what the
-patchew failure was complaining about.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
 
-> +            elts.append(indent(level + 1) + '{ %s, %s }' %
-> +                        (to_c_string(key), to_qlit(value, level + 1, T=
-rue)))
-> +        elts.append(indent(level + 1) + '{}')
-> +        ret +=3D 'QLIT_QDICT(((QLitDictEntry[]) {\n'
-> +        ret +=3D ',\n'.join(elts) + '\n'
-> +        ret +=3D indent(level) + '}))'
+PS: this all shows that nbd_trip is tooo complex (and yes, I remember,
+that its final semantics was made by myself :(.. It should be
+refactored into several smaller parts. Do you have any ideas?
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+The complexity here is that we should handle channel errors (fatal) and
+export errors(non fatal) in different ways, and both of error types may
+have errp, which should be handled differently too..
+
+May be, the best way is to make separate functions for each command,
+avoiding code duplication by using helper-functions instead of common code
+in nbd_trip.
+
+ nbd/server.c | 64 +++++++++++++++++++++++++++++++++++-------------------------
+ 1 file changed, 37 insertions(+), 27 deletions(-)
+
+diff --git a/nbd/server.c b/nbd/server.c
+index 4990a5826e..ea6b9467e4 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -21,6 +21,7 @@
+ #include "qapi/error.h"
+ #include "trace.h"
+ #include "nbd-internal.h"
++#include "qemu/error-report.h"
+ 
+ static int system_errno_to_nbd_errno(int err)
+ {
+@@ -1341,6 +1342,30 @@ static int coroutine_fn nbd_co_send_structured_read(NBDClient *client,
+     return nbd_co_send_iov(client, iov, 2, errp);
+ }
+ 
++static int coroutine_fn nbd_co_send_structured_error(NBDClient *client,
++                                                     uint64_t handle,
++                                                     uint32_t error,
++                                                     const char *msg,
++                                                     Error **errp)
++{
++    NBDStructuredError chunk;
++    int nbd_err = system_errno_to_nbd_errno(error);
++    struct iovec iov[] = {
++        {.iov_base = &chunk, .iov_len = sizeof(chunk)},
++        {.iov_base = (char *)msg, .iov_len = msg ? strlen(msg) : 0},
++    };
++
++    assert(nbd_err);
++    trace_nbd_co_send_structured_error(handle, nbd_err,
++                                       nbd_err_lookup(nbd_err), msg ? msg : "");
++    set_be_chunk(&chunk.h, NBD_REPLY_FLAG_DONE, NBD_REPLY_TYPE_ERROR, handle,
++                 sizeof(chunk) - sizeof(chunk.h) + iov[1].iov_len);
++    stl_be_p(&chunk.error, nbd_err);
++    stw_be_p(&chunk.message_length, iov[1].iov_len);
++
++    return nbd_co_send_iov(client, iov, 1 + !!iov[1].iov_len, errp);
++}
++
+ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
+                                                 uint64_t handle,
+                                                 uint64_t offset,
+@@ -1361,8 +1386,15 @@ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
+         bool final;
+ 
+         if (status < 0) {
+-            error_setg_errno(errp, -status, "unable to check for holes");
+-            return status;
++            char *msg = g_strdup_printf("unable to check for holes: %s",
++                                              strerror(-status));
++
++            error_report("%s", msg);
++
++            ret = nbd_co_send_structured_error(client, handle, -status, msg,
++                                               errp);
++            g_free(msg);
++            return ret;
+         }
+         assert(pnum && pnum <= size - progress);
+         final = progress + pnum == size;
+@@ -1400,30 +1432,6 @@ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
+     return ret;
+ }
+ 
+-static int coroutine_fn nbd_co_send_structured_error(NBDClient *client,
+-                                                     uint64_t handle,
+-                                                     uint32_t error,
+-                                                     const char *msg,
+-                                                     Error **errp)
+-{
+-    NBDStructuredError chunk;
+-    int nbd_err = system_errno_to_nbd_errno(error);
+-    struct iovec iov[] = {
+-        {.iov_base = &chunk, .iov_len = sizeof(chunk)},
+-        {.iov_base = (char *)msg, .iov_len = msg ? strlen(msg) : 0},
+-    };
+-
+-    assert(nbd_err);
+-    trace_nbd_co_send_structured_error(handle, nbd_err,
+-                                       nbd_err_lookup(nbd_err), msg ? msg : "");
+-    set_be_chunk(&chunk.h, NBD_REPLY_FLAG_DONE, NBD_REPLY_TYPE_ERROR, handle,
+-                 sizeof(chunk) - sizeof(chunk.h) + iov[1].iov_len);
+-    stl_be_p(&chunk.error, nbd_err);
+-    stw_be_p(&chunk.message_length, iov[1].iov_len);
+-
+-    return nbd_co_send_iov(client, iov, 1 + !!iov[1].iov_len, errp);
+-}
+-
+ /* nbd_co_receive_request
+  * Collect a client request. Return 0 if request looks valid, -EIO to drop
+  * connection right away, and any other negative value to report an error to
+@@ -1567,7 +1575,7 @@ static coroutine_fn void nbd_trip(void *opaque)
+                                           request.from, req->data, request.len,
+                                           &local_err);
+             if (ret < 0) {
+-                goto reply;
++                goto replied;
+             }
+             goto done;
+         }
+@@ -1664,6 +1672,8 @@ reply:
+                                        req->data, reply_data_len, &local_err);
+     }
+     g_free(msg);
++
++replied:
+     if (ret < 0) {
+         error_prepend(&local_err, "Failed to send reply: ");
+         goto disconnect;
+-- 
+2.11.1
