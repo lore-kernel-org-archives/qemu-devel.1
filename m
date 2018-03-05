@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1esmxE-0003Oe-2J
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:02:49 -0500
+	(envelope-from <cohuck@redhat.com>) id 1esn11-0004a1-1E
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:06:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1esmxA-0001Kl-Vx
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:02:48 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:39469)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1esmxA-0001IX-My
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:02:44 -0500
-Received: by mail-wm0-x242.google.com with SMTP id i3so14186706wmi.4
-	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 02:02:44 -0800 (PST)
-References: <1519998711-73430-1-git-send-email-mjc@sifive.com>
-	<20180305084111.GM2450@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180305084111.GM2450@redhat.com>
-Date: Mon, 05 Mar 2018 10:02:41 +0000
-Message-ID: <87fu5eu9fi.fsf@linaro.org>
+	(envelope-from <cohuck@redhat.com>) id 1esn0x-0003rA-RZ
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:06:43 -0500
+Date: Mon, 5 Mar 2018 11:06:13 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180305110613.2c62b2ab.cohuck@redhat.com>
+In-Reply-To: <20180215042900.16078-12-f4bug@amsat.org>
+References: <20180215042900.16078-1-f4bug@amsat.org>
+	<20180215042900.16078-12-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 00/23] RISC-V QEMU Port Submission
+Subject: Re: [Qemu-devel] [PATCH 11/30] hw/s390x: use the BYTE-based
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: Michael Clark <mjc@sifive.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "open
+	list:S390" <qemu-s390x@nongnu.org>
 
+On Thu, 15 Feb 2018 01:28:41 -0300
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
 
-Richard W.M. Jones <rjones@redhat.com> writes:
+> It ease code review, unit is explicit.
 
-> The attached patch is also needed to avoid crashes during various
-> math-heavy test suites.
->
-> Rich.
->
-> --
-<snip>
-> From: Stef O'Rear <sorear2@gmail.com>
-> Date: Sat, 3 Mar 2018 03:46:00 -0800
-> Subject: [PATCH] softfloat: fix crash on int conversion of SNaN
->
-> Signed-off-by: Stef O'Rear <sorear2@gmail.com>
+s/ease/eases/
+
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  fpu/softfloat.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-> index e7fb0d357a..1da1db377e 100644
-> --- a/fpu/softfloat.c
-> +++ b/fpu/softfloat.c
-> @@ -1342,6 +1342,8 @@ static int64_t round_to_int_and_pack(FloatParts in,=
- int rmode,
->      switch (p.cls) {
->      case float_class_snan:
->      case float_class_qnan:
-> +    case float_class_dnan:
-> +    case float_class_msnan:
->          return max;
->      case float_class_inf:
->          return p.sign ? min : max;
-> @@ -1430,6 +1432,8 @@ static uint64_t round_to_uint_and_pack(FloatParts i=
-n, int rmode, uint64_t max,
->      switch (p.cls) {
->      case float_class_snan:
->      case float_class_qnan:
-> +    case float_class_dnan:
-> +    case float_class_msnan:
->          s->float_exception_flags =3D orig_flags | float_flag_invalid;
->          return max;
->      case float_class_inf:
+>  hw/s390x/sclp.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+> index 276972b59f..8537aa2688 100644
+> --- a/hw/s390x/sclp.c
+> +++ b/hw/s390x/sclp.c
+> @@ -526,8 +526,8 @@ static void sclp_realize(DeviceState *dev, Error **er=
+rp)
+> =20
+>      ret =3D s390_set_memory_limit(machine->maxram_size, &hw_limit);
+>      if (ret =3D=3D -E2BIG) {
+> -        error_setg(&err, "host supports a maximum of %" PRIu64 " GB",
+> -                   hw_limit >> 30);
+> +        error_setg(&err, "host supports a maximum of %llu GB",
+> +                   hw_limit / G_BYTE);
+>      } else if (ret) {
+>          error_setg(&err, "setting the guest size failed");
+>      }
 
-Obviously I wasn't exercising the NaN exit paths enough and we added the
-return_nan() common code fairly late in the series.
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
---
-Alex Benn=C3=A9e
+Acked-by: Cornelia Huck <cohuck@redhat.com>
