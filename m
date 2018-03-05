@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49419)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esxWX-0004SW-9k
+	id 1esxWY-0004T3-Cn
 	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:19:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esxWV-0001bm-CB
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:19:57 -0500
+	id 1esxWX-0001e4-1T
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:19:58 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon,  5 Mar 2018 18:19:16 -0300
-Message-Id: <20180305211928.466-11-f4bug@amsat.org>
+Date: Mon,  5 Mar 2018 18:19:17 -0300
+Message-Id: <20180305211928.466-12-f4bug@amsat.org>
 In-Reply-To: <20180305211928.466-1-f4bug@amsat.org>
 References: <20180305211928.466-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH v2 10/22] hw/isa/superio: Factor out the
- serial code from pc87312.c
+Subject: [Qemu-devel] [RFC PATCH v2 11/22] hw/isa/superio: Factor out the
+ floppy disc controller code from pc87312.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,13 +34,13 @@ Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
  include/hw/isa/pc87312.h |  4 ----
  include/hw/isa/superio.h |  2 ++
- hw/isa/isa-superio.c     | 39 +++++++++++++++++++++++++++++++++++++++
- hw/isa/pc87312.c         | 43 ++++++++++++-------------------------------
+ hw/isa/isa-superio.c     | 36 ++++++++++++++++++++++++++++++++++++
+ hw/isa/pc87312.c         | 46 +++++++++++++++++++---------------------------
  hw/isa/trace-events      |  2 +-
- 5 files changed, 54 insertions(+), 36 deletions(-)
+ 5 files changed, 58 insertions(+), 32 deletions(-)
 
 diff --git a/include/hw/isa/pc87312.h b/include/hw/isa/pc87312.h
-index bcc4578479..1480615a2c 100644
+index 1480615a2c..e16263d4b1 100644
 --- a/include/hw/isa/pc87312.h
 +++ b/include/hw/isa/pc87312.h
 @@ -39,10 +39,6 @@ typedef struct PC87312State {
@@ -49,209 +49,207 @@ index bcc4578479..1480615a2c 100644
  
 -    struct {
 -        ISADevice *dev;
--    } uart[2];
+-    } fdc;
 -
      struct {
          ISADevice *dev;
-     } fdc;
+     } ide;
 diff --git a/include/hw/isa/superio.h b/include/hw/isa/superio.h
-index e9879cfde1..0b516721c3 100644
+index 0b516721c3..e8007b9eee 100644
 --- a/include/hw/isa/superio.h
 +++ b/include/hw/isa/superio.h
-@@ -28,6 +28,7 @@ typedef struct ISASuperIODevice {
-     /*< public >*/
+@@ -29,6 +29,7 @@ typedef struct ISASuperIODevice {
  
      ISADevice *parallel[MAX_PARALLEL_PORTS];
-+    ISADevice *serial[MAX_SERIAL_PORTS];
+     ISADevice *serial[MAX_SERIAL_PORTS];
++    ISADevice *floppy;
  } ISASuperIODevice;
  
  typedef struct ISASuperIOFuncs {
-@@ -45,6 +46,7 @@ typedef struct ISASuperIOClass {
-     DeviceRealize parent_realize;
+@@ -47,6 +48,7 @@ typedef struct ISASuperIOClass {
  
      ISASuperIOFuncs parallel;
-+    ISASuperIOFuncs serial;
+     ISASuperIOFuncs serial;
++    ISASuperIOFuncs floppy;
  } ISASuperIOClass;
  
  #endif /* HW_ISA_SUPERIO_H */
 diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
-index 4e0b1af633..bd4671655e 100644
+index bd4671655e..22bf79d3c3 100644
 --- a/hw/isa/isa-superio.c
 +++ b/hw/isa/isa-superio.c
-@@ -14,6 +14,7 @@
+@@ -11,7 +11,10 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu/error-report.h"
++#include "qapi/error.h"
  #include "sysemu/sysemu.h"
++#include "sysemu/block-backend.h"
++#include "sysemu/blockdev.h"
  #include "chardev/char.h"
  #include "hw/isa/superio.h"
-+#include "hw/char/serial.h"
- #include "trace.h"
+ #include "hw/char/serial.h"
+@@ -25,6 +28,7 @@ static void isa_superio_realize(DeviceState *dev, Error **errp)
+     ISADevice *isa;
+     DeviceState *d;
+     Chardev *chr;
++    DriveInfo *drive;
+     char *name;
+     int i;
  
- static void isa_superio_realize(DeviceState *dev, Error **errp)
-@@ -64,6 +65,44 @@ static void isa_superio_realize(DeviceState *dev, Error **errp)
+@@ -103,6 +107,38 @@ static void isa_superio_realize(DeviceState *dev, Error **errp)
              g_free(name);
          }
      }
 +
-+    /* Serial */
-+    for (i = 0; i < k->serial.count; i++) {
-+        if (i >= ARRAY_SIZE(sio->serial)) {
-+            warn_report("superio: ignoring %ld serial controllers",
-+                        k->serial.count - ARRAY_SIZE(sio->serial));
-+            break;
++    /* Floppy disc */
++    if (!k->floppy.is_enabled || k->floppy.is_enabled(sio, 0)) {
++        isa = isa_create(bus, "isa-fdc");
++        d = DEVICE(isa);
++        if (k->floppy.get_iobase) {
++            qdev_prop_set_uint32(d, "iobase", k->floppy.get_iobase(sio, 0));
 +        }
-+        if (!k->serial.is_enabled || k->serial.is_enabled(sio, i)) {
-+            name = g_strdup_printf("discarding-serial%d", i);
-+            /* FIXME use a qdev chardev prop instead of serial_hds[] */
-+            chr = serial_hds[i];
-+            if (chr == NULL || chr->be) {
-+                chr = qemu_chr_new(name, "null");
-+            }
-+            isa = isa_create(bus, TYPE_ISA_SERIAL);
-+            d = DEVICE(isa);
-+            qdev_prop_set_uint32(d, "index", i);
-+            if (k->serial.get_iobase) {
-+                qdev_prop_set_uint32(d, "iobase",
-+                                     k->serial.get_iobase(sio, i));
-+            }
-+            if (k->serial.get_irq) {
-+                qdev_prop_set_uint32(d, "irq", k->serial.get_irq(sio, i));
-+            }
-+            qdev_prop_set_chr(d, "chardev", chr);
-+            qdev_init_nofail(d);
-+            sio->serial[i] = isa;
-+            trace_superio_create_serial(i,
-+                                        k->serial.get_iobase ?
-+                                        k->serial.get_iobase(sio, i) : -1,
-+                                        k->serial.get_irq ?
-+                                        k->serial.get_irq(sio, i) : -1);
-+            object_property_add_child(OBJECT(dev), name,
-+                                      OBJECT(sio->serial[0]), NULL);
-+            g_free(name);
++        if (k->floppy.get_irq) {
++            qdev_prop_set_uint32(d, "irq", k->floppy.get_irq(sio, 0));
 +        }
++        /* FIXME use a qdev drive property instead of drive_get() */
++        drive = drive_get(IF_FLOPPY, 0, 0);
++        if (drive != NULL) {
++            qdev_prop_set_drive(d, "driveA", blk_by_legacy_dinfo(drive),
++                                &error_fatal);
++        }
++        /* FIXME use a qdev drive property instead of drive_get() */
++        drive = drive_get(IF_FLOPPY, 0, 1);
++        if (drive != NULL) {
++            qdev_prop_set_drive(d, "driveB", blk_by_legacy_dinfo(drive),
++                                &error_fatal);
++        }
++        qdev_init_nofail(d);
++        sio->floppy = isa;
++        trace_superio_create_floppy(0,
++                                    k->floppy.get_iobase ?
++                                    k->floppy.get_iobase(sio, 0) : -1,
++                                    k->floppy.get_irq ?
++                                    k->floppy.get_irq(sio, 0) : -1);
 +    }
++
  }
  
  static void isa_superio_class_init(ObjectClass *oc, void *data)
 diff --git a/hw/isa/pc87312.c b/hw/isa/pc87312.c
-index 1c15715c69..c2837bca43 100644
+index c2837bca43..a1845a91c3 100644
 --- a/hw/isa/pc87312.c
 +++ b/hw/isa/pc87312.c
-@@ -29,8 +29,6 @@
+@@ -27,8 +27,6 @@
+ #include "hw/isa/pc87312.h"
+ #include "qapi/error.h"
  #include "qemu/error-report.h"
- #include "sysemu/block-backend.h"
- #include "sysemu/blockdev.h"
--#include "sysemu/sysemu.h"
--#include "chardev/char.h"
+-#include "sysemu/block-backend.h"
+-#include "sysemu/blockdev.h"
  #include "trace.h"
  
  
-@@ -100,8 +98,9 @@ static const uint16_t uart_base[2][4] = {
-     { 0x2e8, 0x238, 0x2e0, 0x228 }
- };
+@@ -129,16 +127,26 @@ static bool is_uart_enabled(ISASuperIODevice *sio, uint8_t i)
  
--static inline uint16_t get_uart_iobase(PC87312State *s, int i)
-+static uint16_t get_uart_iobase(ISASuperIODevice *sio, uint8_t i)
+ /* Floppy controller */
+ 
+-static inline bool is_fdc_enabled(PC87312State *s)
++static bool is_fdc_enabled(ISASuperIODevice *sio, uint8_t index)
  {
 +    PC87312State *s = PC87312(sio);
-     int idx;
-     idx = (s->regs[REG_FAR] >> (2 * i + 2)) & 0x3;
-     if (idx == 0) {
-@@ -113,15 +112,17 @@ static inline uint16_t get_uart_iobase(PC87312State *s, int i)
-     }
++    assert(!index);
+     return s->regs[REG_FER] & FER_FDC_EN;
  }
  
--static inline unsigned int get_uart_irq(PC87312State *s, int i)
-+static unsigned int get_uart_irq(ISASuperIODevice *sio, uint8_t i)
+-static inline uint16_t get_fdc_iobase(PC87312State *s)
++static uint16_t get_fdc_iobase(ISASuperIODevice *sio, uint8_t index)
  {
 +    PC87312State *s = PC87312(sio);
-     int idx;
-     idx = (s->regs[REG_FAR] >> (2 * i + 2)) & 0x3;
-     return (idx & 1) ? 3 : 4;
++    assert(!index);
+     return (s->regs[REG_FER] & FER_FDC_ADDR) ? 0x370 : 0x3f0;
  }
  
--static inline bool is_uart_enabled(PC87312State *s, int i)
-+static bool is_uart_enabled(ISASuperIODevice *sio, uint8_t i)
- {
-+    PC87312State *s = PC87312(sio);
-     return s->regs[REG_FER] & (FER_UART1_EN << i);
- }
++static unsigned int get_fdc_irq(ISASuperIODevice *sio, uint8_t index)
++{
++    assert(!index);
++    return 6;
++}
++
  
-@@ -271,11 +272,8 @@ static void pc87312_realize(DeviceState *dev, Error **errp)
+ /* IDE controller */
+ 
+@@ -272,7 +280,6 @@ static void pc87312_realize(DeviceState *dev, Error **errp)
      DeviceState *d;
      ISADevice *isa;
      ISABus *bus;
--    Chardev *chr;
-     DriveInfo *drive;
+-    DriveInfo *drive;
      Error *local_err = NULL;
--    char name[5];
--    int i;
  
      s = PC87312(dev);
-     isa = ISA_DEVICE(dev);
-@@ -289,27 +287,6 @@ static void pc87312_realize(DeviceState *dev, Error **errp)
+@@ -287,28 +294,6 @@ static void pc87312_realize(DeviceState *dev, Error **errp)
          return;
      }
  
--    for (i = 0; i < 2; i++) {
--        if (is_uart_enabled(s, i)) {
--            /* FIXME use a qdev chardev prop instead of serial_hds[] */
--            chr = serial_hds[i];
--            if (chr == NULL) {
--                snprintf(name, sizeof(name), "ser%d", i);
--                chr = qemu_chr_new(name, "null");
--            }
--            isa = isa_create(bus, "isa-serial");
--            d = DEVICE(isa);
--            qdev_prop_set_uint32(d, "index", i);
--            qdev_prop_set_uint32(d, "iobase", get_uart_iobase(s, i));
--            qdev_prop_set_uint32(d, "irq", get_uart_irq(s, i));
--            qdev_prop_set_chr(d, "chardev", chr);
--            qdev_init_nofail(d);
--            s->uart[i].dev = isa;
--            trace_pc87312_info_serial(i, get_uart_iobase(s, i),
--                                      get_uart_irq(s, i));
+-    if (is_fdc_enabled(s)) {
+-        isa = isa_create(bus, "isa-fdc");
+-        d = DEVICE(isa);
+-        qdev_prop_set_uint32(d, "iobase", get_fdc_iobase(s));
+-        qdev_prop_set_uint32(d, "irq", 6);
+-        /* FIXME use a qdev drive property instead of drive_get() */
+-        drive = drive_get(IF_FLOPPY, 0, 0);
+-        if (drive != NULL) {
+-            qdev_prop_set_drive(d, "driveA", blk_by_legacy_dinfo(drive),
+-                                &error_fatal);
 -        }
+-        /* FIXME use a qdev drive property instead of drive_get() */
+-        drive = drive_get(IF_FLOPPY, 0, 1);
+-        if (drive != NULL) {
+-            qdev_prop_set_drive(d, "driveB", blk_by_legacy_dinfo(drive),
+-                                &error_fatal);
+-        }
+-        qdev_init_nofail(d);
+-        s->fdc.dev = isa;
+-        trace_pc87312_info_floppy(get_fdc_iobase(s));
 -    }
 -
-     if (is_fdc_enabled(s)) {
-         isa = isa_create(bus, "isa-fdc");
+     if (is_ide_enabled(s)) {
+         isa = isa_create(bus, "isa-ide");
          d = DEVICE(isa);
-@@ -380,8 +357,6 @@ static void pc87312_class_init(ObjectClass *klass, void *data)
-     dc->reset = pc87312_reset;
-     dc->vmsd = &vmstate_pc87312;
-     dc->props = pc87312_properties;
--    /* Reason: Uses serial_hds[0] in realize(), so it can't be used twice */
--    dc->user_creatable = false;
- 
-     sc->parallel = (ISASuperIOFuncs){
-         .count = 1,
-@@ -389,6 +364,12 @@ static void pc87312_class_init(ObjectClass *klass, void *data)
-         .get_iobase = get_parallel_iobase,
-         .get_irq    = get_parallel_irq,
+@@ -370,6 +355,12 @@ static void pc87312_class_init(ObjectClass *klass, void *data)
+         .get_iobase = get_uart_iobase,
+         .get_irq    = get_uart_irq,
      };
-+    sc->serial = (ISASuperIOFuncs){
-+        .count = 2,
-+        .is_enabled = is_uart_enabled,
-+        .get_iobase = get_uart_iobase,
-+        .get_irq    = get_uart_irq,
++    sc->floppy = (ISASuperIOFuncs){
++        .count = 1,
++        .is_enabled = is_fdc_enabled,
++        .get_iobase = get_fdc_iobase,
++        .get_irq    = get_fdc_irq,
 +    };
  }
  
  static const TypeInfo pc87312_type_info = {
+@@ -378,6 +369,7 @@ static const TypeInfo pc87312_type_info = {
+     .instance_size = sizeof(PC87312State),
+     .instance_init = pc87312_initfn,
+     .class_init    = pc87312_class_init,
++    /* FIXME use a qdev drive property instead of drive_get() */
+ };
+ 
+ static void pc87312_register_types(void)
 diff --git a/hw/isa/trace-events b/hw/isa/trace-events
-index 97b1949981..c78dd6c353 100644
+index c78dd6c353..8d9900882f 100644
 --- a/hw/isa/trace-events
 +++ b/hw/isa/trace-events
-@@ -2,10 +2,10 @@
- 
+@@ -3,9 +3,9 @@
  # hw/isa/isa-superio.c
  superio_create_parallel(int id, uint16_t base, unsigned int irq) "id=%d, base 0x%03x, irq %u"
-+superio_create_serial(int id, uint16_t base, unsigned int irq) "id=%d, base 0x%03x, irq %u"
+ superio_create_serial(int id, uint16_t base, unsigned int irq) "id=%d, base 0x%03x, irq %u"
++superio_create_floppy(int id, uint16_t base, unsigned int irq) "id=%d, base 0x%03x, irq %u"
  
  # hw/isa/pc87312.c
  pc87312_io_read(uint32_t addr, uint32_t val) "read addr=0x%x val=0x%x"
  pc87312_io_write(uint32_t addr, uint32_t val) "write addr=0x%x val=0x%x"
- pc87312_info_floppy(uint32_t base) "base 0x%x"
+-pc87312_info_floppy(uint32_t base) "base 0x%x"
  pc87312_info_ide(uint32_t base) "base 0x%x"
--pc87312_info_serial(int n, uint32_t base, uint32_t irq) "id=%d, base 0x%x, irq %u"
 -- 
 2.16.2
