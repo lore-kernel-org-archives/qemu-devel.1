@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1esqA3-0006g0-WE
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:28:17 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1esqBK-0007hI-1c
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:29:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1esqA2-0007By-S8
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:28:15 -0500
-Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:33229)
+	(envelope-from <peter.maydell@linaro.org>) id 1esqBI-0008WG-UD
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:29:34 -0500
+Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:45823)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1esqA2-0007BV-N6
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:28:14 -0500
-Received: by mail-oi0-x236.google.com with SMTP id e9so5357335oii.0
-	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 05:28:14 -0800 (PST)
+	id 1esqBI-0008Vo-P3
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:29:32 -0500
+Received: by mail-oi0-x22f.google.com with SMTP id j79so11987477oib.12
+	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 05:29:32 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180302185448.6314-1-kwolf@redhat.com>
-References: <20180302185448.6314-1-kwolf@redhat.com>
+In-Reply-To: <1520004397-28521-1-git-send-email-minyard@acm.org>
+References: <1520004397-28521-1-git-send-email-minyard@acm.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 5 Mar 2018 13:27:53 +0000
-Message-ID: <CAFEAcA9xKJxWrdkU7cTW7YgJSMG3f5ZfqD5vP8wtFUYEX5SRQw@mail.gmail.com>
+Date: Mon, 5 Mar 2018 13:29:11 +0000
+Message-ID: <CAFEAcA8WZVHJ-uBowS3V2gpuiO8Fwg2rZLpb3WT2dMLTD2Crzw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/37] Block layer patches
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] ipmi: Fix vmstate transfer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,87 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Corey Minyard <minyard@acm.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 2 March 2018 at 18:54, Kevin Wolf <kwolf@redhat.com> wrote:
-> The following changes since commit 86f4c7e05b1c44dbe1b329a51f311f10aef6ff34:
+On 2 March 2018 at 15:26,  <minyard@acm.org> wrote:
+> I apologize for the resend, I left the list off the previous post.
 >
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20180302' into staging (2018-03-02 14:37:10 +0000)
+> This is unchanged since the previous post, two weeks ago.  I received
+> no comments, so I guess it's ok.  It's fairly broken now, so I would
+> like this fixed.
+>
+> Changes from v1:
+>   * Validate the data values in pre_load functions.
+>   * For KCS, instead of an old function, create a separate vmstate
+>     structure for the new version.  The name on the old vmstate
+>     structure wasn't specific enough, so a new name was needed,
+>     The old structure is set up to never be sent, but it can be
+>     received.
+>
+> The following changes since commit 427cbc7e4136a061628cb4315cc8182ea36d772f:
+>
+>   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2018-03-01 18:46:41 +0000)
 >
 > are available in the git repository at:
 >
->   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>   https://github.com/cminyard/qemu.git tags/ipmi-vmstate-fixes
 >
-> for you to fetch changes up to 9d9b4b640f9e583ff4b24dc762630945f3ccc16d:
+> for you to fetch changes up to 90797371d9a3138657e7b1f7ab4425eb67d6fd0a:
 >
->   Merge remote-tracking branch 'mreitz/tags/pull-block-2018-03-02' into queue-block (2018-03-02 18:45:03 +0100)
->
-> ----------------------------------------------------------------
-> Block layer patches
+>   ipmi: Use proper struct reference for BT vmstate (2018-03-02 07:48:39 -0600)
 >
 
-This gives me a clang sanitizer error while running 'make check':
-
-e104462:xenial:clang$ UBSAN_OPTIONS=print_stacktrace=1
-QTEST_QEMU_BINARY=i386-softmmu/qemu-system-i386
-QTEST_QEMU_IMG=qemu-img tests/ide-test
-/i386/ide/identify: OK
-/i386/ide/flush: OK
-/i386/ide/bmdma/setup: OK
-/i386/ide/bmdma/simple_rw: OK
-/i386/ide/bmdma/trim: OK
-/i386/ide/bmdma/short_prdt: OK
-/i386/ide/bmdma/one_sector_short_prdt: OK
-/i386/ide/bmdma/long_prdt: OK
-/i386/ide/bmdma/no_busmaster: OK
-/i386/ide/bmdma/teardown: OK
-/i386/ide/flush/nodev: OK
-/i386/ide/flush/empty_drive:
-/home/petmay01/linaro/qemu-for-merges/block.c:3926:16: runtime error:
-member access within null pointer of type 'const BlockDriverState'
-(aka 'const struct BlockDriverState')
-    #0 0x5560b5776f48 in bdrv_get_node_name
-/home/petmay01/linaro/qemu-for-merges/block.c:3926:16
-    #1 0x5560b587fc92 in send_qmp_error_event
-/home/petmay01/linaro/qemu-for-merges/block/block-backend.c:1621:36
-    #2 0x5560b587fc92 in blk_error_action
-/home/petmay01/linaro/qemu-for-merges/block/block-backend.c:1655
-    #3 0x5560b52619e6 in ide_handle_rw_error
-/home/petmay01/linaro/qemu-for-merges/hw/ide/core.c:836:5
-    #4 0x5560b5278d7b in ide_flush_cb
-/home/petmay01/linaro/qemu-for-merges/hw/ide/core.c:1067:13
-    #5 0x5560b58822ac in blk_aio_complete
-/home/petmay01/linaro/qemu-for-merges/block/block-backend.c:1286:9
-    #6 0x5560b5a04417 in aio_bh_poll
-/home/petmay01/linaro/qemu-for-merges/util/async.c:118:13
-    #7 0x5560b5a10cef in aio_dispatch
-/home/petmay01/linaro/qemu-for-merges/util/aio-posix.c:436:5
-    #8 0x5560b5a062fa in aio_ctx_dispatch
-/home/petmay01/linaro/qemu-for-merges/util/async.c:261:5
-    #9 0x7f9786667196 in g_main_context_dispatch
-(/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4a196)
-    #10 0x5560b5a0dd08 in glib_pollfds_poll
-/home/petmay01/linaro/qemu-for-merges/util/main-loop.c:214:9
-    #11 0x5560b5a0dd08 in os_host_main_loop_wait
-/home/petmay01/linaro/qemu-for-merges/util/main-loop.c:261
-    #12 0x5560b5a0dd08 in main_loop_wait
-/home/petmay01/linaro/qemu-for-merges/util/main-loop.c:515
-    #13 0x5560b4fdebf2 in main_loop
-/home/petmay01/linaro/qemu-for-merges/vl.c:1942:9
-    #14 0x5560b4fdebf2 in main /home/petmay01/linaro/qemu-for-merges/vl.c:4772
-    #15 0x7f97843ec82f in __libc_start_main
-/build/glibc-Cl5G7W/glibc-2.23/csu/../csu/libc-start.c:291
-    #16 0x5560b4b456c8 in _start
-(/home/petmay01/linaro/qemu-for-merges/build/clang/i386-softmmu/qemu-system-i386+0xe5c6c8)
-
-OK
-/i386/ide/flush/retry_pci: OK
-/i386/ide/flush/retry_isa: OK
-/i386/ide/cdrom/pio: OK
-/i386/ide/cdrom/pio_large: OK
-/i386/ide/cdrom/dma: OK
-
+If you could avoid sending pull request emails for patchsets, I'd
+appreciate it -- they automatically go into my queue of
+things-to-process-for-master, and if I'm not paying enough attention
+they might actually get applied...
 
 thanks
 -- PMM
