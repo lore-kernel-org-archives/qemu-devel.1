@@ -1,25 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1esony-0002an-98
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 07:01:27 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1esos5-0004S4-Su
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 07:05:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1esont-0005WG-4S
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 07:01:22 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41802 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1esons-0005Vr-Uq
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 07:01:17 -0500
-Date: Mon, 5 Mar 2018 12:00:58 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180305120058.GF3131@work-vm>
-References: <1520004397-28521-1-git-send-email-minyard@acm.org>
-	<1520004397-28521-3-git-send-email-minyard@acm.org>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1esos2-0006hD-NI
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 07:05:37 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51610
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1esos2-0006h7-Gk
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 07:05:34 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w25C4U6Y069350
+	for <qemu-devel@nongnu.org>; Mon, 5 Mar 2018 07:05:33 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2gh5dhrhqe-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 07:05:33 -0500
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Mon, 5 Mar 2018 05:05:32 -0700
+References: <1520200587-14681-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1520200587-14681-2-git-send-email-stefanb@linux.vnet.ibm.com>
+	<20180305094937.GB3131@work-vm>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Mon, 5 Mar 2018 07:05:27 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1520004397-28521-3-git-send-email-minyard@acm.org>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] ipmi: Use proper struct reference
- for BT vmstate
+In-Reply-To: <20180305094937.GB3131@work-vm>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <85dd51e6-9fa9-a369-922b-13bcb6e8d1f6@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/5] tpm: convert tpm_crb.c to use
+ trace-events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,116 +44,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: minyard@acm.org
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <cminyard@mvista.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org
 
-* minyard@acm.org (minyard@acm.org) wrote:
-> From: Corey Minyard <cminyard@mvista.com>
-> 
-> The vmstate for isa_ipmi_bt was referencing into the bt structure,
-> instead create a bt structure separate and use that.
-> 
-> The version 1 of the BT transfer was fairly broken, if a migration
-> occured during an IPMI operation, it is likely the migration would
-> be corrupted because I misunderstood the VMSTATE_VBUFFER_UINT32()
-> handling, I thought it handled transferring the length field,
-> too.  So I just remove support for that.  I doubt anyone is using
-> it at this point.
-> 
-> This also removes the transfer of use_irq, since that should come
-> from configuration.
-> 
-> Signed-off-by: Corey Minyard <cminyard@mvista.com>
-> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  hw/ipmi/isa_ipmi_bt.c | 61 ++++++++++++++++++++++++++++++++++++++++-----------
->  1 file changed, 48 insertions(+), 13 deletions(-)
-> 
-> diff --git a/hw/ipmi/isa_ipmi_bt.c b/hw/ipmi/isa_ipmi_bt.c
-> index e946030..b64dce2 100644
-> --- a/hw/ipmi/isa_ipmi_bt.c
-> +++ b/hw/ipmi/isa_ipmi_bt.c
-> @@ -450,22 +450,57 @@ static void isa_ipmi_bt_realize(DeviceState *dev, Error **errp)
->      isa_register_ioport(isadev, &iib->bt.io, iib->bt.io_base);
->  }
->  
-> -static const VMStateDescription vmstate_ISAIPMIBTDevice = {
-> -    .name = TYPE_IPMI_INTERFACE,
-> +static int ipmi_bt_vmstate_post_load(void *opaque, int version)
-> +{
-> +    IPMIBT *ib = opaque;
-> +
-> +    /* Make sure all the values are sane. */
-> +    if (ib->outpos >= MAX_IPMI_MSG_SIZE || ib->outlen >= MAX_IPMI_MSG_SIZE ||
-> +        ib->outpos >= ib->outlen) {
-> +        ib->outpos = 0;
-> +        ib->outlen = 0;
-> +    }
-> +
-> +    if (ib->inlen >= MAX_IPMI_MSG_SIZE) {
-> +        ib->inlen = 0;
-> +    }
-> +
-> +    return 0;
-> +}
+On 03/05/2018 04:49 AM, Dr. David Alan Gilbert wrote:
+> * Stefan Berger (stefanb@linux.vnet.ibm.com) wrote:
+>> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>> ---
+>>   Makefile.objs       |  1 +
+>>   hw/tpm/tpm_crb.c    | 17 +++++------------
+>>   hw/tpm/trace-events |  5 +++++
+>>   3 files changed, 11 insertions(+), 12 deletions(-)
+>>   create mode 100644 hw/tpm/trace-events
+>>
+>> diff --git a/Makefile.objs b/Makefile.objs
+>> index 5dc1348..72c3d8c 100644
+>> --- a/Makefile.objs
+>> +++ b/Makefile.objs
+>> @@ -162,6 +162,7 @@ trace-events-subdirs += hw/alpha
+>>   trace-events-subdirs += hw/hppa
+>>   trace-events-subdirs += hw/xen
+>>   trace-events-subdirs += hw/ide
+>> +trace-events-subdirs += hw/tpm
+>>   trace-events-subdirs += ui
+>>   trace-events-subdirs += audio
+>>   trace-events-subdirs += net
+>> diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
+>> index b5b8256..d8917cb 100644
+>> --- a/hw/tpm/tpm_crb.c
+>> +++ b/hw/tpm/tpm_crb.c
+>> @@ -29,6 +29,7 @@
+>>   #include "sysemu/reset.h"
+>>   #include "tpm_int.h"
+>>   #include "tpm_util.h"
+>> +#include "trace.h"
+>>   
+>>   typedef struct CRBState {
+>>       DeviceState parent_obj;
+>> @@ -44,14 +45,6 @@ typedef struct CRBState {
+>>   
+>>   #define CRB(obj) OBJECT_CHECK(CRBState, (obj), TYPE_TPM_CRB)
+>>   
+>> -#define DEBUG_CRB 0
+>> -
+>> -#define DPRINTF(fmt, ...) do {                  \
+>> -        if (DEBUG_CRB) {                        \
+>> -            printf(fmt, ## __VA_ARGS__);        \
+>> -        }                                       \
+>> -    } while (0)
+>> -
+>>   #define CRB_INTF_TYPE_CRB_ACTIVE 0b1
+>>   #define CRB_INTF_VERSION_CRB 0b1
+>>   #define CRB_INTF_CAP_LOCALITY_0_ONLY 0b0
+>> @@ -91,8 +84,8 @@ static uint64_t tpm_crb_mmio_read(void *opaque, hwaddr addr,
+>>       unsigned offset = addr & 3;
+>>       uint32_t val = *(uint32_t *)regs >> (8 * offset);
+>>   
+>> -    DPRINTF("CRB read 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32 "\n",
+>> -            addr, size, val);
+>> +    trace_tpm_crb_mmio_read(addr, size, val);
+>> +
+>>       return val;
+>>   }
+>>   
+>> @@ -100,8 +93,8 @@ static void tpm_crb_mmio_write(void *opaque, hwaddr addr,
+>>                                  uint64_t val, unsigned size)
+>>   {
+>>       CRBState *s = CRB(opaque);
+>> -    DPRINTF("CRB write 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx64 "\n",
+>> -            addr, size, val);
+>> +
+>> +    trace_tpm_crb_mmio_write(addr, size, val);
+>>   
+>>       switch (addr) {
+>>       case A_CRB_CTRL_REQ:
+>> diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
+>> new file mode 100644
+>> index 0000000..336b06d
+>> --- /dev/null
+>> +++ b/hw/tpm/trace-events
+>> @@ -0,0 +1,5 @@
+>> +# See docs/devel/tracing.txt for syntax documentation.
+>> +
+>> +# hw/tpm/tpm_crb.c
+>> +tpm_crb_mmio_read(uint64_t addr, unsigned size, uint32_t val) "CRB read 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
+>> +tpm_crb_mmio_write(uint64_t addr, unsigned size, uint32_t val) "CRB write 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
+> Have you checked that builds OK on 32bit?   I think you'll need to use
+> PRIx64 there since the trace makes you use the uint64_t parameter.
 
-OK, this one looks fine; I'd personally add a printf or something in the
-case where you're having to fix up the output/outlen just so you know;
-but that's OK; and since you know the device I'll leave the use_irq etc
-to you, so:
+It builds fines as it is.
 
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> +const VMStateDescription vmstate_IPMIBT = {
-> +    .name = TYPE_IPMI_INTERFACE_PREFIX "bt",
->      .version_id = 1,
->      .minimum_version_id = 1,
-> +    .post_load = ipmi_bt_vmstate_post_load,
-> +    .fields      = (VMStateField[]) {
-> +        VMSTATE_BOOL(obf_irq_set, IPMIBT),
-> +        VMSTATE_BOOL(atn_irq_set, IPMIBT),
-> +        VMSTATE_BOOL(irqs_enabled, IPMIBT),
-> +        VMSTATE_UINT32(outpos, IPMIBT),
-> +        VMSTATE_UINT32(outlen, IPMIBT),
-> +        VMSTATE_UINT8_ARRAY(outmsg, IPMIBT, MAX_IPMI_MSG_SIZE),
-> +        VMSTATE_UINT32(inlen, IPMIBT),
-> +        VMSTATE_UINT8_ARRAY(inmsg, IPMIBT, MAX_IPMI_MSG_SIZE),
-> +        VMSTATE_UINT8(control_reg, IPMIBT),
-> +        VMSTATE_UINT8(mask_reg, IPMIBT),
-> +        VMSTATE_UINT8(waiting_rsp, IPMIBT),
-> +        VMSTATE_UINT8(waiting_seq, IPMIBT),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static const VMStateDescription vmstate_ISAIPMIBTDevice = {
-> +    .name = TYPE_IPMI_INTERFACE_PREFIX "isa-bt",
-> +    .version_id = 2,
-> +    .minimum_version_id = 2,
-> +    /*
-> +     * Version 1 had messed up the array transfer, it's not even usable
-> +     * because it used VMSTATE_VBUFFER_UINT32, but it did not transfer
-> +     * the buffer length, so random things would happen.
-> +     */
->      .fields      = (VMStateField[]) {
-> -        VMSTATE_BOOL(bt.obf_irq_set, ISAIPMIBTDevice),
-> -        VMSTATE_BOOL(bt.atn_irq_set, ISAIPMIBTDevice),
-> -        VMSTATE_BOOL(bt.use_irq, ISAIPMIBTDevice),
-> -        VMSTATE_BOOL(bt.irqs_enabled, ISAIPMIBTDevice),
-> -        VMSTATE_UINT32(bt.outpos, ISAIPMIBTDevice),
-> -        VMSTATE_VBUFFER_UINT32(bt.outmsg, ISAIPMIBTDevice, 1, NULL, bt.outlen),
-> -        VMSTATE_VBUFFER_UINT32(bt.inmsg, ISAIPMIBTDevice, 1, NULL, bt.inlen),
-> -        VMSTATE_UINT8(bt.control_reg, ISAIPMIBTDevice),
-> -        VMSTATE_UINT8(bt.mask_reg, ISAIPMIBTDevice),
-> -        VMSTATE_UINT8(bt.waiting_rsp, ISAIPMIBTDevice),
-> -        VMSTATE_UINT8(bt.waiting_seq, ISAIPMIBTDevice),
-> +        VMSTATE_STRUCT(bt, ISAIPMIBTDevice, 1, vmstate_IPMIBT, IPMIBT),
->          VMSTATE_END_OF_LIST()
->      }
->  };
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+   Stefan
