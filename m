@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1esnay-0001iu-CK
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:43:53 -0500
+	(envelope-from <peterx@redhat.com>) id 1esnb0-0001lK-JR
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:43:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1esnat-0001Ud-GN
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:43:52 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38438 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1esnaz-0001YW-Rv
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:43:54 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41544 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1esnat-0001UN-AK
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:43:47 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 93B8E87ABA
-	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 10:43:36 +0000 (UTC)
-Date: Mon, 5 Mar 2018 10:43:27 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180305104326.GC3131@work-vm>
-References: <1520243276-30197-1-git-send-email-thuth@redhat.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1esnaz-0001YC-Nu
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:43:53 -0500
+Date: Mon, 5 Mar 2018 18:43:46 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180305104346.GD7584@xz-mi>
+References: <1519900415-30314-1-git-send-email-yi.l.liu@linux.intel.com>
+	<1519900415-30314-9-git-send-email-yi.l.liu@linux.intel.com>
+	<f06bee8b-646d-e9e8-d2e6-78cdddb76ab1@redhat.com>
+	<20180305084309.GF2482@sky-dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1520243276-30197-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] Allow to specify a display device ID
- and head whith the screendump command
+In-Reply-To: <20180305084309.GF2482@sky-dev>
+Subject: Re: [Qemu-devel] [PATCH v3 08/12] hw/pci: introduce
+ pci_device_notify_iommu()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,133 +30,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Jiri Denemark <jdenemar@redhat.com>
+To: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com, david@gibson.dropbear.id.au, alex.williamson@redhat.com, eric.auger.pro@gmail.com, yi.l.liu@intel.com, kevin.tian@intel.com, jasowang@redhat.com
 
-* Thomas Huth (thuth@redhat.com) wrote:
-> QEMU's screendump command can only take dumps from the primary display.
-> When using multiple VGA cards, there is no way to get a dump from a
-> secondary card or other display heads yet. So let's add an 'device' and
-> a 'head' parameter to the HMP and QMP commands to be able to specify
-> alternative devices and heads with the screendump command, too.
+On Mon, Mar 05, 2018 at 04:43:09PM +0800, Liu, Yi L wrote:
+> On Fri, Mar 02, 2018 at 05:06:56PM +0100, Paolo Bonzini wrote:
+> > On 01/03/2018 11:33, Liu, Yi L wrote:
+> > > +    pci_device_notify_iommu(pdev, PCI_NTY_DEV_ADD);
+> > > +
+> > >      pci_setup_sva_ops(pdev, &vfio_pci_sva_ops);
+> > >  
+> > >      return;
+> > > @@ -3134,6 +3136,7 @@ static void vfio_exitfn(PCIDevice *pdev)
+> > >  {
+> > >      VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
+> > >  
+> > > +    pci_device_notify_iommu(pdev, PCI_NTY_DEV_DEL);
+> > 
+> > Please make the names longer: PCI_IOMMU_NOTIFY_DEVICE_ADDED and
+> > PCI_IOMMU_NOTIFY_DEVICE_REMOVED.  (This is independent of my other
+> > remark, about doing this in generic PCI code for all devices that
+> > register SVA ops).
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  v2:
->  - Renamed 'id' to 'device'
->  - Add suport for specifying the 'head', too
-> 
->  hmp-commands.hx |  7 ++++---
->  hmp.c           |  4 +++-
->  qapi/ui.json    |  7 ++++++-
->  ui/console.c    | 22 ++++++++++++++++++----
->  4 files changed, 31 insertions(+), 9 deletions(-)
-> 
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index d26eb41..ebb5fe4 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -253,9 +253,10 @@ ETEXI
->  
->      {
->          .name       = "screendump",
-> -        .args_type  = "filename:F",
-> -        .params     = "filename",
-> -        .help       = "save screen into PPM image 'filename'",
-> +        .args_type  = "filename:F,device:s?,head:i?",
-> +        .params     = "filename [device [head]]",
-> +        .help       = "save screen from head 'head' of display device 'device' "
-> +                      "into PPM image 'filename'",
->          .cmd        = hmp_screendump,
->      },
->  
-> diff --git a/hmp.c b/hmp.c
-> index ae86bfb..7dcf72f 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -2132,9 +2132,11 @@ err_out:
->  void hmp_screendump(Monitor *mon, const QDict *qdict)
->  {
->      const char *filename = qdict_get_str(qdict, "filename");
-> +    const char *id = qdict_get_try_str(qdict, "device");
-> +    int64_t head = qdict_get_try_int(qdict, "head", 0);
->      Error *err = NULL;
->  
-> -    qmp_screendump(filename, &err);
-> +    qmp_screendump(filename, id != NULL, id, id != NULL, head, &err);
->      hmp_handle_error(mon, &err);
->  }
+> Thanks for the suggestion, will appply.
 
-Looks ok from HMP; one question, is there a way to give an ID to the
-default VGA or only to extra devices?
+Isn't the name too generic if it's tailored for VFIO only? Would
+something like PCI_IOMMU_NOTIFY_VFIO_ADD be a bit better?
 
-
-Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> diff --git a/qapi/ui.json b/qapi/ui.json
-> index 3e82f25..e60b323 100644
-> --- a/qapi/ui.json
-> +++ b/qapi/ui.json
-> @@ -77,6 +77,10 @@
->  #
->  # @filename: the path of a new PPM file to store the image
->  #
-> +# @device: ID of the display device that should be used (since 2.12)
-> +#
-> +# @head: head to use in case the device supports multiple heads (since 2.12)
-> +#
->  # Returns: Nothing on success
->  #
->  # Since: 0.14.0
-> @@ -88,7 +92,8 @@
->  # <- { "return": {} }
->  #
->  ##
-> -{ 'command': 'screendump', 'data': {'filename': 'str'} }
-> +{ 'command': 'screendump',
-> +  'data': {'filename': 'str', '*device': 'str', '*head': 'int'} }
->  
->  ##
->  # == Spice
-> diff --git a/ui/console.c b/ui/console.c
-> index e22931a..76b694e 100644
-> --- a/ui/console.c
-> +++ b/ui/console.c
-> @@ -344,14 +344,28 @@ write_err:
->      goto out;
->  }
->  
-> -void qmp_screendump(const char *filename, Error **errp)
-> +void qmp_screendump(const char *filename, bool has_device, const char *device,
-> +                    bool has_head, int64_t head, Error **errp)
->  {
->      QemuConsole *con = qemu_console_lookup_by_index(0);
->      DisplaySurface *surface;
->  
-> -    if (con == NULL) {
-> -        error_setg(errp, "There is no QemuConsole I can screendump from.");
-> -        return;
-> +    if (has_device) {
-> +        con = qemu_console_lookup_by_device_name(device, has_head ? head : 0,
-> +                                                 errp);
-> +        if (!con) {
-> +            return;
-> +        }
-> +    } else {
-> +        if (has_head) {
-> +            error_setg(errp, "'head' must be specified together with 'device'");
-> +            return;
-> +        }
-> +        con = qemu_console_lookup_by_index(0);
-> +        if (!con) {
-> +            error_setg(errp, "There is no console to take a screendump from.");
-> +            return;
-> +        }
->      }
->  
->      graphic_hw_update(con);
-> -- 
-> 1.8.3.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- 
+Peter Xu
