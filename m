@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1esqBK-0007hI-1c
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:29:35 -0500
+	(envelope-from <drjones@redhat.com>) id 1esqIj-0001Y0-QN
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:37:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1esqBI-0008WG-UD
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:29:34 -0500
-Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:45823)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1esqBI-0008Vo-P3
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:29:32 -0500
-Received: by mail-oi0-x22f.google.com with SMTP id j79so11987477oib.12
-	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 05:29:32 -0800 (PST)
+	(envelope-from <drjones@redhat.com>) id 1esqIf-00057E-Nf
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:37:13 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33870 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1esqIf-00056Y-HQ
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:37:09 -0500
+Date: Mon, 5 Mar 2018 14:36:54 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180305133654.7aokepvzcmxhzk4q@kamzik.brq.redhat.com>
+References: <20180228180215.25470-1-wei@redhat.com>
+	<20180228180215.25470-2-wei@redhat.com>
+	<ca21f795-dae7-d6b5-44f1-ef8ba792ac04@redhat.com>
+	<20180305110122.GD3131@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <1520004397-28521-1-git-send-email-minyard@acm.org>
-References: <1520004397-28521-1-git-send-email-minyard@acm.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 5 Mar 2018 13:29:11 +0000
-Message-ID: <CAFEAcA8WZVHJ-uBowS3V2gpuiO8Fwg2rZLpb3WT2dMLTD2Crzw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] ipmi: Fix vmstate transfer
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180305110122.GD3131@work-vm>
+Subject: Re: [Qemu-devel] [PATCH V7 1/4] rules: Move cross compilation auto
+ detection functions to rules.mak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +30,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Corey Minyard <minyard@acm.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Wei Huang <wei@redhat.com>, peter.maydell@linaro.org, qemu-devel@nongnu.org, quintela@redhat.com
 
-On 2 March 2018 at 15:26,  <minyard@acm.org> wrote:
-> I apologize for the resend, I left the list off the previous post.
->
-> This is unchanged since the previous post, two weeks ago.  I received
-> no comments, so I guess it's ok.  It's fairly broken now, so I would
-> like this fixed.
->
-> Changes from v1:
->   * Validate the data values in pre_load functions.
->   * For KCS, instead of an old function, create a separate vmstate
->     structure for the new version.  The name on the old vmstate
->     structure wasn't specific enough, so a new name was needed,
->     The old structure is set up to never be sent, but it can be
->     received.
->
-> The following changes since commit 427cbc7e4136a061628cb4315cc8182ea36d772f:
->
->   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2018-03-01 18:46:41 +0000)
->
-> are available in the git repository at:
->
->   https://github.com/cminyard/qemu.git tags/ipmi-vmstate-fixes
->
-> for you to fetch changes up to 90797371d9a3138657e7b1f7ab4425eb67d6fd0a:
->
->   ipmi: Use proper struct reference for BT vmstate (2018-03-02 07:48:39 -0600)
->
+On Mon, Mar 05, 2018 at 11:01:23AM +0000, Dr. David Alan Gilbert wrote:
+> * Laurent Vivier (lvivier@redhat.com) wrote:
+> > On 28/02/2018 19:02, Wei Huang wrote:
+> > > This patch moves the auto detection functions for cross compilation from
+> > > roms/Makefile to rules.mak. So the functions can be shared among Makefiles
+> > > in QEMU.
+> > > 
+> > > Signed-off-by: Wei Huang <wei@redhat.com>
+> > > Reviewed-by: Andrew Jones <drjones@redhat.com>
+> > > ---
+> > >  roms/Makefile | 24 +++++++-----------------
+> > >  rules.mak     | 15 +++++++++++++++
+> > >  2 files changed, 22 insertions(+), 17 deletions(-)
+> > > 
+> > > diff --git a/roms/Makefile b/roms/Makefile
+> > > index b5e5a69e91..e972c65333 100644
+> > > --- a/roms/Makefile
+> > > +++ b/roms/Makefile
+> > > @@ -21,23 +21,6 @@ pxe-rom-virtio   efi-rom-virtio   : DID := 1000
+> > >  pxe-rom-vmxnet3  efi-rom-vmxnet3  : VID := 15ad
+> > >  pxe-rom-vmxnet3  efi-rom-vmxnet3  : DID := 07b0
+> > >  
+> > > -#
+> > > -# cross compiler auto detection
+> > > -#
+> > > -path := $(subst :, ,$(PATH))
+> > > -system := $(shell uname -s | tr "A-Z" "a-z")
+> > > -
+> > > -# first find cross binutils in path
+> > > -find-cross-ld = $(firstword $(wildcard $(patsubst %,%/$(1)-*$(system)*-ld,$(path))))
+> > > -# then check we have cross gcc too
+> > > -find-cross-gcc = $(firstword $(wildcard $(patsubst %ld,%gcc,$(call find-cross-ld,$(1)))))
+> > > -# finally strip off path + toolname so we get the prefix
+> > > -find-cross-prefix = $(subst gcc,,$(notdir $(call find-cross-gcc,$(1))))
+> > > -
+> > > -powerpc64_cross_prefix := $(call find-cross-prefix,powerpc64)
+> > > -powerpc_cross_prefix := $(call find-cross-prefix,powerpc)
+> > > -x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
+> > > -
+> > >  # tag our seabios builds
+> > >  SEABIOS_EXTRAVERSION="-prebuilt.qemu-project.org"
+> > >  
+> > > @@ -66,6 +49,13 @@ default:
+> > >  	@echo "  skiboot        -- update skiboot.lid"
+> > >  	@echo "  u-boot.e500    -- update u-boot.e500"
+> > >  
+> > > +SRC_PATH=..
+> > > +include $(SRC_PATH)/rules.mak
+> > > +
+> > > +powerpc64_cross_prefix := $(call find-cross-prefix,powerpc64)
+> > > +powerpc_cross_prefix := $(call find-cross-prefix,powerpc)
+> > > +x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
+> > > +
+> > >  bios: build-seabios-config-seabios-128k build-seabios-config-seabios-256k
+> > >  	cp seabios/builds/seabios-128k/bios.bin ../pc-bios/bios.bin
+> > >  	cp seabios/builds/seabios-256k/bios.bin ../pc-bios/bios-256k.bin
+> > > diff --git a/rules.mak b/rules.mak
+> > > index 6e943335f3..ef8adee3f8 100644
+> > > --- a/rules.mak
+> > > +++ b/rules.mak
+> > > @@ -62,6 +62,21 @@ expand-objs = $(strip $(sort $(filter %.o,$1)) \
+> > >                    $(foreach o,$(filter %.mo,$1),$($o-objs)) \
+> > >                    $(filter-out %.o %.mo,$1))
+> > >  
+> > > +# Cross compilation auto detection. Use find-cross-prefix to detect the
+> > > +# target archtecture's prefix, and then append it to the build tool or pass
+> > > +# it to CROSS_COMPILE directly. Here is one example:
+> > > +#      x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
+> > > +#      $(x86_64_cross_prefix)gcc -c test.c -o test.o
+> > > +#      make -C testdir CROSS_COMPILE=$(x86_64_cross_prefix)
+> > > +cross-search-path := $(subst :, ,$(PATH))
+> > > +cross-host-system := $(shell uname -s | tr "A-Z" "a-z")
+> > > +
+> > > +find-cross-ld = $(firstword $(wildcard $(patsubst \
+> > > +                    %,%/$(1)-*$(cross-host-system)*-ld,$(cross-search-path))))
+> > > +find-cross-gcc = $(firstword $(wildcard \
+> > > +                    $(patsubst %ld,%gcc,$(call find-cross-ld,$(1)))))
+> > > +find-cross-prefix = $(subst gcc,,$(notdir $(call find-cross-gcc,$(1))))
+> > > +
+> > >  %.o: %.c
+> > >  	$(call quiet-command,$(CC) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
+> > >  	       $(QEMU_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) \
+> > > 
+> > 
+> > With this patch, "make slof" fails:
+> > 
+> >   git submodule init roms/SLOF
+> >   git submodule update roms/SLOF
+> >   cd roms
+> >   make slof
+> > ...
+> > make[4]: Entering directory
+> > '/home/lvivier/Projects/qemu-upstream/roms/SLOF/lib/libnvram'
+> > 	[CC]	Makefile.dep
+> > powerpc64-linux-gnu-ar: nvram.o: No such file or directory
+> > make[4]: *** [Makefile:31: ../libnvram.a] Error 1
+> > 
+> > Perhaps rules.mak defines values inherited by SLOF makefiles that are
+> > incompatible?
+> 
+> OK, can we go back a step here; and split this series; it's trying to do
+> two entirely different things:
+> 
+>    a) Add an aarch64 migration test
+>    b) Refactor some of the build stuff
+> 
+> I'd like to see (a) posted separately, doing things approximately the same way that
+> the x86 ROM is doing it. 
 
-If you could avoid sending pull request emails for patchsets, I'd
-appreciate it -- they automatically go into my queue of
-things-to-process-for-master, and if I'm not paying enough attention
-they might actually get applied...
+IMO, the makefile is the right approach. I wouldn't like to see AArch64
+added with a script and then converted, along with x86, to a makefile at
+some later time (probably never).
 
-thanks
--- PMM
+We can drop the build refactoring, at the expense of adding redundant
+cross-compile support, but still introduce a makefile. Likely nobody will
+ever get around to the refactoring needed to remove that redundancy, but
+oh well...
+
+I think we try to fix the SLOF build issue first, though.
+
+Thanks,
+drew
