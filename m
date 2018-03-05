@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1espjc-000543-6f
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:01:00 -0500
+	(envelope-from <bounces@canonical.com>) id 1espjh-00054w-DW
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:01:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1espjZ-0003Nd-3P
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:00:56 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44208 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1espjY-0003NX-Uk
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:00:53 -0500
-Date: Mon, 5 Mar 2018 14:00:36 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180305140036.2f8c705a@redhat.com>
-In-Reply-To: <20180305132915.4dacc461@redhat.com>
-References: <20180215042900.16078-1-f4bug@amsat.org>
-	<20180215042900.16078-9-f4bug@amsat.org>
-	<20180305132915.4dacc461@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1espjX-0003NA-Vm
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:01:01 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39660)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1espjX-0003Mx-PI
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:00:51 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1espjW-0001Xm-0K
+	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 13:00:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D6C182E80CC
+	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 13:00:49 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 08/30] hw/i386: use the BYTE-based
- definitions
+Date: Mon, 05 Mar 2018 12:51:16 -0000
+From: Max Reitz <1753186@bugs.launchpad.net>
+Reply-To: Bug 1753186 <1753186@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152012131660.6957.17826936817192816521.malonedeb@gac.canonical.com>
+Message-Id: <152025427665.7678.10111816125434174751.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1753186] Re: qemu-nbd: always first snapshot
+ loaded from VDI images with snapshots
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +37,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Anthony Perard <anthony.perard@citrix.com>, "open
-	list:X86" <xen-devel@lists.xenproject.org>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-On Mon, 5 Mar 2018 13:29:15 +0100
-Igor Mammedov <imammedo@redhat.com> wrote:
+Hi,
 
-> On Thu, 15 Feb 2018 01:28:38 -0300
-> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
->=20
-> > It ease code review, unit is explicit.
-> >=20
-> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > --- =20
-> [...]
->=20
-> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > index deb440f286..9ccc6192b5 100644
-> > --- a/hw/i386/acpi-build.c
-> > +++ b/hw/i386/acpi-build.c
-> > @@ -2320,8 +2320,8 @@ build_tpm2(GArray *table_data, BIOSLinker *linker=
-, GArray *tcpalog)
-> >                   (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL,=
- NULL);
-> >  }
-> > =20
-> > -#define HOLE_640K_START  (640 * 1024)
-> > -#define HOLE_640K_END   (1024 * 1024)
-> > +#define HOLE_640K_START  (640 * K_BYTE)
-> > +#define HOLE_640K_END   (1024 * K_BYTE) =20
-> nit:
-> could be 1 * M_BYTE
->=20
-> [...]
->=20
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-taking it back
+As far as I can tell that's because only the first snapshot is actually sto=
+red in the VDI.
+(1) I've created a VM with /tmp/foo.vdi as storage
+(2) Executed "echo 'snapshot' > /dev/sda" in the guest
+(3) Took a snapshot
+(4) Executed "echo 'next snapshot' > /dev/sda" in the guest
+(5) Took a snapshot
+(6) Executed "echo 'active layer' > /dev/sda" in the guest
 
-While building it, I get:
+$ strings /tmp/foo.vdi
+<<< Oracle VM VirtualBox Disk Image >>>
+snapshot
+$ ls ~/VirtualBox\ VMs/foo/Snapshots
+{c9a75c86-6c0d-4aaa-9d24-cbd4456c74fb}.vdi  {ce16e224-fa61-4b26-a5c5-21d920=
+62ced7}.vdi
+$ strings ~/VirtualBox\ VMs/foo/Snapshots/\{ce16e224-fa61-4b26-a5c5-21d9206=
+2ced7\}.vdi =
 
-In file included from qemu/hw/acpi/ich9.c:38:0:
-qemu/include/hw/i386/ich9.h:25:28: error: =E2=80=98K_BYTE=E2=80=99 undeclar=
-ed here (not in a function)
- #define ICH9_CC_SIZE (16 * K_BYTE) /* Chipset configuration registers */
-                            ^
-qemu/include/hw/i386/ich9.h:56:25: note: in expansion of macro =E2=80=98ICH=
-9_CC_SIZE=E2=80=99
-     uint8_t chip_config[ICH9_CC_SIZE];
-                         ^
-make: *** [hw/acpi/ich9.o] Error 1
+<<< Oracle VM VirtualBox Disk Image >>>
+next snapshot
+$ strings ~/VirtualBox\ VMs/foo/Snapshots/\{c9a75c86-6c0d-4aaa-9d24-cbd4456=
+c74fb\}.vdi =
 
-=20
+<<< Oracle VM VirtualBox Disk Image >>>
+active layer
+
+So snapshots in VDI apparently are what qemu calls external snapshots, so t=
+hey work through backing file links -- and the original file is simply the =
+bottom-most backing file (that is, the oldest snapshot).  So the file you'd=
+ want to open is {c9a75c86-6c0d-4aaa-9d24-cbd4456c74fb}.vdi. =
+
+ However:
+$ qemu-img info \{ce16e224-fa61-4b26-a5c5-21d92062ced7\}.vdi
+qemu-img: Could not open '{ce16e224-fa61-4b26-a5c5-21d92062ced7}.vdi': unsu=
+pported VDI image (non-NULL link UUID)
+
+So qemu doesn't support this now.  The current behavior is more or less
+correct (because the file only contains the data of the oldest
+snapshot), supporting snapshots would be a feature request.
+
+Max
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1753186
+
+Title:
+  qemu-nbd: always first snapshot loaded from VDI images with snapshots
+
+Status in QEMU:
+  New
+
+Bug description:
+  When mounting a virtual box disk image of a VM with snapshots, always
+  the state of the first snapshot is shown.
+
+  How to reproduce:
+  1. Create a new VirtualBox VM or use an existing one, while choosing VDI =
+as the disk image format.
+  2. Create a snapshot of the VM.
+  3. Modify the file system from within the VM enough that differences to t=
+he snapshotted version are apparent.
+  4. Create another snapshot.
+  5. Shut down the VM.
+  6. Mount the partition from the disk image with `qemu-nbd -c /dev/nbd0 /p=
+ath/to/disk.vdi; mount /dev/nbd0pX /mnt`
+
+  Expected result: The mounted disk image shall represent the latest state =
+of the VM
+  Actual result: The mounted disk image represents the VM state at the firs=
+t snapshot
+
+  version information: qemu-nbd-2.11.1(openSUSE Tumbleweed)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1753186/+subscriptions
