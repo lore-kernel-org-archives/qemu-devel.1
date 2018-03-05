@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1esn9w-0007uf-NG
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:15:58 -0500
+	(envelope-from <cohuck@redhat.com>) id 1esnG7-0001Wb-Ez
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:22:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1esn9t-0001YE-4m
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:15:56 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34606 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1esn9s-0001Xw-Vy
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:15:53 -0500
-References: <20171026064635.7179-1-aik@ozlabs.ru>
-	<13277057-669f-cd77-95f1-f0e54f7ae222@redhat.com>
-	<7e694888-43ce-6653-92a0-c0b4c235d4ca@ozlabs.ru>
-	<e6a81bdc-a961-d55f-85c4-55149c878988@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <5ed185e2-c53a-0f82-a5f9-08e4918ad1b0@redhat.com>
-Date: Mon, 5 Mar 2018 11:15:33 +0100
+	(envelope-from <cohuck@redhat.com>) id 1esnG4-0005YK-B1
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:22:19 -0500
+Date: Mon, 5 Mar 2018 11:21:56 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180305112156.2df08098.cohuck@redhat.com>
+In-Reply-To: <7f36d2d3-df76-9627-8976-ff06a6729ef1@redhat.com>
+References: <1519731154-3127-1-git-send-email-thuth@redhat.com>
+	<3e8dd204-a07d-00bd-84f3-813dc35c18cd@redhat.com>
+	<7f36d2d3-df76-9627-8976-ff06a6729ef1@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <e6a81bdc-a961-d55f-85c4-55149c878988@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu] fdc: Exit if ISA controller does not
- support DMA
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] hw/s390x: Add the possibility
+ to specify the netboot image on the command line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,97 +25,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Markus Armbruster <armbru@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
 
-On 08.12.2017 22:29, John Snow wrote:
-> 
-> On 11/21/2017 09:48 PM, Alexey Kardashevskiy wrote:
->> On 07/11/17 11:58, John Snow wrote:
->>>
->>>
->>> On 10/26/2017 02:46 AM, Alexey Kardashevskiy wrote:
->>>> A "powernv" machine type defines an ISA bus but it does not add any DMA
->>>> controller to it so it is possible to hit assert(fdctrl->dma) by
->>>> adding "-machine powernv -device isa-fdc".
->>>>
->>>> This replaces assert() with an error message.
->>>>
->>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>>> ---
-[...]
->>>> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
->>>> index 67f78ac702..ed8b367572 100644
->>>> --- a/hw/block/fdc.c
->>>> +++ b/hw/block/fdc.c
->>>> @@ -2700,7 +2700,10 @@ static void isabus_fdc_realize(DeviceState *dev, Error **errp)
->>>>      fdctrl->dma_chann = isa->dma;
->>>>      if (fdctrl->dma_chann != -1) {
->>>>          fdctrl->dma = isa_get_dma(isa_bus_from_device(isadev), isa->dma);
->>>> -        assert(fdctrl->dma);
->>>> +        if (!fdctrl->dma) {
->>>> +            error_setg(errp, "ISA controller does not support DMA, exiting");
->>>> +            return;
->>>> +        }
->>>>      }
->>>>  
->>>>      qdev_set_legacy_instance_id(dev, isa->iobase, 2);
->>>>
->>>
->>> I've been MIA for a little while, so I'm out of the loop -- but I am not
->>> sure this is entirely the right way to fix this problem. I think it is
->>> more the case that certain boards should not be able to ask for certain
->>> types of devices, and we should prohibit e.g. powernv from being able to
->>> ask for an ISA floppy disk controller.
->>>
->>> (It doesn't seem to have an ISA DMA controller by default, but I have no
->>> idea if that means it can't EVER have one...)
->>>
->>> Papering over this by making it a soft error when we fail to execute
->>> isa_get_dma and then assuming in retrospect it's because the machine
->>> type we're on cannot have an ISA DMA controller seems a little
->>> wrong-headed. It also leaves side-effects from isa_register_portio_list
->>> and isa_init_irq, so we can't just bail here -- it's only marginally
->>> better than the assert() it's doing.
->>>
->>> That said, I am not really sure what the right thing to do is ... I
->>> suspect the "right thing" is to express the dependency that isa-fdc
->>> requires an ISA DMA controller -- and maybe that check happens here when
->>> isa_get_dma fails and we have to unwind the realize function, but we
->>> need to do it gracefully.
->>>
->>> Give me a day to think about it, but I do want to make sure this is in
->>> the next release.
->>
->> The day has passed, any news? :)
-> 
-> *cough* It turns out that understanding the intricacies of FDC and ISA
-> is nobody's favorite thing to do.
-> 
-> OK, so ehabkost pointed me to this:
-> 
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg496460.html
-> 
-> Where we declare that DMA devices generally can't be created by the user
-> for the inverse of the reason we're seeing here: these devices need to
-> be created precisely once: not zero times, not twice, exactly once.
-> 
-> So we made the ISA DMA devices themselves not user-creatable, so you are
-> indeed correct here that the absence of fdctrl->dma does more or less
-> mean that the current configuration "doesn't support DMA." ... but maybe
-> this won't always be true, and maybe some devices (TYPE_I82374?) are
-> user creatable, so let's make a "softer" error message:
-> 
-> "No ISA DMA device present, can't create ISA FDC device."
-> 
-> Then, on the other end, we need to unwind realize() gracefully, maybe we
-> can just shuffle up isa_get_dma() earlier so we don't have to unwind
-> anything if it comes back empty.
-> 
-> Then I'll take the patch, because fixing this more properly I think will
-> take more time or effort than I have to spend on the FDC device.
+On Wed, 28 Feb 2018 13:24:35 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-The problem still persists ... was there ever a follow-up to this patch
-/ discussion?
+> On 28.02.2018 12:02, David Hildenbrand wrote:
+> > On 27.02.2018 12:32, Thomas Huth wrote:  
+> >> The file name of the netboot binary is currently hard-coded to
+> >> "s390-netboot.img", without a possibility for the user to select
+> >> an alternative firmware image here. That's unfortunate, especially
+> >> since the basics are already there: The filename is a property of
+> >> the s390-ipl device. So we just have to add a check whether the user
+> >> already provided the property and only set the default if the string
+> >> is still empty. Now it is possible to select a different firmware
+> >> image with "-global s390-ipl.netboot_fw=/path/to/s390-netboot.img".
+> >>
+> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> >> ---
+> >>  hw/s390x/s390-virtio-ccw.c | 4 +++-
+> >>  1 file changed, 3 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> >> index 4abbe89..7b3fb5f 100644
+> >> --- a/hw/s390x/s390-virtio-ccw.c
+> >> +++ b/hw/s390x/s390-virtio-ccw.c
+> >> @@ -254,8 +254,10 @@ static void s390_init_ipl_dev(const char *kernel_filename,
+> >>      }
+> >>      qdev_prop_set_string(dev, "cmdline", kernel_cmdline);
+> >>      qdev_prop_set_string(dev, "firmware", firmware);
+> >> -    qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
+> >>      qdev_prop_set_bit(dev, "enforce_bios", enforce_bios);
+> >> +    if (!strlen(object_property_get_str(new, "netboot_fw", &error_abort))) {  
+> > 
+> > Isn't it the case that object_property_get_str() can return also NULL?
+> > 
+> > (looking at s390_ipl_set_loadparm())  
+> 
+> It can return NULL in case of errors (e.g. the property is not a string
+> or not available at all). In this case, we know that the property is a
+> string and that it is available, so IMHO no need to check for NULL here.
+> 
+> Not sure why s390_ipl_set_loadparm() explicitely checks for this ...
+> maybe this was originally required to support the old s390-virtio
+> (non-ccw) machine, too?
 
- Thomas
+Probably, IIRC the loadparm patches are quite old. Potential cleanup?
