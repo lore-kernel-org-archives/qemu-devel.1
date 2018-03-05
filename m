@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49556)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esxWg-0004cT-Kw
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:20:08 -0500
+	id 1esxWg-0004cS-Ki
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:20:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esxWd-0001j0-DM
+	id 1esxWf-0001kH-AM
 	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:20:06 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:38776)
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:54408)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esxWd-0001ie-3s
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:20:03 -0500
-Received: by mail-wm0-x242.google.com with SMTP id z9so18275321wmb.3
-	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 13:20:03 -0800 (PST)
+	id 1esxWf-0001jT-06
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:20:05 -0500
+Received: by mail-wm0-x243.google.com with SMTP id z81so18730611wmb.4
+	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 13:20:04 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon,  5 Mar 2018 18:19:21 -0300
-Message-Id: <20180305211928.466-16-f4bug@amsat.org>
+Date: Mon,  5 Mar 2018 18:19:22 -0300
+Message-Id: <20180305211928.466-17-f4bug@amsat.org>
 In-Reply-To: <20180305211928.466-1-f4bug@amsat.org>
 References: <20180305211928.466-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH v2 15/22] hw/isa/superio: Factor out the
- FDC37M817 Super I/O from mips_malta.c
+Subject: [Qemu-devel] [RFC PATCH v2 16/22] hw/mips/mips_fulong2e: Factor out
+ vt82c686b_southbridge_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,144 +39,133 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/isa/superio.h |  2 ++
- hw/isa/isa-superio.c     | 20 ++++++++++++++++++++
- hw/mips/mips_malta.c     | 35 ++++++++++-------------------------
- 3 files changed, 32 insertions(+), 25 deletions(-)
+ hw/mips/mips_fulong2e.c | 83 ++++++++++++++++++++++++-------------------------
+ 1 file changed, 41 insertions(+), 42 deletions(-)
 
-diff --git a/include/hw/isa/superio.h b/include/hw/isa/superio.h
-index 3dd5448f8c..b47aac3cf8 100644
---- a/include/hw/isa/superio.h
-+++ b/include/hw/isa/superio.h
-@@ -54,4 +54,6 @@ typedef struct ISASuperIOClass {
-     ISASuperIOFuncs ide;
- } ISASuperIOClass;
+diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+index 9339e02120..ca1f76a724 100644
+--- a/hw/mips/mips_fulong2e.c
++++ b/hw/mips/mips_fulong2e.c
+@@ -78,8 +78,6 @@
+ #define FULONG2E_ATI_SLOT        6
+ #define FULONG2E_RTL8139_SLOT    7
  
-+#define TYPE_FDC37M81X_SUPERIO  "fdc37m81x-superio"
-+
- #endif /* HW_ISA_SUPERIO_H */
-diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
-index 88d254a602..f1f699fc2f 100644
---- a/hw/isa/isa-superio.c
-+++ b/hw/isa/isa-superio.c
-@@ -182,9 +182,29 @@ static const TypeInfo isa_superio_type_info = {
-     .class_init = isa_superio_class_init,
+-static ISADevice *pit;
+-
+ static struct _loaderparams {
+     int ram_size;
+     const char *kernel_filename;
+@@ -232,11 +230,44 @@ static const uint8_t eeprom_spd[0x80] = {
+     0x20,0x30,0x20
  };
  
-+/* SMS FDC37M817 Super I/O */
-+static void fdc37m81x_class_init(ObjectClass *klass, void *data)
-+{
-+    ISASuperIOClass *sc = ISA_SUPERIO_CLASS(klass);
-+
-+    sc->serial.count = 2; /* NS16C550A */
-+    sc->parallel.count = 1;
-+    sc->floppy.count = 1; /* SMSC 82077AA Compatible */
-+    sc->ide.count = 0;
-+}
-+
-+static const TypeInfo fdc37m81x_type_info = {
-+    .name          = TYPE_FDC37M81X_SUPERIO,
-+    .parent        = TYPE_ISA_SUPERIO,
-+    .instance_size = sizeof(ISASuperIODevice),
-+    .class_size    = sizeof(ISASuperIOClass),
-+    .class_init    = fdc37m81x_class_init,
-+};
-+
- static void isa_superio_register_types(void)
+-/* Audio support */
+-static void audio_init (PCIBus *pci_bus)
++static void vt82c686b_southbridge_init(PCIBus *pci_bus, int slot, qemu_irq intc,
++                                       I2CBus **i2c_bus, ISABus **p_isa_bus)
  {
-     type_register_static(&isa_superio_type_info);
-+    type_register_static(&fdc37m81x_type_info);
+-    vt82c686b_ac97_init(pci_bus, PCI_DEVFN(FULONG2E_VIA_SLOT, 5));
+-    vt82c686b_mc97_init(pci_bus, PCI_DEVFN(FULONG2E_VIA_SLOT, 6));
++    qemu_irq *i8259;
++    ISABus *isa_bus;
++    DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
++
++    isa_bus = vt82c686b_init(pci_bus, PCI_DEVFN(slot, 0));
++    if (!isa_bus) {
++        fprintf(stderr, "vt82c686b_init error\n");
++        exit(1);
++    }
++    *p_isa_bus = isa_bus;
++    /* Interrupt controller */
++    /* The 8259 -> IP5  */
++    i8259 = i8259_init(isa_bus, intc);
++    isa_bus_irqs(isa_bus, i8259);
++    /* init other devices */
++    i8254_pit_init(isa_bus, 0x40, 0, NULL);
++    i8257_dma_init(isa_bus, 0);
++
++    ide_drive_get(hd, ARRAY_SIZE(hd));
++    vt82c686b_ide_init(pci_bus, hd, PCI_DEVFN(slot, 1));
++
++    pci_create_simple(pci_bus, PCI_DEVFN(slot, 2), "vt82c686b-usb-uhci");
++    pci_create_simple(pci_bus, PCI_DEVFN(slot, 3), "vt82c686b-usb-uhci");
++
++    *i2c_bus = vt82c686b_pm_init(pci_bus, PCI_DEVFN(slot, 4), 0xeee1, NULL);
++
++    /* Audio support */
++    vt82c686b_ac97_init(pci_bus, PCI_DEVFN(slot, 5));
++    vt82c686b_mc97_init(pci_bus, PCI_DEVFN(slot, 6));
++
++    /* Super I/O */
++    isa_create_simple(isa_bus, TYPE_I8042);
++
++    serial_hds_isa_init(isa_bus, 0, MAX_SERIAL_PORTS);
++    parallel_hds_isa_init(isa_bus, 1);
  }
  
- type_init(isa_superio_register_types)
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index 9e0724ca5a..f6513a4fd5 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -27,14 +27,12 @@
- #include "cpu.h"
- #include "hw/hw.h"
- #include "hw/i386/pc.h"
-+#include "hw/isa/superio.h"
- #include "hw/dma/i8257.h"
- #include "hw/char/serial.h"
--#include "hw/char/parallel.h"
--#include "hw/block/fdc.h"
- #include "net/net.h"
- #include "hw/boards.h"
- #include "hw/i2c/smbus.h"
--#include "sysemu/block-backend.h"
- #include "hw/block/flash.h"
- #include "hw/mips/mips.h"
- #include "hw/mips/cpudevs.h"
-@@ -47,7 +45,6 @@
- #include "hw/loader.h"
- #include "elf.h"
- #include "hw/timer/mc146818rtc.h"
--#include "hw/input/i8042.h"
- #include "hw/timer/i8254.h"
- #include "sysemu/blockdev.h"
- #include "exec/address-spaces.h"
-@@ -1005,10 +1002,8 @@ void mips_malta_init(MachineState *machine)
-     qemu_irq cbus_irq, i8259_irq;
-     int piix4_devfn;
+ /* Network support */
+@@ -269,11 +300,9 @@ static void mips_fulong2e_init(MachineState *machine)
+     MemoryRegion *bios = g_new(MemoryRegion, 1);
+     long bios_size;
+     int64_t kernel_entry;
+-    qemu_irq *i8259;
+     PCIBus *pci_bus;
+     ISABus *isa_bus;
      I2CBus *smbus;
--    int i;
-     DriveInfo *dinfo;
-     DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
--    DriveInfo *fd[MAX_FD];
-     int fl_idx = 0;
-     int fl_sectors = bios_size >> 16;
-     int be;
-@@ -1023,15 +1018,6 @@ void mips_malta_init(MachineState *machine)
+-    DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
+     MIPSCPU *cpu;
+     CPUMIPSState *env;
  
-     qdev_init_nofail(dev);
+@@ -335,46 +364,16 @@ static void mips_fulong2e_init(MachineState *machine)
+     /* North bridge, Bonito --> IP2 */
+     pci_bus = bonito_init((qemu_irq *)&(env->irq[2]));
  
--    /* Make sure the first 3 serial ports are associated with a device. */
--    for(i = 0; i < 3; i++) {
--        if (!serial_hds[i]) {
--            char label[32];
--            snprintf(label, sizeof(label), "serial%d", i);
--            serial_hds[i] = qemu_chr_new(label, "null");
--        }
+-    /* South bridge */
+-    ide_drive_get(hd, ARRAY_SIZE(hd));
+-
+-    isa_bus = vt82c686b_init(pci_bus, PCI_DEVFN(FULONG2E_VIA_SLOT, 0));
+-    if (!isa_bus) {
+-        error_report("vt82c686b_init error");
+-        exit(1);
 -    }
 -
-     /* create CPU */
-     mips_create_cpu(s, machine->cpu_type, &cbus_irq, &i8259_irq);
+-    /* Interrupt controller */
+-    /* The 8259 -> IP5  */
+-    i8259 = i8259_init(isa_bus, env->irq[5]);
+-    isa_bus_irqs(isa_bus, i8259);
+-
+-    vt82c686b_ide_init(pci_bus, hd, PCI_DEVFN(FULONG2E_VIA_SLOT, 1));
+-    pci_create_simple(pci_bus, PCI_DEVFN(FULONG2E_VIA_SLOT, 2),
+-                      "vt82c686b-usb-uhci");
+-    pci_create_simple(pci_bus, PCI_DEVFN(FULONG2E_VIA_SLOT, 3),
+-                      "vt82c686b-usb-uhci");
++    /* South bridge -> IP5 */
++    vt82c686b_southbridge_init(pci_bus, FULONG2E_VIA_SLOT, env->irq[5],
++                               &smbus, &isa_bus);
  
-@@ -1067,7 +1053,14 @@ void mips_malta_init(MachineState *machine)
- #else
-     be = 0;
- #endif
-+
-     /* FPGA */
-+
-+    /* Make sure the second serial port is associated with a device. */
-+    if (!serial_hds[2]) {
-+        serial_hds[2] = qemu_chr_new("fpga-uart", "null");
-+    }
-+
-     /* The CBUS UART is attached to the MIPS CPU INT2 pin, ie interrupt 4 */
-     malta_fpga_init(system_memory, FPGA_ADDRESS, cbus_irq, serial_hds[2]);
+-    smbus = vt82c686b_pm_init(pci_bus, PCI_DEVFN(FULONG2E_VIA_SLOT, 4),
+-                              0xeee1, NULL);
+     /* TODO: Populate SPD eeprom data.  */
+     smbus_eeprom_init(smbus, 1, eeprom_spd, sizeof(eeprom_spd));
  
-@@ -1214,16 +1207,8 @@ void mips_malta_init(MachineState *machine)
-     smbus_eeprom_init(smbus, 8, smbus_eeprom_buf, smbus_eeprom_size);
-     g_free(smbus_eeprom_buf);
- 
+-    /* init other devices */
+-    pit = i8254_pit_init(isa_bus, 0x40, 0, NULL);
+-    i8257_dma_init(isa_bus, 0);
+-
 -    /* Super I/O */
 -    isa_create_simple(isa_bus, TYPE_I8042);
 -
--    serial_hds_isa_init(isa_bus, 0, 2);
+     mc146818_rtc_init(isa_bus, 2000, NULL);
+ 
+-    serial_hds_isa_init(isa_bus, 0, MAX_SERIAL_PORTS);
 -    parallel_hds_isa_init(isa_bus, 1);
 -
--    for(i = 0; i < MAX_FD; i++) {
--        fd[i] = drive_get(IF_FLOPPY, 0, i);
--    }
--    fdctrl_init_isa(isa_bus, fd);
-+    /* Super I/O: SMS FDC37M817 */
-+    isa_create_simple(isa_bus, TYPE_FDC37M81X_SUPERIO);
- 
-     /* Network card */
+-    /* Sound card */
+-    audio_init(pci_bus);
+-    /* Network card */
++    /* Network card: RTL8139D */
      network_init(pci_bus);
+ }
+ 
 -- 
 2.16.2
