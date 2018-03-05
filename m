@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1esnHc-0002YH-C5
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:23:53 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1esnIp-0003Fy-Jb
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:25:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1esnHZ-0007ZJ-7L
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:23:52 -0500
-Date: Mon, 5 Mar 2018 11:23:44 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180305112344.42000020.cohuck@redhat.com>
-In-Reply-To: <1519731154-3127-1-git-send-email-thuth@redhat.com>
-References: <1519731154-3127-1-git-send-email-thuth@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1esnIk-0008Ci-Vv
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:25:07 -0500
+Received: from mail-oi0-x232.google.com ([2607:f8b0:4003:c06::232]:41687)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1esnIk-0008CK-Pt
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:25:02 -0500
+Received: by mail-oi0-x232.google.com with SMTP id g5so11625919oiy.8
+	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 02:25:02 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/s390x: Add the possibility to specify
- the netboot image on the command line
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 5 Mar 2018 10:24:41 +0000
+Message-ID: <CAFEAcA8Wz4q=+HDpSG_pFHB7xKMez6hCPFodoOxoTgr1FOy5nA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] QEMU fails to configure on non-x86 hosts with recent
+ SDL2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +27,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>
+To: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Tue, 27 Feb 2018 12:32:34 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+On non-x86 hosts with SDL2 2.0.8, configure fails:
 
-> The file name of the netboot binary is currently hard-coded to
-> "s390-netboot.img", without a possibility for the user to select
-> an alternative firmware image here. That's unfortunate, especially
-> since the basics are already there: The filename is a property of
-> the s390-ipl device. So we just have to add a check whether the user
-> already provided the property and only set the default if the string
-> is still empty. Now it is possible to select a different firmware
-> image with "-global s390-ipl.netboot_fw=/path/to/s390-netboot.img".
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hw/s390x/s390-virtio-ccw.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 4abbe89..7b3fb5f 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -254,8 +254,10 @@ static void s390_init_ipl_dev(const char *kernel_filename,
->      }
->      qdev_prop_set_string(dev, "cmdline", kernel_cmdline);
->      qdev_prop_set_string(dev, "firmware", firmware);
-> -    qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
->      qdev_prop_set_bit(dev, "enforce_bios", enforce_bios);
-> +    if (!strlen(object_property_get_str(new, "netboot_fw", &error_abort))) {
-> +        qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
-> +    }
->      object_property_add_child(qdev_get_machine(), TYPE_S390_IPL,
->                                new, NULL);
->      object_unref(new);
 
-So, any objections to me merging this? I think this makes sense for
-Thomas' use case.
+config-host.mak is out-of-date, running configure
+
+ERROR: configure test passed without -Werror but failed with -Werror.
+       This is probably a bug in the configure script. The failing command
+       will be at the bottom of config.log.
+       You can run configure with --disable-werror to bypass this check.
+
+The relevant configure test is the SDL one:
+#include <SDL.h>
+#undef main /* We don't want SDL to override our main() */
+int main( void ) { return SDL_Init (SDL_INIT_VIDEO); }
+
+and it fails because on non-x86 platforms one of the SDL headers
+triggers a -Wundef warning:
+
+cc -Wundef -o zz9.o -I /usr/include/SDL2 -c qemu-conf.c
+In file included from /usr/include/SDL2/SDL.h:38:0,
+                 from qemu-conf.c:1:
+/usr/include/SDL2/SDL_cpuinfo.h:63:5: warning: "HAVE_IMMINTRIN_H" is
+not defined, evaluates to 0 [-Wundef]
+ #if HAVE_IMMINTRIN_H && !defined(SDL_DISABLE_IMMINTRIN_H)
+     ^~~~~~~~~~~~~~~~
+
+I've reported the bug to debian:
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=892087
+(who will probably forward it upstream), but since this version
+of SDL is already released, I guess we need to work around it it
+QEMU...
+
+Any suggestions for how to do a workaround?
+
+thanks
+-- PMM
