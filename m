@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1esjqZ-0002jd-2B
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:43:44 -0500
+	(envelope-from <peterx@redhat.com>) id 1esjqc-0002l7-BQ
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:43:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1esjqU-0005oP-BO
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:43:43 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36510 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1esjqb-0005va-7k
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:43:46 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35398 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1esjqU-0005nW-5u
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:43:38 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1esjqb-0005v2-1p
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:43:45 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E6CE0404084B
-	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 06:43:33 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8EC928D6C7
+	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 06:43:44 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Mon,  5 Mar 2018 14:43:18 +0800
-Message-Id: <20180305064324.9238-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 0/6] qio: general non-default GMainContext
- support
+Date: Mon,  5 Mar 2018 14:43:21 +0800
+Message-Id: <20180305064324.9238-4-peterx@redhat.com>
+In-Reply-To: <20180305064324.9238-1-peterx@redhat.com>
+References: <20180305064324.9238-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 3/6] qio: store gsources for net listeners
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,68 +32,199 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, peterx@redhat.com, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-V1: http://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg06972.html
-V2: http://lists.gnu.org/archive/html/qemu-devel/2018-03/msg00016.html
+Originally we were storing the GSources tag IDs.  That'll be not enough
+if we are going to support non-default gcontext for QIO code.  Switch to
+GSources without changing anything real.  Now we still always pass in
+NULL, which means the default gcontext.
 
->From this version, I'll split the old series into two: one QIO series
-and one CHARDEV series.  This is the QIO part.
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ include/io/net-listener.h | 22 ++++++++++++++++--
+ io/net-listener.c         | 58 +++++++++++++++++++++++++++++------------------
+ 2 files changed, 56 insertions(+), 24 deletions(-)
 
-Hopefully I have addressed every comments in v2.  Please shoot if I
-missed any of them.  Thanks,
-
-v3:
-- add r-bs
-- move the migration patch out of the series [Dan]
-- in comments, mention "%NULL" case for contexts [Paolo]
-- do similar thing to listen_async and dgram_async to allow context
-  parameter [Dan]
-- cache TCPChardevTelnetInit properly in telnet patch, and fixes
-  around that new change in the patch [Paolo]
-- drop patch 5 [Dan]
-- drop the helper tcp_chr_net_listener_setup() [Dan]
-
-v2:
-- collect r-bs
-- qio_channel_add_watch_full() should still return the same thing as
-  the old one, and introduced qio_channel_add_watch_full() to return a
-  GSource pointer. [Dan]
-- Fix commit message on RDMA. It's using QIO, but still, I am not
-  touching it.  [Dan]
-- use qio_net_listener_set_client_func_full() directly, and avoid
-  introducing new API. [Dan]
-
-Please review.  Thanks.
-
-Peter Xu (6):
-  qio: rename qio_task_thread_result
-  qio: introduce qio_channel_add_watch_{full|source}
-  qio: store gsources for net listeners
-  qio: non-default context for threaded qtask
-  qio: non-default context for async conn
-  qio: non-default context for TLS handshake
-
- chardev/char-socket.c          |  5 ++--
- include/io/channel-socket.h    | 15 ++++++++---
- include/io/channel-tls.h       |  5 +++-
- include/io/channel.h           | 44 ++++++++++++++++++++++++++++++++
- include/io/net-listener.h      | 22 ++++++++++++++--
- include/io/task.h              |  7 +++--
- io/channel-socket.c            | 18 ++++++++-----
- io/channel-tls.c               | 45 ++++++++++++++++++++++++--------
- io/channel.c                   | 40 ++++++++++++++++++++++++-----
- io/dns-resolver.c              |  3 ++-
- io/net-listener.c              | 58 ++++++++++++++++++++++++++----------------
- io/task.c                      | 22 +++++++++++++---
- migration/socket.c             |  3 ++-
- migration/tls.c                |  2 ++
- nbd/client.c                   |  1 +
- nbd/server.c                   |  1 +
- tests/test-io-channel-socket.c |  4 +--
- tests/test-io-channel-tls.c    |  2 ++
- tests/test-io-task.c           |  2 ++
- ui/vnc-auth-vencrypt.c         |  1 +
- ui/vnc-ws.c                    |  1 +
- 21 files changed, 239 insertions(+), 62 deletions(-)
-
+diff --git a/include/io/net-listener.h b/include/io/net-listener.h
+index 56d6da7a76..8081ac58a2 100644
+--- a/include/io/net-listener.h
++++ b/include/io/net-listener.h
+@@ -53,7 +53,7 @@ struct QIONetListener {
+ 
+     char *name;
+     QIOChannelSocket **sioc;
+-    gulong *io_tag;
++    GSource **io_source;
+     size_t nsioc;
+ 
+     bool connected;
+@@ -120,17 +120,35 @@ void qio_net_listener_add(QIONetListener *listener,
+                           QIOChannelSocket *sioc);
+ 
+ /**
+- * qio_net_listener_set_client_func:
++ * qio_net_listener_set_client_func_full:
+  * @listener: the network listener object
+  * @func: the callback function
+  * @data: opaque data to pass to @func
+  * @notify: callback to free @data
++ * @context: the context that the sources will be bound to.  If %NULL,
++ *           the default context will be used.
+  *
+  * Register @func to be invoked whenever a new client
+  * connects to the listener. @func will be invoked
+  * passing in the QIOChannelSocket instance for the
+  * client.
+  */
++void qio_net_listener_set_client_func_full(QIONetListener *listener,
++                                           QIONetListenerClientFunc func,
++                                           gpointer data,
++                                           GDestroyNotify notify,
++                                           GMainContext *context);
++
++/**
++ * qio_net_listener_set_client_func:
++ * @listener: the network listener object
++ * @func: the callback function
++ * @data: opaque data to pass to @func
++ * @notify: callback to free @data
++ *
++ * Wrapper of qio_net_listener_set_client_func_full(), only that the
++ * sources will always be bound to default main context.
++ */
+ void qio_net_listener_set_client_func(QIONetListener *listener,
+                                       QIONetListenerClientFunc func,
+                                       gpointer data,
+diff --git a/io/net-listener.c b/io/net-listener.c
+index de38dfae99..555e8acaa4 100644
+--- a/io/net-listener.c
++++ b/io/net-listener.c
+@@ -118,29 +118,32 @@ void qio_net_listener_add(QIONetListener *listener,
+ 
+     listener->sioc = g_renew(QIOChannelSocket *, listener->sioc,
+                              listener->nsioc + 1);
+-    listener->io_tag = g_renew(gulong, listener->io_tag, listener->nsioc + 1);
++    listener->io_source = g_renew(typeof(listener->io_source[0]),
++                                  listener->io_source,
++                                  listener->nsioc + 1);
+     listener->sioc[listener->nsioc] = sioc;
+-    listener->io_tag[listener->nsioc] = 0;
++    listener->io_source[listener->nsioc] = NULL;
+ 
+     object_ref(OBJECT(sioc));
+     listener->connected = true;
+ 
+     if (listener->io_func != NULL) {
+         object_ref(OBJECT(listener));
+-        listener->io_tag[listener->nsioc] = qio_channel_add_watch(
++        listener->io_source[listener->nsioc] = qio_channel_add_watch_source(
+             QIO_CHANNEL(listener->sioc[listener->nsioc]), G_IO_IN,
+             qio_net_listener_channel_func,
+-            listener, (GDestroyNotify)object_unref);
++            listener, (GDestroyNotify)object_unref, NULL);
+     }
+ 
+     listener->nsioc++;
+ }
+ 
+ 
+-void qio_net_listener_set_client_func(QIONetListener *listener,
+-                                      QIONetListenerClientFunc func,
+-                                      gpointer data,
+-                                      GDestroyNotify notify)
++void qio_net_listener_set_client_func_full(QIONetListener *listener,
++                                           QIONetListenerClientFunc func,
++                                           gpointer data,
++                                           GDestroyNotify notify,
++                                           GMainContext *context)
+ {
+     size_t i;
+ 
+@@ -152,23 +155,32 @@ void qio_net_listener_set_client_func(QIONetListener *listener,
+     listener->io_notify = notify;
+ 
+     for (i = 0; i < listener->nsioc; i++) {
+-        if (listener->io_tag[i]) {
+-            g_source_remove(listener->io_tag[i]);
+-            listener->io_tag[i] = 0;
++        if (listener->io_source[i]) {
++            g_source_destroy(listener->io_source[i]);
++            g_source_unref(listener->io_source[i]);
++            listener->io_source[i] = NULL;
+         }
+     }
+ 
+     if (listener->io_func != NULL) {
+         for (i = 0; i < listener->nsioc; i++) {
+             object_ref(OBJECT(listener));
+-            listener->io_tag[i] = qio_channel_add_watch(
++            listener->io_source[i] = qio_channel_add_watch_source(
+                 QIO_CHANNEL(listener->sioc[i]), G_IO_IN,
+                 qio_net_listener_channel_func,
+-                listener, (GDestroyNotify)object_unref);
++                listener, (GDestroyNotify)object_unref, context);
+         }
+     }
+ }
+ 
++void qio_net_listener_set_client_func(QIONetListener *listener,
++                                      QIONetListenerClientFunc func,
++                                      gpointer data,
++                                      GDestroyNotify notify)
++{
++    qio_net_listener_set_client_func_full(listener, func, data,
++                                          notify, NULL);
++}
+ 
+ struct QIONetListenerClientWaitData {
+     QIOChannelSocket *sioc;
+@@ -211,9 +223,10 @@ QIOChannelSocket *qio_net_listener_wait_client(QIONetListener *listener)
+     size_t i;
+ 
+     for (i = 0; i < listener->nsioc; i++) {
+-        if (listener->io_tag[i]) {
+-            g_source_remove(listener->io_tag[i]);
+-            listener->io_tag[i] = 0;
++        if (listener->io_source[i]) {
++            g_source_destroy(listener->io_source[i]);
++            g_source_unref(listener->io_source[i]);
++            listener->io_source[i] = NULL;
+         }
+     }
+ 
+@@ -241,10 +254,10 @@ QIOChannelSocket *qio_net_listener_wait_client(QIONetListener *listener)
+     if (listener->io_func != NULL) {
+         for (i = 0; i < listener->nsioc; i++) {
+             object_ref(OBJECT(listener));
+-            listener->io_tag[i] = qio_channel_add_watch(
++            listener->io_source[i] = qio_channel_add_watch_source(
+                 QIO_CHANNEL(listener->sioc[i]), G_IO_IN,
+                 qio_net_listener_channel_func,
+-                listener, (GDestroyNotify)object_unref);
++                listener, (GDestroyNotify)object_unref, NULL);
+         }
+     }
+ 
+@@ -260,9 +273,10 @@ void qio_net_listener_disconnect(QIONetListener *listener)
+     }
+ 
+     for (i = 0; i < listener->nsioc; i++) {
+-        if (listener->io_tag[i]) {
+-            g_source_remove(listener->io_tag[i]);
+-            listener->io_tag[i] = 0;
++        if (listener->io_source[i]) {
++            g_source_destroy(listener->io_source[i]);
++            g_source_unref(listener->io_source[i]);
++            listener->io_source[i] = NULL;
+         }
+         qio_channel_close(QIO_CHANNEL(listener->sioc[i]), NULL);
+     }
+@@ -285,7 +299,7 @@ static void qio_net_listener_finalize(Object *obj)
+     for (i = 0; i < listener->nsioc; i++) {
+         object_unref(OBJECT(listener->sioc[i]));
+     }
+-    g_free(listener->io_tag);
++    g_free(listener->io_source);
+     g_free(listener->sioc);
+     g_free(listener->name);
+ }
 -- 
 2.14.3
