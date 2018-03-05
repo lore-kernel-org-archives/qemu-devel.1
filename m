@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1esmTi-0003Ld-OV
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 04:32:19 -0500
+	(envelope-from <stefanha@redhat.com>) id 1esmba-0005bl-04
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 04:40:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1esmTd-0001Tk-2N
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 04:32:18 -0500
-Received: from mail-qk0-f194.google.com ([209.85.220.194]:46372)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1esmTc-0001TP-U4
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 04:32:12 -0500
-Received: by mail-qk0-f194.google.com with SMTP id 130so19753737qkd.13
-	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 01:32:12 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1520200587-14681-1-git-send-email-stefanb@linux.vnet.ibm.com>
-References: <1520200587-14681-1-git-send-email-stefanb@linux.vnet.ibm.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Mon, 5 Mar 2018 10:32:11 +0100
-Message-ID: <CAMxuvayTFjQU3_W_LH1ETVexm8PHrNZpP2OJt+ufnrCnGjkrsA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/5] Convert the TPM code to use tracing
+	(envelope-from <stefanha@redhat.com>) id 1esmbZ-00064r-5o
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 04:40:26 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Mon,  5 Mar 2018 09:40:00 +0000
+Message-Id: <20180305094006.21446-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL 0/6] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +17,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Hi
+The following changes since commit 136c67e07869227b21b3f627316e03679ce7b738:
 
-On Sun, Mar 4, 2018 at 10:56 PM, Stefan Berger
-<stefanb@linux.vnet.ibm.com> wrote:
-> This series of patches converts the TPM code to use tracing rather
-> than the #define DEBUG_XYZ type of debugging.
->
-> Regards,
->    Stefan
->
-> Stefan Berger (5):
->   tpm: convert tpm_crb.c to use trace-events
->   tpm: convert tpm_passthrough.c to use trace-events
->   tpm: convert tpm_util.c to use trace-events
->   tpm: convert tpm_emulator.c to use trace-events
->   tpm: convert tpm_tis.c to use trace-events
+  Merge remote-tracking branch 'remotes/bkoppelmann/tags/pull-tricore-2018-03-02' into staging (2018-03-02 16:56:20 +0000)
 
-Series:
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+are available in the Git repository at:
 
+  git://github.com/stefanha/qemu.git tags/block-pull-request
 
->
->  Makefile.objs            |  1 +
->  hw/tpm/tpm_crb.c         | 17 +++------
->  hw/tpm/tpm_emulator.c    | 45 +++++++++++-----------
->  hw/tpm/tpm_passthrough.c | 13 ++-----
->  hw/tpm/tpm_tis.c         | 98 ++++++++++++++++++++++--------------------=
-------
->  hw/tpm/tpm_util.c        | 29 ++++++--------
->  hw/tpm/trace-events      | 46 +++++++++++++++++++++++
->  7 files changed, 135 insertions(+), 114 deletions(-)
->  create mode 100644 hw/tpm/trace-events
->
-> --
-> 2.5.5
->
+for you to fetch changes up to 23500c6a9409efc80d696aede0629bfbe7556a90:
+
+  README: Document 'git-publish' workflow (2018-03-05 09:03:17 +0000)
+
+----------------------------------------------------------------
+Pull request
+
+Mostly patches that are only indirectly related to the block layer, but I've
+reviewed them and there is no maintainer.
+
+----------------------------------------------------------------
+
+Fam Zheng (2):
+  Add a git-publish configuration file
+  README: Document 'git-publish' workflow
+
+Su Hang (3):
+  util/uri.c: Coding style check, Only whitespace involved
+  util/uri.c: remove brackets that wrap `return` statement's content.
+  util/uri.c: wrap single statement blocks with braces {}
+
+Thomas Huth (1):
+  tests/libqos: Check for valid dev pointer when looking for PCI devices
+
+ tests/libqos/virtio-pci.c |    4 +-
+ util/uri.c                | 1733 ++++++++++++++++++++++++---------------------
+ .gitpublish               |   51 ++
+ README                    |   31 +-
+ 4 files changed, 1014 insertions(+), 805 deletions(-)
+ create mode 100644 .gitpublish
+
+-- 
+2.14.3
