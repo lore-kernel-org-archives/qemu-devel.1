@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esdgq-00088m-Vn
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 19:09:20 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1esf5I-00010B-8u
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 20:38:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esdgn-0004Ky-NU
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 19:09:16 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:55819)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esdgn-0004KQ-Bu
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 19:09:13 -0500
-Received: by mail-wm0-x241.google.com with SMTP id q83so12621875wme.5
-	for <qemu-devel@nongnu.org>; Sun, 04 Mar 2018 16:09:13 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1520200587-14681-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1520200587-14681-5-git-send-email-stefanb@linux.vnet.ibm.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <387e950a-1472-2fab-f78d-177b322bad0c@amsat.org>
-Date: Sun, 4 Mar 2018 21:09:10 -0300
+	(envelope-from <dgibson@ozlabs.org>) id 1esf5H-0003hx-41
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 20:38:36 -0500
+Date: Mon, 5 Mar 2018 12:27:55 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180305012755.GC2650@umbus.fritz.box>
+References: <20180302214826.1671E7456D8@zero.eik.bme.hu>
 MIME-Version: 1.0
-In-Reply-To: <1520200587-14681-5-git-send-email-stefanb@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 4/5] tpm: convert tpm_emulator.c to use
- trace-events
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="2JFBq9zoW8cOFH7v"
+Content-Disposition: inline
+In-Reply-To: <20180302214826.1671E7456D8@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH] ppc440_uc: Fix unintialized variable
+ warning with older gcc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,176 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, dgilbert@redhat.com
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-On 03/04/2018 06:56 PM, Stefan Berger wrote:
-> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+--2JFBq9zoW8cOFH7v
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Mar 02, 2018 at 10:43:23PM +0100, BALATON Zoltan wrote:
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+
+Applied, and rebased so we don't get bisection breakage.
 
 > ---
->  hw/tpm/tpm_emulator.c | 45 +++++++++++++++++++++++----------------------
->  hw/tpm/trace-events   | 14 ++++++++++++++
->  2 files changed, 37 insertions(+), 22 deletions(-)
-> 
-> diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
-> index b787aee..d0da10a 100644
-> --- a/hw/tpm/tpm_emulator.c
-> +++ b/hw/tpm/tpm_emulator.c
-> @@ -39,14 +39,7 @@
->  #include "qapi/error.h"
->  #include "qapi/clone-visitor.h"
->  #include "chardev/char-fe.h"
-> -
-> -#define DEBUG_TPM 0
-> -
-> -#define DPRINTF(fmt, ...) do { \
-> -    if (DEBUG_TPM) { \
-> -        fprintf(stderr, "tpm-emulator:"fmt"\n", ## __VA_ARGS__); \
-> -    } \
-> -} while (0)
-> +#include "trace.h"
->  
->  #define TYPE_TPM_EMULATOR "tpm-emulator"
->  #define TPM_EMULATOR(obj) \
-> @@ -151,13 +144,12 @@ static int tpm_emulator_set_locality(TPMEmulator *tpm_emu, uint8_t locty_number,
->  {
->      ptm_loc loc;
->  
-> -    DPRINTF("%s : locality: 0x%x", __func__, locty_number);
-> -
->      if (tpm_emu->cur_locty_number == locty_number) {
->          return 0;
->      }
->  
-> -    DPRINTF("setting locality : 0x%x", locty_number);
-> +    trace_tpm_emulator_set_locality(locty_number);
-> +
->      loc.u.req.loc = locty_number;
->      if (tpm_emulator_ctrlcmd(tpm_emu, CMD_SET_LOCALITY, &loc,
->                               sizeof(loc), sizeof(loc)) < 0) {
-> @@ -183,7 +175,7 @@ static void tpm_emulator_handle_request(TPMBackend *tb, TPMBackendCmd *cmd,
->  {
->      TPMEmulator *tpm_emu = TPM_EMULATOR(tb);
->  
-> -    DPRINTF("processing TPM command");
-> +    trace_tpm_emulator_handle_request();
->  
->      if (tpm_emulator_set_locality(tpm_emu, cmd->locty, errp) < 0 ||
->          tpm_emulator_unix_tx_bufs(tpm_emu, cmd->in, cmd->in_len,
-> @@ -195,7 +187,6 @@ static void tpm_emulator_handle_request(TPMBackend *tb, TPMBackendCmd *cmd,
->  
->  static int tpm_emulator_probe_caps(TPMEmulator *tpm_emu)
->  {
-> -    DPRINTF("%s", __func__);
->      if (tpm_emulator_ctrlcmd(tpm_emu, CMD_GET_CAPABILITY,
->                               &tpm_emu->caps, 0, sizeof(tpm_emu->caps)) < 0) {
->          error_report("tpm-emulator: probing failed : %s", strerror(errno));
-> @@ -204,7 +195,7 @@ static int tpm_emulator_probe_caps(TPMEmulator *tpm_emu)
->  
->      tpm_emu->caps = be64_to_cpu(tpm_emu->caps);
->  
-> -    DPRINTF("capabilities : 0x%"PRIx64, tpm_emu->caps);
-> +    trace_tpm_emulator_probe_caps(tpm_emu->caps);
->  
->      return 0;
->  }
-> @@ -293,7 +284,7 @@ static int tpm_emulator_set_buffer_size(TPMBackend *tb,
->          *actual_size = be32_to_cpu(psbs.u.resp.buffersize);
->      }
->  
-> -    DPRINTF("buffer size: %u, min: %u, max: %u\n",
-> +    trace_tpm_emulator_set_buffer_size(
->              be32_to_cpu(psbs.u.resp.buffersize),
->              be32_to_cpu(psbs.u.resp.minsize),
->              be32_to_cpu(psbs.u.resp.maxsize));
-> @@ -314,7 +305,7 @@ static int tpm_emulator_startup_tpm(TPMBackend *tb, size_t buffersize)
->          goto err_exit;
->      }
->  
-> -    DPRINTF("%s", __func__);
-> +    trace_tpm_emulator_startup_tpm();
->      if (tpm_emulator_ctrlcmd(tpm_emu, CMD_INIT, &init, sizeof(init),
->                               sizeof(init)) < 0) {
->          error_report("tpm-emulator: could not send INIT: %s",
-> @@ -348,7 +339,7 @@ static bool tpm_emulator_get_tpm_established_flag(TPMBackend *tb)
->                       strerror(errno));
->          return false;
->      }
-> -    DPRINTF("got established flag: %0x", est.u.resp.bit);
-> +    trace_tpm_emulator_get_tpm_established_flag(est.u.resp.bit);
->  
->      tpm_emu->established_flag_cached = 1;
->      tpm_emu->established_flag = (est.u.resp.bit != 0);
-> @@ -395,7 +386,7 @@ static void tpm_emulator_cancel_cmd(TPMBackend *tb)
->      ptm_res res;
->  
->      if (!TPM_EMULATOR_IMPLEMENTS_ALL_CAPS(tpm_emu, PTM_CAP_CANCEL_TPM_CMD)) {
-> -        DPRINTF("Backend does not support CANCEL_TPM_CMD");
-> +        trace_tpm_emulator_cancel_cmd_not_supt();
->          return;
->      }
->  
-> @@ -521,8 +512,16 @@ static int tpm_emulator_handle_device_opts(TPMEmulator *tpm_emu, QemuOpts *opts)
->          goto err;
->      }
->  
-> -    DPRINTF("TPM Version %s", tpm_emu->tpm_version == TPM_VERSION_1_2 ? "1.2" :
-> -            (tpm_emu->tpm_version == TPM_VERSION_2_0 ?  "2.0" : "Unspecified"));
-> +    switch (tpm_emu->tpm_version) {
-> +    case TPM_VERSION_1_2:
-> +        trace_tpm_emulator_handle_device_opts_tpm12();
-> +        break;
-> +    case TPM_VERSION_2_0:
-> +        trace_tpm_emulator_handle_device_opts_tpm2();
-> +        break;
+>  hw/ppc/ppc440_uc.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>=20
+> diff --git a/hw/ppc/ppc440_uc.c b/hw/ppc/ppc440_uc.c
+> index 4e2523a..976ab2b 100644
+> --- a/hw/ppc/ppc440_uc.c
+> +++ b/hw/ppc/ppc440_uc.c
+> @@ -1050,6 +1050,9 @@ static void ppc460ex_pcie_realize(DeviceState *dev,=
+ Error **errp)
+>      case DCRN_PCIE1_BASE:
+>          id =3D 1;
+>          break;
 > +    default:
-> +        trace_tpm_emulator_handle_device_opts_unspec();
-> +    }
->  
->      if (tpm_emulator_probe_caps(tpm_emu) ||
->          tpm_emulator_check_caps(tpm_emu)) {
-> @@ -532,7 +531,8 @@ static int tpm_emulator_handle_device_opts(TPMEmulator *tpm_emu, QemuOpts *opts)
->      return tpm_emulator_block_migration(tpm_emu);
->  
->  err:
-> -    DPRINTF("Startup error");
-> +    trace_tpm_emulator_handle_device_opts_startup_error();
-> +
->      return -1;
->  }
->  
-> @@ -573,7 +573,8 @@ static void tpm_emulator_inst_init(Object *obj)
->  {
->      TPMEmulator *tpm_emu = TPM_EMULATOR(obj);
->  
-> -    DPRINTF("%s", __func__);
-> +    trace_tpm_emulator_inst_init();
-> +
->      tpm_emu->options = g_new0(TPMEmulatorOptions, 1);
->      tpm_emu->cur_locty_number = ~0;
->      qemu_mutex_init(&tpm_emu->mutex);
-> diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-> index 66b2b91..fe88fa6 100644
-> --- a/hw/tpm/trace-events
-> +++ b/hw/tpm/trace-events
-> @@ -14,3 +14,17 @@ tpm_util_get_buffer_size_len(uint32_t len, size_t expected) "tpm_resp->len = %u,
->  tpm_util_get_buffer_size_hdr_len2(uint32_t len, size_t expected) "tpm2_resp->hdr.len = %u, expected = %zu"
->  tpm_util_get_buffer_size_len2(uint32_t len, size_t expected) "tpm2_resp->len = %u, expected = %zu"
->  tpm_util_get_buffer_size(size_t len) "buffersize of device: %zu"
-> +
-> +# hw/tpm/tpm_emulator.c
-> +tpm_emulator_set_locality(uint8_t locty) "setting locality to %d"
-> +tpm_emulator_handle_request(void) "processing TPM command"
-> +tpm_emulator_probe_caps(uint64_t caps) "capabilities: 0x%"PRIx64
-> +tpm_emulator_set_buffer_size(uint32_t buffersize, uint32_t minsize, uint32_t maxsize) "buffer size: %u, min: %u, max: %u"
-> +tpm_emulator_startup_tpm(void) "startup"
-> +tpm_emulator_get_tpm_established_flag(uint8_t flag) "got established flag: %d"
-> +tpm_emulator_cancel_cmd_not_supt(void) "Backend does not support CANCEL_TPM_CMD"
-> +tpm_emulator_handle_device_opts_tpm12(void) "TPM Version 1.2"
-> +tpm_emulator_handle_device_opts_tpm2(void) "TPM Version 2"
-> +tpm_emulator_handle_device_opts_unspec(void) "TPM Version Unspecified"
-> +tpm_emulator_handle_device_opts_startup_error(void) "Startup error"
-> +tpm_emulator_inst_init(void) ""
-> 
+> +        error_setg(errp, "invalid PCIe DCRN base");
+> +        return;
+>      }
+>      snprintf(buf, sizeof(buf), "pcie%d-io", id);
+>      memory_region_init(&s->iomem, OBJECT(s), buf, UINT64_MAX);
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--2JFBq9zoW8cOFH7v
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqcnRsACgkQbDjKyiDZ
+s5K9Ug/9FRGtfzGNQnZza6fZ1+Upz+Zzws0WHjfNjLJBAvwAXptbkU+aqHxbdKt7
+AYfraYKM0bmZIgXLp1AnpA91cJ411ZZtebRES7XrP/uDBM6SabOhBcwAMVdgZd92
+5KtC5tO9lAwa4tm+AHy/VjClSSQKYZuOaHUOeC6bxgzi7qMuqLYv7AjErVayA/Sl
+t/1Lb5pWaPkSoOWN5C7NEzEhuk3yZH6Xu5whyNiFhcuwQQgCq2Ianb2iR9HT/g5b
+ksLXwPL1b1aeaWVBw4q8SM8vvDPabwa5gzI+Dhktw1Mwih5wHTex2jhxXeEZw1i/
+rWNmOevky/Shoi1Kh4eX2ImiiT+HeWOpVbJrFtbEVljz96kvfcIfoN+WkF8ywUV6
+rik5B4EAb8bnOF0he6JSNltsyWRVkp2mOdLijlBvFUOEatxlEViHYnKdtO89AMFg
+MurA/YMEth5DAfYSD+ZrPWMoX9Qz2FY6nBPPTCb6/2sLyomieonv67G1hRZ+TdYW
+9X3Q2Ym9zRDgXZO9sEmestGg8DzUf3/+h52Kcl96Pk/TP6OobK0faQPjAB7Yk2FZ
+xCCzXxHPe5BA08Al8660f6f7+xVv1IvDc78u1VAZbW1cEcL4xu+Ccc763uCp1/Rp
+on7YNl79ONgkBqnvtZQHZDCFr4nHZ6bQNs5VUDRwpks6R059GLg=
+=K2Jd
+-----END PGP SIGNATURE-----
+
+--2JFBq9zoW8cOFH7v--
