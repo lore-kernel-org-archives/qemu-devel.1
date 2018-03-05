@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1esobY-0001Qc-3g
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 06:48:33 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1esony-0002an-98
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 07:01:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1esobV-0007re-0J
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 06:48:32 -0500
-Received: from mail-qt0-f195.google.com ([209.85.216.195]:41678)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1esobU-0007rW-RO
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 06:48:28 -0500
-Received: by mail-qt0-f195.google.com with SMTP id j4so19927299qth.8
-	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 03:48:28 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1esont-0005WG-4S
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 07:01:22 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41802 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1esons-0005Vr-Uq
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 07:01:17 -0500
+Date: Mon, 5 Mar 2018 12:00:58 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180305120058.GF3131@work-vm>
+References: <1520004397-28521-1-git-send-email-minyard@acm.org>
+	<1520004397-28521-3-git-send-email-minyard@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <20180305065040.10353-2-peterx@redhat.com>
-References: <20180305065040.10353-1-peterx@redhat.com>
-	<20180305065040.10353-2-peterx@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Mon, 5 Mar 2018 12:48:27 +0100
-Message-ID: <CAMxuvazSk=YL9boVBbJ6vb74zRXqEasPnp60Aj_JbjAbn=7i0w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/9] vl: export machine_init_done
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1520004397-28521-3-git-send-email-minyard@acm.org>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] ipmi: Use proper struct reference
+ for BT vmstate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,83 +28,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
+To: minyard@acm.org
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <cminyard@mvista.com>
 
-Hi
-
-On Mon, Mar 5, 2018 at 7:50 AM, Peter Xu <peterx@redhat.com> wrote:
-> We have that variable but not exported.  Export that so modules can have
-> a way to poke on whether machine init has finished.
-
-Which modules?
-
-> Meanwhile, set that up even before calling the notifiers, so that
-> notifiers who may depend on this field will get a correct answer.
->
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
+* minyard@acm.org (minyard@acm.org) wrote:
+> From: Corey Minyard <cminyard@mvista.com>
+> 
+> The vmstate for isa_ipmi_bt was referencing into the bt structure,
+> instead create a bt structure separate and use that.
+> 
+> The version 1 of the BT transfer was fairly broken, if a migration
+> occured during an IPMI operation, it is likely the migration would
+> be corrupted because I misunderstood the VMSTATE_VBUFFER_UINT32()
+> handling, I thought it handled transferring the length field,
+> too.  So I just remove support for that.  I doubt anyone is using
+> it at this point.
+> 
+> This also removes the transfer of use_irq, since that should come
+> from configuration.
+> 
+> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > ---
->  include/sysemu/sysemu.h   | 2 ++
->  stubs/machine-init-done.c | 2 ++
->  vl.c                      | 4 ++--
->  3 files changed, 6 insertions(+), 2 deletions(-)
->
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index 77bb3da582..3f0f35610b 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -86,6 +86,8 @@ void qemu_system_guest_panicked(GuestPanicInformation *=
-info);
->  void qemu_add_exit_notifier(Notifier *notify);
->  void qemu_remove_exit_notifier(Notifier *notify);
->
-> +extern bool machine_init_done;
+>  hw/ipmi/isa_ipmi_bt.c | 61 ++++++++++++++++++++++++++++++++++++++++-----------
+>  1 file changed, 48 insertions(+), 13 deletions(-)
+> 
+> diff --git a/hw/ipmi/isa_ipmi_bt.c b/hw/ipmi/isa_ipmi_bt.c
+> index e946030..b64dce2 100644
+> --- a/hw/ipmi/isa_ipmi_bt.c
+> +++ b/hw/ipmi/isa_ipmi_bt.c
+> @@ -450,22 +450,57 @@ static void isa_ipmi_bt_realize(DeviceState *dev, Error **errp)
+>      isa_register_ioport(isadev, &iib->bt.io, iib->bt.io_base);
+>  }
+>  
+> -static const VMStateDescription vmstate_ISAIPMIBTDevice = {
+> -    .name = TYPE_IPMI_INTERFACE,
+> +static int ipmi_bt_vmstate_post_load(void *opaque, int version)
+> +{
+> +    IPMIBT *ib = opaque;
 > +
->  void qemu_add_machine_init_done_notifier(Notifier *notify);
->  void qemu_remove_machine_init_done_notifier(Notifier *notify);
->
-> diff --git a/stubs/machine-init-done.c b/stubs/machine-init-done.c
-> index 9a0d62514f..4121f1709b 100644
-> --- a/stubs/machine-init-done.c
-> +++ b/stubs/machine-init-done.c
-> @@ -2,6 +2,8 @@
->  #include "qemu-common.h"
->  #include "sysemu/sysemu.h"
->
-> +bool machine_init_done =3D true;
+> +    /* Make sure all the values are sane. */
+> +    if (ib->outpos >= MAX_IPMI_MSG_SIZE || ib->outlen >= MAX_IPMI_MSG_SIZE ||
+> +        ib->outpos >= ib->outlen) {
+> +        ib->outpos = 0;
+> +        ib->outlen = 0;
+> +    }
 > +
->  void qemu_add_machine_init_done_notifier(Notifier *notify)
->  {
->  }
-> diff --git a/vl.c b/vl.c
-> index a33ac008fb..57777e8d47 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2712,7 +2712,7 @@ static void qemu_run_exit_notifiers(void)
->      notifier_list_notify(&exit_notifiers, NULL);
->  }
->
-> -static bool machine_init_done;
-> +bool machine_init_done;
->
->  void qemu_add_machine_init_done_notifier(Notifier *notify)
->  {
-> @@ -2729,8 +2729,8 @@ void qemu_remove_machine_init_done_notifier(Notifie=
-r *notify)
->
->  static void qemu_run_machine_init_done_notifiers(void)
->  {
-> -    notifier_list_notify(&machine_init_done_notifiers, NULL);
->      machine_init_done =3D true;
-> +    notifier_list_notify(&machine_init_done_notifiers, NULL);
->  }
->
->  static const QEMUOption *lookup_opt(int argc, char **argv,
-> --
-> 2.14.3
->
+> +    if (ib->inlen >= MAX_IPMI_MSG_SIZE) {
+> +        ib->inlen = 0;
+> +    }
+> +
+> +    return 0;
+> +}
+
+OK, this one looks fine; I'd personally add a printf or something in the
+case where you're having to fix up the output/outlen just so you know;
+but that's OK; and since you know the device I'll leave the use_irq etc
+to you, so:
+
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> +const VMStateDescription vmstate_IPMIBT = {
+> +    .name = TYPE_IPMI_INTERFACE_PREFIX "bt",
+>      .version_id = 1,
+>      .minimum_version_id = 1,
+> +    .post_load = ipmi_bt_vmstate_post_load,
+> +    .fields      = (VMStateField[]) {
+> +        VMSTATE_BOOL(obf_irq_set, IPMIBT),
+> +        VMSTATE_BOOL(atn_irq_set, IPMIBT),
+> +        VMSTATE_BOOL(irqs_enabled, IPMIBT),
+> +        VMSTATE_UINT32(outpos, IPMIBT),
+> +        VMSTATE_UINT32(outlen, IPMIBT),
+> +        VMSTATE_UINT8_ARRAY(outmsg, IPMIBT, MAX_IPMI_MSG_SIZE),
+> +        VMSTATE_UINT32(inlen, IPMIBT),
+> +        VMSTATE_UINT8_ARRAY(inmsg, IPMIBT, MAX_IPMI_MSG_SIZE),
+> +        VMSTATE_UINT8(control_reg, IPMIBT),
+> +        VMSTATE_UINT8(mask_reg, IPMIBT),
+> +        VMSTATE_UINT8(waiting_rsp, IPMIBT),
+> +        VMSTATE_UINT8(waiting_seq, IPMIBT),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static const VMStateDescription vmstate_ISAIPMIBTDevice = {
+> +    .name = TYPE_IPMI_INTERFACE_PREFIX "isa-bt",
+> +    .version_id = 2,
+> +    .minimum_version_id = 2,
+> +    /*
+> +     * Version 1 had messed up the array transfer, it's not even usable
+> +     * because it used VMSTATE_VBUFFER_UINT32, but it did not transfer
+> +     * the buffer length, so random things would happen.
+> +     */
+>      .fields      = (VMStateField[]) {
+> -        VMSTATE_BOOL(bt.obf_irq_set, ISAIPMIBTDevice),
+> -        VMSTATE_BOOL(bt.atn_irq_set, ISAIPMIBTDevice),
+> -        VMSTATE_BOOL(bt.use_irq, ISAIPMIBTDevice),
+> -        VMSTATE_BOOL(bt.irqs_enabled, ISAIPMIBTDevice),
+> -        VMSTATE_UINT32(bt.outpos, ISAIPMIBTDevice),
+> -        VMSTATE_VBUFFER_UINT32(bt.outmsg, ISAIPMIBTDevice, 1, NULL, bt.outlen),
+> -        VMSTATE_VBUFFER_UINT32(bt.inmsg, ISAIPMIBTDevice, 1, NULL, bt.inlen),
+> -        VMSTATE_UINT8(bt.control_reg, ISAIPMIBTDevice),
+> -        VMSTATE_UINT8(bt.mask_reg, ISAIPMIBTDevice),
+> -        VMSTATE_UINT8(bt.waiting_rsp, ISAIPMIBTDevice),
+> -        VMSTATE_UINT8(bt.waiting_seq, ISAIPMIBTDevice),
+> +        VMSTATE_STRUCT(bt, ISAIPMIBTDevice, 1, vmstate_IPMIBT, IPMIBT),
+>          VMSTATE_END_OF_LIST()
+>      }
+>  };
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
