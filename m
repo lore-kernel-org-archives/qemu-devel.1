@@ -1,32 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1esu8n-0006l0-4U
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 12:43:14 -0500
+	(envelope-from <nia.alarie@gmail.com>) id 1esuFy-0001WO-Ih
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 12:50:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1esu8k-0003Lr-0B
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 12:43:13 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52100 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1esu8j-0003LU-Rd
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 12:43:09 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 95A1C4063665
-	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 17:42:58 +0000 (UTC)
-Date: Mon, 5 Mar 2018 17:42:42 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180305174241.GR3131@work-vm>
-References: <20180216131625.9639-1-dgilbert@redhat.com>
-	<20180216131625.9639-12-dgilbert@redhat.com>
-	<20180228084234.GA27381@xz-mi>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180228084234.GA27381@xz-mi>
-Subject: Re: [Qemu-devel] [PATCH v3 11/29] vhost+postcopy: Transmit 'listen'
- to client
+	(envelope-from <nia.alarie@gmail.com>) id 1esuFt-0006Wh-CW
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 12:50:38 -0500
+From: Nia Alarie <nia.alarie@gmail.com>
+Date: Mon,  5 Mar 2018 17:49:14 +0000
+Message-Id: <20180305174914.25931-1-nia.alarie@gmail.com>
+Subject: [Qemu-devel] [PATCH v2] s390x/sclpconsole: Remove dead code -
+ delete error handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,49 +18,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, marcandre.lureau@redhat.com, imammedo@redhat.com, mst@redhat.com, quintela@redhat.com, aarcange@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, borntraeger@de.ibm.com, cohuck@redhat.com, rth@twiddle.net, stefanha@gmail.com, jim@groklearning.com, joel@jms.id.au, Nia Alarie <nia.alarie@gmail.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Fri, Feb 16, 2018 at 01:16:07PM +0000, Dr. David Alan Gilbert (git) wrote:
-> 
-> [...]
-> 
-> >  typedef struct VuVirtqElement {
-> > diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-> > index 621543e654..bdec9ec0e8 100644
-> > --- a/docs/interop/vhost-user.txt
-> > +++ b/docs/interop/vhost-user.txt
-> > @@ -682,6 +682,12 @@ Master message types
-> >        the slave must open a userfaultfd for later use.
-> >        Note that at this stage the migration is still in precopy mode.
-> >  
-> > + * VHOST_USER_POSTCOPY_LISTEN
-> > +      Id: 27
-> > +      Master payload: N/A
-> > +
-> > +      Master advises slave that a transition to postcopy mode has happened.
-> 
-> Could we add something to explain why this listen needs to be
-> broadcasted to clients?  Since I failed to find it out quickly
-> myself. :(
+The other event handlers (quiesce and cpu) do not define these
+handlers, and this one does nothing, so it can be removed.
 
-I've changed this to:
+virtio_ccw_exit always returns 0, so change its return type to
+void.
 
- * VHOST_USER_POSTCOPY_LISTEN
-      Id: 29
-      Master payload: N/A
+Signed-off-by: Nia Alarie <nia.alarie@gmail.com>
+---
+ hw/char/sclpconsole-lm.c          |  6 ------
+ hw/char/sclpconsole.c             |  6 ------
+ hw/s390x/event-facility.c         | 14 --------------
+ hw/s390x/virtio-ccw.c             |  6 +++---
+ hw/s390x/virtio-ccw.h             |  2 +-
+ include/hw/s390x/event-facility.h |  1 -
+ 6 files changed, 4 insertions(+), 31 deletions(-)
 
-      Master advises slave that a transition to postcopy mode has happened.
-      The slave must ensure that shared memory is registered with userfaultfd
-      to cause faulting of non-present pages.
-
-      This is always sent sometime after a VHOST_USER_POSTCOPY_ADVISE, and
-      thus only when VHOST_USER_PROTOCOL_F_PAGEFAULT is supported.
-
-Dave
-
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/hw/char/sclpconsole-lm.c b/hw/char/sclpconsole-lm.c
+index c500bdaf29..84efd8df73 100644
+--- a/hw/char/sclpconsole-lm.c
++++ b/hw/char/sclpconsole-lm.c
+@@ -318,11 +318,6 @@ static int console_init(SCLPEvent *event)
+     return 0;
+ }
+ 
+-static int console_exit(SCLPEvent *event)
+-{
+-    return 0;
+-}
+-
+ static void console_reset(DeviceState *dev)
+ {
+    SCLPEvent *event = SCLP_EVENT(dev);
+@@ -349,7 +344,6 @@ static void console_class_init(ObjectClass *klass, void *data)
+     dc->reset = console_reset;
+     dc->vmsd = &vmstate_sclplmconsole;
+     ec->init = console_init;
+-    ec->exit = console_exit;
+     ec->get_send_mask = send_mask;
+     ec->get_receive_mask = receive_mask;
+     ec->can_handle_event = can_handle_event;
+diff --git a/hw/char/sclpconsole.c b/hw/char/sclpconsole.c
+index d0265dfa7a..e6ba0a46bd 100644
+--- a/hw/char/sclpconsole.c
++++ b/hw/char/sclpconsole.c
+@@ -246,11 +246,6 @@ static void console_reset(DeviceState *dev)
+    scon->notify = false;
+ }
+ 
+-static int console_exit(SCLPEvent *event)
+-{
+-    return 0;
+-}
+-
+ static Property console_properties[] = {
+     DEFINE_PROP_CHR("chardev", SCLPConsole, chr),
+     DEFINE_PROP_END_OF_LIST(),
+@@ -265,7 +260,6 @@ static void console_class_init(ObjectClass *klass, void *data)
+     dc->reset = console_reset;
+     dc->vmsd = &vmstate_sclpconsole;
+     ec->init = console_init;
+-    ec->exit = console_exit;
+     ec->get_send_mask = send_mask;
+     ec->get_receive_mask = receive_mask;
+     ec->can_handle_event = can_handle_event;
+diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+index 155a69467b..79de3c738f 100644
+--- a/hw/s390x/event-facility.c
++++ b/hw/s390x/event-facility.c
+@@ -431,26 +431,12 @@ static void event_realize(DeviceState *qdev, Error **errp)
+     }
+ }
+ 
+-static void event_unrealize(DeviceState *qdev, Error **errp)
+-{
+-    SCLPEvent *event = SCLP_EVENT(qdev);
+-    SCLPEventClass *child = SCLP_EVENT_GET_CLASS(event);
+-    if (child->exit) {
+-        int rc = child->exit(event);
+-        if (rc < 0) {
+-            error_setg(errp, "SCLP event exit failed.");
+-            return;
+-        }
+-    }
+-}
+-
+ static void event_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     dc->bus_type = TYPE_SCLP_EVENTS_BUS;
+     dc->realize = event_realize;
+-    dc->unrealize = event_unrealize;
+ }
+ 
+ static const TypeInfo sclp_event_type_info = {
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index 8f7fbc2ab7..0773818a82 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -752,7 +752,7 @@ out_err:
+     g_free(sch);
+ }
+ 
+-static int virtio_ccw_exit(VirtioCcwDevice *dev)
++static void virtio_ccw_exit(VirtioCcwDevice *dev)
+ {
+     CcwDevice *ccw_dev = CCW_DEVICE(dev);
+     SubchDev *sch = ccw_dev->sch;
+@@ -765,7 +765,6 @@ static int virtio_ccw_exit(VirtioCcwDevice *dev)
+         release_indicator(&dev->routes.adapter, dev->indicators);
+         dev->indicators = NULL;
+     }
+-    return 0;
+ }
+ 
+ static void virtio_ccw_net_realize(VirtioCcwDevice *ccw_dev, Error **errp)
+@@ -1710,7 +1709,8 @@ static int virtio_ccw_busdev_exit(DeviceState *dev)
+     VirtioCcwDevice *_dev = (VirtioCcwDevice *)dev;
+     VirtIOCCWDeviceClass *_info = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
+ 
+-    return _info->exit(_dev);
++    _info->exit(_dev);
++    return 0;
+ }
+ 
+ static void virtio_ccw_busdev_unplug(HotplugHandler *hotplug_dev,
+diff --git a/hw/s390x/virtio-ccw.h b/hw/s390x/virtio-ccw.h
+index 3905f3a3d6..8ffe7fe095 100644
+--- a/hw/s390x/virtio-ccw.h
++++ b/hw/s390x/virtio-ccw.h
+@@ -76,7 +76,7 @@ typedef struct VirtioCcwDevice VirtioCcwDevice;
+ typedef struct VirtIOCCWDeviceClass {
+     CCWDeviceClass parent_class;
+     void (*realize)(VirtioCcwDevice *dev, Error **errp);
+-    int (*exit)(VirtioCcwDevice *dev);
++    void (*exit)(VirtioCcwDevice *dev);
+ } VirtIOCCWDeviceClass;
+ 
+ /* Performance improves when virtqueue kick processing is decoupled from the
+diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
+index 5119b9b7f0..b913f85edc 100644
+--- a/include/hw/s390x/event-facility.h
++++ b/include/hw/s390x/event-facility.h
+@@ -174,7 +174,6 @@ typedef struct SCLPEvent {
+ typedef struct SCLPEventClass {
+     DeviceClass parent_class;
+     int (*init)(SCLPEvent *event);
+-    int (*exit)(SCLPEvent *event);
+ 
+     /* get SCLP's send mask */
+     unsigned int (*get_send_mask)(void);
+-- 
+2.16.2
