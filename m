@@ -1,14 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1essWY-0000e5-PX
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:59:39 -0500
+	(envelope-from <eblake@redhat.com>) id 1essWq-0000r5-Ai
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:59:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1essWX-0001p6-Uh
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:59:38 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon,  5 Mar 2018 15:59:26 +0000
-Message-Id: <20180305155926.25858-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH] qemu-iotests: fix 203 migration completion race
+	(envelope-from <eblake@redhat.com>) id 1essWm-0001wJ-JE
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:59:56 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47206 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1essWm-0001w2-Eh
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:59:52 -0500
+References: <1519998711-73430-1-git-send-email-mjc@sifive.com>
+	<1519998711-73430-24-git-send-email-mjc@sifive.com>
+	<4506959a-8d32-039a-f0e3-c864fd44ace6@redhat.com>
+	<CAHNT7NsGeLU8rzfJBBrKxuD9WffHRNcF=mUrgGXzWF=2Qz2FdA@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <25cfff0d-4fd2-ac85-f9e6-feec9d9e4469@redhat.com>
+Date: Mon, 5 Mar 2018 09:59:50 -0600
+MIME-Version: 1.0
+In-Reply-To: <CAHNT7NsGeLU8rzfJBBrKxuD9WffHRNcF=mUrgGXzWF=2Qz2FdA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 23/23] RISC-V Build Infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,71 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Michael Clark <mjc@sifive.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-There is a race between the test's 'query-migrate' QMP command after the
-QMP 'STOP' event and completing the migration:
+On 03/02/2018 08:37 PM, Michael Clark wrote:
+> Let me know if you have a branch for me to pull and rebase against.
 
-The test case invokes 'query-migrate' upon receiving 'STOP'.  At this
-point the migration thread may still be in the process of completing.
-Therefore 'query-migrate' can return 'status': 'active' for a brief
-window of time instead of 'status': 'completed'.  This results in
-qemu-iotests 203 hanging.
+http://repo.or.cz/qemu/ericb.git qapi
 
-Solve the race by enabling the 'events' migration capability, which
-causes QEMU to emit migration-specific QMP events that do not suffer
-from this race condition.  Wait for the QMP 'MIGRATION' event with
-'status': 'completed'.
+But that has landed in master now.
 
-Reported-by: Max Reitz <mreitz@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- tests/qemu-iotests/203     | 15 +++++++++++----
- tests/qemu-iotests/203.out |  5 +++++
- 2 files changed, 16 insertions(+), 4 deletions(-)
+> 
+> We are passing all build and make check tests in travis (except for a
+> couple of build timeouts because we are hitting the default 50 minute
+> timeout)
+> 
+> https://travis-ci.org/riscv/riscv-qemu/builds/348234736
+> 
 
-diff --git a/tests/qemu-iotests/203 b/tests/qemu-iotests/203
-index 2c811917d8..4874a1a0d8 100755
---- a/tests/qemu-iotests/203
-+++ b/tests/qemu-iotests/203
-@@ -49,11 +49,18 @@ with iotests.FilePath('disk0.img') as disk0_img_path, \
-                        node_name='drive1-node', iothread='iothread0',
-                        force=True))
- 
-+    iotests.log('Enabling migration QMP events...')
-+    iotests.log(vm.qmp('migrate-set-capabilities', capabilities=[
-+        {
-+            'capability': 'events',
-+            'state': True
-+        }
-+    ]))
-+
-     iotests.log('Starting migration...')
-     iotests.log(vm.qmp('migrate', uri='exec:cat >/dev/null'))
-     while True:
--        vm.get_qmp_event(wait=60.0)
--        result = vm.qmp('query-migrate')
--        status = result.get('return', {}).get('status', None)
--        if status == 'completed':
-+        event = vm.event_wait('MIGRATION')
-+        iotests.log(event, filters=[iotests.filter_qmp_event])
-+        if event['data']['status'] == 'completed':
-             break
-diff --git a/tests/qemu-iotests/203.out b/tests/qemu-iotests/203.out
-index 3f1ff900e4..1a11f0975c 100644
---- a/tests/qemu-iotests/203.out
-+++ b/tests/qemu-iotests/203.out
-@@ -2,5 +2,10 @@ Launching VM...
- Setting IOThreads...
- {u'return': {}}
- {u'return': {}}
-+Enabling migration QMP events...
-+{u'return': {}}
- Starting migration...
- {u'return': {}}
-+{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'setup'}, u'event': u'MIGRATION'}
-+{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'active'}, u'event': u'MIGRATION'}
-+{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'completed'}, u'event': u'MIGRATION'}
+Also, top-posting makes it a bit harder to see what you are replying to.
+
+
+>>>    qapi-schema.json                       | 17 ++++++++++++++++-
+>>>
+>>
+>> Will need rebasing to modify qapi/misc.json if my pending PULL request
+>> issues get resolved first:
+>>
+>> https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg00469.html
+>>
+
+
 -- 
-2.14.3
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
