@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esvMX-0004pF-9v
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 14:01:30 -0500
+	(envelope-from <jirislaby@gmail.com>) id 1esvNZ-0005bi-Tp
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 14:02:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esvMU-0008Bu-5F
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 14:01:29 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
+	(envelope-from <jirislaby@gmail.com>) id 1esvNW-0000PX-ND
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 14:02:33 -0500
 References: <20180305112732.26471-1-f4bug@amsat.org>
-	<20180305112732.26471-3-f4bug@amsat.org>
-	<20180305185754.GE17368@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <d64466e4-57af-ffb7-fb1f-837885e532dd@amsat.org>
-Date: Mon, 5 Mar 2018 16:01:12 -0300
+	<20180305112732.26471-22-f4bug@amsat.org>
+From: Jiri Slaby <jslaby@suse.cz>
+Message-ID: <d0a41a33-45c0-92bf-7fa1-e5cad644b4fe@suse.cz>
+Date: Mon, 5 Mar 2018 20:02:27 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180305185754.GE17368@redhat.com>
+In-Reply-To: <20180305112732.26471-22-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [RFC PATCH v2 02/30] hw: include
- "qemu/cunits.h" and clean unused "qemu/cutils.h"
+Subject: Re: [Qemu-devel] [PATCH v2 21/30] hw/misc: use the BYTE-based
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +25,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, Michael Walle <michael@walle.cc>, Yongbok Kim <yongbok.kim@mips.com>, Marek Vasut <marex@denx.de>, qemu-trivial@nongnu.org, Alexander Graf <agraf@suse.de>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Marcel Apfelbaum <marcel@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "open list:ARM" <qemu-arm@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Chris Wulff <crwulff@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Paul Burton <paul.burton@mips.com>, "open list:New World" <qemu-ppc@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>, Gerd Hoffmann <kraxel@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-On 03/05/2018 03:57 PM, Daniel P. Berrangé wrote:
-> On Mon, Mar 05, 2018 at 08:27:04AM -0300, Philippe Mathieu-Daudé wrote:
->> These files were including "qemu/cutils.h" to use the byte-based size
->> definitions, now available in "qemu/cunits.h".
-> 
-> I know I'm "complaining" about bike-shed colour here....
-> 
-> Feels like just calling it units.h is sufficient - all our .h code is
-> C code so don't need reminding of it by filename, particularly since
-> we're avoiding system header clash by using the qemu/ prefix on #includes.
+On 03/05/2018, 12:27 PM, Philippe Mathieu-Daudé wrote:
+> --- a/hw/misc/auxbus.c
+> +++ b/hw/misc/auxbus.c
+> @@ -68,7 +68,7 @@ AUXBus *aux_init_bus(DeviceState *parent, const char *name)
+>  
+>      /* Memory related. */
+>      bus->aux_io = g_malloc(sizeof(*bus->aux_io));
+> -    memory_region_init(bus->aux_io, OBJECT(bus), "aux-io", (1 << 20));
+> +    memory_region_init(bus->aux_io, OBJECT(bus), "aux-io", 2 * M_BYTE);
 
-I like your suggestion :)
+Only M_BYTE, not "2 *".
 
-> 
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> 
-> Regardless of whether you rename it or not though,
-> 
->    Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+>      address_space_init(&bus->aux_addr_space, bus->aux_io, "aux-io");
+>      return bus;
+>  }
+> diff --git a/hw/misc/edu.c b/hw/misc/edu.c
+> index 34eb05d213..ce8235dfc4 100644
+> --- a/hw/misc/edu.c
+> +++ b/hw/misc/edu.c
+> @@ -357,7 +357,7 @@ static void pci_edu_realize(PCIDevice *pdev, Error **errp)
+>                         edu, QEMU_THREAD_JOINABLE);
+>  
+>      memory_region_init_io(&edu->mmio, OBJECT(edu), &edu_mmio_ops, edu,
+> -                    "edu-mmio", 1 << 20);
+> +                    "edu-mmio", 1 * M_BYTE);
 
-Thanks!
+"1 * " is superfluous
 
-> 
-> 
-> Regards,
-> Daniel
-> 
+thanks,
+-- 
+js
+suse labs
