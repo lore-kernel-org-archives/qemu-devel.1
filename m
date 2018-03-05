@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eslFJ-0003fP-QV
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:13:23 -0500
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1eslNx-0005mN-11
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:22:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eslFE-0006Pr-O4
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:13:21 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35678 helo=mx1.redhat.com)
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1eslNs-00046S-HA
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:22:16 -0500
+Received: from mga18.intel.com ([134.134.136.126]:62752)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1eslFE-0006OS-Iv
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:13:16 -0500
-Date: Mon, 5 Mar 2018 09:13:02 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180305081302.GA4789@localhost.localdomain>
-References: <1513877118-3149-1-git-send-email-jack.schwartz@oracle.com>
-	<20180115155413.GJ32271@localhost.localdomain>
-	<45620ce8-23c6-3ad5-2393-a5f48c2a9f58@oracle.com>
+	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
+	id 1eslNs-00044n-8R
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:22:12 -0500
+Date: Mon, 5 Mar 2018 16:05:20 +0800
+From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Message-ID: <20180305080520.GA2482@sky-dev>
+References: <1519900415-30314-1-git-send-email-yi.l.liu@linux.intel.com>
+	<1519900415-30314-5-git-send-email-yi.l.liu@linux.intel.com>
+	<20180305074555.GA7584@xz-mi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <45620ce8-23c6-3ad5-2393-a5f48c2a9f58@oracle.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH QEMU v1 0/4] multiboot: bss_end_addr can be
- zero / cleanup
+In-Reply-To: <20180305074555.GA7584@xz-mi>
+Subject: Re: [Qemu-devel] [PATCH v3 04/12] vfio/pci: add notify framework
+ based on IOMMUSVAContext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +30,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jack Schwartz <jack.schwartz@oracle.com>
-Cc: ehabkost@redhat.com, Anatol Pomozov <anatol.pomozov@gmail.com>, konrad.wilk@oracle.com, daniel.kiper@oracle.com, mst@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
+To: Peter Xu <peterx@redhat.com>
+Cc: kevin.tian@intel.com, yi.l.liu@intel.com, mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org, alex.williamson@redhat.com, pbonzini@redhat.com, eric.auger.pro@gmail.com, david@gibson.dropbear.id.au
 
-Am 02.03.2018 um 20:32 hat Jack Schwartz geschrieben:
-> Hi Kevin.
->=20
-> On 2018-01-15 07:54, Kevin Wolf wrote:
-> > Am 21.12.2017 um 18:25 hat Jack Schwartz geschrieben:
-> > > Properly account for the possibility of multiboot kernels with a ze=
-ro
-> > > bss_end_addr.  The Multiboot Specification, section 3.1.3 allows fo=
-r
-> > > kernels without a bss section, by allowing a zeroed bss_end_addr mu=
-ltiboot
-> > > header field.
-> > >=20
-> > > Do some cleanup to multiboot.c as well:
-> > > - Remove some unused variables.
-> > > - Use more intuitive header names when displaying fields in message=
-s.
-> > > - Change fprintf(stderr...) to error_report
-> > There are some conflicts with Anatol's (CCed) multiboot series:
-> > https://lists.nongnu.org/archive/html/qemu-devel/2017-10/msg03003.htm=
-l
-> >=20
-> > None if these should be hard to resolve, but it would be good if you
-> > could agree with each other whose patch series should come first, and
-> > then the other one should be rebased on top of that.
-> >=20
-> > > Testing:
-> > >    1) Ran the "make check" test suite.
-> > >    2) Booted multiboot kernel with bss_end_addr=3D0.  (I rolled my =
-own
-> > >       grub multiboot.elf test "kernel" by modifying source.)  Verif=
-ied
-> > >       with gdb that new code that reads addresses/offsets from mult=
-iboot
-> > >       header was accessed.
-> > >    3) Booted multiboot kernel with non-zero bss_end_addr.
-> > >    4) Uncommented DEBUG_MULTIBOOT in multiboot.c and verified messa=
-ges worked.
-> > >    5) Code has soaked in an internal repo for two months.
-> > Can you integrate your test kernel from 2) in tests/multiboot/ so we =
-can
-> > keep this as a regression test?
-> If need be, would you be willing to accept updated versions of these pa=
-tches
-> (with another review, of course) without the test file?=A0 I will deliv=
-er the
-> test file later once I get company approvals.=A0 I don't want the test =
-file to
-> continue holding everything up in the meantime.
+On Mon, Mar 05, 2018 at 03:45:55PM +0800, Peter Xu wrote:
+> On Thu, Mar 01, 2018 at 06:33:27PM +0800, Liu, Yi L wrote:
+> > This patch introduces a notify framework for IOMMUSVAContext.sva_notifiers.
+> > 
+> > Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> > ---
+> >  hw/vfio/common.c              | 1 +
+> >  include/hw/vfio/vfio-common.h | 9 +++++++++
+> >  2 files changed, 10 insertions(+)
+> > 
+> > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> > index 06277d2..1cc96df 100644
+> > --- a/hw/vfio/common.c
+> > +++ b/hw/vfio/common.c
+> > @@ -1019,6 +1019,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+> >      container->fd = fd;
+> >      QLIST_INIT(&container->giommu_mr_list);
+> >      QLIST_INIT(&container->hostwin_list);
+> > +    QLIST_INIT(&container->gsva_ctx_list);
+> >      if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1_IOMMU) ||
+> >          ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU)) {
+> >          bool v2 = !!ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU);
+> > diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> > index 702a085..4c16b4c 100644
+> > --- a/include/hw/vfio/vfio-common.h
+> > +++ b/include/hw/vfio/vfio-common.h
+> > @@ -29,6 +29,7 @@
+> >  #ifdef CONFIG_LINUX
+> >  #include <linux/vfio.h>
+> >  #endif
+> > +#include "hw/core/pasid.h"
+> >  
+> >  #define ERR_PREFIX "vfio error: %s: "
+> >  #define WARN_PREFIX "vfio warning: %s: "
+> > @@ -88,6 +89,7 @@ typedef struct VFIOContainer {
+> >       * future
+> >       */
+> >      QLIST_HEAD(, VFIOGuestIOMMUMR) giommu_mr_list;
+> > +    QLIST_HEAD(, VFIOGuestIOMMUSVAContext) gsva_ctx_list;
+> 
+> IIUC vfio container is per-domain, so here we have a per-domain
+> context.  Does that mean that all the devices in the same IOMMU group
+> (or say, share the 2nd level page table) must share the same PASID
+> table (or say, the 1st level page table)?  Thanks,
 
-Sure, let's move forward with what we have now. Please keep me CCed when
-you send a new version and I'll give it a review and hopeuflly get it
-merged.
+Correct. We are also discussing it in another thread which is
+on the bind granularity. Basically, SVA may only works for the
+case in which only a single device in an iommu group. This is
+based on the fact that there is no special handling to the PASID
+TLP Prefix in PCI-E spec.
 
-Kevin
+https://patchwork.kernel.org/patch/10213877/
+
+Thanks,
+Yi Liu
