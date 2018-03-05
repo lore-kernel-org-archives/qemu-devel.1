@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eswDh-00074l-BF
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 14:56:26 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eswXb-00040w-Rb
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 15:17:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eswDg-0007YR-H6
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 14:56:25 -0500
-References: <20180305180433.106408-1-vsementsov@virtuozzo.com>
-	<b8324efe-7fd4-3c44-faac-a7a9e9e1ad3e@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9c4b48b2-e4ad-b8ec-0886-e30d06a950e3@redhat.com>
-Date: Mon, 5 Mar 2018 13:56:18 -0600
+	(envelope-from <dgilbert@redhat.com>) id 1eswXY-0008Gw-JF
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 15:16:59 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55802 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eswXY-0008Gc-DT
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 15:16:56 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 08B4D410FBAE
+	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 20:16:52 +0000 (UTC)
+Date: Mon, 5 Mar 2018 20:16:44 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180305201643.GX3131@work-vm>
+References: <20180216131625.9639-1-dgilbert@redhat.com>
+	<20180216131625.9639-22-dgilbert@redhat.com>
+	<20180302075513.GN27381@xz-mi>
 MIME-Version: 1.0
-In-Reply-To: <b8324efe-7fd4-3c44-faac-a7a9e9e1ad3e@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] nbd/server: fix space read
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180302075513.GN27381@xz-mi>
+Subject: Re: [Qemu-devel] [PATCH v3 21/29] vhost+postcopy: Add vhost waker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,35 +34,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: pbonzini@redhat.com, den@openvz.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, marcandre.lureau@redhat.com, imammedo@redhat.com, mst@redhat.com, quintela@redhat.com, aarcange@redhat.com
 
-On 03/05/2018 01:47 PM, Eric Blake wrote:
-> On 03/05/2018 12:04 PM, Vladimir Sementsov-Ogievskiy wrote:
+* Peter Xu (peterx@redhat.com) wrote:
+> On Fri, Feb 16, 2018 at 01:16:17PM +0000, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > Register a waker function in vhost-user code to be notified when
+> > pages arrive or requests to previously mapped pages get requested.
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  hw/virtio/trace-events |  3 +++
+> >  hw/virtio/vhost-user.c | 30 ++++++++++++++++++++++++++++++
+> >  2 files changed, 33 insertions(+)
+> > 
+> > diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> > index 3afd12cfea..fe5e0ff856 100644
+> > --- a/hw/virtio/trace-events
+> > +++ b/hw/virtio/trace-events
+> > @@ -13,6 +13,9 @@ vhost_user_postcopy_fault_handler_found(int i, uint64_t region_offset, uint64_t
+> >  vhost_user_postcopy_listen(void) ""
+> >  vhost_user_set_mem_table_postcopy(uint64_t client_addr, uint64_t qhva, int reply_i, int region_i) "client:0x%"PRIx64" for hva: 0x%"PRIx64" reply %d region %d"
+> >  vhost_user_set_mem_table_withfd(int index, const char *name, uint64_t memory_size, uint64_t guest_phys_addr, uint64_t userspace_addr, uint64_t offset) "%d:%s: size:0x%"PRIx64" GPA:0x%"PRIx64" QVA/userspace:0x%"PRIx64" RB offset:0x%"PRIx64
+> > +vhost_user_postcopy_waker(const char *rb, uint64_t rb_offset) "%s + 0x%"PRIx64
+> > +vhost_user_postcopy_waker_found(uint64_t client_addr) "0x%"PRIx64
+> > +vhost_user_postcopy_waker_nomatch(const char *rb, uint64_t rb_offset) "%s + 0x%"PRIx64
+> >  
+> >  # hw/virtio/virtio.c
+> >  virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
+> > diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> > index 4589bfd92e..74807091a0 100644
+> > --- a/hw/virtio/vhost-user.c
+> > +++ b/hw/virtio/vhost-user.c
+> > @@ -990,6 +990,35 @@ static int vhost_user_postcopy_fault_handler(struct PostCopyFD *pcfd,
+> >      return -1;
+> >  }
+> >  
+> > +static int vhost_user_postcopy_waker(struct PostCopyFD *pcfd, RAMBlock *rb,
+> > +                                     uint64_t offset)
+> > +{
+> > +    struct vhost_dev *dev = pcfd->data;
+> > +    struct vhost_user *u = dev->opaque;
+> > +    int i;
+> > +
+> > +    trace_vhost_user_postcopy_waker(qemu_ram_get_idstr(rb), offset);
+> > +
+> > +    if (!u) {
+> > +        return 0;
+> > +    }
+> > +    /* Translate the offset into an address in the clients address space */
+> > +    for (i = 0; i < MIN(dev->mem->nregions, u->region_rb_len); i++) {
+> > +        if (u->region_rb[i] == rb &&
+> > +            offset >= u->region_rb_offset[i] &&
+> > +            offset < (u->region_rb_offset[i] +
+> > +                      dev->mem->regions[i].memory_size)) {
+> > +            uint64_t client_addr = (offset - u->region_rb_offset[i]) +
+> > +                                   u->postcopy_client_bases[i];
+> > +            trace_vhost_user_postcopy_waker_found(client_addr);
+> > +            return postcopy_wake_shared(pcfd, client_addr, rb);
+> > +        }
+> > +    }
+> > +
+> > +    trace_vhost_user_postcopy_waker_nomatch(qemu_ram_get_idstr(rb), offset);
+> > +    return 0;
+> 
+> Can we really reach here?
 
-In the subject line: s/space/sparse/
+Yes; note that all the waker's registered get called for all pages
+received
+so that:
+  a) A page not in shared memory, or not actually registered with a
+device, still calls the waker's and it's upto the waker to figure out
+whether it's interested for the device it belongs to.
 
->> In case of io error in nbd_co_send_sparse_read we should not
->> "goto reply:", as it is fatal error and common behavior is
->> disconnect in this case. We should not try to send client an
->> error reply, representing channel-io error on previous try to
->> send a reply.
->=20
-> Good catch.
->=20
->>
->> Fix this by handle block-status error in nbd_co_send_sparse_read,
->> so nbd_co_send_sparse_read fails only on io error. Then just skip
->> common "reply:" code path in nbd_trip.
->>
->> Note: nbd_co_send_structured_error is moved without changes to be
->> called from nbd_co_send_sparse_read.
->=20
-> Might be easier to read as two patches, one for the code motion, the=20
-> other for using the new code.=C2=A0 But I'm not going to insist on a sp=
-lit.
->=20
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+  b) With two devices registered, they might each have registered
+different areas of shared memory, and thus it's upto the waker to figure
+out if it's interested in this specific page.
+
+Dave
+
+> > +}
+> > +
+> >  /*
+> >   * Called at the start of an inbound postcopy on reception of the
+> >   * 'advise' command.
+> > @@ -1035,6 +1064,7 @@ static int vhost_user_postcopy_advise(struct vhost_dev *dev, Error **errp)
+> >      u->postcopy_fd.fd = ufd;
+> >      u->postcopy_fd.data = dev;
+> >      u->postcopy_fd.handler = vhost_user_postcopy_fault_handler;
+> > +    u->postcopy_fd.waker = vhost_user_postcopy_waker;
+> >      u->postcopy_fd.idstr = "vhost-user"; /* Need to find unique name */
+> >      postcopy_register_shared_ufd(&u->postcopy_fd);
+> >      return 0;
+> > -- 
+> > 2.14.3
+> > 
+> 
+> Thanks,
+> 
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
