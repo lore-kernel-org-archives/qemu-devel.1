@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1esgu6-0001Of-N6
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 22:35:12 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1esiUl-00041x-VY
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 00:17:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1esgu3-0004BM-EB
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 22:35:10 -0500
-Received: from ozlabs.org ([103.22.144.67]:58027)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1esgu2-0004AX-ON
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 22:35:07 -0500
-Date: Mon, 5 Mar 2018 14:31:44 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180305033144.GI2650@umbus.fritz.box>
-References: <1519900322-30263-1-git-send-email-yi.l.liu@linux.intel.com>
-	<1519900322-30263-6-git-send-email-yi.l.liu@linux.intel.com>
+	(envelope-from <andrew.smirnov@gmail.com>) id 1esiUk-0006qe-HP
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 00:17:07 -0500
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Sun,  4 Mar 2018 21:16:52 -0800
+Message-Id: <20180305051655.5944-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="0NB0lE7sNnW8+0qW"
-Content-Disposition: inline
-In-Reply-To: <1519900322-30263-6-git-send-email-yi.l.liu@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v3 05/12] hw/pci: introduce PCISVAOps to
- PCIDevice
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v7 0/3] Initial i.MX7 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,231 +20,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, alex.williamson@redhat.com, eric.auger.pro@gmail.com
+To: qemu-arm@nongnu.org
+Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, yurovsky@gmail.com
+
+Hi everyone,
+
+This v7 of the patch series containing the work that I've done in
+order to enable support for i.MX7 emulation in QEMU.
+
+As the one before last commit in the series states the supported i.MX7
+features are:
+
+    * up to 2 Cortex A9 cores (SMP works with PSCI)
+    * A7 MPCORE (identical to A15 MPCORE)
+    * 4 GPTs modules
+    * 7 GPIO controllers
+    * 2 IOMUXC controllers
+    * 1 CCM module
+    * 1 SVNS module
+    * 1 SRC module
+    * 1 GPCv2 controller
+    * 4 eCSPI controllers
+    * 4 I2C controllers
+    * 7 i.MX UART controllers
+    * 2 FlexCAN controllers
+    * 2 Ethernet controllers (FEC)
+    * 3 SD controllers (USDHC)
+    * 4 WDT modules
+    * 1 SDMA module
+    * 1 GPR module
+    * 2 USBMISC modules
+    * 2 ADC modules
+    * 1 PCIe controller
+    * 3 USB controllers
+    * 1 LCD controller
+    * 1 ARMv7 DAP IP block
+
+Feedback is welcome!
+
+Changes since [v6]:
+
+    - All endiannes in Designware PCI implementation is now specified
+      as little-endian
+
+Changes since [v5]:
+
+    - Rebase patchest on top of latest QEMU master, so now the
+      patchset is down to three patches
+
+    - Reverted the change to use pci_data_* functions becuase the
+      patch supporting this change was causing trouble
+
+    - Fixed endiannes of MSI and configuration space accessors to be
+      LITTLE_ENDIAN
+
+Changes since [v4]:
+
+    - Rebase patchest on top of latest QEMU master
+
+    - Reworked PCIE emulation code to create MemoryRegions
+      only once
+
+    - Fixed incorrect usages of PCI instead of PCIE
+
+    - Fixed device class reported by PCIE bridge
+
+    - Added patch to make pci_data_read() and pci_data_write() usable
+      for PCIE devices as well
+
+    - Converted PCIE code to use pci_data_read() and pci_data_write()
+
+    - Added VMStateDescription code for PCIE
+
+    - Collected Reviewed-by tag from Philippe
+
+Changes since [v3]:
+
+    - Changes to FEC were split into a separate set and merged to master
+
+    - Patchest is rebased on latest master
+
+    - Converted to use PSCI DT fixup code that is shared with virt
+      platform (now relocated to live in arm/boot.c)
+
+    - Large number of dummy block were converted to use
+      create_unimplemented_device() as opposed to its own dedicated
+      type
+
+    - Incorporated varios small feedback items
+
+    - Collected Reviewed-by tags from Peter
+
+Changes since [v2]:
+
+    - Added stubs for more blocks that were causing memory
+      transactions when booting Linux guest as were revealed by
+      additional testing of the patchest
+
+    - Added proper USB emulation code, so now it should be possible to
+      emulated guest's USB bus
+
+Changes since [v1]:
+
+    - Patchset no longer relies on "ignore_memory_transaction_failures = false"
+      for its functionality
+
+    - As a consequnce of implementing the above a number of patches
+      implementing dummy IP block emulation as well as PCIe emulation
+      patches that I alluded to in [v1] are now included in this patch
+      series
+
+    - "has_el3" property is no longer being set to "false" as a part
+      of intialization of A7 CPU. I couldn't reproduce the issues that
+      I thought I was having, so I just dropped that code.
+
+    - A number of smaller feedback items from Peter and other has been
+      incorporated into the patches.
 
 
---0NB0lE7sNnW8+0qW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks,
+Andrey Smirnov
 
-On Thu, Mar 01, 2018 at 06:31:55PM +0800, Liu, Yi L wrote:
-> This patch intoduces PCISVAOps for virt-SVA.
->=20
-> So far, to setup virt-SVA for assigned SVA capable device, needs to
-> config host translation structures. e.g. for VT-d, needs to set the
-> guest pasid table to host and enable nested translation. Besides,
-> vIOMMU emulator needs to forward guest's cache invalidation to host.
-> On VT-d, it is guest's invalidation to 1st level translation related
-> cache, such invalidation should be forwarded to host.
->=20
-> Proposed PCISVAOps are:
-> * sva_bind_guest_pasid_table: set the guest pasid table to host, and
->                               enable nested translation in host
-> * sva_register_notifier: register sva_notifier to forward guest's
->                          cache invalidation to host
-> * sva_unregister_notifier: unregister sva_notifier
->=20
-> The PCISVAOps should be provided by vfio or modules alike. Mainly for
-> assigned SVA capable devices.
->=20
-> Take virt-SVA on VT-d as an exmaple:
-> If a guest wants to setup virt-SVA for an assigned SVA capable device,
-> it programs its context entry. vIOMMU emulator captures guest's context
-> entry programming, and figure out the target device. vIOMMU emulator
-> use the pci_device_sva_bind_pasid_table() API to bind the guest pasid
-> table to host.
->=20
-> Guest would also program its pasid table. vIOMMU emulator captures
-> guest's pasid entry programming. In Qemu, needs to allocate an
-> AddressSpace to stand for the pasid tagged address space and Qemu also
-> needs to register sva_notifier to forward future cache invalidation
-> request to host.
->=20
-> Allocating AddressSpace to stand for the pasid tagged address space is
-> for the emulation of emulated SVA capable devices. Emulated SVA capable
-> devices may issue SVA aware DMAs, Qemu needs to emulate read/write to a
-> pasid tagged AddressSpace. Thus needs an abstraction for such address
-> space in Qemu.
->=20
-> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+[v6] https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg03587.html
+[v5] https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg01558.html
+[v4] https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg03264.html
+[v3] https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg04236.html
+[v2] https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg05516.html
+[v1] https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg04770.html
 
-So PCISVAOps is roughly equivalent to the cluster-of-PASIDs context I
-was suggesting in my earlier comments, however it's only an ops
-structure.  That means you can't easily share a context between
-multiple PCI devices which is unfortunate because:
-    * The simplest use case for SVA I can see would just put the
-      same set of PASIDs into place for every SVA capable device
-    * Sometimes the IOMMU can't determine exactly what device a DMA
-      came from.  Now the bridge cases where this applies are probably
-      unlikely with SVA devices, but I wouldn't want to bet on it.  In
-      addition, the chances some manufacturer will eventually put out
-      a buggy multifunction SVA capable device that use the wrong RIDs
-      for the secondary functions is pretty darn high.
+Andrey Smirnov (3):
+  pci: Add support for Designware IP block
+  i.MX: Add i.MX7 SOC implementation.
+  Implement support for i.MX7 Sabre board
 
-So I think instead you want a cluster-of-PASIDs object which has an
-ops table including both these and the per-PASID calls from the
-earlier patches (but the per-PASID calls would now take an explicit
-PASID value).
+ default-configs/arm-softmmu.mak  |   3 +
+ include/hw/arm/fsl-imx7.h        | 222 ++++++++++++
+ include/hw/pci-host/designware.h | 102 ++++++
+ include/hw/pci/pci_ids.h         |   2 +
+ hw/arm/fsl-imx7.c                | 580 ++++++++++++++++++++++++++++++
+ hw/arm/mcimx7d-sabre.c           |  90 +++++
+ hw/pci-host/designware.c         | 755 +++++++++++++++++++++++++++++++++++++++
+ hw/arm/Makefile.objs             |   3 +
+ hw/pci-host/Makefile.objs        |   2 +
+ 9 files changed, 1759 insertions(+)
+ create mode 100644 include/hw/arm/fsl-imx7.h
+ create mode 100644 include/hw/pci-host/designware.h
+ create mode 100644 hw/arm/fsl-imx7.c
+ create mode 100644 hw/arm/mcimx7d-sabre.c
+ create mode 100644 hw/pci-host/designware.c
 
-> ---
->  hw/pci/pci.c         | 60 ++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  include/hw/pci/pci.h | 21 ++++++++++++++++++
->  2 files changed, 81 insertions(+)
->=20
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index e006b6a..157fe21 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -2573,6 +2573,66 @@ void pci_setup_iommu(PCIBus *bus, PCIIOMMUFunc fn,=
- void *opaque)
->      bus->iommu_opaque =3D opaque;
->  }
-> =20
-> +void pci_setup_sva_ops(PCIDevice *dev, PCISVAOps *ops)
-> +{
-> +    if (dev) {
-> +        dev->sva_ops =3D ops;
-> +    }
-> +    return;
-> +}
-> +
-> +void pci_device_sva_bind_pasid_table(PCIBus *bus,
-> +                     int32_t devfn, uint64_t addr, uint32_t size)
-> +{
-> +    PCIDevice *dev;
-> +
-> +    if (!bus) {
-> +        return;
-> +    }
-> +
-> +    dev =3D bus->devices[devfn];
-> +    if (dev && dev->sva_ops) {
-> +        dev->sva_ops->sva_bind_pasid_table(bus, devfn, addr, size);
-> +    }
-> +    return;
-> +}
-> +
-> +void pci_device_sva_register_notifier(PCIBus *bus, int32_t devfn,
-> +                                      IOMMUSVAContext *sva_ctx)
-> +{
-> +    PCIDevice *dev;
-> +
-> +    if (!bus) {
-> +        return;
-> +    }
-> +
-> +    dev =3D bus->devices[devfn];
-> +    if (dev && dev->sva_ops) {
-> +        dev->sva_ops->sva_register_notifier(bus,
-> +                                            devfn,
-> +                                            sva_ctx);
-> +    }
-> +    return;
-> +}
-> +
-> +void pci_device_sva_unregister_notifier(PCIBus *bus, int32_t devfn,
-> +                                        IOMMUSVAContext *sva_ctx)
-> +{
-> +    PCIDevice *dev;
-> +
-> +    if (!bus) {
-> +        return;
-> +    }
-> +
-> +    dev =3D bus->devices[devfn];
-> +    if (dev && dev->sva_ops) {
-> +        dev->sva_ops->sva_unregister_notifier(bus,
-> +                                              devfn,
-> +                                              sva_ctx);
-> +    }
-> +    return;
-> +}
-> +
->  static void pci_dev_get_w64(PCIBus *b, PCIDevice *dev, void *opaque)
->  {
->      Range *range =3D opaque;
-> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> index d8c18c7..32889a4 100644
-> --- a/include/hw/pci/pci.h
-> +++ b/include/hw/pci/pci.h
-> @@ -10,6 +10,8 @@
-> =20
->  #include "hw/pci/pcie.h"
-> =20
-> +#include "hw/core/pasid.h"
-> +
->  extern bool pci_available;
-> =20
->  /* PCI bus */
-> @@ -262,6 +264,16 @@ struct PCIReqIDCache {
->  };
->  typedef struct PCIReqIDCache PCIReqIDCache;
-> =20
-> +typedef struct PCISVAOps PCISVAOps;
-> +struct PCISVAOps {
-> +    void (*sva_bind_pasid_table)(PCIBus *bus, int32_t devfn,
-> +             uint64_t pasidt_addr, uint32_t size);
-> +    void (*sva_register_notifier)(PCIBus *bus, int32_t devfn,
-> +                                  IOMMUSVAContext *sva_ctx);
-> +    void (*sva_unregister_notifier)(PCIBus *bus, int32_t devfn,
-> +                                    IOMMUSVAContext *sva_ctx);
-> +};
-> +
->  struct PCIDevice {
->      DeviceState qdev;
-> =20
-> @@ -351,6 +363,7 @@ struct PCIDevice {
->      MSIVectorUseNotifier msix_vector_use_notifier;
->      MSIVectorReleaseNotifier msix_vector_release_notifier;
->      MSIVectorPollNotifier msix_vector_poll_notifier;
-> +    PCISVAOps *sva_ops;
->  };
-> =20
->  void pci_register_bar(PCIDevice *pci_dev, int region_num,
-> @@ -477,6 +490,14 @@ typedef AddressSpace *(*PCIIOMMUFunc)(PCIBus *, void=
- *, int);
->  AddressSpace *pci_device_iommu_address_space(PCIDevice *dev);
->  void pci_setup_iommu(PCIBus *bus, PCIIOMMUFunc fn, void *opaque);
-> =20
-> +void pci_setup_sva_ops(PCIDevice *dev, PCISVAOps *ops);
-> +void pci_device_sva_bind_pasid_table(PCIBus *bus, int32_t devfn,
-> +                     uint64_t pasidt_addr, uint32_t size);
-> +void pci_device_sva_register_notifier(PCIBus *bus, int32_t devfn,
-> +                                      IOMMUSVAContext *sva_ctx);
-> +void pci_device_sva_unregister_notifier(PCIBus *bus, int32_t devfn,
-> +                                       IOMMUSVAContext *sva_ctx);
-> +
->  static inline void
->  pci_set_byte(uint8_t *config, uint8_t val)
->  {
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---0NB0lE7sNnW8+0qW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqcuiAACgkQbDjKyiDZ
-s5JRRw//VQiM2WfdZtbqJcpcp7GkwYykY82AXdGTRMg+lpqOCwEqYfPqLnBpgmVJ
-4/HNTcZ0H6O4A/Ki8Y65x6CvuXpRIDxW0eaxEoO+kA1RnoeuCpBeSQVkd5y1Ellc
-ILl/Own05HrcKUGSwPew11LtIICMfBN51MTVRcLXI16/1N4r4aMIJiqtonnf+BAK
-JVkQcU2ELvPYePnYBZFM0pUBgQX7PSeEoKZvwmPRhDz3ZcANWqBHkOjGAzdflxnu
-8OPv0M/4Qj+FRaIORDrxQdAL0r0njMq+fk0hhHuUhaXRnEOjt8XmsXYGBiPnayN4
-ikSl1/ZsK3GoGzpczhfaudTZakHfD915R2OJ45ieCltaeAvB+1neOkQ3m1BeDIlZ
-TYRFCqyhZNMmrJ4APgTw7KmJU3+HYkpj3qsRj46PlVNYKRVD4caZlTYGXt3ZT5oK
-ajjb7llpnzhEpmMA8hXPIXbVagSyZg0esd7uTfh69qnJX79jTVgVSn5me14sHM7d
-PJxVW0+M0Dkk62lENq4Mq+A+zO/0UNyBvyEOsVcyUY8kiGsdPTiLd9Wisx9Qfc8t
-MXQCHonfpmfz+tbHz7xrpMtazz/1WOronxerE3iOFaU6U3QrBW7ugxDJCt7mFMug
-Z72f5YFQPuPeBSGBLJdZkeVlIPsquT0kCFzB7e4j84wn+jvQV2Q=
-=YQkJ
------END PGP SIGNATURE-----
-
---0NB0lE7sNnW8+0qW--
+-- 
+2.14.3
