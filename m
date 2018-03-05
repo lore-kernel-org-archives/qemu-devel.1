@@ -1,43 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1esqXl-0007nc-L9
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:52:46 -0500
+	(envelope-from <berrange@redhat.com>) id 1esqXp-0007p4-EU
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:52:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1esqXi-0003Ut-EW
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:52:45 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33136)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1esqXi-0003UD-5Y
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:52:42 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w25DnvUl010560
-	for <qemu-devel@nongnu.org>; Mon, 5 Mar 2018 08:52:40 -0500
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gh3gh1j5h-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 08:52:40 -0500
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Mon, 5 Mar 2018 08:52:38 -0500
-References: <1519934373-3629-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1519934373-3629-2-git-send-email-stefanb@linux.vnet.ibm.com>
-	<CAJ+F1CLUyeroa3wDDnC2tgAbvo+GChT4aADQUWF5y7Zn6_3KsQ@mail.gmail.com>
-	<20180302101427.GB3154@work-vm>
-	<57ac3b64-831e-2245-45f4-08d3970bbf6d@linux.vnet.ibm.com>
-	<20180305124346.GI3131@work-vm>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Mon, 5 Mar 2018 08:52:35 -0500
+	(envelope-from <berrange@redhat.com>) id 1esqXm-0003Vj-3S
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:52:49 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40900 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1esqXl-0003VV-Tj
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:52:46 -0500
+Date: Mon, 5 Mar 2018 13:52:32 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180305135232.GR17368@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180228180215.25470-1-wei@redhat.com>
+	<20180228180215.25470-2-wei@redhat.com>
+	<ca21f795-dae7-d6b5-44f1-ef8ba792ac04@redhat.com>
+	<20180305110122.GD3131@work-vm>
+	<20180305133654.7aokepvzcmxhzk4q@kamzik.brq.redhat.com>
+	<CAFEAcA8jse2AdCO8JgA7m99h8pwTRBCQ9aOi=-0QOG+pA9tk2w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180305124346.GI3131@work-vm>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <385b9762-ae06-11f2-5af0-614ce2ce00bc@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/2] tpm: extend TPM emulator with state
- migration support
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8jse2AdCO8JgA7m99h8pwTRBCQ9aOi=-0QOG+pA9tk2w@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH V7 1/4] rules: Move cross compilation auto
+ detection functions to rules.mak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,23 +33,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Juan Quintela <quintela@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Andrew Jones <drjones@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Wei Huang <wei@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 03/05/2018 07:43 AM, Dr. David Alan Gilbert wrote:
-> * Stefan Berger (stefanb@linux.vnet.ibm.com) wrote:
->> On 03/02/2018 05:14 AM, Dr. David Alan Gilbert wrote:
->>
->> hw/tpm/tpm_emulator.c:909:tpm_emulator_class_init: Object 0x55f4cbc72680 is
->> not an instance of type device
->> Aborted
->>
->> Can we leave it as it is ?
-> Oh, not a device, hmmm that's odd; yeh probably best then.
+On Mon, Mar 05, 2018 at 01:40:06PM +0000, Peter Maydell wrote:
+> On 5 March 2018 at 13:36, Andrew Jones <drjones@redhat.com> wrote:
+> > IMO, the makefile is the right approach. I wouldn't like to see AArch64
+> > added with a script and then converted, along with x86, to a makefile at
+> > some later time (probably never).
+> 
+> I'm not really enthusiastic about this approach of picking a cross
+> compiler in the makefile rather than configure, though. The stuff
+> we have at the moment that tries to build the x86 ROMs with whatever
+> random host compiler we happen to be using is already a source
+> of occasional brokenness. If we're going to try to build target
+> code on a wider basis than just the x86 roms I'd like to see it
+> done in a cleaner manner...
 
-At least it doesn't *need* to be a device that an OS could talk to via 
-MMIO or so. That's the TIS or CRB hardware interfaces in this case. If 
-we have to convert this 'backend' to a device for some reason, I'd do 
-it, but rather leave it as it is if not.
+Seems like for each arch that we need a cross compiler for, we
+ought to have configure args & a corresponding config.mak variable
 
-    Stefan
+eg
+
+   configure \
+   	--cross-cc-aarch64=aarch64-redhat-linux-gcc \
+        --cross-cc-x86_64=x86_64-redhat-linux-gcc \
+
+If the --cross-cc-$ARCH arg isn't given we can just autodetect
+one, if present.
+
+This would end up setting in config.mak
+
+ CROSS_CC_X86_64=x86_64-redhat-linux-c++
+ CROSS_CC_AARCH64=aarch64-redhat-linux-c++
+
+
+If the --cross-cc-$ARCH  arg is not given, and we can't automatically
+find a suitable compiler for that arch, then CC_$ARCH make variable
+should be left undefined. Any rules using these cross-compilers should
+automatically disable themselves, to ensure we don't suddenly force
+all people building QEMU to install many cross compilers.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
