@@ -1,34 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1esqMa-0004e3-6o
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:41:13 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1esqXl-0007nc-L9
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:52:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1esqMW-00070z-63
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:41:12 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50260)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1esqMV-00070l-Vq
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:41:08 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1esqMT-00077C-V2
-	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 13:41:06 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0496A2E81A5
-	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 13:41:04 +0000 (UTC)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1esqXi-0003Ut-EW
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:52:45 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33136)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1esqXi-0003UD-5Y
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:52:42 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w25DnvUl010560
+	for <qemu-devel@nongnu.org>; Mon, 5 Mar 2018 08:52:40 -0500
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2gh3gh1j5h-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 08:52:40 -0500
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Mon, 5 Mar 2018 08:52:38 -0500
+References: <1519934373-3629-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1519934373-3629-2-git-send-email-stefanb@linux.vnet.ibm.com>
+	<CAJ+F1CLUyeroa3wDDnC2tgAbvo+GChT4aADQUWF5y7Zn6_3KsQ@mail.gmail.com>
+	<20180302101427.GB3154@work-vm>
+	<57ac3b64-831e-2245-45f4-08d3970bbf6d@linux.vnet.ibm.com>
+	<20180305124346.GI3131@work-vm>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Mon, 5 Mar 2018 08:52:35 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 05 Mar 2018 13:35:04 -0000
-From: =?utf-8?q?=C3=89ric_Hoffman?= <1673976@bugs.launchpad.net>
-Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152025690463.7584.7515381414475565173.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1673976] Re: linux-user clone() can't handle
- glibc posix_spawn() (causes locale-gen to assert)
+In-Reply-To: <20180305124346.GI3131@work-vm>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <385b9762-ae06-11f2-5af0-614ce2ce00bc@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] tpm: extend TPM emulator with state
+ migration support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,54 +46,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Juan Quintela <quintela@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-Ok, I taught that could be an issue, but as I said, I don't really know
-all the internals of QEMU.
+On 03/05/2018 07:43 AM, Dr. David Alan Gilbert wrote:
+> * Stefan Berger (stefanb@linux.vnet.ibm.com) wrote:
+>> On 03/02/2018 05:14 AM, Dr. David Alan Gilbert wrote:
+>>
+>> hw/tpm/tpm_emulator.c:909:tpm_emulator_class_init: Object 0x55f4cbc72680 is
+>> not an instance of type device
+>> Aborted
+>>
+>> Can we leave it as it is ?
+> Oh, not a device, hmmm that's odd; yeh probably best then.
 
-Another idea would be to fork the child, without CLONE_VM, on the
-initial call to the clone syscall, like it's done right now, and then
-wait for that child until he call execve or exit syscall.  Maybe using
-some shared memory or IPC to pass the relevant status when the child
-finally invoke those syscalls.
+At least it doesn't *need* to be a device that an OS could talk to via 
+MMIO or so. That's the TIS or CRB hardware interfaces in this case. If 
+we have to convert this 'backend' to a device for some reason, I'd do 
+it, but rather leave it as it is if not.
 
-When the child finally call one of those, then after signalling the
-parent about where it is (and the params to the syscall), the child
-could exit and the parent actually take action.
-
-Regards,
-Eric
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1673976
-
-Title:
-  linux-user clone() can't handle glibc posix_spawn() (causes locale-gen
-  to assert)
-
-Status in QEMU:
-  New
-
-Bug description:
-  I'm running a command (locale-gen) inside of an armv7h chroot mounted
-  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
-  chroot file system and I get a core dump.
-
-  locale-gen
-  Generating locales...
-  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
-360: __spawnix: Assertion `ec >=3D 0' failed.
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
- localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
-le
-
-  I've done this same thing successfully for years, but this breakage
-  has appeared some time in the last 3 or so months. Possibly with the
-  update to qemu version 2.8.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
+    Stefan
