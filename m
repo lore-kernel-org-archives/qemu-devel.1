@@ -1,41 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1ess4m-0003UM-S1
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:30:57 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ess5y-00049H-Li
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:32:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1ess4l-0000wg-V6
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:30:56 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48614)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1ess4l-0000p3-MB
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:30:55 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w25FUduU113093
-	for <qemu-devel@nongnu.org>; Mon, 5 Mar 2018 10:30:44 -0500
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gh620r89y-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 10:30:41 -0500
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Mon, 5 Mar 2018 08:30:12 -0700
-References: <152024589806.7327.9844777027357521578.malonedeb@gac.canonical.com>
-	<083d2e7c-5ada-88c9-bf50-0c68e7c19136@de.ibm.com>
-	<c0d0caa1-992a-7df6-67bb-e7d639f18049@redhat.com>
-From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Mon, 5 Mar 2018 10:30:08 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ess5x-0001mz-HE
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:32:10 -0500
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:34890)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ess5x-0001ll-Ax
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:32:09 -0500
+Received: by mail-ot0-x242.google.com with SMTP id w2so15262953otg.2
+	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 07:32:09 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <c0d0caa1-992a-7df6-67bb-e7d639f18049@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <0d19a911-765c-ac44-fab5-a90f23c9e968@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [Bug 1753437] [NEW]
- qemu/pc-bios/s390-ccw/libc.c:82: bad test ?
+In-Reply-To: <20180305061237.21484-1-andrew.smirnov@gmail.com>
+References: <20180305061237.21484-1-andrew.smirnov@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 5 Mar 2018 15:31:48 +0000
+Message-ID: <CAFEAcA_Y3oY0w3Xmrs0BTfhXw1s7S-8pESZ-rB2HgXzZ_5Vxmw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RESEND PATCH v7 0/3] Initial i.MX7 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,40 +28,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Bug 1753437 <1753437@bugs.launchpad.net>, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>
+To: Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, "Michael S . Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-On 03/05/2018 09:53 AM, Thomas Huth wrote:
-> On 05.03.2018 12:22, Christian Borntraeger wrote:
->> Adding qemu-s390x.
->>
->> On 03/05/2018 11:31 AM, dcb wrote:
->>> Public bug reported:
->>>
->>> qemu/pc-bios/s390-ccw/libc.c:82]: (style) Unsigned variable 'num_idx'
->>> can't be negative so it is unnecessary to test it.
->>>
->>> Source code is
->>>
->>>
->>>      while (num_idx >= 0) {
->>>
->>> but
->>>
->>>      size_t num_idx = 1; /* account for NUL */
->>>
->>> So there is no escape from the while loop.
-> Actually we're defining size_t like this in the s390-ccw bios:
+On 5 March 2018 at 06:12, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
+> RESEND due to botched original v7 submission (patch 1/3 broken)
 >
-> typedef long               size_t;
+> Hi everyone,
 >
-> So the while loop is not endless.
->
-> But yes, this is ugly, we should fix the function and re-define size_t
-> to be unsigned instead...
->
->   Thomas
->
-Agreed.
+> This v7 of the patch series containing the work that I've done in
+> order to enable support for i.MX7 emulation in QEMU.
 
--- 
-- Collin L Walling
+Thanks; applied to target-arm.next.
+
+By the way there were a couple of i.MX bug reports this weekend:
+https://bugs.launchpad.net/qemu/+bug/1753314  (about the UART)
+https://bugs.launchpad.net/qemu/+bug/1753309  (about ethernet)
+
+Are you interested in having a look at them?
+
+thanks
+-- PMM
