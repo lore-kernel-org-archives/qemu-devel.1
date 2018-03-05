@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1esj63-0004zw-7G
+	(envelope-from <yulei.zhang@intel.com>) id 1esj63-0004zy-7n
 	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 00:55:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1esj5y-0008Eb-Be
+	(envelope-from <yulei.zhang@intel.com>) id 1esj5y-0008Em-W4
 	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 00:55:39 -0500
 Received: from mga06.intel.com ([134.134.136.31]:54637)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yulei.zhang@intel.com>)
-	id 1esj5y-0008DY-2j
+	id 1esj5y-0008DY-Hk
 	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 00:55:34 -0500
 From: Yulei Zhang <yulei.zhang@intel.com>
-Date: Mon,  5 Mar 2018 14:00:49 +0800
-Message-Id: <1520229653-10658-1-git-send-email-yulei.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH V3 0/4] vfio: Introduce Live migration
- capability to vfio_mdev device
+Date: Mon,  5 Mar 2018 14:00:51 +0800
+Message-Id: <1520229653-10658-3-git-send-email-yulei.zhang@intel.com>
+In-Reply-To: <1520229653-10658-1-git-send-email-yulei.zhang@intel.com>
+References: <1520229653-10658-1-git-send-email-yulei.zhang@intel.com>
+Subject: [Qemu-devel] [PATCH V3 2/4] vfio: Add vm status change callback to
+ stop/restart the mdev device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,83 +28,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kevin.tian@intel.com, zhenyuw@linux.intel.com, kwankhede@nvidia.com, alex.williamson@redhat.com, Yulei Zhang <yulei.zhang@intel.com>
 
-Summary
+VM status change handler is added to change the vfio pci device
+status during the migration, write the demanded device status
+to the DEVICE STATUS subregion to stop the device on the source side
+before fetch its status and start the deivce on the target side
+after restore its status.
 
-This series RFC would like to resume the discussion about how to
-introduce the live migration capability to vfio mdev device. 
+Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
+---
+ hw/vfio/pci.c                 | 20 ++++++++++++++++++++
+ include/hw/vfio/vfio-common.h |  1 +
+ linux-headers/linux/vfio.h    |  3 +++
+ 3 files changed, 24 insertions(+)
 
-By adding a new vfio subtype region VFIO_REGION_SUBTYPE_DEVICE_STATE,
-the mdev device will be set to migratable if the new region exist
-during the initialization.  
-
-The intention to add the new region is using it for mdev device status
-save and restore during the migration. The access to this region
-will be trapped and forward to the mdev device driver, it also uses 
-the first byte in the new region to control the running state of mdev
-device, so during the migration after stop the mdev driver, qemu could
-retrieve the specific device status from this region and transfer to 
-the target VM side for the mdev device restore.
-
-In addition,  we add one new ioctl VFIO_IOMMU_GET_DIRTY_BITMAP to help do 
-the mdev device dirty page synchronization during the migration, currently
-it is just for static copy, in the future we would like to add new interface
-for the pre-copy.
-
-Below is the vfio_mdev device migration sequence
-Source VM side:
-			start migration
-				|
-				V
-        	 get the cpu state change callback, write to the
-        	 subregion's first byte to stop the mdev device
-				|
-				V
-		 quary the dirty page bitmap from iommu container 
-		 and add into qemu dirty list for synchronization
-				|
-				V
-		 save the deivce status into Qemufile which is 
-                     read from the vfio device subregion
-
-Target VM side:
-		   restore the mdev device after get the
-		     saved status context from Qemufile
-				|
-				V
-		     get the cpu state change callback
- 		     write to subregion's first byte to 
-                      start the mdev device to put it in 
-                      running status
-				|
-				V
-			finish migration
-
-V3->V2:
-1. rebase the patch to Qemu stable 2.10 branch.
-2. use a common name for the subregion instead of specific for 
-   intel IGD.
-
-V1->V2:
-Per Alex's suggestion:
-1. use device subtype region instead of VFIO PCI fixed region.
-2. remove unnecessary ioctl, use the first byte of subregion to 
-   control the running state of mdev device.  
-3. for dirty page synchronization, implement the interface with
-   VFIOContainer instead of vfio pci device.
-
-Yulei Zhang (4):
-  vfio: introduce a new VFIO subregion for mdev device migration support
-  vfio: Add vm status change callback to stop/restart the mdev device
-  vfio: Add struct vfio_vmstate_info to introduce put/get callback
-    funtion for vfio device status save/restore
-  vifo: introduce new VFIO ioctl VFIO_IOMMU_GET_DIRTY_BITMAP
-
- hw/vfio/common.c              |  34 +++++++++
- hw/vfio/pci.c                 | 171 +++++++++++++++++++++++++++++++++++++++++-
- hw/vfio/pci.h                 |   1 +
- include/hw/vfio/vfio-common.h |   1 +
- linux-headers/linux/vfio.h    |  29 ++++++-
- 5 files changed, 232 insertions(+), 4 deletions(-)
-
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 2fe20e4..3e2289c 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -38,6 +38,7 @@
+ static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
+ static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
+ static VMStateDescription vfio_pci_vmstate;
++static void vfio_vm_change_state_handler(void *pv, int running, RunState state);
+ 
+ /*
+  * Disabling BAR mmaping can be slow, but toggling it around INTx can
+@@ -2880,6 +2881,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+     vfio_register_err_notifier(vdev);
+     vfio_register_req_notifier(vdev);
+     vfio_setup_resetfn_quirk(vdev);
++    qemu_add_vm_change_state_handler(vfio_vm_change_state_handler, vdev);
+ 
+     return;
+ 
+@@ -2962,6 +2964,24 @@ post_reset:
+     vfio_pci_post_reset(vdev);
+ }
+ 
++static void vfio_vm_change_state_handler(void *pv, int running, RunState state)
++{
++    VFIOPCIDevice *vdev = pv;
++    VFIODevice *vbasedev = &vdev->vbasedev;
++    uint8_t dev_state;
++    uint8_t sz = 1;
++
++    dev_state = running ? VFIO_DEVICE_START : VFIO_DEVICE_STOP;
++
++    if (pwrite(vdev->vbasedev.fd, &dev_state,
++               sz, vdev->device_state.offset) != sz) {
++        error_report("vfio: Failed to %s device", running ? "start" : "stop");
++        return;
++    }
++
++    vbasedev->device_state = dev_state;
++}
++
+ static void vfio_instance_init(Object *obj)
+ {
+     PCIDevice *pci_dev = PCI_DEVICE(obj);
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index f3a2ac9..9c14a8f 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -125,6 +125,7 @@ typedef struct VFIODevice {
+     unsigned int num_irqs;
+     unsigned int num_regions;
+     unsigned int flags;
++    bool device_state;
+ } VFIODevice;
+ 
+ struct VFIODeviceOps {
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index c3b8e4a..4ddeebc 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -303,6 +303,9 @@ struct vfio_region_info_cap_type {
+ /* Mdev sub-type for device state save and restore */
+ #define VFIO_REGION_SUBTYPE_DEVICE_STATE	(4)
+ 
++#define VFIO_DEVICE_START	0
++#define VFIO_DEVICE_STOP	1
++
+ /**
+  * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
+  *				    struct vfio_irq_info)
 -- 
 2.7.4
