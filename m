@@ -1,39 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40032)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1esoCr-0001hf-7F
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 06:23:02 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1esoHR-0003AU-Ne
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 06:27:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1esoCo-0003Uu-6C
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 06:23:01 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36852)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1esoCn-0003UH-So
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 06:22:58 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w25BMaUO119844
-	for <qemu-devel@nongnu.org>; Mon, 5 Mar 2018 06:22:56 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gh3t4atv0-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 06:22:56 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 5 Mar 2018 11:22:54 -0000
-References: <152024589806.7327.9844777027357521578.malonedeb@gac.canonical.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 5 Mar 2018 12:22:50 +0100
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1esoHQ-0006my-Qp
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 06:27:45 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Mon,  5 Mar 2018 08:27:03 -0300
+Message-Id: <20180305112732.26471-2-f4bug@amsat.org>
+In-Reply-To: <20180305112732.26471-1-f4bug@amsat.org>
+References: <20180305112732.26471-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <152024589806.7327.9844777027357521578.malonedeb@gac.canonical.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <083d2e7c-5ada-88c9-bf50-0c68e7c19136@de.ibm.com>
-Subject: Re: [Qemu-devel] [Bug 1753437] [NEW]
- qemu/pc-bios/s390-ccw/libc.c:82: bad test ?
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 01/30] util/cutils: extract byte-based
+ definitions into a new header: "qemu/cunits.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,28 +27,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1753437 <1753437@bugs.launchpad.net>, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>
+To: qemu-trivial@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-Adding qemu-s390x.
+(added in 076b35b5a56)
 
-On 03/05/2018 11:31 AM, dcb wrote:
-> Public bug reported:
-> 
-> qemu/pc-bios/s390-ccw/libc.c:82]: (style) Unsigned variable 'num_idx'
-> can't be negative so it is unnecessary to test it.
-> 
-> Source code is
-> 
-> 
->     while (num_idx >= 0) {
-> 
-> but
-> 
->     size_t num_idx = 1; /* account for NUL */
-> 
-> So there is no escape from the while loop.
-> 
-> ** Affects: qemu
->      Importance: Undecided
->          Status: New
-> 
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+---
+ include/qemu/cunits.h | 11 +++++++++++
+ include/qemu/cutils.h |  8 +-------
+ 2 files changed, 12 insertions(+), 7 deletions(-)
+ create mode 100644 include/qemu/cunits.h
+
+diff --git a/include/qemu/cunits.h b/include/qemu/cunits.h
+new file mode 100644
+index 0000000000..c0207b7611
+--- /dev/null
++++ b/include/qemu/cunits.h
+@@ -0,0 +1,11 @@
++#ifndef QEMU_CUNITS_H
++#define QEMU_CUNITS_H
++
++#define K_BYTE     (1ULL << 10)
++#define M_BYTE     (1ULL << 20)
++#define G_BYTE     (1ULL << 30)
++#define T_BYTE     (1ULL << 40)
++#define P_BYTE     (1ULL << 50)
++#define E_BYTE     (1ULL << 60)
++
++#endif
+diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
+index f0878eaafa..01184a70b3 100644
+--- a/include/qemu/cutils.h
++++ b/include/qemu/cutils.h
+@@ -2,6 +2,7 @@
+ #define QEMU_CUTILS_H
+ 
+ #include "qemu/fprintf-fn.h"
++#include "qemu/cunits.h"
+ 
+ /**
+  * pstrcpy:
+@@ -143,13 +144,6 @@ int qemu_strtosz(const char *nptr, char **end, uint64_t *result);
+ int qemu_strtosz_MiB(const char *nptr, char **end, uint64_t *result);
+ int qemu_strtosz_metric(const char *nptr, char **end, uint64_t *result);
+ 
+-#define K_BYTE     (1ULL << 10)
+-#define M_BYTE     (1ULL << 20)
+-#define G_BYTE     (1ULL << 30)
+-#define T_BYTE     (1ULL << 40)
+-#define P_BYTE     (1ULL << 50)
+-#define E_BYTE     (1ULL << 60)
+-
+ /* used to print char* safely */
+ #define STR_OR_NULL(str) ((str) ? (str) : "null")
+ 
+-- 
+2.16.2
