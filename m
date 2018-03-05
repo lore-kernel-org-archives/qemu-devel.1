@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1essNi-0004tQ-24
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:50:30 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1essOb-0005Qx-PO
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:51:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1essNh-0002j3-1p
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:50:30 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1essOb-0003IT-02
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:51:25 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:52710)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1essOa-0003I9-OQ
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:51:24 -0500
+Received: by mail-wm0-x242.google.com with SMTP id t3so16806310wmc.2
+	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 07:51:24 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_Y3oY0w3Xmrs0BTfhXw1s7S-8pESZ-rB2HgXzZ_5Vxmw@mail.gmail.com>
-References: <20180305061237.21484-1-andrew.smirnov@gmail.com>
-	<CAFEAcA_Y3oY0w3Xmrs0BTfhXw1s7S-8pESZ-rB2HgXzZ_5Vxmw@mail.gmail.com>
-From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Mon, 5 Mar 2018 07:50:23 -0800
-Message-ID: <CAHQ1cqFrb3eryu9Dvi2=8aV_=K-MX9bqPHNAH4Fc4p402Sm0Bw@mail.gmail.com>
+In-Reply-To: <1520264575-26506-1-git-send-email-mrezanin@redhat.com>
+References: <1520264575-26506-1-git-send-email-mrezanin@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 5 Mar 2018 16:51:22 +0100
+Message-ID: <CAJ+F1CJdDFWsogi9x_1xb__X==9VE0kBj7KY1qe5w07rhHfCYw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RESEND PATCH v7 0/3] Initial i.MX7 support
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] Use CONFIG_VHOST_USER_SCSI to enable
+ vhost-scsi-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,40 +30,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Guenter Roeck <linux@roeck-us.net>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, "Michael S . Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: Miroslav Rezanina <mrezanin@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
-On Mon, Mar 5, 2018 at 7:31 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 5 March 2018 at 06:12, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
->> RESEND due to botched original v7 submission (patch 1/3 broken)
->>
->> Hi everyone,
->>
->> This v7 of the patch series containing the work that I've done in
->> order to enable support for i.MX7 emulation in QEMU.
+On Mon, Mar 5, 2018 at 4:42 PM,  <mrezanin@redhat.com> wrote:
+> From: Miroslav Rezanina <mrezanin@redhat.com>
 >
-> Thanks; applied to target-arm.next.
+> Currently, "defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)"
+> is used to enable/disable vhost-scsi-pci build as this condition
+> is used to enable/disable CONFIG_VHOST_USER_SCSI too.
 >
-> By the way there were a couple of i.MX bug reports this weekend:
-> https://bugs.launchpad.net/qemu/+bug/1753314  (about the UART)
+> However, when CONFIG_VHOST_USER_SCSI is manually disable vhost-scsi-pci
+> is still registered although it should be disabled.
+>
+> Changing condition to use CONFIG_VHOST_USER_SCSI so vhost-scsi-pci
+> can be controled by CONFIG_VHOST_USER_SCSI option.
+>
+> Signed-off-by: Miroslav Rezanina <mrezanin@redhat.com>
 
-Sure, might not be able to look at it immediately but I'll give it a
-spin by the end of this week.
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-> https://bugs.launchpad.net/qemu/+bug/1753309  (about ethernet)
+
+> ---
+>  hw/virtio/virtio-pci.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> index 1e8ab7b..df59d6b 100644
+> --- a/hw/virtio/virtio-pci.c
+> +++ b/hw/virtio/virtio-pci.c
+> @@ -2163,7 +2163,7 @@ static const TypeInfo vhost_scsi_pci_info =3D {
+>  };
+>  #endif
+>
+> -#if defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)
+> +#if defined(CONFIG_VHOST_USER_SCSI)
+>  /* vhost-user-scsi-pci */
+>  static Property vhost_user_scsi_pci_properties[] =3D {
+>      DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
+> @@ -2696,7 +2696,7 @@ static void virtio_pci_register_types(void)
+>  #ifdef CONFIG_VHOST_SCSI
+>      type_register_static(&vhost_scsi_pci_info);
+>  #endif
+> -#if defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)
+> +#if defined(CONFIG_VHOST_USER_SCSI)
+>      type_register_static(&vhost_user_scsi_pci_info);
+>  #endif
+>  #ifdef CONFIG_VHOST_VSOCK
+> --
+> 1.8.3.1
+>
 >
 
-Peter:
 
-Ha! This is a rather amusing coincidence since I was just talking
-about this exact bug with Guenter Roeck (added to this thread), who
-was going to submit a patch to fix it.
 
-Guenter:
-
-Sorry for just randomly pulling you into this seemingly random
-discussion, but I though this additional context would be helpful to
-you.
-
-Thanks,
-Andrey Smirnov
+--=20
+Marc-Andr=C3=A9 Lureau
