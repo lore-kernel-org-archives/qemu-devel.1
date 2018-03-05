@@ -1,31 +1,47 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esxWq-0004rN-GS
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:20:17 -0500
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1esxZx-0007kb-Ft
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:23:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esxWp-0001v5-AG
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:20:16 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:54410)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esxWp-0001un-1w
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:20:15 -0500
-Received: by mail-wm0-x243.google.com with SMTP id z81so18731461wmb.4
-	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 13:20:14 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon,  5 Mar 2018 18:19:28 -0300
-Message-Id: <20180305211928.466-23-f4bug@amsat.org>
-In-Reply-To: <20180305211928.466-1-f4bug@amsat.org>
-References: <20180305211928.466-1-f4bug@amsat.org>
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1esxZu-0003Cb-8R
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:23:29 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33980
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
+	id 1esxZu-0002qF-2i
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:23:26 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w25LIcc8144705
+	for <qemu-devel@nongnu.org>; Mon, 5 Mar 2018 16:22:25 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2gh8rpnndd-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 16:22:24 -0500
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
+	Mon, 5 Mar 2018 14:22:22 -0700
+References: <1519746259-27710-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<1519746259-27710-6-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<00b392ee-c928-3b22-4caf-33e7ce04f7f7@redhat.com>
+	<e0b24000-0d2a-46f5-c880-89bf6a394bbb@linux.vnet.ibm.com>
+	<bf963413-21ad-9b33-bd6c-e096e5686c59@redhat.com>
+	<20180228124058.6166d957.cohuck@redhat.com>
+	<b60e70b9-f076-8cc9-7c29-2887954b1404@linux.vnet.ibm.com>
+	<c739f2ad-8e9a-1fa0-4277-3c4447c6ef15@redhat.com>
+From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+Date: Mon, 5 Mar 2018 16:22:13 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH v2 22/22] hw/i386/pc: Factor out the
- superio code
+In-Reply-To: <c739f2ad-8e9a-1fa0-4277-3c4447c6ef15@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <c0ff3874-e933-e30b-bc37-60abc4732a23@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] s390x/cpumodel: Set up CPU model
+ for AP device support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,116 +50,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Marcel Apfelbaum <marcel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alexey Kardashevskiy <aik@ozlabs.ru>, Thomas Huth <thuth@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>
+To: David Hildenbrand <david@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, bjsdjshi@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/i386/pc.c | 72 ++++++++++++++++++++++++++++++++++--------------------------
- 1 file changed, 41 insertions(+), 31 deletions(-)
+On 03/01/2018 09:36 AM, David Hildenbrand wrote:
+> On 01.03.2018 15:12, Pierre Morel wrote:
+>> On 28/02/2018 12:40, Cornelia Huck wrote:
+>>> On Wed, 28 Feb 2018 11:26:30 +0100
+>>> David Hildenbrand <david@redhat.com> wrote:
+>>>
+>>>> Then I request the following change in KVM:
+>>>>
+>>>> If KVM_S390_VM_CPU_FEAT_AP is enabled in KVM, ECA.28 is _always_ set
+>>>> (not just if an AP device is configured). This especially makes things a
+>>>> lot easier when it comes to handling hotplugged CPUs and avoiding race
+>>>> conditions when enabling these bits as mentioned in the KVM series.
+>>>>
+>>>> KVM_S390_VM_CPU_FEAT_AP == AP instructions available for the guest
+>>>> (don't throw an operation exception).
+>>>>
+>>>> So this feature then really is guest ABI. The instructions are
+>>>> available. If there is no device configured, bad luck.
+>>> Sounds sensible from my POV.
+>>>
+>> I have a concern with this proposition and with the original code:
+> Very good, this is exactly what I talked to Conny about yesterday.
+>
+> Short version: CPU model is guest ABI, everything else is configuration.
+>
+>> 1) ap=on is a guest ABI feature saying to the guest you can use AP
+>> instructions
+> Indeed, that's what belongs into the CPU model.
+>
+>> 2) How we provide AP instructions to the guest can be done in three
+>> different ways:
+>>    - SIE Interpretation
+AP instructions executed on the guest will be interpreted and passed 
+directly
+through to a real AP device installed on the host according to the APQN
+specified in the instruction, so the AP instructions must be available 
+on the
+host.
+>>    - interception with VFIO
+AP instructions executed on the guest will be intercepted, and 
+interpreted by
+QEMU then forwarded to a real AP device installed on the host according 
+to how
+the AP devices are configured in userspace - i.e., whether there is 
+remapping,
+multiplexing or sharing of adapters/domains etc. This also requires that AP
+instructions be available on the host.
+>>    - interception with emulation
+AP instructions executed on the guest will be intercepted, interpreted 
+by QEMU
+and emulated. This will not require AP instructions be available on the 
+host.
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index efb1b3bccf..cb3b480e65 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1519,6 +1519,44 @@ static const MemoryRegionOps ioportF0_io_ops = {
-     },
- };
- 
-+static void pc_superio_init(ISABus *isa_bus, bool create_fdctrl, bool no_vmport)
-+{
-+    int i;
-+    DriveInfo *fd[MAX_FD];
-+    qemu_irq *a20_line;
-+    ISADevice *i8042, *port92, *vmmouse;
-+
-+    serial_hds_isa_init(isa_bus, 0, MAX_SERIAL_PORTS);
-+    parallel_hds_isa_init(isa_bus, MAX_PARALLEL_PORTS);
-+
-+    for (i = 0; i < MAX_FD; i++) {
-+        fd[i] = drive_get(IF_FLOPPY, 0, i);
-+        create_fdctrl |= !!fd[i];
-+    }
-+    if (create_fdctrl) {
-+        fdctrl_init_isa(isa_bus, fd);
-+    }
-+
-+    i8042 = isa_create_simple(isa_bus, "i8042");
-+    if (!no_vmport) {
-+        vmport_init(isa_bus);
-+        vmmouse = isa_try_create(isa_bus, "vmmouse");
-+    } else {
-+        vmmouse = NULL;
-+    }
-+    if (vmmouse) {
-+        DeviceState *dev = DEVICE(vmmouse);
-+        qdev_prop_set_ptr(dev, "ps2_mouse", i8042);
-+        qdev_init_nofail(dev);
-+    }
-+    port92 = isa_create_simple(isa_bus, "port92");
-+
-+    a20_line = qemu_allocate_irqs(handle_a20_line_change, first_cpu, 2);
-+    i8042_setup_a20_line(i8042, a20_line[0]);
-+    port92_init(port92, a20_line[1]);
-+    g_free(a20_line);
-+}
-+
- void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
-                           ISADevice **rtc_state,
-                           bool create_fdctrl,
-@@ -1527,13 +1565,11 @@ void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
-                           uint32_t hpet_irqs)
- {
-     int i;
--    DriveInfo *fd[MAX_FD];
-     DeviceState *hpet = NULL;
-     int pit_isa_irq = 0;
-     qemu_irq pit_alt_irq = NULL;
-     qemu_irq rtc_irq = NULL;
--    qemu_irq *a20_line;
--    ISADevice *i8042, *port92, *vmmouse, *pit = NULL;
-+    ISADevice *pit = NULL;
-     MemoryRegion *ioport80_io = g_new(MemoryRegion, 1);
-     MemoryRegion *ioportF0_io = g_new(MemoryRegion, 1);
- 
-@@ -1590,36 +1626,10 @@ void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
-         pcspk_init(isa_bus, pit);
-     }
- 
--    serial_hds_isa_init(isa_bus, 0, MAX_SERIAL_PORTS);
--    parallel_hds_isa_init(isa_bus, MAX_PARALLEL_PORTS);
--
--    a20_line = qemu_allocate_irqs(handle_a20_line_change, first_cpu, 2);
--    i8042 = isa_create_simple(isa_bus, "i8042");
--    i8042_setup_a20_line(i8042, a20_line[0]);
--    if (!no_vmport) {
--        vmport_init(isa_bus);
--        vmmouse = isa_try_create(isa_bus, "vmmouse");
--    } else {
--        vmmouse = NULL;
--    }
--    if (vmmouse) {
--        DeviceState *dev = DEVICE(vmmouse);
--        qdev_prop_set_ptr(dev, "ps2_mouse", i8042);
--        qdev_init_nofail(dev);
--    }
--    port92 = isa_create_simple(isa_bus, "port92");
--    port92_init(port92, a20_line[1]);
--    g_free(a20_line);
--
-     i8257_dma_init(isa_bus, 0);
- 
--    for(i = 0; i < MAX_FD; i++) {
--        fd[i] = drive_get(IF_FLOPPY, 0, i);
--        create_fdctrl |= !!fd[i];
--    }
--    if (create_fdctrl) {
--        fdctrl_init_isa(isa_bus, fd);
--    }
-+    /* Super I/O */
-+    pc_superio_init(isa_bus, create_fdctrl, no_vmport);
- }
- 
- void pc_nic_init(ISABus *isa_bus, PCIBus *pci_bus)
--- 
-2.16.2
+In all cases above, the need to set ECA_APIE is dependent upon the device
+type configured for the guest.
+>>
+> Due to bad AP design we can't handle this like zPCI - completely in
+> QEMU. That's what should control it.
+>
+>> 3) We implement this with a device in QEMU and a certain level kernel
+>> support.
+>>
+>> It seems possible to set or not ECA.28 , based on the type of kernel device:
+>> - SIE interpretation -> MATRIX KVM device -> ECA.28
+>> - Interception with VFIO and virtualization -> no ECA.28
+>> - interception with emulation -> no ECA.28
+>>
+>> I understand the concern with the vCPU but I think we can handle it with
+>> an indirect variable
+>> like:
+>>
+>> SIE interpretation Device + KVM_S390_VM_CPU_FEAT_AP -> set the variable
+>> ap_to_be_sie_interpreted=1
+>> Then in vCPU initialization set ECA.28 based on this variable.
+> That's exactly why we have the cpu feature interface. E.g. CMMA -> if
+> not enabled, not interpreted by HW (however also not intercepted to user
+> space - no sense in doing that right now).
+There are two factors at play here, the device type (i.e., -device 
+vfio_ap) and
+the KVM_S390_VM_CPU_FEAT_AP feature. Setting ECA_APIE makes no sense if the
+vfio_ap device is not configured. For the passthrough implementation, this
+means that the AP bus will successfully load on the guest, but there will
+be no AP devices detected. If the expectation is that ap=on will allow 
+access
+to AP devices on the guest, that would be a mistaken assumption.
+
+If down the road a new guest AP device is introduced that allows 
+multiplexing,
+device remapping etc., then it will be necessary to intercept AP 
+instructions
+executed on the guest. In this case, if ap=on results in setting ECA_APIE,
+then the instructions will be interpreted and passed through to a device
+that does not exist because it won't be defined in the guest's CRYCB.
+
+Based on these two scenarios, I think what we are really saying with ap=on
+is that the guest will require use of the AP instructions installed on the
+host. Whether those instructions are executed as a result of interpretation
+by the hardware or because they are executed by the device driver is a
+separate matter. So, I am inclined to agree with Pierre for that reason.
+ECA_APIE should be set only if ap=on (i.e., AP instructions are available
+on the host) and the user of those instructions (i.e., the driver) indicate
+an intent to use them.
+>
+>> I think it let us more doors open, what is your opinion?
+> In general, for now we don't care. The kernel is the only AP bus provider.
+True today, but not necessarily in the future.
+>
+> If KVM presents AP support -> AP feature can be enabled. And it should
+> always enable it.
+I disagree for the reasons stated above.
+>
+> Once we have a QEMU AP bus implementation, things get more complicated.
+> We could provide the AP feature also without KVM (like zPCI).
+I am not familiar with zPCI, so I can't comment.
+>
+> But weather or not to enable the KVM control has to be concluded from
+> the other configuration. Only user space can now that and has to decide
+> before enabling AP in KVM.
+>
+> So I think for now we are fine. Later, this might be tricky to check but
+> not impossible.
+>
+>> Regards,
+>>
+>> Pierre
+>>
+>>
+>
