@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1esvZM-0004Bg-Iu
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 14:14:45 -0500
+	(envelope-from <thuth@redhat.com>) id 1esvj1-0001Cy-Ae
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 14:24:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1esvZJ-0006ub-9f
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 14:14:44 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52324 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1esvZJ-0006uC-4T
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 14:14:41 -0500
-References: <20180305065710.25876-1-haozhong.zhang@intel.com>
-	<20180305065710.25876-3-haozhong.zhang@intel.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d22bd716-c48f-89a6-d264-cea75ab7b3c4@redhat.com>
-Date: Mon, 5 Mar 2018 13:14:34 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180305065710.25876-3-haozhong.zhang@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] qmp: distinguish PC-DIMM and NVDIMM
- in MemoryDeviceInfoList
+	(envelope-from <thuth@redhat.com>) id 1esviy-0002l6-Mg
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 14:24:43 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon,  5 Mar 2018 20:24:26 +0100
+Message-Id: <1520277866-4360-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] pc-bios/s390-ccw: Move string arrays from
+ bootmap header to .c file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +18,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Haozhong Zhang <haozhong.zhang@intel.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Markus Armbruster <armbru@redhat.com>, dgilbert@redhat.com
+To: qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-On 03/05/2018 12:57 AM, Haozhong Zhang wrote:
-> It may need to treat PC-DIMM and NVDIMM differently, e.g., when
-> deciding the necessity of non-volatile flag bit in SRAT memory
-> affinity structures.
-> 
-> NVDIMMDeviceInfo, which inherits from PCDIMMDeviceInfo, is added to
-> union type MemoryDeviceInfo to record information of NVDIMM devices.
-> The NVDIMM-specific data is currently left empty and will be filled
-> when necessary in the future.
-> 
-> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> ---
->   hmp.c            | 14 +++++++++++---
->   hw/mem/pc-dimm.c | 20 ++++++++++++++++++--
->   numa.c           | 19 +++++++++++++------
->   qapi-schema.json | 18 +++++++++++++++++-
+bootmap.h currently can only be included once - otherwise the
+linker complains about multiple definitions of the "magic" strings.
+It's a bad style to define string arrays in header files, so let's
+better move these to the bootmap.c file instead where they are used.
 
-Will need rebasing now that the contents live in qapi/misc.json.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ pc-bios/s390-ccw/bootmap.c | 22 ++++++++++++++++++++++
+ pc-bios/s390-ccw/bootmap.h | 19 -------------------
+ 2 files changed, 22 insertions(+), 19 deletions(-)
 
-> +++ b/qapi-schema.json
-> @@ -2920,6 +2920,18 @@
->             }
->   }
->   
-> +##
-> +# @NVDIMMDeviceInfo:
-> +#
-> +# NVDIMMDevice state information
-> +#
-> +# Since: 2.12
-> +##
-> +{ 'struct': 'NVDIMMDeviceInfo',
-> +  'base': 'PCDIMMDeviceInfo',
-> +  'data': {}
-> +}
-
-You added no data, so why did you need the type?
-
-> +
->   ##
->   # @MemoryDeviceInfo:
->   #
-> @@ -2927,7 +2939,11 @@
->   #
->   # Since: 2.1
->   ##
-> -{ 'union': 'MemoryDeviceInfo', 'data': {'dimm': 'PCDIMMDeviceInfo'} }
-> +{ 'union': 'MemoryDeviceInfo',
-> +  'data': { 'dimm': 'PCDIMMDeviceInfo',
-> +            'nvdimm': 'NVDIMMDeviceInfo'
-
-Names aren't part of the interface; would it be better to rename 
-PCDIMMDeviceInfo into something that can be generically shared between 
-both the 'dimm' and 'nvdimm' branches without having to create a 
-pointless subtype?
-
+diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+index 29bfd8c..5e0be54 100644
+--- a/pc-bios/s390-ccw/bootmap.c
++++ b/pc-bios/s390-ccw/bootmap.c
+@@ -37,6 +37,28 @@ typedef struct ResetInfo {
+ 
+ static ResetInfo save;
+ 
++const uint8_t el_torito_magic[] = "EL TORITO SPECIFICATION"
++                                  "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
++
++/*
++ * Match two CCWs located after PSW and eight filler bytes.
++ * From libmagic and arch/s390/kernel/head.S.
++ */
++const uint8_t linux_s390_magic[] = "\x02\x00\x00\x18\x60\x00\x00\x50\x02\x00"
++                                   "\x00\x68\x60\x00\x00\x50\x40\x40\x40\x40"
++                                   "\x40\x40\x40\x40";
++
++static const uint8_t vol_desc_magic[] = "CD001";
++
++static inline bool is_iso_vd_valid(IsoVolDesc *vd)
++{
++    const uint8_t vol_desc_magic[] = "CD001";
++
++    return !memcmp(&vd->ident[0], vol_desc_magic, 5) &&
++           vd->version == 0x1 &&
++           vd->type <= VOL_DESC_TYPE_PARTITION;
++}
++
+ static void jump_to_IPL_2(void)
+ {
+     ResetInfo *current = 0;
+diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
+index c636626..07eb600 100644
+--- a/pc-bios/s390-ccw/bootmap.h
++++ b/pc-bios/s390-ccw/bootmap.h
+@@ -375,9 +375,6 @@ static inline void read_iso_boot_image(uint32_t block_offset, void *load_addr,
+                "Failed to read boot image!");
+ }
+ 
+-const uint8_t el_torito_magic[] = "EL TORITO SPECIFICATION"
+-                                  "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+-
+ #define ISO9660_MAX_DIR_DEPTH 8
+ 
+ typedef struct IsoDirHdr {
+@@ -430,20 +427,12 @@ typedef struct IsoVolDesc {
+     } vd;
+ } __attribute__((packed)) IsoVolDesc;
+ 
+-const uint8_t vol_desc_magic[] = "CD001";
+ #define VOL_DESC_TYPE_BOOT 0
+ #define VOL_DESC_TYPE_PRIMARY 1
+ #define VOL_DESC_TYPE_SUPPLEMENT 2
+ #define VOL_DESC_TYPE_PARTITION 3
+ #define VOL_DESC_TERMINATOR 255
+ 
+-static inline bool is_iso_vd_valid(IsoVolDesc *vd)
+-{
+-    return !memcmp(&vd->ident[0], vol_desc_magic, 5) &&
+-           vd->version == 0x1 &&
+-           vd->type <= VOL_DESC_TYPE_PARTITION;
+-}
+-
+ typedef struct IsoBcValid {
+     uint8_t platform_id;
+     uint16_t reserved;
+@@ -468,14 +457,6 @@ typedef struct IsoBcHdr {
+     uint8_t id[28];
+ } __attribute__((packed)) IsoBcHdr;
+ 
+-/*
+- * Match two CCWs located after PSW and eight filler bytes.
+- * From libmagic and arch/s390/kernel/head.S.
+- */
+-const uint8_t linux_s390_magic[] = "\x02\x00\x00\x18\x60\x00\x00\x50\x02\x00"
+-                                   "\x00\x68\x60\x00\x00\x50\x40\x40\x40\x40"
+-                                   "\x40\x40\x40\x40";
+-
+ typedef struct IsoBcEntry {
+     uint8_t id;
+     union {
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+1.8.3.1
