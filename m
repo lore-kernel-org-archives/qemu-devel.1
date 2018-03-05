@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51047)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esdgT-0007qg-Dd
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 19:08:54 -0500
+	id 1esdgf-00080v-Oa
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 19:09:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esdgP-00043j-Im
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 19:08:52 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:39198)
+	id 1esdgc-0004Co-Hp
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 19:09:05 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33936)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esdgP-00043K-CZ
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 19:08:49 -0500
-Received: by mail-wm0-x244.google.com with SMTP id i3so12247366wmi.4
-	for <qemu-devel@nongnu.org>; Sun, 04 Mar 2018 16:08:49 -0800 (PST)
+	id 1esdgc-0004Bq-8F
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 19:09:02 -0500
+Received: by mail-wm0-x242.google.com with SMTP id a20so10806317wmd.1
+	for <qemu-devel@nongnu.org>; Sun, 04 Mar 2018 16:09:02 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1520200587-14681-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1520200587-14681-3-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1520200587-14681-4-git-send-email-stefanb@linux.vnet.ibm.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4de8d07a-40db-cc86-59e7-6a081c2e526e@amsat.org>
-Date: Sun, 4 Mar 2018 21:08:46 -0300
+Message-ID: <a542bdfe-27a4-6676-25a2-0b6ebf03e169@amsat.org>
+Date: Sun, 4 Mar 2018 21:08:59 -0300
 MIME-Version: 1.0
-In-Reply-To: <1520200587-14681-3-git-send-email-stefanb@linux.vnet.ibm.com>
+In-Reply-To: <1520200587-14681-4-git-send-email-stefanb@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/5] tpm: convert tpm_passthrough.c to use
+Subject: Re: [Qemu-devel] [PATCH 3/5] tpm: convert tpm_util.c to use
  trace-events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -45,58 +45,84 @@ On 03/04/2018 06:56 PM, Stefan Berger wrote:
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  hw/tpm/tpm_passthrough.c | 13 +++----------
->  hw/tpm/trace-events      |  4 ++++
->  2 files changed, 7 insertions(+), 10 deletions(-)
+>  hw/tpm/tpm_util.c   | 29 ++++++++++++-----------------
+>  hw/tpm/trace-events |  7 +++++++
+>  2 files changed, 19 insertions(+), 17 deletions(-)
 > 
-> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-> index a495fe0..2589c4d 100644
-> --- a/hw/tpm/tpm_passthrough.c
-> +++ b/hw/tpm/tpm_passthrough.c
-> @@ -31,14 +31,7 @@
->  #include "hw/hw.h"
->  #include "qapi/clone-visitor.h"
->  #include "tpm_util.h"
+> diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
+> index 2de52a0..ee41757 100644
+> --- a/hw/tpm/tpm_util.c
+> +++ b/hw/tpm/tpm_util.c
+> @@ -28,14 +28,7 @@
+>  #include "exec/memory.h"
+>  #include "sysemu/tpm_backend.h"
+>  #include "hw/qdev.h"
 > -
 > -#define DEBUG_TPM 0
 > -
 > -#define DPRINTF(fmt, ...) do { \
 > -    if (DEBUG_TPM) { \
-> -        fprintf(stderr, fmt, ## __VA_ARGS__); \
+> -        fprintf(stderr, "tpm-util:"fmt"\n", ## __VA_ARGS__); \
 > -    } \
 > -} while (0)
 > +#include "trace.h"
 >  
->  #define TYPE_TPM_PASSTHROUGH "tpm-passthrough"
->  #define TPM_PASSTHROUGH(obj) \
-> @@ -137,7 +130,7 @@ static void tpm_passthrough_handle_request(TPMBackend *tb, TPMBackendCmd *cmd,
->  {
->      TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
+>  /* tpm backend property */
 >  
-> -    DPRINTF("tpm_passthrough: processing command %p\n", cmd);
-> +    trace_tpm_passthrough_handle_request(cmd);
+> @@ -279,10 +272,11 @@ int tpm_util_get_buffer_size(int tpm_fd, TPMVersion tpm_version,
 >  
->      tpm_passthrough_unix_tx_bufs(tpm_pt, cmd->in, cmd->in_len,
->                                   cmd->out, cmd->out_len, &cmd->selftest_done,
-> @@ -146,7 +139,7 @@ static void tpm_passthrough_handle_request(TPMBackend *tb, TPMBackendCmd *cmd,
+>          if (be32_to_cpu(tpm_resp.hdr.len) != sizeof(tpm_resp) ||
+>              be32_to_cpu(tpm_resp.len) != sizeof(uint32_t)) {
+> -            DPRINTF("tpm_resp->hdr.len = %u, expected = %zu\n",
+> -                    be32_to_cpu(tpm_resp.hdr.len), sizeof(tpm_resp));
+> -            DPRINTF("tpm_resp->len = %u, expected = %zu\n",
+> -                    be32_to_cpu(tpm_resp.len), sizeof(uint32_t));
+> +            trace_tpm_util_get_buffer_size_hdr_len(
+> +                be32_to_cpu(tpm_resp.hdr.len),
+> +                sizeof(tpm_resp));
+> +            trace_tpm_util_get_buffer_size_len(be32_to_cpu(tpm_resp.len),
+> +                                               sizeof(uint32_t));
+>              error_report("tpm_util: Got unexpected response to "
+>                           "TPM_GetCapability; errcode: 0x%x",
+>                           be32_to_cpu(tpm_resp.hdr.errcode));
+> @@ -327,10 +321,11 @@ int tpm_util_get_buffer_size(int tpm_fd, TPMVersion tpm_version,
 >  
->  static void tpm_passthrough_reset(TPMBackend *tb)
->  {
-> -    DPRINTF("tpm_passthrough: CALL TO TPM_RESET!\n");
-> +    trace_tpm_passthrough_reset();
+>          if (be32_to_cpu(tpm2_resp.hdr.len) != sizeof(tpm2_resp) ||
+>              be32_to_cpu(tpm2_resp.count) != 2) {
+> -            DPRINTF("tpm2_resp->hdr.len = %u, expected = %zu\n",
+> -                    be32_to_cpu(tpm2_resp.hdr.len), sizeof(tpm2_resp));
+> -            DPRINTF("tpm2_resp->len = %u, expected = %u\n",
+> -                    be32_to_cpu(tpm2_resp.count), 2);
+> +            trace_tpm_util_get_buffer_size_hdr_len2(
+> +                be32_to_cpu(tpm2_resp.hdr.len),
+> +                sizeof(tpm2_resp));
+> +            trace_tpm_util_get_buffer_size_len2(
+> +                be32_to_cpu(tpm2_resp.count), 2);
+>              error_report("tpm_util: Got unexpected response to "
+>                           "TPM2_GetCapability; errcode: 0x%x",
+>                           be32_to_cpu(tpm2_resp.hdr.errcode));
+> @@ -344,7 +339,7 @@ int tpm_util_get_buffer_size(int tpm_fd, TPMVersion tpm_version,
+>          return -EFAULT;
+>      }
 >  
->      tpm_passthrough_cancel_cmd(tb);
+> -    DPRINTF("buffersize of device: %zu\n", *buffersize);
+> +    trace_tpm_util_get_buffer_size(*buffersize);
+>  
+>      return 0;
 >  }
 > diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-> index 336b06d..8557dd9 100644
+> index 8557dd9..66b2b91 100644
 > --- a/hw/tpm/trace-events
 > +++ b/hw/tpm/trace-events
-> @@ -3,3 +3,7 @@
->  # hw/tpm/tpm_crb.c
->  tpm_crb_mmio_read(uint64_t addr, unsigned size, uint32_t val) "CRB read 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
->  tpm_crb_mmio_write(uint64_t addr, unsigned size, uint32_t val) "CRB write 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
+> @@ -7,3 +7,10 @@ tpm_crb_mmio_write(uint64_t addr, unsigned size, uint32_t val) "CRB write 0x" TA
+>  # hw/tpm/tpm_passthrough.c
+>  tpm_passthrough_handle_request(void *cmd) "processing command %p"
+>  tpm_passthrough_reset(void) "reset"
 > +
-> +# hw/tpm/tpm_passthrough.c
-> +tpm_passthrough_handle_request(void *cmd) "processing command %p"
-> +tpm_passthrough_reset(void) "reset"
+> +# hw/tpm/tpm_util.c
+> +tpm_util_get_buffer_size_hdr_len(uint32_t len, size_t expected) "tpm_resp->hdr.len = %u, expected = %zu"
+> +tpm_util_get_buffer_size_len(uint32_t len, size_t expected) "tpm_resp->len = %u, expected = %zu"
+> +tpm_util_get_buffer_size_hdr_len2(uint32_t len, size_t expected) "tpm2_resp->hdr.len = %u, expected = %zu"
+> +tpm_util_get_buffer_size_len2(uint32_t len, size_t expected) "tpm2_resp->len = %u, expected = %zu"
+> +tpm_util_get_buffer_size(size_t len) "buffersize of device: %zu"
 > 
