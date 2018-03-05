@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1esp2Q-0000hX-3v
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 07:16:18 -0500
+	(envelope-from <famz@redhat.com>) id 1esp9P-0003kj-Sg
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 07:23:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1esp2L-0000kl-Uy
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 07:16:18 -0500
-Received: from mail-ot0-x22c.google.com ([2607:f8b0:4003:c0f::22c]:46731)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1esp2L-0000jy-Ov
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 07:16:13 -0500
-Received: by mail-ot0-x22c.google.com with SMTP id g97so14662796otg.13
-	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 04:16:13 -0800 (PST)
+	(envelope-from <famz@redhat.com>) id 1esp9O-0004Kd-VE
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 07:23:31 -0500
+Date: Mon, 5 Mar 2018 20:23:14 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180305122314.GA13252@lemon.usersys.redhat.com>
+References: <20180305094006.21446-1-stefanha@redhat.com>
+	<20180305094006.21446-7-stefanha@redhat.com>
+	<w51bmg24wxs.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20180302195143.31678-1-eblake@redhat.com>
-References: <20180302195143.31678-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 5 Mar 2018 12:15:52 +0000
-Message-ID: <CAFEAcA-WgS9nLC3iEQXi3p5Lhb1EDK-UEpty0ahgiG9ooPtLQQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v4 00/30] QAPI patches for 2018-03-01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <w51bmg24wxs.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PULL 6/6] README: Document
+ 'git-publish' workflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +25,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Alberto Garcia <berto@igalia.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org
 
-On 2 March 2018 at 19:51, Eric Blake <eblake@redhat.com> wrote:
-> The following changes since commit 136c67e07869227b21b3f627316e03679ce7b738:
->
->   Merge remote-tracking branch 'remotes/bkoppelmann/tags/pull-tricore-2018-03-02' into staging (2018-03-02 16:56:20 +0000)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/ericb.git tags/pull-qapi-2018-03-01-v4
->
-> for you to fetch changes up to 418b1d0ae3a2cc992659f626a2a3f11944e0b259:
->
->   qapi: Don't create useless directory qapi-generated (2018-03-02 13:48:26 -0600)
->
-> v4: another attempt at silencing OSX warnings on empty .o [Peter]
-> (sending just the changed patches)
->
-> ----------------------------------------------------------------
-> qapi patches for 2018-03-01
->
-> - Markus Armbruster: Modularize generated QAPI code
->
-> ----------------------------------------------------------------
+On Mon, 03/05 11:51, Alberto Garcia wrote:
+> On Mon 05 Mar 2018 10:40:06 AM CET, Stefan Hajnoczi wrote:
+> > +A 'git-profile' utility was created to make above process less
+> > +cumbersome, and is highly recommended for making regular
+> > contributions,
+> 
+> A 'git-profile' utility ? Did you want to say 'git-publish' there?
 
-This version works -- applied, thanks.
+Oops. Apparently, yes.
 
--- PMM
+Fam
