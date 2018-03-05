@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43638)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1esqJb-0002BF-Cf
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:38:08 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1esqLs-0004Dd-VB
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:40:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1esqJX-0005UZ-Bd
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:38:07 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33884 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1esqJX-0005UE-6b
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:38:03 -0500
-References: <20180228211028.83970-1-brijesh.singh@amd.com>
-	<20180228211028.83970-12-brijesh.singh@amd.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <6a76cb62-99ec-f442-28cd-ba9daf478a05@redhat.com>
-Date: Mon, 5 Mar 2018 14:37:57 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1esqLs-0006V8-62
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:40:28 -0500
+Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:38619)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1esqLs-0006Ut-0H
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:40:28 -0500
+Received: by mail-ot0-x22a.google.com with SMTP id 95so14901905ote.5
+	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 05:40:27 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180228211028.83970-12-brijesh.singh@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v10 11/28] sev/i386: add command to
- initialize the memory encryption context
+In-Reply-To: <20180305133654.7aokepvzcmxhzk4q@kamzik.brq.redhat.com>
+References: <20180228180215.25470-1-wei@redhat.com>
+	<20180228180215.25470-2-wei@redhat.com>
+	<ca21f795-dae7-d6b5-44f1-ef8ba792ac04@redhat.com>
+	<20180305110122.GD3131@work-vm>
+	<20180305133654.7aokepvzcmxhzk4q@kamzik.brq.redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 5 Mar 2018 13:40:06 +0000
+Message-ID: <CAFEAcA8jse2AdCO8JgA7m99h8pwTRBCQ9aOi=-0QOG+pA9tk2w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH V7 1/4] rules: Move cross compilation auto
+ detection functions to rules.mak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +33,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Alexander Graf <agraf@suse.de>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Markus Armbruster <armbru@redhat.com>, Bruce Rogers <brogers@suse.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, Borislav Petkov <bp@suse.de>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Andrew Jones <drjones@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>
 
-Hi Brijesh,
+On 5 March 2018 at 13:36, Andrew Jones <drjones@redhat.com> wrote:
+> IMO, the makefile is the right approach. I wouldn't like to see AArch64
+> added with a script and then converted, along with x86, to a makefile at
+> some later time (probably never).
 
-I triggered an assertion failure here:
+I'm not really enthusiastic about this approach of picking a cross
+compiler in the makefile rather than configure, though. The stuff
+we have at the moment that tries to build the x86 ROMs with whatever
+random host compiler we happen to be using is already a source
+of occasional brokenness. If we're going to try to build target
+code on a wider basis than just the x86 roms I'd like to see it
+done in a cleaner manner...
 
-On 02/28/18 22:10, Brijesh Singh wrote:
-> When memory encryption is enabled, KVM_SEV_INIT command is used to
-> initialize the platform. The command loads the SEV related persistent
-> data from non-volatile storage and initializes the platform context.
-> This command should be first issued before invoking any other guest
-> commands provided by the SEV firmware.
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  accel/kvm/kvm-all.c       |  15 ++++
->  include/sysemu/sev.h      |  22 +++++
->  stubs/Makefile.objs       |   1 +
->  stubs/sev.c               |  21 +++++
->  target/i386/Makefile.objs |   2 +-
->  target/i386/monitor.c     |  11 ++-
->  target/i386/sev-stub.c    |  41 +++++++++
->  target/i386/sev.c         | 222 ++++++++++++++++++++++++++++++++++++++++++++++
->  target/i386/sev_i386.h    |  29 ++++++
->  target/i386/trace-events  |   3 +
->  10 files changed, 364 insertions(+), 3 deletions(-)
->  create mode 100644 include/sysemu/sev.h
->  create mode 100644 stubs/sev.c
->  create mode 100644 target/i386/sev-stub.c
-
-[...]
-
-> @@ -1636,6 +1640,17 @@ static int kvm_init(MachineState *ms)
->  
->      kvm_state = s;
->  
-> +    /*
-> +     * if memory encryption object is specified then initialize the memory
-> +     * encryption context.
-> +     */
-> +    if (ms->memory_encryption) {
-> +        kvm_state->memcrypt_handle = sev_guest_init(ms->memory_encryption);
-> +        if (!kvm_state->memcrypt_handle) {
-> +            goto err;
-> +        }
-> +    }
-> +
-
-You should set the "err" variable to a negative error code; otherwise
-the assertion at the "err" label will trigger:
-
-err:
-    assert(ret < 0);
-
-Thanks
-Laszlo
+thanks
+-- PMM
