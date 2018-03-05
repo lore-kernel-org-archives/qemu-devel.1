@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esoI1-00047f-W4
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 06:28:22 -0500
+	(envelope-from <stefanha@redhat.com>) id 1esoZ5-0007cL-AL
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 06:46:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esoI0-0007Ka-N8
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 06:28:21 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon,  5 Mar 2018 08:27:30 -0300
-Message-Id: <20180305112732.26471-29-f4bug@amsat.org>
-In-Reply-To: <20180305112732.26471-1-f4bug@amsat.org>
-References: <20180305112732.26471-1-f4bug@amsat.org>
+	(envelope-from <stefanha@redhat.com>) id 1esoZ4-0006vJ-Gd
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 06:45:59 -0500
+Date: Mon, 5 Mar 2018 11:45:33 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180305114533.GI7910@stefanha-x1.localdomain>
+References: <c0d7b993-b3b8-a753-21f5-e2257de27caf@kamp.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 28/30] ivshmem: use the BYTE-based
- definitions
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ZOudaV4lSIjFTlHv"
+Content-Disposition: inline
+In-Reply-To: <c0d7b993-b3b8-a753-21f5-e2257de27caf@kamp.de>
+Subject: Re: [Qemu-devel] block migration and MAX_IN_FLIGHT_IO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +23,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-trivial@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: Peter Lieven <pl@kamp.de>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, wency@cn.fujitsu.com, qemu block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-It eases code review, unit is explicit.
 
-Patch generated using:
+--ZOudaV4lSIjFTlHv
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-  $ git grep -E '(1024|2048|4096|8192|(<<|>>).?(10|20|30))' hw/ include/hw/
+On Thu, Feb 22, 2018 at 12:13:50PM +0100, Peter Lieven wrote:
+> I stumbled across the MAX_INFLIGHT_IO field that was introduced in 2015 a=
+nd was curious what was the reason
+> to choose 512MB as readahead? The question is that I found that the sourc=
+e VM gets very unresponsive I/O wise
+> while the initial 512MB are read and furthermore seems to stay unreaspons=
+ive if we choose a high migration speed
+> and have a fast storage on the destination VM.
+>=20
+> In our environment I modified this value to 16MB which seems to work much=
+ smoother. I wonder if we should make
+> this a user configurable value or define a different rate limit for the b=
+lock transfer in bulk stage at least?
 
-and modified manually.
+I don't know if benchmarks were run when choosing the value.  From the
+commit description it sounds like the main purpose was to limit the
+amount of memory that can be consumed.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
----
- hw/misc/ivshmem.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+16 MB also fulfills that criteria :), but why is the source VM more
+responsive with a lower value?
 
-diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index 16f03701b7..9b3ad96471 100644
---- a/hw/misc/ivshmem.c
-+++ b/hw/misc/ivshmem.c
-@@ -1302,7 +1302,7 @@ static void ivshmem_realize(PCIDevice *dev, Error **errp)
-     }
- 
-     if (s->sizearg == NULL) {
--        s->legacy_size = 4 << 20; /* 4 MB default */
-+        s->legacy_size = 4 * M_BYTE; /* 4 MB default */
-     } else {
-         int ret;
-         uint64_t size;
--- 
-2.16.2
+Perhaps the issue is queue depth on the storage device - the block
+migration code enqueues up to 512 MB worth of reads, and guest I/O has
+to wait?
+
+Stefan
+
+--ZOudaV4lSIjFTlHv
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJanS3dAAoJEJykq7OBq3PItdcIAIqRmz4VPTNofM0sVL8AB5hv
+SI6hedno+0XwlWmOS37vpVlfMnGF4RRBvSVGdlmjjEyQRORfHhArFIu63qe1knoq
+c7L78KAdhKUjz6JtTAu5YznSjSX8NVGJG81OU3sla3WLnUcki6YVfvWCqd8Z8eaZ
+fgNBLxyao80dIx7hll2a0VAi7a41hdrnzS4HkH8PT5whE9haZ776PHci3GoWfyHp
+aBWOIVkdjs9eQlvQ1ag2GtNoy1r8gDbiWWN3ponuIikvhnDUAa3RaC6Qp9Djq2bc
+oWW3n4onbIMaV1K1QLDlucnOvxeS71pDhRLVai7d/rYIHhl7u3Auv7kFLv9mafM=
+=2pxa
+-----END PGP SIGNATURE-----
+
+--ZOudaV4lSIjFTlHv--
