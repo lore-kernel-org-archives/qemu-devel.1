@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1eswZK-00053h-NQ
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 15:18:48 -0500
+	(envelope-from <Babu.Moger@amd.com>) id 1eswZP-00059k-Af
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 15:18:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1eswZH-00010v-Kt
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 15:18:46 -0500
-Received: from mail-bn3nam01on0063.outbound.protection.outlook.com
-	([104.47.33.63]:48284
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	(envelope-from <Babu.Moger@amd.com>) id 1eswZM-00012U-5N
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 15:18:51 -0500
+Received: from mail-cys01nam02on0080.outbound.protection.outlook.com
+	([104.47.37.80]:10256
+	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1eswZH-00010I-G7
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 15:18:43 -0500
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1eswZL-000122-Sb
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 15:18:48 -0500
 From: Babu Moger <babu.moger@amd.com>
-Date: Mon,  5 Mar 2018 15:18:23 -0500
-Message-Id: <1520281107-5115-2-git-send-email-babu.moger@amd.com>
+Date: Mon,  5 Mar 2018 15:18:26 -0500
+Message-Id: <1520281107-5115-5-git-send-email-babu.moger@amd.com>
 In-Reply-To: <1520281107-5115-1-git-send-email-babu.moger@amd.com>
 References: <1520281107-5115-1-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 1/5] target/i386: Generalize some of the
- macro definitions
+Subject: [Qemu-devel] [PATCH v3 4/5] target/i386: Enable TOPOEXT feature on
+ AMD EPYC CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,122 +31,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, rkrcmar@redhat.com
 Cc: mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, Gary.Hook@amd.com, Thomas.Lendacky@amd.com, babu.moger@amd.com
 
-Generalize some of the macro definitions which are generic cache
-properties that are common between CPUID 4 and CPUID 0x8000001D
-in preparation for adding support for 0x8000001D.
+Enable TOPOEXT feature on EPYC CPU. This is required to support
+hyperthreading on VM guests. Also extend xlevel to 0x8000001E.
 
 Signed-off-by: Babu Moger <babu.moger@amd.com>
 ---
- target/i386/cpu.c | 52 ++++++++++++++++++++++++++--------------------------
- 1 file changed, 26 insertions(+), 26 deletions(-)
+ target/i386/cpu.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index b5e431e..42dd381 100644
+index 555ab83..88941d9 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -66,22 +66,22 @@
- #define CPUID_2_L3_16MB_16WAY_64B 0x4d
- 
- 
--/* CPUID Leaf 4 constants: */
-+/* Cache specific constants: */
- 
- /* EAX: */
--#define CPUID_4_TYPE_DCACHE  1
--#define CPUID_4_TYPE_ICACHE  2
--#define CPUID_4_TYPE_UNIFIED 3
-+#define TYPE_DCACHE  1
-+#define TYPE_ICACHE  2
-+#define TYPE_UNIFIED 3
- 
--#define CPUID_4_LEVEL(l)          ((l) << 5)
-+#define CACHE_LEVEL(l)          ((l) << 5)
- 
--#define CPUID_4_SELF_INIT_LEVEL (1 << 8)
--#define CPUID_4_FULLY_ASSOC     (1 << 9)
-+#define CACHE_SELF_INIT_LEVEL (1 << 8)
-+#define CACHE_FULLY_ASSOC     (1 << 9)
- 
- /* EDX: */
--#define CPUID_4_NO_INVD_SHARING (1 << 0)
--#define CPUID_4_INCLUSIVE       (1 << 1)
--#define CPUID_4_COMPLEX_IDX     (1 << 2)
-+#define CACHE_NO_INVD_SHARING (1 << 0)
-+#define CACHE_INCLUSIVE       (1 << 1)
-+#define CACHE_COMPLEX_IDX     (1 << 2)
- 
- #define ASSOC_FULL 0xFF
- 
-@@ -3273,29 +3273,29 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-             *eax = 0;
-             switch (count) {
-             case 0: /* L1 dcache info */
--                *eax |= CPUID_4_TYPE_DCACHE | \
--                        CPUID_4_LEVEL(1) | \
--                        CPUID_4_SELF_INIT_LEVEL;
-+                *eax |= TYPE_DCACHE | \
-+                        CACHE_LEVEL(1) | \
-+                        CACHE_SELF_INIT_LEVEL;
-                 *ebx = (L1D_LINE_SIZE - 1) | \
-                        ((L1D_PARTITIONS - 1) << 12) | \
-                        ((L1D_ASSOCIATIVITY - 1) << 22);
-                 *ecx = L1D_SETS - 1;
--                *edx = CPUID_4_NO_INVD_SHARING;
-+                *edx = CACHE_NO_INVD_SHARING;
-                 break;
-             case 1: /* L1 icache info */
--                *eax |= CPUID_4_TYPE_ICACHE | \
--                        CPUID_4_LEVEL(1) | \
--                        CPUID_4_SELF_INIT_LEVEL;
-+                *eax |= TYPE_ICACHE | \
-+                        CACHE_LEVEL(1) | \
-+                        CACHE_SELF_INIT_LEVEL;
-                 *ebx = (L1I_LINE_SIZE - 1) | \
-                        ((L1I_PARTITIONS - 1) << 12) | \
-                        ((L1I_ASSOCIATIVITY - 1) << 22);
-                 *ecx = L1I_SETS - 1;
--                *edx = CPUID_4_NO_INVD_SHARING;
-+                *edx = CACHE_NO_INVD_SHARING;
-                 break;
-             case 2: /* L2 cache info */
--                *eax |= CPUID_4_TYPE_UNIFIED | \
--                        CPUID_4_LEVEL(2) | \
--                        CPUID_4_SELF_INIT_LEVEL;
-+                *eax |= TYPE_UNIFIED | \
-+                        CACHE_LEVEL(2) | \
-+                        CACHE_SELF_INIT_LEVEL;
-                 if (cs->nr_threads > 1) {
-                     *eax |= (cs->nr_threads - 1) << 14;
-                 }
-@@ -3303,7 +3303,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-                        ((L2_PARTITIONS - 1) << 12) | \
-                        ((L2_ASSOCIATIVITY - 1) << 22);
-                 *ecx = L2_SETS - 1;
--                *edx = CPUID_4_NO_INVD_SHARING;
-+                *edx = CACHE_NO_INVD_SHARING;
-                 break;
-             case 3: /* L3 cache info */
-                 if (!cpu->enable_l3_cache) {
-@@ -3313,16 +3313,16 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-                     *edx = 0;
-                     break;
-                 }
--                *eax |= CPUID_4_TYPE_UNIFIED | \
--                        CPUID_4_LEVEL(3) | \
--                        CPUID_4_SELF_INIT_LEVEL;
-+                *eax |= TYPE_UNIFIED | \
-+                        CACHE_LEVEL(3) | \
-+                        CACHE_SELF_INIT_LEVEL;
-                 pkg_offset = apicid_pkg_offset(cs->nr_cores, cs->nr_threads);
-                 *eax |= ((1 << pkg_offset) - 1) << 14;
-                 *ebx = (L3_N_LINE_SIZE - 1) | \
-                        ((L3_N_PARTITIONS - 1) << 12) | \
-                        ((L3_N_ASSOCIATIVITY - 1) << 22);
-                 *ecx = L3_N_SETS - 1;
--                *edx = CPUID_4_INCLUSIVE | CPUID_4_COMPLEX_IDX;
-+                *edx = CACHE_INCLUSIVE | CACHE_COMPLEX_IDX;
-                 break;
-             default: /* end of info */
-                 *eax = 0;
+@@ -1955,7 +1955,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
+         .features[FEAT_8000_0001_ECX] =
+             CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
+             CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
+-            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
++            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
++            CPUID_EXT3_TOPOEXT,
+         .features[FEAT_7_0_EBX] =
+             CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
+             CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RDSEED |
+@@ -1970,7 +1971,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+             CPUID_XSAVE_XGETBV1,
+         .features[FEAT_6_EAX] =
+             CPUID_6_EAX_ARAT,
+-        .xlevel = 0x8000000A,
++        .xlevel = 0x8000001E,
+         .model_id = "AMD EPYC Processor",
+     },
+     {
 -- 
 1.8.3.1
