@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eswXb-00040w-Rb
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 15:17:00 -0500
+	(envelope-from <Babu.Moger@amd.com>) id 1eswZK-00053g-My
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 15:18:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eswXY-0008Gw-JF
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 15:16:59 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55802 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eswXY-0008Gc-DT
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 15:16:56 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 08B4D410FBAE
-	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 20:16:52 +0000 (UTC)
-Date: Mon, 5 Mar 2018 20:16:44 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180305201643.GX3131@work-vm>
-References: <20180216131625.9639-1-dgilbert@redhat.com>
-	<20180216131625.9639-22-dgilbert@redhat.com>
-	<20180302075513.GN27381@xz-mi>
+	(envelope-from <Babu.Moger@amd.com>) id 1eswZH-00010p-Ft
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 15:18:46 -0500
+Received: from mail-bn3nam01on0063.outbound.protection.outlook.com
+	([104.47.33.63]:48284
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1eswZH-00010I-8i
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 15:18:43 -0500
+From: Babu Moger <babu.moger@amd.com>
+Date: Mon,  5 Mar 2018 15:18:22 -0500
+Message-ID: <1520281107-5115-1-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180302075513.GN27381@xz-mi>
-Subject: Re: [Qemu-devel] [PATCH v3 21/29] vhost+postcopy: Add vhost waker
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 0/5] Enable TOPOEXT to support
+ hyperthreading on AMD CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,107 +27,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, marcandre.lureau@redhat.com, imammedo@redhat.com, mst@redhat.com, quintela@redhat.com, aarcange@redhat.com
+To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, rkrcmar@redhat.com
+Cc: mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, Gary.Hook@amd.com, Thomas.Lendacky@amd.com, babu.moger@amd.com
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Fri, Feb 16, 2018 at 01:16:17PM +0000, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > Register a waker function in vhost-user code to be notified when
-> > pages arrive or requests to previously mapped pages get requested.
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  hw/virtio/trace-events |  3 +++
-> >  hw/virtio/vhost-user.c | 30 ++++++++++++++++++++++++++++++
-> >  2 files changed, 33 insertions(+)
-> > 
-> > diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> > index 3afd12cfea..fe5e0ff856 100644
-> > --- a/hw/virtio/trace-events
-> > +++ b/hw/virtio/trace-events
-> > @@ -13,6 +13,9 @@ vhost_user_postcopy_fault_handler_found(int i, uint64_t region_offset, uint64_t
-> >  vhost_user_postcopy_listen(void) ""
-> >  vhost_user_set_mem_table_postcopy(uint64_t client_addr, uint64_t qhva, int reply_i, int region_i) "client:0x%"PRIx64" for hva: 0x%"PRIx64" reply %d region %d"
-> >  vhost_user_set_mem_table_withfd(int index, const char *name, uint64_t memory_size, uint64_t guest_phys_addr, uint64_t userspace_addr, uint64_t offset) "%d:%s: size:0x%"PRIx64" GPA:0x%"PRIx64" QVA/userspace:0x%"PRIx64" RB offset:0x%"PRIx64
-> > +vhost_user_postcopy_waker(const char *rb, uint64_t rb_offset) "%s + 0x%"PRIx64
-> > +vhost_user_postcopy_waker_found(uint64_t client_addr) "0x%"PRIx64
-> > +vhost_user_postcopy_waker_nomatch(const char *rb, uint64_t rb_offset) "%s + 0x%"PRIx64
-> >  
-> >  # hw/virtio/virtio.c
-> >  virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
-> > diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> > index 4589bfd92e..74807091a0 100644
-> > --- a/hw/virtio/vhost-user.c
-> > +++ b/hw/virtio/vhost-user.c
-> > @@ -990,6 +990,35 @@ static int vhost_user_postcopy_fault_handler(struct PostCopyFD *pcfd,
-> >      return -1;
-> >  }
-> >  
-> > +static int vhost_user_postcopy_waker(struct PostCopyFD *pcfd, RAMBlock *rb,
-> > +                                     uint64_t offset)
-> > +{
-> > +    struct vhost_dev *dev = pcfd->data;
-> > +    struct vhost_user *u = dev->opaque;
-> > +    int i;
-> > +
-> > +    trace_vhost_user_postcopy_waker(qemu_ram_get_idstr(rb), offset);
-> > +
-> > +    if (!u) {
-> > +        return 0;
-> > +    }
-> > +    /* Translate the offset into an address in the clients address space */
-> > +    for (i = 0; i < MIN(dev->mem->nregions, u->region_rb_len); i++) {
-> > +        if (u->region_rb[i] == rb &&
-> > +            offset >= u->region_rb_offset[i] &&
-> > +            offset < (u->region_rb_offset[i] +
-> > +                      dev->mem->regions[i].memory_size)) {
-> > +            uint64_t client_addr = (offset - u->region_rb_offset[i]) +
-> > +                                   u->postcopy_client_bases[i];
-> > +            trace_vhost_user_postcopy_waker_found(client_addr);
-> > +            return postcopy_wake_shared(pcfd, client_addr, rb);
-> > +        }
-> > +    }
-> > +
-> > +    trace_vhost_user_postcopy_waker_nomatch(qemu_ram_get_idstr(rb), offset);
-> > +    return 0;
-> 
-> Can we really reach here?
+This series enables the TOPOEXT feature for AMD CPUs. This is required to
+support hyperthreading on kvm guests.
 
-Yes; note that all the waker's registered get called for all pages
-received
-so that:
-  a) A page not in shared memory, or not actually registered with a
-device, still calls the waker's and it's upto the waker to figure out
-whether it's interested for the device it belongs to.
+This addresses the issues reported in these bugs:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1481253
+https://bugs.launchpad.net/qemu/+bug/1703506=20
 
-  b) With two devices registered, they might each have registered
-different areas of shared memory, and thus it's upto the waker to figure
-out if it's interested in this specific page.
+v3:
+1.Removed the patch #1. Radim mentioned that original typo problem is in=20
+  linux kernel header. qemu is just copying those files.
+2.In previous version, I used the cpuid 4 definitions for AMDs cpuid leaf
+  0x8000001D. CPUID 4 is very intel specific and we dont want to expose tho=
+se
+  details under AMD. I have renamed some of these definitions as generic.
+  These changes are in patch#1. Radim, let me know if this is what you inte=
+nded.
+3.Added assert to for core_id(Suggested by Radim Kr=C4=8Dm=C3=A1=C5=99).
+4.Changed the if condition under "L3 cache info"(Suggested by Gary Hook).
+5.Addressed few more text correction and code cleanup(Suggested by Thomas L=
+endacky).
 
-Dave
+v2:
+  Fixed few more minor issues per Gary Hook's comments. Thank you Gary.
+  Removed the patch#1. We need to handle the instruction cache associativit=
+y=20
+  seperately. It varies based on the cpu family. I will comeback to that la=
+ter.
+  Added two more typo corrections in patch#1 and patch#5.
 
-> > +}
-> > +
-> >  /*
-> >   * Called at the start of an inbound postcopy on reception of the
-> >   * 'advise' command.
-> > @@ -1035,6 +1064,7 @@ static int vhost_user_postcopy_advise(struct vhost_dev *dev, Error **errp)
-> >      u->postcopy_fd.fd = ufd;
-> >      u->postcopy_fd.data = dev;
-> >      u->postcopy_fd.handler = vhost_user_postcopy_fault_handler;
-> > +    u->postcopy_fd.waker = vhost_user_postcopy_waker;
-> >      u->postcopy_fd.idstr = "vhost-user"; /* Need to find unique name */
-> >      postcopy_register_shared_ufd(&u->postcopy_fd);
-> >      return 0;
-> > -- 
-> > 2.14.3
-> > 
-> 
-> Thanks,
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+v1:
+  Stanislav Lanci posted few patches earlier.=20
+  https://patchwork.kernel.org/patch/10040903/
+
+Rebased his patches with few changes.
+1.Spit the patches into two, separating cpuid functions=20
+  0x8000001D and 0x8000001E (Patch 2 and 3).
+2.Removed the generic non-intel check and made a separate patch
+  with some changes(Patch 5).
+3.Fixed L3_N_SETS_AMD(from 4096 to 8192) based on CPUID_Fn8000001D_ECX_x03.
+
+Added 2 more patches.
+Patch 1. Fixes cache associativity.
+Patch 4. Adds TOPOEXT feature on AMD EPYC CPU.
+
+Babu Moger (3):
+  target/i386: Generalize some of the macro definitions
+  target/i386: Enable TOPOEXT feature on AMD EPYC CPU
+  target/i386: Remove generic SMT thread check
+
+Stanislav Lanci (2):
+  target/i386: Populate AMD Processor Cache Information
+  target/i386: Add support for CPUID_8000_001E for AMD
+
+ target/i386/cpu.c | 157 ++++++++++++++++++++++++++++++++++++++++++--------=
+----
+ target/i386/kvm.c |  29 ++++++++--
+ 2 files changed, 149 insertions(+), 37 deletions(-)
+
+--=20
+1.8.3.1
