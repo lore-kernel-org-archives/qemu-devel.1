@@ -1,18 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1esjBK-0000KF-Cm
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:01:07 -0500
+	(envelope-from <no-reply@patchew.org>) id 1esjBT-0000Qd-Kx
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:01:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1esjBJ-0003rJ-PY
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:01:06 -0500
+	(envelope-from <no-reply@patchew.org>) id 1esjBP-0003uJ-JD
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:01:15 -0500
+Resent-Message-Id: <E1esjBP-0003uJ-JD@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21090)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1esjBP-0003sC-CL
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:01:11 -0500
+In-Reply-To: <1520229653-10658-1-git-send-email-yulei.zhang@intel.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152022963946.1371.16553652819439481065@bdbb90650ae5>
 MIME-Version: 1.0
-In-Reply-To: <20180305051655.5944-1-andrew.smirnov@gmail.com>
-References: <20180305051655.5944-1-andrew.smirnov@gmail.com>
-From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Sun, 4 Mar 2018 22:01:01 -0800
-Message-ID: <CAHQ1cqHc-kk+Ls6o8oWjFSKij0tOBRObbYBZiiFyGo1kS2iiYg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v7 0/3] Initial i.MX7 support
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 4 Mar 2018 22:00:40 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH V3 0/4] vfio: Introduce Live migration
+ capability to vfio_mdev device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,19 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "open list:ARM" <qemu-arm@nongnu.org>
-Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel.apfelbaum@zoho.com>, "Michael S . Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: yulei.zhang@intel.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, kevin.tian@intel.com, alex.williamson@redhat.com, kwankhede@nvidia.com, zhenyuw@linux.intel.com
 
-On Sun, Mar 4, 2018 at 9:16 PM, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
-> Hi everyone,
->
-
-Ugh, just realized that I was too hasty to call git "send-email" and
-patch 1/3 in this submission is broken since I forgot to remove
-"is_express" field. Please disregard this version of v7 and I'll
-resend corrected one shortly.
-
-Very sorry for the noise.
-
-Thanks,
-Andrey Smirnov
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MjAyMjk2NTMtMTA2NTgtMS1naXQtc2VuZC1lbWFpbC15dWxlaS56aGFuZ0Bp
+bnRlbC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCBWMyAwLzRdIHZmaW86IEludHJv
+ZHVjZSBMaXZlIG1pZ3JhdGlvbiBjYXBhYmlsaXR5IHRvIHZmaW9fbWRldiBkZXZpY2UKCj09PSBU
+RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChn
+aXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
+VHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRz
+PSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29t
+bWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1u
+IDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFp
+bCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZh
+aWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFp
+bGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2
+NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJv
+amVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMTUyMDIyOTY1My0x
+MDY1OC0xLWdpdC1zZW5kLWVtYWlsLXl1bGVpLnpoYW5nQGludGVsLmNvbSAtPiBwYXRjaGV3LzE1
+MjAyMjk2NTMtMTA2NTgtMS1naXQtc2VuZC1lbWFpbC15dWxlaS56aGFuZ0BpbnRlbC5jb20KU3dp
+dGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpjNDA5MmFlMDBlIHZpZm86IGludHJvZHVjZSBu
+ZXcgVkZJTyBpb2N0bCBWRklPX0lPTU1VX0dFVF9ESVJUWV9CSVRNQVAKYTYwOTBmZmZjNSB2Zmlv
+OiBBZGQgc3RydWN0IHZmaW9fdm1zdGF0ZV9pbmZvIHRvIGludHJvZHVjZSBwdXQvZ2V0IGNhbGxi
+YWNrIGZ1bnRpb24gZm9yIHZmaW8gZGV2aWNlIHN0YXR1cyBzYXZlL3Jlc3RvcmUKNzRmMWYwNDVh
+OSB2ZmlvOiBBZGQgdm0gc3RhdHVzIGNoYW5nZSBjYWxsYmFjayB0byBzdG9wL3Jlc3RhcnQgdGhl
+IG1kZXYgZGV2aWNlCmIzMjgyNTI3OWMgdmZpbzogaW50cm9kdWNlIGEgbmV3IFZGSU8gc3VicmVn
+aW9uIGZvciBtZGV2IGRldmljZSBtaWdyYXRpb24gc3VwcG9ydAoKPT09IE9VVFBVVCBCRUdJTiA9
+PT0KQ2hlY2tpbmcgUEFUQ0ggMS80OiB2ZmlvOiBpbnRyb2R1Y2UgYSBuZXcgVkZJTyBzdWJyZWdp
+b24gZm9yIG1kZXYgZGV2aWNlIG1pZ3JhdGlvbiBzdXBwb3J0Li4uCkVSUk9SOiBpbml0aWFsaXpl
+ciBmb3Igc3RydWN0IFZNU3RhdGVEZXNjcmlwdGlvbiBzaG91bGQgbm9ybWFsbHkgYmUgY29uc3QK
+IzQ5OiBGSUxFOiBody92ZmlvL3BjaS5jOjMxNzI6CitzdGF0aWMgVk1TdGF0ZURlc2NyaXB0aW9u
+IHZmaW9fcGNpX3Ztc3RhdGUgPSB7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDU0IGxp
+bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNr
+aW5nIFBBVENIIDIvNDogdmZpbzogQWRkIHZtIHN0YXR1cyBjaGFuZ2UgY2FsbGJhY2sgdG8gc3Rv
+cC9yZXN0YXJ0IHRoZSBtZGV2IGRldmljZS4uLgpDaGVja2luZyBQQVRDSCAzLzQ6IHZmaW86IEFk
+ZCBzdHJ1Y3QgdmZpb192bXN0YXRlX2luZm8gdG8gaW50cm9kdWNlIHB1dC9nZXQgY2FsbGJhY2sg
+ZnVudGlvbiBmb3IgdmZpbyBkZXZpY2Ugc3RhdHVzIHNhdmUvcmVzdG9yZS4uLgpDaGVja2luZyBQ
+QVRDSCA0LzQ6IHZpZm86IGludHJvZHVjZSBuZXcgVkZJTyBpb2N0bCBWRklPX0lPTU1VX0dFVF9E
+SVJUWV9CSVRNQVAuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdp
+dGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3
+IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
+aGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
