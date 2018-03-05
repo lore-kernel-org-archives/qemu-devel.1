@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1esk4G-000535-Hd
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:57:53 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1esk4P-0005Bl-58
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:58:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1esk4C-0004oQ-Jd
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:57:52 -0500
-Received: from mga12.intel.com ([192.55.52.136]:5361)
+	(envelope-from <haozhong.zhang@intel.com>) id 1esk4L-0004rZ-7f
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:58:01 -0500
+Received: from mga07.intel.com ([134.134.136.100]:36125)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1esk4C-0004nb-A6
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:57:48 -0500
+	id 1esk4K-0004rA-Qy
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:57:57 -0500
 From: Haozhong Zhang <haozhong.zhang@intel.com>
-Date: Mon,  5 Mar 2018 14:57:08 +0800
-Message-Id: <20180305065710.25876-4-haozhong.zhang@intel.com>
+Date: Mon,  5 Mar 2018 14:57:09 +0800
+Message-Id: <20180305065710.25876-5-haozhong.zhang@intel.com>
 In-Reply-To: <20180305065710.25876-1-haozhong.zhang@intel.com>
 References: <20180305065710.25876-1-haozhong.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH v3 3/5] hw/acpi-build: build SRAT memory
- affinity structures for DIMM devices
+Subject: [Qemu-devel] [PATCH v3 4/5] tests/bios-tables-test: allow setting
+ extra machine options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,108 +28,161 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mst@redhat.com, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>
 
-ACPI 6.2A Table 5-129 "SPA Range Structure" requires the proximity
-domain of a NVDIMM SPA range must match with corresponding entry in
-SRAT table.
-
-The address ranges of vNVDIMM in QEMU are allocated from the
-hot-pluggable address space, which is entirely covered by one SRAT
-memory affinity structure. However, users can set the vNVDIMM
-proximity domain in NFIT SPA range structure by the 'node' property of
-'-device nvdimm' to a value different than the one in the above SRAT
-memory affinity structure.
-
-In order to solve such proximity domain mismatch, this patch builds
-one SRAT memory affinity structure for each DIMM device present at
-boot time, including both PC-DIMM and NVDIMM, with the proximity
-domain specified in '-device pc-dimm' or '-device nvdimm'.
-
-The remaining hot-pluggable address space is covered by one or multiple
-SRAT memory affinity structures with the proximity domain of the last
-node as before.
+Some test cases may require extra machine options than those used in
+the current test_acpi_ones(), e.g., nvdimm test cases require the
+machine option 'nvdimm=on'.
 
 Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
 ---
- hw/i386/acpi-build.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 56 insertions(+), 4 deletions(-)
+ tests/bios-tables-test.c | 45 +++++++++++++++++++++++++++++----------------
+ 1 file changed, 29 insertions(+), 16 deletions(-)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index deb440f286..2ca0317386 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2323,6 +2323,59 @@ build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
- #define HOLE_640K_START  (640 * 1024)
- #define HOLE_640K_END   (1024 * 1024)
- 
-+static void build_srat_hotpluggable_memory(GArray *table_data, uint64_t base,
-+                                           uint64_t len, int default_node)
-+{
-+    MemoryDeviceInfoList *info_list = qmp_pc_dimm_device_list();
-+    MemoryDeviceInfoList *info;
-+    MemoryDeviceInfo *mi;
-+    PCDIMMDeviceInfo *di;
-+    uint64_t end = base + len, cur, addr, size;
-+    int node;
-+    bool is_nvdimm;
-+    AcpiSratMemoryAffinity *numamem;
-+    MemoryAffinityFlags flags;
-+
-+    for (cur = base, info = info_list;
-+         cur < end;
-+         cur += size, info = info->next) {
-+        numamem = acpi_data_push(table_data, sizeof *numamem);
-+
-+        if (!info) {
-+            build_srat_memory(numamem, cur, end - cur, default_node,
-+                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
-+            break;
-+        }
-+
-+        mi = info->value;
-+        is_nvdimm = (mi->type == MEMORY_DEVICE_INFO_KIND_NVDIMM);
-+        di = !is_nvdimm ? mi->u.dimm.data :
-+                          qapi_NVDIMMDeviceInfo_base(mi->u.nvdimm.data);
-+
-+        addr = di->addr;
-+        if (cur < addr) {
-+            build_srat_memory(numamem, cur, addr - cur, default_node,
-+                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
-+            numamem = acpi_data_push(table_data, sizeof *numamem);
-+        }
-+
-+        size = di->size;
-+        node = di->node;
-+
-+        flags = MEM_AFFINITY_ENABLED;
-+        if (di->hotpluggable) {
-+            flags |= MEM_AFFINITY_HOTPLUGGABLE;
-+        }
-+        if (is_nvdimm) {
-+            flags |= MEM_AFFINITY_NON_VOLATILE;
-+        }
-+
-+        build_srat_memory(numamem, addr, size, node, flags);
-+    }
-+
-+    qapi_free_MemoryDeviceInfoList(info_list);
-+}
-+
- static void
- build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
- {
-@@ -2434,10 +2487,9 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
-      * providing _PXM method if necessary.
-      */
-     if (hotplugabble_address_space_size) {
--        numamem = acpi_data_push(table_data, sizeof *numamem);
--        build_srat_memory(numamem, pcms->hotplug_memory.base,
--                          hotplugabble_address_space_size, pcms->numa_nodes - 1,
--                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
-+        build_srat_hotpluggable_memory(table_data, pcms->hotplug_memory.base,
-+                                       hotplugabble_address_space_size,
-+                                       pcms->numa_nodes - 1);
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 65b271a173..d45181aa51 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -654,17 +654,22 @@ static void test_smbios_structs(test_data *data)
      }
+ }
  
-     build_header(linker, table_data,
+-static void test_acpi_one(const char *params, test_data *data)
++static void test_acpi_one(const char *extra_machine_opts,
++                          const char *params, test_data *data)
+ {
+     char *args;
+ 
+     /* Disable kernel irqchip to be able to override apic irq0. */
+-    args = g_strdup_printf("-machine %s,accel=%s,kernel-irqchip=off "
++    args = g_strdup_printf("-machine %s,accel=%s,kernel-irqchip=off",
++                           data->machine, "kvm:tcg");
++    if (extra_machine_opts) {
++        args = g_strdup_printf("%s,%s", args, extra_machine_opts);
++    }
++    args = g_strdup_printf("%s "
+                            "-net none -display none %s "
+                            "-drive id=hd0,if=none,file=%s,format=raw "
+                            "-device ide-hd,drive=hd0 ",
+-                           data->machine, "kvm:tcg",
+-                           params ? params : "", disk);
++                           args, params ? params : "", disk);
+ 
+     qtest_start(args);
+ 
+@@ -711,7 +716,7 @@ static void test_acpi_piix4_tcg(void)
+     data.machine = MACHINE_PC;
+     data.required_struct_types = base_required_struct_types;
+     data.required_struct_types_len = ARRAY_SIZE(base_required_struct_types);
+-    test_acpi_one(NULL, &data);
++    test_acpi_one(NULL, NULL, &data);
+     free_test_data(&data);
+ }
+ 
+@@ -724,7 +729,7 @@ static void test_acpi_piix4_tcg_bridge(void)
+     data.variant = ".bridge";
+     data.required_struct_types = base_required_struct_types;
+     data.required_struct_types_len = ARRAY_SIZE(base_required_struct_types);
+-    test_acpi_one("-device pci-bridge,chassis_nr=1", &data);
++    test_acpi_one(NULL, "-device pci-bridge,chassis_nr=1", &data);
+     free_test_data(&data);
+ }
+ 
+@@ -736,7 +741,7 @@ static void test_acpi_q35_tcg(void)
+     data.machine = MACHINE_Q35;
+     data.required_struct_types = base_required_struct_types;
+     data.required_struct_types_len = ARRAY_SIZE(base_required_struct_types);
+-    test_acpi_one(NULL, &data);
++    test_acpi_one(NULL, NULL, &data);
+     free_test_data(&data);
+ }
+ 
+@@ -749,7 +754,7 @@ static void test_acpi_q35_tcg_bridge(void)
+     data.variant = ".bridge";
+     data.required_struct_types = base_required_struct_types;
+     data.required_struct_types_len = ARRAY_SIZE(base_required_struct_types);
+-    test_acpi_one("-device pci-bridge,chassis_nr=1",
++    test_acpi_one(NULL, "-device pci-bridge,chassis_nr=1",
+                   &data);
+     free_test_data(&data);
+ }
+@@ -761,7 +766,8 @@ static void test_acpi_piix4_tcg_cphp(void)
+     memset(&data, 0, sizeof(data));
+     data.machine = MACHINE_PC;
+     data.variant = ".cphp";
+-    test_acpi_one("-smp 2,cores=3,sockets=2,maxcpus=6"
++    test_acpi_one(NULL,
++                  "-smp 2,cores=3,sockets=2,maxcpus=6"
+                   " -numa node -numa node"
+                   " -numa dist,src=0,dst=1,val=21",
+                   &data);
+@@ -775,7 +781,8 @@ static void test_acpi_q35_tcg_cphp(void)
+     memset(&data, 0, sizeof(data));
+     data.machine = MACHINE_Q35;
+     data.variant = ".cphp";
+-    test_acpi_one(" -smp 2,cores=3,sockets=2,maxcpus=6"
++    test_acpi_one(NULL,
++                  " -smp 2,cores=3,sockets=2,maxcpus=6"
+                   " -numa node -numa node"
+                   " -numa dist,src=0,dst=1,val=21",
+                   &data);
+@@ -795,7 +802,8 @@ static void test_acpi_q35_tcg_ipmi(void)
+     data.variant = ".ipmibt";
+     data.required_struct_types = ipmi_required_struct_types;
+     data.required_struct_types_len = ARRAY_SIZE(ipmi_required_struct_types);
+-    test_acpi_one("-device ipmi-bmc-sim,id=bmc0"
++    test_acpi_one(NULL,
++                  "-device ipmi-bmc-sim,id=bmc0"
+                   " -device isa-ipmi-bt,bmc=bmc0",
+                   &data);
+     free_test_data(&data);
+@@ -813,7 +821,8 @@ static void test_acpi_piix4_tcg_ipmi(void)
+     data.variant = ".ipmikcs";
+     data.required_struct_types = ipmi_required_struct_types;
+     data.required_struct_types_len = ARRAY_SIZE(ipmi_required_struct_types);
+-    test_acpi_one("-device ipmi-bmc-sim,id=bmc0"
++    test_acpi_one(NULL,
++                  "-device ipmi-bmc-sim,id=bmc0"
+                   " -device isa-ipmi-kcs,irq=0,bmc=bmc0",
+                   &data);
+     free_test_data(&data);
+@@ -826,7 +835,8 @@ static void test_acpi_q35_tcg_memhp(void)
+     memset(&data, 0, sizeof(data));
+     data.machine = MACHINE_Q35;
+     data.variant = ".memhp";
+-    test_acpi_one(" -m 128,slots=3,maxmem=1G"
++    test_acpi_one(NULL,
++                  " -m 128,slots=3,maxmem=1G"
+                   " -numa node -numa node"
+                   " -numa dist,src=0,dst=1,val=21",
+                   &data);
+@@ -840,7 +850,8 @@ static void test_acpi_piix4_tcg_memhp(void)
+     memset(&data, 0, sizeof(data));
+     data.machine = MACHINE_PC;
+     data.variant = ".memhp";
+-    test_acpi_one(" -m 128,slots=3,maxmem=1G"
++    test_acpi_one(NULL,
++                  " -m 128,slots=3,maxmem=1G"
+                   " -numa node -numa node"
+                   " -numa dist,src=0,dst=1,val=21",
+                   &data);
+@@ -854,7 +865,8 @@ static void test_acpi_q35_tcg_numamem(void)
+     memset(&data, 0, sizeof(data));
+     data.machine = MACHINE_Q35;
+     data.variant = ".numamem";
+-    test_acpi_one(" -numa node -numa node,mem=128", &data);
++    test_acpi_one(NULL,
++                  " -numa node -numa node,mem=128", &data);
+     free_test_data(&data);
+ }
+ 
+@@ -865,7 +877,8 @@ static void test_acpi_piix4_tcg_numamem(void)
+     memset(&data, 0, sizeof(data));
+     data.machine = MACHINE_PC;
+     data.variant = ".numamem";
+-    test_acpi_one(" -numa node -numa node,mem=128", &data);
++    test_acpi_one(NULL,
++                  " -numa node -numa node,mem=128", &data);
+     free_test_data(&data);
+ }
+ 
 -- 
 2.14.1
