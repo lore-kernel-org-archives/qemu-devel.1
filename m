@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1esiu8-0002k6-VV
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 00:43:21 -0500
+	(envelope-from <yulei.zhang@intel.com>) id 1esj63-0004zw-7G
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 00:55:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1esiu5-00045g-SF
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 00:43:21 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57552 helo=mx1.redhat.com)
+	(envelope-from <yulei.zhang@intel.com>) id 1esj5y-0008Eb-Be
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 00:55:39 -0500
+Received: from mga06.intel.com ([134.134.136.31]:54637)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1esiu5-00045Y-Mx
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 00:43:17 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 37EA8EAEA0
-	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 05:43:14 +0000 (UTC)
-Date: Mon, 5 Mar 2018 13:43:04 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180305054304.GB23195@xz-mi>
-References: <20180301084438.13594-1-peterx@redhat.com>
-	<20180301084438.13594-8-peterx@redhat.com>
-	<20180301154331.GN14643@redhat.com> <20180302042609.GA27381@xz-mi>
-	<4fc1731d-4611-555e-b78f-1efd67edf1df@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4fc1731d-4611-555e-b78f-1efd67edf1df@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 07/15] qio/chardev: update net listener
- gcontext
+	(Exim 4.71) (envelope-from <yulei.zhang@intel.com>)
+	id 1esj5y-0008DY-2j
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 00:55:34 -0500
+From: Yulei Zhang <yulei.zhang@intel.com>
+Date: Mon,  5 Mar 2018 14:00:49 +0800
+Message-Id: <1520229653-10658-1-git-send-email-yulei.zhang@intel.com>
+Subject: [Qemu-devel] [PATCH V3 0/4] vfio: Introduce Live migration
+ capability to vfio_mdev device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,39 +23,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kevin.tian@intel.com, zhenyuw@linux.intel.com, kwankhede@nvidia.com, alex.williamson@redhat.com, Yulei Zhang <yulei.zhang@intel.com>
 
-On Fri, Mar 02, 2018 at 12:17:30PM +0100, Paolo Bonzini wrote:
-> On 02/03/2018 05:26, Peter Xu wrote:
-> > Frankly speaking I was a bit confused when I started to read
-> > chardev/qio codes with so many hooks, e.g., when I saw:
-> > 
-> >      qio_net_listener_set_client_func(s->listener, tcp_chr_accept,
-> >                                       chr, NULL);
-> > 
-> > I totally have no idea on what happened.  I need to go deeper into the
-> > net listener code to know that, hmm, it's setting up something to
-> > accept connections!
-> > 
-> > If I can have something like:
-> > 
-> >     tcp_chr_net_listener_setup(s, true);
-> > 
-> > It may be easier for me to understand that there's something either
-> > registered for the listening ports, and I don't need to care about
-> > which function will be called when accept happened.  Basically it
-> > "hides" some logic inside, that's IMHO where functions/macros help.
-> 
-> I tend to agree with Daniel, but I probably would be convinced if you
-> had a pair of functions tcp_chr_{start,stop}_listen instead of a bool
-> argument.
+Summary
 
-Thanks Paolo for your suggestion.
+This series RFC would like to resume the discussion about how to
+introduce the live migration capability to vfio mdev device. 
 
-Let me just keep the code untouched so that we can be more focused on
-the topic of the series.  I'll try to avoid unecessary clean ups
-there.  Thanks,
+By adding a new vfio subtype region VFIO_REGION_SUBTYPE_DEVICE_STATE,
+the mdev device will be set to migratable if the new region exist
+during the initialization.  
+
+The intention to add the new region is using it for mdev device status
+save and restore during the migration. The access to this region
+will be trapped and forward to the mdev device driver, it also uses 
+the first byte in the new region to control the running state of mdev
+device, so during the migration after stop the mdev driver, qemu could
+retrieve the specific device status from this region and transfer to 
+the target VM side for the mdev device restore.
+
+In addition,  we add one new ioctl VFIO_IOMMU_GET_DIRTY_BITMAP to help do 
+the mdev device dirty page synchronization during the migration, currently
+it is just for static copy, in the future we would like to add new interface
+for the pre-copy.
+
+Below is the vfio_mdev device migration sequence
+Source VM side:
+			start migration
+				|
+				V
+        	 get the cpu state change callback, write to the
+        	 subregion's first byte to stop the mdev device
+				|
+				V
+		 quary the dirty page bitmap from iommu container 
+		 and add into qemu dirty list for synchronization
+				|
+				V
+		 save the deivce status into Qemufile which is 
+                     read from the vfio device subregion
+
+Target VM side:
+		   restore the mdev device after get the
+		     saved status context from Qemufile
+				|
+				V
+		     get the cpu state change callback
+ 		     write to subregion's first byte to 
+                      start the mdev device to put it in 
+                      running status
+				|
+				V
+			finish migration
+
+V3->V2:
+1. rebase the patch to Qemu stable 2.10 branch.
+2. use a common name for the subregion instead of specific for 
+   intel IGD.
+
+V1->V2:
+Per Alex's suggestion:
+1. use device subtype region instead of VFIO PCI fixed region.
+2. remove unnecessary ioctl, use the first byte of subregion to 
+   control the running state of mdev device.  
+3. for dirty page synchronization, implement the interface with
+   VFIOContainer instead of vfio pci device.
+
+Yulei Zhang (4):
+  vfio: introduce a new VFIO subregion for mdev device migration support
+  vfio: Add vm status change callback to stop/restart the mdev device
+  vfio: Add struct vfio_vmstate_info to introduce put/get callback
+    funtion for vfio device status save/restore
+  vifo: introduce new VFIO ioctl VFIO_IOMMU_GET_DIRTY_BITMAP
+
+ hw/vfio/common.c              |  34 +++++++++
+ hw/vfio/pci.c                 | 171 +++++++++++++++++++++++++++++++++++++++++-
+ hw/vfio/pci.h                 |   1 +
+ include/hw/vfio/vfio-common.h |   1 +
+ linux-headers/linux/vfio.h    |  29 ++++++-
+ 5 files changed, 232 insertions(+), 4 deletions(-)
 
 -- 
-Peter Xu
+2.7.4
