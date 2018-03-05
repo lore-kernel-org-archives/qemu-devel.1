@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1esgY0-0006pF-RG
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 22:12:21 -0500
+	(envelope-from <jasowang@redhat.com>) id 1esgY5-0006r5-7y
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 22:12:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1esgXw-0005J4-G5
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 22:12:20 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57184 helo=mx1.redhat.com)
+	(envelope-from <jasowang@redhat.com>) id 1esgY4-0005Ps-7u
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 22:12:25 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57196 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1esgXw-0005Hz-9y
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 22:12:16 -0500
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1esgY4-0005Pb-3i
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 22:12:24 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon,  5 Mar 2018 11:11:56 +0800
-Message-Id: <1520219524-17160-2-git-send-email-jasowang@redhat.com>
+Date: Mon,  5 Mar 2018 11:11:58 +0800
+Message-Id: <1520219524-17160-4-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1520219524-17160-1-git-send-email-jasowang@redhat.com>
 References: <1520219524-17160-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 1/9] net: Move error reporting from
- net_init_client/netdev to the calling site
+Subject: [Qemu-devel] [PULL 3/9] net: Only show vhost-user in the help text
+ if CONFIG_POSIX is defined
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,104 +29,31 @@ Cc: Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>
 
 From: Thomas Huth <thuth@redhat.com>
 
-It looks strange that net_init_client() and net_init_netdev() both
-take an "Error **errp" parameter, but then do the error reporting
-with "error_report_err(local_err)" on their own. Let's move the
-error reporting to the calling site instead to simplify this code
-a little bit.
+According to net/Makefile.objs we only link in the vhost-user code
+if CONFIG_POSIX has been set. So the help screen should also only
+show this information if CONFIG_POSIX has been defined.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- include/net/net.h |  2 +-
- net/net.c         | 29 +++++------------------------
- vl.c              |  3 ++-
- 3 files changed, 8 insertions(+), 26 deletions(-)
+ qemu-options.hx | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/include/net/net.h b/include/net/net.h
-index 3fc48e4..bdd4d9f 100644
---- a/include/net/net.h
-+++ b/include/net/net.h
-@@ -206,7 +206,7 @@ extern const char *legacy_bootp_filename;
- 
- int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp);
- int net_client_parse(QemuOptsList *opts_list, const char *str);
--int net_init_clients(void);
-+int net_init_clients(Error **errp);
- void net_check_clients(void);
- void net_cleanup(void);
- void hmp_host_net_add(Monitor *mon, const QDict *qdict);
-diff --git a/net/net.c b/net/net.c
-index 7d42925..e213a61 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -1520,46 +1520,27 @@ void net_check_clients(void)
- 
- static int net_init_client(void *dummy, QemuOpts *opts, Error **errp)
- {
--    Error *local_err = NULL;
--
--    net_client_init(opts, false, &local_err);
--    if (local_err) {
--        error_report_err(local_err);
--        return -1;
--    }
--
--    return 0;
-+    return net_client_init(opts, false, errp);
- }
- 
- static int net_init_netdev(void *dummy, QemuOpts *opts, Error **errp)
- {
--    Error *local_err = NULL;
--    int ret;
--
--    ret = net_client_init(opts, true, &local_err);
--    if (local_err) {
--        error_report_err(local_err);
--        return -1;
--    }
--
--    return ret;
-+    return net_client_init(opts, true, errp);
- }
- 
--int net_init_clients(void)
-+int net_init_clients(Error **errp)
- {
--    QemuOptsList *net = qemu_find_opts("net");
--
-     net_change_state_entry =
-         qemu_add_vm_change_state_handler(net_vm_change_state_handler, NULL);
- 
-     QTAILQ_INIT(&net_clients);
- 
-     if (qemu_opts_foreach(qemu_find_opts("netdev"),
--                          net_init_netdev, NULL, NULL)) {
-+                          net_init_netdev, NULL, errp)) {
-         return -1;
-     }
- 
--    if (qemu_opts_foreach(net, net_init_client, NULL, NULL)) {
-+    if (qemu_opts_foreach(qemu_find_opts("net"), net_init_client, NULL, errp)) {
-         return -1;
-     }
- 
-diff --git a/vl.c b/vl.c
-index a33ac00..1931621 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4489,7 +4489,8 @@ int main(int argc, char **argv, char **envp)
- 
-     colo_info_init();
- 
--    if (net_init_clients() < 0) {
-+    if (net_init_clients(&err) < 0) {
-+        error_report_err(err);
-         exit(1);
-     }
- 
+diff --git a/qemu-options.hx b/qemu-options.hx
+index fea949d..5781599 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -1998,8 +1998,10 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
+     "                VALE port (created on the fly) called 'name' ('nmname' is name of the \n"
+     "                netmap device, defaults to '/dev/netmap')\n"
+ #endif
++#ifdef CONFIG_POSIX
+     "-netdev vhost-user,id=str,chardev=dev[,vhostforce=on|off]\n"
+     "                configure a vhost-user network, backed by a chardev 'dev'\n"
++#endif
+     "-netdev hubport,id=str,hubid=n[,netdev=nd]\n"
+     "                configure a hub port on QEMU VLAN 'n'\n", QEMU_ARCH_ALL)
+ DEF("net", HAS_ARG, QEMU_OPTION_net,
 -- 
 2.7.4
