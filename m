@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1esjqo-00034c-So
+	(envelope-from <peterx@redhat.com>) id 1esjqo-00034Z-Rv
 	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:44:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1esjqi-00068C-MJ
+	(envelope-from <peterx@redhat.com>) id 1esjqm-0006BS-MJ
 	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:43:58 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53396 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53400 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1esjqi-00067b-Gw
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:43:52 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1esjqm-0006B8-Gn
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:43:56 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 17D8B40FB64A
-	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 06:43:52 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1523340FB64A
+	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 06:43:56 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Mon,  5 Mar 2018 14:43:23 +0800
-Message-Id: <20180305064324.9238-6-peterx@redhat.com>
+Date: Mon,  5 Mar 2018 14:43:24 +0800
+Message-Id: <20180305064324.9238-7-peterx@redhat.com>
 In-Reply-To: <20180305064324.9238-1-peterx@redhat.com>
 References: <20180305064324.9238-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 5/6] qio: non-default context for async conn
+Subject: [Qemu-devel] [PATCH v3 6/6] qio: non-default context for TLS
+ handshake
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,197 +33,241 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, peterx@redhat.com, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-We have worked on qio_task_run_in_thread() already.  Further, let
-all the qio channel APIs use that context.
+A new parameter "context" is added to qio_channel_tls_handshake() is to
+allow the TLS to be run on a non-default context.  Still, no functional
+change.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- chardev/char-socket.c          |  4 ++--
- include/io/channel-socket.h    | 15 ++++++++++++---
- io/channel-socket.c            | 15 +++++++++------
- migration/socket.c             |  3 ++-
- tests/test-io-channel-socket.c |  4 ++--
- 5 files changed, 27 insertions(+), 14 deletions(-)
+ chardev/char-socket.c       |  1 +
+ include/io/channel-tls.h    |  5 ++++-
+ io/channel-tls.c            | 45 ++++++++++++++++++++++++++++++++++-----------
+ migration/tls.c             |  2 ++
+ nbd/client.c                |  1 +
+ nbd/server.c                |  1 +
+ tests/test-io-channel-tls.c |  2 ++
+ ui/vnc-auth-vencrypt.c      |  1 +
+ ui/vnc-ws.c                 |  1 +
+ 9 files changed, 47 insertions(+), 12 deletions(-)
 
 diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index bdd6cff5f6..754d82679a 100644
+index 754d82679a..113feaf948 100644
 --- a/chardev/char-socket.c
 +++ b/chardev/char-socket.c
-@@ -866,7 +866,7 @@ static gboolean socket_reconnect_timeout(gpointer opaque)
-     tcp_chr_set_client_ioc_name(chr, sioc);
-     qio_channel_socket_connect_async(sioc, s->addr,
-                                      qemu_chr_socket_connected,
--                                     chr, NULL);
-+                                     chr, NULL, NULL);
- 
-     return false;
+@@ -702,6 +702,7 @@ static void tcp_chr_tls_init(Chardev *chr)
+     qio_channel_tls_handshake(tioc,
+                               tcp_chr_tls_handshake,
+                               chr,
++                              NULL,
+                               NULL);
  }
-@@ -950,7 +950,7 @@ static void qmp_chardev_open_socket(Chardev *chr,
-         tcp_chr_set_client_ioc_name(chr, sioc);
-         qio_channel_socket_connect_async(sioc, s->addr,
-                                          qemu_chr_socket_connected,
--                                         chr, NULL);
-+                                         chr, NULL, NULL);
+ 
+diff --git a/include/io/channel-tls.h b/include/io/channel-tls.h
+index d157eb10e8..87fcaf9146 100644
+--- a/include/io/channel-tls.h
++++ b/include/io/channel-tls.h
+@@ -116,6 +116,8 @@ qio_channel_tls_new_client(QIOChannel *master,
+  * @func: the callback to invoke when completed
+  * @opaque: opaque data to pass to @func
+  * @destroy: optional callback to free @opaque
++ * @context: the context that TLS handshake will run with. If %NULL,
++ *           the default context will be used
+  *
+  * Perform the TLS session handshake. This method
+  * will return immediately and the handshake will
+@@ -126,7 +128,8 @@ qio_channel_tls_new_client(QIOChannel *master,
+ void qio_channel_tls_handshake(QIOChannelTLS *ioc,
+                                QIOTaskFunc func,
+                                gpointer opaque,
+-                               GDestroyNotify destroy);
++                               GDestroyNotify destroy,
++                               GMainContext *context);
+ 
+ /**
+  * qio_channel_tls_get_session:
+diff --git a/io/channel-tls.c b/io/channel-tls.c
+index 6182702dab..9628e6fa47 100644
+--- a/io/channel-tls.c
++++ b/io/channel-tls.c
+@@ -140,13 +140,19 @@ qio_channel_tls_new_client(QIOChannel *master,
+     return NULL;
+ }
+ 
++struct QIOChannelTLSData {
++    QIOTask *task;
++    GMainContext *context;
++};
++typedef struct QIOChannelTLSData QIOChannelTLSData;
+ 
+ static gboolean qio_channel_tls_handshake_io(QIOChannel *ioc,
+                                              GIOCondition condition,
+                                              gpointer user_data);
+ 
+ static void qio_channel_tls_handshake_task(QIOChannelTLS *ioc,
+-                                           QIOTask *task)
++                                           QIOTask *task,
++                                           GMainContext *context)
+ {
+     Error *err = NULL;
+     QCryptoTLSSessionHandshakeStatus status;
+@@ -171,6 +177,15 @@ static void qio_channel_tls_handshake_task(QIOChannelTLS *ioc,
+         qio_task_complete(task);
      } else {
-         if (s->is_listen) {
-             char *name;
-diff --git a/include/io/channel-socket.h b/include/io/channel-socket.h
-index 53801f6042..d7134d2cd6 100644
---- a/include/io/channel-socket.h
-+++ b/include/io/channel-socket.h
-@@ -101,6 +101,8 @@ int qio_channel_socket_connect_sync(QIOChannelSocket *ioc,
-  * @callback: the function to invoke on completion
-  * @opaque: user data to pass to @callback
-  * @destroy: the function to free @opaque
-+ * @context: the context to run the async task. If %NULL, the default
-+ *           context will be used.
-  *
-  * Attempt to connect to the address @addr. This method
-  * will run in the background so the caller will regain
-@@ -113,7 +115,8 @@ void qio_channel_socket_connect_async(QIOChannelSocket *ioc,
-                                       SocketAddress *addr,
-                                       QIOTaskFunc callback,
-                                       gpointer opaque,
--                                      GDestroyNotify destroy);
-+                                      GDestroyNotify destroy,
-+                                      GMainContext *context);
+         GIOCondition condition;
++        QIOChannelTLSData *data = g_new0(typeof(*data), 1);
++
++        data->task = task;
++        data->context = context;
++
++        if (context) {
++            g_main_context_ref(context);
++        }
++
+         if (status == QCRYPTO_TLS_HANDSHAKE_SENDING) {
+             condition = G_IO_OUT;
+         } else {
+@@ -178,11 +193,12 @@ static void qio_channel_tls_handshake_task(QIOChannelTLS *ioc,
+         }
  
+         trace_qio_channel_tls_handshake_pending(ioc, status);
+-        qio_channel_add_watch(ioc->master,
+-                              condition,
+-                              qio_channel_tls_handshake_io,
+-                              task,
+-                              NULL);
++        qio_channel_add_watch_full(ioc->master,
++                                   condition,
++                                   qio_channel_tls_handshake_io,
++                                   data,
++                                   NULL,
++                                   context);
+     }
+ }
  
- /**
-@@ -138,6 +141,8 @@ int qio_channel_socket_listen_sync(QIOChannelSocket *ioc,
-  * @callback: the function to invoke on completion
-  * @opaque: user data to pass to @callback
-  * @destroy: the function to free @opaque
-+ * @context: the context to run the async task. If %NULL, the default
-+ *           context will be used.
-  *
-  * Attempt to listen to the address @addr. This method
-  * will run in the background so the caller will regain
-@@ -150,7 +155,8 @@ void qio_channel_socket_listen_async(QIOChannelSocket *ioc,
-                                      SocketAddress *addr,
-                                      QIOTaskFunc callback,
-                                      gpointer opaque,
--                                     GDestroyNotify destroy);
-+                                     GDestroyNotify destroy,
-+                                     GMainContext *context);
- 
- 
- /**
-@@ -179,6 +185,8 @@ int qio_channel_socket_dgram_sync(QIOChannelSocket *ioc,
-  * @callback: the function to invoke on completion
-  * @opaque: user data to pass to @callback
-  * @destroy: the function to free @opaque
-+ * @context: the context to run the async task. If %NULL, the default
-+ *           context will be used.
-  *
-  * Attempt to initialize a datagram socket bound to
-  * @localAddr and communicating with peer @remoteAddr.
-@@ -194,7 +202,8 @@ void qio_channel_socket_dgram_async(QIOChannelSocket *ioc,
-                                     SocketAddress *remoteAddr,
-                                     QIOTaskFunc callback,
-                                     gpointer opaque,
--                                    GDestroyNotify destroy);
-+                                    GDestroyNotify destroy,
-+                                    GMainContext *context);
- 
- 
- /**
-diff --git a/io/channel-socket.c b/io/channel-socket.c
-index 4224ce323a..18c139c365 100644
---- a/io/channel-socket.c
-+++ b/io/channel-socket.c
-@@ -173,7 +173,8 @@ void qio_channel_socket_connect_async(QIOChannelSocket *ioc,
-                                       SocketAddress *addr,
-                                       QIOTaskFunc callback,
-                                       gpointer opaque,
--                                      GDestroyNotify destroy)
-+                                      GDestroyNotify destroy,
-+                                      GMainContext *context)
+@@ -191,12 +207,18 @@ static gboolean qio_channel_tls_handshake_io(QIOChannel *ioc,
+                                              GIOCondition condition,
+                                              gpointer user_data)
  {
-     QIOTask *task = qio_task_new(
-         OBJECT(ioc), callback, opaque, destroy);
-@@ -188,7 +189,7 @@ void qio_channel_socket_connect_async(QIOChannelSocket *ioc,
-                            qio_channel_socket_connect_worker,
-                            addrCopy,
-                            (GDestroyNotify)qapi_free_SocketAddress,
--                           NULL);
-+                           context);
+-    QIOTask *task = user_data;
++    QIOChannelTLSData *data = user_data;
++    QIOTask *task = data->task;
++    GMainContext *context = data->context;
+     QIOChannelTLS *tioc = QIO_CHANNEL_TLS(
+         qio_task_get_source(task));
+ 
+-    qio_channel_tls_handshake_task(
+-       tioc, task);
++    g_free(data);
++    qio_channel_tls_handshake_task(tioc, task, context);
++
++    if (context) {
++        g_main_context_unref(context);
++    }
+ 
+     return FALSE;
  }
- 
- 
-@@ -233,7 +234,8 @@ void qio_channel_socket_listen_async(QIOChannelSocket *ioc,
-                                      SocketAddress *addr,
-                                      QIOTaskFunc callback,
-                                      gpointer opaque,
--                                     GDestroyNotify destroy)
-+                                     GDestroyNotify destroy,
-+                                     GMainContext *context)
+@@ -204,7 +226,8 @@ static gboolean qio_channel_tls_handshake_io(QIOChannel *ioc,
+ void qio_channel_tls_handshake(QIOChannelTLS *ioc,
+                                QIOTaskFunc func,
+                                gpointer opaque,
+-                               GDestroyNotify destroy)
++                               GDestroyNotify destroy,
++                               GMainContext *context)
  {
-     QIOTask *task = qio_task_new(
-         OBJECT(ioc), callback, opaque, destroy);
-@@ -247,7 +249,7 @@ void qio_channel_socket_listen_async(QIOChannelSocket *ioc,
-                            qio_channel_socket_listen_worker,
-                            addrCopy,
-                            (GDestroyNotify)qapi_free_SocketAddress,
--                           NULL);
-+                           context);
+     QIOTask *task;
+ 
+@@ -212,7 +235,7 @@ void qio_channel_tls_handshake(QIOChannelTLS *ioc,
+                         func, opaque, destroy);
+ 
+     trace_qio_channel_tls_handshake_start(ioc);
+-    qio_channel_tls_handshake_task(ioc, task);
++    qio_channel_tls_handshake_task(ioc, task, context);
  }
  
  
-@@ -309,7 +311,8 @@ void qio_channel_socket_dgram_async(QIOChannelSocket *ioc,
-                                     SocketAddress *remoteAddr,
-                                     QIOTaskFunc callback,
-                                     gpointer opaque,
--                                    GDestroyNotify destroy)
-+                                    GDestroyNotify destroy,
-+                                    GMainContext *context)
- {
-     QIOTask *task = qio_task_new(
-         OBJECT(ioc), callback, opaque, destroy);
-@@ -324,7 +327,7 @@ void qio_channel_socket_dgram_async(QIOChannelSocket *ioc,
-                            qio_channel_socket_dgram_worker,
-                            data,
-                            qio_channel_socket_dgram_worker_free,
--                           NULL);
-+                           context);
+diff --git a/migration/tls.c b/migration/tls.c
+index a29b35b33c..3b9e8c9263 100644
+--- a/migration/tls.c
++++ b/migration/tls.c
+@@ -105,6 +105,7 @@ void migration_tls_channel_process_incoming(MigrationState *s,
+     qio_channel_tls_handshake(tioc,
+                               migration_tls_incoming_handshake,
+                               NULL,
++                              NULL,
+                               NULL);
  }
  
- 
-diff --git a/migration/socket.c b/migration/socket.c
-index e090097077..8a93fb1af5 100644
---- a/migration/socket.c
-+++ b/migration/socket.c
-@@ -103,7 +103,8 @@ static void socket_start_outgoing_migration(MigrationState *s,
-                                      saddr,
-                                      socket_outgoing_migration,
-                                      data,
--                                     socket_connect_data_free);
-+                                     socket_connect_data_free,
-+                                     NULL);
-     qapi_free_SocketAddress(saddr);
+@@ -159,5 +160,6 @@ void migration_tls_channel_connect(MigrationState *s,
+     qio_channel_tls_handshake(tioc,
+                               migration_tls_outgoing_handshake,
+                               s,
++                              NULL,
+                               NULL);
  }
+diff --git a/nbd/client.c b/nbd/client.c
+index 9c3fe4aaa6..dcad23a053 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -579,6 +579,7 @@ static QIOChannel *nbd_receive_starttls(QIOChannel *ioc,
+     qio_channel_tls_handshake(tioc,
+                               nbd_tls_handshake,
+                               &data,
++                              NULL,
+                               NULL);
  
-diff --git a/tests/test-io-channel-socket.c b/tests/test-io-channel-socket.c
-index d357cd2a8e..b273fd3ba2 100644
---- a/tests/test-io-channel-socket.c
-+++ b/tests/test-io-channel-socket.c
-@@ -179,7 +179,7 @@ static void test_io_channel_setup_async(SocketAddress *listen_addr,
-     lioc = qio_channel_socket_new();
-     qio_channel_socket_listen_async(
-         lioc, listen_addr,
--        test_io_channel_complete, &data, NULL);
-+        test_io_channel_complete, &data, NULL, NULL);
+     if (!data.complete) {
+diff --git a/nbd/server.c b/nbd/server.c
+index 4990a5826e..e714bfe6a1 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -599,6 +599,7 @@ static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
+     qio_channel_tls_handshake(tioc,
+                               nbd_tls_handshake,
+                               &data,
++                              NULL,
+                               NULL);
  
-     g_main_loop_run(data.loop);
-     g_main_context_iteration(g_main_context_default(), FALSE);
-@@ -200,7 +200,7 @@ static void test_io_channel_setup_async(SocketAddress *listen_addr,
+     if (!data.complete) {
+diff --git a/tests/test-io-channel-tls.c b/tests/test-io-channel-tls.c
+index a210d01ba5..32743b2c96 100644
+--- a/tests/test-io-channel-tls.c
++++ b/tests/test-io-channel-tls.c
+@@ -203,10 +203,12 @@ static void test_io_channel_tls(const void *opaque)
+     qio_channel_tls_handshake(clientChanTLS,
+                               test_tls_handshake_done,
+                               &clientHandshake,
++                              NULL,
+                               NULL);
+     qio_channel_tls_handshake(serverChanTLS,
+                               test_tls_handshake_done,
+                               &serverHandshake,
++                              NULL,
+                               NULL);
  
-     qio_channel_socket_connect_async(
-         QIO_CHANNEL_SOCKET(*src), connect_addr,
--        test_io_channel_complete, &data, NULL);
-+        test_io_channel_complete, &data, NULL, NULL);
+     /*
+diff --git a/ui/vnc-auth-vencrypt.c b/ui/vnc-auth-vencrypt.c
+index 7833631275..d99ea362c1 100644
+--- a/ui/vnc-auth-vencrypt.c
++++ b/ui/vnc-auth-vencrypt.c
+@@ -128,6 +128,7 @@ static int protocol_client_vencrypt_auth(VncState *vs, uint8_t *data, size_t len
+         qio_channel_tls_handshake(tls,
+                                   vnc_tls_handshake_done,
+                                   vs,
++                                  NULL,
+                                   NULL);
+     }
+     return 0;
+diff --git a/ui/vnc-ws.c b/ui/vnc-ws.c
+index 6ccad22cef..950f1cd2ac 100644
+--- a/ui/vnc-ws.c
++++ b/ui/vnc-ws.c
+@@ -81,6 +81,7 @@ gboolean vncws_tls_handshake_io(QIOChannel *ioc G_GNUC_UNUSED,
+     qio_channel_tls_handshake(tls,
+                               vncws_tls_handshake_done,
+                               vs,
++                              NULL,
+                               NULL);
  
-     g_main_loop_run(data.loop);
-     g_main_context_iteration(g_main_context_default(), FALSE);
+     return TRUE;
 -- 
 2.14.3
