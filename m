@@ -1,20 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1essTl-0007md-SE
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:56:46 -0500
+	(envelope-from <stefanha@redhat.com>) id 1essWY-0000e5-PX
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:59:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1essTl-0007Is-66
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:56:45 -0500
-References: <20180302134917.25526-1-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <53df9dc5-6cb0-c7ef-2c07-923e59aa9b60@redhat.com>
-Date: Mon, 5 Mar 2018 16:56:37 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180302134917.25526-1-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="RYfixdFBa4jUehUBMb2BNiWOyngmitBRL"
-Subject: Re: [Qemu-devel] [PATCH] iotests: Mark all tests executable
+	(envelope-from <stefanha@redhat.com>) id 1essWX-0001p6-Uh
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 10:59:38 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Mon,  5 Mar 2018 15:59:26 +0000
+Message-Id: <20180305155926.25858-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH] qemu-iotests: fix 203 migration completion race
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,48 +17,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RYfixdFBa4jUehUBMb2BNiWOyngmitBRL
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
-Message-ID: <53df9dc5-6cb0-c7ef-2c07-923e59aa9b60@redhat.com>
-Subject: Re: [PATCH] iotests: Mark all tests executable
-References: <20180302134917.25526-1-eblake@redhat.com>
-In-Reply-To: <20180302134917.25526-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+There is a race between the test's 'query-migrate' QMP command after the
+QMP 'STOP' event and completing the migration:
 
-On 2018-03-02 14:49, Eric Blake wrote:
-> The majority of our iotests have the executable bit set; fix the
-> few outliers for consistency.
->=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
+The test case invokes 'query-migrate' upon receiving 'STOP'.  At this
+point the migration thread may still be in the process of completing.
+Therefore 'query-migrate' can return 'status': 'active' for a brief
+window of time instead of 'status': 'completed'.  This results in
+qemu-iotests 203 hanging.
 
-I think 124 is missing.
+Solve the race by enabling the 'events' migration capability, which
+causes QEMU to emit migration-specific QMP events that do not suffer
+from this race condition.  Wait for the QMP 'MIGRATION' event with
+'status': 'completed'.
 
-Max
+Reported-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ tests/qemu-iotests/203     | 15 +++++++++++----
+ tests/qemu-iotests/203.out |  5 +++++
+ 2 files changed, 16 insertions(+), 4 deletions(-)
 
-
---RYfixdFBa4jUehUBMb2BNiWOyngmitBRL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqdaLUSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AenEIAK5mbyhN2ecM9sgpTVVxn0MNqHzBjrL/
-6uJgAmjQfxYswmhjwCy5TjSNmdvurZ/CJ5NWMzTpJbSuWbjBSNzZlJF99oQexdsl
-mOjto4P2B5CATMQ7zxhMv6zS6nxC7cxlCSQOUc7EqCRCwGCtxCLFpKCNtDudNfSv
-t5hBVfSVudDDytFyAbHIA4peZ3tUQDwFPKEALUQynaxvJUpcom3kbCsUmzKxgC+v
-AvjawtNgk5d24M8+4BYjN6uodU0t01wdpX8Y+nSOlf6nWCEThgC2KM1n4C3pZJgk
-k3oZBQ8j3LXKfztY0kb0ZVkfr350LqT5nxw7b9ug1wwLSPXARYH76gQ=
-=hjSk
------END PGP SIGNATURE-----
-
---RYfixdFBa4jUehUBMb2BNiWOyngmitBRL--
+diff --git a/tests/qemu-iotests/203 b/tests/qemu-iotests/203
+index 2c811917d8..4874a1a0d8 100755
+--- a/tests/qemu-iotests/203
++++ b/tests/qemu-iotests/203
+@@ -49,11 +49,18 @@ with iotests.FilePath('disk0.img') as disk0_img_path, \
+                        node_name='drive1-node', iothread='iothread0',
+                        force=True))
+ 
++    iotests.log('Enabling migration QMP events...')
++    iotests.log(vm.qmp('migrate-set-capabilities', capabilities=[
++        {
++            'capability': 'events',
++            'state': True
++        }
++    ]))
++
+     iotests.log('Starting migration...')
+     iotests.log(vm.qmp('migrate', uri='exec:cat >/dev/null'))
+     while True:
+-        vm.get_qmp_event(wait=60.0)
+-        result = vm.qmp('query-migrate')
+-        status = result.get('return', {}).get('status', None)
+-        if status == 'completed':
++        event = vm.event_wait('MIGRATION')
++        iotests.log(event, filters=[iotests.filter_qmp_event])
++        if event['data']['status'] == 'completed':
+             break
+diff --git a/tests/qemu-iotests/203.out b/tests/qemu-iotests/203.out
+index 3f1ff900e4..1a11f0975c 100644
+--- a/tests/qemu-iotests/203.out
++++ b/tests/qemu-iotests/203.out
+@@ -2,5 +2,10 @@ Launching VM...
+ Setting IOThreads...
+ {u'return': {}}
+ {u'return': {}}
++Enabling migration QMP events...
++{u'return': {}}
+ Starting migration...
+ {u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'setup'}, u'event': u'MIGRATION'}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'active'}, u'event': u'MIGRATION'}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'completed'}, u'event': u'MIGRATION'}
+-- 
+2.14.3
