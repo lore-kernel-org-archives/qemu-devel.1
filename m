@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eslnm-0003qs-Hc
+	(envelope-from <kraxel@redhat.com>) id 1eslnm-0003qo-HI
 	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:48:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eslnj-0003aR-AR
+	(envelope-from <kraxel@redhat.com>) id 1eslnj-0003aM-A5
 	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:48:58 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36726 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39014 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eslnj-0003Yz-3P
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eslnj-0003Yw-3F
 	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:48:55 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 17728404084A
+	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 08:48:51 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon,  5 Mar 2018 09:48:34 +0100
-Message-Id: <20180305084844.18222-4-kraxel@redhat.com>
+Date: Mon,  5 Mar 2018 09:48:44 +0100
+Message-Id: <20180305084844.18222-14-kraxel@redhat.com>
 In-Reply-To: <20180305084844.18222-1-kraxel@redhat.com>
 References: <20180305084844.18222-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 03/13] cocoa: switch over to new display registry
+Subject: [Qemu-devel] [PULL 13/13] ui/sdl: build as module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,81 +30,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20180301100547.18962-4-kraxel@redhat.com
+Message-id: 20180301100547.18962-14-kraxel@redhat.com
 ---
- include/ui/console.h | 12 ------------
- vl.c                 |  3 ---
- ui/cocoa.m           | 14 +++++++++++++-
- 3 files changed, 13 insertions(+), 16 deletions(-)
+ configure        | 2 +-
+ ui/Makefile.objs | 3 ++-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/include/ui/console.h b/include/ui/console.h
-index cb86e6a0dd..f8c462106a 100644
---- a/include/ui/console.h
-+++ b/include/ui/console.h
-@@ -444,18 +444,6 @@ void qemu_display_register(QemuDisplay *ui);
- void qemu_display_early_init(DisplayOptions *opts);
- void qemu_display_init(DisplayState *ds, DisplayOptions *opts);
+diff --git a/configure b/configure
+index 269add1187..cb4fdb3573 100755
+--- a/configure
++++ b/configure
+@@ -6039,7 +6039,7 @@ if test "$have_x11" = "yes" -a "$need_x11" = "yes"; then
+   echo "X11_LIBS=$x11_libs" >> $config_host_mak
+ fi
+ if test "$sdl" = "yes" ; then
+-  echo "CONFIG_SDL=y" >> $config_host_mak
++  echo "CONFIG_SDL=m" >> $config_host_mak
+   echo "CONFIG_SDLABI=$sdlabi" >> $config_host_mak
+   echo "SDL_CFLAGS=$sdl_cflags" >> $config_host_mak
+   echo "SDL_LIBS=$sdl_libs" >> $config_host_mak
+diff --git a/ui/Makefile.objs b/ui/Makefile.objs
+index a37232762b..dcd54a5287 100644
+--- a/ui/Makefile.objs
++++ b/ui/Makefile.objs
+@@ -11,7 +11,6 @@ common-obj-y += keymaps.o console.o cursor.o qemu-pixman.o
+ common-obj-y += input.o input-keymap.o input-legacy.o
+ common-obj-$(CONFIG_LINUX) += input-linux.o
+ common-obj-$(CONFIG_SPICE) += spice-core.o spice-input.o spice-display.o
+-common-obj-$(CONFIG_SDL) += sdl.mo
+ common-obj-$(CONFIG_COCOA) += cocoa.o
+ common-obj-$(CONFIG_VNC) += $(vnc-obj-y)
+ common-obj-$(call lnot,$(CONFIG_VNC)) += vnc-stubs.o
+@@ -20,6 +19,8 @@ common-obj-$(CONFIG_X11) += x_keymap.o
+ x_keymap.o-cflags := $(X11_CFLAGS)
+ x_keymap.o-libs := $(X11_LIBS)
  
--/* cocoa.m */
--#ifdef CONFIG_COCOA
--void cocoa_display_init(DisplayState *ds, DisplayOptions *opts);
--#else
--static inline void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
--{
--    /* This must never be called if CONFIG_COCOA is disabled */
--    error_report("Cocoa support is disabled");
--    abort();
--}
--#endif
--
- /* vnc.c */
- void vnc_display_init(const char *id);
- void vnc_display_open(const char *id, Error **errp);
-diff --git a/vl.c b/vl.c
-index 5b2410d564..377140ebd9 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4667,9 +4667,6 @@ int main(int argc, char **argv, char **envp)
-     case DISPLAY_TYPE_CURSES:
-         curses_display_init(ds, &dpy);
-         break;
--    case DISPLAY_TYPE_COCOA:
--        cocoa_display_init(ds, &dpy);
--        break;
-     default:
-         qemu_display_init(ds, &dpy);
-         break;
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 90d9aa57ea..8b0dce90cb 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -1683,7 +1683,7 @@ static void addRemovableDevicesMenuItems(void)
-     qapi_free_BlockInfoList(pointerToFree);
- }
- 
--void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
-+static void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
- {
-     COCOA_DEBUG("qemu_cocoa: cocoa_display_init\n");
- 
-@@ -1713,3 +1713,15 @@ void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
-      */
-     addRemovableDevicesMenuItems();
- }
-+
-+static QemuDisplay qemu_display_cocoa = {
-+    .type       = DISPLAY_TYPE_COCOA,
-+    .init       = cocoa_display_init,
-+};
-+
-+static void register_cocoa(void)
-+{
-+    qemu_display_register(&qemu_display_cocoa);
-+}
-+
-+type_init(register_cocoa);
++# ui-sdl module
++common-obj-$(CONFIG_SDL) += sdl.mo
+ ifeq ($(CONFIG_SDLABI),1.2)
+ sdl.mo-objs := sdl.o sdl_zoom.o
+ endif
 -- 
 2.9.3
