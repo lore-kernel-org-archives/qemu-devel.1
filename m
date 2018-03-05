@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1esjqf-0002oa-Ve
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:43:56 -0500
+	(envelope-from <peterx@redhat.com>) id 1esjqo-00034c-So
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:44:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1esjqe-00062c-Pn
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:43:50 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33754 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1esjqi-00068C-MJ
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:43:58 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53396 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1esjqe-00061J-K7
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:43:48 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1esjqi-00067b-Gw
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:43:52 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 19CC6814DF4C
-	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 06:43:48 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 17D8B40FB64A
+	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 06:43:52 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Mon,  5 Mar 2018 14:43:22 +0800
-Message-Id: <20180305064324.9238-5-peterx@redhat.com>
+Date: Mon,  5 Mar 2018 14:43:23 +0800
+Message-Id: <20180305064324.9238-6-peterx@redhat.com>
 In-Reply-To: <20180305064324.9238-1-peterx@redhat.com>
 References: <20180305064324.9238-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 4/6] qio: non-default context for threaded
- qtask
+Subject: [Qemu-devel] [PATCH v3 5/6] qio: non-default context for async conn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,183 +32,197 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, peterx@redhat.com, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-qio_task_run_in_thread() allows main thread to run blocking operations
-in the background. However it has an assumption on that it's always
-working with the default context. This patch tries to allow the threaded
-QIO task framework to run with non-default gcontext.
+We have worked on qio_task_run_in_thread() already.  Further, let
+all the qio channel APIs use that context.
 
-Currently no functional change so far, so the QIOTasks are still always
-running on main context.
-
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- include/io/task.h    |  7 +++++--
- io/channel-socket.c  |  9 ++++++---
- io/dns-resolver.c    |  3 ++-
- io/task.c            | 20 ++++++++++++++++++--
- tests/test-io-task.c |  2 ++
- 5 files changed, 33 insertions(+), 8 deletions(-)
+ chardev/char-socket.c          |  4 ++--
+ include/io/channel-socket.h    | 15 ++++++++++++---
+ io/channel-socket.c            | 15 +++++++++------
+ migration/socket.c             |  3 ++-
+ tests/test-io-channel-socket.c |  4 ++--
+ 5 files changed, 27 insertions(+), 14 deletions(-)
 
-diff --git a/include/io/task.h b/include/io/task.h
-index 6021f51336..9e09b95b2e 100644
---- a/include/io/task.h
-+++ b/include/io/task.h
-@@ -227,15 +227,18 @@ QIOTask *qio_task_new(Object *source,
-  * @worker: the function to invoke in a thread
-  * @opaque: opaque data to pass to @worker
-  * @destroy: function to free @opaque
-+ * @context: the context to run the complete hook. If %NULL, the
-+ *           default context will be used.
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index bdd6cff5f6..754d82679a 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -866,7 +866,7 @@ static gboolean socket_reconnect_timeout(gpointer opaque)
+     tcp_chr_set_client_ioc_name(chr, sioc);
+     qio_channel_socket_connect_async(sioc, s->addr,
+                                      qemu_chr_socket_connected,
+-                                     chr, NULL);
++                                     chr, NULL, NULL);
+ 
+     return false;
+ }
+@@ -950,7 +950,7 @@ static void qmp_chardev_open_socket(Chardev *chr,
+         tcp_chr_set_client_ioc_name(chr, sioc);
+         qio_channel_socket_connect_async(sioc, s->addr,
+                                          qemu_chr_socket_connected,
+-                                         chr, NULL);
++                                         chr, NULL, NULL);
+     } else {
+         if (s->is_listen) {
+             char *name;
+diff --git a/include/io/channel-socket.h b/include/io/channel-socket.h
+index 53801f6042..d7134d2cd6 100644
+--- a/include/io/channel-socket.h
++++ b/include/io/channel-socket.h
+@@ -101,6 +101,8 @@ int qio_channel_socket_connect_sync(QIOChannelSocket *ioc,
+  * @callback: the function to invoke on completion
+  * @opaque: user data to pass to @callback
+  * @destroy: the function to free @opaque
++ * @context: the context to run the async task. If %NULL, the default
++ *           context will be used.
   *
-  * Run a task in a background thread. When @worker
-  * returns it will call qio_task_complete() in
-- * the main event thread context.
-+ * the event thread context that provided.
-  */
- void qio_task_run_in_thread(QIOTask *task,
-                             QIOTaskWorker worker,
-                             gpointer opaque,
--                            GDestroyNotify destroy);
-+                            GDestroyNotify destroy,
-+                            GMainContext *context);
+  * Attempt to connect to the address @addr. This method
+  * will run in the background so the caller will regain
+@@ -113,7 +115,8 @@ void qio_channel_socket_connect_async(QIOChannelSocket *ioc,
+                                       SocketAddress *addr,
+                                       QIOTaskFunc callback,
+                                       gpointer opaque,
+-                                      GDestroyNotify destroy);
++                                      GDestroyNotify destroy,
++                                      GMainContext *context);
+ 
  
  /**
-  * qio_task_complete:
+@@ -138,6 +141,8 @@ int qio_channel_socket_listen_sync(QIOChannelSocket *ioc,
+  * @callback: the function to invoke on completion
+  * @opaque: user data to pass to @callback
+  * @destroy: the function to free @opaque
++ * @context: the context to run the async task. If %NULL, the default
++ *           context will be used.
+  *
+  * Attempt to listen to the address @addr. This method
+  * will run in the background so the caller will regain
+@@ -150,7 +155,8 @@ void qio_channel_socket_listen_async(QIOChannelSocket *ioc,
+                                      SocketAddress *addr,
+                                      QIOTaskFunc callback,
+                                      gpointer opaque,
+-                                     GDestroyNotify destroy);
++                                     GDestroyNotify destroy,
++                                     GMainContext *context);
+ 
+ 
+ /**
+@@ -179,6 +185,8 @@ int qio_channel_socket_dgram_sync(QIOChannelSocket *ioc,
+  * @callback: the function to invoke on completion
+  * @opaque: user data to pass to @callback
+  * @destroy: the function to free @opaque
++ * @context: the context to run the async task. If %NULL, the default
++ *           context will be used.
+  *
+  * Attempt to initialize a datagram socket bound to
+  * @localAddr and communicating with peer @remoteAddr.
+@@ -194,7 +202,8 @@ void qio_channel_socket_dgram_async(QIOChannelSocket *ioc,
+                                     SocketAddress *remoteAddr,
+                                     QIOTaskFunc callback,
+                                     gpointer opaque,
+-                                    GDestroyNotify destroy);
++                                    GDestroyNotify destroy,
++                                    GMainContext *context);
+ 
+ 
+ /**
 diff --git a/io/channel-socket.c b/io/channel-socket.c
-index 563e297357..4224ce323a 100644
+index 4224ce323a..18c139c365 100644
 --- a/io/channel-socket.c
 +++ b/io/channel-socket.c
-@@ -187,7 +187,8 @@ void qio_channel_socket_connect_async(QIOChannelSocket *ioc,
-     qio_task_run_in_thread(task,
+@@ -173,7 +173,8 @@ void qio_channel_socket_connect_async(QIOChannelSocket *ioc,
+                                       SocketAddress *addr,
+                                       QIOTaskFunc callback,
+                                       gpointer opaque,
+-                                      GDestroyNotify destroy)
++                                      GDestroyNotify destroy,
++                                      GMainContext *context)
+ {
+     QIOTask *task = qio_task_new(
+         OBJECT(ioc), callback, opaque, destroy);
+@@ -188,7 +189,7 @@ void qio_channel_socket_connect_async(QIOChannelSocket *ioc,
                             qio_channel_socket_connect_worker,
                             addrCopy,
--                           (GDestroyNotify)qapi_free_SocketAddress);
-+                           (GDestroyNotify)qapi_free_SocketAddress,
-+                           NULL);
+                            (GDestroyNotify)qapi_free_SocketAddress,
+-                           NULL);
++                           context);
  }
  
  
-@@ -245,7 +246,8 @@ void qio_channel_socket_listen_async(QIOChannelSocket *ioc,
-     qio_task_run_in_thread(task,
+@@ -233,7 +234,8 @@ void qio_channel_socket_listen_async(QIOChannelSocket *ioc,
+                                      SocketAddress *addr,
+                                      QIOTaskFunc callback,
+                                      gpointer opaque,
+-                                     GDestroyNotify destroy)
++                                     GDestroyNotify destroy,
++                                     GMainContext *context)
+ {
+     QIOTask *task = qio_task_new(
+         OBJECT(ioc), callback, opaque, destroy);
+@@ -247,7 +249,7 @@ void qio_channel_socket_listen_async(QIOChannelSocket *ioc,
                             qio_channel_socket_listen_worker,
                             addrCopy,
--                           (GDestroyNotify)qapi_free_SocketAddress);
-+                           (GDestroyNotify)qapi_free_SocketAddress,
-+                           NULL);
+                            (GDestroyNotify)qapi_free_SocketAddress,
+-                           NULL);
++                           context);
  }
  
  
-@@ -321,7 +323,8 @@ void qio_channel_socket_dgram_async(QIOChannelSocket *ioc,
-     qio_task_run_in_thread(task,
+@@ -309,7 +311,8 @@ void qio_channel_socket_dgram_async(QIOChannelSocket *ioc,
+                                     SocketAddress *remoteAddr,
+                                     QIOTaskFunc callback,
+                                     gpointer opaque,
+-                                    GDestroyNotify destroy)
++                                    GDestroyNotify destroy,
++                                    GMainContext *context)
+ {
+     QIOTask *task = qio_task_new(
+         OBJECT(ioc), callback, opaque, destroy);
+@@ -324,7 +327,7 @@ void qio_channel_socket_dgram_async(QIOChannelSocket *ioc,
                             qio_channel_socket_dgram_worker,
                             data,
--                           qio_channel_socket_dgram_worker_free);
-+                           qio_channel_socket_dgram_worker_free,
-+                           NULL);
+                            qio_channel_socket_dgram_worker_free,
+-                           NULL);
++                           context);
  }
  
  
-diff --git a/io/dns-resolver.c b/io/dns-resolver.c
-index c072d121c3..75c2ca9c4a 100644
---- a/io/dns-resolver.c
-+++ b/io/dns-resolver.c
-@@ -233,7 +233,8 @@ void qio_dns_resolver_lookup_async(QIODNSResolver *resolver,
-     qio_task_run_in_thread(task,
-                            qio_dns_resolver_lookup_worker,
-                            data,
--                           qio_dns_resolver_lookup_data_free);
-+                           qio_dns_resolver_lookup_data_free,
-+                           NULL);
+diff --git a/migration/socket.c b/migration/socket.c
+index e090097077..8a93fb1af5 100644
+--- a/migration/socket.c
++++ b/migration/socket.c
+@@ -103,7 +103,8 @@ static void socket_start_outgoing_migration(MigrationState *s,
+                                      saddr,
+                                      socket_outgoing_migration,
+                                      data,
+-                                     socket_connect_data_free);
++                                     socket_connect_data_free,
++                                     NULL);
+     qapi_free_SocketAddress(saddr);
  }
  
- 
-diff --git a/io/task.c b/io/task.c
-index 1a0a1c7185..2886a2c1bc 100644
---- a/io/task.c
-+++ b/io/task.c
-@@ -77,6 +77,7 @@ struct QIOTaskThreadData {
-     QIOTaskWorker worker;
-     gpointer opaque;
-     GDestroyNotify destroy;
-+    GMainContext *context;
- };
- 
- 
-@@ -91,6 +92,10 @@ static gboolean qio_task_thread_result(gpointer opaque)
-         data->destroy(data->opaque);
-     }
- 
-+    if (data->context) {
-+        g_main_context_unref(data->context);
-+    }
-+
-     g_free(data);
- 
-     return FALSE;
-@@ -100,6 +105,7 @@ static gboolean qio_task_thread_result(gpointer opaque)
- static gpointer qio_task_thread_worker(gpointer opaque)
- {
-     struct QIOTaskThreadData *data = opaque;
-+    GSource *idle;
- 
-     trace_qio_task_thread_run(data->task);
-     data->worker(data->task, data->opaque);
-@@ -110,7 +116,11 @@ static gpointer qio_task_thread_worker(gpointer opaque)
-      * the worker results
-      */
-     trace_qio_task_thread_exit(data->task);
--    g_idle_add(qio_task_thread_result, data);
-+
-+    idle = g_idle_source_new();
-+    g_source_set_callback(idle, qio_task_thread_result, data, NULL);
-+    g_source_attach(idle, data->context);
-+
-     return NULL;
- }
- 
-@@ -118,15 +128,21 @@ static gpointer qio_task_thread_worker(gpointer opaque)
- void qio_task_run_in_thread(QIOTask *task,
-                             QIOTaskWorker worker,
-                             gpointer opaque,
--                            GDestroyNotify destroy)
-+                            GDestroyNotify destroy,
-+                            GMainContext *context)
- {
-     struct QIOTaskThreadData *data = g_new0(struct QIOTaskThreadData, 1);
-     QemuThread thread;
- 
-+    if (context) {
-+        g_main_context_ref(context);
-+    }
-+
-     data->task = task;
-     data->worker = worker;
-     data->opaque = opaque;
-     data->destroy = destroy;
-+    data->context = context;
- 
-     trace_qio_task_thread_start(task, worker, opaque);
-     qemu_thread_create(&thread,
-diff --git a/tests/test-io-task.c b/tests/test-io-task.c
-index 141aa2c55d..bac1bb4e7a 100644
---- a/tests/test-io-task.c
-+++ b/tests/test-io-task.c
-@@ -187,6 +187,7 @@ static void test_task_thread_complete(void)
-     qio_task_run_in_thread(task,
-                            test_task_thread_worker,
-                            &data,
-+                           NULL,
-                            NULL);
+diff --git a/tests/test-io-channel-socket.c b/tests/test-io-channel-socket.c
+index d357cd2a8e..b273fd3ba2 100644
+--- a/tests/test-io-channel-socket.c
++++ b/tests/test-io-channel-socket.c
+@@ -179,7 +179,7 @@ static void test_io_channel_setup_async(SocketAddress *listen_addr,
+     lioc = qio_channel_socket_new();
+     qio_channel_socket_listen_async(
+         lioc, listen_addr,
+-        test_io_channel_complete, &data, NULL);
++        test_io_channel_complete, &data, NULL, NULL);
  
      g_main_loop_run(data.loop);
-@@ -228,6 +229,7 @@ static void test_task_thread_failure(void)
-     qio_task_run_in_thread(task,
-                            test_task_thread_worker,
-                            &data,
-+                           NULL,
-                            NULL);
+     g_main_context_iteration(g_main_context_default(), FALSE);
+@@ -200,7 +200,7 @@ static void test_io_channel_setup_async(SocketAddress *listen_addr,
+ 
+     qio_channel_socket_connect_async(
+         QIO_CHANNEL_SOCKET(*src), connect_addr,
+-        test_io_channel_complete, &data, NULL);
++        test_io_channel_complete, &data, NULL, NULL);
  
      g_main_loop_run(data.loop);
+     g_main_context_iteration(g_main_context_default(), FALSE);
 -- 
 2.14.3
