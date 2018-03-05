@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1esouY-0005ND-Uv
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 07:08:15 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1esp2Q-0000hX-3v
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 07:16:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1esouU-0007HG-TC
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 07:08:10 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40534 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1esouU-0007H8-NS
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 07:08:06 -0500
-Date: Mon, 5 Mar 2018 12:07:46 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180305120745.GG3131@work-vm>
-References: <1520200587-14681-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1520200587-14681-2-git-send-email-stefanb@linux.vnet.ibm.com>
-	<20180305094937.GB3131@work-vm>
-	<85dd51e6-9fa9-a369-922b-13bcb6e8d1f6@linux.vnet.ibm.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1esp2L-0000kl-Uy
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 07:16:18 -0500
+Received: from mail-ot0-x22c.google.com ([2607:f8b0:4003:c0f::22c]:46731)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1esp2L-0000jy-Ov
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 07:16:13 -0500
+Received: by mail-ot0-x22c.google.com with SMTP id g97so14662796otg.13
+	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 04:16:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <85dd51e6-9fa9-a369-922b-13bcb6e8d1f6@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] tpm: convert tpm_crb.c to use
- trace-events
+In-Reply-To: <20180302195143.31678-1-eblake@redhat.com>
+References: <20180302195143.31678-1-eblake@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 5 Mar 2018 12:15:52 +0000
+Message-ID: <CAFEAcA-WgS9nLC3iEQXi3p5Lhb1EDK-UEpty0ahgiG9ooPtLQQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v4 00/30] QAPI patches for 2018-03-01
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,96 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-* Stefan Berger (stefanb@linux.vnet.ibm.com) wrote:
-> On 03/05/2018 04:49 AM, Dr. David Alan Gilbert wrote:
-> > * Stefan Berger (stefanb@linux.vnet.ibm.com) wrote:
-> > > Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> > > ---
-> > >   Makefile.objs       |  1 +
-> > >   hw/tpm/tpm_crb.c    | 17 +++++------------
-> > >   hw/tpm/trace-events |  5 +++++
-> > >   3 files changed, 11 insertions(+), 12 deletions(-)
-> > >   create mode 100644 hw/tpm/trace-events
-> > > 
-> > > diff --git a/Makefile.objs b/Makefile.objs
-> > > index 5dc1348..72c3d8c 100644
-> > > --- a/Makefile.objs
-> > > +++ b/Makefile.objs
-> > > @@ -162,6 +162,7 @@ trace-events-subdirs += hw/alpha
-> > >   trace-events-subdirs += hw/hppa
-> > >   trace-events-subdirs += hw/xen
-> > >   trace-events-subdirs += hw/ide
-> > > +trace-events-subdirs += hw/tpm
-> > >   trace-events-subdirs += ui
-> > >   trace-events-subdirs += audio
-> > >   trace-events-subdirs += net
-> > > diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
-> > > index b5b8256..d8917cb 100644
-> > > --- a/hw/tpm/tpm_crb.c
-> > > +++ b/hw/tpm/tpm_crb.c
-> > > @@ -29,6 +29,7 @@
-> > >   #include "sysemu/reset.h"
-> > >   #include "tpm_int.h"
-> > >   #include "tpm_util.h"
-> > > +#include "trace.h"
-> > >   typedef struct CRBState {
-> > >       DeviceState parent_obj;
-> > > @@ -44,14 +45,6 @@ typedef struct CRBState {
-> > >   #define CRB(obj) OBJECT_CHECK(CRBState, (obj), TYPE_TPM_CRB)
-> > > -#define DEBUG_CRB 0
-> > > -
-> > > -#define DPRINTF(fmt, ...) do {                  \
-> > > -        if (DEBUG_CRB) {                        \
-> > > -            printf(fmt, ## __VA_ARGS__);        \
-> > > -        }                                       \
-> > > -    } while (0)
-> > > -
-> > >   #define CRB_INTF_TYPE_CRB_ACTIVE 0b1
-> > >   #define CRB_INTF_VERSION_CRB 0b1
-> > >   #define CRB_INTF_CAP_LOCALITY_0_ONLY 0b0
-> > > @@ -91,8 +84,8 @@ static uint64_t tpm_crb_mmio_read(void *opaque, hwaddr addr,
-> > >       unsigned offset = addr & 3;
-> > >       uint32_t val = *(uint32_t *)regs >> (8 * offset);
-> > > -    DPRINTF("CRB read 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32 "\n",
-> > > -            addr, size, val);
-> > > +    trace_tpm_crb_mmio_read(addr, size, val);
-> > > +
-> > >       return val;
-> > >   }
-> > > @@ -100,8 +93,8 @@ static void tpm_crb_mmio_write(void *opaque, hwaddr addr,
-> > >                                  uint64_t val, unsigned size)
-> > >   {
-> > >       CRBState *s = CRB(opaque);
-> > > -    DPRINTF("CRB write 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx64 "\n",
-> > > -            addr, size, val);
-> > > +
-> > > +    trace_tpm_crb_mmio_write(addr, size, val);
-> > >       switch (addr) {
-> > >       case A_CRB_CTRL_REQ:
-> > > diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-> > > new file mode 100644
-> > > index 0000000..336b06d
-> > > --- /dev/null
-> > > +++ b/hw/tpm/trace-events
-> > > @@ -0,0 +1,5 @@
-> > > +# See docs/devel/tracing.txt for syntax documentation.
-> > > +
-> > > +# hw/tpm/tpm_crb.c
-> > > +tpm_crb_mmio_read(uint64_t addr, unsigned size, uint32_t val) "CRB read 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
-> > > +tpm_crb_mmio_write(uint64_t addr, unsigned size, uint32_t val) "CRB write 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
-> > Have you checked that builds OK on 32bit?   I think you'll need to use
-> > PRIx64 there since the trace makes you use the uint64_t parameter.
-> 
-> It builds fines as it is.
+On 2 March 2018 at 19:51, Eric Blake <eblake@redhat.com> wrote:
+> The following changes since commit 136c67e07869227b21b3f627316e03679ce7b738:
+>
+>   Merge remote-tracking branch 'remotes/bkoppelmann/tags/pull-tricore-2018-03-02' into staging (2018-03-02 16:56:20 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/ericb.git tags/pull-qapi-2018-03-01-v4
+>
+> for you to fetch changes up to 418b1d0ae3a2cc992659f626a2a3f11944e0b259:
+>
+>   qapi: Don't create useless directory qapi-generated (2018-03-02 13:48:26 -0600)
+>
+> v4: another attempt at silencing OSX warnings on empty .o [Peter]
+> (sending just the changed patches)
+>
+> ----------------------------------------------------------------
+> qapi patches for 2018-03-01
+>
+> - Markus Armbruster: Modularize generated QAPI code
+>
+> ----------------------------------------------------------------
 
-OK, fair enough.
+This version works -- applied, thanks.
 
-Dave
-
->   Stefan
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- PMM
