@@ -1,15 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1esy1A-0002HZ-7w
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:51:37 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1esy4K-0004G2-VG
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:54:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1esy16-00073O-8U
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:51:36 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1esy4G-0007xC-W4
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:54:53 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:40960
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1esy4G-0007vs-Ps
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 16:54:48 -0500
+References: <1520010495-58172-1-git-send-email-anton.nefedov@virtuozzo.com>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Mon,  5 Mar 2018 21:51:13 +0000
-Message-Id: <20180305215113.25085-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH] adb: add trace-events for monitoring
- keyboard/mouse during bus enumeration
+Message-ID: <be2cf515-ddf8-74ef-7854-319329ee9209@ilande.co.uk>
+Date: Mon, 5 Mar 2018 21:54:37 +0000
+MIME-Version: 1.0
+In-Reply-To: <1520010495-58172-1-git-send-email-anton.nefedov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] ide: fix invalid TRIM range abortion for
+ macio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,89 +30,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: jsnow@redhat.com
 
-This is useful to help diagnose problems related to address clashes during
-MacOS 9 boot.
+On 02/03/18 17:08, Anton Nefedov wrote:
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/input/adb-kbd.c    | 4 ++++
- hw/input/adb-mouse.c  | 5 +++++
- hw/input/trace-events | 5 +++++
- 3 files changed, 14 insertions(+)
+> commit 947858b0 "ide: abort TRIM operation for invalid range"
+> is incorrect for macio; just ide_dma_error() without doing a callback
+> is not enough for that errorpath.
+> 
+> Instead, pass -EINVAL to the callback and handle it there
+> (see related motivation for read/write in 58ac32113).
+> 
+> It will however catch possible EINVAL from the block layer too.
+> 
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> ---
+>   hw/ide/core.c | 17 +++++++++--------
+>   1 file changed, 9 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/ide/core.c b/hw/ide/core.c
+> index 257b429..54510d4 100644
+> --- a/hw/ide/core.c
+> +++ b/hw/ide/core.c
+> @@ -402,7 +402,6 @@ typedef struct TrimAIOCB {
+>       QEMUIOVector *qiov;
+>       BlockAIOCB *aiocb;
+>       int i, j;
+> -    bool is_invalid;
+>   } TrimAIOCB;
+>   
+>   static void trim_aio_cancel(BlockAIOCB *acb)
+> @@ -430,11 +429,8 @@ static void ide_trim_bh_cb(void *opaque)
+>   {
+>       TrimAIOCB *iocb = opaque;
+>   
+> -    if (iocb->is_invalid) {
+> -        ide_dma_error(iocb->s);
+> -    } else {
+> -        iocb->common.cb(iocb->common.opaque, iocb->ret);
+> -    }
+> +    iocb->common.cb(iocb->common.opaque, iocb->ret);
+> +
+>       qemu_bh_delete(iocb->bh);
+>       iocb->bh = NULL;
+>       qemu_aio_unref(iocb);
+> @@ -462,7 +458,7 @@ static void ide_issue_trim_cb(void *opaque, int ret)
+>                   }
+>   
+>                   if (!ide_sect_range_ok(s, sector, count)) {
+> -                    iocb->is_invalid = true;
+> +                    iocb->ret = -EINVAL;
+>                       goto done;
+>                   }
+>   
+> @@ -502,7 +498,6 @@ BlockAIOCB *ide_issue_trim(
+>       iocb->qiov = qiov;
+>       iocb->i = -1;
+>       iocb->j = 0;
+> -    iocb->is_invalid = false;
+>       ide_issue_trim_cb(iocb, 0);
+>       return &iocb->common;
+>   }
+> @@ -848,6 +843,12 @@ static void ide_dma_cb(void *opaque, int ret)
+>       if (ret == -ECANCELED) {
+>           return;
+>       }
+> +
+> +    if (ret == -EINVAL) {
+> +        ide_dma_error(s);
+> +        return;
+> +    }
+> +
+>       if (ret < 0) {
+>           if (ide_handle_rw_error(s, -ret, ide_dma_cmd_to_retry(s->dma_cmd))) {
+>               s->bus->dma->aiocb = NULL;
+> 
 
-diff --git a/hw/input/adb-kbd.c b/hw/input/adb-kbd.c
-index 266aed1b7b..50b62712c8 100644
---- a/hw/input/adb-kbd.c
-+++ b/hw/input/adb-kbd.c
-@@ -258,6 +258,7 @@ static int adb_kbd_request(ADBDevice *d, uint8_t *obuf,
-             case ADB_CMD_CHANGE_ID_AND_ACT:
-             case ADB_CMD_CHANGE_ID_AND_ENABLE:
-                 d->devaddr = buf[1] & 0xf;
-+                trace_adb_kbd_request_change_addr(d->devaddr);
-                 break;
-             default:
-                 d->devaddr = buf[1] & 0xf;
-@@ -269,6 +270,9 @@ static int adb_kbd_request(ADBDevice *d, uint8_t *obuf,
-                 if (buf[2] == 1 || buf[2] == 2 || buf[2] == 3) {
-                     d->handler = buf[2];
-                 }
-+
-+                trace_adb_kbd_request_change_addr_and_handler(d->devaddr,
-+                                                              d->handler);
-                 break;
-             }
-         }
-diff --git a/hw/input/adb-mouse.c b/hw/input/adb-mouse.c
-index 47e88faf25..3ba6027d33 100644
---- a/hw/input/adb-mouse.c
-+++ b/hw/input/adb-mouse.c
-@@ -118,6 +118,7 @@ static int adb_mouse_request(ADBDevice *d, uint8_t *obuf,
-         s->dx = 0;
-         s->dy = 0;
-         s->dz = 0;
-+        trace_adb_mouse_flush();
-         return 0;
-     }
- 
-@@ -138,6 +139,7 @@ static int adb_mouse_request(ADBDevice *d, uint8_t *obuf,
-             case ADB_CMD_CHANGE_ID_AND_ACT:
-             case ADB_CMD_CHANGE_ID_AND_ENABLE:
-                 d->devaddr = buf[1] & 0xf;
-+                trace_adb_mouse_request_change_addr(d->devaddr);
-                 break;
-             default:
-                 d->devaddr = buf[1] & 0xf;
-@@ -155,6 +157,9 @@ static int adb_mouse_request(ADBDevice *d, uint8_t *obuf,
-                 if (buf[2] == 1 || buf[2] == 2) {
-                     d->handler = buf[2];
-                 }
-+
-+                trace_adb_mouse_request_change_addr_and_handler(d->devaddr,
-+                                                                d->handler);
-                 break;
-             }
-         }
-diff --git a/hw/input/trace-events b/hw/input/trace-events
-index 5affabc81d..db72484a25 100644
---- a/hw/input/trace-events
-+++ b/hw/input/trace-events
-@@ -4,10 +4,15 @@
- adb_kbd_no_key(void) "Ignoring NO_KEY"
- adb_kbd_writereg(int reg, uint8_t val) "reg %d val 0x%2.2x"
- adb_kbd_readreg(int reg, uint8_t val0, uint8_t val1) "reg %d obuf[0] 0x%2.2x obuf[1] 0x%2.2x"
-+adb_kbd_request_change_addr(int devaddr) "change addr to 0x%x"
-+adb_kbd_request_change_addr_and_handler(int devaddr, int handler) "change addr and handler to 0x%x, 0x%x"
- 
- # hw/input/adb-mouse.c
-+adb_mouse_flush(void) "flush"
- adb_mouse_writereg(int reg, uint8_t val) "reg %d val 0x%2.2x"
- adb_mouse_readreg(int reg, uint8_t val0, uint8_t val1) "reg %d obuf[0] 0x%2.2x obuf[1] 0x%2.2x"
-+adb_mouse_request_change_addr(int devaddr) "change addr to 0x%x"
-+adb_mouse_request_change_addr_and_handler(int devaddr, int handler) "change addr and handler to 0x%x, 0x%x"
- 
- # hw/input/ps2.c
- ps2_put_keycode(void *opaque, int keycode) "%p keycode 0x%02x"
--- 
-2.11.0
+Hi Anton,
+
+Thanks for this. I applied this patch to git master with my macio patch 
+at https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06076.html 
+and it allowed to continue all the way through the Debian installer for 
+the PPC g3beige machine so I believe it is working.
+
+Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+
+ATB,
+
+Mark.
