@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eskwC-0005lc-Pb
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 02:53:37 -0500
+	(envelope-from <peterx@redhat.com>) id 1esl2a-0007gN-1F
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:00:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eskw9-0005KR-El
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 02:53:36 -0500
-Received: from mga17.intel.com ([192.55.52.151]:16839)
+	(envelope-from <peterx@redhat.com>) id 1esl2V-0000gd-NE
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:00:12 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37898 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1eskw9-0005K3-68
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 02:53:33 -0500
-Date: Mon, 5 Mar 2018 15:53:28 +0800
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-ID: <20180305075328.6i77el735gnqf3gt@hz-desktop>
-References: <20171207101812.23602-1-haozhong.zhang@intel.com>
-	<20171207101812.23602-4-haozhong.zhang@intel.com>
-	<20180227164147.GB1799@perard.uk.xensource.com>
-	<20180228075654.gv22h2zd73peuyxm@hz-desktop>
-	<20180302115009.GF1799@perard.uk.xensource.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1esl2V-0000gU-Ho
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 03:00:07 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AB3744085010
+	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 08:00:02 +0000 (UTC)
+Date: Mon, 5 Mar 2018 15:59:54 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180305075954.GB7584@xz-mi>
+References: <20180305065040.10353-1-peterx@redhat.com>
+	<152023581793.1371.12770150376954730773@bdbb90650ae5>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180302115009.GF1799@perard.uk.xensource.com>
-Subject: Re: [Qemu-devel] [RFC QEMU PATCH v4 03/10] hostmem-xen: add a host
- memory backend for Xen
+In-Reply-To: <152023581793.1371.12770150376954730773@bdbb90650ae5>
+Subject: Re: [Qemu-devel] [PATCH 0/9] chardev: qio related non-default
+ context support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,54 +34,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, marcandre.lureau@redhat.com
 
-On 03/02/18 11:50 +0000, Anthony PERARD wrote:
-> On Wed, Feb 28, 2018 at 03:56:54PM +0800, Haozhong Zhang wrote:
-> > On 02/27/18 16:41 +0000, Anthony PERARD wrote:
-> > > On Thu, Dec 07, 2017 at 06:18:05PM +0800, Haozhong Zhang wrote:
-> > > > @@ -108,7 +109,10 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
-> > > >      }
-> > > >  
-> > > >      memory_region_add_subregion(&hpms->mr, addr - hpms->base, mr);
-> > > > -    vmstate_register_ram(vmstate_mr, dev);
-> > > > +    /* memory-backend-xen is not backed by RAM. */
-> > > > +    if (!xen_enabled()) {
-> > > 
-> > > Is it possible to have the same condition as the one used in
-> > > host_memory_backend_memory_complete? i.e. base on whether the memory
-> > > region is mapped or not (backend->mr.ram_block).
-> > 
-> > Like "if (!xen_enabled() || backend->mr.ram_block))"? No, it will mute
-> > the abortion (vmstate_register_ram --> qemu_ram_set_idstr ) caused by
-> > the case that !backend->mr.ram_block in the non-xen environment.
-> 
-> In non-xen environment, vmstate_register_ram() will be called, because
-> !xen_enabled() is true, it would not matter if there is a ram_block or
-> not.
+On Sun, Mar 04, 2018 at 11:43:39PM -0800, no-reply@patchew.org wrote:
 
-Sorry, I really meant 'if (backend->mr.ram_block)', which may mute the
-abortion in non-xen environment. 'if (!xen_enabled())' keeps the
-original semantics in non-xen environment, so it's unlikely to break
-the non-xen usage.
+[...]
 
-Haozhong
+>   TEST    decodetree.py
+>   LINK    tests/check-qdict
+>   LINK    tests/test-char
+>   LINK    tests/check-qnum
+>   LINK    tests/check-qstring
+>   LINK    tests/check-qlist
+>   LINK    tests/check-qnull
+> tests/test-char.o: In function `char_mux_test':
+> /tmp/qemu-test/src/tests/test-char.c:169: undefined reference to `muxes_realized'
 
-> 
-> But if there is a memory-backend that can run in a xen environment that
-> have a ram_block, vmstate_register_ram would not be called in the
-> origial patch, but if we use (!xen_enabled() || vmstate_mr->ram_block)
-> as condition then vmstate_register_ram will be called.
-> 
-> Is this make sense?
-> 
-> > > > +        vmstate_register_ram(vmstate_mr, dev);
-> > > > +    }
-> > > >      numa_set_mem_node_id(addr, memory_region_size(mr), dimm->node);
-> > > >  
-> > > >  out:
-> 
-> -- 
-> Anthony PERARD
-> 
+This is a valid report.
+
+I need to squash this into patch 5 to fix it:
+
+diff --git a/include/chardev/char-mux.h b/include/chardev/char-mux.h
+index 8928977897..1e13187767 100644
+--- a/include/chardev/char-mux.h
++++ b/include/chardev/char-mux.h
+@@ -27,8 +27,6 @@
+ #include "chardev/char.h"
+ #include "chardev/char-fe.h"
+ 
+-extern bool muxes_realized;
+-
+ #define MAX_MUX 4
+ #define MUX_BUFFER_SIZE 32 /* Must be a power of 2.  */
+ #define MUX_BUFFER_MASK (MUX_BUFFER_SIZE - 1)
+diff --git a/tests/test-char.c b/tests/test-char.c
+index b358620911..e49af9e398 100644
+--- a/tests/test-char.c
++++ b/tests/test-char.c
+@@ -166,7 +166,6 @@ static void char_mux_test(void)
+     FeHandler h1 = { 0, }, h2 = { 0, };
+     CharBackend chr_be1, chr_be2;
+ 
+-    muxes_realized = true; /* done after machine init */
+     opts = qemu_opts_create(qemu_find_opts("chardev"), "mux-label",
+                             1, &error_abort);
+     qemu_opt_set(opts, "backend", "ringbuf", &error_abort);
+
+I'll repost until I got some other feedbacks.
+
+-- 
+Peter Xu
