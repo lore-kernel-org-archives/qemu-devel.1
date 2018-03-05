@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1esqLs-0004Dd-VB
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:40:29 -0500
+	(envelope-from <bounces@canonical.com>) id 1esqMa-0004e3-6o
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:41:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1esqLs-0006V8-62
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:40:28 -0500
-Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:38619)
+	(envelope-from <bounces@canonical.com>) id 1esqMW-00070z-63
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:41:12 -0500
+Received: from indium.canonical.com ([91.189.90.7]:50260)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1esqLs-0006Ut-0H
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:40:28 -0500
-Received: by mail-ot0-x22a.google.com with SMTP id 95so14901905ote.5
-	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 05:40:27 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1esqMV-00070l-Vq
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 08:41:08 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1esqMT-00077C-V2
+	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 13:41:06 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0496A2E81A5
+	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 13:41:04 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180305133654.7aokepvzcmxhzk4q@kamzik.brq.redhat.com>
-References: <20180228180215.25470-1-wei@redhat.com>
-	<20180228180215.25470-2-wei@redhat.com>
-	<ca21f795-dae7-d6b5-44f1-ef8ba792ac04@redhat.com>
-	<20180305110122.GD3131@work-vm>
-	<20180305133654.7aokepvzcmxhzk4q@kamzik.brq.redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 5 Mar 2018 13:40:06 +0000
-Message-ID: <CAFEAcA8jse2AdCO8JgA7m99h8pwTRBCQ9aOi=-0QOG+pA9tk2w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V7 1/4] rules: Move cross compilation auto
- detection functions to rules.mak
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 05 Mar 2018 13:35:04 -0000
+From: =?utf-8?q?=C3=89ric_Hoffman?= <1673976@bugs.launchpad.net>
+Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152025690463.7584.7515381414475565173.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1673976] Re: linux-user clone() can't handle
+ glibc posix_spawn() (causes locale-gen to assert)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,21 +37,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 5 March 2018 at 13:36, Andrew Jones <drjones@redhat.com> wrote:
-> IMO, the makefile is the right approach. I wouldn't like to see AArch64
-> added with a script and then converted, along with x86, to a makefile at
-> some later time (probably never).
+Ok, I taught that could be an issue, but as I said, I don't really know
+all the internals of QEMU.
 
-I'm not really enthusiastic about this approach of picking a cross
-compiler in the makefile rather than configure, though. The stuff
-we have at the moment that tries to build the x86 ROMs with whatever
-random host compiler we happen to be using is already a source
-of occasional brokenness. If we're going to try to build target
-code on a wider basis than just the x86 roms I'd like to see it
-done in a cleaner manner...
+Another idea would be to fork the child, without CLONE_VM, on the
+initial call to the clone syscall, like it's done right now, and then
+wait for that child until he call execve or exit syscall.  Maybe using
+some shared memory or IPC to pass the relevant status when the child
+finally invoke those syscalls.
 
-thanks
--- PMM
+When the child finally call one of those, then after signalling the
+parent about where it is (and the params to the syscall), the child
+could exit and the parent actually take action.
+
+Regards,
+Eric
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1673976
+
+Title:
+  linux-user clone() can't handle glibc posix_spawn() (causes locale-gen
+  to assert)
+
+Status in QEMU:
+  New
+
+Bug description:
+  I'm running a command (locale-gen) inside of an armv7h chroot mounted
+  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
+  chroot file system and I get a core dump.
+
+  locale-gen
+  Generating locales...
+  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
+360: __spawnix: Assertion `ec >=3D 0' failed.
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
+ localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
+le
+
+  I've done this same thing successfully for years, but this breakage
+  has appeared some time in the last 3 or so months. Possibly with the
+  update to qemu version 2.8.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
