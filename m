@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1esjxv-0007kf-JH
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:51:20 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1esk3y-0004pS-CK
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:57:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1esjxr-0001eF-MN
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:51:19 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53498 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1esjxr-0001e0-HM
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:51:15 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1302140FB65A
-	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 06:51:15 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Mon,  5 Mar 2018 14:50:40 +0800
-Message-Id: <20180305065040.10353-10-peterx@redhat.com>
-In-Reply-To: <20180305065040.10353-1-peterx@redhat.com>
-References: <20180305065040.10353-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 9/9] chardev: tcp: postpone TLS work until
- machine done
+	(envelope-from <haozhong.zhang@intel.com>) id 1esk3u-0004ac-GM
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:57:34 -0500
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Date: Mon,  5 Mar 2018 14:57:05 +0800
+Message-Id: <20180305065710.25876-1-haozhong.zhang@intel.com>
+Subject: [Qemu-devel] [PATCH v3 0/5] hw/acpi-build: build SRAT memory
+ affinity structures for DIMM devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +19,79 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, peterx@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: mst@redhat.com, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>, dgilbert@redhat.com, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org
 
-TLS handshake may create background GSource tasks, while we won't know
-the correct GMainContext until the whole chardev (including frontend)
-inited.  Let's postpone the initial TLS handshake until machine done.
+ACPI 6.2A Table 5-129 "SPA Range Structure" requires the proximity
+domain of a NVDIMM SPA range must match with corresponding entry in
+SRAT table.
 
-For dynamically created tcp chardev, we don't postpone that by checking
-the init_machine_done variable.
+The address ranges of vNVDIMM in QEMU are allocated from the
+hot-pluggable address space, which is entirely covered by one SRAT
+memory affinity structure. However, users can set the vNVDIMM
+proximity domain in NFIT SPA range structure by the 'node' property of
+'-device nvdimm' to a value different than the one in the above SRAT
+memory affinity structure.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- chardev/char-socket.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+In order to solve such proximity domain mismatch, this patch builds
+one SRAT memory affinity structure for each DIMM device present at
+boot time, including both PC-DIMM and NVDIMM, with the proximity
+domain specified in '-device pc-dimm' or '-device nvdimm'.
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index bd40864f87..997c70dd7d 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -31,6 +31,7 @@
- #include "qemu/option.h"
- #include "qapi/error.h"
- #include "qapi/clone-visitor.h"
-+#include "sysemu/sysemu.h"
- 
- #include "chardev/char-io.h"
- 
-@@ -722,6 +723,11 @@ static void tcp_chr_tls_init(Chardev *chr)
-     Error *err = NULL;
-     gchar *name;
- 
-+    if (!machine_init_done) {
-+        /* This will be postponed to machine_done notifier */
-+        return;
-+    }
-+
-     if (s->is_listen) {
-         tioc = qio_channel_tls_new_server(
-             s->ioc, s->tls_creds,
-@@ -1145,6 +1151,10 @@ static int tcp_chr_machine_done_hook(Chardev *chr)
-         tcp_chr_connect_async(chr);
-     }
- 
-+    if (s->tls_creds) {
-+        tcp_chr_tls_init(chr);
-+    }
-+
-     return 0;
- }
- 
+The remaining hot-pluggable address space is covered by one or multiple
+SRAT memory affinity structures with the proximity domain of the last
+node as before.
+
+
+Changes in v3:
+ * (Patch 1&2) Use qmp_pc_dimm_device_list to get information of DIMM
+   devices and move it to separate patches.
+ * (Patch 3) Replace while loop by a more readable for loop.
+ * (Patch 3) Refactor the flag setting code.
+ * (Patch 3) s/'static-plugged'/'present at boot time' in commit message.
+
+Changes in v2:
+ * Build SRAT memory affinity structures of PC-DIMM devices as well.
+ * Add test cases.
+
+
+Haozhong Zhang (5):
+  pc-dimm: refactor qmp_pc_dimm_device_list
+  qmp: distinguish PC-DIMM and NVDIMM in MemoryDeviceInfoList
+  hw/acpi-build: build SRAT memory affinity structures for DIMM devices
+  tests/bios-tables-test: allow setting extra machine options
+  tests/bios-tables-test: add test cases for DIMM proximity
+
+ hmp.c                                 |  14 +++--
+ hw/i386/acpi-build.c                  |  60 +++++++++++++++++++--
+ hw/mem/pc-dimm.c                      |  99 ++++++++++++++++++++--------------
+ hw/ppc/spapr.c                        |   3 +-
+ include/hw/mem/pc-dimm.h              |   2 +-
+ numa.c                                |  23 ++++----
+ qapi-schema.json                      |  18 ++++++-
+ qmp.c                                 |   7 +--
+ stubs/qmp_pc_dimm.c                   |   4 +-
+ tests/acpi-test-data/pc/APIC.dimmpxm  | Bin 0 -> 136 bytes
+ tests/acpi-test-data/pc/DSDT.dimmpxm  | Bin 0 -> 6710 bytes
+ tests/acpi-test-data/pc/NFIT.dimmpxm  | Bin 0 -> 224 bytes
+ tests/acpi-test-data/pc/SRAT.dimmpxm  | Bin 0 -> 416 bytes
+ tests/acpi-test-data/pc/SSDT.dimmpxm  | Bin 0 -> 685 bytes
+ tests/acpi-test-data/q35/APIC.dimmpxm | Bin 0 -> 136 bytes
+ tests/acpi-test-data/q35/DSDT.dimmpxm | Bin 0 -> 9394 bytes
+ tests/acpi-test-data/q35/NFIT.dimmpxm | Bin 0 -> 224 bytes
+ tests/acpi-test-data/q35/SRAT.dimmpxm | Bin 0 -> 416 bytes
+ tests/acpi-test-data/q35/SSDT.dimmpxm | Bin 0 -> 685 bytes
+ tests/bios-tables-test.c              |  78 +++++++++++++++++++++------
+ 20 files changed, 225 insertions(+), 83 deletions(-)
+ create mode 100644 tests/acpi-test-data/pc/APIC.dimmpxm
+ create mode 100644 tests/acpi-test-data/pc/DSDT.dimmpxm
+ create mode 100644 tests/acpi-test-data/pc/NFIT.dimmpxm
+ create mode 100644 tests/acpi-test-data/pc/SRAT.dimmpxm
+ create mode 100644 tests/acpi-test-data/pc/SSDT.dimmpxm
+ create mode 100644 tests/acpi-test-data/q35/APIC.dimmpxm
+ create mode 100644 tests/acpi-test-data/q35/DSDT.dimmpxm
+ create mode 100644 tests/acpi-test-data/q35/NFIT.dimmpxm
+ create mode 100644 tests/acpi-test-data/q35/SRAT.dimmpxm
+ create mode 100644 tests/acpi-test-data/q35/SSDT.dimmpxm
+
 -- 
-2.14.3
+2.14.1
