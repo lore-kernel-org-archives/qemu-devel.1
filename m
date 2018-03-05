@@ -1,15 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1esssy-0002D0-Jf
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 11:22:51 -0500
+	(envelope-from <kwolf@redhat.com>) id 1esstE-0002Pz-Aq
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 11:23:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1esssx-0003mj-Lz
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 11:22:48 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon,  5 Mar 2018 17:22:29 +0100
-Message-Id: <1520266949-29817-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] hw/arm: Use more CONFIG switches for the
- object files
+	(envelope-from <kwolf@redhat.com>) id 1esstD-0003uR-77
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 11:23:04 -0500
+Date: Mon, 5 Mar 2018 17:22:51 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180305162251.GB4789@localhost.localdomain>
+References: <20180305150529.11203-1-kwolf@redhat.com>
+	<0bf2b0c9-93ae-d816-b1ca-6a042340dcee@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0bf2b0c9-93ae-d816-b1ca-6a042340dcee@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] block: Fix NULL dereference on empty drive
+ error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,103 +24,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-block@nongnu.org, stefanha@redhat.com, qemu-devel@nongnu.org
 
-A lot of ARM object files are linked into the executable unconditionally,
-even though we have corresponding CONFIG switches like CONFIG_PXA2XX or
-CONFIG_OMAP. We should make sure to use these switches in the Makefile so
-that the users can disable certain unwanted boards and devices more easily.
-While we're at it, also add some new switches for the boards that do not
-have a CONFIG option yet.
+Am 05.03.2018 um 17:10 hat Eric Blake geschrieben:
+> On 03/05/2018 09:05 AM, Kevin Wolf wrote:
+> > blk_error_action() sends a BLOCK_IO_ERROR QMP event which includes the
+> > node name of its root node. If the BlockBackend represents an empty
+> > drive, there is no root node, so we should not try to access its node
+> > name. Make the field optional in the event and include it only when
+> > the BlockBackend isn't empty.
+> > 
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> > 
+> > Stefan, this is needed for your patch that reverts the workaround in the
+> > IDE flush code. Without it, make check seems to succeed, but if you look
+> > closer, qemu actually segfaults.
+> > 
+> > qapi/block-core.json  | 6 ++++--
+> >   block/block-backend.c | 5 +++--
+> >   2 files changed, 7 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/qapi/block-core.json b/qapi/block-core.json
+> > index 5c5921bfb7..00475f08d4 100644
+> > --- a/qapi/block-core.json
+> > +++ b/qapi/block-core.json
+> > @@ -3676,7 +3676,8 @@
+> >   #
+> >   # @node-name: node name. Note that errors may be reported for the root node
+> >   #             that is directly attached to a guest device rather than for the
+> > -#             node where the error occurred. (Since: 2.8)
+> > +#             node where the error occurred. The node name is not present if
+> > +#             the drive is empty. (Since: 2.8)
+> 
+> Making an output field change from always present to sometimes absent
+> might break older clients that expected to be able to parse the field
+> unconditionally.  Would it be better to keep the 'node-name' field
+> mandatory in the output but make it an empty string?
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- v2:
- - Fixed the miscategorization of the boards in v1
- - Add separate config switches for the boards that did not have a
-   config switch yet.
+I considered that, but how likely is it that a client can handle an
+empty string instead of a valid node name, but can't handle an absent
+field? I assume that such clients would probably break either way. And
+in that case I preferred to use the cleaner design.
 
- default-configs/arm-softmmu.mak |  7 +++++++
- hw/arm/Makefile.objs            | 30 +++++++++++++++++++++---------
- 2 files changed, 28 insertions(+), 9 deletions(-)
+> Then again, since the field was not present prior to 2.8, but the event
+> itself is older, we can argue that clients of older qemu have to be prepared
+> for the field to not be present.  So I think I can live with this change
+> as-is.
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index d724106..96071c8 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -47,6 +47,7 @@ CONFIG_A9MPCORE=y
- CONFIG_A15MPCORE=y
- 
- CONFIG_ARM_V7M=y
-+CONFIG_NETDUINO2=y
- 
- CONFIG_ARM_GIC=y
- CONFIG_ARM_GIC_KVM=$(CONFIG_KVM)
-@@ -109,6 +110,7 @@ CONFIG_TZ_PPC=y
- CONFIG_IOTKIT=y
- CONFIG_IOTKIT_SECCTL=y
- 
-+CONFIG_VERSATILE=y
- CONFIG_VERSATILE_PCI=y
- CONFIG_VERSATILE_I2C=y
- 
-@@ -117,6 +119,7 @@ CONFIG_VFIO_XGMAC=y
- CONFIG_VFIO_AMD_XGBE=y
- 
- CONFIG_SDHCI=y
-+CONFIG_INTEGRATOR=y
- CONFIG_INTEGRATOR_DEBUG=y
- 
- CONFIG_ALLWINNER_A10_PIT=y
-@@ -140,3 +143,7 @@ CONFIG_GPIO_KEY=y
- CONFIG_MSF2=y
- CONFIG_FW_CFG_DMA=y
- CONFIG_XILINX_AXI=y
-+
-+CONFIG_STRONGARM=y
-+CONFIG_HIGHBANK=y
-+CONFIG_MUSICPAL=y
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index 2322581..53611a7 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -1,15 +1,27 @@
--obj-y += boot.o collie.o exynos4_boards.o gumstix.o highbank.o
--obj-$(CONFIG_DIGIC) += digic_boards.o
--obj-y += integratorcp.o mainstone.o musicpal.o nseries.o
--obj-y += omap_sx1.o palm.o realview.o spitz.o stellaris.o
--obj-y += tosa.o versatilepb.o vexpress.o virt.o xilinx_zynq.o z2.o
-+obj-y += boot.o virt.o sysbus-fdt.o
- obj-$(CONFIG_ACPI) += virt-acpi-build.o
--obj-y += netduino2.o
--obj-y += sysbus-fdt.o
-+obj-$(CONFIG_DIGIC) += digic_boards.o
-+obj-$(CONFIG_EXYNOS4) += exynos4_boards.o
-+obj-$(CONFIG_HIGHBANK) += highbank.o
-+obj-$(CONFIG_INTEGRATOR) += integratorcp.o
-+obj-$(CONFIG_MAINSTONE) += mainstone.o
-+obj-$(CONFIG_MUSICPAL) += musicpal.o
-+obj-$(CONFIG_NETDUINO2) += netduino2.o
-+obj-$(CONFIG_NSERIES) += nseries.o
-+obj-$(CONFIG_OMAP) += omap_sx1.o palm.o
-+obj-$(CONFIG_PXA2XX) += gumstix.o spitz.o tosa.o z2.o
-+obj-$(CONFIG_REALVIEW) += realview.o
-+obj-$(CONFIG_STELLARIS) += stellaris.o
-+obj-$(CONFIG_STRONGARM) += collie.o
-+obj-$(CONFIG_VERSATILE) += vexpress.o versatilepb.o
-+obj-$(CONFIG_ZYNQ) += xilinx_zynq.o
- 
--obj-y += armv7m.o exynos4210.o pxa2xx.o pxa2xx_gpio.o pxa2xx_pic.o
-+obj-$(CONFIG_ARM_V7M) += armv7m.o
-+obj-$(CONFIG_EXYNOS4) += exynos4210.o
-+obj-$(CONFIG_PXA2XX) += pxa2xx.o pxa2xx_gpio.o pxa2xx_pic.o
- obj-$(CONFIG_DIGIC) += digic.o
--obj-y += omap1.o omap2.o strongarm.o
-+obj-$(CONFIG_OMAP) += omap1.o omap2.o
-+obj-$(CONFIG_STRONGARM) += strongarm.o
- obj-$(CONFIG_ALLWINNER_A10) += allwinner-a10.o cubieboard.o
- obj-$(CONFIG_RASPI) += bcm2835_peripherals.o bcm2836.o raspi.o
- obj-$(CONFIG_STM32F205_SOC) += stm32f205_soc.o
--- 
-1.8.3.1
+Right, that too. If libvirt can deal with it (and I suppose it can
+because it doesn't really use node names yet), we should be okay.
+> 
+> >   #
+> >   # @operation: I/O operation
+> >   #
+> > @@ -3707,7 +3708,8 @@
+> >   #
+> >   ##
+> >   { 'event': 'BLOCK_IO_ERROR',
+> > -  'data': { 'device': 'str', 'node-name': 'str', 'operation': 'IoOperationType',
+> > +  'data': { 'device': 'str', '*node-name': 'str',
+> > +            'operation': 'IoOperationType',
+> >               'action': 'BlockErrorAction', '*nospace': 'bool',
+> >               'reason': 'str' } }
+> 
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks.
+
+Kevin
