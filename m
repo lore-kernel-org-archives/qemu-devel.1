@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1esjkX-0000fI-7e
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:37:30 -0500
+	(envelope-from <peterx@redhat.com>) id 1esjqZ-0002jf-5z
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:43:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1esjkT-000235-3V
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:37:29 -0500
-Received: from mga05.intel.com ([192.55.52.43]:7688)
+	(envelope-from <peterx@redhat.com>) id 1esjqX-0005rb-Ji
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:43:43 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53390 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
-	id 1esjkS-000229-QV
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:37:25 -0500
-From: Luwei Kang <luwei.kang@intel.com>
-Date: Mon,  5 Mar 2018 00:48:36 +0800
-Message-Id: <1520182116-16485-2-git-send-email-luwei.kang@intel.com>
-In-Reply-To: <1520182116-16485-1-git-send-email-luwei.kang@intel.com>
-References: <1520182116-16485-1-git-send-email-luwei.kang@intel.com>
-Subject: [Qemu-devel] [PATCH v4 2/2] i386: Add support to get/set/migrate
- Intel Processor Trace feature
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1esjqX-0005r9-Ea
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 01:43:41 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0866B40FB64A
+	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 06:43:41 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Mon,  5 Mar 2018 14:43:20 +0800
+Message-Id: <20180305064324.9238-3-peterx@redhat.com>
+In-Reply-To: <20180305064324.9238-1-peterx@redhat.com>
+References: <20180305064324.9238-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 2/6] qio: introduce
+ qio_channel_add_watch_{full|source}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,193 +30,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, kvm@vger.kernel.org
-Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com, Chao Peng <chao.p.peng@linux.intel.com>, Luwei Kang <luwei.kang@intel.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, peterx@redhat.com, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-From: Chao Peng <chao.p.peng@linux.intel.com>
+Firstly, introduce an internal qio_channel_add_watch_full(), which
+enhances qio_channel_add_watch() that context can be specified.
 
-Add Intel Processor Trace related definition. It also add
-corresponding part to kvm_get/set_msr and vmstate.
+Then add a new API wrapper qio_channel_add_watch_source() to return a
+GSource pointer rather than a tag ID.
 
-Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-Signed-off-by: Luwei Kang <luwei.kang@intel.com>
+Note that the _source() call will keep a reference of GSource so that
+callers need to unref them explicitly when finished using the GSource.
+
+Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- target/i386/cpu.h     | 22 ++++++++++++++++++++++
- target/i386/kvm.c     | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
- target/i386/machine.c | 38 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 111 insertions(+)
+ include/io/channel.h | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ io/channel.c         | 40 ++++++++++++++++++++++++++++++++++------
+ 2 files changed, 78 insertions(+), 6 deletions(-)
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index f5b9ecb..5457d3b 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -415,6 +415,21 @@ typedef enum X86Seg {
- #define MSR_MC0_ADDR                    0x402
- #define MSR_MC0_MISC                    0x403
+diff --git a/include/io/channel.h b/include/io/channel.h
+index 3995e243a3..e8cdadb0b0 100644
+--- a/include/io/channel.h
++++ b/include/io/channel.h
+@@ -648,6 +648,50 @@ guint qio_channel_add_watch(QIOChannel *ioc,
+                             gpointer user_data,
+                             GDestroyNotify notify);
  
-+#define MSR_IA32_RTIT_OUTPUT_BASE       0x560
-+#define MSR_IA32_RTIT_OUTPUT_MASK       0x561
-+#define MSR_IA32_RTIT_CTL               0x570
-+#define MSR_IA32_RTIT_STATUS            0x571
-+#define MSR_IA32_RTIT_CR3_MATCH         0x572
-+#define MSR_IA32_RTIT_ADDR0_A           0x580
-+#define MSR_IA32_RTIT_ADDR0_B           0x581
-+#define MSR_IA32_RTIT_ADDR1_A           0x582
-+#define MSR_IA32_RTIT_ADDR1_B           0x583
-+#define MSR_IA32_RTIT_ADDR2_A           0x584
-+#define MSR_IA32_RTIT_ADDR2_B           0x585
-+#define MSR_IA32_RTIT_ADDR3_A           0x586
-+#define MSR_IA32_RTIT_ADDR3_B           0x587
-+#define MAX_RTIT_ADDRS                  8
++/**
++ * qio_channel_add_watch_full:
++ * @ioc: the channel object
++ * @condition: the I/O condition to monitor
++ * @func: callback to invoke when the source becomes ready
++ * @user_data: opaque data to pass to @func
++ * @notify: callback to free @user_data
++ * @context: the context to run the watch source
++ *
++ * Similar as qio_channel_add_watch(), but allows to specify context
++ * to run the watch source.
++ *
++ * Returns: the source ID
++ */
++guint qio_channel_add_watch_full(QIOChannel *ioc,
++                                 GIOCondition condition,
++                                 QIOChannelFunc func,
++                                 gpointer user_data,
++                                 GDestroyNotify notify,
++                                 GMainContext *context);
 +
- #define MSR_EFER                        0xc0000080
++/**
++ * qio_channel_add_watch_source:
++ * @ioc: the channel object
++ * @condition: the I/O condition to monitor
++ * @func: callback to invoke when the source becomes ready
++ * @user_data: opaque data to pass to @func
++ * @notify: callback to free @user_data
++ * @context: gcontext to bind the source to
++ *
++ * Similar as qio_channel_add_watch(), but allows to specify context
++ * to run the watch source, meanwhile return the GSource object
++ * instead of tag ID, with the GSource referenced already.
++ *
++ * Note: callers is responsible to unref the source when not needed.
++ *
++ * Returns: the source pointer
++ */
++GSource *qio_channel_add_watch_source(QIOChannel *ioc,
++                                      GIOCondition condition,
++                                      QIOChannelFunc func,
++                                      gpointer user_data,
++                                      GDestroyNotify notify,
++                                      GMainContext *context);
  
- #define MSR_EFER_SCE   (1 << 0)
-@@ -1154,6 +1169,13 @@ typedef struct CPUX86State {
-     uint64_t msr_hv_stimer_config[HV_STIMER_COUNT];
-     uint64_t msr_hv_stimer_count[HV_STIMER_COUNT];
+ /**
+  * qio_channel_attach_aio_context:
+diff --git a/io/channel.c b/io/channel.c
+index ec4b86de7c..8dd0684f5d 100644
+--- a/io/channel.c
++++ b/io/channel.c
+@@ -299,11 +299,12 @@ void qio_channel_set_aio_fd_handler(QIOChannel *ioc,
+     klass->io_set_aio_fd_handler(ioc, ctx, io_read, io_write, opaque);
+ }
  
-+    uint64_t msr_rtit_ctrl;
-+    uint64_t msr_rtit_status;
-+    uint64_t msr_rtit_output_base;
-+    uint64_t msr_rtit_output_mask;
-+    uint64_t msr_rtit_cr3_match;
-+    uint64_t msr_rtit_addrs[MAX_RTIT_ADDRS];
-+
-     /* exception/interrupt handling */
-     int error_code;
-     int exception_is_int;
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index f9f4cd1..097c953 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1811,6 +1811,25 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-                 kvm_msr_entry_add(cpu, MSR_MTRRphysMask(i), mask);
-             }
-         }
-+        if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
-+            int addr_num = kvm_arch_get_supported_cpuid(kvm_state,
-+                                                    0x14, 1, R_EAX) & 0x7;
-+
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL,
-+                            env->msr_rtit_ctrl);
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS,
-+                            env->msr_rtit_status);
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE,
-+                            env->msr_rtit_output_base);
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_MASK,
-+                            env->msr_rtit_output_mask);
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CR3_MATCH,
-+                            env->msr_rtit_cr3_match);
-+            for (i = 0; i < addr_num; i++) {
-+                kvm_msr_entry_add(cpu, MSR_IA32_RTIT_ADDR0_A + i,
-+                            env->msr_rtit_addrs[i]);
-+            }
-+        }
+-guint qio_channel_add_watch(QIOChannel *ioc,
+-                            GIOCondition condition,
+-                            QIOChannelFunc func,
+-                            gpointer user_data,
+-                            GDestroyNotify notify)
++guint qio_channel_add_watch_full(QIOChannel *ioc,
++                                 GIOCondition condition,
++                                 QIOChannelFunc func,
++                                 gpointer user_data,
++                                 GDestroyNotify notify,
++                                 GMainContext *context)
+ {
+     GSource *source;
+     guint id;
+@@ -312,12 +313,39 @@ guint qio_channel_add_watch(QIOChannel *ioc,
  
-         /* Note: MSR_IA32_FEATURE_CONTROL is written separately, see
-          *       kvm_put_msr_feature_control. */
-@@ -2124,6 +2143,20 @@ static int kvm_get_msrs(X86CPU *cpu)
-         }
-     }
+     g_source_set_callback(source, (GSourceFunc)func, user_data, notify);
  
-+    if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
-+        int addr_num =
-+            kvm_arch_get_supported_cpuid(kvm_state, 0x14, 1, R_EAX) & 0x7;
-+
-+        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_MASK, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CR3_MATCH, 0);
-+        for (i = 0; i < addr_num; i++) {
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_ADDR0_A + i, 0);
-+        }
-+    }
-+
-     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, cpu->kvm_msr_buf);
-     if (ret < 0) {
-         return ret;
-@@ -2364,6 +2397,24 @@ static int kvm_get_msrs(X86CPU *cpu)
-         case MSR_IA32_SPEC_CTRL:
-             env->spec_ctrl = msrs[i].data;
-             break;
-+        case MSR_IA32_RTIT_CTL:
-+            env->msr_rtit_ctrl = msrs[i].data;
-+            break;
-+        case MSR_IA32_RTIT_STATUS:
-+            env->msr_rtit_status = msrs[i].data;
-+            break;
-+        case MSR_IA32_RTIT_OUTPUT_BASE:
-+            env->msr_rtit_output_base = msrs[i].data;
-+            break;
-+        case MSR_IA32_RTIT_OUTPUT_MASK:
-+            env->msr_rtit_output_mask = msrs[i].data;
-+            break;
-+        case MSR_IA32_RTIT_CR3_MATCH:
-+            env->msr_rtit_cr3_match = msrs[i].data;
-+            break;
-+        case MSR_IA32_RTIT_ADDR0_A ... MSR_IA32_RTIT_ADDR3_B:
-+            env->msr_rtit_addrs[index - MSR_IA32_RTIT_ADDR0_A] = msrs[i].data;
-+            break;
-         }
-     }
+-    id = g_source_attach(source, NULL);
++    id = g_source_attach(source, context);
+     g_source_unref(source);
  
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 361c05a..c05fe6f 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -837,6 +837,43 @@ static const VMStateDescription vmstate_spec_ctrl = {
-     }
- };
+     return id;
+ }
  
-+static bool intel_pt_enable_needed(void *opaque)
++guint qio_channel_add_watch(QIOChannel *ioc,
++                            GIOCondition condition,
++                            QIOChannelFunc func,
++                            gpointer user_data,
++                            GDestroyNotify notify)
 +{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+    int i;
-+
-+    if (env->msr_rtit_ctrl || env->msr_rtit_status ||
-+        env->msr_rtit_output_base || env->msr_rtit_output_mask ||
-+        env->msr_rtit_cr3_match) {
-+        return true;
-+    }
-+
-+    for (i = 0; i < MAX_RTIT_ADDRS; i++) {
-+        if (env->msr_rtit_addrs[i]) {
-+            return true;
-+        }
-+    }
-+
-+    return false;
++    return qio_channel_add_watch_full(ioc, condition, func,
++                                      user_data, notify, NULL);
 +}
 +
-+static const VMStateDescription vmstate_msr_intel_pt = {
-+    .name = "cpu/intel_pt",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = intel_pt_enable_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.msr_rtit_ctrl, X86CPU),
-+        VMSTATE_UINT64(env.msr_rtit_status, X86CPU),
-+        VMSTATE_UINT64(env.msr_rtit_output_base, X86CPU),
-+        VMSTATE_UINT64(env.msr_rtit_output_mask, X86CPU),
-+        VMSTATE_UINT64(env.msr_rtit_cr3_match, X86CPU),
-+        VMSTATE_UINT64_ARRAY(env.msr_rtit_addrs, X86CPU, MAX_RTIT_ADDRS),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
++GSource *qio_channel_add_watch_source(QIOChannel *ioc,
++                                      GIOCondition condition,
++                                      QIOChannelFunc func,
++                                      gpointer user_data,
++                                      GDestroyNotify notify,
++                                      GMainContext *context)
++{
++    GSource *source;
++    guint id;
 +
- VMStateDescription vmstate_x86_cpu = {
-     .name = "cpu",
-     .version_id = 12,
-@@ -957,6 +994,7 @@ VMStateDescription vmstate_x86_cpu = {
- #endif
-         &vmstate_spec_ctrl,
-         &vmstate_mcg_ext_ctl,
-+        &vmstate_msr_intel_pt,
-         NULL
-     }
- };
++    id = qio_channel_add_watch_full(ioc, condition, func,
++                                    user_data, notify, context);
++    source = g_main_context_find_source_by_id(context, id);
++    g_source_ref(source);
++    return source;
++}
++
+ 
+ int qio_channel_shutdown(QIOChannel *ioc,
+                          QIOChannelShutdown how,
 -- 
-1.8.3.1
+2.14.3
