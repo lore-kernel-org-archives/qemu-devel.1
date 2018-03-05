@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1esgYU-0007CB-If
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 22:12:58 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1esgsO-0008R7-Ti
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 22:33:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1esgYT-0005jt-D8
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 22:12:50 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52666 helo=mx1.redhat.com)
+	(envelope-from <wei.w.wang@intel.com>) id 1esgsL-00039K-Qb
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 22:33:24 -0500
+Received: from mga17.intel.com ([192.55.52.151]:58068)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1esgYT-0005jX-82
-	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 22:12:49 -0500
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon,  5 Mar 2018 11:12:04 +0800
-Message-Id: <1520219524-17160-10-git-send-email-jasowang@redhat.com>
-In-Reply-To: <1520219524-17160-1-git-send-email-jasowang@redhat.com>
-References: <1520219524-17160-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 9/9] tap: setting error appropriately when
- calling net_init_tap_one()
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1esgsL-00038k-Hw
+	for qemu-devel@nongnu.org; Sun, 04 Mar 2018 22:33:21 -0500
+Message-ID: <5A9CBB2F.8010400@intel.com>
+Date: Mon, 05 Mar 2018 11:36:15 +0800
+From: Wei Wang <wei.w.wang@intel.com>
+MIME-Version: 1.0
+References: <1519980450-3404-1-git-send-email-wei.w.wang@intel.com>
+	<1519980450-3404-3-git-send-email-wei.w.wang@intel.com>
+	<20180302203557-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180302203557-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_HINT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,98 +30,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Jay Zhou <jianjay.zhou@huawei.com>, Jason Wang <jasowang@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-From: Jay Zhou <jianjay.zhou@huawei.com>
+On 03/03/2018 02:37 AM, Michael S. Tsirkin wrote:
+> On Fri, Mar 02, 2018 at 04:47:29PM +0800, Wei Wang wrote:
+>> diff --git a/include/sysemu/balloon.h b/include/sysemu/balloon.h
+>> index af49e19..16a2aae 100644
+>> --- a/include/sysemu/balloon.h
+>> +++ b/include/sysemu/balloon.h
+> ...
+>
+>> +typedef void (QEMUBalloonFreePageStart)(void *opaque);
+>> +typedef void (QEMUBalloonFreePageStop)(void *opaque);
+> So I think the rule is that no bitmap sync must happen
+> between these two, otherwise a hint might arrive and
+> override the sync output.
+>
+> Should be documented I think.
+>
 
-If netdev_add tap,id=net0,...,vhost=on failed in net_init_tap_one(),
-the followed up device_add virtio-net-pci,netdev=net0 will fail
-too, prints:
+Yes, agree. How about adding the following new balloon API explanation 
+to this patch's commit:
 
-   TUNSETOFFLOAD ioctl() failed: Bad file descriptor TUNSETOFFLOAD
-   ioctl() failed: Bad file descriptor
+     - balloon_free_page_start: Callers call this API to obtain guest free
+       page hints, and clear the related bits from the migration dirty 
+bitmap.
+       The whole process is implemented in a new thread independent of the
+       migration thread. Free page hints imply the part of guest memory is
+       likely to be free without a guarantee. That is, the reported free 
+pages
+       may not be free any more when QEMU receives them, so callers are
+       responsible for detecting those pages that are not free pages 
+after the
+       bits are cleared from the dirty bitmap. To ensure the above, this API
+       should be used when the migration dirty logging mechanism (e.g.
+       guest memory write-protection) has started.
 
-The reason is that the fd of tap is closed when error occured after
-calling net_init_tap_one().
+     - balloon_free_page_stop: Callers call this API to stop the guest from
+       reporting free page hints. Bits from the dirty bitmap are safe to
+       be cleared on condition that the dirty logging mechanism is recording
+       pages that the guest has written to. To avoid the case that clearing
+       bits of free page hints overrides the dirty bits offered by the dirty
+       logging mechanism, this API is suggested to be called before QEMU
+       synchronizes the dirty logging bitmap.
 
-The fd should be closed when calling net_init_tap_one failed:
-   - if tap_set_sndbuf() failed
-   - if tap_set_sndbuf() succeeded but vhost failed to open or
-     initialize with vhostforce flag on
-   - with wrong vhost command line parameter
-The fd should not be closed just because vhost failed to open or
-initialize but without vhostforce flag. So the followed up
-device_add can fall back to userspace virtio successfully.
+     - balloon_free_page_support: This API is called to check whether the
+       balloon device supports the guest free page reporting feature. The
+       balloon_free_page_start and balloon_free_page_stop APIs should be 
+used
+       only when this API returns true.
 
-Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Suggested-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- include/net/vhost_net.h |  3 +++
- net/tap.c               | 22 +++++++++++++++++-----
- 2 files changed, 20 insertions(+), 5 deletions(-)
 
-diff --git a/include/net/vhost_net.h b/include/net/vhost_net.h
-index afc1499..77e4739 100644
---- a/include/net/vhost_net.h
-+++ b/include/net/vhost_net.h
-@@ -4,6 +4,9 @@
- #include "net/net.h"
- #include "hw/virtio/vhost-backend.h"
- 
-+#define VHOST_NET_INIT_FAILED \
-+    "vhost-net requested but could not be initialized"
-+
- struct vhost_net;
- typedef struct vhost_net VHostNetState;
- 
-diff --git a/net/tap.c b/net/tap.c
-index 979e622..2b3a36f 100644
---- a/net/tap.c
-+++ b/net/tap.c
-@@ -686,14 +686,23 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
-         if (vhostfdname) {
-             vhostfd = monitor_fd_param(cur_mon, vhostfdname, &err);
-             if (vhostfd == -1) {
--                error_propagate(errp, err);
-+                if (tap->has_vhostforce && tap->vhostforce) {
-+                    error_propagate(errp, err);
-+                } else {
-+                    warn_report_err(err);
-+                }
-                 return;
-             }
-         } else {
-             vhostfd = open("/dev/vhost-net", O_RDWR);
-             if (vhostfd < 0) {
--                error_setg_errno(errp, errno,
--                                 "tap: open vhost char device failed");
-+                if (tap->has_vhostforce && tap->vhostforce) {
-+                    error_setg_errno(errp, errno,
-+                                     "tap: open vhost char device failed");
-+                } else {
-+                    warn_report("tap: open vhost char device failed: %s",
-+                                strerror(errno));
-+                }
-                 return;
-             }
-             fcntl(vhostfd, F_SETFL, O_NONBLOCK);
-@@ -702,8 +711,11 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
- 
-         s->vhost_net = vhost_net_init(&options);
-         if (!s->vhost_net) {
--            error_setg(errp,
--                       "vhost-net requested but could not be initialized");
-+            if (tap->has_vhostforce && tap->vhostforce) {
-+                error_setg(errp, VHOST_NET_INIT_FAILED);
-+            } else {
-+                warn_report(VHOST_NET_INIT_FAILED);
-+            }
-             return;
-         }
-     } else if (vhostfdname) {
--- 
-2.7.4
+Best,
+Wei
