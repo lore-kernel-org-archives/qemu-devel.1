@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1esnYI-0000ap-Ir
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:41:07 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1esnay-0001iu-CK
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:43:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1esnYD-0008LS-Ls
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:41:06 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43300)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1esnYC-0008IT-Tx
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:41:01 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1esnY9-0004XE-IA
-	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 10:40:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 591B62E80D3
-	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 10:40:57 +0000 (UTC)
+	(envelope-from <dgilbert@redhat.com>) id 1esnat-0001Ud-GN
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:43:52 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38438 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1esnat-0001UN-AK
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:43:47 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 93B8E87ABA
+	for <qemu-devel@nongnu.org>; Mon,  5 Mar 2018 10:43:36 +0000 (UTC)
+Date: Mon, 5 Mar 2018 10:43:27 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180305104326.GC3131@work-vm>
+References: <1520243276-30197-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 05 Mar 2018 10:31:37 -0000
-From: dcb <1753437@bugs.launchpad.net>
-Reply-To: Bug 1753437 <1753437@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <152024589806.7327.9844777027357521578.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1753437] [NEW] qemu/pc-bios/s390-ccw/libc.c:82:
- bad test ?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1520243276-30197-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] Allow to specify a display device ID
+ and head whith the screendump command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,55 +33,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Jiri Denemark <jdenemar@redhat.com>
 
-Public bug reported:
+* Thomas Huth (thuth@redhat.com) wrote:
+> QEMU's screendump command can only take dumps from the primary display.
+> When using multiple VGA cards, there is no way to get a dump from a
+> secondary card or other display heads yet. So let's add an 'device' and
+> a 'head' parameter to the HMP and QMP commands to be able to specify
+> alternative devices and heads with the screendump command, too.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  v2:
+>  - Renamed 'id' to 'device'
+>  - Add suport for specifying the 'head', too
+> 
+>  hmp-commands.hx |  7 ++++---
+>  hmp.c           |  4 +++-
+>  qapi/ui.json    |  7 ++++++-
+>  ui/console.c    | 22 ++++++++++++++++++----
+>  4 files changed, 31 insertions(+), 9 deletions(-)
+> 
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index d26eb41..ebb5fe4 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -253,9 +253,10 @@ ETEXI
+>  
+>      {
+>          .name       = "screendump",
+> -        .args_type  = "filename:F",
+> -        .params     = "filename",
+> -        .help       = "save screen into PPM image 'filename'",
+> +        .args_type  = "filename:F,device:s?,head:i?",
+> +        .params     = "filename [device [head]]",
+> +        .help       = "save screen from head 'head' of display device 'device' "
+> +                      "into PPM image 'filename'",
+>          .cmd        = hmp_screendump,
+>      },
+>  
+> diff --git a/hmp.c b/hmp.c
+> index ae86bfb..7dcf72f 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -2132,9 +2132,11 @@ err_out:
+>  void hmp_screendump(Monitor *mon, const QDict *qdict)
+>  {
+>      const char *filename = qdict_get_str(qdict, "filename");
+> +    const char *id = qdict_get_try_str(qdict, "device");
+> +    int64_t head = qdict_get_try_int(qdict, "head", 0);
+>      Error *err = NULL;
+>  
+> -    qmp_screendump(filename, &err);
+> +    qmp_screendump(filename, id != NULL, id, id != NULL, head, &err);
+>      hmp_handle_error(mon, &err);
+>  }
 
-qemu/pc-bios/s390-ccw/libc.c:82]: (style) Unsigned variable 'num_idx'
-can't be negative so it is unnecessary to test it.
-
-Source code is
+Looks ok from HMP; one question, is there a way to give an ID to the
+default VGA or only to extra devices?
 
 
-    while (num_idx >=3D 0) {
+Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-but
-
-    size_t num_idx =3D 1; /* account for NUL */
-
-So there is no escape from the while loop.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1753437
-
-Title:
-  qemu/pc-bios/s390-ccw/libc.c:82: bad test ?
-
-Status in QEMU:
-  New
-
-Bug description:
-  qemu/pc-bios/s390-ccw/libc.c:82]: (style) Unsigned variable 'num_idx'
-  can't be negative so it is unnecessary to test it.
-
-  Source code is
-
-  =
-
-      while (num_idx >=3D 0) {
-
-  but
-
-      size_t num_idx =3D 1; /* account for NUL */
-
-  So there is no escape from the while loop.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1753437/+subscriptions
+> diff --git a/qapi/ui.json b/qapi/ui.json
+> index 3e82f25..e60b323 100644
+> --- a/qapi/ui.json
+> +++ b/qapi/ui.json
+> @@ -77,6 +77,10 @@
+>  #
+>  # @filename: the path of a new PPM file to store the image
+>  #
+> +# @device: ID of the display device that should be used (since 2.12)
+> +#
+> +# @head: head to use in case the device supports multiple heads (since 2.12)
+> +#
+>  # Returns: Nothing on success
+>  #
+>  # Since: 0.14.0
+> @@ -88,7 +92,8 @@
+>  # <- { "return": {} }
+>  #
+>  ##
+> -{ 'command': 'screendump', 'data': {'filename': 'str'} }
+> +{ 'command': 'screendump',
+> +  'data': {'filename': 'str', '*device': 'str', '*head': 'int'} }
+>  
+>  ##
+>  # == Spice
+> diff --git a/ui/console.c b/ui/console.c
+> index e22931a..76b694e 100644
+> --- a/ui/console.c
+> +++ b/ui/console.c
+> @@ -344,14 +344,28 @@ write_err:
+>      goto out;
+>  }
+>  
+> -void qmp_screendump(const char *filename, Error **errp)
+> +void qmp_screendump(const char *filename, bool has_device, const char *device,
+> +                    bool has_head, int64_t head, Error **errp)
+>  {
+>      QemuConsole *con = qemu_console_lookup_by_index(0);
+>      DisplaySurface *surface;
+>  
+> -    if (con == NULL) {
+> -        error_setg(errp, "There is no QemuConsole I can screendump from.");
+> -        return;
+> +    if (has_device) {
+> +        con = qemu_console_lookup_by_device_name(device, has_head ? head : 0,
+> +                                                 errp);
+> +        if (!con) {
+> +            return;
+> +        }
+> +    } else {
+> +        if (has_head) {
+> +            error_setg(errp, "'head' must be specified together with 'device'");
+> +            return;
+> +        }
+> +        con = qemu_console_lookup_by_index(0);
+> +        if (!con) {
+> +            error_setg(errp, "There is no console to take a screendump from.");
+> +            return;
+> +        }
+>      }
+>  
+>      graphic_hw_update(con);
+> -- 
+> 1.8.3.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
