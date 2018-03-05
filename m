@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esnNE-00058W-Nw
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:29:41 -0500
+	(envelope-from <berrange@redhat.com>) id 1esnQw-0006sQ-Mn
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:33:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esnN9-0003Cy-Mq
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:29:40 -0500
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:45117)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1esnN9-0003CV-GH
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:29:35 -0500
-Received: by mail-wr0-x229.google.com with SMTP id p104so16638155wrc.12
-	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 02:29:35 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171026064635.7179-1-aik@ozlabs.ru>
-	<13277057-669f-cd77-95f1-f0e54f7ae222@redhat.com>
-	<7e694888-43ce-6653-92a0-c0b4c235d4ca@ozlabs.ru>
-	<e6a81bdc-a961-d55f-85c4-55149c878988@redhat.com>
-	<df85e8f4-23ae-6404-26b8-b45cc7896bbc@reactos.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <d65b171f-0f98-a28f-e0d0-c122ff4bba34@amsat.org>
-Date: Mon, 5 Mar 2018 07:29:32 -0300
+	(envelope-from <berrange@redhat.com>) id 1esnQs-0005Uk-Sv
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:33:30 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58396 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1esnQs-0005UU-MR
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 05:33:26 -0500
+Date: Mon, 5 Mar 2018 10:33:07 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180305103307.GL17368@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <CAFEAcA8Wz4q=+HDpSG_pFHB7xKMez6hCPFodoOxoTgr1FOy5nA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <df85e8f4-23ae-6404-26b8-b45cc7896bbc@reactos.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH qemu] fdc: Exit if ISA controller does not
- support DMA
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8Wz4q=+HDpSG_pFHB7xKMez6hCPFodoOxoTgr1FOy5nA@mail.gmail.com>
+Subject: Re: [Qemu-devel] QEMU fails to configure on non-x86 hosts with
+ recent SDL2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,45 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, John Snow <jsnow@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
-Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-On 10/26/2017 03:46 AM, Alexey Kardashevskiy wrote:
-> A "powernv" machine type defines an ISA bus but it does not add any
-> DMA
-> controller to it so it is possible to hit assert(fdctrl->dma) by
-> adding "-machine powernv -device isa-fdc".
-
-The same happens with the Alpha machine.
-
-On 12/13/2017 03:19 AM, Hervé Poussineau wrote:
-> Le 08/12/2017 à 22:29, John Snow a écrit :
-> [...]
->>
->> It looks like Herve was working on decoupling floppies from i8257, but
->> perhaps didn't get all the way through -- I'm not actually clear on what
->> work remains to be done here, maybe he can chime in if he's still
->> interested in the project?
->>
+On Mon, Mar 05, 2018 at 10:24:41AM +0000, Peter Maydell wrote:
+> On non-x86 hosts with SDL2 2.0.8, configure fails:
 > 
-> Indeed, I worked on decoupling floppies (and other ISA devices) from
-> i8257, for three reasons:
-> 1) having a working floppy on MIPS Magnum machine. fdc is PC-compatible,
-> but DMA controller is not i8257-compatible.
-> 2) reimplement another ISA bus with a somewhat i8257-compatible DMA
-> 3) for fun, support multiple ISA buses on a same machine but on
-> different PCI bridges.
 > 
-> I failed on point 1), mostly due to lack of documentation.
-> I succeeded on point 2), by having locally some patches for a ISAPNP
-> bus, where IO/IRQ/DMA addresses of ISA devices can change dynamically,
-> and devices can be discovered by operating system.
-> About point 3, most of the patches are ready, but some details are still
-> to be fixed.
+> config-host.mak is out-of-date, running configure
+> 
+> ERROR: configure test passed without -Werror but failed with -Werror.
+>        This is probably a bug in the configure script. The failing command
+>        will be at the bottom of config.log.
+>        You can run configure with --disable-werror to bypass this check.
+> 
+> The relevant configure test is the SDL one:
+> #include <SDL.h>
+> #undef main /* We don't want SDL to override our main() */
+> int main( void ) { return SDL_Init (SDL_INIT_VIDEO); }
+> 
+> and it fails because on non-x86 platforms one of the SDL headers
+> triggers a -Wundef warning:
+> 
+> cc -Wundef -o zz9.o -I /usr/include/SDL2 -c qemu-conf.c
+> In file included from /usr/include/SDL2/SDL.h:38:0,
+>                  from qemu-conf.c:1:
+> /usr/include/SDL2/SDL_cpuinfo.h:63:5: warning: "HAVE_IMMINTRIN_H" is
+> not defined, evaluates to 0 [-Wundef]
+>  #if HAVE_IMMINTRIN_H && !defined(SDL_DISABLE_IMMINTRIN_H)
+>      ^~~~~~~~~~~~~~~~
 
-I'm having hard time refactoring all these PC chipsets, I'll make some
-room to send my current work as RFC before soft freeze.
+Ewwww, even ignoring the -Wundef issue, this is a really unpleasant
+approach from SDL.  All these HAVE_* symbols SDL2 tests & defines
+are polluting the global header namespace and could easily clash
+with symbols defined by QEMU / $APP's own configure.ac script :-(
+
+> Any suggestions for how to do a workaround?
+
+Drop -Wundef when running the configiure test, or override it with -Wno-undef
+
+If the actual ui/sdl* files fail for same reason, we could use a gcc
+pragma top disable -Wundef in just those files, or set -Wno-undef in
+CFLAGS on a per-.o file basis in Makefile.objs
 
 Regards,
-
-Phil.
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
