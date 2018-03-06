@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1etAgJ-0004OG-AA
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:22:56 -0500
+	(envelope-from <yi.l.liu@intel.com>) id 1etAl4-0007Ou-VN
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:27:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1etAgG-0002yY-2j
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:22:55 -0500
-Received: from mga17.intel.com ([192.55.52.151]:34016)
+	(envelope-from <yi.l.liu@intel.com>) id 1etAl1-0005Aq-OG
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:27:50 -0500
+Received: from mga02.intel.com ([134.134.136.20]:35804)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
-	id 1etAgF-0002xu-OB
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:22:51 -0500
-Date: Tue, 6 Mar 2018 19:06:01 +0800
-From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Message-ID: <20180306110601.GD3158@sky-dev>
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1etAl1-0005AQ-Dw
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:27:47 -0500
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+Date: Tue, 6 Mar 2018 11:27:41 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C257439B88B68@SHSMSX104.ccr.corp.intel.com>
 References: <1519900415-30314-1-git-send-email-yi.l.liu@linux.intel.com>
 	<1519900415-30314-9-git-send-email-yi.l.liu@linux.intel.com>
-	<f06bee8b-646d-e9e8-d2e6-78cdddb76ab1@redhat.com>
-	<20180305084309.GF2482@sky-dev> <20180305104346.GD7584@xz-mi>
-	<83f9d85f-a6f8-0fc0-9097-e9f761148bab@redhat.com>
-	<20180306104727.GB17720@xz-mi>
+	<f9ee648a-ff93-b57a-4b05-6bd0f40c15bf@redhat.com>
+	<20180305084207.GE2482@sky-dev>
+	<2160f478-2c8a-8fbe-1df8-78c1984cf375@redhat.com>
+	<20180306110337.GC3158@sky-dev>
+	<c888c285-ffb8-aa4c-6486-2b9bddb64844@redhat.com>
+In-Reply-To: <c888c285-ffb8-aa4c-6486-2b9bddb64844@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180306104727.GB17720@xz-mi>
 Subject: Re: [Qemu-devel] [PATCH v3 08/12] hw/pci: introduce
  pci_device_notify_iommu()
 List-Id: <qemu-devel.nongnu.org>
@@ -33,43 +34,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com, david@gibson.dropbear.id.au, alex.williamson@redhat.com, eric.auger.pro@gmail.com, yi.l.liu@intel.com, kevin.tian@intel.com, jasowang@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>, "mst@redhat.com" <mst@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "peterx@redhat.com" <peterx@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 
-On Tue, Mar 06, 2018 at 06:47:27PM +0800, Peter Xu wrote:
-> On Tue, Mar 06, 2018 at 11:19:13AM +0100, Paolo Bonzini wrote:
-> > On 05/03/2018 11:43, Peter Xu wrote:
-> > > On Mon, Mar 05, 2018 at 04:43:09PM +0800, Liu, Yi L wrote:
-> > >> On Fri, Mar 02, 2018 at 05:06:56PM +0100, Paolo Bonzini wrote:
-> > >>> On 01/03/2018 11:33, Liu, Yi L wrote:
-> > >>>> +    pci_device_notify_iommu(pdev, PCI_NTY_DEV_ADD);
-> > >>>> +
-> > >>>>      pci_setup_sva_ops(pdev, &vfio_pci_sva_ops);
-> > >>>>  
-> > >>>>      return;
-> > >>>> @@ -3134,6 +3136,7 @@ static void vfio_exitfn(PCIDevice *pdev)
-> > >>>>  {
-> > >>>>      VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-> > >>>>  
-> > >>>> +    pci_device_notify_iommu(pdev, PCI_NTY_DEV_DEL);
-> > >>>
-> > >>> Please make the names longer: PCI_IOMMU_NOTIFY_DEVICE_ADDED and
-> > >>> PCI_IOMMU_NOTIFY_DEVICE_REMOVED.  (This is independent of my other
-> > >>> remark, about doing this in generic PCI code for all devices that
-> > >>> register SVA ops).
-> > >>
-> > >> Thanks for the suggestion, will appply.
-> > > 
-> > > Isn't the name too generic if it's tailored for VFIO only? Would
-> > > something like PCI_IOMMU_NOTIFY_VFIO_ADD be a bit better?
-> > 
-> > I don't think it's for VFIO only.  It's just that VFIO is the only
-> > caller of pci_setup_sva_ops.
-> 
-> Indeed.  E.g., we can have emulated devices that also want to provide
-> the SVA ops.
-
-Excatly as Paolo commented. ^_^
-
-Thanks,
-Yi Liu 
+PiBGcm9tOiBQYW9sbyBCb256aW5pIFttYWlsdG86cGJvbnppbmlAcmVkaGF0LmNvbV0NCj4gU2Vu
+dDogVHVlc2RheSwgTWFyY2ggNiwgMjAxOCA3OjIyIFBNDQo+IFN1YmplY3Q6IFJlOiBbUWVtdS1k
+ZXZlbF0gW1BBVENIIHYzIDA4LzEyXSBody9wY2k6IGludHJvZHVjZQ0KPiBwY2lfZGV2aWNlX25v
+dGlmeV9pb21tdSgpDQo+IA0KPiBPbiAwNi8wMy8yMDE4IDEyOjAzLCBMaXUsIFlpIEwgd3JvdGU6
+DQo+ID4gT24gVHVlLCBNYXIgMDYsIDIwMTggYXQgMTE6MTg6NDNBTSArMDEwMCwgUGFvbG8gQm9u
+emluaSB3cm90ZToNCj4gPj4gT24gMDUvMDMvMjAxOCAwOTo0MiwgTGl1LCBZaSBMIHdyb3RlOg0K
+PiA+Pj4+IEluIGdlbmVyYWwgSSB0aGluayBpdCdzIGJldHRlciB0byBjaGFuZ2UgeW91ciBuYW1l
+cyBmcm9tICJhc3NpZ25lZF9kZXYiDQo+ID4+Pj4gdG8gInN2YV9kZXYiLCBiZWNhdXNlIHRoZSBw
+b2ludCBvZiB0aGUgbGlzdCBpcyB0byBvbmx5IGl0ZXJhdGUgb3Zlcg0KPiA+Pj4+IGRldmljZXMg
+dGhhdCBtaWdodCBiZSBpbnRlcmVzdGVkIGluIHVzaW5nIFNWQS4NCj4gPj4+DQo+ID4+PiBGb3Ig
+ImFzc2lnbmVkX2RldiIsIG15IHB1cnBvc2UgaXMgdG8gZGlzdGluZ3Vpc2ggImFzc2lnbmVkIGRl
+dmljZXMiDQo+ID4+PiBmcm9tIGVtdWxhdGVkIGRldmljZXMuIE9ubHkgdGhlIFNWQSB1c2FnZSBv
+biAiYXNzaWduZWQgZGV2aWNlcyIgaXMgY2FyZWQgaGVyZS4NCj4gPj4+IEJ1dCBpdCBpcyB0cnVl
+IG9ubHkgU1ZBIGNhcGFibGUgZGV2aWNlIGlzIGludGVyZXN0ZWQuIFNvIEkgbWF5IG5lZWQNCj4g
+Pj4+IHRvIHJlbmFtZSBpdCBhcyAiYXNzaWduZWRfc3ZhX2RldiIuIEhvdyBhYm91dCB5b3VyIG9w
+aW5pb24/DQo+ID4+DQo+ID4+IFdoYXQgeW91IGNhcmUgYWJvdXQgaXMgbm90IHdoZXRoZXIgdGhl
+IGRldmljZSBhc3NpZ25lZCwgYnV0IHJhdGhlcg0KPiA+PiB3aGV0aGVyIGl0IGNhbGxlZCBvciBu
+b3QgcGNpX3NldHVwX3N2YV9vcHMuICBDdXJyZW50bHkgb25seSBWRklPIGRvZXMNCj4gPj4gdGhp
+cywgYnV0IHRoYXQncyBub3QgYSByZXF1aXJlbWVudC4gIEhlbmNlIG15IHN1Z2dlc3Rpb24gb2Yg
+Y2FsbGluZw0KPiA+PiBpdCBzdmFfZGV2Lg0KPiA+DQo+ID4gWWVzLCBvbmx5IFZGSU8gY2FsbHMg
+cGNpX3NldHVwX3N2YV9vcHMgc28gZmFyLCBidXQgaXQgc2hvdWxkIG5vdCBsaW1pdGVkIHRvLg0K
+PiA+IEknbGwgYXBwbHkgaW4gbmV4dCB2ZXJzaW9uLg0KPiANCj4gRm9yIHdoYXQgaXQncyB3b3J0
+aCwgSSBhZ3JlZSB3aXRoIERhdmlkJ3Mgc3VnZ2VzdGlvbiBmb3IgbmFtaW5nIChzbw0KPiBwY2lf
+c2V0dXBfcGFzaWRfb3BzLCBwYXNpZF9kZXYsIGV0Yy4pDQoNClRoYW5rcywgUGFvbG8uIEkgd291
+bGQgZm9sbG93IHN1Z2dlc3Rpb25zIGZyb20geW91IHR3by4NCg0KUmVnYXJkcywNCllpIExpdQ0K
