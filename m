@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1etLZ3-0007UL-A9
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:00:10 -0500
+	(envelope-from <mjc@sifive.com>) id 1etLg2-0000fX-6P
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:07:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1etLYx-0006sQ-Jj
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:00:09 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:56244)
+	(envelope-from <mjc@sifive.com>) id 1etLg0-0001A3-Cs
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:07:22 -0500
+Received: from mail-ot0-x236.google.com ([2607:f8b0:4003:c0f::236]:45118)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1etLYx-0006sD-BK
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:00:03 -0500
-Received: by mail-wm0-x243.google.com with SMTP id q83so1262653wme.5
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 15:00:03 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1520369037-37977-1-git-send-email-mjc@sifive.com>
-	<1520369037-37977-6-git-send-email-mjc@sifive.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <cbb078ea-6339-cf49-1c7f-d61b39b14f64@amsat.org>
-Date: Tue, 6 Mar 2018 20:00:00 -0300
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1etLg0-00019Q-4w
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:07:20 -0500
+Received: by mail-ot0-x236.google.com with SMTP id f11so314522otj.12
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 15:07:19 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1520369037-37977-6-git-send-email-mjc@sifive.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 05/22] RISC-V: Remove redundant
- identity_translate from
+In-Reply-To: <1520369037-37977-1-git-send-email-mjc@sifive.com>
+References: <1520369037-37977-1-git-send-email-mjc@sifive.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Wed, 7 Mar 2018 12:07:18 +1300
+Message-ID: <CAHNT7NsqMQr9hmFN2wBo+CevLjD=X-9UTeDCoEfg_GVEvtJ1pw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 00/22] Spec conformance bug fixes and
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,112 +28,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches load_elf <patches@groups.riscv.org>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
 
-On 03/06/2018 05:43 PM, Michael Clark wrote:
-> When load_elf is called with NULL as an argument to the
-> address translate callback, it does an identity translation.
-> This commit removes the redundant identity_translate callback.
-> 
-> Signed-off-by: Michael Clark <mjc@sifive.com>
-> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+On Wed, Mar 7, 2018 at 9:43 AM, Michael Clark <mjc@sifive.com> wrote:
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> This is the series of spec conformance bug fixes and code cleanups.
+> We would like to get this series in after our core changes in v8.2.
+>
+> - Implements WARL behavior for CSRs that don't support writes
+> - Improves specification conformance of the page table walker
+>   - Change access checks from ternary operator to if statements
+>   - Checks for misaligned PPNs
+>   - Disallow M-mode or S-mode from fetching from User pages
+>   - Adds reserved PTE flag check: W or W|X
+>   - Improves page walker comments and general readability
+> - Several trivial code cleanups to hw/riscv
+>   - Replacing hard coded constants with reference to enums
+>     or the machine memory maps.
+> - Adds bounds checks when writing device-tree to ROM
+>
+> Michael Clark (22):
+>   RISC-V: Make virt create_fdt interface consistent
+>   RISC-V: Replace hardcoded constants with enum values
+>   RISC-V: Make virt board description match spike
+>   RISC-V: Use ROM base address and size from memory map
+>   RISC-V: Remove redundant identity_translate from load_elf
+>   RISC-V: Mark ROM read-only after copying in code and config
+>   RISC-V: Remove unused class definitions from machines
+>   RISC-V: Make sure the emulated rom has space for device-tree
+>   RISC-V: Include hexidecimal instruction in disassembly
+>   RISC-V: Hold rcu_read_lock when accessing memory directly
+>   RISC-V: Improve page table walker spec compliance
+>   RISC-V: Update E order and I extension order
+>   RISC-V: Make spike and virt header guards more specific
+>   RISC-V: Make virt header comment title consistent
+>   RISC-V: Use memory_region_is_ram in atomic pte update
+>   RISC-V: Remove EM_RISCV ELF_MACHINE indirection from load_elf
+>   RISC-V: Ingore satp writes and return 0 for reads when no-mmu
+>   RISC-V: Remove braces from satp case statement with no locals
+>   RISC-V: riscv-qemu port supports sv39 and sv48
+>   RISC-V: vectored traps are optional
+>   RISC-V: No traps on writes to misa,minstret[h],mcycle[h]
+>   RISC-V: Remove support for adhoc X_COP local-interrupt
+>
+>  disas/riscv.c                   | 39 +++++++++++----------
+>  hw/riscv/sifive_clint.c         |  9 ++---
+>  hw/riscv/sifive_e.c             | 34 ++----------------
+>  hw/riscv/sifive_u.c             | 65 +++++++++++-----------------------
+>  hw/riscv/spike.c                | 65 +++++++++++++---------------------
+>  hw/riscv/virt.c                 | 77 ++++++++++++++----------------
+> -----------
+>  include/hw/riscv/sifive_clint.h |  4 +++
+>  include/hw/riscv/sifive_e.h     |  9 -----
+>  include/hw/riscv/sifive_u.h     | 13 +++----
+>  include/hw/riscv/spike.h        | 16 ++++-----
+>  include/hw/riscv/virt.h         | 21 ++++-------
+>  target/riscv/cpu.c              |  2 +-
+>  target/riscv/cpu.h              |  6 ++--
+>  target/riscv/cpu_bits.h         |  3 --
+>  target/riscv/helper.c           | 63 +++++++++++++++++++++++----------
+>  target/riscv/op_helper.c        | 52 ++++++++++++++--------------
+>  16 files changed, 193 insertions(+), 285 deletions(-)
+>
 
-> ---
->  hw/riscv/sifive_e.c | 7 +------
->  hw/riscv/sifive_u.c | 7 +------
->  hw/riscv/spike.c    | 7 +------
->  hw/riscv/virt.c     | 7 +------
->  4 files changed, 4 insertions(+), 24 deletions(-)
-> 
-> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-> index 19eca36..09c9d49 100644
-> --- a/hw/riscv/sifive_e.c
-> +++ b/hw/riscv/sifive_e.c
-> @@ -82,16 +82,11 @@ static void copy_le32_to_phys(hwaddr pa, uint32_t *rom, size_t len)
->      }
->  }
->  
-> -static uint64_t identity_translate(void *opaque, uint64_t addr)
-> -{
-> -    return addr;
-> -}
-> -
->  static uint64_t load_kernel(const char *kernel_filename)
->  {
->      uint64_t kernel_entry, kernel_high;
->  
-> -    if (load_elf(kernel_filename, identity_translate, NULL,
-> +    if (load_elf(kernel_filename, NULL, NULL,
->                   &kernel_entry, NULL, &kernel_high,
->                   0, ELF_MACHINE, 1, 0) < 0) {
->          error_report("qemu: could not load kernel '%s'", kernel_filename);
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index f3f7615..6116c38 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -68,16 +68,11 @@ static void copy_le32_to_phys(hwaddr pa, uint32_t *rom, size_t len)
->      }
->  }
->  
-> -static uint64_t identity_translate(void *opaque, uint64_t addr)
-> -{
-> -    return addr;
-> -}
-> -
->  static uint64_t load_kernel(const char *kernel_filename)
->  {
->      uint64_t kernel_entry, kernel_high;
->  
-> -    if (load_elf(kernel_filename, identity_translate, NULL,
-> +    if (load_elf(kernel_filename, NULL, NULL,
->                   &kernel_entry, NULL, &kernel_high,
->                   0, ELF_MACHINE, 1, 0) < 0) {
->          error_report("qemu: could not load kernel '%s'", kernel_filename);
-> diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-> index 4c233ec..7710333 100644
-> --- a/hw/riscv/spike.c
-> +++ b/hw/riscv/spike.c
-> @@ -59,16 +59,11 @@ static void copy_le32_to_phys(hwaddr pa, uint32_t *rom, size_t len)
->      }
->  }
->  
-> -static uint64_t identity_translate(void *opaque, uint64_t addr)
-> -{
-> -    return addr;
-> -}
-> -
->  static uint64_t load_kernel(const char *kernel_filename)
->  {
->      uint64_t kernel_entry, kernel_high;
->  
-> -    if (load_elf_ram_sym(kernel_filename, identity_translate, NULL,
-> +    if (load_elf_ram_sym(kernel_filename, NULL, NULL,
->              &kernel_entry, NULL, &kernel_high, 0, ELF_MACHINE, 1, 0,
->              NULL, true, htif_symbol_callback) < 0) {
->          error_report("qemu: could not load kernel '%s'", kernel_filename);
-> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> index 0d101fc..f8c19b4 100644
-> --- a/hw/riscv/virt.c
-> +++ b/hw/riscv/virt.c
-> @@ -62,16 +62,11 @@ static void copy_le32_to_phys(hwaddr pa, uint32_t *rom, size_t len)
->      }
->  }
->  
-> -static uint64_t identity_translate(void *opaque, uint64_t addr)
-> -{
-> -    return addr;
-> -}
-> -
->  static uint64_t load_kernel(const char *kernel_filename)
->  {
->      uint64_t kernel_entry, kernel_high;
->  
-> -    if (load_elf(kernel_filename, identity_translate, NULL,
-> +    if (load_elf(kernel_filename, NULL, NULL,
->                   &kernel_entry, NULL, &kernel_high,
->                   0, ELF_MACHINE, 1, 0) < 0) {
->          error_report("qemu: could not load kernel '%s'", kernel_filename);
-> 
+BTW Apologies for the duplicate emails. I'm still getting to grips with the
+git-sendemail workflow and was using a sed script to Add Cc's which munged
+the headers as it didn't take into account Subject lines flowing to two
+lines. I guess I can just include Cc: in the commit message? and
+git-format-patch will handle it for me? or I just should how to use
+git-publish...
+
+I still have to work on Igor's requested change to CPU initializer
+declarations, and i'd also like to get the patch in that fixes fmin/fmax
+test failures using the riscv-tests testsuite by implementing IEEE-754
+minimumNumber/maximumNumber. I'll try to get a patch onto the list before
+soft-freeze. I dropped the patch which was in an earlier version of our
+port patch series due to a conflict with changes in softfloat (conversion
+of minmax from a macro to a static function iirc).
+
+Michael.
