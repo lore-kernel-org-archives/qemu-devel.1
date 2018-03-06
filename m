@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1et4Hx-0002lE-3P
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:33:22 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1et4Nf-0004LQ-5P
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:39:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1et4Ht-0000HL-Vw
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:33:21 -0500
-Received: from smtp65.cstnet.cn ([159.226.251.65]:37384 helo=cstnet.cn)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1et4Ht-0000Ga-BY
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:33:17 -0500
-Date: Tue, 6 Mar 2018 12:33:11 +0800 (GMT+08:00)
-From: "Su Hang" <suhang16@mails.ucas.ac.cn>
-In-Reply-To: <20180302112911.GE6026@stefanha-x1.localdomain>
-References: <1519788689-11967-1-git-send-email-suhang16@mails.ucas.ac.cn>
-	<20180302112911.GE6026@stefanha-x1.localdomain>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	(envelope-from <dgibson@ozlabs.org>) id 1et4Nc-0002eg-1K
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:39:15 -0500
+Date: Tue, 6 Mar 2018 15:06:17 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180306040617.GV2650@umbus.fritz.box>
+References: <20180305211928.466-1-f4bug@amsat.org>
+	<20180305211928.466-13-f4bug@amsat.org>
 MIME-Version: 1.0
-Message-ID: <2feee67f.29662.161f995af1c.Coremail.suhang16@mails.ucas.ac.cn>
-Subject: Re: [Qemu-devel] [PATCH v3] scripts/checkpatch.pl: add check for
- `while` and `for`
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="uFO8jlCBh1yRPqfb"
+Content-Disposition: inline
+In-Reply-To: <20180305211928.466-13-f4bug@amsat.org>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 12/22] hw/isa/superio: Add a
+ keyboard/mouse controller (8042)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +25,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: thuth@redhat.com, qemu-devel@nongnu.org
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Marcel Apfelbaum <marcel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alexey Kardashevskiy <aik@ozlabs.ru>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Alexander Graf <agraf@suse.de>, "open list:PReP" <qemu-ppc@nongnu.org>
 
-QXMgdG9vIG1hbnkgZW1haWxzIG92ZXJ3aGVsbWVkIG15IGVtYWlsIGJveCwgSSBhbSB2ZXJ5IHNv
-cnJ5IGZvciBub3Qgc2VlaW5nIHlvdXIgcmVwbHkgdW50aWwgdGhpcyBtb3JuaW5nLgoKSSB3aWxs
-IGZpeCB3cm9uZyB1c2luZyBvZiBnaXQgcmlnaHQgbm93IQoKIlN0ZWZhbiBIYWpub2N6aSIgPHN0
-ZWZhbmhhQHJlZGhhdC5jb20+d3JvdGU6Cj4gT24gV2VkLCBGZWIgMjgsIDIwMTggYXQgMTE6MzE6
-MjlBTSArMDgwMCwgU3UgSGFuZyB3cm90ZToNCj4gPiBBZGRpbmcgY2hlY2sgZm9yIGB3aGlsZWAg
-YW5kIGBmb3JgIHN0YXRlbWVudHMsIHdoaWNoIGNvbmRpdGlvbiBoYXMgbW9yZSB0aGFuDQo+ID4g
-b25lIGxpbmUuDQo+ID4gDQo+ID4gVGhlIGZvcm1lciBjaGVja3BhdGNoLnBsIGNhbiBjaGVjayBg
-aWZgIHN0YXRlbWVudCwgd2hpY2ggY29uZGl0aW9uIGhhcyBtb3JlDQo+ID4gdGhhbiBvbmUgbGlu
-ZSwgd2hldGhlciBibG9jayBtaXNzZXMgYnJhY2Ugcm91bmQsIGxpa2UgdGhpczoNCj4gPiAnJycN
-Cj4gPiBpZiAoY29uZDEgfHwNCj4gPiAgICAgY29uZDIpDQo+ID4gICAgIHN0YXRlbWVudDsNCj4g
-PiAnJycNCj4gPiBCdXQgaXQgZG9lc24ndCBkbyB0aGUgc2FtZSBjaGVjayBmb3IgYGZvcmAgYW5k
-IGB3aGlsZWAgc3RhdGVtZW50cy4NCj4gPiANCj4gPiBVc2luZyBgKD86Li4uKWAgaW5zdGVhZCBv
-ZiBgKC4uLilgIGluIHJlZ2V4IHBhdHRlcm4gY2F0Y2guDQo+ID4gQmVjYXVzZSBgKD86Li4uKWAg
-aXMgZmFzdGVyIGFuZCBhdm9pZHMgdW53YW50ZWQgc2lkZS1lZmZlY3QuDQo+IA0KPiBUaGlzIHBh
-dGNoIGRvZXNuJ3QgYXBwbHkgdG8gcWVtdS5naXQvbWFzdGVyIGJlY2F1c2UgaXQncyBiYXNlZCBv
-biB5b3VyDQo+IHYyIHBhdGNoLg0KPiANCj4gUGxlYXNlIHNlbmQgYSBzaW5nbGUgdjQgcGF0Y2gg
-dGhhdCBjb21iaW5lcyB2MiBhbmQgdjMgY2hhbmdlcyBhbmQgY2FuIGJlDQo+IGFwcGxpZWQgdG8g
-cWVtdS5naXQvbWFzdGVyLg0KPiANCj4gWW91IGNhbiB1c2UgImdpdCByZWJhc2UgLWkgb3JpZ2lu
-L21hc3RlciIgdG8gY29tYmluZSBjaGFuZ2VzIGFuZCBwdXQNCj4gdGhlbSBvbnRvIHRoZSBsYXRl
-c3Qgb3JpZ2luL21hc3Rlci4gIFNlZSB0aGUgImZpeHVwIiBhbmQgInNxdWFzaCINCj4gY29tbWFu
-ZHMgaW4gZ2l0LXJlYmFzZSgxKSdzIGludGVyYWN0aXZlIG1vZGUgZm9yIGNvbWJpbmluZyBwYXRj
-aGVzLg0KPiANCj4gVGhhbmtzIQ0KPiANCj4gPiBTdWdnZXN0ZWQtYnk6IFN0ZWZhbiBIYWpub2N6
-aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4NCj4gPiBTdWdnZXN0ZWQtYnk6IEVyaWMgQmxha2UgPGVi
-bGFrZUByZWRoYXQuY29tPg0KPiA+IFN1Z2dlc3RlZC1ieTogVGhvbWFzIEh1dGggPHRodXRoQHJl
-ZGhhdC5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogU3UgSGFuZyA8c3VoYW5nMTZAbWFpbHMudWNh
-cy5hYy5jbj4NCj4gPiAtLS0NCj4gPiAgc2NyaXB0cy9jaGVja3BhdGNoLnBsIHwgNiArKystLS0N
-Cj4gPiAgMSBmaWxlIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkNCj4g
-PiANCj4gPiBkaWZmIC0tZ2l0IGEvc2NyaXB0cy9jaGVja3BhdGNoLnBsIGIvc2NyaXB0cy9jaGVj
-a3BhdGNoLnBsDQo+ID4gaW5kZXggMTBjMTM4MzQ0ZmE5Li5iZWQxZGJiZDU0ZDEgMTAwNzU1DQo+
-ID4gLS0tIGEvc2NyaXB0cy9jaGVja3BhdGNoLnBsDQo+ID4gKysrIGIvc2NyaXB0cy9jaGVja3Bh
-dGNoLnBsDQo+ID4gQEAgLTIzNTIsOSArMjM1Miw5IEBAIHN1YiBwcm9jZXNzIHsNCj4gPiAgCQkJ
-fQ0KPiA+ICAJCX0NCj4gPiAgDQo+ID4gLSMgY2hlY2sgZm9yIG1pc3NpbmcgYnJhY2luZyByb3Vu
-ZCBpZiBldGMNCj4gPiAtCQlpZiAoJGxpbmUgPX4gLyheLiopXGIoZm9yfHdoaWxlfGlmKVxiLyAm
-Jg0KPiA+IC0JCQkkbGluZSAhfiAvXCNccyooZm9yfHdoaWxlfGlmKS8pIHsNCj4gPiArIyBjaGVj
-ayBmb3IgbWlzc2luZyBicmFjaW5nIGFyb3VuZCBpZiBldGMNCj4gPiArCQlpZiAoJGxpbmUgPX4g
-LyheLiopXGIoPzpmb3J8d2hpbGV8aWYpXGIvICYmDQo+ID4gKwkJCSRsaW5lICF+IC9cI1xzKig/
-OmZvcnx3aGlsZXxpZikvKSB7DQo+ID4gIAkJCW15ICgkbGV2ZWwsICRlbmRsbiwgQGNodW5rcykg
-PQ0KPiA+ICAJCQkJY3R4X3N0YXRlbWVudF9mdWxsKCRsaW5lbnIsICRyZWFsY250LCAxKTsNCj4g
-PiAgICAgICAgICAgICAgICAgICAgICAgICAgaWYgKCRkYmdfYWR2X2Fwdykgew0KPiA+IC0tIA0K
-PiA+IDIuNy40DQo+ID4gDQo=
+
+--uFO8jlCBh1yRPqfb
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Mar 05, 2018 at 06:19:18PM -0300, Philippe Mathieu-Daud=E9 wrote:
+> Since the PC87312 inherits this abstract model, we remove the I8042
+> instance in the PREP machine.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+>  include/hw/isa/superio.h | 1 +
+>  hw/isa/isa-superio.c     | 3 +++
+>  hw/ppc/prep.c            | 1 -
+>  3 files changed, 4 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/include/hw/isa/superio.h b/include/hw/isa/superio.h
+> index e8007b9eee..2fc33bf3d3 100644
+> --- a/include/hw/isa/superio.h
+> +++ b/include/hw/isa/superio.h
+> @@ -30,6 +30,7 @@ typedef struct ISASuperIODevice {
+>      ISADevice *parallel[MAX_PARALLEL_PORTS];
+>      ISADevice *serial[MAX_SERIAL_PORTS];
+>      ISADevice *floppy;
+> +    ISADevice *kbc;
+>  } ISASuperIODevice;
+> =20
+>  typedef struct ISASuperIOFuncs {
+> diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
+> index 22bf79d3c3..6a24ac0259 100644
+> --- a/hw/isa/isa-superio.c
+> +++ b/hw/isa/isa-superio.c
+> @@ -17,6 +17,7 @@
+>  #include "sysemu/blockdev.h"
+>  #include "chardev/char.h"
+>  #include "hw/isa/superio.h"
+> +#include "hw/input/i8042.h"
+>  #include "hw/char/serial.h"
+>  #include "trace.h"
+> =20
+> @@ -139,6 +140,8 @@ static void isa_superio_realize(DeviceState *dev, Err=
+or **errp)
+>                                      k->floppy.get_irq(sio, 0) : -1);
+>      }
+> =20
+> +    /* Keyboard, mouse */
+> +    sio->kbc =3D isa_create_simple(bus, TYPE_I8042);
+>  }
+> =20
+>  static void isa_superio_class_init(ObjectClass *oc, void *data)
+> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+> index 610ec7ec32..96d319b87c 100644
+> --- a/hw/ppc/prep.c
+> +++ b/hw/ppc/prep.c
+> @@ -642,7 +642,6 @@ static void ppc_prep_init(MachineState *machine)
+>                       hd[2 * i],
+>  		     hd[2 * i + 1]);
+>      }
+> -    isa_create_simple(isa_bus, TYPE_I8042);
+> =20
+>      cpu =3D POWERPC_CPU(first_cpu);
+>      sysctrl->reset_irq =3D cpu->env.irq_inputs[PPC6xx_INPUT_HRESET];
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--uFO8jlCBh1yRPqfb
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqeE7kACgkQbDjKyiDZ
+s5KmnRAAwCGMnjfc8/bxKjkhu8nKsM3ijmYgZxy76o55jgxIQOkO74+0R5qoxNRG
+qA+Zn35fpfKcQcDWve4BGqLDa+BLQool96II4JRdTIWgF2ZTB9hjgxZkwqG6tMX3
+ZUkdIVXD+JvyDnbJLTSCyPXoTr3U6SzlwAY2v2v4ifH9ik/9AZBKqo1dzQsU7zn7
+z6FUD+x3IDd9MTIuTdMknllDKVWsJS8Xva2tN7mIiCA9KwfU0MBxHAPlJez4Kj8b
+yySw/1OIxQei49qgCs9K6uOcqu5i3H7bEiXKOhnlJFSoPmBmjCJvYyPmuI5nS9lH
+HtsOMVRSFyk3crDGlI5usBZ3MJW3+7QvqgYz4jTFH10v3s3+C6lUb7feYn6gqb1d
+iExMWlQQ2zzE9UohFOyMxb0Ig4CS+EVnOFf4QXm2UAG2sp6gNnDZ+lo9AkW0uKeV
+zWcZf72DjMh36g8ZsiGpsyHX0fajC5ACf+3Y44YQZ6NHfBpg1zkQ12fEijyS5mgw
+YJnVCUQyepsu+DiVhnmX66qBTm5/4T0pfLJAvfwXy2vhvP4a81SqdZ6o9QCAMa6n
+Kfa7IcCPaMgkC3vj3oXCqYq7lthYxYlrQ7pZNpqMOHsuKTdQRsurexVfwqBTLnwC
+aZSIxqrn2+iAdW7q679RVNHBRj3XLSy7VGstXutGIp447Db3Nrc=
+=31I2
+-----END PGP SIGNATURE-----
+
+--uFO8jlCBh1yRPqfb--
