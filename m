@@ -1,18 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1etCt8-00033V-05
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:44:19 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1etCwD-0005nn-1V
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:47:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1etCt4-0007ah-RK
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:44:18 -0500
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Tue,  6 Mar 2018 13:44:02 +0000
-Message-Id: <20180306134402.997-1-berrange@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1etCwC-0001e3-5G
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:47:29 -0500
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:41804)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1etCwB-0001dV-W3
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:47:28 -0500
+Received: by mail-oi0-x241.google.com with SMTP id g5so14837980oiy.8
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 05:47:27 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20180306134317.836-1-berrange@redhat.com>
+References: <20180306134317.836-1-berrange@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 6 Mar 2018 13:47:06 +0000
+Message-ID: <CAFEAcA84nJvwBZhrkZdoHjLerD7_ixfXf8HqiXE9aZnvGe=+WQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] misc,
- ide: remove use of HWADDR_PRIx in trace events
+Subject: Re: [Qemu-devel] [PATCH v2] misc: don't use hwaddr as a type in
+ trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,72 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-The trace events all use a uint64_t data type, so should be using the
-corresponding PRIx64 format, not HWADDR_PRIx which is intended for use
-with the 'hwaddr' type.
+On 6 March 2018 at 13:43, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wro=
+te:
+> Use types that are defined by QEMU in trace events caused build failures
+> for the UST trace backend:
+>
+>   In file included from trace-ust-all.c:13:0:
+>   trace-ust-all.h:11844:206: error: unknown type name =E2=80=98hwaddr=E2=
+=80=99
+>
+> It only knows about C built-in types, and any types that are pulled in
+> from includs of qemu-common.h and lttng/tracepoint.h. This does not
+> include the 'hwaddr' type, so replace it with a uint64_t which is what
+> exec/hwaddr.h defines 'hwaddr' as. This fixes the build failure
+> introduced by
+>
+>   commit 9eb8040c2d2b38e1a40bb6129b1b668fa178fcab
+>   Author: Peter Maydell <peter.maydell@linaro.org>
+>   Date:   Fri Mar 2 10:45:39 2018 +0000
+>
+>     hw/misc/tz-ppc: Model TrustZone peripheral protection controller
+>
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- hw/ide/trace-events  | 4 ++--
- hw/misc/trace-events | 8 ++++----
- 2 files changed, 6 insertions(+), 6 deletions(-)
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-diff --git a/hw/ide/trace-events b/hw/ide/trace-events
-index 0c39cabe72..5c0e59ec42 100644
---- a/hw/ide/trace-events
-+++ b/hw/ide/trace-events
-@@ -108,8 +108,8 @@ ahci_dma_prepare_buf_fail(void *s, int port) "ahci(%p=
-)[%d]: sglist population fa
- ahci_dma_rw_buf(void *s, int port, int l) "ahci(%p)[%d] len=3D0x%x"
- ahci_cmd_done(void *s, int port) "ahci(%p)[%d]: cmd done"
- ahci_reset(void *s) "ahci(%p): HBA reset"
--allwinner_ahci_mem_read(void *s, void *a, uint64_t addr, uint64_t val, u=
-nsigned size) "ahci(%p): read a=3D%p addr=3D0x%"HWADDR_PRIx" val=3D0x%"PR=
-Ix64", size=3D%d"
--allwinner_ahci_mem_write(void *s, void *a, uint64_t addr, uint64_t val, =
-unsigned size) "ahci(%p): write a=3D%p addr=3D0x%"HWADDR_PRIx" val=3D0x%"=
-PRIx64", size=3D%d"
-+allwinner_ahci_mem_read(void *s, void *a, uint64_t addr, uint64_t val, u=
-nsigned size) "ahci(%p): read a=3D%p addr=3D0x%"PRIx64" val=3D0x%"PRIx64"=
-, size=3D%d"
-+allwinner_ahci_mem_write(void *s, void *a, uint64_t addr, uint64_t val, =
-unsigned size) "ahci(%p): write a=3D%p addr=3D0x%"PRIx64" val=3D0x%"PRIx6=
-4", size=3D%d"
-=20
- # Warning: Verbose
- handle_reg_h2d_fis_dump(void *s, int port, const char *fis) "ahci(%p)[%d=
-]: %s"
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index 562d9ed005..ec5a9f0da1 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -69,13 +69,13 @@ mps2_fpgaio_reset(void) "MPS2 FPGAIO: reset"
- mps2_fpgaio_leds(char led1, char led0) "MPS2 FPGAIO LEDs: %c%c"
-=20
- # hw/misc/msf2-sysreg.c
--msf2_sysreg_write(uint64_t offset, uint32_t val, uint32_t prev) "msf2-sy=
-sreg write: addr 0x%08" HWADDR_PRIx " data 0x%" PRIx32 " prev 0x%" PRIx32
--msf2_sysreg_read(uint64_t offset, uint32_t val) "msf2-sysreg read: addr =
-0x%08" HWADDR_PRIx " data 0x%08" PRIx32
-+msf2_sysreg_write(uint64_t offset, uint32_t val, uint32_t prev) "msf2-sy=
-sreg write: addr 0x%08" PRIx64 " data 0x%" PRIx32 " prev 0x%" PRIx32
-+msf2_sysreg_read(uint64_t offset, uint32_t val) "msf2-sysreg read: addr =
-0x%08" PRIx64 " data 0x%08" PRIx32
- msf2_sysreg_write_pll_status(void) "Invalid write to read only PLL statu=
-s register"
-=20
- #hw/misc/imx7_gpr.c
--imx7_gpr_read(uint64_t offset) "addr 0x%08" HWADDR_PRIx
--imx7_gpr_write(uint64_t offset, uint64_t value) "addr 0x%08" HWADDR_PRIx=
- "value 0x%08" HWADDR_PRIx
-+imx7_gpr_read(uint64_t offset) "addr 0x%08" PRIx64
-+imx7_gpr_write(uint64_t offset, uint64_t value) "addr 0x%08" PRIx64 "val=
-ue 0x%08" PRIx64
-=20
- # hw/misc/mos6522.c
- mos6522_set_counter(int index, unsigned int val) "T%d.counter=3D%d"
---=20
-2.14.3
+I'll apply this to master, since it will fix the travis build.
+
+thanks
+-- PMM
