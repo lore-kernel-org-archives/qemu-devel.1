@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1etLiR-0002Mb-KM
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:09:52 -0500
+	(envelope-from <bounces@canonical.com>) id 1etLjN-0003E3-Nv
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:10:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1etLiM-0002rK-TK
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:09:51 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:37379)
+	(envelope-from <bounces@canonical.com>) id 1etLjI-0003Lo-OV
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:10:49 -0500
+Received: from indium.canonical.com ([91.189.90.7]:43912)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1etLiM-0002ql-MB
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:09:46 -0500
-Received: by mail-wr0-x241.google.com with SMTP id z12so303149wrg.4
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 15:09:46 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1520369037-37977-1-git-send-email-mjc@sifive.com>
-	<1520369037-37977-19-git-send-email-mjc@sifive.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e7719b4b-ce44-695d-1a8b-21ea4d0a1b9b@amsat.org>
-Date: Tue, 6 Mar 2018 20:09:43 -0300
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1etLjI-0003LS-HU
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:10:44 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1etLjH-00008H-IB
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 23:10:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8025B2E80C0
+	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 23:10:43 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1520369037-37977-19-git-send-email-mjc@sifive.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 18/22] RISC-V: Remove braces from satp
- case statement with
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 06 Mar 2018 23:05:09 -0000
+From: Guenter Roeck <public@roeck-us.net>
+Reply-To: Bug 1753309 <1753309@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152019341691.7537.9997390122339723494.malonedeb@gac.canonical.com>
+Message-Id: <152037750913.7728.5349945021016807601.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1753309] Re: Ethernet interrupt vectors for
+ sabrelite machine are defined backwards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,38 +37,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches no locals <patches@groups.riscv.org>
+To: qemu-devel@nongnu.org
 
-On 03/06/2018 05:43 PM, Michael Clark wrote:
-> Signed-off-by: Michael Clark <mjc@sifive.com>
-> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+#3: Correct, Linux version 4.14 and older registers two interrupt lines,
+both the correct and the wrong one. With qemu version, the kernel
+receives interrupts on irq 151, with the other on 150. So, yes, I guess
+it works by accident. My question is what to do with older (pre-4.14)
+kernels. Presumably those worked (?) with real hardware, so I am a bit
+concerned about the impact of applying 4c8777892e80b to those kernels.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+-- =
 
-> ---
->  target/riscv/op_helper.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-> index dd3e417..f79716a 100644
-> --- a/target/riscv/op_helper.c
-> +++ b/target/riscv/op_helper.c
-> @@ -240,7 +240,7 @@ void csr_write_helper(CPURISCVState *env, target_ulong val_to_write,
->          csr_write_helper(env, next_mie, CSR_MIE);
->          break;
->      }
-> -    case CSR_SATP: /* CSR_SPTBR */ {
-> +    case CSR_SATP: /* CSR_SPTBR */
->          if (!riscv_feature(env, RISCV_FEATURE_MMU)) {
->              break;
->          }
-> @@ -258,7 +258,6 @@ void csr_write_helper(CPURISCVState *env, target_ulong val_to_write,
->              env->satp = val_to_write;
->          }
->          break;
-> -    }
->      case CSR_SEPC:
->          env->sepc = val_to_write;
->          break;
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1753309
+
+Title:
+  Ethernet interrupt vectors for sabrelite machine are defined backwards
+
+Status in QEMU:
+  New
+
+Bug description:
+  The sabrelite machine model used by qemu-system-arm is based on the
+  Freescale/NXP i.MX6Q processor. This SoC has an on-board ethernet
+  controller which is supported in QEMU using the imx_fec.c module
+  (actually called imx.enet for this model.)
+
+  The include/hw/arm/fsm-imx6.h file defines the interrupt vectors for
+  the imx.enet device like this:
+
+  #define FSL_IMX6_ENET_MAC_1588_IRQ 118
+  #define FSL_IMX6_ENET_MAC_IRQ 119
+
+  However, this is backwards. The reference manual for the i.MX6D/Q
+  devices can be found here:
+
+  https://www.nxp.com/docs/en/reference-manual/IMX6DQRM.pdf
+
+  On page 225, in Table 3-1. ARM Cortex A9 domain interrupt summary, it
+  shows the following:
+
+  150 ENET
+  MAC 0 IRQ, Logical OR of:
+  MAC 0 Periodic Timer Overflow
+  MAC 0 Time Stamp Available
+  MAC 0 Time Stamp Available
+  MAC 0 Time Stamp Available
+  MAC 0 Payload Receive Error
+  MAC 0 Transmit FIFO Underrun
+  MAC 0 Collision Retry Limit
+  MAC 0 Late Collision
+  MAC 0 Ethernet Bus Error
+  MAC 0 MII Data Transfer Done
+  MAC 0 Receive Buffer Done
+  MAC 0 Receive Frame Done
+  MAC 0 Transmit Buffer Done
+  MAC 0 Transmit Frame Done
+  MAC 0 Graceful Stop
+  MAC 0 Babbling Transmit Error
+  MAC 0 Babbling Receive Error
+  MAC 0 Wakeup Request [synchronous]
+
+  151 ENET
+  MAC 0 1588 Timer interrupt [synchronous] request
+
+  Note:
+  150 - 32 =3D=3D 118
+  151 - 32 =3D=3D 119
+
+  In other words, the vector definitions in the fsl-imx6.h file are
+  reversed. The correct definition is:
+
+  #define FSL_IMX6_ENET_MAC_IRQ 118
+  #define FSL_IMX6_ENET_MAC_1588_IRQ 119
+
+  I tested the sabrelite simulation using VxWorks 7 (which supports the
+  SabreLite board) and found that while I was able to send and receive
+  packet data via the simulated ethernet interface, the VxWorks i.MX6
+  ethernet driver failed to receive any interrupts. When I corrected the
+  interrupt vector definitions as shown above and recompiled QEMU,
+  everything worked as expected. I was able to exchange ICMP packets
+  with the simulated target and telnet to/from the VxWorks instance
+  running in the virtual machine. I used the tap interface for this.
+
+  As a workaround I was also able to make the ethernet work by modifying
+  the VxWorks imx6q-sabrelite.dts file to change the ethernet interrupt
+  property from 150 to 151.
+
+  This problem was observed with the following environment:
+
+  Host: FreeBSD/amd64 11.1-RELEASE
+  QEMU version: 2.11.0 and 2.11.1 built from source code
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1753309/+subscriptions
