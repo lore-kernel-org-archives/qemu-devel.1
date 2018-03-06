@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1et8Qx-0005AX-Oy
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 03:58:57 -0500
+	(envelope-from <thuth@redhat.com>) id 1et8TK-0006Sp-BJ
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:01:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1et8Qu-00048K-Jz
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 03:58:55 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38988 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1et8TE-0004yZ-Rp
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:01:22 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55640 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1et8Qu-00048B-Ec
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 03:58:52 -0500
-Date: Tue, 6 Mar 2018 09:58:34 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180306095834.187ce0bc@redhat.com>
-In-Reply-To: <CAHNT7NtLiVnRrm35o=-47hBr6CMTOatPEfpJ5jFx5HLTPBY2NA@mail.gmail.com>
-References: <1519998711-73430-1-git-send-email-mjc@sifive.com>
-	<1519998711-73430-4-git-send-email-mjc@sifive.com>
-	<20180305104447.41953c9e@redhat.com>
-	<CAHNT7NtLiVnRrm35o=-47hBr6CMTOatPEfpJ5jFx5HLTPBY2NA@mail.gmail.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1et8TE-0004yH-Nw
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:01:16 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4965D4023150
+	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 09:01:16 +0000 (UTC)
+References: <1520267868-31778-1-git-send-email-thuth@redhat.com>
+	<710eb2ec-8585-900f-6829-67765c188252@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6a10a395-1a5f-060e-9e17-e77250c333b2@redhat.com>
+Date: Tue, 6 Mar 2018 10:01:11 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 03/23] RISC-V CPU Core Definition
+In-Reply-To: <710eb2ec-8585-900f-6829-67765c188252@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4] qapi: Add device ID and head parameters
+ to screendump
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,153 +35,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Jiri Denemark <jdenemar@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Tue, 6 Mar 2018 11:24:02 +1300
-Michael Clark <mjc@sifive.com> wrote:
+On 05.03.2018 17:50, Eric Blake wrote:
+> On 03/05/2018 10:37 AM, Thomas Huth wrote:
+>> QEMU's screendump command can only take dumps from the primary display=
+.
+>> When using multiple VGA cards, there is no way to get a dump from a
+>> secondary card or other display heads yet. So let's add an 'device' an=
+d
+>=20
+> s/an/a/
 
-> On Mon, Mar 5, 2018 at 10:44 PM, Igor Mammedov <imammedo@redhat.com> wrote:
-> 
-> > On Sat,  3 Mar 2018 02:51:31 +1300
-> > Michael Clark <mjc@sifive.com> wrote:
-> >  
-> > > Add CPU state header, CPU definitions and initialization routines
-> > >
-> > > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> > > Signed-off-by: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> > > Signed-off-by: Michael Clark <mjc@sifive.com>
-> > > ---
-> > >  target/riscv/cpu.c      | 432 ++++++++++++++++++++++++++++++  
-> > ++++++++++++++++++  
-> > >  target/riscv/cpu.h      | 296 +++++++++++++++++++++++++++++++++
-> > >  target/riscv/cpu_bits.h | 411 ++++++++++++++++++++++++++++++  
-> > +++++++++++++++  
-> > >  3 files changed, 1139 insertions(+)
-> > >  create mode 100644 target/riscv/cpu.c
-> > >  create mode 100644 target/riscv/cpu.h
-> > >  create mode 100644 target/riscv/cpu_bits.h
-> > >
-> > > diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-> > > new file mode 100644
-> > > index 0000000..4851890
-> > > --- /dev/null
-> > > +++ b/target/riscv/cpu.c  
-> > [...]
-> >  
-> > > +
-> > > +typedef struct RISCVCPUInfo {
-> > > +    const int bit_widths;
-> > > +    const char *name;
-> > > +    void (*initfn)(Object *obj);
-> > > +} RISCVCPUInfo;
-> > > +  
-> > [...]
-> >  
-> > > +static const RISCVCPUInfo riscv_cpus[] = {
-> > > +    { 96, TYPE_RISCV_CPU_ANY,              riscv_any_cpu_init },
-> > > +    { 32, TYPE_RISCV_CPU_RV32GCSU_V1_09_1,  
-> > rv32gcsu_priv1_09_1_cpu_init },  
-> > > +    { 32, TYPE_RISCV_CPU_RV32GCSU_V1_10_0,  
-> > rv32gcsu_priv1_10_0_cpu_init },  
-> > > +    { 32, TYPE_RISCV_CPU_RV32IMACU_NOMMU,  rv32imacu_nommu_cpu_init },
-> > > +    { 32, TYPE_RISCV_CPU_SIFIVE_E31,       rv32imacu_nommu_cpu_init },
-> > > +    { 32, TYPE_RISCV_CPU_SIFIVE_U34,       rv32gcsu_priv1_10_0_cpu_init  
-> > },  
-> > > +    { 64, TYPE_RISCV_CPU_RV64GCSU_V1_09_1,  
-> > rv64gcsu_priv1_09_1_cpu_init },  
-> > > +    { 64, TYPE_RISCV_CPU_RV64GCSU_V1_10_0,  
-> > rv64gcsu_priv1_10_0_cpu_init },  
-> > > +    { 64, TYPE_RISCV_CPU_RV64IMACU_NOMMU,  rv64imacu_nommu_cpu_init },
-> > > +    { 64, TYPE_RISCV_CPU_SIFIVE_E51,       rv64imacu_nommu_cpu_init },
-> > > +    { 64, TYPE_RISCV_CPU_SIFIVE_U54,       rv64gcsu_priv1_10_0_cpu_init  
-> > },  
-> > > +    { 0, NULL, NULL }
-> > > +};
-> > > +  
-> > [...]
-> >  
-> > > +static void cpu_register(const RISCVCPUInfo *info)
-> > > +{
-> > > +    TypeInfo type_info = {
-> > > +        .name = info->name,
-> > > +        .parent = TYPE_RISCV_CPU,
-> > > +        .instance_size = sizeof(RISCVCPU),
-> > > +        .instance_init = info->initfn,
-> > > +    };
-> > > +
-> > > +    type_register(&type_info);
-> > > +}  
-> > [...]
-> >  
-> > > +void riscv_cpu_list(FILE *f, fprintf_function cpu_fprintf)
-> > > +{
-> > > +    const RISCVCPUInfo *info = riscv_cpus;
-> > > +
-> > > +    while (info->name) {
-> > > +        if (info->bit_widths & TARGET_LONG_BITS) {
-> > > +            (*cpu_fprintf)(f, "%s\n", info->name);
-> > > +        }
-> > > +        info++;
-> > > +    }
-> > > +}
-> > > +
-> > > +static void riscv_cpu_register_types(void)
-> > > +{
-> > > +    const RISCVCPUInfo *info = riscv_cpus;
-> > > +
-> > > +    type_register_static(&riscv_cpu_type_info);
-> > > +
-> > > +    while (info->name) {
-> > > +        if (info->bit_widths & TARGET_LONG_BITS) {
-> > > +            cpu_register(info);
-> > > +        }
-> > > +        info++;
-> > > +    }
-> > > +}
-> > > +
-> > > +type_init(riscv_cpu_register_types)  
-> > This still isn't fixed as requested
-> >  http://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06412.html  
-> 
-> 
-> It's possibly because I explicitly requested a clarification. Pointing at a
-> commit and being asked to infer what the desired change is, is not what I
-> would call reasonable feedback. The code has already been reviewed.
-Well, it's been pointed since v4 (it's not like change has been asked for
-at the last moment) and no one asked for clarification.
+Gerd, could you please fix that up when picking up the patch? Thanks!
 
+>> a 'head' parameter to the HMP and QMP commands to be able to specify
+>> alternative devices and heads with the screendump command, too.
+>>
+>> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>> Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> We have
-> just expanded on it in a manner consistent with how the ARM port handled
-> cpu initialization.
-> I'm happy to comply if you give me detailed instructions on what is wrong,
-> why, and how to fix it versus infer your problem from this commit to
-> another architecture.
-> 
-> Apologies if i'm a bit slow, but I really don't understand the change you
-> intend us to make.
-There is nothing wrong and it's totally ok to use existing code to
-start with writing new patches. The only thing is that it's moving
-codebase and new patches shouldn't interfere with ongoing work done
-by others. Hence sometimes you see comments requesting to use
-a particular approach to do something that could be done in
-various ways.
+Thanks for the reviews!
 
-In this specific case used reference code (ARM) still uses old way
-register CPU types that is phased out in favor of DEFINE_TYPES.
-
-There is nothing that warrants usage of custom 'struct RISCVCPUInfo'
-and riscv_cpu_register_types().
-You should use pretty trivial approach used in 974e58d2, namely:
-
- 1   rewrite riscv_cpu_list() to use object_class_get_list()
-     instead of 'struct RISCVCPUInfo', example sh4_cpu_list()
- 2.1 drop 'struct RISCVCPUInfo' and use TypeInfo array instead
-     superh_cpu_type_infos[] and DEFINE_SUPERH_CPU_TYPE() could serve as example
- 2.2 replace riscv_cpu_register_types/type_init with DEFINE_TYPES()
-
-That way your code will be consistent with direction this part
-moves towards and when others work on generalizing CPU related parts
-they won't have to deal with one more instance of old style cpu
-types init and listing.
+ Thomas
