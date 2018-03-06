@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1et9mN-0001wX-Im
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 05:25:11 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1et9nx-0002wn-Bc
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 05:26:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1et9mK-000242-FJ
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 05:25:07 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <3c829c67-f6b9-ad7e-ba1d-a0f7d25623bd@redhat.com>
-References: <20180302112050.26670-1-berto@igalia.com>
-	<3c829c67-f6b9-ad7e-ba1d-a0f7d25623bd@redhat.com>
-Date: Tue, 06 Mar 2018 11:25:02 +0100
-Message-ID: <w514lltmrgh.fsf@maestria.local.igalia.com>
+	(envelope-from <pbonzini@redhat.com>) id 1et9nu-0002qx-9B
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 05:26:45 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52160 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1et9nu-0002qb-5J
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 05:26:42 -0500
+References: <1519900415-30314-1-git-send-email-yi.l.liu@linux.intel.com>
+	<1519900415-30314-12-git-send-email-yi.l.liu@linux.intel.com>
+	<a899b75f-5a0b-2a0f-f995-5a3c21eeab8c@redhat.com>
+	<20180305091119.GH2482@sky-dev>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <afb9cbb9-3b05-7677-5707-6deb540daf26@redhat.com>
+Date: Tue, 6 Mar 2018 11:26:30 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3] iotests: Tweak 030 in order to trigger
- a race condition with parallel jobs
+In-Reply-To: <20180305091119.GH2482@sky-dev>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 11/12] intel_iommu: add framework for
+ PASID AddressSpace management
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,20 +31,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, david@gibson.dropbear.id.au, kevin.tian@intel.com, yi.l.liu@intel.com, jasowang@redhat.com, peterx@redhat.com, alex.williamson@redhat.com, eric.auger.pro@gmail.com
 
-On Mon 05 Mar 2018 05:59:47 PM CET, Max Reitz wrote:
-> Secondly, I've reverted 3d5d319e1221082 to test this, and I could
-> reproduce failure exactly once.  Since then, no luck (in like 20
-> attempts, I think)...
+On 05/03/2018 10:11, Liu, Yi L wrote:
+>> Do you really need VTDDeviceNode?  I think can you simply put the
+>> QLIST_ENTRY in VTDAddressSpace (named e.g. next_by_pasid), since
+>> VTDAddressSpace already includes a (bus, devfn).
+> Existing VTDAddressSpace is actaully per-device. While for PASID tagged
+> address space, it is possible to have multiple devices tied to a single
+> PASID tagged address space.
 
-Oh, I see. I was bisecting this and it seems that 1a63a907507fbbcf made
-this problem more difficult to reproduce. If you revert that one too (in
-addition to 3d5d319e1221082, that is) then it crashes very easily.
+Yes, that's the purpose of VTDPASIDAddressSpace.
 
-I don't think it makes sense to tweak the test ever further, I would
-simply mention that "this triggers the bug that was fixed by 3d5d319e122
-and 1a63a907507fbbcf" or something like that.
+> Reuse VTDAddressSpace could be a choice since
+> it is a per-device structure, but it may be missleading since there is
+> other fileds in VTDAddressSpace. This is why I proposed to have VTDDevi=
+ceNode.
 
-Berto
+I think it's okay to put all per-device setup in VTDAddressSpace.  Later
+if it makes sense VTDAddressSpace could become a union, according to
+whether the IOMMU is configured for PASID or requester ID operation, and
+could be renamed to VTDDeviceInfo.  But for now it's not needed.
+
+Paolo
+
+> But consolidation is possible here.
