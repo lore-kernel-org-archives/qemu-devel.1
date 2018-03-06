@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1etEWU-0005jb-3v
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:29:03 -0500
+	(envelope-from <thuth@redhat.com>) id 1etEWt-0005we-9p
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:29:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1etEWT-0002KV-4P
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:29:02 -0500
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:52065)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1etEWS-0002Ji-Tg
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:29:01 -0500
-Received: by mail-wm0-x22c.google.com with SMTP id h21so23544834wmd.1
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 07:29:00 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1etEWq-0002RM-Hu
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:29:27 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53930 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1etEWq-0002RB-Bt
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:29:24 -0500
+References: <cover.1515960078.git.pisa@cmp.felk.cvut.cz>
+	<48c4af3c240286a89fc5fdbcaa254ea386c979b9.1515960078.git.pisa@cmp.felk.cvut.cz>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <a7069bf9-4321-5fa7-69ac-15d88737c5ec@redhat.com>
+Date: Tue, 6 Mar 2018 16:29:19 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180306132701.ezej6d7pysp6roxb@sirius.home.kraxel.org>
-References: <20180306074053.22856-1-kraxel@redhat.com>
-	<CAJ+F1CK5MsZ5=-z2yWznBcHjZqskHSdiyYxC30azEcQ9AXrRLg@mail.gmail.com>
-	<20180306114232.v5gtwxald4mmelab@sirius.home.kraxel.org>
-	<CAJ+F1CJo28aN6mwihp8UTwq4jtgz21BxT+U7F-jGu7fyhefBkA@mail.gmail.com>
-	<20180306132701.ezej6d7pysp6roxb@sirius.home.kraxel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 6 Mar 2018 16:28:58 +0100
-Message-ID: <CAJ+F1C+N4_RV=brsQ3XDE9TMA=s8GNVXC1B9K5S+83xz+-yWiA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/7] audio: modularize
+In-Reply-To: <48c4af3c240286a89fc5fdbcaa254ea386c979b9.1515960078.git.pisa@cmp.felk.cvut.cz>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V4 4/7] CAN bus Kvaser PCI CAN-S (single
+ SJA1000 channel) emulation added.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,62 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>
+To: pisa@cmp.felk.cvut.cz, qemu-devel@nongnu.org
+Cc: Marek Vasut <marex@denx.de>, Oliver Hartkopp <socketcan@hartkopp.net>, Stefan Hajnoczi <stefanha@gmail.com>, Deniz Eren <deniz.eren@icloud.com>, Oleksij Rempel <o.rempel@pengutronix.de>, Konrad Frederic <frederic.konrad@adacore.com>, Jan Kiszka <jan.kiszka@siemens.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Hi
+On 14.01.2018 21:14, pisa@cmp.felk.cvut.cz wrote:
+> From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+> 
+> Signed-off-by: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+> ---
+>  default-configs/pci.mak |   1 +
+>  hw/can/Makefile.objs    |   1 +
+>  hw/can/can_kvaser_pci.c | 375 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 377 insertions(+)
+>  create mode 100644 hw/can/can_kvaser_pci.c
 
-On Tue, Mar 6, 2018 at 2:27 PM, Gerd Hoffmann <kraxel@redhat.com> wrote:
->> >> /home/elmarco/src/qemu/build/x86_64-softmmu/../audio-pa.so: undefined
->> >> symbol: audio_pt_unlock_and_signal
->
->> Fresh directory, cleaned ccache. That didn't help. fwiw, I am
->> compiling on f27, gcc (GCC) 7.3.1 20180130. I'll investigate further
->> if you can't reproduce.
->
-> Hmm, working fine here (both rhel-7 and fedora-27 testbuild container, de=
-fault
-> build flags).
->
-> The symbol in question should be provided by qemu:
->
-> kraxel@fedora-64bit ~/projects/qemu/build/fedora# objdump -x audio-pa.so =
-| grep audio_pt_unlock_and_signal
-> 0000000000000000         *UND*  0000000000000000              audio_pt_un=
-lock_and_signal
-> kraxel@fedora-64bit ~/projects/qemu/build/fedora# objdump -x x86_64-softm=
-mu/qemu-system-x86_64 | grep audio_pt_unlock_and_signal
-> 00000000004735f0 g     F .text  0000000000000067              audio_pt_un=
-lock_and_signal
->
-> Possibly your linker throws it away, thinking there is no user because of=
- the
-> modular drivers?
+ Hi,
 
-It's not that, but it works if I build qemu with -rdynamic. dlopen(3):
+the kvaser_pci device introduced a new way to crash QEMU, e.g.:
 
-External  references in the shared object are resolved using the
-shared objects in that object's dependency list and any other objects
-previously opened with the RTLD_GLOBAL flag.  If the executable
-       was linked with the flag "-rdynamic" (or, synonymously,
-"--export-dynamic"), then the global symbols in the executable will
-also be used to resolve references in a dynamically loaded shared
-object.
+mips64el-softmmu/qemu-system-mips64el -M malta,accel=qtest \
+                                      -device kvaser_pci
 
-(If I understand right, there is some magic rules.mk
-process-archive-undefs to make sure the used symbols from modules are
-always linked in)
+Program received signal SIGSEGV, Segmentation fault.
+0x0000555555a6e2ec in can_bus_insert_client (bus=0x0, client=client@entry=0x5555570c4018)
+    at /home/thuth/devel/qemu/net/can/can_core.c:50
+50	    QTAILQ_INSERT_TAIL(&bus->clients, client, next);
+(gdb) bt
+#0  0x0000555555a6e2ec in can_bus_insert_client (bus=0x0, client=client@entry=0x5555570c4018)
+    at /home/thuth/devel/qemu/net/can/can_core.c:50
+#1  0x00005555559d7364 in can_sja_connect_to_bus (s=s@entry=0x5555570c3f80, bus=<optimized out>)
+    at /home/thuth/devel/qemu/hw/net/can/can_sja1000.c:869
+#2  0x00005555559d75a4 in kvaser_pci_realize (pci_dev=0x5555570c33d0, errp=0x7fffffffd8e0)
+    at /home/thuth/devel/qemu/hw/net/can/can_kvaser_pci.c:230
+#3  0x00005555559e12f1 in pci_qdev_realize (qdev=0x5555570c33d0, errp=0x7fffffffd980)
+    at /home/thuth/devel/qemu/hw/pci/pci.c:2029
+#4  0x0000555555963c3a in device_set_realized (obj=<optimized out>, value=<optimized out>, errp=0x7fffffffdab8)
+    at /home/thuth/devel/qemu/hw/core/qdev.c:852
+#5  0x0000555555aa7a7e in property_set_bool (obj=0x5555570c33d0, v=<optimized out>, name=<optimized out>, opaque=0x555556f6d220, errp=0x7fffffffdab8) at /home/thuth/devel/qemu/qom/object.c:1906
+#6  0x0000555555aabbef in object_property_set_qobject (obj=obj@entry=0x5555570c33d0, value=value@entry=0x5555570c4a60, name=name@entry=0x555555c7079f "realized", errp=errp@entry=0x7fffffffdab8)
+    at /home/thuth/devel/qemu/qom/qom-qobject.c:27
+#7  0x0000555555aa9860 in object_property_set_bool (obj=0x5555570c33d0, value=<optimized out>, name=0x555555c7079f "realized", errp=0x7fffffffdab8) at /home/thuth/devel/qemu/qom/object.c:1171
+#8  0x00005555558eb1d9 in qdev_device_add (opts=0x55555689ff40, errp=errp@entry=0x7fffffffdb90)
+    at /home/thuth/devel/qemu/qdev-monitor.c:634
+#9  0x00005555558ed547 in device_init_func (opaque=<optimized out>, opts=<optimized out>, errp=<optimized out>)
+    at /home/thuth/devel/qemu/vl.c:2350
+#10 0x0000555555b8d75a in qemu_opts_foreach (list=<optimized out>, func=func@entry=
+    0x5555558ed520 <device_init_func>, opaque=opaque@entry=0x0, errp=errp@entry=0x0)
+    at /home/thuth/devel/qemu/util/qemu-option.c:1073
+#11 0x00005555557b8f64 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>)
+    at /home/thuth/devel/qemu/vl.c:4618
 
-Could it be that -rdynamic / --export-dynamic is assumed in our build
-system since modules have been added?
+Could you please fix this?
 
-yes, it's pulled from /usr/lib64/pkgconfig/gmodule-2.0.pc, but glib
-upstream built with meson doesn't have the flag anymore. That's
-probably worth fixing in glib:
-https://bugzilla.gnome.org/show_bug.cgi?id=3D794123
-
-We should switch to using gmodule-export-2.0.pc (since 2.6), which is
-also broken in meson build.  I'll send a patch for that.
-
---=20
-Marc-Andr=C3=A9 Lureau
+ Thanks,
+  Thomas
