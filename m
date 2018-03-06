@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wangjintang@huawei.com>) id 1et2oI-0000p4-Af
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 21:58:39 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1et3Ae-0005M5-EC
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 22:21:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wangjintang@huawei.com>) id 1et2oF-0005eX-8j
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 21:58:38 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2263 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wangjintang@huawei.com>)
-	id 1et2oE-0005d8-TS
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 21:58:35 -0500
-Received: from DGGEMA404-HUB.china.huawei.com (unknown [172.30.72.55])
-	by Forcepoint Email with ESMTP id 752086DE441EC
-	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 10:58:27 +0800 (CST)
-From: Wangjintang <wangjintang@huawei.com>
-Date: Tue, 6 Mar 2018 02:56:51 +0000
-Message-ID: <C94A741879221447B4FC9B607EB4FFCD7A03E948@DGGEMA504-MBX.china.huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <dgibson@ozlabs.org>) id 1et3Ad-0005ml-8G
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 22:21:44 -0500
+Date: Tue, 6 Mar 2018 13:10:13 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180306021013.GT2650@umbus.fritz.box>
+References: <1520247228-15496-1-git-send-email-wei.guo.simon@gmail.com>
 MIME-Version: 1.0
-Subject: [Qemu-devel] question about "warning: TCG doesn't support requested
- feature: CPUID.01H:ECX.f16c "
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="SSJ6yXlPvEk0CmSI"
+Content-Disposition: inline
+In-Reply-To: <1520247228-15496-1-git-send-email-wei.guo.simon@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2] PowerPC: Add TS bits into msr_mask
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +23,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Zhangchuande <zhangchuande@huawei.com>, huangsibo <huangsibo@huawei.com>
+To: wei.guo.simon@gmail.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
 
-SGkgYWxsLA0KDQoJV2UgcnVuIGFwcGxpY2F0aW9uIHdpdGggcWVtdSwgZ2V0IHRoZSBiZWxvdyBl
-cnJvciwgdGhlIHJlYXNvbiBpcyB0aGF0ICIgVENHIGRvZXNuJ3Qgc3VwcG9ydCByZXF1ZXN0ZWQg
-ZmVhdHVyZTogQ1BVSUQuMDFIOkVDWC5mMTZjICIuDQpEb2VzIFRDRyBpbiBxZW11IHN1cHBvcnQg
-IiBDUFVJRC4wMUg6RUNYLmYxNmMgIj8gDQpJZiBUQ0cgaW4gcWVtdSBzdXBwb3J0LCB0aGVuIGhv
-dyB0byB1c2U/ICBUaGFua3MuDQoNCiQgc3VkbyAgLi9xZW11LTIuMTEuMV9iaW4vYmluL3FlbXUt
-c3lzdGVtLXg4Nl82NCAtY3B1IFNreWxha2UtU2VydmVyIC1NIHEzNSAtbSA0MDk2IC1zbXAgMSAt
-bm9ncmFwaGljICAta2VybmVsIGJ6SW1hZ2UtNC40LjAgLWluaXRyZCBpbml0cmQuaW1nLTQuNC4w
-LTMxLWdlbmVyaWMgIC1hcHBlbmQgInJvb3Q9L2Rldi92ZGExIGNvbnNvbGU9dHR5UzAiIC1ib290
-IGQgLWRyaXZlIGlmPXZpcnRpbyxmaWxlPS4vdWJ1bnR1Mi5pbWcgLW5ldCBuaWMsbW9kZWw9dmly
-dGlvIC1uZXQgdGFwLGlmbmFtZT10YXAyNixzY3JpcHQ9bm8sZG93bnNjcmlwdD1ubw0KcWVtdS1z
-eXN0ZW0teDg2XzY0OiB3YXJuaW5nOiBUQ0cgZG9lc24ndCBzdXBwb3J0IHJlcXVlc3RlZCBmZWF0
-dXJlOiBDUFVJRC4wMUg6RUNYLmZtYSBbYml0IDEyXQ0KcWVtdS1zeXN0ZW0teDg2XzY0OiB3YXJu
-aW5nOiBUQ0cgZG9lc24ndCBzdXBwb3J0IHJlcXVlc3RlZCBmZWF0dXJlOiBDUFVJRC4wMUg6RUNY
-LnBjaWQgW2JpdCAxN10NCnFlbXUtc3lzdGVtLXg4Nl82NDogd2FybmluZzogVENHIGRvZXNuJ3Qg
-c3VwcG9ydCByZXF1ZXN0ZWQgZmVhdHVyZTogQ1BVSUQuMDFIOkVDWC54MmFwaWMgW2JpdCAyMV0N
-CnFlbXUtc3lzdGVtLXg4Nl82NDogd2FybmluZzogVENHIGRvZXNuJ3Qgc3VwcG9ydCByZXF1ZXN0
-ZWQgZmVhdHVyZTogQ1BVSUQuMDFIOkVDWC50c2MtZGVhZGxpbmUgW2JpdCAyNF0NCnFlbXUtc3lz
-dGVtLXg4Nl82NDogd2FybmluZzogVENHIGRvZXNuJ3Qgc3VwcG9ydCByZXF1ZXN0ZWQgZmVhdHVy
-ZTogQ1BVSUQuMDFIOkVDWC5hdnggW2JpdCAyOF0NCnFlbXUtc3lzdGVtLXg4Nl82NDogd2Fybmlu
-ZzogVENHIGRvZXNuJ3Qgc3VwcG9ydCByZXF1ZXN0ZWQgZmVhdHVyZTogQ1BVSUQuMDFIOkVDWC5m
-MTZjIFtiaXQgMjldDQpxZW11LXN5c3RlbS14ODZfNjQ6IHdhcm5pbmc6IFRDRyBkb2Vzbid0IHN1
-cHBvcnQgcmVxdWVzdGVkIGZlYXR1cmU6IENQVUlELjAxSDpFQ1gucmRyYW5kIFtiaXQgMzBdDQpx
-ZW11LXN5c3RlbS14ODZfNjQ6IHdhcm5pbmc6IFRDRyBkb2Vzbid0IHN1cHBvcnQgcmVxdWVzdGVk
-IGZlYXR1cmU6IENQVUlELjA3SDpFQlguaGxlIFtiaXQgNF0NCnFlbXUtc3lzdGVtLXg4Nl82NDog
-d2FybmluZzogVENHIGRvZXNuJ3Qgc3VwcG9ydCByZXF1ZXN0ZWQgZmVhdHVyZTogQ1BVSUQuMDdI
-OkVCWC5hdngyIFtiaXQgNV0NCnFlbXUtc3lzdGVtLXg4Nl82NDogd2FybmluZzogVENHIGRvZXNu
-J3Qgc3VwcG9ydCByZXF1ZXN0ZWQgZmVhdHVyZTogQ1BVSUQuMDdIOkVCWC5pbnZwY2lkIFtiaXQg
-MTBdDQpxZW11LXN5c3RlbS14ODZfNjQ6IHdhcm5pbmc6IFRDRyBkb2Vzbid0IHN1cHBvcnQgcmVx
-dWVzdGVkIGZlYXR1cmU6IENQVUlELjA3SDpFQlgucnRtIFtiaXQgMTFdDQpxZW11LXN5c3RlbS14
-ODZfNjQ6IHdhcm5pbmc6IFRDRyBkb2Vzbid0IHN1cHBvcnQgcmVxdWVzdGVkIGZlYXR1cmU6IENQ
-VUlELjA3SDpFQlguYXZ4NTEyZiBbYml0IDE2XQ0KcWVtdS1zeXN0ZW0teDg2XzY0OiB3YXJuaW5n
-OiBUQ0cgZG9lc24ndCBzdXBwb3J0IHJlcXVlc3RlZCBmZWF0dXJlOiBDUFVJRC4wN0g6RUJYLmF2
-eDUxMmRxIFtiaXQgMTddDQpxZW11LXN5c3RlbS14ODZfNjQ6IHdhcm5pbmc6IFRDRyBkb2Vzbid0
-IHN1cHBvcnQgcmVxdWVzdGVkIGZlYXR1cmU6IENQVUlELjA3SDpFQlgucmRzZWVkIFtiaXQgMThd
-DQpxZW11LXN5c3RlbS14ODZfNjQ6IHdhcm5pbmc6IFRDRyBkb2Vzbid0IHN1cHBvcnQgcmVxdWVz
-dGVkIGZlYXR1cmU6IENQVUlELjA3SDpFQlguYXZ4NTEyY2QgW2JpdCAyOF0NCnFlbXUtc3lzdGVt
-LXg4Nl82NDogd2FybmluZzogVENHIGRvZXNuJ3Qgc3VwcG9ydCByZXF1ZXN0ZWQgZmVhdHVyZTog
-Q1BVSUQuMDdIOkVCWC5hdng1MTJidyBbYml0IDMwXQ0KcWVtdS1zeXN0ZW0teDg2XzY0OiB3YXJu
-aW5nOiBUQ0cgZG9lc24ndCBzdXBwb3J0IHJlcXVlc3RlZCBmZWF0dXJlOiBDUFVJRC4wN0g6RUJY
-LmF2eDUxMnZsIFtiaXQgMzFdDQpxZW11LXN5c3RlbS14ODZfNjQ6IHdhcm5pbmc6IFRDRyBkb2Vz
-bid0IHN1cHBvcnQgcmVxdWVzdGVkIGZlYXR1cmU6IENQVUlELjgwMDAwMDAxSDpFQ1guM2Rub3dw
-cmVmZXRjaCBbYml0IDhdDQpxZW11LXN5c3RlbS14ODZfNjQ6IHdhcm5pbmc6IFRDRyBkb2Vzbid0
-IHN1cHBvcnQgcmVxdWVzdGVkIGZlYXR1cmU6IENQVUlELjBESDpFQVgueHNhdmVjIFtiaXQgMV0N
-ClNlYUJJT1MgKHZlcnNpb24gcmVsLTEuMTEuMC0wLWc2MzQ1MWZjYTEzLXByZWJ1aWx0LnFlbXUt
-cHJvamVjdC5vcmcpDQogDQoNClJlZ2FyZHMsDQpXYW5nIEppbnRhbmcgDQogDQoNCg==
+
+--SSJ6yXlPvEk0CmSI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Mar 05, 2018 at 06:53:48PM +0800, wei.guo.simon@gmail.com wrote:
+> From: Simon Guo <wei.guo.simon@gmail.com>
+>=20
+> During migration, after MSR bits is synced, cpu_post_load() will use
+> msr_mask to determine which PPC MSR bits will be applied into the target
+> side. Hardware Transaction Memory(HTM) has been supported since Power8,
+> but TS0/TS1 bit was not in msr_mask yet. That will prevent target KVM
+> from loading TM checkpointed values.
+>=20
+> This patch adds TS bits into msr_mask for Power8, so that transactional
+> application can be migrated across qemu.
+>=20
+> Signed-off-by: Simon Guo <wei.guo.simon@gmail.com>
+
+Much better, applied, thanks.
+
+> ---
+>  target/ppc/translate_init.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> index 55c99c9..ca06028 100644
+> --- a/target/ppc/translate_init.c
+> +++ b/target/ppc/translate_init.c
+> @@ -8689,6 +8689,8 @@ POWERPC_FAMILY(POWER8)(ObjectClass *oc, void *data)
+>                      (1ull << MSR_DR) |
+>                      (1ull << MSR_PMM) |
+>                      (1ull << MSR_RI) |
+> +                    (1ull << MSR_TS0) |
+> +                    (1ull << MSR_TS1) |
+>                      (1ull << MSR_LE);
+>      pcc->mmu_model =3D POWERPC_MMU_2_07;
+>  #if defined(CONFIG_SOFTMMU)
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--SSJ6yXlPvEk0CmSI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqd+IUACgkQbDjKyiDZ
+s5LffQ/9F7SU6QKezKFeA/g5SKpU0pat9CiTNT3+FUJix2iUYAKehl/nfzDqOmV2
+OXDFDphebuFXuvdQub5p7f2JMeoDrd8Xnvgs8I65LNqIhNleXDY+aCJSP0QlbKb8
+BMmzXzrQDyO8izYE5B24tDQEE+C6H/BCY3KMi7V9+FVupnIDuTLU8pFpYdC/qK88
+e8Cbq+W+Vk0CSakObOpPqaxyWY+N1KOetsl7cWjavZxDNydDLfOICkY02qYtsfKE
+CH4vJR/0o4H3jmHgeVZ4s65Vmx+8vLUIvFBiV7k9fY+/Hl3757+DrNxgNJDuCVf0
+wdjy7GFXmhzUvTaM75gfo9mMgJVI+rx0hI+hPqv1+rIqFmEiVBjm+AbBseAFFI0e
+vGw+p0zjK7LsOXcNBnOQjDNM79zPC6sjWFM8lEGqrys2NljvN9eA3PH77k+6IMUI
+auZEbdTVb005Y2lumDESiyvJFNvJErvWlWgZJuRByvXYpKj5JgWsiatxauxRZ1xQ
+aUsC6k3F1zDbbKN8VDqVu29dl8mV7D9Y8M2FbuiWA7AskUqyszVGAniaHKmD0c+G
+hVwmFl98iIwOwPqwpZetf7BDde3PAPN6gRFo4YVGbLQxFCFgtYFNtLnbyO3E3XtA
+EqJHhE2+MlMeZ3LinGrBo0SVDw0txY6w0QgMmxb5X8CKOluEWqo=
+=4ruP
+-----END PGP SIGNATURE-----
+
+--SSJ6yXlPvEk0CmSI--
