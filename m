@@ -1,19 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37322)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1etFUP-0004Ud-22
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:31:02 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38606)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1etFZA-0008SI-A1
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:35:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1etFUL-0000Qt-Uf
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:30:57 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180226143623.12200-1-berto@igalia.com>
-References: <20180226143623.12200-1-berto@igalia.com>
-Date: Tue, 06 Mar 2018 17:30:51 +0100
-Message-ID: <w51po4hkvyc.fsf@maestria.local.igalia.com>
+	(envelope-from <pl@kamp.de>) id 1etFZ5-0003k1-DZ
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:35:52 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:52812 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1etFZ5-0003jJ-3f
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:35:47 -0500
+Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
+	for qemu-devel@nongnu.org; Tue, 6 Mar 2018 17:35:40 +0100
+References: <c0d7b993-b3b8-a753-21f5-e2257de27caf@kamp.de>
+	<20180305114533.GI7910@stefanha-x1.localdomain>
+	<0f1ec3c7-1157-e618-62f8-ffd5e08eb342@kamp.de>
+	<20180305145215.GM3131@work-vm>
+	<20180306160739.GN31045@stefanha-x1.localdomain>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <824907bb-3a37-27bd-76db-be17d05bdac0@kamp.de>
+Date: Tue, 6 Mar 2018 17:35:41 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3] iotests: Test abnormally large size in
- compressed cluster descriptor
+In-Reply-To: <20180306160739.GN31045@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [Qemu-block] block migration and MAX_IN_FLIGHT_IO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,174 +34,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, wency@cn.fujitsu.com, qemu block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-ping
+Am 06.03.2018 um 17:07 schrieb Stefan Hajnoczi:
+> On Mon, Mar 05, 2018 at 02:52:16PM +0000, Dr. David Alan Gilbert wrote:
+>> * Peter Lieven (pl@kamp.de) wrote:
+>>> Am 05.03.2018 um 12:45 schrieb Stefan Hajnoczi:
+>>>> On Thu, Feb 22, 2018 at 12:13:50PM +0100, Peter Lieven wrote:
+>>>>> I stumbled across the MAX_INFLIGHT_IO field that was introduced in 2015 and was curious what was the reason
+>>>>> to choose 512MB as readahead? The question is that I found that the source VM gets very unresponsive I/O wise
+>>>>> while the initial 512MB are read and furthermore seems to stay unreasponsive if we choose a high migration speed
+>>>>> and have a fast storage on the destination VM.
+>>>>>
+>>>>> In our environment I modified this value to 16MB which seems to work much smoother. I wonder if we should make
+>>>>> this a user configurable value or define a different rate limit for the block transfer in bulk stage at least?
+>>>> I don't know if benchmarks were run when choosing the value.  From the
+>>>> commit description it sounds like the main purpose was to limit the
+>>>> amount of memory that can be consumed.
+>>>>
+>>>> 16 MB also fulfills that criteria :), but why is the source VM more
+>>>> responsive with a lower value?
+>>>>
+>>>> Perhaps the issue is queue depth on the storage device - the block
+>>>> migration code enqueues up to 512 MB worth of reads, and guest I/O has
+>>>> to wait?
+>>> That is my guess. Especially if the destination storage is faster we basically alsways have
+>>> 512 I/Os in flight on the source storage.
+>>>
+>>> Does anyone mind if the reduce that value to 16MB or do we need a better mechanism?
+>> We've got migration-parameters these days; you could connect it to one
+>> of those fairly easily I think.
+>> Try: grep -i 'cpu[-_]throttle[-_]initial'  for an example of one that's
+>> already there.
+>> Then you can set it to whatever you like.
+> It would be nice to solve the performance problem without adding a
+> tuneable.
+>
+> On the other hand, QEMU has no idea what the queue depth of the device
+> is.  Therefore it cannot prioritize guest I/O over block migration I/O.
+>
+> 512 parallel requests is much too high.  Most parallel I/O benchmarking
+> is done at 32-64 queue depth.
+>
+> I think that 16 parallel requests is a reasonable maximum number for a
+> background job.
+>
+> We need to be clear though that the purpose of this change is unrelated
+> to the original 512 MB memory footprint goal.  It just happens to touch
+> the same constant but the goal is now to submit at most 16 I/O requests
+> in parallel to avoid monopolizing the I/O device.
 
-On Mon 26 Feb 2018 03:36:23 PM CET, Alberto Garcia wrote:
-> L2 entries for compressed clusters have a field that indicates the
-> number of sectors used to store the data in the image.
->
-> That's however not the size of the compressed data itself, just the
-> number of sectors where that data is located. The actual data size is
-> usually not a multiple of the sector size, and therefore cannot be
-> represented with this field.
->
-> The way it works is that QEMU reads all the specified sectors and
-> starts decompressing the data until there's enough to recover the
-> original uncompressed cluster. If there are any bytes left that
-> haven't been decompressed they are simply ignored.
->
-> One consequence of this is that even if the size field is larger than
-> it needs to be QEMU can handle it just fine: it will read more data
-> from disk but it will ignore the extra bytes.
->
-> This test creates an image with two compressed clusters that use 5
-> sectors (2.5 KB) each, increases the size field to the maximum (8192
-> sectors, or 4 MB) and verifies that the data can be read without
-> problems.
->
-> This test is important because while the decompressed data takes
-> exactly one cluster, the maximum value allowed in the compressed size
-> field is twice the cluster size. So although QEMU won't produce images
-> with such large values we need to make sure that it can handle them.
->
-> Another effect of increasing the size field is that it can make
-> it include data from the following host cluster(s). In this case
-> 'qemu-img check' will detect that the refcounts are not correct, and
-> we'll need to rebuild them.
->
-> Additionally, this patch also tests that decreasing the size corrupts
-> the image since the original data can no longer be recovered. In this
-> case QEMU returns an error when trying to read the compressed data,
-> but 'qemu-img check' doesn't see anything wrong if the refcounts are
-> consistent.
->
-> One possible task for the future is to make 'qemu-img check' verify
-> the sizes of the compressed clusters, by trying to decompress the data
-> and checking that the size stored in the L2 entry is correct.
->
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->
-> v3: Add TODO comment, as suggested by Eric.
->
->     Corrupt the length of the second compressed cluster as well so the
->     uncompressed data would span three host clusters.
->
-> v2: We now have two scenarios where we make QEMU read data from the
->     next host cluster and from beyond the end of the image. This
->     version also runs qemu-img check on the corrupted image.
->
->     If the size field is too small, reading fails but qemu-img check
->     succeeds.
->
->     If the size field is too large, reading succeeds but qemu-img
->     check fails (this can be repaired, though).
->
-> ---
->  tests/qemu-iotests/122     | 45 +++++++++++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/122.out | 31 +++++++++++++++++++++++++++++++
->  2 files changed, 76 insertions(+)
->
-> diff --git a/tests/qemu-iotests/122 b/tests/qemu-iotests/122
-> index 45b359c2ba..5b9593016c 100755
-> --- a/tests/qemu-iotests/122
-> +++ b/tests/qemu-iotests/122
-> @@ -130,6 +130,51 @@ $QEMU_IO -c "read -P 0    1024k 1022k" "$TEST_IMG" 2>&1 | _filter_qemu_io | _fil
->  
->  
->  echo
-> +echo "=== Corrupted size field in compressed cluster descriptor ==="
-> +echo
-> +# Create an empty image, fill half of it with data and compress it.
-> +# The L2 entries of the two compressed clusters are located at
-> +# 0x800000 and 0x800008, their original values are 0x4008000000a00000
-> +# and 0x4008000000a00802 (5 sectors for compressed data each).
-> +TEST_IMG="$TEST_IMG".1 _make_test_img 8M
-> +$QEMU_IO -c "write -P 0x11 0 4M" "$TEST_IMG".1 2>&1 | _filter_qemu_io | _filter_testdir
-> +$QEMU_IMG convert -c -O qcow2 -o cluster_size=2M "$TEST_IMG".1 "$TEST_IMG"
-> +
-> +# Reduce size of compressed data to 4 sectors: this corrupts the image.
-> +poke_file "$TEST_IMG" $((0x800000)) "\x40\x06"
-> +$QEMU_IO -c "read  -P 0x11 0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
-> +
-> +# 'qemu-img check' however doesn't see anything wrong because it
-> +# doesn't try to decompress the data and the refcounts are consistent.
-> +# TODO: update qemu-img so this can be detected
-> +_check_test_img
-> +
-> +# Increase size of compressed data to the maximum (8192 sectors).
-> +# This makes QEMU read more data (8192 sectors instead of 5, host
-> +# addresses [0xa00000, 0xdfffff]), but the decompression algorithm
-> +# stops once we have enough to restore the uncompressed cluster, so
-> +# the rest of the data is ignored.
-> +poke_file "$TEST_IMG" $((0x800000)) "\x7f\xfe"
-> +# Do it also for the second compressed cluster (L2 entry at 0x800008).
-> +# In this case the compressed data would span 3 host clusters
-> +# (host addresses: [0xa00802, 0xe00801])
-> +poke_file "$TEST_IMG" $((0x800008)) "\x7f\xfe"
-> +
-> +# Here the image is too small so we're asking QEMU to read beyond the
-> +# end of the image.
-> +$QEMU_IO -c "read  -P 0x11  0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
-> +# But if we grow the image we won't be reading beyond its end anymore.
-> +$QEMU_IO -c "write -P 0x22 4M 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
-> +$QEMU_IO -c "read  -P 0x11  0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
-> +
-> +# The refcount data is however wrong because due to the increased size
-> +# of the compressed data it now reaches the following host clusters.
-> +# This can be repaired by qemu-img check.
-> +_check_test_img -r all
-> +$QEMU_IO -c "read  -P 0x11  0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
-> +$QEMU_IO -c "read  -P 0x22 4M 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
-> +
-> +echo
->  echo "=== Full allocation with -S 0 ==="
->  echo
->  
-> diff --git a/tests/qemu-iotests/122.out b/tests/qemu-iotests/122.out
-> index 47d8656db8..bdda75650f 100644
-> --- a/tests/qemu-iotests/122.out
-> +++ b/tests/qemu-iotests/122.out
-> @@ -99,6 +99,37 @@ read 1024/1024 bytes at offset 1047552
->  read 1046528/1046528 bytes at offset 1048576
->  1022 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> +=== Corrupted size field in compressed cluster descriptor ===
-> +
-> +Formatting 'TEST_DIR/t.IMGFMT.1', fmt=IMGFMT size=8388608
-> +wrote 4194304/4194304 bytes at offset 0
-> +4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read failed: Input/output error
-> +No errors were found on the image.
-> +read 4194304/4194304 bytes at offset 0
-> +4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 4194304/4194304 bytes at offset 4194304
-> +4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 4194304/4194304 bytes at offset 0
-> +4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +ERROR cluster 6 refcount=1 reference=3
-> +ERROR cluster 7 refcount=1 reference=2
-> +Repairing cluster 6 refcount=1 reference=3
-> +Repairing cluster 7 refcount=1 reference=2
-> +Repairing OFLAG_COPIED data cluster: l2_entry=8000000000c00000 refcount=3
-> +Repairing OFLAG_COPIED data cluster: l2_entry=8000000000e00000 refcount=2
-> +The following inconsistencies were found and repaired:
-> +
-> +    0 leaked clusters
-> +    4 corruptions
-> +
-> +Double checking the fixed image now...
-> +No errors were found on the image.
-> +read 4194304/4194304 bytes at offset 0
-> +4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 4194304/4194304 bytes at offset 4194304
-> +4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
->  === Full allocation with -S 0 ===
->  
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-> -- 
-> 2.11.0
+I think we should really look at this. The variables that control if we stay in the while loop or not are incremented and decremented
+at the following places:
+
+mig_save_device_dirty:
+mig_save_device_bulk:
+    block_mig_state.submitted++;
+
+blk_mig_read_cb:
+    block_mig_state.submitted--;
+    block_mig_state.read_done++;
+
+flush_blks:
+    block_mig_state.read_done--;
+
+The condition of the while loop is:
+(block_mig_state.submitted +
+            block_mig_state.read_done) * BLOCK_SIZE <
+           qemu_file_get_rate_limit(f) &&
+           (block_mig_state.submitted +
+            block_mig_state.read_done) <
+           MAX_INFLIGHT_IO)
+
+At first I wonder if we ever reach the rate-limit because we put the read buffers onto f AFTER we exit the while loop?
+
+And even if we reach the limit we constantly maintain 512 I/Os in parallel because we immediately decrement read_done
+when we put the buffers to f in flush_blks. In the next iteration of the while loop we then read again until we have 512 in-flight I/Os.
+
+And shouldn't we have a time limit to limit the time we stay in the while loop? I think we artificially delay sending data to f?
+
+Peter
