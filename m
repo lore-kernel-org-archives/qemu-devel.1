@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1etGjk-0003oO-Ow
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:50:53 -0500
+	(envelope-from <jbaron@akamai.com>) id 1etGmB-0005qw-CT
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:53:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1etGjk-0000oE-0P
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:50:52 -0500
+	(envelope-from <jbaron@akamai.com>) id 1etGm8-0001qv-5p
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:53:23 -0500
+Received: from mx0a-00190b01.pphosted.com ([2620:100:9001:583::1]:58498)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jbaron@akamai.com>) id 1etGm7-0001qN-QN
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:53:20 -0500
+References: <cover.1519961667.git.jbaron@akamai.com>
+	<864430f2a613c4d3c82b591ed7bc27068ddad369.1519961667.git.jbaron@akamai.com>
+	<20180302195256-mutt-send-email-mst@kernel.org>
+From: Jason Baron <jbaron@akamai.com>
+Message-ID: <a44eda0c-7f5b-ad31-f357-730fb62afb77@akamai.com>
+Date: Tue, 6 Mar 2018 12:53:14 -0500
 MIME-Version: 1.0
-In-Reply-To: <763029e7-f64d-72ef-4e6e-a8395423cbe5@vivier.eu>
-References: <20180301173636.19082-1-jcmvbkbc@gmail.com>
-	<91b370e2-d5aa-98b9-a005-2fe8f77881ee@vivier.eu>
-	<CAMo8BfLV632wv7o9jX_=4W=a-tuJViUGjb2GitLdfHoj3SgkKg@mail.gmail.com>
-	<763029e7-f64d-72ef-4e6e-a8395423cbe5@vivier.eu>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Tue, 6 Mar 2018 09:50:49 -0800
-Message-ID: <CAMo8BfLneghf9BfbBvGiS5yQxGD1R7xNBGMKYcwHmUAXtkB=7w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 05/11] linux-user: fix
- mmap/munmap/mprotect/mremap/shmat
+In-Reply-To: <20180302195256-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/4] eth: add speed and duplex definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,52 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: jasowang@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
 
-On Tue, Mar 6, 2018 at 9:39 AM, Laurent Vivier <laurent@vivier.eu> wrote:
-> Le 06/03/2018 =C3=A0 18:28, Max Filippov a =C3=A9crit :
->> On Tue, Mar 6, 2018 at 4:02 AM, Laurent Vivier <laurent@vivier.eu> wrote=
-:
->>> Le 01/03/2018 =C3=A0 18:36, Max Filippov a =C3=A9crit :
->>>>  #define GUEST_ADDR_MAX (reserved_va ? reserved_va : \
->>>> -                                    (1ul <<
-> TARGET_VIRT_ADDR_SPACE_BITS) - 1)
->>>> +                        (2ul << (TARGET_VIRT_ADDR_SPACE_BITS - 1)) - =
-1)
->>>
->>> I don't understand why you do this change. Could you explain?
->>
->> For a lot of targets TARGET_VIRT_ADDR_SPACE_BITS is the same as
->> HOST_LONG_BITS, so the shift results in undefined behavior. E.g. without
->> this change I see the following warnings when building such targets for
->> x86_64 host:
->>
->> linux-user/syscall.c:4905:10: note: in expansion of macro
-> =E2=80=98guest_range_valid=E2=80=99
->>      if (!guest_range_valid(shmaddr, shm_info.shm_segsz)) {
->>           ^~~~~~~~~~~~~~~~~
->> include/exec/cpu-all.h:163:30: warning: left shift count >=3D width of
->> type [-Wshift-count-overflow]
->>                          (1ul << (TARGET_VIRT_ADDR_SPACE_BITS)) - 1)
->>
->> Changing it to 2ul << (TARGET_VIRT_ADDR_SPACE_BITS - 1)
->> fixes undefined behavior. Probably that deserves a comment in the
->> changelog.
->>
->
-> Perhaps you can keep the scheme used originally with h2g_valid(), it's
-> easier to read:
->
-> #if HOST_LONG_BITS <=3D TARGET_VIRT_ADDR_SPACE_BITS
-> #define GUEST_ADDR_MAX (reserved_va ? reserved_va : ~0ul)
-> #else
-> #define GUEST_ADDR_MAX (reserved_va ? reserved_va : \
->                         (1ul << TARGET_VIRT_ADDR_SPACE_BITS) - 1)
-> #endif
 
-Ok, will do.
 
---=20
-Thanks.
--- Max
+On 03/02/2018 12:54 PM, Michael S. Tsirkin wrote:
+> On Thu, Mar 01, 2018 at 10:46:33PM -0500, Jason Baron wrote:
+>> Pull in definitions for SPEED_UNKNOWN, DUPLEX_UNKNOWN, DUPLEX_HALF,
+>> and DUPLEX_FULL.
+>>
+>> Signed-off-by: Jason Baron <jbaron@akamai.com>
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>> Cc: Jason Wang <jasowang@redhat.com>
+>> Cc: virtio-dev@lists.oasis-open.org
+>> ---
+>>  include/net/eth.h | 7 +++++++
+>>  1 file changed, 7 insertions(+)
+>>
+>> diff --git a/include/net/eth.h b/include/net/eth.h
+>> index 09054a5..9843678 100644
+>> --- a/include/net/eth.h
+>> +++ b/include/net/eth.h
+>> @@ -417,4 +417,11 @@ bool
+>>  eth_parse_ipv6_hdr(const struct iovec *pkt, int pkt_frags,
+>>                     size_t ip6hdr_off, eth_ip6_hdr_info *info);
+>>  
+>> +/* ethtool defines - from linux/ethtool.h */
+>> +#define SPEED_UNKNOWN           -1
+>> +
+>> +#define DUPLEX_HALF             0x00
+>> +#define DUPLEX_FULL             0x01
+>> +#define DUPLEX_UNKNOWN          0xff
+>> +
+>>  #endif
+> 
+> While that's not a lot, I think we should import linux/ethtool.h into
+> include/standard-headers/linux/ using scripts/update-linux-headers.sh
+> 
+
+Ok, I had started down that path, by including
+include/uapi/linux/ethtool.h but that resulted in a few other headers -
+kernel.h, sysinfo.h. And so it seemed like a lot of headers for only a
+few lines. But I will re-visit it...
+
+Thanks,
+
+-Jason
