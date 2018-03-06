@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1etIXH-00068i-7c
+	(envelope-from <paolo.bonzini@gmail.com>) id 1etIXH-00068l-FV
 	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 14:46:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1etIXF-0001ZE-Fk
+	(envelope-from <paolo.bonzini@gmail.com>) id 1etIXG-0001ZY-HD
 	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 14:46:07 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:56219)
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:43597)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1etIXF-0001Z7-6i
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 14:46:05 -0500
-Received: by mail-wm0-x242.google.com with SMTP id q83so423204wme.5
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 11:46:05 -0800 (PST)
+	id 1etIXG-0001ZR-AG
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 14:46:06 -0500
+Received: by mail-wr0-x241.google.com with SMTP id u49so22157008wrc.10
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 11:46:06 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  6 Mar 2018 20:45:58 +0100
-Message-Id: <20180306194600.9650-2-pbonzini@redhat.com>
+Date: Tue,  6 Mar 2018 20:45:59 +0100
+Message-Id: <20180306194600.9650-3-pbonzini@redhat.com>
 In-Reply-To: <20180306194600.9650-1-pbonzini@redhat.com>
 References: <20180306194600.9650-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/3] qom: introduce object_class_get_list_sorted
+Subject: [Qemu-devel] [PATCH 2/3] net: allow using any PCI NICs in -net or
+ -nic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,241 +29,118 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Jason Wang <jasowang@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-Unify half a dozen copies of very similar code (the only difference being
-whether comparisons were case-sensitive) and use it also in Tricore,
-which did not do any sorting of CPU model names.
+Remove the hard-coded list of PCI NIC names; instead, fill an array
+using all PCI devices listed under DEVICE_CATEGORY_NETWORK. Keep
+the old shortcut "virtio" for virtio-net-pci.
 
+Suggested-by: Thomas Huth <thuth@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qom/object.h    | 11 +++++++++++
- qdev-monitor.c          |  9 +--------
- qom/object.c            | 13 +++++++++++++
- target/alpha/cpu.c      | 15 +--------------
- target/hppa/cpu.c       | 15 +--------------
- target/lm32/cpu.c       | 15 +--------------
- target/sh4/cpu.c        | 15 +--------------
- target/tricore/helper.c |  2 +-
- 8 files changed, 30 insertions(+), 65 deletions(-)
+ hw/pci/pci.c | 61 ++++++++++++++++++++++++++++++------------------------------
+ 1 file changed, 30 insertions(+), 31 deletions(-)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index 4f07090db0..96ce81bc5e 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -913,6 +913,17 @@ void object_class_foreach(void (*fn)(ObjectClass *klass, void *opaque),
- GSList *object_class_get_list(const char *implements_type,
-                               bool include_abstract);
- 
-+/**
-+ * object_class_get_list_sorted:
-+ * @implements_type: The type to filter for, including its derivatives.
-+ * @include_abstract: Whether to include abstract classes.
-+ *
-+ * Returns: A singly-linked list of the classes in alphabetical
-+ * case-insensitive order.
-+ */
-+GSList *object_class_get_list_sorted(const char *implements_type,
-+                                     bool include_abstract);
-+
- /**
-  * object_ref:
-  * @obj: the object
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index b7e3291f8b..61e0300991 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -122,12 +122,6 @@ static void qdev_print_devinfo(DeviceClass *dc)
-     error_printf("\n");
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 2174c254eb..aa24a26680 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -1815,49 +1815,48 @@ PciInfoList *qmp_query_pci(Error **errp)
+     return head;
  }
  
--static gint devinfo_cmp(gconstpointer a, gconstpointer b)
--{
--    return strcasecmp(object_class_get_name((ObjectClass *)a),
--                      object_class_get_name((ObjectClass *)b));
--}
+-static const char * const pci_nic_models[] = {
+-    "ne2k_pci",
+-    "i82551",
+-    "i82557b",
+-    "i82559er",
+-    "rtl8139",
+-    "e1000",
+-    "pcnet",
+-    "virtio",
+-    "sungem",
+-    NULL
+-};
 -
- static void qdev_print_devinfos(bool show_no_user)
+-static const char * const pci_nic_names[] = {
+-    "ne2k_pci",
+-    "i82551",
+-    "i82557b",
+-    "i82559er",
+-    "rtl8139",
+-    "e1000",
+-    "pcnet",
+-    "virtio-net-pci",
+-    "sungem",
+-    NULL
+-};
+-
+ /* Initialize a PCI NIC.  */
+ PCIDevice *pci_nic_init_nofail(NICInfo *nd, PCIBus *rootbus,
+                                const char *default_model,
+                                const char *default_devaddr)
  {
-     static const char *cat_name[DEVICE_CATEGORY_MAX + 1] = {
-@@ -146,8 +140,7 @@ static void qdev_print_devinfos(bool show_no_user)
+     const char *devaddr = nd->devaddr ? nd->devaddr : default_devaddr;
++    GSList *list;
++    GPtrArray *pci_nic_models;
+     PCIBus *bus;
+     PCIDevice *pci_dev;
+     DeviceState *dev;
+     int devfn;
      int i;
-     bool cat_printed;
  
--    list = g_slist_sort(object_class_get_list(TYPE_DEVICE, false),
--                        devinfo_cmp);
-+    list = object_class_get_list_sorted(TYPE_DEVICE, false);
- 
-     for (i = 0; i <= DEVICE_CATEGORY_MAX; i++) {
-         cat_printed = false;
-diff --git a/qom/object.c b/qom/object.c
-index 755ad03819..6088f55943 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -891,6 +891,19 @@ GSList *object_class_get_list(const char *implements_type,
-     return list;
- }
- 
-+static gint object_class_cmp(gconstpointer a, gconstpointer b)
-+{
-+    return strcasecmp(object_class_get_name((ObjectClass *)a),
-+                      object_class_get_name((ObjectClass *)b));
-+}
+-    if (qemu_show_nic_models(nd->model, pci_nic_models)) {
++    if (!strcmp(nd->model, "virtio")) {
++        g_free(nd->model);
++        nd->model = g_strdup("virtio-net-pci");
++    }
 +
-+GSList *object_class_get_list_sorted(const char *implements_type,
-+                                     bool include_abstract)
-+{
-+    return g_slist_sort(object_class_get_list(implements_type, include_abstract),
-+                        object_class_cmp);
-+}
++    list = object_class_get_list_sorted(TYPE_PCI_DEVICE, false);
++    pci_nic_models = g_ptr_array_new_with_free_func(g_free);
++    while (list) {
++        DeviceClass *dc = OBJECT_CLASS_CHECK(DeviceClass, list->data,
++                                             TYPE_DEVICE);
++        GSList *next;
++        if (test_bit(DEVICE_CATEGORY_NETWORK, dc->categories) &&
++            dc->user_creatable) {
++            const char *name = object_class_get_name(list->data) ;
++            g_ptr_array_add(pci_nic_models, (gpointer)name);
++        }
++        next = list->next;
++        g_slist_free_1(list);
++        list = next;
++    }
++    g_ptr_array_add(pci_nic_models, NULL);
 +
- void object_ref(Object *obj)
- {
-     if (!obj) {
-diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
-index 55675ce419..b08078e7fc 100644
---- a/target/alpha/cpu.c
-+++ b/target/alpha/cpu.c
-@@ -71,18 +71,6 @@ static void alpha_cpu_realizefn(DeviceState *dev, Error **errp)
-     acc->parent_realize(dev, errp);
++    if (qemu_show_nic_models(nd->model, (const char **)pci_nic_models->pdata)) {
+         exit(0);
+     }
+ 
+-    i = qemu_find_nic_model(nd, pci_nic_models, default_model);
++    i = qemu_find_nic_model(nd, (const char **)pci_nic_models->pdata,
++                            default_model);
+     if (i < 0) {
+         exit(1);
+     }
+@@ -1865,15 +1864,15 @@ PCIDevice *pci_nic_init_nofail(NICInfo *nd, PCIBus *rootbus,
+     bus = pci_get_bus_devfn(&devfn, rootbus, devaddr);
+     if (!bus) {
+         error_report("Invalid PCI device address %s for device %s",
+-                     devaddr, pci_nic_names[i]);
++                     devaddr, nd->model);
+         exit(1);
+     }
+ 
+-    pci_dev = pci_create(bus, devfn, pci_nic_names[i]);
++    pci_dev = pci_create(bus, devfn, nd->model);
+     dev = &pci_dev->qdev;
+     qdev_set_nic_properties(dev, nd);
+     qdev_init_nofail(dev);
+-
++    g_ptr_array_free(pci_nic_models, true);
+     return pci_dev;
  }
  
--/* Sort alphabetically by type name. */
--static gint alpha_cpu_list_compare(gconstpointer a, gconstpointer b)
--{
--    ObjectClass *class_a = (ObjectClass *)a;
--    ObjectClass *class_b = (ObjectClass *)b;
--    const char *name_a, *name_b;
--
--    name_a = object_class_get_name(class_a);
--    name_b = object_class_get_name(class_b);
--    return strcmp(name_a, name_b);
--}
--
- static void alpha_cpu_list_entry(gpointer data, gpointer user_data)
- {
-     ObjectClass *oc = data;
-@@ -100,8 +88,7 @@ void alpha_cpu_list(FILE *f, fprintf_function cpu_fprintf)
-     };
-     GSList *list;
- 
--    list = object_class_get_list(TYPE_ALPHA_CPU, false);
--    list = g_slist_sort(list, alpha_cpu_list_compare);
-+    list = object_class_get_list_sorted(TYPE_ALPHA_CPU, false);
-     (*cpu_fprintf)(f, "Available CPUs:\n");
-     g_slist_foreach(list, alpha_cpu_list_entry, &s);
-     g_slist_free(list);
-diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
-index 969f628f0a..c261b6b090 100644
---- a/target/hppa/cpu.c
-+++ b/target/hppa/cpu.c
-@@ -110,18 +110,6 @@ static void hppa_cpu_realizefn(DeviceState *dev, Error **errp)
- #endif
- }
- 
--/* Sort hppabetically by type name. */
--static gint hppa_cpu_list_compare(gconstpointer a, gconstpointer b)
--{
--    ObjectClass *class_a = (ObjectClass *)a;
--    ObjectClass *class_b = (ObjectClass *)b;
--    const char *name_a, *name_b;
--
--    name_a = object_class_get_name(class_a);
--    name_b = object_class_get_name(class_b);
--    return strcmp(name_a, name_b);
--}
--
- static void hppa_cpu_list_entry(gpointer data, gpointer user_data)
- {
-     ObjectClass *oc = data;
-@@ -138,8 +126,7 @@ void hppa_cpu_list(FILE *f, fprintf_function cpu_fprintf)
-     };
-     GSList *list;
- 
--    list = object_class_get_list(TYPE_HPPA_CPU, false);
--    list = g_slist_sort(list, hppa_cpu_list_compare);
-+    list = object_class_get_list_sorted(TYPE_HPPA_CPU, false);
-     (*cpu_fprintf)(f, "Available CPUs:\n");
-     g_slist_foreach(list, hppa_cpu_list_entry, &s);
-     g_slist_free(list);
-diff --git a/target/lm32/cpu.c b/target/lm32/cpu.c
-index 96c2499d0b..0003152469 100644
---- a/target/lm32/cpu.c
-+++ b/target/lm32/cpu.c
-@@ -32,18 +32,6 @@ static void lm32_cpu_set_pc(CPUState *cs, vaddr value)
-     cpu->env.pc = value;
- }
- 
--/* Sort alphabetically by type name. */
--static gint lm32_cpu_list_compare(gconstpointer a, gconstpointer b)
--{
--    ObjectClass *class_a = (ObjectClass *)a;
--    ObjectClass *class_b = (ObjectClass *)b;
--    const char *name_a, *name_b;
--
--    name_a = object_class_get_name(class_a);
--    name_b = object_class_get_name(class_b);
--    return strcmp(name_a, name_b);
--}
--
- static void lm32_cpu_list_entry(gpointer data, gpointer user_data)
- {
-     ObjectClass *oc = data;
-@@ -65,8 +53,7 @@ void lm32_cpu_list(FILE *f, fprintf_function cpu_fprintf)
-     };
-     GSList *list;
- 
--    list = object_class_get_list(TYPE_LM32_CPU, false);
--    list = g_slist_sort(list, lm32_cpu_list_compare);
-+    list = object_class_get_list_sorted(TYPE_LM32_CPU, false);
-     (*cpu_fprintf)(f, "Available CPUs:\n");
-     g_slist_foreach(list, lm32_cpu_list_entry, &s);
-     g_slist_free(list);
-diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
-index 6302cfda3a..541ffc2d97 100644
---- a/target/sh4/cpu.c
-+++ b/target/sh4/cpu.c
-@@ -85,18 +85,6 @@ typedef struct SuperHCPUListState {
-     FILE *file;
- } SuperHCPUListState;
- 
--/* Sort alphabetically by type name. */
--static gint superh_cpu_list_compare(gconstpointer a, gconstpointer b)
--{
--    ObjectClass *class_a = (ObjectClass *)a;
--    ObjectClass *class_b = (ObjectClass *)b;
--    const char *name_a, *name_b;
--
--    name_a = object_class_get_name(class_a);
--    name_b = object_class_get_name(class_b);
--    return strcmp(name_a, name_b);
--}
--
- static void superh_cpu_list_entry(gpointer data, gpointer user_data)
- {
-     SuperHCPUListState *s = user_data;
-@@ -114,8 +102,7 @@ void sh4_cpu_list(FILE *f, fprintf_function cpu_fprintf)
-     };
-     GSList *list;
- 
--    list = object_class_get_list(TYPE_SUPERH_CPU, false);
--    list = g_slist_sort(list, superh_cpu_list_compare);
-+    list = object_class_get_list_sorted(TYPE_SUPERH_CPU, false);
-     g_slist_foreach(list, superh_cpu_list_entry, &s);
-     g_slist_free(list);
- }
-diff --git a/target/tricore/helper.c b/target/tricore/helper.c
-index 45276d3782..dad7eea085 100644
---- a/target/tricore/helper.c
-+++ b/target/tricore/helper.c
-@@ -101,7 +101,7 @@ void tricore_cpu_list(FILE *f, fprintf_function cpu_fprintf)
-     };
-     GSList *list;
- 
--    list = object_class_get_list(TYPE_TRICORE_CPU, false);
-+    list = object_class_get_list_sorted(TYPE_TRICORE_CPU, false);
-     (*cpu_fprintf)(f, "Available CPUs:\n");
-     g_slist_foreach(list, tricore_cpu_list_entry, &s);
-     g_slist_free(list);
 -- 
 2.14.3
