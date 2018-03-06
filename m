@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1et9GA-00009c-Oc
+	(envelope-from <kraxel@redhat.com>) id 1et9GA-00009b-Oe
 	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:51:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1et9G8-0004ya-49
+	(envelope-from <kraxel@redhat.com>) id 1et9G8-0004yH-2M
 	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:51:50 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57526 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57178 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1et9G7-0004xb-T9
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:51:48 -0500
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1et9G7-0004xZ-T4
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:51:47 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue,  6 Mar 2018 10:51:26 +0100
-Message-Id: <20180306095135.21285-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 0/9] vfio: add display support
+Date: Tue,  6 Mar 2018 10:51:29 +0100
+Message-Id: <20180306095135.21285-4-kraxel@redhat.com>
+In-Reply-To: <20180306095135.21285-1-kraxel@redhat.com>
+References: <20180306095135.21285-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v7 3/9] ui/pixman: add
+ qemu_drm_format_to_pixman()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,73 +27,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: intel-gvt-dev@lists.freedesktop.org, Alex Williamson <alex.williamson@redhat.com>, Tina Zhang <tina.zhang@intel.com>, Gerd Hoffmann <kraxel@redhat.com>, Kirti Wankhede <kwankhede@nvidia.com>
 
-This series adds support for a vgpu display to the qemu vfio code.
+Map drm fourcc codes to pixman formats.
 
-v7:
- - rebase to latest master.
- - dmabuf: update cursor hotspot properly (Tina).
- - dmabuf: track whenever cursor hotspot + position changes.
- - codestryle fixes.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ include/ui/qemu-pixman.h |  5 +++++
+ ui/qemu-pixman.c         | 22 ++++++++++++++++++++++
+ 2 files changed, 27 insertions(+)
 
-v6:
- - add support for hotplugging QemuConsoles.
- - drop vfio-pci-display device, re-add OnOffAuto display property.
- - add proper cleanup in finalize.
-
-v5:
- - rebase to latest master
- - drop DeviceState->hotpluggable patch, use separate vfio-pci-display
-   device instead so we can use DeviceClass->hotpluggable.
- - add vfio dma-buf patch.  Right now this can be tested with '-display
-   egl-headless' only.  gtk and spice support is almost ready for merge
-   and should follow soon.
-
-cheers,
-  Gerd
-
-Gerd Hoffmann (9):
-  linux-headers: update to 4.16-rc1
-  standard-headers: add drm/drm_fourcc.h
-  ui/pixman: add qemu_drm_format_to_pixman()
-  console: minimal hotplug suport
-  secondary-vga: properly close QemuConsole on unplug
-  vfio/common: cleanup in vfio_region_finalize
-  vfio/display: core & wireup
-  vfio/display: adding region support
-  vfio/display: adding dmabuf support
-
- hw/vfio/pci.h                                      |   5 +
- include/hw/vfio/vfio-common.h                      |  22 ++
- include/standard-headers/drm/drm_fourcc.h          | 411 +++++++++++++++++++++
- include/standard-headers/linux/input-event-codes.h |   1 +
- include/standard-headers/linux/input.h             |  11 +
- include/standard-headers/linux/pci_regs.h          |  30 +-
- include/standard-headers/linux/virtio_net.h        |  13 +
- include/ui/console.h                               |   2 +
- include/ui/qemu-pixman.h                           |   5 +
- linux-headers/asm-powerpc/kvm.h                    |   2 +
- linux-headers/asm-powerpc/unistd.h                 |   3 +
- linux-headers/asm-s390/unistd.h                    | 401 +-------------------
- linux-headers/asm-s390/unistd_32.h                 | 364 ++++++++++++++++++
- linux-headers/asm-s390/unistd_64.h                 | 331 +++++++++++++++++
- linux-headers/asm-x86/kvm_para.h                   |   4 +
- linux-headers/linux/kvm.h                          |  90 +++++
- linux-headers/linux/psci.h                         |   3 +
- linux-headers/linux/vfio.h                         |  72 ++++
- hw/display/vga-pci.c                               |   9 +
- hw/vfio/common.c                                   |   7 +
- hw/vfio/display.c                                  | 347 +++++++++++++++++
- hw/vfio/pci.c                                      |  10 +
- ui/console.c                                       |  79 +++-
- ui/qemu-pixman.c                                   |  22 ++
- hw/vfio/Makefile.objs                              |   2 +-
- scripts/update-linux-headers.sh                    |   8 +
- ui/trace-events                                    |   2 +
- 27 files changed, 1839 insertions(+), 417 deletions(-)
- create mode 100644 include/standard-headers/drm/drm_fourcc.h
- create mode 100644 linux-headers/asm-s390/unistd_32.h
- create mode 100644 linux-headers/asm-s390/unistd_64.h
- create mode 100644 hw/vfio/display.c
-
+diff --git a/include/ui/qemu-pixman.h b/include/ui/qemu-pixman.h
+index 4a67e01232..b7c82d17fc 100644
+--- a/include/ui/qemu-pixman.h
++++ b/include/ui/qemu-pixman.h
+@@ -33,6 +33,8 @@
+ # define PIXMAN_BE_r8g8b8a8   PIXMAN_r8g8b8a8
+ # define PIXMAN_BE_x8b8g8r8   PIXMAN_x8b8g8r8
+ # define PIXMAN_BE_a8b8g8r8   PIXMAN_a8b8g8r8
++# define PIXMAN_LE_r8g8b8     PIXMAN_b8g8r8
++# define PIXMAN_LE_a8r8g8b8   PIXMAN_b8g8r8a8
+ # define PIXMAN_LE_x8r8g8b8   PIXMAN_b8g8r8x8
+ #else
+ # define PIXMAN_BE_r8g8b8     PIXMAN_b8g8r8
+@@ -44,6 +46,8 @@
+ # define PIXMAN_BE_r8g8b8a8   PIXMAN_a8b8g8r8
+ # define PIXMAN_BE_x8b8g8r8   PIXMAN_r8g8b8x8
+ # define PIXMAN_BE_a8b8g8r8   PIXMAN_r8g8b8a8
++# define PIXMAN_LE_r8g8b8     PIXMAN_r8g8b8
++# define PIXMAN_LE_a8r8g8b8   PIXMAN_a8r8g8b8
+ # define PIXMAN_LE_x8r8g8b8   PIXMAN_x8r8g8b8
+ #endif
+ 
+@@ -51,6 +55,7 @@
+ 
+ PixelFormat qemu_pixelformat_from_pixman(pixman_format_code_t format);
+ pixman_format_code_t qemu_default_pixman_format(int bpp, bool native_endian);
++pixman_format_code_t qemu_drm_format_to_pixman(uint32_t drm_format);
+ int qemu_pixman_get_type(int rshift, int gshift, int bshift);
+ pixman_format_code_t qemu_pixman_get_format(PixelFormat *pf);
+ bool qemu_pixman_check_format(DisplayChangeListener *dcl,
+diff --git a/ui/qemu-pixman.c b/ui/qemu-pixman.c
+index 6e591ab821..3e52abd92d 100644
+--- a/ui/qemu-pixman.c
++++ b/ui/qemu-pixman.c
+@@ -6,6 +6,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "ui/console.h"
++#include "standard-headers/drm/drm_fourcc.h"
+ 
+ PixelFormat qemu_pixelformat_from_pixman(pixman_format_code_t format)
+ {
+@@ -88,6 +89,27 @@ pixman_format_code_t qemu_default_pixman_format(int bpp, bool native_endian)
+     return 0;
+ }
+ 
++/* Note: drm is little endian, pixman is native endian */
++pixman_format_code_t qemu_drm_format_to_pixman(uint32_t drm_format)
++{
++    static const struct {
++        uint32_t drm_format;
++        pixman_format_code_t pixman;
++    } map[] = {
++        { DRM_FORMAT_RGB888,   PIXMAN_LE_r8g8b8   },
++        { DRM_FORMAT_ARGB8888, PIXMAN_LE_a8r8g8b8 },
++        { DRM_FORMAT_XRGB8888, PIXMAN_LE_x8r8g8b8 }
++    };
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(map); i++) {
++        if (drm_format == map[i].drm_format) {
++            return map[i].pixman;
++        }
++    }
++    return 0;
++}
++
+ int qemu_pixman_get_type(int rshift, int gshift, int bshift)
+ {
+     int type = PIXMAN_TYPE_OTHER;
 -- 
 2.9.3
