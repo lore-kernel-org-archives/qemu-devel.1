@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1et8t6-0003UZ-Er
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:28:01 -0500
+	(envelope-from <kraxel@redhat.com>) id 1et9GA-00009c-Oc
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:51:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1et8t2-0007W2-CL
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:28:00 -0500
-Date: Tue, 6 Mar 2018 10:27:52 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180306102752.168548c7.cohuck@redhat.com>
-In-Reply-To: <d16953b5-e47d-937e-dd61-f0acf302d949@de.ibm.com>
-References: <1519407778-23095-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-	<1519407778-23095-4-git-send-email-imbrenda@linux.vnet.ibm.com>
-	<90dab7d2-be2a-4ab6-ed08-4ce8cac5664f@de.ibm.com>
-	<20180305162710.70f680ff.cohuck@redhat.com>
-	<d16953b5-e47d-937e-dd61-f0acf302d949@de.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 3/3] s390x/sclp: extend
- SCLP event masks to 64 bits
+	(envelope-from <kraxel@redhat.com>) id 1et9G8-0004ya-49
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:51:50 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57526 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1et9G7-0004xb-T9
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:51:48 -0500
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue,  6 Mar 2018 10:51:26 +0100
+Message-Id: <20180306095135.21285-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v7 0/9] vfio: add display support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,54 +21,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: intel-gvt-dev@lists.freedesktop.org, Alex Williamson <alex.williamson@redhat.com>, Tina Zhang <tina.zhang@intel.com>, Gerd Hoffmann <kraxel@redhat.com>, Kirti Wankhede <kwankhede@nvidia.com>
 
-On Tue, 6 Mar 2018 09:23:23 +0100
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+This series adds support for a vgpu display to the qemu vfio code.
 
-> On 03/05/2018 04:27 PM, Cornelia Huck wrote:
-> > On Fri, 2 Mar 2018 10:44:46 +0100
-> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> >   
-> >> On 02/23/2018 06:42 PM, Claudio Imbrenda wrote:  
-> >>> Extend the SCLP event masks to 64 bits.
-> >>>
-> >>> Notice that using any of the new bits results in a state that cannot be
-> >>> migrated to an older version.
-> >>>
-> >>> Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-> >>> ---
-> >>>  hw/s390x/event-facility.c         | 56 ++++++++++++++++++++++++++++++---------
-> >>>  include/hw/s390x/event-facility.h |  2 +-
-> >>>  2 files changed, 45 insertions(+), 13 deletions(-)
-> >>>
-> >>> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-> >>> index e04ed9f..c3e39ee 100644
-> >>> --- a/hw/s390x/event-facility.c
-> >>> +++ b/hw/s390x/event-facility.c
-> >>> @@ -30,7 +30,7 @@ struct SCLPEventFacility {
-> >>>      SysBusDevice parent_obj;
-> >>>      SCLPEventsBus sbus;
-> >>>      /* guest's receive mask */
-> >>> -    sccb_mask_t receive_mask;
-> >>> +    uint32_t receive_mask_pieces[2];    
-> >>
-> >>
-> >> Before the change, we basically use be32_to_cpu to transfer the byte field into a cpu
-> >> endianess value. In the end it is actually a bitfield, but for compat we need to keep
-> >> he reversal. So it will be hard to get this fixed without some kind of ugliness.  
-> > 
-> > Could we also use a compat mask callback/handler for older machines and
-> > switch to 64 bit handlers for the default case? Probably would be even
-> > more ugly, though.  
-> 
-> Claudio had a version with a pre/post/load/save handler. Claudio can you repost this
-> version so that we can have a look what is "less ugly"?
-> 
+v7:
+ - rebase to latest master.
+ - dmabuf: update cursor hotspot properly (Tina).
+ - dmabuf: track whenever cursor hotspot + position changes.
+ - codestryle fixes.
 
-Would that other version be independent of the first two patches (i.e.,
-only replace this patch)?
+v6:
+ - add support for hotplugging QemuConsoles.
+ - drop vfio-pci-display device, re-add OnOffAuto display property.
+ - add proper cleanup in finalize.
 
-I would like to apply patch 1 as it is a fix, and patch 2 seems
-uncontroversial as a cleanup.
+v5:
+ - rebase to latest master
+ - drop DeviceState->hotpluggable patch, use separate vfio-pci-display
+   device instead so we can use DeviceClass->hotpluggable.
+ - add vfio dma-buf patch.  Right now this can be tested with '-display
+   egl-headless' only.  gtk and spice support is almost ready for merge
+   and should follow soon.
+
+cheers,
+  Gerd
+
+Gerd Hoffmann (9):
+  linux-headers: update to 4.16-rc1
+  standard-headers: add drm/drm_fourcc.h
+  ui/pixman: add qemu_drm_format_to_pixman()
+  console: minimal hotplug suport
+  secondary-vga: properly close QemuConsole on unplug
+  vfio/common: cleanup in vfio_region_finalize
+  vfio/display: core & wireup
+  vfio/display: adding region support
+  vfio/display: adding dmabuf support
+
+ hw/vfio/pci.h                                      |   5 +
+ include/hw/vfio/vfio-common.h                      |  22 ++
+ include/standard-headers/drm/drm_fourcc.h          | 411 +++++++++++++++++++++
+ include/standard-headers/linux/input-event-codes.h |   1 +
+ include/standard-headers/linux/input.h             |  11 +
+ include/standard-headers/linux/pci_regs.h          |  30 +-
+ include/standard-headers/linux/virtio_net.h        |  13 +
+ include/ui/console.h                               |   2 +
+ include/ui/qemu-pixman.h                           |   5 +
+ linux-headers/asm-powerpc/kvm.h                    |   2 +
+ linux-headers/asm-powerpc/unistd.h                 |   3 +
+ linux-headers/asm-s390/unistd.h                    | 401 +-------------------
+ linux-headers/asm-s390/unistd_32.h                 | 364 ++++++++++++++++++
+ linux-headers/asm-s390/unistd_64.h                 | 331 +++++++++++++++++
+ linux-headers/asm-x86/kvm_para.h                   |   4 +
+ linux-headers/linux/kvm.h                          |  90 +++++
+ linux-headers/linux/psci.h                         |   3 +
+ linux-headers/linux/vfio.h                         |  72 ++++
+ hw/display/vga-pci.c                               |   9 +
+ hw/vfio/common.c                                   |   7 +
+ hw/vfio/display.c                                  | 347 +++++++++++++++++
+ hw/vfio/pci.c                                      |  10 +
+ ui/console.c                                       |  79 +++-
+ ui/qemu-pixman.c                                   |  22 ++
+ hw/vfio/Makefile.objs                              |   2 +-
+ scripts/update-linux-headers.sh                    |   8 +
+ ui/trace-events                                    |   2 +
+ 27 files changed, 1839 insertions(+), 417 deletions(-)
+ create mode 100644 include/standard-headers/drm/drm_fourcc.h
+ create mode 100644 linux-headers/asm-s390/unistd_32.h
+ create mode 100644 linux-headers/asm-s390/unistd_64.h
+ create mode 100644 hw/vfio/display.c
+
+-- 
+2.9.3
