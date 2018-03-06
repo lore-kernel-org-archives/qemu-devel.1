@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1etCBa-00031Z-CM
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 07:59:19 -0500
+	(envelope-from <berto@igalia.com>) id 1etCEh-0005Um-R8
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:02:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1etCBZ-0008MO-7n
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 07:59:18 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:42977)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1etCBZ-0008Lv-2B
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 07:59:17 -0500
-Received: by mail-ot0-x244.google.com with SMTP id l5so18206946otf.9
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 04:59:16 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <87a7vltmka.fsf@linaro.org>
-References: <20180303143823.27055-1-richard.henderson@linaro.org>
-	<20180303143823.27055-2-richard.henderson@linaro.org>
-	<87a7vltmka.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 6 Mar 2018 12:58:55 +0000
-Message-ID: <CAFEAcA8hNzeCSe2DNwUfzeKOSonHY5uoc31m68F2YQsvcyjJLQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v4 1/5] linux-user: Implement
- aarch64 PR_SVE_SET/GET_VL
+	(envelope-from <berto@igalia.com>) id 1etCEe-0002Yp-OJ
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:02:31 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Tue,  6 Mar 2018 15:01:21 +0200
+Message-Id: <20180306130121.30243-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v4] iotests: Tweak 030 in order to trigger a
+ race condition with parallel jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +18,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
 
-On 6 March 2018 at 12:28, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
->
-> Richard Henderson <richard.henderson@linaro.org> writes:
->
->> As an implementation choice, widening VL has zeroed the
->> previously inaccessible portion of the sve registers.
->>
->> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+This patch tweaks TestParallelOps in iotest 030 so it allocates data
+in smaller regions (256KB/512KB instead of 512KB/1MB) and the
+block-stream job in test_stream_commit() only needs to copy data that
+is at the very end of the image.
 
->> +                int old_vq =3D (env->vfp.zcr_el[1] & 0xf) + 1;
->> +                int vq =3D MAX(arg2 / 16, 1);
->> +
->> +                if (vq < old_vq) {
->> +                    aarch64_sve_narrow_vq(env, vq);
->> +                }
->> +                env->vfp.zcr_el[1] =3D vq - 1;
->
-> It seems odd not to have setting this inside cpu64.c. Won't a similar
-> manipulation need to be made for system mode? I'd keep all the logic
-> together in aarch64_sve_narrow_vq (or maybe call it aarch64_sve_set_vq
-> and pass it the current exception level).
+This way when the block-stream job is awakened it will finish right
+away without any chance of being stopped by block_job_sleep_ns(). This
+triggers the bug that was fixed by 3d5d319e1221082974711af1d09d82f and
+1a63a907507fbbcfaee3f622907ec24 and is therefore a more useful test
+case for parallel block jobs.
 
-I think I asked Richard to put it into linux-user because it was
-in target/arm in an earlier version of this series. The manipulation
-that's happening here is kind of linux-specific (if it were for
-system mode we'd need to think about ZCR_EL2 and ZCR_EL3 as well),
-and the analogy is with cpu_set_tls/cpu_get_tls which are in
-linux-user/arm/target_cpu.h.
+After this patch the aforementiond bug can also be reproduced with the
+test_stream_parallel() test case.
 
-NB: I've already put this series in target-arm.next -- do you want
-me to drop them ? (That would mean they won't go in 2.12, given
-RTH is away.)
+Since with this change the stream job in test_stream_commit() finishes
+early, this patch introduces a similar test case where both jobs are
+slowed down so they can actually run in parallel.
 
-thanks
--- PMM
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Cc: John Snow <jsnow@redhat.com>
+---
+
+v4: Mention that commit 1a63a907507fbbcfaee3f622907ec24 also
+    contributes to solve the original bug (both commits need to
+    reverted in order to reproduce this bug reliably).
+
+    Rewrite the loop that writes data into the images to make it more
+    readable.
+
+---
+ tests/qemu-iotests/030     | 52 ++++++++++++++++++++++++++++++++++++++--------
+ tests/qemu-iotests/030.out |  4 ++--
+ 2 files changed, 45 insertions(+), 11 deletions(-)
+
+diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+index 457984b8e9..b5f88959aa 100755
+--- a/tests/qemu-iotests/030
++++ b/tests/qemu-iotests/030
+@@ -156,7 +156,7 @@ class TestSingleDrive(iotests.QMPTestCase):
+ class TestParallelOps(iotests.QMPTestCase):
+     num_ops = 4 # Number of parallel block-stream operations
+     num_imgs = num_ops * 2 + 1
+-    image_len = num_ops * 1024 * 1024
++    image_len = num_ops * 512 * 1024
+     imgs = []
+ 
+     def setUp(self):
+@@ -176,14 +176,14 @@ class TestParallelOps(iotests.QMPTestCase):
+                      '-o', 'backing_file=%s' % self.imgs[i-1], self.imgs[i])
+ 
+         # Put data into the images we are copying data from
+-        for i in range(self.num_imgs / 2):
+-            img_index = i * 2 + 1
+-            # Alternate between 512k and 1M.
++        odd_img_indexes = [x for x in reversed(range(self.num_imgs)) if x % 2 == 1]
++        for i in range(len(odd_img_indexes)):
++            # Alternate between 256KB and 512KB.
+             # This way jobs will not finish in the same order they were created
+-            num_kb = 512 + 512 * (i % 2)
++            num_kb = 256 + 256 * (i % 2)
+             qemu_io('-f', iotests.imgfmt,
+-                    '-c', 'write -P %d %d %d' % (i, i*1024*1024, num_kb * 1024),
+-                    self.imgs[img_index])
++                    '-c', 'write -P 0xFF %dk %dk' % (i * 512, num_kb),
++                    self.imgs[odd_img_indexes[i]])
+ 
+         # Attach the drive to the VM
+         self.vm = iotests.VM()
+@@ -318,12 +318,14 @@ class TestParallelOps(iotests.QMPTestCase):
+         self.wait_until_completed(drive='commit-drive0')
+ 
+     # Test a block-stream and a block-commit job in parallel
+-    def test_stream_commit(self):
++    # Here the stream job is supposed to finish quickly in order to reproduce
++    # the scenario that triggers the bug fixed in 3d5d319e1221 and 1a63a907507
++    def test_stream_commit_1(self):
+         self.assertLessEqual(8, self.num_imgs)
+         self.assert_no_active_block_jobs()
+ 
+         # Stream from node0 into node2
+-        result = self.vm.qmp('block-stream', device='node2', job_id='node2')
++        result = self.vm.qmp('block-stream', device='node2', base_node='node0', job_id='node2')
+         self.assert_qmp(result, 'return', {})
+ 
+         # Commit from the active layer into node3
+@@ -348,6 +350,38 @@ class TestParallelOps(iotests.QMPTestCase):
+ 
+         self.assert_no_active_block_jobs()
+ 
++    # This is similar to test_stream_commit_1 but both jobs are slowed
++    # down so they can run in parallel for a little while.
++    def test_stream_commit_2(self):
++        self.assertLessEqual(8, self.num_imgs)
++        self.assert_no_active_block_jobs()
++
++        # Stream from node0 into node4
++        result = self.vm.qmp('block-stream', device='node4', base_node='node0', job_id='node4', speed=1024*1024)
++        self.assert_qmp(result, 'return', {})
++
++        # Commit from the active layer into node5
++        result = self.vm.qmp('block-commit', device='drive0', base=self.imgs[5], speed=1024*1024)
++        self.assert_qmp(result, 'return', {})
++
++        # Wait for all jobs to be finished.
++        pending_jobs = ['node4', 'drive0']
++        while len(pending_jobs) > 0:
++            for event in self.vm.get_qmp_events(wait=True):
++                if event['event'] == 'BLOCK_JOB_COMPLETED':
++                    node_name = self.dictpath(event, 'data/device')
++                    self.assertTrue(node_name in pending_jobs)
++                    self.assert_qmp_absent(event, 'data/error')
++                    pending_jobs.remove(node_name)
++                if event['event'] == 'BLOCK_JOB_READY':
++                    self.assert_qmp(event, 'data/device', 'drive0')
++                    self.assert_qmp(event, 'data/type', 'commit')
++                    self.assert_qmp_absent(event, 'data/error')
++                    self.assertTrue('drive0' in pending_jobs)
++                    self.vm.qmp('block-job-complete', device='drive0')
++
++        self.assert_no_active_block_jobs()
++
+     # Test the base_node parameter
+     def test_stream_base_node_name(self):
+         self.assert_no_active_block_jobs()
+diff --git a/tests/qemu-iotests/030.out b/tests/qemu-iotests/030.out
+index 391c8573ca..42314e9c00 100644
+--- a/tests/qemu-iotests/030.out
++++ b/tests/qemu-iotests/030.out
+@@ -1,5 +1,5 @@
+-.......................
++........................
+ ----------------------------------------------------------------------
+-Ran 23 tests
++Ran 24 tests
+ 
+ OK
+-- 
+2.11.0
