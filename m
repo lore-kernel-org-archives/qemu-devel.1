@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1etEFe-0005et-1J
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:11:41 -0500
+	(envelope-from <thuth@redhat.com>) id 1etEHw-0007LU-NQ
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:14:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1etEFY-00086n-BW
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:11:37 -0500
-Date: Tue, 6 Mar 2018 16:11:17 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180306151117.GH7139@localhost.localdomain>
-References: <cover.1519921268.git.berto@igalia.com>
-	<d58bbc353563bb9c83ffe90faaa36fadf683e332.1519921268.git.berto@igalia.com>
-	<20180306145426.GG7139@localhost.localdomain>
-	<w51vae9l041.fsf@maestria.local.igalia.com>
+	(envelope-from <thuth@redhat.com>) id 1etEHt-0001en-Bf
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:14:00 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39234 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1etEHt-0001eT-6X
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:13:57 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D1334404084A
+	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 15:13:56 +0000 (UTC)
+References: <1520342370-123606-1-git-send-email-pbonzini@redhat.com>
+	<1520342370-123606-8-git-send-email-pbonzini@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f264b47a-d5cc-74b7-eab3-a0693f549ee4@redhat.com>
+Date: Tue, 6 Mar 2018 16:13:54 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <w51vae9l041.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [PATCH 3/7] qcow2: Check L1 table parameters in
- qcow2_expand_zero_clusters()
+In-Reply-To: <1520342370-123606-8-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 07/34] Document --rtc-td-hack,
+ --localtime and --startdate as deprecated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,42 +35,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-Am 06.03.2018 um 16:01 hat Alberto Garcia geschrieben:
-> On Tue 06 Mar 2018 03:54:26 PM CET, Kevin Wolf wrote:
-> >> @@ -2092,11 +2092,18 @@ int qcow2_expand_zero_clusters(BlockDriverState *bs,
-> >>      }
-> >>  
-> >>      for (i = 0; i < s->nb_snapshots; i++) {
-> >> -        int l1_sectors = DIV_ROUND_UP(s->snapshots[i].l1_size *
-> >> -                                      sizeof(uint64_t), BDRV_SECTOR_SIZE);
-> >> +        int l1_size2;
-> >> +        uint64_t *new_l1_table;
-> >>  
-> >> -        uint64_t *new_l1_table =
-> >> -            g_try_realloc(l1_table, l1_sectors * BDRV_SECTOR_SIZE);
-> >> +        ret = qcow2_validate_table(bs, s->snapshots[i].l1_table_offset,
-> >> +                                   s->snapshots[i].l1_size, sizeof(uint64_t),
-> >> +                                   QCOW_MAX_L1_SIZE, "", NULL);
-> >> +        if (ret < 0) {
-> >> +            return ret;
-> >
-> > Shouldn't this be goto fail?
+On 06.03.2018 14:19, Paolo Bonzini wrote:
+> From: Thomas Huth <thuth@redhat.com>
 > 
-> You're right, this is a loop, and l1_table could have been initialized
-> in previous iterations.
+> These options have been marked in a comment in qemu-options.hx as
+> deprecated in 2009 already (see commit 1ed2fc1fa35fadc0d6), but we
+> never informed the users about these deprecations. Let's catch up
+> on that omission now.
 > 
-> I'll send a corrected version with this change, but first I'll wait a
-> bit in case you see anything else in the series.
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Message-Id: <1519138892-12836-1-git-send-email-thuth@redhat.com>
+> [Fix messages. - Paolo]
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  qemu-doc.texi | 16 +++++++++++-----
+>  vl.c          |  5 +++++
+>  2 files changed, 16 insertions(+), 5 deletions(-)
+> 
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index fb6fac5..589519a 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -2723,12 +2723,18 @@ filesystem test suite. Also it requires the CAP_DAC_READ_SEARCH capability,
+>  which is not the recommended way to run QEMU. This backend should not be
+>  used and it will be removed with no replacement.
+>  
+> -@subsection -no-frame (since 2.12.0)
+> +@subsection -rtc-td-hack (since 2.12.0)
+>  
+> -The ``-no-frame'' argument works with SDL 1.2 only.  SDL 2.0 lacks
+> -support for frameless windows, and the other user interfaces never
+> -implemented this in the first place.  So this will be removed together
+> -with SDL 1.2 support.
 
-I've finished the review now, the rest looks correct.
+No, this should not be removed. Looks like an accident when resolving a
+conflict?
 
-The only other thing I wondered is about the cases where you pass a
-NULL errp because the callers don't get an Error parameter, so they
-can't pass it on. Some of these callers already use error_report(), so
-it would be okay to use error_report_err() for an error returned by
-qcow2_validate_table(), too. I think that would improve the messages.
-
-Kevin
+ Thomas
