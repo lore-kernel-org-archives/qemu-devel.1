@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47046)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1etJT5-0006M8-5j
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:45:52 -0500
+	(envelope-from <mjc@sifive.com>) id 1etJT8-0006Om-CF
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:45:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1etJT0-0003TS-91
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:45:51 -0500
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:38728)
+	(envelope-from <mjc@sifive.com>) id 1etJT7-0003Wr-Ld
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:45:54 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:38688)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1etJT0-0003TJ-34
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:45:46 -0500
-Received: by mail-pl0-x241.google.com with SMTP id m22-v6so9033222pls.5
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 12:45:45 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1etJT7-0003Wb-9p
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:45:53 -0500
+Received: by mail-pg0-x242.google.com with SMTP id l24so8753701pgc.5
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 12:45:53 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Wed,  7 Mar 2018 09:43:45 +1300
-Message-Id: <1520369037-37977-11-git-send-email-mjc@sifive.com>
+Date: Wed,  7 Mar 2018 09:43:47 +1300
+Message-Id: <1520369037-37977-13-git-send-email-mjc@sifive.com>
 In-Reply-To: <1520369037-37977-1-git-send-email-mjc@sifive.com>
 References: <1520369037-37977-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v1 10/22] RISC-V: Hold rcu_read_lock when
- accessing memory
+Subject: [Qemu-devel] [PATCH v1 12/22] RISC-V: Update E order and I
+ extension order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +27,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches directly <patches@groups.riscv.org>, Stefan O'Rear <sorear2@gmail.com>
+Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
 
->From reading other code that accesses memory regions directly,
-it appears that the rcu_read_lock needs to be held. Note: the
-original code for accessing RAM directly was added because
-there is no other way to use atomic_cmpxchg easily.
+Section 22.8 Subset Naming Convention of the RISC-V ISA Specification
+defines the canonical order for extensions in the ISA string. It is
+silent on the position of the E extension however E is a substitute
+for I so it must come early in the extension list order. A comment
+is added to state E and I are mutually exclusive, as the E extension
+will be added to the RISC-V port in the future.
 
 Signed-off-by: Michael Clark <mjc@sifive.com>
-Signed-off-by: Stefan O'Rear <sorear2@gmail.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- target/riscv/helper.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ target/riscv/cpu.c | 2 +-
+ target/riscv/cpu.h | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/target/riscv/helper.c b/target/riscv/helper.c
-index 02cbcea..228933c 100644
---- a/target/riscv/helper.c
-+++ b/target/riscv/helper.c
-@@ -209,6 +209,7 @@ restart:
-                    as the PTE is no longer valid */
-                 MemoryRegion *mr;
-                 hwaddr l = sizeof(target_ulong), addr1;
-+                rcu_read_lock();
-                 mr = address_space_translate(cs->as, pte_addr,
-                     &addr1, &l, false);
-                 if (memory_access_is_direct(mr, true)) {
-@@ -222,16 +223,19 @@ restart:
-                     target_ulong old_pte =
-                         atomic_cmpxchg(pte_pa, pte, updated_pte);
-                     if (old_pte != pte) {
-+                        rcu_read_unlock();
-                         goto restart;
-                     } else {
-                         pte = updated_pte;
-                     }
- #endif
-                 } else {
-+                    rcu_read_unlock();
-                     /* misconfigured PTE in ROM (AD bits are not preset) or
-                      * PTE is in IO space and can't be updated atomically */
-                     return TRANSLATE_FAIL;
-                 }
-+                rcu_read_unlock();
-             }
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 4851890..d2ae56a 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -26,7 +26,7 @@
  
-             /* for superpage mappings, make a fake leaf PTE for the TLB's
+ /* RISC-V CPU definitions */
+ 
+-static const char riscv_exts[26] = "IMAFDQECLBJTPVNSUHKORWXYZG";
++static const char riscv_exts[26] = "IEMAFDQCLBJTPVNSUHKORWXYZG";
+ 
+ const char * const riscv_int_regnames[] = {
+   "zero", "ra  ", "sp  ", "gp  ", "tp  ", "t0  ", "t1  ", "t2  ",
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index cff02a2..3a0ca2f 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -71,6 +71,7 @@
+ #define RV(x) ((target_ulong)1 << (x - 'A'))
+ 
+ #define RVI RV('I')
++#define RVE RV('E') /* E and I are mutually exclusive */
+ #define RVM RV('M')
+ #define RVA RV('A')
+ #define RVF RV('F')
 -- 
 2.7.0
