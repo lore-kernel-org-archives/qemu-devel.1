@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1etCwD-0005nn-1V
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:47:29 -0500
+	(envelope-from <stefanha@gmail.com>) id 1etCwq-0006Li-U4
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:48:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1etCwC-0001e3-5G
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:47:29 -0500
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:41804)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1etCwB-0001dV-W3
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:47:28 -0500
-Received: by mail-oi0-x241.google.com with SMTP id g5so14837980oiy.8
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 05:47:27 -0800 (PST)
+	(envelope-from <stefanha@gmail.com>) id 1etCwp-0002AE-Gq
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:48:08 -0500
+Date: Tue, 6 Mar 2018 13:47:57 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180306134757.GH31045@stefanha-x1.localdomain>
+References: <20180226170313.8178-1-mreitz@redhat.com>
+	<20180227161743.GC32480@stefanha-x1.localdomain>
+	<f0f0f6a0-bf09-8561-5c81-87d38ebef168@redhat.com>
+	<2fddac03-cde4-8d83-7651-a3928398e909@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180306134317.836-1-berrange@redhat.com>
-References: <20180306134317.836-1-berrange@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 6 Mar 2018 13:47:06 +0000
-Message-ID: <CAFEAcA84nJvwBZhrkZdoHjLerD7_ixfXf8HqiXE9aZnvGe=+WQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] misc: don't use hwaddr as a type in
- trace events
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="YrlhzR9YrZtruaFS"
+Content-Disposition: inline
+In-Reply-To: <2fddac03-cde4-8d83-7651-a3928398e909@redhat.com>
+Subject: Re: [Qemu-devel] [RFC] qemu-img: Drop BLK_ZERO from convert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +26,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-On 6 March 2018 at 13:43, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wro=
-te:
-> Use types that are defined by QEMU in trace events caused build failures
-> for the UST trace backend:
->
->   In file included from trace-ust-all.c:13:0:
->   trace-ust-all.h:11844:206: error: unknown type name =E2=80=98hwaddr=E2=
-=80=99
->
-> It only knows about C built-in types, and any types that are pulled in
-> from includs of qemu-common.h and lttng/tracepoint.h. This does not
-> include the 'hwaddr' type, so replace it with a uint64_t which is what
-> exec/hwaddr.h defines 'hwaddr' as. This fixes the build failure
-> introduced by
->
->   commit 9eb8040c2d2b38e1a40bb6129b1b668fa178fcab
->   Author: Peter Maydell <peter.maydell@linaro.org>
->   Date:   Fri Mar 2 10:45:39 2018 +0000
->
->     hw/misc/tz-ppc: Model TrustZone peripheral protection controller
->
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+--YrlhzR9YrZtruaFS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I'll apply this to master, since it will fix the travis build.
+On Wed, Feb 28, 2018 at 09:11:32PM +0100, Max Reitz wrote:
+> On 2018-02-28 19:08, Max Reitz wrote:
+> > On 2018-02-27 17:17, Stefan Hajnoczi wrote:
+> >> On Mon, Feb 26, 2018 at 06:03:13PM +0100, Max Reitz wrote:
+> >>> There are filesystems (among which is tmpfs) that have a hard time
+> >>> reporting allocation status.  That is definitely a bug in them.
+> >>>
+> >>> However, there is no good reason why qemu-img convert should query the
+> >>> allocation status in the first place.  It does zero detection by itse=
+lf
+> >>> anyway, so we can detect unallocated areas ourselves.
+> >>>
+> >>> Furthermore, if a filesystem driver has any sense, reading unallocated
+> >>> data should take just as much time as lseek(SEEK_DATA) + memset().  So
+> >>> the only overhead we introduce by dropping the manual lseek() call is=
+ a
+> >>> memset() in the driver and a buffer_is_zero() in qemu-img, both of wh=
+ich
+> >>> should be relatively quick.
+> >>
+> >> This makes sense.  Which file systems did you test this patch on?
+> >=20
+> > On tmpfs and xfs, so far.
+> >=20
+> >> XFS, ext4, and tmpfs would be a good minimal test set to prove the
+> >> patch.  Perhaps with two input files:
+> >> 1. A file that is mostly filled with data.
+> >> 2. A file that is only sparsely populated with data.
+> >=20
+> > And probably with vmdk, which (by default) forbids querying any areas
+> > larger than 64 kB.
+> >=20
+> >> The time taken should be comparable with the time before this patch.
+> >=20
+> > Yep, I'll do some benchmarks.
+>=20
+> And the results are in.  I've created 2 GB images on various filesystems
+> in various formats, then I've either written 64 kB every 32 MB to them
+> ("sparse"), or left out 64 kB every 32 MB ("full").  Then I've converted
+> them to null-co:// and took the (real) time through "time". (Script is
+> attached.)
+>=20
+> I've attached the raw results before and after this patch.  Usually, I
+> did six runs for each case and dropped the most extreme outlier --
+> except for full vmdk images, where I've only done one run for each case
+> because creating these images can take a very long time.
+>=20
+> Here are the differences from before to after:
+>=20
+> sparse raw on tmpfs:    + 19 % (436 ms to 520 ms)
+> sparse qcow2 on tmpfs:  - 31 % (435 ms to 301 ms)
+> sparse vmdk on tmpfs:   + 37 % (214 ms to 294 ms)
+>=20
+> sparse raw on xfs:      + 69 % (452 ms to 762 ms)
+> sparse qcow2 on xfs:    - 34 % (462 ms to 304 ms)
+> sparse vmdk on xfs:     + 42 % (210 ms to 298 ms)
+>=20
+> sparse raw on ext4:     +360 % (144 ms to 655 ms)
+> sparse qcow2 on ext4:   +120 % (147 ms to 330 ms)
+> sparse vmdk on ext4:    + 16 % (253 ms to 293 ms)
+>=20
+>=20
+> full raw on tmpfs:      -  9 % (437 ms to 398 ms)
+> full qcow2 on tmpfs:    - 75 % (1.63 s to 403 ms)
+> full vmdk on tmpfs:     -100 % (10 min to 767 ms)
+>=20
+> full raw on xfs:        -  1 % (407 ms to 404 ms, insignificant)
+> full qcow2 on xfs:      -  1 % (410 ms to 404 ms, insignificant)
+> full vmdk on xfs:       - 33 % (1.05 s to 695 ms)
+>=20
+>=20
+>=20
+>=20
+> full raw on ext4:       -  2 % (308 ms to 301 ms, insignificant)
+> full qcow2 on ext4:     +  2 % (307 ms to 312 ms, insignificant)
+> full vmdk on ext4:      - 74 % (3.53 s to 839 ms)
+>=20
+>=20
+> So...  It's more extreme than I had hoped, that's for sure.  What I
+> conclude from this is:
+>=20
+> (1) This patch is generally good for nearly fully allocated images.  In
+> the worst case (on well-behaving filesystems with well-optimized image
+> formats) it changes nothing.  In the best case, conversion time is
+> reduced drastically.
+>=20
+> (2) For sparse raw images, this is absolutely devastating.  Reading them
+> now takes more than (ext4) or nearly (xfs) twice as much time as reading
+> a fully allocated image.  So much for "if a filesystem driver has any
+> sense".
+>=20
+> (2a) It might be worth noting that on xfs, reading the sparse file took
+> longer even before this patch...
+>=20
+> (3) qcow2 is different: It benefits from this patch on tmpfs and xfs
+> (note that reading a sparse qcow2 file took longer than reading a full
+> qcow2 file before this patch!), but it gets pretty much destroyed on
+> ext4, too.
+>=20
+> (4) As for sparse vmdk images...  Reading them takes longer, but it's
+> still fasster than reading full vmdk images, so that's not horrible.
+>=20
+>=20
+> So there we are.  I was wrong about filesystem drivers having any sense,
+> so this patch can indeed have a hugely negative impact.
+>=20
+> I would argue that conversion time for full images is more important,
+> because that's probably the main use case; but the thing is that here
+> this patch only helps for tmpfs and vmdk.  We don't care too much about
+> vmdk, and the fact that tmpfs takes so long simply is a bug.
+>=20
+> I guess the xfs/tmpfs results would still be in a range where they are
+> barely acceptable (because it's mainly a qcow2 vs. raw tradeoff), but
+> the ext4 horrors probably make this patch a no-go in its current form.
+>=20
+> In any case it's interesting to see that even the current qemu-img
+> convert takes longer to read sparsely allocated qcow2/raw files from xfs
+> than fully allocated images...
+>=20
+>=20
+> So I guess I'll re-send this patch where the change is done only for
+> -S 0.
 
-thanks
--- PMM
+Wow, unexpected.  Thanks for doing the benchmarks!
+
+Stefan
+
+--YrlhzR9YrZtruaFS
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJanpwNAAoJEJykq7OBq3PIxXYH/iIXnDNpBvSo/QBauoa/dpJk
+9YHL7LNDIult41mP5tHwy06GUayWg2XFx9w9pmFcMhVLzScp/wjaJo13Xys8rqIt
+PZSNWTh0nMbjiwA6nA1crk7elq4yMhMAwhFz4tutCUutgunqISQ96a4yHCKFsZIZ
+rW22I/TeYkZlWhgG9qx9VLx1IGeMQ1NLGEXSb7vDueCjZGntN68m4oxHtATthpdr
+a/wmopurkfj+l2DJt1eo97gU9sAKE0r2uHL4HRRLPAcPPMmOVmLLbTlohfvCVbNq
+FhQQy/fTI8fi1Ijbf1WxgSqn9C9iMKS+EHckf+uweK6rXYMcInzsq/c5MXhktgs=
+=HHzr
+-----END PGP SIGNATURE-----
+
+--YrlhzR9YrZtruaFS--
