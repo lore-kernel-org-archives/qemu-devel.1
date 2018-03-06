@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1etAl4-0007Ou-VN
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:27:51 -0500
+	(envelope-from <stefanha@gmail.com>) id 1etAoj-0000Ek-2q
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:31:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1etAl1-0005Aq-OG
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:27:50 -0500
-Received: from mga02.intel.com ([134.134.136.20]:35804)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1etAl1-0005AQ-Dw
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:27:47 -0500
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-Date: Tue, 6 Mar 2018 11:27:41 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C257439B88B68@SHSMSX104.ccr.corp.intel.com>
-References: <1519900415-30314-1-git-send-email-yi.l.liu@linux.intel.com>
-	<1519900415-30314-9-git-send-email-yi.l.liu@linux.intel.com>
-	<f9ee648a-ff93-b57a-4b05-6bd0f40c15bf@redhat.com>
-	<20180305084207.GE2482@sky-dev>
-	<2160f478-2c8a-8fbe-1df8-78c1984cf375@redhat.com>
-	<20180306110337.GC3158@sky-dev>
-	<c888c285-ffb8-aa4c-6486-2b9bddb64844@redhat.com>
-In-Reply-To: <c888c285-ffb8-aa4c-6486-2b9bddb64844@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <stefanha@gmail.com>) id 1etAof-0007Js-3i
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:31:37 -0500
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:34311)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1etAoe-0007IV-Sw
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:31:33 -0500
+Received: by mail-wr0-x241.google.com with SMTP id o8so9055314wra.1
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 03:31:32 -0800 (PST)
+Date: Tue, 6 Mar 2018 11:31:30 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180306113129.GD31045@stefanha-x1.localdomain>
+References: <CAMyPS3QVbV2FPNfE-Y_-kgpcpOTWr9zFWED50oCkJaBjJ3XtRg@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 08/12] hw/pci: introduce
- pci_device_notify_iommu()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="jCrbxBqMcLqd4mOl"
+Content-Disposition: inline
+In-Reply-To: <CAMyPS3QVbV2FPNfE-Y_-kgpcpOTWr9zFWED50oCkJaBjJ3XtRg@mail.gmail.com>
+Subject: Re: [Qemu-devel] make error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,31 +29,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>, "mst@redhat.com" <mst@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "peterx@redhat.com" <peterx@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+To: Ronald Delobel <rdelobel@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-PiBGcm9tOiBQYW9sbyBCb256aW5pIFttYWlsdG86cGJvbnppbmlAcmVkaGF0LmNvbV0NCj4gU2Vu
-dDogVHVlc2RheSwgTWFyY2ggNiwgMjAxOCA3OjIyIFBNDQo+IFN1YmplY3Q6IFJlOiBbUWVtdS1k
-ZXZlbF0gW1BBVENIIHYzIDA4LzEyXSBody9wY2k6IGludHJvZHVjZQ0KPiBwY2lfZGV2aWNlX25v
-dGlmeV9pb21tdSgpDQo+IA0KPiBPbiAwNi8wMy8yMDE4IDEyOjAzLCBMaXUsIFlpIEwgd3JvdGU6
-DQo+ID4gT24gVHVlLCBNYXIgMDYsIDIwMTggYXQgMTE6MTg6NDNBTSArMDEwMCwgUGFvbG8gQm9u
-emluaSB3cm90ZToNCj4gPj4gT24gMDUvMDMvMjAxOCAwOTo0MiwgTGl1LCBZaSBMIHdyb3RlOg0K
-PiA+Pj4+IEluIGdlbmVyYWwgSSB0aGluayBpdCdzIGJldHRlciB0byBjaGFuZ2UgeW91ciBuYW1l
-cyBmcm9tICJhc3NpZ25lZF9kZXYiDQo+ID4+Pj4gdG8gInN2YV9kZXYiLCBiZWNhdXNlIHRoZSBw
-b2ludCBvZiB0aGUgbGlzdCBpcyB0byBvbmx5IGl0ZXJhdGUgb3Zlcg0KPiA+Pj4+IGRldmljZXMg
-dGhhdCBtaWdodCBiZSBpbnRlcmVzdGVkIGluIHVzaW5nIFNWQS4NCj4gPj4+DQo+ID4+PiBGb3Ig
-ImFzc2lnbmVkX2RldiIsIG15IHB1cnBvc2UgaXMgdG8gZGlzdGluZ3Vpc2ggImFzc2lnbmVkIGRl
-dmljZXMiDQo+ID4+PiBmcm9tIGVtdWxhdGVkIGRldmljZXMuIE9ubHkgdGhlIFNWQSB1c2FnZSBv
-biAiYXNzaWduZWQgZGV2aWNlcyIgaXMgY2FyZWQgaGVyZS4NCj4gPj4+IEJ1dCBpdCBpcyB0cnVl
-IG9ubHkgU1ZBIGNhcGFibGUgZGV2aWNlIGlzIGludGVyZXN0ZWQuIFNvIEkgbWF5IG5lZWQNCj4g
-Pj4+IHRvIHJlbmFtZSBpdCBhcyAiYXNzaWduZWRfc3ZhX2RldiIuIEhvdyBhYm91dCB5b3VyIG9w
-aW5pb24/DQo+ID4+DQo+ID4+IFdoYXQgeW91IGNhcmUgYWJvdXQgaXMgbm90IHdoZXRoZXIgdGhl
-IGRldmljZSBhc3NpZ25lZCwgYnV0IHJhdGhlcg0KPiA+PiB3aGV0aGVyIGl0IGNhbGxlZCBvciBu
-b3QgcGNpX3NldHVwX3N2YV9vcHMuICBDdXJyZW50bHkgb25seSBWRklPIGRvZXMNCj4gPj4gdGhp
-cywgYnV0IHRoYXQncyBub3QgYSByZXF1aXJlbWVudC4gIEhlbmNlIG15IHN1Z2dlc3Rpb24gb2Yg
-Y2FsbGluZw0KPiA+PiBpdCBzdmFfZGV2Lg0KPiA+DQo+ID4gWWVzLCBvbmx5IFZGSU8gY2FsbHMg
-cGNpX3NldHVwX3N2YV9vcHMgc28gZmFyLCBidXQgaXQgc2hvdWxkIG5vdCBsaW1pdGVkIHRvLg0K
-PiA+IEknbGwgYXBwbHkgaW4gbmV4dCB2ZXJzaW9uLg0KPiANCj4gRm9yIHdoYXQgaXQncyB3b3J0
-aCwgSSBhZ3JlZSB3aXRoIERhdmlkJ3Mgc3VnZ2VzdGlvbiBmb3IgbmFtaW5nIChzbw0KPiBwY2lf
-c2V0dXBfcGFzaWRfb3BzLCBwYXNpZF9kZXYsIGV0Yy4pDQoNClRoYW5rcywgUGFvbG8uIEkgd291
-bGQgZm9sbG93IHN1Z2dlc3Rpb25zIGZyb20geW91IHR3by4NCg0KUmVnYXJkcywNCllpIExpdQ0K
+
+--jCrbxBqMcLqd4mOl
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Feb 20, 2018 at 04:40:49PM +0100, Ronald Delobel wrote:
+> Hello,
+>=20
+> This is the error I get when building qemu-2.11.[0-1] with
+> gcc-7.3.0/glibc-2.27, removing the static attribute suffice to finnish the
+> build using the glibc provided memfd_create and qemu don't crash, but I
+> miss some knowledge here about what a static function really is, a kind of
+> private one? Shouldn't it be renamed instead and stay as static?
+>=20
+> Just to report it.
+
+Thanks for reporting this.  Peter Maydell looked into this and answered
+it in another email thread:
+
+  "this looks like a QEMU incompatibility with newer glibc that
+  we fixed in QEMU commit 75e5b70e6b5dcc4. That didn't quite make
+  the 2.11.0 release, but will be in 2.12.0."
+
+>   CC      util/qemu-thread-posix.o
+>   CC      util/memfd.o
+> util/memfd.c:40:12: error: la d=E9claration statique de =AB memfd_create =
+=BB suit
+> une d=E9claration non statique
+>  static int memfd_create(const char *name, unsigned int flags)
+>             ^~~~~~~~~~~~
+> In file included from /usr/include/bits/mman-linux.h:115:0,
+>                  from /usr/include/bits/mman.h:45,
+>                  from /usr/include/sys/mman.h:41,
+>                  from
+> /usr/local/src/qemu-2.11.1/include/sysemu/os-posix.h:29,
+>                  from /usr/local/src/qemu-2.11.1/include/qemu/osdep.h:104,
+>                  from util/memfd.c:28:
+> /usr/include/bits/mman-shared.h:46:5: note: la d=E9claration pr=E9c=E9den=
+te de
+> =AB memfd_create =BB =E9tait ici
+>  int memfd_create (const char *__name, unsigned int __flags) __THROW;
+>      ^~~~~~~~~~~~
+> make: *** [/usr/local/src/qemu-2.11.1/rules.mak:66: util/memfd.o] Error 1
+
+--jCrbxBqMcLqd4mOl
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJannwRAAoJEJykq7OBq3PI+EwIAMmXHgq12iC9DAydeOO2WwKw
+X4btY8uqSqoW7XIzHH8bfy06OfWWaTuB7KSWbr2puOAOI87FMrrnnYivAGwLPU0n
+ozub0sDZ01+V/sxn2EM9Quze7y1BQOqZprRS/6j3CSUmytY+K3uZ1P0nj2McPOfj
+VRt8k/rs1REbDXFCFws/LrN4Qa5mSAIfKPU2zsWEyx+UGjYdUhlOLWyH5XRhgvxP
+FEBD7UyBE0ss780rSSZSjgyXEj+GCD8yg7ppi4cWnX/T81am8tjoE+m8n++UvzTp
+g6zZCV8elXzm2xCZuG1kdZA6OCaPVc9LQZZ4vCJE8/E+fgAOehjZRpaf6XsAwnQ=
+=dcGn
+-----END PGP SIGNATURE-----
+
+--jCrbxBqMcLqd4mOl--
