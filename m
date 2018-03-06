@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1etCjE-0002Ud-Q0
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:34:06 -0500
+	(envelope-from <yulei.zhang@intel.com>) id 1etCjt-00031a-29
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:34:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1etCjD-0007GR-RE
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:34:04 -0500
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:41659)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1etCjD-0007Fe-MF
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:34:03 -0500
-Received: by mail-ot0-x242.google.com with SMTP id w38so18310294ota.8
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 05:34:03 -0800 (PST)
+	(envelope-from <yulei.zhang@intel.com>) id 1etCjp-0007eV-Rn
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:34:45 -0500
+Received: from mga02.intel.com ([134.134.136.20]:44093)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yulei.zhang@intel.com>)
+	id 1etCjp-0007dH-Go
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:34:41 -0500
+From: "Zhang, Yulei" <yulei.zhang@intel.com>
+Date: Tue, 6 Mar 2018 13:34:37 +0000
+Message-ID: <01FDBDDE256B79498DC57789713132D46A0779DA@SHSMSX101.ccr.corp.intel.com>
+References: <1520229653-10658-1-git-send-email-yulei.zhang@intel.com>
+	<077d834a-b32b-8ab0-d2b5-264d4eefbc70@nvidia.com>
+In-Reply-To: <077d834a-b32b-8ab0-d2b5-264d4eefbc70@nvidia.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20180306132430.32110-1-berrange@redhat.com>
-References: <20180306132430.32110-1-berrange@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 6 Mar 2018 13:33:42 +0000
-Message-ID: <CAFEAcA95xt-9MJHcRC7WovEB3W259_eFD7Q8v_pG5rGh3L7oCg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] misc: don't use hwaddr as a type in trace
- events
+Subject: Re: [Qemu-devel] [PATCH V3 0/4] vfio: Introduce Live migration
+ capability to vfio_mdev device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +30,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>
 
-On 6 March 2018 at 13:24, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wro=
-te:
-> Use types that are defined by QEMU in trace events caused build failures
-> for the UST trace backend:
->
->   In file included from trace-ust-all.c:13:0:
->   trace-ust-all.h:11844:206: error: unknown type name =E2=80=98hwaddr=E2=
-=80=99
->
-> It only knows about C built-in types, and any types that are pulled in
-> from includs of qemu-common.h and lttng/tracepoint.h. This does not
-> include the 'hwaddr' type, so replace it with a uint64_t which is what
-> exec/hwaddr.h defines 'hwaddr' as. This fixes the build failure
-> introduced by
->
->   commit 9eb8040c2d2b38e1a40bb6129b1b668fa178fcab
->   Author: Peter Maydell <peter.maydell@linaro.org>
->   Date:   Fri Mar 2 10:45:39 2018 +0000
->
->     hw/misc/tz-ppc: Model TrustZone peripheral protection controller
->
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
-
-Oops.
-
-> --- a/hw/misc/trace-events
-> +++ b/hw/misc/trace-events
-> @@ -92,8 +92,8 @@ tz_ppc_cfg_sec_resp(int level) "TZ PPC: cfg_sec_resp =
-=3D %d"
->  tz_ppc_irq_enable(int level) "TZ PPC: int_enable =3D %d"
->  tz_ppc_irq_clear(int level) "TZ PPC: int_clear =3D %d"
->  tz_ppc_update_irq(int level) "TZ PPC: setting irq line to %d"
-> -tz_ppc_read_blocked(int n, hwaddr offset, bool secure, bool user) "TZ PP=
-C: port %d offset 0x%" HWADDR_PRIx " read (secure %d user %d) blocked"
-> -tz_ppc_write_blocked(int n, hwaddr offset, bool secure, bool user) "TZ P=
-PC: port %d offset 0x%" HWADDR_PRIx " write (secure %d user %d) blocked"
-> +tz_ppc_read_blocked(int n, uint64_t offset, bool secure, bool user) "TZ =
-PPC: port %d offset 0x%" HWADDR_PRIx " read (secure %d user %d) blocked"
-> +tz_ppc_write_blocked(int n, uint64_t offset, bool secure, bool user) "TZ=
- PPC: port %d offset 0x%" HWADDR_PRIx " write (secure %d user %d) blocked"
-
-
-If the type isn't "hwaddr" then HWADDR_PRIx is the wrong
-format string macro -- those should change to PRIx64.
-
-thanks
--- PMM
+SGkgS2lydGksDQoNClllcywgdGhhdCBpcyB0aGUgcGxhbiBhbmQgd2Ugd2lsbCBhZGRyZXNzIGl0
+IGluIHRoZSBjb21pbmcgdmVyc2lvbnMuDQpJbiB0aGlzIHZlcnNpb24gd2UganVzdCByZWJhc2Ug
+dGhlIGNvZGUgYW5kIGxvb2tpbmcgZm9yIG1vcmUgaW5wdXRzLg0KDQpUaGFua3MsIA0KWXVsZWkN
+Cg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBLaXJ0aSBXYW5raGVkZSBb
+bWFpbHRvOmt3YW5raGVkZUBudmlkaWEuY29tXQ0KPiBTZW50OiBNb25kYXksIE1hcmNoIDUsIDIw
+MTggOTowMyBQTQ0KPiBUbzogWmhhbmcsIFl1bGVpIDx5dWxlaS56aGFuZ0BpbnRlbC5jb20+OyBx
+ZW11LWRldmVsQG5vbmdudS5vcmcNCj4gQ2M6IFRpYW4sIEtldmluIDxrZXZpbi50aWFuQGludGVs
+LmNvbT47IHpoZW55dXdAbGludXguaW50ZWwuY29tOw0KPiBhbGV4LndpbGxpYW1zb25AcmVkaGF0
+LmNvbQ0KPiBTdWJqZWN0OiBSZTogW1BBVENIIFYzIDAvNF0gdmZpbzogSW50cm9kdWNlIExpdmUg
+bWlncmF0aW9uIGNhcGFiaWxpdHkgdG8NCj4gdmZpb19tZGV2IGRldmljZQ0KPiANCj4gSGkgWXVs
+ZWkgWmhhbmcsDQo+IA0KPiBUaGlzIHNlcmllcyBpcyBzYW1lIGFzIHRoZSBwcmV2aW91cyB2ZXJz
+aW9uLCB0aGF0IGlzLCB0aGVyZSBpcyBubyBwcmUtY29weQ0KPiBwaGFzZS4gVGhpcyBvbmx5IHRh
+a2VzIGNhcmUgb2Ygc3RvcC1hbmQtY29weSBwaGFzZS4NCj4gQXMgcGVyIHdlIGRpc2N1c3NlZCBp
+biBLVk0gRm9ydW0gMjAxNyBpbiBPY3RvYmVyLCB0aGVyZSBzaG91bGQgYmUNCj4gcHJvdmlzaW9u
+IG9mIHByZS1jb3B5IHBoYXNlLg0KPiANCj4gVGhhbmtzLA0KPiBLaXJ0aQ0KPiANCj4gT24gMy81
+LzIwMTggMTE6MzAgQU0sIFl1bGVpIFpoYW5nIHdyb3RlOg0KPiA+IFN1bW1hcnkNCj4gPg0KPiA+
+IFRoaXMgc2VyaWVzIFJGQyB3b3VsZCBsaWtlIHRvIHJlc3VtZSB0aGUgZGlzY3Vzc2lvbiBhYm91
+dCBob3cgdG8NCj4gPiBpbnRyb2R1Y2UgdGhlIGxpdmUgbWlncmF0aW9uIGNhcGFiaWxpdHkgdG8g
+dmZpbyBtZGV2IGRldmljZS4NCj4gPg0KPiA+IEJ5IGFkZGluZyBhIG5ldyB2ZmlvIHN1YnR5cGUg
+cmVnaW9uDQo+IFZGSU9fUkVHSU9OX1NVQlRZUEVfREVWSUNFX1NUQVRFLA0KPiA+IHRoZSBtZGV2
+IGRldmljZSB3aWxsIGJlIHNldCB0byBtaWdyYXRhYmxlIGlmIHRoZSBuZXcgcmVnaW9uIGV4aXN0
+DQo+ID4gZHVyaW5nIHRoZSBpbml0aWFsaXphdGlvbi4NCj4gPg0KPiA+IFRoZSBpbnRlbnRpb24g
+dG8gYWRkIHRoZSBuZXcgcmVnaW9uIGlzIHVzaW5nIGl0IGZvciBtZGV2IGRldmljZSBzdGF0dXMN
+Cj4gPiBzYXZlIGFuZCByZXN0b3JlIGR1cmluZyB0aGUgbWlncmF0aW9uLiBUaGUgYWNjZXNzIHRv
+IHRoaXMgcmVnaW9uIHdpbGwNCj4gPiBiZSB0cmFwcGVkIGFuZCBmb3J3YXJkIHRvIHRoZSBtZGV2
+IGRldmljZSBkcml2ZXIsIGl0IGFsc28gdXNlcyB0aGUNCj4gPiBmaXJzdCBieXRlIGluIHRoZSBu
+ZXcgcmVnaW9uIHRvIGNvbnRyb2wgdGhlIHJ1bm5pbmcgc3RhdGUgb2YgbWRldg0KPiA+IGRldmlj
+ZSwgc28gZHVyaW5nIHRoZSBtaWdyYXRpb24gYWZ0ZXIgc3RvcCB0aGUgbWRldiBkcml2ZXIsIHFl
+bXUgY291bGQNCj4gPiByZXRyaWV2ZSB0aGUgc3BlY2lmaWMgZGV2aWNlIHN0YXR1cyBmcm9tIHRo
+aXMgcmVnaW9uIGFuZCB0cmFuc2ZlciB0bw0KPiA+IHRoZSB0YXJnZXQgVk0gc2lkZSBmb3IgdGhl
+IG1kZXYgZGV2aWNlIHJlc3RvcmUuDQo+ID4NCj4gPiBJbiBhZGRpdGlvbiwgIHdlIGFkZCBvbmUg
+bmV3IGlvY3RsIFZGSU9fSU9NTVVfR0VUX0RJUlRZX0JJVE1BUCB0bw0KPiBoZWxwDQo+ID4gZG8g
+dGhlIG1kZXYgZGV2aWNlIGRpcnR5IHBhZ2Ugc3luY2hyb25pemF0aW9uIGR1cmluZyB0aGUgbWln
+cmF0aW9uLA0KPiA+IGN1cnJlbnRseSBpdCBpcyBqdXN0IGZvciBzdGF0aWMgY29weSwgaW4gdGhl
+IGZ1dHVyZSB3ZSB3b3VsZCBsaWtlIHRvDQo+ID4gYWRkIG5ldyBpbnRlcmZhY2UgZm9yIHRoZSBw
+cmUtY29weS4NCj4gPg0KPiA+IEJlbG93IGlzIHRoZSB2ZmlvX21kZXYgZGV2aWNlIG1pZ3JhdGlv
+biBzZXF1ZW5jZSBTb3VyY2UgVk0gc2lkZToNCj4gPiAJCQlzdGFydCBtaWdyYXRpb24NCj4gPiAJ
+CQkJfA0KPiA+IAkJCQlWDQo+ID4gICAgICAgICAJIGdldCB0aGUgY3B1IHN0YXRlIGNoYW5nZSBj
+YWxsYmFjaywgd3JpdGUgdG8gdGhlDQo+ID4gICAgICAgICAJIHN1YnJlZ2lvbidzIGZpcnN0IGJ5
+dGUgdG8gc3RvcCB0aGUgbWRldiBkZXZpY2UNCj4gPiAJCQkJfA0KPiA+IAkJCQlWDQo+ID4gCQkg
+cXVhcnkgdGhlIGRpcnR5IHBhZ2UgYml0bWFwIGZyb20gaW9tbXUgY29udGFpbmVyDQo+ID4gCQkg
+YW5kIGFkZCBpbnRvIHFlbXUgZGlydHkgbGlzdCBmb3Igc3luY2hyb25pemF0aW9uDQo+ID4gCQkJ
+CXwNCj4gPiAJCQkJVg0KPiA+IAkJIHNhdmUgdGhlIGRlaXZjZSBzdGF0dXMgaW50byBRZW11Zmls
+ZSB3aGljaCBpcw0KPiA+ICAgICAgICAgICAgICAgICAgICAgIHJlYWQgZnJvbSB0aGUgdmZpbyBk
+ZXZpY2Ugc3VicmVnaW9uDQo+ID4NCj4gPiBUYXJnZXQgVk0gc2lkZToNCj4gPiAJCSAgIHJlc3Rv
+cmUgdGhlIG1kZXYgZGV2aWNlIGFmdGVyIGdldCB0aGUNCj4gPiAJCSAgICAgc2F2ZWQgc3RhdHVz
+IGNvbnRleHQgZnJvbSBRZW11ZmlsZQ0KPiA+IAkJCQl8DQo+ID4gCQkJCVYNCj4gPiAJCSAgICAg
+Z2V0IHRoZSBjcHUgc3RhdGUgY2hhbmdlIGNhbGxiYWNrDQo+ID4gIAkJICAgICB3cml0ZSB0byBz
+dWJyZWdpb24ncyBmaXJzdCBieXRlIHRvDQo+ID4gICAgICAgICAgICAgICAgICAgICAgIHN0YXJ0
+IHRoZSBtZGV2IGRldmljZSB0byBwdXQgaXQgaW4NCj4gPiAgICAgICAgICAgICAgICAgICAgICAg
+cnVubmluZyBzdGF0dXMNCj4gPiAJCQkJfA0KPiA+IAkJCQlWDQo+ID4gCQkJZmluaXNoIG1pZ3Jh
+dGlvbg0KPiA+DQo+ID4gVjMtPlYyOg0KPiA+IDEuIHJlYmFzZSB0aGUgcGF0Y2ggdG8gUWVtdSBz
+dGFibGUgMi4xMCBicmFuY2guDQo+ID4gMi4gdXNlIGEgY29tbW9uIG5hbWUgZm9yIHRoZSBzdWJy
+ZWdpb24gaW5zdGVhZCBvZiBzcGVjaWZpYyBmb3INCj4gPiAgICBpbnRlbCBJR0QuDQo+ID4NCj4g
+PiBWMS0+VjI6DQo+ID4gUGVyIEFsZXgncyBzdWdnZXN0aW9uOg0KPiA+IDEuIHVzZSBkZXZpY2Ug
+c3VidHlwZSByZWdpb24gaW5zdGVhZCBvZiBWRklPIFBDSSBmaXhlZCByZWdpb24uDQo+ID4gMi4g
+cmVtb3ZlIHVubmVjZXNzYXJ5IGlvY3RsLCB1c2UgdGhlIGZpcnN0IGJ5dGUgb2Ygc3VicmVnaW9u
+IHRvDQo+ID4gICAgY29udHJvbCB0aGUgcnVubmluZyBzdGF0ZSBvZiBtZGV2IGRldmljZS4NCj4g
+PiAzLiBmb3IgZGlydHkgcGFnZSBzeW5jaHJvbml6YXRpb24sIGltcGxlbWVudCB0aGUgaW50ZXJm
+YWNlIHdpdGgNCj4gPiAgICBWRklPQ29udGFpbmVyIGluc3RlYWQgb2YgdmZpbyBwY2kgZGV2aWNl
+Lg0KPiA+DQo+ID4gWXVsZWkgWmhhbmcgKDQpOg0KPiA+ICAgdmZpbzogaW50cm9kdWNlIGEgbmV3
+IFZGSU8gc3VicmVnaW9uIGZvciBtZGV2IGRldmljZSBtaWdyYXRpb24gc3VwcG9ydA0KPiA+ICAg
+dmZpbzogQWRkIHZtIHN0YXR1cyBjaGFuZ2UgY2FsbGJhY2sgdG8gc3RvcC9yZXN0YXJ0IHRoZSBt
+ZGV2IGRldmljZQ0KPiA+ICAgdmZpbzogQWRkIHN0cnVjdCB2ZmlvX3Ztc3RhdGVfaW5mbyB0byBp
+bnRyb2R1Y2UgcHV0L2dldCBjYWxsYmFjaw0KPiA+ICAgICBmdW50aW9uIGZvciB2ZmlvIGRldmlj
+ZSBzdGF0dXMgc2F2ZS9yZXN0b3JlDQo+ID4gICB2aWZvOiBpbnRyb2R1Y2UgbmV3IFZGSU8gaW9j
+dGwgVkZJT19JT01NVV9HRVRfRElSVFlfQklUTUFQDQo+ID4NCj4gPiAgaHcvdmZpby9jb21tb24u
+YyAgICAgICAgICAgICAgfCAgMzQgKysrKysrKysrDQo+ID4gIGh3L3ZmaW8vcGNpLmMgICAgICAg
+ICAgICAgICAgIHwgMTcxDQo+ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrLQ0KPiA+ICBody92ZmlvL3BjaS5oICAgICAgICAgICAgICAgICB8ICAgMSArDQo+ID4gIGlu
+Y2x1ZGUvaHcvdmZpby92ZmlvLWNvbW1vbi5oIHwgICAxICsNCj4gPiAgbGludXgtaGVhZGVycy9s
+aW51eC92ZmlvLmggICAgfCAgMjkgKysrKysrLQ0KPiA+ICA1IGZpbGVzIGNoYW5nZWQsIDIzMiBp
+bnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygtKQ0KPiA+DQo=
