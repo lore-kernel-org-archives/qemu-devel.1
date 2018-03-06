@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1et3TO-0005pA-62
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 22:41:07 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1et3nl-0001Nj-0h
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:02:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1et3TN-00040X-3Y
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 22:41:06 -0500
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:33759)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1et3TM-000407-TH
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 22:41:05 -0500
-Received: by mail-oi0-x243.google.com with SMTP id e9so7176212oii.0
-	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 19:41:04 -0800 (PST)
+	(envelope-from <dgibson@ozlabs.org>) id 1et3nk-0004N6-6e
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:02:09 -0500
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Tue,  6 Mar 2018 15:01:25 +1100
+Message-Id: <20180306040154.3669-2-david@gibson.dropbear.id.au>
+In-Reply-To: <20180306040154.3669-1-david@gibson.dropbear.id.au>
+References: <20180306040154.3669-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-References: <1519944838-12430-1-git-send-email-cota@braap.org>
-	<CAHNT7NusFbz=Dt0TGEWKFyJjDDpF3zjGmfkKw4w9thBOFzHb6g@mail.gmail.com>
-	<20180306025659.GA4195@flamenco>
-In-Reply-To: <20180306025659.GA4195@flamenco>
-From: Michael Clark <mjc@sifive.com>
-Date: Tue, 06 Mar 2018 03:40:53 +0000
-Message-ID: <CAHNT7NuU-_Evs1XDu5tEOBregHx0HNO_ANvWDABsU6Ld02uMmQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCHv1 00/14] Translation loop conversion for
- sh4/sparc/mips/s390x/openrisc targets
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 01/30] spapr: fix missing CPU core nodes in DT
+ when running with TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +23,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: Alexander Graf <agraf@suse.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, Stafford Horne <shorne@gmail.com>, Yongbok Kim <yongbok.kim@mips.com>, qemu-s390x@nongnu.org
+To: peter.maydell@linaro.org, groug@kaod.org
+Cc: agraf@suse.de, surajjs@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Tue, 6 Mar 2018 at 3:57 PM, Emilio G. Cota <cota@braap.org> wrote:
+From: Greg Kurz <groug@kaod.org>
 
-> On Tue, Mar 06, 2018 at 12:57:13 +1300, Michael Clark wrote:
-> > On Fri, Mar 2, 2018 at 11:53 AM, Emilio G. Cota <cota@braap.org> wrote:
-> >
-> > > [ What is this all about? See this message:
-> > >   http://lists.gnu.org/archive/html/qemu-devel/2018-02/msg04785.html ]
-> (snip)
-> > > You can fetch this series from:
-> > >   https://github.com/cota/qemu/tree/trloop-conv-v1
-> >
-> >
-> > Curious to know what we would need to change in RISC-V translate.c:
-> >
-> > -
-> >
-> https://github.com/riscv/riscv-qemu/blob/qemu-upstream-v8/target/riscv/translate.c
-> >
-> > I'm going to make a v8.1 branch and tag that is a rebase of the v8 patch
-> > series against current QEMU master, and hopefully we get the RISC-V port
-> > merged before the soft-freeze. Fingers crossed.
->
-> I have patches that convert riscv as well.
->
-> Once riscv is on master I'll send the patches to the list; I don't want
-> this work to delay the riscv merge even more!
+Commit 5d0fb1508e2d "spapr: consolidate the VCPU id numbering logic
+in a single place" introduced a helper to detect thread0 of a virtual
+core based on its VCPU id. This is used to create CPU core nodes in
+the DT, but it is broken in TCG.
 
+$ qemu-system-ppc64 -nographic -accel tcg -machine dumpdtb=3Ddtb.bin \
+                    -smp cores=3D16,maxcpus=3D16,threads=3D1
+$ dtc -f -O dts dtb.bin | grep POWER8
+                PowerPC,POWER8@0 {
+                PowerPC,POWER8@8 {
 
-Appreciated. Thanks very much!
+instead of the expected 16 cores that we get with KVM:
 
-Michael
+$ dtc -f -O dts dtb.bin | grep POWER8
+                PowerPC,POWER8@0 {
+                PowerPC,POWER8@8 {
+                PowerPC,POWER8@10 {
+                PowerPC,POWER8@18 {
+                PowerPC,POWER8@20 {
+                PowerPC,POWER8@28 {
+                PowerPC,POWER8@30 {
+                PowerPC,POWER8@38 {
+                PowerPC,POWER8@40 {
+                PowerPC,POWER8@48 {
+                PowerPC,POWER8@50 {
+                PowerPC,POWER8@58 {
+                PowerPC,POWER8@60 {
+                PowerPC,POWER8@68 {
+                PowerPC,POWER8@70 {
+                PowerPC,POWER8@78 {
 
->
->
+This happens because spapr_get_vcpu_id() maps VCPU ids to
+cs->cpu_index in TCG mode. This confuses the code in
+spapr_is_thread0_in_vcore(), since it assumes thread0 VCPU
+ids to have a spapr->vsmt spacing.
+
+    spapr_get_vcpu_id(cpu) % spapr->vsmt =3D=3D 0
+
+Actually, there's no real reason to expose cs->cpu_index instead
+of the VCPU id, since we also generate it with TCG. Also we already
+set it explicitly in spapr_set_vcpu_id(), so there's no real reason
+either to call kvm_arch_vcpu_id() with KVM.
+
+This patch unifies spapr_get_vcpu_id() to always return the computed
+VCPU id both in TCG and KVM. This is one step forward towards KVM<->TCG
+migration.
+
+Fixes: 5d0fb1508e2d
+Reported-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
+
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 83c9d66dd5..d6fd0e666e 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3810,13 +3810,7 @@ static void spapr_pic_print_info(InterruptStatsPro=
+vider *obj,
+=20
+ int spapr_get_vcpu_id(PowerPCCPU *cpu)
+ {
+-    CPUState *cs =3D CPU(cpu);
+-
+-    if (kvm_enabled()) {
+-        return kvm_arch_vcpu_id(cs);
+-    } else {
+-        return cs->cpu_index;
+-    }
++    return cpu->vcpu_id;
+ }
+=20
+ void spapr_set_vcpu_id(PowerPCCPU *cpu, int cpu_index, Error **errp)
+--=20
+2.14.3
