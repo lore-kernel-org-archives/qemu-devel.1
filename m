@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etJK4-0005QX-3X
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:36:37 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etJK9-0005UJ-3z
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:36:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etJK3-00082d-1s
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:36:32 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etJK6-00084T-Pl
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:36:37 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Tue,  6 Mar 2018 20:31:03 +0000
-Message-Id: <20180306203103.25563-20-mark.cave-ayland@ilande.co.uk>
+Date: Tue,  6 Mar 2018 20:30:58 +0000
+Message-Id: <20180306203103.25563-15-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20180306203103.25563-1-mark.cave-ayland@ilande.co.uk>
 References: <20180306203103.25563-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 19/19] mac_newworld: move wiring of macio IRQs
- to macio_newworld_realize()
+Subject: [Qemu-devel] [PATCH 14/19] uninorth: use object link to pass
+ OpenPIC object to uninorth
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,127 +22,307 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-Since the macio device has a link to the PIC device, we can now wire up the
-IRQs directly via qdev GPIOs rather than having to use an intermediate array.
+Now that the OpenPIC is wired up via the board, we can now remove our temporary
+PIC qdev pointer property and replace it with an object link instead.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/misc/macio/macio.c         | 37 ++++++++++++++++++++++---------------
- hw/ppc/mac_newworld.c         | 14 --------------
- include/hw/misc/macio/macio.h |  1 -
- 3 files changed, 22 insertions(+), 30 deletions(-)
+ hw/pci-host/uninorth.c         | 73 +++++++++++++++++++++++++-----------------
+ hw/ppc/mac_newworld.c          | 12 ++++---
+ include/hw/pci-host/uninorth.h |  5 ++-
+ 3 files changed, 55 insertions(+), 35 deletions(-)
 
-diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-index af1bd46b4b..1aa7bb7c89 100644
---- a/hw/misc/macio/macio.c
-+++ b/hw/misc/macio/macio.c
-@@ -265,11 +265,10 @@ static void macio_newworld_realize(PCIDevice *d, Error **errp)
+diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
+index ec6e529d66..e2278fd0f0 100644
+--- a/hw/pci-host/uninorth.c
++++ b/hw/pci-host/uninorth.c
+@@ -38,10 +38,10 @@ static int pci_unin_map_irq(PCIDevice *pci_dev, int irq_num)
+ 
+ static void pci_unin_set_irq(void *opaque, int irq_num, int level)
  {
-     MacIOState *s = MACIO(d);
-     NewWorldMacIOState *ns = NEWWORLD_MACIO(d);
-+    DeviceState *pic_dev = DEVICE(ns->pic);
-     Error *err = NULL;
-     SysBusDevice *sysbus_dev;
-     MemoryRegion *timer_memory = NULL;
--    int i;
--    int cur_irq = 0;
+-    qemu_irq *pic = opaque;
++    UNINState *s = opaque;
  
-     macio_common_realize(d, &err);
-     if (err) {
-@@ -278,11 +277,14 @@ static void macio_newworld_realize(PCIDevice *d, Error **errp)
-     }
+     trace_unin_set_irq(unin_irq_line[irq_num], level);
+-    qemu_set_irq(pic[unin_irq_line[irq_num]], level);
++    qemu_set_irq(s->irqs[irq_num], level);
+ }
  
-     sysbus_dev = SYS_BUS_DEVICE(&s->cuda);
--    sysbus_connect_irq(sysbus_dev, 0, ns->irqs[cur_irq++]);
-+    sysbus_connect_irq(sysbus_dev, 0, qdev_get_gpio_in(pic_dev,
-+                                                       NEWWORLD_CUDA_IRQ));
+ static uint32_t unin_get_config_reg(uint32_t reg, uint32_t addr)
+@@ -109,6 +109,15 @@ static const MemoryRegionOps unin_data_ops = {
+     .endianness = DEVICE_LITTLE_ENDIAN,
+ };
  
-     sysbus_dev = SYS_BUS_DEVICE(&s->escc);
--    sysbus_connect_irq(sysbus_dev, 0, ns->irqs[cur_irq++]);
--    sysbus_connect_irq(sysbus_dev, 1, ns->irqs[cur_irq++]);
-+    sysbus_connect_irq(sysbus_dev, 0, qdev_get_gpio_in(pic_dev,
-+                                                       NEWWORLD_ESCCB_IRQ));
-+    sysbus_connect_irq(sysbus_dev, 1, qdev_get_gpio_in(pic_dev,
-+                                                       NEWWORLD_ESCCA_IRQ));
- 
-     /* OpenPIC */
-     sysbus_dev = SYS_BUS_DEVICE(ns->pic);
-@@ -290,15 +292,22 @@ static void macio_newworld_realize(PCIDevice *d, Error **errp)
-                                 sysbus_mmio_get_region(sysbus_dev, 0));
- 
-     /* IDE buses */
--    for (i = 0; i < ARRAY_SIZE(ns->ide); i++) {
--        qemu_irq irq0 = ns->irqs[cur_irq++];
--        qemu_irq irq1 = ns->irqs[cur_irq++];
-+    macio_realize_ide(s, &ns->ide[0],
-+                      qdev_get_gpio_in(pic_dev, NEWWORLD_IDE0_IRQ),
-+                      qdev_get_gpio_in(pic_dev, NEWWORLD_IDE0_DMA_IRQ),
-+                      0x16, &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
++static void pci_unin_init_irqs(UNINState *s)
++{
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(s->irqs); i++) {
++        s->irqs[i] = qdev_get_gpio_in(DEVICE(s->pic), unin_irq_line[i]);
 +    }
++}
++
+ static void pci_unin_main_realize(DeviceState *dev, Error **errp)
+ {
+     UNINState *s = UNI_NORTH_PCI_HOST_BRIDGE(dev);
+@@ -116,12 +125,13 @@ static void pci_unin_main_realize(DeviceState *dev, Error **errp)
  
--        macio_realize_ide(s, &ns->ide[i], irq0, irq1, 0x16 + (i * 4), &err);
--        if (err) {
--            error_propagate(errp, err);
--            return;
--        }
-+    macio_realize_ide(s, &ns->ide[1],
-+                      qdev_get_gpio_in(pic_dev, NEWWORLD_IDE1_IRQ),
-+                      qdev_get_gpio_in(pic_dev, NEWWORLD_IDE1_DMA_IRQ),
-+                      0x1a, &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-     }
+     h->bus = pci_register_root_bus(dev, NULL,
+                                    pci_unin_set_irq, pci_unin_map_irq,
+-                                   s->pic_irqs,
++                                   s,
+                                    &s->pci_mmio,
+                                    get_system_io(),
+                                    PCI_DEVFN(11, 0), 4, TYPE_PCI_BUS);
  
-     /* Timer */
-@@ -314,8 +323,6 @@ static void macio_newworld_init(Object *obj)
-     NewWorldMacIOState *ns = NEWWORLD_MACIO(obj);
-     int i;
+     pci_create_simple(h->bus, PCI_DEVFN(11, 0), "uni-north-pci");
++    pci_unin_init_irqs(s);
  
--    qdev_init_gpio_out(DEVICE(obj), ns->irqs, ARRAY_SIZE(ns->irqs));
+     /* DEC 21154 bridge */
+ #if 0
+@@ -150,6 +160,11 @@ static void pci_unin_main_init(Object *obj)
+                              "unin-pci-hole", &s->pci_mmio,
+                              0x80000000ULL, 0x10000000ULL);
+ 
++    object_property_add_link(obj, "pic", TYPE_OPENPIC,
++                             (Object **) &s->pic,
++                             qdev_prop_allow_set_link_before_realize,
++                             0, NULL);
++
+     sysbus_init_mmio(sbd, &h->conf_mem);
+     sysbus_init_mmio(sbd, &h->data_mem);
+     sysbus_init_mmio(sbd, &s->pci_hole);
+@@ -162,12 +177,13 @@ static void pci_u3_agp_realize(DeviceState *dev, Error **errp)
+ 
+     h->bus = pci_register_root_bus(dev, NULL,
+                                    pci_unin_set_irq, pci_unin_map_irq,
+-                                   s->pic_irqs,
++                                   s,
+                                    &s->pci_mmio,
+                                    get_system_io(),
+                                    PCI_DEVFN(11, 0), 4, TYPE_PCI_BUS);
+ 
+     pci_create_simple(h->bus, PCI_DEVFN(11, 0), "u3-agp");
++    pci_unin_init_irqs(s);
+ }
+ 
+ static void pci_u3_agp_init(Object *obj)
+@@ -189,6 +205,11 @@ static void pci_u3_agp_init(Object *obj)
+                              "unin-pci-hole", &s->pci_mmio,
+                              0x80000000ULL, 0x70000000ULL);
+ 
++    object_property_add_link(obj, "pic", TYPE_OPENPIC,
++                             (Object **) &s->pic,
++                             qdev_prop_allow_set_link_before_realize,
++                             0, NULL);
++
+     sysbus_init_mmio(sbd, &h->conf_mem);
+     sysbus_init_mmio(sbd, &h->data_mem);
+     sysbus_init_mmio(sbd, &s->pci_hole);
+@@ -201,16 +222,18 @@ static void pci_unin_agp_realize(DeviceState *dev, Error **errp)
+ 
+     h->bus = pci_register_root_bus(dev, NULL,
+                                    pci_unin_set_irq, pci_unin_map_irq,
+-                                   s->pic_irqs,
++                                   s,
+                                    &s->pci_mmio,
+                                    get_system_io(),
+                                    PCI_DEVFN(11, 0), 4, TYPE_PCI_BUS);
+ 
+     pci_create_simple(h->bus, PCI_DEVFN(11, 0), "uni-north-agp");
++    pci_unin_init_irqs(s);
+ }
+ 
+ static void pci_unin_agp_init(Object *obj)
+ {
++    UNINState *s = UNI_NORTH_AGP_HOST_BRIDGE(obj);
+     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+     PCIHostState *h = PCI_HOST_BRIDGE(obj);
+ 
+@@ -219,6 +242,12 @@ static void pci_unin_agp_init(Object *obj)
+                           obj, "unin-agp-conf-idx", 0x1000);
+     memory_region_init_io(&h->data_mem, OBJECT(h), &pci_host_data_le_ops,
+                           obj, "unin-agp-conf-data", 0x1000);
++
++    object_property_add_link(obj, "pic", TYPE_OPENPIC,
++                             (Object **) &s->pic,
++                             qdev_prop_allow_set_link_before_realize,
++                             0, NULL);
++
+     sysbus_init_mmio(sbd, &h->conf_mem);
+     sysbus_init_mmio(sbd, &h->data_mem);
+ }
+@@ -230,16 +259,18 @@ static void pci_unin_internal_realize(DeviceState *dev, Error **errp)
+ 
+     h->bus = pci_register_root_bus(dev, NULL,
+                                    pci_unin_set_irq, pci_unin_map_irq,
+-                                   s->pic_irqs,
++                                   s,
+                                    &s->pci_mmio,
+                                    get_system_io(),
+                                    PCI_DEVFN(14, 0), 4, TYPE_PCI_BUS);
+ 
+     pci_create_simple(h->bus, PCI_DEVFN(14, 0), "uni-north-internal-pci");
++    pci_unin_init_irqs(s);
+ }
+ 
+ static void pci_unin_internal_init(Object *obj)
+ {
++    UNINState *s = UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE(obj);
+     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+     PCIHostState *h = PCI_HOST_BRIDGE(obj);
+ 
+@@ -248,6 +279,12 @@ static void pci_unin_internal_init(Object *obj)
+                           obj, "unin-pci-conf-idx", 0x1000);
+     memory_region_init_io(&h->data_mem, OBJECT(h), &pci_host_data_le_ops,
+                           obj, "unin-pci-conf-data", 0x1000);
++
++    object_property_add_link(obj, "pic", TYPE_OPENPIC,
++                             (Object **) &s->pic,
++                             qdev_prop_allow_set_link_before_realize,
++                             0, NULL);
++
+     sysbus_init_mmio(sbd, &h->conf_mem);
+     sysbus_init_mmio(sbd, &h->data_mem);
+ }
+@@ -412,17 +449,11 @@ static const TypeInfo unin_internal_pci_host_info = {
+     },
+ };
+ 
+-static Property pci_unin_main_properties[] = {
+-    DEFINE_PROP_PTR("pic-irqs", UNINState, pic_irqs),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
 -
-     object_property_add_link(obj, "pic", TYPE_OPENPIC,
-                              (Object **) &ns->pic,
-                              qdev_prop_allow_set_link_before_realize,
+ static void pci_unin_main_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     dc->realize = pci_unin_main_realize;
+-    dc->props = pci_unin_main_properties;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+ }
+ 
+@@ -434,17 +465,11 @@ static const TypeInfo pci_unin_main_info = {
+     .class_init    = pci_unin_main_class_init,
+ };
+ 
+-static Property pci_u3_agp_properties[] = {
+-    DEFINE_PROP_PTR("pic-irqs", UNINState, pic_irqs),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+ static void pci_u3_agp_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     dc->realize = pci_u3_agp_realize;
+-    dc->props = pci_u3_agp_properties;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+ }
+ 
+@@ -456,17 +481,11 @@ static const TypeInfo pci_u3_agp_info = {
+     .class_init    = pci_u3_agp_class_init,
+ };
+ 
+-static Property pci_unin_agp_class_properties[] = {
+-    DEFINE_PROP_PTR("pic-irqs", UNINState, pic_irqs),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+ static void pci_unin_agp_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     dc->realize = pci_unin_agp_realize;
+-    dc->props = pci_unin_agp_class_properties;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+ }
+ 
+@@ -478,17 +497,11 @@ static const TypeInfo pci_unin_agp_info = {
+     .class_init    = pci_unin_agp_class_init,
+ };
+ 
+-static Property pci_unin_internal_class_properties[] = {
+-    DEFINE_PROP_PTR("pic-irqs", UNINState, pic_irqs),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+ static void pci_unin_internal_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     dc->realize = pci_unin_internal_realize;
+-    dc->props = pci_unin_internal_class_properties;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+ }
+ 
 diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index 3cde507065..ae2ce562a4 100644
+index f806187d8c..5d121a6071 100644
 --- a/hw/ppc/mac_newworld.c
 +++ b/hw/ppc/mac_newworld.c
-@@ -376,20 +376,6 @@ static void ppc_core99_init(MachineState *machine)
-     /* MacIO */
-     macio = NEWWORLD_MACIO(pci_create(pci_bus, -1, TYPE_NEWWORLD_MACIO));
-     dev = DEVICE(macio);
--    qdev_connect_gpio_out(dev, 0,
--        qdev_get_gpio_in(pic_dev, NEWWORLD_CUDA_IRQ));
--    qdev_connect_gpio_out(dev, 1,
--        qdev_get_gpio_in(pic_dev, NEWWORLD_ESCCB_IRQ));
--    qdev_connect_gpio_out(dev, 2,
--        qdev_get_gpio_in(pic_dev, NEWWORLD_ESCCA_IRQ));
--    qdev_connect_gpio_out(dev, 3,
--        qdev_get_gpio_in(pic_dev, NEWWORLD_IDE0_IRQ));
--    qdev_connect_gpio_out(dev, 4,
--        qdev_get_gpio_in(pic_dev, NEWWORLD_IDE0_DMA_IRQ));
--    qdev_connect_gpio_out(dev, 5,
--        qdev_get_gpio_in(pic_dev, NEWWORLD_IDE1_IRQ));
--    qdev_connect_gpio_out(dev, 6,
--        qdev_get_gpio_in(pic_dev, NEWWORLD_IDE1_DMA_IRQ));
-     qdev_prop_set_uint64(dev, "frequency", tbfreq);
-     object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
-                              &error_abort);
-diff --git a/include/hw/misc/macio/macio.h b/include/hw/misc/macio/macio.h
-index 4528282b36..e3b9ef48dd 100644
---- a/include/hw/misc/macio/macio.h
-+++ b/include/hw/misc/macio/macio.h
-@@ -72,7 +72,6 @@ typedef struct NewWorldMacIOState {
-     /*< public >*/
+@@ -348,7 +348,8 @@ static void ppc_core99_init(MachineState *machine)
+         /* 970 gets a U3 bus */
+         /* Uninorth AGP bus */
+         dev = qdev_create(NULL, TYPE_U3_AGP_HOST_BRIDGE);
+-        qdev_prop_set_ptr(dev, "pic-irqs", pic);
++        object_property_set_link(OBJECT(dev), OBJECT(pic_dev), "pic",
++                                 &error_abort);
+         qdev_init_nofail(dev);
+         uninorth_pci = U3_AGP_HOST_BRIDGE(dev);
+         s = SYS_BUS_DEVICE(dev);
+@@ -363,7 +364,8 @@ static void ppc_core99_init(MachineState *machine)
+         /* Use values found on a real PowerMac */
+         /* Uninorth AGP bus */
+         dev = qdev_create(NULL, TYPE_UNI_NORTH_AGP_HOST_BRIDGE);
+-        qdev_prop_set_ptr(dev, "pic-irqs", pic);
++        object_property_set_link(OBJECT(dev), OBJECT(pic_dev), "pic",
++                                 &error_abort);
+         qdev_init_nofail(dev);
+         s = SYS_BUS_DEVICE(dev);
+         sysbus_mmio_map(s, 0, 0xf0800000);
+@@ -371,7 +373,8 @@ static void ppc_core99_init(MachineState *machine)
  
-     OpenPICState *pic;
--    qemu_irq irqs[7];
-     MACIOIDEState ide[2];
- } NewWorldMacIOState;
+         /* Uninorth internal bus */
+         dev = qdev_create(NULL, TYPE_UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE);
+-        qdev_prop_set_ptr(dev, "pic-irqs", pic);
++        object_property_set_link(OBJECT(dev), OBJECT(pic_dev), "pic",
++                                 &error_abort);
+         qdev_init_nofail(dev);
+         s = SYS_BUS_DEVICE(dev);
+         sysbus_mmio_map(s, 0, 0xf4800000);
+@@ -379,7 +382,8 @@ static void ppc_core99_init(MachineState *machine)
  
+         /* Uninorth main bus */
+         dev = qdev_create(NULL, TYPE_UNI_NORTH_PCI_HOST_BRIDGE);
+-        qdev_prop_set_ptr(dev, "pic-irqs", pic);
++        object_property_set_link(OBJECT(dev), OBJECT(pic_dev), "pic",
++                                 &error_abort);
+         qdev_init_nofail(dev);
+         uninorth_pci = UNI_NORTH_PCI_HOST_BRIDGE(dev);
+         s = SYS_BUS_DEVICE(dev);
+diff --git a/include/hw/pci-host/uninorth.h b/include/hw/pci-host/uninorth.h
+index 12979712d0..6b520e753c 100644
+--- a/include/hw/pci-host/uninorth.h
++++ b/include/hw/pci-host/uninorth.h
+@@ -25,6 +25,8 @@
+ #ifndef UNINORTH_H
+ #define UNINORTH_H
+ 
++#include "hw/ppc/openpic.h"
++
+ #define TYPE_UNI_NORTH_PCI_HOST_BRIDGE "uni-north-pci-pcihost"
+ #define TYPE_UNI_NORTH_AGP_HOST_BRIDGE "uni-north-agp-pcihost"
+ #define TYPE_UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE "uni-north-internal-pci-pcihost"
+@@ -42,7 +44,8 @@
+ typedef struct UNINState {
+     PCIHostState parent_obj;
+ 
+-    void *pic_irqs;
++    OpenPICState *pic;
++    qemu_irq irqs[4];
+     MemoryRegion pci_mmio;
+     MemoryRegion pci_hole;
+ } UNINState;
 -- 
 2.11.0
