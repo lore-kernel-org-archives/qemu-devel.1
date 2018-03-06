@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1etJgz-0002Pn-W0
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 16:00:18 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etJpY-0001Tk-Vb
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 16:09:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1etJgt-0003Nc-Su
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 16:00:14 -0500
-Resent-Message-Id: <E1etJgt-0003Nc-Su@eggs.gnu.org>
-In-Reply-To: <20180306203103.25563-1-mark.cave-ayland@ilande.co.uk>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152036996711.1413.5381428549955473097@bdbb90650ae5>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etJpX-0007WT-NR
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 16:09:04 -0500
+References: <152036996711.1413.5381428549955473097@bdbb90650ae5>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <5906b289-d149-10fd-b32d-911d67d7ba29@ilande.co.uk>
+Date: Tue, 6 Mar 2018 21:08:44 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 6 Mar 2018 12:59:27 -0800 (PST)
+In-Reply-To: <152036996711.1413.5381428549955473097@bdbb90650ae5>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH 00/19] uninorth fixes/mac_newworld board
  wiring improvements
 List-Id: <qemu-devel.nongnu.org>
@@ -24,83 +24,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mark.cave-ayland@ilande.co.uk
-Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMzA2MjAzMTAzLjI1NTYzLTEtbWFyay5jYXZlLWF5bGFuZEBpbGFuZGUu
-Y28udWsKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwMC8xOV0gdW5pbm9ydGggZml4ZXMv
-bWFjX25ld3dvcmxkIGJvYXJkIHdpcmluZyBpbXByb3ZlbWVudHMKCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25l
-bGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
-ZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cg
-LS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAg
-IGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9
-JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0
-cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAg
-ICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNU
-IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
-ODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAq
-IFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODAzMDYyMDMxMDMuMjU1NjMtMS1t
-YXJrLmNhdmUtYXlsYW5kQGlsYW5kZS5jby51ayAtPiBwYXRjaGV3LzIwMTgwMzA2MjAzMTAzLjI1
-NTYzLTEtbWFyay5jYXZlLWF5bGFuZEBpbGFuZGUuY28udWsKU3dpdGNoZWQgdG8gYSBuZXcgYnJh
-bmNoICd0ZXN0JwplN2Y1MTBmYjFjIG1hY19uZXd3b3JsZDogbW92ZSB3aXJpbmcgb2YgbWFjaW8g
-SVJRcyB0byBtYWNpb19uZXd3b3JsZF9yZWFsaXplKCkKZTFjYjZhZjlhNCBtYWNfbmV3d29ybGQ6
-IHJlbW92ZSBwaWNzIElSUSBhcnJheSBhbmQgd2lyZSB1cCBtYWNpbyB0byBPcGVuUElDIGRpcmVj
-dGx5CmNmMTZlYjAyMjMgdW5pbm9ydGg6IGNyZWF0ZSBuZXcgdW5pbm9ydGggZGV2aWNlCjlhMjk1
-MjRmYzkgdW5pbm9ydGg6IHJlbmFtZSBVTklOU3RhdGUgdG8gVU5JTkhvc3RTdGF0ZQpiZDM2NTM3
-MDlhIHVuaW5vcnRoOiBtb3ZlIFBDSSBJTyAoSVNBKSBtZW1vcnkgcmVnaW9uIGludG8gdGhlIHVu
-aW5vcnRoIGRldmljZQpmMTAyMDAwNGQ3IHVuaW5vcnRoOiB1c2Ugb2JqZWN0IGxpbmsgdG8gcGFz
-cyBPcGVuUElDIG9iamVjdCB0byB1bmlub3J0aAowMDBiNzhlYmYxIHVuaW5vcnRoOiByZW1vdmUg
-b2Jzb2xldGUgcGNpX3BtYWNfdTNfaW5pdCgpIGZ1bmN0aW9uCjAxOWNlOTcwZDEgdW5pbm9ydGg6
-IHJlbW92ZSBvYnNvbGV0ZSBwY2lfcG1hY19pbml0KCkgZnVuY3Rpb24KZDc0Y2Q5YTk4NiB1bmlu
-b3J0aDogZW5hYmxlIGludGVybmFsIFBDSSBob3N0IGJyaWRnZQplYjJkOGJjZjI1IHVuaW5vcnRo
-OiBmaXggUENJIGFuZCBBR1AgYnVzIG1peHVwCmE0NDRlYWJmY2IgdW5pbm9ydGg6IG1vdmUgUENJ
-IGhvc3QgYnJpZGdlIGJ1cyBpbml0aWFsaXNhdGlvbiBpbnRvIGRldmljZSByZWFsaXplCjY0MDFj
-OWMzN2YgdW5pbm9ydGg6IGludHJvZHVjZSB0ZW1wb3JhcnkgcGljX2lycXMgZGV2aWNlIHByb3Bl
-cnR5CjBmNWZiNGVjNzAgdW5pbm9ydGg6IG1vdmUgUENJIG1taW8gbWVtb3J5IHJlZ2lvbiBpbml0
-aWFsaXNhdGlvbiBpbnRvIGluaXQgZnVuY3Rpb24KMmY3YTYyODgzNiB1bmlub3J0aDogYWx0ZXIg
-cGNpX3BtYWNfaW5pdCgpIGFuZCBwY2lfcG1hY191M19pbml0KCkgdG8gcmV0dXJuIHVuaW5vcnRo
-IGRldmljZQo3ODA1MzViZjIxIHVuaW5vcnRoOiBtb3ZlIHVuaW5vcnRoIGRlZmluaXRpb25zIGlu
-dG8gdW5pbm9ydGguaApkODgxNmJjMTY3IHVuaW5vcnRoOiByZW1vdmUgc3RyYXkgUENJQnVzIHJl
-YWxpemUgZnJvbSBtYWNfbmV3d29ybGQuYwpmODJhMWE2ZDVjIHVuaW5vcnRoOiBRT01pZnkgUENJ
-IGFuZCBBR1AgaG9zdCBicmlkZ2VzCmEwYzA2YzgwM2IgdW5pbm9ydGg6IHJlbW92ZSBzZWNvbmQg
-c2V0IG9mIHVuaW5vcnRoIHRva2VuIHJlZ2lzdGVycwo0YmFhN2VjZjNiIHVuaW5vcnRoOiB0cml2
-aWFsIHN0eWxlIGZpeHVwcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8x
-OTogdW5pbm9ydGg6IHRyaXZpYWwgc3R5bGUgZml4dXBzLi4uCkNoZWNraW5nIFBBVENIIDIvMTk6
-IHVuaW5vcnRoOiByZW1vdmUgc2Vjb25kIHNldCBvZiB1bmlub3J0aCB0b2tlbiByZWdpc3RlcnMu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMy8xOTogdW5pbm9ydGg6IFFPTWlmeSBQQ0kgYW5kIEFHUCBob3N0
-IGJyaWRnZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8xOTogdW5pbm9ydGg6IHJlbW92ZSBzdHJheSBQ
-Q0lCdXMgcmVhbGl6ZSBmcm9tIG1hY19uZXd3b3JsZC5jLi4uCkNoZWNraW5nIFBBVENIIDUvMTk6
-IHVuaW5vcnRoOiBtb3ZlIHVuaW5vcnRoIGRlZmluaXRpb25zIGludG8gdW5pbm9ydGguaC4uLgpD
-aGVja2luZyBQQVRDSCA2LzE5OiB1bmlub3J0aDogYWx0ZXIgcGNpX3BtYWNfaW5pdCgpIGFuZCBw
-Y2lfcG1hY191M19pbml0KCkgdG8gcmV0dXJuIHVuaW5vcnRoIGRldmljZS4uLgpDaGVja2luZyBQ
-QVRDSCA3LzE5OiB1bmlub3J0aDogbW92ZSBQQ0kgbW1pbyBtZW1vcnkgcmVnaW9uIGluaXRpYWxp
-c2F0aW9uIGludG8gaW5pdCBmdW5jdGlvbi4uLgpDaGVja2luZyBQQVRDSCA4LzE5OiB1bmlub3J0
-aDogaW50cm9kdWNlIHRlbXBvcmFyeSBwaWNfaXJxcyBkZXZpY2UgcHJvcGVydHkuLi4KQ2hlY2tp
-bmcgUEFUQ0ggOS8xOTogdW5pbm9ydGg6IG1vdmUgUENJIGhvc3QgYnJpZGdlIGJ1cyBpbml0aWFs
-aXNhdGlvbiBpbnRvIGRldmljZSByZWFsaXplLi4uCkVSUk9SOiBpZiB0aGlzIGNvZGUgaXMgcmVk
-dW5kYW50IGNvbnNpZGVyIHJlbW92aW5nIGl0CiM0MTogRklMRTogaHcvcGNpLWhvc3QvdW5pbm9y
-dGguYzoxMjc6CisjaWYgMAoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyMjEgbGluZXMg
-Y2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcg
-UEFUQ0ggMTAvMTk6IHVuaW5vcnRoOiBmaXggUENJIGFuZCBBR1AgYnVzIG1peHVwLi4uCkNoZWNr
-aW5nIFBBVENIIDExLzE5OiB1bmlub3J0aDogZW5hYmxlIGludGVybmFsIFBDSSBob3N0IGJyaWRn
-ZS4uLgpDaGVja2luZyBQQVRDSCAxMi8xOTogdW5pbm9ydGg6IHJlbW92ZSBvYnNvbGV0ZSBwY2lf
-cG1hY19pbml0KCkgZnVuY3Rpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMTk6IHVuaW5vcnRoOiBy
-ZW1vdmUgb2Jzb2xldGUgcGNpX3BtYWNfdTNfaW5pdCgpIGZ1bmN0aW9uLi4uCkNoZWNraW5nIFBB
-VENIIDE0LzE5OiB1bmlub3J0aDogdXNlIG9iamVjdCBsaW5rIHRvIHBhc3MgT3BlblBJQyBvYmpl
-Y3QgdG8gdW5pbm9ydGguLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvMTk6IHVuaW5vcnRoOiBtb3ZlIFBD
-SSBJTyAoSVNBKSBtZW1vcnkgcmVnaW9uIGludG8gdGhlIHVuaW5vcnRoIGRldmljZS4uLgpDaGVj
-a2luZyBQQVRDSCAxNi8xOTogdW5pbm9ydGg6IHJlbmFtZSBVTklOU3RhdGUgdG8gVU5JTkhvc3RT
-dGF0ZS4uLgpDaGVja2luZyBQQVRDSCAxNy8xOTogdW5pbm9ydGg6IGNyZWF0ZSBuZXcgdW5pbm9y
-dGggZGV2aWNlLi4uCkNoZWNraW5nIFBBVENIIDE4LzE5OiBtYWNfbmV3d29ybGQ6IHJlbW92ZSBw
-aWNzIElSUSBhcnJheSBhbmQgd2lyZSB1cCBtYWNpbyB0byBPcGVuUElDIGRpcmVjdGx5Li4uCkNo
-ZWNraW5nIFBBVENIIDE5LzE5OiBtYWNfbmV3d29ybGQ6IG1vdmUgd2lyaW5nIG9mIG1hY2lvIElS
-UXMgdG8gbWFjaW9fbmV3d29ybGRfcmVhbGl6ZSgpLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
-dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On 06/03/18 20:59, no-reply@patchew.org wrote:
+
+> Hi,
+> 
+> This series seems to have some coding style problems. See output below for
+> more information:
+> 
+> Type: series
+> Message-id: 20180306203103.25563-1-mark.cave-ayland@ilande.co.uk
+> Subject: [Qemu-devel] [PATCH 00/19] uninorth fixes/mac_newworld board wiring improvements
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> 
+> BASE=base
+> n=1
+> total=$(git log --oneline $BASE.. | wc -l)
+> failed=0
+> 
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> git config --local diff.algorithm histogram
+> 
+> commits="$(git log --format=%H --reverse $BASE..)"
+> for c in $commits; do
+>      echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
+>      if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
+>          failed=1
+>          echo
+>      fi
+>      n=$((n+1))
+> done
+> 
+> exit $failed
+> === TEST SCRIPT END ===
+> 
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+>  From https://github.com/patchew-project/qemu
+>   * [new tag]               patchew/20180306203103.25563-1-mark.cave-ayland@ilande.co.uk -> patchew/20180306203103.25563-1-mark.cave-ayland@ilande.co.uk
+> Switched to a new branch 'test'
+> e7f510fb1c mac_newworld: move wiring of macio IRQs to macio_newworld_realize()
+> e1cb6af9a4 mac_newworld: remove pics IRQ array and wire up macio to OpenPIC directly
+> cf16eb0223 uninorth: create new uninorth device
+> 9a29524fc9 uninorth: rename UNINState to UNINHostState
+> bd3653709a uninorth: move PCI IO (ISA) memory region into the uninorth device
+> f1020004d7 uninorth: use object link to pass OpenPIC object to uninorth
+> 000b78ebf1 uninorth: remove obsolete pci_pmac_u3_init() function
+> 019ce970d1 uninorth: remove obsolete pci_pmac_init() function
+> d74cd9a986 uninorth: enable internal PCI host bridge
+> eb2d8bcf25 uninorth: fix PCI and AGP bus mixup
+> a444eabfcb uninorth: move PCI host bridge bus initialisation into device realize
+> 6401c9c37f uninorth: introduce temporary pic_irqs device property
+> 0f5fb4ec70 uninorth: move PCI mmio memory region initialisation into init function
+> 2f7a628836 uninorth: alter pci_pmac_init() and pci_pmac_u3_init() to return uninorth device
+> 780535bf21 uninorth: move uninorth definitions into uninorth.h
+> d8816bc167 uninorth: remove stray PCIBus realize from mac_newworld.c
+> f82a1a6d5c uninorth: QOMify PCI and AGP host bridges
+> a0c06c803b uninorth: remove second set of uninorth token registers
+> 4baa7ecf3b uninorth: trivial style fixups
+> 
+> === OUTPUT BEGIN ===
+> Checking PATCH 1/19: uninorth: trivial style fixups...
+> Checking PATCH 2/19: uninorth: remove second set of uninorth token registers...
+> Checking PATCH 3/19: uninorth: QOMify PCI and AGP host bridges...
+> Checking PATCH 4/19: uninorth: remove stray PCIBus realize from mac_newworld.c...
+> Checking PATCH 5/19: uninorth: move uninorth definitions into uninorth.h...
+> Checking PATCH 6/19: uninorth: alter pci_pmac_init() and pci_pmac_u3_init() to return uninorth device...
+> Checking PATCH 7/19: uninorth: move PCI mmio memory region initialisation into init function...
+> Checking PATCH 8/19: uninorth: introduce temporary pic_irqs device property...
+> Checking PATCH 9/19: uninorth: move PCI host bridge bus initialisation into device realize...
+> ERROR: if this code is redundant consider removing it
+> #41: FILE: hw/pci-host/uninorth.c:127:
+> +#if 0
+> 
+> total: 1 errors, 0 warnings, 221 lines checked
+
+This is a false alarm since this #if 0 ... #endif block is removed in 
+patch 11.
+
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 
+> Checking PATCH 10/19: uninorth: fix PCI and AGP bus mixup...
+> Checking PATCH 11/19: uninorth: enable internal PCI host bridge...
+> Checking PATCH 12/19: uninorth: remove obsolete pci_pmac_init() function...
+> Checking PATCH 13/19: uninorth: remove obsolete pci_pmac_u3_init() function...
+> Checking PATCH 14/19: uninorth: use object link to pass OpenPIC object to uninorth...
+> Checking PATCH 15/19: uninorth: move PCI IO (ISA) memory region into the uninorth device...
+> Checking PATCH 16/19: uninorth: rename UNINState to UNINHostState...
+> Checking PATCH 17/19: uninorth: create new uninorth device...
+> Checking PATCH 18/19: mac_newworld: remove pics IRQ array and wire up macio to OpenPIC directly...
+> Checking PATCH 19/19: mac_newworld: move wiring of macio IRQs to macio_newworld_realize()...
+> === OUTPUT END ===
+> 
+> Test command exited with code: 1
+> 
+> 
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@freelists.org
+
+
+ATB,
+
+Mark.
