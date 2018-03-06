@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1etFEq-0007Ks-Ry
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:14:55 -0500
+	(envelope-from <berto@igalia.com>) id 1etFEs-0007MR-Od
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:14:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1etFEo-00080g-0A
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:14:52 -0500
+	(envelope-from <berto@igalia.com>) id 1etFEo-00080z-1j
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:14:54 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Tue,  6 Mar 2018 18:14:08 +0200
-Message-Id: <080ff2e2c66577e8113454dce4974c6a34915d9f.1520352600.git.berto@igalia.com>
+Date: Tue,  6 Mar 2018 18:14:09 +0200
+Message-Id: <9c2d3f530811be74521e2963f51bd8f23770879f.1520352600.git.berto@igalia.com>
 In-Reply-To: <cover.1520352600.git.berto@igalia.com>
 References: <cover.1520352600.git.berto@igalia.com>
 In-Reply-To: <cover.1520352600.git.berto@igalia.com>
 References: <cover.1520352600.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 3/7] qcow2: Check L1 table parameters in
- qcow2_expand_zero_clusters()
+Subject: [Qemu-devel] [PATCH v2 4/7] qcow2: Check snapshot L1 tables in
+ qcow2_check_metadata_overlap()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,111 +25,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-This function iterates over all snapshots of a qcow2 file in order to
-expand all zero clusters, but it does not validate the snapshots' L1
-tables first.
+The inactive-l2 overlap check iterates uses the L1 tables from all
+snapshots, but it does not validate them first.
 
 We now have a function to take care of this, so let's use it.
 
-We can also take the opportunity to replace the sector-based
-bdrv_read() with bdrv_pread().
-
 Signed-off-by: Alberto Garcia <berto@igalia.com>
-Cc: Eric Blake <eblake@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/qcow2-cluster.c      | 24 +++++++++++++++++-------
- tests/qemu-iotests/080     |  2 ++
+ block/qcow2-refcount.c     | 10 +++++++++-
+ tests/qemu-iotests/080     |  4 ++++
  tests/qemu-iotests/080.out |  4 ++++
- 3 files changed, 23 insertions(+), 7 deletions(-)
+ 3 files changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 98908c4264..1aee726c6a 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -25,6 +25,7 @@
- #include "qemu/osdep.h"
- #include <zlib.h>
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 126cca3276..443ec0a6e5 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -2614,9 +2614,17 @@ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
+             uint64_t l1_ofs = s->snapshots[i].l1_table_offset;
+             uint32_t l1_sz  = s->snapshots[i].l1_size;
+             uint64_t l1_sz2 = l1_sz * sizeof(uint64_t);
+-            uint64_t *l1 = g_try_malloc(l1_sz2);
++            uint64_t *l1;
+             int ret;
  
-+#include "qapi/error.h"
- #include "qemu-common.h"
- #include "block/block_int.h"
- #include "block/qcow2.h"
-@@ -2092,11 +2093,21 @@ int qcow2_expand_zero_clusters(BlockDriverState *bs,
-     }
- 
-     for (i = 0; i < s->nb_snapshots; i++) {
--        int l1_sectors = DIV_ROUND_UP(s->snapshots[i].l1_size *
--                                      sizeof(uint64_t), BDRV_SECTOR_SIZE);
-+        int l1_size2;
-+        uint64_t *new_l1_table;
-+        Error *local_err = NULL;
- 
--        uint64_t *new_l1_table =
--            g_try_realloc(l1_table, l1_sectors * BDRV_SECTOR_SIZE);
-+        ret = qcow2_validate_table(bs, s->snapshots[i].l1_table_offset,
-+                                   s->snapshots[i].l1_size, sizeof(uint64_t),
-+                                   QCOW_MAX_L1_SIZE, "Snapshot L1 table",
-+                                   &local_err);
-+        if (ret < 0) {
-+            error_report_err(local_err);
-+            goto fail;
-+        }
++            ret = qcow2_validate_table(bs, l1_ofs, l1_sz, sizeof(uint64_t),
++                                       QCOW_MAX_L1_SIZE, "", NULL);
++            if (ret < 0) {
++                return ret;
++            }
 +
-+        l1_size2 = s->snapshots[i].l1_size * sizeof(uint64_t);
-+        new_l1_table = g_try_realloc(l1_table, l1_size2);
- 
-         if (!new_l1_table) {
-             ret = -ENOMEM;
-@@ -2105,9 +2116,8 @@ int qcow2_expand_zero_clusters(BlockDriverState *bs,
- 
-         l1_table = new_l1_table;
- 
--        ret = bdrv_read(bs->file,
--                        s->snapshots[i].l1_table_offset / BDRV_SECTOR_SIZE,
--                        (void *)l1_table, l1_sectors);
-+        ret = bdrv_pread(bs->file, s->snapshots[i].l1_table_offset,
-+                         l1_table, l1_size2);
-         if (ret < 0) {
-             goto fail;
-         }
++            l1 = g_try_malloc(l1_sz2);
++
+             if (l1_sz2 && l1 == NULL) {
+                 return -ENOMEM;
+             }
 diff --git a/tests/qemu-iotests/080 b/tests/qemu-iotests/080
-index 6a10e7defa..5622604f83 100755
+index 5622604f83..018f815697 100755
 --- a/tests/qemu-iotests/080
 +++ b/tests/qemu-iotests/080
-@@ -177,6 +177,7 @@ _make_test_img 64M
- { $QEMU_IMG snapshot -c test $TEST_IMG; } 2>&1 | _filter_testdir
+@@ -178,6 +178,8 @@ _make_test_img 64M
  poke_file "$TEST_IMG" "$offset_snap1_l1_offset" "\x00\x00\x00\x00\x00\x40\x02\x00"
  { $QEMU_IMG convert -s test $TEST_IMG $TEST_IMG.snap; } 2>&1 | _filter_testdir
-+{ $QEMU_IMG amend -o compat=0.10 $TEST_IMG; } 2>&1 | _filter_testdir
+ { $QEMU_IMG amend -o compat=0.10 $TEST_IMG; } 2>&1 | _filter_testdir
++{ $QEMU_IO -c "open -o overlap-check.inactive-l2=on $TEST_IMG" \
++           -c 'write 0 4k'; } 2>&1 | _filter_qemu_io | _filter_testdir
  
  echo
  echo "== Invalid snapshot L1 table size =="
-@@ -185,6 +186,7 @@ _make_test_img 64M
- { $QEMU_IMG snapshot -c test $TEST_IMG; } 2>&1 | _filter_testdir
+@@ -187,6 +189,8 @@ _make_test_img 64M
  poke_file "$TEST_IMG" "$offset_snap1_l1_size" "\x10\x00\x00\x00"
  { $QEMU_IMG convert -s test $TEST_IMG $TEST_IMG.snap; } 2>&1 | _filter_testdir
-+{ $QEMU_IMG amend -o compat=0.10 $TEST_IMG; } 2>&1 | _filter_testdir
+ { $QEMU_IMG amend -o compat=0.10 $TEST_IMG; } 2>&1 | _filter_testdir
++{ $QEMU_IO -c "open -o overlap-check.inactive-l2=on $TEST_IMG" \
++           -c 'write 0 4k'; } 2>&1 | _filter_qemu_io | _filter_testdir
  
  # success, all done
  echo "*** done"
 diff --git a/tests/qemu-iotests/080.out b/tests/qemu-iotests/080.out
-index f0d9038d55..315edbc26f 100644
+index 315edbc26f..d622ac06c0 100644
 --- a/tests/qemu-iotests/080.out
 +++ b/tests/qemu-iotests/080.out
-@@ -64,10 +64,14 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -66,6 +66,8 @@ wrote 512/512 bytes at offset 0
  qemu-img: Failed to load snapshot: Snapshot L1 table offset invalid
-+qemu-img: Snapshot L1 table offset invalid
-+qemu-img: Error while amending options: Invalid argument
+ qemu-img: Snapshot L1 table offset invalid
+ qemu-img: Error while amending options: Invalid argument
++Failed to flush the refcount block cache: Invalid argument
++write failed: Invalid argument
  
  == Invalid snapshot L1 table size ==
  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -74,4 +76,6 @@ wrote 512/512 bytes at offset 0
  qemu-img: Failed to load snapshot: Snapshot L1 table too large
-+qemu-img: Snapshot L1 table too large
-+qemu-img: Error while amending options: File too large
+ qemu-img: Snapshot L1 table too large
+ qemu-img: Error while amending options: File too large
++Failed to flush the refcount block cache: File too large
++write failed: File too large
  *** done
 -- 
 2.11.0
