@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1etDsC-0000PP-3L
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:47:28 -0500
+	(envelope-from <imammedo@redhat.com>) id 1etDsP-0000Ub-8Y
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:47:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1etDs8-00080I-9J
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:47:24 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41022 helo=mx1.redhat.com)
+	(envelope-from <imammedo@redhat.com>) id 1etDsM-0008AQ-JI
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:47:37 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57818 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1etDs7-0007yk-WA
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:47:20 -0500
-References: <1519987399-19160-1-git-send-email-jusual@mail.ru>
-	<20180306143104.GI31045@stefanha-x1.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <21566db2-d512-65f5-6b7a-6fd43db53927@redhat.com>
-Date: Tue, 6 Mar 2018 15:47:08 +0100
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1etDsM-0008AC-BL
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:47:34 -0500
+Date: Tue, 6 Mar 2018 15:47:28 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180306154728.087f1411@redhat.com>
+In-Reply-To: <20180305173720-mutt-send-email-mst@kernel.org>
+References: <1520241169-22892-1-git-send-email-jianjay.zhou@huawei.com>
+	<20180305173720-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180306143104.GI31045@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="7GW1T4a0Px84vQvd4CH3PcDEt17kaRYg6"
-Subject: Re: [Qemu-devel] [PATCH v2] checkpatch: add a warning for
- basename/dirname
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v9] vhost: used_memslots refactoring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +27,326 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Julia Suvorova <jusual@mail.ru>
-Cc: qemu-devel@nongnu.org, Jim Mussared <jim@groklearning.com>, Joel Stanley <joel@jms.id.au>, Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jay Zhou <jianjay.zhou@huawei.com>, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, qemu-devel@nongnu.org, arei.gonglei@huawei.com, liuzhe13@huawei.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7GW1T4a0Px84vQvd4CH3PcDEt17kaRYg6
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Julia Suvorova <jusual@mail.ru>
-Cc: qemu-devel@nongnu.org, Jim Mussared <jim@groklearning.com>,
- Joel Stanley <joel@jms.id.au>, Cornelia Huck <cohuck@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Message-ID: <21566db2-d512-65f5-6b7a-6fd43db53927@redhat.com>
-Subject: Re: [PATCH v2] checkpatch: add a warning for basename/dirname
-References: <1519987399-19160-1-git-send-email-jusual@mail.ru>
- <20180306143104.GI31045@stefanha-x1.localdomain>
-In-Reply-To: <20180306143104.GI31045@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+On Mon, 5 Mar 2018 17:37:42 +0200
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-On 06/03/2018 15:31, Stefan Hajnoczi wrote:
-> On Fri, Mar 02, 2018 at 01:43:19PM +0300, Julia Suvorova wrote:
->> g_path_get_* do the same as g_strdup(basename/dirname(...)) but
->> without modifying the argument.
->>
->> Signed-off-by: Julia Suvorova <jusual@mail.ru>
->> ---
->>  scripts/checkpatch.pl | 5 +++++
->>  1 file changed, 5 insertions(+)
->=20
-> Thanks, applied to my block-next tree:
-> https://github.com/stefanha/qemu/commits/block-next
+> On Mon, Mar 05, 2018 at 05:12:49PM +0800, Jay Zhou wrote:
+> > Used_memslots is shared by vhost kernel and user, it is equal to
+> > dev->mem->nregions, which is correct for vhost kernel, but not for
+> > vhost user, the latter one uses memory regions that have file
+> > descriptor. E.g. a VM has a vhost-user NIC and 8(vhost user memslot
+> > upper limit) memory slots, it will be failed to hotplug a new DIMM
+> > device since vhost_has_free_slot() finds no free slot left. It
+> > should be successful if only part of memory slots have file
+> > descriptor, so setting used memslots for vhost-user and
+> > vhost-kernel respectively.
+> > 
+> > v7 ... v9:
+> >  - rebased on the master
+> > v2 ... v6:
+> >  - delete the "used_memslots" global variable, and add it
+> >    for vhost-user and vhost-kernel separately
+> >  - refine the function, commit log
+> >  - used_memslots refactoring
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
+> 
+> Igor - does you ack still stand?
+Rebased version looks fine so:
 
-It's already in qemu.git :) (commit fb8446d94e).
-
-Paolo
+Acked-by: Igor Mammedov <imammedo@redhat.com>
 
 
---7GW1T4a0Px84vQvd4CH3PcDEt17kaRYg6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlqeqewACgkQv/vSX3jH
-roMDRgf8DTjJs1RlajjhhIwZGAlbl7cF7xbSYj2+QjLY63gC65DZV/Gl9Xnpj5Lp
-TC7zmszU9HOUh+DKSHdBB/7We92g5SYft4z6EHFGZODrmZxlvanB64aVMYJ43thv
-K0rRIfDYYwvecIPP5aKkQG47TrVpg1ibJVERzfN0ebl8UvESY2QhtgEafbBJe3j+
-QdmyJdPAdvdndshNW3S9IN7Tf7RhK/n0Vv6LzYKIqOH7R15yRe5QGu+Pz5/+jA8H
-/qrV3lyf0rOGFRoiwKUsjNnntAhWPGXSA5fMb80cbtTOAwK/rHA8nfcpUMuggP/Q
-kcmcD9bPWUfK4Y+kTX0ZqZv1x8EuRg==
-=GzrI
------END PGP SIGNATURE-----
-
---7GW1T4a0Px84vQvd4CH3PcDEt17kaRYg6--
+> > Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+> > Signed-off-by: Liuzhe <liuzhe13@huawei.com>
+> > ---
+> >  hw/virtio/vhost-backend.c         | 15 +++++++-
+> >  hw/virtio/vhost-user.c            | 77 ++++++++++++++++++++++++++-------------
+> >  hw/virtio/vhost.c                 | 13 +++----
+> >  include/hw/virtio/vhost-backend.h |  6 ++-
+> >  4 files changed, 75 insertions(+), 36 deletions(-)
+> > 
+> > diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
+> > index 7f09efa..59def69 100644
+> > --- a/hw/virtio/vhost-backend.c
+> > +++ b/hw/virtio/vhost-backend.c
+> > @@ -15,6 +15,8 @@
+> >  #include "hw/virtio/vhost-backend.h"
+> >  #include "qemu/error-report.h"
+> >  
+> > +static unsigned int vhost_kernel_used_memslots;
+> > +
+> >  static int vhost_kernel_call(struct vhost_dev *dev, unsigned long int request,
+> >                               void *arg)
+> >  {
+> > @@ -62,6 +64,11 @@ static int vhost_kernel_memslots_limit(struct vhost_dev *dev)
+> >      return limit;
+> >  }
+> >  
+> > +static bool vhost_kernel_has_free_memslots(struct vhost_dev *dev)
+> > +{
+> > +    return vhost_kernel_used_memslots < vhost_kernel_memslots_limit(dev);
+> > +}
+> > +
+> >  static int vhost_kernel_net_set_backend(struct vhost_dev *dev,
+> >                                          struct vhost_vring_file *file)
+> >  {
+> > @@ -233,11 +240,16 @@ static void vhost_kernel_set_iotlb_callback(struct vhost_dev *dev,
+> >          qemu_set_fd_handler((uintptr_t)dev->opaque, NULL, NULL, NULL);
+> >  }
+> >  
+> > +static void vhost_kernel_set_used_memslots(struct vhost_dev *dev)
+> > +{
+> > +    vhost_kernel_used_memslots = dev->mem->nregions;
+> > +}
+> > +
+> >  static const VhostOps kernel_ops = {
+> >          .backend_type = VHOST_BACKEND_TYPE_KERNEL,
+> >          .vhost_backend_init = vhost_kernel_init,
+> >          .vhost_backend_cleanup = vhost_kernel_cleanup,
+> > -        .vhost_backend_memslots_limit = vhost_kernel_memslots_limit,
+> > +        .vhost_backend_has_free_memslots = vhost_kernel_has_free_memslots,
+> >          .vhost_net_set_backend = vhost_kernel_net_set_backend,
+> >          .vhost_scsi_set_endpoint = vhost_kernel_scsi_set_endpoint,
+> >          .vhost_scsi_clear_endpoint = vhost_kernel_scsi_clear_endpoint,
+> > @@ -264,6 +276,7 @@ static const VhostOps kernel_ops = {
+> >  #endif /* CONFIG_VHOST_VSOCK */
+> >          .vhost_set_iotlb_callback = vhost_kernel_set_iotlb_callback,
+> >          .vhost_send_device_iotlb_msg = vhost_kernel_send_device_iotlb_msg,
+> > +        .vhost_set_used_memslots = vhost_kernel_set_used_memslots,
+> >  };
+> >  
+> >  int vhost_set_backend_type(struct vhost_dev *dev, VhostBackendType backend_type)
+> > diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> > index 41ff5cf..ef14249 100644
+> > --- a/hw/virtio/vhost-user.c
+> > +++ b/hw/virtio/vhost-user.c
+> > @@ -163,6 +163,8 @@ static VhostUserMsg m __attribute__ ((unused));
+> >  /* The version of the protocol we support */
+> >  #define VHOST_USER_VERSION    (0x1)
+> >  
+> > +static bool vhost_user_free_memslots = true;
+> > +
+> >  struct vhost_user {
+> >      CharBackend *chr;
+> >      int slave_fd;
+> > @@ -330,12 +332,43 @@ static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t base,
+> >      return 0;
+> >  }
+> >  
+> > +static int vhost_user_prepare_msg(struct vhost_dev *dev, VhostUserMemory *mem,
+> > +                                  int *fds)
+> > +{
+> > +    int i, fd;
+> > +
+> > +    vhost_user_free_memslots = true;
+> > +    for (i = 0, mem->nregions = 0; i < dev->mem->nregions; ++i) {
+> > +        struct vhost_memory_region *reg = dev->mem->regions + i;
+> > +        ram_addr_t offset;
+> > +        MemoryRegion *mr;
+> > +
+> > +        assert((uintptr_t)reg->userspace_addr == reg->userspace_addr);
+> > +        mr = memory_region_from_host((void *)(uintptr_t)reg->userspace_addr,
+> > +                                     &offset);
+> > +        fd = memory_region_get_fd(mr);
+> > +        if (fd > 0) {
+> > +            if (mem->nregions == VHOST_MEMORY_MAX_NREGIONS) {
+> > +                vhost_user_free_memslots = false;
+> > +                return -1;
+> > +            }
+> > +
+> > +            mem->regions[mem->nregions].userspace_addr = reg->userspace_addr;
+> > +            mem->regions[mem->nregions].memory_size = reg->memory_size;
+> > +            mem->regions[mem->nregions].guest_phys_addr = reg->guest_phys_addr;
+> > +            mem->regions[mem->nregions].mmap_offset = offset;
+> > +            fds[mem->nregions++] = fd;
+> > +        }
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> > +
+> >  static int vhost_user_set_mem_table(struct vhost_dev *dev,
+> >                                      struct vhost_memory *mem)
+> >  {
+> >      int fds[VHOST_MEMORY_MAX_NREGIONS];
+> > -    int i, fd;
+> > -    size_t fd_num = 0;
+> > +    size_t fd_num;
+> >      bool reply_supported = virtio_has_feature(dev->protocol_features,
+> >                                                VHOST_USER_PROTOCOL_F_REPLY_ACK);
+> >  
+> > @@ -348,29 +381,12 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
+> >          msg.hdr.flags |= VHOST_USER_NEED_REPLY_MASK;
+> >      }
+> >  
+> > -    for (i = 0; i < dev->mem->nregions; ++i) {
+> > -        struct vhost_memory_region *reg = dev->mem->regions + i;
+> > -        ram_addr_t offset;
+> > -        MemoryRegion *mr;
+> > -
+> > -        assert((uintptr_t)reg->userspace_addr == reg->userspace_addr);
+> > -        mr = memory_region_from_host((void *)(uintptr_t)reg->userspace_addr,
+> > -                                     &offset);
+> > -        fd = memory_region_get_fd(mr);
+> > -        if (fd > 0) {
+> > -            if (fd_num == VHOST_MEMORY_MAX_NREGIONS) {
+> > -                error_report("Failed preparing vhost-user memory table msg");
+> > -                return -1;
+> > -            }
+> > -            msg.payload.memory.regions[fd_num].userspace_addr = reg->userspace_addr;
+> > -            msg.payload.memory.regions[fd_num].memory_size  = reg->memory_size;
+> > -            msg.payload.memory.regions[fd_num].guest_phys_addr = reg->guest_phys_addr;
+> > -            msg.payload.memory.regions[fd_num].mmap_offset = offset;
+> > -            fds[fd_num++] = fd;
+> > -        }
+> > +    if (vhost_user_prepare_msg(dev, &msg.payload.memory, fds) < 0) {
+> > +        error_report("Failed preparing vhost-user memory table msg");
+> > +        return -1;
+> >      }
+> >  
+> > -    msg.payload.memory.nregions = fd_num;
+> > +    fd_num = msg.payload.memory.nregions;
+> >  
+> >      if (!fd_num) {
+> >          error_report("Failed initializing vhost-user memory map, "
+> > @@ -886,9 +902,9 @@ static int vhost_user_get_vq_index(struct vhost_dev *dev, int idx)
+> >      return idx;
+> >  }
+> >  
+> > -static int vhost_user_memslots_limit(struct vhost_dev *dev)
+> > +static bool vhost_user_has_free_memslots(struct vhost_dev *dev)
+> >  {
+> > -    return VHOST_MEMORY_MAX_NREGIONS;
+> > +    return vhost_user_free_memslots;
+> >  }
+> >  
+> >  static bool vhost_user_requires_shm_log(struct vhost_dev *dev)
+> > @@ -1156,11 +1172,19 @@ vhost_user_crypto_close_session(struct vhost_dev *dev, uint64_t session_id)
+> >      return 0;
+> >  }
+> >  
+> > +static void vhost_user_set_used_memslots(struct vhost_dev *dev)
+> > +{
+> > +    int fds[VHOST_MEMORY_MAX_NREGIONS];
+> > +    VhostUserMsg msg;
+> > +
+> > +    vhost_user_prepare_msg(dev, &msg.payload.memory, fds);
+> > +}
+> > +
+> >  const VhostOps user_ops = {
+> >          .backend_type = VHOST_BACKEND_TYPE_USER,
+> >          .vhost_backend_init = vhost_user_init,
+> >          .vhost_backend_cleanup = vhost_user_cleanup,
+> > -        .vhost_backend_memslots_limit = vhost_user_memslots_limit,
+> > +        .vhost_backend_has_free_memslots = vhost_user_has_free_memslots,
+> >          .vhost_set_log_base = vhost_user_set_log_base,
+> >          .vhost_set_mem_table = vhost_user_set_mem_table,
+> >          .vhost_set_vring_addr = vhost_user_set_vring_addr,
+> > @@ -1184,6 +1208,7 @@ const VhostOps user_ops = {
+> >          .vhost_send_device_iotlb_msg = vhost_user_send_device_iotlb_msg,
+> >          .vhost_get_config = vhost_user_get_config,
+> >          .vhost_set_config = vhost_user_set_config,
+> > +        .vhost_set_used_memslots = vhost_user_set_used_memslots,
+> >          .vhost_crypto_create_session = vhost_user_crypto_create_session,
+> >          .vhost_crypto_close_session = vhost_user_crypto_close_session,
+> >  };
+> > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> > index d8d0ef9..17262d2 100644
+> > --- a/hw/virtio/vhost.c
+> > +++ b/hw/virtio/vhost.c
+> > @@ -44,20 +44,19 @@
+> >  static struct vhost_log *vhost_log;
+> >  static struct vhost_log *vhost_log_shm;
+> >  
+> > -static unsigned int used_memslots;
+> >  static QLIST_HEAD(, vhost_dev) vhost_devices =
+> >      QLIST_HEAD_INITIALIZER(vhost_devices);
+> >  
+> >  bool vhost_has_free_slot(void)
+> >  {
+> > -    unsigned int slots_limit = ~0U;
+> >      struct vhost_dev *hdev;
+> >  
+> >      QLIST_FOREACH(hdev, &vhost_devices, entry) {
+> > -        unsigned int r = hdev->vhost_ops->vhost_backend_memslots_limit(hdev);
+> > -        slots_limit = MIN(slots_limit, r);
+> > +        if (!hdev->vhost_ops->vhost_backend_has_free_memslots(hdev)) {
+> > +            return false;
+> > +        }
+> >      }
+> > -    return slots_limit > used_memslots;
+> > +    return true;
+> >  }
+> >  
+> >  static void vhost_dev_sync_region(struct vhost_dev *dev,
+> > @@ -446,7 +445,6 @@ static void vhost_commit(MemoryListener *listener)
+> >                         dev->n_mem_sections * sizeof dev->mem->regions[0];
+> >      dev->mem = g_realloc(dev->mem, regions_size);
+> >      dev->mem->nregions = dev->n_mem_sections;
+> > -    used_memslots = dev->mem->nregions;
+> >      for (i = 0; i < dev->n_mem_sections; i++) {
+> >          struct vhost_memory_region *cur_vmr = dev->mem->regions + i;
+> >          struct MemoryRegionSection *mrs = dev->mem_sections + i;
+> > @@ -458,6 +456,7 @@ static void vhost_commit(MemoryListener *listener)
+> >              mrs->offset_within_region;
+> >          cur_vmr->flags_padding   = 0;
+> >      }
+> > +    dev->vhost_ops->vhost_set_used_memslots(dev);
+> >  
+> >      if (!dev->started) {
+> >          goto out;
+> > @@ -1202,7 +1201,7 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+> >      memory_listener_register(&hdev->memory_listener, &address_space_memory);
+> >      QLIST_INSERT_HEAD(&vhost_devices, hdev, entry);
+> >  
+> > -    if (used_memslots > hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
+> > +    if (!hdev->vhost_ops->vhost_backend_has_free_memslots(hdev)) {
+> >          error_report("vhost backend memory slots limit is less"
+> >                  " than current number of present memory slots");
+> >          r = -1;
+> > diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
+> > index 5dac61f..ff06c2d 100644
+> > --- a/include/hw/virtio/vhost-backend.h
+> > +++ b/include/hw/virtio/vhost-backend.h
+> > @@ -36,7 +36,7 @@ struct vhost_iotlb_msg;
+> >  
+> >  typedef int (*vhost_backend_init)(struct vhost_dev *dev, void *opaque);
+> >  typedef int (*vhost_backend_cleanup)(struct vhost_dev *dev);
+> > -typedef int (*vhost_backend_memslots_limit)(struct vhost_dev *dev);
+> > +typedef bool (*vhost_backend_has_free_memslots)(struct vhost_dev *dev);
+> >  
+> >  typedef int (*vhost_net_set_backend_op)(struct vhost_dev *dev,
+> >                                  struct vhost_vring_file *file);
+> > @@ -94,6 +94,7 @@ typedef int (*vhost_set_config_op)(struct vhost_dev *dev, const uint8_t *data,
+> >                                     uint32_t flags);
+> >  typedef int (*vhost_get_config_op)(struct vhost_dev *dev, uint8_t *config,
+> >                                     uint32_t config_len);
+> > +typedef void (*vhost_set_used_memslots_op)(struct vhost_dev *dev);
+> >  
+> >  typedef int (*vhost_crypto_create_session_op)(struct vhost_dev *dev,
+> >                                                void *session_info,
+> > @@ -105,7 +106,7 @@ typedef struct VhostOps {
+> >      VhostBackendType backend_type;
+> >      vhost_backend_init vhost_backend_init;
+> >      vhost_backend_cleanup vhost_backend_cleanup;
+> > -    vhost_backend_memslots_limit vhost_backend_memslots_limit;
+> > +    vhost_backend_has_free_memslots vhost_backend_has_free_memslots;
+> >      vhost_net_set_backend_op vhost_net_set_backend;
+> >      vhost_net_set_mtu_op vhost_net_set_mtu;
+> >      vhost_scsi_set_endpoint_op vhost_scsi_set_endpoint;
+> > @@ -136,6 +137,7 @@ typedef struct VhostOps {
+> >      vhost_send_device_iotlb_msg_op vhost_send_device_iotlb_msg;
+> >      vhost_get_config_op vhost_get_config;
+> >      vhost_set_config_op vhost_set_config;
+> > +    vhost_set_used_memslots_op vhost_set_used_memslots;
+> >      vhost_crypto_create_session_op vhost_crypto_create_session;
+> >      vhost_crypto_close_session_op vhost_crypto_close_session;
+> >  } VhostOps;
+> > -- 
+> > 1.8.3.1
+> >   
+> 
