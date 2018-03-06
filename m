@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1et2mm-0008It-EF
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 21:57:05 -0500
+	(envelope-from <wangjintang@huawei.com>) id 1et2oI-0000p4-Af
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 21:58:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1et2mj-0004ln-BT
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 21:57:04 -0500
-Date: Mon, 5 Mar 2018 21:56:59 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180306025659.GA4195@flamenco>
-References: <1519944838-12430-1-git-send-email-cota@braap.org>
-	<CAHNT7NusFbz=Dt0TGEWKFyJjDDpF3zjGmfkKw4w9thBOFzHb6g@mail.gmail.com>
+	(envelope-from <wangjintang@huawei.com>) id 1et2oF-0005eX-8j
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 21:58:38 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2263 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wangjintang@huawei.com>)
+	id 1et2oE-0005d8-TS
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 21:58:35 -0500
+Received: from DGGEMA404-HUB.china.huawei.com (unknown [172.30.72.55])
+	by Forcepoint Email with ESMTP id 752086DE441EC
+	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 10:58:27 +0800 (CST)
+From: Wangjintang <wangjintang@huawei.com>
+Date: Tue, 6 Mar 2018 02:56:51 +0000
+Message-ID: <C94A741879221447B4FC9B607EB4FFCD7A03E948@DGGEMA504-MBX.china.huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHNT7NusFbz=Dt0TGEWKFyJjDDpF3zjGmfkKw4w9thBOFzHb6g@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCHv1 00/14] Translation loop conversion for
- sh4/sparc/mips/s390x/openrisc targets
+Subject: [Qemu-devel] question about "warning: TCG doesn't support requested
+ feature: CPUID.01H:ECX.f16c "
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,31 +30,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, David Hildenbrand <david@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org, Artyom Tarasenko <atar4qemu@gmail.com>, Stafford Horne <shorne@gmail.com>, Yongbok Kim <yongbok.kim@mips.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Zhangchuande <zhangchuande@huawei.com>, huangsibo <huangsibo@huawei.com>
 
-On Tue, Mar 06, 2018 at 12:57:13 +1300, Michael Clark wrote:
-> On Fri, Mar 2, 2018 at 11:53 AM, Emilio G. Cota <cota@braap.org> wrote:
-> 
-> > [ What is this all about? See this message:
-> >   http://lists.gnu.org/archive/html/qemu-devel/2018-02/msg04785.html ]
-(snip)
-> > You can fetch this series from:
-> >   https://github.com/cota/qemu/tree/trloop-conv-v1
-> 
-> 
-> Curious to know what we would need to change in RISC-V translate.c:
-> 
-> -
-> https://github.com/riscv/riscv-qemu/blob/qemu-upstream-v8/target/riscv/translate.c
-> 
-> I'm going to make a v8.1 branch and tag that is a rebase of the v8 patch
-> series against current QEMU master, and hopefully we get the RISC-V port
-> merged before the soft-freeze. Fingers crossed.
-
-I have patches that convert riscv as well.
-
-Once riscv is on master I'll send the patches to the list; I don't want
-this work to delay the riscv merge even more!
-
-		Emilio
+SGkgYWxsLA0KDQoJV2UgcnVuIGFwcGxpY2F0aW9uIHdpdGggcWVtdSwgZ2V0IHRoZSBiZWxvdyBl
+cnJvciwgdGhlIHJlYXNvbiBpcyB0aGF0ICIgVENHIGRvZXNuJ3Qgc3VwcG9ydCByZXF1ZXN0ZWQg
+ZmVhdHVyZTogQ1BVSUQuMDFIOkVDWC5mMTZjICIuDQpEb2VzIFRDRyBpbiBxZW11IHN1cHBvcnQg
+IiBDUFVJRC4wMUg6RUNYLmYxNmMgIj8gDQpJZiBUQ0cgaW4gcWVtdSBzdXBwb3J0LCB0aGVuIGhv
+dyB0byB1c2U/ICBUaGFua3MuDQoNCiQgc3VkbyAgLi9xZW11LTIuMTEuMV9iaW4vYmluL3FlbXUt
+c3lzdGVtLXg4Nl82NCAtY3B1IFNreWxha2UtU2VydmVyIC1NIHEzNSAtbSA0MDk2IC1zbXAgMSAt
+bm9ncmFwaGljICAta2VybmVsIGJ6SW1hZ2UtNC40LjAgLWluaXRyZCBpbml0cmQuaW1nLTQuNC4w
+LTMxLWdlbmVyaWMgIC1hcHBlbmQgInJvb3Q9L2Rldi92ZGExIGNvbnNvbGU9dHR5UzAiIC1ib290
+IGQgLWRyaXZlIGlmPXZpcnRpbyxmaWxlPS4vdWJ1bnR1Mi5pbWcgLW5ldCBuaWMsbW9kZWw9dmly
+dGlvIC1uZXQgdGFwLGlmbmFtZT10YXAyNixzY3JpcHQ9bm8sZG93bnNjcmlwdD1ubw0KcWVtdS1z
+eXN0ZW0teDg2XzY0OiB3YXJuaW5nOiBUQ0cgZG9lc24ndCBzdXBwb3J0IHJlcXVlc3RlZCBmZWF0
+dXJlOiBDUFVJRC4wMUg6RUNYLmZtYSBbYml0IDEyXQ0KcWVtdS1zeXN0ZW0teDg2XzY0OiB3YXJu
+aW5nOiBUQ0cgZG9lc24ndCBzdXBwb3J0IHJlcXVlc3RlZCBmZWF0dXJlOiBDUFVJRC4wMUg6RUNY
+LnBjaWQgW2JpdCAxN10NCnFlbXUtc3lzdGVtLXg4Nl82NDogd2FybmluZzogVENHIGRvZXNuJ3Qg
+c3VwcG9ydCByZXF1ZXN0ZWQgZmVhdHVyZTogQ1BVSUQuMDFIOkVDWC54MmFwaWMgW2JpdCAyMV0N
+CnFlbXUtc3lzdGVtLXg4Nl82NDogd2FybmluZzogVENHIGRvZXNuJ3Qgc3VwcG9ydCByZXF1ZXN0
+ZWQgZmVhdHVyZTogQ1BVSUQuMDFIOkVDWC50c2MtZGVhZGxpbmUgW2JpdCAyNF0NCnFlbXUtc3lz
+dGVtLXg4Nl82NDogd2FybmluZzogVENHIGRvZXNuJ3Qgc3VwcG9ydCByZXF1ZXN0ZWQgZmVhdHVy
+ZTogQ1BVSUQuMDFIOkVDWC5hdnggW2JpdCAyOF0NCnFlbXUtc3lzdGVtLXg4Nl82NDogd2Fybmlu
+ZzogVENHIGRvZXNuJ3Qgc3VwcG9ydCByZXF1ZXN0ZWQgZmVhdHVyZTogQ1BVSUQuMDFIOkVDWC5m
+MTZjIFtiaXQgMjldDQpxZW11LXN5c3RlbS14ODZfNjQ6IHdhcm5pbmc6IFRDRyBkb2Vzbid0IHN1
+cHBvcnQgcmVxdWVzdGVkIGZlYXR1cmU6IENQVUlELjAxSDpFQ1gucmRyYW5kIFtiaXQgMzBdDQpx
+ZW11LXN5c3RlbS14ODZfNjQ6IHdhcm5pbmc6IFRDRyBkb2Vzbid0IHN1cHBvcnQgcmVxdWVzdGVk
+IGZlYXR1cmU6IENQVUlELjA3SDpFQlguaGxlIFtiaXQgNF0NCnFlbXUtc3lzdGVtLXg4Nl82NDog
+d2FybmluZzogVENHIGRvZXNuJ3Qgc3VwcG9ydCByZXF1ZXN0ZWQgZmVhdHVyZTogQ1BVSUQuMDdI
+OkVCWC5hdngyIFtiaXQgNV0NCnFlbXUtc3lzdGVtLXg4Nl82NDogd2FybmluZzogVENHIGRvZXNu
+J3Qgc3VwcG9ydCByZXF1ZXN0ZWQgZmVhdHVyZTogQ1BVSUQuMDdIOkVCWC5pbnZwY2lkIFtiaXQg
+MTBdDQpxZW11LXN5c3RlbS14ODZfNjQ6IHdhcm5pbmc6IFRDRyBkb2Vzbid0IHN1cHBvcnQgcmVx
+dWVzdGVkIGZlYXR1cmU6IENQVUlELjA3SDpFQlgucnRtIFtiaXQgMTFdDQpxZW11LXN5c3RlbS14
+ODZfNjQ6IHdhcm5pbmc6IFRDRyBkb2Vzbid0IHN1cHBvcnQgcmVxdWVzdGVkIGZlYXR1cmU6IENQ
+VUlELjA3SDpFQlguYXZ4NTEyZiBbYml0IDE2XQ0KcWVtdS1zeXN0ZW0teDg2XzY0OiB3YXJuaW5n
+OiBUQ0cgZG9lc24ndCBzdXBwb3J0IHJlcXVlc3RlZCBmZWF0dXJlOiBDUFVJRC4wN0g6RUJYLmF2
+eDUxMmRxIFtiaXQgMTddDQpxZW11LXN5c3RlbS14ODZfNjQ6IHdhcm5pbmc6IFRDRyBkb2Vzbid0
+IHN1cHBvcnQgcmVxdWVzdGVkIGZlYXR1cmU6IENQVUlELjA3SDpFQlgucmRzZWVkIFtiaXQgMThd
+DQpxZW11LXN5c3RlbS14ODZfNjQ6IHdhcm5pbmc6IFRDRyBkb2Vzbid0IHN1cHBvcnQgcmVxdWVz
+dGVkIGZlYXR1cmU6IENQVUlELjA3SDpFQlguYXZ4NTEyY2QgW2JpdCAyOF0NCnFlbXUtc3lzdGVt
+LXg4Nl82NDogd2FybmluZzogVENHIGRvZXNuJ3Qgc3VwcG9ydCByZXF1ZXN0ZWQgZmVhdHVyZTog
+Q1BVSUQuMDdIOkVCWC5hdng1MTJidyBbYml0IDMwXQ0KcWVtdS1zeXN0ZW0teDg2XzY0OiB3YXJu
+aW5nOiBUQ0cgZG9lc24ndCBzdXBwb3J0IHJlcXVlc3RlZCBmZWF0dXJlOiBDUFVJRC4wN0g6RUJY
+LmF2eDUxMnZsIFtiaXQgMzFdDQpxZW11LXN5c3RlbS14ODZfNjQ6IHdhcm5pbmc6IFRDRyBkb2Vz
+bid0IHN1cHBvcnQgcmVxdWVzdGVkIGZlYXR1cmU6IENQVUlELjgwMDAwMDAxSDpFQ1guM2Rub3dw
+cmVmZXRjaCBbYml0IDhdDQpxZW11LXN5c3RlbS14ODZfNjQ6IHdhcm5pbmc6IFRDRyBkb2Vzbid0
+IHN1cHBvcnQgcmVxdWVzdGVkIGZlYXR1cmU6IENQVUlELjBESDpFQVgueHNhdmVjIFtiaXQgMV0N
+ClNlYUJJT1MgKHZlcnNpb24gcmVsLTEuMTEuMC0wLWc2MzQ1MWZjYTEzLXByZWJ1aWx0LnFlbXUt
+cHJvamVjdC5vcmcpDQogDQoNClJlZ2FyZHMsDQpXYW5nIEppbnRhbmcgDQogDQoNCg==
