@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1etC8A-0008TV-1O
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 07:55:48 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1etC8I-00009J-1i
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 07:55:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1etC84-0004rX-4v
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 07:55:46 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1etC8D-00050O-4F
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 07:55:54 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  6 Mar 2018 12:55:26 +0000
-Message-Id: <20180306125526.27838-7-peter.maydell@linaro.org>
+Date: Tue,  6 Mar 2018 12:55:24 +0000
+Message-Id: <20180306125526.27838-5-peter.maydell@linaro.org>
 In-Reply-To: <20180306125526.27838-1-peter.maydell@linaro.org>
 References: <20180306125526.27838-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 6/6] hw/arm/virt: Support -machine
- gic-version=max
+Subject: [Qemu-devel] [PATCH v2 4/6] target/arm: Make 'any' CPU just an
+ alias for 'max'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,69 +23,179 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Add support for passing 'max' to -machine gic-version. By analogy
-with the -cpu max option, this picks the "best available" GIC version
-whether you're using KVM or TCG, so it behaves like 'host' when
-using KVM, and gives you GICv3 when using TCG.
+Now we have a working '-cpu max', the linux-user-only
+'any' CPU is pretty much the same thing, so implement it
+that way.
 
-Also like '-cpu host', using -machine gic-version=max' means there
-is no guarantee of migration compatibility between QEMU versions;
-in future 'max' might mean '4'.
+For the moment we don't add any of the extra feature bits
+to the system-emulation "max", because we don't set the
+ID register bits we would need to to advertise those
+features as present.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/virt.c | 29 +++++++++++++++++++----------
- 1 file changed, 19 insertions(+), 10 deletions(-)
+ target/arm/cpu.c   | 50 +++++++++++++++++++++++----------------------
+ target/arm/cpu64.c | 59 ++++++++++++++++++++++++++----------------------------
+ 2 files changed, 54 insertions(+), 55 deletions(-)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index cda4b83586..2c07245047 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1207,16 +1207,23 @@ static void machvirt_init(MachineState *machine)
-     /* We can probe only here because during property set
-      * KVM is not available yet
-      */
--    if (!vms->gic_version) {
-+    if (vms->gic_version <= 0) {
-+        /* "host" or "max" */
-         if (!kvm_enabled()) {
--            error_report("gic-version=host requires KVM");
--            exit(1);
--        }
--
--        vms->gic_version = kvm_arm_vgic_probe();
--        if (!vms->gic_version) {
--            error_report("Unable to determine GIC version supported by host");
--            exit(1);
-+            if (vms->gic_version == 0) {
-+                error_report("gic-version=host requires KVM");
-+                exit(1);
-+            } else {
-+                /* "max": currently means 3 for TCG */
-+                vms->gic_version = 3;
-+            }
-+        } else {
-+            vms->gic_version = kvm_arm_vgic_probe();
-+            if (!vms->gic_version) {
-+                error_report(
-+                    "Unable to determine GIC version supported by host");
-+                exit(1);
-+            }
-         }
-     }
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index e46ddcc613..c8d3da2140 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -965,9 +965,17 @@ static ObjectClass *arm_cpu_class_by_name(const char *cpu_model)
+     ObjectClass *oc;
+     char *typename;
+     char **cpuname;
++    const char *cpunamestr;
  
-@@ -1480,9 +1487,11 @@ static void virt_set_gic_version(Object *obj, const char *value, Error **errp)
-         vms->gic_version = 2;
-     } else if (!strcmp(value, "host")) {
-         vms->gic_version = 0; /* Will probe later */
-+    } else if (!strcmp(value, "max")) {
-+        vms->gic_version = -1; /* Will probe later */
+     cpuname = g_strsplit(cpu_model, ",", 1);
+-    typename = g_strdup_printf(ARM_CPU_TYPE_NAME("%s"), cpuname[0]);
++    cpunamestr = cpuname[0];
++#ifdef CONFIG_USER_ONLY
++    /* For backwards compatibility usermode emulation allows "-cpu any",
++     * which has the same semantics as "-cpu max".
++     */
++    cpunamestr = "max";
++#endif
++    typename = g_strdup_printf(ARM_CPU_TYPE_NAME("%s"), cpunamestr);
+     oc = object_class_by_name(typename);
+     g_strfreev(cpuname);
+     g_free(typename);
+@@ -1711,29 +1719,23 @@ static void arm_max_initfn(Object *obj)
+         kvm_arm_set_cpu_features_from_host(cpu);
      } else {
-         error_setg(errp, "Invalid gic-version value");
--        error_append_hint(errp, "Valid values are 3, 2, host.\n");
-+        error_append_hint(errp, "Valid values are 3, 2, host, max.\n");
+         cortex_a15_initfn(obj);
+-        /* In future we might add feature bits here even if the
+-         * real-world A15 doesn't implement them.
+-         */
+-    }
+-}
+-#endif
+-
+ #ifdef CONFIG_USER_ONLY
+-static void arm_any_initfn(Object *obj)
+-{
+-    ARMCPU *cpu = ARM_CPU(obj);
+-    set_feature(&cpu->env, ARM_FEATURE_V8);
+-    set_feature(&cpu->env, ARM_FEATURE_VFP4);
+-    set_feature(&cpu->env, ARM_FEATURE_NEON);
+-    set_feature(&cpu->env, ARM_FEATURE_THUMB2EE);
+-    set_feature(&cpu->env, ARM_FEATURE_V8_AES);
+-    set_feature(&cpu->env, ARM_FEATURE_V8_SHA1);
+-    set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
+-    set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
+-    set_feature(&cpu->env, ARM_FEATURE_CRC);
+-    set_feature(&cpu->env, ARM_FEATURE_V8_RDM);
+-    set_feature(&cpu->env, ARM_FEATURE_V8_FCMA);
+-    cpu->midr = 0xffffffff;
++        /* We don't set these in system emulation mode for the moment,
++         * since we don't correctly set the ID registers to advertise them,
++         */
++        set_feature(&cpu->env, ARM_FEATURE_V8);
++        set_feature(&cpu->env, ARM_FEATURE_VFP4);
++        set_feature(&cpu->env, ARM_FEATURE_NEON);
++        set_feature(&cpu->env, ARM_FEATURE_THUMB2EE);
++        set_feature(&cpu->env, ARM_FEATURE_V8_AES);
++        set_feature(&cpu->env, ARM_FEATURE_V8_SHA1);
++        set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
++        set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
++        set_feature(&cpu->env, ARM_FEATURE_CRC);
++        set_feature(&cpu->env, ARM_FEATURE_V8_RDM);
++        set_feature(&cpu->env, ARM_FEATURE_V8_FCMA);
++#endif
++    }
+ }
+ #endif
+ 
+@@ -1789,7 +1791,7 @@ static const ARMCPUInfo arm_cpus[] = {
+     { .name = "max",         .initfn = arm_max_initfn },
+ #endif
+ #ifdef CONFIG_USER_ONLY
+-    { .name = "any",         .initfn = arm_any_initfn },
++    { .name = "any",         .initfn = arm_max_initfn },
+ #endif
+ #endif
+     { .name = NULL }
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 9042d3dfd1..3429875787 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -226,38 +226,38 @@ static void aarch64_max_initfn(Object *obj)
+         kvm_arm_set_cpu_features_from_host(cpu);
+     } else {
+         aarch64_a57_initfn(obj);
+-        /* In future we might add feature bits here even if the
+-         * real-world A57 doesn't implement them.
++#ifdef CONFIG_USER_ONLY
++        /* We don't set these in system emulation mode for the moment,
++         * since we don't correctly set the ID registers to advertise them,
++         * and in some cases they're only available in AArch64 and not AArch32,
++         * whereas the architecture requires them to be present in both if
++         * present in either.
+          */
++        set_feature(&cpu->env, ARM_FEATURE_V8);
++        set_feature(&cpu->env, ARM_FEATURE_VFP4);
++        set_feature(&cpu->env, ARM_FEATURE_NEON);
++        set_feature(&cpu->env, ARM_FEATURE_AARCH64);
++        set_feature(&cpu->env, ARM_FEATURE_V8_AES);
++        set_feature(&cpu->env, ARM_FEATURE_V8_SHA1);
++        set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
++        set_feature(&cpu->env, ARM_FEATURE_V8_SHA512);
++        set_feature(&cpu->env, ARM_FEATURE_V8_SHA3);
++        set_feature(&cpu->env, ARM_FEATURE_V8_SM3);
++        set_feature(&cpu->env, ARM_FEATURE_V8_SM4);
++        set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
++        set_feature(&cpu->env, ARM_FEATURE_CRC);
++        set_feature(&cpu->env, ARM_FEATURE_V8_RDM);
++        set_feature(&cpu->env, ARM_FEATURE_V8_FP16);
++        set_feature(&cpu->env, ARM_FEATURE_V8_FCMA);
++        /* For usermode -cpu max we can use a larger and more efficient DCZ
++         * blocksize since we don't have to follow what the hardware does.
++         */
++        cpu->ctr = 0x80038003; /* 32 byte I and D cacheline size, VIPT icache */
++        cpu->dcz_blocksize = 7; /*  512 bytes */
++#endif
      }
  }
+ 
+-#ifdef CONFIG_USER_ONLY
+-static void aarch64_any_initfn(Object *obj)
+-{
+-    ARMCPU *cpu = ARM_CPU(obj);
+-
+-    set_feature(&cpu->env, ARM_FEATURE_V8);
+-    set_feature(&cpu->env, ARM_FEATURE_VFP4);
+-    set_feature(&cpu->env, ARM_FEATURE_NEON);
+-    set_feature(&cpu->env, ARM_FEATURE_AARCH64);
+-    set_feature(&cpu->env, ARM_FEATURE_V8_AES);
+-    set_feature(&cpu->env, ARM_FEATURE_V8_SHA1);
+-    set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
+-    set_feature(&cpu->env, ARM_FEATURE_V8_SHA512);
+-    set_feature(&cpu->env, ARM_FEATURE_V8_SHA3);
+-    set_feature(&cpu->env, ARM_FEATURE_V8_SM3);
+-    set_feature(&cpu->env, ARM_FEATURE_V8_SM4);
+-    set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
+-    set_feature(&cpu->env, ARM_FEATURE_CRC);
+-    set_feature(&cpu->env, ARM_FEATURE_V8_RDM);
+-    set_feature(&cpu->env, ARM_FEATURE_V8_FP16);
+-    set_feature(&cpu->env, ARM_FEATURE_V8_FCMA);
+-    cpu->ctr = 0x80038003; /* 32 byte I and D cacheline size, VIPT icache */
+-    cpu->dcz_blocksize = 7; /*  512 bytes */
+-}
+-#endif
+-
+ typedef struct ARMCPUInfo {
+     const char *name;
+     void (*initfn)(Object *obj);
+@@ -268,9 +268,6 @@ static const ARMCPUInfo aarch64_cpus[] = {
+     { .name = "cortex-a57",         .initfn = aarch64_a57_initfn },
+     { .name = "cortex-a53",         .initfn = aarch64_a53_initfn },
+     { .name = "max",                .initfn = aarch64_max_initfn },
+-#ifdef CONFIG_USER_ONLY
+-    { .name = "any",         .initfn = aarch64_any_initfn },
+-#endif
+     { .name = NULL }
+ };
  
 -- 
 2.16.2
