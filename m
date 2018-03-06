@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etGox-0007S8-9L
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:56:16 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1etGpH-0007go-2z
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:56:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etGou-0002n8-3k
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:56:15 -0500
-References: <20180306040154.3669-1-david@gibson.dropbear.id.au>
-	<fd62ebf7-3abc-79a2-f269-825b4f8d6598@redhat.com>
-	<818fe50b-c3b8-30c5-5452-2009762142c1@ilande.co.uk>
-	<4e7dd0a0-ca7e-8df7-e966-95e39d34d106@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <a30f9017-b43b-0425-3d20-5708523821b7@ilande.co.uk>
-Date: Tue, 6 Mar 2018 17:56:03 +0000
+	(envelope-from <dgilbert@redhat.com>) id 1etGpD-0002tf-N7
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:56:35 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47752 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1etGpD-0002tG-HZ
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:56:31 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7D94C80AD211
+	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 17:56:27 +0000 (UTC)
+Date: Tue, 6 Mar 2018 17:56:19 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180306175619.GN3096@work-vm>
+References: <20180306170959.3921-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <4e7dd0a0-ca7e-8df7-e966-95e39d34d106@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 00/30] ppc-for-2.12 queue 20180306
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180306170959.3921-1-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] migration: fix minor finalize leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,34 +33,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-On 06/03/18 17:47, Thomas Huth wrote:
+* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
+> Spotted thanks to ASAN:
+> QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 tests/migration-t=
+est -p /x86_64/migration/bad_dest
+>=20
+> =3D=3D30302=3D=3DERROR: LeakSanitizer: detected memory leaks
+>=20
+> Direct leak of 48 byte(s) in 1 object(s) allocated from:
+>     #0 0x7f60efba1a38 in __interceptor_calloc (/lib64/libasan.so.4+0xde=
+a38)
+>     #1 0x7f60eef3cf75 in g_malloc0 ../glib/gmem.c:124
+>     #2 0x55ca9094702c in error_copy /home/elmarco/src/qemu/util/error.c=
+:203
+>     #3 0x55ca9037a30f in migrate_set_error /home/elmarco/src/qemu/migra=
+tion/migration.c:1139
+>     #4 0x55ca9037a462 in migrate_fd_error /home/elmarco/src/qemu/migrat=
+ion/migration.c:1150
+>     #5 0x55ca9038162b in migrate_fd_connect /home/elmarco/src/qemu/migr=
+ation/migration.c:2411
+>     #6 0x55ca90386e41 in migration_channel_connect /home/elmarco/src/qe=
+mu/migration/channel.c:81
+>     #7 0x55ca9038335e in socket_outgoing_migration /home/elmarco/src/qe=
+mu/migration/socket.c:85
+>     #8 0x55ca9083dd3a in qio_task_complete /home/elmarco/src/qemu/io/ta=
+sk.c:142
+>     #9 0x55ca9083d6cc in gio_task_thread_result /home/elmarco/src/qemu/=
+io/task.c:88
+>     #10 0x7f60eef37317 in g_idle_dispatch ../glib/gmain.c:5552
+>     #11 0x7f60eef3490b in g_main_dispatch ../glib/gmain.c:3182
+>     #12 0x7f60eef357ac in g_main_context_dispatch ../glib/gmain.c:3847
+>     #13 0x55ca90927231 in glib_pollfds_poll /home/elmarco/src/qemu/util=
+/main-loop.c:214
+>     #14 0x55ca90927420 in os_host_main_loop_wait /home/elmarco/src/qemu=
+/util/main-loop.c:261
+>     #15 0x55ca909275fa in main_loop_wait /home/elmarco/src/qemu/util/ma=
+in-loop.c:515
+>     #16 0x55ca8fc1c2a4 in main_loop /home/elmarco/src/qemu/vl.c:1942
+>     #17 0x55ca8fc2eb3a in main /home/elmarco/src/qemu/vl.c:4724
+>     #18 0x7f60e4082009 in __libc_start_main (/lib64/libc.so.6+0x21009)
+>=20
+> Indirect leak of 45 byte(s) in 1 object(s) allocated from:
+>     #0 0x7f60efba1850 in malloc (/lib64/libasan.so.4+0xde850)
+>     #1 0x7f60eef3cf0c in g_malloc ../glib/gmem.c:94
+>     #2 0x7f60eef3d1cf in g_malloc_n ../glib/gmem.c:331
+>     #3 0x7f60eef596eb in g_strdup ../glib/gstrfuncs.c:363
+>     #4 0x55ca90947085 in error_copy /home/elmarco/src/qemu/util/error.c=
+:204
+>     #5 0x55ca9037a30f in migrate_set_error /home/elmarco/src/qemu/migra=
+tion/migration.c:1139
+>     #6 0x55ca9037a462 in migrate_fd_error /home/elmarco/src/qemu/migrat=
+ion/migration.c:1150
+>     #7 0x55ca9038162b in migrate_fd_connect /home/elmarco/src/qemu/migr=
+ation/migration.c:2411
+>     #8 0x55ca90386e41 in migration_channel_connect /home/elmarco/src/qe=
+mu/migration/channel.c:81
+>     #9 0x55ca9038335e in socket_outgoing_migration /home/elmarco/src/qe=
+mu/migration/socket.c:85
+>     #10 0x55ca9083dd3a in qio_task_complete /home/elmarco/src/qemu/io/t=
+ask.c:142
+>     #11 0x55ca9083d6cc in gio_task_thread_result /home/elmarco/src/qemu=
+/io/task.c:88
+>     #12 0x7f60eef37317 in g_idle_dispatch ../glib/gmain.c:5552
+>     #13 0x7f60eef3490b in g_main_dispatch ../glib/gmain.c:3182
+>     #14 0x7f60eef357ac in g_main_context_dispatch ../glib/gmain.c:3847
+>     #15 0x55ca90927231 in glib_pollfds_poll /home/elmarco/src/qemu/util=
+/main-loop.c:214
+>     #16 0x55ca90927420 in os_host_main_loop_wait /home/elmarco/src/qemu=
+/util/main-loop.c:261
+>     #17 0x55ca909275fa in main_loop_wait /home/elmarco/src/qemu/util/ma=
+in-loop.c:515
+>     #18 0x55ca8fc1c2a4 in main_loop /home/elmarco/src/qemu/vl.c:1942
+>     #19 0x55ca8fc2eb3a in main /home/elmarco/src/qemu/vl.c:4724
+>     #20 0x7f60e4082009 in __libc_start_main (/lib64/libc.so.6+0x21009)
+>=20
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
 
->> It seems that the error is being raised when setting the property rather
->> than during realize so I'm not sure what I can do to handle this. Any
->> thoughts?
-> 
-> Does the device need to be hot-pluggable or even user_creatable at all?
-> It seems like it is also using serial_hds[] directly, so that is a good
-> indication that it is *not* user creatable. So maybe the easiest fix is
-> to simply set
-> 
-> 	dc->user_creatable = false;
-> 
-> in macio_class_init() ?
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-(Added Daniel to CC)
-
-I believe it should fail anyhow during realize because both macio 
-devices (newworld and oldworld) requires an object link to the PIC which 
-won't be set when using device_add via the monitor as in your example.
-
-But it still doesn't quite feel right that just setting a property value 
-should abort() immediately. Daniel, any thoughts?
-
-
-ATB,
-
-Mark.
+> ---
+>  migration/migration.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/migration/migration.c b/migration/migration.c
+> index e345d0cc7e..62c243d2d4 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -2541,6 +2541,7 @@ static void migration_instance_finalize(Object *o=
+bj)
+>      g_free(params->tls_hostname);
+>      g_free(params->tls_creds);
+>      qemu_sem_destroy(&ms->pause_sem);
+> +    error_free(ms->error);
+>  }
+> =20
+>  static void migration_instance_init(Object *obj)
+> --=20
+> 2.16.2.346.g9779355e34
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
