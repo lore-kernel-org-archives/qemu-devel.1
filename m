@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1etJfe-000124-PT
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:58:51 -0500
+	(envelope-from <no-reply@patchew.org>) id 1etJgz-0002Pn-W0
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 16:00:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1etJfa-0002wP-UH
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:58:50 -0500
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:42325)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1etJfa-0002wL-OA
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:58:46 -0500
-Received: by mail-pl0-x241.google.com with SMTP id 93-v6so3224plc.9
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 12:58:46 -0800 (PST)
-From: Michael Clark <mjc@sifive.com>
-Date: Wed,  7 Mar 2018 09:56:30 +1300
-Message-Id: <1520369790-38306-21-git-send-email-mjc@sifive.com>
-In-Reply-To: <1520369790-38306-1-git-send-email-mjc@sifive.com>
-References: <1520369790-38306-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v1 22/22] RISC-V: Remove support for adhoc
- X_COP interrupt
+	(envelope-from <no-reply@patchew.org>) id 1etJgt-0003Nc-Su
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 16:00:14 -0500
+Resent-Message-Id: <E1etJgt-0003Nc-Su@eggs.gnu.org>
+In-Reply-To: <20180306203103.25563-1-mark.cave-ayland@ilande.co.uk>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152036996711.1413.5381428549955473097@bdbb90650ae5>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 6 Mar 2018 12:59:27 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 00/19] uninorth fixes/mac_newworld board
+ wiring improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +24,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
+To: mark.cave-ayland@ilande.co.uk
+Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-This is essentially dead-code elimination. Support for more
-local interrupts will be added in a future revision, as they
-will be defined in a future version of the Privileged ISA
-specification.
-
-Signed-off-by: Michael Clark <mjc@sifive.com>
-Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
----
- target/riscv/cpu_bits.h  | 1 -
- target/riscv/op_helper.c | 2 +-
- 2 files changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-index 12b4757..133e070 100644
---- a/target/riscv/cpu_bits.h
-+++ b/target/riscv/cpu_bits.h
-@@ -346,7 +346,6 @@
- #define IRQ_S_EXT       9
- #define IRQ_H_EXT       10 /* until: priv-1.9.1 */
- #define IRQ_M_EXT       11 /* until: priv-1.9.1 */
--#define IRQ_X_COP       12 /* non-standard */
- 
- /* Default addresses */
- #define DEFAULT_RSTVEC     0x00001000
-diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-index f8595a6..f543e61 100644
---- a/target/riscv/op_helper.c
-+++ b/target/riscv/op_helper.c
-@@ -90,7 +90,7 @@ void csr_write_helper(CPURISCVState *env, target_ulong val_to_write,
-         target_ulong csrno)
- {
- #ifndef CONFIG_USER_ONLY
--    uint64_t delegable_ints = MIP_SSIP | MIP_STIP | MIP_SEIP | (1 << IRQ_X_COP);
-+    uint64_t delegable_ints = MIP_SSIP | MIP_STIP | MIP_SEIP;
-     uint64_t all_ints = delegable_ints | MIP_MSIP | MIP_MTIP;
- #endif
- 
--- 
-2.7.0
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMzA2MjAzMTAzLjI1NTYzLTEtbWFyay5jYXZlLWF5bGFuZEBpbGFuZGUu
+Y28udWsKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwMC8xOV0gdW5pbm9ydGggZml4ZXMv
+bWFjX25ld3dvcmxkIGJvYXJkIHdpcmluZyBpbXByb3ZlbWVudHMKCj09PSBURVNUIFNDUklQVCBC
+RUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25l
+bGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
+ZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cg
+LS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAg
+IGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9
+JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0
+cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAg
+ICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNU
+IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
+ODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAq
+IFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODAzMDYyMDMxMDMuMjU1NjMtMS1t
+YXJrLmNhdmUtYXlsYW5kQGlsYW5kZS5jby51ayAtPiBwYXRjaGV3LzIwMTgwMzA2MjAzMTAzLjI1
+NTYzLTEtbWFyay5jYXZlLWF5bGFuZEBpbGFuZGUuY28udWsKU3dpdGNoZWQgdG8gYSBuZXcgYnJh
+bmNoICd0ZXN0JwplN2Y1MTBmYjFjIG1hY19uZXd3b3JsZDogbW92ZSB3aXJpbmcgb2YgbWFjaW8g
+SVJRcyB0byBtYWNpb19uZXd3b3JsZF9yZWFsaXplKCkKZTFjYjZhZjlhNCBtYWNfbmV3d29ybGQ6
+IHJlbW92ZSBwaWNzIElSUSBhcnJheSBhbmQgd2lyZSB1cCBtYWNpbyB0byBPcGVuUElDIGRpcmVj
+dGx5CmNmMTZlYjAyMjMgdW5pbm9ydGg6IGNyZWF0ZSBuZXcgdW5pbm9ydGggZGV2aWNlCjlhMjk1
+MjRmYzkgdW5pbm9ydGg6IHJlbmFtZSBVTklOU3RhdGUgdG8gVU5JTkhvc3RTdGF0ZQpiZDM2NTM3
+MDlhIHVuaW5vcnRoOiBtb3ZlIFBDSSBJTyAoSVNBKSBtZW1vcnkgcmVnaW9uIGludG8gdGhlIHVu
+aW5vcnRoIGRldmljZQpmMTAyMDAwNGQ3IHVuaW5vcnRoOiB1c2Ugb2JqZWN0IGxpbmsgdG8gcGFz
+cyBPcGVuUElDIG9iamVjdCB0byB1bmlub3J0aAowMDBiNzhlYmYxIHVuaW5vcnRoOiByZW1vdmUg
+b2Jzb2xldGUgcGNpX3BtYWNfdTNfaW5pdCgpIGZ1bmN0aW9uCjAxOWNlOTcwZDEgdW5pbm9ydGg6
+IHJlbW92ZSBvYnNvbGV0ZSBwY2lfcG1hY19pbml0KCkgZnVuY3Rpb24KZDc0Y2Q5YTk4NiB1bmlu
+b3J0aDogZW5hYmxlIGludGVybmFsIFBDSSBob3N0IGJyaWRnZQplYjJkOGJjZjI1IHVuaW5vcnRo
+OiBmaXggUENJIGFuZCBBR1AgYnVzIG1peHVwCmE0NDRlYWJmY2IgdW5pbm9ydGg6IG1vdmUgUENJ
+IGhvc3QgYnJpZGdlIGJ1cyBpbml0aWFsaXNhdGlvbiBpbnRvIGRldmljZSByZWFsaXplCjY0MDFj
+OWMzN2YgdW5pbm9ydGg6IGludHJvZHVjZSB0ZW1wb3JhcnkgcGljX2lycXMgZGV2aWNlIHByb3Bl
+cnR5CjBmNWZiNGVjNzAgdW5pbm9ydGg6IG1vdmUgUENJIG1taW8gbWVtb3J5IHJlZ2lvbiBpbml0
+aWFsaXNhdGlvbiBpbnRvIGluaXQgZnVuY3Rpb24KMmY3YTYyODgzNiB1bmlub3J0aDogYWx0ZXIg
+cGNpX3BtYWNfaW5pdCgpIGFuZCBwY2lfcG1hY191M19pbml0KCkgdG8gcmV0dXJuIHVuaW5vcnRo
+IGRldmljZQo3ODA1MzViZjIxIHVuaW5vcnRoOiBtb3ZlIHVuaW5vcnRoIGRlZmluaXRpb25zIGlu
+dG8gdW5pbm9ydGguaApkODgxNmJjMTY3IHVuaW5vcnRoOiByZW1vdmUgc3RyYXkgUENJQnVzIHJl
+YWxpemUgZnJvbSBtYWNfbmV3d29ybGQuYwpmODJhMWE2ZDVjIHVuaW5vcnRoOiBRT01pZnkgUENJ
+IGFuZCBBR1AgaG9zdCBicmlkZ2VzCmEwYzA2YzgwM2IgdW5pbm9ydGg6IHJlbW92ZSBzZWNvbmQg
+c2V0IG9mIHVuaW5vcnRoIHRva2VuIHJlZ2lzdGVycwo0YmFhN2VjZjNiIHVuaW5vcnRoOiB0cml2
+aWFsIHN0eWxlIGZpeHVwcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8x
+OTogdW5pbm9ydGg6IHRyaXZpYWwgc3R5bGUgZml4dXBzLi4uCkNoZWNraW5nIFBBVENIIDIvMTk6
+IHVuaW5vcnRoOiByZW1vdmUgc2Vjb25kIHNldCBvZiB1bmlub3J0aCB0b2tlbiByZWdpc3RlcnMu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMy8xOTogdW5pbm9ydGg6IFFPTWlmeSBQQ0kgYW5kIEFHUCBob3N0
+IGJyaWRnZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8xOTogdW5pbm9ydGg6IHJlbW92ZSBzdHJheSBQ
+Q0lCdXMgcmVhbGl6ZSBmcm9tIG1hY19uZXd3b3JsZC5jLi4uCkNoZWNraW5nIFBBVENIIDUvMTk6
+IHVuaW5vcnRoOiBtb3ZlIHVuaW5vcnRoIGRlZmluaXRpb25zIGludG8gdW5pbm9ydGguaC4uLgpD
+aGVja2luZyBQQVRDSCA2LzE5OiB1bmlub3J0aDogYWx0ZXIgcGNpX3BtYWNfaW5pdCgpIGFuZCBw
+Y2lfcG1hY191M19pbml0KCkgdG8gcmV0dXJuIHVuaW5vcnRoIGRldmljZS4uLgpDaGVja2luZyBQ
+QVRDSCA3LzE5OiB1bmlub3J0aDogbW92ZSBQQ0kgbW1pbyBtZW1vcnkgcmVnaW9uIGluaXRpYWxp
+c2F0aW9uIGludG8gaW5pdCBmdW5jdGlvbi4uLgpDaGVja2luZyBQQVRDSCA4LzE5OiB1bmlub3J0
+aDogaW50cm9kdWNlIHRlbXBvcmFyeSBwaWNfaXJxcyBkZXZpY2UgcHJvcGVydHkuLi4KQ2hlY2tp
+bmcgUEFUQ0ggOS8xOTogdW5pbm9ydGg6IG1vdmUgUENJIGhvc3QgYnJpZGdlIGJ1cyBpbml0aWFs
+aXNhdGlvbiBpbnRvIGRldmljZSByZWFsaXplLi4uCkVSUk9SOiBpZiB0aGlzIGNvZGUgaXMgcmVk
+dW5kYW50IGNvbnNpZGVyIHJlbW92aW5nIGl0CiM0MTogRklMRTogaHcvcGNpLWhvc3QvdW5pbm9y
+dGguYzoxMjc6CisjaWYgMAoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyMjEgbGluZXMg
+Y2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
+ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
+dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcg
+UEFUQ0ggMTAvMTk6IHVuaW5vcnRoOiBmaXggUENJIGFuZCBBR1AgYnVzIG1peHVwLi4uCkNoZWNr
+aW5nIFBBVENIIDExLzE5OiB1bmlub3J0aDogZW5hYmxlIGludGVybmFsIFBDSSBob3N0IGJyaWRn
+ZS4uLgpDaGVja2luZyBQQVRDSCAxMi8xOTogdW5pbm9ydGg6IHJlbW92ZSBvYnNvbGV0ZSBwY2lf
+cG1hY19pbml0KCkgZnVuY3Rpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMTk6IHVuaW5vcnRoOiBy
+ZW1vdmUgb2Jzb2xldGUgcGNpX3BtYWNfdTNfaW5pdCgpIGZ1bmN0aW9uLi4uCkNoZWNraW5nIFBB
+VENIIDE0LzE5OiB1bmlub3J0aDogdXNlIG9iamVjdCBsaW5rIHRvIHBhc3MgT3BlblBJQyBvYmpl
+Y3QgdG8gdW5pbm9ydGguLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvMTk6IHVuaW5vcnRoOiBtb3ZlIFBD
+SSBJTyAoSVNBKSBtZW1vcnkgcmVnaW9uIGludG8gdGhlIHVuaW5vcnRoIGRldmljZS4uLgpDaGVj
+a2luZyBQQVRDSCAxNi8xOTogdW5pbm9ydGg6IHJlbmFtZSBVTklOU3RhdGUgdG8gVU5JTkhvc3RT
+dGF0ZS4uLgpDaGVja2luZyBQQVRDSCAxNy8xOTogdW5pbm9ydGg6IGNyZWF0ZSBuZXcgdW5pbm9y
+dGggZGV2aWNlLi4uCkNoZWNraW5nIFBBVENIIDE4LzE5OiBtYWNfbmV3d29ybGQ6IHJlbW92ZSBw
+aWNzIElSUSBhcnJheSBhbmQgd2lyZSB1cCBtYWNpbyB0byBPcGVuUElDIGRpcmVjdGx5Li4uCkNo
+ZWNraW5nIFBBVENIIDE5LzE5OiBtYWNfbmV3d29ybGQ6IG1vdmUgd2lyaW5nIG9mIG1hY2lvIElS
+UXMgdG8gbWFjaW9fbmV3d29ybGRfcmVhbGl6ZSgpLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
+dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
