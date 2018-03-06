@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1etJeu-0000Ju-Vk
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:58:06 -0500
+	(envelope-from <mjc@sifive.com>) id 1etJf1-0000QS-Io
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:58:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1etJeu-0002mo-3q
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:58:05 -0500
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:45324)
+	(envelope-from <mjc@sifive.com>) id 1etJex-0002ng-MY
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:58:11 -0500
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:34592)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1etJet-0002me-V1
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:58:04 -0500
-Received: by mail-pf0-x243.google.com with SMTP id h19so8379042pfd.12
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 12:58:03 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1etJex-0002nW-Gt
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:58:07 -0500
+Received: by mail-pl0-x243.google.com with SMTP id u13-v6so15140plq.1
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 12:58:07 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Wed,  7 Mar 2018 09:56:17 +1300
-Message-Id: <1520369790-38306-8-git-send-email-mjc@sifive.com>
+Date: Wed,  7 Mar 2018 09:56:18 +1300
+Message-Id: <1520369790-38306-9-git-send-email-mjc@sifive.com>
 In-Reply-To: <1520369790-38306-1-git-send-email-mjc@sifive.com>
 References: <1520369790-38306-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v1 09/22] RISC-V: Include hexidecimal in
- disassembly
+Subject: [Qemu-devel] [PATCH v1 10/22] RISC-V: Hold rcu_read_lock when
+ accessing memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,81 +27,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
+Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>, Stefan O'Rear <sorear2@gmail.com>
 
-This was added to help debug issues using -d in_asm. It is
-useful to see the instruction bytes, as one can detect if
-one is trying to execute ASCII or device-tree magic.
+>From reading other code that accesses memory regions directly,
+it appears that the rcu_read_lock needs to be held. Note: the
+original code for accessing RAM directly was added because
+there is no other way to use atomic_cmpxchg easily.
 
 Signed-off-by: Michael Clark <mjc@sifive.com>
+Signed-off-by: Stefan O'Rear <sorear2@gmail.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- disas/riscv.c | 39 ++++++++++++++++++++-------------------
- 1 file changed, 20 insertions(+), 19 deletions(-)
+ target/riscv/helper.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/disas/riscv.c b/disas/riscv.c
-index 3c17501..4580308 100644
---- a/disas/riscv.c
-+++ b/disas/riscv.c
-@@ -2769,25 +2769,6 @@ static void format_inst(char *buf, size_t buflen, size_t tab, rv_decode *dec)
-     char tmp[64];
-     const char *fmt;
+diff --git a/target/riscv/helper.c b/target/riscv/helper.c
+index 02cbcea..228933c 100644
+--- a/target/riscv/helper.c
++++ b/target/riscv/helper.c
+@@ -209,6 +209,7 @@ restart:
+                    as the PTE is no longer valid */
+                 MemoryRegion *mr;
+                 hwaddr l = sizeof(target_ulong), addr1;
++                rcu_read_lock();
+                 mr = address_space_translate(cs->as, pte_addr,
+                     &addr1, &l, false);
+                 if (memory_access_is_direct(mr, true)) {
+@@ -222,16 +223,19 @@ restart:
+                     target_ulong old_pte =
+                         atomic_cmpxchg(pte_pa, pte, updated_pte);
+                     if (old_pte != pte) {
++                        rcu_read_unlock();
+                         goto restart;
+                     } else {
+                         pte = updated_pte;
+                     }
+ #endif
+                 } else {
++                    rcu_read_unlock();
+                     /* misconfigured PTE in ROM (AD bits are not preset) or
+                      * PTE is in IO space and can't be updated atomically */
+                     return TRANSLATE_FAIL;
+                 }
++                rcu_read_unlock();
+             }
  
--    if (dec->op == rv_op_illegal) {
--        size_t len = inst_length(dec->inst);
--        switch (len) {
--        case 2:
--            snprintf(buf, buflen, "(0x%04" PRIx64 ")", dec->inst);
--            break;
--        case 4:
--            snprintf(buf, buflen, "(0x%08" PRIx64 ")", dec->inst);
--            break;
--        case 6:
--            snprintf(buf, buflen, "(0x%012" PRIx64 ")", dec->inst);
--            break;
--        default:
--            snprintf(buf, buflen, "(0x%016" PRIx64 ")", dec->inst);
--            break;
--        }
--        return;
--    }
--
-     fmt = opcode_data[dec->op].format;
-     while (*fmt) {
-         switch (*fmt) {
-@@ -3004,6 +2985,11 @@ disasm_inst(char *buf, size_t buflen, rv_isa isa, uint64_t pc, rv_inst inst)
-     format_inst(buf, buflen, 16, &dec);
- }
- 
-+#define INST_FMT_2 "%04" PRIx64 "              "
-+#define INST_FMT_4 "%08" PRIx64 "          "
-+#define INST_FMT_6 "%012" PRIx64 "      "
-+#define INST_FMT_8 "%016" PRIx64 "  "
-+
- static int
- print_insn_riscv(bfd_vma memaddr, struct disassemble_info *info, rv_isa isa)
- {
-@@ -3031,6 +3017,21 @@ print_insn_riscv(bfd_vma memaddr, struct disassemble_info *info, rv_isa isa)
-         }
-     }
- 
-+    switch (len) {
-+    case 2:
-+        (*info->fprintf_func)(info->stream, INST_FMT_2, inst);
-+        break;
-+    case 4:
-+        (*info->fprintf_func)(info->stream, INST_FMT_4, inst);
-+        break;
-+    case 6:
-+        (*info->fprintf_func)(info->stream, INST_FMT_6, inst);
-+        break;
-+    default:
-+        (*info->fprintf_func)(info->stream, INST_FMT_8, inst);
-+        break;
-+    }
-+
-     disasm_inst(buf, sizeof(buf), isa, memaddr, inst);
-     (*info->fprintf_func)(info->stream, "%s", buf);
- 
+             /* for superpage mappings, make a fake leaf PTE for the TLB's
 -- 
 2.7.0
