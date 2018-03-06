@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1etKK1-0005mW-3X
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 16:40:34 -0500
+	(envelope-from <bounces@canonical.com>) id 1etKTw-0004Nh-W9
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 16:50:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1etKJx-0005F2-0o
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 16:40:33 -0500
-References: <20180306193418.28095-1-jcmvbkbc@gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <45793d45-f736-28ec-6346-0d8b4d4b8ed9@vivier.eu>
-Date: Tue, 6 Mar 2018 22:40:16 +0100
+	(envelope-from <bounces@canonical.com>) id 1etKTt-00028c-PN
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 16:50:49 -0500
+Received: from indium.canonical.com ([91.189.90.7]:55536)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1etKTt-00025V-Iy
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 16:50:45 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1etKTs-0007rM-F4
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 21:50:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 705392E80C7
+	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 21:50:44 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180306193418.28095-1-jcmvbkbc@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 05/11] linux-user: fix
- mmap/munmap/mprotect/mremap/shmat
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 06 Mar 2018 21:44:55 -0000
+From: Bill Paul <wpaul@windriver.com>
+Reply-To: Bug 1753309 <1753309@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152019341691.7537.9997390122339723494.malonedeb@gac.canonical.com>
+Message-Id: <152037269578.7728.4875822417510253413.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1753309] Re: Ethernet interrupt vectors for
+ sabrelite machine are defined backwards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,128 +37,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
+To: qemu-devel@nongnu.org
 
-Le 06/03/2018 à 20:34, Max Filippov a écrit :
-> In linux-user QEMU that runs for a target with TARGET_ABI_BITS bigger
-> than L1_MAP_ADDR_SPACE_BITS an assertion in page_set_flags fires when
-> mmap, munmap, mprotect, mremap or shmat is called for an address outside
-> the guest address space. mmap and mprotect should return ENOMEM in such
-> case.
-> 
-> Introduce macro guest_range_valid that verifies if address range is
-> within guest address space and does not wrap around. Use that macro in
-> mmap/munmap/mprotect/mremap/shmat for error checking.
-> 
-> Cc: qemu-stable@nongnu.org
-> Cc: Riku Voipio <riku.voipio@iki.fi>
-> Cc: Laurent Vivier <laurent@vivier.eu>
-> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
-> ---
-> Changes v3->v4:
-> - change GUEST_ADDR_MAX and h2g_valid definitions as suggested by Laurent
->   Vivier.
-> 
-> Changes v2->v3:
-> - fix comparison in guest_valid: it must be 'less' to preserve the existing
->   functionality, not 'less or equal'.
-> - fix guest_range_valid: it may not use guest_valid, because single range
->   that occupies all of the guest address space is valid.
-> 
->  include/exec/cpu-all.h  |  4 ++++
->  include/exec/cpu_ldst.h | 14 ++++++++------
->  linux-user/mmap.c       | 20 +++++++++++++++-----
->  linux-user/syscall.c    |  3 +++
->  4 files changed, 30 insertions(+), 11 deletions(-)
-> 
-> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-> index 0b141683f095..6304cfa7e171 100644
-> --- a/include/exec/cpu-all.h
-> +++ b/include/exec/cpu-all.h
-> @@ -159,8 +159,12 @@ extern unsigned long guest_base;
->  extern int have_guest_base;
->  extern unsigned long reserved_va;
->  
-> +#if HOST_LONG_BITS <= TARGET_VIRT_ADDR_SPACE_BITS
-> +#define GUEST_ADDR_MAX (reserved_va ? reserved_va : ~0ul)
+"4.14+: Both versions of qemu (as-is and interrupts reverted) work fine"
 
-In fact, below, for h2g_valid(), reserved_va is ignored in this case, so
-it should be:
+Hm. I really wonder how it can be possible that Linux works with the
+interrupt vectors reversed, though to be fair I have not looked at the
+Linux i.MX6 ENET driver code. I suppose it's possible that the driver is
+binding the same interrupt service routine to both interrupt vectors. If
+so, then it works by accident. :)
 
-#define GUEST_ADDR_MAX (~0ul)
+I think U-Boot uses polling so it wouldn't care if the interrupt vectors
+are wrong.
 
-[I know, my bad]
+We have several SabreLite boards in house. We also have NXP Sabre SD
+reference boards which use the same i.MX6Q SoC and the exact same
+ethernet driver with the same interrupt configuration. I have always
+used VxWorks with them rather than Linux, and I can say for a fact that
+the VxWorks ENET driver only binds an ISR to vector 150 (118) (VxWorks
+doesn't currently support the IEEE 1588 feature with this interface so
+it never uses vector 151) and it works as expected -- network interrupt
+events are indeed received via vector 150.
 
-> +#else
->  #define GUEST_ADDR_MAX (reserved_va ? reserved_va : \
+The same VxWorks image that works with real hardware does not work with
+QEMU unless I fix the vectors in fsl-imx6.h.
 
-I think it should become "reserved_va ? reserved_va - 1 : \"
-as "reserved_va" is a size but GUEST_ADDR_MAX is the maximum value
-available. See below.
+In short, both the hardware and the manual seem to agree. QEMU is doing
+it wrong. :)
 
->                                      (1ul << TARGET_VIRT_ADDR_SPACE_BITS) - 1)
-> +#endif
->  #else
->  
->  #include "exec/hwaddr.h"
-> diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
-> index 191f2e962a3c..22f5df9c8a92 100644
-> --- a/include/exec/cpu_ldst.h
-> +++ b/include/exec/cpu_ldst.h
-> @@ -52,15 +52,17 @@
->  #define g2h(x) ((void *)((unsigned long)(target_ulong)(x) + guest_base))
->  
->  #if HOST_LONG_BITS <= TARGET_VIRT_ADDR_SPACE_BITS
-> -#define h2g_valid(x) 1
-> +#define guest_valid(x) 1
->  #else
-> -#define h2g_valid(x) ({ \
-> -    unsigned long __guest = (unsigned long)(x) - guest_base; \
-> -    (__guest < (1ul << TARGET_VIRT_ADDR_SPACE_BITS)) && \
-> -    (!reserved_va || (__guest < reserved_va)); \
-> -})
-> +#define guest_valid(x) ((x) < GUEST_ADDR_MAX)
+Also, the errata sheet for the i.MX6 is here:
 
-I think it should be ((x) <= GUEST_ADDR_MAX), because
+https://www.nxp.com/docs/en/errata/IMX6DQCE.pdf
 
-    (__guest < (1ul << TARGET_VIRT_ADDR_SPACE_BITS))
-->  (__guest <= ((1ul << TARGET_VIRT_ADDR_SPACE_BITS) - 1)
-->  (__guest <= GUEST_ADDR_MAX)
+Apparently erratum 6687 is related to power management and wakeup
+events. I'm not sure how that factors in to how Linux behaves.
 
-To work with reserved_va, it has also to be defined as "reserved_va -
-1". And in open_self_maps() we should have "max = ... :
-(uintptr_t)g2h(GUEST_ADDR_MAX) + 1;" and then we have a "h2g(max - 1)"
-that will correctly return GUEST_ADDR_MAX.
+-- =
 
-Then you don't need the "#if" because if "HOST_LONG_BITS <=
-TARGET_VIRT_ADDR_SPACE_BITS", x is 32bit and GUEST_ADDR_MAX) is ~0uk,
-and then ((x) <= GUEST_ADDR_MAX) is always true.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1753309
 
->  #endif
->  
-> +#define h2g_valid(x) guest_valid((unsigned long)(x) - guest_base)
-> +
-> +#define guest_range_valid(start, len) \
-> +    ({unsigned long l = (len); \
-> +     l <= GUEST_ADDR_MAX && (start) <= GUEST_ADDR_MAX - l; })
-> +
->  #define h2g_nocheck(x) ({ \
->      unsigned long __ret = (unsigned long)(x) - guest_base; \
->      (abi_ulong)__ret; \
-...
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index e24f43c4a259..79245e73784f 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -4900,6 +4900,9 @@ static inline abi_ulong do_shmat(CPUArchState *cpu_env,
->              return -TARGET_EINVAL;
->          }
->      }
-> +    if (!guest_range_valid(shmaddr, shm_info.shm_segsz)) {
+Title:
+  Ethernet interrupt vectors for sabrelite machine are defined backwards
 
-if shmaddr is NULL, "the system chooses a suitable (unused) address" so
-you can't check this as is.
+Status in QEMU:
+  New
 
-Thanks,
-Laurent
+Bug description:
+  The sabrelite machine model used by qemu-system-arm is based on the
+  Freescale/NXP i.MX6Q processor. This SoC has an on-board ethernet
+  controller which is supported in QEMU using the imx_fec.c module
+  (actually called imx.enet for this model.)
+
+  The include/hw/arm/fsm-imx6.h file defines the interrupt vectors for
+  the imx.enet device like this:
+
+  #define FSL_IMX6_ENET_MAC_1588_IRQ 118
+  #define FSL_IMX6_ENET_MAC_IRQ 119
+
+  However, this is backwards. The reference manual for the i.MX6D/Q
+  devices can be found here:
+
+  https://www.nxp.com/docs/en/reference-manual/IMX6DQRM.pdf
+
+  On page 225, in Table 3-1. ARM Cortex A9 domain interrupt summary, it
+  shows the following:
+
+  150 ENET
+  MAC 0 IRQ, Logical OR of:
+  MAC 0 Periodic Timer Overflow
+  MAC 0 Time Stamp Available
+  MAC 0 Time Stamp Available
+  MAC 0 Time Stamp Available
+  MAC 0 Payload Receive Error
+  MAC 0 Transmit FIFO Underrun
+  MAC 0 Collision Retry Limit
+  MAC 0 Late Collision
+  MAC 0 Ethernet Bus Error
+  MAC 0 MII Data Transfer Done
+  MAC 0 Receive Buffer Done
+  MAC 0 Receive Frame Done
+  MAC 0 Transmit Buffer Done
+  MAC 0 Transmit Frame Done
+  MAC 0 Graceful Stop
+  MAC 0 Babbling Transmit Error
+  MAC 0 Babbling Receive Error
+  MAC 0 Wakeup Request [synchronous]
+
+  151 ENET
+  MAC 0 1588 Timer interrupt [synchronous] request
+
+  Note:
+  150 - 32 =3D=3D 118
+  151 - 32 =3D=3D 119
+
+  In other words, the vector definitions in the fsl-imx6.h file are
+  reversed. The correct definition is:
+
+  #define FSL_IMX6_ENET_MAC_IRQ 118
+  #define FSL_IMX6_ENET_MAC_1588_IRQ 119
+
+  I tested the sabrelite simulation using VxWorks 7 (which supports the
+  SabreLite board) and found that while I was able to send and receive
+  packet data via the simulated ethernet interface, the VxWorks i.MX6
+  ethernet driver failed to receive any interrupts. When I corrected the
+  interrupt vector definitions as shown above and recompiled QEMU,
+  everything worked as expected. I was able to exchange ICMP packets
+  with the simulated target and telnet to/from the VxWorks instance
+  running in the virtual machine. I used the tap interface for this.
+
+  As a workaround I was also able to make the ethernet work by modifying
+  the VxWorks imx6q-sabrelite.dts file to change the ethernet interrupt
+  property from 150 to 151.
+
+  This problem was observed with the following environment:
+
+  Host: FreeBSD/amd64 11.1-RELEASE
+  QEMU version: 2.11.0 and 2.11.1 built from source code
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1753309/+subscriptions
