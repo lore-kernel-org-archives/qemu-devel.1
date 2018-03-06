@@ -1,19 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1etFEq-0007Kp-Ri
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:14:56 -0500
+	(envelope-from <berto@igalia.com>) id 1etFEq-0007Km-R1
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:14:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1etFEo-00081C-3U
+	(envelope-from <berto@igalia.com>) id 1etFEo-00080i-1B
 	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:14:52 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Tue,  6 Mar 2018 18:14:06 +0200
-Message-Id: <deac43cbf5ba32db410734717feee4e58e8439a5.1520352600.git.berto@igalia.com>
-In-Reply-To: <cover.1520352600.git.berto@igalia.com>
-References: <cover.1520352600.git.berto@igalia.com>
-In-Reply-To: <cover.1520352600.git.berto@igalia.com>
-References: <cover.1520352600.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 1/7] qcow2: Generalize
- validate_table_offset() into qcow2_validate_table()
+Date: Tue,  6 Mar 2018 18:14:05 +0200
+Message-Id: <cover.1520352600.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v2 0/7] Add checks for corruption in the
+ snapshot table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,221 +21,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-This function checks that the offset and size of a table are valid.
+Hey,
 
-While the offset checks are fine, the size check is too generic, since
-it only verifies that the total size in bytes fits in a 64-bit
-integer. In practice all tables used in qcow2 have much smaller size
-limits, so the size needs to be checked again for each table using its
-actual limit.
+here's the new version of this series. It fixes a leak reported by
+Kevin and adds a couple of error_report_err() to make use of the
+message returned by qcow2_validate_table().
 
-This patch generalizes this function by allowing the caller to specify
-the maximum size for that table. In addition to that it allows passing
-an Error variable.
+Regards,
 
-The function is also renamed and made public since we're going to use
-it in other parts of the code.
+Berto
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
+Changes:
+
+v2:
+- Patch 3: Don't leak l1_table and report the error returned by
+  qcow2_validate_table()
+- Patch 5: Report the error returned by qcow2_validate_table().
+
+v1: https://lists.gnu.org/archive/html/qemu-block/2018-03/msg00030.html
+- Initial version
+
+Output of backport-diff against v1:
+
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+
+001/7:[----] [-C] 'qcow2: Generalize validate_table_offset() into qcow2_validate_table()'
+002/7:[----] [--] 'qcow2: Check L1 table offset in qcow2_snapshot_load_tmp()'
+003/7:[0010] [FC] 'qcow2: Check L1 table parameters in qcow2_expand_zero_clusters()'
+004/7:[----] [-C] 'qcow2: Check snapshot L1 tables in qcow2_check_metadata_overlap()'
+005/7:[0007] [FC] 'qcow2: Check snapshot L1 table in qcow2_snapshot_goto()'
+006/7:[----] [-C] 'qcow2: Check snapshot L1 table in qcow2_snapshot_delete()'
+007/7:[----] [-C] 'qcow2: Make qemu-img check detect corrupted L1 tables in snapshots'
+
+Alberto Garcia (7):
+  qcow2: Generalize validate_table_offset() into qcow2_validate_table()
+  qcow2: Check L1 table offset in qcow2_snapshot_load_tmp()
+  qcow2: Check L1 table parameters in qcow2_expand_zero_clusters()
+  qcow2: Check snapshot L1 tables in qcow2_check_metadata_overlap()
+  qcow2: Check snapshot L1 table in qcow2_snapshot_goto()
+  qcow2: Check snapshot L1 table in qcow2_snapshot_delete()
+  qcow2: Make qemu-img check detect corrupted L1 tables in snapshots
+
+ block/qcow2-cluster.c      | 24 ++++++++++-----
+ block/qcow2-refcount.c     | 24 ++++++++++++++-
+ block/qcow2-snapshot.c     | 24 +++++++++++++--
  block/qcow2.c              | 77 ++++++++++++++++++----------------------------
  block/qcow2.h              | 10 +++---
- tests/qemu-iotests/080.out | 16 +++++-----
- 3 files changed, 43 insertions(+), 60 deletions(-)
+ tests/qemu-iotests/080     | 22 ++++++++++++-
+ tests/qemu-iotests/080.out | 58 ++++++++++++++++++++++++++++------
+ 7 files changed, 166 insertions(+), 73 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 071dc4d608..1ab6abf3b5 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -559,26 +559,23 @@ static int qcow2_check(BlockDriverState *bs, BdrvCheckResult *result,
-     return ret;
- }
- 
--static int validate_table_offset(BlockDriverState *bs, uint64_t offset,
--                                 uint64_t entries, size_t entry_len)
-+int qcow2_validate_table(BlockDriverState *bs, uint64_t offset,
-+                         uint64_t entries, size_t entry_len,
-+                         int64_t max_size_bytes, const char *table_name,
-+                         Error **errp)
- {
-     BDRVQcow2State *s = bs->opaque;
--    uint64_t size;
-+
-+    if (entries > max_size_bytes / entry_len) {
-+        error_setg(errp, "%s too large", table_name);
-+        return -EFBIG;
-+    }
- 
-     /* Use signed INT64_MAX as the maximum even for uint64_t header fields,
-      * because values will be passed to qemu functions taking int64_t. */
--    if (entries > INT64_MAX / entry_len) {
--        return -EINVAL;
--    }
--
--    size = entries * entry_len;
--
--    if (INT64_MAX - size < offset) {
--        return -EINVAL;
--    }
--
--    /* Tables must be cluster aligned */
--    if (offset_into_cluster(s, offset) != 0) {
-+    if ((INT64_MAX - entries * entry_len < offset) ||
-+        (offset_into_cluster(s, offset) != 0)) {
-+        error_setg(errp, "%s offset invalid", table_name);
-         return -EINVAL;
-     }
- 
-@@ -1308,47 +1305,42 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
-     s->refcount_table_size =
-         header.refcount_table_clusters << (s->cluster_bits - 3);
- 
--    if (header.refcount_table_clusters > qcow2_max_refcount_clusters(s)) {
--        error_setg(errp, "Reference count table too large");
--        ret = -EINVAL;
--        goto fail;
--    }
--
-     if (header.refcount_table_clusters == 0 && !(flags & BDRV_O_CHECK)) {
-         error_setg(errp, "Image does not contain a reference count table");
-         ret = -EINVAL;
-         goto fail;
-     }
- 
--    ret = validate_table_offset(bs, s->refcount_table_offset,
--                                s->refcount_table_size, sizeof(uint64_t));
-+    ret = qcow2_validate_table(bs, s->refcount_table_offset,
-+                               header.refcount_table_clusters,
-+                               s->cluster_size, QCOW_MAX_REFTABLE_SIZE,
-+                               "Reference count table", errp);
-     if (ret < 0) {
--        error_setg(errp, "Invalid reference count table offset");
-         goto fail;
-     }
- 
--    /* Snapshot table offset/length */
--    if (header.nb_snapshots > QCOW_MAX_SNAPSHOTS) {
--        error_setg(errp, "Too many snapshots");
--        ret = -EINVAL;
--        goto fail;
--    }
--
--    ret = validate_table_offset(bs, header.snapshots_offset,
--                                header.nb_snapshots,
--                                sizeof(QCowSnapshotHeader));
-+    /* The total size in bytes of the snapshot table is checked in
-+     * qcow2_read_snapshots() because the size of each snapshot is
-+     * variable and we don't know it yet.
-+     * Here we only check the offset and number of snapshots. */
-+    ret = qcow2_validate_table(bs, header.snapshots_offset,
-+                               header.nb_snapshots,
-+                               sizeof(QCowSnapshotHeader),
-+                               sizeof(QCowSnapshotHeader) * QCOW_MAX_SNAPSHOTS,
-+                               "Snapshot table", errp);
-     if (ret < 0) {
--        error_setg(errp, "Invalid snapshot table offset");
-         goto fail;
-     }
- 
-     /* read the level 1 table */
--    if (header.l1_size > QCOW_MAX_L1_SIZE / sizeof(uint64_t)) {
--        error_setg(errp, "Active L1 table too large");
--        ret = -EFBIG;
-+    ret = qcow2_validate_table(bs, header.l1_table_offset,
-+                               header.l1_size, sizeof(uint64_t),
-+                               QCOW_MAX_L1_SIZE, "Active L1 table", errp);
-+    if (ret < 0) {
-         goto fail;
-     }
-     s->l1_size = header.l1_size;
-+    s->l1_table_offset = header.l1_table_offset;
- 
-     l1_vm_state_index = size_to_l1(s, header.size);
-     if (l1_vm_state_index > INT_MAX) {
-@@ -1366,15 +1358,6 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
-         goto fail;
-     }
- 
--    ret = validate_table_offset(bs, header.l1_table_offset,
--                                header.l1_size, sizeof(uint64_t));
--    if (ret < 0) {
--        error_setg(errp, "Invalid L1 table offset");
--        goto fail;
--    }
--    s->l1_table_offset = header.l1_table_offset;
--
--
-     if (s->l1_size > 0) {
-         s->l1_table = qemu_try_blockalign(bs->file->bs,
-             ROUND_UP(s->l1_size * sizeof(uint64_t), 512));
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 1a84cc77b0..2d24855d8e 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -485,11 +485,6 @@ static inline int64_t qcow2_vm_state_offset(BDRVQcow2State *s)
-     return (int64_t)s->l1_vm_state_index << (s->cluster_bits + s->l2_bits);
- }
- 
--static inline uint64_t qcow2_max_refcount_clusters(BDRVQcow2State *s)
--{
--    return QCOW_MAX_REFTABLE_SIZE >> s->cluster_bits;
--}
--
- static inline QCow2ClusterType qcow2_get_cluster_type(uint64_t l2_entry)
- {
-     if (l2_entry & QCOW_OFLAG_COMPRESSED) {
-@@ -547,6 +542,11 @@ void qcow2_signal_corruption(BlockDriverState *bs, bool fatal, int64_t offset,
-                              int64_t size, const char *message_format, ...)
-                              GCC_FMT_ATTR(5, 6);
- 
-+int qcow2_validate_table(BlockDriverState *bs, uint64_t offset,
-+                         uint64_t entries, size_t entry_len,
-+                         int64_t max_size_bytes, const char *table_name,
-+                         Error **errp);
-+
- /* qcow2-refcount.c functions */
- int qcow2_refcount_init(BlockDriverState *bs);
- void qcow2_refcount_close(BlockDriverState *bs);
-diff --git a/tests/qemu-iotests/080.out b/tests/qemu-iotests/080.out
-index 6a7fda1356..4c7790c9ee 100644
---- a/tests/qemu-iotests/080.out
-+++ b/tests/qemu-iotests/080.out
-@@ -18,18 +18,18 @@ can't open device TEST_DIR/t.qcow2: Reference count table too large
- 
- == Misaligned refcount table ==
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
--can't open device TEST_DIR/t.qcow2: Invalid reference count table offset
-+can't open device TEST_DIR/t.qcow2: Reference count table offset invalid
- 
- == Huge refcount offset ==
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
--can't open device TEST_DIR/t.qcow2: Invalid reference count table offset
-+can't open device TEST_DIR/t.qcow2: Reference count table offset invalid
- 
- == Invalid snapshot table ==
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
--can't open device TEST_DIR/t.qcow2: Too many snapshots
--can't open device TEST_DIR/t.qcow2: Too many snapshots
--can't open device TEST_DIR/t.qcow2: Invalid snapshot table offset
--can't open device TEST_DIR/t.qcow2: Invalid snapshot table offset
-+can't open device TEST_DIR/t.qcow2: Snapshot table too large
-+can't open device TEST_DIR/t.qcow2: Snapshot table too large
-+can't open device TEST_DIR/t.qcow2: Snapshot table offset invalid
-+can't open device TEST_DIR/t.qcow2: Snapshot table offset invalid
- 
- == Hitting snapshot table size limit ==
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-@@ -41,8 +41,8 @@ read 512/512 bytes at offset 0
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- can't open device TEST_DIR/t.qcow2: Active L1 table too large
- can't open device TEST_DIR/t.qcow2: Active L1 table too large
--can't open device TEST_DIR/t.qcow2: Invalid L1 table offset
--can't open device TEST_DIR/t.qcow2: Invalid L1 table offset
-+can't open device TEST_DIR/t.qcow2: Active L1 table offset invalid
-+can't open device TEST_DIR/t.qcow2: Active L1 table offset invalid
- 
- == Invalid L1 table (with internal snapshot in the image) ==
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
 -- 
 2.11.0
