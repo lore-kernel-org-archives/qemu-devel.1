@@ -1,14 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42075)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1etM14-0003rm-3a
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:29:07 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1etM2L-0004j9-K6
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:30:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1etM10-0007n4-4k
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:29:06 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1etM2K-00005j-Qt
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:30:25 -0500
+Date: Wed, 7 Mar 2018 00:30:22 +0100 (CET)
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Wed, 7 Mar 2018 00:15:15 +0100
-Message-Id: <20180306232851.8DD617456A5@zero.eik.bme.hu>
-Subject: [Qemu-devel] [PATCH] sii3112: Remove unneeded exit function
+In-Reply-To: <47673305-ea4c-20bf-a3c1-47d4e4cfd950@redhat.com>
+Message-ID: <alpine.BSF.2.21.1803070028590.57076@zero.eik.bme.hu>
+References: <20180111045937.2119-1-david@gibson.dropbear.id.au>
+	<20180111045937.2119-7-david@gibson.dropbear.id.au>
+	<47673305-ea4c-20bf-a3c1-47d4e4cfd950@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 06/11] hw/ide: Emulate SiI3112
+ SATA controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,49 +24,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, John Snow <jsnow@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-An exit function was mistakenly left here but it's not needed because
-the PCI bars are organised differently in this device. Calling this
-exit function during device_del was causing an abort with
-memory_region_del_subregion: `Assertion subregion->container == mr' failed.
+On Tue, 6 Mar 2018, Thomas Huth wrote:
+> On 11.01.2018 05:59, David Gibson wrote:
+>> From: BALATON Zoltan <balaton@eik.bme.hu>
+>>
+>> This is a common generic PCI SATA controller that is also used in PCs
+>> but more importantly guests running on the Sam460ex board prefer this
+>> card and have a driver for it (unlike for other SATA controllers
+>> already emulated).
+>
+> Hi,
+>
+> looks like this new device can now be used to crash QEMU in certain
+> circumstances:
+>
+> $ ppc64-softmmu/qemu-system-ppc64 -monitor stdio
+> QEMU 2.11.50 monitor - type 'help' for more information
+> (qemu) device_add sii3112,id=x
+> (qemu) device_del x
+> qemu-system-ppc64: /home/thuth/devel/qemu/memory.c:2346:
+> memory_region_del_subregion: Assertion `subregion->container == mr' failed.
+> Aborted (core dumped)
+>
+> Any ideas how to fix this?
 
-Reported-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
- hw/ide/sii3112.c | 12 ------------
- 1 file changed, 12 deletions(-)
+Looks like the exit function that causes this crash was left there by 
+mistake and is not needed. I've sent a patch to remove it.
 
-diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
-index e3896c6..743a50e 100644
---- a/hw/ide/sii3112.c
-+++ b/hw/ide/sii3112.c
-@@ -327,17 +327,6 @@ static void sii3112_pci_realize(PCIDevice *dev, Error **errp)
-     qemu_register_reset(sii3112_reset, s);
- }
- 
--static void sii3112_pci_exitfn(PCIDevice *dev)
--{
--    PCIIDEState *d = PCI_IDE(dev);
--    int i;
--
--    for (i = 0; i < 2; ++i) {
--        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].extra_io);
--        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].addr_ioport);
--    }
--}
--
- static void sii3112_pci_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-@@ -348,7 +337,6 @@ static void sii3112_pci_class_init(ObjectClass *klass, void *data)
-     pd->class_id = PCI_CLASS_STORAGE_RAID;
-     pd->revision = 1;
-     pd->realize = sii3112_pci_realize;
--    pd->exit = sii3112_pci_exitfn;
-     dc->desc = "SiI3112A SATA controller";
-     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
- }
--- 
-2.7.6
+Thank you,
+BALATON Zoltan
