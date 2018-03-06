@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1et8TK-0006Sp-BJ
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:01:26 -0500
+	(envelope-from <imammedo@redhat.com>) id 1et8UD-0006wW-3A
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:02:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1et8TE-0004yZ-Rp
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:01:22 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55640 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1et8TE-0004yH-Nw
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:01:16 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4965D4023150
-	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 09:01:16 +0000 (UTC)
-References: <1520267868-31778-1-git-send-email-thuth@redhat.com>
-	<710eb2ec-8585-900f-6829-67765c188252@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <6a10a395-1a5f-060e-9e17-e77250c333b2@redhat.com>
-Date: Tue, 6 Mar 2018 10:01:11 +0100
+	(envelope-from <imammedo@redhat.com>) id 1et8UC-0005Uk-5p
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:02:17 -0500
+Date: Tue, 6 Mar 2018 10:02:14 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180306100214.32c99c12@redhat.com>
+In-Reply-To: <20180305112732.26471-27-f4bug@amsat.org>
+References: <20180305112732.26471-1-f4bug@amsat.org>
+	<20180305112732.26471-27-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <710eb2ec-8585-900f-6829-67765c188252@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4] qapi: Add device ID and head parameters
- to screendump
+Subject: Re: [Qemu-devel] [PATCH v2 26/30] hw/smbios: use the BYTE-based
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,32 +24,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
-Cc: Jiri Denemark <jdenemar@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Cc: qemu-trivial@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
 
-On 05.03.2018 17:50, Eric Blake wrote:
-> On 03/05/2018 10:37 AM, Thomas Huth wrote:
->> QEMU's screendump command can only take dumps from the primary display=
-.
->> When using multiple VGA cards, there is no way to get a dump from a
->> secondary card or other display heads yet. So let's add an 'device' an=
-d
+On Mon,  5 Mar 2018 08:27:28 -0300
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+
+> It eases code review, unit is explicit.
 >=20
-> s/an/a/
-
-Gerd, could you please fix that up when picking up the patch? Thanks!
-
->> a 'head' parameter to the HMP and QMP commands to be able to specify
->> alternative devices and heads with the screendump command, too.
->>
->> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->> Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
+> Patch generated using:
 >=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+>   $ git grep -E '(1024|2048|4096|8192|(<<|>>).?(10|20|30))' hw/ include/h=
+w/
+>=20
+> and modified manually.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Thanks for the reviews!
-
- Thomas
+> ---
+>  hw/smbios/smbios.c | 14 +++++---------
+>  1 file changed, 5 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
+> index 27a07e96f4..fa02f9ce3f 100644
+> --- a/hw/smbios/smbios.c
+> +++ b/hw/smbios/smbios.c
+> @@ -625,10 +625,6 @@ static void smbios_build_type_11_table(void)
+>      SMBIOS_BUILD_TABLE_POST;
+>  }
+> =20
+> -#define ONE_KB ((ram_addr_t)1 << 10)
+> -#define ONE_MB ((ram_addr_t)1 << 20)
+> -#define ONE_GB ((ram_addr_t)1 << 30)
+> -
+>  #define MAX_T16_STD_SZ 0x80000000 /* 2T in Kilobytes */
+> =20
+>  static void smbios_build_type_16_table(unsigned dimm_cnt)
+> @@ -640,7 +636,7 @@ static void smbios_build_type_16_table(unsigned dimm_=
+cnt)
+>      t->location =3D 0x01; /* Other */
+>      t->use =3D 0x03; /* System memory */
+>      t->error_correction =3D 0x06; /* Multi-bit ECC (for Microsoft, per S=
+eaBIOS) */
+> -    size_kb =3D QEMU_ALIGN_UP(ram_size, ONE_KB) / ONE_KB;
+> +    size_kb =3D QEMU_ALIGN_UP(ram_size, K_BYTE) / K_BYTE;
+>      if (size_kb < MAX_T16_STD_SZ) {
+>          t->maximum_capacity =3D cpu_to_le32(size_kb);
+>          t->extended_maximum_capacity =3D cpu_to_le64(0);
+> @@ -668,7 +664,7 @@ static void smbios_build_type_17_table(unsigned insta=
+nce, uint64_t size)
+>      t->memory_error_information_handle =3D cpu_to_le16(0xFFFE); /* Not p=
+rovided */
+>      t->total_width =3D cpu_to_le16(0xFFFF); /* Unknown */
+>      t->data_width =3D cpu_to_le16(0xFFFF); /* Unknown */
+> -    size_mb =3D QEMU_ALIGN_UP(size, ONE_MB) / ONE_MB;
+> +    size_mb =3D QEMU_ALIGN_UP(size, M_BYTE) / M_BYTE;
+>      if (size_mb < MAX_T17_STD_SZ) {
+>          t->size =3D cpu_to_le16(size_mb);
+>          t->extended_size =3D cpu_to_le32(0);
+> @@ -707,8 +703,8 @@ static void smbios_build_type_19_table(unsigned insta=
+nce,
+> =20
+>      end =3D start + size - 1;
+>      assert(end > start);
+> -    start_kb =3D start / ONE_KB;
+> -    end_kb =3D end / ONE_KB;
+> +    start_kb =3D start / K_BYTE;
+> +    end_kb =3D end / K_BYTE;
+>      if (start_kb < UINT32_MAX && end_kb < UINT32_MAX) {
+>          t->starting_address =3D cpu_to_le32(start_kb);
+>          t->ending_address =3D cpu_to_le32(end_kb);
+> @@ -869,7 +865,7 @@ void smbios_get_tables(const struct smbios_phys_mem_a=
+rea *mem_array,
+> =20
+>          smbios_build_type_11_table();
+> =20
+> -#define MAX_DIMM_SZ (16ll * ONE_GB)
+> +#define MAX_DIMM_SZ (16 * G_BYTE)
+>  #define GET_DIMM_SZ ((i < dimm_cnt - 1) ? MAX_DIMM_SZ \
+>                                          : ((ram_size - 1) % MAX_DIMM_SZ)=
+ + 1)
+> =20
