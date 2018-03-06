@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1et3nz-0001YP-3H
+	(envelope-from <dgibson@ozlabs.org>) id 1et3nz-0001Yu-HI
 	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:02:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1et3nx-0004Vc-2h
+	(envelope-from <dgibson@ozlabs.org>) id 1et3nv-0004UH-7f
 	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:02:23 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue,  6 Mar 2018 15:01:49 +1100
-Message-Id: <20180306040154.3669-26-david@gibson.dropbear.id.au>
+Date: Tue,  6 Mar 2018 15:01:38 +1100
+Message-Id: <20180306040154.3669-15-david@gibson.dropbear.id.au>
 In-Reply-To: <20180306040154.3669-1-david@gibson.dropbear.id.au>
 References: <20180306040154.3669-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 25/30] ppc/spapr-caps: Convert cap-ibs to custom
- spapr-cap
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 14/30] macio: move macio related structures and
+ defines into separate macio.h file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,209 +24,210 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, groug@kaod.org
-Cc: agraf@suse.de, surajjs@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, surajjs@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Convert cap-ibs (indirect branch speculation) to a custom spapr-cap
-type.
-
-All tristate caps have now been converted to custom spapr-caps, so
-remove the remaining support for them.
-
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-[dwg: Don't explicitly list "?"/help option, trust convention]
-[dwg: Fold tristate removal into here, to not break bisect]
-[dwg: Fix minor style problems]
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_caps.c    | 90 ++++++++++++++------------------------------------
- hw/ppc/spapr_hcall.c   |  5 ++-
- include/hw/ppc/spapr.h |  5 ++-
- target/ppc/kvm.c       |  6 ++--
- 4 files changed, 36 insertions(+), 70 deletions(-)
+ hw/misc/macio/macio.c         | 43 +------------------------
+ hw/ppc/mac.h                  |  3 --
+ hw/ppc/mac_newworld.c         |  1 +
+ hw/ppc/mac_oldworld.c         |  1 +
+ include/hw/misc/macio/macio.h | 75 +++++++++++++++++++++++++++++++++++++=
+++++++
+ 5 files changed, 78 insertions(+), 45 deletions(-)
+ create mode 100644 include/hw/misc/macio/macio.h
 
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 8748692425..da1f519e13 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -89,65 +89,6 @@ static void spapr_cap_set_bool(Object *obj, Visitor *v, const char *name,
-     spapr->eff.caps[cap->index] = value ? SPAPR_CAP_ON : SPAPR_CAP_OFF;
- }
- 
--static void spapr_cap_get_tristate(Object *obj, Visitor *v, const char *name,
--                                   void *opaque, Error **errp)
+diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+index 1c10d8a1d7..4e502ede2e 100644
+--- a/hw/misc/macio/macio.c
++++ b/hw/misc/macio/macio.c
+@@ -30,48 +30,7 @@
+ #include "hw/pci/pci.h"
+ #include "hw/ppc/mac_dbdma.h"
+ #include "hw/char/escc.h"
+-
+-#define TYPE_MACIO "macio"
+-#define MACIO(obj) OBJECT_CHECK(MacIOState, (obj), TYPE_MACIO)
+-
+-typedef struct MacIOState
 -{
--    sPAPRCapabilityInfo *cap = opaque;
--    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
--    char *val = NULL;
--    uint8_t value = spapr_get_cap(spapr, cap->index);
+-    /*< private >*/
+-    PCIDevice parent;
+-    /*< public >*/
 -
--    switch (value) {
--    case SPAPR_CAP_BROKEN:
--        val = g_strdup("broken");
--        break;
--    case SPAPR_CAP_WORKAROUND:
--        val = g_strdup("workaround");
--        break;
--    case SPAPR_CAP_FIXED:
--        val = g_strdup("fixed");
--        break;
--    default:
--        error_setg(errp, "Invalid value (%d) for cap-%s", value, cap->name);
--        return;
--    }
+-    MemoryRegion bar;
+-    CUDAState cuda;
+-    DBDMAState dbdma;
+-    ESCCState escc;
+-    MemoryRegion *pic_mem;
+-    uint64_t frequency;
+-} MacIOState;
 -
--    visit_type_str(v, name, &val, errp);
--    g_free(val);
--}
+-#define OLDWORLD_MACIO(obj) \
+-    OBJECT_CHECK(OldWorldMacIOState, (obj), TYPE_OLDWORLD_MACIO)
 -
--static void spapr_cap_set_tristate(Object *obj, Visitor *v, const char *name,
--                                   void *opaque, Error **errp)
--{
--    sPAPRCapabilityInfo *cap = opaque;
--    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
--    char *val;
--    Error *local_err = NULL;
--    uint8_t value;
+-typedef struct OldWorldMacIOState {
+-    /*< private >*/
+-    MacIOState parent_obj;
+-    /*< public >*/
 -
--    visit_type_str(v, name, &val, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        return;
--    }
+-    qemu_irq irqs[7];
 -
--    if (!strcasecmp(val, "broken")) {
--        value = SPAPR_CAP_BROKEN;
--    } else if (!strcasecmp(val, "workaround")) {
--        value = SPAPR_CAP_WORKAROUND;
--    } else if (!strcasecmp(val, "fixed")) {
--        value = SPAPR_CAP_FIXED;
--    } else {
--        error_setg(errp, "Invalid capability mode \"%s\" for cap-%s", val,
--                   cap->name);
--        goto out;
--    }
+-    MacIONVRAMState nvram;
+-    MACIOIDEState ide[2];
+-} OldWorldMacIOState;
 -
--    spapr->cmd_line_caps[cap->index] = true;
--    spapr->eff.caps[cap->index] = value;
--out:
--    g_free(val);
--}
- 
- static void  spapr_cap_get_string(Object *obj, Visitor *v, const char *name,
-                                   void *opaque, Error **errp)
-@@ -294,16 +235,31 @@ static void cap_safe_bounds_check_apply(sPAPRMachineState *spapr, uint8_t val,
-     }
- }
- 
-+sPAPRCapPossible cap_ibs_possible = {
-+    .num = 4,
-+    /* Note workaround only maintained for compatibility */
-+    .vals = {"broken", "workaround", "fixed-ibs", "fixed-ccd"},
-+    .help = "broken - no protection, fixed-ibs - indirect branch serialisation,"
-+            " fixed-ccd - cache count disabled",
-+};
+-#define NEWWORLD_MACIO(obj) \
+-    OBJECT_CHECK(NewWorldMacIOState, (obj), TYPE_NEWWORLD_MACIO)
+-
+-typedef struct NewWorldMacIOState {
+-    /*< private >*/
+-    MacIOState parent_obj;
+-    /*< public >*/
+-    qemu_irq irqs[7];
+-    MACIOIDEState ide[2];
+-} NewWorldMacIOState;
++#include "hw/misc/macio/macio.h"
+=20
+ /*
+  * The mac-io has two interfaces to the ESCC. One is called "escc-legacy=
+",
+diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
+index 5b5fffdff3..a02f797598 100644
+--- a/hw/ppc/mac.h
++++ b/hw/ppc/mac.h
+@@ -47,9 +47,6 @@
+=20
+=20
+ /* MacIO */
+-#define TYPE_OLDWORLD_MACIO "macio-oldworld"
+-#define TYPE_NEWWORLD_MACIO "macio-newworld"
+-
+ #define TYPE_MACIO_IDE "macio-ide"
+ #define MACIO_IDE(obj) OBJECT_CHECK(MACIOIDEState, (obj), TYPE_MACIO_IDE=
+)
+=20
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index 5e82158759..396216954e 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -60,6 +60,7 @@
+ #include "hw/boards.h"
+ #include "hw/nvram/fw_cfg.h"
+ #include "hw/char/escc.h"
++#include "hw/misc/macio/macio.h"
+ #include "hw/ppc/openpic.h"
+ #include "hw/ide.h"
+ #include "hw/loader.h"
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 06a61220cb..5903ff47d3 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -37,6 +37,7 @@
+ #include "hw/boards.h"
+ #include "hw/nvram/fw_cfg.h"
+ #include "hw/char/escc.h"
++#include "hw/misc/macio/macio.h"
+ #include "hw/ide.h"
+ #include "hw/loader.h"
+ #include "elf.h"
+diff --git a/include/hw/misc/macio/macio.h b/include/hw/misc/macio/macio.=
+h
+new file mode 100644
+index 0000000000..e1e249f898
+--- /dev/null
++++ b/include/hw/misc/macio/macio.h
+@@ -0,0 +1,75 @@
++/*
++ * PowerMac MacIO device emulation
++ *
++ * Copyright (c) 2005-2007 Fabrice Bellard
++ * Copyright (c) 2007 Jocelyn Mayer
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
++ * of this software and associated documentation files (the "Software"),=
+ to deal
++ * in the Software without restriction, including without limitation the=
+ rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be includ=
+ed in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
++ * THE SOFTWARE.
++ */
 +
- static void cap_safe_indirect_branch_apply(sPAPRMachineState *spapr,
-                                            uint8_t val, Error **errp)
- {
-+    uint8_t kvm_val = kvmppc_get_cap_safe_indirect_branch();
++#ifndef MACIO_H
++#define MACIO_H
 +
-     if (val == SPAPR_CAP_WORKAROUND) { /* Can only be Broken or Fixed */
--        error_setg(errp, "Requested safe indirect branch capability level \"workaround\" not valid, try cap-ibs=fixed");
-+        error_setg(errp,
-+"Requested safe indirect branch capability level \"workaround\" not valid, try cap-ibs=%s",
-+                   cap_ibs_possible.vals[kvm_val]);
-     } else if (tcg_enabled() && val) {
-         /* TODO - for now only allow broken for TCG */
--        error_setg(errp, "Requested safe indirect branch capability level not supported by tcg, try a different value for cap-ibs");
--    } else if (kvm_enabled() && (val > kvmppc_get_cap_safe_indirect_branch())) {
--        error_setg(errp, "Requested safe indirect branch capability level not supported by kvm, try a different value for cap-ibs");
-+        error_setg(errp,
-+"Requested safe indirect branch capability level not supported by tcg, try a different value for cap-ibs");
-+    } else if (kvm_enabled() && val && (val != kvm_val)) {
-+        error_setg(errp,
-+"Requested safe indirect branch capability level not supported by kvm, try cap-ibs=%s",
-+                   cap_ibs_possible.vals[kvm_val]);
-     }
- }
- 
-@@ -359,11 +315,13 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
-     },
-     [SPAPR_CAP_IBS] = {
-         .name = "ibs",
--        .description = "Indirect Branch Serialisation (broken, fixed)",
-+        .description =
-+            "Indirect Branch Speculation (broken, fixed-ibs, fixed-ccd)",
-         .index = SPAPR_CAP_IBS,
--        .get = spapr_cap_get_tristate,
--        .set = spapr_cap_set_tristate,
-+        .get = spapr_cap_get_string,
-+        .set = spapr_cap_set_string,
-         .type = "string",
-+        .possible = &cap_ibs_possible,
-         .apply = cap_safe_indirect_branch_apply,
-     },
- };
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 1986560480..16bccdd5c0 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1705,7 +1705,10 @@ static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
-     }
- 
-     switch (safe_indirect_branch) {
--    case SPAPR_CAP_FIXED:
-+    case SPAPR_CAP_FIXED_CCD:
-+        characteristics |= H_CPU_CHAR_CACHE_COUNT_DIS;
-+        break;
-+    case SPAPR_CAP_FIXED_IBS:
-         characteristics |= H_CPU_CHAR_BCCTRL_SERIALISED;
-         break;
-     default: /* broken */
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 36942b378d..d60b7c6d7a 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -75,10 +75,12 @@ typedef enum {
- /* Bool Caps */
- #define SPAPR_CAP_OFF                   0x00
- #define SPAPR_CAP_ON                    0x01
--/* Broken | Workaround | Fixed Caps */
-+/* Custom Caps */
- #define SPAPR_CAP_BROKEN                0x00
- #define SPAPR_CAP_WORKAROUND            0x01
- #define SPAPR_CAP_FIXED                 0x02
-+#define SPAPR_CAP_FIXED_IBS             0x02
-+#define SPAPR_CAP_FIXED_CCD             0x03
- 
- typedef struct sPAPRCapabilities sPAPRCapabilities;
- struct sPAPRCapabilities {
-@@ -313,6 +315,7 @@ struct sPAPRMachineState {
- #define H_CPU_CHAR_L1D_THREAD_PRIV              PPC_BIT(4)
- #define H_CPU_CHAR_HON_BRANCH_HINTS             PPC_BIT(5)
- #define H_CPU_CHAR_THR_RECONF_TRIG              PPC_BIT(6)
-+#define H_CPU_CHAR_CACHE_COUNT_DIS              PPC_BIT(7)
- #define H_CPU_BEHAV_FAVOUR_SECURITY             PPC_BIT(0)
- #define H_CPU_BEHAV_L1D_FLUSH_PR                PPC_BIT(1)
- #define H_CPU_BEHAV_BNDS_CHK_SPEC_BAR           PPC_BIT(2)
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 2c183f61e2..79a436a384 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2494,8 +2494,10 @@ static void kvmppc_get_cpu_characteristics(KVMState *s)
-         cap_ppc_safe_bounds_check = 1;
-     }
-     /* Parse and set cap_ppc_safe_indirect_branch */
--    if (c.character & c.character_mask & H_CPU_CHAR_BCCTRL_SERIALISED) {
--        cap_ppc_safe_indirect_branch = 2;
-+    if (c.character & c.character_mask & H_CPU_CHAR_CACHE_COUNT_DIS) {
-+        cap_ppc_safe_indirect_branch = SPAPR_CAP_FIXED_CCD;
-+    } else if (c.character & c.character_mask & H_CPU_CHAR_BCCTRL_SERIALISED) {
-+        cap_ppc_safe_indirect_branch = SPAPR_CAP_FIXED_IBS;
-     }
- }
- 
--- 
++#include "hw/misc/macio/cuda.h"
++#include "hw/ppc/mac_dbdma.h"
++
++#define TYPE_MACIO "macio"
++#define MACIO(obj) OBJECT_CHECK(MacIOState, (obj), TYPE_MACIO)
++
++typedef struct MacIOState {
++    /*< private >*/
++    PCIDevice parent;
++    /*< public >*/
++
++    MemoryRegion bar;
++    CUDAState cuda;
++    DBDMAState dbdma;
++    ESCCState escc;
++    MemoryRegion *pic_mem;
++    uint64_t frequency;
++} MacIOState;
++
++#define TYPE_OLDWORLD_MACIO "macio-oldworld"
++#define OLDWORLD_MACIO(obj) \
++    OBJECT_CHECK(OldWorldMacIOState, (obj), TYPE_OLDWORLD_MACIO)
++
++typedef struct OldWorldMacIOState {
++    /*< private >*/
++    MacIOState parent_obj;
++    /*< public >*/
++
++    qemu_irq irqs[7];
++
++    MacIONVRAMState nvram;
++    MACIOIDEState ide[2];
++} OldWorldMacIOState;
++
++#define TYPE_NEWWORLD_MACIO "macio-newworld"
++#define NEWWORLD_MACIO(obj) \
++    OBJECT_CHECK(NewWorldMacIOState, (obj), TYPE_NEWWORLD_MACIO)
++
++typedef struct NewWorldMacIOState {
++    /*< private >*/
++    MacIOState parent_obj;
++    /*< public >*/
++    qemu_irq irqs[7];
++    MACIOIDEState ide[2];
++} NewWorldMacIOState;
++
++#endif /* MACIO_H */
+--=20
 2.14.3
