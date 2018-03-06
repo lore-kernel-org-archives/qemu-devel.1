@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1etC89-0008Sv-Ha
+	(envelope-from <pm215@archaic.org.uk>) id 1etC8A-0008TV-1O
 	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 07:55:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1etC88-0004wS-Px
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 07:55:45 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1etC84-0004rX-4v
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 07:55:46 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  6 Mar 2018 12:55:25 +0000
-Message-Id: <20180306125526.27838-6-peter.maydell@linaro.org>
+Date: Tue,  6 Mar 2018 12:55:26 +0000
+Message-Id: <20180306125526.27838-7-peter.maydell@linaro.org>
 In-Reply-To: <20180306125526.27838-1-peter.maydell@linaro.org>
 References: <20180306125526.27838-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 5/6] hw/arm/virt: Add "max" to the list of
- CPU types "virt" supports
+Subject: [Qemu-devel] [PATCH v2 6/6] hw/arm/virt: Support -machine
+ gic-version=max
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,25 +23,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Allow the virt board to support '-cpu max' in the same way
-it already handles '-cpu host'.
+Add support for passing 'max' to -machine gic-version. By analogy
+with the -cpu max option, this picks the "best available" GIC version
+whether you're using KVM or TCG, so it behaves like 'host' when
+using KVM, and gives you GICv3 when using TCG.
+
+Also like '-cpu host', using -machine gic-version=max' means there
+is no guarantee of migration compatibility between QEMU versions;
+in future 'max' might mean '4'.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/virt.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/arm/virt.c | 29 +++++++++++++++++++----------
+ 1 file changed, 19 insertions(+), 10 deletions(-)
 
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index dbb3c8036a..cda4b83586 100644
+index cda4b83586..2c07245047 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -169,6 +169,7 @@ static const char *valid_cpus[] = {
-     ARM_CPU_TYPE_NAME("cortex-a53"),
-     ARM_CPU_TYPE_NAME("cortex-a57"),
-     ARM_CPU_TYPE_NAME("host"),
-+    ARM_CPU_TYPE_NAME("max"),
- };
+@@ -1207,16 +1207,23 @@ static void machvirt_init(MachineState *machine)
+     /* We can probe only here because during property set
+      * KVM is not available yet
+      */
+-    if (!vms->gic_version) {
++    if (vms->gic_version <= 0) {
++        /* "host" or "max" */
+         if (!kvm_enabled()) {
+-            error_report("gic-version=host requires KVM");
+-            exit(1);
+-        }
+-
+-        vms->gic_version = kvm_arm_vgic_probe();
+-        if (!vms->gic_version) {
+-            error_report("Unable to determine GIC version supported by host");
+-            exit(1);
++            if (vms->gic_version == 0) {
++                error_report("gic-version=host requires KVM");
++                exit(1);
++            } else {
++                /* "max": currently means 3 for TCG */
++                vms->gic_version = 3;
++            }
++        } else {
++            vms->gic_version = kvm_arm_vgic_probe();
++            if (!vms->gic_version) {
++                error_report(
++                    "Unable to determine GIC version supported by host");
++                exit(1);
++            }
+         }
+     }
  
- static bool cpu_type_valid(const char *cpu)
+@@ -1480,9 +1487,11 @@ static void virt_set_gic_version(Object *obj, const char *value, Error **errp)
+         vms->gic_version = 2;
+     } else if (!strcmp(value, "host")) {
+         vms->gic_version = 0; /* Will probe later */
++    } else if (!strcmp(value, "max")) {
++        vms->gic_version = -1; /* Will probe later */
+     } else {
+         error_setg(errp, "Invalid gic-version value");
+-        error_append_hint(errp, "Valid values are 3, 2, host.\n");
++        error_append_hint(errp, "Valid values are 3, 2, host, max.\n");
+     }
+ }
+ 
 -- 
 2.16.2
