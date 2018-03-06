@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1et7J8-0007ai-Iz
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 02:46:47 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1et7JE-0007fv-44
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 02:46:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1et7J4-0004nD-LW
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 02:46:46 -0500
-Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:39864)
+	(envelope-from <aik@ozlabs.ru>) id 1et7JD-0004qE-3W
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 02:46:52 -0500
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:34350)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1et7J4-0004mv-EZ
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 02:46:42 -0500
-Received: by mail-it0-x242.google.com with SMTP id l187so13595068ith.4
-	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 23:46:42 -0800 (PST)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1et7JC-0004q2-UN
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 02:46:51 -0500
+Received: by mail-it0-x244.google.com with SMTP id n128so11819291ith.1
+	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 23:46:50 -0800 (PST)
 References: <20180305083655.6186-1-pbonzini@redhat.com>
-	<20180305083655.6186-5-pbonzini@redhat.com>
+	<20180305083655.6186-6-pbonzini@redhat.com>
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <83364e38-e0d9-8c57-8a9e-44fb5a30c8fb@ozlabs.ru>
-Date: Tue, 6 Mar 2018 18:46:37 +1100
+Message-ID: <dd7d2a9d-7fd4-0e98-ba72-f2c5e0b2cc71@ozlabs.ru>
+Date: Tue, 6 Mar 2018 18:46:45 +1100
 MIME-Version: 1.0
-In-Reply-To: <20180305083655.6186-5-pbonzini@redhat.com>
+In-Reply-To: <20180305083655.6186-6-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-AU
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/7] address_space_read:
+Subject: Re: [Qemu-devel] [PATCH 5/7] address_space_access_valid:
  address_space_to_flatview needs RCU lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -35,10 +35,9 @@ To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-stable@nongnu.org
 
 On 05/03/18 19:36, Paolo Bonzini wrote:
-> address_space_read is calling address_space_to_flatview but it can
+> address_space_access_valid is calling address_space_to_flatview but it can
 > be called outside the RCU lock.  To fix it, push the rcu_read_lock/unlock
-> pair up from flatview_read_full to address_space_read's constant size
-> fast path and address_space_read_full.
+> pair up from flatview_access_valid to address_space_access_valid.
 > 
 > Cc: qemu-stable@nongnu.org
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
@@ -46,151 +45,45 @@ On 05/03/18 19:36, Paolo Bonzini wrote:
 Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
 > ---
->  exec.c                | 44 ++++++++++++++++++++++++++++----------------
->  include/exec/memory.h | 25 ++++++++++---------------
->  2 files changed, 38 insertions(+), 31 deletions(-)
+>  exec.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
 > 
 > diff --git a/exec.c b/exec.c
-> index 0b74b58d45..55b7452bd7 100644
+> index 55b7452bd7..177583c2ee 100644
 > --- a/exec.c
 > +++ b/exec.c
-> @@ -2612,6 +2612,8 @@ static const MemoryRegionOps watch_mem_ops = {
->      },
->  };
->  
-> +static MemTxResult flatview_read(FlatView *fv, hwaddr addr,
-> +                                      MemTxAttrs attrs, uint8_t *buf, int len);
->  static MemTxResult flatview_write(FlatView *fv, hwaddr addr, MemTxAttrs attrs,
->                                    const uint8_t *buf, int len);
->  static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
-> @@ -3161,24 +3163,18 @@ MemTxResult flatview_read_continue(FlatView *fv, hwaddr addr,
->      return result;
->  }
->  
-> -MemTxResult flatview_read_full(FlatView *fv, hwaddr addr,
-> -                               MemTxAttrs attrs, uint8_t *buf, int len)
-> +/* Called from RCU critical section.  */
-> +static MemTxResult flatview_read(FlatView *fv, hwaddr addr,
-> +                                 MemTxAttrs attrs, uint8_t *buf, int len)
->  {
->      hwaddr l;
->      hwaddr addr1;
+> @@ -3391,7 +3391,6 @@ static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
 >      MemoryRegion *mr;
-> -    MemTxResult result = MEMTX_OK;
-> -
-> -    if (len > 0) {
-> -        rcu_read_lock();
-> -        l = len;
-> -        mr = flatview_translate(fv, addr, &addr1, &l, false);
-> -        result = flatview_read_continue(fv, addr, attrs, buf, len,
-> -                                        addr1, l, mr);
-> -        rcu_read_unlock();
-> -    }
+>      hwaddr l, xlat;
 >  
-> -    return result;
-> +    l = len;
-> +    mr = flatview_translate(fv, addr, &addr1, &l, false);
-> +    return flatview_read_continue(fv, addr, attrs, buf, len,
-> +                                  addr1, l, mr);
->  }
->  
->  static MemTxResult flatview_rw(FlatView *fv, hwaddr addr, MemTxAttrs attrs,
-> @@ -3199,6 +3195,22 @@ MemTxResult address_space_rw(AddressSpace *as, hwaddr addr,
->                         addr, attrs, buf, len, is_write);
->  }
->  
-> +MemTxResult address_space_read_full(AddressSpace *as, hwaddr addr,
-> +                                    MemTxAttrs attrs, uint8_t *buf, int len)
-> +{
-> +    MemTxResult result = MEMTX_OK;
-> +    FlatView *fv;
-> +
-> +    if (len > 0) {
-> +        rcu_read_lock();
-> +        fv = address_space_to_flatview(as);
-> +        result = flatview_read(fv, addr, attrs, buf, len);
-> +        rcu_read_unlock();
-> +    }
-> +
-> +    return result;
-> +}
-> +
->  MemTxResult address_space_write(AddressSpace *as, hwaddr addr,
->                                  MemTxAttrs attrs,
->                                  const uint8_t *buf, int len)
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index 6c8e394675..54ff81fbd1 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -1894,13 +1894,12 @@ void address_space_unmap(AddressSpace *as, void *buffer, hwaddr len,
->  
->  
->  /* Internal functions, part of the implementation of address_space_read.  */
-> +MemTxResult address_space_read_full(AddressSpace *as, hwaddr addr,
-> +                                    MemTxAttrs attrs, uint8_t *buf, int len);
->  MemTxResult flatview_read_continue(FlatView *fv, hwaddr addr,
->                                     MemTxAttrs attrs, uint8_t *buf,
->                                     int len, hwaddr addr1, hwaddr l,
->                                     MemoryRegion *mr);
-> -
-> -MemTxResult flatview_read_full(FlatView *fv, hwaddr addr,
-> -                               MemTxAttrs attrs, uint8_t *buf, int len);
->  void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr);
->  
->  static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
-> @@ -1919,25 +1918,28 @@ static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
->   *
->   * Return a MemTxResult indicating whether the operation succeeded
->   * or failed (eg unassigned memory, device rejected the transaction,
-> - * IOMMU fault).
-> + * IOMMU fault).  Called within RCU critical section.
->   *
-> - * @fv: #FlatView to be accessed
-> + * @as: #AddressSpace to be accessed
->   * @addr: address within that address space
->   * @attrs: memory transaction attributes
->   * @buf: buffer with the data transferred
->   */
->  static inline __attribute__((__always_inline__))
-> -MemTxResult flatview_read(FlatView *fv, hwaddr addr, MemTxAttrs attrs,
-> -                          uint8_t *buf, int len)
-> +MemTxResult address_space_read(AddressSpace *as, hwaddr addr,
-> +                               MemTxAttrs attrs, uint8_t *buf,
-> +                               int len)
->  {
->      MemTxResult result = MEMTX_OK;
->      hwaddr l, addr1;
->      void *ptr;
->      MemoryRegion *mr;
-> +    FlatView *fv;
->  
->      if (__builtin_constant_p(len)) {
->          if (len) {
->              rcu_read_lock();
-> +            fv = address_space_to_flatview(as);
->              l = len;
->              mr = flatview_translate(fv, addr, &addr1, &l, false);
->              if (len == l && memory_access_is_direct(mr, false)) {
-> @@ -1950,18 +1952,11 @@ MemTxResult flatview_read(FlatView *fv, hwaddr addr, MemTxAttrs attrs,
->              rcu_read_unlock();
->          }
->      } else {
-> -        result = flatview_read_full(fv, addr, attrs, buf, len);
-> +        result = address_space_read_full(as, addr, attrs, buf, len);
+> -    rcu_read_lock();
+>      while (len > 0) {
+>          l = len;
+>          mr = flatview_translate(fv, addr, &xlat, &l, is_write);
+> @@ -3406,15 +3405,20 @@ static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
+>          len -= l;
+>          addr += l;
 >      }
->      return result;
+> -    rcu_read_unlock();
+>      return true;
 >  }
 >  
-> -static inline MemTxResult address_space_read(AddressSpace *as, hwaddr addr,
-> -                                             MemTxAttrs attrs, uint8_t *buf,
-> -                                             int len)
-> -{
-> -    return flatview_read(address_space_to_flatview(as), addr, attrs, buf, len);
-> -}
-> -
->  /**
->   * address_space_read_cached: read from a cached RAM region
->   *
+>  bool address_space_access_valid(AddressSpace *as, hwaddr addr,
+>                                  int len, bool is_write)
+>  {
+> -    return flatview_access_valid(address_space_to_flatview(as),
+> -                                 addr, len, is_write);
+> +    FlatView *fv;
+> +    bool result;
+> +
+> +    rcu_read_lock();
+> +    fv = address_space_to_flatview(as);
+> +    result = flatview_access_valid(fv, addr, len, is_write);
+> +    rcu_read_unlock();
+> +    return result;
+>  }
+>  
+>  static hwaddr
 > 
 
 
