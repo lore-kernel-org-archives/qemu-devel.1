@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49236)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1et3nq-0001QE-Bi
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:02:15 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1et3nq-0001QJ-DK
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:02:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1et3np-0004Pu-55
+	(envelope-from <dgibson@ozlabs.org>) id 1et3no-0004Pc-Vg
 	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:02:14 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue,  6 Mar 2018 15:01:28 +1100
-Message-Id: <20180306040154.3669-5-david@gibson.dropbear.id.au>
+Date: Tue,  6 Mar 2018 15:01:32 +1100
+Message-Id: <20180306040154.3669-9-david@gibson.dropbear.id.au>
 In-Reply-To: <20180306040154.3669-1-david@gibson.dropbear.id.au>
 References: <20180306040154.3669-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 04/30] roms: Added git submodule for
- u-boot-sam460 (firmware for sam460ex)
+Subject: [Qemu-devel] [PULL 08/30] spapr: harden code that depends on VSMT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,66 +20,218 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, groug@kaod.org
-Cc: agraf@suse.de, surajjs@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, surajjs@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+From: Greg Kurz <groug@kaod.org>
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+VSMT must be set in order to compute VCPU ids. This means that the
+following functions must not be called before spapr_set_vsmt_mode()
+was called:
+- spapr_vcpu_id()
+- spapr_is_thread0_in_vcore()
+- xics_max_server_number()
+
+We had a recent regression where the latter would be called before VSMT
+was set, and broke migration of some old machine types. This patch
+adds assert() in the above functions to avoid problems in the future.
+
+Also, since VSMT is really a CPU related thing, spapr_set_vsmt_mode() is
+now called from spapr_init_cpus(), just before the first VSMT user.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- .gitmodules          | 3 +++
- roms/Makefile        | 7 +++++++
- roms/u-boot-sam460ex | 1 +
- 3 files changed, 11 insertions(+)
- create mode 160000 roms/u-boot-sam460ex
+ hw/ppc/spapr.c | 144 ++++++++++++++++++++++++++++++---------------------------
+ 1 file changed, 75 insertions(+), 69 deletions(-)
 
-diff --git a/.gitmodules b/.gitmodules
-index 7a8282df46..b76fb450a4 100644
---- a/.gitmodules
-+++ b/.gitmodules
-@@ -43,3 +43,6 @@
- [submodule "roms/seabios-hppa"]
- 	path = roms/seabios-hppa
- 	url = git://github.com/hdeller/seabios-hppa.git
-+[submodule "roms/u-boot-sam460ex"]
-+	path = roms/u-boot-sam460ex
-+	url = git://github.com/zbalaton/u-boot-sam460ex
-diff --git a/roms/Makefile b/roms/Makefile
-index b5e5a69e91..02b69fbac8 100644
---- a/roms/Makefile
-+++ b/roms/Makefile
-@@ -65,6 +65,7 @@ default:
- 	@echo "  slof           -- update slof.bin"
- 	@echo "  skiboot        -- update skiboot.lid"
- 	@echo "  u-boot.e500    -- update u-boot.e500"
-+	@echo "  u-boot.sam460  -- update u-boot.sam460"
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 3f1c5c5133..1c2703cb6b 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -105,12 +105,14 @@
+  */
+ static int spapr_vcpu_id(sPAPRMachineState *spapr, int cpu_index)
+ {
++    assert(spapr->vsmt);
+     return
+         (cpu_index / smp_threads) * spapr->vsmt + cpu_index % smp_threads;
+ }
+ static bool spapr_is_thread0_in_vcore(sPAPRMachineState *spapr,
+                                       PowerPCCPU *cpu)
+ {
++    assert(spapr->vsmt);
+     return spapr_get_vcpu_id(cpu) % spapr->vsmt == 0;
+ }
  
- bios: build-seabios-config-seabios-128k build-seabios-config-seabios-256k
- 	cp seabios/builds/seabios-128k/bios.bin ../pc-bios/bios.bin
-@@ -147,6 +148,11 @@ u-boot.e500:
- 	$(powerpc_cross_prefix)strip u-boot/build.e500/u-boot -o \
- 		../pc-bios/u-boot.e500
+@@ -177,6 +179,7 @@ static void pre_2_10_vmstate_unregister_dummy_icp(int i)
  
-+u-boot.sam460:
-+	$(MAKE) -C u-boot-sam460ex Sam460ex_config
-+	$(MAKE) -C u-boot-sam460ex CROSS_COMPILE=$(powerpc_cross_prefix)
-+	cp u-boot-sam460ex/u-boot.bin ../pc-bios/u-boot-sam460-20100605.bin
+ static int xics_max_server_number(sPAPRMachineState *spapr)
+ {
++    assert(spapr->vsmt);
+     return DIV_ROUND_UP(max_cpus * spapr->vsmt, smp_threads);
+ }
+ 
+@@ -2220,73 +2223,6 @@ static CPUArchId *spapr_find_cpu_slot(MachineState *ms, uint32_t id, int *idx)
+     return &ms->possible_cpus->cpus[index];
+ }
+ 
+-static void spapr_init_cpus(sPAPRMachineState *spapr)
+-{
+-    MachineState *machine = MACHINE(spapr);
+-    MachineClass *mc = MACHINE_GET_CLASS(machine);
+-    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(machine);
+-    const char *type = spapr_get_cpu_core_type(machine->cpu_type);
+-    const CPUArchIdList *possible_cpus;
+-    int boot_cores_nr = smp_cpus / smp_threads;
+-    int i;
+-
+-    possible_cpus = mc->possible_cpu_arch_ids(machine);
+-    if (mc->has_hotpluggable_cpus) {
+-        if (smp_cpus % smp_threads) {
+-            error_report("smp_cpus (%u) must be multiple of threads (%u)",
+-                         smp_cpus, smp_threads);
+-            exit(1);
+-        }
+-        if (max_cpus % smp_threads) {
+-            error_report("max_cpus (%u) must be multiple of threads (%u)",
+-                         max_cpus, smp_threads);
+-            exit(1);
+-        }
+-    } else {
+-        if (max_cpus != smp_cpus) {
+-            error_report("This machine version does not support CPU hotplug");
+-            exit(1);
+-        }
+-        boot_cores_nr = possible_cpus->len;
+-    }
+-
+-    if (smc->pre_2_10_has_unused_icps) {
+-        int i;
+-
+-        for (i = 0; i < xics_max_server_number(spapr); i++) {
+-            /* Dummy entries get deregistered when real ICPState objects
+-             * are registered during CPU core hotplug.
+-             */
+-            pre_2_10_vmstate_register_dummy_icp(i);
+-        }
+-    }
+-
+-    for (i = 0; i < possible_cpus->len; i++) {
+-        int core_id = i * smp_threads;
+-
+-        if (mc->has_hotpluggable_cpus) {
+-            spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_CPU,
+-                                   spapr_vcpu_id(spapr, core_id));
+-        }
+-
+-        if (i < boot_cores_nr) {
+-            Object *core  = object_new(type);
+-            int nr_threads = smp_threads;
+-
+-            /* Handle the partially filled core for older machine types */
+-            if ((i + 1) * smp_threads >= smp_cpus) {
+-                nr_threads = smp_cpus - i * smp_threads;
+-            }
+-
+-            object_property_set_int(core, nr_threads, "nr-threads",
+-                                    &error_fatal);
+-            object_property_set_int(core, core_id, CPU_CORE_PROP_CORE_ID,
+-                                    &error_fatal);
+-            object_property_set_bool(core, true, "realized", &error_fatal);
+-        }
+-    }
+-}
+-
+ static void spapr_set_vsmt_mode(sPAPRMachineState *spapr, Error **errp)
+ {
+     Error *local_err = NULL;
+@@ -2359,6 +2295,78 @@ out:
+     error_propagate(errp, local_err);
+ }
+ 
++static void spapr_init_cpus(sPAPRMachineState *spapr)
++{
++    MachineState *machine = MACHINE(spapr);
++    MachineClass *mc = MACHINE_GET_CLASS(machine);
++    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(machine);
++    const char *type = spapr_get_cpu_core_type(machine->cpu_type);
++    const CPUArchIdList *possible_cpus;
++    int boot_cores_nr = smp_cpus / smp_threads;
++    int i;
 +
- skiboot:
- 	$(MAKE) -C skiboot CROSS=$(powerpc64_cross_prefix)
- 	cp skiboot/skiboot.lid ../pc-bios/skiboot.lid
-@@ -160,4 +166,5 @@ clean:
- 	$(MAKE) -C ipxe/src veryclean
- 	$(MAKE) -C SLOF clean
- 	rm -rf u-boot/build.e500
-+	$(MAKE) -C u-boot-sam460ex distclean
- 	$(MAKE) -C skiboot clean
-diff --git a/roms/u-boot-sam460ex b/roms/u-boot-sam460ex
-new file mode 160000
-index 0000000000..119aa277f7
---- /dev/null
-+++ b/roms/u-boot-sam460ex
-@@ -0,0 +1 @@
-+Subproject commit 119aa277f74a4a2d3f7ab6c9471292308eba14e4
++    possible_cpus = mc->possible_cpu_arch_ids(machine);
++    if (mc->has_hotpluggable_cpus) {
++        if (smp_cpus % smp_threads) {
++            error_report("smp_cpus (%u) must be multiple of threads (%u)",
++                         smp_cpus, smp_threads);
++            exit(1);
++        }
++        if (max_cpus % smp_threads) {
++            error_report("max_cpus (%u) must be multiple of threads (%u)",
++                         max_cpus, smp_threads);
++            exit(1);
++        }
++    } else {
++        if (max_cpus != smp_cpus) {
++            error_report("This machine version does not support CPU hotplug");
++            exit(1);
++        }
++        boot_cores_nr = possible_cpus->len;
++    }
++
++    /* VSMT must be set in order to be able to compute VCPU ids, ie to
++     * call xics_max_server_number() or spapr_vcpu_id().
++     */
++    spapr_set_vsmt_mode(spapr, &error_fatal);
++
++    if (smc->pre_2_10_has_unused_icps) {
++        int i;
++
++        for (i = 0; i < xics_max_server_number(spapr); i++) {
++            /* Dummy entries get deregistered when real ICPState objects
++             * are registered during CPU core hotplug.
++             */
++            pre_2_10_vmstate_register_dummy_icp(i);
++        }
++    }
++
++    for (i = 0; i < possible_cpus->len; i++) {
++        int core_id = i * smp_threads;
++
++        if (mc->has_hotpluggable_cpus) {
++            spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_CPU,
++                                   spapr_vcpu_id(spapr, core_id));
++        }
++
++        if (i < boot_cores_nr) {
++            Object *core  = object_new(type);
++            int nr_threads = smp_threads;
++
++            /* Handle the partially filled core for older machine types */
++            if ((i + 1) * smp_threads >= smp_cpus) {
++                nr_threads = smp_cpus - i * smp_threads;
++            }
++
++            object_property_set_int(core, nr_threads, "nr-threads",
++                                    &error_fatal);
++            object_property_set_int(core, core_id, CPU_CORE_PROP_CORE_ID,
++                                    &error_fatal);
++            object_property_set_bool(core, true, "realized", &error_fatal);
++        }
++    }
++}
++
+ /* pSeries LPAR / sPAPR hardware init */
+ static void spapr_machine_init(MachineState *machine)
+ {
+@@ -2486,8 +2494,6 @@ static void spapr_machine_init(MachineState *machine)
+     }
+ 
+     /* init CPUs */
+-    spapr_set_vsmt_mode(spapr, &error_fatal);
+-
+     spapr_init_cpus(spapr);
+ 
+     if (kvm_enabled()) {
 -- 
 2.14.3
