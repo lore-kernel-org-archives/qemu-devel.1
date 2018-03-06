@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1etFlZ-0007ay-L6
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:48:42 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1etFmq-00088A-Qr
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:50:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1etFlV-0000Zh-MB
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:48:41 -0500
-References: <20180306040154.3669-1-david@gibson.dropbear.id.au>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <fd62ebf7-3abc-79a2-f269-825b4f8d6598@redhat.com>
-Date: Tue, 6 Mar 2018 17:48:26 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180306040154.3669-1-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 00/30] ppc-for-2.12 queue 20180306
+	(envelope-from <pbonzini@redhat.com>) id 1etFmq-0000qL-12
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:50:00 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42940 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1etFmp-0000qF-Su
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:49:59 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 69368404008D
+	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 16:49:59 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue,  6 Mar 2018 17:49:54 +0100
+Message-Id: <20180306164957.24275-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/3] change q35 default NIC to e1000e
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,85 +27,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-On 06.03.2018 05:01, David Gibson wrote:
-> The following changes since commit f2bb2d14c2958f3f5aef456bd2cdb1ff99f4a562:
-> 
->   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2018-03-05 16:41:20 +0000)
-> 
-> are available in the Git repository at:
-> 
->   git://github.com/dgibson/qemu.git tags/ppc-for-2.12-20180306
-> 
-> for you to fetch changes up to 21b786f607b11d888f90bbb8c3414500515d11e7:
-> 
->   PowerPC: Add TS bits into msr_mask (2018-03-06 13:16:29 +1100)
-> 
-> ----------------------------------------------------------------
-> ppc patch queue 2018-03-06
-> 
-> This pull request supersedes ppc-for-2.12-20180302 which had compile
-> problems with some gcc versions.  It also contains a few additional
-> patches.
-> 
-> Highlights are:
->     * New Sam460ex machine type
->     * Yet more fixes related to vcpu id allocation for spapr
->     * Numerous macio cleanupsr
->     * Some enhancements to the Spectre/Meltdown fixes for pseries,
->       allowing use of a better mitigation for indirect branch based
->       exploits
->     * New pseries machine types with Spectre/Meltdown mitigations
->       enabled (stop gap until libvirt and management understands the
->       machine options)
->     * A handful of other fixes
-> 
-> ----------------------------------------------------------------
-> BALATON Zoltan (5):
->       ppc440_uc: Fix unintialized variable warning with older gcc
->       ppc440: Add emulation of plb-pcix controller found in some 440 SoCs
->       roms: Added git submodule for u-boot-sam460 (firmware for sam460ex)
->       pc-bios: Added u-boot-sam460 firmware binary
->       ppc: Add aCube Sam460ex board
-> 
-> David Engraf (1):
->       PPC: e500: Fix duplicate kernel load and device tree overlap
-> 
-> Greg Kurz (3):
->       spapr: fix missing CPU core nodes in DT when running with TCG
->       spapr: register dummy ICPs later
->       spapr: harden code that depends on VSMT
-> 
-> Mark Cave-Ayland (13):
->       macio: embed DBDMA device directly within macio
->       macio: move ESCC device within the macio device
->       heathrow: QOMify heathrow PIC
->       heathrow: convert to trace-events
->       heathrow: change heathrow_pic_init() to return the heathrow device
->       macio: move macio related structures and defines into separate macio.h file
->       mac_oldworld: use object link to pass heathrow PIC object to macio
->       openpic: move KVM-specific declarations into separate openpic_kvm.h file
->       openpic: move OpenPIC state and related definitions to openpic.h
->       mac_newworld: use object link to pass OpenPIC object to macio
->       macio: move setting of CUDA timebase frequency to macio_common_realize()
->       macio: remove macio_init() function
->       adb: add trace-events for monitoring keyboard/mouse during bus enumeration
+The Intel 82574 NIC has better performance and more features than
+the aging e1000 (aka 82540), for example MSI-X.  This patch chooses it
+by default for the Q35 machine type.  As suggested by Thomas, instead
+of special casing e1000e, all PCI NIC device names become valid models
+for "-net nic,model=..." or "-nic model=..." (patches 1-2).
 
-Something in the recent commits introduced a new way to cause unexpected
-aborts of QEMU:
+Paolo
 
-$ ppc64-softmmu/qemu-system-ppc64 -monitor stdio
-QEMU 2.11.50 monitor - type 'help' for more information
-(qemu) device_add macio-newworld
-Unexpected error in qemu_chr_fe_init() at
-/home/thuth/devel/qemu/chardev/char-fe.c:222:
-Device 'serial0' is in use
-Aborted (core dumped)
+Paolo Bonzini (3):
+  qom: introduce object_class_get_list_sorted
+  net: allow using any PCI NICs in -net or -nic
+  q35: change default NIC to e1000e
 
-Of course it does not make sense to add a macio-newworld device on the
-pseries machine, but QEMU should not abort in this case - it should just
-print an error message and continue afterwards. Any ideas how to fix this?
+ hw/i386/pc.c            |  7 +++---
+ hw/i386/pc_piix.c       |  6 ++++-
+ hw/i386/pc_q35.c        |  8 ++++++-
+ hw/pci/pci.c            | 61 ++++++++++++++++++++++++-------------------------
+ include/hw/i386/pc.h    |  3 ++-
+ include/qom/object.h    | 10 ++++++++
+ qdev-monitor.c          |  9 +-------
+ qom/object.c            | 14 ++++++++++++
+ target/alpha/cpu.c      | 15 +-----------
+ target/hppa/cpu.c       | 14 +-----------
+ target/lm32/cpu.c       | 15 +-----------
+ target/sh4/cpu.c        | 15 +-----------
+ target/tricore/helper.c |  2 +-
+ 13 files changed, 78 insertions(+), 101 deletions(-)
 
- Thomas
+-- 
+2.14.3
