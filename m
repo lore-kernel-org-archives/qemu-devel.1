@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1etCVl-0005Sj-Sk
+	(envelope-from <paolo.bonzini@gmail.com>) id 1etCVl-0005RV-32
 	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:20:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1etCVj-0006Z3-FX
+	(envelope-from <paolo.bonzini@gmail.com>) id 1etCVi-0006Xy-Cf
 	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:20:09 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:39659)
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:40144)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1etCVj-0006YA-8H
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:20:07 -0500
-Received: by mail-wr0-x241.google.com with SMTP id w77so20920791wrc.6
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 05:20:07 -0800 (PST)
+	id 1etCVi-0006XO-5s
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:20:06 -0500
+Received: by mail-wm0-x244.google.com with SMTP id t6so22235844wmt.5
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 05:20:06 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  6 Mar 2018 14:19:23 +0100
-Message-Id: <1520342370-123606-28-git-send-email-pbonzini@redhat.com>
+Date: Tue,  6 Mar 2018 14:19:22 +0100
+Message-Id: <1520342370-123606-27-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1520342370-123606-1-git-send-email-pbonzini@redhat.com>
 References: <1520342370-123606-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 27/34] Remove unnecessary WHPX __debugbreak();
+Subject: [Qemu-devel] [PULL 26/34] Resolves WHPX breaking changes in SDK
+ 17095
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,112 +33,89 @@ Cc: "Justin Terry (VM)" <juterry@microsoft.com>
 
 From: "Justin Terry (VM) via Qemu-devel" <qemu-devel@nongnu.org>
 
-Minor code cleanup. The calls to __debugbreak() are not required and should
-no longer be used to prevent unnecessary breaks.
+1. Fixes the changes required to the WHvTryMmioEmulation, WHvTryIoEmulation, and
+WHvEmulatorCreateEmulator based on the new VpContext forwarding.
+2. Removes the WHvRunVpExitReasonAlerted case.
 
 Signed-off-by: Justin Terry (VM) <juterry@microsoft.com>
-Message-Id: <1519665216-1078-4-git-send-email-juterry@microsoft.com>
+Message-Id: <1519665216-1078-3-git-send-email-juterry@microsoft.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Justin Terry (VM) via Qemu-devel <qemu-devel@nongnu.org>
 ---
- target/i386/whpx-all.c | 12 ------------
- 1 file changed, 12 deletions(-)
+ target/i386/whpx-all.c | 26 ++++++++++----------------
+ 1 file changed, 10 insertions(+), 16 deletions(-)
 
 diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
-index 969c2f5..14ea732 100644
+index eeee43e..969c2f5 100644
 --- a/target/i386/whpx-all.c
 +++ b/target/i386/whpx-all.c
-@@ -364,7 +364,6 @@ static void whpx_set_registers(CPUState *cpu)
-     if (FAILED(hr)) {
-         error_report("WHPX: Failed to set virtual processor context, hr=%08lx",
-                      hr);
--        __debugbreak();
-     }
+@@ -613,6 +613,7 @@ static HRESULT CALLBACK whpx_emu_translate_callback(
+ }
  
-     return;
-@@ -391,7 +390,6 @@ static void whpx_get_registers(CPUState *cpu)
-     if (FAILED(hr)) {
-         error_report("WHPX: Failed to get virtual processor context, hr=%08lx",
-                      hr);
--        __debugbreak();
-     }
+ static const WHV_EMULATOR_CALLBACKS whpx_emu_callbacks = {
++    .Size = sizeof(WHV_EMULATOR_CALLBACKS),
+     .WHvEmulatorIoPortCallback = whpx_emu_ioport_callback,
+     .WHvEmulatorMemoryCallback = whpx_emu_memio_callback,
+     .WHvEmulatorGetVirtualProcessorRegisters = whpx_emu_getreg_callback,
+@@ -626,7 +627,9 @@ static int whpx_handle_mmio(CPUState *cpu, WHV_MEMORY_ACCESS_CONTEXT *ctx)
+     struct whpx_vcpu *vcpu = get_whpx_vcpu(cpu);
+     WHV_EMULATOR_STATUS emu_status;
  
-     /* Indexes for first 16 registers match between HV and QEMU definitions */
-@@ -554,7 +552,6 @@ static HRESULT CALLBACK whpx_emu_getreg_callback(
+-    hr = WHvEmulatorTryMmioEmulation(vcpu->emulator, cpu, ctx, &emu_status);
++    hr = WHvEmulatorTryMmioEmulation(vcpu->emulator, cpu,
++                                     &vcpu->exit_ctx.VpContext, ctx,
++                                     &emu_status);
      if (FAILED(hr)) {
-         error_report("WHPX: Failed to get virtual processor registers,"
-                      " hr=%08lx", hr);
--        __debugbreak();
-     }
- 
-     return hr;
-@@ -576,7 +573,6 @@ static HRESULT CALLBACK whpx_emu_setreg_callback(
-     if (FAILED(hr)) {
-         error_report("WHPX: Failed to set virtual processor registers,"
-                      " hr=%08lx", hr);
--        __debugbreak();
-     }
- 
-     /*
-@@ -604,7 +600,6 @@ static HRESULT CALLBACK whpx_emu_translate_callback(
-                          Gva, TranslateFlags, &res, Gpa);
-     if (FAILED(hr)) {
-         error_report("WHPX: Failed to translate GVA, hr=%08lx", hr);
--        __debugbreak();
-     } else {
-         *TranslationResult = res.ResultCode;
-     }
-@@ -631,13 +626,11 @@ static int whpx_handle_mmio(CPUState *cpu, WHV_MEMORY_ACCESS_CONTEXT *ctx)
-                                      &vcpu->exit_ctx.VpContext, ctx,
-                                      &emu_status);
-     if (FAILED(hr)) {
--        __debugbreak();
+         __debugbreak();
          error_report("WHPX: Failed to parse MMIO access, hr=%08lx", hr);
-         return -1;
-     }
+@@ -649,7 +652,9 @@ static int whpx_handle_portio(CPUState *cpu,
+     struct whpx_vcpu *vcpu = get_whpx_vcpu(cpu);
+     WHV_EMULATOR_STATUS emu_status;
  
-     if (!emu_status.EmulationSuccessful) {
--        __debugbreak();
-         error_report("WHPX: Failed to emulate MMIO access");
-         return -1;
-     }
-@@ -656,13 +649,11 @@ static int whpx_handle_portio(CPUState *cpu,
-                                    &vcpu->exit_ctx.VpContext, ctx,
-                                    &emu_status);
+-    hr = WHvEmulatorTryIoEmulation(vcpu->emulator, cpu, ctx, &emu_status);
++    hr = WHvEmulatorTryIoEmulation(vcpu->emulator, cpu,
++                                   &vcpu->exit_ctx.VpContext, ctx,
++                                   &emu_status);
      if (FAILED(hr)) {
--        __debugbreak();
+         __debugbreak();
          error_report("WHPX: Failed to parse PortIO access, hr=%08lx", hr);
-         return -1;
-     }
- 
-     if (!emu_status.EmulationSuccessful) {
--        __debugbreak();
-         error_report("WHPX: Failed to emulate PortMMIO access");
-         return -1;
-     }
-@@ -716,7 +707,6 @@ static void whpx_vcpu_pre_run(CPUState *cpu)
-         if (cpu->interrupt_request & CPU_INTERRUPT_SMI) {
-             qemu_mutex_lock_iothread();
-             cpu->interrupt_request &= ~CPU_INTERRUPT_SMI;
--            __debugbreak();
-             qemu_mutex_unlock_iothread();
+@@ -905,18 +910,8 @@ static int whpx_vcpu_run(CPUState *cpu)
+             whpx_vcpu_kick(cpu);
          }
-     }
-@@ -785,7 +775,6 @@ static void whpx_vcpu_pre_run(CPUState *cpu)
+ 
+-        for (;;) {
+-            hr = WHvRunVirtualProcessor(whpx->partition, cpu->cpu_index,
+-                                        &vcpu->exit_ctx, whpx->exit_ctx_size);
+-
+-            if (SUCCEEDED(hr) && (vcpu->exit_ctx.ExitReason ==
+-                                  WHvRunVpExitReasonAlerted)) {
+-                WHvCancelRunVirtualProcessor(whpx->partition, cpu->cpu_index,
+-                                             0);
+-            } else {
+-                break;
+-            }
+-        }
++        hr = WHvRunVirtualProcessor(whpx->partition, cpu->cpu_index,
++                                    &vcpu->exit_ctx, whpx->exit_ctx_size);
+ 
          if (FAILED(hr)) {
-             error_report("WHPX: Failed to set interrupt state registers,"
-                          " hr=%08lx", hr);
--            __debugbreak();
-         }
+             error_report("WHPX: Failed to exec a virtual processor,"
+@@ -956,7 +951,6 @@ static int whpx_vcpu_run(CPUState *cpu)
+         case WHvRunVpExitReasonX64MsrAccess:
+         case WHvRunVpExitReasonX64Cpuid:
+         case WHvRunVpExitReasonException:
+-        case WHvRunVpExitReasonAlerted:
+         default:
+             error_report("WHPX: Unexpected VP exit code %d",
+                          vcpu->exit_ctx.ExitReason);
+@@ -1068,7 +1062,7 @@ int whpx_init_vcpu(CPUState *cpu)
+         return -ENOMEM;
      }
  
-@@ -812,7 +801,6 @@ static void whpx_vcpu_post_run(CPUState *cpu)
+-    hr = WHvEmulatorCreateEmulator(whpx_emu_callbacks, &vcpu->emulator);
++    hr = WHvEmulatorCreateEmulator(&whpx_emu_callbacks, &vcpu->emulator);
      if (FAILED(hr)) {
-         error_report("WHPX: Failed to get interrupt state regusters,"
+         error_report("WHPX: Failed to setup instruction completion support,"
                       " hr=%08lx", hr);
--        __debugbreak();
-         vcpu->interruptable = false;
-         return;
-     }
 -- 
 1.8.3.1
