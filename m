@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etGOU-0006Th-5y
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:28:55 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1etGQW-0008JH-9X
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:31:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etGOP-0007lA-2Z
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:28:54 -0500
-References: <20180306040154.3669-1-david@gibson.dropbear.id.au>
-	<fd62ebf7-3abc-79a2-f269-825b4f8d6598@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <818fe50b-c3b8-30c5-5452-2009762142c1@ilande.co.uk>
-Date: Tue, 6 Mar 2018 17:28:09 +0000
-MIME-Version: 1.0
-In-Reply-To: <fd62ebf7-3abc-79a2-f269-825b4f8d6598@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 00/30] ppc-for-2.12 queue 20180306
+	(envelope-from <dgilbert@redhat.com>) id 1etGQR-0008Nu-2J
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:31:00 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44164 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1etGQQ-0008Nk-T2
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:30:54 -0500
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Tue,  6 Mar 2018 17:30:42 +0000
+Message-Id: <20180306173042.24572-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH] tests: Silence migration-test 'bad' test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,101 +21,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, quintela@redhat.com
+Cc: peterx@redhat.com, peter.maydell@linaro.org
 
-On 06/03/18 16:48, Thomas Huth wrote:
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-> Something in the recent commits introduced a new way to cause unexpected
-> aborts of QEMU:
-> 
-> $ ppc64-softmmu/qemu-system-ppc64 -monitor stdio
-> QEMU 2.11.50 monitor - type 'help' for more information
-> (qemu) device_add macio-newworld
-> Unexpected error in qemu_chr_fe_init() at
-> /home/thuth/devel/qemu/chardev/char-fe.c:222:
-> Device 'serial0' is in use
-> Aborted (core dumped)
-> 
-> Of course it does not make sense to add a macio-newworld device on the
-> pseries machine, but QEMU should not abort in this case - it should just
-> print an error message and continue afterwards. Any ideas how to fix this?
+In 2c9bb29703c I added a migration test that purposely fails;
+unfortunately it prints a copy of the failure message to stderr
+which makes the output a bit messy.
 
-So the backtrace from git master looks like this:
+Hide stderr for that test.
 
-Thread 1 "qemu-system-ppc" received signal SIGABRT, Aborted.
-__GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:51 
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ tests/migration-test.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 74f9361bdd..422bf1afdf 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -382,7 +382,7 @@ static void migrate_start_postcopy(QTestState *who)
+ }
  
+ static void test_migrate_start(QTestState **from, QTestState **to,
+-                               const char *uri)
++                               const char *uri, bool hide_stderr)
+ {
+     gchar *cmd_src, *cmd_dst;
+     char *bootpath = g_strdup_printf("%s/bootsect", tmpfs);
+@@ -427,6 +427,17 @@ static void test_migrate_start(QTestState **from, QTestState **to,
  
-
-51      ../sysdeps/unix/sysv/linux/raise.c: No such file or directory. 
+     g_free(bootpath);
  
++    if (hide_stderr) {
++        gchar *tmp;
++        tmp = g_strdup_printf("%s 2>/dev/null", cmd_src);
++        g_free(cmd_src);
++        cmd_src = tmp;
++
++        tmp = g_strdup_printf("%s 2>/dev/null", cmd_dst);
++        g_free(cmd_dst);
++        cmd_dst = tmp;
++    }
++
+     *from = qtest_start(cmd_src);
+     g_free(cmd_src);
  
-
-(gdb) bt 
+@@ -518,7 +529,7 @@ static void test_migrate(void)
+     char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
+     QTestState *from, *to;
  
+-    test_migrate_start(&from, &to, uri);
++    test_migrate_start(&from, &to, uri, false);
  
-
-#0  __GI_raise (sig=sig@entry=6) at 
-../sysdeps/unix/sysv/linux/raise.c:51 
+     migrate_set_capability(from, "postcopy-ram", "true");
+     migrate_set_capability(to, "postcopy-ram", "true");
+@@ -560,7 +571,7 @@ static void test_baddest(void)
+     const char *status;
+     bool failed;
  
-
-#1  0x00007fffdbd6e3fa in __GI_abort () at abort.c:89 
- 
- 
-
-#2  0x0000555555de6d86 in error_handle_fatal (errp=0x555556bdfb90 
-<error_abort>, err=0x555556ef5a00) at util/error.c:38 
- 
-
-#3  0x0000555555de6eb6 in error_setv (errp=0x555556bdfb90 <error_abort>, 
-src=0x555556031ad0 "chardev/char-fe.c", line=222, func=0x555556031c50 
-<__func__.18713> "qemu_chr_fe_init", 
-err_class=ERROR_CLASS_GENERIC_ERROR,
-     fmt=0x555556031b50 "Device '%s' is in use", ap=0x7fffffffd010, 
-suffix=0x0) at util/error.c:71 
- 
-
-#4  0x0000555555de7097 in error_setg_internal (errp=0x555556bdfb90 
-<error_abort>, src=0x555556031ad0 "chardev/char-fe.c", line=222, 
-func=0x555556031c50 <__func__.18713> "qemu_chr_fe_init", 
-
-     fmt=0x555556031b50 "Device '%s' is in use") at util/error.c:95 
- 
- 
-
-#5  0x0000555555d673fc in qemu_chr_fe_init (b=0x555557aef590, 
-s=0x555556de2290, errp=0x555556bdfb90 <error_abort>) at 
-chardev/char-fe.c:222 
-
-#6  0x0000555555af5467 in set_chr (obj=0x555557aeef80, v=0x555557960c20, 
-name=0x555555f65fc5 "chrA", opaque=0x555556658410 <escc_properties+432>, 
-errp=0x555556bdfb90 <error_abort>) at 
-hw/core/qdev-properties-system.c:216
-#7  0x0000555555cb326a in object_property_set (obj=0x555557aeef80, 
-v=0x555557960c20, name=0x555555f65fc5 "chrA", errp=0x555556bdfb90 
-<error_abort>) at qom/object.c:1109 
-
-#8  0x0000555555cb6232 in object_property_set_qobject 
-(obj=0x555557aeef80, value=0x555557960bf0, name=0x555555f65fc5 "chrA", 
-errp=0x555556bdfb90 <error_abort>) at qom/qom-qobject.c:27 
-
-#9  0x0000555555cb32af in object_property_set_str (obj=0x555557aeef80, 
-value=0x555556de23c0 "serial0", name=0x555555f65fc5 "chrA", 
-errp=0x555556bdfb90 <error_abort>) at qom/object.c:1117 
-
-#10 0x0000555555af5d94 in qdev_prop_set_chr (dev=0x555557aeef80, 
-name=0x555555f65fc5 "chrA", value=0x555556de2290) at 
-hw/core/qdev-properties-system.c:427
-#11 0x0000555555b350a8 in macio_instance_init (obj=0x555557aec3c0) at 
-hw/misc/macio/macio.c:347
-
-
-It seems that the error is being raised when setting the property rather 
-than during realize so I'm not sure what I can do to handle this. Any 
-thoughts?
-
-
-ATB,
-
-Mark.
+-    test_migrate_start(&from, &to, "tcp:0:0");
++    test_migrate_start(&from, &to, "tcp:0:0", true);
+     migrate(from, "tcp:0:0");
+     do {
+         rsp = wait_command(from, "{ 'execute': 'query-migrate' }");
+-- 
+2.14.3
