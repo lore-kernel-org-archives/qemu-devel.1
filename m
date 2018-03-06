@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1etG6W-00072c-Dt
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:10:22 -0500
+	(envelope-from <david@redhat.com>) id 1etG6j-0007C8-OD
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:10:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1etG6T-0000Ij-61
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:10:20 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58334 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1etG6T-0000IG-0T
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:10:17 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1EE7684221
-	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 17:10:13 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  6 Mar 2018 18:09:59 +0100
-Message-Id: <20180306170959.3921-1-marcandre.lureau@redhat.com>
+	(envelope-from <david@redhat.com>) id 1etG6g-0000P0-EN
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:10:33 -0500
+References: <1519746259-27710-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<d4d35d0e-b8a4-f30f-f9ad-71c405e80d18@redhat.com>
+	<555a7ff8-d724-f040-4ade-3fd4aceaca7d@linux.vnet.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <4b9bb4fd-d34e-9f46-5414-d6c14e9a6ce8@redhat.com>
+Date: Tue, 6 Mar 2018 18:10:20 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <555a7ff8-d724-f040-4ade-3fd4aceaca7d@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] migration: fix minor finalize leak
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] s390x: vfio-ap: guest dedicated
+ crypto adapters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,99 +26,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Pierre Morel <pmorel@linux.vnet.ibm.com>, Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, bjsdjshi@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
 
-Spotted thanks to ASAN:
-QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 tests/migration-tes=
-t -p /x86_64/migration/bad_dest
 
-=3D=3D30302=3D=3DERROR: LeakSanitizer: detected memory leaks
+> If L2 forward devices to L3 through SIE ECA.28 but no bit is set is in=20
+> the CRYCB of L2,
+> L3 will not see any device.
 
-Direct leak of 48 byte(s) in 1 object(s) allocated from:
-    #0 0x7f60efba1a38 in __interceptor_calloc (/lib64/libasan.so.4+0xdea3=
-8)
-    #1 0x7f60eef3cf75 in g_malloc0 ../glib/gmem.c:124
-    #2 0x55ca9094702c in error_copy /home/elmarco/src/qemu/util/error.c:2=
-03
-    #3 0x55ca9037a30f in migrate_set_error /home/elmarco/src/qemu/migrati=
-on/migration.c:1139
-    #4 0x55ca9037a462 in migrate_fd_error /home/elmarco/src/qemu/migratio=
-n/migration.c:1150
-    #5 0x55ca9038162b in migrate_fd_connect /home/elmarco/src/qemu/migrat=
-ion/migration.c:2411
-    #6 0x55ca90386e41 in migration_channel_connect /home/elmarco/src/qemu=
-/migration/channel.c:81
-    #7 0x55ca9038335e in socket_outgoing_migration /home/elmarco/src/qemu=
-/migration/socket.c:85
-    #8 0x55ca9083dd3a in qio_task_complete /home/elmarco/src/qemu/io/task=
-.c:142
-    #9 0x55ca9083d6cc in gio_task_thread_result /home/elmarco/src/qemu/io=
-/task.c:88
-    #10 0x7f60eef37317 in g_idle_dispatch ../glib/gmain.c:5552
-    #11 0x7f60eef3490b in g_main_dispatch ../glib/gmain.c:3182
-    #12 0x7f60eef357ac in g_main_context_dispatch ../glib/gmain.c:3847
-    #13 0x55ca90927231 in glib_pollfds_poll /home/elmarco/src/qemu/util/m=
-ain-loop.c:214
-    #14 0x55ca90927420 in os_host_main_loop_wait /home/elmarco/src/qemu/u=
-til/main-loop.c:261
-    #15 0x55ca909275fa in main_loop_wait /home/elmarco/src/qemu/util/main=
--loop.c:515
-    #16 0x55ca8fc1c2a4 in main_loop /home/elmarco/src/qemu/vl.c:1942
-    #17 0x55ca8fc2eb3a in main /home/elmarco/src/qemu/vl.c:4724
-    #18 0x7f60e4082009 in __libc_start_main (/lib64/libc.so.6+0x21009)
+Exactly and this is the problem: How should L2 know that these devices
+are special and cannot be forwarded.
 
-Indirect leak of 45 byte(s) in 1 object(s) allocated from:
-    #0 0x7f60efba1850 in malloc (/lib64/libasan.so.4+0xde850)
-    #1 0x7f60eef3cf0c in g_malloc ../glib/gmem.c:94
-    #2 0x7f60eef3d1cf in g_malloc_n ../glib/gmem.c:331
-    #3 0x7f60eef596eb in g_strdup ../glib/gstrfuncs.c:363
-    #4 0x55ca90947085 in error_copy /home/elmarco/src/qemu/util/error.c:2=
-04
-    #5 0x55ca9037a30f in migrate_set_error /home/elmarco/src/qemu/migrati=
-on/migration.c:1139
-    #6 0x55ca9037a462 in migrate_fd_error /home/elmarco/src/qemu/migratio=
-n/migration.c:1150
-    #7 0x55ca9038162b in migrate_fd_connect /home/elmarco/src/qemu/migrat=
-ion/migration.c:2411
-    #8 0x55ca90386e41 in migration_channel_connect /home/elmarco/src/qemu=
-/migration/channel.c:81
-    #9 0x55ca9038335e in socket_outgoing_migration /home/elmarco/src/qemu=
-/migration/socket.c:85
-    #10 0x55ca9083dd3a in qio_task_complete /home/elmarco/src/qemu/io/tas=
-k.c:142
-    #11 0x55ca9083d6cc in gio_task_thread_result /home/elmarco/src/qemu/i=
-o/task.c:88
-    #12 0x7f60eef37317 in g_idle_dispatch ../glib/gmain.c:5552
-    #13 0x7f60eef3490b in g_main_dispatch ../glib/gmain.c:3182
-    #14 0x7f60eef357ac in g_main_context_dispatch ../glib/gmain.c:3847
-    #15 0x55ca90927231 in glib_pollfds_poll /home/elmarco/src/qemu/util/m=
-ain-loop.c:214
-    #16 0x55ca90927420 in os_host_main_loop_wait /home/elmarco/src/qemu/u=
-til/main-loop.c:261
-    #17 0x55ca909275fa in main_loop_wait /home/elmarco/src/qemu/util/main=
--loop.c:515
-    #18 0x55ca8fc1c2a4 in main_loop /home/elmarco/src/qemu/vl.c:1942
-    #19 0x55ca8fc2eb3a in main /home/elmarco/src/qemu/vl.c:4724
-    #20 0x7f60e4082009 in __libc_start_main (/lib64/libc.so.6+0x21009)
+>=20
+>>
+>> This is what we call the nightmare of nested virtualization (see x86),
+>> because we have to emulate L3 instructions in L1 - but even worse, not
+>> even in L1 kernel space but in L1 user space.
+>=20
+> As soon as one level begin to virtualize, all levels under it
+> must virtualize too so that L3 instructions will be handled in L2
+> which will issue instructions that will be handled in L1.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- migration/migration.c | 1 +
- 1 file changed, 1 insertion(+)
+By virtualize I assume you mean emulate? If so, yes.
 
-diff --git a/migration/migration.c b/migration/migration.c
-index e345d0cc7e..62c243d2d4 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2541,6 +2541,7 @@ static void migration_instance_finalize(Object *obj=
-)
-     g_free(params->tls_hostname);
-     g_free(params->tls_creds);
-     qemu_sem_destroy(&ms->pause_sem);
-+    error_free(ms->error);
- }
-=20
- static void migration_instance_init(Object *obj)
+>>
+>> So we could never provide the AP feature reliably with the SIE feature=
+.
+>=20
+> I think we should change a little this sentence to:
+> We can not provide SIE interpretation to a guest from which
+> any guest level N-1 does not use SIE interpretation.
+
+Exactly, and as said, there is no way to tell a guest that it has AP but
+cannot use AP interpretation but has to intercept and handle manually.
+
+>=20
+> Nothing bad will occur for the host, the hardware or other guests,
+> but the guest will just not get any device.
+>=20
+>> We want to avoid interdependence between CPU features. (because
+>> everything else makes CPU feature detection ugly - CMMA is a good
+>> example and the only exception so far)
+>>
+>>
+>> Long story even shorter:
+>>
+>> No emulated AP devices with KVM.
+>>
+> I agree with: KVM should never set bits in CRYCB for emulated devices.
+
+I think this is stronger: emulated AP devices should not be used with
+KVM because it can potentially lead to architectural (v)SIE conflicts.
+
+But the details are buried in some AP documentation not accessible to me.
+
+Anyhow, if the scenario I described cannot be worked around via:
+
+a) telling a guest that AP virtualization cannot be used - which doesn't
+seem to be possible
+b) provoking for selected devices a SIE exit when an AP instruction is
+executed on these devices - and this is totally fine with the documented
+AP architecture
+
+I assume we would have to live with !emualted AP devices.
+
 --=20
-2.16.2.346.g9779355e34
+
+Thanks,
+
+David / dhildenb
