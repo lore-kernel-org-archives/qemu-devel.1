@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1et9nx-0002wn-Bc
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 05:26:46 -0500
+	(envelope-from <berrange@redhat.com>) id 1et9r8-0003sm-7s
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 05:30:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1et9nu-0002qx-9B
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 05:26:45 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52160 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1et9r5-00056G-5c
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 05:30:02 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49828 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1et9nu-0002qb-5J
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 05:26:42 -0500
-References: <1519900415-30314-1-git-send-email-yi.l.liu@linux.intel.com>
-	<1519900415-30314-12-git-send-email-yi.l.liu@linux.intel.com>
-	<a899b75f-5a0b-2a0f-f995-5a3c21eeab8c@redhat.com>
-	<20180305091119.GH2482@sky-dev>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <afb9cbb9-3b05-7677-5707-6deb540daf26@redhat.com>
-Date: Tue, 6 Mar 2018 11:26:30 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1et9r5-00055Q-0v
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 05:29:59 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 42215406E1D2
+	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 10:29:54 +0000 (UTC)
+Date: Tue, 6 Mar 2018 10:29:47 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180306102947.GE6163@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180305064324.9238-1-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180305091119.GH2482@sky-dev>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 11/12] intel_iommu: add framework for
- PASID AddressSpace management
+Content-Disposition: inline
+In-Reply-To: <20180305064324.9238-1-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/6] qio: general non-default
+ GMainContext support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,29 +34,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, david@gibson.dropbear.id.au, kevin.tian@intel.com, yi.l.liu@intel.com, jasowang@redhat.com, peterx@redhat.com, alex.williamson@redhat.com, eric.auger.pro@gmail.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 05/03/2018 10:11, Liu, Yi L wrote:
->> Do you really need VTDDeviceNode?  I think can you simply put the
->> QLIST_ENTRY in VTDAddressSpace (named e.g. next_by_pasid), since
->> VTDAddressSpace already includes a (bus, devfn).
-> Existing VTDAddressSpace is actaully per-device. While for PASID tagged
-> address space, it is possible to have multiple devices tied to a single
-> PASID tagged address space.
+On Mon, Mar 05, 2018 at 02:43:18PM +0800, Peter Xu wrote:
+> V1: http://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg06972.html
+> V2: http://lists.gnu.org/archive/html/qemu-devel/2018-03/msg00016.html
+> 
+> From this version, I'll split the old series into two: one QIO series
+> and one CHARDEV series.  This is the QIO part.
+> 
+> Hopefully I have addressed every comments in v2.  Please shoot if I
+> missed any of them.  Thanks,
 
-Yes, that's the purpose of VTDPASIDAddressSpace.
+Thanks, I'm queuing this series and will send a pull req for it
+assuming it passes the usual tests.
 
-> Reuse VTDAddressSpace could be a choice since
-> it is a per-device structure, but it may be missleading since there is
-> other fileds in VTDAddressSpace. This is why I proposed to have VTDDevi=
-ceNode.
 
-I think it's okay to put all per-device setup in VTDAddressSpace.  Later
-if it makes sense VTDAddressSpace could become a union, according to
-whether the IOMMU is configured for PASID or requester ID operation, and
-could be renamed to VTDDeviceInfo.  But for now it's not needed.
-
-Paolo
-
-> But consolidation is possible here.
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
