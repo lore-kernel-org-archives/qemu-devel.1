@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36227)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1etLVp-00066J-Jy
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 17:56:50 -0500
+	id 1etLZ3-0007UL-A9
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:00:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1etLVm-000626-Gh
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 17:56:49 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:32918)
+	id 1etLYx-0006sQ-Jj
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:00:09 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:56244)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1etLVm-000620-5a
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 17:56:46 -0500
-Received: by mail-wm0-x244.google.com with SMTP id s206so20104024wme.0
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 14:56:45 -0800 (PST)
+	id 1etLYx-0006sD-BK
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:00:03 -0500
+Received: by mail-wm0-x243.google.com with SMTP id q83so1262653wme.5
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 15:00:03 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1520369037-37977-1-git-send-email-mjc@sifive.com>
-	<1520369037-37977-3-git-send-email-mjc@sifive.com>
+	<1520369037-37977-6-git-send-email-mjc@sifive.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <bc9ac5d7-7090-1059-8243-93ea50cec18d@amsat.org>
-Date: Tue, 6 Mar 2018 19:56:41 -0300
+Message-ID: <cbb078ea-6339-cf49-1c7f-d61b39b14f64@amsat.org>
+Date: Tue, 6 Mar 2018 20:00:00 -0300
 MIME-Version: 1.0
-In-Reply-To: <1520369037-37977-3-git-send-email-mjc@sifive.com>
+In-Reply-To: <1520369037-37977-6-git-send-email-mjc@sifive.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 02/22] RISC-V: Replace hardcoded
- constants with enum values
+Subject: Re: [Qemu-devel] [PATCH v1 05/22] RISC-V: Remove redundant
+ identity_translate from
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,11 +37,12 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches load_elf <patches@groups.riscv.org>
 
 On 03/06/2018 05:43 PM, Michael Clark wrote:
-> The RISC-V device-tree code has a number of hard-coded
-> constants and this change moves them into header enums.
+> When load_elf is called with NULL as an argument to the
+> address translate callback, it does an identity translation.
+> This commit removes the redundant identity_translate callback.
 > 
 > Signed-off-by: Michael Clark <mjc@sifive.com>
 > Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
@@ -49,173 +50,98 @@ On 03/06/2018 05:43 PM, Michael Clark wrote:
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  hw/riscv/sifive_clint.c         | 9 +++------
->  hw/riscv/sifive_u.c             | 6 ++++--
->  hw/riscv/spike.c                | 6 ++++--
->  hw/riscv/virt.c                 | 6 ++++--
->  include/hw/riscv/sifive_clint.h | 4 ++++
->  include/hw/riscv/sifive_u.h     | 4 ++++
->  include/hw/riscv/spike.h        | 4 ++++
->  include/hw/riscv/virt.h         | 4 ++++
->  8 files changed, 31 insertions(+), 12 deletions(-)
+>  hw/riscv/sifive_e.c | 7 +------
+>  hw/riscv/sifive_u.c | 7 +------
+>  hw/riscv/spike.c    | 7 +------
+>  hw/riscv/virt.c     | 7 +------
+>  4 files changed, 4 insertions(+), 24 deletions(-)
 > 
-> diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
-> index 4893453..7cc606e 100644
-> --- a/hw/riscv/sifive_clint.c
-> +++ b/hw/riscv/sifive_clint.c
-> @@ -26,13 +26,10 @@
->  #include "hw/riscv/sifive_clint.h"
->  #include "qemu/timer.h"
+> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+> index 19eca36..09c9d49 100644
+> --- a/hw/riscv/sifive_e.c
+> +++ b/hw/riscv/sifive_e.c
+> @@ -82,16 +82,11 @@ static void copy_le32_to_phys(hwaddr pa, uint32_t *rom, size_t len)
+>      }
+>  }
 >  
-> -/* See: riscv-pk/machine/sbi_entry.S and arch/riscv/kernel/time.c */
-> -#define TIMER_FREQ (10 * 1000 * 1000)
+> -static uint64_t identity_translate(void *opaque, uint64_t addr)
+> -{
+> -    return addr;
+> -}
 > -
->  static uint64_t cpu_riscv_read_rtc(void)
+>  static uint64_t load_kernel(const char *kernel_filename)
 >  {
-> -    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL), TIMER_FREQ,
-> -                    NANOSECONDS_PER_SECOND);
-> +    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-> +        SIFIVE_CLINT_TIMEBASE_FREQ, NANOSECONDS_PER_SECOND);
->  }
+>      uint64_t kernel_entry, kernel_high;
 >  
->  /*
-> @@ -59,7 +56,7 @@ static void sifive_clint_write_timecmp(RISCVCPU *cpu, uint64_t value)
->      diff = cpu->env.timecmp - rtc_r;
->      /* back to ns (note args switched in muldiv64) */
->      next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-> -        muldiv64(diff, NANOSECONDS_PER_SECOND, TIMER_FREQ);
-> +        muldiv64(diff, NANOSECONDS_PER_SECOND, SIFIVE_CLINT_TIMEBASE_FREQ);
->      timer_mod(cpu->env.timer, next);
->  }
->  
+> -    if (load_elf(kernel_filename, identity_translate, NULL,
+> +    if (load_elf(kernel_filename, NULL, NULL,
+>                   &kernel_entry, NULL, &kernel_high,
+>                   0, ELF_MACHINE, 1, 0) < 0) {
+>          error_report("qemu: could not load kernel '%s'", kernel_filename);
 > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index 1c2deef..f3f7615 100644
+> index f3f7615..6116c38 100644
 > --- a/hw/riscv/sifive_u.c
 > +++ b/hw/riscv/sifive_u.c
-> @@ -122,7 +122,8 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
->      g_free(nodename);
+> @@ -68,16 +68,11 @@ static void copy_le32_to_phys(hwaddr pa, uint32_t *rom, size_t len)
+>      }
+>  }
 >  
->      qemu_fdt_add_subnode(fdt, "/cpus");
-> -    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency", 10000000);
-> +    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
-> +        SIFIVE_CLINT_TIMEBASE_FREQ);
->      qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
->      qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
+> -static uint64_t identity_translate(void *opaque, uint64_t addr)
+> -{
+> -    return addr;
+> -}
+> -
+>  static uint64_t load_kernel(const char *kernel_filename)
+>  {
+>      uint64_t kernel_entry, kernel_high;
 >  
-> @@ -131,7 +132,8 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
->          char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
->          char *isa = riscv_isa_string(&s->soc.harts[cpu]);
->          qemu_fdt_add_subnode(fdt, nodename);
-> -        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 1000000000);
-> +        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
-> +                              SIFIVE_U_CLOCK_FREQ);
->          qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
->          qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
->          qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
+> -    if (load_elf(kernel_filename, identity_translate, NULL,
+> +    if (load_elf(kernel_filename, NULL, NULL,
+>                   &kernel_entry, NULL, &kernel_high,
+>                   0, ELF_MACHINE, 1, 0) < 0) {
+>          error_report("qemu: could not load kernel '%s'", kernel_filename);
 > diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-> index 2d1f114..4c233ec 100644
+> index 4c233ec..7710333 100644
 > --- a/hw/riscv/spike.c
 > +++ b/hw/riscv/spike.c
-> @@ -115,7 +115,8 @@ static void create_fdt(SpikeState *s, const struct MemmapEntry *memmap,
->      g_free(nodename);
+> @@ -59,16 +59,11 @@ static void copy_le32_to_phys(hwaddr pa, uint32_t *rom, size_t len)
+>      }
+>  }
 >  
->      qemu_fdt_add_subnode(fdt, "/cpus");
-> -    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency", 10000000);
-> +    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
-> +        SIFIVE_CLINT_TIMEBASE_FREQ);
->      qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
->      qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
+> -static uint64_t identity_translate(void *opaque, uint64_t addr)
+> -{
+> -    return addr;
+> -}
+> -
+>  static uint64_t load_kernel(const char *kernel_filename)
+>  {
+>      uint64_t kernel_entry, kernel_high;
 >  
-> @@ -124,7 +125,8 @@ static void create_fdt(SpikeState *s, const struct MemmapEntry *memmap,
->          char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
->          char *isa = riscv_isa_string(&s->soc.harts[cpu]);
->          qemu_fdt_add_subnode(fdt, nodename);
-> -        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 1000000000);
-> +        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
-> +                              SPIKE_CLOCK_FREQ);
->          qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
->          qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
->          qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
+> -    if (load_elf_ram_sym(kernel_filename, identity_translate, NULL,
+> +    if (load_elf_ram_sym(kernel_filename, NULL, NULL,
+>              &kernel_entry, NULL, &kernel_high, 0, ELF_MACHINE, 1, 0,
+>              NULL, true, htif_symbol_callback) < 0) {
+>          error_report("qemu: could not load kernel '%s'", kernel_filename);
 > diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> index 37968d2..a402856 100644
+> index 0d101fc..f8c19b4 100644
 > --- a/hw/riscv/virt.c
 > +++ b/hw/riscv/virt.c
-> @@ -145,7 +145,8 @@ static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
->      g_free(nodename);
+> @@ -62,16 +62,11 @@ static void copy_le32_to_phys(hwaddr pa, uint32_t *rom, size_t len)
+>      }
+>  }
 >  
->      qemu_fdt_add_subnode(fdt, "/cpus");
-> -    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency", 10000000);
-> +    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
-> +                          SIFIVE_CLINT_TIMEBASE_FREQ);
->      qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
->      qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
+> -static uint64_t identity_translate(void *opaque, uint64_t addr)
+> -{
+> -    return addr;
+> -}
+> -
+>  static uint64_t load_kernel(const char *kernel_filename)
+>  {
+>      uint64_t kernel_entry, kernel_high;
 >  
-> @@ -155,7 +156,8 @@ static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
->          char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
->          char *isa = riscv_isa_string(&s->soc.harts[cpu]);
->          qemu_fdt_add_subnode(fdt, nodename);
-> -        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 1000000000);
-> +        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
-> +                              VIRT_CLOCK_FREQ);
->          qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
->          qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
->          qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
-> diff --git a/include/hw/riscv/sifive_clint.h b/include/hw/riscv/sifive_clint.h
-> index aaa2a58..e2865be 100644
-> --- a/include/hw/riscv/sifive_clint.h
-> +++ b/include/hw/riscv/sifive_clint.h
-> @@ -47,4 +47,8 @@ enum {
->      SIFIVE_TIME_BASE    = 0xBFF8
->  };
->  
-> +enum {
-> +    SIFIVE_CLINT_TIMEBASE_FREQ = 10000000
-> +};
-> +
->  #endif
-> diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
-> index 662e8a1..be38aa0 100644
-> --- a/include/hw/riscv/sifive_u.h
-> +++ b/include/hw/riscv/sifive_u.h
-> @@ -50,6 +50,10 @@ enum {
->      SIFIVE_U_UART1_IRQ = 4
->  };
->  
-> +enum {
-> +    SIFIVE_U_CLOCK_FREQ = 1000000000
-> +};
-> +
->  #define SIFIVE_U_PLIC_HART_CONFIG "MS"
->  #define SIFIVE_U_PLIC_NUM_SOURCES 127
->  #define SIFIVE_U_PLIC_NUM_PRIORITIES 7
-> diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
-> index cb55a14..d85a64e 100644
-> --- a/include/hw/riscv/spike.h
-> +++ b/include/hw/riscv/spike.h
-> @@ -42,6 +42,10 @@ enum {
->      SPIKE_DRAM
->  };
->  
-> +enum {
-> +    SPIKE_CLOCK_FREQ = 1000000000
-> +};
-> +
->  #if defined(TARGET_RISCV32)
->  #define SPIKE_V1_09_1_CPU TYPE_RISCV_CPU_RV32GCSU_V1_09_1
->  #define SPIKE_V1_10_0_CPU TYPE_RISCV_CPU_RV32GCSU_V1_10_0
-> diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
-> index 7525647..2fbe808 100644
-> --- a/include/hw/riscv/virt.h
-> +++ b/include/hw/riscv/virt.h
-> @@ -55,6 +55,10 @@ enum {
->      VIRTIO_NDEV = 10
->  };
->  
-> +enum {
-> +    VIRT_CLOCK_FREQ = 1000000000
-> +};
-> +
->  #define VIRT_PLIC_HART_CONFIG "MS"
->  #define VIRT_PLIC_NUM_SOURCES 127
->  #define VIRT_PLIC_NUM_PRIORITIES 7
+> -    if (load_elf(kernel_filename, identity_translate, NULL,
+> +    if (load_elf(kernel_filename, NULL, NULL,
+>                   &kernel_entry, NULL, &kernel_high,
+>                   0, ELF_MACHINE, 1, 0) < 0) {
+>          error_report("qemu: could not load kernel '%s'", kernel_filename);
 > 
