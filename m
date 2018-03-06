@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1et87K-0005cU-0f
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 03:38:39 -0500
+	(envelope-from <liran.alon@oracle.com>) id 1et8H5-0001LO-SM
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 03:48:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1et87H-0003i1-Em
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 03:38:38 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48418 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1et87H-0003hu-9Z
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 03:38:35 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D95C0EAEA0
-	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 08:38:34 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue,  6 Mar 2018 09:38:32 +0100
-Message-Id: <20180306083832.8144-4-kraxel@redhat.com>
-In-Reply-To: <20180306083832.8144-1-kraxel@redhat.com>
-References: <20180306083832.8144-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] spice: add cursor_dmabuf support
+	(envelope-from <liran.alon@oracle.com>) id 1et8H2-00089H-LM
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 03:48:43 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:56848)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+	id 1et8H2-00087C-8T
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 03:48:40 -0500
+MIME-Version: 1.0
+Message-ID: <5d7bae55-cb34-4894-9806-f8514ec2d7db@default>
+Date: Tue, 6 Mar 2018 00:48:35 -0800 (PST)
+From: Liran Alon <liran.alon@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Subject: Re: [Qemu-devel] [PATCH] KVM: x86: Add support for save/load
+ MSR_SMI_COUNT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,200 +28,160 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: konrad.wilk@oracle.com, rth@twiddle.net, mtosatti@redhat.com, pbonzini@redhat.com, habkost@redhat.com, kvm@vger.kernel.org
 
-Add support for cursor dmabufs.  qemu has to render the cursor for
-that, so in case a cursor is present qemu allocates a new dmabuf, blits
-the scanout, blends in the pointer and passes on the new dmabuf to
-spice-server.  Without cursor qemu continues to simply pass on the
-scanout dmabuf as-is.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- include/ui/spice-display.h |   9 ++++
- ui/spice-display.c         | 114 +++++++++++++++++++++++++++++++++++++++++++--
- ui/trace-events            |   3 ++
- 3 files changed, 121 insertions(+), 5 deletions(-)
+Gentle ping.
+(http://patchwork.ozlabs.org/patch/878657/)
 
-diff --git a/include/ui/spice-display.h b/include/ui/spice-display.h
-index 6b5c73b21c..87a84a59d4 100644
---- a/include/ui/spice-display.h
-+++ b/include/ui/spice-display.h
-@@ -122,6 +122,15 @@ struct SimpleSpiceDisplay {
-     int gl_updates;
-     bool have_scanout;
-     bool have_surface;
-+
-+    QemuDmaBuf *guest_dmabuf;
-+    bool guest_dmabuf_refresh;
-+    bool render_cursor;
-+
-+    egl_fb guest_fb;
-+    egl_fb blit_fb;
-+    egl_fb cursor_fb;
-+    bool have_hot;
- #endif
- };
- 
-diff --git a/ui/spice-display.c b/ui/spice-display.c
-index a494db1196..61edc9d1ea 100644
---- a/ui/spice-display.c
-+++ b/ui/spice-display.c
-@@ -941,25 +941,126 @@ static void qemu_spice_gl_scanout_dmabuf(DisplayChangeListener *dcl,
- {
-     SimpleSpiceDisplay *ssd = container_of(dcl, SimpleSpiceDisplay, dcl);
- 
--    /* note: spice server will close the fd, so hand over a dup */
--    spice_qxl_gl_scanout(&ssd->qxl, dup(dmabuf->fd),
--                         dmabuf->width, dmabuf->height,
--                         dmabuf->stride, dmabuf->fourcc, false);
--    qemu_spice_gl_monitor_config(ssd, 0, 0, dmabuf->width, dmabuf->height);
-+    ssd->guest_dmabuf = dmabuf;
-+    ssd->guest_dmabuf_refresh = true;
-+
-     ssd->have_surface = false;
-     ssd->have_scanout = true;
- }
- 
-+static void qemu_spice_gl_cursor_dmabuf(DisplayChangeListener *dcl,
-+                                        QemuDmaBuf *dmabuf, bool have_hot,
-+                                        uint32_t hot_x, uint32_t hot_y)
-+{
-+    SimpleSpiceDisplay *ssd = container_of(dcl, SimpleSpiceDisplay, dcl);
-+
-+    ssd->have_hot = have_hot;
-+    ssd->hot_x = hot_x;
-+    ssd->hot_y = hot_y;
-+
-+    trace_qemu_spice_gl_cursor(ssd->qxl.id, dmabuf != NULL, have_hot);
-+    if (dmabuf) {
-+        egl_dmabuf_import_texture(dmabuf);
-+        if (!dmabuf->texture) {
-+            return;
-+        }
-+        egl_fb_setup_for_tex(&ssd->cursor_fb, dmabuf->width, dmabuf->height,
-+                             dmabuf->texture, false);
-+    } else {
-+        egl_fb_destroy(&ssd->cursor_fb);
-+    }
-+}
-+
-+static void qemu_spice_gl_cursor_position(DisplayChangeListener *dcl,
-+                                          uint32_t pos_x, uint32_t pos_y)
-+{
-+    SimpleSpiceDisplay *ssd = container_of(dcl, SimpleSpiceDisplay, dcl);
-+
-+    ssd->ptr_x = pos_x;
-+    ssd->ptr_y = pos_y;
-+}
-+
-+static void qemu_spice_gl_release_dmabuf(DisplayChangeListener *dcl,
-+                                         QemuDmaBuf *dmabuf)
-+{
-+    SimpleSpiceDisplay *ssd = container_of(dcl, SimpleSpiceDisplay, dcl);
-+
-+    if (ssd->guest_dmabuf == dmabuf) {
-+        ssd->guest_dmabuf = NULL;
-+        ssd->guest_dmabuf_refresh = false;
-+    }
-+    egl_dmabuf_release_texture(dmabuf);
-+}
-+
- static void qemu_spice_gl_update(DisplayChangeListener *dcl,
-                                  uint32_t x, uint32_t y, uint32_t w, uint32_t h)
- {
-     SimpleSpiceDisplay *ssd = container_of(dcl, SimpleSpiceDisplay, dcl);
-+    EGLint stride = 0, fourcc = 0;
-+    bool render_cursor = false;
-+    bool y_0_top = false; /* FIXME */
-     uint64_t cookie;
-+    int fd;
- 
-     if (!ssd->have_scanout) {
-         return;
-     }
- 
-+    if (ssd->cursor_fb.texture) {
-+        render_cursor = true;
-+    }
-+    if (ssd->render_cursor != render_cursor) {
-+        ssd->render_cursor = render_cursor;
-+        ssd->guest_dmabuf_refresh = true;
-+        egl_fb_destroy(&ssd->blit_fb);
-+    }
-+
-+    if (ssd->guest_dmabuf_refresh) {
-+        QemuDmaBuf *dmabuf = ssd->guest_dmabuf;
-+        if (render_cursor) {
-+            egl_dmabuf_import_texture(dmabuf);
-+            if (!dmabuf->texture) {
-+                return;
-+            }
-+
-+            /* source framebuffer */
-+            egl_fb_setup_for_tex(&ssd->guest_fb,
-+                                 dmabuf->width, dmabuf->height,
-+                                 dmabuf->texture, false);
-+
-+            /* dest framebuffer */
-+            if (ssd->blit_fb.width  != dmabuf->width ||
-+                ssd->blit_fb.height != dmabuf->height) {
-+                trace_qemu_spice_gl_render_dmabuf(ssd->qxl.id, dmabuf->width,
-+                                                  dmabuf->height);
-+                egl_fb_destroy(&ssd->blit_fb);
-+                egl_fb_setup_new_tex(&ssd->blit_fb,
-+                                     dmabuf->width, dmabuf->height);
-+                fd = egl_get_fd_for_texture(ssd->blit_fb.texture,
-+                                            &stride, &fourcc);
-+                spice_qxl_gl_scanout(&ssd->qxl, fd,
-+                                     dmabuf->width, dmabuf->height,
-+                                     stride, fourcc, false);
-+            }
-+        } else {
-+            trace_qemu_spice_gl_forward_dmabuf(ssd->qxl.id,
-+                                               dmabuf->width, dmabuf->height);
-+            /* note: spice server will close the fd, so hand over a dup */
-+            spice_qxl_gl_scanout(&ssd->qxl, dup(dmabuf->fd),
-+                                 dmabuf->width, dmabuf->height,
-+                                 dmabuf->stride, dmabuf->fourcc, false);
-+        }
-+        qemu_spice_gl_monitor_config(ssd, 0, 0, dmabuf->width, dmabuf->height);
-+        ssd->guest_dmabuf_refresh = false;
-+    }
-+
-+    if (render_cursor) {
-+        egl_texture_blit(ssd->gls, &ssd->blit_fb, &ssd->guest_fb,
-+                         !y_0_top);
-+        egl_texture_blend(ssd->gls, &ssd->blit_fb, &ssd->cursor_fb,
-+                          !y_0_top, ssd->ptr_x, ssd->ptr_y);
-+        glFlush();
-+    }
- 
-     trace_qemu_spice_gl_update(ssd->qxl.id, w, h, x, y);
-     qemu_spice_gl_block(ssd, true);
-@@ -984,6 +1085,9 @@ static const DisplayChangeListenerOps display_listener_gl_ops = {
-     .dpy_gl_scanout_disable  = qemu_spice_gl_scanout_disable,
-     .dpy_gl_scanout_texture  = qemu_spice_gl_scanout_texture,
-     .dpy_gl_scanout_dmabuf   = qemu_spice_gl_scanout_dmabuf,
-+    .dpy_gl_cursor_dmabuf    = qemu_spice_gl_cursor_dmabuf,
-+    .dpy_gl_cursor_position  = qemu_spice_gl_cursor_position,
-+    .dpy_gl_release_dmabuf   = qemu_spice_gl_release_dmabuf,
-     .dpy_gl_update           = qemu_spice_gl_update,
- };
- 
-diff --git a/ui/trace-events b/ui/trace-events
-index 518e950a01..a957f363f1 100644
---- a/ui/trace-events
-+++ b/ui/trace-events
-@@ -83,6 +83,9 @@ qemu_spice_ui_info(int qid, uint32_t width, uint32_t height) "%d %dx%d"
- qemu_spice_gl_surface(int qid, uint32_t w, uint32_t h, uint32_t fourcc) "%d %dx%d, fourcc 0x%x"
- qemu_spice_gl_scanout_disable(int qid) "%d"
- qemu_spice_gl_scanout_texture(int qid, uint32_t w, uint32_t h, uint32_t fourcc) "%d %dx%d, fourcc 0x%x"
-+qemu_spice_gl_cursor(int qid, bool enabled, bool hotspot) "%d enabled %d, hotspot %d"
-+qemu_spice_gl_forward_dmabuf(int qid, uint32_t width, uint32_t height) "%d %dx%d"
-+qemu_spice_gl_render_dmabuf(int qid, uint32_t width, uint32_t height) "%d %dx%d"
- qemu_spice_gl_update(int qid, uint32_t x, uint32_t y, uint32_t w, uint32_t h) "%d +%d+%d %dx%d"
- 
- # ui/keymaps.c
--- 
-2.9.3
+----- liran.alon@oracle.com wrote:
+
+> This MSR returns the number of #SMIs that occurred on
+> CPU since boot.
+>=20
+> KVM commit 52797bf9a875 ("KVM: x86: Add emulation of MSR_SMI_COUNT")
+> introduced support for emulating this MSR.
+>=20
+> This commit adds support for QEMU to save/load this
+> MSR for migration purposes.
+>=20
+> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+> Reviewed-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+> Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+> ---
+>  target/i386/cpu.c     |  1 +
+>  target/i386/cpu.h     |  3 +++
+>  target/i386/kvm.c     | 13 +++++++++++++
+>  target/i386/machine.c | 20 ++++++++++++++++++++
+>  4 files changed, 37 insertions(+)
+>=20
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index b5e431e769da..ba9ec6a6116b 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -3645,6 +3645,7 @@ static void x86_cpu_reset(CPUState *s)
+>      cpu_x86_update_cr0(env, 0x60000010);
+>      env->a20_mask =3D ~0x0;
+>      env->smbase =3D 0x30000;
+> +    env->msr_smi_count =3D 0;
+> =20
+>      env->idt.limit =3D 0xffff;
+>      env->gdt.limit =3D 0xffff;
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index faf39ec1ce77..254e557bb8fa 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1,3 +1,4 @@
+> +
+>  /*
+>   * i386 virtual CPU header
+>   *
+> @@ -359,6 +360,7 @@ typedef enum X86Seg {
+>  #define MSR_P6_PERFCTR0                 0xc1
+> =20
+>  #define MSR_IA32_SMBASE                 0x9e
+> +#define MSR_SMI_COUNT                   0x34
+>  #define MSR_MTRRcap                     0xfe
+>  #define MSR_MTRRcap_VCNT                8
+>  #define MSR_MTRRcap_FIXRANGE_SUPPORT    (1 << 8)
+> @@ -1123,6 +1125,7 @@ typedef struct CPUX86State {
+> =20
+>      uint64_t pat;
+>      uint32_t smbase;
+> +    uint64_t msr_smi_count;
+> =20
+>      uint32_t pkru;
+> =20
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index ad4b159b28af..a53735f266c5 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -92,6 +92,7 @@ static bool has_msr_hv_stimer;
+>  static bool has_msr_hv_frequencies;
+>  static bool has_msr_xss;
+>  static bool has_msr_spec_ctrl;
+> +static bool has_msr_smi_count;
+> =20
+>  static uint32_t has_architectural_pmu_version;
+>  static uint32_t num_architectural_pmu_gp_counters;
+> @@ -1124,6 +1125,9 @@ static int kvm_get_supported_msrs(KVMState *s)
+>                  case MSR_IA32_SMBASE:
+>                      has_msr_smbase =3D true;
+>                      break;
+> +                case MSR_SMI_COUNT:
+> +                    has_msr_smi_count =3D true;
+> +                    break;
+>                  case MSR_IA32_MISC_ENABLE:
+>                      has_msr_misc_enable =3D true;
+>                      break;
+> @@ -1633,6 +1637,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+>      if (has_msr_smbase) {
+>          kvm_msr_entry_add(cpu, MSR_IA32_SMBASE, env->smbase);
+>      }
+> +    if (has_msr_smi_count) {
+> +        kvm_msr_entry_add(cpu, MSR_SMI_COUNT, env->msr_smi_count);
+> +    }
+>      if (has_msr_bndcfgs) {
+>          kvm_msr_entry_add(cpu, MSR_IA32_BNDCFGS, env->msr_bndcfgs);
+>      }
+> @@ -1979,6 +1986,9 @@ static int kvm_get_msrs(X86CPU *cpu)
+>      if (has_msr_smbase) {
+>          kvm_msr_entry_add(cpu, MSR_IA32_SMBASE, 0);
+>      }
+> +    if (has_msr_smi_count) {
+> +        kvm_msr_entry_add(cpu, MSR_SMI_COUNT, 0);
+> +    }
+>      if (has_msr_feature_control) {
+>          kvm_msr_entry_add(cpu, MSR_IA32_FEATURE_CONTROL, 0);
+>      }
+> @@ -2205,6 +2215,9 @@ static int kvm_get_msrs(X86CPU *cpu)
+>          case MSR_IA32_SMBASE:
+>              env->smbase =3D msrs[i].data;
+>              break;
+> +        case MSR_SMI_COUNT:
+> +            env->msr_smi_count =3D msrs[i].data;
+> +            break;
+>          case MSR_IA32_FEATURE_CONTROL:
+>              env->msr_ia32_feature_control =3D msrs[i].data;
+>              break;
+> diff --git a/target/i386/machine.c b/target/i386/machine.c
+> index 361c05aedfdc..9432496cbda8 100644
+> --- a/target/i386/machine.c
+> +++ b/target/i386/machine.c
+> @@ -395,6 +395,25 @@ static const VMStateDescription
+> vmstate_msr_tsc_adjust =3D {
+>      }
+>  };
+> =20
+> +static bool msr_smi_count_needed(void *opaque)
+> +{
+> +    X86CPU *cpu =3D opaque;
+> +    CPUX86State *env =3D &cpu->env;
+> +
+> +    return env->msr_smi_count !=3D 0;
+> +}
+> +
+> +static const VMStateDescription vmstate_msr_smi_count =3D {
+> +    .name =3D "cpu/msr_smi_count",
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .needed =3D msr_smi_count_needed,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_UINT64(env.msr_smi_count, X86CPU),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  static bool tscdeadline_needed(void *opaque)
+>  {
+>      X86CPU *cpu =3D opaque;
+> @@ -952,6 +971,7 @@ VMStateDescription vmstate_x86_cpu =3D {
+>          &vmstate_avx512,
+>          &vmstate_xss,
+>          &vmstate_tsc_khz,
+> +        &vmstate_msr_smi_count,
+>  #ifdef TARGET_X86_64
+>          &vmstate_pkru,
+>  #endif
+> --=20
+> 1.9.1
