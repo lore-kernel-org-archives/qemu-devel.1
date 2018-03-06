@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1etEly-00078E-EE
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:45:03 -0500
+	(envelope-from <berrange@redhat.com>) id 1etEnV-0008Ey-IT
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:46:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1etElu-00015G-7l
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:45:02 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38870)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1etElt-00012w-V8
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:44:58 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w26FisWr127513
-	for <qemu-devel@nongnu.org>; Tue, 6 Mar 2018 10:44:55 -0500
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ghwjq146y-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 10:44:40 -0500
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Tue, 6 Mar 2018 08:44:26 -0700
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Tue,  6 Mar 2018 12:44:11 -0300
-Message-Id: <20180306154411.18462-1-danielhb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 1/1] scsi-disk.c: consider bl->max_transfer in
- INQUIRY emulation
+	(envelope-from <berrange@redhat.com>) id 1etEnR-00026k-CE
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:46:37 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40686 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1etEnR-00026X-6K
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:46:33 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5B07B4023155
+	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 15:46:32 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Tue,  6 Mar 2018 15:46:25 +0000
+Message-Id: <20180306154625.23910-1-berrange@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] trace: only permit standard C types and fixed
+ size integer types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,59 +32,109 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, famz@redhat.com, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-The calculation of the max_transfer atribute of BlockDriverState
-makes considerations such as max_segments and transfer_length via
-the BLKSECTGET ioctl (if available).
+Some trace backends will compile code based on the declared trace
+events. It should not be assumed that the backends can resolve any QEMU
+specific typedefs. So trace events should restrict their argument
+types to the standard C types and fixed size integer types. Any complex
+pointer types can be declared as "void *" for purposes of trace events,
+since nothing will be dereferencing these pointer arguments.
 
-However, bl->max_transfer isn't considered when emulating the INQUIRY
-'Block Limit' response to the scsi-hd devices. This leads to situations
-where the declared max_sectors from the INQUIRY response is inconsistent
-with the block limits, which isn't ideal. It can also be misleading to the
-user that sets /sys/block/<dev>/queue/max_sectors_kb to a certain
-value, then finds a different value in the guest OS for the same disk.
-
-Following the same logic scsi_read_complete from scsi-generic.c does
-when patching the response of the Block Limits VPD back to the guest,
-change the max_io_sectors value of the emulated Block Limits VPD
-response by considering the blk_get_max_transfer of the related
-BlockDriverState. Use MIN_NOT_ZERO to be sure that the minimal
-value is chosen.
-
-Given that we're changing max_io_sectors, consider that min_io_sectors
-and opt_io_sectors can't be greater than the new calculated value.
-
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- hw/scsi/scsi-disk.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ scripts/tracetool/__init__.py | 45 +++++++++++++++++++++++++++++++++++++=
+++++++
+ trace-events                  |  6 +++---
+ 2 files changed, 48 insertions(+), 3 deletions(-)
 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 49d2559d93..c65c1ce56d 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -704,6 +704,21 @@ static int scsi_disk_emulate_inquiry(SCSIRequest *req, uint8_t *outbuf)
-                         page_code);
-                 return -1;
-             }
-+            if (s->qdev.type == TYPE_DISK) {
-+                int max_transfer_blk = blk_get_max_transfer(s->qdev.conf.blk);
-+                int max_io_sectors_blk =
-+                    max_transfer_blk / s->qdev.blocksize;
+diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.p=
+y
+index 3646c2b9fc..52cc687ae3 100644
+--- a/scripts/tracetool/__init__.py
++++ b/scripts/tracetool/__init__.py
+@@ -41,6 +41,50 @@ def out(*lines, **kwargs):
+     lines =3D [ l % kwargs for l in lines ]
+     sys.stdout.writelines("\n".join(lines) + "\n")
+=20
++# We only want to allow standard C types or fixed sized
++# integer types. We don't want QEMU specific types
++# as we can't assume trace backends can resolve all the
++# typedefs
++ALLOWED_TYPES =3D [
++    "int",
++    "long",
++    "short",
++    "char",
++    "bool",
++    "unsigned",
++    "signed",
++    "float",
++    "double",
++    "int8_t",
++    "uint8_t",
++    "int16_t",
++    "uint16_t",
++    "int32_t",
++    "uint32_t",
++    "int64_t",
++    "uint64_t",
++    "void",
++    "size_t",
++    "ssize_t",
++    "uintptr_t",
++    # Magic substitution is done by tracetool
++    "TCGv",
++]
 +
-+                max_io_sectors =
-+                    MIN_NON_ZERO(max_io_sectors_blk, max_io_sectors);
-+
-+                /* min_io_size and opt_io_size can't be greater than
-+                 * max_io_sectors */
-+                min_io_size =
-+                    MIN_NON_ZERO(min_io_size, max_io_sectors);
-+                opt_io_size =
-+                    MIN_NON_ZERO(opt_io_size, max_io_sectors);
-+            }
-             /* required VPD size with unmap support */
-             buflen = 0x40;
-             memset(outbuf + 4, 0, buflen - 4);
--- 
++def validate_type(name):
++    bits =3D name.split(" ")
++    for bit in bits:
++        bit =3D re.sub("\*", "", bit)
++        if bit =3D=3D "":
++            continue
++        if bit =3D=3D "const":
++            continue
++        if bit not in ALLOWED_TYPES:
++            raise ValueError("Argument type '%s' is not in whitelist. "
++                             "Only standard C types and fixed size integ=
+er "
++                             "types should be used. struct, union, and "
++                             "other complex pointer types should be "
++                             "declared as 'void *'" % name)
+=20
+ class Arguments:
+     """Event arguments description."""
+@@ -87,6 +131,7 @@ class Arguments:
+             else:
+                 arg_type, identifier =3D arg.rsplit(None, 1)
+=20
++            validate_type(arg_type)
+             res.append((arg_type, identifier))
+         return Arguments(res)
+=20
+diff --git a/trace-events b/trace-events
+index 89fcad0fd1..855b0ab240 100644
+--- a/trace-events
++++ b/trace-events
+@@ -68,9 +68,9 @@ memory_region_tb_read(int cpu_index, uint64_t addr, uin=
+t64_t value, unsigned siz
+ memory_region_tb_write(int cpu_index, uint64_t addr, uint64_t value, uns=
+igned size) "cpu %d addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
+ memory_region_ram_device_read(int cpu_index, void *mr, uint64_t addr, ui=
+nt64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRI=
+x64" size %u"
+ memory_region_ram_device_write(int cpu_index, void *mr, uint64_t addr, u=
+int64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PR=
+Ix64" size %u"
+-flatview_new(FlatView *view, MemoryRegion *root) "%p (root %p)"
+-flatview_destroy(FlatView *view, MemoryRegion *root) "%p (root %p)"
+-flatview_destroy_rcu(FlatView *view, MemoryRegion *root) "%p (root %p)"
++flatview_new(void *view, void *root) "%p (root %p)"
++flatview_destroy(void *view, void *root) "%p (root %p)"
++flatview_destroy_rcu(void *view, void *root) "%p (root %p)"
+=20
+ # gdbstub.c
+ gdbstub_op_start(const char *device) "Starting gdbstub using device %s"
+--=20
 2.14.3
