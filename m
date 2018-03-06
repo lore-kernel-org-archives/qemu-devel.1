@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1etJTS-0006hs-Px
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:46:15 -0500
+	(envelope-from <mjc@sifive.com>) id 1etJTV-0006kg-CO
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:46:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1etJTN-0003cd-Tp
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:46:14 -0500
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:42289)
+	(envelope-from <mjc@sifive.com>) id 1etJTU-0003eT-ML
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:46:17 -0500
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:36217)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1etJTN-0003cR-Nt
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:46:09 -0500
-Received: by mail-pl0-x243.google.com with SMTP id 93-v6so12546707plc.9
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 12:46:09 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1etJTU-0003eF-Fs
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:46:16 -0500
+Received: by mail-pg0-x244.google.com with SMTP id i14so8760824pgv.3
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 12:46:16 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Wed,  7 Mar 2018 09:43:52 +1300
-Message-Id: <1520369037-37977-18-git-send-email-mjc@sifive.com>
+Date: Wed,  7 Mar 2018 09:43:54 +1300
+Message-Id: <1520369037-37977-20-git-send-email-mjc@sifive.com>
 In-Reply-To: <1520369037-37977-1-git-send-email-mjc@sifive.com>
 References: <1520369037-37977-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v1 17/22] RISC-V: Ingore satp writes and return
- 0 for reads
+Subject: [Qemu-devel] [PATCH v1 19/22] RISC-V: riscv-qemu port supports sv39
+ and sv48
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,46 +27,28 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches when no-mmu <patches@groups.riscv.org>
-
-satp is WARL so it should not trap on illegal writes, rather
-it can be hardwired to zero and silently ignore illegal writes.
-
-It seems the RISC-V WARL behaviour is preferred to having to
-bear trap overhead, versus simply reading back the value and
-checking if the write took (saves hundreds of cycles and much
-more complex trap handling code).
+Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
 
 Signed-off-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- target/riscv/op_helper.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ target/riscv/cpu.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-index e34715d..dd3e417 100644
---- a/target/riscv/op_helper.c
-+++ b/target/riscv/op_helper.c
-@@ -242,7 +242,7 @@ void csr_write_helper(CPURISCVState *env, target_ulong val_to_write,
-     }
-     case CSR_SATP: /* CSR_SPTBR */ {
-         if (!riscv_feature(env, RISCV_FEATURE_MMU)) {
--            goto do_illegal;
-+            break;
-         }
-         if (env->priv_ver <= PRIV_VERSION_1_09_1 && (val_to_write ^ env->sptbr))
-         {
-@@ -452,7 +452,10 @@ target_ulong csr_read_helper(CPURISCVState *env, target_ulong csrno)
-         return env->scounteren;
-     case CSR_SCAUSE:
-         return env->scause;
--    case CSR_SPTBR:
-+    case CSR_SATP: /* CSR_SPTBR */
-+        if (!riscv_feature(env, RISCV_FEATURE_MMU)) {
-+            return 0;
-+        }
-         if (env->priv_ver >= PRIV_VERSION_1_10_0) {
-             return env->satp;
-         } else {
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 7c4482b..f47fc9c 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -24,8 +24,8 @@
+ #define TARGET_PAGE_BITS 12 /* 4 KiB Pages */
+ #if defined(TARGET_RISCV64)
+ #define TARGET_LONG_BITS 64
+-#define TARGET_PHYS_ADDR_SPACE_BITS 50
+-#define TARGET_VIRT_ADDR_SPACE_BITS 39
++#define TARGET_PHYS_ADDR_SPACE_BITS 52
++#define TARGET_VIRT_ADDR_SPACE_BITS 48
+ #elif defined(TARGET_RISCV32)
+ #define TARGET_LONG_BITS 32
+ #define TARGET_PHYS_ADDR_SPACE_BITS 34
 -- 
 2.7.0
