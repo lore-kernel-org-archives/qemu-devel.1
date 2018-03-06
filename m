@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1etCwq-0006Li-U4
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:48:11 -0500
+	(envelope-from <no-reply@patchew.org>) id 1etD3r-0003yt-1x
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:55:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1etCwp-0002AE-Gq
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:48:08 -0500
-Date: Tue, 6 Mar 2018 13:47:57 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180306134757.GH31045@stefanha-x1.localdomain>
-References: <20180226170313.8178-1-mreitz@redhat.com>
-	<20180227161743.GC32480@stefanha-x1.localdomain>
-	<f0f0f6a0-bf09-8561-5c81-87d38ebef168@redhat.com>
-	<2fddac03-cde4-8d83-7651-a3928398e909@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1etD3m-000709-CD
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:55:22 -0500
+Resent-Message-Id: <E1etD3m-000709-CD@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21096)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1etD3l-0006rn-To
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:55:18 -0500
+In-Reply-To: <1520342370-123606-1-git-send-email-pbonzini@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152034448949.1389.9761497460336010364@bdbb90650ae5>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="YrlhzR9YrZtruaFS"
-Content-Disposition: inline
-In-Reply-To: <2fddac03-cde4-8d83-7651-a3928398e909@redhat.com>
-Subject: Re: [Qemu-devel] [RFC] qemu-img: Drop BLK_ZERO from convert
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 6 Mar 2018 05:54:50 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 00/34] Misc patches for 2018-03-06
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,154 +28,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-
---YrlhzR9YrZtruaFS
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Feb 28, 2018 at 09:11:32PM +0100, Max Reitz wrote:
-> On 2018-02-28 19:08, Max Reitz wrote:
-> > On 2018-02-27 17:17, Stefan Hajnoczi wrote:
-> >> On Mon, Feb 26, 2018 at 06:03:13PM +0100, Max Reitz wrote:
-> >>> There are filesystems (among which is tmpfs) that have a hard time
-> >>> reporting allocation status.  That is definitely a bug in them.
-> >>>
-> >>> However, there is no good reason why qemu-img convert should query the
-> >>> allocation status in the first place.  It does zero detection by itse=
-lf
-> >>> anyway, so we can detect unallocated areas ourselves.
-> >>>
-> >>> Furthermore, if a filesystem driver has any sense, reading unallocated
-> >>> data should take just as much time as lseek(SEEK_DATA) + memset().  So
-> >>> the only overhead we introduce by dropping the manual lseek() call is=
- a
-> >>> memset() in the driver and a buffer_is_zero() in qemu-img, both of wh=
-ich
-> >>> should be relatively quick.
-> >>
-> >> This makes sense.  Which file systems did you test this patch on?
-> >=20
-> > On tmpfs and xfs, so far.
-> >=20
-> >> XFS, ext4, and tmpfs would be a good minimal test set to prove the
-> >> patch.  Perhaps with two input files:
-> >> 1. A file that is mostly filled with data.
-> >> 2. A file that is only sparsely populated with data.
-> >=20
-> > And probably with vmdk, which (by default) forbids querying any areas
-> > larger than 64 kB.
-> >=20
-> >> The time taken should be comparable with the time before this patch.
-> >=20
-> > Yep, I'll do some benchmarks.
->=20
-> And the results are in.  I've created 2 GB images on various filesystems
-> in various formats, then I've either written 64 kB every 32 MB to them
-> ("sparse"), or left out 64 kB every 32 MB ("full").  Then I've converted
-> them to null-co:// and took the (real) time through "time". (Script is
-> attached.)
->=20
-> I've attached the raw results before and after this patch.  Usually, I
-> did six runs for each case and dropped the most extreme outlier --
-> except for full vmdk images, where I've only done one run for each case
-> because creating these images can take a very long time.
->=20
-> Here are the differences from before to after:
->=20
-> sparse raw on tmpfs:    + 19 % (436 ms to 520 ms)
-> sparse qcow2 on tmpfs:  - 31 % (435 ms to 301 ms)
-> sparse vmdk on tmpfs:   + 37 % (214 ms to 294 ms)
->=20
-> sparse raw on xfs:      + 69 % (452 ms to 762 ms)
-> sparse qcow2 on xfs:    - 34 % (462 ms to 304 ms)
-> sparse vmdk on xfs:     + 42 % (210 ms to 298 ms)
->=20
-> sparse raw on ext4:     +360 % (144 ms to 655 ms)
-> sparse qcow2 on ext4:   +120 % (147 ms to 330 ms)
-> sparse vmdk on ext4:    + 16 % (253 ms to 293 ms)
->=20
->=20
-> full raw on tmpfs:      -  9 % (437 ms to 398 ms)
-> full qcow2 on tmpfs:    - 75 % (1.63 s to 403 ms)
-> full vmdk on tmpfs:     -100 % (10 min to 767 ms)
->=20
-> full raw on xfs:        -  1 % (407 ms to 404 ms, insignificant)
-> full qcow2 on xfs:      -  1 % (410 ms to 404 ms, insignificant)
-> full vmdk on xfs:       - 33 % (1.05 s to 695 ms)
->=20
->=20
->=20
->=20
-> full raw on ext4:       -  2 % (308 ms to 301 ms, insignificant)
-> full qcow2 on ext4:     +  2 % (307 ms to 312 ms, insignificant)
-> full vmdk on ext4:      - 74 % (3.53 s to 839 ms)
->=20
->=20
-> So...  It's more extreme than I had hoped, that's for sure.  What I
-> conclude from this is:
->=20
-> (1) This patch is generally good for nearly fully allocated images.  In
-> the worst case (on well-behaving filesystems with well-optimized image
-> formats) it changes nothing.  In the best case, conversion time is
-> reduced drastically.
->=20
-> (2) For sparse raw images, this is absolutely devastating.  Reading them
-> now takes more than (ext4) or nearly (xfs) twice as much time as reading
-> a fully allocated image.  So much for "if a filesystem driver has any
-> sense".
->=20
-> (2a) It might be worth noting that on xfs, reading the sparse file took
-> longer even before this patch...
->=20
-> (3) qcow2 is different: It benefits from this patch on tmpfs and xfs
-> (note that reading a sparse qcow2 file took longer than reading a full
-> qcow2 file before this patch!), but it gets pretty much destroyed on
-> ext4, too.
->=20
-> (4) As for sparse vmdk images...  Reading them takes longer, but it's
-> still fasster than reading full vmdk images, so that's not horrible.
->=20
->=20
-> So there we are.  I was wrong about filesystem drivers having any sense,
-> so this patch can indeed have a hugely negative impact.
->=20
-> I would argue that conversion time for full images is more important,
-> because that's probably the main use case; but the thing is that here
-> this patch only helps for tmpfs and vmdk.  We don't care too much about
-> vmdk, and the fact that tmpfs takes so long simply is a bug.
->=20
-> I guess the xfs/tmpfs results would still be in a range where they are
-> barely acceptable (because it's mainly a qcow2 vs. raw tradeoff), but
-> the ext4 horrors probably make this patch a no-go in its current form.
->=20
-> In any case it's interesting to see that even the current qemu-img
-> convert takes longer to read sparsely allocated qcow2/raw files from xfs
-> than fully allocated images...
->=20
->=20
-> So I guess I'll re-send this patch where the change is done only for
-> -S 0.
-
-Wow, unexpected.  Thanks for doing the benchmarks!
-
-Stefan
-
---YrlhzR9YrZtruaFS
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJanpwNAAoJEJykq7OBq3PIxXYH/iIXnDNpBvSo/QBauoa/dpJk
-9YHL7LNDIult41mP5tHwy06GUayWg2XFx9w9pmFcMhVLzScp/wjaJo13Xys8rqIt
-PZSNWTh0nMbjiwA6nA1crk7elq4yMhMAwhFz4tutCUutgunqISQ96a4yHCKFsZIZ
-rW22I/TeYkZlWhgG9qx9VLx1IGeMQ1NLGEXSb7vDueCjZGntN68m4oxHtATthpdr
-a/wmopurkfj+l2DJt1eo97gU9sAKE0r2uHL4HRRLPAcPPMmOVmLLbTlohfvCVbNq
-FhQQy/fTI8fi1Ijbf1WxgSqn9C9iMKS+EHckf+uweK6rXYMcInzsq/c5MXhktgs=
-=HHzr
------END PGP SIGNATURE-----
-
---YrlhzR9YrZtruaFS--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MjAzNDIzNzAtMTIzNjA2LTEtZ2l0LXNlbmQtZW1haWwtcGJvbnppbmlAcmVk
+aGF0LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMDAvMzRdIE1pc2MgcGF0Y2hlcyBm
+b3IgMjAxOC0wMy0wNgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFT
+RT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFp
+bGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAt
+LWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRo
+bSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJB
+U0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4v
+JHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBz
+aG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
+ayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChu
+KzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5n
+IDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dp
+dGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAg
+cGF0Y2hldy8xNTIwMzQyMzcwLTEyMzYwNi0xLWdpdC1zZW5kLWVtYWlsLXBib256aW5pQHJlZGhh
+dC5jb20gLT4gcGF0Y2hldy8xNTIwMzQyMzcwLTEyMzYwNi0xLWdpdC1zZW5kLWVtYWlsLXBib256
+aW5pQHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDMw
+NjEzMjQzMC4zMjExMC0xLWJlcnJhbmdlQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MDMwNjEz
+MjQzMC4zMjExMC0xLWJlcnJhbmdlQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
+ICd0ZXN0JwphNGNlYjE1YmFjIHVzZSBnX3BhdGhfZ2V0X2Jhc2VuYW1lIGluc3RlYWQgb2YgYmFz
+ZW5hbWUKNmMyNTY3Y2RmMCBiYWxsb29uOiBGaXggZG9jdW1lbnRhdGlvbiBvZiB0aGUgLS1iYWxs
+b29uIHBhcmFtZXRlciBhbmQgZGVwcmVjYXRlIGl0CmFlMWNiNTQzZjMgV0hQWCBpbXByb3ZlIGlu
+dGVycnVwdCBub3RpZmljYXRpb24gcmVnaXN0cmF0aW9uCjEyNjkwMmU4OGIgV0hYUCBSZW1vdmVz
+IHRoZSB1c2Ugb2YgV0h2R2V0RXhpdENvbnRleHRTaXplCmUyZTRkODkwYjIgRml4IFdIUFggaXNz
+dWUgbGVha2luZyB0cHIgdmFsdWVzCjA1YWZiZmY1MDcgRml4IFdIUFggdHlwbyBpbiAnbW1pbycK
+NzM4Y2MxOGFmZiBGaXggV0hQWCBhZGRpdGlvbmFsIGxvY2sgYWNxdWlzaXRpb24KYjVkN2RmNGNi
+YSBSZW1vdmUgdW5uZWNlc3NhcnkgV0hQWCBfX2RlYnVnYnJlYWsoKTsKOWRlOTFiNGVjNyBSZXNv
+bHZlcyBXSFBYIGJyZWFraW5nIGNoYW5nZXMgaW4gU0RLIDE3MDk1CjIxZmU4ODIwMGQgRml4aW5n
+IFdIUFggY2FzaW5nIHRvIG1hdGNoIFNESwo3OGY1MTk0YjBmIFJldmVydCAiYnVpbGQtc3lzOiBj
+b21waWxlIHdpdGggLU9nIG9yIC1PMSB3aGVuIC0tZW5hYmxlLWRlYnVnIgo4NjIzOTM3YmM4IGNo
+ZWNrcGF0Y2g6IGFkZCBjaGVjayBmb3IgYHdoaWxlYCBhbmQgYGZvcmAKYmI3Yjk1M2M0ZCBjaGVj
+a3BhdGNoOiBhZGQgYSB3YXJuaW5nIGZvciBiYXNlbmFtZS9kaXJuYW1lCjJjNDY5YTAyY2YgYWRk
+cmVzc19zcGFjZV9ydzogYWRkcmVzc19zcGFjZV90b19mbGF0dmlldyBuZWVkcyBSQ1UgbG9jawpj
+NjFjYjY1ODU0IGFkZHJlc3Nfc3BhY2VfbWFwOiBhZGRyZXNzX3NwYWNlX3RvX2ZsYXR2aWV3IG5l
+ZWRzIFJDVSBsb2NrCmE1OWNmODU4ODAgYWRkcmVzc19zcGFjZV9hY2Nlc3NfdmFsaWQ6IGFkZHJl
+c3Nfc3BhY2VfdG9fZmxhdHZpZXcgbmVlZHMgUkNVIGxvY2sKMGRhNTliZDY4MiBhZGRyZXNzX3Nw
+YWNlX3JlYWQ6IGFkZHJlc3Nfc3BhY2VfdG9fZmxhdHZpZXcgbmVlZHMgUkNVIGxvY2sKNmU3OWZl
+NDMxZCBhZGRyZXNzX3NwYWNlX3dyaXRlOiBhZGRyZXNzX3NwYWNlX3RvX2ZsYXR2aWV3IG5lZWRz
+IFJDVSBsb2NrCmMyMzM0OWM2YzIgbWVtb3J5OiBpbmxpbmUgc29tZSBwZXJmb3JtYW5jZS1zZW5z
+aXRpdmUgYWNjZXNzb3JzCjk5OTM4NDg2MDUgb3BlbnBpY19rdm06IGRyb3AgYWRkcmVzc19zcGFj
+ZV90b19mbGF0dmlldyBjYWxsCmY2OGExYjZlMDUgY2hhcmRldjogZml4IGxlYWsgaW4gdGNwX2No
+cl90ZWxuZXRfaW5pdF9pbygpCmQxOTEyMGI4MWYgc2RoY2ktdGVzdDogZml4IGxlYWtzCmYyOTFi
+ZDdjOWMgYWhjaS10ZXN0OiBmaXggb3B0cyBsZWFrIG9mIHNraXAgdGVzdHMKZTljZWM5NTA2NyBs
+b2NrYWJsZTogd29ya2Fyb3VuZCBHQ0MgbGluayBpc3N1ZSB3aXRoIEFTQU4KODI5Yjc4YjRmZSBi
+dWlsZC1zeXM6IGZpeCAtZnNhbml0aXplPWFkZHJlc3MgY2hlY2sKODMyYzE2ZmZjMCBxbXA6IEFk
+ZCBxb20tbGlzdC1wcm9wZXJ0aWVzIHRvIGxpc3QgUU9NIG9iamVjdCBwcm9wZXJ0aWVzCjRhZDFh
+ZTlkYmMgcW1wOiBNZXJnZSBPYmplY3RQcm9wZXJ0eUluZm8gYW5kIERldmljZVByb3BlcnR5SW5m
+bwpjYWIyYjhkOWM3IERvY3VtZW50IC0tcnRjLXRkLWhhY2ssIC0tbG9jYWx0aW1lIGFuZCAtLXN0
+YXJ0ZGF0ZSBhcyBkZXByZWNhdGVkCjI0NDFiZjJhYTkgY3B1czogQ1BVIHRocmVhZHMgYXJlIGFs
+d2F5cyBjcmVhdGVkIGluaXRpYWxseSBmb3Igb25lIENQVSBvbmx5Cjg4M2MzODFiZjMgY3B1czog
+d2FpdCBmb3IgQ1BVIGNyZWF0aW9uIGF0IGNlbnRyYWwgcGxhY2UKMTBmMzUzN2I3YiBjcHVzOiBw
+cm9wZXJseSBpbml0aXRhbGl6ZSBDUFUgPiAxIHVuZGVyIHNpbmdsZS10aHJlYWRlZCBUQ0cKYmFi
+ODIxNThjZSBzY3NpOiBSZW1vdmUgYXV0b21hdGljIGNyZWF0aW9uIG9mIFNDU0kgY29udHJvbGxl
+cnMgd2l0aCAtZHJpdmUgaWY9c2NzaQozYmYwZTcwZjI0IFJlbW92ZSB0aGUgZGVwcmVjYXRlZCAt
+dGRmIG9wdGlvbgoxMjgyNjlmM2YwIGczNjRmYjogZml4IERpcnR5Qml0bWFwU25hcHNob3QgbGVh
+awoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8zNDogZzM2NGZiOiBmaXgg
+RGlydHlCaXRtYXBTbmFwc2hvdCBsZWFrLi4uCkNoZWNraW5nIFBBVENIIDIvMzQ6IFJlbW92ZSB0
+aGUgZGVwcmVjYXRlZCAtdGRmIG9wdGlvbi4uLgpDaGVja2luZyBQQVRDSCAzLzM0OiBzY3NpOiBS
+ZW1vdmUgYXV0b21hdGljIGNyZWF0aW9uIG9mIFNDU0kgY29udHJvbGxlcnMgd2l0aCAtZHJpdmUg
+aWY9c2NzaS4uLgpDaGVja2luZyBQQVRDSCA0LzM0OiBjcHVzOiBwcm9wZXJseSBpbml0aXRhbGl6
+ZSBDUFUgPiAxIHVuZGVyIHNpbmdsZS10aHJlYWRlZCBUQ0cuLi4KQ2hlY2tpbmcgUEFUQ0ggNS8z
+NDogY3B1czogd2FpdCBmb3IgQ1BVIGNyZWF0aW9uIGF0IGNlbnRyYWwgcGxhY2UuLi4KQ2hlY2tp
+bmcgUEFUQ0ggNi8zNDogY3B1czogQ1BVIHRocmVhZHMgYXJlIGFsd2F5cyBjcmVhdGVkIGluaXRp
+YWxseSBmb3Igb25lIENQVSBvbmx5Li4uCkNoZWNraW5nIFBBVENIIDcvMzQ6IERvY3VtZW50IC0t
+cnRjLXRkLWhhY2ssIC0tbG9jYWx0aW1lIGFuZCAtLXN0YXJ0ZGF0ZSBhcyBkZXByZWNhdGVkLi4u
+CldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM3MjogRklMRTogdmwuYzozODczOgor
+ICAgICAgICAgICAgICAgIHdhcm5fcmVwb3J0KCJUaGlzIG9wdGlvbiBpcyBkZXByZWNhdGVkLCB1
+c2UgJy1ydGMgYmFzZT0nIGluc3RlYWQuIik7Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
+IDQ2IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+Q2hlY2tpbmcgUEFUQ0ggOC8zNDogcW1wOiBNZXJnZSBPYmplY3RQcm9wZXJ0eUluZm8gYW5kIERl
+dmljZVByb3BlcnR5SW5mby4uLgpDaGVja2luZyBQQVRDSCA5LzM0OiBxbXA6IEFkZCBxb20tbGlz
+dC1wcm9wZXJ0aWVzIHRvIGxpc3QgUU9NIG9iamVjdCBwcm9wZXJ0aWVzLi4uCkNoZWNraW5nIFBB
+VENIIDEwLzM0OiBidWlsZC1zeXM6IGZpeCAtZnNhbml0aXplPWFkZHJlc3MgY2hlY2suLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMTEvMzQ6IGxvY2thYmxlOiB3b3JrYXJvdW5kIEdDQyBsaW5rIGlzc3VlIHdp
+dGggQVNBTi4uLgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQg
+YmUgYXZvaWRlZAojMjg6IEZJTEU6IGluY2x1ZGUvcWVtdS9sb2NrYWJsZS5oOjMxOgorI2lmIGRl
+ZmluZWQoX19PUFRJTUlaRV9fKSAmJiAhZGVmaW5lZChfX1NBTklUSVpFX0FERFJFU1NfXykKCnRv
+dGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgOCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhh
+cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
+YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
+RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDEyLzM0OiBhaGNpLXRlc3Q6
+IGZpeCBvcHRzIGxlYWsgb2Ygc2tpcCB0ZXN0cy4uLgpDaGVja2luZyBQQVRDSCAxMy8zNDogc2Ro
+Y2ktdGVzdDogZml4IGxlYWtzLi4uCkNoZWNraW5nIFBBVENIIDE0LzM0OiBjaGFyZGV2OiBmaXgg
+bGVhayBpbiB0Y3BfY2hyX3RlbG5ldF9pbml0X2lvKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvMzQ6
+IG9wZW5waWNfa3ZtOiBkcm9wIGFkZHJlc3Nfc3BhY2VfdG9fZmxhdHZpZXcgY2FsbC4uLgpDaGVj
+a2luZyBQQVRDSCAxNi8zNDogbWVtb3J5OiBpbmxpbmUgc29tZSBwZXJmb3JtYW5jZS1zZW5zaXRp
+dmUgYWNjZXNzb3JzLi4uCkNoZWNraW5nIFBBVENIIDE3LzM0OiBhZGRyZXNzX3NwYWNlX3dyaXRl
+OiBhZGRyZXNzX3NwYWNlX3RvX2ZsYXR2aWV3IG5lZWRzIFJDVSBsb2NrLi4uCkNoZWNraW5nIFBB
+VENIIDE4LzM0OiBhZGRyZXNzX3NwYWNlX3JlYWQ6IGFkZHJlc3Nfc3BhY2VfdG9fZmxhdHZpZXcg
+bmVlZHMgUkNVIGxvY2suLi4KQ2hlY2tpbmcgUEFUQ0ggMTkvMzQ6IGFkZHJlc3Nfc3BhY2VfYWNj
+ZXNzX3ZhbGlkOiBhZGRyZXNzX3NwYWNlX3RvX2ZsYXR2aWV3IG5lZWRzIFJDVSBsb2NrLi4uCkNo
+ZWNraW5nIFBBVENIIDIwLzM0OiBhZGRyZXNzX3NwYWNlX21hcDogYWRkcmVzc19zcGFjZV90b19m
+bGF0dmlldyBuZWVkcyBSQ1UgbG9jay4uLgpDaGVja2luZyBQQVRDSCAyMS8zNDogYWRkcmVzc19z
+cGFjZV9ydzogYWRkcmVzc19zcGFjZV90b19mbGF0dmlldyBuZWVkcyBSQ1UgbG9jay4uLgpDaGVj
+a2luZyBQQVRDSCAyMi8zNDogY2hlY2twYXRjaDogYWRkIGEgd2FybmluZyBmb3IgYmFzZW5hbWUv
+ZGlybmFtZS4uLgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzI0OiBGSUxFOiBzY3Jp
+cHRzL2NoZWNrcGF0Y2gucGw6MjU4OToKKwkJCVdBUk4oImNvbnNpZGVyIHVzaW5nIGdfcGF0aF9n
+ZXRfJDEoKSBpbiBwcmVmZXJlbmNlIHRvIGdfc3RyZHVwKCQxKCkpXG4iIC4gJGhlcmVjdXJyKTsK
+CnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRj
+aCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMjMvMzQ6IGNoZWNr
+cGF0Y2g6IGFkZCBjaGVjayBmb3IgYHdoaWxlYCBhbmQgYGZvcmAuLi4KQ2hlY2tpbmcgUEFUQ0gg
+MjQvMzQ6IFJldmVydCAiYnVpbGQtc3lzOiBjb21waWxlIHdpdGggLU9nIG9yIC1PMSB3aGVuIC0t
+ZW5hYmxlLWRlYnVnIi4uLgpDaGVja2luZyBQQVRDSCAyNS8zNDogRml4aW5nIFdIUFggY2FzaW5n
+IHRvIG1hdGNoIFNESy4uLgpDaGVja2luZyBQQVRDSCAyNi8zNDogUmVzb2x2ZXMgV0hQWCBicmVh
+a2luZyBjaGFuZ2VzIGluIFNESyAxNzA5NS4uLgpDaGVja2luZyBQQVRDSCAyNy8zNDogUmVtb3Zl
+IHVubmVjZXNzYXJ5IFdIUFggX19kZWJ1Z2JyZWFrKCk7Li4uCkNoZWNraW5nIFBBVENIIDI4LzM0
+OiBGaXggV0hQWCBhZGRpdGlvbmFsIGxvY2sgYWNxdWlzaXRpb24uLi4KQ2hlY2tpbmcgUEFUQ0gg
+MjkvMzQ6IEZpeCBXSFBYIHR5cG8gaW4gJ21taW8nLi4uCkNoZWNraW5nIFBBVENIIDMwLzM0OiBG
+aXggV0hQWCBpc3N1ZSBsZWFraW5nIHRwciB2YWx1ZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMzEvMzQ6
+IFdIWFAgUmVtb3ZlcyB0aGUgdXNlIG9mIFdIdkdldEV4aXRDb250ZXh0U2l6ZS4uLgpDaGVja2lu
+ZyBQQVRDSCAzMi8zNDogV0hQWCBpbXByb3ZlIGludGVycnVwdCBub3RpZmljYXRpb24gcmVnaXN0
+cmF0aW9uLi4uCkNoZWNraW5nIFBBVENIIDMzLzM0OiBiYWxsb29uOiBGaXggZG9jdW1lbnRhdGlv
+biBvZiB0aGUgLS1iYWxsb29uIHBhcmFtZXRlciBhbmQgZGVwcmVjYXRlIGl0Li4uCkNoZWNraW5n
+IFBBVENIIDM0LzM0OiB1c2UgZ19wYXRoX2dldF9iYXNlbmFtZSBpbnN0ZWFkIG9mIGJhc2VuYW1l
+Li4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
+CgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3Bh
+dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBm
+cmVlbGlzdHMub3Jn
