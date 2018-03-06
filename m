@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60642)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1et9GD-0000Aj-L1
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:51:55 -0500
+	(envelope-from <kraxel@redhat.com>) id 1et9GD-0000AU-C8
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:51:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1et9GC-00051m-7t
+	(envelope-from <kraxel@redhat.com>) id 1et9GC-000523-CY
 	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:51:53 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57528 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57184 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1et9GC-00051K-1V
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1et9GC-00051b-8y
 	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:51:52 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue,  6 Mar 2018 10:51:30 +0100
-Message-Id: <20180306095135.21285-5-kraxel@redhat.com>
+Date: Tue,  6 Mar 2018 10:51:31 +0100
+Message-Id: <20180306095135.21285-6-kraxel@redhat.com>
 In-Reply-To: <20180306095135.21285-1-kraxel@redhat.com>
 References: <20180306095135.21285-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 4/9] console: minimal hotplug suport
+Subject: [Qemu-devel] [PATCH v7 5/9] secondary-vga: properly close
+ QemuConsole on unplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,173 +27,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: intel-gvt-dev@lists.freedesktop.org, Alex Williamson <alex.williamson@redhat.com>, Tina Zhang <tina.zhang@intel.com>, Gerd Hoffmann <kraxel@redhat.com>, Kirti Wankhede <kwankhede@nvidia.com>
 
-This patch allows to unbind devices from QemuConsoles, using the new
-graphic_console_close() function.  The QemuConsole will show a static
-display then, saying the device was unplugged.  When re-plugging a
-display later on the QemuConsole will be reused.
-
-Eventually we will allocate and release QemuConsoles dynamically at some
-point in the future, that'll need more infrastructure though to notify
-user interfaces (gtk, sdl, spice, ...) about QemuConsoles coming and
-going.
+Using the new graphic_console_close() function.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/ui/console.h |  2 ++
- ui/console.c         | 79 ++++++++++++++++++++++++++++++++++++++++++++++++----
- ui/trace-events      |  2 ++
- 3 files changed, 77 insertions(+), 6 deletions(-)
+ hw/display/vga-pci.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/include/ui/console.h b/include/ui/console.h
-index aae9e44cb3..22dada9ca1 100644
---- a/include/ui/console.h
-+++ b/include/ui/console.h
-@@ -384,6 +384,7 @@ QemuConsole *graphic_console_init(DeviceState *dev, uint32_t head,
- void graphic_console_set_hwops(QemuConsole *con,
-                                const GraphicHwOps *hw_ops,
-                                void *opaque);
-+void graphic_console_close(QemuConsole *con);
- 
- void graphic_hw_update(QemuConsole *con);
- void graphic_hw_invalidate(QemuConsole *con);
-@@ -396,6 +397,7 @@ QemuConsole *qemu_console_lookup_by_index(unsigned int index);
- QemuConsole *qemu_console_lookup_by_device(DeviceState *dev, uint32_t head);
- QemuConsole *qemu_console_lookup_by_device_name(const char *device_id,
-                                                 uint32_t head, Error **errp);
-+QemuConsole *qemu_console_lookup_unused(void);
- bool qemu_console_is_visible(QemuConsole *con);
- bool qemu_console_is_graphic(QemuConsole *con);
- bool qemu_console_is_fixedsize(QemuConsole *con);
-diff --git a/ui/console.c b/ui/console.c
-index 6ab4ff3baf..f91aa71357 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -1266,11 +1266,16 @@ static QemuConsole *new_console(DisplayState *ds, console_type_t console_type,
-     s->console_type = console_type;
- 
-     consoles = g_realloc(consoles, sizeof(*consoles) * (nb_consoles+1));
--    if (console_type != GRAPHIC_CONSOLE) {
-+    if (console_type != GRAPHIC_CONSOLE || qdev_hotplug) {
-         s->index = nb_consoles;
-         consoles[nb_consoles++] = s;
-     } else {
--        /* HACK: Put graphical consoles before text consoles.  */
-+        /*
-+         * HACK: Put graphical consoles before text consoles.
-+         *
-+         * Only do that for coldplugged devices.  After initial device
-+         * initialization we will not renumber the consoles any more.
-+         */
-         for (i = nb_consoles; i > 0; i--) {
-             if (consoles[i - 1]->console_type == GRAPHIC_CONSOLE)
-                 break;
-@@ -1858,21 +1863,61 @@ QemuConsole *graphic_console_init(DeviceState *dev, uint32_t head,
-     int height = 480;
-     QemuConsole *s;
-     DisplayState *ds;
-+    DisplaySurface *surface;
- 
-     ds = get_alloc_displaystate();
--    trace_console_gfx_new();
--    s = new_console(ds, GRAPHIC_CONSOLE, head);
--    s->ui_timer = timer_new_ms(QEMU_CLOCK_REALTIME, dpy_set_ui_info_timer, s);
-+    s = qemu_console_lookup_unused();
-+    if (s) {
-+        trace_console_gfx_reuse(s->index);
-+        if (s->surface) {
-+            width = surface_width(s->surface);
-+            height = surface_height(s->surface);
-+        }
-+    } else {
-+        trace_console_gfx_new();
-+        s = new_console(ds, GRAPHIC_CONSOLE, head);
-+        s->ui_timer = timer_new_ms(QEMU_CLOCK_REALTIME,
-+                                   dpy_set_ui_info_timer, s);
-+    }
-     graphic_console_set_hwops(s, hw_ops, opaque);
-     if (dev) {
-         object_property_set_link(OBJECT(s), OBJECT(dev), "device",
-                                  &error_abort);
-     }
- 
--    s->surface = qemu_create_message_surface(width, height, noinit);
-+    surface = qemu_create_message_surface(width, height, noinit);
-+    dpy_gfx_replace_surface(s, surface);
-     return s;
+diff --git a/hw/display/vga-pci.c b/hw/display/vga-pci.c
+index 1674bd3581..f312930664 100644
+--- a/hw/display/vga-pci.c
++++ b/hw/display/vga-pci.c
+@@ -292,6 +292,14 @@ static void pci_secondary_vga_realize(PCIDevice *dev, Error **errp)
+     pci_register_bar(&d->dev, 2, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->mmio);
  }
  
-+static const GraphicHwOps unused_ops = {
-+    /* no callbacks */
-+};
-+
-+void graphic_console_close(QemuConsole *con)
++static void pci_secondary_vga_exit(PCIDevice *dev)
 +{
-+    static const char unplugged[] =
-+        "Guest display has been unplugged";
-+    DisplaySurface *surface;
-+    int width = 640;
-+    int height = 480;
++    PCIVGAState *d = PCI_VGA(dev);
++    VGACommonState *s = &d->vga;
 +
-+    if (con->surface) {
-+        width = surface_width(con->surface);
-+        height = surface_height(con->surface);
-+    }
-+
-+    trace_console_gfx_close(con->index);
-+    object_property_set_link(OBJECT(con), NULL, "device", &error_abort);
-+    graphic_console_set_hwops(con, &unused_ops, NULL);
-+
-+    if (con->gl) {
-+        dpy_gl_scanout_disable(con);
-+    }
-+    surface = qemu_create_message_surface(width, height, unplugged);
-+    dpy_gfx_replace_surface(con, surface);
++    graphic_console_close(s->con);
 +}
 +
- QemuConsole *qemu_console_lookup_by_index(unsigned int index)
+ static void pci_secondary_vga_init(Object *obj)
  {
-     if (index >= nb_consoles) {
-@@ -1929,6 +1974,28 @@ QemuConsole *qemu_console_lookup_by_device_name(const char *device_id,
-     return con;
- }
+     /* Expose framebuffer byteorder via QOM */
+@@ -361,6 +369,7 @@ static void secondary_class_init(ObjectClass *klass, void *data)
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
  
-+QemuConsole *qemu_console_lookup_unused(void)
-+{
-+    Object *obj;
-+    int i;
-+
-+    for (i = 0; i < nb_consoles; i++) {
-+        if (!consoles[i]) {
-+            continue;
-+        }
-+        if (consoles[i]->hw_ops != &unused_ops) {
-+            continue;
-+        }
-+        obj = object_property_get_link(OBJECT(consoles[i]),
-+                                       "device", &error_abort);
-+        if (obj != NULL) {
-+            continue;
-+        }
-+        return consoles[i];
-+    }
-+    return NULL;
-+}
-+
- bool qemu_console_is_visible(QemuConsole *con)
- {
-     return (con == active_console) || (con->dcls > 0);
-diff --git a/ui/trace-events b/ui/trace-events
-index 861b68a305..b22ec558f7 100644
---- a/ui/trace-events
-+++ b/ui/trace-events
-@@ -2,6 +2,8 @@
- 
- # ui/console.c
- console_gfx_new(void) ""
-+console_gfx_reuse(int index) "%d"
-+console_gfx_close(int index) "%d"
- console_putchar_csi(int esc_param0, int esc_param1, int ch, int nb_esc_params) "escape sequence CSI%d;%d%c, %d parameters"
- console_putchar_unhandled(int ch) "unhandled escape character '%c'"
- console_txt_new(int w, int h) "%dx%d"
+     k->realize = pci_secondary_vga_realize;
++    k->exit = pci_secondary_vga_exit;
+     k->class_id = PCI_CLASS_DISPLAY_OTHER;
+     dc->props = secondary_pci_properties;
+     dc->reset = pci_secondary_vga_reset;
 -- 
 2.9.3
