@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1etJTS-0006ht-QE
+	(envelope-from <mjc@sifive.com>) id 1etJTS-0006hs-Px
 	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:46:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1etJTR-0003dd-G4
+	(envelope-from <mjc@sifive.com>) id 1etJTN-0003cd-Tp
 	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:46:14 -0500
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:40368)
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:42289)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1etJTR-0003dI-A2
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:46:13 -0500
-Received: by mail-pg0-x243.google.com with SMTP id g8so4102079pgv.7
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 12:46:13 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1etJTN-0003cR-Nt
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:46:09 -0500
+Received: by mail-pl0-x243.google.com with SMTP id 93-v6so12546707plc.9
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 12:46:09 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Wed,  7 Mar 2018 09:43:53 +1300
-Message-Id: <1520369037-37977-19-git-send-email-mjc@sifive.com>
+Date: Wed,  7 Mar 2018 09:43:52 +1300
+Message-Id: <1520369037-37977-18-git-send-email-mjc@sifive.com>
 In-Reply-To: <1520369037-37977-1-git-send-email-mjc@sifive.com>
 References: <1520369037-37977-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v1 18/22] RISC-V: Remove braces from satp case
- statement with
+Subject: [Qemu-devel] [PATCH v1 17/22] RISC-V: Ingore satp writes and return
+ 0 for reads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,34 +27,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches no locals <patches@groups.riscv.org>
+Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches when no-mmu <patches@groups.riscv.org>
+
+satp is WARL so it should not trap on illegal writes, rather
+it can be hardwired to zero and silently ignore illegal writes.
+
+It seems the RISC-V WARL behaviour is preferred to having to
+bear trap overhead, versus simply reading back the value and
+checking if the write took (saves hundreds of cycles and much
+more complex trap handling code).
 
 Signed-off-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- target/riscv/op_helper.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ target/riscv/op_helper.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-index dd3e417..f79716a 100644
+index e34715d..dd3e417 100644
 --- a/target/riscv/op_helper.c
 +++ b/target/riscv/op_helper.c
-@@ -240,7 +240,7 @@ void csr_write_helper(CPURISCVState *env, target_ulong val_to_write,
-         csr_write_helper(env, next_mie, CSR_MIE);
-         break;
+@@ -242,7 +242,7 @@ void csr_write_helper(CPURISCVState *env, target_ulong val_to_write,
      }
--    case CSR_SATP: /* CSR_SPTBR */ {
-+    case CSR_SATP: /* CSR_SPTBR */
+     case CSR_SATP: /* CSR_SPTBR */ {
          if (!riscv_feature(env, RISCV_FEATURE_MMU)) {
-             break;
+-            goto do_illegal;
++            break;
          }
-@@ -258,7 +258,6 @@ void csr_write_helper(CPURISCVState *env, target_ulong val_to_write,
-             env->satp = val_to_write;
-         }
-         break;
--    }
-     case CSR_SEPC:
-         env->sepc = val_to_write;
-         break;
+         if (env->priv_ver <= PRIV_VERSION_1_09_1 && (val_to_write ^ env->sptbr))
+         {
+@@ -452,7 +452,10 @@ target_ulong csr_read_helper(CPURISCVState *env, target_ulong csrno)
+         return env->scounteren;
+     case CSR_SCAUSE:
+         return env->scause;
+-    case CSR_SPTBR:
++    case CSR_SATP: /* CSR_SPTBR */
++        if (!riscv_feature(env, RISCV_FEATURE_MMU)) {
++            return 0;
++        }
+         if (env->priv_ver >= PRIV_VERSION_1_10_0) {
+             return env->satp;
+         } else {
 -- 
 2.7.0
