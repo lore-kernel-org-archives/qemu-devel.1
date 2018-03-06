@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1etsD8-00015y-96
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 04:51:43 -0500
+	(envelope-from <no-reply@patchew.org>) id 1etsEQ-00020j-48
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 04:53:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1etsD5-0000TW-8J
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 04:51:42 -0500
-Date: Thu, 8 Mar 2018 17:15:41 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180308061541.GO3083@umbus.fritz.box>
-References: <20180308023337.21062-1-haozhong.zhang@intel.com>
-	<20180308023337.21062-2-haozhong.zhang@intel.com>
+	(envelope-from <no-reply@patchew.org>) id 1etsEN-0000x7-1x
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 04:53:02 -0500
+Resent-Message-Id: <E1etsEN-0000x7-1x@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21089)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1etsEM-0000wh-QM
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 04:52:58 -0500
+In-Reply-To: <20180306095135.21285-1-kraxel@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152033073440.1386.13082307514856122914@bdbb90650ae5>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="WoqaC9TUMqqIOlla"
-Content-Disposition: inline
-In-Reply-To: <20180308023337.21062-2-haozhong.zhang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/5] pc-dimm: make
- qmp_pc_dimm_device_list() sort devices by address
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 6 Mar 2018 02:05:35 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v7 0/9] vfio: add display support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,262 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Haozhong Zhang <haozhong.zhang@intel.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-ppc@nongnu.org
+To: kraxel@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, alex.williamson@redhat.com, intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com, tina.zhang@intel.com
 
-
---WoqaC9TUMqqIOlla
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Mar 08, 2018 at 10:33:33AM +0800, Haozhong Zhang wrote:
-> Make qmp_pc_dimm_device_list() return sorted by start address
-> list of devices so that it could be reused in places that
-> would need sorted list*. Reuse existing pc_dimm_built_list()
-> to get sorted list.
->=20
-> While at it hide recursive callbacks from callers, so that:
->=20
->   qmp_pc_dimm_device_list(qdev_get_machine(), &list);
->=20
-> could be replaced with simpler:
->=20
->   list =3D qmp_pc_dimm_device_list();
->=20
-> * follow up patch will use it in build_srat()
->=20
-> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-ppc part
-
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
->  hw/mem/pc-dimm.c         | 83 +++++++++++++++++++++++++-----------------=
-------
->  hw/ppc/spapr.c           |  3 +-
->  include/hw/mem/pc-dimm.h |  2 +-
->  numa.c                   |  4 +--
->  qmp.c                    |  7 +---
->  stubs/qmp_pc_dimm.c      |  4 +--
->  6 files changed, 50 insertions(+), 53 deletions(-)
->=20
-> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> index 6e74b61cb6..4d050fe2cd 100644
-> --- a/hw/mem/pc-dimm.c
-> +++ b/hw/mem/pc-dimm.c
-> @@ -162,45 +162,6 @@ uint64_t get_plugged_memory_size(void)
->      return pc_existing_dimms_capacity(&error_abort);
->  }
-> =20
-> -int qmp_pc_dimm_device_list(Object *obj, void *opaque)
-> -{
-> -    MemoryDeviceInfoList ***prev =3D opaque;
-> -
-> -    if (object_dynamic_cast(obj, TYPE_PC_DIMM)) {
-> -        DeviceState *dev =3D DEVICE(obj);
-> -
-> -        if (dev->realized) {
-> -            MemoryDeviceInfoList *elem =3D g_new0(MemoryDeviceInfoList, =
-1);
-> -            MemoryDeviceInfo *info =3D g_new0(MemoryDeviceInfo, 1);
-> -            PCDIMMDeviceInfo *di =3D g_new0(PCDIMMDeviceInfo, 1);
-> -            DeviceClass *dc =3D DEVICE_GET_CLASS(obj);
-> -            PCDIMMDevice *dimm =3D PC_DIMM(obj);
-> -
-> -            if (dev->id) {
-> -                di->has_id =3D true;
-> -                di->id =3D g_strdup(dev->id);
-> -            }
-> -            di->hotplugged =3D dev->hotplugged;
-> -            di->hotpluggable =3D dc->hotpluggable;
-> -            di->addr =3D dimm->addr;
-> -            di->slot =3D dimm->slot;
-> -            di->node =3D dimm->node;
-> -            di->size =3D object_property_get_uint(OBJECT(dimm), PC_DIMM_=
-SIZE_PROP,
-> -                                                NULL);
-> -            di->memdev =3D object_get_canonical_path(OBJECT(dimm->hostme=
-m));
-> -
-> -            info->u.dimm.data =3D di;
-> -            elem->value =3D info;
-> -            elem->next =3D NULL;
-> -            **prev =3D elem;
-> -            *prev =3D &elem->next;
-> -        }
-> -    }
-> -
-> -    object_child_foreach(obj, qmp_pc_dimm_device_list, opaque);
-> -    return 0;
-> -}
-> -
->  static int pc_dimm_slot2bitmap(Object *obj, void *opaque)
->  {
->      unsigned long *bitmap =3D opaque;
-> @@ -276,6 +237,50 @@ static int pc_dimm_built_list(Object *obj, void *opa=
-que)
->      return 0;
->  }
-> =20
-> +MemoryDeviceInfoList *qmp_pc_dimm_device_list(void)
-> +{
-> +    GSList *dimms =3D NULL, *item;
-> +    MemoryDeviceInfoList *list =3D NULL, *prev =3D NULL;
-> +
-> +    object_child_foreach(qdev_get_machine(), pc_dimm_built_list, &dimms);
-> +
-> +    for (item =3D dimms; item; item =3D g_slist_next(item)) {
-> +        PCDIMMDevice *dimm =3D PC_DIMM(item->data);
-> +        Object *obj =3D OBJECT(dimm);
-> +        MemoryDeviceInfoList *elem =3D g_new0(MemoryDeviceInfoList, 1);
-> +        MemoryDeviceInfo *info =3D g_new0(MemoryDeviceInfo, 1);
-> +        PCDIMMDeviceInfo *di =3D g_new0(PCDIMMDeviceInfo, 1);
-> +        DeviceClass *dc =3D DEVICE_GET_CLASS(obj);
-> +        DeviceState *dev =3D DEVICE(obj);
-> +
-> +        if (dev->id) {
-> +            di->has_id =3D true;
-> +            di->id =3D g_strdup(dev->id);
-> +        }
-> +        di->hotplugged =3D dev->hotplugged;
-> +        di->hotpluggable =3D dc->hotpluggable;
-> +        di->addr =3D dimm->addr;
-> +        di->slot =3D dimm->slot;
-> +        di->node =3D dimm->node;
-> +        di->size =3D object_property_get_uint(obj, PC_DIMM_SIZE_PROP, NU=
-LL);
-> +        di->memdev =3D object_get_canonical_path(OBJECT(dimm->hostmem));
-> +
-> +        info->u.dimm.data =3D di;
-> +        elem->value =3D info;
-> +        elem->next =3D NULL;
-> +        if (prev) {
-> +            prev->next =3D elem;
-> +        } else {
-> +            list =3D elem;
-> +        }
-> +        prev =3D elem;
-> +    }
-> +
-> +    g_slist_free(dimms);
-> +
-> +    return list;
-> +}
-> +
->  uint64_t pc_dimm_get_free_addr(uint64_t address_space_start,
->                                 uint64_t address_space_size,
->                                 uint64_t *hint, uint64_t align, uint64_t =
-size,
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 7e1c858566..44a0670d11 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -722,8 +722,7 @@ static int spapr_populate_drconf_memory(sPAPRMachineS=
-tate *spapr, void *fdt)
->      }
-> =20
->      if (hotplug_lmb_start) {
-> -        MemoryDeviceInfoList **prev =3D &dimms;
-> -        qmp_pc_dimm_device_list(qdev_get_machine(), &prev);
-> +        dimms =3D qmp_pc_dimm_device_list();
->      }
-> =20
->      /* ibm,dynamic-memory */
-> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-> index d83b957829..1fc479281c 100644
-> --- a/include/hw/mem/pc-dimm.h
-> +++ b/include/hw/mem/pc-dimm.h
-> @@ -93,7 +93,7 @@ uint64_t pc_dimm_get_free_addr(uint64_t address_space_s=
-tart,
-> =20
->  int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
-> =20
-> -int qmp_pc_dimm_device_list(Object *obj, void *opaque);
-> +MemoryDeviceInfoList *qmp_pc_dimm_device_list(void);
->  uint64_t pc_existing_dimms_capacity(Error **errp);
->  uint64_t get_plugged_memory_size(void);
->  void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
-> diff --git a/numa.c b/numa.c
-> index 5d7529c1d9..7ca2bef63f 100644
-> --- a/numa.c
-> +++ b/numa.c
-> @@ -520,12 +520,10 @@ void memory_region_allocate_system_memory(MemoryReg=
-ion *mr, Object *owner,
-> =20
->  static void numa_stat_memory_devices(NumaNodeMem node_mem[])
->  {
-> -    MemoryDeviceInfoList *info_list =3D NULL;
-> -    MemoryDeviceInfoList **prev =3D &info_list;
-> +    MemoryDeviceInfoList *info_list =3D qmp_pc_dimm_device_list();
->      MemoryDeviceInfoList *info;
->      PCDIMMDeviceInfo     *pcdimm_info;
-> =20
-> -    qmp_pc_dimm_device_list(qdev_get_machine(), &prev);
->      for (info =3D info_list; info; info =3D info->next) {
->          MemoryDeviceInfo *value =3D info->value;
-> =20
-> diff --git a/qmp.c b/qmp.c
-> index 8c7d1cc479..4b2517d8b5 100644
-> --- a/qmp.c
-> +++ b/qmp.c
-> @@ -731,12 +731,7 @@ void qmp_object_del(const char *id, Error **errp)
-> =20
->  MemoryDeviceInfoList *qmp_query_memory_devices(Error **errp)
->  {
-> -    MemoryDeviceInfoList *head =3D NULL;
-> -    MemoryDeviceInfoList **prev =3D &head;
-> -
-> -    qmp_pc_dimm_device_list(qdev_get_machine(), &prev);
-> -
-> -    return head;
-> +    return qmp_pc_dimm_device_list();
->  }
-> =20
->  ACPIOSTInfoList *qmp_query_acpi_ospm_status(Error **errp)
-> diff --git a/stubs/qmp_pc_dimm.c b/stubs/qmp_pc_dimm.c
-> index 9ddc4f619a..b6b2cca89e 100644
-> --- a/stubs/qmp_pc_dimm.c
-> +++ b/stubs/qmp_pc_dimm.c
-> @@ -2,9 +2,9 @@
->  #include "qom/object.h"
->  #include "hw/mem/pc-dimm.h"
-> =20
-> -int qmp_pc_dimm_device_list(Object *obj, void *opaque)
-> +MemoryDeviceInfoList *qmp_pc_dimm_device_list(void)
->  {
-> -   return 0;
-> +   return NULL;
->  }
-> =20
->  uint64_t get_plugged_memory_size(void)
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---WoqaC9TUMqqIOlla
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqg1QsACgkQbDjKyiDZ
-s5KLwg//ew6WZu7aZed2rmuEoiAOGQIFxmnDYZCe+nTUDlaQ5fogv6r+fesn371Q
-uuSTmEV0OhfdjYwTIcCVlz+Bn9zglfXDO2nETtVHieI2y2mflfg3AlOotlaPW8xY
-6FLQZjbpmaw/W3ifXyntZCZeRHRr+PekKvK1K9/lsGWYrgS0lviMlwWeeFvuoYN0
-efgX+FpaVgKVuwYUt+MAmo8U69ky/uonBJfHk/l7ZWiWu2RNGz01ND2PPlVd1QDB
-HR3eGKBR3dWPfGORhvmabXmm/+TJmYQuIWvqTK+9Vm15w4ywHzoM0PmEI/7y0aaw
-e3ycC4Ge4pq6fIYV6D/5GFN9FMk8Y93LW3hu+RLrjKeSQq/K0oUu55b26riSq7+7
-MXj2876nNs2KHDoklDeAsBA/A54cpL/y3PiRv0oL8HN29ZaikI8quOv0NmplPB1A
-6x1g7Q25nl9DP8t+c/A+NstUL32v61fphX2zJPZHHUS3Tm7NHVsUpDnVk2qQdVX7
-f3MkdwtEvSyiD1FiM+90xw7TF4yDZcNTZSu7sbhnikjInZuglUxSfzqWoPfemiw4
-A+ZVRIKWNW97M8LdbhAvnqMyU4IVPfxyhz3JhJb9+4V2+ovRQETXdz09fABXWvYY
-M+SF8mB7iOuNtAaMfTxLUM+C6jlHoZA3YQg/0nR7Qe6XOLAriOI=
-=tcF0
------END PGP SIGNATURE-----
-
---WoqaC9TUMqqIOlla--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMzA2MDk1MTM1LjIxMjg1LTEta3JheGVsQHJlZGhhdC5jb20KU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NyAwLzldIHZmaW86IGFkZCBkaXNwbGF5IHN1cHBvcnQK
+Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90
+YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
+bmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpj
+b21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBp
+biAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQg
+bG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1h
+dD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAg
+ICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhp
+dCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
+ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
+ZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODAz
+MDYwOTUxMzUuMjEyODUtMS1rcmF4ZWxAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwMzA2MDk1
+MTM1LjIxMjg1LTEta3JheGVsQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
+ZXN0Jwo0OWExZTY1MjBlIHZmaW8vZGlzcGxheTogYWRkaW5nIGRtYWJ1ZiBzdXBwb3J0CmFkNmQx
+Y2UyODYgdmZpby9kaXNwbGF5OiBhZGRpbmcgcmVnaW9uIHN1cHBvcnQKZDU4M2U5MzE0NyB2Zmlv
+L2Rpc3BsYXk6IGNvcmUgJiB3aXJldXAKZDhhNWZlN2M5MSB2ZmlvL2NvbW1vbjogY2xlYW51cCBp
+biB2ZmlvX3JlZ2lvbl9maW5hbGl6ZQowODczMWJkMjNiIHNlY29uZGFyeS12Z2E6IHByb3Blcmx5
+IGNsb3NlIFFlbXVDb25zb2xlIG9uIHVucGx1ZwoyYmJkYTA2MjQ1IGNvbnNvbGU6IG1pbmltYWwg
+aG90cGx1ZyBzdXBvcnQKNTQyZmZkYzRlYyB1aS9waXhtYW46IGFkZCBxZW11X2RybV9mb3JtYXRf
+dG9fcGl4bWFuKCkKMzYxY2Q1ZGZiMCBzdGFuZGFyZC1oZWFkZXJzOiBhZGQgZHJtL2RybV9mb3Vy
+Y2MuaAphN2Q1YThkY2E3IGxpbnV4LWhlYWRlcnM6IHVwZGF0ZSB0byA0LjE2LXJjMQoKPT09IE9V
+VFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS85OiBsaW51eC1oZWFkZXJzOiB1cGRhdGUg
+dG8gNC4xNi1yYzEuLi4KQ2hlY2tpbmcgUEFUQ0ggMi85OiBzdGFuZGFyZC1oZWFkZXJzOiBhZGQg
+ZHJtL2RybV9mb3VyY2MuaC4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0
+YWJzCiM0NTQ6IEZJTEU6IHNjcmlwdHMvdXBkYXRlLWxpbnV4LWhlYWRlcnMuc2g6MTU5OgorXkki
+JG91dHB1dC9pbmNsdWRlL3N0YW5kYXJkLWhlYWRlcnMvZHJtIiQKCnRvdGFsOiAxIGVycm9ycywg
+MCB3YXJuaW5ncywgNDM0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDMvOTogdWkvcGl4bWFuOiBhZGQgcWVtdV9kcm1f
+Zm9ybWF0X3RvX3BpeG1hbigpLi4uCkNoZWNraW5nIFBBVENIIDQvOTogY29uc29sZTogbWluaW1h
+bCBob3RwbHVnIHN1cG9ydC4uLgpDaGVja2luZyBQQVRDSCA1Lzk6IHNlY29uZGFyeS12Z2E6IHBy
+b3Blcmx5IGNsb3NlIFFlbXVDb25zb2xlIG9uIHVucGx1Zy4uLgpDaGVja2luZyBQQVRDSCA2Lzk6
+IHZmaW8vY29tbW9uOiBjbGVhbnVwIGluIHZmaW9fcmVnaW9uX2ZpbmFsaXplLi4uCkNoZWNraW5n
+IFBBVENIIDcvOTogdmZpby9kaXNwbGF5OiBjb3JlICYgd2lyZXVwLi4uCkNoZWNraW5nIFBBVENI
+IDgvOTogdmZpby9kaXNwbGF5OiBhZGRpbmcgcmVnaW9uIHN1cHBvcnQuLi4KRVJST1I6IGJyYWNl
+cyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTQzOiBG
+SUxFOiBody92ZmlvL2Rpc3BsYXkuYzoxNjI6CisgICAgaWYgKCF2ZGV2LT5kcHkpClsuLi5dCgp0
+b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDE1MyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA5Lzk6IHZmaW8vZGlz
+cGxheTogYWRkaW5nIGRtYWJ1ZiBzdXBwb3J0Li4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
+b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
+Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
+ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
