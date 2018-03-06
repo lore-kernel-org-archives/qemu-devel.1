@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eszym-0006HL-7k
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 18:57:17 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1et0Bf-0001RQ-Dp
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 19:10:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eszyk-0006CT-Jw
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 18:57:16 -0500
-Received: from mail-ot0-x235.google.com ([2607:f8b0:4003:c0f::235]:40017)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eszyk-0006CB-CG
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 18:57:14 -0500
-Received: by mail-ot0-x235.google.com with SMTP id l12so16711584otj.7
-	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 15:57:14 -0800 (PST)
+	(envelope-from <dgibson@ozlabs.org>) id 1et0Bd-0003Bb-IY
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 19:10:35 -0500
+Date: Tue, 6 Mar 2018 11:10:18 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180306001018.GP2650@umbus.fritz.box>
+References: <20180305083655.6186-1-pbonzini@redhat.com>
+	<20180305083655.6186-2-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1519944838-12430-1-git-send-email-cota@braap.org>
-References: <1519944838-12430-1-git-send-email-cota@braap.org>
-From: Michael Clark <mjc@sifive.com>
-Date: Tue, 6 Mar 2018 12:57:13 +1300
-Message-ID: <CAHNT7NusFbz=Dt0TGEWKFyJjDDpF3zjGmfkKw4w9thBOFzHb6g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCHv1 00/14] Translation loop conversion for
- sh4/sparc/mips/s390x/openrisc targets
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="YolNsh7G+K7zsfIR"
+Content-Disposition: inline
+In-Reply-To: <20180305083655.6186-2-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/7] openpic_kvm: drop
+ address_space_to_flatview call
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +25,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, David Hildenbrand <david@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org, Artyom Tarasenko <atar4qemu@gmail.com>, Stafford Horne <shorne@gmail.com>, Yongbok Kim <yongbok.kim@mips.com>, Aurelien Jarno <aurelien@aurel32.net>
-
-On Fri, Mar 2, 2018 at 11:53 AM, Emilio G. Cota <cota@braap.org> wrote:
-
-> [ What is this all about? See this message:
->   http://lists.gnu.org/archive/html/qemu-devel/2018-02/msg04785.html ]
->
-> Merged the separate patchsets I sent in the last couple of weeks into
-> one set. This will be easier to merge since it will avoid potential
-> merge conflicts due to adding max_insns to dc->base.
->
-> Changes since sending the separate series for
-> sh4/sparc/mips/s390x/openrisc:
-> - Rebased on top of master (669743979)
-> - Added R-b's
-> - sh4: no changes since v3
-> - mips: no changes (no reviews yet!)
-> - sparc:
->   + Use base.singlestep_enabled and singlestep like in other targets,
->     e.g. Alpha.
->   + Remove the unnecessary
->      (dc.pc - pc_start) < (TARGET_PAGE_SIZE - 32))
->     check.
-> - s390x:
->   + Remove dc->pc, use pc_next instead as David suggested.
->   + Use dc for DisasContext instead of s.
->   + Compute next_page in translate_insn instead of keeping it in dc.
->   + Looked into dropping dc->do_debug, but don't see an easy way to do so.
-> - openrisc:
->   + Consistently use DISAS_NORETURN after generating an
->     exception; fixed the two call sites that Richard pointed out,
->     plus a couple of others that weren't visible in the previous patch.
->   + Remove the dc->next_page_start field; instead, set the max_insn
->     bound in translate_insn.
->
-> You can fetch this series from:
->   https://github.com/cota/qemu/tree/trloop-conv-v1
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-stable@nongnu.org
 
 
-Curious to know what we would need to change in RISC-V translate.c:
+--YolNsh7G+K7zsfIR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--
-https://github.com/riscv/riscv-qemu/blob/qemu-upstream-v8/target/riscv/translate.c
+On Mon, Mar 05, 2018 at 09:36:49AM +0100, Paolo Bonzini wrote:
+> The MemoryListener is registered on address_space_memory, there is
+> not much to assert.  This currently works because the callback
+> is invoked only once when the listener is registered, but section->fv
+> is the _new_ FlatView, not the old one on later calls and that
+> would break.
+>=20
+> This confines address_space_to_flatview to exec.c and memory.c.
+>=20
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-I'm going to make a v8.1 branch and tag that is a rebase of the v8 patch
-series against current QEMU master, and hopefully we get the RISC-V port
-merged before the soft-freeze. Fingers crossed.
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
-Diffstat below.
->
-> Thanks,
->
->                 Emilio
->
->  accel/tcg/translator.c      |   21 +-
->  include/exec/translator.h   |    8 +-
->  target/alpha/translate.c    |    6 +-
->  target/arm/translate-a64.c  |    8 +-
->  target/arm/translate.c      |    9 +-
->  target/hppa/translate.c     |    7 +-
->  target/i386/translate.c     |    5 +-
->  target/mips/translate.c     |  623 +++++------
->  target/openrisc/translate.c |  226 ++--
->  target/ppc/translate.c      |    5 +-
->  target/s390x/translate.c    | 1527 +++++++++++++--------------
->  target/sh4/translate.c      |  171 +--
->  target/sparc/translate.c    |  207 ++--
->  13 files changed, 1401 insertions(+), 1422 deletions(-)
->
->
+Do you want me to take this through my tree?
+
+
+> ---
+>  hw/intc/openpic_kvm.c | 4 ----
+>  1 file changed, 4 deletions(-)
+>=20
+> diff --git a/hw/intc/openpic_kvm.c b/hw/intc/openpic_kvm.c
+> index fa83420254..39a6f369c5 100644
+> --- a/hw/intc/openpic_kvm.c
+> +++ b/hw/intc/openpic_kvm.c
+> @@ -124,10 +124,6 @@ static void kvm_openpic_region_add(MemoryListener *l=
+istener,
+>      uint64_t reg_base;
+>      int ret;
+> =20
+> -    if (section->fv !=3D address_space_to_flatview(&address_space_memory=
+)) {
+> -        abort();
+> -    }
+> -
+>      /* Ignore events on regions that are not us */
+>      if (section->mr !=3D &opp->mem) {
+>          return;
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--YolNsh7G+K7zsfIR
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqd3GoACgkQbDjKyiDZ
+s5K+3BAA2WgdU14BXcXLCDkidDt6pgG0bU2OWLmB/09+9nUWylBdshbpyUmT48Xk
+/2vf0xhdor3Lwn64Mi09aRBpemxQapQ/IDSThUk9XKaL1CtQ7yzQ1Ou4+f28qwGA
+cCy8rtDrNoy+5JfZTx4kmti3MHdKBOjos+FQbZdGyavOCLLFatHsH/hK1yvMkYej
+R00uzEzWR5IzmNICfXCA4hYf0+f5OyDxubyb86aoonTnpUKqLDvFuKxbokRMBamd
+ICaFO9b1XFxYnEleHkUkgr/2sk604vrh9bDTv8ppDfxYsSN5fPodGKAkkXAVoIc2
+zv7wjU7dWuguhIlk69mZH73crT3pbzAEIFia3OV3QBeQkc7i6aQYYc1QCvKP1iGR
+m41hcDRmdLixRX4ZdCBOLIRNbbeenfeDWDjcV2fI8kLkQhjO5lwwZkq6fozJv8t0
+uTJPSij+sRG7F+cVVtJRJV9hV/eI7HZOO4GQWKER+ZqLO4pPJiRtu6UfAm50r7mP
+9a2D2CaQNEjTGW8csLM1qLJBGJUetv7u/+FDzgGfoFNQeQrJOexbk08DLaxgJUt9
+14/dzcsnGNAEkBwzFJtpVewN5LOGBicHN5I1NoqttdmoPIxOYKRk/2meMg+PV3ci
+Js1jEHblJKXbaKnS3QPbU4/ArvqTFm+PWsBq6Yq8WN2ihTrI1Dc=
+=pgr6
+-----END PGP SIGNATURE-----
+
+--YolNsh7G+K7zsfIR--
