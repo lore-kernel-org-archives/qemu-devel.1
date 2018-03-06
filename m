@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1etAru-0001cK-TH
+	(envelope-from <kraxel@redhat.com>) id 1etAru-0001cJ-ST
 	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:34:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1etArr-0001nL-Mn
+	(envelope-from <kraxel@redhat.com>) id 1etArs-0001oP-Bb
 	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:34:54 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34924 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54602 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1etArr-0001mk-I1
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:34:51 -0500
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1etArs-0001ny-7B
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:34:52 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue,  6 Mar 2018 12:34:39 +0100
-Message-Id: <20180306113442.15295-7-kraxel@redhat.com>
-In-Reply-To: <20180306113442.15295-1-kraxel@redhat.com>
-References: <20180306113442.15295-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 6/9] vfio/common: cleanup in
- vfio_region_finalize
+Date: Tue,  6 Mar 2018 12:34:33 +0100
+Message-Id: <20180306113442.15295-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v8 0/9] vfio: add display support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,28 +24,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: intel-gvt-dev@lists.freedesktop.org, Alex Williamson <alex.williamson@redhat.com>, Tina Zhang <tina.zhang@intel.com>, Gerd Hoffmann <kraxel@redhat.com>, Kirti Wankhede <kwankhede@nvidia.com>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/vfio/common.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+This series adds support for a vgpu display to the qemu vfio code.
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index f895e3c335..6a8203a532 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -858,6 +858,13 @@ void vfio_region_finalize(VFIORegion *region)
-     g_free(region->mmaps);
- 
-     trace_vfio_region_finalize(region->vbasedev->name, region->nr);
-+
-+    region->mem = NULL;
-+    region->mmaps = NULL;
-+    region->nr_mmaps = 0;
-+    region->size = 0;
-+    region->flags = 0;
-+    region->nr = 0;
- }
- 
- void vfio_region_mmaps_set_enabled(VFIORegion *region, bool enabled)
+v8:
+ - codestyle fixes, this time for real ...
+
+v7:
+ - rebase to latest master.
+ - dmabuf: update cursor hotspot properly (Tina).
+ - dmabuf: track whenever cursor hotspot + position changes.
+ - codestyle fixes.
+
+v6:
+ - add support for hotplugging QemuConsoles.
+ - drop vfio-pci-display device, re-add OnOffAuto display property.
+ - add proper cleanup in finalize.
+
+v5:
+ - rebase to latest master
+ - drop DeviceState->hotpluggable patch, use separate vfio-pci-display
+   device instead so we can use DeviceClass->hotpluggable.
+ - add vfio dma-buf patch.  Right now this can be tested with '-display
+   egl-headless' only.  gtk and spice support is almost ready for merge
+   and should follow soon.
+
+cheers,
+  Gerd
+
+Gerd Hoffmann (9):
+  linux-headers: update to 4.16-rc1
+  standard-headers: add drm/drm_fourcc.h
+  ui/pixman: add qemu_drm_format_to_pixman()
+  console: minimal hotplug suport
+  secondary-vga: properly close QemuConsole on unplug
+  vfio/common: cleanup in vfio_region_finalize
+  vfio/display: core & wireup
+  vfio/display: adding region support
+  vfio/display: adding dmabuf support
+
+ hw/vfio/pci.h                                      |   5 +
+ include/hw/vfio/vfio-common.h                      |  22 ++
+ include/standard-headers/drm/drm_fourcc.h          | 411 +++++++++++++++++++++
+ include/standard-headers/linux/input-event-codes.h |   1 +
+ include/standard-headers/linux/input.h             |  11 +
+ include/standard-headers/linux/pci_regs.h          |  30 +-
+ include/standard-headers/linux/virtio_net.h        |  13 +
+ include/ui/console.h                               |   2 +
+ include/ui/qemu-pixman.h                           |   5 +
+ linux-headers/asm-powerpc/kvm.h                    |   2 +
+ linux-headers/asm-powerpc/unistd.h                 |   3 +
+ linux-headers/asm-s390/unistd.h                    | 401 +-------------------
+ linux-headers/asm-s390/unistd_32.h                 | 364 ++++++++++++++++++
+ linux-headers/asm-s390/unistd_64.h                 | 331 +++++++++++++++++
+ linux-headers/asm-x86/kvm_para.h                   |   4 +
+ linux-headers/linux/kvm.h                          |  90 +++++
+ linux-headers/linux/psci.h                         |   3 +
+ linux-headers/linux/vfio.h                         |  72 ++++
+ hw/display/vga-pci.c                               |   9 +
+ hw/vfio/common.c                                   |   7 +
+ hw/vfio/display.c                                  | 347 +++++++++++++++++
+ hw/vfio/pci.c                                      |  10 +
+ ui/console.c                                       |  79 +++-
+ ui/qemu-pixman.c                                   |  22 ++
+ hw/vfio/Makefile.objs                              |   2 +-
+ scripts/update-linux-headers.sh                    |   8 +
+ ui/trace-events                                    |   2 +
+ 27 files changed, 1839 insertions(+), 417 deletions(-)
+ create mode 100644 include/standard-headers/drm/drm_fourcc.h
+ create mode 100644 linux-headers/asm-s390/unistd_32.h
+ create mode 100644 linux-headers/asm-s390/unistd_64.h
+ create mode 100644 hw/vfio/display.c
+
 -- 
 2.9.3
