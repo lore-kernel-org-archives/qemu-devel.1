@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1etDGY-0004dN-Ov
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:08:31 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1etDJE-0006OE-RU
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:11:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1etDGX-00076x-DH
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:08:30 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:45438)
+	(envelope-from <alex.bennee@linaro.org>) id 1etDJA-0000LH-FZ
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:11:16 -0500
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:34500)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1etDGX-00076W-6h
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:08:29 -0500
-Received: by mail-ot0-x243.google.com with SMTP id f11so18412981otj.12
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 06:08:29 -0800 (PST)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1etDJA-0000K9-4q
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:11:12 -0500
+Received: by mail-wr0-x241.google.com with SMTP id o8so9576467wra.1
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 06:11:12 -0800 (PST)
+References: <20180303143823.27055-1-richard.henderson@linaro.org>
+	<20180303143823.27055-3-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180303143823.27055-3-richard.henderson@linaro.org>
+Date: Tue, 06 Mar 2018 14:11:09 +0000
+Message-ID: <876069thtu.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1518893216-9983-3-git-send-email-eric.auger@redhat.com>
-References: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
-	<1518893216-9983-3-git-send-email-eric.auger@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 6 Mar 2018 14:08:07 +0000
-Message-ID: <CAFEAcA-uMZwR8HfVDx0Rau9G2unMypWJEL0o3ACPHxCqZ+g=_Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v9 02/14] hw/arm/smmu-common: IOMMU memory
- region and address space setup
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 2/5] aarch64-linux-user: Split out
+ helpers for guest signal handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,149 +31,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-On 17 February 2018 at 18:46, Eric Auger <eric.auger@redhat.com> wrote:
-> We enumerate all the PCI devices attached to the SMMU and
-> initialize an associated IOMMU memory region and address space.
-> This happens on SMMU base instance init.
->
-> Those info are stored in SMMUDevice objects. The devices are
-> grouped according to the PCIBus they belong to. A hash table
-> indexed by the PCIBus poinet is used. Also an array indexed by
 
-"pointer".
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-> the bus number allows to find the list of SMMUDevices.
+> Split out helpers from target_setup_frame and target_restore_sigframe
+> for dealing with general registers, fpsimd registers, and the end record.
 >
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> When we add support for sve registers, the relative positions of
+> these will change.
 >
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 > ---
-> v8 -> v9:
-> - fix key value for lookup
+>  linux-user/signal.c | 120 ++++++++++++++++++++++++++++++----------------=
+------
+>  1 file changed, 69 insertions(+), 51 deletions(-)
 >
-> v7 -> v8:
-> - introduce SMMU_MAX_VA_BITS
-> - use PCI bus handle as a key
-> - do not clear s->smmu_as_by_bus_num
-> - use g_new0 instead of g_malloc0
-> - use primary_bus field
-> ---
->  hw/arm/smmu-common.c         | 59 ++++++++++++++++++++++++++++++++++++++++++++
->  include/hw/arm/smmu-common.h |  6 +++++
->  2 files changed, 65 insertions(+)
+> diff --git a/linux-user/signal.c b/linux-user/signal.c
+> index 9a380b9e31..25c9743aed 100644
+> --- a/linux-user/signal.c
+> +++ b/linux-user/signal.c
+> @@ -1462,16 +1462,17 @@ struct target_rt_sigframe {
+>      uint32_t tramp[2];
+>  };
 >
-> diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-> index 86a5aab..d0516dc 100644
-> --- a/hw/arm/smmu-common.c
-> +++ b/hw/arm/smmu-common.c
-> @@ -28,12 +28,71 @@
->  #include "qemu/error-report.h"
->  #include "hw/arm/smmu-common.h"
->
-> +SMMUPciBus *smmu_find_as_from_bus_num(SMMUState *s, uint8_t bus_num)
-> +{
-> +    SMMUPciBus *smmu_pci_bus = s->smmu_as_by_bus_num[bus_num];
-
-Variable name suggests this is a table of AddressSpaces indexed by
-bus number, but the code says we're getting SMMUPCIBus objects from it?
-
-> +
-> +    if (!smmu_pci_bus) {
-> +        GHashTableIter iter;
-> +
-> +        g_hash_table_iter_init(&iter, s->smmu_as_by_busptr);
-> +        while (g_hash_table_iter_next(&iter, NULL, (void **)&smmu_pci_bus)) {
-> +            if (pci_bus_num(smmu_pci_bus->bus) == bus_num) {
-> +                s->smmu_as_by_bus_num[bus_num] = smmu_pci_bus;
-> +                return smmu_pci_bus;
-> +            }
-> +        }
-
-Why do we populate this hashtable lazily rather than when we
-put the SMMUPciBus in the smmu_as_by_busptr table? Do we
-expect this function not to ordinarily be called?
-
-> +    }
-> +    return smmu_pci_bus;
-> +}
-> +
-> +static AddressSpace *smmu_find_add_as(PCIBus *bus, void *opaque, int devfn)
-> +{
-> +    SMMUState *s = opaque;
-> +    SMMUPciBus *sbus = g_hash_table_lookup(s->smmu_as_by_busptr, bus);
-> +    SMMUDevice *sdev;
-> +
-> +    if (!sbus) {
-> +        sbus = g_malloc0(sizeof(SMMUPciBus) +
-> +                         sizeof(SMMUDevice *) * SMMU_PCI_DEVFN_MAX);
-> +        sbus->bus = bus;
-> +        g_hash_table_insert(s->smmu_as_by_busptr, bus, sbus);
-> +    }
-> +
-> +    sdev = sbus->pbdev[devfn];
-> +    if (!sdev) {
-> +        char *name = g_strdup_printf("%s-%d-%d",
-> +                                     s->mrtypename,
-> +                                     pci_bus_num(bus), devfn);
-> +        sdev = sbus->pbdev[devfn] = g_new0(SMMUDevice, 1);
-> +
-> +        sdev->smmu = s;
-> +        sdev->bus = bus;
-> +        sdev->devfn = devfn;
-> +
-> +        memory_region_init_iommu(&sdev->iommu, sizeof(sdev->iommu),
-> +                                 s->mrtypename,
-> +                                 OBJECT(s), name, 1ULL << SMMU_MAX_VA_BITS);
-> +        address_space_init(&sdev->as,
-> +                           MEMORY_REGION(&sdev->iommu), name);
-
-This leaks the memory pointed to by name, doesn't it?
-(address_space_init() takes a copy of the name string, so you want
-to g_free(name) here.)
-
-> +    }
-> +
-> +    return &sdev->as;
-> +}
-> +
->  static void smmu_base_realize(DeviceState *dev, Error **errp)
+> -static int target_setup_sigframe(struct target_rt_sigframe *sf,
+> -                                 CPUARMState *env, target_sigset_t *set)
+> +static void target_setup_general_frame(struct target_rt_sigframe *sf,
+> +                                       CPUARMState *env, target_sigset_t=
+ *set)
 >  {
->      SMMUState *s = ARM_SMMU(dev);
+>      int i;
+> -    struct target_aux_context *aux =3D
+> -        (struct target_aux_context *)sf->uc.tuc_mcontext.__reserved;
 >
->      s->configs = g_hash_table_new_full(NULL, NULL, NULL, g_free);
->      s->iotlb = g_hash_table_new_full(NULL, NULL, NULL, g_free);
-> +    s->smmu_as_by_busptr = g_hash_table_new(NULL, NULL);
+> -    /* set up the stack frame for unwinding */
+> -    __put_user(env->xregs[29], &sf->fp);
+> -    __put_user(env->xregs[30], &sf->lr);
+> +    __put_user(0, &sf->uc.tuc_flags);
+> +    __put_user(0, &sf->uc.tuc_link);
 > +
-> +    if (s->primary_bus) {
-> +        pci_setup_iommu(s->primary_bus, smmu_find_add_as, s);
-> +    } else {
-> +        error_setg(errp, "SMMU is not attached to any PCI bus!");
-> +    }
+> +    __put_user(target_sigaltstack_used.ss_sp, &sf->uc.tuc_stack.ss_sp);
+> +    __put_user(sas_ss_flags(env->xregs[31]), &sf->uc.tuc_stack.ss_flags);
+> +    __put_user(target_sigaltstack_used.ss_size, &sf->uc.tuc_stack.ss_siz=
+e);
+>
+>      for (i =3D 0; i < 31; i++) {
+>          __put_user(env->xregs[i], &sf->uc.tuc_mcontext.regs[i]);
+> @@ -1485,39 +1486,42 @@ static int target_setup_sigframe(struct target_rt=
+_sigframe *sf,
+>      for (i =3D 0; i < TARGET_NSIG_WORDS; i++) {
+>          __put_user(set->sig[i], &sf->uc.tuc_sigmask.sig[i]);
+>      }
+> +}
+> +
+> +static void target_setup_fpsimd_record(struct target_fpsimd_context *fps=
+imd,
+> +                                       CPUARMState *env)
+> +{
+> +    int i;
+> +
+> +    __put_user(TARGET_FPSIMD_MAGIC, &fpsimd->head.magic);
+> +    __put_user(sizeof(struct target_fpsimd_context), &fpsimd->head.size);
+> +    __put_user(vfp_get_fpsr(env), &fpsimd->fpsr);
+> +    __put_user(vfp_get_fpcr(env), &fpsimd->fpcr);
+>
+>      for (i =3D 0; i < 32; i++) {
+>          uint64_t *q =3D aa64_vfp_qreg(env, i);
+>  #ifdef TARGET_WORDS_BIGENDIAN
+> -        __put_user(q[0], &aux->fpsimd.vregs[i * 2 + 1]);
+> -        __put_user(q[1], &aux->fpsimd.vregs[i * 2]);
+> +        __put_user(q[0], &fpsimd->vregs[i * 2 + 1]);
+> +        __put_user(q[1], &fpsimd->vregs[i * 2]);
+>  #else
+> -        __put_user(q[0], &aux->fpsimd.vregs[i * 2]);
+> -        __put_user(q[1], &aux->fpsimd.vregs[i * 2 + 1]);
+> +        __put_user(q[0], &fpsimd->vregs[i * 2]);
+> +        __put_user(q[1], &fpsimd->vregs[i * 2 + 1]);
+>  #endif
+>      }
+> -    __put_user(vfp_get_fpsr(env), &aux->fpsimd.fpsr);
+> -    __put_user(vfp_get_fpcr(env), &aux->fpsimd.fpcr);
+> -    __put_user(TARGET_FPSIMD_MAGIC, &aux->fpsimd.head.magic);
+> -    __put_user(sizeof(struct target_fpsimd_context),
+> -            &aux->fpsimd.head.size);
+> -
+> -    /* set the "end" magic */
+> -    __put_user(0, &aux->end.magic);
+> -    __put_user(0, &aux->end.size);
+> -
+> -    return 0;
 >  }
 >
->  static void smmu_base_reset(DeviceState *dev)
-> diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
-> index 8a9d931..aee96c2 100644
-> --- a/include/hw/arm/smmu-common.h
-> +++ b/include/hw/arm/smmu-common.h
-> @@ -121,4 +121,10 @@ typedef struct {
->  #define ARM_SMMU_GET_CLASS(obj)                              \
->      OBJECT_GET_CLASS(SMMUBaseClass, (obj), TYPE_ARM_SMMU)
->
-> +SMMUPciBus *smmu_find_as_from_bus_num(SMMUState *s, uint8_t bus_num);
-> +
-> +static inline uint16_t smmu_get_sid(SMMUDevice *sdev)
+> -static int target_restore_sigframe(CPUARMState *env,
+> -                                   struct target_rt_sigframe *sf)
+> +static void target_setup_end_record(struct target_aarch64_ctx *end)
 > +{
-> +    return  ((pci_bus_num(sdev->bus) & 0xff) << 8) | sdev->devfn;
+> +    __put_user(0, &end->magic);
+> +    __put_user(0, &end->size);
 > +}
+> +
+> +static void target_restore_general_frame(CPUARMState *env,
+> +                                         struct target_rt_sigframe *sf)
+>  {
+>      sigset_t set;
+> -    int i;
+> -    struct target_aux_context *aux =3D
+> -        (struct target_aux_context *)sf->uc.tuc_mcontext.__reserved;
+> -    uint32_t magic, size, fpsr, fpcr;
+>      uint64_t pstate;
+> +    int i;
+>
+>      target_to_host_sigset(&set, &sf->uc.tuc_sigmask);
+>      set_sigmask(&set);
+> @@ -1530,30 +1534,48 @@ static int target_restore_sigframe(CPUARMState *e=
+nv,
+>      __get_user(env->pc, &sf->uc.tuc_mcontext.pc);
+>      __get_user(pstate, &sf->uc.tuc_mcontext.pstate);
+>      pstate_write(env, pstate);
+> +}
+>
+> -    __get_user(magic, &aux->fpsimd.head.magic);
+> -    __get_user(size, &aux->fpsimd.head.size);
+> +static void target_restore_fpsimd_record(CPUARMState *env,
+> +                                         struct target_fpsimd_context *f=
+psimd)
+> +{
+> +    uint32_t fpsr, fpcr;
+> +    int i;
+>
+> -    if (magic !=3D TARGET_FPSIMD_MAGIC
+> -        || size !=3D sizeof(struct target_fpsimd_context)) {
+> -        return 1;
+> -    }
+> +    __get_user(fpsr, &fpsimd->fpsr);
+> +    vfp_set_fpsr(env, fpsr);
+> +    __get_user(fpcr, &fpsimd->fpcr);
+> +    vfp_set_fpcr(env, fpcr);
+>
+>      for (i =3D 0; i < 32; i++) {
+>          uint64_t *q =3D aa64_vfp_qreg(env, i);
+>  #ifdef TARGET_WORDS_BIGENDIAN
+> -        __get_user(q[0], &aux->fpsimd.vregs[i * 2 + 1]);
+> -        __get_user(q[1], &aux->fpsimd.vregs[i * 2]);
+> +        __get_user(q[0], &fpsimd->vregs[i * 2 + 1]);
+> +        __get_user(q[1], &fpsimd->vregs[i * 2]);
+>  #else
+> -        __get_user(q[0], &aux->fpsimd.vregs[i * 2]);
+> -        __get_user(q[1], &aux->fpsimd.vregs[i * 2 + 1]);
+> +        __get_user(q[0], &fpsimd->vregs[i * 2]);
+> +        __get_user(q[1], &fpsimd->vregs[i * 2 + 1]);
+>  #endif
+>      }
+> -    __get_user(fpsr, &aux->fpsimd.fpsr);
+> -    vfp_set_fpsr(env, fpsr);
+> -    __get_user(fpcr, &aux->fpsimd.fpcr);
+> -    vfp_set_fpcr(env, fpcr);
+> +}
+>
+> +static int target_restore_sigframe(CPUARMState *env,
+> +                                   struct target_rt_sigframe *sf)
+> +{
+> +    struct target_aux_context *aux
+> +        =3D (struct target_aux_context *)sf->uc.tuc_mcontext.__reserved;
+> +    uint32_t magic, size;
+> +
+> +    target_restore_general_frame(env, sf);
+> +
+> +    __get_user(magic, &aux->fpsimd.head.magic);
+> +    __get_user(size, &aux->fpsimd.head.size);
+> +    if (magic =3D=3D TARGET_FPSIMD_MAGIC
+> +        && size =3D=3D sizeof(struct target_fpsimd_context)) {
+> +        target_restore_fpsimd_record(env, &aux->fpsimd);
+> +    } else {
+> +        return 1;
+> +    }
+>      return 0;
+>  }
+>
+> @@ -1580,6 +1602,7 @@ static void target_setup_frame(int usig, struct tar=
+get_sigaction *ka,
+>                                 CPUARMState *env)
+>  {
+>      struct target_rt_sigframe *frame;
+> +    struct target_aux_context *aux;
+>      abi_ulong frame_addr, return_addr;
+>
+>      frame_addr =3D get_sigframe(ka, env);
+> @@ -1587,17 +1610,12 @@ static void target_setup_frame(int usig, struct t=
+arget_sigaction *ka,
+>      if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
+>          goto give_sigsegv;
+>      }
+> +    aux =3D (struct target_aux_context *)frame->uc.tuc_mcontext.__reserv=
+ed;
+>
+> -    __put_user(0, &frame->uc.tuc_flags);
+> -    __put_user(0, &frame->uc.tuc_link);
+> +    target_setup_general_frame(frame, env, set);
+> +    target_setup_fpsimd_record(&aux->fpsimd, env);
+> +    target_setup_end_record(&aux->end);
+>
+> -    __put_user(target_sigaltstack_used.ss_sp,
+> -                      &frame->uc.tuc_stack.ss_sp);
+> -    __put_user(sas_ss_flags(env->xregs[31]),
+> -                      &frame->uc.tuc_stack.ss_flags);
+> -    __put_user(target_sigaltstack_used.ss_size,
+> -                      &frame->uc.tuc_stack.ss_size);
+> -    target_setup_sigframe(frame, env, set);
+>      if (ka->sa_flags & TARGET_SA_RESTORER) {
+>          return_addr =3D ka->sa_restorer;
+>      } else {
 
-Can we have at least brief documentation comments for any
-new functions or prototypes added to header files, please?
 
->  #endif  /* HW_ARM_SMMU_COMMON */
-> --
-
-thanks
--- PMM
+--
+Alex Benn=C3=A9e
