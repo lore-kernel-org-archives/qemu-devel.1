@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1et41R-0006Nc-RO
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:16:18 -0500
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1et4Hx-0002lE-3P
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:33:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1et41M-0001Qc-Th
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:16:17 -0500
-Received: from mga17.intel.com ([192.55.52.151]:16093)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1et41M-0001QO-IP
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:16:12 -0500
-Date: Tue, 6 Mar 2018 12:16:08 +0800
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-ID: <20180306041608.mbr6b25y557awxrn@hz-desktop>
-References: <20171207101030.22364-1-haozhong.zhang@intel.com>
-	<20171207101812.23602-1-haozhong.zhang@intel.com>
-	<20180227172223.GD1799@perard.uk.xensource.com>
-	<20180228093659.xpq2amq2zjuw2mdr@hz-desktop>
-	<20180302120323.GG1799@perard.uk.xensource.com>
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1et4Ht-0000HL-Vw
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:33:21 -0500
+Received: from smtp65.cstnet.cn ([159.226.251.65]:37384 helo=cstnet.cn)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1et4Ht-0000Ga-BY
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:33:17 -0500
+Date: Tue, 6 Mar 2018 12:33:11 +0800 (GMT+08:00)
+From: "Su Hang" <suhang16@mails.ucas.ac.cn>
+In-Reply-To: <20180302112911.GE6026@stefanha-x1.localdomain>
+References: <1519788689-11967-1-git-send-email-suhang16@mails.ucas.ac.cn>
+	<20180302112911.GE6026@stefanha-x1.localdomain>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180302120323.GG1799@perard.uk.xensource.com>
-Subject: Re: [Qemu-devel] [Xen-devel] [RFC QEMU PATCH v4 00/10] Implement
- vNVDIMM for Xen HVM guest
+Message-ID: <2feee67f.29662.161f995af1c.Coremail.suhang16@mails.ucas.ac.cn>
+Subject: Re: [Qemu-devel] [PATCH v3] scripts/checkpatch.pl: add check for
+ `while` and `for`
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,61 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: thuth@redhat.com, qemu-devel@nongnu.org
 
-On 03/02/18 12:03 +0000, Anthony PERARD wrote:
-> On Wed, Feb 28, 2018 at 05:36:59PM +0800, Haozhong Zhang wrote:
-> > On 02/27/18 17:22 +0000, Anthony PERARD wrote:
-> > > On Thu, Dec 07, 2017 at 06:18:02PM +0800, Haozhong Zhang wrote:
-> > > > This is the QEMU part patches that works with the associated Xen
-> > > > patches to enable vNVDIMM support for Xen HVM domains. Xen relies on
-> > > > QEMU to build guest NFIT and NVDIMM namespace devices, and allocate
-> > > > guest address space for vNVDIMM devices.
-> > > 
-> > > I've got other question, and maybe possible improvements.
-> > > 
-> > > When QEMU build the ACPI tables, it also initialize some MemoryRegion,
-> > > which use more guest memory. Do you know if those regions are used with
-> > > your patch series on Xen?
-> > 
-> > Yes, that's why dm_acpi_size is introduced.
-> > 
-> > > Otherwise, we could try to avoid their
-> > > creation with this:
-> > > In xenfv_machine_options()
-> > > m->rom_file_has_mr = false;
-> > > (setting this in xen_hvm_init() would probably be better, but I havn't
-> > > try)
-> > 
-> > If my memory is correct, simply setting rom_file_has_mr to false does
-> > not work (though I cannot remind the exact reason). I'll have a look
-> > as the code to refresh my memory.
-> 
-> I've played a bit with this idea, but without a proper NVDIMM available
-> for the guest, so I don't know if it's going to work properly without
-> the mr.
-> 
-> To make it work, I had to disable some code in acpi_build_update() that
-> make use of the MemoryRegions, as well as an assert in acpi_setup().
-> After those small hacks, I could boot the guest, and I've check that the
-> expected ACPI tables where there, and they looked correct to my eyes.
-> And least `ndctl list` works and showed the nvdimm (that I have
-> configured on QEMU's cmdline).
-> 
-> But I may not have been far enough with my tests, and maybe something
-> later relies on the MRs, especially the _DSM method that I don't know if
-> it was working properly.
-> 
-> Anyway, that why I proposed the idea, and if we can avoid more
-> uncertainty about how much guest memory QEMU is going to use, that would
-> be good.
-> 
-
-Yes, I also tested some non-trivial _DSM methods and it looks rom
-files without memory regions can work with Xen after some
-modifications. I'll apply this idea in the next version if no other
-issues are found.
-
-Thanks,
-Haozhong
+QXMgdG9vIG1hbnkgZW1haWxzIG92ZXJ3aGVsbWVkIG15IGVtYWlsIGJveCwgSSBhbSB2ZXJ5IHNv
+cnJ5IGZvciBub3Qgc2VlaW5nIHlvdXIgcmVwbHkgdW50aWwgdGhpcyBtb3JuaW5nLgoKSSB3aWxs
+IGZpeCB3cm9uZyB1c2luZyBvZiBnaXQgcmlnaHQgbm93IQoKIlN0ZWZhbiBIYWpub2N6aSIgPHN0
+ZWZhbmhhQHJlZGhhdC5jb20+d3JvdGU6Cj4gT24gV2VkLCBGZWIgMjgsIDIwMTggYXQgMTE6MzE6
+MjlBTSArMDgwMCwgU3UgSGFuZyB3cm90ZToNCj4gPiBBZGRpbmcgY2hlY2sgZm9yIGB3aGlsZWAg
+YW5kIGBmb3JgIHN0YXRlbWVudHMsIHdoaWNoIGNvbmRpdGlvbiBoYXMgbW9yZSB0aGFuDQo+ID4g
+b25lIGxpbmUuDQo+ID4gDQo+ID4gVGhlIGZvcm1lciBjaGVja3BhdGNoLnBsIGNhbiBjaGVjayBg
+aWZgIHN0YXRlbWVudCwgd2hpY2ggY29uZGl0aW9uIGhhcyBtb3JlDQo+ID4gdGhhbiBvbmUgbGlu
+ZSwgd2hldGhlciBibG9jayBtaXNzZXMgYnJhY2Ugcm91bmQsIGxpa2UgdGhpczoNCj4gPiAnJycN
+Cj4gPiBpZiAoY29uZDEgfHwNCj4gPiAgICAgY29uZDIpDQo+ID4gICAgIHN0YXRlbWVudDsNCj4g
+PiAnJycNCj4gPiBCdXQgaXQgZG9lc24ndCBkbyB0aGUgc2FtZSBjaGVjayBmb3IgYGZvcmAgYW5k
+IGB3aGlsZWAgc3RhdGVtZW50cy4NCj4gPiANCj4gPiBVc2luZyBgKD86Li4uKWAgaW5zdGVhZCBv
+ZiBgKC4uLilgIGluIHJlZ2V4IHBhdHRlcm4gY2F0Y2guDQo+ID4gQmVjYXVzZSBgKD86Li4uKWAg
+aXMgZmFzdGVyIGFuZCBhdm9pZHMgdW53YW50ZWQgc2lkZS1lZmZlY3QuDQo+IA0KPiBUaGlzIHBh
+dGNoIGRvZXNuJ3QgYXBwbHkgdG8gcWVtdS5naXQvbWFzdGVyIGJlY2F1c2UgaXQncyBiYXNlZCBv
+biB5b3VyDQo+IHYyIHBhdGNoLg0KPiANCj4gUGxlYXNlIHNlbmQgYSBzaW5nbGUgdjQgcGF0Y2gg
+dGhhdCBjb21iaW5lcyB2MiBhbmQgdjMgY2hhbmdlcyBhbmQgY2FuIGJlDQo+IGFwcGxpZWQgdG8g
+cWVtdS5naXQvbWFzdGVyLg0KPiANCj4gWW91IGNhbiB1c2UgImdpdCByZWJhc2UgLWkgb3JpZ2lu
+L21hc3RlciIgdG8gY29tYmluZSBjaGFuZ2VzIGFuZCBwdXQNCj4gdGhlbSBvbnRvIHRoZSBsYXRl
+c3Qgb3JpZ2luL21hc3Rlci4gIFNlZSB0aGUgImZpeHVwIiBhbmQgInNxdWFzaCINCj4gY29tbWFu
+ZHMgaW4gZ2l0LXJlYmFzZSgxKSdzIGludGVyYWN0aXZlIG1vZGUgZm9yIGNvbWJpbmluZyBwYXRj
+aGVzLg0KPiANCj4gVGhhbmtzIQ0KPiANCj4gPiBTdWdnZXN0ZWQtYnk6IFN0ZWZhbiBIYWpub2N6
+aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4NCj4gPiBTdWdnZXN0ZWQtYnk6IEVyaWMgQmxha2UgPGVi
+bGFrZUByZWRoYXQuY29tPg0KPiA+IFN1Z2dlc3RlZC1ieTogVGhvbWFzIEh1dGggPHRodXRoQHJl
+ZGhhdC5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogU3UgSGFuZyA8c3VoYW5nMTZAbWFpbHMudWNh
+cy5hYy5jbj4NCj4gPiAtLS0NCj4gPiAgc2NyaXB0cy9jaGVja3BhdGNoLnBsIHwgNiArKystLS0N
+Cj4gPiAgMSBmaWxlIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkNCj4g
+PiANCj4gPiBkaWZmIC0tZ2l0IGEvc2NyaXB0cy9jaGVja3BhdGNoLnBsIGIvc2NyaXB0cy9jaGVj
+a3BhdGNoLnBsDQo+ID4gaW5kZXggMTBjMTM4MzQ0ZmE5Li5iZWQxZGJiZDU0ZDEgMTAwNzU1DQo+
+ID4gLS0tIGEvc2NyaXB0cy9jaGVja3BhdGNoLnBsDQo+ID4gKysrIGIvc2NyaXB0cy9jaGVja3Bh
+dGNoLnBsDQo+ID4gQEAgLTIzNTIsOSArMjM1Miw5IEBAIHN1YiBwcm9jZXNzIHsNCj4gPiAgCQkJ
+fQ0KPiA+ICAJCX0NCj4gPiAgDQo+ID4gLSMgY2hlY2sgZm9yIG1pc3NpbmcgYnJhY2luZyByb3Vu
+ZCBpZiBldGMNCj4gPiAtCQlpZiAoJGxpbmUgPX4gLyheLiopXGIoZm9yfHdoaWxlfGlmKVxiLyAm
+Jg0KPiA+IC0JCQkkbGluZSAhfiAvXCNccyooZm9yfHdoaWxlfGlmKS8pIHsNCj4gPiArIyBjaGVj
+ayBmb3IgbWlzc2luZyBicmFjaW5nIGFyb3VuZCBpZiBldGMNCj4gPiArCQlpZiAoJGxpbmUgPX4g
+LyheLiopXGIoPzpmb3J8d2hpbGV8aWYpXGIvICYmDQo+ID4gKwkJCSRsaW5lICF+IC9cI1xzKig/
+OmZvcnx3aGlsZXxpZikvKSB7DQo+ID4gIAkJCW15ICgkbGV2ZWwsICRlbmRsbiwgQGNodW5rcykg
+PQ0KPiA+ICAJCQkJY3R4X3N0YXRlbWVudF9mdWxsKCRsaW5lbnIsICRyZWFsY250LCAxKTsNCj4g
+PiAgICAgICAgICAgICAgICAgICAgICAgICAgaWYgKCRkYmdfYWR2X2Fwdykgew0KPiA+IC0tIA0K
+PiA+IDIuNy40DQo+ID4gDQo=
