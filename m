@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1etE5X-0007q1-4u
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:01:15 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1etE69-0008B6-VC
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:01:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1etE5R-0007xb-Jo
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:01:11 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180306145426.GG7139@localhost.localdomain>
-References: <cover.1519921268.git.berto@igalia.com>
-	<d58bbc353563bb9c83ffe90faaa36fadf683e332.1519921268.git.berto@igalia.com>
-	<20180306145426.GG7139@localhost.localdomain>
-Date: Tue, 06 Mar 2018 16:01:02 +0100
-Message-ID: <w51vae9l041.fsf@maestria.local.igalia.com>
+	(envelope-from <eric.auger@redhat.com>) id 1etE63-0008LV-QF
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:01:50 -0500
+References: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
+	<1518893216-9983-2-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA8pdpA1MUAyKNyAdM9QH6_n2NBvZPYdiFKK20N9FG2z1g@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <27acd12a-31c5-8139-256e-f002aa5ca43a@redhat.com>
+Date: Tue, 6 Mar 2018 16:01:21 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 3/7] qcow2: Check L1 table parameters in
- qcow2_expand_zero_clusters()
+In-Reply-To: <CAFEAcA8pdpA1MUAyKNyAdM9QH6_n2NBvZPYdiFKK20N9FG2z1g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v9 01/14] hw/arm/smmu-common: smmu base
+ device and datatypes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +25,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Tomasz Nowicki <tn@semihalf.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Christoffer Dall <christoffer.dall@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, linuc.decode@gmail.com, Bharat Bhushan <bharat.bhushan@nxp.com>, Prem Mallappa <prem.mallappa@gmail.com>, eric.auger.pro@gmail.com
 
-On Tue 06 Mar 2018 03:54:26 PM CET, Kevin Wolf wrote:
->> @@ -2092,11 +2092,18 @@ int qcow2_expand_zero_clusters(BlockDriverState *bs,
->>      }
->>  
->>      for (i = 0; i < s->nb_snapshots; i++) {
->> -        int l1_sectors = DIV_ROUND_UP(s->snapshots[i].l1_size *
->> -                                      sizeof(uint64_t), BDRV_SECTOR_SIZE);
->> +        int l1_size2;
->> +        uint64_t *new_l1_table;
->>  
->> -        uint64_t *new_l1_table =
->> -            g_try_realloc(l1_table, l1_sectors * BDRV_SECTOR_SIZE);
->> +        ret = qcow2_validate_table(bs, s->snapshots[i].l1_table_offset,
->> +                                   s->snapshots[i].l1_size, sizeof(uint64_t),
->> +                                   QCOW_MAX_L1_SIZE, "", NULL);
->> +        if (ret < 0) {
->> +            return ret;
->
-> Shouldn't this be goto fail?
+Hi Peter,
 
-You're right, this is a loop, and l1_table could have been initialized
-in previous iterations.
+On 06/03/18 13:09, Peter Maydell wrote:
+> On 17 February 2018 at 18:46, Eric Auger <eric.auger@redhat.com> wrote:
+>> The patch introduces the smmu base device and class for the ARM
+>> smmu. Devices for specific versions will be derived from this
+>> base device.
+>>
+>> We also introduce some important datatypes.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
+>>
+> 
+>> + * Author: Prem Mallappa <pmallapp@broadcom.com>
+>> + *
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "sysemu/sysemu.h"
+>> +#include "exec/address-spaces.h"
+>> +#include "trace.h"
+>> +#include "exec/target_page.h"
+>> +#include "qom/cpu.h"
+>> +#include "hw/qdev-properties.h"
+>> +#include "qapi/error.h"
+>> +
+>> +#include "qemu/error-report.h"
+>> +#include "hw/arm/smmu-common.h"
+>> +
+>> +static void smmu_base_realize(DeviceState *dev, Error **errp)
+>> +{
+>> +    SMMUState *s = ARM_SMMU(dev);
+>> +
+>> +    s->configs = g_hash_table_new_full(NULL, NULL, NULL, g_free);
+>> +    s->iotlb = g_hash_table_new_full(NULL, NULL, NULL, g_free);
+> 
+> Shouldn't we also invoke the parent_realize ?
+Yes will fix that.
 
-I'll send a corrected version with this change, but first I'll wait a
-bit in case you see anything else in the series.
+note that those hash tables are not yet used. However I kept those in
+this series to illustrate the split between the generic and smmuv3 part.
+configs will be used to cache config data whereas iotlb will be used to
+cache IOTLB entries. I can remove them at the moment and keep the
+realize function void.
+> 
+>> +}
+>> +
+>> +static void smmu_base_reset(DeviceState *dev)
+>> +{
+>> +    SMMUState *s = ARM_SMMU(dev);
+>> +
+>> +    g_hash_table_remove_all(s->configs);
+>> +    g_hash_table_remove_all(s->iotlb);
+>> +}
+>> +
+>> +static Property smmu_dev_properties[] = {
+>> +    DEFINE_PROP_UINT8("bus_num", SMMUState, bus_num, 0),
+>> +    DEFINE_PROP_LINK("primary-bus", SMMUState, primary_bus, "PCI", PCIBus *),
+>> +    DEFINE_PROP_END_OF_LIST(),
+>> +};
+>> +
+>> +static void smmu_base_class_init(ObjectClass *klass, void *data)
+>> +{
+>> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>> +    SMMUBaseClass *sbc = ARM_SMMU_CLASS(klass);
+>> +
+>> +    dc->props = smmu_dev_properties;
+>> +    sbc->parent_realize = dc->realize;
+>> +    dc->realize = smmu_base_realize;
+> 
+> There's a device_class_set_parent_realize() in the tree now that
+> we should probably use instead of these 2 lines:
+>        device_class_set_parent_realize(dc, smmu_base_realize,
+>                                        &sbc->parent_realize);
+OK. Will do that as well for smmuv3 class. I used the fellow reset
+setter but not that one.
+> 
+>> +    dc->reset = smmu_base_reset;
+>> +}
+>> +
+>> +static const TypeInfo smmu_base_info = {
+>> +    .name          = TYPE_ARM_SMMU,
+>> +    .parent        = TYPE_SYS_BUS_DEVICE,
+>> +    .instance_size = sizeof(SMMUState),
+>> +    .class_data    = NULL,
+>> +    .class_size    = sizeof(SMMUBaseClass),
+>> +    .class_init    = smmu_base_class_init,
+>> +    .abstract      = true,
+>> +};
+>> +
+>> +static void smmu_base_register_types(void)
+>> +{
+>> +    type_register_static(&smmu_base_info);
+>> +}
+>> +
+>> +type_init(smmu_base_register_types)
+>> +
+>> diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+>> new file mode 100644
+>> index 0000000..8a9d931
+>> --- /dev/null
+>> +++ b/include/hw/arm/smmu-common.h
+>> @@ -0,0 +1,124 @@
+>> +/*
+>> + * ARM SMMU Support
+>> + *
+>> + * Copyright (C) 2015-2016 Broadcom Corporation
+>> + * Copyright (c) 2017 Red Hat, Inc.
+>> + * Written by Prem Mallappa, Eric Auger
+>> + *
+>> + * This program is free software; you can redistribute it and/or modify
+>> + * it under the terms of the GNU General Public License version 2 as
+>> + * published by the Free Software Foundation.
+>> + *
+>> + * This program is distributed in the hope that it will be useful,
+>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> + * GNU General Public License for more details.
+>> + *
+>> + */
+>> +
+>> +#ifndef HW_ARM_SMMU_COMMON_H
+>> +#define HW_ARM_SMMU_COMMON_H
+>> +
+>> +#include <hw/sysbus.h>
+> 
+> QEMU headers should be included using "", not <>.
+> 
+>> +#include "hw/pci/pci.h"
+>> +
+>> +#define SMMU_PCI_BUS_MAX      256
+>> +#define SMMU_PCI_DEVFN_MAX    256
+>> +
+>> +#define SMMU_MAX_VA_BITS      48
+>> +
+>> +/*
+>> + * Page table walk error types
+>> + */
+>> +typedef enum {
+>> +    SMMU_PTW_ERR_NONE,
+>> +    SMMU_PTW_ERR_WALK_EABT,   /* Translation walk external abort */
+>> +    SMMU_PTW_ERR_TRANSLATION, /* Translation fault */
+>> +    SMMU_PTW_ERR_ADDR_SIZE,   /* Address Size fault */
+>> +    SMMU_PTW_ERR_ACCESS,      /* Access fault */
+>> +    SMMU_PTW_ERR_PERMISSION,  /* Permission fault */
+>> +} SMMUPTWEventType;
+>> +
+>> +typedef struct SMMUPTWEventInfo {
+>> +    SMMUPTWEventType type;
+>> +    dma_addr_t addr; /* fetched address that induced an abort, if any */
+>> +} SMMUPTWEventInfo;
+>> +
+>> +typedef struct SMMUTransTableInfo {
+>> +    bool disabled;             /* is the translation table disabled? */
+>> +    uint64_t ttb;              /* TT base address */
+>> +    uint8_t tsz;               /* input range, ie. 2^(64 -tsz)*/
+>> +    uint8_t granule_sz;        /* granule page shift */
+>> +    uint8_t initial_level;     /* initial lookup level */
+>> +} SMMUTransTableInfo;
+>> +
+>> +/*
+>> + * Generic structure populated by derived SMMU devices
+>> + * after decoding the configuration information and used as
+>> + * input to the page table walk
+>> + */
+>> +typedef struct SMMUTransCfg {
+>> +    int      stage;            /* translation stage */
+>> +    bool     aa64;             /* arch64 or aarch32 translation table */
+>> +    bool     disabled;         /* smmu is disabled */
+>> +    bool     bypassed;         /* translation is bypassed */
+>> +    bool     aborted;          /* translation is aborted */
+>> +    uint64_t ttb;              /* TT base address */
+>> +    uint8_t oas;               /* output address width */
+>> +    uint8_t  tbi;              /* Top Byte Ignore */
+>> +    uint16_t asid;
+>> +    SMMUTransTableInfo tt[2];
+> 
+> Can you be consistent about either lining up the field names or not doing so,
+> please? (I would suggest going for 'not'.)
+OK
+> 
+>> +} SMMUTransCfg;
+> 
+> Otherwise
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+thanks!
 
-Berto
+Eric
+> 
+> thanks
+> -- PMM
+> 
