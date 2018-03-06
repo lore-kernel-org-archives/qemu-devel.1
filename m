@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1etLg2-0000fX-6P
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:07:23 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1etLhp-0001vI-Vk
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:09:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1etLg0-0001A3-Cs
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:07:22 -0500
-Received: from mail-ot0-x236.google.com ([2607:f8b0:4003:c0f::236]:45118)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1etLhl-0002Ri-69
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:09:13 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:52547)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1etLg0-00019Q-4w
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:07:20 -0500
-Received: by mail-ot0-x236.google.com with SMTP id f11so314522otj.12
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 15:07:19 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1520369037-37977-1-git-send-email-mjc@sifive.com>
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1etLhk-0002R3-VM
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:09:09 -0500
+Received: by mail-wm0-x244.google.com with SMTP id t3so1329502wmc.2
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 15:09:08 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
 References: <1520369037-37977-1-git-send-email-mjc@sifive.com>
-From: Michael Clark <mjc@sifive.com>
-Date: Wed, 7 Mar 2018 12:07:18 +1300
-Message-ID: <CAHNT7NsqMQr9hmFN2wBo+CevLjD=X-9UTeDCoEfg_GVEvtJ1pw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 00/22] Spec conformance bug fixes and
- cleanups
+	<1520369037-37977-10-git-send-email-mjc@sifive.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <24d071b1-52d1-7558-90f4-21c318bf6792@amsat.org>
+Date: Tue, 6 Mar 2018 20:09:05 -0300
+MIME-Version: 1.0
+In-Reply-To: <1520369037-37977-10-git-send-email-mjc@sifive.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 09/22] RISC-V: Include hexidecimal
+ instruction in
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,83 +36,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
+To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches disassembly <patches@groups.riscv.org>
 
-On Wed, Mar 7, 2018 at 9:43 AM, Michael Clark <mjc@sifive.com> wrote:
+On 03/06/2018 05:43 PM, Michael Clark wrote:
+> This was added to help debug issues using -d in_asm. It is
+> useful to see the instruction bytes, as one can detect if
+> one is trying to execute ASCII or device-tree magic.
 
-> This is the series of spec conformance bug fixes and code cleanups.
-> We would like to get this series in after our core changes in v8.2.
->
-> - Implements WARL behavior for CSRs that don't support writes
-> - Improves specification conformance of the page table walker
->   - Change access checks from ternary operator to if statements
->   - Checks for misaligned PPNs
->   - Disallow M-mode or S-mode from fetching from User pages
->   - Adds reserved PTE flag check: W or W|X
->   - Improves page walker comments and general readability
-> - Several trivial code cleanups to hw/riscv
->   - Replacing hard coded constants with reference to enums
->     or the machine memory maps.
-> - Adds bounds checks when writing device-tree to ROM
->
-> Michael Clark (22):
->   RISC-V: Make virt create_fdt interface consistent
->   RISC-V: Replace hardcoded constants with enum values
->   RISC-V: Make virt board description match spike
->   RISC-V: Use ROM base address and size from memory map
->   RISC-V: Remove redundant identity_translate from load_elf
->   RISC-V: Mark ROM read-only after copying in code and config
->   RISC-V: Remove unused class definitions from machines
->   RISC-V: Make sure the emulated rom has space for device-tree
->   RISC-V: Include hexidecimal instruction in disassembly
->   RISC-V: Hold rcu_read_lock when accessing memory directly
->   RISC-V: Improve page table walker spec compliance
->   RISC-V: Update E order and I extension order
->   RISC-V: Make spike and virt header guards more specific
->   RISC-V: Make virt header comment title consistent
->   RISC-V: Use memory_region_is_ram in atomic pte update
->   RISC-V: Remove EM_RISCV ELF_MACHINE indirection from load_elf
->   RISC-V: Ingore satp writes and return 0 for reads when no-mmu
->   RISC-V: Remove braces from satp case statement with no locals
->   RISC-V: riscv-qemu port supports sv39 and sv48
->   RISC-V: vectored traps are optional
->   RISC-V: No traps on writes to misa,minstret[h],mcycle[h]
->   RISC-V: Remove support for adhoc X_COP local-interrupt
->
->  disas/riscv.c                   | 39 +++++++++++----------
->  hw/riscv/sifive_clint.c         |  9 ++---
->  hw/riscv/sifive_e.c             | 34 ++----------------
->  hw/riscv/sifive_u.c             | 65 +++++++++++-----------------------
->  hw/riscv/spike.c                | 65 +++++++++++++---------------------
->  hw/riscv/virt.c                 | 77 ++++++++++++++----------------
-> -----------
->  include/hw/riscv/sifive_clint.h |  4 +++
->  include/hw/riscv/sifive_e.h     |  9 -----
->  include/hw/riscv/sifive_u.h     | 13 +++----
->  include/hw/riscv/spike.h        | 16 ++++-----
->  include/hw/riscv/virt.h         | 21 ++++-------
->  target/riscv/cpu.c              |  2 +-
->  target/riscv/cpu.h              |  6 ++--
->  target/riscv/cpu_bits.h         |  3 --
->  target/riscv/helper.c           | 63 +++++++++++++++++++++++----------
->  target/riscv/op_helper.c        | 52 ++++++++++++++--------------
->  16 files changed, 193 insertions(+), 285 deletions(-)
->
+clean :)
 
-BTW Apologies for the duplicate emails. I'm still getting to grips with the
-git-sendemail workflow and was using a sed script to Add Cc's which munged
-the headers as it didn't take into account Subject lines flowing to two
-lines. I guess I can just include Cc: in the commit message? and
-git-format-patch will handle it for me? or I just should how to use
-git-publish...
+> 
+> Signed-off-by: Michael Clark <mjc@sifive.com>
+> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 
-I still have to work on Igor's requested change to CPU initializer
-declarations, and i'd also like to get the patch in that fixes fmin/fmax
-test failures using the riscv-tests testsuite by implementing IEEE-754
-minimumNumber/maximumNumber. I'll try to get a patch onto the list before
-soft-freeze. I dropped the patch which was in an earlier version of our
-port patch series due to a conflict with changes in softfloat (conversion
-of minmax from a macro to a static function iirc).
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Michael.
+> ---
+>  disas/riscv.c | 39 ++++++++++++++++++++-------------------
+>  1 file changed, 20 insertions(+), 19 deletions(-)
+> 
+> diff --git a/disas/riscv.c b/disas/riscv.c
+> index 3c17501..4580308 100644
+> --- a/disas/riscv.c
+> +++ b/disas/riscv.c
+> @@ -2769,25 +2769,6 @@ static void format_inst(char *buf, size_t buflen, size_t tab, rv_decode *dec)
+>      char tmp[64];
+>      const char *fmt;
+>  
+> -    if (dec->op == rv_op_illegal) {
+> -        size_t len = inst_length(dec->inst);
+> -        switch (len) {
+> -        case 2:
+> -            snprintf(buf, buflen, "(0x%04" PRIx64 ")", dec->inst);
+> -            break;
+> -        case 4:
+> -            snprintf(buf, buflen, "(0x%08" PRIx64 ")", dec->inst);
+> -            break;
+> -        case 6:
+> -            snprintf(buf, buflen, "(0x%012" PRIx64 ")", dec->inst);
+> -            break;
+> -        default:
+> -            snprintf(buf, buflen, "(0x%016" PRIx64 ")", dec->inst);
+> -            break;
+> -        }
+> -        return;
+> -    }
+> -
+>      fmt = opcode_data[dec->op].format;
+>      while (*fmt) {
+>          switch (*fmt) {
+> @@ -3004,6 +2985,11 @@ disasm_inst(char *buf, size_t buflen, rv_isa isa, uint64_t pc, rv_inst inst)
+>      format_inst(buf, buflen, 16, &dec);
+>  }
+>  
+> +#define INST_FMT_2 "%04" PRIx64 "              "
+> +#define INST_FMT_4 "%08" PRIx64 "          "
+> +#define INST_FMT_6 "%012" PRIx64 "      "
+> +#define INST_FMT_8 "%016" PRIx64 "  "
+> +
+>  static int
+>  print_insn_riscv(bfd_vma memaddr, struct disassemble_info *info, rv_isa isa)
+>  {
+> @@ -3031,6 +3017,21 @@ print_insn_riscv(bfd_vma memaddr, struct disassemble_info *info, rv_isa isa)
+>          }
+>      }
+>  
+> +    switch (len) {
+> +    case 2:
+> +        (*info->fprintf_func)(info->stream, INST_FMT_2, inst);
+> +        break;
+> +    case 4:
+> +        (*info->fprintf_func)(info->stream, INST_FMT_4, inst);
+> +        break;
+> +    case 6:
+> +        (*info->fprintf_func)(info->stream, INST_FMT_6, inst);
+> +        break;
+> +    default:
+> +        (*info->fprintf_func)(info->stream, INST_FMT_8, inst);
+> +        break;
+> +    }
+> +
+>      disasm_inst(buf, sizeof(buf), isa, memaddr, inst);
+>      (*info->fprintf_func)(info->stream, "%s", buf);
+>  
+> 
