@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1etCca-0004QI-Pq
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:27:13 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1etCjE-0002Ud-Q0
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:34:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1etCcU-0002XF-SM
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:27:12 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35354 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1etCcU-0002X1-N8
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:27:06 -0500
-Date: Tue, 6 Mar 2018 14:27:01 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180306132701.ezej6d7pysp6roxb@sirius.home.kraxel.org>
-References: <20180306074053.22856-1-kraxel@redhat.com>
-	<CAJ+F1CK5MsZ5=-z2yWznBcHjZqskHSdiyYxC30azEcQ9AXrRLg@mail.gmail.com>
-	<20180306114232.v5gtwxald4mmelab@sirius.home.kraxel.org>
-	<CAJ+F1CJo28aN6mwihp8UTwq4jtgz21BxT+U7F-jGu7fyhefBkA@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1etCjD-0007GR-RE
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:34:04 -0500
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:41659)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1etCjD-0007Fe-MF
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:34:03 -0500
+Received: by mail-ot0-x242.google.com with SMTP id w38so18310294ota.8
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 05:34:03 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CJo28aN6mwihp8UTwq4jtgz21BxT+U7F-jGu7fyhefBkA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 0/7] audio: modularize
+In-Reply-To: <20180306132430.32110-1-berrange@redhat.com>
+References: <20180306132430.32110-1-berrange@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 6 Mar 2018 13:33:42 +0000
+Message-ID: <CAFEAcA95xt-9MJHcRC7WovEB3W259_eFD7Q8v_pG5rGh3L7oCg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] misc: don't use hwaddr as a type in trace
+ events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +30,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-> >> /home/elmarco/src/qemu/build/x86_64-softmmu/../audio-pa.so: undefined
-> >> symbol: audio_pt_unlock_and_signal
+On 6 March 2018 at 13:24, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wro=
+te:
+> Use types that are defined by QEMU in trace events caused build failures
+> for the UST trace backend:
+>
+>   In file included from trace-ust-all.c:13:0:
+>   trace-ust-all.h:11844:206: error: unknown type name =E2=80=98hwaddr=E2=
+=80=99
+>
+> It only knows about C built-in types, and any types that are pulled in
+> from includs of qemu-common.h and lttng/tracepoint.h. This does not
+> include the 'hwaddr' type, so replace it with a uint64_t which is what
+> exec/hwaddr.h defines 'hwaddr' as. This fixes the build failure
+> introduced by
+>
+>   commit 9eb8040c2d2b38e1a40bb6129b1b668fa178fcab
+>   Author: Peter Maydell <peter.maydell@linaro.org>
+>   Date:   Fri Mar 2 10:45:39 2018 +0000
+>
+>     hw/misc/tz-ppc: Model TrustZone peripheral protection controller
+>
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
 
-> Fresh directory, cleaned ccache. That didn't help. fwiw, I am
-> compiling on f27, gcc (GCC) 7.3.1 20180130. I'll investigate further
-> if you can't reproduce.
+Oops.
 
-Hmm, working fine here (both rhel-7 and fedora-27 testbuild container, default
-build flags).
+> --- a/hw/misc/trace-events
+> +++ b/hw/misc/trace-events
+> @@ -92,8 +92,8 @@ tz_ppc_cfg_sec_resp(int level) "TZ PPC: cfg_sec_resp =
+=3D %d"
+>  tz_ppc_irq_enable(int level) "TZ PPC: int_enable =3D %d"
+>  tz_ppc_irq_clear(int level) "TZ PPC: int_clear =3D %d"
+>  tz_ppc_update_irq(int level) "TZ PPC: setting irq line to %d"
+> -tz_ppc_read_blocked(int n, hwaddr offset, bool secure, bool user) "TZ PP=
+C: port %d offset 0x%" HWADDR_PRIx " read (secure %d user %d) blocked"
+> -tz_ppc_write_blocked(int n, hwaddr offset, bool secure, bool user) "TZ P=
+PC: port %d offset 0x%" HWADDR_PRIx " write (secure %d user %d) blocked"
+> +tz_ppc_read_blocked(int n, uint64_t offset, bool secure, bool user) "TZ =
+PPC: port %d offset 0x%" HWADDR_PRIx " read (secure %d user %d) blocked"
+> +tz_ppc_write_blocked(int n, uint64_t offset, bool secure, bool user) "TZ=
+ PPC: port %d offset 0x%" HWADDR_PRIx " write (secure %d user %d) blocked"
 
-The symbol in question should be provided by qemu:
 
-kraxel@fedora-64bit ~/projects/qemu/build/fedora# objdump -x audio-pa.so | grep audio_pt_unlock_and_signal
-0000000000000000         *UND*  0000000000000000              audio_pt_unlock_and_signal
-kraxel@fedora-64bit ~/projects/qemu/build/fedora# objdump -x x86_64-softmmu/qemu-system-x86_64 | grep audio_pt_unlock_and_signal
-00000000004735f0 g     F .text  0000000000000067              audio_pt_unlock_and_signal
+If the type isn't "hwaddr" then HWADDR_PRIx is the wrong
+format string macro -- those should change to PRIx64.
 
-Possibly your linker throws it away, thinking there is no user because of the
-modular drivers?
-
-cheers,
-  Gerd
+thanks
+-- PMM
