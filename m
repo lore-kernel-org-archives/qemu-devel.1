@@ -1,26 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1et7Wy-0001ts-7G
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 03:01:10 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1et7gd-0004z5-Pq
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 03:11:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1et7Wu-0003JK-Au
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 03:01:04 -0500
-Received: from mga14.intel.com ([192.55.52.115]:53905)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1et7Wt-0003Il-UB
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 03:01:00 -0500
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-Date: Tue, 6 Mar 2018 08:00:41 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C257439B87886@SHSMSX104.ccr.corp.intel.com>
-References: <1519900415-30314-1-git-send-email-yi.l.liu@linux.intel.com>
-	<1519900415-30314-8-git-send-email-yi.l.liu@linux.intel.com>
-	<20180306064436.GD3615@xz-mi>
-In-Reply-To: <20180306064436.GD3615@xz-mi>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <borntraeger@de.ibm.com>) id 1et7ga-0000yR-Do
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 03:11:03 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36150
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1et7ga-0000xk-3Z
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 03:11:00 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w2688vps049379
+	for <qemu-devel@nongnu.org>; Tue, 6 Mar 2018 03:10:58 -0500
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ghppq9a10-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 03:10:58 -0500
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 6 Mar 2018 08:10:56 -0000
+References: <1520317081-5341-1-git-send-email-thuth@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue, 6 Mar 2018 09:10:54 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 07/12] vfio/pci: register sva notifier
+In-Reply-To: <1520317081-5341-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <56c10a06-e6ef-0d02-b9e9-342ed95bdfe7@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2] pc-bios/s390-ccw: Move string arrays
+ from bootmap header to .c file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,92 +43,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "Tian, Kevin" <kevin.tian@intel.com>, "jasowang@redhat.com" <jasowang@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-PiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBldGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBUdWVz
-ZGF5LCBNYXJjaCA2LCAyMDE4IDI6NDUgUE0NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MyAwNy8x
-Ml0gdmZpby9wY2k6IHJlZ2lzdGVyIHN2YSBub3RpZmllcg0KPiANCj4gT24gVGh1LCBNYXIgMDEs
-IDIwMTggYXQgMDY6MzM6MzBQTSArMDgwMCwgTGl1LCBZaSBMIHdyb3RlOg0KPiA+IFRoaXMgcGF0
-Y2ggc2hvd3MgaG93IHN2YSBub3RpZmllciBpcyByZWdpc3RlcmVkLiBBbmQgcHJvdmlkZWQgYW4N
-Cj4gPiBleGFtcGxlIGJ5IHJlZ2lzdGVyaW5nIG5vdGlmeSBmdW5jIGZvciB0bGIgZmx1c2ggcHJv
-cGFnYXRpb24uDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBMaXUsIFlpIEwgPHlpLmwubGl1QGxp
-bnV4LmludGVsLmNvbT4NCj4gPiAtLS0NCj4gPiAgaHcvdmZpby9wY2kuYyB8IDU1DQo+ID4gKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLQ0KPiA+
-ICAxIGZpbGUgY2hhbmdlZCwgNTMgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4gPg0K
-PiA+IGRpZmYgLS1naXQgYS9ody92ZmlvL3BjaS5jIGIvaHcvdmZpby9wY2kuYyBpbmRleCBhNjBh
-NGQ3Li5iNzI5N2NjDQo+ID4gMTAwNjQ0DQo+ID4gLS0tIGEvaHcvdmZpby9wY2kuYw0KPiA+ICsr
-KyBiL2h3L3ZmaW8vcGNpLmMNCj4gPiBAQCAtMjc3NSw2ICsyNzc1LDI2IEBAIHN0YXRpYyB2b2lk
-IHZmaW9fdW5yZWdpc3Rlcl9yZXFfbm90aWZpZXIoVkZJT1BDSURldmljZQ0KPiAqdmRldikNCj4g
-PiAgICAgIHZkZXYtPnJlcV9lbmFibGVkID0gZmFsc2U7DQo+ID4gIH0NCj4gPg0KPiA+ICtzdGF0
-aWMgVkZJT0NvbnRhaW5lciAqdmZpb19nZXRfY29udGFpbmVyX2Zyb21fYnVzZGV2KFBDSUJ1cyAq
-YnVzLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIGludDMyX3QgZGV2Zm4pIHsNCj4gPiArICAgIFZGSU9Hcm91cCAqZ3JvdXA7DQo+ID4g
-KyAgICBWRklPUENJRGV2aWNlICp2ZGV2X2l0ZXI7DQo+ID4gKyAgICBWRklPRGV2aWNlICp2YmFz
-ZWRldl9pdGVyOw0KPiA+ICsgICAgUENJRGV2aWNlICpwZGV2X2l0ZXI7DQo+ID4gKw0KPiA+ICsg
-ICAgUUxJU1RfRk9SRUFDSChncm91cCwgJnZmaW9fZ3JvdXBfbGlzdCwgbmV4dCkgew0KPiA+ICsg
-ICAgICAgIFFMSVNUX0ZPUkVBQ0godmJhc2VkZXZfaXRlciwgJmdyb3VwLT5kZXZpY2VfbGlzdCwg
-bmV4dCkgew0KPiA+ICsgICAgICAgICAgICB2ZGV2X2l0ZXIgPSBjb250YWluZXJfb2YodmJhc2Vk
-ZXZfaXRlciwgVkZJT1BDSURldmljZSwgdmJhc2VkZXYpOw0KPiA+ICsgICAgICAgICAgICBwZGV2
-X2l0ZXIgPSAmdmRldl9pdGVyLT5wZGV2Ow0KPiA+ICsgICAgICAgICAgICBpZiAocGNpX2dldF9i
-dXMocGRldl9pdGVyKSA9PSBidXMgJiYgcGRldl9pdGVyLT5kZXZmbiA9PSBkZXZmbikgew0KPiA+
-ICsgICAgICAgICAgICAgICAgcmV0dXJuIGdyb3VwLT5jb250YWluZXI7DQo+ID4gKyAgICAgICAg
-ICAgIH0NCj4gPiArICAgICAgICB9DQo+ID4gKyAgICB9DQo+ID4gKyAgICByZXR1cm4gTlVMTDsN
-Cj4gPiArfQ0KPiA+ICsNCj4gPiAgc3RhdGljIHZvaWQgdmZpb19wY2lfZGV2aWNlX3N2YV9iaW5k
-X3Bhc2lkX3RhYmxlKFBDSUJ1cyAqYnVzLA0KPiA+ICAgICAgICAgICAgICAgICAgIGludDMyX3Qg
-ZGV2Zm4sIHVpbnQ2NF90IHBhc2lkdF9hZGRyLCB1aW50MzJfdCBzaXplKQ0KPiA+IHsgQEAgLTI3
-ODMsMTEgKzI4MDMsNDIgQEAgc3RhdGljIHZvaWQNCj4gPiB2ZmlvX3BjaV9kZXZpY2Vfc3ZhX2Jp
-bmRfcGFzaWRfdGFibGUoUENJQnVzICpidXMsDQo+ID4gICAgICBTbyBmYXIsIEludGVsIFZULWQg
-YW5kIEFNRCBJT01NVSByZXF1aXJlcyBpdC4gKi8gIH0NCj4gPg0KPiA+ICtzdGF0aWMgdm9pZCB2
-ZmlvX2lvbW11X3N2YV90bGJfaW52YWxpZGF0ZV9ub3RpZnkoSU9NTVVTVkFOb3RpZmllciAqbiwN
-Cj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIElP
-TU1VU1ZBRXZlbnREYXRhDQo+ID4gKypldmVudF9kYXRhKSB7DQo+ID4gKy8qICBTYW1wbGUgY29k
-ZSwgd291bGQgYmUgZGV0YWlsZWQgaW4gY29taW5nIHZpcnQtU1ZBIHBhdGNoc2V0Lg0KPiA+ICsg
-ICAgVkZJT0d1ZXN0SU9NTVVTVkFDb250ZXh0ICpnc3ZhX2N0eDsNCj4gPiArICAgIElPTU1VU1ZB
-Q29udGV4dCAqc3ZhX2N0eDsNCj4gPiArICAgIFZGSU9Db250YWluZXIgKmNvbnRhaW5lcjsNCj4g
-PiArDQo+ID4gKyAgICBnc3ZhX2N0eCA9IGNvbnRhaW5lcl9vZihuLCBWRklPR3Vlc3RJT01NVVNW
-QUNvbnRleHQsIG4pOw0KPiA+ICsgICAgY29udGFpbmVyID0gZ3N2YV9jdHgtPmNvbnRhaW5lcjsN
-Cj4gPiArDQo+ID4gKyAgICBUT0RPOiBmb3J3YXJkIHRvIGhvc3QgdGhyb3VnaCBWRklPIElPQ1RM
-DQo+IA0KPiBJTUhPIGlmIHRoZSBzZXJpZXMgaXMgbm90IHJlYWR5IGZvciBtZXJnaW5nLCB3ZSBj
-YW4gc3RpbGwgbWFyayBpdCBhcyBSRkMgYW5kIGRlY2xhcmUNCj4gdGhhdCBzbyBwZW9wbGUgd29u
-J3QgbmVlZCB0byBnbyBpbnRvIGRldGFpbHMgb2YgdGhlIHBhdGNoZXMuDQoNClRoYW5rcyBmb3Ig
-dGhlIHN1Z2dlc3Rpb24uIEFjdHVhbGx5LCBJIHdhcyBoZXNpdGF0aW5nIGl0LiBBcyB5b3UgbWF5
-IGtub3csIHRoaXMgaXMgYWN0dWFsbHkNCjNyZCB2ZXJzaW9uIG9mIHRoaXMgZWZmb3J0LiBCdXQg
-eWVzLCBJIHdvdWxkIGZvbGxvdyB5b3VyIHN1Z2dlc3Rpb24gaW4gY29taW5nIHZlcnNpb25zLg0K
-DQo+ID4gKyovDQo+ID4gK30NCj4gPiArDQo+ID4gIHN0YXRpYyB2b2lkIHZmaW9fcGNpX2Rldmlj
-ZV9zdmFfcmVnaXN0ZXJfbm90aWZpZXIoUENJQnVzICpidXMsDQo+ID4gICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgaW50MzJfdCBkZXZmbiwgSU9NTVVTVkFDb250ZXh0ICpzdmFfY3R4KSAgew0K
-PiA+IC0gICAgLyogUmVnaXN0ZXIgbm90aWZpZXIgZm9yIFRMQiBpbnZhbGlkYXRpb24gcHJvcGFn
-YXRpb24NCj4gPiAtICAgICAgICovDQo+ID4gKyAgICBWRklPQ29udGFpbmVyICpjb250YWluZXIg
-PSB2ZmlvX2dldF9jb250YWluZXJfZnJvbV9idXNkZXYoYnVzLA0KPiA+ICsgZGV2Zm4pOw0KPiA+
-ICsNCj4gPiArICAgIGlmIChjb250YWluZXIgIT0gTlVMTCkgew0KPiA+ICsgICAgICAgIFZGSU9H
-dWVzdElPTU1VU1ZBQ29udGV4dCAqZ3N2YV9jdHg7DQo+ID4gKyAgICAgICAgZ3N2YV9jdHggPSBn
-X21hbGxvYzAoc2l6ZW9mKCpnc3ZhX2N0eCkpOw0KPiA+ICsgICAgICAgIGdzdmFfY3R4LT5zdmFf
-Y3R4ID0gc3ZhX2N0eDsNCj4gPiArICAgICAgICBnc3ZhX2N0eC0+Y29udGFpbmVyID0gY29udGFp
-bmVyOw0KPiA+ICsgICAgICAgIFFMSVNUX0lOU0VSVF9IRUFEKCZjb250YWluZXItPmdzdmFfY3R4
-X2xpc3QsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgZ3N2YV9jdHgsDQo+ID4gKyAg
-ICAgICAgICAgICAgICAgICAgICAgICAgZ3N2YV9jdHhfbmV4dCk7DQo+ID4gKyAgICAgICAvKiBS
-ZWdpc3RlciB2ZmlvX2lvbW11X3N2YV90bGJfaW52YWxpZGF0ZV9ub3RpZnkgd2l0aCBldmVudCBm
-bGFnDQo+ID4gKyAgICAgICAgICAgSU9NTVVfU1ZBX0VWRU5UX1RMQl9JTlYgKi8NCj4gPiArICAg
-ICAgICBpb21tdV9zdmFfbm90aWZpZXJfcmVnaXN0ZXIoc3ZhX2N0eCwNCj4gPiArICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgJmdzdmFfY3R4LT5uLA0KPiA+ICsgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICB2ZmlvX2lvbW11X3N2YV90bGJfaW52YWxpZGF0ZV9u
-b3RpZnksDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIElPTU1VX1NW
-QV9FVkVOVF9UTEJfSU5WKTsNCj4gDQo+IEkgd291bGQgc3F1YXNoIHRoaXMgcGF0Y2ggaW50byBw
-cmV2aW91cyBvbmUgc2luY2UgYmFzaWNhbGx5IHRoaXMgaXMgb25seSBwYXJ0IG9mIHRoZQ0KPiBp
-bXBsZW1lbnRhdGlvbiB0byBwcm92aWRlIHZmaW8tc3BlaWNpZmljIHJlZ2lzdGVyIGhvb2suDQoN
-CnN1cmUuDQoNCj4gQnV0IGEgbW9yZSBpbXBvcnRhbnQgcXVlc3Rpb24gaXMuLi4gd2h5IHRoaXM/
-DQo+IA0KPiBJTUhPIHRoZSBub3RpZmllciByZWdpc3RyYXRpb24gY2FuIGJlIGdlbmVyYWwgZm9y
-IFBDSS4gIFdoeSB2ZmlvIG5lZWRzIHRvIHByb3ZpZGUgaXQncw0KPiBvd24gcmVnaXN0ZXIgY2Fs
-bGJhY2s/ICBXb3VsZCBpdCBiZSBlbm91Z2ggaWYgaXQgb25seSBwcm92aWRlcyBpdHMgb3duIG5v
-dGlmeSBjYWxsYmFjaz8NCg0KVGhlIG5vdGlmaWVycyBhcmUgaW4gVkZJTy4gSG93ZXZlciwgdGhl
-IHJlZ2lzdHJhdGlvbiBpcyBjb250cm9sbGVkIGJ5IHZJT01NVSBlbXVsYXRvci4NCkluIHRoaXMg
-c2VyaWVzLCBQQVNJRCB0YWdnZWQgQWRkcmVzcyBTcGFjZSBpcyBpbnRyb2R1Y2VkLiBBbmQgdGhl
-IG5ldyBub3RpZmllcnMgYXJlIGZvcg0Kc3VjaCBBZGRyZXNzIFNwYWNlLiBTdWNoIEFkZHJlc3Mg
-U3BhY2UgaXMgY3JlYXRlZCBhbmQgZGVsZXRlZCBpbiB2SU9NTVUgZW11bGF0b3IuDQpTbyB0aGUg
-bm90aWZpZXIgcmVnaXN0cmF0aW9uIG5lZWRzIHRvIGhhcHBlbiBhY2NvcmRpbmdseS4NCg0KZS5n
-LiBndWVzdCBTVk0gYXBwbGljYXRpb24gYmluZCBhIGRldmljZSB0byBhIHByb2Nlc3MsIGl0IHBy
-b2dyYW1zIHRoZSBndWVzdCBpb21tdQ0KdHJhbnNsYXRpb24gc3RydWN0dXJlLCB2SU9NTVUgZW11
-bGF0b3IgY2FwdHVyZXMgdGhlIGNoYW5nZSwgYW5kIGNyZWF0ZSBhIFBBU0lEDQp0YWdnZWQgQWRk
-cmVzcyBTcGFjZSBmb3IgaXQgYW5kIHJlZ2lzdGVyIG5vdGlmaWVycy4NCg0KVGhhdCdzIHdoeSBJ
-IGRvIGl0IGluIHN1Y2ggYSBtYW5uZXIuDQoNClRoYW5rcywNCllpIExpdQ0KDQoNCg==
+
+
+On 03/06/2018 07:18 AM, Thomas Huth wrote:
+> bootmap.h can currently only be included once - otherwise the linker
+> complains about multiple definitions of the "magic" strings. It's a
+> bad style to define string arrays in header files, so let's better
+> move these to the bootmap.c file instead where they are used.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+
+> ---
+>  v2:
+>  - Removed duplicated vol_desc_magic (copy-n-paste error)
+> 
+>  pc-bios/s390-ccw/bootmap.c | 20 ++++++++++++++++++++
+>  pc-bios/s390-ccw/bootmap.h | 19 -------------------
+>  2 files changed, 20 insertions(+), 19 deletions(-)
+> 
+> diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+> index 29bfd8c..fc2a9fe 100644
+> --- a/pc-bios/s390-ccw/bootmap.c
+> +++ b/pc-bios/s390-ccw/bootmap.c
+> @@ -37,6 +37,26 @@ typedef struct ResetInfo {
+> 
+>  static ResetInfo save;
+> 
+> +const uint8_t el_torito_magic[] = "EL TORITO SPECIFICATION"
+> +                                  "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+> +
+> +/*
+> + * Match two CCWs located after PSW and eight filler bytes.
+> + * From libmagic and arch/s390/kernel/head.S.
+> + */
+> +const uint8_t linux_s390_magic[] = "\x02\x00\x00\x18\x60\x00\x00\x50\x02\x00"
+> +                                   "\x00\x68\x60\x00\x00\x50\x40\x40\x40\x40"
+> +                                   "\x40\x40\x40\x40";
+> +
+> +static inline bool is_iso_vd_valid(IsoVolDesc *vd)
+> +{
+> +    const uint8_t vol_desc_magic[] = "CD001";
+> +
+> +    return !memcmp(&vd->ident[0], vol_desc_magic, 5) &&
+> +           vd->version == 0x1 &&
+> +           vd->type <= VOL_DESC_TYPE_PARTITION;
+> +}
+> +
+>  static void jump_to_IPL_2(void)
+>  {
+>      ResetInfo *current = 0;
+> diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
+> index c636626..07eb600 100644
+> --- a/pc-bios/s390-ccw/bootmap.h
+> +++ b/pc-bios/s390-ccw/bootmap.h
+> @@ -375,9 +375,6 @@ static inline void read_iso_boot_image(uint32_t block_offset, void *load_addr,
+>                 "Failed to read boot image!");
+>  }
+> 
+> -const uint8_t el_torito_magic[] = "EL TORITO SPECIFICATION"
+> -                                  "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+> -
+>  #define ISO9660_MAX_DIR_DEPTH 8
+> 
+>  typedef struct IsoDirHdr {
+> @@ -430,20 +427,12 @@ typedef struct IsoVolDesc {
+>      } vd;
+>  } __attribute__((packed)) IsoVolDesc;
+> 
+> -const uint8_t vol_desc_magic[] = "CD001";
+>  #define VOL_DESC_TYPE_BOOT 0
+>  #define VOL_DESC_TYPE_PRIMARY 1
+>  #define VOL_DESC_TYPE_SUPPLEMENT 2
+>  #define VOL_DESC_TYPE_PARTITION 3
+>  #define VOL_DESC_TERMINATOR 255
+> 
+> -static inline bool is_iso_vd_valid(IsoVolDesc *vd)
+> -{
+> -    return !memcmp(&vd->ident[0], vol_desc_magic, 5) &&
+> -           vd->version == 0x1 &&
+> -           vd->type <= VOL_DESC_TYPE_PARTITION;
+> -}
+> -
+>  typedef struct IsoBcValid {
+>      uint8_t platform_id;
+>      uint16_t reserved;
+> @@ -468,14 +457,6 @@ typedef struct IsoBcHdr {
+>      uint8_t id[28];
+>  } __attribute__((packed)) IsoBcHdr;
+> 
+> -/*
+> - * Match two CCWs located after PSW and eight filler bytes.
+> - * From libmagic and arch/s390/kernel/head.S.
+> - */
+> -const uint8_t linux_s390_magic[] = "\x02\x00\x00\x18\x60\x00\x00\x50\x02\x00"
+> -                                   "\x00\x68\x60\x00\x00\x50\x40\x40\x40\x40"
+> -                                   "\x40\x40\x40\x40";
+> -
+>  typedef struct IsoBcEntry {
+>      uint8_t id;
+>      union {
+> 
