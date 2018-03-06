@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1etJTL-0006cv-KC
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:46:09 -0500
+	(envelope-from <mjc@sifive.com>) id 1etJTS-0006ht-QE
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:46:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1etJTK-0003bu-Li
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:46:07 -0500
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:38731)
+	(envelope-from <mjc@sifive.com>) id 1etJTR-0003dd-G4
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:46:14 -0500
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:40368)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1etJTK-0003bg-G3
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:46:06 -0500
-Received: by mail-pl0-x243.google.com with SMTP id m22-v6so9033720pls.5
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 12:46:06 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1etJTR-0003dI-A2
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:46:13 -0500
+Received: by mail-pg0-x243.google.com with SMTP id g8so4102079pgv.7
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 12:46:13 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Wed,  7 Mar 2018 09:43:51 +1300
-Message-Id: <1520369037-37977-17-git-send-email-mjc@sifive.com>
+Date: Wed,  7 Mar 2018 09:43:53 +1300
+Message-Id: <1520369037-37977-19-git-send-email-mjc@sifive.com>
 In-Reply-To: <1520369037-37977-1-git-send-email-mjc@sifive.com>
 References: <1520369037-37977-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v1 16/22] RISC-V: Remove EM_RISCV ELF_MACHINE
- indirection from
+Subject: [Qemu-devel] [PATCH v1 18/22] RISC-V: Remove braces from satp case
+ statement with
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,83 +27,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches load_elf <patches@groups.riscv.org>
-
-Pointless indirection. Other ports use EM_ constants directly.
+Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches no locals <patches@groups.riscv.org>
 
 Signed-off-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- hw/riscv/sifive_e.c | 2 +-
- hw/riscv/sifive_u.c | 2 +-
- hw/riscv/spike.c    | 2 +-
- hw/riscv/virt.c     | 2 +-
- target/riscv/cpu.h  | 1 -
- 5 files changed, 4 insertions(+), 5 deletions(-)
+ target/riscv/op_helper.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index 4872b68..39e4cb4 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -88,7 +88,7 @@ static uint64_t load_kernel(const char *kernel_filename)
- 
-     if (load_elf(kernel_filename, NULL, NULL,
-                  &kernel_entry, NULL, &kernel_high,
--                 0, ELF_MACHINE, 1, 0) < 0) {
-+                 0, EM_RISCV, 1, 0) < 0) {
-         error_report("qemu: could not load kernel '%s'", kernel_filename);
-         exit(1);
+diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+index dd3e417..f79716a 100644
+--- a/target/riscv/op_helper.c
++++ b/target/riscv/op_helper.c
+@@ -240,7 +240,7 @@ void csr_write_helper(CPURISCVState *env, target_ulong val_to_write,
+         csr_write_helper(env, next_mie, CSR_MIE);
+         break;
      }
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 57b4f4f..0e633a0 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -74,7 +74,7 @@ static uint64_t load_kernel(const char *kernel_filename)
- 
-     if (load_elf(kernel_filename, NULL, NULL,
-                  &kernel_entry, NULL, &kernel_high,
--                 0, ELF_MACHINE, 1, 0) < 0) {
-+                 0, EM_RISCV, 1, 0) < 0) {
-         error_report("qemu: could not load kernel '%s'", kernel_filename);
-         exit(1);
-     }
-diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-index c7d937b..70e697c 100644
---- a/hw/riscv/spike.c
-+++ b/hw/riscv/spike.c
-@@ -64,7 +64,7 @@ static uint64_t load_kernel(const char *kernel_filename)
-     uint64_t kernel_entry, kernel_high;
- 
-     if (load_elf_ram_sym(kernel_filename, NULL, NULL,
--            &kernel_entry, NULL, &kernel_high, 0, ELF_MACHINE, 1, 0,
-+            &kernel_entry, NULL, &kernel_high, 0, EM_RISCV, 1, 0,
-             NULL, true, htif_symbol_callback) < 0) {
-         error_report("qemu: could not load kernel '%s'", kernel_filename);
-         exit(1);
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index d680cbd..e3f8bb7 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -68,7 +68,7 @@ static uint64_t load_kernel(const char *kernel_filename)
- 
-     if (load_elf(kernel_filename, NULL, NULL,
-                  &kernel_entry, NULL, &kernel_high,
--                 0, ELF_MACHINE, 1, 0) < 0) {
-+                 0, EM_RISCV, 1, 0) < 0) {
-         error_report("qemu: could not load kernel '%s'", kernel_filename);
-         exit(1);
-     }
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 3a0ca2f..7c4482b 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -34,7 +34,6 @@
- 
- #define TCG_GUEST_DEFAULT_MO 0
- 
--#define ELF_MACHINE EM_RISCV
- #define CPUArchState struct CPURISCVState
- 
- #include "qemu-common.h"
+-    case CSR_SATP: /* CSR_SPTBR */ {
++    case CSR_SATP: /* CSR_SPTBR */
+         if (!riscv_feature(env, RISCV_FEATURE_MMU)) {
+             break;
+         }
+@@ -258,7 +258,6 @@ void csr_write_helper(CPURISCVState *env, target_ulong val_to_write,
+             env->satp = val_to_write;
+         }
+         break;
+-    }
+     case CSR_SEPC:
+         env->sepc = val_to_write;
+         break;
 -- 
 2.7.0
