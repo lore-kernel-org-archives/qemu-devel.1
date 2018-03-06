@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1etDgv-0003jL-In
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:35:46 -0500
+	(envelope-from <zhenwei.pi@youruncloud.com>) id 1et6Mw-0007Rr-G4
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 01:46:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1etDgs-0007wC-Uc
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:35:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43554)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1etDgs-0007vX-No
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:35:42 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1etDgq-0007mQ-FQ
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 14:35:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 33BC52E80CE
-	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 14:35:40 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 06 Mar 2018 14:28:33 -0000
-From: Guenter Roeck <public@roeck-us.net>
-Reply-To: Bug 1753309 <1753309@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152019341691.7537.9997390122339723494.malonedeb@gac.canonical.com>
-Message-Id: <152034651354.20543.17789694574886324395.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1753309] Re: Ethernet interrupt vectors for
- sabrelite machine are defined backwards
+	(envelope-from <zhenwei.pi@youruncloud.com>) id 1et6Ms-0002BS-JB
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 01:46:38 -0500
+Received: from mail139-37.mail.alibaba.com ([198.11.139.37]:55173)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <zhenwei.pi@youruncloud.com>)
+	id 1et6Ms-00029e-8D
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 01:46:34 -0500
+From: "zhenwei.pi" <zhenwei.pi@youruncloud.com>
+Date: Tue,  6 Mar 2018 14:46:21 +0800
+Message-Id: <1520318781-22644-1-git-send-email-zhenwei.pi@youruncloud.com>
+Subject: [Qemu-devel] [PATCH] usbredir: reorder fields in USBRedirDevice to
+ reduce padding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,104 +23,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: kraxel@redhat.com
+Cc: qemu-devel@nongnu.org, zhenwei.pi@youruncloud.com
 
-Swapping the interrupt pins fixes the problem on Linux v4.13 and later.
-Older kernels start failing as follows.
+Changing the current ordering saves 8 bytes per entry in x86_64.
 
- On v4.12 and earlier, the Ethernet interface fails to instantiate with
-    fec 2188000.ethernet (unnamed net_device) (uninitialized): MDIO read ti=
-meout
-    fec: probe of 2188000.ethernet failed with error -5
-  I have not found the reason yet. Unmodified qemu works fine.
-- v4.1 and earlier crash. The crash is due to a bad error path and fixed by=
- commit
-  32cba57ba74be ("net: fec: introduce fec_ptp_stop and use in probe fail pa=
-th").
+Signed-off-by: zhenwei.pi <zhenwei.pi@youruncloud.com>
+---
+ hw/usb/redirect.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1753309
-
-Title:
-  Ethernet interrupt vectors for sabrelite machine are defined backwards
-
-Status in QEMU:
-  New
-
-Bug description:
-  The sabrelite machine model used by qemu-system-arm is based on the
-  Freescale/NXP i.MX6Q processor. This SoC has an on-board ethernet
-  controller which is supported in QEMU using the imx_fec.c module
-  (actually called imx.enet for this model.)
-
-  The include/hw/arm/fsm-imx6.h file defines the interrupt vectors for
-  the imx.enet device like this:
-
-  #define FSL_IMX6_ENET_MAC_1588_IRQ 118
-  #define FSL_IMX6_ENET_MAC_IRQ 119
-
-  However, this is backwards. The reference manual for the i.MX6D/Q
-  devices can be found here:
-
-  https://www.nxp.com/docs/en/reference-manual/IMX6DQRM.pdf
-
-  On page 225, in Table 3-1. ARM Cortex A9 domain interrupt summary, it
-  shows the following:
-
-  150 ENET
-  MAC 0 IRQ, Logical OR of:
-  MAC 0 Periodic Timer Overflow
-  MAC 0 Time Stamp Available
-  MAC 0 Time Stamp Available
-  MAC 0 Time Stamp Available
-  MAC 0 Payload Receive Error
-  MAC 0 Transmit FIFO Underrun
-  MAC 0 Collision Retry Limit
-  MAC 0 Late Collision
-  MAC 0 Ethernet Bus Error
-  MAC 0 MII Data Transfer Done
-  MAC 0 Receive Buffer Done
-  MAC 0 Receive Frame Done
-  MAC 0 Transmit Buffer Done
-  MAC 0 Transmit Frame Done
-  MAC 0 Graceful Stop
-  MAC 0 Babbling Transmit Error
-  MAC 0 Babbling Receive Error
-  MAC 0 Wakeup Request [synchronous]
-
-  151 ENET
-  MAC 0 1588 Timer interrupt [synchronous] request
-
-  Note:
-  150 - 32 =3D=3D 118
-  151 - 32 =3D=3D 119
-
-  In other words, the vector definitions in the fsl-imx6.h file are
-  reversed. The correct definition is:
-
-  #define FSL_IMX6_ENET_MAC_IRQ 118
-  #define FSL_IMX6_ENET_MAC_1588_IRQ 119
-
-  I tested the sabrelite simulation using VxWorks 7 (which supports the
-  SabreLite board) and found that while I was able to send and receive
-  packet data via the simulated ethernet interface, the VxWorks i.MX6
-  ethernet driver failed to receive any interrupts. When I corrected the
-  interrupt vector definitions as shown above and recompiled QEMU,
-  everything worked as expected. I was able to exchange ICMP packets
-  with the simulated target and telnet to/from the VxWorks instance
-  running in the virtual machine. I used the tap interface for this.
-
-  As a workaround I was also able to make the ethernet work by modifying
-  the VxWorks imx6q-sabrelite.dts file to change the ethernet interrupt
-  property from 150 to 151.
-
-  This problem was observed with the following environment:
-
-  Host: FreeBSD/amd64 11.1-RELEASE
-  QEMU version: 2.11.0 and 2.11.1 built from source code
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1753309/+subscriptions
+diff --git a/hw/usb/redirect.c b/hw/usb/redirect.c
+index ec17430..65a9196 100644
+--- a/hw/usb/redirect.c
++++ b/hw/usb/redirect.c
+@@ -106,10 +106,10 @@ struct USBRedirDevice {
+     USBDevice dev;
+     /* Properties */
+     CharBackend cs;
++    bool enable_streams;
+     uint8_t debug;
+-    char *filter_str;
+     int32_t bootindex;
+-    bool enable_streams;
++    char *filter_str;
+     /* Data passed from chardev the fd_read cb to the usbredirparser read cb */
+     const uint8_t *read_buf;
+     int read_buf_size;
+-- 
+2.7.4
