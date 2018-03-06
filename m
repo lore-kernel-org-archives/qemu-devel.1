@@ -1,25 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1etAzR-0008LI-Tu
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:42:43 -0500
+	(envelope-from <sandipan@linux.vnet.ibm.com>) id 1etAzV-0008NP-Ar
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:42:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1etAzO-0007LL-QJ
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:42:41 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45150 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1etAzO-0007L2-Li
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:42:38 -0500
-Date: Tue, 6 Mar 2018 12:42:33 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180306114232.v5gtwxald4mmelab@sirius.home.kraxel.org>
-References: <20180306074053.22856-1-kraxel@redhat.com>
-	<CAJ+F1CK5MsZ5=-z2yWznBcHjZqskHSdiyYxC30azEcQ9AXrRLg@mail.gmail.com>
+	(envelope-from <sandipan@linux.vnet.ibm.com>) id 1etAzS-0007N4-64
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:42:45 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46038)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sandipan@linux.vnet.ibm.com>)
+	id 1etAzR-0007MT-U8
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:42:42 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w26BcsTw111828
+	for <qemu-devel@nongnu.org>; Tue, 6 Mar 2018 06:42:40 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ght7b0bat-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 06:42:40 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <sandipan@linux.vnet.ibm.com>;
+	Tue, 6 Mar 2018 11:42:37 -0000
+References: <20180306064210.26157-1-sandipan@linux.vnet.ibm.com>
+	<CAFEAcA-M1smCAVg3OwK0W7vNXiJBadh8sehHbLmDa7NuYb7tLA@mail.gmail.com>
+From: Sandipan Das <sandipan@linux.vnet.ibm.com>
+Date: Tue, 6 Mar 2018 17:12:32 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CK5MsZ5=-z2yWznBcHjZqskHSdiyYxC30azEcQ9AXrRLg@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/7] audio: modularize
+In-Reply-To: <CAFEAcA-M1smCAVg3OwK0W7vNXiJBadh8sehHbLmDa7NuYb7tLA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <ce312b56-8e2d-a59f-649a-b7ed167c04bf@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH risu 1/3] ppc64.risu: Add missing byte and
+ dword loads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,56 +43,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, naveen.n.rao@linux.vnet.ibm.com, QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, Mar 06, 2018 at 12:22:49PM +0100, Marc-Andr=E9 Lureau wrote:
-> Hi
->=20
-> On Tue, Mar 6, 2018 at 8:40 AM, Gerd Hoffmann <kraxel@redhat.com> wrote=
-:
-> > Add audio driver (host backend) registry.  Add audio module support.
-> > Enable module builds for alsa, oss, pulse and sdl.
-> >
-> > Gerd Hoffmann (7):
-> >   audio: add driver registry
-> >   audio: add module loading support
-> >   build: enable audio modules
-> >   audio/alsa: build as module
-> >   audio/oss: build as module
-> >   audio/pulseaudio: build as module
-> >   audio/sdl: build as module
-> >
->=20
-> Is this a problem on my side? (configure
-> '--audio-drv-list=3Doss,alsa,pa,sdl' '--enable-modules')
->=20
-> elmarco@boraha:~/src/qemu/build (master %)$
-> x86_64-softmmu/qemu-system-x86_64 -audio-help
-> Failed to open module:
-> /home/elmarco/src/qemu/build/x86_64-softmmu/../audio-oss.so: undefined
-> symbol: _TRACE_OSS_INVALID_AVAILABLE_SIZE_DSTATE
-> Failed to open module:
-> /home/elmarco/src/qemu/build/x86_64-softmmu/../audio-alsa.so:
-> undefined symbol: _TRACE_ALSA_XRUN_OUT_DSTATE
-> Failed to open module:
-> /home/elmarco/src/qemu/build/x86_64-softmmu/../audio-pa.so: undefined
-> symbol: audio_pt_unlock_and_signal
-> Failed to open module:
-> /home/elmarco/src/qemu/build/x86_64-softmmu/../audio-sdl.so: undefined
-> symbol: audio_pcm_sw_write
 
-Works fine here.  Tried "make clean && make"?
+On 03/06/2018 05:09 PM, Peter Maydell wrote:
+> On 6 March 2018 at 06:42, Sandipan Das <sandipan@linux.vnet.ibm.com> wrote:
+>> The patterns for the following instructions are added:
+>>  * Load Byte and Zero (lbz)
+>>  * Load Byte and Zero with Update (lbzu)
+>>  * Load Byte and Zero Indexed (lbzx)
+>>  * Load Byte and Zero with Update Indexed (lbzux)
+>>  * Load Doubleword (ld)
+>>
+>> Signed-off-by: Sandipan Das <sandipan@linux.vnet.ibm.com>
+> 
+> Hi -- this patchset doesn't seem to have a cover letter. Could
+> you resend it with one, please? Our automated patch handling
+> tools all expect a cover letter if there's more than one patch
+> in a set.
+> 
+> thanks
+> -- PMM
+> 
+> 
 
-Qemu build system seems to not rebuild object files when the compiler
-flags change.  So you can't switch between --enable-modules and
---disable-modules without "make clean" inbetween.  Same issue when
-patches switch code from compiled-in to modular and you try an
-incremental build.
+Sure
 
-I've seen only build failues due to this, not module load errors.  But
-possibly only because I stopped doing incremental builds when working on
-module patches ...
-
-cheers,
-  Gerd
+--
+With Regards,
+Sandipan
