@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etJF4-0000T8-VO
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:31:23 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etJF6-0000UE-Bx
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:31:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etJF3-0005Vi-Lu
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:31:22 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etJF4-0005Wb-Dy
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:31:24 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Tue,  6 Mar 2018 20:30:46 +0000
-Message-Id: <20180306203103.25563-3-mark.cave-ayland@ilande.co.uk>
+Date: Tue,  6 Mar 2018 20:30:47 +0000
+Message-Id: <20180306203103.25563-4-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20180306203103.25563-1-mark.cave-ayland@ilande.co.uk>
 References: <20180306203103.25563-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 02/19] uninorth: remove second set of uninorth
- token registers
+Subject: [Qemu-devel] [PATCH 03/19] uninorth: QOMify PCI and AGP host bridges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,39 +21,185 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-Commit 593c181160: "PPC: Newworld: Add second uninorth control register set"
-added a second set of uninorth registers at 0xf3000000.
-
-Testing MacOS 9.2 to MacOS X 10.4 reveals no accesses to this address and I
-can't find any reference to it in Apple's Core99.cpp source so I'm assuming
-that this was the result of another bug that has now been fixed.
-
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/ppc/mac_newworld.c | 4 ----
- 1 file changed, 4 deletions(-)
+ hw/pci-host/uninorth.c | 79 ++++++++++++++++++++------------------------------
+ 1 file changed, 32 insertions(+), 47 deletions(-)
 
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index a749e2565d..1eba79d54b 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -148,7 +148,6 @@ static void ppc_core99_init(MachineState *machine)
-     qemu_irq *pic, **openpic_irqs;
-     MemoryRegion *isa = g_new(MemoryRegion, 1);
-     MemoryRegion *unin_memory = g_new(MemoryRegion, 1);
--    MemoryRegion *unin2_memory = g_new(MemoryRegion, 1);
-     int linux_boot, i, j, k;
-     MemoryRegion *ram = g_new(MemoryRegion, 1), *bios = g_new(MemoryRegion, 1);
-     hwaddr kernel_base, initrd_base, cmdline_base = 0;
-@@ -283,9 +282,6 @@ static void ppc_core99_init(MachineState *machine)
-     memory_region_init_io(unin_memory, NULL, &unin_ops, token, "unin", 0x1000);
-     memory_region_add_subregion(get_system_memory(), 0xf8000000, unin_memory);
+diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
+index 710818e355..1d4d3f5705 100644
+--- a/hw/pci-host/uninorth.c
++++ b/hw/pci-host/uninorth.c
+@@ -129,72 +129,61 @@ static const MemoryRegionOps unin_data_ops = {
+     .endianness = DEVICE_LITTLE_ENDIAN,
+ };
  
--    memory_region_init_io(unin2_memory, NULL, &unin_ops, token, "unin", 0x1000);
--    memory_region_add_subregion(get_system_memory(), 0xf3000000, unin2_memory);
+-static int pci_unin_main_init_device(SysBusDevice *dev)
++static void pci_unin_main_init(Object *obj)
+ {
+-    PCIHostState *h;
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    PCIHostState *h = PCI_HOST_BRIDGE(obj);
+ 
+     /* Use values found on a real PowerMac */
+     /* Uninorth main bus */
+-    h = PCI_HOST_BRIDGE(dev);
 -
-     openpic_irqs = g_malloc0(smp_cpus * sizeof(qemu_irq *));
-     openpic_irqs[0] =
-         g_malloc0(smp_cpus * sizeof(qemu_irq) * OPENPIC_OUTPUT_NB);
+     memory_region_init_io(&h->conf_mem, OBJECT(h), &pci_host_conf_le_ops,
+-                          dev, "pci-conf-idx", 0x1000);
+-    memory_region_init_io(&h->data_mem, OBJECT(h), &unin_data_ops, dev,
++                          obj, "pci-conf-idx", 0x1000);
++    memory_region_init_io(&h->data_mem, OBJECT(h), &unin_data_ops, obj,
+                           "pci-conf-data", 0x1000);
+-    sysbus_init_mmio(dev, &h->conf_mem);
+-    sysbus_init_mmio(dev, &h->data_mem);
+-
+-    return 0;
++    sysbus_init_mmio(sbd, &h->conf_mem);
++    sysbus_init_mmio(sbd, &h->data_mem);
+ }
+ 
+-
+-static int pci_u3_agp_init_device(SysBusDevice *dev)
++static void pci_u3_agp_init(Object *obj)
+ {
+-    PCIHostState *h;
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    PCIHostState *h = PCI_HOST_BRIDGE(obj);
+ 
+     /* Uninorth U3 AGP bus */
+-    h = PCI_HOST_BRIDGE(dev);
+-
+     memory_region_init_io(&h->conf_mem, OBJECT(h), &pci_host_conf_le_ops,
+-                          dev, "pci-conf-idx", 0x1000);
+-    memory_region_init_io(&h->data_mem, OBJECT(h), &unin_data_ops, dev,
++                          obj, "pci-conf-idx", 0x1000);
++    memory_region_init_io(&h->data_mem, OBJECT(h), &unin_data_ops, obj,
+                           "pci-conf-data", 0x1000);
+-    sysbus_init_mmio(dev, &h->conf_mem);
+-    sysbus_init_mmio(dev, &h->data_mem);
+-
+-    return 0;
++    sysbus_init_mmio(sbd, &h->conf_mem);
++    sysbus_init_mmio(sbd, &h->data_mem);
+ }
+ 
+-static int pci_unin_agp_init_device(SysBusDevice *dev)
++static void pci_unin_agp_init(Object *obj)
+ {
+-    PCIHostState *h;
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    PCIHostState *h = PCI_HOST_BRIDGE(obj);
+ 
+     /* Uninorth AGP bus */
+-    h = PCI_HOST_BRIDGE(dev);
+-
+     memory_region_init_io(&h->conf_mem, OBJECT(h), &pci_host_conf_le_ops,
+-                          dev, "pci-conf-idx", 0x1000);
++                          obj, "pci-conf-idx", 0x1000);
+     memory_region_init_io(&h->data_mem, OBJECT(h), &pci_host_data_le_ops,
+-                          dev, "pci-conf-data", 0x1000);
+-    sysbus_init_mmio(dev, &h->conf_mem);
+-    sysbus_init_mmio(dev, &h->data_mem);
+-    return 0;
++                          obj, "pci-conf-data", 0x1000);
++    sysbus_init_mmio(sbd, &h->conf_mem);
++    sysbus_init_mmio(sbd, &h->data_mem);
+ }
+ 
+-static int pci_unin_internal_init_device(SysBusDevice *dev)
++static void pci_unin_internal_init(Object *obj)
+ {
+-    PCIHostState *h;
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    PCIHostState *h = PCI_HOST_BRIDGE(obj);
+ 
+     /* Uninorth internal bus */
+-    h = PCI_HOST_BRIDGE(dev);
+-
+     memory_region_init_io(&h->conf_mem, OBJECT(h), &pci_host_conf_le_ops,
+-                          dev, "pci-conf-idx", 0x1000);
++                          obj, "pci-conf-idx", 0x1000);
+     memory_region_init_io(&h->data_mem, OBJECT(h), &pci_host_data_le_ops,
+-                          dev, "pci-conf-data", 0x1000);
+-    sysbus_init_mmio(dev, &h->conf_mem);
+-    sysbus_init_mmio(dev, &h->data_mem);
+-    return 0;
++                          obj, "pci-conf-data", 0x1000);
++    sysbus_init_mmio(sbd, &h->conf_mem);
++    sysbus_init_mmio(sbd, &h->data_mem);
+ }
+ 
+ PCIBus *pci_pmac_init(qemu_irq *pic,
+@@ -461,10 +450,8 @@ static const TypeInfo unin_internal_pci_host_info = {
+ 
+ static void pci_unin_main_class_init(ObjectClass *klass, void *data)
+ {
+-    SysBusDeviceClass *sbc = SYS_BUS_DEVICE_CLASS(klass);
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+-    sbc->init = pci_unin_main_init_device;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+ }
+ 
+@@ -472,15 +459,14 @@ static const TypeInfo pci_unin_main_info = {
+     .name          = TYPE_UNI_NORTH_PCI_HOST_BRIDGE,
+     .parent        = TYPE_PCI_HOST_BRIDGE,
+     .instance_size = sizeof(UNINState),
++    .instance_init = pci_unin_main_init,
+     .class_init    = pci_unin_main_class_init,
+ };
+ 
+ static void pci_u3_agp_class_init(ObjectClass *klass, void *data)
+ {
+-    SysBusDeviceClass *sbc = SYS_BUS_DEVICE_CLASS(klass);
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+-    sbc->init = pci_u3_agp_init_device;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+ }
+ 
+@@ -488,15 +474,14 @@ static const TypeInfo pci_u3_agp_info = {
+     .name          = TYPE_U3_AGP_HOST_BRIDGE,
+     .parent        = TYPE_PCI_HOST_BRIDGE,
+     .instance_size = sizeof(UNINState),
++    .instance_init = pci_u3_agp_init,
+     .class_init    = pci_u3_agp_class_init,
+ };
+ 
+ static void pci_unin_agp_class_init(ObjectClass *klass, void *data)
+ {
+-    SysBusDeviceClass *sbc = SYS_BUS_DEVICE_CLASS(klass);
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+-    sbc->init = pci_unin_agp_init_device;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+ }
+ 
+@@ -504,15 +489,14 @@ static const TypeInfo pci_unin_agp_info = {
+     .name          = TYPE_UNI_NORTH_AGP_HOST_BRIDGE,
+     .parent        = TYPE_PCI_HOST_BRIDGE,
+     .instance_size = sizeof(UNINState),
++    .instance_init = pci_unin_agp_init,
+     .class_init    = pci_unin_agp_class_init,
+ };
+ 
+ static void pci_unin_internal_class_init(ObjectClass *klass, void *data)
+ {
+-    SysBusDeviceClass *sbc = SYS_BUS_DEVICE_CLASS(klass);
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+-    sbc->init = pci_unin_internal_init_device;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+ }
+ 
+@@ -520,6 +504,7 @@ static const TypeInfo pci_unin_internal_info = {
+     .name          = TYPE_UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE,
+     .parent        = TYPE_PCI_HOST_BRIDGE,
+     .instance_size = sizeof(UNINState),
++    .instance_init = pci_unin_internal_init,
+     .class_init    = pci_unin_internal_class_init,
+ };
+ 
 -- 
 2.11.0
