@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39948)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1etLma-00065d-TH
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:14:10 -0500
+	id 1etLpg-0007GB-Ie
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:17:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1etLmV-0005Pm-UR
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:14:08 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:52596)
+	id 1etLpb-0000GT-J8
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:17:20 -0500
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:44019)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1etLmV-0005Ox-Kp
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:14:03 -0500
-Received: by mail-wm0-x244.google.com with SMTP id t3so1345327wmc.2
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 15:14:03 -0800 (PST)
+	id 1etLpb-0000EN-9X
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:17:15 -0500
+Received: by mail-wr0-x22d.google.com with SMTP id u49so301266wrc.10
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 15:17:15 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20180306164957.24275-1-pbonzini@redhat.com>
-	<20180306164957.24275-3-pbonzini@redhat.com>
+References: <20180306170959.3921-1-marcandre.lureau@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ce3c5abe-5d57-3bde-0949-db17ce82c7cc@amsat.org>
-Date: Tue, 6 Mar 2018 20:14:01 -0300
+Message-ID: <e6e225ad-541b-823e-1776-56ccc2a7df67@amsat.org>
+Date: Tue, 6 Mar 2018 20:17:12 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180306164957.24275-3-pbonzini@redhat.com>
+In-Reply-To: <20180306170959.3921-1-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] net: allow using any PCI NICs in -net
- or -nic
+Subject: Re: [Qemu-devel] [PATCH] migration: fix minor finalize leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,122 +34,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On 03/06/2018 01:49 PM, Paolo Bonzini wrote:
-> Remove the hard-coded list of PCI NIC names; instead, fill an array
-> using all PCI devices listed under DEVICE_CATEGORY_NETWORK. Keep
-> the old shortcut "virtio" for virtio-net-pci.
+On 03/06/2018 02:09 PM, Marc-André Lureau wrote:
+> Spotted thanks to ASAN:
+> QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64 tests/migration-test -p /x86_64/migration/bad_dest
 > 
-> Suggested-by: Thomas Huth <thuth@redhat.com>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ==30302==ERROR: LeakSanitizer: detected memory leaks
+> 
+> Direct leak of 48 byte(s) in 1 object(s) allocated from:
+>     #0 0x7f60efba1a38 in __interceptor_calloc (/lib64/libasan.so.4+0xdea38)
+>     #1 0x7f60eef3cf75 in g_malloc0 ../glib/gmem.c:124
+>     #2 0x55ca9094702c in error_copy /home/elmarco/src/qemu/util/error.c:203
+>     #3 0x55ca9037a30f in migrate_set_error /home/elmarco/src/qemu/migration/migration.c:1139
+>     #4 0x55ca9037a462 in migrate_fd_error /home/elmarco/src/qemu/migration/migration.c:1150
+>     #5 0x55ca9038162b in migrate_fd_connect /home/elmarco/src/qemu/migration/migration.c:2411
+>     #6 0x55ca90386e41 in migration_channel_connect /home/elmarco/src/qemu/migration/channel.c:81
+>     #7 0x55ca9038335e in socket_outgoing_migration /home/elmarco/src/qemu/migration/socket.c:85
+>     #8 0x55ca9083dd3a in qio_task_complete /home/elmarco/src/qemu/io/task.c:142
+>     #9 0x55ca9083d6cc in gio_task_thread_result /home/elmarco/src/qemu/io/task.c:88
+>     #10 0x7f60eef37317 in g_idle_dispatch ../glib/gmain.c:5552
+>     #11 0x7f60eef3490b in g_main_dispatch ../glib/gmain.c:3182
+>     #12 0x7f60eef357ac in g_main_context_dispatch ../glib/gmain.c:3847
+>     #13 0x55ca90927231 in glib_pollfds_poll /home/elmarco/src/qemu/util/main-loop.c:214
+>     #14 0x55ca90927420 in os_host_main_loop_wait /home/elmarco/src/qemu/util/main-loop.c:261
+>     #15 0x55ca909275fa in main_loop_wait /home/elmarco/src/qemu/util/main-loop.c:515
+>     #16 0x55ca8fc1c2a4 in main_loop /home/elmarco/src/qemu/vl.c:1942
+>     #17 0x55ca8fc2eb3a in main /home/elmarco/src/qemu/vl.c:4724
+>     #18 0x7f60e4082009 in __libc_start_main (/lib64/libc.so.6+0x21009)
+> 
+> Indirect leak of 45 byte(s) in 1 object(s) allocated from:
+>     #0 0x7f60efba1850 in malloc (/lib64/libasan.so.4+0xde850)
+>     #1 0x7f60eef3cf0c in g_malloc ../glib/gmem.c:94
+>     #2 0x7f60eef3d1cf in g_malloc_n ../glib/gmem.c:331
+>     #3 0x7f60eef596eb in g_strdup ../glib/gstrfuncs.c:363
+>     #4 0x55ca90947085 in error_copy /home/elmarco/src/qemu/util/error.c:204
+>     #5 0x55ca9037a30f in migrate_set_error /home/elmarco/src/qemu/migration/migration.c:1139
+>     #6 0x55ca9037a462 in migrate_fd_error /home/elmarco/src/qemu/migration/migration.c:1150
+>     #7 0x55ca9038162b in migrate_fd_connect /home/elmarco/src/qemu/migration/migration.c:2411
+>     #8 0x55ca90386e41 in migration_channel_connect /home/elmarco/src/qemu/migration/channel.c:81
+>     #9 0x55ca9038335e in socket_outgoing_migration /home/elmarco/src/qemu/migration/socket.c:85
+>     #10 0x55ca9083dd3a in qio_task_complete /home/elmarco/src/qemu/io/task.c:142
+>     #11 0x55ca9083d6cc in gio_task_thread_result /home/elmarco/src/qemu/io/task.c:88
+>     #12 0x7f60eef37317 in g_idle_dispatch ../glib/gmain.c:5552
+>     #13 0x7f60eef3490b in g_main_dispatch ../glib/gmain.c:3182
+>     #14 0x7f60eef357ac in g_main_context_dispatch ../glib/gmain.c:3847
+>     #15 0x55ca90927231 in glib_pollfds_poll /home/elmarco/src/qemu/util/main-loop.c:214
+>     #16 0x55ca90927420 in os_host_main_loop_wait /home/elmarco/src/qemu/util/main-loop.c:261
+>     #17 0x55ca909275fa in main_loop_wait /home/elmarco/src/qemu/util/main-loop.c:515
+>     #18 0x55ca8fc1c2a4 in main_loop /home/elmarco/src/qemu/vl.c:1942
+>     #19 0x55ca8fc2eb3a in main /home/elmarco/src/qemu/vl.c:4724
+>     #20 0x7f60e4082009 in __libc_start_main (/lib64/libc.so.6+0x21009)
+> 
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  hw/pci/pci.c | 61 ++++++++++++++++++++++++++++++------------------------------
->  1 file changed, 30 insertions(+), 31 deletions(-)
+>  migration/migration.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index 2174c254eb..aa24a26680 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -1815,49 +1815,48 @@ PciInfoList *qmp_query_pci(Error **errp)
->      return head;
+> diff --git a/migration/migration.c b/migration/migration.c
+> index e345d0cc7e..62c243d2d4 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -2541,6 +2541,7 @@ static void migration_instance_finalize(Object *obj)
+>      g_free(params->tls_hostname);
+>      g_free(params->tls_creds);
+>      qemu_sem_destroy(&ms->pause_sem);
+> +    error_free(ms->error);
 >  }
 >  
-> -static const char * const pci_nic_models[] = {
-> -    "ne2k_pci",
-> -    "i82551",
-> -    "i82557b",
-> -    "i82559er",
-> -    "rtl8139",
-> -    "e1000",
-> -    "pcnet",
-> -    "virtio",
-> -    "sungem",
-> -    NULL
-> -};
-> -
-> -static const char * const pci_nic_names[] = {
-> -    "ne2k_pci",
-> -    "i82551",
-> -    "i82557b",
-> -    "i82559er",
-> -    "rtl8139",
-> -    "e1000",
-> -    "pcnet",
-> -    "virtio-net-pci",
-> -    "sungem",
-> -    NULL
-> -};
-> -
->  /* Initialize a PCI NIC.  */
->  PCIDevice *pci_nic_init_nofail(NICInfo *nd, PCIBus *rootbus,
->                                 const char *default_model,
->                                 const char *default_devaddr)
->  {
->      const char *devaddr = nd->devaddr ? nd->devaddr : default_devaddr;
-> +    GSList *list;
-> +    GPtrArray *pci_nic_models;
->      PCIBus *bus;
->      PCIDevice *pci_dev;
->      DeviceState *dev;
->      int devfn;
->      int i;
->  
-> -    if (qemu_show_nic_models(nd->model, pci_nic_models)) {
-> +    if (!strcmp(nd->model, "virtio")) {
-> +        g_free(nd->model);
-> +        nd->model = g_strdup("virtio-net-pci");
-> +    }
-> +
-> +    list = object_class_get_list_sorted(TYPE_PCI_DEVICE, false);
-> +    pci_nic_models = g_ptr_array_new_with_free_func(g_free);
-> +    while (list) {
-> +        DeviceClass *dc = OBJECT_CLASS_CHECK(DeviceClass, list->data,
-> +                                             TYPE_DEVICE);
-> +        GSList *next;
-> +        if (test_bit(DEVICE_CATEGORY_NETWORK, dc->categories) &&
-> +            dc->user_creatable) {
-> +            const char *name = object_class_get_name(list->data) ;
-> +            g_ptr_array_add(pci_nic_models, (gpointer)name);
-> +        }
-> +        next = list->next;
-> +        g_slist_free_1(list);
-> +        list = next;
-> +    }
-> +    g_ptr_array_add(pci_nic_models, NULL);
-> +
-> +    if (qemu_show_nic_models(nd->model, (const char **)pci_nic_models->pdata)) {
->          exit(0);
->      }
->  
-> -    i = qemu_find_nic_model(nd, pci_nic_models, default_model);
-> +    i = qemu_find_nic_model(nd, (const char **)pci_nic_models->pdata,
-> +                            default_model);
->      if (i < 0) {
->          exit(1);
->      }
-> @@ -1865,15 +1864,15 @@ PCIDevice *pci_nic_init_nofail(NICInfo *nd, PCIBus *rootbus,
->      bus = pci_get_bus_devfn(&devfn, rootbus, devaddr);
->      if (!bus) {
->          error_report("Invalid PCI device address %s for device %s",
-> -                     devaddr, pci_nic_names[i]);
-> +                     devaddr, nd->model);
->          exit(1);
->      }
->  
-> -    pci_dev = pci_create(bus, devfn, pci_nic_names[i]);
-> +    pci_dev = pci_create(bus, devfn, nd->model);
->      dev = &pci_dev->qdev;
->      qdev_set_nic_properties(dev, nd);
->      qdev_init_nofail(dev);
-> -
-> +    g_ptr_array_free(pci_nic_models, true);
->      return pci_dev;
->  }
->  
+>  static void migration_instance_init(Object *obj)
 > 
