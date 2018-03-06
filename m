@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etJKW-0005ru-EH
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:37:01 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etJKZ-0005wn-U5
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:37:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etJKV-0008He-6h
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:37:00 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etJKY-0008LE-GQ
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:37:03 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Tue,  6 Mar 2018 20:30:59 +0000
-Message-Id: <20180306203103.25563-16-mark.cave-ayland@ilande.co.uk>
+Date: Tue,  6 Mar 2018 20:31:01 +0000
+Message-Id: <20180306203103.25563-18-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20180306203103.25563-1-mark.cave-ayland@ilande.co.uk>
 References: <20180306203103.25563-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 15/19] uninorth: move PCI IO (ISA) memory
- region into the uninorth device
+Subject: [Qemu-devel] [PATCH 17/19] uninorth: create new uninorth device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,146 +21,213 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-Do this for both the uninorth main and uninorth u3 AGP buses, using the main
-PCI bus for each machine (this ensures the IO addresses still match those
-used by OpenBIOS).
+Commit 4e46dcdbd3 "PPC: Newworld: Add uninorth token register" added a TODO
+which was to convert the uninorth registers hack to a proper device. Move
+these registers to a new uninorth device, removing the old hacks from
+mac_newworld.c.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/pci-host/uninorth.c         | 14 ++++++++++----
- hw/ppc/mac_newworld.c          | 12 ++++++------
- include/hw/pci-host/uninorth.h |  1 +
- 3 files changed, 17 insertions(+), 10 deletions(-)
+ hw/pci-host/trace-events       |  2 ++
+ hw/pci-host/uninorth.c         | 58 ++++++++++++++++++++++++++++++++++++++++++
+ hw/ppc/mac_newworld.c          | 41 +++++------------------------
+ hw/ppc/trace-events            |  4 ---
+ include/hw/pci-host/uninorth.h | 11 ++++++++
+ 5 files changed, 77 insertions(+), 39 deletions(-)
 
+diff --git a/hw/pci-host/trace-events b/hw/pci-host/trace-events
+index 341a87a702..dd7a398e96 100644
+--- a/hw/pci-host/trace-events
++++ b/hw/pci-host/trace-events
+@@ -18,3 +18,5 @@ unin_set_irq(int irq_num, int level) "setting INT %d = %d"
+ unin_get_config_reg(uint32_t reg, uint32_t addr, uint32_t retval) "converted config space accessor 0x%"PRIx32 "/0x%"PRIx32 " -> 0x%"PRIx32
+ unin_data_write(uint64_t addr, unsigned len, uint64_t val) "write addr 0x%"PRIx64 " len %d val 0x%"PRIx64
+ unin_data_read(uint64_t addr, unsigned len, uint64_t val) "read addr 0x%"PRIx64 " len %d val 0x%"PRIx64
++unin_write(uint64_t addr, uint64_t value) "addr=0x%" PRIx64 " val=0x%"PRIx64
++unin_read(uint64_t addr, uint64_t value) "addr=0x%" PRIx64 " val=0x%"PRIx64
 diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
-index e2278fd0f0..3a29a4410e 100644
+index fada0ffd5f..dbfad01d9d 100644
 --- a/hw/pci-host/uninorth.c
 +++ b/hw/pci-host/uninorth.c
-@@ -127,7 +127,7 @@ static void pci_unin_main_realize(DeviceState *dev, Error **errp)
-                                    pci_unin_set_irq, pci_unin_map_irq,
-                                    s,
-                                    &s->pci_mmio,
--                                   get_system_io(),
-+                                   &s->pci_io,
-                                    PCI_DEVFN(11, 0), 4, TYPE_PCI_BUS);
+@@ -519,6 +519,62 @@ static const TypeInfo pci_unin_internal_info = {
+     .class_init    = pci_unin_internal_class_init,
+ };
  
-     pci_create_simple(h->bus, PCI_DEVFN(11, 0), "uni-north-pci");
-@@ -155,6 +155,8 @@ static void pci_unin_main_init(Object *obj)
- 
-     memory_region_init(&s->pci_mmio, OBJECT(s), "unin-pci-mmio",
-                        0x100000000ULL);
-+    memory_region_init_io(&s->pci_io, OBJECT(s), &unassigned_io_ops, obj,
-+                          "unin-pci-isa-mmio", 0x00800000);
- 
-     memory_region_init_alias(&s->pci_hole, OBJECT(s),
-                              "unin-pci-hole", &s->pci_mmio,
-@@ -168,6 +170,7 @@ static void pci_unin_main_init(Object *obj)
-     sysbus_init_mmio(sbd, &h->conf_mem);
-     sysbus_init_mmio(sbd, &h->data_mem);
-     sysbus_init_mmio(sbd, &s->pci_hole);
-+    sysbus_init_mmio(sbd, &s->pci_io);
++/* UniN device */
++static void unin_write(void *opaque, hwaddr addr, uint64_t value,
++                       unsigned size)
++{
++    trace_unin_write(addr, value);
++    if (addr == 0x0) {
++        *(int *)opaque = value;
++    }
++}
++
++static uint64_t unin_read(void *opaque, hwaddr addr, unsigned size)
++{
++    uint32_t value;
++
++    value = 0;
++    switch (addr) {
++    case 0:
++        value = *(int *)opaque;
++    }
++
++    trace_unin_read(addr, value);
++
++    return value;
++}
++
++static const MemoryRegionOps unin_ops = {
++    .read = unin_read,
++    .write = unin_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++};
++
++static void unin_init(Object *obj)
++{
++    UNINState *s = UNI_NORTH(obj);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++
++    memory_region_init_io(&s->mem, obj, &unin_ops, &s->token, "unin", 0x1000);
++
++    sysbus_init_mmio(sbd, &s->mem);
++}
++
++static void unin_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
++}
++
++static const TypeInfo unin_info = {
++    .name          = TYPE_UNI_NORTH,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(UNINState),
++    .instance_init = unin_init,
++    .class_init    = unin_class_init,
++};
++
+ static void unin_register_types(void)
+ {
+     type_register_static(&unin_main_pci_host_info);
+@@ -530,6 +586,8 @@ static void unin_register_types(void)
+     type_register_static(&pci_u3_agp_info);
+     type_register_static(&pci_unin_agp_info);
+     type_register_static(&pci_unin_internal_info);
++
++    type_register_static(&unin_info);
  }
  
- static void pci_u3_agp_realize(DeviceState *dev, Error **errp)
-@@ -179,7 +182,7 @@ static void pci_u3_agp_realize(DeviceState *dev, Error **errp)
-                                    pci_unin_set_irq, pci_unin_map_irq,
-                                    s,
-                                    &s->pci_mmio,
--                                   get_system_io(),
-+                                   &s->pci_io,
-                                    PCI_DEVFN(11, 0), 4, TYPE_PCI_BUS);
- 
-     pci_create_simple(h->bus, PCI_DEVFN(11, 0), "u3-agp");
-@@ -200,6 +203,8 @@ static void pci_u3_agp_init(Object *obj)
- 
-     memory_region_init(&s->pci_mmio, OBJECT(s), "unin-pci-mmio",
-                        0x100000000ULL);
-+    memory_region_init_io(&s->pci_io, OBJECT(s), &unassigned_io_ops, obj,
-+                          "unin-pci-isa-mmio", 0x00800000);
- 
-     memory_region_init_alias(&s->pci_hole, OBJECT(s),
-                              "unin-pci-hole", &s->pci_mmio,
-@@ -213,6 +218,7 @@ static void pci_u3_agp_init(Object *obj)
-     sysbus_init_mmio(sbd, &h->conf_mem);
-     sysbus_init_mmio(sbd, &h->data_mem);
-     sysbus_init_mmio(sbd, &s->pci_hole);
-+    sysbus_init_mmio(sbd, &s->pci_io);
- }
- 
- static void pci_unin_agp_realize(DeviceState *dev, Error **errp)
-@@ -224,7 +230,7 @@ static void pci_unin_agp_realize(DeviceState *dev, Error **errp)
-                                    pci_unin_set_irq, pci_unin_map_irq,
-                                    s,
-                                    &s->pci_mmio,
--                                   get_system_io(),
-+                                   &s->pci_io,
-                                    PCI_DEVFN(11, 0), 4, TYPE_PCI_BUS);
- 
-     pci_create_simple(h->bus, PCI_DEVFN(11, 0), "uni-north-agp");
-@@ -261,7 +267,7 @@ static void pci_unin_internal_realize(DeviceState *dev, Error **errp)
-                                    pci_unin_set_irq, pci_unin_map_irq,
-                                    s,
-                                    &s->pci_mmio,
--                                   get_system_io(),
-+                                   &s->pci_io,
-                                    PCI_DEVFN(14, 0), 4, TYPE_PCI_BUS);
- 
-     pci_create_simple(h->bus, PCI_DEVFN(14, 0), "uni-north-internal-pci");
+ type_init(unin_register_types)
 diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index 5d121a6071..5cb9f9abd0 100644
+index ae0de4e36e..2fcb101982 100644
 --- a/hw/ppc/mac_newworld.c
 +++ b/hw/ppc/mac_newworld.c
-@@ -146,7 +146,6 @@ static void ppc_core99_init(MachineState *machine)
+@@ -83,36 +83,6 @@
+ 
+ #define NDRV_VGA_FILENAME "qemu_vga.ndrv"
+ 
+-/* UniN device */
+-static void unin_write(void *opaque, hwaddr addr, uint64_t value,
+-                       unsigned size)
+-{
+-    trace_mac99_uninorth_write(addr, value);
+-    if (addr == 0x0) {
+-        *(int*)opaque = value;
+-    }
+-}
+-
+-static uint64_t unin_read(void *opaque, hwaddr addr, unsigned size)
+-{
+-    uint32_t value;
+-
+-    value = 0;
+-    switch (addr) {
+-    case 0:
+-        value = *(int*)opaque;
+-    }
+-
+-    trace_mac99_uninorth_read(addr, value);
+-
+-    return value;
+-}
+-
+-static const MemoryRegionOps unin_ops = {
+-    .read = unin_read,
+-    .write = unin_write,
+-    .endianness = DEVICE_NATIVE_ENDIAN,
+-};
+ 
+ static void fw_cfg_boot_set(void *opaque, const char *boot_device,
+                             Error **errp)
+@@ -146,7 +116,6 @@ static void ppc_core99_init(MachineState *machine)
      CPUPPCState *env = NULL;
      char *filename;
      qemu_irq *pic, **openpic_irqs;
--    MemoryRegion *isa = g_new(MemoryRegion, 1);
-     MemoryRegion *unin_memory = g_new(MemoryRegion, 1);
+-    MemoryRegion *unin_memory = g_new(MemoryRegion, 1);
      int linux_boot, i, j, k;
      MemoryRegion *ram = g_new(MemoryRegion, 1), *bios = g_new(MemoryRegion, 1);
-@@ -274,11 +273,6 @@ static void ppc_core99_init(MachineState *machine)
+     hwaddr kernel_base, initrd_base, cmdline_base = 0;
+@@ -165,7 +134,6 @@ static void ppc_core99_init(MachineState *machine)
+     int machine_arch;
+     SysBusDevice *s;
+     DeviceState *dev, *pic_dev;
+-    int *token = g_new(int, 1);
+     hwaddr nvram_addr = 0xFFF04000;
+     uint64_t tbfreq;
+ 
+@@ -273,9 +241,12 @@ static void ppc_core99_init(MachineState *machine)
          }
      }
  
--    /* Register 8 MB of ISA IO space */
--    memory_region_init_alias(isa, NULL, "isa_mmio",
--                             get_system_io(), 0, 0x00800000);
--    memory_region_add_subregion(get_system_memory(), 0xf2000000, isa);
+-    /* UniN init: XXX should be a real device */
+-    memory_region_init_io(unin_memory, NULL, &unin_ops, token, "unin", 0x1000);
+-    memory_region_add_subregion(get_system_memory(), 0xf8000000, unin_memory);
++    /* UniN init */
++    dev = qdev_create(NULL, TYPE_UNI_NORTH);
++    qdev_init_nofail(dev);
++    s = SYS_BUS_DEVICE(dev);
++    memory_region_add_subregion(get_system_memory(), 0xf8000000,
++                                sysbus_mmio_get_region(s, 0));
+ 
+     openpic_irqs = g_malloc0(smp_cpus * sizeof(qemu_irq *));
+     openpic_irqs[0] =
+diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
+index 66ec7eda6e..dc5e65aee9 100644
+--- a/hw/ppc/trace-events
++++ b/hw/ppc/trace-events
+@@ -92,10 +92,6 @@ rs6000mc_size_read(uint32_t addr, uint32_t val) "read addr=0x%x val=0x%x"
+ rs6000mc_size_write(uint32_t addr, uint32_t val) "write addr=0x%x val=0x%x"
+ rs6000mc_parity_read(uint32_t addr, uint32_t val) "read addr=0x%x val=0x%x"
+ 
+-# hw/ppc/mac_newworld.c
+-mac99_uninorth_write(uint64_t addr, uint64_t value) "addr=0x%" PRIx64 " val=0x%"PRIx64
+-mac99_uninorth_read(uint64_t addr, uint64_t value) "addr=0x%" PRIx64 " val=0x%"PRIx64
 -
-     /* UniN init: XXX should be a real device */
-     memory_region_init_io(unin_memory, NULL, &unin_ops, token, "unin", 0x1000);
-     memory_region_add_subregion(get_system_memory(), 0xf8000000, unin_memory);
-@@ -356,6 +350,9 @@ static void ppc_core99_init(MachineState *machine)
-         /* PCI hole */
-         memory_region_add_subregion(get_system_memory(), 0x80000000ULL,
-                                     sysbus_mmio_get_region(s, 2));
-+        /* Register 8 MB of ISA IO space */
-+        memory_region_add_subregion(get_system_memory(), 0xf2000000,
-+                                    sysbus_mmio_get_region(s, 3));
-         sysbus_mmio_map(s, 0, 0xf0800000);
-         sysbus_mmio_map(s, 1, 0xf0c00000);
- 
-@@ -390,6 +387,9 @@ static void ppc_core99_init(MachineState *machine)
-         /* PCI hole */
-         memory_region_add_subregion(get_system_memory(), 0x80000000ULL,
-                                     sysbus_mmio_get_region(s, 2));
-+        /* Register 8 MB of ISA IO space */
-+        memory_region_add_subregion(get_system_memory(), 0xf2000000,
-+                                    sysbus_mmio_get_region(s, 3));
-         sysbus_mmio_map(s, 0, 0xf2800000);
-         sysbus_mmio_map(s, 1, 0xf2c00000);
- 
+ # hw/ppc/ppc4xx_pci.c
+ ppc4xx_pci_map_irq(int32_t devfn, int irq_num, int slot) "devfn 0x%x irq %d -> %d"
+ ppc4xx_pci_set_irq(int irq_num) "PCI irq %d"
 diff --git a/include/hw/pci-host/uninorth.h b/include/hw/pci-host/uninorth.h
-index 6b520e753c..c4771aa7fa 100644
+index d1424b165a..b0eb093e72 100644
 --- a/include/hw/pci-host/uninorth.h
 +++ b/include/hw/pci-host/uninorth.h
-@@ -48,6 +48,7 @@ typedef struct UNINState {
-     qemu_irq irqs[4];
-     MemoryRegion pci_mmio;
-     MemoryRegion pci_hole;
-+    MemoryRegion pci_io;
- } UNINState;
+@@ -51,4 +51,15 @@ typedef struct UNINHostState {
+     MemoryRegion pci_io;
+ } UNINHostState;
  
++typedef struct UNINState {
++    SysBusDevice parent_obj;
++
++    MemoryRegion mem;
++    int token[1];
++} UNINState;
++
++#define TYPE_UNI_NORTH "uni-north"
++#define UNI_NORTH(obj) \
++    OBJECT_CHECK(UNINState, (obj), TYPE_UNI_NORTH)
++
  #endif /* UNINORTH_H */
 -- 
 2.11.0
