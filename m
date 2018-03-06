@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1et7Ii-0007Iy-QQ
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 02:46:26 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1et7Ix-0007SE-M1
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 02:46:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1et7Ih-0004es-PS
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 02:46:20 -0500
-Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:35848)
+	(envelope-from <aik@ozlabs.ru>) id 1et7It-0004j8-OG
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 02:46:35 -0500
+Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:40977)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1et7Ih-0004eX-I5
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 02:46:19 -0500
-Received: by mail-it0-x243.google.com with SMTP id u5so13600423itc.1
-	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 23:46:19 -0800 (PST)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1et7It-0004ih-IP
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 02:46:31 -0500
+Received: by mail-io0-x244.google.com with SMTP id q24so21002331ioh.8
+	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 23:46:31 -0800 (PST)
 References: <20180305083655.6186-1-pbonzini@redhat.com>
-	<20180305083655.6186-3-pbonzini@redhat.com>
+	<20180305083655.6186-4-pbonzini@redhat.com>
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <1be6854d-49db-5099-711c-3ce66245db38@ozlabs.ru>
-Date: Tue, 6 Mar 2018 18:46:14 +1100
+Message-ID: <431962fb-8f05-42b0-387e-410ba3c2b554@ozlabs.ru>
+Date: Tue, 6 Mar 2018 18:46:26 +1100
 MIME-Version: 1.0
-In-Reply-To: <20180305083655.6186-3-pbonzini@redhat.com>
+In-Reply-To: <20180305083655.6186-4-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-AU
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/7] memory: inline some
- performance-sensitive accessors
+Subject: Re: [Qemu-devel] [PATCH 3/7] address_space_write:
+ address_space_to_flatview needs RCU lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,141 +35,86 @@ To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-stable@nongnu.org
 
 On 05/03/18 19:36, Paolo Bonzini wrote:
-> These accessors are called from inlined functions, and the call sequence
-> is much more expensive than just inlining the access.  Move the
-> struct declaration to memory-internal.h so that exec.c and memory.c
-> can both use an inline function.
+> address_space_write is calling address_space_to_flatview but it can
+> be called outside the RCU lock.  To fix it, push the rcu_read_lock/unlock
+> pair up from flatview_write to address_space_write.
 > 
 > Cc: qemu-stable@nongnu.org
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
 Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
+
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  include/exec/memory-internal.h | 13 +++++++++----
->  include/exec/memory.h          | 22 +++++++++++++++++++++-
->  memory.c                       | 30 ------------------------------
->  3 files changed, 30 insertions(+), 35 deletions(-)
+>  exec.c | 37 ++++++++++++++++++++++---------------
+>  1 file changed, 22 insertions(+), 15 deletions(-)
 > 
-> diff --git a/include/exec/memory-internal.h b/include/exec/memory-internal.h
-> index 4162474fd5..6a5ee42d36 100644
-> --- a/include/exec/memory-internal.h
-> +++ b/include/exec/memory-internal.h
-> @@ -21,7 +21,15 @@
->  #define MEMORY_INTERNAL_H
->  
->  #ifndef CONFIG_USER_ONLY
-> -typedef struct AddressSpaceDispatch AddressSpaceDispatch;
-> +static inline AddressSpaceDispatch *flatview_to_dispatch(FlatView *fv)
-> +{
-> +    return fv->dispatch;
-> +}
-> +
-> +static inline AddressSpaceDispatch *address_space_to_dispatch(AddressSpace *as)
-> +{
-> +    return flatview_to_dispatch(address_space_to_flatview(as));
-> +}
->  
->  extern const MemoryRegionOps unassigned_mem_ops;
->  
-> @@ -31,9 +39,6 @@ bool memory_region_access_valid(MemoryRegion *mr, hwaddr addr,
->  void flatview_add_to_dispatch(FlatView *fv, MemoryRegionSection *section);
->  AddressSpaceDispatch *address_space_dispatch_new(FlatView *fv);
->  void address_space_dispatch_compact(AddressSpaceDispatch *d);
-> -
-> -AddressSpaceDispatch *address_space_to_dispatch(AddressSpace *as);
-> -AddressSpaceDispatch *flatview_to_dispatch(FlatView *fv);
->  void address_space_dispatch_free(AddressSpaceDispatch *d);
->  
->  void mtree_print_dispatch(fprintf_function mon, void *f,
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index fff9b1d871..6c8e394675 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -326,7 +326,27 @@ struct AddressSpace {
->      QTAILQ_ENTRY(AddressSpace) address_spaces_link;
->  };
->  
-> -FlatView *address_space_to_flatview(AddressSpace *as);
-> +typedef struct AddressSpaceDispatch AddressSpaceDispatch;
-> +typedef struct FlatRange FlatRange;
-> +
-> +/* Flattened global view of current active memory hierarchy.  Kept in sorted
-> + * order.
-> + */
-> +struct FlatView {
-> +    struct rcu_head rcu;
-> +    unsigned ref;
-> +    FlatRange *ranges;
-> +    unsigned nr;
-> +    unsigned nr_allocated;
-> +    struct AddressSpaceDispatch *dispatch;
-> +    MemoryRegion *root;
-> +};
-> +
-> +static inline FlatView *address_space_to_flatview(AddressSpace *as)
-> +{
-> +    return atomic_rcu_read(&as->current_map);
-> +}
-> +
->  
->  /**
->   * MemoryRegionSection: describes a fragment of a #MemoryRegion
-> diff --git a/memory.c b/memory.c
-> index c7f6588452..78d07aa51d 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -210,8 +210,6 @@ static bool memory_region_ioeventfd_equal(MemoryRegionIoeventfd a,
->          && !memory_region_ioeventfd_before(b, a);
+> diff --git a/exec.c b/exec.c
+> index e8d7b335b6..0b74b58d45 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -3074,6 +3074,7 @@ static MemTxResult flatview_write_continue(FlatView *fv, hwaddr addr,
+>      return result;
 >  }
 >  
-> -typedef struct FlatRange FlatRange;
-> -
->  /* Range of memory in the global map.  Addresses are absolute. */
->  struct FlatRange {
->      MemoryRegion *mr;
-> @@ -222,19 +220,6 @@ struct FlatRange {
->      bool readonly;
->  };
->  
-> -/* Flattened global view of current active memory hierarchy.  Kept in sorted
-> - * order.
-> - */
-> -struct FlatView {
-> -    struct rcu_head rcu;
-> -    unsigned ref;
-> -    FlatRange *ranges;
-> -    unsigned nr;
-> -    unsigned nr_allocated;
-> -    struct AddressSpaceDispatch *dispatch;
-> -    MemoryRegion *root;
-> -};
-> -
->  typedef struct AddressSpaceOps AddressSpaceOps;
->  
->  #define FOR_EACH_FLAT_RANGE(var, view)          \
-> @@ -322,21 +307,6 @@ static void flatview_unref(FlatView *view)
->      }
->  }
->  
-> -FlatView *address_space_to_flatview(AddressSpace *as)
-> -{
-> -    return atomic_rcu_read(&as->current_map);
-> -}
-> -
-> -AddressSpaceDispatch *flatview_to_dispatch(FlatView *fv)
-> -{
-> -    return fv->dispatch;
-> -}
-> -
-> -AddressSpaceDispatch *address_space_to_dispatch(AddressSpace *as)
-> -{
-> -    return flatview_to_dispatch(address_space_to_flatview(as));
-> -}
-> -
->  static bool can_merge(FlatRange *r1, FlatRange *r2)
+> +/* Called from RCU critical section.  */
+>  static MemTxResult flatview_write(FlatView *fv, hwaddr addr, MemTxAttrs attrs,
+>                                    const uint8_t *buf, int len)
 >  {
->      return int128_eq(addrrange_end(r1->addr), r2->addr.start)
+> @@ -3082,25 +3083,14 @@ static MemTxResult flatview_write(FlatView *fv, hwaddr addr, MemTxAttrs attrs,
+>      MemoryRegion *mr;
+>      MemTxResult result = MEMTX_OK;
+>  
+> -    if (len > 0) {
+> -        rcu_read_lock();
+> -        l = len;
+> -        mr = flatview_translate(fv, addr, &addr1, &l, true);
+> -        result = flatview_write_continue(fv, addr, attrs, buf, len,
+> -                                         addr1, l, mr);
+> -        rcu_read_unlock();
+> -    }
+> +    l = len;
+> +    mr = flatview_translate(fv, addr, &addr1, &l, true);
+> +    result = flatview_write_continue(fv, addr, attrs, buf, len,
+> +                                     addr1, l, mr);
+>  
+>      return result;
+>  }
+>  
+> -MemTxResult address_space_write(AddressSpace *as, hwaddr addr,
+> -                                              MemTxAttrs attrs,
+> -                                              const uint8_t *buf, int len)
+> -{
+> -    return flatview_write(address_space_to_flatview(as), addr, attrs, buf, len);
+> -}
+> -
+>  /* Called within RCU critical section.  */
+>  MemTxResult flatview_read_continue(FlatView *fv, hwaddr addr,
+>                                     MemTxAttrs attrs, uint8_t *buf,
+> @@ -3209,6 +3199,23 @@ MemTxResult address_space_rw(AddressSpace *as, hwaddr addr,
+>                         addr, attrs, buf, len, is_write);
+>  }
+>  
+> +MemTxResult address_space_write(AddressSpace *as, hwaddr addr,
+> +                                MemTxAttrs attrs,
+> +                                const uint8_t *buf, int len)
+> +{
+> +    MemTxResult result = MEMTX_OK;
+> +    FlatView *fv;
+> +
+> +    if (len > 0) {
+> +        rcu_read_lock();
+> +        fv = address_space_to_flatview(as);
+> +        result = flatview_write(fv, addr, attrs, buf, len);
+> +        rcu_read_unlock();
+> +    }
+> +
+> +    return result;
+> +}
+> +
+>  void cpu_physical_memory_rw(hwaddr addr, uint8_t *buf,
+>                              int len, int is_write)
+>  {
 > 
 
 
