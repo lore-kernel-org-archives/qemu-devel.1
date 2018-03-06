@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1et8fP-0005gm-G6
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:13:52 -0500
+	(envelope-from <cohuck@redhat.com>) id 1et8pe-0001Xi-5N
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:24:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1et8fK-00045j-EY
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:13:51 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49394 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1et8fK-00044X-AW
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:13:46 -0500
-Message-ID: <1520327623.4132.10.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Tue, 06 Mar 2018 10:13:43 +0100
-In-Reply-To: <CAHNT7Nv-Whr=fdgXANnSuw1yxb6EEBzdxVFSfkLZhh6knzS3sA@mail.gmail.com>
-References: <1519998942-73622-1-git-send-email-mjc@sifive.com>
-	<CAFEAcA_kTXTs9z-v3Zow8r52QFrWPwQ3YSjhZOzPr6aj8jdSJQ@mail.gmail.com>
-	<CAHNT7Nt72aUwGAGfV0zYya_WH3qXipk6XnLbfDPytMXMTLSJ-Q@mail.gmail.com>
-	<CAFEAcA_otsCR5CC2amGpU2cTdViH4+PkH84XHz1PaYt5nKGhAQ@mail.gmail.com>
-	<CAHNT7NtJniQs_JcWOHnUr06be7Ht=9+sHmdr+rVNRUwy5+fJiw@mail.gmail.com>
-	<CAHNT7Nv-Whr=fdgXANnSuw1yxb6EEBzdxVFSfkLZhh6knzS3sA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+	(envelope-from <cohuck@redhat.com>) id 1et8pa-0004rX-3l
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:24:26 -0500
+Date: Tue, 6 Mar 2018 10:24:03 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180306102404.56eecbd6.cohuck@redhat.com>
+In-Reply-To: <1519731154-3127-1-git-send-email-thuth@redhat.com>
+References: <1519731154-3127-1-git-send-email-thuth@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL] RISC-V QEMU Port Submission v8
+Subject: Re: [Qemu-devel] [PATCH] hw/s390x: Add the possibility to specify
+ the netboot image on the command line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,24 +23,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>
 
-On Tue, 2018-03-06 at 14:30 +1300, Michael Clark wrote:
-> I'm currently working on some changes locally to split the firmware from
-> the kernel image. Currently the kernel image is embedded in the firmware (r
-> iscv-pk/bbl).
+On Tue, 27 Feb 2018 12:32:34 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-I was wondering about this just yesterday.
+> The file name of the netboot binary is currently hard-coded to
+> "s390-netboot.img", without a possibility for the user to select
+> an alternative firmware image here. That's unfortunate, especially
+> since the basics are already there: The filename is a property of
+> the s390-ipl device. So we just have to add a check whether the user
+> already provided the property and only set the default if the string
+> is still empty. Now it is possible to select a different firmware
+> image with "-global s390-ipl.netboot_fw=/path/to/s390-netboot.img".
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/s390x/s390-virtio-ccw.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 4abbe89..7b3fb5f 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -254,8 +254,10 @@ static void s390_init_ipl_dev(const char *kernel_filename,
+>      }
+>      qdev_prop_set_string(dev, "cmdline", kernel_cmdline);
+>      qdev_prop_set_string(dev, "firmware", firmware);
+> -    qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
+>      qdev_prop_set_bit(dev, "enforce_bios", enforce_bios);
+> +    if (!strlen(object_property_get_str(new, "netboot_fw", &error_abort))) {
+> +        qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
+> +    }
+>      object_property_add_child(qdev_get_machine(), TYPE_S390_IPL,
+>                                new, NULL);
+>      object_unref(new);
 
-Will this eventually lead to a situation where we can have a single
-firmware image which is shared between all guests, a la OVMF/AAVMF,
-with grub and the kernels stored on the virtual disk itself, like
-on most other architectures?
-
-That should make it less awkward to add RISC-V support to libvirt,
-plus I expect it to be kind of a requirement for full distribution
-support, especially when it comes to updates and such.
-
--- 
-Andrea Bolognani / Red Hat / Virtualization
+Thanks, applied.
