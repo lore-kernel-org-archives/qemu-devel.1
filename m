@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1etEKl-0000Yz-VD
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:17:01 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1etEOX-0002fY-71
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:20:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1etEKi-0003ce-K0
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:16:55 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180306151117.GH7139@localhost.localdomain>
-References: <cover.1519921268.git.berto@igalia.com>
-	<d58bbc353563bb9c83ffe90faaa36fadf683e332.1519921268.git.berto@igalia.com>
-	<20180306145426.GG7139@localhost.localdomain>
-	<w51vae9l041.fsf@maestria.local.igalia.com>
-	<20180306151117.GH7139@localhost.localdomain>
-Date: Tue, 06 Mar 2018 16:16:49 +0100
-Message-ID: <w51sh9dkzdq.fsf@maestria.local.igalia.com>
+	(envelope-from <pbonzini@redhat.com>) id 1etEOU-000631-HN
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:20:49 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34374 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1etEOU-00062h-Cf
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:20:46 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6E52B7B4AD
+	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 15:20:42 +0000 (UTC)
+References: <1520342370-123606-1-git-send-email-pbonzini@redhat.com>
+	<1520342370-123606-8-git-send-email-pbonzini@redhat.com>
+	<f264b47a-d5cc-74b7-eab3-a0693f549ee4@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <94d0e802-7b74-465f-4a09-387d53d64459@redhat.com>
+Date: Tue, 6 Mar 2018 16:20:34 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 3/7] qcow2: Check L1 table parameters in
- qcow2_expand_zero_clusters()
+In-Reply-To: <f264b47a-d5cc-74b7-eab3-a0693f549ee4@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 07/34] Document --rtc-td-hack,
+ --localtime and --startdate as deprecated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,18 +36,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-On Tue 06 Mar 2018 04:11:17 PM CET, Kevin Wolf wrote:
-> I've finished the review now, the rest looks correct.
->
-> The only other thing I wondered is about the cases where you pass a
-> NULL errp because the callers don't get an Error parameter, so they
-> can't pass it on. Some of these callers already use error_report(), so
-> it would be okay to use error_report_err() for an error returned by
-> qcow2_validate_table(), too. I think that would improve the messages.
+On 06/03/2018 16:13, Thomas Huth wrote:
+> On 06.03.2018 14:19, Paolo Bonzini wrote:
+>> From: Thomas Huth <thuth@redhat.com>
+>>
+>> These options have been marked in a comment in qemu-options.hx as
+>> deprecated in 2009 already (see commit 1ed2fc1fa35fadc0d6), but we
+>> never informed the users about these deprecations. Let's catch up
+>> on that omission now.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> Message-Id: <1519138892-12836-1-git-send-email-thuth@redhat.com>
+>> [Fix messages. - Paolo]
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>  qemu-doc.texi | 16 +++++++++++-----
+>>  vl.c          |  5 +++++
+>>  2 files changed, 16 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/qemu-doc.texi b/qemu-doc.texi
+>> index fb6fac5..589519a 100644
+>> --- a/qemu-doc.texi
+>> +++ b/qemu-doc.texi
+>> @@ -2723,12 +2723,18 @@ filesystem test suite. Also it requires the CAP_DAC_READ_SEARCH capability,
+>>  which is not the recommended way to run QEMU. This backend should not be
+>>  used and it will be removed with no replacement.
+>>  
+>> -@subsection -no-frame (since 2.12.0)
+>> +@subsection -rtc-td-hack (since 2.12.0)
+>>  
+>> -The ``-no-frame'' argument works with SDL 1.2 only.  SDL 2.0 lacks
+>> -support for frameless windows, and the other user interfaces never
+>> -implemented this in the first place.  So this will be removed together
+>> -with SDL 1.2 support.
+> 
+> No, this should not be removed. Looks like an accident when resolving a
+> conflict?
 
-Good idea, I'll change that and resend the series.
+Oops, yes.  My wrong understanding was that 2.12 removed SDL 1.2 support.
 
-Berto
+Paolo
