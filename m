@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etKf8-00007t-3m
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etKf8-00007v-3s
 	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 17:02:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etKf4-0006kk-SU
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etKf4-0006kh-SW
 	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 17:02:22 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Tue,  6 Mar 2018 22:01:54 +0000
-Message-Id: <20180306220159.4287-2-mark.cave-ayland@ilande.co.uk>
+Date: Tue,  6 Mar 2018 22:01:58 +0000
+Message-Id: <20180306220159.4287-6-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20180306220159.4287-1-mark.cave-ayland@ilande.co.uk>
 References: <20180306220159.4287-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 1/6] heathrow: remove obsolete heathow_init()
- function
+Subject: [Qemu-devel] [PATCH 5/6] mac_oldworld: remove pics IRQ array and
+ wire up macio to heathrow directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,136 +22,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-Instead wire up heathrow to the CPU and grackle PCI host using qdev GPIOs.
+Introduce constants for the pre-defined Old World IRQs to help keep things
+readable.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/intc/heathrow_pic.c         | 23 +++++------------------
- hw/ppc/mac.h                   |  4 ----
- hw/ppc/mac_oldworld.c          | 20 ++++++++++++--------
- include/hw/intc/heathrow_pic.h |  2 +-
- 4 files changed, 18 insertions(+), 31 deletions(-)
+ hw/ppc/mac.h          |  8 ++++++++
+ hw/ppc/mac_oldworld.c | 27 ++++++++++++++-------------
+ 2 files changed, 22 insertions(+), 13 deletions(-)
 
-diff --git a/hw/intc/heathrow_pic.c b/hw/intc/heathrow_pic.c
-index 393fdd7326..b8b997deca 100644
---- a/hw/intc/heathrow_pic.c
-+++ b/hw/intc/heathrow_pic.c
-@@ -172,27 +172,14 @@ static void heathrow_init(Object *obj)
-     HeathrowState *s = HEATHROW(obj);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
- 
--    memory_region_init_io(&s->mem, OBJECT(s), &heathrow_ops, s,
--                          "heathrow-pic", 0x1000);
--    sysbus_init_mmio(sbd, &s->mem);
--}
--
--DeviceState *heathrow_pic_init(int nb_cpus, qemu_irq **irqs,
--                               qemu_irq **pic_irqs)
--{
--    DeviceState *d;
--    HeathrowState *s;
--
--    d = qdev_create(NULL, TYPE_HEATHROW);
--    qdev_init_nofail(d);
--
--    s = HEATHROW(d);
-     /* only 1 CPU */
--    s->irqs = irqs[0];
-+    qdev_init_gpio_out(DEVICE(obj), s->irqs, 1);
- 
--    *pic_irqs = qemu_allocate_irqs(heathrow_set_irq, s, HEATHROW_NUM_IRQS);
-+    qdev_init_gpio_in(DEVICE(obj), heathrow_set_irq, HEATHROW_NUM_IRQS);
- 
--    return d;
-+    memory_region_init_io(&s->mem, OBJECT(s), &heathrow_ops, s,
-+                          "heathrow-pic", 0x1000);
-+    sysbus_init_mmio(sbd, &s->mem);
- }
- 
- static void heathrow_class_init(ObjectClass *oc, void *data)
 diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
-index a02f797598..424d20088b 100644
+index 04568c2a22..6f3603c21e 100644
 --- a/hw/ppc/mac.h
 +++ b/hw/ppc/mac.h
-@@ -75,10 +75,6 @@ void macio_ide_register_dma(MACIOIDEState *ide);
- void macio_init(PCIDevice *dev,
-                 MemoryRegion *pic_mem);
+@@ -45,6 +45,14 @@
  
--/* Heathrow PIC */
--DeviceState *heathrow_pic_init(int nb_cpus, qemu_irq **irqs,
--                               qemu_irq **pic_irqs);
--
- /* Grackle PCI */
- #define TYPE_GRACKLE_PCI_HOST_BRIDGE "grackle-pcihost"
- PCIBus *pci_grackle_init(uint32_t base, qemu_irq *pic,
+ #define ESCC_CLOCK 3686400
+ 
++/* Old World IRQs */
++#define OLDWORLD_CUDA_IRQ      0x12
++#define OLDWORLD_ESCCB_IRQ     0x10
++#define OLDWORLD_ESCCA_IRQ     0xf
++#define OLDWORLD_IDE0_IRQ      0xd
++#define OLDWORLD_IDE0_DMA_IRQ  0x2
++#define OLDWORLD_IDE1_IRQ      0xe
++#define OLDWORLD_IDE1_DMA_IRQ  0x3
+ 
+ /* MacIO */
+ #define TYPE_MACIO_IDE "macio-ide"
 diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index 935493c966..62788a54c0 100644
+index 2bf70c4375..048b0cea7e 100644
 --- a/hw/ppc/mac_oldworld.c
 +++ b/hw/ppc/mac_oldworld.c
-@@ -85,7 +85,7 @@ static void ppc_heathrow_init(MachineState *machine)
+@@ -88,7 +88,6 @@ static void ppc_heathrow_init(MachineState *machine)
      PowerPCCPU *cpu = NULL;
      CPUPPCState *env = NULL;
      char *filename;
--    qemu_irq *pic, **heathrow_irqs;
-+    qemu_irq *pic;
+-    qemu_irq *pic;
      int linux_boot, i;
      MemoryRegion *ram = g_new(MemoryRegion, 1);
      MemoryRegion *bios = g_new(MemoryRegion, 1);
-@@ -228,16 +228,15 @@ static void ppc_heathrow_init(MachineState *machine)
-     memory_region_add_subregion(sysmem, 0xfe000000, isa);
- 
-     /* XXX: we register only 1 output pin for heathrow PIC */
--    heathrow_irqs = g_malloc0(smp_cpus * sizeof(qemu_irq *));
--    heathrow_irqs[0] =
--        g_malloc0(smp_cpus * sizeof(qemu_irq) * 1);
-+    pic_dev = qdev_create(NULL, TYPE_HEATHROW);
-+    qdev_init_nofail(pic_dev);
-+
-     /* Connect the heathrow PIC outputs to the 6xx bus */
-     for (i = 0; i < smp_cpus; i++) {
-         switch (PPC_INPUT(env)) {
-         case PPC_FLAGS_INPUT_6xx:
--            heathrow_irqs[i] = heathrow_irqs[0] + (i * 1);
--            heathrow_irqs[i][0] =
--                ((qemu_irq *)env->irq_inputs)[PPC6xx_INPUT_INT];
-+            qdev_connect_gpio_out(pic_dev, 0,
-+                ((qemu_irq *)env->irq_inputs)[PPC6xx_INPUT_INT]);
-             break;
-         default:
-             error_report("Bus model not supported on OldWorld Mac machine");
-@@ -245,6 +244,11 @@ static void ppc_heathrow_init(MachineState *machine)
+@@ -242,11 +241,6 @@ static void ppc_heathrow_init(MachineState *machine)
          }
      }
  
-+    pic = g_new0(qemu_irq, HEATHROW_NUM_IRQS);
-+    for (i = 0; i < HEATHROW_NUM_IRQS; i++) {
-+        pic[i] = qdev_get_gpio_in(pic_dev, i);
-+    }
-+
+-    pic = g_new0(qemu_irq, HEATHROW_NUM_IRQS);
+-    for (i = 0; i < HEATHROW_NUM_IRQS; i++) {
+-        pic[i] = qdev_get_gpio_in(pic_dev, i);
+-    }
+-
      /* Timebase Frequency */
      if (kvm_enabled()) {
          tbfreq = kvmppc_get_tbfreq();
-@@ -257,7 +261,7 @@ static void ppc_heathrow_init(MachineState *machine)
-         error_report("Only 6xx bus is supported on heathrow machine");
-         exit(1);
-     }
--    pic_dev = heathrow_pic_init(1, heathrow_irqs, &pic);
-+
-     pci_bus = pci_grackle_init(0xfec00000, pic,
-                                get_system_memory(),
-                                get_system_io());
-diff --git a/include/hw/intc/heathrow_pic.h b/include/hw/intc/heathrow_pic.h
-index bc3ffaab87..56c2ef339f 100644
---- a/include/hw/intc/heathrow_pic.h
-+++ b/include/hw/intc/heathrow_pic.h
-@@ -41,7 +41,7 @@ typedef struct HeathrowState {
- 
-     MemoryRegion mem;
-     HeathrowPICState pics[2];
--    qemu_irq *irqs;
-+    qemu_irq irqs[1];
- } HeathrowState;
- 
- #define HEATHROW_NUM_IRQS 64
+@@ -288,13 +282,20 @@ static void ppc_heathrow_init(MachineState *machine)
+     /* MacIO */
+     macio = OLDWORLD_MACIO(pci_create(pci_bus, -1, TYPE_OLDWORLD_MACIO));
+     dev = DEVICE(macio);
+-    qdev_connect_gpio_out(dev, 0, pic[0x12]); /* CUDA */
+-    qdev_connect_gpio_out(dev, 1, pic[0x10]); /* ESCC-B */
+-    qdev_connect_gpio_out(dev, 2, pic[0x0F]); /* ESCC-A */
+-    qdev_connect_gpio_out(dev, 3, pic[0x0D]); /* IDE-0 */
+-    qdev_connect_gpio_out(dev, 4, pic[0x02]); /* IDE-0 DMA */
+-    qdev_connect_gpio_out(dev, 5, pic[0x0E]); /* IDE-1 */
+-    qdev_connect_gpio_out(dev, 6, pic[0x03]); /* IDE-1 DMA */
++    qdev_connect_gpio_out(dev, 0,
++        qdev_get_gpio_in(pic_dev, OLDWORLD_CUDA_IRQ));
++    qdev_connect_gpio_out(dev, 1,
++        qdev_get_gpio_in(pic_dev, OLDWORLD_ESCCB_IRQ));
++    qdev_connect_gpio_out(dev, 2,
++        qdev_get_gpio_in(pic_dev, OLDWORLD_ESCCA_IRQ));
++    qdev_connect_gpio_out(dev, 3,
++        qdev_get_gpio_in(pic_dev, OLDWORLD_IDE0_IRQ));
++    qdev_connect_gpio_out(dev, 4,
++        qdev_get_gpio_in(pic_dev, OLDWORLD_IDE0_DMA_IRQ));
++    qdev_connect_gpio_out(dev, 5,
++        qdev_get_gpio_in(pic_dev, OLDWORLD_IDE1_IRQ));
++    qdev_connect_gpio_out(dev, 6,
++        qdev_get_gpio_in(pic_dev, OLDWORLD_IDE1_DMA_IRQ));
+     qdev_prop_set_uint64(dev, "frequency", tbfreq);
+     object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
+                              &error_abort);
 -- 
 2.11.0
