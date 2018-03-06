@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1et3QF-0003zQ-Ln
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 22:37:52 -0500
+	(envelope-from <mjc@sifive.com>) id 1et3TO-0005pA-62
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 22:41:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1et3QA-000255-NX
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 22:37:51 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39014 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1et3QA-00024j-HH
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 22:37:46 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D9B5BEAE98
-	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 03:37:45 +0000 (UTC)
-Date: Tue, 6 Mar 2018 11:37:36 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180306033736.GA3615@xz-mi>
-References: <20180216131625.9639-1-dgilbert@redhat.com>
-	<20180216131625.9639-21-dgilbert@redhat.com>
-	<20180302075107.GM27381@xz-mi> <20180305195513.GW3131@work-vm>
+	(envelope-from <mjc@sifive.com>) id 1et3TN-00040X-3Y
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 22:41:06 -0500
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:33759)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1et3TM-000407-TH
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 22:41:05 -0500
+Received: by mail-oi0-x243.google.com with SMTP id e9so7176212oii.0
+	for <qemu-devel@nongnu.org>; Mon, 05 Mar 2018 19:41:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180305195513.GW3131@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v3 20/29] postcopy:
- postcopy_notify_shared_wake
+References: <1519944838-12430-1-git-send-email-cota@braap.org>
+	<CAHNT7NusFbz=Dt0TGEWKFyJjDDpF3zjGmfkKw4w9thBOFzHb6g@mail.gmail.com>
+	<20180306025659.GA4195@flamenco>
+In-Reply-To: <20180306025659.GA4195@flamenco>
+From: Michael Clark <mjc@sifive.com>
+Date: Tue, 06 Mar 2018 03:40:53 +0000
+Message-ID: <CAHNT7NuU-_Evs1XDu5tEOBregHx0HNO_ANvWDABsU6Ld02uMmQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCHv1 00/14] Translation loop conversion for
+ sh4/sparc/mips/s390x/openrisc targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,95 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, marcandre.lureau@redhat.com, imammedo@redhat.com, mst@redhat.com, quintela@redhat.com, aarcange@redhat.com
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: Alexander Graf <agraf@suse.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, Stafford Horne <shorne@gmail.com>, Yongbok Kim <yongbok.kim@mips.com>, qemu-s390x@nongnu.org
 
-On Mon, Mar 05, 2018 at 07:55:13PM +0000, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > On Fri, Feb 16, 2018 at 01:16:16PM +0000, Dr. David Alan Gilbert (git) wrote:
-> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > > 
-> > > Add a hook to allow a client userfaultfd to be 'woken'
-> > > when a page arrives, and a walker that calls that
-> > > hook for relevant clients given a RAMBlock and offset.
-> > > 
-> > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > ---
-> > >  migration/postcopy-ram.c | 16 ++++++++++++++++
-> > >  migration/postcopy-ram.h | 10 ++++++++++
-> > >  2 files changed, 26 insertions(+)
-> > > 
-> > > diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> > > index 67deae7e1c..879711968c 100644
-> > > --- a/migration/postcopy-ram.c
-> > > +++ b/migration/postcopy-ram.c
-> > > @@ -824,6 +824,22 @@ static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
-> > >      return ret;
-> > >  }
-> > >  
-> > > +int postcopy_notify_shared_wake(RAMBlock *rb, uint64_t offset)
-> > > +{
-> > > +    int i;
-> > > +    MigrationIncomingState *mis = migration_incoming_get_current();
-> > > +    GArray *pcrfds = mis->postcopy_remote_fds;
-> > > +
-> > > +    for (i = 0; i < pcrfds->len; i++) {
-> > > +        struct PostCopyFD *cur = &g_array_index(pcrfds, struct PostCopyFD, i);
-> > > +        int ret = cur->waker(cur, rb, offset);
-> > > +        if (ret) {
-> > > +            return ret;
-> > > +        }
-> > > +    }
-> > > +    return 0;
-> > > +}
-> > > +
-> > 
-> > We should know that which FD needs what pages, right?  If with that
-> > information, we can only notify the ones who have page faulted on
-> > exactly the same page?  Otherwise we do UFFDIO_WAKE once for each
-> > client when a page is ready, even if the clients have not page faulted
-> > at all?
-> 
-> The 'waker' function we call knows that, we don't; see the
-> 'vhost_user_postcopy_waker' in the next patch, and it hunts down whether
-> the address the waker is called for is one it's responsible for.
+On Tue, 6 Mar 2018 at 3:57 PM, Emilio G. Cota <cota@braap.org> wrote:
 
-For vhost-user devices, they should be always responsible for mostly
-all RAM exported on the guest?  If so, they will always be notified to
-wake up if a page is copied?
+> On Tue, Mar 06, 2018 at 12:57:13 +1300, Michael Clark wrote:
+> > On Fri, Mar 2, 2018 at 11:53 AM, Emilio G. Cota <cota@braap.org> wrote:
+> >
+> > > [ What is this all about? See this message:
+> > >   http://lists.gnu.org/archive/html/qemu-devel/2018-02/msg04785.html ]
+> (snip)
+> > > You can fetch this series from:
+> > >   https://github.com/cota/qemu/tree/trloop-conv-v1
+> >
+> >
+> > Curious to know what we would need to change in RISC-V translate.c:
+> >
+> > -
+> >
+> https://github.com/riscv/riscv-qemu/blob/qemu-upstream-v8/target/riscv/translate.c
+> >
+> > I'm going to make a v8.1 branch and tag that is a rebase of the v8 patch
+> > series against current QEMU master, and hopefully we get the RISC-V port
+> > merged before the soft-freeze. Fingers crossed.
+>
+> I have patches that convert riscv as well.
+>
+> Once riscv is on master I'll send the patches to the list; I don't want
+> this work to delay the riscv merge even more!
 
-Here I was thinking not only about responsible ranges - It was about
-whether each PostcopyFD could note down the faulted addresses that
-were waiting to be service.  Then when we do the wake up, we could
-possibly skip notifying the PostcopyFD when the copied page is not
-covering any of the faulted addresses on that PostcopyFD?
 
-> Also note that a shared page might be shared between multiple other
-> programs - not just one.  In our case that could be two vhost-user
-> devices wired to two separate processes.
+Appreciated. Thanks very much!
 
-Yeah, but the idea still stands IMHO - we can notify only those
-PostcopyFDs that have faulted on the page already and skip the rest.
-For sure there can be more than one candidate for the wakeup, since
-there can be multiple PostcopyFDs that captured page fault on the same
-page (or even, same address).
+Michael
 
-> 
-> > But for the first version, I think it's fine.  And I believe if we
-> > maintain the faulted addresses we need some way to sync between the
-> > wake thread and fault thread too.
-> 
-> Hmm can you explain that a bit more?
-
-Basically above was what I thought - to record the faulted addresses
-with specific PostcopyFD when page fault happened, then we may know
-which page(s) will a PostcopyFD need.  But when with that, we'll
-possibly need a lock to protect the information (or any other sync
-method).
-
-(Hope I didn't miss anything important along the way)
-
-Thanks,
-
--- 
-Peter Xu
+>
+>
