@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brian.johnson@hpe.com>) id 1et0k9-0004Iu-Bx
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 19:46:14 -0500
+	(envelope-from <liming.gao@intel.com>) id 1et1vm-0005iX-1E
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 21:02:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brian.johnson@hpe.com>) id 1et0k6-0005q3-7q
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 19:46:13 -0500
-Received: from g9t5009.houston.hpe.com ([15.241.48.73]:51602)
+	(envelope-from <liming.gao@intel.com>) id 1et1vh-0000mD-NG
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 21:02:18 -0500
+Received: from mga17.intel.com ([192.55.52.151]:4567)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brian.johnson@hpe.com>)
-	id 1et0k6-0005o8-0a
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 19:46:10 -0500
+	(Exim 4.71) (envelope-from <liming.gao@intel.com>)
+	id 1et1vh-0000lh-CN
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 21:02:13 -0500
+From: "Gao, Liming" <liming.gao@intel.com>
+Date: Tue, 6 Mar 2018 02:02:07 +0000
+Message-ID: <4A89E2EF3DFEDB4C8BFDE51014F606A14E1D7B37@SHSMSX104.ccr.corp.intel.com>
 References: <20180223132311.26555-1-marcandre.lureau@redhat.com>
 	<20180223132311.26555-4-marcandre.lureau@redhat.com>
 	<91D51528-C2CA-41DF-921F-DBD5C2EC028C@apple.com>
 	<CAJ+F1C+sTmv7M8QU2vqfPWE2Zej_DxJQF8aVSH5pZC8pqo8OZw@mail.gmail.com>
 	<26353964-066c-5664-1d67-6a79a3d21ac9@redhat.com>
-From: "Brian J. Johnson" <brian.johnson@hpe.com>
-Message-ID: <5a8e107d-15f5-0278-9f89-5efb60de2719@hpe.com>
-Date: Mon, 5 Mar 2018 18:45:47 -0600
-MIME-Version: 1.0
 In-Reply-To: <26353964-066c-5664-1d67-6a79a3d21ac9@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Subject: Re: [Qemu-devel] [edk2] [PATCH 3/7] HACK: HobLib: workaround
  infinite loop
 List-Id: <qemu-devel.nongnu.org>
@@ -33,77 +33,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Andrew Fish <afish@apple.com>
-Cc: edk2-devel@lists.01.org, Peter Jones <pjones@redhat.com>, Jiewen Yao <jiewen.yao@intel.com>, QEMU <qemu-devel@nongnu.org>, Javier Martinez
-	Canillas <javierm@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>, =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, Andrew Fish <afish@apple.com>
+Cc: "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, Peter Jones <pjones@redhat.com>, "Yao, Jiewen" <jiewen.yao@intel.com>, QEMU <qemu-devel@nongnu.org>, Javier Martinez Canillas <javierm@redhat.com>
 
-On 03/05/2018 12:22 PM, Laszlo Ersek wrote:
-> PEIMs generally "execute in place" (XIP), i.e. they run from flash, not
-> RAM. In this status they use "temporary RAM" (e.g. CPU caches configured
-> like RAM) for stack & heap; whatever HOBs they produce are stored in
-> "temp RAM" as well. Then one of the PEIMs "discovers permanent RAM"
-> (basically it programs the memory controller and publishes the RAM
-> ranges). In turn the PEI core "migrates" PEIMs from temporary to
-> permanent RAM, including the HOB list.
-> 
-> Before the temporary RAM migration (when still executing in place from
-> flash), PEIMs cannot have writeable global variables. For example,
-> dynamic PCDs are also maintained in a HOB (the PCD HOB).
-> 
-> A PEIM normally cannot (and shouldn't) tell whether it is dispatched
-> before or after permanent RAM is published. If needed, a PEIM can
-> advertise that it depends on permanent RAM (for example because it needs
-> a lot of heap memory) by including "gEfiPeiMemoryDiscoveredPpiGuid" in
-> its DEPEX.
-> 
-> Finally, it seems like a PEIM can also express, "I'm fine with being
-> dispatched from both flash (XIP) vs. permanent RAM, just the PEI core
-> tell me whichever it is". Apparently, if the PEIM is dispatched from
-> flash (before permanent RAM is available), its call to
-> RegisterForShadow() returns EFI_SUCCESS (and then its entry point
-> function will be invoked for a 2nd time, after the temp RAM migration).
-> And when a PEIM is dispatched from RAM (either for the very first time,
-> or for the second time, after being dispatched from flash first), the
-> same call returns EFI_ALREADY_STARTED.
-> 
-> Honestly, I'm unsure what this is good for (both in general, and
-> specifically for Tcg2Pei). Apparently, Tcg2Pei needs permanent RAM for
-> doing the measurements (which makes sense); I just wonder what exactly
-> it does so that it cannot simply specify
-> "gEfiPeiMemoryDiscoveredPpiGuid" in its DEPEX.
-
-I haven't looked at this particular PEIM.  But one case where 
-registering for shadowing is useful is for improving performance when 
-running from permanent RAM, where writable global variables are 
-available.  For instance, when running from flash, a ReportStatusCode 
-PEIM may need to go through a slow process to locate an output hardware 
-device on every PPI call.  This may involve traversing the HOB list, 
-consulting other PPIs, even probing hardware addresses.  But once it's 
-shadowed to RAM, it can locate the device once, then cache its address 
-in a global.  Not to mention that the code itself is far, far faster 
-when run from RAM vs. flash.  (That's probably a key difference between 
-a real machine and a VM.)
-
-Also, I've personally written a PEIM which saves a bunch of internal 
-state in a HOB, since that's the main writable storage when running from 
-flash.  That state includes pointers to other data (in flash.)  Once the 
-data is all shadowed to RAM, it updates the HOB to point to the data in 
-RAM.  That way it's a lot faster to access the data.
-
-I also have other PEIMs which are constrained (via DEPEX) to run *only* 
-from RAM, since they have larger memory requirements than can be 
-satisfied from temporary cache-as-RAM.  That's certainly a valid 
-technique as well.
-
-RegisterForShadow() is a useful tool for making the most of the 
-restricted PEI environment.  And having it standardized like this is, as 
-Andrew said, a lot better than the hacks people had to use beforehand.
-
-Thanks,
--- 
-Brian J. Johnson
-Enterprise X86 Lab
-
-Hewlett Packard Enterprise
-
-brian.johnson@hpe.com
+TGFzemxvOg0KICBJIGFsc28gc3VnZ2VzdCB0byBjaGVjayB0aGUgZ2VuZXJhdGVkIFByb2Nlc3NM
+aWJyYXJ5Q29uc3RydWN0b3JMaXN0ICgpIGZ1bmN0aW9uLiBJdCBpcyBpbiB0aGUgZHJpdmVyIGJ1
+aWxkIG91dHB1dCBBdXRvR2VuLmMgY29kZS4gWW91IGNhbiBjaGVjayB3aGF0IGxpYnJhcnkgZnVu
+Y3Rpb24gYmUgY2FsbGVkIGluIHRoaXMgZnVuY3Rpb24uIFRoZW4sIGZ1cnRoZXIgYWRkIGRlYnVn
+IG1lc3NhZ2UgaW4gdGhlIGxpYnJhcnkgZnVuY3Rpb24uIEkgc3VzcGVjdCBzb21lIGZ1bmN0aW9u
+IGRvZXMgdGhlIHdyb25nIG9wZXJhdGlvbiBhbmQgY29ycnVwdCB0aGUgbWVtb3J5LiANCg0KVGhh
+bmtzDQpMaW1pbmcNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogZWRrMi1k
+ZXZlbCBbbWFpbHRvOmVkazItZGV2ZWwtYm91bmNlc0BsaXN0cy4wMS5vcmddIE9uIEJlaGFsZiBP
+ZiBMYXN6bG8gRXJzZWsNCj4gU2VudDogVHVlc2RheSwgTWFyY2ggNiwgMjAxOCAyOjIzIEFNDQo+
+IFRvOiBNYXJjLUFuZHLDqSBMdXJlYXUgPG1hcmNhbmRyZS5sdXJlYXVAZ21haWwuY29tPjsgQW5k
+cmV3IEZpc2ggPGFmaXNoQGFwcGxlLmNvbT4NCj4gQ2M6IGVkazItZGV2ZWxAbGlzdHMuMDEub3Jn
+OyBQZXRlciBKb25lcyA8cGpvbmVzQHJlZGhhdC5jb20+OyBZYW8sIEppZXdlbiA8amlld2VuLnlh
+b0BpbnRlbC5jb20+OyBRRU1VDQo+IDxxZW11LWRldmVsQG5vbmdudS5vcmc+OyBKYXZpZXIgTWFy
+dGluZXogQ2FuaWxsYXMgPGphdmllcm1AcmVkaGF0LmNvbT4NCj4gU3ViamVjdDogUmU6IFtlZGsy
+XSBbUEFUQ0ggMy83XSBIQUNLOiBIb2JMaWI6IHdvcmthcm91bmQgaW5maW5pdGUgbG9vcA0KPiAN
+Cj4gT24gMDMvMDUvMTggMTU6MDUsIE1hcmMtQW5kcsOpIEx1cmVhdSB3cm90ZToNCj4gPiBIaQ0K
+PiA+DQo+ID4gT24gRnJpLCBGZWIgMjMsIDIwMTggYXQgODo0NSBQTSwgQW5kcmV3IEZpc2ggPGFm
+aXNoQGFwcGxlLmNvbT4gd3JvdGU6DQo+ID4+DQo+ID4+DQo+ID4+PiBPbiBGZWIgMjMsIDIwMTgs
+IGF0IDU6MjMgQU0sIG1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbSB3cm90ZToNCj4gPj4+DQo+
+ID4+PiBGcm9tOiBNYXJjLUFuZHLDqSBMdXJlYXUgPG1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNv
+bT4NCj4gPj4+DQo+ID4+PiBXaXRob3V0IHRoaXMgaGFjaywgR2V0TmV4dEhvYigpIGxvb3BzIGlu
+ZmluaXRlbHkgd2l0aCB0aGUgbmV4dA0KPiA+Pj4gcGF0Y2guIEkgZG9uJ3QgdW5kZXJzdGFuZCB0
+aGUgcmVhc29uLg0KPiA+Pj4NCj4gPj4+IFRoZSBsb29wIGlzIHRyaWdnZXJlZCBieSB0aGUgR2V0
+Rmlyc3RHdWlkSG9iICgmZ1RwbUVycm9ySG9iR3VpZCkNCj4gPj4+IGNhbGwuDQo+ID4+Pg0KPiA+
+Pj4gQ0M6IExhc3psbyBFcnNlayA8bGVyc2VrQHJlZGhhdC5jb20+DQo+ID4+PiBDQzogU3RlZmFu
+IEJlcmdlciA8c3RlZmFuYkBsaW51eC52bmV0LmlibS5jb20+DQo+ID4+PiBDb250cmlidXRlZC11
+bmRlcjogVGlhbm9Db3JlIENvbnRyaWJ1dGlvbiBBZ3JlZW1lbnQgMS4wDQo+ID4+PiBTaWduZWQt
+b2ZmLWJ5OiBNYXJjLUFuZHLDqSBMdXJlYXUgPG1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbT4N
+Cj4gPj4+IC0tLQ0KPiA+Pj4gTWRlUGtnL0xpYnJhcnkvUGVpSG9iTGliL0hvYkxpYi5jIHwgNCAr
+KysrDQo+ID4+PiAxIGZpbGUgY2hhbmdlZCwgNCBpbnNlcnRpb25zKCspDQo+ID4+Pg0KPiA+Pj4g
+ZGlmZiAtLWdpdCBhL01kZVBrZy9MaWJyYXJ5L1BlaUhvYkxpYi9Ib2JMaWIuYyBiL01kZVBrZy9M
+aWJyYXJ5L1BlaUhvYkxpYi9Ib2JMaWIuYw0KPiA+Pj4gaW5kZXggNWMwZWViOTkyZi4uZWQzYzVm
+YmQ2ZCAxMDA2NDQNCj4gPj4+IC0tLSBhL01kZVBrZy9MaWJyYXJ5L1BlaUhvYkxpYi9Ib2JMaWIu
+Yw0KPiA+Pj4gKysrIGIvTWRlUGtnL0xpYnJhcnkvUGVpSG9iTGliL0hvYkxpYi5jDQo+ID4+PiBA
+QCAtODksNiArODksMTAgQEAgR2V0TmV4dEhvYiAoDQo+ID4+PiAgICAgaWYgKEhvYi5IZWFkZXIt
+PkhvYlR5cGUgPT0gVHlwZSkgew0KPiA+Pj4gICAgICAgcmV0dXJuIEhvYi5SYXc7DQo+ID4+PiAg
+ICAgfQ0KPiA+Pj4gKyAgICBpZiAoR0VUX0hPQl9MRU5HVEggKEhvYlN0YXJ0KSA9PSAwKSB7DQo+
+ID4+DQo+ID4+IEFzIExhc3psbyBwb2ludHMgb3V0IHRoaXMgZXJyb3IgY29uZGl0aW9uIGlzIGxp
+a2VseSBtZW1vcnkNCj4gPj4gY29ycnVwdGlvbi4gVGh1cyBpdCB3b3VsZCBiZSBiZXR0ZXIgdG8g
+Y2hlY2sgZm9yIGFsbCBrbm93IGlsbGVnYWwNCj4gPj4gdmFsdWVzPw0KPiA+Pg0KPiA+PiBpZiAo
+R0VUX0hPQl9MRU5HVEgoSG9iU3RhcnQpIDwgc2l6ZW9mIChFRklfSE9CX0dFTkVSSUNfSEVBREVS
+KQ0KPiA+Pg0KPiA+DQo+ID4gVGhhbmtzLCBJIGhhdmUgYWRqdXN0ZWQgdGhlIGNoZWNrLg0KPiA+
+DQo+ID4gV2l0aCBtYW51YWwgY2FsbHMgYW5kIHByaW50ZiAoSSBkb24ndCBrbm93ICBhIGJldHRl
+ciB3YXkgdG8gZGVidWcgb3ZtZg0KPiA+IDspLA0KPiANCj4gV2VsbCB0aGF0J3MgaG93IEkgZ2Vu
+ZXJhbGx5IGRlYnVnIGl0IHRvbyA6KQ0KPiANCj4gPiBJIHRyeSB0byBsb2NhdGUgdGhlIGlzc3Vl
+LiBJdCdzIHNvbWVob3cgcmVsYXRlZCB0bw0KPiA+IFJlZ2lzdGVyRm9yU2hhZG93KCkuIFRoZSAi
+Y29ycnVwdGlvbiIgc2VlbXMgdG8gaGFwcGVuIGR1cmluZyB0aGUNCj4gPiBzZWNvbmQgY2FsbC4g
+QWZ0ZXIgdGhlDQo+ID4gUGVpTG9hZEltYWdlKC4uLixQRUlNX1NUQVRFX1JFR0lTVEVSX0ZPUl9T
+SEFET1csLi4pLCByaWdodCBiZWZvcmUNCj4gPiBjYWxsaW5nIFBlaW1FbnRyeVBvaW50KCksIGEg
+R2V0Rmlyc3RHdWlkSG9iKCkgc3VjY2VlZCwgYnV0IGluc2lkZSB0aGUNCj4gPiBmdW5jdGlvbiwg
+aXQgZmFpbHMgKHdpdGggdGhlIHNhbWUgYXJndW1lbnRzKS4gUmlnaHQgYWZ0ZXIgaXQgc3VjY2Vl
+ZHMNCj4gPiBhZ2Fpbi4uLiBUaGUgUGVpbUVudHJ5UG9pbnQoKSBpcyBub3QgdGhlIFRjZzJQZWk6
+UGVpbUVudHJ5TUEoKSwgSQ0KPiA+IHN1cHBvc2UgdGhlcmUgaXMgc29tZSBraW5kIG9mIHdyYXBw
+aW5nIGNvZGUsIGJ1dCBJIGZhaWwgdG8gZmluZCB3aGVyZS4NCj4gPiBBbnkgaWRlYT8NCj4gDQo+
+IFRoaXMgc291bmRzIGhlbHBmdWwuIEkgZG9uJ3Qga25vdyB3aGF0IHRoZSBwcm9ibGVtIGlzLCBi
+dXQgSSBjYW4NCj4gZWxhYm9yYXRlIG9uIHlvdXIgZGV0YWlscyBhIGJpdDsgcGVyaGFwcyBzb21l
+b25lIGVsc2Ugd2lsbCBoYXZlIG1vcmUNCj4gaWRlYXMuDQo+IA0KPiBBcHBhcmVudGx5IHRoZXJl
+IGlzIGEgUEVJIHNlcnZpY2UgY2FsbGVkIFJlZ2lzdGVyRm9yU2hhZG93KCkuDQo+ICgiQXBwYXJl
+bnRseSIsIGJlY2F1c2UgSSd2ZSBuZXZlciBzZWVuLCBsZXQgYWxvbmUgd3JpdHRlbiwgYSBQRUlN
+DQo+IGNhbGxpbmcgdGhpcyBzZXJ2aWNlLikgVGhlIHNlcnZpY2UgaXMgc3BlY2lmaWVkIGluIHRo
+ZSBQSSBzcGVjLCB3aGljaCBpcw0KPiBxdW90ZWQgaW4gdGhlIGVkazIgdHJlZSBbTWRlUGtnL0lu
+Y2x1ZGUvUGkvUGlQZWlDaXMuaF06DQo+IA0KPiA+IC8qKg0KPiA+ICAgUmVnaXN0ZXIgYSBQRUlN
+IHNvIHRoYXQgaXQgd2lsbCBiZSBzaGFkb3dlZCBhbmQgY2FsbGVkIGFnYWluLg0KPiA+DQo+ID4g
+ICBUaGlzIHNlcnZpY2UgcmVnaXN0ZXJzIGEgZmlsZSBoYW5kbGUgc28gdGhhdCBhZnRlciBtZW1v
+cnkgaXMNCj4gPiAgIGF2YWlsYWJsZSwgdGhlIFBFSU0gd2lsbCBiZSByZS1sb2FkZWQgaW50byBw
+ZXJtYW5lbnQgbWVtb3J5IGFuZA0KPiA+ICAgcmUtaW5pdGlhbGl6ZWQuIFRoZSBQRUlNIHJlZ2lz
+dGVyZWQgdGhpcyB3YXkgd2lsbCBhbHdheXMgYmUNCj4gPiAgIGluaXRpYWxpemVkIHR3aWNlLiBU
+aGUgZmlyc3QgdGltZSwgdGhpcyBmdW5jdGlvbiBjYWxsIHdpbGwNCj4gPiAgIHJldHVybiBFRklf
+U1VDQ0VTUy4gVGhlIHNlY29uZCB0aW1lLCB0aGlzIGZ1bmN0aW9uIGNhbGwgd2lsbA0KPiA+ICAg
+cmV0dXJuIEVGSV9BTFJFQURZX1NUQVJURUQuIERlcGVuZGluZyBvbiB0aGUgb3JkZXIgaW4gd2hp
+Y2gNCj4gPiAgIFBFSU1zIGFyZSBkaXNwYXRjaGVkLCB0aGUgUEVJTSBtYWtpbmcgdGhpcyBjYWxs
+IG1heSBiZQ0KPiA+ICAgaW5pdGlhbGl6ZWQgYWZ0ZXIgcGVybWFuZW50IG1lbW9yeSBpcyBpbnN0
+YWxsZWQsIGV2ZW4gdGhlIGZpcnN0DQo+ID4gICB0aW1lLg0KPiA+DQo+ID4gICBAcGFyYW0gIEZp
+bGVIYW5kbGUgICAgICAgICAgICBQRUlNJ3MgZmlsZSBoYW5kbGUuIE11c3QgYmUgdGhlIGN1cnJl
+bnRseQ0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZXhlY3V0aW5nIFBFSU0u
+DQo+ID4NCj4gPiAgIEByZXR2YWwgRUZJX1NVQ0NFU1MgICAgICAgICAgIFRoZSBQRUlNIHdhcyBz
+dWNjZXNzZnVsbHkgcmVnaXN0ZXJlZCBmb3INCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIHNoYWRvd2luZy4NCj4gPiAgIEByZXR2YWwgRUZJX0FMUkVBRFlfU1RBUlRFRCAgIFRo
+ZSBQRUlNIHdhcyBwcmV2aW91c2x5DQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICByZWdpc3RlcmVkIGZvciBzaGFkb3dpbmcuDQo+ID4gICBAcmV0dmFsIEVGSV9OT1RfRk9VTkQg
+ICAgICAgICBUaGUgRmlsZUhhbmRsZSBkb2VzIG5vdCByZWZlciB0byBhDQo+ID4gICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICB2YWxpZCBmaWxlIGhhbmRsZS4NCj4gPg0KPiA+ICoqLw0K
+PiA+IHR5cGVkZWYNCj4gPiBFRklfU1RBVFVTDQo+ID4gKEVGSUFQSSAqRUZJX1BFSV9SRUdJU1RF
+Ul9GT1JfU0hBRE9XKSgNCj4gPiAgIElOICBFRklfUEVJX0ZJTEVfSEFORExFIEZpbGVIYW5kbGUN
+Cj4gPiAgICk7DQo+IA0KPiBQRUlNcyBnZW5lcmFsbHkgImV4ZWN1dGUgaW4gcGxhY2UiIChYSVAp
+LCBpLmUuIHRoZXkgcnVuIGZyb20gZmxhc2gsIG5vdA0KPiBSQU0uIEluIHRoaXMgc3RhdHVzIHRo
+ZXkgdXNlICJ0ZW1wb3JhcnkgUkFNIiAoZS5nLiBDUFUgY2FjaGVzIGNvbmZpZ3VyZWQNCj4gbGlr
+ZSBSQU0pIGZvciBzdGFjayAmIGhlYXA7IHdoYXRldmVyIEhPQnMgdGhleSBwcm9kdWNlIGFyZSBz
+dG9yZWQgaW4NCj4gInRlbXAgUkFNIiBhcyB3ZWxsLiBUaGVuIG9uZSBvZiB0aGUgUEVJTXMgImRp
+c2NvdmVycyBwZXJtYW5lbnQgUkFNIg0KPiAoYmFzaWNhbGx5IGl0IHByb2dyYW1zIHRoZSBtZW1v
+cnkgY29udHJvbGxlciBhbmQgcHVibGlzaGVzIHRoZSBSQU0NCj4gcmFuZ2VzKS4gSW4gdHVybiB0
+aGUgUEVJIGNvcmUgIm1pZ3JhdGVzIiBQRUlNcyBmcm9tIHRlbXBvcmFyeSB0bw0KPiBwZXJtYW5l
+bnQgUkFNLCBpbmNsdWRpbmcgdGhlIEhPQiBsaXN0Lg0KPiANCj4gQmVmb3JlIHRoZSB0ZW1wb3Jh
+cnkgUkFNIG1pZ3JhdGlvbiAod2hlbiBzdGlsbCBleGVjdXRpbmcgaW4gcGxhY2UgZnJvbQ0KPiBm
+bGFzaCksIFBFSU1zIGNhbm5vdCBoYXZlIHdyaXRlYWJsZSBnbG9iYWwgdmFyaWFibGVzLiBGb3Ig
+ZXhhbXBsZSwNCj4gZHluYW1pYyBQQ0RzIGFyZSBhbHNvIG1haW50YWluZWQgaW4gYSBIT0IgKHRo
+ZSBQQ0QgSE9CKS4NCj4gDQo+IEEgUEVJTSBub3JtYWxseSBjYW5ub3QgKGFuZCBzaG91bGRuJ3Qp
+IHRlbGwgd2hldGhlciBpdCBpcyBkaXNwYXRjaGVkDQo+IGJlZm9yZSBvciBhZnRlciBwZXJtYW5l
+bnQgUkFNIGlzIHB1Ymxpc2hlZC4gSWYgbmVlZGVkLCBhIFBFSU0gY2FuDQo+IGFkdmVydGlzZSB0
+aGF0IGl0IGRlcGVuZHMgb24gcGVybWFuZW50IFJBTSAoZm9yIGV4YW1wbGUgYmVjYXVzZSBpdCBu
+ZWVkcw0KPiBhIGxvdCBvZiBoZWFwIG1lbW9yeSkgYnkgaW5jbHVkaW5nICJnRWZpUGVpTWVtb3J5
+RGlzY292ZXJlZFBwaUd1aWQiIGluDQo+IGl0cyBERVBFWC4NCj4gDQo+IEZpbmFsbHksIGl0IHNl
+ZW1zIGxpa2UgYSBQRUlNIGNhbiBhbHNvIGV4cHJlc3MsICJJJ20gZmluZSB3aXRoIGJlaW5nDQo+
+IGRpc3BhdGNoZWQgZnJvbSBib3RoIGZsYXNoIChYSVApIHZzLiBwZXJtYW5lbnQgUkFNLCBqdXN0
+IHRoZSBQRUkgY29yZQ0KPiB0ZWxsIG1lIHdoaWNoZXZlciBpdCBpcyIuIEFwcGFyZW50bHksIGlm
+IHRoZSBQRUlNIGlzIGRpc3BhdGNoZWQgZnJvbQ0KPiBmbGFzaCAoYmVmb3JlIHBlcm1hbmVudCBS
+QU0gaXMgYXZhaWxhYmxlKSwgaXRzIGNhbGwgdG8NCj4gUmVnaXN0ZXJGb3JTaGFkb3coKSByZXR1
+cm5zIEVGSV9TVUNDRVNTIChhbmQgdGhlbiBpdHMgZW50cnkgcG9pbnQNCj4gZnVuY3Rpb24gd2ls
+bCBiZSBpbnZva2VkIGZvciBhIDJuZCB0aW1lLCBhZnRlciB0aGUgdGVtcCBSQU0gbWlncmF0aW9u
+KS4NCj4gQW5kIHdoZW4gYSBQRUlNIGlzIGRpc3BhdGNoZWQgZnJvbSBSQU0gKGVpdGhlciBmb3Ig
+dGhlIHZlcnkgZmlyc3QgdGltZSwNCj4gb3IgZm9yIHRoZSBzZWNvbmQgdGltZSwgYWZ0ZXIgYmVp
+bmcgZGlzcGF0Y2hlZCBmcm9tIGZsYXNoIGZpcnN0KSwgdGhlDQo+IHNhbWUgY2FsbCByZXR1cm5z
+IEVGSV9BTFJFQURZX1NUQVJURUQuDQo+IA0KPiBIb25lc3RseSwgSSdtIHVuc3VyZSB3aGF0IHRo
+aXMgaXMgZ29vZCBmb3IgKGJvdGggaW4gZ2VuZXJhbCwgYW5kDQo+IHNwZWNpZmljYWxseSBmb3Ig
+VGNnMlBlaSkuIEFwcGFyZW50bHksIFRjZzJQZWkgbmVlZHMgcGVybWFuZW50IFJBTSBmb3INCj4g
+ZG9pbmcgdGhlIG1lYXN1cmVtZW50cyAod2hpY2ggbWFrZXMgc2Vuc2UpOyBJIGp1c3Qgd29uZGVy
+IHdoYXQgZXhhY3RseQ0KPiBpdCBkb2VzIHNvIHRoYXQgaXQgY2Fubm90IHNpbXBseSBzcGVjaWZ5
+DQo+ICJnRWZpUGVpTWVtb3J5RGlzY292ZXJlZFBwaUd1aWQiIGluIGl0cyBERVBFWC4NCj4gDQo+
+IEkgZG8gc2VlIHRoYXQgdGhlICghbUltYWdlSW5NZW1vcnkpIGJyYW5jaCBjb250YWlucyB0aGUg
+VFBNDQo+IGluaXRpYWxpemF0aW9uIGNvZGUuIEhvd2V2ZXIsIGFzIHRoZSBQSSBzcGVjIGl0c2Vs
+ZiBzYXlzLCBpdCBpcyBub3QNCj4gZ3VhcmFudGVlZCB0aGF0IGEgUEVJTSB3aWxsIGJlIGRpc3Bh
+dGNoZWQgZnJvbSBYSVAgKGkuZS4sIGJlZm9yZQ0KPiBwZXJtYW5lbnQgUkFNKSAqYXQgYWxsKi4g
+U28gaXQncyBub3QgY2xlYXIgdG8gbWUgaG93ICJidXNpbmVzcw0KPiBmdW5jdGlvbmFsaXR5IiBj
+YW4gZGVwZW5kIG9uIFhJUC4NCj4gDQo+IA0KPiBOb3csIE9WTUYgaXMgYSBiaXQgZGlmZmVyZW50
+IHdydC4gIm1lbW9yeSBjb250cm9sbGVyIHByb2dyYW1taW5nIiAtLSBpdA0KPiBydW5zIG9uIHZp
+cnR1YWwgcGxhdGZvcm1zIHdoZXJlIHByb2dyYW1taW5nIHRoZSBtZW1vcnkgY29udHJvbGxlcnMg
+aXMNCj4gdW5uZWNlc3NhcnkuIFdoYXQgaGFwcGVucyBpcywgaW5zdGVhZCwgdGhhdCBvbmx5IHRo
+ZSBTRUMgcGhhc2UgcnVucyBmcm9tDQo+IGZsYXNoIChYSVApLCBhbmQgaXQgZGVjb21wcmVzc2Vz
+IGV2ZW4gdGhlIFBFSSBmaXJtd2FyZSB2b2x1bWUgdG8gbm9ybWFsDQo+IFJBTS4gVGhlIHBoYXNl
+IHdoZXJlIFBFSU1zICJydW4gZnJvbSBmbGFzaCIgKFhJUCkgc3RpbGwgZXhpc3RzLCBvZg0KPiBj
+b3Vyc2UsIGV4Y2VwdCB0aGV5IGFjdHVhbGx5IHJ1biBmcm9tIFJBTSAtLSBzbywgZm9yIGV4YW1w
+bGUsIHRoZXkgaGF2ZQ0KPiB3cml0ZWFibGUgZ2xvYmFsIHZhcmlhYmxlcyByaWdodCBvZmYgdGhl
+IGJhdC4gUGVyaGFwcyB0aGlzIGludGVyZmVyZXMNCj4gc29tZWhvdyB3aXRoIHRoZSBSZWdpc3Rl
+ckZvclNoYWRvdygpIHNlcnZpY2UgYW5kL29yIGhvdyBQRUlNcyBleHBlY3QNCj4gdGhhdCBzZXJ2
+aWNlIHRvIHdvcmsuDQo+IA0KPiBSZWdhcmRpbmcgdGhlIFBFSU0gZW50cnkgcG9pbnQgLS0gdGhl
+IFBFSU1zJyAib3duIiBlbnRyeSBwb2ludCBmdW5jdGlvbnMNCj4gYXJlIGFsd2F5cyB3cmFwcGVk
+Lg0KPiANCj4gLSBUaGUgb3V0ZXJtb3N0IChjb21tb24pIGVudHJ5IHBvaW50IGZ1bmN0aW9uIGlz
+IGNhbGxlZA0KPiAgIF9Nb2R1bGVFbnRyeVBvaW50KCkuIEl0IGlzIGRlY2xhcmVkIGluDQo+ICAg
+Ik1kZVBrZy9JbmNsdWRlL0xpYnJhcnkvUGVpbUVudHJ5UG9pbnQuaCIuIFRoaXMgaXMgd2hhdCB0
+aGUgUEVJIGNvcmUNCj4gICBjYWxscyB3aGVuIGRpc3BhdGNoaW5nIGEgUEVJTS4NCj4gDQo+IC0g
+SW5kaXZpZHVhbCBQRUlNcyBhZGQgdGhlIFBlaW1FbnRyeVBvaW50IGxpYiBjbGFzcyB0byB0aGVp
+ciBJTkYgZmlsZXMsDQo+ICAgdW5kZXIgW0xpYnJhcnlDbGFzc2VzXS4gVGhlIGltcGxlbWVudGF0
+aW9uIGlzIGluDQo+ICAgIk1kZVBrZy9MaWJyYXJ5L1BlaW1FbnRyeVBvaW50Ii4gSW4gcGFydGlj
+dWxhciwgdGhlIGZ1bmN0aW9uIGNhbGxzDQo+ICAgUHJvY2Vzc0xpYnJhcnlDb25zdHJ1Y3Rvckxp
+c3QoKS4NCj4gDQo+IC0gVGhlIGJ1aWxkIHRvb2xzIGdlbmVyYXRlIHRoZSBzb3VyY2UgY29kZSBm
+b3INCj4gICBQcm9jZXNzTGlicmFyeUNvbnN0cnVjdG9yTGlzdCgpOyBiYXNlZCBvbiB0aGUgKHJl
+Y3Vyc2l2ZWx5IGRldGVybWluZWQpDQo+ICAgbGlicmFyeSBpbnN0YW5jZSBkZXBlbmRlbmN5IHRy
+ZWUuIChTZWFyY2ggdGhlIEJ1aWxkIHN1YmRpcmVjdG9yeSBmb3INCj4gICAiQXV0b0dlbi5jIiBm
+aWxlcy4pIFNvLCBiZWZvcmUgdGhlIFBFSU0ncyBhY3R1YWwgZW50cnkgcG9pbnQgaXMNCj4gICBj
+YWxsZWQsIHRoZSBsaWIgaW5zdGFuY2VzJyBDT05TVFJVQ1RPUiBmdW5jdGlvbnMgYXJlIGNhbGxl
+ZCwgaW4gdGhlDQo+ICAgcmlnaHQgb3JkZXIsIHNvIHRoYXQgdGhlIFBFSU0gaXMgZW50ZXJlZCB3
+aXRoIGFsbCBsaWJyYXJpZXMgInJlYWR5IHRvDQo+ICAgdXNlIi4NCj4gDQo+IEkgZ3Vlc3MgdGhh
+dCwgd2hlbiBUY2cyUGVpIGlzIGRpc3BhdGNoZWQgZm9yIHRoZSAybmQgdGltZSwgZnJvbQ0KPiBw
+ZXJtYW5lbnQgUkFNLCB0aGUgZmlyc3QgKHN1Y2Nlc3NmdWwpIEdldEZpcnN0R3VpZEhvYigpIGNh
+bGwgdGhhdCB5b3UNCj4gc2VlIG9jY3VycyBsaWtlIHRoaXMsIGZyb20gZ2VuZXJhdGVkIGNvZGUs
+IGFzIHBhcnQgb2YgbGlicmFyeQ0KPiBjb25zdHJ1Y3Rpb24uIFNvbWUgbGlicmFyeSBpbnN0YW5j
+ZSdzIGNvbnN0cnVjdG9yIGZ1bmN0aW9uIGNhbGxzDQo+IEdldEZpcnN0R3VpZEhvYigpLCBzdWNj
+ZXNzZnVsbHkuDQo+IA0KPiBUaGUgY29ycnVwdGlvbiBjb3VsZCBzb21laG93IGJlIHJlbGF0ZWQg
+dG8gdGhlIEhPQiBsaXN0J3MgbWlncmF0aW9uIGZyb20NCj4gdGVtcCBSQU0gdG8gcGVybWFuZW50
+IFJBTS4gVGhlIE9WTUYgZGVidWcgbG9nIHNob3VsZCBjb250YWluIHNvbWV0aGluZw0KPiBsaWtl
+IHRoaXM6DQo+IA0KPiA+IFRlbXAgU3RhY2sgOiBCYXNlQWRkcmVzcz0weDgxODAwMCBMZW5ndGg9
+MHg4MDAwDQo+ID4gVGVtcCBIZWFwICA6IEJhc2VBZGRyZXNzPTB4ODEwMDAwIExlbmd0aD0weDgw
+MDANCj4gPiBUb3RhbCB0ZW1wb3JhcnkgbWVtb3J5OiAgICA2NTUzNiBieXRlcy4NCj4gPiAgIHRl
+bXBvcmFyeSBtZW1vcnkgc3RhY2sgZXZlciB1c2VkOiAgICAgICAyODY1NiBieXRlcy4NCj4gPiAg
+IHRlbXBvcmFyeSBtZW1vcnkgaGVhcCB1c2VkIGZvciBIb2JMaXN0OiA2MDU2IGJ5dGVzLg0KPiA+
+ICAgdGVtcG9yYXJ5IG1lbW9yeSBoZWFwIG9jY3VwaWVkIGJ5IG1lbW9yeSBwYWdlczogMCBieXRl
+cy4NCj4gDQo+IEltcGx5aW5nIHRoYXQsIGJlZm9yZSB0aGUgdGVtcCBSQU0gbWlncmF0aW9uLCB0
+aGUgSE9CIGxpc3QgY29uc3VtZWQgfjZLQg0KPiBpbiB0b3RhbCBvZiB0aGUgMzJLQiB0ZW1wIFJB
+TSBoZWFwLiBJdCBzZWVtcyB1bmxpa2VseSB0aGF0IHdlIHJ1biBvdXQgb2YNCj4gdGVtcCBSQU0g
+aGVhcC4NCj4gDQo+IEhvcGVmdWxseSB0aGlzIGhlbHBzIHlvdSBwcm9jZWVkIHdpdGggdGhlIGRl
+YnVnZ2luZy4uLiBDb3JyZWN0aW9ucyBhcmUNCj4gd2VsY29tZSB0b28sIG9idmlvdXNseSENCj4g
+DQo+IFRoYW5rcywNCj4gTGFzemxvDQo+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fDQo+IGVkazItZGV2ZWwgbWFpbGluZyBsaXN0DQo+IGVkazItZGV2ZWxA
+bGlzdHMuMDEub3JnDQo+IGh0dHBzOi8vbGlzdHMuMDEub3JnL21haWxtYW4vbGlzdGluZm8vZWRr
+Mi1kZXZlbA0K
