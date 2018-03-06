@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42144)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1etFmx-0008Ay-7u
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:50:08 -0500
+	(envelope-from <thuth@redhat.com>) id 1etFpc-0001yM-5Q
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:52:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1etFmr-0000qZ-3d
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:50:07 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42944 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1etFmq-0000qQ-Ux
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:50:01 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7962B404008D
-	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 16:50:00 +0000 (UTC)
-Received: from donizetti.redhat.com (ovpn-116-241.ams2.redhat.com
-	[10.36.116.241])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C1A2F2156601
-	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 16:49:59 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  6 Mar 2018 17:49:55 +0100
-Message-Id: <20180306164957.24275-2-pbonzini@redhat.com>
-In-Reply-To: <20180306164957.24275-1-pbonzini@redhat.com>
-References: <20180306164957.24275-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/3] qom: introduce object_class_get_list_sorted
+	(envelope-from <thuth@redhat.com>) id 1etFpb-000218-1t
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 11:52:52 -0500
+References: <20180306164504.9138-1-berto@igalia.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <309ef189-6bd6-c9f3-60aa-9d45112d8e47@redhat.com>
+Date: Tue, 6 Mar 2018 17:52:40 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180306164504.9138-1-berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] iotests: Update output of 051 and 186
+ after commit 1454509726719e0933c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,240 +24,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Qemu-block <qemu-block@nongnu.org>
 
-Unify half a dozen copies of very similar code (the only difference being
-whether comparisons were case-sensitive) and use it also in Tricore,
-which did not do any sorting of CPU model names.
+On 06.03.2018 17:45, Alberto Garcia wrote:
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  tests/qemu-iotests/051.pc.out | 20 --------------------
+>  tests/qemu-iotests/186.out    | 22 +++-------------------
+>  2 files changed, 3 insertions(+), 39 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
+> index 830c11880a..b01f9a90d7 100644
+> --- a/tests/qemu-iotests/051.pc.out
+> +++ b/tests/qemu-iotests/051.pc.out
+> @@ -117,20 +117,10 @@ Testing: -drive if=ide,media=cdrom
+>  QEMU X.Y.Z monitor - type 'help' for more information
+>  (qemu) quit
+>  
+> -Testing: -drive if=scsi,media=cdrom
+> -QEMU X.Y.Z monitor - type 'help' for more information
+> -(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
+> -quit
+> -
+>  Testing: -drive if=ide
+>  QEMU X.Y.Z monitor - type 'help' for more information
+>  (qemu) QEMU_PROG: Initialization of device ide-hd failed: Device needs media, but drive is empty
+>  
+> -Testing: -drive if=scsi
+> -QEMU X.Y.Z monitor - type 'help' for more information
+> -(qemu) QEMU_PROG: -drive if=scsi: warning: bus=0,unit=0 is deprecated with this machine type
+> -QEMU_PROG: -drive if=scsi: Device needs media, but drive is empty
+> -
+>  Testing: -drive if=virtio
+>  QEMU X.Y.Z monitor - type 'help' for more information
+>  (qemu) QEMU_PROG: -drive if=virtio: Device needs media, but drive is empty
+> @@ -170,20 +160,10 @@ Testing: -drive file=TEST_DIR/t.qcow2,if=ide,media=cdrom,readonly=on
+>  QEMU X.Y.Z monitor - type 'help' for more information
+>  (qemu) quit
+>  
+> -Testing: -drive file=TEST_DIR/t.qcow2,if=scsi,media=cdrom,readonly=on
+> -QEMU X.Y.Z monitor - type 'help' for more information
+> -(qemu) QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=scsi,media=cdrom,readonly=on: warning: bus=0,unit=0 is deprecated with this machine type
+> -quit
+> -
+>  Testing: -drive file=TEST_DIR/t.qcow2,if=ide,readonly=on
+>  QEMU X.Y.Z monitor - type 'help' for more information
+>  (qemu) QEMU_PROG: Initialization of device ide-hd failed: Block node is read-only
+>  
+> -Testing: -drive file=TEST_DIR/t.qcow2,if=scsi,readonly=on
+> -QEMU X.Y.Z monitor - type 'help' for more information
+> -(qemu) QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=scsi,readonly=on: warning: bus=0,unit=0 is deprecated with this machine type
+> -quit
+> -
+>  Testing: -drive file=TEST_DIR/t.qcow2,if=virtio,readonly=on
+>  QEMU X.Y.Z monitor - type 'help' for more information
+>  (qemu) quit
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- include/qom/object.h    | 10 ++++++++++
- qdev-monitor.c          |  9 +--------
- qom/object.c            | 14 ++++++++++++++
- target/alpha/cpu.c      | 15 +--------------
- target/hppa/cpu.c       | 14 +-------------
- target/lm32/cpu.c       | 15 +--------------
- target/sh4/cpu.c        | 15 +--------------
- target/tricore/helper.c |  2 +-
- 8 files changed, 30 insertions(+), 64 deletions(-)
+Ack for that part.
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index 4f07090db0..12c0f58c8f 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -913,6 +913,17 @@ void object_class_foreach(void (*fn)(ObjectClass *klass, void *opaque),
- GSList *object_class_get_list(const char *implements_type,
-                               bool include_abstract);
- 
-+/**
-+ * object_class_get_list_sorted:
-+ * @implements_type: The type to filter for, including its derivatives.
-+ * @include_abstract: Whether to include abstract classes.
-+ *
-+ * Returns: A singly-linked list of the classes in alphabetical
-+ * case-insensitive order.
-+ */
-+GSList *object_class_get_list_sorted(const char *implements_type,
-+                              bool include_abstract);
-+
- /**
-  * object_ref:
-  * @obj: the object
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index b7e3291f8b..61e0300991 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -122,12 +122,6 @@ static void qdev_print_devinfo(DeviceClass *dc)
-     error_printf("\n");
- }
- 
--static gint devinfo_cmp(gconstpointer a, gconstpointer b)
--{
--    return strcasecmp(object_class_get_name((ObjectClass *)a),
--                      object_class_get_name((ObjectClass *)b));
--}
--
- static void qdev_print_devinfos(bool show_no_user)
- {
-     static const char *cat_name[DEVICE_CATEGORY_MAX + 1] = {
-@@ -146,8 +140,7 @@ static void qdev_print_devinfos(bool show_no_user)
-     int i;
-     bool cat_printed;
- 
--    list = g_slist_sort(object_class_get_list(TYPE_DEVICE, false),
--                        devinfo_cmp);
-+    list = object_class_get_list_sorted(TYPE_DEVICE, false);
- 
-     for (i = 0; i <= DEVICE_CATEGORY_MAX; i++) {
-         cat_printed = false;
-diff --git a/qom/object.c b/qom/object.c
-index 755ad03819..6088f55943 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -891,6 +891,19 @@ GSList *object_class_get_list(const char *implements_type,
-     return list;
- }
- 
-+static gint object_class_cmp(gconstpointer a, gconstpointer b)
-+{
-+    return strcasecmp(object_class_get_name((ObjectClass *)a),
-+                      object_class_get_name((ObjectClass *)b));
-+}
-+
-+GSList *object_class_get_list_sorted(const char *implements_type,
-+                                     bool include_abstract)
-+{
-+    return g_slist_sort(object_class_get_list(implements_type, include_abstract),
-+                        object_class_cmp);
-+}
-+
- void object_ref(Object *obj)
- {
-     if (!obj) {
-diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
-index 55675ce419..b08078e7fc 100644
---- a/target/alpha/cpu.c
-+++ b/target/alpha/cpu.c
-@@ -71,18 +71,6 @@ static void alpha_cpu_realizefn(DeviceState *dev, Error **errp)
-     acc->parent_realize(dev, errp);
- }
- 
--/* Sort alphabetically by type name. */
--static gint alpha_cpu_list_compare(gconstpointer a, gconstpointer b)
--{
--    ObjectClass *class_a = (ObjectClass *)a;
--    ObjectClass *class_b = (ObjectClass *)b;
--    const char *name_a, *name_b;
--
--    name_a = object_class_get_name(class_a);
--    name_b = object_class_get_name(class_b);
--    return strcmp(name_a, name_b);
--}
--
- static void alpha_cpu_list_entry(gpointer data, gpointer user_data)
- {
-     ObjectClass *oc = data;
-@@ -100,8 +88,7 @@ void alpha_cpu_list(FILE *f, fprintf_function cpu_fprintf)
-     };
-     GSList *list;
- 
--    list = object_class_get_list(TYPE_ALPHA_CPU, false);
--    list = g_slist_sort(list, alpha_cpu_list_compare);
-+    list = object_class_get_list_sorted(TYPE_ALPHA_CPU, false);
-     (*cpu_fprintf)(f, "Available CPUs:\n");
-     g_slist_foreach(list, alpha_cpu_list_entry, &s);
-     g_slist_free(list);
-diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
-index 969f628f0a..e5da8c3cab 100644
---- a/target/hppa/cpu.c
-+++ b/target/hppa/cpu.c
-@@ -110,18 +110,6 @@ static void hppa_cpu_realizefn(DeviceState *dev, Error **errp)
- #endif
- }
- 
--/* Sort hppabetically by type name. */
--static gint hppa_cpu_list_compare(gconstpointer a, gconstpointer b)
--{
--    ObjectClass *class_a = (ObjectClass *)a;
--    ObjectClass *class_b = (ObjectClass *)b;
--    const char *name_a, *name_b;
--
--    name_a = object_class_get_name(class_a);
--    name_b = object_class_get_name(class_b);
--    return strcmp(name_a, name_b);
--}
--
- static void hppa_cpu_list_entry(gpointer data, gpointer user_data)
- {
-     ObjectClass *oc = data;
-@@ -138,7 +126,7 @@ void hppa_cpu_list(FILE *f, fprintf_function cpu_fprintf)
-     };
-     GSList *list;
- 
--    list = object_class_get_list(TYPE_HPPA_CPU, false);
-+    list = object_class_get_list_sorted(TYPE_HPPA_CPU, false);
-     list = g_slist_sort(list, hppa_cpu_list_compare);
-     (*cpu_fprintf)(f, "Available CPUs:\n");
-     g_slist_foreach(list, hppa_cpu_list_entry, &s);
-diff --git a/target/lm32/cpu.c b/target/lm32/cpu.c
-index 96c2499d0b..0003152469 100644
---- a/target/lm32/cpu.c
-+++ b/target/lm32/cpu.c
-@@ -32,18 +32,6 @@ static void lm32_cpu_set_pc(CPUState *cs, vaddr value)
-     cpu->env.pc = value;
- }
- 
--/* Sort alphabetically by type name. */
--static gint lm32_cpu_list_compare(gconstpointer a, gconstpointer b)
--{
--    ObjectClass *class_a = (ObjectClass *)a;
--    ObjectClass *class_b = (ObjectClass *)b;
--    const char *name_a, *name_b;
--
--    name_a = object_class_get_name(class_a);
--    name_b = object_class_get_name(class_b);
--    return strcmp(name_a, name_b);
--}
--
- static void lm32_cpu_list_entry(gpointer data, gpointer user_data)
- {
-     ObjectClass *oc = data;
-@@ -65,8 +53,7 @@ void lm32_cpu_list(FILE *f, fprintf_function cpu_fprintf)
-     };
-     GSList *list;
- 
--    list = object_class_get_list(TYPE_LM32_CPU, false);
--    list = g_slist_sort(list, lm32_cpu_list_compare);
-+    list = object_class_get_list_sorted(TYPE_LM32_CPU, false);
-     (*cpu_fprintf)(f, "Available CPUs:\n");
-     g_slist_foreach(list, lm32_cpu_list_entry, &s);
-     g_slist_free(list);
-diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
-index 6302cfda3a..541ffc2d97 100644
---- a/target/sh4/cpu.c
-+++ b/target/sh4/cpu.c
-@@ -85,18 +85,6 @@ typedef struct SuperHCPUListState {
-     FILE *file;
- } SuperHCPUListState;
- 
--/* Sort alphabetically by type name. */
--static gint superh_cpu_list_compare(gconstpointer a, gconstpointer b)
--{
--    ObjectClass *class_a = (ObjectClass *)a;
--    ObjectClass *class_b = (ObjectClass *)b;
--    const char *name_a, *name_b;
--
--    name_a = object_class_get_name(class_a);
--    name_b = object_class_get_name(class_b);
--    return strcmp(name_a, name_b);
--}
--
- static void superh_cpu_list_entry(gpointer data, gpointer user_data)
- {
-     SuperHCPUListState *s = user_data;
-@@ -114,8 +102,7 @@ void sh4_cpu_list(FILE *f, fprintf_function cpu_fprintf)
-     };
-     GSList *list;
- 
--    list = object_class_get_list(TYPE_SUPERH_CPU, false);
--    list = g_slist_sort(list, superh_cpu_list_compare);
-+    list = object_class_get_list_sorted(TYPE_SUPERH_CPU, false);
-     g_slist_foreach(list, superh_cpu_list_entry, &s);
-     g_slist_free(list);
- }
-diff --git a/target/tricore/helper.c b/target/tricore/helper.c
-index 45276d3782..dad7eea085 100644
---- a/target/tricore/helper.c
-+++ b/target/tricore/helper.c
-@@ -101,7 +101,7 @@ void tricore_cpu_list(FILE *f, fprintf_function cpu_fprintf)
-     };
-     GSList *list;
- 
--    list = object_class_get_list(TYPE_TRICORE_CPU, false);
-+    list = object_class_get_list_sorted(TYPE_TRICORE_CPU, false);
-     (*cpu_fprintf)(f, "Available CPUs:\n");
-     g_slist_foreach(list, tricore_cpu_list_entry, &s);
-     g_slist_free(list);
--- 
-2.14.3
+> diff --git a/tests/qemu-iotests/186.out b/tests/qemu-iotests/186.out
+> index c8377fe146..d83bba1a88 100644
+> --- a/tests/qemu-iotests/186.out
+> +++ b/tests/qemu-iotests/186.out
+> @@ -444,31 +444,15 @@ ide0-cd0 (NODE_NAME): null-co:// (null-co, read-only)
+>  
+>  Testing: -drive if=scsi,driver=null-co
+>  QEMU X.Y.Z monitor - type 'help' for more information
+> -(qemu) QEMU_PROG: -drive if=scsi,driver=null-co: warning: bus=0,unit=0 is deprecated with this machine type
+> -info block
+> -scsi0-hd0 (NODE_NAME): null-co:// (null-co)
+> -    Attached to:      /machine/unattached/device[27]/scsi.0/legacy[0]
+> -    Cache mode:       writeback
+> -(qemu) quit
+> +(qemu) QEMU_PROG: -drive if=scsi,driver=null-co: machine type does not support if=scsi,bus=0,unit=0
+>  
+>  Testing: -drive if=scsi,media=cdrom
+>  QEMU X.Y.Z monitor - type 'help' for more information
+> -(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
+> -info block
+> -scsi0-cd0: [not inserted]
+> -    Attached to:      /machine/unattached/device[27]/scsi.0/legacy[0]
+> -    Removable device: not locked, tray closed
+> -(qemu) quit
+> +(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: machine type does not support if=scsi,bus=0,unit=0
+>  
+>  Testing: -drive if=scsi,driver=null-co,media=cdrom
+>  QEMU X.Y.Z monitor - type 'help' for more information
+> -(qemu) QEMU_PROG: -drive if=scsi,driver=null-co,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
+> -info block
+> -scsi0-cd0 (NODE_NAME): null-co:// (null-co, read-only)
+> -    Attached to:      /machine/unattached/device[27]/scsi.0/legacy[0]
+> -    Removable device: not locked, tray closed
+> -    Cache mode:       writeback
+> -(qemu) quit
+> +(qemu) QEMU_PROG: -drive if=scsi,driver=null-co,media=cdrom: machine type does not support if=scsi,bus=0,unit=0
+
+That rather sounds like this "if=scsi" test should be removed now?
+
+ Thomas
