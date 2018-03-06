@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1etCVu-0005dE-8x
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:20:27 -0500
+	(envelope-from <berrange@redhat.com>) id 1etCaC-00026f-R2
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:24:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1etCVk-0006bU-SS
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:20:18 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:40145)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1etCVk-0006aK-M4
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:20:08 -0500
-Received: by mail-wm0-x244.google.com with SMTP id t6so22236132wmt.5
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 05:20:08 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  6 Mar 2018 14:19:24 +0100
-Message-Id: <1520342370-123606-29-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1520342370-123606-1-git-send-email-pbonzini@redhat.com>
-References: <1520342370-123606-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 28/34] Fix WHPX additional lock acquisition
+	(envelope-from <berrange@redhat.com>) id 1etCa8-0001Fs-Re
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:24:44 -0500
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Tue,  6 Mar 2018 13:24:30 +0000
+Message-Id: <20180306132430.32110-1-berrange@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] misc: don't use hwaddr as a type in trace
+ events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +22,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Justin Terry (VM)" <juterry@microsoft.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-From: "Justin Terry (VM) via Qemu-devel" <qemu-devel@nongnu.org>
+Use types that are defined by QEMU in trace events caused build failures
+for the UST trace backend:
 
-The code already is holding the qemu_mutex for the IO thread. We do not need
-to additionally take the lock again in this case.
+  In file included from trace-ust-all.c:13:0:
+  trace-ust-all.h:11844:206: error: unknown type name =E2=80=98hwaddr=E2=80=
+=99
 
-Signed-off-by: Justin Terry (VM) <juterry@microsoft.com>
-Message-Id: <1519665216-1078-5-git-send-email-juterry@microsoft.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Justin Terry (VM) via Qemu-devel <qemu-devel@nongnu.org>
+It only knows about C built-in types, and any types that are pulled in
+from includs of qemu-common.h and lttng/tracepoint.h. This does not
+include the 'hwaddr' type, so replace it with a uint64_t which is what
+exec/hwaddr.h defines 'hwaddr' as. This fixes the build failure
+introduced by
+
+  commit 9eb8040c2d2b38e1a40bb6129b1b668fa178fcab
+  Author: Peter Maydell <peter.maydell@linaro.org>
+  Date:   Fri Mar 2 10:45:39 2018 +0000
+
+    hw/misc/tz-ppc: Model TrustZone peripheral protection controller
+
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- target/i386/whpx-all.c | 2 --
- 1 file changed, 2 deletions(-)
 
-diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
-index 14ea732..74a8f4d 100644
---- a/target/i386/whpx-all.c
-+++ b/target/i386/whpx-all.c
-@@ -705,9 +705,7 @@ static void whpx_vcpu_pre_run(CPUState *cpu)
-             new_int.InterruptionVector = 2;
-         }
-         if (cpu->interrupt_request & CPU_INTERRUPT_SMI) {
--            qemu_mutex_lock_iothread();
-             cpu->interrupt_request &= ~CPU_INTERRUPT_SMI;
--            qemu_mutex_unlock_iothread();
-         }
-     }
- 
--- 
-1.8.3.1
+For future work it might be good to have tracetool whitelist the
+permitted data types that can be safely used in trace events...
+
+ hw/misc/trace-events | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+index eb5ffcc0a8..b0cc047289 100644
+--- a/hw/misc/trace-events
++++ b/hw/misc/trace-events
+@@ -92,8 +92,8 @@ tz_ppc_cfg_sec_resp(int level) "TZ PPC: cfg_sec_resp =3D=
+ %d"
+ tz_ppc_irq_enable(int level) "TZ PPC: int_enable =3D %d"
+ tz_ppc_irq_clear(int level) "TZ PPC: int_clear =3D %d"
+ tz_ppc_update_irq(int level) "TZ PPC: setting irq line to %d"
+-tz_ppc_read_blocked(int n, hwaddr offset, bool secure, bool user) "TZ PP=
+C: port %d offset 0x%" HWADDR_PRIx " read (secure %d user %d) blocked"
+-tz_ppc_write_blocked(int n, hwaddr offset, bool secure, bool user) "TZ P=
+PC: port %d offset 0x%" HWADDR_PRIx " write (secure %d user %d) blocked"
++tz_ppc_read_blocked(int n, uint64_t offset, bool secure, bool user) "TZ =
+PPC: port %d offset 0x%" HWADDR_PRIx " read (secure %d user %d) blocked"
++tz_ppc_write_blocked(int n, uint64_t offset, bool secure, bool user) "TZ=
+ PPC: port %d offset 0x%" HWADDR_PRIx " write (secure %d user %d) blocked=
+"
+=20
+ # hw/misc/iotkit-secctl.c
+ iotkit_secctl_s_read(uint32_t offset, uint64_t data, unsigned size) "IoT=
+Kit SecCtl S regs read: offset 0x%x data 0x%" PRIx64 " size %u"
+--=20
+2.14.3
