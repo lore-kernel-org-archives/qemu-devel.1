@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1etIMI-0000r2-RC
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 14:34:48 -0500
+	(envelope-from <jack.schwartz@oracle.com>) id 1etIMX-00013O-UC
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 14:35:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1etIMH-0005UL-KY
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 14:34:46 -0500
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Tue,  6 Mar 2018 11:34:18 -0800
-Message-Id: <20180306193418.28095-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH v4 05/11] linux-user: fix
- mmap/munmap/mprotect/mremap/shmat
+	(envelope-from <jack.schwartz@oracle.com>) id 1etIMU-0005YF-Q9
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 14:35:01 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:57674)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jack.schwartz@oracle.com>)
+	id 1etIMU-0005XH-FJ
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 14:34:58 -0500
+References: <20180227194816.17940-1-ppandit@redhat.com>
+From: Jack Schwartz <jack.schwartz@oracle.com>
+Message-ID: <596af722-6990-482d-2fc5-0d03bd7b4711@oracle.com>
+Date: Tue, 6 Mar 2018 11:30:54 -0800
+MIME-Version: 1.0
+In-Reply-To: <20180227194816.17940-1-ppandit@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] multiboot: check mh_load_end_addr address
+ field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,151 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Max Filippov <jcmvbkbc@gmail.com>, qemu-stable@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, CERT CC <cert.cc@orange.co>, Prasad J Pandit <pjp@fedoraproject.org>, "Michael S . Tsirkin" <mst@redhat.com>
 
-In linux-user QEMU that runs for a target with TARGET_ABI_BITS bigger
-than L1_MAP_ADDR_SPACE_BITS an assertion in page_set_flags fires when
-mmap, munmap, mprotect, mremap or shmat is called for an address outside
-the guest address space. mmap and mprotect should return ENOMEM in such
-case.
+Hi Prasad.
 
-Introduce macro guest_range_valid that verifies if address range is
-within guest address space and does not wrap around. Use that macro in
-mmap/munmap/mprotect/mremap/shmat for error checking.
+The Multiboot Spec will allow for a zero bss end address.=C2=A0 (Please s=
+ee=20
+section 3.1.3 at https://www.gnu.org/software/grub/manual/multiboot/=C2=A0=
+ .=20
+) For a zero bss end address, this patch will not do the right thing.
 
-Cc: qemu-stable@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>
-Cc: Laurent Vivier <laurent@vivier.eu>
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
----
-Changes v3->v4:
-- change GUEST_ADDR_MAX and h2g_valid definitions as suggested by Laurent
-  Vivier.
+I had proposed some patches to properly handle zero bss end address, but=20
+they got delayed.=C2=A0 However, I will be re-sending updated patches out=
+=20
+later today.=C2=A0 Please stay tuned...
 
-Changes v2->v3:
-- fix comparison in guest_valid: it must be 'less' to preserve the existing
-  functionality, not 'less or equal'.
-- fix guest_range_valid: it may not use guest_valid, because single range
-  that occupies all of the guest address space is valid.
+ =C2=A0=C2=A0=C2=A0 Thanks,
+ =C2=A0=C2=A0=C2=A0 Jack
 
- include/exec/cpu-all.h  |  4 ++++
- include/exec/cpu_ldst.h | 14 ++++++++------
- linux-user/mmap.c       | 20 +++++++++++++++-----
- linux-user/syscall.c    |  3 +++
- 4 files changed, 30 insertions(+), 11 deletions(-)
-
-diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-index 0b141683f095..6304cfa7e171 100644
---- a/include/exec/cpu-all.h
-+++ b/include/exec/cpu-all.h
-@@ -159,8 +159,12 @@ extern unsigned long guest_base;
- extern int have_guest_base;
- extern unsigned long reserved_va;
- 
-+#if HOST_LONG_BITS <= TARGET_VIRT_ADDR_SPACE_BITS
-+#define GUEST_ADDR_MAX (reserved_va ? reserved_va : ~0ul)
-+#else
- #define GUEST_ADDR_MAX (reserved_va ? reserved_va : \
-                                     (1ul << TARGET_VIRT_ADDR_SPACE_BITS) - 1)
-+#endif
- #else
- 
- #include "exec/hwaddr.h"
-diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
-index 191f2e962a3c..22f5df9c8a92 100644
---- a/include/exec/cpu_ldst.h
-+++ b/include/exec/cpu_ldst.h
-@@ -52,15 +52,17 @@
- #define g2h(x) ((void *)((unsigned long)(target_ulong)(x) + guest_base))
- 
- #if HOST_LONG_BITS <= TARGET_VIRT_ADDR_SPACE_BITS
--#define h2g_valid(x) 1
-+#define guest_valid(x) 1
- #else
--#define h2g_valid(x) ({ \
--    unsigned long __guest = (unsigned long)(x) - guest_base; \
--    (__guest < (1ul << TARGET_VIRT_ADDR_SPACE_BITS)) && \
--    (!reserved_va || (__guest < reserved_va)); \
--})
-+#define guest_valid(x) ((x) < GUEST_ADDR_MAX)
- #endif
- 
-+#define h2g_valid(x) guest_valid((unsigned long)(x) - guest_base)
-+
-+#define guest_range_valid(start, len) \
-+    ({unsigned long l = (len); \
-+     l <= GUEST_ADDR_MAX && (start) <= GUEST_ADDR_MAX - l; })
-+
- #define h2g_nocheck(x) ({ \
-     unsigned long __ret = (unsigned long)(x) - guest_base; \
-     (abi_ulong)__ret; \
-diff --git a/linux-user/mmap.c b/linux-user/mmap.c
-index 0fbfd6dff20d..df81f9b803b6 100644
---- a/linux-user/mmap.c
-+++ b/linux-user/mmap.c
-@@ -80,8 +80,9 @@ int target_mprotect(abi_ulong start, abi_ulong len, int prot)
-         return -EINVAL;
-     len = TARGET_PAGE_ALIGN(len);
-     end = start + len;
--    if (end < start)
--        return -EINVAL;
-+    if (!guest_range_valid(start, len)) {
-+        return -ENOMEM;
-+    }
-     prot &= PROT_READ | PROT_WRITE | PROT_EXEC;
-     if (len == 0)
-         return 0;
-@@ -481,8 +482,8 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
- 	 * It can fail only on 64-bit host with 32-bit target.
- 	 * On any other target/host host mmap() handles this error correctly.
- 	 */
--        if ((unsigned long)start + len - 1 > (abi_ulong) -1) {
--            errno = EINVAL;
-+        if (!guest_range_valid(start, len)) {
-+            errno = ENOMEM;
-             goto fail;
-         }
- 
-@@ -622,8 +623,10 @@ int target_munmap(abi_ulong start, abi_ulong len)
-     if (start & ~TARGET_PAGE_MASK)
-         return -EINVAL;
-     len = TARGET_PAGE_ALIGN(len);
--    if (len == 0)
-+    if (len == 0 || !guest_range_valid(start, len)) {
-         return -EINVAL;
-+    }
-+
-     mmap_lock();
-     end = start + len;
-     real_start = start & qemu_host_page_mask;
-@@ -678,6 +681,13 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
-     int prot;
-     void *host_addr;
- 
-+    if (!guest_range_valid(old_addr, old_size) ||
-+        ((flags & MREMAP_FIXED) &&
-+         !guest_range_valid(new_addr, new_size))) {
-+        errno = ENOMEM;
-+        return -1;
-+    }
-+
-     mmap_lock();
- 
-     if (flags & MREMAP_FIXED) {
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index e24f43c4a259..79245e73784f 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -4900,6 +4900,9 @@ static inline abi_ulong do_shmat(CPUArchState *cpu_env,
-             return -TARGET_EINVAL;
-         }
-     }
-+    if (!guest_range_valid(shmaddr, shm_info.shm_segsz)) {
-+        return -TARGET_EINVAL;
-+    }
- 
-     mmap_lock();
- 
--- 
-2.11.0
+On 02/27/18 11:48, P J P wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+>
+> While loading kernel via multiboot-v1 image, (flags & 0x00010000)
+> indicates that multiboot header contains valid addresses to load
+> the kernel image. In that, end of the data segment address
+> 'mh_load_end_addr' should be less than the bss segment address
+> 'mh_bss_end_addr'. Add check to validate that.
+>
+> Reported-by: CERT CC <cert.cc@orange.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> ---
+>   hw/i386/multiboot.c | 4 ++++
+>   1 file changed, 4 insertions(+)
+>
+> diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
+> index 46d9c68bf5..d16e32bf4a 100644
+> --- a/hw/i386/multiboot.c
+> +++ b/hw/i386/multiboot.c
+> @@ -227,6 +227,10 @@ int load_multiboot(FWCfgState *fw_cfg,
+>               fprintf(stderr, "invalid mh_load_addr address\n");
+>               exit(1);
+>           }
+> +        if (mh_load_end_addr > mh_bss_end_addr) {
+> +            fprintf(stderr, "invalid mh_load_end_addr address\n");
+> +            exit(1);
+> +        }
+>  =20
+>           uint32_t mb_kernel_text_offset =3D i - (mh_header_addr - mh_l=
+oad_addr);
+>           uint32_t mb_load_size =3D 0;
