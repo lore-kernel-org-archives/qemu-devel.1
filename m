@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1etMG5-00007o-Su
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:44:38 -0500
+	(envelope-from <cota@braap.org>) id 1etMJA-00018e-Or
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:47:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1etMG2-00062T-O4
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:44:37 -0500
-Date: Wed, 7 Mar 2018 00:44:32 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20180306203103.25563-8-mark.cave-ayland@ilande.co.uk>
-Message-ID: <alpine.BSF.2.21.1803070040490.57076@zero.eik.bme.hu>
-References: <20180306203103.25563-1-mark.cave-ayland@ilande.co.uk>
-	<20180306203103.25563-8-mark.cave-ayland@ilande.co.uk>
+	(envelope-from <cota@braap.org>) id 1etMJ7-0007KX-LS
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:47:48 -0500
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:51353)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1etMJ7-0007KH-EY
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:47:45 -0500
+Date: Tue, 6 Mar 2018 18:47:42 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180306234742.GA26112@flamenco>
+References: <1520369037-37977-1-git-send-email-mjc@sifive.com>
+	<CAHNT7NsqMQr9hmFN2wBo+CevLjD=X-9UTeDCoEfg_GVEvtJ1pw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 07/19] uninorth: move PCI mmio
- memory region initialisation into init function
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHNT7NsqMQr9hmFN2wBo+CevLjD=X-9UTeDCoEfg_GVEvtJ1pw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v1 00/22] Spec conformance bug fixes and
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,112 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Michael Clark <mjc@sifive.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-On Tue, 6 Mar 2018, Mark Cave-Ayland wrote:
-> Whilst we are here, rename the memory regions to better reflect whether they
-> belong to either a PCI or an AGP bus.
->
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
-> hw/pci-host/uninorth.c | 28 ++++++++++++++++++----------
-> 1 file changed, 18 insertions(+), 10 deletions(-)
->
-> diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
-> index b081e3c153..5b8fc3aa16 100644
-> --- a/hw/pci-host/uninorth.c
-> +++ b/hw/pci-host/uninorth.c
-> @@ -111,29 +111,39 @@ static const MemoryRegionOps unin_data_ops = {
->
-> static void pci_unin_main_init(Object *obj)
-> {
-> +    UNINState *s = UNI_NORTH_PCI_HOST_BRIDGE(obj);
->     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
->     PCIHostState *h = PCI_HOST_BRIDGE(obj);
->
->     /* Use values found on a real PowerMac */
->     /* Uninorth main bus */
->     memory_region_init_io(&h->conf_mem, OBJECT(h), &pci_host_conf_le_ops,
-> -                          obj, "pci-conf-idx", 0x1000);
-> +                          obj, "unin-pci-conf-idx", 0x1000);
->     memory_region_init_io(&h->data_mem, OBJECT(h), &unin_data_ops, obj,
-> -                          "pci-conf-data", 0x1000);
-> +                          "unin-pci-conf-data", 0x1000);
-> +
-> +    memory_region_init(&s->pci_mmio, OBJECT(s), "unin-pci-mmio",
-> +                       0x100000000ULL);
-> +
->     sysbus_init_mmio(sbd, &h->conf_mem);
->     sysbus_init_mmio(sbd, &h->data_mem);
-> }
->
-> static void pci_u3_agp_init(Object *obj)
-> {
-> +    UNINState *s = U3_AGP_HOST_BRIDGE(obj);
->     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
->     PCIHostState *h = PCI_HOST_BRIDGE(obj);
->
->     /* Uninorth U3 AGP bus */
->     memory_region_init_io(&h->conf_mem, OBJECT(h), &pci_host_conf_le_ops,
-> -                          obj, "pci-conf-idx", 0x1000);
-> +                          obj, "unin-pci-conf-idx", 0x1000);
->     memory_region_init_io(&h->data_mem, OBJECT(h), &unin_data_ops, obj,
-> -                          "pci-conf-data", 0x1000);
-> +                          "unin-pci-conf-data", 0x1000);
-> +
-> +    memory_region_init(&s->pci_mmio, OBJECT(s), "unin-pci-mmio",
+On Wed, Mar 07, 2018 at 12:07:18 +1300, Michael Clark wrote:
+> BTW Apologies for the duplicate emails. I'm still getting to grips with the
+> git-sendemail workflow and was using a sed script to Add Cc's which munged
+> the headers as it didn't take into account Subject lines flowing to two
+> lines. I guess I can just include Cc: in the commit message? and
+> git-format-patch will handle it for me? or I just should how to use
+> git-publish...
 
-The name of this function and the above comment both suggest this is an 
-AGP bus so did you mean to rename these to unin-agp-* instead of 
-unin-pci-*?
+I don't have experience with git-publish. The following two suggestions
+might help though:
 
-Regards,
-BALATON Zoltan
+- Yes, add Cc's to individual patches -- those are picked up by send-email.
+  That also applies to the cover letter, although note that if
+  you use --compose then Cc's won't be picked up. Instead, just write
+  the cover letter into a 0000-$cover.patch (with Cc's in there)
+  and do not use --compose.
 
-> +                       0x100000000ULL);
-> +
->     sysbus_init_mmio(sbd, &h->conf_mem);
->     sysbus_init_mmio(sbd, &h->data_mem);
-> }
-> @@ -145,9 +155,9 @@ static void pci_unin_agp_init(Object *obj)
->
->     /* Uninorth AGP bus */
->     memory_region_init_io(&h->conf_mem, OBJECT(h), &pci_host_conf_le_ops,
-> -                          obj, "pci-conf-idx", 0x1000);
-> +                          obj, "unin-agp-conf-idx", 0x1000);
->     memory_region_init_io(&h->data_mem, OBJECT(h), &pci_host_data_le_ops,
-> -                          obj, "pci-conf-data", 0x1000);
-> +                          obj, "unin-agp-conf-data", 0x1000);
->     sysbus_init_mmio(sbd, &h->conf_mem);
->     sysbus_init_mmio(sbd, &h->data_mem);
-> }
-> @@ -159,9 +169,9 @@ static void pci_unin_internal_init(Object *obj)
->
->     /* Uninorth internal bus */
->     memory_region_init_io(&h->conf_mem, OBJECT(h), &pci_host_conf_le_ops,
-> -                          obj, "pci-conf-idx", 0x1000);
-> +                          obj, "unin-pci-conf-idx", 0x1000);
->     memory_region_init_io(&h->data_mem, OBJECT(h), &pci_host_data_le_ops,
-> -                          obj, "pci-conf-data", 0x1000);
-> +                          obj, "unin-pci-conf-data", 0x1000);
->     sysbus_init_mmio(sbd, &h->conf_mem);
->     sysbus_init_mmio(sbd, &h->data_mem);
-> }
-> @@ -182,7 +192,6 @@ UNINState *pci_pmac_init(qemu_irq *pic,
->     s = SYS_BUS_DEVICE(dev);
->     h = PCI_HOST_BRIDGE(s);
->     d = UNI_NORTH_PCI_HOST_BRIDGE(dev);
-> -    memory_region_init(&d->pci_mmio, OBJECT(d), "pci-mmio", 0x100000000ULL);
->     memory_region_init_alias(&d->pci_hole, OBJECT(d), "pci-hole", &d->pci_mmio,
->                              0x80000000ULL, 0x10000000ULL);
->     memory_region_add_subregion(address_space_mem, 0x80000000ULL,
-> @@ -247,7 +256,6 @@ UNINState *pci_pmac_u3_init(qemu_irq *pic,
->     h = PCI_HOST_BRIDGE(dev);
->     d = U3_AGP_HOST_BRIDGE(dev);
->
-> -    memory_region_init(&d->pci_mmio, OBJECT(d), "pci-mmio", 0x100000000ULL);
->     memory_region_init_alias(&d->pci_hole, OBJECT(d), "pci-hole", &d->pci_mmio,
->                              0x80000000ULL, 0x70000000ULL);
->     memory_region_add_subregion(address_space_mem, 0x80000000ULL,
->
+- Use send-email's --dry-run option to make sure everything looks good
+  without actually sending any emails.
+
+> I still have to work on Igor's requested change to CPU initializer
+> declarations, and i'd also like to get the patch in that fixes fmin/fmax
+> test failures using the riscv-tests testsuite by implementing IEEE-754
+> minimumNumber/maximumNumber. I'll try to get a patch onto the list before
+> soft-freeze. I dropped the patch which was in an earlier version of our
+> port patch series due to a conflict with changes in softfloat (conversion
+> of minmax from a macro to a static function iirc).
+
+Note that if you're fixing a bug (and the fmin/fmax patch qualifies),
+you can definitely get it merged post-soft-freeze.
+
+		E.
