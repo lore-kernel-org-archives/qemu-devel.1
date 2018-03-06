@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1etCEh-0005Um-R8
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:02:37 -0500
+	(envelope-from <kraxel@redhat.com>) id 1etCG3-0006Ts-BP
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:03:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1etCEe-0002Yp-OJ
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:02:31 -0500
-From: Alberto Garcia <berto@igalia.com>
-Date: Tue,  6 Mar 2018 15:01:21 +0200
-Message-Id: <20180306130121.30243-1-berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v4] iotests: Tweak 030 in order to trigger a
- race condition with parallel jobs
+	(envelope-from <kraxel@redhat.com>) id 1etCFx-0003Rn-MQ
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:03:55 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57466 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1etCFx-0003RL-HT
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 08:03:49 -0500
+Date: Tue, 6 Mar 2018 14:03:40 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180306130340.cbng5f4sserabwxn@sirius.home.kraxel.org>
+References: <20180306083832.8144-1-kraxel@redhat.com>
+	<20180306083832.8144-4-kraxel@redhat.com>
+	<CAJ+F1CLiB6aMmSopdf3NwH6KN3y=rcY6XQaCciEYnA55d_75Fw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CLiB6aMmSopdf3NwH6KN3y=rcY6XQaCciEYnA55d_75Fw@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] spice: add cursor_dmabuf support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,144 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
-This patch tweaks TestParallelOps in iotest 030 so it allocates data
-in smaller regions (256KB/512KB instead of 512KB/1MB) and the
-block-stream job in test_stream_commit() only needs to copy data that
-is at the very end of the image.
+On Tue, Mar 06, 2018 at 12:56:55PM +0100, Marc-Andr=E9 Lureau wrote:
+> Hi
+>=20
+> On Tue, Mar 6, 2018 at 9:38 AM, Gerd Hoffmann <kraxel@redhat.com> wrote=
+:
+> > Add support for cursor dmabufs.  qemu has to render the cursor for
+> > that, so in case a cursor is present qemu allocates a new dmabuf, bli=
+ts
+> > the scanout, blends in the pointer and passes on the new dmabuf to
+> > spice-server.  Without cursor qemu continues to simply pass on the
+> > scanout dmabuf as-is.
+> >
+> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+>=20
+> What about client side rendering mode? (for responsiveness etc)
 
-This way when the block-stream job is awakened it will finish right
-away without any chance of being stopped by block_job_sleep_ns(). This
-triggers the bug that was fixed by 3d5d319e1221082974711af1d09d82f and
-1a63a907507fbbcfaee3f622907ec24 and is therefore a more useful test
-case for parallel block jobs.
+Note that client side cursor rending needs guest support.  Intel added
+some extra paravirtual registers for the hotspot location (on physical
+hardware this isn't needed).  So client-side cursor rendering will only
+work for guests which have support for those extra registers, and we
+will need the current rendering code *anyway* in case we don't get the
+hotspot location from the guest.  So I figured I go with this code base
+for now, put it into shape and run for 2.12 merge.
 
-After this patch the aforementiond bug can also be reproduced with the
-test_stream_parallel() test case.
+> Why not read the cursor data and pass it as regular cursor update? I
+> don't think such a small and infrequent CPU read will impact
+> performance much.
 
-Since with this change the stream job in test_stream_commit() finishes
-early, this patch introduces a similar test case where both jobs are
-slowed down so they can actually run in parallel.
+Well, it's not *that* infrequent.  Cursor shape might have changed even
+if the dmabuf is still the same (i.e. guest didn't place the cursor
+elsewhere in memory).  Also note that Intel uses a 256x256 cursor sprite
+(with most of it being unused), so it isn't that small either.
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Cc: John Snow <jsnow@redhat.com>
----
+But, yes, I plan to check that out and try to send the cursor as regular
+spice cursor update.  Will probably not make 2.12 though, too much
+higher priority stuff in the pipeline ...
 
-v4: Mention that commit 1a63a907507fbbcfaee3f622907ec24 also
-    contributes to solve the original bug (both commits need to
-    reverted in order to reproduce this bug reliably).
-
-    Rewrite the loop that writes data into the images to make it more
-    readable.
-
----
- tests/qemu-iotests/030     | 52 ++++++++++++++++++++++++++++++++++++++--------
- tests/qemu-iotests/030.out |  4 ++--
- 2 files changed, 45 insertions(+), 11 deletions(-)
-
-diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-index 457984b8e9..b5f88959aa 100755
---- a/tests/qemu-iotests/030
-+++ b/tests/qemu-iotests/030
-@@ -156,7 +156,7 @@ class TestSingleDrive(iotests.QMPTestCase):
- class TestParallelOps(iotests.QMPTestCase):
-     num_ops = 4 # Number of parallel block-stream operations
-     num_imgs = num_ops * 2 + 1
--    image_len = num_ops * 1024 * 1024
-+    image_len = num_ops * 512 * 1024
-     imgs = []
- 
-     def setUp(self):
-@@ -176,14 +176,14 @@ class TestParallelOps(iotests.QMPTestCase):
-                      '-o', 'backing_file=%s' % self.imgs[i-1], self.imgs[i])
- 
-         # Put data into the images we are copying data from
--        for i in range(self.num_imgs / 2):
--            img_index = i * 2 + 1
--            # Alternate between 512k and 1M.
-+        odd_img_indexes = [x for x in reversed(range(self.num_imgs)) if x % 2 == 1]
-+        for i in range(len(odd_img_indexes)):
-+            # Alternate between 256KB and 512KB.
-             # This way jobs will not finish in the same order they were created
--            num_kb = 512 + 512 * (i % 2)
-+            num_kb = 256 + 256 * (i % 2)
-             qemu_io('-f', iotests.imgfmt,
--                    '-c', 'write -P %d %d %d' % (i, i*1024*1024, num_kb * 1024),
--                    self.imgs[img_index])
-+                    '-c', 'write -P 0xFF %dk %dk' % (i * 512, num_kb),
-+                    self.imgs[odd_img_indexes[i]])
- 
-         # Attach the drive to the VM
-         self.vm = iotests.VM()
-@@ -318,12 +318,14 @@ class TestParallelOps(iotests.QMPTestCase):
-         self.wait_until_completed(drive='commit-drive0')
- 
-     # Test a block-stream and a block-commit job in parallel
--    def test_stream_commit(self):
-+    # Here the stream job is supposed to finish quickly in order to reproduce
-+    # the scenario that triggers the bug fixed in 3d5d319e1221 and 1a63a907507
-+    def test_stream_commit_1(self):
-         self.assertLessEqual(8, self.num_imgs)
-         self.assert_no_active_block_jobs()
- 
-         # Stream from node0 into node2
--        result = self.vm.qmp('block-stream', device='node2', job_id='node2')
-+        result = self.vm.qmp('block-stream', device='node2', base_node='node0', job_id='node2')
-         self.assert_qmp(result, 'return', {})
- 
-         # Commit from the active layer into node3
-@@ -348,6 +350,38 @@ class TestParallelOps(iotests.QMPTestCase):
- 
-         self.assert_no_active_block_jobs()
- 
-+    # This is similar to test_stream_commit_1 but both jobs are slowed
-+    # down so they can run in parallel for a little while.
-+    def test_stream_commit_2(self):
-+        self.assertLessEqual(8, self.num_imgs)
-+        self.assert_no_active_block_jobs()
-+
-+        # Stream from node0 into node4
-+        result = self.vm.qmp('block-stream', device='node4', base_node='node0', job_id='node4', speed=1024*1024)
-+        self.assert_qmp(result, 'return', {})
-+
-+        # Commit from the active layer into node5
-+        result = self.vm.qmp('block-commit', device='drive0', base=self.imgs[5], speed=1024*1024)
-+        self.assert_qmp(result, 'return', {})
-+
-+        # Wait for all jobs to be finished.
-+        pending_jobs = ['node4', 'drive0']
-+        while len(pending_jobs) > 0:
-+            for event in self.vm.get_qmp_events(wait=True):
-+                if event['event'] == 'BLOCK_JOB_COMPLETED':
-+                    node_name = self.dictpath(event, 'data/device')
-+                    self.assertTrue(node_name in pending_jobs)
-+                    self.assert_qmp_absent(event, 'data/error')
-+                    pending_jobs.remove(node_name)
-+                if event['event'] == 'BLOCK_JOB_READY':
-+                    self.assert_qmp(event, 'data/device', 'drive0')
-+                    self.assert_qmp(event, 'data/type', 'commit')
-+                    self.assert_qmp_absent(event, 'data/error')
-+                    self.assertTrue('drive0' in pending_jobs)
-+                    self.vm.qmp('block-job-complete', device='drive0')
-+
-+        self.assert_no_active_block_jobs()
-+
-     # Test the base_node parameter
-     def test_stream_base_node_name(self):
-         self.assert_no_active_block_jobs()
-diff --git a/tests/qemu-iotests/030.out b/tests/qemu-iotests/030.out
-index 391c8573ca..42314e9c00 100644
---- a/tests/qemu-iotests/030.out
-+++ b/tests/qemu-iotests/030.out
-@@ -1,5 +1,5 @@
--.......................
-+........................
- ----------------------------------------------------------------------
--Ran 23 tests
-+Ran 24 tests
- 
- OK
--- 
-2.11.0
+cheers,
+  Gerd
