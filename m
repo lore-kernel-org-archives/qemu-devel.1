@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44860)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1etHVo-0000Fs-6b
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 13:40:33 -0500
+	id 1etHa1-0002Mg-2q
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 13:44:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1etHVk-0006lI-3M
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 13:40:32 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:42104)
+	id 1etHZy-00089Z-0V
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 13:44:53 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:55474)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1etHVj-0006kz-SH
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 13:40:28 -0500
-Received: by mail-wr0-x241.google.com with SMTP id k9so21962802wre.9
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 10:40:27 -0800 (PST)
+	id 1etHZx-00089L-NK
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 13:44:49 -0500
+Received: by mail-wm0-x244.google.com with SMTP id q83so97699wme.5
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 10:44:49 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20180306172250.3049-1-stefanha@redhat.com>
+References: <20180306154625.23910-1-berrange@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4593aa24-49cb-aeb9-aea6-f620ebac937c@amsat.org>
-Date: Tue, 6 Mar 2018 15:40:23 -0300
+Message-ID: <2b197711-fb0a-afaa-0a33-9c0b5ade9c7a@amsat.org>
+Date: Tue, 6 Mar 2018 15:44:46 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180306172250.3049-1-stefanha@redhat.com>
+In-Reply-To: <20180306154625.23910-1-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] trace: fix ARM TrustZone PPC hwaddr type
+Subject: Re: [Qemu-devel] [PATCH] trace: only permit standard C types and
+ fixed size integer types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,48 +35,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 
-On 03/06/2018 02:22 PM, Stefan Hajnoczi wrote:
-> Commit 9eb8040c2d2b ("hw/misc/tz-ppc: Model TrustZone peripheral
-> protection controller") added trace events with hwaddr type arguments.
-> 
-> This is not allowed and leads to the following compiler errors when
-> building with ./configure --enable-trace-backends=ust:
-> 
->   trace-ust-all.h:11847:20: error: unknown type name ‘hwaddr’; did you mean ‘h_addr’?
->     TP_ARGS(int, n, hwaddr, offset, bool, secure, bool, user),
-> 
-> Generated LTTng UST tracepoint definitions cannot include declarations
-> for all QEMU types and therefore docs/devel/tracing.txt requires using
-> only primitive or stdint.h types.
+On 03/06/2018 12:46 PM, Daniel P. Berrangé wrote:
+> Some trace backends will compile code based on the declared trace
+> events. It should not be assumed that the backends can resolve any QEMU
+> specific typedefs. So trace events should restrict their argument
+> types to the standard C types and fixed size integer types. Any complex
+> pointer types can be declared as "void *" for purposes of trace events,
+> since nothing will be dereferencing these pointer arguments.
 
-Maybe the trace generator script can check for legal/forbidden types?
+Exactly what I was thinking of!
 
 > 
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+> ---
+>  scripts/tracetool/__init__.py | 45 +++++++++++++++++++++++++++++++++++++++++++
+>  trace-events                  |  6 +++---
+
+Maybe split in 2 different patches?
+
+>  2 files changed, 48 insertions(+), 3 deletions(-)
+> 
+> diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.py
+> index 3646c2b9fc..52cc687ae3 100644
+> --- a/scripts/tracetool/__init__.py
+> +++ b/scripts/tracetool/__init__.py
+> @@ -41,6 +41,50 @@ def out(*lines, **kwargs):
+>      lines = [ l % kwargs for l in lines ]
+>      sys.stdout.writelines("\n".join(lines) + "\n")
+>  
+> +# We only want to allow standard C types or fixed sized
+> +# integer types. We don't want QEMU specific types
+> +# as we can't assume trace backends can resolve all the
+> +# typedefs
+> +ALLOWED_TYPES = [
+> +    "int",
+> +    "long",
+> +    "short",
+> +    "char",
+> +    "bool",
+> +    "unsigned",
+> +    "signed",
+> +    "float",
+> +    "double",
+> +    "int8_t",
+> +    "uint8_t",
+> +    "int16_t",
+> +    "uint16_t",
+> +    "int32_t",
+> +    "uint32_t",
+> +    "int64_t",
+> +    "uint64_t",
+> +    "void",
+> +    "size_t",
+> +    "ssize_t",
+> +    "uintptr_t",
+
+ptrdiff_t?
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> ---
->  hw/misc/trace-events | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-> index eb5ffcc0a8..562d9ed005 100644
-> --- a/hw/misc/trace-events
-> +++ b/hw/misc/trace-events
-> @@ -92,8 +92,8 @@ tz_ppc_cfg_sec_resp(int level) "TZ PPC: cfg_sec_resp = %d"
->  tz_ppc_irq_enable(int level) "TZ PPC: int_enable = %d"
->  tz_ppc_irq_clear(int level) "TZ PPC: int_clear = %d"
->  tz_ppc_update_irq(int level) "TZ PPC: setting irq line to %d"
-> -tz_ppc_read_blocked(int n, hwaddr offset, bool secure, bool user) "TZ PPC: port %d offset 0x%" HWADDR_PRIx " read (secure %d user %d) blocked"
-> -tz_ppc_write_blocked(int n, hwaddr offset, bool secure, bool user) "TZ PPC: port %d offset 0x%" HWADDR_PRIx " write (secure %d user %d) blocked"
-> +tz_ppc_read_blocked(int n, uint64_t offset, bool secure, bool user) "TZ PPC: port %d offset 0x%" PRIx64 " read (secure %d user %d) blocked"
-> +tz_ppc_write_blocked(int n, uint64_t offset, bool secure, bool user) "TZ PPC: port %d offset 0x%" PRIx64 " write (secure %d user %d) blocked"
+> +    # Magic substitution is done by tracetool
+> +    "TCGv",
+> +]
+> +
+> +def validate_type(name):
+> +    bits = name.split(" ")
+> +    for bit in bits:
+> +        bit = re.sub("\*", "", bit)
+> +        if bit == "":
+> +            continue
+> +        if bit == "const":
+> +            continue
+> +        if bit not in ALLOWED_TYPES:
+> +            raise ValueError("Argument type '%s' is not in whitelist. "
+> +                             "Only standard C types and fixed size integer "
+> +                             "types should be used. struct, union, and "
+> +                             "other complex pointer types should be "
+> +                             "declared as 'void *'" % name)
 >  
->  # hw/misc/iotkit-secctl.c
->  iotkit_secctl_s_read(uint32_t offset, uint64_t data, unsigned size) "IoTKit SecCtl S regs read: offset 0x%x data 0x%" PRIx64 " size %u"
+>  class Arguments:
+>      """Event arguments description."""
+> @@ -87,6 +131,7 @@ class Arguments:
+>              else:
+>                  arg_type, identifier = arg.rsplit(None, 1)
+>  
+> +            validate_type(arg_type)
+>              res.append((arg_type, identifier))
+>          return Arguments(res)
+>  
+> diff --git a/trace-events b/trace-events
+> index 89fcad0fd1..855b0ab240 100644
+> --- a/trace-events
+> +++ b/trace-events
+> @@ -68,9 +68,9 @@ memory_region_tb_read(int cpu_index, uint64_t addr, uint64_t value, unsigned siz
+>  memory_region_tb_write(int cpu_index, uint64_t addr, uint64_t value, unsigned size) "cpu %d addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
+>  memory_region_ram_device_read(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
+>  memory_region_ram_device_write(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
+> -flatview_new(FlatView *view, MemoryRegion *root) "%p (root %p)"
+> -flatview_destroy(FlatView *view, MemoryRegion *root) "%p (root %p)"
+> -flatview_destroy_rcu(FlatView *view, MemoryRegion *root) "%p (root %p)"
+> +flatview_new(void *view, void *root) "%p (root %p)"
+> +flatview_destroy(void *view, void *root) "%p (root %p)"
+> +flatview_destroy_rcu(void *view, void *root) "%p (root %p)"
+>  
+>  # gdbstub.c
+>  gdbstub_op_start(const char *device) "Starting gdbstub using device %s"
 > 
