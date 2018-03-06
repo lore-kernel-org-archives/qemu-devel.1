@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1et6LH-0006Qu-Pi
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 01:44:56 -0500
+	(envelope-from <fengguang.wu@intel.com>) id 1et6VM-0000Kq-An
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 01:55:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1et6LD-0001T1-Re
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 01:44:55 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44636 helo=mx1.redhat.com)
+	(envelope-from <fengguang.wu@intel.com>) id 1et6VI-0006Vi-RF
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 01:55:20 -0500
+Received: from mga17.intel.com ([192.55.52.151]:22454)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1et6LD-0001SG-Ll
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 01:44:51 -0500
-Date: Tue, 6 Mar 2018 14:44:36 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180306064436.GD3615@xz-mi>
-References: <1519900415-30314-1-git-send-email-yi.l.liu@linux.intel.com>
-	<1519900415-30314-8-git-send-email-yi.l.liu@linux.intel.com>
+	(Exim 4.71) (envelope-from <fengguang.wu@intel.com>)
+	id 1et6VI-0006T9-HK
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 01:55:16 -0500
+Date: Tue, 6 Mar 2018 14:54:11 +0800
+From: kbuild test robot <lkp@intel.com>
+Message-ID: <201803061415.NOLGNvAS%fengguang.wu@intel.com>
+References: <20180228201520.25283.97532.stgit@gimli.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1519900415-30314-8-git-send-email-yi.l.liu@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v3 07/12] vfio/pci: register sva notifier
+In-Reply-To: <20180228201520.25283.97532.stgit@gimli.home>
+Subject: Re: [Qemu-devel] [PATCH 3/3] vfio/pci: Add ioeventfd support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,115 +27,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, david@gibson.dropbear.id.au, pbonzini@redhat.com, alex.williamson@redhat.com, eric.auger.pro@gmail.com, yi.l.liu@intel.com, kevin.tian@intel.com, jasowang@redhat.com
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: kbuild-all@01.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, peterx@redhat.com, eric.auger@redhat.com, aik@ozlabs.ru
 
-On Thu, Mar 01, 2018 at 06:33:30PM +0800, Liu, Yi L wrote:
-> This patch shows how sva notifier is registered. And provided
-> an example by registering notify func for tlb flush propagation.
-> 
-> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
-> ---
->  hw/vfio/pci.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 53 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index a60a4d7..b7297cc 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -2775,6 +2775,26 @@ static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
->      vdev->req_enabled = false;
->  }
->  
-> +static VFIOContainer *vfio_get_container_from_busdev(PCIBus *bus,
-> +                                                     int32_t devfn)
-> +{
-> +    VFIOGroup *group;
-> +    VFIOPCIDevice *vdev_iter;
-> +    VFIODevice *vbasedev_iter;
-> +    PCIDevice *pdev_iter;
-> +
-> +    QLIST_FOREACH(group, &vfio_group_list, next) {
-> +        QLIST_FOREACH(vbasedev_iter, &group->device_list, next) {
-> +            vdev_iter = container_of(vbasedev_iter, VFIOPCIDevice, vbasedev);
-> +            pdev_iter = &vdev_iter->pdev;
-> +            if (pci_get_bus(pdev_iter) == bus && pdev_iter->devfn == devfn) {
-> +                return group->container;
-> +            }
-> +        }
-> +    }
-> +    return NULL;
-> +}
-> +
->  static void vfio_pci_device_sva_bind_pasid_table(PCIBus *bus,
->                   int32_t devfn, uint64_t pasidt_addr, uint32_t size)
->  {
-> @@ -2783,11 +2803,42 @@ static void vfio_pci_device_sva_bind_pasid_table(PCIBus *bus,
->      So far, Intel VT-d and AMD IOMMU requires it. */
->  }
->  
-> +static void vfio_iommu_sva_tlb_invalidate_notify(IOMMUSVANotifier *n,
-> +                                                 IOMMUSVAEventData *event_data)
-> +{
-> +/*  Sample code, would be detailed in coming virt-SVA patchset.
-> +    VFIOGuestIOMMUSVAContext *gsva_ctx;
-> +    IOMMUSVAContext *sva_ctx;
-> +    VFIOContainer *container;
-> +
-> +    gsva_ctx = container_of(n, VFIOGuestIOMMUSVAContext, n);
-> +    container = gsva_ctx->container;
-> +
-> +    TODO: forward to host through VFIO IOCTL
+Hi Alex,
 
-IMHO if the series is not ready for merging, we can still mark it as
-RFC and declare that so people won't need to go into details of the
-patches.
+I love your patch! Perhaps something to improve:
 
-> +*/
-> +}
-> +
->  static void vfio_pci_device_sva_register_notifier(PCIBus *bus,
->                            int32_t devfn, IOMMUSVAContext *sva_ctx)
->  {
-> -    /* Register notifier for TLB invalidation propagation
-> -       */
-> +    VFIOContainer *container = vfio_get_container_from_busdev(bus, devfn);
-> +
-> +    if (container != NULL) {
-> +        VFIOGuestIOMMUSVAContext *gsva_ctx;
-> +        gsva_ctx = g_malloc0(sizeof(*gsva_ctx));
-> +        gsva_ctx->sva_ctx = sva_ctx;
-> +        gsva_ctx->container = container;
-> +        QLIST_INSERT_HEAD(&container->gsva_ctx_list,
-> +                          gsva_ctx,
-> +                          gsva_ctx_next);
-> +       /* Register vfio_iommu_sva_tlb_invalidate_notify with event flag
-> +           IOMMU_SVA_EVENT_TLB_INV */
-> +        iommu_sva_notifier_register(sva_ctx,
-> +                                    &gsva_ctx->n,
-> +                                    vfio_iommu_sva_tlb_invalidate_notify,
-> +                                    IOMMU_SVA_EVENT_TLB_INV);
+[auto build test WARNING on linus/master]
+[also build test WARNING on v4.16-rc4 next-20180306]
+[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
 
-I would squash this patch into previous one since basically this is
-only part of the implementation to provide vfio-speicific register
-hook.
+url:    https://github.com/0day-ci/linux/commits/Alex-Williamson/vfio-pci-Pull-BAR-mapping-setup-from-read-write-path/20180303-015851
+reproduce:
+        # apt-get install sparse
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF=-D__CHECK_ENDIAN__
 
-But a more important question is... why this?
 
-IMHO the notifier registration can be general for PCI.  Why vfio needs
-to provide it's own register callback?  Would it be enough if it only
-provides its own notify callback?
+sparse warnings: (new ones prefixed by >>)
 
-Thanks,
+>> drivers/vfio/pci/vfio_pci_rdwr.c:290:1: sparse: incorrect type in argument 2 (different address spaces) @@    expected void [noderef] <asn:2>*<noident> @@    got sn:2>*<noident> @@
+   drivers/vfio/pci/vfio_pci_rdwr.c:290:1:    expected void [noderef] <asn:2>*<noident>
+   drivers/vfio/pci/vfio_pci_rdwr.c:290:1:    got void *opaque
+   drivers/vfio/pci/vfio_pci_rdwr.c:291:1: sparse: incorrect type in argument 2 (different address spaces) @@    expected void [noderef] <asn:2>*<noident> @@    got sn:2>*<noident> @@
+   drivers/vfio/pci/vfio_pci_rdwr.c:291:1:    expected void [noderef] <asn:2>*<noident>
+   drivers/vfio/pci/vfio_pci_rdwr.c:291:1:    got void *opaque
+   drivers/vfio/pci/vfio_pci_rdwr.c:292:1: sparse: incorrect type in argument 2 (different address spaces) @@    expected void [noderef] <asn:2>*<noident> @@    got sn:2>*<noident> @@
+   drivers/vfio/pci/vfio_pci_rdwr.c:292:1:    expected void [noderef] <asn:2>*<noident>
+   drivers/vfio/pci/vfio_pci_rdwr.c:292:1:    got void *opaque
+>> drivers/vfio/pci/vfio_pci_rdwr.c:378:52: sparse: incorrect type in argument 1 (different address spaces) @@    expected void *opaque @@    got void [noderef] <avoid *opaque @@
+   drivers/vfio/pci/vfio_pci_rdwr.c:378:52:    expected void *opaque
+   drivers/vfio/pci/vfio_pci_rdwr.c:378:52:    got void [noderef] <asn:2>*
 
-> +        return;
-> +    }
->  }
->  
->  static void vfio_pci_device_sva_unregister_notifier(PCIBus *bus,
-> -- 
-> 1.9.1
-> 
+vim +290 drivers/vfio/pci/vfio_pci_rdwr.c
 
--- 
-Peter Xu
+   286	
+   287	#ifdef iowrite64
+   288	VFIO_PCI_IOEVENTFD_HANDLER(64)
+   289	#endif
+ > 290	VFIO_PCI_IOEVENTFD_HANDLER(32)
+   291	VFIO_PCI_IOEVENTFD_HANDLER(16)
+   292	VFIO_PCI_IOEVENTFD_HANDLER(8)
+   293	
+   294	long vfio_pci_ioeventfd(struct vfio_pci_device *vdev, loff_t offset,
+   295				uint64_t data, int count, int fd)
+   296	{
+   297		struct pci_dev *pdev = vdev->pdev;
+   298		loff_t pos = offset & VFIO_PCI_OFFSET_MASK;
+   299		int ret, bar = VFIO_PCI_OFFSET_TO_INDEX(offset);
+   300		struct vfio_pci_ioeventfd *ioeventfd;
+   301		int (*handler)(void *addr, void *value);
+   302	
+   303		/* Only support ioeventfds into BARs */
+   304		if (bar > VFIO_PCI_BAR5_REGION_INDEX)
+   305			return -EINVAL;
+   306	
+   307		if (pos + count > pci_resource_len(pdev, bar))
+   308			return -EINVAL;
+   309	
+   310		/* Disallow ioeventfds working around MSI-X table writes */
+   311		if (bar == vdev->msix_bar &&
+   312		    !(pos + count <= vdev->msix_offset ||
+   313		      pos >= vdev->msix_offset + vdev->msix_size))
+   314			return -EINVAL;
+   315	
+   316		switch (count) {
+   317		case 1:
+   318			handler = &vfio_pci_ioeventfd_handler8;
+   319			break;
+   320		case 2:
+   321			handler = &vfio_pci_ioeventfd_handler16;
+   322			break;
+   323		case 4:
+   324			handler = &vfio_pci_ioeventfd_handler32;
+   325			break;
+   326	#ifdef iowrite64
+   327		case 8:
+   328			handler = &vfio_pci_ioeventfd_handler64;
+   329			break;
+   330	#endif
+   331		default:
+   332			return -EINVAL;
+   333		}
+   334	
+   335		ret = vfio_pci_setup_barmap(vdev, bar);
+   336		if (ret)
+   337			return ret;
+   338	
+   339		mutex_lock(&vdev->ioeventfds_lock);
+   340	
+   341		list_for_each_entry(ioeventfd, &vdev->ioeventfds_list, next) {
+   342			if (ioeventfd->pos == pos && ioeventfd->bar == bar &&
+   343			    ioeventfd->data == data && ioeventfd->count == count) {
+   344				if (fd == -1) {
+   345					vfio_virqfd_disable(&ioeventfd->virqfd);
+   346					list_del(&ioeventfd->next);
+   347					vdev->ioeventfds_nr--;
+   348					kfree(ioeventfd);
+   349					ret = 0;
+   350				} else
+   351					ret = -EEXIST;
+   352	
+   353				goto out_unlock;
+   354			}
+   355		}
+   356	
+   357		if (fd < 0) {
+   358			ret = -ENODEV;
+   359			goto out_unlock;
+   360		}
+   361	
+   362		if (vdev->ioeventfds_nr >= VFIO_PCI_IOEVENTFD_MAX) {
+   363			ret = -ENOSPC;
+   364			goto out_unlock;
+   365		}
+   366	
+   367		ioeventfd = kzalloc(sizeof(*ioeventfd), GFP_KERNEL);
+   368		if (!ioeventfd) {
+   369			ret = -ENOMEM;
+   370			goto out_unlock;
+   371		}
+   372	
+   373		ioeventfd->pos = pos;
+   374		ioeventfd->bar = bar;
+   375		ioeventfd->data = data;
+   376		ioeventfd->count = count;
+   377	
+ > 378		ret = vfio_virqfd_enable(vdev->barmap[bar] + pos, handler, NULL,
+
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
