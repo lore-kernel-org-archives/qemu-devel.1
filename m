@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1etHcJ-0003M0-Tr
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 13:47:17 -0500
+	(envelope-from <bounces@canonical.com>) id 1etDgv-0003jL-In
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:35:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1etHcG-0000oo-NM
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 13:47:15 -0500
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:34750)
+	(envelope-from <bounces@canonical.com>) id 1etDgs-0007wC-Uc
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:35:45 -0500
+Received: from indium.canonical.com ([91.189.90.7]:43554)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1etHcG-0000nH-GH
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 13:47:12 -0500
-Received: by mail-wr0-x22f.google.com with SMTP id o8so10503561wra.1
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 10:47:12 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180306154650.24075-1-berrange@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f774b431-ac8b-347b-806d-157a7ee5a121@amsat.org>
-Date: Tue, 6 Mar 2018 15:47:09 -0300
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1etDgs-0007vX-No
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:35:42 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1etDgq-0007mQ-FQ
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 14:35:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 33BC52E80CE
+	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 14:35:40 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180306154650.24075-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] trace: include filename when printing
- parser error messages
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 06 Mar 2018 14:28:33 -0000
+From: Guenter Roeck <public@roeck-us.net>
+Reply-To: Bug 1753309 <1753309@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152019341691.7537.9997390122339723494.malonedeb@gac.canonical.com>
+Message-Id: <152034651354.20543.17789694574886324395.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1753309] Re: Ethernet interrupt vectors for
+ sabrelite machine are defined backwards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,92 +37,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 03/06/2018 12:46 PM, Daniel P. Berrangé wrote:
-> Improves error messages from:
-> 
->   ValueError: Error on line 72: need more than 1 value to unpack
-> 
-> To
-> 
->   ValueError: Error at /home/berrange/src/virt/qemu/trace-events:72:
->     need more than 1 value to unpack
-> 
-> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+Swapping the interrupt pins fixes the problem on Linux v4.13 and later.
+Older kernels start failing as follows.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+ On v4.12 and earlier, the Ethernet interface fails to instantiate with
+    fec 2188000.ethernet (unnamed net_device) (uninitialized): MDIO read ti=
+meout
+    fec: probe of 2188000.ethernet failed with error -5
+  I have not found the reason yet. Unmodified qemu works fine.
+- v4.1 and earlier crash. The crash is due to a bad error path and fixed by=
+ commit
+  32cba57ba74be ("net: fec: introduce fec_ptp_stop and use in probe fail pa=
+th").
 
-> ---
->  scripts/simpletrace.py        | 4 ++--
->  scripts/tracetool.py          | 2 +-
->  scripts/tracetool/__init__.py | 6 ++++--
->  3 files changed, 7 insertions(+), 5 deletions(-)
-> 
-> diff --git a/scripts/simpletrace.py b/scripts/simpletrace.py
-> index a3a6315055..fefc0806b8 100755
-> --- a/scripts/simpletrace.py
-> +++ b/scripts/simpletrace.py
-> @@ -168,7 +168,7 @@ class Analyzer(object):
->  def process(events, log, analyzer, read_header=True):
->      """Invoke an analyzer on each event in a log."""
->      if isinstance(events, str):
-> -        events = read_events(open(events, 'r'))
-> +        events = read_events(open(events, 'r'), events)
->      if isinstance(log, str):
->          log = open(log, 'rb')
->  
-> @@ -233,7 +233,7 @@ def run(analyzer):
->                           '<trace-file>\n' % sys.argv[0])
->          sys.exit(1)
->  
-> -    events = read_events(open(sys.argv[1], 'r'))
-> +    events = read_events(open(sys.argv[1], 'r'), sys.argv[1])
->      process(events, sys.argv[2], analyzer, read_header=read_header)
->  
->  if __name__ == '__main__':
-> diff --git a/scripts/tracetool.py b/scripts/tracetool.py
-> index c55a21518b..fe2b0771f2 100755
-> --- a/scripts/tracetool.py
-> +++ b/scripts/tracetool.py
-> @@ -142,7 +142,7 @@ def main(args):
->      events = []
->      for arg in args:
->          with open(arg, "r") as fh:
-> -            events.extend(tracetool.read_events(fh))
-> +            events.extend(tracetool.read_events(fh, arg))
->  
->      try:
->          tracetool.generate(events, arg_group, arg_format, arg_backends,
-> diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.py
-> index 52cc687ae3..b645be30d1 100644
-> --- a/scripts/tracetool/__init__.py
-> +++ b/scripts/tracetool/__init__.py
-> @@ -336,13 +336,15 @@ class Event(object):
->                       self)
->  
->  
-> -def read_events(fobj):
-> +def read_events(fobj, fname):
->      """Generate the output for the given (format, backends) pair.
->  
->      Parameters
->      ----------
->      fobj : file
->          Event description file.
-> +    fname : str
-> +        Name of event file
->  
->      Returns a list of Event objects
->      """
-> @@ -357,7 +359,7 @@ def read_events(fobj):
->          try:
->              event = Event.build(line)
->          except ValueError as e:
-> -            arg0 = 'Error on line %d: %s' % (lineno, e.args[0])
-> +            arg0 = 'Error at %s:%d: %s' % (fname, lineno, e.args[0])
->              e.args = (arg0,) + e.args[1:]
->              raise
->  
-> 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1753309
+
+Title:
+  Ethernet interrupt vectors for sabrelite machine are defined backwards
+
+Status in QEMU:
+  New
+
+Bug description:
+  The sabrelite machine model used by qemu-system-arm is based on the
+  Freescale/NXP i.MX6Q processor. This SoC has an on-board ethernet
+  controller which is supported in QEMU using the imx_fec.c module
+  (actually called imx.enet for this model.)
+
+  The include/hw/arm/fsm-imx6.h file defines the interrupt vectors for
+  the imx.enet device like this:
+
+  #define FSL_IMX6_ENET_MAC_1588_IRQ 118
+  #define FSL_IMX6_ENET_MAC_IRQ 119
+
+  However, this is backwards. The reference manual for the i.MX6D/Q
+  devices can be found here:
+
+  https://www.nxp.com/docs/en/reference-manual/IMX6DQRM.pdf
+
+  On page 225, in Table 3-1. ARM Cortex A9 domain interrupt summary, it
+  shows the following:
+
+  150 ENET
+  MAC 0 IRQ, Logical OR of:
+  MAC 0 Periodic Timer Overflow
+  MAC 0 Time Stamp Available
+  MAC 0 Time Stamp Available
+  MAC 0 Time Stamp Available
+  MAC 0 Payload Receive Error
+  MAC 0 Transmit FIFO Underrun
+  MAC 0 Collision Retry Limit
+  MAC 0 Late Collision
+  MAC 0 Ethernet Bus Error
+  MAC 0 MII Data Transfer Done
+  MAC 0 Receive Buffer Done
+  MAC 0 Receive Frame Done
+  MAC 0 Transmit Buffer Done
+  MAC 0 Transmit Frame Done
+  MAC 0 Graceful Stop
+  MAC 0 Babbling Transmit Error
+  MAC 0 Babbling Receive Error
+  MAC 0 Wakeup Request [synchronous]
+
+  151 ENET
+  MAC 0 1588 Timer interrupt [synchronous] request
+
+  Note:
+  150 - 32 =3D=3D 118
+  151 - 32 =3D=3D 119
+
+  In other words, the vector definitions in the fsl-imx6.h file are
+  reversed. The correct definition is:
+
+  #define FSL_IMX6_ENET_MAC_IRQ 118
+  #define FSL_IMX6_ENET_MAC_1588_IRQ 119
+
+  I tested the sabrelite simulation using VxWorks 7 (which supports the
+  SabreLite board) and found that while I was able to send and receive
+  packet data via the simulated ethernet interface, the VxWorks i.MX6
+  ethernet driver failed to receive any interrupts. When I corrected the
+  interrupt vector definitions as shown above and recompiled QEMU,
+  everything worked as expected. I was able to exchange ICMP packets
+  with the simulated target and telnet to/from the VxWorks instance
+  running in the virtual machine. I used the tap interface for this.
+
+  As a workaround I was also able to make the ethernet work by modifying
+  the VxWorks imx6q-sabrelite.dts file to change the ethernet interrupt
+  property from 150 to 151.
+
+  This problem was observed with the following environment:
+
+  Host: FreeBSD/amd64 11.1-RELEASE
+  QEMU version: 2.11.0 and 2.11.1 built from source code
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1753309/+subscriptions
