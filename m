@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1etAdV-0002Nq-5M
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:20:02 -0500
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1etAdy-0002oP-LF
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:20:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1etAdU-0001mu-5i
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:20:01 -0500
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:42988)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1etAdU-0001md-0a
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:20:00 -0500
-Received: by mail-oi0-x242.google.com with SMTP id c18so14511763oiy.9
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 03:19:59 -0800 (PST)
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1etAdv-00021X-De
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:20:30 -0500
+Received: from mga03.intel.com ([134.134.136.65]:63952)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
+	id 1etAdv-000212-34
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:20:27 -0500
+Date: Tue, 6 Mar 2018 19:03:37 +0800
+From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Message-ID: <20180306110337.GC3158@sky-dev>
+References: <1519900415-30314-1-git-send-email-yi.l.liu@linux.intel.com>
+	<1519900415-30314-9-git-send-email-yi.l.liu@linux.intel.com>
+	<f9ee648a-ff93-b57a-4b05-6bd0f40c15bf@redhat.com>
+	<20180305084207.GE2482@sky-dev>
+	<2160f478-2c8a-8fbe-1df8-78c1984cf375@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180306040154.3669-1-david@gibson.dropbear.id.au>
-References: <20180306040154.3669-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 6 Mar 2018 11:19:38 +0000
-Message-ID: <CAFEAcA9wA-Go6SPy6yWsh4TLJMtG1gWnNWsgbgwZ6JL1dQYUxA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/30] ppc-for-2.12 queue 20180306
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2160f478-2c8a-8fbe-1df8-78c1984cf375@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 08/12] hw/pci: introduce
+ pci_device_notify_iommu()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Greg Kurz <groug@kaod.org>, Alexander Graf <agraf@suse.de>, surajjs@au1.ibm.com, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kevin.tian@intel.com, yi.l.liu@intel.com, mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com, alex.williamson@redhat.com, eric.auger.pro@gmail.com, david@gibson.dropbear.id.au
 
-On 6 March 2018 at 04:01, David Gibson <david@gibson.dropbear.id.au> wrote:
-> The following changes since commit f2bb2d14c2958f3f5aef456bd2cdb1ff99f4a562:
->
->   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2018-03-05 16:41:20 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-2.12-20180306
->
-> for you to fetch changes up to 21b786f607b11d888f90bbb8c3414500515d11e7:
->
->   PowerPC: Add TS bits into msr_mask (2018-03-06 13:16:29 +1100)
->
-> ----------------------------------------------------------------
-> ppc patch queue 2018-03-06
->
-> This pull request supersedes ppc-for-2.12-20180302 which had compile
-> problems with some gcc versions.  It also contains a few additional
-> patches.
->
-> Highlights are:
->     * New Sam460ex machine type
->     * Yet more fixes related to vcpu id allocation for spapr
->     * Numerous macio cleanupsr
->     * Some enhancements to the Spectre/Meltdown fixes for pseries,
->       allowing use of a better mitigation for indirect branch based
->       exploits
->     * New pseries machine types with Spectre/Meltdown mitigations
->       enabled (stop gap until libvirt and management understands the
->       machine options)
->     * A handful of other fixes
->
+On Tue, Mar 06, 2018 at 11:18:43AM +0100, Paolo Bonzini wrote:
+> On 05/03/2018 09:42, Liu, Yi L wrote:
+> >> In general I think it's better to change your names from "assigned_dev"
+> >> to "sva_dev", because the point of the list is to only iterate over
+> >> devices that might be interested in using SVA.
+> >
+> > For "assigned_dev", my purpose is to distinguish "assigned devices" from
+> > emulated devices. Only the SVA usage on "assigned devices" is cared here.
+> > But it is true only SVA capable device is interested. So I may need to
+> > rename it as "assigned_sva_dev". How about your opinion?
+> 
+> What you care about is not whether the device assigned, but rather
+> whether it called or not pci_setup_sva_ops.  Currently only VFIO does
+> this, but that's not a requirement.  Hence my suggestion of calling it
+> sva_dev.
 
-Applied, thanks.
+Yes, only VFIO calls pci_setup_sva_ops so far, but it should not limited to.
+I'll apply in next version.
 
--- PMM
+Thanks,
+Yi Liu
