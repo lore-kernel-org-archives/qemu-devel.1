@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50595)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1etAgJ-0004OT-JE
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1etAgJ-0004OG-AA
 	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:22:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1etAgF-0002yH-Mj
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1etAgG-0002yY-2j
 	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:22:55 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:34970)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1etAgF-0002xz-Fo
+Received: from mga17.intel.com ([192.55.52.151]:34016)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
+	id 1etAgF-0002xu-OB
 	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:22:51 -0500
-Received: by mail-wr0-x244.google.com with SMTP id l43so20547592wrc.2
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 03:22:51 -0800 (PST)
+Date: Tue, 6 Mar 2018 19:06:01 +0800
+From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Message-ID: <20180306110601.GD3158@sky-dev>
+References: <1519900415-30314-1-git-send-email-yi.l.liu@linux.intel.com>
+	<1519900415-30314-9-git-send-email-yi.l.liu@linux.intel.com>
+	<f06bee8b-646d-e9e8-d2e6-78cdddb76ab1@redhat.com>
+	<20180305084309.GF2482@sky-dev> <20180305104346.GD7584@xz-mi>
+	<83f9d85f-a6f8-0fc0-9097-e9f761148bab@redhat.com>
+	<20180306104727.GB17720@xz-mi>
 MIME-Version: 1.0
-In-Reply-To: <20180306074053.22856-1-kraxel@redhat.com>
-References: <20180306074053.22856-1-kraxel@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 6 Mar 2018 12:22:49 +0100
-Message-ID: <CAJ+F1CK5MsZ5=-z2yWznBcHjZqskHSdiyYxC30azEcQ9AXrRLg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/7] audio: modularize
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180306104727.GB17720@xz-mi>
+Subject: Re: [Qemu-devel] [PATCH v3 08/12] hw/pci: introduce
+ pci_device_notify_iommu()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +33,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com, david@gibson.dropbear.id.au, alex.williamson@redhat.com, eric.auger.pro@gmail.com, yi.l.liu@intel.com, kevin.tian@intel.com, jasowang@redhat.com
 
-Hi
+On Tue, Mar 06, 2018 at 06:47:27PM +0800, Peter Xu wrote:
+> On Tue, Mar 06, 2018 at 11:19:13AM +0100, Paolo Bonzini wrote:
+> > On 05/03/2018 11:43, Peter Xu wrote:
+> > > On Mon, Mar 05, 2018 at 04:43:09PM +0800, Liu, Yi L wrote:
+> > >> On Fri, Mar 02, 2018 at 05:06:56PM +0100, Paolo Bonzini wrote:
+> > >>> On 01/03/2018 11:33, Liu, Yi L wrote:
+> > >>>> +    pci_device_notify_iommu(pdev, PCI_NTY_DEV_ADD);
+> > >>>> +
+> > >>>>      pci_setup_sva_ops(pdev, &vfio_pci_sva_ops);
+> > >>>>  
+> > >>>>      return;
+> > >>>> @@ -3134,6 +3136,7 @@ static void vfio_exitfn(PCIDevice *pdev)
+> > >>>>  {
+> > >>>>      VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
+> > >>>>  
+> > >>>> +    pci_device_notify_iommu(pdev, PCI_NTY_DEV_DEL);
+> > >>>
+> > >>> Please make the names longer: PCI_IOMMU_NOTIFY_DEVICE_ADDED and
+> > >>> PCI_IOMMU_NOTIFY_DEVICE_REMOVED.  (This is independent of my other
+> > >>> remark, about doing this in generic PCI code for all devices that
+> > >>> register SVA ops).
+> > >>
+> > >> Thanks for the suggestion, will appply.
+> > > 
+> > > Isn't the name too generic if it's tailored for VFIO only? Would
+> > > something like PCI_IOMMU_NOTIFY_VFIO_ADD be a bit better?
+> > 
+> > I don't think it's for VFIO only.  It's just that VFIO is the only
+> > caller of pci_setup_sva_ops.
+> 
+> Indeed.  E.g., we can have emulated devices that also want to provide
+> the SVA ops.
 
-On Tue, Mar 6, 2018 at 8:40 AM, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> Add audio driver (host backend) registry.  Add audio module support.
-> Enable module builds for alsa, oss, pulse and sdl.
->
-> Gerd Hoffmann (7):
->   audio: add driver registry
->   audio: add module loading support
->   build: enable audio modules
->   audio/alsa: build as module
->   audio/oss: build as module
->   audio/pulseaudio: build as module
->   audio/sdl: build as module
->
+Excatly as Paolo commented. ^_^
 
-Is this a problem on my side? (configure
-'--audio-drv-list=3Doss,alsa,pa,sdl' '--enable-modules')
-
-elmarco@boraha:~/src/qemu/build (master %)$
-x86_64-softmmu/qemu-system-x86_64 -audio-help
-Failed to open module:
-/home/elmarco/src/qemu/build/x86_64-softmmu/../audio-oss.so: undefined
-symbol: _TRACE_OSS_INVALID_AVAILABLE_SIZE_DSTATE
-Failed to open module:
-/home/elmarco/src/qemu/build/x86_64-softmmu/../audio-alsa.so:
-undefined symbol: _TRACE_ALSA_XRUN_OUT_DSTATE
-Failed to open module:
-/home/elmarco/src/qemu/build/x86_64-softmmu/../audio-pa.so: undefined
-symbol: audio_pt_unlock_and_signal
-Failed to open module:
-/home/elmarco/src/qemu/build/x86_64-softmmu/../audio-sdl.so: undefined
-symbol: audio_pcm_sw_write
-
->  configure             |  7 ++++-
->  Makefile              |  4 +++
->  Makefile.objs         |  1 +
->  audio/audio_int.h     | 14 ++++-----
->  include/qemu/module.h |  1 +
->  audio/alsaaudio.c     |  8 ++++-
->  audio/audio.c         | 83 +++++++++++++++++++++++++++++++++++----------=
-------
->  audio/coreaudio.c     |  8 ++++-
->  audio/dsoundaudio.c   |  8 ++++-
->  audio/noaudio.c       |  8 ++++-
->  audio/ossaudio.c      |  8 ++++-
->  audio/paaudio.c       |  8 ++++-
->  audio/sdlaudio.c      |  8 ++++-
->  audio/spiceaudio.c    |  8 ++++-
->  audio/wavaudio.c      |  8 ++++-
->  audio/Makefile.objs   | 30 +++++++++++++------
->  scripts/create_config |  2 +-
->  17 files changed, 159 insertions(+), 55 deletions(-)
->
-> --
-> 2.9.3
->
->
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+Thanks,
+Yi Liu 
