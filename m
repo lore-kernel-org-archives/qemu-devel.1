@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1et3nx-0001XL-Vy
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:02:25 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1et3nz-0001Ze-Ud
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:02:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1et3nu-0004Tv-Ss
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:02:22 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1et3nv-0004UV-D5
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:02:23 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue,  6 Mar 2018 15:01:35 +1100
-Message-Id: <20180306040154.3669-12-david@gibson.dropbear.id.au>
+Date: Tue,  6 Mar 2018 15:01:41 +1100
+Message-Id: <20180306040154.3669-18-david@gibson.dropbear.id.au>
 In-Reply-To: <20180306040154.3669-1-david@gibson.dropbear.id.au>
 References: <20180306040154.3669-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 11/30] heathrow: QOMify heathrow PIC
+Subject: [Qemu-devel] [PULL 17/30] openpic: move OpenPIC state and related
+ definitions to openpic.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,294 +25,383 @@ Cc: agraf@suse.de, surajjs@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.o
 
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
+This is to faciliate access to OpenPICState when wiring up the PIC to the macio
+controller.
+
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/heathrow_pic.c         | 126 +++++++++++++++++++++++------------------
- include/hw/intc/heathrow_pic.h |  49 ++++++++++++++++
- 2 files changed, 119 insertions(+), 56 deletions(-)
- create mode 100644 include/hw/intc/heathrow_pic.h
+ hw/intc/openpic.c        | 157 ----------------------------------------------
+ include/hw/ppc/openpic.h | 159 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 158 insertions(+), 158 deletions(-)
 
-diff --git a/hw/intc/heathrow_pic.c b/hw/intc/heathrow_pic.c
-index 171f5ed814..7bf44e0d86 100644
---- a/hw/intc/heathrow_pic.c
-+++ b/hw/intc/heathrow_pic.c
-@@ -25,6 +25,7 @@
- #include "qemu/osdep.h"
- #include "hw/hw.h"
- #include "hw/ppc/mac.h"
-+#include "hw/intc/heathrow_pic.h"
+diff --git a/hw/intc/openpic.c b/hw/intc/openpic.c
+index 9159a06f07..811cee9b26 100644
+--- a/hw/intc/openpic.c
++++ b/hw/intc/openpic.c
+@@ -63,10 +63,6 @@ static int get_current_cpu(void);
+         } \
+     } while (0)
  
- /* debug PIC */
- //#define DEBUG_PIC
-@@ -36,39 +37,27 @@
- #define PIC_DPRINTF(fmt, ...)
- #endif
- 
--typedef struct HeathrowPIC {
--    uint32_t events;
--    uint32_t mask;
--    uint32_t levels;
--    uint32_t level_triggered;
--} HeathrowPIC;
+-#define MAX_CPU     32
+-#define MAX_MSI     8
+-#define VID         0x03 /* MPIC version ID */
 -
--typedef struct HeathrowPICS {
--    MemoryRegion mem;
--    HeathrowPIC pics[2];
+ /* OpenPIC capability flags */
+ #define OPENPIC_FLAG_IDR_CRIT     (1 << 0)
+ #define OPENPIC_FLAG_ILR          (2 << 0)
+@@ -85,35 +81,6 @@ static int get_current_cpu(void);
+ #define OPENPIC_CPU_REG_START        0x20000
+ #define OPENPIC_CPU_REG_SIZE         0x100 + ((MAX_CPU - 1) * 0x1000)
+ 
+-/* Raven */
+-#define RAVEN_MAX_CPU      2
+-#define RAVEN_MAX_EXT     48
+-#define RAVEN_MAX_IRQ     64
+-#define RAVEN_MAX_TMR      OPENPIC_MAX_TMR
+-#define RAVEN_MAX_IPI      OPENPIC_MAX_IPI
+-
+-/* KeyLargo */
+-#define KEYLARGO_MAX_CPU  4
+-#define KEYLARGO_MAX_EXT  64
+-#define KEYLARGO_MAX_IPI  4
+-#define KEYLARGO_MAX_IRQ  (64 + KEYLARGO_MAX_IPI)
+-#define KEYLARGO_MAX_TMR  0
+-#define KEYLARGO_IPI_IRQ  (KEYLARGO_MAX_EXT) /* First IPI IRQ */
+-/* Timers don't exist but this makes the code happy... */
+-#define KEYLARGO_TMR_IRQ  (KEYLARGO_IPI_IRQ + KEYLARGO_MAX_IPI)
+-
+-/* Interrupt definitions */
+-#define RAVEN_FE_IRQ     (RAVEN_MAX_EXT)     /* Internal functional IRQ */
+-#define RAVEN_ERR_IRQ    (RAVEN_MAX_EXT + 1) /* Error IRQ */
+-#define RAVEN_TMR_IRQ    (RAVEN_MAX_EXT + 2) /* First timer IRQ */
+-#define RAVEN_IPI_IRQ    (RAVEN_TMR_IRQ + RAVEN_MAX_TMR) /* First IPI IRQ */
+-/* First doorbell IRQ */
+-#define RAVEN_DBL_IRQ    (RAVEN_IPI_IRQ + (RAVEN_MAX_CPU * RAVEN_MAX_IPI))
+-
+-typedef struct FslMpicInfo {
+-    int max_ext;
+-} FslMpicInfo;
+-
+ static FslMpicInfo fsl_mpic_20 = {
+     .max_ext = 12,
+ };
+@@ -211,55 +178,6 @@ static void openpic_cpu_write_internal(void *opaque, hwaddr addr,
+                                        uint32_t val, int idx);
+ static void openpic_reset(DeviceState *d);
+ 
+-typedef enum IRQType {
+-    IRQ_TYPE_NORMAL = 0,
+-    IRQ_TYPE_FSLINT,        /* FSL internal interrupt -- level only */
+-    IRQ_TYPE_FSLSPECIAL,    /* FSL timer/IPI interrupt, edge, no polarity */
+-} IRQType;
+-
+-/* Round up to the nearest 64 IRQs so that the queue length
+- * won't change when moving between 32 and 64 bit hosts.
+- */
+-#define IRQQUEUE_SIZE_BITS ((OPENPIC_MAX_IRQ + 63) & ~63)
+-
+-typedef struct IRQQueue {
+-    unsigned long *queue;
+-    int32_t queue_size; /* Only used for VMSTATE_BITMAP */
+-    int next;
+-    int priority;
+-} IRQQueue;
+-
+-typedef struct IRQSource {
+-    uint32_t ivpr;  /* IRQ vector/priority register */
+-    uint32_t idr;   /* IRQ destination register */
+-    uint32_t destmask; /* bitmap of CPU destinations */
+-    int last_cpu;
+-    int output;     /* IRQ level, e.g. OPENPIC_OUTPUT_INT */
+-    int pending;    /* TRUE if IRQ is pending */
+-    IRQType type;
+-    bool level:1;   /* level-triggered */
+-    bool nomask:1;  /* critical interrupts ignore mask on some FSL MPICs */
+-} IRQSource;
+-
+-#define IVPR_MASK_SHIFT       31
+-#define IVPR_MASK_MASK        (1U << IVPR_MASK_SHIFT)
+-#define IVPR_ACTIVITY_SHIFT   30
+-#define IVPR_ACTIVITY_MASK    (1U << IVPR_ACTIVITY_SHIFT)
+-#define IVPR_MODE_SHIFT       29
+-#define IVPR_MODE_MASK        (1U << IVPR_MODE_SHIFT)
+-#define IVPR_POLARITY_SHIFT   23
+-#define IVPR_POLARITY_MASK    (1U << IVPR_POLARITY_SHIFT)
+-#define IVPR_SENSE_SHIFT      22
+-#define IVPR_SENSE_MASK       (1U << IVPR_SENSE_SHIFT)
+-
+-#define IVPR_PRIORITY_MASK     (0xFU << 16)
+-#define IVPR_PRIORITY(_ivprr_) ((int)(((_ivprr_) & IVPR_PRIORITY_MASK) >> 16))
+-#define IVPR_VECTOR(opp, _ivprr_) ((_ivprr_) & (opp)->vector_mask)
+-
+-/* IDR[EP/CI] are only for FSL MPIC prior to v4.0 */
+-#define IDR_EP      0x80000000  /* external pin */
+-#define IDR_CI      0x40000000  /* critical interrupt */
+-
+ /* Convert between openpic clock ticks and nanosecs.  In the hardware the clock
+    frequency is driven by board inputs to the PIC which the PIC would then
+    divide by 4 or 8.  For now hard code to 25MZ.
+@@ -275,81 +193,6 @@ static inline uint64_t ticks_to_ns(uint64_t ticks)
+     return ticks * OPENPIC_TIMER_NS_PER_TICK;
+ }
+ 
+-typedef struct OpenPICTimer {
+-    uint32_t tccr;  /* Global timer current count register */
+-    uint32_t tbcr;  /* Global timer base count register */
+-    int                   n_IRQ;
+-    bool                  qemu_timer_active; /* Is the qemu_timer is running? */
+-    struct QEMUTimer     *qemu_timer;
+-    struct OpenPICState  *opp;          /* Device timer is part of. */
+-    /* The QEMU_CLOCK_VIRTUAL time (in ns) corresponding to the last
+-       current_count written or read, only defined if qemu_timer_active. */
+-    uint64_t              origin_time;
+-} OpenPICTimer;
+-
+-typedef struct OpenPICMSI {
+-    uint32_t msir;   /* Shared Message Signaled Interrupt Register */
+-} OpenPICMSI;
+-
+-typedef struct IRQDest {
+-    int32_t ctpr; /* CPU current task priority */
+-    IRQQueue raised;
+-    IRQQueue servicing;
 -    qemu_irq *irqs;
--} HeathrowPICS;
 -
--static inline int check_irq(HeathrowPIC *pic)
-+static inline int heathrow_check_irq(HeathrowPICState *pic)
- {
-     return (pic->events | (pic->levels & pic->level_triggered)) & pic->mask;
- }
- 
- /* update the CPU irq state */
--static void heathrow_pic_update(HeathrowPICS *s)
-+static void heathrow_update_irq(HeathrowState *s)
- {
--    if (check_irq(&s->pics[0]) || check_irq(&s->pics[1])) {
-+    if (heathrow_check_irq(&s->pics[0]) ||
-+            heathrow_check_irq(&s->pics[1])) {
-         qemu_irq_raise(s->irqs[0]);
-     } else {
-         qemu_irq_lower(s->irqs[0]);
-     }
- }
- 
--static void pic_write(void *opaque, hwaddr addr,
--                      uint64_t value, unsigned size)
-+static void heathrow_write(void *opaque, hwaddr addr,
-+                           uint64_t value, unsigned size)
- {
--    HeathrowPICS *s = opaque;
--    HeathrowPIC *pic;
-+    HeathrowState *s = opaque;
-+    HeathrowPICState *pic;
-     unsigned int n;
- 
-     n = ((addr & 0xfff) - 0x10) >> 4;
-@@ -79,24 +68,24 @@ static void pic_write(void *opaque, hwaddr addr,
-     switch(addr & 0xf) {
-     case 0x04:
-         pic->mask = value;
--        heathrow_pic_update(s);
-+        heathrow_update_irq(s);
-         break;
-     case 0x08:
-         /* do not reset level triggered IRQs */
-         value &= ~pic->level_triggered;
-         pic->events &= ~value;
--        heathrow_pic_update(s);
-+        heathrow_update_irq(s);
-         break;
-     default:
-         break;
-     }
- }
- 
--static uint64_t pic_read(void *opaque, hwaddr addr,
--                         unsigned size)
-+static uint64_t heathrow_read(void *opaque, hwaddr addr,
-+                              unsigned size)
- {
--    HeathrowPICS *s = opaque;
--    HeathrowPIC *pic;
-+    HeathrowState *s = opaque;
-+    HeathrowPICState *pic;
-     unsigned int n;
-     uint32_t value;
- 
-@@ -124,16 +113,16 @@ static uint64_t pic_read(void *opaque, hwaddr addr,
-     return value;
- }
- 
--static const MemoryRegionOps heathrow_pic_ops = {
--    .read = pic_read,
--    .write = pic_write,
-+static const MemoryRegionOps heathrow_ops = {
-+    .read = heathrow_read,
-+    .write = heathrow_write,
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
- 
--static void heathrow_pic_set_irq(void *opaque, int num, int level)
-+static void heathrow_set_irq(void *opaque, int num, int level)
- {
--    HeathrowPICS *s = opaque;
--    HeathrowPIC *pic;
-+    HeathrowState *s = opaque;
-+    HeathrowPICState *pic;
-     unsigned int irq_bit;
- 
- #if defined(DEBUG)
-@@ -153,7 +142,7 @@ static void heathrow_pic_set_irq(void *opaque, int num, int level)
-     } else {
-         pic->levels &= ~irq_bit;
-     }
--    heathrow_pic_update(s);
-+    heathrow_update_irq(s);
- }
- 
- static const VMStateDescription vmstate_heathrow_pic_one = {
-@@ -161,54 +150,79 @@ static const VMStateDescription vmstate_heathrow_pic_one = {
-     .version_id = 0,
-     .minimum_version_id = 0,
-     .fields = (VMStateField[]) {
--        VMSTATE_UINT32(events, HeathrowPIC),
--        VMSTATE_UINT32(mask, HeathrowPIC),
--        VMSTATE_UINT32(levels, HeathrowPIC),
--        VMSTATE_UINT32(level_triggered, HeathrowPIC),
-+        VMSTATE_UINT32(events, HeathrowPICState),
-+        VMSTATE_UINT32(mask, HeathrowPICState),
-+        VMSTATE_UINT32(levels, HeathrowPICState),
-+        VMSTATE_UINT32(level_triggered, HeathrowPICState),
-         VMSTATE_END_OF_LIST()
-     }
- };
- 
--static const VMStateDescription vmstate_heathrow_pic = {
-+static const VMStateDescription vmstate_heathrow = {
-     .name = "heathrow_pic",
-     .version_id = 1,
-     .minimum_version_id = 1,
-     .fields = (VMStateField[]) {
--        VMSTATE_STRUCT_ARRAY(pics, HeathrowPICS, 2, 1,
--                             vmstate_heathrow_pic_one, HeathrowPIC),
-+        VMSTATE_STRUCT_ARRAY(pics, HeathrowState, 2, 1,
-+                             vmstate_heathrow_pic_one, HeathrowPICState),
-         VMSTATE_END_OF_LIST()
-     }
- };
- 
--static void heathrow_pic_reset_one(HeathrowPIC *s)
-+static void heathrow_reset(DeviceState *d)
- {
--    memset(s, '\0', sizeof(HeathrowPIC));
-+    HeathrowState *s = HEATHROW(d);
-+
-+    s->pics[0].level_triggered = 0;
-+    s->pics[1].level_triggered = 0x1ff00000;
- }
- 
--static void heathrow_pic_reset(void *opaque)
-+static void heathrow_init(Object *obj)
- {
--    HeathrowPICS *s = opaque;
+-    /* Count of IRQ sources asserting on non-INT outputs */
+-    uint32_t outputs_active[OPENPIC_OUTPUT_NB];
+-} IRQDest;
 -
--    heathrow_pic_reset_one(&s->pics[0]);
--    heathrow_pic_reset_one(&s->pics[1]);
-+    HeathrowState *s = HEATHROW(obj);
- 
--    s->pics[0].level_triggered = 0;
--    s->pics[1].level_triggered = 0x1ff00000;
-+    memory_region_init_io(&s->mem, OBJECT(s), &heathrow_ops, s,
-+                          "heathrow-pic", 0x1000);
- }
- 
- qemu_irq *heathrow_pic_init(MemoryRegion **pmem,
-                             int nb_cpus, qemu_irq **irqs)
+-#define OPENPIC(obj) OBJECT_CHECK(OpenPICState, (obj), TYPE_OPENPIC)
+-
+-typedef struct OpenPICState {
+-    /*< private >*/
+-    SysBusDevice parent_obj;
+-    /*< public >*/
+-
+-    MemoryRegion mem;
+-
+-    /* Behavior control */
+-    FslMpicInfo *fsl;
+-    uint32_t model;
+-    uint32_t flags;
+-    uint32_t nb_irqs;
+-    uint32_t vid;
+-    uint32_t vir; /* Vendor identification register */
+-    uint32_t vector_mask;
+-    uint32_t tfrr_reset;
+-    uint32_t ivpr_reset;
+-    uint32_t idr_reset;
+-    uint32_t brr1;
+-    uint32_t mpic_mode_mask;
+-
+-    /* Sub-regions */
+-    MemoryRegion sub_io_mem[6];
+-
+-    /* Global registers */
+-    uint32_t frr; /* Feature reporting register */
+-    uint32_t gcr; /* Global configuration register  */
+-    uint32_t pir; /* Processor initialization register */
+-    uint32_t spve; /* Spurious vector register */
+-    uint32_t tfrr; /* Timer frequency reporting register */
+-    /* Source registers */
+-    IRQSource src[OPENPIC_MAX_IRQ];
+-    /* Local registers per output pin */
+-    IRQDest dst[MAX_CPU];
+-    uint32_t nb_cpus;
+-    /* Timer registers */
+-    OpenPICTimer timers[OPENPIC_MAX_TMR];
+-    uint32_t max_tmr;
+-
+-    /* Shared MSI registers */
+-    OpenPICMSI msi[MAX_MSI];
+-    uint32_t max_irq;
+-    uint32_t irq_ipi0;
+-    uint32_t irq_tim0;
+-    uint32_t irq_msi;
+-} OpenPICState;
+-
+ static inline void IRQ_setbit(IRQQueue *q, int n_IRQ)
  {
--    HeathrowPICS *s;
-+    DeviceState *d;
-+    HeathrowState *s;
+     set_bit(n_IRQ, q->queue);
+diff --git a/include/hw/ppc/openpic.h b/include/hw/ppc/openpic.h
+index 693e981965..5eb982197d 100644
+--- a/include/hw/ppc/openpic.h
++++ b/include/hw/ppc/openpic.h
+@@ -2,10 +2,13 @@
+ #define OPENPIC_H
  
--    s = g_malloc0(sizeof(HeathrowPICS));
-+    d = qdev_create(NULL, TYPE_HEATHROW);
-+    qdev_init_nofail(d);
-+
-+    s = HEATHROW(d);
-     /* only 1 CPU */
-     s->irqs = irqs[0];
--    memory_region_init_io(&s->mem, NULL, &heathrow_pic_ops, s,
--                          "heathrow-pic", 0x1000);
-+
-     *pmem = &s->mem;
+ #include "qemu-common.h"
++#include "hw/sysbus.h"
+ #include "hw/qdev-core.h"
+ #include "qom/cpu.h"
  
--    vmstate_register(NULL, -1, &vmstate_heathrow_pic, s);
--    qemu_register_reset(heathrow_pic_reset, s);
--    return qemu_allocate_irqs(heathrow_pic_set_irq, s, 64);
-+    return qemu_allocate_irqs(heathrow_set_irq, s, HEATHROW_NUM_IRQS);
-+}
+-#define TYPE_OPENPIC "openpic"
++#define MAX_CPU     32
++#define MAX_MSI     8
++#define VID         0x03 /* MPIC version ID */
+ 
+ /* OpenPIC have 5 outputs per CPU connected and one IRQ out single output */
+ enum {
+@@ -28,4 +31,158 @@ enum {
+ #define OPENPIC_MAX_IRQ     (OPENPIC_MAX_SRC + OPENPIC_MAX_IPI + \
+                              OPENPIC_MAX_TMR)
+ 
++/* Raven */
++#define RAVEN_MAX_CPU      2
++#define RAVEN_MAX_EXT     48
++#define RAVEN_MAX_IRQ     64
++#define RAVEN_MAX_TMR      OPENPIC_MAX_TMR
++#define RAVEN_MAX_IPI      OPENPIC_MAX_IPI
 +
-+static void heathrow_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
++/* KeyLargo */
++#define KEYLARGO_MAX_CPU  4
++#define KEYLARGO_MAX_EXT  64
++#define KEYLARGO_MAX_IPI  4
++#define KEYLARGO_MAX_IRQ  (64 + KEYLARGO_MAX_IPI)
++#define KEYLARGO_MAX_TMR  0
++#define KEYLARGO_IPI_IRQ  (KEYLARGO_MAX_EXT) /* First IPI IRQ */
++/* Timers don't exist but this makes the code happy... */
++#define KEYLARGO_TMR_IRQ  (KEYLARGO_IPI_IRQ + KEYLARGO_MAX_IPI)
 +
-+    dc->reset = heathrow_reset;
-+    dc->vmsd = &vmstate_heathrow;
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
- }
++/* Interrupt definitions */
++#define RAVEN_FE_IRQ     (RAVEN_MAX_EXT)     /* Internal functional IRQ */
++#define RAVEN_ERR_IRQ    (RAVEN_MAX_EXT + 1) /* Error IRQ */
++#define RAVEN_TMR_IRQ    (RAVEN_MAX_EXT + 2) /* First timer IRQ */
++#define RAVEN_IPI_IRQ    (RAVEN_TMR_IRQ + RAVEN_MAX_TMR) /* First IPI IRQ */
++/* First doorbell IRQ */
++#define RAVEN_DBL_IRQ    (RAVEN_IPI_IRQ + (RAVEN_MAX_CPU * RAVEN_MAX_IPI))
 +
-+static const TypeInfo heathrow_type_info = {
-+    .name = TYPE_HEATHROW,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(HeathrowState),
-+    .instance_init = heathrow_init,
-+    .class_init = heathrow_class_init,
-+};
++typedef struct FslMpicInfo {
++    int max_ext;
++} FslMpicInfo;
 +
-+static void heathrow_register_types(void)
-+{
-+    type_register_static(&heathrow_type_info);
-+}
++typedef enum IRQType {
++    IRQ_TYPE_NORMAL = 0,
++    IRQ_TYPE_FSLINT,        /* FSL internal interrupt -- level only */
++    IRQ_TYPE_FSLSPECIAL,    /* FSL timer/IPI interrupt, edge, no polarity */
++} IRQType;
 +
-+type_init(heathrow_register_types)
-diff --git a/include/hw/intc/heathrow_pic.h b/include/hw/intc/heathrow_pic.h
-new file mode 100644
-index 0000000000..bc3ffaab87
---- /dev/null
-+++ b/include/hw/intc/heathrow_pic.h
-@@ -0,0 +1,49 @@
-+/*
-+ * Heathrow PIC support (OldWorld PowerMac)
-+ *
-+ * Copyright (c) 2005-2007 Fabrice Bellard
-+ * Copyright (c) 2007 Jocelyn Mayer
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
++/* Round up to the nearest 64 IRQs so that the queue length
++ * won't change when moving between 32 and 64 bit hosts.
 + */
++#define IRQQUEUE_SIZE_BITS ((OPENPIC_MAX_IRQ + 63) & ~63)
 +
-+#ifndef HEATHROW_H
-+#define HEATHROW_H
++typedef struct IRQQueue {
++    unsigned long *queue;
++    int32_t queue_size; /* Only used for VMSTATE_BITMAP */
++    int next;
++    int priority;
++} IRQQueue;
 +
-+#define TYPE_HEATHROW "heathrow"
-+#define HEATHROW(obj) OBJECT_CHECK(HeathrowState, (obj), TYPE_HEATHROW)
++typedef struct IRQSource {
++    uint32_t ivpr;  /* IRQ vector/priority register */
++    uint32_t idr;   /* IRQ destination register */
++    uint32_t destmask; /* bitmap of CPU destinations */
++    int last_cpu;
++    int output;     /* IRQ level, e.g. OPENPIC_OUTPUT_INT */
++    int pending;    /* TRUE if IRQ is pending */
++    IRQType type;
++    bool level:1;   /* level-triggered */
++    bool nomask:1;  /* critical interrupts ignore mask on some FSL MPICs */
++} IRQSource;
 +
-+typedef struct HeathrowPICState {
-+    uint32_t events;
-+    uint32_t mask;
-+    uint32_t levels;
-+    uint32_t level_triggered;
-+} HeathrowPICState;
++#define IVPR_MASK_SHIFT       31
++#define IVPR_MASK_MASK        (1U << IVPR_MASK_SHIFT)
++#define IVPR_ACTIVITY_SHIFT   30
++#define IVPR_ACTIVITY_MASK    (1U << IVPR_ACTIVITY_SHIFT)
++#define IVPR_MODE_SHIFT       29
++#define IVPR_MODE_MASK        (1U << IVPR_MODE_SHIFT)
++#define IVPR_POLARITY_SHIFT   23
++#define IVPR_POLARITY_MASK    (1U << IVPR_POLARITY_SHIFT)
++#define IVPR_SENSE_SHIFT      22
++#define IVPR_SENSE_MASK       (1U << IVPR_SENSE_SHIFT)
 +
-+typedef struct HeathrowState {
++#define IVPR_PRIORITY_MASK     (0xFU << 16)
++#define IVPR_PRIORITY(_ivprr_) ((int)(((_ivprr_) & IVPR_PRIORITY_MASK) >> 16))
++#define IVPR_VECTOR(opp, _ivprr_) ((_ivprr_) & (opp)->vector_mask)
++
++/* IDR[EP/CI] are only for FSL MPIC prior to v4.0 */
++#define IDR_EP      0x80000000  /* external pin */
++#define IDR_CI      0x40000000  /* critical interrupt */
++
++typedef struct OpenPICTimer {
++    uint32_t tccr;  /* Global timer current count register */
++    uint32_t tbcr;  /* Global timer base count register */
++    int                   n_IRQ;
++    bool                  qemu_timer_active; /* Is the qemu_timer is running? */
++    struct QEMUTimer     *qemu_timer;
++    struct OpenPICState  *opp;          /* Device timer is part of. */
++    /* The QEMU_CLOCK_VIRTUAL time (in ns) corresponding to the last
++       current_count written or read, only defined if qemu_timer_active. */
++    uint64_t              origin_time;
++} OpenPICTimer;
++
++typedef struct OpenPICMSI {
++    uint32_t msir;   /* Shared Message Signaled Interrupt Register */
++} OpenPICMSI;
++
++typedef struct IRQDest {
++    int32_t ctpr; /* CPU current task priority */
++    IRQQueue raised;
++    IRQQueue servicing;
++    qemu_irq *irqs;
++
++    /* Count of IRQ sources asserting on non-INT outputs */
++    uint32_t outputs_active[OPENPIC_OUTPUT_NB];
++} IRQDest;
++
++#define TYPE_OPENPIC "openpic"
++#define OPENPIC(obj) OBJECT_CHECK(OpenPICState, (obj), TYPE_OPENPIC)
++
++typedef struct OpenPICState {
++    /*< private >*/
 +    SysBusDevice parent_obj;
++    /*< public >*/
 +
 +    MemoryRegion mem;
-+    HeathrowPICState pics[2];
-+    qemu_irq *irqs;
-+} HeathrowState;
 +
-+#define HEATHROW_NUM_IRQS 64
++    /* Behavior control */
++    FslMpicInfo *fsl;
++    uint32_t model;
++    uint32_t flags;
++    uint32_t nb_irqs;
++    uint32_t vid;
++    uint32_t vir; /* Vendor identification register */
++    uint32_t vector_mask;
++    uint32_t tfrr_reset;
++    uint32_t ivpr_reset;
++    uint32_t idr_reset;
++    uint32_t brr1;
++    uint32_t mpic_mode_mask;
 +
-+#endif /* HEATHROW_H */
++    /* Sub-regions */
++    MemoryRegion sub_io_mem[6];
++
++    /* Global registers */
++    uint32_t frr; /* Feature reporting register */
++    uint32_t gcr; /* Global configuration register  */
++    uint32_t pir; /* Processor initialization register */
++    uint32_t spve; /* Spurious vector register */
++    uint32_t tfrr; /* Timer frequency reporting register */
++    /* Source registers */
++    IRQSource src[OPENPIC_MAX_IRQ];
++    /* Local registers per output pin */
++    IRQDest dst[MAX_CPU];
++    uint32_t nb_cpus;
++    /* Timer registers */
++    OpenPICTimer timers[OPENPIC_MAX_TMR];
++    uint32_t max_tmr;
++
++    /* Shared MSI registers */
++    OpenPICMSI msi[MAX_MSI];
++    uint32_t max_irq;
++    uint32_t irq_ipi0;
++    uint32_t irq_tim0;
++    uint32_t irq_msi;
++} OpenPICState;
++
+ #endif /* OPENPIC_H */
 -- 
 2.14.3
