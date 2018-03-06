@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1et3o0-0001aG-Dd
-	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:02:26 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1et3nx-0004Vp-FH
+	(envelope-from <dgibson@ozlabs.org>) id 1et3ny-0001YE-V6
 	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:02:24 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1et3nx-0004W2-Jb
+	for qemu-devel@nongnu.org; Mon, 05 Mar 2018 23:02:22 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue,  6 Mar 2018 15:01:46 +1100
-Message-Id: <20180306040154.3669-23-david@gibson.dropbear.id.au>
+Date: Tue,  6 Mar 2018 15:01:51 +1100
+Message-Id: <20180306040154.3669-28-david@gibson.dropbear.id.au>
 In-Reply-To: <20180306040154.3669-1-david@gibson.dropbear.id.au>
 References: <20180306040154.3669-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 22/30] ppc/spapr-caps: Add support for custom
- spapr_capabilities
+Subject: [Qemu-devel] [PULL 27/30] hw/ppc/spapr,
+ e500: Use new property "stdout-path" for boot console
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,118 +21,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, groug@kaod.org
-Cc: agraf@suse.de, surajjs@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, surajjs@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-There are currently 2 implemented types of spapr-caps, boolean and
-tristate. However there may be a need for caps which don't fit either of
-these options. Add a custom capability type for which a list of custom
-valid strings can be specified and implement the get/set functions for
-these. Also add a field for help text to describe the available options.
+Linux kernel commit 2a9d832cc9aae21ea827520fef635b6c49a06c6d
+(of: Add bindings for chosen node, stdout-path) deprecated chosen property
+"linux,stdout-path" and "stdout".
 
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-[dwg: Change "help" option to "?" matching qemu conventions]
-[dwg: Add ATTRIBUTE_UNUSED to avoid breaking bisect]
+Introduce the new property "stdout-path" and continue supporting the older
+property to remain compatible with existing/older firmware. This older property
+can be deprecated after 5 years.
+
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_caps.c | 70 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 70 insertions(+)
+ hw/ppc/e500.c  | 7 +++++++
+ hw/ppc/spapr.c | 7 +++++++
+ 2 files changed, 14 insertions(+)
 
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 99a4b71d19..3d8b796df9 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -32,6 +32,20 @@
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index 13a34f50b7..ef541a00be 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -120,7 +120,14 @@ static void dt_serial_create(void *fdt, unsigned long long offset,
+     qemu_fdt_setprop_string(fdt, "/aliases", alias, ser);
  
- #include "hw/ppc/spapr.h"
- 
-+typedef struct sPAPRCapPossible {
-+    int num;            /* size of vals array below */
-+    const char *help;   /* help text for vals */
-+    /*
-+     * Note:
-+     * - because of the way compatibility is determined vals MUST be ordered
-+     *   such that later options are a superset of all preceding options.
-+     * - the order of vals must be preserved, that is their index is important,
-+     *   however vals may be added to the end of the list so long as the above
-+     *   point is observed
-+     */
-+    const char *vals[];
-+} sPAPRCapPossible;
-+
- typedef struct sPAPRCapabilityInfo {
-     const char *name;
-     const char *description;
-@@ -41,6 +55,8 @@ typedef struct sPAPRCapabilityInfo {
-     ObjectPropertyAccessor *get;
-     ObjectPropertyAccessor *set;
-     const char *type;
-+    /* Possible values if this is a custom string type */
-+    sPAPRCapPossible *possible;
-     /* Make sure the virtual hardware can support this capability */
-     void (*apply)(sPAPRMachineState *spapr, uint8_t val, Error **errp);
- } sPAPRCapabilityInfo;
-@@ -133,6 +149,60 @@ out:
-     g_free(val);
+     if (defcon) {
++        /*
++         * "linux,stdout-path" and "stdout" properties are deprecated by linux
++         * kernel. New platforms should only use the "stdout-path" property. Set
++         * the new property and continue using older property to remain
++         * compatible with the existing firmware.
++         */
+         qemu_fdt_setprop_string(fdt, "/chosen", "linux,stdout-path", ser);
++        qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", ser);
+     }
  }
  
-+static void ATTRIBUTE_UNUSED spapr_cap_get_string(Object *obj, Visitor *v,
-+                                                  const char *name,
-+                                                  void *opaque, Error **errp)
-+{
-+    sPAPRCapabilityInfo *cap = opaque;
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
-+    char *val = NULL;
-+    uint8_t value = spapr_get_cap(spapr, cap->index);
-+
-+    if (value >= cap->possible->num) {
-+        error_setg(errp, "Invalid value (%d) for cap-%s", value, cap->name);
-+        return;
-+    }
-+
-+    val = g_strdup(cap->possible->vals[value]);
-+
-+    visit_type_str(v, name, &val, errp);
-+    g_free(val);
-+}
-+
-+static void ATTRIBUTE_UNUSED spapr_cap_set_string(Object *obj, Visitor *v,
-+                                                  const char *name,
-+                                                  void *opaque, Error **errp)
-+{
-+    sPAPRCapabilityInfo *cap = opaque;
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
-+    Error *local_err = NULL;
-+    uint8_t i;
-+    char *val;
-+
-+    visit_type_str(v, name, &val, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    if (!strcmp(val, "?")) {
-+        error_setg(errp, "%s", cap->possible->help);
-+        goto out;
-+    }
-+    for (i = 0; i < cap->possible->num; i++) {
-+        if (!strcasecmp(val, cap->possible->vals[i])) {
-+            spapr->cmd_line_caps[cap->index] = true;
-+            spapr->eff.caps[cap->index] = i;
-+            goto out;
-+        }
-+    }
-+
-+    error_setg(errp, "Invalid capability mode \"%s\" for cap-%s", val,
-+               cap->name);
-+out:
-+    g_free(val);
-+}
-+
- static void cap_htm_apply(sPAPRMachineState *spapr, uint8_t val, Error **errp)
- {
-     if (!val) {
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 1b6ddd827e..7e1c858566 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1053,7 +1053,14 @@ static void spapr_dt_chosen(sPAPRMachineState *spapr, void *fdt)
+     }
+ 
+     if (!spapr->has_graphics && stdout_path) {
++        /*
++         * "linux,stdout-path" and "stdout" properties are deprecated by linux
++         * kernel. New platforms should only use the "stdout-path" property. Set
++         * the new property and continue using older property to remain
++         * compatible with the existing firmware.
++         */
+         _FDT(fdt_setprop_string(fdt, chosen, "linux,stdout-path", stdout_path));
++        _FDT(fdt_setprop_string(fdt, chosen, "stdout-path", stdout_path));
+     }
+ 
+     spapr_dt_ov5_platform_support(fdt, chosen);
 -- 
 2.14.3
