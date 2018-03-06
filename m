@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1etG15-0002xk-VF
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:04:44 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1etG6W-00072c-Dt
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:10:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1etG15-0006Mx-4H
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:04:43 -0500
-Date: Tue, 6 Mar 2018 18:04:27 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180306170426.GJ7139@localhost.localdomain>
-References: <cover.1520352600.git.berto@igalia.com>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1etG6T-0000Ij-61
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:10:20 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58334 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1etG6T-0000IG-0T
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 12:10:17 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1EE7684221
+	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 17:10:13 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue,  6 Mar 2018 18:09:59 +0100
+Message-Id: <20180306170959.3921-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1520352600.git.berto@igalia.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] Add checks for corruption in the
- snapshot table
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] migration: fix minor finalize leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,16 +31,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Am 06.03.2018 um 17:14 hat Alberto Garcia geschrieben:
-> Hey,
-> 
-> here's the new version of this series. It fixes a leak reported by
-> Kevin and adds a couple of error_report_err() to make use of the
-> message returned by qcow2_validate_table().
+Spotted thanks to ASAN:
+QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 tests/migration-tes=
+t -p /x86_64/migration/bad_dest
 
-Thanks, applied to the block branch.
+=3D=3D30302=3D=3DERROR: LeakSanitizer: detected memory leaks
 
-Kevin
+Direct leak of 48 byte(s) in 1 object(s) allocated from:
+    #0 0x7f60efba1a38 in __interceptor_calloc (/lib64/libasan.so.4+0xdea3=
+8)
+    #1 0x7f60eef3cf75 in g_malloc0 ../glib/gmem.c:124
+    #2 0x55ca9094702c in error_copy /home/elmarco/src/qemu/util/error.c:2=
+03
+    #3 0x55ca9037a30f in migrate_set_error /home/elmarco/src/qemu/migrati=
+on/migration.c:1139
+    #4 0x55ca9037a462 in migrate_fd_error /home/elmarco/src/qemu/migratio=
+n/migration.c:1150
+    #5 0x55ca9038162b in migrate_fd_connect /home/elmarco/src/qemu/migrat=
+ion/migration.c:2411
+    #6 0x55ca90386e41 in migration_channel_connect /home/elmarco/src/qemu=
+/migration/channel.c:81
+    #7 0x55ca9038335e in socket_outgoing_migration /home/elmarco/src/qemu=
+/migration/socket.c:85
+    #8 0x55ca9083dd3a in qio_task_complete /home/elmarco/src/qemu/io/task=
+.c:142
+    #9 0x55ca9083d6cc in gio_task_thread_result /home/elmarco/src/qemu/io=
+/task.c:88
+    #10 0x7f60eef37317 in g_idle_dispatch ../glib/gmain.c:5552
+    #11 0x7f60eef3490b in g_main_dispatch ../glib/gmain.c:3182
+    #12 0x7f60eef357ac in g_main_context_dispatch ../glib/gmain.c:3847
+    #13 0x55ca90927231 in glib_pollfds_poll /home/elmarco/src/qemu/util/m=
+ain-loop.c:214
+    #14 0x55ca90927420 in os_host_main_loop_wait /home/elmarco/src/qemu/u=
+til/main-loop.c:261
+    #15 0x55ca909275fa in main_loop_wait /home/elmarco/src/qemu/util/main=
+-loop.c:515
+    #16 0x55ca8fc1c2a4 in main_loop /home/elmarco/src/qemu/vl.c:1942
+    #17 0x55ca8fc2eb3a in main /home/elmarco/src/qemu/vl.c:4724
+    #18 0x7f60e4082009 in __libc_start_main (/lib64/libc.so.6+0x21009)
+
+Indirect leak of 45 byte(s) in 1 object(s) allocated from:
+    #0 0x7f60efba1850 in malloc (/lib64/libasan.so.4+0xde850)
+    #1 0x7f60eef3cf0c in g_malloc ../glib/gmem.c:94
+    #2 0x7f60eef3d1cf in g_malloc_n ../glib/gmem.c:331
+    #3 0x7f60eef596eb in g_strdup ../glib/gstrfuncs.c:363
+    #4 0x55ca90947085 in error_copy /home/elmarco/src/qemu/util/error.c:2=
+04
+    #5 0x55ca9037a30f in migrate_set_error /home/elmarco/src/qemu/migrati=
+on/migration.c:1139
+    #6 0x55ca9037a462 in migrate_fd_error /home/elmarco/src/qemu/migratio=
+n/migration.c:1150
+    #7 0x55ca9038162b in migrate_fd_connect /home/elmarco/src/qemu/migrat=
+ion/migration.c:2411
+    #8 0x55ca90386e41 in migration_channel_connect /home/elmarco/src/qemu=
+/migration/channel.c:81
+    #9 0x55ca9038335e in socket_outgoing_migration /home/elmarco/src/qemu=
+/migration/socket.c:85
+    #10 0x55ca9083dd3a in qio_task_complete /home/elmarco/src/qemu/io/tas=
+k.c:142
+    #11 0x55ca9083d6cc in gio_task_thread_result /home/elmarco/src/qemu/i=
+o/task.c:88
+    #12 0x7f60eef37317 in g_idle_dispatch ../glib/gmain.c:5552
+    #13 0x7f60eef3490b in g_main_dispatch ../glib/gmain.c:3182
+    #14 0x7f60eef357ac in g_main_context_dispatch ../glib/gmain.c:3847
+    #15 0x55ca90927231 in glib_pollfds_poll /home/elmarco/src/qemu/util/m=
+ain-loop.c:214
+    #16 0x55ca90927420 in os_host_main_loop_wait /home/elmarco/src/qemu/u=
+til/main-loop.c:261
+    #17 0x55ca909275fa in main_loop_wait /home/elmarco/src/qemu/util/main=
+-loop.c:515
+    #18 0x55ca8fc1c2a4 in main_loop /home/elmarco/src/qemu/vl.c:1942
+    #19 0x55ca8fc2eb3a in main /home/elmarco/src/qemu/vl.c:4724
+    #20 0x7f60e4082009 in __libc_start_main (/lib64/libc.so.6+0x21009)
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ migration/migration.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/migration/migration.c b/migration/migration.c
+index e345d0cc7e..62c243d2d4 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -2541,6 +2541,7 @@ static void migration_instance_finalize(Object *obj=
+)
+     g_free(params->tls_hostname);
+     g_free(params->tls_creds);
+     qemu_sem_destroy(&ms->pause_sem);
++    error_free(ms->error);
+ }
+=20
+ static void migration_instance_init(Object *obj)
+--=20
+2.16.2.346.g9779355e34
