@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35704)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1etLRd-0004U6-Ff
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 17:52:30 -0500
+	id 1etLVp-00066J-Jy
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 17:56:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1etLRa-0004Ac-AK
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 17:52:29 -0500
+	id 1etLVm-000626-Gh
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 17:56:49 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:32918)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1etLVm-000620-5a
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 17:56:46 -0500
+Received: by mail-wm0-x244.google.com with SMTP id s206so20104024wme.0
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 14:56:45 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20180306203103.25563-1-mark.cave-ayland@ilande.co.uk>
-	<20180306203103.25563-17-mark.cave-ayland@ilande.co.uk>
+References: <1520369037-37977-1-git-send-email-mjc@sifive.com>
+	<1520369037-37977-3-git-send-email-mjc@sifive.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ce3352a4-35e3-2655-cc80-e1082ffd9550@amsat.org>
-Date: Tue, 6 Mar 2018 19:52:20 -0300
+Message-ID: <bc9ac5d7-7090-1059-8243-93ea50cec18d@amsat.org>
+Date: Tue, 6 Mar 2018 19:56:41 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180306203103.25563-17-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <1520369037-37977-3-git-send-email-mjc@sifive.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 16/19] uninorth: rename UNINState to
- UNINHostState
+Subject: Re: [Qemu-devel] [PATCH v1 02/22] RISC-V: Replace hardcoded
+ constants with enum values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,234 +36,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-On 03/06/2018 05:31 PM, Mark Cave-Ayland wrote:
-> The existing UNINState actually represents the PCI/AGP host bridge stage so
-> rename it accordingly.
+On 03/06/2018 05:43 PM, Michael Clark wrote:
+> The RISC-V device-tree code has a number of hard-coded
+> constants and this change moves them into header enums.
 > 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Signed-off-by: Michael Clark <mjc@sifive.com>
+> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  hw/pci-host/uninorth.c         | 32 ++++++++++++++++----------------
->  hw/ppc/mac.h                   |  8 ++++----
->  hw/ppc/mac_newworld.c          |  2 +-
->  include/hw/pci-host/uninorth.h | 12 ++++++------
->  4 files changed, 27 insertions(+), 27 deletions(-)
+>  hw/riscv/sifive_clint.c         | 9 +++------
+>  hw/riscv/sifive_u.c             | 6 ++++--
+>  hw/riscv/spike.c                | 6 ++++--
+>  hw/riscv/virt.c                 | 6 ++++--
+>  include/hw/riscv/sifive_clint.h | 4 ++++
+>  include/hw/riscv/sifive_u.h     | 4 ++++
+>  include/hw/riscv/spike.h        | 4 ++++
+>  include/hw/riscv/virt.h         | 4 ++++
+>  8 files changed, 31 insertions(+), 12 deletions(-)
 > 
-> diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
-> index 3a29a4410e..fada0ffd5f 100644
-> --- a/hw/pci-host/uninorth.c
-> +++ b/hw/pci-host/uninorth.c
-> @@ -38,7 +38,7 @@ static int pci_unin_map_irq(PCIDevice *pci_dev, int irq_num)
+> diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
+> index 4893453..7cc606e 100644
+> --- a/hw/riscv/sifive_clint.c
+> +++ b/hw/riscv/sifive_clint.c
+> @@ -26,13 +26,10 @@
+>  #include "hw/riscv/sifive_clint.h"
+>  #include "qemu/timer.h"
 >  
->  static void pci_unin_set_irq(void *opaque, int irq_num, int level)
+> -/* See: riscv-pk/machine/sbi_entry.S and arch/riscv/kernel/time.c */
+> -#define TIMER_FREQ (10 * 1000 * 1000)
+> -
+>  static uint64_t cpu_riscv_read_rtc(void)
 >  {
-> -    UNINState *s = opaque;
-> +    UNINHostState *s = opaque;
+> -    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL), TIMER_FREQ,
+> -                    NANOSECONDS_PER_SECOND);
+> +    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
+> +        SIFIVE_CLINT_TIMEBASE_FREQ, NANOSECONDS_PER_SECOND);
+>  }
 >  
->      trace_unin_set_irq(unin_irq_line[irq_num], level);
->      qemu_set_irq(s->irqs[irq_num], level);
-> @@ -81,7 +81,7 @@ static uint32_t unin_get_config_reg(uint32_t reg, uint32_t addr)
->  static void unin_data_write(void *opaque, hwaddr addr,
->                              uint64_t val, unsigned len)
->  {
-> -    UNINState *s = opaque;
-> +    UNINHostState *s = opaque;
->      PCIHostState *phb = PCI_HOST_BRIDGE(s);
->      trace_unin_data_write(addr, len, val);
->      pci_data_write(phb->bus,
-> @@ -92,7 +92,7 @@ static void unin_data_write(void *opaque, hwaddr addr,
->  static uint64_t unin_data_read(void *opaque, hwaddr addr,
->                                 unsigned len)
->  {
-> -    UNINState *s = opaque;
-> +    UNINHostState *s = opaque;
->      PCIHostState *phb = PCI_HOST_BRIDGE(s);
->      uint32_t val;
+>  /*
+> @@ -59,7 +56,7 @@ static void sifive_clint_write_timecmp(RISCVCPU *cpu, uint64_t value)
+>      diff = cpu->env.timecmp - rtc_r;
+>      /* back to ns (note args switched in muldiv64) */
+>      next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+> -        muldiv64(diff, NANOSECONDS_PER_SECOND, TIMER_FREQ);
+> +        muldiv64(diff, NANOSECONDS_PER_SECOND, SIFIVE_CLINT_TIMEBASE_FREQ);
+>      timer_mod(cpu->env.timer, next);
+>  }
 >  
-> @@ -109,7 +109,7 @@ static const MemoryRegionOps unin_data_ops = {
->      .endianness = DEVICE_LITTLE_ENDIAN,
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index 1c2deef..f3f7615 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -122,7 +122,8 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+>      g_free(nodename);
+>  
+>      qemu_fdt_add_subnode(fdt, "/cpus");
+> -    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency", 10000000);
+> +    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
+> +        SIFIVE_CLINT_TIMEBASE_FREQ);
+>      qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
+>      qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
+>  
+> @@ -131,7 +132,8 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+>          char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+>          char *isa = riscv_isa_string(&s->soc.harts[cpu]);
+>          qemu_fdt_add_subnode(fdt, nodename);
+> -        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 1000000000);
+> +        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
+> +                              SIFIVE_U_CLOCK_FREQ);
+>          qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
+>          qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
+>          qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
+> diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+> index 2d1f114..4c233ec 100644
+> --- a/hw/riscv/spike.c
+> +++ b/hw/riscv/spike.c
+> @@ -115,7 +115,8 @@ static void create_fdt(SpikeState *s, const struct MemmapEntry *memmap,
+>      g_free(nodename);
+>  
+>      qemu_fdt_add_subnode(fdt, "/cpus");
+> -    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency", 10000000);
+> +    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
+> +        SIFIVE_CLINT_TIMEBASE_FREQ);
+>      qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
+>      qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
+>  
+> @@ -124,7 +125,8 @@ static void create_fdt(SpikeState *s, const struct MemmapEntry *memmap,
+>          char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+>          char *isa = riscv_isa_string(&s->soc.harts[cpu]);
+>          qemu_fdt_add_subnode(fdt, nodename);
+> -        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 1000000000);
+> +        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
+> +                              SPIKE_CLOCK_FREQ);
+>          qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
+>          qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
+>          qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
+> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> index 37968d2..a402856 100644
+> --- a/hw/riscv/virt.c
+> +++ b/hw/riscv/virt.c
+> @@ -145,7 +145,8 @@ static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+>      g_free(nodename);
+>  
+>      qemu_fdt_add_subnode(fdt, "/cpus");
+> -    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency", 10000000);
+> +    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
+> +                          SIFIVE_CLINT_TIMEBASE_FREQ);
+>      qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
+>      qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
+>  
+> @@ -155,7 +156,8 @@ static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+>          char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+>          char *isa = riscv_isa_string(&s->soc.harts[cpu]);
+>          qemu_fdt_add_subnode(fdt, nodename);
+> -        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 1000000000);
+> +        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
+> +                              VIRT_CLOCK_FREQ);
+>          qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
+>          qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
+>          qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
+> diff --git a/include/hw/riscv/sifive_clint.h b/include/hw/riscv/sifive_clint.h
+> index aaa2a58..e2865be 100644
+> --- a/include/hw/riscv/sifive_clint.h
+> +++ b/include/hw/riscv/sifive_clint.h
+> @@ -47,4 +47,8 @@ enum {
+>      SIFIVE_TIME_BASE    = 0xBFF8
 >  };
 >  
-> -static void pci_unin_init_irqs(UNINState *s)
-> +static void pci_unin_init_irqs(UNINHostState *s)
->  {
->      int i;
->  
-> @@ -120,7 +120,7 @@ static void pci_unin_init_irqs(UNINState *s)
->  
->  static void pci_unin_main_realize(DeviceState *dev, Error **errp)
->  {
-> -    UNINState *s = UNI_NORTH_PCI_HOST_BRIDGE(dev);
-> +    UNINHostState *s = UNI_NORTH_PCI_HOST_BRIDGE(dev);
->      PCIHostState *h = PCI_HOST_BRIDGE(dev);
->  
->      h->bus = pci_register_root_bus(dev, NULL,
-> @@ -142,7 +142,7 @@ static void pci_unin_main_realize(DeviceState *dev, Error **errp)
->  
->  static void pci_unin_main_init(Object *obj)
->  {
-> -    UNINState *s = UNI_NORTH_PCI_HOST_BRIDGE(obj);
-> +    UNINHostState *s = UNI_NORTH_PCI_HOST_BRIDGE(obj);
->      SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
->      PCIHostState *h = PCI_HOST_BRIDGE(obj);
->  
-> @@ -175,7 +175,7 @@ static void pci_unin_main_init(Object *obj)
->  
->  static void pci_u3_agp_realize(DeviceState *dev, Error **errp)
->  {
-> -    UNINState *s = U3_AGP_HOST_BRIDGE(dev);
-> +    UNINHostState *s = U3_AGP_HOST_BRIDGE(dev);
->      PCIHostState *h = PCI_HOST_BRIDGE(dev);
->  
->      h->bus = pci_register_root_bus(dev, NULL,
-> @@ -191,7 +191,7 @@ static void pci_u3_agp_realize(DeviceState *dev, Error **errp)
->  
->  static void pci_u3_agp_init(Object *obj)
->  {
-> -    UNINState *s = U3_AGP_HOST_BRIDGE(obj);
-> +    UNINHostState *s = U3_AGP_HOST_BRIDGE(obj);
->      SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
->      PCIHostState *h = PCI_HOST_BRIDGE(obj);
->  
-> @@ -223,7 +223,7 @@ static void pci_u3_agp_init(Object *obj)
->  
->  static void pci_unin_agp_realize(DeviceState *dev, Error **errp)
->  {
-> -    UNINState *s = UNI_NORTH_AGP_HOST_BRIDGE(dev);
-> +    UNINHostState *s = UNI_NORTH_AGP_HOST_BRIDGE(dev);
->      PCIHostState *h = PCI_HOST_BRIDGE(dev);
->  
->      h->bus = pci_register_root_bus(dev, NULL,
-> @@ -239,7 +239,7 @@ static void pci_unin_agp_realize(DeviceState *dev, Error **errp)
->  
->  static void pci_unin_agp_init(Object *obj)
->  {
-> -    UNINState *s = UNI_NORTH_AGP_HOST_BRIDGE(obj);
-> +    UNINHostState *s = UNI_NORTH_AGP_HOST_BRIDGE(obj);
->      SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
->      PCIHostState *h = PCI_HOST_BRIDGE(obj);
->  
-> @@ -260,7 +260,7 @@ static void pci_unin_agp_init(Object *obj)
->  
->  static void pci_unin_internal_realize(DeviceState *dev, Error **errp)
->  {
-> -    UNINState *s = UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE(dev);
-> +    UNINHostState *s = UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE(dev);
->      PCIHostState *h = PCI_HOST_BRIDGE(dev);
->  
->      h->bus = pci_register_root_bus(dev, NULL,
-> @@ -276,7 +276,7 @@ static void pci_unin_internal_realize(DeviceState *dev, Error **errp)
->  
->  static void pci_unin_internal_init(Object *obj)
->  {
-> -    UNINState *s = UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE(obj);
-> +    UNINHostState *s = UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE(obj);
->      SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
->      PCIHostState *h = PCI_HOST_BRIDGE(obj);
->  
-> @@ -466,7 +466,7 @@ static void pci_unin_main_class_init(ObjectClass *klass, void *data)
->  static const TypeInfo pci_unin_main_info = {
->      .name          = TYPE_UNI_NORTH_PCI_HOST_BRIDGE,
->      .parent        = TYPE_PCI_HOST_BRIDGE,
-> -    .instance_size = sizeof(UNINState),
-> +    .instance_size = sizeof(UNINHostState),
->      .instance_init = pci_unin_main_init,
->      .class_init    = pci_unin_main_class_init,
+> +enum {
+> +    SIFIVE_CLINT_TIMEBASE_FREQ = 10000000
+> +};
+> +
+>  #endif
+> diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+> index 662e8a1..be38aa0 100644
+> --- a/include/hw/riscv/sifive_u.h
+> +++ b/include/hw/riscv/sifive_u.h
+> @@ -50,6 +50,10 @@ enum {
+>      SIFIVE_U_UART1_IRQ = 4
 >  };
-> @@ -482,7 +482,7 @@ static void pci_u3_agp_class_init(ObjectClass *klass, void *data)
->  static const TypeInfo pci_u3_agp_info = {
->      .name          = TYPE_U3_AGP_HOST_BRIDGE,
->      .parent        = TYPE_PCI_HOST_BRIDGE,
-> -    .instance_size = sizeof(UNINState),
-> +    .instance_size = sizeof(UNINHostState),
->      .instance_init = pci_u3_agp_init,
->      .class_init    = pci_u3_agp_class_init,
+>  
+> +enum {
+> +    SIFIVE_U_CLOCK_FREQ = 1000000000
+> +};
+> +
+>  #define SIFIVE_U_PLIC_HART_CONFIG "MS"
+>  #define SIFIVE_U_PLIC_NUM_SOURCES 127
+>  #define SIFIVE_U_PLIC_NUM_PRIORITIES 7
+> diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
+> index cb55a14..d85a64e 100644
+> --- a/include/hw/riscv/spike.h
+> +++ b/include/hw/riscv/spike.h
+> @@ -42,6 +42,10 @@ enum {
+>      SPIKE_DRAM
 >  };
-> @@ -498,7 +498,7 @@ static void pci_unin_agp_class_init(ObjectClass *klass, void *data)
->  static const TypeInfo pci_unin_agp_info = {
->      .name          = TYPE_UNI_NORTH_AGP_HOST_BRIDGE,
->      .parent        = TYPE_PCI_HOST_BRIDGE,
-> -    .instance_size = sizeof(UNINState),
-> +    .instance_size = sizeof(UNINHostState),
->      .instance_init = pci_unin_agp_init,
->      .class_init    = pci_unin_agp_class_init,
+>  
+> +enum {
+> +    SPIKE_CLOCK_FREQ = 1000000000
+> +};
+> +
+>  #if defined(TARGET_RISCV32)
+>  #define SPIKE_V1_09_1_CPU TYPE_RISCV_CPU_RV32GCSU_V1_09_1
+>  #define SPIKE_V1_10_0_CPU TYPE_RISCV_CPU_RV32GCSU_V1_10_0
+> diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
+> index 7525647..2fbe808 100644
+> --- a/include/hw/riscv/virt.h
+> +++ b/include/hw/riscv/virt.h
+> @@ -55,6 +55,10 @@ enum {
+>      VIRTIO_NDEV = 10
 >  };
-> @@ -514,7 +514,7 @@ static void pci_unin_internal_class_init(ObjectClass *klass, void *data)
->  static const TypeInfo pci_unin_internal_info = {
->      .name          = TYPE_UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE,
->      .parent        = TYPE_PCI_HOST_BRIDGE,
-> -    .instance_size = sizeof(UNINState),
-> +    .instance_size = sizeof(UNINHostState),
->      .instance_init = pci_unin_internal_init,
->      .class_init    = pci_unin_internal_class_init,
->  };
-> diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
-> index 628415b255..5f5916252a 100644
-> --- a/hw/ppc/mac.h
-> +++ b/hw/ppc/mac.h
-> @@ -88,10 +88,10 @@ PCIBus *pci_grackle_init(uint32_t base, qemu_irq *pic,
->                           MemoryRegion *address_space_io);
 >  
->  /* UniNorth PCI */
-> -UNINState *pci_pmac_init(qemu_irq *pic,
-> -                         MemoryRegion *address_space_mem);
-> -UNINState *pci_pmac_u3_init(qemu_irq *pic,
-> -                            MemoryRegion *address_space_mem);
-> +UNINHostState *pci_pmac_init(qemu_irq *pic,
-> +                             MemoryRegion *address_space_mem);
-> +UNINHostState *pci_pmac_u3_init(qemu_irq *pic,
-> +                                MemoryRegion *address_space_mem);
->  
->  /* Mac NVRAM */
->  #define TYPE_MACIO_NVRAM "macio-nvram"
-> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-> index 5cb9f9abd0..ae0de4e36e 100644
-> --- a/hw/ppc/mac_newworld.c
-> +++ b/hw/ppc/mac_newworld.c
-> @@ -151,7 +151,7 @@ static void ppc_core99_init(MachineState *machine)
->      MemoryRegion *ram = g_new(MemoryRegion, 1), *bios = g_new(MemoryRegion, 1);
->      hwaddr kernel_base, initrd_base, cmdline_base = 0;
->      long kernel_size, initrd_size;
-> -    UNINState *uninorth_pci;
-> +    UNINHostState *uninorth_pci;
->      PCIBus *pci_bus;
->      NewWorldMacIOState *macio;
->      MACIOIDEState *macio_ide;
-> diff --git a/include/hw/pci-host/uninorth.h b/include/hw/pci-host/uninorth.h
-> index c4771aa7fa..d1424b165a 100644
-> --- a/include/hw/pci-host/uninorth.h
-> +++ b/include/hw/pci-host/uninorth.h
-> @@ -33,15 +33,15 @@
->  #define TYPE_U3_AGP_HOST_BRIDGE "u3-agp-pcihost"
->  
->  #define UNI_NORTH_PCI_HOST_BRIDGE(obj) \
-> -    OBJECT_CHECK(UNINState, (obj), TYPE_UNI_NORTH_PCI_HOST_BRIDGE)
-> +    OBJECT_CHECK(UNINHostState, (obj), TYPE_UNI_NORTH_PCI_HOST_BRIDGE)
->  #define UNI_NORTH_AGP_HOST_BRIDGE(obj) \
-> -    OBJECT_CHECK(UNINState, (obj), TYPE_UNI_NORTH_AGP_HOST_BRIDGE)
-> +    OBJECT_CHECK(UNINHostState, (obj), TYPE_UNI_NORTH_AGP_HOST_BRIDGE)
->  #define UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE(obj) \
-> -    OBJECT_CHECK(UNINState, (obj), TYPE_UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE)
-> +    OBJECT_CHECK(UNINHostState, (obj), TYPE_UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE)
->  #define U3_AGP_HOST_BRIDGE(obj) \
-> -    OBJECT_CHECK(UNINState, (obj), TYPE_U3_AGP_HOST_BRIDGE)
-> +    OBJECT_CHECK(UNINHostState, (obj), TYPE_U3_AGP_HOST_BRIDGE)
->  
-> -typedef struct UNINState {
-> +typedef struct UNINHostState {
->      PCIHostState parent_obj;
->  
->      OpenPICState *pic;
-> @@ -49,6 +49,6 @@ typedef struct UNINState {
->      MemoryRegion pci_mmio;
->      MemoryRegion pci_hole;
->      MemoryRegion pci_io;
-> -} UNINState;
-> +} UNINHostState;
->  
->  #endif /* UNINORTH_H */
+> +enum {
+> +    VIRT_CLOCK_FREQ = 1000000000
+> +};
+> +
+>  #define VIRT_PLIC_HART_CONFIG "MS"
+>  #define VIRT_PLIC_NUM_SOURCES 127
+>  #define VIRT_PLIC_NUM_PRIORITIES 7
 > 
