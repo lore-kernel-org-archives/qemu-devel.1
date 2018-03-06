@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1etDyN-0004qI-Mi
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:53:48 -0500
+	(envelope-from <kwolf@redhat.com>) id 1etDzE-0005S1-6W
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:54:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1etDyJ-00039R-D5
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:53:47 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41200 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1etDyJ-000399-8F
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:53:43 -0500
-Date: Tue, 6 Mar 2018 15:53:31 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180306145331.y36cuci2lvd3qnnf@sirius.home.kraxel.org>
-References: <20180306113442.15295-1-kraxel@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1etDzA-0003jK-5n
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 09:54:40 -0500
+Date: Tue, 6 Mar 2018 15:54:26 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180306145426.GG7139@localhost.localdomain>
+References: <cover.1519921268.git.berto@igalia.com>
+	<d58bbc353563bb9c83ffe90faaa36fadf683e332.1519921268.git.berto@igalia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180306113442.15295-1-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v8 0/9] vfio: add display support
+In-Reply-To: <d58bbc353563bb9c83ffe90faaa36fadf683e332.1519921268.git.berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH 3/7] qcow2: Check L1 table parameters in
+ qcow2_expand_zero_clusters()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,71 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: intel-gvt-dev@lists.freedesktop.org, Alex Williamson <alex.williamson@redhat.com>, Tina Zhang <tina.zhang@intel.com>, Kirti Wankhede <kwankhede@nvidia.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Tue, Mar 06, 2018 at 12:34:33PM +0100, Gerd Hoffmann wrote:
-> This series adds support for a vgpu display to the qemu vfio code.
+Am 01.03.2018 um 17:27 hat Alberto Garcia geschrieben:
+> This function iterates over all snapshots of a qcow2 file in order to
+> expand all zero clusters, but it does not validate the snapshots' L1
+> tables first.
+> 
+> We now have a function to take care of this, so let's use it.
+> 
+> We can also take the opportunity to replace the sector-based
+> bdrv_read() with bdrv_pread().
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2-cluster.c      | 20 +++++++++++++-------
+>  tests/qemu-iotests/080     |  2 ++
+>  tests/qemu-iotests/080.out |  2 ++
+>  3 files changed, 17 insertions(+), 7 deletions(-)
+> 
+> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> index e406b0f3b9..40167ac09c 100644
+> --- a/block/qcow2-cluster.c
+> +++ b/block/qcow2-cluster.c
+> @@ -2092,11 +2092,18 @@ int qcow2_expand_zero_clusters(BlockDriverState *bs,
+>      }
+>  
+>      for (i = 0; i < s->nb_snapshots; i++) {
+> -        int l1_sectors = DIV_ROUND_UP(s->snapshots[i].l1_size *
+> -                                      sizeof(uint64_t), BDRV_SECTOR_SIZE);
+> +        int l1_size2;
+> +        uint64_t *new_l1_table;
+>  
+> -        uint64_t *new_l1_table =
+> -            g_try_realloc(l1_table, l1_sectors * BDRV_SECTOR_SIZE);
+> +        ret = qcow2_validate_table(bs, s->snapshots[i].l1_table_offset,
+> +                                   s->snapshots[i].l1_size, sizeof(uint64_t),
+> +                                   QCOW_MAX_L1_SIZE, "", NULL);
+> +        if (ret < 0) {
+> +            return ret;
 
-Ok, for anyone who wants play with this, the requirements:
+Shouldn't this be goto fail?
 
-qemu
-====
-
-The repo at git://git.kraxel.org/qemu has a sirius/dmabufs-merge branch
-with this series and spice patches and gtk patches merged.
-
-The traditional work/intel-vgpu branch has been updated too (it is the
-same as sirius/dmabufs-merge plus some work-in-progress patches).
-
-host kernel
-===========
-
-You need a 4.16-rc kernel.  The intel graphics driver comes with mdev
-support.  Needs gen5+ hardware (broadwell, skylake, kaby-lake).  Not
-sure about nvidia.
-
-Pure software drivers are available from 
-   git://git.kraxel.org/cgit/linux vfio-sample-display
-
-There are three kernel modules in samples/vfio-mdev:
-
-  (1) mdpy.ko.  Very simple display device.  Fixed framebuffer and
-      resolution.  Uses the region-based vfio display interface.
-  (2) mbochs.ko.  Mimics qemu vga with bochs dispi vbe interface.
-      Doesn't emulate any legacy vga.  But good enough to make the
-      bochs-drm.ko driver happy.  Uses the dmabuf-based vfio display
-      interface.  Zero-copy display updates.
-  (3) mdpy-fb.ko.  Guest framebuffer driver for (1).
-
-guest kernel
-============
-
-intel-gvt: 4.9+ I think.
-nvidia:    dunno.
-mbochs:    3.14+ should work.
-mdpy:      The vfio-sample-display branch above if you want see guest
-	   display updates.  Without that you'll see a static test
-	   pattern.
-
-booting the guest
-=================
-
-Create mdev devices and use "-device vfio-pci,..." as usual, see
-https://www.kernel.org/doc/Documentation/vfio-mediated-device.txt
-
-For mdev devices using dmabufs you need opengl support.
-So start qemu with spice or gtk ui and opengl enabled:
-
-  qemu -display gtk,gl=on
-  qemu -spice gl=on,$otherargs
-
-When using a display without opengl support you can use egl-headless to
-handle the opengl rendering and texture readout (which of course adds
-some overhead):
-
-  qemu -display egl-headless -vga $display
-  qemu -display egl-headless -spice gl=off,$otherargs
-
-enjoy,
-  Gerd
+Kevin
