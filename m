@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44144)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etJKE-0005Zh-MW
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:36:43 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etJKK-0005fn-OS
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:36:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etJKD-00088X-QI
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:36:42 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etJKH-0008AM-C3
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 15:36:48 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Tue,  6 Mar 2018 20:30:54 +0000
-Message-Id: <20180306203103.25563-11-mark.cave-ayland@ilande.co.uk>
+Date: Tue,  6 Mar 2018 20:30:56 +0000
+Message-Id: <20180306203103.25563-13-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20180306203103.25563-1-mark.cave-ayland@ilande.co.uk>
 References: <20180306203103.25563-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 10/19] uninorth: fix PCI and AGP bus mixup
+Subject: [Qemu-devel] [PATCH 12/19] uninorth: remove obsolete
+ pci_pmac_init() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,74 +22,122 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-Somewhere in the history of time, the initialisation of the PCI buses for the
-AGP and PCI host bridges got mixed up in that the PCI host bridge was
-creating an instance of the AGP PCI bus, and the AGP PCI bus was missing.
-
-Swap the PCI host bridge over to use the correct PCI bus (including setting
-the kMacRISCPCIAddressSelect register used by MacOS X) and add the missing
-reference to the AGP PCI bus.
+Instead wire up the PCI/AGP host bridges in mac_newworld.c. Now this is complete
+it is possible to move the initialisation of the PCI hole alias into
+pci_unin_main_init().
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/pci-host/uninorth.c | 24 +++++++++++++-----------
- 1 file changed, 13 insertions(+), 11 deletions(-)
+ hw/pci-host/uninorth.c | 46 +++++-----------------------------------------
+ hw/ppc/mac_newworld.c  | 30 +++++++++++++++++++++++++++++-
+ 2 files changed, 34 insertions(+), 42 deletions(-)
 
 diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
-index 426b3c4e33..1f6752c294 100644
+index ccde332fa9..8e4e9b3d35 100644
 --- a/hw/pci-host/uninorth.c
 +++ b/hw/pci-host/uninorth.c
-@@ -121,7 +121,7 @@ static void pci_unin_main_realize(DeviceState *dev, Error **errp)
-                                    get_system_io(),
-                                    PCI_DEVFN(11, 0), 4, TYPE_PCI_BUS);
+@@ -146,8 +146,13 @@ static void pci_unin_main_init(Object *obj)
+     memory_region_init(&s->pci_mmio, OBJECT(s), "unin-pci-mmio",
+                        0x100000000ULL);
  
--    pci_create_simple(h->bus, PCI_DEVFN(11, 0), "uni-north-agp");
-+    pci_create_simple(h->bus, PCI_DEVFN(11, 0), "uni-north-pci");
- 
-     /* DEC 21154 bridge */
- #if 0
-@@ -195,6 +195,8 @@ static void pci_unin_agp_realize(DeviceState *dev, Error **errp)
-                                    &s->pci_mmio,
-                                    get_system_io(),
-                                    PCI_DEVFN(11, 0), 4, TYPE_PCI_BUS);
++    memory_region_init_alias(&s->pci_hole, OBJECT(s),
++                             "unin-pci-hole", &s->pci_mmio,
++                             0x80000000ULL, 0x10000000ULL);
 +
-+    pci_create_simple(h->bus, PCI_DEVFN(11, 0), "uni-north-agp");
+     sysbus_init_mmio(sbd, &h->conf_mem);
+     sysbus_init_mmio(sbd, &h->data_mem);
++    sysbus_init_mmio(sbd, &s->pci_hole);
  }
  
- static void pci_unin_agp_init(Object *obj)
-@@ -303,16 +305,6 @@ static void unin_main_pci_host_realize(PCIDevice *d, Error **errp)
-     d->config[0x0D] = 0x10;
-     /* capabilities_pointer */
-     d->config[0x34] = 0x00;
+ static void pci_u3_agp_realize(DeviceState *dev, Error **errp)
+@@ -242,47 +247,6 @@ static void pci_unin_internal_init(Object *obj)
+     sysbus_init_mmio(sbd, &h->data_mem);
+ }
+ 
+-UNINState *pci_pmac_init(qemu_irq *pic,
+-                         MemoryRegion *address_space_mem)
+-{
+-    DeviceState *dev;
+-    SysBusDevice *s;
+-    UNINState *d;
+-
+-    /* Use values found on a real PowerMac */
+-    /* Uninorth AGP bus */
+-    dev = qdev_create(NULL, TYPE_UNI_NORTH_AGP_HOST_BRIDGE);
+-    qdev_prop_set_ptr(dev, "pic-irqs", pic);
+-    qdev_init_nofail(dev);
+-    s = SYS_BUS_DEVICE(dev);
+-    sysbus_mmio_map(s, 0, 0xf0800000);
+-    sysbus_mmio_map(s, 1, 0xf0c00000);
+-
+-    /* Uninorth internal bus */
+-    dev = qdev_create(NULL, TYPE_UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE);
+-    qdev_prop_set_ptr(dev, "pic-irqs", pic);
+-    qdev_init_nofail(dev);
+-    s = SYS_BUS_DEVICE(dev);
+-    sysbus_mmio_map(s, 0, 0xf4800000);
+-    sysbus_mmio_map(s, 1, 0xf4c00000);
+-
+-    /* Uninorth main bus */
+-    dev = qdev_create(NULL, TYPE_UNI_NORTH_PCI_HOST_BRIDGE);
+-    qdev_prop_set_ptr(dev, "pic-irqs", pic);
+-    qdev_init_nofail(dev);
+-    s = SYS_BUS_DEVICE(dev);
+-    d = UNI_NORTH_PCI_HOST_BRIDGE(dev);
+-    memory_region_init_alias(&d->pci_hole, OBJECT(d), "pci-hole", &d->pci_mmio,
+-                             0x80000000ULL, 0x10000000ULL);
+-    memory_region_add_subregion(address_space_mem, 0x80000000ULL,
+-                                &d->pci_hole);
+-
+-    sysbus_mmio_map(s, 0, 0xf2800000);
+-    sysbus_mmio_map(s, 1, 0xf2c00000);
+-
+-    return d;
 -}
 -
--static void unin_agp_pci_host_realize(PCIDevice *d, Error **errp)
--{
--    /* cache_line_size */
--    d->config[0x0C] = 0x08;
--    /* latency_timer */
--    d->config[0x0D] = 0x10;
--    /* capabilities_pointer
--    d->config[0x34] = 0x80; */
- 
-     /*
-      * Set kMacRISCPCIAddressSelect (0x48) register to indicate PCI
-@@ -325,6 +317,16 @@ static void unin_agp_pci_host_realize(PCIDevice *d, Error **errp)
-     d->config[0x4b] = 0x1;
- }
- 
-+static void unin_agp_pci_host_realize(PCIDevice *d, Error **errp)
-+{
-+    /* cache_line_size */
-+    d->config[0x0C] = 0x08;
-+    /* latency_timer */
-+    d->config[0x0D] = 0x10;
-+    /* capabilities_pointer
-+    d->config[0x34] = 0x80; */
-+}
-+
- static void u3_agp_pci_host_realize(PCIDevice *d, Error **errp)
+ UNINState *pci_pmac_u3_init(qemu_irq *pic,
+                             MemoryRegion *address_space_mem)
  {
-     /* cache line size */
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index f2b07207d3..da76c33099 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -349,7 +349,35 @@ static void ppc_core99_init(MachineState *machine)
+         uninorth_pci = pci_pmac_u3_init(pic, get_system_memory());
+         machine_arch = ARCH_MAC99_U3;
+     } else {
+-        uninorth_pci = pci_pmac_init(pic, get_system_memory());
++        /* Use values found on a real PowerMac */
++        /* Uninorth AGP bus */
++        dev = qdev_create(NULL, TYPE_UNI_NORTH_AGP_HOST_BRIDGE);
++        qdev_prop_set_ptr(dev, "pic-irqs", pic);
++        qdev_init_nofail(dev);
++        s = SYS_BUS_DEVICE(dev);
++        sysbus_mmio_map(s, 0, 0xf0800000);
++        sysbus_mmio_map(s, 1, 0xf0c00000);
++
++        /* Uninorth internal bus */
++        dev = qdev_create(NULL, TYPE_UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE);
++        qdev_prop_set_ptr(dev, "pic-irqs", pic);
++        qdev_init_nofail(dev);
++        s = SYS_BUS_DEVICE(dev);
++        sysbus_mmio_map(s, 0, 0xf4800000);
++        sysbus_mmio_map(s, 1, 0xf4c00000);
++
++        /* Uninorth main bus */
++        dev = qdev_create(NULL, TYPE_UNI_NORTH_PCI_HOST_BRIDGE);
++        qdev_prop_set_ptr(dev, "pic-irqs", pic);
++        qdev_init_nofail(dev);
++        uninorth_pci = UNI_NORTH_PCI_HOST_BRIDGE(dev);
++        s = SYS_BUS_DEVICE(dev);
++        /* PCI hole */
++        memory_region_add_subregion(get_system_memory(), 0x80000000ULL,
++                                    sysbus_mmio_get_region(s, 2));
++        sysbus_mmio_map(s, 0, 0xf2800000);
++        sysbus_mmio_map(s, 1, 0xf2c00000);
++
+         machine_arch = ARCH_MAC99;
+     }
+ 
 -- 
 2.11.0
