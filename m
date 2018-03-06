@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1etAfp-00041u-Ey
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:22:26 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1etAgJ-0004OT-JE
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:22:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1etAfm-0002iY-0v
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:22:25 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44356 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1etAfl-0002iJ-Rv
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:22:21 -0500
-References: <1519900415-30314-1-git-send-email-yi.l.liu@linux.intel.com>
-	<1519900415-30314-9-git-send-email-yi.l.liu@linux.intel.com>
-	<f9ee648a-ff93-b57a-4b05-6bd0f40c15bf@redhat.com>
-	<20180305084207.GE2482@sky-dev>
-	<2160f478-2c8a-8fbe-1df8-78c1984cf375@redhat.com>
-	<20180306110337.GC3158@sky-dev>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c888c285-ffb8-aa4c-6486-2b9bddb64844@redhat.com>
-Date: Tue, 6 Mar 2018 12:22:11 +0100
+	(envelope-from <marcandre.lureau@gmail.com>) id 1etAgF-0002yH-Mj
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:22:55 -0500
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:34970)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1etAgF-0002xz-Fo
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 06:22:51 -0500
+Received: by mail-wr0-x244.google.com with SMTP id l43so20547592wrc.2
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 03:22:51 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180306110337.GC3158@sky-dev>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 08/12] hw/pci: introduce
- pci_device_notify_iommu()
+In-Reply-To: <20180306074053.22856-1-kraxel@redhat.com>
+References: <20180306074053.22856-1-kraxel@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 6 Mar 2018 12:22:49 +0100
+Message-ID: <CAJ+F1CK5MsZ5=-z2yWznBcHjZqskHSdiyYxC30azEcQ9AXrRLg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/7] audio: modularize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,30 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Cc: kevin.tian@intel.com, yi.l.liu@intel.com, mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com, alex.williamson@redhat.com, eric.auger.pro@gmail.com, david@gibson.dropbear.id.au
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
-On 06/03/2018 12:03, Liu, Yi L wrote:
-> On Tue, Mar 06, 2018 at 11:18:43AM +0100, Paolo Bonzini wrote:
->> On 05/03/2018 09:42, Liu, Yi L wrote:
->>>> In general I think it's better to change your names from "assigned_dev"
->>>> to "sva_dev", because the point of the list is to only iterate over
->>>> devices that might be interested in using SVA.
->>>
->>> For "assigned_dev", my purpose is to distinguish "assigned devices" from
->>> emulated devices. Only the SVA usage on "assigned devices" is cared here.
->>> But it is true only SVA capable device is interested. So I may need to
->>> rename it as "assigned_sva_dev". How about your opinion?
->>
->> What you care about is not whether the device assigned, but rather
->> whether it called or not pci_setup_sva_ops.  Currently only VFIO does
->> this, but that's not a requirement.  Hence my suggestion of calling it
->> sva_dev.
-> 
-> Yes, only VFIO calls pci_setup_sva_ops so far, but it should not limited to.
-> I'll apply in next version.
+Hi
 
-For what it's worth, I agree with David's suggestion for naming (so
-pci_setup_pasid_ops, pasid_dev, etc.)
+On Tue, Mar 6, 2018 at 8:40 AM, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> Add audio driver (host backend) registry.  Add audio module support.
+> Enable module builds for alsa, oss, pulse and sdl.
+>
+> Gerd Hoffmann (7):
+>   audio: add driver registry
+>   audio: add module loading support
+>   build: enable audio modules
+>   audio/alsa: build as module
+>   audio/oss: build as module
+>   audio/pulseaudio: build as module
+>   audio/sdl: build as module
+>
 
-Paolo
+Is this a problem on my side? (configure
+'--audio-drv-list=3Doss,alsa,pa,sdl' '--enable-modules')
+
+elmarco@boraha:~/src/qemu/build (master %)$
+x86_64-softmmu/qemu-system-x86_64 -audio-help
+Failed to open module:
+/home/elmarco/src/qemu/build/x86_64-softmmu/../audio-oss.so: undefined
+symbol: _TRACE_OSS_INVALID_AVAILABLE_SIZE_DSTATE
+Failed to open module:
+/home/elmarco/src/qemu/build/x86_64-softmmu/../audio-alsa.so:
+undefined symbol: _TRACE_ALSA_XRUN_OUT_DSTATE
+Failed to open module:
+/home/elmarco/src/qemu/build/x86_64-softmmu/../audio-pa.so: undefined
+symbol: audio_pt_unlock_and_signal
+Failed to open module:
+/home/elmarco/src/qemu/build/x86_64-softmmu/../audio-sdl.so: undefined
+symbol: audio_pcm_sw_write
+
+>  configure             |  7 ++++-
+>  Makefile              |  4 +++
+>  Makefile.objs         |  1 +
+>  audio/audio_int.h     | 14 ++++-----
+>  include/qemu/module.h |  1 +
+>  audio/alsaaudio.c     |  8 ++++-
+>  audio/audio.c         | 83 +++++++++++++++++++++++++++++++++++----------=
+------
+>  audio/coreaudio.c     |  8 ++++-
+>  audio/dsoundaudio.c   |  8 ++++-
+>  audio/noaudio.c       |  8 ++++-
+>  audio/ossaudio.c      |  8 ++++-
+>  audio/paaudio.c       |  8 ++++-
+>  audio/sdlaudio.c      |  8 ++++-
+>  audio/spiceaudio.c    |  8 ++++-
+>  audio/wavaudio.c      |  8 ++++-
+>  audio/Makefile.objs   | 30 +++++++++++++------
+>  scripts/create_config |  2 +-
+>  17 files changed, 159 insertions(+), 55 deletions(-)
+>
+> --
+> 2.9.3
+>
+>
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
