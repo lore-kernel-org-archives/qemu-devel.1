@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1etEHw-0007LU-NQ
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:14:01 -0500
+	(envelope-from <imammedo@redhat.com>) id 1etEKH-0000IE-Kv
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:16:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1etEHt-0001en-Bf
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:14:00 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39234 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1etEHt-0001eT-6X
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:13:57 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D1334404084A
-	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 15:13:56 +0000 (UTC)
-References: <1520342370-123606-1-git-send-email-pbonzini@redhat.com>
-	<1520342370-123606-8-git-send-email-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f264b47a-d5cc-74b7-eab3-a0693f549ee4@redhat.com>
-Date: Tue, 6 Mar 2018 16:13:54 +0100
+	(envelope-from <imammedo@redhat.com>) id 1etEKG-0003Kj-EY
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:16:25 -0500
+Date: Tue, 6 Mar 2018 16:16:17 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180306161617.07459ef6@redhat.com>
+In-Reply-To: <20180306125526.27838-5-peter.maydell@linaro.org>
+References: <20180306125526.27838-1-peter.maydell@linaro.org>
+	<20180306125526.27838-5-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1520342370-123606-8-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 07/34] Document --rtc-td-hack,
- --localtime and --startdate as deprecated
+Subject: Re: [Qemu-devel] [PATCH v2 4/6] target/arm: Make 'any' CPU just an
+ alias for 'max'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,42 +24,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Philippe =?UTF-8?B?TWF0?= =?UTF-8?B?aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, patches@linaro.org
 
-On 06.03.2018 14:19, Paolo Bonzini wrote:
-> From: Thomas Huth <thuth@redhat.com>
+On Tue,  6 Mar 2018 12:55:24 +0000
+Peter Maydell <peter.maydell@linaro.org> wrote:
+
+> Now we have a working '-cpu max', the linux-user-only
+> 'any' CPU is pretty much the same thing, so implement it
+> that way.
 > 
-> These options have been marked in a comment in qemu-options.hx as
-> deprecated in 2009 already (see commit 1ed2fc1fa35fadc0d6), but we
-> never informed the users about these deprecations. Let's catch up
-> on that omission now.
+> For the moment we don't add any of the extra feature bits
+> to the system-emulation "max", because we don't set the
+> ID register bits we would need to to advertise those
+> features as present.
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> Message-Id: <1519138892-12836-1-git-send-email-thuth@redhat.com>
-> [Fix messages. - Paolo]
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  qemu-doc.texi | 16 +++++++++++-----
->  vl.c          |  5 +++++
->  2 files changed, 16 insertions(+), 5 deletions(-)
+>  target/arm/cpu.c   | 50 +++++++++++++++++++++++----------------------
+>  target/arm/cpu64.c | 59 ++++++++++++++++++++++++++----------------------------
+>  2 files changed, 54 insertions(+), 55 deletions(-)
 > 
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index fb6fac5..589519a 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -2723,12 +2723,18 @@ filesystem test suite. Also it requires the CAP_DAC_READ_SEARCH capability,
->  which is not the recommended way to run QEMU. This backend should not be
->  used and it will be removed with no replacement.
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index e46ddcc613..c8d3da2140 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -965,9 +965,17 @@ static ObjectClass *arm_cpu_class_by_name(const char *cpu_model)
+>      ObjectClass *oc;
+>      char *typename;
+>      char **cpuname;
+> +    const char *cpunamestr;
 >  
-> -@subsection -no-frame (since 2.12.0)
-> +@subsection -rtc-td-hack (since 2.12.0)
+>      cpuname = g_strsplit(cpu_model, ",", 1);
+> -    typename = g_strdup_printf(ARM_CPU_TYPE_NAME("%s"), cpuname[0]);
+> +    cpunamestr = cpuname[0];
+> +#ifdef CONFIG_USER_ONLY
+> +    /* For backwards compatibility usermode emulation allows "-cpu any",
+> +     * which has the same semantics as "-cpu max".
+> +     */
+> +    cpunamestr = "max";
+shouldn't it be
+ if (!strcmp(cpuname[0], "any")) {
+     cpunamestr = "max";
+ }
+
+
+> +#endif
+> +    typename = g_strdup_printf(ARM_CPU_TYPE_NAME("%s"), cpunamestr);
+>      oc = object_class_by_name(typename);
+>      g_strfreev(cpuname);
+>      g_free(typename);
+> @@ -1711,29 +1719,23 @@ static void arm_max_initfn(Object *obj)
+>          kvm_arm_set_cpu_features_from_host(cpu);
+>      } else {
+>          cortex_a15_initfn(obj);
+> -        /* In future we might add feature bits here even if the
+> -         * real-world A15 doesn't implement them.
+> -         */
+> -    }
+> -}
+> -#endif
+> -
+>  #ifdef CONFIG_USER_ONLY
+> -static void arm_any_initfn(Object *obj)
+> -{
+> -    ARMCPU *cpu = ARM_CPU(obj);
+> -    set_feature(&cpu->env, ARM_FEATURE_V8);
+> -    set_feature(&cpu->env, ARM_FEATURE_VFP4);
+> -    set_feature(&cpu->env, ARM_FEATURE_NEON);
+> -    set_feature(&cpu->env, ARM_FEATURE_THUMB2EE);
+> -    set_feature(&cpu->env, ARM_FEATURE_V8_AES);
+> -    set_feature(&cpu->env, ARM_FEATURE_V8_SHA1);
+> -    set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
+> -    set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
+> -    set_feature(&cpu->env, ARM_FEATURE_CRC);
+> -    set_feature(&cpu->env, ARM_FEATURE_V8_RDM);
+> -    set_feature(&cpu->env, ARM_FEATURE_V8_FCMA);
+> -    cpu->midr = 0xffffffff;
+> +        /* We don't set these in system emulation mode for the moment,
+> +         * since we don't correctly set the ID registers to advertise them,
+> +         */
+> +        set_feature(&cpu->env, ARM_FEATURE_V8);
+> +        set_feature(&cpu->env, ARM_FEATURE_VFP4);
+> +        set_feature(&cpu->env, ARM_FEATURE_NEON);
+> +        set_feature(&cpu->env, ARM_FEATURE_THUMB2EE);
+> +        set_feature(&cpu->env, ARM_FEATURE_V8_AES);
+> +        set_feature(&cpu->env, ARM_FEATURE_V8_SHA1);
+> +        set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
+> +        set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
+> +        set_feature(&cpu->env, ARM_FEATURE_CRC);
+> +        set_feature(&cpu->env, ARM_FEATURE_V8_RDM);
+> +        set_feature(&cpu->env, ARM_FEATURE_V8_FCMA);
+> +#endif
+> +    }
+>  }
+>  #endif
 >  
-> -The ``-no-frame'' argument works with SDL 1.2 only.  SDL 2.0 lacks
-> -support for frameless windows, and the other user interfaces never
-> -implemented this in the first place.  So this will be removed together
-> -with SDL 1.2 support.
+> @@ -1789,7 +1791,7 @@ static const ARMCPUInfo arm_cpus[] = {
+>      { .name = "max",         .initfn = arm_max_initfn },
+>  #endif
+>  #ifdef CONFIG_USER_ONLY
+> -    { .name = "any",         .initfn = arm_any_initfn },
+> +    { .name = "any",         .initfn = arm_max_initfn },
+Note,
+ 'any' will disappear from "-cpu help"
+but that's probably fine, old users would still be able to use alias
+and new ones won't even suspect about its existence and use 'max'.
 
-No, this should not be removed. Looks like an accident when resolving a
-conflict?
-
- Thomas
+[...]
