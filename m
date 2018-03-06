@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1etLjN-0003E3-Nv
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:10:50 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1etLlo-0005Et-WF
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:13:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1etLjI-0003Lo-OV
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:10:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43912)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1etLlj-0004bn-NN
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:13:20 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:39260)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1etLjI-0003LS-HU
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:10:44 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1etLjH-00008H-IB
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 23:10:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8025B2E80C0
-	for <qemu-devel@nongnu.org>; Tue,  6 Mar 2018 23:10:43 +0000 (UTC)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1etLlj-0004bZ-DX
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 18:13:15 -0500
+Received: by mail-wm0-x242.google.com with SMTP id i3so1254518wmi.4
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 15:13:15 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180306164957.24275-1-pbonzini@redhat.com>
+	<20180306164957.24275-2-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c5572225-34e5-01af-5133-20dc6a59f24c@amsat.org>
+Date: Tue, 6 Mar 2018 20:13:12 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 06 Mar 2018 23:05:09 -0000
-From: Guenter Roeck <public@roeck-us.net>
-Reply-To: Bug 1753309 <1753309@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152019341691.7537.9997390122339723494.malonedeb@gac.canonical.com>
-Message-Id: <152037750913.7728.5349945021016807601.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1753309] Re: Ethernet interrupt vectors for
- sabrelite machine are defined backwards
+In-Reply-To: <20180306164957.24275-2-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] qom: introduce
+ object_class_get_list_sorted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,98 +36,243 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-#3: Correct, Linux version 4.14 and older registers two interrupt lines,
-both the correct and the wrong one. With qemu version, the kernel
-receives interrupts on irq 151, with the other on 150. So, yes, I guess
-it works by accident. My question is what to do with older (pre-4.14)
-kernels. Presumably those worked (?) with real hardware, so I am a bit
-concerned about the impact of applying 4c8777892e80b to those kernels.
+On 03/06/2018 01:49 PM, Paolo Bonzini wrote:
+> Unify half a dozen copies of very similar code (the only difference being
+> whether comparisons were case-sensitive) and use it also in Tricore,
+> which did not do any sorting of CPU model names.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
--- =
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1753309
-
-Title:
-  Ethernet interrupt vectors for sabrelite machine are defined backwards
-
-Status in QEMU:
-  New
-
-Bug description:
-  The sabrelite machine model used by qemu-system-arm is based on the
-  Freescale/NXP i.MX6Q processor. This SoC has an on-board ethernet
-  controller which is supported in QEMU using the imx_fec.c module
-  (actually called imx.enet for this model.)
-
-  The include/hw/arm/fsm-imx6.h file defines the interrupt vectors for
-  the imx.enet device like this:
-
-  #define FSL_IMX6_ENET_MAC_1588_IRQ 118
-  #define FSL_IMX6_ENET_MAC_IRQ 119
-
-  However, this is backwards. The reference manual for the i.MX6D/Q
-  devices can be found here:
-
-  https://www.nxp.com/docs/en/reference-manual/IMX6DQRM.pdf
-
-  On page 225, in Table 3-1. ARM Cortex A9 domain interrupt summary, it
-  shows the following:
-
-  150 ENET
-  MAC 0 IRQ, Logical OR of:
-  MAC 0 Periodic Timer Overflow
-  MAC 0 Time Stamp Available
-  MAC 0 Time Stamp Available
-  MAC 0 Time Stamp Available
-  MAC 0 Payload Receive Error
-  MAC 0 Transmit FIFO Underrun
-  MAC 0 Collision Retry Limit
-  MAC 0 Late Collision
-  MAC 0 Ethernet Bus Error
-  MAC 0 MII Data Transfer Done
-  MAC 0 Receive Buffer Done
-  MAC 0 Receive Frame Done
-  MAC 0 Transmit Buffer Done
-  MAC 0 Transmit Frame Done
-  MAC 0 Graceful Stop
-  MAC 0 Babbling Transmit Error
-  MAC 0 Babbling Receive Error
-  MAC 0 Wakeup Request [synchronous]
-
-  151 ENET
-  MAC 0 1588 Timer interrupt [synchronous] request
-
-  Note:
-  150 - 32 =3D=3D 118
-  151 - 32 =3D=3D 119
-
-  In other words, the vector definitions in the fsl-imx6.h file are
-  reversed. The correct definition is:
-
-  #define FSL_IMX6_ENET_MAC_IRQ 118
-  #define FSL_IMX6_ENET_MAC_1588_IRQ 119
-
-  I tested the sabrelite simulation using VxWorks 7 (which supports the
-  SabreLite board) and found that while I was able to send and receive
-  packet data via the simulated ethernet interface, the VxWorks i.MX6
-  ethernet driver failed to receive any interrupts. When I corrected the
-  interrupt vector definitions as shown above and recompiled QEMU,
-  everything worked as expected. I was able to exchange ICMP packets
-  with the simulated target and telnet to/from the VxWorks instance
-  running in the virtual machine. I used the tap interface for this.
-
-  As a workaround I was also able to make the ethernet work by modifying
-  the VxWorks imx6q-sabrelite.dts file to change the ethernet interrupt
-  property from 150 to 151.
-
-  This problem was observed with the following environment:
-
-  Host: FreeBSD/amd64 11.1-RELEASE
-  QEMU version: 2.11.0 and 2.11.1 built from source code
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1753309/+subscriptions
+> ---
+>  include/qom/object.h    | 10 ++++++++++
+>  qdev-monitor.c          |  9 +--------
+>  qom/object.c            | 14 ++++++++++++++
+>  target/alpha/cpu.c      | 15 +--------------
+>  target/hppa/cpu.c       | 14 +-------------
+>  target/lm32/cpu.c       | 15 +--------------
+>  target/sh4/cpu.c        | 15 +--------------
+>  target/tricore/helper.c |  2 +-
+>  8 files changed, 30 insertions(+), 64 deletions(-)
+> 
+> diff --git a/include/qom/object.h b/include/qom/object.h
+> index 4f07090db0..12c0f58c8f 100644
+> --- a/include/qom/object.h
+> +++ b/include/qom/object.h
+> @@ -913,6 +913,17 @@ void object_class_foreach(void (*fn)(ObjectClass *klass, void *opaque),
+>  GSList *object_class_get_list(const char *implements_type,
+>                                bool include_abstract);
+>  
+> +/**
+> + * object_class_get_list_sorted:
+> + * @implements_type: The type to filter for, including its derivatives.
+> + * @include_abstract: Whether to include abstract classes.
+> + *
+> + * Returns: A singly-linked list of the classes in alphabetical
+> + * case-insensitive order.
+> + */
+> +GSList *object_class_get_list_sorted(const char *implements_type,
+> +                              bool include_abstract);
+> +
+>  /**
+>   * object_ref:
+>   * @obj: the object
+> diff --git a/qdev-monitor.c b/qdev-monitor.c
+> index b7e3291f8b..61e0300991 100644
+> --- a/qdev-monitor.c
+> +++ b/qdev-monitor.c
+> @@ -122,12 +122,6 @@ static void qdev_print_devinfo(DeviceClass *dc)
+>      error_printf("\n");
+>  }
+>  
+> -static gint devinfo_cmp(gconstpointer a, gconstpointer b)
+> -{
+> -    return strcasecmp(object_class_get_name((ObjectClass *)a),
+> -                      object_class_get_name((ObjectClass *)b));
+> -}
+> -
+>  static void qdev_print_devinfos(bool show_no_user)
+>  {
+>      static const char *cat_name[DEVICE_CATEGORY_MAX + 1] = {
+> @@ -146,8 +140,7 @@ static void qdev_print_devinfos(bool show_no_user)
+>      int i;
+>      bool cat_printed;
+>  
+> -    list = g_slist_sort(object_class_get_list(TYPE_DEVICE, false),
+> -                        devinfo_cmp);
+> +    list = object_class_get_list_sorted(TYPE_DEVICE, false);
+>  
+>      for (i = 0; i <= DEVICE_CATEGORY_MAX; i++) {
+>          cat_printed = false;
+> diff --git a/qom/object.c b/qom/object.c
+> index 755ad03819..6088f55943 100644
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -891,6 +891,19 @@ GSList *object_class_get_list(const char *implements_type,
+>      return list;
+>  }
+>  
+> +static gint object_class_cmp(gconstpointer a, gconstpointer b)
+> +{
+> +    return strcasecmp(object_class_get_name((ObjectClass *)a),
+> +                      object_class_get_name((ObjectClass *)b));
+> +}
+> +
+> +GSList *object_class_get_list_sorted(const char *implements_type,
+> +                                     bool include_abstract)
+> +{
+> +    return g_slist_sort(object_class_get_list(implements_type, include_abstract),
+> +                        object_class_cmp);
+> +}
+> +
+>  void object_ref(Object *obj)
+>  {
+>      if (!obj) {
+> diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
+> index 55675ce419..b08078e7fc 100644
+> --- a/target/alpha/cpu.c
+> +++ b/target/alpha/cpu.c
+> @@ -71,18 +71,6 @@ static void alpha_cpu_realizefn(DeviceState *dev, Error **errp)
+>      acc->parent_realize(dev, errp);
+>  }
+>  
+> -/* Sort alphabetically by type name. */
+> -static gint alpha_cpu_list_compare(gconstpointer a, gconstpointer b)
+> -{
+> -    ObjectClass *class_a = (ObjectClass *)a;
+> -    ObjectClass *class_b = (ObjectClass *)b;
+> -    const char *name_a, *name_b;
+> -
+> -    name_a = object_class_get_name(class_a);
+> -    name_b = object_class_get_name(class_b);
+> -    return strcmp(name_a, name_b);
+> -}
+> -
+>  static void alpha_cpu_list_entry(gpointer data, gpointer user_data)
+>  {
+>      ObjectClass *oc = data;
+> @@ -100,8 +88,7 @@ void alpha_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+>      };
+>      GSList *list;
+>  
+> -    list = object_class_get_list(TYPE_ALPHA_CPU, false);
+> -    list = g_slist_sort(list, alpha_cpu_list_compare);
+> +    list = object_class_get_list_sorted(TYPE_ALPHA_CPU, false);
+>      (*cpu_fprintf)(f, "Available CPUs:\n");
+>      g_slist_foreach(list, alpha_cpu_list_entry, &s);
+>      g_slist_free(list);
+> diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
+> index 969f628f0a..e5da8c3cab 100644
+> --- a/target/hppa/cpu.c
+> +++ b/target/hppa/cpu.c
+> @@ -110,18 +110,6 @@ static void hppa_cpu_realizefn(DeviceState *dev, Error **errp)
+>  #endif
+>  }
+>  
+> -/* Sort hppabetically by type name. */
+> -static gint hppa_cpu_list_compare(gconstpointer a, gconstpointer b)
+> -{
+> -    ObjectClass *class_a = (ObjectClass *)a;
+> -    ObjectClass *class_b = (ObjectClass *)b;
+> -    const char *name_a, *name_b;
+> -
+> -    name_a = object_class_get_name(class_a);
+> -    name_b = object_class_get_name(class_b);
+> -    return strcmp(name_a, name_b);
+> -}
+> -
+>  static void hppa_cpu_list_entry(gpointer data, gpointer user_data)
+>  {
+>      ObjectClass *oc = data;
+> @@ -138,7 +126,7 @@ void hppa_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+>      };
+>      GSList *list;
+>  
+> -    list = object_class_get_list(TYPE_HPPA_CPU, false);
+> +    list = object_class_get_list_sorted(TYPE_HPPA_CPU, false);
+>      list = g_slist_sort(list, hppa_cpu_list_compare);
+>      (*cpu_fprintf)(f, "Available CPUs:\n");
+>      g_slist_foreach(list, hppa_cpu_list_entry, &s);
+> diff --git a/target/lm32/cpu.c b/target/lm32/cpu.c
+> index 96c2499d0b..0003152469 100644
+> --- a/target/lm32/cpu.c
+> +++ b/target/lm32/cpu.c
+> @@ -32,18 +32,6 @@ static void lm32_cpu_set_pc(CPUState *cs, vaddr value)
+>      cpu->env.pc = value;
+>  }
+>  
+> -/* Sort alphabetically by type name. */
+> -static gint lm32_cpu_list_compare(gconstpointer a, gconstpointer b)
+> -{
+> -    ObjectClass *class_a = (ObjectClass *)a;
+> -    ObjectClass *class_b = (ObjectClass *)b;
+> -    const char *name_a, *name_b;
+> -
+> -    name_a = object_class_get_name(class_a);
+> -    name_b = object_class_get_name(class_b);
+> -    return strcmp(name_a, name_b);
+> -}
+> -
+>  static void lm32_cpu_list_entry(gpointer data, gpointer user_data)
+>  {
+>      ObjectClass *oc = data;
+> @@ -65,8 +53,7 @@ void lm32_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+>      };
+>      GSList *list;
+>  
+> -    list = object_class_get_list(TYPE_LM32_CPU, false);
+> -    list = g_slist_sort(list, lm32_cpu_list_compare);
+> +    list = object_class_get_list_sorted(TYPE_LM32_CPU, false);
+>      (*cpu_fprintf)(f, "Available CPUs:\n");
+>      g_slist_foreach(list, lm32_cpu_list_entry, &s);
+>      g_slist_free(list);
+> diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
+> index 6302cfda3a..541ffc2d97 100644
+> --- a/target/sh4/cpu.c
+> +++ b/target/sh4/cpu.c
+> @@ -85,18 +85,6 @@ typedef struct SuperHCPUListState {
+>      FILE *file;
+>  } SuperHCPUListState;
+>  
+> -/* Sort alphabetically by type name. */
+> -static gint superh_cpu_list_compare(gconstpointer a, gconstpointer b)
+> -{
+> -    ObjectClass *class_a = (ObjectClass *)a;
+> -    ObjectClass *class_b = (ObjectClass *)b;
+> -    const char *name_a, *name_b;
+> -
+> -    name_a = object_class_get_name(class_a);
+> -    name_b = object_class_get_name(class_b);
+> -    return strcmp(name_a, name_b);
+> -}
+> -
+>  static void superh_cpu_list_entry(gpointer data, gpointer user_data)
+>  {
+>      SuperHCPUListState *s = user_data;
+> @@ -114,8 +102,7 @@ void sh4_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+>      };
+>      GSList *list;
+>  
+> -    list = object_class_get_list(TYPE_SUPERH_CPU, false);
+> -    list = g_slist_sort(list, superh_cpu_list_compare);
+> +    list = object_class_get_list_sorted(TYPE_SUPERH_CPU, false);
+>      g_slist_foreach(list, superh_cpu_list_entry, &s);
+>      g_slist_free(list);
+>  }
+> diff --git a/target/tricore/helper.c b/target/tricore/helper.c
+> index 45276d3782..dad7eea085 100644
+> --- a/target/tricore/helper.c
+> +++ b/target/tricore/helper.c
+> @@ -101,7 +101,7 @@ void tricore_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+>      };
+>      GSList *list;
+>  
+> -    list = object_class_get_list(TYPE_TRICORE_CPU, false);
+> +    list = object_class_get_list_sorted(TYPE_TRICORE_CPU, false);
+>      (*cpu_fprintf)(f, "Available CPUs:\n");
+>      g_slist_foreach(list, tricore_cpu_list_entry, &s);
+>      g_slist_free(list);
+> 
