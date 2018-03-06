@@ -1,39 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1et7St-0007F5-4O
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 02:56:52 -0500
+	(envelope-from <yi.l.liu@intel.com>) id 1et7Wy-0001ts-7G
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 03:01:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1et7Sp-0001Gv-7w
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 02:56:51 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33516
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1et7Sp-0001Ga-1x
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 02:56:47 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w267sLaj117417
-	for <qemu-devel@nongnu.org>; Tue, 6 Mar 2018 02:56:46 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ghnfpbc4d-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 02:56:45 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 6 Mar 2018 07:56:44 -0000
-References: <20180306075448.1179-1-haoqf@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 6 Mar 2018 08:56:38 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180306075448.1179-1-haoqf@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <yi.l.liu@intel.com>) id 1et7Wu-0003JK-Au
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 03:01:04 -0500
+Received: from mga14.intel.com ([192.55.52.115]:53905)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1et7Wt-0003Il-UB
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 03:01:00 -0500
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+Date: Tue, 6 Mar 2018 08:00:41 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C257439B87886@SHSMSX104.ccr.corp.intel.com>
+References: <1519900415-30314-1-git-send-email-yi.l.liu@linux.intel.com>
+	<1519900415-30314-8-git-send-email-yi.l.liu@linux.intel.com>
+	<20180306064436.GD3615@xz-mi>
+In-Reply-To: <20180306064436.GD3615@xz-mi>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <b7dbab37-9a75-f945-baca-7d4e568476d0@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] iotests: bypass s390x for case 200
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 07/12] vfio/pci: register sva notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,44 +29,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QingFeng Hao <haoqf@linux.vnet.ibm.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peterx@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, cohuck@redhat.com, zyimin@linux.vnet.ibm.com, famz@redhat.com
+To: Peter Xu <peterx@redhat.com>, "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "Tian, Kevin" <kevin.tian@intel.com>, "jasowang@redhat.com" <jasowang@redhat.com>
 
-Nack. This will be fixed by 
-
-s390/ipl: only print boot menu error if -boot menu=on was specified
-
-On 03/06/2018 08:54 AM, QingFeng Hao wrote:
-> In s390x, the case 200 failed as:
->  === Starting QEMU VM ===
-> 
-> +QEMU_PROG: boot menu is not supported for this device type.
->  {"return": {}}
-> 
->  === Sending stream/cancel, checking for SIGSEGV only ===
-> Failures: 200
-> Failed 1 of 1 tests
-> 
-> It was caused by the command which isn't supported by s390x now:
-> qemu-system-s390x -device pci-bridge,id=bridge1,chassis_nr=1,bus=pci.0 -object iothread,id=iothread0 -device virtio-scsi-pci,bus=bridge1,addr=0x1f,id=scsi0,iothread=iothread0 -drive file=.../scratch/test.img,media=disk,if=none,cache=writeback,id=drive_sysdisk,format=qcow2 -device scsi-hd,drive=drive_sysdisk,bus=scsi0.0,id=sysdisk,bootindex=0 -nographic
-> 
-> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-> ---
->  tests/qemu-iotests/200 | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/tests/qemu-iotests/200 b/tests/qemu-iotests/200
-> index ddbdedc476..7e53bd7774 100755
-> --- a/tests/qemu-iotests/200
-> +++ b/tests/qemu-iotests/200
-> @@ -45,6 +45,10 @@ _supported_fmt qcow2 qed
->  _supported_proto file
->  _supported_os Linux
-> 
-> +if [ "$QEMU_DEFAULT_MACHINE" != "pc" ]; then
-> +    _notrun "Requires a PC machine"
-> +fi
-> +
->  BACKING_IMG="${TEST_DIR}/backing.img"
->  TEST_IMG="${TEST_DIR}/test.img"
-> 
+PiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBldGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBUdWVz
+ZGF5LCBNYXJjaCA2LCAyMDE4IDI6NDUgUE0NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MyAwNy8x
+Ml0gdmZpby9wY2k6IHJlZ2lzdGVyIHN2YSBub3RpZmllcg0KPiANCj4gT24gVGh1LCBNYXIgMDEs
+IDIwMTggYXQgMDY6MzM6MzBQTSArMDgwMCwgTGl1LCBZaSBMIHdyb3RlOg0KPiA+IFRoaXMgcGF0
+Y2ggc2hvd3MgaG93IHN2YSBub3RpZmllciBpcyByZWdpc3RlcmVkLiBBbmQgcHJvdmlkZWQgYW4N
+Cj4gPiBleGFtcGxlIGJ5IHJlZ2lzdGVyaW5nIG5vdGlmeSBmdW5jIGZvciB0bGIgZmx1c2ggcHJv
+cGFnYXRpb24uDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBMaXUsIFlpIEwgPHlpLmwubGl1QGxp
+bnV4LmludGVsLmNvbT4NCj4gPiAtLS0NCj4gPiAgaHcvdmZpby9wY2kuYyB8IDU1DQo+ID4gKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLQ0KPiA+
+ICAxIGZpbGUgY2hhbmdlZCwgNTMgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4gPg0K
+PiA+IGRpZmYgLS1naXQgYS9ody92ZmlvL3BjaS5jIGIvaHcvdmZpby9wY2kuYyBpbmRleCBhNjBh
+NGQ3Li5iNzI5N2NjDQo+ID4gMTAwNjQ0DQo+ID4gLS0tIGEvaHcvdmZpby9wY2kuYw0KPiA+ICsr
+KyBiL2h3L3ZmaW8vcGNpLmMNCj4gPiBAQCAtMjc3NSw2ICsyNzc1LDI2IEBAIHN0YXRpYyB2b2lk
+IHZmaW9fdW5yZWdpc3Rlcl9yZXFfbm90aWZpZXIoVkZJT1BDSURldmljZQ0KPiAqdmRldikNCj4g
+PiAgICAgIHZkZXYtPnJlcV9lbmFibGVkID0gZmFsc2U7DQo+ID4gIH0NCj4gPg0KPiA+ICtzdGF0
+aWMgVkZJT0NvbnRhaW5lciAqdmZpb19nZXRfY29udGFpbmVyX2Zyb21fYnVzZGV2KFBDSUJ1cyAq
+YnVzLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIGludDMyX3QgZGV2Zm4pIHsNCj4gPiArICAgIFZGSU9Hcm91cCAqZ3JvdXA7DQo+ID4g
+KyAgICBWRklPUENJRGV2aWNlICp2ZGV2X2l0ZXI7DQo+ID4gKyAgICBWRklPRGV2aWNlICp2YmFz
+ZWRldl9pdGVyOw0KPiA+ICsgICAgUENJRGV2aWNlICpwZGV2X2l0ZXI7DQo+ID4gKw0KPiA+ICsg
+ICAgUUxJU1RfRk9SRUFDSChncm91cCwgJnZmaW9fZ3JvdXBfbGlzdCwgbmV4dCkgew0KPiA+ICsg
+ICAgICAgIFFMSVNUX0ZPUkVBQ0godmJhc2VkZXZfaXRlciwgJmdyb3VwLT5kZXZpY2VfbGlzdCwg
+bmV4dCkgew0KPiA+ICsgICAgICAgICAgICB2ZGV2X2l0ZXIgPSBjb250YWluZXJfb2YodmJhc2Vk
+ZXZfaXRlciwgVkZJT1BDSURldmljZSwgdmJhc2VkZXYpOw0KPiA+ICsgICAgICAgICAgICBwZGV2
+X2l0ZXIgPSAmdmRldl9pdGVyLT5wZGV2Ow0KPiA+ICsgICAgICAgICAgICBpZiAocGNpX2dldF9i
+dXMocGRldl9pdGVyKSA9PSBidXMgJiYgcGRldl9pdGVyLT5kZXZmbiA9PSBkZXZmbikgew0KPiA+
+ICsgICAgICAgICAgICAgICAgcmV0dXJuIGdyb3VwLT5jb250YWluZXI7DQo+ID4gKyAgICAgICAg
+ICAgIH0NCj4gPiArICAgICAgICB9DQo+ID4gKyAgICB9DQo+ID4gKyAgICByZXR1cm4gTlVMTDsN
+Cj4gPiArfQ0KPiA+ICsNCj4gPiAgc3RhdGljIHZvaWQgdmZpb19wY2lfZGV2aWNlX3N2YV9iaW5k
+X3Bhc2lkX3RhYmxlKFBDSUJ1cyAqYnVzLA0KPiA+ICAgICAgICAgICAgICAgICAgIGludDMyX3Qg
+ZGV2Zm4sIHVpbnQ2NF90IHBhc2lkdF9hZGRyLCB1aW50MzJfdCBzaXplKQ0KPiA+IHsgQEAgLTI3
+ODMsMTEgKzI4MDMsNDIgQEAgc3RhdGljIHZvaWQNCj4gPiB2ZmlvX3BjaV9kZXZpY2Vfc3ZhX2Jp
+bmRfcGFzaWRfdGFibGUoUENJQnVzICpidXMsDQo+ID4gICAgICBTbyBmYXIsIEludGVsIFZULWQg
+YW5kIEFNRCBJT01NVSByZXF1aXJlcyBpdC4gKi8gIH0NCj4gPg0KPiA+ICtzdGF0aWMgdm9pZCB2
+ZmlvX2lvbW11X3N2YV90bGJfaW52YWxpZGF0ZV9ub3RpZnkoSU9NTVVTVkFOb3RpZmllciAqbiwN
+Cj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIElP
+TU1VU1ZBRXZlbnREYXRhDQo+ID4gKypldmVudF9kYXRhKSB7DQo+ID4gKy8qICBTYW1wbGUgY29k
+ZSwgd291bGQgYmUgZGV0YWlsZWQgaW4gY29taW5nIHZpcnQtU1ZBIHBhdGNoc2V0Lg0KPiA+ICsg
+ICAgVkZJT0d1ZXN0SU9NTVVTVkFDb250ZXh0ICpnc3ZhX2N0eDsNCj4gPiArICAgIElPTU1VU1ZB
+Q29udGV4dCAqc3ZhX2N0eDsNCj4gPiArICAgIFZGSU9Db250YWluZXIgKmNvbnRhaW5lcjsNCj4g
+PiArDQo+ID4gKyAgICBnc3ZhX2N0eCA9IGNvbnRhaW5lcl9vZihuLCBWRklPR3Vlc3RJT01NVVNW
+QUNvbnRleHQsIG4pOw0KPiA+ICsgICAgY29udGFpbmVyID0gZ3N2YV9jdHgtPmNvbnRhaW5lcjsN
+Cj4gPiArDQo+ID4gKyAgICBUT0RPOiBmb3J3YXJkIHRvIGhvc3QgdGhyb3VnaCBWRklPIElPQ1RM
+DQo+IA0KPiBJTUhPIGlmIHRoZSBzZXJpZXMgaXMgbm90IHJlYWR5IGZvciBtZXJnaW5nLCB3ZSBj
+YW4gc3RpbGwgbWFyayBpdCBhcyBSRkMgYW5kIGRlY2xhcmUNCj4gdGhhdCBzbyBwZW9wbGUgd29u
+J3QgbmVlZCB0byBnbyBpbnRvIGRldGFpbHMgb2YgdGhlIHBhdGNoZXMuDQoNClRoYW5rcyBmb3Ig
+dGhlIHN1Z2dlc3Rpb24uIEFjdHVhbGx5LCBJIHdhcyBoZXNpdGF0aW5nIGl0LiBBcyB5b3UgbWF5
+IGtub3csIHRoaXMgaXMgYWN0dWFsbHkNCjNyZCB2ZXJzaW9uIG9mIHRoaXMgZWZmb3J0LiBCdXQg
+eWVzLCBJIHdvdWxkIGZvbGxvdyB5b3VyIHN1Z2dlc3Rpb24gaW4gY29taW5nIHZlcnNpb25zLg0K
+DQo+ID4gKyovDQo+ID4gK30NCj4gPiArDQo+ID4gIHN0YXRpYyB2b2lkIHZmaW9fcGNpX2Rldmlj
+ZV9zdmFfcmVnaXN0ZXJfbm90aWZpZXIoUENJQnVzICpidXMsDQo+ID4gICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgaW50MzJfdCBkZXZmbiwgSU9NTVVTVkFDb250ZXh0ICpzdmFfY3R4KSAgew0K
+PiA+IC0gICAgLyogUmVnaXN0ZXIgbm90aWZpZXIgZm9yIFRMQiBpbnZhbGlkYXRpb24gcHJvcGFn
+YXRpb24NCj4gPiAtICAgICAgICovDQo+ID4gKyAgICBWRklPQ29udGFpbmVyICpjb250YWluZXIg
+PSB2ZmlvX2dldF9jb250YWluZXJfZnJvbV9idXNkZXYoYnVzLA0KPiA+ICsgZGV2Zm4pOw0KPiA+
+ICsNCj4gPiArICAgIGlmIChjb250YWluZXIgIT0gTlVMTCkgew0KPiA+ICsgICAgICAgIFZGSU9H
+dWVzdElPTU1VU1ZBQ29udGV4dCAqZ3N2YV9jdHg7DQo+ID4gKyAgICAgICAgZ3N2YV9jdHggPSBn
+X21hbGxvYzAoc2l6ZW9mKCpnc3ZhX2N0eCkpOw0KPiA+ICsgICAgICAgIGdzdmFfY3R4LT5zdmFf
+Y3R4ID0gc3ZhX2N0eDsNCj4gPiArICAgICAgICBnc3ZhX2N0eC0+Y29udGFpbmVyID0gY29udGFp
+bmVyOw0KPiA+ICsgICAgICAgIFFMSVNUX0lOU0VSVF9IRUFEKCZjb250YWluZXItPmdzdmFfY3R4
+X2xpc3QsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgZ3N2YV9jdHgsDQo+ID4gKyAg
+ICAgICAgICAgICAgICAgICAgICAgICAgZ3N2YV9jdHhfbmV4dCk7DQo+ID4gKyAgICAgICAvKiBS
+ZWdpc3RlciB2ZmlvX2lvbW11X3N2YV90bGJfaW52YWxpZGF0ZV9ub3RpZnkgd2l0aCBldmVudCBm
+bGFnDQo+ID4gKyAgICAgICAgICAgSU9NTVVfU1ZBX0VWRU5UX1RMQl9JTlYgKi8NCj4gPiArICAg
+ICAgICBpb21tdV9zdmFfbm90aWZpZXJfcmVnaXN0ZXIoc3ZhX2N0eCwNCj4gPiArICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgJmdzdmFfY3R4LT5uLA0KPiA+ICsgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICB2ZmlvX2lvbW11X3N2YV90bGJfaW52YWxpZGF0ZV9u
+b3RpZnksDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIElPTU1VX1NW
+QV9FVkVOVF9UTEJfSU5WKTsNCj4gDQo+IEkgd291bGQgc3F1YXNoIHRoaXMgcGF0Y2ggaW50byBw
+cmV2aW91cyBvbmUgc2luY2UgYmFzaWNhbGx5IHRoaXMgaXMgb25seSBwYXJ0IG9mIHRoZQ0KPiBp
+bXBsZW1lbnRhdGlvbiB0byBwcm92aWRlIHZmaW8tc3BlaWNpZmljIHJlZ2lzdGVyIGhvb2suDQoN
+CnN1cmUuDQoNCj4gQnV0IGEgbW9yZSBpbXBvcnRhbnQgcXVlc3Rpb24gaXMuLi4gd2h5IHRoaXM/
+DQo+IA0KPiBJTUhPIHRoZSBub3RpZmllciByZWdpc3RyYXRpb24gY2FuIGJlIGdlbmVyYWwgZm9y
+IFBDSS4gIFdoeSB2ZmlvIG5lZWRzIHRvIHByb3ZpZGUgaXQncw0KPiBvd24gcmVnaXN0ZXIgY2Fs
+bGJhY2s/ICBXb3VsZCBpdCBiZSBlbm91Z2ggaWYgaXQgb25seSBwcm92aWRlcyBpdHMgb3duIG5v
+dGlmeSBjYWxsYmFjaz8NCg0KVGhlIG5vdGlmaWVycyBhcmUgaW4gVkZJTy4gSG93ZXZlciwgdGhl
+IHJlZ2lzdHJhdGlvbiBpcyBjb250cm9sbGVkIGJ5IHZJT01NVSBlbXVsYXRvci4NCkluIHRoaXMg
+c2VyaWVzLCBQQVNJRCB0YWdnZWQgQWRkcmVzcyBTcGFjZSBpcyBpbnRyb2R1Y2VkLiBBbmQgdGhl
+IG5ldyBub3RpZmllcnMgYXJlIGZvcg0Kc3VjaCBBZGRyZXNzIFNwYWNlLiBTdWNoIEFkZHJlc3Mg
+U3BhY2UgaXMgY3JlYXRlZCBhbmQgZGVsZXRlZCBpbiB2SU9NTVUgZW11bGF0b3IuDQpTbyB0aGUg
+bm90aWZpZXIgcmVnaXN0cmF0aW9uIG5lZWRzIHRvIGhhcHBlbiBhY2NvcmRpbmdseS4NCg0KZS5n
+LiBndWVzdCBTVk0gYXBwbGljYXRpb24gYmluZCBhIGRldmljZSB0byBhIHByb2Nlc3MsIGl0IHBy
+b2dyYW1zIHRoZSBndWVzdCBpb21tdQ0KdHJhbnNsYXRpb24gc3RydWN0dXJlLCB2SU9NTVUgZW11
+bGF0b3IgY2FwdHVyZXMgdGhlIGNoYW5nZSwgYW5kIGNyZWF0ZSBhIFBBU0lEDQp0YWdnZWQgQWRk
+cmVzcyBTcGFjZSBmb3IgaXQgYW5kIHJlZ2lzdGVyIG5vdGlmaWVycy4NCg0KVGhhdCdzIHdoeSBJ
+IGRvIGl0IGluIHN1Y2ggYSBtYW5uZXIuDQoNClRoYW5rcywNCllpIExpdQ0KDQoNCg==
