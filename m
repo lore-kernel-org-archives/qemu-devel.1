@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1et9GD-0000AU-C8
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:51:58 -0500
+	(envelope-from <kraxel@redhat.com>) id 1et9GD-0000Ai-KA
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:51:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1et9GC-000523-CY
+	(envelope-from <kraxel@redhat.com>) id 1et9GC-00052C-HB
 	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:51:53 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57184 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57186 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1et9GC-00051b-8y
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1et9GC-00051g-Bd
 	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 04:51:52 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue,  6 Mar 2018 10:51:31 +0100
-Message-Id: <20180306095135.21285-6-kraxel@redhat.com>
+Date: Tue,  6 Mar 2018 10:51:32 +0100
+Message-Id: <20180306095135.21285-7-kraxel@redhat.com>
 In-Reply-To: <20180306095135.21285-1-kraxel@redhat.com>
 References: <20180306095135.21285-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 5/9] secondary-vga: properly close
- QemuConsole on unplug
+Subject: [Qemu-devel] [PATCH v7 6/9] vfio/common: cleanup in
+ vfio_region_finalize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +27,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: intel-gvt-dev@lists.freedesktop.org, Alex Williamson <alex.williamson@redhat.com>, Tina Zhang <tina.zhang@intel.com>, Gerd Hoffmann <kraxel@redhat.com>, Kirti Wankhede <kwankhede@nvidia.com>
 
-Using the new graphic_console_close() function.
-
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/display/vga-pci.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ hw/vfio/common.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/hw/display/vga-pci.c b/hw/display/vga-pci.c
-index 1674bd3581..f312930664 100644
---- a/hw/display/vga-pci.c
-+++ b/hw/display/vga-pci.c
-@@ -292,6 +292,14 @@ static void pci_secondary_vga_realize(PCIDevice *dev, Error **errp)
-     pci_register_bar(&d->dev, 2, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->mmio);
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index f895e3c335..6a8203a532 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -858,6 +858,13 @@ void vfio_region_finalize(VFIORegion *region)
+     g_free(region->mmaps);
+ 
+     trace_vfio_region_finalize(region->vbasedev->name, region->nr);
++
++    region->mem = NULL;
++    region->mmaps = NULL;
++    region->nr_mmaps = 0;
++    region->size = 0;
++    region->flags = 0;
++    region->nr = 0;
  }
  
-+static void pci_secondary_vga_exit(PCIDevice *dev)
-+{
-+    PCIVGAState *d = PCI_VGA(dev);
-+    VGACommonState *s = &d->vga;
-+
-+    graphic_console_close(s->con);
-+}
-+
- static void pci_secondary_vga_init(Object *obj)
- {
-     /* Expose framebuffer byteorder via QOM */
-@@ -361,6 +369,7 @@ static void secondary_class_init(ObjectClass *klass, void *data)
-     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
- 
-     k->realize = pci_secondary_vga_realize;
-+    k->exit = pci_secondary_vga_exit;
-     k->class_id = PCI_CLASS_DISPLAY_OTHER;
-     dc->props = secondary_pci_properties;
-     dc->reset = pci_secondary_vga_reset;
+ void vfio_region_mmaps_set_enabled(VFIORegion *region, bool enabled)
 -- 
 2.9.3
