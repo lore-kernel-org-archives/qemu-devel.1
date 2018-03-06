@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41353)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1etE4X-0007ES-G9
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:00:10 -0500
+	(envelope-from <berto@igalia.com>) id 1etE5X-0007q1-4u
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:01:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1etE4T-0007Iv-GF
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:00:09 -0500
-Date: Tue, 6 Mar 2018 15:59:54 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180306155954.32e15f6a.cohuck@redhat.com>
-In-Reply-To: <20180227173251.17025-1-cohuck@redhat.com>
-References: <20180227173251.17025-1-cohuck@redhat.com>
+	(envelope-from <berto@igalia.com>) id 1etE5R-0007xb-Jo
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 10:01:11 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20180306145426.GG7139@localhost.localdomain>
+References: <cover.1519921268.git.berto@igalia.com>
+	<d58bbc353563bb9c83ffe90faaa36fadf683e332.1519921268.git.berto@igalia.com>
+	<20180306145426.GG7139@localhost.localdomain>
+Date: Tue, 06 Mar 2018 16:01:02 +0100
+Message-ID: <w51vae9l041.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] vfio-ccw: license text should indicate GPL
- v2 or later
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 3/7] qcow2: Check L1 table parameters in
+ qcow2_expand_zero_clusters()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,38 +24,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Alex Williamson <alex.williamson@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Tue, 27 Feb 2018 18:32:51 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+On Tue 06 Mar 2018 03:54:26 PM CET, Kevin Wolf wrote:
+>> @@ -2092,11 +2092,18 @@ int qcow2_expand_zero_clusters(BlockDriverState *bs,
+>>      }
+>>  
+>>      for (i = 0; i < s->nb_snapshots; i++) {
+>> -        int l1_sectors = DIV_ROUND_UP(s->snapshots[i].l1_size *
+>> -                                      sizeof(uint64_t), BDRV_SECTOR_SIZE);
+>> +        int l1_size2;
+>> +        uint64_t *new_l1_table;
+>>  
+>> -        uint64_t *new_l1_table =
+>> -            g_try_realloc(l1_table, l1_sectors * BDRV_SECTOR_SIZE);
+>> +        ret = qcow2_validate_table(bs, s->snapshots[i].l1_table_offset,
+>> +                                   s->snapshots[i].l1_size, sizeof(uint64_t),
+>> +                                   QCOW_MAX_L1_SIZE, "", NULL);
+>> +        if (ret < 0) {
+>> +            return ret;
+>
+> Shouldn't this be goto fail?
 
-> The license text currently specifies "any version" of the GPL. It
-> is unlikely that GPL v1 was ever intended; change this to the
-> standard "or any later version" text.
-> 
-> Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> Cc: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-> Cc: Pierre Morel <pmorel@linux.vnet.ibm.com>
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  hw/vfio/ccw.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> index 16713f2c52..4e5855741a 100644
-> --- a/hw/vfio/ccw.c
-> +++ b/hw/vfio/ccw.c
-> @@ -6,8 +6,8 @@
->   *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
->   *            Pierre Morel <pmorel@linux.vnet.ibm.com>
->   *
-> - * This work is licensed under the terms of the GNU GPL, version 2 or(at
-> - * your option) any version. See the COPYING file in the top-level
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
-> + * your option) any later version. See the COPYING file in the top-level
->   * directory.
->   */
->  
+You're right, this is a loop, and l1_table could have been initialized
+in previous iterations.
 
-Queued to s390-next.
+I'll send a corrected version with this change, but first I'll wait a
+bit in case you see anything else in the series.
+
+Berto
