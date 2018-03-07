@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1etWoG-0004uD-EZ
+	(envelope-from <quintela@redhat.com>) id 1etWoF-0004ss-2J
 	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 06:00:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1etWoC-0006AJ-C3
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 06:00:36 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34490 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1etWo9-00068A-AS
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 06:00:35 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45248 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1etWoC-00069w-8g
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 06:00:32 -0500
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1etWo8-00064a-UG
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 06:00:29 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C2ABB4023B98
-	for <qemu-devel@nongnu.org>; Wed,  7 Mar 2018 11:00:31 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 896C8818AAEB
+	for <qemu-devel@nongnu.org>; Wed,  7 Mar 2018 11:00:20 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed,  7 Mar 2018 11:59:56 +0100
-Message-Id: <20180307110010.2205-11-quintela@redhat.com>
+Date: Wed,  7 Mar 2018 11:59:48 +0100
+Message-Id: <20180307110010.2205-3-quintela@redhat.com>
 In-Reply-To: <20180307110010.2205-1-quintela@redhat.com>
 References: <20180307110010.2205-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v10 10/24] migration: In case of error just end
- the migration
+Subject: [Qemu-devel] [PATCH v10 02/24] tests: Add migration xbzrle test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,33 +33,106 @@ To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- migration/socket.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ tests/migration-test.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 64 insertions(+)
 
-diff --git a/migration/socket.c b/migration/socket.c
-index 08606c665d..b12b0a462e 100644
---- a/migration/socket.c
-+++ b/migration/socket.c
-@@ -139,9 +139,8 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
-     sioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
-                                      &err);
-     if (!sioc) {
--        error_report("could not accept migration connection (%s)",
--                     error_get_pretty(err));
--        goto out;
-+        migrate_set_error(migrate_get_current(), err);
-+        return G_SOURCE_REMOVE;
-     }
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 65ce3ea4ab..fb67a88353 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -501,6 +501,20 @@ static void deprecated_set_speed(QTestState *who, const char *value)
+     migrate_check_parameter(who, "max-bandwidth", value);
+ }
  
-     trace_migration_socket_incoming_accepted();
-@@ -150,7 +149,6 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
-     migration_channel_process_incoming(QIO_CHANNEL(sioc));
-     object_unref(OBJECT(sioc));
++static void deprecated_set_cache_size(QTestState *who, const char *value)
++{
++    QDict *rsp;
++    gchar *cmd;
++
++    cmd = g_strdup_printf("{ 'execute': 'migrate-set-cache-size',"
++                          "'arguments': { 'value': %s } }", value);
++    rsp = qtest_qmp(who, cmd);
++    g_free(cmd);
++    g_assert(qdict_haskey(rsp, "return"));
++    QDECREF(rsp);
++    migrate_check_parameter(who, "xbzrle-cache-size", value);
++}
++
+ static void test_deprecated(void)
+ {
+     QTestState *from;
+@@ -509,6 +523,7 @@ static void test_deprecated(void)
  
--out:
-     if (migration_has_all_channels()) {
-         /* Close listening socket as its no longer needed */
-         qio_channel_close(ioc, NULL);
+     deprecated_set_downtime(from, 0.12345);
+     deprecated_set_speed(from, "12345");
++    deprecated_set_cache_size(from, "4096");
+ 
+     qtest_quit(from);
+ }
+@@ -623,6 +638,54 @@ static void test_precopy_unix(void)
+     g_free(uri);
+ }
+ 
++static void test_xbzrle(const char *uri)
++{
++    QTestState *from, *to;
++
++    test_migrate_start(&from, &to, uri);
++
++    /* We want to pick a speed slow enough that the test completes
++     * quickly, but that it doesn't complete precopy even on a slow
++     * machine, so also set the downtime.
++     */
++    /* 1 ms should make it not converge*/
++    migrate_set_parameter(from, "downtime-limit", "1");
++    /* 1GB/s */
++    migrate_set_parameter(from, "max-bandwidth", "1000000000");
++
++    migrate_set_parameter(from, "xbzrle-cache-size", "33554432");
++
++    migrate_set_capability(from, "xbzrle", "true");
++    migrate_set_capability(to, "xbzrle", "true");
++    /* Wait for the first serial output from the source */
++    wait_for_serial("src_serial");
++
++    migrate(from, uri);
++
++    wait_for_migration_pass(from);
++
++    /* 300ms should converge */
++    migrate_set_parameter(from, "downtime-limit", "300");
++
++    if (!got_stop) {
++        qtest_qmp_eventwait(from, "STOP");
++    }
++    qtest_qmp_eventwait(to, "RESUME");
++
++    wait_for_serial("dest_serial");
++    wait_for_migration_complete(from);
++
++    test_migrate_end(from, to, true);
++}
++
++static void test_xbzrle_unix(void)
++{
++    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
++
++    test_xbzrle(uri);
++    g_free(uri);
++}
++
+ int main(int argc, char **argv)
+ {
+     char template[] = "/tmp/migration-test-XXXXXX";
+@@ -646,6 +709,7 @@ int main(int argc, char **argv)
+     qtest_add_func("/migration/deprecated", test_deprecated);
+     qtest_add_func("/migration/bad_dest", test_baddest);
+     qtest_add_func("/migration/precopy/unix", test_precopy_unix);
++    qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
+ 
+     ret = g_test_run();
+ 
 -- 
 2.14.3
