@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1etTNr-0001sL-Mj
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 02:21:08 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etTQQ-00035Z-9x
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 02:23:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1etTNo-0000sz-GA
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 02:21:07 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38512 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1etTNo-0000st-B3
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 02:21:04 -0500
-Date: Wed, 7 Mar 2018 12:50:54 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <1513877118-3149-3-git-send-email-jack.schwartz@oracle.com>
-Message-ID: <nycvar.YSQ.7.76.1803071249330.20163@wniryva>
-References: <1513877118-3149-1-git-send-email-jack.schwartz@oracle.com>
-	<1513877118-3149-3-git-send-email-jack.schwartz@oracle.com>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etTQN-00021s-3D
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 02:23:46 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+References: <20180306203103.25563-1-mark.cave-ayland@ilande.co.uk>
+	<20180306203103.25563-8-mark.cave-ayland@ilande.co.uk>
+	<alpine.BSF.2.21.1803070040490.57076@zero.eik.bme.hu>
+	<4afbd222-f661-fd24-9b88-29c80b98175f@ilande.co.uk>
+Message-ID: <3e6543c0-0343-36b5-2755-161f6fafe7b1@ilande.co.uk>
+Date: Wed, 7 Mar 2018 07:23:33 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH QEMU v1 2/4] multiboot: Remove unused
- variables from multiboot.c
+In-Reply-To: <4afbd222-f661-fd24-9b88-29c80b98175f@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 07/19] uninorth: move PCI mmio
+ memory region initialisation into init function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,37 +27,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jack Schwartz <jack.schwartz@oracle.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, konrad.wilk@oracle.com, daniel.kiper@oracle.com, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-+-- On Thu, 21 Dec 2017, Jack Schwartz wrote --+
-| Remove unused variables: mh_mode_type, mh_width, mh_height, mh_depth
-| 
-| Signed-off-by: Jack Schwartz <jack.schwartz@oracle.com>
-| Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
-| ---
-|  hw/i386/multiboot.c | 6 ------
-|  1 file changed, 6 deletions(-)
-| 
-| diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
-| index ff2733d..964feaf 100644
-| --- a/hw/i386/multiboot.c
-| +++ b/hw/i386/multiboot.c
-| @@ -255,12 +255,6 @@ int load_multiboot(FWCfgState *fw_cfg,
-|              mb_kernel_size = mb_load_size;
-|          }
-|  
-| -        /* Valid if mh_flags sets MULTIBOOT_HEADER_HAS_VBE.
-| -        uint32_t mh_mode_type = ldl_p(header+i+32);
-| -        uint32_t mh_width = ldl_p(header+i+36);
-| -        uint32_t mh_height = ldl_p(header+i+40);
-| -        uint32_t mh_depth = ldl_p(header+i+44); */
-| -
+On 07/03/18 07:02, Mark Cave-Ayland wrote:
 
-+1 They are anyway comments.
-Reviewed-by: Prasad J Pandit <pjp@fedoraproject.org>
+> On 06/03/18 23:44, BALATON Zoltan wrote:
+> 
+>> On Tue, 6 Mar 2018, Mark Cave-Ayland wrote:
+>>> Whilst we are here, rename the memory regions to better reflect 
+>>> whether they
+>>> belong to either a PCI or an AGP bus.
+>>>
+>>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>> ---
+>>> hw/pci-host/uninorth.c | 28 ++++++++++++++++++----------
+>>> 1 file changed, 18 insertions(+), 10 deletions(-)
+>>>
+>>> diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
+>>> index b081e3c153..5b8fc3aa16 100644
+>>> --- a/hw/pci-host/uninorth.c
+>>> +++ b/hw/pci-host/uninorth.c
+>>> @@ -111,29 +111,39 @@ static const MemoryRegionOps unin_data_ops = {
+>>>
+>>> static void pci_unin_main_init(Object *obj)
+>>> {
+>>> +    UNINState *s = UNI_NORTH_PCI_HOST_BRIDGE(obj);
+>>>     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+>>>     PCIHostState *h = PCI_HOST_BRIDGE(obj);
+>>>
+>>>     /* Use values found on a real PowerMac */
+>>>     /* Uninorth main bus */
+>>>     memory_region_init_io(&h->conf_mem, OBJECT(h), 
+>>> &pci_host_conf_le_ops,
+>>> -                          obj, "pci-conf-idx", 0x1000);
+>>> +                          obj, "unin-pci-conf-idx", 0x1000);
+>>>     memory_region_init_io(&h->data_mem, OBJECT(h), &unin_data_ops, obj,
+>>> -                          "pci-conf-data", 0x1000);
+>>> +                          "unin-pci-conf-data", 0x1000);
+>>> +
+>>> +    memory_region_init(&s->pci_mmio, OBJECT(s), "unin-pci-mmio",
+>>> +                       0x100000000ULL);
+>>> +
+>>>     sysbus_init_mmio(sbd, &h->conf_mem);
+>>>     sysbus_init_mmio(sbd, &h->data_mem);
+>>> }
+>>>
+>>> static void pci_u3_agp_init(Object *obj)
+>>> {
+>>> +    UNINState *s = U3_AGP_HOST_BRIDGE(obj);
+>>>     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+>>>     PCIHostState *h = PCI_HOST_BRIDGE(obj);
+>>>
+>>>     /* Uninorth U3 AGP bus */
+>>>     memory_region_init_io(&h->conf_mem, OBJECT(h), 
+>>> &pci_host_conf_le_ops,
+>>> -                          obj, "pci-conf-idx", 0x1000);
+>>> +                          obj, "unin-pci-conf-idx", 0x1000);
+>>>     memory_region_init_io(&h->data_mem, OBJECT(h), &unin_data_ops, obj,
+>>> -                          "pci-conf-data", 0x1000);
+>>> +                          "unin-pci-conf-data", 0x1000);
+>>> +
+>>> +    memory_region_init(&s->pci_mmio, OBJECT(s), "unin-pci-mmio",
+>>
+>> The name of this function and the above comment both suggest this is 
+>> an AGP bus so did you mean to rename these to unin-agp-* instead of 
+>> unin-pci-*?
+> 
+> Well this patchset purposely avoids doing anything with the U3 model 
+> other than the required refactoring to move the wiring to board level as 
+> really the entire U3 model needs some love - I can't even boot Linux 
+> without this patchset (I suspect it's probably DT related).
+> 
+> Having said that the wiring changes are such an improvement that I would 
+> argue for applying this patchset if possible since any future fixes will 
+> be considerably easier based upon it.
 
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+Looking in detail I think this naming is still correct: the U3 PCI bus 
+address is currently 0xf0000000 which is actually the AGP bus rather 
+than the PCI bus at 0xf2000000...
+
+
+ATB,
+
+Mark.
