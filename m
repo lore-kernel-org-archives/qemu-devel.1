@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1etYae-0005xN-8H
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 07:54:41 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1etYg4-0003B5-B1
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 08:00:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1etYaa-0000x5-Ar
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 07:54:40 -0500
-Received: from mga02.intel.com ([134.134.136.20]:26378)
+	(envelope-from <pbonzini@redhat.com>) id 1etYg0-0002rq-FH
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 08:00:16 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40432 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1etYaa-0000wi-1P
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 07:54:36 -0500
-Message-ID: <5A9FE1BB.6040105@intel.com>
-Date: Wed, 07 Mar 2018 20:57:31 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1etYg0-0002rZ-AV
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 08:00:12 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5C58B8424D
+	for <qemu-devel@nongnu.org>; Wed,  7 Mar 2018 13:00:08 +0000 (UTC)
+References: <1520342370-123606-1-git-send-email-pbonzini@redhat.com>
+	<1520342370-123606-20-git-send-email-pbonzini@redhat.com>
+	<20180307134952.06e877a2.cohuck@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <219ccfa2-3fe1-cea7-a8c6-88891374efbe@redhat.com>
+Date: Wed, 7 Mar 2018 14:00:02 +0100
 MIME-Version: 1.0
-References: <1519980450-3404-1-git-send-email-wei.w.wang@intel.com>
-	<1519980450-3404-4-git-send-email-wei.w.wang@intel.com>
-	<20180307123209.GD3089@work-vm>
-In-Reply-To: <20180307123209.GD3089@work-vm>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <20180307134952.06e877a2.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] migration: use the free page hint
- feature from balloon
+Subject: Re: [Qemu-devel] [PULL 19/34] address_space_access_valid:
+ address_space_to_flatview needs RCU lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,78 +36,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 03/07/2018 08:32 PM, Dr. David Alan Gilbert wrote:
-> * Wei Wang (wei.w.wang@intel.com) wrote:
->> Start the free page optimization when the bulk stage starts. In case the
->> guest is slow in reporting, actively stops it when the bulk stage ends.
->> The optimization avoids sending guest free pages during the bulk stage.
->> Currently, the optimization is added to precopy only.
+On 07/03/2018 13:49, Cornelia Huck wrote:
+> On Tue,  6 Mar 2018 14:19:15 +0100
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
+> 
+>> address_space_access_valid is calling address_space_to_flatview but it can
+>> be called outside the RCU lock.  To fix it, push the rcu_read_lock/unlock
+>> pair up from flatview_access_valid to address_space_access_valid.
 >>
->> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
->> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> CC: Juan Quintela <quintela@redhat.com>
->> CC: Michael S. Tsirkin <mst@redhat.com>
-> I think this is OK, but with the only problem being that postcopy will
-> break;  we need to disable the mechanism if postcopy is enabled.
->
-> Dave
->
+>> Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 >> ---
->>   migration/ram.c | 19 ++++++++++++++++++-
->>   1 file changed, 18 insertions(+), 1 deletion(-)
->>
->> diff --git a/migration/ram.c b/migration/ram.c
->> index 769a0f6..f6af7e6 100644
->> --- a/migration/ram.c
->> +++ b/migration/ram.c
->> @@ -51,6 +51,7 @@
->>   #include "qemu/rcu_queue.h"
->>   #include "migration/colo.h"
->>   #include "migration/block.h"
->> +#include "sysemu/balloon.h"
->>   
->>   /***********************************************************/
->>   /* ram save/restore */
->> @@ -208,6 +209,8 @@ struct RAMState {
->>       uint32_t last_version;
->>       /* We are in the first round */
->>       bool ram_bulk_stage;
->> +    /* The free pages optimization feature is supported */
->> +    bool free_page_support;
->>       /* How many times we have dirty too many pages */
->>       int dirty_rate_high_cnt;
->>       /* these variables are used for bitmap sync */
->> @@ -775,7 +778,7 @@ unsigned long migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
->>       unsigned long *bitmap = rb->bmap;
->>       unsigned long next;
->>   
->> -    if (rs->ram_bulk_stage && start > 0) {
->> +    if (rs->ram_bulk_stage && start > 0 && !rs->free_page_support) {
->>           next = start + 1;
->>       } else {
->>           next = find_next_bit(bitmap, size, start);
->> @@ -1225,6 +1228,10 @@ static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss, bool *again)
->>               /* Flag that we've looped */
->>               pss->complete_round = true;
->>               rs->ram_bulk_stage = false;
->> +            if (rs->free_page_support) {
->> +                balloon_free_page_stop();
->> +                rs->free_page_support = false;
->> +            }
->>               if (migrate_use_xbzrle()) {
->>                   /* If xbzrle is on, stop using the data compression at this
->>                    * point. In theory, xbzrle can do better than compression.
->> @@ -1656,6 +1663,8 @@ static void ram_state_reset(RAMState *rs)
->>       rs->last_page = 0;
->>       rs->last_version = ram_list.version;
->>       rs->ram_bulk_stage = true;
->> +    rs->free_page_support = balloon_free_page_support() &
->> +                            !migration_in_postcopy();
+>>  exec.c | 12 ++++++++----
+>>  1 file changed, 8 insertions(+), 4 deletions(-)
+> 
+> This one kills my s390x guests when running under tcg:
+> 
+> qemu-system-s390x: /home/cohuck/git/qemu/include/qemu/rcu.h:89: void rcu_read_unlock(void): Assertion `p_rcu_reader->depth != 0' failed.
+> 
+> Easy to reproduce with the moon buggy image from the QEMU Advent
+> Calendar:
+> 
+> s390x-softmmu/qemu-system-s390x -M s390-ccw-virtio -nographic -smp 2 -kernel ~/Downloads/s390-moon-buggy/s390-bb.kernel -initrd ~/Downloads/s390-moon-buggy/s390-moon-buggy.initrd
 
-We checked the postcopy here :)
+This is the fix for all of these:
 
-Best,
-Wei
+diff --git a/exec.c b/exec.c
+index 604f03c535..a9181e6417 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3393,7 +3393,6 @@ static bool flatview_access_valid(FlatView *fv,
+hwaddr addr, int len,
+         if (!memory_access_is_direct(mr, is_write)) {
+             l = memory_access_size(mr, l, addr);
+             if (!memory_region_access_valid(mr, xlat, l, is_write)) {
+-                rcu_read_unlock();
+                 return false;
+             }
+         }
+
+Paolo
