@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ete6i-0000NN-AR
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 13:48:09 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ete88-0001A6-IT
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 13:49:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ete6h-00082I-Cg
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 13:48:08 -0500
-References: <cover.1520352600.git.berto@igalia.com>
-	<080ff2e2c66577e8113454dce4974c6a34915d9f.1520352600.git.berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d9268455-ae27-6818-2533-5a25a3a3439d@redhat.com>
-Date: Wed, 7 Mar 2018 12:47:41 -0600
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ete87-0000GP-CX
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 13:49:36 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:45415
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1ete87-0000GB-5h
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 13:49:35 -0500
+References: <1519984765-15748-1-git-send-email-konrad@adacore.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <555e2626-998a-8562-1a4a-e2c989215e5e@ilande.co.uk>
+Date: Wed, 7 Mar 2018 18:49:21 +0000
 MIME-Version: 1.0
-In-Reply-To: <080ff2e2c66577e8113454dce4974c6a34915d9f.1520352600.git.berto@igalia.com>
+In-Reply-To: <1519984765-15748-1-git-send-email-konrad@adacore.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/7] qcow2: Check L1 table parameters in
- qcow2_expand_zero_clusters()
+Subject: Re: [Qemu-devel] [PATCH] sparc: fix leon3 casa instruction when MMU
+ is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,31 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: KONRAD Frederic <konrad@adacore.com>, qemu-devel@nongnu.org
+Cc: rth@twiddle.net, frederic.konrad@adacore.com
 
-On 03/06/2018 10:14 AM, Alberto Garcia wrote:
-> This function iterates over all snapshots of a qcow2 file in order to
-> expand all zero clusters, but it does not validate the snapshots' L1
-> tables first.
+On 02/03/18 09:59, KONRAD Frederic wrote:
+
+> From: KONRAD Frederic <frederic.konrad@adacore.com>
 > 
-> We now have a function to take care of this, so let's use it.
+> Since the commit af7a06bac7d3abb2da48ef3277d2a415772d2ae8:
+> `casa [..](10), .., ..` (and probably others alternate space instructions)
+> triggers a data access exception when the MMU is disabled.
 > 
-> We can also take the opportunity to replace the sector-based
-> bdrv_read() with bdrv_pread().
+> When we enter get_asi(...) dc->mem_idx is set to MMU_PHYS_IDX when the MMU
+> is disabled. Just keep mem_idx unchanged in this case so we passthrough the
+> MMU when it is disabled.
 > 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> Cc: Eric Blake <eblake@redhat.com>
+> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
 > ---
->   block/qcow2-cluster.c      | 24 +++++++++++++++++-------
->   tests/qemu-iotests/080     |  2 ++
->   tests/qemu-iotests/080.out |  4 ++++
->   3 files changed, 23 insertions(+), 7 deletions(-)
+> 
+> Notes:
+>      Changes RFC -> V1:
+>       * emit the instruction with MMU_PHYS_IDX instead of checking that the MMU
+>         is enabled in get_physical_address(..)
+> 
+>   target/sparc/translate.c | 5 +++++
+>   1 file changed, 5 insertions(+)
+> 
+> diff --git a/target/sparc/translate.c b/target/sparc/translate.c
+> index 71e0853..5aa367a 100644
+> --- a/target/sparc/translate.c
+> +++ b/target/sparc/translate.c
+> @@ -2093,6 +2093,11 @@ static DisasASI get_asi(DisasContext *dc, int insn, TCGMemOp memop)
+>               type = GET_ASI_BFILL;
+>               break;
+>           }
+> +
+> +        /* MMU_PHYS_IDX is used when the MMU is disabled to passthrough the
+> +         * permissions check in get_physical_address(..).
+> +         */
+> +        mem_idx = (dc->mem_idx == MMU_PHYS_IDX) ? MMU_PHYS_IDX : mem_idx;
+>       } else {
+>           gen_exception(dc, TT_PRIV_INSN);
+>           type = GET_ASI_EXCP;
 > 
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Thanks Frederic, I've applied this to my qemu-sparc branch.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+
+ATB,
+
+Mark.
