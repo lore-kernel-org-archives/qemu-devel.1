@@ -1,28 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1etOYW-0000aN-5a
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 21:11:49 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1etOeW-0002Yg-H8
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 21:18:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1etOYS-0004MI-U4
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 21:11:48 -0500
-Received: from mga06.intel.com ([134.134.136.31]:46957)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
-	id 1etOYS-0004LI-I1
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 21:11:44 -0500
-From: "Tian, Kevin" <kevin.tian@intel.com>
-Date: Wed, 7 Mar 2018 02:11:36 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19102DB8C@SHSMSX101.ccr.corp.intel.com>
-References: <1520229653-10658-1-git-send-email-yulei.zhang@intel.com>
-	<077d834a-b32b-8ab0-d2b5-264d4eefbc70@nvidia.com>
-	<01FDBDDE256B79498DC57789713132D46A0779DA@SHSMSX101.ccr.corp.intel.com>
-In-Reply-To: <01FDBDDE256B79498DC57789713132D46A0779DA@SHSMSX101.ccr.corp.intel.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <aik@ozlabs.ru>) id 1etOeT-00085b-9z
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 21:18:00 -0500
+Received: from mail-pf0-x22b.google.com ([2607:f8b0:400e:c00::22b]:39926)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1etOeS-00084x-Sv
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 21:17:57 -0500
+Received: by mail-pf0-x22b.google.com with SMTP id u5so347563pfh.6
+	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 18:17:56 -0800 (PST)
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+References: <20180212051954.GE11634@umbus.fritz.box>
+	<0a57f0ec-4300-f4f3-3957-4bced8b57e14@ozlabs.ru>
+	<20180212090653.42bdd2e2@w520.home>
+	<0c594a0b-488c-b5f8-e8ed-ffa8f4a98088@ozlabs.ru>
+	<20180213053630.GL11634@umbus.fritz.box>
+	<20180213054124.GN11634@umbus.fritz.box>
+	<8282d070-b2d3-7e43-3da9-b17c77b99a67@ozlabs.ru>
+	<20180214013323.GA5247@umbus.fritz.box>
+	<843efd62-7a39-8536-91ad-1abea2beb190@ozlabs.ru>
+	<20180214085541.5491705f@w520.home>
+	<20180216052824.GI2074@umbus.fritz.box>
+	<c11af933-3f08-f2c8-0552-ce43ac8f5741@ozlabs.ru>
+	<a29658e8-d2da-161d-d9b8-41f186969927@ozlabs.ru>
+Message-ID: <821596dc-35b0-60cf-3e1f-3df0809b2f8e@ozlabs.ru>
+Date: Wed, 7 Mar 2018 13:17:50 +1100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH V3 0/4] vfio: Introduce Live migration
- capability to vfio_mdev device
+In-Reply-To: <a29658e8-d2da-161d-d9b8-41f186969927@ozlabs.ru>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="baBtISSwqtBl6fRWuZSs727oEVGST35L0"
+Subject: Re: [Qemu-devel] [PATCH qemu v7 2/4] vfio/pci: Relax DMA map errors
+ for MMIO regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,92 +42,292 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zhang, Yulei" <yulei.zhang@intel.com>, Kirti Wankhede <kwankhede@nvidia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-PiBGcm9tOiBaaGFuZywgWXVsZWkNCj4gU2VudDogVHVlc2RheSwgTWFyY2ggNiwgMjAxOCA5OjM1
-IFBNDQo+IA0KPiBIaSBLaXJ0aSwNCj4gDQo+IFllcywgdGhhdCBpcyB0aGUgcGxhbiBhbmQgd2Ug
-d2lsbCBhZGRyZXNzIGl0IGluIHRoZSBjb21pbmcgdmVyc2lvbnMuDQo+IEluIHRoaXMgdmVyc2lv
-biB3ZSBqdXN0IHJlYmFzZSB0aGUgY29kZSBhbmQgbG9va2luZyBmb3IgbW9yZSBpbnB1dHMuDQoN
-Ckl0J3Mgbm90IGhvdyBhIG5ldyB2ZXJzaW9uIGlzIGV4cGVjdGVkIHRvIHByb3ZpZGUuIEZvciBy
-ZXZpZXcNCmNvbW1lbnRzIHdoaWNoIHlvdSByZWNlaXZlZCBmcm9tIHByZXZpb3VzIHZlcnNpb25z
-LCB5b3UgbmVlZA0KZWNobyB0aGVtIGluIHRoZSBuZXcgdmVyc2lvbiB3aGVyZSAnZWNobycgbWVh
-bnMgZWl0aGVyIGZpeCBhbmQgbGlzdA0KaW4gY2hhbmdlIGxpc3Qgb3IgcHJvdmlkaW5nIGEgVE9E
-TyBsaXN0IGZvciB1bmhhbmRsZWQgY29tbWVudHMgDQpzbyByZXZpZXdlcnMga25vdyB3aGF0IHRv
-IGZ1cnRoZXIgbG9vayBhdC4gQWxzbyByZWJhc2UgdXN1YWxseQ0KZG9lc24ndCBiZWFyIGEgbmV3
-IHZlcnNpb24uLi4NCg0KYnR3IHdoZW4gZGVzY3JpYmluZyBjaGFuZ2UgbGlzdCBvZiB2ZXJzaW9u
-IGhpc3RvcnksIHBsZWFzZSB1c2UgdjItPnYzDQppbnN0ZWFkIG9mIHZpY2UgdmVyc2EuDQoNClRo
-YW5rcw0KS2V2aW4NCg0KPiANCj4gVGhhbmtzLA0KPiBZdWxlaQ0KPiANCj4gPiAtLS0tLU9yaWdp
-bmFsIE1lc3NhZ2UtLS0tLQ0KPiA+IEZyb206IEtpcnRpIFdhbmtoZWRlIFttYWlsdG86a3dhbmto
-ZWRlQG52aWRpYS5jb21dDQo+ID4gU2VudDogTW9uZGF5LCBNYXJjaCA1LCAyMDE4IDk6MDMgUE0N
-Cj4gPiBUbzogWmhhbmcsIFl1bGVpIDx5dWxlaS56aGFuZ0BpbnRlbC5jb20+OyBxZW11LWRldmVs
-QG5vbmdudS5vcmcNCj4gPiBDYzogVGlhbiwgS2V2aW4gPGtldmluLnRpYW5AaW50ZWwuY29tPjsg
-emhlbnl1d0BsaW51eC5pbnRlbC5jb207DQo+ID4gYWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20N
-Cj4gPiBTdWJqZWN0OiBSZTogW1BBVENIIFYzIDAvNF0gdmZpbzogSW50cm9kdWNlIExpdmUgbWln
-cmF0aW9uIGNhcGFiaWxpdHkgdG8NCj4gPiB2ZmlvX21kZXYgZGV2aWNlDQo+ID4NCj4gPiBIaSBZ
-dWxlaSBaaGFuZywNCj4gPg0KPiA+IFRoaXMgc2VyaWVzIGlzIHNhbWUgYXMgdGhlIHByZXZpb3Vz
-IHZlcnNpb24sIHRoYXQgaXMsIHRoZXJlIGlzIG5vIHByZS1jb3B5DQo+ID4gcGhhc2UuIFRoaXMg
-b25seSB0YWtlcyBjYXJlIG9mIHN0b3AtYW5kLWNvcHkgcGhhc2UuDQo+ID4gQXMgcGVyIHdlIGRp
-c2N1c3NlZCBpbiBLVk0gRm9ydW0gMjAxNyBpbiBPY3RvYmVyLCB0aGVyZSBzaG91bGQgYmUNCj4g
-PiBwcm92aXNpb24gb2YgcHJlLWNvcHkgcGhhc2UuDQo+ID4NCj4gPiBUaGFua3MsDQo+ID4gS2ly
-dGkNCj4gPg0KPiA+IE9uIDMvNS8yMDE4IDExOjMwIEFNLCBZdWxlaSBaaGFuZyB3cm90ZToNCj4g
-PiA+IFN1bW1hcnkNCj4gPiA+DQo+ID4gPiBUaGlzIHNlcmllcyBSRkMgd291bGQgbGlrZSB0byBy
-ZXN1bWUgdGhlIGRpc2N1c3Npb24gYWJvdXQgaG93IHRvDQo+ID4gPiBpbnRyb2R1Y2UgdGhlIGxp
-dmUgbWlncmF0aW9uIGNhcGFiaWxpdHkgdG8gdmZpbyBtZGV2IGRldmljZS4NCj4gPiA+DQo+ID4g
-PiBCeSBhZGRpbmcgYSBuZXcgdmZpbyBzdWJ0eXBlIHJlZ2lvbg0KPiA+IFZGSU9fUkVHSU9OX1NV
-QlRZUEVfREVWSUNFX1NUQVRFLA0KPiA+ID4gdGhlIG1kZXYgZGV2aWNlIHdpbGwgYmUgc2V0IHRv
-IG1pZ3JhdGFibGUgaWYgdGhlIG5ldyByZWdpb24gZXhpc3QNCj4gPiA+IGR1cmluZyB0aGUgaW5p
-dGlhbGl6YXRpb24uDQo+ID4gPg0KPiA+ID4gVGhlIGludGVudGlvbiB0byBhZGQgdGhlIG5ldyBy
-ZWdpb24gaXMgdXNpbmcgaXQgZm9yIG1kZXYgZGV2aWNlIHN0YXR1cw0KPiA+ID4gc2F2ZSBhbmQg
-cmVzdG9yZSBkdXJpbmcgdGhlIG1pZ3JhdGlvbi4gVGhlIGFjY2VzcyB0byB0aGlzIHJlZ2lvbiB3
-aWxsDQo+ID4gPiBiZSB0cmFwcGVkIGFuZCBmb3J3YXJkIHRvIHRoZSBtZGV2IGRldmljZSBkcml2
-ZXIsIGl0IGFsc28gdXNlcyB0aGUNCj4gPiA+IGZpcnN0IGJ5dGUgaW4gdGhlIG5ldyByZWdpb24g
-dG8gY29udHJvbCB0aGUgcnVubmluZyBzdGF0ZSBvZiBtZGV2DQo+ID4gPiBkZXZpY2UsIHNvIGR1
-cmluZyB0aGUgbWlncmF0aW9uIGFmdGVyIHN0b3AgdGhlIG1kZXYgZHJpdmVyLCBxZW11IGNvdWxk
-DQo+ID4gPiByZXRyaWV2ZSB0aGUgc3BlY2lmaWMgZGV2aWNlIHN0YXR1cyBmcm9tIHRoaXMgcmVn
-aW9uIGFuZCB0cmFuc2ZlciB0bw0KPiA+ID4gdGhlIHRhcmdldCBWTSBzaWRlIGZvciB0aGUgbWRl
-diBkZXZpY2UgcmVzdG9yZS4NCj4gPiA+DQo+ID4gPiBJbiBhZGRpdGlvbiwgIHdlIGFkZCBvbmUg
-bmV3IGlvY3RsIFZGSU9fSU9NTVVfR0VUX0RJUlRZX0JJVE1BUA0KPiB0bw0KPiA+IGhlbHANCj4g
-PiA+IGRvIHRoZSBtZGV2IGRldmljZSBkaXJ0eSBwYWdlIHN5bmNocm9uaXphdGlvbiBkdXJpbmcg
-dGhlIG1pZ3JhdGlvbiwNCj4gPiA+IGN1cnJlbnRseSBpdCBpcyBqdXN0IGZvciBzdGF0aWMgY29w
-eSwgaW4gdGhlIGZ1dHVyZSB3ZSB3b3VsZCBsaWtlIHRvDQo+ID4gPiBhZGQgbmV3IGludGVyZmFj
-ZSBmb3IgdGhlIHByZS1jb3B5Lg0KPiA+ID4NCj4gPiA+IEJlbG93IGlzIHRoZSB2ZmlvX21kZXYg
-ZGV2aWNlIG1pZ3JhdGlvbiBzZXF1ZW5jZSBTb3VyY2UgVk0gc2lkZToNCj4gPiA+IAkJCXN0YXJ0
-IG1pZ3JhdGlvbg0KPiA+ID4gCQkJCXwNCj4gPiA+IAkJCQlWDQo+ID4gPiAgICAgICAgIAkgZ2V0
-IHRoZSBjcHUgc3RhdGUgY2hhbmdlIGNhbGxiYWNrLCB3cml0ZSB0byB0aGUNCj4gPiA+ICAgICAg
-ICAgCSBzdWJyZWdpb24ncyBmaXJzdCBieXRlIHRvIHN0b3AgdGhlIG1kZXYgZGV2aWNlDQo+ID4g
-PiAJCQkJfA0KPiA+ID4gCQkJCVYNCj4gPiA+IAkJIHF1YXJ5IHRoZSBkaXJ0eSBwYWdlIGJpdG1h
-cCBmcm9tIGlvbW11IGNvbnRhaW5lcg0KPiA+ID4gCQkgYW5kIGFkZCBpbnRvIHFlbXUgZGlydHkg
-bGlzdCBmb3Igc3luY2hyb25pemF0aW9uDQo+ID4gPiAJCQkJfA0KPiA+ID4gCQkJCVYNCj4gPiA+
-IAkJIHNhdmUgdGhlIGRlaXZjZSBzdGF0dXMgaW50byBRZW11ZmlsZSB3aGljaCBpcw0KPiA+ID4g
-ICAgICAgICAgICAgICAgICAgICAgcmVhZCBmcm9tIHRoZSB2ZmlvIGRldmljZSBzdWJyZWdpb24N
-Cj4gPiA+DQo+ID4gPiBUYXJnZXQgVk0gc2lkZToNCj4gPiA+IAkJICAgcmVzdG9yZSB0aGUgbWRl
-diBkZXZpY2UgYWZ0ZXIgZ2V0IHRoZQ0KPiA+ID4gCQkgICAgIHNhdmVkIHN0YXR1cyBjb250ZXh0
-IGZyb20gUWVtdWZpbGUNCj4gPiA+IAkJCQl8DQo+ID4gPiAJCQkJVg0KPiA+ID4gCQkgICAgIGdl
-dCB0aGUgY3B1IHN0YXRlIGNoYW5nZSBjYWxsYmFjaw0KPiA+ID4gIAkJICAgICB3cml0ZSB0byBz
-dWJyZWdpb24ncyBmaXJzdCBieXRlIHRvDQo+ID4gPiAgICAgICAgICAgICAgICAgICAgICAgc3Rh
-cnQgdGhlIG1kZXYgZGV2aWNlIHRvIHB1dCBpdCBpbg0KPiA+ID4gICAgICAgICAgICAgICAgICAg
-ICAgIHJ1bm5pbmcgc3RhdHVzDQo+ID4gPiAJCQkJfA0KPiA+ID4gCQkJCVYNCj4gPiA+IAkJCWZp
-bmlzaCBtaWdyYXRpb24NCj4gPiA+DQo+ID4gPiBWMy0+VjI6DQo+ID4gPiAxLiByZWJhc2UgdGhl
-IHBhdGNoIHRvIFFlbXUgc3RhYmxlIDIuMTAgYnJhbmNoLg0KPiA+ID4gMi4gdXNlIGEgY29tbW9u
-IG5hbWUgZm9yIHRoZSBzdWJyZWdpb24gaW5zdGVhZCBvZiBzcGVjaWZpYyBmb3INCj4gPiA+ICAg
-IGludGVsIElHRC4NCj4gPiA+DQo+ID4gPiBWMS0+VjI6DQo+ID4gPiBQZXIgQWxleCdzIHN1Z2dl
-c3Rpb246DQo+ID4gPiAxLiB1c2UgZGV2aWNlIHN1YnR5cGUgcmVnaW9uIGluc3RlYWQgb2YgVkZJ
-TyBQQ0kgZml4ZWQgcmVnaW9uLg0KPiA+ID4gMi4gcmVtb3ZlIHVubmVjZXNzYXJ5IGlvY3RsLCB1
-c2UgdGhlIGZpcnN0IGJ5dGUgb2Ygc3VicmVnaW9uIHRvDQo+ID4gPiAgICBjb250cm9sIHRoZSBy
-dW5uaW5nIHN0YXRlIG9mIG1kZXYgZGV2aWNlLg0KPiA+ID4gMy4gZm9yIGRpcnR5IHBhZ2Ugc3lu
-Y2hyb25pemF0aW9uLCBpbXBsZW1lbnQgdGhlIGludGVyZmFjZSB3aXRoDQo+ID4gPiAgICBWRklP
-Q29udGFpbmVyIGluc3RlYWQgb2YgdmZpbyBwY2kgZGV2aWNlLg0KPiA+ID4NCj4gPiA+IFl1bGVp
-IFpoYW5nICg0KToNCj4gPiA+ICAgdmZpbzogaW50cm9kdWNlIGEgbmV3IFZGSU8gc3VicmVnaW9u
-IGZvciBtZGV2IGRldmljZSBtaWdyYXRpb24NCj4gc3VwcG9ydA0KPiA+ID4gICB2ZmlvOiBBZGQg
-dm0gc3RhdHVzIGNoYW5nZSBjYWxsYmFjayB0byBzdG9wL3Jlc3RhcnQgdGhlIG1kZXYgZGV2aWNl
-DQo+ID4gPiAgIHZmaW86IEFkZCBzdHJ1Y3QgdmZpb192bXN0YXRlX2luZm8gdG8gaW50cm9kdWNl
-IHB1dC9nZXQgY2FsbGJhY2sNCj4gPiA+ICAgICBmdW50aW9uIGZvciB2ZmlvIGRldmljZSBzdGF0
-dXMgc2F2ZS9yZXN0b3JlDQo+ID4gPiAgIHZpZm86IGludHJvZHVjZSBuZXcgVkZJTyBpb2N0bCBW
-RklPX0lPTU1VX0dFVF9ESVJUWV9CSVRNQVANCj4gPiA+DQo+ID4gPiAgaHcvdmZpby9jb21tb24u
-YyAgICAgICAgICAgICAgfCAgMzQgKysrKysrKysrDQo+ID4gPiAgaHcvdmZpby9wY2kuYyAgICAg
-ICAgICAgICAgICAgfCAxNzENCj4gPiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKy0NCj4gPiA+ICBody92ZmlvL3BjaS5oICAgICAgICAgICAgICAgICB8ICAgMSArDQo+
-ID4gPiAgaW5jbHVkZS9ody92ZmlvL3ZmaW8tY29tbW9uLmggfCAgIDEgKw0KPiA+ID4gIGxpbnV4
-LWhlYWRlcnMvbGludXgvdmZpby5oICAgIHwgIDI5ICsrKysrKy0NCj4gPiA+ICA1IGZpbGVzIGNo
-YW5nZWQsIDIzMiBpbnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygtKQ0KPiA+ID4NCg==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--baBtISSwqtBl6fRWuZSs727oEVGST35L0
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+To: David Gibson <david@gibson.dropbear.id.au>,
+ Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Message-ID: <821596dc-35b0-60cf-3e1f-3df0809b2f8e@ozlabs.ru>
+Subject: Re: [PATCH qemu v7 2/4] vfio/pci: Relax DMA map errors for MMIO
+ regions
+References: <20180212051954.GE11634@umbus.fritz.box>
+ <0a57f0ec-4300-f4f3-3957-4bced8b57e14@ozlabs.ru>
+ <20180212090653.42bdd2e2@w520.home>
+ <0c594a0b-488c-b5f8-e8ed-ffa8f4a98088@ozlabs.ru>
+ <20180213053630.GL11634@umbus.fritz.box>
+ <20180213054124.GN11634@umbus.fritz.box>
+ <8282d070-b2d3-7e43-3da9-b17c77b99a67@ozlabs.ru>
+ <20180214013323.GA5247@umbus.fritz.box>
+ <843efd62-7a39-8536-91ad-1abea2beb190@ozlabs.ru>
+ <20180214085541.5491705f@w520.home> <20180216052824.GI2074@umbus.fritz.box>
+ <c11af933-3f08-f2c8-0552-ce43ac8f5741@ozlabs.ru>
+ <a29658e8-d2da-161d-d9b8-41f186969927@ozlabs.ru>
+In-Reply-To: <a29658e8-d2da-161d-d9b8-41f186969927@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 26/02/18 19:36, Alexey Kardashevskiy wrote:
+> On 19/02/18 13:46, Alexey Kardashevskiy wrote:
+>> On 16/02/18 16:28, David Gibson wrote:
+>>> On Wed, Feb 14, 2018 at 08:55:41AM -0700, Alex Williamson wrote:
+>>>> On Wed, 14 Feb 2018 19:09:16 +1100
+>>>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>>>>
+>>>>> On 14/02/18 12:33, David Gibson wrote:
+>>>>>> On Tue, Feb 13, 2018 at 07:20:56PM +1100, Alexey Kardashevskiy wro=
+te: =20
+>>>>>>> On 13/02/18 16:41, David Gibson wrote: =20
+>>>>>>>> On Tue, Feb 13, 2018 at 04:36:30PM +1100, David Gibson wrote: =20
+>>>>>>>>> On Tue, Feb 13, 2018 at 12:15:52PM +1100, Alexey Kardashevskiy =
+wrote: =20
+>>>>>>>>>> On 13/02/18 03:06, Alex Williamson wrote: =20
+>>>>>>>>>>> On Mon, 12 Feb 2018 18:05:54 +1100
+>>>>>>>>>>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>>>>>>>>>>> =20
+>>>>>>>>>>>> On 12/02/18 16:19, David Gibson wrote: =20
+>>>>>>>>>>>>> On Fri, Feb 09, 2018 at 06:55:01PM +1100, Alexey Kardashevs=
+kiy wrote:   =20
+>>>>>>>>>>>>>> At the moment if vfio_memory_listener is registered in the=
+ system memory
+>>>>>>>>>>>>>> address space, it maps/unmaps every RAM memory region for =
+DMA.
+>>>>>>>>>>>>>> It expects system page size aligned memory sections so vfi=
+o_dma_map
+>>>>>>>>>>>>>> would not fail and so far this has been the case. A mappin=
+g failure
+>>>>>>>>>>>>>> would be fatal. A side effect of such behavior is that som=
+e MMIO pages
+>>>>>>>>>>>>>> would not be mapped silently.
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> However we are going to change MSIX BAR handling so we wil=
+l end having
+>>>>>>>>>>>>>> non-aligned sections in vfio_memory_listener (more details=
+ is in
+>>>>>>>>>>>>>> the next patch) and vfio_dma_map will exit QEMU.
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> In order to avoid fatal failures on what previously was no=
+t a failure and
+>>>>>>>>>>>>>> was just silently ignored, this checks the section alignme=
+nt to
+>>>>>>>>>>>>>> the smallest supported IOMMU page size and prints an error=
+ if not aligned;
+>>>>>>>>>>>>>> it also prints an error if vfio_dma_map failed despite the=
+ page size check.
+>>>>>>>>>>>>>> Both errors are not fatal; only MMIO RAM regions are check=
+ed
+>>>>>>>>>>>>>> (aka "RAM device" regions).
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> If the amount of errors printed is overwhelming, the MSIX =
+relocation
+>>>>>>>>>>>>>> could be used to avoid excessive error output.
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> This is unlikely to cause any behavioral change.
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>   =20
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> There are some relatively superficial problems noted below.=
+
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> But more fundamentally, this feels like it's extending an e=
+xisting
+>>>>>>>>>>>>> hack past the point of usefulness.
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> The explicit check for is_ram_device() here has always both=
+ered me -
+>>>>>>>>>>>>> it's not like a real bus bridge magically knows whether a t=
+arget
+>>>>>>>>>>>>> address maps to RAM or not.
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> What I think is really going on is that even for systems wi=
+thout an
+>>>>>>>>>>>>> IOMMU, it's not really true to say that the PCI address spa=
+ce maps
+>>>>>>>>>>>>> directly onto address_space_memory.  Instead, there's a lar=
+ge, but
+>>>>>>>>>>>>> much less than 2^64 sized, "upstream window" at address 0 o=
+n the PCI
+>>>>>>>>>>>>> bus, which is identity mapped to the system bus.  Details w=
+ill vary
+>>>>>>>>>>>>> with the system, but in practice we expect nothing but RAM =
+to be in
+>>>>>>>>>>>>> that window.  Addresses not within that window won't be map=
+ped to the
+>>>>>>>>>>>>> system bus but will just be broadcast on the PCI bus and mi=
+ght be
+>>>>>>>>>>>>> picked up as a p2p transaction.   =20
+>>>>>>>>>>>>
+>>>>>>>>>>>> Currently this p2p works only via the IOMMU, direct p2p is n=
+ot possible as
+>>>>>>>>>>>> the guest needs to know physical MMIO addresses to make p2p =
+work and it
+>>>>>>>>>>>> does not. =20
+>>>>>>>>>>>
+>>>>>>>>>>> /me points to the Direct Translated P2P section of the ACS sp=
+ec, though
+>>>>>>>>>>> it's as prone to spoofing by the device as ATS.  In any case,=
+ p2p
+>>>>>>>>>>> reflected from the IOMMU is still p2p and offloads the CPU ev=
+en if
+>>>>>>>>>>> bandwidth suffers vs bare metal depending on if the data doub=
+les back
+>>>>>>>>>>> over any links.  Thanks, =20
+>>>>>>>>>>
+>>>>>>>>>> Sure, I was just saying that p2p via IOMMU won't be as simple =
+as broadcast
+>>>>>>>>>> on the PCI bus, IOMMU needs to be programmed in advance to mak=
+e this work,
+>>>>>>>>>> and current that broadcast won't work for the passed through d=
+evices. =20
+>>>>>>>>>
+>>>>>>>>> Well, sure, p2p in a guest with passthrough devices clearly nee=
+ds to
+>>>>>>>>> be translated through the IOMMU (and p2p from a passthrough to =
+an
+>>>>>>>>> emulated device is essentially impossible).
+>>>>>>>>>
+>>>>>>>>> But.. what does that have to do with this code.  This is the me=
+mory
+>>>>>>>>> area watcher, looking for memory regions being mapped directly =
+into
+>>>>>>>>> the PCI space.  NOT IOMMU regions, since those are handled sepa=
+rately
+>>>>>>>>> by wiring up the IOMMU notifier.  This will only trigger if RAM=
+-like,
+>>>>>>>>> non-RAM regions are put into PCI space *not* behind an IOMMMU. =
+=20
+>>>>>>>>
+>>>>>>>> Duh, sorry, realised I was mixing up host and guest IOMMU.  I gu=
+ess
+>>>>>>>> the point here is that this will map RAM-like devices into the h=
+ost
+>>>>>>>> IOMMU when there is no guest IOMMU, allowing p2p transactions be=
+tween
+>>>>>>>> passthrough devices (though not from passthrough to emulated dev=
+ices). =20
+>>>>>>>
+>>>>>>> Correct.
+>>>>>>> =20
+>>>>>>>>
+>>>>>>>> The conditions still seem kind of awkward to me, but I guess it =
+makes
+>>>>>>>> sense. =20
+>>>>>>>
+>>>>>>> Is it the time to split this listener to RAM-listener and PCI bus=
+ listener? =20
+>>>>>>
+>>>>>> I'm not really sure what you mean by that.
+>>>>>>  =20
+>>>>>>> On x86 it listens on the "memory" AS, on spapr - on the
+>>>>>>> "pci@800000020000000" AS, this will just create more confusion ov=
+er time... =20
+>>>>>>
+>>>>>> Hm, it's still logically the same AS in each case - the PCI addres=
+s
+>>>>>> space.  It's just that in the x86 case that happens to be the same=
+ as
+>>>>>> the memory AS (at least when there isn't a guest side IOMMU). =20
+>>>>>
+>>>>> Hm. Ok.
+>>>>>
+>>>>>> I do wonder if that's really right even for x86 without IOMMU.  Th=
+e
+>>>>>> PCI address space is identity mapped to the "main" memory address
+>>>>>> space there, but I'm not sure it's mapped th *all* of the main mem=
+ory =20
+>>>>>
+>>>>> What should have been in the place of "th" above? :)
+>>>>>
+>>>>>> address space, probably just certain ranges of it.  That's what I =
+was
+>>>>>> suggesting earlier in the thread. =20
+>>>>>
+>>>>> afaict vfio is trying to mmap every RAM MR =3D=3D KVM memory slot, =
+no ranges or
+>>>>> anything like that. I am trying to figure out what is not correct w=
+ith the
+>>>>> patch. Thanks,
+>>>>
+>>>> It is possible for x86 systems to have translation applied to MMIO v=
+s
+>>>> RAM such that the processor view and device view of MMIO are differe=
+nt,
+>>>> putting them into separate address spaces, but this is not typical a=
+nd
+>>>> not available on the class of chipsets that QEMU emulates for PC.
+>>>> Therefore I think it's correct that MMIO and RAM all live in one big=
+
+>>>> happy, flat address space as they do now (assuming the guest IOMMU i=
+s
+>>>> not present or disabled).  Thanks,
+>>>
+>>> Ah.. I think the thing I was missing is that on PC (at least with
+>>> typical chipsets) *all* MMIO essentially comes from PCI space.  Even
+>>> the legacy devices are essentially ISA which is treated as being on a=
+
+>>> bridge under the PCI space.  On non-x86 there are often at least a
+>>> handful of MMIO devices that aren't within the PCI space - say, the
+>>> PCI host bridge itself at least.  x86 avoids that by using the
+>>> separate IO space, which is also a bit weird in that it's
+>>> simultaneously direct attached to the cpu (and so doesn't need bridge=
+
+>>> configuration), but also identified with the legay IO space treated a=
+s
+>>> being under two bridges (host->PCI, PCI->ISA) for other purposes.
+>>>
+>>> Maybe it's just me, but I find it makes more sense to me if I think o=
+f
+>>> it as the two ASes being equal because on PC the system address map
+>>> (address_space_memory) is made equal to the PCI address map, rather
+>>> than the PCI address map being made equal to the system one.
+>>
+>> It makes more sense to me too, we just do not exploit/expose this on S=
+PAPR
+>> - the PCI address space only has 2xIOMMU and 1xMSI windows and that's =
+it,
+>> no MMIO which is mapped to the system AS only (adding those to the PCI=
+ AS
+>> is little tricky as mentioned elsewhere).
+>>
+>> Anyway, I still wonder - what needs to be addressed in the 2/4 patch i=
+n
+>> order to proceed?
+>=20
+> Ping?
+>=20
+
+
+Ping?
+
+
+--=20
+Alexey
+
+
+--baBtISSwqtBl6fRWuZSs727oEVGST35L0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJCBAEBCAAsFiEEZSrPibrORRTHQ99dhhM92CvBILkFAlqfS88OHGFpa0Bvemxh
+YnMucnUACgkQhhM92CvBILkpchAAvJ2QW+M8YkpoCFXIcgCgnDrHH2XACEsX27HJ
+aWivCeMD7RGyS/RkbLTCqzjc8+p8McaVxtWb9QdGcrtlNlnyColFI0iNXoTbI6U6
+c0pb5CQQG5fqjGqb9g6blaPVA3XmIL6UhNI5Bfi/QXNJusaNEsKluwg/oiCU8zyM
+wocSsDkt+bOtzBpt6/IQAd/y6WzcOlFNchACIOmlAy2LzTBOvxPMOqpEve+LIr6b
+iZpaW0ISBBdY+ADYMOsNxJqIcD6Jl++F3xG6uVrTUD4X7OnI8QpxO7414p7EtYly
+Ho/GEDFEXD6QaQCBVzUcN/tRZHIwLMM3lrxH9bgZ1Warzzfk2ZGhi2PxPtDNJj+6
+QuTk8SSBppzF3THsTPeDN22GehtKgN7VgR3Z8QP2/gRY0vdmjz2VuyPnTr+qvs8w
+u/2LlIduaBgkDRuNNF2y1B/vHcsN6PcO0dyV6M6aWjGRoV15DpmjjfIlzP0oXqdo
+nInzLT61xZ/IhjS21sFKi+LemgfBwHuXygDRLaaQ6LT90bxuYGAgzlyluFgz58YH
+JWLhW210UQUK0l6pJ9pUDl1HsDWMTZMCZqR9PdSsoXkayG0T/KW+E8jqxqLv6qJJ
+mutmnhlpeH31pgVfclCkh3xE4OD91dOueMKYwwIBchauDq9TpUo0SnuTOM+Eg8Gr
+JNoFo9s=
+=1Goc
+-----END PGP SIGNATURE-----
+
+--baBtISSwqtBl6fRWuZSs727oEVGST35L0--
