@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1etVg7-0007Gl-Ce
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 04:48:08 -0500
+	(envelope-from <bounces@canonical.com>) id 1etVj2-0008T7-PJ
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 04:51:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1etVg3-0002rk-7A
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 04:48:07 -0500
+	(envelope-from <bounces@canonical.com>) id 1etViz-0003lZ-Hd
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 04:51:08 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47388)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1etViz-0003lT-Az
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 04:51:05 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1etVix-0002Ba-RK
+	for <qemu-devel@nongnu.org>; Wed, 07 Mar 2018 09:51:04 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 613F52E8199
+	for <qemu-devel@nongnu.org>; Wed,  7 Mar 2018 09:50:59 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <231fe0ce-3df4-a175-2fba-403023cc65e1@kamp.de>
-References: <c0d7b993-b3b8-a753-21f5-e2257de27caf@kamp.de>
-	<20180305114533.GI7910@stefanha-x1.localdomain>
-	<0f1ec3c7-1157-e618-62f8-ffd5e08eb342@kamp.de>
-	<20180305145215.GM3131@work-vm>
-	<20180306160739.GN31045@stefanha-x1.localdomain>
-	<824907bb-3a37-27bd-76db-be17d05bdac0@kamp.de>
-	<231fe0ce-3df4-a175-2fba-403023cc65e1@kamp.de>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Wed, 7 Mar 2018 09:47:57 +0000
-Message-ID: <CAJSP0QXTFz55WmF8M7Lc8hLjeD3YpSXCQx+Q8y9=9CN8NW8EJw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-block] block migration and MAX_IN_FLIGHT_IO
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 07 Mar 2018 09:37:11 -0000
+From: philmd <1658120@bugs.launchpad.net>
+Reply-To: Bug 1658120 <1658120@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170120152141.14276.42073.malonedeb@soybean.canonical.com>
+Message-Id: <152041543130.20833.5961743391555594772.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1658120] Re: building with gcc-aarch64-linux-gnu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,101 +36,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Fam Zheng <famz@redhat.com>, Wen Congyang <wency@cn.fujitsu.com>, qemu block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Wed, Mar 7, 2018 at 7:55 AM, Peter Lieven <pl@kamp.de> wrote:
-> Am 06.03.2018 um 17:35 schrieb Peter Lieven:
->> Am 06.03.2018 um 17:07 schrieb Stefan Hajnoczi:
->>> On Mon, Mar 05, 2018 at 02:52:16PM +0000, Dr. David Alan Gilbert wrote:
->>>> * Peter Lieven (pl@kamp.de) wrote:
->>>>> Am 05.03.2018 um 12:45 schrieb Stefan Hajnoczi:
->>>>>> On Thu, Feb 22, 2018 at 12:13:50PM +0100, Peter Lieven wrote:
->>>>>>> I stumbled across the MAX_INFLIGHT_IO field that was introduced in 2015 and was curious what was the reason
->>>>>>> to choose 512MB as readahead? The question is that I found that the source VM gets very unresponsive I/O wise
->>>>>>> while the initial 512MB are read and furthermore seems to stay unreasponsive if we choose a high migration speed
->>>>>>> and have a fast storage on the destination VM.
->>>>>>>
->>>>>>> In our environment I modified this value to 16MB which seems to work much smoother. I wonder if we should make
->>>>>>> this a user configurable value or define a different rate limit for the block transfer in bulk stage at least?
->>>>>> I don't know if benchmarks were run when choosing the value.  From the
->>>>>> commit description it sounds like the main purpose was to limit the
->>>>>> amount of memory that can be consumed.
->>>>>>
->>>>>> 16 MB also fulfills that criteria :), but why is the source VM more
->>>>>> responsive with a lower value?
->>>>>>
->>>>>> Perhaps the issue is queue depth on the storage device - the block
->>>>>> migration code enqueues up to 512 MB worth of reads, and guest I/O has
->>>>>> to wait?
->>>>> That is my guess. Especially if the destination storage is faster we basically alsways have
->>>>> 512 I/Os in flight on the source storage.
->>>>>
->>>>> Does anyone mind if the reduce that value to 16MB or do we need a better mechanism?
->>>> We've got migration-parameters these days; you could connect it to one
->>>> of those fairly easily I think.
->>>> Try: grep -i 'cpu[-_]throttle[-_]initial'  for an example of one that's
->>>> already there.
->>>> Then you can set it to whatever you like.
->>> It would be nice to solve the performance problem without adding a
->>> tuneable.
->>>
->>> On the other hand, QEMU has no idea what the queue depth of the device
->>> is.  Therefore it cannot prioritize guest I/O over block migration I/O.
->>>
->>> 512 parallel requests is much too high.  Most parallel I/O benchmarking
->>> is done at 32-64 queue depth.
->>>
->>> I think that 16 parallel requests is a reasonable maximum number for a
->>> background job.
->>>
->>> We need to be clear though that the purpose of this change is unrelated
->>> to the original 512 MB memory footprint goal.  It just happens to touch
->>> the same constant but the goal is now to submit at most 16 I/O requests
->>> in parallel to avoid monopolizing the I/O device.
->> I think we should really look at this. The variables that control if we stay in the while loop or not are incremented and decremented
->> at the following places:
->>
->> mig_save_device_dirty:
->> mig_save_device_bulk:
->>     block_mig_state.submitted++;
->>
->> blk_mig_read_cb:
->>     block_mig_state.submitted--;
->>     block_mig_state.read_done++;
->>
->> flush_blks:
->>     block_mig_state.read_done--;
->>
->> The condition of the while loop is:
->> (block_mig_state.submitted +
->>             block_mig_state.read_done) * BLOCK_SIZE <
->>            qemu_file_get_rate_limit(f) &&
->>            (block_mig_state.submitted +
->>             block_mig_state.read_done) <
->>            MAX_INFLIGHT_IO)
->>
->> At first I wonder if we ever reach the rate-limit because we put the read buffers onto f AFTER we exit the while loop?
->>
->> And even if we reach the limit we constantly maintain 512 I/Os in parallel because we immediately decrement read_done
->> when we put the buffers to f in flush_blks. In the next iteration of the while loop we then read again until we have 512 in-flight I/Os.
->>
->> And shouldn't we have a time limit to limit the time we stay in the while loop? I think we artificially delay sending data to f?
->
-> Thinking about it for a while I would propose the following:
->
-> a) rename MAX_INFLIGHT_IO to MAX_IO_BUFFERS
-> b) add MAX_PARALLEL_IO with a value of 16
-> c) compare qemu_file_get_rate_limit only with block_mig_state.read_done
->
-> This would yield in the following condition for the while loop:
->
-> (block_mig_state.read_done * BLOCK_SIZE < qemu_file_get_rate_limit(f) &&
->  (block_mig_state.submitted + block_mig_state.read_done) < MAX_IO_BUFFERS &&
->  block_mig_state.submitted < MAX_PARALLEL_IO)
->
-> Sounds that like a plan?
+Hi Cao Van Dong,
 
-That sounds good to me.
+you need to install zlib1g-dev:arm64, see:
 
-Stefan
+https://github.com/qemu/qemu/blob/master/tests/docker/dockerfiles
+/debian-arm64-cross.docker
+
+Regards,
+
+Phil.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1658120
+
+Title:
+  building with gcc-aarch64-linux-gnu
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  Hi, while trying to build qemu v2.8.0 with gcc-aarch64-linux-gnu
+  cross-compiler I'm getting the following :
+
+  =
+
+  In file included from /usr/include/x86_64-linux-gnu/sys/syscall.h:31:0,
+                   from /root/qemu/util/compatfd.c:21:
+  /root/qemu/util/compatfd.c: In function 'qemu_signalfd':
+  /root/qemu/util/compatfd.c:103:19: error: '__NR_signalfd' undeclared (fir=
+st use in this function)
+       ret =3D syscall(SYS_signalfd, -1, mask, _NSIG / 8);
+                     ^
+  /root/qemu/util/compatfd.c:103:19: note: each undeclared identifier is re=
+ported only once for each function it appears in
+  /root/qemu/rules.mak:59: recipe for target 'util/compatfd.o' failed
+  make: *** [util/compatfd.o] Error 1
+
+  =
+
+  I had configured it with :
+
+  ../configure --target-list=3Dx86_64-linux-user --static --cpu=3Daarch64
+
+  And I'm on :
+
+  Linux ubuntu-512mb-fra1-01 4.4.0-59-generic #80-Ubuntu SMP Fri Jan 6
+  17:47:47 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+
+  Thanks
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1658120/+subscriptions
