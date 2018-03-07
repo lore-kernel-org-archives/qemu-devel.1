@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1etSdB-0003eq-EH
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 01:32:54 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1etShK-0004tz-6E
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 01:37:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1etSd8-00038q-BG
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 01:32:53 -0500
-Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:35801)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1etSd8-00038h-51
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 01:32:50 -0500
-Received: by mail-it0-x242.google.com with SMTP id v194so2045943itb.0
-	for <qemu-devel@nongnu.org>; Tue, 06 Mar 2018 22:32:50 -0800 (PST)
-References: <20180201093545.33741-1-aik@ozlabs.ru>
-	<38e2df74-c7d7-a062-8385-494adae0ef89@ozlabs.ru>
-	<727e34b6-0f7f-bd0c-9a34-51d5bc844c73@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <e878fb8c-e33b-54bc-545d-bd4a80d92a88@ozlabs.ru>
-Date: Wed, 7 Mar 2018 17:32:44 +1100
-MIME-Version: 1.0
-In-Reply-To: <727e34b6-0f7f-bd0c-9a34-51d5bc844c73@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu] slirp/debug: Print IP addresses in
- human readable form
+	(envelope-from <jcmvbkbc@gmail.com>) id 1etShI-0003wz-On
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 01:37:10 -0500
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Tue,  6 Mar 2018 22:36:51 -0800
+Message-Id: <20180307063651.4421-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH v5 05/11] linux-user: fix
+ mmap/munmap/mprotect/mremap/shmat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,44 +18,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: qemu-devel@nongnu.org
+Cc: Max Filippov <jcmvbkbc@gmail.com>, qemu-stable@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-On 7/3/18 5:24 pm, Thomas Huth wrote:
-> On 07.03.2018 04:38, Alexey Kardashevskiy wrote:
->> On 01/02/18 20:35, Alexey Kardashevskiy wrote:
->>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>
->> Ping?
->>
->>
->>> ---
->>>  slirp/arp_table.c | 4 ++--
->>>  slirp/socket.c    | 8 ++++----
->>>  slirp/udp.c       | 4 ++--
->>>  3 files changed, 8 insertions(+), 8 deletions(-)
->>>
->>> diff --git a/slirp/arp_table.c b/slirp/arp_table.c
->>> index 3547043..bac608f 100644
->>> --- a/slirp/arp_table.c
->>> +++ b/slirp/arp_table.c
->>> @@ -33,7 +33,7 @@ void arp_table_add(Slirp *slirp, uint32_t ip_addr, uint8_t ethaddr[ETH_ALEN])
->>>      int i;
->>>  
->>>      DEBUG_CALL("arp_table_add");
->>> -    DEBUG_ARG("ip = 0x%x", ip_addr);
->>> +    DEBUG_ARG("ip = %s", inet_ntoa(*(struct in_addr *)&ip_addr));
-> 
-> Is this endianness safe? The man-page of inet_ntoa says that the
-> function is expecting network byte order, so I wonder whether this works
-> right on both, big and little endian hosts?
+In linux-user QEMU that runs for a target with TARGET_ABI_BITS bigger
+than L1_MAP_ADDR_SPACE_BITS an assertion in page_set_flags fires when
+mmap, munmap, mprotect, mremap or shmat is called for an address outside
+the guest address space. mmap and mprotect should return ENOMEM in such
+case.
 
+Change definition of GUEST_ADDR_MAX to always be the last valid guest
+address. Account for this change in open_self_maps.
+Add macro guest_addr_valid that verifies if the guest address is valid.
+Add function guest_range_valid that verifies if address range is within
+guest address space and does not wrap around. Use that macro in
+mmap/munmap/mprotect/mremap/shmat for error checking.
 
+Cc: qemu-stable@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>
+Cc: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+Changes v4->v5:
+- change definition of GUEST_ADDR_MAX to always be the last valid guest
+  address. Account for this change in guest_addr_valid and open_self_maps.
+- turn guest_range_valid into a function.
 
-arp_table_add() is called for either sin_addr (network order) or
-slirp_arphdr::ar_sip which is initialized from sin_addr (network order)
-with no order conversion. Bugs are still possible, of course :)
+Changes v3->v4:
+- change GUEST_ADDR_MAX and h2g_valid definitions as suggested by Laurent
+  Vivier.
 
+Changes v2->v3:
+- fix comparison in guest_valid: it must be 'less' to preserve the existing
+  functionality, not 'less or equal'.
+- fix guest_range_valid: it may not use guest_valid, because single range
+  that occupies all of the guest address space is valid.
 
+ include/exec/cpu-all.h  |  6 +++++-
+ include/exec/cpu_ldst.h | 19 ++++++++++---------
+ linux-user/mmap.c       | 20 +++++++++++++++-----
+ linux-user/syscall.c    |  5 ++++-
+ 4 files changed, 34 insertions(+), 16 deletions(-)
+
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index 0b141683f095..f4fa94e9669d 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -159,8 +159,12 @@ extern unsigned long guest_base;
+ extern int have_guest_base;
+ extern unsigned long reserved_va;
+ 
+-#define GUEST_ADDR_MAX (reserved_va ? reserved_va : \
++#if HOST_LONG_BITS <= TARGET_VIRT_ADDR_SPACE_BITS
++#define GUEST_ADDR_MAX (~0ul)
++#else
++#define GUEST_ADDR_MAX (reserved_va ? reserved_va - 1 : \
+                                     (1ul << TARGET_VIRT_ADDR_SPACE_BITS) - 1)
++#endif
+ #else
+ 
+ #include "exec/hwaddr.h"
+diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
+index 191f2e962a3c..313664e9dae8 100644
+--- a/include/exec/cpu_ldst.h
++++ b/include/exec/cpu_ldst.h
+@@ -51,15 +51,16 @@
+ /* All direct uses of g2h and h2g need to go away for usermode softmmu.  */
+ #define g2h(x) ((void *)((unsigned long)(target_ulong)(x) + guest_base))
+ 
+-#if HOST_LONG_BITS <= TARGET_VIRT_ADDR_SPACE_BITS
+-#define h2g_valid(x) 1
+-#else
+-#define h2g_valid(x) ({ \
+-    unsigned long __guest = (unsigned long)(x) - guest_base; \
+-    (__guest < (1ul << TARGET_VIRT_ADDR_SPACE_BITS)) && \
+-    (!reserved_va || (__guest < reserved_va)); \
+-})
+-#endif
++#define guest_addr_valid(x) ((x) <= GUEST_ADDR_MAX)
++#define h2g_valid(x) guest_addr_valid((unsigned long)(x) - guest_base)
++
++static inline int guest_range_valid(unsigned long start, unsigned long len)
++{
++    if (len)
++        return guest_addr_valid(len - 1) && start <= GUEST_ADDR_MAX - len + 1;
++    else
++        return guest_addr_valid(start);
++}
+ 
+ #define h2g_nocheck(x) ({ \
+     unsigned long __ret = (unsigned long)(x) - guest_base; \
+diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+index 0fbfd6dff20d..df81f9b803b6 100644
+--- a/linux-user/mmap.c
++++ b/linux-user/mmap.c
+@@ -80,8 +80,9 @@ int target_mprotect(abi_ulong start, abi_ulong len, int prot)
+         return -EINVAL;
+     len = TARGET_PAGE_ALIGN(len);
+     end = start + len;
+-    if (end < start)
+-        return -EINVAL;
++    if (!guest_range_valid(start, len)) {
++        return -ENOMEM;
++    }
+     prot &= PROT_READ | PROT_WRITE | PROT_EXEC;
+     if (len == 0)
+         return 0;
+@@ -481,8 +482,8 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
+ 	 * It can fail only on 64-bit host with 32-bit target.
+ 	 * On any other target/host host mmap() handles this error correctly.
+ 	 */
+-        if ((unsigned long)start + len - 1 > (abi_ulong) -1) {
+-            errno = EINVAL;
++        if (!guest_range_valid(start, len)) {
++            errno = ENOMEM;
+             goto fail;
+         }
+ 
+@@ -622,8 +623,10 @@ int target_munmap(abi_ulong start, abi_ulong len)
+     if (start & ~TARGET_PAGE_MASK)
+         return -EINVAL;
+     len = TARGET_PAGE_ALIGN(len);
+-    if (len == 0)
++    if (len == 0 || !guest_range_valid(start, len)) {
+         return -EINVAL;
++    }
++
+     mmap_lock();
+     end = start + len;
+     real_start = start & qemu_host_page_mask;
+@@ -678,6 +681,13 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
+     int prot;
+     void *host_addr;
+ 
++    if (!guest_range_valid(old_addr, old_size) ||
++        ((flags & MREMAP_FIXED) &&
++         !guest_range_valid(new_addr, new_size))) {
++        errno = ENOMEM;
++        return -1;
++    }
++
+     mmap_lock();
+ 
+     if (flags & MREMAP_FIXED) {
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index e24f43c4a259..809644742aff 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -4900,6 +4900,9 @@ static inline abi_ulong do_shmat(CPUArchState *cpu_env,
+             return -TARGET_EINVAL;
+         }
+     }
++    if (!guest_range_valid(shmaddr, shm_info.shm_segsz)) {
++        return -TARGET_EINVAL;
++    }
+ 
+     mmap_lock();
+ 
+@@ -7468,7 +7471,7 @@ static int open_self_maps(void *cpu_env, int fd)
+         }
+         if (h2g_valid(min)) {
+             int flags = page_get_flags(h2g(min));
+-            max = h2g_valid(max - 1) ? max : (uintptr_t)g2h(GUEST_ADDR_MAX);
++            max = h2g_valid(max - 1) ? max : (uintptr_t)g2h(GUEST_ADDR_MAX) + 1;
+             if (page_check_range(h2g(min), max - min, flags) == -1) {
+                 continue;
+             }
 -- 
-Alexey
+2.11.0
