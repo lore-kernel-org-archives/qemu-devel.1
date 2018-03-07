@@ -1,31 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1etYW7-0002h1-RR
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 07:50:00 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1etYYH-0003Xt-J5
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 07:52:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1etYW3-00073R-JA
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 07:49:59 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48172 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1etYW3-00073H-Dl
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 07:49:55 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EC7188182D17
-	for <qemu-devel@nongnu.org>; Wed,  7 Mar 2018 12:49:54 +0000 (UTC)
-Date: Wed, 7 Mar 2018 13:49:52 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180307134952.06e877a2.cohuck@redhat.com>
-In-Reply-To: <1520342370-123606-20-git-send-email-pbonzini@redhat.com>
-References: <1520342370-123606-1-git-send-email-pbonzini@redhat.com>
-	<1520342370-123606-20-git-send-email-pbonzini@redhat.com>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1etYYD-0008Hj-HF
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 07:52:13 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53476
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1etYYD-0008Gh-B3
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 07:52:09 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w27Co1dw119297
+	for <qemu-devel@nongnu.org>; Wed, 7 Mar 2018 07:52:08 -0500
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2gjdpq718r-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 07 Mar 2018 07:52:08 -0500
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Wed, 7 Mar 2018 05:52:07 -0700
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Wed,  7 Mar 2018 07:51:56 -0500
+In-Reply-To: <1520427119-6236-1-git-send-email-stefanb@linux.vnet.ibm.com>
+References: <1520427119-6236-1-git-send-email-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 19/34] address_space_access_valid:
- address_space_to_flatview needs RCU lock
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <1520427119-6236-3-git-send-email-stefanb@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v1 2/5] tpm: convert tpm_passthrough.c to use
+ trace-events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,49 +42,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-On Tue,  6 Mar 2018 14:19:15 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ hw/tpm/tpm_passthrough.c | 13 +++----------
+ hw/tpm/trace-events      |  4 ++++
+ 2 files changed, 7 insertions(+), 10 deletions(-)
 
-> address_space_access_valid is calling address_space_to_flatview but it can
-> be called outside the RCU lock.  To fix it, push the rcu_read_lock/unlock
-> pair up from flatview_access_valid to address_space_access_valid.
-> 
-> Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  exec.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
-
-This one kills my s390x guests when running under tcg:
-
-qemu-system-s390x: /home/cohuck/git/qemu/include/qemu/rcu.h:89: void rcu_read_unlock(void): Assertion `p_rcu_reader->depth != 0' failed.
-
-Easy to reproduce with the moon buggy image from the QEMU Advent
-Calendar:
-
-s390x-softmmu/qemu-system-s390x -M s390-ccw-virtio -nographic -smp 2 -kernel ~/Downloads/s390-moon-buggy/s390-bb.kernel -initrd ~/Downloads/s390-moon-buggy/s390-moon-buggy.initrd
-
-(regardless whether using smp or not)
-
-Backchain:
-
-(gdb) bt
-#0  0x00007ffff399d9fb in raise () from /lib64/libc.so.6
-#1  0x00007ffff399f800 in abort () from /lib64/libc.so.6
-#2  0x00007ffff39960da in __assert_fail_base () from /lib64/libc.so.6
-#3  0x00007ffff3996152 in __assert_fail () from /lib64/libc.so.6
-#4  0x00005555556a4919 in rcu_read_unlock ()
-    at /home/cohuck/git/qemu/include/qemu/rcu.h:89
-#5  cpu_exec (cpu=0x555556423f50)
-    at /home/cohuck/git/qemu/accel/tcg/cpu-exec.c:740
-#6  0x000055555566cbf5 in tcg_cpu_exec (cpu=<optimized out>)
-    at /home/cohuck/git/qemu/cpus.c:1341
-#7  qemu_tcg_rr_cpu_thread_fn (arg=<optimized out>)
-    at /home/cohuck/git/qemu/cpus.c:1435
-#8  0x00007ffff3d4336d in start_thread () from /lib64/libpthread.so.0
-#9  0x00007ffff3a77b4f in clone () from /lib64/libc.so.6
-
-F26 host, qemu built with clang.
+diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+index a495fe0..2589c4d 100644
+--- a/hw/tpm/tpm_passthrough.c
++++ b/hw/tpm/tpm_passthrough.c
+@@ -31,14 +31,7 @@
+ #include "hw/hw.h"
+ #include "qapi/clone-visitor.h"
+ #include "tpm_util.h"
+-
+-#define DEBUG_TPM 0
+-
+-#define DPRINTF(fmt, ...) do { \
+-    if (DEBUG_TPM) { \
+-        fprintf(stderr, fmt, ## __VA_ARGS__); \
+-    } \
+-} while (0)
++#include "trace.h"
+=20
+ #define TYPE_TPM_PASSTHROUGH "tpm-passthrough"
+ #define TPM_PASSTHROUGH(obj) \
+@@ -137,7 +130,7 @@ static void tpm_passthrough_handle_request(TPMBackend=
+ *tb, TPMBackendCmd *cmd,
+ {
+     TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
+=20
+-    DPRINTF("tpm_passthrough: processing command %p\n", cmd);
++    trace_tpm_passthrough_handle_request(cmd);
+=20
+     tpm_passthrough_unix_tx_bufs(tpm_pt, cmd->in, cmd->in_len,
+                                  cmd->out, cmd->out_len, &cmd->selftest_=
+done,
+@@ -146,7 +139,7 @@ static void tpm_passthrough_handle_request(TPMBackend=
+ *tb, TPMBackendCmd *cmd,
+=20
+ static void tpm_passthrough_reset(TPMBackend *tb)
+ {
+-    DPRINTF("tpm_passthrough: CALL TO TPM_RESET!\n");
++    trace_tpm_passthrough_reset();
+=20
+     tpm_passthrough_cancel_cmd(tb);
+ }
+diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
+index 336b06d..8557dd9 100644
+--- a/hw/tpm/trace-events
++++ b/hw/tpm/trace-events
+@@ -3,3 +3,7 @@
+ # hw/tpm/tpm_crb.c
+ tpm_crb_mmio_read(uint64_t addr, unsigned size, uint32_t val) "CRB read =
+0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
+ tpm_crb_mmio_write(uint64_t addr, unsigned size, uint32_t val) "CRB writ=
+e 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
++
++# hw/tpm/tpm_passthrough.c
++tpm_passthrough_handle_request(void *cmd) "processing command %p"
++tpm_passthrough_reset(void) "reset"
+--=20
+2.5.5
