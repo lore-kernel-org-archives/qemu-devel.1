@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eteIS-0004Yl-Jk
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 14:00:20 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eteIT-0004a7-5D
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 14:00:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eteIM-0004KL-TN
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 14:00:16 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eteIS-0004RY-4Q
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 14:00:17 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed,  7 Mar 2018 19:59:10 +0100
-Message-Id: <20180307185946.29366-2-kwolf@redhat.com>
+Date: Wed,  7 Mar 2018 19:59:18 +0100
+Message-Id: <20180307185946.29366-10-kwolf@redhat.com>
 In-Reply-To: <20180307185946.29366-1-kwolf@redhat.com>
 References: <20180307185946.29366-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 01/37] block/qapi: Introduce
- BlockdevCreateOptions
+Subject: [Qemu-devel] [PATCH v4 09/37] util: Add
+ qemu_opts_to_qdict_filtered()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,89 +23,100 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-This creates a BlockdevCreateOptions union type that will contain all of
-the options for image creation. We'll start out with an empty struct
-type BlockdevCreateNotSupported for all drivers.
+This allows, given a QemuOpts for a QemuOptsList that was merged from
+multiple QemuOptsList, to only consider those options that exist in one
+specific list. Block drivers need this to separate format-layer create
+options from protocol-level options.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
+ include/qemu/option.h |  2 ++
+ util/qemu-option.c    | 42 +++++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 39 insertions(+), 5 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 00475f08d4..bb2db662f7 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3359,6 +3359,68 @@
- { 'command': 'blockdev-del', 'data': { 'node-name': 'str' } }
+diff --git a/include/qemu/option.h b/include/qemu/option.h
+index b127fb6db6..306fdb5f7a 100644
+--- a/include/qemu/option.h
++++ b/include/qemu/option.h
+@@ -124,6 +124,8 @@ void qemu_opts_set_defaults(QemuOptsList *list, const char *params,
+                             int permit_abbrev);
+ QemuOpts *qemu_opts_from_qdict(QemuOptsList *list, const QDict *qdict,
+                                Error **errp);
++QDict *qemu_opts_to_qdict_filtered(QemuOpts *opts, QDict *qdict,
++                                   QemuOptsList *list, bool del);
+ QDict *qemu_opts_to_qdict(QemuOpts *opts, QDict *qdict);
+ void qemu_opts_absorb_qdict(QemuOpts *opts, QDict *qdict, Error **errp);
  
- ##
-+# @BlockdevCreateNotSupported:
-+#
-+# This is used for all drivers that don't support creating images.
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'BlockdevCreateNotSupported', 'data': {}}
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index a401e936da..2b412eff5e 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -1007,14 +1007,23 @@ void qemu_opts_absorb_qdict(QemuOpts *opts, QDict *qdict, Error **errp)
+ }
+ 
+ /*
+- * Convert from QemuOpts to QDict.
+- * The QDict values are of type QString.
++ * Convert from QemuOpts to QDict. The QDict values are of type QString.
++ *
++ * If @list is given, only add those options to the QDict that are contained in
++ * the list. If @del is true, any options added to the QDict are removed from
++ * the QemuOpts, otherwise they remain there.
++ *
++ * If two options in @opts have the same name, they are processed in order
++ * so that the last one wins (consistent with the reverse iteration in
++ * qemu_opt_find()), but all of them are deleted if @del is true.
++ *
+  * TODO We'll want to use types appropriate for opt->desc->type, but
+  * this is enough for now.
+  */
+-QDict *qemu_opts_to_qdict(QemuOpts *opts, QDict *qdict)
++QDict *qemu_opts_to_qdict_filtered(QemuOpts *opts, QDict *qdict,
++                                   QemuOptsList *list, bool del)
+ {
+-    QemuOpt *opt;
++    QemuOpt *opt, *next;
+ 
+     if (!qdict) {
+         qdict = qdict_new();
+@@ -1022,12 +1031,35 @@ QDict *qemu_opts_to_qdict(QemuOpts *opts, QDict *qdict)
+     if (opts->id) {
+         qdict_put_str(qdict, "id", opts->id);
+     }
+-    QTAILQ_FOREACH(opt, &opts->head, next) {
++    QTAILQ_FOREACH_SAFE(opt, &opts->head, next, next) {
++        if (list) {
++            QemuOptDesc *desc;
++            bool found = false;
++            for (desc = list->desc; desc->name; desc++) {
++                if (!strcmp(desc->name, opt->name)) {
++                    found = true;
++                    break;
++                }
++            }
++            if (!found) {
++                continue;
++            }
++        }
+         qdict_put_str(qdict, opt->name, opt->str);
++        if (del) {
++            qemu_opt_del(opt);
++        }
+     }
+     return qdict;
+ }
+ 
++/* Copy all options in a QemuOpts to the given QDict. See
++ * qemu_opts_to_qdict_filtered() for details. */
++QDict *qemu_opts_to_qdict(QemuOpts *opts, QDict *qdict)
++{
++    return qemu_opts_to_qdict_filtered(opts, qdict, NULL, false);
++}
 +
-+##
-+# @BlockdevCreateOptions:
-+#
-+# Options for creating an image format on a given node.
-+#
-+# @driver           block driver to create the image format
-+#
-+# Since: 2.12
-+##
-+{ 'union': 'BlockdevCreateOptions',
-+  'base': {
-+      'driver':         'BlockdevDriver' },
-+  'discriminator': 'driver',
-+  'data': {
-+      'blkdebug':       'BlockdevCreateNotSupported',
-+      'blkverify':      'BlockdevCreateNotSupported',
-+      'bochs':          'BlockdevCreateNotSupported',
-+      'cloop':          'BlockdevCreateNotSupported',
-+      'dmg':            'BlockdevCreateNotSupported',
-+      'file':           'BlockdevCreateNotSupported',
-+      'ftp':            'BlockdevCreateNotSupported',
-+      'ftps':           'BlockdevCreateNotSupported',
-+      'gluster':        'BlockdevCreateNotSupported',
-+      'host_cdrom':     'BlockdevCreateNotSupported',
-+      'host_device':    'BlockdevCreateNotSupported',
-+      'http':           'BlockdevCreateNotSupported',
-+      'https':          'BlockdevCreateNotSupported',
-+      'iscsi':          'BlockdevCreateNotSupported',
-+      'luks':           'BlockdevCreateNotSupported',
-+      'nbd':            'BlockdevCreateNotSupported',
-+      'nfs':            'BlockdevCreateNotSupported',
-+      'null-aio':       'BlockdevCreateNotSupported',
-+      'null-co':        'BlockdevCreateNotSupported',
-+      'nvme':           'BlockdevCreateNotSupported',
-+      'parallels':      'BlockdevCreateNotSupported',
-+      'qcow2':          'BlockdevCreateNotSupported',
-+      'qcow':           'BlockdevCreateNotSupported',
-+      'qed':            'BlockdevCreateNotSupported',
-+      'quorum':         'BlockdevCreateNotSupported',
-+      'raw':            'BlockdevCreateNotSupported',
-+      'rbd':            'BlockdevCreateNotSupported',
-+      'replication':    'BlockdevCreateNotSupported',
-+      'sheepdog':       'BlockdevCreateNotSupported',
-+      'ssh':            'BlockdevCreateNotSupported',
-+      'throttle':       'BlockdevCreateNotSupported',
-+      'vdi':            'BlockdevCreateNotSupported',
-+      'vhdx':           'BlockdevCreateNotSupported',
-+      'vmdk':           'BlockdevCreateNotSupported',
-+      'vpc':            'BlockdevCreateNotSupported',
-+      'vvfat':          'BlockdevCreateNotSupported',
-+      'vxhs':           'BlockdevCreateNotSupported'
-+  } }
-+
-+##
- # @blockdev-open-tray:
- #
- # Opens a block device's tray. If there is a block driver state tree inserted as
+ /* Validate parsed opts against descriptions where no
+  * descriptions were provided in the QemuOptsList.
+  */
 -- 
 2.13.6
