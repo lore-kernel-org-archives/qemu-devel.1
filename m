@@ -1,22 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ethj3-0004Wr-Ha
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 17:39:58 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eti06-0000ko-6J
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 17:57:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ethiz-0000Y0-K5
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 17:39:57 -0500
-Date: Wed, 7 Mar 2018 23:39:49 +0100
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20180307223949.5swn6dhu3bx5e3n5@var.youpi.perso.aquilenet.fr>
-References: <20180201093545.33741-1-aik@ozlabs.ru>
-	<38e2df74-c7d7-a062-8385-494adae0ef89@ozlabs.ru>
-	<727e34b6-0f7f-bd0c-9a34-51d5bc844c73@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eti03-0008Fi-55
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 17:57:34 -0500
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:53449)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eti02-0008EG-Ue
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 17:57:31 -0500
+Received: by mail-wm0-x22b.google.com with SMTP id e194so7804689wmd.3
+	for <qemu-devel@nongnu.org>; Wed, 07 Mar 2018 14:57:30 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <23118.27370.136663.284087@guava.gson.org>
+	<143c7064-8a4d-6f78-6d50-ed10096ddd3b@gmx.com>
+	<5b3a1a64-2960-d120-08f4-e32227df2712@amsat.org>
+	<20180307223433.davsfc42oll6e3er@var.youpi.perso.aquilenet.fr>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <991c562c-692d-c632-4ed4-ac85b27f0e1f@amsat.org>
+Date: Wed, 7 Mar 2018 19:57:28 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <727e34b6-0f7f-bd0c-9a34-51d5bc844c73@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH qemu] slirp/debug: Print IP addresses in
- human readable form
+In-Reply-To: <20180307223433.davsfc42oll6e3er@var.youpi.perso.aquilenet.fr>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] slirp: disable Nagle in outgoing
+ connections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,30 +38,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Samuel Thibault <samuel.thibault@gnu.org>
+Cc: Kamil Rytarowski <n54@gmx.com>, Andreas Gustafsson <gson@gson.org>, qemu-devel@nongnu.org, Jan Kiszka <jan.kiszka@siemens.com>
 
-Hello,
+On 03/07/2018 07:34 PM, Samuel Thibault wrote:
+> Hello,
+> 
+> Thanks for the Cc.
+> 
+> I have applied it to my tree.  I don't think there is any reason to
+> avoid the same change for ingoing connections?  Could one of your review
+> the attached patch doing it?
 
-Remember to Cc the maintainer, I just can't read qemu-devel fully to
-find slirp mails.
+attached patch:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Thomas Huth, on mer. 07 mars 2018 07:24:16 +0100, wrote:
-> >> diff --git a/slirp/arp_table.c b/slirp/arp_table.c
-> >> index 3547043..bac608f 100644
-> >> --- a/slirp/arp_table.c
-> >> +++ b/slirp/arp_table.c
-> >> @@ -33,7 +33,7 @@ void arp_table_add(Slirp *slirp, uint32_t ip_addr, uint8_t ethaddr[ETH_ALEN])
-> >>      int i;
-> >>  
-> >>      DEBUG_CALL("arp_table_add");
-> >> -    DEBUG_ARG("ip = 0x%x", ip_addr);
-> >> +    DEBUG_ARG("ip = %s", inet_ntoa(*(struct in_addr *)&ip_addr));
-
-I never like casts :)
-And it happens that the standard doesn't say that s_addr is necessarily
-the first field of struct in_addr, so better really initialize a struct
-in_addr variable and use that (ditto for arp_table_search and
-tcp_listen).
-
-Samuel
+> 
+> Samuel
+> 
