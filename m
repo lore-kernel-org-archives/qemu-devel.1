@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1etdDU-00078T-Jv
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 12:51:05 -0500
+	(envelope-from <mreitz@redhat.com>) id 1etdHO-0001XL-N1
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 12:55:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1etdDQ-0000Fq-HZ
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 12:51:04 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60600)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1etdDQ-0000FJ-Bg
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 12:51:00 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1etdDM-0001Wj-Rs
-	for <qemu-devel@nongnu.org>; Wed, 07 Mar 2018 17:50:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 74DBA2E80E5
-	for <qemu-devel@nongnu.org>; Wed,  7 Mar 2018 17:50:51 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1etdHN-00027q-SP
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 12:55:06 -0500
+References: <20180306130121.30243-1-berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <cec0f674-b25a-9c7c-e12c-49513e0060d0@redhat.com>
+Date: Wed, 7 Mar 2018 18:54:51 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 07 Mar 2018 17:42:21 -0000
-From: Guenter Roeck <public@roeck-us.net>
-Reply-To: Bug 1753309 <1753309@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152019341691.7537.9997390122339723494.malonedeb@gac.canonical.com>
-Message-Id: <152044454184.20543.8044387801013591055.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1753309] Re: Ethernet interrupt vectors for
- sabrelite machine are defined backwards
+In-Reply-To: <20180306130121.30243-1-berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="kV971HavYPnVlvlBdNn9O0hUWn7Z2gR5a"
+Subject: Re: [Qemu-devel] [PATCH v4] iotests: Tweak 030 in order to trigger
+ a race condition with parallel jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,93 +24,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
 
-Submitted https://patchwork.kernel.org/patch/10264615/
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--kV971HavYPnVlvlBdNn9O0hUWn7Z2gR5a
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ John Snow <jsnow@redhat.com>
+Message-ID: <cec0f674-b25a-9c7c-e12c-49513e0060d0@redhat.com>
+Subject: Re: [PATCH v4] iotests: Tweak 030 in order to trigger a race
+ condition with parallel jobs
+References: <20180306130121.30243-1-berto@igalia.com>
+In-Reply-To: <20180306130121.30243-1-berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 2018-03-06 14:01, Alberto Garcia wrote:
+> This patch tweaks TestParallelOps in iotest 030 so it allocates data
+> in smaller regions (256KB/512KB instead of 512KB/1MB) and the
+> block-stream job in test_stream_commit() only needs to copy data that
+> is at the very end of the image.
+>=20
+> This way when the block-stream job is awakened it will finish right
+> away without any chance of being stopped by block_job_sleep_ns(). This
+> triggers the bug that was fixed by 3d5d319e1221082974711af1d09d82f and
+> 1a63a907507fbbcfaee3f622907ec24 and is therefore a more useful test
+> case for parallel block jobs.
+>=20
+> After this patch the aforementiond bug can also be reproduced with the
+> test_stream_parallel() test case.
+>=20
+> Since with this change the stream job in test_stream_commit() finishes
+> early, this patch introduces a similar test case where both jobs are
+> slowed down so they can actually run in parallel.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Cc: John Snow <jsnow@redhat.com>
+> ---
+>=20
+> v4: Mention that commit 1a63a907507fbbcfaee3f622907ec24 also
+>     contributes to solve the original bug (both commits need to
+>     reverted in order to reproduce this bug reliably).
+>=20
+>     Rewrite the loop that writes data into the images to make it more
+>     readable.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1753309
+Thanks!  Applied to my block tree:
 
-Title:
-  Ethernet interrupt vectors for sabrelite machine are defined backwards
+https://github.com/XanClic/qemu/commits/block
 
-Status in QEMU:
-  New
+(Still took me a couple of attempts to get it to fail both commits
+reverted, though...)
 
-Bug description:
-  The sabrelite machine model used by qemu-system-arm is based on the
-  Freescale/NXP i.MX6Q processor. This SoC has an on-board ethernet
-  controller which is supported in QEMU using the imx_fec.c module
-  (actually called imx.enet for this model.)
+Max
 
-  The include/hw/arm/fsm-imx6.h file defines the interrupt vectors for
-  the imx.enet device like this:
 
-  #define FSL_IMX6_ENET_MAC_1588_IRQ 118
-  #define FSL_IMX6_ENET_MAC_IRQ 119
+--kV971HavYPnVlvlBdNn9O0hUWn7Z2gR5a
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  However, this is backwards. The reference manual for the i.MX6D/Q
-  devices can be found here:
+-----BEGIN PGP SIGNATURE-----
 
-  https://www.nxp.com/docs/en/reference-manual/IMX6DQRM.pdf
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqgJ2sSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AbeAH/3enDqKqAMiPTTzFSaYLsNkJDIa3KaNm
+FFe2TCRR96GG7+Zsp48B7ZMca+NnAnphZVdgbEc529F+Am5j8tXOH9NaHMG4TCJ/
+6m4uwkXKklVY0gJ3U0Yu8g4LhpYZTo6mEaZcFf5C0fcbPTq1V887GrbpHhFqnk0I
+UnPBOX6Iw5OZh1RByTbyKCCAam9Ft5WODiAXmPkG464GGEnxWje3Qycx5lBcScfd
+NlaIwBfvhm6CKLaXyWw4g8YfR9xCFVICIaQJYIfnlr+SMHvYrxgEhz9fyg2WloqH
+jDJuCOSi6Ug3r/m+uxMsm1kE19u33JU+KZrYHEDFoGJOmlaUVwHOuf4=
+=+l8O
+-----END PGP SIGNATURE-----
 
-  On page 225, in Table 3-1. ARM Cortex A9 domain interrupt summary, it
-  shows the following:
-
-  150 ENET
-  MAC 0 IRQ, Logical OR of:
-  MAC 0 Periodic Timer Overflow
-  MAC 0 Time Stamp Available
-  MAC 0 Time Stamp Available
-  MAC 0 Time Stamp Available
-  MAC 0 Payload Receive Error
-  MAC 0 Transmit FIFO Underrun
-  MAC 0 Collision Retry Limit
-  MAC 0 Late Collision
-  MAC 0 Ethernet Bus Error
-  MAC 0 MII Data Transfer Done
-  MAC 0 Receive Buffer Done
-  MAC 0 Receive Frame Done
-  MAC 0 Transmit Buffer Done
-  MAC 0 Transmit Frame Done
-  MAC 0 Graceful Stop
-  MAC 0 Babbling Transmit Error
-  MAC 0 Babbling Receive Error
-  MAC 0 Wakeup Request [synchronous]
-
-  151 ENET
-  MAC 0 1588 Timer interrupt [synchronous] request
-
-  Note:
-  150 - 32 =3D=3D 118
-  151 - 32 =3D=3D 119
-
-  In other words, the vector definitions in the fsl-imx6.h file are
-  reversed. The correct definition is:
-
-  #define FSL_IMX6_ENET_MAC_IRQ 118
-  #define FSL_IMX6_ENET_MAC_1588_IRQ 119
-
-  I tested the sabrelite simulation using VxWorks 7 (which supports the
-  SabreLite board) and found that while I was able to send and receive
-  packet data via the simulated ethernet interface, the VxWorks i.MX6
-  ethernet driver failed to receive any interrupts. When I corrected the
-  interrupt vector definitions as shown above and recompiled QEMU,
-  everything worked as expected. I was able to exchange ICMP packets
-  with the simulated target and telnet to/from the VxWorks instance
-  running in the virtual machine. I used the tap interface for this.
-
-  As a workaround I was also able to make the ethernet work by modifying
-  the VxWorks imx6q-sabrelite.dts file to change the ethernet interrupt
-  property from 150 to 151.
-
-  This problem was observed with the following environment:
-
-  Host: FreeBSD/amd64 11.1-RELEASE
-  QEMU version: 2.11.0 and 2.11.1 built from source code
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1753309/+subscriptions
+--kV971HavYPnVlvlBdNn9O0hUWn7Z2gR5a--
