@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1etXLx-00010b-Az
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 06:35:26 -0500
+	(envelope-from <berrange@redhat.com>) id 1etXP6-00027V-Mt
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 06:38:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1etXLw-000485-Bw
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 06:35:25 -0500
-Date: Wed, 7 Mar 2018 11:35:07 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180307113507.GD16861@stefanha-x1.localdomain>
-References: <20180306105354.15197-1-stefanha@redhat.com>
-	<20180306110844.GC7139@localhost.localdomain>
+	(envelope-from <berrange@redhat.com>) id 1etXP3-0005KT-JE
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 06:38:40 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45786 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1etXP3-0005K2-CE
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 06:38:37 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D4E314001851
+	for <qemu-devel@nongnu.org>; Wed,  7 Mar 2018 11:38:36 +0000 (UTC)
+Date: Wed, 7 Mar 2018 11:38:34 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180307113834.GL20201@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180307110010.2205-1-quintela@redhat.com>
+	<20180307110010.2205-4-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Q0rSlbzrZN6k9QnT"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180306110844.GC7139@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH] block: make BDRV_POLL_WHILE() re-entrancy
- safe
+In-Reply-To: <20180307110010.2205-4-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v10 03/24] migration: Create tcp_port
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +35,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "fuweiwei (C)" <fuweiwei2@huawei.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
+On Wed, Mar 07, 2018 at 11:59:49AM +0100, Juan Quintela wrote:
+> It will be used to store the uri tcp_port parameter.  This is the only
+> parameter than can change and we can need to be able to connect to it.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> 
+> --
+> 
+> This used to be uri parameter, but it has so many troubles to
+> reproduce that it don't just make sense.
+> ---
+>  hmp.c                 |  3 +++
+>  migration/migration.c |  8 ++++++++
+>  qapi/migration.json   | 19 ++++++++++++++++---
+>  3 files changed, 27 insertions(+), 3 deletions(-)
 
---Q0rSlbzrZN6k9QnT
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index 7f465a1902..b6ef193f47 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -490,6 +490,9 @@
+>  #                     and a power of 2
+>  #                     (Since 2.11)
+>  #
+> +# @x-tcp-port: Only used for tcp, to know what the real port is
+> +#                     (Since 2.12)
+> +#
+>  # Since: 2.4
+>  ##
+>  { 'enum': 'MigrationParameter',
+> @@ -498,7 +501,7 @@
+>             'tls-creds', 'tls-hostname', 'max-bandwidth',
+>             'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
+>             'x-multifd-channels', 'x-multifd-page-count',
+> -           'xbzrle-cache-size' ] }
+> +           'xbzrle-cache-size', 'x-tcp-port' ] }
+>  
+>  ##
+>  # @MigrateSetParameters:
+> @@ -566,6 +569,10 @@
+>  #                     needs to be a multiple of the target page size
+>  #                     and a power of 2
+>  #                     (Since 2.11)
+> +#
+> +# @x-tcp-port: Only used for tcp, to know what the real port is
+> +#                     (Since 2.12)
+> +#
+>  # Since: 2.4
+>  ##
+>  # TODO either fuse back into MigrationParameters, or make
+> @@ -584,7 +591,8 @@
+>              '*block-incremental': 'bool',
+>              '*x-multifd-channels': 'int',
+>              '*x-multifd-page-count': 'int',
+> -            '*xbzrle-cache-size': 'size' } }
+> +            '*xbzrle-cache-size': 'size',
+> +            '*x-tcp-port': 'uint16'} }
 
-On Tue, Mar 06, 2018 at 12:08:44PM +0100, Kevin Wolf wrote:
-> Am 06.03.2018 um 11:53 hat Stefan Hajnoczi geschrieben:
-> > Nested BDRV_POLL_WHILE() calls can occur.  Currently
-> > assert(!bs_->wakeup) will fail when this happens.
-> >=20
-> > This patch converts bs->wakeup from bool to a counter.
-> >=20
-> > Nesting works correctly because outer BDRV_POLL_WHILE() callers evaluate
-> > the condition again after the inner caller completes (invoking the inner
-> > caller counts as aio_poll() progress).
-> >=20
-> > Reported-by: "fuweiwei (C)" <fuweiwei2@huawei.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->=20
-> Doesn't this conflict with your own AIO_WAIT_WHILE() patch?
+This should not exist - this exposes this parameter in migate-set-parameters
+as a end user settable property, which is definitely not desirable.
 
-Yes, I wanted this patch to be easy for Weiwei to test without
-dependencies.
+It is only something we should report with 'query-migrate' / 'info migrate'
 
-AIO_WAIT_WHILE() has just hit qemu.git/master, so I'll rebase and send a
-v2.
+>  # @migrate-set-parameters:
+> @@ -667,6 +675,10 @@
+>  #                     needs to be a multiple of the target page size
+>  #                     and a power of 2
+>  #                     (Since 2.11)
+> +#
+> +# @x-tcp-port: Only used for tcp, to know what the real port is
+> +#                     (Since 2.12)
+> +#
+>  # Since: 2.4
+>  ##
+>  { 'struct': 'MigrationParameters',
+> @@ -683,7 +695,8 @@
+>              '*block-incremental': 'bool' ,
+>              '*x-multifd-channels': 'uint8',
+>              '*x-multifd-page-count': 'uint32',
+> -            '*xbzrle-cache-size': 'size' } }
+> +            '*xbzrle-cache-size': 'size',
+> +            '*x-tcp-port': 'uint16'} }
 
-Stefan
+As mentioned in previous review, IMHO we should be reporting the full
+socket address, and allow an array of them, since we're going to have
+more than one address available. i.e.
 
---Q0rSlbzrZN6k9QnT
-Content-Type: application/pgp-signature; name="signature.asc"
+   '*socket-address': ['SocketAddress']
 
------BEGIN PGP SIGNATURE-----
+It doesn't cover non-socket based URIs, but that's fine, because for those
+the mgmt app already knows how the channel is setup. We just need the
+array of SocketAddress, because for socket URIs, the hostname, gets turned
+into an array of addresses, and the mgmt app can't discover them.
 
-iQEcBAEBAgAGBQJan85rAAoJEJykq7OBq3PIX+UH/R3cFyY65efvNY3ohjwwNxrr
-o9ulQCIGykZ2R5zgY8OMhwJQuE5Zeb6A6MOSadZYImriyK2NEZN+92s7HOcEtnrR
-uNgcujwJheASxsoXVS0B5fZUCR+tdCsgR9axadhSKIngUmad5ppLsJJhSV4EKxQq
-67VwlOObJErumN6sx4a+MXGjXIZhSWV8H9tDzIJfi24QPHglga6OfiOvzeJ79exV
-G15tGEblx93kBapJZXp9RrIIG5B7WC0CKg+KmvSPjzAZHvxDHyvqOm5z/nRfyQb7
-MwYNGORzgFBBGZe0ztMBVmoXES6LuFXwg9SOEtNFq5WVCGX+pmGt/9gcvWBk2jo=
-=9CLk
------END PGP SIGNATURE-----
-
---Q0rSlbzrZN6k9QnT--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
