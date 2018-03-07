@@ -1,50 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1etc7X-0007BX-EU
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:40:52 -0500
+	(envelope-from <spanella@gmail.com>) id 1etc9r-0000K7-50
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:43:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1etc7S-0003Gx-GW
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:40:51 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42368)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1etc7S-0003Gh-7F
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:40:46 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w27GeYPM071217
-	for <qemu-devel@nongnu.org>; Wed, 7 Mar 2018 11:40:44 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gjkd216yc-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 07 Mar 2018 11:40:39 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Wed, 7 Mar 2018 16:40:18 -0000
-References: <1519746259-27710-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1519746259-27710-6-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<00b392ee-c928-3b22-4caf-33e7ce04f7f7@redhat.com>
-	<e0b24000-0d2a-46f5-c880-89bf6a394bbb@linux.vnet.ibm.com>
-	<bf963413-21ad-9b33-bd6c-e096e5686c59@redhat.com>
-	<20180228124058.6166d957.cohuck@redhat.com>
-	<b60e70b9-f076-8cc9-7c29-2887954b1404@linux.vnet.ibm.com>
-	<c739f2ad-8e9a-1fa0-4277-3c4447c6ef15@redhat.com>
-	<c0ff3874-e933-e30b-bc37-60abc4732a23@linux.vnet.ibm.com>
-	<05cd3b46-1fa6-6cf6-b414-5dfa2af13105@redhat.com>
-	<36825fd8-fb91-069a-01d7-520a97c743d9@linux.vnet.ibm.com>
-	<20180307154151.4e51b2fb.cohuck@redhat.com>
-From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Wed, 7 Mar 2018 17:40:13 +0100
+	(envelope-from <spanella@gmail.com>) id 1etc9p-0004zp-IK
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:43:15 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180307154151.4e51b2fb.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <47414709-fa95-5cbe-4513-82433a69e881@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] s390x/cpumodel: Set up CPU model
- for AP device support
+In-Reply-To: <CAJSP0QXt=Mrk8JdWJF4ewwELuP_kPuW1mBKn0BCVr349rpudBw@mail.gmail.com>
+References: <20180306204819.11266-1-stefanha@redhat.com>
+	<20180306204819.11266-3-stefanha@redhat.com>
+	<CANz-nerKaY_NG4enTxut9RuerWGL47sNKkgtJ_QpHws75ckO7A@mail.gmail.com>
+	<CAJSP0QXzMf1UdehS3Cp3Yud6a7U4n-ixYTtCawyd8_wGLbWq0w@mail.gmail.com>
+	<CANz-neoa1o-x+opbd6OLHdw0K1ROvwA462wXC-MOmXVPDDbu8g@mail.gmail.com>
+	<CAJSP0QXt=Mrk8JdWJF4ewwELuP_kPuW1mBKn0BCVr349rpudBw@mail.gmail.com>
+From: Stefano Panella <spanella@gmail.com>
+Date: Wed, 7 Mar 2018 16:43:12 +0000
+Message-ID: <CANz-neqFk-kdLaWTj3syokjF6Kttsq-L1JvkqDS-uR3KixBkBQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] iotests: add 208
+ nbd-server + blockdev-snapshot-sync test case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -53,102 +27,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, bjsdjshi@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-On 07/03/2018 15:41, Cornelia Huck wrote:
-> On Wed, 7 Mar 2018 11:09:46 +0100
-> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
+On Wed, Mar 7, 2018 at 4:16 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
 >
->> What I mean is the reverse implication
->>
->> ECA_APIE =3D> ap=3Don
->>
->> But you can have ap =3D on and ECA_APIE =3D off
->> This is interception or emulation.
->>
->> and the second thing is that we need two QEMU cpu features
->> AP : guest API to say we provide AP instructions to the guest (what ev=
-er
->> we do to provide it)
->> ECA_APIE : kernel will setup the SIE with interpretation
->>
->> other said:
->> if( !ap)
->>   =C2=A0=C2=A0=C2=A0 return -ENODEVICE
->> if(ECA_API)
->>   =C2=A0=C2=A0=C2=A0 set_interpretation()
->> else
->>   =C2=A0=C2=A0=C2=A0 set_interception()
-> This discussion is giving me a headache, so let's take a step back and
-> figure out what is needed/wanted/possible.
+> On Wed, Mar 7, 2018 at 1:57 PM, Stefano Panella <spanella@gmail.com>
+wrote:
+> > On Wed, Mar 7, 2018 at 10:55 AM, Stefan Hajnoczi <stefanha@gmail.com>
+wrote:
+> >>
+> >> On Tue, Mar 6, 2018 at 11:25 PM, Stefano Panella <spanella@gmail.com>
+> >> wrote:
+> >> > I have applied this patch and when I run the following qmp commands
+I I
+> >> > do
+> >> > not see the crash anymore but there is still something wrong because
+> >> > only
+> >> > /root/a is opened from qemu. It looks like nbd-server-stop is also
+> >> > getting
+> >> > rid of the nodes added with blockdev-snapshot-sync, therfore is than
+not
+> >> > possible to do blockdev-del on /root/d because node-name is not found
+> >>
+> >> Nodes are reference counted.  If nothing holds a refcount then the
+> >> node is freed.
+> > Thanks, that explains the behaviour
+> >>
+> >> The blockdev-add command holds a reference to the node.  The node will
+> >> stay alive until blockdev-del, which releases that reference.
+> >>
+> >> blockdev-snapshot-sync does not hold a reference.  Therefore snapshot
+> >> nodes are freed once nothing is using them anymore.  When the snapshot
+> >> node is created, the users of the parent node are updated to point to
+> >> the snapshot node instead.  This is why the NBD server switches to the
+> >> snapshot mode after blockdev-snapshot-sync.
+> >>
+> >> This is why the snapshot nodes disappear after the NBD server is
+> >> stopped while /root/a stays alive.
+> >>
+> >> I'm not sure if the current blockdev-snapshot-sync behavior is useful.
+> >> Perhaps the presence of the "snapshot-node-name" argument should cause
+> >> the snapshot node to be treated as monitor-owned, just like
+> >> blockdev-add.  This would introduce leaks for existing QMP clients
+> >> though, so it may be necessary to add yet another argument for this
+> >> behavior.
+> > that would be nice, I mean to add an extra parameter so it is added to
+the
+> > monitor
+> >>
+> >> Anyway, I hope this explains the current behavior.  I don't see a
+> >> problem with it, but it's something the API users need to be aware of.
+> >>
+> > Yes, I was not aware of that behaviour, the problem is that many
+examples
+> > refer
+> > to having a device associated with the blockdev-add'd node therefore we
+do
+> > not
+> > see this problem.
+> >> If it is a problem for your use case, please explain what you are
+trying
+> >> to do.
+> >>
+> > It is not strictly a problem for my usecase but it would be nice to
+have the
+> > extra param to
+> > blockdev-snapshot-sync. That would also fix the problem of running
+multiple
+> > snap-sync
+> > after blockdev-add but before there is any user.
 >
-> * straight passthrough of tuples, SIE doing the heavy lifting
->    -> what this patchset is doing, and should be fine, even regarding
->       nesting
+> Max Reitz mentioned that the 'blockdev-snapshot' command is preferred
+> over 'blockdev-snapshot-sync'.  'blockdev-snapshot-sync' is a legacy
+> command that implicitly creates the snapshot node.
 >
-> * remapping of tuples, SIE doing most of the work
-
-Currently the SIE do not allow remapping.
-Only interception can allow remapping.
-
-> (IIRC it's possible
->    to only intercept for a subset of instructions?)
-
-More than possible: some AP instructions, when existing, are always=20
-intercepted and some
-other are intercepted based on a specific condition and on STFLE bits=20
-but for them
-SIE Execution control bit is ignored.
-
-However, we do not use these instructions in this patch series.
-
->    -> that's where it gets complicated, and IIUC we can't have any mixe=
-d
->       straight/remap setups, and we may have issues regarding nesting
-
-We do not have issues regarding nesting, we can not nest
-a guest doing SIE interpretation inside another doing interception.
-It is an architectural design, not an issue.
-
-To guaranty this, the architecture provide Effective Execution Control,
-EEC.
-
-The handling of ECA28 for guests execution is combined into a
-single description, the EECA, when operating at guest level 2
-the EECA.28 is the logical AND of the guest level 1 ECA.28 and the
-guest level 2 ECA.28
-
-When using vSIE we need to propagate this handling.
-
->    Question: How important is that use case? Can we drop it and make ou=
-r
->    lives much easier?
-
-AFAIK, and as long as my information is up to date, we can not close the=20
-door to interception.
-
-In other word, we need to separate the CPU feature defining "if AP=20
-instructions are available"
-from the QEMU property defining "How we provide the instructions".
-
-ECA28 obviously belongs to the "how" and not to the "if".
-
-
-
+> The difference is that 'blockdev-snapshot' requires that the user
+> first creates the snapshot file (e.g. using qemu-img create), then
+> uses 'blockdev-add' to add the snapshot node, and finally uses
+> 'blockdev-snapshot' to install the snapshot node.
 >
-> * full emulation (which would be the only option for tcg, obviously)
->    -> even if it were doable, I doubt it would be very useful
->    It would be great if we could have a design that would also
->    accommodate this (and I have rooted for that in the past), but the
->    more I hear about the issues here, the more I doubt whether this is
->    something we should spend time on.
+> When 'blockdev-snapshot' is used, the user must delete snapshot nodes
+> using 'blockdev-del' since they created using 'blockdev-add'.
 >
-> Another question: Can some of the use cases be serviced via
-> virtio-crypto as well (clear key)? Would that in combination with
-> straight passthrough be enough?
->
+That is a very usefull info, I was not aware that blockdev-snapshot-sync
+was not
+recommended. I will try to run some examples with blockdev-snapshot.
+In case I want to achieve
+A <- B
+and I do:
+blockdev_add A
+create external snapshot with qemu-img B with A as backing image
+blockdev_add B
+blockdev_snapshot B -> A
 
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+What do I need to do to delete A and B?
+is it fine to just call blockdev_del B ?
+or should I call blockdev_del A as well?
+
+Thanks again for your help!!!
+
+> Stefan
