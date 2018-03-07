@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eteGE-0003RS-UE
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 13:58:00 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eteIK-0004OD-6U
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 14:00:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eteGC-0003Ac-7v
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 13:57:58 -0500
-Received: from 7.mo6.mail-out.ovh.net ([46.105.59.196]:53434)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eteGB-00037b-Vb
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 13:57:56 -0500
-Received: from player728.ha.ovh.net (unknown [10.109.120.1])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 7574514505F
-	for <qemu-devel@nongnu.org>; Wed,  7 Mar 2018 19:57:47 +0100 (CET)
-From: Greg Kurz <groug@kaod.org>
-Date: Wed, 07 Mar 2018 19:57:37 +0100
-Message-ID: <152044905701.22965.8924520463227226351.stgit@bahia.lan>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] virtio_net: flush uncompleted TX on reset
+	(envelope-from <kwolf@redhat.com>) id 1eteII-0004Du-UV
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 14:00:08 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Wed,  7 Mar 2018 19:59:13 +0100
+Message-Id: <20180307185946.29366-5-kwolf@redhat.com>
+In-Reply-To: <20180307185946.29366-1-kwolf@redhat.com>
+References: <20180307185946.29366-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 04/37] qcow2: Let qcow2_create() handle
+ protocol layer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +20,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, R Nageswara Sastry <nasastry@in.ibm.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-If the backend could not transmit a packet right away for some reason,
-the packet is queued for asynchronous sending. The corresponding vq
-element is tracked in the async_tx.elem field of the VirtIONetQueue,
-for later freeing when the transmission is complete.
+Currently, qcow2_create() only parses the QemuOpts and then calls
+qcow2_co_create() for the actual image creation, which includes both the
+creation of the actual file on the file system and writing a valid empty
+qcow2 image into that file.
 
-If a reset happens before completion, virtio_net_tx_complete() will push
-async_tx.elem back to the guest anyway, and we end up with the inuse flag
-of the vq being equal to -1. The next call to virtqueue_pop() is then
-likely to fail with "Virtqueue size exceeded".
+The plan is that qcow2_co_create() becomes the function that implements
+the functionality for a future 'blockdev-create' QMP command, which only
+creates the qcow2 layer on an already opened file node.
 
-This can be reproduced easily by starting a guest without a net backend,
-doing a system reset when it is booted, and finally snapshotting it.
+This is a first step towards that goal: Let's move out anything that
+deals with the protocol layer from qcow2_co_create() into
+qcow2_create().  This means that qcow2_co_create() doesn't need a file
+name any more.
 
-The appropriate fix is to ensure that such an asynchronous transmission
-cannot survive a device reset. So for all queues, we first try to send
-the packet again, and eventually we purge it if the backend still could
-not deliver it.
-
-Reported-by: R. Nageswara Sastry <nasastry@in.ibm.com>
-Buglink: https://github.com/open-power-host-os/qemu/issues/37
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- hw/net/virtio-net.c |   11 +++++++++++
- 1 file changed, 11 insertions(+)
+ block/qcow2.c | 64 +++++++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 38 insertions(+), 26 deletions(-)
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 188744e17d57..eea3cdb2c700 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -422,6 +422,7 @@ static RxFilterInfo *virtio_net_query_rxfilter(NetClientState *nc)
- static void virtio_net_reset(VirtIODevice *vdev)
- {
-     VirtIONet *n = VIRTIO_NET(vdev);
-+    int i;
- 
-     /* Reset back to compatibility mode */
-     n->promisc = 1;
-@@ -445,6 +446,16 @@ static void virtio_net_reset(VirtIODevice *vdev)
-     memcpy(&n->mac[0], &n->nic->conf->macaddr, sizeof(n->mac));
-     qemu_format_nic_info_str(qemu_get_queue(n->nic), n->mac);
-     memset(n->vlans, 0, MAX_VLAN >> 3);
-+
-+    /* Flush any async TX */
-+    for (i = 0;  i < n->max_queues; i++) {
-+        NetClientState *nc = qemu_get_subqueue(n->nic, i);
-+
-+        if (!qemu_net_queue_flush(nc->peer->incoming_queue)) {
-+            qemu_net_queue_purge(nc->peer->incoming_queue, nc);
-+        }
-+        assert(!virtio_net_get_subqueue(nc)->async_tx.elem);
-+    }
+diff --git a/block/qcow2.c b/block/qcow2.c
+index b7354a27a1..7a11874d22 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2761,7 +2761,7 @@ static uint64_t qcow2_opt_get_refcount_bits_del(QemuOpts *opts, int version,
  }
  
- static void peer_test_vnet_hdr(VirtIONet *n)
+ static int coroutine_fn
+-qcow2_co_create(const char *filename, int64_t total_size,
++qcow2_co_create(BlockDriverState *bs, int64_t total_size,
+                 const char *backing_file, const char *backing_format,
+                 int flags, size_t cluster_size, PreallocMode prealloc,
+                 QemuOpts *opts, int version, int refcount_order,
+@@ -2787,28 +2787,11 @@ qcow2_co_create(const char *filename, int64_t total_size,
+     Error *local_err = NULL;
+     int ret;
+ 
+-    if (prealloc == PREALLOC_MODE_FULL || prealloc == PREALLOC_MODE_FALLOC) {
+-        int64_t prealloc_size =
+-            qcow2_calc_prealloc_size(total_size, cluster_size, refcount_order);
+-        qemu_opt_set_number(opts, BLOCK_OPT_SIZE, prealloc_size, &error_abort);
+-        qemu_opt_set(opts, BLOCK_OPT_PREALLOC, PreallocMode_str(prealloc),
+-                     &error_abort);
+-    }
+-
+-    ret = bdrv_create_file(filename, opts, &local_err);
++    blk = blk_new(BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
++    ret = blk_insert_bs(blk, bs, errp);
+     if (ret < 0) {
+-        error_propagate(errp, local_err);
+-        return ret;
+-    }
+-
+-    blk = blk_new_open(filename, NULL, NULL,
+-                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
+-                       &local_err);
+-    if (blk == NULL) {
+-        error_propagate(errp, local_err);
+-        return -EIO;
++        goto out;
+     }
+-
+     blk_set_allow_write_beyond_eof(blk, true);
+ 
+     /* Write the header */
+@@ -2863,7 +2846,8 @@ qcow2_co_create(const char *filename, int64_t total_size,
+      */
+     options = qdict_new();
+     qdict_put_str(options, "driver", "qcow2");
+-    blk = blk_new_open(filename, NULL, options,
++    qdict_put_str(options, "file", bs->node_name);
++    blk = blk_new_open(NULL, NULL, options,
+                        BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_NO_FLUSH,
+                        &local_err);
+     if (blk == NULL) {
+@@ -2935,7 +2919,8 @@ qcow2_co_create(const char *filename, int64_t total_size,
+      */
+     options = qdict_new();
+     qdict_put_str(options, "driver", "qcow2");
+-    blk = blk_new_open(filename, NULL, options,
++    qdict_put_str(options, "file", bs->node_name);
++    blk = blk_new_open(NULL, NULL, options,
+                        BDRV_O_RDWR | BDRV_O_NO_BACKING | BDRV_O_NO_IO,
+                        &local_err);
+     if (blk == NULL) {
+@@ -2966,6 +2951,7 @@ static int coroutine_fn qcow2_co_create_opts(const char *filename, QemuOpts *opt
+     uint64_t refcount_bits;
+     int refcount_order;
+     char *encryptfmt = NULL;
++    BlockDriverState *bs = NULL;
+     Error *local_err = NULL;
+     int ret;
+ 
+@@ -3034,12 +3020,38 @@ static int coroutine_fn qcow2_co_create_opts(const char *filename, QemuOpts *opt
+ 
+     refcount_order = ctz32(refcount_bits);
+ 
+-    ret = qcow2_co_create(filename, size, backing_file, backing_fmt, flags,
++    /* Create and open the file (protocol layer) */
++    if (prealloc == PREALLOC_MODE_FULL || prealloc == PREALLOC_MODE_FALLOC) {
++        int64_t prealloc_size =
++            qcow2_calc_prealloc_size(size, cluster_size, refcount_order);
++        qemu_opt_set_number(opts, BLOCK_OPT_SIZE, prealloc_size, &error_abort);
++        qemu_opt_set(opts, BLOCK_OPT_PREALLOC, PreallocMode_str(prealloc),
++                     &error_abort);
++    }
++
++    ret = bdrv_create_file(filename, opts, errp);
++    if (ret < 0) {
++        goto finish;
++    }
++
++    bs = bdrv_open(filename, NULL, NULL,
++                   BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL, errp);
++    if (bs == NULL) {
++        ret = -EIO;
++        goto finish;
++    }
++
++    /* Create the qcow2 image (format layer) */
++    ret = qcow2_co_create(bs, size, backing_file, backing_fmt, flags,
+                           cluster_size, prealloc, opts, version, refcount_order,
+-                          encryptfmt, &local_err);
+-    error_propagate(errp, local_err);
++                          encryptfmt, errp);
++    if (ret < 0) {
++        goto finish;
++    }
+ 
+ finish:
++    bdrv_unref(bs);
++
+     g_free(backing_file);
+     g_free(backing_fmt);
+     g_free(encryptfmt);
+-- 
+2.13.6
