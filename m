@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1etbS1-0005SU-2d
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:57:58 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1etbS2-0005TG-0U
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:57:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1etbRw-00012E-Tm
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:57:57 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53006 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1etbS0-000149-My
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:57:58 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54576 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1etbRw-00011e-Nc
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:57:52 -0500
+	id 1etbS0-00013w-Gj
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:57:56 -0500
 From: marcandre.lureau@redhat.com
-Date: Wed,  7 Mar 2018 16:57:38 +0100
-Message-Id: <20180307155746.18526-1-marcandre.lureau@redhat.com>
+Date: Wed,  7 Mar 2018 16:57:41 +0100
+Message-Id: <20180307155746.18526-4-marcandre.lureau@redhat.com>
+In-Reply-To: <20180307155746.18526-1-marcandre.lureau@redhat.com>
+References: <20180307155746.18526-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 0/8] RFC: ovmf: preliminary TPM2 support
+Subject: [Qemu-devel] [PATCH v2 3/8] MdeModulePkg: fix REGISITER -> REGISTER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,91 +32,168 @@ Cc: pjones@redhat.com, jiewen.yao@intel.com, stefanb@linux.vnet.ibm.com, lersek@
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Hi,
+Cc: Laszlo Ersek <lersek@redhat.com>
+Contributed-under: TianoCore Contribution Agreement 1.0
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ MdeModulePkg/Core/Pei/Dispatcher/Dispatcher.c | 18 +++++++++---------
+ MdeModulePkg/Core/Pei/Image/Image.c           |  4 ++--
+ MdeModulePkg/Core/Pei/PeiMain.h               |  2 +-
+ MdeModulePkg/Core/Pei/PeiMain/PeiMain.c       |  2 +-
+ 4 files changed, 13 insertions(+), 13 deletions(-)
 
-The following series adds basic TPM2 support for OVMF-on-QEMU (I
-haven't tested TPM1, for lack of interest). It links with the modules
-to initializes the device in PEI phase, and do measurements (both PEI
-and DXE). The Tcg2Dxe module provides the Tcg2 protocol which allows
-the guest to access the measurement log and other facilities.
-
-DxeTpm2MeasureBootLib seems to do its job at measuring images that are
-not measured in PEI phase (such as PCI PXE rom)
-
-Tcg2ConfigDxe is not included due to its integration with edk2 own PPI
-implementation which conflicts with qemu design. PPI design is still
-being discussed & experimented at this point.
-
-Linux guests seem to work fine. But windows guest generally complains
-about the lack of PPI interface (most HLK tests require it, tpm.msc
-admin interactions too). I haven't done "real" use-cases tests, as I
-lack experience with TPM usage. Any help appreciated to test the TPM.
-
-I build edk2 with:
-
-$ build -DTPM2_ENABLE -DSECURE_BOOT_ENABLE  -DMEM_VARSTORE_EMU_ENABLE=3DF=
-ALSE
-
-I test with qemu & swtpm/libtpms (tpm2 branches, swtpm_setup.sh --tpm2 --=
-tpm-state tpmstatedir)
-
-$ swtpm socket --tpmstate tpmstatedir --ctrl type=3Dunixio,path=3Dtpmsock=
-  --tpm2 &
-$ qemu .. -chardev socket,id=3Dchrtpm,path=3Dtpmsock -tpmdev emulator,id=3D=
-tpm0,chardev=3Dchrtpm -device tpm-crb,tpmdev=3Dtpm0
-
-Thanks
-
-Github tree:
-https://github.com/elmarco/edk2/tree/tpm2 (tpm2-v2 tag)
-
-Related bug:
-https://bugzilla.tianocore.org/show_bug.cgi?id=3D594
-
-v2:
-- the series can now be applied to master directly, thanks to dropping
-  PeiReadOnlyVariable requirement
-- remove the HOB list workaround, the main fix is now upstream. Add a
-  preliminary patch to complete it.
-- removed traces of TPM1.2 support
-- add own OvmfPkg Tcg2ConfigPei, which performs only TPM2 detection
-- make PcdTpmInstanceGuid default all-bits-zero
-- drop unneeded Pcd values
-- explain why SHA1 is still nice to have (for 1.2 log format)
-- drop Tcg2ConfigDxe
-- more detailed commit messages, thanks to Laszlo explanations!
-- rebased
-
-TODO:
-- modify Ia32 and Ia32X64 builds
-
-Marc-Andr=C3=A9 Lureau (8):
-  SecurityPkg: also clear HashInterfaceHob.SupportedHashMask
-  SecurityPkg/Tcg2Pei: drop PeiReadOnlyVariable from Depex
-  MdeModulePkg: fix REGISITER -> REGISTER
-  ovmf: simplify SecurityStubDxe.inf inclusion
-  ovmf: add OvmfPkg Tcg2ConfigPei module
-  ovmf: link with Tcg2Pei module
-  ovmf: link with Tcg2Dxe module
-  ovmf: add DxeTpm2MeasureBootLib
-
- MdeModulePkg/Core/Pei/Dispatcher/Dispatcher.c |  18 +--
- MdeModulePkg/Core/Pei/Image/Image.c           |   4 +-
- MdeModulePkg/Core/Pei/PeiMain.h               |   2 +-
- MdeModulePkg/Core/Pei/PeiMain/PeiMain.c       |   2 +-
- OvmfPkg/OvmfPkgIa32.dsc                       |   6 +-
- OvmfPkg/OvmfPkgIa32X64.dsc                    |   6 +-
- OvmfPkg/OvmfPkgX64.dsc                        |  49 ++++++-
- OvmfPkg/OvmfPkgX64.fdf                        |   9 ++
- OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf      |  57 ++++++++
- OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPeim.c       | 124 ++++++++++++++++++
- OvmfPkg/Tcg/Tcg2Config/TpmDetection.c         |  46 +++++++
- .../HashLibBaseCryptoRouterPei.c              |   1 +
- SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf           |   1 -
- 13 files changed, 299 insertions(+), 26 deletions(-)
- create mode 100644 OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
- create mode 100644 OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPeim.c
- create mode 100644 OvmfPkg/Tcg/Tcg2Config/TpmDetection.c
-
+diff --git a/MdeModulePkg/Core/Pei/Dispatcher/Dispatcher.c b/MdeModulePkg=
+/Core/Pei/Dispatcher/Dispatcher.c
+index 79f2e5cebcbe..027176d872c7 100644
+--- a/MdeModulePkg/Core/Pei/Dispatcher/Dispatcher.c
++++ b/MdeModulePkg/Core/Pei/Dispatcher/Dispatcher.c
+@@ -970,7 +970,7 @@ PeiDispatcher (
+   if ((Private->PeiMemoryInstalled) && (Private->HobList.HandoffInformat=
+ionTable->BootMode !=3D BOOT_ON_S3_RESUME || PcdGetBool (PcdShadowPeimOnS=
+3Boot))) {
+     //
+     // Once real memory is available, shadow the RegisterForShadow modul=
+es. And meanwhile
+-    // update the modules' status from PEIM_STATE_REGISITER_FOR_SHADOW t=
+o PEIM_STATE_DONE.
++    // update the modules' status from PEIM_STATE_REGISTER_FOR_SHADOW to=
+ PEIM_STATE_DONE.
+     //
+     SaveCurrentPeimCount  =3D Private->CurrentPeimCount;
+     SaveCurrentFvCount    =3D Private->CurrentPeimFvCount;
+@@ -978,7 +978,7 @@ PeiDispatcher (
+=20
+     for (Index1 =3D 0; Index1 <=3D SaveCurrentFvCount; Index1++) {
+       for (Index2 =3D 0; (Index2 < PcdGet32 (PcdPeiCoreMaxPeimPerFv)) &&=
+ (Private->Fv[Index1].FvFileHandles[Index2] !=3D NULL); Index2++) {
+-        if (Private->Fv[Index1].PeimState[Index2] =3D=3D PEIM_STATE_REGI=
+SITER_FOR_SHADOW) {
++        if (Private->Fv[Index1].PeimState[Index2] =3D=3D PEIM_STATE_REGI=
+STER_FOR_SHADOW) {
+           PeimFileHandle =3D Private->Fv[Index1].FvFileHandles[Index2];
+           Private->CurrentFileHandle   =3D PeimFileHandle;
+           Private->CurrentPeimFvCount  =3D Index1;
+@@ -986,13 +986,13 @@ PeiDispatcher (
+           Status =3D PeiLoadImage (
+                     (CONST EFI_PEI_SERVICES **) &Private->Ps,
+                     PeimFileHandle,
+-                    PEIM_STATE_REGISITER_FOR_SHADOW,
++                    PEIM_STATE_REGISTER_FOR_SHADOW,
+                     &EntryPoint,
+                     &AuthenticationState
+                     );
+           if (Status =3D=3D EFI_SUCCESS) {
+             //
+-            // PEIM_STATE_REGISITER_FOR_SHADOW move to PEIM_STATE_DONE
++            // PEIM_STATE_REGISTER_FOR_SHADOW move to PEIM_STATE_DONE
+             //
+             Private->Fv[Index1].PeimState[Index2]++;
+             //
+@@ -1165,7 +1165,7 @@ PeiDispatcher (
+             //
+             PeiCheckAndSwitchStack (SecCoreData, Private);
+=20
+-            if ((Private->PeiMemoryInstalled) && (Private->Fv[FvCount].P=
+eimState[PeimCount] =3D=3D PEIM_STATE_REGISITER_FOR_SHADOW) &&   \
++            if ((Private->PeiMemoryInstalled) && (Private->Fv[FvCount].P=
+eimState[PeimCount] =3D=3D PEIM_STATE_REGISTER_FOR_SHADOW) &&   \
+                 (Private->HobList.HandoffInformationTable->BootMode !=3D=
+ BOOT_ON_S3_RESUME || PcdGetBool (PcdShadowPeimOnS3Boot))) {
+               //
+               // If memory is available we shadow images by default for =
+performance reasons.
+@@ -1179,7 +1179,7 @@ PeiDispatcher (
+                 Status =3D PeiLoadImage (
+                            PeiServices,
+                            PeimFileHandle,
+-                           PEIM_STATE_REGISITER_FOR_SHADOW,
++                           PEIM_STATE_REGISTER_FOR_SHADOW,
+                            &EntryPoint,
+                            &AuthenticationState
+                            );
+@@ -1192,7 +1192,7 @@ PeiDispatcher (
+               //PERF_END (PeiServices, L"PEIM", PeimFileHandle, 0);
+=20
+               //
+-              // PEIM_STATE_REGISITER_FOR_SHADOW move to PEIM_STATE_DONE
++              // PEIM_STATE_REGISTER_FOR_SHADOW move to PEIM_STATE_DONE
+               //
+               Private->Fv[FvCount].PeimState[PeimCount]++;
+=20
+@@ -1356,14 +1356,14 @@ PeiRegisterForShadow (
+     return EFI_NOT_FOUND;
+   }
+=20
+-  if (Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->Curren=
+tPeimCount] >=3D PEIM_STATE_REGISITER_FOR_SHADOW) {
++  if (Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->Curren=
+tPeimCount] >=3D PEIM_STATE_REGISTER_FOR_SHADOW) {
+     //
+     // If the PEIM has already entered the PEIM_STATE_REGISTER_FOR_SHADO=
+W or PEIM_STATE_DONE then it's already been started
+     //
+     return EFI_ALREADY_STARTED;
+   }
+=20
+-  Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->CurrentPei=
+mCount] =3D PEIM_STATE_REGISITER_FOR_SHADOW;
++  Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->CurrentPei=
+mCount] =3D PEIM_STATE_REGISTER_FOR_SHADOW;
+=20
+   return EFI_SUCCESS;
+ }
+diff --git a/MdeModulePkg/Core/Pei/Image/Image.c b/MdeModulePkg/Core/Pei/=
+Image/Image.c
+index f41d3acac77e..f07f48823117 100644
+--- a/MdeModulePkg/Core/Pei/Image/Image.c
++++ b/MdeModulePkg/Core/Pei/Image/Image.c
+@@ -387,7 +387,7 @@ LoadAndRelocatePeCoffImage (
+   }
+   IsRegisterForShadow =3D FALSE;
+   if ((Private->CurrentFileHandle =3D=3D FileHandle)=20
+-    && (Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->Curr=
+entPeimCount] =3D=3D PEIM_STATE_REGISITER_FOR_SHADOW)) {
++    && (Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->Curr=
+entPeimCount] =3D=3D PEIM_STATE_REGISTER_FOR_SHADOW)) {
+     IsRegisterForShadow =3D TRUE;
+   }
+=20
+@@ -876,7 +876,7 @@ PeiLoadImage (
+         //
+         // The shadowed PEIM must be relocatable.
+         //
+-        if (PeimState =3D=3D PEIM_STATE_REGISITER_FOR_SHADOW) {
++        if (PeimState =3D=3D PEIM_STATE_REGISTER_FOR_SHADOW) {
+           IsStrip =3D RelocationIsStrip ((VOID *) (UINTN) ImageAddress);
+           ASSERT (!IsStrip);
+           if (IsStrip) {
+diff --git a/MdeModulePkg/Core/Pei/PeiMain.h b/MdeModulePkg/Core/Pei/PeiM=
+ain.h
+index fef3753e4b3b..a1cdbc15d98a 100644
+--- a/MdeModulePkg/Core/Pei/PeiMain.h
++++ b/MdeModulePkg/Core/Pei/PeiMain.h
+@@ -104,7 +104,7 @@ typedef struct {
+ //
+ #define PEIM_STATE_NOT_DISPATCHED         0x00
+ #define PEIM_STATE_DISPATCHED             0x01
+-#define PEIM_STATE_REGISITER_FOR_SHADOW   0x02
++#define PEIM_STATE_REGISTER_FOR_SHADOW    0x02
+ #define PEIM_STATE_DONE                   0x03
+=20
+ typedef struct {
+diff --git a/MdeModulePkg/Core/Pei/PeiMain/PeiMain.c b/MdeModulePkg/Core/=
+Pei/PeiMain/PeiMain.c
+index 3cd61906c3df..775bf18ce938 100644
+--- a/MdeModulePkg/Core/Pei/PeiMain/PeiMain.c
++++ b/MdeModulePkg/Core/Pei/PeiMain/PeiMain.c
+@@ -104,7 +104,7 @@ ShadowPeiCore (
+   Status =3D PeiLoadImage (
+               GetPeiServicesTablePointer (),
+               *((EFI_PEI_FILE_HANDLE*)&PeiCoreFileHandle),
+-              PEIM_STATE_REGISITER_FOR_SHADOW,
++              PEIM_STATE_REGISTER_FOR_SHADOW,
+               &EntryPoint,
+               &AuthenticationState
+               );
 --=20
 2.16.2.346.g9779355e34
