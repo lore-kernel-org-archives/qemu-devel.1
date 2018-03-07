@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1etZ3A-0007DM-S7
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 08:24:09 -0500
+	(envelope-from <thuth@redhat.com>) id 1etZ8L-0001QJ-Iw
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 08:29:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1etZ35-0003zy-SN
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 08:24:08 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38360 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1etZ8G-00063t-Iv
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 08:29:29 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48084 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1etZ35-0003zp-NY
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 08:24:03 -0500
-Date: Wed, 7 Mar 2018 14:23:52 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180307142352.586c49e1.cohuck@redhat.com>
-In-Reply-To: <20180307130238.19358-1-pbonzini@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1etZ8G-00063W-EA
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 08:29:24 -0500
 References: <20180307130238.19358-1-pbonzini@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <096e970e-87f0-9aee-63a9-6d0194147b71@redhat.com>
+Date: Wed, 7 Mar 2018 14:29:12 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180307130238.19358-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH] memory: fix flatview_access_valid RCU read
  lock/unlock imbalance
@@ -27,12 +28,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, thuth@redhat.com, intermediadc@hotmail.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: cohuck@redhat.com, intermediadc@hotmail.com
 
-On Wed,  7 Mar 2018 14:02:38 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
-
+On 07.03.2018 14:02, Paolo Bonzini wrote:
 > Fixes: 11e732a5ed46903f997985bed4c3767ca28a7eb6
 > Reported-by: Cornelia Huck <cohuck@redhat.com>
 > Reported-by: luigi burdo <intermediadc@hotmail.com>
@@ -53,7 +52,8 @@ Paolo Bonzini <pbonzini@redhat.com> wrote:
 >                  return false;
 >              }
 >          }
+> 
 
-Thanks, that fixes master for me.
+Thanks, this seems to fix the problem with the sam640ex and 40p machines.
 
-Tested-by: Cornelia Huck <cohuck@redhat.com>
+Tested-by: Thomas Huth <thuth@redhat.com>
