@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1etbPm-0003jK-OH
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:55:39 -0500
+	(envelope-from <cohuck@redhat.com>) id 1etbQ4-0003t3-RN
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:55:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1etbPi-0007iq-Rs
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:55:38 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46552 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1etbPi-0007hg-KP
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:55:34 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8512338375
-	for <qemu-devel@nongnu.org>; Wed,  7 Mar 2018 15:55:30 +0000 (UTC)
-Date: Wed, 7 Mar 2018 15:55:24 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180307155524.GN20201@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180307154258.9313-1-kraxel@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1etbQ0-0007qH-0D
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:55:56 -0500
+Date: Wed, 7 Mar 2018 16:55:48 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180307165548.29f7ec07.cohuck@redhat.com>
+In-Reply-To: <1520435434-24471-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+References: <1520435434-24471-1-git-send-email-imbrenda@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180307154258.9313-1-kraxel@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] sdl: workaround bug in sdl 2.0.8 headers
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 1/1] s390x/sclp: extend SCLP event masks
+ to 64 bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,44 +23,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com
 
-On Wed, Mar 07, 2018 at 04:42:57PM +0100, Gerd Hoffmann wrote:
-> https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D892087
->=20
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+On Wed,  7 Mar 2018 16:10:34 +0100
+Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> wrote:
+
+> Extend the SCLP event masks to 64 bits.
+> 
+> Notice that using any of the new bits results in a state that cannot be
+> migrated to an older version.
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
 > ---
->  configure | 1 +
->  1 file changed, 1 insertion(+)
+>  hw/s390x/event-facility.c         | 49 ++++++++++++++++++++++++++++++++-------
+>  include/hw/s390x/event-facility.h |  2 +-
+>  2 files changed, 41 insertions(+), 10 deletions(-)
+> 
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> @@ -376,6 +387,21 @@ static bool vmstate_event_facility_mask_length_needed(void *opaque)
+>      return ef->allow_all_mask_sizes;
+>  }
+>  
+> +static const VMStateDescription vmstate_event_facility_mask64 = {
+> +    .name = "vmstate-event-facility/mask64",
 
+Should that really be called 'mask64' - you're just transferring the
+missing part of the mask here, aren't you?
 
->=20
-> diff --git a/configure b/configure
-> index 6f3921c02a..86240f97ac 100755
-> --- a/configure
-> +++ b/configure
-> @@ -2874,6 +2874,7 @@ if test "$sdl" !=3D "no" ; then
->  int main( void ) { return SDL_Init (SDL_INIT_VIDEO); }
->  EOF
->    sdl_cflags=3D$($sdlconfig --cflags 2>/dev/null)
-> +  sdl_cflags=3D"$sdl_cflags -Wno-undef"  # workaround 2.0.8 bug
->    if test "$static" =3D "yes" ; then
->      if $pkg_config $sdlname --exists; then
->        sdl_libs=3D$($pkg_config $sdlname --static --libs 2>/dev/null)
-> --=20
-> 2.9.3
->=20
->=20
+> +    .version_id = 0,
+> +    .minimum_version_id = 0,
+> +    .needed = vmstate_event_facility_mask64_needed,
+> +    .fields = (VMStateField[]) {
+> +#ifdef HOST_WORDS_BIGENDIAN
+> +        VMSTATE_UINT32(receive_mask_pieces[1], SCLPEventFacility),
+> +#else
+> +        VMSTATE_UINT32(receive_mask_pieces[0], SCLPEventFacility),
+> +#endif
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+That #ifdef is kind of ugly, and a bit confusing, I think.
+
+What about doing something like
+
+/* we need to save 32 bit chunks for compatibility */
+#ifdef HOST_WORDS_BIGENDIAN
+#define RECV_MASK_LOWER 0
+#define RECV_MASK_UPPER 1
+#else /* little endian host */
+#define RECV_MASK_LOWER 1
+#define RECV_MASK_UPPER 0
+#endif
+
+and transfer receive_mask_pieces[RECV_MASK_UPPER] here...
+
+> +        VMSTATE_END_OF_LIST()
+> +     }
+> +};
+> +
+>  static const VMStateDescription vmstate_event_facility_mask_length = {
+>      .name = "vmstate-event-facility/mask_length",
+>      .version_id = 0,
+> @@ -392,10 +418,15 @@ static const VMStateDescription vmstate_event_facility = {
+>      .version_id = 0,
+>      .minimum_version_id = 0,
+>      .fields = (VMStateField[]) {
+> -        VMSTATE_UINT32(receive_mask, SCLPEventFacility),
+> +#ifdef HOST_WORDS_BIGENDIAN
+> +        VMSTATE_UINT32(receive_mask_pieces[0], SCLPEventFacility),
+> +#else
+> +        VMSTATE_UINT32(receive_mask_pieces[1], SCLPEventFacility),
+> +#endif
+
+...and receive_mask_pieces[REV_MASK_LOWER] here?
+
+(And I guess 64bit receive masks should be enough for everybody? IOW, we
+don't expect a similar dance in the near future?)
+
+>          VMSTATE_END_OF_LIST()
+>       },
+>      .subsections = (const VMStateDescription * []) {
+> +        &vmstate_event_facility_mask64,
+>          &vmstate_event_facility_mask_length,
+>          NULL
+>       }
