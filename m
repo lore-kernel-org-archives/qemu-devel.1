@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eta6S-0006yJ-Os
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 09:31:37 -0500
+	(envelope-from <thuth@redhat.com>) id 1etaDZ-0001Pw-Gm
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 09:38:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eta6P-0008WB-KP
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 09:31:36 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43216 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1etaDU-0003M6-JE
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 09:38:57 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40900 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eta6P-0008W3-G1
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 09:31:33 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1etaDU-0003Lm-Dc
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 09:38:52 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 198F58D6FB
-	for <qemu-devel@nongnu.org>; Wed,  7 Mar 2018 14:31:33 +0000 (UTC)
-References: <20180306194600.9650-1-pbonzini@redhat.com>
-	<20180306194600.9650-2-pbonzini@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id DB4EA4023EFF
+	for <qemu-devel@nongnu.org>; Wed,  7 Mar 2018 14:38:48 +0000 (UTC)
+References: <20180307142857.28438-1-pbonzini@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b7da5bff-bf88-b3f6-6581-06bc49020a2d@redhat.com>
-Date: Wed, 7 Mar 2018 15:31:30 +0100
+Message-ID: <9a5fd178-cd3d-5128-d1dd-779975b01eb4@redhat.com>
+Date: Wed, 7 Mar 2018 15:38:41 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180306194600.9650-2-pbonzini@redhat.com>
+In-Reply-To: <20180307142857.28438-1-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] qom: introduce
- object_class_get_list_sorted
+Subject: Re: [Qemu-devel] [PATCH] qemu-doc: update deprecation section to
+ use -nic and -netdev hubport
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,27 +37,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Cc: Jason Wang <jasowang@redhat.com>
 
-On 06.03.2018 20:45, Paolo Bonzini wrote:
-> Unify half a dozen copies of very similar code (the only difference being
-> whether comparisons were case-sensitive) and use it also in Tricore,
-> which did not do any sorting of CPU model names.
+On 07.03.2018 15:28, Paolo Bonzini wrote:
+> The deprecated SLIRP options -tftp, -bootp, -redir, -smb provide
+> sample replacements that use "-net nic".  Suggest "-nic" instead,
+> since we finally have a path towards getting rid of "-net".
 > 
+> For "-net vlan" the replacement involves hubport network devices,
+> so mention that too.
+> 
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
-[...]
-> diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
-> index 969f628f0a..c261b6b090 100644
-> --- a/target/hppa/cpu.c
-> +++ b/target/hppa/cpu.c
-> @@ -110,18 +110,6 @@ static void hppa_cpu_realizefn(DeviceState *dev, Error **errp)
->  #endif
->  }
+>  qemu-doc.texi | 38 +++++++++++++++++++++-----------------
+>  1 file changed, 21 insertions(+), 17 deletions(-)
+> 
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index 39e38c87ec..918d97c18b 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -2643,42 +2643,46 @@ combined with ``-vnc tls-creds=tls0'
 >  
-> -/* Sort hppabetically by type name. */
+>  @subsection -tftp (since 2.6.0)
+>  
+> -The ``-tftp /some/dir'' argument is replaced by
+> -``-netdev user,id=x,tftp=/some/dir'', either accompanied with
+> -``-device ...,netdev=x'' (for pluggable NICs) or ``-net nic,netdev=x''
+> +The ``-tftp /some/dir'' argument is replaced by either
+> +``-netdev user,id=x,tftp=/some/dir '' (for pluggable NICs, accompanied
+> +with ``-device ...,netdev=x''), or ``-nic user,tftp=/some/dir''
+>  (for embedded NICs). The new syntax allows different settings to be
+>  provided per NIC.
+>  
+>  @subsection -bootp (since 2.6.0)
+>  
+> -The ``-bootp /some/file'' argument is replaced by
+> -``-netdev user,id=x,bootp=/some/file'', either accompanied with
+> -``-device ...,netdev=x'' (for pluggable NICs) or ``-net nic,netdev=x''
+> +The ``-bootp /some/file'' argument is replaced by either
+> +``-netdev user,id=x,bootp=/some/file '' (for pluggable NICs, accompanied
+> +with ``-device ...,netdev=x''), or ``-nic user,bootp=/some/file''
+>  (for embedded NICs). The new syntax allows different settings to be
+>  provided per NIC.
+>  
+>  @subsection -redir (since 2.6.0)
+>  
+>  The ``-redir [tcp|udp]:hostport:[guestaddr]:guestport'' argument is
+> -replaced by ``-netdev
+> -user,id=x,hostfwd=[tcp|udp]:[hostaddr]:hostport-[guestaddr]:guestport'',
+> -either accompanied with ``-device ...,netdev=x'' (for pluggable NICs) or
+> -``-net nic,netdev=x'' (for embedded NICs). The new syntax allows different
+> -settings to be provided per NIC.
+> +replaced by either
+> +``-netdev user,id=x,hostfwd=[tcp|udp]:[hostaddr]:hostport-[guestaddr]:guestport''
+> +(for pluggable NICs, accompanied with ``-device ...,netdev=x'') or
+> +``-nic user,hostfwd=[tcp|udp]:[hostaddr]:hostport-[guestaddr]:guestport''
+> +(for embedded NICs). The new syntax allows different settings to be
+> +provided per NIC.
+>  
+>  @subsection -smb (since 2.6.0)
+>  
+> -The ``-smb /some/dir'' argument is replaced by
+> -``-netdev user,id=x,smb=/some/dir'', either accompanied with
+> -``-device ...,netdev=x'' (for pluggable NICs) or ``-net nic,netdev=x''
+> +The ``-smb /some/dir'' argument is replaced by either
+> +``-netdev user,id=x,smb=/some/dir '' (for pluggable NICs, accompanied
+> +with ``-device ...,netdev=x''), or ``-nic user,smb=/some/dir''
+>  (for embedded NICs). The new syntax allows different settings to be
+>  provided per NIC.
+>  
+>  @subsection -net vlan (since 2.9.0)
+>  
+> -The ``-net vlan=NN'' argument is partially replaced with the
+> -new ``-netdev'' argument. The remaining use cases will no
+> -longer be directly supported in QEMU.
+> +The ``-net vlan=NN'' argument was mostly used to attach separate
+> +network backends to different virtual NICs.  This is the default
+> +behavior for ``-netdev'' and ``-nic''.  You can connect multiple
+> +``-netdev'' and ``-nic'' devices to the same network using the
+> +"hubport" network backend, created with ``-netdev hubport,hubid=NN,...''
+> +and ``-nic hubport,hubid=NN''.
+>  
+>  @subsection -drive cyls=...,heads=...,secs=...,trans=... (since 2.10.0)
 
-Oh, what a pity to see that "hppabetically" go away, that looked like a
-really neat search-and-replace bug :-)
+Acked-by: Thomas Huth <thuth@redhat.com>
 
-Anyway, patch looks fine to me:
+But please note that we've currently got a BiteSizeTask to replace all
+single-dash options with double dash options here:
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+https://wiki.qemu.org/BiteSizedTasks#Consistent_option_usage_in_documentation
+
+So it would be nicer if you'd directly use double dash options here now.
+(Note that you also got to use @option{--nic xxx} instead of ``--nic xxx''
+in that case)
+
+ Thomas
