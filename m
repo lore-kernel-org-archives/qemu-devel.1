@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1etbSD-0005gS-IB
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:58:10 -0500
+	(envelope-from <stefanha@gmail.com>) id 1etbkH-000800-8n
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:16:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1etbS8-0001D7-Nh
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:58:09 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54606 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1etbS8-0001Cn-JQ
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:58:04 -0500
-From: marcandre.lureau@redhat.com
-Date: Wed,  7 Mar 2018 16:57:46 +0100
-Message-Id: <20180307155746.18526-9-marcandre.lureau@redhat.com>
-In-Reply-To: <20180307155746.18526-1-marcandre.lureau@redhat.com>
-References: <20180307155746.18526-1-marcandre.lureau@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1etbkG-00016S-5W
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:16:49 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 8/8] ovmf: add DxeTpm2MeasureBootLib
+In-Reply-To: <CANz-neoa1o-x+opbd6OLHdw0K1ROvwA462wXC-MOmXVPDDbu8g@mail.gmail.com>
+References: <20180306204819.11266-1-stefanha@redhat.com>
+	<20180306204819.11266-3-stefanha@redhat.com>
+	<CANz-nerKaY_NG4enTxut9RuerWGL47sNKkgtJ_QpHws75ckO7A@mail.gmail.com>
+	<CAJSP0QXzMf1UdehS3Cp3Yud6a7U4n-ixYTtCawyd8_wGLbWq0w@mail.gmail.com>
+	<CANz-neoa1o-x+opbd6OLHdw0K1ROvwA462wXC-MOmXVPDDbu8g@mail.gmail.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Wed, 7 Mar 2018 16:16:46 +0000
+Message-ID: <CAJSP0QXt=Mrk8JdWJF4ewwELuP_kPuW1mBKn0BCVr349rpudBw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] iotests: add 208
+ nbd-server + blockdev-snapshot-sync test case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,47 +26,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: edk2-devel@lists.01.org
-Cc: pjones@redhat.com, jiewen.yao@intel.com, stefanb@linux.vnet.ibm.com, lersek@redhat.com, qemu-devel@nongnu.org, javierm@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Stefano Panella <spanella@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On Wed, Mar 7, 2018 at 1:57 PM, Stefano Panella <spanella@gmail.com> wrote:
+> On Wed, Mar 7, 2018 at 10:55 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>>
+>> On Tue, Mar 6, 2018 at 11:25 PM, Stefano Panella <spanella@gmail.com>
+>> wrote:
+>> > I have applied this patch and when I run the following qmp commands I I
+>> > do
+>> > not see the crash anymore but there is still something wrong because
+>> > only
+>> > /root/a is opened from qemu. It looks like nbd-server-stop is also
+>> > getting
+>> > rid of the nodes added with blockdev-snapshot-sync, therfore is than not
+>> > possible to do blockdev-del on /root/d because node-name is not found
+>>
+>> Nodes are reference counted.  If nothing holds a refcount then the
+>> node is freed.
+> Thanks, that explains the behaviour
+>>
+>> The blockdev-add command holds a reference to the node.  The node will
+>> stay alive until blockdev-del, which releases that reference.
+>>
+>> blockdev-snapshot-sync does not hold a reference.  Therefore snapshot
+>> nodes are freed once nothing is using them anymore.  When the snapshot
+>> node is created, the users of the parent node are updated to point to
+>> the snapshot node instead.  This is why the NBD server switches to the
+>> snapshot mode after blockdev-snapshot-sync.
+>>
+>> This is why the snapshot nodes disappear after the NBD server is
+>> stopped while /root/a stays alive.
+>>
+>> I'm not sure if the current blockdev-snapshot-sync behavior is useful.
+>> Perhaps the presence of the "snapshot-node-name" argument should cause
+>> the snapshot node to be treated as monitor-owned, just like
+>> blockdev-add.  This would introduce leaks for existing QMP clients
+>> though, so it may be necessary to add yet another argument for this
+>> behavior.
+> that would be nice, I mean to add an extra parameter so it is added to the
+> monitor
+>>
+>> Anyway, I hope this explains the current behavior.  I don't see a
+>> problem with it, but it's something the API users need to be aware of.
+>>
+> Yes, I was not aware of that behaviour, the problem is that many examples
+> refer
+> to having a device associated with the blockdev-add'd node therefore we do
+> not
+> see this problem.
+>> If it is a problem for your use case, please explain what you are trying
+>> to do.
+>>
+> It is not strictly a problem for my usecase but it would be nice to have the
+> extra param to
+> blockdev-snapshot-sync. That would also fix the problem of running multiple
+> snap-sync
+> after blockdev-add but before there is any user.
 
-The library registers a security management handler, to measure images
-that are not measure in PEI phase.
+Max Reitz mentioned that the 'blockdev-snapshot' command is preferred
+over 'blockdev-snapshot-sync'.  'blockdev-snapshot-sync' is a legacy
+command that implicitly creates the snapshot node.
 
-This seems to work for example with the qemu PXE rom:
+The difference is that 'blockdev-snapshot' requires that the user
+first creates the snapshot file (e.g. using qemu-img create), then
+uses 'blockdev-add' to add the snapshot node, and finally uses
+'blockdev-snapshot' to install the snapshot node.
 
-Loading driver at 0x0003E6C2000 EntryPoint=3D0x0003E6C9076 8086100e.efi
+When 'blockdev-snapshot' is used, the user must delete snapshot nodes
+using 'blockdev-del' since they created using 'blockdev-add'.
 
-And the following binary_bios_measurements log entry seems to be
-added:
-
-PCR: 2	type: EV_EFI_BOOT_SERVICES_DRIVER     	size: 0x4e	digest: 70a22475=
-e9f18806d2ed9193b48d80d26779d9a4
-
-Cc: Laszlo Ersek <lersek@redhat.com>
-Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Contributed-under: TianoCore Contribution Agreement 1.0
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- OvmfPkg/OvmfPkgX64.dsc | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
-index 7753852144fb..9db1712e3623 100644
---- a/OvmfPkg/OvmfPkgX64.dsc
-+++ b/OvmfPkg/OvmfPkgX64.dsc
-@@ -662,6 +662,9 @@ [Components]
-     <LibraryClasses>
- !if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
-       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificat=
-ionLib.inf
-+!endif
-+!if $(TPM2_ENABLE) =3D=3D TRUE
-+      NULL|SecurityPkg/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBootL=
-ib.inf
- !endif
-   }
-=20
---=20
-2.16.2.346.g9779355e34
+Stefan
