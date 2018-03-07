@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eteIa-0004ix-1y
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 14:00:25 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eteIY-0004XN-SR
+	(envelope-from <kwolf@redhat.com>) id 1eteIZ-0004iL-Fe
 	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 14:00:24 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <kwolf@redhat.com>) id 1eteIY-0004X4-8A
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 14:00:23 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed,  7 Mar 2018 19:59:21 +0100
-Message-Id: <20180307185946.29366-13-kwolf@redhat.com>
+Date: Wed,  7 Mar 2018 19:59:19 +0100
+Message-Id: <20180307185946.29366-11-kwolf@redhat.com>
 In-Reply-To: <20180307185946.29366-1-kwolf@redhat.com>
 References: <20180307185946.29366-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 12/37] qdict: Introduce qdict_rename_keys()
+Subject: [Qemu-devel] [PATCH v4 10/37] test-qemu-opts: Test
+ qemu_opts_append()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,221 +23,174 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-A few block drivers will need to rename .bdrv_create options for their
-QAPIfication, so let's have a helper function for that.
+Basic test for merging two QemuOptsLists.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- include/qapi/qmp/qdict.h |   6 +++
- qobject/qdict.c          |  34 +++++++++++++
- tests/check-qdict.c      | 129 +++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 169 insertions(+)
+ tests/test-qemu-opts.c | 128 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 128 insertions(+)
 
-diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
-index ff6f7842c3..7c6d844549 100644
---- a/include/qapi/qmp/qdict.h
-+++ b/include/qapi/qmp/qdict.h
-@@ -81,4 +81,10 @@ QObject *qdict_crumple(const QDict *src, Error **errp);
- 
- void qdict_join(QDict *dest, QDict *src, bool overwrite);
- 
-+typedef struct QDictRenames {
-+    const char *from;
-+    const char *to;
-+} QDictRenames;
-+bool qdict_rename_keys(QDict *qdict, const QDictRenames *renames, Error **errp);
-+
- #endif /* QDICT_H */
-diff --git a/qobject/qdict.c b/qobject/qdict.c
-index 23df84f9cd..229b8c840b 100644
---- a/qobject/qdict.c
-+++ b/qobject/qdict.c
-@@ -1072,3 +1072,37 @@ void qdict_join(QDict *dest, QDict *src, bool overwrite)
-         entry = next;
-     }
- }
-+
-+/**
-+ * qdict_rename_keys(): Rename keys in qdict according to the replacements
-+ * specified in the array renames. The array must be terminated by an entry
-+ * with from = NULL.
-+ *
-+ * The renames are performed individually in the order of the array, so entries
-+ * may be renamed multiple times and may or may not conflict depending on the
-+ * order of the renames array.
-+ *
-+ * Returns true for success, false in error cases.
-+ */
-+bool qdict_rename_keys(QDict *qdict, const QDictRenames *renames, Error **errp)
-+{
-+    QObject *qobj;
-+
-+    while (renames->from) {
-+        if (qdict_haskey(qdict, renames->from)) {
-+            if (qdict_haskey(qdict, renames->to)) {
-+                error_setg(errp, "'%s' and its alias '%s' can't be used at the "
-+                           "same time", renames->to, renames->from);
-+                return false;
-+            }
-+
-+            qobj = qdict_get(qdict, renames->from);
-+            qobject_incref(qobj);
-+            qdict_put_obj(qdict, renames->to, qobj);
-+            qdict_del(qdict, renames->from);
-+        }
-+
-+        renames++;
-+    }
-+    return true;
-+}
-diff --git a/tests/check-qdict.c b/tests/check-qdict.c
-index ec628f3453..a3faea8bfc 100644
---- a/tests/check-qdict.c
-+++ b/tests/check-qdict.c
-@@ -665,6 +665,133 @@ static void qdict_crumple_test_empty(void)
-     QDECREF(dst);
+diff --git a/tests/test-qemu-opts.c b/tests/test-qemu-opts.c
+index 5d5a3daa7b..6c3183390b 100644
+--- a/tests/test-qemu-opts.c
++++ b/tests/test-qemu-opts.c
+@@ -23,6 +23,8 @@ static QemuOptsList opts_list_01 = {
+         {
+             .name = "str1",
+             .type = QEMU_OPT_STRING,
++            .help = "Help texts are preserved in qemu_opts_append",
++            .def_value_str = "default",
+         },{
+             .name = "str2",
+             .type = QEMU_OPT_STRING,
+@@ -32,6 +34,7 @@ static QemuOptsList opts_list_01 = {
+         },{
+             .name = "number1",
+             .type = QEMU_OPT_NUMBER,
++            .help = "Having help texts only for some options is okay",
+         },{
+             .name = "number2",
+             .type = QEMU_OPT_NUMBER,
+@@ -743,6 +746,129 @@ static void test_opts_parse_size(void)
+     qemu_opts_reset(&opts_list_02);
  }
  
-+static int qdict_count_entries(QDict *dict)
++static void append_verify_list_01(QemuOptDesc *desc, bool with_overlapping)
 +{
-+    const QDictEntry *e;
-+    int count = 0;
++    int i = 0;
 +
-+    for (e = qdict_first(dict); e; e = qdict_next(dict, e)) {
-+        count++;
++    if (with_overlapping) {
++        g_assert_cmpstr(desc[i].name, ==, "str1");
++        g_assert_cmpint(desc[i].type, ==, QEMU_OPT_STRING);
++        g_assert_cmpstr(desc[i].help, ==,
++                        "Help texts are preserved in qemu_opts_append");
++        g_assert_cmpstr(desc[i].def_value_str, ==, "default");
++        i++;
++
++        g_assert_cmpstr(desc[i].name, ==, "str2");
++        g_assert_cmpint(desc[i].type, ==, QEMU_OPT_STRING);
++        g_assert_cmpstr(desc[i].help, ==, NULL);
++        g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
++        i++;
 +    }
 +
-+    return count;
++    g_assert_cmpstr(desc[i].name, ==, "str3");
++    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_STRING);
++    g_assert_cmpstr(desc[i].help, ==, NULL);
++    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
++    i++;
++
++    g_assert_cmpstr(desc[i].name, ==, "number1");
++    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_NUMBER);
++    g_assert_cmpstr(desc[i].help, ==,
++                    "Having help texts only for some options is okay");
++    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
++    i++;
++
++    g_assert_cmpstr(desc[i].name, ==, "number2");
++    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_NUMBER);
++    g_assert_cmpstr(desc[i].help, ==, NULL);
++    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
++    i++;
++
++    g_assert_cmpstr(desc[i].name, ==, NULL);
 +}
 +
-+static void qdict_rename_keys_test(void)
++static void append_verify_list_02(QemuOptDesc *desc)
 +{
-+    QDict *dict = qdict_new();
-+    QDict *copy;
-+    QDictRenames *renames;
-+    Error *local_err = NULL;
++    int i = 0;
 +
-+    qdict_put_str(dict, "abc", "foo");
-+    qdict_put_str(dict, "abcdef", "bar");
-+    qdict_put_int(dict, "number", 42);
-+    qdict_put_bool(dict, "flag", true);
-+    qdict_put_null(dict, "nothing");
++    g_assert_cmpstr(desc[i].name, ==, "str1");
++    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_STRING);
++    g_assert_cmpstr(desc[i].help, ==, NULL);
++    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
++    i++;
 +
-+    /* Empty rename list */
-+    renames = (QDictRenames[]) {
-+        { NULL, "this can be anything" }
-+    };
-+    copy = qdict_clone_shallow(dict);
-+    qdict_rename_keys(copy, renames, &error_abort);
++    g_assert_cmpstr(desc[i].name, ==, "str2");
++    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_STRING);
++    g_assert_cmpstr(desc[i].help, ==, NULL);
++    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
++    i++;
 +
-+    g_assert_cmpstr(qdict_get_str(copy, "abc"), ==, "foo");
-+    g_assert_cmpstr(qdict_get_str(copy, "abcdef"), ==, "bar");
-+    g_assert_cmpint(qdict_get_int(copy, "number"), ==, 42);
-+    g_assert_cmpint(qdict_get_bool(copy, "flag"), ==, true);
-+    g_assert(qobject_type(qdict_get(copy, "nothing")) == QTYPE_QNULL);
-+    g_assert_cmpint(qdict_count_entries(copy), ==, 5);
++    g_assert_cmpstr(desc[i].name, ==, "bool1");
++    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_BOOL);
++    g_assert_cmpstr(desc[i].help, ==, NULL);
++    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
++    i++;
 +
-+    QDECREF(copy);
++    g_assert_cmpstr(desc[i].name, ==, "bool2");
++    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_BOOL);
++    g_assert_cmpstr(desc[i].help, ==, NULL);
++    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
++    i++;
 +
-+    /* Simple rename of all entries */
-+    renames = (QDictRenames[]) {
-+        { "abc",        "str1" },
-+        { "abcdef",     "str2" },
-+        { "number",     "int" },
-+        { "flag",       "bool" },
-+        { "nothing",    "null" },
-+        { NULL , NULL }
-+    };
-+    copy = qdict_clone_shallow(dict);
-+    qdict_rename_keys(copy, renames, &error_abort);
++    g_assert_cmpstr(desc[i].name, ==, "size1");
++    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_SIZE);
++    g_assert_cmpstr(desc[i].help, ==, NULL);
++    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
++    i++;
 +
-+    g_assert(!qdict_haskey(copy, "abc"));
-+    g_assert(!qdict_haskey(copy, "abcdef"));
-+    g_assert(!qdict_haskey(copy, "number"));
-+    g_assert(!qdict_haskey(copy, "flag"));
-+    g_assert(!qdict_haskey(copy, "nothing"));
++    g_assert_cmpstr(desc[i].name, ==, "size2");
++    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_SIZE);
++    g_assert_cmpstr(desc[i].help, ==, NULL);
++    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
++    i++;
 +
-+    g_assert_cmpstr(qdict_get_str(copy, "str1"), ==, "foo");
-+    g_assert_cmpstr(qdict_get_str(copy, "str2"), ==, "bar");
-+    g_assert_cmpint(qdict_get_int(copy, "int"), ==, 42);
-+    g_assert_cmpint(qdict_get_bool(copy, "bool"), ==, true);
-+    g_assert(qobject_type(qdict_get(copy, "null")) == QTYPE_QNULL);
-+    g_assert_cmpint(qdict_count_entries(copy), ==, 5);
-+
-+    QDECREF(copy);
-+
-+    /* Renames are processed top to bottom */
-+    renames = (QDictRenames[]) {
-+        { "abc",        "tmp" },
-+        { "abcdef",     "abc" },
-+        { "number",     "abcdef" },
-+        { "flag",       "number" },
-+        { "nothing",    "flag" },
-+        { "tmp",        "nothing" },
-+        { NULL , NULL }
-+    };
-+    copy = qdict_clone_shallow(dict);
-+    qdict_rename_keys(copy, renames, &error_abort);
-+
-+    g_assert_cmpstr(qdict_get_str(copy, "nothing"), ==, "foo");
-+    g_assert_cmpstr(qdict_get_str(copy, "abc"), ==, "bar");
-+    g_assert_cmpint(qdict_get_int(copy, "abcdef"), ==, 42);
-+    g_assert_cmpint(qdict_get_bool(copy, "number"), ==, true);
-+    g_assert(qobject_type(qdict_get(copy, "flag")) == QTYPE_QNULL);
-+    g_assert(!qdict_haskey(copy, "tmp"));
-+    g_assert_cmpint(qdict_count_entries(copy), ==, 5);
-+
-+    QDECREF(copy);
-+
-+    /* Conflicting rename */
-+    renames = (QDictRenames[]) {
-+        { "abcdef",     "abc" },
-+        { NULL , NULL }
-+    };
-+    copy = qdict_clone_shallow(dict);
-+    qdict_rename_keys(copy, renames, &local_err);
-+
-+    g_assert(local_err != NULL);
-+    error_free(local_err);
-+    local_err = NULL;
-+
-+    g_assert_cmpstr(qdict_get_str(copy, "abc"), ==, "foo");
-+    g_assert_cmpstr(qdict_get_str(copy, "abcdef"), ==, "bar");
-+    g_assert_cmpint(qdict_get_int(copy, "number"), ==, 42);
-+    g_assert_cmpint(qdict_get_bool(copy, "flag"), ==, true);
-+    g_assert(qobject_type(qdict_get(copy, "nothing")) == QTYPE_QNULL);
-+    g_assert_cmpint(qdict_count_entries(copy), ==, 5);
-+
-+    QDECREF(copy);
-+
-+    /* Renames in an empty dict */
-+    renames = (QDictRenames[]) {
-+        { "abcdef",     "abc" },
-+        { NULL , NULL }
-+    };
-+
-+    QDECREF(dict);
-+    dict = qdict_new();
-+
-+    qdict_rename_keys(dict, renames, &error_abort);
-+    g_assert(qdict_first(dict) == NULL);
-+
-+    QDECREF(dict);
++    g_assert_cmpstr(desc[i].name, ==, "size3");
++    g_assert_cmpint(desc[i].type, ==, QEMU_OPT_SIZE);
++    g_assert_cmpstr(desc[i].help, ==, NULL);
++    g_assert_cmpstr(desc[i].def_value_str, ==, NULL);
 +}
 +
- static void qdict_crumple_test_bad_inputs(void)
++static void test_opts_append_to_null(void)
++{
++    QemuOptsList *merged;
++
++    merged = qemu_opts_append(NULL, &opts_list_01);
++    g_assert(merged != &opts_list_01);
++
++    g_assert_cmpstr(merged->name, ==, NULL);
++    g_assert_cmpstr(merged->implied_opt_name, ==, NULL);
++    g_assert_false(merged->merge_lists);
++
++    append_verify_list_01(merged->desc, true);
++
++    qemu_opts_free(merged);
++}
++
++static void test_opts_append(void)
++{
++    QemuOptsList *first, *merged;
++
++    first = qemu_opts_append(NULL, &opts_list_02);
++    merged = qemu_opts_append(first, &opts_list_01);
++    g_assert(first != &opts_list_02);
++    g_assert(merged != &opts_list_01);
++
++    g_assert_cmpstr(merged->name, ==, NULL);
++    g_assert_cmpstr(merged->implied_opt_name, ==, NULL);
++    g_assert_false(merged->merge_lists);
++
++    append_verify_list_02(&merged->desc[0]);
++    append_verify_list_01(&merged->desc[7], false);
++
++    qemu_opts_free(merged);
++}
++
++
+ int main(int argc, char *argv[])
  {
-     QDict *src;
-@@ -880,6 +1007,8 @@ int main(int argc, char **argv)
-     g_test_add_func("/public/crumple/bad_inputs",
-                     qdict_crumple_test_bad_inputs);
- 
-+    g_test_add_func("/public/rename_keys", qdict_rename_keys_test);
-+
-     /* The Big one */
-     if (g_test_slow()) {
-         g_test_add_func("/stress/test", qdict_stress_test);
+     register_opts();
+@@ -761,6 +887,8 @@ int main(int argc, char *argv[])
+     g_test_add_func("/qemu-opts/opts_parse/bool", test_opts_parse_bool);
+     g_test_add_func("/qemu-opts/opts_parse/number", test_opts_parse_number);
+     g_test_add_func("/qemu-opts/opts_parse/size", test_opts_parse_size);
++    g_test_add_func("/qemu-opts/append_to_null", test_opts_append_to_null);
++    g_test_add_func("/qemu-opts/append", test_opts_append);
+     g_test_run();
+     return 0;
+ }
 -- 
 2.13.6
