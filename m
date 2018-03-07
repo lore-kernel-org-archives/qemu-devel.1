@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1etY55-0004iZ-Tf
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 07:22:09 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1etY6y-0005ub-Sx
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 07:24:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1etY53-00067u-9B
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 07:22:03 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39056 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1etY6s-00071s-UD
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 07:24:00 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46066 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1etY53-000679-4J
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 07:22:01 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C75CBD143A
-	for <qemu-devel@nongnu.org>; Wed,  7 Mar 2018 12:22:00 +0000 (UTC)
-Date: Wed, 7 Mar 2018 12:21:58 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180307122158.GW20201@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180306053320.15401-1-peterx@redhat.com>
-	<20180306053320.15401-2-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1etY6s-00071i-PM
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 07:23:54 -0500
+Date: Wed, 7 Mar 2018 12:23:49 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180307122348.GC3089@work-vm>
+References: <1519980450-3404-1-git-send-email-wei.w.wang@intel.com>
+	<1519980450-3404-2-git-send-email-wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180306053320.15401-2-peterx@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/9] vl: export machine_init_done
+In-Reply-To: <1519980450-3404-2-git-send-email-wei.w.wang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] migration: API to clear bits of
+ guest free pages from the dirty bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,35 +28,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-On Tue, Mar 06, 2018 at 01:33:12PM +0800, Peter Xu wrote:
-> We have that variable but not exported.  Export that so modules can hav=
-e
-> a way to poke on whether machine init has finished.
->=20
-> Meanwhile, set that up even before calling the notifiers, so that
-> notifiers who may depend on this field will get a correct answer.
->=20
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+* Wei Wang (wei.w.wang@intel.com) wrote:
+> This patch adds an API to clear bits corresponding to guest free pages
+> from the dirty bitmap. Spilt the free page block if it crosses the QEMU
+> RAMBlock boundary.
+> 
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> CC: Juan Quintela <quintela@redhat.com>
+> CC: Michael S. Tsirkin <mst@redhat.com>
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
 > ---
->  include/sysemu/sysemu.h   | 2 ++
->  stubs/machine-init-done.c | 2 ++
->  vl.c                      | 4 ++--
->  3 files changed, 6 insertions(+), 2 deletions(-)
-
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+>  include/migration/misc.h |  2 ++
+>  migration/ram.c          | 20 ++++++++++++++++++++
+>  2 files changed, 22 insertions(+)
+> 
+> diff --git a/include/migration/misc.h b/include/migration/misc.h
+> index 77fd4f5..fae1acf 100644
+> --- a/include/migration/misc.h
+> +++ b/include/migration/misc.h
+> @@ -14,11 +14,13 @@
+>  #ifndef MIGRATION_MISC_H
+>  #define MIGRATION_MISC_H
+>  
+> +#include "exec/cpu-common.h"
+>  #include "qemu/notify.h"
+>  
+>  /* migration/ram.c */
+>  
+>  void ram_mig_init(void);
+> +void qemu_guest_free_page_hint(void *addr, size_t len);
+>  
+>  /* migration/block.c */
+>  
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 5e33e5c..769a0f6 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -2189,6 +2189,26 @@ static int ram_init_all(RAMState **rsp)
+>      return 0;
+>  }
+>  
+> +void qemu_guest_free_page_hint(void *addr, size_t len)
+> +{
+> +    RAMBlock *block;
+> +    ram_addr_t offset;
+> +    size_t used_len, start, npages;
+> +
+> +    for (used_len = len; len > 0; len -= used_len) {
+> +        block = qemu_ram_block_from_host(addr, false, &offset);
+> +        if (unlikely(offset + len > block->used_length)) {
+> +            used_len = block->used_length - offset;
+> +            addr += used_len;
+> +        }
+> +
+> +        start = offset >> TARGET_PAGE_BITS;
+> +        npages = used_len >> TARGET_PAGE_BITS;
+> +        bitmap_clear(block->bmap, start, npages);
+> +        ram_state->migration_dirty_pages -= npages;
+> +    }
+> +}
+> +
+>  /*
+>   * Each of ram_save_setup, ram_save_iterate and ram_save_complete has
+>   * long-running RCU critical section.  When rcu-reclaims in the code
+> -- 
+> 1.8.3.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
