@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ethdy-0001jt-OM
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 17:34:43 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ethj3-0004Wr-Ha
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 17:39:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ethdt-0006Zf-SO
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 17:34:42 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:52758)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1ethdt-0006ZJ-KH
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 17:34:37 -0500
-Date: Wed, 7 Mar 2018 23:34:33 +0100
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ethiz-0000Y0-K5
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 17:39:57 -0500
+Date: Wed, 7 Mar 2018 23:39:49 +0100
 From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20180307223433.davsfc42oll6e3er@var.youpi.perso.aquilenet.fr>
-References: <23118.27370.136663.284087@guava.gson.org>
-	<143c7064-8a4d-6f78-6d50-ed10096ddd3b@gmx.com>
-	<5b3a1a64-2960-d120-08f4-e32227df2712@amsat.org>
+Message-ID: <20180307223949.5swn6dhu3bx5e3n5@var.youpi.perso.aquilenet.fr>
+References: <20180201093545.33741-1-aik@ozlabs.ru>
+	<38e2df74-c7d7-a062-8385-494adae0ef89@ozlabs.ru>
+	<727e34b6-0f7f-bd0c-9a34-51d5bc844c73@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="vls5p33xhfukltlv"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5b3a1a64-2960-d120-08f4-e32227df2712@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH] slirp: disable Nagle in outgoing
- connections
+In-Reply-To: <727e34b6-0f7f-bd0c-9a34-51d5bc844c73@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH qemu] slirp/debug: Print IP addresses in
+ human readable form
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +25,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Kamil Rytarowski <n54@gmx.com>, Andreas Gustafsson <gson@gson.org>, qemu-devel@nongnu.org, Jan Kiszka <jan.kiszka@siemens.com>
-
-
---vls5p33xhfukltlv
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+To: Thomas Huth <thuth@redhat.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
 Hello,
 
-Thanks for the Cc.
+Remember to Cc the maintainer, I just can't read qemu-devel fully to
+find slirp mails.
 
-I have applied it to my tree.  I don't think there is any reason to
-avoid the same change for ingoing connections?  Could one of your review
-the attached patch doing it?
+Thomas Huth, on mer. 07 mars 2018 07:24:16 +0100, wrote:
+> >> diff --git a/slirp/arp_table.c b/slirp/arp_table.c
+> >> index 3547043..bac608f 100644
+> >> --- a/slirp/arp_table.c
+> >> +++ b/slirp/arp_table.c
+> >> @@ -33,7 +33,7 @@ void arp_table_add(Slirp *slirp, uint32_t ip_addr, uint8_t ethaddr[ETH_ALEN])
+> >>      int i;
+> >>  
+> >>      DEBUG_CALL("arp_table_add");
+> >> -    DEBUG_ARG("ip = 0x%x", ip_addr);
+> >> +    DEBUG_ARG("ip = %s", inet_ntoa(*(struct in_addr *)&ip_addr));
+
+I never like casts :)
+And it happens that the standard doesn't say that s_addr is necessarily
+the first field of struct in_addr, so better really initialize a struct
+in_addr variable and use that (ditto for arp_table_search and
+tcp_listen).
 
 Samuel
-
---vls5p33xhfukltlv
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename=patch
-
-commit 99a9a5028e0e15aa3b17d6f884c1e5f48dccea90
-Author: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date:   Wed Mar 7 23:29:41 2018 +0100
-
-    slirp: disable Nagle in ingoing connections
-    
-    This follows 3929766fb3e4 ('slirp: disable Nagle in outgoing connections'):
-    for the same reasons, ingoing connections should have the Nagle algorithm disabled.
-    
-    Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
-
-diff --git a/slirp/socket.c b/slirp/socket.c
-index cb7b5b608d..81f67b5702 100644
---- a/slirp/socket.c
-+++ b/slirp/socket.c
-@@ -754,6 +754,8 @@ tcp_listen(Slirp *slirp, uint32_t haddr, u_int hport, uint32_t laddr,
- 		return NULL;
- 	}
- 	qemu_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
-+	opt = 1;
-+	qemu_setsockopt(s, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(int));
- 
- 	getsockname(s,(struct sockaddr *)&addr,&addrlen);
- 	so->so_ffamily = AF_INET;
-
---vls5p33xhfukltlv--
