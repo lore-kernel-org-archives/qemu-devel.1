@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1etlaI-0005HR-JG
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 21:47:11 -0500
+	(envelope-from <no-reply@patchew.org>) id 1etlzC-00050s-41
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 22:12:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1etlaF-0007pV-Gx
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 21:47:10 -0500
-Date: Thu, 8 Mar 2018 13:02:40 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180308020240.GL3083@umbus.fritz.box>
-References: <1520424915-9794-1-git-send-email-thuth@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1etlz8-0005vF-2J
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 22:12:54 -0500
+Resent-Message-Id: <E1etlz8-0005vF-2J@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21054)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1etlz7-0005ro-Qn
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 22:12:50 -0500
+In-Reply-To: <20180307110010.2205-1-quintela@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152042199586.1437.1230297151633342862@bdbb90650ae5>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="HLsZ5Z1opAQvdr2J"
-Content-Disposition: inline
-In-Reply-To: <1520424915-9794-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] tests/boot-serial: Check the 40p machine,
- too
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 7 Mar 2018 03:26:37 -0800 (PST)
+Subject: Re: [Qemu-devel] [RFC v10 00/24] Multifd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,79 +28,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org
+To: quintela@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-
---HLsZ5Z1opAQvdr2J
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Mar 07, 2018 at 01:15:15PM +0100, Thomas Huth wrote:
-> The "40p" machine is using the Open Hack'Ware BIOS, just like the "prep"
-> machine, so we can test it accordingly with the boot-serial tester, too.
-> While we're at it, also change the strings that we are using for the
-> "prep" machine, so that this test now also checks some CLI parameters.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Applied, thanks.
-
-> ---
->  NB: The 40p machine is currently broken - when the emulator is quit,
->  there is a rcu_read_unlock assertion message printed out. This test
->  here succeeds anyway since the qtest framework does not care about
->  errors in the shutdown path yet.
->=20
->  tests/boot-serial-test.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->=20
-> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-> index ece25c6..5b24cd2 100644
-> --- a/tests/boot-serial-test.c
-> +++ b/tests/boot-serial-test.c
-> @@ -75,11 +75,13 @@ typedef struct testdef {
->  static testdef_t tests[] =3D {
->      { "alpha", "clipper", "", "PCI:" },
->      { "ppc", "ppce500", "", "U-Boot" },
-> -    { "ppc", "prep", "", "Open Hack'Ware BIOS" },
-> +    { "ppc", "prep", "-m 96", "Memory size: 96 MB" },
-> +    { "ppc", "40p", "-boot d", "Booting from device d" },
->      { "ppc", "g3beige", "", "PowerPC,750" },
->      { "ppc", "mac99", "", "PowerPC,G4" },
->      { "ppc64", "ppce500", "", "U-Boot" },
-> -    { "ppc64", "prep", "", "Open Hack'Ware BIOS" },
-> +    { "ppc64", "prep", "-boot e", "Booting from device e" },
-> +    { "ppc64", "40p", "-m 192", "Memory size: 192 MB" },
->      { "ppc64", "mac99", "", "PowerPC,970FX" },
->      { "ppc64", "pseries", "", "Open Firmware" },
->      { "ppc64", "powernv", "-cpu POWER8", "OPAL" },
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---HLsZ5Z1opAQvdr2J
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqgmcAACgkQbDjKyiDZ
-s5LGnBAAoDd2tCG6rriyvl9h5rhJK2IDG2nLPJFd4+Wr0/yqmeOjmGE6OndnFCcU
-03tO6wb3k9gp8SUv9wdIbBXeAECPiy43HBobCPkUp6m2T+ZdOnHisBvTsrRhe8LL
-IDIO2iUfOZCMx5Hfbfd54zlY+FDncKuwg/0O2BjK1cb2l4VKhCIyAj+LIRqwE2O9
-F92purhoC84JkbM3+hhSp/dWd0UjLQcek/1RstZ1kQs2h82V0NIs2erdtr0DVHZy
-sUHj5WWnzphrxhe1uMlFnuXXa903XWLnV9AL/PwQoSNmfZZ6HbrLZanek7LCBsjU
-EX2hvGBGY+IBp8EiTpGr2UjsKwfXpMMZ7lri/A1kwPBjlHSD2AUthT156/WJ/bkw
-yGiBTudxEEIL0KuxbArXkdh0bSTzB9Ud43kjtYFrmemdKtFlkUR/wz1NTGikevch
-uOEb+AI1CJHnoz4mtrpyFP8HTeowFp5zKbNJeF7VxUpz5KpXf4sntoePaULsqqzt
-G1qLsII4Cpwb+95rBvowfTUXYgqnZXOiL9NVWIoXwMSKqIVNH0YWQCJ1tTK0ZRrC
-mdQEY+cAZSUgsLZ4jM8xfN0/rrZy/9rTY2fk2fDIfePJyMbELxskOGQo8ZXKs6rh
-mz2yZYJBBKS5zAg9mqEbWbCimBR+g5W1g8XAzFwqqMKkvHvlHzU=
-=vLb6
------END PGP SIGNATURE-----
-
---HLsZ5Z1opAQvdr2J--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMzA3MTEwMDEwLjIyMDUtMS1xdWludGVsYUByZWRoYXQuY29tClN1Ympl
+Y3Q6IFtRZW11LWRldmVsXSBbUkZDIHYxMCAwMC8yNF0gTXVsdGlmZAoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1v
+bmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
+LnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxv
+ZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwog
+ICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1h
+dD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3Jp
+cHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAg
+ICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRF
+U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
+YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwowZDRjMmIzNTYwIG1p
+Z3JhdGlvbjogU2VuZCBwYWdlcyB0aHJvdWdoIHRoZSBtdWx0aWZkIGNoYW5uZWxzCmRmZDIwYzZk
+OTggbWlncmF0aW9uOiBDcmVhdGUgcGFnZXMgc3RydWN0dXJlIGZvciByZWNlcHRpb24KMjQ0MTRh
+NjViMCBtaWdyYXRpb246IENyZWF0ZSByYW1fbXVsdGlmZF9wYWdlCjJkNzNjOGE2OTAgbWlncmF0
+aW9uOiBUcmFuc21pdCBpbml0aWFsIHBhY2thZ2UgdGhyb3VnaCB0aGUgbXVsdGlmZCBjaGFubmVs
+cwpjZmU3ZGUzYWYxIG1pZ3JhdGlvbjogRGVsYXkgc3RhcnQgb2YgbWlncmF0aW9uIG1haW4gcm91
+dGluZXMKYzc1M2VhZjZhZiBtaWdyYXRpb246IENyZWF0ZSBtdWx0aWZkIGNoYW5uZWxzCjg3ZWVl
+ZTAzNDUgbWlncmF0aW9uOiBBZGQgbXVsdGlmZCB0cmFjZXMgZm9yIHN0YXJ0L2VuZCB0aHJlYWQK
+MTdlOTYxY2M3NyBtaWdyYXRpb246IEV4cG9ydCBmdW5jdGlvbnMgdG8gY3JlYXRlIHNlbmQgY2hh
+bm5lbHMKOTRmODI0MjI1ZCBtaWdyYXRpb246IFN5bmNocm9uaXplIHJlY3YgdGhyZWFkcwo3ZjM0
+ZDY2N2E5IG1pZ3JhdGlvbjogU3luY2hyb25pemUgc2VuZCB0aHJlYWRzCjRhNGIwMGE1NGQgbWln
+cmF0aW9uOiBCZSBzdXJlIGFsbCByZWN2IGNoYW5uZWxzIGFyZSBjcmVhdGVkCmM5N2Q4NDMyMTYg
+bWlncmF0aW9uOiBJbnRyb2R1Y2UgbXVsdGlmZF9yZWN2X25ld19jaGFubmVsKCkKOGExMzc4N2Y2
+NiBtaWdyYXRpb246IFJlZmVyZW5jZSBjb3VudGluZyByZWN2IGNoYW5uZWxzIGNvcnJlY3RseQo1
+NzdmYmUwODk1IG1pZ3JhdGlvbjogdGVybWluYXRlXyogY2FuIGJlIGNhbGxlZCBmb3Igb3RoZXIg
+dGhyZWFkcwpkNGYwOTY2ZDUwIG1pZ3JhdGlvbjogSW4gY2FzZSBvZiBlcnJvciBqdXN0IGVuZCB0
+aGUgbWlncmF0aW9uCmM5NDQzY2YwYzcgbWlncmF0aW9uOiBTZXQgZXJyb3Igc3RhdGUgaW4gY2Fz
+ZSBvZiBlcnJvcgpjYWVhNzc4ZTc0IG1pZ3JhdGlvbjogQWRkIG11bHRpZmQgdGVzdAplYWI2MTJh
+YjBhIHRlc3RzOiBBZGQgbWlncmF0aW9uIGNvbXByZXNzIHRocmVhZHMgdGVzdHMKODQ5YTNiNTJk
+MiB0ZXN0czogQWRkIGJhc2ljIG1pZ3JhdGlvbiBwcmVjb3B5IHRjcCB0ZXN0CjVjZTY4OTMxYzIg
+dGVzdHM6IE1pZ3JhdGlvbiBwcGMgbm93IGlubGluZXMgaXRzIHByb2dyYW0KNWYwNDZmZjg4MCBt
+aWdyYXRpb246IFNldCB0aGUgbWlncmF0aW9uIHRjcCBwb3J0CjRhNTVlN2VhZDMgbWlncmF0aW9u
+OiBDcmVhdGUgdGNwX3BvcnQgcGFyYW1ldGVyCjBkYWYzMWFlZWMgdGVzdHM6IEFkZCBtaWdyYXRp
+b24geGJ6cmxlIHRlc3QKMmQ5Y2U4NWUzMiB0ZXN0czogQWRkIG1pZ3JhdGlvbiBwcmVjb3B5IHRl
+c3QKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjQ6IHRlc3RzOiBBZGQg
+bWlncmF0aW9uIHByZWNvcHkgdGVzdC4uLgpDaGVja2luZyBQQVRDSCAyLzI0OiB0ZXN0czogQWRk
+IG1pZ3JhdGlvbiB4YnpybGUgdGVzdC4uLgpDaGVja2luZyBQQVRDSCAzLzI0OiBtaWdyYXRpb246
+IENyZWF0ZSB0Y3BfcG9ydCBwYXJhbWV0ZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8yNDogbWlncmF0
+aW9uOiBTZXQgdGhlIG1pZ3JhdGlvbiB0Y3AgcG9ydC4uLgpDaGVja2luZyBQQVRDSCA1LzI0OiB0
+ZXN0czogTWlncmF0aW9uIHBwYyBub3cgaW5saW5lcyBpdHMgcHJvZ3JhbS4uLgpDaGVja2luZyBQ
+QVRDSCA2LzI0OiB0ZXN0czogQWRkIGJhc2ljIG1pZ3JhdGlvbiBwcmVjb3B5IHRjcCB0ZXN0Li4u
+CkNoZWNraW5nIFBBVENIIDcvMjQ6IHRlc3RzOiBBZGQgbWlncmF0aW9uIGNvbXByZXNzIHRocmVh
+ZHMgdGVzdHMuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8yNDogbWlncmF0aW9uOiBBZGQgbXVsdGlmZCB0
+ZXN0Li4uCkNoZWNraW5nIFBBVENIIDkvMjQ6IG1pZ3JhdGlvbjogU2V0IGVycm9yIHN0YXRlIGlu
+IGNhc2Ugb2YgZXJyb3IuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMjQ6IG1pZ3JhdGlvbjogSW4gY2Fz
+ZSBvZiBlcnJvciBqdXN0IGVuZCB0aGUgbWlncmF0aW9uLi4uCkNoZWNraW5nIFBBVENIIDExLzI0
+OiBtaWdyYXRpb246IHRlcm1pbmF0ZV8qIGNhbiBiZSBjYWxsZWQgZm9yIG90aGVyIHRocmVhZHMu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMTIvMjQ6IG1pZ3JhdGlvbjogUmVmZXJlbmNlIGNvdW50aW5nIHJl
+Y3YgY2hhbm5lbHMgY29ycmVjdGx5Li4uCkNoZWNraW5nIFBBVENIIDEzLzI0OiBtaWdyYXRpb246
+IEludHJvZHVjZSBtdWx0aWZkX3JlY3ZfbmV3X2NoYW5uZWwoKS4uLgpDaGVja2luZyBQQVRDSCAx
+NC8yNDogbWlncmF0aW9uOiBCZSBzdXJlIGFsbCByZWN2IGNoYW5uZWxzIGFyZSBjcmVhdGVkLi4u
+CkNoZWNraW5nIFBBVENIIDE1LzI0OiBtaWdyYXRpb246IFN5bmNocm9uaXplIHNlbmQgdGhyZWFk
+cy4uLgpDaGVja2luZyBQQVRDSCAxNi8yNDogbWlncmF0aW9uOiBTeW5jaHJvbml6ZSByZWN2IHRo
+cmVhZHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTcvMjQ6IG1pZ3JhdGlvbjogRXhwb3J0IGZ1bmN0aW9u
+cyB0byBjcmVhdGUgc2VuZCBjaGFubmVscy4uLgpDaGVja2luZyBQQVRDSCAxOC8yNDogbWlncmF0
+aW9uOiBBZGQgbXVsdGlmZCB0cmFjZXMgZm9yIHN0YXJ0L2VuZCB0aHJlYWQuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMTkvMjQ6IG1pZ3JhdGlvbjogQ3JlYXRlIG11bHRpZmQgY2hhbm5lbHMuLi4KRVJST1I6
+IGRvIG5vdCBpbml0aWFsaXNlIHN0YXRpY3MgdG8gMCBvciBOVUxMCiMxMDk6IEZJTEU6IG1pZ3Jh
+dGlvbi9yYW0uYzo3MzU6CisgICAgc3RhdGljIGludCBpID0gMDsKCnRvdGFsOiAxIGVycm9ycywg
+MCB3YXJuaW5ncywgMTAwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIwLzI0OiBtaWdyYXRpb246IERlbGF5IHN0YXJ0
+IG9mIG1pZ3JhdGlvbiBtYWluIHJvdXRpbmVzLi4uCkNoZWNraW5nIFBBVENIIDIxLzI0OiBtaWdy
+YXRpb246IFRyYW5zbWl0IGluaXRpYWwgcGFja2FnZSB0aHJvdWdoIHRoZSBtdWx0aWZkIGNoYW5u
+ZWxzLi4uCkNoZWNraW5nIFBBVENIIDIyLzI0OiBtaWdyYXRpb246IENyZWF0ZSByYW1fbXVsdGlm
+ZF9wYWdlLi4uCkVSUk9SOiBkbyBub3QgaW5pdGlhbGlzZSBzdGF0aWNzIHRvIDAgb3IgTlVMTAoj
+MTg0OiBGSUxFOiBtaWdyYXRpb24vcmFtLmM6NjYwOgorICAgIHN0YXRpYyBpbnQgbmV4dF9jaGFu
+bmVsID0gMDsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVu
+dGhlc2lzICcpJwojMjA0OiBGSUxFOiBtaWdyYXRpb24vcmFtLmM6NjgwOgorICAgIGZvciAoaSA9
+IG5leHRfY2hhbm5lbDs7IGkgPSAoaSArIDEpICUgbWlncmF0ZV9tdWx0aWZkX2NoYW5uZWxzKCkg
+KSB7Cgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDI1MCBsaW5lcyBjaGVja2VkCgpZb3Vy
+IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
+ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
+ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyMy8yNDog
+bWlncmF0aW9uOiBDcmVhdGUgcGFnZXMgc3RydWN0dXJlIGZvciByZWNlcHRpb24uLi4KQ2hlY2tp
+bmcgUEFUQ0ggMjQvMjQ6IG1pZ3JhdGlvbjogU2VuZCBwYWdlcyB0aHJvdWdoIHRoZSBtdWx0aWZk
+IGNoYW5uZWxzLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRo
+IGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
+aHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
+dy1kZXZlbEBmcmVlbGlzdHMub3Jn
