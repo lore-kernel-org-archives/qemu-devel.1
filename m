@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1etc0V-0004my-Vl
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:33:41 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1etc39-0005l9-TO
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:36:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1etc0T-0000BY-2U
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:33:35 -0500
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:38852)
+	(envelope-from <peter.maydell@linaro.org>) id 1etc39-00012N-16
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:36:19 -0500
+Received: from mail-oi0-x235.google.com ([2607:f8b0:4003:c06::235]:45906)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1etc0S-0000B2-T4
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:33:33 -0500
-Received: by mail-wm0-f68.google.com with SMTP id z9so5852609wmb.3
-	for <qemu-devel@nongnu.org>; Wed, 07 Mar 2018 08:33:32 -0800 (PST)
-References: <20180226170313.8178-1-mreitz@redhat.com>
-	<20180227161743.GC32480@stefanha-x1.localdomain>
-	<f0f0f6a0-bf09-8561-5c81-87d38ebef168@redhat.com>
-	<2fddac03-cde4-8d83-7651-a3928398e909@redhat.com>
-	<20180306134757.GH31045@stefanha-x1.localdomain>
-	<20180306173718.GK7139@localhost.localdomain>
-	<a9315872-40fa-16fe-7107-7d74e2b24e52@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <adaf915b-50fc-c0a4-a27f-12b9e609c14a@redhat.com>
-Date: Wed, 7 Mar 2018 17:33:29 +0100
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1etc38-000128-S8
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:36:18 -0500
+Received: by mail-oi0-x235.google.com with SMTP id j79so2112931oib.12
+	for <qemu-devel@nongnu.org>; Wed, 07 Mar 2018 08:36:18 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <a9315872-40fa-16fe-7107-7d74e2b24e52@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] qemu-img: Drop BLK_ZERO from convert
+In-Reply-To: <f1e870f8-9669-ffde-0556-bc8b16467356@redhat.com>
+References: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
+	<1518893216-9983-4-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA_scj3Nw+W6a7NL6bRR3ZGvUx1NLa4cWSmvfOA1BCEPgQ@mail.gmail.com>
+	<f1e870f8-9669-ffde-0556-bc8b16467356@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 7 Mar 2018 16:35:57 +0000
+Message-ID: <CAFEAcA8+CDvbsQw5EKz5t0JJa1oNpteu+=X5JHxFNdyBUu7OTw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v9 03/14] hw/arm/smmu-common: VMSAv8-64
+ page table walk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,26 +32,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>
 
-On 07/03/2018 16:57, Max Reitz wrote:
->>>> (2) For sparse raw images, this is absolutely devastating.  Reading them
->>>> now takes more than (ext4) or nearly (xfs) twice as much time as reading
->>>> a fully allocated image.  So much for "if a filesystem driver has any
->>>> sense".
->> Are you sure that only the filesystem is the problem? Checking for every
->> single byte of an image whether it is zero has to cost some performance.
-> Well, yes, but "read data location from FS metadata" + "realize it's a
-> hole" + memset() + "repe scasb" shouldn't take twice as much time as
-> "read data location from FS metadata" + "read data from SSD".
-> 
-> I expected the "realize it's a hole" part to fall out for free, so this
-> would that memset() + repe scasb take much longer than reading data from
-> the SSD -- and that's just pretty much impossible.
-> 
+On 7 March 2018 at 16:23, Auger Eric <eric.auger@redhat.com> wrote:
+> Hi Peter,
+>
+> On 06/03/18 20:43, Peter Maydell wrote:
+>> On 17 February 2018 at 18:46, Eric Auger <eric.auger@redhat.com> wrote:
 
-This makes a lot of sense, but just to double-check, what does profiling
-say?
+>>> +int smmu_ptw(SMMUTransCfg *cfg, dma_addr_t iova, IOMMUAccessFlags perm,
+>>> +             IOMMUTLBEntry *tlbe, SMMUPTWEventInfo *info)
+>>> +{
+>>> +    if (!cfg->aa64) {
+>>> +        error_setg(&error_fatal,
+>>> +                   "SMMUv3 model does not support VMSAv8-32 page walk yet");
+>>
+>> This sort of guest-provokable error should not be fatal -- log
+>> it with LOG_UNIMP and carry on as best you can (in this case
+>> the spec should say what happens for SMMUv3 implementations which
+>> don't support AArch32 tables).
+> This code should never been entered as the check is done when decoding
+> the CD in the smmuv3. However since it is a base class I wanted to
+> enphase the ptw was only supporting AArch32.
 
-Paolo
+Ah, right. That should be an assert() with a brief comment
+about why the condition will never trigger.
+
+
+>>> +#define is_permission_fault(ap, perm) \
+>>> +    (((perm) & IOMMU_WO) && ((ap) & 0x2))
+>>
+>> Don't we also need to check AP bit 1 in some cases?
+>> (when the StreamWorld is S or NS EL1 and either (a) the incoming
+>> transaction has its attrs.user = 1 and STE.PRIVCFG is 0b0x, or
+>> (b) STE.PRIVCFG is 0b10).
+> I think I don't need to as I don't support this feature at the moment:
+> spec says:
+> "When SMMU_IDR1.ATTR_PERMS_OVR=0, this field is RES0 and the incoming
+> PRIV attribute is used."
+> But to be honest I was not aware this existed ;()
+
+I think you still need to check the incoming transaction
+for user vs priv, even if you don't support STE.PRIVCFG.
+
+>>> +
+>>> +#define PTE_AP_TO_PERM(ap) \
+>>> +    (IOMMU_ACCESS_FLAG(true, !((ap) & 0x2)))
+>>
+>> Similarly here.
+> ?
+
+Can't just ignore AP bit 1 (or 0, if you're counting it that way).
+
+
+thanks
+-- PMM
