@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1etcHn-0004qc-6p
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:51:31 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1etcHr-0004v6-W8
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:51:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1etcHj-0008O2-BO
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:51:27 -0500
-Received: from mail-by2nam03on0085.outbound.protection.outlook.com
-	([104.47.42.85]:43840
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+	(envelope-from <brijesh.singh@amd.com>) id 1etcHn-0008Qz-NF
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:51:32 -0500
+Received: from mail-bl2nam02on0056.outbound.protection.outlook.com
+	([104.47.38.56]:46551
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1etcHj-0008ML-3N
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:51:23 -0500
+	id 1etcHn-0008QI-H7
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:51:27 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Wed,  7 Mar 2018 10:50:28 -0600
-Message-Id: <20180307165038.88640-19-brijesh.singh@amd.com>
+Date: Wed,  7 Mar 2018 10:50:33 -0600
+Message-ID: <20180307165038.88640-24-brijesh.singh@amd.com>
 In-Reply-To: <20180307165038.88640-1-brijesh.singh@amd.com>
 References: <20180307165038.88640-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v11 18/28] sev/i386: add support to
- LAUNCH_MEASURE command
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v11 23/28] qmp: add query-sev-launch-measure
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,149 +31,111 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>
 
-During machine creation we encrypted the guest bios image, the
-LAUNCH_MEASURE command can be used to retrieve the measurement of
-the encrypted memory region. This measurement is a signature of
-the memory contents that can be sent to the guest owner as an
-attestation that the memory was encrypted correctly by the firmware.
-VM management tools like libvirt can query the measurement using
-query-sev-launch-measure QMP command.
+The command can be used by libvirt to retrieve the measurement of SEV guest=
+.
+This measurement is a signature of the memory contents that was encrypted
+through the LAUNCH_UPDATE_DATA.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- target/i386/sev-stub.c   |  5 ++++
- target/i386/sev.c        | 63 ++++++++++++++++++++++++++++++++++++++++++++++++
- target/i386/sev_i386.h   |  2 ++
- target/i386/trace-events |  1 +
- 4 files changed, 71 insertions(+)
+ monitor.c             |  7 +++++++
+ qapi/misc.json        | 29 +++++++++++++++++++++++++++++
+ target/i386/monitor.c | 17 +++++++++++++++++
+ 3 files changed, 53 insertions(+)
 
-diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
-index c86d8c139237..2f61c32ec975 100644
---- a/target/i386/sev-stub.c
-+++ b/target/i386/sev-stub.c
-@@ -39,3 +39,8 @@ uint32_t sev_get_reduced_phys_bits(void)
- {
-     return 0;
+diff --git a/monitor.c b/monitor.c
+index 2225cf5030dc..d53ecc5ddab3 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -984,6 +984,7 @@ static void qmp_unregister_commands_hack(void)
+ #ifndef TARGET_I386
+     qmp_unregister_command(&qmp_commands, "rtc-reset-reinjection");
+     qmp_unregister_command(&qmp_commands, "query-sev");
++    qmp_unregister_command(&qmp_commands, "query-sev-launch-measure");
+ #endif
+ #ifndef TARGET_S390X
+     qmp_unregister_command(&qmp_commands, "dump-skeys");
+@@ -4110,6 +4111,12 @@ SevInfo *qmp_query_sev(Error **errp)
+     error_setg(errp, QERR_FEATURE_DISABLED, "query-sev");
+     return NULL;
  }
 +
-+char *sev_get_launch_measurement(void)
++SevLaunchMeasureInfo *qmp_query_sev_launch_measure(Error **errp)
 +{
++    error_setg(errp, QERR_FEATURE_DISABLED, "query-sev-launch-measure");
 +    return NULL;
 +}
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 6a5f026e8fc6..e01c753be3ec 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -511,6 +511,68 @@ sev_launch_update_data(uint8_t *addr, uint64_t len)
-     return ret;
+ #endif
+=20
+ #ifndef TARGET_S390X
+diff --git a/qapi/misc.json b/qapi/misc.json
+index fcf3bfc66a15..66c8229ec406 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -3275,3 +3275,32 @@
+ #
+ ##
+ { 'command': 'query-sev', 'returns': 'SevInfo' }
++
++##
++# @SevLaunchMeasureInfo:
++#
++# SEV Guest Launch measurement information
++#
++# @data: the measurement value encoded in base64
++#
++# Since: 2.12
++#
++##
++{ 'struct': 'SevLaunchMeasureInfo', 'data': {'data': 'str'} }
++
++##
++# @query-sev-launch-measure:
++#
++# Query the SEV guest launch information.
++#
++# Returns: The @SevLaunchMeasureInfo for the guest
++#
++# Since: 2.12
++#
++# Example:
++#
++# -> { "execute": "query-sev-launch-measure" }
++# <- { "return": { "data": "4l8LXeNlSPUDlXPJG5966/8%YZ" } }
++#
++##
++{ 'command': 'query-sev-launch-measure', 'returns': 'SevLaunchMeasureInfo'=
  }
- 
-+static void
-+sev_launch_get_measure(Notifier *notifier, void *unused)
-+{
-+    int ret, error;
-+    guchar *data;
-+    SEVState *s = sev_state;
-+    struct kvm_sev_launch_measure *measurement;
-+
-+    if (!sev_check_state(SEV_STATE_LUPDATE)) {
-+        return;
-+    }
-+
-+    measurement = g_new0(struct kvm_sev_launch_measure, 1);
-+
-+    /* query the measurement blob length */
-+    ret = sev_ioctl(sev_state->sev_fd, KVM_SEV_LAUNCH_MEASURE,
-+                    measurement, &error);
-+    if (!measurement->len) {
-+        error_report("%s: LAUNCH_MEASURE ret=%d fw_error=%d '%s'",
-+                     __func__, ret, error, fw_error_to_str(errno));
-+        goto free_measurement;
-+    }
-+
-+    data = g_new0(guchar, measurement->len);
-+    measurement->uaddr = (unsigned long)data;
-+
-+    /* get the measurement blob */
-+    ret = sev_ioctl(sev_state->sev_fd, KVM_SEV_LAUNCH_MEASURE,
-+                    measurement, &error);
-+    if (ret) {
-+        error_report("%s: LAUNCH_MEASURE ret=%d fw_error=%d '%s'",
-+                     __func__, ret, error, fw_error_to_str(errno));
-+        goto free_data;
-+    }
-+
-+    sev_set_guest_state(SEV_STATE_LSECRET);
-+
-+    /* encode the measurement value and emit the event */
-+    s->measurement = g_base64_encode(data, measurement->len);
-+    trace_kvm_sev_launch_measurement(s->measurement);
-+
-+free_data:
-+    g_free(data);
-+free_measurement:
-+    g_free(measurement);
-+}
-+
-+char *
-+sev_get_launch_measurement(void)
-+{
-+    if (sev_state &&
-+        sev_state->state >= SEV_STATE_LSECRET) {
-+        return g_strdup(sev_state->measurement);
-+    }
-+
-+    return NULL;
-+}
-+
-+static Notifier sev_machine_done_notify = {
-+    .notify = sev_launch_get_measure,
-+};
-+
- void *
- sev_guest_init(const char *id)
- {
-@@ -588,6 +650,7 @@ sev_guest_init(const char *id)
+diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+index 7df31c3cdf1b..e5596bbc0fc2 100644
+--- a/target/i386/monitor.c
++++ b/target/i386/monitor.c
+@@ -720,3 +720,20 @@ void hmp_info_sev(Monitor *mon, const QDict *qdict)
+         monitor_printf(mon, "SEV is not enabled\n");
      }
- 
-     ram_block_notifier_add(&sev_ram_notifier);
-+    qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
- 
-     return s;
- err:
-diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
-index c06be12c8079..c21d1f31d712 100644
---- a/target/i386/sev_i386.h
-+++ b/target/i386/sev_i386.h
-@@ -42,6 +42,7 @@ extern uint64_t sev_get_me_mask(void);
- extern SevInfo *sev_get_info(void);
- extern uint32_t sev_get_cbit_position(void);
- extern uint32_t sev_get_reduced_phys_bits(void);
-+extern char *sev_get_launch_measurement(void);
- 
- typedef struct QSevGuestInfo QSevGuestInfo;
- typedef struct QSevGuestInfoClass QSevGuestInfoClass;
-@@ -83,6 +84,7 @@ struct SEVState {
-     uint32_t handle;
-     int sev_fd;
-     SevState state;
-+    gchar *measurement;
- };
- 
- typedef struct SEVState SEVState;
-diff --git a/target/i386/trace-events b/target/i386/trace-events
-index c0cd8e93217f..f7a1a1e6b85c 100644
---- a/target/i386/trace-events
-+++ b/target/i386/trace-events
-@@ -13,3 +13,4 @@ kvm_memcrypt_unregister_region(void *addr, size_t len) "addr %p len 0x%lu"
- kvm_sev_change_state(const char *old, const char *new) "%s -> %s"
- kvm_sev_launch_start(int policy, void *session, void *pdh) "policy 0x%x session %p pdh %p"
- kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len 0x%" PRIu64
-+kvm_sev_launch_measurement(const char *value) "data %s"
--- 
+ }
++
++SevLaunchMeasureInfo *qmp_query_sev_launch_measure(Error **errp)
++{
++    char *data;
++    SevLaunchMeasureInfo *info;
++
++    data =3D sev_get_launch_measurement();
++    if (!data) {
++        error_setg(errp, "Measurement is not available");
++        return NULL;
++    }
++
++    info =3D g_malloc0(sizeof(*info));
++    info->data =3D data;
++
++    return info;
++}
+--=20
 2.14.3
