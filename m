@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40865)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1etTgT-0008Bz-LF
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 02:40:23 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42451)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1etTv2-0003uo-U4
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 02:55:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1etTgQ-0000F7-93
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 02:40:21 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57902 helo=mx1.redhat.com)
+	(envelope-from <pl@kamp.de>) id 1etTuz-0004FA-Qd
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 02:55:24 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:52620 helo=mx01.kamp.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1etTgQ-0000Er-2q
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 02:40:18 -0500
-Date: Wed, 7 Mar 2018 13:10:02 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <1513877118-3149-5-git-send-email-jack.schwartz@oracle.com>
-Message-ID: <nycvar.YSQ.7.76.1803071259320.20163@wniryva>
-References: <1513877118-3149-1-git-send-email-jack.schwartz@oracle.com>
-	<1513877118-3149-5-git-send-email-jack.schwartz@oracle.com>
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1etTuz-0004EX-Fm
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 02:55:21 -0500
+Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
+	for qemu-devel@nongnu.org; Wed, 7 Mar 2018 08:55:16 +0100
+From: Peter Lieven <pl@kamp.de>
+References: <c0d7b993-b3b8-a753-21f5-e2257de27caf@kamp.de>
+	<20180305114533.GI7910@stefanha-x1.localdomain>
+	<0f1ec3c7-1157-e618-62f8-ffd5e08eb342@kamp.de>
+	<20180305145215.GM3131@work-vm>
+	<20180306160739.GN31045@stefanha-x1.localdomain>
+	<824907bb-3a37-27bd-76db-be17d05bdac0@kamp.de>
+Message-ID: <231fe0ce-3df4-a175-2fba-403023cc65e1@kamp.de>
+Date: Wed, 7 Mar 2018 08:55:16 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH QEMU v1 4/4] multiboot: fprintf(stderr...)
- -> error_report()
+In-Reply-To: <824907bb-3a37-27bd-76db-be17d05bdac0@kamp.de>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [Qemu-block] block migration and MAX_IN_FLIGHT_IO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,202 +35,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jack Schwartz <jack.schwartz@oracle.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, konrad.wilk@oracle.com, daniel.kiper@oracle.com, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+To: Stefan Hajnoczi <stefanha@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, wency@cn.fujitsu.com, qemu block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-+-- On Thu, 21 Dec 2017, Jack Schwartz wrote --+
-| Change all fprintf(stderr...) calls in hw/i386/multiboot.c to call
-| error_report() instead, including the mb_debug macro.  Remove the "\n"
-| from strings passed to all modified calls, since error_report() appends
-| one.
-| 
-| Signed-off-by: Jack Schwartz <jack.schwartz@oracle.com>
-| Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
-| ---
-|  hw/i386/multiboot.c | 55 ++++++++++++++++++++++++++++-------------------------
-|  1 file changed, 29 insertions(+), 26 deletions(-)
-| 
-| diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
-| index 818728b..d9a0a95 100644
-| --- a/hw/i386/multiboot.c
-| +++ b/hw/i386/multiboot.c
-| @@ -31,12 +31,13 @@
-|  #include "hw/loader.h"
-|  #include "elf.h"
-|  #include "sysemu/sysemu.h"
-| +#include "qemu/error-report.h"
-|  
-|  /* Show multiboot debug output */
-|  //#define DEBUG_MULTIBOOT
-|  
-|  #ifdef DEBUG_MULTIBOOT
-| -#define mb_debug(a...) fprintf(stderr, ## a)
-| +#define mb_debug(a...) error_report(a)
-|  #else
-|  #define mb_debug(a...)
-|  #endif
-| @@ -137,7 +138,7 @@ static void mb_add_mod(MultibootState *s,
-|      stl_p(p + MB_MOD_END,     end);
-|      stl_p(p + MB_MOD_CMDLINE, cmdline_phys);
-|  
-| -    mb_debug("mod%02d: "TARGET_FMT_plx" - "TARGET_FMT_plx"\n",
-| +    mb_debug("mod%02d: "TARGET_FMT_plx" - "TARGET_FMT_plx,
-|               s->mb_mods_count, start, end);
-|  
-|      s->mb_mods_count++;
-| @@ -179,12 +180,12 @@ int load_multiboot(FWCfgState *fw_cfg,
-|      if (!is_multiboot)
-|          return 0; /* no multiboot */
-|  
-| -    mb_debug("qemu: I believe we found a multiboot image!\n");
-| +    mb_debug("qemu: I believe we found a multiboot image!");
-|      memset(bootinfo, 0, sizeof(bootinfo));
-|      memset(&mbs, 0, sizeof(mbs));
-|  
-|      if (flags & 0x00000004) { /* MULTIBOOT_HEADER_HAS_VBE */
-| -        fprintf(stderr, "qemu: multiboot knows VBE. we don't.\n");
-| +        error_report("qemu: multiboot knows VBE. we don't.");
-|      }
-|      if (!(flags & 0x00010000)) { /* MULTIBOOT_HEADER_HAS_ADDR */
-|          uint64_t elf_entry;
-| @@ -193,7 +194,7 @@ int load_multiboot(FWCfgState *fw_cfg,
-|          fclose(f);
-|  
-|          if (((struct elf64_hdr*)header)->e_machine == EM_X86_64) {
-| -            fprintf(stderr, "Cannot load x86-64 image, give a 32bit one.\n");
-| +            error_report("Cannot load x86-64 image, give a 32bit one.");
-|              exit(1);
-|          }
-|  
-| @@ -201,7 +202,7 @@ int load_multiboot(FWCfgState *fw_cfg,
-|                                 &elf_low, &elf_high, 0, I386_ELF_MACHINE,
-|                                 0, 0);
-|          if (kernel_size < 0) {
-| -            fprintf(stderr, "Error while loading elf kernel\n");
-| +            error_report("Error while loading elf kernel");
-|              exit(1);
-|          }
-|          mh_load_addr = elf_low;
-| @@ -210,12 +211,13 @@ int load_multiboot(FWCfgState *fw_cfg,
-|  
-|          mbs.mb_buf = g_malloc(mb_kernel_size);
-|          if (rom_copy(mbs.mb_buf, mh_load_addr, mb_kernel_size) != mb_kernel_size) {
-| -            fprintf(stderr, "Error while fetching elf kernel from rom\n");
-| +            error_report("Error while fetching elf kernel from rom");
-|              exit(1);
-|          }
-|  
-| -        mb_debug("qemu: loading multiboot-elf kernel (%#x bytes) with entry %#zx\n",
-| -                  mb_kernel_size, (size_t)mh_entry_addr);
-| +        mb_debug("qemu: loading multiboot-elf kernel "
-| +                 "(%#x bytes) with entry %#zx",
-| +                 mb_kernel_size, (size_t)mh_entry_addr);
-|      } else {
-|          /* Valid if mh_flags sets MULTIBOOT_HEADER_HAS_ADDR. */
-|          uint32_t mh_header_addr = ldl_p(header+i+12);
-| @@ -224,7 +226,7 @@ int load_multiboot(FWCfgState *fw_cfg,
-|  
-|          mh_load_addr = ldl_p(header+i+16);
-|          if (mh_header_addr < mh_load_addr) {
-| -            fprintf(stderr, "invalid load_addr address\n");
-| +            error_report("invalid load_addr address");
-|              exit(1);
-|          }
-|  
-| @@ -234,20 +236,20 @@ int load_multiboot(FWCfgState *fw_cfg,
-|  
-|          if (mh_load_end_addr) {
-|              if (mh_load_end_addr < mh_load_addr) {
-| -                fprintf(stderr, "invalid load_end_addr address\n");
-| +                error_report("invalid load_end_addr address");
-|                  exit(1);
-|              }
-|              mb_load_size = mh_load_end_addr - mh_load_addr;
-|          } else {
-|              if (kernel_file_size < mb_kernel_text_offset) {
-| -                fprintf(stderr, "invalid kernel_file_size\n");
-| +                error_report("invalid kernel_file_size");
-|                  exit(1);
-|              }
-|              mb_load_size = kernel_file_size - mb_kernel_text_offset;
-|          }
-|          if (mh_bss_end_addr) {
-|              if (mh_bss_end_addr < (mh_load_addr + mb_load_size)) {
-| -                fprintf(stderr, "invalid bss_end_addr address\n");
-| +                error_report("invalid bss_end_addr address");
-|                  exit(1);
-|              }
-|              mb_kernel_size = mh_bss_end_addr - mh_load_addr;
-| @@ -255,17 +257,17 @@ int load_multiboot(FWCfgState *fw_cfg,
-|              mb_kernel_size = mb_load_size;
-|          }
-|  
-| -        mb_debug("multiboot: header_addr = %#x\n", mh_header_addr);
-| -        mb_debug("multiboot: load_addr = %#x\n", mh_load_addr);
-| -        mb_debug("multiboot: load_end_addr = %#x\n", mh_load_end_addr);
-| -        mb_debug("multiboot: bss_end_addr = %#x\n", mh_bss_end_addr);
-| -        mb_debug("qemu: loading multiboot kernel (%#x bytes) at %#x\n",
-| +        mb_debug("multiboot: header_addr = %#x", mh_header_addr);
-| +        mb_debug("multiboot: load_addr = %#x", mh_load_addr);
-| +        mb_debug("multiboot: load_end_addr = %#x", mh_load_end_addr);
-| +        mb_debug("multiboot: bss_end_addr = %#x", mh_bss_end_addr);
-| +        mb_debug("qemu: loading multiboot kernel (%#x bytes) at %#x",
-|                   mb_load_size, mh_load_addr);
-|  
-|          mbs.mb_buf = g_malloc(mb_kernel_size);
-|          fseek(f, mb_kernel_text_offset, SEEK_SET);
-|          if (fread(mbs.mb_buf, 1, mb_load_size, f) != mb_load_size) {
-| -            fprintf(stderr, "fread() failed\n");
-| +            error_report("fread() failed");
-|              exit(1);
-|          }
-|          memset(mbs.mb_buf + mb_load_size, 0, mb_kernel_size - mb_load_size);
-| @@ -319,10 +321,10 @@ int load_multiboot(FWCfgState *fw_cfg,
-|              hwaddr c = mb_add_cmdline(&mbs, tmpbuf);
-|              if ((next_space = strchr(tmpbuf, ' ')))
-|                  *next_space = '\0';
-| -            mb_debug("multiboot loading module: %s\n", tmpbuf);
-| +            mb_debug("multiboot loading module: %s", tmpbuf);
-|              mb_mod_length = get_image_size(tmpbuf);
-|              if (mb_mod_length < 0) {
-| -                fprintf(stderr, "Failed to open file '%s'\n", tmpbuf);
-| +                error_report("Failed to open file '%s'", tmpbuf);
-|                  exit(1);
-|              }
-|  
-| @@ -333,7 +335,7 @@ int load_multiboot(FWCfgState *fw_cfg,
-|              mb_add_mod(&mbs, mbs.mb_buf_phys + offs,
-|                         mbs.mb_buf_phys + offs + mb_mod_length, c);
-|  
-| -            mb_debug("mod_start: %p\nmod_end:   %p\n  cmdline: "TARGET_FMT_plx"\n",
-| +            mb_debug("mod_start: %p\nmod_end:   %p\n  cmdline: "TARGET_FMT_plx,
-|                       (char *)mbs.mb_buf + offs,
-|                       (char *)mbs.mb_buf + offs + mb_mod_length, c);
-|              initrd_filename = next_initrd+1;
-| @@ -361,10 +363,11 @@ int load_multiboot(FWCfgState *fw_cfg,
-|      stl_p(bootinfo + MBI_BOOT_DEVICE, 0x8000ffff); /* XXX: use the -boot switch? */
-|      stl_p(bootinfo + MBI_MMAP_ADDR,   ADDR_E820_MAP);
-|  
-| -    mb_debug("multiboot: entry_addr = %#x\n", mh_entry_addr);
-| -    mb_debug("           mb_buf_phys   = "TARGET_FMT_plx"\n", mbs.mb_buf_phys);
-| -    mb_debug("           mod_start     = "TARGET_FMT_plx"\n", mbs.mb_buf_phys + mbs.offset_mods);
-| -    mb_debug("           mb_mods_count = %d\n", mbs.mb_mods_count);
-| +    mb_debug("multiboot: entry_addr = %#x", mh_entry_addr);
-| +    mb_debug("           mb_buf_phys   = "TARGET_FMT_plx, mbs.mb_buf_phys);
-| +    mb_debug("           mod_start     = "TARGET_FMT_plx,
-| +             mbs.mb_buf_phys + mbs.offset_mods);
-| +    mb_debug("           mb_mods_count = %d", mbs.mb_mods_count);
-|  
-|      /* save bootinfo off the stack */
-|      mb_bootinfo_data = g_memdup(bootinfo, sizeof(bootinfo));
-| 
+Am 06.03.2018 um 17:35 schrieb Peter Lieven:
+> Am 06.03.2018 um 17:07 schrieb Stefan Hajnoczi:
+>> On Mon, Mar 05, 2018 at 02:52:16PM +0000, Dr. David Alan Gilbert wrote:
+>>> * Peter Lieven (pl@kamp.de) wrote:
+>>>> Am 05.03.2018 um 12:45 schrieb Stefan Hajnoczi:
+>>>>> On Thu, Feb 22, 2018 at 12:13:50PM +0100, Peter Lieven wrote:
+>>>>>> I stumbled across the MAX_INFLIGHT_IO field that was introduced in 2015 and was curious what was the reason
+>>>>>> to choose 512MB as readahead? The question is that I found that the source VM gets very unresponsive I/O wise
+>>>>>> while the initial 512MB are read and furthermore seems to stay unreasponsive if we choose a high migration speed
+>>>>>> and have a fast storage on the destination VM.
+>>>>>>
+>>>>>> In our environment I modified this value to 16MB which seems to work much smoother. I wonder if we should make
+>>>>>> this a user configurable value or define a different rate limit for the block transfer in bulk stage at least?
+>>>>> I don't know if benchmarks were run when choosing the value.  From the
+>>>>> commit description it sounds like the main purpose was to limit the
+>>>>> amount of memory that can be consumed.
+>>>>>
+>>>>> 16 MB also fulfills that criteria :), but why is the source VM more
+>>>>> responsive with a lower value?
+>>>>>
+>>>>> Perhaps the issue is queue depth on the storage device - the block
+>>>>> migration code enqueues up to 512 MB worth of reads, and guest I/O has
+>>>>> to wait?
+>>>> That is my guess. Especially if the destination storage is faster we basically alsways have
+>>>> 512 I/Os in flight on the source storage.
+>>>>
+>>>> Does anyone mind if the reduce that value to 16MB or do we need a better mechanism?
+>>> We've got migration-parameters these days; you could connect it to one
+>>> of those fairly easily I think.
+>>> Try: grep -i 'cpu[-_]throttle[-_]initial'  for an example of one that's
+>>> already there.
+>>> Then you can set it to whatever you like.
+>> It would be nice to solve the performance problem without adding a
+>> tuneable.
+>>
+>> On the other hand, QEMU has no idea what the queue depth of the device
+>> is.  Therefore it cannot prioritize guest I/O over block migration I/O.
+>>
+>> 512 parallel requests is much too high.  Most parallel I/O benchmarking
+>> is done at 32-64 queue depth.
+>>
+>> I think that 16 parallel requests is a reasonable maximum number for a
+>> background job.
+>>
+>> We need to be clear though that the purpose of this change is unrelated
+>> to the original 512 MB memory footprint goal.  It just happens to touch
+>> the same constant but the goal is now to submit at most 16 I/O requests
+>> in parallel to avoid monopolizing the I/O device.
+> I think we should really look at this. The variables that control if we stay in the while loop or not are incremented and decremented
+> at the following places:
+>
+> mig_save_device_dirty:
+> mig_save_device_bulk:
+>     block_mig_state.submitted++;
+>
+> blk_mig_read_cb:
+>     block_mig_state.submitted--;
+>     block_mig_state.read_done++;
+>
+> flush_blks:
+>     block_mig_state.read_done--;
+>
+> The condition of the while loop is:
+> (block_mig_state.submitted +
+>             block_mig_state.read_done) * BLOCK_SIZE <
+>            qemu_file_get_rate_limit(f) &&
+>            (block_mig_state.submitted +
+>             block_mig_state.read_done) <
+>            MAX_INFLIGHT_IO)
+>
+> At first I wonder if we ever reach the rate-limit because we put the read buffers onto f AFTER we exit the while loop?
+>
+> And even if we reach the limit we constantly maintain 512 I/Os in parallel because we immediately decrement read_done
+> when we put the buffers to f in flush_blks. In the next iteration of the while loop we then read again until we have 512 in-flight I/Os.
+>
+> And shouldn't we have a time limit to limit the time we stay in the while loop? I think we artificially delay sending data to f?
 
-Looks okay.
+Thinking about it for a while I would propose the following:
 
-It maybe good to have version of error_report() which calls exit(1) too. I 
-guess err(3) family of functions isn't used because they are nonstandard.
+a) rename MAX_INFLIGHT_IO to MAX_IO_BUFFERS
+b) add MAX_PARALLEL_IO with a value of 16
+c) compare qemu_file_get_rate_limit only with block_mig_state.read_done
 
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+This would yield in the following condition for the while loop:
+
+(block_mig_state.read_done * BLOCK_SIZE < qemu_file_get_rate_limit(f) &&
+ (block_mig_state.submitted + block_mig_state.read_done) < MAX_IO_BUFFERS &&
+ block_mig_state.submitted < MAX_PARALLEL_IO)
+
+Sounds that like a plan?
+
+Peter
