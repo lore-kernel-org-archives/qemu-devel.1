@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50225)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1etcHa-0004dH-Ui
+	(envelope-from <brijesh.singh@amd.com>) id 1etcHb-0004di-AC
 	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:51:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1etcHW-0008DJ-Q2
+	(envelope-from <brijesh.singh@amd.com>) id 1etcHX-0008ED-Cf
 	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:51:15 -0500
 Received: from mail-bl2nam02on0050.outbound.protection.outlook.com
 	([104.47.38.50]:40768
 	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1etcHW-0008Cd-Jg
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:51:10 -0500
+	id 1etcHX-0008Cd-77
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:51:11 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Wed,  7 Mar 2018 10:50:15 -0600
-Message-Id: <20180307165038.88640-6-brijesh.singh@amd.com>
+Date: Wed,  7 Mar 2018 10:50:17 -0600
+Message-Id: <20180307165038.88640-8-brijesh.singh@amd.com>
 In-Reply-To: <20180307165038.88640-1-brijesh.singh@amd.com>
 References: <20180307165038.88640-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v11 05/28] machine: add -memory-encryption
- property
+Subject: [Qemu-devel] [PATCH v11 07/28] docs: add AMD Secure Encrypted
+ Virtualization (SEV)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,94 +32,113 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>
 
-When CPU supports memory encryption feature, the property can be used to
-specify the encryption object to use when launching an encrypted guest.
+Create a documentation entry to describe the AMD Secure Encrypted
+Virtualization (SEV) feature.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- hw/core/machine.c   | 22 ++++++++++++++++++++++
- include/hw/boards.h |  1 +
- qemu-options.hx     |  5 ++++-
- 3 files changed, 27 insertions(+), 1 deletion(-)
+ docs/amd-memory-encryption.txt | 92 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 92 insertions(+)
+ create mode 100644 docs/amd-memory-encryption.txt
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 5e2bbcdacedb..2040177664d5 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -334,6 +334,22 @@ static bool machine_get_enforce_config_section(Object *obj, Error **errp)
-     return ms->enforce_config_section;
- }
- 
-+static char *machine_get_memory_encryption(Object *obj, Error **errp)
-+{
-+    MachineState *ms = MACHINE(obj);
+diff --git a/docs/amd-memory-encryption.txt b/docs/amd-memory-encryption.txt
+new file mode 100644
+index 000000000000..72a92b6c6353
+--- /dev/null
++++ b/docs/amd-memory-encryption.txt
+@@ -0,0 +1,92 @@
++Secure Encrypted Virtualization (SEV) is a feature found on AMD processors.
 +
-+    return g_strdup(ms->memory_encryption);
-+}
++SEV is an extension to the AMD-V architecture which supports running encrypted
++virtual machine (VMs) under the control of KVM. Encrypted VMs have their pages
++(code and data) secured such that only the guest itself has access to the
++unencrypted version. Each encrypted VM is associated with a unique encryption
++key; if its data is accessed to a different entity using a different key the
++encrypted guests data will be incorrectly decrypted, leading to unintelligible
++data.
 +
-+static void machine_set_memory_encryption(Object *obj, const char *value,
-+                                        Error **errp)
-+{
-+    MachineState *ms = MACHINE(obj);
++The key management of this feature is handled by separate processor known as
++AMD secure processor (AMD-SP) which is present in AMD SOCs. Firmware running
++inside the AMD-SP provide commands to support common VM lifecycle. This
++includes commands for launching, snapshotting, migrating and debugging the
++encrypted guest. Those SEV command can be issued via KVM_MEMORY_ENCRYPT_OP
++ioctls.
 +
-+    g_free(ms->memory_encryption);
-+    ms->memory_encryption = g_strdup(value);
-+}
++Launching
++---------
++Boot images (such as bios) must be encrypted before guest can be booted.
++MEMORY_ENCRYPT_OP ioctl provides commands to encrypt the images :LAUNCH_START,
++LAUNCH_UPDATE_DATA, LAUNCH_MEASURE and LAUNCH_FINISH. These four commands
++together generate a fresh memory encryption key for the VM, encrypt the boot
++images and provide a measurement than can be used as an attestation of the
++successful launch.
 +
- void machine_class_allow_dynamic_sysbus_dev(MachineClass *mc, const char *type)
- {
-     strList *item = g_new0(strList, 1);
-@@ -612,6 +628,12 @@ static void machine_class_init(ObjectClass *oc, void *data)
-         &error_abort);
-     object_class_property_set_description(oc, "enforce-config-section",
-         "Set on to enforce configuration section migration", &error_abort);
++LAUNCH_START is called first to create a cryptographic launch context within
++the firmware. To create this context, guest owner must provides guest policy,
++its public Diffie-Hellman key (PDH) and session parameters. These inputs
++should be treated as binary blob and must be passed as-is to the SEV firmware.
 +
-+    object_class_property_add_str(oc, "memory-encryption",
-+        machine_get_memory_encryption, machine_set_memory_encryption,
-+        &error_abort);
-+    object_class_property_set_description(oc, "memory-encryption",
-+        "Set memory encyption object to use", &error_abort);
- }
- 
- static void machine_class_base_init(ObjectClass *oc, void *data)
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index efb0a9edfdf1..8ce9a7a21d3d 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -243,6 +243,7 @@ struct MachineState {
-     bool suppress_vmdesc;
-     bool enforce_config_section;
-     bool enable_graphics;
-+    char *memory_encryption;
- 
-     ram_addr_t ram_size;
-     ram_addr_t maxram_size;
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 2a22a62f743b..c157946af308 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -43,7 +43,8 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
-     "                suppress-vmdesc=on|off disables self-describing migration (default=off)\n"
-     "                nvdimm=on|off controls NVDIMM support (default=off)\n"
-     "                enforce-config-section=on|off enforce configuration section migration (default=off)\n"
--    "                s390-squash-mcss=on|off (deprecated) controls support for squashing into default css (default=off)\n",
-+    "                s390-squash-mcss=on|off (deprecated) controls support for squashing into default css (default=off)\n"
-+    "                memory-encryption=@var{} memory encryption object to use (default=none)\n",
-     QEMU_ARCH_ALL)
- STEXI
- @item -machine [type=]@var{name}[,prop=@var{value}[,...]]
-@@ -110,6 +111,8 @@ code to send configuration section even if the machine-type sets the
- @option{migration.send-configuration} property to @var{off}.
- NOTE: this parameter is deprecated. Please use @option{-global}
- @option{migration.send-configuration}=@var{on|off} instead.
-+@item memory-encryption=@var{}
-+Memory encryption object to use. The default is none.
- @end table
- ETEXI
- 
++The guest policy is passed as plaintext and hypervisor may able to read it
++but should not modify it (any modification of the policy bits will result
++in bad measurement). The guest policy is a 4-byte data structure containing
++several flags that restricts what can be done on running SEV guest.
++See KM Spec section 3 and 6.2 for more details.
++
++Guest owners provided DH certificate and session parameters will be used to
++establish a cryptographic session with the guest owner to negotiate keys used
++for the attestation.
++
++LAUNCH_UPDATE_DATA encrypts the memory region using the cryptographic context
++created via LAUNCH_START command. If required, this command can be called
++multiple times to encrypt different memory regions. The command also calculates
++the measurement of the memory contents as it encrypts.
++
++LAUNCH_MEASURE command can be used to retrieve the measurement of encrypted
++memory. This measurement is a signature of the memory contents that can be
++sent to the guest owner as an attestation that the memory was encrypted
++correctly by the firmware. The guest owner may wait to provide the guest
++confidential information until it can verify the attestation measurement.
++Since the guest owner knows the initial contents of the guest at boot, the
++attestation measurement can be verified by comparing it to what the guest owner
++expects.
++
++LAUNCH_FINISH command finalizes the guest launch and destroy's the cryptographic
++context.
++
++See SEV KM API Spec [1] 'Launching a guest' usage flow (Appendix A) for the
++complete flow chart.
++
++Debugging
++-----------
++Since memory contents of SEV guest is encrypted hence hypervisor access to the
++guest memory will get a cipher text. If guest policy allows debugging, then
++hypervisor can use DEBUG_DECRYPT and DEBUG_ENCRYPT commands access the guest
++memory region for debug purposes.
++
++Snapshot/Restore
++-----------------
++TODO
++
++Live Migration
++----------------
++TODO
++
++References
++-----------------
++
++AMD Memory Encryption whitepaper:
++http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/AMD_Memory_Encryption_Whitepaper_v7-Public.pdf
++
++Secure Encrypted Virutualization Key Management:
++[1] http://support.amd.com/TechDocs/55766_SEV-KM API_Specification.pdf
++
++KVM Forum slides:
++http://www.linux-kvm.org/images/7/74/02x08A-Thomas_Lendacky-AMDs_Virtualizatoin_Memory_Encryption_Technology.pdf
++
++AMD64 Architecture Programmer's Manual:
++   http://support.amd.com/TechDocs/24593.pdf
++   SME is section 7.10
++   SEV is section 15.34
 -- 
 2.14.3
