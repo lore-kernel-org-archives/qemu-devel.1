@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eteIh-0004rf-Fy
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 14:00:32 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eteIh-0004rX-CI
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 14:00:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eteIg-0004ad-FT
+	(envelope-from <kwolf@redhat.com>) id 1eteIg-0004aR-1l
 	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 14:00:31 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed,  7 Mar 2018 19:59:25 +0100
-Message-Id: <20180307185946.29366-17-kwolf@redhat.com>
+Date: Wed,  7 Mar 2018 19:59:24 +0100
+Message-Id: <20180307185946.29366-16-kwolf@redhat.com>
 In-Reply-To: <20180307185946.29366-1-kwolf@redhat.com>
 References: <20180307185946.29366-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 16/37] file-posix: Support .bdrv_co_create
+Subject: [Qemu-devel] [PATCH v4 15/37] block: x-blockdev-create QMP command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,179 +22,173 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-This adds the .bdrv_co_create driver callback to file, which enables
-image creation over QMP.
+This adds a synchronous x-blockdev-create QMP command that can create
+qcow2 images on a given node name.
+
+We don't want to block while creating an image, so this is not the final
+interface in all aspects, but BlockdevCreateOptionsQcow2 and
+.bdrv_co_create() are what they actually might look like in the end. In
+any case, this should be good enough to test whether we interpret
+BlockdevCreateOptions as we should.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qapi/block-core.json | 20 ++++++++++++-
- block/file-posix.c   | 79 +++++++++++++++++++++++++++++++++++++---------------
- 2 files changed, 75 insertions(+), 24 deletions(-)
+ qapi/block-core.json      | 12 ++++++++
+ include/block/block_int.h |  5 +++-
+ block/create.c            | 76 +++++++++++++++++++++++++++++++++++++++++++++++
+ block/qcow2.c             |  1 +
+ block/Makefile.objs       |  2 +-
+ 5 files changed, 94 insertions(+), 2 deletions(-)
+ create mode 100644 block/create.c
 
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 88d7a8678d..41955b097f 100644
+index dfea7b0102..88d7a8678d 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -3359,6 +3359,24 @@
- { 'command': 'blockdev-del', 'data': { 'node-name': 'str' } }
+@@ -3464,6 +3464,18 @@
+   } }
  
  ##
-+# @BlockdevCreateOptionsFile:
++# @x-blockdev-create:
 +#
-+# Driver specific image creation options for file.
-+#
-+# @filename         Filename for the new image file
-+# @size             Size of the virtual disk in bytes
-+# @preallocation    Preallocation mode for the new image (default: off)
-+# @nocow            Turn off copy-on-write (valid only on btrfs; default: off)
++# Create an image format on a given node.
++# TODO Replace with something asynchronous (block job?)
 +#
 +# Since: 2.12
 +##
-+{ 'struct': 'BlockdevCreateOptionsFile',
-+  'data': { 'filename':         'str',
-+            'size':             'size',
-+            '*preallocation':   'PreallocMode',
-+            '*nocow':           'bool' } }
++{ 'command': 'x-blockdev-create',
++  'data': 'BlockdevCreateOptions',
++  'boxed': true }
 +
 +##
- # @BlockdevQcow2Version:
+ # @blockdev-open-tray:
  #
- # @v2:  The original QCOW2 format as introduced in qemu 0.10 (version 2)
-@@ -3429,7 +3447,7 @@
-       'bochs':          'BlockdevCreateNotSupported',
-       'cloop':          'BlockdevCreateNotSupported',
-       'dmg':            'BlockdevCreateNotSupported',
--      'file':           'BlockdevCreateNotSupported',
-+      'file':           'BlockdevCreateOptionsFile',
-       'ftp':            'BlockdevCreateNotSupported',
-       'ftps':           'BlockdevCreateNotSupported',
-       'gluster':        'BlockdevCreateNotSupported',
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 7f2cc63c60..fbc21a9921 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1982,34 +1982,25 @@ static int64_t raw_get_allocated_file_size(BlockDriverState *bs)
-     return (int64_t)st.st_blocks * 512;
- }
+ # Opens a block device's tray. If there is a block driver state tree inserted as
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index a84cc04d55..27e17addba 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -129,8 +129,11 @@ struct BlockDriver {
+     int (*bdrv_file_open)(BlockDriverState *bs, QDict *options, int flags,
+                           Error **errp);
+     void (*bdrv_close)(BlockDriverState *bs);
+-    int coroutine_fn (*bdrv_co_create_opts)(const char *filename, QemuOpts *opts,
++    int coroutine_fn (*bdrv_co_create)(BlockdevCreateOptions *opts,
+                                        Error **errp);
++    int coroutine_fn (*bdrv_co_create_opts)(const char *filename,
++                                            QemuOpts *opts,
++                                            Error **errp);
+     int (*bdrv_make_empty)(BlockDriverState *bs);
  
--static int coroutine_fn raw_co_create_opts(const char *filename, QemuOpts *opts,
--                                           Error **errp)
-+static int raw_co_create(BlockdevCreateOptions *options, Error **errp)
- {
-+    BlockdevCreateOptionsFile *file_opts;
-     int fd;
-     int result = 0;
--    int64_t total_size = 0;
--    bool nocow = false;
--    PreallocMode prealloc;
--    char *buf = NULL;
--    Error *local_err = NULL;
- 
--    strstart(filename, "file:", &filename);
-+    /* Validate options and set default values */
-+    assert(options->driver == BLOCKDEV_DRIVER_FILE);
-+    file_opts = &options->u.file;
- 
--    /* Read out options */
--    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
--                          BDRV_SECTOR_SIZE);
--    nocow = qemu_opt_get_bool(opts, BLOCK_OPT_NOCOW, false);
--    buf = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
--    prealloc = qapi_enum_parse(&PreallocMode_lookup, buf,
--                               PREALLOC_MODE_OFF, &local_err);
--    g_free(buf);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        result = -EINVAL;
--        goto out;
-+    if (!file_opts->has_nocow) {
-+        file_opts->nocow = false;
-+    }
-+    if (!file_opts->has_preallocation) {
-+        file_opts->preallocation = PREALLOC_MODE_OFF;
-     }
- 
--    fd = qemu_open(filename, O_RDWR | O_CREAT | O_TRUNC | O_BINARY,
-+    /* Create file */
-+    fd = qemu_open(file_opts->filename, O_RDWR | O_CREAT | O_TRUNC | O_BINARY,
-                    0644);
-     if (fd < 0) {
-         result = -errno;
-@@ -2017,7 +2008,7 @@ static int coroutine_fn raw_co_create_opts(const char *filename, QemuOpts *opts,
-         goto out;
-     }
- 
--    if (nocow) {
-+    if (file_opts->nocow) {
- #ifdef __linux__
-         /* Set NOCOW flag to solve performance issue on fs like btrfs.
-          * This is an optimisation. The FS_IOC_SETFLAGS ioctl return value
-@@ -2032,7 +2023,8 @@ static int coroutine_fn raw_co_create_opts(const char *filename, QemuOpts *opts,
- #endif
-     }
- 
--    result = raw_regular_truncate(fd, total_size, prealloc, errp);
-+    result = raw_regular_truncate(fd, file_opts->size, file_opts->preallocation,
-+                                  errp);
-     if (result < 0) {
-         goto out_close;
-     }
-@@ -2046,6 +2038,46 @@ out:
-     return result;
- }
- 
-+static int coroutine_fn raw_co_create_opts(const char *filename, QemuOpts *opts,
-+                                           Error **errp)
+     void (*bdrv_refresh_filename)(BlockDriverState *bs, QDict *options);
+diff --git a/block/create.c b/block/create.c
+new file mode 100644
+index 0000000000..8bd8a03719
+--- /dev/null
++++ b/block/create.c
+@@ -0,0 +1,76 @@
++/*
++ * Block layer code related to image creation
++ *
++ * Copyright (c) 2018 Kevin Wolf <kwolf@redhat.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "block/block_int.h"
++#include "qapi/qapi-commands-block-core.h"
++#include "qapi/error.h"
++
++typedef struct BlockdevCreateCo {
++    BlockDriver *drv;
++    BlockdevCreateOptions *opts;
++    int ret;
++    Error **errp;
++} BlockdevCreateCo;
++
++static void coroutine_fn bdrv_co_create_co_entry(void *opaque)
 +{
-+    BlockdevCreateOptions options;
-+    int64_t total_size = 0;
-+    bool nocow = false;
-+    PreallocMode prealloc;
-+    char *buf = NULL;
-+    Error *local_err = NULL;
-+
-+    /* Skip file: protocol prefix */
-+    strstart(filename, "file:", &filename);
-+
-+    /* Read out options */
-+    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
-+                          BDRV_SECTOR_SIZE);
-+    nocow = qemu_opt_get_bool(opts, BLOCK_OPT_NOCOW, false);
-+    buf = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
-+    prealloc = qapi_enum_parse(&PreallocMode_lookup, buf,
-+                               PREALLOC_MODE_OFF, &local_err);
-+    g_free(buf);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return -EINVAL;
-+    }
-+
-+    options = (BlockdevCreateOptions) {
-+        .driver     = BLOCKDEV_DRIVER_FILE,
-+        .u.file     = {
-+            .filename           = (char *) filename,
-+            .size               = total_size,
-+            .has_preallocation  = true,
-+            .preallocation      = prealloc,
-+            .has_nocow          = true,
-+            .nocow              = nocow,
-+        },
-+    };
-+    return raw_co_create(&options, errp);
++    BlockdevCreateCo *cco = opaque;
++    cco->ret = cco->drv->bdrv_co_create(cco->opts, cco->errp);
 +}
 +
- /*
-  * Find allocation range in @bs around offset @start.
-  * May change underlying file descriptor's file offset.
-@@ -2277,6 +2309,7 @@ BlockDriver bdrv_file = {
-     .bdrv_reopen_commit = raw_reopen_commit,
-     .bdrv_reopen_abort = raw_reopen_abort,
-     .bdrv_close = raw_close,
-+    .bdrv_co_create = raw_co_create,
-     .bdrv_co_create_opts = raw_co_create_opts,
++void qmp_x_blockdev_create(BlockdevCreateOptions *options, Error **errp)
++{
++    const char *fmt = BlockdevDriver_str(options->driver);
++    BlockDriver *drv = bdrv_find_format(fmt);
++    Coroutine *co;
++    BlockdevCreateCo cco;
++
++    /* If the driver is in the schema, we know that it exists. But it may not
++     * be whitelisted. */
++    assert(drv);
++    if (bdrv_uses_whitelist() && !bdrv_is_whitelisted(drv, false)) {
++        error_setg(errp, "Driver is not whitelisted");
++        return;
++    }
++
++    /* Call callback if it exists */
++    if (!drv->bdrv_co_create) {
++        error_setg(errp, "Driver does not support blockdev-create");
++        return;
++    }
++
++    cco = (BlockdevCreateCo) {
++        .drv = drv,
++        .opts = options,
++        .ret = -EINPROGRESS,
++        .errp = errp,
++    };
++
++    co = qemu_coroutine_create(bdrv_co_create_co_entry, &cco);
++    qemu_coroutine_enter(co);
++    while (cco.ret == -EINPROGRESS) {
++        aio_poll(qemu_get_aio_context(), true);
++    }
++}
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 37b0e36c1e..7472af6931 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -4490,6 +4490,7 @@ BlockDriver bdrv_qcow2 = {
+     .bdrv_join_options    = qcow2_join_options,
+     .bdrv_child_perm      = bdrv_format_default_perms,
+     .bdrv_co_create_opts  = qcow2_co_create_opts,
++    .bdrv_co_create       = qcow2_co_create,
      .bdrv_has_zero_init = bdrv_has_zero_init_1,
-     .bdrv_co_block_status = raw_co_block_status,
+     .bdrv_co_block_status = qcow2_co_block_status,
+ 
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index aede94f105..d644bac60a 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -9,7 +9,7 @@ block-obj-y += block-backend.o snapshot.o qapi.o
+ block-obj-$(CONFIG_WIN32) += file-win32.o win32-aio.o
+ block-obj-$(CONFIG_POSIX) += file-posix.o
+ block-obj-$(CONFIG_LINUX_AIO) += linux-aio.o
+-block-obj-y += null.o mirror.o commit.o io.o
++block-obj-y += null.o mirror.o commit.o io.o create.o
+ block-obj-y += throttle-groups.o
+ block-obj-$(CONFIG_LINUX) += nvme.o
+ 
 -- 
 2.13.6
