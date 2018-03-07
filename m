@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ete88-0001A6-IT
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 13:49:37 -0500
+	(envelope-from <groug@kaod.org>) id 1eteGE-0003RS-UE
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 13:58:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ete87-0000GP-CX
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 13:49:36 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:45415
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1ete87-0000GB-5h
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 13:49:35 -0500
-References: <1519984765-15748-1-git-send-email-konrad@adacore.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <555e2626-998a-8562-1a4a-e2c989215e5e@ilande.co.uk>
-Date: Wed, 7 Mar 2018 18:49:21 +0000
+	(envelope-from <groug@kaod.org>) id 1eteGC-0003Ac-7v
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 13:57:58 -0500
+Received: from 7.mo6.mail-out.ovh.net ([46.105.59.196]:53434)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eteGB-00037b-Vb
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 13:57:56 -0500
+Received: from player728.ha.ovh.net (unknown [10.109.120.1])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 7574514505F
+	for <qemu-devel@nongnu.org>; Wed,  7 Mar 2018 19:57:47 +0100 (CET)
+From: Greg Kurz <groug@kaod.org>
+Date: Wed, 07 Mar 2018 19:57:37 +0100
+Message-ID: <152044905701.22965.8924520463227226351.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <1519984765-15748-1-git-send-email-konrad@adacore.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] sparc: fix leon3 casa instruction when MMU
- is disabled
+Subject: [Qemu-devel] [PATCH] virtio_net: flush uncompleted TX on reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +27,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: KONRAD Frederic <konrad@adacore.com>, qemu-devel@nongnu.org
-Cc: rth@twiddle.net, frederic.konrad@adacore.com
+To: qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, R Nageswara Sastry <nasastry@in.ibm.com>
 
-On 02/03/18 09:59, KONRAD Frederic wrote:
+If the backend could not transmit a packet right away for some reason,
+the packet is queued for asynchronous sending. The corresponding vq
+element is tracked in the async_tx.elem field of the VirtIONetQueue,
+for later freeing when the transmission is complete.
 
-> From: KONRAD Frederic <frederic.konrad@adacore.com>
-> 
-> Since the commit af7a06bac7d3abb2da48ef3277d2a415772d2ae8:
-> `casa [..](10), .., ..` (and probably others alternate space instructions)
-> triggers a data access exception when the MMU is disabled.
-> 
-> When we enter get_asi(...) dc->mem_idx is set to MMU_PHYS_IDX when the MMU
-> is disabled. Just keep mem_idx unchanged in this case so we passthrough the
-> MMU when it is disabled.
-> 
-> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
-> ---
-> 
-> Notes:
->      Changes RFC -> V1:
->       * emit the instruction with MMU_PHYS_IDX instead of checking that the MMU
->         is enabled in get_physical_address(..)
-> 
->   target/sparc/translate.c | 5 +++++
->   1 file changed, 5 insertions(+)
-> 
-> diff --git a/target/sparc/translate.c b/target/sparc/translate.c
-> index 71e0853..5aa367a 100644
-> --- a/target/sparc/translate.c
-> +++ b/target/sparc/translate.c
-> @@ -2093,6 +2093,11 @@ static DisasASI get_asi(DisasContext *dc, int insn, TCGMemOp memop)
->               type = GET_ASI_BFILL;
->               break;
->           }
-> +
-> +        /* MMU_PHYS_IDX is used when the MMU is disabled to passthrough the
-> +         * permissions check in get_physical_address(..).
-> +         */
-> +        mem_idx = (dc->mem_idx == MMU_PHYS_IDX) ? MMU_PHYS_IDX : mem_idx;
->       } else {
->           gen_exception(dc, TT_PRIV_INSN);
->           type = GET_ASI_EXCP;
-> 
+If a reset happens before completion, virtio_net_tx_complete() will push
+async_tx.elem back to the guest anyway, and we end up with the inuse flag
+of the vq being equal to -1. The next call to virtqueue_pop() is then
+likely to fail with "Virtqueue size exceeded".
 
-Thanks Frederic, I've applied this to my qemu-sparc branch.
+This can be reproduced easily by starting a guest without a net backend,
+doing a system reset when it is booted, and finally snapshotting it.
 
+The appropriate fix is to ensure that such an asynchronous transmission
+cannot survive a device reset. So for all queues, we first try to send
+the packet again, and eventually we purge it if the backend still could
+not deliver it.
 
-ATB,
+Reported-by: R. Nageswara Sastry <nasastry@in.ibm.com>
+Buglink: https://github.com/open-power-host-os/qemu/issues/37
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/net/virtio-net.c |   11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-Mark.
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 188744e17d57..eea3cdb2c700 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -422,6 +422,7 @@ static RxFilterInfo *virtio_net_query_rxfilter(NetClientState *nc)
+ static void virtio_net_reset(VirtIODevice *vdev)
+ {
+     VirtIONet *n = VIRTIO_NET(vdev);
++    int i;
+ 
+     /* Reset back to compatibility mode */
+     n->promisc = 1;
+@@ -445,6 +446,16 @@ static void virtio_net_reset(VirtIODevice *vdev)
+     memcpy(&n->mac[0], &n->nic->conf->macaddr, sizeof(n->mac));
+     qemu_format_nic_info_str(qemu_get_queue(n->nic), n->mac);
+     memset(n->vlans, 0, MAX_VLAN >> 3);
++
++    /* Flush any async TX */
++    for (i = 0;  i < n->max_queues; i++) {
++        NetClientState *nc = qemu_get_subqueue(n->nic, i);
++
++        if (!qemu_net_queue_flush(nc->peer->incoming_queue)) {
++            qemu_net_queue_purge(nc->peer->incoming_queue, nc);
++        }
++        assert(!virtio_net_get_subqueue(nc)->async_tx.elem);
++    }
+ }
+ 
+ static void peer_test_vnet_hdr(VirtIONet *n)
