@@ -1,15 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1etYSs-0000kG-RC
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 07:46:43 -0500
+	(envelope-from <marc.zyngier@arm.com>) id 1etYU4-0001Of-2N
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 07:47:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1etYSn-0006NV-1J
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 07:46:38 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed,  7 Mar 2018 12:46:19 +0000
-Message-Id: <20180307124619.6218-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] block: make BDRV_POLL_WHILE() re-entrancy
- safe
+	(envelope-from <marc.zyngier@arm.com>) id 1etYU3-0006hC-Aa
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 07:47:52 -0500
+References: <000e01d3afad$b9a13830$2ce3a890$@codeaurora.org>
+	<20180227104708.GA11391@cbox>
+	<ac329e1b1f5265a805916ab4f8708f9d@codeaurora.org>
+	<20180227124604.GA2373@cbox>
+	<20180227132131.fipafmnb56a7fj76@kamzik.brq.redhat.com>
+	<20180301105030.2b716e68@redhat.com>
+	<CAFEAcA9yaU745Asy--jM0nu8FDJ62CEXSH_TKa-ZZfC16qye6w@mail.gmail.com>
+	<b049a501-cd5e-8c22-9c62-88c950e01b1b@redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Message-ID: <acd04e77-33c9-71f1-c140-1f9c20da8022@arm.com>
+Date: Wed, 7 Mar 2018 12:47:39 +0000
+MIME-Version: 1.0
+In-Reply-To: <b049a501-cd5e-8c22-9c62-88c950e01b1b@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-arm] VCPU hotplug on KVM/ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,122 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, "fuweiwei (C)" <fuweiwei2@huawei.com>
+To: David Hildenbrand <david@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>
+Cc: Christoffer Dall <cdall@cs.columbia.edu>, QEMU Developers <qemu-devel@nongnu.org>, Christoffer Dall <christofferdall@christofferdall.dk>, qemu-arm <qemu-arm@nongnu.org>, kvmarm@lists.cs.columbia.edu
 
-Nested BDRV_POLL_WHILE() calls can occur.  Currently
-assert(!wait_->wakeup) fails in AIO_WAIT_WHILE() when this happens.
+On 01/03/18 13:32, David Hildenbrand wrote:
+> On 01.03.2018 11:05, Peter Maydell wrote:
+>> On 1 March 2018 at 09:50, Igor Mammedov <imammedo@redhat.com> wrote:
+>>> In QEMU on x86 (and I think ppc, s390 as well), we create vCPUs on demand.>>
+>>> It would be nice if ARM would be able to do that too,
+>>> so that it could take advantage of the same code.
+>>
+>> It's not clear to me how that would work, given that for
+>> instance the interrupt controller wants to know up-front
+>> how many CPUs it has to deal with.
+>>
+> 
+> So how is cpu hotplug handled in HW? Or doesn't it even exist there?
 
-This patch converts the bool wait_->need_kick flag to an unsigned
-wait_->num_waiters counter.
+I don't know of any physical system offering that facility.
 
-Nesting works correctly because outer AIO_WAIT_WHILE() callers evaluate
-the condition again after the inner caller completes (invoking the inner
-caller counts as aio_poll() progress).
+> (we have max_cpus for the interrupt controller, but not sure if that is
+> what we want)
+We'd need something along those lines. Each CPU has a notional point to
+point link to the interrupt controller (to the redistributor, to be
+precise), and this entity must pre-exist.
 
-Reported-by: "fuweiwei (C)" <fuweiwei2@huawei.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
-v2:
- * Rebase onto qemu.git/master now that AIO_WAIT_WHILE() has landed
-   [Kevin]
+Thanks,
 
- include/block/aio-wait.h | 61 ++++++++++++++++++++++++------------------------
- util/aio-wait.c          |  2 +-
- 2 files changed, 31 insertions(+), 32 deletions(-)
-
-diff --git a/include/block/aio-wait.h b/include/block/aio-wait.h
-index a48c744fa8..74cde07bef 100644
---- a/include/block/aio-wait.h
-+++ b/include/block/aio-wait.h
-@@ -50,8 +50,8 @@
-  *   }
-  */
- typedef struct {
--    /* Is the main loop waiting for a kick?  Accessed with atomic ops. */
--    bool need_kick;
-+    /* Number of waiting AIO_WAIT_WHILE() callers. Accessed with atomic ops. */
-+    unsigned num_waiters;
- } AioWait;
- 
- /**
-@@ -71,35 +71,34 @@ typedef struct {
-  * wait on conditions between two IOThreads since that could lead to deadlock,
-  * go via the main loop instead.
-  */
--#define AIO_WAIT_WHILE(wait, ctx, cond) ({                  \
--    bool waited_ = false;                                   \
--    bool busy_ = true;                                      \
--    AioWait *wait_ = (wait);                                \
--    AioContext *ctx_ = (ctx);                               \
--    if (in_aio_context_home_thread(ctx_)) {                 \
--        while ((cond) || busy_) {                           \
--            busy_ = aio_poll(ctx_, (cond));                 \
--            waited_ |= !!(cond) | busy_;                    \
--        }                                                   \
--    } else {                                                \
--        assert(qemu_get_current_aio_context() ==            \
--               qemu_get_aio_context());                     \
--        assert(!wait_->need_kick);                          \
--        /* Set wait_->need_kick before evaluating cond.  */ \
--        atomic_mb_set(&wait_->need_kick, true);             \
--        while (busy_) {                                     \
--            if ((cond)) {                                   \
--                waited_ = busy_ = true;                     \
--                aio_context_release(ctx_);                  \
--                aio_poll(qemu_get_aio_context(), true);     \
--                aio_context_acquire(ctx_);                  \
--            } else {                                        \
--                busy_ = aio_poll(ctx_, false);              \
--                waited_ |= busy_;                           \
--            }                                               \
--        }                                                   \
--        atomic_set(&wait_->need_kick, false);               \
--    }                                                       \
-+#define AIO_WAIT_WHILE(wait, ctx, cond) ({                         \
-+    bool waited_ = false;                                          \
-+    bool busy_ = true;                                             \
-+    AioWait *wait_ = (wait);                                       \
-+    AioContext *ctx_ = (ctx);                                      \
-+    if (in_aio_context_home_thread(ctx_)) {                        \
-+        while ((cond) || busy_) {                                  \
-+            busy_ = aio_poll(ctx_, (cond));                        \
-+            waited_ |= !!(cond) | busy_;                           \
-+        }                                                          \
-+    } else {                                                       \
-+        assert(qemu_get_current_aio_context() ==                   \
-+               qemu_get_aio_context());                            \
-+        /* Increment wait_->num_waiters before evaluating cond. */ \
-+        atomic_inc(&wait_->num_waiters);                           \
-+        while (busy_) {                                            \
-+            if ((cond)) {                                          \
-+                waited_ = busy_ = true;                            \
-+                aio_context_release(ctx_);                         \
-+                aio_poll(qemu_get_aio_context(), true);            \
-+                aio_context_acquire(ctx_);                         \
-+            } else {                                               \
-+                busy_ = aio_poll(ctx_, false);                     \
-+                waited_ |= busy_;                                  \
-+            }                                                      \
-+        }                                                          \
-+        atomic_dec(&wait_->num_waiters);                           \
-+    }                                                              \
-     waited_; })
- 
- /**
-diff --git a/util/aio-wait.c b/util/aio-wait.c
-index a487cdb852..be85a32273 100644
---- a/util/aio-wait.c
-+++ b/util/aio-wait.c
-@@ -34,7 +34,7 @@ static void dummy_bh_cb(void *opaque)
- void aio_wait_kick(AioWait *wait)
- {
-     /* The barrier (or an atomic op) is in the caller.  */
--    if (atomic_read(&wait->need_kick)) {
-+    if (atomic_read(&wait->num_waiters)) {
-         aio_bh_schedule_oneshot(qemu_get_aio_context(), dummy_bh_cb, NULL);
-     }
- }
+	M.
 -- 
-2.14.3
+Jazz is not dead. It just smells funny...
