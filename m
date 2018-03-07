@@ -1,19 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1etUOG-0001pi-MO
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 03:25:37 -0500
+	(envelope-from <bounces@canonical.com>) id 1etUww-0000lD-LU
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 04:01:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1etUOD-0006lp-G7
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 03:25:36 -0500
-Received: from fanzine.igalia.com ([91.117.99.155]:54726)
+	(envelope-from <bounces@canonical.com>) id 1etUwt-0000p3-JZ
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 04:01:26 -0500
+Received: from indium.canonical.com ([91.189.90.7]:58350)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1etUOD-0006lW-3N
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 03:25:33 -0500
-From: Alberto Garcia <berto@igalia.com>
-Date: Wed,  7 Mar 2018 10:25:12 +0200
-Message-Id: <20180307082512.14203-1-berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2] iotests: Update 051 and 186 after commit
- 1454509726719e0933c
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1etUwt-0000og-DF
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 04:01:23 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1etUws-0008GW-6o
+	for <qemu-devel@nongnu.org>; Wed, 07 Mar 2018 09:01:22 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1B6272E80CD
+	for <qemu-devel@nongnu.org>; Wed,  7 Mar 2018 09:01:22 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 07 Mar 2018 08:51:12 -0000
+From: Cao Van Dong <1658120@bugs.launchpad.net>
+Reply-To: Bug 1658120 <1658120@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170120152141.14276.42073.malonedeb@soybean.canonical.com>
+Message-Id: <152041267242.7807.1797840678819358821.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1658120] Re: building with gcc-aarch64-linux-gnu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,118 +37,76 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-SCSI controllers are no longer created automatically for
--drive if=scsi, so this patch updates the tests that relied
-on that.
+Hello everyone!!
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- tests/qemu-iotests/051.pc.out | 20 --------------------
- tests/qemu-iotests/186        |  4 ----
- tests/qemu-iotests/186.out    | 28 ----------------------------
- 3 files changed, 52 deletions(-)
+I am having a issue when build qemu using gcc aarch64-linux-gnu-* on
+ubuntu 16.04:
 
-diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
-index 830c11880a..b01f9a90d7 100644
---- a/tests/qemu-iotests/051.pc.out
-+++ b/tests/qemu-iotests/051.pc.out
-@@ -117,20 +117,10 @@ Testing: -drive if=ide,media=cdrom
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) quit
- 
--Testing: -drive if=scsi,media=cdrom
--QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
--quit
--
- Testing: -drive if=ide
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) QEMU_PROG: Initialization of device ide-hd failed: Device needs media, but drive is empty
- 
--Testing: -drive if=scsi
--QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) QEMU_PROG: -drive if=scsi: warning: bus=0,unit=0 is deprecated with this machine type
--QEMU_PROG: -drive if=scsi: Device needs media, but drive is empty
--
- Testing: -drive if=virtio
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) QEMU_PROG: -drive if=virtio: Device needs media, but drive is empty
-@@ -170,20 +160,10 @@ Testing: -drive file=TEST_DIR/t.qcow2,if=ide,media=cdrom,readonly=on
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) quit
- 
--Testing: -drive file=TEST_DIR/t.qcow2,if=scsi,media=cdrom,readonly=on
--QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=scsi,media=cdrom,readonly=on: warning: bus=0,unit=0 is deprecated with this machine type
--quit
--
- Testing: -drive file=TEST_DIR/t.qcow2,if=ide,readonly=on
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) QEMU_PROG: Initialization of device ide-hd failed: Block node is read-only
- 
--Testing: -drive file=TEST_DIR/t.qcow2,if=scsi,readonly=on
--QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=scsi,readonly=on: warning: bus=0,unit=0 is deprecated with this machine type
--quit
--
- Testing: -drive file=TEST_DIR/t.qcow2,if=virtio,readonly=on
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) quit
-diff --git a/tests/qemu-iotests/186 b/tests/qemu-iotests/186
-index 44cc01ed87..9687243d34 100755
---- a/tests/qemu-iotests/186
-+++ b/tests/qemu-iotests/186
-@@ -133,10 +133,6 @@ check_info_block -drive if=ide,driver=null-co
- check_info_block -drive if=ide,media=cdrom
- check_info_block -drive if=ide,driver=null-co,media=cdrom
- 
--check_info_block -drive if=scsi,driver=null-co
--check_info_block -drive if=scsi,media=cdrom
--check_info_block -drive if=scsi,driver=null-co,media=cdrom
--
- check_info_block -drive if=virtio,driver=null-co
- 
- check_info_block -drive if=pflash,driver=null-co,size=1M
-diff --git a/tests/qemu-iotests/186.out b/tests/qemu-iotests/186.out
-index c8377fe146..ec75c0fc60 100644
---- a/tests/qemu-iotests/186.out
-+++ b/tests/qemu-iotests/186.out
-@@ -442,34 +442,6 @@ ide0-cd0 (NODE_NAME): null-co:// (null-co, read-only)
-     Cache mode:       writeback
- (qemu) quit
- 
--Testing: -drive if=scsi,driver=null-co
--QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) QEMU_PROG: -drive if=scsi,driver=null-co: warning: bus=0,unit=0 is deprecated with this machine type
--info block
--scsi0-hd0 (NODE_NAME): null-co:// (null-co)
--    Attached to:      /machine/unattached/device[27]/scsi.0/legacy[0]
--    Cache mode:       writeback
--(qemu) quit
--
--Testing: -drive if=scsi,media=cdrom
--QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
--info block
--scsi0-cd0: [not inserted]
--    Attached to:      /machine/unattached/device[27]/scsi.0/legacy[0]
--    Removable device: not locked, tray closed
--(qemu) quit
--
--Testing: -drive if=scsi,driver=null-co,media=cdrom
--QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) QEMU_PROG: -drive if=scsi,driver=null-co,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
--info block
--scsi0-cd0 (NODE_NAME): null-co:// (null-co, read-only)
--    Attached to:      /machine/unattached/device[27]/scsi.0/legacy[0]
--    Removable device: not locked, tray closed
--    Cache mode:       writeback
--(qemu) quit
--
- Testing: -drive if=virtio,driver=null-co
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
--- 
-2.11.0
+dong02@dong:~/qemu$ ./configure                                            =
+      \
+>     --prefix=3D/usr --cross-prefix=3D/usr/bin/aarch64-linux-gnu-   \
+>     --target-list=3Daarch64-softmmu                              \
+>     --enable-attr       --enable-fdt       --enable-kvm        \
+>     --enable-sdl        --enable-system    --enable-tools      \
+>     --audio-drv-list=3D                                          \
+>     --disable-bluez     --disable-brlapi   --disable-bsd-user  \
+>     --disable-cap-ng    --disable-curl     --disable-curses    \
+>     --disable-docs      --disable-libiscsi --disable-linux-aio \
+>     --disable-rbd       --disable-seccomp  --disable-slirp     \
+>     --disable-sparse    --disable-spice    --disable-strip     \
+>     --disable-usb-redir --disable-vde      --disable-virtfs    \
+>     --disable-vnc       --disable-werror   --disable-xen
+
+ERROR: zlib check failed
+       Make sure to have the zlib libs and headers installed.
+
+I installed zlib library: sudo apt-get install zlib1g-dev. However, result =
+no change
+Please help me!!
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1658120
+
+Title:
+  building with gcc-aarch64-linux-gnu
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  Hi, while trying to build qemu v2.8.0 with gcc-aarch64-linux-gnu
+  cross-compiler I'm getting the following :
+
+  =
+
+  In file included from /usr/include/x86_64-linux-gnu/sys/syscall.h:31:0,
+                   from /root/qemu/util/compatfd.c:21:
+  /root/qemu/util/compatfd.c: In function 'qemu_signalfd':
+  /root/qemu/util/compatfd.c:103:19: error: '__NR_signalfd' undeclared (fir=
+st use in this function)
+       ret =3D syscall(SYS_signalfd, -1, mask, _NSIG / 8);
+                     ^
+  /root/qemu/util/compatfd.c:103:19: note: each undeclared identifier is re=
+ported only once for each function it appears in
+  /root/qemu/rules.mak:59: recipe for target 'util/compatfd.o' failed
+  make: *** [util/compatfd.o] Error 1
+
+  =
+
+  I had configured it with :
+
+  ../configure --target-list=3Dx86_64-linux-user --static --cpu=3Daarch64
+
+  And I'm on :
+
+  Linux ubuntu-512mb-fra1-01 4.4.0-59-generic #80-Ubuntu SMP Fri Jan 6
+  17:47:47 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+
+  Thanks
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1658120/+subscriptions
