@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eteIY-0004gi-2M
+	(envelope-from <kwolf@redhat.com>) id 1eteIY-0004ga-1X
 	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 14:00:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eteIV-0004Vk-Vj
+	(envelope-from <kwolf@redhat.com>) id 1eteIV-0004Vc-S8
 	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 14:00:22 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed,  7 Mar 2018 19:59:15 +0100
-Message-Id: <20180307185946.29366-7-kwolf@redhat.com>
+Date: Wed,  7 Mar 2018 19:59:20 +0100
+Message-Id: <20180307185946.29366-12-kwolf@redhat.com>
 In-Reply-To: <20180307185946.29366-1-kwolf@redhat.com>
 References: <20180307185946.29366-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 06/37] qcow2: Use BlockdevRef in
- qcow2_co_create()
+Subject: [Qemu-devel] [PATCH v4 11/37] test-qemu-opts: Test
+ qemu_opts_to_qdict_filtered()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,211 +23,162 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
-Instead of passing a separate BlockDriverState* into qcow2_co_create(),
-make use of the BlockdevRef that is included in BlockdevCreateOptions.
-
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/block.h |  1 +
- block.c               | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- block/qcow2.c         | 39 +++++++++++++++++++++++++--------------
- 3 files changed, 73 insertions(+), 14 deletions(-)
+ tests/test-qemu-opts.c | 125 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 125 insertions(+)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 8b6db952a2..7805187b30 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -246,6 +246,7 @@ BdrvChild *bdrv_open_child(const char *filename,
-                            BlockDriverState* parent,
-                            const BdrvChildRole *child_role,
-                            bool allow_none, Error **errp);
-+BlockDriverState *bdrv_open_blockdev_ref(BlockdevRef *ref, Error **errp);
- void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd,
-                          Error **errp);
- int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
-diff --git a/block.c b/block.c
-index 8f1c43d037..4fc65f7621 100644
---- a/block.c
-+++ b/block.c
-@@ -34,6 +34,8 @@
+diff --git a/tests/test-qemu-opts.c b/tests/test-qemu-opts.c
+index 6c3183390b..2c422abcd4 100644
+--- a/tests/test-qemu-opts.c
++++ b/tests/test-qemu-opts.c
+@@ -10,6 +10,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu/cutils.h"
+ #include "qemu/option.h"
++#include "qemu/option_int.h"
+ #include "qapi/error.h"
  #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qjson.h"
  #include "qapi/qmp/qstring.h"
-+#include "qapi/qobject-output-visitor.h"
-+#include "qapi/qapi-visit-block-core.h"
- #include "sysemu/block-backend.h"
- #include "sysemu/sysemu.h"
- #include "qemu/notify.h"
-@@ -2406,6 +2408,51 @@ BdrvChild *bdrv_open_child(const char *filename,
-     return c;
+@@ -868,6 +869,127 @@ static void test_opts_append(void)
+     qemu_opts_free(merged);
  }
  
-+/* TODO Future callers may need to specify parent/child_role in order for
-+ * option inheritance to work. Existing callers use it for the root node. */
-+BlockDriverState *bdrv_open_blockdev_ref(BlockdevRef *ref, Error **errp)
++static void test_opts_to_qdict_basic(void)
 +{
-+    BlockDriverState *bs = NULL;
-+    Error *local_err = NULL;
-+    QObject *obj = NULL;
-+    QDict *qdict = NULL;
-+    const char *reference = NULL;
-+    Visitor *v = NULL;
++    QemuOpts *opts;
++    QDict *dict;
 +
-+    if (ref->type == QTYPE_QSTRING) {
-+        reference = ref->u.reference;
-+    } else {
-+        BlockdevOptions *options = &ref->u.definition;
-+        assert(ref->type == QTYPE_QDICT);
++    opts = qemu_opts_parse(&opts_list_01, "str1=foo,str2=,str3=bar,number1=42",
++                           false, &error_abort);
++    g_assert(opts != NULL);
 +
-+        v = qobject_output_visitor_new(&obj);
-+        visit_type_BlockdevOptions(v, NULL, &options, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            goto fail;
-+        }
-+        visit_complete(v, &obj);
++    dict = qemu_opts_to_qdict(opts, NULL);
++    g_assert(dict != NULL);
 +
-+        qdict = qobject_to_qdict(obj);
-+        qdict_flatten(qdict);
++    g_assert_cmpstr(qdict_get_str(dict, "str1"), ==, "foo");
++    g_assert_cmpstr(qdict_get_str(dict, "str2"), ==, "");
++    g_assert_cmpstr(qdict_get_str(dict, "str3"), ==, "bar");
++    g_assert_cmpstr(qdict_get_str(dict, "number1"), ==, "42");
++    g_assert_false(qdict_haskey(dict, "number2"));
 +
-+        /* bdrv_open_inherit() defaults to the values in bdrv_flags (for
-+         * compatibility with other callers) rather than what we want as the
-+         * real defaults. Apply the defaults here instead. */
-+        qdict_set_default_str(qdict, BDRV_OPT_CACHE_DIRECT, "off");
-+        qdict_set_default_str(qdict, BDRV_OPT_CACHE_NO_FLUSH, "off");
-+        qdict_set_default_str(qdict, BDRV_OPT_READ_ONLY, "off");
-+    }
-+
-+    bs = bdrv_open_inherit(NULL, reference, qdict, 0, NULL, NULL, errp);
-+    obj = NULL;
-+
-+fail:
-+    qobject_decref(obj);
-+    visit_free(v);
-+    return bs;
++    QDECREF(dict);
++    qemu_opts_del(opts);
 +}
 +
- static BlockDriverState *bdrv_append_temp_snapshot(BlockDriverState *bs,
-                                                    int flags,
-                                                    QDict *snapshot_options,
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 7679c28f57..b7df2d5cab 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2768,8 +2768,8 @@ static uint64_t qcow2_opt_get_refcount_bits_del(QemuOpts *opts, int version,
- }
- 
- static int coroutine_fn
--qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
--                QemuOpts *opts, const char *encryptfmt, Error **errp)
-+qcow2_co_create(BlockdevCreateOptions *create_options, QemuOpts *opts,
-+                const char *encryptfmt, Error **errp)
- {
-     BlockdevCreateOptionsQcow2 *qcow2_opts;
-     QDict *options;
-@@ -2786,7 +2786,8 @@ qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
-      * 2 GB for 64k clusters, and we don't want to have a 2 GB initial file
-      * size for any qcow2 image.
-      */
--    BlockBackend *blk;
-+    BlockBackend *blk = NULL;
-+    BlockDriverState *bs = NULL;
-     QCowHeader *header;
-     size_t cluster_size;
-     int version;
-@@ -2795,10 +2796,15 @@ qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
-     Error *local_err = NULL;
-     int ret;
- 
--    /* Validate options and set default values */
-     assert(create_options->driver == BLOCKDEV_DRIVER_QCOW2);
-     qcow2_opts = &create_options->u.qcow2;
- 
-+    bs = bdrv_open_blockdev_ref(qcow2_opts->file, errp);
-+    if (bs == NULL) {
-+        return -EIO;
-+    }
++static void test_opts_to_qdict_filtered(void)
++{
++    QemuOptsList *first, *merged;
++    QemuOpts *opts;
++    QDict *dict;
 +
-+    /* Validate options and set default values */
-     if (!QEMU_IS_ALIGNED(qcow2_opts->size, BDRV_SECTOR_SIZE)) {
-         error_setg(errp, "Image size must be a multiple of 512 bytes");
-         ret = -EINVAL;
-@@ -2827,7 +2833,8 @@ qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
-     }
++    first = qemu_opts_append(NULL, &opts_list_02);
++    merged = qemu_opts_append(first, &opts_list_01);
++
++    opts = qemu_opts_parse(merged,
++                           "str1=foo,str2=,str3=bar,bool1=off,number1=42",
++                           false, &error_abort);
++    g_assert(opts != NULL);
++
++    /* Convert to QDict without deleting from opts */
++    dict = qemu_opts_to_qdict_filtered(opts, NULL, &opts_list_01, false);
++    g_assert(dict != NULL);
++    g_assert_cmpstr(qdict_get_str(dict, "str1"), ==, "foo");
++    g_assert_cmpstr(qdict_get_str(dict, "str2"), ==, "");
++    g_assert_cmpstr(qdict_get_str(dict, "str3"), ==, "bar");
++    g_assert_cmpstr(qdict_get_str(dict, "number1"), ==, "42");
++    g_assert_false(qdict_haskey(dict, "number2"));
++    g_assert_false(qdict_haskey(dict, "bool1"));
++    QDECREF(dict);
++
++    dict = qemu_opts_to_qdict_filtered(opts, NULL, &opts_list_02, false);
++    g_assert(dict != NULL);
++    g_assert_cmpstr(qdict_get_str(dict, "str1"), ==, "foo");
++    g_assert_cmpstr(qdict_get_str(dict, "str2"), ==, "");
++    g_assert_cmpstr(qdict_get_str(dict, "bool1"), ==, "off");
++    g_assert_false(qdict_haskey(dict, "str3"));
++    g_assert_false(qdict_haskey(dict, "number1"));
++    g_assert_false(qdict_haskey(dict, "number2"));
++    QDECREF(dict);
++
++    /* Now delete converted options from opts */
++    dict = qemu_opts_to_qdict_filtered(opts, NULL, &opts_list_01, true);
++    g_assert(dict != NULL);
++    g_assert_cmpstr(qdict_get_str(dict, "str1"), ==, "foo");
++    g_assert_cmpstr(qdict_get_str(dict, "str2"), ==, "");
++    g_assert_cmpstr(qdict_get_str(dict, "str3"), ==, "bar");
++    g_assert_cmpstr(qdict_get_str(dict, "number1"), ==, "42");
++    g_assert_false(qdict_haskey(dict, "number2"));
++    g_assert_false(qdict_haskey(dict, "bool1"));
++    QDECREF(dict);
++
++    dict = qemu_opts_to_qdict_filtered(opts, NULL, &opts_list_02, true);
++    g_assert(dict != NULL);
++    g_assert_cmpstr(qdict_get_str(dict, "bool1"), ==, "off");
++    g_assert_false(qdict_haskey(dict, "str1"));
++    g_assert_false(qdict_haskey(dict, "str2"));
++    g_assert_false(qdict_haskey(dict, "str3"));
++    g_assert_false(qdict_haskey(dict, "number1"));
++    g_assert_false(qdict_haskey(dict, "number2"));
++    QDECREF(dict);
++
++    g_assert_true(QTAILQ_EMPTY(&opts->head));
++
++    qemu_opts_del(opts);
++    qemu_opts_free(merged);
++}
++
++static void test_opts_to_qdict_duplicates(void)
++{
++    QemuOpts *opts;
++    QemuOpt *opt;
++    QDict *dict;
++
++    opts = qemu_opts_parse(&opts_list_03, "foo=a,foo=b", false, &error_abort);
++    g_assert(opts != NULL);
++
++    /* Verify that opts has two options with the same name */
++    opt = QTAILQ_FIRST(&opts->head);
++    g_assert_cmpstr(opt->name, ==, "foo");
++    g_assert_cmpstr(opt->str , ==, "a");
++
++    opt = QTAILQ_NEXT(opt, next);
++    g_assert_cmpstr(opt->name, ==, "foo");
++    g_assert_cmpstr(opt->str , ==, "b");
++
++    opt = QTAILQ_NEXT(opt, next);
++    g_assert(opt == NULL);
++
++    /* In the conversion to QDict, the last one wins */
++    dict = qemu_opts_to_qdict(opts, NULL);
++    g_assert(dict != NULL);
++    g_assert_cmpstr(qdict_get_str(dict, "foo"), ==, "b");
++    QDECREF(dict);
++
++    /* The last one still wins if entries are deleted, and both are deleted */
++    dict = qemu_opts_to_qdict_filtered(opts, NULL, NULL, true);
++    g_assert(dict != NULL);
++    g_assert_cmpstr(qdict_get_str(dict, "foo"), ==, "b");
++    QDECREF(dict);
++
++    g_assert_true(QTAILQ_EMPTY(&opts->head));
++
++    qemu_opts_del(opts);
++}
  
-     if (!validate_cluster_size(cluster_size, errp)) {
--        return -EINVAL;
-+        ret = -EINVAL;
-+        goto out;
-     }
- 
-     if (!qcow2_opts->has_preallocation) {
-@@ -2838,11 +2845,13 @@ qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
-     {
-         error_setg(errp, "Backing file and preallocation cannot be used at "
-                    "the same time");
--        return -EINVAL;
-+        ret = -EINVAL;
-+        goto out;
-     }
-     if (qcow2_opts->has_backing_fmt && !qcow2_opts->has_backing_file) {
-         error_setg(errp, "Backing format cannot be used without backing file");
--        return -EINVAL;
-+        ret = -EINVAL;
-+        goto out;
-     }
- 
-     if (!qcow2_opts->has_lazy_refcounts) {
-@@ -2851,7 +2860,8 @@ qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
-     if (version < 3 && qcow2_opts->lazy_refcounts) {
-         error_setg(errp, "Lazy refcounts only supported with compatibility "
-                    "level 1.1 and above (use compat=1.1 or greater)");
--        return -EINVAL;
-+        ret = -EINVAL;
-+        goto out;
-     }
- 
-     if (!qcow2_opts->has_refcount_bits) {
-@@ -2862,13 +2872,15 @@ qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
-     {
-         error_setg(errp, "Refcount width must be a power of two and may not "
-                    "exceed 64 bits");
--        return -EINVAL;
-+        ret = -EINVAL;
-+        goto out;
-     }
-     if (version < 3 && qcow2_opts->refcount_bits != 16) {
-         error_setg(errp, "Different refcount widths than 16 bits require "
-                    "compatibility level 1.1 or above (use compat=1.1 or "
-                    "greater)");
--        return -EINVAL;
-+        ret = -EINVAL;
-+        goto out;
-     }
-     refcount_order = ctz32(qcow2_opts->refcount_bits);
- 
-@@ -3026,9 +3038,8 @@ qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
- 
-     ret = 0;
- out:
--    if (blk) {
--        blk_unref(blk);
--    }
-+    blk_unref(blk);
-+    bdrv_unref(bs);
-     return ret;
+ int main(int argc, char *argv[])
+ {
+@@ -889,6 +1011,9 @@ int main(int argc, char *argv[])
+     g_test_add_func("/qemu-opts/opts_parse/size", test_opts_parse_size);
+     g_test_add_func("/qemu-opts/append_to_null", test_opts_append_to_null);
+     g_test_add_func("/qemu-opts/append", test_opts_append);
++    g_test_add_func("/qemu-opts/to_qdict/basic", test_opts_to_qdict_basic);
++    g_test_add_func("/qemu-opts/to_qdict/filtered", test_opts_to_qdict_filtered);
++    g_test_add_func("/qemu-opts/to_qdict/duplicates", test_opts_to_qdict_duplicates);
+     g_test_run();
+     return 0;
  }
- 
-@@ -3157,7 +3168,7 @@ static int coroutine_fn qcow2_co_create_opts(const char *filename, QemuOpts *opt
-             .refcount_bits      = refcount_bits,
-         },
-     };
--    ret = qcow2_co_create(bs, &create_options, opts, encryptfmt, errp);
-+    ret = qcow2_co_create(&create_options, opts, encryptfmt, errp);
-     if (ret < 0) {
-         goto finish;
-     }
 -- 
 2.13.6
