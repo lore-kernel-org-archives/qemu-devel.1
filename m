@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jack.schwartz@oracle.com>) id 1etOFp-0005Eb-MM
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 20:52:30 -0500
+	(envelope-from <kevin.tian@intel.com>) id 1etOYW-0000aN-5a
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 21:11:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jack.schwartz@oracle.com>) id 1etOFl-0005Zz-Oc
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 20:52:29 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:41914)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jack.schwartz@oracle.com>)
-	id 1etOFl-0005Xo-FA
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 20:52:25 -0500
-From: Jack Schwartz <jack.schwartz@oracle.com>
-References: <1513877118-3149-1-git-send-email-jack.schwartz@oracle.com>
-	<20180115155413.GJ32271@localhost.localdomain>
-	<45620ce8-23c6-3ad5-2393-a5f48c2a9f58@oracle.com>
-	<20180305081302.GA4789@localhost.localdomain>
-Message-ID: <8cfdcb24-5137-a7e6-91de-ab705a22bd78@oracle.com>
-Date: Tue, 6 Mar 2018 17:52:08 -0800
-MIME-Version: 1.0
-In-Reply-To: <20180305081302.GA4789@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <kevin.tian@intel.com>) id 1etOYS-0004MI-U4
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 21:11:48 -0500
+Received: from mga06.intel.com ([134.134.136.31]:46957)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
+	id 1etOYS-0004LI-I1
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 21:11:44 -0500
+From: "Tian, Kevin" <kevin.tian@intel.com>
+Date: Wed, 7 Mar 2018 02:11:36 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19102DB8C@SHSMSX101.ccr.corp.intel.com>
+References: <1520229653-10658-1-git-send-email-yulei.zhang@intel.com>
+	<077d834a-b32b-8ab0-d2b5-264d4eefbc70@nvidia.com>
+	<01FDBDDE256B79498DC57789713132D46A0779DA@SHSMSX101.ccr.corp.intel.com>
+In-Reply-To: <01FDBDDE256B79498DC57789713132D46A0779DA@SHSMSX101.ccr.corp.intel.com>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH QEMU v1 0/4] multiboot: bss_end_addr can be
- zero / cleanup
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH V3 0/4] vfio: Introduce Live migration
+ capability to vfio_mdev device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,85 +31,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, Anatol Pomozov <anatol.pomozov@gmail.com>, konrad.wilk@oracle.com, daniel.kiper@oracle.com, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ppandit@redhat.com
+To: "Zhang, Yulei" <yulei.zhang@intel.com>, Kirti Wankhede <kwankhede@nvidia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>
 
-Hi Kevin and everyone.
-
-On 2018-03-05 00:13, Kevin Wolf wrote:
-> Am 02.03.2018 um 20:32 hat Jack Schwartz geschrieben:
->> Hi Kevin.
->>
->> On 2018-01-15 07:54, Kevin Wolf wrote:
->>> Am 21.12.2017 um 18:25 hat Jack Schwartz geschrieben:
->>>> Properly account for the possibility of multiboot kernels with a zer=
-o
->>>> bss_end_addr.  The Multiboot Specification, section 3.1.3 allows for
->>>> kernels without a bss section, by allowing a zeroed bss_end_addr mul=
-tiboot
->>>> header field.
->>>>
->>>> Do some cleanup to multiboot.c as well:
->>>> - Remove some unused variables.
->>>> - Use more intuitive header names when displaying fields in messages.
->>>> - Change fprintf(stderr...) to error_report
->>> There are some conflicts with Anatol's (CCed) multiboot series:
->>> https://lists.nongnu.org/archive/html/qemu-devel/2017-10/msg03003.htm=
-l
->>>
->>> None if these should be hard to resolve, but it would be good if you
->>> could agree with each other whose patch series should come first, and
->>> then the other one should be rebased on top of that.
->>>
->>>> Testing:
->>>>     1) Ran the "make check" test suite.
->>>>     2) Booted multiboot kernel with bss_end_addr=3D0.  (I rolled my =
-own
->>>>        grub multiboot.elf test "kernel" by modifying source.)  Verif=
-ied
->>>>        with gdb that new code that reads addresses/offsets from mult=
-iboot
->>>>        header was accessed.
->>>>     3) Booted multiboot kernel with non-zero bss_end_addr.
->>>>     4) Uncommented DEBUG_MULTIBOOT in multiboot.c and verified messa=
-ges worked.
->>>>     5) Code has soaked in an internal repo for two months.
->>> Can you integrate your test kernel from 2) in tests/multiboot/ so we =
-can
->>> keep this as a regression test?
->> If need be, would you be willing to accept updated versions of these p=
-atches
->> (with another review, of course) without the test file?=C2=A0 I will d=
-eliver the
->> test file later once I get company approvals.=C2=A0 I don't want the t=
-est file to
->> continue holding everything up in the meantime.
-> Sure, let's move forward with what we have now. Please keep me CCed whe=
-n
-> you send a new version and I'll give it a review and hopeuflly get it
-> merged.
->
-> Kevin
-Thanks, Kevin.
-
-Patches have not changed, and I verified they still work on a current=20
-repo.=C2=A0 (Multiboot.c has had a one-line change regarding a header fil=
-e,=20
-so I rebuilt and re-tested to make sure.)
-
-Links again, for your reference:
-
-1/4 multiboot: bss_end_addr can be zero
-http://patchwork.ozlabs.org/patch/852049/
-
-2/4 multiboot: Remove unused variables from multiboot.c
-http://patchwork.ozlabs.org/patch/852045/
-
-3/4 multiboot: Use header names when displaying fields
-http://patchwork.ozlabs.org/patch/852046/
-
-4/4 multiboot: fprintf(stderr...) -> error_report()
-http://patchwork.ozlabs.org/patch/852051/
-
- =C2=A0=C2=A0=C2=A0 Thanks,
- =C2=A0=C2=A0=C2=A0 Jack
+PiBGcm9tOiBaaGFuZywgWXVsZWkNCj4gU2VudDogVHVlc2RheSwgTWFyY2ggNiwgMjAxOCA5OjM1
+IFBNDQo+IA0KPiBIaSBLaXJ0aSwNCj4gDQo+IFllcywgdGhhdCBpcyB0aGUgcGxhbiBhbmQgd2Ug
+d2lsbCBhZGRyZXNzIGl0IGluIHRoZSBjb21pbmcgdmVyc2lvbnMuDQo+IEluIHRoaXMgdmVyc2lv
+biB3ZSBqdXN0IHJlYmFzZSB0aGUgY29kZSBhbmQgbG9va2luZyBmb3IgbW9yZSBpbnB1dHMuDQoN
+Ckl0J3Mgbm90IGhvdyBhIG5ldyB2ZXJzaW9uIGlzIGV4cGVjdGVkIHRvIHByb3ZpZGUuIEZvciBy
+ZXZpZXcNCmNvbW1lbnRzIHdoaWNoIHlvdSByZWNlaXZlZCBmcm9tIHByZXZpb3VzIHZlcnNpb25z
+LCB5b3UgbmVlZA0KZWNobyB0aGVtIGluIHRoZSBuZXcgdmVyc2lvbiB3aGVyZSAnZWNobycgbWVh
+bnMgZWl0aGVyIGZpeCBhbmQgbGlzdA0KaW4gY2hhbmdlIGxpc3Qgb3IgcHJvdmlkaW5nIGEgVE9E
+TyBsaXN0IGZvciB1bmhhbmRsZWQgY29tbWVudHMgDQpzbyByZXZpZXdlcnMga25vdyB3aGF0IHRv
+IGZ1cnRoZXIgbG9vayBhdC4gQWxzbyByZWJhc2UgdXN1YWxseQ0KZG9lc24ndCBiZWFyIGEgbmV3
+IHZlcnNpb24uLi4NCg0KYnR3IHdoZW4gZGVzY3JpYmluZyBjaGFuZ2UgbGlzdCBvZiB2ZXJzaW9u
+IGhpc3RvcnksIHBsZWFzZSB1c2UgdjItPnYzDQppbnN0ZWFkIG9mIHZpY2UgdmVyc2EuDQoNClRo
+YW5rcw0KS2V2aW4NCg0KPiANCj4gVGhhbmtzLA0KPiBZdWxlaQ0KPiANCj4gPiAtLS0tLU9yaWdp
+bmFsIE1lc3NhZ2UtLS0tLQ0KPiA+IEZyb206IEtpcnRpIFdhbmtoZWRlIFttYWlsdG86a3dhbmto
+ZWRlQG52aWRpYS5jb21dDQo+ID4gU2VudDogTW9uZGF5LCBNYXJjaCA1LCAyMDE4IDk6MDMgUE0N
+Cj4gPiBUbzogWmhhbmcsIFl1bGVpIDx5dWxlaS56aGFuZ0BpbnRlbC5jb20+OyBxZW11LWRldmVs
+QG5vbmdudS5vcmcNCj4gPiBDYzogVGlhbiwgS2V2aW4gPGtldmluLnRpYW5AaW50ZWwuY29tPjsg
+emhlbnl1d0BsaW51eC5pbnRlbC5jb207DQo+ID4gYWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20N
+Cj4gPiBTdWJqZWN0OiBSZTogW1BBVENIIFYzIDAvNF0gdmZpbzogSW50cm9kdWNlIExpdmUgbWln
+cmF0aW9uIGNhcGFiaWxpdHkgdG8NCj4gPiB2ZmlvX21kZXYgZGV2aWNlDQo+ID4NCj4gPiBIaSBZ
+dWxlaSBaaGFuZywNCj4gPg0KPiA+IFRoaXMgc2VyaWVzIGlzIHNhbWUgYXMgdGhlIHByZXZpb3Vz
+IHZlcnNpb24sIHRoYXQgaXMsIHRoZXJlIGlzIG5vIHByZS1jb3B5DQo+ID4gcGhhc2UuIFRoaXMg
+b25seSB0YWtlcyBjYXJlIG9mIHN0b3AtYW5kLWNvcHkgcGhhc2UuDQo+ID4gQXMgcGVyIHdlIGRp
+c2N1c3NlZCBpbiBLVk0gRm9ydW0gMjAxNyBpbiBPY3RvYmVyLCB0aGVyZSBzaG91bGQgYmUNCj4g
+PiBwcm92aXNpb24gb2YgcHJlLWNvcHkgcGhhc2UuDQo+ID4NCj4gPiBUaGFua3MsDQo+ID4gS2ly
+dGkNCj4gPg0KPiA+IE9uIDMvNS8yMDE4IDExOjMwIEFNLCBZdWxlaSBaaGFuZyB3cm90ZToNCj4g
+PiA+IFN1bW1hcnkNCj4gPiA+DQo+ID4gPiBUaGlzIHNlcmllcyBSRkMgd291bGQgbGlrZSB0byBy
+ZXN1bWUgdGhlIGRpc2N1c3Npb24gYWJvdXQgaG93IHRvDQo+ID4gPiBpbnRyb2R1Y2UgdGhlIGxp
+dmUgbWlncmF0aW9uIGNhcGFiaWxpdHkgdG8gdmZpbyBtZGV2IGRldmljZS4NCj4gPiA+DQo+ID4g
+PiBCeSBhZGRpbmcgYSBuZXcgdmZpbyBzdWJ0eXBlIHJlZ2lvbg0KPiA+IFZGSU9fUkVHSU9OX1NV
+QlRZUEVfREVWSUNFX1NUQVRFLA0KPiA+ID4gdGhlIG1kZXYgZGV2aWNlIHdpbGwgYmUgc2V0IHRv
+IG1pZ3JhdGFibGUgaWYgdGhlIG5ldyByZWdpb24gZXhpc3QNCj4gPiA+IGR1cmluZyB0aGUgaW5p
+dGlhbGl6YXRpb24uDQo+ID4gPg0KPiA+ID4gVGhlIGludGVudGlvbiB0byBhZGQgdGhlIG5ldyBy
+ZWdpb24gaXMgdXNpbmcgaXQgZm9yIG1kZXYgZGV2aWNlIHN0YXR1cw0KPiA+ID4gc2F2ZSBhbmQg
+cmVzdG9yZSBkdXJpbmcgdGhlIG1pZ3JhdGlvbi4gVGhlIGFjY2VzcyB0byB0aGlzIHJlZ2lvbiB3
+aWxsDQo+ID4gPiBiZSB0cmFwcGVkIGFuZCBmb3J3YXJkIHRvIHRoZSBtZGV2IGRldmljZSBkcml2
+ZXIsIGl0IGFsc28gdXNlcyB0aGUNCj4gPiA+IGZpcnN0IGJ5dGUgaW4gdGhlIG5ldyByZWdpb24g
+dG8gY29udHJvbCB0aGUgcnVubmluZyBzdGF0ZSBvZiBtZGV2DQo+ID4gPiBkZXZpY2UsIHNvIGR1
+cmluZyB0aGUgbWlncmF0aW9uIGFmdGVyIHN0b3AgdGhlIG1kZXYgZHJpdmVyLCBxZW11IGNvdWxk
+DQo+ID4gPiByZXRyaWV2ZSB0aGUgc3BlY2lmaWMgZGV2aWNlIHN0YXR1cyBmcm9tIHRoaXMgcmVn
+aW9uIGFuZCB0cmFuc2ZlciB0bw0KPiA+ID4gdGhlIHRhcmdldCBWTSBzaWRlIGZvciB0aGUgbWRl
+diBkZXZpY2UgcmVzdG9yZS4NCj4gPiA+DQo+ID4gPiBJbiBhZGRpdGlvbiwgIHdlIGFkZCBvbmUg
+bmV3IGlvY3RsIFZGSU9fSU9NTVVfR0VUX0RJUlRZX0JJVE1BUA0KPiB0bw0KPiA+IGhlbHANCj4g
+PiA+IGRvIHRoZSBtZGV2IGRldmljZSBkaXJ0eSBwYWdlIHN5bmNocm9uaXphdGlvbiBkdXJpbmcg
+dGhlIG1pZ3JhdGlvbiwNCj4gPiA+IGN1cnJlbnRseSBpdCBpcyBqdXN0IGZvciBzdGF0aWMgY29w
+eSwgaW4gdGhlIGZ1dHVyZSB3ZSB3b3VsZCBsaWtlIHRvDQo+ID4gPiBhZGQgbmV3IGludGVyZmFj
+ZSBmb3IgdGhlIHByZS1jb3B5Lg0KPiA+ID4NCj4gPiA+IEJlbG93IGlzIHRoZSB2ZmlvX21kZXYg
+ZGV2aWNlIG1pZ3JhdGlvbiBzZXF1ZW5jZSBTb3VyY2UgVk0gc2lkZToNCj4gPiA+IAkJCXN0YXJ0
+IG1pZ3JhdGlvbg0KPiA+ID4gCQkJCXwNCj4gPiA+IAkJCQlWDQo+ID4gPiAgICAgICAgIAkgZ2V0
+IHRoZSBjcHUgc3RhdGUgY2hhbmdlIGNhbGxiYWNrLCB3cml0ZSB0byB0aGUNCj4gPiA+ICAgICAg
+ICAgCSBzdWJyZWdpb24ncyBmaXJzdCBieXRlIHRvIHN0b3AgdGhlIG1kZXYgZGV2aWNlDQo+ID4g
+PiAJCQkJfA0KPiA+ID4gCQkJCVYNCj4gPiA+IAkJIHF1YXJ5IHRoZSBkaXJ0eSBwYWdlIGJpdG1h
+cCBmcm9tIGlvbW11IGNvbnRhaW5lcg0KPiA+ID4gCQkgYW5kIGFkZCBpbnRvIHFlbXUgZGlydHkg
+bGlzdCBmb3Igc3luY2hyb25pemF0aW9uDQo+ID4gPiAJCQkJfA0KPiA+ID4gCQkJCVYNCj4gPiA+
+IAkJIHNhdmUgdGhlIGRlaXZjZSBzdGF0dXMgaW50byBRZW11ZmlsZSB3aGljaCBpcw0KPiA+ID4g
+ICAgICAgICAgICAgICAgICAgICAgcmVhZCBmcm9tIHRoZSB2ZmlvIGRldmljZSBzdWJyZWdpb24N
+Cj4gPiA+DQo+ID4gPiBUYXJnZXQgVk0gc2lkZToNCj4gPiA+IAkJICAgcmVzdG9yZSB0aGUgbWRl
+diBkZXZpY2UgYWZ0ZXIgZ2V0IHRoZQ0KPiA+ID4gCQkgICAgIHNhdmVkIHN0YXR1cyBjb250ZXh0
+IGZyb20gUWVtdWZpbGUNCj4gPiA+IAkJCQl8DQo+ID4gPiAJCQkJVg0KPiA+ID4gCQkgICAgIGdl
+dCB0aGUgY3B1IHN0YXRlIGNoYW5nZSBjYWxsYmFjaw0KPiA+ID4gIAkJICAgICB3cml0ZSB0byBz
+dWJyZWdpb24ncyBmaXJzdCBieXRlIHRvDQo+ID4gPiAgICAgICAgICAgICAgICAgICAgICAgc3Rh
+cnQgdGhlIG1kZXYgZGV2aWNlIHRvIHB1dCBpdCBpbg0KPiA+ID4gICAgICAgICAgICAgICAgICAg
+ICAgIHJ1bm5pbmcgc3RhdHVzDQo+ID4gPiAJCQkJfA0KPiA+ID4gCQkJCVYNCj4gPiA+IAkJCWZp
+bmlzaCBtaWdyYXRpb24NCj4gPiA+DQo+ID4gPiBWMy0+VjI6DQo+ID4gPiAxLiByZWJhc2UgdGhl
+IHBhdGNoIHRvIFFlbXUgc3RhYmxlIDIuMTAgYnJhbmNoLg0KPiA+ID4gMi4gdXNlIGEgY29tbW9u
+IG5hbWUgZm9yIHRoZSBzdWJyZWdpb24gaW5zdGVhZCBvZiBzcGVjaWZpYyBmb3INCj4gPiA+ICAg
+IGludGVsIElHRC4NCj4gPiA+DQo+ID4gPiBWMS0+VjI6DQo+ID4gPiBQZXIgQWxleCdzIHN1Z2dl
+c3Rpb246DQo+ID4gPiAxLiB1c2UgZGV2aWNlIHN1YnR5cGUgcmVnaW9uIGluc3RlYWQgb2YgVkZJ
+TyBQQ0kgZml4ZWQgcmVnaW9uLg0KPiA+ID4gMi4gcmVtb3ZlIHVubmVjZXNzYXJ5IGlvY3RsLCB1
+c2UgdGhlIGZpcnN0IGJ5dGUgb2Ygc3VicmVnaW9uIHRvDQo+ID4gPiAgICBjb250cm9sIHRoZSBy
+dW5uaW5nIHN0YXRlIG9mIG1kZXYgZGV2aWNlLg0KPiA+ID4gMy4gZm9yIGRpcnR5IHBhZ2Ugc3lu
+Y2hyb25pemF0aW9uLCBpbXBsZW1lbnQgdGhlIGludGVyZmFjZSB3aXRoDQo+ID4gPiAgICBWRklP
+Q29udGFpbmVyIGluc3RlYWQgb2YgdmZpbyBwY2kgZGV2aWNlLg0KPiA+ID4NCj4gPiA+IFl1bGVp
+IFpoYW5nICg0KToNCj4gPiA+ICAgdmZpbzogaW50cm9kdWNlIGEgbmV3IFZGSU8gc3VicmVnaW9u
+IGZvciBtZGV2IGRldmljZSBtaWdyYXRpb24NCj4gc3VwcG9ydA0KPiA+ID4gICB2ZmlvOiBBZGQg
+dm0gc3RhdHVzIGNoYW5nZSBjYWxsYmFjayB0byBzdG9wL3Jlc3RhcnQgdGhlIG1kZXYgZGV2aWNl
+DQo+ID4gPiAgIHZmaW86IEFkZCBzdHJ1Y3QgdmZpb192bXN0YXRlX2luZm8gdG8gaW50cm9kdWNl
+IHB1dC9nZXQgY2FsbGJhY2sNCj4gPiA+ICAgICBmdW50aW9uIGZvciB2ZmlvIGRldmljZSBzdGF0
+dXMgc2F2ZS9yZXN0b3JlDQo+ID4gPiAgIHZpZm86IGludHJvZHVjZSBuZXcgVkZJTyBpb2N0bCBW
+RklPX0lPTU1VX0dFVF9ESVJUWV9CSVRNQVANCj4gPiA+DQo+ID4gPiAgaHcvdmZpby9jb21tb24u
+YyAgICAgICAgICAgICAgfCAgMzQgKysrKysrKysrDQo+ID4gPiAgaHcvdmZpby9wY2kuYyAgICAg
+ICAgICAgICAgICAgfCAxNzENCj4gPiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKy0NCj4gPiA+ICBody92ZmlvL3BjaS5oICAgICAgICAgICAgICAgICB8ICAgMSArDQo+
+ID4gPiAgaW5jbHVkZS9ody92ZmlvL3ZmaW8tY29tbW9uLmggfCAgIDEgKw0KPiA+ID4gIGxpbnV4
+LWhlYWRlcnMvbGludXgvdmZpby5oICAgIHwgIDI5ICsrKysrKy0NCj4gPiA+ICA1IGZpbGVzIGNo
+YW5nZWQsIDIzMiBpbnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygtKQ0KPiA+ID4NCg==
