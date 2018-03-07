@@ -1,15 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1etZyN-0002dU-6G
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 09:23:16 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eta34-0004RW-ND
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 09:28:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1etZyK-00040L-1F
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 09:23:15 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed,  7 Mar 2018 15:22:54 +0100
-Message-Id: <1520432574-20615-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/misc/macio: Mark the macio devices with
- user_creatable = false
+	(envelope-from <borntraeger@de.ibm.com>) id 1eta31-00070h-HF
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 09:28:06 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56712)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eta31-00070C-8y
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 09:28:03 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w27EPWvF130773
+	for <qemu-devel@nongnu.org>; Wed, 7 Mar 2018 09:28:00 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2gjfev73ru-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 07 Mar 2018 09:28:00 -0500
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 7 Mar 2018 14:27:57 -0000
+References: <1519746259-27710-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<d4d35d0e-b8a4-f30f-f9ad-71c405e80d18@redhat.com>
+	<555a7ff8-d724-f040-4ade-3fd4aceaca7d@linux.vnet.ibm.com>
+	<4b9bb4fd-d34e-9f46-5414-d6c14e9a6ce8@redhat.com>
+	<82740dc5-7213-62b3-5b1c-37e287c31d60@linux.vnet.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed, 7 Mar 2018 15:27:52 +0100
+MIME-Version: 1.0
+In-Reply-To: <82740dc5-7213-62b3-5b1c-37e287c31d60@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <44780285-0240-3187-ac5c-5f60b22f6303@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] s390x: vfio-ap: guest dedicated
+ crypto adapters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,38 +46,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Pierre Morel <pmorel@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, cohuck@redhat.com, bjsdjshi@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
 
-The macio devices currently cause a crash when the user tries to
-instantiate them on a different machine:
 
-$ ppc64-softmmu/qemu-system-ppc64 -device macio-newworld
-Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:222:
-qemu-system-ppc64: -device macio-newworld: Device 'serial0' is in use
-Aborted (core dumped)
 
-These devices are clearly not intended to be creatable by the user
-since they are using serial_hds[] directly in their instance_init
-function. So let's mark them with user_creatable = false.
+On 03/07/2018 11:22 AM, Pierre Morel wrote:
+> On 06/03/2018 18:10, David Hildenbrand wrote:
+>>> If L2 forward devices to L3 through SIE ECA.28 but no bit is set is in
+>>> the CRYCB of L2,
+>>> L3 will not see any device.
+>> Exactly and this is the problem: How should L2 know that these devices
+>> are special and cannot be forwarded.
+>>
+>>>> This is what we call the nightmare of nested virtualization (see x86),
+>>>> because we have to emulate L3 instructions in L1 - but even worse, not
+>>>> even in L1 kernel space but in L1 user space.
+>>> As soon as one level begin to virtualize, all levels under it
+>>> must virtualize too so that L3 instructions will be handled in L2
+>>> which will issue instructions that will be handled in L1.
+>> By virtualize I assume you mean emulate? If so, yes.
+>>
+>>>> So we could never provide the AP feature reliably with the SIE feature.
+>>> I think we should change a little this sentence to:
+>>> We can not provide SIE interpretation to a guest from which
+>>> any guest level N-1 does not use SIE interpretation.
+>> Exactly, and as said, there is no way to tell a guest that it has AP but
+>> cannot use AP interpretation but has to intercept and handle manually.
+> 
+> 
+> vSIE must clear ECA28 during running of the guest if the host itself do not have ECA28 set.
+> Since ECA28 set for the host means AP instructions available for the host
+> then we can sum it up by: vSIE should never set ECA28 in the shadow SIE
+> if no AP instructions available.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/misc/macio/macio.c | 2 ++
- 1 file changed, 2 insertions(+)
+To say it differently, architecturally ECA28 is an effective control so we might
+put the burden on the guest2 by saying even it you set eca.28 you might still
+get exits for NQAP,PQAP,DQAP and handle it appropriately.
 
-diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-index af1bd46..454244f 100644
---- a/hw/misc/macio/macio.c
-+++ b/hw/misc/macio/macio.c
-@@ -406,6 +406,8 @@ static void macio_class_init(ObjectClass *klass, void *data)
-     k->class_id = PCI_CLASS_OTHERS << 8;
-     dc->props = macio_properties;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-+    /* Reason: Uses serial_hds in macio_instance_init */
-+    dc->user_creatable = false;
- }
- 
- static const TypeInfo macio_oldworld_type_info = {
--- 
-1.8.3.1
+
+> 
+> Pierre
+> 
+> 
+>>
+>>> Nothing bad will occur for the host, the hardware or other guests,
+>>> but the guest will just not get any device.
+>>>
+>>>> We want to avoid interdependence between CPU features. (because
+>>>> everything else makes CPU feature detection ugly - CMMA is a good
+>>>> example and the only exception so far)
+>>>>
+>>>>
+>>>> Long story even shorter:
+>>>>
+>>>> No emulated AP devices with KVM.
+>>>>
+>>> I agree with: KVM should never set bits in CRYCB for emulated devices.
+>> I think this is stronger: emulated AP devices should not be used with
+>> KVM because it can potentially lead to architectural (v)SIE conflicts.
+>>
+>> But the details are buried in some AP documentation not accessible to me.
+>>
+>> Anyhow, if the scenario I described cannot be worked around via:
+>>
+>> a) telling a guest that AP virtualization cannot be used - which doesn't
+>> seem to be possible
+>> b) provoking for selected devices a SIE exit when an AP instruction is
+>> executed on these devices - and this is totally fine with the documented
+>> AP architecture
+>>
+>> I assume we would have to live with !emualted AP devices.
+>>
+> 
