@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1etcHx-00052D-Rg
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:51:42 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1etcIl-0005nu-1o
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:52:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1etcHt-0008Uj-Nj
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:51:37 -0500
-Received: from mail-bl2nam02on0074.outbound.protection.outlook.com
-	([104.47.38.74]:55741
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1etcHt-0008US-I7
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:51:33 -0500
-From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Wed,  7 Mar 2018 10:50:38 -0600
-Message-ID: <20180307165038.88640-29-brijesh.singh@amd.com>
-In-Reply-To: <20180307165038.88640-1-brijesh.singh@amd.com>
-References: <20180307165038.88640-1-brijesh.singh@amd.com>
+	(envelope-from <pbonzini@redhat.com>) id 1etcIh-0000QC-3q
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:52:27 -0500
+Received: from mail-wr0-f180.google.com ([209.85.128.180]:37004)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1etcIg-0000Pk-T6
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:52:23 -0500
+Received: by mail-wr0-f180.google.com with SMTP id z12so2872607wrg.4
+	for <qemu-devel@nongnu.org>; Wed, 07 Mar 2018 08:52:22 -0800 (PST)
+References: <20180305211928.466-1-f4bug@amsat.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f185bbb8-e7cd-b90a-da57-9dcbabecb1f2@redhat.com>
+Date: Wed, 7 Mar 2018 17:52:19 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v11 28/28] tests/qmp-test: blacklist sev
- specific qmp commands
+In-Reply-To: <20180305211928.466-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH v2 00/22] remove i386/pc dependency:
+ generic SuperIO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +30,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Michael S . Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Marcel Apfelbaum <marcel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alexey Kardashevskiy <aik@ozlabs.ru>, Thomas Huth <thuth@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Guan Xuetao <gxt@mprc.pku.edu.cn>, Yongbok Kim <yongbok.kim@mips.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-Blacklist the following commands to fix the 'make check' failure.
+On 05/03/2018 22:19, Philippe Mathieu-Daudé wrote:
+> Since v1:
+> - complete rewrite, split out the PIIX devices for another series
+> 
+> In this rewrite I extract the common SuperIO code from pc87312.c; use it in
+> few MIPS boards; then as example, easily add a new SuperIO chipset (SMC37C669)
+> to the dp264 machine.
+> 
+> More devices are being converted but I'm running out of time for the soft
+> freeze (mips_r4k, hppa_dino, and the PC ones).
+> 
+> This series could be the 'part 2' of my previous "remove i386/pc dependency
+> from non-PC world" I started around 2.9.
+> 
+> Philippe Mathieu-Daudé (22):
+>   hw/isa: Move parallel_hds_isa_init() to hw/char/parallel-isa.c
+>   hw/dma/i8257: Rename DMA_init() to i8257_dma_init()
+>   hw/input/i8042: Extract declarations from i386/pc.h into input/i8042.h
+>   hw/isa/pc87312: Rename the device type as TYPE_PC87312_SUPERIO
+>   hw/isa/pc87312: Use uint16_t for the ISA I/O base address
+>   hw/isa/pc87312: Use 'unsigned int' for the irq value
+>   hw/isa/superio: Add a Super I/O template based on the PC87312 device
+>   hw/isa/pc87312: Inherit from the abstract TYPE_ISA_SUPERIO
+>   hw/isa/superio: Factor out the parallel code from pc87312.c
+>   hw/isa/superio: Factor out the serial code from pc87312.c
+>   hw/isa/superio: Factor out the floppy disc controller code from pc87312.c
+>   hw/isa/superio: Add a keyboard/mouse controller (8042)
+>   hw/isa/superio: Factor out the IDE code from pc87312.c
+>   hw/mips/malta: Code movement
+>   hw/isa/superio: Factor out the FDC37M817 Super I/O from mips_malta.c
+>   hw/mips/mips_fulong2e: Factor out vt82c686b_southbridge_init()
+>   hw/isa/vt82c686: Rename vt82c686b_init() -> vt82c686b_isa_init()
+>   hw/isa/vt82c686: Add the TYPE_VT82C686B_SUPERIO
+>   hw/isa/superio: Add the SMC FDC37C669 Super I/O
+>   hw/alpha/dp264: Add the ISA DMA controller
+>   hw/alpha/dp264: Use the TYPE_SMC37C669_SUPERIO
+>   hw/i386/pc: Factor out the superio code
+> 
+>  default-configs/alpha-softmmu.mak |   5 +
+>  include/hw/char/parallel.h        |  14 +++
+>  include/hw/{isa => dma}/i8257.h   |   6 ++
+>  include/hw/i386/pc.h              |  17 ---
+>  include/hw/input/i8042.h          |  24 +++++
+>  include/hw/isa/isa.h              |   2 -
+>  include/hw/isa/pc87312.h          |  24 ++---
+>  include/hw/isa/superio.h          |  60 +++++++++++
+>  include/hw/isa/vt82c686.h         |   4 +-
+>  hw/alpha/dp264.c                  |  13 ++-
+>  hw/char/parallel-isa.c            |  36 +++++++
+>  hw/char/parallel.c                |   2 +-
+>  hw/dma/i82374.c                   |   3 +-
+>  hw/dma/i8257.c                    |   4 +-
+>  hw/i386/pc.c                      |  77 ++++++++------
+>  hw/i386/vmmouse.c                 |   1 +
+>  hw/i386/vmport.c                  |   1 +
+>  hw/input/pckbd.c                  |   2 +-
+>  hw/isa/isa-bus.c                  |  26 -----
+>  hw/isa/isa-superio.c              | 210 ++++++++++++++++++++++++++++++++++++++
+>  hw/isa/pc87312.c                  | 178 ++++++++++++++------------------
+>  hw/isa/smc37c669-superio.c        | 115 +++++++++++++++++++++
+>  hw/isa/vt82c686.c                 |  22 +++-
+>  hw/mips/mips_fulong2e.c           |  85 +++++++--------
+>  hw/mips/mips_jazz.c               |   5 +-
+>  hw/mips/mips_malta.c              |  48 ++++-----
+>  hw/mips/mips_r4k.c                |   3 +-
+>  hw/ppc/prep.c                     |   6 +-
+>  hw/sparc/sun4m.c                  |   4 -
+>  hw/sparc64/sun4u.c                |   6 +-
+>  hw/unicore32/puv3.c               |   1 +
+>  hw/char/Makefile.objs             |   1 +
+>  hw/isa/Makefile.objs              |   1 +
+>  hw/isa/trace-events               |  10 +-
+>  MAINTAINERS                       |   6 +-
+>  35 files changed, 721 insertions(+), 301 deletions(-)
+>  create mode 100644 include/hw/char/parallel.h
+>  rename include/hw/{isa => dma}/i8257.h (86%)
+>  create mode 100644 include/hw/input/i8042.h
+>  create mode 100644 include/hw/isa/superio.h
+>  create mode 100644 hw/char/parallel-isa.c
+>  create mode 100644 hw/isa/isa-superio.c
+>  create mode 100644 hw/isa/smc37c669-superio.c
+> 
 
-query-sev-launch-measure: it returns meaninful data only when we launch
-SEV guest otherwise the command returns an error.
+Queued, thanks.
 
-query-sev: it return an error when SEV is not available on host (e.g non
-X86 platform or KVM is disabled at the build time)
-
-query-sev-capabilities: it returns an error when SEV feature is not
-available on host machine.
-
-Cc: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
----
- tests/qmp-test.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index 22445d9ec258..7470c6b754bc 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -204,6 +204,11 @@ static bool query_is_blacklisted(const char *cmd)
-         "query-gic-capabilities", /* arm */
-         /* Success depends on target-specific build configuration: */
-         "query-pci",              /* CONFIG_PCI */
-+        /* Success depends on launching SEV guest */
-+        "query-sev-launch-measure",
-+        /* Success depends on Host or Hypervisor SEV support */
-+        "query-sev",
-+        "query-sev-capabilities",
-         NULL
-     };
-     int i;
---=20
-2.14.3
+Paolo
