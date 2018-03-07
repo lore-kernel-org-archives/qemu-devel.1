@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1etcDU-0002Dh-VS
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:47:02 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1etcHW-0004aT-EJ
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:51:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1etcDT-0006Pf-Oj
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:47:01 -0500
-References: <20180306204819.11266-1-stefanha@redhat.com>
-	<20180306204819.11266-3-stefanha@redhat.com>
-	<CANz-nerKaY_NG4enTxut9RuerWGL47sNKkgtJ_QpHws75ckO7A@mail.gmail.com>
-	<CAJSP0QXzMf1UdehS3Cp3Yud6a7U4n-ixYTtCawyd8_wGLbWq0w@mail.gmail.com>
-	<CANz-neoa1o-x+opbd6OLHdw0K1ROvwA462wXC-MOmXVPDDbu8g@mail.gmail.com>
-	<CAJSP0QXt=Mrk8JdWJF4ewwELuP_kPuW1mBKn0BCVr349rpudBw@mail.gmail.com>
-	<CANz-neqFk-kdLaWTj3syokjF6Kttsq-L1JvkqDS-uR3KixBkBQ@mail.gmail.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <f9b85013-fd66-113b-aa59-dc79fe6b3e95@redhat.com>
-Date: Wed, 7 Mar 2018 17:46:48 +0100
+	(envelope-from <brijesh.singh@amd.com>) id 1etcHR-0008AL-Ug
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:51:10 -0500
+Received: from mail-bl2nam02on0081.outbound.protection.outlook.com
+	([104.47.38.81]:60768
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1etcHR-00089n-P9
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 11:51:05 -0500
+From: Brijesh Singh <brijesh.singh@amd.com>
+Date: Wed,  7 Mar 2018 10:50:11 -0600
+Message-Id: <20180307165038.88640-2-brijesh.singh@amd.com>
+In-Reply-To: <20180307165038.88640-1-brijesh.singh@amd.com>
+References: <20180307165038.88640-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <CANz-neqFk-kdLaWTj3syokjF6Kttsq-L1JvkqDS-uR3KixBkBQ@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Ix4boppCiQZ5d8cOiuykASbFZJDedxC80"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] iotests: add 208
- nbd-server + blockdev-snapshot-sync test case
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v11 01/28] memattrs: add debug attribute
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,186 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Panella <spanella@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Ix4boppCiQZ5d8cOiuykASbFZJDedxC80
-From: Max Reitz <mreitz@redhat.com>
-To: Stefano Panella <spanella@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
-Message-ID: <f9b85013-fd66-113b-aa59-dc79fe6b3e95@redhat.com>
-Subject: Re: [Qemu-block] [PATCH 2/2] iotests: add 208 nbd-server +
- blockdev-snapshot-sync test case
-References: <20180306204819.11266-1-stefanha@redhat.com>
- <20180306204819.11266-3-stefanha@redhat.com>
- <CANz-nerKaY_NG4enTxut9RuerWGL47sNKkgtJ_QpHws75ckO7A@mail.gmail.com>
- <CAJSP0QXzMf1UdehS3Cp3Yud6a7U4n-ixYTtCawyd8_wGLbWq0w@mail.gmail.com>
- <CANz-neoa1o-x+opbd6OLHdw0K1ROvwA462wXC-MOmXVPDDbu8g@mail.gmail.com>
- <CAJSP0QXt=Mrk8JdWJF4ewwELuP_kPuW1mBKn0BCVr349rpudBw@mail.gmail.com>
- <CANz-neqFk-kdLaWTj3syokjF6Kttsq-L1JvkqDS-uR3KixBkBQ@mail.gmail.com>
-In-Reply-To: <CANz-neqFk-kdLaWTj3syokjF6Kttsq-L1JvkqDS-uR3KixBkBQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Extend the MemTxAttrs to include 'debug' flag. The flag can be used as
+general indicator that operation was triggered by the debugger.
 
-On 2018-03-07 17:43, Stefano Panella wrote:
->=20
->=20
-> On Wed, Mar 7, 2018 at 4:16 PM, Stefan Hajnoczi <stefanha@gmail.com
-> <mailto:stefanha@gmail.com>> wrote:
->>
->> On Wed, Mar 7, 2018 at 1:57 PM, Stefano Panella <spanella@gmail.com
-> <mailto:spanella@gmail.com>> wrote:
->> > On Wed, Mar 7, 2018 at 10:55 AM, Stefan Hajnoczi <stefanha@gmail.com=
+Later in the patch series we set the debug=1 when issuing a memory access
+from the gdbstub or HMP commands. This patch is prerequisite to support
+debugging the encrypted guest. If we see request with debug=1 then we
+will need to use encryption APIs to access the guest memory.
 
-> <mailto:stefanha@gmail.com>> wrote:
->> >>
->> >> On Tue, Mar 6, 2018 at 11:25 PM, Stefano Panella
-> <spanella@gmail.com <mailto:spanella@gmail.com>>
->> >> wrote:
->> >> > I have applied this patch and when I run the following qmp
-> commands I I
->> >> > do
->> >> > not see the crash anymore but there is still something wrong beca=
-use
->> >> > only
->> >> > /root/a is opened from qemu. It looks like nbd-server-stop is als=
-o
->> >> > getting
->> >> > rid of the nodes added with blockdev-snapshot-sync, therfore is
-> than not
->> >> > possible to do blockdev-del on /root/d because node-name is not f=
-ound
->> >>
->> >> Nodes are reference counted.=C2=A0 If nothing holds a refcount then=
- the
->> >> node is freed.
->> > Thanks, that explains the behaviour
->> >>
->> >> The blockdev-add command holds a reference to the node.=C2=A0 The n=
-ode will
->> >> stay alive until blockdev-del, which releases that reference.
->> >>
->> >> blockdev-snapshot-sync does not hold a reference.=C2=A0 Therefore s=
-napshot
->> >> nodes are freed once nothing is using them anymore.=C2=A0 When the =
-snapshot
->> >> node is created, the users of the parent node are updated to point =
-to
->> >> the snapshot node instead.=C2=A0 This is why the NBD server switche=
-s to the
->> >> snapshot mode after blockdev-snapshot-sync.
->> >>
->> >> This is why the snapshot nodes disappear after the NBD server is
->> >> stopped while /root/a stays alive.
->> >>
->> >> I'm not sure if the current blockdev-snapshot-sync behavior is usef=
-ul.
->> >> Perhaps the presence of the "snapshot-node-name" argument should ca=
-use
->> >> the snapshot node to be treated as monitor-owned, just like
->> >> blockdev-add.=C2=A0 This would introduce leaks for existing QMP cli=
-ents
->> >> though, so it may be necessary to add yet another argument for this=
+Cc: Alistair Francis <alistair.francis@xilinx.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+---
+ include/exec/memattrs.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
->> >> behavior.
->> > that would be nice, I mean to add an extra parameter so it is added
-> to the
->> > monitor
->> >>
->> >> Anyway, I hope this explains the current behavior.=C2=A0 I don't se=
-e a
->> >> problem with it, but it's something the API users need to be aware =
-of.
->> >>
->> > Yes, I was not aware of that behaviour, the problem is that many
-> examples
->> > refer
->> > to having a device associated with the blockdev-add'd node therefore=
-
-> we do
->> > not
->> > see this problem.
->> >> If it is a problem for your use case, please explain what you are
-> trying
->> >> to do.
->> >>
->> > It is not strictly a problem for my usecase but it would be nice to
-> have the
->> > extra param to
->> > blockdev-snapshot-sync. That would also fix the problem of running
-> multiple
->> > snap-sync
->> > after blockdev-add but before there is any user.
->>
->> Max Reitz mentioned that the 'blockdev-snapshot' command is preferred
->> over 'blockdev-snapshot-sync'. =C2=A0'blockdev-snapshot-sync' is a leg=
-acy
->> command that implicitly creates the snapshot node.
->>
->> The difference is that 'blockdev-snapshot' requires that the user
->> first creates the snapshot file (e.g. using qemu-img create), then
->> uses 'blockdev-add' to add the snapshot node, and finally uses
->> 'blockdev-snapshot' to install the snapshot node.
->>
->> When 'blockdev-snapshot' is used, the user must delete snapshot nodes
->> using 'blockdev-del' since they created using 'blockdev-add'.
->>
-> That is a very usefull info, I was not aware that blockdev-snapshot-syn=
-c
-> was not
-> recommended.
-
-Yeah, well...  Someone (O:-)) needs to go over all the block QMP
-commands and see which are good and which should be deprecated at some
-point.  I don't think we have a central list of everything yet...
-
-> I will try to run some examples with blockdev-snapshot.
-> In case I want to achieve
-> A <- B
-> and I do:
-> blockdev_add A
-> create external snapshot with qemu-img B with A as backing image
-> blockdev_add B
-> blockdev_snapshot B -> A
->=20
-> What do I need to do to delete A and B?
-> is it fine to just call blockdev_del B ?
-> or should I call blockdev_del A as well?
-
-You need to call both.  The basic idea is that you have to pair every
-blockdev-add with a blockdev-del.
-
-(You have to delete B first, though, because you cannot delete a node
-while it is in use (and A is in use by B as long as B exists).)
-
-Don't forget the '"backing": null" parameter for the blockdev-add B
-command, or B will already have A opened as its backing image (which is
-not good, you don't want qemu to open the same image twice).
-
-(Or maybe blockdev-add B will not even work without '"backing": null'
-because qemu figures out that you are trying to open the same image (A)
-twice and prevent that.)
-
-Max
-
-
---Ix4boppCiQZ5d8cOiuykASbFZJDedxC80
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqgF3gSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A9VEH/iAahyQP3iyWPKMmzOfYVAjdAh1H2OS/
-ByCTDDgCmXrV0JuwE0PGIeh2ZxL9iwOo4RuskYDYVcRBdOKhuBHQBBVcFdAbkXjp
-l1h6OkSrPA+x5yPNsVvG7UzUpDYtnCa4/Hd1QcBePiyAmlWU/fRr3JYf17c9V+zq
-6c1Ru66e5RDFqn2R7iDGoB4GgT5+cnZcFYoH5JnUh/S30qPXvAwnlG7ENy8YA4gP
-mEm2C9VlFkb7SkngVydTdNGnlmKFWmvxbkKhOaixWOjQuamCNhJryocCxg2ZFlSI
-WSmbw6R9iuCjOwvYEMSogiXkPDW4bfjgItqQQSCBYqcpA5zjVybju+Y=
-=1eCk
------END PGP SIGNATURE-----
-
---Ix4boppCiQZ5d8cOiuykASbFZJDedxC80--
+diff --git a/include/exec/memattrs.h b/include/exec/memattrs.h
+index d4a16420984b..08099e4f7e72 100644
+--- a/include/exec/memattrs.h
++++ b/include/exec/memattrs.h
+@@ -37,6 +37,8 @@ typedef struct MemTxAttrs {
+     unsigned int user:1;
+     /* Requester ID (for MSI for example) */
+     unsigned int requester_id:16;
++    /* Memory access request from the debugger */
++    unsigned int debug:1;
+ } MemTxAttrs;
+ 
+ /* Bus masters which don't specify any attributes will get this,
+-- 
+2.14.3
