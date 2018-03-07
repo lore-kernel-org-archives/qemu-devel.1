@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1etbS1-0005TB-W9
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:57:58 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1etbS3-0005UB-3O
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:58:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1etbRz-00013T-3S
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:57:58 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53026 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1etbS2-00016N-1U
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:57:59 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54586 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1etbRy-00013L-VA
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:57:55 -0500
+	id 1etbS1-00015E-TC
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:57:57 -0500
 From: marcandre.lureau@redhat.com
-Date: Wed,  7 Mar 2018 16:57:40 +0100
-Message-Id: <20180307155746.18526-3-marcandre.lureau@redhat.com>
+Date: Wed,  7 Mar 2018 16:57:42 +0100
+Message-Id: <20180307155746.18526-5-marcandre.lureau@redhat.com>
 In-Reply-To: <20180307155746.18526-1-marcandre.lureau@redhat.com>
 References: <20180307155746.18526-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 2/8] SecurityPkg/Tcg2Pei: drop
- PeiReadOnlyVariable from Depex
+Subject: [Qemu-devel] [PATCH v2 4/8] ovmf: simplify SecurityStubDxe.inf
+ inclusion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,27 +33,82 @@ Cc: pjones@redhat.com, jiewen.yao@intel.com, stefanb@linux.vnet.ibm.com, lersek@
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-The module doesn't use read-only variable.
+SecurityStubDxe.inf should be included unconditionally.
 
 Cc: Laszlo Ersek <lersek@redhat.com>
 Contributed-under: TianoCore Contribution Agreement 1.1
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf | 1 -
- 1 file changed, 1 deletion(-)
+ OvmfPkg/OvmfPkgIa32.dsc    | 6 ++----
+ OvmfPkg/OvmfPkgIa32X64.dsc | 6 ++----
+ OvmfPkg/OvmfPkgX64.dsc     | 6 ++----
+ 3 files changed, 6 insertions(+), 12 deletions(-)
 
-diff --git a/SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf b/SecurityPkg/Tcg/Tcg2Pe=
-i/Tcg2Pei.inf
-index bc910c3baf97..a4aae1488ff8 100644
---- a/SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
-+++ b/SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
-@@ -91,7 +91,6 @@ [Pcd]
+diff --git a/OvmfPkg/OvmfPkgIa32.dsc b/OvmfPkg/OvmfPkgIa32.dsc
+index fbe0f790e431..5bd3f4f977df 100644
+--- a/OvmfPkg/OvmfPkgIa32.dsc
++++ b/OvmfPkg/OvmfPkgIa32.dsc
+@@ -611,14 +611,12 @@ [Components]
 =20
- [Depex]
-   gEfiPeiMasterBootModePpiGuid AND
--  gEfiPeiReadOnlyVariable2PpiGuid AND
-   gEfiTpmDeviceSelectedGuid
+   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 =20
- [UserExtensions.TianoCore."ExtraFiles"]
+-!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
+   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
+     <LibraryClasses>
++!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
+       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificat=
+ionLib.inf
+-	}
+-!else
+-  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+ !endif
++  }
+=20
+   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
+   PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
+diff --git a/OvmfPkg/OvmfPkgIa32X64.dsc b/OvmfPkg/OvmfPkgIa32X64.dsc
+index fb10e0b0f2e4..7dded86c4940 100644
+--- a/OvmfPkg/OvmfPkgIa32X64.dsc
++++ b/OvmfPkg/OvmfPkgIa32X64.dsc
+@@ -620,14 +620,12 @@ [Components.X64]
+=20
+   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+=20
+-!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
+   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
+     <LibraryClasses>
++!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
+       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificat=
+ionLib.inf
+-	}
+-!else
+-  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+ !endif
++  }
+=20
+   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
+   PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
+diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
+index a31551f5ae24..a8e89276c0b2 100644
+--- a/OvmfPkg/OvmfPkgX64.dsc
++++ b/OvmfPkg/OvmfPkgX64.dsc
+@@ -618,14 +618,12 @@ [Components]
+=20
+   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+=20
+-!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
+   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
+     <LibraryClasses>
++!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
+       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificat=
+ionLib.inf
+-	}
+-!else
+-  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+ !endif
++  }
+=20
+   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
+   PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
 --=20
 2.16.2.346.g9779355e34
