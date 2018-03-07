@@ -1,17 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1etaH2-0002sr-O2
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 09:42:37 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1etaIH-0004Fr-VH
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 09:43:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1etaH1-0005JJ-Mr
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 09:42:32 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed,  7 Mar 2018 14:42:04 +0000
-Message-Id: <20180307144205.20619-4-stefanha@redhat.com>
-In-Reply-To: <20180307144205.20619-1-stefanha@redhat.com>
-References: <20180307144205.20619-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 3/4] virtio-scsi: fix race between
- .ioeventfd_stop() and vq handler
+	(envelope-from <pbonzini@redhat.com>) id 1etaID-0005v6-2I
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 09:43:50 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51560 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1etaIC-0005ur-Tk
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 09:43:44 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 776108182D0C
+	for <qemu-devel@nongnu.org>; Wed,  7 Mar 2018 14:43:44 +0000 (UTC)
+References: <20180307142857.28438-1-pbonzini@redhat.com>
+	<9a5fd178-cd3d-5128-d1dd-779975b01eb4@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <112351a6-eb46-9c85-37eb-b928ac20a91a@redhat.com>
+Date: Wed, 7 Mar 2018 15:43:42 +0100
+MIME-Version: 1.0
+In-Reply-To: <9a5fd178-cd3d-5128-d1dd-779975b01eb4@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qemu-doc: update deprecation section to
+ use -nic and -netdev hubport
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,58 +35,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, Richard Henderson <rth@twiddle.net>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>
 
-If the main loop thread invokes .ioeventfd_stop() just as the vq handler
-function begins in the IOThread then the handler may lose the race for
-the AioContext lock.  By the time the vq handler is able to acquire the
-AioContext lock the ioeventfd has already been removed and the handler
-isn't supposed to run anymore!
+On 07/03/2018 15:38, Thomas Huth wrote:
+> But please note that we've currently got a BiteSizeTask to replace all
+> single-dash options with double dash options here:
+> 
+> https://wiki.qemu.org/BiteSizedTasks#Consistent_option_usage_in_documentation
 
-Use the new aio_wait_bh_oneshot() function to perform ioeventfd removal
-from within the IOThread.  This way no races with the vq handler are
-possible.
+Is anybody actually using VLANs^Wdouble dash options?  I learnt about
+them a month ago...
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- hw/scsi/virtio-scsi-dataplane.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+Paolo
 
-diff --git a/hw/scsi/virtio-scsi-dataplane.c b/hw/scsi/virtio-scsi-dataplane.c
-index 1c33322ba6..912e5005d8 100644
---- a/hw/scsi/virtio-scsi-dataplane.c
-+++ b/hw/scsi/virtio-scsi-dataplane.c
-@@ -107,9 +107,10 @@ static int virtio_scsi_vring_init(VirtIOSCSI *s, VirtQueue *vq, int n,
-     return 0;
- }
- 
--/* assumes s->ctx held */
--static void virtio_scsi_clear_aio(VirtIOSCSI *s)
-+/* Context: BH in IOThread */
-+static void virtio_scsi_dataplane_stop_bh(void *opaque)
- {
-+    VirtIOSCSI *s = opaque;
-     VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(s);
-     int i;
- 
-@@ -171,7 +172,7 @@ int virtio_scsi_dataplane_start(VirtIODevice *vdev)
-     return 0;
- 
- fail_vrings:
--    virtio_scsi_clear_aio(s);
-+    aio_wait_bh_oneshot(s->ctx, virtio_scsi_dataplane_stop_bh, s);
-     aio_context_release(s->ctx);
-     for (i = 0; i < vs->conf.num_queues + 2; i++) {
-         virtio_bus_set_host_notifier(VIRTIO_BUS(qbus), i, false);
-@@ -207,7 +208,7 @@ void virtio_scsi_dataplane_stop(VirtIODevice *vdev)
-     s->dataplane_stopping = true;
- 
-     aio_context_acquire(s->ctx);
--    virtio_scsi_clear_aio(s);
-+    aio_wait_bh_oneshot(s->ctx, virtio_scsi_dataplane_stop_bh, s);
-     aio_context_release(s->ctx);
- 
-     blk_drain_all(); /* ensure there are no in-flight requests */
--- 
-2.14.3
+> So it would be nicer if you'd directly use double dash options here now.
+> (Note that you also got to use @option{--nic xxx} instead of ``--nic xxx''
+> in that case)
