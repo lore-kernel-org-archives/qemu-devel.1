@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1etOzM-00072l-NM
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 21:39:34 -0500
+	(envelope-from <jsnow@redhat.com>) id 1etP0V-0007yp-Kn
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 21:40:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1etOzI-0006yb-MP
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 21:39:32 -0500
-Date: Wed, 7 Mar 2018 13:25:50 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180307022550.GB3083@umbus.fritz.box>
-References: <20180306203103.25563-1-mark.cave-ayland@ilande.co.uk>
-	<20180306203103.25563-2-mark.cave-ayland@ilande.co.uk>
+	(envelope-from <jsnow@redhat.com>) id 1etP0R-0007fv-JK
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 21:40:43 -0500
+References: <20180306232851.8DD617456A5@zero.eik.bme.hu>
+	<20180307022327.GA3083@umbus.fritz.box>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <d1c5f8a6-a7c1-b08c-4994-940e890e7894@redhat.com>
+Date: Tue, 6 Mar 2018 21:40:30 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="61jdw2sOBCFtR2d/"
-Content-Disposition: inline
-In-Reply-To: <20180306203103.25563-2-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 01/19] uninorth: trivial style fixups
+In-Reply-To: <20180307022327.GA3083@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] sii3112: Remove unneeded exit function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,112 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>, BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>
 
 
---61jdw2sOBCFtR2d/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 06, 2018 at 08:30:45PM +0000, Mark Cave-Ayland wrote:
-> This makes sure we keep patchew/checkpatch happy during the remainder of =
-this
-> patchset.
->=20
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+On 03/06/2018 09:23 PM, David Gibson wrote:
+> On Wed, Mar 07, 2018 at 12:15:15AM +0100, BALATON Zoltan wrote:
+>> An exit function was mistakenly left here but it's not needed because
+>> the PCI bars are organised differently in this device. Calling this
+>> exit function during device_del was causing an abort with
+>> memory_region_del_subregion: `Assertion subregion->container == mr' failed.
+>>
+>> Reported-by: Thomas Huth <thuth@redhat.com>
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> 
+> Applied to ppc-for-2.12, thanks.
+> 
 
-Applied, thanks.
+Beat me to it, thanks! I'm a little distracted right now.
 
-> ---
->  hw/pci-host/uninorth.c | 29 +++++++++++++++++++----------
->  1 file changed, 19 insertions(+), 10 deletions(-)
->=20
-> diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
-> index 66991da975..710818e355 100644
-> --- a/hw/pci-host/uninorth.c
-> +++ b/hw/pci-host/uninorth.c
-> @@ -272,7 +272,6 @@ PCIBus *pci_pmac_u3_init(qemu_irq *pic,
->      UNINState *d;
-> =20
->      /* Uninorth AGP bus */
-> -
->      dev =3D qdev_create(NULL, TYPE_U3_AGP_HOST_BRIDGE);
->      qdev_init_nofail(dev);
->      s =3D SYS_BUS_DEVICE(dev);
-> @@ -302,16 +301,23 @@ PCIBus *pci_pmac_u3_init(qemu_irq *pic,
-> =20
->  static void unin_main_pci_host_realize(PCIDevice *d, Error **errp)
->  {
-> -    d->config[0x0C] =3D 0x08; // cache_line_size
-> -    d->config[0x0D] =3D 0x10; // latency_timer
-> -    d->config[0x34] =3D 0x00; // capabilities_pointer
-> +    /* cache_line_size */
-> +    d->config[0x0C] =3D 0x08;
-> +    /* latency_timer */
-> +    d->config[0x0D] =3D 0x10;
-> +    /* capabilities_pointer */
-> +    d->config[0x34] =3D 0x00;
->  }
-> =20
->  static void unin_agp_pci_host_realize(PCIDevice *d, Error **errp)
->  {
-> -    d->config[0x0C] =3D 0x08; // cache_line_size
-> -    d->config[0x0D] =3D 0x10; // latency_timer
-> -    //    d->config[0x34] =3D 0x80; // capabilities_pointer
-> +    /* cache_line_size */
-> +    d->config[0x0C] =3D 0x08;
-> +    /* latency_timer */
-> +    d->config[0x0D] =3D 0x10;
-> +    /* capabilities_pointer
-> +    d->config[0x34] =3D 0x80; */
-> +
->      /*
->       * Set kMacRISCPCIAddressSelect (0x48) register to indicate PCI
->       * memory space with base 0x80000000, size 0x10000000 for Apple's
-> @@ -333,9 +339,12 @@ static void u3_agp_pci_host_realize(PCIDevice *d, Er=
-ror **errp)
-> =20
->  static void unin_internal_pci_host_realize(PCIDevice *d, Error **errp)
->  {
-> -    d->config[0x0C] =3D 0x08; // cache_line_size
-> -    d->config[0x0D] =3D 0x10; // latency_timer
-> -    d->config[0x34] =3D 0x00; // capabilities_pointer
-> +    /* cache_line_size */
-> +    d->config[0x0C] =3D 0x08;
-> +    /* latency_timer */
-> +    d->config[0x0D] =3D 0x10;
-> +    /* capabilities_pointer */
-> +    d->config[0x34] =3D 0x00;
->  }
-> =20
->  static void unin_main_pci_host_class_init(ObjectClass *klass, void *data)
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---61jdw2sOBCFtR2d/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqfTa4ACgkQbDjKyiDZ
-s5IvGRAAtCkNQZJ2qvlazMCB0/PwU3+zgVXhZGeC6ZRJeErm28sboC5ESiUqEddZ
-MTr6PlSoPWjG5zfU2rUeHCsfOhOZUQnNUOhWln0yXcS0GwaHyux076fu7uwsss4q
-nhj4eT+6NXelVJB9/YxoOSmIk8/DimMV1AIQaC/GQ1omU3XEMCnp+pa6aXP+fSET
-TjIyrKm4QdG6o/cd3bXgA+e+SSYF+6VlwHdT2e/kOkzr/BjB6XQjaI5q8a2pjkbP
-tCRo7Dhqs4r6n47SdVuJJ5qHIcJGXDVQDSBuedigb38kErIPXmhGH9cgjTgR6CKb
-qqaqdbDgvIzE5mV2jwFlK+Xk9/WGnPteFqfHcgqCe5xXxEnghaRlWJLlWvyEYj5L
-S5MuvsptdWmWa7EiR7K1JJxfWY63N3rDr0Fx3yv7mjSxcxxZgAKTqWYn+79DcGHt
-yZ6i3SBx9cIfNF7JRCy3KuhucO4Y5wiB3d1skzU+X2DP0d2lssK/UGqbD95HxMMW
-EAhGcMszurZvl8lhSCQ6DPRTvclqh6mHnjqIEUSe21ZkBGXil5hBV1NxoRsnBBsg
-bT9hSZif3pnAuA0Rxrbb3KI+cWxy2nYwVxvy7cfd8MEhTsOQSida2JyLg1r5wpK0
-iNVXG/OD9ti6tPDLzP5aapPvtF6iISSv9cRjOZzLPjBfP+KNu/8=
-=oBCI
------END PGP SIGNATURE-----
-
---61jdw2sOBCFtR2d/--
+>> ---
+>>  hw/ide/sii3112.c | 12 ------------
+>>  1 file changed, 12 deletions(-)
+>>
+>> diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
+>> index e3896c6..743a50e 100644
+>> --- a/hw/ide/sii3112.c
+>> +++ b/hw/ide/sii3112.c
+>> @@ -327,17 +327,6 @@ static void sii3112_pci_realize(PCIDevice *dev, Error **errp)
+>>      qemu_register_reset(sii3112_reset, s);
+>>  }
+>>  
+>> -static void sii3112_pci_exitfn(PCIDevice *dev)
+>> -{
+>> -    PCIIDEState *d = PCI_IDE(dev);
+>> -    int i;
+>> -
+>> -    for (i = 0; i < 2; ++i) {
+>> -        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].extra_io);
+>> -        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].addr_ioport);
+>> -    }
+>> -}
+>> -
+>>  static void sii3112_pci_class_init(ObjectClass *klass, void *data)
+>>  {
+>>      DeviceClass *dc = DEVICE_CLASS(klass);
+>> @@ -348,7 +337,6 @@ static void sii3112_pci_class_init(ObjectClass *klass, void *data)
+>>      pd->class_id = PCI_CLASS_STORAGE_RAID;
+>>      pd->revision = 1;
+>>      pd->realize = sii3112_pci_realize;
+>> -    pd->exit = sii3112_pci_exitfn;
+>>      dc->desc = "SiI3112A SATA controller";
+>>      set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+>>  }
+> 
