@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1etZtj-0000b2-RZ
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 09:18:28 -0500
+	(envelope-from <thuth@redhat.com>) id 1etZyN-0002dU-6G
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 09:23:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1etZtg-0001S2-2L
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 09:18:27 -0500
-Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:40054)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1etZtf-0001Ro-SO
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 09:18:23 -0500
-Received: by mail-oi0-x22e.google.com with SMTP id c12so1747305oic.7
-	for <qemu-devel@nongnu.org>; Wed, 07 Mar 2018 06:18:23 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20180307141118.cbgvj55p4wcrphyw@sirius.home.kraxel.org>
-References: <CAFEAcA8Wz4q=+HDpSG_pFHB7xKMez6hCPFodoOxoTgr1FOy5nA@mail.gmail.com>
-	<20180305103307.GL17368@redhat.com>
-	<20180307141118.cbgvj55p4wcrphyw@sirius.home.kraxel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 7 Mar 2018 14:18:02 +0000
-Message-ID: <CAFEAcA-j_tZVKwnKzQP6bHahxHUge53vibgkVyVQFmDzS4F7Zg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] QEMU fails to configure on non-x86 hosts with
- recent SDL2
+	(envelope-from <thuth@redhat.com>) id 1etZyK-00040L-1F
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 09:23:15 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed,  7 Mar 2018 15:22:54 +0100
+Message-Id: <1520432574-20615-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/misc/macio: Mark the macio devices with
+ user_creatable = false
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +18,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-On 7 March 2018 at 14:11, Gerd Hoffmann <kraxel@redhat.com> wrote:
->   Hi,
->
->> > Any suggestions for how to do a workaround?
->>
->> Drop -Wundef when running the configiure test, or override it with -Wno-undef
->>
->> If the actual ui/sdl* files fail for same reason, we could use a gcc
->> pragma top disable -Wundef in just those files, or set -Wno-undef in
->> CFLAGS on a per-.o file basis in Makefile.objs
->
-> What is the status here?  Could you try this peter?  Don't have a test
-> box with SDL 2.0.8 at hand ...
+The macio devices currently cause a crash when the user tries to
+instantiate them on a different machine:
 
-Haven't tried it, but I'm pretty sure it would work. For the
-moment I just passed --disable-sdl to configure...
+$ ppc64-softmmu/qemu-system-ppc64 -device macio-newworld
+Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:222:
+qemu-system-ppc64: -device macio-newworld: Device 'serial0' is in use
+Aborted (core dumped)
 
-> Any reaction from debian/upstream?  Given that this probably affects
-> pretty much any SDL user and 2.0.8 is a few days old only a quick 2.0.9
-> bugfix release would be the best solution I guess.
+These devices are clearly not intended to be creatable by the user
+since they are using serial_hds[] directly in their instance_init
+function. So let's mark them with user_creatable = false.
 
-Nothing from Debian yet; haven't tried to contact upstream
-(feel free to do that yourself).
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/misc/macio/macio.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-thanks
--- PMM
+diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+index af1bd46..454244f 100644
+--- a/hw/misc/macio/macio.c
++++ b/hw/misc/macio/macio.c
+@@ -406,6 +406,8 @@ static void macio_class_init(ObjectClass *klass, void *data)
+     k->class_id = PCI_CLASS_OTHERS << 8;
+     dc->props = macio_properties;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
++    /* Reason: Uses serial_hds in macio_instance_init */
++    dc->user_creatable = false;
+ }
+ 
+ static const TypeInfo macio_oldworld_type_info = {
+-- 
+1.8.3.1
