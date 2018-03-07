@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eteIQ-0004Un-NG
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 14:00:20 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eteIR-0004Vo-EI
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 14:00:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eteIP-0004Mc-NA
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 14:00:14 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eteIQ-0004NL-CF
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 14:00:15 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed,  7 Mar 2018 19:59:11 +0100
-Message-Id: <20180307185946.29366-3-kwolf@redhat.com>
+Date: Wed,  7 Mar 2018 19:59:17 +0100
+Message-Id: <20180307185946.29366-9-kwolf@redhat.com>
 In-Reply-To: <20180307185946.29366-1-kwolf@redhat.com>
 References: <20180307185946.29366-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 02/37] block/qapi: Add qcow2 create options
- to schema
+Subject: [Qemu-devel] [PATCH v4 08/37] qcow2: Handle full/falloc
+ preallocation in qcow2_co_create()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,75 +23,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, jcody@redhat.com, jdurgin@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, qemu-devel@nongnu.org
 
+Once qcow2_co_create() can be called directly on an already existing
+node, we must provide the 'full' and 'falloc' preallocation modes
+outside of creating the image on the protocol layer. Fortunately, we
+have preallocated truncate now which can provide this functionality.
+
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json | 45 ++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 44 insertions(+), 1 deletion(-)
+ block/qcow2.c | 28 +++++++++++++++++++---------
+ 1 file changed, 19 insertions(+), 9 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index bb2db662f7..dfea7b0102 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3359,6 +3359,49 @@
- { 'command': 'blockdev-del', 'data': { 'node-name': 'str' } }
+diff --git a/block/qcow2.c b/block/qcow2.c
+index e1821eb3c8..933c612754 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2908,6 +2908,25 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
+     }
+     blk_set_allow_write_beyond_eof(blk, true);
  
- ##
-+# @BlockdevQcow2Version:
-+#
-+# @v2:  The original QCOW2 format as introduced in qemu 0.10 (version 2)
-+# @v3:  The extended QCOW2 format as introduced in qemu 1.1 (version 3)
-+#
-+# Since: 2.12
-+##
-+{ 'enum': 'BlockdevQcow2Version',
-+  'data': [ 'v2', 'v3' ] }
++    /* Clear the protocol layer and preallocate it if necessary */
++    ret = blk_truncate(blk, 0, PREALLOC_MODE_OFF, errp);
++    if (ret < 0) {
++        goto out;
++    }
 +
++    if (qcow2_opts->preallocation == PREALLOC_MODE_FULL ||
++        qcow2_opts->preallocation == PREALLOC_MODE_FALLOC)
++    {
++        int64_t prealloc_size =
++            qcow2_calc_prealloc_size(qcow2_opts->size, cluster_size,
++                                     refcount_order);
 +
-+##
-+# @BlockdevCreateOptionsQcow2:
-+#
-+# Driver specific image creation options for qcow2.
-+#
-+# @file             Node to create the image format on
-+# @size             Size of the virtual disk in bytes
-+# @version          Compatibility level (default: v3)
-+# @backing-file     File name of the backing file if a backing file
-+#                   should be used
-+# @backing-fmt      Name of the block driver to use for the backing file
-+# @encrypt          Encryption options if the image should be encrypted
-+# @cluster-size     qcow2 cluster size in bytes (default: 65536)
-+# @preallocation    Preallocation mode for the new image (default: off)
-+# @lazy-refcounts   True if refcounts may be updated lazily (default: off)
-+# @refcount-bits    Width of reference counts in bits (default: 16)
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'BlockdevCreateOptionsQcow2',
-+  'data': { 'file':             'BlockdevRef',
-+            'size':             'size',
-+            '*version':         'BlockdevQcow2Version',
-+            '*backing-file':    'str',
-+            '*backing-fmt':     'BlockdevDriver',
-+            '*encrypt':         'QCryptoBlockCreateOptions',
-+            '*cluster-size':    'size',
-+            '*preallocation':   'PreallocMode',
-+            '*lazy-refcounts':  'bool',
-+            '*refcount-bits':   'int' } }
++        ret = blk_truncate(blk, prealloc_size, qcow2_opts->preallocation, errp);
++        if (ret < 0) {
++            goto out;
++        }
++    }
 +
-+##
- # @BlockdevCreateNotSupported:
- #
- # This is used for all drivers that don't support creating images.
-@@ -3402,7 +3445,7 @@
-       'null-co':        'BlockdevCreateNotSupported',
-       'nvme':           'BlockdevCreateNotSupported',
-       'parallels':      'BlockdevCreateNotSupported',
--      'qcow2':          'BlockdevCreateNotSupported',
-+      'qcow2':          'BlockdevCreateOptionsQcow2',
-       'qcow':           'BlockdevCreateNotSupported',
-       'qed':            'BlockdevCreateNotSupported',
-       'quorum':         'BlockdevCreateNotSupported',
+     /* Write the header */
+     QEMU_BUILD_BUG_ON((1 << MIN_CLUSTER_BITS) < sizeof(*header));
+     header = g_malloc0(cluster_size);
+@@ -3145,15 +3164,6 @@ static int coroutine_fn qcow2_co_create_opts(const char *filename, QemuOpts *opt
+ 
+ 
+     /* Create and open the file (protocol layer) */
+-    if (prealloc == PREALLOC_MODE_FULL || prealloc == PREALLOC_MODE_FALLOC) {
+-        int refcount_order = ctz32(refcount_bits);
+-        int64_t prealloc_size =
+-            qcow2_calc_prealloc_size(size, cluster_size, refcount_order);
+-        qemu_opt_set_number(opts, BLOCK_OPT_SIZE, prealloc_size, &error_abort);
+-        qemu_opt_set(opts, BLOCK_OPT_PREALLOC, PreallocMode_str(prealloc),
+-                     &error_abort);
+-    }
+-
+     ret = bdrv_create_file(filename, opts, errp);
+     if (ret < 0) {
+         goto finish;
 -- 
 2.13.6
