@@ -1,33 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43706)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1etU68-0006ag-6B
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 03:06:52 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46216)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <berto@igalia.com>) id 1etUOG-0001pi-MO
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 03:25:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1etU63-0007ff-7f
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 03:06:52 -0500
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:47138 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1etU62-0007ez-Un
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 03:06:47 -0500
-Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
-	for qemu-devel@nongnu.org; Wed, 7 Mar 2018 09:06:41 +0100
-From: Peter Lieven <pl@kamp.de>
-References: <c0d7b993-b3b8-a753-21f5-e2257de27caf@kamp.de>
-	<20180305114533.GI7910@stefanha-x1.localdomain>
-	<0f1ec3c7-1157-e618-62f8-ffd5e08eb342@kamp.de>
-	<20180305145215.GM3131@work-vm>
-	<20180306160739.GN31045@stefanha-x1.localdomain>
-	<824907bb-3a37-27bd-76db-be17d05bdac0@kamp.de>
-	<231fe0ce-3df4-a175-2fba-403023cc65e1@kamp.de>
-Message-ID: <99df10d6-6514-56ee-16ce-8b7d1823cc08@kamp.de>
-Date: Wed, 7 Mar 2018 09:06:41 +0100
-MIME-Version: 1.0
-In-Reply-To: <231fe0ce-3df4-a175-2fba-403023cc65e1@kamp.de>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: [Qemu-devel] block migration and dirty bitmap reset
+	(envelope-from <berto@igalia.com>) id 1etUOD-0006lp-G7
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 03:25:36 -0500
+Received: from fanzine.igalia.com ([91.117.99.155]:54726)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1etUOD-0006lW-3N
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 03:25:33 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Wed,  7 Mar 2018 10:25:12 +0200
+Message-Id: <20180307082512.14203-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v2] iotests: Update 051 and 186 after commit
+ 1454509726719e0933c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,25 +22,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, wency@cn.fujitsu.com, qemu block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Hi,
+SCSI controllers are no longer created automatically for
+-drive if=scsi, so this patch updates the tests that relied
+on that.
 
-while looking at the code I wonder if the blk_aio_preadv and the bdrv_reset_dirty_bitmap order must
-be swapped in mig_save_device_bulk:
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ tests/qemu-iotests/051.pc.out | 20 --------------------
+ tests/qemu-iotests/186        |  4 ----
+ tests/qemu-iotests/186.out    | 28 ----------------------------
+ 3 files changed, 52 deletions(-)
 
-    qemu_mutex_lock_iothread();
-    aio_context_acquire(blk_get_aio_context(bmds->blk));
-    blk->aiocb = blk_aio_preadv(bb, cur_sector * BDRV_SECTOR_SIZE, &blk->qiov,
-                                0, blk_mig_read_cb, blk);
-
-    bdrv_reset_dirty_bitmap(bmds->dirty_bitmap, cur_sector * BDRV_SECTOR_SIZE,
-                            nr_sectors * BDRV_SECTOR_SIZE);
-    aio_context_release(blk_get_aio_context(bmds->blk));
-    qemu_mutex_unlock_iothread();
-
-In mig_save_device_dirty we first reset the dirty bitmap and read then which shoulds like
-a better idea. Maybe it doesn't matter while we acquire the aioctx and the iothread lock...
-
-Peter
+diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
+index 830c11880a..b01f9a90d7 100644
+--- a/tests/qemu-iotests/051.pc.out
++++ b/tests/qemu-iotests/051.pc.out
+@@ -117,20 +117,10 @@ Testing: -drive if=ide,media=cdrom
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) quit
+ 
+-Testing: -drive if=scsi,media=cdrom
+-QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
+-quit
+-
+ Testing: -drive if=ide
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) QEMU_PROG: Initialization of device ide-hd failed: Device needs media, but drive is empty
+ 
+-Testing: -drive if=scsi
+-QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) QEMU_PROG: -drive if=scsi: warning: bus=0,unit=0 is deprecated with this machine type
+-QEMU_PROG: -drive if=scsi: Device needs media, but drive is empty
+-
+ Testing: -drive if=virtio
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) QEMU_PROG: -drive if=virtio: Device needs media, but drive is empty
+@@ -170,20 +160,10 @@ Testing: -drive file=TEST_DIR/t.qcow2,if=ide,media=cdrom,readonly=on
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) quit
+ 
+-Testing: -drive file=TEST_DIR/t.qcow2,if=scsi,media=cdrom,readonly=on
+-QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=scsi,media=cdrom,readonly=on: warning: bus=0,unit=0 is deprecated with this machine type
+-quit
+-
+ Testing: -drive file=TEST_DIR/t.qcow2,if=ide,readonly=on
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) QEMU_PROG: Initialization of device ide-hd failed: Block node is read-only
+ 
+-Testing: -drive file=TEST_DIR/t.qcow2,if=scsi,readonly=on
+-QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=scsi,readonly=on: warning: bus=0,unit=0 is deprecated with this machine type
+-quit
+-
+ Testing: -drive file=TEST_DIR/t.qcow2,if=virtio,readonly=on
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) quit
+diff --git a/tests/qemu-iotests/186 b/tests/qemu-iotests/186
+index 44cc01ed87..9687243d34 100755
+--- a/tests/qemu-iotests/186
++++ b/tests/qemu-iotests/186
+@@ -133,10 +133,6 @@ check_info_block -drive if=ide,driver=null-co
+ check_info_block -drive if=ide,media=cdrom
+ check_info_block -drive if=ide,driver=null-co,media=cdrom
+ 
+-check_info_block -drive if=scsi,driver=null-co
+-check_info_block -drive if=scsi,media=cdrom
+-check_info_block -drive if=scsi,driver=null-co,media=cdrom
+-
+ check_info_block -drive if=virtio,driver=null-co
+ 
+ check_info_block -drive if=pflash,driver=null-co,size=1M
+diff --git a/tests/qemu-iotests/186.out b/tests/qemu-iotests/186.out
+index c8377fe146..ec75c0fc60 100644
+--- a/tests/qemu-iotests/186.out
++++ b/tests/qemu-iotests/186.out
+@@ -442,34 +442,6 @@ ide0-cd0 (NODE_NAME): null-co:// (null-co, read-only)
+     Cache mode:       writeback
+ (qemu) quit
+ 
+-Testing: -drive if=scsi,driver=null-co
+-QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) QEMU_PROG: -drive if=scsi,driver=null-co: warning: bus=0,unit=0 is deprecated with this machine type
+-info block
+-scsi0-hd0 (NODE_NAME): null-co:// (null-co)
+-    Attached to:      /machine/unattached/device[27]/scsi.0/legacy[0]
+-    Cache mode:       writeback
+-(qemu) quit
+-
+-Testing: -drive if=scsi,media=cdrom
+-QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
+-info block
+-scsi0-cd0: [not inserted]
+-    Attached to:      /machine/unattached/device[27]/scsi.0/legacy[0]
+-    Removable device: not locked, tray closed
+-(qemu) quit
+-
+-Testing: -drive if=scsi,driver=null-co,media=cdrom
+-QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) QEMU_PROG: -drive if=scsi,driver=null-co,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
+-info block
+-scsi0-cd0 (NODE_NAME): null-co:// (null-co, read-only)
+-    Attached to:      /machine/unattached/device[27]/scsi.0/legacy[0]
+-    Removable device: not locked, tray closed
+-    Cache mode:       writeback
+-(qemu) quit
+-
+ Testing: -drive if=virtio,driver=null-co
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) info block
+-- 
+2.11.0
