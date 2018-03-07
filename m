@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1etP0V-0007yp-Kn
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 21:40:45 -0500
+	(envelope-from <jcody@redhat.com>) id 1etPZm-0000M2-Go
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 22:17:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1etP0R-0007fv-JK
-	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 21:40:43 -0500
-References: <20180306232851.8DD617456A5@zero.eik.bme.hu>
-	<20180307022327.GA3083@umbus.fritz.box>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <d1c5f8a6-a7c1-b08c-4994-940e890e7894@redhat.com>
-Date: Tue, 6 Mar 2018 21:40:30 -0500
+	(envelope-from <jcody@redhat.com>) id 1etPZl-0006Ls-G4
+	for qemu-devel@nongnu.org; Tue, 06 Mar 2018 22:17:10 -0500
+Date: Tue, 6 Mar 2018 22:16:56 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180307031656.GA12302@localhost.localdomain>
+References: <20180206105204.14817-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180307022327.GA3083@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] sii3112: Remove unneeded exit function
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180206105204.14817-1-berrange@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] block: include original filename when
+ reporting invalid URIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +24,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
+On Tue, Feb 06, 2018 at 10:52:04AM +0000, Daniel P. Berrang=E9 wrote:
+> Consider passing a JSON based block driver to "qemu-img commit"
+>=20
+> $ qemu-img commit 'json:{"driver":"qcow2","file":{"driver":"gluster",\
+>                   "volume":"gv0","path":"sn1.qcow2",
+>                   "server":[{"type":\
+> 		  "tcp","host":"10.73.199.197","port":"24007"}]},}'
+>=20
+> Currently it will commit the content and then report an incredibly
+> useless error message when trying to re-open the committed image:
+>=20
+>   qemu-img: invalid URI
+>   Usage: file=3Dgluster[+transport]://[host[:port]]volume/path[?socket=3D=
+...][,file.debug=3DN][,file.logfile=3D/path/filename.log]
+>=20
+> With this fix we get:
+>=20
+>   qemu-img: invalid URI json:{"server.0.host": "10.73.199.197",
+>       "driver": "gluster", "path": "luks.qcow2", "server.0.type":
+>       "tcp", "server.0.port": "24007", "volume": "gv0"}
+>=20
+> Of course the root cause problem still exists, but now we know
+> what actually needs fixing.
+>=20
+> Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
+> ---
+>  block/gluster.c  | 2 +-
+>  block/sheepdog.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/block/gluster.c b/block/gluster.c
+> index 0f4265a3a4..0215e19087 100644
+> --- a/block/gluster.c
+> +++ b/block/gluster.c
+> @@ -660,7 +660,7 @@ static struct glfs *qemu_gluster_init(BlockdevOptio=
+nsGluster *gconf,
+>      if (filename) {
+>          ret =3D qemu_gluster_parse_uri(gconf, filename);
+>          if (ret < 0) {
+> -            error_setg(errp, "invalid URI");
+> +            error_setg(errp, "invalid URI %s", filename);
+>              error_append_hint(errp, "Usage: file=3Dgluster[+transport]=
+://"
+>                                      "[host[:port]]volume/path[?socket=3D=
+...]"
+>                                      "[,file.debug=3DN]"
+> diff --git a/block/sheepdog.c b/block/sheepdog.c
+> index f684477328..c847ab6c98 100644
+> --- a/block/sheepdog.c
+> +++ b/block/sheepdog.c
+> @@ -1050,7 +1050,7 @@ static void sd_parse_uri(SheepdogConfig *cfg, con=
+st char *filename,
+> =20
+>      cfg->uri =3D uri =3D uri_parse(filename);
+>      if (!uri) {
+> -        error_setg(&err, "invalid URI");
+> +        error_setg(&err, "invalid URI '%s'", filename);
+>          goto out;
+>      }
+> =20
+> --=20
+> 2.14.3
+>=20
 
+Thanks,
 
-On 03/06/2018 09:23 PM, David Gibson wrote:
-> On Wed, Mar 07, 2018 at 12:15:15AM +0100, BALATON Zoltan wrote:
->> An exit function was mistakenly left here but it's not needed because
->> the PCI bars are organised differently in this device. Calling this
->> exit function during device_del was causing an abort with
->> memory_region_del_subregion: `Assertion subregion->container == mr' failed.
->>
->> Reported-by: Thomas Huth <thuth@redhat.com>
->> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> 
-> Applied to ppc-for-2.12, thanks.
-> 
+Applied to my block branch:
 
-Beat me to it, thanks! I'm a little distracted right now.
+git://github.com/codyprime/qemu-kvm-jtc block
 
->> ---
->>  hw/ide/sii3112.c | 12 ------------
->>  1 file changed, 12 deletions(-)
->>
->> diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
->> index e3896c6..743a50e 100644
->> --- a/hw/ide/sii3112.c
->> +++ b/hw/ide/sii3112.c
->> @@ -327,17 +327,6 @@ static void sii3112_pci_realize(PCIDevice *dev, Error **errp)
->>      qemu_register_reset(sii3112_reset, s);
->>  }
->>  
->> -static void sii3112_pci_exitfn(PCIDevice *dev)
->> -{
->> -    PCIIDEState *d = PCI_IDE(dev);
->> -    int i;
->> -
->> -    for (i = 0; i < 2; ++i) {
->> -        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].extra_io);
->> -        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].addr_ioport);
->> -    }
->> -}
->> -
->>  static void sii3112_pci_class_init(ObjectClass *klass, void *data)
->>  {
->>      DeviceClass *dc = DEVICE_CLASS(klass);
->> @@ -348,7 +337,6 @@ static void sii3112_pci_class_init(ObjectClass *klass, void *data)
->>      pd->class_id = PCI_CLASS_STORAGE_RAID;
->>      pd->revision = 1;
->>      pd->realize = sii3112_pci_realize;
->> -    pd->exit = sii3112_pci_exitfn;
->>      dc->desc = "SiI3112A SATA controller";
->>      set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
->>  }
-> 
+-Jeff
