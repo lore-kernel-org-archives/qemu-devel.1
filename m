@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1etYyU-0005MJ-SD
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 08:19:19 -0500
+	(envelope-from <cohuck@redhat.com>) id 1etZ3A-0007DM-S7
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 08:24:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1etYyR-0001XI-Lw
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 08:19:18 -0500
-Received: from mail-by2nam01on0089.outbound.protection.outlook.com
-	([104.47.34.89]:11264
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1etYyR-0001Wr-9E
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 08:19:15 -0500
-References: <20180228211028.83970-1-brijesh.singh@amd.com>
-	<20180228211028.83970-12-brijesh.singh@amd.com>
-	<6a76cb62-99ec-f442-28cd-ba9daf478a05@redhat.com>
-From: Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <c7082c52-979d-8f25-5e97-8da259092732@amd.com>
-Date: Wed, 7 Mar 2018 07:19:02 -0600
+	(envelope-from <cohuck@redhat.com>) id 1etZ35-0003zy-SN
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 08:24:08 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38360 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1etZ35-0003zp-NY
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 08:24:03 -0500
+Date: Wed, 7 Mar 2018 14:23:52 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180307142352.586c49e1.cohuck@redhat.com>
+In-Reply-To: <20180307130238.19358-1-pbonzini@redhat.com>
+References: <20180307130238.19358-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <6a76cb62-99ec-f442-28cd-ba9daf478a05@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v10 11/28] sev/i386: add command to
- initialize the memory encryption context
+Subject: Re: [Qemu-devel] [PATCH] memory: fix flatview_access_valid RCU read
+ lock/unlock imbalance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,64 +27,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
-Cc: brijesh.singh@amd.com, Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Alexander Graf <agraf@suse.de>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Markus Armbruster <armbru@redhat.com>, Bruce Rogers <brogers@suse.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, Borislav Petkov <bp@suse.de>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, thuth@redhat.com, intermediadc@hotmail.com
 
-Hi Laszlo,
+On Wed,  7 Mar 2018 14:02:38 +0100
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
+> Fixes: 11e732a5ed46903f997985bed4c3767ca28a7eb6
+> Reported-by: Cornelia Huck <cohuck@redhat.com>
+> Reported-by: luigi burdo <intermediadc@hotmail.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  exec.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/exec.c b/exec.c
+> index 604f03c535..a9181e6417 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -3393,7 +3393,6 @@ static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
+>          if (!memory_access_is_direct(mr, is_write)) {
+>              l = memory_access_size(mr, l, addr);
+>              if (!memory_region_access_valid(mr, xlat, l, is_write)) {
+> -                rcu_read_unlock();
+>                  return false;
+>              }
+>          }
 
-On 3/5/18 7:37 AM, Laszlo Ersek wrote:
-> Hi Brijesh,
->
-> I triggered an assertion failure here:
->
-> On 02/28/18 22:10, Brijesh Singh wrote:
->> When memory encryption is enabled, KVM_SEV_INIT command is used to
->> initialize the platform. The command loads the SEV related persistent
->> data from non-volatile storage and initializes the platform context.
->> This command should be first issued before invoking any other guest
->> commands provided by the SEV firmware.
->>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Richard Henderson <rth@twiddle.net>
->> Cc: Eduardo Habkost <ehabkost@redhat.com>
->> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->> ---
->>  accel/kvm/kvm-all.c       |  15 ++++
->>  include/sysemu/sev.h      |  22 +++++
->>  stubs/Makefile.objs       |   1 +
->>  stubs/sev.c               |  21 +++++
->>  target/i386/Makefile.objs |   2 +-
->>  target/i386/monitor.c     |  11 ++-
->>  target/i386/sev-stub.c    |  41 +++++++++
->>  target/i386/sev.c         | 222 ++++++++++++++++++++++++++++++++++++++++++++++
->>  target/i386/sev_i386.h    |  29 ++++++
->>  target/i386/trace-events  |   3 +
->>  10 files changed, 364 insertions(+), 3 deletions(-)
->>  create mode 100644 include/sysemu/sev.h
->>  create mode 100644 stubs/sev.c
->>  create mode 100644 target/i386/sev-stub.c
-> [...]
->
->> @@ -1636,6 +1640,17 @@ static int kvm_init(MachineState *ms)
->>  
->>      kvm_state = s;
->>  
->> +    /*
->> +     * if memory encryption object is specified then initialize the memory
->> +     * encryption context.
->> +     */
->> +    if (ms->memory_encryption) {
->> +        kvm_state->memcrypt_handle = sev_guest_init(ms->memory_encryption);
->> +        if (!kvm_state->memcrypt_handle) {
->> +            goto err;
->> +        }
->> +    }
->> +
-> You should set the "err" variable to a negative error code; otherwise
-> the assertion at the "err" label will trigger:
->
-> err:
->     assert(ret < 0);
+Thanks, that fixes master for me.
 
-Noted, will fix in v11. thanks for reporting this.
+Tested-by: Cornelia Huck <cohuck@redhat.com>
