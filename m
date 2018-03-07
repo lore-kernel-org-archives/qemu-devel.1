@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1etWEb-00014q-Ka
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 05:23:46 -0500
+	(envelope-from <imammedo@redhat.com>) id 1etWL1-0003nQ-KM
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 05:30:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1etWEX-0001Zt-JT
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 05:23:45 -0500
-Date: Wed, 7 Mar 2018 10:23:38 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180307102338.GI20201@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180306040154.3669-1-david@gibson.dropbear.id.au>
-	<fd62ebf7-3abc-79a2-f269-825b4f8d6598@redhat.com>
-	<818fe50b-c3b8-30c5-5452-2009762142c1@ilande.co.uk>
-	<4e7dd0a0-ca7e-8df7-e966-95e39d34d106@redhat.com>
-	<a30f9017-b43b-0425-3d20-5708523821b7@ilande.co.uk>
+	(envelope-from <imammedo@redhat.com>) id 1etWKx-0003k9-M9
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 05:30:23 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43300 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1etWKx-0003jW-G9
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 05:30:19 -0500
+Date: Wed, 7 Mar 2018 11:30:01 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180307113001.462f9644@redhat.com>
+In-Reply-To: <20180305065710.25876-4-haozhong.zhang@intel.com>
+References: <20180305065710.25876-1-haozhong.zhang@intel.com>
+	<20180305065710.25876-4-haozhong.zhang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <a30f9017-b43b-0425-3d20-5708523821b7@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PULL 00/30] ppc-for-2.12 queue 20180306
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] hw/acpi-build: build SRAT memory
+ affinity structures for DIMM devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +28,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>
 
-On Tue, Mar 06, 2018 at 05:56:03PM +0000, Mark Cave-Ayland wrote:
-> On 06/03/18 17:47, Thomas Huth wrote:
-> 
-> > > It seems that the error is being raised when setting the property rather
-> > > than during realize so I'm not sure what I can do to handle this. Any
-> > > thoughts?
-> > 
-> > Does the device need to be hot-pluggable or even user_creatable at all?
-> > It seems like it is also using serial_hds[] directly, so that is a good
-> > indication that it is *not* user creatable. So maybe the easiest fix is
-> > to simply set
-> > 
-> > 	dc->user_creatable = false;
-> > 
-> > in macio_class_init() ?
-> 
-> (Added Daniel to CC)
-> 
-> I believe it should fail anyhow during realize because both macio devices
-> (newworld and oldworld) requires an object link to the PIC which won't be
-> set when using device_add via the monitor as in your example.
-> 
-> But it still doesn't quite feel right that just setting a property value
-> should abort() immediately. Daniel, any thoughts?
+On Mon,  5 Mar 2018 14:57:08 +0800
+Haozhong Zhang <haozhong.zhang@intel.com> wrote:
 
-Setting user_creatable = false is important, as that flag is used to filter
-the list of permitted devices when doing monitor readline completion for
-'device_add' and when printing available devices with '-device ?'
+> ACPI 6.2A Table 5-129 "SPA Range Structure" requires the proximity
+> domain of a NVDIMM SPA range must match with corresponding entry in
+> SRAT table.
+> 
+> The address ranges of vNVDIMM in QEMU are allocated from the
+> hot-pluggable address space, which is entirely covered by one SRAT
+> memory affinity structure. However, users can set the vNVDIMM
+> proximity domain in NFIT SPA range structure by the 'node' property of
+> '-device nvdimm' to a value different than the one in the above SRAT
+> memory affinity structure.
+> 
+> In order to solve such proximity domain mismatch, this patch builds
+> one SRAT memory affinity structure for each DIMM device present at
+> boot time, including both PC-DIMM and NVDIMM, with the proximity
+> domain specified in '-device pc-dimm' or '-device nvdimm'.
+> 
+> The remaining hot-pluggable address space is covered by one or multiple
+> SRAT memory affinity structures with the proximity domain of the last
+> node as before.
+> 
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> ---
+>  hw/i386/acpi-build.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 56 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index deb440f286..2ca0317386 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2323,6 +2323,59 @@ build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+>  #define HOLE_640K_START  (640 * 1024)
+>  #define HOLE_640K_END   (1024 * 1024)
+>  
+> +static void build_srat_hotpluggable_memory(GArray *table_data, uint64_t base,
+> +                                           uint64_t len, int default_node)
+> +{
+> +    MemoryDeviceInfoList *info_list = qmp_pc_dimm_device_list();
+> +    MemoryDeviceInfoList *info;
+> +    MemoryDeviceInfo *mi;
+> +    PCDIMMDeviceInfo *di;
+> +    uint64_t end = base + len, cur, addr, size;
+> +    int node;
+> +    bool is_nvdimm;
+> +    AcpiSratMemoryAffinity *numamem;
+> +    MemoryAffinityFlags flags;
+> +
+> +    for (cur = base, info = info_list;
+> +         cur < end;
+> +         cur += size, info = info->next) {
+> +        numamem = acpi_data_push(table_data, sizeof *numamem);
+> +
+> +        if (!info) {
+> +            build_srat_memory(numamem, cur, end - cur, default_node,
+> +                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+> +            break;
+> +        }
+> +
+> +        mi = info->value;
+> +        is_nvdimm = (mi->type == MEMORY_DEVICE_INFO_KIND_NVDIMM);
+> +        di = !is_nvdimm ? mi->u.dimm.data :
+> +                          qapi_NVDIMMDeviceInfo_base(mi->u.nvdimm.data);
+> +
+> +        addr = di->addr;
+maybe drop addr and use di->addr directly
 
+> +        if (cur < addr) {
+> +            build_srat_memory(numamem, cur, addr - cur, default_node,
+> +                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+> +            numamem = acpi_data_push(table_data, sizeof *numamem);
+> +        }
+> +
+> +        size = di->size;
+> +        node = di->node;
+the same wrt di->node
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> +
+> +        flags = MEM_AFFINITY_ENABLED;
+> +        if (di->hotpluggable) {
+> +            flags |= MEM_AFFINITY_HOTPLUGGABLE;
+> +        }
+> +        if (is_nvdimm) {
+> +            flags |= MEM_AFFINITY_NON_VOLATILE;
+> +        }
+> +
+> +        build_srat_memory(numamem, addr, size, node, flags);
+> +    }
+> +
+> +    qapi_free_MemoryDeviceInfoList(info_list);
+> +}
+> +
+>  static void
+>  build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>  {
+> @@ -2434,10 +2487,9 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>       * providing _PXM method if necessary.
+>       */
+>      if (hotplugabble_address_space_size) {
+> -        numamem = acpi_data_push(table_data, sizeof *numamem);
+> -        build_srat_memory(numamem, pcms->hotplug_memory.base,
+> -                          hotplugabble_address_space_size, pcms->numa_nodes - 1,
+> -                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+> +        build_srat_hotpluggable_memory(table_data, pcms->hotplug_memory.base,
+> +                                       hotplugabble_address_space_size,
+> +                                       pcms->numa_nodes - 1);
+>      }
+>  
+>      build_header(linker, table_data,
