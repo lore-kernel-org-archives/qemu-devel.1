@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1etagm-0003Z3-J9
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:09:14 -0500
+	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1etaiL-0004S5-AZ
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:10:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1etagi-0006yZ-NL
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:09:08 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52336 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1etagi-0006yM-IQ
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:09:04 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 40ABA8182D0C
-	for <qemu-devel@nongnu.org>; Wed,  7 Mar 2018 15:09:04 +0000 (UTC)
-Date: Wed, 7 Mar 2018 15:08:59 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180307150858.GG3089@work-vm>
-References: <20180307110010.2205-1-quintela@redhat.com>
-	<20180307110010.2205-11-quintela@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180307110010.2205-11-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v10 10/24] migration: In case of error just
- end the migration
+	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1etaiH-0007ni-UX
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:10:45 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56738
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imbrenda@linux.vnet.ibm.com>)
+	id 1etaiH-0007n8-Og
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 10:10:41 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w27ExcgR110393
+	for <qemu-devel@nongnu.org>; Wed, 7 Mar 2018 10:10:40 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2gjhk8aqhx-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 07 Mar 2018 10:10:40 -0500
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <imbrenda@linux.vnet.ibm.com>;
+	Wed, 7 Mar 2018 15:10:38 -0000
+From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+Date: Wed,  7 Mar 2018 16:10:34 +0100
+Message-Id: <1520435434-24471-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v5 1/1] s390x/sclp: extend SCLP event masks to
+ 64 bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,48 +37,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: cohuck@redhat.com
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+Extend the SCLP event masks to 64 bits.
 
-It's probably worth keeping an eye on what happens in the case
-of Peter's postcopy recovery where a new incoming connection
-happens later.
+Notice that using any of the new bits results in a state that cannot be
+migrated to an older version.
 
-Dave
+Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+---
+ hw/s390x/event-facility.c         | 49 ++++++++++++++++++++++++++++++++-------
+ include/hw/s390x/event-facility.h |  2 +-
+ 2 files changed, 41 insertions(+), 10 deletions(-)
 
-> ---
->  migration/socket.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/migration/socket.c b/migration/socket.c
-> index 08606c665d..b12b0a462e 100644
-> --- a/migration/socket.c
-> +++ b/migration/socket.c
-> @@ -139,9 +139,8 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
->      sioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
->                                       &err);
->      if (!sioc) {
-> -        error_report("could not accept migration connection (%s)",
-> -                     error_get_pretty(err));
-> -        goto out;
-> +        migrate_set_error(migrate_get_current(), err);
-> +        return G_SOURCE_REMOVE;
->      }
->  
->      trace_migration_socket_incoming_accepted();
-> @@ -150,7 +149,6 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
->      migration_channel_process_incoming(QIO_CHANNEL(sioc));
->      object_unref(OBJECT(sioc));
->  
-> -out:
->      if (migration_has_all_channels()) {
->          /* Close listening socket as its no longer needed */
->          qio_channel_close(ioc, NULL);
-> -- 
-> 2.14.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+index e04ed9f..c166e0a 100644
+--- a/hw/s390x/event-facility.c
++++ b/hw/s390x/event-facility.c
+@@ -30,7 +30,10 @@ struct SCLPEventFacility {
+     SysBusDevice parent_obj;
+     SCLPEventsBus sbus;
+     /* guest's receive mask */
+-    sccb_mask_t receive_mask;
++    union {
++        uint32_t receive_mask_pieces[2];
++        sccb_mask_t receive_mask;
++    };
+     /*
+      * when false, we keep the same broken, backwards compatible behaviour as
+      * before, allowing only masks of size exactly 4; when true, we implement
+@@ -262,7 +265,7 @@ static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
+     case SCLP_SELECTIVE_READ:
+         copy_mask((uint8_t *)&sclp_active_selection_mask, (uint8_t *)&red->mask,
+                   sizeof(sclp_active_selection_mask), ef->mask_length);
+-        sclp_active_selection_mask = be32_to_cpu(sclp_active_selection_mask);
++        sclp_active_selection_mask = be64_to_cpu(sclp_active_selection_mask);
+         if (!sclp_cp_receive_mask ||
+             (sclp_active_selection_mask & ~sclp_cp_receive_mask)) {
+             sccb->h.response_code =
+@@ -294,21 +297,22 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
+     }
+ 
+     /*
+-     * Note: We currently only support masks up to 4 byte length;
+-     *       the remainder is filled up with zeroes. Linux uses
+-     *       a 4 byte mask length.
++     * Note: We currently only support masks up to 8 byte length;
++     *       the remainder is filled up with zeroes. Older Linux
++     *       kernels use a 4 byte mask length, newer ones can use both
++     *       8 or 4 depending on what is available on the host.
+      */
+ 
+     /* keep track of the guest's capability masks */
+     copy_mask((uint8_t *)&tmp_mask, WEM_CP_RECEIVE_MASK(we_mask, mask_length),
+               sizeof(tmp_mask), mask_length);
+-    ef->receive_mask = be32_to_cpu(tmp_mask);
++    ef->receive_mask = be64_to_cpu(tmp_mask);
+ 
+     /* return the SCLP's capability masks to the guest */
+-    tmp_mask = cpu_to_be32(get_host_receive_mask(ef));
++    tmp_mask = cpu_to_be64(get_host_receive_mask(ef));
+     copy_mask(WEM_RECEIVE_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
+               mask_length, sizeof(tmp_mask));
+-    tmp_mask = cpu_to_be32(get_host_send_mask(ef));
++    tmp_mask = cpu_to_be64(get_host_send_mask(ef));
+     copy_mask(WEM_SEND_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
+               mask_length, sizeof(tmp_mask));
+ 
+@@ -369,6 +373,13 @@ static void command_handler(SCLPEventFacility *ef, SCCB *sccb, uint64_t code)
+     }
+ }
+ 
++static bool vmstate_event_facility_mask64_needed(void *opaque)
++{
++    SCLPEventFacility *ef = opaque;
++
++    return (ef->receive_mask & 0xFFFFFFFF) != 0;
++}
++
+ static bool vmstate_event_facility_mask_length_needed(void *opaque)
+ {
+     SCLPEventFacility *ef = opaque;
+@@ -376,6 +387,21 @@ static bool vmstate_event_facility_mask_length_needed(void *opaque)
+     return ef->allow_all_mask_sizes;
+ }
+ 
++static const VMStateDescription vmstate_event_facility_mask64 = {
++    .name = "vmstate-event-facility/mask64",
++    .version_id = 0,
++    .minimum_version_id = 0,
++    .needed = vmstate_event_facility_mask64_needed,
++    .fields = (VMStateField[]) {
++#ifdef HOST_WORDS_BIGENDIAN
++        VMSTATE_UINT32(receive_mask_pieces[1], SCLPEventFacility),
++#else
++        VMSTATE_UINT32(receive_mask_pieces[0], SCLPEventFacility),
++#endif
++        VMSTATE_END_OF_LIST()
++     }
++};
++
+ static const VMStateDescription vmstate_event_facility_mask_length = {
+     .name = "vmstate-event-facility/mask_length",
+     .version_id = 0,
+@@ -392,10 +418,15 @@ static const VMStateDescription vmstate_event_facility = {
+     .version_id = 0,
+     .minimum_version_id = 0,
+     .fields = (VMStateField[]) {
+-        VMSTATE_UINT32(receive_mask, SCLPEventFacility),
++#ifdef HOST_WORDS_BIGENDIAN
++        VMSTATE_UINT32(receive_mask_pieces[0], SCLPEventFacility),
++#else
++        VMSTATE_UINT32(receive_mask_pieces[1], SCLPEventFacility),
++#endif
+         VMSTATE_END_OF_LIST()
+      },
+     .subsections = (const VMStateDescription * []) {
++        &vmstate_event_facility_mask64,
+         &vmstate_event_facility_mask_length,
+         NULL
+      }
+diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
+index 0e2b761..06ba4ea 100644
+--- a/include/hw/s390x/event-facility.h
++++ b/include/hw/s390x/event-facility.h
+@@ -73,7 +73,7 @@ typedef struct WriteEventMask {
+ #define WEM_RECEIVE_MASK(wem, mask_len) ((wem)->masks + 2 * (mask_len))
+ #define WEM_SEND_MASK(wem, mask_len) ((wem)->masks + 3 * (mask_len))
+ 
+-typedef uint32_t sccb_mask_t;
++typedef uint64_t sccb_mask_t;
+ 
+ typedef struct EventBufferHeader {
+     uint16_t length;
+-- 
+2.7.4
