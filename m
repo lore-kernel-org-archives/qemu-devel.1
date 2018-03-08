@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eu1gG-00037u-UJ
+	(envelope-from <dgilbert@redhat.com>) id 1eu1gG-00037t-U3
 	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eu1gD-00063r-LO
+	(envelope-from <dgilbert@redhat.com>) id 1eu1gC-00063B-5n
 	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:24 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40186 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44386 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eu1gD-00063U-FA
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:21 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eu1gC-00062r-0h
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:20 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DD2464040073
-	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 19:58:20 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6CE857C6CC
+	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 19:58:19 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Thu,  8 Mar 2018 19:57:47 +0000
-Message-Id: <20180308195811.24894-6-dgilbert@redhat.com>
+Date: Thu,  8 Mar 2018 19:57:46 +0000
+Message-Id: <20180308195811.24894-5-dgilbert@redhat.com>
 In-Reply-To: <20180308195811.24894-1-dgilbert@redhat.com>
 References: <20180308195811.24894-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 05/29] postcopy: Add vhost-user flag for
- postcopy and check it
+Subject: [Qemu-devel] [PATCH v4 04/29] postcopy: Add notifier chain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,153 +34,144 @@ Cc: aarcange@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Add a vhost feature flag for postcopy support, and
-use the postcopy notifier to check it before allowing postcopy.
+Add a notifier chain for postcopy with a 'reason' flag
+and an opportunity for a notifier member to return an error.
+
+Call it when enabling postcopy.
+
+This will initially used to enable devices to declare they're unable
+to postcopy and later to notify of devices of stages within postcopy.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- contrib/libvhost-user/libvhost-user.h |  2 ++
- docs/interop/vhost-user.txt           | 10 +++++++++
- hw/virtio/vhost-user.c                | 41 ++++++++++++++++++++++++++++++++++-
- 3 files changed, 52 insertions(+), 1 deletion(-)
+ migration/postcopy-ram.c | 36 ++++++++++++++++++++++++++++++++++++
+ migration/postcopy-ram.h | 26 ++++++++++++++++++++++++++
+ vl.c                     |  2 ++
+ 3 files changed, 64 insertions(+)
 
-diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
-index 18f95f65d7..96db29c4ce 100644
---- a/contrib/libvhost-user/libvhost-user.h
-+++ b/contrib/libvhost-user/libvhost-user.h
-@@ -48,6 +48,8 @@ enum VhostUserProtocolFeature {
-     VHOST_USER_PROTOCOL_F_NET_MTU = 4,
-     VHOST_USER_PROTOCOL_F_SLAVE_REQ = 5,
-     VHOST_USER_PROTOCOL_F_CROSS_ENDIAN = 6,
-+    VHOST_USER_PROTOCOL_F_CRYPTO_SESSION = 7,
-+    VHOST_USER_PROTOCOL_F_PAGEFAULT = 8,
- 
-     VHOST_USER_PROTOCOL_F_MAX
- };
-diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-index cb3a7595aa..91a572d781 100644
---- a/docs/interop/vhost-user.txt
-+++ b/docs/interop/vhost-user.txt
-@@ -290,6 +290,15 @@ Once the source has finished migration, rings will be stopped by
- the source. No further update must be done before rings are
- restarted.
- 
-+In postcopy migration the slave is started before all the memory has been
-+received from the source host, and care must be taken to avoid accessing pages
-+that have yet to be received.  The slave opens a 'userfault'-fd and registers
-+the memory with it; this fd is then passed back over to the master.
-+The master services requests on the userfaultfd for pages that are accessed
-+and when the page is available it performs WAKE ioctl's on the userfaultfd
-+to wake the stalled slave.  The client indicates support for this via the
-+VHOST_USER_PROTOCOL_F_PAGEFAULT feature.
-+
- Memory access
- -------------
- 
-@@ -369,6 +378,7 @@ Protocol features
- #define VHOST_USER_PROTOCOL_F_SLAVE_REQ      5
- #define VHOST_USER_PROTOCOL_F_CROSS_ENDIAN   6
- #define VHOST_USER_PROTOCOL_F_CRYPTO_SESSION 7
-+#define VHOST_USER_PROTOCOL_F_PAGEFAULT      8
- 
- Master message types
- --------------------
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 41ff5cff41..aab35c4845 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -18,6 +18,8 @@
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index a75b5d393f..1089814d54 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -23,6 +23,8 @@
+ #include "savevm.h"
+ #include "postcopy-ram.h"
+ #include "ram.h"
++#include "qapi/error.h"
++#include "qemu/notify.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/balloon.h"
  #include "qemu/error-report.h"
- #include "qemu/sockets.h"
- #include "sysemu/cryptodev.h"
-+#include "migration/migration.h"
-+#include "migration/postcopy-ram.h"
- 
- #include <sys/ioctl.h>
- #include <sys/socket.h>
-@@ -41,7 +43,7 @@ enum VhostUserProtocolFeature {
-     VHOST_USER_PROTOCOL_F_SLAVE_REQ = 5,
-     VHOST_USER_PROTOCOL_F_CROSS_ENDIAN = 6,
-     VHOST_USER_PROTOCOL_F_CRYPTO_SESSION = 7,
--
-+    VHOST_USER_PROTOCOL_F_PAGEFAULT = 8,
-     VHOST_USER_PROTOCOL_F_MAX
+@@ -45,6 +47,33 @@ struct PostcopyDiscardState {
+     unsigned int nsentcmds;
  };
  
-@@ -164,8 +166,10 @@ static VhostUserMsg m __attribute__ ((unused));
- #define VHOST_USER_VERSION    (0x1)
- 
- struct vhost_user {
-+    struct vhost_dev *dev;
-     CharBackend *chr;
-     int slave_fd;
-+    NotifierWithReturn postcopy_notifier;
- };
- 
- static bool ioeventfd_enabled(void)
-@@ -791,6 +795,33 @@ out:
-     return ret;
- }
- 
-+static int vhost_user_postcopy_notifier(NotifierWithReturn *notifier,
-+                                        void *opaque)
++static NotifierWithReturnList postcopy_notifier_list;
++
++void postcopy_infrastructure_init(void)
 +{
-+    struct PostcopyNotifyData *pnd = opaque;
-+    struct vhost_user *u = container_of(notifier, struct vhost_user,
-+                                         postcopy_notifier);
-+    struct vhost_dev *dev = u->dev;
-+
-+    switch (pnd->reason) {
-+    case POSTCOPY_NOTIFY_PROBE:
-+        if (!virtio_has_feature(dev->protocol_features,
-+                                VHOST_USER_PROTOCOL_F_PAGEFAULT)) {
-+            /* TODO: Get the device name into this error somehow */
-+            error_setg(pnd->errp,
-+                       "vhost-user backend not capable of postcopy");
-+            return -ENOENT;
-+        }
-+        break;
-+
-+    default:
-+        /* We ignore notifications we don't know */
-+        break;
-+    }
-+
-+    return 0;
++    notifier_with_return_list_init(&postcopy_notifier_list);
 +}
 +
- static int vhost_user_init(struct vhost_dev *dev, void *opaque)
- {
-     uint64_t features, protocol_features;
-@@ -802,6 +833,7 @@ static int vhost_user_init(struct vhost_dev *dev, void *opaque)
-     u = g_new0(struct vhost_user, 1);
-     u->chr = opaque;
-     u->slave_fd = -1;
-+    u->dev = dev;
-     dev->opaque = u;
++void postcopy_add_notifier(NotifierWithReturn *nn)
++{
++    notifier_with_return_list_add(&postcopy_notifier_list, nn);
++}
++
++void postcopy_remove_notifier(NotifierWithReturn *n)
++{
++    notifier_with_return_remove(n);
++}
++
++int postcopy_notify(enum PostcopyNotifyReason reason, Error **errp)
++{
++    struct PostcopyNotifyData pnd;
++    pnd.reason = reason;
++    pnd.errp = errp;
++
++    return notifier_with_return_list_notify(&postcopy_notifier_list,
++                                            &pnd);
++}
++
+ /* Postcopy needs to detect accesses to pages that haven't yet been copied
+  * across, and efficiently map new pages in, the techniques for doing this
+  * are target OS specific.
+@@ -215,6 +244,7 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+     struct uffdio_register reg_struct;
+     struct uffdio_range range_struct;
+     uint64_t feature_mask;
++    Error *local_err = NULL;
  
-     err = vhost_user_get_features(dev, &features);
-@@ -858,6 +890,9 @@ static int vhost_user_init(struct vhost_dev *dev, void *opaque)
-         return err;
+     if (qemu_target_page_size() > pagesize) {
+         error_report("Target page size bigger than host page size");
+@@ -228,6 +258,12 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+         goto out;
      }
  
-+    u->postcopy_notifier.notify = vhost_user_postcopy_notifier;
-+    postcopy_add_notifier(&u->postcopy_notifier);
-+
-     return 0;
- }
- 
-@@ -868,6 +903,10 @@ static int vhost_user_cleanup(struct vhost_dev *dev)
-     assert(dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_USER);
- 
-     u = dev->opaque;
-+    if (u->postcopy_notifier.notify) {
-+        postcopy_remove_notifier(&u->postcopy_notifier);
-+        u->postcopy_notifier.notify = NULL;
++    /* Give devices a chance to object */
++    if (postcopy_notify(POSTCOPY_NOTIFY_PROBE, &local_err)) {
++        error_report_err(local_err);
++        goto out;
 +    }
-     if (u->slave_fd >= 0) {
-         qemu_set_fd_handler(u->slave_fd, NULL, NULL, NULL);
-         close(u->slave_fd);
++
+     /* Version and features check */
+     if (!ufd_check_and_apply(ufd, mis)) {
+         goto out;
+diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+index 14f6cadcbd..2e879bbacb 100644
+--- a/migration/postcopy-ram.h
++++ b/migration/postcopy-ram.h
+@@ -116,4 +116,30 @@ PostcopyState postcopy_state_set(PostcopyState new_state);
+ 
+ void postcopy_fault_thread_notify(MigrationIncomingState *mis);
+ 
++/*
++ * To be called once at the start before any device initialisation
++ */
++void postcopy_infrastructure_init(void);
++
++/* Add a notifier to a list to be called when checking whether the devices
++ * can support postcopy.
++ * It's data is a *PostcopyNotifyData
++ * It should return 0 if OK, or a negative value on failure.
++ * On failure it must set the data->errp to an error.
++ *
++ */
++enum PostcopyNotifyReason {
++    POSTCOPY_NOTIFY_PROBE = 0,
++};
++
++struct PostcopyNotifyData {
++    enum PostcopyNotifyReason reason;
++    Error **errp;
++};
++
++void postcopy_add_notifier(NotifierWithReturn *nn);
++void postcopy_remove_notifier(NotifierWithReturn *n);
++/* Call the notifier list set by postcopy_add_start_notifier */
++int postcopy_notify(enum PostcopyNotifyReason reason, Error **errp);
++
+ #endif
+diff --git a/vl.c b/vl.c
+index dae986b352..55c8d692e8 100644
+--- a/vl.c
++++ b/vl.c
+@@ -94,6 +94,7 @@ int main(int argc, char **argv)
+ #include "audio/audio.h"
+ #include "sysemu/cpus.h"
+ #include "migration/colo.h"
++#include "migration/postcopy-ram.h"
+ #include "sysemu/kvm.h"
+ #include "sysemu/hax.h"
+ #include "qapi/qobject-input-visitor.h"
+@@ -3101,6 +3102,7 @@ int main(int argc, char **argv, char **envp)
+     module_call_init(MODULE_INIT_OPTS);
+ 
+     runstate_init();
++    postcopy_infrastructure_init();
+ 
+     if (qcrypto_init(&err) < 0) {
+         error_reportf_err(err, "cannot initialize crypto: ");
 -- 
 2.14.3
