@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1etsD8-00015x-8Q
+	(envelope-from <dgibson@ozlabs.org>) id 1etsD8-00015y-96
 	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 04:51:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1etsD5-0000TR-6b
+	(envelope-from <dgibson@ozlabs.org>) id 1etsD5-0000TW-8J
 	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 04:51:42 -0500
-Date: Thu, 8 Mar 2018 17:17:07 +1100
+Date: Thu, 8 Mar 2018 17:15:41 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180308061707.GP3083@umbus.fritz.box>
-References: <20180307205427.3A2877456C6@zero.eik.bme.hu>
+Message-ID: <20180308061541.GO3083@umbus.fritz.box>
+References: <20180308023337.21062-1-haozhong.zhang@intel.com>
+	<20180308023337.21062-2-haozhong.zhang@intel.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="0UhZIN3Sa23/ILEd"
+	protocol="application/pgp-signature"; boundary="WoqaC9TUMqqIOlla"
 Content-Disposition: inline
-In-Reply-To: <20180307205427.3A2877456C6@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH] ppc440_pcix: Add dummy implementation of
- BRDGOPT registers
+In-Reply-To: <20180308023337.21062-2-haozhong.zhang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/5] pc-dimm: make
+ qmp_pc_dimm_device_list() sort devices by address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,92 +25,237 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>
+To: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-ppc@nongnu.org
 
 
---0UhZIN3Sa23/ILEd
+--WoqaC9TUMqqIOlla
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 07, 2018 at 09:43:59PM +0100, BALATON Zoltan wrote:
-> I don't know what should be the correct implementation for these so
-> these are just stored and returned as is without doing anything for
-> now only to silence warnings when u-boot accesses these registers.
+On Thu, Mar 08, 2018 at 10:33:33AM +0800, Haozhong Zhang wrote:
+> Make qmp_pc_dimm_device_list() return sorted by start address
+> list of devices so that it could be reused in places that
+> would need sorted list*. Reuse existing pc_dimm_built_list()
+> to get sorted list.
 >=20
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> While at it hide recursive callbacks from callers, so that:
+>=20
+>   qmp_pc_dimm_device_list(qdev_get_machine(), &list);
+>=20
+> could be replaced with simpler:
+>=20
+>   list =3D qmp_pc_dimm_device_list();
+>=20
+> * follow up patch will use it in build_srat()
+>=20
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-I'm a bit dubious about putting in a dummy register implementation.
-Specifically, I think the case needs to be made that the dummy
-implementation is preferable to just putting up with the test errors.
+ppc part
 
-At the very least there should be a comment in the code indicating
-that it's just a dummy stub implementation.
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  hw/ppc/ppc440_pcix.c | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
+>  hw/mem/pc-dimm.c         | 83 +++++++++++++++++++++++++-----------------=
+------
+>  hw/ppc/spapr.c           |  3 +-
+>  include/hw/mem/pc-dimm.h |  2 +-
+>  numa.c                   |  4 +--
+>  qmp.c                    |  7 +---
+>  stubs/qmp_pc_dimm.c      |  4 +--
+>  6 files changed, 50 insertions(+), 53 deletions(-)
 >=20
-> diff --git a/hw/ppc/ppc440_pcix.c b/hw/ppc/ppc440_pcix.c
-> index ab2626a..3f177d3 100644
-> --- a/hw/ppc/ppc440_pcix.c
-> +++ b/hw/ppc/ppc440_pcix.c
-> @@ -55,6 +55,8 @@ typedef struct PPC440PCIXState {
->      PCIDevice *dev;
->      struct PLBOutMap pom[PPC440_PCIX_NR_POMS];
->      struct PLBInMap pim[PPC440_PCIX_NR_PIMS];
-> +    uint32_t brdgopt1;
-> +    uint32_t brdgopt2;
->      uint32_t sts;
->      qemu_irq irq[PCI_NUM_PINS];
->      AddressSpace bm_as;
-> @@ -95,6 +97,8 @@ typedef struct PPC440PCIXState {
->  #define PCIX0_PIM0SAH       0xf8
->  #define PCIX0_PIM2SAH       0xfc
-> =20
-> +#define PCIX0_BRDGOPT1      0x40
-> +#define PCIX0_BRDGOPT2      0x44
->  #define PCIX0_STS           0xe0
-> =20
->  #define PCI_ALL_SIZE        (PPC440_REG_BASE + PPC440_REG_SIZE)
-> @@ -270,6 +274,12 @@ static void ppc440_pcix_reg_write4(void *opaque, hwa=
-ddr addr,
->          ppc440_pcix_update_pim(s, 2);
->          break;
-> =20
-> +    case PCIX0_BRDGOPT1:
-> +        s->brdgopt1 =3D val;
-> +        break;
-> +    case PCIX0_BRDGOPT2:
-> +        s->brdgopt2 =3D val;
-> +        break;
->      case PCIX0_STS:
->          s->sts =3D val;
->          break;
-> @@ -365,6 +375,12 @@ static uint64_t ppc440_pcix_reg_read4(void *opaque, =
-hwaddr addr,
->          val =3D s->pim[2].la >> 32;
->          break;
-> =20
-> +    case PCIX0_BRDGOPT1:
-> +        val =3D s->brdgopt1;
-> +        break;
-> +    case PCIX0_BRDGOPT2:
-> +        val =3D s->brdgopt2;
-> +        break;
->      case PCIX0_STS:
->          val =3D s->sts;
->          break;
-> @@ -408,6 +424,8 @@ static void ppc440_pcix_reset(DeviceState *dev)
->      for (i =3D 0; i < PPC440_PCIX_NR_PIMS; i++) {
->          s->pim[i].sa =3D 0xffffffff00000000ULL;
->      }
-> +    s->brdgopt1 =3D 0;
-> +    s->brdgopt2 =3D 0;
->      s->sts =3D 0;
+> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> index 6e74b61cb6..4d050fe2cd 100644
+> --- a/hw/mem/pc-dimm.c
+> +++ b/hw/mem/pc-dimm.c
+> @@ -162,45 +162,6 @@ uint64_t get_plugged_memory_size(void)
+>      return pc_existing_dimms_capacity(&error_abort);
 >  }
 > =20
+> -int qmp_pc_dimm_device_list(Object *obj, void *opaque)
+> -{
+> -    MemoryDeviceInfoList ***prev =3D opaque;
+> -
+> -    if (object_dynamic_cast(obj, TYPE_PC_DIMM)) {
+> -        DeviceState *dev =3D DEVICE(obj);
+> -
+> -        if (dev->realized) {
+> -            MemoryDeviceInfoList *elem =3D g_new0(MemoryDeviceInfoList, =
+1);
+> -            MemoryDeviceInfo *info =3D g_new0(MemoryDeviceInfo, 1);
+> -            PCDIMMDeviceInfo *di =3D g_new0(PCDIMMDeviceInfo, 1);
+> -            DeviceClass *dc =3D DEVICE_GET_CLASS(obj);
+> -            PCDIMMDevice *dimm =3D PC_DIMM(obj);
+> -
+> -            if (dev->id) {
+> -                di->has_id =3D true;
+> -                di->id =3D g_strdup(dev->id);
+> -            }
+> -            di->hotplugged =3D dev->hotplugged;
+> -            di->hotpluggable =3D dc->hotpluggable;
+> -            di->addr =3D dimm->addr;
+> -            di->slot =3D dimm->slot;
+> -            di->node =3D dimm->node;
+> -            di->size =3D object_property_get_uint(OBJECT(dimm), PC_DIMM_=
+SIZE_PROP,
+> -                                                NULL);
+> -            di->memdev =3D object_get_canonical_path(OBJECT(dimm->hostme=
+m));
+> -
+> -            info->u.dimm.data =3D di;
+> -            elem->value =3D info;
+> -            elem->next =3D NULL;
+> -            **prev =3D elem;
+> -            *prev =3D &elem->next;
+> -        }
+> -    }
+> -
+> -    object_child_foreach(obj, qmp_pc_dimm_device_list, opaque);
+> -    return 0;
+> -}
+> -
+>  static int pc_dimm_slot2bitmap(Object *obj, void *opaque)
+>  {
+>      unsigned long *bitmap =3D opaque;
+> @@ -276,6 +237,50 @@ static int pc_dimm_built_list(Object *obj, void *opa=
+que)
+>      return 0;
+>  }
+> =20
+> +MemoryDeviceInfoList *qmp_pc_dimm_device_list(void)
+> +{
+> +    GSList *dimms =3D NULL, *item;
+> +    MemoryDeviceInfoList *list =3D NULL, *prev =3D NULL;
+> +
+> +    object_child_foreach(qdev_get_machine(), pc_dimm_built_list, &dimms);
+> +
+> +    for (item =3D dimms; item; item =3D g_slist_next(item)) {
+> +        PCDIMMDevice *dimm =3D PC_DIMM(item->data);
+> +        Object *obj =3D OBJECT(dimm);
+> +        MemoryDeviceInfoList *elem =3D g_new0(MemoryDeviceInfoList, 1);
+> +        MemoryDeviceInfo *info =3D g_new0(MemoryDeviceInfo, 1);
+> +        PCDIMMDeviceInfo *di =3D g_new0(PCDIMMDeviceInfo, 1);
+> +        DeviceClass *dc =3D DEVICE_GET_CLASS(obj);
+> +        DeviceState *dev =3D DEVICE(obj);
+> +
+> +        if (dev->id) {
+> +            di->has_id =3D true;
+> +            di->id =3D g_strdup(dev->id);
+> +        }
+> +        di->hotplugged =3D dev->hotplugged;
+> +        di->hotpluggable =3D dc->hotpluggable;
+> +        di->addr =3D dimm->addr;
+> +        di->slot =3D dimm->slot;
+> +        di->node =3D dimm->node;
+> +        di->size =3D object_property_get_uint(obj, PC_DIMM_SIZE_PROP, NU=
+LL);
+> +        di->memdev =3D object_get_canonical_path(OBJECT(dimm->hostmem));
+> +
+> +        info->u.dimm.data =3D di;
+> +        elem->value =3D info;
+> +        elem->next =3D NULL;
+> +        if (prev) {
+> +            prev->next =3D elem;
+> +        } else {
+> +            list =3D elem;
+> +        }
+> +        prev =3D elem;
+> +    }
+> +
+> +    g_slist_free(dimms);
+> +
+> +    return list;
+> +}
+> +
+>  uint64_t pc_dimm_get_free_addr(uint64_t address_space_start,
+>                                 uint64_t address_space_size,
+>                                 uint64_t *hint, uint64_t align, uint64_t =
+size,
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 7e1c858566..44a0670d11 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -722,8 +722,7 @@ static int spapr_populate_drconf_memory(sPAPRMachineS=
+tate *spapr, void *fdt)
+>      }
+> =20
+>      if (hotplug_lmb_start) {
+> -        MemoryDeviceInfoList **prev =3D &dimms;
+> -        qmp_pc_dimm_device_list(qdev_get_machine(), &prev);
+> +        dimms =3D qmp_pc_dimm_device_list();
+>      }
+> =20
+>      /* ibm,dynamic-memory */
+> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+> index d83b957829..1fc479281c 100644
+> --- a/include/hw/mem/pc-dimm.h
+> +++ b/include/hw/mem/pc-dimm.h
+> @@ -93,7 +93,7 @@ uint64_t pc_dimm_get_free_addr(uint64_t address_space_s=
+tart,
+> =20
+>  int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
+> =20
+> -int qmp_pc_dimm_device_list(Object *obj, void *opaque);
+> +MemoryDeviceInfoList *qmp_pc_dimm_device_list(void);
+>  uint64_t pc_existing_dimms_capacity(Error **errp);
+>  uint64_t get_plugged_memory_size(void);
+>  void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+> diff --git a/numa.c b/numa.c
+> index 5d7529c1d9..7ca2bef63f 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -520,12 +520,10 @@ void memory_region_allocate_system_memory(MemoryReg=
+ion *mr, Object *owner,
+> =20
+>  static void numa_stat_memory_devices(NumaNodeMem node_mem[])
+>  {
+> -    MemoryDeviceInfoList *info_list =3D NULL;
+> -    MemoryDeviceInfoList **prev =3D &info_list;
+> +    MemoryDeviceInfoList *info_list =3D qmp_pc_dimm_device_list();
+>      MemoryDeviceInfoList *info;
+>      PCDIMMDeviceInfo     *pcdimm_info;
+> =20
+> -    qmp_pc_dimm_device_list(qdev_get_machine(), &prev);
+>      for (info =3D info_list; info; info =3D info->next) {
+>          MemoryDeviceInfo *value =3D info->value;
+> =20
+> diff --git a/qmp.c b/qmp.c
+> index 8c7d1cc479..4b2517d8b5 100644
+> --- a/qmp.c
+> +++ b/qmp.c
+> @@ -731,12 +731,7 @@ void qmp_object_del(const char *id, Error **errp)
+> =20
+>  MemoryDeviceInfoList *qmp_query_memory_devices(Error **errp)
+>  {
+> -    MemoryDeviceInfoList *head =3D NULL;
+> -    MemoryDeviceInfoList **prev =3D &head;
+> -
+> -    qmp_pc_dimm_device_list(qdev_get_machine(), &prev);
+> -
+> -    return head;
+> +    return qmp_pc_dimm_device_list();
+>  }
+> =20
+>  ACPIOSTInfoList *qmp_query_acpi_ospm_status(Error **errp)
+> diff --git a/stubs/qmp_pc_dimm.c b/stubs/qmp_pc_dimm.c
+> index 9ddc4f619a..b6b2cca89e 100644
+> --- a/stubs/qmp_pc_dimm.c
+> +++ b/stubs/qmp_pc_dimm.c
+> @@ -2,9 +2,9 @@
+>  #include "qom/object.h"
+>  #include "hw/mem/pc-dimm.h"
+> =20
+> -int qmp_pc_dimm_device_list(Object *obj, void *opaque)
+> +MemoryDeviceInfoList *qmp_pc_dimm_device_list(void)
+>  {
+> -   return 0;
+> +   return NULL;
+>  }
+> =20
+>  uint64_t get_plugged_memory_size(void)
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -117,24 +263,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---0UhZIN3Sa23/ILEd
+--WoqaC9TUMqqIOlla
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqg1WMACgkQbDjKyiDZ
-s5Jm3BAAp4yBWVGfQ6M5HkKWHJjeDheRS97CpOtLcjYmvFQ7uxZRWJBxVSokHMuu
-81+wSOo2vRtC7B4virY7fFQ3uF0BniLQ0ZZNA7WhvlOIHi22M+vjn7aN+jVnoBQd
-F5NQvIUpPUwVr+yhw3Z5RH2cKW1yveFXuCI12aUbAgPMo/NGH8K0czGr9YEPQzX7
-ypKobbkTykXIRH8XSVKaw/3UJjfEG6xE+l9JCjFeygQLd24gLjlp8BFR+AmU38CW
-BpGPeFgRRhUsIrJxy+0lKWidZMfMhn3jwqAFy3yQWJ87EUDuFR1MbVuASG95B8X/
-QTN1MKzi9iHMSDdPKC01U7SDIa59qeq9nWDphkDYQTax4LgJr6XNjZ0FLVPjtLWo
-TokE0dpXB1TnJAJKWxC57VPq3QXOcp8ehRfh/RMNAVcd64RyjyF+vbmm05WEfzAW
-d36qloXJMMUzdOfdGLRLpvq5vOs7obA422mGCh7eOvi1CHes/Drl+QJqJP7hlFEg
-76kNS8Lfti+65/Db3uwku8jyOp7v9/zVbPj4azwrCz9l+SViB5FyHFLOJcKZ23CL
-k3cfrUlhI/gPCQZPEdIGunEpUigl4++W350CZxfhjBsztJQ75Jf2nE0s8/U2AfWQ
-2QQJY4tUm7R8JdOq1ucYQcW1JJuNCmDRF6GOCPvkqrDS3prD4do=
-=pg0s
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqg1QsACgkQbDjKyiDZ
+s5KLwg//ew6WZu7aZed2rmuEoiAOGQIFxmnDYZCe+nTUDlaQ5fogv6r+fesn371Q
+uuSTmEV0OhfdjYwTIcCVlz+Bn9zglfXDO2nETtVHieI2y2mflfg3AlOotlaPW8xY
+6FLQZjbpmaw/W3ifXyntZCZeRHRr+PekKvK1K9/lsGWYrgS0lviMlwWeeFvuoYN0
+efgX+FpaVgKVuwYUt+MAmo8U69ky/uonBJfHk/l7ZWiWu2RNGz01ND2PPlVd1QDB
+HR3eGKBR3dWPfGORhvmabXmm/+TJmYQuIWvqTK+9Vm15w4ywHzoM0PmEI/7y0aaw
+e3ycC4Ge4pq6fIYV6D/5GFN9FMk8Y93LW3hu+RLrjKeSQq/K0oUu55b26riSq7+7
+MXj2876nNs2KHDoklDeAsBA/A54cpL/y3PiRv0oL8HN29ZaikI8quOv0NmplPB1A
+6x1g7Q25nl9DP8t+c/A+NstUL32v61fphX2zJPZHHUS3Tm7NHVsUpDnVk2qQdVX7
+f3MkdwtEvSyiD1FiM+90xw7TF4yDZcNTZSu7sbhnikjInZuglUxSfzqWoPfemiw4
+A+ZVRIKWNW97M8LdbhAvnqMyU4IVPfxyhz3JhJb9+4V2+ovRQETXdz09fABXWvYY
+M+SF8mB7iOuNtAaMfTxLUM+C6jlHoZA3YQg/0nR7Qe6XOLAriOI=
+=tcF0
 -----END PGP SIGNATURE-----
 
---0UhZIN3Sa23/ILEd--
+--WoqaC9TUMqqIOlla--
