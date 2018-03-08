@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1etyjT-0008KS-9o
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:49:32 -0500
+	(envelope-from <berrange@redhat.com>) id 1etymP-0000uq-1w
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:52:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1etyjP-0007Bk-KK
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:49:31 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45020 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1etymL-0003Dc-AE
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:52:33 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38536 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1etyjP-0007BQ-E4
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:49:27 -0500
-Date: Thu, 8 Mar 2018 16:49:10 +0000
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1etymL-0003C7-4N
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:52:29 -0500
+Date: Thu, 8 Mar 2018 16:52:20 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180308164910.GF4718@redhat.com>
+Message-ID: <20180308165220.GG4718@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20180308124901.83533-1-brijesh.singh@amd.com>
-	<20180308124901.83533-9-brijesh.singh@amd.com>
+	<20180308124901.83533-10-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180308124901.83533-9-brijesh.singh@amd.com>
-Subject: Re: [Qemu-devel] [PATCH v12 08/28] target/i386: add Secure
- Encrypted Virtulization (SEV) object
+In-Reply-To: <20180308124901.83533-10-brijesh.singh@amd.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v12 09/28] qmp: add query-sev command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +30,71 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Brijesh Singh <brijesh.singh@amd.com>
-Cc: qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>
 
-On Thu, Mar 08, 2018 at 06:48:41AM -0600, Brijesh Singh wrote:
-> Add a new memory encryption object 'sev-guest'. The object will be used
-> to create enrypted VMs on AMD EPYC CPU. The object provides the properties
-> to pass guest owner's public Diffie-hellman key, guest policy and session
-> information required to create the memory encryption context within the
-> SEV firmware.
-> 
-> e.g to launch SEV guest
->  # $QEMU \
->     -object sev-guest,id=sev0 \
->     -machine ....,memory-encryption=sev0
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
+On Thu, Mar 08, 2018 at 06:48:42AM -0600, Brijesh Singh wrote:
+> The QMP query command can used to retrieve the SEV information when
+> memory encryption is enabled on AMD platform.
+>=20
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
+> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  monitor.c             |  7 +++++
+>  qapi/misc.json        | 76 +++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  target/i386/monitor.c |  8 ++++++
+>  3 files changed, 91 insertions(+)
 
-
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 4c280142c52c..6113bce08a8c 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -4353,6 +4353,50 @@ contents of @code{iv.b64} to the second secret
->           data=$SECRET,iv=$(<iv.b64)
->  @end example
->  
-> +@item -object sev-guest,id=@var{id},cbitpos=@var{cbitpos},reduced-phys-bits=@var{val},[sev-device=@var{string},policy=@var{policy},handle=@var{handle},dh-cert-file=@var{file},session-file=@var{file}]
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index bd04469a4ba2..14681729f8fc 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -3201,3 +3201,79 @@
+>  # Since: 2.9
+>  ##
+>  { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
 > +
-> +Create a Secure Encrypted Virtualization (SEV) guest object, which can be used
-> +to provide the guest memory encryption support on AMD processors.
 > +
-> +When memory encryption is enabled, one of the physical address bit (aka the
-> +C-bit) is utilized to mark if a memory page is protected. The @option{cbitpos}
-> +is used to provide the C-bit position. The C-bit position is Host family dependent
-> +hence user must provide this value. On EPYC, the value should be 47.
-> +
-> +When memory encryption is enabled, we loose certain bits in physical address space.
-> +The @option{reduced-phys-bits} is used to provide the number of bits we loose in
-> +physical address space. Similar to C-bit, the value is Host family dependent.
-> +On EPYC, the value should be 5.
+> +##
+> +# @SevState:
+> +#
+> +# An enumeration of SEV state information used during @query-sev.
+> +#
+> +# @uninit: The guest is uninitialized.
+> +#
+> +# @lupdate: The guest is currently being launched and plaintext and
+> +#           reigster state is being imported.
 
-Is it valid to specify a different value for either of these properties ?
-eg what happens if I pass cbitpos=45 instead of 47 on an EPYC host ?
+Typo s/reigster/register/
 
-In particular I thinking about possible migration scenario, where EPYC
-uses 47 by default but some $NEXT AMD CPU uses 48 by default. In that
-case we might want to use '47' on both CPUs if we need ability to live
-migrate between different host CPU generations. Would that be valid ?
-
-On the flip side, if the value really it strictly tied to the host
-CPU family and no deviation is permitted, could the kernel not just
-pick the right value automatically avoiding the config option ?
-
-
+> +#
+> +# @lsecret: The guest is currently being launched and ciphertext data
+> +#           are being imported.
+> +#
+> +# @running: The guest is fully launched or migrated in.
+> +#
+> +# @supdate: The guest is currently being migrated out to another machi=
+ne.
+> +#
+> +# @rupdate: The guest is currently being migrated from another machine=
+.
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'enum': 'SevState',
+> +  'data': ['uninit', 'lupdate', 'lsecret', 'running', 'supdate', 'rupd=
+ate' ] }
 
 Regards,
 Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
