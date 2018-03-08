@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1etuD0-0005qv-K4
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:59:44 -0500
+	(envelope-from <star.zeng@intel.com>) id 1etuLf-0008LQ-0T
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:08:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1etuCx-0006NY-Hx
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:59:42 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45594 helo=mx1.redhat.com)
+	(envelope-from <star.zeng@intel.com>) id 1etuLb-00010X-Pw
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:08:38 -0500
+Received: from mga09.intel.com ([134.134.136.24]:27633)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1etuCx-0006NP-Be
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:59:39 -0500
+	(Exim 4.71) (envelope-from <star.zeng@intel.com>) id 1etuLb-0000xX-EJ
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:08:35 -0500
+From: "Zeng, Star" <star.zeng@intel.com>
+Date: Thu, 8 Mar 2018 12:08:27 +0000
+Message-ID: <0C09AFA07DD0434D9E2A0C6AEB0483103BA48270@shsmsx102.ccr.corp.intel.com>
 References: <20180307155746.18526-1-marcandre.lureau@redhat.com>
 	<20180307155746.18526-4-marcandre.lureau@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <9abfc936-c7e0-7982-baed-88ec8047ae68@redhat.com>
-Date: Thu, 8 Mar 2018 12:59:27 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180307155746.18526-4-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	<9abfc936-c7e0-7982-baed-88ec8047ae68@redhat.com>
+In-Reply-To: <9abfc936-c7e0-7982-baed-88ec8047ae68@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Subject: Re: [Qemu-devel] [edk2] [PATCH v2 3/8] MdeModulePkg: fix REGISITER
  -> REGISTER
 List-Id: <qemu-devel.nongnu.org>
@@ -29,197 +30,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@redhat.com, edk2-devel@lists.01.org
-Cc: qemu-devel@nongnu.org, javierm@redhat.com, pjones@redhat.com, jiewen.yao@intel.com, Star Zeng <star.zeng@intel.com>, Eric Dong <eric.dong@intel.com>
+To: Laszlo Ersek <lersek@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "javierm@redhat.com" <javierm@redhat.com>, "pjones@redhat.com" <pjones@redhat.com>, "Yao,
+	Jiewen" <jiewen.yao@intel.com>, "Dong, Eric" <eric.dong@intel.com>, "Zeng, Star" <star.zeng@intel.com>
 
-On 03/07/18 16:57, marcandre.lureau@redhat.com wrote:
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> Cc: Laszlo Ersek <lersek@redhat.com>
-> Contributed-under: TianoCore Contribution Agreement 1.0
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  MdeModulePkg/Core/Pei/Dispatcher/Dispatcher.c | 18 +++++++++---------
->  MdeModulePkg/Core/Pei/Image/Image.c           |  4 ++--
->  MdeModulePkg/Core/Pei/PeiMain.h               |  2 +-
->  MdeModulePkg/Core/Pei/PeiMain/PeiMain.c       |  2 +-
->  4 files changed, 13 insertions(+), 13 deletions(-)
-
-CC'ing Star & Eric (see Maintainers.txt).
-
-
-I suggest changing te subject like this:
-
-  MdeModulePkg/Core/Pei: fix REGISITER -> REGISTER typo
-
-And just so the commit message isn't empty, let's say there, "No
-functional changes.".
-
-
-With those updates:
-
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-Thanks
-Laszlo
-
-
-
-> diff --git a/MdeModulePkg/Core/Pei/Dispatcher/Dispatcher.c b/MdeModuleP=
-kg/Core/Pei/Dispatcher/Dispatcher.c
-> index 79f2e5cebcbe..027176d872c7 100644
-> --- a/MdeModulePkg/Core/Pei/Dispatcher/Dispatcher.c
-> +++ b/MdeModulePkg/Core/Pei/Dispatcher/Dispatcher.c
-> @@ -970,7 +970,7 @@ PeiDispatcher (
->    if ((Private->PeiMemoryInstalled) && (Private->HobList.HandoffInform=
-ationTable->BootMode !=3D BOOT_ON_S3_RESUME || PcdGetBool (PcdShadowPeimO=
-nS3Boot))) {
->      //
->      // Once real memory is available, shadow the RegisterForShadow mod=
-ules. And meanwhile
-> -    // update the modules' status from PEIM_STATE_REGISITER_FOR_SHADOW=
- to PEIM_STATE_DONE.
-> +    // update the modules' status from PEIM_STATE_REGISTER_FOR_SHADOW =
-to PEIM_STATE_DONE.
->      //
->      SaveCurrentPeimCount  =3D Private->CurrentPeimCount;
->      SaveCurrentFvCount    =3D Private->CurrentPeimFvCount;
-> @@ -978,7 +978,7 @@ PeiDispatcher (
-> =20
->      for (Index1 =3D 0; Index1 <=3D SaveCurrentFvCount; Index1++) {
->        for (Index2 =3D 0; (Index2 < PcdGet32 (PcdPeiCoreMaxPeimPerFv)) =
-&& (Private->Fv[Index1].FvFileHandles[Index2] !=3D NULL); Index2++) {
-> -        if (Private->Fv[Index1].PeimState[Index2] =3D=3D PEIM_STATE_RE=
-GISITER_FOR_SHADOW) {
-> +        if (Private->Fv[Index1].PeimState[Index2] =3D=3D PEIM_STATE_RE=
-GISTER_FOR_SHADOW) {
->            PeimFileHandle =3D Private->Fv[Index1].FvFileHandles[Index2]=
-;
->            Private->CurrentFileHandle   =3D PeimFileHandle;
->            Private->CurrentPeimFvCount  =3D Index1;
-> @@ -986,13 +986,13 @@ PeiDispatcher (
->            Status =3D PeiLoadImage (
->                      (CONST EFI_PEI_SERVICES **) &Private->Ps,
->                      PeimFileHandle,
-> -                    PEIM_STATE_REGISITER_FOR_SHADOW,
-> +                    PEIM_STATE_REGISTER_FOR_SHADOW,
->                      &EntryPoint,
->                      &AuthenticationState
->                      );
->            if (Status =3D=3D EFI_SUCCESS) {
->              //
-> -            // PEIM_STATE_REGISITER_FOR_SHADOW move to PEIM_STATE_DONE
-> +            // PEIM_STATE_REGISTER_FOR_SHADOW move to PEIM_STATE_DONE
->              //
->              Private->Fv[Index1].PeimState[Index2]++;
->              //
-> @@ -1165,7 +1165,7 @@ PeiDispatcher (
->              //
->              PeiCheckAndSwitchStack (SecCoreData, Private);
-> =20
-> -            if ((Private->PeiMemoryInstalled) && (Private->Fv[FvCount]=
-.PeimState[PeimCount] =3D=3D PEIM_STATE_REGISITER_FOR_SHADOW) &&   \
-> +            if ((Private->PeiMemoryInstalled) && (Private->Fv[FvCount]=
-.PeimState[PeimCount] =3D=3D PEIM_STATE_REGISTER_FOR_SHADOW) &&   \
->                  (Private->HobList.HandoffInformationTable->BootMode !=3D=
- BOOT_ON_S3_RESUME || PcdGetBool (PcdShadowPeimOnS3Boot))) {
->                //
->                // If memory is available we shadow images by default fo=
-r performance reasons.
-> @@ -1179,7 +1179,7 @@ PeiDispatcher (
->                  Status =3D PeiLoadImage (
->                             PeiServices,
->                             PeimFileHandle,
-> -                           PEIM_STATE_REGISITER_FOR_SHADOW,
-> +                           PEIM_STATE_REGISTER_FOR_SHADOW,
->                             &EntryPoint,
->                             &AuthenticationState
->                             );
-> @@ -1192,7 +1192,7 @@ PeiDispatcher (
->                //PERF_END (PeiServices, L"PEIM", PeimFileHandle, 0);
-> =20
->                //
-> -              // PEIM_STATE_REGISITER_FOR_SHADOW move to PEIM_STATE_DO=
-NE
-> +              // PEIM_STATE_REGISTER_FOR_SHADOW move to PEIM_STATE_DON=
-E
->                //
->                Private->Fv[FvCount].PeimState[PeimCount]++;
-> =20
-> @@ -1356,14 +1356,14 @@ PeiRegisterForShadow (
->      return EFI_NOT_FOUND;
->    }
-> =20
-> -  if (Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->Curr=
-entPeimCount] >=3D PEIM_STATE_REGISITER_FOR_SHADOW) {
-> +  if (Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->Curr=
-entPeimCount] >=3D PEIM_STATE_REGISTER_FOR_SHADOW) {
->      //
->      // If the PEIM has already entered the PEIM_STATE_REGISTER_FOR_SHA=
-DOW or PEIM_STATE_DONE then it's already been started
->      //
->      return EFI_ALREADY_STARTED;
->    }
-> =20
-> -  Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->CurrentP=
-eimCount] =3D PEIM_STATE_REGISITER_FOR_SHADOW;
-> +  Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->CurrentP=
-eimCount] =3D PEIM_STATE_REGISTER_FOR_SHADOW;
-> =20
->    return EFI_SUCCESS;
->  }
-> diff --git a/MdeModulePkg/Core/Pei/Image/Image.c b/MdeModulePkg/Core/Pe=
-i/Image/Image.c
-> index f41d3acac77e..f07f48823117 100644
-> --- a/MdeModulePkg/Core/Pei/Image/Image.c
-> +++ b/MdeModulePkg/Core/Pei/Image/Image.c
-> @@ -387,7 +387,7 @@ LoadAndRelocatePeCoffImage (
->    }
->    IsRegisterForShadow =3D FALSE;
->    if ((Private->CurrentFileHandle =3D=3D FileHandle)=20
-> -    && (Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->Cu=
-rrentPeimCount] =3D=3D PEIM_STATE_REGISITER_FOR_SHADOW)) {
-> +    && (Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->Cu=
-rrentPeimCount] =3D=3D PEIM_STATE_REGISTER_FOR_SHADOW)) {
->      IsRegisterForShadow =3D TRUE;
->    }
-> =20
-> @@ -876,7 +876,7 @@ PeiLoadImage (
->          //
->          // The shadowed PEIM must be relocatable.
->          //
-> -        if (PeimState =3D=3D PEIM_STATE_REGISITER_FOR_SHADOW) {
-> +        if (PeimState =3D=3D PEIM_STATE_REGISTER_FOR_SHADOW) {
->            IsStrip =3D RelocationIsStrip ((VOID *) (UINTN) ImageAddress=
-);
->            ASSERT (!IsStrip);
->            if (IsStrip) {
-> diff --git a/MdeModulePkg/Core/Pei/PeiMain.h b/MdeModulePkg/Core/Pei/Pe=
-iMain.h
-> index fef3753e4b3b..a1cdbc15d98a 100644
-> --- a/MdeModulePkg/Core/Pei/PeiMain.h
-> +++ b/MdeModulePkg/Core/Pei/PeiMain.h
-> @@ -104,7 +104,7 @@ typedef struct {
->  //
->  #define PEIM_STATE_NOT_DISPATCHED         0x00
->  #define PEIM_STATE_DISPATCHED             0x01
-> -#define PEIM_STATE_REGISITER_FOR_SHADOW   0x02
-> +#define PEIM_STATE_REGISTER_FOR_SHADOW    0x02
->  #define PEIM_STATE_DONE                   0x03
-> =20
->  typedef struct {
-> diff --git a/MdeModulePkg/Core/Pei/PeiMain/PeiMain.c b/MdeModulePkg/Cor=
-e/Pei/PeiMain/PeiMain.c
-> index 3cd61906c3df..775bf18ce938 100644
-> --- a/MdeModulePkg/Core/Pei/PeiMain/PeiMain.c
-> +++ b/MdeModulePkg/Core/Pei/PeiMain/PeiMain.c
-> @@ -104,7 +104,7 @@ ShadowPeiCore (
->    Status =3D PeiLoadImage (
->                GetPeiServicesTablePointer (),
->                *((EFI_PEI_FILE_HANDLE*)&PeiCoreFileHandle),
-> -              PEIM_STATE_REGISITER_FOR_SHADOW,
-> +              PEIM_STATE_REGISTER_FOR_SHADOW,
->                &EntryPoint,
->                &AuthenticationState
->                );
->=20
+SSBhZ3JlZSB3aXRoIExhc3psbydzIHN1Z2dlc3Rpb24uDQpBbmQgaXQgaXMgZ29vZCBvYnNlcnZh
+dGlvbi4NCg0KUmV2aWV3ZWQtYnk6IFN0YXIgWmVuZyA8c3Rhci56ZW5nQGludGVsLmNvbT4NCg0K
+VGhhbmtzLA0KU3Rhcg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IExhc3psbyBF
+cnNlayBbbWFpbHRvOmxlcnNla0ByZWRoYXQuY29tXSANClNlbnQ6IFRodXJzZGF5LCBNYXJjaCA4
+LCAyMDE4IDc6NTkgUE0NClRvOiBtYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb207IGVkazItZGV2
+ZWxAbGlzdHMuMDEub3JnDQpDYzogcWVtdS1kZXZlbEBub25nbnUub3JnOyBqYXZpZXJtQHJlZGhh
+dC5jb207IHBqb25lc0ByZWRoYXQuY29tOyBZYW8sIEppZXdlbiA8amlld2VuLnlhb0BpbnRlbC5j
+b20+OyBaZW5nLCBTdGFyIDxzdGFyLnplbmdAaW50ZWwuY29tPjsgRG9uZywgRXJpYyA8ZXJpYy5k
+b25nQGludGVsLmNvbT4NClN1YmplY3Q6IFJlOiBbZWRrMl0gW1BBVENIIHYyIDMvOF0gTWRlTW9k
+dWxlUGtnOiBmaXggUkVHSVNJVEVSIC0+IFJFR0lTVEVSDQoNCk9uIDAzLzA3LzE4IDE2OjU3LCBt
+YXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20gd3JvdGU6DQo+IEZyb206IE1hcmMtQW5kcsOpIEx1
+cmVhdSA8bWFyY2FuZHJlLmx1cmVhdUByZWRoYXQuY29tPg0KPiANCj4gQ2M6IExhc3psbyBFcnNl
+ayA8bGVyc2VrQHJlZGhhdC5jb20+DQo+IENvbnRyaWJ1dGVkLXVuZGVyOiBUaWFub0NvcmUgQ29u
+dHJpYnV0aW9uIEFncmVlbWVudCAxLjANCj4gU2lnbmVkLW9mZi1ieTogTWFyYy1BbmRyw6kgTHVy
+ZWF1IDxtYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20+DQo+IC0tLQ0KPiAgTWRlTW9kdWxlUGtn
+L0NvcmUvUGVpL0Rpc3BhdGNoZXIvRGlzcGF0Y2hlci5jIHwgMTggKysrKysrKysrLS0tLS0tLS0t
+DQo+ICBNZGVNb2R1bGVQa2cvQ29yZS9QZWkvSW1hZ2UvSW1hZ2UuYyAgICAgICAgICAgfCAgNCAr
+Ky0tDQo+ICBNZGVNb2R1bGVQa2cvQ29yZS9QZWkvUGVpTWFpbi5oICAgICAgICAgICAgICAgfCAg
+MiArLQ0KPiAgTWRlTW9kdWxlUGtnL0NvcmUvUGVpL1BlaU1haW4vUGVpTWFpbi5jICAgICAgIHwg
+IDIgKy0NCj4gIDQgZmlsZXMgY2hhbmdlZCwgMTMgaW5zZXJ0aW9ucygrKSwgMTMgZGVsZXRpb25z
+KC0pDQoNCkNDJ2luZyBTdGFyICYgRXJpYyAoc2VlIE1haW50YWluZXJzLnR4dCkuDQoNCg0KSSBz
+dWdnZXN0IGNoYW5naW5nIHRlIHN1YmplY3QgbGlrZSB0aGlzOg0KDQogIE1kZU1vZHVsZVBrZy9D
+b3JlL1BlaTogZml4IFJFR0lTSVRFUiAtPiBSRUdJU1RFUiB0eXBvDQoNCkFuZCBqdXN0IHNvIHRo
+ZSBjb21taXQgbWVzc2FnZSBpc24ndCBlbXB0eSwgbGV0J3Mgc2F5IHRoZXJlLCAiTm8gZnVuY3Rp
+b25hbCBjaGFuZ2VzLiIuDQoNCg0KV2l0aCB0aG9zZSB1cGRhdGVzOg0KDQpSZXZpZXdlZC1ieTog
+TGFzemxvIEVyc2VrIDxsZXJzZWtAcmVkaGF0LmNvbT4NCg0KVGhhbmtzDQpMYXN6bG8NCg0KDQoN
+Cj4gZGlmZiAtLWdpdCBhL01kZU1vZHVsZVBrZy9Db3JlL1BlaS9EaXNwYXRjaGVyL0Rpc3BhdGNo
+ZXIuYyANCj4gYi9NZGVNb2R1bGVQa2cvQ29yZS9QZWkvRGlzcGF0Y2hlci9EaXNwYXRjaGVyLmMN
+Cj4gaW5kZXggNzlmMmU1Y2ViY2JlLi4wMjcxNzZkODcyYzcgMTAwNjQ0DQo+IC0tLSBhL01kZU1v
+ZHVsZVBrZy9Db3JlL1BlaS9EaXNwYXRjaGVyL0Rpc3BhdGNoZXIuYw0KPiArKysgYi9NZGVNb2R1
+bGVQa2cvQ29yZS9QZWkvRGlzcGF0Y2hlci9EaXNwYXRjaGVyLmMNCj4gQEAgLTk3MCw3ICs5NzAs
+NyBAQCBQZWlEaXNwYXRjaGVyICgNCj4gICAgaWYgKChQcml2YXRlLT5QZWlNZW1vcnlJbnN0YWxs
+ZWQpICYmIChQcml2YXRlLT5Ib2JMaXN0LkhhbmRvZmZJbmZvcm1hdGlvblRhYmxlLT5Cb290TW9k
+ZSAhPSBCT09UX09OX1MzX1JFU1VNRSB8fCBQY2RHZXRCb29sIChQY2RTaGFkb3dQZWltT25TM0Jv
+b3QpKSkgew0KPiAgICAgIC8vDQo+ICAgICAgLy8gT25jZSByZWFsIG1lbW9yeSBpcyBhdmFpbGFi
+bGUsIHNoYWRvdyB0aGUgUmVnaXN0ZXJGb3JTaGFkb3cgbW9kdWxlcy4gQW5kIG1lYW53aGlsZQ0K
+PiAtICAgIC8vIHVwZGF0ZSB0aGUgbW9kdWxlcycgc3RhdHVzIGZyb20gUEVJTV9TVEFURV9SRUdJ
+U0lURVJfRk9SX1NIQURPVyB0byBQRUlNX1NUQVRFX0RPTkUuDQo+ICsgICAgLy8gdXBkYXRlIHRo
+ZSBtb2R1bGVzJyBzdGF0dXMgZnJvbSBQRUlNX1NUQVRFX1JFR0lTVEVSX0ZPUl9TSEFET1cgdG8g
+UEVJTV9TVEFURV9ET05FLg0KPiAgICAgIC8vDQo+ICAgICAgU2F2ZUN1cnJlbnRQZWltQ291bnQg
+ID0gUHJpdmF0ZS0+Q3VycmVudFBlaW1Db3VudDsNCj4gICAgICBTYXZlQ3VycmVudEZ2Q291bnQg
+ICAgPSBQcml2YXRlLT5DdXJyZW50UGVpbUZ2Q291bnQ7DQo+IEBAIC05NzgsNyArOTc4LDcgQEAg
+UGVpRGlzcGF0Y2hlciAoDQo+ICANCj4gICAgICBmb3IgKEluZGV4MSA9IDA7IEluZGV4MSA8PSBT
+YXZlQ3VycmVudEZ2Q291bnQ7IEluZGV4MSsrKSB7DQo+ICAgICAgICBmb3IgKEluZGV4MiA9IDA7
+IChJbmRleDIgPCBQY2RHZXQzMiAoUGNkUGVpQ29yZU1heFBlaW1QZXJGdikpICYmIChQcml2YXRl
+LT5GdltJbmRleDFdLkZ2RmlsZUhhbmRsZXNbSW5kZXgyXSAhPSBOVUxMKTsgSW5kZXgyKyspIHsN
+Cj4gLSAgICAgICAgaWYgKFByaXZhdGUtPkZ2W0luZGV4MV0uUGVpbVN0YXRlW0luZGV4Ml0gPT0g
+UEVJTV9TVEFURV9SRUdJU0lURVJfRk9SX1NIQURPVykgew0KPiArICAgICAgICBpZiAoUHJpdmF0
+ZS0+RnZbSW5kZXgxXS5QZWltU3RhdGVbSW5kZXgyXSA9PSANCj4gKyBQRUlNX1NUQVRFX1JFR0lT
+VEVSX0ZPUl9TSEFET1cpIHsNCj4gICAgICAgICAgICBQZWltRmlsZUhhbmRsZSA9IFByaXZhdGUt
+PkZ2W0luZGV4MV0uRnZGaWxlSGFuZGxlc1tJbmRleDJdOw0KPiAgICAgICAgICAgIFByaXZhdGUt
+PkN1cnJlbnRGaWxlSGFuZGxlICAgPSBQZWltRmlsZUhhbmRsZTsNCj4gICAgICAgICAgICBQcml2
+YXRlLT5DdXJyZW50UGVpbUZ2Q291bnQgID0gSW5kZXgxOyBAQCAtOTg2LDEzICs5ODYsMTMgDQo+
+IEBAIFBlaURpc3BhdGNoZXIgKA0KPiAgICAgICAgICAgIFN0YXR1cyA9IFBlaUxvYWRJbWFnZSAo
+DQo+ICAgICAgICAgICAgICAgICAgICAgIChDT05TVCBFRklfUEVJX1NFUlZJQ0VTICoqKSAmUHJp
+dmF0ZS0+UHMsDQo+ICAgICAgICAgICAgICAgICAgICAgIFBlaW1GaWxlSGFuZGxlLA0KPiAtICAg
+ICAgICAgICAgICAgICAgICBQRUlNX1NUQVRFX1JFR0lTSVRFUl9GT1JfU0hBRE9XLA0KPiArICAg
+ICAgICAgICAgICAgICAgICBQRUlNX1NUQVRFX1JFR0lTVEVSX0ZPUl9TSEFET1csDQo+ICAgICAg
+ICAgICAgICAgICAgICAgICZFbnRyeVBvaW50LA0KPiAgICAgICAgICAgICAgICAgICAgICAmQXV0
+aGVudGljYXRpb25TdGF0ZQ0KPiAgICAgICAgICAgICAgICAgICAgICApOw0KPiAgICAgICAgICAg
+IGlmIChTdGF0dXMgPT0gRUZJX1NVQ0NFU1MpIHsNCj4gICAgICAgICAgICAgIC8vDQo+IC0gICAg
+ICAgICAgICAvLyBQRUlNX1NUQVRFX1JFR0lTSVRFUl9GT1JfU0hBRE9XIG1vdmUgdG8gUEVJTV9T
+VEFURV9ET05FDQo+ICsgICAgICAgICAgICAvLyBQRUlNX1NUQVRFX1JFR0lTVEVSX0ZPUl9TSEFE
+T1cgbW92ZSB0byBQRUlNX1NUQVRFX0RPTkUNCj4gICAgICAgICAgICAgIC8vDQo+ICAgICAgICAg
+ICAgICBQcml2YXRlLT5GdltJbmRleDFdLlBlaW1TdGF0ZVtJbmRleDJdKys7DQo+ICAgICAgICAg
+ICAgICAvLw0KPiBAQCAtMTE2NSw3ICsxMTY1LDcgQEAgUGVpRGlzcGF0Y2hlciAoDQo+ICAgICAg
+ICAgICAgICAvLw0KPiAgICAgICAgICAgICAgUGVpQ2hlY2tBbmRTd2l0Y2hTdGFjayAoU2VjQ29y
+ZURhdGEsIFByaXZhdGUpOw0KPiAgDQo+IC0gICAgICAgICAgICBpZiAoKFByaXZhdGUtPlBlaU1l
+bW9yeUluc3RhbGxlZCkgJiYgKFByaXZhdGUtPkZ2W0Z2Q291bnRdLlBlaW1TdGF0ZVtQZWltQ291
+bnRdID09IFBFSU1fU1RBVEVfUkVHSVNJVEVSX0ZPUl9TSEFET1cpICYmICAgXA0KPiArICAgICAg
+ICAgICAgaWYgKChQcml2YXRlLT5QZWlNZW1vcnlJbnN0YWxsZWQpICYmIChQcml2YXRlLT5GdltG
+dkNvdW50XS5QZWltU3RhdGVbUGVpbUNvdW50XSA9PSBQRUlNX1NUQVRFX1JFR0lTVEVSX0ZPUl9T
+SEFET1cpICYmICAgXA0KPiAgICAgICAgICAgICAgICAgIChQcml2YXRlLT5Ib2JMaXN0LkhhbmRv
+ZmZJbmZvcm1hdGlvblRhYmxlLT5Cb290TW9kZSAhPSBCT09UX09OX1MzX1JFU1VNRSB8fCBQY2RH
+ZXRCb29sIChQY2RTaGFkb3dQZWltT25TM0Jvb3QpKSkgew0KPiAgICAgICAgICAgICAgICAvLw0K
+PiAgICAgICAgICAgICAgICAvLyBJZiBtZW1vcnkgaXMgYXZhaWxhYmxlIHdlIHNoYWRvdyBpbWFn
+ZXMgYnkgZGVmYXVsdCBmb3IgcGVyZm9ybWFuY2UgcmVhc29ucy4NCj4gQEAgLTExNzksNyArMTE3
+OSw3IEBAIFBlaURpc3BhdGNoZXIgKA0KPiAgICAgICAgICAgICAgICAgIFN0YXR1cyA9IFBlaUxv
+YWRJbWFnZSAoDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBQZWlTZXJ2aWNlcywNCj4g
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFBlaW1GaWxlSGFuZGxlLA0KPiAtICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgUEVJTV9TVEFURV9SRUdJU0lURVJfRk9SX1NIQURPVywNCj4gKyAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIFBFSU1fU1RBVEVfUkVHSVNURVJfRk9SX1NIQURPVywN
+Cj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICZFbnRyeVBvaW50LA0KPiAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgJkF1dGhlbnRpY2F0aW9uU3RhdGUNCj4gICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICk7DQo+IEBAIC0xMTkyLDcgKzExOTIsNyBAQCBQZWlEaXNwYXRjaGVyICgN
+Cj4gICAgICAgICAgICAgICAgLy9QRVJGX0VORCAoUGVpU2VydmljZXMsIEwiUEVJTSIsIFBlaW1G
+aWxlSGFuZGxlLCAwKTsNCj4gIA0KPiAgICAgICAgICAgICAgICAvLw0KPiAtICAgICAgICAgICAg
+ICAvLyBQRUlNX1NUQVRFX1JFR0lTSVRFUl9GT1JfU0hBRE9XIG1vdmUgdG8gUEVJTV9TVEFURV9E
+T05FDQo+ICsgICAgICAgICAgICAgIC8vIFBFSU1fU1RBVEVfUkVHSVNURVJfRk9SX1NIQURPVyBt
+b3ZlIHRvIA0KPiArIFBFSU1fU1RBVEVfRE9ORQ0KPiAgICAgICAgICAgICAgICAvLw0KPiAgICAg
+ICAgICAgICAgICBQcml2YXRlLT5GdltGdkNvdW50XS5QZWltU3RhdGVbUGVpbUNvdW50XSsrOw0K
+PiAgDQo+IEBAIC0xMzU2LDE0ICsxMzU2LDE0IEBAIFBlaVJlZ2lzdGVyRm9yU2hhZG93ICgNCj4g
+ICAgICByZXR1cm4gRUZJX05PVF9GT1VORDsNCj4gICAgfQ0KPiAgDQo+IC0gIGlmIA0KPiAoUHJp
+dmF0ZS0+RnZbUHJpdmF0ZS0+Q3VycmVudFBlaW1GdkNvdW50XS5QZWltU3RhdGVbUHJpdmF0ZS0+
+Q3VycmVudFBlDQo+IGltQ291bnRdID49IFBFSU1fU1RBVEVfUkVHSVNJVEVSX0ZPUl9TSEFET1cp
+IHsNCj4gKyAgaWYgDQo+ICsgKFByaXZhdGUtPkZ2W1ByaXZhdGUtPkN1cnJlbnRQZWltRnZDb3Vu
+dF0uUGVpbVN0YXRlW1ByaXZhdGUtPkN1cnJlbnQNCj4gKyBQZWltQ291bnRdID49IFBFSU1fU1RB
+VEVfUkVHSVNURVJfRk9SX1NIQURPVykgew0KPiAgICAgIC8vDQo+ICAgICAgLy8gSWYgdGhlIFBF
+SU0gaGFzIGFscmVhZHkgZW50ZXJlZCB0aGUgUEVJTV9TVEFURV9SRUdJU1RFUl9GT1JfU0hBRE9X
+IG9yIFBFSU1fU1RBVEVfRE9ORSB0aGVuIGl0J3MgYWxyZWFkeSBiZWVuIHN0YXJ0ZWQNCj4gICAg
+ICAvLw0KPiAgICAgIHJldHVybiBFRklfQUxSRUFEWV9TVEFSVEVEOw0KPiAgICB9DQo+ICANCj4g
+LSAgDQo+IFByaXZhdGUtPkZ2W1ByaXZhdGUtPkN1cnJlbnRQZWltRnZDb3VudF0uUGVpbVN0YXRl
+W1ByaXZhdGUtPkN1cnJlbnRQZWkNCj4gbUNvdW50XSA9IFBFSU1fU1RBVEVfUkVHSVNJVEVSX0ZP
+Ul9TSEFET1c7DQo+ICsgIA0KPiArIFByaXZhdGUtPkZ2W1ByaXZhdGUtPkN1cnJlbnRQZWltRnZD
+b3VudF0uUGVpbVN0YXRlW1ByaXZhdGUtPkN1cnJlbnRQDQo+ICsgZWltQ291bnRdID0gUEVJTV9T
+VEFURV9SRUdJU1RFUl9GT1JfU0hBRE9XOw0KPiAgDQo+ICAgIHJldHVybiBFRklfU1VDQ0VTUzsN
+Cj4gIH0NCj4gZGlmZiAtLWdpdCBhL01kZU1vZHVsZVBrZy9Db3JlL1BlaS9JbWFnZS9JbWFnZS5j
+IA0KPiBiL01kZU1vZHVsZVBrZy9Db3JlL1BlaS9JbWFnZS9JbWFnZS5jDQo+IGluZGV4IGY0MWQz
+YWNhYzc3ZS4uZjA3ZjQ4ODIzMTE3IDEwMDY0NA0KPiAtLS0gYS9NZGVNb2R1bGVQa2cvQ29yZS9Q
+ZWkvSW1hZ2UvSW1hZ2UuYw0KPiArKysgYi9NZGVNb2R1bGVQa2cvQ29yZS9QZWkvSW1hZ2UvSW1h
+Z2UuYw0KPiBAQCAtMzg3LDcgKzM4Nyw3IEBAIExvYWRBbmRSZWxvY2F0ZVBlQ29mZkltYWdlICgN
+Cj4gICAgfQ0KPiAgICBJc1JlZ2lzdGVyRm9yU2hhZG93ID0gRkFMU0U7DQo+ICAgIGlmICgoUHJp
+dmF0ZS0+Q3VycmVudEZpbGVIYW5kbGUgPT0gRmlsZUhhbmRsZSkgDQo+IC0gICAgJiYgKFByaXZh
+dGUtPkZ2W1ByaXZhdGUtPkN1cnJlbnRQZWltRnZDb3VudF0uUGVpbVN0YXRlW1ByaXZhdGUtPkN1
+cnJlbnRQZWltQ291bnRdID09IFBFSU1fU1RBVEVfUkVHSVNJVEVSX0ZPUl9TSEFET1cpKSB7DQo+
+ICsgICAgJiYgDQo+ICsgKFByaXZhdGUtPkZ2W1ByaXZhdGUtPkN1cnJlbnRQZWltRnZDb3VudF0u
+UGVpbVN0YXRlW1ByaXZhdGUtPkN1cnJlbnQNCj4gKyBQZWltQ291bnRdID09IFBFSU1fU1RBVEVf
+UkVHSVNURVJfRk9SX1NIQURPVykpIHsNCj4gICAgICBJc1JlZ2lzdGVyRm9yU2hhZG93ID0gVFJV
+RTsNCj4gICAgfQ0KPiAgDQo+IEBAIC04NzYsNyArODc2LDcgQEAgUGVpTG9hZEltYWdlICgNCj4g
+ICAgICAgICAgLy8NCj4gICAgICAgICAgLy8gVGhlIHNoYWRvd2VkIFBFSU0gbXVzdCBiZSByZWxv
+Y2F0YWJsZS4NCj4gICAgICAgICAgLy8NCj4gLSAgICAgICAgaWYgKFBlaW1TdGF0ZSA9PSBQRUlN
+X1NUQVRFX1JFR0lTSVRFUl9GT1JfU0hBRE9XKSB7DQo+ICsgICAgICAgIGlmIChQZWltU3RhdGUg
+PT0gUEVJTV9TVEFURV9SRUdJU1RFUl9GT1JfU0hBRE9XKSB7DQo+ICAgICAgICAgICAgSXNTdHJp
+cCA9IFJlbG9jYXRpb25Jc1N0cmlwICgoVk9JRCAqKSAoVUlOVE4pIEltYWdlQWRkcmVzcyk7DQo+
+ICAgICAgICAgICAgQVNTRVJUICghSXNTdHJpcCk7DQo+ICAgICAgICAgICAgaWYgKElzU3RyaXAp
+IHsNCj4gZGlmZiAtLWdpdCBhL01kZU1vZHVsZVBrZy9Db3JlL1BlaS9QZWlNYWluLmggDQo+IGIv
+TWRlTW9kdWxlUGtnL0NvcmUvUGVpL1BlaU1haW4uaCBpbmRleCBmZWYzNzUzZTRiM2IuLmExY2Ri
+YzE1ZDk4YSANCj4gMTAwNjQ0DQo+IC0tLSBhL01kZU1vZHVsZVBrZy9Db3JlL1BlaS9QZWlNYWlu
+LmgNCj4gKysrIGIvTWRlTW9kdWxlUGtnL0NvcmUvUGVpL1BlaU1haW4uaA0KPiBAQCAtMTA0LDcg
+KzEwNCw3IEBAIHR5cGVkZWYgc3RydWN0IHsNCj4gIC8vDQo+ICAjZGVmaW5lIFBFSU1fU1RBVEVf
+Tk9UX0RJU1BBVENIRUQgICAgICAgICAweDAwDQo+ICAjZGVmaW5lIFBFSU1fU1RBVEVfRElTUEFU
+Q0hFRCAgICAgICAgICAgICAweDAxDQo+IC0jZGVmaW5lIFBFSU1fU1RBVEVfUkVHSVNJVEVSX0ZP
+Ul9TSEFET1cgICAweDAyDQo+ICsjZGVmaW5lIFBFSU1fU1RBVEVfUkVHSVNURVJfRk9SX1NIQURP
+VyAgICAweDAyDQo+ICAjZGVmaW5lIFBFSU1fU1RBVEVfRE9ORSAgICAgICAgICAgICAgICAgICAw
+eDAzDQo+ICANCj4gIHR5cGVkZWYgc3RydWN0IHsNCj4gZGlmZiAtLWdpdCBhL01kZU1vZHVsZVBr
+Zy9Db3JlL1BlaS9QZWlNYWluL1BlaU1haW4uYyANCj4gYi9NZGVNb2R1bGVQa2cvQ29yZS9QZWkv
+UGVpTWFpbi9QZWlNYWluLmMNCj4gaW5kZXggM2NkNjE5MDZjM2RmLi43NzViZjE4Y2U5MzggMTAw
+NjQ0DQo+IC0tLSBhL01kZU1vZHVsZVBrZy9Db3JlL1BlaS9QZWlNYWluL1BlaU1haW4uYw0KPiAr
+KysgYi9NZGVNb2R1bGVQa2cvQ29yZS9QZWkvUGVpTWFpbi9QZWlNYWluLmMNCj4gQEAgLTEwNCw3
+ICsxMDQsNyBAQCBTaGFkb3dQZWlDb3JlICgNCj4gICAgU3RhdHVzID0gUGVpTG9hZEltYWdlICgN
+Cj4gICAgICAgICAgICAgICAgR2V0UGVpU2VydmljZXNUYWJsZVBvaW50ZXIgKCksDQo+ICAgICAg
+ICAgICAgICAgICooKEVGSV9QRUlfRklMRV9IQU5ETEUqKSZQZWlDb3JlRmlsZUhhbmRsZSksDQo+
+IC0gICAgICAgICAgICAgIFBFSU1fU1RBVEVfUkVHSVNJVEVSX0ZPUl9TSEFET1csDQo+ICsgICAg
+ICAgICAgICAgIFBFSU1fU1RBVEVfUkVHSVNURVJfRk9SX1NIQURPVywNCj4gICAgICAgICAgICAg
+ICAgJkVudHJ5UG9pbnQsDQo+ICAgICAgICAgICAgICAgICZBdXRoZW50aWNhdGlvblN0YXRlDQo+
+ICAgICAgICAgICAgICAgICk7DQo+IA0KDQo=
