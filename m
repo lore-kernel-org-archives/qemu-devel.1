@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1etqyl-0000wQ-NM
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 03:32:48 -0500
+	(envelope-from <kraxel@redhat.com>) id 1etqyo-00010t-Cs
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 03:32:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1etqyi-0008HQ-JU
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 03:32:47 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50498 helo=mx1.redhat.com)
+	(envelope-from <kraxel@redhat.com>) id 1etqym-0008Ly-LZ
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 03:32:50 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39550 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1etqyi-0008GB-E8
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 03:32:44 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1etqym-0008LJ-GH
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 03:32:48 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A0C338163C52
-	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 08:32:39 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E890C406E8BD
+	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 08:32:36 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  8 Mar 2018 09:32:30 +0100
-Message-Id: <20180308083231.20180-8-kraxel@redhat.com>
+Date: Thu,  8 Mar 2018 09:32:26 +0100
+Message-Id: <20180308083231.20180-4-kraxel@redhat.com>
 In-Reply-To: <20180308083231.20180-1-kraxel@redhat.com>
 References: <20180308083231.20180-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 7/8] ui/gtk-egl: add scanout_dmabuf support
+Subject: [Qemu-devel] [PULL 3/8] ui/gtk: make GtkGlArea usage a runtime
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,77 +33,166 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Add support for dmabuf scanouts to gtk-egl.
+Compile in both gtk-egl and gtk-gl-area, then allow to choose at runtime
+instead of compile time which opengl variant we want use.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20180306090951.22932-6-kraxel@redhat.com
+Message-id: 20180306090951.22932-2-kraxel@redhat.com
 ---
- include/ui/gtk.h |  4 ++++
- ui/gtk-egl.c     | 23 +++++++++++++++++++++++
- ui/gtk.c         |  2 ++
- 3 files changed, 29 insertions(+)
+ include/ui/gtk.h |  2 ++
+ ui/gtk.c         | 53 +++++++++++++++++++++++++++++------------------------
+ ui/Makefile.objs |  3 +--
+ 3 files changed, 32 insertions(+), 26 deletions(-)
 
 diff --git a/include/ui/gtk.h b/include/ui/gtk.h
-index f6dafc5961..84c992c227 100644
+index 849c896eef..f6dafc5961 100644
 --- a/include/ui/gtk.h
 +++ b/include/ui/gtk.h
-@@ -113,6 +113,10 @@ void gd_egl_scanout_texture(DisplayChangeListener *dcl,
-                             uint32_t backing_height,
-                             uint32_t x, uint32_t y,
-                             uint32_t w, uint32_t h);
-+void gd_egl_scanout_dmabuf(DisplayChangeListener *dcl,
-+                           QemuDmaBuf *dmabuf);
-+void gd_egl_release_dmabuf(DisplayChangeListener *dcl,
-+                           QemuDmaBuf *dmabuf);
- void gd_egl_scanout_flush(DisplayChangeListener *dcl,
-                           uint32_t x, uint32_t y, uint32_t w, uint32_t h);
- void gtk_egl_init(void);
-diff --git a/ui/gtk-egl.c b/ui/gtk-egl.c
-index eb86c26a1d..2c83c22d04 100644
---- a/ui/gtk-egl.c
-+++ b/ui/gtk-egl.c
-@@ -194,6 +194,29 @@ void gd_egl_scanout_texture(DisplayChangeListener *dcl,
-                          backing_id, false);
- }
+@@ -90,6 +90,8 @@ typedef struct VirtualConsole {
+     };
+ } VirtualConsole;
  
-+void gd_egl_scanout_dmabuf(DisplayChangeListener *dcl,
-+                           QemuDmaBuf *dmabuf)
-+{
-+#ifdef CONFIG_OPENGL_DMABUF
-+    egl_dmabuf_import_texture(dmabuf);
-+    if (!dmabuf->texture) {
-+        return;
-+    }
++extern bool gtk_use_gl_area;
 +
-+    gd_egl_scanout_texture(dcl, dmabuf->texture,
-+                           false, dmabuf->width, dmabuf->height,
-+                           0, 0, dmabuf->width, dmabuf->height);
-+#endif
-+}
-+
-+void gd_egl_release_dmabuf(DisplayChangeListener *dcl,
-+                           QemuDmaBuf *dmabuf)
-+{
-+#ifdef CONFIG_OPENGL_DMABUF
-+    egl_dmabuf_release_texture(dmabuf);
-+#endif
-+}
-+
- void gd_egl_scanout_flush(DisplayChangeListener *dcl,
-                           uint32_t x, uint32_t y, uint32_t w, uint32_t h)
- {
+ /* ui/gtk.c */
+ void gd_update_windowsize(VirtualConsole *vc);
+ 
 diff --git a/ui/gtk.c b/ui/gtk.c
-index 4a1622b887..cf2061d716 100644
+index 563cff32b8..856429a02f 100644
 --- a/ui/gtk.c
 +++ b/ui/gtk.c
-@@ -744,6 +744,8 @@ static const DisplayChangeListenerOps dcl_egl_ops = {
-     .dpy_gl_ctx_get_current  = qemu_egl_get_current_context,
-     .dpy_gl_scanout_disable  = gd_egl_scanout_disable,
-     .dpy_gl_scanout_texture  = gd_egl_scanout_texture,
-+    .dpy_gl_scanout_dmabuf   = gd_egl_scanout_dmabuf,
-+    .dpy_gl_release_dmabuf   = gd_egl_release_dmabuf,
+@@ -243,6 +243,8 @@ typedef struct VCChardev {
+ #define TYPE_CHARDEV_VC "chardev-vc"
+ #define VC_CHARDEV(obj) OBJECT_CHECK(VCChardev, (obj), TYPE_CHARDEV_VC)
+ 
++bool gtk_use_gl_area;
++
+ static void gd_grab_pointer(VirtualConsole *vc, const char *reason);
+ static void gd_ungrab_pointer(GtkDisplayState *s);
+ static void gd_grab_keyboard(VirtualConsole *vc, const char *reason);
+@@ -453,7 +455,7 @@ static void gd_update_full_redraw(VirtualConsole *vc)
+     int ww, wh;
+     gdk_drawable_get_size(gtk_widget_get_window(area), &ww, &wh);
+ #if defined(CONFIG_GTK_GL)
+-    if (vc->gfx.gls) {
++    if (vc->gfx.gls && gtk_use_gl_area) {
+         gtk_gl_area_queue_render(GTK_GL_AREA(vc->gfx.drawing_area));
+         return;
+     }
+@@ -725,7 +727,7 @@ static const DisplayChangeListenerOps dcl_gl_area_ops = {
+     .dpy_gl_update           = gd_gl_area_scanout_flush,
+ };
+ 
+-#else
++#endif /* CONFIG_GTK_GL */
+ 
+ static const DisplayChangeListenerOps dcl_egl_ops = {
+     .dpy_name             = "gtk-egl",
+@@ -745,7 +747,6 @@ static const DisplayChangeListenerOps dcl_egl_ops = {
      .dpy_gl_update           = gd_egl_scanout_flush,
  };
  
+-#endif /* CONFIG_GTK_GL */
+ #endif /* CONFIG_OPENGL */
+ 
+ /** QEMU Events **/
+@@ -844,13 +845,13 @@ static gboolean gd_draw_event(GtkWidget *widget, cairo_t *cr, void *opaque)
+ 
+ #if defined(CONFIG_OPENGL)
+     if (vc->gfx.gls) {
+-#if defined(CONFIG_GTK_GL)
+-        /* invoke render callback please */
+-        return FALSE;
+-#else
+-        gd_egl_draw(vc);
+-        return TRUE;
+-#endif
++        if (gtk_use_gl_area) {
++            /* invoke render callback please */
++            return FALSE;
++        } else {
++            gd_egl_draw(vc);
++            return TRUE;
++        }
+     }
+ #endif
+ 
+@@ -1993,7 +1994,7 @@ static void gd_connect_vc_gfx_signals(VirtualConsole *vc)
+     g_signal_connect(vc->gfx.drawing_area, "draw",
+                      G_CALLBACK(gd_draw_event), vc);
+ #if defined(CONFIG_GTK_GL)
+-    if (display_opengl) {
++    if (gtk_use_gl_area) {
+         /* wire up GtkGlArea events */
+         g_signal_connect(vc->gfx.drawing_area, "render",
+                          G_CALLBACK(gd_render_event), vc);
+@@ -2116,26 +2117,29 @@ static GSList *gd_vc_gfx_init(GtkDisplayState *s, VirtualConsole *vc,
+ #if defined(CONFIG_OPENGL)
+     if (display_opengl) {
+ #if defined(CONFIG_GTK_GL)
+-        vc->gfx.drawing_area = gtk_gl_area_new();
+-        vc->gfx.dcl.ops = &dcl_gl_area_ops;
+-#else
+-        vc->gfx.drawing_area = gtk_drawing_area_new();
+-        /*
+-         * gtk_widget_set_double_buffered() was deprecated in 3.14.
+-         * It is required for opengl rendering on X11 though.  A
+-         * proper replacement (native opengl support) is only
+-         * available in 3.16+.  Silence the warning if possible.
+-         */
++        if (gtk_use_gl_area) {
++            vc->gfx.drawing_area = gtk_gl_area_new();
++            vc->gfx.dcl.ops = &dcl_gl_area_ops;
++        } else
++#endif /* CONFIG_GTK_GL */
++        {
++            vc->gfx.drawing_area = gtk_drawing_area_new();
++            /*
++             * gtk_widget_set_double_buffered() was deprecated in 3.14.
++             * It is required for opengl rendering on X11 though.  A
++             * proper replacement (native opengl support) is only
++             * available in 3.16+.  Silence the warning if possible.
++             */
+ #ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+ #endif
+-        gtk_widget_set_double_buffered(vc->gfx.drawing_area, FALSE);
++            gtk_widget_set_double_buffered(vc->gfx.drawing_area, FALSE);
+ #ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
+ #pragma GCC diagnostic pop
+ #endif
+-        vc->gfx.dcl.ops = &dcl_egl_ops;
+-#endif /* CONFIG_GTK_GL */
++            vc->gfx.dcl.ops = &dcl_egl_ops;
++        }
+     } else
+ #endif
+     {
+@@ -2437,6 +2441,7 @@ static void early_gtk_display_init(DisplayOptions *opts)
+     if (opts->has_gl && opts->gl) {
+ #if defined(CONFIG_OPENGL)
+ #if defined(CONFIG_GTK_GL)
++        gtk_use_gl_area = true;
+         gtk_gl_area_init();
+ #else
+         gtk_egl_init();
+diff --git a/ui/Makefile.objs b/ui/Makefile.objs
+index dcd54a5287..d1203bb80a 100644
+--- a/ui/Makefile.objs
++++ b/ui/Makefile.objs
+@@ -52,11 +52,10 @@ common-obj-y += egl-context.o
+ common-obj-$(CONFIG_OPENGL_DMABUF) += egl-headless.o
+ ifeq ($(CONFIG_GTK_GL),y)
+ gtk.mo-objs += gtk-gl-area.o
+-else
++endif
+ gtk.mo-objs += gtk-egl.o
+ gtk.mo-libs += $(OPENGL_LIBS)
+ endif
+-endif
+ 
+ shader.o-libs += $(OPENGL_LIBS)
+ console-gl.o-libs += $(OPENGL_LIBS)
 -- 
 2.9.3
