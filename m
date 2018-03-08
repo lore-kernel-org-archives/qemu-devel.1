@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35969)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ettDE-0003T8-1V
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:55:53 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42149)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1etvcw-00063N-RO
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:30:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ettDB-0005oZ-06
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:55:52 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42704)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ettDA-0005mn-PV
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:55:48 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ettD8-0004VW-Q7
-	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 10:55:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6D4212E80D6
-	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 10:55:46 +0000 (UTC)
+	(envelope-from <pl@kamp.de>) id 1etvct-0004RB-N9
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:30:34 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:45901 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1etvct-0004Q9-DU
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:30:31 -0500
+Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
+	for qemu-devel@nongnu.org; Thu, 8 Mar 2018 14:30:24 +0100
+References: <1520507908-16743-1-git-send-email-pl@kamp.de>
+	<1520507908-16743-5-git-send-email-pl@kamp.de>
+	<87po4ed953.fsf@secure.laptop>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <01963940-1438-3d10-8f3b-d400fcb24df9@kamp.de>
+Date: Thu, 8 Mar 2018 14:30:25 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Mar 2018 10:42:56 -0000
-From: Evangelos Foutras <evangelos@foutrelis.com>
-Reply-To: Bug 1754295 <1754295@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <152050577611.7417.5009498133217351253.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1754295] [NEW] Incorrect en-us keymap in QEMU 2.11
+In-Reply-To: <87po4ed953.fsf@secure.laptop>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 4/5] migration/block: limit the number of
+ parallel I/O requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,78 +33,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: quintela@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, dgilbert@redhat.com, famz@redhat.com, stefanha@redhat.com, jjherne@linux.vnet.ibm.com
 
-Public bug reported:
+Am 08.03.2018 um 13:50 schrieb Juan Quintela:
+> Peter Lieven <pl@kamp.de> wrote:
+>> the current implementation submits up to 512 I/O requests in parallel
+>> which is much to high especially for a background task.
+>> This patch adds a maximum limit of 16 I/O requests that can
+>> be submitted in parallel to avoid monopolizing the I/O device.
+>>
+>> Signed-off-by: Peter Lieven <pl@kamp.de>
+> This code is already a mess (TM).  It is difficult to understand what we
+> are doing, so not easy to see if your changes are better/worse than what
+> we have.
+>
+> I am not sure that your solution help to improve things here.  Let's see
+> what I understand.
+>
+> We have three fields (without a single comment):
+>
+> - submitted: this is the number of blocks that we have asked the block
+>               device to read asynchronously to main memory, and that
+>               haven't yet read.  I.e. "blocks_read_pending" would be a
+>               better name?
+>
+> - read_done: this is the number of blocks that we have finished read
+>               asynchronously from this block device.  When we finish, we
+>               do a submitted -- and a read_done++.  blocks_read_finished
+>               name?
 
-I'm using the latest Arch Linux installation ISO as a live system and
-start QEMU with the following command:
+Correct. The names should be adjusted.
 
-$ qemu-system-x86_64 -enable-kvm -boot d -cdrom
-~/isos/archlinux-2018.03.01-x86_64.iso -m 512 -vnc :0 -k en-us
+>
+> - transferred: This is the number of blocks that we have transferred
+>                 since the beginning of migration.  At this point, we do a
+>                 read_done-- and a transferred++
+>
+> Note also that we do malloc()/free() for each block
 
-Then I use Vinagre to connect to the guest system, boot the default
-bootloader option, and type the character '<' at the command prompt. The
-guest prints the character '>' instead of the '<' I typed.
+Yes, but that is a different story.
 
-I believe this is caused by the updated en-us keymap in QEMU 2.11. [1]
+>
+> So, now that we have defined what our fields mean, we need to know what
+> is our test.  block_save_pending():
+>
+>      get_remaining_dirty() + (submitted + read_done) * BLOCK_SIZE
+>
+> Looks good.
+>
+> But let's us see what test we do in block_save_iterate() (Yes, I have
+> been very liberal with reformatting and removal of struct names):
+>
+> (submitted + read_done) * BLOCK_SIZE <  qemu_file_get_rate_limit(f) &&
+> (submitted + read_done) < MAX_INFLIGHT_IO
+>
+> The idea of that test is to make sure that we _don't send_ through the
+> QEMUFile more than qemu_file_get_rate_limit(f).  But there are several
+> things here:
+> - we have already issued a flush_blks() call before we enter the loop
+>    And it is inside possibility that we have already sent too much data at
+>    this point, but we enter the while loop anyways.
+>
+>    Notice that flush_blks() does the right thing and test in each loop if
+>    qemu_file_rate_limit() has been reached and stops sending more data if
+>    it returns true;
+>
+> - At this point, we *could* have sent all that can be sent for this
+>    round, but we enter the loop anyways.  And we test two things:
+>       - that we haven't read from block devices more than
+>         qemu_file_get_rate_limit() bytes (notice that this is the maximum
+>         that we could put through the migration channel, not really
+>         related  with what we read from block devices).
+>
+>       - that we haven't read in this round more than MAX_INFLIGHT_IO
+>         blocks.  That is 512 blocks, at BLOCK_SIZE bytes is 512MB. Why?
+>         Who knows.
 
-If I start QEMU with `-k en-gb` (or without the -k switch at all), I can
-type '<' and get the same character to appear on the guest's command
-line. The issue happens with the updated en-us keymap. It is also fixed
-if I replace /usr/share/qemu/keymaps/en-us with the old keymap file
-(before commit a7815faf).
+The idea behind this was only to limit the maximum memory that is allocated.
+That was not meant as a rate limit for the storage backend.
 
-This problem was originally reported against Packer because we were
-seeing '>' characters in place of '<' when using it with the QEMU
-builder. [2]
+>
+> - Now we exit the while loop, and we have pending blocks to send, the
+>      minimum between:
+>         - qemu_file_get_rate_limit()/BLOCK_SIZE, and
+>         - MAX_INFLIGHT_IO
+>
+> But not all of them are ready to send, only "read_done" blocks are
+> ready, the "submitted" ones are still waiting for read completion.
 
-[1] https://github.com/qemu/qemu/commit/a7815faffb2bd594b92aa3542d7b799cc89=
-c5414
-[2] https://github.com/hashicorp/packer/issues/5769
+Thats what I tried to address in patch 5.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+>
+> And we call back flush_blks() that will try to send all the "read_done"
+> blocks through the migration channel until we hit
+> qemu_file_rate_limit().
+>
+> So, looking at the problem from far away:
+>
+> - how many read requests are we have to have in flight at any moment, is
+>    that 16 from this series the right number? Notice that each request
+>    are 1MB, so this is 16MB (I have no clue what is the right value).
 
--- =
+I choosed that value because it helped to improved the stalls in the
+guest that I have been seeing. Stefan also said that 16 would be a good
+value for a background task. 512 is definetly too much.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1754295
+>
+> - how many blocks should we get on each round.  Notice that the reason
+>    for the 1st patch on this series is because the block layer is not
+>    sending enough blocks to prevent ram migration to start.  If there are
+>    enough dirty memory sent from the block layer, we shouldn't ever enter
+>    the ram stage.
+>    Notice how we register them in vl.c:
+>
+>      blk_mig_init();
+>      ram_mig_init();
 
-Title:
-  Incorrect en-us keymap in QEMU 2.11
+The idea of the 1st patch was to skip ram migration until we have completed
+the first round of block migration (aka bulk phase) as this will take a long time.
+After that we are only doing incremental updates. You are right this might still
+be too early, but it to start after the bulk phase was an easy choice without
+introducing another heuristic.
 
-Status in QEMU:
-  New
+>
+> So, after so long mail, do I have some suggestion?
+>
+> - should we make the MAX_PARALLEL_IO autotunig?  i.e. if we are not
+>    being able to get qemu_file_get_rate_limit()/BLOCK_SIZE read_blocks by
+>    iteration, we should increase MAX_PARALLEL_IO limit?
 
-Bug description:
-  I'm using the latest Arch Linux installation ISO as a live system and
-  start QEMU with the following command:
+We should not, if the bandwidth of the migration stream is high we would again
+monipolize the I/O device and get stalls in guest I/O.
 
-  $ qemu-system-x86_64 -enable-kvm -boot d -cdrom
-  ~/isos/archlinux-2018.03.01-x86_64.iso -m 512 -vnc :0 -k en-us
+>
+> - should we "take" into account how many blocks have transferred the 1st
+>    call to flush_blks() and only wait for "read_blocks" until
+>    flush_blks() instead of for the whole set?
 
-  Then I use Vinagre to connect to the guest system, boot the default
-  bootloader option, and type the character '<' at the command prompt.
-  The guest prints the character '>' instead of the '<' I typed.
+We still have to avoid that we have too much parallel I/O. But I was also thinking that
+we need a time limit (as the ram migration has). We might sit in the while loop until
+512MB have read if we have a fast source storage and a high migration bandwidth
+so that we never reach the rate limit.
 
-  I believe this is caused by the updated en-us keymap in QEMU 2.11. [1]
-
-  If I start QEMU with `-k en-gb` (or without the -k switch at all), I
-  can type '<' and get the same character to appear on the guest's
-  command line. The issue happens with the updated en-us keymap. It is
-  also fixed if I replace /usr/share/qemu/keymaps/en-us with the old
-  keymap file (before commit a7815faf).
-
-  This problem was originally reported against Packer because we were
-  seeing '>' characters in place of '<' when using it with the QEMU
-  builder. [2]
-
-  [1] https://github.com/qemu/qemu/commit/a7815faffb2bd594b92aa3542d7b799cc=
-89c5414
-  [2] https://github.com/hashicorp/packer/issues/5769
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1754295/+subscriptions
+Peter
