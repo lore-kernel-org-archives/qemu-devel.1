@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56984)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
-	id 1eu0pR-0000qD-H2
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:03:50 -0500
+	id 1eu0pQ-0000oY-9U
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:03:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
-	id 1eu0pQ-0002gP-Mf
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:03:49 -0500
-Received: from smtp.citrix.com ([66.165.176.89]:53118)
+	id 1eu0pP-0002dx-56
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:03:48 -0500
+Received: from smtp.citrix.com ([66.165.176.89]:27694)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
-	id 1eu0pQ-0002dt-FY
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:03:48 -0500
+	id 1eu0pO-0002cK-U1
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:03:47 -0500
 From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Thu, 8 Mar 2018 19:03:04 +0000
-Message-ID: <1520535787-6223-10-git-send-email-ian.jackson@eu.citrix.com>
+Date: Thu, 8 Mar 2018 19:02:57 +0000
+Message-ID: <1520535787-6223-3-git-send-email-ian.jackson@eu.citrix.com>
 In-Reply-To: <1520535787-6223-1-git-send-email-ian.jackson@eu.citrix.com>
 References: <1520535787-6223-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 09/12] configure: do_compiler: Dump some extra
- info under bash
+Subject: [Qemu-devel] [PATCH 02/12] xen: link against xentoolcore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +29,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>, "Kent R. Spillner" <kspillner@acm.org>, Janosch Frank <frankja@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <Ian.Jackson@eu.citrix.com>
 
-This makes it much easier to find a particular thing in config.log.
+From: Anthony PERARD <anthony.perard@citrix.com>
 
-The information may be lacking in other shells, resulting in harmless
-empty output.  (This is why we don't use the proper ${FUNCNAME[*]}
-array syntax - other shells will choke on that.)
-
-The extra output is only printed if configure is run with bash.  On
-systems where /bin/sh is not bash, it is necessary to say bash
-./configure to get the extra debug info in the log.
+Xen libraries in 4.10 include a new xentoolcore library.  This
+contains the xentoolcore_restrict_all function which we are about to
+want to use.
 
 Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
-CC: Kent R. Spillner <kspillner@acm.org>
-CC: Janosch Frank <frankja@linux.vnet.ibm.com>
-CC: Thomas Huth <thuth@redhat.com>
-CC: Peter Maydell <peter.maydell@linaro.org>
-CC: Paolo Bonzini <pbonzini@redhat.com>
+Acked-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
-v6: Fix commit message wording.
-v4: No longer tag this patch RFC.
+v5: More truthful commit message.
 ---
- configure | 4 ++++
- 1 file changed, 4 insertions(+)
+ configure | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/configure b/configure
-index 0a8059f..841c146 100755
+index 6f3921c..0a8059f 100755
 --- a/configure
 +++ b/configure
-@@ -60,6 +60,10 @@ do_compiler() {
-     # is compiler binary to execute.
-     local compiler="$1"
-     shift
-+    echo >>config.log "
-+funcs: ${FUNCNAME}
-+lines: ${BASH_LINENO}
-+files: ${BASH_SOURCE}"
-     echo $compiler "$@" >> config.log
-     $compiler "$@" >> config.log 2>&1 || return $?
-     # Test passed. If this is an --enable-werror build, rerun
+@@ -2179,7 +2179,7 @@ if test "$xen" != "no" ; then
+       $($pkg_config --modversion xencontrol | sed 's/\./ /g') )"
+     xen=yes
+     xen_pc="xencontrol xenstore xenguest xenforeignmemory xengnttab"
+-    xen_pc="$xen_pc xenevtchn xendevicemodel"
++    xen_pc="$xen_pc xenevtchn xendevicemodel xentoolcore"
+     QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags $xen_pc)"
+     libs_softmmu="$($pkg_config --libs $xen_pc) $libs_softmmu"
+     LDFLAGS="$($pkg_config --libs $xen_pc) $LDFLAGS"
+@@ -2211,18 +2211,20 @@ EOF
+         cat > $TMPC <<EOF &&
+ #undef XC_WANT_COMPAT_MAP_FOREIGN_API
+ #include <xenforeignmemory.h>
++#include <xentoolcore.h>
+ int main(void) {
+   xenforeignmemory_handle *xfmem;
+ 
+   xfmem = xenforeignmemory_open(0, 0);
+   xenforeignmemory_map2(xfmem, 0, 0, 0, 0, 0, 0, 0);
++  xentoolcore_restrict_all(0);
+ 
+   return 0;
+ }
+ EOF
+-        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs"
++        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs -lxentoolcore"
+       then
+-      xen_stable_libs="-lxendevicemodel $xen_stable_libs"
++      xen_stable_libs="-lxendevicemodel $xen_stable_libs -lxentoolcore"
+       xen_ctrl_version=41000
+       xen=yes
+     elif
 -- 
 2.1.4
