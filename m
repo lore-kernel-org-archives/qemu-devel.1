@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1etkMf-0007xu-TC
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 20:29:02 -0500
+	(envelope-from <famz@redhat.com>) id 1etl3B-00005c-Cy
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 21:12:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1etkMf-00006g-7H
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 20:29:01 -0500
-Date: Thu, 8 Mar 2018 09:28:42 +0800
+	(envelope-from <famz@redhat.com>) id 1etl3A-0007Oo-KM
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 21:12:57 -0500
+Date: Thu, 8 Mar 2018 10:12:41 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180308012842.GJ13844@lemon.usersys.redhat.com>
-References: <c0d7b993-b3b8-a753-21f5-e2257de27caf@kamp.de>
-	<20180305114533.GI7910@stefanha-x1.localdomain>
-	<0f1ec3c7-1157-e618-62f8-ffd5e08eb342@kamp.de>
-	<20180305145215.GM3131@work-vm>
-	<20180306160739.GN31045@stefanha-x1.localdomain>
-	<824907bb-3a37-27bd-76db-be17d05bdac0@kamp.de>
-	<231fe0ce-3df4-a175-2fba-403023cc65e1@kamp.de>
-	<99df10d6-6514-56ee-16ce-8b7d1823cc08@kamp.de>
+Message-ID: <20180308021241.GM13844@lemon.usersys.redhat.com>
+References: <20180205202232.19254-1-mreitz@redhat.com>
+	<73838a0c-d960-d24d-b706-a0ecbcbe7aaf@redhat.com>
+	<20180307100424.GA7917@localhost.localdomain>
+	<2d97780c-4a06-1b08-8211-760fc3567c2a@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <99df10d6-6514-56ee-16ce-8b7d1823cc08@kamp.de>
-Subject: Re: [Qemu-devel] block migration and dirty bitmap reset
+In-Reply-To: <2d97780c-4a06-1b08-8211-760fc3567c2a@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/2] block/ssh: Implement
+ .bdrv_refresh_filename()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +26,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, wency@cn.fujitsu.com, qemu block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, "Richard W . M . Jones" <rjones@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Wed, 03/07 09:06, Peter Lieven wrote:
-> Hi,
+On Wed, 03/07 12:50, John Snow wrote:
+> It's something I'd like to see patchew do, actually:
 > 
-> while looking at the code I wonder if the blk_aio_preadv and the bdrv_reset_dirty_bitmap order must
-> be swapped in mig_save_device_bulk:
-> 
->     qemu_mutex_lock_iothread();
->     aio_context_acquire(blk_get_aio_context(bmds->blk));
->     blk->aiocb = blk_aio_preadv(bb, cur_sector * BDRV_SECTOR_SIZE, &blk->qiov,
->                                 0, blk_mig_read_cb, blk);
-> 
->     bdrv_reset_dirty_bitmap(bmds->dirty_bitmap, cur_sector * BDRV_SECTOR_SIZE,
->                             nr_sectors * BDRV_SECTOR_SIZE);
->     aio_context_release(blk_get_aio_context(bmds->blk));
->     qemu_mutex_unlock_iothread();
-> 
-> In mig_save_device_dirty we first reset the dirty bitmap and read then which shoulds like
-> a better idea.
+> "Here's a list of what's on the list that has no reviews or NACKs, and
+> needs some love"
 
-Yes, that sounds right to me.
+It's not hard to define a search condition for that:
+
+http://patchew.org/search-help
+
+http://patchew.org/search?q=project%3AQEMU+age%3A%3E1m+not%3Areviewed+not%3Areplied+not%3Amerged+is%3Atested+to%3Aqemu-block
+
+> 
+> coupled with a 30 day "Hey, nobody looked at this" ping to the list
+> before it NACKs a set for being too old.
+
+If the initial landing of the patch didn't get enough attention, chances are the
+pings will not change much about it especially it's from a bot.
+
+A summary list sounds good, though.
 
 Fam
