@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1etqF1-0003VE-1y
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 02:45:31 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etqH5-0004we-4E
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 02:47:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1etqEw-0006Mc-6N
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 02:45:31 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48566 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1etqEv-0006MQ-Qi
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 02:45:26 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D81414040073
-	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 07:45:14 +0000 (UTC)
-Date: Thu, 8 Mar 2018 08:45:07 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180308074507.nwho4tddsoxb3b7v@sirius.home.kraxel.org>
-References: <20180307144951.d75lo5rgzi2vf27z@eukaryote>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1etqH0-0006ok-91
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 02:47:39 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:46663
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1etqH0-0006m8-23
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 02:47:34 -0500
+Date: Thu, 8 Mar 2018 07:47:14 +0000
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <20180308074714.flmzofjhz4p45ljr@kentang.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180307144951.d75lo5rgzi2vf27z@eukaryote>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC] Defining firmware (OVMF,
- et al) metadata format & file
+Subject: [Qemu-devel] [PULL] qemu-sparc updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,40 +26,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kashyap Chamarthy <kchamart@redhat.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, lersek@redhat.com, berrange@redhat.com
+To: peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-> Suggested approach
-> ------------------
->=20
-> Based on an upstream discussion on 'virt-tools'[1] mailing list and som=
-e
-> Bugzillas, Gerd Hoffmann, Laszlo Ersek and Dan Berrang=E9 had a suggest=
-ion
-> to define a firmware metadata format and file (example in [1]):
->=20
->   - For each firmware file we need a metadata file in a well defined
->     location, e.g. /usr/share/qemu/bios/ that lists stuff like:
->=20
->       - Path to the firmware binary
->       - Path to the pre-built OVMF 'vars' file (if any)
+Hi Peter,
 
-How to load the binary (using -bios, -pflash, possibly also -kernel, for
-uboot @ arm).
+Here are a couple of last-minute fixes for SPARC. Please pull.
 
->       - Support architectures - associated QEMU feature flags (Secure
->         Boot)
 
-Also machine types.  ovmf builds with smm don't boot on pc.  coreboot
-has hardware-specific roms too, so the pc build wouldn't boot on q35 and
-visa versa.  Same on arm, where the firmware typically is board-specific.
+ATB,
 
->       - If the binary provides / requires SMM (System Management Mode)
+Mark.
 
-Possibly a more generic "flags" or "properties" thing, I can easily
-imagine that simliar requirements show up on other platforms too.
 
-Also a "name" and a "description" field would be useful.
+The following changes since commit f32408f3b472a088467474ab152be3b6285b2d7b:
 
-cheers,
-  Gerd
+  misc: don't use hwaddr as a type in trace events (2018-03-06 14:24:30 +0000)
+
+are available in the git repository at:
+
+  https://github.com/mcayland/qemu.git tags/qemu-sparc-signed
+
+for you to fetch changes up to 6e10f37c86068e35151f982c976a85f1bec07ef2:
+
+  sparc: fix leon3 casa instruction when MMU is disabled (2018-03-08 07:22:03 +0000)
+
+----------------------------------------------------------------
+qemu-sparc update
+
+----------------------------------------------------------------
+KONRAD Frederic (1):
+      sparc: fix leon3 casa instruction when MMU is disabled
+
+Thomas Huth (1):
+      hw/sparc/sun4m: Fix implicit creation of "-drive if=scsi" devices
+
+ hw/sparc/sun4m.c         | 1 +
+ target/sparc/translate.c | 5 +++++
+ 2 files changed, 6 insertions(+)
