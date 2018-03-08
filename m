@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eu10A-0001tM-GY
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:15:05 -0500
+	(envelope-from <groeck7@gmail.com>) id 1eu17E-0006fg-1T
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:22:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eu0zn-0007X3-Ax
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:14:54 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39092 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1eu0zm-0007Wj-U2
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:14:31 -0500
-References: <20180307155746.18526-1-marcandre.lureau@redhat.com>
-	<20180307155746.18526-8-marcandre.lureau@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <f0b59d9c-1d70-2c1f-53a9-81c656e0723c@redhat.com>
-Date: Thu, 8 Mar 2018 20:14:13 +0100
+	(envelope-from <groeck7@gmail.com>) id 1eu17A-0003fC-Qf
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:22:12 -0500
+Received: from mail-pg0-x22d.google.com ([2607:f8b0:400e:c05::22d]:38135)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <groeck7@gmail.com>) id 1eu17A-0003eQ-Gh
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:22:08 -0500
+Received: by mail-pg0-x22d.google.com with SMTP id l24so2600822pgc.5
+	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 11:22:08 -0800 (PST)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Thu, 8 Mar 2018 11:22:04 -0800
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <20180308192204.GA1898@roeck-us.net>
+References: <1520444223-8389-1-git-send-email-linux@roeck-us.net>
+	<CAFEAcA-+J7MUSssjPZ5BTNzGx_4h0YANdCegGfWNzYmoNatcqg@mail.gmail.com>
+	<20180308171239.GA22206@roeck-us.net>
+	<201803081028.39635.wpaul@windriver.com>
 MIME-Version: 1.0
-In-Reply-To: <20180307155746.18526-8-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [edk2] [PATCH v2 7/8] ovmf: link with Tcg2Dxe
- module
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <201803081028.39635.wpaul@windriver.com>
+Subject: Re: [Qemu-devel] [PATCH] fsl-imx6: Swap Ethernet interrupt defines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,372 +32,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@redhat.com, edk2-devel@lists.01.org
-Cc: qemu-devel@nongnu.org, javierm@redhat.com, pjones@redhat.com, jiewen.yao@intel.com
+To: Bill Paul <wpaul@windriver.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Chris Healy <cphealy@gmail.com>, Jason Wang <jasowang@redhat.com>, Jean-Christophe Dubois <jcd@tribudubois.net>
 
-On 03/07/18 16:57, marcandre.lureau@redhat.com wrote:
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> This module measures and log the boot environment. It also produces
-> the Tcg2 protocol, which allows for example to read the log from OS.
->=20
-> The linux kernel doesn't yet read the EFI_TCG2_EVENT_LOG_FORMAT_TCG_2,
-> which is required for crypto-agile log. In fact, only upcoming 4.16
-> adds support EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2:
->=20
-> [    0.000000] efi: EFI v2.70 by EDK II
-> [    0.000000] efi:  SMBIOS=3D0x3fa1f000  ACPI=3D0x3fbb6000  ACPI 2.0=3D=
-0x3fbb6014  MEMATTR=3D0x3e7d4318  TPMEventLog=3D0x3db21018
->=20
-> $ python chipsec_util.py tpm parse_log binary_bios_measurements
->=20
-> [CHIPSEC] Version 1.3.5.dev2
-> [CHIPSEC] API mode: using OS native API (not using CHIPSEC kernel modul=
-e)
-> [CHIPSEC] Executing command 'tpm' with args ['parse_log', '/tmp/binary_=
-bios_measurements']
->=20
-> PCR: 0	type: EV_S_CRTM_VERSION               	size: 0x2	digest: 1489f92=
-3c4dca729178b3e3233458550d8dddf29
-> 	+ version:
-> PCR: 0	type: EV_EFI_PLATFORM_FIRMWARE_BLOB   	size: 0x10	digest: fd39ce=
-d7c0d2a61f6830c78c7625f94826b05bcc
-> 	+ base: 0x820000	length: 0xe0000
-> PCR: 0	type: EV_EFI_PLATFORM_FIRMWARE_BLOB   	size: 0x10	digest: 39ebc6=
-783b72bc1e73c7d5bcfeb5f54a3f105d4c
-> 	+ base: 0x900000	length: 0xa00000
-> PCR: 7	type: EV_EFI_VARIABLE_DRIVER_CONFIG   	size: 0x35	digest: 57cd4d=
-c19442475aa82743484f3b1caa88e142b8
-> PCR: 7	type: EV_EFI_VARIABLE_DRIVER_CONFIG   	size: 0x24	digest: 9b1387=
-306ebb7ff8e795e7be77563666bbf4516e
-> PCR: 7	type: EV_EFI_VARIABLE_DRIVER_CONFIG   	size: 0x26	digest: 9afa86=
-c507419b8570c62167cb9486d9fc809758
-> PCR: 7	type: EV_EFI_VARIABLE_DRIVER_CONFIG   	size: 0x24	digest: 5bf8fa=
-a078d40ffbd03317c93398b01229a0e1e0
-> PCR: 7	type: EV_EFI_VARIABLE_DRIVER_CONFIG   	size: 0x26	digest: 734424=
-c9fe8fc71716c42096f4b74c88733b175e
-> PCR: 7	type: EV_SEPARATOR                    	size: 0x4	digest: 9069ca7=
-8e7450a285173431b3e52c5c25299e473
-> PCR: 1	type: EV_EFI_VARIABLE_BOOT            	size: 0x3e	digest: 252f8e=
-bb85340290b64f4b06a001742be8e5cab6
-> PCR: 1	type: EV_EFI_VARIABLE_BOOT            	size: 0x6e	digest: 22a4f6=
-ee9af6dba01d3528deb64b74b582fc182b
-> PCR: 1	type: EV_EFI_VARIABLE_BOOT            	size: 0x80	digest: b7811d=
-5bf30a7efd4e385c6179fe10d9290bb9e8
-> PCR: 1	type: EV_EFI_VARIABLE_BOOT            	size: 0x84	digest: 425e50=
-2c24fc924e231e0a62327b6b7d1f704573
-> PCR: 1	type: EV_EFI_VARIABLE_BOOT            	size: 0x9a	digest: 0b5d2c=
-98ac5de6148a4a1490ff9d5df69039f04e
-> PCR: 1	type: EV_EFI_VARIABLE_BOOT            	size: 0xbd	digest: 20bd5f=
-402271d57a88ea314fe35c1705956b1f74
-> PCR: 1	type: EV_EFI_VARIABLE_BOOT            	size: 0x88	digest: df5d66=
-05cb8f4366d745a8464cfb26c1efdc305c
-> PCR: 4	type: EV_EFI_ACTION                   	size: 0x28	digest: cd0fdb=
-4531a6ec41be2753ba042637d6e5f7f256
-> PCR: 0	type: EV_SEPARATOR                    	size: 0x4	digest: 9069ca7=
-8e7450a285173431b3e52c5c25299e473
-> PCR: 1	type: EV_SEPARATOR                    	size: 0x4	digest: 9069ca7=
-8e7450a285173431b3e52c5c25299e473
-> PCR: 2	type: EV_SEPARATOR                    	size: 0x4	digest: 9069ca7=
-8e7450a285173431b3e52c5c25299e473
-> PCR: 3	type: EV_SEPARATOR                    	size: 0x4	digest: 9069ca7=
-8e7450a285173431b3e52c5c25299e473
-> PCR: 4	type: EV_SEPARATOR                    	size: 0x4	digest: 9069ca7=
-8e7450a285173431b3e52c5c25299e473
-> PCR: 5	type: EV_SEPARATOR                    	size: 0x4	digest: 9069ca7=
-8e7450a285173431b3e52c5c25299e473
->=20
-> $ tpm2_pcrlist
-> sha1 :
->   0  : 35bd1786b6909daad610d7598b1d620352d33b8a
->   1  : ec0511e860206e0af13c31da2f9e943fb6ca353d
->   2  : b2a83b0ebf2f8374299a5b2bdfc31ea955ad7236
->   3  : b2a83b0ebf2f8374299a5b2bdfc31ea955ad7236
->   4  : 45a323382bd933f08e7f0e256bc8249e4095b1ec
->   5  : d16d7e629fd8d08ca256f9ad3a3a1587c9e6cc1b
->   6  : b2a83b0ebf2f8374299a5b2bdfc31ea955ad7236
->   7  : 518bd167271fbb64589c61e43d8c0165861431d8
->   8  : 0000000000000000000000000000000000000000
->   9  : 0000000000000000000000000000000000000000
->   10 : 0000000000000000000000000000000000000000
->   11 : 0000000000000000000000000000000000000000
->   12 : 0000000000000000000000000000000000000000
->   13 : 0000000000000000000000000000000000000000
->   14 : 0000000000000000000000000000000000000000
->   15 : 0000000000000000000000000000000000000000
->   16 : 0000000000000000000000000000000000000000
->   17 : ffffffffffffffffffffffffffffffffffffffff
->   18 : ffffffffffffffffffffffffffffffffffffffff
->   19 : ffffffffffffffffffffffffffffffffffffffff
->   20 : ffffffffffffffffffffffffffffffffffffffff
->   21 : ffffffffffffffffffffffffffffffffffffffff
->   22 : ffffffffffffffffffffffffffffffffffffffff
->   23 : 0000000000000000000000000000000000000000
-> sha256 :
->   0  : 9ae903dbae3357ac00d223660bac19ea5c021499a56201104332ab966631ce2c
->   1  : acc611d90245cf04e77b0ca94901f90e7fa54770f0426f53c3049b532243d1b8
->   2  : 3d458cfe55cc03ea1f443f1562beec8df51c75e14a9fcf9a7234a13f198e7969
->   3  : 3d458cfe55cc03ea1f443f1562beec8df51c75e14a9fcf9a7234a13f198e7969
->   4  : 7a94ffe8a7729a566d3d3c577fcb4b6b1e671f31540375f80eae6382ab785e35
->   5  : a5ceb755d043f32431d63e39f5161464620a3437280494b5850dc1b47cc074e0
->   6  : 3d458cfe55cc03ea1f443f1562beec8df51c75e14a9fcf9a7234a13f198e7969
->   7  : 65caf8dd1e0ea7a6347b635d2b379c93b9a1351edc2afc3ecda700e534eb3068
->   8  : 0000000000000000000000000000000000000000000000000000000000000000
->   9  : 0000000000000000000000000000000000000000000000000000000000000000
->   10 : 0000000000000000000000000000000000000000000000000000000000000000
->   11 : 0000000000000000000000000000000000000000000000000000000000000000
->   12 : 0000000000000000000000000000000000000000000000000000000000000000
->   13 : 0000000000000000000000000000000000000000000000000000000000000000
->   14 : 0000000000000000000000000000000000000000000000000000000000000000
->   15 : 0000000000000000000000000000000000000000000000000000000000000000
->   16 : 0000000000000000000000000000000000000000000000000000000000000000
->   17 : ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
->   18 : ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
->   19 : ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
->   20 : ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
->   21 : ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
->   22 : ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
->   23 : 0000000000000000000000000000000000000000000000000000000000000000
-> sha384 :
->=20
-> The PhysicalPresenceLib is required, it sets some variables, but the
-> firmware doesn't act on it yet.
->=20
-> Laszlo Ersek explained on the list why Tpm2DeviceLib has to be
-> resolved differently for DXE_DRIVER modules in general and for
-> "Tcg2Dxe.inf" specifically:
->=20
->   * We have a library class called Tpm2DeviceLib -- this is basically t=
-he
->   set of APIs declared in "SecurityPkg/Include/Library/Tpm2DeviceLib.h"=
-.
->   Its leading comment says "This library abstract how to access TPM2
->   hardware device".
->=20
->   There are two *sets* of APIs in "Tpm2DeviceLib.h":
->=20
->   (a) functions that deal with the TPM2 device:
->       - Tpm2RequestUseTpm(),
->       - Tpm2SubmitCommand()
->=20
->       This set of APIs is supposed to be used by clients that *consume*
->       the TPM2 device abstraction.
->=20
->   (b) the function Tpm2RegisterTpm2DeviceLib(), which is supposed to be
->       used by *providers* of various TPM2 device abstractions.
->=20
->   * Then, we have two implementations (instances) of the Tpm2DeviceLib =
-class:
->   (1) SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.inf
->   (2) SecurityPkg/Library/Tpm2DeviceLibRouter/Tpm2DeviceLibRouterDxe.in=
-f
->=20
->   (1) The first library instance ("Tpm2DeviceLibTcg2.inf") implements t=
-he
->   APIs listed under (a), and it does not implement (b) -- see
->   EFI_UNSUPPORTED. In other words, this lib instance is strictly meant =
-for
->   drivers that *consume* the TPM2 device abstraction. And, the (a) grou=
-p
->   of APIs is implemented by forwarding the requests to the TCG2 protoco=
-l.
->=20
->   The idea here is that all the drivers that consume the TPM2 abstracti=
-on
->   do not have to be statically linked with a large TPM2 device library
->   instance; instead they are only linked (statically) with this "thin"
->   library instance, and all the actual work is delegated to whichever
->   driver that provides the singleton TCG2 protocol.
->=20
->   (2) The second library instance ("Tpm2DeviceLibRouterDxe.inf") is mea=
-nt
->   for the driver that offers (produces) the TCG2 protocol. This lib
->   instance implements both (a) and (b) API groups.
->=20
->   * Here's how things fit together:
->=20
->   (i) The "SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2InstanceLibDTpm.in=
-f"
->   library instance (which has no lib class) is linked into "Tcg2Dxe.inf=
-"
->   via NULL class resolution. This simply means that before the
->   "Tcg2Dxe.inf" entry point function is entered, the constructor functi=
-on
->   of "Tpm2InstanceLibDTpm.inf" will be called.
->=20
->   (ii) This Tpm2InstanceLibDTpmConstructor() function calls API (b), an=
-d
->   registers its own actual TPM2 command implementation with the
->   "Tpm2DeviceLibRouter" library instance (also linked into the Tcg2Dxe
->   driver). This provides the back-end for the API set (a).
->=20
->          TCG2 protocol provider (Tcg2Dxe.inf driver) launches
->                       |
->                       v
->     NULL class: Tpm2InstanceLibDTpm instance construction
->                       |
->                       v
->     Tpm2DeviceLib class: Tpm2DeviceLibRouter instance
->            backend registration for API set (a)
->=20
->   (iii) The Tcg2Dxe driver exposes the TCG2 protocol.
->=20
->   (iv) A TPM2 consumer calls API set (a) via lib instance (1). Such cal=
-ls
->   land in Tcg2Dxe, via the protocol.
->=20
->   (v) Tcg2Dxe serves the protocol request by forwarding it to API set (=
-a)
->   from lib instance (2).
->=20
->   (vi) Those functions call the "backend" functions registered by
->   Tpm2DeviceLibDTpm in step (ii).
->=20
->        TPM 2 consumer driver
->                 |
->                 v
->   Tpm2DeviceLib class: Tpm2DeviceLibTcg2 instance
->                 |
->                 v
->          TCG2 protocol interface
->                 |
->                 v
->   TCG2 protocol provider: Tcg2Dxe.inf driver
->                 |
->                 v
->   Tpm2DeviceLib class: Tpm2DeviceLibRouter instance
->                 |
->                 v
->      NULL class: Tpm2InstanceLibDTpm instance
->         (via earlier registration)
->                 |
->                 v
->        TPM2 chip (actual hardware)
->=20
->   * So that is the "router" pattern in edk2. Namely,
->=20
->   - Consumers of an abstraction use a thin library instance.
->=20
->   - The thin library instance calls a firmware-global (singleton) servi=
-ce,
->     i.e. a PPI (in the PEI phase) or protocol (in the DXE phase).
->=20
->   - The PEIM providing the PPI, or the DXE driver providing the protoco=
-l,
->     don't themselves implement the actual service either. Instead they
->     offer a "registration" service too, and they only connect the incom=
-ing
->     "consumer" calls to the earlier registered back-end(s).
->=20
->   - The "registration service", for back-ends to use, may take various
->     forms.
->=20
->     It can be exposed globally to the rest of the firmware, as
->     another member function of the PPI / protocol structure. Then backe=
-nds
->     can be provided by separate PEIMs / DXE drivers.
->=20
->     Or else, the registration service can be exposed as just another
->     library API. In this case, the backends are provided as NULL class
->     library instances, and a platform  DSC file links them into the PEI=
-M /
->     DXE driver via NULL class resolutions. The backend lib instances ca=
-ll
->     the registration service in their own respective constructor
->     functions.
->=20
-> Cc: Laszlo Ersek <lersek@redhat.com>
-> Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> Contributed-under: TianoCore Contribution Agreement 1.0
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  OvmfPkg/OvmfPkgX64.dsc | 16 ++++++++++++++++
->  OvmfPkg/OvmfPkgX64.fdf |  4 ++++
->  2 files changed, 20 insertions(+)
+On Thu, Mar 08, 2018 at 10:28:39AM -0800, Bill Paul wrote:
+> Of all the gin joints in all the towns in all the world, Guenter Roeck had to 
+> walk into mine at 09:12 on Thursday 08 March 2018 and say:
+> 
+> > On Thu, Mar 08, 2018 at 02:51:04PM +0000, Peter Maydell wrote:
+> > > On 8 March 2018 at 14:47, Guenter Roeck <linux@roeck-us.net> wrote:
+> > > > On 03/08/2018 02:50 AM, Peter Maydell wrote:
+> > > >> So do the works-by-accident kernels fail on QEMU because
+> > > >> we don't emulate some bit of the ethernet device ?
+> > > >> Ideally we could fix that so we could boot newer kernels
+> > > >> without breaking the old ones...
+> > > > 
+> > > > I don't know if a fix working for all versions of Linux is even
+> > > > possible. Creating both interrupts might be an option, but would
+> > > > likely cause other problems since some versions of Linux would handle
+> > > > the same interrupt twice, while others expect the second interrupt
+> > > > to be associated with the timer.
+> > > 
+> > > Did the older Linux kernels work on the real hardware? (I
+> > > would guess so, but sometimes these things only get tested
+> > > on emulation...) If so, then in theory "make QEMU work like
+> > > the hardware" should allow all the kernels to work on QEMU.
+> > 
+> > Older kernels (4.9 and earlier) register the second interrupt
+> > on a gpio pin.
+> > 
+> > Linux 4.1, ToT qemu with this patch applied:
+> > 
+> >  38:          0  gpio-mxc   6 Level     2188000.ethernet
+> > 286:          0       GIC 151 Level     2188000.ethernet
+> > 
+> > Linux 4.1, ToT qemu without this patch:
+> > 
+> >  38:          0  gpio-mxc   6 Level     2188000.ethernet
+> > 286:         64       GIC 151 Level     2188000.ethernet
+> > 
+> > linux 4.14, ToT qemu with this patch:
+> > 
+> >  64:         64     GIC-0 150 Level     2188000.ethernet
+> >  65:          0     GIC-0 151 Level     2188000.ethernet
+> > 
+> > linux 4.14, ToT qemu without this patch:
+> > 
+> >  64:          0     GIC-0 150 Level     2188000.ethernet
+> >  65:         64     GIC-0 151 Level     2188000.ethernet
+> > 
+> > Presumably real hardware generates interrupts on the gpio pin.
+> > 
+> > The qemu code specifically states that it won't generate
+> > MDIO related interrupts on gpio pins. From hw/net/imx_fec.c:
+> > 
+> > /*
+> >  * The MII phy could raise a GPIO to the processor which in turn
+> >  * could be handled as an interrpt by the OS.
+> >  * For now we don't handle any GPIO/interrupt line, so the OS will
+> >  * have to poll for the PHY status.
+> >  */
+> > 
+> > Linux doesn't poll the phy but expects interrupts to work. I have
+> > no idea what is supposed to happen with regular ethernet interrupts,
+> > and if those are also mapped to a gpio pin on real hardware.
+> 
+> The i.MX6, like a lot of ARM chips, has an internal pin/signal muxing block. 
+> The implementation can vary from one SoC to another. The i.MX6 calls it the 
+> IOMUX block.
+> 
+> The reason for using the GPIO pin here has to do with erratum 6687 in the 
+> i.MX6. The problem is this: the ENET block has several interrupt sources such 
+> as RX done, TX done, various errors and wakeup request. The i.MX6 also has two 
+> blocks to which interrupts can be routed: the GIC (Generic Interrupt 
+> Controller) and GPC (Generic Power Controller). The GPC is only used for power 
+> management: you can use it to configure what device interrupts (from internal 
+> SoC peripherals) can wake the system from hibernation.
+> 
+> The GIC receives all ENET events ORed together via vector 150.
+> 
+> But the GPC is only connected to the wakeup request signal.
+> 
+> According to the erratum 6687 documentation, this means that a normal RX or TX 
+> event would not wake up the system, which is suboptimal.
+> 
+> The workaround for this is:
+> 
+> - Configure the internal mux block to route the ENET interrupt line to a GPIO 
+> pin (as with the GIC, this also gives you all ENET events ORed together)
+> - Unmask the GPIO interrupt in the GPC block instead of the ENET interrupt
+> 
+> The erratum description recommends using GPIO6. It also says that this 
+> workaround was implemented in Freescale/NXP's Linux BSP for this chip. I don't 
+> know if it was also upstreamed to the official Linux kernel.
+> 
+My understanding is that it was upstreamed but later (after 4.9) at least
+partially removed.
 
-(1) Please change the subject line to:
+> Note that this workaround is applied by software, and is really only needed if 
+> you want the ethernet controller to serve as a wakeup event source.
+> 
+> As far as I can tell QEMU does not support the IOMUX block, so it would never 
+> be possible for a kernel with this workaround in place to get interrupts via 
+> the GPIO6 pin.
+> 
+> That said, I don't think the i.MX6 ENET driver itself would need to use the 
+> GPIO6 interrupt. When we implemented power management support for VxWorks we 
+> also used this workaround, but only for the benefit of the GPC module. As far 
+> as I recall, the ENET driver still used GIC vector 150. This may be why this 
+> behavior was removed in later kernels. 
+> 
+> Anyway, this means that the only reason older Linux kernels worked in QEMU 
+> with the broken interrupt configuration is that they also registered a handler 
+> on vector 151 (119). Even though QEMU could not send events via GPIO6, it was 
+> mistakenly sending them via vector 151, so it looked like things worked. On 
+> real hardware, the older kernels would have gotten their interrupts via GPIO6 
+> and also worked. The older kernels would _not_ work if you fix QEMU because 
+> now they would never get interrupts on either vector, unless you fudge things 
+> so that the ENET module triggers both vector 150 and the vector for GPIO6 in 
+> the GIC or patch them to back out the erratum 6678 workaround as later kernels 
+> do.
+> 
+Excellent analysis.
 
-OvmfPkg: include Tcg2Dxe module
+> Later kernels that register vectors 150 and 151 would work with both broken 
+> and fixed QEMU and real hardware.
+> 
+... except in Linux v4.15 and later since those kernels register the second
+interrupt as a timer interrupt. Because of this, the shipping version of qemu
+does not work with Linux v4.15+.
 
-> diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
-> index 3fa1a31f4c37..7753852144fb 100644
-> --- a/OvmfPkg/OvmfPkgX64.dsc
-> +++ b/OvmfPkg/OvmfPkgX64.dsc
-> @@ -211,6 +211,8 @@ [LibraryClasses]
-> =20
->  !if $(TPM2_ENABLE) =3D=3D TRUE
->    Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
-> +  Tcg2PhysicalPresenceLib|SecurityPkg/Library/DxeTcg2PhysicalPresenceL=
-ib/DxeTcg2PhysicalPresenceLib.inf
-> +  Tcg2PpVendorLib|SecurityPkg/Library/Tcg2PpVendorLibNull/Tcg2PpVendor=
-LibNull.inf
->  !endif
-> =20
->  [LibraryClasses.common]
-> @@ -362,6 +364,10 @@ [LibraryClasses.common.DXE_DRIVER]
->    PciLib|OvmfPkg/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
->    MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
->    QemuFwCfgS3Lib|OvmfPkg/Library/QemuFwCfgS3Lib/DxeQemuFwCfgS3LibFwCfg=
-.inf
-> +!if $(TPM2_ENABLE)
-> +  HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCrypt=
-oRouterDxe.inf
-
-(2) Can you move this HashLib resolution under Tcg2Dxe.inf?
-
-> +  Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg=
-2.inf
-> +!endif
-> =20
->  [LibraryClasses.common.UEFI_APPLICATION]
->    PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
-> @@ -642,6 +648,16 @@ [Components]
-> =20
->    MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
-> =20
-> +!if $(TPM2_ENABLE) =3D=3D TRUE
-> +  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf {
-> +    <LibraryClasses>
-> +      Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibRouter/Tpm2Device=
-LibRouterDxe.inf
-> +      NULL|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2InstanceLibDTpm.i=
-nf
-> +      NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1=
-.inf
-> +      NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSh=
-a256.inf
-> +  }
-> +!endif
-> +
->    MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
->      <LibraryClasses>
->  !if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
-> diff --git a/OvmfPkg/OvmfPkgX64.fdf b/OvmfPkg/OvmfPkgX64.fdf
-> index c0173e7adf5f..1a46104fc63d 100644
-> --- a/OvmfPkg/OvmfPkgX64.fdf
-> +++ b/OvmfPkg/OvmfPkgX64.fdf
-> @@ -392,6 +392,10 @@ [FV.DXEFV]
->  INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
->  !endif
-> =20
-> +!if $(TPM2_ENABLE) =3D=3D TRUE
-> +INF  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
-> +!endif
-> +
-
-(3) In the DSC file, you are adding Tcg2Dxe between RuntimeDxe and
-SecurityStubDxe; can you please stick with the same in the FDF file?
-It's easier to read.
-
-Alternatively, you can add Tcg2Dxe after VariableRuntimeDxe too, of
-course, but then the DSC file should follow suit. Makes no difference
-functionally, but it's easier to read.
-
->  ######################################################################=
-##########
-> =20
->  [FV.FVMAIN_COMPACT]
->=20
-
-Thanks!
-Laszlo
+Thanks,
+Guenter
