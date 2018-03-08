@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=598c11397=Paul.Durrant@citrix.com>)
-	id 1etv3g-0000li-9n
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:54:09 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1etv6B-000375-AZ
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:56:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=598c11397=Paul.Durrant@citrix.com>)
-	id 1etv3c-0007fw-95
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:54:08 -0500
-Received: from smtp.eu.citrix.com ([185.25.65.24]:21463)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=598c11397=Paul.Durrant@citrix.com>)
-	id 1etv3b-0007dE-Vx
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:54:04 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Thu, 8 Mar 2018 12:53:47 +0000
-Message-ID: <e9d205b6139c4e338b5535fc6bed3a2a@AMSPEX02CL03.citrite.net>
-References: <1520513551-19851-1-git-send-email-igor.druzhinin@citrix.com>
-In-Reply-To: <1520513551-19851-1-git-send-email-igor.druzhinin@citrix.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <peter.maydell@linaro.org>) id 1etv6A-0000wZ-Gr
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:56:43 -0500
+Received: from mail-ot0-x22f.google.com ([2607:f8b0:4003:c0f::22f]:45487)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1etv6A-0000wG-95
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:56:42 -0500
+Received: by mail-ot0-x22f.google.com with SMTP id f11so5275401otj.12
+	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 04:56:42 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] xen-pvdevice: Introduce a simplistic
- xen-pvdevice save state
+In-Reply-To: <20180307112532.24248-1-berrange@redhat.com>
+References: <20180307112532.24248-1-berrange@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 8 Mar 2018 12:56:21 +0000
+Message-ID: <CAFEAcA_vtSLkn_3EUgpxwSE1XmF45y3fcKJUQU6YN33VUHmUfg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 0/6] Qio next patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,63 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Druzhinin <igor.druzhinin@citrix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
-Cc: "sstabellini@kernel.org" <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, "mst@redhat.com" <mst@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Eric Blake <eblake@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 
-> -----Original Message-----
-> From: Igor Druzhinin [mailto:igor.druzhinin@citrix.com]
-> Sent: 08 March 2018 12:53
-> To: qemu-devel@nongnu.org; xen-devel@lists.xenproject.org
-> Cc: sstabellini@kernel.org; Paul Durrant <Paul.Durrant@citrix.com>; Antho=
-ny
-> Perard <anthony.perard@citrix.com>; mst@redhat.com;
-> pbonzini@redhat.com; Igor Druzhinin <igor.druzhinin@citrix.com>
-> Subject: [PATCH] xen-pvdevice: Introduce a simplistic xen-pvdevice save
-> state
->=20
-> This should help to avoid problems with accessing the device after
-> migration/resume without PV drivers. Older systems will acquire
-> the new record when migrated which should not change their state for
-> worse.
->=20
-> Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
+On 7 March 2018 at 11:25, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wro=
+te:
+> The following changes since commit f2bb2d14c2958f3f5aef456bd2cdb1ff99f4a5=
+62:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request'=
+ into staging (2018-03-05 16:41:20 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/berrange/qemu tags/qio-next-pull-request
+>
+> for you to fetch changes up to 1939ccdaa61ce6a1f57d83277b3d41d3a9ad3c58:
+>
+>   qio: non-default context for TLS handshake (2018-03-06 10:19:07 +0000)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
+>
+> Peter Xu (6):
+>   qio: rename qio_task_thread_result
+>   qio: introduce qio_channel_add_watch_{full|source}
+>   qio: store gsources for net listeners
+>   qio: non-default context for threaded qtask
+>   qio: non-default context for async conn
+>   qio: non-default context for TLS handshake
+>
 
-Reviewed-by: Paul Durrant <paul.durrant@citrix.com>
+Applied, thanks.
 
-> ---
->  hw/i386/xen/xen_pvdevice.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->=20
-> diff --git a/hw/i386/xen/xen_pvdevice.c b/hw/i386/xen/xen_pvdevice.c
-> index c093b34..ef22a03 100644
-> --- a/hw/i386/xen/xen_pvdevice.c
-> +++ b/hw/i386/xen/xen_pvdevice.c
-> @@ -71,6 +71,16 @@ static const MemoryRegionOps xen_pv_mmio_ops =3D {
->      .endianness =3D DEVICE_LITTLE_ENDIAN,
->  };
->=20
-> +static const VMStateDescription vmstate_xen_pvdevice =3D {
-> +    .name =3D "xen-pvdevice",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_PCI_DEVICE(parent_obj, XenPVDevice),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->  static void xen_pv_realize(PCIDevice *pci_dev, Error **errp)
->  {
->      XenPVDevice *d =3D XEN_PV_DEVICE(pci_dev);
-> @@ -120,6 +130,7 @@ static void xen_pv_class_init(ObjectClass *klass, voi=
-d
-> *data)
->      k->class_id =3D PCI_CLASS_SYSTEM_OTHER;
->      dc->desc =3D "Xen PV Device";
->      dc->props =3D xen_pv_props;
-> +    dc->vmsd =3D &vmstate_xen_pvdevice;
->  }
->=20
->  static const TypeInfo xen_pv_type_info =3D {
-> --
-> 2.7.4
+-- PMM
