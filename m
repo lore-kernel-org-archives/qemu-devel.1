@@ -1,18 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1etvFz-0003dP-5O
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:06:57 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1etvHL-0004lY-MS
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:08:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1etvFy-000602-3b
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:06:51 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  8 Mar 2018 13:06:20 +0000
-Message-Id: <20180308130626.12393-1-peter.maydell@linaro.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1etvHC-0006rs-8W
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:08:15 -0500
+Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:37607)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1etvHC-0006rW-35
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:08:06 -0500
+Received: by mail-ot0-x22a.google.com with SMTP id t2so5315410otj.4
+	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 05:08:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 0/6] arm: support -cpu max (and
- gic-version=max)
+In-Reply-To: <20180223163354.GC7151@stefanha-x1.localdomain>
+References: <20180213140029.8308-1-peter.maydell@linaro.org>
+	<20180223163354.GC7151@stefanha-x1.localdomain>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 8 Mar 2018 13:07:45 +0000
+Message-ID: <CAFEAcA-zpqnONjDXFXG4TBtrXDZXSJZ1wAth95X_kzk04sPcjg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] log-for-trace.h: Split out parts of log.h
+ used by trace.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,78 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
+On 23 February 2018 at 16:33, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> On Tue, Feb 13, 2018 at 02:00:29PM +0000, Peter Maydell wrote:
+>> A persistent build problem we see is where a source file
+>> accidentally omits the #include of log.h. This slips through
+>> local developer testing because if you configure with the
+>> default (log) trace backend trace.h will pull in log.h for you.
+>> Compilation fails only if some other backend is selected.
+>>
+>> To make this error cause a compile failure regardless of
+>> the configured trace backend, split out the parts of log.h
+>> that trace.h requires into a new log-for-trace.h header.
+>> Since almost all manual uses of the log.h functions will
+>> use constants or functions which aren't in log-for-trace.h,
+>> this will let us catch missing #include "qemu/log.h" more
+>> consistently.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>>  include/qemu/log-for-trace.h     | 35 +++++++++++++++++++++++++++++++++++
+>>  include/qemu/log.h               | 18 ++++--------------
+>>  scripts/tracetool/backend/log.py | 13 ++++++-------
+>>  3 files changed, 45 insertions(+), 21 deletions(-)
+>>  create mode 100644 include/qemu/log-for-trace.h
+>
+> Thanks, applied to my tracing tree:
+> https://github.com/stefanha/qemu/commits/tracing
 
-This patchset adds support for '-cpu max' to Arm, along the lines
-of the existing support we have for x86 targets:
-
- * under KVM, -cpu max is the same as -cpu host
- * under TCG, -cpu max means "emulate with as many features as
-   possible"
-
--cpu max is supported for both usermode and system emulation,
-again following the x86 line.
-
-NB that cross-QEMU-version migration is not supported for -cpu max:
-in future the definition of "maximum set of features" will change
-as we add more emulation features.
-
-The patchset also adds support to the virt board for the "max"
-option to -machine gic-version, requesting "best available
-interrupt controller", with the same semantics as -cpu max.
-
-Together these should assist users like libguestfs that just want
-to be able to run code without having to figure out what the
-right command line arguments for this particular host system are.
-
-The patches make 'any' a synonym for 'max', using the approach
-of putting a compat hack into arm_cpu_class_by_name() that
-Igor suggested. For the moment, we don't enable any of the
-CPU feature bits in 'max' that aren't in the a15/a57 if we're
-doing system emulation mode. This is a combination of:
- * some of those bits are currently only implemented sufficiently
-   for user-only mode, not for system emulation
- * we would also need to update ID register bits to advertise the
-   extra features
-We should certainly do that, but I'd like to get basic -cpu max
-support into 2.12, and the softfreeze deadline is rapidly approaching,
-so I've opted to postpone that to post 2.12. If people have the time
-to review this series this week I'd really appreciate it.
-
-Changes since v1:
- * the "check CPU realize succeeded in virt board" patch is in master
- * the "target/arm: Make 'any' CPU just an alias for 'max'" is new,
-   and unifies 'any' with 'max' as suggested in review of v1
- * the other patches are essentially unchanged
-
-Changes since v2:
- * fixed the silly error in patch 4 that made user-only mode always
-   use "max" rather than only if the user asked for "any"...
+Are you planning to put in a pullreq before codefreeze?
 
 thanks
 -- PMM
-
-
-Peter Maydell (6):
-  target/arm: Query host CPU features on-demand at instance init
-  target/arm: Move definition of 'host' cpu type into cpu.c
-  target/arm: Add "-cpu max" support
-  target/arm: Make 'any' CPU just an alias for 'max'
-  hw/arm/virt: Add "max" to the list of CPU types "virt" supports
-  hw/arm/virt: Support -machine gic-version=max
-
- target/arm/cpu-qom.h |  2 ++
- target/arm/cpu.h     |  5 +++
- target/arm/kvm_arm.h | 35 +++++++++++++------
- hw/arm/virt.c        | 30 ++++++++++------
- target/arm/cpu.c     | 97 +++++++++++++++++++++++++++++++++++++++++++---------
- target/arm/cpu64.c   | 66 ++++++++++++++++++++++-------------
- target/arm/kvm.c     | 53 ++++++++++------------------
- target/arm/kvm32.c   |  8 ++---
- target/arm/kvm64.c   |  8 ++---
- 9 files changed, 200 insertions(+), 104 deletions(-)
-
--- 
-2.16.2
