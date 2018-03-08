@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:34705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eu1Qg-00046k-08
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:43:49 -0500
+	(envelope-from <eblake@redhat.com>) id 1eu1UW-0005az-5n
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:46:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eu1ON-0003sV-Ub
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:42:17 -0500
-Resent-Message-Id: <E1eu1ON-0003sV-Ub@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21149)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eu1ON-0003sE-Je
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:39:55 -0500
-In-Reply-To: <1520530757-4477-1-git-send-email-ian.jackson@eu.citrix.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152053165650.1470.11628739449311470295@bdbb90650ae5>
+	(envelope-from <eblake@redhat.com>) id 1eu1UT-000786-3I
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:46:16 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39964 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eu1US-00077X-T5
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:46:13 -0500
+References: <20180304210608.vn33p6pn7t2nsxv4@var.youpi.perso.aquilenet.fr>
+	<20180308185743.3408-1-benjamin.drung@profitbricks.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <88890d90-4dc6-bac3-4591-f29a271181df@redhat.com>
+Date: Thu, 8 Mar 2018 13:46:00 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 8 Mar 2018 09:54:17 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v6 00/11] xen: xen-domid-restrict
- improvements
+In-Reply-To: <20180308185743.3408-1-benjamin.drung@profitbricks.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2 v2] slirp: Add classless static routes
+ support to DHCP server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,84 +29,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ian.jackson@eu.citrix.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
+To: Benjamin Drung <benjamin.drung@profitbricks.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Samuel Thibault <samuel.thibault@gnu.org>, Jan Kiszka <jan.kiszka@siemens.com>
+Cc: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MjA1MzA3NTctNDQ3Ny0xLWdpdC1zZW5kLWVtYWlsLWlhbi5qYWNrc29uQGV1
-LmNpdHJpeC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NiAwMC8xMV0geGVuOiB4
-ZW4tZG9taWQtcmVzdHJpY3QgaW1wcm92ZW1lbnRzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
-CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
-U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
-PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
-aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
-LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
-YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
-ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
-RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
-NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRh
-Z10gICAgICAgICAgICAgICBwYXRjaGV3LzE1MjA1MzA3NTctNDQ3Ny0xLWdpdC1zZW5kLWVtYWls
-LWlhbi5qYWNrc29uQGV1LmNpdHJpeC5jb20gLT4gcGF0Y2hldy8xNTIwNTMwNzU3LTQ0NzctMS1n
-aXQtc2VuZC1lbWFpbC1pYW4uamFja3NvbkBldS5jaXRyaXguY29tClN3aXRjaGVkIHRvIGEgbmV3
-IGJyYW5jaCAndGVzdCcKNGMyNTQ0MmVhZCBzY3JpcHRzL2dldF9tYWludGFpbmVyLnBsOiBQcmlu
-dCBwcm9wZXIgZXJyb3IgbWVzc2FnZSBmb3IgbWlzc2luZyAkZmlsZQphZGNjYjJkMWNmIHhlbjog
-RXhwZWN0IHhlbnN0b3JlIHdyaXRlIHRvIGZhaWwgd2hlbiByZXN0cmljdGVkCmQ3MjE1ZjMyOWUg
-eGVuOiBVc2UgbmV3bHkgYWRkZWQgZG1vcHMgZm9yIG1hcHBpbmcgVkdBIG1lbW9yeQpmN2YxODVh
-NmExIGNvbmZpZ3VyZTogZG9fY29tcGlsZXI6IER1bXAgc29tZSBleHRyYSBpbmZvIHVuZGVyIGJh
-c2gKNzU1Njc3NzhjYSBvcy1wb3NpeDogUHJvdmlkZSBuZXcgLXJ1bmFzIDx1aWQ+OjxnaWQ+IGZh
-Y2lsaXR5CmFmN2Q0ODU4NjEgeGVuOiBkZXN0cm95X2h2bV9kb21haW46IFRyeSB4ZW5kZXZpY2Vt
-b2RlbF9zaHV0ZG93bgozMzRjY2FlNjNmIHhlbjogbW92ZSB4Y19pbnRlcmZhY2UgY29tcGF0aWJp
-bGl0eSBmYWxsYmFjayBmdXJ0aGVyIHVwIHRoZSBmaWxlCjNhNTFkMzU1MTcgeGVuOiBkZXN0cm95
-X2h2bV9kb21haW46IE1vdmUgcmVhc29uIGludG8gYSB2YXJpYWJsZQpmNDAxMjVhNTQ0IHhlbjog
-ZGVmZXIgY2FsbCB0byB4ZW5fcmVzdHJpY3QgdW50aWwganVzdCBiZWZvcmUgb3Nfc2V0dXBfcG9z
-dAo3YTRlNjM2ODU3IHhlbjogcmVzdHJpY3Q6IHVzZSB4ZW50b29sY29yZV9yZXN0cmljdF9hbGwK
-MjU5ZWI0ZGUzOCB4ZW46IGxpbmsgYWdhaW5zdCB4ZW50b29sY29yZQoKPT09IE9VVFBVVCBCRUdJ
-TiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMTogeGVuOiBsaW5rIGFnYWluc3QgeGVudG9vbGNvcmUu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMi8xMTogeGVuOiByZXN0cmljdDogdXNlIHhlbnRvb2xjb3JlX3Jl
-c3RyaWN0X2FsbC4uLgpDaGVja2luZyBQQVRDSCAzLzExOiB4ZW46IGRlZmVyIGNhbGwgdG8geGVu
-X3Jlc3RyaWN0IHVudGlsIGp1c3QgYmVmb3JlIG9zX3NldHVwX3Bvc3QuLi4KQ2hlY2tpbmcgUEFU
-Q0ggNC8xMTogeGVuOiBkZXN0cm95X2h2bV9kb21haW46IE1vdmUgcmVhc29uIGludG8gYSB2YXJp
-YWJsZS4uLgpDaGVja2luZyBQQVRDSCA1LzExOiB4ZW46IG1vdmUgeGNfaW50ZXJmYWNlIGNvbXBh
-dGliaWxpdHkgZmFsbGJhY2sgZnVydGhlciB1cCB0aGUgZmlsZS4uLgpDaGVja2luZyBQQVRDSCA2
-LzExOiB4ZW46IGRlc3Ryb3lfaHZtX2RvbWFpbjogVHJ5IHhlbmRldmljZW1vZGVsX3NodXRkb3du
-Li4uCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBz
-dGF0ZW1lbnQKIzM0OiBGSUxFOiBody9pMzg2L3hlbi94ZW4taHZtLmM6MTM5ODoKKyAgICAgICAg
-aWYgKGVycm5vICE9IEVOT1RUWSAvKiBvbGQgWGVuICovKQpbLi4uXQoKdG90YWw6IDEgZXJyb3Jz
-LCAwIHdhcm5pbmdzLCAzMyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA3LzExOiBvcy1wb3NpeDogUHJvdmlkZSBuZXcg
-LXJ1bmFzIDx1aWQ+OjxnaWQ+IGZhY2lsaXR5Li4uCkNoZWNraW5nIFBBVENIIDgvMTE6IGNvbmZp
-Z3VyZTogZG9fY29tcGlsZXI6IER1bXAgc29tZSBleHRyYSBpbmZvIHVuZGVyIGJhc2guLi4KQ2hl
-Y2tpbmcgUEFUQ0ggOS8xMTogeGVuOiBVc2UgbmV3bHkgYWRkZWQgZG1vcHMgZm9yIG1hcHBpbmcg
-VkdBIG1lbW9yeS4uLgpFUlJPUjogRXJyb3IgbWVzc2FnZXMgc2hvdWxkIG5vdCBjb250YWluIG5l
-d2xpbmVzCiM5MDogRklMRTogaHcvaTM4Ni94ZW4veGVuLWh2bS5jOjQwNjoKKyAgICAgICAgICAg
-ICAgICAgICAgICIgdG8gR0ZOICUiUFJJX3hlbl9wZm4iIGZhaWxlZDogJXNcbiIsCgpFUlJPUjog
-RXJyb3IgbWVzc2FnZXMgc2hvdWxkIG5vdCBjb250YWluIG5ld2xpbmVzCiMxMDI6IEZJTEU6IGh3
-L2kzODYveGVuL3hlbi1odm0uYzo0MTc6CisgICAgICAgIGVycm9yX3JlcG9ydCgicGluX21lbW9y
-eV9jYWNoZWF0dHIgZmFpbGVkOiAlc1xuIiwgc3RyZXJyb3IoZXJybm8pKTsKCkVSUk9SOiBFcnJv
-ciBtZXNzYWdlcyBzaG91bGQgbm90IGNvbnRhaW4gbmV3bGluZXMKIzEzNDogRklMRTogaHcvaTM4
-Ni94ZW4veGVuLWh2bS5jOjQ1MDoKKyAgICAgICAgICAgICAgICAgICAgICIgdG8gR0ZOICUiUFJJ
-X3hlbl9wZm4iIGZhaWxlZDogJXNcbiIsCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0
-aGF0ICcqJyAoY3R4Old4VikKIzE1MjogRklMRTogaW5jbHVkZS9ody94ZW4veGVuX2NvbW1vbi5o
-Ojk1OgorICAgIHhlbmRldmljZW1vZGVsX2hhbmRsZSAqZG1vZCwgZG9taWRfdCBkb21pZCwgdWlu
-dDMyX3Qgc2l6ZSwgdWludDY0X3Qgc3JjX2dmbiwKICAgICAgICAgICAgICAgICAgICAgICAgICAg
-XgoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0
-YXRlbWVudAojMTY0OiBGSUxFOiBpbmNsdWRlL2h3L3hlbi94ZW5fY29tbW9uLmg6MTA3OgorICAg
-ICAgICBpZiAocmMpClsuLi5dCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcq
-JyAoY3R4Old4VikKIzE3MjogRklMRTogaW5jbHVkZS9ody94ZW4veGVuX2NvbW1vbi5oOjExNToK
-KyAgICB4ZW5kZXZpY2Vtb2RlbF9oYW5kbGUgKmRtb2QsIGRvbWlkX3QgZG9taWQsIHVpbnQ2NF90
-IHN0YXJ0LCB1aW50NjRfdCBlbmQsCiAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFs
-OiA2IGVycm9ycywgMCB3YXJuaW5ncywgMTM4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDEwLzExOiB4ZW46IEV4cGVj
-dCB4ZW5zdG9yZSB3cml0ZSB0byBmYWlsIHdoZW4gcmVzdHJpY3RlZC4uLgpDaGVja2luZyBQQVRD
-SCAxMS8xMTogc2NyaXB0cy9nZXRfbWFpbnRhaW5lci5wbDogUHJpbnQgcHJvcGVyIGVycm9yIG1l
-c3NhZ2UgZm9yIG1pc3NpbmcgJGZpbGUuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
-bmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
-eSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
-YmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On 03/08/2018 12:57 PM, Benjamin Drung wrote:
+> This patch will allow the user to specify classless static routes for
+> the replies from the built-in DHCP server.
+> 
+> Signed-off-by: Benjamin Drung <benjamin.drung@profitbricks.com>
+> ---
+
+For future patches, when sending a v2, it's best to document here (after 
+the --- separator) what changed from v1.  It's also a good idea to send 
+a fresh thread rather than tying your v2 in-reply-to your v1, so that it 
+doesn't get buried in an old conversation.
+
+More submission hints at https://wiki.qemu.org/Contribute/SubmitAPatch
+
+>   net/slirp.c      | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++++---
+>   qapi/net.json    |  4 ++++
+>   qemu-options.hx  | 14 +++++++++++-
+>   slirp/bootp.c    | 20 +++++++++++++++++
+>   slirp/bootp.h    |  2 ++
+>   slirp/libslirp.h |  9 +++++++-
+>   slirp/slirp.c    |  7 +++++-
+>   slirp/slirp.h    |  2 ++
+>   8 files changed, 120 insertions(+), 6 deletions(-)
+
+Reviewing just the QMP interface:
+
+
+> +++ b/qapi/net.json
+> @@ -163,6 +163,9 @@
+>   # @domainname: guest-visible domain name of the virtual nameserver
+>   #              (since 2.12)
+>   #
+> +# @route: guest-visible static classless route of the virtual nameserver
+> +#         (since 2.12)
+> +#
+>   # @ipv6-prefix: IPv6 network prefix (default is fec0::) (since
+>   #               2.6). The network prefix is given in the usual
+>   #               hexadecimal IPv6 address notation.
+> @@ -201,6 +204,7 @@
+>       '*dns':       'str',
+>       '*dnssearch': ['String'],
+>       '*domainname': 'str',
+> +    '*route':     ['String'],
+
+I know we've used ['String'] for previous members, but that's rather 
+heavyweight - it transmits over QMP as:
+
+"dnssearch": [ { "str": "foo" }, { "str": "bar" } ]
+
+Nicer is ['str'], which transmits as:
+
+"route": [ "foo", "bar" ]
+
+so the question boils down to whether cross-member consistency is more 
+important than making your additions concise.
+
+> +++ b/qemu-options.hx
+> @@ -1904,7 +1904,7 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
+>       "         [,ipv6[=on|off]][,ipv6-net=addr[/int]][,ipv6-host=addr]\n"
+>       "         [,restrict=on|off][,hostname=host][,dhcpstart=addr]\n"
+>       "         [,dns=addr][,ipv6-dns=addr][,dnssearch=domain][,domainname=domain]\n"
+> -    "         [,tftp=dir][,bootfile=f][,hostfwd=rule][,guestfwd=rule]"
+> +    "         [,route=addr/mask[:gateway]][,tftp=dir][,bootfile=f][,hostfwd=rule][,guestfwd=rule]"
+
+Urgh - your QMP interface HAS to be further parsed to get to the useful 
+information.  While it's nice to have compact syntax on the command 
+line, it is really worth thinking about making information easier to 
+consume (that is, NO further parsing required once the information is in 
+JSON format).  Would it be any better to send things over the wire as:
+
+"route": [ { "addr": "...", "mask": 24, "gateway": "..." } ]
+
+instead of cramming all the information into a single string?  But based 
+on the way this also maps to the command line, you may not have a choice 
+without a lot more code complexity.
+
+>   #ifndef _WIN32
+>                                                "[,smb=dir[,smbserver=addr]]\n"
+>   #endif
+> @@ -2137,6 +2137,18 @@ qemu -net user,dnssearch=mgmt.example.org,dnssearch=example.org [...]
+>   @item domainname=@var{domain}
+>   Specifies the client domain name reported by the built-in DHCP server.
+>   
+> +@item route=@var{addr}/@var{mask}[:@var{gateway}]
+> +Provides an entry for the classless static routes list sent by the built-in
+> +DHCP server. More than one route can be transmitted by specifying
+> +this option multiple times. If supported, this will cause the guest to
+> +automatically set the given static routes instead of the given default gateway.
+> +If @var{gateway} is not specified, the default gateway will be used.
+> +
+> +Example:
+> +@example
+> +qemu -net user,route=10.0.2.0/24,route=192.168.0.0/16 [...]
+> +@end example
+
+Can we please spell that '--net', along the lines of 
+https://wiki.qemu.org/BiteSizedTasks#Consistent_option_usage_in_documentation
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
