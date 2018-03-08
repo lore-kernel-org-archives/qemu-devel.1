@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eu1UW-0005az-5n
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:46:17 -0500
+	(envelope-from <eblake@redhat.com>) id 1eu1YC-0007P5-Ht
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:50:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eu1UT-000786-3I
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:46:16 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39964 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eu1US-00077X-T5
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:46:13 -0500
-References: <20180304210608.vn33p6pn7t2nsxv4@var.youpi.perso.aquilenet.fr>
-	<20180308185743.3408-1-benjamin.drung@profitbricks.com>
+	(envelope-from <eblake@redhat.com>) id 1eu1YB-0000FV-NV
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:50:04 -0500
+References: <20180207125037.13510-1-vsementsov@virtuozzo.com>
+	<20180207125037.13510-2-vsementsov@virtuozzo.com>
+	<20180306153213.GK31045@stefanha-x1.localdomain>
+	<49f2f289-ce1c-6e24-8b54-bb5b5c1601bc@redhat.com>
+	<9ef1c947-616f-0cde-040d-7a4f0fc8f146@virtuozzo.com>
+	<c8e6c246-1311-fd52-6267-b78eb02bfd07@virtuozzo.com>
+	<9ed82315-3b8a-52c4-5d80-4c5041bd3c87@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <88890d90-4dc6-bac3-4591-f29a271181df@redhat.com>
-Date: Thu, 8 Mar 2018 13:46:00 -0600
+Message-ID: <aa519c33-dc85-4494-8ea5-426998bd29e0@redhat.com>
+Date: Thu, 8 Mar 2018 13:49:51 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180308185743.3408-1-benjamin.drung@profitbricks.com>
+In-Reply-To: <9ed82315-3b8a-52c4-5d80-4c5041bd3c87@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2 v2] slirp: Add classless static routes
- support to DHCP server
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] block/accounting: introduce latency
+ histogram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,108 +30,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Benjamin Drung <benjamin.drung@profitbricks.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Samuel Thibault <samuel.thibault@gnu.org>, Jan Kiszka <jan.kiszka@siemens.com>
-Cc: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, den@openvz.org
 
-On 03/08/2018 12:57 PM, Benjamin Drung wrote:
-> This patch will allow the user to specify classless static routes for
-> the replies from the built-in DHCP server.
-> 
-> Signed-off-by: Benjamin Drung <benjamin.drung@profitbricks.com>
-> ---
+On 03/08/2018 12:58 PM, Vladimir Sementsov-Ogievskiy wrote:
+>>> Hm. these numbers are actually boundary points of histogram=20
+>>> intervals, not intervals itself. And, wiki says "The bins are usually=
+=20
+>>> specified as consecutive, non-overlapping intervals of a variable.",=20
+>>> so, intervals are bins.
+>>>
+>>> So, what about:
+>>>
+>>> 1. interval_boundaries
+>>> 2. bin_boundaries
+>>> 3. boundaries
+>>>
+>>> (and same names with s/_/-/ for qapi)
 
-For future patches, when sending a v2, it's best to document here (after 
-the --- separator) what changed from v1.  It's also a good idea to send 
-a fresh thread rather than tying your v2 in-reply-to your v1, so that it 
-doesn't get buried in an old conversation.
+Any of those works for me; 1 is probably most precise, while 3 is the=20
+shortest to type.
 
-More submission hints at https://wiki.qemu.org/Contribute/SubmitAPatch
+>>>
+>>>
+>>
+>>
+>> Also, now I doubt, is it a good idea to share same bin boundaries for=20
+>> each io type.
+>>
+>=20
+> so, for qmp command, what about:
+>=20
+> boundaries - optional, default boundaries for all io operations
+> boundaries-read - boundaries for read
+> boundaries-write - boundaries for write
+> ...
+>=20
+> so, call without any boundaries: drop _all_ histograms
+> call with only specific boundaries-*: set or reset _only_ corresponding=
+=20
+> specific histograms
+> call with only boundaries parameter: set or reset _all_ histograms
+> call with boundaries parameter and some of (or all, but it is not=20
+> useful) specific boundaries-*: set or reset _all_ histograms, some to=20
+> default=C2=A0 and some to specific.
 
->   net/slirp.c      | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++++---
->   qapi/net.json    |  4 ++++
->   qemu-options.hx  | 14 +++++++++++-
->   slirp/bootp.c    | 20 +++++++++++++++++
->   slirp/bootp.h    |  2 ++
->   slirp/libslirp.h |  9 +++++++-
->   slirp/slirp.c    |  7 +++++-
->   slirp/slirp.h    |  2 ++
->   8 files changed, 120 insertions(+), 6 deletions(-)
+Seems reasonable, and if that makes the command more useful for your=20
+timing, I'm fine with it (your argument that different timing bins for=20
+read and write also makes sense, as there are some inherent differences=20
+in the amount of work done in the two directions).
 
-Reviewing just the QMP interface:
-
-
-> +++ b/qapi/net.json
-> @@ -163,6 +163,9 @@
->   # @domainname: guest-visible domain name of the virtual nameserver
->   #              (since 2.12)
->   #
-> +# @route: guest-visible static classless route of the virtual nameserver
-> +#         (since 2.12)
-> +#
->   # @ipv6-prefix: IPv6 network prefix (default is fec0::) (since
->   #               2.6). The network prefix is given in the usual
->   #               hexadecimal IPv6 address notation.
-> @@ -201,6 +204,7 @@
->       '*dns':       'str',
->       '*dnssearch': ['String'],
->       '*domainname': 'str',
-> +    '*route':     ['String'],
-
-I know we've used ['String'] for previous members, but that's rather 
-heavyweight - it transmits over QMP as:
-
-"dnssearch": [ { "str": "foo" }, { "str": "bar" } ]
-
-Nicer is ['str'], which transmits as:
-
-"route": [ "foo", "bar" ]
-
-so the question boils down to whether cross-member consistency is more 
-important than making your additions concise.
-
-> +++ b/qemu-options.hx
-> @@ -1904,7 +1904,7 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
->       "         [,ipv6[=on|off]][,ipv6-net=addr[/int]][,ipv6-host=addr]\n"
->       "         [,restrict=on|off][,hostname=host][,dhcpstart=addr]\n"
->       "         [,dns=addr][,ipv6-dns=addr][,dnssearch=domain][,domainname=domain]\n"
-> -    "         [,tftp=dir][,bootfile=f][,hostfwd=rule][,guestfwd=rule]"
-> +    "         [,route=addr/mask[:gateway]][,tftp=dir][,bootfile=f][,hostfwd=rule][,guestfwd=rule]"
-
-Urgh - your QMP interface HAS to be further parsed to get to the useful 
-information.  While it's nice to have compact syntax on the command 
-line, it is really worth thinking about making information easier to 
-consume (that is, NO further parsing required once the information is in 
-JSON format).  Would it be any better to send things over the wire as:
-
-"route": [ { "addr": "...", "mask": 24, "gateway": "..." } ]
-
-instead of cramming all the information into a single string?  But based 
-on the way this also maps to the command line, you may not have a choice 
-without a lot more code complexity.
-
->   #ifndef _WIN32
->                                                "[,smb=dir[,smbserver=addr]]\n"
->   #endif
-> @@ -2137,6 +2137,18 @@ qemu -net user,dnssearch=mgmt.example.org,dnssearch=example.org [...]
->   @item domainname=@var{domain}
->   Specifies the client domain name reported by the built-in DHCP server.
->   
-> +@item route=@var{addr}/@var{mask}[:@var{gateway}]
-> +Provides an entry for the classless static routes list sent by the built-in
-> +DHCP server. More than one route can be transmitted by specifying
-> +this option multiple times. If supported, this will cause the guest to
-> +automatically set the given static routes instead of the given default gateway.
-> +If @var{gateway} is not specified, the default gateway will be used.
-> +
-> +Example:
-> +@example
-> +qemu -net user,route=10.0.2.0/24,route=192.168.0.0/16 [...]
-> +@end example
-
-Can we please spell that '--net', along the lines of 
-https://wiki.qemu.org/BiteSizedTasks#Consistent_option_usage_in_documentation
-
--- 
+--=20
 Eric Blake, Principal Software Engineer
 Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
