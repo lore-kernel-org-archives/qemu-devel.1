@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1etlaG-0005GE-Nc
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 21:47:09 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1etlaI-0005HP-JB
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 21:47:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1etlaF-0007pM-HD
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 21:47:08 -0500
-Date: Thu, 8 Mar 2018 13:04:25 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1etlaF-0007pN-Gr
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 21:47:10 -0500
+Date: Thu, 8 Mar 2018 13:06:03 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180308020425.GM3083@umbus.fritz.box>
-References: <1520413694-1271-1-git-send-email-thuth@redhat.com>
+Message-ID: <20180308020603.GN3083@umbus.fritz.box>
+References: <1520432574-20615-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="2YJj5f1P6Th4nBRw"
+	protocol="application/pgp-signature"; boundary="uWbmMdDzzl2TXAgx"
 Content-Disposition: inline
-In-Reply-To: <1520413694-1271-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/ppc/prep: Fix implicit creation of
- "-drive if=scsi" devices
+In-Reply-To: <1520432574-20615-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/misc/macio: Mark the macio devices with
+ user_creatable = false
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,80 +25,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
 
---2YJj5f1P6Th4nBRw
+--uWbmMdDzzl2TXAgx
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 07, 2018 at 10:08:14AM +0100, Thomas Huth wrote:
-> The global hack for creating SCSI devices has recently been removed,
-> but this apparently broke SCSI devices on some boards that were not
-> ready for this change yet. For the 40p machine you now get:
+On Wed, Mar 07, 2018 at 03:22:54PM +0100, Thomas Huth wrote:
+> The macio devices currently cause a crash when the user tries to
+> instantiate them on a different machine:
 >=20
-> $ ppc64-softmmu/qemu-system-ppc64 -M 40p -cdrom x.iso
-> qemu-system-ppc64: -cdrom x.iso: machine type does not support if=3Dscsi,=
-bus=3D0,unit=3D2
+> $ ppc64-softmmu/qemu-system-ppc64 -device macio-newworld
+> Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:222:
+> qemu-system-ppc64: -device macio-newworld: Device 'serial0' is in use
+> Aborted (core dumped)
 >=20
-> Fix it by providing a lsi53c810_create() function that takes care
-> of calling scsi_bus_legacy_handle_cmdline() after creating the
-> corresponding SCSI controller.
+> These devices are clearly not intended to be creatable by the user
+> since they are using serial_hds[] directly in their instance_init
+> function. So let's mark them with user_creatable =3D false.
 >=20
-> Fixes: 1454509726719e0933c800fad00d6999752688ea
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 
 Applied, thanks.
 
 > ---
->  hw/ppc/prep.c        | 2 +-
->  hw/scsi/lsi53c895a.c | 7 +++++++
->  include/hw/pci/pci.h | 1 +
->  3 files changed, 9 insertions(+), 1 deletion(-)
+>  hw/misc/macio/macio.c | 2 ++
+>  1 file changed, 2 insertions(+)
 >=20
-> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-> index 096d4d4..3361509 100644
-> --- a/hw/ppc/prep.c
-> +++ b/hw/ppc/prep.c
-> @@ -788,7 +788,7 @@ static void ibm_40p_init(MachineState *machine)
->          qdev_prop_set_uint32(dev, "equipment", 0xc0);
->          qdev_init_nofail(dev);
-> =20
-> -        pci_create_simple(pci_bus, PCI_DEVFN(1, 0), "lsi53c810");
-> +        lsi53c810_create(pci_bus, PCI_DEVFN(1, 0));
-> =20
->          /* XXX: s3-trio at PCI_DEVFN(2, 0) */
->          pci_vga_init(pci_bus);
-> diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-> index f3d4c4d..160657f 100644
-> --- a/hw/scsi/lsi53c895a.c
-> +++ b/hw/scsi/lsi53c895a.c
-> @@ -2279,3 +2279,10 @@ void lsi53c895a_create(PCIBus *bus)
-> =20
->      scsi_bus_legacy_handle_cmdline(&s->bus);
+> diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+> index af1bd46..454244f 100644
+> --- a/hw/misc/macio/macio.c
+> +++ b/hw/misc/macio/macio.c
+> @@ -406,6 +406,8 @@ static void macio_class_init(ObjectClass *klass, void=
+ *data)
+>      k->class_id =3D PCI_CLASS_OTHERS << 8;
+>      dc->props =3D macio_properties;
+>      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+> +    /* Reason: Uses serial_hds in macio_instance_init */
+> +    dc->user_creatable =3D false;
 >  }
-> +
-> +void lsi53c810_create(PCIBus *bus, int devfn)
-> +{
-> +    LSIState *s =3D LSI53C895A(pci_create_simple(bus, devfn, "lsi53c810"=
-));
-> +
-> +    scsi_bus_legacy_handle_cmdline(&s->bus);
-> +}
-> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> index d8c18c7..e255941 100644
-> --- a/include/hw/pci/pci.h
-> +++ b/include/hw/pci/pci.h
-> @@ -708,6 +708,7 @@ PCIDevice *pci_create(PCIBus *bus, int devfn, const c=
-har *name);
->  PCIDevice *pci_create_simple(PCIBus *bus, int devfn, const char *name);
 > =20
->  void lsi53c895a_create(PCIBus *bus);
-> +void lsi53c810_create(PCIBus *bus, int devfn);
-> =20
->  qemu_irq pci_allocate_irq(PCIDevice *pci_dev);
->  void pci_set_irq(PCIDevice *pci_dev, int level);
+>  static const TypeInfo macio_oldworld_type_info =3D {
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -106,24 +75,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---2YJj5f1P6Th4nBRw
+--uWbmMdDzzl2TXAgx
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqgmikACgkQbDjKyiDZ
-s5KZHRAA2rLRODR/pSybSk91Wbw+RmL3sU3WkJn1zh2HQ0n1avn7p3fW4HtGFgYl
-9ZBvWMGzTM2nbXxDrQVG+cihTQfniY99NeDZkBs3mPgzEt9KZOirmmv6j6DiAYMx
-awjgolJUGZJW5KpzeqDTpIlGBYqLf7eDZECHmDSHjvves0326BHRrq0TTLYlwjHF
-7gcmd0SZZEfHxuD9C21YHJIMd6HounivD9rlMfIIon1E09iV5jyghYfdqzd7usCN
-PeuZp+kj2jnyTu46Fs3ukXAHsuRw7YupEGKs2javSFaEEgR73sV7J6vYrFfQvBWi
-RhyqiYVY7s45hgbk1I/yvkd7aH2thxh8qbqFyIOsAH3z8yFEdPH20bRcGaTESRD7
-X2VJ5Bng+f+3MVRAdd9xf13/QjGzyDiFNF87aNlHw0kPFuRWTolg0JHP8AIIZ7uS
-LknknCVlvZlWLst1s6ZnOPXqDsagysZa4S0Z/O4UYo5raFNRIMTwk48vnsSUbb8A
-aXd7tftKeluZzz30tLPU/YZr67PpNKLjmjvdwCYAMEmJ+AgodmbR4+xeTC8C7iwl
-kIV66gJjFceMxOW8fHSZvLsILyNq3cLTkvVpL3eW02RBqsIsqMl21k5WadDlnbl/
-SVutwDCGY0gYKx2fyp6EvnQkqAdOufo0qLd7gJ/mVKLphgDWSfs=
-=hFZ6
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqgmosACgkQbDjKyiDZ
+s5KvQg//XJ4+V4TRXZYtei9qo6HTjx02EiCsxcLfenATIslCrhhypnoDujKwiA90
+XS+0iGzfGAWo+nVRc5acDgiQCuuBWMIR5WaYC/99xTdkL4UvowrTKHsI7SXdDYZ/
+/xLdTSGX+AfQ1v+NlUDyNN9NxvM+hd4x0PKyXVzFSBDbuODUuV0MwDDPSqyD4gtY
+dpiGdv8mM0TcqpT484FuYdVzxcrS/7dLazpofwIpWSsyrDUW3oalOwApVXgb2FIa
+n9V2d9Y3v6oQun/tYW5HDaJdF7oU5QKM8H6ioU+pgH6gvCHS9ycjrvtBeBaow8oC
+7ss6yjnIgcPR5GSicGbwtBKPg4Ko6jlwbsnhP/Sbn2CmH2t0wOvBKtPF/LTfXywa
+bqnoeDwF7MI2MT9wSP2R0Jkly9mGu35yYx0+2wUmdyIhaeQxor8g1ubA+9TpTfBw
+41+FH+yZBcy5S0lDjbNtM1/cAca7pchPNcX+vncBs42UMT5TTNGZp2pV1pMfkY24
+KkoA0NC2zlPlhDqZjPyNoC6SF11tX16km7LRUIj2pk5mTDdQ1Y0UFnFQfZZaxJGR
+fF/QPcFuWbGMPLZ6jwvIVIWNRLhUbPAwLDXQWbXbSOKsEul/VEdd4kgVYRk2xXpM
+w3uiJV6o+U1NvUXBbvw6HzQ1y5mDF50XQDIif15n5IEteUqWAas=
+=qTu/
 -----END PGP SIGNATURE-----
 
---2YJj5f1P6Th4nBRw--
+--uWbmMdDzzl2TXAgx--
