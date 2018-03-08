@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eu4rz-0007Gt-HH
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 18:22:44 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eu5u9-0003SU-Dk
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 19:29:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eu4rw-0004XZ-9i
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 18:22:43 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56554 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eu4rw-0004XL-3H
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 18:22:40 -0500
-Date: Thu, 8 Mar 2018 23:22:24 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20180308232224.GA10248@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20180308124901.83533-1-brijesh.singh@amd.com>
-	<20180308124901.83533-29-brijesh.singh@amd.com>
-	<20180308170824.GL4718@redhat.com>
-	<e6db1aaa-83c7-ae5c-2311-bc247b301426@amd.com>
-	<20180308214504.GE3417@localhost.localdomain>
+	(envelope-from <dgibson@ozlabs.org>) id 1eu5u8-0006WM-Aq
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 19:29:01 -0500
+Date: Fri, 9 Mar 2018 10:44:46 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180308234446.GQ3083@umbus.fritz.box>
+References: <20180308111305.C9F56745707@zero.eik.bme.hu>
+	<20180308144845.0D7647456CD@zero.eik.bme.hu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="v+Mbu5iuT/5Blw/K"
 Content-Disposition: inline
-In-Reply-To: <20180308214504.GE3417@localhost.localdomain>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v12 28/28] tests/qmp-test: blacklist sev
- specific qmp commands
+In-Reply-To: <20180308144845.0D7647456CD@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH v2] ppc440_pcix: Change some error_report
+ to qemu_log_mask(LOG_UNIMP, ...)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,65 +25,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>
 
-On Thu, Mar 08, 2018 at 06:45:04PM -0300, Eduardo Habkost wrote:
-> On Thu, Mar 08, 2018 at 02:18:55PM -0600, Brijesh Singh wrote:
-> >=20
-> >=20
-> > On 3/8/18 11:08 AM, Daniel P. Berrang=C3=A9 wrote:
-> > > On Thu, Mar 08, 2018 at 06:49:01AM -0600, Brijesh Singh wrote:
-> > >> Blacklist the following commands to fix the 'make check' failure.
-> > >>
-> > >> query-sev-launch-measure: it returns meaninful data only when we l=
-aunch
-> > >> SEV guest otherwise the command returns an error.
-> > >>
-> > >> query-sev: it return an error when SEV is not available on host (e=
-.g non
-> > >> X86 platform or KVM is disabled at the build time)
-> > >>
-> > >> query-sev-capabilities: it returns an error when SEV feature is no=
-t
-> > >> available on host machine.
-> > > We generally expect 'make check' to succeed on every single patch
-> > > in a series, so that 'git bisect' doesn't break.
-> > >
-> > > So you should add each command to the blacklist in the same commit
-> > > that introduced the failure in the first place.
-> >=20
-> >=20
-> > Sure, I can quickly send the updated patch series to address your thi=
-s
-> > concern, but before spamming everyone's inbox I was wondering if I ca=
-n
-> > get some indication whether this series will make into 2.12 merge.
-> >=20
-> > Paolo, Eduardo and Richard,
-> >=20
-> > Most of the changes are in x86 directory hence any thought if you are
-> > considering this series for 2.12 ? I have been testing the series wit=
-h
-> > and without SEV support and so far have not ran into any issue. if yo=
-u
-> > are not planning to pull this series in 2.12 then I will wait a bit
-> > longer to get more feedback before sending the updates to address
-> > Daniel's comment. thanks
+
+--v+Mbu5iuT/5Blw/K
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Mar 08, 2018 at 12:08:08PM +0100, BALATON Zoltan wrote:
+> Using log unimp is more appropriate for these messages and this also
+> silences them by default so they won't clobber make check output when
+> tests are added for this board.
 >=20
-> Trying to merge it before 2.12 soft freeze (next Tuesday) still
-> looks like a reasonable goal to me.  What do others think?
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-I've only really looked at the QAPI / QMP bits and they seem fine from
-pov of libvirt's needs - just very minor comments. So not objection from
-me on that area of the code.
+Applied, thanks.
 
-Regards,
-Daniel
+> ---
+> v2: Use defined format string for printing hwaddr instead of casting.
+> I guess this does not invalidate the R-b tag of v1 so I've added that too.
+>=20
+>  hw/ppc/ppc440_pcix.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hw/ppc/ppc440_pcix.c b/hw/ppc/ppc440_pcix.c
+> index ab2626a..1dc5d7f 100644
+> --- a/hw/ppc/ppc440_pcix.c
+> +++ b/hw/ppc/ppc440_pcix.c
+> @@ -286,8 +286,9 @@ static void ppc440_pcix_reg_write4(void *opaque, hwad=
+dr addr,
+>          break;
+> =20
+>      default:
+> -        error_report("%s: unhandled PCI internal register 0x%lx", __func=
+__,
+> -                     (unsigned long)addr);
+> +        qemu_log_mask(LOG_UNIMP,
+> +                      "%s: unhandled PCI internal register 0x%"HWADDR_PR=
+Ix"\n",
+> +                      __func__, addr);
+>          break;
+>      }
+>  }
+> @@ -377,8 +378,9 @@ static uint64_t ppc440_pcix_reg_read4(void *opaque, h=
+waddr addr,
+>          break;
+> =20
+>      default:
+> -        error_report("%s: invalid PCI internal register 0x%lx", __func__,
+> -                     (unsigned long)addr);
+> +        qemu_log_mask(LOG_UNIMP,
+> +                      "%s: invalid PCI internal register 0x%" HWADDR_PRI=
+x "\n",
+> +                      __func__, addr);
+>          val =3D 0;
+>      }
+> =20
+
 --=20
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange=
-/ :|
-|: http://libvirt.org              -o-             http://virt-manager.or=
-g :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr=
-/ :|
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--v+Mbu5iuT/5Blw/K
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqhyuwACgkQbDjKyiDZ
+s5IochAAuQmaIz08e4IJJ689FI2mIG5q8w6mnXFJDhe++bMgCuUCqe6VgQgfaTj3
+DxOPc6u06F/JIyPlsYyV8rDfGqSYWl4USWZfm3+cImVM5KBO+rYce3XLnRJfsDHd
+j6Tv92Imrs/IEgrUJ1uUrJQ/aU/qre8lH1tnMqSWHiGuy0i9Kw5oz1hLX2BCazR/
+5cO/ebBV2/QFdP1hT0QEeHw++ZVgiF43Vki5TotyTUjtJ3C2fospfNXGTxhvPAVa
+mOiouOXq8aL3bN9FD9R7L5Tgld5HXKG5gAuvtI/z81XKBRPCtxJ3HEtg3bbJl6YM
+62CHPMKVFsbBazOzttsd4HTKadyTPFlEJ+QAxFtV3edJ+YcZTnmKqDoytZ1insMG
++6s6AU5BDVmNTETGQUZj4V8leYlsaDxPA8ne59915s69NA9o7lYCRkLIKCQsR18/
+DlGIZEZU6sv4J6ghBoEBRobp1O2CjIkFdLuw52uzhNwaT17B+SsdzmC2EjqCKEuU
+uhRiWKcr6e3/+ySBtSmHbms0EMNTsxNZl9eNUEuwRR+GVVMDiQj/rSbvcAuYWWDM
+TjNfUz0N8y33kAlDZrFoU3Pu1rnqOly/iJO1LU0yABeh+Wnshqp7B1MPX1yEhaJ5
+iiVtEqRI1uGejbk96kNldzyXyrYhc7L4SBYewg610X2XnAHMZ8o=
+=Te97
+-----END PGP SIGNATURE-----
+
+--v+Mbu5iuT/5Blw/K--
