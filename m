@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ett8a-0001uQ-O1
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:51:05 -0500
+	(envelope-from <mjc@sifive.com>) id 1ettRC-0007Mr-4m
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:10:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ett8Z-0002bX-Jy
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:51:04 -0500
-Received: from mail-ot0-x22c.google.com ([2607:f8b0:4003:c0f::22c]:33737)
+	(envelope-from <mjc@sifive.com>) id 1ettR5-00048P-V0
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:10:18 -0500
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:40585)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ett8Z-0002bA-F2
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:51:03 -0500
-Received: by mail-ot0-x22c.google.com with SMTP id y11so5010651otg.0
-	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 02:51:03 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ettR5-000489-NE
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:10:11 -0500
+Received: by mail-oi0-x243.google.com with SMTP id c12so4059301oic.7
+	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 03:10:11 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1520444223-8389-1-git-send-email-linux@roeck-us.net>
-References: <1520444223-8389-1-git-send-email-linux@roeck-us.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 8 Mar 2018 10:50:42 +0000
-Message-ID: <CAFEAcA8iFYGhzmLm6pyZi6tg=Di1P=vi_Enyw_ia1M34B3t8aw@mail.gmail.com>
+References: <1520365586-30384-1-git-send-email-mjc@sifive.com>
+	<CAFEAcA_G1tHrBZ=GxAy0b-SLbYU2-XOAUNL0D=8MQeL0Roz_cQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA_G1tHrBZ=GxAy0b-SLbYU2-XOAUNL0D=8MQeL0Roz_cQ@mail.gmail.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Thu, 08 Mar 2018 11:10:00 +0000
+Message-ID: <CAHNT7NtRnSB-GYHp=v3iM7+_72y43YpZesbYCrnTvCikTiUMuw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] fsl-imx6: Swap Ethernet interrupt defines
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL] RISC-V QEMU Port Submission v8.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Chris Healy <cphealy@gmail.com>, Jason Wang <jasowang@redhat.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Bill Paul <wpaul@windriver.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, RISC-V Patches <patches@groups.riscv.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
-On 7 March 2018 at 17:37, Guenter Roeck <linux@roeck-us.net> wrote:
-> The sabrelite machine model used by qemu-system-arm is based on the
-> Freescale/NXP i.MX6Q processor. This SoC has an on-board ethernet
-> controller which is supported in QEMU using the imx_fec.c module
-> (actually called imx.enet for this model.)
->
-> The include/hw/arm/fsm-imx6.h file defines the interrupt vectors for the
-> imx.enet device like this:
->
->  #define FSL_IMX6_ENET_MAC_1588_IRQ 118
->  #define FSL_IMX6_ENET_MAC_IRQ 119
->
-> According to https://www.nxp.com/docs/en/reference-manual/IMX6DQRM.pdf,
-> page 225, in Table 3-1. ARM Cortex A9 domain interrupt summary,
-> interrupts are as follows.
->
-> 150 ENET MAC 0 IRQ
-> 151 ENET MAC 0 1588 Timer interrupt
->
-> where
->
-> 150 - 32 == 118
-> 151 - 32 == 119
->
-> In other words, the vector definitions in the fsl-imx6.h file are reversed.
->
-> This results in lost interrupt warnings when running recent (v4.15+) Linux
-> kernels, and the Ethernet interface will fail to probe.
->
-> Note that applying this patch will cause problems with older Linux kernels:
-> The Ethernet interface will fail to probe with Linux v4.9 and earlier.
-> Linux v4.1 and earlier will crash. This is a Linux kernel problem, not a
-> qemu problem: the Linux kernel only worked by accident since it requested
-> both interrupts.
+On Thu, 8 Mar 2018 at 11:02 PM, Peter Maydell <peter.maydell@linaro.org>
+wrote:
 
-So do the works-by-accident kernels fail on QEMU because
-we don't emulate some bit of the ethernet device ?
-Ideally we could fix that so we could boot newer kernels
-without breaking the old ones...
+> On 6 March 2018 at 19:46, Michael Clark <mjc@sifive.com> wrote:
+> > -----BEGIN PGP SIGNED MESSAGE-----
+> > Hash: SHA1
+> >
+> > The following changes since commit
+> f32408f3b472a088467474ab152be3b6285b2d7b:
+> >
+> >   misc: don't use hwaddr as a type in trace events (2018-03-06 14:24:30
+> +0000)
+> >
+> > are available in the git repository at:
+> >
+> >   https://github.com/riscv/riscv-qemu.git tags/riscv-qemu-upstream-v8.2
+> >
+> > for you to fetch changes up to 7051b081bf6796e5e84406f6223a7c4900bf7298=
+:
+> >
+> >   RISC-V - Remove support for adhoc non-standard X_COP local-interrupt
+> (2018-03-07 08:36:03 +1300)
+>
+>
+> Hi -- I would have applied this, but some of the commits
+> have no signed-off-by lines.
+>
+> This is important, and I've already asked for it once. We cannot
+> accept anything that doesn't have a clear record in the commit
+> message of everybody (person or company) who's contributed code
+> to it, indicating that they're happy for their copyrighted
+> contributions to be taken into QEMU under our license. Lists
+> of names without emails in the cover letter are not sufficient.
+>
+> In fact a lot of the last part of this patchset looks like
+> unreviewed changes/fixes that if we were going to have them we
+> should have squashed into the correct patches and resent the
+> series for review. Please don't do this. Code review is an
+> important part of how the QEMU project works.
 
-thanks
--- PMM
+
+You must be looking at the wrong tag. There are multiple sign-offs in all
+23 commits. The tag is riscv-qemu-upstream-v8.2. Sagar and Bastian
+contacted me out of band to add their sign-offs. Please look at the commits
+again and tell me which commit id doesn=E2=80=99t have a sign-off on that t=
+ag (23
+commits iirc)
+
+Michael
+
+>
+>
