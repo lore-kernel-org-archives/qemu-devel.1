@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1etxM9-00021c-MQ
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:21:22 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1etxNj-0003H9-CM
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:23:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1etxM6-0002hR-HP
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:21:21 -0500
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:45091)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1etxM6-0002h1-8m
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:21:18 -0500
-Received: by mail-wr0-x231.google.com with SMTP id p104so6032905wrc.12
-	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 07:21:18 -0800 (PST)
-Date: Thu, 8 Mar 2018 15:21:15 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180308152115.GB2769@stefanha-x1.localdomain>
-References: <20180306154650.24075-1-berrange@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1etxNi-0003cJ-7s
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:22:59 -0500
+References: <20180307225732.155835-1-eblake@redhat.com>
+	<1651749911.5944222.1520491852256.JavaMail.zimbra@redhat.com>
+	<8b5bee3a-c30b-38da-b861-bceebad9b57e@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c316b5e0-932f-6de0-ac19-41d12730201c@redhat.com>
+Date: Thu, 8 Mar 2018 16:22:47 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="A6N2fC+uXW/VQSAv"
-Content-Disposition: inline
-In-Reply-To: <20180306154650.24075-1-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] trace: include filename when printing
- parser error messages
+In-Reply-To: <8b5bee3a-c30b-38da-b861-bceebad9b57e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] nbd/server: Honor FUA request on
+ NBD_CMD_TRIM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +26,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, vsementsov@virtuozzo.com, kwolf@redhat.com
 
-
---A6N2fC+uXW/VQSAv
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Mar 06, 2018 at 03:46:50PM +0000, Daniel P. Berrang=E9 wrote:
-> Improves error messages from:
+On 08/03/2018 15:45, Eric Blake wrote:
+> On 03/08/2018 12:50 AM, Paolo Bonzini wrote:
+>>> The NBD spec states that since trim requests can affect disk contents=
+,
+>>> then they should allow for FUA semantics just like writes for ensurin=
+g
+>>> the disk has settled before returning.=C2=A0 As bdrv_[co_]pdiscard() =
+does
+>>> not (yet?) support a flags argument, we can't pass FUA down the block
+>>> layer stack, and must therefore emulate it with a flush at the NBD
+>>> layer.
+>>
+>> TRIM requests should not need FUA since they're just advisory.
 >=20
->   ValueError: Error on line 72: need more than 1 value to unpack
->=20
-> To
->=20
->   ValueError: Error at /home/berrange/src/virt/qemu/trace-events:72:
->     need more than 1 value to unpack
->=20
-> Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
-> ---
->  scripts/simpletrace.py        | 4 ++--
->  scripts/tracetool.py          | 2 +-
->  scripts/tracetool/__init__.py | 6 ++++--
->  3 files changed, 7 insertions(+), 5 deletions(-)
+> Still, while you argue that TRIM is advisory (which I agree), if it doe=
+s
+> nothing, then you've (implicitly) honored FUA (that transaction didn't
+> affect persistent storage, so you didn't have to wait any longer for
+> anything to land); but if it DOES change the disk contents, then waitin=
+g
+> for that change to land IS worth supporting, hence why the NBD protocol
+> requires the FUA flag to be honored on trim.
 
-Thanks, applied to my tracing tree:
-https://github.com/stefanha/qemu/commits/tracing
+But if power fails, after restart you cannot see the difference between
+a TRIM command that chose to did nothing, and one that chose to change
+the disk contents but failed to persist the changes.  This is why I
+thought there is no need for FUA in my opinion.
 
-Stefan
+I suppose in principle you could detect the change by reading the
+TRIMmed sectors and writing to another disk.  So TRIM would have to be a
+Schroedinger command that is persistent once you read the sectors, and
+that makes little sense.  The problem is, SCSI doesn't have a FUA flag
+either...
 
---A6N2fC+uXW/VQSAv
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaoVTqAAoJEJykq7OBq3PIZjAH/itMd3AbKb29DPr6MYk7q2Pg
-epJeVY5BcAJ7B+SCTmb2u34zHBpaguo1RTr1xbRaEfSnY1EQ4qQsMplWyPFc3HwU
-d+R/NnwD864UctBoGOWRXUqIwgyTP4BcRY0vl9cOSoEtdW77Xjvf1+SFekBxFW6B
-htq5gtf0eJWvCyJ2QUSVRYdR579rtlgaDa/PSp0pOSDcQOH/6IRIzKGfFATmn35k
-H9HI5Ny7hBET0l+p7qyW3g7kCSdK+pX9HbP90vYsnVaX4TWNLUUGDXPzWlhMvOon
-GC1iAfAqfO+5AXjALPGR7UJu5y55JE1JAXmdSGN48EEawjaDs6kF+ltCoQ1kExE=
-=HLSU
------END PGP SIGNATURE-----
-
---A6N2fC+uXW/VQSAv--
+Paolo
