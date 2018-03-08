@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eu0JA-00063y-Jn
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:30:34 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eu0LI-0007as-Bi
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:32:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eu0J9-0004LB-FQ
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:30:28 -0500
-Received: from mail-ot0-x22e.google.com ([2607:f8b0:4003:c0f::22e]:35685)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eu0J9-0004Kv-8H
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:30:27 -0500
-Received: by mail-ot0-x22e.google.com with SMTP id r30so6346251otr.2
-	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 10:30:27 -0800 (PST)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eu0LH-00050K-4N
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:32:40 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180308111305.C9F56745707@zero.eik.bme.hu>
+	<20180308144845.0D7647456CD@zero.eik.bme.hu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <ff8b93cc-921c-6e0c-b847-b0ae286a2049@amsat.org>
+Date: Thu, 8 Mar 2018 15:32:33 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180308150329.27238-1-alex.bennee@linaro.org>
-References: <20180308150329.27238-1-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 8 Mar 2018 18:30:06 +0000
-Message-ID: <CAFEAcA8fEzmcnL0bkjfw6UJF9MaJLOUebGmGXR_LLXC=F7VPeA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/1] disable broken shippable build
+In-Reply-To: <20180308144845.0D7647456CD@zero.eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] ppc440_pcix: Change some error_report
+ to qemu_log_mask(LOG_UNIMP, ...)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On 8 March 2018 at 15:03, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
-> The following changes since commit 0ab4537f08e09b13788db67efd760592fb7db7=
-69:
->
->   Merge remote-tracking branch 'remotes/stefanberger/tags/pull-tpm-2018-0=
-3-07-1' into staging (2018-03-08 12:56:39 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/stsquad/qemu.git tags/pull-shippable-disable-ppc-080=
-318-1
->
-> for you to fetch changes up to b2dba411cf5afc6771e0dd9900fa2b5031a686ac:
->
->   .shippable.yml: disable powerpc-cross image (2018-03-08 14:34:41 +0000)
->
-> ----------------------------------------------------------------
-> One fix to disable broken ppc cross-compile test on shippable
->
-> ----------------------------------------------------------------
-> Alex Benn=C3=A9e (1):
->       .shippable.yml: disable powerpc-cross image
->
->  .shippable.yml | 2 --
->  1 file changed, 2 deletions(-)
+On 03/08/2018 08:08 AM, BALATON Zoltan wrote:
+> Using log unimp is more appropriate for these messages and this also
+> silences them by default so they won't clobber make check output when
+> tests are added for this board.
+> 
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> ---
+> v2: Use defined format string for printing hwaddr instead of casting.
 
-Applied, thanks.
+Thanks.
 
--- PMM
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> I guess this does not invalidate the R-b tag of v1 so I've added that too.
+> 
+>  hw/ppc/ppc440_pcix.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/ppc/ppc440_pcix.c b/hw/ppc/ppc440_pcix.c
+> index ab2626a..1dc5d7f 100644
+> --- a/hw/ppc/ppc440_pcix.c
+> +++ b/hw/ppc/ppc440_pcix.c
+> @@ -286,8 +286,9 @@ static void ppc440_pcix_reg_write4(void *opaque, hwaddr addr,
+>          break;
+>  
+>      default:
+> -        error_report("%s: unhandled PCI internal register 0x%lx", __func__,
+> -                     (unsigned long)addr);
+> +        qemu_log_mask(LOG_UNIMP,
+> +                      "%s: unhandled PCI internal register 0x%"HWADDR_PRIx"\n",
+> +                      __func__, addr);
+>          break;
+>      }
+>  }
+> @@ -377,8 +378,9 @@ static uint64_t ppc440_pcix_reg_read4(void *opaque, hwaddr addr,
+>          break;
+>  
+>      default:
+> -        error_report("%s: invalid PCI internal register 0x%lx", __func__,
+> -                     (unsigned long)addr);
+> +        qemu_log_mask(LOG_UNIMP,
+> +                      "%s: invalid PCI internal register 0x%" HWADDR_PRIx "\n",
+> +                      __func__, addr);
+>          val = 0;
+>      }
+>  
+> 
