@@ -1,38 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1etut0-0002pF-91
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:43:07 -0500
+	(envelope-from <yvugenfi@redhat.com>) id 1etuyr-0004ag-1j
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:49:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1etusv-0000kk-De
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:43:06 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60120
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1etusv-0000kK-84
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:43:01 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w28CdUmw084080
-	for <qemu-devel@nongnu.org>; Thu, 8 Mar 2018 07:43:00 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gk3btddys-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 07:43:00 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 8 Mar 2018 12:42:58 -0000
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 8 Mar 2018 13:42:55 +0100
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <7c67e799-f4d8-6bf5-004e-6e1106fe053a@de.ibm.com>
-Subject: [Qemu-devel] qemu crashes with vnc and multiple outputs + console
- redirection
+	(envelope-from <yvugenfi@redhat.com>) id 1etuym-0003O4-67
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:49:09 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56686 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yvugenfi@redhat.com>) id 1etuym-0003Kq-0i
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:49:04 -0500
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+From: Yan Vugenfirer <yvugenfi@redhat.com>
+In-Reply-To: <20180306201252-mutt-send-email-mst@kernel.org>
+Date: Thu, 8 Mar 2018 14:48:45 +0200
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <71A8623C-BB2A-4579-AD12-77A9D1B70F97@redhat.com>
+References: <cover.1519961667.git.jbaron@akamai.com>
+	<c9d3cf2fbc3c64bb28e0438185d85d95b2088127.1519961667.git.jbaron@akamai.com>
+	<7fc612d0-9610-9b07-d054-bb1438898f47@redhat.com>
+	<20180302221831-mutt-send-email-mst@kernel.org>
+	<258F88CA-D946-4804-A65D-2EA0790A66AF@redhat.com>
+	<09cbf694-907e-dd68-60ff-eeb169925a5e@akamai.com>
+	<20180306201252-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [virtio-dev] [PATCH 4/4] virtio-net: add linkspeed
+ and duplex settings to virtio-net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,47 +34,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>
-
-Gerd,
-
-I am playing with the virtio-gpu support on s390 and for that I also wanted to multiplex
-the existing consoles. So I basically used the max_outputs=2 of virtio gpu to be able
-to switch with ctrl+alt+1 and 3 between the virtio gpu and the sclplm console.
-
--chardev pty,id=charconsole0 -device sclpconsole,chardev=charconsole0,id=console0
--chardev vc,id=charconsole1 -device sclplmconsole,chardev=charconsole1,id=console1
--device virtio-keyboard-ccw,id=input0,devno=fe.0.0001
--vnc 0.0.0.0:0
--k en-us
--device virtio-gpu-ccw,id=video0,max_outputs=2,devno=fe.0.0008 
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Baron <jbaron@akamai.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
 
 
-This seems to work fine, vrtio-gpu is on 1 and sclplm is on 3. Problem is, 
-when I randomly do ctrl+alt+[^1..9] sooner or later qemu crashes with
 
-(gdb) bt
-#0  0x000000000123dd9e in surface_width (s=0x0) at /home/cborntra/REPOS/qemu/include/ui/console.h:339
-#1  0x000000000123dd9e in vnc_width (vd=vd@entry=0x345e9100) at /home/cborntra/REPOS/qemu/ui/vnc.c:610
-#2  0x000000000123df84 in vnc_update_server_surface (vd=vd@entry=0x345e9100) at /home/cborntra/REPOS/qemu/ui/vnc.c:735
-#3  0x00000000012437dc in vnc_dpy_switch (dcl=0x345e9140, surface=0x0) at /home/cborntra/REPOS/qemu/ui/vnc.c:756
-#4  0x0000000001233456 in console_select (index=index@entry=1) at /home/cborntra/REPOS/qemu/ui/console.c:1039
-#5  0x00000000012400ba in do_key_event (vs=vs@entry=0x34652130, down=down@entry=1, keycode=keycode@entry=3, sym=sym@entry=50) at /home/cborntra/REPOS/qemu/ui/vnc.c:1801
-#6  0x00000000012406e2 in key_event (vs=vs@entry=0x34652130, down=down@entry=1, sym=<optimized out>) at /home/cborntra/REPOS/qemu/ui/vnc.c:2010
-#7  0x0000000001243bea in protocol_client_msg (vs=0x34652130, data=0x346485e0 "\004\001", len=<optimized out>) at /home/cborntra/REPOS/qemu/ui/vnc.c:2341
-#8  0x0000000001241bae in vnc_client_read (vs=vs@entry=0x34652130) at /home/cborntra/REPOS/qemu/ui/vnc.c:1511
-#9  0x0000000001241c32 in vnc_client_io (ioc=<error reading variable: value has been optimized out>, condition=<error reading variable: value has been optimized out>, opaque=0x34652130, opaque@entry=<error reading variable: value has been optimized out>) at /home/cborntra/REPOS/qemu/ui/vnc.c:1531
-#10 0x00000000013015fe in qio_channel_fd_source_dispatch (source=<optimized out>, callback=<optimized out>, user_data=<optimized out>)
-    at /home/cborntra/REPOS/qemu/io/channel-watch.c:84
-#11 0x000003ff968510aa in g_main_context_dispatch () at /lib64/libglib-2.0.so.0
-#12 0x00000000013522e6 in glib_pollfds_poll () at /home/cborntra/REPOS/qemu/util/main-loop.c:214
-#13 0x00000000013523ba in os_host_main_loop_wait (timeout=<optimized out>) at /home/cborntra/REPOS/qemu/util/main-loop.c:261
-#14 0x0000000001352500 in main_loop_wait (nonblocking=nonblocking@entry=0) at /home/cborntra/REPOS/qemu/util/main-loop.c:515
-#15 0x0000000001164a06 in main_loop () at /home/cborntra/REPOS/qemu/vl.c:1940
-#16 0x00000000011684d8 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at /home/cborntra/REPOS/qemu/vl.c:4764
+> On 6 Mar 2018, at 20:13, Michael S. Tsirkin <mst@redhat.com> wrote:
+>=20
+> On Tue, Mar 06, 2018 at 01:02:06PM -0500, Jason Baron wrote:
+>>=20
+>>=20
+>> On 03/04/2018 08:05 AM, Yan Vugenfirer wrote:
+>>>=20
+>>>=20
+>>>> On 2 Mar 2018, at 22:19, Michael S. Tsirkin <mst@redhat.com
+>>>> <mailto:mst@redhat.com>> wrote:
+>>>>=20
+>>>> On Fri, Mar 02, 2018 at 03:14:01PM +0800, Jason Wang wrote:
+>>>>>=20
+>>>>>=20
+>>>>> On 2018=E5=B9=B403=E6=9C=8802=E6=97=A5 11:46, Jason Baron wrote:
+>>>>>> Although linkspeed and duplex can be set in a linux guest via
+>>>>>> 'ethtool -s',
+>>>>>> this requires custom ethtool commands for virtio-net by default.
+>>>>>>=20
+>>>>>> Introduce a new feature flag, VIRTIO_NET_F_SPEED_DUPLEX, which =
+allows
+>>>>>> the hypervisor to export a linkspeed and duplex setting. The user =
+can
+>>>>>> subsequently overwrite it later if desired via: 'ethtool -s'.
+>>>>>>=20
+>>>>>> Linkspeed and duplex settings can be set as:
+>>>>>> '-device virtio-net,speed=3D10000,duplex=3Dfull'
+>>>>>=20
+>>>>> I was thinking whether or not it's better to decide the duplex by =
+the
+>>>>> type
+>>>>> of backends.
+>>>>>=20
+>>>>> E.g userspace and vhost-kernel implement a in fact half duplex. =
+But dpdk
+>>>>> implement a full duplex.
+>>>>>=20
+>>>>> Thanks
+>>>>=20
+>>>> OTOH it's a priority for some people to be able to support =
+migration
+>>>> between different backend types. Breaking that won't be nice.
+>>>=20
+>>> I think that in this case we need a way to update the settings of =
+link
+>>> speed and link duplex (maybe add QMP command). Migration between
+>>> different backend types should cause link down\link up events. And =
+this
+>>> is a time for a driver to re-read the settings and update the OS.
+>>>=20
+>>> Best regards,
+>>> Yan.
+>>>=20
+>>=20
+>> So the virtio_net driver in linux will re-read these settings on link =
+up
+>> events. So I could add a qmp command to set these (in addition to the
+>> command-line) interface, if desired. Is there a consensus that we =
+need
+>> to add a qmp command here? Or can that be treated as a future item, =
+if
+>> somebody wants it?
+>>=20
+>> Thanks,
+>>=20
+>> -Jason
+>=20
+> We already have ability to take link down and up.
+> I'd say it's a future item.
+I agree.
 
-
-any quick idea?
-
-Christian
+Yan.
+>=20
+> --=20
+> MST
