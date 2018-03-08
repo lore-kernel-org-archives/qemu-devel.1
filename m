@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1etyVx-0003S5-8A
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:35:39 -0500
+	(envelope-from <berrange@redhat.com>) id 1etyeB-0006uo-5R
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:44:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1etyVu-0007Ec-2p
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:35:33 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35274 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1etye7-0004DR-8y
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:44:03 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35454 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1etyVt-0007E6-Sg
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:35:29 -0500
-References: <20180307155746.18526-1-marcandre.lureau@redhat.com>
-	<20180307155746.18526-5-marcandre.lureau@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <6bae8e57-2ba5-d870-9220-38c30c350978@redhat.com>
-Date: Thu, 8 Mar 2018 17:35:18 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1etye7-0004D2-2U
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:43:59 -0500
+Date: Thu, 8 Mar 2018 16:43:41 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180308164341.GE4718@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180308124901.83533-1-brijesh.singh@amd.com>
+	<20180308124901.83533-6-brijesh.singh@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20180307155746.18526-5-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [edk2] [PATCH v2 4/8] ovmf: simplify
- SecurityStubDxe.inf inclusion
+Content-Disposition: inline
+In-Reply-To: <20180308124901.83533-6-brijesh.singh@amd.com>
+Subject: Re: [Qemu-devel] [PATCH v12 05/28] machine: add -memory-encryption
+ property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,98 +29,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@redhat.com, edk2-devel@lists.01.org
-Cc: qemu-devel@nongnu.org, javierm@redhat.com, pjones@redhat.com, jiewen.yao@intel.com
+To: Brijesh Singh <brijesh.singh@amd.com>
+Cc: qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>
 
-On 03/07/18 16:57, marcandre.lureau@redhat.com wrote:
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> SecurityStubDxe.inf should be included unconditionally.
->=20
-> Cc: Laszlo Ersek <lersek@redhat.com>
-> Contributed-under: TianoCore Contribution Agreement 1.1
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Nitpick: the subject makes it seem like you're adding
+"-memory-encryption" as a CLI arg, but actually its
+adding support for  'memory-encryption=$VAL' property
+to the '-machine' CLI arg.
+
+Sufficient to just   s/-memory-encryption/"memory-encryption"/
+
+On Thu, Mar 08, 2018 at 06:48:38AM -0600, Brijesh Singh wrote:
+> When CPU supports memory encryption feature, the property can be used to
+> specify the encryption object to use when launching an encrypted guest.
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: Marcel Apfelbaum <marcel@redhat.com>
+> Cc: Stefan Hajnoczi <stefanha@gmail.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > ---
->  OvmfPkg/OvmfPkgIa32.dsc    | 6 ++----
->  OvmfPkg/OvmfPkgIa32X64.dsc | 6 ++----
->  OvmfPkg/OvmfPkgX64.dsc     | 6 ++----
->  3 files changed, 6 insertions(+), 12 deletions(-)
->=20
-> diff --git a/OvmfPkg/OvmfPkgIa32.dsc b/OvmfPkg/OvmfPkgIa32.dsc
-> index fbe0f790e431..5bd3f4f977df 100644
-> --- a/OvmfPkg/OvmfPkgIa32.dsc
-> +++ b/OvmfPkg/OvmfPkgIa32.dsc
-> @@ -611,14 +611,12 @@ [Components]
-> =20
->    MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
-> =20
-> -!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
->    MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
->      <LibraryClasses>
-> +!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
->        NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerific=
-ationLib.inf
-> -	}
-> -!else
-> -  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
->  !endif
-> +  }
-> =20
->    MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
->    PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
-> diff --git a/OvmfPkg/OvmfPkgIa32X64.dsc b/OvmfPkg/OvmfPkgIa32X64.dsc
-> index fb10e0b0f2e4..7dded86c4940 100644
-> --- a/OvmfPkg/OvmfPkgIa32X64.dsc
-> +++ b/OvmfPkg/OvmfPkgIa32X64.dsc
-> @@ -620,14 +620,12 @@ [Components.X64]
-> =20
->    MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
-> =20
-> -!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
->    MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
->      <LibraryClasses>
-> +!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
->        NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerific=
-ationLib.inf
-> -	}
-> -!else
-> -  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
->  !endif
-> +  }
-> =20
->    MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
->    PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
-> diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
-> index a31551f5ae24..a8e89276c0b2 100644
-> --- a/OvmfPkg/OvmfPkgX64.dsc
-> +++ b/OvmfPkg/OvmfPkgX64.dsc
-> @@ -618,14 +618,12 @@ [Components]
-> =20
->    MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
-> =20
-> -!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
->    MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
->      <LibraryClasses>
-> +!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
->        NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerific=
-ationLib.inf
-> -	}
-> -!else
-> -  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
->  !endif
-> +  }
-> =20
->    MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
->    PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
->=20
+>  hw/core/machine.c   | 22 ++++++++++++++++++++++
+>  include/hw/boards.h |  1 +
+>  qemu-options.hx     |  5 ++++-
+>  3 files changed, 27 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 5e2bbcdacedb..2040177664d5 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -334,6 +334,22 @@ static bool machine_get_enforce_config_section(Object *obj, Error **errp)
+>      return ms->enforce_config_section;
+>  }
+>  
+> +static char *machine_get_memory_encryption(Object *obj, Error **errp)
+> +{
+> +    MachineState *ms = MACHINE(obj);
+> +
+> +    return g_strdup(ms->memory_encryption);
+> +}
+> +
+> +static void machine_set_memory_encryption(Object *obj, const char *value,
+> +                                        Error **errp)
+> +{
+> +    MachineState *ms = MACHINE(obj);
+> +
+> +    g_free(ms->memory_encryption);
+> +    ms->memory_encryption = g_strdup(value);
+> +}
+> +
+>  void machine_class_allow_dynamic_sysbus_dev(MachineClass *mc, const char *type)
+>  {
+>      strList *item = g_new0(strList, 1);
+> @@ -612,6 +628,12 @@ static void machine_class_init(ObjectClass *oc, void *data)
+>          &error_abort);
+>      object_class_property_set_description(oc, "enforce-config-section",
+>          "Set on to enforce configuration section migration", &error_abort);
+> +
+> +    object_class_property_add_str(oc, "memory-encryption",
+> +        machine_get_memory_encryption, machine_set_memory_encryption,
+> +        &error_abort);
+> +    object_class_property_set_description(oc, "memory-encryption",
+> +        "Set memory encyption object to use", &error_abort);
+>  }
+>  
+>  static void machine_class_base_init(ObjectClass *oc, void *data)
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index efb0a9edfdf1..8ce9a7a21d3d 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -243,6 +243,7 @@ struct MachineState {
+>      bool suppress_vmdesc;
+>      bool enforce_config_section;
+>      bool enable_graphics;
+> +    char *memory_encryption;
+>  
+>      ram_addr_t ram_size;
+>      ram_addr_t maxram_size;
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 6585058c6cde..4c280142c52c 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -43,7 +43,8 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
+>      "                suppress-vmdesc=on|off disables self-describing migration (default=off)\n"
+>      "                nvdimm=on|off controls NVDIMM support (default=off)\n"
+>      "                enforce-config-section=on|off enforce configuration section migration (default=off)\n"
+> -    "                s390-squash-mcss=on|off (deprecated) controls support for squashing into default css (default=off)\n",
+> +    "                s390-squash-mcss=on|off (deprecated) controls support for squashing into default css (default=off)\n"
+> +    "                memory-encryption=@var{} memory encryption object to use (default=none)\n",
+>      QEMU_ARCH_ALL)
+>  STEXI
+>  @item -machine [type=]@var{name}[,prop=@var{value}[,...]]
+> @@ -110,6 +111,8 @@ code to send configuration section even if the machine-type sets the
+>  @option{migration.send-configuration} property to @var{off}.
+>  NOTE: this parameter is deprecated. Please use @option{-global}
+>  @option{migration.send-configuration}=@var{on|off} instead.
+> +@item memory-encryption=@var{}
+> +Memory encryption object to use. The default is none.
+>  @end table
+>  ETEXI
+>  
+> -- 
+> 2.14.3
+> 
 
-Please change the subject as follows:
-
-OvmfPkg: simplify SecurityStubDxe.inf inclusion
-
-With that update:
-
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-Thanks
-Laszlo
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
