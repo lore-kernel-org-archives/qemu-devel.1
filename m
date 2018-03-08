@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benjamin.drung@profitbricks.com>) id 1eu1pI-0002Z7-5C
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:07:45 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1eu20O-0005OC-N2
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:19:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benjamin.drung@profitbricks.com>) id 1eu1pE-0002X2-0v
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:07:44 -0500
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:40061)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <benjamin.drung@profitbricks.com>)
-	id 1eu1pD-0002Vs-NE
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:07:39 -0500
-Received: by mail-wr0-x22f.google.com with SMTP id o76so6913809wrb.7
-	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 12:07:39 -0800 (PST)
-Message-ID: <1520539656.6051.11.camel@profitbricks.com>
-From: Benjamin Drung <benjamin.drung@profitbricks.com>
-Date: Thu, 08 Mar 2018 21:07:36 +0100
-In-Reply-To: <88890d90-4dc6-bac3-4591-f29a271181df@redhat.com>
-References: <20180304210608.vn33p6pn7t2nsxv4@var.youpi.perso.aquilenet.fr>
-	<20180308185743.3408-1-benjamin.drung@profitbricks.com>
-	<88890d90-4dc6-bac3-4591-f29a271181df@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/2 v2] slirp: Add classless static routes
- support to DHCP server
+	(envelope-from <brijesh.singh@amd.com>) id 1eu20K-0000bq-Mx
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:19:12 -0500
+Received: from mail-sn1nam01on0084.outbound.protection.outlook.com
+	([104.47.32.84]:23584
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1eu20K-0000at-Bz
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:19:08 -0500
+References: <20180308124901.83533-1-brijesh.singh@amd.com>
+	<20180308124901.83533-29-brijesh.singh@amd.com>
+	<20180308170824.GL4718@redhat.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <e6db1aaa-83c7-ae5c-2311-bc247b301426@amd.com>
+Date: Thu, 8 Mar 2018 14:18:55 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180308170824.GL4718@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v12 28/28] tests/qmp-test: blacklist sev
+ specific qmp commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,145 +33,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Samuel Thibault <samuel.thibault@gnu.org>, Jan Kiszka <jan.kiszka@siemens.com>
-Cc: qemu-devel@nongnu.org
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: brijesh.singh@amd.com, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>
 
-Am Donnerstag, den 08.03.2018, 13:46 -0600 schrieb Eric Blake:
-> On 03/08/2018 12:57 PM, Benjamin Drung wrote:
-> > This patch will allow the user to specify classless static routes
-> > for
-> > the replies from the built-in DHCP server.
-> > 
-> > Signed-off-by: Benjamin Drung <benjamin.drung@profitbricks.com>
-> > ---
-> 
-> For future patches, when sending a v2, it's best to document here
-> (after 
-> the --- separator) what changed from v1.  It's also a good idea to
-> send 
-> a fresh thread rather than tying your v2 in-reply-to your v1, so that
-> it 
-> doesn't get buried in an old conversation.
-> 
-> More submission hints at https://wiki.qemu.org/Contribute/SubmitAPatch
 
-Thanks. I will do that with the next iteration. Patch v2 addressed all
-remarks from Samuel Thibault.
 
-> > +++ b/qapi/net.json
-> > @@ -163,6 +163,9 @@
-> >   # @domainname: guest-visible domain name of the virtual
-> > nameserver
-> >   #              (since 2.12)
-> >   #
-> > +# @route: guest-visible static classless route of the virtual
-> > nameserver
-> > +#         (since 2.12)
-> > +#
-> >   # @ipv6-prefix: IPv6 network prefix (default is fec0::) (since
-> >   #               2.6). The network prefix is given in the usual
-> >   #               hexadecimal IPv6 address notation.
-> > @@ -201,6 +204,7 @@
-> >       '*dns':       'str',
-> >       '*dnssearch': ['String'],
-> >       '*domainname': 'str',
-> > +    '*route':     ['String'],
-> 
-> I know we've used ['String'] for previous members, but that's rather 
-> heavyweight - it transmits over QMP as:
-> 
-> "dnssearch": [ { "str": "foo" }, { "str": "bar" } ]
-> 
-> Nicer is ['str'], which transmits as:
-> 
-> "route": [ "foo", "bar" ]
-> 
-> so the question boils down to whether cross-member consistency is
-> more 
-> important than making your additions concise.
+On 3/8/18 11:08 AM, Daniel P. Berrang=C3=A9 wrote:
+> On Thu, Mar 08, 2018 at 06:49:01AM -0600, Brijesh Singh wrote:
+>> Blacklist the following commands to fix the 'make check' failure.
+>>
+>> query-sev-launch-measure: it returns meaninful data only when we launch
+>> SEV guest otherwise the command returns an error.
+>>
+>> query-sev: it return an error when SEV is not available on host (e.g non
+>> X86 platform or KVM is disabled at the build time)
+>>
+>> query-sev-capabilities: it returns an error when SEV feature is not
+>> available on host machine.
+> We generally expect 'make check' to succeed on every single patch
+> in a series, so that 'git bisect' doesn't break.
+>
+> So you should add each command to the blacklist in the same commit
+> that introduced the failure in the first place.
 
-Agreed that ['str'] is nicer. I will update the patch.
 
-> > +++ b/qemu-options.hx
-> > @@ -1904,7 +1904,7 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
-> >       "         [,ipv6[=on|off]][,ipv6-net=addr[/int]][,ipv6-
-> > host=addr]\n"
-> >       "         [,restrict=on|off][,hostname=host][,dhcpstart=addr]
-> > \n"
-> >       "         [,dns=addr][,ipv6-
-> > dns=addr][,dnssearch=domain][,domainname=domain]\n"
-> > -    "         [,tftp=dir][,bootfile=f][,hostfwd=rule][,guestfwd=ru
-> > le]"
-> > +    "         [,route=addr/mask[:gateway]][,tftp=dir][,bootfile=f]
-> > [,hostfwd=rule][,guestfwd=rule]"
-> 
-> Urgh - your QMP interface HAS to be further parsed to get to the
-> useful 
-> information.  While it's nice to have compact syntax on the command 
-> line, it is really worth thinking about making information easier to 
-> consume (that is, NO further parsing required once the information is
-> in 
-> JSON format).  Would it be any better to send things over the wire
-> as:
-> 
-> "route": [ { "addr": "...", "mask": 24, "gateway": "..." } ]
+Sure, I can quickly send the updated patch series to address your this
+concern, but before spamming everyone's inbox I was wondering if I can
+get some indication whether this series will make into 2.12 merge.
 
-That's looks good.
+Paolo, Eduardo and Richard,
 
-> instead of cramming all the information into a single string?  But
-> based 
-> on the way this also maps to the command line, you may not have a
-> choice 
-> without a lot more code complexity.
+Most of the changes are in x86 directory hence any thought if you are
+considering this series for 2.12 ? I have been testing the series with
+and without SEV support and so far have not ran into any issue. if you
+are not planning to pull this series in 2.12 then I will wait a bit
+longer to get more feedback before sending the updates to address
+Daniel's comment. thanks
 
-Can you point me to an example where similar parsing is done?
 
-> >   #ifndef _WIN32
-> >                                                "[,smb=dir[,smbserve
-> > r=addr]]\n"
-> >   #endif
-> > @@ -2137,6 +2137,18 @@ qemu -net
-> > user,dnssearch=mgmt.example.org,dnssearch=example.org [...]
-> >   @item domainname=@var{domain}
-> >   Specifies the client domain name reported by the built-in DHCP
-> > server.
-> >   
-> > +@item route=@var{addr}/@var{mask}[:@var{gateway}]
-> > +Provides an entry for the classless static routes list sent by the
-> > built-in
-> > +DHCP server. More than one route can be transmitted by specifying
-> > +this option multiple times. If supported, this will cause the
-> > guest to
-> > +automatically set the given static routes instead of the given
-> > default gateway.
-> > +If @var{gateway} is not specified, the default gateway will be
-> > used.
-> > +
-> > +Example:
-> > +@example
-> > +qemu -net user,route=10.0.2.0/24,route=192.168.0.0/16 [...]
-> > +@end example
-> 
-> Can we please spell that '--net', along the lines of 
-> https://wiki.qemu.org/BiteSizedTasks#Consistent_option_usage_in_docum
-> entation
-
-I can change it, but then the documentation is inconsistent. There
-are 75 lines with '-net' in qemu-options.hx, but only two lines
-with '--net'.
-
--- 
-Benjamin Drung
-System Developer
-Debian & Ubuntu Developer
-
-ProfitBricks GmbH
-Greifswalder Str. 207
-D - 10405 Berlin
-
-Email: benjamin.drung@profitbricks.com
-URL: https://www.profitbricks.de
-
-Sitz der Gesellschaft: Berlin
-Registergericht: Amtsgericht Charlottenburg, HRB 125506 B
-Geschäftsführer: Achim Weiss, Matthias Steinberg
+=C2=A0
+>> Cc: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
+>> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> Cc: Markus Armbruster <armbru@redhat.com>
+>> Reviewed-by: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+>> ---
+>>  tests/qmp-test.c | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>>
+>> diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+>> index 22445d9ec258..7470c6b754bc 100644
+>> --- a/tests/qmp-test.c
+>> +++ b/tests/qmp-test.c
+>> @@ -204,6 +204,11 @@ static bool query_is_blacklisted(const char *cmd)
+>>          "query-gic-capabilities", /* arm */
+>>          /* Success depends on target-specific build configuration: */
+>>          "query-pci",              /* CONFIG_PCI */
+>> +        /* Success depends on launching SEV guest */
+>> +        "query-sev-launch-measure",
+>> +        /* Success depends on Host or Hypervisor SEV support */
+>> +        "query-sev",
+>> +        "query-sev-capabilities",
+>>          NULL
+>>      };
+>>      int i;
+>> --=20
+>> 2.14.3
+>>
+> Regards,
+> Daniel
