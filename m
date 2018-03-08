@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eu0tI-0004CX-Vg
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:07:49 -0500
+	(envelope-from <lersek@redhat.com>) id 1eu10A-0001tM-GY
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:15:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eu0tE-0004LW-OJ
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:07:48 -0500
-References: <20180207125037.13510-1-vsementsov@virtuozzo.com>
-	<20180306160017.GM31045@stefanha-x1.localdomain>
-	<20180306174918.GA22807@flamenco>
-	<482599db-65b7-ba5d-6784-72acf3486786@virtuozzo.com>
-	<20180308185638.GA25161@flamenco>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <876a1999-fdc7-196e-e94b-a71e82ad13f9@virtuozzo.com>
-Date: Thu, 8 Mar 2018 22:07:35 +0300
+	(envelope-from <lersek@redhat.com>) id 1eu0zn-0007X3-Ax
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:14:54 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39092 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1eu0zm-0007Wj-U2
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:14:31 -0500
+References: <20180307155746.18526-1-marcandre.lureau@redhat.com>
+	<20180307155746.18526-8-marcandre.lureau@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <f0b59d9c-1d70-2c1f-53a9-81c656e0723c@redhat.com>
+Date: Thu, 8 Mar 2018 20:14:13 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180308185638.GA25161@flamenco>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20180307155746.18526-8-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] block latency histogram
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [edk2] [PATCH v2 7/8] ovmf: link with Tcg2Dxe
+ module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +29,372 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, kwolf@redhat.com, qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, den@openvz.org
+To: marcandre.lureau@redhat.com, edk2-devel@lists.01.org
+Cc: qemu-devel@nongnu.org, javierm@redhat.com, pjones@redhat.com, jiewen.yao@intel.com
 
-08.03.2018 21:56, Emilio G. Cota wrote:
-> On Thu, Mar 08, 2018 at 14:42:29 +0300, Vladimir Sementsov-Ogievskiy wrote:
->> Hi Emilio!
->>
->> Looked through qdist, if I understand correctly, it saves each added (with
->> different value) element. It is not effective for disk io timing - we'll
->> have too much elements. In my approach, histogram don't grow, it initially
->> have several ranges and counts hits to each range.
-> I thought about this use case, i.e. having a gazillion elements.
-> You should just do some pre-binning before inserting samples
-> into qdist, as pointed out in this comment in qdist.h:
->
-> /*
->   * Samples with the same 'x value' end up in the same qdist_entry,
->   * e.g. inc(0.1) and inc(0.1) end up as {x=0.1, count=2}.
->   *
->   * Binning happens only at print time, so that we retain the flexibility to
->   * choose the binning. This might not be ideal for workloads that do not care
->   * much about precision and insert many samples all with different x values;
->   * in that case, pre-binning (e.g. entering both 0.115 and 0.097 as 0.1)
->   * should be considered.
->   */
-> struct qdist_entry {
->      double x;
->      unsigned long count;
-> };
->
-> Let me know if you need help with that.
->
-> Thanks,
->
-> 		Emilio
+On 03/07/18 16:57, marcandre.lureau@redhat.com wrote:
+> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>=20
+> This module measures and log the boot environment. It also produces
+> the Tcg2 protocol, which allows for example to read the log from OS.
+>=20
+> The linux kernel doesn't yet read the EFI_TCG2_EVENT_LOG_FORMAT_TCG_2,
+> which is required for crypto-agile log. In fact, only upcoming 4.16
+> adds support EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2:
+>=20
+> [    0.000000] efi: EFI v2.70 by EDK II
+> [    0.000000] efi:  SMBIOS=3D0x3fa1f000  ACPI=3D0x3fbb6000  ACPI 2.0=3D=
+0x3fbb6014  MEMATTR=3D0x3e7d4318  TPMEventLog=3D0x3db21018
+>=20
+> $ python chipsec_util.py tpm parse_log binary_bios_measurements
+>=20
+> [CHIPSEC] Version 1.3.5.dev2
+> [CHIPSEC] API mode: using OS native API (not using CHIPSEC kernel modul=
+e)
+> [CHIPSEC] Executing command 'tpm' with args ['parse_log', '/tmp/binary_=
+bios_measurements']
+>=20
+> PCR: 0	type: EV_S_CRTM_VERSION               	size: 0x2	digest: 1489f92=
+3c4dca729178b3e3233458550d8dddf29
+> 	+ version:
+> PCR: 0	type: EV_EFI_PLATFORM_FIRMWARE_BLOB   	size: 0x10	digest: fd39ce=
+d7c0d2a61f6830c78c7625f94826b05bcc
+> 	+ base: 0x820000	length: 0xe0000
+> PCR: 0	type: EV_EFI_PLATFORM_FIRMWARE_BLOB   	size: 0x10	digest: 39ebc6=
+783b72bc1e73c7d5bcfeb5f54a3f105d4c
+> 	+ base: 0x900000	length: 0xa00000
+> PCR: 7	type: EV_EFI_VARIABLE_DRIVER_CONFIG   	size: 0x35	digest: 57cd4d=
+c19442475aa82743484f3b1caa88e142b8
+> PCR: 7	type: EV_EFI_VARIABLE_DRIVER_CONFIG   	size: 0x24	digest: 9b1387=
+306ebb7ff8e795e7be77563666bbf4516e
+> PCR: 7	type: EV_EFI_VARIABLE_DRIVER_CONFIG   	size: 0x26	digest: 9afa86=
+c507419b8570c62167cb9486d9fc809758
+> PCR: 7	type: EV_EFI_VARIABLE_DRIVER_CONFIG   	size: 0x24	digest: 5bf8fa=
+a078d40ffbd03317c93398b01229a0e1e0
+> PCR: 7	type: EV_EFI_VARIABLE_DRIVER_CONFIG   	size: 0x26	digest: 734424=
+c9fe8fc71716c42096f4b74c88733b175e
+> PCR: 7	type: EV_SEPARATOR                    	size: 0x4	digest: 9069ca7=
+8e7450a285173431b3e52c5c25299e473
+> PCR: 1	type: EV_EFI_VARIABLE_BOOT            	size: 0x3e	digest: 252f8e=
+bb85340290b64f4b06a001742be8e5cab6
+> PCR: 1	type: EV_EFI_VARIABLE_BOOT            	size: 0x6e	digest: 22a4f6=
+ee9af6dba01d3528deb64b74b582fc182b
+> PCR: 1	type: EV_EFI_VARIABLE_BOOT            	size: 0x80	digest: b7811d=
+5bf30a7efd4e385c6179fe10d9290bb9e8
+> PCR: 1	type: EV_EFI_VARIABLE_BOOT            	size: 0x84	digest: 425e50=
+2c24fc924e231e0a62327b6b7d1f704573
+> PCR: 1	type: EV_EFI_VARIABLE_BOOT            	size: 0x9a	digest: 0b5d2c=
+98ac5de6148a4a1490ff9d5df69039f04e
+> PCR: 1	type: EV_EFI_VARIABLE_BOOT            	size: 0xbd	digest: 20bd5f=
+402271d57a88ea314fe35c1705956b1f74
+> PCR: 1	type: EV_EFI_VARIABLE_BOOT            	size: 0x88	digest: df5d66=
+05cb8f4366d745a8464cfb26c1efdc305c
+> PCR: 4	type: EV_EFI_ACTION                   	size: 0x28	digest: cd0fdb=
+4531a6ec41be2753ba042637d6e5f7f256
+> PCR: 0	type: EV_SEPARATOR                    	size: 0x4	digest: 9069ca7=
+8e7450a285173431b3e52c5c25299e473
+> PCR: 1	type: EV_SEPARATOR                    	size: 0x4	digest: 9069ca7=
+8e7450a285173431b3e52c5c25299e473
+> PCR: 2	type: EV_SEPARATOR                    	size: 0x4	digest: 9069ca7=
+8e7450a285173431b3e52c5c25299e473
+> PCR: 3	type: EV_SEPARATOR                    	size: 0x4	digest: 9069ca7=
+8e7450a285173431b3e52c5c25299e473
+> PCR: 4	type: EV_SEPARATOR                    	size: 0x4	digest: 9069ca7=
+8e7450a285173431b3e52c5c25299e473
+> PCR: 5	type: EV_SEPARATOR                    	size: 0x4	digest: 9069ca7=
+8e7450a285173431b3e52c5c25299e473
+>=20
+> $ tpm2_pcrlist
+> sha1 :
+>   0  : 35bd1786b6909daad610d7598b1d620352d33b8a
+>   1  : ec0511e860206e0af13c31da2f9e943fb6ca353d
+>   2  : b2a83b0ebf2f8374299a5b2bdfc31ea955ad7236
+>   3  : b2a83b0ebf2f8374299a5b2bdfc31ea955ad7236
+>   4  : 45a323382bd933f08e7f0e256bc8249e4095b1ec
+>   5  : d16d7e629fd8d08ca256f9ad3a3a1587c9e6cc1b
+>   6  : b2a83b0ebf2f8374299a5b2bdfc31ea955ad7236
+>   7  : 518bd167271fbb64589c61e43d8c0165861431d8
+>   8  : 0000000000000000000000000000000000000000
+>   9  : 0000000000000000000000000000000000000000
+>   10 : 0000000000000000000000000000000000000000
+>   11 : 0000000000000000000000000000000000000000
+>   12 : 0000000000000000000000000000000000000000
+>   13 : 0000000000000000000000000000000000000000
+>   14 : 0000000000000000000000000000000000000000
+>   15 : 0000000000000000000000000000000000000000
+>   16 : 0000000000000000000000000000000000000000
+>   17 : ffffffffffffffffffffffffffffffffffffffff
+>   18 : ffffffffffffffffffffffffffffffffffffffff
+>   19 : ffffffffffffffffffffffffffffffffffffffff
+>   20 : ffffffffffffffffffffffffffffffffffffffff
+>   21 : ffffffffffffffffffffffffffffffffffffffff
+>   22 : ffffffffffffffffffffffffffffffffffffffff
+>   23 : 0000000000000000000000000000000000000000
+> sha256 :
+>   0  : 9ae903dbae3357ac00d223660bac19ea5c021499a56201104332ab966631ce2c
+>   1  : acc611d90245cf04e77b0ca94901f90e7fa54770f0426f53c3049b532243d1b8
+>   2  : 3d458cfe55cc03ea1f443f1562beec8df51c75e14a9fcf9a7234a13f198e7969
+>   3  : 3d458cfe55cc03ea1f443f1562beec8df51c75e14a9fcf9a7234a13f198e7969
+>   4  : 7a94ffe8a7729a566d3d3c577fcb4b6b1e671f31540375f80eae6382ab785e35
+>   5  : a5ceb755d043f32431d63e39f5161464620a3437280494b5850dc1b47cc074e0
+>   6  : 3d458cfe55cc03ea1f443f1562beec8df51c75e14a9fcf9a7234a13f198e7969
+>   7  : 65caf8dd1e0ea7a6347b635d2b379c93b9a1351edc2afc3ecda700e534eb3068
+>   8  : 0000000000000000000000000000000000000000000000000000000000000000
+>   9  : 0000000000000000000000000000000000000000000000000000000000000000
+>   10 : 0000000000000000000000000000000000000000000000000000000000000000
+>   11 : 0000000000000000000000000000000000000000000000000000000000000000
+>   12 : 0000000000000000000000000000000000000000000000000000000000000000
+>   13 : 0000000000000000000000000000000000000000000000000000000000000000
+>   14 : 0000000000000000000000000000000000000000000000000000000000000000
+>   15 : 0000000000000000000000000000000000000000000000000000000000000000
+>   16 : 0000000000000000000000000000000000000000000000000000000000000000
+>   17 : ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+>   18 : ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+>   19 : ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+>   20 : ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+>   21 : ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+>   22 : ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+>   23 : 0000000000000000000000000000000000000000000000000000000000000000
+> sha384 :
+>=20
+> The PhysicalPresenceLib is required, it sets some variables, but the
+> firmware doesn't act on it yet.
+>=20
+> Laszlo Ersek explained on the list why Tpm2DeviceLib has to be
+> resolved differently for DXE_DRIVER modules in general and for
+> "Tcg2Dxe.inf" specifically:
+>=20
+>   * We have a library class called Tpm2DeviceLib -- this is basically t=
+he
+>   set of APIs declared in "SecurityPkg/Include/Library/Tpm2DeviceLib.h"=
+.
+>   Its leading comment says "This library abstract how to access TPM2
+>   hardware device".
+>=20
+>   There are two *sets* of APIs in "Tpm2DeviceLib.h":
+>=20
+>   (a) functions that deal with the TPM2 device:
+>       - Tpm2RequestUseTpm(),
+>       - Tpm2SubmitCommand()
+>=20
+>       This set of APIs is supposed to be used by clients that *consume*
+>       the TPM2 device abstraction.
+>=20
+>   (b) the function Tpm2RegisterTpm2DeviceLib(), which is supposed to be
+>       used by *providers* of various TPM2 device abstractions.
+>=20
+>   * Then, we have two implementations (instances) of the Tpm2DeviceLib =
+class:
+>   (1) SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.inf
+>   (2) SecurityPkg/Library/Tpm2DeviceLibRouter/Tpm2DeviceLibRouterDxe.in=
+f
+>=20
+>   (1) The first library instance ("Tpm2DeviceLibTcg2.inf") implements t=
+he
+>   APIs listed under (a), and it does not implement (b) -- see
+>   EFI_UNSUPPORTED. In other words, this lib instance is strictly meant =
+for
+>   drivers that *consume* the TPM2 device abstraction. And, the (a) grou=
+p
+>   of APIs is implemented by forwarding the requests to the TCG2 protoco=
+l.
+>=20
+>   The idea here is that all the drivers that consume the TPM2 abstracti=
+on
+>   do not have to be statically linked with a large TPM2 device library
+>   instance; instead they are only linked (statically) with this "thin"
+>   library instance, and all the actual work is delegated to whichever
+>   driver that provides the singleton TCG2 protocol.
+>=20
+>   (2) The second library instance ("Tpm2DeviceLibRouterDxe.inf") is mea=
+nt
+>   for the driver that offers (produces) the TCG2 protocol. This lib
+>   instance implements both (a) and (b) API groups.
+>=20
+>   * Here's how things fit together:
+>=20
+>   (i) The "SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2InstanceLibDTpm.in=
+f"
+>   library instance (which has no lib class) is linked into "Tcg2Dxe.inf=
+"
+>   via NULL class resolution. This simply means that before the
+>   "Tcg2Dxe.inf" entry point function is entered, the constructor functi=
+on
+>   of "Tpm2InstanceLibDTpm.inf" will be called.
+>=20
+>   (ii) This Tpm2InstanceLibDTpmConstructor() function calls API (b), an=
+d
+>   registers its own actual TPM2 command implementation with the
+>   "Tpm2DeviceLibRouter" library instance (also linked into the Tcg2Dxe
+>   driver). This provides the back-end for the API set (a).
+>=20
+>          TCG2 protocol provider (Tcg2Dxe.inf driver) launches
+>                       |
+>                       v
+>     NULL class: Tpm2InstanceLibDTpm instance construction
+>                       |
+>                       v
+>     Tpm2DeviceLib class: Tpm2DeviceLibRouter instance
+>            backend registration for API set (a)
+>=20
+>   (iii) The Tcg2Dxe driver exposes the TCG2 protocol.
+>=20
+>   (iv) A TPM2 consumer calls API set (a) via lib instance (1). Such cal=
+ls
+>   land in Tcg2Dxe, via the protocol.
+>=20
+>   (v) Tcg2Dxe serves the protocol request by forwarding it to API set (=
+a)
+>   from lib instance (2).
+>=20
+>   (vi) Those functions call the "backend" functions registered by
+>   Tpm2DeviceLibDTpm in step (ii).
+>=20
+>        TPM 2 consumer driver
+>                 |
+>                 v
+>   Tpm2DeviceLib class: Tpm2DeviceLibTcg2 instance
+>                 |
+>                 v
+>          TCG2 protocol interface
+>                 |
+>                 v
+>   TCG2 protocol provider: Tcg2Dxe.inf driver
+>                 |
+>                 v
+>   Tpm2DeviceLib class: Tpm2DeviceLibRouter instance
+>                 |
+>                 v
+>      NULL class: Tpm2InstanceLibDTpm instance
+>         (via earlier registration)
+>                 |
+>                 v
+>        TPM2 chip (actual hardware)
+>=20
+>   * So that is the "router" pattern in edk2. Namely,
+>=20
+>   - Consumers of an abstraction use a thin library instance.
+>=20
+>   - The thin library instance calls a firmware-global (singleton) servi=
+ce,
+>     i.e. a PPI (in the PEI phase) or protocol (in the DXE phase).
+>=20
+>   - The PEIM providing the PPI, or the DXE driver providing the protoco=
+l,
+>     don't themselves implement the actual service either. Instead they
+>     offer a "registration" service too, and they only connect the incom=
+ing
+>     "consumer" calls to the earlier registered back-end(s).
+>=20
+>   - The "registration service", for back-ends to use, may take various
+>     forms.
+>=20
+>     It can be exposed globally to the rest of the firmware, as
+>     another member function of the PPI / protocol structure. Then backe=
+nds
+>     can be provided by separate PEIMs / DXE drivers.
+>=20
+>     Or else, the registration service can be exposed as just another
+>     library API. In this case, the backends are provided as NULL class
+>     library instances, and a platform  DSC file links them into the PEI=
+M /
+>     DXE driver via NULL class resolutions. The backend lib instances ca=
+ll
+>     the registration service in their own respective constructor
+>     functions.
+>=20
+> Cc: Laszlo Ersek <lersek@redhat.com>
+> Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> Contributed-under: TianoCore Contribution Agreement 1.0
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  OvmfPkg/OvmfPkgX64.dsc | 16 ++++++++++++++++
+>  OvmfPkg/OvmfPkgX64.fdf |  4 ++++
+>  2 files changed, 20 insertions(+)
 
-In this case, I'll have to do same bin search (and store same interval 
-settings) as I already do, on my part, to calculate a parameter for 
-qdist interface. And I'll have store almost all same data on my part. 
-So, it doesn't really help. And I need nothing of qdist benefits: I 
-don't need (and don't want) dynamic allocation of bins on adding an 
-element or any type of visualization.
+(1) Please change the subject line to:
 
--- 
-Best regards,
-Vladimir
+OvmfPkg: include Tcg2Dxe module
+
+> diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
+> index 3fa1a31f4c37..7753852144fb 100644
+> --- a/OvmfPkg/OvmfPkgX64.dsc
+> +++ b/OvmfPkg/OvmfPkgX64.dsc
+> @@ -211,6 +211,8 @@ [LibraryClasses]
+> =20
+>  !if $(TPM2_ENABLE) =3D=3D TRUE
+>    Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
+> +  Tcg2PhysicalPresenceLib|SecurityPkg/Library/DxeTcg2PhysicalPresenceL=
+ib/DxeTcg2PhysicalPresenceLib.inf
+> +  Tcg2PpVendorLib|SecurityPkg/Library/Tcg2PpVendorLibNull/Tcg2PpVendor=
+LibNull.inf
+>  !endif
+> =20
+>  [LibraryClasses.common]
+> @@ -362,6 +364,10 @@ [LibraryClasses.common.DXE_DRIVER]
+>    PciLib|OvmfPkg/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
+>    MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
+>    QemuFwCfgS3Lib|OvmfPkg/Library/QemuFwCfgS3Lib/DxeQemuFwCfgS3LibFwCfg=
+.inf
+> +!if $(TPM2_ENABLE)
+> +  HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCrypt=
+oRouterDxe.inf
+
+(2) Can you move this HashLib resolution under Tcg2Dxe.inf?
+
+> +  Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg=
+2.inf
+> +!endif
+> =20
+>  [LibraryClasses.common.UEFI_APPLICATION]
+>    PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+> @@ -642,6 +648,16 @@ [Components]
+> =20
+>    MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+> =20
+> +!if $(TPM2_ENABLE) =3D=3D TRUE
+> +  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf {
+> +    <LibraryClasses>
+> +      Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibRouter/Tpm2Device=
+LibRouterDxe.inf
+> +      NULL|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2InstanceLibDTpm.i=
+nf
+> +      NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1=
+.inf
+> +      NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSh=
+a256.inf
+> +  }
+> +!endif
+> +
+>    MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
+>      <LibraryClasses>
+>  !if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
+> diff --git a/OvmfPkg/OvmfPkgX64.fdf b/OvmfPkg/OvmfPkgX64.fdf
+> index c0173e7adf5f..1a46104fc63d 100644
+> --- a/OvmfPkg/OvmfPkgX64.fdf
+> +++ b/OvmfPkg/OvmfPkgX64.fdf
+> @@ -392,6 +392,10 @@ [FV.DXEFV]
+>  INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+>  !endif
+> =20
+> +!if $(TPM2_ENABLE) =3D=3D TRUE
+> +INF  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
+> +!endif
+> +
+
+(3) In the DSC file, you are adding Tcg2Dxe between RuntimeDxe and
+SecurityStubDxe; can you please stick with the same in the FDF file?
+It's easier to read.
+
+Alternatively, you can add Tcg2Dxe after VariableRuntimeDxe too, of
+course, but then the DSC file should follow suit. Makes no difference
+functionally, but it's easier to read.
+
+>  ######################################################################=
+##########
+> =20
+>  [FV.FVMAIN_COMPACT]
+>=20
+
+Thanks!
+Laszlo
