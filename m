@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1etxpe-00071H-VV
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:51:51 -0500
+	(envelope-from <stefanha@gmail.com>) id 1etxpf-00071N-KQ
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:51:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1etxpb-0002cC-Tm
+	(envelope-from <stefanha@gmail.com>) id 1etxpc-0002d7-J0
 	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:51:51 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43164 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1etxpb-0002bS-Px
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:51:47 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3EDAE76FB9
-	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 15:51:47 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  8 Mar 2018 16:51:45 +0100
-Message-Id: <20180308155145.19315-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] scsi: support NDOB (no data-out buffer) for
- WRITE SAME commands
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:40708)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1etxpc-0002bb-Ba
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:51:48 -0500
+Received: by mail-wm0-x22f.google.com with SMTP id t6so144396wmt.5
+	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 07:51:48 -0800 (PST)
+Date: Thu, 8 Mar 2018 15:51:45 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180308155145.GD2769@stefanha-x1.localdomain>
+References: <4509561520419741@web56g.yandex.ru>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Ycz6tD7Th1CMF4v7"
+Content-Disposition: inline
+In-Reply-To: <4509561520419741@web56g.yandex.ru>
+Subject: Re: [Qemu-devel] BUG? Using memory after freeing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +29,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com
+To: Aleksey Kuleshov <rndfax@yandex.ru>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-A NDOB bit set to one specifies that the disk shall not transfer data
-from the data-out buffer and shall process the command as if the data-out
-buffer contained user data set to all zeroes.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/scsi/scsi-bus.c       | 2 +-
- hw/scsi/scsi-disk.c      | 2 +-
- tests/virtio-scsi-test.c | 6 ++++++
- 3 files changed, 8 insertions(+), 2 deletions(-)
+--Ycz6tD7Th1CMF4v7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index 1eaeffc830..9646743a7d 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -944,7 +944,7 @@ static int scsi_req_xfer(SCSICommand *cmd, SCSIDevice *dev, uint8_t *buf)
-         break;
-     case WRITE_SAME_10:
-     case WRITE_SAME_16:
--        cmd->xfer = dev->blocksize;
-+        cmd->xfer = buf[1] & 1 ? 0 : dev->blocksize;
-         break;
-     case READ_CAPACITY_10:
-         cmd->xfer = 8;
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index c65c1ce56d..5b7a48f5a5 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -1807,7 +1807,7 @@ static void scsi_disk_emulate_write_same(SCSIDiskReq *r, uint8_t *inbuf)
-         return;
-     }
- 
--    if (buffer_is_zero(inbuf, s->qdev.blocksize)) {
-+    if ((req->cmd.buf[1] & 0x1) || buffer_is_zero(inbuf, s->qdev.blocksize)) {
-         int flags = (req->cmd.buf[1] & 0x8) ? BDRV_REQ_MAY_UNMAP : 0;
- 
-         /* The request is used as the AIO opaque value, so add a ref.  */
-diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
-index 7393d69bb2..037872bb98 100644
---- a/tests/virtio-scsi-test.c
-+++ b/tests/virtio-scsi-test.c
-@@ -216,6 +216,9 @@ static void test_unaligned_write_same(void)
-     const uint8_t write_same_cdb_2[VIRTIO_SCSI_CDB_SIZE] = {
-         0x41, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x33, 0x00, 0x00
-     };
-+    const uint8_t write_same_cdb_ndob[VIRTIO_SCSI_CDB_SIZE] = {
-+        0x41, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x33, 0x00, 0x00
-+    };
- 
-     vs = qvirtio_scsi_pci_init(PCI_SLOT);
- 
-@@ -225,6 +228,9 @@ static void test_unaligned_write_same(void)
-     g_assert_cmphex(0, ==,
-         virtio_scsi_do_command(vs, write_same_cdb_2, NULL, 0, buf2, 512, NULL));
- 
-+    g_assert_cmphex(0, ==,
-+        virtio_scsi_do_command(vs, write_same_cdb_ndob, NULL, 0, NULL, 0, NULL));
-+
-     qvirtio_scsi_pci_free(vs);
- }
- 
--- 
-2.14.3
+On Wed, Mar 07, 2018 at 01:49:01PM +0300, Aleksey Kuleshov wrote:
+> Hello!
+
+Thanks for the email!  I have CCed the PCI maintainers, Michael Tsirkin
+and Marcel Apfelbaum.
+
+In the future you can find out who to contact using:
+
+  $ scripts/get_maintainers -f hw/pci/pci_bridge.c
+
+> Explanation of what I saw is follows.
+>=20
+> In hw/pci/pci_bridge.c function pci_bridge_update_mappings does follows:
+> ```
+> void pci_bridge_update_mappings(PCIBridge *br)
+> {
+>     PCIBridgeWindows *w =3D br->windows;
+>=20
+>     /* Make updates atomic to: handle the case of one VCPU updating the b=
+ridge
+>      * while another accesses an unaffected region. */
+>     memory_region_transaction_begin();
+>     pci_bridge_region_del(br, br->windows);
+>     br->windows =3D pci_bridge_region_init(br);
+>     memory_region_transaction_commit();
+>     pci_bridge_region_cleanup(br, w);
+> }
+> ```
+>=20
+> It calls memory_region_transaction_commit which calls flatview_unref:
+> ```
+> static void flatview_unref(FlatView *view)
+> {
+>     if (atomic_fetch_dec(&view->ref) =3D=3D 1) {
+>         trace_flatview_destroy_rcu(view, view->root);
+>         assert(view->root);
+>         call_rcu(view, flatview_destroy, rcu);
+>     }
+> }
+> ```
+> As far as I understood, call_rcu can be considered as a deferred call to =
+flatview_destroy.
+>=20
+> Then in pci_bridge_update_mappings there is a call to pci_bridge_region_c=
+leanup which does:
+> ```
+> static void pci_bridge_region_cleanup(PCIBridge *br, PCIBridgeWindows *w)
+> {
+>     object_unparent(OBJECT(&w->alias_io));
+>     object_unparent(OBJECT(&w->alias_mem));
+>     object_unparent(OBJECT(&w->alias_pref_mem));
+>     object_unparent(OBJECT(&w->alias_vga[QEMU_PCI_VGA_IO_LO]));
+>     object_unparent(OBJECT(&w->alias_vga[QEMU_PCI_VGA_IO_HI]));
+>     object_unparent(OBJECT(&w->alias_vga[QEMU_PCI_VGA_MEM]));
+>     g_free(w);
+> }
+> ```
+> Note g_free(w). "w" holds MemoryRegions, which are part of that FlatView
+> which is going to be destroyed some time later in the future.
+>=20
+> When RCU thread kicks in, flatview_destroy is called on MemoryRegions whi=
+ch were
+> part of that "w" which is now freed and QEMU seg faults.
+>=20
+
+--Ycz6tD7Th1CMF4v7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaoVwRAAoJEJykq7OBq3PIFPUH/jE3rKYv7Oi/j+kvKgn33aQs
+wWWwBAWFqIhwSewYilvFzL019sRZ8gUp9jTmZZlqgxoy/vXpL54BEXws/zQVP/qX
+QSYKao5Y4/pR/eExleQcbv2th+EstyXlZhXOOw5eNN3UgdrNGWFZjUNtFJ09aoxD
+ruZh3lkSMsIeR8xwFBN3Vp/nBzzK7RMBdj6dU4uAMDuCTFBNjIdl2rNU072SPL03
+yIcsHJakU984fwPvbfSUV2qs1Vz940gYHWTlOhT/5Zm9doNX68t8lA61JlDs1zmA
+8Rsr5PEnGXgKckIxKhhLlBFpvj3zLNjqmDVKF+JRVv9Bf5SVkrcCSLCQzPNfWSo=
+=xHPv
+-----END PGP SIGNATURE-----
+
+--Ycz6tD7Th1CMF4v7--
