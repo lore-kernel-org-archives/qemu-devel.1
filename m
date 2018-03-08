@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eu0Yu-0004YP-Pf
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eu0Yu-0004YQ-Q5
 	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:46:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eu0Yp-0003J6-S6
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eu0Yp-0003JE-So
 	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:46:44 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu,  8 Mar 2018 21:46:34 +0300
-Message-Id: <20180308184636.178534-4-vsementsov@virtuozzo.com>
+Date: Thu,  8 Mar 2018 21:46:32 +0300
+Message-Id: <20180308184636.178534-2-vsementsov@virtuozzo.com>
 In-Reply-To: <20180308184636.178534-1-vsementsov@virtuozzo.com>
 References: <20180308184636.178534-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 3/5] nbd/server: fix: check client->closing
- before reply sending
+Subject: [Qemu-devel] [PATCH 1/5] nbd/server: move
+ nbd_co_send_structured_error up
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +23,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: pbonzini@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
+To be reused in nbd_co_send_sparse_read() in the following patch.
+
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
-
-It's like an RFC. I'm not sure, but this place looks like a bug. Shouldn't
-we chack client-closing even before nbd_client_receive_next_request() call?
-
- nbd/server.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ nbd/server.c | 48 ++++++++++++++++++++++++------------------------
+ 1 file changed, 24 insertions(+), 24 deletions(-)
 
 diff --git a/nbd/server.c b/nbd/server.c
-index e0de431e10..97b45a21fa 100644
+index 4990a5826e..c406b0656d 100644
 --- a/nbd/server.c
 +++ b/nbd/server.c
-@@ -1547,10 +1547,6 @@ static coroutine_fn void nbd_trip(void *opaque)
-         goto disconnect;
-     }
+@@ -1341,6 +1341,30 @@ static int coroutine_fn nbd_co_send_structured_read(NBDClient *client,
+     return nbd_co_send_iov(client, iov, 2, errp);
+ }
  
--    if (ret < 0) {
--        goto reply;
--    }
--
-     if (client->closing) {
-         /*
-          * The client may be closed when we are blocked in
-@@ -1559,6 +1555,10 @@ static coroutine_fn void nbd_trip(void *opaque)
-         goto done;
-     }
- 
-+    if (ret < 0) {
-+        goto reply;
-+    }
++static int coroutine_fn nbd_co_send_structured_error(NBDClient *client,
++                                                     uint64_t handle,
++                                                     uint32_t error,
++                                                     const char *msg,
++                                                     Error **errp)
++{
++    NBDStructuredError chunk;
++    int nbd_err = system_errno_to_nbd_errno(error);
++    struct iovec iov[] = {
++        {.iov_base = &chunk, .iov_len = sizeof(chunk)},
++        {.iov_base = (char *)msg, .iov_len = msg ? strlen(msg) : 0},
++    };
 +
-     switch (request.type) {
-     case NBD_CMD_READ:
-         /* XXX: NBD Protocol only documents use of FUA with WRITE */
++    assert(nbd_err);
++    trace_nbd_co_send_structured_error(handle, nbd_err,
++                                       nbd_err_lookup(nbd_err), msg ? msg : "");
++    set_be_chunk(&chunk.h, NBD_REPLY_FLAG_DONE, NBD_REPLY_TYPE_ERROR, handle,
++                 sizeof(chunk) - sizeof(chunk.h) + iov[1].iov_len);
++    stl_be_p(&chunk.error, nbd_err);
++    stw_be_p(&chunk.message_length, iov[1].iov_len);
++
++    return nbd_co_send_iov(client, iov, 1 + !!iov[1].iov_len, errp);
++}
++
+ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
+                                                 uint64_t handle,
+                                                 uint64_t offset,
+@@ -1400,30 +1424,6 @@ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
+     return ret;
+ }
+ 
+-static int coroutine_fn nbd_co_send_structured_error(NBDClient *client,
+-                                                     uint64_t handle,
+-                                                     uint32_t error,
+-                                                     const char *msg,
+-                                                     Error **errp)
+-{
+-    NBDStructuredError chunk;
+-    int nbd_err = system_errno_to_nbd_errno(error);
+-    struct iovec iov[] = {
+-        {.iov_base = &chunk, .iov_len = sizeof(chunk)},
+-        {.iov_base = (char *)msg, .iov_len = msg ? strlen(msg) : 0},
+-    };
+-
+-    assert(nbd_err);
+-    trace_nbd_co_send_structured_error(handle, nbd_err,
+-                                       nbd_err_lookup(nbd_err), msg ? msg : "");
+-    set_be_chunk(&chunk.h, NBD_REPLY_FLAG_DONE, NBD_REPLY_TYPE_ERROR, handle,
+-                 sizeof(chunk) - sizeof(chunk.h) + iov[1].iov_len);
+-    stl_be_p(&chunk.error, nbd_err);
+-    stw_be_p(&chunk.message_length, iov[1].iov_len);
+-
+-    return nbd_co_send_iov(client, iov, 1 + !!iov[1].iov_len, errp);
+-}
+-
+ /* nbd_co_receive_request
+  * Collect a client request. Return 0 if request looks valid, -EIO to drop
+  * connection right away, and any other negative value to report an error to
 -- 
 2.11.1
