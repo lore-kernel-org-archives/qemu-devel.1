@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groeck7@gmail.com>) id 1etx7A-0003I3-EM
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:05:54 -0500
+	(envelope-from <laurent@vivier.eu>) id 1etxBc-0005DF-9e
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:10:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groeck7@gmail.com>) id 1etx76-000126-GV
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:05:52 -0500
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:45084)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <groeck7@gmail.com>) id 1etx76-00010R-An
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:05:48 -0500
-Received: by mail-pf0-x243.google.com with SMTP id h19so2429287pfd.12
-	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 07:05:48 -0800 (PST)
-Sender: Guenter Roeck <groeck7@gmail.com>
-References: <1520444223-8389-1-git-send-email-linux@roeck-us.net>
-	<CAFEAcA8iFYGhzmLm6pyZi6tg=Di1P=vi_Enyw_ia1M34B3t8aw@mail.gmail.com>
-	<1cb9cc42-c7c9-5124-a615-27914d23b05c@roeck-us.net>
-	<CAFEAcA-+J7MUSssjPZ5BTNzGx_4h0YANdCegGfWNzYmoNatcqg@mail.gmail.com>
-From: Guenter Roeck <linux@roeck-us.net>
-Message-ID: <7bd98eb6-a657-71f3-4d9e-0ea5585db2f2@roeck-us.net>
-Date: Thu, 8 Mar 2018 07:05:45 -0800
+	(envelope-from <laurent@vivier.eu>) id 1etxBY-0003rh-Tw
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:10:28 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:56295)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1etxBY-0003oN-JA
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:10:24 -0500
+References: <20180308144733.25615-1-peter.maydell@linaro.org>
+	<20180308144733.25615-2-peter.maydell@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <fce7cfb1-9ab1-10b6-eb96-2488eb27da04@vivier.eu>
+Date: Thu, 8 Mar 2018 16:10:06 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-+J7MUSssjPZ5BTNzGx_4h0YANdCegGfWNzYmoNatcqg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180308144733.25615-2-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] fsl-imx6: Swap Ethernet interrupt defines
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] linux-user: Drop unicore32 code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,32 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Chris Healy <cphealy@gmail.com>, Jason Wang <jasowang@redhat.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Bill Paul <wpaul@windriver.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Riku Voipio <riku.voipio@iki.fi>, Guan Xuetao <gxt@mprc.pku.edu.cn>
 
-On 03/08/2018 06:51 AM, Peter Maydell wrote:
-> On 8 March 2018 at 14:47, Guenter Roeck <linux@roeck-us.net> wrote:
->> On 03/08/2018 02:50 AM, Peter Maydell wrote:
->>> So do the works-by-accident kernels fail on QEMU because
->>> we don't emulate some bit of the ethernet device ?
->>> Ideally we could fix that so we could boot newer kernels
->>> without breaking the old ones...
+Le 08/03/2018 à 15:47, Peter Maydell a écrit :
+> We dropped the unicore32-linux-user target in commit 5e2b40f7271cf9
+> in 2016. Nobody has made any attempt to fix the issues that
+> caused us to drop it, so remove the associated code.
+> (The system emulation parts of unicore32 remain.)
 > 
->>
->> I don't know if a fix working for all versions of Linux is even possible.
->> Creating both interrupts might be an option, but would likely cause
->> other problems since some versions of Linux would handle the same
->> interrupt twice, while others expect the second interrupt
->> to be associated with the timer.
-> 
-> Did the older Linux kernels work on the real hardware? (I
-> would guess so, but sometimes these things only get tested
-> on emulation...) If so, then in theory "make QEMU work like
-> the hardware" should allow all the kernels to work on QEMU.
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  linux-user/qemu.h                     |   5 +-
+>  linux-user/syscall_defs.h             |   6 +-
+>  linux-user/unicore32/syscall_nr.h     | 371 ----------------------------------
+>  linux-user/unicore32/target_cpu.h     |  27 ---
+>  linux-user/unicore32/target_elf.h     |  14 --
+>  linux-user/unicore32/target_signal.h  |  30 ---
+>  linux-user/unicore32/target_structs.h |  58 ------
+>  linux-user/unicore32/target_syscall.h |  62 ------
+>  linux-user/unicore32/termbits.h       |   2 -
+>  linux-user/elfload.c                  |  72 -------
+>  linux-user/main.c                     |  99 +--------
+>  linux-user/signal.c                   |   5 +-
+>  12 files changed, 6 insertions(+), 745 deletions(-)
+>  delete mode 100644 linux-user/unicore32/syscall_nr.h
+>  delete mode 100644 linux-user/unicore32/target_cpu.h
+>  delete mode 100644 linux-user/unicore32/target_elf.h
+>  delete mode 100644 linux-user/unicore32/target_signal.h
+>  delete mode 100644 linux-user/unicore32/target_structs.h
+>  delete mode 100644 linux-user/unicore32/target_syscall.h
+>  delete mode 100644 linux-user/unicore32/termbits.h
 > 
 
-Good point. I'll assume that this is the case, and have another look.
-Unfortunately I don't have real hardware, so it is difficult to observe
-the differences for real.
-
-Guenter
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
