@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46038)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eu0B4-0001px-BU
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:22:07 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eu0B9-0001sq-4Y
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:22:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eu0B1-0000vo-5z
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:22:06 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20180207125037.13510-1-vsementsov@virtuozzo.com>
-	<20180207125037.13510-2-vsementsov@virtuozzo.com>
-	<20180306153213.GK31045@stefanha-x1.localdomain>
-	<49f2f289-ce1c-6e24-8b54-bb5b5c1601bc@redhat.com>
-	<9ef1c947-616f-0cde-040d-7a4f0fc8f146@virtuozzo.com>
-Message-ID: <c8e6c246-1311-fd52-6267-b78eb02bfd07@virtuozzo.com>
-Date: Thu, 8 Mar 2018 21:21:54 +0300
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eu0B5-0000xU-TW
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:22:11 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:53049)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eu0B5-0000xC-JO
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:22:07 -0500
+Received: by mail-wm0-x243.google.com with SMTP id t3so1051176wmc.2
+	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 10:22:07 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180308172834.3281-1-pbonzini@redhat.com>
+	<20180308172834.3281-2-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <6e2c1965-9b88-18e4-910f-d5521b5674ff@amsat.org>
+Date: Thu, 8 Mar 2018 15:22:04 -0300
 MIME-Version: 1.0
-In-Reply-To: <9ef1c947-616f-0cde-040d-7a4f0fc8f146@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20180308172834.3281-2-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] block/accounting: introduce latency
- histogram
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] qom: introduce
+ object_class_get_list_sorted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,87 +36,244 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, den@openvz.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-08.03.2018 21:14, Vladimir Sementsov-Ogievskiy wrote:
-> 08.03.2018 20:31, Eric Blake wrote:
->> On 03/06/2018 09:32 AM, Stefan Hajnoczi wrote:
->>> On Wed, Feb 07, 2018 at 03:50:36PM +0300, Vladimir=20
->>> Sementsov-Ogievskiy wrote:
->>>> Introduce latency histogram statics for block devices.
->>>> For each accounted operation type latency region [0, +inf) is
->>>> divided into subregions by several points. Then, calculate
->>>> hits for each subregion.
->>>>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>> ---
->>
->>> According to Wikipedia and Mathworld, "intervals" and "bins" are
->>> commonly used terms:
->>> https://en.wikipedia.org/wiki/Histogram
->>> http://mathworld.wolfram.com/Histogram.html
->>>
->>> I suggest:
->>>
->>> =C2=A0=C2=A0 typedef struct {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* The following histogram is repr=
-esented like this:
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 5|=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 4|=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 3| *=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 2| *=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0 *
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 1| *=C2=A0=C2=A0=C2=A0 *=
-=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0 *
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0 +------------------
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 10=C2=A0=C2=A0 50=C2=A0=C2=A0 100
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * BlockLatencyHistogram hist=
-ogram =3D {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 .n=
-bins =3D 4,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 .i=
-ntervals =3D {10, 50, 100},
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 .b=
-ins =3D {3, 1, 5, 2},
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * };
->>
->> The name 'intervals' is still slightly ambiguous: does it hold the=20
->> boundary point (0-10 for 10 slots, 10-50 for 40 slots, 50-100, for 50=20
->> slots, then 100-INF) or is it the interval size of each slot (first=20
->> bin is 10 slots for 0-10, next bin is 50 slots wide so 10-60, next=20
->> bin is 100 slots wide so 60-160, everything else is 160-INF).=C2=A0 But=
-=20
->> the ascii-art diagram plus the text is sufficient to resolve the=20
->> intent if you keep that name (I don't have a suggestion for a better=20
->> name).
->>
->
-> Hm. these numbers are actually boundary points of histogram intervals,=20
-> not intervals itself. And, wiki says "The bins are usually specified=20
-> as consecutive, non-overlapping intervals of a variable.", so,=20
-> intervals are bins.
->
-> So, what about:
->
-> 1. interval_boundaries
-> 2. bin_boundaries
-> 3. boundaries
->
-> (and same names with s/_/-/ for qapi)
->
->
+On 03/08/2018 02:28 PM, Paolo Bonzini wrote:
+> Unify half a dozen copies of very similar code (the only difference being
+> whether comparisons were case-sensitive) and use it also in Tricore,
+> which did not do any sorting of CPU model names.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Also, now I doubt, is it a good idea to share same bin boundaries for=20
-each io type.
-
---=20
-Best regards,
-Vladimir
+> ---
+>  include/qom/object.h    | 11 +++++++++++
+>  qdev-monitor.c          |  9 +--------
+>  qom/object.c            | 13 +++++++++++++
+>  target/alpha/cpu.c      | 15 +--------------
+>  target/hppa/cpu.c       | 15 +--------------
+>  target/lm32/cpu.c       | 15 +--------------
+>  target/sh4/cpu.c        | 15 +--------------
+>  target/tricore/helper.c |  2 +-
+>  8 files changed, 30 insertions(+), 65 deletions(-)
+> 
+> diff --git a/include/qom/object.h b/include/qom/object.h
+> index 4f07090db0..96ce81bc5e 100644
+> --- a/include/qom/object.h
+> +++ b/include/qom/object.h
+> @@ -913,6 +913,17 @@ void object_class_foreach(void (*fn)(ObjectClass *klass, void *opaque),
+>  GSList *object_class_get_list(const char *implements_type,
+>                                bool include_abstract);
+>  
+> +/**
+> + * object_class_get_list_sorted:
+> + * @implements_type: The type to filter for, including its derivatives.
+> + * @include_abstract: Whether to include abstract classes.
+> + *
+> + * Returns: A singly-linked list of the classes in alphabetical
+> + * case-insensitive order.
+> + */
+> +GSList *object_class_get_list_sorted(const char *implements_type,
+> +                              bool include_abstract);
+> +
+>  /**
+>   * object_ref:
+>   * @obj: the object
+> diff --git a/qdev-monitor.c b/qdev-monitor.c
+> index b7e3291f8b..61e0300991 100644
+> --- a/qdev-monitor.c
+> +++ b/qdev-monitor.c
+> @@ -122,12 +122,6 @@ static void qdev_print_devinfo(DeviceClass *dc)
+>      error_printf("\n");
+>  }
+>  
+> -static gint devinfo_cmp(gconstpointer a, gconstpointer b)
+> -{
+> -    return strcasecmp(object_class_get_name((ObjectClass *)a),
+> -                      object_class_get_name((ObjectClass *)b));
+> -}
+> -
+>  static void qdev_print_devinfos(bool show_no_user)
+>  {
+>      static const char *cat_name[DEVICE_CATEGORY_MAX + 1] = {
+> @@ -146,8 +140,7 @@ static void qdev_print_devinfos(bool show_no_user)
+>      int i;
+>      bool cat_printed;
+>  
+> -    list = g_slist_sort(object_class_get_list(TYPE_DEVICE, false),
+> -                        devinfo_cmp);
+> +    list = object_class_get_list_sorted(TYPE_DEVICE, false);
+>  
+>      for (i = 0; i <= DEVICE_CATEGORY_MAX; i++) {
+>          cat_printed = false;
+> diff --git a/qom/object.c b/qom/object.c
+> index 755ad03819..6088f55943 100644
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -891,6 +891,19 @@ GSList *object_class_get_list(const char *implements_type,
+>      return list;
+>  }
+>  
+> +static gint object_class_cmp(gconstpointer a, gconstpointer b)
+> +{
+> +    return strcasecmp(object_class_get_name((ObjectClass *)a),
+> +                      object_class_get_name((ObjectClass *)b));
+> +}
+> +
+> +GSList *object_class_get_list_sorted(const char *implements_type,
+> +                                     bool include_abstract)
+> +{
+> +    return g_slist_sort(object_class_get_list(implements_type, include_abstract),
+> +                        object_class_cmp);
+> +}
+> +
+>  void object_ref(Object *obj)
+>  {
+>      if (!obj) {
+> diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
+> index 55675ce419..b08078e7fc 100644
+> --- a/target/alpha/cpu.c
+> +++ b/target/alpha/cpu.c
+> @@ -71,18 +71,6 @@ static void alpha_cpu_realizefn(DeviceState *dev, Error **errp)
+>      acc->parent_realize(dev, errp);
+>  }
+>  
+> -/* Sort alphabetically by type name. */
+> -static gint alpha_cpu_list_compare(gconstpointer a, gconstpointer b)
+> -{
+> -    ObjectClass *class_a = (ObjectClass *)a;
+> -    ObjectClass *class_b = (ObjectClass *)b;
+> -    const char *name_a, *name_b;
+> -
+> -    name_a = object_class_get_name(class_a);
+> -    name_b = object_class_get_name(class_b);
+> -    return strcmp(name_a, name_b);
+> -}
+> -
+>  static void alpha_cpu_list_entry(gpointer data, gpointer user_data)
+>  {
+>      ObjectClass *oc = data;
+> @@ -100,8 +88,7 @@ void alpha_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+>      };
+>      GSList *list;
+>  
+> -    list = object_class_get_list(TYPE_ALPHA_CPU, false);
+> -    list = g_slist_sort(list, alpha_cpu_list_compare);
+> +    list = object_class_get_list_sorted(TYPE_ALPHA_CPU, false);
+>      (*cpu_fprintf)(f, "Available CPUs:\n");
+>      g_slist_foreach(list, alpha_cpu_list_entry, &s);
+>      g_slist_free(list);
+> diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
+> index 969f628f0a..c261b6b090 100644
+> --- a/target/hppa/cpu.c
+> +++ b/target/hppa/cpu.c
+> @@ -110,18 +110,6 @@ static void hppa_cpu_realizefn(DeviceState *dev, Error **errp)
+>  #endif
+>  }
+>  
+> -/* Sort hppabetically by type name. */
+> -static gint hppa_cpu_list_compare(gconstpointer a, gconstpointer b)
+> -{
+> -    ObjectClass *class_a = (ObjectClass *)a;
+> -    ObjectClass *class_b = (ObjectClass *)b;
+> -    const char *name_a, *name_b;
+> -
+> -    name_a = object_class_get_name(class_a);
+> -    name_b = object_class_get_name(class_b);
+> -    return strcmp(name_a, name_b);
+> -}
+> -
+>  static void hppa_cpu_list_entry(gpointer data, gpointer user_data)
+>  {
+>      ObjectClass *oc = data;
+> @@ -138,8 +126,7 @@ void hppa_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+>      };
+>      GSList *list;
+>  
+> -    list = object_class_get_list(TYPE_HPPA_CPU, false);
+> -    list = g_slist_sort(list, hppa_cpu_list_compare);
+> +    list = object_class_get_list_sorted(TYPE_HPPA_CPU, false);
+>      (*cpu_fprintf)(f, "Available CPUs:\n");
+>      g_slist_foreach(list, hppa_cpu_list_entry, &s);
+>      g_slist_free(list);
+> diff --git a/target/lm32/cpu.c b/target/lm32/cpu.c
+> index 96c2499d0b..0003152469 100644
+> --- a/target/lm32/cpu.c
+> +++ b/target/lm32/cpu.c
+> @@ -32,18 +32,6 @@ static void lm32_cpu_set_pc(CPUState *cs, vaddr value)
+>      cpu->env.pc = value;
+>  }
+>  
+> -/* Sort alphabetically by type name. */
+> -static gint lm32_cpu_list_compare(gconstpointer a, gconstpointer b)
+> -{
+> -    ObjectClass *class_a = (ObjectClass *)a;
+> -    ObjectClass *class_b = (ObjectClass *)b;
+> -    const char *name_a, *name_b;
+> -
+> -    name_a = object_class_get_name(class_a);
+> -    name_b = object_class_get_name(class_b);
+> -    return strcmp(name_a, name_b);
+> -}
+> -
+>  static void lm32_cpu_list_entry(gpointer data, gpointer user_data)
+>  {
+>      ObjectClass *oc = data;
+> @@ -65,8 +53,7 @@ void lm32_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+>      };
+>      GSList *list;
+>  
+> -    list = object_class_get_list(TYPE_LM32_CPU, false);
+> -    list = g_slist_sort(list, lm32_cpu_list_compare);
+> +    list = object_class_get_list_sorted(TYPE_LM32_CPU, false);
+>      (*cpu_fprintf)(f, "Available CPUs:\n");
+>      g_slist_foreach(list, lm32_cpu_list_entry, &s);
+>      g_slist_free(list);
+> diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
+> index 6302cfda3a..541ffc2d97 100644
+> --- a/target/sh4/cpu.c
+> +++ b/target/sh4/cpu.c
+> @@ -85,18 +85,6 @@ typedef struct SuperHCPUListState {
+>      FILE *file;
+>  } SuperHCPUListState;
+>  
+> -/* Sort alphabetically by type name. */
+> -static gint superh_cpu_list_compare(gconstpointer a, gconstpointer b)
+> -{
+> -    ObjectClass *class_a = (ObjectClass *)a;
+> -    ObjectClass *class_b = (ObjectClass *)b;
+> -    const char *name_a, *name_b;
+> -
+> -    name_a = object_class_get_name(class_a);
+> -    name_b = object_class_get_name(class_b);
+> -    return strcmp(name_a, name_b);
+> -}
+> -
+>  static void superh_cpu_list_entry(gpointer data, gpointer user_data)
+>  {
+>      SuperHCPUListState *s = user_data;
+> @@ -114,8 +102,7 @@ void sh4_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+>      };
+>      GSList *list;
+>  
+> -    list = object_class_get_list(TYPE_SUPERH_CPU, false);
+> -    list = g_slist_sort(list, superh_cpu_list_compare);
+> +    list = object_class_get_list_sorted(TYPE_SUPERH_CPU, false);
+>      g_slist_foreach(list, superh_cpu_list_entry, &s);
+>      g_slist_free(list);
+>  }
+> diff --git a/target/tricore/helper.c b/target/tricore/helper.c
+> index 45276d3782..dad7eea085 100644
+> --- a/target/tricore/helper.c
+> +++ b/target/tricore/helper.c
+> @@ -101,7 +101,7 @@ void tricore_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+>      };
+>      GSList *list;
+>  
+> -    list = object_class_get_list(TYPE_TRICORE_CPU, false);
+> +    list = object_class_get_list_sorted(TYPE_TRICORE_CPU, false);
+>      (*cpu_fprintf)(f, "Available CPUs:\n");
+>      g_slist_foreach(list, tricore_cpu_list_entry, &s);
+>      g_slist_free(list);
+> 
