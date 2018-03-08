@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1etscH-0005Vd-IM
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:17:44 -0500
+	(envelope-from <berrange@redhat.com>) id 1etsgn-0006wZ-DV
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:22:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1etscB-00048T-Se
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:17:41 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52216 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1etscB-00047V-NI
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:17:35 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6007C4000787
-	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 10:17:35 +0000 (UTC)
-Date: Thu, 8 Mar 2018 10:17:28 +0000
+	(envelope-from <berrange@redhat.com>) id 1etsgj-0006YG-D7
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:22:21 -0500
+Date: Thu, 8 Mar 2018 10:21:53 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180308101728.GG4718@redhat.com>
+Message-ID: <20180308102153.GH4718@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180307144951.d75lo5rgzi2vf27z@eukaryote>
-	<20180307151836.GK20201@redhat.com>
-	<20180308075245.lgzredyhn2paawg4@sirius.home.kraxel.org>
+References: <20180307185946.29366-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180308075245.lgzredyhn2paawg4@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] [RFC] Defining firmware (OVMF,
- et al) metadata format & file
+In-Reply-To: <20180307185946.29366-1-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 00/37] x-blockdev-create for protocols
+ and qcow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,36 +24,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, lersek@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, jdurgin@redhat.com, pkrempa@redhat.com, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, namei.unix@gmail.com
 
-On Thu, Mar 08, 2018 at 08:52:45AM +0100, Gerd Hoffmann wrote:
->   Hi,
+On Wed, Mar 07, 2018 at 07:59:09PM +0100, Kevin Wolf wrote:
+> This series implements a minimal QMP command that allows to create an
+> image file on the protocol level or an image format on a given block
+> node.
 > 
-> > > [*] Open question: Who, between QEMU and libvirt, should define the said
-> > > firmware metadata format and file?
-> > 
-> > IMHO QEMU should be defining the format, because the file will contain
-> > info about certain QEMU features associated with the firmware (eg smm).
-> > Also there are potentially other non-libvirt mgmt apps that spawn QEMU
-> > which would like this info (eg libguestfs), so having libvirt define the
-> > format is inappropriate.
-> > 
-> > I'd suggest we just need something in docs/specs/firmware-metadata.rst
-> > for QEMU source tree.
-> > 
-> > Potentially QEMU could even use the metadata files itself for finding
-> > the default firmeware images, instead of compiling this info into its
-> > binaries. I wouldn't suggest we need todo that right away, but bear it
-> > in mind as a potential use case.
+> Eventually, the interface is going to change to some kind of an async
+> command (possibly a (non-)block job), but that will require more work on
+> the job infrastructure first, so let's first QAPIfy image creation in
+> the block drivers. In this series, I'm going for a synchronous command
+> that is prefixed with x- for now.
 > 
-> With qemu using this itself in mind it probably makes sense to specify
-> this as qapi schema.  That'll simplify parsing and using these files in
-> qemu, and possibly simplifies things on the libvirt side too.
+> This series converts qcow2 and all protocol drivers that allow an actual
+> image creation. This means that drivers which only check if the already
+> existing storage is good enough are not converted (e.g. host_device,
+> iscsi). The old behaviour was useful because 'qemu-img create' wants to
+> create both protocol and format layer, but with the separation in QMP,
+> you can just leave out the protocol layer creation when the device
+> already exists.
 
-I was thinking of an 'ini' style format, similar to that used by systemd
-unit files, but a JSON format file is a nicer fit with QEMU & Libvirt if
-we describe it with qapi.
+Are you going to convert the other format drivers in later versions of
+this series, or leave it upto individual maintaniers to convert the
+rest ? (personally thinking of the luks driver of course)
+
 
 Regards,
 Daniel
