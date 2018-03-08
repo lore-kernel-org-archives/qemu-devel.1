@@ -1,25 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eu0WU-0003hW-MC
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:44:16 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eu0Yu-0004YO-Pe
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:46:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eu0WP-0001qI-RB
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:44:14 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42090 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eu0WP-0001pq-Ke
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:44:09 -0500
-References: <1518692807-25859-1-git-send-email-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5c1674ff-1895-525a-a765-317a30f6f561@redhat.com>
-Date: Thu, 8 Mar 2018 19:43:51 +0100
-MIME-Version: 1.0
-In-Reply-To: <1518692807-25859-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Polish the version strings containing the
- package version
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eu0Yp-0003J1-SG
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:46:44 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu,  8 Mar 2018 21:46:33 +0300
+Message-Id: <20180308184636.178534-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20180308184636.178534-1-vsementsov@virtuozzo.com>
+References: <20180308184636.178534-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v2 2/5] nbd/server: fix sparse read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,218 +19,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: pbonzini@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-On 15/02/2018 12:06, Thomas Huth wrote:
-> Since commit 67a1de0d195a there is no space anymore between the
-> version number and the parentheses when running configure with
-> --with-pkgversion=foo :
-> 
->  $ qemu-system-s390x --version
->  QEMU emulator version 2.11.50(foo)
-> 
-> But the space is included when building without that option
-> when building from a git checkout:
-> 
->  $ qemu-system-s390x --version
->  QEMU emulator version 2.11.50 (v2.11.0-1494-gbec9c64-dirty)
-> 
-> The same confusion exists with the "query-version" QMP command.
-> Let's fix this by introducing a proper QEMU_FULL_VERSION definition
-> that includes the space and parentheses, while the QEMU_PKGVERSION
-> should just cleanly contain the package version string itself.
-> Note that this also changes the behavior of the "query-version" QMP
-> command (the space and parentheses are not included there anymore),
-> but that's supposed to be OK since the strings there are not meant
-> to be parsed by other tools.
-> 
-> Fixes: 67a1de0d195a6185c39b436159c9ffc7720bf979
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1673373
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  Makefile              | 20 +++++++++++---------
->  bsd-user/main.c       |  2 +-
->  configure             |  2 +-
->  linux-user/main.c     |  2 +-
->  qemu-img.c            |  2 +-
->  qemu-io.c             |  2 +-
->  qemu-nbd.c            |  2 +-
->  qga/main.c            |  2 +-
->  scsi/qemu-pr-helper.c |  2 +-
->  ui/cocoa.m            |  2 +-
->  vl.c                  |  2 +-
->  11 files changed, 21 insertions(+), 19 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index b5a6d60..e6afe5c 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -367,21 +367,23 @@ all: $(DOCS) $(TOOLS) $(HELPERS-y) recurse-all modules
->  qemu-version.h: FORCE
->  	$(call quiet-command, \
->  		(cd $(SRC_PATH); \
-> -		printf '#define QEMU_PKGVERSION '; \
->  		if test -n "$(PKGVERSION)"; then \
-> -			printf '"$(PKGVERSION)"\n'; \
-> +			pkgvers="$(PKGVERSION)"; \
->  		else \
->  			if test -d .git; then \
-> -				printf '" ('; \
-> -				git describe --match 'v*' 2>/dev/null | tr -d '\n'; \
-> +				pkgvers=$$(git describe --match 'v*' 2>/dev/null | tr -d '\n');\
->  				if ! git diff-index --quiet HEAD &>/dev/null; then \
-> -					printf -- '-dirty'; \
-> +					pkgvers="$${pkgvers}-dirty"; \
->  				fi; \
-> -				printf ')"\n'; \
-> -			else \
-> -				printf '""\n'; \
->  			fi; \
-> -		fi) > $@.tmp)
-> +		fi; \
-> +		printf "#define QEMU_PKGVERSION \"$${pkgvers}\"\n"; \
-> +		if test -n "$${pkgvers}"; then \
-> +			printf '#define QEMU_FULL_VERSION QEMU_VERSION " (" QEMU_PKGVERSION ")"\n'; \
-> +		else \
-> +			printf '#define QEMU_FULL_VERSION QEMU_VERSION\n'; \
-> +		fi; \
-> +		) > $@.tmp)
->  	$(call quiet-command, if ! cmp -s $@ $@.tmp; then \
->  	  mv $@.tmp $@; \
->  	 else \
-> diff --git a/bsd-user/main.c b/bsd-user/main.c
-> index efef5ff..05aa559 100644
-> --- a/bsd-user/main.c
-> +++ b/bsd-user/main.c
-> @@ -649,7 +649,7 @@ void cpu_loop(CPUSPARCState *env)
->  
->  static void usage(void)
->  {
-> -    printf("qemu-" TARGET_NAME " version " QEMU_VERSION QEMU_PKGVERSION
-> +    printf("qemu-" TARGET_NAME " version " QEMU_FULL_VERSION
->             "\n" QEMU_COPYRIGHT "\n"
->             "usage: qemu-" TARGET_NAME " [options] program [arguments...]\n"
->             "BSD CPU emulator (compiled for %s emulation)\n"
-> diff --git a/configure b/configure
-> index 913e148..5be086a 100755
-> --- a/configure
-> +++ b/configure
-> @@ -1160,7 +1160,7 @@ for opt do
->    ;;
->    --disable-blobs) blobs="no"
->    ;;
-> -  --with-pkgversion=*) pkgversion=" ($optarg)"
-> +  --with-pkgversion=*) pkgversion="$optarg"
->    ;;
->    --with-coroutine=*) coroutine="$optarg"
->    ;;
-> diff --git a/linux-user/main.c b/linux-user/main.c
-> index 7de0e02..dfd4c98 100644
-> --- a/linux-user/main.c
-> +++ b/linux-user/main.c
-> @@ -4068,7 +4068,7 @@ static void handle_arg_strace(const char *arg)
->  
->  static void handle_arg_version(const char *arg)
->  {
-> -    printf("qemu-" TARGET_NAME " version " QEMU_VERSION QEMU_PKGVERSION
-> +    printf("qemu-" TARGET_NAME " version " QEMU_FULL_VERSION
->             "\n" QEMU_COPYRIGHT "\n");
->      exit(EXIT_SUCCESS);
->  }
-> diff --git a/qemu-img.c b/qemu-img.c
-> index 56edc15..e56a15d 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -46,7 +46,7 @@
->  #include "crypto/init.h"
->  #include "trace/control.h"
->  
-> -#define QEMU_IMG_VERSION "qemu-img version " QEMU_VERSION QEMU_PKGVERSION \
-> +#define QEMU_IMG_VERSION "qemu-img version " QEMU_FULL_VERSION \
->                            "\n" QEMU_COPYRIGHT "\n"
->  
->  typedef struct img_cmd_t {
-> diff --git a/qemu-io.c b/qemu-io.c
-> index f554ab6..b0efa96 100644
-> --- a/qemu-io.c
-> +++ b/qemu-io.c
-> @@ -534,7 +534,7 @@ int main(int argc, char **argv)
->              trace_file = trace_opt_parse(optarg);
->              break;
->          case 'V':
-> -            printf("%s version " QEMU_VERSION QEMU_PKGVERSION "\n"
-> +            printf("%s version " QEMU_FULL_VERSION "\n"
->                     QEMU_COPYRIGHT "\n", progname);
->              exit(0);
->          case 'h':
-> diff --git a/qemu-nbd.c b/qemu-nbd.c
-> index ed5d9b5..0af0560 100644
-> --- a/qemu-nbd.c
-> +++ b/qemu-nbd.c
-> @@ -130,7 +130,7 @@ QEMU_HELP_BOTTOM "\n"
->  static void version(const char *name)
->  {
->      printf(
-> -"%s " QEMU_VERSION QEMU_PKGVERSION "\n"
-> +"%s " QEMU_FULL_VERSION "\n"
->  "Written by Anthony Liguori.\n"
->  "\n"
->  QEMU_COPYRIGHT "\n"
-> diff --git a/qga/main.c b/qga/main.c
-> index cb434d8..a877b30 100644
-> --- a/qga/main.c
-> +++ b/qga/main.c
-> @@ -218,7 +218,7 @@ static void usage(const char *cmd)
->  {
->      printf(
->  "Usage: %s [-m <method> -p <path>] [<options>]\n"
-> -"QEMU Guest Agent " QEMU_VERSION QEMU_PKGVERSION "\n"
-> +"QEMU Guest Agent " QEMU_FULL_VERSION "\n"
->  QEMU_COPYRIGHT "\n"
->  "\n"
->  "  -m, --method      transport method: one of unix-listen, virtio-serial,\n"
-> diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
-> index 9fe615c..3facbba 100644
-> --- a/scsi/qemu-pr-helper.c
-> +++ b/scsi/qemu-pr-helper.c
-> @@ -102,7 +102,7 @@ QEMU_HELP_BOTTOM "\n"
->  static void version(const char *name)
->  {
->      printf(
-> -"%s " QEMU_VERSION QEMU_PKGVERSION "\n"
-> +"%s " QEMU_FULL_VERSION "\n"
->  "Written by Paolo Bonzini.\n"
->  "\n"
->  QEMU_COPYRIGHT "\n"
-> diff --git a/ui/cocoa.m b/ui/cocoa.m
-> index 51db47c..a9e173a 100644
-> --- a/ui/cocoa.m
-> +++ b/ui/cocoa.m
-> @@ -1330,7 +1330,7 @@ QemuCocoaView *cocoaView;
->      /* Create the version string*/
->      NSString *version_string;
->      version_string = [[NSString alloc] initWithFormat:
-> -    @"QEMU emulator version %s%s", QEMU_VERSION, QEMU_PKGVERSION];
-> +    @"QEMU emulator version %s", QEMU_FULL_VERSION];
->      [version_label setStringValue: version_string];
->      [superView addSubview: version_label];
->  
-> diff --git a/vl.c b/vl.c
-> index 2187849..6740c27 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -1942,7 +1942,7 @@ static void main_loop(void)
->  
->  static void version(void)
->  {
-> -    printf("QEMU emulator version " QEMU_VERSION QEMU_PKGVERSION "\n"
-> +    printf("QEMU emulator version " QEMU_FULL_VERSION "\n"
->             QEMU_COPYRIGHT "\n");
->  }
->  
-> 
+In case of io error in nbd_co_send_sparse_read we should not
+"goto reply:", as it is fatal error and common behavior is
+disconnect in this case. We should not try to send client an
+error reply, representing channel-io error on previous try to
+send a reply.
 
-Queued, thanks.
+Fix this by handle block-status error in nbd_co_send_sparse_read,
+so nbd_co_send_sparse_read fails only on io error. Then just skip
+common "reply:" code path in nbd_trip.
 
-Paolo
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+
+v2: code movement splitted to 01
+    remove error_report
+    fix indent
+    fix commit message subject line
+    add comment to nbd_co_send_sparse_read (be free to adjust it)
+
+ nbd/server.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/nbd/server.c b/nbd/server.c
+index c406b0656d..e0de431e10 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1365,6 +1365,10 @@ static int coroutine_fn nbd_co_send_structured_error(NBDClient *client,
+     return nbd_co_send_iov(client, iov, 1 + !!iov[1].iov_len, errp);
+ }
+ 
++/* Do sparse read and send structured reply to the client.
++ * Returns -errno if sending fails. bdrv_block_status_above() fail is not
++ * considered as an error, but reported to the client instead (as a structured
++ * error). */
+ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
+                                                 uint64_t handle,
+                                                 uint64_t offset,
+@@ -1385,8 +1389,13 @@ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
+         bool final;
+ 
+         if (status < 0) {
+-            error_setg_errno(errp, -status, "unable to check for holes");
+-            return status;
++            char *msg = g_strdup_printf("unable to check for holes: %s",
++                                        strerror(-status));
++
++            ret = nbd_co_send_structured_error(client, handle, -status, msg,
++                                               errp);
++            g_free(msg);
++            return ret;
+         }
+         assert(pnum && pnum <= size - progress);
+         final = progress + pnum == size;
+@@ -1567,7 +1576,7 @@ static coroutine_fn void nbd_trip(void *opaque)
+                                           request.from, req->data, request.len,
+                                           &local_err);
+             if (ret < 0) {
+-                goto reply;
++                goto replied;
+             }
+             goto done;
+         }
+@@ -1664,6 +1673,8 @@ reply:
+                                        req->data, reply_data_len, &local_err);
+     }
+     g_free(msg);
++
++replied:
+     if (ret < 0) {
+         error_prepend(&local_err, "Failed to send reply: ");
+         goto disconnect;
+-- 
+2.11.1
