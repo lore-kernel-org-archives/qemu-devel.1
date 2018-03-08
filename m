@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eu1l4-0007Mz-Rw
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:03:24 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eu1lb-0007q2-IG
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:03:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eu1l3-0000Qh-3E
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:03:22 -0500
-Received: from mail-oi0-x235.google.com ([2607:f8b0:4003:c06::235]:41771)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eu1l2-0000QT-Qy
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:03:21 -0500
-Received: by mail-oi0-x235.google.com with SMTP id g5so5291416oiy.8
-	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 12:03:20 -0800 (PST)
+	(envelope-from <ehabkost@redhat.com>) id 1eu1lW-0000ZH-MZ
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:03:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59404)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eu1lW-0000Yy-Hj
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:03:50 -0500
+Date: Thu, 8 Mar 2018 17:03:45 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180308200345.GD3417@localhost.localdomain>
+References: <1520530757-4477-1-git-send-email-ian.jackson@eu.citrix.com>
+	<1520530757-4477-4-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <20180308114856.GN4718@redhat.com>
-References: <1520365586-30384-1-git-send-email-mjc@sifive.com>
-	<CAFEAcA_G1tHrBZ=GxAy0b-SLbYU2-XOAUNL0D=8MQeL0Roz_cQ@mail.gmail.com>
-	<CAHNT7NtRnSB-GYHp=v3iM7+_72y43YpZesbYCrnTvCikTiUMuw@mail.gmail.com>
-	<CAHNT7NuqgY-zgPJT4gUJMaHr24E-PwrN=Eje+m1XW24mAf07Ag@mail.gmail.com>
-	<20180308114856.GN4718@redhat.com>
-From: Michael Clark <mjc@sifive.com>
-Date: Fri, 9 Mar 2018 09:03:19 +1300
-Message-ID: <CAHNT7NvnVdEBBWqX5EqTDWjGCuqcO7CGxQTxcHMH-AWeV=Y8TQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL] RISC-V QEMU Port Submission v8.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1520530757-4477-4-git-send-email-ian.jackson@eu.citrix.com>
+Subject: Re: [Qemu-devel] [PATCH 03/11] xen: defer call to xen_restrict
+ until just before os_setup_post
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,126 +28,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: Ian Jackson <ian.jackson@eu.citrix.com>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Fri, Mar 9, 2018 at 12:48 AM, Daniel P. Berrang=C3=A9 <berrange@redhat.c=
-om>
-wrote:
+On Thu, Mar 08, 2018 at 05:39:09PM +0000, Ian Jackson wrote:
+[...]
+> diff --git a/vl.c b/vl.c
+> index dae986b..e6e8e1e 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4719,6 +4719,7 @@ int main(int argc, char **argv, char **envp)
+>          vm_start();
+>      }
+>  
+> +    xen_setup_post();
 
-> On Thu, Mar 08, 2018 at 11:18:30AM +0000, Michael Clark wrote:
-> > On Fri, 9 Mar 2018 at 12:10 AM, Michael Clark <mjc@sifive.com> wrote:
-> >
-> > > On Thu, 8 Mar 2018 at 11:02 PM, Peter Maydell <
-> peter.maydell@linaro.org>
-> > > wrote:
-> > >
-> > >> On 6 March 2018 at 19:46, Michael Clark <mjc@sifive.com> wrote:
-> > >> > -----BEGIN PGP SIGNED MESSAGE-----
-> > >> > Hash: SHA1
-> > >> >
-> > >> > The following changes since commit
-> > >> f32408f3b472a088467474ab152be3b6285b2d7b:
-> > >> >
-> > >> >   misc: don't use hwaddr as a type in trace events (2018-03-06
-> 14:24:30
-> > >> +0000)
-> > >> >
-> > >> > are available in the git repository at:
-> > >> >
-> > >> >   https://github.com/riscv/riscv-qemu.git
-> tags/riscv-qemu-upstream-v8.2
-> > >> >
-> > >> > for you to fetch changes up to 7051b081bf6796e5e84406f6223a7c
-> 4900bf7298:
-> > >> >
-> > >> >   RISC-V - Remove support for adhoc non-standard X_COP
-> local-interrupt
-> > >> (2018-03-07 08:36:03 +1300)
-> > >>
-> > >>
-> > >> Hi -- I would have applied this, but some of the commits
-> > >> have no signed-off-by lines.
-> > >>
-> > >> This is important, and I've already asked for it once. We cannot
-> > >> accept anything that doesn't have a clear record in the commit
-> > >> message of everybody (person or company) who's contributed code
-> > >> to it, indicating that they're happy for their copyrighted
-> > >> contributions to be taken into QEMU under our license. Lists
-> > >> of names without emails in the cover letter are not sufficient.
-> > >>
-> > >> In fact a lot of the last part of this patchset looks like
-> > >> unreviewed changes/fixes that if we were going to have them we
-> > >> should have squashed into the correct patches and resent the
-> > >> series for review. Please don't do this. Code review is an
-> > >> important part of how the QEMU project works.
-> > >
-> > >
-> > > You must be looking at the wrong tag. There are multiple sign-offs in
-> all
-> > > 23 commits. The tag is riscv-qemu-upstream-v8.2. Sagar and Bastian
-> > > contacted me out of band to add their sign-offs. Please look at the
-> commits
-> > > again and tell me which commit id doesn=E2=80=99t have a sign-off on =
-that tag
-> (23
-> > > commits iirc)
-> > >
-> >
-> > I can forward you the mail out-of-band. I had to contact contributors t=
-o
-> > get them to agree to change the license from MIT to GPLv2, based on a
-> > request from Red Hat.
-> >
-> > You are making this very hard. Do you work for Arm perchance? I really
-> > wouldn=E2=80=99t be surprised if our port is being sandbagged by Arm. A=
-pologies
-> for
-> > being so direct about this, but things like this happen...
-> >
-> > I have complied with practically every review request and the sign-offs
-> are
-> > there. It=E2=80=99s a bit ridiculous.
-> >
-> > It would be nice to find someone neutral, unrelated to Arm, to merge ou=
-r
-> PR
->
-> Please stop with these ridiculous conspiracy theories right away. It is a
-> totally inappropriate and baseless accusation to make.
->
+I don't think we should have accelerator-specific code in main(),
+if we already have accelerator classes that can abstract that
+out.  I suggest adding a AccelClass;:setup_post() method that can
+be called here.
 
-My apologies. I do tend towards conspiratorial thinking, and this is
-related to a pain and anxiety disorder combined with insomnia. It seems the
-issue is completely my fault and i'll apologise again on this email. I will
-refrain from making any non-technical comments after this. I'm not trying
-to make an excuse. I do tend towards conspiratorial thinking.
-
-I'm obviously having trouble moving from a Github PR / merge flow, to a
-Linux git-send-email based flow.
-
-The Linux git-send-email based flow has a steeper learning curve... and the
-mistakes are completely mine...
-
-Sorry. I sincerely hope its accepted.
-
-Peter is not trying to punish you with extra rules. Over time QEMU has been
-> raising the bar for *all* contributions with extra code style checks,
-> automated testing, and review. Unfortunately this does mean that the larg=
-er
-> the patch series / feature, the more work is required to get to a mergabl=
-e
-> state, especially if the contributors are not previously familiar with QE=
-MU
-> development.
->
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/
-> dberrange :|
-> |: https://libvirt.org         -o-
-> https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/
-> dberrange :|
->
+-- 
+Eduardo
