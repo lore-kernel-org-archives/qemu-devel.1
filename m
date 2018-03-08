@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54774)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1etzFu-00066b-K6
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:23:03 -0500
+	(envelope-from <stefanha@gmail.com>) id 1etzKO-0007wn-0u
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:27:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1etzFr-0007sP-EG
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:23:02 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37282 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1etzFr-0007s9-9E
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:22:59 -0500
-References: <20180308023337.21062-1-haozhong.zhang@intel.com>
-	<20180308023337.21062-3-haozhong.zhang@intel.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <42a520ee-9715-3a88-21bc-2b0b11f5d6f3@redhat.com>
-Date: Thu, 8 Mar 2018 11:22:47 -0600
+	(envelope-from <stefanha@gmail.com>) id 1etzKK-0000xG-5Y
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:27:40 -0500
+Date: Thu, 8 Mar 2018 17:27:26 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180308172726.GG2769@stefanha-x1.localdomain>
+References: <7b01ba4b-7f5f-30c7-d6d8-3c22f2774e7e@kamp.de>
+	<20180306115124.GG31045@stefanha-x1.localdomain>
+	<dfd15486-e90b-50cd-0271-37a55c3cfc74@kamp.de>
 MIME-Version: 1.0
-In-Reply-To: <20180308023337.21062-3-haozhong.zhang@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/5] qmp: distinguish PC-DIMM and NVDIMM
- in MemoryDeviceInfoList
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="KIzF6Cje4W/osXrF"
+Content-Disposition: inline
+In-Reply-To: <dfd15486-e90b-50cd-0271-37a55c3cfc74@kamp.de>
+Subject: Re: [Qemu-devel] [Qemu-block] Limiting coroutine stack usage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +25,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Haozhong Zhang <haozhong.zhang@intel.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Markus Armbruster <armbru@redhat.com>, dgilbert@redhat.com
+To: Peter Lieven <pl@kamp.de>
+Cc: qemu block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 03/07/2018 08:33 PM, Haozhong Zhang wrote:
-> It may need to treat PC-DIMM and NVDIMM differently, e.g., when
-> deciding the necessity of non-volatile flag bit in SRAT memory
-> affinity structures.
-> 
-> NVDIMMDeviceInfo, which inherits from PCDIMMDeviceInfo, is added to
-> union type MemoryDeviceInfo to record information of NVDIMM devices.
-> The NVDIMM-specific data is currently left empty and will be filled
-> when necessary in the future.
-> 
-> It also fixes "info memory-devices"/query-memory-devices which
-> currently show nvdimm devices as dimm devices since
-> object_dynamic_cast(obj, TYPE_PC_DIMM) happily cast nvdimm to
-> TYPE_PC_DIMM which it's been inherited from.
-> 
-> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> ---
 
-> +++ b/qapi/misc.json
-> @@ -2830,6 +2830,18 @@
->             }
->   }
->   
-> +##
-> +# @NVDIMMDeviceInfo:
-> +#
-> +# NVDIMMDevice state information
-> +#
-> +# Since: 2.12
-> +##
-> +{ 'struct': 'NVDIMMDeviceInfo',
-> +  'base': 'PCDIMMDeviceInfo',
-> +  'data': {}
-> +}
-> +
+--KIzF6Cje4W/osXrF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-As long as you don't have any data members to add, you could omit this 
-type...
+On Wed, Mar 07, 2018 at 09:36:38PM +0100, Peter Lieven wrote:
+> Am 06.03.2018 um 12:51 schrieb Stefan Hajnoczi:
+> > On Tue, Feb 20, 2018 at 06:04:02PM +0100, Peter Lieven wrote:
+> >> I remember we discussed a long time ago to limit the stack usage of al=
+l functions that are executed in a coroutine
+> >> context to a very low value to be able to safely limit the coroutine s=
+tack size as well.
+> >>
+> >> I checked through all functions in block/, migration/ and nbd/ and the=
+re are only very few larger or unbound stack
+> >> allocations that can easily be fixed.
+> >>
+> >> Now my question: Is there an easy way to add a cflag like -Wstack-usag=
+e=3D2048 to all objects in a given directory only?
+> >> I tried to add a llimit to the whole project, but fixing this will be =
+a larger task.
+> > 2KB is fine for QEMU code but actual coroutine stack sizes will have to
+> > be at least 8KB, I guess, in order for third-party libraries to work
+> > (e.g. curl, rbd).  PATH_MAX is 4KB on Linux.
+> >
+> > Nested event loops in QEMU code can also result in deep call stacks.
+> > This happens when aio_poll() invokes an fd handler or BH that also
+> > invokes aio_poll().
+>=20
+> The plan was to limit the stack usage only as a compiler option. I would =
+leave the coroutine stack size at 1MB
+> for now until we have a way to identify the worst case usage.
 
->   ##
->   # @MemoryDeviceInfo:
->   #
-> @@ -2837,7 +2849,11 @@
->   #
->   # Since: 2.1
->   ##
-> -{ 'union': 'MemoryDeviceInfo', 'data': {'dimm': 'PCDIMMDeviceInfo'} }
-> +{ 'union': 'MemoryDeviceInfo',
-> +  'data': { 'dimm': 'PCDIMMDeviceInfo',
-> +            'nvdimm': 'NVDIMMDeviceInfo'
-> +          }
+I'm not sure we'll be able to confidently set a small stack size, but a
+compile-time check doesn't hurt.
 
-and just write this as
+Maybe someday we'll switch to stackless coroutines.  Clang now has
+coroutines support and maybe gcc will get it too (for C++20).  If the
+compiler transforms the code then coroutine state can be kept in a
+smaller data area that is not a call stack.  A single per-thread call
+stack is used to run any coroutine and only during coroutine execution.
 
-  'data': { 'dimm': 'PCDIMMDeviceInfo',
-            'nvdimm': 'PCDIMMDeviceInfo' }
+Stefan
 
-If, down the road, you want to add data members to one but not both of 
-the branches, we can add a new (sub-)type at that time, and it won't 
-break backwards compatibility.
+--KIzF6Cje4W/osXrF
+Content-Type: application/pgp-signature; name="signature.asc"
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaoXJ+AAoJEJykq7OBq3PIc2cH/0qdNdwR3/Qu5PwkfZ3h+O1t
+gb2aYqYuSwcR5MQ8SXHpGleobTpvP0g/fAIcpjrr+3arwpOxXSS5TcsDksHor2xI
+lNFvIwQSch8QR9ta5mQCpRonqDdq+TpdYp43KrzRxQ4RYZJPHOG+2INy4jIhPFoe
+yasaLYaHq5rQ063kOktF89Xc72DMBOPWogAZjxZAwi4EpLM4Qq3isviE1HeXzwxL
+jGaAw3U6VeOA+eSWFs22eOFIdV0ERxy79L3wdrFFVi6mEHj75lF7KxhluZBgugU4
+gkNJ9d9YCenAEUOb77LWQZLy0HlMu63XXOTRoalYgZM8WANJzNi8/QYROyg5YUw=
+=5/iy
+-----END PGP SIGNATURE-----
+
+--KIzF6Cje4W/osXrF--
