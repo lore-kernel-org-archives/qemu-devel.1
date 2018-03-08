@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56764)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eu4DH-0007KU-3z
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:40 -0500
+	id 1eu4DI-0007MI-Ro
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eu4DC-0004NZ-5N
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:39 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33236)
+	id 1eu4DG-0004QA-UX
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:40 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:33240)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eu4DB-0004M5-Sx
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:34 -0500
-Received: by mail-wm0-x241.google.com with SMTP id s206so1072536wme.0
-	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 14:40:33 -0800 (PST)
+	id 1eu4DG-0004Pp-NQ
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:38 -0500
+Received: by mail-wm0-x244.google.com with SMTP id s206so1072720wme.0
+	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 14:40:38 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu,  8 Mar 2018 23:39:43 +0100
-Message-Id: <20180308223946.26784-23-f4bug@amsat.org>
+Date: Thu,  8 Mar 2018 23:39:46 +0100
+Message-Id: <20180308223946.26784-26-f4bug@amsat.org>
 In-Reply-To: <20180308223946.26784-1-f4bug@amsat.org>
 References: <20180308223946.26784-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 22/25] hw/isa/superio: Add the SMC FDC37C669
- Super I/O
+Subject: [Qemu-devel] [PATCH 25/25] hw/i386/pc: Factor out the superio code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,177 +33,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Marcel Apfelbaum <marcel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alexey Kardashevskiy <aik@ozlabs.ru>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>
+To: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Marcel Apfelbaum <marcel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexey Kardashevskiy <aik@ozlabs.ru>, Thomas Huth <thuth@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Eduardo Habkost <ehabkost@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-Richard: I added the smc37c669 device in the Alpha machine, since it is the
-only user, as Michael previously suggested the non-PC devices should not be
-in the "PC chipset" entry which is already big (that's why some devices got
-moved from there to MIPS and PPC).
+ hw/i386/pc.c | 72 ++++++++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 41 insertions(+), 31 deletions(-)
 
- include/hw/isa/superio.h   |   1 +
- hw/isa/smc37c669-superio.c | 115 +++++++++++++++++++++++++++++++++++++++++++++
- MAINTAINERS                |   1 +
- hw/isa/Makefile.objs       |   2 +-
- 4 files changed, 118 insertions(+), 1 deletion(-)
- create mode 100644 hw/isa/smc37c669-superio.c
-
-diff --git a/include/hw/isa/superio.h b/include/hw/isa/superio.h
-index b47aac3cf8..f9ba29aa30 100644
---- a/include/hw/isa/superio.h
-+++ b/include/hw/isa/superio.h
-@@ -55,5 +55,6 @@ typedef struct ISASuperIOClass {
- } ISASuperIOClass;
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index cdcdfafe8e..20fa62f5d6 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1519,6 +1519,44 @@ static const MemoryRegionOps ioportF0_io_ops = {
+     },
+ };
  
- #define TYPE_FDC37M81X_SUPERIO  "fdc37m81x-superio"
-+#define TYPE_SMC37C669_SUPERIO  "smc37c669-superio"
++static void pc_superio_init(ISABus *isa_bus, bool create_fdctrl, bool no_vmport)
++{
++    int i;
++    DriveInfo *fd[MAX_FD];
++    qemu_irq *a20_line;
++    ISADevice *i8042, *port92, *vmmouse;
++
++    serial_hds_isa_init(isa_bus, 0, MAX_SERIAL_PORTS);
++    parallel_hds_isa_init(isa_bus, MAX_PARALLEL_PORTS);
++
++    for (i = 0; i < MAX_FD; i++) {
++        fd[i] = drive_get(IF_FLOPPY, 0, i);
++        create_fdctrl |= !!fd[i];
++    }
++    if (create_fdctrl) {
++        fdctrl_init_isa(isa_bus, fd);
++    }
++
++    i8042 = isa_create_simple(isa_bus, "i8042");
++    if (!no_vmport) {
++        vmport_init(isa_bus);
++        vmmouse = isa_try_create(isa_bus, "vmmouse");
++    } else {
++        vmmouse = NULL;
++    }
++    if (vmmouse) {
++        DeviceState *dev = DEVICE(vmmouse);
++        qdev_prop_set_ptr(dev, "ps2_mouse", i8042);
++        qdev_init_nofail(dev);
++    }
++    port92 = isa_create_simple(isa_bus, "port92");
++
++    a20_line = qemu_allocate_irqs(handle_a20_line_change, first_cpu, 2);
++    i8042_setup_a20_line(i8042, a20_line[0]);
++    port92_init(port92, a20_line[1]);
++    g_free(a20_line);
++}
++
+ void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
+                           ISADevice **rtc_state,
+                           bool create_fdctrl,
+@@ -1527,13 +1565,11 @@ void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
+                           uint32_t hpet_irqs)
+ {
+     int i;
+-    DriveInfo *fd[MAX_FD];
+     DeviceState *hpet = NULL;
+     int pit_isa_irq = 0;
+     qemu_irq pit_alt_irq = NULL;
+     qemu_irq rtc_irq = NULL;
+-    qemu_irq *a20_line;
+-    ISADevice *i8042, *port92, *vmmouse, *pit = NULL;
++    ISADevice *pit = NULL;
+     MemoryRegion *ioport80_io = g_new(MemoryRegion, 1);
+     MemoryRegion *ioportF0_io = g_new(MemoryRegion, 1);
  
- #endif /* HW_ISA_SUPERIO_H */
-diff --git a/hw/isa/smc37c669-superio.c b/hw/isa/smc37c669-superio.c
-new file mode 100644
-index 0000000000..aa233c6967
---- /dev/null
-+++ b/hw/isa/smc37c669-superio.c
-@@ -0,0 +1,115 @@
-+/*
-+ * SMC FDC37C669 Super I/O controller
-+ *
-+ * Copyright (c) 2018 Philippe Mathieu-Daudé
-+ *
-+ * This code is licensed under the GNU GPLv2 and later.
-+ * See the COPYING file in the top-level directory.
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/isa/superio.h"
-+
-+/* UARTs (compatible with NS16450 or PC16550) */
-+
-+static bool is_serial_enabled(ISASuperIODevice *sio, uint8_t index)
-+{
-+    return index < 2;
-+}
-+
-+static uint16_t get_serial_iobase(ISASuperIODevice *sio, uint8_t index)
-+{
-+    return index ? 0x2f8 : 0x3f8;
-+}
-+
-+static unsigned int get_serial_irq(ISASuperIODevice *sio, uint8_t index)
-+{
-+    return index ? 3 : 4;
-+}
-+
-+/* Parallel port */
-+
-+static bool is_parallel_enabled(ISASuperIODevice *sio, uint8_t index)
-+{
-+    return index < 1;
-+}
-+
-+static uint16_t get_parallel_iobase(ISASuperIODevice *sio, uint8_t index)
-+{
-+    return 0x3bc;
-+}
-+
-+static unsigned int get_parallel_irq(ISASuperIODevice *sio, uint8_t index)
-+{
-+    return 7;
-+}
-+
-+static unsigned int get_parallel_dma(ISASuperIODevice *sio, uint8_t index)
-+{
-+    return 3;
-+}
-+
-+/* Diskette controller (Software compatible with the Intel PC8477) */
-+
-+static bool is_fdc_enabled(ISASuperIODevice *sio, uint8_t index)
-+{
-+    return index < 1;
-+}
-+
-+static uint16_t get_fdc_iobase(ISASuperIODevice *sio, uint8_t index)
-+{
-+    return 0x3f0;
-+}
-+
-+static unsigned int get_fdc_irq(ISASuperIODevice *sio, uint8_t index)
-+{
-+    return 6;
-+}
-+
-+static unsigned int get_fdc_dma(ISASuperIODevice *sio, uint8_t index)
-+{
-+    return 2;
-+}
-+
-+static void smc37c669_class_init(ObjectClass *klass, void *data)
-+{
-+    ISASuperIOClass *sc = ISA_SUPERIO_CLASS(klass);
-+
-+    sc->parallel = (ISASuperIOFuncs){
-+        .count = 1,
-+        .is_enabled = is_parallel_enabled,
-+        .get_iobase = get_parallel_iobase,
-+        .get_irq    = get_parallel_irq,
-+        .get_dma    = get_parallel_dma,
-+    };
-+    sc->serial = (ISASuperIOFuncs){
-+        .count = 2,
-+        .is_enabled = is_serial_enabled,
-+        .get_iobase = get_serial_iobase,
-+        .get_irq    = get_serial_irq,
-+    };
-+    sc->floppy = (ISASuperIOFuncs){
-+        .count = 1,
-+        .is_enabled = is_fdc_enabled,
-+        .get_iobase = get_fdc_iobase,
-+        .get_irq    = get_fdc_irq,
-+        .get_dma    = get_fdc_dma,
-+    };
-+    sc->ide.count = 0;
-+}
-+
-+static const TypeInfo smc37c669_type_info = {
-+    .name          = TYPE_SMC37C669_SUPERIO,
-+    .parent        = TYPE_ISA_SUPERIO,
-+    .instance_size = sizeof(ISASuperIODevice),
-+    .class_size    = sizeof(ISASuperIOClass),
-+    .class_init    = smc37c669_class_init,
-+};
-+
-+static void smc37c669_register_types(void)
-+{
-+    type_register_static(&smc37c669_type_info);
-+}
-+
-+type_init(smc37c669_register_types)
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e806491d6c..db20e52f5d 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -405,6 +405,7 @@ Alpha Machines
- M: Richard Henderson <rth@twiddle.net>
- S: Maintained
- F: hw/alpha/
-+F: hw/isa/smc37c669-superio.c
+@@ -1590,36 +1626,10 @@ void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
+         pcspk_init(isa_bus, pit);
+     }
  
- ARM Machines
- ------------
-diff --git a/hw/isa/Makefile.objs b/hw/isa/Makefile.objs
-index cac655ba58..83e06f6c04 100644
---- a/hw/isa/Makefile.objs
-+++ b/hw/isa/Makefile.objs
-@@ -1,5 +1,5 @@
- common-obj-$(CONFIG_ISA_BUS) += isa-bus.o
--common-obj-$(CONFIG_ISA_BUS) += isa-superio.o
-+common-obj-$(CONFIG_ISA_BUS) += isa-superio.o smc37c669-superio.o
- common-obj-$(CONFIG_APM) += apm.o
- common-obj-$(CONFIG_I82378) += i82378.o
- common-obj-$(CONFIG_PC87312) += pc87312.o
+-    serial_hds_isa_init(isa_bus, 0, MAX_SERIAL_PORTS);
+-    parallel_hds_isa_init(isa_bus, MAX_PARALLEL_PORTS);
+-
+-    a20_line = qemu_allocate_irqs(handle_a20_line_change, first_cpu, 2);
+-    i8042 = isa_create_simple(isa_bus, "i8042");
+-    i8042_setup_a20_line(i8042, a20_line[0]);
+-    if (!no_vmport) {
+-        vmport_init(isa_bus);
+-        vmmouse = isa_try_create(isa_bus, "vmmouse");
+-    } else {
+-        vmmouse = NULL;
+-    }
+-    if (vmmouse) {
+-        DeviceState *dev = DEVICE(vmmouse);
+-        qdev_prop_set_ptr(dev, "ps2_mouse", i8042);
+-        qdev_init_nofail(dev);
+-    }
+-    port92 = isa_create_simple(isa_bus, "port92");
+-    port92_init(port92, a20_line[1]);
+-    g_free(a20_line);
+-
+     i8257_dma_init(isa_bus, 0);
+ 
+-    for(i = 0; i < MAX_FD; i++) {
+-        fd[i] = drive_get(IF_FLOPPY, 0, i);
+-        create_fdctrl |= !!fd[i];
+-    }
+-    if (create_fdctrl) {
+-        fdctrl_init_isa(isa_bus, fd);
+-    }
++    /* Super I/O */
++    pc_superio_init(isa_bus, create_fdctrl, no_vmport);
+ }
+ 
+ void pc_nic_init(ISABus *isa_bus, PCIBus *pci_bus)
 -- 
 2.16.2
