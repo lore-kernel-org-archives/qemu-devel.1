@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eu0kb-0004vk-Rf
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:58:51 -0500
+	(envelope-from <thuth@redhat.com>) id 1eu0lE-0005Ul-G2
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:59:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eu0kX-0000DP-VN
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:58:49 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:43434)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eu0kX-0000Cr-LM
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:58:45 -0500
-Received: by mail-wr0-x242.google.com with SMTP id a63so3120361wrc.10
-	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 10:58:45 -0800 (PST)
-References: <20180308130626.12393-1-peter.maydell@linaro.org>
-	<20180308130626.12393-4-peter.maydell@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180308130626.12393-4-peter.maydell@linaro.org>
-Date: Thu, 08 Mar 2018 18:58:43 +0000
-Message-ID: <876066l7h8.fsf@linaro.org>
+	(envelope-from <thuth@redhat.com>) id 1eu0lA-0000VR-JV
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:59:28 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42568 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eu0lA-0000VH-D0
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:59:24 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CE40DD143A
+	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 18:59:23 +0000 (UTC)
+References: <20180308172834.3281-1-pbonzini@redhat.com>
+	<20180308172834.3281-3-pbonzini@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <efeacf71-65ff-9bd4-59ef-5ee4cb6a0d7c@redhat.com>
+Date: Thu, 8 Mar 2018 19:59:21 +0100
 MIME-Version: 1.0
+In-Reply-To: <20180308172834.3281-3-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 3/6] target/arm: Add "-cpu max" support
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] net: allow using any PCI NICs in -net
+ or -nic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,135 +35,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Igor Mammedov <imammedo@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> Add support for "-cpu max" for ARM guests. This CPU type behaves
-> like "-cpu host" when KVM is enabled, and like a system CPU with
-> the maximum possible feature set otherwise. (Note that this means
-> it won't be migratable across versions, as we will likely add
-> features to it in future.)
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
+On 08.03.2018 18:28, Paolo Bonzini wrote:
+> Remove the hard-coded list of PCI NIC names; instead, fill an array
+> using all PCI devices listed under DEVICE_CATEGORY_NETWORK. Keep
+> the old shortcut "virtio" for virtio-net-pci.
+> 
+> Suggested-by: Thomas Huth <thuth@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  target/arm/cpu-qom.h |  2 ++
->  target/arm/cpu.c     | 24 ++++++++++++++++++++++++
->  target/arm/cpu64.c   | 21 +++++++++++++++++++++
->  3 files changed, 47 insertions(+)
->
-> diff --git a/target/arm/cpu-qom.h b/target/arm/cpu-qom.h
-> index a42495bac9..d135ff8e06 100644
-> --- a/target/arm/cpu-qom.h
-> +++ b/target/arm/cpu-qom.h
-> @@ -33,6 +33,8 @@ struct arm_boot_info;
->  #define ARM_CPU_GET_CLASS(obj) \
->      OBJECT_GET_CLASS(ARMCPUClass, (obj), TYPE_ARM_CPU)
->
-> +#define TYPE_ARM_MAX_CPU "max-" TYPE_ARM_CPU
-> +
->  /**
->   * ARMCPUClass:
->   * @parent_realize: The parent class' realize handler.
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 1a58a2c094..e46ddcc613 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -1697,6 +1697,27 @@ static void pxa270c5_initfn(Object *obj)
->      cpu->reset_sctlr =3D 0x00000078;
+>  hw/pci/pci.c | 61 ++++++++++++++++++++++++++++++------------------------------
+>  1 file changed, 30 insertions(+), 31 deletions(-)
+> 
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 2174c254eb..67a3f72bd6 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -1815,49 +1815,48 @@ PciInfoList *qmp_query_pci(Error **errp)
+>      return head;
 >  }
->
-> +#ifndef TARGET_AARCH64
-> +/* -cpu max: if KVM is enabled, like -cpu host (best possible with this =
-host);
-> + * otherwise, a CPU with as many features enabled as our emulation suppo=
-rts.
-> + * The version of '-cpu max' for qemu-system-aarch64 is defined in cpu64=
-.c;
-> + * this only needs to handle 32 bits.
-> + */
-> +static void arm_max_initfn(Object *obj)
-> +{
-> +    ARMCPU *cpu =3D ARM_CPU(obj);
-> +
-> +    if (kvm_enabled()) {
-> +        kvm_arm_set_cpu_features_from_host(cpu);
-> +    } else {
-> +        cortex_a15_initfn(obj);
-> +        /* In future we might add feature bits here even if the
-> +         * real-world A15 doesn't implement them.
-> +         */
+>  
+> -static const char * const pci_nic_models[] = {
+> -    "ne2k_pci",
+> -    "i82551",
+> -    "i82557b",
+> -    "i82559er",
+> -    "rtl8139",
+> -    "e1000",
+> -    "pcnet",
+> -    "virtio",
+> -    "sungem",
+> -    NULL
+> -};
+> -
+> -static const char * const pci_nic_names[] = {
+> -    "ne2k_pci",
+> -    "i82551",
+> -    "i82557b",
+> -    "i82559er",
+> -    "rtl8139",
+> -    "e1000",
+> -    "pcnet",
+> -    "virtio-net-pci",
+> -    "sungem",
+> -    NULL
+> -};
+> -
+>  /* Initialize a PCI NIC.  */
+>  PCIDevice *pci_nic_init_nofail(NICInfo *nd, PCIBus *rootbus,
+>                                 const char *default_model,
+>                                 const char *default_devaddr)
+>  {
+>      const char *devaddr = nd->devaddr ? nd->devaddr : default_devaddr;
+> +    GSList *list;
+> +    GPtrArray *pci_nic_models;
+>      PCIBus *bus;
+>      PCIDevice *pci_dev;
+>      DeviceState *dev;
+>      int devfn;
+>      int i;
+>  
+> -    if (qemu_show_nic_models(nd->model, pci_nic_models)) {
+> +    if (nd->model && !strcmp(nd->model, "virtio")) {
+> +        g_free(nd->model);
+> +        nd->model = g_strdup("virtio-net-pci");
 > +    }
-> +}
-> +#endif
 > +
->  #ifdef CONFIG_USER_ONLY
->  static void arm_any_initfn(Object *obj)
->  {
-> @@ -1764,6 +1785,9 @@ static const ARMCPUInfo arm_cpus[] =3D {
->      { .name =3D "pxa270-b1",   .initfn =3D pxa270b1_initfn },
->      { .name =3D "pxa270-c0",   .initfn =3D pxa270c0_initfn },
->      { .name =3D "pxa270-c5",   .initfn =3D pxa270c5_initfn },
-> +#ifndef TARGET_AARCH64
-> +    { .name =3D "max",         .initfn =3D arm_max_initfn },
-> +#endif
->  #ifdef CONFIG_USER_ONLY
->      { .name =3D "any",         .initfn =3D arm_any_initfn },
->  #endif
-> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> index 4228713b19..9042d3dfd1 100644
-> --- a/target/arm/cpu64.c
-> +++ b/target/arm/cpu64.c
-> @@ -28,6 +28,7 @@
->  #include "hw/arm/arm.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/kvm.h"
-> +#include "kvm_arm.h"
->
->  static inline void set_feature(CPUARMState *env, int feature)
->  {
-> @@ -212,6 +213,25 @@ static void aarch64_a53_initfn(Object *obj)
->      define_arm_cp_regs(cpu, cortex_a57_a53_cp_reginfo);
+> +    list = object_class_get_list_sorted(TYPE_PCI_DEVICE, false);
+> +    pci_nic_models = g_ptr_array_new();
+> +    while (list) {
+> +        DeviceClass *dc = OBJECT_CLASS_CHECK(DeviceClass, list->data,
+> +                                             TYPE_DEVICE);
+> +        GSList *next;
+> +        if (test_bit(DEVICE_CATEGORY_NETWORK, dc->categories) &&
+> +            dc->user_creatable) {
+> +            const char *name = object_class_get_name(list->data);
+> +            g_ptr_array_add(pci_nic_models, (gpointer)name);
+> +        }
+> +        next = list->next;
+> +        g_slist_free_1(list);
+> +        list = next;
+> +    }
+> +    g_ptr_array_add(pci_nic_models, NULL);
+> +
+> +    if (qemu_show_nic_models(nd->model, (const char **)pci_nic_models->pdata)) {
+>          exit(0);
+>      }
+>  
+> -    i = qemu_find_nic_model(nd, pci_nic_models, default_model);
+> +    i = qemu_find_nic_model(nd, (const char **)pci_nic_models->pdata,
+> +                            default_model);
+>      if (i < 0) {
+>          exit(1);
+>      }
+> @@ -1865,15 +1864,15 @@ PCIDevice *pci_nic_init_nofail(NICInfo *nd, PCIBus *rootbus,
+>      bus = pci_get_bus_devfn(&devfn, rootbus, devaddr);
+>      if (!bus) {
+>          error_report("Invalid PCI device address %s for device %s",
+> -                     devaddr, pci_nic_names[i]);
+> +                     devaddr, nd->model);
+>          exit(1);
+>      }
+>  
+> -    pci_dev = pci_create(bus, devfn, pci_nic_names[i]);
+> +    pci_dev = pci_create(bus, devfn, nd->model);
+>      dev = &pci_dev->qdev;
+>      qdev_set_nic_properties(dev, nd);
+>      qdev_init_nofail(dev);
+> -
+> +    g_ptr_array_free(pci_nic_models, true);
+>      return pci_dev;
 >  }
->
-> +/* -cpu max: if KVM is enabled, like -cpu host (best possible with this =
-host);
-> + * otherwise, a CPU with as many features enabled as our emulation suppo=
-rts.
-> + * The version of '-cpu max' for qemu-system-arm is defined in cpu.c;
-> + * this only needs to handle 64 bits.
-> + */
-> +static void aarch64_max_initfn(Object *obj)
-> +{
-> +    ARMCPU *cpu =3D ARM_CPU(obj);
-> +
-> +    if (kvm_enabled()) {
-> +        kvm_arm_set_cpu_features_from_host(cpu);
-> +    } else {
-> +        aarch64_a57_initfn(obj);
-> +        /* In future we might add feature bits here even if the
-> +         * real-world A57 doesn't implement them.
-> +         */
-> +    }
-> +}
-> +
->  #ifdef CONFIG_USER_ONLY
->  static void aarch64_any_initfn(Object *obj)
->  {
-> @@ -247,6 +267,7 @@ typedef struct ARMCPUInfo {
->  static const ARMCPUInfo aarch64_cpus[] =3D {
->      { .name =3D "cortex-a57",         .initfn =3D aarch64_a57_initfn },
->      { .name =3D "cortex-a53",         .initfn =3D aarch64_a53_initfn },
-> +    { .name =3D "max",                .initfn =3D aarch64_max_initfn },
->  #ifdef CONFIG_USER_ONLY
->      { .name =3D "any",         .initfn =3D aarch64_any_initfn },
->  #endif
+>  
+> 
 
-
---
-Alex Benn=C3=A9e
+Reviewed-by: Thomas Huth <thuth@redhat.com>
