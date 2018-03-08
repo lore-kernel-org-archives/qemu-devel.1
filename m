@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1etzuS-0005a5-Sv
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:04:57 -0500
+	(envelope-from <cohuck@redhat.com>) id 1etzuU-0005c8-Ov
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:05:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1etzuR-0006BW-Rs
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:04:56 -0500
+	(envelope-from <cohuck@redhat.com>) id 1etzuT-0006Cj-K6
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:04:58 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Thu,  8 Mar 2018 19:04:22 +0100
-Message-Id: <20180308180423.941-11-cohuck@redhat.com>
+Date: Thu,  8 Mar 2018 19:04:23 +0100
+Message-Id: <20180308180423.941-12-cohuck@redhat.com>
 In-Reply-To: <20180308180423.941-1-cohuck@redhat.com>
 References: <20180308180423.941-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 10/11] pc-bios/s390-ccw: Move string arrays from
- bootmap header to .c file
+Subject: [Qemu-devel] [PULL 11/11] s390x/virtio: Convert virtio-ccw from
+ *_exit to *_unrealize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,104 +21,190 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, rth@twiddle.net, agraf@suse.de, david@redhat.com, thuth@redhat.com, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, rth@twiddle.net, agraf@suse.de, david@redhat.com, thuth@redhat.com, Nia Alarie <nia.alarie@gmail.com>, Cornelia Huck <cohuck@redhat.com>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Nia Alarie <nia.alarie@gmail.com>
 
-bootmap.h can currently only be included once - otherwise the linker
-complains about multiple definitions of the "magic" strings. It's a
-bad style to define string arrays in header files, so let's better
-move these to the bootmap.c file instead where they are used.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1520317081-5341-1-git-send-email-thuth@redhat.com>
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Nia Alarie <nia.alarie@gmail.com>
+Message-Id: <20180307162958.11232-1-nia.alarie@gmail.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- pc-bios/s390-ccw/bootmap.c | 20 ++++++++++++++++++++
- pc-bios/s390-ccw/bootmap.h | 19 -------------------
- 2 files changed, 20 insertions(+), 19 deletions(-)
+ hw/s390x/virtio-ccw.c | 34 +++++++++++++++++-----------------
+ hw/s390x/virtio-ccw.h |  2 +-
+ 2 files changed, 18 insertions(+), 18 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index 29bfd8c875..fc2a9fe33b 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -37,6 +37,26 @@ typedef struct ResetInfo {
- 
- static ResetInfo save;
- 
-+const uint8_t el_torito_magic[] = "EL TORITO SPECIFICATION"
-+                                  "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
-+
-+/*
-+ * Match two CCWs located after PSW and eight filler bytes.
-+ * From libmagic and arch/s390/kernel/head.S.
-+ */
-+const uint8_t linux_s390_magic[] = "\x02\x00\x00\x18\x60\x00\x00\x50\x02\x00"
-+                                   "\x00\x68\x60\x00\x00\x50\x40\x40\x40\x40"
-+                                   "\x40\x40\x40\x40";
-+
-+static inline bool is_iso_vd_valid(IsoVolDesc *vd)
-+{
-+    const uint8_t vol_desc_magic[] = "CD001";
-+
-+    return !memcmp(&vd->ident[0], vol_desc_magic, 5) &&
-+           vd->version == 0x1 &&
-+           vd->type <= VOL_DESC_TYPE_PARTITION;
-+}
-+
- static void jump_to_IPL_2(void)
- {
-     ResetInfo *current = 0;
-diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
-index c636626f1a..07eb600b00 100644
---- a/pc-bios/s390-ccw/bootmap.h
-+++ b/pc-bios/s390-ccw/bootmap.h
-@@ -375,9 +375,6 @@ static inline void read_iso_boot_image(uint32_t block_offset, void *load_addr,
-                "Failed to read boot image!");
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index 8f7fbc2ab7..e51fbefd23 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -752,7 +752,7 @@ out_err:
+     g_free(sch);
  }
  
--const uint8_t el_torito_magic[] = "EL TORITO SPECIFICATION"
--                                  "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
--
- #define ISO9660_MAX_DIR_DEPTH 8
+-static int virtio_ccw_exit(VirtioCcwDevice *dev)
++static void virtio_ccw_unrealize(VirtioCcwDevice *dev, Error **errp)
+ {
+     CcwDevice *ccw_dev = CCW_DEVICE(dev);
+     SubchDev *sch = ccw_dev->sch;
+@@ -760,12 +760,12 @@ static int virtio_ccw_exit(VirtioCcwDevice *dev)
+     if (sch) {
+         css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
+         g_free(sch);
++        ccw_dev->sch = NULL;
+     }
+     if (dev->indicators) {
+         release_indicator(&dev->routes.adapter, dev->indicators);
+         dev->indicators = NULL;
+     }
+-    return 0;
+ }
  
- typedef struct IsoDirHdr {
-@@ -430,20 +427,12 @@ typedef struct IsoVolDesc {
-     } vd;
- } __attribute__((packed)) IsoVolDesc;
+ static void virtio_ccw_net_realize(VirtioCcwDevice *ccw_dev, Error **errp)
+@@ -1344,7 +1344,7 @@ static void virtio_ccw_net_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
  
--const uint8_t vol_desc_magic[] = "CD001";
- #define VOL_DESC_TYPE_BOOT 0
- #define VOL_DESC_TYPE_PRIMARY 1
- #define VOL_DESC_TYPE_SUPPLEMENT 2
- #define VOL_DESC_TYPE_PARTITION 3
- #define VOL_DESC_TERMINATOR 255
+     k->realize = virtio_ccw_net_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = virtio_ccw_net_properties;
+     set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
+@@ -1372,7 +1372,7 @@ static void virtio_ccw_blk_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
  
--static inline bool is_iso_vd_valid(IsoVolDesc *vd)
--{
--    return !memcmp(&vd->ident[0], vol_desc_magic, 5) &&
--           vd->version == 0x1 &&
--           vd->type <= VOL_DESC_TYPE_PARTITION;
--}
--
- typedef struct IsoBcValid {
-     uint8_t platform_id;
-     uint16_t reserved;
-@@ -468,14 +457,6 @@ typedef struct IsoBcHdr {
-     uint8_t id[28];
- } __attribute__((packed)) IsoBcHdr;
+     k->realize = virtio_ccw_blk_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = virtio_ccw_blk_properties;
+     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+@@ -1400,7 +1400,7 @@ static void virtio_ccw_serial_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
  
--/*
-- * Match two CCWs located after PSW and eight filler bytes.
-- * From libmagic and arch/s390/kernel/head.S.
-- */
--const uint8_t linux_s390_magic[] = "\x02\x00\x00\x18\x60\x00\x00\x50\x02\x00"
--                                   "\x00\x68\x60\x00\x00\x50\x40\x40\x40\x40"
--                                   "\x40\x40\x40\x40";
--
- typedef struct IsoBcEntry {
-     uint8_t id;
-     union {
+     k->realize = virtio_ccw_serial_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = virtio_ccw_serial_properties;
+     set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+@@ -1428,7 +1428,7 @@ static void virtio_ccw_balloon_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_balloon_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = virtio_ccw_balloon_properties;
+     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+@@ -1456,7 +1456,7 @@ static void virtio_ccw_scsi_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_scsi_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = virtio_ccw_scsi_properties;
+     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+@@ -1483,7 +1483,7 @@ static void vhost_ccw_scsi_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = vhost_ccw_scsi_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = vhost_ccw_scsi_properties;
+     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+@@ -1520,7 +1520,7 @@ static void virtio_ccw_rng_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_rng_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = virtio_ccw_rng_properties;
+     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+@@ -1558,7 +1558,7 @@ static void virtio_ccw_crypto_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_crypto_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = virtio_ccw_crypto_properties;
+     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+@@ -1596,7 +1596,7 @@ static void virtio_ccw_gpu_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_gpu_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = virtio_ccw_gpu_properties;
+     dc->hotpluggable = false;
+@@ -1625,7 +1625,7 @@ static void virtio_ccw_input_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_input_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = virtio_ccw_input_properties;
+     set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+@@ -1705,12 +1705,12 @@ static void virtio_ccw_busdev_realize(DeviceState *dev, Error **errp)
+     virtio_ccw_device_realize(_dev, errp);
+ }
+ 
+-static int virtio_ccw_busdev_exit(DeviceState *dev)
++static void virtio_ccw_busdev_unrealize(DeviceState *dev, Error **errp)
+ {
+     VirtioCcwDevice *_dev = (VirtioCcwDevice *)dev;
+     VirtIOCCWDeviceClass *_info = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
+ 
+-    return _info->exit(_dev);
++    _info->unrealize(_dev, errp);
+ }
+ 
+ static void virtio_ccw_busdev_unplug(HotplugHandler *hotplug_dev,
+@@ -1728,7 +1728,7 @@ static void virtio_ccw_device_class_init(ObjectClass *klass, void *data)
+ 
+     k->unplug = virtio_ccw_busdev_unplug;
+     dc->realize = virtio_ccw_busdev_realize;
+-    dc->exit = virtio_ccw_busdev_exit;
++    dc->unrealize = virtio_ccw_busdev_unrealize;
+     dc->bus_type = TYPE_VIRTUAL_CSS_BUS;
+ }
+ 
+@@ -1804,7 +1804,7 @@ static void virtio_ccw_9p_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     k->realize = virtio_ccw_9p_realize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = virtio_ccw_9p_properties;
+@@ -1853,7 +1853,7 @@ static void vhost_vsock_ccw_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = vhost_vsock_ccw_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+     dc->props = vhost_vsock_ccw_properties;
+     dc->reset = virtio_ccw_reset;
+diff --git a/hw/s390x/virtio-ccw.h b/hw/s390x/virtio-ccw.h
+index 3905f3a3d6..2fc513001e 100644
+--- a/hw/s390x/virtio-ccw.h
++++ b/hw/s390x/virtio-ccw.h
+@@ -76,7 +76,7 @@ typedef struct VirtioCcwDevice VirtioCcwDevice;
+ typedef struct VirtIOCCWDeviceClass {
+     CCWDeviceClass parent_class;
+     void (*realize)(VirtioCcwDevice *dev, Error **errp);
+-    int (*exit)(VirtioCcwDevice *dev);
++    void (*unrealize)(VirtioCcwDevice *dev, Error **errp);
+ } VirtIOCCWDeviceClass;
+ 
+ /* Performance improves when virtqueue kick processing is decoupled from the
 -- 
 2.13.6
