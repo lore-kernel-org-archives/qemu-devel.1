@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1etwqh-0003mj-Ig
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 09:48:52 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1etwtC-0005kZ-3a
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 09:51:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1etwqc-0008SP-NP
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 09:48:51 -0500
-In-Reply-To: <20180308111305.C9F56745707@zero.eik.bme.hu>
-References: <20180308111305.C9F56745707@zero.eik.bme.hu>
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Thu, 8 Mar 2018 12:08:08 +0100
-Message-Id: <20180308144845.0D7647456CD@zero.eik.bme.hu>
-Subject: [Qemu-devel] [PATCH v2] ppc440_pcix: Change some error_report to
- qemu_log_mask(LOG_UNIMP, ...)
+	(envelope-from <peter.maydell@linaro.org>) id 1etwtB-0001W1-9n
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 09:51:26 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:38825)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1etwtB-0001Vo-4e
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 09:51:25 -0500
+Received: by mail-ot0-x241.google.com with SMTP id 95so5614706ote.5
+	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 06:51:24 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <1cb9cc42-c7c9-5124-a615-27914d23b05c@roeck-us.net>
+References: <1520444223-8389-1-git-send-email-linux@roeck-us.net>
+	<CAFEAcA8iFYGhzmLm6pyZi6tg=Di1P=vi_Enyw_ia1M34B3t8aw@mail.gmail.com>
+	<1cb9cc42-c7c9-5124-a615-27914d23b05c@roeck-us.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 8 Mar 2018 14:51:04 +0000
+Message-ID: <CAFEAcA-+J7MUSssjPZ5BTNzGx_4h0YANdCegGfWNzYmoNatcqg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] fsl-imx6: Swap Ethernet interrupt defines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,49 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Chris Healy <cphealy@gmail.com>, Jason Wang <jasowang@redhat.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Bill Paul <wpaul@windriver.com>
 
-Using log unimp is more appropriate for these messages and this also
-silences them by default so they won't clobber make check output when
-tests are added for this board.
+On 8 March 2018 at 14:47, Guenter Roeck <linux@roeck-us.net> wrote:
+> On 03/08/2018 02:50 AM, Peter Maydell wrote:
+>> So do the works-by-accident kernels fail on QEMU because
+>> we don't emulate some bit of the ethernet device ?
+>> Ideally we could fix that so we could boot newer kernels
+>> without breaking the old ones...
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
-v2: Use defined format string for printing hwaddr instead of casting.
-I guess this does not invalidate the R-b tag of v1 so I've added that too.
+>
+> I don't know if a fix working for all versions of Linux is even possible.
+> Creating both interrupts might be an option, but would likely cause
+> other problems since some versions of Linux would handle the same
+> interrupt twice, while others expect the second interrupt
+> to be associated with the timer.
 
- hw/ppc/ppc440_pcix.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Did the older Linux kernels work on the real hardware? (I
+would guess so, but sometimes these things only get tested
+on emulation...) If so, then in theory "make QEMU work like
+the hardware" should allow all the kernels to work on QEMU.
 
-diff --git a/hw/ppc/ppc440_pcix.c b/hw/ppc/ppc440_pcix.c
-index ab2626a..1dc5d7f 100644
---- a/hw/ppc/ppc440_pcix.c
-+++ b/hw/ppc/ppc440_pcix.c
-@@ -286,8 +286,9 @@ static void ppc440_pcix_reg_write4(void *opaque, hwaddr addr,
-         break;
- 
-     default:
--        error_report("%s: unhandled PCI internal register 0x%lx", __func__,
--                     (unsigned long)addr);
-+        qemu_log_mask(LOG_UNIMP,
-+                      "%s: unhandled PCI internal register 0x%"HWADDR_PRIx"\n",
-+                      __func__, addr);
-         break;
-     }
- }
-@@ -377,8 +378,9 @@ static uint64_t ppc440_pcix_reg_read4(void *opaque, hwaddr addr,
-         break;
- 
-     default:
--        error_report("%s: invalid PCI internal register 0x%lx", __func__,
--                     (unsigned long)addr);
-+        qemu_log_mask(LOG_UNIMP,
-+                      "%s: invalid PCI internal register 0x%" HWADDR_PRIx "\n",
-+                      __func__, addr);
-         val = 0;
-     }
- 
--- 
-2.7.6
+thanks
+-- PMM
