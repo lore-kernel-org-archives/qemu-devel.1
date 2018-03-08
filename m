@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ettwF-0003Ps-RG
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:42:25 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ettwX-0003en-1U
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:42:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ettwF-0005TO-0E
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:42:23 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45144 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ettwE-0005T1-Qg
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:42:22 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DC1A24023BB3
-	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 11:42:21 +0000 (UTC)
-Date: Thu, 8 Mar 2018 19:42:13 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180308114213.GE32252@xz-mi>
-References: <20180306053320.15401-1-peterx@redhat.com>
-	<20180306053320.15401-10-peterx@redhat.com>
-	<20180307123650.GD20201@redhat.com> <20180308034409.GA32252@xz-mi>
-	<20180308101359.GE4718@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ettwT-0005gv-VW
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:42:41 -0500
+References: <20180207125037.13510-1-vsementsov@virtuozzo.com>
+	<20180306160017.GM31045@stefanha-x1.localdomain>
+	<20180306174918.GA22807@flamenco>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <482599db-65b7-ba5d-6784-72acf3486786@virtuozzo.com>
+Date: Thu, 8 Mar 2018 14:42:29 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180308101359.GE4718@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 9/9] chardev: tcp: postpone TLS work
- until machine done
+In-Reply-To: <20180306174918.GA22807@flamenco>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] block latency histogram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,66 +25,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, kwolf@redhat.com, qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, den@openvz.org
 
-On Thu, Mar 08, 2018 at 10:13:59AM +0000, Daniel P. Berrang=C3=A9 wrote:
-> On Thu, Mar 08, 2018 at 11:44:09AM +0800, Peter Xu wrote:
-> > On Wed, Mar 07, 2018 at 12:36:50PM +0000, Daniel P. Berrang=C3=A9 wro=
-te:
-> >=20
-> > [...]
-> >=20
-> > > > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> > > > index bd40864f87..997c70dd7d 100644
-> > > > --- a/chardev/char-socket.c
-> > > > +++ b/chardev/char-socket.c
-> > > > @@ -31,6 +31,7 @@
-> > > >  #include "qemu/option.h"
-> > > >  #include "qapi/error.h"
-> > > >  #include "qapi/clone-visitor.h"
-> > > > +#include "sysemu/sysemu.h"
-> > > > =20
-> > > >  #include "chardev/char-io.h"
-> > > > =20
-> > > > @@ -722,6 +723,11 @@ static void tcp_chr_tls_init(Chardev *chr)
-> > > >      Error *err =3D NULL;
-> > > >      gchar *name;
-> > > > =20
-> > > > +    if (!machine_init_done) {
-> > > > +        /* This will be postponed to machine_done notifier */
-> > > > +        return;
-> > > > +    }
-> > > > +
-> > > >      if (s->is_listen) {
-> > > >          tioc =3D qio_channel_tls_new_server(
-> > > >              s->ioc, s->tls_creds,
-> > > > @@ -1145,6 +1151,10 @@ static int tcp_chr_machine_done_hook(Chard=
-ev *chr)
-> > > >          tcp_chr_connect_async(chr);
-> > > >      }
-> > > > =20
-> > > > +    if (s->tls_creds) {
-> > > > +        tcp_chr_tls_init(chr);
-> > > > +    }
-> > >=20
-> > > This looks questionable - AFAICT, there's no guarantee we have any
-> > > client connection active when the machine dnoe hook runs. Only if
-> > > the chardev is set in client mode, and reconnect_time is *not* set,
-> > > but this seems to be run unconditionally.
-> >=20
-> > You are right.  Thanks for spotting that.
-> >=20
-> > Then how about this?  It's a bit ugly, but I think it should be safe:
->=20
-> Is it perhaps not possible to just check if  's->ioc' is non-NULL
-> in the tcp_chr_machine_done_hook for your original patch ?
+Hi Emilio!
 
-In tcp_chr_new_client() I see that s->ioc will be set no matter what,
-and that function can even be called without TLS enabled I think.
-Does that mean only check against s->ioc would not be enough?
+Looked through qdist, if I understand correctly, it saves each added 
+(with different value) element. It is not effective for disk io timing - 
+we'll have too much elements. In my approach, histogram don't grow, it 
+initially have several ranges and counts hits to each range.
 
-Thanks,
 
---=20
-Peter Xu
+06.03.2018 20:49, Emilio G. Cota wrote:
+> On Tue, Mar 06, 2018 at 16:00:17 +0000, Stefan Hajnoczi wrote:
+>> On Wed, Feb 07, 2018 at 03:50:35PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+>>> Vladimir Sementsov-Ogievskiy (2):
+>>>    block/accounting: introduce latency histogram
+>>>    qapi: add block latency histogram interface
+> (snip)
+>>>   5 files changed, 228 insertions(+), 1 deletion(-)
+>> The feature looks good.  I posted documentation and code readability
+>> suggestions.
+> Hi Vladimir,
+>
+> Did you consider using qdist? For reference, see commit bf3afd5f419
+> and/or grep 'qdist'.
+>
+> Thanks,
+>
+> 		Emilio
+
+
+-- 
+Best regards,
+Vladimir
