@@ -1,34 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1etyEj-0005Pe-Hh
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:17:47 -0500
+	(envelope-from <kraxel@redhat.com>) id 1etyF8-0005bI-VH
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:18:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1etyEf-0000uO-Cu
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:17:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:45022)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1etyEf-0000tm-3A
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:17:41 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1etyEc-0001WK-FK
-	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 16:17:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8DD2E2E82CD
-	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 16:10:56 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Mar 2018 16:02:19 -0000
-From: Antoine <1754038@bugs.launchpad.net>
-Reply-To: Bug 1754038 <1754038@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152043137992.20954.13820740787208030462.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152052493916.7807.12527274838357131859.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1754038] Re: ARM M: Systick first wrap delayed
- (qemu-timers/icount prb?)
+	(envelope-from <kraxel@redhat.com>) id 1etyF2-00014c-Uy
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:18:10 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34726 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1etyF2-00014H-Oj
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:18:04 -0500
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu,  8 Mar 2018 17:18:03 +0100
+Message-Id: <20180308161803.6152-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] vnc: deal with surface NULL pointers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,279 +22,93 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-Ok I spent more time trying to identify the commits giving problem.
+Secondary displays in multihead setups are allowed to have a NULL
+DisplaySurface.  Typically user interfaces handle this by hiding the
+window which shows the display in question.
 
-So before 8d04fb5, qemu is executing the binary as expected:
+This isn't an option for vnc though because it simply hasn't a concept
+of windows or outputs.  So handle the situation by showing a placeholder
+DisplaySurface instead.  Also check in console_select whenever a surface
+is preset in the first place before requesting an update.
 
-setup timer
-cnt 007cccca  --        7
-cnt 006998a2  --        7
-cnt 00566479  --        7
-cnt 0043304f  --        7
-cnt 002ffc26  --        7
-cnt 001cc7fd  --        7
-cnt 000993d5  --        7
-SysTick
-cnt 00865f9c  --    10007
-cnt 00732b5c  --        7
-cnt 005ff733  --        7
-cnt 004cc30a  --        7
-[...]
+This fixes a segfault which can be triggered by switching to an unused
+display (via vtrl-alt-<nr>) in a multihead setup, for example using
+-device virtio-vga,max_outputs=2.
 
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ include/ui/console.h |  2 ++
+ ui/console.c         | 10 ++++++----
+ ui/vnc.c             | 10 ++++++++++
+ 3 files changed, 18 insertions(+), 4 deletions(-)
 
-Then, after this commit "tcg: drop global lock during TCG code execution":
-
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D8d04fb55dec381bc5105cb47f=
-29d918e579e8cbd
-
-things start to look bad (but not the same way I first ran into):
-
-setup timer
-SysTick
-cnt 00000000  --    10007
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 008ff3e3  --        7
-cnt 007cbfba  --        7
-cnt 00698b92  --        7
-cnt 00565768  --        7
-cnt 0043233f  --        7
-cnt 002fef16  --        7
-cnt 001cbaed  --        7
-cnt 000986c5  --        7
-SysTick
-cnt 0086528b  --    10007
-cnt 00731e4c  --        7
-cnt 005fea23  --        7
-cnt 004cb5fa  --        7
-cnt 003981d1  --        7
-[...]
-
-Then, not long after, this commit changes a little bit the prb "icount:
-process QEMU_CLOCK_VIRTUAL timers in vCPU thread"
-
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D6b8f0187a4d7c263e356302f8=
-d308655372a4b5b
-
-Output then looks like:
-
-setup timer
-cnt 007cccca  --        7
-cnt 006998a2  --        7
-cnt 00566479  --        7
-cnt 0043304f  --        7
-cnt 002ffc26  --        7
-cnt 001cc7fd  --        7
-cnt 000993d5  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-cnt 00000000  --        7
-SysTick
-cnt 000986e0  --    10007
-SysTick
-cnt 00865290  --    10007
-cnt 00731e51  --        7
-cnt 005fea27  --        7
-[...]
-
-... and it seems this very problem has been occurring up to now.
-
-I am here using the binary attached, with this command line:
-
-qemu-system-arm -M lm3s6965evb -nographic -kernel hello.bin -serial
-file:$(tty) -icount 4 -cpu cortex-m4
-
-And with these build options:
-
-./configure --target-list=3Darm-softmmu --disable-slirp --disable-blobs
---disable-docs --disable-guest-agent --disable-gnutls --disable-nettle
---disable-gcrypt --disable-sdl --disable-gtk --disable-vnc --disable-
-virtfs --disable-xen --disable-brlapi --disable-curl --disable-bluez
---disable-kvm --disable-rdma --disable-vde --disable-netmap --disable-
-linux-aio --disable-cap-ng --disable-attr --disable-vhost-net --disable-
-spice --disable-rbd --disable-libiscsi --disable-libnfs --disable-
-smartcard --disable-libusb --disable-usb-redir --disable-lzo --disable-
-snappy --disable-bzip2 --disable-seccomp --disable-glusterfs --disable-
-tpm --disable-libssh2 --disable-numa --disable-tcmalloc --disable-
-jemalloc --disable-opengl --disable-virglrenderer --disable-xfsctl
---disable-qom-cast-debug --disable-pie --extra-cflags=3D-mtune=3Dnative
-
-Note that, to prevent MTTCG/icount error, we must modify configure for
-the arm target with:
-
-     mttcg=3D"no"
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1754038
-
-Title:
-  ARM M: Systick first wrap delayed (qemu-timers/icount prb?)
-
-Status in QEMU:
-  New
-
-Bug description:
-  When running this kind of code with qemu:
-
-  static void SysTickISR(void)
-  {
-  	printf("SysTick\n");
-  }
-
-  void main()
-  {
-  	volatile int i, j;
-  	printf("setup timer\n");
-  	*(uint32_t*) 0xE000E014 =3D 0x8FFFFF; //reload value
-  	*(uint32_t*) 0xE000E018 =3D 0;        //force reload
-  	*(uint32_t*) 0xE000E010 =3D 7;        //cpu clk + ISR + enable =
-
-
-  	for (j =3D 0; j < 0x100; j++) {
-  		for (i =3D 0; i < 0x100000; i++)
-  			;
-  		printf("cnt %08x  -- %8x\n", *(uint32_t*) 0xE000E018, *(uint32_t*)0xE00=
-0E010);
-  	}
-  }
-
-  I get the following output (comments added after '#'):
-
-  setup timer
-  cnt 007cccca  --        7
-  cnt 006998a2  --        7
-  cnt 00566479  --        7
-  cnt 0043304f  --        7
-  cnt 002ffc26  --        7
-  cnt 001cc7fd  --        7
-  cnt 000993d5  --        7
-  cnt 00000000  --        7  <--- problem here, systick should wrap and rai=
-se isr
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  SysTick                     <--- delayed isr occuring here
-  cnt 000986e0  --    10007
-  SysTick
-  cnt 00865290  --    10007   <---- then running fine as long as regs not m=
-odified
-  cnt 00731e51  --        7
-  cnt 005fea27  --        7
-  cnt 004cb5ff  --        7
-  cnt 003981d6  --        7
-  cnt 00264dad  --        7
-  cnt 00131984  --        7
-  SysTick
-  cnt 008fe545  --    10007
-  cnt 007cb106  --        7
-  cnt 00697cdd  --        7
-  cnt 005648b4  --        7
-  cnt 0043148b  --        7
-  cnt 002fe061  --        7
-  cnt 001cac38  --        7
-  cnt 00097810  --        7
-  SysTick
-  cnt 008643d6  --    10007
-  cnt 00730f97  --        7
-  cnt 005fdb6d  --        7
-  cnt 004ca745  --        7
-  cnt 0039731c  --        7
-  cnt 00263ef3  --        7
-  cnt 00130aca  --        7
-  SysTick
-  cnt 008fd68b  --    10007
-  cnt 007ca24c  --        7
-  cnt 00696e23  --        7
-  cnt 005639fa  --        7
-  cnt 004305d1  --        7
-  cnt 002fd1a8  --        7
-  cnt 001c9d7f  --        7
-  cnt 00096956  --        7
-  SysTick
-  cnt 0086351d  --    10007
-  cnt 007300dd  --        7
-  cnt 005fccb4  --        7
-  cnt 004c988c  --        7
-  cnt 00396463  --        7
-  cnt 00263039  --        7
-  cnt 0012fc10  --        7
-  [...]
-
-  Command line and version:
-  qemu-system-arm -M lm3s6965evb -nographic -kernel hello.bin -monitor stdi=
-o -serial file:/dev/pts/6 -icount 4 -cpu cortex-m4
-  QEMU 2.11.50
-
-  I am compiling from git repo, head is:
-  commit f32408f3b472a088467474ab152be3b6285b2d7b
-  Author: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-  Date:   Tue Mar 6 13:43:17 2018 +0000
-
-  Config options:
-  ./configure --target-list=3Darm-softmmu --enable-debug --disable-slirp --=
-enable-tcg-interpreter --disable-blobs --disable-docs --disable-guest-agent=
- --disable-gnutls --disable-nettle --disable-gcrypt --disable-sdl --disable=
--gtk --disable-vnc --disable-virtfs --disable-mpath --disable-xen --disable=
--brlapi --disable-curl --disable-bluez --disable-kvm --disable-hax --disabl=
-e-hvf --disable-whpx --disable-rdma --disable-vde --disable-netmap --disabl=
-e-linux-aio --disable-cap-ng --disable-attr --disable-vhost-net --disable-s=
-pice --disable-rbd --disable-libiscsi --disable-libnfs --disable-smartcard =
---disable-libusb --disable-live-block-migration --disable-usb-redir --disab=
-le-lzo --disable-snappy --disable-bzip2 --disable-seccomp --disable-gluster=
-fs --disable-tpm --disable-libssh2 --disable-numa --disable-libxml2 --disab=
-le-tcmalloc --disable-jemalloc --disable-replication --disable-vhost-vsock =
---disable-opengl --disable-virglrenderer --disable-xfsctl --disable-qom-cas=
-t-debug --disable-vxhs --disable-crypto-afalg --disable-vhost-user --disabl=
-e-capstone --disable-pie --extra-cflags=3D-mtune=3Dnative
-
-  =
-
-  Not working with git tag 2.10.0 (almost same config)
-
-  Working with stock qemu-arm 2.5.0 from Ubuntu 16.04.
-
-  I started investigating, though I am not familiar with qemu code and I
-  could see that the execution is not geting out of
-  qemu_tcg_rr_cpu_thread_fn() 'while' loop and timers are not triggered
-  because the values in cpu->icount_extra or cpu->icount_budget are not
-  to modified accordingly after the timer is set (host side) when the
-  systick register is written (target side).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1754038/+subscriptions
+diff --git a/include/ui/console.h b/include/ui/console.h
+index aae9e44cb3..5fca9afcbc 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -260,6 +260,8 @@ DisplaySurface *qemu_create_displaysurface_guestmem(int width, int height,
+                                                     pixman_format_code_t format,
+                                                     int linesize,
+                                                     uint64_t addr);
++DisplaySurface *qemu_create_message_surface(int w, int h,
++                                            const char *msg);
+ PixelFormat qemu_default_pixelformat(int bpp);
+ 
+ DisplaySurface *qemu_create_displaysurface(int width, int height);
+diff --git a/ui/console.c b/ui/console.c
+index 6ab4ff3baf..348610dd43 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -1039,8 +1039,10 @@ void console_select(unsigned int index)
+                     dcl->ops->dpy_gfx_switch(dcl, s->surface);
+                 }
+             }
+-            dpy_gfx_update(s, 0, 0, surface_width(s->surface),
+-                           surface_height(s->surface));
++            if (s->surface) {
++                dpy_gfx_update(s, 0, 0, surface_width(s->surface),
++                               surface_height(s->surface));
++            }
+         }
+         if (ds->have_text) {
+             dpy_text_resize(s, s->width, s->height);
+@@ -1370,8 +1372,8 @@ DisplaySurface *qemu_create_displaysurface_guestmem(int width, int height,
+     return surface;
+ }
+ 
+-static DisplaySurface *qemu_create_message_surface(int w, int h,
+-                                                   const char *msg)
++DisplaySurface *qemu_create_message_surface(int w, int h,
++                                            const char *msg)
+ {
+     DisplaySurface *surface = qemu_create_displaysurface(w, h);
+     pixman_color_t bg = color_table_rgb[0][QEMU_COLOR_BLACK];
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 13c28cabb0..e164eb798c 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -746,9 +746,19 @@ static void vnc_update_server_surface(VncDisplay *vd)
+ static void vnc_dpy_switch(DisplayChangeListener *dcl,
+                            DisplaySurface *surface)
+ {
++    static const char placeholder_msg[] =
++        "Display output is not active.";
++    static DisplaySurface *placeholder;
+     VncDisplay *vd = container_of(dcl, VncDisplay, dcl);
+     VncState *vs;
+ 
++    if (surface == NULL) {
++        if (placeholder == NULL) {
++            placeholder = qemu_create_message_surface(640, 480, placeholder_msg);
++        }
++        surface = placeholder;
++    }
++
+     vnc_abort_display_jobs(vd);
+     vd->ds = surface;
+ 
+-- 
+2.9.3
