@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eu1gG-00037w-US
+	(envelope-from <dgilbert@redhat.com>) id 1eu1gG-00037u-UJ
 	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eu1gF-00064L-2l
+	(envelope-from <dgilbert@redhat.com>) id 1eu1gD-00063r-LO
 	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:24 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50668 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40186 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eu1gE-000644-Ti
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:23 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eu1gD-00063U-FA
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:21 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 59CAE76FBA
-	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 19:58:22 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id DD2464040073
+	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 19:58:20 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Thu,  8 Mar 2018 19:57:48 +0000
-Message-Id: <20180308195811.24894-7-dgilbert@redhat.com>
+Date: Thu,  8 Mar 2018 19:57:47 +0000
+Message-Id: <20180308195811.24894-6-dgilbert@redhat.com>
 In-Reply-To: <20180308195811.24894-1-dgilbert@redhat.com>
 References: <20180308195811.24894-1-dgilbert@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 06/29] vhost-user: Add
- 'VHOST_USER_POSTCOPY_ADVISE' message
+Subject: [Qemu-devel] [PATCH v4 05/29] postcopy: Add vhost-user flag for
+ postcopy and check it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,215 +35,153 @@ Cc: aarcange@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Wire up a notifier to send a VHOST_USER_POSTCOPY_ADVISE
-message on an incoming advise.
-
-Later patches will fill in the behaviour/contents of the
-message.
+Add a vhost feature flag for postcopy support, and
+use the postcopy notifier to check it before allowing postcopy.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- contrib/libvhost-user/libvhost-user.c | 14 ++++++++++
- contrib/libvhost-user/libvhost-user.h |  3 +++
- docs/interop/vhost-user.txt           | 10 ++++++++
- hw/virtio/vhost-user.c                | 48 +++++++++++++++++++++++++++++=
-++++++
- migration/postcopy-ram.h              |  1 +
- migration/savevm.c                    |  6 +++++
- 6 files changed, 82 insertions(+)
+ contrib/libvhost-user/libvhost-user.h |  2 ++
+ docs/interop/vhost-user.txt           | 10 +++++++++
+ hw/virtio/vhost-user.c                | 41 ++++++++++++++++++++++++++++++++++-
+ 3 files changed, 52 insertions(+), 1 deletion(-)
 
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
-r/libvhost-user.c
-index 2e358b5bce..71825d2dde 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -86,6 +86,7 @@ vu_request_to_string(unsigned int req)
-         REQ(VHOST_USER_SET_VRING_ENDIAN),
-         REQ(VHOST_USER_GET_CONFIG),
-         REQ(VHOST_USER_SET_CONFIG),
-+        REQ(VHOST_USER_POSTCOPY_ADVISE),
-         REQ(VHOST_USER_MAX),
-     };
- #undef REQ
-@@ -856,6 +857,17 @@ vu_set_config(VuDev *dev, VhostUserMsg *vmsg)
-     return false;
- }
-=20
-+static bool
-+vu_set_postcopy_advise(VuDev *dev, VhostUserMsg *vmsg)
-+{
-+    /* TODO: Open ufd, pass it back in the request
-+     * TODO: Add addresses
-+     */
-+    vmsg->payload.u64 =3D 0xcafe;
-+    vmsg->size =3D sizeof(vmsg->payload.u64);
-+    return true; /* =3D send a reply */
-+}
-+
- static bool
- vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
- {
-@@ -927,6 +939,8 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
-         return vu_set_config(dev, vmsg);
-     case VHOST_USER_NONE:
-         break;
-+    case VHOST_USER_POSTCOPY_ADVISE:
-+        return vu_set_postcopy_advise(dev, vmsg);
-     default:
-         vmsg_close_fds(vmsg);
-         vu_panic(dev, "Unhandled request: %d", vmsg->request);
-diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
-r/libvhost-user.h
-index 96db29c4ce..00d78a8810 100644
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
+index 18f95f65d7..96db29c4ce 100644
 --- a/contrib/libvhost-user/libvhost-user.h
 +++ b/contrib/libvhost-user/libvhost-user.h
-@@ -83,6 +83,9 @@ typedef enum VhostUserRequest {
-     VHOST_USER_SET_VRING_ENDIAN =3D 23,
-     VHOST_USER_GET_CONFIG =3D 24,
-     VHOST_USER_SET_CONFIG =3D 25,
-+    VHOST_USER_CREATE_CRYPTO_SESSION =3D 26,
-+    VHOST_USER_CLOSE_CRYPTO_SESSION =3D 27,
-+    VHOST_USER_POSTCOPY_ADVISE  =3D 28,
-     VHOST_USER_MAX
- } VhostUserRequest;
-=20
+@@ -48,6 +48,8 @@ enum VhostUserProtocolFeature {
+     VHOST_USER_PROTOCOL_F_NET_MTU = 4,
+     VHOST_USER_PROTOCOL_F_SLAVE_REQ = 5,
+     VHOST_USER_PROTOCOL_F_CROSS_ENDIAN = 6,
++    VHOST_USER_PROTOCOL_F_CRYPTO_SESSION = 7,
++    VHOST_USER_PROTOCOL_F_PAGEFAULT = 8,
+ 
+     VHOST_USER_PROTOCOL_F_MAX
+ };
 diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-index 91a572d781..acc4186c79 100644
+index cb3a7595aa..91a572d781 100644
 --- a/docs/interop/vhost-user.txt
 +++ b/docs/interop/vhost-user.txt
-@@ -699,6 +699,16 @@ Master message types
-      feature has been successfully negotiated.
-      It's a required feature for crypto devices.
-=20
-+ * VHOST_USER_POSTCOPY_ADVISE
-+      Id: 28
-+      Master payload: N/A
-+      Slave payload: userfault fd + u64
+@@ -290,6 +290,15 @@ Once the source has finished migration, rings will be stopped by
+ the source. No further update must be done before rings are
+ restarted.
+ 
++In postcopy migration the slave is started before all the memory has been
++received from the source host, and care must be taken to avoid accessing pages
++that have yet to be received.  The slave opens a 'userfault'-fd and registers
++the memory with it; this fd is then passed back over to the master.
++The master services requests on the userfaultfd for pages that are accessed
++and when the page is available it performs WAKE ioctl's on the userfaultfd
++to wake the stalled slave.  The client indicates support for this via the
++VHOST_USER_PROTOCOL_F_PAGEFAULT feature.
 +
-+      When VHOST_USER_PROTOCOL_F_PAGEFAULT is supported, the
-+      master advises slave that a migration with postcopy enabled is und=
-erway,
-+      the slave must open a userfaultfd for later use.
-+      Note that at this stage the migration is still in precopy mode.
-+
- Slave message types
- -------------------
-=20
+ Memory access
+ -------------
+ 
+@@ -369,6 +378,7 @@ Protocol features
+ #define VHOST_USER_PROTOCOL_F_SLAVE_REQ      5
+ #define VHOST_USER_PROTOCOL_F_CROSS_ENDIAN   6
+ #define VHOST_USER_PROTOCOL_F_CRYPTO_SESSION 7
++#define VHOST_USER_PROTOCOL_F_PAGEFAULT      8
+ 
+ Master message types
+ --------------------
 diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index aab35c4845..431858b219 100644
+index 41ff5cff41..aab35c4845 100644
 --- a/hw/virtio/vhost-user.c
 +++ b/hw/virtio/vhost-user.c
-@@ -78,6 +78,7 @@ typedef enum VhostUserRequest {
-     VHOST_USER_SET_CONFIG =3D 25,
-     VHOST_USER_CREATE_CRYPTO_SESSION =3D 26,
-     VHOST_USER_CLOSE_CRYPTO_SESSION =3D 27,
-+    VHOST_USER_POSTCOPY_ADVISE  =3D 28,
-     VHOST_USER_MAX
- } VhostUserRequest;
-=20
-@@ -795,6 +796,50 @@ out:
+@@ -18,6 +18,8 @@
+ #include "qemu/error-report.h"
+ #include "qemu/sockets.h"
+ #include "sysemu/cryptodev.h"
++#include "migration/migration.h"
++#include "migration/postcopy-ram.h"
+ 
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+@@ -41,7 +43,7 @@ enum VhostUserProtocolFeature {
+     VHOST_USER_PROTOCOL_F_SLAVE_REQ = 5,
+     VHOST_USER_PROTOCOL_F_CROSS_ENDIAN = 6,
+     VHOST_USER_PROTOCOL_F_CRYPTO_SESSION = 7,
+-
++    VHOST_USER_PROTOCOL_F_PAGEFAULT = 8,
+     VHOST_USER_PROTOCOL_F_MAX
+ };
+ 
+@@ -164,8 +166,10 @@ static VhostUserMsg m __attribute__ ((unused));
+ #define VHOST_USER_VERSION    (0x1)
+ 
+ struct vhost_user {
++    struct vhost_dev *dev;
+     CharBackend *chr;
+     int slave_fd;
++    NotifierWithReturn postcopy_notifier;
+ };
+ 
+ static bool ioeventfd_enabled(void)
+@@ -791,6 +795,33 @@ out:
      return ret;
  }
-=20
-+/*
-+ * Called at the start of an inbound postcopy on reception of the
-+ * 'advise' command.
-+ */
-+static int vhost_user_postcopy_advise(struct vhost_dev *dev, Error **err=
-p)
+ 
++static int vhost_user_postcopy_notifier(NotifierWithReturn *notifier,
++                                        void *opaque)
 +{
-+    struct vhost_user *u =3D dev->opaque;
-+    CharBackend *chr =3D u->chr;
-+    int ufd;
-+    VhostUserMsg msg =3D {
-+        .hdr.request =3D VHOST_USER_POSTCOPY_ADVISE,
-+        .hdr.flags =3D VHOST_USER_VERSION,
-+    };
++    struct PostcopyNotifyData *pnd = opaque;
++    struct vhost_user *u = container_of(notifier, struct vhost_user,
++                                         postcopy_notifier);
++    struct vhost_dev *dev = u->dev;
 +
-+    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-+        error_setg(errp, "Failed to send postcopy_advise to vhost");
-+        return -1;
++    switch (pnd->reason) {
++    case POSTCOPY_NOTIFY_PROBE:
++        if (!virtio_has_feature(dev->protocol_features,
++                                VHOST_USER_PROTOCOL_F_PAGEFAULT)) {
++            /* TODO: Get the device name into this error somehow */
++            error_setg(pnd->errp,
++                       "vhost-user backend not capable of postcopy");
++            return -ENOENT;
++        }
++        break;
++
++    default:
++        /* We ignore notifications we don't know */
++        break;
 +    }
 +
-+    if (vhost_user_read(dev, &msg) < 0) {
-+        error_setg(errp, "Failed to get postcopy_advise reply from vhost=
-");
-+        return -1;
-+    }
-+
-+    if (msg.hdr.request !=3D VHOST_USER_POSTCOPY_ADVISE) {
-+        error_setg(errp, "Unexpected msg type. Expected %d received %d",
-+                     VHOST_USER_POSTCOPY_ADVISE, msg.hdr.request);
-+        return -1;
-+    }
-+
-+    if (msg.hdr.size !=3D sizeof(msg.payload.u64)) {
-+        error_setg(errp, "Received bad msg size.");
-+        return -1;
-+    }
-+    ufd =3D qemu_chr_fe_get_msgfd(chr);
-+    if (ufd < 0) {
-+        error_setg(errp, "%s: Failed to get ufd", __func__);
-+        return -1;
-+    }
-+
-+    /* TODO: register ufd with userfault thread */
 +    return 0;
 +}
 +
- static int vhost_user_postcopy_notifier(NotifierWithReturn *notifier,
-                                         void *opaque)
+ static int vhost_user_init(struct vhost_dev *dev, void *opaque)
  {
-@@ -814,6 +859,9 @@ static int vhost_user_postcopy_notifier(NotifierWithR=
-eturn *notifier,
-         }
-         break;
-=20
-+    case POSTCOPY_NOTIFY_INBOUND_ADVISE:
-+        return vhost_user_postcopy_advise(dev, pnd->errp);
-+
-     default:
-         /* We ignore notifications we don't know */
-         break;
-diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
-index 2e879bbacb..0421c98d57 100644
---- a/migration/postcopy-ram.h
-+++ b/migration/postcopy-ram.h
-@@ -130,6 +130,7 @@ void postcopy_infrastructure_init(void);
-  */
- enum PostcopyNotifyReason {
-     POSTCOPY_NOTIFY_PROBE =3D 0,
-+    POSTCOPY_NOTIFY_INBOUND_ADVISE,
- };
-=20
- struct PostcopyNotifyData {
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 358c5b51e2..1f2bf12a28 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1386,6 +1386,7 @@ static int loadvm_postcopy_handle_advise(MigrationI=
-ncomingState *mis,
- {
-     PostcopyState ps =3D postcopy_state_set(POSTCOPY_INCOMING_ADVISE);
-     uint64_t remote_pagesize_summary, local_pagesize_summary, remote_tps=
-;
-+    Error *local_err =3D NULL;
-=20
-     trace_loadvm_postcopy_handle_advise();
-     if (ps !=3D POSTCOPY_INCOMING_NONE) {
-@@ -1451,6 +1452,11 @@ static int loadvm_postcopy_handle_advise(Migration=
-IncomingState *mis,
-         return -1;
+     uint64_t features, protocol_features;
+@@ -802,6 +833,7 @@ static int vhost_user_init(struct vhost_dev *dev, void *opaque)
+     u = g_new0(struct vhost_user, 1);
+     u->chr = opaque;
+     u->slave_fd = -1;
++    u->dev = dev;
+     dev->opaque = u;
+ 
+     err = vhost_user_get_features(dev, &features);
+@@ -858,6 +890,9 @@ static int vhost_user_init(struct vhost_dev *dev, void *opaque)
+         return err;
      }
-=20
-+    if (postcopy_notify(POSTCOPY_NOTIFY_INBOUND_ADVISE, &local_err)) {
-+        error_report_err(local_err);
-+        return -1;
+ 
++    u->postcopy_notifier.notify = vhost_user_postcopy_notifier;
++    postcopy_add_notifier(&u->postcopy_notifier);
++
+     return 0;
+ }
+ 
+@@ -868,6 +903,10 @@ static int vhost_user_cleanup(struct vhost_dev *dev)
+     assert(dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_USER);
+ 
+     u = dev->opaque;
++    if (u->postcopy_notifier.notify) {
++        postcopy_remove_notifier(&u->postcopy_notifier);
++        u->postcopy_notifier.notify = NULL;
 +    }
-+
-     if (ram_postcopy_incoming_init(mis)) {
-         return -1;
-     }
---=20
+     if (u->slave_fd >= 0) {
+         qemu_set_fd_handler(u->slave_fd, NULL, NULL, NULL);
+         close(u->slave_fd);
+-- 
 2.14.3
