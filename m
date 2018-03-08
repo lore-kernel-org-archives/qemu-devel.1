@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eu2Nh-0003Z0-Is
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:43:18 -0500
+	(envelope-from <lersek@redhat.com>) id 1eu2S6-00052Q-O7
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:47:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eu2Nc-00085F-Hm
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:43:17 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:51202)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eu2Nc-00084v-7x
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:43:12 -0500
-Received: by mail-wm0-x242.google.com with SMTP id h21so245752wmd.1
-	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 12:43:12 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180305211928.466-1-f4bug@amsat.org>
-	<20180305211928.466-16-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9ead7dfb-df2a-6fbc-00ae-742d1e2b112f@amsat.org>
-Date: Thu, 8 Mar 2018 21:43:08 +0100
+	(envelope-from <lersek@redhat.com>) id 1eu2S1-0001AP-Ib
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:47:50 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42810 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1eu2S1-0001A3-Dp
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:47:45 -0500
+References: <20180307144951.d75lo5rgzi2vf27z@eukaryote>
+	<90ba320e-2a05-8962-dc6b-252b3e15d1b7@redhat.com>
+	<20180308154730.GZ4718@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <c455f46b-dc25-fe7e-acc8-140f4a703e94@redhat.com>
+Date: Thu, 8 Mar 2018 21:47:27 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180305211928.466-16-f4bug@amsat.org>
+In-Reply-To: <20180308154730.GZ4718@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 15/22] hw/isa/superio: Factor out
- the FDC37M817 Super I/O from mips_malta.c
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC] Defining firmware (OVMF,
+ et al) metadata format & file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,152 +30,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Marcel Apfelbaum <marcel@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alexey Kardashevskiy <aik@ozlabs.ru>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, kraxel@redhat.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-On 03/05/2018 10:19 PM, Philippe Mathieu-Daudé wrote:
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  include/hw/isa/superio.h |  2 ++
->  hw/isa/isa-superio.c     | 20 ++++++++++++++++++++
->  hw/mips/mips_malta.c     | 35 ++++++++++-------------------------
->  3 files changed, 32 insertions(+), 25 deletions(-)
-> 
-> diff --git a/include/hw/isa/superio.h b/include/hw/isa/superio.h
-> index 3dd5448f8c..b47aac3cf8 100644
-> --- a/include/hw/isa/superio.h
-> +++ b/include/hw/isa/superio.h
-> @@ -54,4 +54,6 @@ typedef struct ISASuperIOClass {
->      ISASuperIOFuncs ide;
->  } ISASuperIOClass;
->  
-> +#define TYPE_FDC37M81X_SUPERIO  "fdc37m81x-superio"
-> +
->  #endif /* HW_ISA_SUPERIO_H */
-> diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
-> index 88d254a602..f1f699fc2f 100644
-> --- a/hw/isa/isa-superio.c
-> +++ b/hw/isa/isa-superio.c
-> @@ -182,9 +182,29 @@ static const TypeInfo isa_superio_type_info = {
->      .class_init = isa_superio_class_init,
->  };
->  
-> +/* SMS FDC37M817 Super I/O */
-> +static void fdc37m81x_class_init(ObjectClass *klass, void *data)
-> +{
-> +    ISASuperIOClass *sc = ISA_SUPERIO_CLASS(klass);
-> +
-> +    sc->serial.count = 2; /* NS16C550A */
-> +    sc->parallel.count = 1;
-> +    sc->floppy.count = 1; /* SMSC 82077AA Compatible */
-> +    sc->ide.count = 0;
-> +}
-> +
-> +static const TypeInfo fdc37m81x_type_info = {
-> +    .name          = TYPE_FDC37M81X_SUPERIO,
-> +    .parent        = TYPE_ISA_SUPERIO,
-> +    .instance_size = sizeof(ISASuperIODevice),
-> +    .class_size    = sizeof(ISASuperIOClass),
-> +    .class_init    = fdc37m81x_class_init,
-> +};
-> +
->  static void isa_superio_register_types(void)
->  {
->      type_register_static(&isa_superio_type_info);
-> +    type_register_static(&fdc37m81x_type_info);
->  }
->  
->  type_init(isa_superio_register_types)
-> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-> index 9e0724ca5a..f6513a4fd5 100644
-> --- a/hw/mips/mips_malta.c
-> +++ b/hw/mips/mips_malta.c
-> @@ -27,14 +27,12 @@
->  #include "cpu.h"
->  #include "hw/hw.h"
->  #include "hw/i386/pc.h"
-> +#include "hw/isa/superio.h"
->  #include "hw/dma/i8257.h"
->  #include "hw/char/serial.h"
-> -#include "hw/char/parallel.h"
-> -#include "hw/block/fdc.h"
->  #include "net/net.h"
->  #include "hw/boards.h"
->  #include "hw/i2c/smbus.h"
-> -#include "sysemu/block-backend.h"
->  #include "hw/block/flash.h"
->  #include "hw/mips/mips.h"
->  #include "hw/mips/cpudevs.h"
-> @@ -47,7 +45,6 @@
->  #include "hw/loader.h"
->  #include "elf.h"
->  #include "hw/timer/mc146818rtc.h"
-> -#include "hw/input/i8042.h"
->  #include "hw/timer/i8254.h"
->  #include "sysemu/blockdev.h"
->  #include "exec/address-spaces.h"
-> @@ -1005,10 +1002,8 @@ void mips_malta_init(MachineState *machine)
->      qemu_irq cbus_irq, i8259_irq;
->      int piix4_devfn;
->      I2CBus *smbus;
-> -    int i;
->      DriveInfo *dinfo;
->      DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
-> -    DriveInfo *fd[MAX_FD];
->      int fl_idx = 0;
->      int fl_sectors = bios_size >> 16;
->      int be;
-> @@ -1023,15 +1018,6 @@ void mips_malta_init(MachineState *machine)
->  
->      qdev_init_nofail(dev);
->  
-> -    /* Make sure the first 3 serial ports are associated with a device. */
-> -    for(i = 0; i < 3; i++) {
-> -        if (!serial_hds[i]) {
-> -            char label[32];
-> -            snprintf(label, sizeof(label), "serial%d", i);
-> -            serial_hds[i] = qemu_chr_new(label, "null");
-> -        }
-> -    }
-> -
->      /* create CPU */
->      mips_create_cpu(s, machine->cpu_type, &cbus_irq, &i8259_irq);
->  
-> @@ -1067,7 +1053,14 @@ void mips_malta_init(MachineState *machine)
->  #else
->      be = 0;
->  #endif
-> +
->      /* FPGA */
-> +
-> +    /* Make sure the second serial port is associated with a device. */
-> +    if (!serial_hds[2]) {
-> +        serial_hds[2] = qemu_chr_new("fpga-uart", "null");
-> +    }
-> +
->      /* The CBUS UART is attached to the MIPS CPU INT2 pin, ie interrupt 4 */
->      malta_fpga_init(system_memory, FPGA_ADDRESS, cbus_irq, serial_hds[2]);
->  
-> @@ -1214,16 +1207,8 @@ void mips_malta_init(MachineState *machine)
->      smbus_eeprom_init(smbus, 8, smbus_eeprom_buf, smbus_eeprom_size);
->      g_free(smbus_eeprom_buf);
->  
-> -    /* Super I/O */
-> -    isa_create_simple(isa_bus, TYPE_I8042);
-> -
-> -    serial_hds_isa_init(isa_bus, 0, 2);
-> -    parallel_hds_isa_init(isa_bus, 1);
-> -
-> -    for(i = 0; i < MAX_FD; i++) {
-> -        fd[i] = drive_get(IF_FLOPPY, 0, i);
-> -    }
-> -    fdctrl_init_isa(isa_bus, fd);
-> +    /* Super I/O: SMS FDC37M817 */
-> +    isa_create_simple(isa_bus, TYPE_FDC37M81X_SUPERIO);
->  
->      /* Network card */
->      network_init(pci_bus);
-> 
+On 03/08/18 16:47, Daniel P. Berrang=C3=A9 wrote:
+> On Thu, Mar 08, 2018 at 12:10:30PM +0100, Laszlo Ersek wrote:
 
-Booting Aurelien Malta Linux image with this series applied, the console
-is identical (also 'info mtree' in monitor).
+>> I suggest (or agree) that the property list be composed of free-form
+>> name=3Dvalue pairs (at least conceptually). I understand Gerd is propo=
+sing
+>> a QAPI schema for this, so maybe do { property_name : "foo",
+>> property_value : "bar" }, or similar. The registry of properties (name=
+s,
+>> possible values, meanings) should be kept separate (although possibly
+>> still under QEMU).
+>>
+>> For OVMF (x86), I guess the initial set of properties should come from
+>> the "-D FOO[=3DBAR]" build flags that OVMF currently supports. (The li=
+st
+>> might grow or change incompatibly over time, so this is just a raw
+>> starter idea.)
+>=20
+> I really don't want to see us using firmware implementation specific
+> property names in these files. It means libvirt will require knowledge
+> of what each different firmware's property names mean.
+>=20
+> We need to have some core standardized set of property names that can
+> be provided by any firmware implementation using the same terminology.
+>=20
+> If we want to /also/ provide some extra firmeware-specific property
+> names that would be ok for informative purposes, but when lbivirt is
+> picking which firmware file to use, it would only ever look at the
+> standardized property names/values.
+
+This is a reasonable requirement from the libvirt side.
+
+Unfortunately (or not), it requires someone (or a tight group of people)
+to collect the features of all virtual firmwares in existence, and
+extract a common set of properties that maps back to each firmware one
+way or another. This is not unusual (basically this is how all standards
+bodies work that intend to codify existing practice), it just needs a
+bunch of work and coordination. We'll have to maintain a registry.
+
+Personally I can't comment on anything else than OVMF and the ArmVirt
+firmwares.
+
+Thanks,
+Laszlo
