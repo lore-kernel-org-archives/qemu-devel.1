@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59882)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
-	id 1etzW2-0007QM-Ih
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:39:44 -0500
+	id 1etzW2-0007QI-98
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:39:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
-	id 1etzW1-0008MZ-CC
+	id 1etzW1-0008MX-Cr
 	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:39:42 -0500
-Received: from smtp.citrix.com ([66.165.176.89]:42122)
+Received: from smtp.citrix.com ([66.165.176.89]:31749)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
-	id 1etzW1-0008JW-3h
+	id 1etzW1-0008KY-39
 	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:39:41 -0500
 From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Thu, 8 Mar 2018 17:39:13 +0000
-Message-ID: <1520530757-4477-8-git-send-email-ian.jackson@eu.citrix.com>
+Date: Thu, 8 Mar 2018 17:39:12 +0000
+Message-ID: <1520530757-4477-7-git-send-email-ian.jackson@eu.citrix.com>
 In-Reply-To: <1520530757-4477-1-git-send-email-ian.jackson@eu.citrix.com>
 References: <1520530757-4477-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 07/11] os-posix: Provide new -runas <uid>:<gid>
- facility
+Subject: [Qemu-devel] [PATCH 06/11] xen: destroy_hvm_domain: Try
+ xendevicemodel_shutdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,147 +30,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Ian Jackson <Ian.Jackson@eu.citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Ian Jackson <Ian.Jackson@eu.citrix.com>
 
-This allows the caller to specify a uid and gid to use, even if there
-is no corresponding password entry.  This will be useful in certain
-Xen configurations.
+xc_interface_open etc. is not going to work if we have dropped
+privilege, but xendevicemodel_shutdown will if everything is new
+enough.
 
-We don't support just -runas <uid> because: (i) deprivileging without
-calling setgroups would be ineffective (ii) given only a uid we don't
-know what gid we ought to use (since uids may eppear in multiple
-passwd file entries with different gids).
+xendevicemodel_shutdown is only availabe in Xen 4.10 and later, so
+provide a stub for earlier versions.
 
 Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
 Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Markus Armbruster <armbru@redhat.com>
-CC: Daniel P. Berrange <berrange@redhat.com>
 ---
-v6: Use qemu_strtoul for the first strtoul.
-    Use error_report rather than fprintf to print usage error message.
-    Fix an error message which still referred to . rather than :
-v5: Use : rather than . to separate uid from gid
-v4: Changed to reuse option -runas
-v3: Error messages fixed.  Thanks to Peter Maydell and Ross Lagerwall.
-v2: Coding style fixes.
+v6: Do not print message about harmless condition in ENOTTY case.
+v2: Add compatibility stub for Xen < 4.10.
+    Fix coding style.
 
 Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
 ---
- os-posix.c      | 62 +++++++++++++++++++++++++++++++++++++++++++++++----------
- qemu-options.hx |  3 ++-
- 2 files changed, 53 insertions(+), 12 deletions(-)
+ hw/i386/xen/xen-hvm.c       | 11 +++++++++++
+ include/hw/xen/xen_common.h |  7 +++++++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/os-posix.c b/os-posix.c
-index b9c2343..32d7cf0 100644
---- a/os-posix.c
-+++ b/os-posix.c
-@@ -42,6 +42,8 @@
- #endif
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index 3590d99..b95748d 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -1386,9 +1386,20 @@ void destroy_hvm_domain(bool reboot)
+ {
+     xc_interface *xc_handle;
+     int sts;
++    int rc;
  
- static struct passwd *user_pwd;
-+static uid_t user_uid = (uid_t)-1;
-+static gid_t user_gid = (gid_t)-1;
- static const char *chroot_dir;
- static int daemonize;
- static int daemon_pipe;
-@@ -127,6 +129,34 @@ void os_set_proc_name(const char *s)
- #endif
+     unsigned int reason = reboot ? SHUTDOWN_reboot : SHUTDOWN_poweroff;
+ 
++    if (xen_dmod) {
++        rc = xendevicemodel_shutdown(xen_dmod, xen_domid, reason);
++        if (!rc) {
++            return;
++        }
++        if (errno != ENOTTY /* old Xen */)
++            perror("xendevicemodel_shutdown failed");
++        /* well, try the old thing then */
++    }
++
+     xc_handle = xc_interface_open(0, 0, 0);
+     if (xc_handle == NULL) {
+         fprintf(stderr, "Cannot acquire xenctrl handle\n");
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index 60c4ebb..4bd30a3 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -108,6 +108,13 @@ static inline int xentoolcore_restrict_all(domid_t domid)
+     return -1;
  }
  
-+
-+static bool os_parse_runas_uid_gid(const char *optarg)
++static inline int xendevicemodel_shutdown(xendevicemodel_handle *dmod,
++                                          domid_t domid, unsigned int reason)
 +{
-+    unsigned long lv;
-+    char *ep;
-+    uid_t got_uid;
-+    gid_t got_gid;
-+    int rc;
-+
-+    errno = 0;
-+    rc = qemu_strtoul(optarg, &ep, 0, &lv);
-+    got_uid = lv; /* overflow here is ID in C99 */
-+    if (rc || *ep != ':' || got_uid != lv || got_uid == (uid_t)-1) {
-+        return false;
-+    }
-+
-+    lv = 0;
-+    rc = qemu_strtoul(ep + 1, 0, 0, &lv);
-+    got_gid = lv; /* overflow here is ID in C99 */
-+    if (rc || got_gid != lv || got_gid == (gid_t)-1) {
-+        return false;
-+    }
-+
-+    user_uid = got_uid;
-+    user_gid = got_gid;
-+    return true;
++    errno = ENOTTY;
++    return -1;
 +}
 +
- /*
-  * Parse OS specific command line options.
-  * return 0 if option handled, -1 otherwise
-@@ -144,8 +174,8 @@ void os_parse_cmd_args(int index, const char *optarg)
- #endif
-     case QEMU_OPTION_runas:
-         user_pwd = getpwnam(optarg);
--        if (!user_pwd) {
--            fprintf(stderr, "User \"%s\" doesn't exist\n", optarg);
-+        if (!user_pwd && !os_parse_runas_uid_gid(optarg)) {
-+            error_report("User doesn't exist (and is not <uid>:<gid>)");
-             exit(1);
-         }
-         break;
-@@ -165,18 +195,28 @@ void os_parse_cmd_args(int index, const char *optarg)
+ #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 41000 */
  
- static void change_process_uid(void)
- {
--    if (user_pwd) {
--        if (setgid(user_pwd->pw_gid) < 0) {
--            fprintf(stderr, "Failed to setgid(%d)\n", user_pwd->pw_gid);
-+    if (user_pwd || user_uid != (uid_t)-1) {
-+        gid_t intended_gid = user_pwd ? user_pwd->pw_gid : user_gid;
-+        uid_t intended_uid = user_pwd ? user_pwd->pw_uid : user_uid;
-+        if (setgid(intended_gid) < 0) {
-+            fprintf(stderr, "Failed to setgid(%d)\n", intended_gid);
-             exit(1);
-         }
--        if (initgroups(user_pwd->pw_name, user_pwd->pw_gid) < 0) {
--            fprintf(stderr, "Failed to initgroups(\"%s\", %d)\n",
--                    user_pwd->pw_name, user_pwd->pw_gid);
--            exit(1);
-+        if (user_pwd) {
-+            if (initgroups(user_pwd->pw_name, user_pwd->pw_gid) < 0) {
-+                fprintf(stderr, "Failed to initgroups(\"%s\", %d)\n",
-+                        user_pwd->pw_name, user_pwd->pw_gid);
-+                exit(1);
-+            }
-+        } else {
-+            if (setgroups(1, &user_gid) < 0) {
-+                fprintf(stderr, "Failed to setgroups(1, [%d])",
-+                        user_gid);
-+                exit(1);
-+            }
-         }
--        if (setuid(user_pwd->pw_uid) < 0) {
--            fprintf(stderr, "Failed to setuid(%d)\n", user_pwd->pw_uid);
-+        if (setuid(intended_uid) < 0) {
-+            fprintf(stderr, "Failed to setuid(%d)\n", intended_uid);
-             exit(1);
-         }
-         if (setuid(0) != -1) {
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 6585058..211f2a6 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3763,7 +3763,8 @@ ETEXI
- 
- #ifndef _WIN32
- DEF("runas", HAS_ARG, QEMU_OPTION_runas, \
--    "-runas user     change to user id user just before starting the VM\n",
-+    "-runas user     change to user id user just before starting the VM\n" \
-+    "                user can be numeric uid:gid instead\n",
-     QEMU_ARCH_ALL)
- #endif
- STEXI
+ #include <xentoolcore.h>
 -- 
 2.1.4
