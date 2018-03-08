@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ety3Y-0008K9-Dj
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:06:17 -0500
+	(envelope-from <stefanha@gmail.com>) id 1etyAO-0003B4-EH
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:13:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ety3S-0001qG-Gf
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:06:12 -0500
-References: <20180307225732.155835-1-eblake@redhat.com>
-	<1651749911.5944222.1520491852256.JavaMail.zimbra@redhat.com>
-	<8b5bee3a-c30b-38da-b861-bceebad9b57e@redhat.com>
-	<c316b5e0-932f-6de0-ac19-41d12730201c@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d0e62cf0-c7b8-d883-4959-b5bc22be5608@redhat.com>
-Date: Thu, 8 Mar 2018 10:05:55 -0600
+	(envelope-from <stefanha@gmail.com>) id 1etyAK-0006Ea-FH
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:13:16 -0500
+Date: Thu, 8 Mar 2018 16:13:09 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180308161309.GF2769@stefanha-x1.localdomain>
+References: <20180307162958.11232-1-nia.alarie@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <c316b5e0-932f-6de0-ac19-41d12730201c@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] nbd/server: Honor FUA request on
- NBD_CMD_TRIM
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="K/NRh952CO+2tg14"
+Content-Disposition: inline
+In-Reply-To: <20180307162958.11232-1-nia.alarie@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] s390x/virtio: Convert virtio-ccw from
+ *_exit to *_unrealize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +24,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, vsementsov@virtuozzo.com, kwolf@redhat.com
+To: Nia Alarie <nia.alarie@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, borntraeger@de.ibm.com, jim@groklearning.com, joel@jms.id.au
 
-On 03/08/2018 09:22 AM, Paolo Bonzini wrote:
->>> TRIM requests should not need FUA since they're just advisory.
->>
->> Still, while you argue that TRIM is advisory (which I agree), if it does
->> nothing, then you've (implicitly) honored FUA (that transaction didn't
->> affect persistent storage, so you didn't have to wait any longer for
->> anything to land); but if it DOES change the disk contents, then waiting
->> for that change to land IS worth supporting, hence why the NBD protocol
->> requires the FUA flag to be honored on trim.
-> 
-> But if power fails, after restart you cannot see the difference between
-> a TRIM command that chose to did nothing, and one that chose to change
-> the disk contents but failed to persist the changes.  This is why I
-> thought there is no need for FUA in my opinion.
-> 
-> I suppose in principle you could detect the change by reading the
-> TRIMmed sectors and writing to another disk.  So TRIM would have to be a
-> Schroedinger command that is persistent once you read the sectors, and
-> that makes little sense.  The problem is, SCSI doesn't have a FUA flag
-> either...
 
-The documentation of NBD_CMD_TRIM says that in general you must not 
-expect reliable read results from the area you trimmed (since the 
-command is advisory, you don't know if you would read the old data 
-unchanged, all zeroes, or even random unrelated data).  But if you know 
-that a particular server treats TRIM as mandatory rather than advisory, 
-and also guarantees a reads-as-zero after a successful TRIM, then for 
-that particular server, the FUA flag on TRIM makes sense.  The 
-documentation for NBD_CMD_BLOCK_STATUS also points out that block status 
-may, but not must, be altered by NBD_CMD_TRIM, which might be another 
-way to observer how much of a TRIM request was advisory.
+--K/NRh952CO+2tg14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-At any rate, your argument makes sense that because bdrv_pdiscard() is 
-advisory, we can't tell whether it made a difference, and therefore 
-waiting for it to make a difference isn't worthwhile, and therefore 
-plumbing BDRV_REQ_FUA through the block layer for bdrv_pdiscard() is 
-pointless.  At this point, I will just go ahead and add the flush for 
-qemu as NBD server if it ever sees NBD_CMD_TRIM + FUA (which is unlikely 
-to happen in practice, as most clients are smart enough to realize that 
-TRIM is advisory and reading after TRIM is unreliable anyways, so 
-waiting for the TRIM to land is pointless); and qemu as a client will 
-probably never send NBD_CMD_TRIM + FUA.
+On Wed, Mar 07, 2018 at 04:29:58PM +0000, Nia Alarie wrote:
+> @@ -760,12 +760,12 @@ static int virtio_ccw_exit(VirtioCcwDevice *dev)
+>      if (sch) {
+>          css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
+>          g_free(sch);
+> +        ccw_dev->sch = NULL;
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+This change is unrelated to the topic of the patch and not mentioned in
+the commit description.  I think it was probably made for consistency,
+rather than a bug fix or functional change.  That's a valid reason too
+but please mention secondary changes like this in future patches so
+reviewers know why you made them.
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--K/NRh952CO+2tg14
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaoWEVAAoJEJykq7OBq3PISC8IALij0P6v/xOpDzVY1Yr5wwEC
+X3FgleIyas475lkzJhFbGmXk6XVbQsOeu1LdAayMb75XxVJ4z1rxmrhNBzhC8HIf
+Ac4z34YCMMllFhtCAXleJFsqhUsAkGUjMwu5gbZbI9x1cAu1C1hjREDmG0GyicNP
+AIzBI+gk/6nk197F3JbnmS3Yu16vIupFPaBKo0uw5ZzDBFWVB0azRyBqkJI1TRao
+PJgxliduOFRKOcG9uR2bccHdNsjeRvbbJAF3OGMxyBrMhNpoqfC5Sw9IuK2VRyRc
+HLnzQMoVrrDG/W/UBHQM55q8Ghr/nYSw7kN0pBgJUtu4l9VlPrnB4zPh1eWjuDY=
+=taNL
+-----END PGP SIGNATURE-----
+
+--K/NRh952CO+2tg14--
