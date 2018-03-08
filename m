@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1etuzy-0005WR-8r
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:50:21 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1etv02-0005be-G5
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:50:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1etuzu-0004BQ-8e
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:50:18 -0500
-Received: from mail-cys01nam02on0055.outbound.protection.outlook.com
-	([104.47.37.55]:40580
+	(envelope-from <brijesh.singh@amd.com>) id 1etuzy-0004H8-Gw
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:50:22 -0500
+Received: from mail-cys01nam02on0064.outbound.protection.outlook.com
+	([104.47.37.64]:3232
 	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1etuzt-0004As-W4
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:50:14 -0500
+	id 1etuzy-0004GP-9p
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:50:18 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Thu,  8 Mar 2018 06:48:51 -0600
-Message-Id: <20180308124901.83533-19-brijesh.singh@amd.com>
+Date: Thu,  8 Mar 2018 06:48:53 -0600
+Message-Id: <20180308124901.83533-21-brijesh.singh@amd.com>
 In-Reply-To: <20180308124901.83533-1-brijesh.singh@amd.com>
 References: <20180308124901.83533-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v12 18/28] sev/i386: add support to
- LAUNCH_MEASURE command
+Subject: [Qemu-devel] [PATCH v12 20/28] hw/i386: set ram_debug_ops when
+ memory encryption is enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,147 +32,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
 
-During machine creation we encrypted the guest bios image, the
-LAUNCH_MEASURE command can be used to retrieve the measurement of
-the encrypted memory region. This measurement is a signature of
-the memory contents that can be sent to the guest owner as an
-attestation that the memory was encrypted correctly by the firmware.
-VM management tools like libvirt can query the measurement using
-query-sev-launch-measure QMP command.
+When memory encryption is enabled, the guest RAM and boot flash ROM will
+contain the encrypted data. By setting the debug ops allow us to invoke
+encryption APIs when accessing the memory for the debug purposes.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Richard Henderson <rth@twiddle.net>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- target/i386/sev-stub.c   |  5 ++++
- target/i386/sev.c        | 63 ++++++++++++++++++++++++++++++++++++++++++++++++
- target/i386/sev_i386.h   |  2 ++
- target/i386/trace-events |  1 +
- 4 files changed, 71 insertions(+)
+ hw/i386/pc.c       | 9 +++++++++
+ hw/i386/pc_sysfw.c | 6 ++++++
+ 2 files changed, 15 insertions(+)
 
-diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
-index c86d8c139237..2f61c32ec975 100644
---- a/target/i386/sev-stub.c
-+++ b/target/i386/sev-stub.c
-@@ -39,3 +39,8 @@ uint32_t sev_get_reduced_phys_bits(void)
- {
-     return 0;
- }
-+
-+char *sev_get_launch_measurement(void)
-+{
-+    return NULL;
-+}
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index cb0bf84742ed..7ad7eaf600a7 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -516,6 +516,68 @@ sev_launch_update_data(uint8_t *addr, uint64_t len)
-     return ret;
- }
- 
-+static void
-+sev_launch_get_measure(Notifier *notifier, void *unused)
-+{
-+    int ret, error;
-+    guchar *data;
-+    SEVState *s = sev_state;
-+    struct kvm_sev_launch_measure *measurement;
-+
-+    if (!sev_check_state(SEV_STATE_LUPDATE)) {
-+        return;
-+    }
-+
-+    measurement = g_new0(struct kvm_sev_launch_measure, 1);
-+
-+    /* query the measurement blob length */
-+    ret = sev_ioctl(sev_state->sev_fd, KVM_SEV_LAUNCH_MEASURE,
-+                    measurement, &error);
-+    if (!measurement->len) {
-+        error_report("%s: LAUNCH_MEASURE ret=%d fw_error=%d '%s'",
-+                     __func__, ret, error, fw_error_to_str(errno));
-+        goto free_measurement;
-+    }
-+
-+    data = g_new0(guchar, measurement->len);
-+    measurement->uaddr = (unsigned long)data;
-+
-+    /* get the measurement blob */
-+    ret = sev_ioctl(sev_state->sev_fd, KVM_SEV_LAUNCH_MEASURE,
-+                    measurement, &error);
-+    if (ret) {
-+        error_report("%s: LAUNCH_MEASURE ret=%d fw_error=%d '%s'",
-+                     __func__, ret, error, fw_error_to_str(errno));
-+        goto free_data;
-+    }
-+
-+    sev_set_guest_state(SEV_STATE_LSECRET);
-+
-+    /* encode the measurement value and emit the event */
-+    s->measurement = g_base64_encode(data, measurement->len);
-+    trace_kvm_sev_launch_measurement(s->measurement);
-+
-+free_data:
-+    g_free(data);
-+free_measurement:
-+    g_free(measurement);
-+}
-+
-+char *
-+sev_get_launch_measurement(void)
-+{
-+    if (sev_state &&
-+        sev_state->state >= SEV_STATE_LSECRET) {
-+        return g_strdup(sev_state->measurement);
-+    }
-+
-+    return NULL;
-+}
-+
-+static Notifier sev_machine_done_notify = {
-+    .notify = sev_launch_get_measure,
-+};
-+
- void *
- sev_guest_init(const char *id)
- {
-@@ -593,6 +655,7 @@ sev_guest_init(const char *id)
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 35fcb6efdfb9..69364b6856b5 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1360,6 +1360,15 @@ void pc_memory_init(PCMachineState *pcms,
+         e820_add_entry(0x100000000ULL, pcms->above_4g_mem_size, E820_RAM);
      }
  
-     ram_block_notifier_add(&sev_ram_notifier);
-+    qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
- 
-     return s;
- err:
-diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
-index 924cebcab02d..6e370775770e 100644
---- a/target/i386/sev_i386.h
-+++ b/target/i386/sev_i386.h
-@@ -37,6 +37,7 @@ extern uint64_t sev_get_me_mask(void);
- extern SevInfo *sev_get_info(void);
- extern uint32_t sev_get_cbit_position(void);
- extern uint32_t sev_get_reduced_phys_bits(void);
-+extern char *sev_get_launch_measurement(void);
- 
- typedef struct QSevGuestInfo QSevGuestInfo;
- typedef struct QSevGuestInfoClass QSevGuestInfoClass;
-@@ -78,6 +79,7 @@ struct SEVState {
-     uint32_t handle;
-     int sev_fd;
-     SevState state;
-+    gchar *measurement;
- };
- 
- typedef struct SEVState SEVState;
-diff --git a/target/i386/trace-events b/target/i386/trace-events
-index c0cd8e93217f..f7a1a1e6b85c 100644
---- a/target/i386/trace-events
-+++ b/target/i386/trace-events
-@@ -13,3 +13,4 @@ kvm_memcrypt_unregister_region(void *addr, size_t len) "addr %p len 0x%lu"
- kvm_sev_change_state(const char *old, const char *new) "%s -> %s"
- kvm_sev_launch_start(int policy, void *session, void *pdh) "policy 0x%x session %p pdh %p"
- kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len 0x%" PRIu64
-+kvm_sev_launch_measurement(const char *value) "data %s"
++    /*
++     * When memory encryption is enabled, the guest RAM will be encrypted with
++     * a guest unique key. Set the debug ops so that any debug access to the
++     * guest RAM will go through the memory encryption APIs.
++     */
++    if (kvm_memcrypt_enabled()) {
++        kvm_memcrypt_set_debug_ops(ram);
++    }
++
+     if (!pcmc->has_reserved_memory &&
+         (machine->ram_slots ||
+          (machine->maxram_size > machine->ram_size))) {
+diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+index 73ac783f2055..845240f97293 100644
+--- a/hw/i386/pc_sysfw.c
++++ b/hw/i386/pc_sysfw.c
+@@ -181,6 +181,12 @@ static void pc_system_flash_init(MemoryRegion *rom_memory)
+                     error_report("failed to encrypt pflash rom");
+                     exit(1);
+                 }
++
++                /*
++                 * The pflash ROM is encrypted, set the debug ops so that any
++                 * debug accesses will use memory encryption APIs.
++                 */
++                kvm_memcrypt_set_debug_ops(flash_mem);
+             }
+         }
+     }
 -- 
 2.14.3
