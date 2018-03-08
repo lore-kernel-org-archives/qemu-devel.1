@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1etrRj-0006Kb-6x
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 04:02:44 -0500
+	(envelope-from <thuth@redhat.com>) id 1etrRs-0006P4-A4
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 04:02:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1etrRe-0003op-E3
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 04:02:43 -0500
-Received: from mail-vk0-f66.google.com ([209.85.213.66]:43030)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <fzheng@redhat.com>) id 1etrRe-0003n3-22
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 04:02:38 -0500
-Received: by mail-vk0-f66.google.com with SMTP id p189so3154435vkd.10
-	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 01:02:37 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1etrRn-0003tk-DS
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 04:02:52 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49958 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1etrRn-0003tV-8v
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 04:02:47 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2894FD1437
+	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 09:02:36 +0000 (UTC)
+References: <20180306194600.9650-1-pbonzini@redhat.com>
+	<20180306194600.9650-3-pbonzini@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ab061320-f21b-4a97-4abe-76ba33c7f1c1@redhat.com>
+Date: Thu, 8 Mar 2018 10:02:26 +0100
 MIME-Version: 1.0
-In-Reply-To: <0EDE7998-76A9-41F5-AE83-89BA0E9C3A6E@kamp.de>
-References: <c0d7b993-b3b8-a753-21f5-e2257de27caf@kamp.de>
-	<20180305114533.GI7910@stefanha-x1.localdomain>
-	<0f1ec3c7-1157-e618-62f8-ffd5e08eb342@kamp.de>
-	<20180305145215.GM3131@work-vm>
-	<20180306160739.GN31045@stefanha-x1.localdomain>
-	<824907bb-3a37-27bd-76db-be17d05bdac0@kamp.de>
-	<231fe0ce-3df4-a175-2fba-403023cc65e1@kamp.de>
-	<99df10d6-6514-56ee-16ce-8b7d1823cc08@kamp.de>
-	<20180308012842.GJ13844@lemon.usersys.redhat.com>
-	<0EDE7998-76A9-41F5-AE83-89BA0E9C3A6E@kamp.de>
-From: Fam Zheng <famz@redhat.com>
-Date: Thu, 8 Mar 2018 17:01:56 +0800
-Message-ID: <CAK1Eb9=cZVH6v4hmLmTrTLH81DL-nP1Z-v+7EswQHd4fqaYBvA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] block migration and dirty bitmap reset
+In-Reply-To: <20180306194600.9650-3-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/3] net: allow using any PCI NICs in -net
+ or -nic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,44 +35,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, wency@cn.fujitsu.com, qemu block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Thu, Mar 8, 2018 at 4:57 PM, Peter Lieven <pl@kamp.de> wrote:
->
->
->> Am 08.03.2018 um 02:28 schrieb Fam Zheng <famz@redhat.com>:
->>
->>> On Wed, 03/07 09:06, Peter Lieven wrote:
->>> Hi,
->>>
->>> while looking at the code I wonder if the blk_aio_preadv and the bdrv_reset_dirty_bitmap order must
->>> be swapped in mig_save_device_bulk:
->>>
->>>    qemu_mutex_lock_iothread();
->>>    aio_context_acquire(blk_get_aio_context(bmds->blk));
->>>    blk->aiocb = blk_aio_preadv(bb, cur_sector * BDRV_SECTOR_SIZE, &blk->qiov,
->>>                                0, blk_mig_read_cb, blk);
->>>
->>>    bdrv_reset_dirty_bitmap(bmds->dirty_bitmap, cur_sector * BDRV_SECTOR_SIZE,
->>>                            nr_sectors * BDRV_SECTOR_SIZE);
->>>    aio_context_release(blk_get_aio_context(bmds->blk));
->>>    qemu_mutex_unlock_iothread();
->>>
->>> In mig_save_device_dirty we first reset the dirty bitmap and read then which shoulds like
->>> a better idea.
->>
->> Yes, that sounds right to me.
->>
->> Fam
->
-> You mean the order should be swapped in mig_save_device_bulk as well?
+On 06.03.2018 20:45, Paolo Bonzini wrote:
+> Remove the hard-coded list of PCI NIC names; instead, fill an array
+> using all PCI devices listed under DEVICE_CATEGORY_NETWORK. Keep
+> the old shortcut "virtio" for virtio-net-pci.
+>=20
+> Suggested-by: Thomas Huth <thuth@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  hw/pci/pci.c | 61 ++++++++++++++++++++++++++++++----------------------=
+--------
+>  1 file changed, 30 insertions(+), 31 deletions(-)
+>=20
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 2174c254eb..aa24a26680 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -1815,49 +1815,48 @@ PciInfoList *qmp_query_pci(Error **errp)
+>      return head;
+>  }
+> =20
+> -static const char * const pci_nic_models[] =3D {
+> -    "ne2k_pci",
+> -    "i82551",
+> -    "i82557b",
+> -    "i82559er",
+> -    "rtl8139",
+> -    "e1000",
+> -    "pcnet",
+> -    "virtio",
+> -    "sungem",
+> -    NULL
+> -};
+> -
+> -static const char * const pci_nic_names[] =3D {
+> -    "ne2k_pci",
+> -    "i82551",
+> -    "i82557b",
+> -    "i82559er",
+> -    "rtl8139",
+> -    "e1000",
+> -    "pcnet",
+> -    "virtio-net-pci",
+> -    "sungem",
+> -    NULL
+> -};
+> -
+>  /* Initialize a PCI NIC.  */
+>  PCIDevice *pci_nic_init_nofail(NICInfo *nd, PCIBus *rootbus,
+>                                 const char *default_model,
+>                                 const char *default_devaddr)
+>  {
+>      const char *devaddr =3D nd->devaddr ? nd->devaddr : default_devadd=
+r;
+> +    GSList *list;
+> +    GPtrArray *pci_nic_models;
+>      PCIBus *bus;
+>      PCIDevice *pci_dev;
+>      DeviceState *dev;
+>      int devfn;
+>      int i;
+> =20
+> -    if (qemu_show_nic_models(nd->model, pci_nic_models)) {
+> +    if (!strcmp(nd->model, "virtio")) {
+> +        g_free(nd->model);
+> +        nd->model =3D g_strdup("virtio-net-pci");
 
-Yeah, resetting the dirty bitmap before reading makes sure we don't
-miss any new data.
+Should we maybe also print out a deprecation message in this case, so
+that we could get rid of this hack in a couple of releases? (i.e. only
+allow "virtio-net-pci" in future releases?)
 
-Fam
+> +    }
+> +
+> +    list =3D object_class_get_list_sorted(TYPE_PCI_DEVICE, false);
+> +    pci_nic_models =3D g_ptr_array_new_with_free_func(g_free);
 
->
-> Peter
->
+OK, so that means that the entries will be freed when the array is
+destroyed, right? ...
+
+> +    while (list) {
+> +        DeviceClass *dc =3D OBJECT_CLASS_CHECK(DeviceClass, list->data=
+,
+> +                                             TYPE_DEVICE);
+> +        GSList *next;
+> +        if (test_bit(DEVICE_CATEGORY_NETWORK, dc->categories) &&
+> +            dc->user_creatable) {
+> +            const char *name =3D object_class_get_name(list->data) ;
+
+... but object_class_get_name() returns the original name, not a
+g_strdup of it, right?
+(apart from that: Please remove the space before the semicolon)
+
+> +            g_ptr_array_add(pci_nic_models, (gpointer)name);
+> +        }
+> +        next =3D list->next;
+> +        g_slist_free_1(list);
+> +        list =3D next;
+> +    }
+> +    g_ptr_array_add(pci_nic_models, NULL);
+> +
+> +    if (qemu_show_nic_models(nd->model, (const char **)pci_nic_models-=
+>pdata)) {
+>          exit(0);
+>      }
+> =20
+> -    i =3D qemu_find_nic_model(nd, pci_nic_models, default_model);
+> +    i =3D qemu_find_nic_model(nd, (const char **)pci_nic_models->pdata=
+,
+> +                            default_model);
+>      if (i < 0) {
+>          exit(1);
+>      }
+> @@ -1865,15 +1864,15 @@ PCIDevice *pci_nic_init_nofail(NICInfo *nd, PCI=
+Bus *rootbus,
+>      bus =3D pci_get_bus_devfn(&devfn, rootbus, devaddr);
+>      if (!bus) {
+>          error_report("Invalid PCI device address %s for device %s",
+> -                     devaddr, pci_nic_names[i]);
+> +                     devaddr, nd->model);
+>          exit(1);
+>      }
+> =20
+> -    pci_dev =3D pci_create(bus, devfn, pci_nic_names[i]);
+> +    pci_dev =3D pci_create(bus, devfn, nd->model);
+>      dev =3D &pci_dev->qdev;
+>      qdev_set_nic_properties(dev, nd);
+>      qdev_init_nofail(dev);
+> -
+> +    g_ptr_array_free(pci_nic_models, true);
+
+... so this will g_free the original pointers of the device classes - I
+guess this will sooner or later cause some trouble.
+
+Apart from that, I really like this patch - that hard-coded
+pci_nic_models[] was really ugly.
+
+ Thomas
