@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1etowi-0006On-OG
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 01:22:33 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1etpNN-0003jc-ED
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 01:50:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1etowd-0001SI-Q7
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 01:22:32 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36426 helo=mx1.redhat.com)
+	(envelope-from <haozhong.zhang@intel.com>) id 1etpNK-00055i-93
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 01:50:05 -0500
+Received: from mga09.intel.com ([134.134.136.24]:13745)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1etowd-0001Rn-KC
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 01:22:27 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 40AEF406E8A4
-	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 06:22:16 +0000 (UTC)
-Date: Thu, 8 Mar 2018 14:22:00 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180308062200.GC32252@xz-mi>
-References: <20180216131625.9639-1-dgilbert@redhat.com>
-	<20180216131625.9639-23-dgilbert@redhat.com>
-	<20180302080524.GO27381@xz-mi> <20180306103652.GC3096@work-vm>
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1etpNJ-00054R-O7
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 01:50:02 -0500
+Date: Thu, 8 Mar 2018 14:49:55 +0800
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Message-ID: <20180308064955.tg2wiwbub4dasjyz@hz-desktop>
+References: <20180228072558.7434-1-haozhong.zhang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180306103652.GC3096@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v3 22/29] vhost+postcopy: Call wakeups
+In-Reply-To: <20180228072558.7434-1-haozhong.zhang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v4 0/8] nvdimm: guarantee persistence of
+ QEMU writes to persistent memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,98 +28,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, marcandre.lureau@redhat.com, imammedo@redhat.com, mst@redhat.com, quintela@redhat.com, aarcange@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, dgilbert@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>
 
-On Tue, Mar 06, 2018 at 10:36:52AM +0000, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > On Fri, Feb 16, 2018 at 01:16:18PM +0000, Dr. David Alan Gilbert (git) wrote:
-> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > > 
-> > > Cause the vhost-user client to be woken up whenever:
-> > >   a) We place a page in postcopy mode
-> > >   b) We get a fault and the page has already been received
-> > > 
-> > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > ---
-> > >  migration/postcopy-ram.c | 14 ++++++++++----
-> > >  migration/trace-events   |  1 +
-> > >  2 files changed, 11 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> > > index 879711968c..13561703b5 100644
-> > > --- a/migration/postcopy-ram.c
-> > > +++ b/migration/postcopy-ram.c
-> > > @@ -566,7 +566,11 @@ int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb,
-> > >  
-> > >      trace_postcopy_request_shared_page(pcfd->idstr, qemu_ram_get_idstr(rb),
-> > >                                         rb_offset);
-> > > -    /* TODO: Check bitmap to see if we already have the page */
-> > > +    if (ramblock_recv_bitmap_test_byte_offset(rb, aligned_rbo)) {
-> > > +        trace_postcopy_request_shared_page_present(pcfd->idstr,
-> > > +                                        qemu_ram_get_idstr(rb), rb_offset);
-> > > +        return postcopy_wake_shared(pcfd, client_addr, rb);
-> > > +    }
-> > >      if (rb != mis->last_rb) {
-> > >          mis->last_rb = rb;
-> > >          migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
-> > > @@ -863,7 +867,8 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
-> > >      }
-> > >  
-> > >      trace_postcopy_place_page(host);
-> > > -    return 0;
-> > > +    return postcopy_notify_shared_wake(rb,
-> > > +                                       qemu_ram_block_host_offset(rb, host));
-> > >  }
-> > >  
-> > >  /*
-> > > @@ -887,6 +892,9 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
-> > >  
-> > >              return -e;
-> > >          }
-> > > +        return postcopy_notify_shared_wake(rb,
-> > > +                                           qemu_ram_block_host_offset(rb,
-> > > +                                                                      host));
-> > >      } else {
-> > >          /* The kernel can't use UFFDIO_ZEROPAGE for hugepages */
-> > >          if (!mis->postcopy_tmp_zero_page) {
-> > > @@ -906,8 +914,6 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
-> > >          return postcopy_place_page(mis, host, mis->postcopy_tmp_zero_page,
-> > >                                     rb);
-> > >      }
-> > > -
-> > > -    return 0;
-> > >  }
-> > 
-> > Could there be race?  E.g.:
-> > 
-> >               ram_load_thread             page_fault_thread
-> >              -----------------           -------------------
-> > 
-> >                                           if (recv_bitmap_set())
-> >                                               wake()
-> >              copy_page()
-> >              recv_bitmap_set()
-> >              wake()
-> >                                           request_page()
-> > 
-> > Then the last requested page may never be serviced?
+Ping?
+
+On 02/28/18 15:25 +0800, Haozhong Zhang wrote:
+> QEMU writes to vNVDIMM backends in the vNVDIMM label emulation and
+> live migration. If the backend is on the persistent memory, QEMU needs
+> to take proper operations to ensure its writes persistent on the
+> persistent memory. Otherwise, a host power failure may result in the
+> loss the guest data on the persistent memory.
 > 
-> The postcopy finishes when the last page is received, and thus when that
-> also performs the wake() (from the load thread); so that's not a
-> problem.
-> You can get the case where a page that qemu has already received, still
-> needs to be woken for the shared users (which is why we have the wake in
-> the fault_thread).
-> When the postcopy finishes, the client is sent a POSTCOPY_END, at which
-> point it closes it's userfaultfd and it should wake everything remaining
-> up; so any late requests shouldn't be a problem (the END is sent
-> before the fault-thread quits).
-
-Yeah now I think the race is invalid - the wake() in ram_load_thread
-will wake up the paused thread in this case.  I misunderstood.
-
-Thanks,
-
--- 
-Peter Xu
+> This v3 patch series is based on Marcel's patch "mem: add share
+> parameter to memory-backend-ram" [1] because of the changes in patch 1.
+> 
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg03858.html
+> 
+> Previous versions can be found at
+> v3: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg04365.html
+> v2: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg01579.html
+> v1: https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg05040.html
+> 
+> Changes in v4:
+>  * (Patch 2) Fix compilation errors found by patchew.
+> 
+> Changes in v3:
+>  * (Patch 5) Add a is_pmem flag to ram_handle_compressed() and handle
+>    PMEM writes in it, so we don't need the _common function.
+>  * (Patch 6) Expose qemu_get_buffer_common so we can remove the
+>    unnecessary qemu_get_buffer_to_pmem wrapper.
+>  * (Patch 8) Add a is_pmem flag to xbzrle_decode_buffer() and handle
+>    PMEM writes in it, so we can remove the unnecessary
+>    xbzrle_decode_buffer_{common, to_pmem}.
+>  * Move libpmem stubs to stubs/pmem.c and fix the compilation failures
+>    of test-{xbzrle,vmstate}.c.
+> 
+> Changes in v2:
+>  * (Patch 1) Use a flags parameter in file ram allocation functions.
+>  * (Patch 2) Add a new option 'pmem' to hostmem-file.
+>  * (Patch 3) Use libpmem to operate on the persistent memory, rather
+>    than re-implementing those operations in QEMU.
+>  * (Patch 5-8) Consider the write persistence in the migration path.
+> 
+> Haozhong Zhang (8):
+>   [1/8] memory, exec: switch file ram allocation functions to 'flags' parameters
+>   [2/8] hostmem-file: add the 'pmem' option
+>   [3/8] configure: add libpmem support
+>   [4/8] mem/nvdimm: ensure write persistence to PMEM in label emulation
+>   [5/8] migration/ram: ensure write persistence on loading zero pages to PMEM
+>   [6/8] migration/ram: ensure write persistence on loading normal pages to PMEM
+>   [7/8] migration/ram: ensure write persistence on loading compressed pages to PMEM
+>   [8/8] migration/ram: ensure write persistence on loading xbzrle pages to PMEM
+> 
+>  backends/hostmem-file.c             | 27 +++++++++++++++++++-
+>  configure                           | 35 ++++++++++++++++++++++++++
+>  docs/nvdimm.txt                     | 14 +++++++++++
+>  exec.c                              | 20 ++++++++++++---
+>  hw/mem/nvdimm.c                     |  9 ++++++-
+>  include/exec/memory.h               | 12 +++++++--
+>  include/exec/ram_addr.h             | 28 +++++++++++++++++++--
+>  include/migration/qemu-file-types.h |  2 ++
+>  include/qemu/pmem.h                 | 27 ++++++++++++++++++++
+>  memory.c                            |  8 +++---
+>  migration/qemu-file.c               | 29 ++++++++++++++--------
+>  migration/ram.c                     | 49 +++++++++++++++++++++++++++----------
+>  migration/ram.h                     |  2 +-
+>  migration/rdma.c                    |  2 +-
+>  migration/xbzrle.c                  |  8 ++++--
+>  migration/xbzrle.h                  |  3 ++-
+>  numa.c                              |  2 +-
+>  qemu-options.hx                     |  9 ++++++-
+>  stubs/Makefile.objs                 |  1 +
+>  stubs/pmem.c                        | 37 ++++++++++++++++++++++++++++
+>  tests/Makefile.include              |  4 +--
+>  tests/test-xbzrle.c                 |  4 +--
+>  22 files changed, 285 insertions(+), 47 deletions(-)
+>  create mode 100644 include/qemu/pmem.h
+>  create mode 100644 stubs/pmem.c
+> 
+> -- 
+> 2.14.1
+> 
