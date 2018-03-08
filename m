@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eu23J-0007lB-5x
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:22:15 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eu2Cg-0007HN-Hr
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:31:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eu23F-0002qo-5W
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:22:13 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40718 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eu23E-0002qR-UC
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:22:09 -0500
-References: <20180304210608.vn33p6pn7t2nsxv4@var.youpi.perso.aquilenet.fr>
-	<20180308185743.3408-1-benjamin.drung@profitbricks.com>
-	<88890d90-4dc6-bac3-4591-f29a271181df@redhat.com>
-	<1520539656.6051.11.camel@profitbricks.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e5af8c70-e6e4-682a-bbd7-6b914b813737@redhat.com>
-Date: Thu, 8 Mar 2018 14:21:57 -0600
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eu2Cd-0000hf-BH
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 15:31:54 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180305211928.466-1-f4bug@amsat.org>
+	<20180305211928.466-10-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <639ad755-450b-2b8d-70a7-17ca99e34676@amsat.org>
+Date: Thu, 8 Mar 2018 21:31:37 +0100
 MIME-Version: 1.0
-In-Reply-To: <1520539656.6051.11.camel@profitbricks.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180305211928.466-10-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2 v2] slirp: Add classless static routes
- support to DHCP server
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH v2 09/22] hw/isa/superio: Factor out
+ the parallel code from pc87312.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,147 +29,236 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Benjamin Drung <benjamin.drung@profitbricks.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Samuel Thibault <samuel.thibault@gnu.org>, Jan Kiszka <jan.kiszka@siemens.com>
-Cc: qemu-devel@nongnu.org
+To: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Marcel Apfelbaum <marcel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alexey Kardashevskiy <aik@ozlabs.ru>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, "open list:PReP" <qemu-ppc@nongnu.org>
 
-On 03/08/2018 02:07 PM, Benjamin Drung wrote:
-> Am Donnerstag, den 08.03.2018, 13:46 -0600 schrieb Eric Blake:
->> On 03/08/2018 12:57 PM, Benjamin Drung wrote:
->>> This patch will allow the user to specify classless static routes
->>> for
->>> the replies from the built-in DHCP server.
->>>
->>> Signed-off-by: Benjamin Drung <benjamin.drung@profitbricks.com>
->>> ---
->>
->> For future patches, when sending a v2, it's best to document here
->> (after
->> the --- separator) what changed from v1.  It's also a good idea to
->> send
->> a fresh thread rather than tying your v2 in-reply-to your v1, so that
->> it
->> doesn't get buried in an old conversation.
->>
->> More submission hints at https://wiki.qemu.org/Contribute/SubmitAPatch
+On 03/05/2018 10:19 PM, Philippe Mathieu-Daudé wrote:
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  include/hw/isa/pc87312.h |  4 ---
+>  include/hw/isa/superio.h |  6 +++++
+>  hw/isa/isa-superio.c     | 63 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/isa/pc87312.c         | 38 ++++++++++++-----------------
+>  hw/isa/trace-events      |  4 ++-
+>  5 files changed, 87 insertions(+), 28 deletions(-)
 > 
-> Thanks. I will do that with the next iteration. Patch v2 addressed all
-> remarks from Samuel Thibault.
+> diff --git a/include/hw/isa/pc87312.h b/include/hw/isa/pc87312.h
+> index f3761d6fe1..bcc4578479 100644
+> --- a/include/hw/isa/pc87312.h
+> +++ b/include/hw/isa/pc87312.h
+> @@ -39,10 +39,6 @@ typedef struct PC87312State {
+>      uint16_t iobase;
+>      uint8_t config; /* initial configuration */
+>  
+> -    struct {
+> -        ISADevice *dev;
+> -    } parallel;
+> -
+>      struct {
+>          ISADevice *dev;
+>      } uart[2];
+> diff --git a/include/hw/isa/superio.h b/include/hw/isa/superio.h
+> index cff6ad6c08..e9879cfde1 100644
+> --- a/include/hw/isa/superio.h
+> +++ b/include/hw/isa/superio.h
+> @@ -23,7 +23,11 @@
+>      OBJECT_CLASS_CHECK(ISASuperIOClass, (klass), TYPE_ISA_SUPERIO)
+>  
+>  typedef struct ISASuperIODevice {
+> +    /*< private >*/
+>      ISADevice parent_obj;
+> +    /*< public >*/
+> +
+> +    ISADevice *parallel[MAX_PARALLEL_PORTS];
+>  } ISASuperIODevice;
+>  
+>  typedef struct ISASuperIOFuncs {
+> @@ -39,6 +43,8 @@ typedef struct ISASuperIOClass {
+>      ISADeviceClass parent_class;
+>      /*< public >*/
+>      DeviceRealize parent_realize;
+> +
+> +    ISASuperIOFuncs parallel;
+>  } ISASuperIOClass;
+>  
+>  #endif /* HW_ISA_SUPERIO_H */
+> diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
+> index 7777f8b9f0..4e0b1af633 100644
+> --- a/hw/isa/isa-superio.c
+> +++ b/hw/isa/isa-superio.c
+> @@ -10,13 +10,76 @@
+>   * SPDX-License-Identifier: GPL-2.0-or-later
+>   */
+>  #include "qemu/osdep.h"
+> +#include "qemu/error-report.h"
+> +#include "sysemu/sysemu.h"
+> +#include "chardev/char.h"
+>  #include "hw/isa/superio.h"
+>  #include "trace.h"
+>  
+> +static void isa_superio_realize(DeviceState *dev, Error **errp)
+> +{
+> +    ISASuperIODevice *sio = ISA_SUPERIO(dev);
+> +    ISASuperIOClass *k = ISA_SUPERIO_GET_CLASS(sio);
+> +    ISABus *bus = isa_bus_from_device(ISA_DEVICE(dev));
+> +    ISADevice *isa;
+> +    DeviceState *d;
+> +    Chardev *chr;
+> +    char *name;
+> +    int i;
+> +
+> +    /* Parallel port */
+> +    for (i = 0; i < k->parallel.count; i++) {
+> +        if (i >= ARRAY_SIZE(sio->parallel)) {
+> +            warn_report("superio: ignoring %ld parallel controllers",
+> +                        k->parallel.count - ARRAY_SIZE(sio->parallel));
+> +            break;
+> +        }
+> +        if (!k->parallel.is_enabled || k->parallel.is_enabled(sio, i)) {
+> +            name = g_strdup_printf("discarding-parallel%d", i);
+> +            /* FIXME use a qdev chardev prop instead of parallel_hds[] */
+> +            chr = parallel_hds[i];
+> +            if (chr == NULL || chr->be) {
+> +                chr = qemu_chr_new(name, "null");
+> +            }
+> +            isa = isa_create(bus, "isa-parallel");
+> +            d = DEVICE(isa);
+> +            qdev_prop_set_uint32(d, "index", i);
+> +            if (k->parallel.get_iobase) {
+> +                qdev_prop_set_uint32(d, "iobase",
+> +                                     k->parallel.get_iobase(sio, i));
+> +            }
+> +            if (k->parallel.get_irq) {
+> +                qdev_prop_set_uint32(d, "irq", k->parallel.get_irq(sio, i));
+> +            }
+> +            qdev_prop_set_chr(d, "chardev", chr);
+> +            qdev_init_nofail(d);
+> +            sio->parallel[i] = isa;
+> +            trace_superio_create_parallel(i,
+> +                                          k->parallel.get_iobase ?
+> +                                          k->parallel.get_iobase(sio, i) : -1,
+> +                                          k->parallel.get_irq ?
+> +                                          k->parallel.get_irq(sio, i) : -1);
+> +            object_property_add_child(OBJECT(dev), name,
+> +                                      OBJECT(sio->parallel[i]), NULL);
+> +            g_free(name);
+> +        }
+> +    }
+> +}
+> +
+> +static void isa_superio_class_init(ObjectClass *oc, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(oc);
+> +
+> +    dc->realize = isa_superio_realize;
+> +    /* Reason: Uses parallel_hds[0] in realize(), so it can't be used twice */
+> +    dc->user_creatable = false;
+> +}
+> +
+>  static const TypeInfo isa_superio_type_info = {
+>      .name = TYPE_ISA_SUPERIO,
+>      .parent = TYPE_ISA_DEVICE,
+>      .abstract = true,
 
-At this point, since Samuel is the net maintainer, I'll trust his 
-judgment on what interface works best; my review is only trying to make 
-sure we don't bake in a UI mistake at the last minute (although we can 
-adjust things during soft freeze, if needed).
+I missed here:
 
+       .class_size = sizeof(ISASuperIOClass),
 
->>>        '*dnssearch': ['String'],
->>>        '*domainname': 'str',
->>> +    '*route':     ['String'],
->>
->> I know we've used ['String'] for previous members, but that's rather
->> heavyweight - it transmits over QMP as:
->>
->> "dnssearch": [ { "str": "foo" }, { "str": "bar" } ]
->>
->> Nicer is ['str'], which transmits as:
->>
->> "route": [ "foo", "bar" ]
->>
->> so the question boils down to whether cross-member consistency is
->> more
->> important than making your additions concise.
+> +    .class_init = isa_superio_class_init,
+>  };
+>  
+>  static void isa_superio_register_types(void)
+> diff --git a/hw/isa/pc87312.c b/hw/isa/pc87312.c
+> index 6b8100ff56..1c15715c69 100644
+> --- a/hw/isa/pc87312.c
+> +++ b/hw/isa/pc87312.c
+> @@ -64,22 +64,25 @@
+>  
+>  /* Parallel port */
+>  
+> -static inline bool is_parallel_enabled(PC87312State *s)
+> +static bool is_parallel_enabled(ISASuperIODevice *sio, uint8_t index)
+>  {
+> -    return s->regs[REG_FER] & FER_PARALLEL_EN;
+> +    PC87312State *s = PC87312(sio);
+> +    return index ? false : s->regs[REG_FER] & FER_PARALLEL_EN;
+>  }
+>  
+>  static const uint16_t parallel_base[] = { 0x378, 0x3bc, 0x278, 0x00 };
+>  
+> -static inline uint16_t get_parallel_iobase(PC87312State *s)
+> +static uint16_t get_parallel_iobase(ISASuperIODevice *sio, uint8_t index)
+>  {
+> +    PC87312State *s = PC87312(sio);
+>      return parallel_base[s->regs[REG_FAR] & FAR_PARALLEL_ADDR];
+>  }
+>  
+>  static const unsigned int parallel_irq[] = { 5, 7, 5, 0 };
+>  
+> -static inline unsigned int get_parallel_irq(PC87312State *s)
+> +static unsigned int get_parallel_irq(ISASuperIODevice *sio, uint8_t index)
+>  {
+> +    PC87312State *s = PC87312(sio);
+>      int idx;
+>      idx = (s->regs[REG_FAR] & FAR_PARALLEL_ADDR);
+>      if (idx == 0) {
+> @@ -286,24 +289,6 @@ static void pc87312_realize(DeviceState *dev, Error **errp)
+>          return;
+>      }
+>  
+> -    if (is_parallel_enabled(s)) {
+> -        /* FIXME use a qdev chardev prop instead of parallel_hds[] */
+> -        chr = parallel_hds[0];
+> -        if (chr == NULL) {
+> -            chr = qemu_chr_new("par0", "null");
+> -        }
+> -        isa = isa_create(bus, "isa-parallel");
+> -        d = DEVICE(isa);
+> -        qdev_prop_set_uint32(d, "index", 0);
+> -        qdev_prop_set_uint32(d, "iobase", get_parallel_iobase(s));
+> -        qdev_prop_set_uint32(d, "irq", get_parallel_irq(s));
+> -        qdev_prop_set_chr(d, "chardev", chr);
+> -        qdev_init_nofail(d);
+> -        s->parallel.dev = isa;
+> -        trace_pc87312_info_parallel(get_parallel_iobase(s),
+> -                                    get_parallel_irq(s));
+> -    }
+> -
+>      for (i = 0; i < 2; i++) {
+>          if (is_uart_enabled(s, i)) {
+>              /* FIXME use a qdev chardev prop instead of serial_hds[] */
+> @@ -395,8 +380,15 @@ static void pc87312_class_init(ObjectClass *klass, void *data)
+>      dc->reset = pc87312_reset;
+>      dc->vmsd = &vmstate_pc87312;
+>      dc->props = pc87312_properties;
+> -    /* Reason: Uses parallel_hds[0] in realize(), so it can't be used twice */
+> +    /* Reason: Uses serial_hds[0] in realize(), so it can't be used twice */
+>      dc->user_creatable = false;
+> +
+> +    sc->parallel = (ISASuperIOFuncs){
+> +        .count = 1,
+> +        .is_enabled = is_parallel_enabled,
+> +        .get_iobase = get_parallel_iobase,
+> +        .get_irq    = get_parallel_irq,
+> +    };
+>  }
+>  
+>  static const TypeInfo pc87312_type_info = {
+> diff --git a/hw/isa/trace-events b/hw/isa/trace-events
+> index a4ab4e3634..97b1949981 100644
+> --- a/hw/isa/trace-events
+> +++ b/hw/isa/trace-events
+> @@ -1,9 +1,11 @@
+>  # See docs/devel/tracing.txt for syntax documentation.
+>  
+> +# hw/isa/isa-superio.c
+> +superio_create_parallel(int id, uint16_t base, unsigned int irq) "id=%d, base 0x%03x, irq %u"
+> +
+>  # hw/isa/pc87312.c
+>  pc87312_io_read(uint32_t addr, uint32_t val) "read addr=0x%x val=0x%x"
+>  pc87312_io_write(uint32_t addr, uint32_t val) "write addr=0x%x val=0x%x"
+>  pc87312_info_floppy(uint32_t base) "base 0x%x"
+>  pc87312_info_ide(uint32_t base) "base 0x%x"
+> -pc87312_info_parallel(uint32_t base, uint32_t irq) "base 0x%x, irq %u"
+>  pc87312_info_serial(int n, uint32_t base, uint32_t irq) "id=%d, base 0x%x, irq %u"
 > 
-> Agreed that ['str'] is nicer. I will update the patch.
-
-The problem is that ['str'] might not work easily for the command line 
-glue; I'm more familiar with how QMP exposes things than with the 
-command line parsing, and Markus, who is trying to improve command line 
-parsing to share more common infrastructure with QMP, might have better 
-comments on the topic, except that he's on leave for a few weeks and 
-won't respond until after 2.12 is frozen.  Using ['String'] for 
-consistency is therefore okay, if you can't get ['str'] working quickly.
-
-
->>> @@ -1904,7 +1904,7 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
->>>        "         [,ipv6[=on|off]][,ipv6-net=addr[/int]][,ipv6-
->>> host=addr]\n"
-
-Here's an example where we made the command line smart.  ipv6-net takes 
-TWO pieces of information: addr/int; on the QMP side, we spelled it 
-'*ipv6-prefix':'str' + 'ipv6-prefixlen':'int'.  So somewhere in the 
-command line parsing code for --net (which I'm less familiar with), 
-there is some glue code taking the compact representation and splitting 
-it into the more verbose but more direct QMP representation - well, that 
-is, if we are converting it into QMP form at all (part of the problem is 
-that our command line and runtime control don't always share code, 
-although we're trying to get better at that).
-
->>> +    "         [,route=addr/mask[:gateway]][,tftp=dir][,bootfile=f]
->>> [,hostfwd=rule][,guestfwd=rule]"
->>
->> Urgh - your QMP interface HAS to be further parsed to get to the
->> useful
->> information.  While it's nice to have compact syntax on the command
->> line, it is really worth thinking about making information easier to
->> consume (that is, NO further parsing required once the information is
->> in
->> JSON format).  Would it be any better to send things over the wire
->> as:
->>
->> "route": [ { "addr": "...", "mask": 24, "gateway": "..." } ]
-> 
-> That's looks good.
-
-Okay, doing that would mean using something like:
-
-{ 'struct': 'RouteEntry', 'data': { 'addr': 'str', '*mask': 'int', 
-'*gateway': 'str' } }
-...
-'route': [ 'RouteEntry' ]
-
-(but reuse, rather than inventing a new type, if one of the existing QMP 
-types already resembles what I proposed for RouteEntry)
-
-The command line can still use route=addr/mask:gateway syntax, parse it 
-down into components, then compile the QMP array of already-parsed 
-structs (rather than making QMP take a direct ['String'] that still 
-needs further parsing).  It may take more glue code, but the idea is 
-that all the glue code should live on the front end, so that the QMP 
-backend should be easy to work with.
-
-> 
->> instead of cramming all the information into a single string?  But
->> based
->> on the way this also maps to the command line, you may not have a
->> choice
->> without a lot more code complexity.
-> 
-> Can you point me to an example where similar parsing is done?
-
-Hopefully my hint about command-line ipv6-net gets you started (as I 
-said, I'm less familiar with the specifics of net code, so much as 
-taking the interface point of view here).
-
->>> +@example
->>> +qemu -net user,route=10.0.2.0/24,route=192.168.0.0/16 [...]
->>> +@end example
->>
->> Can we please spell that '--net', along the lines of
->> https://wiki.qemu.org/BiteSizedTasks#Consistent_option_usage_in_docum
->> entation
-> 
-> I can change it, but then the documentation is inconsistent. There
-> are 75 lines with '-net' in qemu-options.hx, but only two lines
-> with '--net'.
-
-Yeah, there's that.  But hopefully someone will tackle the bite-sized 
-task to get things consistent, and once they do, leaving fewer places 
-that still need to be switched is nice.  I can live with either spelling 
-until the bite-sized task is tackled, and am not implying you have to 
-take on that task yourself, so much as pointing it out so you can choose 
-if it is worth the nicer spelling for new content, or leaving it as-is 
-to feel more consistent in the short term.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
