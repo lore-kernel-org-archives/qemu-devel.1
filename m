@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56460)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eu4Cq-0006sv-Pj
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:15 -0500
+	id 1eu4Cu-0006x7-Ur
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eu4Cp-0003xi-TD
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:12 -0500
+	id 1eu4Ct-00042i-IL
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:16 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu,  8 Mar 2018 23:39:30 +0100
-Message-Id: <20180308223946.26784-10-f4bug@amsat.org>
+Date: Thu,  8 Mar 2018 23:39:32 +0100
+Message-Id: <20180308223946.26784-12-f4bug@amsat.org>
 In-Reply-To: <20180308223946.26784-1-f4bug@amsat.org>
 References: <20180308223946.26784-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 09/25] hw/isa/pc87312: Inherit from the
- abstract TYPE_ISA_SUPERIO
+Subject: [Qemu-devel] [PATCH 11/25] hw/isa/superio: Factor out the serial
+ code from pc87312.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,76 +32,228 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/isa/pc87312.h |  6 ++++--
- hw/isa/pc87312.c         | 11 ++++++++++-
- 2 files changed, 14 insertions(+), 3 deletions(-)
+ include/hw/isa/pc87312.h |  4 ----
+ include/hw/isa/superio.h |  2 ++
+ hw/isa/isa-superio.c     | 41 +++++++++++++++++++++++++++++++++++++++++
+ hw/isa/pc87312.c         | 43 ++++++++++++-------------------------------
+ hw/isa/trace-events      |  2 +-
+ 5 files changed, 56 insertions(+), 36 deletions(-)
 
 diff --git a/include/hw/isa/pc87312.h b/include/hw/isa/pc87312.h
-index b65b219a8a..f3761d6fe1 100644
+index bcc4578479..1480615a2c 100644
 --- a/include/hw/isa/pc87312.h
 +++ b/include/hw/isa/pc87312.h
-@@ -25,14 +25,16 @@
- #ifndef QEMU_PC87312_H
- #define QEMU_PC87312_H
- 
--#include "hw/isa/isa.h"
-+#include "hw/isa/superio.h"
- 
- 
- #define TYPE_PC87312_SUPERIO "pc87312"
- #define PC87312(obj) OBJECT_CHECK(PC87312State, (obj), TYPE_PC87312_SUPERIO)
- 
- typedef struct PC87312State {
--    ISADevice dev;
-+    /*< private >*/
-+    ISASuperIODevice parent_dev;
-+    /*< public >*/
- 
+@@ -39,10 +39,6 @@ typedef struct PC87312State {
      uint16_t iobase;
      uint8_t config; /* initial configuration */
+ 
+-    struct {
+-        ISADevice *dev;
+-    } uart[2];
+-
+     struct {
+         ISADevice *dev;
+     } fdc;
+diff --git a/include/hw/isa/superio.h b/include/hw/isa/superio.h
+index e9879cfde1..0b516721c3 100644
+--- a/include/hw/isa/superio.h
++++ b/include/hw/isa/superio.h
+@@ -28,6 +28,7 @@ typedef struct ISASuperIODevice {
+     /*< public >*/
+ 
+     ISADevice *parallel[MAX_PARALLEL_PORTS];
++    ISADevice *serial[MAX_SERIAL_PORTS];
+ } ISASuperIODevice;
+ 
+ typedef struct ISASuperIOFuncs {
+@@ -45,6 +46,7 @@ typedef struct ISASuperIOClass {
+     DeviceRealize parent_realize;
+ 
+     ISASuperIOFuncs parallel;
++    ISASuperIOFuncs serial;
+ } ISASuperIOClass;
+ 
+ #endif /* HW_ISA_SUPERIO_H */
+diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
+index eb263fcc3a..6962421aad 100644
+--- a/hw/isa/isa-superio.c
++++ b/hw/isa/isa-superio.c
+@@ -14,6 +14,7 @@
+ #include "sysemu/sysemu.h"
+ #include "chardev/char.h"
+ #include "hw/isa/superio.h"
++#include "hw/char/serial.h"
+ #include "trace.h"
+ 
+ static void isa_superio_realize(DeviceState *dev, Error **errp)
+@@ -66,6 +67,46 @@ static void isa_superio_realize(DeviceState *dev, Error **errp)
+             g_free(name);
+         }
+     }
++
++    /* Serial */
++    for (i = 0; i < k->serial.count; i++) {
++        if (i >= ARRAY_SIZE(sio->serial)) {
++            warn_report("superio: ignoring %td serial controllers",
++                        k->serial.count - ARRAY_SIZE(sio->serial));
++            break;
++        }
++        if (!k->serial.is_enabled || k->serial.is_enabled(sio, i)) {
++            /* FIXME use a qdev chardev prop instead of serial_hds[] */
++            chr = serial_hds[i];
++            if (chr == NULL || chr->be) {
++                name = g_strdup_printf("discarding-serial%d", i);
++                chr = qemu_chr_new(name, "null");
++            } else {
++                name = g_strdup_printf("serial%d", i);
++            }
++            isa = isa_create(bus, TYPE_ISA_SERIAL);
++            d = DEVICE(isa);
++            qdev_prop_set_uint32(d, "index", i);
++            if (k->serial.get_iobase) {
++                qdev_prop_set_uint32(d, "iobase",
++                                     k->serial.get_iobase(sio, i));
++            }
++            if (k->serial.get_irq) {
++                qdev_prop_set_uint32(d, "irq", k->serial.get_irq(sio, i));
++            }
++            qdev_prop_set_chr(d, "chardev", chr);
++            qdev_init_nofail(d);
++            sio->serial[i] = isa;
++            trace_superio_create_serial(i,
++                                        k->serial.get_iobase ?
++                                        k->serial.get_iobase(sio, i) : -1,
++                                        k->serial.get_irq ?
++                                        k->serial.get_irq(sio, i) : -1);
++            object_property_add_child(OBJECT(dev), name,
++                                      OBJECT(sio->serial[0]), NULL);
++            g_free(name);
++        }
++    }
+ }
+ 
+ static void isa_superio_class_init(ObjectClass *oc, void *data)
 diff --git a/hw/isa/pc87312.c b/hw/isa/pc87312.c
-index fda91fed21..6b8100ff56 100644
+index 1c15715c69..c2837bca43 100644
 --- a/hw/isa/pc87312.c
 +++ b/hw/isa/pc87312.c
-@@ -270,6 +270,7 @@ static void pc87312_realize(DeviceState *dev, Error **errp)
-     ISABus *bus;
-     Chardev *chr;
-     DriveInfo *drive;
-+    Error *local_err = NULL;
-     char name[5];
-     int i;
+@@ -29,8 +29,6 @@
+ #include "qemu/error-report.h"
+ #include "sysemu/block-backend.h"
+ #include "sysemu/blockdev.h"
+-#include "sysemu/sysemu.h"
+-#include "chardev/char.h"
+ #include "trace.h"
  
-@@ -279,6 +280,12 @@ static void pc87312_realize(DeviceState *dev, Error **errp)
-     isa_register_ioport(isa, &s->io, s->iobase);
-     pc87312_hard_reset(s);
  
-+    ISA_SUPERIO_GET_CLASS(dev)->parent_realize(dev, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-     if (is_parallel_enabled(s)) {
-         /* FIXME use a qdev chardev prop instead of parallel_hds[] */
-         chr = parallel_hds[0];
-@@ -381,7 +388,9 @@ static Property pc87312_properties[] = {
- static void pc87312_class_init(ObjectClass *klass, void *data)
+@@ -100,8 +98,9 @@ static const uint16_t uart_base[2][4] = {
+     { 0x2e8, 0x238, 0x2e0, 0x228 }
+ };
+ 
+-static inline uint16_t get_uart_iobase(PC87312State *s, int i)
++static uint16_t get_uart_iobase(ISASuperIODevice *sio, uint8_t i)
  {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-+    ISASuperIOClass *sc = ISA_SUPERIO_CLASS(klass);
++    PC87312State *s = PC87312(sio);
+     int idx;
+     idx = (s->regs[REG_FAR] >> (2 * i + 2)) & 0x3;
+     if (idx == 0) {
+@@ -113,15 +112,17 @@ static inline uint16_t get_uart_iobase(PC87312State *s, int i)
+     }
+ }
  
-+    sc->parent_realize = dc->realize;
-     dc->realize = pc87312_realize;
+-static inline unsigned int get_uart_irq(PC87312State *s, int i)
++static unsigned int get_uart_irq(ISASuperIODevice *sio, uint8_t i)
+ {
++    PC87312State *s = PC87312(sio);
+     int idx;
+     idx = (s->regs[REG_FAR] >> (2 * i + 2)) & 0x3;
+     return (idx & 1) ? 3 : 4;
+ }
+ 
+-static inline bool is_uart_enabled(PC87312State *s, int i)
++static bool is_uart_enabled(ISASuperIODevice *sio, uint8_t i)
+ {
++    PC87312State *s = PC87312(sio);
+     return s->regs[REG_FER] & (FER_UART1_EN << i);
+ }
+ 
+@@ -271,11 +272,8 @@ static void pc87312_realize(DeviceState *dev, Error **errp)
+     DeviceState *d;
+     ISADevice *isa;
+     ISABus *bus;
+-    Chardev *chr;
+     DriveInfo *drive;
+     Error *local_err = NULL;
+-    char name[5];
+-    int i;
+ 
+     s = PC87312(dev);
+     isa = ISA_DEVICE(dev);
+@@ -289,27 +287,6 @@ static void pc87312_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
+-    for (i = 0; i < 2; i++) {
+-        if (is_uart_enabled(s, i)) {
+-            /* FIXME use a qdev chardev prop instead of serial_hds[] */
+-            chr = serial_hds[i];
+-            if (chr == NULL) {
+-                snprintf(name, sizeof(name), "ser%d", i);
+-                chr = qemu_chr_new(name, "null");
+-            }
+-            isa = isa_create(bus, "isa-serial");
+-            d = DEVICE(isa);
+-            qdev_prop_set_uint32(d, "index", i);
+-            qdev_prop_set_uint32(d, "iobase", get_uart_iobase(s, i));
+-            qdev_prop_set_uint32(d, "irq", get_uart_irq(s, i));
+-            qdev_prop_set_chr(d, "chardev", chr);
+-            qdev_init_nofail(d);
+-            s->uart[i].dev = isa;
+-            trace_pc87312_info_serial(i, get_uart_iobase(s, i),
+-                                      get_uart_irq(s, i));
+-        }
+-    }
+-
+     if (is_fdc_enabled(s)) {
+         isa = isa_create(bus, "isa-fdc");
+         d = DEVICE(isa);
+@@ -380,8 +357,6 @@ static void pc87312_class_init(ObjectClass *klass, void *data)
      dc->reset = pc87312_reset;
      dc->vmsd = &vmstate_pc87312;
-@@ -392,7 +401,7 @@ static void pc87312_class_init(ObjectClass *klass, void *data)
+     dc->props = pc87312_properties;
+-    /* Reason: Uses serial_hds[0] in realize(), so it can't be used twice */
+-    dc->user_creatable = false;
+ 
+     sc->parallel = (ISASuperIOFuncs){
+         .count = 1,
+@@ -389,6 +364,12 @@ static void pc87312_class_init(ObjectClass *klass, void *data)
+         .get_iobase = get_parallel_iobase,
+         .get_irq    = get_parallel_irq,
+     };
++    sc->serial = (ISASuperIOFuncs){
++        .count = 2,
++        .is_enabled = is_uart_enabled,
++        .get_iobase = get_uart_iobase,
++        .get_irq    = get_uart_irq,
++    };
+ }
  
  static const TypeInfo pc87312_type_info = {
-     .name          = TYPE_PC87312_SUPERIO,
--    .parent        = TYPE_ISA_DEVICE,
-+    .parent        = TYPE_ISA_SUPERIO,
-     .instance_size = sizeof(PC87312State),
-     .instance_init = pc87312_initfn,
-     .class_init    = pc87312_class_init,
+diff --git a/hw/isa/trace-events b/hw/isa/trace-events
+index 97b1949981..c78dd6c353 100644
+--- a/hw/isa/trace-events
++++ b/hw/isa/trace-events
+@@ -2,10 +2,10 @@
+ 
+ # hw/isa/isa-superio.c
+ superio_create_parallel(int id, uint16_t base, unsigned int irq) "id=%d, base 0x%03x, irq %u"
++superio_create_serial(int id, uint16_t base, unsigned int irq) "id=%d, base 0x%03x, irq %u"
+ 
+ # hw/isa/pc87312.c
+ pc87312_io_read(uint32_t addr, uint32_t val) "read addr=0x%x val=0x%x"
+ pc87312_io_write(uint32_t addr, uint32_t val) "write addr=0x%x val=0x%x"
+ pc87312_info_floppy(uint32_t base) "base 0x%x"
+ pc87312_info_ide(uint32_t base) "base 0x%x"
+-pc87312_info_serial(int n, uint32_t base, uint32_t irq) "id=%d, base 0x%x, irq %u"
 -- 
 2.16.2
