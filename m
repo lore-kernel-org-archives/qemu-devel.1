@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1etsEQ-00020j-48
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 04:53:03 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1etsNf-0005nX-Jl
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:02:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1etsEN-0000x7-1x
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 04:53:02 -0500
-Resent-Message-Id: <E1etsEN-0000x7-1x@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21089)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1etsEM-0000wh-QM
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 04:52:58 -0500
-In-Reply-To: <20180306095135.21285-1-kraxel@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152033073440.1386.13082307514856122914@bdbb90650ae5>
+	(envelope-from <peter.maydell@linaro.org>) id 1etsNZ-0006qB-Vo
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:02:35 -0500
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:34718)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1etsNZ-0006pU-Pg
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:02:29 -0500
+Received: by mail-oi0-x242.google.com with SMTP id c83so3959334oib.1
+	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 02:02:29 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 6 Mar 2018 02:05:35 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v7 0/9] vfio: add display support
+In-Reply-To: <1520365586-30384-1-git-send-email-mjc@sifive.com>
+References: <1520365586-30384-1-git-send-email-mjc@sifive.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 8 Mar 2018 10:02:08 +0000
+Message-ID: <CAFEAcA_G1tHrBZ=GxAy0b-SLbYU2-XOAUNL0D=8MQeL0Roz_cQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL] RISC-V QEMU Port Submission v8.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, alex.williamson@redhat.com, intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com, tina.zhang@intel.com
+To: Michael Clark <mjc@sifive.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMzA2MDk1MTM1LjIxMjg1LTEta3JheGVsQHJlZGhhdC5jb20KU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NyAwLzldIHZmaW86IGFkZCBkaXNwbGF5IHN1cHBvcnQK
-Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90
-YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
-bmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpj
-b21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBp
-biAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQg
-bG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1h
-dD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAg
-ICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhp
-dCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
-ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
-ZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODAz
-MDYwOTUxMzUuMjEyODUtMS1rcmF4ZWxAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwMzA2MDk1
-MTM1LjIxMjg1LTEta3JheGVsQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0Jwo0OWExZTY1MjBlIHZmaW8vZGlzcGxheTogYWRkaW5nIGRtYWJ1ZiBzdXBwb3J0CmFkNmQx
-Y2UyODYgdmZpby9kaXNwbGF5OiBhZGRpbmcgcmVnaW9uIHN1cHBvcnQKZDU4M2U5MzE0NyB2Zmlv
-L2Rpc3BsYXk6IGNvcmUgJiB3aXJldXAKZDhhNWZlN2M5MSB2ZmlvL2NvbW1vbjogY2xlYW51cCBp
-biB2ZmlvX3JlZ2lvbl9maW5hbGl6ZQowODczMWJkMjNiIHNlY29uZGFyeS12Z2E6IHByb3Blcmx5
-IGNsb3NlIFFlbXVDb25zb2xlIG9uIHVucGx1ZwoyYmJkYTA2MjQ1IGNvbnNvbGU6IG1pbmltYWwg
-aG90cGx1ZyBzdXBvcnQKNTQyZmZkYzRlYyB1aS9waXhtYW46IGFkZCBxZW11X2RybV9mb3JtYXRf
-dG9fcGl4bWFuKCkKMzYxY2Q1ZGZiMCBzdGFuZGFyZC1oZWFkZXJzOiBhZGQgZHJtL2RybV9mb3Vy
-Y2MuaAphN2Q1YThkY2E3IGxpbnV4LWhlYWRlcnM6IHVwZGF0ZSB0byA0LjE2LXJjMQoKPT09IE9V
-VFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS85OiBsaW51eC1oZWFkZXJzOiB1cGRhdGUg
-dG8gNC4xNi1yYzEuLi4KQ2hlY2tpbmcgUEFUQ0ggMi85OiBzdGFuZGFyZC1oZWFkZXJzOiBhZGQg
-ZHJtL2RybV9mb3VyY2MuaC4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0
-YWJzCiM0NTQ6IEZJTEU6IHNjcmlwdHMvdXBkYXRlLWxpbnV4LWhlYWRlcnMuc2g6MTU5OgorXkki
-JG91dHB1dC9pbmNsdWRlL3N0YW5kYXJkLWhlYWRlcnMvZHJtIiQKCnRvdGFsOiAxIGVycm9ycywg
-MCB3YXJuaW5ncywgNDM0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDMvOTogdWkvcGl4bWFuOiBhZGQgcWVtdV9kcm1f
-Zm9ybWF0X3RvX3BpeG1hbigpLi4uCkNoZWNraW5nIFBBVENIIDQvOTogY29uc29sZTogbWluaW1h
-bCBob3RwbHVnIHN1cG9ydC4uLgpDaGVja2luZyBQQVRDSCA1Lzk6IHNlY29uZGFyeS12Z2E6IHBy
-b3Blcmx5IGNsb3NlIFFlbXVDb25zb2xlIG9uIHVucGx1Zy4uLgpDaGVja2luZyBQQVRDSCA2Lzk6
-IHZmaW8vY29tbW9uOiBjbGVhbnVwIGluIHZmaW9fcmVnaW9uX2ZpbmFsaXplLi4uCkNoZWNraW5n
-IFBBVENIIDcvOTogdmZpby9kaXNwbGF5OiBjb3JlICYgd2lyZXVwLi4uCkNoZWNraW5nIFBBVENI
-IDgvOTogdmZpby9kaXNwbGF5OiBhZGRpbmcgcmVnaW9uIHN1cHBvcnQuLi4KRVJST1I6IGJyYWNl
-cyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTQzOiBG
-SUxFOiBody92ZmlvL2Rpc3BsYXkuYzoxNjI6CisgICAgaWYgKCF2ZGV2LT5kcHkpClsuLi5dCgp0
-b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDE1MyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA5Lzk6IHZmaW8vZGlz
-cGxheTogYWRkaW5nIGRtYWJ1ZiBzdXBwb3J0Li4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
-b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
-ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On 6 March 2018 at 19:46, Michael Clark <mjc@sifive.com> wrote:
+> -----BEGIN PGP SIGNED MESSAGE-----
+> Hash: SHA1
+>
+> The following changes since commit f32408f3b472a088467474ab152be3b6285b2d7b:
+>
+>   misc: don't use hwaddr as a type in trace events (2018-03-06 14:24:30 +0000)
+>
+> are available in the git repository at:
+>
+>   https://github.com/riscv/riscv-qemu.git tags/riscv-qemu-upstream-v8.2
+>
+> for you to fetch changes up to 7051b081bf6796e5e84406f6223a7c4900bf7298:
+>
+>   RISC-V - Remove support for adhoc non-standard X_COP local-interrupt (2018-03-07 08:36:03 +1300)
+
+
+Hi -- I would have applied this, but some of the commits
+have no signed-off-by lines.
+
+This is important, and I've already asked for it once. We cannot
+accept anything that doesn't have a clear record in the commit
+message of everybody (person or company) who's contributed code
+to it, indicating that they're happy for their copyrighted
+contributions to be taken into QEMU under our license. Lists
+of names without emails in the cover letter are not sufficient.
+
+In fact a lot of the last part of this patchset looks like
+unreviewed changes/fixes that if we were going to have them we
+should have squashed into the correct patches and resent the
+series for review. Please don't do this. Code review is an
+important part of how the QEMU project works.
+
+thanks
+-- PMM
