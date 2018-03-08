@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eu0M4-00083t-As
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:33:29 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eu0QK-0000yY-9h
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:37:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eu0M1-0005HW-7X
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:33:28 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56696 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1eu0M1-0005HL-2f
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:33:25 -0500
-From: Laszlo Ersek <lersek@redhat.com>
-References: <20180307155746.18526-1-marcandre.lureau@redhat.com>
-	<20180307155746.18526-7-marcandre.lureau@redhat.com>
-	<c46d7d18-5f4c-fe76-6b4a-a7109749d4b4@redhat.com>
-Message-ID: <4394ee6b-d3b3-4208-f052-4aead4638108@redhat.com>
-Date: Thu, 8 Mar 2018 19:33:07 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1eu0QI-0006be-Mx
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:37:52 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:45189)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eu0QI-0006bF-FX
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:37:50 -0500
+Received: by mail-ot0-x241.google.com with SMTP id f11so6336626otj.12
+	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 10:37:50 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <c46d7d18-5f4c-fe76-6b4a-a7109749d4b4@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [edk2] [PATCH v2 6/8] ovmf: link with Tcg2Pei
- module
+In-Reply-To: <1518893216-9983-8-git-send-email-eric.auger@redhat.com>
+References: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
+	<1518893216-9983-8-git-send-email-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 8 Mar 2018 18:37:28 +0000
+Message-ID: <CAFEAcA9d30THtJPihHAm1dRRLr8a2kg2UqMmxJv-p1Zvjj2PgA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v9 07/14] hw/arm/smmuv3: Implement MMIO
+ write operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,94 +30,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@redhat.com, edk2-devel@lists.01.org
-Cc: qemu-devel@nongnu.org, javierm@redhat.com, pjones@redhat.com, jiewen.yao@intel.com
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>
 
-On 03/08/18 19:20, Laszlo Ersek wrote:
-> On 03/07/18 16:57, marcandre.lureau@redhat.com wrote:
->> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>
->> This module will initialize TPM device, measure reported FVs and BIOS
->> version. We keep both SHA-1 and SHA-256 for the TCG 1.2 log format
->> compatibility, but the SHA-256 measurements and TCG 2 log format are
->> now recommended.
->>
->> Cc: Laszlo Ersek <lersek@redhat.com>
->> Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>
->> Contributed-under: TianoCore Contribution Agreement 1.0
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> ---
->>  OvmfPkg/OvmfPkgX64.dsc | 7 +++++++
->>  OvmfPkg/OvmfPkgX64.fdf | 1 +
->>  2 files changed, 8 insertions(+)
->=20
-> (1) Please change the subject line to:
->=20
-> OvmfPkg: include Tcg2Pei module
->=20
->>
->> diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
->> index 64bd6b6a9f08..3fa1a31f4c37 100644
->> --- a/OvmfPkg/OvmfPkgX64.dsc
->> +++ b/OvmfPkg/OvmfPkgX64.dsc
->> @@ -278,6 +278,8 @@ [LibraryClasses.common.PEIM]
->>    QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
->> =20
->>  !if $(TPM2_ENABLE)
->> +  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
->=20
-> (2) Technically this makes sense, but given the fact that we resolve
-> BaseCryptLib unconditionally for a bunch of other module types, I think
-> we should do that for PEIMs as well.
->=20
->> +  HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCryp=
-toRouterPei.inf
+On 17 February 2018 at 18:46, Eric Auger <eric.auger@redhat.com> wrote:
+> Now we have relevant helpers for queue and irq
+> management, let's implement MMIO write operations.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>
+> ---
+>
+> v7 -> v8:
+> - precise in the commit message invalidation commands
+>   are not yet treated.
+> - use new queue helpers
+> - do not decode unhandled commands at this stage
+> ---
+>  hw/arm/smmuv3-internal.h |  24 +++++++---
+>  hw/arm/smmuv3.c          | 111 +++++++++++++++++++++++++++++++++++++++++++++--
+>  hw/arm/trace-events      |   6 +++
+>  3 files changed, 132 insertions(+), 9 deletions(-)
+>
+> diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
+> index c0771ce..5af97ae 100644
+> --- a/hw/arm/smmuv3-internal.h
+> +++ b/hw/arm/smmuv3-internal.h
+> @@ -152,6 +152,25 @@ static inline uint64_t smmu_read64(uint64_t r, unsigned offset,
+>      return extract64(r, offset << 3, 32);
+>  }
+>
+> +static inline void smmu_write64(uint64_t *r, unsigned offset,
+> +                                unsigned size, uint64_t value)
+> +{
+> +    if (size == 8 && !offset) {
+> +        *r  = value;
+> +    }
+> +
+> +    /* 32 bit access */
+> +
+> +    if (offset && offset != 4)  {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "SMMUv3 MMIO write: bad offset/size %u/%u\n",
+> +                      offset, size);
+> +        return ;
+> +    }
+> +
+> +    *r = deposit64(*r, offset << 3, 32, value);
 
-(3) Actually, can you please move this library resolution under
-"Tcg2Pei.inf"? Every single PEIM that uses this library instance will
-need us to spell out the individual hash plugins for it anyway. So I
-think keeping the "hash router" lib instance together with those
-NULL-class instances is cleaner.
+Similar remarks apply to this helper as to smmu_read64 in the earlier patch.
 
-Thanks
-Laszlo
+> +}
+> +
+>  /* Interrupts */
+>
+>  #define smmuv3_eventq_irq_enabled(s)                   \
+> @@ -159,9 +178,6 @@ static inline uint64_t smmu_read64(uint64_t r, unsigned offset,
+>  #define smmuv3_gerror_irq_enabled(s)                  \
+>      (FIELD_EX32(s->irq_ctrl, IRQ_CTRL, GERROR_IRQEN))
+>
+> -void smmuv3_trigger_irq(SMMUv3State *s, SMMUIrq irq, uint32_t gerror_mask);
+> -void smmuv3_write_gerrorn(SMMUv3State *s, uint32_t gerrorn);
+> -
+>  /* Queue Handling */
+>
+>  #define LOG2SIZE(q)        extract64((q)->base, 0, 5)
+> @@ -310,6 +326,4 @@ enum { /* Command completion notification */
+>              addr;                                             \
+>          })
+>
+> -int smmuv3_cmdq_consume(SMMUv3State *s);
+> -
+>  #endif
+> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+> index 0b57215..fcfdbb0 100644
+> --- a/hw/arm/smmuv3.c
+> +++ b/hw/arm/smmuv3.c
+> @@ -37,7 +37,8 @@
+>   * @irq: irq type
+>   * @gerror_mask: mask of gerrors to toggle (relevant if @irq is GERROR)
+>   */
+> -void smmuv3_trigger_irq(SMMUv3State *s, SMMUIrq irq, uint32_t gerror_mask)
+> +static void smmuv3_trigger_irq(SMMUv3State *s, SMMUIrq irq,
+> +                               uint32_t gerror_mask)
+>  {
+>
+>      bool pulse = false;
+> @@ -75,7 +76,7 @@ void smmuv3_trigger_irq(SMMUv3State *s, SMMUIrq irq, uint32_t gerror_mask)
+>      }
+>  }
+>
+> -void smmuv3_write_gerrorn(SMMUv3State *s, uint32_t new_gerrorn)
+> +static void smmuv3_write_gerrorn(SMMUv3State *s, uint32_t new_gerrorn)
+>  {
+>      uint32_t pending = s->gerror ^ s->gerrorn;
+>      uint32_t toggled = s->gerrorn ^ new_gerrorn;
+> @@ -199,7 +200,7 @@ static void smmuv3_init_regs(SMMUv3State *s)
+>      s->sid_split = 0;
+>  }
+>
+> -int smmuv3_cmdq_consume(SMMUv3State *s)
+> +static int smmuv3_cmdq_consume(SMMUv3State *s)
+>  {
+>      SMMUCmdError cmd_error = SMMU_CERROR_NONE;
+>      SMMUQueue *q = &s->cmdq;
+> @@ -298,7 +299,109 @@ int smmuv3_cmdq_consume(SMMUv3State *s)
+>  static void smmu_write_mmio(void *opaque, hwaddr addr,
+>                              uint64_t val, unsigned size)
+>  {
+> -    /* not yet implemented */
+> +    SMMUState *sys = opaque;
+> +    SMMUv3State *s = ARM_SMMUV3(sys);
+> +
+> +    /* CONSTRAINED UNPREDICTABLE choice to have page0/1 be exact aliases */
+> +    addr &= ~0x10000;
+> +
+> +    if (size != 4 && size != 8) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "SMMUv3 MMIO write: bad size %u\n", size);
+> +    }
 
->>    Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDT=
-pm.inf
->>  !endif
->> =20
->> @@ -615,6 +617,11 @@ [Components]
->> =20
->>  !if $(TPM2_ENABLE) =3D=3D TRUE
->>    OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
->> +  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf {
->> +    <LibraryClasses>
->> +      NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha=
-1.inf
->> +      NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibS=
-ha256.inf
->> +  }
->>  !endif
->> =20
->>    #
->> diff --git a/OvmfPkg/OvmfPkgX64.fdf b/OvmfPkg/OvmfPkgX64.fdf
->> index dbafada5226b..c0173e7adf5f 100644
->> --- a/OvmfPkg/OvmfPkgX64.fdf
->> +++ b/OvmfPkg/OvmfPkgX64.fdf
->> @@ -167,6 +167,7 @@ [FV.PEIFV]
->> =20
->>  !if $(TPM2_ENABLE) =3D=3D TRUE
->>  INF  OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
->> +INF  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
->>  !endif
->> =20
->>  #####################################################################=
-###########
->>
->=20
-> Looks good. (The final version should handle the other DSC / FDF files =
-too.)
->=20
-> Thanks!
-> Laszlo
->=20
+As with read, this can never happen so you don't need to check for it.
+
+As with read, probably better to explicitly whitelist the 64-bit
+accessible offsets, and LOG_GUEST_ERROR and write-ignore the others.
+
+> +
+> +    trace_smmuv3_write_mmio(addr, val, size);
+> +
+> +    switch (addr) {
+> +    case A_CR0:
+> +        s->cr[0] = val;
+> +        s->cr0ack = val;
+
+Spec says "reserved fields in SMMU_CR0 are not reflected in SMMU_CR0ACK",
+so you probably need to mask those out.
+
+> +        /* in case the command queue has been enabled */
+> +        smmuv3_cmdq_consume(s);
+> +        return;
+> +    case A_CR1:
+> +        s->cr[1] = val;
+> +        return;
+> +    case A_CR2:
+> +        s->cr[2] = val;
+> +        return;
+> +    case A_IRQ_CTRL:
+> +        s->irq_ctrl = val;
+> +        return;
+> +    case A_GERRORN:
+> +        smmuv3_write_gerrorn(s, val);
+> +        /*
+> +         * By acknowledging the CMDQ_ERR, SW may notify cmds can
+> +         * be processed again
+> +         */
+> +        smmuv3_cmdq_consume(s);
+> +        return;
+> +    case A_GERROR_IRQ_CFG0: /* 64b */
+> +        smmu_write64(&s->gerror_irq_cfg0, 0, size, val);
+> +        return;
+> +    case A_GERROR_IRQ_CFG0 + 4:
+> +        smmu_write64(&s->gerror_irq_cfg0, 4, size, val);
+> +        return;
+> +    case A_GERROR_IRQ_CFG1:
+> +        s->gerror_irq_cfg1 = val;
+> +        return;
+> +    case A_GERROR_IRQ_CFG2:
+> +        s->gerror_irq_cfg2 = val;
+> +        return;
+> +    case A_STRTAB_BASE: /* 64b */
+> +        smmu_write64(&s->strtab_base, 0, size, val);
+> +        return;
+> +    case A_STRTAB_BASE + 4:
+> +        smmu_write64(&s->strtab_base, 4, size, val);
+> +        return;
+> +    case A_STRTAB_BASE_CFG:
+> +        s->strtab_base_cfg = val;
+> +        if (FIELD_EX32(val, STRTAB_BASE_CFG, FMT) == 1) {
+> +            s->sid_split = FIELD_EX32(val, STRTAB_BASE_CFG, SPLIT);
+> +            s->features |= SMMU_FEATURE_2LVL_STE;
+> +        }
+> +        return;
+> +    case A_CMDQ_BASE: /* 64b */
+> +        smmu_write64(&s->cmdq.base, 0, size, val);
+> +        return;
+> +    case A_CMDQ_BASE + 4: /* 64b */
+> +        smmu_write64(&s->cmdq.base, 4, size, val);
+> +        return;
+> +    case A_CMDQ_PROD:
+> +        s->cmdq.prod = val;
+> +        smmuv3_cmdq_consume(s);
+> +        return;
+> +    case A_CMDQ_CONS:
+> +        s->cmdq.cons = val;
+> +        return;
+> +    case A_EVENTQ_BASE: /* 64b */
+> +        smmu_write64(&s->eventq.base, 0, size, val);
+> +        return;
+> +    case A_EVENTQ_BASE + 4:
+> +        smmu_write64(&s->eventq.base, 4, size, val);
+> +        return;
+> +    case A_EVENTQ_PROD:
+> +        s->eventq.prod = val;
+> +        return;
+> +    case A_EVENTQ_CONS:
+> +        s->eventq.cons = val;
+> +        return;
+> +    case A_EVENTQ_IRQ_CFG0: /* 64b */
+> +        s->eventq.prod = val;
+> +        smmu_write64(&s->eventq_irq_cfg0, 0, size, val);
+> +        return;
+> +    case A_EVENTQ_IRQ_CFG0 + 4:
+> +        smmu_write64(&s->eventq_irq_cfg0, 4, size, val);
+> +        return;
+> +    case A_EVENTQ_IRQ_CFG1:
+> +        s->eventq_irq_cfg1 = val;
+> +        return;
+> +    case A_EVENTQ_IRQ_CFG2:
+> +        s->eventq_irq_cfg2 = val;
+> +        return;
+> +    default:
+> +        error_report("%s unhandled access at 0x%"PRIx64, __func__, addr);
+
+Tracepoint or LOG_GUEST_ERROR, not error_report(), please.
+
+> +    }
+>  }
+>
+>  static uint64_t smmu_read_mmio(void *opaque, hwaddr addr, unsigned size)
+> diff --git a/hw/arm/trace-events b/hw/arm/trace-events
+> index 1c5105d..ed5dce0 100644
+> --- a/hw/arm/trace-events
+> +++ b/hw/arm/trace-events
+> @@ -22,3 +22,9 @@ smmuv3_unhandled_cmd(uint32_t type) "Unhandled command type=%d"
+>  smmuv3_cmdq_consume(uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t cons_wrap) "prod=%d cons=%d prod.wrap=%d cons.wrap=%d"
+>  smmuv3_cmdq_opcode(const char *opcode) "<--- %s"
+>  smmuv3_cmdq_consume_out(uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t cons_wrap) "prod:%d, cons:%d, prod_wrap:%d, cons_wrap:%d "
+> +smmuv3_update(bool is_empty, uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t cons_wrap) "q empty:%d prod:%d cons:%d p.wrap:%d p.cons:%d"
+> +smmuv3_update_check_cmd(int error) "cmdq not enabled or error :0x%x"
+> +smmuv3_write_mmio(hwaddr addr, uint64_t val, unsigned size) "addr: 0x%"PRIx64" val:0x%"PRIx64" size: 0x%x"
+> +smmuv3_write_mmio_idr(hwaddr addr, uint64_t val) "write to RO/Unimpl reg 0x%lx val64:0x%lx"
+> +smmuv3_write_mmio_evtq_cons_bef_clear(uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t cons_wrap) "Before clearing interrupt prod:0x%x cons:0x%x prod.w:%d cons.w:%d"
+> +smmuv3_write_mmio_evtq_cons_after_clear(uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t cons_wrap) "after clearing interrupt prod:0x%x cons:0x%x prod.w:%d cons.w:%d"
+
+
+thanks
+-- PMM
