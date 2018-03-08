@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yvugenfi@redhat.com>) id 1etuyr-0004ag-1j
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:49:10 -0500
+	(envelope-from <quintela@redhat.com>) id 1etuzE-0004pn-6Q
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:49:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yvugenfi@redhat.com>) id 1etuym-0003O4-67
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:49:09 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56686 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yvugenfi@redhat.com>) id 1etuym-0003Kq-0i
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:49:04 -0500
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-From: Yan Vugenfirer <yvugenfi@redhat.com>
-In-Reply-To: <20180306201252-mutt-send-email-mst@kernel.org>
-Date: Thu, 8 Mar 2018 14:48:45 +0200
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <71A8623C-BB2A-4579-AD12-77A9D1B70F97@redhat.com>
-References: <cover.1519961667.git.jbaron@akamai.com>
-	<c9d3cf2fbc3c64bb28e0438185d85d95b2088127.1519961667.git.jbaron@akamai.com>
-	<7fc612d0-9610-9b07-d054-bb1438898f47@redhat.com>
-	<20180302221831-mutt-send-email-mst@kernel.org>
-	<258F88CA-D946-4804-A65D-2EA0790A66AF@redhat.com>
-	<09cbf694-907e-dd68-60ff-eeb169925a5e@akamai.com>
-	<20180306201252-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH 4/4] virtio-net: add linkspeed
- and duplex settings to virtio-net
+	(envelope-from <quintela@redhat.com>) id 1etuzD-0003eD-3Y
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:49:32 -0500
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1520507908-16743-5-git-send-email-pl@kamp.de> (Peter Lieven's
+	message of "Thu, 8 Mar 2018 12:18:27 +0100")
+References: <1520507908-16743-1-git-send-email-pl@kamp.de>
+	<1520507908-16743-5-git-send-email-pl@kamp.de>
+Reply-To: quintela@redhat.com
+Date: Thu, 08 Mar 2018 13:50:00 +0100
+Message-ID: <87po4ed953.fsf@secure.laptop>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 4/5] migration/block: limit the number of
+ parallel I/O requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,83 +25,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Baron <jbaron@akamai.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+To: Peter Lieven <pl@kamp.de>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, dgilbert@redhat.com, famz@redhat.com, stefanha@redhat.com, jjherne@linux.vnet.ibm.com
 
+Peter Lieven <pl@kamp.de> wrote:
+> the current implementation submits up to 512 I/O requests in parallel
+> which is much to high especially for a background task.
+> This patch adds a maximum limit of 16 I/O requests that can
+> be submitted in parallel to avoid monopolizing the I/O device.
+>
+> Signed-off-by: Peter Lieven <pl@kamp.de>
 
+This code is already a mess (TM).  It is difficult to understand what we
+are doing, so not easy to see if your changes are better/worse than what
+we have.
 
-> On 6 Mar 2018, at 20:13, Michael S. Tsirkin <mst@redhat.com> wrote:
->=20
-> On Tue, Mar 06, 2018 at 01:02:06PM -0500, Jason Baron wrote:
->>=20
->>=20
->> On 03/04/2018 08:05 AM, Yan Vugenfirer wrote:
->>>=20
->>>=20
->>>> On 2 Mar 2018, at 22:19, Michael S. Tsirkin <mst@redhat.com
->>>> <mailto:mst@redhat.com>> wrote:
->>>>=20
->>>> On Fri, Mar 02, 2018 at 03:14:01PM +0800, Jason Wang wrote:
->>>>>=20
->>>>>=20
->>>>> On 2018=E5=B9=B403=E6=9C=8802=E6=97=A5 11:46, Jason Baron wrote:
->>>>>> Although linkspeed and duplex can be set in a linux guest via
->>>>>> 'ethtool -s',
->>>>>> this requires custom ethtool commands for virtio-net by default.
->>>>>>=20
->>>>>> Introduce a new feature flag, VIRTIO_NET_F_SPEED_DUPLEX, which =
-allows
->>>>>> the hypervisor to export a linkspeed and duplex setting. The user =
-can
->>>>>> subsequently overwrite it later if desired via: 'ethtool -s'.
->>>>>>=20
->>>>>> Linkspeed and duplex settings can be set as:
->>>>>> '-device virtio-net,speed=3D10000,duplex=3Dfull'
->>>>>=20
->>>>> I was thinking whether or not it's better to decide the duplex by =
-the
->>>>> type
->>>>> of backends.
->>>>>=20
->>>>> E.g userspace and vhost-kernel implement a in fact half duplex. =
-But dpdk
->>>>> implement a full duplex.
->>>>>=20
->>>>> Thanks
->>>>=20
->>>> OTOH it's a priority for some people to be able to support =
-migration
->>>> between different backend types. Breaking that won't be nice.
->>>=20
->>> I think that in this case we need a way to update the settings of =
-link
->>> speed and link duplex (maybe add QMP command). Migration between
->>> different backend types should cause link down\link up events. And =
-this
->>> is a time for a driver to re-read the settings and update the OS.
->>>=20
->>> Best regards,
->>> Yan.
->>>=20
->>=20
->> So the virtio_net driver in linux will re-read these settings on link =
-up
->> events. So I could add a qmp command to set these (in addition to the
->> command-line) interface, if desired. Is there a consensus that we =
-need
->> to add a qmp command here? Or can that be treated as a future item, =
-if
->> somebody wants it?
->>=20
->> Thanks,
->>=20
->> -Jason
->=20
-> We already have ability to take link down and up.
-> I'd say it's a future item.
-I agree.
+I am not sure that your solution help to improve things here.  Let's see
+what I understand.
 
-Yan.
->=20
-> --=20
-> MST
+We have three fields (without a single comment):
+
+- submitted: this is the number of blocks that we have asked the block
+             device to read asynchronously to main memory, and that
+             haven't yet read.  I.e. "blocks_read_pending" would be a
+             better name?
+
+- read_done: this is the number of blocks that we have finished read
+             asynchronously from this block device.  When we finish, we
+             do a submitted -- and a read_done++.  blocks_read_finished
+             name?
+
+- transferred: This is the number of blocks that we have transferred
+               since the beginning of migration.  At this point, we do a
+               read_done-- and a transferred++
+
+Note also that we do malloc()/free() for each block
+
+So, now that we have defined what our fields mean, we need to know what
+is our test.  block_save_pending():
+
+    get_remaining_dirty() + (submitted + read_done) * BLOCK_SIZE
+
+Looks good.
+
+But let's us see what test we do in block_save_iterate() (Yes, I have
+been very liberal with reformatting and removal of struct names):
+
+(submitted + read_done) * BLOCK_SIZE <  qemu_file_get_rate_limit(f) &&
+(submitted + read_done) < MAX_INFLIGHT_IO
+
+The idea of that test is to make sure that we _don't send_ through the
+QEMUFile more than qemu_file_get_rate_limit(f).  But there are several
+things here:
+- we have already issued a flush_blks() call before we enter the loop
+  And it is inside possibility that we have already sent too much data at
+  this point, but we enter the while loop anyways.
+
+  Notice that flush_blks() does the right thing and test in each loop if
+  qemu_file_rate_limit() has been reached and stops sending more data if
+  it returns true;
+
+- At this point, we *could* have sent all that can be sent for this
+  round, but we enter the loop anyways.  And we test two things:
+     - that we haven't read from block devices more than
+       qemu_file_get_rate_limit() bytes (notice that this is the maximum
+       that we could put through the migration channel, not really
+       related  with what we read from block devices).
+
+     - that we haven't read in this round more than MAX_INFLIGHT_IO
+       blocks.  That is 512 blocks, at BLOCK_SIZE bytes is 512MB. Why?
+       Who knows.
+
+- Now we exit the while loop, and we have pending blocks to send, the
+    minimum between:
+       - qemu_file_get_rate_limit()/BLOCK_SIZE, and
+       - MAX_INFLIGHT_IO
+
+But not all of them are ready to send, only "read_done" blocks are
+ready, the "submitted" ones are still waiting for read completion.
+
+And we call back flush_blks() that will try to send all the "read_done"
+blocks through the migration channel until we hit
+qemu_file_rate_limit().
+
+So, looking at the problem from far away:
+
+- how many read requests are we have to have in flight at any moment, is
+  that 16 from this series the right number? Notice that each request
+  are 1MB, so this is 16MB (I have no clue what is the right value).
+
+- how many blocks should we get on each round.  Notice that the reason
+  for the 1st patch on this series is because the block layer is not
+  sending enough blocks to prevent ram migration to start.  If there are
+  enough dirty memory sent from the block layer, we shouldn't ever enter
+  the ram stage.
+  Notice how we register them in vl.c:
+
+    blk_mig_init();
+    ram_mig_init();
+
+So, after so long mail, do I have some suggestion?
+
+- should we make the MAX_PARALLEL_IO autotunig?  i.e. if we are not
+  being able to get qemu_file_get_rate_limit()/BLOCK_SIZE read_blocks by
+  iteration, we should increase MAX_PARALLEL_IO limit?
+
+- should we "take" into account how many blocks have transferred the 1st
+  call to flush_blks() and only wait for "read_blocks" until
+  flush_blks() instead of for the whole set?
+
+Later, Juan.
