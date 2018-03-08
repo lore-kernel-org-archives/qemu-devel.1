@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eu0AQ-0001KY-Kh
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:21:27 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eu0B4-0001px-BU
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:22:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eu0AN-0000d1-FI
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:21:26 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38866 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eu0AN-0000cf-AN
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:21:23 -0500
-References: <1518692807-25859-1-git-send-email-thuth@redhat.com>
-	<8ccf0ec6-4eb4-7039-ca51-1fbcd192fa2a@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <93bf7fb0-2bd0-0c23-1a3a-b73f31ff313b@redhat.com>
-Date: Thu, 8 Mar 2018 19:21:20 +0100
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eu0B1-0000vo-5z
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:22:06 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20180207125037.13510-1-vsementsov@virtuozzo.com>
+	<20180207125037.13510-2-vsementsov@virtuozzo.com>
+	<20180306153213.GK31045@stefanha-x1.localdomain>
+	<49f2f289-ce1c-6e24-8b54-bb5b5c1601bc@redhat.com>
+	<9ef1c947-616f-0cde-040d-7a4f0fc8f146@virtuozzo.com>
+Message-ID: <c8e6c246-1311-fd52-6267-b78eb02bfd07@virtuozzo.com>
+Date: Thu, 8 Mar 2018 21:21:54 +0300
 MIME-Version: 1.0
-In-Reply-To: <8ccf0ec6-4eb4-7039-ca51-1fbcd192fa2a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <9ef1c947-616f-0cde-040d-7a4f0fc8f146@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] Polish the version strings containing the
- package version
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] block/accounting: introduce latency
+ histogram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +28,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, den@openvz.org
 
-On 15.02.2018 15:38, Eric Blake wrote:
-> On 02/15/2018 05:06 AM, Thomas Huth wrote:
->> Since commit 67a1de0d195a there is no space anymore between the
->> version number and the parentheses when running configure with
->> --with-pkgversion=3Dfoo :
+08.03.2018 21:14, Vladimir Sementsov-Ogievskiy wrote:
+> 08.03.2018 20:31, Eric Blake wrote:
+>> On 03/06/2018 09:32 AM, Stefan Hajnoczi wrote:
+>>> On Wed, Feb 07, 2018 at 03:50:36PM +0300, Vladimir=20
+>>> Sementsov-Ogievskiy wrote:
+>>>> Introduce latency histogram statics for block devices.
+>>>> For each accounted operation type latency region [0, +inf) is
+>>>> divided into subregions by several points. Then, calculate
+>>>> hits for each subregion.
+>>>>
+>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>> ---
 >>
->> =C2=A0 $ qemu-system-s390x --version
->> =C2=A0 QEMU emulator version 2.11.50(foo)
+>>> According to Wikipedia and Mathworld, "intervals" and "bins" are
+>>> commonly used terms:
+>>> https://en.wikipedia.org/wiki/Histogram
+>>> http://mathworld.wolfram.com/Histogram.html
+>>>
+>>> I suggest:
+>>>
+>>> =C2=A0=C2=A0 typedef struct {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* The following histogram is repr=
+esented like this:
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 5|=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 4|=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 3| *=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 2| *=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0 *
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 1| *=C2=A0=C2=A0=C2=A0 *=
+=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0 *
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0 +------------------
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 10=C2=A0=C2=A0 50=C2=A0=C2=A0 100
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * BlockLatencyHistogram hist=
+ogram =3D {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 .n=
+bins =3D 4,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 .i=
+ntervals =3D {10, 50, 100},
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 .b=
+ins =3D {3, 1, 5, 2},
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * };
 >>
->> But the space is included when building without that option
->> when building from a git checkout:
+>> The name 'intervals' is still slightly ambiguous: does it hold the=20
+>> boundary point (0-10 for 10 slots, 10-50 for 40 slots, 50-100, for 50=20
+>> slots, then 100-INF) or is it the interval size of each slot (first=20
+>> bin is 10 slots for 0-10, next bin is 50 slots wide so 10-60, next=20
+>> bin is 100 slots wide so 60-160, everything else is 160-INF).=C2=A0 But=
+=20
+>> the ascii-art diagram plus the text is sufficient to resolve the=20
+>> intent if you keep that name (I don't have a suggestion for a better=20
+>> name).
 >>
->> =C2=A0 $ qemu-system-s390x --version
->> =C2=A0 QEMU emulator version 2.11.50 (v2.11.0-1494-gbec9c64-dirty)
->>
->> The same confusion exists with the "query-version" QMP command.
->> Let's fix this by introducing a proper QEMU_FULL_VERSION definition
->> that includes the space and parentheses, while the QEMU_PKGVERSION
->> should just cleanly contain the package version string itself.
->> Note that this also changes the behavior of the "query-version" QMP
->> command (the space and parentheses are not included there anymore),
->> but that's supposed to be OK since the strings there are not meant
->> to be parsed by other tools.
->>
->> Fixes: 67a1de0d195a6185c39b436159c9ffc7720bf979
->> Buglink: https://bugs.launchpad.net/qemu/+bug/1673373
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->=20
-> I like it!
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+>
+> Hm. these numbers are actually boundary points of histogram intervals,=20
+> not intervals itself. And, wiki says "The bins are usually specified=20
+> as consecutive, non-overlapping intervals of a variable.", so,=20
+> intervals are bins.
+>
+> So, what about:
+>
+> 1. interval_boundaries
+> 2. bin_boundaries
+> 3. boundaries
+>
+> (and same names with s/_/-/ for qapi)
+>
+>
 
-Ping!
 
-Paolo, could you maybe take this through your misc tree?
+Also, now I doubt, is it a good idea to share same bin boundaries for=20
+each io type.
 
- Thomas
+--=20
+Best regards,
+Vladimir
