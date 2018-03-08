@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eu0Ht-0005BH-J7
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:29:11 -0500
+	(envelope-from <Bill.Paul@windriver.com>) id 1eu0Ir-0005l3-Q0
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:30:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eu0Hr-0003kY-Ht
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:29:09 -0500
-Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:36446)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eu0Hr-0003kI-B6
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:29:07 -0500
-Received: by mail-oi0-x234.google.com with SMTP id u73so5081009oie.3
-	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 10:29:07 -0800 (PST)
+	(envelope-from <Bill.Paul@windriver.com>) id 1eu0Io-00049p-KO
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:30:09 -0500
+Received: from mail5.windriver.com ([192.103.53.11]:55428 helo=mail5.wrs.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Bill.Paul@windriver.com>)
+	id 1eu0Io-00048K-AF
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:30:06 -0500
+From: Bill Paul <wpaul@windriver.com>
+Date: Thu, 8 Mar 2018 10:28:39 -0800
+References: <1520444223-8389-1-git-send-email-linux@roeck-us.net>
+	<CAFEAcA-+J7MUSssjPZ5BTNzGx_4h0YANdCegGfWNzYmoNatcqg@mail.gmail.com>
+	<20180308171239.GA22206@roeck-us.net>
+In-Reply-To: <20180308171239.GA22206@roeck-us.net>
 MIME-Version: 1.0
-In-Reply-To: <1518893216-9983-7-git-send-email-eric.auger@redhat.com>
-References: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
-	<1518893216-9983-7-git-send-email-eric.auger@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 8 Mar 2018 18:28:45 +0000
-Message-ID: <CAFEAcA_KBtbNiRUV5=nFVj=y8Sv7moNJSs-WVEYv6mdtzDaQ3w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v9 06/14] hw/arm/smmuv3: Queue helpers
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Message-ID: <201803081028.39635.wpaul@windriver.com>
+Subject: Re: [Qemu-devel] [PATCH] fsl-imx6: Swap Ethernet interrupt defines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,473 +29,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Chris
+	Healy <cphealy@gmail.com>, Jason Wang <jasowang@redhat.com>, Jean-Christophe Dubois <jcd@tribudubois.net>
 
-On 17 February 2018 at 18:46, Eric Auger <eric.auger@redhat.com> wrote:
-> We introduce helpers to read/write into the command and event
-> circular queues.
->
-> smmuv3_write_eventq and smmuv3_cmq_consume will become static
-> in subsequent patches.
->
-> Invalidation commands are not yet dealt with. We do not cache
-> data that need to be invalidated. This will change with vhost
-> integration.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->
-> ---
->
-> v8 -> v9:
-> - fix CMD_SSID & CMD_ADDR + some renamings
-> - do cons increment after the execution of the command
-> - add Q_INCONSISTENT()
->
-> v7 -> v8
-> - use address_space_rw
-> - helpers inspired from spec
-> ---
->  hw/arm/smmuv3-internal.h | 150 +++++++++++++++++++++++++++++++++++++++++++
->  hw/arm/smmuv3.c          | 162 +++++++++++++++++++++++++++++++++++++++++++++++
->  hw/arm/trace-events      |   4 ++
->  3 files changed, 316 insertions(+)
->
-> diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
-> index 40b39a1..c0771ce 100644
-> --- a/hw/arm/smmuv3-internal.h
-> +++ b/hw/arm/smmuv3-internal.h
-> @@ -162,4 +162,154 @@ static inline uint64_t smmu_read64(uint64_t r, unsigned offset,
->  void smmuv3_trigger_irq(SMMUv3State *s, SMMUIrq irq, uint32_t gerror_mask);
->  void smmuv3_write_gerrorn(SMMUv3State *s, uint32_t gerrorn);
->
-> +/* Queue Handling */
-> +
-> +#define LOG2SIZE(q)        extract64((q)->base, 0, 5)
-> +#define BASE(q)            ((q)->base & SMMU_BASE_ADDR_MASK)
+Of all the gin joints in all the towns in all the world, Guenter Roeck had to 
+walk into mine at 09:12 on Thursday 08 March 2018 and say:
 
-These are both very generic names for things in header files.
+> On Thu, Mar 08, 2018 at 02:51:04PM +0000, Peter Maydell wrote:
+> > On 8 March 2018 at 14:47, Guenter Roeck <linux@roeck-us.net> wrote:
+> > > On 03/08/2018 02:50 AM, Peter Maydell wrote:
+> > >> So do the works-by-accident kernels fail on QEMU because
+> > >> we don't emulate some bit of the ethernet device ?
+> > >> Ideally we could fix that so we could boot newer kernels
+> > >> without breaking the old ones...
+> > > 
+> > > I don't know if a fix working for all versions of Linux is even
+> > > possible. Creating both interrupts might be an option, but would
+> > > likely cause other problems since some versions of Linux would handle
+> > > the same interrupt twice, while others expect the second interrupt
+> > > to be associated with the timer.
+> > 
+> > Did the older Linux kernels work on the real hardware? (I
+> > would guess so, but sometimes these things only get tested
+> > on emulation...) If so, then in theory "make QEMU work like
+> > the hardware" should allow all the kernels to work on QEMU.
+> 
+> Older kernels (4.9 and earlier) register the second interrupt
+> on a gpio pin.
+> 
+> Linux 4.1, ToT qemu with this patch applied:
+> 
+>  38:          0  gpio-mxc   6 Level     2188000.ethernet
+> 286:          0       GIC 151 Level     2188000.ethernet
+> 
+> Linux 4.1, ToT qemu without this patch:
+> 
+>  38:          0  gpio-mxc   6 Level     2188000.ethernet
+> 286:         64       GIC 151 Level     2188000.ethernet
+> 
+> linux 4.14, ToT qemu with this patch:
+> 
+>  64:         64     GIC-0 150 Level     2188000.ethernet
+>  65:          0     GIC-0 151 Level     2188000.ethernet
+> 
+> linux 4.14, ToT qemu without this patch:
+> 
+>  64:          0     GIC-0 150 Level     2188000.ethernet
+>  65:         64     GIC-0 151 Level     2188000.ethernet
+> 
+> Presumably real hardware generates interrupts on the gpio pin.
+> 
+> The qemu code specifically states that it won't generate
+> MDIO related interrupts on gpio pins. From hw/net/imx_fec.c:
+> 
+> /*
+>  * The MII phy could raise a GPIO to the processor which in turn
+>  * could be handled as an interrpt by the OS.
+>  * For now we don't handle any GPIO/interrupt line, so the OS will
+>  * have to poll for the PHY status.
+>  */
+> 
+> Linux doesn't poll the phy but expects interrupts to work. I have
+> no idea what is supposed to happen with regular ethernet interrupts,
+> and if those are also mapped to a gpio pin on real hardware.
 
-Looking at the required behaviour of the *_BASE registers,
-if the LOG2SIZE field is written to a value larger than the maximum,
-it is supposed to read back as the value written but must behave
-as if it was set to the maximum. That suggests to me that your
-SMMUQueue struct should have a "log2size" field which is set when
-the guest writes to *_BASE (which is where you can cap it to the
-max value).
+The i.MX6, like a lot of ARM chips, has an internal pin/signal muxing block. 
+The implementation can vary from one SoC to another. The i.MX6 calls it the 
+IOMUX block.
 
-> +#define WRAP_MASK(q)       (1 << LOG2SIZE(q))
-> +#define INDEX_MASK(q)      ((1 << LOG2SIZE(q)) - 1)
-> +#define WRAP_INDEX_MASK(q) ((1 << (LOG2SIZE(q) + 1)) - 1)
+The reason for using the GPIO pin here has to do with erratum 6687 in the 
+i.MX6. The problem is this: the ENET block has several interrupt sources such 
+as RX done, TX done, various errors and wakeup request. The i.MX6 also has two 
+blocks to which interrupts can be routed: the GIC (Generic Interrupt 
+Controller) and GPC (Generic Power Controller). The GPC is only used for power 
+management: you can use it to configure what device interrupts (from internal 
+SoC peripherals) can wake the system from hibernation.
 
-WRAP_INDEX_MASK is unused (but see below for a possible use)
+The GIC receives all ENET events ORed together via vector 150.
 
-> +
-> +#define Q_CONS_ENTRY(q)  (BASE(q) + \
-> +                          (q)->entry_size * ((q)->cons & INDEX_MASK(q)))
-> +#define Q_PROD_ENTRY(q)  (BASE(q) + \
-> +                          (q)->entry_size * ((q)->prod & INDEX_MASK(q)))
-> +
-> +#define Q_CONS(q) ((q)->cons & INDEX_MASK(q))
-> +#define Q_PROD(q) ((q)->prod & INDEX_MASK(q))
+But the GPC is only connected to the wakeup request signal.
 
-If you put these a bit earlier you can use them in the definitions
-of Q_CONS_ENTRY and Q_PROD_ENTRY.
+According to the erratum 6687 documentation, this means that a normal RX or TX 
+event would not wake up the system, which is suboptimal.
 
-> +
-> +#define Q_CONS_WRAP(q) (((q)->cons & WRAP_MASK(q)) >> LOG2SIZE(q))
-> +#define Q_PROD_WRAP(q) (((q)->prod & WRAP_MASK(q)) >> LOG2SIZE(q))
-> +
-> +#define Q_FULL(q) \
-> +    (((((q)->cons) & INDEX_MASK(q)) == \
-> +      (((q)->prod) & INDEX_MASK(q))) && \
-> +     ((((q)->cons) & WRAP_MASK(q)) != \
-> +      (((q)->prod) & WRAP_MASK(q))))
+The workaround for this is:
 
-You could write this as
-   ((cons ^ prod) & WRAP_INDEX_MASK) == WRAP_MASK
+- Configure the internal mux block to route the ENET interrupt line to a GPIO 
+pin (as with the GIC, this also gives you all ENET events ORed together)
+- Unmask the GPIO interrupt in the GPC block instead of the ENET interrupt
 
-> +
-> +#define Q_EMPTY(q) \
-> +    (((((q)->cons) & INDEX_MASK(q)) == \
-> +      (((q)->prod) & INDEX_MASK(q))) && \
-> +     ((((q)->cons) & WRAP_MASK(q)) == \
-> +      (((q)->prod) & WRAP_MASK(q))))
+The erratum description recommends using GPIO6. It also says that this 
+workaround was implemented in Freescale/NXP's Linux BSP for this chip. I don't 
+know if it was also upstreamed to the official Linux kernel.
 
-and this as
-   (cons & WRAP_INDEX_MASK) == (prod & WRAP_INDEX_MASK)
+Note that this workaround is applied by software, and is really only needed if 
+you want the ethernet controller to serve as a wakeup event source.
 
-(or as ((cons ^ prod) & WRAP_INDEX_MASK) == 0, but that's unnecessarily
-obscure I think.)
+As far as I can tell QEMU does not support the IOMUX block, so it would never 
+be possible for a kernel with this workaround in place to get interrupts via 
+the GPIO6 pin.
 
+That said, I don't think the i.MX6 ENET driver itself would need to use the 
+GPIO6 interrupt. When we implemented power management support for VxWorks we 
+also used this workaround, but only for the benefit of the GPC module. As far 
+as I recall, the ENET driver still used GIC vector 150. This may be why this 
+behavior was removed in later kernels. 
 
-This is all a bit macro-heavy. Do these really all need to be macros
-rather than functions?
+Anyway, this means that the only reason older Linux kernels worked in QEMU 
+with the broken interrupt configuration is that they also registered a handler 
+on vector 151 (119). Even though QEMU could not send events via GPIO6, it was 
+mistakenly sending them via vector 151, so it looked like things worked. On 
+real hardware, the older kernels would have gotten their interrupts via GPIO6 
+and also worked. The older kernels would _not_ work if you fix QEMU because 
+now they would never get interrupts on either vector, unless you fudge things 
+so that the ENET module triggers both vector 150 and the vector for GPIO6 in 
+the GIC or patch them to back out the erratum 6678 workaround as later kernels 
+do.
 
-> +
-> +#define Q_INCONSISTENT(q) \
-> +((((((q)->prod) & INDEX_MASK(q)) > (((q)->cons) & INDEX_MASK(q))) && \
-> +((((q)->prod) & WRAP_MASK(q)) != (((q)->cons) & WRAP_MASK(q)))) || \
-> +(((((q)->prod) & INDEX_MASK(q)) < (((q)->cons) & INDEX_MASK(q))) && \
-> +((((q)->prod) & WRAP_MASK(q)) == (((q)->cons) & WRAP_MASK(q))))) \
-> +
+Later kernels that register vectors 150 and 151 would work with both broken 
+and fixed QEMU and real hardware.
 
-This never seems to be used. (Also it has a stray trailing '\',
-and isn't indented very clearly.
+But you should fix the incorrect interrupt configuration regardless. :)
+ 
+-Bill
 
-> +#define SMMUV3_CMDQ_ENABLED(s) \
-> +     (FIELD_EX32(s->cr[0], CR0, CMDQEN))
-> +
-> +#define SMMUV3_EVENTQ_ENABLED(s) \
-> +     (FIELD_EX32(s->cr[0], CR0, EVENTQEN))
-> +
-> +static inline void smmu_write_cmdq_err(SMMUv3State *s, uint32_t err_type)
-> +{
-> +    s->cmdq.cons = FIELD_DP32(s->cmdq.cons, CMDQ_CONS, ERR, err_type);
-> +}
-> +
-> +void smmuv3_write_eventq(SMMUv3State *s, Evt *evt);
-> +
-> +/* Commands */
-> +
-> +enum {
-> +    SMMU_CMD_PREFETCH_CONFIG = 0x01,
-> +    SMMU_CMD_PREFETCH_ADDR,
-> +    SMMU_CMD_CFGI_STE,
-> +    SMMU_CMD_CFGI_STE_RANGE,
-> +    SMMU_CMD_CFGI_CD,
-> +    SMMU_CMD_CFGI_CD_ALL,
-> +    SMMU_CMD_CFGI_ALL,
-> +    SMMU_CMD_TLBI_NH_ALL     = 0x10,
-> +    SMMU_CMD_TLBI_NH_ASID,
-> +    SMMU_CMD_TLBI_NH_VA,
-> +    SMMU_CMD_TLBI_NH_VAA,
-> +    SMMU_CMD_TLBI_EL3_ALL    = 0x18,
-> +    SMMU_CMD_TLBI_EL3_VA     = 0x1a,
-> +    SMMU_CMD_TLBI_EL2_ALL    = 0x20,
-> +    SMMU_CMD_TLBI_EL2_ASID,
-> +    SMMU_CMD_TLBI_EL2_VA,
-> +    SMMU_CMD_TLBI_EL2_VAA,  /* 0x23 */
-> +    SMMU_CMD_TLBI_S12_VMALL  = 0x28,
-> +    SMMU_CMD_TLBI_S2_IPA     = 0x2a,
-> +    SMMU_CMD_TLBI_NSNH_ALL   = 0x30,
-> +    SMMU_CMD_ATC_INV         = 0x40,
-> +    SMMU_CMD_PRI_RESP,
-> +    SMMU_CMD_RESUME          = 0x44,
-> +    SMMU_CMD_STALL_TERM,
-> +    SMMU_CMD_SYNC,          /* 0x46 */
-> +};
-> +
-> +static const char *cmd_stringify[] = {
-> +    [SMMU_CMD_PREFETCH_CONFIG] = "SMMU_CMD_PREFETCH_CONFIG",
-> +    [SMMU_CMD_PREFETCH_ADDR]   = "SMMU_CMD_PREFETCH_ADDR",
-> +    [SMMU_CMD_CFGI_STE]        = "SMMU_CMD_CFGI_STE",
-> +    [SMMU_CMD_CFGI_STE_RANGE]  = "SMMU_CMD_CFGI_STE_RANGE",
-> +    [SMMU_CMD_CFGI_CD]         = "SMMU_CMD_CFGI_CD",
-> +    [SMMU_CMD_CFGI_CD_ALL]     = "SMMU_CMD_CFGI_CD_ALL",
-> +    [SMMU_CMD_CFGI_ALL]        = "SMMU_CMD_CFGI_ALL",
-> +    [SMMU_CMD_TLBI_NH_ALL]     = "SMMU_CMD_TLBI_NH_ALL",
-> +    [SMMU_CMD_TLBI_NH_ASID]    = "SMMU_CMD_TLBI_NH_ASID",
-> +    [SMMU_CMD_TLBI_NH_VA]      = "SMMU_CMD_TLBI_NH_VA",
-> +    [SMMU_CMD_TLBI_NH_VAA]     = "SMMU_CMD_TLBI_NH_VAA",
-> +    [SMMU_CMD_TLBI_EL3_ALL]    = "SMMU_CMD_TLBI_EL3_ALL",
-> +    [SMMU_CMD_TLBI_EL3_VA]     = "SMMU_CMD_TLBI_EL3_VA",
-> +    [SMMU_CMD_TLBI_EL2_ALL]    = "SMMU_CMD_TLBI_EL2_ALL",
-> +    [SMMU_CMD_TLBI_EL2_ASID]   = "SMMU_CMD_TLBI_EL2_ASID",
-> +    [SMMU_CMD_TLBI_EL2_VA]     = "SMMU_CMD_TLBI_EL2_VA",
-> +    [SMMU_CMD_TLBI_EL2_VAA]    = "SMMU_CMD_TLBI_EL2_VAA",
-> +    [SMMU_CMD_TLBI_S12_VMALL]  = "SMMU_CMD_TLBI_S12_VMALL",
-> +    [SMMU_CMD_TLBI_S2_IPA]     = "SMMU_CMD_TLBI_S2_IPA",
-> +    [SMMU_CMD_TLBI_NSNH_ALL]   = "SMMU_CMD_TLBI_NSNH_ALL",
-> +    [SMMU_CMD_ATC_INV]         = "SMMU_CMD_ATC_INV",
-> +    [SMMU_CMD_PRI_RESP]        = "SMMU_CMD_PRI_RESP",
-> +    [SMMU_CMD_RESUME]          = "SMMU_CMD_RESUME",
-> +    [SMMU_CMD_STALL_TERM]      = "SMMU_CMD_STALL_TERM",
-> +    [SMMU_CMD_SYNC]            = "SMMU_CMD_SYNC",
-> +};
-> +
-> +#define SMMU_CMD_STRING(type) (                                      \
-> +(type < ARRAY_SIZE(cmd_stringify)) ? cmd_stringify[type] : "UNKNOWN" \
-> +)
-
-If this was a function you'd know what the type of 'type' is
-and so whether it needed to have a >= 0 check on it. Also it
-will hand you a NULL pointer for a value that's inside the
-array size but not initialized, like 0x24.
-
-> +
-> +/* CMDQ fields */
-> +
-> +typedef enum {
-> +    SMMU_CERROR_NONE = 0,
-> +    SMMU_CERROR_ILL,
-> +    SMMU_CERROR_ABT,
-> +    SMMU_CERROR_ATC_INV_SYNC,
-> +} SMMUCmdError;
-> +
-> +enum { /* Command completion notification */
-> +    CMD_SYNC_SIG_NONE,
-> +    CMD_SYNC_SIG_IRQ,
-> +    CMD_SYNC_SIG_SEV,
-> +};
-> +
-> +#define CMD_TYPE(x)         extract32((x)->word[0], 0 , 8)
-> +#define CMD_SSEC(x)         extract32((x)->word[0], 10, 1)
-> +#define CMD_SSV(x)          extract32((x)->word[0], 11, 1)
-> +#define CMD_RESUME_AC(x)    extract32((x)->word[0], 12, 1)
-> +#define CMD_RESUME_AB(x)    extract32((x)->word[0], 13, 1)
-> +#define CMD_SYNC_CS(x)      extract32((x)->word[0], 12, 2)
-> +#define CMD_SSID(x)         extract32((x)->word[0], 12, 20)
-> +#define CMD_SID(x)          ((x)->word[1])
-> +#define CMD_VMID(x)         extract32((x)->word[1], 0 , 16)
-> +#define CMD_ASID(x)         extract32((x)->word[1], 16, 16)
-> +#define CMD_RESUME_STAG(x)  extract32((x)->word[2], 0 , 16)
-> +#define CMD_RESP(x)         extract32((x)->word[2], 11, 2)
-> +#define CMD_LEAF(x)         extract32((x)->word[2], 0 , 1)
-> +#define CMD_STE_RANGE(x)    extract32((x)->word[2], 0 , 5)
-> +#define CMD_ADDR(x) ({                                        \
-> +            uint64_t high = (uint64_t)(x)->word[3];           \
-> +            uint64_t low = extract32((x)->word[2], 12, 20);    \
-> +            uint64_t addr = high << 32 | (low << 12);         \
-> +            addr;                                             \
-> +        })
-> +
-> +int smmuv3_cmdq_consume(SMMUv3State *s);
-> +
->  #endif
-> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-> index 8779d3f..0b57215 100644
-> --- a/hw/arm/smmuv3.c
-> +++ b/hw/arm/smmuv3.c
-> @@ -94,6 +94,72 @@ void smmuv3_write_gerrorn(SMMUv3State *s, uint32_t new_gerrorn)
->      trace_smmuv3_write_gerrorn(acked, s->gerrorn);
->  }
->
-> +static uint32_t queue_index_inc(uint32_t val,
-> +                                uint32_t qidx_mask, uint32_t qwrap_mask)
-> +{
-> +    uint32_t i = (val + 1) & qidx_mask;
-> +
-> +    if (i <= (val & qidx_mask)) {
-> +        i = ((val & qwrap_mask) ^ qwrap_mask) | i;
-> +    } else {
-> +        i = (val & qwrap_mask) | i;
-> +    }
-> +    return i;
-
-This is unnecessarily complicated -- an index increment is just
-   val = (val + 1) & INDEX_WRAP_MASK;
-which will automatically flip the wrap bit as required.
-
-> +}
-> +
-> +static inline void queue_prod_incr(SMMUQueue *q)
-> +{
-> +    q->prod = queue_index_inc(q->prod, INDEX_MASK(q), WRAP_MASK(q));
-
-Doesn't this trash the ERR code in bits [30:24], or are you
-keeping that somewhere else for efficiency?
-
-> +}
-> +
-> +static inline void queue_cons_incr(SMMUQueue *q)
-> +{
-> +    q->cons = queue_index_inc(q->cons, INDEX_MASK(q), WRAP_MASK(q));
-> +}
-> +
-> +static inline MemTxResult queue_read(SMMUQueue *q, void *data)
-> +{
-> +    dma_addr_t addr = Q_CONS_ENTRY(q);
-> +
-> +    return dma_memory_read(&address_space_memory, addr,
-> +                           (uint8_t *)data, q->entry_size);
-
-Does the compiler complain if you don't provide this cast?
-
-> +}
-> +
-> +static void queue_write(SMMUQueue *q, void *data)
-> +{
-> +    dma_addr_t addr = Q_PROD_ENTRY(q);
-> +    MemTxResult ret;
-> +
-> +    ret = dma_memory_write(&address_space_memory, addr,
-> +                           (uint8_t *)data, q->entry_size);
-> +    if (ret != MEMTX_OK) {
-> +        return;
-
-Shouldn't we record or return this error to the caller,
-like queue_read() does, rather than throwing it away?
-I think that for the event queue (which is the only user
-here ) this should cause an EVENTQ_ABT_ERR.
-
-> +    }
-> +
-> +    queue_prod_incr(q);
-> +}
-> +
-> +void smmuv3_write_eventq(SMMUv3State *s, Evt *evt)
-> +{
-> +    SMMUQueue *q = &s->eventq;
-> +    bool q_empty = Q_EMPTY(q);
-> +    bool q_full = Q_FULL(q);
-
-You only use these once each, and they're not very complicated
-expressions, so you might as well just have the uses be
-"if (Q_FULL(q)) { ..." &c.
-
-> +
-> +    if (!SMMUV3_EVENTQ_ENABLED(s)) {
-> +        return;
-> +    }
-> +
-> +    if (q_full) {
-> +        return;
-> +    }
-> +
-> +    queue_write(q, evt);
-> +
-> +    if (q_empty) {
-> +        smmuv3_trigger_irq(s, SMMU_IRQ_EVTQ, 0);
-> +    }
-> +}
-> +
->  static void smmuv3_init_regs(SMMUv3State *s)
->  {
->      /**
-> @@ -133,6 +199,102 @@ static void smmuv3_init_regs(SMMUv3State *s)
->      s->sid_split = 0;
->  }
->
-> +int smmuv3_cmdq_consume(SMMUv3State *s)
-> +{
-> +    SMMUCmdError cmd_error = SMMU_CERROR_NONE;
-> +    SMMUQueue *q = &s->cmdq;
-> +    uint32_t type = 0;
-> +
-> +    if (!SMMUV3_CMDQ_ENABLED(s)) {
-> +        return 0;
-> +    }
-> +    /*
-> +     * some commands depend on register values, as above. In case those
-
-Where is "as above" referring to ?
-
-> +     * register values change while handling the command, spec says it
-> +     * is UNPREDICTABLE whether the command is interpreted under the new
-> +     * or old value.
-> +     */
-> +
-> +    while (!Q_EMPTY(q)) {
-> +        uint32_t pending = s->gerror ^ s->gerrorn;
-> +        Cmd cmd;
-> +
-> +        trace_smmuv3_cmdq_consume(Q_PROD(q), Q_CONS(q),
-> +                                  Q_PROD_WRAP(q), Q_CONS_WRAP(q));
-> +
-> +        if (FIELD_EX32(pending, GERROR, CMDQ_ERR)) {
-> +            break;
-> +        }
-> +
-> +        if (queue_read(q, &cmd) != MEMTX_OK) {
-> +            cmd_error = SMMU_CERROR_ABT;
-> +            break;
-> +        }
-> +
-> +        type = CMD_TYPE(&cmd);
-> +
-> +        trace_smmuv3_cmdq_opcode(SMMU_CMD_STRING(type));
-> +
-> +        switch (type) {
-> +        case SMMU_CMD_SYNC:
-> +            if (CMD_SYNC_CS(&cmd) & CMD_SYNC_SIG_IRQ) {
-> +                smmuv3_trigger_irq(s, SMMU_IRQ_CMD_SYNC, 0);
-> +            }
-> +            break;
-> +        case SMMU_CMD_PREFETCH_CONFIG:
-> +        case SMMU_CMD_PREFETCH_ADDR:
-> +        case SMMU_CMD_CFGI_STE:
-> +        case SMMU_CMD_CFGI_STE_RANGE: /* same as SMMU_CMD_CFGI_ALL */
-> +        case SMMU_CMD_CFGI_CD:
-> +        case SMMU_CMD_CFGI_CD_ALL:
-> +        case SMMU_CMD_TLBI_NH_ALL:
-> +        case SMMU_CMD_TLBI_NH_ASID:
-> +        case SMMU_CMD_TLBI_NH_VA:
-> +        case SMMU_CMD_TLBI_NH_VAA:
-> +        case SMMU_CMD_TLBI_EL3_ALL:
-> +        case SMMU_CMD_TLBI_EL3_VA:
-> +        case SMMU_CMD_TLBI_EL2_ALL:
-> +        case SMMU_CMD_TLBI_EL2_ASID:
-> +        case SMMU_CMD_TLBI_EL2_VA:
-> +        case SMMU_CMD_TLBI_EL2_VAA:
-> +        case SMMU_CMD_TLBI_S12_VMALL:
-> +        case SMMU_CMD_TLBI_S2_IPA:
-> +        case SMMU_CMD_TLBI_NSNH_ALL:
-> +        case SMMU_CMD_ATC_INV:
-> +        case SMMU_CMD_PRI_RESP:
-> +        case SMMU_CMD_RESUME:
-> +        case SMMU_CMD_STALL_TERM:
-> +            trace_smmuv3_unhandled_cmd(type);
-> +            break;
-> +        default:
-> +            cmd_error = SMMU_CERROR_ILL;
-> +            error_report("Illegal command type: %d", CMD_TYPE(&cmd));
-
-This isn't what error_report() is for. You can log it as a GUEST_ERROR.
-
-> +            break;
-> +        }
-> +        if (cmd_error) {
-> +            break;
-> +        }
-> +        /*
-> +         * We only increment the cons index after the completion of
-> +         * the command. We do that because the SYNC returns immediatly
-
-"immediately"
-
-> +         * and do not check the completion of previous commands
-
-"does not"
-
-> +         */
-> +        queue_cons_incr(q);
-> +    }
-> +
-> +    if (cmd_error) {
-> +        error_report("Error on %s command execution: %d",
-> +                     SMMU_CMD_STRING(type), cmd_error);
-
-Again, not error_report(). Probably a good location for a trace_ point.
-
-> +        smmu_write_cmdq_err(s, cmd_error);
-> +        smmuv3_trigger_irq(s, SMMU_IRQ_GERROR, R_GERROR_CMDQ_ERR_MASK);
-> +    }
-> +
-> +    trace_smmuv3_cmdq_consume_out(Q_PROD(q), Q_CONS(q),
-> +                                  Q_PROD_WRAP(q), Q_CONS_WRAP(q));
-> +
-> +    return 0;
-> +}
-> +
->  static void smmu_write_mmio(void *opaque, hwaddr addr,
->                              uint64_t val, unsigned size)
->  {
-> diff --git a/hw/arm/trace-events b/hw/arm/trace-events
-> index 2ddae40..1c5105d 100644
-> --- a/hw/arm/trace-events
-> +++ b/hw/arm/trace-events
-> @@ -18,3 +18,7 @@ smmuv3_read_mmio(hwaddr addr, uint64_t val, unsigned size) "addr: 0x%"PRIx64" va
->  smmuv3_trigger_irq(int irq) "irq=%d"
->  smmuv3_write_gerror(uint32_t toggled, uint32_t gerror) "toggled=0x%x, new gerror=0x%x"
->  smmuv3_write_gerrorn(uint32_t acked, uint32_t gerrorn) "acked=0x%x, new gerrorn=0x%x"
-> +smmuv3_unhandled_cmd(uint32_t type) "Unhandled command type=%d"
-> +smmuv3_cmdq_consume(uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t cons_wrap) "prod=%d cons=%d prod.wrap=%d cons.wrap=%d"
-> +smmuv3_cmdq_opcode(const char *opcode) "<--- %s"
-> +smmuv3_cmdq_consume_out(uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t cons_wrap) "prod:%d, cons:%d, prod_wrap:%d, cons_wrap:%d "
-> --
-> 2.5.5
->
-
-thanks
--- PMM
+> Any idea how to fix this ?
+> 
+> Guenter
+-- 
+=============================================================================
+-Bill Paul            (510) 749-2329 | Senior Member of Technical Staff,
+                 wpaul@windriver.com | Master of Unix-Fu - Wind River Systems
+=============================================================================
+   "I put a dollar in a change machine. Nothing changed." - George Carlin
+=============================================================================
