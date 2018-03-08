@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eu1gB-000343-RY
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:24 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eu1gG-00037w-US
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eu1gA-00062d-Ln
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:19 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50664 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1eu1gF-00064L-2l
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:24 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50668 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eu1gA-00062J-GA
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:18 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eu1gE-000644-Ti
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:23 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ED40576FB9
-	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 19:58:17 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 59CAE76FBA
+	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 19:58:22 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Thu,  8 Mar 2018 19:57:45 +0000
-Message-Id: <20180308195811.24894-4-dgilbert@redhat.com>
+Date: Thu,  8 Mar 2018 19:57:48 +0000
+Message-Id: <20180308195811.24894-7-dgilbert@redhat.com>
 In-Reply-To: <20180308195811.24894-1-dgilbert@redhat.com>
 References: <20180308195811.24894-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 03/29] postcopy: use UFFDIO_ZEROPAGE only
- when available
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 06/29] vhost-user: Add
+ 'VHOST_USER_POSTCOPY_ADVISE' message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,100 +38,215 @@ Cc: aarcange@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Use a flag on the RAMBlock to state whether it has the
-UFFDIO_ZEROPAGE capability, use it when it's available.
+Wire up a notifier to send a VHOST_USER_POSTCOPY_ADVISE
+message on an incoming advise.
 
-This allows the use of postcopy on tmpfs as well as hugepage
-backed files.
+Later patches will fill in the behaviour/contents of the
+message.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- exec.c                    | 16 ++++++++++++++++
- include/exec/cpu-common.h |  3 +++
- migration/postcopy-ram.c  | 13 ++++++++++---
- 3 files changed, 29 insertions(+), 3 deletions(-)
+ contrib/libvhost-user/libvhost-user.c | 14 ++++++++++
+ contrib/libvhost-user/libvhost-user.h |  3 +++
+ docs/interop/vhost-user.txt           | 10 ++++++++
+ hw/virtio/vhost-user.c                | 48 +++++++++++++++++++++++++++++=
+++++++
+ migration/postcopy-ram.h              |  1 +
+ migration/savevm.c                    |  6 +++++
+ 6 files changed, 82 insertions(+)
 
-diff --git a/exec.c b/exec.c
-index 7187bff683..be6f99e11d 100644
---- a/exec.c
-+++ b/exec.c
-@@ -99,6 +99,11 @@ static MemoryRegion io_mem_unassigned;
-  */
- #define RAM_RESIZEABLE (1 << 2)
- 
-+/* UFFDIO_ZEROPAGE is available on this RAMBlock to atomically
-+ * zero the page and wake waiting processes.
-+ * (Set during postcopy)
-+ */
-+#define RAM_UF_ZEROPAGE (1 << 3)
- #endif
- 
- #ifdef TARGET_PAGE_BITS_VARY
-@@ -1767,6 +1772,17 @@ bool qemu_ram_is_shared(RAMBlock *rb)
-     return rb->flags & RAM_SHARED;
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
+r/libvhost-user.c
+index 2e358b5bce..71825d2dde 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -86,6 +86,7 @@ vu_request_to_string(unsigned int req)
+         REQ(VHOST_USER_SET_VRING_ENDIAN),
+         REQ(VHOST_USER_GET_CONFIG),
+         REQ(VHOST_USER_SET_CONFIG),
++        REQ(VHOST_USER_POSTCOPY_ADVISE),
+         REQ(VHOST_USER_MAX),
+     };
+ #undef REQ
+@@ -856,6 +857,17 @@ vu_set_config(VuDev *dev, VhostUserMsg *vmsg)
+     return false;
  }
- 
-+/* Note: Only set at the start of postcopy */
-+bool qemu_ram_is_uf_zeroable(RAMBlock *rb)
+=20
++static bool
++vu_set_postcopy_advise(VuDev *dev, VhostUserMsg *vmsg)
 +{
-+    return rb->flags & RAM_UF_ZEROPAGE;
++    /* TODO: Open ufd, pass it back in the request
++     * TODO: Add addresses
++     */
++    vmsg->payload.u64 =3D 0xcafe;
++    vmsg->size =3D sizeof(vmsg->payload.u64);
++    return true; /* =3D send a reply */
 +}
 +
-+void qemu_ram_set_uf_zeroable(RAMBlock *rb)
-+{
-+    rb->flags |= RAM_UF_ZEROPAGE;
-+}
-+
- /* Called with iothread lock held.  */
- void qemu_ram_set_idstr(RAMBlock *new_block, const char *name, DeviceState *dev)
+ static bool
+ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
  {
-diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-index 0d861a6289..24d335f95d 100644
---- a/include/exec/cpu-common.h
-+++ b/include/exec/cpu-common.h
-@@ -73,6 +73,9 @@ void qemu_ram_set_idstr(RAMBlock *block, const char *name, DeviceState *dev);
- void qemu_ram_unset_idstr(RAMBlock *block);
- const char *qemu_ram_get_idstr(RAMBlock *rb);
- bool qemu_ram_is_shared(RAMBlock *rb);
-+bool qemu_ram_is_uf_zeroable(RAMBlock *rb);
-+void qemu_ram_set_uf_zeroable(RAMBlock *rb);
+@@ -927,6 +939,8 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
+         return vu_set_config(dev, vmsg);
+     case VHOST_USER_NONE:
+         break;
++    case VHOST_USER_POSTCOPY_ADVISE:
++        return vu_set_postcopy_advise(dev, vmsg);
+     default:
+         vmsg_close_fds(vmsg);
+         vu_panic(dev, "Unhandled request: %d", vmsg->request);
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
+r/libvhost-user.h
+index 96db29c4ce..00d78a8810 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -83,6 +83,9 @@ typedef enum VhostUserRequest {
+     VHOST_USER_SET_VRING_ENDIAN =3D 23,
+     VHOST_USER_GET_CONFIG =3D 24,
+     VHOST_USER_SET_CONFIG =3D 25,
++    VHOST_USER_CREATE_CRYPTO_SESSION =3D 26,
++    VHOST_USER_CLOSE_CRYPTO_SESSION =3D 27,
++    VHOST_USER_POSTCOPY_ADVISE  =3D 28,
+     VHOST_USER_MAX
+ } VhostUserRequest;
+=20
+diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+index 91a572d781..acc4186c79 100644
+--- a/docs/interop/vhost-user.txt
++++ b/docs/interop/vhost-user.txt
+@@ -699,6 +699,16 @@ Master message types
+      feature has been successfully negotiated.
+      It's a required feature for crypto devices.
+=20
++ * VHOST_USER_POSTCOPY_ADVISE
++      Id: 28
++      Master payload: N/A
++      Slave payload: userfault fd + u64
 +
- size_t qemu_ram_pagesize(RAMBlock *block);
- size_t qemu_ram_pagesize_largest(void);
- 
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 032abfbf1a..a75b5d393f 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -481,6 +481,10 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
-         error_report("%s userfault: Region doesn't support COPY", __func__);
++      When VHOST_USER_PROTOCOL_F_PAGEFAULT is supported, the
++      master advises slave that a migration with postcopy enabled is und=
+erway,
++      the slave must open a userfaultfd for later use.
++      Note that at this stage the migration is still in precopy mode.
++
+ Slave message types
+ -------------------
+=20
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index aab35c4845..431858b219 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -78,6 +78,7 @@ typedef enum VhostUserRequest {
+     VHOST_USER_SET_CONFIG =3D 25,
+     VHOST_USER_CREATE_CRYPTO_SESSION =3D 26,
+     VHOST_USER_CLOSE_CRYPTO_SESSION =3D 27,
++    VHOST_USER_POSTCOPY_ADVISE  =3D 28,
+     VHOST_USER_MAX
+ } VhostUserRequest;
+=20
+@@ -795,6 +796,50 @@ out:
+     return ret;
+ }
+=20
++/*
++ * Called at the start of an inbound postcopy on reception of the
++ * 'advise' command.
++ */
++static int vhost_user_postcopy_advise(struct vhost_dev *dev, Error **err=
+p)
++{
++    struct vhost_user *u =3D dev->opaque;
++    CharBackend *chr =3D u->chr;
++    int ufd;
++    VhostUserMsg msg =3D {
++        .hdr.request =3D VHOST_USER_POSTCOPY_ADVISE,
++        .hdr.flags =3D VHOST_USER_VERSION,
++    };
++
++    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
++        error_setg(errp, "Failed to send postcopy_advise to vhost");
++        return -1;
++    }
++
++    if (vhost_user_read(dev, &msg) < 0) {
++        error_setg(errp, "Failed to get postcopy_advise reply from vhost=
+");
++        return -1;
++    }
++
++    if (msg.hdr.request !=3D VHOST_USER_POSTCOPY_ADVISE) {
++        error_setg(errp, "Unexpected msg type. Expected %d received %d",
++                     VHOST_USER_POSTCOPY_ADVISE, msg.hdr.request);
++        return -1;
++    }
++
++    if (msg.hdr.size !=3D sizeof(msg.payload.u64)) {
++        error_setg(errp, "Received bad msg size.");
++        return -1;
++    }
++    ufd =3D qemu_chr_fe_get_msgfd(chr);
++    if (ufd < 0) {
++        error_setg(errp, "%s: Failed to get ufd", __func__);
++        return -1;
++    }
++
++    /* TODO: register ufd with userfault thread */
++    return 0;
++}
++
+ static int vhost_user_postcopy_notifier(NotifierWithReturn *notifier,
+                                         void *opaque)
+ {
+@@ -814,6 +859,9 @@ static int vhost_user_postcopy_notifier(NotifierWithR=
+eturn *notifier,
+         }
+         break;
+=20
++    case POSTCOPY_NOTIFY_INBOUND_ADVISE:
++        return vhost_user_postcopy_advise(dev, pnd->errp);
++
+     default:
+         /* We ignore notifications we don't know */
+         break;
+diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+index 2e879bbacb..0421c98d57 100644
+--- a/migration/postcopy-ram.h
++++ b/migration/postcopy-ram.h
+@@ -130,6 +130,7 @@ void postcopy_infrastructure_init(void);
+  */
+ enum PostcopyNotifyReason {
+     POSTCOPY_NOTIFY_PROBE =3D 0,
++    POSTCOPY_NOTIFY_INBOUND_ADVISE,
+ };
+=20
+ struct PostcopyNotifyData {
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 358c5b51e2..1f2bf12a28 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1386,6 +1386,7 @@ static int loadvm_postcopy_handle_advise(MigrationI=
+ncomingState *mis,
+ {
+     PostcopyState ps =3D postcopy_state_set(POSTCOPY_INCOMING_ADVISE);
+     uint64_t remote_pagesize_summary, local_pagesize_summary, remote_tps=
+;
++    Error *local_err =3D NULL;
+=20
+     trace_loadvm_postcopy_handle_advise();
+     if (ps !=3D POSTCOPY_INCOMING_NONE) {
+@@ -1451,6 +1452,11 @@ static int loadvm_postcopy_handle_advise(Migration=
+IncomingState *mis,
          return -1;
      }
-+    if (reg_struct.ioctls & ((__u64)1 << _UFFDIO_ZEROPAGE)) {
-+        RAMBlock *rb = qemu_ram_block_by_name(block_name);
-+        qemu_ram_set_uf_zeroable(rb);
+=20
++    if (postcopy_notify(POSTCOPY_NOTIFY_INBOUND_ADVISE, &local_err)) {
++        error_report_err(local_err);
++        return -1;
 +    }
- 
-     return 0;
- }
-@@ -700,11 +704,14 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
- int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
-                              RAMBlock *rb)
- {
-+    size_t pagesize = qemu_ram_pagesize(rb);
-     trace_postcopy_place_page_zero(host);
- 
--    if (qemu_ram_pagesize(rb) == getpagesize()) {
--        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, NULL, getpagesize(),
--                                rb)) {
-+    /* Normal RAMBlocks can zero a page using UFFDIO_ZEROPAGE
-+     * but it's not available for everything (e.g. hugetlbpages)
-+     */
-+    if (qemu_ram_is_uf_zeroable(rb)) {
-+        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, NULL, pagesize, rb)) {
-             int e = errno;
-             error_report("%s: %s zero host: %p",
-                          __func__, strerror(e), host);
--- 
++
+     if (ram_postcopy_incoming_init(mis)) {
+         return -1;
+     }
+--=20
 2.14.3
