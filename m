@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1etzUF-0006el-NA
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:37:52 -0500
+	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
+	id 1etzW1-0007Q6-1t
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:39:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1etzUA-0007YJ-Pz
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:37:51 -0500
-Date: Thu, 8 Mar 2018 17:37:42 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180308173742.GH2769@stefanha-x1.localdomain>
-References: <20180306204819.11266-1-stefanha@redhat.com>
-	<b0babfd7-71b7-c1cb-52a2-994c7cff843b@redhat.com>
+	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
+	id 1etzVw-0008HR-M0
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:39:41 -0500
+Received: from smtp.citrix.com ([66.165.176.89]:50174)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
+	id 1etzVw-0008H2-DE
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:39:36 -0500
+From: Ian Jackson <ian.jackson@eu.citrix.com>
+Date: Thu, 8 Mar 2018 17:39:15 +0000
+Message-ID: <1520530757-4477-10-git-send-email-ian.jackson@eu.citrix.com>
+In-Reply-To: <1520530757-4477-1-git-send-email-ian.jackson@eu.citrix.com>
+References: <1520530757-4477-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="MGu/vTNewDGZ7tmp"
-Content-Disposition: inline
-In-Reply-To: <b0babfd7-71b7-c1cb-52a2-994c7cff843b@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/2] block: fix
- nbd-server-stop crash after blockdev-snapshot-sync
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 09/11] xen: Use newly added dmops for mapping
+ VGA memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +29,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Stefano Panella <spanella@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: xen-devel@lists.xenproject.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Ian Jackson <ian.jackson@eu.citrix.com>
 
+From: Ross Lagerwall <ross.lagerwall@citrix.com>
 
---MGu/vTNewDGZ7tmp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Xen unstable (to be in 4.11) has two new dmops, relocate_memory and
+pin_memory_cacheattr. Use these to set up the VGA memory, replacing the
+previous calls to libxc. This allows the VGA console to work properly
+when QEMU is running restricted (-xen-domid-restrict).
 
-On Wed, Mar 07, 2018 at 05:27:45PM -0600, Eric Blake wrote:
-> On 03/06/2018 02:48 PM, Stefan Hajnoczi wrote:
-> > The blockdev-snapshot-sync command uses bdrv_append() to update all par=
-ents to
-> > point at the external snapshot node.  This breaks BlockBackend's
-> > blk_add/remove_aio_context_notifier(), which doesn't expect a BDS chang=
-e.
-> >=20
-> > Patch 1 fixes this by tracking AioContext notifiers in BlockBackend.
-> >=20
-> > See the test case in Patch 2 for a reproducer.
-> >=20
-> > Stefan Hajnoczi (2):
-> >    block: let blk_add/remove_aio_context_notifier() tolerate BDS changes
-> >    iotests: add 208 nbd-server + blockdev-snapshot-sync test case
-> >=20
-> >   block/block-backend.c      | 63 +++++++++++++++++++++++++++++++++++++=
-+++++++++
-> >   block/trace-events         |  2 ++
-> >   tests/qemu-iotests/208     | 55 +++++++++++++++++++++++++++++++++++++=
-+++
-> >   tests/qemu-iotests/208.out |  9 +++++++
-> >   tests/qemu-iotests/group   |  1 +
-> >   5 files changed, 130 insertions(+)
-> >   create mode 100755 tests/qemu-iotests/208
-> >   create mode 100644 tests/qemu-iotests/208.out
->=20
-> Whose tree should this series go through?  MAINTAINERS didn't flag it as
-> directly touching any files that normally affect my NBD queue, but given
-> that the iotest that reproduces the problem uses NBD, I'm fine if you want
-> it to go through me.
+Wrapper functions are provided to allow QEMU to work with older versions
+of Xen.
 
-Good question.  Max and Kevin maintain block/block-backend.c so one of
-them should be happy with this series before it gets merged.
+Tweak the error handling while making this change:
+* Report pin_memory_cacheattr errors.
+* Report errors even when DEBUG_HVM is not set. This is useful for
+trying to understand why VGA is not working, since otherwise it just
+fails silently.
+* Fix the return values when an error occurs. The functions now
+consistently return -1 and set errno.
 
-When a patch affects multiple trees, the last sub-maintainer to review
-it can do the merge.
+CC: Ian Jackson <ian.jackson@eu.citrix.com>
+Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+Reviewed-by: Ian Jackson <ian.jackson@eu.citrix.com>
+---
+v6: New patch in this version of the series
+---
+ configure                   | 19 ++++++++++++++++++
+ hw/i386/xen/xen-hvm.c       | 49 ++++++++++++++++++++++++---------------------
+ include/hw/xen/xen_common.h | 31 ++++++++++++++++++++++++++++
+ 3 files changed, 76 insertions(+), 23 deletions(-)
 
-So if they have already posted their R-b when you are finished, then
-feel free to merge it!  And vice versa.
-
-Stefan
-
---MGu/vTNewDGZ7tmp
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaoXTmAAoJEJykq7OBq3PIaugIAJso7FA42ABKiaZ5UwWO7OD3
-swZLZrpOzcgP4xCo6KIxgj8Dp0l1dBq2lZHGUf8PreAuWkgheyF2s49ivs+Vhu5b
-jh1NoBknwQ31SSEKIOG/se+d3RfZeHmuzJ98vwK10Y2BspnMY2ApEqk64g0ZFKM3
-ofveBp3iJcTg4T2vfRF4ka4mYtuuMsECJSM+w7Ea/uFJyDivnO1Gqt+vhpuMv0L7
-x0+h2viEvveFP9IWLwtq6eQhV8hIH/NlVL+CY6Zuc1aedJkQ0rm5fqNh79Ui4dwk
-B3EwmuKZnxtdK0SUg6S0uCeerQGBwjkW7G8t+cQ3QAL6k9CV7kKCZxciezbeuYw=
-=VTom
------END PGP SIGNATURE-----
-
---MGu/vTNewDGZ7tmp--
+diff --git a/configure b/configure
+index 841c146..9a83836 100755
+--- a/configure
++++ b/configure
+@@ -2213,6 +2213,25 @@ EOF
+     # Xen unstable
+     elif
+         cat > $TMPC <<EOF &&
++#undef XC_WANT_COMPAT_DEVICEMODEL_API
++#define __XEN_TOOLS__
++#include <xendevicemodel.h>
++int main(void) {
++  xendevicemodel_handle *xd;
++
++  xd = xendevicemodel_open(0, 0);
++  xendevicemodel_pin_memory_cacheattr(xd, 0, 0, 0, 0);
++
++  return 0;
++}
++EOF
++        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs -lxentoolcore"
++      then
++      xen_stable_libs="-lxendevicemodel $xen_stable_libs -lxentoolcore"
++      xen_ctrl_version=41100
++      xen=yes
++    elif
++        cat > $TMPC <<EOF &&
+ #undef XC_WANT_COMPAT_MAP_FOREIGN_API
+ #include <xenforeignmemory.h>
+ #include <xentoolcore.h>
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index b95748d..22bd537 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -347,7 +347,7 @@ static int xen_add_to_physmap(XenIOState *state,
+                               MemoryRegion *mr,
+                               hwaddr offset_within_region)
+ {
+-    unsigned long i = 0;
++    unsigned long nr_pages;
+     int rc = 0;
+     XenPhysmap *physmap = NULL;
+     hwaddr pfn, start_gpfn;
+@@ -396,22 +396,26 @@ go_physmap:
+ 
+     pfn = phys_offset >> TARGET_PAGE_BITS;
+     start_gpfn = start_addr >> TARGET_PAGE_BITS;
+-    for (i = 0; i < size >> TARGET_PAGE_BITS; i++) {
+-        unsigned long idx = pfn + i;
+-        xen_pfn_t gpfn = start_gpfn + i;
+-
+-        rc = xen_xc_domain_add_to_physmap(xen_xc, xen_domid, XENMAPSPACE_gmfn, idx, gpfn);
+-        if (rc) {
+-            DPRINTF("add_to_physmap MFN %"PRI_xen_pfn" to PFN %"
+-                    PRI_xen_pfn" failed: %d (errno: %d)\n", idx, gpfn, rc, errno);
+-            return -rc;
+-        }
++    nr_pages = size >> TARGET_PAGE_BITS;
++    rc = xendevicemodel_relocate_memory(xen_dmod, xen_domid, nr_pages, pfn,
++                                        start_gpfn);
++    if (rc) {
++        int saved_errno = errno;
++
++        error_report("relocate_memory %lu pages from GFN %"PRI_xen_pfn
++                     " to GFN %"PRI_xen_pfn" failed: %s\n",
++                     nr_pages, pfn, start_gpfn, strerror(saved_errno));
++        errno = saved_errno;
++        return -1;
+     }
+ 
+-    xc_domain_pin_memory_cacheattr(xen_xc, xen_domid,
++    rc = xendevicemodel_pin_memory_cacheattr(xen_dmod, xen_domid,
+                                    start_addr >> TARGET_PAGE_BITS,
+                                    (start_addr + size - 1) >> TARGET_PAGE_BITS,
+                                    XEN_DOMCTL_MEM_CACHEATTR_WB);
++    if (rc) {
++        error_report("pin_memory_cacheattr failed: %s\n", strerror(errno));
++    }
+     return xen_save_physmap(state, physmap);
+ }
+ 
+@@ -419,7 +423,6 @@ static int xen_remove_from_physmap(XenIOState *state,
+                                    hwaddr start_addr,
+                                    ram_addr_t size)
+ {
+-    unsigned long i = 0;
+     int rc = 0;
+     XenPhysmap *physmap = NULL;
+     hwaddr phys_offset = 0;
+@@ -438,16 +441,16 @@ static int xen_remove_from_physmap(XenIOState *state,
+     size >>= TARGET_PAGE_BITS;
+     start_addr >>= TARGET_PAGE_BITS;
+     phys_offset >>= TARGET_PAGE_BITS;
+-    for (i = 0; i < size; i++) {
+-        xen_pfn_t idx = start_addr + i;
+-        xen_pfn_t gpfn = phys_offset + i;
+-
+-        rc = xen_xc_domain_add_to_physmap(xen_xc, xen_domid, XENMAPSPACE_gmfn, idx, gpfn);
+-        if (rc) {
+-            fprintf(stderr, "add_to_physmap MFN %"PRI_xen_pfn" to PFN %"
+-                    PRI_xen_pfn" failed: %d (errno: %d)\n", idx, gpfn, rc, errno);
+-            return -rc;
+-        }
++    rc = xendevicemodel_relocate_memory(xen_dmod, xen_domid, size, start_addr,
++                                        phys_offset);
++    if (rc) {
++        int saved_errno = errno;
++
++        error_report("relocate_memory %lu pages from GFN %"PRI_xen_pfn
++                     " to GFN %"PRI_xen_pfn" failed: %s\n",
++                     size, start_addr, phys_offset, strerror(saved_errno));
++        errno = saved_errno;
++        return -1;
+     }
+ 
+     QLIST_REMOVE(physmap, list);
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index 4bd30a3..a236eb1 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -89,6 +89,37 @@ typedef xc_interface xendevicemodel_handle;
+ 
+ #endif
+ 
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41100
++
++static inline int xendevicemodel_relocate_memory(
++    xendevicemodel_handle *dmod, domid_t domid, uint32_t size, uint64_t src_gfn,
++    uint64_t dst_gfn)
++{
++    uint32_t i;
++    int rc;
++
++    for (i = 0; i < size; i++) {
++        unsigned long idx = src_gfn + i;
++        xen_pfn_t gpfn = dst_gfn + i;
++
++        rc = xc_domain_add_to_physmap(xen_xc, domid, XENMAPSPACE_gmfn, idx,
++                                      gpfn);
++        if (rc)
++            return rc;
++    }
++
++    return 0;
++}
++
++static inline int xendevicemodel_pin_memory_cacheattr(
++    xendevicemodel_handle *dmod, domid_t domid, uint64_t start, uint64_t end,
++    uint32_t type)
++{
++    return xc_domain_pin_memory_cacheattr(xen_xc, domid, start, end, type);
++}
++
++#endif /* CONFIG_XEN_CTRL_INTERFACE_VERSION < 41100 */
++
+ #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
+ 
+ #define XEN_COMPAT_PHYSMAP
+-- 
+2.1.4
