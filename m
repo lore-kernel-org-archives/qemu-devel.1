@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eu02l-0004fO-Du
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:13:33 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eu03y-0005fE-M7
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:14:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eu02i-0003Xf-8k
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:13:31 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37576 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eu02i-0003XM-2w
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:13:28 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A9B674000787
-	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 18:13:27 +0000 (UTC)
-References: <20180308172834.3281-1-pbonzini@redhat.com>
-	<20180308172834.3281-4-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <a117064b-3805-3611-a476-c16865671d84@redhat.com>
-Date: Thu, 8 Mar 2018 19:13:25 +0100
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eu03v-0004P3-FR
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:14:46 -0500
+References: <20180207125037.13510-1-vsementsov@virtuozzo.com>
+	<20180207125037.13510-2-vsementsov@virtuozzo.com>
+	<20180306153213.GK31045@stefanha-x1.localdomain>
+	<49f2f289-ce1c-6e24-8b54-bb5b5c1601bc@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <9ef1c947-616f-0cde-040d-7a4f0fc8f146@virtuozzo.com>
+Date: Thu, 8 Mar 2018 21:14:34 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180308172834.3281-4-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <49f2f289-ce1c-6e24-8b54-bb5b5c1601bc@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/3] q35: change default NIC to e1000e
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] block/accounting: introduce latency
+ histogram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,146 +27,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: Jason Wang <jasowang@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, den@openvz.org
 
-On 08.03.2018 18:28, Paolo Bonzini wrote:
-> The e1000 NIC is getting old and is not a very good default for a
-> PCIe machine type.  Change it to e1000e, which should be supported
-> by a good number of guests.
-> 
-> In particular, drivers for 82574 were added first to Linux 2.6.27 (2008)
-> and Windows 2008 R2.  This does mean that Windows 2008 will not work
-> anymore with Q35 machine types and a default "-net nic -net xxx" network
-> configuration; it did work before because it does have an AHCI driver.
-> However, Windows 2008 has been declared out of main stream support
-> in 2015.  It will get out of extended support in 2020.  Windows 2008
-> R2 has the same end of support dates and, since the two are basically
-> Vista vs. Windows 7, R2 probably is more popular.
-> 
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  hw/i386/pc.c         | 7 ++++---
->  hw/i386/pc_piix.c    | 6 +++++-
->  hw/i386/pc_q35.c     | 8 +++++++-
->  include/hw/i386/pc.h | 3 ++-
->  4 files changed, 18 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 35fcb6efdf..dc1f535697 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1619,18 +1619,19 @@ void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
->      }
->  }
->  
-> -void pc_nic_init(ISABus *isa_bus, PCIBus *pci_bus)
-> +void pc_nic_init(PCMachineClass *pcmc, ISABus *isa_bus, PCIBus *pci_bus)
->  {
->      int i;
->  
->      rom_set_order_override(FW_CFG_ORDER_OVERRIDE_NIC);
->      for (i = 0; i < nb_nics; i++) {
->          NICInfo *nd = &nd_table[i];
-> +        const char *model = nd->model ? nd->model : pcmc->default_nic_model;
->  
-> -        if (!pci_bus || (nd->model && strcmp(nd->model, "ne2k_isa") == 0)) {
-> +        if (g_str_equal(model, "ne2k_isa")) {
->              pc_init_ne2k_isa(isa_bus, nd);
->          } else {
-> -            pci_nic_init_nofail(nd, pci_bus, "e1000", NULL);
-> +            pci_nic_init_nofail(nd, pci_bus, model, NULL);
->          }
->      }
->      rom_reset_order_override();
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index 8658bcba63..0f1966d547 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -240,7 +240,7 @@ static void pc_init1(MachineState *machine,
->      pc_basic_device_init(isa_bus, pcms->gsi, &rtc_state, true,
->                           (pcms->vmport != ON_OFF_AUTO_ON), pcms->pit, 0x4);
->  
-> -    pc_nic_init(isa_bus, pci_bus);
-> +    pc_nic_init(pcmc, isa_bus, pci_bus);
->  
->      ide_drive_get(hd, ARRAY_SIZE(hd));
->      if (pcmc->pci_enabled) {
-> @@ -417,6 +417,9 @@ static void pc_xen_hvm_init(MachineState *machine)
->  
->  static void pc_i440fx_machine_options(MachineClass *m)
->  {
-> +    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-> +    pcmc->default_nic_model = "e1000";
-> +
->      m->family = "pc_piix";
->      m->desc = "Standard PC (i440FX + PIIX, 1996)";
->      m->default_machine_opts = "firmware=bios-256k.bin";
-> @@ -1114,6 +1117,7 @@ static void isapc_machine_options(MachineClass *m)
->      pcmc->gigabyte_align = false;
->      pcmc->smbios_legacy_mode = true;
->      pcmc->has_reserved_memory = false;
-> +    pcmc->default_nic_model = "ne2k_isa";
->      m->default_cpu_type = X86_CPU_TYPE_NAME("486");
->  }
->  
-> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> index 0c0bc48137..9ae916327e 100644
-> --- a/hw/i386/pc_q35.c
-> +++ b/hw/i386/pc_q35.c
-> @@ -272,7 +272,7 @@ static void pc_q35_init(MachineState *machine)
->  
->      /* the rest devices to which pci devfn is automatically assigned */
->      pc_vga_init(isa_bus, host_bus);
-> -    pc_nic_init(isa_bus, host_bus);
-> +    pc_nic_init(pcmc, isa_bus, host_bus);
->  
->      if (pcms->acpi_nvdimm_state.is_enabled) {
->          nvdimm_init_acpi_state(&pcms->acpi_nvdimm_state, system_io,
-> @@ -294,6 +294,9 @@ static void pc_q35_init(MachineState *machine)
->  
->  static void pc_q35_machine_options(MachineClass *m)
->  {
-> +    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-> +    pcmc->default_nic_model = "e1000e";
-> +
->      m->family = "pc_q35";
->      m->desc = "Standard PC (Q35 + ICH9, 2009)";
->      m->units_per_default_bus = 1;
-> @@ -316,7 +319,10 @@ DEFINE_Q35_MACHINE(v2_12, "pc-q35-2.12", NULL,
->  
->  static void pc_q35_2_11_machine_options(MachineClass *m)
->  {
-> +    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-> +
->      pc_q35_2_12_machine_options(m);
-> +    pcmc->default_nic_model = "e1000";
->      m->alias = NULL;
->      SET_MACHINE_COMPAT(m, PC_COMPAT_2_11);
->  }
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index bb49165fe0..e81654eb7f 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -114,6 +114,7 @@ struct PCMachineClass {
->      /* Device configuration: */
->      bool pci_enabled;
->      bool kvmclock_enabled;
-> +    const char *default_nic_model;
->  
->      /* Compat options: */
->  
-> @@ -248,7 +249,7 @@ void pc_init_ne2k_isa(ISABus *bus, NICInfo *nd);
->  void pc_cmos_init(PCMachineState *pcms,
->                    BusState *ide0, BusState *ide1,
->                    ISADevice *s);
-> -void pc_nic_init(ISABus *isa_bus, PCIBus *pci_bus);
-> +void pc_nic_init(PCMachineClass *pcmc, ISABus *isa_bus, PCIBus *pci_bus);
->  void pc_pci_device_init(PCIBus *pci_bus);
->  
->  typedef void (*cpu_set_smm_t)(int smm, void *arg);
-> 
+08.03.2018 20:31, Eric Blake wrote:
+> On 03/06/2018 09:32 AM, Stefan Hajnoczi wrote:
+>> On Wed, Feb 07, 2018 at 03:50:36PM +0300, Vladimir=20
+>> Sementsov-Ogievskiy wrote:
+>>> Introduce latency histogram statics for block devices.
+>>> For each accounted operation type latency region [0, +inf) is
+>>> divided into subregions by several points. Then, calculate
+>>> hits for each subregion.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> ---
+>
+>> According to Wikipedia and Mathworld, "intervals" and "bins" are
+>> commonly used terms:
+>> https://en.wikipedia.org/wiki/Histogram
+>> http://mathworld.wolfram.com/Histogram.html
+>>
+>> I suggest:
+>>
+>> =C2=A0=C2=A0 typedef struct {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* The following histogram is repre=
+sented like this:
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 5|=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 4|=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 3| *=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 2| *=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0 *
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 1| *=C2=A0=C2=A0=C2=A0 *=C2=
+=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0 *
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0 +------------------
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 10=C2=A0=C2=A0 50=C2=A0=C2=A0 100
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * BlockLatencyHistogram histo=
+gram =3D {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 .nb=
+ins =3D 4,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 .in=
+tervals =3D {10, 50, 100},
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 .bi=
+ns =3D {3, 1, 5, 2},
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * };
+>
+> The name 'intervals' is still slightly ambiguous: does it hold the=20
+> boundary point (0-10 for 10 slots, 10-50 for 40 slots, 50-100, for 50=20
+> slots, then 100-INF) or is it the interval size of each slot (first=20
+> bin is 10 slots for 0-10, next bin is 50 slots wide so 10-60, next bin=20
+> is 100 slots wide so 60-160, everything else is 160-INF).=C2=A0 But the=20
+> ascii-art diagram plus the text is sufficient to resolve the intent if=20
+> you keep that name (I don't have a suggestion for a better name).
+>
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Hm. these numbers are actually boundary points of histogram intervals,=20
+not intervals itself. And, wiki says "The bins are usually specified as=20
+consecutive, non-overlapping intervals of a variable.", so, intervals=20
+are bins.
+
+So, what about:
+
+1. interval_boundaries
+2. bin_boundaries
+3. boundaries
+
+(and same names with s/_/-/ for qapi)
+
+
+--=20
+Best regards,
+Vladimir
