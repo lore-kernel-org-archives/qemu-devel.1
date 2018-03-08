@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eu1g7-0002zt-6E
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:16 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eu1g9-00031W-9q
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eu1g6-00060s-AW
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:15 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50658 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1eu1g7-00061Y-Pk
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:17 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40174 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eu1g6-00060m-4b
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:14 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eu1g7-00061L-JQ
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:15 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8E442BD9E
-	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 19:58:13 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0B8A54000787
+	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 19:58:15 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Thu,  8 Mar 2018 19:57:42 +0000
-Message-Id: <20180308195811.24894-1-dgilbert@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 00/29] postcopy+vhost-user/shared ram
+Date: Thu,  8 Mar 2018 19:57:43 +0000
+Message-Id: <20180308195811.24894-2-dgilbert@redhat.com>
+In-Reply-To: <20180308195811.24894-1-dgilbert@redhat.com>
+References: <20180308195811.24894-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 01/29] migrate: Update
+ ram_block_discard_range for shared
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,74 +35,123 @@ Cc: aarcange@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-  This set enables postcopy migration with shared memory to a vhost user =
-process.
-It's based off current head.
+The choice of call to discard a block is getting more complicated
+for other cases.   We use fallocate PUNCH_HOLE in any file cases;
+it works for both hugepage and for tmpfs.
+We use the DONTNEED for non-hugepage cases either where they're
+anonymous or where they're private.
 
-  Testing is mostly performed with dpdk, with corresponding modifications=
- by
-Maxime.
+Care should be taken when trying other backing files.
 
-  v4 is mostly just fixes from comments received during review of v3,
-and the normal updating of all the virtio enum's to catch up with other
-things getting in before us.
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+---
+ exec.c       | 60 ++++++++++++++++++++++++++++++++++++++++++++++--------------
+ trace-events |  3 ++-
+ 2 files changed, 48 insertions(+), 15 deletions(-)
 
-Dave
-
-
-Dr. David Alan Gilbert (29):
-  migrate: Update ram_block_discard_range for shared
-  qemu_ram_block_host_offset
-  postcopy: use UFFDIO_ZEROPAGE only when available
-  postcopy: Add notifier chain
-  postcopy: Add vhost-user flag for postcopy and check it
-  vhost-user: Add 'VHOST_USER_POSTCOPY_ADVISE' message
-  libvhost-user: Support sending fds back to qemu
-  libvhost-user: Open userfaultfd
-  postcopy: Allow registering of fd handler
-  vhost+postcopy: Register shared ufd with postcopy
-  vhost+postcopy: Transmit 'listen' to client
-  postcopy+vhost-user: Split set_mem_table for postcopy
-  migration/ram: ramblock_recv_bitmap_test_byte_offset
-  libvhost-user+postcopy: Register new regions with the ufd
-  vhost+postcopy: Send address back to qemu
-  vhost+postcopy: Stash RAMBlock and offset
-  vhost+postcopy: Send requests to source for shared pages
-  vhost+postcopy: Resolve client address
-  postcopy: helper for waking shared
-  postcopy: postcopy_notify_shared_wake
-  vhost+postcopy: Add vhost waker
-  vhost+postcopy: Call wakeups
-  libvhost-user: mprotect & madvises for postcopy
-  vhost-user: Add VHOST_USER_POSTCOPY_END message
-  vhost+postcopy: Wire up POSTCOPY_END notify
-  vhost: Huge page align and merge
-  postcopy: Allow shared memory
-  libvhost-user: Claim support for postcopy
-  postcopy shared docs
-
- contrib/libvhost-user/libvhost-user.c | 303 ++++++++++++++++++++++++-
- contrib/libvhost-user/libvhost-user.h |  11 +
- docs/devel/migration.rst              |  41 ++++
- docs/interop/vhost-user.txt           |  51 +++++
- exec.c                                |  86 +++++--
- hw/virtio/trace-events                |  16 +-
- hw/virtio/vhost-user.c                | 411 ++++++++++++++++++++++++++++=
-+++++-
- hw/virtio/vhost.c                     |  66 +++++-
- include/exec/cpu-common.h             |   4 +
- migration/migration.c                 |   6 +
- migration/migration.h                 |   4 +
- migration/postcopy-ram.c              | 354 +++++++++++++++++++++++-----=
--
- migration/postcopy-ram.h              |  69 ++++++
- migration/ram.c                       |   5 +
- migration/ram.h                       |   1 +
- migration/savevm.c                    |  13 ++
- migration/trace-events                |   6 +
- trace-events                          |   3 +-
- vl.c                                  |   2 +
- 19 files changed, 1354 insertions(+), 98 deletions(-)
-
---=20
+diff --git a/exec.c b/exec.c
+index 604f03c535..77313bc4cd 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3722,6 +3722,7 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
+     }
+ 
+     if ((start + length) <= rb->used_length) {
++        bool need_madvise, need_fallocate;
+         uint8_t *host_endaddr = host_startaddr + length;
+         if ((uintptr_t)host_endaddr & (rb->page_size - 1)) {
+             error_report("ram_block_discard_range: Unaligned end address: %p",
+@@ -3731,29 +3732,60 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
+ 
+         errno = ENOTSUP; /* If we are missing MADVISE etc */
+ 
+-        if (rb->page_size == qemu_host_page_size) {
+-#if defined(CONFIG_MADVISE)
+-            /* Note: We need the madvise MADV_DONTNEED behaviour of definitely
+-             * freeing the page.
+-             */
+-            ret = madvise(host_startaddr, length, MADV_DONTNEED);
+-#endif
+-        } else {
+-            /* Huge page case  - unfortunately it can't do DONTNEED, but
+-             * it can do the equivalent by FALLOC_FL_PUNCH_HOLE in the
+-             * huge page file.
++        /* The logic here is messy;
++         *    madvise DONTNEED fails for hugepages
++         *    fallocate works on hugepages and shmem
++         */
++        need_madvise = (rb->page_size == qemu_host_page_size);
++        need_fallocate = rb->fd != -1;
++        if (need_fallocate) {
++            /* For a file, this causes the area of the file to be zero'd
++             * if read, and for hugetlbfs also causes it to be unmapped
++             * so a userfault will trigger.
+              */
+ #ifdef CONFIG_FALLOCATE_PUNCH_HOLE
+             ret = fallocate(rb->fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+                             start, length);
++            if (ret) {
++                ret = -errno;
++                error_report("ram_block_discard_range: Failed to fallocate "
++                             "%s:%" PRIx64 " +%zx (%d)",
++                             rb->idstr, start, length, ret);
++                goto err;
++            }
++#else
++            ret = -ENOSYS;
++            error_report("ram_block_discard_range: fallocate not available/file"
++                         "%s:%" PRIx64 " +%zx (%d)",
++                         rb->idstr, start, length, ret);
++            goto err;
+ #endif
+         }
+-        if (ret) {
+-            ret = -errno;
+-            error_report("ram_block_discard_range: Failed to discard range "
++        if (need_madvise) {
++            /* For normal RAM this causes it to be unmapped,
++             * for shared memory it causes the local mapping to disappear
++             * and to fall back on the file contents (which we just
++             * fallocate'd away).
++             */
++#if defined(CONFIG_MADVISE)
++            ret =  madvise(host_startaddr, length, MADV_DONTNEED);
++            if (ret) {
++                ret = -errno;
++                error_report("ram_block_discard_range: Failed to discard range "
++                             "%s:%" PRIx64 " +%zx (%d)",
++                             rb->idstr, start, length, ret);
++                goto err;
++            }
++#else
++            ret = -ENOSYS;
++            error_report("ram_block_discard_range: MADVISE not available"
+                          "%s:%" PRIx64 " +%zx (%d)",
+                          rb->idstr, start, length, ret);
++            goto err;
++#endif
+         }
++        trace_ram_block_discard_range(rb->idstr, host_startaddr, length,
++                                      need_madvise, need_fallocate, ret);
+     } else {
+         error_report("ram_block_discard_range: Overrun block '%s' (%" PRIu64
+                      "/%zx/" RAM_ADDR_FMT")",
+diff --git a/trace-events b/trace-events
+index 89fcad0fd1..196598a6f8 100644
+--- a/trace-events
++++ b/trace-events
+@@ -55,9 +55,10 @@ dma_complete(void *dbs, int ret, void *cb) "dbs=%p ret=%d cb=%p"
+ dma_blk_cb(void *dbs, int ret) "dbs=%p ret=%d"
+ dma_map_wait(void *dbs) "dbs=%p"
+ 
+-#  # exec.c
++# exec.c
+ find_ram_offset(uint64_t size, uint64_t offset) "size: 0x%" PRIx64 " @ 0x%" PRIx64
+ find_ram_offset_loop(uint64_t size, uint64_t candidate, uint64_t offset, uint64_t next, uint64_t mingap) "trying size: 0x%" PRIx64 " @ 0x%" PRIx64 ", offset: 0x%" PRIx64" next: 0x%" PRIx64 " mingap: 0x%" PRIx64
++ram_block_discard_range(const char *rbname, void *hva, size_t length, bool need_madvise, bool need_fallocate, int ret) "%s@%p + 0x%zx: madvise: %d fallocate: %d ret: %d"
+ 
+ # memory.c
+ memory_region_ops_read(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
+-- 
 2.14.3
