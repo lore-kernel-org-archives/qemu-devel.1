@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1etppf-00039f-Iz
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 02:19:20 -0500
+	(envelope-from <kraxel@redhat.com>) id 1etq2G-00077z-JQ
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 02:32:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1etppe-0006pz-Kj
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 02:19:19 -0500
-References: <20180307215010.30706-1-jcmvbkbc@gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <03992eba-6a6c-8dce-cefc-33d00a82faf4@vivier.eu>
-Date: Thu, 8 Mar 2018 08:19:01 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180307215010.30706-1-jcmvbkbc@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v6 05/11] linux-user: fix
- mmap/munmap/mprotect/mremap/shmat
+	(envelope-from <kraxel@redhat.com>) id 1etq2D-0002Ou-Fz
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 02:32:20 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38230 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1etq2D-0002Om-Br
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 02:32:17 -0500
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu,  8 Mar 2018 08:31:59 +0100
+Message-Id: <20180308073159.1068-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] vga: fix region calculation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,52 +21,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, P J P <ppandit@redhat.com>, Ross Lagerwall <ross.lagerwall@citrix.com>
 
-Le 07/03/2018 à 22:50, Max Filippov a écrit :
-> In linux-user QEMU that runs for a target with TARGET_ABI_BITS bigger
-> than L1_MAP_ADDR_SPACE_BITS an assertion in page_set_flags fires when
-> mmap, munmap, mprotect, mremap or shmat is called for an address outside
-> the guest address space. mmap and mprotect should return ENOMEM in such
-> case.
-> 
-> Change definition of GUEST_ADDR_MAX to always be the last valid guest
-> address. Account for this change in open_self_maps.
-> Add macro guest_addr_valid that verifies if the guest address is valid.
-> Add function guest_range_valid that verifies if address range is within
-> guest address space and does not wrap around. Use that macro in
-> mmap/munmap/mprotect/mremap/shmat for error checking.
-> 
-> Cc: qemu-stable@nongnu.org
-> Cc: Riku Voipio <riku.voipio@iki.fi>
-> Cc: Laurent Vivier <laurent@vivier.eu>
-> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
-> ---
-> Changes v5->v6:
-> - drop 'if (len)' clause from guest_range_valid and explicitly compare
->   len with GUEST_ADDR_MAX.
-> 
-> Changes v4->v5:
-> - change definition of GUEST_ADDR_MAX to always be the last valid guest
->   address. Account for this change in guest_addr_valid and open_self_maps.
-> - turn guest_range_valid into a function.
-> 
-> Changes v3->v4:
-> - change GUEST_ADDR_MAX and h2g_valid definitions as suggested by Laurent
->   Vivier.
-> 
-> Changes v2->v3:
-> - fix comparison in guest_valid: it must be 'less' to preserve the existing
->   functionality, not 'less or equal'.
-> - fix guest_range_valid: it may not use guest_valid, because single range
->   that occupies all of the guest address space is valid.
-> 
->  include/exec/cpu-all.h  |  6 +++++-
->  include/exec/cpu_ldst.h | 16 +++++++---------
->  linux-user/mmap.c       | 20 +++++++++++++++-----
->  linux-user/syscall.c    |  5 ++++-
->  4 files changed, 31 insertions(+), 16 deletions(-)
-> 
+Typically the scanline length and the line offset are identical.  But
+case they are not our calculation for region_end is incorrect.  Using
+line_offset is fine for all scanlines, except the last one where we have
+to use the actual scanline length.
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Fixes: CVE-2018-<to-be-filled>
+Cc: P J P <ppandit@redhat.com>
+Cc: Ross Lagerwall <ross.lagerwall@citrix.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/display/vga.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/hw/display/vga.c b/hw/display/vga.c
+index 28f298b342..72181330b8 100644
+--- a/hw/display/vga.c
++++ b/hw/display/vga.c
+@@ -1483,6 +1483,8 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+ 
+     region_start = (s->start_addr * 4);
+     region_end = region_start + (ram_addr_t)s->line_offset * height;
++    region_end += width * s->get_bpp(s) / 8; /* scanline length */
++    region_end -= s->line_offset;
+     if (region_end > s->vbe_size) {
+         /* wraps around (can happen with cirrus vbe modes) */
+         region_start = 0;
+-- 
+2.9.3
