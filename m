@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1etw1B-0003Yc-TN
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:55:39 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1etw4Y-0004Wp-JS
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:59:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1etw18-0000Ce-0d
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:55:37 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48766 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1etw17-0000CD-RK
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:55:33 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 264054075168
-	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 13:55:29 +0000 (UTC)
-Date: Thu, 8 Mar 2018 21:55:22 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180308135521.GH32252@xz-mi>
-References: <20180306053320.15401-1-peterx@redhat.com>
-	<20180306053320.15401-10-peterx@redhat.com>
-	<20180307123650.GD20201@redhat.com> <20180308034409.GA32252@xz-mi>
-	<20180308101359.GE4718@redhat.com> <20180308114213.GE32252@xz-mi>
-	<20180308133143.GP4718@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1etw4X-0002N7-Nc
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:59:06 -0500
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:36047)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1etw4X-0002Ms-Gg
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:59:05 -0500
+Received: by mail-wm0-x22b.google.com with SMTP id 188so11194392wme.1
+	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 05:59:05 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180308133143.GP4718@redhat.com>
+In-Reply-To: <06C8AB66E78EE34A949939824ABE2B313B651F39@shsmsx102.ccr.corp.intel.com>
+References: <20180307155746.18526-1-marcandre.lureau@redhat.com>
+	<06C8AB66E78EE34A949939824ABE2B313B651F39@shsmsx102.ccr.corp.intel.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 8 Mar 2018 14:59:03 +0100
+Message-ID: <CAJ+F1CKuHzO-F3XbjqQyLL49JipsR+Sk8zFy1ZuMssUz_71qvA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 9/9] chardev: tcp: postpone TLS work
- until machine done
+Subject: Re: [Qemu-devel] [edk2] [PATCH v2 0/8] RFC: ovmf: preliminary TPM2
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,120 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: "Shi, Steven" <steven.shi@intel.com>
+Cc: "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, "lersek@redhat.com" <lersek@redhat.com>, "pjones@redhat.com" <pjones@redhat.com>, "Yao,
+	Jiewen" <jiewen.yao@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "javierm@redhat.com" <javierm@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-On Thu, Mar 08, 2018 at 01:31:43PM +0000, Daniel P. Berrang=C3=A9 wrote:
-> On Thu, Mar 08, 2018 at 07:42:13PM +0800, Peter Xu wrote:
-> > On Thu, Mar 08, 2018 at 10:13:59AM +0000, Daniel P. Berrang=C3=A9 wro=
-te:
-> > > On Thu, Mar 08, 2018 at 11:44:09AM +0800, Peter Xu wrote:
-> > > > On Wed, Mar 07, 2018 at 12:36:50PM +0000, Daniel P. Berrang=C3=A9=
- wrote:
-> > > >=20
-> > > > [...]
-> > > >=20
-> > > > > > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> > > > > > index bd40864f87..997c70dd7d 100644
-> > > > > > --- a/chardev/char-socket.c
-> > > > > > +++ b/chardev/char-socket.c
-> > > > > > @@ -31,6 +31,7 @@
-> > > > > >  #include "qemu/option.h"
-> > > > > >  #include "qapi/error.h"
-> > > > > >  #include "qapi/clone-visitor.h"
-> > > > > > +#include "sysemu/sysemu.h"
-> > > > > > =20
-> > > > > >  #include "chardev/char-io.h"
-> > > > > > =20
-> > > > > > @@ -722,6 +723,11 @@ static void tcp_chr_tls_init(Chardev *ch=
-r)
-> > > > > >      Error *err =3D NULL;
-> > > > > >      gchar *name;
-> > > > > > =20
-> > > > > > +    if (!machine_init_done) {
-> > > > > > +        /* This will be postponed to machine_done notifier *=
-/
-> > > > > > +        return;
-> > > > > > +    }
-> > > > > > +
-> > > > > >      if (s->is_listen) {
-> > > > > >          tioc =3D qio_channel_tls_new_server(
-> > > > > >              s->ioc, s->tls_creds,
-> > > > > > @@ -1145,6 +1151,10 @@ static int tcp_chr_machine_done_hook(C=
-hardev *chr)
-> > > > > >          tcp_chr_connect_async(chr);
-> > > > > >      }
-> > > > > > =20
-> > > > > > +    if (s->tls_creds) {
-> > > > > > +        tcp_chr_tls_init(chr);
-> > > > > > +    }
-> > > > >=20
-> > > > > This looks questionable - AFAICT, there's no guarantee we have =
-any
-> > > > > client connection active when the machine dnoe hook runs. Only =
-if
-> > > > > the chardev is set in client mode, and reconnect_time is *not* =
-set,
-> > > > > but this seems to be run unconditionally.
-> > > >=20
-> > > > You are right.  Thanks for spotting that.
-> > > >=20
-> > > > Then how about this?  It's a bit ugly, but I think it should be s=
-afe:
-> > >=20
-> > > Is it perhaps not possible to just check if  's->ioc' is non-NULL
-> > > in the tcp_chr_machine_done_hook for your original patch ?
-> >=20
-> > In tcp_chr_new_client() I see that s->ioc will be set no matter what,
-> > and that function can even be called without TLS enabled I think.
-> > Does that mean only check against s->ioc would not be enough?
->=20
-> I mean like this:
->=20
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index a1966aae51..19e3193817 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -723,6 +723,11 @@ static void tcp_chr_tls_init(Chardev *chr)
->      Error *err =3D NULL;
->      gchar *name;
-> =20
-> +    if (!machine_init_done) {
-> +        /* This will be postponed to machine_done notifier */
-> +        return;
-> +    }
-> +
->      if (s->is_listen) {
->          tioc =3D qio_channel_tls_new_server(
->              s->ioc, s->tls_creds,
-> @@ -1146,6 +1151,10 @@ static int tcp_chr_machine_done_hook(Chardev *ch=
-r)
->          tcp_chr_connect_async(chr);
->      }
-> =20
-> +    if (s->ioc && s->tls_creds) {
-> +        tcp_chr_tls_init(chr);
-> +    }
-> +
->      return 0;
->  }
-> =20
->=20
->=20
-> s->ioc will only be !=3D NULL, if some codepath in qemu_chr_parse_socke=
-t
+Hi
 
-I guess here you mean qmp_chardev_open_socket().
+On Thu, Mar 8, 2018 at 1:31 PM, Shi, Steven <steven.shi@intel.com> wrote:
+> Hi Marcandre,
+>> I test with qemu & swtpm/libtpms (tpm2 branches, swtpm_setup.sh --tpm2 -=
+-tpm-state tpmstatedir)
+>> $ swtpm socket --tpmstate tpmstatedir --ctrl type=3Dunixio,path=3Dtpmsoc=
+k  --tpm2 &
+>
+> Where is the swtpm_setup.sh? And could you tell how to build & install th=
+e swtpm?
+>
 
-> ended up calling tcp_chr_new_client(). If that happened we will have
-> skipped setup of TLS, so calling tcp_chr_tls_init() based on
-> s->ioc && s->tls_creds feels right to me.
+You need to compile & install libtpms & swtpm :
 
-Yes, it looks right to me too. :)
+git clone -b tpm2-preview.rev146.v2 https://github.com/stefanberger/libtpms
+cd libtpms
+autoreconf -vfi && ./configure --with-tpm2 --with-openssl  && make install
 
-I'll post a complete patch soon with your authorship.
+git clone -b tpm2-preview.v2 https://github.com/stefanberger/swtpm
+cd swtpm
+autoreconf -vfi && ./configure --with-openssl && make install
 
-Thanks!
+Then you can run:
+mkdir tpmstatedir
+swtpm_setup.sh --tpm2 --tpm-state tpmstatedir
 
+Run the emulator:
+swtpm socket --tpmstate dir=3Dtpmstatedir --ctrl
+type=3Dunixio,path=3Dtpmemu.sock  --tpm2
+
+Run qemu (from git) with ovmf (with this series):
+qemu ... -chardev socket,id=3Dchrtpm,path=3Dtpmemu.sock -tpmdev
+emulator,id=3Dtpm0,chardev=3Dchrtpm  -device tpm-crb,tpmdev=3Dtpm0
+-drive if=3Dpflash,format=3Draw,file=3DOVMF_CODE.fd,readonly -drive
+if=3Dpflash,format=3Draw,file=3DOVMF_VARS.fd ..
+
+cheers
 --=20
-Peter Xu
+Marc-Andr=C3=A9 Lureau
