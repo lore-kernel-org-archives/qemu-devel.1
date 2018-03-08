@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1etuzt-0005Oa-UJ
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:50:18 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1etuzw-0005T7-PL
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:50:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1etuzn-00048L-CZ
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:50:13 -0500
-Received: from mail-co1nam03on0062.outbound.protection.outlook.com
-	([104.47.40.62]:49216
-	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
+	(envelope-from <brijesh.singh@amd.com>) id 1etuzs-0004Am-LL
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:50:16 -0500
+Received: from mail-cys01nam02on0076.outbound.protection.outlook.com
+	([104.47.37.76]:52544
+	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1etuzn-00047i-1q
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:50:07 -0500
+	id 1etuzs-0004AE-9S
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:50:12 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Thu,  8 Mar 2018 06:48:48 -0600
-Message-Id: <20180308124901.83533-16-brijesh.singh@amd.com>
+Date: Thu,  8 Mar 2018 06:48:50 -0600
+Message-Id: <20180308124901.83533-18-brijesh.singh@amd.com>
 In-Reply-To: <20180308124901.83533-1-brijesh.singh@amd.com>
 References: <20180308124901.83533-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v12 15/28] sev/i386: add command to create
- launch memory encryption context
+Subject: [Qemu-devel] [PATCH v12 17/28] target/i386: encrypt bios rom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,139 +31,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
 
-The KVM_SEV_LAUNCH_START command creates a new VM encryption key (VEK).
-The encryption key created with the command will be used for encrypting
-the bootstrap images (such as guest bios).
+SEV requires that guest bios must be encrypted before booting the guest.
 
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Richard Henderson <rth@twiddle.net>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- target/i386/sev.c        | 86 ++++++++++++++++++++++++++++++++++++++++++++++++
- target/i386/trace-events |  2 ++
- 2 files changed, 88 insertions(+)
+ hw/i386/pc_sysfw.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 4f85035d5203..eee693745103 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -105,6 +105,17 @@ fw_error_to_str(int code)
-     return sev_fw_errlist[code];
- }
+diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+index 4325575e7d82..73ac783f2055 100644
+--- a/hw/i386/pc_sysfw.c
++++ b/hw/i386/pc_sysfw.c
+@@ -113,6 +113,8 @@ static void pc_system_flash_init(MemoryRegion *rom_memory)
+     pflash_t *system_flash;
+     MemoryRegion *flash_mem;
+     char name[64];
++    void *flash_ptr;
++    int ret, flash_size;
  
-+static void
-+sev_set_guest_state(SevState new_state)
-+{
-+    assert(new_state < SEV_STATE__MAX);
-+    assert(sev_state);
+     sector_bits = 12;
+     sector_size = 1 << sector_bits;
+@@ -169,6 +171,17 @@ static void pc_system_flash_init(MemoryRegion *rom_memory)
+         if (unit == 0) {
+             flash_mem = pflash_cfi01_get_memory(system_flash);
+             pc_isa_bios_init(rom_memory, flash_mem, size);
 +
-+    trace_kvm_sev_change_state(SevState_str(sev_state->state),
-+                               SevState_str(new_state));
-+    sev_state->state = new_state;
-+}
-+
- static void
- sev_ram_block_added(RAMBlockNotifier *n, void *host, size_t size)
- {
-@@ -406,6 +417,75 @@ sev_get_info(void)
-     return info;
- }
- 
-+static int
-+sev_read_file_base64(const char *filename, guchar **data, gsize *len)
-+{
-+    gsize sz;
-+    gchar *base64;
-+    GError *error = NULL;
-+
-+    if (!g_file_get_contents(filename, &base64, &sz, &error)) {
-+        error_report("failed to read '%s' (%s)", filename, error->message);
-+        return -1;
-+    }
-+
-+    *data = g_base64_decode(base64, len);
-+    return 0;
-+}
-+
-+static int
-+sev_launch_start(SEVState *s)
-+{
-+    gsize sz;
-+    int ret = 1;
-+    int fw_error;
-+    QSevGuestInfo *sev = s->sev_info;
-+    struct kvm_sev_launch_start *start;
-+    guchar *session = NULL, *dh_cert = NULL;
-+
-+    start = g_new0(struct kvm_sev_launch_start, 1);
-+
-+    start->handle = object_property_get_int(OBJECT(sev), "handle",
-+                                            &error_abort);
-+    start->policy = object_property_get_int(OBJECT(sev), "policy",
-+                                            &error_abort);
-+    if (sev->session_file) {
-+        if (sev_read_file_base64(sev->session_file, &session, &sz) < 0) {
-+            return 1;
-+        }
-+        start->session_uaddr = (unsigned long)session;
-+        start->session_len = sz;
-+    }
-+
-+    if (sev->dh_cert_file) {
-+        if (sev_read_file_base64(sev->dh_cert_file, &dh_cert, &sz) < 0) {
-+            return 1;
-+        }
-+        start->dh_uaddr = (unsigned long)dh_cert;
-+        start->dh_len = sz;
-+    }
-+
-+    trace_kvm_sev_launch_start(start->policy, session, dh_cert);
-+    ret = sev_ioctl(s->sev_fd, KVM_SEV_LAUNCH_START, start, &fw_error);
-+    if (ret < 0) {
-+        error_report("%s: LAUNCH_START ret=%d fw_error=%d '%s'",
-+                __func__, ret, fw_error, fw_error_to_str(fw_error));
-+        return 1;
-+    }
-+
-+    object_property_set_int(OBJECT(sev), start->handle, "handle",
-+                            &error_abort);
-+    sev_set_guest_state(SEV_STATE_LUPDATE);
-+    s->handle = start->handle;
-+    s->policy = start->policy;
-+
-+    g_free(start);
-+    g_free(session);
-+    g_free(dh_cert);
-+
-+    return 0;
-+}
-+
- void *
- sev_guest_init(const char *id)
- {
-@@ -476,6 +556,12 @@ sev_guest_init(const char *id)
-         goto err;
++            /* Encrypt the pflash boot ROM */
++            if (kvm_memcrypt_enabled()) {
++                flash_ptr = memory_region_get_ram_ptr(flash_mem);
++                flash_size = memory_region_size(flash_mem);
++                ret = kvm_memcrypt_encrypt_data(flash_ptr, flash_size);
++                if (ret) {
++                    error_report("failed to encrypt pflash rom");
++                    exit(1);
++                }
++            }
+         }
      }
- 
-+    ret = sev_launch_start(s);
-+    if (ret) {
-+        error_report("%s: failed to create encryption context", __func__);
-+        goto err;
-+    }
-+
-     ram_block_notifier_add(&sev_ram_notifier);
- 
-     return s;
-diff --git a/target/i386/trace-events b/target/i386/trace-events
-index ffa3d2250425..9402251e9991 100644
---- a/target/i386/trace-events
-+++ b/target/i386/trace-events
-@@ -10,3 +10,5 @@ kvm_x86_update_msi_routes(int num) "Updated %d MSI routes"
- kvm_sev_init(void) ""
- kvm_memcrypt_register_region(void *addr, size_t len) "addr %p len 0x%lu"
- kvm_memcrypt_unregister_region(void *addr, size_t len) "addr %p len 0x%lu"
-+kvm_sev_change_state(const char *old, const char *new) "%s -> %s"
-+kvm_sev_launch_start(int policy, void *session, void *pdh) "policy 0x%x session %p pdh %p"
+ }
 -- 
 2.14.3
