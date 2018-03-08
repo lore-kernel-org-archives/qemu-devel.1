@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48947)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jbaron@akamai.com>) id 1etmBo-0007wq-V3
+	(envelope-from <jbaron@akamai.com>) id 1etmBo-0007wp-V0
 	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 22:25:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jbaron@akamai.com>) id 1etmBl-000304-OK
+	(envelope-from <jbaron@akamai.com>) id 1etmBl-000300-Oc
 	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 22:25:56 -0500
-Received: from mx0a-00190b01.pphosted.com ([2620:100:9001:583::1]:59660)
+Received: from mx0b-00190b01.pphosted.com ([2620:100:9005:57f::1]:49878)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jbaron@akamai.com>) id 1etmBl-0002zS-C0
+	(Exim 4.71) (envelope-from <jbaron@akamai.com>) id 1etmBl-0002zd-Bu
 	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 22:25:53 -0500
 From: Jason Baron <jbaron@akamai.com>
-Date: Wed,  7 Mar 2018 22:25:38 -0500
-Message-Id: <cover.1520450515.git.jbaron@akamai.com>
-Subject: [Qemu-devel] [PATCH v2 0/3] virtio-net: allow linkspeed and duplex
- setting
+Date: Wed,  7 Mar 2018 22:25:40 -0500
+Message-Id: <0f209d96811d1760d833154779a61b0730119ff6.1520450515.git.jbaron@akamai.com>
+In-Reply-To: <cover.1520450515.git.jbaron@akamai.com>
+References: <cover.1520450515.git.jbaron@akamai.com>
+In-Reply-To: <cover.1520450515.git.jbaron@akamai.com>
+References: <cover.1520450515.git.jbaron@akamai.com>
+Subject: [Qemu-devel] [PATCH v2 2/3] virtio-net: use 64-bit values for
+ feature flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +29,135 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mst@redhat.com, jasowang@redhat.com, virtio-dev@lists.oasis-open.org
 
-Hi,
+In prepartion for using some of the high order feature bits, make sure that
+virtio-net uses 64-bit values everywhere.
 
-Linux can now read linkspeed and duplex settings as set by the
-hypervisor:
+Signed-off-by: Jason Baron <jbaron@akamai.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: virtio-dev@lists.oasis-open.org
+---
+ hw/net/virtio-net.c            | 55 +++++++++++++++++++++---------------------
+ include/hw/virtio/virtio-net.h |  2 +-
+ 2 files changed, 29 insertions(+), 28 deletions(-)
 
-faa9b39 virtio_net: propagate linkspeed/duplex settings from the hypervisor
-
-This series thus adds qemu support.
-
-Also, this patchset depends on this header sync:
-
-https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg07072.html
-
-Thanks,
-
--Jason
-
-v2
--pull in include/linux/ethtool.h (Michael Tsirkin)
-
-Jason Baron (3):
-  scripts/update-linux-headers: add ethtool.h and update to 4.16.0-rc4
-  virtio-net: use 64-bit values for feature flags
-  virtio-net: add linkspeed and duplex settings to virtio-net
-
- hw/net/virtio-net.c                      |   81 +-
- include/hw/virtio/virtio-net.h           |    5 +-
- include/standard-headers/linux/ethtool.h | 1821 ++++++++++++++++++++++++++++++
- include/standard-headers/linux/input.h   |    4 +-
- include/standard-headers/linux/kernel.h  |   15 +
- include/standard-headers/linux/sysinfo.h |   25 +
- linux-headers/asm-x86/kvm_para.h         |    1 +
- linux-headers/linux/kvm.h                |    2 +
- scripts/update-linux-headers.sh          |   11 +-
- 9 files changed, 1934 insertions(+), 31 deletions(-)
- create mode 100644 include/standard-headers/linux/ethtool.h
- create mode 100644 include/standard-headers/linux/kernel.h
- create mode 100644 include/standard-headers/linux/sysinfo.h
-
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 369d40b..4feaa49 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -48,18 +48,18 @@
+     (offsetof(container, field) + sizeof(((container *)0)->field))
+ 
+ typedef struct VirtIOFeature {
+-    uint32_t flags;
++    uint64_t flags;
+     size_t end;
+ } VirtIOFeature;
+ 
+ static VirtIOFeature feature_sizes[] = {
+-    {.flags = 1 << VIRTIO_NET_F_MAC,
++    {.flags = 1ULL << VIRTIO_NET_F_MAC,
+      .end = endof(struct virtio_net_config, mac)},
+-    {.flags = 1 << VIRTIO_NET_F_STATUS,
++    {.flags = 1ULL << VIRTIO_NET_F_STATUS,
+      .end = endof(struct virtio_net_config, status)},
+-    {.flags = 1 << VIRTIO_NET_F_MQ,
++    {.flags = 1ULL << VIRTIO_NET_F_MQ,
+      .end = endof(struct virtio_net_config, max_virtqueue_pairs)},
+-    {.flags = 1 << VIRTIO_NET_F_MTU,
++    {.flags = 1ULL << VIRTIO_NET_F_MTU,
+      .end = endof(struct virtio_net_config, mtu)},
+     {}
+ };
+@@ -1938,7 +1938,7 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+     int i;
+ 
+     if (n->net_conf.mtu) {
+-        n->host_features |= (0x1 << VIRTIO_NET_F_MTU);
++        n->host_features |= (1ULL << VIRTIO_NET_F_MTU);
+     }
+ 
+     virtio_net_set_config_size(n, n->host_features);
+@@ -2109,45 +2109,46 @@ static const VMStateDescription vmstate_virtio_net = {
+ };
+ 
+ static Property virtio_net_properties[] = {
+-    DEFINE_PROP_BIT("csum", VirtIONet, host_features, VIRTIO_NET_F_CSUM, true),
+-    DEFINE_PROP_BIT("guest_csum", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("csum", VirtIONet, host_features,
++                    VIRTIO_NET_F_CSUM, true),
++    DEFINE_PROP_BIT64("guest_csum", VirtIONet, host_features,
+                     VIRTIO_NET_F_GUEST_CSUM, true),
+-    DEFINE_PROP_BIT("gso", VirtIONet, host_features, VIRTIO_NET_F_GSO, true),
+-    DEFINE_PROP_BIT("guest_tso4", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("gso", VirtIONet, host_features, VIRTIO_NET_F_GSO, true),
++    DEFINE_PROP_BIT64("guest_tso4", VirtIONet, host_features,
+                     VIRTIO_NET_F_GUEST_TSO4, true),
+-    DEFINE_PROP_BIT("guest_tso6", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("guest_tso6", VirtIONet, host_features,
+                     VIRTIO_NET_F_GUEST_TSO6, true),
+-    DEFINE_PROP_BIT("guest_ecn", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("guest_ecn", VirtIONet, host_features,
+                     VIRTIO_NET_F_GUEST_ECN, true),
+-    DEFINE_PROP_BIT("guest_ufo", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("guest_ufo", VirtIONet, host_features,
+                     VIRTIO_NET_F_GUEST_UFO, true),
+-    DEFINE_PROP_BIT("guest_announce", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("guest_announce", VirtIONet, host_features,
+                     VIRTIO_NET_F_GUEST_ANNOUNCE, true),
+-    DEFINE_PROP_BIT("host_tso4", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("host_tso4", VirtIONet, host_features,
+                     VIRTIO_NET_F_HOST_TSO4, true),
+-    DEFINE_PROP_BIT("host_tso6", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("host_tso6", VirtIONet, host_features,
+                     VIRTIO_NET_F_HOST_TSO6, true),
+-    DEFINE_PROP_BIT("host_ecn", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("host_ecn", VirtIONet, host_features,
+                     VIRTIO_NET_F_HOST_ECN, true),
+-    DEFINE_PROP_BIT("host_ufo", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("host_ufo", VirtIONet, host_features,
+                     VIRTIO_NET_F_HOST_UFO, true),
+-    DEFINE_PROP_BIT("mrg_rxbuf", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("mrg_rxbuf", VirtIONet, host_features,
+                     VIRTIO_NET_F_MRG_RXBUF, true),
+-    DEFINE_PROP_BIT("status", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("status", VirtIONet, host_features,
+                     VIRTIO_NET_F_STATUS, true),
+-    DEFINE_PROP_BIT("ctrl_vq", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("ctrl_vq", VirtIONet, host_features,
+                     VIRTIO_NET_F_CTRL_VQ, true),
+-    DEFINE_PROP_BIT("ctrl_rx", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("ctrl_rx", VirtIONet, host_features,
+                     VIRTIO_NET_F_CTRL_RX, true),
+-    DEFINE_PROP_BIT("ctrl_vlan", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("ctrl_vlan", VirtIONet, host_features,
+                     VIRTIO_NET_F_CTRL_VLAN, true),
+-    DEFINE_PROP_BIT("ctrl_rx_extra", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("ctrl_rx_extra", VirtIONet, host_features,
+                     VIRTIO_NET_F_CTRL_RX_EXTRA, true),
+-    DEFINE_PROP_BIT("ctrl_mac_addr", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("ctrl_mac_addr", VirtIONet, host_features,
+                     VIRTIO_NET_F_CTRL_MAC_ADDR, true),
+-    DEFINE_PROP_BIT("ctrl_guest_offloads", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("ctrl_guest_offloads", VirtIONet, host_features,
+                     VIRTIO_NET_F_CTRL_GUEST_OFFLOADS, true),
+-    DEFINE_PROP_BIT("mq", VirtIONet, host_features, VIRTIO_NET_F_MQ, false),
++    DEFINE_PROP_BIT64("mq", VirtIONet, host_features, VIRTIO_NET_F_MQ, false),
+     DEFINE_NIC_PROPERTIES(VirtIONet, nic_conf),
+     DEFINE_PROP_UINT32("x-txtimer", VirtIONet, net_conf.txtimer,
+                        TX_TIMER_INTERVAL),
+diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
+index b81b6a4..e7634c9 100644
+--- a/include/hw/virtio/virtio-net.h
++++ b/include/hw/virtio/virtio-net.h
+@@ -67,7 +67,7 @@ typedef struct VirtIONet {
+     uint32_t has_vnet_hdr;
+     size_t host_hdr_len;
+     size_t guest_hdr_len;
+-    uint32_t host_features;
++    uint64_t host_features;
+     uint8_t has_ufo;
+     uint32_t mergeable_rx_bufs;
+     uint8_t promisc;
 -- 
 2.7.4
