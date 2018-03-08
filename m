@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1etzLX-0000VN-0B
+	(envelope-from <pbonzini@redhat.com>) id 1etzLW-0000VK-Vb
 	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:28:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1etzLS-0001Mq-2C
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:28:51 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36389 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1etzLS-0001Mw-3H
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:28:50 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36388 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1etzLR-0001MU-T1
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1etzLR-0001MW-Sm
 	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:28:46 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6371C401D7BB
-	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 17:28:42 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7E1DB40201DF
+	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 17:28:40 +0000 (UTC)
+Received: from donizetti.redhat.com (ovpn-117-37.ams2.redhat.com
+	[10.36.117.37])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id EDFF450334
+	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 17:28:39 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  8 Mar 2018 18:28:34 +0100
-Message-Id: <20180308172834.3281-4-pbonzini@redhat.com>
+Date: Thu,  8 Mar 2018 18:28:32 +0100
+Message-Id: <20180308172834.3281-2-pbonzini@redhat.com>
 In-Reply-To: <20180308172834.3281-1-pbonzini@redhat.com>
 References: <20180308172834.3281-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] q35: change default NIC to e1000e
+Subject: [Qemu-devel] [PATCH 1/3] qom: introduce object_class_get_list_sorted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,143 +34,240 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Jason Wang <jasowang@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-The e1000 NIC is getting old and is not a very good default for a
-PCIe machine type.  Change it to e1000e, which should be supported
-by a good number of guests.
+Unify half a dozen copies of very similar code (the only difference being
+whether comparisons were case-sensitive) and use it also in Tricore,
+which did not do any sorting of CPU model names.
 
-In particular, drivers for 82574 were added first to Linux 2.6.27 (2008)
-and Windows 2008 R2.  This does mean that Windows 2008 will not work
-anymore with Q35 machine types and a default "-net nic -net xxx" network
-configuration; it did work before because it does have an AHCI driver.
-However, Windows 2008 has been declared out of main stream support
-in 2015.  It will get out of extended support in 2020.  Windows 2008
-R2 has the same end of support dates and, since the two are basically
-Vista vs. Windows 7, R2 probably is more popular.
-
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/i386/pc.c         | 7 ++++---
- hw/i386/pc_piix.c    | 6 +++++-
- hw/i386/pc_q35.c     | 8 +++++++-
- include/hw/i386/pc.h | 3 ++-
- 4 files changed, 18 insertions(+), 6 deletions(-)
+ include/qom/object.h    | 11 +++++++++++
+ qdev-monitor.c          |  9 +--------
+ qom/object.c            | 13 +++++++++++++
+ target/alpha/cpu.c      | 15 +--------------
+ target/hppa/cpu.c       | 15 +--------------
+ target/lm32/cpu.c       | 15 +--------------
+ target/sh4/cpu.c        | 15 +--------------
+ target/tricore/helper.c |  2 +-
+ 8 files changed, 30 insertions(+), 65 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 35fcb6efdf..dc1f535697 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1619,18 +1619,19 @@ void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
-     }
+diff --git a/include/qom/object.h b/include/qom/object.h
+index 4f07090db0..96ce81bc5e 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -913,6 +913,17 @@ void object_class_foreach(void (*fn)(ObjectClass *klass, void *opaque),
+ GSList *object_class_get_list(const char *implements_type,
+                               bool include_abstract);
+ 
++/**
++ * object_class_get_list_sorted:
++ * @implements_type: The type to filter for, including its derivatives.
++ * @include_abstract: Whether to include abstract classes.
++ *
++ * Returns: A singly-linked list of the classes in alphabetical
++ * case-insensitive order.
++ */
++GSList *object_class_get_list_sorted(const char *implements_type,
++                              bool include_abstract);
++
+ /**
+  * object_ref:
+  * @obj: the object
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index b7e3291f8b..61e0300991 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -122,12 +122,6 @@ static void qdev_print_devinfo(DeviceClass *dc)
+     error_printf("\n");
  }
  
--void pc_nic_init(ISABus *isa_bus, PCIBus *pci_bus)
-+void pc_nic_init(PCMachineClass *pcmc, ISABus *isa_bus, PCIBus *pci_bus)
+-static gint devinfo_cmp(gconstpointer a, gconstpointer b)
+-{
+-    return strcasecmp(object_class_get_name((ObjectClass *)a),
+-                      object_class_get_name((ObjectClass *)b));
+-}
+-
+ static void qdev_print_devinfos(bool show_no_user)
  {
+     static const char *cat_name[DEVICE_CATEGORY_MAX + 1] = {
+@@ -146,8 +140,7 @@ static void qdev_print_devinfos(bool show_no_user)
      int i;
+     bool cat_printed;
  
-     rom_set_order_override(FW_CFG_ORDER_OVERRIDE_NIC);
-     for (i = 0; i < nb_nics; i++) {
-         NICInfo *nd = &nd_table[i];
-+        const char *model = nd->model ? nd->model : pcmc->default_nic_model;
+-    list = g_slist_sort(object_class_get_list(TYPE_DEVICE, false),
+-                        devinfo_cmp);
++    list = object_class_get_list_sorted(TYPE_DEVICE, false);
  
--        if (!pci_bus || (nd->model && strcmp(nd->model, "ne2k_isa") == 0)) {
-+        if (g_str_equal(model, "ne2k_isa")) {
-             pc_init_ne2k_isa(isa_bus, nd);
-         } else {
--            pci_nic_init_nofail(nd, pci_bus, "e1000", NULL);
-+            pci_nic_init_nofail(nd, pci_bus, model, NULL);
-         }
-     }
-     rom_reset_order_override();
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 8658bcba63..0f1966d547 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -240,7 +240,7 @@ static void pc_init1(MachineState *machine,
-     pc_basic_device_init(isa_bus, pcms->gsi, &rtc_state, true,
-                          (pcms->vmport != ON_OFF_AUTO_ON), pcms->pit, 0x4);
- 
--    pc_nic_init(isa_bus, pci_bus);
-+    pc_nic_init(pcmc, isa_bus, pci_bus);
- 
-     ide_drive_get(hd, ARRAY_SIZE(hd));
-     if (pcmc->pci_enabled) {
-@@ -417,6 +417,9 @@ static void pc_xen_hvm_init(MachineState *machine)
- 
- static void pc_i440fx_machine_options(MachineClass *m)
- {
-+    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+    pcmc->default_nic_model = "e1000";
-+
-     m->family = "pc_piix";
-     m->desc = "Standard PC (i440FX + PIIX, 1996)";
-     m->default_machine_opts = "firmware=bios-256k.bin";
-@@ -1114,6 +1117,7 @@ static void isapc_machine_options(MachineClass *m)
-     pcmc->gigabyte_align = false;
-     pcmc->smbios_legacy_mode = true;
-     pcmc->has_reserved_memory = false;
-+    pcmc->default_nic_model = "ne2k_isa";
-     m->default_cpu_type = X86_CPU_TYPE_NAME("486");
+     for (i = 0; i <= DEVICE_CATEGORY_MAX; i++) {
+         cat_printed = false;
+diff --git a/qom/object.c b/qom/object.c
+index 755ad03819..6088f55943 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -891,6 +891,19 @@ GSList *object_class_get_list(const char *implements_type,
+     return list;
  }
  
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 0c0bc48137..9ae916327e 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -272,7 +272,7 @@ static void pc_q35_init(MachineState *machine)
- 
-     /* the rest devices to which pci devfn is automatically assigned */
-     pc_vga_init(isa_bus, host_bus);
--    pc_nic_init(isa_bus, host_bus);
-+    pc_nic_init(pcmc, isa_bus, host_bus);
- 
-     if (pcms->acpi_nvdimm_state.is_enabled) {
-         nvdimm_init_acpi_state(&pcms->acpi_nvdimm_state, system_io,
-@@ -294,6 +294,9 @@ static void pc_q35_init(MachineState *machine)
- 
- static void pc_q35_machine_options(MachineClass *m)
- {
-+    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+    pcmc->default_nic_model = "e1000e";
++static gint object_class_cmp(gconstpointer a, gconstpointer b)
++{
++    return strcasecmp(object_class_get_name((ObjectClass *)a),
++                      object_class_get_name((ObjectClass *)b));
++}
 +
-     m->family = "pc_q35";
-     m->desc = "Standard PC (Q35 + ICH9, 2009)";
-     m->units_per_default_bus = 1;
-@@ -316,7 +319,10 @@ DEFINE_Q35_MACHINE(v2_12, "pc-q35-2.12", NULL,
- 
- static void pc_q35_2_11_machine_options(MachineClass *m)
- {
-+    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
++GSList *object_class_get_list_sorted(const char *implements_type,
++                                     bool include_abstract)
++{
++    return g_slist_sort(object_class_get_list(implements_type, include_abstract),
++                        object_class_cmp);
++}
 +
-     pc_q35_2_12_machine_options(m);
-+    pcmc->default_nic_model = "e1000";
-     m->alias = NULL;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_11);
+ void object_ref(Object *obj)
+ {
+     if (!obj) {
+diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
+index 55675ce419..b08078e7fc 100644
+--- a/target/alpha/cpu.c
++++ b/target/alpha/cpu.c
+@@ -71,18 +71,6 @@ static void alpha_cpu_realizefn(DeviceState *dev, Error **errp)
+     acc->parent_realize(dev, errp);
  }
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index bb49165fe0..e81654eb7f 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -114,6 +114,7 @@ struct PCMachineClass {
-     /* Device configuration: */
-     bool pci_enabled;
-     bool kvmclock_enabled;
-+    const char *default_nic_model;
  
-     /* Compat options: */
+-/* Sort alphabetically by type name. */
+-static gint alpha_cpu_list_compare(gconstpointer a, gconstpointer b)
+-{
+-    ObjectClass *class_a = (ObjectClass *)a;
+-    ObjectClass *class_b = (ObjectClass *)b;
+-    const char *name_a, *name_b;
+-
+-    name_a = object_class_get_name(class_a);
+-    name_b = object_class_get_name(class_b);
+-    return strcmp(name_a, name_b);
+-}
+-
+ static void alpha_cpu_list_entry(gpointer data, gpointer user_data)
+ {
+     ObjectClass *oc = data;
+@@ -100,8 +88,7 @@ void alpha_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+     };
+     GSList *list;
  
-@@ -248,7 +249,7 @@ void pc_init_ne2k_isa(ISABus *bus, NICInfo *nd);
- void pc_cmos_init(PCMachineState *pcms,
-                   BusState *ide0, BusState *ide1,
-                   ISADevice *s);
--void pc_nic_init(ISABus *isa_bus, PCIBus *pci_bus);
-+void pc_nic_init(PCMachineClass *pcmc, ISABus *isa_bus, PCIBus *pci_bus);
- void pc_pci_device_init(PCIBus *pci_bus);
+-    list = object_class_get_list(TYPE_ALPHA_CPU, false);
+-    list = g_slist_sort(list, alpha_cpu_list_compare);
++    list = object_class_get_list_sorted(TYPE_ALPHA_CPU, false);
+     (*cpu_fprintf)(f, "Available CPUs:\n");
+     g_slist_foreach(list, alpha_cpu_list_entry, &s);
+     g_slist_free(list);
+diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
+index 969f628f0a..c261b6b090 100644
+--- a/target/hppa/cpu.c
++++ b/target/hppa/cpu.c
+@@ -110,18 +110,6 @@ static void hppa_cpu_realizefn(DeviceState *dev, Error **errp)
+ #endif
+ }
  
- typedef void (*cpu_set_smm_t)(int smm, void *arg);
+-/* Sort hppabetically by type name. */
+-static gint hppa_cpu_list_compare(gconstpointer a, gconstpointer b)
+-{
+-    ObjectClass *class_a = (ObjectClass *)a;
+-    ObjectClass *class_b = (ObjectClass *)b;
+-    const char *name_a, *name_b;
+-
+-    name_a = object_class_get_name(class_a);
+-    name_b = object_class_get_name(class_b);
+-    return strcmp(name_a, name_b);
+-}
+-
+ static void hppa_cpu_list_entry(gpointer data, gpointer user_data)
+ {
+     ObjectClass *oc = data;
+@@ -138,8 +126,7 @@ void hppa_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+     };
+     GSList *list;
+ 
+-    list = object_class_get_list(TYPE_HPPA_CPU, false);
+-    list = g_slist_sort(list, hppa_cpu_list_compare);
++    list = object_class_get_list_sorted(TYPE_HPPA_CPU, false);
+     (*cpu_fprintf)(f, "Available CPUs:\n");
+     g_slist_foreach(list, hppa_cpu_list_entry, &s);
+     g_slist_free(list);
+diff --git a/target/lm32/cpu.c b/target/lm32/cpu.c
+index 96c2499d0b..0003152469 100644
+--- a/target/lm32/cpu.c
++++ b/target/lm32/cpu.c
+@@ -32,18 +32,6 @@ static void lm32_cpu_set_pc(CPUState *cs, vaddr value)
+     cpu->env.pc = value;
+ }
+ 
+-/* Sort alphabetically by type name. */
+-static gint lm32_cpu_list_compare(gconstpointer a, gconstpointer b)
+-{
+-    ObjectClass *class_a = (ObjectClass *)a;
+-    ObjectClass *class_b = (ObjectClass *)b;
+-    const char *name_a, *name_b;
+-
+-    name_a = object_class_get_name(class_a);
+-    name_b = object_class_get_name(class_b);
+-    return strcmp(name_a, name_b);
+-}
+-
+ static void lm32_cpu_list_entry(gpointer data, gpointer user_data)
+ {
+     ObjectClass *oc = data;
+@@ -65,8 +53,7 @@ void lm32_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+     };
+     GSList *list;
+ 
+-    list = object_class_get_list(TYPE_LM32_CPU, false);
+-    list = g_slist_sort(list, lm32_cpu_list_compare);
++    list = object_class_get_list_sorted(TYPE_LM32_CPU, false);
+     (*cpu_fprintf)(f, "Available CPUs:\n");
+     g_slist_foreach(list, lm32_cpu_list_entry, &s);
+     g_slist_free(list);
+diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
+index 6302cfda3a..541ffc2d97 100644
+--- a/target/sh4/cpu.c
++++ b/target/sh4/cpu.c
+@@ -85,18 +85,6 @@ typedef struct SuperHCPUListState {
+     FILE *file;
+ } SuperHCPUListState;
+ 
+-/* Sort alphabetically by type name. */
+-static gint superh_cpu_list_compare(gconstpointer a, gconstpointer b)
+-{
+-    ObjectClass *class_a = (ObjectClass *)a;
+-    ObjectClass *class_b = (ObjectClass *)b;
+-    const char *name_a, *name_b;
+-
+-    name_a = object_class_get_name(class_a);
+-    name_b = object_class_get_name(class_b);
+-    return strcmp(name_a, name_b);
+-}
+-
+ static void superh_cpu_list_entry(gpointer data, gpointer user_data)
+ {
+     SuperHCPUListState *s = user_data;
+@@ -114,8 +102,7 @@ void sh4_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+     };
+     GSList *list;
+ 
+-    list = object_class_get_list(TYPE_SUPERH_CPU, false);
+-    list = g_slist_sort(list, superh_cpu_list_compare);
++    list = object_class_get_list_sorted(TYPE_SUPERH_CPU, false);
+     g_slist_foreach(list, superh_cpu_list_entry, &s);
+     g_slist_free(list);
+ }
+diff --git a/target/tricore/helper.c b/target/tricore/helper.c
+index 45276d3782..dad7eea085 100644
+--- a/target/tricore/helper.c
++++ b/target/tricore/helper.c
+@@ -101,7 +101,7 @@ void tricore_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+     };
+     GSList *list;
+ 
+-    list = object_class_get_list(TYPE_TRICORE_CPU, false);
++    list = object_class_get_list_sorted(TYPE_TRICORE_CPU, false);
+     (*cpu_fprintf)(f, "Available CPUs:\n");
+     g_slist_foreach(list, tricore_cpu_list_entry, &s);
+     g_slist_free(list);
 -- 
 2.14.3
