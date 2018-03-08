@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56234)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eu4Cc-0006iR-P2
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:00 -0500
+	id 1eu4Cf-0006il-2l
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eu4CZ-0003oO-Km
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:39:58 -0500
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:33595)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eu4CZ-0003o2-Af
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:39:55 -0500
-Received: by mail-wr0-x22c.google.com with SMTP id v18so7255257wrv.0
-	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 14:39:55 -0800 (PST)
+	id 1eu4Cd-0003pv-IO
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:01 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu,  8 Mar 2018 23:39:21 +0100
-Message-Id: <20180308223946.26784-1-f4bug@amsat.org>
+Date: Thu,  8 Mar 2018 23:39:23 +0100
+Message-Id: <20180308223946.26784-3-f4bug@amsat.org>
+In-Reply-To: <20180308223946.26784-1-f4bug@amsat.org>
+References: <20180308223946.26784-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 00/25] remove i386/pc dependency: generic
- SuperIO
+Subject: [Qemu-devel] [PATCH 02/25] hw/dma/i8257: Rename DMA_init() to
+ i8257_dma_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,163 +27,235 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Yongbok Kim <yongbok.kim@mips.com>, Marcel Apfelbaum <marcel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alexey Kardashevskiy <aik@ozlabs.ru>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>
+To: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Marcel Apfelbaum <marcel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alexey Kardashevskiy <aik@ozlabs.ru>, Thomas Huth <thuth@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, "open list:PReP" <qemu-ppc@nongnu.org>
 
-Hi Paolo, Michael, Hervé and Yongbok.
+- Move the header from hw/isa/ to hw/dma/
+- Remove the old i386/pc dependency
+- use a bool type for the high_page_enable argument
 
-This series could be the 'part 2' of my previous "remove i386/pc dependency
-from non-PC world" I started around 2.9.
-
-The goal is to unify the Super I/O device pattern.
-
-In this rewrite I:
-- extract the common SuperIO code from pc87312.c
-- use it in few MIPS boards
-- as example, easily add a new SuperIO chipset (SMC37C669) to the DP264 machine.
-
-The SMC37C669 is very easily modeled and understandable in the "Add the SMC
-FDC37C669 Super I/O" patch. Once used by the DP264 machine, the machine direcly
-inherits of the parallel port and two floppy drives without any effort in the
-machine code (therefore, easier to qtest and maintain).
-The emphasis of the differences is show in the link [2].
-
-Since RFC v2:
-- fixed missing .class_size of abstract class in "Add a Super I/O template"
-- fixed ptrdiff_t Werror=format string (patchew)
-- fixed incorrect/missing MAINTAINERS entries
-- only use "discarded-" in device name when no backend provided
-- added R-b tags (David Gibson)
-
-tested on:
-- Q35
-- alpha DP264 [1], [2]
-- mips Malta
-- mips Fuloong (only monitor, no image to test) [3]
-- PReP (only monitor, no image to test)
-
-Paolo: I tested the series and think it is ready to go and shouldn't break
-upstream, but I'd like more testing for the Fuloong/PReP machines and
-eventually an Ack-by from Michael S. Tsirkin since his area is well touched
-by this series.
-
-diff between master and this series here replied to previous thread there:
-[1] http://lists.nongnu.org/archive/html/qemu-devel/2018-03/msg02510.html
-[2] http://lists.nongnu.org/archive/html/qemu-devel/2018-03/msg02516.html
-[3] http://lists.nongnu.org/archive/html/qemu-devel/2018-03/msg02515.html
-
-Since RFC v1:
-- complete rewrite, split out the PIIX devices for another series
-
-More devices are being converted but I'm running out of time for the soft
-freeze (mips_r4k, hppa_dino, and the PC ones).
-
-Regards,
-
-Phil.
-
-$ git backport-diff -u rfc_v2
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-
-001/25:[----] [--] 'hw/isa: Move parallel_hds_isa_init() to hw/char/parallel-isa.c'
-002/25:[----] [--] 'hw/dma/i8257: Rename DMA_init() to i8257_dma_init()'
-003/25:[----] [--] 'hw/input/i8042: Extract declarations from i386/pc.h into input/i8042.h'
-004/25:[down] 'MAINTAINERS: Fix the PC87312 include path'
-005/25:[----] [--] 'hw/isa/pc87312: Rename the device type as TYPE_PC87312_SUPERIO'
-006/25:[----] [--] 'hw/isa/pc87312: Use uint16_t for the ISA I/O base address'
-007/25:[----] [--] 'hw/isa/pc87312: Use 'unsigned int' for the irq value'
-008/25:[0003] [FC] 'hw/isa/superio: Add a Super I/O template based on the PC87312 device'
-009/25:[----] [--] 'hw/isa/pc87312: Inherit from the abstract TYPE_ISA_SUPERIO'
-010/25:[0006] [FC] 'hw/isa/superio: Factor out the parallel code from pc87312.c'
-011/25:[0006] [FC] 'hw/isa/superio: Factor out the serial code from pc87312.c'
-012/25:[----] [--] 'hw/isa/superio: Factor out the floppy disc controller code from pc87312.c'
-013/25:[----] [--] 'hw/isa/superio: Add a keyboard/mouse controller (8042)'
-014/25:[----] [--] 'hw/isa/superio: Factor out the IDE code from pc87312.c'
-015/25:[----] [--] 'hw/mips/malta: Code movement'
-016/25:[0001] [FC] 'hw/isa/superio: Factor out the FDC37M817 Super I/O from mips_malta.c'
-017/25:[----] [--] 'hw/mips/mips_fulong2e: Factor out vt82c686b_southbridge_init()'
-018/25:[----] [--] 'hw/isa/vt82c686: Rename vt82c686b_init() -> vt82c686b_isa_init()'
-019/25:[----] [--] 'hw/isa/vt82c686: Add the TYPE_VT82C686B_SUPERIO'
-020/25:[down] 'MAINTAINERS: Add entries for the VT82C686B Super I/O'
-021/25:[down] 'MAINTAINERS: Split the Alpha TCG/machine section'
-022/25:[0001] [FC] 'hw/isa/superio: Add the SMC FDC37C669 Super I/O'
-023/25:[----] [--] 'hw/alpha/dp264: Add the ISA DMA controller'
-024/25:[----] [--] 'hw/alpha/dp264: Use the TYPE_SMC37C669_SUPERIO'
-025/25:[----] [--] 'hw/i386/pc: Factor out the superio code'
-
-Philippe Mathieu-Daudé (25):
-  hw/isa: Move parallel_hds_isa_init() to hw/char/parallel-isa.c
-  hw/dma/i8257: Rename DMA_init() to i8257_dma_init()
-  hw/input/i8042: Extract declarations from i386/pc.h into input/i8042.h
-  MAINTAINERS: Fix the PC87312 include path
-  hw/isa/pc87312: Rename the device type as TYPE_PC87312_SUPERIO
-  hw/isa/pc87312: Use uint16_t for the ISA I/O base address
-  hw/isa/pc87312: Use 'unsigned int' for the irq value
-  hw/isa/superio: Add a Super I/O template based on the PC87312 device
-  hw/isa/pc87312: Inherit from the abstract TYPE_ISA_SUPERIO
-  hw/isa/superio: Factor out the parallel code from pc87312.c
-  hw/isa/superio: Factor out the serial code from pc87312.c
-  hw/isa/superio: Factor out the floppy disc controller code from pc87312.c
-  hw/isa/superio: Add a keyboard/mouse controller (8042)
-  hw/isa/superio: Factor out the IDE code from pc87312.c
-  hw/mips/malta: Code movement
-  hw/isa/superio: Factor out the FDC37M817 Super I/O from mips_malta.c
-  hw/mips/mips_fulong2e: Factor out vt82c686b_southbridge_init()
-  hw/isa/vt82c686: Rename vt82c686b_init() -> vt82c686b_isa_init()
-  hw/isa/vt82c686: Add the TYPE_VT82C686B_SUPERIO
-  MAINTAINERS: Add entries for the VT82C686B Super I/O
-  MAINTAINERS: Split the Alpha TCG/machine section
-  hw/isa/superio: Add the SMC FDC37C669 Super I/O
-  hw/alpha/dp264: Add the ISA DMA controller
-  hw/alpha/dp264: Use the TYPE_SMC37C669_SUPERIO
-  hw/i386/pc: Factor out the superio code
-
- default-configs/alpha-softmmu.mak |   5 +
- include/hw/char/parallel.h        |  14 +++
- include/hw/{isa => dma}/i8257.h   |   6 ++
- include/hw/i386/pc.h              |  17 ---
- include/hw/input/i8042.h          |  24 +++++
- include/hw/isa/isa.h              |   2 -
- include/hw/isa/pc87312.h          |  24 ++---
- include/hw/isa/superio.h          |  60 +++++++++++
- include/hw/isa/vt82c686.h         |   4 +-
- hw/alpha/dp264.c                  |  13 ++-
- hw/char/parallel-isa.c            |  36 +++++++
- hw/char/parallel.c                |   2 +-
- hw/dma/i82374.c                   |   3 +-
- hw/dma/i8257.c                    |   4 +-
- hw/i386/pc.c                      |  77 ++++++++------
- hw/i386/vmmouse.c                 |   1 +
- hw/i386/vmport.c                  |   1 +
- hw/input/pckbd.c                  |   2 +-
- hw/isa/isa-bus.c                  |  26 -----
- hw/isa/isa-superio.c              | 214 ++++++++++++++++++++++++++++++++++++++
- hw/isa/pc87312.c                  | 178 ++++++++++++++-----------------
- hw/isa/smc37c669-superio.c        | 115 ++++++++++++++++++++
- hw/isa/vt82c686.c                 |  22 +++-
- hw/mips/mips_fulong2e.c           |  85 +++++++--------
- hw/mips/mips_jazz.c               |   5 +-
- hw/mips/mips_malta.c              |  48 ++++-----
- hw/mips/mips_r4k.c                |   3 +-
- hw/ppc/prep.c                     |   6 +-
- hw/sparc/sun4m.c                  |   4 -
- hw/sparc64/sun4u.c                |   6 +-
- hw/unicore32/puv3.c               |   1 +
- MAINTAINERS                       |  20 +++-
- hw/char/Makefile.objs             |   1 +
- hw/isa/Makefile.objs              |   1 +
- hw/isa/trace-events               |  10 +-
- 35 files changed, 737 insertions(+), 303 deletions(-)
- create mode 100644 include/hw/char/parallel.h
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ include/hw/{isa => dma}/i8257.h | 6 ++++++
+ include/hw/isa/isa.h            | 2 --
+ hw/dma/i82374.c                 | 3 ++-
+ hw/dma/i8257.c                  | 4 ++--
+ hw/i386/pc.c                    | 3 ++-
+ hw/mips/mips_fulong2e.c         | 3 ++-
+ hw/mips/mips_jazz.c             | 3 ++-
+ hw/mips/mips_malta.c            | 3 ++-
+ hw/sparc/sun4m.c                | 4 ----
+ hw/sparc64/sun4u.c              | 4 ----
+ MAINTAINERS                     | 2 +-
+ 11 files changed, 19 insertions(+), 18 deletions(-)
  rename include/hw/{isa => dma}/i8257.h (86%)
- create mode 100644 include/hw/input/i8042.h
- create mode 100644 include/hw/isa/superio.h
- create mode 100644 hw/char/parallel-isa.c
- create mode 100644 hw/isa/isa-superio.c
- create mode 100644 hw/isa/smc37c669-superio.c
 
+diff --git a/include/hw/isa/i8257.h b/include/hw/dma/i8257.h
+similarity index 86%
+rename from include/hw/isa/i8257.h
+rename to include/hw/dma/i8257.h
+index 88a2766a3f..2cab50bb6c 100644
+--- a/include/hw/isa/i8257.h
++++ b/include/hw/dma/i8257.h
+@@ -1,6 +1,10 @@
+ #ifndef HW_I8257_H
+ #define HW_I8257_H
+ 
++#include "hw/hw.h"
++#include "hw/isa/isa.h"
++#include "exec/ioport.h"
++
+ #define TYPE_I8257 "i8257"
+ 
+ typedef struct I8257Regs {
+@@ -40,4 +44,6 @@ typedef struct I8257State {
+     PortioList portio_pageh;
+ } I8257State;
+ 
++void i8257_dma_init(ISABus *bus, bool high_page_enable);
++
+ #endif
+diff --git a/include/hw/isa/isa.h b/include/hw/isa/isa.h
+index 95593408ef..b9dbab24b4 100644
+--- a/include/hw/isa/isa.h
++++ b/include/hw/isa/isa.h
+@@ -151,6 +151,4 @@ static inline ISABus *isa_bus_from_device(ISADevice *d)
+     return ISA_BUS(qdev_get_parent_bus(DEVICE(d)));
+ }
+ 
+-/* i8257.c */
+-void DMA_init(ISABus *bus, int high_page_enable);
+ #endif
+diff --git a/hw/dma/i82374.c b/hw/dma/i82374.c
+index 6c0f975df0..83c87d92e0 100644
+--- a/hw/dma/i82374.c
++++ b/hw/dma/i82374.c
+@@ -24,6 +24,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "hw/isa/isa.h"
++#include "hw/dma/i8257.h"
+ 
+ #define TYPE_I82374 "i82374"
+ #define I82374(obj) OBJECT_CHECK(I82374State, (obj), TYPE_I82374)
+@@ -123,7 +124,7 @@ static void i82374_realize(DeviceState *dev, Error **errp)
+     portio_list_add(&s->port_list, isa_address_space_io(&s->parent_obj),
+                     s->iobase);
+ 
+-    DMA_init(isa_bus_from_device(ISA_DEVICE(dev)), 1);
++    i8257_dma_init(isa_bus_from_device(ISA_DEVICE(dev)), true);
+     memset(s->commands, 0, sizeof(s->commands));
+ }
+ 
+diff --git a/hw/dma/i8257.c b/hw/dma/i8257.c
+index bd23e893bf..52675e97c9 100644
+--- a/hw/dma/i8257.c
++++ b/hw/dma/i8257.c
+@@ -24,7 +24,7 @@
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+ #include "hw/isa/isa.h"
+-#include "hw/isa/i8257.h"
++#include "hw/dma/i8257.h"
+ #include "qemu/main-loop.h"
+ #include "trace.h"
+ 
+@@ -622,7 +622,7 @@ static void i8257_register_types(void)
+ 
+ type_init(i8257_register_types)
+ 
+-void DMA_init(ISABus *bus, int high_page_enable)
++void i8257_dma_init(ISABus *bus, bool high_page_enable)
+ {
+     ISADevice *isa1, *isa2;
+     DeviceState *d;
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 81364932d3..ec75b09a8f 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -41,6 +41,7 @@
+ #include "elf.h"
+ #include "multiboot.h"
+ #include "hw/timer/mc146818rtc.h"
++#include "hw/dma/i8257.h"
+ #include "hw/timer/i8254.h"
+ #include "hw/audio/pcspk.h"
+ #include "hw/pci/msi.h"
+@@ -1609,7 +1610,7 @@ void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
+     port92_init(port92, a20_line[1]);
+     g_free(a20_line);
+ 
+-    DMA_init(isa_bus, 0);
++    i8257_dma_init(isa_bus, 0);
+ 
+     for(i = 0; i < MAX_FD; i++) {
+         fd[i] = drive_get(IF_FLOPPY, 0, i);
+diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+index dc77b55755..0545fcd899 100644
+--- a/hw/mips/mips_fulong2e.c
++++ b/hw/mips/mips_fulong2e.c
+@@ -22,6 +22,7 @@
+ #include "qapi/error.h"
+ #include "hw/hw.h"
+ #include "hw/i386/pc.h"
++#include "hw/dma/i8257.h"
+ #include "hw/char/serial.h"
+ #include "hw/char/parallel.h"
+ #include "hw/block/fdc.h"
+@@ -360,7 +361,7 @@ static void mips_fulong2e_init(MachineState *machine)
+ 
+     /* init other devices */
+     pit = i8254_pit_init(isa_bus, 0x40, 0, NULL);
+-    DMA_init(isa_bus, 0);
++    i8257_dma_init(isa_bus, 0);
+ 
+     /* Super I/O */
+     isa_create_simple(isa_bus, "i8042");
+diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
+index b24305b7b4..827ffdcd4a 100644
+--- a/hw/mips/mips_jazz.c
++++ b/hw/mips/mips_jazz.c
+@@ -27,6 +27,7 @@
+ #include "hw/mips/mips.h"
+ #include "hw/mips/cpudevs.h"
+ #include "hw/i386/pc.h"
++#include "hw/dma/i8257.h"
+ #include "hw/char/serial.h"
+ #include "hw/char/parallel.h"
+ #include "hw/isa/isa.h"
+@@ -220,7 +221,7 @@ static void mips_jazz_init(MachineState *machine,
+     /* ISA devices */
+     i8259 = i8259_init(isa_bus, env->irq[4]);
+     isa_bus_irqs(isa_bus, i8259);
+-    DMA_init(isa_bus, 0);
++    i8257_dma_init(isa_bus, 0);
+     pit = i8254_pit_init(isa_bus, 0x40, 0, NULL);
+     pcspk_init(isa_bus, pit);
+ 
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index c74882c7e9..9cb86c432e 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -27,6 +27,7 @@
+ #include "cpu.h"
+ #include "hw/hw.h"
+ #include "hw/i386/pc.h"
++#include "hw/dma/i8257.h"
+ #include "hw/char/serial.h"
+ #include "hw/char/parallel.h"
+ #include "hw/block/fdc.h"
+@@ -1209,7 +1210,7 @@ void mips_malta_init(MachineState *machine)
+     smbus_eeprom_init(smbus, 8, smbus_eeprom_buf, smbus_eeprom_size);
+     g_free(smbus_eeprom_buf);
+     pit = i8254_pit_init(isa_bus, 0x40, 0, NULL);
+-    DMA_init(isa_bus, 0);
++    i8257_dma_init(isa_bus, 0);
+ 
+     /* Super I/O */
+     isa_create_simple(isa_bus, "i8042");
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index 0f5804b3b4..fa1bfd6c92 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -99,10 +99,6 @@ struct sun4m_hwdef {
+     uint8_t nvram_machine_id;
+ };
+ 
+-void DMA_init(ISABus *bus, int high_page_enable)
+-{
+-}
+-
+ static void fw_cfg_boot_set(void *opaque, const char *boot_device,
+                             Error **errp)
+ {
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index ceb1ba7eaf..0ca0243821 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -90,10 +90,6 @@ typedef struct EbusState {
+ #define TYPE_EBUS "ebus"
+ #define EBUS(obj) OBJECT_CHECK(EbusState, (obj), TYPE_EBUS)
+ 
+-void DMA_init(ISABus *bus, int high_page_enable)
+-{
+-}
+-
+ static void fw_cfg_boot_set(void *opaque, const char *boot_device,
+                             Error **errp)
+ {
+diff --git a/MAINTAINERS b/MAINTAINERS
+index c0f1620f3a..335c6c9f65 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -929,8 +929,8 @@ F: hw/timer/mc146818rtc*
+ F: hw/watchdog/wdt_ib700.c
+ F: include/hw/display/vga.h
+ F: include/hw/char/parallel.h
++F: include/hw/dma/i8257.h
+ F: include/hw/i2c/pm_smbus.h
+-F: include/hw/isa/i8257.h
+ F: include/hw/timer/hpet.h
+ F: include/hw/timer/i8254*
+ F: include/hw/timer/mc146818rtc*
 -- 
 2.16.2
