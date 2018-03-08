@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1etlVk-0003gN-Hd
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 21:42:29 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1etlaG-0005GE-Nc
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 21:47:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1etlVh-0005Vq-Ei
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 21:42:28 -0500
-Date: Thu, 8 Mar 2018 10:42:20 +0800
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-ID: <20180308024220.fhclowspyzuyca3n@hz-desktop>
-References: <20180308023337.21062-1-haozhong.zhang@intel.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1etlaF-0007pM-HD
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 21:47:08 -0500
+Date: Thu, 8 Mar 2018 13:04:25 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180308020425.GM3083@umbus.fritz.box>
+References: <1520413694-1271-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="2YJj5f1P6Th4nBRw"
 Content-Disposition: inline
-In-Reply-To: <20180308023337.21062-1-haozhong.zhang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v4 0/5] hw/acpi-build: build SRAT memory
- affinity structures for DIMM devices
+In-Reply-To: <1520413694-1271-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/ppc/prep: Fix implicit creation of
+ "-drive if=scsi" devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,94 +24,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, dgilbert@redhat.com, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-On 03/08/18 10:33 +0800, Haozhong Zhang wrote:
-> (Patch 5 is only for reviewers to run test cases in patch 4)
-> 
-> ACPI 6.2A Table 5-129 "SPA Range Structure" requires the proximity
-> domain of a NVDIMM SPA range must match with corresponding entry in
-> SRAT table.
-> 
-> The address ranges of vNVDIMM in QEMU are allocated from the
-> hot-pluggable address space, which is entirely covered by one SRAT
-> memory affinity structure. However, users can set the vNVDIMM
-> proximity domain in NFIT SPA range structure by the 'node' property of
-> '-device nvdimm' to a value different than the one in the above SRAT
-> memory affinity structure.
-> 
-> In order to solve such proximity domain mismatch, this patch builds
-> one SRAT memory affinity structure for each DIMM device present at
-> boot time, including both PC-DIMM and NVDIMM, with the proximity
-> domain specified in '-device pc-dimm' or '-device nvdimm'.
-> 
-> The remaining hot-pluggable address space is covered by one or multiple
-> SRAT memory affinity structures with the proximity domain of the last
-> node as before.
-> 
-> Changes in v4:
->  * (Patch 1) Update the commit message and add R-b from Igor Mammedov.
->  * (Patch 2) Rebase on misc.json and update the commit message.
->  * (Patch 3) Directly use di-addr and di-node.
->  * (Patch 4) Drop the previous v3 patch 3 and add '-machine nvdimm=on'
-                                 ^^^^^^^^^^ should be 'v3 patch 4'
-				 
->    to parameters of test_acpi_one().
->  * (Patch 4) Put PC-DIMM and NVDIMM to different numa nodes.
->  * (Patch 4&5) Move binary blobs of ACPI tables to DO-NOT-APPLY patch 5.
-> 
-> Changes in v3:
->  * (Patch 1&2) Use qmp_pc_dimm_device_list to get information of DIMM
->    devices and move it to separate patches.
->  * (Patch 3) Replace while loop by a more readable for loop.
->  * (Patch 3) Refactor the flag setting code.
->  * (Patch 3) s/'static-plugged'/'present at boot time' in commit message.
-> 
-> Changes in v2:
->  * Build SRAT memory affinity structures of PC-DIMM devices as well.
->  * Add test cases.
-> 
-> 
-> Haozhong Zhang (5):
->   pc-dimm: make qmp_pc_dimm_device_list() sort devices by address
->   qmp: distinguish PC-DIMM and NVDIMM in MemoryDeviceInfoList
->   hw/acpi-build: build SRAT memory affinity structures for DIMM devices
->   tests/bios-tables-test: add test cases for DIMM proximity
->   [DO NOT APPLY] test/acpi-test-data: add ACPI tables for dimmpxm test
-> 
->  hmp.c                                 |  14 +++--
->  hw/i386/acpi-build.c                  |  57 ++++++++++++++++++--
->  hw/mem/pc-dimm.c                      |  99 ++++++++++++++++++++--------------
->  hw/ppc/spapr.c                        |   3 +-
->  include/hw/mem/pc-dimm.h              |   2 +-
->  numa.c                                |  23 ++++----
->  qapi/misc.json                        |  18 ++++++-
->  qmp.c                                 |   7 +--
->  stubs/qmp_pc_dimm.c                   |   4 +-
->  tests/acpi-test-data/pc/APIC.dimmpxm  | Bin 0 -> 144 bytes
->  tests/acpi-test-data/pc/DSDT.dimmpxm  | Bin 0 -> 6803 bytes
->  tests/acpi-test-data/pc/NFIT.dimmpxm  | Bin 0 -> 224 bytes
->  tests/acpi-test-data/pc/SRAT.dimmpxm  | Bin 0 -> 472 bytes
->  tests/acpi-test-data/pc/SSDT.dimmpxm  | Bin 0 -> 685 bytes
->  tests/acpi-test-data/q35/APIC.dimmpxm | Bin 0 -> 144 bytes
->  tests/acpi-test-data/q35/DSDT.dimmpxm | Bin 0 -> 9487 bytes
->  tests/acpi-test-data/q35/NFIT.dimmpxm | Bin 0 -> 224 bytes
->  tests/acpi-test-data/q35/SRAT.dimmpxm | Bin 0 -> 472 bytes
->  tests/acpi-test-data/q35/SSDT.dimmpxm | Bin 0 -> 685 bytes
->  tests/bios-tables-test.c              |  38 +++++++++++++
->  20 files changed, 198 insertions(+), 67 deletions(-)
->  create mode 100644 tests/acpi-test-data/pc/APIC.dimmpxm
->  create mode 100644 tests/acpi-test-data/pc/DSDT.dimmpxm
->  create mode 100644 tests/acpi-test-data/pc/NFIT.dimmpxm
->  create mode 100644 tests/acpi-test-data/pc/SRAT.dimmpxm
->  create mode 100644 tests/acpi-test-data/pc/SSDT.dimmpxm
->  create mode 100644 tests/acpi-test-data/q35/APIC.dimmpxm
->  create mode 100644 tests/acpi-test-data/q35/DSDT.dimmpxm
->  create mode 100644 tests/acpi-test-data/q35/NFIT.dimmpxm
->  create mode 100644 tests/acpi-test-data/q35/SRAT.dimmpxm
->  create mode 100644 tests/acpi-test-data/q35/SSDT.dimmpxm
-> 
-> -- 
-> 2.14.1
-> 
+
+--2YJj5f1P6Th4nBRw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Mar 07, 2018 at 10:08:14AM +0100, Thomas Huth wrote:
+> The global hack for creating SCSI devices has recently been removed,
+> but this apparently broke SCSI devices on some boards that were not
+> ready for this change yet. For the 40p machine you now get:
+>=20
+> $ ppc64-softmmu/qemu-system-ppc64 -M 40p -cdrom x.iso
+> qemu-system-ppc64: -cdrom x.iso: machine type does not support if=3Dscsi,=
+bus=3D0,unit=3D2
+>=20
+> Fix it by providing a lsi53c810_create() function that takes care
+> of calling scsi_bus_legacy_handle_cmdline() after creating the
+> corresponding SCSI controller.
+>=20
+> Fixes: 1454509726719e0933c800fad00d6999752688ea
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+Applied, thanks.
+
+> ---
+>  hw/ppc/prep.c        | 2 +-
+>  hw/scsi/lsi53c895a.c | 7 +++++++
+>  include/hw/pci/pci.h | 1 +
+>  3 files changed, 9 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+> index 096d4d4..3361509 100644
+> --- a/hw/ppc/prep.c
+> +++ b/hw/ppc/prep.c
+> @@ -788,7 +788,7 @@ static void ibm_40p_init(MachineState *machine)
+>          qdev_prop_set_uint32(dev, "equipment", 0xc0);
+>          qdev_init_nofail(dev);
+> =20
+> -        pci_create_simple(pci_bus, PCI_DEVFN(1, 0), "lsi53c810");
+> +        lsi53c810_create(pci_bus, PCI_DEVFN(1, 0));
+> =20
+>          /* XXX: s3-trio at PCI_DEVFN(2, 0) */
+>          pci_vga_init(pci_bus);
+> diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+> index f3d4c4d..160657f 100644
+> --- a/hw/scsi/lsi53c895a.c
+> +++ b/hw/scsi/lsi53c895a.c
+> @@ -2279,3 +2279,10 @@ void lsi53c895a_create(PCIBus *bus)
+> =20
+>      scsi_bus_legacy_handle_cmdline(&s->bus);
+>  }
+> +
+> +void lsi53c810_create(PCIBus *bus, int devfn)
+> +{
+> +    LSIState *s =3D LSI53C895A(pci_create_simple(bus, devfn, "lsi53c810"=
+));
+> +
+> +    scsi_bus_legacy_handle_cmdline(&s->bus);
+> +}
+> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> index d8c18c7..e255941 100644
+> --- a/include/hw/pci/pci.h
+> +++ b/include/hw/pci/pci.h
+> @@ -708,6 +708,7 @@ PCIDevice *pci_create(PCIBus *bus, int devfn, const c=
+har *name);
+>  PCIDevice *pci_create_simple(PCIBus *bus, int devfn, const char *name);
+> =20
+>  void lsi53c895a_create(PCIBus *bus);
+> +void lsi53c810_create(PCIBus *bus, int devfn);
+> =20
+>  qemu_irq pci_allocate_irq(PCIDevice *pci_dev);
+>  void pci_set_irq(PCIDevice *pci_dev, int level);
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--2YJj5f1P6Th4nBRw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqgmikACgkQbDjKyiDZ
+s5KZHRAA2rLRODR/pSybSk91Wbw+RmL3sU3WkJn1zh2HQ0n1avn7p3fW4HtGFgYl
+9ZBvWMGzTM2nbXxDrQVG+cihTQfniY99NeDZkBs3mPgzEt9KZOirmmv6j6DiAYMx
+awjgolJUGZJW5KpzeqDTpIlGBYqLf7eDZECHmDSHjvves0326BHRrq0TTLYlwjHF
+7gcmd0SZZEfHxuD9C21YHJIMd6HounivD9rlMfIIon1E09iV5jyghYfdqzd7usCN
+PeuZp+kj2jnyTu46Fs3ukXAHsuRw7YupEGKs2javSFaEEgR73sV7J6vYrFfQvBWi
+RhyqiYVY7s45hgbk1I/yvkd7aH2thxh8qbqFyIOsAH3z8yFEdPH20bRcGaTESRD7
+X2VJ5Bng+f+3MVRAdd9xf13/QjGzyDiFNF87aNlHw0kPFuRWTolg0JHP8AIIZ7uS
+LknknCVlvZlWLst1s6ZnOPXqDsagysZa4S0Z/O4UYo5raFNRIMTwk48vnsSUbb8A
+aXd7tftKeluZzz30tLPU/YZr67PpNKLjmjvdwCYAMEmJ+AgodmbR4+xeTC8C7iwl
+kIV66gJjFceMxOW8fHSZvLsILyNq3cLTkvVpL3eW02RBqsIsqMl21k5WadDlnbl/
+SVutwDCGY0gYKx2fyp6EvnQkqAdOufo0qLd7gJ/mVKLphgDWSfs=
+=hFZ6
+-----END PGP SIGNATURE-----
+
+--2YJj5f1P6Th4nBRw--
