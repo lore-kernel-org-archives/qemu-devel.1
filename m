@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58712)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1etuzE-0004pn-6Q
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:49:33 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1etuzI-0004tU-18
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:49:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1etuzD-0003eD-3Y
+	(envelope-from <brijesh.singh@amd.com>) id 1etuzE-0003fh-Gj
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:49:36 -0500
+Received: from mail-co1nam03on0068.outbound.protection.outlook.com
+	([104.47.40.68]:10675
+	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1etuzE-0003cj-6W
 	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:49:32 -0500
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1520507908-16743-5-git-send-email-pl@kamp.de> (Peter Lieven's
-	message of "Thu, 8 Mar 2018 12:18:27 +0100")
-References: <1520507908-16743-1-git-send-email-pl@kamp.de>
-	<1520507908-16743-5-git-send-email-pl@kamp.de>
-Reply-To: quintela@redhat.com
-Date: Thu, 08 Mar 2018 13:50:00 +0100
-Message-ID: <87po4ed953.fsf@secure.laptop>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Date: Thu,  8 Mar 2018 06:48:35 -0600
+Message-Id: <20180308124901.83533-3-brijesh.singh@amd.com>
+In-Reply-To: <20180308124901.83533-1-brijesh.singh@amd.com>
+References: <20180308124901.83533-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 4/5] migration/block: limit the number of
- parallel I/O requests
+Subject: [Qemu-devel] [PATCH v12 02/28] exec: add ram_debug_ops support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,113 +28,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, dgilbert@redhat.com, famz@redhat.com, stefanha@redhat.com, jjherne@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
 
-Peter Lieven <pl@kamp.de> wrote:
-> the current implementation submits up to 512 I/O requests in parallel
-> which is much to high especially for a background task.
-> This patch adds a maximum limit of 16 I/O requests that can
-> be submitted in parallel to avoid monopolizing the I/O device.
->
-> Signed-off-by: Peter Lieven <pl@kamp.de>
+Currently, the guest memory access for the debug purpose is performed
+using the memcpy(). Lets extend the 'struct MemoryRegion' to include
+ram_debug_ops callbacks. The ram_debug_ops can be used to override
+memcpy() with something else.
 
-This code is already a mess (TM).  It is difficult to understand what we
-are doing, so not easy to see if your changes are better/worse than what
-we have.
+The feature can be used by encrypted guest -- which can register
+callbacks to override memcpy() with memory encryption/decryption APIs.
 
-I am not sure that your solution help to improve things here.  Let's see
-what I understand.
+a typical usage:
 
-We have three fields (without a single comment):
+mem_read(uint8_t *dst, uint8_t *src, uint32_t len, MemTxAttrs *attrs);
+mem_write(uint8_t *dst, uint8_t *src, uint32_t len, MemTxAttrs *attrs);
 
-- submitted: this is the number of blocks that we have asked the block
-             device to read asynchronously to main memory, and that
-             haven't yet read.  I.e. "blocks_read_pending" would be a
-             better name?
+MemoryRegionRAMReadWriteOps ops;
+ops.read = mem_read;
+ops.write = mem_write;
 
-- read_done: this is the number of blocks that we have finished read
-             asynchronously from this block device.  When we finish, we
-             do a submitted -- and a read_done++.  blocks_read_finished
-             name?
+memory_region_init_ram(mem, NULL, "memory", size, NULL);
+memory_region_set_ram_debug_ops(mem, ops);
 
-- transferred: This is the number of blocks that we have transferred
-               since the beginning of migration.  At this point, we do a
-               read_done-- and a transferred++
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+---
+ exec.c                | 43 ++++++++++++++++++++++++++++++++-----------
+ include/exec/memory.h | 30 +++++++++++++++++++++++++++++-
+ 2 files changed, 61 insertions(+), 12 deletions(-)
 
-Note also that we do malloc()/free() for each block
-
-So, now that we have defined what our fields mean, we need to know what
-is our test.  block_save_pending():
-
-    get_remaining_dirty() + (submitted + read_done) * BLOCK_SIZE
-
-Looks good.
-
-But let's us see what test we do in block_save_iterate() (Yes, I have
-been very liberal with reformatting and removal of struct names):
-
-(submitted + read_done) * BLOCK_SIZE <  qemu_file_get_rate_limit(f) &&
-(submitted + read_done) < MAX_INFLIGHT_IO
-
-The idea of that test is to make sure that we _don't send_ through the
-QEMUFile more than qemu_file_get_rate_limit(f).  But there are several
-things here:
-- we have already issued a flush_blks() call before we enter the loop
-  And it is inside possibility that we have already sent too much data at
-  this point, but we enter the while loop anyways.
-
-  Notice that flush_blks() does the right thing and test in each loop if
-  qemu_file_rate_limit() has been reached and stops sending more data if
-  it returns true;
-
-- At this point, we *could* have sent all that can be sent for this
-  round, but we enter the loop anyways.  And we test two things:
-     - that we haven't read from block devices more than
-       qemu_file_get_rate_limit() bytes (notice that this is the maximum
-       that we could put through the migration channel, not really
-       related  with what we read from block devices).
-
-     - that we haven't read in this round more than MAX_INFLIGHT_IO
-       blocks.  That is 512 blocks, at BLOCK_SIZE bytes is 512MB. Why?
-       Who knows.
-
-- Now we exit the while loop, and we have pending blocks to send, the
-    minimum between:
-       - qemu_file_get_rate_limit()/BLOCK_SIZE, and
-       - MAX_INFLIGHT_IO
-
-But not all of them are ready to send, only "read_done" blocks are
-ready, the "submitted" ones are still waiting for read completion.
-
-And we call back flush_blks() that will try to send all the "read_done"
-blocks through the migration channel until we hit
-qemu_file_rate_limit().
-
-So, looking at the problem from far away:
-
-- how many read requests are we have to have in flight at any moment, is
-  that 16 from this series the right number? Notice that each request
-  are 1MB, so this is 16MB (I have no clue what is the right value).
-
-- how many blocks should we get on each round.  Notice that the reason
-  for the 1st patch on this series is because the block layer is not
-  sending enough blocks to prevent ram migration to start.  If there are
-  enough dirty memory sent from the block layer, we shouldn't ever enter
-  the ram stage.
-  Notice how we register them in vl.c:
-
-    blk_mig_init();
-    ram_mig_init();
-
-So, after so long mail, do I have some suggestion?
-
-- should we make the MAX_PARALLEL_IO autotunig?  i.e. if we are not
-  being able to get qemu_file_get_rate_limit()/BLOCK_SIZE read_blocks by
-  iteration, we should increase MAX_PARALLEL_IO limit?
-
-- should we "take" into account how many blocks have transferred the 1st
-  call to flush_blks() and only wait for "read_blocks" until
-  flush_blks() instead of for the whole set?
-
-Later, Juan.
+diff --git a/exec.c b/exec.c
+index 604f03c535bc..f69371d30e14 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3056,7 +3056,11 @@ static MemTxResult flatview_write_continue(FlatView *fv, hwaddr addr,
+         } else {
+             /* RAM case */
+             ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l, false);
+-            memcpy(ptr, buf, l);
++            if (attrs.debug && mr->ram_debug_ops) {
++                mr->ram_debug_ops->write(ptr, buf, l, attrs);
++            } else {
++                memcpy(ptr, buf, l);
++            }
+             invalidate_and_set_dirty(mr, addr1, l);
+         }
+ 
+@@ -3144,7 +3148,11 @@ MemTxResult flatview_read_continue(FlatView *fv, hwaddr addr,
+         } else {
+             /* RAM case */
+             ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l, false);
+-            memcpy(buf, ptr, l);
++            if (attrs.debug && mr->ram_debug_ops) {
++                mr->ram_debug_ops->read(buf, ptr, l, attrs);
++            } else {
++                memcpy(buf, ptr, l);
++            }
+         }
+ 
+         if (release_lock) {
+@@ -3237,7 +3245,8 @@ enum write_rom_type {
+ };
+ 
+ static inline void cpu_physical_memory_write_rom_internal(AddressSpace *as,
+-    hwaddr addr, const uint8_t *buf, int len, enum write_rom_type type)
++    hwaddr addr, const uint8_t *buf, int len, MemTxAttrs attrs,
++    enum write_rom_type type)
+ {
+     hwaddr l;
+     uint8_t *ptr;
+@@ -3257,7 +3266,11 @@ static inline void cpu_physical_memory_write_rom_internal(AddressSpace *as,
+             ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
+             switch (type) {
+             case WRITE_DATA:
+-                memcpy(ptr, buf, l);
++                if (mr->ram_debug_ops) {
++                    mr->ram_debug_ops->write(ptr, buf, l, attrs);
++                } else {
++                    memcpy(ptr, buf, l);
++                }
+                 invalidate_and_set_dirty(mr, addr1, l);
+                 break;
+             case FLUSH_CACHE:
+@@ -3276,7 +3289,9 @@ static inline void cpu_physical_memory_write_rom_internal(AddressSpace *as,
+ void cpu_physical_memory_write_rom(AddressSpace *as, hwaddr addr,
+                                    const uint8_t *buf, int len)
+ {
+-    cpu_physical_memory_write_rom_internal(as, addr, buf, len, WRITE_DATA);
++    cpu_physical_memory_write_rom_internal(as, addr, buf, len,
++                                           MEMTXATTRS_UNSPECIFIED,
++                                           WRITE_DATA);
+ }
+ 
+ void cpu_flush_icache_range(hwaddr start, int len)
+@@ -3291,8 +3306,9 @@ void cpu_flush_icache_range(hwaddr start, int len)
+         return;
+     }
+ 
+-    cpu_physical_memory_write_rom_internal(&address_space_memory,
+-                                           start, NULL, len, FLUSH_CACHE);
++    cpu_physical_memory_write_rom_internal(&address_space_memory, start, NULL,
++                                           len, MEMTXATTRS_UNSPECIFIED,
++                                           FLUSH_CACHE);
+ }
+ 
+ typedef struct {
+@@ -3612,6 +3628,10 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
+         page = addr & TARGET_PAGE_MASK;
+         phys_addr = cpu_get_phys_page_attrs_debug(cpu, page, &attrs);
+         asidx = cpu_asidx_from_attrs(cpu, attrs);
++
++        /* set debug attrs to indicate memory access is from the debugger */
++        attrs.debug = 1;
++
+         /* if no physical page mapped, return an error */
+         if (phys_addr == -1)
+             return -1;
+@@ -3620,13 +3640,14 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
+             l = len;
+         phys_addr += (addr & ~TARGET_PAGE_MASK);
+         if (is_write) {
+-            cpu_physical_memory_write_rom(cpu->cpu_ases[asidx].as,
+-                                          phys_addr, buf, l);
++            cpu_physical_memory_write_rom_internal(cpu->cpu_ases[asidx].as,
++                                                   phys_addr, buf, l, attrs,
++                                                   WRITE_DATA);
+         } else {
+             address_space_rw(cpu->cpu_ases[asidx].as, phys_addr,
+-                             MEMTXATTRS_UNSPECIFIED,
+-                             buf, l, 0);
++                             attrs, buf, l, 0);
+         }
++
+         len -= l;
+         buf += l;
+         addr += l;
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 31eae0a64062..875d39a125c6 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -223,6 +223,18 @@ typedef struct IOMMUMemoryRegionClass {
+ typedef struct CoalescedMemoryRange CoalescedMemoryRange;
+ typedef struct MemoryRegionIoeventfd MemoryRegionIoeventfd;
+ 
++/* Memory Region RAM debug callback */
++typedef struct MemoryRegionRAMReadWriteOps MemoryRegionRAMReadWriteOps;
++
++struct MemoryRegionRAMReadWriteOps {
++    /* Write data into guest memory */
++    int (*write) (uint8_t *dest, const uint8_t *src,
++                  uint32_t len, MemTxAttrs attrs);
++    /* Read data from guest memory */
++    int (*read) (uint8_t *dest, const uint8_t *src,
++                 uint32_t len, MemTxAttrs attrs);
++};
++
+ struct MemoryRegion {
+     Object parent_obj;
+ 
+@@ -262,6 +274,7 @@ struct MemoryRegion {
+     const char *name;
+     unsigned ioeventfd_nb;
+     MemoryRegionIoeventfd *ioeventfds;
++    const MemoryRegionRAMReadWriteOps *ram_debug_ops;
+ };
+ 
+ struct IOMMUMemoryRegion {
+@@ -675,6 +688,21 @@ void memory_region_init_rom_device_nomigrate(MemoryRegion *mr,
+                                              uint64_t size,
+                                              Error **errp);
+ 
++/**
++ * memory_region_set_ram_debug_ops: Set debug access ops for a given memory
++ * region.
++ *
++ * @mr: the #MemoryRegion to be initialized
++ * @ops: a function that will be used for when accessing @target region during
++ *       debug
++ */
++static inline void
++memory_region_set_ram_debug_ops(MemoryRegion *mr,
++                                const MemoryRegionRAMReadWriteOps *ops)
++{
++    mr->ram_debug_ops = ops;
++}
++
+ /**
+  * memory_region_init_reservation: Initialize a memory region that reserves
+  *                                 I/O space.
+@@ -1959,7 +1987,7 @@ MemTxResult address_space_read(AddressSpace *as, hwaddr addr,
+     MemoryRegion *mr;
+     FlatView *fv;
+ 
+-    if (__builtin_constant_p(len)) {
++    if (__builtin_constant_p(len) && !attrs.debug) {
+         if (len) {
+             rcu_read_lock();
+             fv = address_space_to_flatview(as);
+-- 
+2.14.3
