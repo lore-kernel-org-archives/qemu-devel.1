@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1etvHL-0004lY-MS
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:08:16 -0500
+	(envelope-from <bounces@canonical.com>) id 1ettDE-0003T8-1V
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:55:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1etvHC-0006rs-8W
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:08:15 -0500
-Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:37607)
+	(envelope-from <bounces@canonical.com>) id 1ettDB-0005oZ-06
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:55:52 -0500
+Received: from indium.canonical.com ([91.189.90.7]:42704)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1etvHC-0006rW-35
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:08:06 -0500
-Received: by mail-ot0-x22a.google.com with SMTP id t2so5315410otj.4
-	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 05:08:06 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ettDA-0005mn-PV
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:55:48 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ettD8-0004VW-Q7
+	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 10:55:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6D4212E80D6
+	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 10:55:46 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180223163354.GC7151@stefanha-x1.localdomain>
-References: <20180213140029.8308-1-peter.maydell@linaro.org>
-	<20180223163354.GC7151@stefanha-x1.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 8 Mar 2018 13:07:45 +0000
-Message-ID: <CAFEAcA-zpqnONjDXFXG4TBtrXDZXSJZ1wAth95X_kzk04sPcjg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] log-for-trace.h: Split out parts of log.h
- used by trace.h
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 08 Mar 2018 10:42:56 -0000
+From: Evangelos Foutras <evangelos@foutrelis.com>
+Reply-To: Bug 1754295 <1754295@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <152050577611.7417.5009498133217351253.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1754295] [NEW] Incorrect en-us keymap in QEMU 2.11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +35,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: qemu-devel@nongnu.org
 
-On 23 February 2018 at 16:33, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> On Tue, Feb 13, 2018 at 02:00:29PM +0000, Peter Maydell wrote:
->> A persistent build problem we see is where a source file
->> accidentally omits the #include of log.h. This slips through
->> local developer testing because if you configure with the
->> default (log) trace backend trace.h will pull in log.h for you.
->> Compilation fails only if some other backend is selected.
->>
->> To make this error cause a compile failure regardless of
->> the configured trace backend, split out the parts of log.h
->> that trace.h requires into a new log-for-trace.h header.
->> Since almost all manual uses of the log.h functions will
->> use constants or functions which aren't in log-for-trace.h,
->> this will let us catch missing #include "qemu/log.h" more
->> consistently.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->>  include/qemu/log-for-trace.h     | 35 +++++++++++++++++++++++++++++++++++
->>  include/qemu/log.h               | 18 ++++--------------
->>  scripts/tracetool/backend/log.py | 13 ++++++-------
->>  3 files changed, 45 insertions(+), 21 deletions(-)
->>  create mode 100644 include/qemu/log-for-trace.h
->
-> Thanks, applied to my tracing tree:
-> https://github.com/stefanha/qemu/commits/tracing
+Public bug reported:
 
-Are you planning to put in a pullreq before codefreeze?
+I'm using the latest Arch Linux installation ISO as a live system and
+start QEMU with the following command:
 
-thanks
--- PMM
+$ qemu-system-x86_64 -enable-kvm -boot d -cdrom
+~/isos/archlinux-2018.03.01-x86_64.iso -m 512 -vnc :0 -k en-us
+
+Then I use Vinagre to connect to the guest system, boot the default
+bootloader option, and type the character '<' at the command prompt. The
+guest prints the character '>' instead of the '<' I typed.
+
+I believe this is caused by the updated en-us keymap in QEMU 2.11. [1]
+
+If I start QEMU with `-k en-gb` (or without the -k switch at all), I can
+type '<' and get the same character to appear on the guest's command
+line. The issue happens with the updated en-us keymap. It is also fixed
+if I replace /usr/share/qemu/keymaps/en-us with the old keymap file
+(before commit a7815faf).
+
+This problem was originally reported against Packer because we were
+seeing '>' characters in place of '<' when using it with the QEMU
+builder. [2]
+
+[1] https://github.com/qemu/qemu/commit/a7815faffb2bd594b92aa3542d7b799cc89=
+c5414
+[2] https://github.com/hashicorp/packer/issues/5769
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1754295
+
+Title:
+  Incorrect en-us keymap in QEMU 2.11
+
+Status in QEMU:
+  New
+
+Bug description:
+  I'm using the latest Arch Linux installation ISO as a live system and
+  start QEMU with the following command:
+
+  $ qemu-system-x86_64 -enable-kvm -boot d -cdrom
+  ~/isos/archlinux-2018.03.01-x86_64.iso -m 512 -vnc :0 -k en-us
+
+  Then I use Vinagre to connect to the guest system, boot the default
+  bootloader option, and type the character '<' at the command prompt.
+  The guest prints the character '>' instead of the '<' I typed.
+
+  I believe this is caused by the updated en-us keymap in QEMU 2.11. [1]
+
+  If I start QEMU with `-k en-gb` (or without the -k switch at all), I
+  can type '<' and get the same character to appear on the guest's
+  command line. The issue happens with the updated en-us keymap. It is
+  also fixed if I replace /usr/share/qemu/keymaps/en-us with the old
+  keymap file (before commit a7815faf).
+
+  This problem was originally reported against Packer because we were
+  seeing '>' characters in place of '<' when using it with the QEMU
+  builder. [2]
+
+  [1] https://github.com/qemu/qemu/commit/a7815faffb2bd594b92aa3542d7b799cc=
+89c5414
+  [2] https://github.com/hashicorp/packer/issues/5769
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1754295/+subscriptions
