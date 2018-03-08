@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40289)
 	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1ettZK-0004Xo-Vf
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:18:44 -0500
+	id 1ettZJ-0004Wo-Ka
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:18:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1ettZJ-00021T-1A
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:18:42 -0500
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:41508 helo=mx01.kamp.de)
+	(envelope-from <pl@kamp.de>) id 1ettZG-0001za-Eg
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:18:41 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:56238 helo=mx01.kamp.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1ettZI-00020b-Ou
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:18:40 -0500
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1ettZG-0001yX-5B
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:18:38 -0500
 Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
 	for qemu-devel@nongnu.org; Thu, 8 Mar 2018 12:18:28 +0100
 From: Peter Lieven <pl@kamp.de>
-Date: Thu,  8 Mar 2018 12:18:24 +0100
-Message-Id: <1520507908-16743-2-git-send-email-pl@kamp.de>
-In-Reply-To: <1520507908-16743-1-git-send-email-pl@kamp.de>
-References: <1520507908-16743-1-git-send-email-pl@kamp.de>
-Subject: [Qemu-devel] [PATCH 1/5] migration: do not transfer ram during bulk
- storage migration
+Date: Thu,  8 Mar 2018 12:18:23 +0100
+Message-Id: <1520507908-16743-1-git-send-email-pl@kamp.de>
+Subject: [Qemu-devel] [PATCH 0/5] block migration fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +27,16 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: dgilbert@redhat.com, quintela@redhat.com, famz@redhat.com, stefanha@redhat.com, jjherne@linux.vnet.ibm.com, Peter Lieven <pl@kamp.de>
 
-this patch makes the bulk phase of a block migration to take
-place before we start transferring ram. As the bulk block migration
-can take a long time its pointless to transfer ram during that phase.
+Peter Lieven (5):
+  migration: do not transfer ram during bulk storage migration
+  migration/block: reset dirty bitmap before read in bulk phase
+  migration/block: rename MAX_INFLIGHT_IO to MAX_IO_BUFFERS
+  migration/block: limit the number of parallel I/O requests
+  migration/block: compare only read blocks against the rate limiter
 
-Signed-off-by: Peter Lieven <pl@kamp.de>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- migration/ram.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ migration/block.c | 17 ++++++++---------
+ migration/ram.c   |  8 ++++++++
+ 2 files changed, 16 insertions(+), 9 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 5e33e5c..42468ee 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2258,6 +2258,13 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
-     int64_t t0;
-     int done = 0;
- 
-+    if (blk_mig_bulk_active()) {
-+        /* Avoid transferring ram during bulk phase of block migration as
-+         * the bulk phase will usually take a long time and transferring
-+         * ram updates during that time is pointless. */
-+        goto out;
-+    }
-+
-     rcu_read_lock();
-     if (ram_list.version != rs->last_version) {
-         ram_state_reset(rs);
-@@ -2304,6 +2311,7 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
-      */
-     ram_control_after_iterate(f, RAM_CONTROL_ROUND);
- 
-+out:
-     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
-     ram_counters.transferred += 8;
- 
 -- 
 2.7.4
