@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58758)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1etnFv-0000mh-Tl
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 23:34:16 -0500
+	(envelope-from <thuth@redhat.com>) id 1etnJ7-0001nu-Mx
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 23:37:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1etnFr-0001vN-0F
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 23:34:15 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42156 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1etnFq-0001vE-Ri
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 23:34:10 -0500
-References: <1520415568-19070-1-git-send-email-thuth@redhat.com>
-	<c902a158-1d19-d271-ea49-f5a2f72347bd@ilande.co.uk>
+	(envelope-from <thuth@redhat.com>) id 1etnJ2-0003Hr-Mv
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 23:37:33 -0500
+References: <20180307205427.3A2877456C6@zero.eik.bme.hu>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <2aa2df96-b1c3-deef-9fbf-a2560f58d17d@redhat.com>
-Date: Thu, 8 Mar 2018 05:33:52 +0100
+Message-ID: <0065edc0-8147-6e70-6508-c205e46d1a18@redhat.com>
+Date: Thu, 8 Mar 2018 05:37:23 +0100
 MIME-Version: 1.0
-In-Reply-To: <c902a158-1d19-d271-ea49-f5a2f72347bd@ilande.co.uk>
+In-Reply-To: <20180307205427.3A2877456C6@zero.eik.bme.hu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/sparc/sun4m: Fix implicit creation of
- "-drive if=scsi" devices
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] ppc440_pcix: Add dummy implementation of
+ BRDGOPT registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +24,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>
 
-On 07.03.2018 19:43, Mark Cave-Ayland wrote:
-> On 07/03/18 09:39, Thomas Huth wrote:
->=20
->> The global hack for creating SCSI devices has recently been removed,
->> but this apparently broke SCSI devices on some boards that were not
->> ready for this change yet. For the sun4m machines you now get:
->>
->> $ sparc-softmmu/qemu-system-sparc -boot d -cdrom x.iso
->> qemu-system-sparc: -cdrom x.iso: machine type does not support
->> if=3Dscsi,bus=3D0,unit=3D2
->>
->> Fix it by calling scsi_bus_legacy_handle_cmdline() after creating the
->> corresponding SCSI controller.
->>
->> Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> Fixes: 1454509726719e0933c800fad00d6999752688ea
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->> =C2=A0 hw/sparc/sun4m.c | 1 +
->> =C2=A0 1 file changed, 1 insertion(+)
->>
->> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
->> index 61eb424..0f5804b 100644
->> --- a/hw/sparc/sun4m.c
->> +++ b/hw/sparc/sun4m.c
->> @@ -324,6 +324,7 @@ static void *sparc32_dma_init(hwaddr dma_base,
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 esp =3D ESP_STATE(object_resolve=
-_path_component(OBJECT(espdma),
->> "esp"));
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sysbus_mmio_map(SYS_BUS_DEVICE(esp), 0,=
- esp_base);
->> +=C2=A0=C2=A0=C2=A0 scsi_bus_legacy_handle_cmdline(&esp->esp.bus);
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ledma =3D SPARC32_LEDMA_DEVICE(o=
-bject_resolve_path_component(
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 OBJECT(dma), "l=
-edma"));
->>
->=20
-> Hi Thomas,
->=20
-> Thanks for the patch - I can confirm that it resolves the issue with
-> qemu-system-sparc.
->=20
-> Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->=20
-> I presume it makes sense for this to go through a tree along with the
-> other patches in the set rather than me taking this via my qemu-sparc
-> branch?
+On 07.03.2018 21:43, BALATON Zoltan wrote:
+> I don't know what should be the correct implementation for these so
+> these are just stored and returned as is without doing anything for
+> now only to silence warnings when u-boot accesses these registers.
+> 
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> ---
+>  hw/ppc/ppc440_pcix.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
+> 
+> diff --git a/hw/ppc/ppc440_pcix.c b/hw/ppc/ppc440_pcix.c
+> index ab2626a..3f177d3 100644
+> --- a/hw/ppc/ppc440_pcix.c
+> +++ b/hw/ppc/ppc440_pcix.c
+> @@ -55,6 +55,8 @@ typedef struct PPC440PCIXState {
+>      PCIDevice *dev;
+>      struct PLBOutMap pom[PPC440_PCIX_NR_POMS];
+>      struct PLBInMap pim[PPC440_PCIX_NR_PIMS];
+> +    uint32_t brdgopt1;
+> +    uint32_t brdgopt2;
+>      uint32_t sts;
+>      qemu_irq irq[PCI_NUM_PINS];
+>      AddressSpace bm_as;
+> @@ -95,6 +97,8 @@ typedef struct PPC440PCIXState {
+>  #define PCIX0_PIM0SAH       0xf8
+>  #define PCIX0_PIM2SAH       0xfc
+>  
+> +#define PCIX0_BRDGOPT1      0x40
+> +#define PCIX0_BRDGOPT2      0x44
+>  #define PCIX0_STS           0xe0
+>  
+>  #define PCI_ALL_SIZE        (PPC440_REG_BASE + PPC440_REG_SIZE)
+> @@ -270,6 +274,12 @@ static void ppc440_pcix_reg_write4(void *opaque, hwaddr addr,
+>          ppc440_pcix_update_pim(s, 2);
+>          break;
+>  
+> +    case PCIX0_BRDGOPT1:
+> +        s->brdgopt1 = val;
+> +        break;
+> +    case PCIX0_BRDGOPT2:
+> +        s->brdgopt2 = val;
+> +        break;
+>      case PCIX0_STS:
+>          s->sts = val;
+>          break;
+> @@ -365,6 +375,12 @@ static uint64_t ppc440_pcix_reg_read4(void *opaque, hwaddr addr,
+>          val = s->pim[2].la >> 32;
+>          break;
+>  
+> +    case PCIX0_BRDGOPT1:
+> +        val = s->brdgopt1;
+> +        break;
+> +    case PCIX0_BRDGOPT2:
+> +        val = s->brdgopt2;
+> +        break;
+>      case PCIX0_STS:
+>          val = s->sts;
+>          break;
+> @@ -408,6 +424,8 @@ static void ppc440_pcix_reset(DeviceState *dev)
+>      for (i = 0; i < PPC440_PCIX_NR_PIMS; i++) {
+>          s->pim[i].sa = 0xffffffff00000000ULL;
+>      }
+> +    s->brdgopt1 = 0;
+> +    s->brdgopt2 = 0;
+>      s->sts = 0;
+>  }
 
-The patches are independent from each other, so it doesn't really
-matter. So if you're planning to send a PULL request before soft freeze
-next Tuesday, please include this patch. Otherwise I hope that Paolo can
-take this through his misc / scsi tree.
+Looks sane, so:
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+... but I wonder whether the error_report() in the "default:" case
+should maybe rather be turned into a qemu_log_mask(LOG_UNIMP, ...) instead?
 
  Thomas
