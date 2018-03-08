@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1etuzZ-000580-01
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:49:57 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1etuzc-0005Be-Pe
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:50:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1etuzU-0003tz-Vm
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:49:53 -0500
-Received: from mail-cys01nam02on0054.outbound.protection.outlook.com
-	([104.47.37.54]:31438
+	(envelope-from <brijesh.singh@amd.com>) id 1etuzY-0003xB-DM
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:49:56 -0500
+Received: from mail-cys01nam02on0040.outbound.protection.outlook.com
+	([104.47.37.40]:4288
 	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1etuzU-0003sX-Jw
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:49:48 -0500
+	id 1etuzX-0003wA-PY
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:49:52 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Thu,  8 Mar 2018 06:48:41 -0600
-Message-Id: <20180308124901.83533-9-brijesh.singh@amd.com>
+Date: Thu,  8 Mar 2018 06:48:42 -0600
+Message-ID: <20180308124901.83533-10-brijesh.singh@amd.com>
 In-Reply-To: <20180308124901.83533-1-brijesh.singh@amd.com>
 References: <20180308124901.83533-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v12 08/28] target/i386: add Secure Encrypted
- Virtulization (SEV) object
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v12 09/28] qmp: add query-sev command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,440 +30,156 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>
 
-Add a new memory encryption object 'sev-guest'. The object will be used
-to create enrypted VMs on AMD EPYC CPU. The object provides the properties
-to pass guest owner's public Diffie-hellman key, guest policy and session
-information required to create the memory encryption context within the
-SEV firmware.
+The QMP query command can used to retrieve the SEV information when
+memory encryption is enabled on AMD platform.
 
-e.g to launch SEV guest
- # $QEMU \
-    -object sev-guest,id=sev0 \
-    -machine ....,memory-encryption=sev0
-
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>
+Cc: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- docs/amd-memory-encryption.txt |  17 +++
- qemu-options.hx                |  44 ++++++++
- target/i386/Makefile.objs      |   2 +-
- target/i386/sev.c              | 228 +++++++++++++++++++++++++++++++++++++++++
- target/i386/sev_i386.h         |  61 +++++++++++
- 5 files changed, 351 insertions(+), 1 deletion(-)
- create mode 100644 target/i386/sev.c
- create mode 100644 target/i386/sev_i386.h
+ monitor.c             |  7 +++++
+ qapi/misc.json        | 76 +++++++++++++++++++++++++++++++++++++++++++++++=
+++++
+ target/i386/monitor.c |  8 ++++++
+ 3 files changed, 91 insertions(+)
 
-diff --git a/docs/amd-memory-encryption.txt b/docs/amd-memory-encryption.txt
-index 72a92b6c6353..05266fd41b23 100644
---- a/docs/amd-memory-encryption.txt
-+++ b/docs/amd-memory-encryption.txt
-@@ -35,10 +35,21 @@ in bad measurement). The guest policy is a 4-byte data structure containing
- several flags that restricts what can be done on running SEV guest.
- See KM Spec section 3 and 6.2 for more details.
- 
-+The guest policy can be provided via the 'policy' property (see below)
+diff --git a/monitor.c b/monitor.c
+index 3f4ba902266b..2225cf5030dc 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -983,6 +983,7 @@ static void qmp_unregister_commands_hack(void)
+ #endif
+ #ifndef TARGET_I386
+     qmp_unregister_command(&qmp_commands, "rtc-reset-reinjection");
++    qmp_unregister_command(&qmp_commands, "query-sev");
+ #endif
+ #ifndef TARGET_S390X
+     qmp_unregister_command(&qmp_commands, "dump-skeys");
+@@ -4103,6 +4104,12 @@ void qmp_rtc_reset_reinjection(Error **errp)
+ {
+     error_setg(errp, QERR_FEATURE_DISABLED, "rtc-reset-reinjection");
+ }
 +
-+# ${QEMU} \
-+   sev-guest,id=sev0,policy=0x1...\
++SevInfo *qmp_query_sev(Error **errp)
++{
++    error_setg(errp, QERR_FEATURE_DISABLED, "query-sev");
++    return NULL;
++}
+ #endif
+=20
+ #ifndef TARGET_S390X
+diff --git a/qapi/misc.json b/qapi/misc.json
+index bd04469a4ba2..14681729f8fc 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -3201,3 +3201,79 @@
+ # Since: 2.9
+ ##
+ { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
 +
- Guest owners provided DH certificate and session parameters will be used to
- establish a cryptographic session with the guest owner to negotiate keys used
- for the attestation.
- 
-+The DH certificate and session blob can be provided via 'dh-cert-file' and
-+'session-file' property (see below
 +
-+# ${QEMU} \
-+     sev-guest,id=sev0,dh-cert-file=<file1>,session-file=<file2>
++##
++# @SevState:
++#
++# An enumeration of SEV state information used during @query-sev.
++#
++# @uninit: The guest is uninitialized.
++#
++# @lupdate: The guest is currently being launched and plaintext and
++#           reigster state is being imported.
++#
++# @lsecret: The guest is currently being launched and ciphertext data
++#           are being imported.
++#
++# @running: The guest is fully launched or migrated in.
++#
++# @supdate: The guest is currently being migrated out to another machine.
++#
++# @rupdate: The guest is currently being migrated from another machine.
++#
++# Since: 2.12
++##
++{ 'enum': 'SevState',
++  'data': ['uninit', 'lupdate', 'lsecret', 'running', 'supdate', 'rupdate'=
+ ] }
 +
- LAUNCH_UPDATE_DATA encrypts the memory region using the cryptographic context
- created via LAUNCH_START command. If required, this command can be called
- multiple times to encrypt different memory regions. The command also calculates
-@@ -59,6 +70,12 @@ context.
- See SEV KM API Spec [1] 'Launching a guest' usage flow (Appendix A) for the
- complete flow chart.
- 
-+To launch a SEV guest
++##
++# @SevInfo:
++#
++# Information about Secure Encrypted Virtualization (SEV) support
++#
++# @enabled: true if SEV is active
++#
++# @api-major: SEV API major version
++#
++# @api-minor: SEV API minor version
++#
++# @build-id: SEV FW build id
++#
++# @policy: SEV policy value
++#
++# @state: SEV guest state
++#
++# @handle: SEV firmware handle
++#
++# Since: 2.12
++##
++{ 'struct': 'SevInfo',
++    'data': { 'enabled': 'bool',
++              'api-major': 'uint8',
++              'api-minor' : 'uint8',
++              'build-id' : 'uint8',
++              'policy' : 'uint32',
++              'state' : 'SevState',
++              'handle' : 'uint32'
++            }
++}
 +
-+# ${QEMU} \
-+    -machine ...,memory-encryption=sev0 \
-+    -object sev-guest,id=sev0,cbitpos=47,reduced-phys-bits=1
-+
- Debugging
- -----------
- Since memory contents of SEV guest is encrypted hence hypervisor access to the
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 4c280142c52c..6113bce08a8c 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4353,6 +4353,50 @@ contents of @code{iv.b64} to the second secret
-          data=$SECRET,iv=$(<iv.b64)
- @end example
- 
-+@item -object sev-guest,id=@var{id},cbitpos=@var{cbitpos},reduced-phys-bits=@var{val},[sev-device=@var{string},policy=@var{policy},handle=@var{handle},dh-cert-file=@var{file},session-file=@var{file}]
-+
-+Create a Secure Encrypted Virtualization (SEV) guest object, which can be used
-+to provide the guest memory encryption support on AMD processors.
-+
-+When memory encryption is enabled, one of the physical address bit (aka the
-+C-bit) is utilized to mark if a memory page is protected. The @option{cbitpos}
-+is used to provide the C-bit position. The C-bit position is Host family dependent
-+hence user must provide this value. On EPYC, the value should be 47.
-+
-+When memory encryption is enabled, we loose certain bits in physical address space.
-+The @option{reduced-phys-bits} is used to provide the number of bits we loose in
-+physical address space. Similar to C-bit, the value is Host family dependent.
-+On EPYC, the value should be 5.
-+
-+The @option{sev-device} provides the device file to use for communicating with
-+the SEV firmware running inside AMD Secure Processor. The default device is
-+'/dev/sev'. If hardware supports memory encryption then /dev/sev devices are
-+created by CCP driver.
-+
-+The @option{policy} provides the guest policy to be enforced by the SEV firmware
-+and restrict what configuration and operational commands can be performed on this
-+guest by the hypervisor. The policy should be provided by the guest owner and is
-+bound to the guest and cannot be changed throughout the lifetime of the guest.
-+The default is 0.
-+
-+If guest @option{policy} allows sharing the key with another SEV guest then
-+@option{handle} can be use to provide handle of the guest from which to share
-+the key.
-+
-+The @option{dh-cert-file} and @option{session-file} provides the guest owner's
-+Public Diffie-Hillman key defined in SEV spec. The PDH and session parameters
-+are used for establishing a cryptographic session with the guest owner to
-+negotiate keys used for attestation. The file must be encoded in base64.
-+
-+e.g to launch a SEV guest
-+@example
-+ # $QEMU \
-+     ......
-+     -object sev-guest,id=sev0,cbitpos=47,reduced-phys-bits=5 \
-+     -machine ...,memory-encryption=sev0
-+     .....
-+
-+@end example
- @end table
- 
- ETEXI
-diff --git a/target/i386/Makefile.objs b/target/i386/Makefile.objs
-index f5c6ef20a7bb..76aeaeae2750 100644
---- a/target/i386/Makefile.objs
-+++ b/target/i386/Makefile.objs
-@@ -4,7 +4,7 @@ obj-$(CONFIG_TCG) += bpt_helper.o cc_helper.o excp_helper.o fpu_helper.o
- obj-$(CONFIG_TCG) += int_helper.o mem_helper.o misc_helper.o mpx_helper.o
- obj-$(CONFIG_TCG) += seg_helper.o smm_helper.o svm_helper.o
- obj-$(CONFIG_SOFTMMU) += machine.o arch_memory_mapping.o arch_dump.o monitor.o
--obj-$(CONFIG_KVM) += kvm.o hyperv.o
-+obj-$(CONFIG_KVM) += kvm.o hyperv.o sev.o
- obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
- # HAX support
- ifdef CONFIG_WIN32
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-new file mode 100644
-index 000000000000..ab42e4a456d2
---- /dev/null
-+++ b/target/i386/sev.c
-@@ -0,0 +1,228 @@
-+/*
-+ * QEMU SEV support
-+ *
-+ * Copyright Advanced Micro Devices 2016-2018
-+ *
-+ * Author:
-+ *      Brijesh Singh <brijesh.singh@amd.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qom/object_interfaces.h"
-+#include "qemu/base64.h"
-+#include "sysemu/kvm.h"
++##
++# @query-sev:
++#
++# Returns information about SEV
++#
++# Returns: @SevInfo
++#
++# Since: 2.12
++#
++# Example:
++#
++# -> { "execute": "query-sev" }
++# <- { "return": { "enabled": true, "api-major" : 0, "api-minor" : 0,
++#                  "build-id" : 0, "policy" : 0, "state" : "running",
++#                  "handle" : 1 } }
++#
++##
++{ 'command': 'query-sev', 'returns': 'SevInfo' }
+diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+index 55ea10deb8ef..27b99adf395b 100644
+--- a/target/i386/monitor.c
++++ b/target/i386/monitor.c
+@@ -30,6 +30,8 @@
+ #include "hw/i386/pc.h"
+ #include "sysemu/kvm.h"
+ #include "hmp.h"
 +#include "sev_i386.h"
-+#include "sysemu/sysemu.h"
++#include "qapi/qapi-commands-misc.h"
+=20
+=20
+ static void print_pte(Monitor *mon, CPUArchState *env, hwaddr addr,
+@@ -665,3 +667,9 @@ void hmp_info_io_apic(Monitor *mon, const QDict *qdict)
+         ioapic_dump_state(mon, qdict);
+     }
+ }
 +
-+#define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
-+#define DEFAULT_SEV_DEVICE      "/dev/sev"
-+
-+static void
-+qsev_guest_finalize(Object *obj)
++SevInfo *qmp_query_sev(Error **errp)
 +{
++    error_setg(errp, "SEV feature is not available");
++    return NULL;
 +}
-+
-+static char *
-+qsev_guest_get_session_file(Object *obj, Error **errp)
-+{
-+    QSevGuestInfo *s = QSEV_GUEST_INFO(obj);
-+
-+    return s->session_file ? g_strdup(s->session_file) : NULL;
-+}
-+
-+static void
-+qsev_guest_set_session_file(Object *obj, const char *value, Error **errp)
-+{
-+    QSevGuestInfo *s = QSEV_GUEST_INFO(obj);
-+
-+    s->session_file = g_strdup(value);
-+}
-+
-+static char *
-+qsev_guest_get_dh_cert_file(Object *obj, Error **errp)
-+{
-+    QSevGuestInfo *s = QSEV_GUEST_INFO(obj);
-+
-+    return g_strdup(s->dh_cert_file);
-+}
-+
-+static void
-+qsev_guest_set_dh_cert_file(Object *obj, const char *value, Error **errp)
-+{
-+    QSevGuestInfo *s = QSEV_GUEST_INFO(obj);
-+
-+    s->dh_cert_file = g_strdup(value);
-+}
-+
-+static char *
-+qsev_guest_get_sev_device(Object *obj, Error **errp)
-+{
-+    QSevGuestInfo *sev = QSEV_GUEST_INFO(obj);
-+
-+    return g_strdup(sev->sev_device);
-+}
-+
-+static void
-+qsev_guest_set_sev_device(Object *obj, const char *value, Error **errp)
-+{
-+    QSevGuestInfo *sev = QSEV_GUEST_INFO(obj);
-+
-+    sev->sev_device = g_strdup(value);
-+}
-+
-+static void
-+qsev_guest_class_init(ObjectClass *oc, void *data)
-+{
-+    object_class_property_add_str(oc, "sev-device",
-+                                  qsev_guest_get_sev_device,
-+                                  qsev_guest_set_sev_device,
-+                                  NULL);
-+    object_class_property_set_description(oc, "sev-device",
-+            "SEV device to use", NULL);
-+    object_class_property_add_str(oc, "dh-cert-file",
-+                                  qsev_guest_get_dh_cert_file,
-+                                  qsev_guest_set_dh_cert_file,
-+                                  NULL);
-+    object_class_property_set_description(oc, "dh-cert-file",
-+            "guest owners DH certificate (encoded with base64)", NULL);
-+    object_class_property_add_str(oc, "session-file",
-+                                  qsev_guest_get_session_file,
-+                                  qsev_guest_set_session_file,
-+                                  NULL);
-+    object_class_property_set_description(oc, "session-file",
-+            "guest owners session parameters (encoded with base64)", NULL);
-+}
-+
-+static void
-+qsev_guest_set_handle(Object *obj, Visitor *v, const char *name,
-+                      void *opaque, Error **errp)
-+{
-+    QSevGuestInfo *sev = QSEV_GUEST_INFO(obj);
-+    uint32_t value;
-+
-+    visit_type_uint32(v, name, &value, errp);
-+    sev->handle = value;
-+}
-+
-+static void
-+qsev_guest_set_policy(Object *obj, Visitor *v, const char *name,
-+                      void *opaque, Error **errp)
-+{
-+    QSevGuestInfo *sev = QSEV_GUEST_INFO(obj);
-+    uint32_t value;
-+
-+    visit_type_uint32(v, name, &value, errp);
-+    sev->policy = value;
-+}
-+
-+static void
-+qsev_guest_set_cbitpos(Object *obj, Visitor *v, const char *name,
-+                       void *opaque, Error **errp)
-+{
-+    QSevGuestInfo *sev = QSEV_GUEST_INFO(obj);
-+    uint32_t value;
-+
-+    visit_type_uint32(v, name, &value, errp);
-+    sev->cbitpos = value;
-+}
-+
-+static void
-+qsev_guest_set_reduced_phys_bits(Object *obj, Visitor *v, const char *name,
-+                                   void *opaque, Error **errp)
-+{
-+    QSevGuestInfo *sev = QSEV_GUEST_INFO(obj);
-+    uint32_t value;
-+
-+    visit_type_uint32(v, name, &value, errp);
-+    sev->reduced_phys_bits = value;
-+}
-+
-+static void
-+qsev_guest_get_policy(Object *obj, Visitor *v, const char *name,
-+                      void *opaque, Error **errp)
-+{
-+    uint32_t value;
-+    QSevGuestInfo *sev = QSEV_GUEST_INFO(obj);
-+
-+    value = sev->policy;
-+    visit_type_uint32(v, name, &value, errp);
-+}
-+
-+static void
-+qsev_guest_get_handle(Object *obj, Visitor *v, const char *name,
-+                      void *opaque, Error **errp)
-+{
-+    uint32_t value;
-+    QSevGuestInfo *sev = QSEV_GUEST_INFO(obj);
-+
-+    value = sev->handle;
-+    visit_type_uint32(v, name, &value, errp);
-+}
-+
-+static void
-+qsev_guest_get_cbitpos(Object *obj, Visitor *v, const char *name,
-+                       void *opaque, Error **errp)
-+{
-+    uint32_t value;
-+    QSevGuestInfo *sev = QSEV_GUEST_INFO(obj);
-+
-+    value = sev->cbitpos;
-+    visit_type_uint32(v, name, &value, errp);
-+}
-+
-+static void
-+qsev_guest_get_reduced_phys_bits(Object *obj, Visitor *v, const char *name,
-+                                   void *opaque, Error **errp)
-+{
-+    uint32_t value;
-+    QSevGuestInfo *sev = QSEV_GUEST_INFO(obj);
-+
-+    value = sev->reduced_phys_bits;
-+    visit_type_uint32(v, name, &value, errp);
-+}
-+
-+static void
-+qsev_guest_init(Object *obj)
-+{
-+    QSevGuestInfo *sev = QSEV_GUEST_INFO(obj);
-+
-+    sev->sev_device = g_strdup(DEFAULT_SEV_DEVICE);
-+    sev->policy = DEFAULT_GUEST_POLICY;
-+    object_property_add(obj, "policy", "uint32", qsev_guest_get_policy,
-+                        qsev_guest_set_policy, NULL, NULL, NULL);
-+    object_property_add(obj, "handle", "uint32", qsev_guest_get_handle,
-+                        qsev_guest_set_handle, NULL, NULL, NULL);
-+    object_property_add(obj, "cbitpos", "uint32", qsev_guest_get_cbitpos,
-+                        qsev_guest_set_cbitpos, NULL, NULL, NULL);
-+    object_property_add(obj, "reduced-phys-bits", "uint32",
-+                        qsev_guest_get_reduced_phys_bits,
-+                        qsev_guest_set_reduced_phys_bits, NULL, NULL, NULL);
-+}
-+
-+/* sev guest info */
-+static const TypeInfo qsev_guest_info = {
-+    .parent = TYPE_OBJECT,
-+    .name = TYPE_QSEV_GUEST_INFO,
-+    .instance_size = sizeof(QSevGuestInfo),
-+    .instance_finalize = qsev_guest_finalize,
-+    .class_size = sizeof(QSevGuestInfoClass),
-+    .class_init = qsev_guest_class_init,
-+    .instance_init = qsev_guest_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_USER_CREATABLE },
-+        { }
-+    }
-+};
-+
-+static void
-+sev_register_types(void)
-+{
-+    type_register_static(&qsev_guest_info);
-+}
-+
-+type_init(sev_register_types);
-diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
-new file mode 100644
-index 000000000000..caf879c3b874
---- /dev/null
-+++ b/target/i386/sev_i386.h
-@@ -0,0 +1,61 @@
-+/*
-+ * QEMU Secure Encrypted Virutualization (SEV) support
-+ *
-+ * Copyright: Advanced Micro Devices, 2016-2018
-+ *
-+ * Authors:
-+ *  Brijesh Singh <brijesh.singh@amd.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef QEMU_SEV_I386_H
-+#define QEMU_SEV_I386_H
-+
-+#include "qom/object.h"
-+#include "qapi/error.h"
-+#include "sysemu/kvm.h"
-+#include "qemu/error-report.h"
-+
-+#define SEV_POLICY_NODBG        0x1
-+#define SEV_POLICY_NOKS         0x2
-+#define SEV_POLICY_ES           0x4
-+#define SEV_POLICY_NOSEND       0x8
-+#define SEV_POLICY_DOMAIN       0x10
-+#define SEV_POLICY_SEV          0x20
-+
-+#define TYPE_QSEV_GUEST_INFO "sev-guest"
-+#define QSEV_GUEST_INFO(obj)                  \
-+    OBJECT_CHECK(QSevGuestInfo, (obj), TYPE_QSEV_GUEST_INFO)
-+
-+typedef struct QSevGuestInfo QSevGuestInfo;
-+typedef struct QSevGuestInfoClass QSevGuestInfoClass;
-+
-+/**
-+ * QSevGuestInfo:
-+ *
-+ * The QSevGuestInfo object is used for creating a SEV guest.
-+ *
-+ * # $QEMU \
-+ *         -object sev-guest,id=sev0 \
-+ *         -machine ...,memory-encryption=sev0
-+ */
-+struct QSevGuestInfo {
-+    Object parent_obj;
-+
-+    char *sev_device;
-+    uint32_t policy;
-+    uint32_t handle;
-+    char *dh_cert_file;
-+    char *session_file;
-+    uint32_t cbitpos;
-+    uint32_t reduced_phys_bits;
-+};
-+
-+struct QSevGuestInfoClass {
-+    ObjectClass parent_class;
-+};
-+
-+#endif
--- 
+--=20
 2.14.3
