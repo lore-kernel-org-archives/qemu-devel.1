@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56596)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eu4D0-00076C-GG
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:26 -0500
+	id 1eu4D4-0007AP-CI
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eu4Cy-00049E-TH
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:22 -0500
+	id 1eu4D2-0004CP-9P
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:26 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:41460)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eu4D1-0004BC-Vr
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:24 -0500
+Received: by mail-wr0-x242.google.com with SMTP id f14so7246778wre.8
+	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 14:40:23 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu,  8 Mar 2018 23:39:35 +0100
-Message-Id: <20180308223946.26784-15-f4bug@amsat.org>
+Date: Thu,  8 Mar 2018 23:39:37 +0100
+Message-Id: <20180308223946.26784-17-f4bug@amsat.org>
 In-Reply-To: <20180308223946.26784-1-f4bug@amsat.org>
 References: <20180308223946.26784-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 14/25] hw/isa/superio: Factor out the IDE code
- from pc87312.c
+Subject: [Qemu-devel] [PATCH 16/25] hw/isa/superio: Factor out the FDC37M817
+ Super I/O from mips_malta.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,164 +34,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Marcel Apfelbaum <marcel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alexey Kardashevskiy <aik@ozlabs.ru>, Thomas Huth <thuth@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, "open list:PReP" <qemu-ppc@nongnu.org>
+To: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Marcel Apfelbaum <marcel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Yongbok Kim <yongbok.kim@mips.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, Thomas Huth <thuth@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
  include/hw/isa/superio.h |  2 ++
- hw/isa/isa-superio.c     | 22 ++++++++++++++++++++++
- hw/isa/pc87312.c         | 36 ++++++++++++++++++++----------------
- hw/isa/trace-events      |  2 +-
- 4 files changed, 45 insertions(+), 17 deletions(-)
+ hw/isa/isa-superio.c     | 19 +++++++++++++++++++
+ hw/mips/mips_malta.c     | 35 ++++++++++-------------------------
+ 3 files changed, 31 insertions(+), 25 deletions(-)
 
 diff --git a/include/hw/isa/superio.h b/include/hw/isa/superio.h
-index 2fc33bf3d3..3dd5448f8c 100644
+index 3dd5448f8c..b47aac3cf8 100644
 --- a/include/hw/isa/superio.h
 +++ b/include/hw/isa/superio.h
-@@ -31,6 +31,7 @@ typedef struct ISASuperIODevice {
-     ISADevice *serial[MAX_SERIAL_PORTS];
-     ISADevice *floppy;
-     ISADevice *kbc;
-+    ISADevice *ide;
- } ISASuperIODevice;
- 
- typedef struct ISASuperIOFuncs {
-@@ -50,6 +51,7 @@ typedef struct ISASuperIOClass {
-     ISASuperIOFuncs parallel;
-     ISASuperIOFuncs serial;
-     ISASuperIOFuncs floppy;
-+    ISASuperIOFuncs ide;
+@@ -54,4 +54,6 @@ typedef struct ISASuperIOClass {
+     ISASuperIOFuncs ide;
  } ISASuperIOClass;
  
++#define TYPE_FDC37M81X_SUPERIO  "fdc37m81x-superio"
++
  #endif /* HW_ISA_SUPERIO_H */
 diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
-index 041b47bdbf..f98711beff 100644
+index f98711beff..b95608a003 100644
 --- a/hw/isa/isa-superio.c
 +++ b/hw/isa/isa-superio.c
-@@ -146,6 +146,28 @@ static void isa_superio_realize(DeviceState *dev, Error **errp)
+@@ -187,9 +187,28 @@ static const TypeInfo isa_superio_type_info = {
+     .class_init = isa_superio_class_init,
+ };
  
-     /* Keyboard, mouse */
-     sio->kbc = isa_create_simple(bus, TYPE_I8042);
-+
-+    /* IDE */
-+    if (k->ide.count && (!k->ide.is_enabled || k->ide.is_enabled(sio, 0))) {
-+        isa = isa_create(bus, "isa-ide");
-+        d = DEVICE(isa);
-+        if (k->ide.get_iobase) {
-+            qdev_prop_set_uint32(d, "iobase", k->ide.get_iobase(sio, 0));
-+        }
-+        if (k->ide.get_iobase) {
-+            qdev_prop_set_uint32(d, "iobase2", k->ide.get_iobase(sio, 1));
-+        }
-+        if (k->ide.get_irq) {
-+            qdev_prop_set_uint32(d, "irq", k->ide.get_irq(sio, 0));
-+        }
-+        qdev_init_nofail(d);
-+        sio->ide = isa;
-+        trace_superio_create_ide(0,
-+                                 k->ide.get_iobase ?
-+                                 k->ide.get_iobase(sio, 0) : -1,
-+                                 k->ide.get_irq ?
-+                                 k->ide.get_irq(sio, 0) : -1);
-+    }
- }
- 
- static void isa_superio_class_init(ObjectClass *oc, void *data)
-diff --git a/hw/isa/pc87312.c b/hw/isa/pc87312.c
-index a1845a91c3..5cf64505fe 100644
---- a/hw/isa/pc87312.c
-+++ b/hw/isa/pc87312.c
-@@ -150,16 +150,28 @@ static unsigned int get_fdc_irq(ISASuperIODevice *sio, uint8_t index)
- 
- /* IDE controller */
- 
--static inline bool is_ide_enabled(PC87312State *s)
-+static bool is_ide_enabled(ISASuperIODevice *sio, uint8_t index)
- {
-+    PC87312State *s = PC87312(sio);
-+
-     return s->regs[REG_FER] & FER_IDE_EN;
- }
- 
--static inline uint16_t get_ide_iobase(PC87312State *s)
-+static uint16_t get_ide_iobase(ISASuperIODevice *sio, uint8_t index)
- {
-+    PC87312State *s = PC87312(sio);
-+
-+    if (index == 1) {
-+        return get_ide_iobase(sio, 0) + 0x206;
-+    }
-     return (s->regs[REG_FER] & FER_IDE_ADDR) ? 0x170 : 0x1f0;
- }
- 
-+static unsigned int get_ide_irq(ISASuperIODevice *sio, uint8_t index)
++/* SMS FDC37M817 Super I/O */
++static void fdc37m81x_class_init(ObjectClass *klass, void *data)
 +{
-+    assert(index == 0);
-+    return 14;
++    ISASuperIOClass *sc = ISA_SUPERIO_CLASS(klass);
++
++    sc->serial.count = 2; /* NS16C550A */
++    sc->parallel.count = 1;
++    sc->floppy.count = 1; /* SMSC 82077AA Compatible */
++    sc->ide.count = 0;
 +}
- 
- static void reconfigure_devices(PC87312State *s)
++
++static const TypeInfo fdc37m81x_type_info = {
++    .name          = TYPE_FDC37M81X_SUPERIO,
++    .parent        = TYPE_ISA_SUPERIO,
++    .instance_size = sizeof(ISASuperIODevice),
++    .class_init    = fdc37m81x_class_init,
++};
++
+ static void isa_superio_register_types(void)
  {
-@@ -277,14 +289,11 @@ static void pc87312_reset(DeviceState *d)
- static void pc87312_realize(DeviceState *dev, Error **errp)
- {
-     PC87312State *s;
--    DeviceState *d;
-     ISADevice *isa;
--    ISABus *bus;
-     Error *local_err = NULL;
+     type_register_static(&isa_superio_type_info);
++    type_register_static(&fdc37m81x_type_info);
+ }
  
-     s = PC87312(dev);
-     isa = ISA_DEVICE(dev);
--    bus = isa_bus_from_device(isa);
-     isa_register_ioport(isa, &s->io, s->iobase);
-     pc87312_hard_reset(s);
+ type_init(isa_superio_register_types)
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 9e0724ca5a..f6513a4fd5 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -27,14 +27,12 @@
+ #include "cpu.h"
+ #include "hw/hw.h"
+ #include "hw/i386/pc.h"
++#include "hw/isa/superio.h"
+ #include "hw/dma/i8257.h"
+ #include "hw/char/serial.h"
+-#include "hw/char/parallel.h"
+-#include "hw/block/fdc.h"
+ #include "net/net.h"
+ #include "hw/boards.h"
+ #include "hw/i2c/smbus.h"
+-#include "sysemu/block-backend.h"
+ #include "hw/block/flash.h"
+ #include "hw/mips/mips.h"
+ #include "hw/mips/cpudevs.h"
+@@ -47,7 +45,6 @@
+ #include "hw/loader.h"
+ #include "elf.h"
+ #include "hw/timer/mc146818rtc.h"
+-#include "hw/input/i8042.h"
+ #include "hw/timer/i8254.h"
+ #include "sysemu/blockdev.h"
+ #include "exec/address-spaces.h"
+@@ -1005,10 +1002,8 @@ void mips_malta_init(MachineState *machine)
+     qemu_irq cbus_irq, i8259_irq;
+     int piix4_devfn;
+     I2CBus *smbus;
+-    int i;
+     DriveInfo *dinfo;
+     DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
+-    DriveInfo *fd[MAX_FD];
+     int fl_idx = 0;
+     int fl_sectors = bios_size >> 16;
+     int be;
+@@ -1023,15 +1018,6 @@ void mips_malta_init(MachineState *machine)
  
-@@ -293,17 +302,6 @@ static void pc87312_realize(DeviceState *dev, Error **errp)
-         error_propagate(errp, local_err);
-         return;
-     }
--
--    if (is_ide_enabled(s)) {
--        isa = isa_create(bus, "isa-ide");
--        d = DEVICE(isa);
--        qdev_prop_set_uint32(d, "iobase", get_ide_iobase(s));
--        qdev_prop_set_uint32(d, "iobase2", get_ide_iobase(s) + 0x206);
--        qdev_prop_set_uint32(d, "irq", 14);
--        qdev_init_nofail(d);
--        s->ide.dev = isa;
--        trace_pc87312_info_ide(get_ide_iobase(s));
+     qdev_init_nofail(dev);
+ 
+-    /* Make sure the first 3 serial ports are associated with a device. */
+-    for(i = 0; i < 3; i++) {
+-        if (!serial_hds[i]) {
+-            char label[32];
+-            snprintf(label, sizeof(label), "serial%d", i);
+-            serial_hds[i] = qemu_chr_new(label, "null");
+-        }
 -    }
- }
+-
+     /* create CPU */
+     mips_create_cpu(s, machine->cpu_type, &cbus_irq, &i8259_irq);
  
- static void pc87312_initfn(Object *obj)
-@@ -361,6 +359,12 @@ static void pc87312_class_init(ObjectClass *klass, void *data)
-         .get_iobase = get_fdc_iobase,
-         .get_irq    = get_fdc_irq,
-     };
-+    sc->ide = (ISASuperIOFuncs){
-+        .count = 1,
-+        .is_enabled = is_ide_enabled,
-+        .get_iobase = get_ide_iobase,
-+        .get_irq    = get_ide_irq,
-+    };
- }
+@@ -1067,7 +1053,14 @@ void mips_malta_init(MachineState *machine)
+ #else
+     be = 0;
+ #endif
++
+     /* FPGA */
++
++    /* Make sure the second serial port is associated with a device. */
++    if (!serial_hds[2]) {
++        serial_hds[2] = qemu_chr_new("fpga-uart", "null");
++    }
++
+     /* The CBUS UART is attached to the MIPS CPU INT2 pin, ie interrupt 4 */
+     malta_fpga_init(system_memory, FPGA_ADDRESS, cbus_irq, serial_hds[2]);
  
- static const TypeInfo pc87312_type_info = {
-diff --git a/hw/isa/trace-events b/hw/isa/trace-events
-index 8d9900882f..80ac6175d6 100644
---- a/hw/isa/trace-events
-+++ b/hw/isa/trace-events
-@@ -4,8 +4,8 @@
- superio_create_parallel(int id, uint16_t base, unsigned int irq) "id=%d, base 0x%03x, irq %u"
- superio_create_serial(int id, uint16_t base, unsigned int irq) "id=%d, base 0x%03x, irq %u"
- superio_create_floppy(int id, uint16_t base, unsigned int irq) "id=%d, base 0x%03x, irq %u"
-+superio_create_ide(int id, uint16_t base, unsigned int irq) "id=%d, base 0x%03x, irq %u"
+@@ -1214,16 +1207,8 @@ void mips_malta_init(MachineState *machine)
+     smbus_eeprom_init(smbus, 8, smbus_eeprom_buf, smbus_eeprom_size);
+     g_free(smbus_eeprom_buf);
  
- # hw/isa/pc87312.c
- pc87312_io_read(uint32_t addr, uint32_t val) "read addr=0x%x val=0x%x"
- pc87312_io_write(uint32_t addr, uint32_t val) "write addr=0x%x val=0x%x"
--pc87312_info_ide(uint32_t base) "base 0x%x"
+-    /* Super I/O */
+-    isa_create_simple(isa_bus, TYPE_I8042);
+-
+-    serial_hds_isa_init(isa_bus, 0, 2);
+-    parallel_hds_isa_init(isa_bus, 1);
+-
+-    for(i = 0; i < MAX_FD; i++) {
+-        fd[i] = drive_get(IF_FLOPPY, 0, i);
+-    }
+-    fdctrl_init_isa(isa_bus, fd);
++    /* Super I/O: SMS FDC37M817 */
++    isa_create_simple(isa_bus, TYPE_FDC37M81X_SUPERIO);
+ 
+     /* Network card */
+     network_init(pci_bus);
 -- 
 2.16.2
