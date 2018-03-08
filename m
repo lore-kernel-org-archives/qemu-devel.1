@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ety39-00082g-9C
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:05:48 -0500
+	(envelope-from <eblake@redhat.com>) id 1ety3Y-0008K9-Dj
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:06:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ety33-0001cz-Ds
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:05:47 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37130 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ety33-0001ch-6s
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:05:41 -0500
-Date: Thu, 8 Mar 2018 16:05:29 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180308160529.GA4718@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180308154016.22228-1-peter.maydell@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1ety3S-0001qG-Gf
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:06:12 -0500
+References: <20180307225732.155835-1-eblake@redhat.com>
+	<1651749911.5944222.1520491852256.JavaMail.zimbra@redhat.com>
+	<8b5bee3a-c30b-38da-b861-bceebad9b57e@redhat.com>
+	<c316b5e0-932f-6de0-ac19-41d12730201c@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d0e62cf0-c7b8-d883-4959-b5bc22be5608@redhat.com>
+Date: Thu, 8 Mar 2018 10:05:55 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180308154016.22228-1-peter.maydell@linaro.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] unicore32: Mark as deprecated
+In-Reply-To: <c316b5e0-932f-6de0-ac19-41d12730201c@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] nbd/server: Honor FUA request on
+ NBD_CMD_TRIM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,100 +27,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org, Guan Xuetao <gxt@mprc.pku.edu.cn>, Paolo Bonzini <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, vsementsov@virtuozzo.com, kwolf@redhat.com
 
-On Thu, Mar 08, 2018 at 03:40:16PM +0000, Peter Maydell wrote:
-> We intend to remove the unicore32 target code:
->=20
->  * It has had no changes since 2012 that were not tree-wide
->    maintenance/API changes/other global updates
->  * We dropped the linux-user unicore32 support in 2016 because of a
->    clash between the 'old ABI' that it was implementing and the ABI
->    that's actually in the upstream Linux kernel, and there have been
->    no moves to get this fixed so we could re-enable it, nor any
->    complaints when it went away
->  * Linux is now planning to drop unicore support:
->    https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1619640=
-.html
->  * there is apparently no upstream gcc support for the architecture
->  * nobody has ever reported a bug or problem to us about it
->=20
-> This commit patches the unicore32 target to warn on startup that it
-> is deprecated, and adds a note to our documentation's deprecation
-> section.
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> I proposed deprecation of unicore32 on 27th Feb:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06634.html
-> and got several 'yes'es and no objections. This is the "changing
-> the codebase" part of that, ready for the 2.12 codefreeze.
->=20
-> We should also note this in the 2.12 Changelog.
-> ---
->  target/unicore32/cpu.c | 11 +++++++++++
->  qemu-doc.texi          |  5 +++++
->  2 files changed, 16 insertions(+)
->=20
-> diff --git a/target/unicore32/cpu.c b/target/unicore32/cpu.c
-> index 29d160a88d..e95fa55b8e 100644
-> --- a/target/unicore32/cpu.c
-> +++ b/target/unicore32/cpu.c
-> @@ -19,6 +19,8 @@
->  #include "migration/vmstate.h"
->  #include "exec/exec-all.h"
->  #include "fpu/softfloat.h"
-> +#include "sysemu/qtest.h"
-> +#include "qemu/error-report.h"
-> =20
->  static void uc32_cpu_set_pc(CPUState *cs, vaddr value)
->  {
-> @@ -120,6 +122,15 @@ static void uc32_cpu_initfn(Object *obj)
->  #endif
-> =20
->      tlb_flush(cs);
-> +
-> +    /* We can't do this in class_init because the qtest_enabled
-> +     * flag hasn't yet been initialized there. Luckily the Unicore32
-> +     * machines don't support SMP so the message will only appear once=
-.
-> +     */
-> +    if (!qtest_enabled()) {
-> +        warn_report("qemu-system-unicore32 is deprecated "
-> +                    "and will be removed in a future QEMU release.");
-> +    }
->  }
-> =20
->  static const VMStateDescription vmstate_uc32_cpu =3D {
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index 39e38c87ec..0e8609c11c 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -2779,6 +2779,11 @@ support page sizes < 4096 any longer.
->  The ``xlnx-ep108'' machine has been replaced by the ``xlnx-zcu102'' ma=
-chine.
->  The ``xlnx-zcu102'' machine has the same features and capabilites in Q=
-EMU.
-> =20
-> +@subsection Unicore32 targets (since 2.12.0)
-> +
-> +The ``unicore32'' CPU target and ``qemu-system-unicore32'' will be rem=
-oved,
-> +since this architecture is unmaintained.
-> +
->  @node License
->  @appendix License
+On 03/08/2018 09:22 AM, Paolo Bonzini wrote:
+>>> TRIM requests should not need FUA since they're just advisory.
+>>
+>> Still, while you argue that TRIM is advisory (which I agree), if it does
+>> nothing, then you've (implicitly) honored FUA (that transaction didn't
+>> affect persistent storage, so you didn't have to wait any longer for
+>> anything to land); but if it DOES change the disk contents, then waiting
+>> for that change to land IS worth supporting, hence why the NBD protocol
+>> requires the FUA flag to be honored on trim.
+> 
+> But if power fails, after restart you cannot see the difference between
+> a TRIM command that chose to did nothing, and one that chose to change
+> the disk contents but failed to persist the changes.  This is why I
+> thought there is no need for FUA in my opinion.
+> 
+> I suppose in principle you could detect the change by reading the
+> TRIMmed sectors and writing to another disk.  So TRIM would have to be a
+> Schroedinger command that is persistent once you read the sectors, and
+> that makes little sense.  The problem is, SCSI doesn't have a FUA flag
+> either...
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+The documentation of NBD_CMD_TRIM says that in general you must not 
+expect reliable read results from the area you trimmed (since the 
+command is advisory, you don't know if you would read the old data 
+unchanged, all zeroes, or even random unrelated data).  But if you know 
+that a particular server treats TRIM as mandatory rather than advisory, 
+and also guarantees a reads-as-zero after a successful TRIM, then for 
+that particular server, the FUA flag on TRIM makes sense.  The 
+documentation for NBD_CMD_BLOCK_STATUS also points out that block status 
+may, but not must, be altered by NBD_CMD_TRIM, which might be another 
+way to observer how much of a TRIM request was advisory.
 
+At any rate, your argument makes sense that because bdrv_pdiscard() is 
+advisory, we can't tell whether it made a difference, and therefore 
+waiting for it to make a difference isn't worthwhile, and therefore 
+plumbing BDRV_REQ_FUA through the block layer for bdrv_pdiscard() is 
+pointless.  At this point, I will just go ahead and add the flush for 
+qemu as NBD server if it ever sees NBD_CMD_TRIM + FUA (which is unlikely 
+to happen in practice, as most clients are smart enough to realize that 
+TRIM is advisory and reading after TRIM is unreliable anyways, so 
+waiting for the TRIM to land is pointless); and qemu as a client will 
+probably never send NBD_CMD_TRIM + FUA.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
