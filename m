@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1etuze-0005Cx-42
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:50:01 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1etuzi-0005EJ-0i
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:50:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1etuzZ-0003yM-Ni
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:49:58 -0500
-Received: from mail-cys01nam02on0066.outbound.protection.outlook.com
-	([104.47.37.66]:52661
+	(envelope-from <brijesh.singh@amd.com>) id 1etuze-00041o-1w
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:50:02 -0500
+Received: from mail-cys01nam02on0089.outbound.protection.outlook.com
+	([104.47.37.89]:10504
 	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1etuzZ-0003xW-Fx
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:49:53 -0500
+	id 1etuzd-00040H-PX
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 07:49:57 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Thu,  8 Mar 2018 06:48:43 -0600
-Message-Id: <20180308124901.83533-11-brijesh.singh@amd.com>
+Date: Thu,  8 Mar 2018 06:48:45 -0600
+Message-Id: <20180308124901.83533-13-brijesh.singh@amd.com>
 In-Reply-To: <20180308124901.83533-1-brijesh.singh@amd.com>
 References: <20180308124901.83533-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v12 10/28] include: add psp-sev.h header file
+Subject: [Qemu-devel] [PATCH v12 12/28] sev/i386: register the guest memory
+ range which may contain encrypted data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,165 +32,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Alexander Graf <agraf@suse.de>, Bruce Rogers <brogers@suse.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
 
-The header file provide the ioctl command and structure to communicate
-with /dev/sev device.
+When SEV is enabled, the hardware encryption engine uses a tweak such
+that the two identical plaintext at different location will have a
+different ciphertexts. So swapping or moving a ciphertexts of two guest
+pages will not result in plaintexts being swapped. Hence relocating
+a physical backing pages of the SEV guest will require some additional
+steps in KVM driver. The KVM_MEMORY_ENCRYPT_{UN,}REG_REGION ioctl can be
+used to register/unregister the guest memory region which may contain the
+encrypted data. KVM driver will internally handle the relocating physical
+backing pages of registered memory regions.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Richard Henderson <rth@twiddle.net>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- linux-headers/linux/psp-sev.h | 142 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 142 insertions(+)
- create mode 100644 linux-headers/linux/psp-sev.h
+ target/i386/sev.c        | 42 ++++++++++++++++++++++++++++++++++++++++++
+ target/i386/trace-events |  2 ++
+ 2 files changed, 44 insertions(+)
 
-diff --git a/linux-headers/linux/psp-sev.h b/linux-headers/linux/psp-sev.h
-new file mode 100644
-index 000000000000..33e247471ae0
---- /dev/null
-+++ b/linux-headers/linux/psp-sev.h
-@@ -0,0 +1,142 @@
-+/*
-+ * Userspace interface for AMD Secure Encrypted Virtualization (SEV)
-+ * platform management commands.
-+ *
-+ * Copyright (C) 2016-2017 Advanced Micro Devices, Inc.
-+ *
-+ * Author: Brijesh Singh <brijesh.singh@amd.com>
-+ *
-+ * SEV spec 0.14 is available at:
-+ * http://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pdf
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 288612e1aa46..4f85035d5203 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -105,6 +105,46 @@ fw_error_to_str(int code)
+     return sev_fw_errlist[code];
+ }
+ 
++static void
++sev_ram_block_added(RAMBlockNotifier *n, void *host, size_t size)
++{
++    int r;
++    struct kvm_enc_region range;
 +
-+#ifndef __PSP_SEV_USER_H__
-+#define __PSP_SEV_USER_H__
++    range.addr = (__u64)host;
++    range.size = size;
 +
-+#include <linux/types.h>
++    trace_kvm_memcrypt_register_region(host, size);
++    r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_REG_REGION, &range);
++    if (r) {
++        error_report("%s: failed to register region (%p+%#lx) error '%s'",
++                     __func__, host, size, strerror(errno));
++        exit(1);
++    }
++}
 +
-+/**
-+ * SEV platform commands
-+ */
-+enum {
-+	SEV_FACTORY_RESET = 0,
-+	SEV_PLATFORM_STATUS,
-+	SEV_PEK_GEN,
-+	SEV_PEK_CSR,
-+	SEV_PDH_GEN,
-+	SEV_PDH_CERT_EXPORT,
-+	SEV_PEK_CERT_IMPORT,
++static void
++sev_ram_block_removed(RAMBlockNotifier *n, void *host, size_t size)
++{
++    int r;
++    struct kvm_enc_region range;
 +
-+	SEV_MAX,
++    range.addr = (__u64)host;
++    range.size = size;
++
++    trace_kvm_memcrypt_unregister_region(host, size);
++    r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_UNREG_REGION, &range);
++    if (r) {
++        error_report("%s: failed to unregister region (%p+%#lx)",
++                     __func__, host, size);
++    }
++}
++
++static struct RAMBlockNotifier sev_ram_notifier = {
++    .ram_block_added = sev_ram_block_added,
++    .ram_block_removed = sev_ram_block_removed,
 +};
 +
-+/**
-+ * SEV Firmware status code
-+ */
-+typedef enum {
-+	SEV_RET_SUCCESS = 0,
-+	SEV_RET_INVALID_PLATFORM_STATE,
-+	SEV_RET_INVALID_GUEST_STATE,
-+	SEV_RET_INAVLID_CONFIG,
-+	SEV_RET_INVALID_LEN,
-+	SEV_RET_ALREADY_OWNED,
-+	SEV_RET_INVALID_CERTIFICATE,
-+	SEV_RET_POLICY_FAILURE,
-+	SEV_RET_INACTIVE,
-+	SEV_RET_INVALID_ADDRESS,
-+	SEV_RET_BAD_SIGNATURE,
-+	SEV_RET_BAD_MEASUREMENT,
-+	SEV_RET_ASID_OWNED,
-+	SEV_RET_INVALID_ASID,
-+	SEV_RET_WBINVD_REQUIRED,
-+	SEV_RET_DFFLUSH_REQUIRED,
-+	SEV_RET_INVALID_GUEST,
-+	SEV_RET_INVALID_COMMAND,
-+	SEV_RET_ACTIVE,
-+	SEV_RET_HWSEV_RET_PLATFORM,
-+	SEV_RET_HWSEV_RET_UNSAFE,
-+	SEV_RET_UNSUPPORTED,
-+	SEV_RET_MAX,
-+} sev_ret_code;
+ static void
+ qsev_guest_finalize(Object *obj)
+ {
+@@ -436,6 +476,8 @@ sev_guest_init(const char *id)
+         goto err;
+     }
+ 
++    ram_block_notifier_add(&sev_ram_notifier);
 +
-+/**
-+ * struct sev_user_data_status - PLATFORM_STATUS command parameters
-+ *
-+ * @major: major API version
-+ * @minor: minor API version
-+ * @state: platform state
-+ * @flags: platform config flags
-+ * @build: firmware build id for API version
-+ * @guest_count: number of active guests
-+ */
-+struct sev_user_data_status {
-+	__u8 api_major;				/* Out */
-+	__u8 api_minor;				/* Out */
-+	__u8 state;				/* Out */
-+	__u32 flags;				/* Out */
-+	__u8 build;				/* Out */
-+	__u32 guest_count;			/* Out */
-+} __attribute__((packed));
-+
-+/**
-+ * struct sev_user_data_pek_csr - PEK_CSR command parameters
-+ *
-+ * @address: PEK certificate chain
-+ * @length: length of certificate
-+ */
-+struct sev_user_data_pek_csr {
-+	__u64 address;				/* In */
-+	__u32 length;				/* In/Out */
-+} __attribute__((packed));
-+
-+/**
-+ * struct sev_user_data_cert_import - PEK_CERT_IMPORT command parameters
-+ *
-+ * @pek_address: PEK certificate chain
-+ * @pek_len: length of PEK certificate
-+ * @oca_address: OCA certificate chain
-+ * @oca_len: length of OCA certificate
-+ */
-+struct sev_user_data_pek_cert_import {
-+	__u64 pek_cert_address;			/* In */
-+	__u32 pek_cert_len;			/* In */
-+	__u64 oca_cert_address;			/* In */
-+	__u32 oca_cert_len;			/* In */
-+} __attribute__((packed));
-+
-+/**
-+ * struct sev_user_data_pdh_cert_export - PDH_CERT_EXPORT command parameters
-+ *
-+ * @pdh_address: PDH certificate address
-+ * @pdh_len: length of PDH certificate
-+ * @cert_chain_address: PDH certificate chain
-+ * @cert_chain_len: length of PDH certificate chain
-+ */
-+struct sev_user_data_pdh_cert_export {
-+	__u64 pdh_cert_address;			/* In */
-+	__u32 pdh_cert_len;			/* In/Out */
-+	__u64 cert_chain_address;		/* In */
-+	__u32 cert_chain_len;			/* In/Out */
-+} __attribute__((packed));
-+
-+/**
-+ * struct sev_issue_cmd - SEV ioctl parameters
-+ *
-+ * @cmd: SEV commands to execute
-+ * @opaque: pointer to the command structure
-+ * @error: SEV FW return code on failure
-+ */
-+struct sev_issue_cmd {
-+	__u32 cmd;				/* In */
-+	__u64 data;				/* In */
-+	__u32 error;				/* Out */
-+} __attribute__((packed));
-+
-+#define SEV_IOC_TYPE		'S'
-+#define SEV_ISSUE_CMD	_IOWR(SEV_IOC_TYPE, 0x0, struct sev_issue_cmd)
-+
-+#endif /* __PSP_USER_SEV_H */
+     return s;
+ err:
+     g_free(sev_state);
+diff --git a/target/i386/trace-events b/target/i386/trace-events
+index 797b716751b7..ffa3d2250425 100644
+--- a/target/i386/trace-events
++++ b/target/i386/trace-events
+@@ -8,3 +8,5 @@ kvm_x86_update_msi_routes(int num) "Updated %d MSI routes"
+ 
+ # target/i386/sev.c
+ kvm_sev_init(void) ""
++kvm_memcrypt_register_region(void *addr, size_t len) "addr %p len 0x%lu"
++kvm_memcrypt_unregister_region(void *addr, size_t len) "addr %p len 0x%lu"
 -- 
 2.14.3
