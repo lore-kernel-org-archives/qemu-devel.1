@@ -1,24 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58911)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1etskm-0008Ga-VB
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:26:33 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60218)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1etsrb-0002TR-G2
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:33:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1etskh-0008Vu-0o
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:26:28 -0500
-References: <1520413694-1271-1-git-send-email-thuth@redhat.com>
-	<3aaac650-2934-c4ab-3f58-c022b1510e81@reactos.org>
-	<950d4782-e1ca-816a-f13c-3dade56a7e7f@redhat.com>
-	<CAFEAcA-bXBfc44y5FV9BOB14KMsJGNj3YEYSDxyAfVGpQooWjg@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <48bc8ae3-97d9-3fba-5c58-a44c20a4a8d4@redhat.com>
-Date: Thu, 8 Mar 2018 11:26:16 +0100
+	(envelope-from <pl@kamp.de>) id 1etsrW-0002c4-KQ
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:33:31 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:52731 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1etsrW-0002Y6-AZ
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 05:33:26 -0500
+Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
+	for qemu-devel@nongnu.org; Thu, 8 Mar 2018 11:33:21 +0100
+References: <c0d7b993-b3b8-a753-21f5-e2257de27caf@kamp.de>
+	<20180305114533.GI7910@stefanha-x1.localdomain>
+	<0f1ec3c7-1157-e618-62f8-ffd5e08eb342@kamp.de>
+	<20180305145215.GM3131@work-vm>
+	<20180306160739.GN31045@stefanha-x1.localdomain>
+	<824907bb-3a37-27bd-76db-be17d05bdac0@kamp.de>
+	<231fe0ce-3df4-a175-2fba-403023cc65e1@kamp.de>
+	<99df10d6-6514-56ee-16ce-8b7d1823cc08@kamp.de>
+	<20180308012842.GJ13844@lemon.usersys.redhat.com>
+	<0EDE7998-76A9-41F5-AE83-89BA0E9C3A6E@kamp.de>
+	<CAK1Eb9=cZVH6v4hmLmTrTLH81DL-nP1Z-v+7EswQHd4fqaYBvA@mail.gmail.com>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <d043ef16-ba45-e6f3-6673-4ff368e4b1fb@kamp.de>
+Date: Thu, 8 Mar 2018 11:33:22 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-bXBfc44y5FV9BOB14KMsJGNj3YEYSDxyAfVGpQooWjg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAK1Eb9=cZVH6v4hmLmTrTLH81DL-nP1Z-v+7EswQHd4fqaYBvA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/ppc/prep: Fix implicit creation of
- "-drive if=scsi" devices
+Subject: Re: [Qemu-devel] block migration and dirty bitmap reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,66 +40,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Fam Zheng <famz@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, wency@cn.fujitsu.com, qemu block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 08.03.2018 11:07, Peter Maydell wrote:
-> On 8 March 2018 at 07:09, Thomas Huth <thuth@redhat.com> wrote:
->> It's the third case. The "generic" code was just removed with commit
->> 1454509726719e0933 since it was considered as a big hack. The generic
->> code should not have to guess to which SCSI adapter a SCSI drive shoul=
-d
->> be attached to. That's the job of the board init code, and this is wha=
-t
->> this patch is doing now for the 40p machine.
+Am 08.03.2018 um 10:01 schrieb Fam Zheng:
+> On Thu, Mar 8, 2018 at 4:57 PM, Peter Lieven <pl@kamp.de> wrote:
 >>
->> Other boards like the "pseries" machine were doing this since a long
->> time already (see the spapr_vscsi_create() function in
->> hw/scsi/spapr_vscsi.c for example).
->>
->>> You just fixed 40p and MIPS Jazz machines, but sparc/SS-10 (and other=
-)
->>> also have the same problem...
->>
->> I also posted a patch for the Sparc machines, you can find it here:
->>
->> https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg01830.html
->=20
-> Are we sure this is the entire list of machines that use this?
+>>> Am 08.03.2018 um 02:28 schrieb Fam Zheng <famz@redhat.com>:
+>>>
+>>>> On Wed, 03/07 09:06, Peter Lieven wrote:
+>>>> Hi,
+>>>>
+>>>> while looking at the code I wonder if the blk_aio_preadv and the bdrv_reset_dirty_bitmap order must
+>>>> be swapped in mig_save_device_bulk:
+>>>>
+>>>>     qemu_mutex_lock_iothread();
+>>>>     aio_context_acquire(blk_get_aio_context(bmds->blk));
+>>>>     blk->aiocb = blk_aio_preadv(bb, cur_sector * BDRV_SECTOR_SIZE, &blk->qiov,
+>>>>                                 0, blk_mig_read_cb, blk);
+>>>>
+>>>>     bdrv_reset_dirty_bitmap(bmds->dirty_bitmap, cur_sector * BDRV_SECTOR_SIZE,
+>>>>                             nr_sectors * BDRV_SECTOR_SIZE);
+>>>>     aio_context_release(blk_get_aio_context(bmds->blk));
+>>>>     qemu_mutex_unlock_iothread();
+>>>>
+>>>> In mig_save_device_dirty we first reset the dirty bitmap and read then which shoulds like
+>>>> a better idea.
+>>> Yes, that sounds right to me.
+>>>
+>>> Fam
+>> You mean the order should be swapped in mig_save_device_bulk as well?
+> Yeah, resetting the dirty bitmap before reading makes sure we don't
+> miss any new data.
 
-Yes. The problem only occurs for boards that are using
-block_default_type =3D IF_SCSI.
+I wonder if this can really happen during blk_aio_preadv?
+Anyway better safe than sorry. It at least will not hurt to swap the order.
 
-$ grep -rl IF_SCSI hw/
-hw/arm/versatilepb.c
-hw/arm/realview.c
-hw/mips/mips_jazz.c
-hw/ppc/prep.c
-hw/ppc/spapr.c
-hw/scsi/scsi-bus.c
-hw/sparc/sun4m.c
-hw/hppa/machine.c
-
-versatilepb, realview and the hppa machine were already using
-lsi53c895a_create() that takes care of this already. spapr is properly
-using scsi_bus_legacy_handle_cmdline() in spapr_vscsi_create(). And for
-jazz, prep and sun4m, I sent the patches to the list yesterday.
-
-> Can we in general try to avoid removing generic code features
-> until we've checked and fixed everything that relies on them? x86 pc
-> is not the only system we support...
-
-Sure. You know, I'm a ppc / s390x guy, so I am very aware of other
-platforms, too. In this case it was just a bad misunderstanding - I did
-not expect that the code would still be used on other platforms, too.
-Sorry for that.
-
-The problem is rather that we still need more automatic regression tests
-for stuff like this. I already have got something in mind for a new
-qtest: If "mkisofs" or "genisoimage" is available, we could create a
-boot CD-ROM automatically using the boot code from tests/boot-sector.c.
-Then the test could try to boot from that CD-ROM to check whether
-"--cdrom" is still working as expected. What do you think, does that
-sound reasonable?
-
- Thomas
+Peter
