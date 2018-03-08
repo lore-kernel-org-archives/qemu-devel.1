@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43634)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eu03y-0005fE-M7
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:14:47 -0500
+	(envelope-from <lersek@redhat.com>) id 1eu0AE-0001Dx-BU
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:21:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eu03v-0004P3-FR
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:14:46 -0500
-References: <20180207125037.13510-1-vsementsov@virtuozzo.com>
-	<20180207125037.13510-2-vsementsov@virtuozzo.com>
-	<20180306153213.GK31045@stefanha-x1.localdomain>
-	<49f2f289-ce1c-6e24-8b54-bb5b5c1601bc@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <9ef1c947-616f-0cde-040d-7a4f0fc8f146@virtuozzo.com>
-Date: Thu, 8 Mar 2018 21:14:34 +0300
+	(envelope-from <lersek@redhat.com>) id 1eu0AB-0000Xb-5h
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:21:14 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37744 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1eu0AA-0000XD-Rb
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 13:21:11 -0500
+References: <20180307155746.18526-1-marcandre.lureau@redhat.com>
+	<20180307155746.18526-7-marcandre.lureau@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <c46d7d18-5f4c-fe76-6b4a-a7109749d4b4@redhat.com>
+Date: Thu, 8 Mar 2018 19:20:59 +0100
 MIME-Version: 1.0
-In-Reply-To: <49f2f289-ce1c-6e24-8b54-bb5b5c1601bc@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20180307155746.18526-7-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] block/accounting: introduce latency
- histogram
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [edk2] [PATCH v2 6/8] ovmf: link with Tcg2Pei
+ module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,79 +29,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, den@openvz.org
+To: marcandre.lureau@redhat.com, edk2-devel@lists.01.org
+Cc: qemu-devel@nongnu.org, javierm@redhat.com, pjones@redhat.com, jiewen.yao@intel.com
 
-08.03.2018 20:31, Eric Blake wrote:
-> On 03/06/2018 09:32 AM, Stefan Hajnoczi wrote:
->> On Wed, Feb 07, 2018 at 03:50:36PM +0300, Vladimir=20
->> Sementsov-Ogievskiy wrote:
->>> Introduce latency histogram statics for block devices.
->>> For each accounted operation type latency region [0, +inf) is
->>> divided into subregions by several points. Then, calculate
->>> hits for each subregion.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> ---
->
->> According to Wikipedia and Mathworld, "intervals" and "bins" are
->> commonly used terms:
->> https://en.wikipedia.org/wiki/Histogram
->> http://mathworld.wolfram.com/Histogram.html
->>
->> I suggest:
->>
->> =C2=A0=C2=A0 typedef struct {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* The following histogram is repre=
-sented like this:
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 5|=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 4|=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 3| *=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 2| *=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0 *
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 1| *=C2=A0=C2=A0=C2=A0 *=C2=
-=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0 *
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0 +------------------
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 10=C2=A0=C2=A0 50=C2=A0=C2=A0 100
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * BlockLatencyHistogram histo=
-gram =3D {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 .nb=
-ins =3D 4,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 .in=
-tervals =3D {10, 50, 100},
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 .bi=
-ns =3D {3, 1, 5, 2},
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * };
->
-> The name 'intervals' is still slightly ambiguous: does it hold the=20
-> boundary point (0-10 for 10 slots, 10-50 for 40 slots, 50-100, for 50=20
-> slots, then 100-INF) or is it the interval size of each slot (first=20
-> bin is 10 slots for 0-10, next bin is 50 slots wide so 10-60, next bin=20
-> is 100 slots wide so 60-160, everything else is 160-INF).=C2=A0 But the=20
-> ascii-art diagram plus the text is sufficient to resolve the intent if=20
-> you keep that name (I don't have a suggestion for a better name).
->
+On 03/07/18 16:57, marcandre.lureau@redhat.com wrote:
+> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>=20
+> This module will initialize TPM device, measure reported FVs and BIOS
+> version. We keep both SHA-1 and SHA-256 for the TCG 1.2 log format
+> compatibility, but the SHA-256 measurements and TCG 2 log format are
+> now recommended.
+>=20
+> Cc: Laszlo Ersek <lersek@redhat.com>
+> Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> Contributed-under: TianoCore Contribution Agreement 1.0
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  OvmfPkg/OvmfPkgX64.dsc | 7 +++++++
+>  OvmfPkg/OvmfPkgX64.fdf | 1 +
+>  2 files changed, 8 insertions(+)
 
-Hm. these numbers are actually boundary points of histogram intervals,=20
-not intervals itself. And, wiki says "The bins are usually specified as=20
-consecutive, non-overlapping intervals of a variable.", so, intervals=20
-are bins.
+(1) Please change the subject line to:
 
-So, what about:
+OvmfPkg: include Tcg2Pei module
 
-1. interval_boundaries
-2. bin_boundaries
-3. boundaries
+>=20
+> diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
+> index 64bd6b6a9f08..3fa1a31f4c37 100644
+> --- a/OvmfPkg/OvmfPkgX64.dsc
+> +++ b/OvmfPkg/OvmfPkgX64.dsc
+> @@ -278,6 +278,8 @@ [LibraryClasses.common.PEIM]
+>    QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
+> =20
+>  !if $(TPM2_ENABLE)
+> +  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
 
-(and same names with s/_/-/ for qapi)
+(2) Technically this makes sense, but given the fact that we resolve
+BaseCryptLib unconditionally for a bunch of other module types, I think
+we should do that for PEIMs as well.
 
+> +  HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCrypt=
+oRouterPei.inf
+>    Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTp=
+m.inf
+>  !endif
+> =20
+> @@ -615,6 +617,11 @@ [Components]
+> =20
+>  !if $(TPM2_ENABLE) =3D=3D TRUE
+>    OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
+> +  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf {
+> +    <LibraryClasses>
+> +      NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1=
+.inf
+> +      NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSh=
+a256.inf
+> +  }
+>  !endif
+> =20
+>    #
+> diff --git a/OvmfPkg/OvmfPkgX64.fdf b/OvmfPkg/OvmfPkgX64.fdf
+> index dbafada5226b..c0173e7adf5f 100644
+> --- a/OvmfPkg/OvmfPkgX64.fdf
+> +++ b/OvmfPkg/OvmfPkgX64.fdf
+> @@ -167,6 +167,7 @@ [FV.PEIFV]
+> =20
+>  !if $(TPM2_ENABLE) =3D=3D TRUE
+>  INF  OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
+> +INF  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
+>  !endif
+> =20
+>  ######################################################################=
+##########
+>=20
 
---=20
-Best regards,
-Vladimir
+Looks good. (The final version should handle the other DSC / FDF files to=
+o.)
+
+Thanks!
+Laszlo
