@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1etxlS-0004vb-BF
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:47:31 -0500
+	(envelope-from <berrange@redhat.com>) id 1etxlZ-00053Z-4Y
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:47:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1etxlM-0000DP-9l
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:47:30 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34002 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1etxlW-0000IW-1X
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:47:37 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43030 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1etxlM-0000CA-2E
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:47:24 -0500
-Date: Thu, 8 Mar 2018 16:47:11 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180308164711.19c368a1@redhat.com>
-In-Reply-To: <20180307140126.GB3090@work-vm>
-References: <1518784641-43151-1-git-send-email-imammedo@redhat.com>
-	<1518784641-43151-5-git-send-email-imammedo@redhat.com>
-	<20180307140126.GB3090@work-vm>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1etxlV-0000IJ-Qo
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:47:33 -0500
+Date: Thu, 8 Mar 2018 15:47:30 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180308154730.GZ4718@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180307144951.d75lo5rgzi2vf27z@eukaryote>
+	<90ba320e-2a05-8962-dc6b-252b3e15d1b7@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 4/9] HMP: disable monitor in preconfig
- state
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <90ba320e-2a05-8962-dc6b-252b3e15d1b7@redhat.com>
+Subject: Re: [Qemu-devel] [RFC] Defining firmware (OVMF,
+ et al) metadata format & file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, pkrempa@redhat.com, ehabkost@redhat.com, cohuck@redhat.com, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, kraxel@redhat.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-On Wed, 7 Mar 2018 14:01:27 +0000
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+On Thu, Mar 08, 2018 at 12:10:30PM +0100, Laszlo Ersek wrote:
+> (
+> Ard, the thread starts here:
+> 
+> http://mid.mail-archive.com/20180307144951.d75lo5rgzi2vf27z@eukaryote
+> )
+> 
+> On 03/07/18 15:49, Kashyap Chamarthy wrote:
+> > Problem background
+> > ------------------
+> > 
+> > The various OVMF binary file names and paths are slightly different[+]
+> > for each Linux distribution.  And each high-level management tool
+> > (libguestfs, oVirt, `virt-manager` and OpenStack Nova) is inventing its
+> > own approach to detect and configure the said OVMF files.  This email
+> > thread is about arriving at some common understanding to make this a bit
+> > more "unified" by addressing these needs in QEMU and libvirt.
+> 
+> I've read Dan's message <20180307151836.GK20201@redhat.com> and Gerd's
+> messages <20180308075245.lgzredyhn2paawg4@sirius.home.kraxel.org>,
+> <20180308074507.nwho4tddsoxb3b7v@sirius.home.kraxel.org>.
+> 
+> Those seem to cover everything, I don't have anything to add wrt.
+> purpose, use case, flexibility etc.
+> 
+> I suggest (or agree) that the property list be composed of free-form
+> name=value pairs (at least conceptually). I understand Gerd is proposing
+> a QAPI schema for this, so maybe do { property_name : "foo",
+> property_value : "bar" }, or similar. The registry of properties (names,
+> possible values, meanings) should be kept separate (although possibly
+> still under QEMU).
+> 
+> For OVMF (x86), I guess the initial set of properties should come from
+> the "-D FOO[=BAR]" build flags that OVMF currently supports. (The list
+> might grow or change incompatibly over time, so this is just a raw
+> starter idea.)
 
-> * Igor Mammedov (imammedo@redhat.com) wrote:
-> > Ban it for now, if someone would need it to work early,
-> > one would have to implement checks if HMP command is valid
-> > at preconfig state.
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> > ---
-> >  monitor.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> > 
-> > diff --git a/monitor.c b/monitor.c
-> > index f499250..fcb5386 100644
-> > --- a/monitor.c
-> > +++ b/monitor.c
-> > @@ -3097,6 +3097,10 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
-> >  
-> >      trace_handle_hmp_command(mon, cmdline);
-> >  
-> > +    if (runstate_check(RUN_STATE_PRECONFIG)) {
-> > +        monitor_printf(mon, "HMP not available in precofig state\n");
-> > +    }  
-> 
-> But you've not returned, so the command will still get parsed?
-yep, it's bug. I've already fixed in v4.
-Plan to post simplified v4 this Friday if nothing goes south.
+I really don't want to see us using firmware implementation specific
+property names in these files. It means libvirt will require knowledge
+of what each different firmware's property names mean.
 
-> 
-> Dave
-> 
-> >      cmd = monitor_parse_command(mon, cmdline, &cmdline, mon->cmd_table);
-> >      if (!cmd) {
-> >          return;
-> > -- 
-> > 2.7.4
-> > 
-> >   
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+We need to have some core standardized set of property names that can
+be provided by any firmware implementation using the same terminology.
+
+If we want to /also/ provide some extra firmeware-specific property
+names that would be ok for informative purposes, but when lbivirt is
+picking which firmware file to use, it would only ever look at the
+standardized property names/values.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
