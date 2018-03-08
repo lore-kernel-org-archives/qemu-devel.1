@@ -1,21 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1etnJ7-0001nu-Mx
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 23:37:34 -0500
+	(envelope-from <nasastry@in.ibm.com>) id 1etnor-0001Ix-AB
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 00:10:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1etnJ2-0003Hr-Mv
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 23:37:33 -0500
-References: <20180307205427.3A2877456C6@zero.eik.bme.hu>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <0065edc0-8147-6e70-6508-c205e46d1a18@redhat.com>
-Date: Thu, 8 Mar 2018 05:37:23 +0100
+	(envelope-from <nasastry@in.ibm.com>) id 1etnom-00068j-BQ
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 00:10:21 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37908)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nasastry@in.ibm.com>) id 1etnol-00062d-Ni
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 00:10:16 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w2859x9s142486
+	for <qemu-devel@nongnu.org>; Thu, 8 Mar 2018 00:10:00 -0500
+Received: from smtp.notes.na.collabserv.com (smtp.notes.na.collabserv.com
+	[192.155.248.75])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2gjxkygbnq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 00:09:58 -0500
+Received: from localhost
+	by smtp.notes.na.collabserv.com with smtp.notes.na.collabserv.com ESMTP
+	for <qemu-devel@nongnu.org> from <nasastry@in.ibm.com>;
+	Thu, 8 Mar 2018 05:09:01 -0000
+In-Reply-To: <152044905701.22965.8924520463227226351.stgit@bahia.lan>
+From: "Nageswara R Sastry" <nasastry@in.ibm.com>
+Date: Thu, 8 Mar 2018 10:38:56 +0530
+References: <152044905701.22965.8924520463227226351.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20180307205427.3A2877456C6@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] ppc440_pcix: Add dummy implementation of
- BRDGOPT registers
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="US-ASCII"
+Message-Id: <OFE3A7F910.3814D427-ON6525824A.001BEDE1-6525824A.001C48BE@notes.na.collabserv.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio_net: flush uncompleted TX on reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,81 +40,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Greg Kurz <groug@kaod.org>
 
-On 07.03.2018 21:43, BALATON Zoltan wrote:
-> I don't know what should be the correct implementation for these so
-> these are just stored and returned as is without doing anything for
-> now only to silence warnings when u-boot accesses these registers.
-> 
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Greg Kurz <groug@kaod.org> wrote on 08/03/2018 12:27:37 AM:
+
+> From: Greg Kurz <groug@kaod.org>
+> To: qemu-devel@nongnu.org
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang=20
+> <jasowang@redhat.com>, R Nageswara Sastry <nasastry@in.ibm.com>
+> Date: 08/03/2018 12:27 AM
+> Subject: [PATCH] virtio=5Fnet: flush uncompleted TX on reset
+>=20
+> If the backend could not transmit a packet right away for some reason,
+> the packet is queued for asynchronous sending. The corresponding vq
+> element is tracked in the async=5Ftx.elem field of the VirtIONetQueue,
+> for later freeing when the transmission is complete.
+>=20
+> If a reset happens before completion, virtio=5Fnet=5Ftx=5Fcomplete() will=
+ push
+> async=5Ftx.elem back to the guest anyway, and we end up with the inuse=20
+flag
+> of the vq being equal to -1. The next call to virtqueue=5Fpop() is then
+> likely to fail with "Virtqueue size exceeded".
+>=20
+> This can be reproduced easily by starting a guest without a net backend,
+> doing a system reset when it is booted, and finally snapshotting it.
+>=20
+> The appropriate fix is to ensure that such an asynchronous transmission
+> cannot survive a device reset. So for all queues, we first try to send
+> the packet again, and eventually we purge it if the backend still could
+> not deliver it.
+>=20
+> Reported-by: R. Nageswara Sastry <nasastry@in.ibm.com>
+
+Tested-by: R. Nageswara Sastry <nasastry@in.ibm.com>
+
+> Buglink: https://urldefense.proofpoint.com/v2/url?
+>=20
+u=3Dhttps-3A=5F=5Fgithub.com=5Fopen-2Dpower-2Dhost-2Dos=5Fqemu=5Fissues=5F3=
+7&d=3DDwICaQ&c=3Djf=5FiaSHvJObTbx-
+> siA1ZOg&r=3DmxAxqGE8eb0FlPPFjDZkTNaoci-GdQbkJayE4r-
+>=20
+wzYY&m=3DhPoY6b601IXJbUV2uh22jBrnYuByNQpwi1d7gvN4yZs&s=3DIc3NN3mM=5FNv1gAJ7=
+dY22-
+> ebnJsG7c0yNkbThX8Tu6xg&e=3D
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  hw/ppc/ppc440_pcix.c | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
-> 
-> diff --git a/hw/ppc/ppc440_pcix.c b/hw/ppc/ppc440_pcix.c
-> index ab2626a..3f177d3 100644
-> --- a/hw/ppc/ppc440_pcix.c
-> +++ b/hw/ppc/ppc440_pcix.c
-> @@ -55,6 +55,8 @@ typedef struct PPC440PCIXState {
->      PCIDevice *dev;
->      struct PLBOutMap pom[PPC440_PCIX_NR_POMS];
->      struct PLBInMap pim[PPC440_PCIX_NR_PIMS];
-> +    uint32_t brdgopt1;
-> +    uint32_t brdgopt2;
->      uint32_t sts;
->      qemu_irq irq[PCI_NUM_PINS];
->      AddressSpace bm_as;
-> @@ -95,6 +97,8 @@ typedef struct PPC440PCIXState {
->  #define PCIX0_PIM0SAH       0xf8
->  #define PCIX0_PIM2SAH       0xfc
->  
-> +#define PCIX0_BRDGOPT1      0x40
-> +#define PCIX0_BRDGOPT2      0x44
->  #define PCIX0_STS           0xe0
->  
->  #define PCI_ALL_SIZE        (PPC440_REG_BASE + PPC440_REG_SIZE)
-> @@ -270,6 +274,12 @@ static void ppc440_pcix_reg_write4(void *opaque, hwaddr addr,
->          ppc440_pcix_update_pim(s, 2);
->          break;
->  
-> +    case PCIX0_BRDGOPT1:
-> +        s->brdgopt1 = val;
-> +        break;
-> +    case PCIX0_BRDGOPT2:
-> +        s->brdgopt2 = val;
-> +        break;
->      case PCIX0_STS:
->          s->sts = val;
->          break;
-> @@ -365,6 +375,12 @@ static uint64_t ppc440_pcix_reg_read4(void *opaque, hwaddr addr,
->          val = s->pim[2].la >> 32;
->          break;
->  
-> +    case PCIX0_BRDGOPT1:
-> +        val = s->brdgopt1;
-> +        break;
-> +    case PCIX0_BRDGOPT2:
-> +        val = s->brdgopt2;
-> +        break;
->      case PCIX0_STS:
->          val = s->sts;
->          break;
-> @@ -408,6 +424,8 @@ static void ppc440_pcix_reset(DeviceState *dev)
->      for (i = 0; i < PPC440_PCIX_NR_PIMS; i++) {
->          s->pim[i].sa = 0xffffffff00000000ULL;
->      }
-> +    s->brdgopt1 = 0;
-> +    s->brdgopt2 = 0;
->      s->sts = 0;
+>  hw/net/virtio-net.c |   11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>=20
+> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> index 188744e17d57..eea3cdb2c700 100644
+> --- a/hw/net/virtio-net.c
+> +++ b/hw/net/virtio-net.c
+> @@ -422,6 +422,7 @@ static RxFilterInfo=20
+> *virtio=5Fnet=5Fquery=5Frxfilter(NetClientState *nc)
+>  static void virtio=5Fnet=5Freset(VirtIODevice *vdev)
+>  {
+>      VirtIONet *n =3D VIRTIO=5FNET(vdev);
+> +    int i;
+>=20
+>      /* Reset back to compatibility mode */
+>      n->promisc =3D 1;
+> @@ -445,6 +446,16 @@ static void virtio=5Fnet=5Freset(VirtIODevice *vdev)
+>      memcpy(&n->mac[0], &n->nic->conf->macaddr, sizeof(n->mac));
+>      qemu=5Fformat=5Fnic=5Finfo=5Fstr(qemu=5Fget=5Fqueue(n->nic), n->mac);
+>      memset(n->vlans, 0, MAX=5FVLAN >> 3);
+> +
+> +    /* Flush any async TX */
+> +    for (i =3D 0;  i < n->max=5Fqueues; i++) {
+> +        NetClientState *nc =3D qemu=5Fget=5Fsubqueue(n->nic, i);
+> +
+> +        if (!qemu=5Fnet=5Fqueue=5Fflush(nc->peer->incoming=5Fqueue)) {
+> +            qemu=5Fnet=5Fqueue=5Fpurge(nc->peer->incoming=5Fqueue, nc);
+> +        }
+> +        assert(!virtio=5Fnet=5Fget=5Fsubqueue(nc)->async=5Ftx.elem);
+> +    }
 >  }
+>=20
+>  static void peer=5Ftest=5Fvnet=5Fhdr(VirtIONet *n)
+>=20
 
-Looks sane, so:
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+With out patch:
+(qemu) system=5Freset
+(qemu) savevm 1
+Virtqueue size exceeded
+(qemu) loadvm 1
+VQ 1 size 0x100 < last=5Favail=5Fidx 0x0 - used=5Fidx 0x1
+Failed to load virtio-net:virtio
+error while loading state for instance 0x0 of device
+'pci@800000020000000:00.0/virtio-net'
+Error -1 while loading VM state
 
-... but I wonder whether the error_report() in the "default:" case
-should maybe rather be turned into a qemu_log_mask(LOG_UNIMP, ...) instead?
-
- Thomas
+With patch:
+(qemu) system=5Freset
+(qemu) savevm 1
+(qemu) loadvm 1
