@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59921)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
-	id 1etzW3-0007Qc-1h
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:39:43 -0500
+	id 1etzW3-0007Qb-0L
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:39:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
-	id 1etzW1-0008Mr-Lv
+	id 1etzW0-0008KO-BX
 	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:39:43 -0500
 Received: from smtp.citrix.com ([66.165.176.89]:42122)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
-	id 1etzW1-0008JW-Dx
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:39:41 -0500
+	id 1etzW0-0008JW-4E
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:39:40 -0500
 From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Thu, 8 Mar 2018 17:39:17 +0000
-Message-ID: <1520530757-4477-12-git-send-email-ian.jackson@eu.citrix.com>
+Date: Thu, 8 Mar 2018 17:39:08 +0000
+Message-ID: <1520530757-4477-3-git-send-email-ian.jackson@eu.citrix.com>
 In-Reply-To: <1520530757-4477-1-git-send-email-ian.jackson@eu.citrix.com>
 References: <1520530757-4477-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 11/11] scripts/get_maintainer.pl: Print proper
- error message for missing $file
+Subject: [Qemu-devel] [PATCH 02/11] xen: restrict: use
+ xentoolcore_restrict_all
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +30,105 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Ian Jackson <Ian.Jackson@eu.citrix.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Ian Jackson <Ian.Jackson@eu.citrix.com>
 
-If you pass scripts/get_maintainer.pl the name of a FIFO or other
-exciting object (/dev/stdin, for example), it would falsely print
-"file not found".  Instead: stat the object rather than using -f so
-that we do not mind if the object is not a file; and print the errno
-value in the error message.
+And insist that it works.
+
+Drop individual use of xendevicemodel_restrict and
+xenforeignmemory_restrict.  These are not actually effective in this
+version of qemu, because qemu has a large number of fds open onto
+various Xen control devices.
+
+The restriction arrangements are still not right, because the
+restriction needs to be done very late - after qemu has opened all of
+its control fds.
+
+xentoolcore_restrict_all and xentoolcore.h are available in Xen 4.10
+and later, only.  Provide a compatibility stub.  And drop the
+compatibility stubs for the old functions.
 
 Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
-CC: Thomas Huth <thuth@redhat.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Stefano Stabellini <sstabellini@kernel.org>
-CC: Anthony PERARD <anthony.perard@citrix.com>
+Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
+Acked-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
-v6: New patch in this version of the series
+v2: Modify the compatibility code, too.
+    Bump this patch ahead of "defer call to xen_restrict until running"
+    Retain call to xentoolcore_restrict_all
 ---
- scripts/get_maintainer.pl | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/hw/xen/xen_common.h | 46 +++++++++++----------------------------------
+ 1 file changed, 11 insertions(+), 35 deletions(-)
 
-diff --git a/scripts/get_maintainer.pl b/scripts/get_maintainer.pl
-index 07369aa..43fb5f5 100755
---- a/scripts/get_maintainer.pl
-+++ b/scripts/get_maintainer.pl
-@@ -381,8 +381,8 @@ foreach my $file (@ARGV) {
- 	##if $file is a directory and it lacks a trailing slash, add one
- 	if ((-d $file)) {
- 	    $file =~ s@([^/])$@$1/@;
--	} elsif (!(-f $file)) {
--	    die "$P: file '${file}' not found\n";
-+	} elsif (!(stat $file)) {
-+	    die "$P: file '${file}' not found: $!\n";
- 	}
-     }
-     if ($from_filename) {
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index 64a978e..1766bb9 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -91,6 +91,16 @@ static inline void *xenforeignmemory_map2(xenforeignmemory_handle *h,
+     return xenforeignmemory_map(h, dom, prot, pages, arr, err);
+ }
+ 
++static inline int xentoolcore_restrict_all(domid_t domid)
++{
++    errno = ENOTTY;
++    return -1;
++}
++
++#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 41000 */
++
++#include <xentoolcore.h>
++
+ #endif
+ 
+ #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
+@@ -218,20 +228,6 @@ static inline int xendevicemodel_set_mem_type(
+     return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
+ }
+ 
+-static inline int xendevicemodel_restrict(
+-    xendevicemodel_handle *dmod, domid_t domid)
+-{
+-    errno = ENOTTY;
+-    return -1;
+-}
+-
+-static inline int xenforeignmemory_restrict(
+-    xenforeignmemory_handle *fmem, domid_t domid)
+-{
+-    errno = ENOTTY;
+-    return -1;
+-}
+-
+ #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
+ 
+ #undef XC_WANT_COMPAT_DEVICEMODEL_API
+@@ -290,28 +286,8 @@ static inline int xen_modified_memory(domid_t domid, uint64_t first_pfn,
+ static inline int xen_restrict(domid_t domid)
+ {
+     int rc;
+-
+-    /* Attempt to restrict devicemodel operations */
+-    rc = xendevicemodel_restrict(xen_dmod, domid);
++    rc = xentoolcore_restrict_all(domid);
+     trace_xen_domid_restrict(rc ? errno : 0);
+-
+-    if (rc < 0) {
+-        /*
+-         * If errno is ENOTTY then restriction is not implemented so
+-         * there's no point in trying to restrict other types of
+-         * operation, but it should not be treated as a failure.
+-         */
+-        if (errno == ENOTTY) {
+-            return 0;
+-        }
+-
+-        return rc;
+-    }
+-
+-    /* Restrict foreignmemory operations */
+-    rc = xenforeignmemory_restrict(xen_fmem, domid);
+-    trace_xen_domid_restrict(rc ? errno : 0);
+-
+     return rc;
+ }
+ 
 -- 
 2.1.4
