@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57049)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57096)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
-	id 1eu0pR-0000qP-OV
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:03:51 -0500
+	id 1eu0pT-0000rm-4e
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:03:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
-	id 1eu0pQ-0002g9-Gp
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:03:49 -0500
-Received: from smtp.citrix.com ([66.165.176.89]:27694)
+	id 1eu0pR-0002i9-SR
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:03:51 -0500
+Received: from smtp.citrix.com ([66.165.176.89]:61825)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
-	id 1eu0pQ-0002cK-9J
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:03:48 -0500
+	id 1eu0pR-0002hC-NK
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:03:49 -0500
 From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Thu, 8 Mar 2018 19:03:03 +0000
-Message-ID: <1520535787-6223-9-git-send-email-ian.jackson@eu.citrix.com>
+Date: Thu, 8 Mar 2018 19:03:07 +0000
+Message-ID: <1520535787-6223-13-git-send-email-ian.jackson@eu.citrix.com>
 In-Reply-To: <1520535787-6223-1-git-send-email-ian.jackson@eu.citrix.com>
 References: <1520535787-6223-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 08/12] os-posix: Provide new -runas <uid>:<gid>
- facility
+Subject: [Qemu-devel] [PATCH 12/12] scripts/get_maintainer.pl: Print proper
+ error message for missing $file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,148 +30,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-This allows the caller to specify a uid and gid to use, even if there
-is no corresponding password entry.  This will be useful in certain
-Xen configurations.
-
-We don't support just -runas <uid> because: (i) deprivileging without
-calling setgroups would be ineffective (ii) given only a uid we don't
-know what gid we ought to use (since uids may eppear in multiple
-passwd file entries with different gids).
+If you pass scripts/get_maintainer.pl the name of a FIFO or other
+exciting object (/dev/stdin, for example), it would falsely print
+"file not found".  Instead: stat the object rather than using -f so
+that we do not mind if the object is not a file; and print the errno
+value in the error message.
 
 Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
+CC: Thomas Huth <thuth@redhat.com>
 CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Markus Armbruster <armbru@redhat.com>
-CC: Daniel P. Berrange <berrange@redhat.com>
+CC: Stefano Stabellini <sstabellini@kernel.org>
+CC: Anthony PERARD <anthony.perard@citrix.com>
 ---
-v6.1: Fix constness of qemu_strtoul end pointer parameter.
-v6: Use qemu_strtoul for the first strtoul.
-    Use error_report rather than fprintf to print usage error message.
-    Fix an error message which still referred to . rather than :
-v5: Use : rather than . to separate uid from gid
-v4: Changed to reuse option -runas
-v3: Error messages fixed.  Thanks to Peter Maydell and Ross Lagerwall.
-v2: Coding style fixes.
-
-Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
+v6: New patch in this version of the series
 ---
- os-posix.c      | 62 +++++++++++++++++++++++++++++++++++++++++++++++----------
- qemu-options.hx |  3 ++-
- 2 files changed, 53 insertions(+), 12 deletions(-)
+ scripts/get_maintainer.pl | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/os-posix.c b/os-posix.c
-index b9c2343..214f8fb 100644
---- a/os-posix.c
-+++ b/os-posix.c
-@@ -42,6 +42,8 @@
- #endif
- 
- static struct passwd *user_pwd;
-+static uid_t user_uid = (uid_t)-1;
-+static gid_t user_gid = (gid_t)-1;
- static const char *chroot_dir;
- static int daemonize;
- static int daemon_pipe;
-@@ -127,6 +129,34 @@ void os_set_proc_name(const char *s)
- #endif
- }
- 
-+
-+static bool os_parse_runas_uid_gid(const char *optarg)
-+{
-+    unsigned long lv;
-+    const char *ep;
-+    uid_t got_uid;
-+    gid_t got_gid;
-+    int rc;
-+
-+    errno = 0;
-+    rc = qemu_strtoul(optarg, &ep, 0, &lv);
-+    got_uid = lv; /* overflow here is ID in C99 */
-+    if (rc || *ep != ':' || got_uid != lv || got_uid == (uid_t)-1) {
-+        return false;
-+    }
-+
-+    lv = 0;
-+    rc = qemu_strtoul(ep + 1, 0, 0, &lv);
-+    got_gid = lv; /* overflow here is ID in C99 */
-+    if (rc || got_gid != lv || got_gid == (gid_t)-1) {
-+        return false;
-+    }
-+
-+    user_uid = got_uid;
-+    user_gid = got_gid;
-+    return true;
-+}
-+
- /*
-  * Parse OS specific command line options.
-  * return 0 if option handled, -1 otherwise
-@@ -144,8 +174,8 @@ void os_parse_cmd_args(int index, const char *optarg)
- #endif
-     case QEMU_OPTION_runas:
-         user_pwd = getpwnam(optarg);
--        if (!user_pwd) {
--            fprintf(stderr, "User \"%s\" doesn't exist\n", optarg);
-+        if (!user_pwd && !os_parse_runas_uid_gid(optarg)) {
-+            error_report("User doesn't exist (and is not <uid>:<gid>)");
-             exit(1);
-         }
-         break;
-@@ -165,18 +195,28 @@ void os_parse_cmd_args(int index, const char *optarg)
- 
- static void change_process_uid(void)
- {
--    if (user_pwd) {
--        if (setgid(user_pwd->pw_gid) < 0) {
--            fprintf(stderr, "Failed to setgid(%d)\n", user_pwd->pw_gid);
-+    if (user_pwd || user_uid != (uid_t)-1) {
-+        gid_t intended_gid = user_pwd ? user_pwd->pw_gid : user_gid;
-+        uid_t intended_uid = user_pwd ? user_pwd->pw_uid : user_uid;
-+        if (setgid(intended_gid) < 0) {
-+            fprintf(stderr, "Failed to setgid(%d)\n", intended_gid);
-             exit(1);
-         }
--        if (initgroups(user_pwd->pw_name, user_pwd->pw_gid) < 0) {
--            fprintf(stderr, "Failed to initgroups(\"%s\", %d)\n",
--                    user_pwd->pw_name, user_pwd->pw_gid);
--            exit(1);
-+        if (user_pwd) {
-+            if (initgroups(user_pwd->pw_name, user_pwd->pw_gid) < 0) {
-+                fprintf(stderr, "Failed to initgroups(\"%s\", %d)\n",
-+                        user_pwd->pw_name, user_pwd->pw_gid);
-+                exit(1);
-+            }
-+        } else {
-+            if (setgroups(1, &user_gid) < 0) {
-+                fprintf(stderr, "Failed to setgroups(1, [%d])",
-+                        user_gid);
-+                exit(1);
-+            }
-         }
--        if (setuid(user_pwd->pw_uid) < 0) {
--            fprintf(stderr, "Failed to setuid(%d)\n", user_pwd->pw_uid);
-+        if (setuid(intended_uid) < 0) {
-+            fprintf(stderr, "Failed to setuid(%d)\n", intended_uid);
-             exit(1);
-         }
-         if (setuid(0) != -1) {
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 6585058..211f2a6 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3763,7 +3763,8 @@ ETEXI
- 
- #ifndef _WIN32
- DEF("runas", HAS_ARG, QEMU_OPTION_runas, \
--    "-runas user     change to user id user just before starting the VM\n",
-+    "-runas user     change to user id user just before starting the VM\n" \
-+    "                user can be numeric uid:gid instead\n",
-     QEMU_ARCH_ALL)
- #endif
- STEXI
+diff --git a/scripts/get_maintainer.pl b/scripts/get_maintainer.pl
+index 07369aa..43fb5f5 100755
+--- a/scripts/get_maintainer.pl
++++ b/scripts/get_maintainer.pl
+@@ -381,8 +381,8 @@ foreach my $file (@ARGV) {
+ 	##if $file is a directory and it lacks a trailing slash, add one
+ 	if ((-d $file)) {
+ 	    $file =~ s@([^/])$@$1/@;
+-	} elsif (!(-f $file)) {
+-	    die "$P: file '${file}' not found\n";
++	} elsif (!(stat $file)) {
++	    die "$P: file '${file}' not found: $!\n";
+ 	}
+     }
+     if ($from_filename) {
 -- 
 2.1.4
