@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1etzLY-0000WU-6J
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:28:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1etzNq-0002de-3f
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:31:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1etzLS-0001N1-4L
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:28:52 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36424 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1etzLR-0001MV-Tk
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:28:46 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5E92C4000787
-	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 17:28:41 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  8 Mar 2018 18:28:33 +0100
-Message-Id: <20180308172834.3281-3-pbonzini@redhat.com>
-In-Reply-To: <20180308172834.3281-1-pbonzini@redhat.com>
-References: <20180308172834.3281-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/3] net: allow using any PCI NICs in -net or
- -nic
+	(envelope-from <eblake@redhat.com>) id 1etzNp-0002wX-2L
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:31:14 -0500
+References: <20180207125037.13510-1-vsementsov@virtuozzo.com>
+	<20180207125037.13510-2-vsementsov@virtuozzo.com>
+	<20180306153213.GK31045@stefanha-x1.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <49f2f289-ce1c-6e24-8b54-bb5b5c1601bc@redhat.com>
+Date: Thu, 8 Mar 2018 11:31:03 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180306153213.GK31045@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] block/accounting: introduce latency
+ histogram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,119 +26,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Jason Wang <jasowang@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, den@openvz.org
 
-Remove the hard-coded list of PCI NIC names; instead, fill an array
-using all PCI devices listed under DEVICE_CATEGORY_NETWORK. Keep
-the old shortcut "virtio" for virtio-net-pci.
+On 03/06/2018 09:32 AM, Stefan Hajnoczi wrote:
+> On Wed, Feb 07, 2018 at 03:50:36PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+>> Introduce latency histogram statics for block devices.
+>> For each accounted operation type latency region [0, +inf) is
+>> divided into subregions by several points. Then, calculate
+>> hits for each subregion.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
 
-Suggested-by: Thomas Huth <thuth@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/pci/pci.c | 61 ++++++++++++++++++++++++++++++------------------------------
- 1 file changed, 30 insertions(+), 31 deletions(-)
+> According to Wikipedia and Mathworld, "intervals" and "bins" are
+> commonly used terms:
+> https://en.wikipedia.org/wiki/Histogram
+> http://mathworld.wolfram.com/Histogram.html
+> 
+> I suggest:
+> 
+>    typedef struct {
+>        /* The following histogram is represented like this:
+>         *
+>         * 5|           *
+>         * 4|           *
+>         * 3| *         *
+>         * 2| *         *    *
+>         * 1| *    *    *    *
+>         *  +------------------
+>         *      10   50   100
+>         *
+>         * BlockLatencyHistogram histogram = {
+>         *     .nbins = 4,
+>         *     .intervals = {10, 50, 100},
+>         *     .bins = {3, 1, 5, 2},
+>         * };
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 2174c254eb..67a3f72bd6 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -1815,49 +1815,48 @@ PciInfoList *qmp_query_pci(Error **errp)
-     return head;
- }
- 
--static const char * const pci_nic_models[] = {
--    "ne2k_pci",
--    "i82551",
--    "i82557b",
--    "i82559er",
--    "rtl8139",
--    "e1000",
--    "pcnet",
--    "virtio",
--    "sungem",
--    NULL
--};
--
--static const char * const pci_nic_names[] = {
--    "ne2k_pci",
--    "i82551",
--    "i82557b",
--    "i82559er",
--    "rtl8139",
--    "e1000",
--    "pcnet",
--    "virtio-net-pci",
--    "sungem",
--    NULL
--};
--
- /* Initialize a PCI NIC.  */
- PCIDevice *pci_nic_init_nofail(NICInfo *nd, PCIBus *rootbus,
-                                const char *default_model,
-                                const char *default_devaddr)
- {
-     const char *devaddr = nd->devaddr ? nd->devaddr : default_devaddr;
-+    GSList *list;
-+    GPtrArray *pci_nic_models;
-     PCIBus *bus;
-     PCIDevice *pci_dev;
-     DeviceState *dev;
-     int devfn;
-     int i;
- 
--    if (qemu_show_nic_models(nd->model, pci_nic_models)) {
-+    if (nd->model && !strcmp(nd->model, "virtio")) {
-+        g_free(nd->model);
-+        nd->model = g_strdup("virtio-net-pci");
-+    }
-+
-+    list = object_class_get_list_sorted(TYPE_PCI_DEVICE, false);
-+    pci_nic_models = g_ptr_array_new();
-+    while (list) {
-+        DeviceClass *dc = OBJECT_CLASS_CHECK(DeviceClass, list->data,
-+                                             TYPE_DEVICE);
-+        GSList *next;
-+        if (test_bit(DEVICE_CATEGORY_NETWORK, dc->categories) &&
-+            dc->user_creatable) {
-+            const char *name = object_class_get_name(list->data);
-+            g_ptr_array_add(pci_nic_models, (gpointer)name);
-+        }
-+        next = list->next;
-+        g_slist_free_1(list);
-+        list = next;
-+    }
-+    g_ptr_array_add(pci_nic_models, NULL);
-+
-+    if (qemu_show_nic_models(nd->model, (const char **)pci_nic_models->pdata)) {
-         exit(0);
-     }
- 
--    i = qemu_find_nic_model(nd, pci_nic_models, default_model);
-+    i = qemu_find_nic_model(nd, (const char **)pci_nic_models->pdata,
-+                            default_model);
-     if (i < 0) {
-         exit(1);
-     }
-@@ -1865,15 +1864,15 @@ PCIDevice *pci_nic_init_nofail(NICInfo *nd, PCIBus *rootbus,
-     bus = pci_get_bus_devfn(&devfn, rootbus, devaddr);
-     if (!bus) {
-         error_report("Invalid PCI device address %s for device %s",
--                     devaddr, pci_nic_names[i]);
-+                     devaddr, nd->model);
-         exit(1);
-     }
- 
--    pci_dev = pci_create(bus, devfn, pci_nic_names[i]);
-+    pci_dev = pci_create(bus, devfn, nd->model);
-     dev = &pci_dev->qdev;
-     qdev_set_nic_properties(dev, nd);
-     qdev_init_nofail(dev);
--
-+    g_ptr_array_free(pci_nic_models, true);
-     return pci_dev;
- }
- 
+The name 'intervals' is still slightly ambiguous: does it hold the 
+boundary point (0-10 for 10 slots, 10-50 for 40 slots, 50-100, for 50 
+slots, then 100-INF) or is it the interval size of each slot (first bin 
+is 10 slots for 0-10, next bin is 50 slots wide so 10-60, next bin is 
+100 slots wide so 60-160, everything else is 160-INF).  But the 
+ascii-art diagram plus the text is sufficient to resolve the intent if 
+you keep that name (I don't have a suggestion for a better name).
+
 -- 
-2.14.3
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
