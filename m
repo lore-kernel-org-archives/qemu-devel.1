@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1etzKe-00089z-Bb
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:27:57 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1etzLX-0000Vi-BK
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:28:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1etzKd-00014R-60
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:27:56 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:47012)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1etzKc-000143-Vt
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:27:55 -0500
-Received: by mail-ot0-x243.google.com with SMTP id g97so6108336otg.13
-	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 09:27:54 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20180308083231.20180-1-kraxel@redhat.com>
-References: <20180308083231.20180-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 8 Mar 2018 17:27:33 +0000
-Message-ID: <CAFEAcA8wUN_T9XrUULCROVFdv+vGipdMuhNz5km1mcX_nVrQgg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/8] Ui 20180308 patches
+	(envelope-from <pbonzini@redhat.com>) id 1etzLW-0001QE-JX
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:28:51 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54760 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1etzLW-0001Q5-Eg
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:28:50 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A8F9B4023BB3
+	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 17:28:39 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu,  8 Mar 2018 18:28:31 +0100
+Message-Id: <20180308172834.3281-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/3] change q35 default NIC to e1000e
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-On 8 March 2018 at 08:32, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> The following changes since commit f32408f3b472a088467474ab152be3b6285b2d7b:
->
->   misc: don't use hwaddr as a type in trace events (2018-03-06 14:24:30 +0000)
->
-> are available in the git repository at:
->
->   git://git.kraxel.org/qemu tags/ui-20180308-pull-request
->
-> for you to fetch changes up to 5c71cfd94d46a9c2e09d041dcc82b297efab2b57:
->
->   ui/gtk-egl: add cursor_dmabuf support (2018-03-08 08:59:01 +0100)
->
-> ----------------------------------------------------------------
-> gtk: add dmabuf support. cleanups, i18n fix.
-> sdl: workaround sdl 2.0.8 header bug,
->
-> ----------------------------------------------------------------
->
-> Bruce Rogers (1):
->   make: switch language file build to be gtk module aware
->
-> Gerd Hoffmann (7):
->   sdl: workaround bug in sdl 2.0.8 headers
->   ui/gtk: make GtkGlArea usage a runtime option
->   ui/gtk: group gtk.mo declarations in Makefile
->   ui/opengl: Makefile cleanup
->   ui/gtk: use GtkGlArea on wayland only
->   ui/gtk-egl: add scanout_dmabuf support
->   ui/gtk-egl: add cursor_dmabuf support
->
+The Intel 82574 NIC has better performance and more features than
+the aging e1000 (aka 82540), for example MSI-X.  This patch chooses it
+by default for the Q35 machine type.  As suggested by Thomas, instead
+of special casing e1000e, all PCI NIC device names become valid models
+for "-net nic,model=..." or "-nic model=..." (patches 1-2).
 
-Hi. This gives me a new warning on FreeBSD:
+Paolo
 
-  CC      ui/gtk.o
-/root/qemu/ui/gtk.c:2141:13: warning: 'gtk_widget_set_double_buffered'
-is deprecated [-Wdeprecated-declarations]
-            gtk_widget_set_double_buffered(vc->gfx.drawing_area, FALSE);
-            ^
-/usr/local/include/gtk-3.0/gtk/gtkwidget.h:876:23: note:
-'gtk_widget_set_double_buffered' has been explicitly marked deprecated
-here
-void                  gtk_widget_set_double_buffered    (GtkWidget    *widget,
-                      ^
-1 warning generated.
+v1->v2: fix hppa compilation
 
+v2->v3: fix GPtrArray usage [Thomas]
 
-thanks
--- PMM
+Paolo Bonzini (3):
+  qom: introduce object_class_get_list_sorted
+  net: allow using any PCI NICs in -net or -nic
+  q35: change default NIC to e1000e
+
+ hw/i386/pc.c            |  7 +++---
+ hw/i386/pc_piix.c       |  6 ++++-
+ hw/i386/pc_q35.c        |  8 ++++++-
+ hw/pci/pci.c            | 61 ++++++++++++++++++++++++-------------------------
+ include/hw/i386/pc.h    |  3 ++-
+ include/qom/object.h    | 11 +++++++++
+ qdev-monitor.c          |  9 +-------
+ qom/object.c            | 13 +++++++++++
+ target/alpha/cpu.c      | 15 +-----------
+ target/hppa/cpu.c       | 15 +-----------
+ target/lm32/cpu.c       | 15 +-----------
+ target/sh4/cpu.c        | 15 +-----------
+ target/tricore/helper.c |  2 +-
+ 13 files changed, 78 insertions(+), 102 deletions(-)
+
+-- 
+2.14.3
