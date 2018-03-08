@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1etxlZ-00053Z-4Y
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:47:38 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1etxpe-00071H-VV
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:51:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1etxlW-0000IW-1X
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:47:37 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43030 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1etxpb-0002cC-Tm
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:51:51 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43164 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1etxlV-0000IJ-Qo
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:47:33 -0500
-Date: Thu, 8 Mar 2018 15:47:30 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180308154730.GZ4718@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180307144951.d75lo5rgzi2vf27z@eukaryote>
-	<90ba320e-2a05-8962-dc6b-252b3e15d1b7@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <90ba320e-2a05-8962-dc6b-252b3e15d1b7@redhat.com>
-Subject: Re: [Qemu-devel] [RFC] Defining firmware (OVMF,
- et al) metadata format & file
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1etxpb-0002bS-Px
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 10:51:47 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3EDAE76FB9
+	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 15:51:47 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu,  8 Mar 2018 16:51:45 +0100
+Message-Id: <20180308155145.19315-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] scsi: support NDOB (no data-out buffer) for
+ WRITE SAME commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, kraxel@redhat.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com
 
-On Thu, Mar 08, 2018 at 12:10:30PM +0100, Laszlo Ersek wrote:
-> (
-> Ard, the thread starts here:
-> 
-> http://mid.mail-archive.com/20180307144951.d75lo5rgzi2vf27z@eukaryote
-> )
-> 
-> On 03/07/18 15:49, Kashyap Chamarthy wrote:
-> > Problem background
-> > ------------------
-> > 
-> > The various OVMF binary file names and paths are slightly different[+]
-> > for each Linux distribution.  And each high-level management tool
-> > (libguestfs, oVirt, `virt-manager` and OpenStack Nova) is inventing its
-> > own approach to detect and configure the said OVMF files.  This email
-> > thread is about arriving at some common understanding to make this a bit
-> > more "unified" by addressing these needs in QEMU and libvirt.
-> 
-> I've read Dan's message <20180307151836.GK20201@redhat.com> and Gerd's
-> messages <20180308075245.lgzredyhn2paawg4@sirius.home.kraxel.org>,
-> <20180308074507.nwho4tddsoxb3b7v@sirius.home.kraxel.org>.
-> 
-> Those seem to cover everything, I don't have anything to add wrt.
-> purpose, use case, flexibility etc.
-> 
-> I suggest (or agree) that the property list be composed of free-form
-> name=value pairs (at least conceptually). I understand Gerd is proposing
-> a QAPI schema for this, so maybe do { property_name : "foo",
-> property_value : "bar" }, or similar. The registry of properties (names,
-> possible values, meanings) should be kept separate (although possibly
-> still under QEMU).
-> 
-> For OVMF (x86), I guess the initial set of properties should come from
-> the "-D FOO[=BAR]" build flags that OVMF currently supports. (The list
-> might grow or change incompatibly over time, so this is just a raw
-> starter idea.)
+A NDOB bit set to one specifies that the disk shall not transfer data
+from the data-out buffer and shall process the command as if the data-out
+buffer contained user data set to all zeroes.
 
-I really don't want to see us using firmware implementation specific
-property names in these files. It means libvirt will require knowledge
-of what each different firmware's property names mean.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/scsi/scsi-bus.c       | 2 +-
+ hw/scsi/scsi-disk.c      | 2 +-
+ tests/virtio-scsi-test.c | 6 ++++++
+ 3 files changed, 8 insertions(+), 2 deletions(-)
 
-We need to have some core standardized set of property names that can
-be provided by any firmware implementation using the same terminology.
-
-If we want to /also/ provide some extra firmeware-specific property
-names that would be ok for informative purposes, but when lbivirt is
-picking which firmware file to use, it would only ever look at the
-standardized property names/values.
-
-Regards,
-Daniel
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index 1eaeffc830..9646743a7d 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -944,7 +944,7 @@ static int scsi_req_xfer(SCSICommand *cmd, SCSIDevice *dev, uint8_t *buf)
+         break;
+     case WRITE_SAME_10:
+     case WRITE_SAME_16:
+-        cmd->xfer = dev->blocksize;
++        cmd->xfer = buf[1] & 1 ? 0 : dev->blocksize;
+         break;
+     case READ_CAPACITY_10:
+         cmd->xfer = 8;
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index c65c1ce56d..5b7a48f5a5 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -1807,7 +1807,7 @@ static void scsi_disk_emulate_write_same(SCSIDiskReq *r, uint8_t *inbuf)
+         return;
+     }
+ 
+-    if (buffer_is_zero(inbuf, s->qdev.blocksize)) {
++    if ((req->cmd.buf[1] & 0x1) || buffer_is_zero(inbuf, s->qdev.blocksize)) {
+         int flags = (req->cmd.buf[1] & 0x8) ? BDRV_REQ_MAY_UNMAP : 0;
+ 
+         /* The request is used as the AIO opaque value, so add a ref.  */
+diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
+index 7393d69bb2..037872bb98 100644
+--- a/tests/virtio-scsi-test.c
++++ b/tests/virtio-scsi-test.c
+@@ -216,6 +216,9 @@ static void test_unaligned_write_same(void)
+     const uint8_t write_same_cdb_2[VIRTIO_SCSI_CDB_SIZE] = {
+         0x41, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x33, 0x00, 0x00
+     };
++    const uint8_t write_same_cdb_ndob[VIRTIO_SCSI_CDB_SIZE] = {
++        0x41, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x33, 0x00, 0x00
++    };
+ 
+     vs = qvirtio_scsi_pci_init(PCI_SLOT);
+ 
+@@ -225,6 +228,9 @@ static void test_unaligned_write_same(void)
+     g_assert_cmphex(0, ==,
+         virtio_scsi_do_command(vs, write_same_cdb_2, NULL, 0, buf2, 512, NULL));
+ 
++    g_assert_cmphex(0, ==,
++        virtio_scsi_do_command(vs, write_same_cdb_ndob, NULL, 0, NULL, 0, NULL));
++
+     qvirtio_scsi_pci_free(vs);
+ }
+ 
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.14.3
