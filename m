@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1etnAh-0007uC-UB
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 23:28:52 -0500
+	(envelope-from <thuth@redhat.com>) id 1etnFv-0000mh-Tl
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 23:34:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1etnAd-0008Te-0z
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 23:28:51 -0500
-References: <1520317081-5341-1-git-send-email-thuth@redhat.com>
-	<383b6582-4953-4256-f4fa-abe0fe4a0e6b@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1etnFr-0001vN-0F
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 23:34:15 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42156 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1etnFq-0001vE-Ri
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 23:34:10 -0500
+References: <1520415568-19070-1-git-send-email-thuth@redhat.com>
+	<c902a158-1d19-d271-ea49-f5a2f72347bd@ilande.co.uk>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <58365548-b4f1-a6fe-9533-c2239082b0fb@redhat.com>
-Date: Thu, 8 Mar 2018 05:28:27 +0100
+Message-ID: <2aa2df96-b1c3-deef-9fbf-a2560f58d17d@redhat.com>
+Date: Thu, 8 Mar 2018 05:33:52 +0100
 MIME-Version: 1.0
-In-Reply-To: <383b6582-4953-4256-f4fa-abe0fe4a0e6b@redhat.com>
+In-Reply-To: <c902a158-1d19-d271-ea49-f5a2f72347bd@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] pc-bios/s390-ccw: Move string arrays
- from bootmap header to .c file
+Subject: Re: [Qemu-devel] [PATCH] hw/sparc/sun4m: Fix implicit creation of
+ "-drive if=scsi" devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +29,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-On 08.03.2018 00:11, Eric Blake wrote:
-> On 03/06/2018 12:18 AM, Thomas Huth wrote:
->> bootmap.h can currently only be included once - otherwise the linker
->> complains about multiple definitions of the "magic" strings.
+On 07.03.2018 19:43, Mark Cave-Ayland wrote:
+> On 07/03/18 09:39, Thomas Huth wrote:
 >=20
-> My first thought when reading that was "Huh? bootmap.h has a proper[*]
-> double-inclusion header guard, and therefore a second #include
-> "bootmap.h" is a no-op - so how can including the header more than once
-> cause a linker complaint?"
-
-Sorry if the description was not precise enough ... but I think it's
-clear if you think about it twice ;-)
-
-> [*] Well, proper if you overlook the fact that the name
-> _PC_BIOS_S390_CCW_BOOTMAP_H starts with a leading underscore followed b=
-y
-> uppercase, and is therefore violating namespace safety rules, as it
-> could collide with a symbol reserved for the implementation
-
-Yeah, we've got a couple of these left. I recently added a task to the
-BiteSizedTasks page to clean those up.
-
-> Your change is fine (moving the declaration into the one .c file that
-> needs them), so no need to change this, but...
->=20
->> +++ b/pc-bios/s390-ccw/bootmap.h
->> @@ -375,9 +375,6 @@ static inline void read_iso_boot_image(uint32_t
->> block_offset, void *load_addr,
+>> The global hack for creating SCSI devices has recently been removed,
+>> but this apparently broke SCSI devices on some boards that were not
+>> ready for this change yet. For the sun4m machines you now get:
+>>
+>> $ sparc-softmmu/qemu-system-sparc -boot d -cdrom x.iso
+>> qemu-system-sparc: -cdrom x.iso: machine type does not support
+>> if=3Dscsi,bus=3D0,unit=3D2
+>>
+>> Fix it by calling scsi_bus_legacy_handle_cmdline() after creating the
+>> corresponding SCSI controller.
+>>
+>> Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> Fixes: 1454509726719e0933c800fad00d6999752688ea
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>> =C2=A0 hw/sparc/sun4m.c | 1 +
+>> =C2=A0 1 file changed, 1 insertion(+)
+>>
+>> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+>> index 61eb424..0f5804b 100644
+>> --- a/hw/sparc/sun4m.c
+>> +++ b/hw/sparc/sun4m.c
+>> @@ -324,6 +324,7 @@ static void *sparc32_dma_init(hwaddr dma_base,
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 esp =3D ESP_STATE(object_resolve=
+_path_component(OBJECT(espdma),
+>> "esp"));
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sysbus_mmio_map(SYS_BUS_DEVICE(esp), 0,=
+ esp_base);
+>> +=C2=A0=C2=A0=C2=A0 scsi_bus_legacy_handle_cmdline(&esp->esp.bus);
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ledma =3D SPARC32_LEDMA_DEVICE(o=
+bject_resolve_path_component(
 >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 "Failed to read boot image!");
->> =C2=A0 }
->> =C2=A0 -const uint8_t el_torito_magic[] =3D "EL TORITO SPECIFICATION"
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "\0\0\0\0\0\0\0\0\=
-0\0\0\0\0\0\0";
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 OBJECT(dma), "l=
+edma"));
+>>
 >=20
-> ...would adding 'static' here also solved the linker error (at the risk
-> of possibly causing a compiler warning/error about unused variable)?
+> Hi Thomas,
+>=20
+> Thanks for the patch - I can confirm that it resolves the issue with
+> qemu-system-sparc.
+>=20
+> Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>=20
+> I presume it makes sense for this to go through a tree along with the
+> other patches in the set rather than me taking this via my qemu-sparc
+> branch?
 
-Yes, we would likely get a warning about unused variable instead, so
-that's not a real option.
+The patches are independent from each other, so it doesn't really
+matter. So if you're planning to send a PULL request before soft freeze
+next Tuesday, please include this patch. Otherwise I hope that Paolo can
+take this through his misc / scsi tree.
 
  Thomas
