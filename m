@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
-	id 1eu0pT-0000rm-4e
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:03:52 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eu0sn-0003lz-NE
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:07:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
-	id 1eu0pR-0002i9-SR
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:03:51 -0500
-Received: from smtp.citrix.com ([66.165.176.89]:61825)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
-	id 1eu0pR-0002hC-NK
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:03:49 -0500
-From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Thu, 8 Mar 2018 19:03:07 +0000
-Message-ID: <1520535787-6223-13-git-send-email-ian.jackson@eu.citrix.com>
-In-Reply-To: <1520535787-6223-1-git-send-email-ian.jackson@eu.citrix.com>
-References: <1520535787-6223-1-git-send-email-ian.jackson@eu.citrix.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eu0sm-0004Bm-Sh
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:07:17 -0500
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:42065)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eu0sm-0004BW-Nc
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:07:16 -0500
+Received: by mail-oi0-x244.google.com with SMTP id c18so5152186oiy.9
+	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 11:07:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 12/12] scripts/get_maintainer.pl: Print proper
- error message for missing $file
+In-Reply-To: <1518893216-9983-11-git-send-email-eric.auger@redhat.com>
+References: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
+	<1518893216-9983-11-git-send-email-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 8 Mar 2018 19:06:55 +0000
+Message-ID: <CAFEAcA8grbFO7E0yoci_dwr2xnH8ujS8cJnpNxGdz=JOged=Gw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v9 10/14] hw/arm/smmuv3: Abort on vfio or
+ vhost case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>
 
-If you pass scripts/get_maintainer.pl the name of a FIFO or other
-exciting object (/dev/stdin, for example), it would falsely print
-"file not found".  Instead: stat the object rather than using -f so
-that we do not mind if the object is not a file; and print the errno
-value in the error message.
+On 17 February 2018 at 18:46, Eric Auger <eric.auger@redhat.com> wrote:
+> At the moment, the SMMUv3 does not support notification on
+> TLB invalidation. So let's abort as soon as such notifier gets
+> enabled.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  hw/arm/smmuv3.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>
+> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+> index 384393f..5efe933 100644
+> --- a/hw/arm/smmuv3.c
+> +++ b/hw/arm/smmuv3.c
+> @@ -1074,12 +1074,23 @@ static void smmuv3_class_init(ObjectClass *klass, void *data)
+>      dc->realize = smmu_realize;
+>  }
+>
+> +static void smmuv3_notify_flag_changed(IOMMUMemoryRegion *iommu,
+> +                                       IOMMUNotifierFlag old,
+> +                                       IOMMUNotifierFlag new)
+> +{
+> +    if (old == IOMMU_NOTIFIER_NONE) {
+> +        error_setg(&error_fatal,
+> +                   "SMMUV3: vhost and vfio notifiers not yet supported");
+> +    }
+> +}
 
-Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
-CC: Thomas Huth <thuth@redhat.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Stefano Stabellini <sstabellini@kernel.org>
-CC: Anthony PERARD <anthony.perard@citrix.com>
----
-v6: New patch in this version of the series
----
- scripts/get_maintainer.pl | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Is this triggerable by the guest, or by the user on the command
+line, or only by a bug in the board or other QEMU code?
 
-diff --git a/scripts/get_maintainer.pl b/scripts/get_maintainer.pl
-index 07369aa..43fb5f5 100755
---- a/scripts/get_maintainer.pl
-+++ b/scripts/get_maintainer.pl
-@@ -381,8 +381,8 @@ foreach my $file (@ARGV) {
- 	##if $file is a directory and it lacks a trailing slash, add one
- 	if ((-d $file)) {
- 	    $file =~ s@([^/])$@$1/@;
--	} elsif (!(-f $file)) {
--	    die "$P: file '${file}' not found\n";
-+	} elsif (!(stat $file)) {
-+	    die "$P: file '${file}' not found: $!\n";
- 	}
-     }
-     if ($from_filename) {
--- 
-2.1.4
+thanks
+-- PMM
