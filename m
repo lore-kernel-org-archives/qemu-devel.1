@@ -1,18 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1etyF8-0005bI-VH
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:18:12 -0500
+	(envelope-from <lersek@redhat.com>) id 1etyVx-0003S5-8A
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:35:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1etyF2-00014c-Uy
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:18:10 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34726 helo=mx1.redhat.com)
+	(envelope-from <lersek@redhat.com>) id 1etyVu-0007Ec-2p
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:35:33 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35274 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1etyF2-00014H-Oj
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:18:04 -0500
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  8 Mar 2018 17:18:03 +0100
-Message-Id: <20180308161803.6152-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] vnc: deal with surface NULL pointers
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1etyVt-0007E6-Sg
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 11:35:29 -0500
+References: <20180307155746.18526-1-marcandre.lureau@redhat.com>
+	<20180307155746.18526-5-marcandre.lureau@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <6bae8e57-2ba5-d870-9220-38c30c350978@redhat.com>
+Date: Thu, 8 Mar 2018 17:35:18 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180307155746.18526-5-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [edk2] [PATCH v2 4/8] ovmf: simplify
+ SecurityStubDxe.inf inclusion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,94 +29,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: marcandre.lureau@redhat.com, edk2-devel@lists.01.org
+Cc: qemu-devel@nongnu.org, javierm@redhat.com, pjones@redhat.com, jiewen.yao@intel.com
 
-Secondary displays in multihead setups are allowed to have a NULL
-DisplaySurface.  Typically user interfaces handle this by hiding the
-window which shows the display in question.
+On 03/07/18 16:57, marcandre.lureau@redhat.com wrote:
+> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>=20
+> SecurityStubDxe.inf should be included unconditionally.
+>=20
+> Cc: Laszlo Ersek <lersek@redhat.com>
+> Contributed-under: TianoCore Contribution Agreement 1.1
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  OvmfPkg/OvmfPkgIa32.dsc    | 6 ++----
+>  OvmfPkg/OvmfPkgIa32X64.dsc | 6 ++----
+>  OvmfPkg/OvmfPkgX64.dsc     | 6 ++----
+>  3 files changed, 6 insertions(+), 12 deletions(-)
+>=20
+> diff --git a/OvmfPkg/OvmfPkgIa32.dsc b/OvmfPkg/OvmfPkgIa32.dsc
+> index fbe0f790e431..5bd3f4f977df 100644
+> --- a/OvmfPkg/OvmfPkgIa32.dsc
+> +++ b/OvmfPkg/OvmfPkgIa32.dsc
+> @@ -611,14 +611,12 @@ [Components]
+> =20
+>    MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+> =20
+> -!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
+>    MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
+>      <LibraryClasses>
+> +!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
+>        NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerific=
+ationLib.inf
+> -	}
+> -!else
+> -  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+>  !endif
+> +  }
+> =20
+>    MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
+>    PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
+> diff --git a/OvmfPkg/OvmfPkgIa32X64.dsc b/OvmfPkg/OvmfPkgIa32X64.dsc
+> index fb10e0b0f2e4..7dded86c4940 100644
+> --- a/OvmfPkg/OvmfPkgIa32X64.dsc
+> +++ b/OvmfPkg/OvmfPkgIa32X64.dsc
+> @@ -620,14 +620,12 @@ [Components.X64]
+> =20
+>    MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+> =20
+> -!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
+>    MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
+>      <LibraryClasses>
+> +!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
+>        NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerific=
+ationLib.inf
+> -	}
+> -!else
+> -  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+>  !endif
+> +  }
+> =20
+>    MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
+>    PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
+> diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
+> index a31551f5ae24..a8e89276c0b2 100644
+> --- a/OvmfPkg/OvmfPkgX64.dsc
+> +++ b/OvmfPkg/OvmfPkgX64.dsc
+> @@ -618,14 +618,12 @@ [Components]
+> =20
+>    MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+> =20
+> -!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
+>    MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
+>      <LibraryClasses>
+> +!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
+>        NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerific=
+ationLib.inf
+> -	}
+> -!else
+> -  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+>  !endif
+> +  }
+> =20
+>    MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
+>    PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
+>=20
 
-This isn't an option for vnc though because it simply hasn't a concept
-of windows or outputs.  So handle the situation by showing a placeholder
-DisplaySurface instead.  Also check in console_select whenever a surface
-is preset in the first place before requesting an update.
+Please change the subject as follows:
 
-This fixes a segfault which can be triggered by switching to an unused
-display (via vtrl-alt-<nr>) in a multihead setup, for example using
--device virtio-vga,max_outputs=2.
+OvmfPkg: simplify SecurityStubDxe.inf inclusion
 
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- include/ui/console.h |  2 ++
- ui/console.c         | 10 ++++++----
- ui/vnc.c             | 10 ++++++++++
- 3 files changed, 18 insertions(+), 4 deletions(-)
+With that update:
 
-diff --git a/include/ui/console.h b/include/ui/console.h
-index aae9e44cb3..5fca9afcbc 100644
---- a/include/ui/console.h
-+++ b/include/ui/console.h
-@@ -260,6 +260,8 @@ DisplaySurface *qemu_create_displaysurface_guestmem(int width, int height,
-                                                     pixman_format_code_t format,
-                                                     int linesize,
-                                                     uint64_t addr);
-+DisplaySurface *qemu_create_message_surface(int w, int h,
-+                                            const char *msg);
- PixelFormat qemu_default_pixelformat(int bpp);
- 
- DisplaySurface *qemu_create_displaysurface(int width, int height);
-diff --git a/ui/console.c b/ui/console.c
-index 6ab4ff3baf..348610dd43 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -1039,8 +1039,10 @@ void console_select(unsigned int index)
-                     dcl->ops->dpy_gfx_switch(dcl, s->surface);
-                 }
-             }
--            dpy_gfx_update(s, 0, 0, surface_width(s->surface),
--                           surface_height(s->surface));
-+            if (s->surface) {
-+                dpy_gfx_update(s, 0, 0, surface_width(s->surface),
-+                               surface_height(s->surface));
-+            }
-         }
-         if (ds->have_text) {
-             dpy_text_resize(s, s->width, s->height);
-@@ -1370,8 +1372,8 @@ DisplaySurface *qemu_create_displaysurface_guestmem(int width, int height,
-     return surface;
- }
- 
--static DisplaySurface *qemu_create_message_surface(int w, int h,
--                                                   const char *msg)
-+DisplaySurface *qemu_create_message_surface(int w, int h,
-+                                            const char *msg)
- {
-     DisplaySurface *surface = qemu_create_displaysurface(w, h);
-     pixman_color_t bg = color_table_rgb[0][QEMU_COLOR_BLACK];
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 13c28cabb0..e164eb798c 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -746,9 +746,19 @@ static void vnc_update_server_surface(VncDisplay *vd)
- static void vnc_dpy_switch(DisplayChangeListener *dcl,
-                            DisplaySurface *surface)
- {
-+    static const char placeholder_msg[] =
-+        "Display output is not active.";
-+    static DisplaySurface *placeholder;
-     VncDisplay *vd = container_of(dcl, VncDisplay, dcl);
-     VncState *vs;
- 
-+    if (surface == NULL) {
-+        if (placeholder == NULL) {
-+            placeholder = qemu_create_message_surface(640, 480, placeholder_msg);
-+        }
-+        surface = placeholder;
-+    }
-+
-     vnc_abort_display_jobs(vd);
-     vd->ds = surface;
- 
--- 
-2.9.3
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+
+Thanks
+Laszlo
