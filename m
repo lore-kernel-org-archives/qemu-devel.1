@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eu1gQ-0003G6-WC
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:36 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eu1gT-0003JI-QF
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eu1gO-0006Ao-30
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:35 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41458 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1eu1gS-0006Ct-EF
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:37 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41462 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eu1gN-0006AM-TR
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:32 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eu1gS-0006CS-8U
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:58:36 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5850F8182D24
-	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 19:58:31 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B87E58182D24
+	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 19:58:35 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Thu,  8 Mar 2018 19:57:54 +0000
-Message-Id: <20180308195811.24894-13-dgilbert@redhat.com>
+Date: Thu,  8 Mar 2018 19:57:57 +0000
+Message-Id: <20180308195811.24894-16-dgilbert@redhat.com>
 In-Reply-To: <20180308195811.24894-1-dgilbert@redhat.com>
 References: <20180308195811.24894-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 12/29] postcopy+vhost-user: Split
- set_mem_table for postcopy
+Subject: [Qemu-devel] [PATCH v4 15/29] vhost+postcopy: Send address back to
+ qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,191 +35,214 @@ Cc: aarcange@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Split the set_mem_table routines in both qemu and libvhost-user
-because the postcopy versions are going to be quite different
-once changes in the later patches are added.
+We need a better way, but at the moment we need the address of the
+mappings sent back to qemu so it can interpret the messages on the
+userfaultfd it reads.
+
+This is done as a 3 stage set:
+   QEMU -> client
+      set_mem_table
+
+   mmap stuff, get addresses
+
+   client -> qemu
+       here are the addresses
+
+   qemu -> client
+       OK - now you can use them
+
+That ensures that qemu has registered the new addresses in it's
+userfault code before the client starts accessing them.
+
+Note: We don't ask for the default 'ack' reply since we've got our own.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- contrib/libvhost-user/libvhost-user.c | 53 ++++++++++++++++++++++++
- hw/virtio/vhost-user.c                | 77 ++++++++++++++++++++++++++++++++++-
- 2 files changed, 128 insertions(+), 2 deletions(-)
+ contrib/libvhost-user/libvhost-user.c | 24 ++++++++++++-
+ docs/interop/vhost-user.txt           |  9 +++++
+ hw/virtio/trace-events                |  1 +
+ hw/virtio/vhost-user.c                | 67 +++++++++++++++++++++++++++++++++--
+ 4 files changed, 98 insertions(+), 3 deletions(-)
 
 diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-index beec7695a8..4922b2c722 100644
+index a18bc74a7c..e02e5d6f46 100644
 --- a/contrib/libvhost-user/libvhost-user.c
 +++ b/contrib/libvhost-user/libvhost-user.c
-@@ -448,6 +448,55 @@ vu_reset_device_exec(VuDev *dev, VhostUserMsg *vmsg)
-     return false;
- }
+@@ -491,10 +491,32 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
+                    dev_region->mmap_addr);
+         }
  
-+static bool
-+vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
-+{
-+    int i;
-+    VhostUserMemory *memory = &vmsg->payload.memory;
-+    dev->nregions = memory->nregions;
-+    /* TODO: Postcopy specific code */
-+    DPRINT("Nregions: %d\n", memory->nregions);
-+    for (i = 0; i < dev->nregions; i++) {
-+        void *mmap_addr;
-+        VhostUserMemoryRegion *msg_region = &memory->regions[i];
-+        VuDevRegion *dev_region = &dev->regions[i];
-+
-+        DPRINT("Region %d\n", i);
-+        DPRINT("    guest_phys_addr: 0x%016"PRIx64"\n",
-+               msg_region->guest_phys_addr);
-+        DPRINT("    memory_size:     0x%016"PRIx64"\n",
-+               msg_region->memory_size);
-+        DPRINT("    userspace_addr   0x%016"PRIx64"\n",
-+               msg_region->userspace_addr);
-+        DPRINT("    mmap_offset      0x%016"PRIx64"\n",
-+               msg_region->mmap_offset);
-+
-+        dev_region->gpa = msg_region->guest_phys_addr;
-+        dev_region->size = msg_region->memory_size;
-+        dev_region->qva = msg_region->userspace_addr;
-+        dev_region->mmap_offset = msg_region->mmap_offset;
-+
-+        /* We don't use offset argument of mmap() since the
-+         * mapped address has to be page aligned, and we use huge
-+         * pages.  */
-+        mmap_addr = mmap(0, dev_region->size + dev_region->mmap_offset,
-+                         PROT_READ | PROT_WRITE, MAP_SHARED,
-+                         vmsg->fds[i], 0);
-+
-+        if (mmap_addr == MAP_FAILED) {
-+            vu_panic(dev, "region mmap error: %s", strerror(errno));
-+        } else {
-+            dev_region->mmap_addr = (uint64_t)(uintptr_t)mmap_addr;
-+            DPRINT("    mmap_addr:       0x%016"PRIx64"\n",
-+                   dev_region->mmap_addr);
-+        }
-+
-+        close(vmsg->fds[i]);
-+    }
-+
-+    return false;
-+}
-+
- static bool
- vu_set_mem_table_exec(VuDev *dev, VhostUserMsg *vmsg)
- {
-@@ -464,6 +513,10 @@ vu_set_mem_table_exec(VuDev *dev, VhostUserMsg *vmsg)
++        /* Return the address to QEMU so that it can translate the ufd
++         * fault addresses back.
++         */
++        msg_region->userspace_addr = (uintptr_t)(mmap_addr +
++                                                 dev_region->mmap_offset);
+         close(vmsg->fds[i]);
      }
-     dev->nregions = memory->nregions;
  
-+    if (dev->postcopy_listening) {
-+        return vu_set_mem_table_exec_postcopy(dev, vmsg);
+-    /* TODO: Get address back to QEMU */
++    /* Send the message back to qemu with the addresses filled in */
++    vmsg->fd_num = 0;
++    if (!vu_message_write(dev, dev->sock, vmsg)) {
++        vu_panic(dev, "failed to respond to set-mem-table for postcopy");
++        return false;
 +    }
 +
-     DPRINT("Nregions: %d\n", memory->nregions);
++    /* Wait for QEMU to confirm that it's registered the handler for the
++     * faults.
++     */
++    if (!vu_message_read(dev, dev->sock, vmsg) ||
++        vmsg->size != sizeof(vmsg->payload.u64) ||
++        vmsg->payload.u64 != 0) {
++        vu_panic(dev, "failed to receive valid ack for postcopy set-mem-table");
++        return false;
++    }
++
++    /* OK, now we can go and register the memory and generate faults */
      for (i = 0; i < dev->nregions; i++) {
-         void *mmap_addr;
+         VuDevRegion *dev_region = &dev->regions[i];
+ #ifdef UFFDIO_REGISTER
+diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+index 7cc7006ef3..cc049196c9 100644
+--- a/docs/interop/vhost-user.txt
++++ b/docs/interop/vhost-user.txt
+@@ -455,12 +455,21 @@ Master message types
+       Id: 5
+       Equivalent ioctl: VHOST_SET_MEM_TABLE
+       Master payload: memory regions description
++      Slave payload: (postcopy only) memory regions description
+ 
+       Sets the memory map regions on the slave so it can translate the vring
+       addresses. In the ancillary data there is an array of file descriptors
+       for each memory mapped region. The size and ordering of the fds matches
+       the number and ordering of memory regions.
+ 
++      When VHOST_USER_POSTCOPY_LISTEN has been received, SET_MEM_TABLE replies with
++      the bases of the memory mapped regions to the master.  It must have mmap'd
++      the regions but not yet accessed them and should not yet generate a userfault
++      event. Note NEED_REPLY_MASK is not set in this case.
++      QEMU will then reply back to the list of mappings with an empty
++      VHOST_USER_SET_MEM_TABLE as an acknolwedgment; only upon reception of this
++      message may the guest start accessing the memory and generating faults.
++
+  * VHOST_USER_SET_LOG_BASE
+ 
+       Id: 6
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 06ec03d6e7..05d18ada77 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -8,6 +8,7 @@ vhost_section(const char *name, int r) "%s:%d"
+ 
+ # hw/virtio/vhost-user.c
+ vhost_user_postcopy_listen(void) ""
++vhost_user_set_mem_table_postcopy(uint64_t client_addr, uint64_t qhva, int reply_i, int region_i) "client:0x%"PRIx64" for hva: 0x%"PRIx64" reply %d region %d"
+ 
+ # hw/virtio/virtio.c
+ virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
 diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index ee200f703e..311addc33b 100644
+index 311addc33b..6875f729e8 100644
 --- a/hw/virtio/vhost-user.c
 +++ b/hw/virtio/vhost-user.c
-@@ -340,15 +340,86 @@ static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t base,
-     return 0;
- }
- 
-+static int vhost_user_set_mem_table_postcopy(struct vhost_dev *dev,
-+                                             struct vhost_memory *mem)
-+{
-+    int fds[VHOST_MEMORY_MAX_NREGIONS];
-+    int i, fd;
-+    size_t fd_num = 0;
-+    bool reply_supported = virtio_has_feature(dev->protocol_features,
-+                                              VHOST_USER_PROTOCOL_F_REPLY_ACK);
-+    /* TODO: Add actual postcopy differences */
-+    VhostUserMsg msg = {
-+        .hdr.request = VHOST_USER_SET_MEM_TABLE,
-+        .hdr.flags = VHOST_USER_VERSION,
-+    };
-+
-+    if (reply_supported) {
-+        msg.hdr.flags |= VHOST_USER_NEED_REPLY_MASK;
-+    }
-+
-+    for (i = 0; i < dev->mem->nregions; ++i) {
-+        struct vhost_memory_region *reg = dev->mem->regions + i;
-+        ram_addr_t offset;
-+        MemoryRegion *mr;
-+
-+        assert((uintptr_t)reg->userspace_addr == reg->userspace_addr);
-+        mr = memory_region_from_host((void *)(uintptr_t)reg->userspace_addr,
-+                                     &offset);
-+        fd = memory_region_get_fd(mr);
-+        if (fd > 0) {
-+            msg.payload.memory.regions[fd_num].userspace_addr =
-+                reg->userspace_addr;
-+            msg.payload.memory.regions[fd_num].memory_size  = reg->memory_size;
-+            msg.payload.memory.regions[fd_num].guest_phys_addr =
-+                reg->guest_phys_addr;
-+            msg.payload.memory.regions[fd_num].mmap_offset = offset;
-+            assert(fd_num < VHOST_MEMORY_MAX_NREGIONS);
-+            fds[fd_num++] = fd;
-+        }
-+    }
-+
-+    msg.payload.memory.nregions = fd_num;
-+
-+    if (!fd_num) {
-+        error_report("Failed initializing vhost-user memory map, "
-+                     "consider using -object memory-backend-file share=on");
-+        return -1;
-+    }
-+
-+    msg.hdr.size = sizeof(msg.payload.memory.nregions);
-+    msg.hdr.size += sizeof(msg.payload.memory.padding);
-+    msg.hdr.size += fd_num * sizeof(VhostUserMemoryRegion);
-+
-+    if (vhost_user_write(dev, &msg, fds, fd_num) < 0) {
-+        return -1;
-+    }
-+
-+    if (reply_supported) {
-+        return process_message_reply(dev, &msg);
-+    }
-+
-+    return 0;
-+}
-+
- static int vhost_user_set_mem_table(struct vhost_dev *dev,
-                                     struct vhost_memory *mem)
+@@ -174,6 +174,7 @@ struct vhost_user {
+     int slave_fd;
+     NotifierWithReturn postcopy_notifier;
+     struct PostCopyFD  postcopy_fd;
++    uint64_t           postcopy_client_bases[VHOST_MEMORY_MAX_NREGIONS];
+     /* True once we've entered postcopy_listen */
+     bool               postcopy_listen;
+ };
+@@ -343,12 +344,15 @@ static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t base,
+ static int vhost_user_set_mem_table_postcopy(struct vhost_dev *dev,
+                                              struct vhost_memory *mem)
  {
 +    struct vhost_user *u = dev->opaque;
      int fds[VHOST_MEMORY_MAX_NREGIONS];
      int i, fd;
      size_t fd_num = 0;
-+    bool do_postcopy = u->postcopy_listen && u->postcopy_fd.handler;
      bool reply_supported = virtio_has_feature(dev->protocol_features,
                                                VHOST_USER_PROTOCOL_F_REPLY_ACK);
- 
-+    if (do_postcopy) {
-+        /* Postcopy has enough differences that it's best done in it's own
-+         * version
-+         */
-+        return vhost_user_set_mem_table_postcopy(dev, mem);
-+    }
+-    /* TODO: Add actual postcopy differences */
++    VhostUserMsg msg_reply;
++    int region_i, msg_i;
 +
      VhostUserMsg msg = {
          .hdr.request = VHOST_USER_SET_MEM_TABLE,
          .hdr.flags = VHOST_USER_VERSION,
-@@ -372,9 +443,11 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
-                 error_report("Failed preparing vhost-user memory table msg");
-                 return -1;
-             }
--            msg.payload.memory.regions[fd_num].userspace_addr = reg->userspace_addr;
-+            msg.payload.memory.regions[fd_num].userspace_addr =
-+                reg->userspace_addr;
-             msg.payload.memory.regions[fd_num].memory_size  = reg->memory_size;
--            msg.payload.memory.regions[fd_num].guest_phys_addr = reg->guest_phys_addr;
-+            msg.payload.memory.regions[fd_num].guest_phys_addr =
-+                reg->guest_phys_addr;
-             msg.payload.memory.regions[fd_num].mmap_offset = offset;
-             fds[fd_num++] = fd;
-         }
+@@ -395,6 +399,64 @@ static int vhost_user_set_mem_table_postcopy(struct vhost_dev *dev,
+         return -1;
+     }
+ 
++    if (vhost_user_read(dev, &msg_reply) < 0) {
++        return -1;
++    }
++
++    if (msg_reply.hdr.request != VHOST_USER_SET_MEM_TABLE) {
++        error_report("%s: Received unexpected msg type."
++                     "Expected %d received %d", __func__,
++                     VHOST_USER_SET_MEM_TABLE, msg_reply.hdr.request);
++        return -1;
++    }
++    /* We're using the same structure, just reusing one of the
++     * fields, so it should be the same size.
++     */
++    if (msg_reply.hdr.size != msg.hdr.size) {
++        error_report("%s: Unexpected size for postcopy reply "
++                     "%d vs %d", __func__, msg_reply.hdr.size, msg.hdr.size);
++        return -1;
++    }
++
++    memset(u->postcopy_client_bases, 0,
++           sizeof(uint64_t) * VHOST_MEMORY_MAX_NREGIONS);
++
++    /* They're in the same order as the regions that were sent
++     * but some of the regions were skipped (above) if they
++     * didn't have fd's
++    */
++    for (msg_i = 0, region_i = 0;
++         region_i < dev->mem->nregions;
++        region_i++) {
++        if (msg_i < fd_num &&
++            msg_reply.payload.memory.regions[msg_i].guest_phys_addr ==
++            dev->mem->regions[region_i].guest_phys_addr) {
++            u->postcopy_client_bases[region_i] =
++                msg_reply.payload.memory.regions[msg_i].userspace_addr;
++            trace_vhost_user_set_mem_table_postcopy(
++                msg_reply.payload.memory.regions[msg_i].userspace_addr,
++                msg.payload.memory.regions[msg_i].userspace_addr,
++                msg_i, region_i);
++            msg_i++;
++        }
++    }
++    if (msg_i != fd_num) {
++        error_report("%s: postcopy reply not fully consumed "
++                     "%d vs %zd",
++                     __func__, msg_i, fd_num);
++        return -1;
++    }
++    /* Now we've registered this with the postcopy code, we ack to the client,
++     * because now we're in the position to be able to deal with any faults
++     * it generates.
++     */
++    /* TODO: Use this for failure cases as well with a bad value */
++    msg.hdr.size = sizeof(msg.payload.u64);
++    msg.payload.u64 = 0; /* OK */
++    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
++        return -1;
++    }
++
+     if (reply_supported) {
+         return process_message_reply(dev, &msg);
+     }
+@@ -411,7 +473,8 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
+     size_t fd_num = 0;
+     bool do_postcopy = u->postcopy_listen && u->postcopy_fd.handler;
+     bool reply_supported = virtio_has_feature(dev->protocol_features,
+-                                              VHOST_USER_PROTOCOL_F_REPLY_ACK);
++                                          VHOST_USER_PROTOCOL_F_REPLY_ACK) &&
++                                          !do_postcopy;
+ 
+     if (do_postcopy) {
+         /* Postcopy has enough differences that it's best done in it's own
 -- 
 2.14.3
