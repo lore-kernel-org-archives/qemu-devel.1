@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1etpgD-0008Pj-Rb
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 02:09:34 -0500
+	(envelope-from <laurent@vivier.eu>) id 1etppf-00039f-Iz
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 02:19:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1etpg9-0003v1-NK
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 02:09:33 -0500
-References: <1520413694-1271-1-git-send-email-thuth@redhat.com>
-	<3aaac650-2934-c4ab-3f58-c022b1510e81@reactos.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <950d4782-e1ca-816a-f13c-3dade56a7e7f@redhat.com>
-Date: Thu, 8 Mar 2018 08:09:08 +0100
+	(envelope-from <laurent@vivier.eu>) id 1etppe-0006pz-Kj
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 02:19:19 -0500
+References: <20180307215010.30706-1-jcmvbkbc@gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <03992eba-6a6c-8dce-cefc-33d00a82faf4@vivier.eu>
+Date: Thu, 8 Mar 2018 08:19:01 +0100
 MIME-Version: 1.0
-In-Reply-To: <3aaac650-2934-c4ab-3f58-c022b1510e81@reactos.org>
+In-Reply-To: <20180307215010.30706-1-jcmvbkbc@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/ppc/prep: Fix implicit creation of
- "-drive if=scsi" devices
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v6 05/11] linux-user: fix
+ mmap/munmap/mprotect/mremap/shmat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +24,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Markus Armbruster <armbru@redhat.com>
+To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
 
-On 08.03.2018 07:58, Herv=C3=A9 Poussineau wrote:
-> Le 07/03/2018 =C3=A0 10:08, Thomas Huth a =C3=A9crit=C2=A0:
->> The global hack for creating SCSI devices has recently been removed,
->> but this apparently broke SCSI devices on some boards that were not
->> ready for this change yet. For the 40p machine you now get:
->>
->> $ ppc64-softmmu/qemu-system-ppc64 -M 40p -cdrom x.iso
->> qemu-system-ppc64: -cdrom x.iso: machine type does not support
->> if=3Dscsi,bus=3D0,unit=3D2
->>
->> Fix it by providing a lsi53c810_create() function that takes care
->> of calling scsi_bus_legacy_handle_cmdline() after creating the
->> corresponding SCSI controller.
->>
->> Fixes: 1454509726719e0933c800fad00d6999752688ea
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->=20
-> Why is it required?
-> - because SCSI adapter is not up to date to QEMU standards (QOM, ...)?
-> - because board is not up to date to QEMU standards (QOM, ...)?
-> - because board is using SCSI devices by default?
-> (mc->block_default_type =3D IF_SCSI) ?
->=20
-> In 2 first cases, what is missing?
-> In third case, maybe it may be better to put it in generic code?
+Le 07/03/2018 à 22:50, Max Filippov a écrit :
+> In linux-user QEMU that runs for a target with TARGET_ABI_BITS bigger
+> than L1_MAP_ADDR_SPACE_BITS an assertion in page_set_flags fires when
+> mmap, munmap, mprotect, mremap or shmat is called for an address outside
+> the guest address space. mmap and mprotect should return ENOMEM in such
+> case.
+> 
+> Change definition of GUEST_ADDR_MAX to always be the last valid guest
+> address. Account for this change in open_self_maps.
+> Add macro guest_addr_valid that verifies if the guest address is valid.
+> Add function guest_range_valid that verifies if address range is within
+> guest address space and does not wrap around. Use that macro in
+> mmap/munmap/mprotect/mremap/shmat for error checking.
+> 
+> Cc: qemu-stable@nongnu.org
+> Cc: Riku Voipio <riku.voipio@iki.fi>
+> Cc: Laurent Vivier <laurent@vivier.eu>
+> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+> ---
+> Changes v5->v6:
+> - drop 'if (len)' clause from guest_range_valid and explicitly compare
+>   len with GUEST_ADDR_MAX.
+> 
+> Changes v4->v5:
+> - change definition of GUEST_ADDR_MAX to always be the last valid guest
+>   address. Account for this change in guest_addr_valid and open_self_maps.
+> - turn guest_range_valid into a function.
+> 
+> Changes v3->v4:
+> - change GUEST_ADDR_MAX and h2g_valid definitions as suggested by Laurent
+>   Vivier.
+> 
+> Changes v2->v3:
+> - fix comparison in guest_valid: it must be 'less' to preserve the existing
+>   functionality, not 'less or equal'.
+> - fix guest_range_valid: it may not use guest_valid, because single range
+>   that occupies all of the guest address space is valid.
+> 
+>  include/exec/cpu-all.h  |  6 +++++-
+>  include/exec/cpu_ldst.h | 16 +++++++---------
+>  linux-user/mmap.c       | 20 +++++++++++++++-----
+>  linux-user/syscall.c    |  5 ++++-
+>  4 files changed, 31 insertions(+), 16 deletions(-)
+> 
 
-It's the third case. The "generic" code was just removed with commit
-1454509726719e0933 since it was considered as a big hack. The generic
-code should not have to guess to which SCSI adapter a SCSI drive should
-be attached to. That's the job of the board init code, and this is what
-this patch is doing now for the 40p machine.
-
-Other boards like the "pseries" machine were doing this since a long
-time already (see the spapr_vscsi_create() function in
-hw/scsi/spapr_vscsi.c for example).
-
-> You just fixed 40p and MIPS Jazz machines, but sparc/SS-10 (and other)
-> also have the same problem...
-
-I also posted a patch for the Sparc machines, you can find it here:
-
-https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg01830.html
-
- Thomas
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
