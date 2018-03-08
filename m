@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38194)
+Received: from eggs.gnu.org ([208.118.235.92]:34705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1eu1ID-0001Ms-LB
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:34:39 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eu1Qg-00046k-08
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:43:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1eu1Ea-0007yC-Fl
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:33:33 -0500
-Received: from mail-pf0-x22f.google.com ([2607:f8b0:400e:c00::22f]:36281)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1eu1Ea-0007wU-2i
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:29:48 -0500
-Received: by mail-pf0-x22f.google.com with SMTP id 68so306099pfx.3
-	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 11:29:46 -0800 (PST)
-Date: Thu, 08 Mar 2018 11:29:44 -0800 (PST)
-In-Reply-To: <CAHNT7NshwZh87Uui6i+ARdOj2BuW6d7gahOiZ0X48Cf3TdOrXQ@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-91cb2b22-0b57-4c9b-8027-8c25eba32497@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [patches] Re: [PULL] RISC-V QEMU Port Submission
- v8.2
+	(envelope-from <no-reply@patchew.org>) id 1eu1ON-0003sV-Ub
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:42:17 -0500
+Resent-Message-Id: <E1eu1ON-0003sV-Ub@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21149)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eu1ON-0003sE-Je
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:39:55 -0500
+In-Reply-To: <1520530757-4477-1-git-send-email-ian.jackson@eu.citrix.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152053165650.1470.11628739449311470295@bdbb90650ae5>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 8 Mar 2018 09:54:17 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v6 00/11] xen: xen-domid-restrict
+ improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +29,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, peter.maydell@linaro.org
-Cc: kbastian@mail.uni-paderborn.de, qemu-devel@nongnu.org, patches@groups.riscv.org, sagark@eecs.berkeley.edu
+To: ian.jackson@eu.citrix.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
 
-On Thu, 08 Mar 2018 03:41:33 PST (-0800), Michael Clark wrote:
-> On Fri, 9 Mar 2018 at 12:18 AM, Michael Clark <mjc@sifive.com> wrote:
->> On Fri, 9 Mar 2018 at 12:10 AM, Michael Clark <mjc@sifive.com> wrote:
->>> On Thu, 8 Mar 2018 at 11:02 PM, Peter Maydell <peter.maydell@linaro.org>
->>> wrote:
->>>> On 6 March 2018 at 19:46, Michael Clark <mjc@sifive.com> wrote:
->> You are making this very hard. Do you work for Arm perchance? I really
->> wouldn’t be surprised if our port is being sandbagged by Arm. Apologies for
->> being so direct about this, but things like this happen...
->>
->> I have complied with practically every review request and the sign-offs
->> are there. It’s a bit ridiculous.
->>
->> It would be nice to find someone neutral, unrelated to Arm, to merge our PR
->>
->
-> Some history on the origins of RISC to put things in perspective:
->
-> https://en.m.wikipedia.org/wiki/Berkeley_RISC
->
-> David Patterson worked with Andrew Waterman and Krste Asanovic on the
-> design of RISC-V. Sagar did most of the work on the QEMU port and he
-> agreeded to sign off on all patches. The SiFive patches only have sign-offs
-> from SiFive because SiFive was the sole contributor for its hardware model,
-> beside the SiFiveUART which has Stefan’s sign-off.
->
-> In any case it seems there is not enough review bandwidth in the QEMU
-> project as a whole and the policy to accept contributions is too strict to
-> be reasonable, given earnest attempts to comply with *all* review feedback.
-> Not impressed.
-
-On behalf of the rest of the RISC-V QEMU team I'd like to apologize for 
-Michael's comments.  That's a pretty insulting thing to say, and the whole 
-thing comes off as a bit entitled: we've asked the QEMU community to do a lot 
-of work for us in reviewing our port, and seeing as how none of us are QEMU 
-contributors we certainly don't have any grounds to ask someone to stop 
-reviewing it -- that's pretty absurd.
-
-While I haven't been following the upstreaming process as closely as I should 
-have been, as far as I can tell there's no grounds to accuse Peter, or anyone 
-else, of trying to shoot down our port for any reason.  Peter, I can understand 
-if you're upset, as I certainly would be.  If you don't want to help out with 
-our port any more then I can understand, but I'd just like to assure you that 
-we value the time you've spent on our port and hope you continue to help out!
-
-Hopefully this doesn't derail our chances of moving forward with submitting the 
-RISC-V port upstream.
-
-Sorry!
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MjA1MzA3NTctNDQ3Ny0xLWdpdC1zZW5kLWVtYWlsLWlhbi5qYWNrc29uQGV1
+LmNpdHJpeC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NiAwMC8xMV0geGVuOiB4
+ZW4tZG9taWQtcmVzdHJpY3QgaW1wcm92ZW1lbnRzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
+CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
+U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
+aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
+PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
+aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
+LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
+ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
+RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
+NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRh
+Z10gICAgICAgICAgICAgICBwYXRjaGV3LzE1MjA1MzA3NTctNDQ3Ny0xLWdpdC1zZW5kLWVtYWls
+LWlhbi5qYWNrc29uQGV1LmNpdHJpeC5jb20gLT4gcGF0Y2hldy8xNTIwNTMwNzU3LTQ0NzctMS1n
+aXQtc2VuZC1lbWFpbC1pYW4uamFja3NvbkBldS5jaXRyaXguY29tClN3aXRjaGVkIHRvIGEgbmV3
+IGJyYW5jaCAndGVzdCcKNGMyNTQ0MmVhZCBzY3JpcHRzL2dldF9tYWludGFpbmVyLnBsOiBQcmlu
+dCBwcm9wZXIgZXJyb3IgbWVzc2FnZSBmb3IgbWlzc2luZyAkZmlsZQphZGNjYjJkMWNmIHhlbjog
+RXhwZWN0IHhlbnN0b3JlIHdyaXRlIHRvIGZhaWwgd2hlbiByZXN0cmljdGVkCmQ3MjE1ZjMyOWUg
+eGVuOiBVc2UgbmV3bHkgYWRkZWQgZG1vcHMgZm9yIG1hcHBpbmcgVkdBIG1lbW9yeQpmN2YxODVh
+NmExIGNvbmZpZ3VyZTogZG9fY29tcGlsZXI6IER1bXAgc29tZSBleHRyYSBpbmZvIHVuZGVyIGJh
+c2gKNzU1Njc3NzhjYSBvcy1wb3NpeDogUHJvdmlkZSBuZXcgLXJ1bmFzIDx1aWQ+OjxnaWQ+IGZh
+Y2lsaXR5CmFmN2Q0ODU4NjEgeGVuOiBkZXN0cm95X2h2bV9kb21haW46IFRyeSB4ZW5kZXZpY2Vt
+b2RlbF9zaHV0ZG93bgozMzRjY2FlNjNmIHhlbjogbW92ZSB4Y19pbnRlcmZhY2UgY29tcGF0aWJp
+bGl0eSBmYWxsYmFjayBmdXJ0aGVyIHVwIHRoZSBmaWxlCjNhNTFkMzU1MTcgeGVuOiBkZXN0cm95
+X2h2bV9kb21haW46IE1vdmUgcmVhc29uIGludG8gYSB2YXJpYWJsZQpmNDAxMjVhNTQ0IHhlbjog
+ZGVmZXIgY2FsbCB0byB4ZW5fcmVzdHJpY3QgdW50aWwganVzdCBiZWZvcmUgb3Nfc2V0dXBfcG9z
+dAo3YTRlNjM2ODU3IHhlbjogcmVzdHJpY3Q6IHVzZSB4ZW50b29sY29yZV9yZXN0cmljdF9hbGwK
+MjU5ZWI0ZGUzOCB4ZW46IGxpbmsgYWdhaW5zdCB4ZW50b29sY29yZQoKPT09IE9VVFBVVCBCRUdJ
+TiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMTogeGVuOiBsaW5rIGFnYWluc3QgeGVudG9vbGNvcmUu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMi8xMTogeGVuOiByZXN0cmljdDogdXNlIHhlbnRvb2xjb3JlX3Jl
+c3RyaWN0X2FsbC4uLgpDaGVja2luZyBQQVRDSCAzLzExOiB4ZW46IGRlZmVyIGNhbGwgdG8geGVu
+X3Jlc3RyaWN0IHVudGlsIGp1c3QgYmVmb3JlIG9zX3NldHVwX3Bvc3QuLi4KQ2hlY2tpbmcgUEFU
+Q0ggNC8xMTogeGVuOiBkZXN0cm95X2h2bV9kb21haW46IE1vdmUgcmVhc29uIGludG8gYSB2YXJp
+YWJsZS4uLgpDaGVja2luZyBQQVRDSCA1LzExOiB4ZW46IG1vdmUgeGNfaW50ZXJmYWNlIGNvbXBh
+dGliaWxpdHkgZmFsbGJhY2sgZnVydGhlciB1cCB0aGUgZmlsZS4uLgpDaGVja2luZyBQQVRDSCA2
+LzExOiB4ZW46IGRlc3Ryb3lfaHZtX2RvbWFpbjogVHJ5IHhlbmRldmljZW1vZGVsX3NodXRkb3du
+Li4uCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBz
+dGF0ZW1lbnQKIzM0OiBGSUxFOiBody9pMzg2L3hlbi94ZW4taHZtLmM6MTM5ODoKKyAgICAgICAg
+aWYgKGVycm5vICE9IEVOT1RUWSAvKiBvbGQgWGVuICovKQpbLi4uXQoKdG90YWw6IDEgZXJyb3Jz
+LCAwIHdhcm5pbmdzLCAzMyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
+c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
+TUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA3LzExOiBvcy1wb3NpeDogUHJvdmlkZSBuZXcg
+LXJ1bmFzIDx1aWQ+OjxnaWQ+IGZhY2lsaXR5Li4uCkNoZWNraW5nIFBBVENIIDgvMTE6IGNvbmZp
+Z3VyZTogZG9fY29tcGlsZXI6IER1bXAgc29tZSBleHRyYSBpbmZvIHVuZGVyIGJhc2guLi4KQ2hl
+Y2tpbmcgUEFUQ0ggOS8xMTogeGVuOiBVc2UgbmV3bHkgYWRkZWQgZG1vcHMgZm9yIG1hcHBpbmcg
+VkdBIG1lbW9yeS4uLgpFUlJPUjogRXJyb3IgbWVzc2FnZXMgc2hvdWxkIG5vdCBjb250YWluIG5l
+d2xpbmVzCiM5MDogRklMRTogaHcvaTM4Ni94ZW4veGVuLWh2bS5jOjQwNjoKKyAgICAgICAgICAg
+ICAgICAgICAgICIgdG8gR0ZOICUiUFJJX3hlbl9wZm4iIGZhaWxlZDogJXNcbiIsCgpFUlJPUjog
+RXJyb3IgbWVzc2FnZXMgc2hvdWxkIG5vdCBjb250YWluIG5ld2xpbmVzCiMxMDI6IEZJTEU6IGh3
+L2kzODYveGVuL3hlbi1odm0uYzo0MTc6CisgICAgICAgIGVycm9yX3JlcG9ydCgicGluX21lbW9y
+eV9jYWNoZWF0dHIgZmFpbGVkOiAlc1xuIiwgc3RyZXJyb3IoZXJybm8pKTsKCkVSUk9SOiBFcnJv
+ciBtZXNzYWdlcyBzaG91bGQgbm90IGNvbnRhaW4gbmV3bGluZXMKIzEzNDogRklMRTogaHcvaTM4
+Ni94ZW4veGVuLWh2bS5jOjQ1MDoKKyAgICAgICAgICAgICAgICAgICAgICIgdG8gR0ZOICUiUFJJ
+X3hlbl9wZm4iIGZhaWxlZDogJXNcbiIsCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0
+aGF0ICcqJyAoY3R4Old4VikKIzE1MjogRklMRTogaW5jbHVkZS9ody94ZW4veGVuX2NvbW1vbi5o
+Ojk1OgorICAgIHhlbmRldmljZW1vZGVsX2hhbmRsZSAqZG1vZCwgZG9taWRfdCBkb21pZCwgdWlu
+dDMyX3Qgc2l6ZSwgdWludDY0X3Qgc3JjX2dmbiwKICAgICAgICAgICAgICAgICAgICAgICAgICAg
+XgoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0
+YXRlbWVudAojMTY0OiBGSUxFOiBpbmNsdWRlL2h3L3hlbi94ZW5fY29tbW9uLmg6MTA3OgorICAg
+ICAgICBpZiAocmMpClsuLi5dCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcq
+JyAoY3R4Old4VikKIzE3MjogRklMRTogaW5jbHVkZS9ody94ZW4veGVuX2NvbW1vbi5oOjExNToK
+KyAgICB4ZW5kZXZpY2Vtb2RlbF9oYW5kbGUgKmRtb2QsIGRvbWlkX3QgZG9taWQsIHVpbnQ2NF90
+IHN0YXJ0LCB1aW50NjRfdCBlbmQsCiAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFs
+OiA2IGVycm9ycywgMCB3YXJuaW5ncywgMTM4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFz
+IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
+cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
+Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDEwLzExOiB4ZW46IEV4cGVj
+dCB4ZW5zdG9yZSB3cml0ZSB0byBmYWlsIHdoZW4gcmVzdHJpY3RlZC4uLgpDaGVja2luZyBQQVRD
+SCAxMS8xMTogc2NyaXB0cy9nZXRfbWFpbnRhaW5lci5wbDogUHJpbnQgcHJvcGVyIGVycm9yIG1l
+c3NhZ2UgZm9yIG1pc3NpbmcgJGZpbGUuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
+bmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
+eSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
+YmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
