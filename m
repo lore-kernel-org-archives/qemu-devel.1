@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1etwpW-00036M-IC
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 09:47:39 -0500
+	(envelope-from <groeck7@gmail.com>) id 1etwpl-0003Ee-8S
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 09:47:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1etwpV-0007oC-FY
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 09:47:38 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46946)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1etwpV-0007nP-86
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 09:47:37 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  8 Mar 2018 14:47:31 +0000
-Message-Id: <20180308144733.25615-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 0/2] Drop dead linux-user/unicore32 code
+	(envelope-from <groeck7@gmail.com>) id 1etwpg-0007tc-8u
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 09:47:53 -0500
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:45430)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <groeck7@gmail.com>) id 1etwpg-0007sD-2C
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 09:47:48 -0500
+Received: by mail-pg0-x243.google.com with SMTP id i133so2285169pgc.12
+	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 06:47:47 -0800 (PST)
+Sender: Guenter Roeck <groeck7@gmail.com>
+References: <1520444223-8389-1-git-send-email-linux@roeck-us.net>
+	<CAFEAcA8iFYGhzmLm6pyZi6tg=Di1P=vi_Enyw_ia1M34B3t8aw@mail.gmail.com>
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <1cb9cc42-c7c9-5124-a615-27914d23b05c@roeck-us.net>
+Date: Thu, 8 Mar 2018 06:47:45 -0800
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA8iFYGhzmLm6pyZi6tg=Di1P=vi_Enyw_ia1M34B3t8aw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] fsl-imx6: Swap Ethernet interrupt defines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,58 +31,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Guan Xuetao <gxt@mprc.pku.edu.cn>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Chris Healy <cphealy@gmail.com>, Jason Wang <jasowang@redhat.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Bill Paul <wpaul@windriver.com>
 
-We disabled the unicore32-linux-user in commit 5e2b40f7271cf9d
-in 2016, due to a problem with the syscall ABI it implemented
-being out of date and out of sync with the mainline kernel.
-In the intervening year and a half there have been no proposals
-to fix these problems so that we could re-enable it. This
-patchset removes the 750 lines of dead code from linux-user.
-(I suggested this in
-https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06634.html
-and there were no objections.)
+On 03/08/2018 02:50 AM, Peter Maydell wrote:
+> On 7 March 2018 at 17:37, Guenter Roeck <linux@roeck-us.net> wrote:
+>> The sabrelite machine model used by qemu-system-arm is based on the
+>> Freescale/NXP i.MX6Q processor. This SoC has an on-board ethernet
+>> controller which is supported in QEMU using the imx_fec.c module
+>> (actually called imx.enet for this model.)
+>>
+>> The include/hw/arm/fsm-imx6.h file defines the interrupt vectors for the
+>> imx.enet device like this:
+>>
+>>   #define FSL_IMX6_ENET_MAC_1588_IRQ 118
+>>   #define FSL_IMX6_ENET_MAC_IRQ 119
+>>
+>> According to https://www.nxp.com/docs/en/reference-manual/IMX6DQRM.pdf,
+>> page 225, in Table 3-1. ARM Cortex A9 domain interrupt summary,
+>> interrupts are as follows.
+>>
+>> 150 ENET MAC 0 IRQ
+>> 151 ENET MAC 0 1588 Timer interrupt
+>>
+>> where
+>>
+>> 150 - 32 == 118
+>> 151 - 32 == 119
+>>
+>> In other words, the vector definitions in the fsl-imx6.h file are reversed.
+>>
+>> This results in lost interrupt warnings when running recent (v4.15+) Linux
+>> kernels, and the Ethernet interface will fail to probe.
+>>
+>> Note that applying this patch will cause problems with older Linux kernels:
+>> The Ethernet interface will fail to probe with Linux v4.9 and earlier.
+>> Linux v4.1 and earlier will crash. This is a Linux kernel problem, not a
+>> qemu problem: the Linux kernel only worked by accident since it requested
+>> both interrupts.
+> 
+> So do the works-by-accident kernels fail on QEMU because
+> we don't emulate some bit of the ethernet device ?
+> Ideally we could fix that so we could boot newer kernels
+> without breaking the old ones...
+> 
 
-The second patch is a cleanup we can make as a result, since
-with unicore32 gone all our targets implement signal handling:
-we can remove the default "not implemented" stub functions.
-You could argue that these might be helpful for future new targets,
-but IMHO signal handling support is too important to allow a
-hypothetical new target to silently get away without implementing
-it.  For initial development it's easy enough to stub out the
-per-architecture functions, and then we will have a clear view of
-which targets (if any) don't have the signal handling implemented
-yet, and the missing feature will show up in code review.
+As mentioned, older versions of Linux assign both interrupt lines instead of one
+to the Ethernet interrupt handler. After applying this patch, this causes the probe
+function to fail. This in turn results in 4.1 and earlier to crash, This is fixed
+by applying upstream commit 32cba57ba7 to those kernels. I asked upstream maintainers
+to apply this patch to 3.18.y and 4.1.y.
 
-thanks
--- PMM
+The wrong interrupt problem is solved in Linux with upstream commit 4c8777892e80b,
+as I pointed out in bugzilla. With this patch applied, older versions of Linux (4.9
+and older) work with qemu, both with and without this patch. What I don't know is if
+older versions of Linux still work on real hardware with 4c8777892e80b applied.
 
+I don't know if a fix working for all versions of Linux is even possible. Creating both
+interrupts might be an option, but would likely cause other problems since some versions
+of Linux would handle the same interrupt twice, while others expect the second interrupt
+to be associated with the timer.
 
-Peter Maydell (2):
-  linux-user: Drop unicore32 code
-  linux-user: Remove the unused "not implemented" signal handling stubs
-
- linux-user/qemu.h                     |   5 +-
- linux-user/syscall_defs.h             |   6 +-
- linux-user/unicore32/syscall_nr.h     | 371 ----------------------------------
- linux-user/unicore32/target_cpu.h     |  27 ---
- linux-user/unicore32/target_elf.h     |  14 --
- linux-user/unicore32/target_signal.h  |  30 ---
- linux-user/unicore32/target_structs.h |  58 ------
- linux-user/unicore32/target_syscall.h |  62 ------
- linux-user/unicore32/termbits.h       |   2 -
- linux-user/elfload.c                  |  72 -------
- linux-user/main.c                     |  99 +--------
- linux-user/signal.c                   |  32 +--
- 12 files changed, 7 insertions(+), 771 deletions(-)
- delete mode 100644 linux-user/unicore32/syscall_nr.h
- delete mode 100644 linux-user/unicore32/target_cpu.h
- delete mode 100644 linux-user/unicore32/target_elf.h
- delete mode 100644 linux-user/unicore32/target_signal.h
- delete mode 100644 linux-user/unicore32/target_structs.h
- delete mode 100644 linux-user/unicore32/target_syscall.h
- delete mode 100644 linux-user/unicore32/termbits.h
-
--- 
-2.16.2
+Guenter
