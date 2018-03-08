@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1etlTA-0002n3-Cv
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 21:39:49 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1etlVk-0003gN-Hd
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 21:42:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1etlT6-0003qc-Ng
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 21:39:47 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42480 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1etlT6-0003qJ-IN
-	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 21:39:44 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 75B098182D1E
-	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 02:39:33 +0000 (UTC)
-References: <20180307110010.2205-1-quintela@redhat.com>
-	<20180307110010.2205-11-quintela@redhat.com>
-	<20180307115210.GN20201@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <96cd3e2a-d05a-e9e5-ac2c-c50ad9432924@redhat.com>
-Date: Wed, 7 Mar 2018 20:39:28 -0600
+	(envelope-from <haozhong.zhang@intel.com>) id 1etlVh-0005Vq-Ei
+	for qemu-devel@nongnu.org; Wed, 07 Mar 2018 21:42:28 -0500
+Date: Thu, 8 Mar 2018 10:42:20 +0800
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Message-ID: <20180308024220.fhclowspyzuyca3n@hz-desktop>
+References: <20180308023337.21062-1-haozhong.zhang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20180307115210.GN20201@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v10 10/24] migration: In case of error just
- end the migration
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180308023337.21062-1-haozhong.zhang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v4 0/5] hw/acpi-build: build SRAT memory
+ affinity structures for DIMM devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,45 +23,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, dgilbert@redhat.com, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org
 
-On 03/07/2018 05:52 AM, Daniel P. Berrang=C3=A9 wrote:
-> On Wed, Mar 07, 2018 at 11:59:56AM +0100, Juan Quintela wrote:
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> ---
->>   migration/socket.c | 6 ++----
->>   1 file changed, 2 insertions(+), 4 deletions(-)
->=20
-> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->=20
-
-> It will only return NULL if a client connected & then went away. This s=
-hould
-> not happen with a "normal" mgmt app usage. On the flip side this allows=
- a
-> malicious network attacker to inflict a denial of service on the migrat=
-ion
-> by simply connecting to target QEMU & immediately exiting.
->=20
-> Our "authentication" for migration relies on being able to validate the=
- TLS
-> certs during TLS handshake. So in general we ought to allow repeated in=
-coming
-> connections until we get a successful handshake.
-
-Indeed, our NBD code had some CVE fixes last year where a rogue 'nc'=20
-process could cause denial of service by connecting and hanging up=20
-immediately, until we fixed it to retry until the first client that=20
-actually got past the handshake.  We don't need to repeat CVEs like that.
-
->=20
-> So in fact, I think a better fix here is to simply remove the original
-> 'error_report' line, and ensure we return G_SOURCE_CONTINUE to wait for
-> another incoming connection from the real mgmt app.
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+On 03/08/18 10:33 +0800, Haozhong Zhang wrote:
+> (Patch 5 is only for reviewers to run test cases in patch 4)
+> 
+> ACPI 6.2A Table 5-129 "SPA Range Structure" requires the proximity
+> domain of a NVDIMM SPA range must match with corresponding entry in
+> SRAT table.
+> 
+> The address ranges of vNVDIMM in QEMU are allocated from the
+> hot-pluggable address space, which is entirely covered by one SRAT
+> memory affinity structure. However, users can set the vNVDIMM
+> proximity domain in NFIT SPA range structure by the 'node' property of
+> '-device nvdimm' to a value different than the one in the above SRAT
+> memory affinity structure.
+> 
+> In order to solve such proximity domain mismatch, this patch builds
+> one SRAT memory affinity structure for each DIMM device present at
+> boot time, including both PC-DIMM and NVDIMM, with the proximity
+> domain specified in '-device pc-dimm' or '-device nvdimm'.
+> 
+> The remaining hot-pluggable address space is covered by one or multiple
+> SRAT memory affinity structures with the proximity domain of the last
+> node as before.
+> 
+> Changes in v4:
+>  * (Patch 1) Update the commit message and add R-b from Igor Mammedov.
+>  * (Patch 2) Rebase on misc.json and update the commit message.
+>  * (Patch 3) Directly use di-addr and di-node.
+>  * (Patch 4) Drop the previous v3 patch 3 and add '-machine nvdimm=on'
+                                 ^^^^^^^^^^ should be 'v3 patch 4'
+				 
+>    to parameters of test_acpi_one().
+>  * (Patch 4) Put PC-DIMM and NVDIMM to different numa nodes.
+>  * (Patch 4&5) Move binary blobs of ACPI tables to DO-NOT-APPLY patch 5.
+> 
+> Changes in v3:
+>  * (Patch 1&2) Use qmp_pc_dimm_device_list to get information of DIMM
+>    devices and move it to separate patches.
+>  * (Patch 3) Replace while loop by a more readable for loop.
+>  * (Patch 3) Refactor the flag setting code.
+>  * (Patch 3) s/'static-plugged'/'present at boot time' in commit message.
+> 
+> Changes in v2:
+>  * Build SRAT memory affinity structures of PC-DIMM devices as well.
+>  * Add test cases.
+> 
+> 
+> Haozhong Zhang (5):
+>   pc-dimm: make qmp_pc_dimm_device_list() sort devices by address
+>   qmp: distinguish PC-DIMM and NVDIMM in MemoryDeviceInfoList
+>   hw/acpi-build: build SRAT memory affinity structures for DIMM devices
+>   tests/bios-tables-test: add test cases for DIMM proximity
+>   [DO NOT APPLY] test/acpi-test-data: add ACPI tables for dimmpxm test
+> 
+>  hmp.c                                 |  14 +++--
+>  hw/i386/acpi-build.c                  |  57 ++++++++++++++++++--
+>  hw/mem/pc-dimm.c                      |  99 ++++++++++++++++++++--------------
+>  hw/ppc/spapr.c                        |   3 +-
+>  include/hw/mem/pc-dimm.h              |   2 +-
+>  numa.c                                |  23 ++++----
+>  qapi/misc.json                        |  18 ++++++-
+>  qmp.c                                 |   7 +--
+>  stubs/qmp_pc_dimm.c                   |   4 +-
+>  tests/acpi-test-data/pc/APIC.dimmpxm  | Bin 0 -> 144 bytes
+>  tests/acpi-test-data/pc/DSDT.dimmpxm  | Bin 0 -> 6803 bytes
+>  tests/acpi-test-data/pc/NFIT.dimmpxm  | Bin 0 -> 224 bytes
+>  tests/acpi-test-data/pc/SRAT.dimmpxm  | Bin 0 -> 472 bytes
+>  tests/acpi-test-data/pc/SSDT.dimmpxm  | Bin 0 -> 685 bytes
+>  tests/acpi-test-data/q35/APIC.dimmpxm | Bin 0 -> 144 bytes
+>  tests/acpi-test-data/q35/DSDT.dimmpxm | Bin 0 -> 9487 bytes
+>  tests/acpi-test-data/q35/NFIT.dimmpxm | Bin 0 -> 224 bytes
+>  tests/acpi-test-data/q35/SRAT.dimmpxm | Bin 0 -> 472 bytes
+>  tests/acpi-test-data/q35/SSDT.dimmpxm | Bin 0 -> 685 bytes
+>  tests/bios-tables-test.c              |  38 +++++++++++++
+>  20 files changed, 198 insertions(+), 67 deletions(-)
+>  create mode 100644 tests/acpi-test-data/pc/APIC.dimmpxm
+>  create mode 100644 tests/acpi-test-data/pc/DSDT.dimmpxm
+>  create mode 100644 tests/acpi-test-data/pc/NFIT.dimmpxm
+>  create mode 100644 tests/acpi-test-data/pc/SRAT.dimmpxm
+>  create mode 100644 tests/acpi-test-data/pc/SSDT.dimmpxm
+>  create mode 100644 tests/acpi-test-data/q35/APIC.dimmpxm
+>  create mode 100644 tests/acpi-test-data/q35/DSDT.dimmpxm
+>  create mode 100644 tests/acpi-test-data/q35/NFIT.dimmpxm
+>  create mode 100644 tests/acpi-test-data/q35/SRAT.dimmpxm
+>  create mode 100644 tests/acpi-test-data/q35/SSDT.dimmpxm
+> 
+> -- 
+> 2.14.1
+> 
