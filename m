@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57062)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
-	id 1eu0pQ-0000pT-Or
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:03:50 -0500
+	id 1eu0pS-0000qa-0E
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:03:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
-	id 1eu0pP-0002eg-R1
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:03:48 -0500
-Received: from smtp.citrix.com ([66.165.176.89]:53118)
+	id 1eu0pQ-0002gg-R7
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:03:50 -0500
+Received: from smtp.citrix.com ([66.165.176.89]:27694)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
-	id 1eu0pP-0002dt-Kx
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:03:47 -0500
+	id 1eu0pQ-0002cK-KO
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 14:03:48 -0500
 From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Thu, 8 Mar 2018 19:03:01 +0000
-Message-ID: <1520535787-6223-7-git-send-email-ian.jackson@eu.citrix.com>
+Date: Thu, 8 Mar 2018 19:02:56 +0000
+Message-ID: <1520535787-6223-2-git-send-email-ian.jackson@eu.citrix.com>
 In-Reply-To: <1520535787-6223-1-git-send-email-ian.jackson@eu.citrix.com>
 References: <1520535787-6223-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 06/12] xen: move xc_interface compatibility
- fallback further up the file
+Subject: [Qemu-devel] [PATCH 01/12] checkpatch: Add xendevicemodel_handle to
+ the list of types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +30,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
+Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
 
-We are going to want to use the dummy xendevicemodel_handle type in
-new stub functions in the CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
-section.  So we need to provide that definition, or (as applicable)
-include the appropriate header, earlier in the file.
+This avoids checkpatch misparsing (as statements) long function
+definitions or declarations, which sometimes start with constructs
+like this:
 
-(Ideally the newer compatibility layers would be at the bottom of the
-file, so that they can naturally benefit from the compatibility layers
-for earlier version.  But that's rather too much for this series.)
+  static inline int xendevicemodel_relocate_memory(
+      xendevicemodel_handle *dmod, domid_t domid, ...
 
-No functional change.
-
+CC: Eric Blake <eblake@redhat.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Daniel P. Berrange <berrange@redhat.com>
 Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
-Acked-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
-v2: New patch in v2 of the series
+v6.1: New patch
 ---
- include/hw/xen/xen_common.h | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+ scripts/checkpatch.pl | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-index 1766bb9..60c4ebb 100644
---- a/include/hw/xen/xen_common.h
-+++ b/include/hw/xen/xen_common.h
-@@ -78,6 +78,17 @@ static inline void *xenforeignmemory_map(xc_interface *h, uint32_t dom,
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index d1fe79b..3e488f7 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -266,6 +266,7 @@ our @typeList = (
+ 	qr{target_(?:u)?long},
+ 	qr{hwaddr},
+ 	qr{xml${Ident}},
++	qr{xendevicemodel_handle},
+ );
  
- extern xenforeignmemory_handle *xen_fmem;
- 
-+#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
-+
-+typedef xc_interface xendevicemodel_handle;
-+
-+#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
-+
-+#undef XC_WANT_COMPAT_DEVICEMODEL_API
-+#include <xendevicemodel.h>
-+
-+#endif
-+
- #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
- 
- #define XEN_COMPAT_PHYSMAP
-@@ -105,8 +116,6 @@ static inline int xentoolcore_restrict_all(domid_t domid)
- 
- #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
- 
--typedef xc_interface xendevicemodel_handle;
--
- static inline xendevicemodel_handle *xendevicemodel_open(
-     struct xentoollog_logger *logger, unsigned int open_flags)
- {
-@@ -228,11 +237,6 @@ static inline int xendevicemodel_set_mem_type(
-     return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
- }
- 
--#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
--
--#undef XC_WANT_COMPAT_DEVICEMODEL_API
--#include <xendevicemodel.h>
--
- #endif
- 
- extern xendevicemodel_handle *xen_dmod;
+ # This can be modified by sub possible.  Since it can be empty, be careful
 -- 
 2.1.4
