@@ -1,30 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42149)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1etvcw-00063N-RO
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:30:39 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42665)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <berrange@redhat.com>) id 1etveN-0007H4-0f
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:32:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1etvct-0004RB-N9
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:30:34 -0500
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:45901 helo=mx01.kamp.de)
+	(envelope-from <berrange@redhat.com>) id 1etveH-00051g-4y
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:32:03 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48276 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1etvct-0004Q9-DU
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:30:31 -0500
-Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
-	for qemu-devel@nongnu.org; Thu, 8 Mar 2018 14:30:24 +0100
-References: <1520507908-16743-1-git-send-email-pl@kamp.de>
-	<1520507908-16743-5-git-send-email-pl@kamp.de>
-	<87po4ed953.fsf@secure.laptop>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <01963940-1438-3d10-8f3b-d400fcb24df9@kamp.de>
-Date: Thu, 8 Mar 2018 14:30:25 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1etveG-00051O-Va
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 08:31:57 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C6C954023BB3
+	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 13:31:53 +0000 (UTC)
+Date: Thu, 8 Mar 2018 13:31:43 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180308133143.GP4718@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180306053320.15401-1-peterx@redhat.com>
+	<20180306053320.15401-10-peterx@redhat.com>
+	<20180307123650.GD20201@redhat.com> <20180308034409.GA32252@xz-mi>
+	<20180308101359.GE4718@redhat.com> <20180308114213.GE32252@xz-mi>
 MIME-Version: 1.0
-In-Reply-To: <87po4ed953.fsf@secure.laptop>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 4/5] migration/block: limit the number of
- parallel I/O requests
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180308114213.GE32252@xz-mi>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 9/9] chardev: tcp: postpone TLS work
+ until machine done
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,147 +38,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, dgilbert@redhat.com, famz@redhat.com, stefanha@redhat.com, jjherne@linux.vnet.ibm.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-Am 08.03.2018 um 13:50 schrieb Juan Quintela:
-> Peter Lieven <pl@kamp.de> wrote:
->> the current implementation submits up to 512 I/O requests in parallel
->> which is much to high especially for a background task.
->> This patch adds a maximum limit of 16 I/O requests that can
->> be submitted in parallel to avoid monopolizing the I/O device.
->>
->> Signed-off-by: Peter Lieven <pl@kamp.de>
-> This code is already a mess (TM).  It is difficult to understand what we
-> are doing, so not easy to see if your changes are better/worse than what
-> we have.
->
-> I am not sure that your solution help to improve things here.  Let's see
-> what I understand.
->
-> We have three fields (without a single comment):
->
-> - submitted: this is the number of blocks that we have asked the block
->               device to read asynchronously to main memory, and that
->               haven't yet read.  I.e. "blocks_read_pending" would be a
->               better name?
->
-> - read_done: this is the number of blocks that we have finished read
->               asynchronously from this block device.  When we finish, we
->               do a submitted -- and a read_done++.  blocks_read_finished
->               name?
+On Thu, Mar 08, 2018 at 07:42:13PM +0800, Peter Xu wrote:
+> On Thu, Mar 08, 2018 at 10:13:59AM +0000, Daniel P. Berrang=C3=A9 wrote=
+:
+> > On Thu, Mar 08, 2018 at 11:44:09AM +0800, Peter Xu wrote:
+> > > On Wed, Mar 07, 2018 at 12:36:50PM +0000, Daniel P. Berrang=C3=A9 w=
+rote:
+> > >=20
+> > > [...]
+> > >=20
+> > > > > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> > > > > index bd40864f87..997c70dd7d 100644
+> > > > > --- a/chardev/char-socket.c
+> > > > > +++ b/chardev/char-socket.c
+> > > > > @@ -31,6 +31,7 @@
+> > > > >  #include "qemu/option.h"
+> > > > >  #include "qapi/error.h"
+> > > > >  #include "qapi/clone-visitor.h"
+> > > > > +#include "sysemu/sysemu.h"
+> > > > > =20
+> > > > >  #include "chardev/char-io.h"
+> > > > > =20
+> > > > > @@ -722,6 +723,11 @@ static void tcp_chr_tls_init(Chardev *chr)
+> > > > >      Error *err =3D NULL;
+> > > > >      gchar *name;
+> > > > > =20
+> > > > > +    if (!machine_init_done) {
+> > > > > +        /* This will be postponed to machine_done notifier */
+> > > > > +        return;
+> > > > > +    }
+> > > > > +
+> > > > >      if (s->is_listen) {
+> > > > >          tioc =3D qio_channel_tls_new_server(
+> > > > >              s->ioc, s->tls_creds,
+> > > > > @@ -1145,6 +1151,10 @@ static int tcp_chr_machine_done_hook(Cha=
+rdev *chr)
+> > > > >          tcp_chr_connect_async(chr);
+> > > > >      }
+> > > > > =20
+> > > > > +    if (s->tls_creds) {
+> > > > > +        tcp_chr_tls_init(chr);
+> > > > > +    }
+> > > >=20
+> > > > This looks questionable - AFAICT, there's no guarantee we have an=
+y
+> > > > client connection active when the machine dnoe hook runs. Only if
+> > > > the chardev is set in client mode, and reconnect_time is *not* se=
+t,
+> > > > but this seems to be run unconditionally.
+> > >=20
+> > > You are right.  Thanks for spotting that.
+> > >=20
+> > > Then how about this?  It's a bit ugly, but I think it should be saf=
+e:
+> >=20
+> > Is it perhaps not possible to just check if  's->ioc' is non-NULL
+> > in the tcp_chr_machine_done_hook for your original patch ?
+>=20
+> In tcp_chr_new_client() I see that s->ioc will be set no matter what,
+> and that function can even be called without TLS enabled I think.
+> Does that mean only check against s->ioc would not be enough?
 
-Correct. The names should be adjusted.
+I mean like this:
 
->
-> - transferred: This is the number of blocks that we have transferred
->                 since the beginning of migration.  At this point, we do a
->                 read_done-- and a transferred++
->
-> Note also that we do malloc()/free() for each block
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index a1966aae51..19e3193817 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -723,6 +723,11 @@ static void tcp_chr_tls_init(Chardev *chr)
+     Error *err =3D NULL;
+     gchar *name;
+=20
++    if (!machine_init_done) {
++        /* This will be postponed to machine_done notifier */
++        return;
++    }
++
+     if (s->is_listen) {
+         tioc =3D qio_channel_tls_new_server(
+             s->ioc, s->tls_creds,
+@@ -1146,6 +1151,10 @@ static int tcp_chr_machine_done_hook(Chardev *chr)
+         tcp_chr_connect_async(chr);
+     }
+=20
++    if (s->ioc && s->tls_creds) {
++        tcp_chr_tls_init(chr);
++    }
++
+     return 0;
+ }
+=20
 
-Yes, but that is a different story.
 
->
-> So, now that we have defined what our fields mean, we need to know what
-> is our test.  block_save_pending():
->
->      get_remaining_dirty() + (submitted + read_done) * BLOCK_SIZE
->
-> Looks good.
->
-> But let's us see what test we do in block_save_iterate() (Yes, I have
-> been very liberal with reformatting and removal of struct names):
->
-> (submitted + read_done) * BLOCK_SIZE <  qemu_file_get_rate_limit(f) &&
-> (submitted + read_done) < MAX_INFLIGHT_IO
->
-> The idea of that test is to make sure that we _don't send_ through the
-> QEMUFile more than qemu_file_get_rate_limit(f).  But there are several
-> things here:
-> - we have already issued a flush_blks() call before we enter the loop
->    And it is inside possibility that we have already sent too much data at
->    this point, but we enter the while loop anyways.
->
->    Notice that flush_blks() does the right thing and test in each loop if
->    qemu_file_rate_limit() has been reached and stops sending more data if
->    it returns true;
->
-> - At this point, we *could* have sent all that can be sent for this
->    round, but we enter the loop anyways.  And we test two things:
->       - that we haven't read from block devices more than
->         qemu_file_get_rate_limit() bytes (notice that this is the maximum
->         that we could put through the migration channel, not really
->         related  with what we read from block devices).
->
->       - that we haven't read in this round more than MAX_INFLIGHT_IO
->         blocks.  That is 512 blocks, at BLOCK_SIZE bytes is 512MB. Why?
->         Who knows.
+s->ioc will only be !=3D NULL, if some codepath in qemu_chr_parse_socket
+ended up calling tcp_chr_new_client(). If that happened we will have
+skipped setup of TLS, so calling tcp_chr_tls_init() based on
+s->ioc && s->tls_creds feels right to me.
 
-The idea behind this was only to limit the maximum memory that is allocated.
-That was not meant as a rate limit for the storage backend.
-
->
-> - Now we exit the while loop, and we have pending blocks to send, the
->      minimum between:
->         - qemu_file_get_rate_limit()/BLOCK_SIZE, and
->         - MAX_INFLIGHT_IO
->
-> But not all of them are ready to send, only "read_done" blocks are
-> ready, the "submitted" ones are still waiting for read completion.
-
-Thats what I tried to address in patch 5.
-
->
-> And we call back flush_blks() that will try to send all the "read_done"
-> blocks through the migration channel until we hit
-> qemu_file_rate_limit().
->
-> So, looking at the problem from far away:
->
-> - how many read requests are we have to have in flight at any moment, is
->    that 16 from this series the right number? Notice that each request
->    are 1MB, so this is 16MB (I have no clue what is the right value).
-
-I choosed that value because it helped to improved the stalls in the
-guest that I have been seeing. Stefan also said that 16 would be a good
-value for a background task. 512 is definetly too much.
-
->
-> - how many blocks should we get on each round.  Notice that the reason
->    for the 1st patch on this series is because the block layer is not
->    sending enough blocks to prevent ram migration to start.  If there are
->    enough dirty memory sent from the block layer, we shouldn't ever enter
->    the ram stage.
->    Notice how we register them in vl.c:
->
->      blk_mig_init();
->      ram_mig_init();
-
-The idea of the 1st patch was to skip ram migration until we have completed
-the first round of block migration (aka bulk phase) as this will take a long time.
-After that we are only doing incremental updates. You are right this might still
-be too early, but it to start after the bulk phase was an easy choice without
-introducing another heuristic.
-
->
-> So, after so long mail, do I have some suggestion?
->
-> - should we make the MAX_PARALLEL_IO autotunig?  i.e. if we are not
->    being able to get qemu_file_get_rate_limit()/BLOCK_SIZE read_blocks by
->    iteration, we should increase MAX_PARALLEL_IO limit?
-
-We should not, if the bandwidth of the migration stream is high we would again
-monipolize the I/O device and get stalls in guest I/O.
-
->
-> - should we "take" into account how many blocks have transferred the 1st
->    call to flush_blks() and only wait for "read_blocks" until
->    flush_blks() instead of for the whole set?
-
-We still have to avoid that we have too much parallel I/O. But I was also thinking that
-we need a time limit (as the ram migration has). We might sit in the while loop until
-512MB have read if we have a fast source storage and a high migration bandwidth
-so that we never reach the rate limit.
-
-Peter
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
