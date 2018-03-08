@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59888)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
-	id 1etzW1-0007Q6-1t
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:39:42 -0500
+	id 1etzW2-0007QJ-BK
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:39:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
-	id 1etzVw-0008HR-M0
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:39:41 -0500
-Received: from smtp.citrix.com ([66.165.176.89]:50174)
+	id 1etzW1-0008Ll-0e
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:39:42 -0500
+Received: from smtp.citrix.com ([66.165.176.89]:31749)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=5980b9d75=Ian.Jackson@citrix.com>)
-	id 1etzVw-0008H2-DE
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:39:36 -0500
+	id 1etzW0-0008KY-PI
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 12:39:40 -0500
 From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Thu, 8 Mar 2018 17:39:15 +0000
-Message-ID: <1520530757-4477-10-git-send-email-ian.jackson@eu.citrix.com>
+Date: Thu, 8 Mar 2018 17:39:11 +0000
+Message-ID: <1520530757-4477-6-git-send-email-ian.jackson@eu.citrix.com>
 In-Reply-To: <1520530757-4477-1-git-send-email-ian.jackson@eu.citrix.com>
 References: <1520530757-4477-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 09/11] xen: Use newly added dmops for mapping
- VGA memory
+Subject: [Qemu-devel] [PATCH 05/11] xen: move xc_interface compatibility
+ fallback further up the file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,194 +30,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: xen-devel@lists.xenproject.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Ian Jackson <ian.jackson@eu.citrix.com>
+Cc: xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Ian Jackson <Ian.Jackson@eu.citrix.com>
 
-From: Ross Lagerwall <ross.lagerwall@citrix.com>
+We are going to want to use the dummy xendevicemodel_handle type in
+new stub functions in the CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
+section.  So we need to provide that definition, or (as applicable)
+include the appropriate header, earlier in the file.
 
-Xen unstable (to be in 4.11) has two new dmops, relocate_memory and
-pin_memory_cacheattr. Use these to set up the VGA memory, replacing the
-previous calls to libxc. This allows the VGA console to work properly
-when QEMU is running restricted (-xen-domid-restrict).
+(Ideally the newer compatibility layers would be at the bottom of the
+file, so that they can naturally benefit from the compatibility layers
+for earlier version.  But that's rather too much for this series.)
 
-Wrapper functions are provided to allow QEMU to work with older versions
-of Xen.
+No functional change.
 
-Tweak the error handling while making this change:
-* Report pin_memory_cacheattr errors.
-* Report errors even when DEBUG_HVM is not set. This is useful for
-trying to understand why VGA is not working, since otherwise it just
-fails silently.
-* Fix the return values when an error occurs. The functions now
-consistently return -1 and set errno.
-
-CC: Ian Jackson <ian.jackson@eu.citrix.com>
-Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
-Reviewed-by: Ian Jackson <ian.jackson@eu.citrix.com>
+Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
+Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+Acked-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
-v6: New patch in this version of the series
+v2: New patch in v2 of the series
 ---
- configure                   | 19 ++++++++++++++++++
- hw/i386/xen/xen-hvm.c       | 49 ++++++++++++++++++++++++---------------------
- include/hw/xen/xen_common.h | 31 ++++++++++++++++++++++++++++
- 3 files changed, 76 insertions(+), 23 deletions(-)
+ include/hw/xen/xen_common.h | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/configure b/configure
-index 841c146..9a83836 100755
---- a/configure
-+++ b/configure
-@@ -2213,6 +2213,25 @@ EOF
-     # Xen unstable
-     elif
-         cat > $TMPC <<EOF &&
-+#undef XC_WANT_COMPAT_DEVICEMODEL_API
-+#define __XEN_TOOLS__
-+#include <xendevicemodel.h>
-+int main(void) {
-+  xendevicemodel_handle *xd;
-+
-+  xd = xendevicemodel_open(0, 0);
-+  xendevicemodel_pin_memory_cacheattr(xd, 0, 0, 0, 0);
-+
-+  return 0;
-+}
-+EOF
-+        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs -lxentoolcore"
-+      then
-+      xen_stable_libs="-lxendevicemodel $xen_stable_libs -lxentoolcore"
-+      xen_ctrl_version=41100
-+      xen=yes
-+    elif
-+        cat > $TMPC <<EOF &&
- #undef XC_WANT_COMPAT_MAP_FOREIGN_API
- #include <xenforeignmemory.h>
- #include <xentoolcore.h>
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index b95748d..22bd537 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -347,7 +347,7 @@ static int xen_add_to_physmap(XenIOState *state,
-                               MemoryRegion *mr,
-                               hwaddr offset_within_region)
- {
--    unsigned long i = 0;
-+    unsigned long nr_pages;
-     int rc = 0;
-     XenPhysmap *physmap = NULL;
-     hwaddr pfn, start_gpfn;
-@@ -396,22 +396,26 @@ go_physmap:
- 
-     pfn = phys_offset >> TARGET_PAGE_BITS;
-     start_gpfn = start_addr >> TARGET_PAGE_BITS;
--    for (i = 0; i < size >> TARGET_PAGE_BITS; i++) {
--        unsigned long idx = pfn + i;
--        xen_pfn_t gpfn = start_gpfn + i;
--
--        rc = xen_xc_domain_add_to_physmap(xen_xc, xen_domid, XENMAPSPACE_gmfn, idx, gpfn);
--        if (rc) {
--            DPRINTF("add_to_physmap MFN %"PRI_xen_pfn" to PFN %"
--                    PRI_xen_pfn" failed: %d (errno: %d)\n", idx, gpfn, rc, errno);
--            return -rc;
--        }
-+    nr_pages = size >> TARGET_PAGE_BITS;
-+    rc = xendevicemodel_relocate_memory(xen_dmod, xen_domid, nr_pages, pfn,
-+                                        start_gpfn);
-+    if (rc) {
-+        int saved_errno = errno;
-+
-+        error_report("relocate_memory %lu pages from GFN %"PRI_xen_pfn
-+                     " to GFN %"PRI_xen_pfn" failed: %s\n",
-+                     nr_pages, pfn, start_gpfn, strerror(saved_errno));
-+        errno = saved_errno;
-+        return -1;
-     }
- 
--    xc_domain_pin_memory_cacheattr(xen_xc, xen_domid,
-+    rc = xendevicemodel_pin_memory_cacheattr(xen_dmod, xen_domid,
-                                    start_addr >> TARGET_PAGE_BITS,
-                                    (start_addr + size - 1) >> TARGET_PAGE_BITS,
-                                    XEN_DOMCTL_MEM_CACHEATTR_WB);
-+    if (rc) {
-+        error_report("pin_memory_cacheattr failed: %s\n", strerror(errno));
-+    }
-     return xen_save_physmap(state, physmap);
- }
- 
-@@ -419,7 +423,6 @@ static int xen_remove_from_physmap(XenIOState *state,
-                                    hwaddr start_addr,
-                                    ram_addr_t size)
- {
--    unsigned long i = 0;
-     int rc = 0;
-     XenPhysmap *physmap = NULL;
-     hwaddr phys_offset = 0;
-@@ -438,16 +441,16 @@ static int xen_remove_from_physmap(XenIOState *state,
-     size >>= TARGET_PAGE_BITS;
-     start_addr >>= TARGET_PAGE_BITS;
-     phys_offset >>= TARGET_PAGE_BITS;
--    for (i = 0; i < size; i++) {
--        xen_pfn_t idx = start_addr + i;
--        xen_pfn_t gpfn = phys_offset + i;
--
--        rc = xen_xc_domain_add_to_physmap(xen_xc, xen_domid, XENMAPSPACE_gmfn, idx, gpfn);
--        if (rc) {
--            fprintf(stderr, "add_to_physmap MFN %"PRI_xen_pfn" to PFN %"
--                    PRI_xen_pfn" failed: %d (errno: %d)\n", idx, gpfn, rc, errno);
--            return -rc;
--        }
-+    rc = xendevicemodel_relocate_memory(xen_dmod, xen_domid, size, start_addr,
-+                                        phys_offset);
-+    if (rc) {
-+        int saved_errno = errno;
-+
-+        error_report("relocate_memory %lu pages from GFN %"PRI_xen_pfn
-+                     " to GFN %"PRI_xen_pfn" failed: %s\n",
-+                     size, start_addr, phys_offset, strerror(saved_errno));
-+        errno = saved_errno;
-+        return -1;
-     }
- 
-     QLIST_REMOVE(physmap, list);
 diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-index 4bd30a3..a236eb1 100644
+index 1766bb9..60c4ebb 100644
 --- a/include/hw/xen/xen_common.h
 +++ b/include/hw/xen/xen_common.h
-@@ -89,6 +89,37 @@ typedef xc_interface xendevicemodel_handle;
+@@ -78,6 +78,17 @@ static inline void *xenforeignmemory_map(xc_interface *h, uint32_t dom,
  
- #endif
+ extern xenforeignmemory_handle *xen_fmem;
  
-+#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41100
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
 +
-+static inline int xendevicemodel_relocate_memory(
-+    xendevicemodel_handle *dmod, domid_t domid, uint32_t size, uint64_t src_gfn,
-+    uint64_t dst_gfn)
-+{
-+    uint32_t i;
-+    int rc;
++typedef xc_interface xendevicemodel_handle;
 +
-+    for (i = 0; i < size; i++) {
-+        unsigned long idx = src_gfn + i;
-+        xen_pfn_t gpfn = dst_gfn + i;
++#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
 +
-+        rc = xc_domain_add_to_physmap(xen_xc, domid, XENMAPSPACE_gmfn, idx,
-+                                      gpfn);
-+        if (rc)
-+            return rc;
-+    }
++#undef XC_WANT_COMPAT_DEVICEMODEL_API
++#include <xendevicemodel.h>
 +
-+    return 0;
-+}
-+
-+static inline int xendevicemodel_pin_memory_cacheattr(
-+    xendevicemodel_handle *dmod, domid_t domid, uint64_t start, uint64_t end,
-+    uint32_t type)
-+{
-+    return xc_domain_pin_memory_cacheattr(xen_xc, domid, start, end, type);
-+}
-+
-+#endif /* CONFIG_XEN_CTRL_INTERFACE_VERSION < 41100 */
++#endif
 +
  #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
  
  #define XEN_COMPAT_PHYSMAP
+@@ -105,8 +116,6 @@ static inline int xentoolcore_restrict_all(domid_t domid)
+ 
+ #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
+ 
+-typedef xc_interface xendevicemodel_handle;
+-
+ static inline xendevicemodel_handle *xendevicemodel_open(
+     struct xentoollog_logger *logger, unsigned int open_flags)
+ {
+@@ -228,11 +237,6 @@ static inline int xendevicemodel_set_mem_type(
+     return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
+ }
+ 
+-#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
+-
+-#undef XC_WANT_COMPAT_DEVICEMODEL_API
+-#include <xendevicemodel.h>
+-
+ #endif
+ 
+ extern xendevicemodel_handle *xen_dmod;
 -- 
 2.1.4
