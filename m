@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56638)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56597)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eu4D6-0007BF-DR
+	id 1eu4D4-0007AQ-CL
 	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eu4D5-0004ET-HQ
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:28 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:54058)
+	id 1eu4D0-0004As-Uh
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:26 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:34432)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eu4D5-0004Dn-6L
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:27 -0500
-Received: by mail-wm0-x241.google.com with SMTP id e194so700071wmd.3
-	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 14:40:27 -0800 (PST)
+	id 1eu4D0-00049Z-ED
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 17:40:22 -0500
+Received: by mail-wr0-x242.google.com with SMTP id o8so7270341wra.1
+	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 14:40:22 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu,  8 Mar 2018 23:39:39 +0100
-Message-Id: <20180308223946.26784-19-f4bug@amsat.org>
+Date: Thu,  8 Mar 2018 23:39:36 +0100
+Message-Id: <20180308223946.26784-16-f4bug@amsat.org>
 In-Reply-To: <20180308223946.26784-1-f4bug@amsat.org>
 References: <20180308223946.26784-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 18/25] hw/isa/vt82c686: Rename vt82c686b_init()
- -> vt82c686b_isa_init()
+Subject: [Qemu-devel] [PATCH 15/25] hw/mips/malta: Code movement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,56 +33,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Marcel Apfelbaum <marcel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexey Kardashevskiy <aik@ozlabs.ru>, Yongbok Kim <yongbok.kim@mips.com>, Thomas Huth <thuth@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Eduardo Habkost <ehabkost@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>
+To: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Marcel Apfelbaum <marcel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alexey Kardashevskiy <aik@ozlabs.ru>, Yongbok Kim <yongbok.kim@mips.com>, Thomas Huth <thuth@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>
 
-This function only initialize the ISA bus.
+Move the SouthBridge peripherals first, and keep the Super I/O
+peripherals last.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/isa/vt82c686.h | 2 +-
- hw/isa/vt82c686.c         | 2 +-
- hw/mips/mips_fulong2e.c   | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+ hw/mips/mips_malta.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/include/hw/isa/vt82c686.h b/include/hw/isa/vt82c686.h
-index 471b5e9e53..db97c8ed7a 100644
---- a/include/hw/isa/vt82c686.h
-+++ b/include/hw/isa/vt82c686.h
-@@ -2,7 +2,7 @@
- #define HW_VT82C686_H
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index cd7bd0eef6..9e0724ca5a 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -1062,10 +1062,6 @@ void mips_malta_init(MachineState *machine)
+         memory_region_add_subregion(system_memory, 512 << 20, ram_low_postio);
+     }
  
- /* vt82c686.c */
--ISABus *vt82c686b_init(PCIBus * bus, int devfn);
-+ISABus *vt82c686b_isa_init(PCIBus * bus, int devfn);
- void vt82c686b_ac97_init(PCIBus *bus, int devfn);
- void vt82c686b_mc97_init(PCIBus *bus, int devfn);
- I2CBus *vt82c686b_pm_init(PCIBus *bus, int devfn, uint32_t smb_io_base,
-diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
-index 070cc1889f..7eaf3c7e8f 100644
---- a/hw/isa/vt82c686.c
-+++ b/hw/isa/vt82c686.c
-@@ -478,7 +478,7 @@ static void vt82c686b_realize(PCIDevice *d, Error **errp)
-     qemu_register_reset(vt82c686b_reset, d);
- }
+-    /* generate SPD EEPROM data */
+-    generate_eeprom_spd(&smbus_eeprom_buf[0 * 256], ram_size);
+-    generate_eeprom_serial(&smbus_eeprom_buf[6 * 256]);
+-
+ #ifdef TARGET_WORDS_BIGENDIAN
+     be = 1;
+ #else
+@@ -1208,15 +1204,19 @@ void mips_malta_init(MachineState *machine)
+     pci_create_simple(pci_bus, piix4_devfn + 2, "piix4-usb-uhci");
+     smbus = piix4_pm_init(pci_bus, piix4_devfn + 3, 0x1100,
+                           isa_get_irq(NULL, 9), NULL, 0, NULL);
+-    smbus_eeprom_init(smbus, 8, smbus_eeprom_buf, smbus_eeprom_size);
+-    g_free(smbus_eeprom_buf);
+     pit = i8254_pit_init(isa_bus, 0x40, 0, NULL);
+     i8257_dma_init(isa_bus, 0);
++    mc146818_rtc_init(isa_bus, 2000, NULL);
++
++    /* generate SPD EEPROM data */
++    generate_eeprom_spd(&smbus_eeprom_buf[0 * 256], ram_size);
++    generate_eeprom_serial(&smbus_eeprom_buf[6 * 256]);
++    smbus_eeprom_init(smbus, 8, smbus_eeprom_buf, smbus_eeprom_size);
++    g_free(smbus_eeprom_buf);
  
--ISABus *vt82c686b_init(PCIBus *bus, int devfn)
-+ISABus *vt82c686b_isa_init(PCIBus *bus, int devfn)
- {
-     PCIDevice *d;
+     /* Super I/O */
+     isa_create_simple(isa_bus, TYPE_I8042);
  
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index ca1f76a724..9ebc225d3b 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -237,7 +237,7 @@ static void vt82c686b_southbridge_init(PCIBus *pci_bus, int slot, qemu_irq intc,
-     ISABus *isa_bus;
-     DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
+-    mc146818_rtc_init(isa_bus, 2000, NULL);
+     serial_hds_isa_init(isa_bus, 0, 2);
+     parallel_hds_isa_init(isa_bus, 1);
  
--    isa_bus = vt82c686b_init(pci_bus, PCI_DEVFN(slot, 0));
-+    isa_bus = vt82c686b_isa_init(pci_bus, PCI_DEVFN(slot, 0));
-     if (!isa_bus) {
-         fprintf(stderr, "vt82c686b_init error\n");
-         exit(1);
 -- 
 2.16.2
