@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ettvg-0002tc-FI
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:41:50 -0500
+	(envelope-from <peterx@redhat.com>) id 1ettwF-0003Ps-RG
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:42:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ettve-00050S-U4
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:41:48 -0500
-Received: from mail-ot0-x231.google.com ([2607:f8b0:4003:c0f::231]:38439)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ettve-0004xu-N1
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:41:46 -0500
-Received: by mail-ot0-x231.google.com with SMTP id 95so5110671ote.5
-	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 03:41:44 -0800 (PST)
+	(envelope-from <peterx@redhat.com>) id 1ettwF-0005TO-0E
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:42:23 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45144 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ettwE-0005T1-Qg
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 06:42:22 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DC1A24023BB3
+	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 11:42:21 +0000 (UTC)
+Date: Thu, 8 Mar 2018 19:42:13 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180308114213.GE32252@xz-mi>
+References: <20180306053320.15401-1-peterx@redhat.com>
+	<20180306053320.15401-10-peterx@redhat.com>
+	<20180307123650.GD20201@redhat.com> <20180308034409.GA32252@xz-mi>
+	<20180308101359.GE4718@redhat.com>
 MIME-Version: 1.0
-References: <1520365586-30384-1-git-send-email-mjc@sifive.com>
-	<CAFEAcA_G1tHrBZ=GxAy0b-SLbYU2-XOAUNL0D=8MQeL0Roz_cQ@mail.gmail.com>
-	<CAHNT7NtRnSB-GYHp=v3iM7+_72y43YpZesbYCrnTvCikTiUMuw@mail.gmail.com>
-	<CAHNT7NuqgY-zgPJT4gUJMaHr24E-PwrN=Eje+m1XW24mAf07Ag@mail.gmail.com>
-In-Reply-To: <CAHNT7NuqgY-zgPJT4gUJMaHr24E-PwrN=Eje+m1XW24mAf07Ag@mail.gmail.com>
-From: Michael Clark <mjc@sifive.com>
-Date: Thu, 08 Mar 2018 11:41:33 +0000
-Message-ID: <CAHNT7NshwZh87Uui6i+ARdOj2BuW6d7gahOiZ0X48Cf3TdOrXQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180308101359.GE4718@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL] RISC-V QEMU Port Submission v8.2
+Subject: Re: [Qemu-devel] [PATCH v2 9/9] chardev: tcp: postpone TLS work
+ until machine done
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,95 +37,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, RISC-V Patches <patches@groups.riscv.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-On Fri, 9 Mar 2018 at 12:18 AM, Michael Clark <mjc@sifive.com> wrote:
+On Thu, Mar 08, 2018 at 10:13:59AM +0000, Daniel P. Berrang=C3=A9 wrote:
+> On Thu, Mar 08, 2018 at 11:44:09AM +0800, Peter Xu wrote:
+> > On Wed, Mar 07, 2018 at 12:36:50PM +0000, Daniel P. Berrang=C3=A9 wro=
+te:
+> >=20
+> > [...]
+> >=20
+> > > > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> > > > index bd40864f87..997c70dd7d 100644
+> > > > --- a/chardev/char-socket.c
+> > > > +++ b/chardev/char-socket.c
+> > > > @@ -31,6 +31,7 @@
+> > > >  #include "qemu/option.h"
+> > > >  #include "qapi/error.h"
+> > > >  #include "qapi/clone-visitor.h"
+> > > > +#include "sysemu/sysemu.h"
+> > > > =20
+> > > >  #include "chardev/char-io.h"
+> > > > =20
+> > > > @@ -722,6 +723,11 @@ static void tcp_chr_tls_init(Chardev *chr)
+> > > >      Error *err =3D NULL;
+> > > >      gchar *name;
+> > > > =20
+> > > > +    if (!machine_init_done) {
+> > > > +        /* This will be postponed to machine_done notifier */
+> > > > +        return;
+> > > > +    }
+> > > > +
+> > > >      if (s->is_listen) {
+> > > >          tioc =3D qio_channel_tls_new_server(
+> > > >              s->ioc, s->tls_creds,
+> > > > @@ -1145,6 +1151,10 @@ static int tcp_chr_machine_done_hook(Chard=
+ev *chr)
+> > > >          tcp_chr_connect_async(chr);
+> > > >      }
+> > > > =20
+> > > > +    if (s->tls_creds) {
+> > > > +        tcp_chr_tls_init(chr);
+> > > > +    }
+> > >=20
+> > > This looks questionable - AFAICT, there's no guarantee we have any
+> > > client connection active when the machine dnoe hook runs. Only if
+> > > the chardev is set in client mode, and reconnect_time is *not* set,
+> > > but this seems to be run unconditionally.
+> >=20
+> > You are right.  Thanks for spotting that.
+> >=20
+> > Then how about this?  It's a bit ugly, but I think it should be safe:
+>=20
+> Is it perhaps not possible to just check if  's->ioc' is non-NULL
+> in the tcp_chr_machine_done_hook for your original patch ?
 
-> On Fri, 9 Mar 2018 at 12:10 AM, Michael Clark <mjc@sifive.com> wrote:
->
->> On Thu, 8 Mar 2018 at 11:02 PM, Peter Maydell <peter.maydell@linaro.org>
->> wrote:
->>
->>> On 6 March 2018 at 19:46, Michael Clark <mjc@sifive.com> wrote:
->>> > -----BEGIN PGP SIGNED MESSAGE-----
->>> > Hash: SHA1
->>> >
->>> > The following changes since commit
->>> f32408f3b472a088467474ab152be3b6285b2d7b:
->>> >
->>> >   misc: don't use hwaddr as a type in trace events (2018-03-06
->>> 14:24:30 +0000)
->>> >
->>> > are available in the git repository at:
->>> >
->>> >   https://github.com/riscv/riscv-qemu.git
->>> tags/riscv-qemu-upstream-v8.2
->>> >
->>> > for you to fetch changes up to
->>> 7051b081bf6796e5e84406f6223a7c4900bf7298:
->>> >
->>> >   RISC-V - Remove support for adhoc non-standard X_COP local-interrup=
-t
->>> (2018-03-07 08:36:03 +1300)
->>>
->>>
->>> Hi -- I would have applied this, but some of the commits
->>> have no signed-off-by lines.
->>>
->>> This is important, and I've already asked for it once. We cannot
->>> accept anything that doesn't have a clear record in the commit
->>> message of everybody (person or company) who's contributed code
->>> to it, indicating that they're happy for their copyrighted
->>> contributions to be taken into QEMU under our license. Lists
->>> of names without emails in the cover letter are not sufficient.
->>>
->>> In fact a lot of the last part of this patchset looks like
->>> unreviewed changes/fixes that if we were going to have them we
->>> should have squashed into the correct patches and resent the
->>> series for review. Please don't do this. Code review is an
->>> important part of how the QEMU project works.
->>
->>
->> You must be looking at the wrong tag. There are multiple sign-offs in al=
-l
->> 23 commits. The tag is riscv-qemu-upstream-v8.2. Sagar and Bastian
->> contacted me out of band to add their sign-offs. Please look at the comm=
-its
->> again and tell me which commit id doesn=E2=80=99t have a sign-off on tha=
-t tag (23
->> commits iirc)
->>
->
-> I can forward you the mail out-of-band. I had to contact contributors to
-> get them to agree to change the license from MIT to GPLv2, based on a
-> request from Red Hat.
->
-> You are making this very hard. Do you work for Arm perchance? I really
-> wouldn=E2=80=99t be surprised if our port is being sandbagged by Arm. Apo=
-logies for
-> being so direct about this, but things like this happen...
->
-> I have complied with practically every review request and the sign-offs
-> are there. It=E2=80=99s a bit ridiculous.
->
-> It would be nice to find someone neutral, unrelated to Arm, to merge our =
-PR
->
+In tcp_chr_new_client() I see that s->ioc will be set no matter what,
+and that function can even be called without TLS enabled I think.
+Does that mean only check against s->ioc would not be enough?
 
-Some history on the origins of RISC to put things in perspective:
+Thanks,
 
-https://en.m.wikipedia.org/wiki/Berkeley_RISC
-
-David Patterson worked with Andrew Waterman and Krste Asanovic on the
-design of RISC-V. Sagar did most of the work on the QEMU port and he
-agreeded to sign off on all patches. The SiFive patches only have sign-offs
-from SiFive because SiFive was the sole contributor for its hardware model,
-beside the SiFiveUART which has Stefan=E2=80=99s sign-off.
-
-In any case it seems there is not enough review bandwidth in the QEMU
-project as a whole and the policy to accept contributions is too strict to
-be reasonable, given earnest attempts to comply with *all* review feedback.
-Not impressed.
-
->
+--=20
+Peter Xu
