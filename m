@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1etqyn-0000zk-Di
+	(envelope-from <kraxel@redhat.com>) id 1etqyn-0000zl-Jg
 	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 03:32:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1etqym-0008Lr-LC
+	(envelope-from <kraxel@redhat.com>) id 1etqym-0008MS-ST
 	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 03:32:49 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49356 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48874 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1etqym-0008LN-Gy
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1etqym-0008Lf-OS
 	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 03:32:48 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5908FD142B
+	for <qemu-devel@nongnu.org>; Thu,  8 Mar 2018 08:32:38 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  8 Mar 2018 09:32:24 +0100
-Message-Id: <20180308083231.20180-2-kraxel@redhat.com>
+Date: Thu,  8 Mar 2018 09:32:29 +0100
+Message-Id: <20180308083231.20180-7-kraxel@redhat.com>
 In-Reply-To: <20180308083231.20180-1-kraxel@redhat.com>
 References: <20180308083231.20180-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 1/8] make: switch language file build to be gtk
- module aware
+Subject: [Qemu-devel] [PULL 6/8] ui/gtk: use GtkGlArea on wayland only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +30,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Bruce Rogers <brogers@suse.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-From: Bruce Rogers <brogers@suse.com>
+For dma-buf support we need a egl context.  The gtk x11 backend uses glx
+contexts though.  We can't use the GtkGlArea widget on x11 because of
+that, so use our own gtk-egl code instead.  wayland continues to use
+the GtkGlArea widget.
 
-Now that gtk support builds as a module, CONFIG_GTK changed from
-y to m. Adjust Makefile correspondingly.
-
-Signed-off-by: Bruce Rogers <brogers@suse.com>
-Message-id: 20180307155517.32570-1-brogers@suse.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: 20180306090951.22932-5-kraxel@redhat.com
 ---
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ ui/gtk.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 9a75c48ae0..026fa17dc0 100644
---- a/Makefile
-+++ b/Makefile
-@@ -851,7 +851,7 @@ ifneq ($(BLOBS),)
- 		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/$$x "$(DESTDIR)$(qemu_datadir)"; \
- 	done
- endif
--ifeq ($(CONFIG_GTK),y)
-+ifeq ($(CONFIG_GTK),m)
- 	$(MAKE) -C po $@
- endif
- 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/keymaps"
+diff --git a/ui/gtk.c b/ui/gtk.c
+index 856429a02f..4a1622b887 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -2440,12 +2440,15 @@ static void early_gtk_display_init(DisplayOptions *opts)
+     assert(opts->type == DISPLAY_TYPE_GTK);
+     if (opts->has_gl && opts->gl) {
+ #if defined(CONFIG_OPENGL)
+-#if defined(CONFIG_GTK_GL)
+-        gtk_use_gl_area = true;
+-        gtk_gl_area_init();
+-#else
+-        gtk_egl_init();
++#if defined(CONFIG_GTK_GL) && defined(GDK_WINDOWING_WAYLAND)
++        if (GDK_IS_WAYLAND_DISPLAY(gdk_display_get_default())) {
++            gtk_use_gl_area = true;
++            gtk_gl_area_init();
++        }
+ #endif
++        {
++            gtk_egl_init();
++        }
+ #endif
+     }
+ 
 -- 
 2.9.3
