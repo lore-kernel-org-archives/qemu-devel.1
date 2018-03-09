@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1euJMc-0006tg-DX
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:51:19 -0500
+	(envelope-from <mjc@sifive.com>) id 1euJN8-0007OA-2x
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:51:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1euJMZ-0000b6-4m
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:51:18 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:36583)
+	(envelope-from <mjc@sifive.com>) id 1euJN6-0000iu-62
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:51:50 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:38635)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1euJMY-0000ap-QP
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:51:15 -0500
-Received: by mail-wr0-x241.google.com with SMTP id v111so9286631wrb.3
-	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 06:51:14 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180215220540.6556-1-f4bug@amsat.org>
-	<20180215220540.6556-9-f4bug@amsat.org>
-	<CAFEAcA-x+t_PNFmMRQBwRQddo9QH=sDWQDiib5TQ8Lb2UU+Rmg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ecaca3be-a9e1-51b7-9e02-402417cc8183@amsat.org>
-Date: Fri, 9 Mar 2018 15:51:11 +0100
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1euJN5-0000ib-QN
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:51:48 -0500
+Received: by mail-ot0-x244.google.com with SMTP id 95so8884298ote.5
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 06:51:47 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-x+t_PNFmMRQBwRQddo9QH=sDWQDiib5TQ8Lb2UU+Rmg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 08/11] sdcard: display command name when
- tracing CMD/ACMD
+In-Reply-To: <CAFEAcA9jWUqFenf=P3bhiJ5iGCZ2kBc7eZxv3BRzO+jd=9h7nQ@mail.gmail.com>
+References: <CAHNT7NshwZh87Uui6i+ARdOj2BuW6d7gahOiZ0X48Cf3TdOrXQ@mail.gmail.com>
+	<mhng-91cb2b22-0b57-4c9b-8027-8c25eba32497@palmer-si-x1c4>
+	<CAHNT7NvDiUHs6cBTd57uO+VdaAyQnH+2s4kp4yiQ1uBS15A22g@mail.gmail.com>
+	<CAFEAcA9jWUqFenf=P3bhiJ5iGCZ2kBc7eZxv3BRzO+jd=9h7nQ@mail.gmail.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Sat, 10 Mar 2018 03:51:46 +1300
+Message-ID: <CAHNT7NuBjcngEesbS4XSwn=gw7S8VYVE_e6FjxKuAHfjoWowjQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [patches] Re: [PULL] RISC-V QEMU Port Submission
+ v8.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,154 +32,214 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Andrzej Zaborowski <balrogg@gmail.com>
+Cc: Palmer Dabbelt <palmer@sifive.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, QEMU Developers <qemu-devel@nongnu.org>, RISC-V Patches <patches@groups.riscv.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
-Hi Peter,
+On Sat, Mar 10, 2018 at 3:28 AM, Peter Maydell <peter.maydell@linaro.org>
+wrote:
 
-On 02/22/2018 01:59 PM, Peter Maydell wrote:
-> On 15 February 2018 at 22:05, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> put the function in sdmmc-common.c since we will reuse it in hw/sd/core.c
->>
-> 
-> As a general note, your commit messages are generally a bit
-> shorter than I'd prefer. This is to some extent a personal
-> style question, but if you're writing lots of patches where
-> the only commit message is the subject-line summary then I
-> think that it's worth being a bit more descriptive.
+> On 8 March 2018 at 19:53, Michael Clark <mjc@sifive.com> wrote:
+> > I re-iterate Palmer's apology.
+> >
+> > I shouldn't be polling git.qemu.org/qemu.git and answering emails near
+> to
+> > 3am in the morning after 4 months of working on trying to get the RISC-V
+> > port in shape to go upstream.
+> >
+> > It appears it is completely my mistake and I had tagged early deltas on
+> top
+> > of v8.2 instead of the tip of v8.2.
+> >
+> > I've force pushed the 'riscv-qemu-upstream-v8.2' so only the mailing list
+> > will hold the history of my mistake.
+>
+> Thank you for the apology. On my side, I regret not starting this
+> email thread by just asking if you'd pushed the wrong tag by mistake,
+> since in retrospect that was certainly the most likely situation.
+>
 
-Got it, I'll try to be a bit more verbose. As you noticed this is not
-natural for me ;) It took me time to understand what is obvious for
-someone focused weeks in the same code, is not for a reviewer context
-switching from an unrelated topic, and for a limited time.
+No worries. It was very late at night. I was tired and a little anxious.
+Thanks very much for bearing with me after my comments.
 
-> Also, the "body" part of the commit message should really
-> be able to stand alone as a description, rather than relying
-> on the subject line to make sense.
 
-This one is easy to fix :)
+> I've now merged and tested the revised tag, and pushed it upstream.
+>
 
-> 
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  hw/sd/sdmmc-internal.h |  3 +++
->>  hw/sd/sd.c             | 13 +++++----
->>  hw/sd/sdmmc-common.c   | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++
->>  hw/sd/Makefile.objs    |  2 +-
->>  hw/sd/trace-events     |  8 +++---
->>  5 files changed, 88 insertions(+), 10 deletions(-)
->>  create mode 100644 hw/sd/sdmmc-common.c
->>
->> diff --git a/hw/sd/sdmmc-internal.h b/hw/sd/sdmmc-internal.h
->> index 0e96cb0081..02b730089b 100644
->> --- a/hw/sd/sdmmc-internal.h
->> +++ b/hw/sd/sdmmc-internal.h
->> @@ -12,4 +12,7 @@
->>
->>  #define SDMMC_CMD_MAX 64
->>
->> +const char *sd_cmd_name(uint8_t cmd);
->> +const char *sd_acmd_name(uint8_t cmd);
-> 
-> Can we have doc comments for new function prototypes in header files,
-> please?
+That's great news.
 
-Yes :|
 
-> 
-> 
->> diff --git a/hw/sd/sdmmc-common.c b/hw/sd/sdmmc-common.c
->> new file mode 100644
->> index 0000000000..1d0198b1ad
->> --- /dev/null
->> +++ b/hw/sd/sdmmc-common.c
->> @@ -0,0 +1,72 @@
->> +/*
->> + * SD/MMC cards common helpers
->> + *
->> + * Copyright (c) 2018  Philippe Mathieu-Daudé <f4bug@amsat.org>
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
->> + * See the COPYING file in the top-level directory.
->> + * SPDX-License-Identifier: GPL-2.0-or-later
-> 
-> Ooh, a SPDX identifier. The project doesn't actually use these
-> at the moment, but it doesn't hurt to have one here I guess.
-> 
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "sdmmc-internal.h"
->> +
->> +const char *sd_cmd_name(uint8_t cmd)
->> +{
->> +    static const char *cmd_abbrev[SDMMC_CMD_MAX] = {
->> +         [0]    = "GO_IDLE_STATE",
->> +         [2]    = "ALL_SEND_CID",            [3]    = "SEND_RELATIVE_ADDR",
->> +         [4]    = "SET_DSR",                 [5]    = "IO_SEND_OP_COND",
->> +         [6]    = "SWITCH_FUNC",             [7]    = "SELECT/DESELECT_CARD",
->> +         [8]    = "SEND_IF_COND",            [9]    = "SEND_CSD",
->> +        [10]    = "SEND_CID",               [11]    = "VOLTAGE_SWITCH",
->> +        [12]    = "STOP_TRANSMISSION",      [13]    = "SEND_STATUS",
->> +                                            [15]    = "GO_INACTIVE_STATE",
->> +        [16]    = "SET_BLOCKLEN",           [17]    = "READ_SINGLE_BLOCK",
->> +        [18]    = "READ_MULTIPLE_BLOCK",    [19]    = "SEND_TUNING_BLOCK",
->> +        [20]    = "SPEED_CLASS_CONTROL",    [21]    = "DPS_spec",
->> +                                            [23]    = "SET_BLOCK_COUNT",
->> +        [24]    = "WRITE_BLOCK",            [25]    = "WRITE_MULTIPLE_BLOCK",
->> +        [26]    = "MANUF_RSVD",             [27]    = "PROGRAM_CSD",
->> +        [28]    = "SET_WRITE_PROT",         [29]    = "CLR_WRITE_PROT",
->> +        [30]    = "SEND_WRITE_PROT",
->> +        [32]    = "ERASE_WR_BLK_START",     [33]    = "ERASE_WR_BLK_END",
->> +        [34]    = "SW_FUNC_RSVD",           [35]    = "SW_FUNC_RSVD",
->> +        [36]    = "SW_FUNC_RSVD",           [37]    = "SW_FUNC_RSVD",
->> +        [38]    = "ERASE",
->> +        [40]    = "DPS_spec",
->> +        [42]    = "LOCK_UNLOCK",            [43]    = "Q_MANAGEMENT",
->> +        [44]    = "Q_TASK_INFO_A",          [45]    = "Q_TASK_INFO_B",
->> +        [46]    = "Q_RD_TASK",              [47]    = "Q_WR_TASK",
->> +        [48]    = "READ_EXTR_SINGLE",       [49]    = "WRITE_EXTR_SINGLE",
->> +        [50]    = "SW_FUNC_RSVD", /* FIXME */
-> 
-> What's this FIXME for? We should either fix whatever it is, or if
-> that's not practical the comment needs to describe the problem
-> so that a future reader of the code knows what it means and might
-> be able to fix it.
+> NB: there was a test failure on OpenBSD host:
+>
+> TEST: tests/qom-test... (pid=64016)
+>   /riscv32/qom/spike_v1.9.1:                                           **
+> ERROR:/home/qemu/tests/qom-test.c:64:test_properties: assertion
+> failed: (qdict_haskey(response, "return"))
+> FAIL
+>
+> but this seems to have been intermittent -- it was only on that one
+> host, and I reran the test suite there and it passed fine the second
+> time. So it may be nothing to do with your code; we'll see if it
+> comes up again.
+>
+> I also had a look at running the port under valgrind, which shows
+> what looks like a bug in riscv_isa_string():
+>
+> $ valgrind ./build/all/riscv32-softmmu/qemu-system-riscv32
+> [...]
+> ==24805== Invalid read of size 1
+> ==24805==    at 0x4C30F74: strlen (in
+> /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==24805==    by 0x26518E: riscv_isa_string (cpu.c:399)
+> ==24805==    by 0x25C15D: create_fdt (spike.c:125)
+> ==24805==    by 0x25C15D: spike_v1_10_0_board_init (spike.c:199)
+> ==24805==    by 0x2CCE1A: machine_run_board_init (machine.c:807)
+> ==24805==    by 0x1BFF28: main (vl.c:4597)
+> ==24805==  Address 0x3055be55 is 0 bytes after a block of size 5 alloc'd
+> ==24805==    at 0x4C2FB55: calloc (in
+> /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==24805==    by 0x70C8770: g_malloc0 (in
+> /lib/x86_64-linux-gnu/libglib-2.0.so.0.4800.2)
+> ==24805==    by 0x26512E: riscv_isa_string (cpu.c:395)
+> ==24805==    by 0x25C15D: create_fdt (spike.c:125)
+> ==24805==    by 0x25C15D: spike_v1_10_0_board_init (spike.c:199)
+> ==24805==    by 0x2CCE1A: machine_run_board_init (machine.c:807)
+> ==24805==    by 0x1BFF28: main (vl.c:4597)
+>
+> I haven't looked too hard at the code, but I suspect you're
+> miscalculating the length of the string and/or not writing the
+> trailing NUL to the string. I recommend you have a look at that,
+> and perhaps try running some other tests under valgrind.
+>
 
-Oops, I forgot to search for the CMD51 correct name.
-Apparently some future Video extension, so I'll just remove the FIXME.
+Thanks very much!
 
-> 
->> +        [52]    = "IO_RW_DIRECT",           [53]    = "IO_RW_EXTENDED",
->> +        [54]    = "SDIO_RSVD",              [55]    = "APP_CMD",
->> +        [56]    = "GEN_CMD",                [57]    = "SW_FUNC_RSVD",
->> +        [58]    = "READ_EXTR_MULTI",        [59]    = "WRITE_EXTR_MULTI",
->> +        [60]    = "MANUF_RSVD",             [61]    = "MANUF_RSVD",
->> +        [62]    = "MANUF_RSVD",             [63]    = "MANUF_RSVD",
->> +    };
->> +    return cmd_abbrev[cmd] ? cmd_abbrev[cmd] : "UNKNOWN_CMD";
->> +}
->> +
->> +const char *sd_acmd_name(uint8_t cmd)
->> +{
->> +    static const char *acmd_abbrev[SDMMC_CMD_MAX] = {
->> +         [6] = "SET_BUS_WIDTH",
->> +        [13] = "SD_STATUS",
->> +        [14] = "DPS_spec",                  [15] = "DPS_spec",
->> +        [16] = "DPS_spec",
->> +        [18] = "SECU_spec",
->> +        [22] = "SEND_NUM_WR_BLOCKS",        [23] = "SET_WR_BLK_ERASE_COUNT",
->> +        [41] = "SD_SEND_OP_COND",
->> +        [42] = "SET_CLR_CARD_DETECT",
->> +        [51] = "SEND_SCR",
->> +        [52] = "SECU_spec",                 [53] = "SECU_spec",
->> +        [54] = "SECU_spec",
->> +        [56] = "SECU_spec",                 [57] = "SECU_spec",
->> +        [58] = "SECU_spec",                 [59] = "SECU_spec",
->> +    };
->> +
->> +    return acmd_abbrev[cmd] ? acmd_abbrev[cmd] : "UNKNOWN_ACMD";
->> +}
-> 
-> thanks
-> -- PMM
-> 
+I'll valgrind locally when I get time. It's very late at night here. 3.45am.
+
+We may very well have a memory issue but it's likely restricted to the
+RISC-V port and shouldn't cause any issues for other ports.
+
+BTW - I've integrated the following 3 branches into the riscv tree:
+
+- https://github.com/riscv/riscv-qemu/tree/softfloat-snan-abort-fix
+- https://github.com/riscv/riscv-qemu/tree/riscv-qemu-upstream-v8.2
+- https://github.com/michaeljclark/riscv-qemu/tree/qemu-devel
+
+into our `riscv-all` integration branch, and we're now passing all FPU
+tests, interestingly, including the NaN-boxing of single precision values
+into doubles. We'll need to check that the riscv-tests testsuite is
+exhastive enough... Suprised! I think Richard might have thought about
+our NaN-boxing
+issue or some other sort of magic is going on :-)
+
+- https://github.com/riscv/riscv-qemu/tree/riscv-all
+
+Michael.
+--
+
+$ sh qemu-images/run-riscv-tests.sh
+rv64ua-v-amoadd_d
+rv64ua-v-amoadd_w
+rv64ua-v-amoand_d
+rv64ua-v-amoand_w
+rv64ua-v-amomax_d
+rv64ua-v-amomax_w
+rv64ua-v-amomaxu_d
+rv64ua-v-amomaxu_w
+rv64ua-v-amomin_d
+rv64ua-v-amomin_w
+rv64ua-v-amominu_d
+rv64ua-v-amominu_w
+rv64ua-v-amoor_d
+rv64ua-v-amoor_w
+rv64ua-v-amoswap_d
+rv64ua-v-amoswap_w
+rv64ua-v-amoxor_d
+rv64ua-v-amoxor_w
+rv64ua-v-lrsc
+rv64uc-v-rvc
+rv64ud-v-fadd
+rv64ud-v-fclass
+rv64ud-v-fcmp
+rv64ud-v-fcvt
+rv64ud-v-fcvt_w
+rv64ud-v-fdiv
+rv64ud-v-fmadd
+rv64ud-v-fmin
+rv64ud-v-ldst
+rv64ud-v-move
+rv64ud-v-recoding
+rv64ud-v-structural
+rv64uf-v-fadd
+rv64uf-v-fclass
+rv64uf-v-fcmp
+rv64uf-v-fcvt
+rv64uf-v-fcvt_w
+rv64uf-v-fdiv
+rv64uf-v-fmadd
+rv64uf-v-fmin
+rv64uf-v-ldst
+rv64uf-v-move
+rv64uf-v-recoding
+rv64ui-v-add
+rv64ui-v-addi
+rv64ui-v-addiw
+rv64ui-v-addw
+rv64ui-v-and
+rv64ui-v-andi
+rv64ui-v-auipc
+rv64ui-v-beq
+rv64ui-v-bge
+rv64ui-v-bgeu
+rv64ui-v-blt
+rv64ui-v-bltu
+rv64ui-v-bne
+rv64ui-v-fence_i
+rv64ui-v-jal
+rv64ui-v-jalr
+rv64ui-v-lb
+rv64ui-v-lbu
+rv64ui-v-ld
+rv64ui-v-lh
+rv64ui-v-lhu
+rv64ui-v-lui
+rv64ui-v-lw
+rv64ui-v-lwu
+rv64ui-v-or
+rv64ui-v-ori
+rv64ui-v-sb
+rv64ui-v-sd
+rv64ui-v-sh
+rv64ui-v-simple
+rv64ui-v-sll
+rv64ui-v-slli
+rv64ui-v-slliw
+rv64ui-v-sllw
+rv64ui-v-slt
+rv64ui-v-slti
+rv64ui-v-sltiu
+rv64ui-v-sltu
+rv64ui-v-sra
+rv64ui-v-srai
+rv64ui-v-sraiw
+rv64ui-v-sraw
+rv64ui-v-srl
+rv64ui-v-srli
+rv64ui-v-srliw
+rv64ui-v-srlw
+rv64ui-v-sub
+rv64ui-v-subw
+rv64ui-v-sw
+rv64ui-v-xor
+rv64ui-v-xori
+rv64um-v-div
+rv64um-v-divu
+rv64um-v-divuw
+rv64um-v-divw
+rv64um-v-mul
+rv64um-v-mulh
+rv64um-v-mulhsu
+rv64um-v-mulhu
+rv64um-v-mulw
+rv64um-v-rem
+rv64um-v-remu
+rv64um-v-remuw
+rv64um-v-remw
