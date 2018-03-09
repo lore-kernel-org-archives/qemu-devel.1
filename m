@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eu6BB-0007lA-Fq
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 19:46:39 -0500
+	(envelope-from <jiewen.yao@intel.com>) id 1eu6Cb-0000KC-9C
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 19:48:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eu6B8-000632-Ae
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 19:46:37 -0500
-Date: Fri, 9 Mar 2018 11:32:38 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180309003238.GR3083@umbus.fritz.box>
-References: <20180306203103.25563-1-mark.cave-ayland@ilande.co.uk>
-	<20180306203103.25563-4-mark.cave-ayland@ilande.co.uk>
+	(envelope-from <jiewen.yao@intel.com>) id 1eu6CY-0007Kl-11
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 19:48:05 -0500
+Received: from mga01.intel.com ([192.55.52.88]:55460)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jiewen.yao@intel.com>)
+	id 1eu6CX-0007KX-JW
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 19:48:01 -0500
+From: "Yao, Jiewen" <jiewen.yao@intel.com>
+Date: Fri, 9 Mar 2018 00:47:58 +0000
+Message-ID: <74D8A39837DF1E4DA445A8C0B3885C503AAEF06A@shsmsx102.ccr.corp.intel.com>
+References: <20180307155746.18526-1-marcandre.lureau@redhat.com>
+	<20180307155746.18526-9-marcandre.lureau@redhat.com>
+	<a62073a3-cc41-ca4b-4822-e28ebcf5204b@redhat.com>
+	<74D8A39837DF1E4DA445A8C0B3885C503AAEEFF3@shsmsx102.ccr.corp.intel.com>
+In-Reply-To: <74D8A39837DF1E4DA445A8C0B3885C503AAEEFF3@shsmsx102.ccr.corp.intel.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="OrT4iOlIQZp3kw4S"
-Content-Disposition: inline
-In-Reply-To: <20180306203103.25563-4-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 03/19] uninorth: QOMify PCI and AGP host
- bridges
+Subject: Re: [Qemu-devel] [PATCH v2 8/8] ovmf: add DxeTpm2MeasureBootLib
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,226 +31,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: "Yao, Jiewen" <jiewen.yao@intel.com>, Laszlo Ersek <lersek@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>
+Cc: "javierm@redhat.com" <javierm@redhat.com>, "pjones@redhat.com" <pjones@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-
---OrT4iOlIQZp3kw4S
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Mar 06, 2018 at 08:30:47PM +0000, Mark Cave-Ayland wrote:
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-Applied, thanks.
-
-> ---
->  hw/pci-host/uninorth.c | 79 ++++++++++++++++++++------------------------=
-------
->  1 file changed, 32 insertions(+), 47 deletions(-)
->=20
-> diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
-> index 710818e355..1d4d3f5705 100644
-> --- a/hw/pci-host/uninorth.c
-> +++ b/hw/pci-host/uninorth.c
-> @@ -129,72 +129,61 @@ static const MemoryRegionOps unin_data_ops =3D {
->      .endianness =3D DEVICE_LITTLE_ENDIAN,
->  };
-> =20
-> -static int pci_unin_main_init_device(SysBusDevice *dev)
-> +static void pci_unin_main_init(Object *obj)
->  {
-> -    PCIHostState *h;
-> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-> +    PCIHostState *h =3D PCI_HOST_BRIDGE(obj);
-> =20
->      /* Use values found on a real PowerMac */
->      /* Uninorth main bus */
-> -    h =3D PCI_HOST_BRIDGE(dev);
-> -
->      memory_region_init_io(&h->conf_mem, OBJECT(h), &pci_host_conf_le_ops,
-> -                          dev, "pci-conf-idx", 0x1000);
-> -    memory_region_init_io(&h->data_mem, OBJECT(h), &unin_data_ops, dev,
-> +                          obj, "pci-conf-idx", 0x1000);
-> +    memory_region_init_io(&h->data_mem, OBJECT(h), &unin_data_ops, obj,
->                            "pci-conf-data", 0x1000);
-> -    sysbus_init_mmio(dev, &h->conf_mem);
-> -    sysbus_init_mmio(dev, &h->data_mem);
-> -
-> -    return 0;
-> +    sysbus_init_mmio(sbd, &h->conf_mem);
-> +    sysbus_init_mmio(sbd, &h->data_mem);
->  }
-> =20
-> -
-> -static int pci_u3_agp_init_device(SysBusDevice *dev)
-> +static void pci_u3_agp_init(Object *obj)
->  {
-> -    PCIHostState *h;
-> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-> +    PCIHostState *h =3D PCI_HOST_BRIDGE(obj);
-> =20
->      /* Uninorth U3 AGP bus */
-> -    h =3D PCI_HOST_BRIDGE(dev);
-> -
->      memory_region_init_io(&h->conf_mem, OBJECT(h), &pci_host_conf_le_ops,
-> -                          dev, "pci-conf-idx", 0x1000);
-> -    memory_region_init_io(&h->data_mem, OBJECT(h), &unin_data_ops, dev,
-> +                          obj, "pci-conf-idx", 0x1000);
-> +    memory_region_init_io(&h->data_mem, OBJECT(h), &unin_data_ops, obj,
->                            "pci-conf-data", 0x1000);
-> -    sysbus_init_mmio(dev, &h->conf_mem);
-> -    sysbus_init_mmio(dev, &h->data_mem);
-> -
-> -    return 0;
-> +    sysbus_init_mmio(sbd, &h->conf_mem);
-> +    sysbus_init_mmio(sbd, &h->data_mem);
->  }
-> =20
-> -static int pci_unin_agp_init_device(SysBusDevice *dev)
-> +static void pci_unin_agp_init(Object *obj)
->  {
-> -    PCIHostState *h;
-> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-> +    PCIHostState *h =3D PCI_HOST_BRIDGE(obj);
-> =20
->      /* Uninorth AGP bus */
-> -    h =3D PCI_HOST_BRIDGE(dev);
-> -
->      memory_region_init_io(&h->conf_mem, OBJECT(h), &pci_host_conf_le_ops,
-> -                          dev, "pci-conf-idx", 0x1000);
-> +                          obj, "pci-conf-idx", 0x1000);
->      memory_region_init_io(&h->data_mem, OBJECT(h), &pci_host_data_le_ops,
-> -                          dev, "pci-conf-data", 0x1000);
-> -    sysbus_init_mmio(dev, &h->conf_mem);
-> -    sysbus_init_mmio(dev, &h->data_mem);
-> -    return 0;
-> +                          obj, "pci-conf-data", 0x1000);
-> +    sysbus_init_mmio(sbd, &h->conf_mem);
-> +    sysbus_init_mmio(sbd, &h->data_mem);
->  }
-> =20
-> -static int pci_unin_internal_init_device(SysBusDevice *dev)
-> +static void pci_unin_internal_init(Object *obj)
->  {
-> -    PCIHostState *h;
-> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-> +    PCIHostState *h =3D PCI_HOST_BRIDGE(obj);
-> =20
->      /* Uninorth internal bus */
-> -    h =3D PCI_HOST_BRIDGE(dev);
-> -
->      memory_region_init_io(&h->conf_mem, OBJECT(h), &pci_host_conf_le_ops,
-> -                          dev, "pci-conf-idx", 0x1000);
-> +                          obj, "pci-conf-idx", 0x1000);
->      memory_region_init_io(&h->data_mem, OBJECT(h), &pci_host_data_le_ops,
-> -                          dev, "pci-conf-data", 0x1000);
-> -    sysbus_init_mmio(dev, &h->conf_mem);
-> -    sysbus_init_mmio(dev, &h->data_mem);
-> -    return 0;
-> +                          obj, "pci-conf-data", 0x1000);
-> +    sysbus_init_mmio(sbd, &h->conf_mem);
-> +    sysbus_init_mmio(sbd, &h->data_mem);
->  }
-> =20
->  PCIBus *pci_pmac_init(qemu_irq *pic,
-> @@ -461,10 +450,8 @@ static const TypeInfo unin_internal_pci_host_info =
-=3D {
-> =20
->  static void pci_unin_main_class_init(ObjectClass *klass, void *data)
->  {
-> -    SysBusDeviceClass *sbc =3D SYS_BUS_DEVICE_CLASS(klass);
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> =20
-> -    sbc->init =3D pci_unin_main_init_device;
->      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
->  }
-> =20
-> @@ -472,15 +459,14 @@ static const TypeInfo pci_unin_main_info =3D {
->      .name          =3D TYPE_UNI_NORTH_PCI_HOST_BRIDGE,
->      .parent        =3D TYPE_PCI_HOST_BRIDGE,
->      .instance_size =3D sizeof(UNINState),
-> +    .instance_init =3D pci_unin_main_init,
->      .class_init    =3D pci_unin_main_class_init,
->  };
-> =20
->  static void pci_u3_agp_class_init(ObjectClass *klass, void *data)
->  {
-> -    SysBusDeviceClass *sbc =3D SYS_BUS_DEVICE_CLASS(klass);
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> =20
-> -    sbc->init =3D pci_u3_agp_init_device;
->      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
->  }
-> =20
-> @@ -488,15 +474,14 @@ static const TypeInfo pci_u3_agp_info =3D {
->      .name          =3D TYPE_U3_AGP_HOST_BRIDGE,
->      .parent        =3D TYPE_PCI_HOST_BRIDGE,
->      .instance_size =3D sizeof(UNINState),
-> +    .instance_init =3D pci_u3_agp_init,
->      .class_init    =3D pci_u3_agp_class_init,
->  };
-> =20
->  static void pci_unin_agp_class_init(ObjectClass *klass, void *data)
->  {
-> -    SysBusDeviceClass *sbc =3D SYS_BUS_DEVICE_CLASS(klass);
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> =20
-> -    sbc->init =3D pci_unin_agp_init_device;
->      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
->  }
-> =20
-> @@ -504,15 +489,14 @@ static const TypeInfo pci_unin_agp_info =3D {
->      .name          =3D TYPE_UNI_NORTH_AGP_HOST_BRIDGE,
->      .parent        =3D TYPE_PCI_HOST_BRIDGE,
->      .instance_size =3D sizeof(UNINState),
-> +    .instance_init =3D pci_unin_agp_init,
->      .class_init    =3D pci_unin_agp_class_init,
->  };
-> =20
->  static void pci_unin_internal_class_init(ObjectClass *klass, void *data)
->  {
-> -    SysBusDeviceClass *sbc =3D SYS_BUS_DEVICE_CLASS(klass);
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> =20
-> -    sbc->init =3D pci_unin_internal_init_device;
->      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
->  }
-> =20
-> @@ -520,6 +504,7 @@ static const TypeInfo pci_unin_internal_info =3D {
->      .name          =3D TYPE_UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE,
->      .parent        =3D TYPE_PCI_HOST_BRIDGE,
->      .instance_size =3D sizeof(UNINState),
-> +    .instance_init =3D pci_unin_internal_init,
->      .class_init    =3D pci_unin_internal_class_init,
->  };
-> =20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---OrT4iOlIQZp3kw4S
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqh1iMACgkQbDjKyiDZ
-s5KMQxAArQ5+hB0sAHPZY1r9ULFIh0F4YHAFrUWMJnTdXZnB3nalqBXp1SpYCfSM
-LTrX8k7WfL8am6j0lfEhZj0g/eEjg1eQR4rOf79tUV+lA8+quzc1T6z4C7BJV8tX
-z9z/NAxO7X9CfRFrMizs5zkHXQFYxsPIIR/AZ1Wuz0DAS0iq2o6pK+VZyXD+08dh
-839GntJhkZoQOvpD4RoXTIH33IhykP99T0m3+C3vqJSw+G02OxdSchgghlJOg3cL
-CWmWHtTtOCtGG7yxcRrPlWDtytGus0MQ1+lDyJwktqEfZZT8s1gCzEuHYpPowE4E
-Jt9Ah91wAsgVmaDkHi2bLugf6rKlXx04IpmnVsTaEBLu3vVGnf4CxEj+rl69YQal
-Ni1exdANby73hKloP1HsiHiI1dj34nP0osZuGJB1RLd60JM1Py12AaTmhDzoVWsW
-xGNANvbwnOuoWhnHaXAc3+OwDyVSE1/wbBCKkciscH9tBUfXXqwdxXy3maik/oIH
-OhBLNgWsd49jxTDU+/pF/RPiTzfHTFidnMy/GILGmTZuB/pHL3VHfpucGsIwdJua
-pA+Y0FtNPqT95C8L9D8H77a9vdMFiUpruSf3SBSl/UFveYWYgTsQ25HzZfu1bX+G
-EjOCy8AyiJIpn/7OFRcapenEw7rLDQrOzwUlIFW1A+1LpfC+jSk=
-=0Kfj
------END PGP SIGNATURE-----
-
---OrT4iOlIQZp3kw4S--
+QmVzaWRlcyB0aGUgY29tbWVudCBiZWxvdywgSSBzaG91bGQgaGF2ZSB1c2VkIHRoZSBleGFtcGxl
+IGluIE92bWZQa2cuDQoNClBsZWFzZSByZWZlciB0byBodHRwczovL2dpdGh1Yi5jb20vdGlhbm9j
+b3JlL2VkazIvYmxvYi9tYXN0ZXIvT3ZtZlBrZy9MaWJyYXJ5L1BsYXRmb3JtQm9vdE1hbmFnZXJM
+aWIvQmRzUGxhdGZvcm0uYw0KDQpUaGUgRWZpQm9vdE1hbmFnZXJEaXNwYXRjaERlZmVycmVkSW1h
+Z2VzKCkgQVBJIGNhbGwgaXMgYWRkZWQganVzdCBhZnRlciBnRWZpRHhlU21tUmVhZHlUb0xvY2tQ
+cm90b2NvbEd1aWQuDQoNClNvIEkgZG9u4oCZdCBzZWUgYW55IHByb2JsZW0gaW4gT1ZNRiBwa2cu
+DQoNCg0KVGhhbmsgeW91DQpZYW8gSmlld2VuDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0t
+LS0NCj4gRnJvbTogZWRrMi1kZXZlbCBbbWFpbHRvOmVkazItZGV2ZWwtYm91bmNlc0BsaXN0cy4w
+MS5vcmddIE9uIEJlaGFsZiBPZiBZYW8sDQo+IEppZXdlbg0KPiBTZW50OiBGcmlkYXksIE1hcmNo
+IDksIDIwMTggODozOSBBTQ0KPiBUbzogTGFzemxvIEVyc2VrIDxsZXJzZWtAcmVkaGF0LmNvbT47
+IG1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbTsNCj4gZWRrMi1kZXZlbEBsaXN0cy4wMS5vcmcN
+Cj4gQ2M6IGphdmllcm1AcmVkaGF0LmNvbTsgcGpvbmVzQHJlZGhhdC5jb207IHFlbXUtZGV2ZWxA
+bm9uZ251Lm9yZw0KPiBTdWJqZWN0OiBSZTogW2VkazJdIFtQQVRDSCB2MiA4LzhdIG92bWY6IGFk
+ZCBEeGVUcG0yTWVhc3VyZUJvb3RMaWINCj4gDQo+IFZlcnkgZ29vZCBxdWVzdGlvbi4NCj4gQ29t
+bWVudCBiZWxvdzoNCj4gDQo+ID4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPiBGcm9t
+OiBMYXN6bG8gRXJzZWsgW21haWx0bzpsZXJzZWtAcmVkaGF0LmNvbV0NCj4gPiBTZW50OiBGcmlk
+YXksIE1hcmNoIDksIDIwMTggMzo1NCBBTQ0KPiA+IFRvOiBtYXJjYW5kcmUubHVyZWF1QHJlZGhh
+dC5jb207IGVkazItZGV2ZWxAbGlzdHMuMDEub3JnOyBZYW8sIEppZXdlbg0KPiA+IDxqaWV3ZW4u
+eWFvQGludGVsLmNvbT4NCj4gPiBDYzogcGpvbmVzQHJlZGhhdC5jb207IHN0ZWZhbmJAbGludXgu
+dm5ldC5pYm0uY29tOw0KPiA+IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsgamF2aWVybUByZWRoYXQu
+Y29tDQo+ID4gU3ViamVjdDogUmU6IFtQQVRDSCB2MiA4LzhdIG92bWY6IGFkZCBEeGVUcG0yTWVh
+c3VyZUJvb3RMaWINCj4gPg0KPiA+IChKaWV3ZW4sIGJlbG93IEkgaGF2ZSBhIHF1ZXN0aW9uIGZv
+ciB5b3UgYXMgd2VsbDsgcGxlYXNlIGhlbHAgd2l0aCB0aGF0LikNCj4gPg0KPiA+IE9uIDAzLzA3
+LzE4IDE2OjU3LCBtYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20gd3JvdGU6DQo+ID4gPiBGcm9t
+OiBNYXJjLUFuZHLDqSBMdXJlYXUgPG1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbT4NCj4gPiA+
+DQo+ID4gPiBUaGUgbGlicmFyeSByZWdpc3RlcnMgYSBzZWN1cml0eSBtYW5hZ2VtZW50IGhhbmRs
+ZXIsIHRvIG1lYXN1cmUgaW1hZ2VzDQo+ID4gPiB0aGF0IGFyZSBub3QgbWVhc3VyZSBpbiBQRUkg
+cGhhc2UuDQo+ID4gPg0KPiA+ID4gVGhpcyBzZWVtcyB0byB3b3JrIGZvciBleGFtcGxlIHdpdGgg
+dGhlIHFlbXUgUFhFIHJvbToNCj4gPiA+DQo+ID4gPiBMb2FkaW5nIGRyaXZlciBhdCAweDAwMDNF
+NkMyMDAwIEVudHJ5UG9pbnQ9MHgwMDAzRTZDOTA3NiA4MDg2MTAwZS5lZmkNCj4gPiA+DQo+ID4g
+PiBBbmQgdGhlIGZvbGxvd2luZyBiaW5hcnlfYmlvc19tZWFzdXJlbWVudHMgbG9nIGVudHJ5IHNl
+ZW1zIHRvIGJlDQo+ID4gPiBhZGRlZDoNCj4gPiA+DQo+ID4gPiBQQ1I6IDIJdHlwZTogRVZfRUZJ
+X0JPT1RfU0VSVklDRVNfRFJJVkVSICAgICAJc2l6ZTogMHg0ZQlkaWdlc3Q6DQo+ID4gNzBhMjI0
+NzVlOWYxODgwNmQyZWQ5MTkzYjQ4ZDgwZDI2Nzc5ZDlhNA0KPiA+ID4NCj4gPiA+IENjOiBMYXN6
+bG8gRXJzZWsgPGxlcnNla0ByZWRoYXQuY29tPg0KPiA+ID4gQ2M6IFN0ZWZhbiBCZXJnZXIgPHN0
+ZWZhbmJAbGludXgudm5ldC5pYm0uY29tPg0KPiA+ID4gQ29udHJpYnV0ZWQtdW5kZXI6IFRpYW5v
+Q29yZSBDb250cmlidXRpb24gQWdyZWVtZW50IDEuMA0KPiA+ID4gU2lnbmVkLW9mZi1ieTogTWFy
+Yy1BbmRyw6kgTHVyZWF1IDxtYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20+DQo+ID4gPiAtLS0N
+Cj4gPiA+ICBPdm1mUGtnL092bWZQa2dYNjQuZHNjIHwgMyArKysNCj4gPiA+ICAxIGZpbGUgY2hh
+bmdlZCwgMyBpbnNlcnRpb25zKCspDQo+ID4gPg0KPiA+ID4gZGlmZiAtLWdpdCBhL092bWZQa2cv
+T3ZtZlBrZ1g2NC5kc2MgYi9Pdm1mUGtnL092bWZQa2dYNjQuZHNjDQo+ID4gPiBpbmRleCA3NzUz
+ODUyMTQ0ZmIuLjlkYjE3MTJlMzYyMyAxMDA2NDQNCj4gPiA+IC0tLSBhL092bWZQa2cvT3ZtZlBr
+Z1g2NC5kc2MNCj4gPiA+ICsrKyBiL092bWZQa2cvT3ZtZlBrZ1g2NC5kc2MNCj4gPiA+IEBAIC02
+NjIsNiArNjYyLDkgQEAgW0NvbXBvbmVudHNdDQo+ID4gPiAgICAgIDxMaWJyYXJ5Q2xhc3Nlcz4N
+Cj4gPiA+ICAhaWYgJChTRUNVUkVfQk9PVF9FTkFCTEUpID09IFRSVUUNCj4gPiA+DQo+ID4NCj4g
+TlVMTHxTZWN1cml0eVBrZy9MaWJyYXJ5L0R4ZUltYWdlVmVyaWZpY2F0aW9uTGliL0R4ZUltYWdl
+VmVyaWZpY2F0aW9uTGliLmluZg0KPiA+ID4gKyFlbmRpZg0KPiA+ID4gKyFpZiAkKFRQTTJfRU5B
+QkxFKSA9PSBUUlVFDQo+ID4gPiArDQo+ID4NCj4gTlVMTHxTZWN1cml0eVBrZy9MaWJyYXJ5L0R4
+ZVRwbTJNZWFzdXJlQm9vdExpYi9EeGVUcG0yTWVhc3VyZUJvb3RMaWIuaQ0KPiA+IG5mDQo+ID4g
+PiAgIWVuZGlmDQo+ID4gPiAgICB9DQo+ID4gPg0KPiA+ID4NCj4gPg0KPiA+ICgxKSBNYXJjLUFu
+ZHLDqSwgcGxlYXNlIGNoYW5nZSB0aGUgc3ViamVjdCBsaW5lIHRvOg0KPiA+DQo+ID4gT3ZtZlBr
+ZzogcGx1ZyBEeGVUcG0yTWVhc3VyZUJvb3RMaWIgaW50byBTZWN1cml0eVN0dWJEeGUNCj4gPg0K
+PiA+DQo+ID4gKDIpIEkgaGF2ZSBhIHF1ZXN0aW9uIGZvciBKaWV3ZW46DQo+ID4NCj4gPiBEeGVU
+cG0yTWVhc3VyZUJvb3RMaWIgY29uc3VtZXMgdGhlIFRDRzIgcHJvdG9jb2wsIGJ1dCBpdCBkb2Vz
+IG5vdCBkZXBlbmQNCj4gPiBvbiBpdCB3aXRoIGEgREVQRVguIEluc3RlYWQsIER4ZVRwbTJNZWFz
+dXJlQm9vdEhhbmRsZXIoKSB0cmllcyB0byBsb2NhdGUNCj4gPiB0aGUgcHJvdG9jb2wgb24gZXZl
+cnkgaW52b2NhdGlvbi4NCj4gW0ppZXdlbl0gWWVzLg0KPiANCj4gPiBUaGlzIG1lYW5zIHRoYXQg
+U2VjdXJpdHlTdHViRHhlIG1heSBwcm9kdWNlIHRoZSBTZWN1cml0eSBhbmQgU2VjdXJpdHkyDQo+
+ID4gQXJjaGl0ZWN0dXJhbCBQcm90b2NvbHMgYmVmb3JlIG1lYXN1cmVtZW50cyBpbnRvIHRoZSBU
+UE0yIGRldmljZSBhcmUNCj4gPiBwb3NzaWJsZS4NCj4gW0ppZXdlbl0gWWVzLg0KPiANCj4gPiBU
+aGVyZWZvcmUsIFVFRklfRFJJVkVSIG1vZHVsZXMgKHdoaWNoIGRlcGVuZCBvbiBhbGwgb2YgdGhl
+DQo+ID4gQXJjaCBwcm90b2NvbHMpIG1heSBiZSBzdGFydGVkIGJlZm9yZSB0aGV5IGNhbiBiZSBt
+ZWFzdXJlZCBpbnRvIHRoZSBUUE0uDQo+ID4NCj4gPiBOb3csIHRoaXMgaXMgbGlrZWx5IG5vIHBy
+b2JsZW0gZm9yIFVFRklfRFJJVkVSIG1vZHVsZXMgdGhhdCBhcmUgYnVpbHQNCj4gPiBpbnRvIHRo
+ZSBmaXJtd2FyZSB2b2x1bWUocyksIGJlY2F1c2UgdGhvc2UgYXJlIG1lYXN1cmVkIGJ5IFRjZzJQ
+ZWkNCj4gPiBhbnl3YXkuDQo+IFtKaWV3ZW5dIFRoYXQgaXMgVFJVRS4NCj4gDQo+IEhvd2V2ZXIs
+IGl0IHdvdWxkIGJlIGEgcHJvYmxlbSBmb3IgVUVGSV9EUklWRVIgbW9kdWxlcyAvIGFwcHMNCj4g
+PiB0aGF0IGNvbWUgZnJvbSBleHRlcm5hbCBtZWRpYSAoZGlzaywgbmV0d29yaywgUENJIG9wcm9t
+LCBldGMpLg0KPiBbSmlld2VuXSBCeSBkZXNpZ24sIHRoZSAzcmQgcGFydCBtb2R1bGUgc2hvdWxk
+IG5vdCBiZSBpbnZva2VkIGJlZm9yZSBFbmRPZkR4ZS4NCj4gQWxsIEFyY2ggUHJvdG9jb2wgUmVh
+ZHkgaXMgbm90IHN0cm9uZyBlbm91Z2guIDotKQ0KPiBQbGVhc2UgcmVmZXIgdG8NCj4gaHR0cHM6
+Ly9naXRodWIuY29tL3RpYW5vY29yZS9lZGsyL2Jsb2IvbWFzdGVyL01kZU1vZHVsZVBrZy9Vbml2
+ZXJzYWwvU2VjDQo+IHVyaXR5U3R1YkR4ZS9EZWZlcjNyZFBhcnR5SW1hZ2VMb2FkLmMNCj4gDQo+
+IElmIGEgbm9uLUZWIGltYWdlIGlzIGxvYWRlZCBiZWZvcmUgRW5kT2ZEeGUsIGl0IHdpbGwgYmUg
+cXVldWVkIGludG8NCj4gbURlZmVycmVkM3JkUGFydHlJbWFnZS4NCj4gDQo+IFdlIGFsc28gYWRk
+ZWQgRWZpQm9vdE1hbmFnZXJEaXNwYXRjaERlZmVycmVkSW1hZ2VzKCkgQVBJIGluDQo+IGh0dHBz
+Oi8vZ2l0aHViLmNvbS90aWFub2NvcmUvZWRrMi9ibG9iL21hc3Rlci9NZGVNb2R1bGVQa2cvSW5j
+bHVkZS9MaWJyYXINCj4geS9VZWZpQm9vdE1hbmFnZXJMaWIuaCBhbmQgaW1wbGVtZW50ZWQgaW4N
+Cj4gaHR0cHM6Ly9naXRodWIuY29tL3RpYW5vY29yZS9lZGsyL2Jsb2IvbWFzdGVyL01kZU1vZHVs
+ZVBrZy9MaWJyYXJ5L1VlZmlCDQo+IG9vdE1hbmFnZXJMaWIvQm1NaXNjLmMNCj4gQSBwbGF0Zm9y
+bSBtdXN0IGNhbGwgRWZpQm9vdE1hbmFnZXJEaXNwYXRjaERlZmVycmVkSW1hZ2VzKCksIGlmIHRo
+ZSBwbGF0Zm9ybQ0KPiBzdXBwb3J0cyBQQ0kgT1JPTS4NCj4gDQo+IFlvdSBjYW4gZmluZCB0aGUg
+c2FtcGxlIGNvZGUgaW4NCj4gaHR0cHM6Ly9naXRodWIuY29tL3RpYW5vY29yZS9lZGsyLXBsYXRm
+b3Jtcy9ibG9iL2RldmVsLU1pblBsYXRmb3JtL1BsYXRmb3JtDQo+IC9JbnRlbC9NaW5QbGF0Zm9y
+bVBrZy9CZHMvTGlicmFyeS9EeGVQbGF0Zm9ybUJvb3RNYW5hZ2VyTGliL0Jkc1BsYXRmb3JtLmMN
+Cj4gDQo+IA0KPiANCj4gPiBIb3dldmVyLCBzdWNoIGFyZSBsb2FkZWQgb25seSBpbiB0aGUgQkRT
+IHBoYXNlLCBhbmQgQkRTIGlzIG9ubHkgZW50ZXJlZA0KPiA+IGFmdGVyIGFsbCBvZiB0aGUgRFhF
+IGRyaXZlcnMgYXJlIGRpc3BhdGNoZWQgZnJvbSB0aGUgZmlybXdhcmUgdm9sdW1lcy4NCj4gPiBJ
+biBvdGhlciB3b3JkcywgdGhlIG9yZGVyaW5nIGJldHdlZW4gVGNnMkR4ZSBhbmQgZXh0ZXJuYWwg
+VUVGSV9EUklWRVIgLw0KPiA+IFVFRklfQVBQTElDQVRJT04gbW9kdWxlcyBpcyBlbnN1cmVkIHRo
+YXQgVGNnMkR4ZSB3aWxsIGJlIGRpc3BhdGNoZWQgaW4NCj4gPiB0aGUgRFhFIHBoYXNlLCB3aGls
+ZSB0aGUgbGF0dGVyIHdpbGwgb25seSBiZSBsb2FkZWQgaW4gQkRTLg0KPiA+DQo+ID4gSXMgdGhp
+cyBpbnRlbnRpb25hbD8gSXMgbXkgdW5kZXJzdGFuZGluZyBjb3JyZWN0Pw0KPiANCj4gW0ppZXdl
+bl0gUmlnaHQuIFRoZSBvbmx5IGFzc3VtcHRpb24gaXM6IFRjZzJEeGUgaXMgaW5jbHVkZWQgaW4g
+dGhlIGZpcm13YXJlDQo+IHZvbHVtZSBhbmQgaXQgaXMgZGlzcGF0Y2hlZCBiZWZvcmUgRW5kT2ZE
+eGUuDQo+IA0KPiANCj4gDQo+ID4NCj4gPiAoMykgSWYgdGhhdCdzIHRoZSBjYXNlLCB0aGVuIE1h
+cmMtQW5kcsOpLCBwbGVhc2UgYWRkIHRoZSBmb2xsb3dpbmcgdG8gdGhlDQo+ID4gY29tbWl0IG1l
+c3NhZ2U6DQo+ID4NCj4gPiAtLS0tLS0tLQ0KPiA+IEhvb2tpbmcgRHhlVHBtMk1lYXN1cmVCb290
+TGliIGludG8gU2VjdXJpdHlTdHViRHhlIGVuc3VyZXMgdGhhdCB0aGUNCj4gPiBTZWN1cml0eSBh
+bmQgU2VjdXJpdHkyIEFyY2ggcHJvdG9jb2xzIHdpbGwgZW50YWlsLCBieSB0aGUgdGltZSBvZg0K
+PiA+IGVudGVyaW5nIHRoZSBCRFMgcGhhc2UsIHRoZSBtZWFzdXJpbmcgb2YgVUVGSSBiaW5hcmll
+cyBpbnRvIHRoZSBUUE0uDQo+ID4gVGh1cywgZXh0ZXJuYWwgVUVGSV9EUklWRVIgYW5kIFVFRklf
+QVBQTElDQVRJT04gbW9kdWxlcyAod2hpY2ggYXJlDQo+ID4gbG9hZGVkIGluIHRoZSBCRFMgcGhh
+c2UsIGZyb20gZGlzaywgbmV0d29yaywgUENJIG9wcm9tLCBldGMpIHdpbGwgYmUNCj4gPiBtZWFz
+dXJlZC4NCj4gPg0KPiA+IERyaXZlcnMgZGlzcGF0Y2hlZCBpbiB0aGUgRFhFIHBoYXNlIGJlZm9y
+ZSBUY2cyRHhlIHdpbGwgbm90IGJlIG1lYXN1cmVkDQo+ID4gaW5kaXZpZHVhbGx5OyBob3dldmVy
+IHN1Y2ggZHJpdmVycyBjb21lIGZyb20gdGhlIGZpcm13YXJlIHZvbHVtZShzKSwgYW5kDQo+ID4g
+dGhvc2UgYXJlIG1lYXN1cmVkIGluIHRoZSBQRUkgcGhhc2UgYnkgVGNnMlBlaS4NCj4gPiAtLS0t
+LS0tLQ0KPiA+DQo+ID4gVGhhbmtzIQ0KPiA+IExhc3psbw0KPiBfX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fXw0KPiBlZGsyLWRldmVsIG1haWxpbmcgbGlzdA0K
+PiBlZGsyLWRldmVsQGxpc3RzLjAxLm9yZw0KPiBodHRwczovL2xpc3RzLjAxLm9yZy9tYWlsbWFu
+L2xpc3RpbmZvL2VkazItZGV2ZWwNCg==
