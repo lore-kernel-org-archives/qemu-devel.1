@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37693)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1euHIp-0000xs-0v
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 07:39:16 -0500
+	id 1euHQQ-000322-7Y
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 07:47:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1euHIk-00062h-KC
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 07:39:14 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:40650)
+	id 1euHQN-0000Ic-3V
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 07:47:06 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:37622)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1euHIk-00061f-AG
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 07:39:10 -0500
-Received: by mail-wm0-x243.google.com with SMTP id t6so3632428wmt.5
-	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 04:39:10 -0800 (PST)
+	id 1euHQM-0000H4-SR
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 07:47:03 -0500
+Received: by mail-wr0-x242.google.com with SMTP id z12so8897932wrg.4
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 04:47:02 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1519998711-73430-1-git-send-email-mjc@sifive.com>
-	<1519998711-73430-20-git-send-email-mjc@sifive.com>
+	<1519998711-73430-8-git-send-email-mjc@sifive.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f52deedb-6cd7-13b1-082d-ebd6e8ff9290@amsat.org>
-Date: Fri, 9 Mar 2018 13:39:06 +0100
+Message-ID: <588ce5d9-bce2-1703-3a83-50e8a2001ceb@amsat.org>
+Date: Fri, 9 Mar 2018 13:46:59 +0100
 MIME-Version: 1.0
-In-Reply-To: <1519998711-73430-20-git-send-email-mjc@sifive.com>
+In-Reply-To: <1519998711-73430-8-git-send-email-mjc@sifive.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v8 19/23] SiFive RISC-V UART Device
+Subject: Re: [Qemu-devel] [PATCH v8 07/23] RISC-V GDB Stub
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,37 +36,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: Stefan O'Rear <sorear2@gmail.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, RISC-V Patches <patches@groups.riscv.org>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
 On 03/02/2018 02:51 PM, Michael Clark wrote:
-> QEMU model of the UART on the SiFive E300 and U500 series SOCs.
-> BBL supports the SiFive UART for early console access via the SBI
-> (Supervisor Binary Interface) and the linux kernel SBI console.
+> GDB Register read and write routines.
 > 
-> The SiFive UART implements the pre qom legacy interface consistent
-> with the 16550a UART in 'hw/char/serial.c'.
-> 
-> Acked-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Stefan O'Rear <sorear2@gmail.com>
-> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Sagar Karandikar <sagark@eecs.berkeley.edu>
 > Signed-off-by: Michael Clark <mjc@sifive.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
->  hw/riscv/sifive_uart.c         | 176 +++++++++++++++++++++++++++++++++++++++++
->  include/hw/riscv/sifive_uart.h |  71 +++++++++++++++++
->  2 files changed, 247 insertions(+)
->  create mode 100644 hw/riscv/sifive_uart.c
->  create mode 100644 include/hw/riscv/sifive_uart.h
+>  target/riscv/gdbstub.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 62 insertions(+)
+>  create mode 100644 target/riscv/gdbstub.c
 > 
-> diff --git a/hw/riscv/sifive_uart.c b/hw/riscv/sifive_uart.c
+> diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
 > new file mode 100644
-> index 0000000..b0c3798
+> index 0000000..4f919b6
 > --- /dev/null
-> +++ b/hw/riscv/sifive_uart.c
-> @@ -0,0 +1,176 @@
+> +++ b/target/riscv/gdbstub.c
+> @@ -0,0 +1,62 @@
 > +/*
-> + * QEMU model of the UART on the SiFive E300 and U500 series SOCs.
+> + * RISC-V GDB Server Stub
 > + *
-> + * Copyright (c) 2016 Stefan O'Rear
+> + * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
 > + *
 > + * This program is free software; you can redistribute it and/or modify it
 > + * under the terms and conditions of the GNU General Public License,
@@ -82,259 +77,47 @@ On 03/02/2018 02:51 PM, Michael Clark wrote:
 > + */
 > +
 > +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "hw/sysbus.h"
-> +#include "chardev/char.h"
-> +#include "chardev/char-fe.h"
-> +#include "target/riscv/cpu.h"
-> +#include "hw/riscv/sifive_uart.h"
+> +#include "qemu-common.h"
+> +#include "exec/gdbstub.h"
+> +#include "cpu.h"
 > +
-> +/*
-> + * Not yet implemented:
-> + *
-> + * Transmit FIFO using "qemu/fifo8.h"
-> + * SIFIVE_UART_IE_TXWM interrupts
-> + * SIFIVE_UART_IE_RXWM interrupts must honor fifo watermark
-> + * Rx FIFO watermark interrupt trigger threshold
-> + * Tx FIFO watermark interrupt trigger threshold.
-> + */
-> +
-> +static void update_irq(SiFiveUARTState *s)
+> +int riscv_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
 > +{
-> +    int cond = 0;
-> +    if ((s->ie & SIFIVE_UART_IE_RXWM) && s->rx_fifo_len) {
-> +        cond = 1;
-> +    }
-> +    if (cond) {
-> +        qemu_irq_raise(s->irq);
-> +    } else {
-> +        qemu_irq_lower(s->irq);
-> +    }
-
-or     qemu_set_irq(s->irq, cond);
-
-> +}
+> +    RISCVCPU *cpu = RISCV_CPU(cs);
+> +    CPURISCVState *env = &cpu->env;
 > +
-> +static uint64_t
-> +uart_read(void *opaque, hwaddr addr, unsigned int size)
-> +{
-> +    SiFiveUARTState *s = opaque;
-> +    unsigned char r;
-> +    switch (addr) {
-> +    case SIFIVE_UART_RXFIFO:
-> +        if (s->rx_fifo_len) {
-> +            r = s->rx_fifo[0];
-> +            memmove(s->rx_fifo, s->rx_fifo + 1, s->rx_fifo_len - 1);
-> +            s->rx_fifo_len--;
-> +            qemu_chr_fe_accept_input(&s->chr);
-> +            update_irq(s);
-> +            return r;
-> +        }
-> +        return 0x80000000;
-
-Can you add a #define for this bit?
-
-> +
-> +    case SIFIVE_UART_TXFIFO:
-> +        return 0; /* Should check tx fifo */
-> +    case SIFIVE_UART_IE:
-> +        return s->ie;
-> +    case SIFIVE_UART_IP:
-> +        return s->rx_fifo_len ? SIFIVE_UART_IP_RXWM : 0;
-> +    case SIFIVE_UART_TXCTRL:
-> +        return s->txctrl;
-> +    case SIFIVE_UART_RXCTRL:
-> +        return s->rxctrl;
-> +    case SIFIVE_UART_DIV:
-> +        return s->div;
+> +    if (n < 32) {
+> +        return gdb_get_regl(mem_buf, env->gpr[n]);
+> +    } else if (n == 32) {
+> +        return gdb_get_regl(mem_buf, env->pc);
+> +    } else if (n < 65) {
+> +        return gdb_get_reg64(mem_buf, env->fpr[n - 33]);
+> +    } else if (n < 4096 + 65) {
+> +        return gdb_get_regl(mem_buf, csr_read_helper(env, n - 65));
 > +    }
-> +
-> +    hw_error("%s: bad read: addr=0x%x\n",
-> +        __func__, (int)addr);
-
-qemu_log(GUEST_ERROR)?
-
 > +    return 0;
 > +}
 > +
-> +static void
-> +uart_write(void *opaque, hwaddr addr,
-> +           uint64_t val64, unsigned int size)
+> +int riscv_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
 > +{
-> +    SiFiveUARTState *s = opaque;
-> +    uint32_t value = val64;
-> +    unsigned char ch = value;
+> +    RISCVCPU *cpu = RISCV_CPU(cs);
+> +    CPURISCVState *env = &cpu->env;
 > +
-> +    switch (addr) {
-> +    case SIFIVE_UART_TXFIFO:
-> +        qemu_chr_fe_write(&s->chr, &ch, 1);
-> +        return;
-> +    case SIFIVE_UART_IE:
-> +        s->ie = val64;
-> +        update_irq(s);
-> +        return;
-> +    case SIFIVE_UART_TXCTRL:
-> +        s->txctrl = val64;
-> +        return;
-> +    case SIFIVE_UART_RXCTRL:
-> +        s->rxctrl = val64;
-> +        return;
-> +    case SIFIVE_UART_DIV:
-> +        s->div = val64;
-> +        return;
+> +    if (n == 0) {
+> +        /* discard writes to x0 */
+> +        return sizeof(target_ulong);
+> +    } else if (n < 32) {
+> +        env->gpr[n] = ldtul_p(mem_buf);
+> +        return sizeof(target_ulong);
+> +    } else if (n == 32) {
+> +        env->pc = ldtul_p(mem_buf);
+> +        return sizeof(target_ulong);
+> +    } else if (n < 65) {
+> +        env->fpr[n - 33] = ldq_p(mem_buf); /* always 64-bit */
+> +        return sizeof(uint64_t);
+> +    } else if (n < 4096 + 65) {
+> +        csr_write_helper(env, ldtul_p(mem_buf), n - 65);
 > +    }
-> +    hw_error("%s: bad write: addr=0x%x v=0x%x\n",
-> +        __func__, (int)addr, (int)value);
-
-Ditto.
-
-> +}
-> +
-> +static const MemoryRegionOps uart_ops = {
-> +    .read = uart_read,
-> +    .write = uart_write,
-> +    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .valid = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 4
-> +    }
-> +};
-> +
-> +static void uart_rx(void *opaque, const uint8_t *buf, int size)
-> +{
-> +    SiFiveUARTState *s = opaque;
-> +
-> +    /* Got a byte.  */
-> +    if (s->rx_fifo_len >= sizeof(s->rx_fifo)) {
-> +        printf("WARNING: UART dropped char.\n");
-
-replace printf() by warn_report()?
-
-> +        return;
-> +    }
-> +    s->rx_fifo[s->rx_fifo_len++] = *buf;
-> +
-> +    update_irq(s);
-> +}
-> +
-> +static int uart_can_rx(void *opaque)
-> +{
-> +    SiFiveUARTState *s = opaque;
-> +
-> +    return s->rx_fifo_len < sizeof(s->rx_fifo);
-> +}
-> +
-> +static void uart_event(void *opaque, int event)
-> +{
-> +}
-> +
-> +static int uart_be_change(void *opaque)
-> +{
-> +    SiFiveUARTState *s = opaque;
-> +
-> +    qemu_chr_fe_set_handlers(&s->chr, uart_can_rx, uart_rx, uart_event,
-> +        uart_be_change, s, NULL, true);
-> +
 > +    return 0;
 > +}
-> +
-> +/*
-> + * Create UART device.
-> + */
-> +SiFiveUARTState *sifive_uart_create(MemoryRegion *address_space, hwaddr base,
-> +    Chardev *chr, qemu_irq irq)
-> +{
-> +    SiFiveUARTState *s = g_malloc0(sizeof(SiFiveUARTState));
-> +    s->irq = irq;
-> +    qemu_chr_fe_init(&s->chr, chr, &error_abort);
-> +    qemu_chr_fe_set_handlers(&s->chr, uart_can_rx, uart_rx, uart_event,
-> +        uart_be_change, s, NULL, true);
-> +    memory_region_init_io(&s->mmio, NULL, &uart_ops, s,
-> +                          TYPE_SIFIVE_UART, SIFIVE_UART_MAX);
-> +    memory_region_add_subregion(address_space, base, &s->mmio);
-> +    return s;
-> +}
-> diff --git a/include/hw/riscv/sifive_uart.h b/include/hw/riscv/sifive_uart.h
-> new file mode 100644
-> index 0000000..504f18a
-> --- /dev/null
-> +++ b/include/hw/riscv/sifive_uart.h
-> @@ -0,0 +1,71 @@
-> +/*
-> + * SiFive UART interface
-> + *
-> + * Copyright (c) 2016 Stefan O'Rear
-> + * Copyright (c) 2017 SiFive, Inc.
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#ifndef HW_SIFIVE_UART_H
-> +#define HW_SIFIVE_UART_H
-> +
-> +enum {
-> +    SIFIVE_UART_TXFIFO        = 0,
-> +    SIFIVE_UART_RXFIFO        = 4,
-> +    SIFIVE_UART_TXCTRL        = 8,
-> +    SIFIVE_UART_TXMARK        = 10,
-> +    SIFIVE_UART_RXCTRL        = 12,
-> +    SIFIVE_UART_RXMARK        = 14,
-> +    SIFIVE_UART_IE            = 16,
-> +    SIFIVE_UART_IP            = 20,
-> +    SIFIVE_UART_DIV           = 24,
-> +    SIFIVE_UART_MAX           = 32
-> +};
-> +
-> +enum {
-> +    SIFIVE_UART_IE_TXWM       = 1, /* Transmit watermark interrupt enable */
-> +    SIFIVE_UART_IE_RXWM       = 2  /* Receive watermark interrupt enable */
-> +};
-> +
-> +enum {
-> +    SIFIVE_UART_IP_TXWM       = 1, /* Transmit watermark interrupt pending */
-> +    SIFIVE_UART_IP_RXWM       = 2  /* Receive watermark interrupt pending */
-> +};
-
-These 2 enums don't need to be exported and can stay in sifive_uart.c.
-
-> +
-> +#define TYPE_SIFIVE_UART "riscv.sifive.uart"
-> +
-> +#define SIFIVE_UART(obj) \
-> +    OBJECT_CHECK(SiFiveUARTState, (obj), TYPE_SIFIVE_UART)
-> +
-> +typedef struct SiFiveUARTState {
-> +    /*< private >*/
-> +    SysBusDevice parent_obj;
-> +
-> +    /*< public >*/
-> +    qemu_irq irq;
-> +    MemoryRegion mmio;
-> +    CharBackend chr;
-> +    uint8_t rx_fifo[8];
-> +    unsigned int rx_fifo_len;
-> +    uint32_t ie;
-> +    uint32_t ip;
-> +    uint32_t txctrl;
-> +    uint32_t rxctrl;
-> +    uint32_t div;
-> +} SiFiveUARTState;
-> +
-> +SiFiveUARTState *sifive_uart_create(MemoryRegion *address_space, hwaddr base,
-> +    Chardev *chr, qemu_irq irq);
-> +
-> +#endif
 > 
-
-removing printf():
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
