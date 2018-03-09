@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1euHmG-0002Nx-WF
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:09:43 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1euHmK-0002S2-Jv
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:09:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1euHmE-0006PP-KW
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:09:40 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47720 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1euHmI-0006UW-9C
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:09:44 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47732 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1euHmE-0006Ok-E7
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:09:38 -0500
+	id 1euHmI-0006Ta-3P
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:09:42 -0500
 From: marcandre.lureau@redhat.com
-Date: Fri,  9 Mar 2018 14:09:15 +0100
-Message-Id: <20180309130918.734-5-marcandre.lureau@redhat.com>
+Date: Fri,  9 Mar 2018 14:09:17 +0100
+Message-Id: <20180309130918.734-7-marcandre.lureau@redhat.com>
 In-Reply-To: <20180309130918.734-1-marcandre.lureau@redhat.com>
 References: <20180309130918.734-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 4/7] OvmfPkg: add customized Tcg2ConfigPei
- clone
+Subject: [Qemu-devel] [PATCH v3 6/7] OvmfPkg: include Tcg2Dxe module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,447 +32,455 @@ Cc: pjones@redhat.com, jiewen.yao@intel.com, stefanb@linux.vnet.ibm.com, lersek@
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-The Tcg2ConfigPei module informs the firmware globally about the TPM
-device type, by setting the PcdTpmInstanceGuid PCD to the appropriate
-GUID value. The original module under SecurityPkg can perform device
-detection, or read a cached value from a non-volatile UEFI variable.
+This module measures and log the boot environment. It also produces
+the Tcg2 protocol, which allows for example to read the log from OS.
 
-OvmfPkg's clone of the module only performs the TPM2 hardware detection.
+The linux kernel doesn't yet read the EFI_TCG2_EVENT_LOG_FORMAT_TCG_2,
+which is required for crypto-agile log. In fact, only upcoming 4.16
+adds support EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2:
 
-This is what the module does:
+[    0.000000] efi: EFI v2.70 by EDK II
+[    0.000000] efi:  SMBIOS=3D0x3fa1f000  ACPI=3D0x3fbb6000  ACPI 2.0=3D0=
+x3fbb6014  MEMATTR=3D0x3e7d4318  TPMEventLog=3D0x3db21018
 
-- Check the QEMU hardware for TPM2 availability only
+$ python chipsec_util.py tpm parse_log binary_bios_measurements
 
-- If found, set the dynamic PCD "PcdTpmInstanceGuid" to
-  &gEfiTpmDeviceInstanceTpm20DtpmGuid. This is what informs the rest of
-  the firmware about the TPM type.
+[CHIPSEC] Version 1.3.5.dev2
+[CHIPSEC] API mode: using OS native API (not using CHIPSEC kernel module)
+[CHIPSEC] Executing command 'tpm' with args ['parse_log', '/tmp/binary_bi=
+os_measurements']
 
-- Install the gEfiTpmDeviceSelectedGuid PPI. This action permits the
-  PEI_CORE to dispatch the Tcg2Pei module, which consumes the above PCD.
-  In effect, the gEfiTpmDeviceSelectedGuid PPI serializes the setting
-  and the consumption of the "TPM type" PCD.
+PCR: 0	type: EV_S_CRTM_VERSION               	size: 0x2	digest: 1489f923c=
+4dca729178b3e3233458550d8dddf29
+	+ version:
+PCR: 0	type: EV_EFI_PLATFORM_FIRMWARE_BLOB   	size: 0x10	digest: fd39ced7=
+c0d2a61f6830c78c7625f94826b05bcc
+	+ base: 0x820000	length: 0xe0000
+PCR: 0	type: EV_EFI_PLATFORM_FIRMWARE_BLOB   	size: 0x10	digest: 39ebc678=
+3b72bc1e73c7d5bcfeb5f54a3f105d4c
+	+ base: 0x900000	length: 0xa00000
+PCR: 7	type: EV_EFI_VARIABLE_DRIVER_CONFIG   	size: 0x35	digest: 57cd4dc1=
+9442475aa82743484f3b1caa88e142b8
+PCR: 7	type: EV_EFI_VARIABLE_DRIVER_CONFIG   	size: 0x24	digest: 9b138730=
+6ebb7ff8e795e7be77563666bbf4516e
+PCR: 7	type: EV_EFI_VARIABLE_DRIVER_CONFIG   	size: 0x26	digest: 9afa86c5=
+07419b8570c62167cb9486d9fc809758
+PCR: 7	type: EV_EFI_VARIABLE_DRIVER_CONFIG   	size: 0x24	digest: 5bf8faa0=
+78d40ffbd03317c93398b01229a0e1e0
+PCR: 7	type: EV_EFI_VARIABLE_DRIVER_CONFIG   	size: 0x26	digest: 734424c9=
+fe8fc71716c42096f4b74c88733b175e
+PCR: 7	type: EV_SEPARATOR                    	size: 0x4	digest: 9069ca78e=
+7450a285173431b3e52c5c25299e473
+PCR: 1	type: EV_EFI_VARIABLE_BOOT            	size: 0x3e	digest: 252f8ebb=
+85340290b64f4b06a001742be8e5cab6
+PCR: 1	type: EV_EFI_VARIABLE_BOOT            	size: 0x6e	digest: 22a4f6ee=
+9af6dba01d3528deb64b74b582fc182b
+PCR: 1	type: EV_EFI_VARIABLE_BOOT            	size: 0x80	digest: b7811d5b=
+f30a7efd4e385c6179fe10d9290bb9e8
+PCR: 1	type: EV_EFI_VARIABLE_BOOT            	size: 0x84	digest: 425e502c=
+24fc924e231e0a62327b6b7d1f704573
+PCR: 1	type: EV_EFI_VARIABLE_BOOT            	size: 0x9a	digest: 0b5d2c98=
+ac5de6148a4a1490ff9d5df69039f04e
+PCR: 1	type: EV_EFI_VARIABLE_BOOT            	size: 0xbd	digest: 20bd5f40=
+2271d57a88ea314fe35c1705956b1f74
+PCR: 1	type: EV_EFI_VARIABLE_BOOT            	size: 0x88	digest: df5d6605=
+cb8f4366d745a8464cfb26c1efdc305c
+PCR: 4	type: EV_EFI_ACTION                   	size: 0x28	digest: cd0fdb45=
+31a6ec41be2753ba042637d6e5f7f256
+PCR: 0	type: EV_SEPARATOR                    	size: 0x4	digest: 9069ca78e=
+7450a285173431b3e52c5c25299e473
+PCR: 1	type: EV_SEPARATOR                    	size: 0x4	digest: 9069ca78e=
+7450a285173431b3e52c5c25299e473
+PCR: 2	type: EV_SEPARATOR                    	size: 0x4	digest: 9069ca78e=
+7450a285173431b3e52c5c25299e473
+PCR: 3	type: EV_SEPARATOR                    	size: 0x4	digest: 9069ca78e=
+7450a285173431b3e52c5c25299e473
+PCR: 4	type: EV_SEPARATOR                    	size: 0x4	digest: 9069ca78e=
+7450a285173431b3e52c5c25299e473
+PCR: 5	type: EV_SEPARATOR                    	size: 0x4	digest: 9069ca78e=
+7450a285173431b3e52c5c25299e473
 
-- If no TPM2 was found, install gPeiTpmInitializationDonePpiGuid.
-  (Normally this is performed by Tcg2Pei, but Tcg2Pei doesn't do it if
-  no TPM2 is available. So in that case our Tcg2ConfigPei must do it.)
+$ tpm2_pcrlist
+sha1 :
+  0  : 35bd1786b6909daad610d7598b1d620352d33b8a
+  1  : ec0511e860206e0af13c31da2f9e943fb6ca353d
+  2  : b2a83b0ebf2f8374299a5b2bdfc31ea955ad7236
+  3  : b2a83b0ebf2f8374299a5b2bdfc31ea955ad7236
+  4  : 45a323382bd933f08e7f0e256bc8249e4095b1ec
+  5  : d16d7e629fd8d08ca256f9ad3a3a1587c9e6cc1b
+  6  : b2a83b0ebf2f8374299a5b2bdfc31ea955ad7236
+  7  : 518bd167271fbb64589c61e43d8c0165861431d8
+  8  : 0000000000000000000000000000000000000000
+  9  : 0000000000000000000000000000000000000000
+  10 : 0000000000000000000000000000000000000000
+  11 : 0000000000000000000000000000000000000000
+  12 : 0000000000000000000000000000000000000000
+  13 : 0000000000000000000000000000000000000000
+  14 : 0000000000000000000000000000000000000000
+  15 : 0000000000000000000000000000000000000000
+  16 : 0000000000000000000000000000000000000000
+  17 : ffffffffffffffffffffffffffffffffffffffff
+  18 : ffffffffffffffffffffffffffffffffffffffff
+  19 : ffffffffffffffffffffffffffffffffffffffff
+  20 : ffffffffffffffffffffffffffffffffffffffff
+  21 : ffffffffffffffffffffffffffffffffffffffff
+  22 : ffffffffffffffffffffffffffffffffffffffff
+  23 : 0000000000000000000000000000000000000000
+sha256 :
+  0  : 9ae903dbae3357ac00d223660bac19ea5c021499a56201104332ab966631ce2c
+  1  : acc611d90245cf04e77b0ca94901f90e7fa54770f0426f53c3049b532243d1b8
+  2  : 3d458cfe55cc03ea1f443f1562beec8df51c75e14a9fcf9a7234a13f198e7969
+  3  : 3d458cfe55cc03ea1f443f1562beec8df51c75e14a9fcf9a7234a13f198e7969
+  4  : 7a94ffe8a7729a566d3d3c577fcb4b6b1e671f31540375f80eae6382ab785e35
+  5  : a5ceb755d043f32431d63e39f5161464620a3437280494b5850dc1b47cc074e0
+  6  : 3d458cfe55cc03ea1f443f1562beec8df51c75e14a9fcf9a7234a13f198e7969
+  7  : 65caf8dd1e0ea7a6347b635d2b379c93b9a1351edc2afc3ecda700e534eb3068
+  8  : 0000000000000000000000000000000000000000000000000000000000000000
+  9  : 0000000000000000000000000000000000000000000000000000000000000000
+  10 : 0000000000000000000000000000000000000000000000000000000000000000
+  11 : 0000000000000000000000000000000000000000000000000000000000000000
+  12 : 0000000000000000000000000000000000000000000000000000000000000000
+  13 : 0000000000000000000000000000000000000000000000000000000000000000
+  14 : 0000000000000000000000000000000000000000000000000000000000000000
+  15 : 0000000000000000000000000000000000000000000000000000000000000000
+  16 : 0000000000000000000000000000000000000000000000000000000000000000
+  17 : ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  18 : ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  19 : ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  20 : ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  21 : ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  22 : ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  23 : 0000000000000000000000000000000000000000000000000000000000000000
+sha384 :
+
+The PhysicalPresenceLib is required, it sets some variables, but the
+firmware doesn't act on it yet.
+
+Laszlo Ersek explained on the list why Tpm2DeviceLib has to be
+resolved differently for DXE_DRIVER modules in general and for
+"Tcg2Dxe.inf" specifically:
+
+  * We have a library class called Tpm2DeviceLib -- this is basically the
+  set of APIs declared in "SecurityPkg/Include/Library/Tpm2DeviceLib.h".
+  Its leading comment says "This library abstract how to access TPM2
+  hardware device".
+
+  There are two *sets* of APIs in "Tpm2DeviceLib.h":
+
+  (a) functions that deal with the TPM2 device:
+      - Tpm2RequestUseTpm(),
+      - Tpm2SubmitCommand()
+
+      This set of APIs is supposed to be used by clients that *consume*
+      the TPM2 device abstraction.
+
+  (b) the function Tpm2RegisterTpm2DeviceLib(), which is supposed to be
+      used by *providers* of various TPM2 device abstractions.
+
+  * Then, we have two implementations (instances) of the Tpm2DeviceLib cl=
+ass:
+  (1) SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.inf
+  (2) SecurityPkg/Library/Tpm2DeviceLibRouter/Tpm2DeviceLibRouterDxe.inf
+
+  (1) The first library instance ("Tpm2DeviceLibTcg2.inf") implements the
+  APIs listed under (a), and it does not implement (b) -- see
+  EFI_UNSUPPORTED. In other words, this lib instance is strictly meant fo=
+r
+  drivers that *consume* the TPM2 device abstraction. And, the (a) group
+  of APIs is implemented by forwarding the requests to the TCG2 protocol.
+
+  The idea here is that all the drivers that consume the TPM2 abstraction
+  do not have to be statically linked with a large TPM2 device library
+  instance; instead they are only linked (statically) with this "thin"
+  library instance, and all the actual work is delegated to whichever
+  driver that provides the singleton TCG2 protocol.
+
+  (2) The second library instance ("Tpm2DeviceLibRouterDxe.inf") is meant
+  for the driver that offers (produces) the TCG2 protocol. This lib
+  instance implements both (a) and (b) API groups.
+
+  * Here's how things fit together:
+
+  (i) The "SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2InstanceLibDTpm.inf"
+  library instance (which has no lib class) is linked into "Tcg2Dxe.inf"
+  via NULL class resolution. This simply means that before the
+  "Tcg2Dxe.inf" entry point function is entered, the constructor function
+  of "Tpm2InstanceLibDTpm.inf" will be called.
+
+  (ii) This Tpm2InstanceLibDTpmConstructor() function calls API (b), and
+  registers its own actual TPM2 command implementation with the
+  "Tpm2DeviceLibRouter" library instance (also linked into the Tcg2Dxe
+  driver). This provides the back-end for the API set (a).
+
+         TCG2 protocol provider (Tcg2Dxe.inf driver) launches
+                      |
+                      v
+    NULL class: Tpm2InstanceLibDTpm instance construction
+                      |
+                      v
+    Tpm2DeviceLib class: Tpm2DeviceLibRouter instance
+           backend registration for API set (a)
+
+  (iii) The Tcg2Dxe driver exposes the TCG2 protocol.
+
+  (iv) A TPM2 consumer calls API set (a) via lib instance (1). Such calls
+  land in Tcg2Dxe, via the protocol.
+
+  (v) Tcg2Dxe serves the protocol request by forwarding it to API set (a)
+  from lib instance (2).
+
+  (vi) Those functions call the "backend" functions registered by
+  Tpm2DeviceLibDTpm in step (ii).
+
+       TPM 2 consumer driver
+                |
+                v
+  Tpm2DeviceLib class: Tpm2DeviceLibTcg2 instance
+                |
+                v
+         TCG2 protocol interface
+                |
+                v
+  TCG2 protocol provider: Tcg2Dxe.inf driver
+                |
+                v
+  Tpm2DeviceLib class: Tpm2DeviceLibRouter instance
+                |
+                v
+     NULL class: Tpm2InstanceLibDTpm instance
+        (via earlier registration)
+                |
+                v
+       TPM2 chip (actual hardware)
+
+  * So that is the "router" pattern in edk2. Namely,
+
+  - Consumers of an abstraction use a thin library instance.
+
+  - The thin library instance calls a firmware-global (singleton) service=
+,
+    i.e. a PPI (in the PEI phase) or protocol (in the DXE phase).
+
+  - The PEIM providing the PPI, or the DXE driver providing the protocol,
+    don't themselves implement the actual service either. Instead they
+    offer a "registration" service too, and they only connect the incomin=
+g
+    "consumer" calls to the earlier registered back-end(s).
+
+  - The "registration service", for back-ends to use, may take various
+    forms.
+
+    It can be exposed globally to the rest of the firmware, as
+    another member function of the PPI / protocol structure. Then backend=
+s
+    can be provided by separate PEIMs / DXE drivers.
+
+    Or else, the registration service can be exposed as just another
+    library API. In this case, the backends are provided as NULL class
+    library instances, and a platform  DSC file links them into the PEIM =
+/
+    DXE driver via NULL class resolutions. The backend lib instances call
+    the registration service in their own respective constructor
+    functions.
 
 Cc: Laszlo Ersek <lersek@redhat.com>
 Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>
 Contributed-under: TianoCore Contribution Agreement 1.0
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- OvmfPkg/OvmfPkgIa32.dsc                  | 17 +++++
- OvmfPkg/OvmfPkgIa32.fdf                  |  4 ++
- OvmfPkg/OvmfPkgIa32X64.dsc               | 17 +++++
- OvmfPkg/OvmfPkgIa32X64.fdf               |  4 ++
- OvmfPkg/OvmfPkgX64.dsc                   | 17 +++++
- OvmfPkg/OvmfPkgX64.fdf                   |  4 ++
- OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf | 53 +++++++++++++++
- OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPeim.c  | 84 ++++++++++++++++++++++++
- 8 files changed, 200 insertions(+)
- create mode 100644 OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
- create mode 100644 OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPeim.c
+ OvmfPkg/OvmfPkgIa32.dsc    | 16 ++++++++++++++++
+ OvmfPkg/OvmfPkgIa32.fdf    |  4 ++++
+ OvmfPkg/OvmfPkgIa32X64.dsc | 16 ++++++++++++++++
+ OvmfPkg/OvmfPkgIa32X64.fdf |  4 ++++
+ OvmfPkg/OvmfPkgX64.dsc     | 16 ++++++++++++++++
+ OvmfPkg/OvmfPkgX64.fdf     |  4 ++++
+ 6 files changed, 60 insertions(+)
 
 diff --git a/OvmfPkg/OvmfPkgIa32.dsc b/OvmfPkg/OvmfPkgIa32.dsc
-index 5bd3f4f977df..ef25e5037028 100644
+index 05ad5cf3754e..f80fb50d4a38 100644
 --- a/OvmfPkg/OvmfPkgIa32.dsc
 +++ b/OvmfPkg/OvmfPkgIa32.dsc
-@@ -39,6 +39,7 @@ [Defines]
-   DEFINE HTTP_BOOT_ENABLE        =3D FALSE
-   DEFINE SMM_REQUIRE             =3D FALSE
-   DEFINE TLS_ENABLE              =3D FALSE
-+  DEFINE TPM2_ENABLE             =3D FALSE
+@@ -206,6 +206,8 @@ [LibraryClasses]
 =20
-   #
-   # Flash size selection. Setting FD_SIZE_IN_KB on the command line dire=
-ctly to
-@@ -203,6 +204,10 @@ [LibraryClasses]
-   OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeL=
-ib/BaseOrderedCollectionRedBlackTreeLib.inf
-   XenHypercallLib|OvmfPkg/Library/XenHypercallLib/XenHypercallLib.inf
+ !if $(TPM2_ENABLE) =3D=3D TRUE
+   Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
++  Tcg2PhysicalPresenceLib|SecurityPkg/Library/DxeTcg2PhysicalPresenceLib=
+/DxeTcg2PhysicalPresenceLib.inf
++  Tcg2PpVendorLib|SecurityPkg/Library/Tcg2PpVendorLibNull/Tcg2PpVendorLi=
+bNull.inf
+ !endif
 =20
-+!if $(TPM2_ENABLE) =3D=3D TRUE
-+  Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
-+!endif
-+
  [LibraryClasses.common]
-   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-=20
-@@ -267,6 +272,10 @@ [LibraryClasses.common.PEIM]
-   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-   QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
-=20
+@@ -356,6 +358,9 @@ [LibraryClasses.common.DXE_DRIVER]
+   PciLib|OvmfPkg/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
+   MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
+   QemuFwCfgS3Lib|OvmfPkg/Library/QemuFwCfgS3Lib/DxeQemuFwCfgS3LibFwCfg.i=
+nf
 +!if $(TPM2_ENABLE) =3D=3D TRUE
-+  Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.=
++  Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.=
 inf
 +!endif
-+
- [LibraryClasses.common.DXE_CORE]
-   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
-   DxeCoreEntryPoint|MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.i=
-nf
-@@ -547,6 +556,10 @@ [PcdsDynamicDefault]
 =20
-   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x00
-=20
-+!if $(TPM2_ENABLE) =3D=3D TRUE
-+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x00, 0x00, 0x00, 0x=
-00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0=
-0}
-+!endif
-+
- ########################################################################=
-########
- #
- # Components Section - list of all EDK II Modules needed by this Platfor=
-m.
-@@ -593,6 +606,10 @@ [Components]
+ [LibraryClasses.common.UEFI_APPLICATION]
+   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+@@ -901,3 +906,14 @@ [Components]
+       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
+   }
  !endif
-   UefiCpuPkg/CpuMpPei/CpuMpPei.inf
-=20
-+!if $(TPM2_ENABLE) =3D=3D TRUE
-+  OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
-+!endif
 +
-   #
-   # DXE Phase modules
-   #
++!if $(TPM2_ENABLE) =3D=3D TRUE
++  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf {
++    <LibraryClasses>
++      Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibRouter/Tpm2DeviceLi=
+bRouterDxe.inf
++      NULL|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2InstanceLibDTpm.inf
++      HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCry=
+ptoRouterDxe.inf
++      NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1.i=
+nf
++      NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha2=
+56.inf
++  }
++!endif
 diff --git a/OvmfPkg/OvmfPkgIa32.fdf b/OvmfPkg/OvmfPkgIa32.fdf
-index ba980834d720..76f35e859eca 100644
+index e9e8611d4cd9..938bf7195ec4 100644
 --- a/OvmfPkg/OvmfPkgIa32.fdf
 +++ b/OvmfPkg/OvmfPkgIa32.fdf
-@@ -165,6 +165,10 @@ [FV.PEIFV]
+@@ -385,6 +385,10 @@ [FV.DXEFV]
+ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
  !endif
- INF  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 =20
 +!if $(TPM2_ENABLE) =3D=3D TRUE
-+INF  OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
++INF  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
 +!endif
 +
  ########################################################################=
 ########
 =20
- [FV.DXEFV]
+ [FV.FVMAIN_COMPACT]
 diff --git a/OvmfPkg/OvmfPkgIa32X64.dsc b/OvmfPkg/OvmfPkgIa32X64.dsc
-index 7dded86c4940..0364dafdcb3a 100644
+index 9a095c3ed88d..bc48b5b63c7a 100644
 --- a/OvmfPkg/OvmfPkgIa32X64.dsc
 +++ b/OvmfPkg/OvmfPkgIa32X64.dsc
-@@ -39,6 +39,7 @@ [Defines]
-   DEFINE HTTP_BOOT_ENABLE        =3D FALSE
-   DEFINE SMM_REQUIRE             =3D FALSE
-   DEFINE TLS_ENABLE              =3D FALSE
-+  DEFINE TPM2_ENABLE             =3D FALSE
+@@ -211,6 +211,8 @@ [LibraryClasses]
 =20
-   #
-   # Flash size selection. Setting FD_SIZE_IN_KB on the command line dire=
-ctly to
-@@ -208,6 +209,10 @@ [LibraryClasses]
-   OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeL=
-ib/BaseOrderedCollectionRedBlackTreeLib.inf
-   XenHypercallLib|OvmfPkg/Library/XenHypercallLib/XenHypercallLib.inf
+ !if $(TPM2_ENABLE) =3D=3D TRUE
+   Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
++  Tcg2PhysicalPresenceLib|SecurityPkg/Library/DxeTcg2PhysicalPresenceLib=
+/DxeTcg2PhysicalPresenceLib.inf
++  Tcg2PpVendorLib|SecurityPkg/Library/Tcg2PpVendorLibNull/Tcg2PpVendorLi=
+bNull.inf
+ !endif
 =20
-+!if $(TPM2_ENABLE) =3D=3D TRUE
-+  Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
-+!endif
-+
  [LibraryClasses.common]
-   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-=20
-@@ -272,6 +277,10 @@ [LibraryClasses.common.PEIM]
-   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-   QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
-=20
+@@ -361,6 +363,9 @@ [LibraryClasses.common.DXE_DRIVER]
+   PciLib|OvmfPkg/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
+   MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
+   QemuFwCfgS3Lib|OvmfPkg/Library/QemuFwCfgS3Lib/DxeQemuFwCfgS3LibFwCfg.i=
+nf
 +!if $(TPM2_ENABLE) =3D=3D TRUE
-+  Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.=
++  Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.=
 inf
 +!endif
-+
- [LibraryClasses.common.DXE_CORE]
-   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
-   DxeCoreEntryPoint|MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.i=
-nf
-@@ -555,6 +564,10 @@ [PcdsDynamicDefault]
 =20
-   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x00
-=20
-+!if $(TPM2_ENABLE) =3D=3D TRUE
-+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x00, 0x00, 0x00, 0x=
-00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0=
-0}
-+!endif
-+
- ########################################################################=
-########
- #
- # Components Section - list of all EDK II Modules needed by this Platfor=
-m.
-@@ -601,6 +614,10 @@ [Components.IA32]
+ [LibraryClasses.common.UEFI_APPLICATION]
+   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+@@ -911,3 +916,14 @@ [Components.X64]
+       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
+   }
  !endif
-   UefiCpuPkg/CpuMpPei/CpuMpPei.inf
-=20
-+!if $(TPM2_ENABLE) =3D=3D TRUE
-+  OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
-+!endif
 +
- [Components.X64]
-   #
-   # DXE Phase modules
++!if $(TPM2_ENABLE) =3D=3D TRUE
++  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf {
++    <LibraryClasses>
++      Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibRouter/Tpm2DeviceLi=
+bRouterDxe.inf
++      NULL|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2InstanceLibDTpm.inf
++      HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCry=
+ptoRouterDxe.inf
++      NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1.i=
+nf
++      NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha2=
+56.inf
++  }
++!endif
 diff --git a/OvmfPkg/OvmfPkgIa32X64.fdf b/OvmfPkg/OvmfPkgIa32X64.fdf
-index 72ac82e76b7b..16c67fa90c75 100644
+index e2a370ce22c5..246e1dc8278a 100644
 --- a/OvmfPkg/OvmfPkgIa32X64.fdf
 +++ b/OvmfPkg/OvmfPkgIa32X64.fdf
-@@ -165,6 +165,10 @@ [FV.PEIFV]
+@@ -392,6 +392,10 @@ [FV.DXEFV]
+ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
  !endif
- INF  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 =20
 +!if $(TPM2_ENABLE) =3D=3D TRUE
-+INF  OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
++INF  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
 +!endif
 +
  ########################################################################=
 ########
 =20
- [FV.DXEFV]
+ [FV.FVMAIN_COMPACT]
 diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
-index a8e89276c0b2..a2845804fc4b 100644
+index 861320e9c1f4..e89de093d6a2 100644
 --- a/OvmfPkg/OvmfPkgX64.dsc
 +++ b/OvmfPkg/OvmfPkgX64.dsc
-@@ -39,6 +39,7 @@ [Defines]
-   DEFINE HTTP_BOOT_ENABLE        =3D FALSE
-   DEFINE SMM_REQUIRE             =3D FALSE
-   DEFINE TLS_ENABLE              =3D FALSE
-+  DEFINE TPM2_ENABLE             =3D FALSE
+@@ -211,6 +211,8 @@ [LibraryClasses]
 =20
-   #
-   # Flash size selection. Setting FD_SIZE_IN_KB on the command line dire=
-ctly to
-@@ -208,6 +209,10 @@ [LibraryClasses]
-   OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeL=
-ib/BaseOrderedCollectionRedBlackTreeLib.inf
-   XenHypercallLib|OvmfPkg/Library/XenHypercallLib/XenHypercallLib.inf
+ !if $(TPM2_ENABLE) =3D=3D TRUE
+   Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
++  Tcg2PhysicalPresenceLib|SecurityPkg/Library/DxeTcg2PhysicalPresenceLib=
+/DxeTcg2PhysicalPresenceLib.inf
++  Tcg2PpVendorLib|SecurityPkg/Library/Tcg2PpVendorLibNull/Tcg2PpVendorLi=
+bNull.inf
+ !endif
 =20
-+!if $(TPM2_ENABLE) =3D=3D TRUE
-+  Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
-+!endif
-+
  [LibraryClasses.common]
-   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-=20
-@@ -272,6 +277,10 @@ [LibraryClasses.common.PEIM]
-   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-   QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
-=20
+@@ -361,6 +363,9 @@ [LibraryClasses.common.DXE_DRIVER]
+   PciLib|OvmfPkg/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
+   MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
+   QemuFwCfgS3Lib|OvmfPkg/Library/QemuFwCfgS3Lib/DxeQemuFwCfgS3LibFwCfg.i=
+nf
 +!if $(TPM2_ENABLE) =3D=3D TRUE
-+  Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.=
++  Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.=
 inf
 +!endif
-+
- [LibraryClasses.common.DXE_CORE]
-   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
-   DxeCoreEntryPoint|MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.i=
-nf
-@@ -554,6 +563,10 @@ [PcdsDynamicDefault]
 =20
-   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x00
-=20
-+!if $(TPM2_ENABLE) =3D=3D TRUE
-+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x00, 0x00, 0x00, 0x=
-00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0=
-0}
-+!endif
-+
- ########################################################################=
-########
- #
- # Components Section - list of all EDK II Modules needed by this Platfor=
-m.
-@@ -600,6 +613,10 @@ [Components]
+ [LibraryClasses.common.UEFI_APPLICATION]
+   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+@@ -909,3 +914,14 @@ [Components]
+       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
+   }
  !endif
-   UefiCpuPkg/CpuMpPei/CpuMpPei.inf
-=20
-+!if $(TPM2_ENABLE) =3D=3D TRUE
-+  OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
-+!endif
 +
-   #
-   # DXE Phase modules
-   #
++!if $(TPM2_ENABLE) =3D=3D TRUE
++  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf {
++    <LibraryClasses>
++      Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibRouter/Tpm2DeviceLi=
+bRouterDxe.inf
++      NULL|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2InstanceLibDTpm.inf
++      HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCry=
+ptoRouterDxe.inf
++      NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1.i=
+nf
++      NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha2=
+56.inf
++  }
++!endif
 diff --git a/OvmfPkg/OvmfPkgX64.fdf b/OvmfPkg/OvmfPkgX64.fdf
-index 2fc17810eb23..dbafada5226b 100644
+index c0173e7adf5f..1a46104fc63d 100644
 --- a/OvmfPkg/OvmfPkgX64.fdf
 +++ b/OvmfPkg/OvmfPkgX64.fdf
-@@ -165,6 +165,10 @@ [FV.PEIFV]
+@@ -392,6 +392,10 @@ [FV.DXEFV]
+ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
  !endif
- INF  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 =20
 +!if $(TPM2_ENABLE) =3D=3D TRUE
-+INF  OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
++INF  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
 +!endif
 +
  ########################################################################=
 ########
 =20
- [FV.DXEFV]
-diff --git a/OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf b/OvmfPkg/Tcg/Tcg2C=
-onfig/Tcg2ConfigPei.inf
-new file mode 100644
-index 000000000000..234cdd6cb40c
---- /dev/null
-+++ b/OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
-@@ -0,0 +1,53 @@
-+## @file
-+#  Set TPM device type
-+#
-+#  In SecurityPkg, this module initializes the TPM device type based on
-+#  a UEFI variable and/or hardware detection. In OvmfPkg, the module
-+#  only performs TPM2 hardware detection.
-+#
-+# Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
-+# Copyright (C) 2018, Red Hat, Inc.
-+#
-+# This program and the accompanying materials
-+# are licensed and made available under the terms and conditions of the =
-BSD License
-+# which accompanies this distribution. The full text of the license may =
-be found at
-+# http://opensource.org/licenses/bsd-license.php
-+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR I=
-MPLIED.
-+#
-+##
-+
-+[Defines]
-+  INF_VERSION                    =3D 0x00010005
-+  BASE_NAME                      =3D Tcg2ConfigPei
-+  FILE_GUID                      =3D BF7F2B0C-9F2F-4889-AB5C-12460022BE8=
-7
-+  MODULE_TYPE                    =3D PEIM
-+  VERSION_STRING                 =3D 1.0
-+  ENTRY_POINT                    =3D Tcg2ConfigPeimEntryPoint
-+
-+[Sources]
-+  Tcg2ConfigPeim.c
-+
-+[Packages]
-+  MdePkg/MdePkg.dec
-+  MdeModulePkg/MdeModulePkg.dec
-+  SecurityPkg/SecurityPkg.dec
-+
-+[LibraryClasses]
-+  PeimEntryPoint
-+  DebugLib
-+  PeiServicesLib
-+  Tpm2DeviceLib
-+
-+[Guids]
-+  gEfiTpmDeviceSelectedGuid           ## PRODUCES             ## GUID   =
- # Used as a PPI GUID
-+  gEfiTpmDeviceInstanceTpm20DtpmGuid  ## SOMETIMES_CONSUMES
-+
-+[Ppis]
-+  gPeiTpmInitializationDonePpiGuid    ## SOMETIMES_PRODUCES
-+
-+[Pcd]
-+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid                 ## PR=
-ODUCES
-+
-+[Depex]
-+  TRUE
-diff --git a/OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPeim.c b/OvmfPkg/Tcg/Tcg2Co=
-nfig/Tcg2ConfigPeim.c
-new file mode 100644
-index 000000000000..8bee1926b3c4
---- /dev/null
-+++ b/OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPeim.c
-@@ -0,0 +1,84 @@
-+/** @file
-+  The module entry point for Tcg2 configuration module.
-+
-+Copyright (c) 2018, Red Hat, Inc.
-+Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-+
-+This program and the accompanying materials
-+are licensed and made available under the terms and conditions of the BS=
-D License
-+which accompanies this distribution.  The full text of the license may b=
-e found at
-+http://opensource.org/licenses/bsd-license.php
-+
-+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMP=
-LIED.
-+
-+**/
-+
-+
-+#include <PiPei.h>
-+
-+#include <Guid/TpmInstance.h>
-+#include <Library/DebugLib.h>
-+#include <Library/PeiServicesLib.h>
-+#include <Library/Tpm2DeviceLib.h>
-+#include <Ppi/TpmInitialized.h>
-+
-+STATIC CONST EFI_PEI_PPI_DESCRIPTOR mTpmSelectedPpi =3D {
-+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
-+  &gEfiTpmDeviceSelectedGuid,
-+  NULL
-+};
-+
-+STATIC CONST EFI_PEI_PPI_DESCRIPTOR  mTpmInitializationDonePpiList =3D {
-+  EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
-+  &gPeiTpmInitializationDonePpiGuid,
-+  NULL
-+};
-+
-+/**
-+  The entry point for Tcg2 configuration driver.
-+
-+  @param  FileHandle  Handle of the file being invoked.
-+  @param  PeiServices Describes the list of possible PEI Services.
-+**/
-+EFI_STATUS
-+EFIAPI
-+Tcg2ConfigPeimEntryPoint (
-+  IN       EFI_PEI_FILE_HANDLE  FileHandle,
-+  IN CONST EFI_PEI_SERVICES     **PeiServices
-+  )
-+{
-+  UINTN                           Size;
-+  EFI_STATUS                      Status;
-+
-+  DEBUG ((DEBUG_INFO, "%a\n", __FUNCTION__));
-+
-+  Status =3D Tpm2RequestUseTpm ();
-+  if (!EFI_ERROR (Status)) {
-+      DEBUG ((DEBUG_INFO, "%a: TPM2 detected\n", __FUNCTION__));
-+      Size =3D sizeof(gEfiTpmDeviceInstanceTpm20DtpmGuid);
-+      Status =3D PcdSetPtrS (
-+          PcdTpmInstanceGuid,
-+          &Size,
-+          &gEfiTpmDeviceInstanceTpm20DtpmGuid
-+          );
-+      ASSERT_EFI_ERROR (Status);
-+  } else {
-+      DEBUG ((DEBUG_INFO, "%a: no TPM2 detected\n", __FUNCTION__));
-+      // If no TPM2 was detected, we still need to install
-+      // TpmInitializationDonePpi. Namely, Tcg2Pei will exit early upon
-+      // seeing the default (all-bits-zero) contents of
-+      // PcdTpmInstanceGuid, thus we have to install the PPI in its plac=
-e,
-+      // in order to unblock any dependent PEIMs.
-+      Status =3D PeiServicesInstallPpi (&mTpmInitializationDonePpiList);
-+      ASSERT_EFI_ERROR (Status);
-+  }
-+
-+  //
-+  // Selection done
-+  //
-+  Status =3D PeiServicesInstallPpi (&mTpmSelectedPpi);
-+  ASSERT_EFI_ERROR (Status);
-+
-+  return Status;
-+}
+ [FV.FVMAIN_COMPACT]
 --=20
 2.16.2.346.g9779355e34
