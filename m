@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1euHwV-0001BC-Np
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:20:16 -0500
+	(envelope-from <stefanha@redhat.com>) id 1euHwS-00017e-LQ
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:20:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1euHwR-0007Up-JH
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:20:15 -0500
+	(envelope-from <stefanha@redhat.com>) id 1euHwR-0007Uk-J1
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:20:12 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri,  9 Mar 2018 13:19:45 +0000
-Message-Id: <20180309131949.18640-4-stefanha@redhat.com>
+Date: Fri,  9 Mar 2018 13:19:44 +0000
+Message-Id: <20180309131949.18640-3-stefanha@redhat.com>
 In-Reply-To: <20180309131949.18640-1-stefanha@redhat.com>
 References: <20180309131949.18640-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 3/7] virtio-blk: dataplane: Don't batch
- notifications if EVENT_IDX is present
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 2/7] README: Fix typo 'git-publish'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,94 +23,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Richard Henderson <rth@twiddle.net>, Sergio Lopez <slp@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-From: Sergio Lopez <slp@redhat.com>
+From: Fam Zheng <famz@redhat.com>
 
-Commit 5b2ffbe4d99843fd8305c573a100047a8c962327 ("virtio-blk: dataplane:
-notify guest as a batch") deferred guest notification to a BH in order
-batch notifications, with purpose of avoiding flooding the guest with
-interruptions.
-
-This optimization came with a cost. The average latency perceived in the
-guest is increased by a few microseconds, but also when multiple IO
-operations finish at the same time, the guest won't be notified until
-all completions from each operation has been run. On the contrary,
-virtio-scsi issues the notification at the end of each completion.
-
-On the other hand, nowadays we have the EVENT_IDX feature that allows a
-better coordination between QEMU and the Guest OS to avoid sending
-unnecessary interruptions.
-
-With this change, virtio-blk/dataplane only batches notifications if the
-EVENT_IDX feature is not present.
-
-Some numbers obtained with fio (ioengine=sync, iodepth=1, direct=1):
- - Test specs:
-   * fio-3.4 (ioengine=sync, iodepth=1, direct=1)
-   * qemu master
-   * virtio-blk with a dedicated iothread (default poll-max-ns)
-   * backend: null_blk nr_devices=1 irqmode=2 completion_nsec=280000
-   * 8 vCPUs pinned to isolated physical cores
-   * Emulator and iothread also pinned to separate isolated cores
-   * variance between runs < 1%
-
- - Not patched
-   * numjobs=1:  lat_avg=327.32  irqs=29998
-   * numjobs=4:  lat_avg=337.89  irqs=29073
-   * numjobs=8:  lat_avg=342.98  irqs=28643
-
- - Patched:
-   * numjobs=1:  lat_avg=323.92  irqs=30262
-   * numjobs=4:  lat_avg=332.65  irqs=29520
-   * numjobs=8:  lat_avg=335.54  irqs=29323
-
-Signed-off-by: Sergio Lopez <slp@redhat.com>
-Message-id: 20180307114459.26636-1-slp@redhat.com
+Reported-by: Alberto Garcia <berto@igalia.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Message-id: 20180306024328.19195-1-famz@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- hw/block/dataplane/virtio-blk.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+ README | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-blk.c
-index 2cb990997e..c46253a924 100644
---- a/hw/block/dataplane/virtio-blk.c
-+++ b/hw/block/dataplane/virtio-blk.c
-@@ -34,6 +34,7 @@ struct VirtIOBlockDataPlane {
-     VirtIODevice *vdev;
-     QEMUBH *bh;                     /* bh for guest notification */
-     unsigned long *batch_notify_vqs;
-+    bool batch_notifications;
- 
-     /* Note that these EventNotifiers are assigned by value.  This is
-      * fine as long as you do not call event_notifier_cleanup on them
-@@ -47,8 +48,12 @@ struct VirtIOBlockDataPlane {
- /* Raise an interrupt to signal guest, if necessary */
- void virtio_blk_data_plane_notify(VirtIOBlockDataPlane *s, VirtQueue *vq)
- {
--    set_bit(virtio_get_queue_index(vq), s->batch_notify_vqs);
--    qemu_bh_schedule(s->bh);
-+    if (s->batch_notifications) {
-+        set_bit(virtio_get_queue_index(vq), s->batch_notify_vqs);
-+        qemu_bh_schedule(s->bh);
-+    } else {
-+        virtio_notify_irqfd(s->vdev, vq);
-+    }
- }
- 
- static void notify_guest_bh(void *opaque)
-@@ -177,6 +182,12 @@ int virtio_blk_data_plane_start(VirtIODevice *vdev)
- 
-     s->starting = true;
- 
-+    if (!virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX)) {
-+        s->batch_notifications = true;
-+    } else {
-+        s->batch_notifications = false;
-+    }
-+
-     /* Set up guest notifier (irq) */
-     r = k->set_guest_notifiers(qbus->parent, nvqs, true);
-     if (r != 0) {
--- 
+diff --git a/README b/README
+index 7833b97365..49a9fd09cd 100644
+--- a/README
++++ b/README
+@@ -73,7 +73,7 @@ The QEMU website is also maintained under source contro=
+l.
+   git clone git://git.qemu.org/qemu-web.git
+   https://www.qemu.org/2017/02/04/the-new-qemu-website-is-up/
+=20
+-A 'git-profile' utility was created to make above process less
++A 'git-publish' utility was created to make above process less
+ cumbersome, and is highly recommended for making regular contributions,
+ or even just for sending consecutive patch series revisions. It also
+ requires a working 'git send-email' setup, and by default doesn't
+--=20
 2.14.3
