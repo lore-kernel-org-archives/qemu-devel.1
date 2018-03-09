@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1euE8O-0003s8-KP
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:17 -0500
+	(envelope-from <peterx@redhat.com>) id 1euE8Q-0003u1-NI
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1euE8J-0005yH-EK
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:16 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45400 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1euE8P-00060K-EV
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:18 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59396 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1euE8J-0005y3-8Y
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:11 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1euE8P-000604-85
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:17 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Fri,  9 Mar 2018 17:15:21 +0800
-Message-Id: <20180309091535.13315-10-peterx@redhat.com>
+Date: Fri,  9 Mar 2018 17:15:23 +0800
+Message-Id: <20180309091535.13315-12-peterx@redhat.com>
 In-Reply-To: <20180309091535.13315-1-peterx@redhat.com>
 References: <20180309091535.13315-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 09/23] migration: new state
- "postcopy-recover"
+Subject: [Qemu-devel] [PATCH v7 11/23] migration: new cmd MIG_CMD_RECV_BITMAP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,164 +26,148 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Introducing new migration state "postcopy-recover". If a migration
-procedure is paused and the connection is rebuilt afterward
-successfully, we'll switch the source VM state from "postcopy-paused" to
-the new state "postcopy-recover", then we'll do the resume logic in the
-migration thread (along with the return path thread).
-
-This patch only do the state switch on source side. Another following up
-patch will handle the state switching on destination side using the same
-status bit.
+Add a new vm command MIG_CMD_RECV_BITMAP to request received bitmap for
+one ramblock.
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/migration.c | 76 ++++++++++++++++++++++++++++++++++++++-------------
- qapi/migration.json   |  4 ++-
- 2 files changed, 60 insertions(+), 20 deletions(-)
+ migration/savevm.c     | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ migration/savevm.h     |  1 +
+ migration/trace-events |  2 ++
+ 3 files changed, 64 insertions(+)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 0b31468552..322d5ad79b 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -561,6 +561,7 @@ static bool migration_is_setup_or_active(int state)
-     case MIGRATION_STATUS_ACTIVE:
-     case MIGRATION_STATUS_POSTCOPY_ACTIVE:
-     case MIGRATION_STATUS_POSTCOPY_PAUSED:
-+    case MIGRATION_STATUS_POSTCOPY_RECOVER:
-     case MIGRATION_STATUS_SETUP:
-     case MIGRATION_STATUS_PRE_SWITCHOVER:
-     case MIGRATION_STATUS_DEVICE:
-@@ -641,6 +642,7 @@ MigrationInfo *qmp_query_migrate(Error **errp)
-     case MIGRATION_STATUS_PRE_SWITCHOVER:
-     case MIGRATION_STATUS_DEVICE:
-     case MIGRATION_STATUS_POSTCOPY_PAUSED:
-+    case MIGRATION_STATUS_POSTCOPY_RECOVER:
-          /* TODO add some postcopy stats */
-         info->has_status = true;
-         info->has_total_time = true;
-@@ -2247,6 +2249,13 @@ typedef enum MigThrError {
-     MIG_THR_ERR_FATAL = 2,
- } MigThrError;
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 93e6a13477..5836c961c9 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -80,6 +80,7 @@ enum qemu_vm_cmd {
+                                       were previously sent during
+                                       precopy but are dirty. */
+     MIG_CMD_PACKAGED,          /* Send a wrapped stream within this stream */
++    MIG_CMD_RECV_BITMAP,       /* Request for recved bitmap on dst */
+     MIG_CMD_MAX
+ };
  
-+/* Return zero if success, or <0 for error */
-+static int postcopy_do_resume(MigrationState *s)
+@@ -97,6 +98,7 @@ static struct mig_cmd_args {
+     [MIG_CMD_POSTCOPY_RAM_DISCARD] = {
+                                    .len = -1, .name = "POSTCOPY_RAM_DISCARD" },
+     [MIG_CMD_PACKAGED]         = { .len =  4, .name = "PACKAGED" },
++    [MIG_CMD_RECV_BITMAP]      = { .len = -1, .name = "RECV_BITMAP" },
+     [MIG_CMD_MAX]              = { .len = -1, .name = "MAX" },
+ };
+ 
+@@ -955,6 +957,19 @@ void qemu_savevm_send_postcopy_run(QEMUFile *f)
+     qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_RUN, 0, NULL);
+ }
+ 
++void qemu_savevm_send_recv_bitmap(QEMUFile *f, char *block_name)
 +{
-+    /* TODO: do the resume logic */
++    size_t len;
++    char buf[256];
++
++    trace_savevm_send_recv_bitmap(block_name);
++
++    buf[0] = len = strlen(block_name);
++    memcpy(buf + 1, block_name, len);
++
++    qemu_savevm_command_send(f, MIG_CMD_RECV_BITMAP, len + 1, (uint8_t *)buf);
++}
++
+ bool qemu_savevm_state_blocked(Error **errp)
+ {
+     SaveStateEntry *se;
+@@ -1777,6 +1792,49 @@ static int loadvm_handle_cmd_packaged(MigrationIncomingState *mis)
+     return ret;
+ }
+ 
++/*
++ * Handle request that source requests for recved_bitmap on
++ * destination. Payload format:
++ *
++ * len (1 byte) + ramblock_name (<255 bytes)
++ */
++static int loadvm_handle_recv_bitmap(MigrationIncomingState *mis,
++                                     uint16_t len)
++{
++    QEMUFile *file = mis->from_src_file;
++    RAMBlock *rb;
++    char block_name[256];
++    size_t cnt;
++
++    cnt = qemu_get_counted_string(file, block_name);
++    if (!cnt) {
++        error_report("%s: failed to read block name", __func__);
++        return -EINVAL;
++    }
++
++    /* Validate before using the data */
++    if (qemu_file_get_error(file)) {
++        return qemu_file_get_error(file);
++    }
++
++    if (len != cnt + 1) {
++        error_report("%s: invalid payload length (%d)", __func__, len);
++        return -EINVAL;
++    }
++
++    rb = qemu_ram_block_by_name(block_name);
++    if (!rb) {
++        error_report("%s: block '%s' not found", __func__, block_name);
++        return -EINVAL;
++    }
++
++    /* TODO: send the bitmap back to source */
++
++    trace_loadvm_handle_recv_bitmap(block_name);
++
 +    return 0;
 +}
 +
  /*
-  * We don't return until we are in a safe state to continue current
-  * postcopy migration.  Returns MIG_THR_ERR_RECOVERED if recovered, or
-@@ -2255,29 +2264,55 @@ typedef enum MigThrError {
- static MigThrError postcopy_pause(MigrationState *s)
- {
-     assert(s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
--    migrate_set_state(&s->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
--                      MIGRATION_STATUS_POSTCOPY_PAUSED);
+  * Process an incoming 'QEMU_VM_COMMAND'
+  * 0           just a normal return
+@@ -1850,6 +1908,9 @@ static int loadvm_process_command(QEMUFile *f)
  
--    /* Current channel is possibly broken. Release it. */
--    assert(s->to_dst_file);
--    qemu_file_shutdown(s->to_dst_file);
--    qemu_fclose(s->to_dst_file);
--    s->to_dst_file = NULL;
-+    while (true) {
-+        migrate_set_state(&s->state, s->state,
-+                          MIGRATION_STATUS_POSTCOPY_PAUSED);
- 
--    error_report("Detected IO failure for postcopy. "
--                 "Migration paused.");
-+        /* Current channel is possibly broken. Release it. */
-+        assert(s->to_dst_file);
-+        qemu_file_shutdown(s->to_dst_file);
-+        qemu_fclose(s->to_dst_file);
-+        s->to_dst_file = NULL;
- 
--    /*
--     * We wait until things fixed up. Then someone will setup the
--     * status back for us.
--     */
--    while (s->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
--        qemu_sem_wait(&s->postcopy_pause_sem);
--    }
-+        error_report("Detected IO failure for postcopy. "
-+                     "Migration paused.");
- 
--    trace_postcopy_pause_continued();
-+        /*
-+         * We wait until things fixed up. Then someone will setup the
-+         * status back for us.
-+         */
-+        while (s->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
-+            qemu_sem_wait(&s->postcopy_pause_sem);
-+        }
+     case MIG_CMD_POSTCOPY_RAM_DISCARD:
+         return loadvm_postcopy_ram_handle_discard(mis, len);
 +
-+        if (s->state == MIGRATION_STATUS_POSTCOPY_RECOVER) {
-+            /* Woken up by a recover procedure. Give it a shot */
- 
--    return MIG_THR_ERR_RECOVERED;
-+            /*
-+             * Firstly, let's wake up the return path now, with a new
-+             * return path channel.
-+             */
-+            qemu_sem_post(&s->postcopy_pause_rp_sem);
-+
-+            /* Do the resume logic */
-+            if (postcopy_do_resume(s) == 0) {
-+                /* Let's continue! */
-+                trace_postcopy_pause_continued();
-+                return MIG_THR_ERR_RECOVERED;
-+            } else {
-+                /*
-+                 * Something wrong happened during the recovery, let's
-+                 * pause again. Pause is always better than throwing
-+                 * data away.
-+                 */
-+                continue;
-+            }
-+        } else {
-+            /* This is not right... Time to quit. */
-+            return MIG_THR_ERR_FATAL;
-+        }
-+    }
- }
- 
- static MigThrError migration_detect_error(MigrationState *s)
-@@ -2597,7 +2632,10 @@ void migrate_fd_connect(MigrationState *s, Error *error_in)
++    case MIG_CMD_RECV_BITMAP:
++        return loadvm_handle_recv_bitmap(mis, len);
      }
  
-     if (resume) {
--        /* TODO: do the resume logic */
-+        /* Wakeup the main migration thread to do the recovery */
-+        migrate_set_state(&s->state, MIGRATION_STATUS_POSTCOPY_PAUSED,
-+                          MIGRATION_STATUS_POSTCOPY_RECOVER);
-+        qemu_sem_post(&s->postcopy_pause_sem);
-         return;
-     }
+     return 0;
+diff --git a/migration/savevm.h b/migration/savevm.h
+index 295c4a1f2c..8126b1cc14 100644
+--- a/migration/savevm.h
++++ b/migration/savevm.h
+@@ -46,6 +46,7 @@ int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len);
+ void qemu_savevm_send_postcopy_advise(QEMUFile *f);
+ void qemu_savevm_send_postcopy_listen(QEMUFile *f);
+ void qemu_savevm_send_postcopy_run(QEMUFile *f);
++void qemu_savevm_send_recv_bitmap(QEMUFile *f, char *block_name);
  
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 11e0736f67..152fb8e51e 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -91,6 +91,8 @@
- #
- # @postcopy-paused: during postcopy but paused. (since 2.12)
- #
-+# @postcopy-recover: trying to recover from a paused postcopy. (since 2.11)
-+#
- # @completed: migration is finished.
- #
- # @failed: some error occurred during migration process.
-@@ -109,7 +111,7 @@
- { 'enum': 'MigrationStatus',
-   'data': [ 'none', 'setup', 'cancelling', 'cancelled',
-             'active', 'postcopy-active', 'postcopy-paused',
--            'completed', 'failed', 'colo',
-+            'postcopy-recover', 'completed', 'failed', 'colo',
-             'pre-switchover', 'device' ] }
- 
- ##
+ void qemu_savevm_send_postcopy_ram_discard(QEMUFile *f, const char *name,
+                                            uint16_t len,
+diff --git a/migration/trace-events b/migration/trace-events
+index 06a919a6e3..62b27fbf11 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -12,6 +12,7 @@ loadvm_state_cleanup(void) ""
+ loadvm_handle_cmd_packaged(unsigned int length) "%u"
+ loadvm_handle_cmd_packaged_main(int ret) "%d"
+ loadvm_handle_cmd_packaged_received(int ret) "%d"
++loadvm_handle_recv_bitmap(char *s) "%s"
+ loadvm_postcopy_handle_advise(void) ""
+ loadvm_postcopy_handle_listen(void) ""
+ loadvm_postcopy_handle_run(void) ""
+@@ -34,6 +35,7 @@ savevm_send_open_return_path(void) ""
+ savevm_send_ping(uint32_t val) "0x%x"
+ savevm_send_postcopy_listen(void) ""
+ savevm_send_postcopy_run(void) ""
++savevm_send_recv_bitmap(char *name) "%s"
+ savevm_state_setup(void) ""
+ savevm_state_header(void) ""
+ savevm_state_iterate(void) ""
 -- 
 2.14.3
