@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1euMEP-00085b-OP
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:55:02 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1euMES-00088X-Cj
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:55:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1euMEO-0003MW-W1
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:55:01 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46064 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1euMER-0003Nk-EV
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:55:04 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47410 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1euMEO-0003MH-RQ
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:55:00 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1euMER-0003Nd-9y
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:55:03 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri,  9 Mar 2018 17:54:51 +0000
-Message-Id: <20180309175453.41548-5-dgilbert@redhat.com>
+Date: Fri,  9 Mar 2018 17:54:53 +0000
+Message-Id: <20180309175453.41548-7-dgilbert@redhat.com>
 In-Reply-To: <20180309175453.41548-1-dgilbert@redhat.com>
 References: <20180309175453.41548-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 4/6] migration/block: rename MAX_INFLIGHT_IO to
- MAX_IO_BUFFERS
+Subject: [Qemu-devel] [PULL 6/6] tests: Silence migration-test 'bad' test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +26,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, pl@kamp.de, peterx@redhat.com, quintela@redhat.com
 
-From: Peter Lieven <pl@kamp.de>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-this actually limits (as the original commit mesage suggests) the
-number of I/O buffers that can be allocated and not the number
-of parallel (inflight) I/O requests.
+In 2c9bb29703c I added a migration test that purposely fails;
+unfortunately it prints a copy of the failure message to stderr
+which makes the output a bit messy.
 
-Signed-off-by: Peter Lieven <pl@kamp.de>
-Message-Id: <1520507908-16743-4-git-send-email-pl@kamp.de>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Hide stderr for that test.
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20180306173042.24572-1-dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Tested-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/block.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ tests/migration-test.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/migration/block.c b/migration/block.c
-index 87bb35ce63..41b95d1dd8 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -36,7 +36,7 @@
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 74f9361bdd..422bf1afdf 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -382,7 +382,7 @@ static void migrate_start_postcopy(QTestState *who)
+ }
  
- #define MAX_IS_ALLOCATED_SEARCH (65536 * BDRV_SECTOR_SIZE)
+ static void test_migrate_start(QTestState **from, QTestState **to,
+-                               const char *uri)
++                               const char *uri, bool hide_stderr)
+ {
+     gchar *cmd_src, *cmd_dst;
+     char *bootpath = g_strdup_printf("%s/bootsect", tmpfs);
+@@ -427,6 +427,17 @@ static void test_migrate_start(QTestState **from, QTestState **to,
  
--#define MAX_INFLIGHT_IO 512
-+#define MAX_IO_BUFFERS 512
+     g_free(bootpath);
  
- //#define DEBUG_BLK_MIGRATION
++    if (hide_stderr) {
++        gchar *tmp;
++        tmp = g_strdup_printf("%s 2>/dev/null", cmd_src);
++        g_free(cmd_src);
++        cmd_src = tmp;
++
++        tmp = g_strdup_printf("%s 2>/dev/null", cmd_dst);
++        g_free(cmd_dst);
++        cmd_dst = tmp;
++    }
++
+     *from = qtest_start(cmd_src);
+     g_free(cmd_src);
  
-@@ -775,9 +775,8 @@ static int block_save_iterate(QEMUFile *f, void *opaque)
-     while ((block_mig_state.submitted +
-             block_mig_state.read_done) * BLOCK_SIZE <
-            qemu_file_get_rate_limit(f) &&
--           (block_mig_state.submitted +
--            block_mig_state.read_done) <
--           MAX_INFLIGHT_IO) {
-+           (block_mig_state.submitted + block_mig_state.read_done) <
-+           MAX_IO_BUFFERS) {
-         blk_mig_unlock();
-         if (block_mig_state.bulk_completed == 0) {
-             /* first finish the bulk phase */
+@@ -518,7 +529,7 @@ static void test_migrate(void)
+     char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
+     QTestState *from, *to;
+ 
+-    test_migrate_start(&from, &to, uri);
++    test_migrate_start(&from, &to, uri, false);
+ 
+     migrate_set_capability(from, "postcopy-ram", "true");
+     migrate_set_capability(to, "postcopy-ram", "true");
+@@ -560,7 +571,7 @@ static void test_baddest(void)
+     const char *status;
+     bool failed;
+ 
+-    test_migrate_start(&from, &to, "tcp:0:0");
++    test_migrate_start(&from, &to, "tcp:0:0", true);
+     migrate(from, "tcp:0:0");
+     do {
+         rsp = wait_command(from, "{ 'execute': 'query-migrate' }");
 -- 
 2.14.3
