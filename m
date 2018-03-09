@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1euKl5-0001EJ-O5
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:41 -0500
+	(envelope-from <kwolf@redhat.com>) id 1euKkv-000136-Mb
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1euKl3-000748-Fk
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:39 -0500
+	(envelope-from <kwolf@redhat.com>) id 1euKku-0006rs-46
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:29 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  9 Mar 2018 17:19:07 +0100
-Message-Id: <20180309161933.8168-31-kwolf@redhat.com>
+Date: Fri,  9 Mar 2018 17:18:57 +0100
+Message-Id: <20180309161933.8168-21-kwolf@redhat.com>
 In-Reply-To: <20180309161933.8168-1-kwolf@redhat.com>
 References: <20180309161933.8168-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 30/56] file-posix: Support .bdrv_co_create
+Subject: [Qemu-devel] [PULL 20/56] qcow2: Use BlockdevRef in
+ qcow2_co_create()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,179 +23,211 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-This adds the .bdrv_co_create driver callback to file, which enables
-image creation over QMP.
+Instead of passing a separate BlockDriverState* into qcow2_co_create(),
+make use of the BlockdevRef that is included in BlockdevCreateOptions.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json | 20 ++++++++++++-
- block/file-posix.c   | 79 +++++++++++++++++++++++++++++++++++++---------------
- 2 files changed, 75 insertions(+), 24 deletions(-)
+ include/block/block.h |  1 +
+ block.c               | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ block/qcow2.c         | 39 +++++++++++++++++++++++++--------------
+ 3 files changed, 73 insertions(+), 14 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 88d7a8678d..41955b097f 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3359,6 +3359,24 @@
- { 'command': 'blockdev-del', 'data': { 'node-name': 'str' } }
- 
- ##
-+# @BlockdevCreateOptionsFile:
-+#
-+# Driver specific image creation options for file.
-+#
-+# @filename         Filename for the new image file
-+# @size             Size of the virtual disk in bytes
-+# @preallocation    Preallocation mode for the new image (default: off)
-+# @nocow            Turn off copy-on-write (valid only on btrfs; default: off)
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'BlockdevCreateOptionsFile',
-+  'data': { 'filename':         'str',
-+            'size':             'size',
-+            '*preallocation':   'PreallocMode',
-+            '*nocow':           'bool' } }
-+
-+##
- # @BlockdevQcow2Version:
- #
- # @v2:  The original QCOW2 format as introduced in qemu 0.10 (version 2)
-@@ -3429,7 +3447,7 @@
-       'bochs':          'BlockdevCreateNotSupported',
-       'cloop':          'BlockdevCreateNotSupported',
-       'dmg':            'BlockdevCreateNotSupported',
--      'file':           'BlockdevCreateNotSupported',
-+      'file':           'BlockdevCreateOptionsFile',
-       'ftp':            'BlockdevCreateNotSupported',
-       'ftps':           'BlockdevCreateNotSupported',
-       'gluster':        'BlockdevCreateNotSupported',
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 7f2cc63c60..fbc21a9921 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1982,34 +1982,25 @@ static int64_t raw_get_allocated_file_size(BlockDriverState *bs)
-     return (int64_t)st.st_blocks * 512;
+diff --git a/include/block/block.h b/include/block/block.h
+index 8b6db952a2..7805187b30 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -246,6 +246,7 @@ BdrvChild *bdrv_open_child(const char *filename,
+                            BlockDriverState* parent,
+                            const BdrvChildRole *child_role,
+                            bool allow_none, Error **errp);
++BlockDriverState *bdrv_open_blockdev_ref(BlockdevRef *ref, Error **errp);
+ void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd,
+                          Error **errp);
+ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
+diff --git a/block.c b/block.c
+index 8f1c43d037..4fc65f7621 100644
+--- a/block.c
++++ b/block.c
+@@ -34,6 +34,8 @@
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qjson.h"
+ #include "qapi/qmp/qstring.h"
++#include "qapi/qobject-output-visitor.h"
++#include "qapi/qapi-visit-block-core.h"
+ #include "sysemu/block-backend.h"
+ #include "sysemu/sysemu.h"
+ #include "qemu/notify.h"
+@@ -2406,6 +2408,51 @@ BdrvChild *bdrv_open_child(const char *filename,
+     return c;
  }
  
--static int coroutine_fn raw_co_create_opts(const char *filename, QemuOpts *opts,
--                                           Error **errp)
-+static int raw_co_create(BlockdevCreateOptions *options, Error **errp)
- {
-+    BlockdevCreateOptionsFile *file_opts;
-     int fd;
-     int result = 0;
--    int64_t total_size = 0;
--    bool nocow = false;
--    PreallocMode prealloc;
--    char *buf = NULL;
--    Error *local_err = NULL;
- 
--    strstart(filename, "file:", &filename);
-+    /* Validate options and set default values */
-+    assert(options->driver == BLOCKDEV_DRIVER_FILE);
-+    file_opts = &options->u.file;
- 
--    /* Read out options */
--    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
--                          BDRV_SECTOR_SIZE);
--    nocow = qemu_opt_get_bool(opts, BLOCK_OPT_NOCOW, false);
--    buf = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
--    prealloc = qapi_enum_parse(&PreallocMode_lookup, buf,
--                               PREALLOC_MODE_OFF, &local_err);
--    g_free(buf);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        result = -EINVAL;
--        goto out;
-+    if (!file_opts->has_nocow) {
-+        file_opts->nocow = false;
-+    }
-+    if (!file_opts->has_preallocation) {
-+        file_opts->preallocation = PREALLOC_MODE_OFF;
-     }
- 
--    fd = qemu_open(filename, O_RDWR | O_CREAT | O_TRUNC | O_BINARY,
-+    /* Create file */
-+    fd = qemu_open(file_opts->filename, O_RDWR | O_CREAT | O_TRUNC | O_BINARY,
-                    0644);
-     if (fd < 0) {
-         result = -errno;
-@@ -2017,7 +2008,7 @@ static int coroutine_fn raw_co_create_opts(const char *filename, QemuOpts *opts,
-         goto out;
-     }
- 
--    if (nocow) {
-+    if (file_opts->nocow) {
- #ifdef __linux__
-         /* Set NOCOW flag to solve performance issue on fs like btrfs.
-          * This is an optimisation. The FS_IOC_SETFLAGS ioctl return value
-@@ -2032,7 +2023,8 @@ static int coroutine_fn raw_co_create_opts(const char *filename, QemuOpts *opts,
- #endif
-     }
- 
--    result = raw_regular_truncate(fd, total_size, prealloc, errp);
-+    result = raw_regular_truncate(fd, file_opts->size, file_opts->preallocation,
-+                                  errp);
-     if (result < 0) {
-         goto out_close;
-     }
-@@ -2046,6 +2038,46 @@ out:
-     return result;
- }
- 
-+static int coroutine_fn raw_co_create_opts(const char *filename, QemuOpts *opts,
-+                                           Error **errp)
++/* TODO Future callers may need to specify parent/child_role in order for
++ * option inheritance to work. Existing callers use it for the root node. */
++BlockDriverState *bdrv_open_blockdev_ref(BlockdevRef *ref, Error **errp)
 +{
-+    BlockdevCreateOptions options;
-+    int64_t total_size = 0;
-+    bool nocow = false;
-+    PreallocMode prealloc;
-+    char *buf = NULL;
++    BlockDriverState *bs = NULL;
 +    Error *local_err = NULL;
++    QObject *obj = NULL;
++    QDict *qdict = NULL;
++    const char *reference = NULL;
++    Visitor *v = NULL;
 +
-+    /* Skip file: protocol prefix */
-+    strstart(filename, "file:", &filename);
++    if (ref->type == QTYPE_QSTRING) {
++        reference = ref->u.reference;
++    } else {
++        BlockdevOptions *options = &ref->u.definition;
++        assert(ref->type == QTYPE_QDICT);
 +
-+    /* Read out options */
-+    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
-+                          BDRV_SECTOR_SIZE);
-+    nocow = qemu_opt_get_bool(opts, BLOCK_OPT_NOCOW, false);
-+    buf = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
-+    prealloc = qapi_enum_parse(&PreallocMode_lookup, buf,
-+                               PREALLOC_MODE_OFF, &local_err);
-+    g_free(buf);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return -EINVAL;
++        v = qobject_output_visitor_new(&obj);
++        visit_type_BlockdevOptions(v, NULL, &options, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            goto fail;
++        }
++        visit_complete(v, &obj);
++
++        qdict = qobject_to_qdict(obj);
++        qdict_flatten(qdict);
++
++        /* bdrv_open_inherit() defaults to the values in bdrv_flags (for
++         * compatibility with other callers) rather than what we want as the
++         * real defaults. Apply the defaults here instead. */
++        qdict_set_default_str(qdict, BDRV_OPT_CACHE_DIRECT, "off");
++        qdict_set_default_str(qdict, BDRV_OPT_CACHE_NO_FLUSH, "off");
++        qdict_set_default_str(qdict, BDRV_OPT_READ_ONLY, "off");
 +    }
 +
-+    options = (BlockdevCreateOptions) {
-+        .driver     = BLOCKDEV_DRIVER_FILE,
-+        .u.file     = {
-+            .filename           = (char *) filename,
-+            .size               = total_size,
-+            .has_preallocation  = true,
-+            .preallocation      = prealloc,
-+            .has_nocow          = true,
-+            .nocow              = nocow,
-+        },
-+    };
-+    return raw_co_create(&options, errp);
++    bs = bdrv_open_inherit(NULL, reference, qdict, 0, NULL, NULL, errp);
++    obj = NULL;
++
++fail:
++    qobject_decref(obj);
++    visit_free(v);
++    return bs;
 +}
 +
- /*
-  * Find allocation range in @bs around offset @start.
-  * May change underlying file descriptor's file offset.
-@@ -2277,6 +2309,7 @@ BlockDriver bdrv_file = {
-     .bdrv_reopen_commit = raw_reopen_commit,
-     .bdrv_reopen_abort = raw_reopen_abort,
-     .bdrv_close = raw_close,
-+    .bdrv_co_create = raw_co_create,
-     .bdrv_co_create_opts = raw_co_create_opts,
-     .bdrv_has_zero_init = bdrv_has_zero_init_1,
-     .bdrv_co_block_status = raw_co_block_status,
+ static BlockDriverState *bdrv_append_temp_snapshot(BlockDriverState *bs,
+                                                    int flags,
+                                                    QDict *snapshot_options,
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 7679c28f57..b7df2d5cab 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2768,8 +2768,8 @@ static uint64_t qcow2_opt_get_refcount_bits_del(QemuOpts *opts, int version,
+ }
+ 
+ static int coroutine_fn
+-qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
+-                QemuOpts *opts, const char *encryptfmt, Error **errp)
++qcow2_co_create(BlockdevCreateOptions *create_options, QemuOpts *opts,
++                const char *encryptfmt, Error **errp)
+ {
+     BlockdevCreateOptionsQcow2 *qcow2_opts;
+     QDict *options;
+@@ -2786,7 +2786,8 @@ qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
+      * 2 GB for 64k clusters, and we don't want to have a 2 GB initial file
+      * size for any qcow2 image.
+      */
+-    BlockBackend *blk;
++    BlockBackend *blk = NULL;
++    BlockDriverState *bs = NULL;
+     QCowHeader *header;
+     size_t cluster_size;
+     int version;
+@@ -2795,10 +2796,15 @@ qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
+     Error *local_err = NULL;
+     int ret;
+ 
+-    /* Validate options and set default values */
+     assert(create_options->driver == BLOCKDEV_DRIVER_QCOW2);
+     qcow2_opts = &create_options->u.qcow2;
+ 
++    bs = bdrv_open_blockdev_ref(qcow2_opts->file, errp);
++    if (bs == NULL) {
++        return -EIO;
++    }
++
++    /* Validate options and set default values */
+     if (!QEMU_IS_ALIGNED(qcow2_opts->size, BDRV_SECTOR_SIZE)) {
+         error_setg(errp, "Image size must be a multiple of 512 bytes");
+         ret = -EINVAL;
+@@ -2827,7 +2833,8 @@ qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
+     }
+ 
+     if (!validate_cluster_size(cluster_size, errp)) {
+-        return -EINVAL;
++        ret = -EINVAL;
++        goto out;
+     }
+ 
+     if (!qcow2_opts->has_preallocation) {
+@@ -2838,11 +2845,13 @@ qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
+     {
+         error_setg(errp, "Backing file and preallocation cannot be used at "
+                    "the same time");
+-        return -EINVAL;
++        ret = -EINVAL;
++        goto out;
+     }
+     if (qcow2_opts->has_backing_fmt && !qcow2_opts->has_backing_file) {
+         error_setg(errp, "Backing format cannot be used without backing file");
+-        return -EINVAL;
++        ret = -EINVAL;
++        goto out;
+     }
+ 
+     if (!qcow2_opts->has_lazy_refcounts) {
+@@ -2851,7 +2860,8 @@ qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
+     if (version < 3 && qcow2_opts->lazy_refcounts) {
+         error_setg(errp, "Lazy refcounts only supported with compatibility "
+                    "level 1.1 and above (use compat=1.1 or greater)");
+-        return -EINVAL;
++        ret = -EINVAL;
++        goto out;
+     }
+ 
+     if (!qcow2_opts->has_refcount_bits) {
+@@ -2862,13 +2872,15 @@ qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
+     {
+         error_setg(errp, "Refcount width must be a power of two and may not "
+                    "exceed 64 bits");
+-        return -EINVAL;
++        ret = -EINVAL;
++        goto out;
+     }
+     if (version < 3 && qcow2_opts->refcount_bits != 16) {
+         error_setg(errp, "Different refcount widths than 16 bits require "
+                    "compatibility level 1.1 or above (use compat=1.1 or "
+                    "greater)");
+-        return -EINVAL;
++        ret = -EINVAL;
++        goto out;
+     }
+     refcount_order = ctz32(qcow2_opts->refcount_bits);
+ 
+@@ -3026,9 +3038,8 @@ qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
+ 
+     ret = 0;
+ out:
+-    if (blk) {
+-        blk_unref(blk);
+-    }
++    blk_unref(blk);
++    bdrv_unref(bs);
+     return ret;
+ }
+ 
+@@ -3157,7 +3168,7 @@ static int coroutine_fn qcow2_co_create_opts(const char *filename, QemuOpts *opt
+             .refcount_bits      = refcount_bits,
+         },
+     };
+-    ret = qcow2_co_create(bs, &create_options, opts, encryptfmt, errp);
++    ret = qcow2_co_create(&create_options, opts, encryptfmt, errp);
+     if (ret < 0) {
+         goto finish;
+     }
 -- 
 2.13.6
