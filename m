@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1euDtz-0008AR-OE
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:01:24 -0500
+	(envelope-from <peterx@redhat.com>) id 1euDu8-0008GW-3Z
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:01:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1euDty-0008Da-Pz
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:01:23 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39642 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1euDu4-0008H6-5z
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:01:32 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60284 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1euDty-0008DE-KC
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:01:22 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1euDu4-0008Gs-0E
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:01:28 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Fri,  9 Mar 2018 16:59:55 +0800
-Message-Id: <20180309090006.10018-13-peterx@redhat.com>
+Date: Fri,  9 Mar 2018 16:59:56 +0800
+Message-Id: <20180309090006.10018-14-peterx@redhat.com>
 In-Reply-To: <20180309090006.10018-1-peterx@redhat.com>
 References: <20180309090006.10018-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 12/23] monitor: let suspend_cnt be thread
- safe
+Subject: [Qemu-devel] [PATCH v8 13/23] monitor: let suspend/resume work even
+ with QMPs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,80 +27,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Monitor code now can be run in more than one thread.  Let it be thread
-safe when accessing suspend_cnt counter.
+This patches allows QMP monitors to be suspended/resumed.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+One thing to mention is that for QMPs that are using IOThreads, we need
+an explicit kick for the IOThread in case it is sleeping.
+
+Meanwhile, we need to take special care on non-interactive HMPs.
+Currently only gdbserver is using that.  For these monitors, we still
+don't allow suspend/resume operations.
+
+Since at it, add traces for the operations.
+
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- monitor.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+ monitor.c    | 47 ++++++++++++++++++++++++++++++++++++++++++++---
+ trace-events |  1 +
+ 2 files changed, 45 insertions(+), 3 deletions(-)
 
 diff --git a/monitor.c b/monitor.c
-index 6959e963e2..71b696c8f3 100644
+index 71b696c8f3..de9343be87 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -194,7 +194,7 @@ struct Monitor {
-     CharBackend chr;
-     int reset_seen;
-     int flags;
--    int suspend_cnt;
-+    int suspend_cnt;            /* Needs to be accessed atomically */
-     bool skip_flush;
-     bool use_io_thr;
- 
-@@ -3816,7 +3816,7 @@ static int monitor_can_read(void *opaque)
- {
-     Monitor *mon = opaque;
- 
--    return (mon->suspend_cnt == 0) ? 1 : 0;
-+    return !atomic_mb_read(&mon->suspend_cnt);
+@@ -250,6 +250,21 @@ static inline bool monitor_is_qmp(const Monitor *mon)
+     return (mon->flags & MONITOR_USE_CONTROL);
  }
  
- /*
-@@ -3948,7 +3948,7 @@ int monitor_suspend(Monitor *mon)
++/**
++ * Whether @mon is using readline?  Note: not all HMP monitors use
++ * readline, e.g., gdbserver has a non-interactive HMP monitor, so
++ * readline is not used there.
++ */
++static inline bool monitor_uses_readline(const Monitor *mon)
++{
++    return mon->flags & MONITOR_USE_READLINE;
++}
++
++static inline bool monitor_is_hmp_non_interactive(const Monitor *mon)
++{
++    return !monitor_is_qmp(mon) && !monitor_uses_readline(mon);
++}
++
+ /**
+  * Is the current monitor, if any, a QMP monitor?
+  */
+@@ -3946,19 +3961,45 @@ static void monitor_command_cb(void *opaque, const char *cmdline,
+ 
+ int monitor_suspend(Monitor *mon)
  {
-     if (!mon->rs)
+-    if (!mon->rs)
++    if (monitor_is_hmp_non_interactive(mon)) {
          return -ENOTTY;
--    mon->suspend_cnt++;
-+    atomic_inc(&mon->suspend_cnt);
++    }
++
+     atomic_inc(&mon->suspend_cnt);
++
++    if (monitor_is_qmp(mon)) {
++        /*
++         * Kick iothread to make sure this takes effect.  It'll be
++         * evaluated again in prepare() of the watch object.
++         */
++        aio_notify(iothread_get_aio_context(mon_global.mon_iothread));
++    }
++
++    trace_monitor_suspend(mon, 1);
      return 0;
  }
  
-@@ -3956,8 +3956,9 @@ void monitor_resume(Monitor *mon)
+ void monitor_resume(Monitor *mon)
  {
-     if (!mon->rs)
+-    if (!mon->rs)
++    if (monitor_is_hmp_non_interactive(mon)) {
          return;
--    if (--mon->suspend_cnt == 0)
-+    if (atomic_dec_fetch(&mon->suspend_cnt) == 0) {
-         readline_show_prompt(mon->rs);
 +    }
++
+     if (atomic_dec_fetch(&mon->suspend_cnt) == 0) {
+-        readline_show_prompt(mon->rs);
++        if (monitor_is_qmp(mon)) {
++            /*
++             * For QMP monitors that are running in IOThread, let's
++             * kick the thread in case it's sleeping.
++             */
++            if (mon->use_io_thr) {
++                aio_notify(iothread_get_aio_context(mon_global.mon_iothread));
++            }
++        } else {
++            assert(mon->rs);
++            readline_show_prompt(mon->rs);
++        }
+     }
++    trace_monitor_suspend(mon, -1);
  }
  
  static QObject *get_qmp_greeting(Monitor *mon)
-@@ -4022,19 +4023,19 @@ static void monitor_event(void *opaque, int event)
-             monitor_resume(mon);
-             monitor_flush(mon);
-         } else {
--            mon->suspend_cnt = 0;
-+            atomic_mb_set(&mon->suspend_cnt, 0);
-         }
-         break;
+diff --git a/trace-events b/trace-events
+index 89fcad0fd1..fe10c3b487 100644
+--- a/trace-events
++++ b/trace-events
+@@ -47,6 +47,7 @@ monitor_protocol_event_emit(uint32_t event, void *data) "event=%d data=%p"
+ monitor_protocol_event_queue(uint32_t event, void *qdict, uint64_t rate) "event=%d data=%p rate=%" PRId64
+ handle_hmp_command(void *mon, const char *cmdline) "mon %p cmdline: %s"
+ handle_qmp_command(void *mon, const char *req) "mon %p req: %s"
++monitor_suspend(void *ptr, int cnt) "mon %p: %d"
  
-     case CHR_EVENT_MUX_OUT:
-         if (mon->reset_seen) {
--            if (mon->suspend_cnt == 0) {
-+            if (atomic_mb_read(&mon->suspend_cnt) == 0) {
-                 monitor_printf(mon, "\n");
-             }
-             monitor_flush(mon);
-             monitor_suspend(mon);
-         } else {
--            mon->suspend_cnt++;
-+            atomic_inc(&mon->suspend_cnt);
-         }
-         qemu_mutex_lock(&mon->out_lock);
-         mon->mux_out = 1;
+ # dma-helpers.c
+ dma_blk_io(void *dbs, void *bs, int64_t offset, bool to_dev) "dbs=%p bs=%p offset=%" PRId64 " to_dev=%d"
 -- 
 2.14.3
