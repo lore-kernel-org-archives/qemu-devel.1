@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1euN3k-0005sa-CE
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:48:06 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1euN4j-0006wS-Ig
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:49:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1euN3j-0003Vp-B8
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:48:04 -0500
-References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
-	<1518702707-7077-7-git-send-email-vsementsov@virtuozzo.com>
-	<b570a199-9139-5652-5ad8-407820680620@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <90a94d99-17c2-00ea-fd11-8a9ebbdebb6c@virtuozzo.com>
-Date: Fri, 9 Mar 2018 21:47:50 +0300
+	(envelope-from <peter.maydell@linaro.org>) id 1euN4i-0003x2-Kk
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:49:05 -0500
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:40852)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1euN4i-0003wu-Ft
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:49:04 -0500
+Received: by mail-ot0-x243.google.com with SMTP id l12so9583181otj.7
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 10:49:04 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <b570a199-9139-5652-5ad8-407820680620@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 6/9] nbd: BLOCK_STATUS for standard
- get_block_status function: client part
+In-Reply-To: <20180309182030.GA22836@roeck-us.net>
+References: <1520444223-8389-1-git-send-email-linux@roeck-us.net>
+	<CAFEAcA-+J7MUSssjPZ5BTNzGx_4h0YANdCegGfWNzYmoNatcqg@mail.gmail.com>
+	<20180308171239.GA22206@roeck-us.net>
+	<201803081028.39635.wpaul@windriver.com>
+	<CAFEAcA9T=sydu47UGry2TVOa0gZF8SZLnaaQ5gqzTQmAgm2b1w@mail.gmail.com>
+	<20180309182030.GA22836@roeck-us.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 9 Mar 2018 18:48:43 +0000
+Message-ID: <CAFEAcA85BTihe_spKnRjraJ65YB6ja0OfG6b03ojj8cE-s410A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] fsl-imx6: Swap Ethernet interrupt defines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,77 +33,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: Bill Paul <wpaul@windriver.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Chris Healy <cphealy@gmail.com>, Jason Wang <jasowang@redhat.com>, Jean-Christophe Dubois <jcd@tribudubois.net>
 
-16.02.2018 23:40, Eric Blake wrote:
-> On 02/15/2018 07:51 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Minimal realization: only one extent in server answer is supported.
->> Flag NBD_CMD_FLAG_REQ_ONE is used to force this behavior.
-
-[...]
-
->> +=C2=A0=C2=A0=C2=A0 memcpy(extent, payload, sizeof(*extent));
->> +=C2=A0=C2=A0=C2=A0 be32_to_cpus(&extent->length);
->> +=C2=A0=C2=A0=C2=A0 be32_to_cpus(&extent->flags);
+On 9 March 2018 at 18:20, Guenter Roeck <linux@roeck-us.net> wrote:
+> On Fri, Mar 09, 2018 at 05:47:16PM +0000, Peter Maydell wrote:
+>> Thanks for that really useful writeup. So if I understand correctly
+>> we have several choices here:
+>>
+>>  (1) we could implement a model of the IOMUX block that is at least
+>>  sufficient to support guests that configure it to route the ENET interrupt
+>>  line to a GPIO pin. Then we could apply this patch that fixes the ENET
+>>  line definitions. Old kernels would continue to work (for the same
+>>  reason they worked on hardware), and new ones would work now too.
+>>  This is in some ways the preferred option, but it's possibly a lot
+>>  of code and we're nearly in freeze for 2.12.
+>>
+>>  (2) we could leave everything as it is for 2.12. This would mean that
+>>  at least we don't regress setups that used to work on older QEMU versions.
+>>  Downside is that we wouldn't be able to run Linux v4.15+, or other
+>>  guest OSes that don't have the bug that older Linux kernels do.
+>>  (Presumably we'd only do this on the understanding that we were going
+>>  to go down route (1) for 2.13.)
+>>
+>>  (3) we could apply this patch for 2.12. Linux v4.15+ now works, as
+>>  do other guest OSes that use the ENET interrupt. v4.1 and older Linux
+>>  guests that used to boot in QEMU stop doing so, and 4.2-4.9 boot but
+>>  lose the ethernet device support. Perhaps for 2.13 we might
+>>  take route (1) to make those older guests start working again.
+>>
+>> Do I have that right?
+>>
+> Pretty much.
 >
-> Instead of doing a memcpy() and then in-place bit-swizzling, you could=20
-> do the swapping as part of assignment, for one less function call (and=20
-> make the code a bit easier to extend, if we later drop our REQ_ONE=20
-> limitation on only having one extent, because you'll advance payload=20
-> as needed):
+>> None of these options seems especially palatable to me, so we're
+>> choosing the lesser evil, I think... (unless somebody wants to say
+>> that option (1) would be 20 lines of code and here's the patch :-))
+>> I guess in the absence of (1) that (3) is better than (2) ?
+>>
 >
-> extent->length =3D payload_advance32(&payload);
-> extent->flags =3D payload_advance32(&payload);
+> I would prefer (2). This is what I decided to use in my "local"
+> version of qemu. Older versions of Linux can be fixed by applying one
+> (4.2..4.9) or two (4.1 and older) upstream patches; anyone interested
+> running those kernels in qemu with Ethernet working should apply those
+> patches (or, alternatively, provide a patch adding IOMUX support to
+> qemu).
 
-Aha, yes. The funny thing is that these are my own helpers.
+Did you mean "prefer (3) [apply this patch]" ? The rest of the paragraph
+makes more sense if you did.
 
->
-> We should probably validate that the length field is a multiple of=20
-> min_block (if a server tells us that all operations must be 512-byte=20
-> aligned, then reports an extent that is smaller than 512 bytes, we=20
-> have no way to ask for the status of the second half of the sector).=20
-> Probably also something that needs to be explicitly stated in the NBD=20
-> spec. [1]
->
->> +
->> +=C2=A0=C2=A0=C2=A0 if (extent->length > orig_length) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "Protocol e=
-rror: server sent chunk=20
->> exceeding requested"
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- " region");
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EINVAL;
->
-> That matches the current spec wording, but I'm not sure I agree with=20
-> it - what's wrong with a server providing a final extent that extends=20
-> beyond the request, if the information was already available for free=20
-> (the classic example: if the server never replies with HOLE or ZERO,=20
-> then the entire file has the same status, so all requests could=20
-> trivially be replied to by taking the starting offset to the end of=20
-> the file as the returned length, rather than just clamping at the=20
-> requested length).
-
-Maybe. But our already released clients not prepared to such change =3D(
-
-But, on the other hand, this gives us possibility to understand, the the=20
-whole target (for backup/mirror) is zero in one request, skipping=20
-target-zeroing loop by 4gb chunks.. What about adding such possibility=20
-with an additionally negotiated option or something like this? (and=20
-don't we now have same possibility with something like INFO?)
-
->
->> +=C2=A0=C2=A0=C2=A0 }
->> +
->> +=C2=A0=C2=A0=C2=A0 return 0;
->> +}
->> +
->> =C2=A0 /* nbd_parse_error_payload
->> =C2=A0=C2=A0 * on success @errp contains message describing nbd error re=
-ply
->> =C2=A0=C2=A0 */
-
---=20
-Best regards,
-Vladimir
+thanks
+-- PMM
