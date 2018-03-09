@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1euPqe-0007KA-Md
+	(envelope-from <kwolf@redhat.com>) id 1euPqh-0007Mj-CT
 	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 16:46:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1euPqZ-0000pu-Hx
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 16:46:44 -0500
+	(envelope-from <kwolf@redhat.com>) id 1euPqf-0000s7-N7
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 16:46:47 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  9 Mar 2018 22:46:07 +0100
-Message-Id: <20180309214611.19122-4-kwolf@redhat.com>
+Date: Fri,  9 Mar 2018 22:46:10 +0100
+Message-Id: <20180309214611.19122-7-kwolf@redhat.com>
 In-Reply-To: <20180309214611.19122-1-kwolf@redhat.com>
 References: <20180309214611.19122-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/7] qcow: Support .bdrv_co_create
+Subject: [Qemu-devel] [PATCH 6/7] vhdx: Support .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,271 +22,248 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, jcody@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-This adds the .bdrv_co_create driver callback to qcow, which
+This adds the .bdrv_co_create driver callback to vhdx, which
 enables image creation over QMP.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-core.json |  21 +++++-
- block/qcow.c         | 196 ++++++++++++++++++++++++++++++++++-----------------
- 2 files changed, 150 insertions(+), 67 deletions(-)
+ qapi/block-core.json |  37 ++++++++++-
+ block/vhdx.c         | 174 ++++++++++++++++++++++++++++++++++++++-------------
+ 2 files changed, 167 insertions(+), 44 deletions(-)
 
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index d38058eeab..c81677c434 100644
+index 2eba0eef7e..3a65909c47 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -3497,6 +3497,25 @@
-             '*cluster-size':    'size' } }
+@@ -3699,6 +3699,41 @@
+             '*static':          'bool' } }
  
  ##
-+# @BlockdevCreateOptionsQcow:
++# @BlockdevVhdxSubformat:
 +#
-+# Driver specific image creation options for qcow.
-+#
-+# @file             Node to create the image format on
-+# @size             Size of the virtual disk in bytes
-+# @backing-file     File name of the backing file if a backing file
-+#                   should be used
-+# @encrypt          Encryption options if the image should be encrypted
++# @dynamic: Growing image file
++# @fixed:   Preallocated fixed-size imge file
 +#
 +# Since: 2.12
 +##
-+{ 'struct': 'BlockdevCreateOptionsQcow',
-+  'data': { 'file':             'BlockdevRef',
-+            'size':             'size',
-+            '*backing-file':    'str',
-+            '*encrypt':         'QCryptoBlockCreateOptions' } }
++{ 'enum': 'BlockdevVhdxSubformat',
++  'data': [ 'dynamic', 'fixed' ] }
 +
 +##
- # @BlockdevQcow2Version:
++# @BlockdevCreateOptionsVhdx:
++#
++# Driver specific image creation options for vhdx.
++#
++# @file             Node to create the image format on
++# @size             Size of the virtual disk in bytes
++# @log-size         Log size in bytes (default: 1 MB)
++# @block-size       Block size in bytes (default: 1 MB)
++# @subformat        vhdx subformat (default: dynamic)
++# @block-state-zero Force use of payload blocks of type 'ZERO'. Non-standard,
++#                   but default.  Do not set to 'off' when using 'qemu-img
++#                   convert' with subformat=dynamic.
++#
++# Since: 2.12
++##
++{ 'struct': 'BlockdevCreateOptionsVhdx',
++  'data': { 'file':                 'BlockdevRef',
++            'size':                 'size',
++            '*log-size':            'size',
++            '*block-size':          'size',
++            '*subformat':           'BlockdevVhdxSubformat',
++            '*block-state-zero':    'bool' } }
++
++##
+ # @BlockdevCreateNotSupported:
  #
- # @v2:  The original QCOW2 format as introduced in qemu 0.10 (version 2)
-@@ -3681,8 +3700,8 @@
-       'null-co':        'BlockdevCreateNotSupported',
-       'nvme':           'BlockdevCreateNotSupported',
-       'parallels':      'BlockdevCreateOptionsParallels',
-+      'qcow':           'BlockdevCreateOptionsQcow',
-       'qcow2':          'BlockdevCreateOptionsQcow2',
--      'qcow':           'BlockdevCreateNotSupported',
-       'qed':            'BlockdevCreateNotSupported',
-       'quorum':         'BlockdevCreateNotSupported',
-       'raw':            'BlockdevCreateNotSupported',
-diff --git a/block/qcow.c b/block/qcow.c
-index 47a18d9a3a..2e3770ca63 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -33,6 +33,8 @@
- #include <zlib.h>
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qstring.h"
+ # This is used for all drivers that don't support creating images.
+@@ -3753,7 +3788,7 @@
+       'ssh':            'BlockdevCreateOptionsSsh',
+       'throttle':       'BlockdevCreateNotSupported',
+       'vdi':            'BlockdevCreateOptionsVdi',
+-      'vhdx':           'BlockdevCreateNotSupported',
++      'vhdx':           'BlockdevCreateOptionsVhdx',
+       'vmdk':           'BlockdevCreateNotSupported',
+       'vpc':            'BlockdevCreateNotSupported',
+       'vvfat':          'BlockdevCreateNotSupported',
+diff --git a/block/vhdx.c b/block/vhdx.c
+index d82350d07c..0ce972381f 100644
+--- a/block/vhdx.c
++++ b/block/vhdx.c
+@@ -26,6 +26,9 @@
+ #include "block/vhdx.h"
+ #include "migration/blocker.h"
+ #include "qemu/uuid.h"
++#include "qapi/qmp/qdict.h"
 +#include "qapi/qobject-input-visitor.h"
 +#include "qapi/qapi-visit-block-core.h"
- #include "crypto/block.h"
- #include "migration/blocker.h"
- #include "block/crypto.h"
-@@ -86,6 +88,8 @@ typedef struct BDRVQcowState {
-     Error *migration_blocker;
- } BDRVQcowState;
  
-+static QemuOptsList qcow_create_opts;
+ /* Options for VHDX creation */
+ 
+@@ -39,6 +42,8 @@ typedef enum VHDXImageType {
+     VHDX_TYPE_DIFFERENCING,   /* Currently unsupported */
+ } VHDXImageType;
+ 
++static QemuOptsList vhdx_create_opts;
 +
- static int decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset);
+ /* Several metadata and region table data entries are identified by
+  * guids in  a MS-specific GUID format. */
  
- static int qcow_probe(const uint8_t *buf, int buf_size, const char *filename)
-@@ -810,62 +814,50 @@ static void qcow_close(BlockDriverState *bs)
-     error_free(s->migration_blocker);
- }
- 
--static int coroutine_fn qcow_co_create_opts(const char *filename, QemuOpts *opts,
+@@ -1792,54 +1797,63 @@ exit:
+  *    .---- ~ ----------- ~ ------------ ~ ---------------- ~ -----------.
+  *   1MB
+  */
+-static int coroutine_fn vhdx_co_create_opts(const char *filename, QemuOpts *opts,
 -                                            Error **errp)
-+static int coroutine_fn qcow_co_create(BlockdevCreateOptions *opts,
++static int coroutine_fn vhdx_co_create(BlockdevCreateOptions *opts,
 +                                       Error **errp)
  {
-+    BlockdevCreateOptionsQcow *qcow_opts;
-     int header_size, backing_filename_len, l1_size, shift, i;
-     QCowHeader header;
-     uint8_t *tmp;
-     int64_t total_size = 0;
--    char *backing_file = NULL;
--    Error *local_err = NULL;
-     int ret;
-+    BlockDriverState *bs;
-     BlockBackend *qcow_blk;
--    char *encryptfmt = NULL;
--    QDict *options;
--    QDict *encryptopts = NULL;
--    QCryptoBlockCreateOptions *crypto_opts = NULL;
-     QCryptoBlock *crypto = NULL;
- 
--    /* Read out options */
--    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
--                          BDRV_SECTOR_SIZE);
-+    assert(opts->driver == BLOCKDEV_DRIVER_QCOW);
-+    qcow_opts = &opts->u.qcow;
++    BlockdevCreateOptionsVhdx *vhdx_opts;
++    BlockBackend *blk = NULL;
++    BlockDriverState *bs = NULL;
 +
-+    /* Sanity checks */
-+    total_size = qcow_opts->size;
-     if (total_size == 0) {
-         error_setg(errp, "Image size is too small, cannot be zero length");
+     int ret = 0;
+-    uint64_t image_size = (uint64_t) 2 * GiB;
+-    uint32_t log_size   = 1 * MiB;
+-    uint32_t block_size = 0;
++    uint64_t image_size;
++    uint32_t log_size;
++    uint32_t block_size;
+     uint64_t signature;
+     uint64_t metadata_offset;
+     bool use_zero_blocks = false;
+ 
+     gunichar2 *creator = NULL;
+     glong creator_items;
+-    BlockBackend *blk;
+-    char *type = NULL;
+     VHDXImageType image_type;
+-    Error *local_err = NULL;
+ 
+-    image_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+-                          BDRV_SECTOR_SIZE);
+-    log_size = qemu_opt_get_size_del(opts, VHDX_BLOCK_OPT_LOG_SIZE, 0);
+-    block_size = qemu_opt_get_size_del(opts, VHDX_BLOCK_OPT_BLOCK_SIZE, 0);
+-    type = qemu_opt_get_del(opts, BLOCK_OPT_SUBFMT);
+-    use_zero_blocks = qemu_opt_get_bool_del(opts, VHDX_BLOCK_OPT_ZERO, true);
++    assert(opts->driver == BLOCKDEV_DRIVER_VHDX);
++    vhdx_opts = &opts->u.vhdx;
++
++    /* Validate options and set default values */
++
++    image_size = vhdx_opts->size;
++    block_size = vhdx_opts->block_size;
++
++    if (!vhdx_opts->has_log_size) {
++        log_size = DEFAULT_LOG_SIZE;
++    } else {
++        log_size = vhdx_opts->log_size;
++    }
++
++    if (!vhdx_opts->has_block_state_zero) {
++        use_zero_blocks = true;
++    } else {
++        use_zero_blocks = vhdx_opts->block_state_zero;
++    }
+ 
+     if (image_size > VHDX_MAX_IMAGE_SIZE) {
+         error_setg_errno(errp, EINVAL, "Image size too large; max of 64TB");
 -        ret = -EINVAL;
--        goto cleanup;
+-        goto exit;
 +        return -EINVAL;
      }
  
--    backing_file = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
--    encryptfmt = qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT_FORMAT);
--    if (encryptfmt) {
--        if (qemu_opt_get(opts, BLOCK_OPT_ENCRYPT)) {
--            error_setg(errp, "Options " BLOCK_OPT_ENCRYPT " and "
--                       BLOCK_OPT_ENCRYPT_FORMAT " are mutually exclusive");
--            ret = -EINVAL;
--            goto cleanup;
--        }
--    } else if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
--        encryptfmt = g_strdup("aes");
-+    if (qcow_opts->has_encrypt &&
-+        qcow_opts->encrypt->format != Q_CRYPTO_BLOCK_FORMAT_QCOW)
-+    {
-+        error_setg(errp, "Unsupported encryption format");
-+        return -EINVAL;
+-    if (type == NULL) {
+-        type = g_strdup("dynamic");
++    if (!vhdx_opts->has_subformat) {
++        vhdx_opts->subformat = BLOCKDEV_VHDX_SUBFORMAT_DYNAMIC;
      }
+ 
+-    if (!strcmp(type, "dynamic")) {
++    switch (vhdx_opts->subformat) {
++    case BLOCKDEV_VHDX_SUBFORMAT_DYNAMIC:
+         image_type = VHDX_TYPE_DYNAMIC;
+-    } else if (!strcmp(type, "fixed")) {
++        break;
++    case BLOCKDEV_VHDX_SUBFORMAT_FIXED:
+         image_type = VHDX_TYPE_FIXED;
+-    } else if (!strcmp(type, "differencing")) {
+-        error_setg_errno(errp, ENOTSUP,
+-                         "Differencing files not yet supported");
+-        ret = -ENOTSUP;
+-        goto exit;
+-    } else {
+-        error_setg(errp, "Invalid subformat '%s'", type);
+-        ret = -EINVAL;
+-        goto exit;
++        break;
++    default:
++        g_assert_not_reached();
+     }
+ 
+     /* These are pretty arbitrary, and mainly designed to keep the BAT
+@@ -1865,21 +1879,17 @@ static int coroutine_fn vhdx_co_create_opts(const char *filename, QemuOpts *opts
+     block_size = block_size > VHDX_BLOCK_SIZE_MAX ? VHDX_BLOCK_SIZE_MAX :
+                                                     block_size;
  
 -    ret = bdrv_create_file(filename, opts, &local_err);
 -    if (ret < 0) {
 -        error_propagate(errp, local_err);
--        goto cleanup;
+-        goto exit;
 +    /* Create BlockBackend to write to the image */
-+    bs = bdrv_open_blockdev_ref(qcow_opts->file, errp);
++    bs = bdrv_open_blockdev_ref(vhdx_opts->file, errp);
 +    if (bs == NULL) {
 +        return -EIO;
      }
  
--    qcow_blk = blk_new_open(filename, NULL, NULL,
--                            BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
--                            &local_err);
--    if (qcow_blk == NULL) {
+-    blk = blk_new_open(filename, NULL, NULL,
+-                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
+-                       &local_err);
+-    if (blk == NULL) {
 -        error_propagate(errp, local_err);
 -        ret = -EIO;
--        goto cleanup;
-+    qcow_blk = blk_new(BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
-+    ret = blk_insert_bs(qcow_blk, bs, errp);
+-        goto exit;
++    blk = blk_new(BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
++    ret = blk_insert_bs(blk, bs, errp);
 +    if (ret < 0) {
-+        goto exit;
++        goto delete_and_exit;
      }
 -
-     blk_set_allow_write_beyond_eof(qcow_blk, true);
+     blk_set_allow_write_beyond_eof(blk, true);
  
-+    /* Create image format */
-     ret = blk_truncate(qcow_blk, 0, PREALLOC_MODE_OFF, errp);
-     if (ret < 0) {
-         goto exit;
-@@ -877,16 +869,15 @@ static int coroutine_fn qcow_co_create_opts(const char *filename, QemuOpts *opts
-     header.size = cpu_to_be64(total_size);
-     header_size = sizeof(header);
-     backing_filename_len = 0;
--    if (backing_file) {
--        if (strcmp(backing_file, "fat:")) {
-+    if (qcow_opts->has_backing_file) {
-+        if (strcmp(qcow_opts->backing_file, "fat:")) {
-             header.backing_file_offset = cpu_to_be64(header_size);
--            backing_filename_len = strlen(backing_file);
-+            backing_filename_len = strlen(qcow_opts->backing_file);
-             header.backing_file_size = cpu_to_be32(backing_filename_len);
-             header_size += backing_filename_len;
-         } else {
-             /* special backing file for vvfat */
--            g_free(backing_file);
--            backing_file = NULL;
-+            qcow_opts->has_backing_file = false;
-         }
-         header.cluster_bits = 9; /* 512 byte cluster to avoid copying
-                                     unmodified sectors */
-@@ -901,26 +892,10 @@ static int coroutine_fn qcow_co_create_opts(const char *filename, QemuOpts *opts
+     /* Create (A) */
+@@ -1931,12 +1941,89 @@ static int coroutine_fn vhdx_co_create_opts(const char *filename, QemuOpts *opts
  
-     header.l1_table_offset = cpu_to_be64(header_size);
+ delete_and_exit:
+     blk_unref(blk);
+-exit:
+-    g_free(type);
++    bdrv_unref(bs);
+     g_free(creator);
+     return ret;
+ }
  
--    options = qemu_opts_to_qdict(opts, NULL);
--    qdict_extract_subqdict(options, &encryptopts, "encrypt.");
--    QDECREF(options);
--    if (encryptfmt) {
--        if (!g_str_equal(encryptfmt, "aes")) {
--            error_setg(errp, "Unknown encryption format '%s', expected 'aes'",
--                       encryptfmt);
--            ret = -EINVAL;
--            goto exit;
--        }
-+    if (qcow_opts->has_encrypt) {
-         header.crypt_method = cpu_to_be32(QCOW_CRYPT_AES);
- 
--        crypto_opts = block_crypto_create_opts_init(
--            Q_CRYPTO_BLOCK_FORMAT_QCOW, encryptopts, errp);
--        if (!crypto_opts) {
--            ret = -EINVAL;
--            goto exit;
--        }
--
--        crypto = qcrypto_block_create(crypto_opts, "encrypt.",
-+        crypto = qcrypto_block_create(qcow_opts->encrypt, "encrypt.",
-                                       NULL, NULL, NULL, errp);
-         if (!crypto) {
-             ret = -EINVAL;
-@@ -936,9 +911,9 @@ static int coroutine_fn qcow_co_create_opts(const char *filename, QemuOpts *opts
-         goto exit;
-     }
- 
--    if (backing_file) {
-+    if (qcow_opts->has_backing_file) {
-         ret = blk_pwrite(qcow_blk, sizeof(header),
--                         backing_file, backing_filename_len, 0);
-+                         qcow_opts->backing_file, backing_filename_len, 0);
-         if (ret != backing_filename_len) {
-             goto exit;
-         }
-@@ -959,12 +934,100 @@ static int coroutine_fn qcow_co_create_opts(const char *filename, QemuOpts *opts
-     ret = 0;
- exit:
-     blk_unref(qcow_blk);
--cleanup:
--    QDECREF(encryptopts);
--    g_free(encryptfmt);
-     qcrypto_block_free(crypto);
--    qapi_free_QCryptoBlockCreateOptions(crypto_opts);
--    g_free(backing_file);
-+    return ret;
-+}
-+
-+static int coroutine_fn qcow_co_create_opts(const char *filename,
-+                                            QemuOpts *opts, Error **errp)
++static int coroutine_fn vhdx_co_create_opts(const char *filename,
++                                            QemuOpts *opts,
++                                            Error **errp)
 +{
 +    BlockdevCreateOptions *create_options = NULL;
-+    BlockDriverState *bs = NULL;
 +    QDict *qdict = NULL;
 +    QObject *qobj;
 +    Visitor *v;
-+    const char *val;
++    BlockDriverState *bs = NULL;
 +    Error *local_err = NULL;
 +    int ret;
 +
 +    static const QDictRenames opt_renames[] = {
-+        { BLOCK_OPT_BACKING_FILE,       "backing-file" },
-+        { BLOCK_OPT_ENCRYPT,            BLOCK_OPT_ENCRYPT_FORMAT },
++        { VHDX_BLOCK_OPT_LOG_SIZE,      "log-size" },
++        { VHDX_BLOCK_OPT_BLOCK_SIZE,    "block-size" },
++        { VHDX_BLOCK_OPT_ZERO,          "block-state-zero" },
 +        { NULL, NULL },
 +    };
 +
 +    /* Parse options and convert legacy syntax */
-+    qdict = qemu_opts_to_qdict_filtered(opts, NULL, &qcow_create_opts, true);
-+
-+    val = qdict_get_try_str(qdict, BLOCK_OPT_ENCRYPT);
-+    if (val && !strcmp(val, "on")) {
-+        qdict_put_str(qdict, BLOCK_OPT_ENCRYPT, "qcow");
-+    } else if (val && !strcmp(val, "off")) {
-+        qdict_del(qdict, BLOCK_OPT_ENCRYPT);
-+    }
-+
-+    val = qdict_get_try_str(qdict, BLOCK_OPT_ENCRYPT_FORMAT);
-+    if (val && !strcmp(val, "aes")) {
-+        qdict_put_str(qdict, BLOCK_OPT_ENCRYPT_FORMAT, "qcow");
-+    }
++    qdict = qemu_opts_to_qdict_filtered(opts, NULL, &vhdx_create_opts, true);
 +
 +    if (!qdict_rename_keys(qdict, opt_renames, errp)) {
 +        ret = -EINVAL;
@@ -308,7 +285,7 @@ index 47a18d9a3a..2e3770ca63 100644
 +    }
 +
 +    /* Now get the QAPI type BlockdevCreateOptions */
-+    qdict_put_str(qdict, "driver", "qcow");
++    qdict_put_str(qdict, "driver", "vhdx");
 +    qdict_put_str(qdict, "file", bs->node_name);
 +
 +    qobj = qdict_crumple(qdict, errp);
@@ -330,31 +307,30 @@ index 47a18d9a3a..2e3770ca63 100644
 +    }
 +
 +    /* Silently round up size */
-+    assert(create_options->driver == BLOCKDEV_DRIVER_QCOW);
-+    create_options->u.qcow.size =
-+        ROUND_UP(create_options->u.qcow.size, BDRV_SECTOR_SIZE);
++    assert(create_options->driver == BLOCKDEV_DRIVER_VHDX);
++    create_options->u.vhdx.size =
++        ROUND_UP(create_options->u.vhdx.size, BDRV_SECTOR_SIZE);
 +
-+    /* Create the qcow image (format layer) */
-+    ret = qcow_co_create(create_options, errp);
-+    if (ret < 0) {
-+        goto fail;
-+    }
++    /* Create the vhdx image (format layer) */
++    ret = vhdx_co_create(create_options, errp);
 +
-+    ret = 0;
 +fail:
 +    QDECREF(qdict);
 +    bdrv_unref(bs);
 +    qapi_free_BlockdevCreateOptions(create_options);
-     return ret;
- }
- 
-@@ -1128,6 +1191,7 @@ static BlockDriver bdrv_qcow = {
-     .bdrv_close		= qcow_close,
++    return ret;
++}
++
+ /* If opened r/w, the VHDX driver will automatically replay the log,
+  * if one is present, inside the vhdx_open() call.
+  *
+@@ -2005,6 +2092,7 @@ static BlockDriver bdrv_vhdx = {
      .bdrv_child_perm        = bdrv_format_default_perms,
-     .bdrv_reopen_prepare    = qcow_reopen_prepare,
-+    .bdrv_co_create         = qcow_co_create,
-     .bdrv_co_create_opts    = qcow_co_create_opts,
-     .bdrv_has_zero_init     = bdrv_has_zero_init_1,
-     .supports_backing       = true,
+     .bdrv_co_readv          = vhdx_co_readv,
+     .bdrv_co_writev         = vhdx_co_writev,
++    .bdrv_co_create         = vhdx_co_create,
+     .bdrv_co_create_opts    = vhdx_co_create_opts,
+     .bdrv_get_info          = vhdx_get_info,
+     .bdrv_co_check          = vhdx_co_check,
 -- 
 2.13.6
