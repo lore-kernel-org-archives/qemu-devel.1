@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1euOR4-0007t9-CR
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:16:15 -0500
+	(envelope-from <groeck7@gmail.com>) id 1euOUC-0000wM-KF
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:19:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1euOR3-0002Z3-HO
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:16:14 -0500
-References: <20180309172713.26318-1-kwolf@redhat.com>
-	<20180309172713.26318-4-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <bfa97e2b-6a2a-eadc-d48d-e36ad9bc8985@redhat.com>
-Date: Fri, 9 Mar 2018 14:15:58 -0600
+	(envelope-from <groeck7@gmail.com>) id 1euOU9-0003dJ-G5
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:19:28 -0500
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:34289)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <groeck7@gmail.com>) id 1euOU9-0003d0-8H
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:19:25 -0500
+Received: by mail-pl0-x243.google.com with SMTP id u13-v6so5836451plq.1
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 12:19:25 -0800 (PST)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Fri, 9 Mar 2018 12:19:21 -0800
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <20180309201921.GA28623@roeck-us.net>
+References: <1520444223-8389-1-git-send-email-linux@roeck-us.net>
+	<CAFEAcA-+J7MUSssjPZ5BTNzGx_4h0YANdCegGfWNzYmoNatcqg@mail.gmail.com>
+	<20180308171239.GA22206@roeck-us.net>
+	<201803081028.39635.wpaul@windriver.com>
+	<CAFEAcA9T=sydu47UGry2TVOa0gZF8SZLnaaQ5gqzTQmAgm2b1w@mail.gmail.com>
+	<20180309182030.GA22836@roeck-us.net>
+	<CAFEAcA85BTihe_spKnRjraJ65YB6ja0OfG6b03ojj8cE-s410A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180309172713.26318-4-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/6] luks: Support .bdrv_co_create
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA85BTihe_spKnRjraJ65YB6ja0OfG6b03ojj8cE-s410A@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] fsl-imx6: Swap Ethernet interrupt defines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +35,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Bill Paul <wpaul@windriver.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Chris Healy <cphealy@gmail.com>, Jason Wang <jasowang@redhat.com>, Jean-Christophe Dubois <jcd@tribudubois.net>
 
-On 03/09/2018 11:27 AM, Kevin Wolf wrote:
-> This adds the .bdrv_co_create driver callback to luks, which enables
-> image creation over QMP.
+On Fri, Mar 09, 2018 at 06:48:43PM +0000, Peter Maydell wrote:
+> On 9 March 2018 at 18:20, Guenter Roeck <linux@roeck-us.net> wrote:
+> > On Fri, Mar 09, 2018 at 05:47:16PM +0000, Peter Maydell wrote:
+> >> Thanks for that really useful writeup. So if I understand correctly
+> >> we have several choices here:
+> >>
+> >>  (1) we could implement a model of the IOMUX block that is at least
+> >>  sufficient to support guests that configure it to route the ENET interrupt
+> >>  line to a GPIO pin. Then we could apply this patch that fixes the ENET
+> >>  line definitions. Old kernels would continue to work (for the same
+> >>  reason they worked on hardware), and new ones would work now too.
+> >>  This is in some ways the preferred option, but it's possibly a lot
+> >>  of code and we're nearly in freeze for 2.12.
+> >>
+> >>  (2) we could leave everything as it is for 2.12. This would mean that
+> >>  at least we don't regress setups that used to work on older QEMU versions.
+> >>  Downside is that we wouldn't be able to run Linux v4.15+, or other
+> >>  guest OSes that don't have the bug that older Linux kernels do.
+> >>  (Presumably we'd only do this on the understanding that we were going
+> >>  to go down route (1) for 2.13.)
+> >>
+> >>  (3) we could apply this patch for 2.12. Linux v4.15+ now works, as
+> >>  do other guest OSes that use the ENET interrupt. v4.1 and older Linux
+> >>  guests that used to boot in QEMU stop doing so, and 4.2-4.9 boot but
+> >>  lose the ethernet device support. Perhaps for 2.13 we might
+> >>  take route (1) to make those older guests start working again.
+> >>
+> >> Do I have that right?
+> >>
+> > Pretty much.
+> >
+> >> None of these options seems especially palatable to me, so we're
+> >> choosing the lesser evil, I think... (unless somebody wants to say
+> >> that option (1) would be 20 lines of code and here's the patch :-))
+> >> I guess in the absence of (1) that (3) is better than (2) ?
+> >>
+> >
+> > I would prefer (2). This is what I decided to use in my "local"
+> > version of qemu. Older versions of Linux can be fixed by applying one
+> > (4.2..4.9) or two (4.1 and older) upstream patches; anyone interested
+> > running those kernels in qemu with Ethernet working should apply those
+> > patches (or, alternatively, provide a patch adding IOMUX support to
+> > qemu).
 > 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->   qapi/block-core.json | 17 ++++++++++++++++-
->   block/crypto.c       | 34 ++++++++++++++++++++++++++++++++++
->   2 files changed, 50 insertions(+), 1 deletion(-)
+> Did you mean "prefer (3) [apply this patch]" ? The rest of the paragraph
+> makes more sense if you did.
 > 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 524d51567a..07039bfe9c 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -3452,6 +3452,21 @@
->               '*preallocation':   'PreallocMode' } }
->   
->   ##
-> +# @BlockdevCreateOptionsLUKS:
-> +#
-> +# Driver specific image creation options for LUKS.
-> +#
-> +# @file             Node to create the image format on
-> +# @size             Size of the virtual disk in bytes
-> +#
-> +# Since: 2.12
+Yes, sorry.
 
-Well, as long as we make it by Tuesday :)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Guenter
