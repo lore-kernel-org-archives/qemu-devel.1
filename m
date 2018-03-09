@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1euFN0-00070E-ET
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:35:27 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1euFO0-0007iO-CI
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:36:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1euFMz-0004XT-Gk
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:35:26 -0500
-References: <20180308223946.26784-1-f4bug@amsat.org>
-	<20180308223946.26784-8-f4bug@amsat.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <d649ccc6-0b91-40d7-38f0-2fbc3a57494b@ilande.co.uk>
-Date: Fri, 9 Mar 2018 10:35:08 +0000
+	(envelope-from <peter.maydell@linaro.org>) id 1euFNz-0004yt-86
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:36:28 -0500
+Received: from mail-oi0-x231.google.com ([2607:f8b0:4003:c06::231]:34648)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1euFNz-0004yZ-2b
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:36:27 -0500
+Received: by mail-oi0-x231.google.com with SMTP id c83so6655614oib.1
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 02:36:26 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180308223946.26784-8-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 07/25] hw/isa/pc87312: Use 'unsigned int'
- for the irq value
+In-Reply-To: <20180308180423.941-1-cohuck@redhat.com>
+References: <20180308180423.941-1-cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 9 Mar 2018 10:36:05 +0000
+Message-ID: <CAFEAcA9J2TuzhLFyuQ7gL7fpE3Cq-nN4pUfXry0S9RcJO4DF=A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/11] s390x patches for the 2.12 softfreeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,46 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Marcel Apfelbaum <marcel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexey Kardashevskiy <aik@ozlabs.ru>, Thomas Huth <thuth@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, "open list:PReP" <qemu-ppc@nongnu.org>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Yongbok Kim <yongbok.kim@mips.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-On 08/03/18 22:39, Philippe Mathieu-Daudé wrote:
+On 8 March 2018 at 18:04, Cornelia Huck <cohuck@redhat.com> wrote:
+> Note that this currently does not work on s390x/tcg (needs "memory: fix
+> flatview_access_valid RCU read lock/unlock imbalance", which hopefully
+> should be submitted soon) -- s390x/kvm is fine.
+>
+> The following changes since commit 83d2e94cba776c02c761a5d14b5c2504796a8c0a:
+>
+>   Merge remote-tracking branch 'remotes/mcayland/tags/qemu-sparc-signed' into staging (2018-03-08 13:42:26 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/cohuck/qemu tags/s390x-20180308
+>
+> for you to fetch changes up to 24118af846868bb22e573be206c63e684ba9846a:
+>
+>   s390x/virtio: Convert virtio-ccw from *_exit to *_unrealize (2018-03-08 17:22:20 +0100)
+>
+> ----------------------------------------------------------------
+> Fixes and cleanups for the 2.12 softfreeze.
+>
+> ----------------------------------------------------------------
+>
 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->   hw/isa/pc87312.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/isa/pc87312.c b/hw/isa/pc87312.c
-> index 105c23e680..fda91fed21 100644
-> --- a/hw/isa/pc87312.c
-> +++ b/hw/isa/pc87312.c
-> @@ -76,9 +76,9 @@ static inline uint16_t get_parallel_iobase(PC87312State *s)
->       return parallel_base[s->regs[REG_FAR] & FAR_PARALLEL_ADDR];
->   }
->   
-> -static const uint32_t parallel_irq[] = { 5, 7, 5, 0 };
-> +static const unsigned int parallel_irq[] = { 5, 7, 5, 0 };
->   
-> -static inline uint32_t get_parallel_irq(PC87312State *s)
-> +static inline unsigned int get_parallel_irq(PC87312State *s)
->   {
->       int idx;
->       idx = (s->regs[REG_FAR] & FAR_PARALLEL_ADDR);
-> @@ -110,7 +110,7 @@ static inline uint16_t get_uart_iobase(PC87312State *s, int i)
->       }
->   }
->   
-> -static inline uint32_t get_uart_irq(PC87312State *s, int i)
-> +static inline unsigned int get_uart_irq(PC87312State *s, int i)
->   {
->       int idx;
->       idx = (s->regs[REG_FAR] >> (2 * i + 2)) & 0x3;
-> 
+Applied, thanks.
 
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-
-ATB,
-
-Mark.
+-- PMM
