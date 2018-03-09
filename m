@@ -1,15 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groeck7@gmail.com>) id 1euPrF-0007mH-NR
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 16:47:22 -0500
+	(envelope-from <cota@braap.org>) id 1euPts-0001GZ-UE
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 16:50:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groeck7@gmail.com>) id 1euPrE-000110-L1
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 16:47:21 -0500
-Sender: Guenter Roeck <groeck7@gmail.com>
-From: Guenter Roeck <linux@roeck-us.net>
-Date: Fri,  9 Mar 2018 13:47:03 -0800
-Message-Id: <1520632024-31535-1-git-send-email-linux@roeck-us.net>
-Subject: [Qemu-devel] [PATCH v2] fsl-imx6: Swap Ethernet interrupt defines
+	(envelope-from <cota@braap.org>) id 1euPto-0001vx-2h
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 16:50:05 -0500
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:47405)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1euPtn-0001vB-QO
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 16:49:59 -0500
+Date: Fri, 9 Mar 2018 16:49:57 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180309214957.GA32140@flamenco>
+References: <CAHNT7NtB16m=Sn7bWugeOOiqVyeCT4Z7VrXijMDVZBA+tUdgPw@mail.gmail.com>
+	<CAFEAcA_rPkjEgNc=uyQ2C+at8Zs28YZVAkOLAZk17JaVyjxuNw@mail.gmail.com>
+	<CAHNT7NvZER8r0Jk2K_vLeB53tDS=rcpZg7S3Yy-7OFy=Gt+4CA@mail.gmail.com>
+	<CAHNT7NtLVFU08oC0ReduK-2mFBwgwjvgfEWaZpYFY-GkjKWv=g@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHNT7NtLVFU08oC0ReduK-2mFBwgwjvgfEWaZpYFY-GkjKWv=g@mail.gmail.com>
+Subject: Re: [Qemu-devel] Apparently fpu/softfloat.c:1374 is reachable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,85 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Peter Chubb <peter.chubb@nicta.com.au>, Jason Wang <jasowang@redhat.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, Andrey Smirnov <andrew.smirnov@gmail.com>, Chris Healy <cphealy@gmail.com>, Bill Paul <wpaul@windriver.com>, Guenter Roeck <linux@roeck-us.net>
+To: Michael Clark <mjc@sifive.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan O'Rear <sorear2@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-The sabrelite machine model used by qemu-system-arm is based on the
-Freescale/NXP i.MX6Q processor. This SoC has an on-board ethernet
-controller which is supported in QEMU using the imx_fec.c module
-(actually called imx.enet for this model.)
+On Fri, Mar 09, 2018 at 11:34:56 +0000, Michael Clark wrote:
+> BTW how does one hide signed-off-by or cc email addresses with the
+> git-send-email workflow?
 
-The include/hw/arm/fsm-imx6.h file defines the interrupt vectors for the
-imx.enet device like this:
+You just don't.
 
- #define FSL_IMX6_ENET_MAC_1588_IRQ 118
- #define FSL_IMX6_ENET_MAC_IRQ 119
+> Seems like editing the patch after git format-patch is likely the only way
+> around for contributors whose wishes I might not have honoured, except
+> originally when I was using an advoc albeit buggy workflow, where the Cc’s
+> et all we’re later added to the patch headers and not the commits. I’ve
+> probably inadvertently violated someone’s wish to keep their email address
+> out of the list archives, which is an understandable wish.
 
-According to https://www.nxp.com/docs/en/reference-manual/IMX6DQRM.pdf,
-page 225, in Table 3-1. ARM Cortex A9 domain interrupt summary,
-interrupts are as follows.
+If that's their wish I'd say just use the --cc flag; they get to keep
+their address hidden from public commit messages, at the expense of (possibly)
+being Cc'ed on more emails than they need to. I think it's a
+reasonable trade-off.
 
-150 ENET MAC 0 IRQ
-151 ENET MAC 0 1588 Timer interrupt
+That said, if they really want to hide their address from others,
+you should use --bcc. But then they wouldn't receive the replies.
 
-where
+> This is not an issue with GitHub PR’s as they keep identity information
+> differently however slicing up the port for upstreaming has lost some of
+> our contributor history. I have made tags before every squash and rebase so
+> we can find all history in the riscv repo, as well as previously trying to
+> keep personal emails out of the cover letters in the first series. With the
+> change to the git-sendemail  workflow i’ve likely regressed here.
+> 
+> I also probably have to manually edit patches to add ‘Cc to the
+> riscv-patches mailing list, as it doesn’t seem right to put that email in
+> the commit messages.
 
-150 - 32 == 118
-151 - 32 == 119
+Isn't Cc'ing riscv-patches an obvious use case for using the --cc flag?
+(BTW You can add as many --cc's as you want, and these apply to all patches
+in a series.)
 
-In other words, the vector definitions in the fsl-imx6.h file are reversed.
+		E.
 
-Fixing the interrupts alone causes problems with older Linux kernels:
-The Ethernet interface will fail to probe with Linux v4.9 and earlier.
-Linux v4.1 and earlier will crash due to a bug in Ethernet driver probe
-error handling. This is a Linux kernel problem, not a qemu problem:
-the Linux kernel only worked by accident since it requested both interrupts.
-
-For backward compatibility, generate the Ethernet interrupt on both interrupt
-lines. This was shown to work from all Linux kernel releases starting with
-v3.16.
-
-Link: https://bugs.launchpad.net/qemu/+bug/1753309
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
----
-v2: Generate Ethernet interrupts on both interrupt lines
-
- hw/net/imx_fec.c          | 7 ++++++-
- include/hw/arm/fsl-imx6.h | 4 ++--
- 2 files changed, 8 insertions(+), 3 deletions(-)
-
-diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
-index 9506f9b..d3ae7db 100644
---- a/hw/net/imx_fec.c
-+++ b/hw/net/imx_fec.c
-@@ -417,7 +417,12 @@ static void imx_enet_write_bd(IMXENETBufDesc *bd, dma_addr_t addr)
- 
- static void imx_eth_update(IMXFECState *s)
- {
--    if (s->regs[ENET_EIR] & s->regs[ENET_EIMR] & ENET_INT_TS_TIMER) {
-+    /*
-+     * Generate ENET_INT_MAC interrrupts on both interrupt lines for
-+     * backward compatibility with Linux kernel versions 4.9 and older.
-+     */
-+    if (s->regs[ENET_EIR] & s->regs[ENET_EIMR] &
-+        (ENET_INT_MAC | ENET_INT_TS_TIMER)) {
-         qemu_set_irq(s->irq[1], 1);
-     } else {
-         qemu_set_irq(s->irq[1], 0);
-diff --git a/include/hw/arm/fsl-imx6.h b/include/hw/arm/fsl-imx6.h
-index ec6c509..06f8aae 100644
---- a/include/hw/arm/fsl-imx6.h
-+++ b/include/hw/arm/fsl-imx6.h
-@@ -438,8 +438,8 @@ typedef struct FslIMX6State {
- #define FSL_IMX6_HDMI_MASTER_IRQ 115
- #define FSL_IMX6_HDMI_CEC_IRQ 116
- #define FSL_IMX6_MLB150_LOW_IRQ 117
--#define FSL_IMX6_ENET_MAC_1588_IRQ 118
--#define FSL_IMX6_ENET_MAC_IRQ 119
-+#define FSL_IMX6_ENET_MAC_IRQ 118
-+#define FSL_IMX6_ENET_MAC_1588_IRQ 119
- #define FSL_IMX6_PCIE1_IRQ 120
- #define FSL_IMX6_PCIE2_IRQ 121
- #define FSL_IMX6_PCIE3_IRQ 122
--- 
-2.7.4
+PS. As always, remember to use --dry-run =)
