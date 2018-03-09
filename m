@@ -1,34 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farosas@linux.vnet.ibm.com>) id 1euMf3-0005LD-Ca
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:22:34 -0500
+	(envelope-from <farosas@linux.vnet.ibm.com>) id 1euMfD-0005U1-KJ
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:22:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farosas@linux.vnet.ibm.com>) id 1euMez-0001gb-Au
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:22:33 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36124
+	(envelope-from <farosas@linux.vnet.ibm.com>) id 1euMf9-0001jH-JE
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:22:43 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36486
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <farosas@linux.vnet.ibm.com>)
-	id 1euMez-0001fy-5K
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:22:29 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w29IKK6v003602
-	for <qemu-devel@nongnu.org>; Fri, 9 Mar 2018 13:22:27 -0500
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gkxkfj3he-1
+	id 1euMf9-0001j9-E1
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:22:39 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w29IKJeh061885
+	for <qemu-devel@nongnu.org>; Fri, 9 Mar 2018 13:22:39 -0500
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2gkuw89awn-1
 	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 13:22:26 -0500
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 13:22:38 -0500
 Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <farosas@linux.vnet.ibm.com>;
-	Fri, 9 Mar 2018 13:22:26 -0500
+	Fri, 9 Mar 2018 13:22:38 -0500
 From: Fabiano Rosas <farosas@linux.vnet.ibm.com>
-Date: Fri,  9 Mar 2018 15:21:56 -0300
-Message-Id: <20180309182202.31206-1-farosas@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 0/5] block: Ensure non-protocol drivers can
- only be selected explicitly
+Date: Fri,  9 Mar 2018 15:21:57 -0300
+In-Reply-To: <20180309182202.31206-1-farosas@linux.vnet.ibm.com>
+References: <20180309182202.31206-1-farosas@linux.vnet.ibm.com>
+Message-Id: <20180309182202.31206-2-farosas@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 1/5] block/replication: Remove protocol_name
+ field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,56 +40,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, Wen Congyang <wencongyang2@huawei.com>, Xie Changlong <xiechanglong.d@gmail.com>
 
-Block drivers can be selected by either protocol syntax:
+The replication driver is only selected explicitly (via
+driver=replication,mode=primary,...) so it is not a protocol driver.
 
-  <protocol>:<filename>[:options]
-
-or explicitly:
-
-  driver=<driver>[,option=<opt1>...]
-
-For the protocol syntax to work, drivers should set the protocol_name
-field of the BlockDriver structure and provide bdrv_file_open and
-bdrv_parse_filename implementations.
-
-Conversely, block drivers that do not support the protocol syntax
-should instead implement bdrv_open and not have a protocol_name field.
-
-Some drivers do not currently adhere to this and errors arise when
-trying to select them using the protocol syntax. For instance:
+This patch removes the protocol_name field from the brdv_replication
+structure so that attempts to invoke this driver using protocol
+syntax (i.e. replication:<filename:options:...>) will fail gracefully:
 
   $ qemu-img info replication:foo
-  qemu-img: block.c:2401: bdrv_open_inherit: \
-  Assertion `!!(flags & BDRV_O_PROTOCOL) == !!drv->bdrv_file_open' failed.
-  Aborted (core dumped)
+  qemu-img: Could not open 'replication:': Unknown protocol 'replication'
 
-This patch-set ensures that the following drivers are meeting the
-above criteria:
-- blkreplay
-- quorum
-- replication
-- throttle
+Buglink: https://bugs.launchpad.net/qemu/+bug/1726733
+Signed-off-by: Fabiano Rosas <farosas@linux.vnet.ibm.com>
+---
+ block/replication.c | 1 -
+ replication.h       | 1 -
+ 2 files changed, 2 deletions(-)
 
-Aside from that, documentation was added to make the above more
-explicit.
-
-
-Fabiano Rosas (5):
-  block/replication: Remove protocol_name field
-  block/quorum: Remove protocol-related fields
-  block/throttle: Remove protocol-related fields
-  block/blkreplay: Remove protocol-related fields
-  include/block/block_int: Document protocol related functions
-
- block/blkreplay.c         | 3 +--
- block/quorum.c            | 3 +--
- block/replication.c       | 1 -
- block/throttle.c          | 3 +--
- include/block/block_int.h | 6 ++++++
- replication.h             | 1 -
- 6 files changed, 9 insertions(+), 8 deletions(-)
-
---
+diff --git a/block/replication.c b/block/replication.c
+index f98ef094b9..6c0c7186d9 100644
+--- a/block/replication.c
++++ b/block/replication.c
+@@ -703,7 +703,6 @@ static void replication_stop(ReplicationState *rs, bool failover, Error **errp)
+ 
+ BlockDriver bdrv_replication = {
+     .format_name                = "replication",
+-    .protocol_name              = "replication",
+     .instance_size              = sizeof(BDRVReplicationState),
+ 
+     .bdrv_open                  = replication_open,
+diff --git a/replication.h b/replication.h
+index 8faefe005f..4c8354de23 100644
+--- a/replication.h
++++ b/replication.h
+@@ -67,7 +67,6 @@ typedef struct ReplicationState ReplicationState;
+  *
+  * BlockDriver bdrv_replication = {
+  *     .format_name                = "replication",
+- *     .protocol_name              = "replication",
+  *     .instance_size              = sizeof(BDRVReplicationState),
+  *
+  *     .bdrv_open                  = replication_open,
+-- 
 2.13.6
