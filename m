@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1euGBf-00019A-VR
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:27:49 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1euGCT-0001bs-FI
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:28:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1euGBc-0003pj-RV
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:27:47 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44624 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1euGBc-0003pc-Mf
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:27:44 -0500
-Date: Fri, 9 Mar 2018 12:27:23 +0100
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20180309112723.deci6fc2k66pbwdj@eukaryote>
-References: <20180307144951.d75lo5rgzi2vf27z@eukaryote>
-	<90ba320e-2a05-8962-dc6b-252b3e15d1b7@redhat.com>
-	<20180308154730.GZ4718@redhat.com>
-	<c455f46b-dc25-fe7e-acc8-140f4a703e94@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1euGCQ-0003yZ-B3
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:28:37 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:56303)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1euGCQ-0003yC-4W
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:28:34 -0500
+Received: by mail-wm0-x242.google.com with SMTP id q83so3293941wme.5
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 03:28:34 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180309110152.16109-1-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1b247bd6-9d14-ff31-c406-3c9bf081faef@amsat.org>
+Date: Fri, 9 Mar 2018 12:28:31 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <c455f46b-dc25-fe7e-acc8-140f4a703e94@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC] Defining firmware (OVMF,
- et al) metadata format & file
+In-Reply-To: <20180309110152.16109-1-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] build: try improve handling of clang
+ warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +35,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, kraxel@redhat.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Thu, Mar 08, 2018 at 09:47:27PM +0100, Laszlo Ersek wrote:
-> On 03/08/18 16:47, Daniel P. Berrang=E9 wrote:
-> > On Thu, Mar 08, 2018 at 12:10:30PM +0100, Laszlo Ersek wrote:
+On 03/09/2018 12:01 PM, Gerd Hoffmann wrote:
+> This patch disables the pragma diagnostic -Wunused-but-set-variable for
+> clang in util/coroutine-ucontext.c.
+> 
+> This in turn allows us to remove it from the configure check, so the
+> CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE will succeed for clang.
+> 
+> With that in place clang builds (linux) will use -Werror by default,
+> which breaks the build due to warning about unaligned struct members.
+> 
+> Given that our structs are often dictated by the hardware qemu emulates
+> and the file formats we use this can't be fixed easily, so I think it is
+> reasonaable to turn off this warning.  Do so by adding
 
-[...]
+reasonable
 
-> >> For OVMF (x86), I guess the initial set of properties should come fr=
-om
-> >> the "-D FOO[=3DBAR]" build flags that OVMF currently supports. (The =
-list
-> >> might grow or change incompatibly over time, so this is just a raw
-> >> starter idea.)
-> >=20
-> > I really don't want to see us using firmware implementation specific
-> > property names in these files. It means libvirt will require knowledg=
-e
-> > of what each different firmware's property names mean.
-> >=20
-> > We need to have some core standardized set of property names that can
-> > be provided by any firmware implementation using the same terminology=
-.
-> >=20
-> > If we want to /also/ provide some extra firmeware-specific property
-> > names that would be ok for informative purposes, but when lbivirt is
-> > picking which firmware file to use, it would only ever look at the
-> > standardized property names/values.
->=20
-> This is a reasonable requirement from the libvirt side.
->=20
-> Unfortunately (or not), it requires someone (or a tight group of people=
-)
-> to collect the features of all virtual firmwares in existence, and
-> extract a common set of properties that maps back to each firmware one
-> way or another.=20
+> -Wno-address-of-packed-member to our list of warning flags.
+> 
+> Now clang builds qemu without warnings.  Well, almost.  There are some
+> left in the rdma code.  Leaving that to the rdma people.  All others can
+> use --disable-rdma to workarounds this.
+> 
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-Hmm, if people consider the above worthwhile (no clue how much time &
-investigation it takes to arrive at a common set of properties) maybe
-slowly we should start collecting such a page?  From a quick look up,
-list of open source firmware implementations I found so (besides OVMF &
-ArmVirt):
+This looks the clever way to fix this.
 
-  - OpenBIOS
-  - SmartFirmware
-  - OpenBoot
-  - CoreBoot
-  - U-Boot
-  - SLOF
-  - ...
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Source: https://en.wikipedia.org/wiki/OpenBIOS
-
-I notice you said "virtual firmwares".  I couldn't find such a list from
-my look up.
-
-Hmm, I also wonder if the "arriving at a common set of properties across
-existing virtual firmwares" is an absolute blocker.
-
-> This is not unusual (basically this is how all standards
-> bodies work that intend to codify existing practice), it just needs a
-> bunch of work and coordination. We'll have to maintain a registry.
->=20
-> Personally I can't comment on anything else than OVMF and the ArmVirt
-> firmwares.
->=20
-> Thanks,
-> Laszlo
-
---=20
-/kashyap
+> ---
+>  configure                 | 2 +-
+>  util/coroutine-ucontext.c | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index 6f3921c02a..5e4310b910 100755
+> --- a/configure
+> +++ b/configure
+> @@ -1692,6 +1692,7 @@ gcc_flags="-Wno-missing-include-dirs -Wempty-body -Wnested-externs $gcc_flags"
+>  gcc_flags="-Wendif-labels -Wno-shift-negative-value $gcc_flags"
+>  gcc_flags="-Wno-initializer-overrides -Wexpansion-to-defined $gcc_flags"
+>  gcc_flags="-Wno-string-plus-int $gcc_flags"
+> +gcc_flags="-Wno-address-of-packed-member $gcc_flags"
+>  # Note that we do not add -Werror to gcc_flags here, because that would
+>  # enable it for all configure tests. If a configure test failed due
+>  # to -Werror this would just silently disable some features,
+> @@ -4860,7 +4861,6 @@ fi
+>  pragma_disable_unused_but_set=no
+>  cat > $TMPC << EOF
+>  #pragma GCC diagnostic push
+> -#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+>  #pragma GCC diagnostic ignored "-Wstrict-prototypes"
+>  #pragma GCC diagnostic pop
+>  
+> diff --git a/util/coroutine-ucontext.c b/util/coroutine-ucontext.c
+> index 926d3402e3..090ba21a13 100644
+> --- a/util/coroutine-ucontext.c
+> +++ b/util/coroutine-ucontext.c
+> @@ -170,7 +170,7 @@ Coroutine *qemu_coroutine_new(void)
+>  }
+>  
+>  #ifdef CONFIG_VALGRIND_H
+> -#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
+> +#if defined(CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE) && !defined(__clang__)
+>  /* Work around an unused variable in the valgrind.h macro... */
+>  #pragma GCC diagnostic push
+>  #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+> @@ -179,7 +179,7 @@ static inline void valgrind_stack_deregister(CoroutineUContext *co)
+>  {
+>      VALGRIND_STACK_DEREGISTER(co->valgrind_stack_id);
+>  }
+> -#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
+> +#if defined(CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE) && !defined(__clang__)
+>  #pragma GCC diagnostic pop
+>  #endif
+>  #endif
+> 
