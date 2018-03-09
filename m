@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1euGgd-0007OK-To
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:59:49 -0500
+	(envelope-from <prvs=5995bc012=Ian.Jackson@citrix.com>)
+	id 1euGoK-0000X8-Fp
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 07:07:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1euGga-0007be-P8
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:59:48 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54366 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1euGga-0007bY-HS
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:59:44 -0500
-Date: Fri, 9 Mar 2018 11:59:29 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180309115928.GB3214@work-vm>
-References: <1520229653-10658-1-git-send-email-yulei.zhang@intel.com>
-	<1520229653-10658-4-git-send-email-yulei.zhang@intel.com>
+	(envelope-from <prvs=5995bc012=Ian.Jackson@citrix.com>)
+	id 1euGoH-0002JP-8A
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 07:07:44 -0500
+Received: from smtp.citrix.com ([66.165.176.89]:11756)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=5995bc012=Ian.Jackson@citrix.com>)
+	id 1euGoH-0002HP-0z
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 07:07:41 -0500
+From: Ian Jackson <ian.jackson@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1520229653-10658-4-git-send-email-yulei.zhang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH V3 3/4] vfio: Add struct vfio_vmstate_info
- to introduce put/get callback funtion for vfio device status save/restore
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Message-ID: <23202.30969.590920.764930@mariner.uk.xensource.com>
+Date: Fri, 9 Mar 2018 12:07:21 +0000
+In-Reply-To: <23202.28943.344150.512881@mariner.uk.xensource.com>
+References: <1520530757-4477-1-git-send-email-ian.jackson@eu.citrix.com>
+	<1520530757-4477-4-git-send-email-ian.jackson@eu.citrix.com>
+	<20180308200345.GD3417@localhost.localdomain>
+	<23202.28943.344150.512881@mariner.uk.xensource.com>
+Subject: Re: [Qemu-devel] [PATCH 03/11] xen: defer call to xen_restrict
+ until just before os_setup_post
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,228 +33,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yulei Zhang <yulei.zhang@intel.com>
-Cc: qemu-devel@nongnu.org, kevin.tian@intel.com, alex.williamson@redhat.com, kwankhede@nvidia.com, zhenyuw@linux.intel.com
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Michael S.
+	Tsirkin" <mst@redhat.com>
 
-* Yulei Zhang (yulei.zhang@intel.com) wrote:
-> Introduce vfio_device_put/vfio_device_get funtion for vfio device state
-> save/restore usage.
+Ian Jackson writes ("Re: [PATCH 03/11] xen: defer call to xen_restrict until just before os_setup_post"):
+> Eduardo Habkost writes ("Re: [PATCH 03/11] xen: defer call to xen_restrict until just before os_setup_post"):
+> > I don't think we should have accelerator-specific code in main(),
+> > if we already have accelerator classes that can abstract that
+> > out.  I suggest adding a AccelClass;:setup_post() method that can
+> > be called here.
 > 
-> For VFIO pci device status migrate, on the source side with
-> funtion vfio_device_put to save the following states
-> 1. pci configuration space addr0~addr5
-> 2. pci configuration space msi_addr msi_data
-> 3. pci device status fetch from device driver
-> 
-> And on the target side with funtion vfio_device_get to restore
-> the same states
-> 1. re-setup the pci bar configuration
-> 2. re-setup the pci device msi configuration
-> 3. restore the pci device status
-> 
-> Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
-> ---
->  hw/vfio/pci.c              | 137 +++++++++++++++++++++++++++++++++++++++++++++
->  linux-headers/linux/vfio.h |   3 +
->  2 files changed, 140 insertions(+)
-> 
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 3e2289c..c1676cf 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -2982,6 +2982,123 @@ static void vfio_vm_change_state_handler(void *pv, int running, RunState state)
->      vbasedev->device_state = dev_state;
->  }
->  
-> +static int vfio_device_put(QEMUFile *f, void *pv, size_t size,
-> +                           VMStateField *field, QJSON *vmdesc)
-> +{
-> +    VFIOPCIDevice *vdev = pv;
-> +    PCIDevice *pdev = &vdev->pdev;
-> +    int sz = vdev->device_state.size - VFIO_DEVICE_STATE_OFFSET;
-> +    uint8_t *buf = NULL;
-> +    uint32_t msi_cfg, msi_lo, msi_hi, msi_data, bar_cfg, i;
-> +    bool msi_64bit;
-> +
-> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
-> +        bar_cfg = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, 4);
-> +        qemu_put_be32(f, bar_cfg);
-> +    }
-> +
-> +    msi_cfg = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS, 2);
-> +    msi_64bit = !!(msi_cfg & PCI_MSI_FLAGS_64BIT);
-> +
-> +    msi_lo = pci_default_read_config(pdev,
-> +                                     pdev->msi_cap + PCI_MSI_ADDRESS_LO, 4);
-> +    qemu_put_be32(f, msi_lo);
-> +
-> +    if (msi_64bit) {
-> +        msi_hi = pci_default_read_config(pdev,
-> +                                         pdev->msi_cap + PCI_MSI_ADDRESS_HI,
-> +                                         4);
-> +        qemu_put_be32(f, msi_hi);
-> +    }
-> +
-> +    msi_data = pci_default_read_config(pdev,
-> +               pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
-> +               2);
-> +    qemu_put_be32(f, msi_data);
-> +
-> +    buf = g_malloc(sz);
-> +    if (buf == NULL) {
-> +        error_report("vfio: Failed to allocate memory for migrate");
-> +        goto exit;
+> I think I can do that.
 
-Yet exit does a 'return 0' - so we've not failed the migration and we've
-generated a broken migration stream.
-(same in the other exit cases)
+How about this ?
 
-> +    }
-> +
-> +    if (pread(vdev->vbasedev.fd, buf, sz,
-> +              vdev->device_state.offset + VFIO_DEVICE_STATE_OFFSET) != sz) {
-> +        error_report("vfio: Failed to read Device State Region");
-> +        goto exit;
-> +    }
-> +
-> +    qemu_put_buffer(f, buf, sz);
-> +
-> +exit:
-> +    g_free(buf);
-> +
-> +    return 0;
-> +}
+>From 61f11221afaa29e10021599420238e03836ba413 Mon Sep 17 00:00:00 2001
+From: Ian Jackson <ian.jackson@eu.citrix.com>
+Date: Fri, 9 Mar 2018 12:02:50 +0000
+Subject: [PATCH v6.2 12/11] AccelClass: Introduce accel_setup_post
 
-We really try and avoid qemu_put_* and qemu_get* as much as possible
-these days.
-Please try building a datastructure (possible in a pre_save) and then
-construction a VMState with all the fields in.
-VMSTATE_WITH_TMP might help you in this case.
+This is called just before os_setup_post.  Currently none of the
+accelerators provide this hook, but the Xen one is going to provide
+one in a moment.
 
-Doing it that way is much more robust against later changes.
+Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
+---
+ accel/accel.c          | 9 +++++++++
+ include/sysemu/accel.h | 3 +++
+ vl.c                   | 1 +
+ 3 files changed, 13 insertions(+)
 
-Also, I wonder if it'sa good idea to include 'sz' (or at least
-state.size) in the migration stream; if it was different on teh
-destination then things would go badly wrong. I don't know about mdev
-to know if that can happen.   You'd need to validate it when it's
-loaded.
-
-Dave
-
-> +
-> +static int vfio_device_get(QEMUFile *f, void *pv,
-> +                           size_t size, VMStateField *field)
-> +{
-> +    VFIOPCIDevice *vdev = pv;
-> +    PCIDevice *pdev = &vdev->pdev;
-> +    int sz = vdev->device_state.size - VFIO_DEVICE_STATE_OFFSET;
-> +    uint8_t *buf = NULL;
-> +    uint32_t ctl, msi_lo, msi_hi, msi_data, bar_cfg, i;
-> +    bool msi_64bit;
-> +
-> +    /* retore pci bar configuration */
-> +    ctl = pci_default_read_config(pdev, PCI_COMMAND, 2);
-> +    vfio_pci_write_config(pdev, PCI_COMMAND,
-> +                          ctl & (!(PCI_COMMAND_IO | PCI_COMMAND_MEMORY)), 2);
-> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
-> +        bar_cfg = qemu_get_be32(f);
-> +        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, bar_cfg, 4);
-> +    }
-> +    vfio_pci_write_config(pdev, PCI_COMMAND,
-> +                          ctl | PCI_COMMAND_IO | PCI_COMMAND_MEMORY, 2);
-> +
-> +    /* restore msi configuration */
-> +    ctl = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS, 2);
-> +    msi_64bit = !!(ctl & PCI_MSI_FLAGS_64BIT);
-> +
-> +    vfio_pci_write_config(&vdev->pdev,
-> +                          pdev->msi_cap + PCI_MSI_FLAGS,
-> +                          ctl & (!PCI_MSI_FLAGS_ENABLE), 2);
-> +
-> +    msi_lo = qemu_get_be32(f);
-> +    vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_LO, msi_lo, 4);
-> +
-> +    if (msi_64bit) {
-> +        msi_hi = qemu_get_be32(f);
-> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_HI,
-> +                              msi_hi, 4);
-> +    }
-> +    msi_data = qemu_get_be32(f);
-> +    vfio_pci_write_config(pdev,
-> +              pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
-> +              msi_data, 2);
-> +
-> +    vfio_pci_write_config(&vdev->pdev, pdev->msi_cap + PCI_MSI_FLAGS,
-> +                          ctl | PCI_MSI_FLAGS_ENABLE, 2);
-> +
-> +    buf = g_malloc(sz);
-> +    if (buf == NULL) {
-> +        error_report("vfio: Failed to allocate memory for migrate");
-> +        return -1;
-> +    }
-> +
-> +    qemu_get_buffer(f, buf, sz);
-> +    if (pwrite(vdev->vbasedev.fd, buf, sz,
-> +               vdev->device_state.offset + VFIO_DEVICE_STATE_OFFSET) != sz) {
-> +        error_report("vfio: Failed to write Device State Region");
-> +        return -1;
-> +    }
-> +
-> +    g_free(buf);
-> +
-> +    return 0;
-> +}
-> +
->  static void vfio_instance_init(Object *obj)
->  {
->      PCIDevice *pci_dev = PCI_DEVICE(obj);
-> @@ -3026,9 +3143,29 @@ static Property vfio_pci_dev_properties[] = {
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> +static const VMStateInfo vfio_vmstate_info = {
-> +    .name = "vfio-state",
-> +    .get = vfio_device_get,
-> +    .put = vfio_device_put,
-> +};
-> +
->  static VMStateDescription vfio_pci_vmstate = {
->      .name = "vfio-pci",
->      .unmigratable = 1,
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        {
-> +            .name         = "vfio dev",
-> +            .version_id   = 0,
-> +            .field_exists = NULL,
-> +            .size         = 0,
-> +            .info         = &vfio_vmstate_info,
-> +            .flags        = VMS_SINGLE,
-> +            .offset       = 0,
-> +         },
-> +        VMSTATE_END_OF_LIST()
-> +    },
->  };
->  
->  static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
-> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-> index 4ddeebc..4451a8f 100644
-> --- a/linux-headers/linux/vfio.h
-> +++ b/linux-headers/linux/vfio.h
-> @@ -303,6 +303,9 @@ struct vfio_region_info_cap_type {
->  /* Mdev sub-type for device state save and restore */
->  #define VFIO_REGION_SUBTYPE_DEVICE_STATE	(4)
->  
-> +/* Offset in region to save device state */
-> +#define VFIO_DEVICE_STATE_OFFSET	1
-> +
->  #define VFIO_DEVICE_START	0
->  #define VFIO_DEVICE_STOP	1
->  
-> -- 
-> 2.7.4
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/accel/accel.c b/accel/accel.c
+index 93e2434..9cfab11 100644
+--- a/accel/accel.c
++++ b/accel/accel.c
+@@ -126,6 +126,15 @@ void accel_register_compat_props(AccelState *accel)
+     register_compat_props_array(class->global_props);
+ }
+ 
++void accel_setup_post(MachineState *ms)
++{
++    AccelState *accel = ms->accelerator;
++    AccelClass *acc = ACCEL_GET_CLASS(accel);
++    if (acc->setup_post) {
++        acc->setup_post(ms, accel);
++    }
++}
++
+ static void register_accel_types(void)
+ {
+     type_register_static(&accel_type);
+diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
+index 5a632ce..637358f 100644
+--- a/include/sysemu/accel.h
++++ b/include/sysemu/accel.h
+@@ -40,6 +40,7 @@ typedef struct AccelClass {
+     const char *name;
+     int (*available)(void);
+     int (*init_machine)(MachineState *ms);
++    void (*setup_post)(MachineState *ms, AccelState *accel);
+     bool *allowed;
+     /*
+      * Array of global properties that would be applied when specific
+@@ -68,5 +69,7 @@ extern unsigned long tcg_tb_size;
+ void configure_accelerator(MachineState *ms);
+ /* Register accelerator specific global properties */
+ void accel_register_compat_props(AccelState *accel);
++/* Called just before os_setup_post (ie just before drop OS privs) */
++void accel_setup_post(MachineState *ms);
+ 
+ #endif
+diff --git a/vl.c b/vl.c
+index e6e8e1e..3fd6401 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4719,6 +4719,7 @@ int main(int argc, char **argv, char **envp)
+         vm_start();
+     }
+ 
++    accel_setup_post(current_machine);
+     xen_setup_post();
+     os_setup_post();
+ 
+-- 
+2.1.4
