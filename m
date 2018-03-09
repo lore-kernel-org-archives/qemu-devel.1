@@ -1,39 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1euMOr-0000UR-Lo
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:05:50 -0500
+	(envelope-from <groeck7@gmail.com>) id 1euMdC-0003xJ-39
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:20:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1euMOm-0000NX-JO
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:05:49 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47148
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1euMOm-0000Md-Cj
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:05:44 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w29HxpKQ004281
-	for <qemu-devel@nongnu.org>; Fri, 9 Mar 2018 13:05:42 -0500
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2gkuw88sty-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 13:05:41 -0500
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 9 Mar 2018 18:05:40 -0000
-References: <20180308161803.6152-1-kraxel@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 9 Mar 2018 19:05:37 +0100
+	(envelope-from <groeck7@gmail.com>) id 1euMd8-0000gX-1W
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:20:38 -0500
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:38443)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <groeck7@gmail.com>) id 1euMd7-0000fv-Qt
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:20:33 -0500
+Received: by mail-ot0-x243.google.com with SMTP id 95so9502085ote.5
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 10:20:33 -0800 (PST)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Fri, 9 Mar 2018 10:20:30 -0800
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <20180309182030.GA22836@roeck-us.net>
+References: <1520444223-8389-1-git-send-email-linux@roeck-us.net>
+	<CAFEAcA-+J7MUSssjPZ5BTNzGx_4h0YANdCegGfWNzYmoNatcqg@mail.gmail.com>
+	<20180308171239.GA22206@roeck-us.net>
+	<201803081028.39635.wpaul@windriver.com>
+	<CAFEAcA9T=sydu47UGry2TVOa0gZF8SZLnaaQ5gqzTQmAgm2b1w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180308161803.6152-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <a8eee638-c447-e851-d0a4-4cf1d0766f96@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] vnc: deal with surface NULL pointers
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9T=sydu47UGry2TVOa0gZF8SZLnaaQ5gqzTQmAgm2b1w@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] fsl-imx6: Swap Ethernet interrupt defines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,100 +33,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Bill Paul <wpaul@windriver.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Chris Healy <cphealy@gmail.com>, Jason Wang <jasowang@redhat.com>, Jean-Christophe Dubois <jcd@tribudubois.net>
 
+On Fri, Mar 09, 2018 at 05:47:16PM +0000, Peter Maydell wrote:
+> On 8 March 2018 at 18:28, Bill Paul <wpaul@windriver.com> wrote:
+> > Anyway, this means that the only reason older Linux kernels worked in QEMU
+> > with the broken interrupt configuration is that they also registered a handler
+> > on vector 151 (119). Even though QEMU could not send events via GPIO6, it was
+> > mistakenly sending them via vector 151, so it looked like things worked. On
+> > real hardware, the older kernels would have gotten their interrupts via GPIO6
+> > and also worked. The older kernels would _not_ work if you fix QEMU because
+> > now they would never get interrupts on either vector, unless you fudge things
+> > so that the ENET module triggers both vector 150 and the vector for GPIO6 in
+> > the GIC or patch them to back out the erratum 6678 workaround as later kernels
+> > do.
+> 
+> Thanks for that really useful writeup. So if I understand correctly
+> we have several choices here:
+> 
+>  (1) we could implement a model of the IOMUX block that is at least
+>  sufficient to support guests that configure it to route the ENET interrupt
+>  line to a GPIO pin. Then we could apply this patch that fixes the ENET
+>  line definitions. Old kernels would continue to work (for the same
+>  reason they worked on hardware), and new ones would work now too.
+>  This is in some ways the preferred option, but it's possibly a lot
+>  of code and we're nearly in freeze for 2.12.
+> 
+>  (2) we could leave everything as it is for 2.12. This would mean that
+>  at least we don't regress setups that used to work on older QEMU versions.
+>  Downside is that we wouldn't be able to run Linux v4.15+, or other
+>  guest OSes that don't have the bug that older Linux kernels do.
+>  (Presumably we'd only do this on the understanding that we were going
+>  to go down route (1) for 2.13.)
+> 
+>  (3) we could apply this patch for 2.12. Linux v4.15+ now works, as
+>  do other guest OSes that use the ENET interrupt. v4.1 and older Linux
+>  guests that used to boot in QEMU stop doing so, and 4.2-4.9 boot but
+>  lose the ethernet device support. Perhaps for 2.13 we might
+>  take route (1) to make those older guests start working again.
+> 
+> Do I have that right?
+> 
+Pretty much.
 
+> None of these options seems especially palatable to me, so we're
+> choosing the lesser evil, I think... (unless somebody wants to say
+> that option (1) would be 20 lines of code and here's the patch :-))
+> I guess in the absence of (1) that (3) is better than (2) ?
+> 
 
-On 03/08/2018 05:18 PM, Gerd Hoffmann wrote:
-> Secondary displays in multihead setups are allowed to have a NULL
-> DisplaySurface.  Typically user interfaces handle this by hiding the
-> window which shows the display in question.
-> 
-> This isn't an option for vnc though because it simply hasn't a concept
-> of windows or outputs.  So handle the situation by showing a placeholder
-> DisplaySurface instead.  Also check in console_select whenever a surface
-> is preset in the first place before requesting an update.
-> 
-> This fixes a segfault which can be triggered by switching to an unused
-> display (via vtrl-alt-<nr>) in a multihead setup, for example using
-> -device virtio-vga,max_outputs=2.
-> 
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
+I would prefer (2). This is what I decided to use in my "local"
+version of qemu. Older versions of Linux can be fixed by applying one
+(4.2..4.9) or two (4.1 and older) upstream patches; anyone interested
+running those kernels in qemu with Ethernet working should apply those
+patches (or, alternatively, provide a patch adding IOMUX support to
+qemu).
 
-Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
-I can see the new placeholder message and the crash is gone.
-
-
->  include/ui/console.h |  2 ++
->  ui/console.c         | 10 ++++++----
->  ui/vnc.c             | 10 ++++++++++
->  3 files changed, 18 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/ui/console.h b/include/ui/console.h
-> index aae9e44cb3..5fca9afcbc 100644
-> --- a/include/ui/console.h
-> +++ b/include/ui/console.h
-> @@ -260,6 +260,8 @@ DisplaySurface *qemu_create_displaysurface_guestmem(int width, int height,
->                                                      pixman_format_code_t format,
->                                                      int linesize,
->                                                      uint64_t addr);
-> +DisplaySurface *qemu_create_message_surface(int w, int h,
-> +                                            const char *msg);
->  PixelFormat qemu_default_pixelformat(int bpp);
-> 
->  DisplaySurface *qemu_create_displaysurface(int width, int height);
-> diff --git a/ui/console.c b/ui/console.c
-> index 6ab4ff3baf..348610dd43 100644
-> --- a/ui/console.c
-> +++ b/ui/console.c
-> @@ -1039,8 +1039,10 @@ void console_select(unsigned int index)
->                      dcl->ops->dpy_gfx_switch(dcl, s->surface);
->                  }
->              }
-> -            dpy_gfx_update(s, 0, 0, surface_width(s->surface),
-> -                           surface_height(s->surface));
-> +            if (s->surface) {
-> +                dpy_gfx_update(s, 0, 0, surface_width(s->surface),
-> +                               surface_height(s->surface));
-> +            }
->          }
->          if (ds->have_text) {
->              dpy_text_resize(s, s->width, s->height);
-> @@ -1370,8 +1372,8 @@ DisplaySurface *qemu_create_displaysurface_guestmem(int width, int height,
->      return surface;
->  }
-> 
-> -static DisplaySurface *qemu_create_message_surface(int w, int h,
-> -                                                   const char *msg)
-> +DisplaySurface *qemu_create_message_surface(int w, int h,
-> +                                            const char *msg)
->  {
->      DisplaySurface *surface = qemu_create_displaysurface(w, h);
->      pixman_color_t bg = color_table_rgb[0][QEMU_COLOR_BLACK];
-> diff --git a/ui/vnc.c b/ui/vnc.c
-> index 13c28cabb0..e164eb798c 100644
-> --- a/ui/vnc.c
-> +++ b/ui/vnc.c
-> @@ -746,9 +746,19 @@ static void vnc_update_server_surface(VncDisplay *vd)
->  static void vnc_dpy_switch(DisplayChangeListener *dcl,
->                             DisplaySurface *surface)
->  {
-> +    static const char placeholder_msg[] =
-> +        "Display output is not active.";
-> +    static DisplaySurface *placeholder;
->      VncDisplay *vd = container_of(dcl, VncDisplay, dcl);
->      VncState *vs;
-> 
-> +    if (surface == NULL) {
-> +        if (placeholder == NULL) {
-> +            placeholder = qemu_create_message_surface(640, 480, placeholder_msg);
-> +        }
-> +        surface = placeholder;
-> +    }
-> +
->      vnc_abort_display_jobs(vd);
->      vd->ds = surface;
-> 
+Thanks,
+Guenter
