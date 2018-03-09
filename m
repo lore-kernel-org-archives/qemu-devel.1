@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1euE8H-0003lX-Pe
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:11 -0500
+	(envelope-from <peterx@redhat.com>) id 1euE8O-0003s6-KL
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1euE8G-0005xP-Fd
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:09 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59250 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1euE8M-0005zB-DX
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:16 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60702 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1euE8G-0005xB-9k
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:08 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1euE8M-0005z0-8M
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:14 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Fri,  9 Mar 2018 17:15:20 +0800
-Message-Id: <20180309091535.13315-9-peterx@redhat.com>
+Date: Fri,  9 Mar 2018 17:15:22 +0800
+Message-Id: <20180309091535.13315-11-peterx@redhat.com>
 In-Reply-To: <20180309091535.13315-1-peterx@redhat.com>
 References: <20180309091535.13315-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 08/23] migration: rebuild channel on source
+Subject: [Qemu-devel] [PATCH v7 10/23] migration: wakeup dst ram-load-thread
+ for recover
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,189 +27,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-This patch detects the "resume" flag of migration command, rebuild the
-channels only if the flag is set.
+On the destination side, we cannot wake up all the threads when we got
+reconnected. The first thing to do is to wake up the main load thread,
+so that we can continue to receive valid messages from source again and
+reply when needed.
+
+At this point, we switch the destination VM state from postcopy-paused
+back to postcopy-recover.
+
+Now we are finally ready to do the resume logic.
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/migration.c | 91 +++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 70 insertions(+), 21 deletions(-)
+ migration/migration.c | 30 ++++++++++++++++++++++++++++--
+ 1 file changed, 28 insertions(+), 2 deletions(-)
 
 diff --git a/migration/migration.c b/migration/migration.c
-index d34653fb51..0b31468552 100644
+index 322d5ad79b..bbeb156a39 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -1359,49 +1359,75 @@ bool migration_is_blocked(Error **errp)
-     return false;
- }
+@@ -429,8 +429,34 @@ static void migration_incoming_process(void)
  
--void qmp_migrate(const char *uri, bool has_blk, bool blk,
--                 bool has_inc, bool inc, bool has_detach, bool detach,
--                 bool has_resume, bool resume, Error **errp)
-+/* Returns true if continue to migrate, or false if error detected */
-+static bool migrate_prepare(MigrationState *s, bool blk, bool blk_inc,
-+                            bool resume, Error **errp)
+ void migration_fd_process_incoming(QEMUFile *f)
  {
-     Error *local_err = NULL;
--    MigrationState *s = migrate_get_current();
--    const char *p;
+-    migration_incoming_setup(f);
+-    migration_incoming_process();
++    MigrationIncomingState *mis = migration_incoming_get_current();
 +
-+    if (resume) {
-+        if (s->state != MIGRATION_STATUS_POSTCOPY_PAUSED) {
-+            error_setg(errp, "Cannot resume if there is no "
-+                       "paused migration");
-+            return false;
-+        }
-+        /* This is a resume, skip init status */
-+        return true;
-+    }
- 
-     if (migration_is_setup_or_active(s->state) ||
-         s->state == MIGRATION_STATUS_CANCELLING ||
-         s->state == MIGRATION_STATUS_COLO) {
-         error_setg(errp, QERR_MIGRATION_ACTIVE);
--        return;
-+        return false;
-     }
++    if (mis->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
++        /* Resumed from a paused postcopy migration */
 +
-     if (runstate_check(RUN_STATE_INMIGRATE)) {
-         error_setg(errp, "Guest is waiting for an incoming migration");
--        return;
-+        return false;
-     }
- 
-     if (migration_is_blocked(errp)) {
--        return;
-+        return false;
-     }
- 
--    if ((has_blk && blk) || (has_inc && inc)) {
-+    if (blk || blk_inc) {
-         if (migrate_use_block() || migrate_use_block_incremental()) {
-             error_setg(errp, "Command options are incompatible with "
-                        "current migration capabilities");
--            return;
-+            return false;
-         }
-         migrate_set_block_enabled(true, &local_err);
-         if (local_err) {
-             error_propagate(errp, local_err);
--            return;
-+            return false;
-         }
-         s->must_remove_block_options = true;
-     }
- 
--    if (has_inc && inc) {
-+    if (blk_inc) {
-         migrate_set_block_incremental(s, true);
-     }
- 
-     migrate_init(s);
- 
-+    return true;
-+}
++        mis->from_src_file = f;
++        /* Postcopy has standalone thread to do vm load */
++        qemu_file_set_blocking(f, true);
 +
-+void qmp_migrate(const char *uri, bool has_blk, bool blk,
-+                 bool has_inc, bool inc, bool has_detach, bool detach,
-+                 bool has_resume, bool resume, Error **errp)
-+{
-+    Error *local_err = NULL;
-+    MigrationState *s = migrate_get_current();
-+    const char *p;
++        /* Re-configure the return path */
++        mis->to_src_file = qemu_file_get_return_path(f);
 +
-+    if (!migrate_prepare(s, has_blk && blk, has_inc && inc,
-+                         has_resume && resume, errp)) {
-+        /* Error detected, put into errp */
-+        return;
-+    }
++        migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_PAUSED,
++                          MIGRATION_STATUS_POSTCOPY_RECOVER);
 +
-     if (strstart(uri, "tcp:", &p)) {
-         tcp_start_outgoing_migration(s, p, &local_err);
- #ifdef CONFIG_RDMA
-@@ -1857,7 +1883,8 @@ out:
-     return NULL;
- }
- 
--static int open_return_path_on_source(MigrationState *ms)
-+static int open_return_path_on_source(MigrationState *ms,
-+                                      bool create_thread)
- {
- 
-     ms->rp_state.from_dst_file = qemu_file_get_return_path(ms->to_dst_file);
-@@ -1866,6 +1893,12 @@ static int open_return_path_on_source(MigrationState *ms)
-     }
- 
-     trace_open_return_path_on_source();
-+
-+    if (!create_thread) {
-+        /* We're done */
-+        return 0;
-+    }
-+
-     qemu_thread_create(&ms->rp_state.rp_thread, "return path",
-                        source_return_path_thread, ms, QEMU_THREAD_JOINABLE);
- 
-@@ -2522,6 +2555,9 @@ static void *migration_thread(void *opaque)
- 
- void migrate_fd_connect(MigrationState *s, Error *error_in)
- {
-+    int64_t rate_limit;
-+    bool resume = s->state == MIGRATION_STATUS_POSTCOPY_PAUSED;
-+
-     s->expected_downtime = s->parameters.downtime_limit;
-     s->cleanup_bh = qemu_bh_new(migrate_fd_cleanup, s);
-     if (error_in) {
-@@ -2530,12 +2566,21 @@ void migrate_fd_connect(MigrationState *s, Error *error_in)
-         return;
-     }
- 
--    qemu_file_set_blocking(s->to_dst_file, true);
--    qemu_file_set_rate_limit(s->to_dst_file,
--                             s->parameters.max_bandwidth / XFER_LIMIT_RATIO);
-+    if (resume) {
-+        /* This is a resumed migration */
-+        rate_limit = INT64_MAX;
++        /*
++         * Here, we only wake up the main loading thread (while the
++         * fault thread will still be waiting), so that we can receive
++         * commands from source now, and answer it if needed. The
++         * fault thread will be woken up afterwards until we are sure
++         * that source is ready to reply to page requests.
++         */
++        qemu_sem_post(&mis->postcopy_pause_sem_dst);
 +    } else {
-+        /* This is a fresh new migration */
-+        rate_limit = s->parameters.max_bandwidth / XFER_LIMIT_RATIO;
-+        s->expected_downtime = s->parameters.downtime_limit;
-+        s->cleanup_bh = qemu_bh_new(migrate_fd_cleanup, s);
- 
--    /* Notify before starting migration thread */
--    notifier_list_notify(&migration_state_notifiers, s);
-+        /* Notify before starting migration thread */
-+        notifier_list_notify(&migration_state_notifiers, s);
++        /* New incoming migration */
++        migration_incoming_setup(f);
++        migration_incoming_process();
 +    }
-+
-+    qemu_file_set_rate_limit(s->to_dst_file, rate_limit);
-+    qemu_file_set_blocking(s->to_dst_file, true);
+ }
  
-     /*
-      * Open the return path. For postcopy, it is used exclusively. For
-@@ -2543,15 +2588,19 @@ void migrate_fd_connect(MigrationState *s, Error *error_in)
-      * QEMU uses the return path.
-      */
-     if (migrate_postcopy_ram() || migrate_use_return_path()) {
--        if (open_return_path_on_source(s)) {
-+        if (open_return_path_on_source(s, !resume)) {
-             error_report("Unable to open return-path for postcopy");
--            migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
--                              MIGRATION_STATUS_FAILED);
-+            migrate_set_state(&s->state, s->state, MIGRATION_STATUS_FAILED);
-             migrate_fd_cleanup(s);
-             return;
-         }
-     }
- 
-+    if (resume) {
-+        /* TODO: do the resume logic */
-+        return;
-+    }
-+
-     if (multifd_save_setup() != 0) {
-         migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-                           MIGRATION_STATUS_FAILED);
+ void migration_ioc_process_incoming(QIOChannel *ioc)
 -- 
 2.14.3
