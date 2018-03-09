@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1euDtT-0007oB-4C
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:00:52 -0500
+	(envelope-from <peterx@redhat.com>) id 1euDtY-0007rA-6N
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:01:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1euDtN-0007ty-E8
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:00:51 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58836 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1euDtS-0007wx-Il
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:00:56 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58842 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1euDtN-0007ti-97
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:00:45 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1euDtS-0007wg-ER
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:00:50 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Fri,  9 Mar 2018 16:59:48 +0800
-Message-Id: <20180309090006.10018-6-peterx@redhat.com>
+Date: Fri,  9 Mar 2018 16:59:49 +0800
+Message-Id: <20180309090006.10018-7-peterx@redhat.com>
 In-Reply-To: <20180309090006.10018-1-peterx@redhat.com>
 References: <20180309090006.10018-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 05/23] monitor: move skip_flush into
- monitor_data_init
+Subject: [Qemu-devel] [PATCH v8 06/23] monitor: move the cur_mon hack deeper
+ for QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,54 +27,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-It's part of the data init.  Collect it.
+In monitor_qmp_read(), we have the hack to temporarily replace the
+cur_mon pointer.  Now we move this hack deeper inside the QMP dispatcher
+routine since the Monitor pointer can be actually obtained using
+container_of() upon the parser object, just like most of the other JSON
+parser users do.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
+This does not make much sense as a single patch.  However, this will be
+a big step for the next patch, when the QMP dispatcher routine will be
+split from the QMP parser.
+
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- monitor.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ monitor.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
 diff --git a/monitor.c b/monitor.c
-index a4417f26cd..48645e0e91 100644
+index 48645e0e91..2b70294772 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -570,13 +570,14 @@ static void monitor_qapi_event_init(void)
- 
- static void handle_hmp_command(Monitor *mon, const char *cmdline);
- 
--static void monitor_data_init(Monitor *mon)
-+static void monitor_data_init(Monitor *mon, bool skip_flush)
+@@ -3762,7 +3762,9 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
  {
-     memset(mon, 0, sizeof(Monitor));
-     qemu_mutex_init(&mon->out_lock);
-     mon->outbuf = qstring_new();
-     /* Use *mon_cmds by default. */
-     mon->cmd_table = mon_cmds;
-+    mon->skip_flush = skip_flush;
- }
+     QObject *req, *rsp = NULL, *id = NULL;
+     QDict *qdict = NULL;
+-    Monitor *mon = cur_mon;
++    MonitorQMP *mon_qmp = container_of(parser, MonitorQMP, parser);
++    Monitor *old_mon, *mon = container_of(mon_qmp, Monitor, qmp);
++
+     Error *err = NULL;
  
- static void monitor_data_destroy(Monitor *mon)
-@@ -597,8 +598,7 @@ char *qmp_human_monitor_command(const char *command_line, bool has_cpu_index,
-     char *output = NULL;
-     Monitor *old_mon, hmp;
- 
--    monitor_data_init(&hmp);
--    hmp.skip_flush = true;
-+    monitor_data_init(&hmp, true);
- 
-     old_mon = cur_mon;
-     cur_mon = &hmp;
-@@ -4039,7 +4039,7 @@ void monitor_init(Chardev *chr, int flags)
+     req = json_parser_parse_err(tokens, NULL, &err);
+@@ -3787,8 +3789,13 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+         QDECREF(req_json);
      }
  
-     mon = g_malloc(sizeof(*mon));
--    monitor_data_init(mon);
-+    monitor_data_init(mon, false);
++    old_mon = cur_mon;
++    cur_mon = mon;
++
+     rsp = qmp_dispatch(cur_mon->qmp.commands, req);
  
-     qemu_chr_fe_init(&mon->chr, chr, &error_abort);
-     mon->flags = flags;
++    cur_mon = old_mon;
++
+     if (mon->qmp.commands == &qmp_cap_negotiation_commands) {
+         qdict = qdict_get_qdict(qobject_to_qdict(rsp), "error");
+         if (qdict
+@@ -3825,13 +3832,9 @@ err_out:
+ 
+ static void monitor_qmp_read(void *opaque, const uint8_t *buf, int size)
+ {
+-    Monitor *old_mon = cur_mon;
+-
+-    cur_mon = opaque;
+-
+-    json_message_parser_feed(&cur_mon->qmp.parser, (const char *) buf, size);
++    Monitor *mon = opaque;
+ 
+-    cur_mon = old_mon;
++    json_message_parser_feed(&mon->qmp.parser, (const char *) buf, size);
+ }
+ 
+ static void monitor_read(void *opaque, const uint8_t *buf, int size)
 -- 
 2.14.3
