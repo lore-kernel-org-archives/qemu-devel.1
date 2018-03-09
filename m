@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59780)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1euLmz-000052-Li
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:26:42 -0500
+	(envelope-from <kwolf@redhat.com>) id 1euLnm-0000pY-MU
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:27:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1euLmy-0006Bd-P3
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:26:41 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47008)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1euLmy-0006A9-HT
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:26:40 -0500
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1euLmx-00079O-BB
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 17:26:39 +0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  9 Mar 2018 17:26:20 +0000
-Message-Id: <20180309172622.4277-24-peter.maydell@linaro.org>
-In-Reply-To: <20180309172622.4277-1-peter.maydell@linaro.org>
-References: <20180309172622.4277-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 23/25] sdcard: Add the Tuning Command (CMD19)
+	(envelope-from <kwolf@redhat.com>) id 1euLnl-0006d0-Ok
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:27:30 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Fri,  9 Mar 2018 18:27:09 +0100
+Message-Id: <20180309172713.26318-3-kwolf@redhat.com>
+In-Reply-To: <20180309172713.26318-1-kwolf@redhat.com>
+References: <20180309172713.26318-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/6] luks: Create
+ block_crypto_co_create_generic()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,84 +20,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, berrange@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Everything that refers to the protocol layer or QemuOpts is moved out of
+block_crypto_create_generic(), so that the remaining function is
+suitable to be called by a .bdrv_co_create implementation.
 
->From the "Physical Layer Simplified Specification Version 3.01":
+LUKS is the only driver that actually implements the old interface, and
+we don't intend to use it in any new drivers, so put the moved out code
+directly into a LUKS function rather than creating a generic
+intermediate one.
 
-  A known data block ("Tuning block") can be used to tune sampling
-  point for tuning required hosts. [...]
-  This procedure gives the system optimal timing for each specific
-  host and card combination and compensates for static delays in
-  the timing budget including process, voltage and different PCB
-  loads and skews. [...]
-  Data block, carried by DAT[3:0], contains a pattern for tuning
-  sampling position to receive data on the CMD and DAT[3:0] line.
-
-[based on a patch from Alistair Francis <alistair.francis@xilinx.com>
- from qemu/xilinx tag xilinx-v2015.2]
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-Message-id: 20180309153654.13518-5-f4bug@amsat.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- hw/sd/sd.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ block/crypto.c | 95 +++++++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 61 insertions(+), 34 deletions(-)
 
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index dc50d6bbf7..235e0518d6 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -1169,6 +1169,14 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
-         }
-         break;
- 
-+    case 19:    /* CMD19: SEND_TUNING_BLOCK (SD) */
-+        if (sd->state == sd_transfer_state) {
-+            sd->state = sd_sendingdata_state;
-+            sd->data_offset = 0;
-+            return sd_r1;
-+        }
-+        break;
-+
-     case 23:    /* CMD23: SET_BLOCK_COUNT */
-         switch (sd->state) {
-         case sd_transfer_state:
-@@ -1893,6 +1901,20 @@ void sd_write_data(SDState *sd, uint8_t value)
-     }
+diff --git a/block/crypto.c b/block/crypto.c
+index 77871640cc..b0a4cb3388 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -306,43 +306,29 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
  }
  
-+#define SD_TUNING_BLOCK_SIZE    64
-+
-+static const uint8_t sd_tuning_block_pattern[SD_TUNING_BLOCK_SIZE] = {
-+    /* See: Physical Layer Simplified Specification Version 3.01, Table 4-2 */
-+    0xff, 0x0f, 0xff, 0x00,         0x0f, 0xfc, 0xc3, 0xcc,
-+    0xc3, 0x3c, 0xcc, 0xff,         0xfe, 0xff, 0xfe, 0xef,
-+    0xff, 0xdf, 0xff, 0xdd,         0xff, 0xfb, 0xff, 0xfb,
-+    0xbf, 0xff, 0x7f, 0xff,         0x77, 0xf7, 0xbd, 0xef,
-+    0xff, 0xf0, 0xff, 0xf0,         0x0f, 0xfc, 0xcc, 0x3c,
-+    0xcc, 0x33, 0xcc, 0xcf,         0xff, 0xef, 0xff, 0xee,
-+    0xff, 0xfd, 0xff, 0xfd,         0xdf, 0xff, 0xbf, 0xff,
-+    0xbb, 0xff, 0xf7, 0xff,         0xf7, 0x7f, 0x7b, 0xde,
-+};
-+
- uint8_t sd_read_data(SDState *sd)
+ 
+-static int block_crypto_create_generic(QCryptoBlockFormat format,
+-                                       const char *filename,
+-                                       QemuOpts *opts,
+-                                       Error **errp)
++static int block_crypto_co_create_generic(BlockDriverState *bs,
++                                          int64_t size,
++                                          QCryptoBlockCreateOptions *opts,
++                                          Error **errp)
  {
-     /* TODO: Append CRCs */
-@@ -1972,6 +1994,13 @@ uint8_t sd_read_data(SDState *sd)
-         }
-         break;
+-    int ret = -EINVAL;
+-    QCryptoBlockCreateOptions *create_opts = NULL;
++    int ret;
++    BlockBackend *blk;
+     QCryptoBlock *crypto = NULL;
+-    struct BlockCryptoCreateData data = {
+-        .size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+-                         BDRV_SECTOR_SIZE),
+-    };
+-    QDict *cryptoopts;
+-
+-    /* Parse options */
+-    cryptoopts = qemu_opts_to_qdict(opts, NULL);
++    struct BlockCryptoCreateData data;
  
-+    case 19:    /* CMD19:  SEND_TUNING_BLOCK (SD) */
-+        if (sd->data_offset >= SD_TUNING_BLOCK_SIZE - 1) {
-+            sd->state = sd_transfer_state;
-+        }
-+        ret = sd_tuning_block_pattern[sd->data_offset++];
-+        break;
+-    create_opts = block_crypto_create_opts_init(format, cryptoopts, errp);
+-    if (!create_opts) {
+-        return -1;
+-    }
++    blk = blk_new(BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
+ 
+-    /* Create protocol layer */
+-    ret = bdrv_create_file(filename, opts, errp);
++    ret = blk_insert_bs(blk, bs, errp);
+     if (ret < 0) {
+-        return ret;
++        goto cleanup;
+     }
+ 
+-    data.blk = blk_new_open(filename, NULL, NULL,
+-                            BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
+-                            errp);
+-    if (!data.blk) {
+-        return -EINVAL;
+-    }
++    data = (struct BlockCryptoCreateData) {
++        .blk = blk,
++        .size = size,
++    };
+ 
+-    /* Create format layer */
+-    crypto = qcrypto_block_create(create_opts, NULL,
++    crypto = qcrypto_block_create(opts, NULL,
+                                   block_crypto_init_func,
+                                   block_crypto_write_func,
+                                   &data,
+@@ -355,10 +341,8 @@ static int block_crypto_create_generic(QCryptoBlockFormat format,
+ 
+     ret = 0;
+  cleanup:
+-    QDECREF(cryptoopts);
+     qcrypto_block_free(crypto);
+-    blk_unref(data.blk);
+-    qapi_free_QCryptoBlockCreateOptions(create_opts);
++    blk_unref(blk);
+     return ret;
+ }
+ 
+@@ -563,8 +547,51 @@ static int coroutine_fn block_crypto_co_create_opts_luks(const char *filename,
+                                                          QemuOpts *opts,
+                                                          Error **errp)
+ {
+-    return block_crypto_create_generic(Q_CRYPTO_BLOCK_FORMAT_LUKS,
+-                                       filename, opts, errp);
++    QCryptoBlockCreateOptions *create_opts = NULL;
++    BlockDriverState *bs = NULL;
++    QDict *cryptoopts;
++    int64_t size;
++    int ret;
 +
-     case 22:	/* ACMD22: SEND_NUM_WR_BLOCKS */
-         ret = sd->data[sd->data_offset ++];
++    /* Parse options */
++    size = qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0);
++
++    cryptoopts = qemu_opts_to_qdict_filtered(opts, NULL,
++                                             &block_crypto_create_opts_luks,
++                                             true);
++
++    create_opts = block_crypto_create_opts_init(Q_CRYPTO_BLOCK_FORMAT_LUKS,
++                                                cryptoopts, errp);
++    if (!create_opts) {
++        ret = -EINVAL;
++        goto fail;
++    }
++
++    /* Create protocol layer */
++    ret = bdrv_create_file(filename, opts, errp);
++    if (ret < 0) {
++        return ret;
++    }
++
++    bs = bdrv_open(filename, NULL, NULL,
++                   BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL, errp);
++    if (!bs) {
++        ret = -EINVAL;
++        goto fail;
++    }
++
++    /* Create format layer */
++    ret = block_crypto_co_create_generic(bs, size, create_opts, errp);
++    if (ret < 0) {
++        goto fail;
++    }
++
++    ret = 0;
++fail:
++    bdrv_unref(bs);
++    qapi_free_QCryptoBlockCreateOptions(create_opts);
++    QDECREF(cryptoopts);
++    return ret;
+ }
  
+ static int block_crypto_get_info_luks(BlockDriverState *bs,
 -- 
-2.16.2
+2.13.6
