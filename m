@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1euKlO-0001br-41
+	(envelope-from <kwolf@redhat.com>) id 1euKlO-0001by-67
 	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1euKlN-0007XE-1a
+	(envelope-from <kwolf@redhat.com>) id 1euKlM-0007Ww-UP
 	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:58 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  9 Mar 2018 17:19:31 +0100
-Message-Id: <20180309161933.8168-55-kwolf@redhat.com>
+Date: Fri,  9 Mar 2018 17:19:30 +0100
+Message-Id: <20180309161933.8168-54-kwolf@redhat.com>
 In-Reply-To: <20180309161933.8168-1-kwolf@redhat.com>
 References: <20180309161933.8168-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 54/56] iotests: Skip test for ENOMEM error
+Subject: [Qemu-devel] [PULL 53/56] iotests: Mark all tests executable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,36 +22,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Fam Zheng <famz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
 
-The AFL image is to exercise the code validating image size, which
-doesn't work on 32 bit or when out of memory (there is a large
-allocation before the interesting point). So check that and skip the
-test, instead of faking the result.
+The majority of our iotests have the executable bit set; fix the
+few outliers for consistency.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-id: 20180301011413.11531-1-famz@redhat.com
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-id: 20180305161824.7188-1-eblake@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/059 | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ tests/qemu-iotests/096 | 0
+ tests/qemu-iotests/124 | 0
+ tests/qemu-iotests/129 | 0
+ tests/qemu-iotests/132 | 0
+ tests/qemu-iotests/136 | 0
+ tests/qemu-iotests/139 | 0
+ tests/qemu-iotests/148 | 0
+ tests/qemu-iotests/152 | 0
+ tests/qemu-iotests/163 | 0
+ tests/qemu-iotests/205 | 0
+ 10 files changed, 0 insertions(+), 0 deletions(-)
+ mode change 100644 => 100755 tests/qemu-iotests/096
+ mode change 100644 => 100755 tests/qemu-iotests/124
+ mode change 100644 => 100755 tests/qemu-iotests/129
+ mode change 100644 => 100755 tests/qemu-iotests/132
+ mode change 100644 => 100755 tests/qemu-iotests/136
+ mode change 100644 => 100755 tests/qemu-iotests/139
+ mode change 100644 => 100755 tests/qemu-iotests/148
+ mode change 100644 => 100755 tests/qemu-iotests/152
+ mode change 100644 => 100755 tests/qemu-iotests/163
+ mode change 100644 => 100755 tests/qemu-iotests/205
 
-diff --git a/tests/qemu-iotests/059 b/tests/qemu-iotests/059
-index 40f89eae18..530bbbe6ce 100755
---- a/tests/qemu-iotests/059
-+++ b/tests/qemu-iotests/059
-@@ -152,9 +152,8 @@ done
- echo
- echo "=== Testing afl image with a very large capacity ==="
- _use_sample_img afl9.vmdk.bz2
--# The sed makes this test pass on machines with little RAM
--# (and also with 32 bit builds)
--_img_info | sed -e 's/Cannot allocate memory/Invalid argument/'
-+_img_info | grep -q 'Cannot allocate memory' && _notrun "Insufficent memory, skipped test"
-+_img_info
- _cleanup_test_img
- 
- # success, all done
+diff --git a/tests/qemu-iotests/096 b/tests/qemu-iotests/096
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/124 b/tests/qemu-iotests/124
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/129 b/tests/qemu-iotests/129
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/132 b/tests/qemu-iotests/132
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/136 b/tests/qemu-iotests/136
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/139 b/tests/qemu-iotests/139
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/148 b/tests/qemu-iotests/148
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/152 b/tests/qemu-iotests/152
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/163 b/tests/qemu-iotests/163
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/205 b/tests/qemu-iotests/205
+old mode 100644
+new mode 100755
 -- 
 2.13.6
