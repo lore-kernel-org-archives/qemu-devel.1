@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1euHwN-000105-Ri
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:20:14 -0500
+	(envelope-from <stefanha@redhat.com>) id 1euHwU-00019F-5s
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:20:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1euHwM-0007OM-FK
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:20:07 -0500
+	(envelope-from <stefanha@redhat.com>) id 1euHwT-0007Vt-7a
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:20:14 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri,  9 Mar 2018 13:19:43 +0000
-Message-Id: <20180309131949.18640-2-stefanha@redhat.com>
+Date: Fri,  9 Mar 2018 13:19:46 +0000
+Message-Id: <20180309131949.18640-5-stefanha@redhat.com>
 In-Reply-To: <20180309131949.18640-1-stefanha@redhat.com>
 References: <20180309131949.18640-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 1/7] block: Fix qemu crash when using scsi-block
+Subject: [Qemu-devel] [PULL 4/7] block: add aio_wait_bh_oneshot()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,196 +20,82 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Richard Henderson <rth@twiddle.net>, Deepa Srinivasan <deepa.srinivasan@oracle.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-From: Deepa Srinivasan <deepa.srinivasan@oracle.com>
+Sometimes it's necessary for the main loop thread to run a BH in an
+IOThread and wait for its completion.  This primitive is useful during
+startup/shutdown to synchronize and avoid race conditions.
 
-Starting qemu with the following arguments causes qemu to segfault:
-... -device lsi,id=lsi0 -drive file=iscsi:<...>,format=raw,if=none,node-name=
-iscsi1 -device scsi-block,bus=lsi0.0,id=<...>,drive=iscsi1
-
-This patch fixes blk_aio_ioctl() so it does not pass stack addresses to
-blk_aio_ioctl_entry() which may be invoked after blk_aio_ioctl() returns. More
-details about the bug follow.
-
-blk_aio_ioctl() invokes blk_aio_prwv() with blk_aio_ioctl_entry as the
-coroutine parameter. blk_aio_prwv() ultimately calls aio_co_enter().
-
-When blk_aio_ioctl() is executed from within a coroutine context (e.g.
-iscsi_bh_cb()), aio_co_enter() adds the coroutine (blk_aio_ioctl_entry) to
-the current coroutine's wakeup queue. blk_aio_ioctl() then returns.
-
-When blk_aio_ioctl_entry() executes later, it accesses an invalid pointer:
-....
-    BlkRwCo *rwco = &acb->rwco;
-
-    rwco->ret = blk_co_ioctl(rwco->blk, rwco->offset,
-                             rwco->qiov->iov[0].iov_base);  <--- qiov is
-                                                                 invalid here
-...
-
-In the case when blk_aio_ioctl() is called from a non-coroutine context,
-blk_aio_ioctl_entry() executes immediately. But if bdrv_co_ioctl() calls
-qemu_coroutine_yield(), blk_aio_ioctl() will return. When the coroutine
-execution is complete, control returns to blk_aio_ioctl_entry() after the call
-to blk_co_ioctl(). There is no invalid reference after this point, but the
-function is still holding on to invalid pointers.
-
-The fix is to change blk_aio_prwv() to accept a void pointer for the IO buffer
-rather than a QEMUIOVector. blk_aio_prwv() passes this through in BlkRwCo and the
-coroutine function casts it to QEMUIOVector or uses the void pointer directly.
-
-Signed-off-by: Deepa Srinivasan <deepa.srinivasan@oracle.com>
-Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Reviewed-by: Mark Kanda <mark.kanda@oracle.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-id: 20180307144205.20619-2-stefanha@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/block-backend.c | 51 +++++++++++++++++++++++++--------------------------
- 1 file changed, 25 insertions(+), 26 deletions(-)
+ include/block/aio-wait.h | 13 +++++++++++++
+ util/aio-wait.c          | 31 +++++++++++++++++++++++++++++++
+ 2 files changed, 44 insertions(+)
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index b3c790e2bd..f2e0a855ff 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -1150,7 +1150,7 @@ int coroutine_fn blk_co_pwritev(BlockBackend *blk, int64_t offset,
- typedef struct BlkRwCo {
-     BlockBackend *blk;
-     int64_t offset;
--    QEMUIOVector *qiov;
-+    void *iobuf;
-     int ret;
-     BdrvRequestFlags flags;
- } BlkRwCo;
-@@ -1158,17 +1158,19 @@ typedef struct BlkRwCo {
- static void blk_read_entry(void *opaque)
- {
-     BlkRwCo *rwco = opaque;
-+    QEMUIOVector *qiov = rwco->iobuf;
+diff --git a/include/block/aio-wait.h b/include/block/aio-wait.h
+index a48c744fa8..f7a3972200 100644
+--- a/include/block/aio-wait.h
++++ b/include/block/aio-wait.h
+@@ -113,4 +113,17 @@ typedef struct {
+  */
+ void aio_wait_kick(AioWait *wait);
  
--    rwco->ret = blk_co_preadv(rwco->blk, rwco->offset, rwco->qiov->size,
--                              rwco->qiov, rwco->flags);
-+    rwco->ret = blk_co_preadv(rwco->blk, rwco->offset, qiov->size,
-+                              qiov, rwco->flags);
- }
- 
- static void blk_write_entry(void *opaque)
- {
-     BlkRwCo *rwco = opaque;
-+    QEMUIOVector *qiov = rwco->iobuf;
- 
--    rwco->ret = blk_co_pwritev(rwco->blk, rwco->offset, rwco->qiov->size,
--                               rwco->qiov, rwco->flags);
-+    rwco->ret = blk_co_pwritev(rwco->blk, rwco->offset, qiov->size,
-+                               qiov, rwco->flags);
- }
- 
- static int blk_prw(BlockBackend *blk, int64_t offset, uint8_t *buf,
-@@ -1188,7 +1190,7 @@ static int blk_prw(BlockBackend *blk, int64_t offset, uint8_t *buf,
-     rwco = (BlkRwCo) {
-         .blk    = blk,
-         .offset = offset,
--        .qiov   = &qiov,
-+        .iobuf  = &qiov,
-         .flags  = flags,
-         .ret    = NOT_DONE,
-     };
-@@ -1296,7 +1298,7 @@ static void blk_aio_complete_bh(void *opaque)
- }
- 
- static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset, int bytes,
--                                QEMUIOVector *qiov, CoroutineEntry co_entry,
-+                                void *iobuf, CoroutineEntry co_entry,
-                                 BdrvRequestFlags flags,
-                                 BlockCompletionFunc *cb, void *opaque)
- {
-@@ -1308,7 +1310,7 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset, int bytes,
-     acb->rwco = (BlkRwCo) {
-         .blk    = blk,
-         .offset = offset,
--        .qiov   = qiov,
-+        .iobuf  = iobuf,
-         .flags  = flags,
-         .ret    = NOT_DONE,
-     };
-@@ -1331,10 +1333,11 @@ static void blk_aio_read_entry(void *opaque)
- {
-     BlkAioEmAIOCB *acb = opaque;
-     BlkRwCo *rwco = &acb->rwco;
-+    QEMUIOVector *qiov = rwco->iobuf;
- 
--    assert(rwco->qiov->size == acb->bytes);
-+    assert(qiov->size == acb->bytes);
-     rwco->ret = blk_co_preadv(rwco->blk, rwco->offset, acb->bytes,
--                              rwco->qiov, rwco->flags);
-+                              qiov, rwco->flags);
-     blk_aio_complete(acb);
- }
- 
-@@ -1342,10 +1345,11 @@ static void blk_aio_write_entry(void *opaque)
- {
-     BlkAioEmAIOCB *acb = opaque;
-     BlkRwCo *rwco = &acb->rwco;
-+    QEMUIOVector *qiov = rwco->iobuf;
- 
--    assert(!rwco->qiov || rwco->qiov->size == acb->bytes);
-+    assert(!qiov || qiov->size == acb->bytes);
-     rwco->ret = blk_co_pwritev(rwco->blk, rwco->offset, acb->bytes,
--                               rwco->qiov, rwco->flags);
-+                               qiov, rwco->flags);
-     blk_aio_complete(acb);
- }
- 
-@@ -1474,8 +1478,10 @@ int blk_co_ioctl(BlockBackend *blk, unsigned long int req, void *buf)
- static void blk_ioctl_entry(void *opaque)
- {
-     BlkRwCo *rwco = opaque;
-+    QEMUIOVector *qiov = rwco->iobuf;
++/**
++ * aio_wait_bh_oneshot:
++ * @ctx: the aio context
++ * @cb: the BH callback function
++ * @opaque: user data for the BH callback function
++ *
++ * Run a BH in @ctx and wait for it to complete.
++ *
++ * Must be called from the main loop thread with @ctx acquired exactly once.
++ * Note that main loop event processing may occur.
++ */
++void aio_wait_bh_oneshot(AioContext *ctx, QEMUBHFunc *cb, void *opaque);
 +
-     rwco->ret = blk_co_ioctl(rwco->blk, rwco->offset,
--                             rwco->qiov->iov[0].iov_base);
-+                             qiov->iov[0].iov_base);
+ #endif /* QEMU_AIO_WAIT */
+diff --git a/util/aio-wait.c b/util/aio-wait.c
+index a487cdb852..975afddf4c 100644
+--- a/util/aio-wait.c
++++ b/util/aio-wait.c
+@@ -38,3 +38,34 @@ void aio_wait_kick(AioWait *wait)
+         aio_bh_schedule_oneshot(qemu_get_aio_context(), dummy_bh_cb, NULL);
+     }
  }
- 
- int blk_ioctl(BlockBackend *blk, unsigned long int req, void *buf)
-@@ -1488,24 +1494,15 @@ static void blk_aio_ioctl_entry(void *opaque)
-     BlkAioEmAIOCB *acb = opaque;
-     BlkRwCo *rwco = &acb->rwco;
- 
--    rwco->ret = blk_co_ioctl(rwco->blk, rwco->offset,
--                             rwco->qiov->iov[0].iov_base);
-+    rwco->ret = blk_co_ioctl(rwco->blk, rwco->offset, rwco->iobuf);
 +
-     blk_aio_complete(acb);
- }
- 
- BlockAIOCB *blk_aio_ioctl(BlockBackend *blk, unsigned long int req, void *buf,
-                           BlockCompletionFunc *cb, void *opaque)
- {
--    QEMUIOVector qiov;
--    struct iovec iov;
--
--    iov = (struct iovec) {
--        .iov_base = buf,
--        .iov_len = 0,
--    };
--    qemu_iovec_init_external(&qiov, &iov, 1);
--
--    return blk_aio_prwv(blk, req, 0, &qiov, blk_aio_ioctl_entry, 0, cb, opaque);
-+    return blk_aio_prwv(blk, req, 0, buf, blk_aio_ioctl_entry, 0, cb, opaque);
- }
- 
- int blk_co_pdiscard(BlockBackend *blk, int64_t offset, int bytes)
-@@ -1949,7 +1946,9 @@ int blk_truncate(BlockBackend *blk, int64_t offset, PreallocMode prealloc,
- static void blk_pdiscard_entry(void *opaque)
- {
-     BlkRwCo *rwco = opaque;
--    rwco->ret = blk_co_pdiscard(rwco->blk, rwco->offset, rwco->qiov->size);
-+    QEMUIOVector *qiov = rwco->iobuf;
++typedef struct {
++    AioWait wait;
++    bool done;
++    QEMUBHFunc *cb;
++    void *opaque;
++} AioWaitBHData;
 +
-+    rwco->ret = blk_co_pdiscard(rwco->blk, rwco->offset, qiov->size);
- }
- 
- int blk_pdiscard(BlockBackend *blk, int64_t offset, int bytes)
++/* Context: BH in IOThread */
++static void aio_wait_bh(void *opaque)
++{
++    AioWaitBHData *data = opaque;
++
++    data->cb(data->opaque);
++
++    data->done = true;
++    aio_wait_kick(&data->wait);
++}
++
++void aio_wait_bh_oneshot(AioContext *ctx, QEMUBHFunc *cb, void *opaque)
++{
++    AioWaitBHData data = {
++        .cb = cb,
++        .opaque = opaque,
++    };
++
++    assert(qemu_get_current_aio_context() == qemu_get_aio_context());
++
++    aio_bh_schedule_oneshot(ctx, aio_wait_bh, &data);
++    AIO_WAIT_WHILE(&data.wait, ctx, !data.done);
++}
 -- 
 2.14.3
