@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1euPqh-0007Mj-CT
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 16:46:48 -0500
+	(envelope-from <kwolf@redhat.com>) id 1euPqh-0007N9-U0
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 16:46:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1euPqf-0000s7-N7
+	(envelope-from <kwolf@redhat.com>) id 1euPqg-0000sV-Fr
 	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 16:46:47 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  9 Mar 2018 22:46:10 +0100
-Message-Id: <20180309214611.19122-7-kwolf@redhat.com>
+Date: Fri,  9 Mar 2018 22:46:11 +0100
+Message-Id: <20180309214611.19122-8-kwolf@redhat.com>
 In-Reply-To: <20180309214611.19122-1-kwolf@redhat.com>
 References: <20180309214611.19122-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 6/7] vhdx: Support .bdrv_co_create
+Subject: [Qemu-devel] [PATCH 7/7] vpc: Support .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,196 +22,159 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, jcody@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-This adds the .bdrv_co_create driver callback to vhdx, which
+This adds the .bdrv_co_create driver callback to vpc, which
 enables image creation over QMP.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-core.json |  37 ++++++++++-
- block/vhdx.c         | 174 ++++++++++++++++++++++++++++++++++++++-------------
- 2 files changed, 167 insertions(+), 44 deletions(-)
+ qapi/block-core.json |  33 ++++++++++-
+ block/vpc.c          | 152 ++++++++++++++++++++++++++++++++++++++-------------
+ 2 files changed, 147 insertions(+), 38 deletions(-)
 
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 2eba0eef7e..3a65909c47 100644
+index 3a65909c47..ca645a0067 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -3699,6 +3699,41 @@
-             '*static':          'bool' } }
+@@ -3734,6 +3734,37 @@
+             '*block-state-zero':    'bool' } }
  
  ##
-+# @BlockdevVhdxSubformat:
++# @BlockdevVpcSubformat:
 +#
 +# @dynamic: Growing image file
 +# @fixed:   Preallocated fixed-size imge file
 +#
 +# Since: 2.12
 +##
-+{ 'enum': 'BlockdevVhdxSubformat',
++{ 'enum': 'BlockdevVpcSubformat',
 +  'data': [ 'dynamic', 'fixed' ] }
 +
 +##
-+# @BlockdevCreateOptionsVhdx:
++# @BlockdevCreateOptionsVpc:
 +#
-+# Driver specific image creation options for vhdx.
++# Driver specific image creation options for vpc (VHD).
 +#
 +# @file             Node to create the image format on
 +# @size             Size of the virtual disk in bytes
-+# @log-size         Log size in bytes (default: 1 MB)
-+# @block-size       Block size in bytes (default: 1 MB)
 +# @subformat        vhdx subformat (default: dynamic)
-+# @block-state-zero Force use of payload blocks of type 'ZERO'. Non-standard,
-+#                   but default.  Do not set to 'off' when using 'qemu-img
-+#                   convert' with subformat=dynamic.
++# @force-size       Force use of the exact byte size instead of rounding to the
++#                   next size that can be represented in CHS geometry
++#                   (default: false)
 +#
 +# Since: 2.12
 +##
-+{ 'struct': 'BlockdevCreateOptionsVhdx',
++{ 'struct': 'BlockdevCreateOptionsVpc',
 +  'data': { 'file':                 'BlockdevRef',
 +            'size':                 'size',
-+            '*log-size':            'size',
-+            '*block-size':          'size',
-+            '*subformat':           'BlockdevVhdxSubformat',
-+            '*block-state-zero':    'bool' } }
++            '*subformat':           'BlockdevVpcSubformat',
++            '*force-size':          'bool' } }
 +
 +##
  # @BlockdevCreateNotSupported:
  #
  # This is used for all drivers that don't support creating images.
-@@ -3753,7 +3788,7 @@
-       'ssh':            'BlockdevCreateOptionsSsh',
-       'throttle':       'BlockdevCreateNotSupported',
+@@ -3790,7 +3821,7 @@
        'vdi':            'BlockdevCreateOptionsVdi',
--      'vhdx':           'BlockdevCreateNotSupported',
-+      'vhdx':           'BlockdevCreateOptionsVhdx',
+       'vhdx':           'BlockdevCreateOptionsVhdx',
        'vmdk':           'BlockdevCreateNotSupported',
-       'vpc':            'BlockdevCreateNotSupported',
+-      'vpc':            'BlockdevCreateNotSupported',
++      'vpc':            'BlockdevCreateOptionsVpc',
        'vvfat':          'BlockdevCreateNotSupported',
-diff --git a/block/vhdx.c b/block/vhdx.c
-index d82350d07c..0ce972381f 100644
---- a/block/vhdx.c
-+++ b/block/vhdx.c
-@@ -26,6 +26,9 @@
- #include "block/vhdx.h"
+       'vxhs':           'BlockdevCreateNotSupported'
+   } }
+diff --git a/block/vpc.c b/block/vpc.c
+index b2e2b9ebd4..8824211713 100644
+--- a/block/vpc.c
++++ b/block/vpc.c
+@@ -32,6 +32,9 @@
  #include "migration/blocker.h"
+ #include "qemu/bswap.h"
  #include "qemu/uuid.h"
 +#include "qapi/qmp/qdict.h"
 +#include "qapi/qobject-input-visitor.h"
 +#include "qapi/qapi-visit-block-core.h"
  
- /* Options for VHDX creation */
+ /**************************************************************/
  
-@@ -39,6 +42,8 @@ typedef enum VHDXImageType {
-     VHDX_TYPE_DIFFERENCING,   /* Currently unsupported */
- } VHDXImageType;
+@@ -166,6 +169,8 @@ static QemuOptsList vpc_runtime_opts = {
+     }
+ };
  
-+static QemuOptsList vhdx_create_opts;
++static QemuOptsList vpc_create_opts;
 +
- /* Several metadata and region table data entries are identified by
-  * guids in  a MS-specific GUID format. */
- 
-@@ -1792,54 +1797,63 @@ exit:
-  *    .---- ~ ----------- ~ ------------ ~ ---------------- ~ -----------.
-  *   1MB
-  */
--static int coroutine_fn vhdx_co_create_opts(const char *filename, QemuOpts *opts,
--                                            Error **errp)
-+static int coroutine_fn vhdx_co_create(BlockdevCreateOptions *opts,
-+                                       Error **errp)
+ static uint32_t vpc_checksum(uint8_t* buf, size_t size)
  {
-+    BlockdevCreateOptionsVhdx *vhdx_opts;
+     uint32_t res = 0;
+@@ -897,12 +902,15 @@ static int create_fixed_disk(BlockBackend *blk, uint8_t *buf,
+     return ret;
+ }
+ 
+-static int coroutine_fn vpc_co_create_opts(const char *filename, QemuOpts *opts,
+-                                           Error **errp)
++static int coroutine_fn vpc_co_create(BlockdevCreateOptions *opts,
++                                      Error **errp)
+ {
++    BlockdevCreateOptionsVpc *vpc_opts;
 +    BlockBackend *blk = NULL;
 +    BlockDriverState *bs = NULL;
 +
-     int ret = 0;
--    uint64_t image_size = (uint64_t) 2 * GiB;
--    uint32_t log_size   = 1 * MiB;
--    uint32_t block_size = 0;
-+    uint64_t image_size;
-+    uint32_t log_size;
-+    uint32_t block_size;
-     uint64_t signature;
-     uint64_t metadata_offset;
-     bool use_zero_blocks = false;
- 
-     gunichar2 *creator = NULL;
-     glong creator_items;
--    BlockBackend *blk;
--    char *type = NULL;
-     VHDXImageType image_type;
+     uint8_t buf[1024];
+     VHDFooter *footer = (VHDFooter *) buf;
+-    char *disk_type_param;
+     int i;
+     uint16_t cyls = 0;
+     uint8_t heads = 0;
+@@ -911,45 +919,38 @@ static int coroutine_fn vpc_co_create_opts(const char *filename, QemuOpts *opts,
+     int64_t total_size;
+     int disk_type;
+     int ret = -EIO;
+-    bool force_size;
 -    Error *local_err = NULL;
+-    BlockBackend *blk = NULL;
  
--    image_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+-    /* Read out options */
+-    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
 -                          BDRV_SECTOR_SIZE);
--    log_size = qemu_opt_get_size_del(opts, VHDX_BLOCK_OPT_LOG_SIZE, 0);
--    block_size = qemu_opt_get_size_del(opts, VHDX_BLOCK_OPT_BLOCK_SIZE, 0);
--    type = qemu_opt_get_del(opts, BLOCK_OPT_SUBFMT);
--    use_zero_blocks = qemu_opt_get_bool_del(opts, VHDX_BLOCK_OPT_ZERO, true);
-+    assert(opts->driver == BLOCKDEV_DRIVER_VHDX);
-+    vhdx_opts = &opts->u.vhdx;
+-    disk_type_param = qemu_opt_get_del(opts, BLOCK_OPT_SUBFMT);
+-    if (disk_type_param) {
+-        if (!strcmp(disk_type_param, "dynamic")) {
+-            disk_type = VHD_DYNAMIC;
+-        } else if (!strcmp(disk_type_param, "fixed")) {
+-            disk_type = VHD_FIXED;
+-        } else {
+-            error_setg(errp, "Invalid disk type, %s", disk_type_param);
+-            ret = -EINVAL;
+-            goto out;
+-        }
+-    } else {
++    assert(opts->driver == BLOCKDEV_DRIVER_VPC);
++    vpc_opts = &opts->u.vpc;
 +
 +    /* Validate options and set default values */
++    total_size = vpc_opts->size;
 +
-+    image_size = vhdx_opts->size;
-+    block_size = vhdx_opts->block_size;
-+
-+    if (!vhdx_opts->has_log_size) {
-+        log_size = DEFAULT_LOG_SIZE;
-+    } else {
-+        log_size = vhdx_opts->log_size;
++    if (!vpc_opts->has_subformat) {
++        vpc_opts->subformat = BLOCKDEV_VPC_SUBFORMAT_DYNAMIC;
 +    }
-+
-+    if (!vhdx_opts->has_block_state_zero) {
-+        use_zero_blocks = true;
-+    } else {
-+        use_zero_blocks = vhdx_opts->block_state_zero;
-+    }
- 
-     if (image_size > VHDX_MAX_IMAGE_SIZE) {
-         error_setg_errno(errp, EINVAL, "Image size too large; max of 64TB");
--        ret = -EINVAL;
--        goto exit;
-+        return -EINVAL;
-     }
- 
--    if (type == NULL) {
--        type = g_strdup("dynamic");
-+    if (!vhdx_opts->has_subformat) {
-+        vhdx_opts->subformat = BLOCKDEV_VHDX_SUBFORMAT_DYNAMIC;
-     }
- 
--    if (!strcmp(type, "dynamic")) {
-+    switch (vhdx_opts->subformat) {
-+    case BLOCKDEV_VHDX_SUBFORMAT_DYNAMIC:
-         image_type = VHDX_TYPE_DYNAMIC;
--    } else if (!strcmp(type, "fixed")) {
++    switch (vpc_opts->subformat) {
++    case BLOCKDEV_VPC_SUBFORMAT_DYNAMIC:
+         disk_type = VHD_DYNAMIC;
 +        break;
-+    case BLOCKDEV_VHDX_SUBFORMAT_FIXED:
-         image_type = VHDX_TYPE_FIXED;
--    } else if (!strcmp(type, "differencing")) {
--        error_setg_errno(errp, ENOTSUP,
--                         "Differencing files not yet supported");
--        ret = -ENOTSUP;
--        goto exit;
--    } else {
--        error_setg(errp, "Invalid subformat '%s'", type);
--        ret = -EINVAL;
--        goto exit;
++    case BLOCKDEV_VPC_SUBFORMAT_FIXED:
++        disk_type = VHD_FIXED;
 +        break;
 +    default:
 +        g_assert_not_reached();
      }
  
-     /* These are pretty arbitrary, and mainly designed to keep the BAT
-@@ -1865,21 +1879,17 @@ static int coroutine_fn vhdx_co_create_opts(const char *filename, QemuOpts *opts
-     block_size = block_size > VHDX_BLOCK_SIZE_MAX ? VHDX_BLOCK_SIZE_MAX :
-                                                     block_size;
- 
+-    force_size = qemu_opt_get_bool_del(opts, VPC_OPT_FORCE_SIZE, false);
+-
 -    ret = bdrv_create_file(filename, opts, &local_err);
 -    if (ret < 0) {
 -        error_propagate(errp, local_err);
--        goto exit;
+-        goto out;
 +    /* Create BlockBackend to write to the image */
-+    bs = bdrv_open_blockdev_ref(vhdx_opts->file, errp);
++    bs = bdrv_open_blockdev_ref(vpc_opts->file, errp);
 +    if (bs == NULL) {
 +        return -EIO;
      }
@@ -222,30 +185,44 @@ index d82350d07c..0ce972381f 100644
 -    if (blk == NULL) {
 -        error_propagate(errp, local_err);
 -        ret = -EIO;
--        goto exit;
 +    blk = blk_new(BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
 +    ret = blk_insert_bs(blk, bs, errp);
 +    if (ret < 0) {
-+        goto delete_and_exit;
+         goto out;
      }
 -
      blk_set_allow_write_beyond_eof(blk, true);
  
-     /* Create (A) */
-@@ -1931,12 +1941,89 @@ static int coroutine_fn vhdx_co_create_opts(const char *filename, QemuOpts *opts
+     /*
+@@ -961,7 +962,7 @@ static int coroutine_fn vpc_co_create_opts(const char *filename, QemuOpts *opts,
+      * we set the geometry to 65535 x 16 x 255 (CxHxS) sectors and use
+      * the image size from the VHD footer to calculate total_sectors.
+      */
+-    if (force_size) {
++    if (vpc_opts->force_size) {
+         /* This will force the use of total_size for sector count, below */
+         cyls         = VHD_CHS_MAX_C;
+         heads        = VHD_CHS_MAX_H;
+@@ -990,7 +991,7 @@ static int coroutine_fn vpc_co_create_opts(const char *filename, QemuOpts *opts,
+     memset(buf, 0, 1024);
  
- delete_and_exit:
+     memcpy(footer->creator, "conectix", 8);
+-    if (force_size) {
++    if (vpc_opts->force_size) {
+         memcpy(footer->creator_app, "qem2", 4);
+     } else {
+         memcpy(footer->creator_app, "qemu", 4);
+@@ -1032,10 +1033,86 @@ static int coroutine_fn vpc_co_create_opts(const char *filename, QemuOpts *opts,
+ 
+ out:
      blk_unref(blk);
--exit:
--    g_free(type);
+-    g_free(disk_type_param);
 +    bdrv_unref(bs);
-     g_free(creator);
-     return ret;
- }
- 
-+static int coroutine_fn vhdx_co_create_opts(const char *filename,
-+                                            QemuOpts *opts,
-+                                            Error **errp)
++    return ret;
++}
++
++static int coroutine_fn vpc_co_create_opts(const char *filename,
++                                           QemuOpts *opts, Error **errp)
 +{
 +    BlockdevCreateOptions *create_options = NULL;
 +    QDict *qdict = NULL;
@@ -256,14 +233,12 @@ index d82350d07c..0ce972381f 100644
 +    int ret;
 +
 +    static const QDictRenames opt_renames[] = {
-+        { VHDX_BLOCK_OPT_LOG_SIZE,      "log-size" },
-+        { VHDX_BLOCK_OPT_BLOCK_SIZE,    "block-size" },
-+        { VHDX_BLOCK_OPT_ZERO,          "block-state-zero" },
++        { VPC_OPT_FORCE_SIZE,           "force-size" },
 +        { NULL, NULL },
 +    };
 +
 +    /* Parse options and convert legacy syntax */
-+    qdict = qemu_opts_to_qdict_filtered(opts, NULL, &vhdx_create_opts, true);
++    qdict = qemu_opts_to_qdict_filtered(opts, NULL, &vpc_create_opts, true);
 +
 +    if (!qdict_rename_keys(qdict, opt_renames, errp)) {
 +        ret = -EINVAL;
@@ -285,7 +260,7 @@ index d82350d07c..0ce972381f 100644
 +    }
 +
 +    /* Now get the QAPI type BlockdevCreateOptions */
-+    qdict_put_str(qdict, "driver", "vhdx");
++    qdict_put_str(qdict, "driver", "vpc");
 +    qdict_put_str(qdict, "file", bs->node_name);
 +
 +    qobj = qdict_crumple(qdict, errp);
@@ -307,30 +282,31 @@ index d82350d07c..0ce972381f 100644
 +    }
 +
 +    /* Silently round up size */
-+    assert(create_options->driver == BLOCKDEV_DRIVER_VHDX);
-+    create_options->u.vhdx.size =
-+        ROUND_UP(create_options->u.vhdx.size, BDRV_SECTOR_SIZE);
++    assert(create_options->driver == BLOCKDEV_DRIVER_VPC);
++    create_options->u.vpc.size =
++        ROUND_UP(create_options->u.vpc.size, BDRV_SECTOR_SIZE);
 +
-+    /* Create the vhdx image (format layer) */
-+    ret = vhdx_co_create(create_options, errp);
++    /* Create the vpc image (format layer) */
++    ret = vpc_co_create(create_options, errp);
 +
 +fail:
 +    QDECREF(qdict);
 +    bdrv_unref(bs);
 +    qapi_free_BlockdevCreateOptions(create_options);
-+    return ret;
-+}
+     return ret;
+ }
+ 
 +
- /* If opened r/w, the VHDX driver will automatically replay the log,
-  * if one is present, inside the vhdx_open() call.
-  *
-@@ -2005,6 +2092,7 @@ static BlockDriver bdrv_vhdx = {
+ static int vpc_has_zero_init(BlockDriverState *bs)
+ {
+     BDRVVPCState *s = bs->opaque;
+@@ -1096,6 +1173,7 @@ static BlockDriver bdrv_vpc = {
+     .bdrv_close             = vpc_close,
+     .bdrv_reopen_prepare    = vpc_reopen_prepare,
      .bdrv_child_perm        = bdrv_format_default_perms,
-     .bdrv_co_readv          = vhdx_co_readv,
-     .bdrv_co_writev         = vhdx_co_writev,
-+    .bdrv_co_create         = vhdx_co_create,
-     .bdrv_co_create_opts    = vhdx_co_create_opts,
-     .bdrv_get_info          = vhdx_get_info,
-     .bdrv_co_check          = vhdx_co_check,
++    .bdrv_co_create         = vpc_co_create,
+     .bdrv_co_create_opts    = vpc_co_create_opts,
+ 
+     .bdrv_co_preadv             = vpc_co_preadv,
 -- 
 2.13.6
