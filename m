@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1euHmO-0002Xt-MW
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:09:49 -0500
+	(envelope-from <berto@igalia.com>) id 1euHnw-0003yJ-4M
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:11:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1euHmJ-0006WS-NB
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:09:48 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56046 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1euHmJ-0006W8-Ii
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:09:43 -0500
-From: marcandre.lureau@redhat.com
-Date: Fri,  9 Mar 2018 14:09:18 +0100
-Message-Id: <20180309130918.734-8-marcandre.lureau@redhat.com>
-In-Reply-To: <20180309130918.734-1-marcandre.lureau@redhat.com>
-References: <20180309130918.734-1-marcandre.lureau@redhat.com>
+	(envelope-from <berto@igalia.com>) id 1euHns-0000Ed-0T
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:11:24 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <08c5381a-cacf-6d0d-d804-4066a7d3018c@redhat.com>
+References: <20180306130121.30243-1-berto@igalia.com>
+	<cec0f674-b25a-9c7c-e12c-49513e0060d0@redhat.com>
+	<w518tb3qae5.fsf@maestria.local.igalia.com>
+	<08c5381a-cacf-6d0d-d804-4066a7d3018c@redhat.com>
+Date: Fri, 09 Mar 2018 14:10:41 +0100
+Message-ID: <w518tb12y3y.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 7/7] OvmfPkg: plug DxeTpm2MeasureBootLib
- into SecurityStubDxe
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4] iotests: Tweak 030 in order to trigger
+ a race condition with parallel jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,111 +25,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: edk2-devel@lists.01.org
-Cc: pjones@redhat.com, jiewen.yao@intel.com, stefanb@linux.vnet.ibm.com, lersek@redhat.com, qemu-devel@nongnu.org, javierm@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On Fri 09 Mar 2018 01:54:31 PM CET, Max Reitz wrote:
+> On 2018-03-08 08:44, Alberto Garcia wrote:
+>> On Wed 07 Mar 2018 06:54:51 PM CET, Max Reitz wrote:
+>>>> v4: Mention that commit 1a63a907507fbbcfaee3f622907ec24 also
+>>>>     contributes to solve the original bug (both commits need to
+>>>>     reverted in order to reproduce this bug reliably).
+>>>>
+>>>>     Rewrite the loop that writes data into the images to make it more
+>>>>     readable.
+>>>
+>>> Thanks!  Applied to my block tree:
+>>>
+>>> https://github.com/XanClic/qemu/commits/block
+>>>
+>>> (Still took me a couple of attempts to get it to fail both commits
+>>> reverted, though...)
+>> 
+>> Odd, I can reproduce it 100% of the cases. Were you maybe running the
+>> tests on tmpfs ?
+>
+> ...yes? O:-)
 
-The library registers a security management handler, to measure images
-that are not measure in PEI phase. For example with the qemu PXE rom:
+Nothing wrong, I do it often, but I used an actual hard drive to
+reproduce this bug.
 
-Loading driver at 0x0003E6C2000 EntryPoint=3D0x0003E6C9076 8086100e.efi
-
-And the following binary_bios_measurements log entry seems to be
-added:
-
-PCR: 2	type: EV_EFI_BOOT_SERVICES_DRIVER     	size: 0x4e	digest: 70a22475=
-e9f18806d2ed9193b48d80d26779d9a4
-
-The following order of operations ensures that 3rd party UEFI modules,
-such as PCI option ROMs and other modules possibly loaded from outside
-of firmware volumes, are measured into the TPM:
-
-(1) Tcg2Dxe is included in DXEFV, therefore it produces the TCG2
-    protocol sometime in the DXE phase (assuming a TPM2 chip is present,
-    reported via PcdTpmInstanceGuid).
-
-(2) The DXE core finds that no more drivers are left to dispatch from
-    DXEFV, and we enter the BDS phase.
-
-(3) OVMF's PlatformBootManagerLib connects all PCI root bridges
-    non-recursively, producing PciIo instances and discovering PCI
-    oproms.
-
-(4) The dispatching of images that don't originate from FVs is deferred
-    at this point, by
-    "MdeModulePkg/Universal/SecurityStubDxe/Defer3rdPartyImageLoad.c".
-
-(5) OVMF's PlatformBootManagerLib signals EndOfDxe.
-
-(6) OVMF's PlatformBootManagerLib calls
-    EfiBootManagerDispatchDeferredImages() -- the images deferred in
-    step (4) are now dispatched.
-
-(7) Image dispatch invokes the Security / Security2 Arch protocols
-    (produced by SecurityStubDxe). In this patch, we hook
-    DxeTpm2MeasureBootLib into SecurityStubDxe, therefore image dispatch
-    will try to locate the TCG2 protocol, and measure the image into the
-    TPM2 chip with the protocol. Because of step (1), the TCG2 protocol
-    will always be found and used (assuming a TPM2 chip is present).
-
-Cc: Laszlo Ersek <lersek@redhat.com>
-Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Contributed-under: TianoCore Contribution Agreement 1.0
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- OvmfPkg/OvmfPkgIa32.dsc    | 3 +++
- OvmfPkg/OvmfPkgIa32X64.dsc | 3 +++
- OvmfPkg/OvmfPkgX64.dsc     | 3 +++
- 3 files changed, 9 insertions(+)
-
-diff --git a/OvmfPkg/OvmfPkgIa32.dsc b/OvmfPkg/OvmfPkgIa32.dsc
-index f80fb50d4a38..92c8c560a067 100644
---- a/OvmfPkg/OvmfPkgIa32.dsc
-+++ b/OvmfPkg/OvmfPkgIa32.dsc
-@@ -644,6 +644,9 @@ [Components]
-     <LibraryClasses>
- !if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
-       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificat=
-ionLib.inf
-+!endif
-+!if $(TPM2_ENABLE) =3D=3D TRUE
-+      NULL|SecurityPkg/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBootL=
-ib.inf
- !endif
-   }
-=20
-diff --git a/OvmfPkg/OvmfPkgIa32X64.dsc b/OvmfPkg/OvmfPkgIa32X64.dsc
-index bc48b5b63c7a..6ecaa795b288 100644
---- a/OvmfPkg/OvmfPkgIa32X64.dsc
-+++ b/OvmfPkg/OvmfPkgIa32X64.dsc
-@@ -653,6 +653,9 @@ [Components.X64]
-     <LibraryClasses>
- !if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
-       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificat=
-ionLib.inf
-+!endif
-+!if $(TPM2_ENABLE) =3D=3D TRUE
-+      NULL|SecurityPkg/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBootL=
-ib.inf
- !endif
-   }
-=20
-diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
-index e89de093d6a2..c98a3657c6f6 100644
---- a/OvmfPkg/OvmfPkgX64.dsc
-+++ b/OvmfPkg/OvmfPkgX64.dsc
-@@ -651,6 +651,9 @@ [Components]
-     <LibraryClasses>
- !if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
-       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificat=
-ionLib.inf
-+!endif
-+!if $(TPM2_ENABLE) =3D=3D TRUE
-+      NULL|SecurityPkg/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBootL=
-ib.inf
- !endif
-   }
-=20
---=20
-2.16.2.346.g9779355e34
+Berto
