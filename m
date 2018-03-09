@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1euMEN-00083H-Kd
+	(envelope-from <dgilbert@redhat.com>) id 1euMEN-00083F-JQ
 	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:55:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1euMEM-0003LR-Le
+	(envelope-from <dgilbert@redhat.com>) id 1euMEK-0003Ki-FT
 	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:54:59 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45594 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35838 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1euMEM-0003LG-Ga
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:54:58 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1euMEK-0003KX-BN
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:54:56 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri,  9 Mar 2018 17:54:49 +0000
-Message-Id: <20180309175453.41548-3-dgilbert@redhat.com>
-In-Reply-To: <20180309175453.41548-1-dgilbert@redhat.com>
-References: <20180309175453.41548-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 2/6] migration: do not transfer ram during bulk
- storage migration
+Date: Fri,  9 Mar 2018 17:54:47 +0000
+Message-Id: <20180309175453.41548-1-dgilbert@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/6] migration queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,46 +27,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, pl@kamp.de, peterx@redhat.com, quintela@redhat.com
 
-From: Peter Lieven <pl@kamp.de>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-this patch makes the bulk phase of a block migration to take
-place before we start transferring ram. As the bulk block migration
-can take a long time its pointless to transfer ram during that phase.
+The following changes since commit b39b61e410022f96ceb53d4381d25cba5126ac=
+44:
 
-Signed-off-by: Peter Lieven <pl@kamp.de>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <1520507908-16743-2-git-send-email-pl@kamp.de>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/ram.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+  memory: fix flatview_access_valid RCU read lock/unlock imbalance (2018-=
+03-09 15:55:20 +0000)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 3b6c077964..7266351fd0 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2258,6 +2258,13 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
-     int64_t t0;
-     int done = 0;
- 
-+    if (blk_mig_bulk_active()) {
-+        /* Avoid transferring ram during bulk phase of block migration as
-+         * the bulk phase will usually take a long time and transferring
-+         * ram updates during that time is pointless. */
-+        goto out;
-+    }
-+
-     rcu_read_lock();
-     if (ram_list.version != rs->last_version) {
-         ram_state_reset(rs);
-@@ -2304,6 +2311,7 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
-      */
-     ram_control_after_iterate(f, RAM_CONTROL_ROUND);
- 
-+out:
-     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
-     ram_counters.transferred += 8;
- 
--- 
-2.14.3
+are available in the Git repository at:
+
+  git://github.com/dagrh/qemu.git tags/pull-migration-20180309a
+
+for you to fetch changes up to f96d6651e4b7cb8a8e91774b9330d82c333171d6:
+
+  tests: Silence migration-test 'bad' test (2018-03-09 17:39:25 +0000)
+
+----------------------------------------------------------------
+Migration pull 2018-03-09
+
+----------------------------------------------------------------
+Dr. David Alan Gilbert (1):
+      tests: Silence migration-test 'bad' test
+
+Marc-Andr=C3=A9 Lureau (1):
+      migration: fix minor finalize leak
+
+Peter Lieven (3):
+      migration: do not transfer ram during bulk storage migration
+      migration/block: reset dirty bitmap before read in bulk phase
+      migration/block: rename MAX_INFLIGHT_IO to MAX_IO_BUFFERS
+
+Peter Xu (1):
+      migration: fix applying wrong capabilities
+
+ migration/block.c      | 12 +++++-------
+ migration/migration.c  |  5 ++++-
+ migration/ram.c        |  8 ++++++++
+ tests/migration-test.c | 17 ++++++++++++++---
+ 4 files changed, 31 insertions(+), 11 deletions(-)
