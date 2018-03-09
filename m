@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1euKCg-0005Hj-SW
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:45:07 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1euKD3-0005gr-MW
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:45:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1euKCf-00040C-SL
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:45:06 -0500
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:43645)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1euKD0-0004Ev-DR
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:45:29 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:37414)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1euKCf-0003zx-N6
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:45:05 -0500
-Received: by mail-oi0-x242.google.com with SMTP id a207so7260267oii.10
-	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 07:45:05 -0800 (PST)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1euKCz-0004EN-SG
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:45:26 -0500
+Received: by mail-wm0-x242.google.com with SMTP id 139so4708900wmn.2
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 07:45:25 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180309135945.20436-1-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7de78a92-4f42-3287-e2ff-895f804e2f37@amsat.org>
+Date: Fri, 9 Mar 2018 16:45:22 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180309153654.13518-2-f4bug@amsat.org>
-References: <20180309153654.13518-1-f4bug@amsat.org>
-	<20180309153654.13518-2-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 9 Mar 2018 15:44:44 +0000
-Message-ID: <CAFEAcA_A+EKpc9BPbBOCU+-_Pw11D7ALDBZ5zDytzQPB6qp1QA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/8] sdcard: Do not trace CMD55,
- except when we already expect an ACMD
+In-Reply-To: <20180309135945.20436-1-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] build: try improve handling of clang
+ warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +35,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair@alistair23.me>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On 9 March 2018 at 15:36, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
-te:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Acked-by: Alistair Francis <alistair.francis@xilinx.com>
+On 03/09/2018 02:59 PM, Gerd Hoffmann wrote:
+> This patch disables the pragma diagnostic -Wunused-but-set-variable for
+> clang in util/coroutine-ucontext.c.
+> 
+> This in turn allows us to remove it from the configure check, so the
+> CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE will succeed for clang.
+> 
+> With that in place clang builds (linux) will use -Werror by default,
+> which breaks the build due to warning about unaligned struct members.
+> 
+> Just turning off this warning isn't a good idea as it indicates
+> portability problems.  So make it a warning again, using
+> -Wno-error=address-of-packed-member.  That way it doesn't break the
+> build but still shows up in the logs.
+> 
+> Now clang builds qemu without errors.  Well, almost.  There are some
+> left in the rdma code.  Leaving that to the rdma people.  All others can
+> use --disable-rdma to workarounds this.
+> 
+> Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
->  hw/sd/sd.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-> index 933890e86f..4a9520e38e 100644
-> --- a/hw/sd/sd.c
-> +++ b/hw/sd/sd.c
-> @@ -866,13 +866,18 @@ static void sd_lock_command(SDState *sd)
->          sd->card_status &=3D ~CARD_IS_LOCKED;
+>  configure                 | 2 +-
+>  util/coroutine-ucontext.c | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index 6f3921c02a..3a12173c83 100755
+> --- a/configure
+> +++ b/configure
+> @@ -1692,6 +1692,7 @@ gcc_flags="-Wno-missing-include-dirs -Wempty-body -Wnested-externs $gcc_flags"
+>  gcc_flags="-Wendif-labels -Wno-shift-negative-value $gcc_flags"
+>  gcc_flags="-Wno-initializer-overrides -Wexpansion-to-defined $gcc_flags"
+>  gcc_flags="-Wno-string-plus-int $gcc_flags"
+> +gcc_flags="-Wno-error=address-of-packed-member $gcc_flags"
+>  # Note that we do not add -Werror to gcc_flags here, because that would
+>  # enable it for all configure tests. If a configure test failed due
+>  # to -Werror this would just silently disable some features,
+> @@ -4860,7 +4861,6 @@ fi
+>  pragma_disable_unused_but_set=no
+>  cat > $TMPC << EOF
+>  #pragma GCC diagnostic push
+> -#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+>  #pragma GCC diagnostic ignored "-Wstrict-prototypes"
+>  #pragma GCC diagnostic pop
+>  
+> diff --git a/util/coroutine-ucontext.c b/util/coroutine-ucontext.c
+> index 926d3402e3..090ba21a13 100644
+> --- a/util/coroutine-ucontext.c
+> +++ b/util/coroutine-ucontext.c
+> @@ -170,7 +170,7 @@ Coroutine *qemu_coroutine_new(void)
 >  }
->
-> -static sd_rsp_type_t sd_normal_command(SDState *sd,
-> -                                       SDRequest req)
-> +static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+>  
+>  #ifdef CONFIG_VALGRIND_H
+> -#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
+> +#if defined(CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE) && !defined(__clang__)
+>  /* Work around an unused variable in the valgrind.h macro... */
+>  #pragma GCC diagnostic push
+>  #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+> @@ -179,7 +179,7 @@ static inline void valgrind_stack_deregister(CoroutineUContext *co)
 >  {
->      uint32_t rca =3D 0x0000;
->      uint64_t addr =3D (sd->ocr & (1 << 30)) ? (uint64_t) req.arg << 9 : =
-req.arg;
->
-> -    trace_sdcard_normal_command(req.cmd, req.arg, sd_state_name(sd->stat=
-e));
-> +    /* CMD55 precedes an ACMD, so we are not interested in tracing it.
-> +     * However there is no ACMD55, so we want to trace this particular c=
-ase.
-> +     */
-> +    if (req.cmd !=3D 55 || sd->expecting_acmd) {
-> +        trace_sdcard_normal_command(req.cmd, req.arg,
-> +                                    sd_state_name(sd->state));
-> +    }
->
->      /* Not interpreting this as an app command */
->      sd->card_status &=3D ~APP_CMD;
-> --
-> 2.16.2
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+>      VALGRIND_STACK_DEREGISTER(co->valgrind_stack_id);
+>  }
+> -#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
+> +#if defined(CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE) && !defined(__clang__)
+>  #pragma GCC diagnostic pop
+>  #endif
+>  #endif
+> 
