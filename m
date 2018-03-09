@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1euKlM-0001Zu-Md
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:58 -0500
+	(envelope-from <kwolf@redhat.com>) id 1euKlO-0001br-41
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1euKlL-0007UC-8t
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:56 -0500
+	(envelope-from <kwolf@redhat.com>) id 1euKlN-0007XE-1a
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:58 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  9 Mar 2018 17:19:29 +0100
-Message-Id: <20180309161933.8168-53-kwolf@redhat.com>
+Date: Fri,  9 Mar 2018 17:19:31 +0100
+Message-Id: <20180309161933.8168-55-kwolf@redhat.com>
 In-Reply-To: <20180309161933.8168-1-kwolf@redhat.com>
 References: <20180309161933.8168-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 52/56] iotests: Test creating overlay when guest
- running
+Subject: [Qemu-devel] [PULL 54/56] iotests: Skip test for ENOMEM error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +24,34 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Fam Zheng <famz@redhat.com>
 
+The AFL image is to exercise the code validating image size, which
+doesn't work on 32 bit or when out of memory (there is a large
+allocation before the interesting point). So check that and skip the
+test, instead of faking the result.
+
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-id: 20171225025107.23985-1-famz@redhat.com
+Message-id: 20180301011413.11531-1-famz@redhat.com
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/153     | 8 +++++---
- tests/qemu-iotests/153.out | 7 ++++---
- 2 files changed, 9 insertions(+), 6 deletions(-)
+ tests/qemu-iotests/059 | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
-index fa25eb24bd..adfd02695b 100755
---- a/tests/qemu-iotests/153
-+++ b/tests/qemu-iotests/153
-@@ -32,6 +32,7 @@ _cleanup()
- {
-     _cleanup_test_img
-     rm -f "${TEST_IMG}.base"
-+    rm -f "${TEST_IMG}.overlay"
-     rm -f "${TEST_IMG}.convert"
-     rm -f "${TEST_IMG}.a"
-     rm -f "${TEST_IMG}.b"
-@@ -177,8 +178,6 @@ rm -f "${TEST_IMG}.lnk" &>/dev/null
- ln -s ${TEST_IMG} "${TEST_IMG}.lnk" || echo "Failed to create link"
- _run_qemu_with_images "${TEST_IMG}.lnk" "${TEST_IMG}"
+diff --git a/tests/qemu-iotests/059 b/tests/qemu-iotests/059
+index 40f89eae18..530bbbe6ce 100755
+--- a/tests/qemu-iotests/059
++++ b/tests/qemu-iotests/059
+@@ -152,9 +152,8 @@ done
+ echo
+ echo "=== Testing afl image with a very large capacity ==="
+ _use_sample_img afl9.vmdk.bz2
+-# The sed makes this test pass on machines with little RAM
+-# (and also with 32 bit builds)
+-_img_info | sed -e 's/Cannot allocate memory/Invalid argument/'
++_img_info | grep -q 'Cannot allocate memory' && _notrun "Insufficent memory, skipped test"
++_img_info
+ _cleanup_test_img
  
--echo
--echo "== Closing an image should unlock it =="
- _launch_qemu
- 
- _send_qemu_cmd $QEMU_HANDLE \
-@@ -193,7 +192,10 @@ _send_qemu_cmd $QEMU_HANDLE \
- 
- _run_cmd $QEMU_IO "${TEST_IMG}" -c 'write 0 512'
- 
--echo "Closing drive"
-+echo "Creating overlay with qemu-img when the guest is running should be allowed"
-+_run_cmd $QEMU_IMG create -f $IMGFMT -b "${TEST_IMG}" "${TEST_IMG}.overlay"
-+
-+echo "== Closing an image should unlock it =="
- _send_qemu_cmd $QEMU_HANDLE \
-     "{ 'execute': 'human-monitor-command',
-        'arguments': { 'command-line': 'drive_del d0' } }" \
-diff --git a/tests/qemu-iotests/153.out b/tests/qemu-iotests/153.out
-index 5b917b177c..34309cfb20 100644
---- a/tests/qemu-iotests/153.out
-+++ b/tests/qemu-iotests/153.out
-@@ -372,15 +372,16 @@ Is another process using the image?
- == Symbolic link ==
- QEMU_PROG: -drive if=none,file=TEST_DIR/t.qcow2: Failed to get "write" lock
- Is another process using the image?
--
--== Closing an image should unlock it ==
- {"return": {}}
- Adding drive
- 
- _qemu_io_wrapper TEST_DIR/t.qcow2 -c write 0 512
- can't open device TEST_DIR/t.qcow2: Failed to get "write" lock
- Is another process using the image?
--Closing drive
-+Creating overlay with qemu-img when the guest is running should be allowed
-+
-+_qemu_img_wrapper create -f qcow2 -b TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.overlay
-+== Closing an image should unlock it ==
- 
- _qemu_io_wrapper TEST_DIR/t.qcow2 -c write 0 512
- Adding two and closing one
+ # success, all done
 -- 
 2.13.6
