@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39506)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1euJWB-0006ap-Nk
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:01:15 -0500
+	(envelope-from <eblake@redhat.com>) id 1euJXW-0007Yv-GD
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:02:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1euJWA-0005Mt-UM
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:01:11 -0500
+	(envelope-from <eblake@redhat.com>) id 1euJXR-0005m6-TE
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:02:34 -0500
 References: <20180309104151.2431-1-apahim@redhat.com>
-	<20180309104151.2431-2-apahim@redhat.com>
+	<20180309104151.2431-3-apahim@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <09c3d7cd-b7a0-6eb7-f6df-81f767be6958@redhat.com>
-Date: Fri, 9 Mar 2018 09:01:01 -0600
+Message-ID: <d264b51a-dc35-32ca-0adc-e79b1522e6de@redhat.com>
+Date: Fri, 9 Mar 2018 09:02:04 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180309104151.2431-2-apahim@redhat.com>
+In-Reply-To: <20180309104151.2431-3-apahim@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/2] qemu-iotests: skip test
- 205 for unsupported formats
+Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-iotests: set exec permission for
+ tests lacking it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +29,14 @@ To: Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
 On 03/09/2018 04:41 AM, Amador Pahim wrote:
-> Using bochs or cloop, qemu-img will fail with:
-> 
->    Format driver 'bochs' does not support image creation
+> Some tests are not executables. This patch sets the executable
+> permission for those tests lacking that.
 > 
 > Signed-off-by: Amador Pahim <apahim@redhat.com>
 > ---
->   tests/qemu-iotests/205 | 3 +++
->   1 file changed, 3 insertions(+)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-> 
-> diff --git a/tests/qemu-iotests/205 b/tests/qemu-iotests/205
-> index e7b2eae51d..fff9be97d2 100644
-> --- a/tests/qemu-iotests/205
-> +++ b/tests/qemu-iotests/205
-> @@ -24,6 +24,9 @@ import iotests
->   import time
->   from iotests import qemu_img_create, qemu_io, filter_qemu_io, QemuIoInteractive
->   
-> +
-> +iotests.verify_image_format(unsupported_fmts=['bochs', 'cloop'])
-> +
->   nbd_sock = 'nbd_sock'
->   nbd_uri = 'nbd+unix:///exp?socket=' + nbd_sock
->   disk = os.path.join(iotests.test_dir, 'disk')
-> 
+Duplicate of a patch already on Max's tree:
+https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg01167.html
 
 -- 
 Eric Blake, Principal Software Engineer
