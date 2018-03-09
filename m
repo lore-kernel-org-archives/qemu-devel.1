@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1euL3x-0001TG-HV
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:40:13 -0500
+	(envelope-from <lersek@redhat.com>) id 1euL4E-0001kG-I2
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:40:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1euL3t-0008U8-NI
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:40:09 -0500
-References: <20180308184636.178534-1-vsementsov@virtuozzo.com>
-	<20180308184636.178534-2-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0196fa0d-28f7-85d4-9b9c-cdc024005f38@redhat.com>
-Date: Fri, 9 Mar 2018 10:39:57 -0600
+	(envelope-from <lersek@redhat.com>) id 1euL49-0000F6-Em
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:40:26 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43460 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1euL49-0000ER-6h
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:40:21 -0500
+References: <20180309130918.734-1-marcandre.lureau@redhat.com>
+	<20180309130918.734-6-marcandre.lureau@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <15291730-3285-a554-89ac-e8c359053cc3@redhat.com>
+Date: Fri, 9 Mar 2018 17:40:05 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180308184636.178534-2-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180309130918.734-6-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/5] nbd/server: move
- nbd_co_send_structured_error up
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 5/7] OvmfPkg: include Tcg2Pei module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,20 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: pbonzini@redhat.com, den@openvz.org
+To: marcandre.lureau@redhat.com, edk2-devel@lists.01.org
+Cc: pjones@redhat.com, jiewen.yao@intel.com, stefanb@linux.vnet.ibm.com, qemu-devel@nongnu.org, javierm@redhat.com
 
-On 03/08/2018 12:46 PM, Vladimir Sementsov-Ogievskiy wrote:
-> To be reused in nbd_co_send_sparse_read() in the following patch.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On 03/09/18 14:09, marcandre.lureau@redhat.com wrote:
+> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>=20
+> This module will initialize TPM device, measure reported FVs and BIOS
+> version. We keep both SHA-1 and SHA-256 for the TCG 1.2 log format
+> compatibility, but the SHA-256 measurements and TCG 2 log format are
+> now recommended.
+>=20
+> Cc: Laszlo Ersek <lersek@redhat.com>
+> Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> Contributed-under: TianoCore Contribution Agreement 1.0
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->   nbd/server.c | 48 ++++++++++++++++++++++++------------------------
->   1 file changed, 24 insertions(+), 24 deletions(-)
-> 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+>  OvmfPkg/OvmfPkgIa32.dsc    | 7 +++++++
+>  OvmfPkg/OvmfPkgIa32.fdf    | 1 +
+>  OvmfPkg/OvmfPkgIa32X64.dsc | 7 +++++++
+>  OvmfPkg/OvmfPkgIa32X64.fdf | 1 +
+>  OvmfPkg/OvmfPkgX64.dsc     | 7 +++++++
+>  OvmfPkg/OvmfPkgX64.fdf     | 1 +
+>  6 files changed, 24 insertions(+)
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
