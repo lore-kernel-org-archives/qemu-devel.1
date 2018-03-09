@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1euGeJ-0006E2-4f
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:57:24 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1euGgd-0007OK-To
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:59:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1euGeF-0006lK-8l
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:57:23 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36303)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1euGeE-0006l2-Vg
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:57:19 -0500
-Received: by mail-wm0-x242.google.com with SMTP id 188so3446536wme.1
-	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 03:57:18 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1519998711-73430-1-git-send-email-mjc@sifive.com>
-	<1519998711-73430-18-git-send-email-mjc@sifive.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6dadb40f-3adc-a985-c355-8fb12efc482b@amsat.org>
-Date: Fri, 9 Mar 2018 12:57:16 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1euGga-0007be-P8
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:59:48 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54366 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1euGga-0007bY-HS
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:59:44 -0500
+Date: Fri, 9 Mar 2018 11:59:29 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180309115928.GB3214@work-vm>
+References: <1520229653-10658-1-git-send-email-yulei.zhang@intel.com>
+	<1520229653-10658-4-git-send-email-yulei.zhang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1519998711-73430-18-git-send-email-mjc@sifive.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v8 17/23] SiFive RISC-V Test Finisher
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1520229653-10658-4-git-send-email-yulei.zhang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH V3 3/4] vfio: Add struct vfio_vmstate_info
+ to introduce put/get callback funtion for vfio device status save/restore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,172 +28,228 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: Yulei Zhang <yulei.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, kevin.tian@intel.com, alex.williamson@redhat.com, kwankhede@nvidia.com, zhenyuw@linux.intel.com
 
-On 03/02/2018 02:51 PM, Michael Clark wrote:
-> Test finisher memory mapped device used to exit simulation.
+* Yulei Zhang (yulei.zhang@intel.com) wrote:
+> Introduce vfio_device_put/vfio_device_get funtion for vfio device state
+> save/restore usage.
 > 
-> Acked-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
-> Signed-off-by: Michael Clark <mjc@sifive.com>
+> For VFIO pci device status migrate, on the source side with
+> funtion vfio_device_put to save the following states
+> 1. pci configuration space addr0~addr5
+> 2. pci configuration space msi_addr msi_data
+> 3. pci device status fetch from device driver
+> 
+> And on the target side with funtion vfio_device_get to restore
+> the same states
+> 1. re-setup the pci bar configuration
+> 2. re-setup the pci device msi configuration
+> 3. restore the pci device status
+> 
+> Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
 > ---
->  hw/riscv/sifive_test.c         | 93 ++++++++++++++++++++++++++++++++++++++++++
->  include/hw/riscv/sifive_test.h | 42 +++++++++++++++++++
->  2 files changed, 135 insertions(+)
->  create mode 100644 hw/riscv/sifive_test.c
->  create mode 100644 include/hw/riscv/sifive_test.h
+>  hw/vfio/pci.c              | 137 +++++++++++++++++++++++++++++++++++++++++++++
+>  linux-headers/linux/vfio.h |   3 +
+>  2 files changed, 140 insertions(+)
 > 
-> diff --git a/hw/riscv/sifive_test.c b/hw/riscv/sifive_test.c
-> new file mode 100644
-> index 0000000..8abd2cd
-> --- /dev/null
-> +++ b/hw/riscv/sifive_test.c
-> @@ -0,0 +1,93 @@
-> +/*
-> + * QEMU SiFive Test Finisher
-> + *
-> + * Copyright (c) 2018 SiFive, Inc.
-> + *
-> + * Test finisher memory mapped device used to exit simulation
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/sysbus.h"
-> +#include "target/riscv/cpu.h"
-> +#include "hw/riscv/sifive_test.h"
-> +
-> +static uint64_t sifive_test_read(void *opaque, hwaddr addr, unsigned int size)
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 3e2289c..c1676cf 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -2982,6 +2982,123 @@ static void vfio_vm_change_state_handler(void *pv, int running, RunState state)
+>      vbasedev->device_state = dev_state;
+>  }
+>  
+> +static int vfio_device_put(QEMUFile *f, void *pv, size_t size,
+> +                           VMStateField *field, QJSON *vmdesc)
 > +{
+> +    VFIOPCIDevice *vdev = pv;
+> +    PCIDevice *pdev = &vdev->pdev;
+> +    int sz = vdev->device_state.size - VFIO_DEVICE_STATE_OFFSET;
+> +    uint8_t *buf = NULL;
+> +    uint32_t msi_cfg, msi_lo, msi_hi, msi_data, bar_cfg, i;
+> +    bool msi_64bit;
+> +
+> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
+> +        bar_cfg = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, 4);
+> +        qemu_put_be32(f, bar_cfg);
+> +    }
+> +
+> +    msi_cfg = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS, 2);
+> +    msi_64bit = !!(msi_cfg & PCI_MSI_FLAGS_64BIT);
+> +
+> +    msi_lo = pci_default_read_config(pdev,
+> +                                     pdev->msi_cap + PCI_MSI_ADDRESS_LO, 4);
+> +    qemu_put_be32(f, msi_lo);
+> +
+> +    if (msi_64bit) {
+> +        msi_hi = pci_default_read_config(pdev,
+> +                                         pdev->msi_cap + PCI_MSI_ADDRESS_HI,
+> +                                         4);
+> +        qemu_put_be32(f, msi_hi);
+> +    }
+> +
+> +    msi_data = pci_default_read_config(pdev,
+> +               pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
+> +               2);
+> +    qemu_put_be32(f, msi_data);
+> +
+> +    buf = g_malloc(sz);
+> +    if (buf == NULL) {
+> +        error_report("vfio: Failed to allocate memory for migrate");
+> +        goto exit;
+
+Yet exit does a 'return 0' - so we've not failed the migration and we've
+generated a broken migration stream.
+(same in the other exit cases)
+
+> +    }
+> +
+> +    if (pread(vdev->vbasedev.fd, buf, sz,
+> +              vdev->device_state.offset + VFIO_DEVICE_STATE_OFFSET) != sz) {
+> +        error_report("vfio: Failed to read Device State Region");
+> +        goto exit;
+> +    }
+> +
+> +    qemu_put_buffer(f, buf, sz);
+> +
+> +exit:
+> +    g_free(buf);
+> +
+> +    return 0;
+> +}
+
+We really try and avoid qemu_put_* and qemu_get* as much as possible
+these days.
+Please try building a datastructure (possible in a pre_save) and then
+construction a VMState with all the fields in.
+VMSTATE_WITH_TMP might help you in this case.
+
+Doing it that way is much more robust against later changes.
+
+Also, I wonder if it'sa good idea to include 'sz' (or at least
+state.size) in the migration stream; if it was different on teh
+destination then things would go badly wrong. I don't know about mdev
+to know if that can happen.   You'd need to validate it when it's
+loaded.
+
+Dave
+
+> +
+> +static int vfio_device_get(QEMUFile *f, void *pv,
+> +                           size_t size, VMStateField *field)
+> +{
+> +    VFIOPCIDevice *vdev = pv;
+> +    PCIDevice *pdev = &vdev->pdev;
+> +    int sz = vdev->device_state.size - VFIO_DEVICE_STATE_OFFSET;
+> +    uint8_t *buf = NULL;
+> +    uint32_t ctl, msi_lo, msi_hi, msi_data, bar_cfg, i;
+> +    bool msi_64bit;
+> +
+> +    /* retore pci bar configuration */
+> +    ctl = pci_default_read_config(pdev, PCI_COMMAND, 2);
+> +    vfio_pci_write_config(pdev, PCI_COMMAND,
+> +                          ctl & (!(PCI_COMMAND_IO | PCI_COMMAND_MEMORY)), 2);
+> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
+> +        bar_cfg = qemu_get_be32(f);
+> +        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, bar_cfg, 4);
+> +    }
+> +    vfio_pci_write_config(pdev, PCI_COMMAND,
+> +                          ctl | PCI_COMMAND_IO | PCI_COMMAND_MEMORY, 2);
+> +
+> +    /* restore msi configuration */
+> +    ctl = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS, 2);
+> +    msi_64bit = !!(ctl & PCI_MSI_FLAGS_64BIT);
+> +
+> +    vfio_pci_write_config(&vdev->pdev,
+> +                          pdev->msi_cap + PCI_MSI_FLAGS,
+> +                          ctl & (!PCI_MSI_FLAGS_ENABLE), 2);
+> +
+> +    msi_lo = qemu_get_be32(f);
+> +    vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_LO, msi_lo, 4);
+> +
+> +    if (msi_64bit) {
+> +        msi_hi = qemu_get_be32(f);
+> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_HI,
+> +                              msi_hi, 4);
+> +    }
+> +    msi_data = qemu_get_be32(f);
+> +    vfio_pci_write_config(pdev,
+> +              pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
+> +              msi_data, 2);
+> +
+> +    vfio_pci_write_config(&vdev->pdev, pdev->msi_cap + PCI_MSI_FLAGS,
+> +                          ctl | PCI_MSI_FLAGS_ENABLE, 2);
+> +
+> +    buf = g_malloc(sz);
+> +    if (buf == NULL) {
+> +        error_report("vfio: Failed to allocate memory for migrate");
+> +        return -1;
+> +    }
+> +
+> +    qemu_get_buffer(f, buf, sz);
+> +    if (pwrite(vdev->vbasedev.fd, buf, sz,
+> +               vdev->device_state.offset + VFIO_DEVICE_STATE_OFFSET) != sz) {
+> +        error_report("vfio: Failed to write Device State Region");
+> +        return -1;
+> +    }
+> +
+> +    g_free(buf);
+> +
 > +    return 0;
 > +}
 > +
-> +static void sifive_test_write(void *opaque, hwaddr addr,
-> +           uint64_t val64, unsigned int size)
-> +{
-> +    if (addr == 0) {
-> +        int status = val64 & 0xffff;
-> +        int code = (val64 >> 16) & 0xffff;
-> +        switch (status) {
-> +        case FINISHER_FAIL:
-> +            exit(code);
-> +        case FINISHER_PASS:
-> +            exit(0);
-> +        default:
-> +            break;
-> +        }
-> +    }
-> +    hw_error("%s: write: addr=0x%x val=0x%016" PRIx64 "\n",
-> +        __func__, (int)addr, val64);
-> +}
-> +
-> +static const MemoryRegionOps sifive_test_ops = {
-> +    .read = sifive_test_read,
-> +    .write = sifive_test_write,
-> +    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .valid = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 4
-> +    }
+>  static void vfio_instance_init(Object *obj)
+>  {
+>      PCIDevice *pci_dev = PCI_DEVICE(obj);
+> @@ -3026,9 +3143,29 @@ static Property vfio_pci_dev_properties[] = {
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> +static const VMStateInfo vfio_vmstate_info = {
+> +    .name = "vfio-state",
+> +    .get = vfio_device_get,
+> +    .put = vfio_device_put,
 > +};
 > +
-> +static void sifive_test_init(Object *obj)
-> +{
-> +    SiFiveTestState *s = SIFIVE_TEST(obj);
+>  static VMStateDescription vfio_pci_vmstate = {
+>      .name = "vfio-pci",
+>      .unmigratable = 1,
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        {
+> +            .name         = "vfio dev",
+> +            .version_id   = 0,
+> +            .field_exists = NULL,
+> +            .size         = 0,
+> +            .info         = &vfio_vmstate_info,
+> +            .flags        = VMS_SINGLE,
+> +            .offset       = 0,
+> +         },
+> +        VMSTATE_END_OF_LIST()
+> +    },
+>  };
+>  
+>  static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
+> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+> index 4ddeebc..4451a8f 100644
+> --- a/linux-headers/linux/vfio.h
+> +++ b/linux-headers/linux/vfio.h
+> @@ -303,6 +303,9 @@ struct vfio_region_info_cap_type {
+>  /* Mdev sub-type for device state save and restore */
+>  #define VFIO_REGION_SUBTYPE_DEVICE_STATE	(4)
+>  
+> +/* Offset in region to save device state */
+> +#define VFIO_DEVICE_STATE_OFFSET	1
 > +
-> +    memory_region_init_io(&s->mmio, obj, &sifive_test_ops, s,
-> +                          TYPE_SIFIVE_TEST, 0x1000);
-
-0x1000? 0x8 is enough :)
-
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
-> +}
-> +
-> +static const TypeInfo sifive_test_info = {
-> +    .name          = TYPE_SIFIVE_TEST,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(SiFiveTestState),
-> +    .instance_init = sifive_test_init,
-> +};
-> +
-> +static void sifive_test_register_types(void)
-> +{
-> +    type_register_static(&sifive_test_info);
-> +}
-> +
-> +type_init(sifive_test_register_types)
-> +
-> +
-> +/*
-> + * Create Test device.
-> + */
-> +DeviceState *sifive_test_create(hwaddr addr)
-> +{
-> +    DeviceState *dev = qdev_create(NULL, TYPE_SIFIVE_TEST);
-> +    qdev_init_nofail(dev);
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, addr);
-> +    return dev;
-> +}
-> diff --git a/include/hw/riscv/sifive_test.h b/include/hw/riscv/sifive_test.h
-> new file mode 100644
-> index 0000000..71d4c9f
-> --- /dev/null
-> +++ b/include/hw/riscv/sifive_test.h
-> @@ -0,0 +1,42 @@
-> +/*
-> + * QEMU Test Finisher interface
-> + *
-> + * Copyright (c) 2018 SiFive, Inc.
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#ifndef HW_SIFIVE_TEST_H
-> +#define HW_SIFIVE_TEST_H
-> +
-> +#define TYPE_SIFIVE_TEST "riscv.sifive.test"
-> +
-> +#define SIFIVE_TEST(obj) \
-> +    OBJECT_CHECK(SiFiveTestState, (obj), TYPE_SIFIVE_TEST)
-> +
-> +typedef struct SiFiveTestState {
-> +    /*< private >*/
-> +    SysBusDevice parent_obj;
-> +
-> +    /*< public >*/
-> +    MemoryRegion mmio;
-> +} SiFiveTestState;
-> +
-> +enum {
-> +    FINISHER_FAIL = 0x3333,
-> +    FINISHER_PASS = 0x5555
-> +};
-> +
-> +DeviceState *sifive_test_create(hwaddr addr);
-> +
-> +#endif
+>  #define VFIO_DEVICE_START	0
+>  #define VFIO_DEVICE_STOP	1
+>  
+> -- 
+> 2.7.4
 > 
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
