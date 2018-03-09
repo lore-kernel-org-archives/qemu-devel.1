@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52072)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1euKBL-00042x-If
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:43:44 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1euKBb-0004JY-Au
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:44:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1euKBK-00031I-SW
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:43:43 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:41752)
+	(envelope-from <peter.maydell@linaro.org>) id 1euKBa-0003AN-Fr
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:43:59 -0500
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:39712)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1euKBK-00030t-L5
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:43:42 -0500
-Received: by mail-ot0-x244.google.com with SMTP id w38so9027528ota.8
-	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 07:43:42 -0800 (PST)
+	id 1euKBa-0003A2-BQ
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:43:58 -0500
+Received: by mail-oi0-x244.google.com with SMTP id t185so7270112oif.6
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 07:43:58 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180309153654.13518-9-f4bug@amsat.org>
+In-Reply-To: <20180309153654.13518-8-f4bug@amsat.org>
 References: <20180309153654.13518-1-f4bug@amsat.org>
-	<20180309153654.13518-9-f4bug@amsat.org>
+	<20180309153654.13518-8-f4bug@amsat.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 9 Mar 2018 15:43:21 +0000
-Message-ID: <CAFEAcA-hPN1DTzP5Zn_xFORXRXeNXc8xyACZF13jpKU4_o6MTw@mail.gmail.com>
+Date: Fri, 9 Mar 2018 15:43:37 +0000
+Message-ID: <CAFEAcA93d8TgbAx0RBmkpCFJtn43fF32jgcMiiy98L0bv6As+Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 8/8] MAINTAINERS: Add entries for SD (SDHCI, SDBus,
- SDCard)
+Subject: Re: [Qemu-devel] [PATCH 7/8] sdhci: Fix a typo in comment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,34 +35,32 @@ Cc: Alistair Francis <alistair@alistair23.me>, "Edgar E . Iglesias" <edgar.igles
 
 On 9 March 2018 at 15:36, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
 te:
-> After spending months studying all the different SD Specifications
-> from the SD Association, voluntarily add myself as maintainer
-> for the SD code.
->
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  MAINTAINERS | 8 ++++++++
->  1 file changed, 8 insertions(+)
+>  hw/sd/sdhci.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index b7c4130388..0446724642 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1089,6 +1089,14 @@ M: Peter Crosthwaite <crosthwaite.peter@gmail.com>
->  S: Maintained
->  F: hw/ssi/xilinx_*
+> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+> index 97b4a473c8..1b828b104d 100644
+> --- a/hw/sd/sdhci.c
+> +++ b/hw/sd/sdhci.c
+> @@ -433,13 +433,13 @@ static void sdhci_read_block_from_card(SDHCIState *=
+s)
+>      for (index =3D 0; index < blk_size; index++) {
+>          data =3D sdbus_read_data(&s->sdbus);
+>          if (!FIELD_EX32(s->hostctl2, SDHC_HOSTCTL2, EXECUTE_TUNING)) {
+> -            /* Device is not in tunning */
+> +            /* Device is not in tuning */
+>              s->fifo_buffer[index] =3D data;
+>          }
+>      }
 >
-> +SD (Secure Card)
-> +M: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> +S: Odd Fixes
-> +F: include/hw/sd/sd*
-> +F: hw/sd/core.c
-> +F: hw/sd/sd*
-> +F: tests/sd*
-> +
->  USB
->  M: Gerd Hoffmann <kraxel@redhat.com>
->  S: Maintained
+>      if (FIELD_EX32(s->hostctl2, SDHC_HOSTCTL2, EXECUTE_TUNING)) {
+> -        /* Device is in tunning */
+> +        /* Device is in tuning */
+>          s->hostctl2 &=3D ~R_SDHC_HOSTCTL2_EXECUTE_TUNING_MASK;
+>          s->hostctl2 |=3D R_SDHC_HOSTCTL2_SAMPLING_CLKSEL_MASK;
+>          s->prnsts &=3D ~(SDHC_DAT_LINE_ACTIVE | SDHC_DOING_READ |
 > --
 > 2.16.2
 
