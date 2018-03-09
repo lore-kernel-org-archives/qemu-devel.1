@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1euHwX-0001Cz-8C
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:20:22 -0500
+	(envelope-from <stefanha@redhat.com>) id 1euHwb-0001Gm-PE
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:20:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1euHwW-0007XK-0H
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:20:17 -0500
+	(envelope-from <stefanha@redhat.com>) id 1euHwZ-0007d8-IS
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:20:21 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri,  9 Mar 2018 13:19:49 +0000
-Message-Id: <20180309131949.18640-8-stefanha@redhat.com>
+Date: Fri,  9 Mar 2018 13:19:47 +0000
+Message-Id: <20180309131949.18640-6-stefanha@redhat.com>
 In-Reply-To: <20180309131949.18640-1-stefanha@redhat.com>
 References: <20180309131949.18640-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 7/7] vl: introduce vm_shutdown()
+Subject: [Qemu-devel] [PULL 5/7] virtio-blk: fix race between
+ .ioeventfd_stop() and vq handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,193 +23,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <stefanha@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Commit 00d09fdbbae5f7864ce754913efc84c12fdf9f1a ("vl: pause vcpus before
-stopping iothreads") and commit dce8921b2baaf95974af8176406881872067adfa
-("iothread: Stop threads before main() quits") tried to work around the
-fact that emulation was still active during termination by stopping
-iothreads.  They suffer from race conditions:
-1. virtio_scsi_handle_cmd_vq() racing with iothread_stop_all() hits the
-   virtio_scsi_ctx_check() assertion failure because the BDS AioContext
-   has been modified by iothread_stop_all().
-2. Guest vq kick racing with main loop termination leaves a readable
-   ioeventfd that is handled by the next aio_poll() when external
-   clients are enabled again, resulting in unwanted emulation activity.
+If the main loop thread invokes .ioeventfd_stop() just as the vq handler
+function begins in the IOThread then the handler may lose the race for
+the AioContext lock.  By the time the vq handler is able to acquire the
+AioContext lock the ioeventfd has already been removed and the handler
+isn't supposed to run anymore!
 
-This patch obsoletes those commits by fully disabling emulation activity
-when vcpus are stopped.
+Use the new aio_wait_bh_oneshot() function to perform ioeventfd removal
+from within the IOThread.  This way no races with the vq handler are
+possible.
 
-Use the new vm_shutdown() function instead of pause_all_vcpus() so that
-vm change state handlers are invoked too.  Virtio devices will now stop
-their ioeventfds, preventing further emulation activity after vm_stop().
-
-Note that vm_stop(RUN_STATE_SHUTDOWN) cannot be used because it emits a
-QMP STOP event that may affect existing clients.
-
-It is no longer necessary to call replay_disable_events() directly since
-vm_shutdown() does so already.
-
-Drop iothread_stop_all() since it is no longer used.
-
-Cc: Fam Zheng <famz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
 Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-id: 20180307144205.20619-5-stefanha@redhat.com
+Message-id: 20180307144205.20619-3-stefanha@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/sysemu/iothread.h |  1 -
- include/sysemu/sysemu.h   |  1 +
- cpus.c                    | 16 +++++++++++++---
- iothread.c                | 31 -------------------------------
- vl.c                      | 13 +++----------
- 5 files changed, 17 insertions(+), 45 deletions(-)
+ hw/block/dataplane/virtio-blk.c | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
 
-diff --git a/include/sysemu/iothread.h b/include/sysemu/iothread.h
-index 799614ffd2..8a7ac2c528 100644
---- a/include/sysemu/iothread.h
-+++ b/include/sysemu/iothread.h
-@@ -45,7 +45,6 @@ typedef struct {
- char *iothread_get_id(IOThread *iothread);
- IOThread *iothread_by_id(const char *id);
- AioContext *iothread_get_aio_context(IOThread *iothread);
--void iothread_stop_all(void);
- GMainContext *iothread_get_g_main_context(IOThread *iothread);
- 
- /*
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index d24ad09f37..356bfdc1c1 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -56,6 +56,7 @@ void vm_start(void);
- int vm_prepare_start(void);
- int vm_stop(RunState state);
- int vm_stop_force_state(RunState state);
-+int vm_shutdown(void);
- 
- typedef enum WakeupReason {
-     /* Always keep QEMU_WAKEUP_REASON_NONE = 0 */
-diff --git a/cpus.c b/cpus.c
-index 9bcff7d63c..d8fe90eafe 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -993,7 +993,7 @@ void cpu_synchronize_all_pre_loadvm(void)
-     }
+diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-blk.c
+index c46253a924..101f32cf66 100644
+--- a/hw/block/dataplane/virtio-blk.c
++++ b/hw/block/dataplane/virtio-blk.c
+@@ -240,6 +240,22 @@ int virtio_blk_data_plane_start(VirtIODevice *vdev)
+     return -ENOSYS;
  }
  
--static int do_vm_stop(RunState state)
-+static int do_vm_stop(RunState state, bool send_stop)
- {
-     int ret = 0;
- 
-@@ -1002,7 +1002,9 @@ static int do_vm_stop(RunState state)
-         pause_all_vcpus();
-         runstate_set(state);
-         vm_state_notify(0, state);
--        qapi_event_send_stop(&error_abort);
-+        if (send_stop) {
-+            qapi_event_send_stop(&error_abort);
-+        }
-     }
- 
-     bdrv_drain_all();
-@@ -1012,6 +1014,14 @@ static int do_vm_stop(RunState state)
-     return ret;
- }
- 
-+/* Special vm_stop() variant for terminating the process.  Historically clients
-+ * did not expect a QMP STOP event and so we need to retain compatibility.
++/* Stop notifications for new requests from guest.
++ *
++ * Context: BH in IOThread
 + */
-+int vm_shutdown(void)
++static void virtio_blk_data_plane_stop_bh(void *opaque)
 +{
-+    return do_vm_stop(RUN_STATE_SHUTDOWN, false);
++    VirtIOBlockDataPlane *s = opaque;
++    unsigned i;
++
++    for (i = 0; i < s->conf->num_queues; i++) {
++        VirtQueue *vq = virtio_get_queue(s->vdev, i);
++
++        virtio_queue_aio_set_host_notifier_handler(vq, s->ctx, NULL);
++    }
 +}
 +
- static bool cpu_can_run(CPUState *cpu)
+ /* Context: QEMU global mutex held */
+ void virtio_blk_data_plane_stop(VirtIODevice *vdev)
  {
-     if (cpu->stop) {
-@@ -1994,7 +2004,7 @@ int vm_stop(RunState state)
-         return 0;
-     }
+@@ -264,13 +280,7 @@ void virtio_blk_data_plane_stop(VirtIODevice *vdev)
+     trace_virtio_blk_data_plane_stop(s);
  
--    return do_vm_stop(state);
-+    return do_vm_stop(state, true);
- }
- 
- /**
-diff --git a/iothread.c b/iothread.c
-index 2ec5a3bffe..1b3463cb00 100644
---- a/iothread.c
-+++ b/iothread.c
-@@ -101,18 +101,6 @@ void iothread_stop(IOThread *iothread)
-     qemu_thread_join(&iothread->thread);
- }
- 
--static int iothread_stop_iter(Object *object, void *opaque)
--{
--    IOThread *iothread;
+     aio_context_acquire(s->ctx);
 -
--    iothread = (IOThread *)object_dynamic_cast(object, TYPE_IOTHREAD);
--    if (!iothread) {
--        return 0;
+-    /* Stop notifications for new requests from guest */
+-    for (i = 0; i < nvqs; i++) {
+-        VirtQueue *vq = virtio_get_queue(s->vdev, i);
+-
+-        virtio_queue_aio_set_host_notifier_handler(vq, s->ctx, NULL);
 -    }
--    iothread_stop(iothread);
--    return 0;
--}
--
- static void iothread_instance_init(Object *obj)
- {
-     IOThread *iothread = IOTHREAD(obj);
-@@ -333,25 +321,6 @@ IOThreadInfoList *qmp_query_iothreads(Error **errp)
-     return head;
- }
++    aio_wait_bh_oneshot(s->ctx, virtio_blk_data_plane_stop_bh, s);
  
--void iothread_stop_all(void)
--{
--    Object *container = object_get_objects_root();
--    BlockDriverState *bs;
--    BdrvNextIterator it;
--
--    for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
--        AioContext *ctx = bdrv_get_aio_context(bs);
--        if (ctx == qemu_get_aio_context()) {
--            continue;
--        }
--        aio_context_acquire(ctx);
--        bdrv_set_aio_context(bs, qemu_get_aio_context());
--        aio_context_release(ctx);
--    }
--
--    object_child_foreach(container, iothread_stop_iter, NULL);
--}
--
- static gpointer iothread_g_main_context_init(gpointer opaque)
- {
-     AioContext *ctx;
-diff --git a/vl.c b/vl.c
-index dae986b352..3ef04ce991 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4722,17 +4722,10 @@ int main(int argc, char **argv, char **envp)
-     os_setup_post();
- 
-     main_loop();
--    replay_disable_events();
- 
--    /* The ordering of the following is delicate.  Stop vcpus to prevent new
--     * I/O requests being queued by the guest.  Then stop IOThreads (this
--     * includes a drain operation and completes all request processing).  At
--     * this point emulated devices are still associated with their IOThreads
--     * (if any) but no longer have any work to do.  Only then can we close
--     * block devices safely because we know there is no more I/O coming.
--     */
--    pause_all_vcpus();
--    iothread_stop_all();
-+    /* No more vcpu or device emulation activity beyond this point */
-+    vm_shutdown();
-+
-     bdrv_close_all();
- 
-     res_free();
+     /* Drain and switch bs back to the QEMU main loop */
+     blk_set_aio_context(s->conf->conf.blk, qemu_get_aio_context());
 -- 
 2.14.3
