@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1euE8v-0004ME-TC
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:50 -0500
+	(envelope-from <peterx@redhat.com>) id 1euE8y-0004P6-SR
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1euE8q-0006Ip-V2
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:49 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59410 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1euE8x-0006So-PK
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:52 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60718 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1euE8q-0006IB-QY
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:44 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1euE8x-0006Se-Kl
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:51 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Fri,  9 Mar 2018 17:15:32 +0800
-Message-Id: <20180309091535.13315-21-peterx@redhat.com>
+Date: Fri,  9 Mar 2018 17:15:34 +0800
+Message-Id: <20180309091535.13315-23-peterx@redhat.com>
 In-Reply-To: <20180309091535.13315-1-peterx@redhat.com>
 References: <20180309091535.13315-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 20/23] qmp/migration: new command
- migrate-recover
+Subject: [Qemu-devel] [PATCH v7 22/23] migration/qmp: add command
+ migrate-pause
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,107 +27,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-The first allow-oob=true command.  It's used on destination side when
-the postcopy migration is paused and ready for a recovery.  After
-execution, a new migration channel will be established for postcopy to
-continue.
+It pauses an ongoing migration.  Currently it only supports postcopy.
+Note that this command will work on either side of the migration.
+Basically when we trigger this on one side, it'll interrupt the other
+side as well since the other side will get notified on the disconnect
+event.
+
+However, it's still possible that the other side is not notified, for
+example, when the network is totally broken, or due to some firewall
+configuration changes.  In that case, we will also need to run the same
+command on the other side so both sides will go into the paused state.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/migration.c | 24 ++++++++++++++++++++++++
- migration/migration.h |  1 +
- migration/savevm.c    |  3 +++
- qapi/migration.json   | 20 ++++++++++++++++++++
- 4 files changed, 48 insertions(+)
+ migration/migration.c | 27 +++++++++++++++++++++++++++
+ qapi/migration.json   | 16 ++++++++++++++++
+ 2 files changed, 43 insertions(+)
 
 diff --git a/migration/migration.c b/migration/migration.c
-index af00cfe04f..180552329c 100644
+index 180552329c..f31fcbb0d5 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -1424,6 +1424,30 @@ void qmp_migrate_incoming(const char *uri, Error **errp)
-     once = false;
+@@ -1448,6 +1448,33 @@ void qmp_migrate_recover(const char *uri, Error **errp)
+     qemu_start_incoming_migration(uri, errp);
  }
  
-+void qmp_migrate_recover(const char *uri, Error **errp)
++void qmp_migrate_pause(Error **errp)
 +{
++    MigrationState *ms = migrate_get_current();
 +    MigrationIncomingState *mis = migration_incoming_get_current();
++    int ret;
 +
-+    if (mis->state != MIGRATION_STATUS_POSTCOPY_PAUSED) {
-+        error_setg(errp, "Migrate recover can only be run "
-+                   "when postcopy is paused.");
++    if (ms->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
++        /* Source side, during postcopy */
++        ret = qemu_file_shutdown(ms->to_dst_file);
++        if (ret) {
++            error_setg(errp, "Failed to pause source migration");
++        }
 +        return;
 +    }
 +
-+    if (atomic_cmpxchg(&mis->postcopy_recover_triggered,
-+                       false, true) == true) {
-+        error_setg(errp, "Migrate recovery is triggered already");
++    if (mis->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
++        ret = qemu_file_shutdown(mis->from_src_file);
++        if (ret) {
++            error_setg(errp, "Failed to pause destination migration");
++        }
 +        return;
 +    }
 +
-+    /*
-+     * Note that this call will never start a real migration; it will
-+     * only re-setup the migration stream and poke existing migration
-+     * to continue using that newly established channel.
-+     */
-+    qemu_start_incoming_migration(uri, errp);
++    error_setg(errp, "migrate-pause is currently only supported "
++               "during postcopy-active state");
 +}
 +
  bool migration_is_blocked(Error **errp)
  {
      if (qemu_savevm_state_blocked(errp)) {
-diff --git a/migration/migration.h b/migration/migration.h
-index 8f64b43584..c549859cc3 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -65,6 +65,7 @@ struct MigrationIncomingState {
-     QemuSemaphore colo_incoming_sem;
- 
-     /* notify PAUSED postcopy incoming migrations to try to continue */
-+    bool postcopy_recover_triggered;
-     QemuSemaphore postcopy_pause_sem_dst;
-     QemuSemaphore postcopy_pause_sem_fault;
- };
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 7f4899ae9c..3e660dfca6 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2166,6 +2166,9 @@ static bool postcopy_pause_incoming(MigrationIncomingState *mis)
- {
-     trace_postcopy_pause_incoming();
- 
-+    /* Clear the triggered bit to allow one recovery */
-+    mis->postcopy_recover_triggered = false;
-+
-     migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
-                       MIGRATION_STATUS_POSTCOPY_PAUSED);
- 
 diff --git a/qapi/migration.json b/qapi/migration.json
-index 152fb8e51e..451d8c572b 100644
+index 451d8c572b..b8827d5ace 100644
 --- a/qapi/migration.json
 +++ b/qapi/migration.json
-@@ -1174,3 +1174,23 @@
- # Since: 2.9
+@@ -1194,3 +1194,19 @@
  ##
- { 'command': 'xen-colo-do-checkpoint' }
+ { 'command': 'migrate-recover', 'data': { 'uri': 'str' },
+   'allow-oob': true }
 +
 +##
-+# @migrate-recover:
++# @migrate-pause:
 +#
-+# Provide a recovery migration stream URI.
-+#
-+# @uri: the URI to be used for the recovery of migration stream.
++# Pause a migration.  Currently it only supports postcopy.
 +#
 +# Returns: nothing.
 +#
 +# Example:
 +#
-+# -> { "execute": "migrate-recover",
-+#      "arguments": { "uri": "tcp:192.168.1.200:12345" } }
++# -> { "execute": "migrate-pause" }
 +# <- { "return": {} }
 +#
 +# Since: 2.12
 +##
-+{ 'command': 'migrate-recover', 'data': { 'uri': 'str' },
-+  'allow-oob': true }
++{ 'command': 'migrate-pause', 'allow-oob': true }
 -- 
 2.14.3
