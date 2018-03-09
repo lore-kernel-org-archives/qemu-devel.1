@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1euE8o-0004FB-QD
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:45 -0500
+	(envelope-from <peterx@redhat.com>) id 1euE8v-0004MD-So
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1euE8n-0006HC-Ti
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:42 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59260 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1euE8u-0006O9-DM
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:49 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59264 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1euE8n-0006H1-OR
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:41 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1euE8u-0006N1-9o
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:48 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Fri,  9 Mar 2018 17:15:31 +0800
-Message-Id: <20180309091535.13315-20-peterx@redhat.com>
+Date: Fri,  9 Mar 2018 17:15:33 +0800
+Message-Id: <20180309091535.13315-22-peterx@redhat.com>
 In-Reply-To: <20180309091535.13315-1-peterx@redhat.com>
 References: <20180309091535.13315-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 19/23] migration: init dst in
- migration_object_init too
+Subject: [Qemu-devel] [PATCH v7 21/23] hmp/migration: add migrate_recover
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,68 +27,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Though we may not need it, now we init both the src/dst migration
-objects in migration_object_init() so that even incoming migration
-object would be thread safe (it was not).
+Sister command to migrate-recover in QMP.
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/migration.c | 28 +++++++++++++++-------------
- 1 file changed, 15 insertions(+), 13 deletions(-)
+ hmp-commands.hx | 13 +++++++++++++
+ hmp.c           | 10 ++++++++++
+ hmp.h           |  1 +
+ 3 files changed, 24 insertions(+)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 17578e2731..af00cfe04f 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -106,6 +106,7 @@ enum mig_rp_message_type {
-    dynamic creation of migration */
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index defba474d6..6758c1f6ed 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -955,7 +955,20 @@ STEXI
+ @findex migrate_incoming
+ Continue an incoming migration using the @var{uri} (that has the same syntax
+ as the -incoming option).
++ETEXI
  
- static MigrationState *current_migration;
-+static MigrationIncomingState *current_incoming;
- 
- static bool migration_object_check(MigrationState *ms, Error **errp);
- static int migration_maybe_pause(MigrationState *s,
-@@ -121,6 +122,18 @@ void migration_object_init(void)
-     assert(!current_migration);
-     current_migration = MIGRATION_OBJ(object_new(TYPE_MIGRATION));
- 
-+    /*
-+     * Init the migrate incoming object as well no matter whether
-+     * we'll use it or not.
-+     */
-+    assert(!current_incoming);
-+    current_incoming = g_new0(MigrationIncomingState, 1);
-+    current_incoming->state = MIGRATION_STATUS_NONE;
-+    qemu_mutex_init(&current_incoming->rp_mutex);
-+    qemu_event_init(&current_incoming->main_thread_load_event, false);
-+    qemu_sem_init(&current_incoming->postcopy_pause_sem_dst, 0);
-+    qemu_sem_init(&current_incoming->postcopy_pause_sem_fault, 0);
++    {
++        .name       = "migrate_recover",
++        .args_type  = "uri:s",
++        .params     = "uri",
++        .help       = "Continue a paused incoming postcopy migration",
++        .cmd        = hmp_migrate_recover,
++    },
 +
-     if (!migration_object_check(current_migration, &err)) {
-         error_report_err(err);
-         exit(1);
-@@ -151,19 +164,8 @@ MigrationState *migrate_get_current(void)
++STEXI
++@item migrate_recover @var{uri}
++@findex migrate_recover
++Continue a paused incoming postcopy migration using the @var{uri}.
+ ETEXI
  
- MigrationIncomingState *migration_incoming_get_current(void)
- {
--    static bool once;
--    static MigrationIncomingState mis_current;
--
--    if (!once) {
--        mis_current.state = MIGRATION_STATUS_NONE;
--        memset(&mis_current, 0, sizeof(MigrationIncomingState));
--        qemu_mutex_init(&mis_current.rp_mutex);
--        qemu_event_init(&mis_current.main_thread_load_event, false);
--        qemu_sem_init(&mis_current.postcopy_pause_sem_dst, 0);
--        qemu_sem_init(&mis_current.postcopy_pause_sem_fault, 0);
--        once = true;
--    }
--    return &mis_current;
-+    assert(current_incoming);
-+    return current_incoming;
+     {
+diff --git a/hmp.c b/hmp.c
+index 4ac4fbcb74..0e189e157b 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1502,6 +1502,16 @@ void hmp_migrate_incoming(Monitor *mon, const QDict *qdict)
+     hmp_handle_error(mon, &err);
  }
  
- void migration_incoming_state_destroy(void)
++void hmp_migrate_recover(Monitor *mon, const QDict *qdict)
++{
++    Error *err = NULL;
++    const char *uri = qdict_get_str(qdict, "uri");
++
++    qmp_migrate_recover(uri, &err);
++
++    hmp_handle_error(mon, &err);
++}
++
+ /* Kept for backwards compatibility */
+ void hmp_migrate_set_downtime(Monitor *mon, const QDict *qdict)
+ {
+diff --git a/hmp.h b/hmp.h
+index b89733876d..5cf02a169a 100644
+--- a/hmp.h
++++ b/hmp.h
+@@ -68,6 +68,7 @@ void hmp_info_snapshots(Monitor *mon, const QDict *qdict);
+ void hmp_migrate_cancel(Monitor *mon, const QDict *qdict);
+ void hmp_migrate_continue(Monitor *mon, const QDict *qdict);
+ void hmp_migrate_incoming(Monitor *mon, const QDict *qdict);
++void hmp_migrate_recover(Monitor *mon, const QDict *qdict);
+ void hmp_migrate_set_downtime(Monitor *mon, const QDict *qdict);
+ void hmp_migrate_set_speed(Monitor *mon, const QDict *qdict);
+ void hmp_migrate_set_capability(Monitor *mon, const QDict *qdict);
 -- 
 2.14.3
