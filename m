@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1euJD5-0002ik-6Q
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:41:28 -0500
+	(envelope-from <no-reply@patchew.org>) id 1euJHF-0003vN-SH
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:45:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1euJD2-0004dh-14
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:41:27 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56110 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1euJD1-0004dW-T5
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:41:23 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7775276FBA
-	for <qemu-devel@nongnu.org>; Fri,  9 Mar 2018 14:41:23 +0000 (UTC)
-References: <1520576005-27647-1-git-send-email-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5464ff65-85d4-4537-a603-fd20074d375f@redhat.com>
-Date: Fri, 9 Mar 2018 15:41:21 +0100
+	(envelope-from <no-reply@patchew.org>) id 1euJHC-0006YG-OG
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:45:45 -0500
+Resent-Message-Id: <E1euJHC-0006YG-OG@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21023)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1euJHC-0006Y2-HI
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:45:42 -0500
+In-Reply-To: <20180309142630.2170-1-laurent@vivier.eu>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152060671798.1497.3007948970030778281@bdbb90650ae5>
 MIME-Version: 1.0
-In-Reply-To: <1520576005-27647-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qemu-doc: Rework the network options
- chapter to make "-net" less prominent
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 9 Mar 2018 06:45:18 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 0/8] M68k for 2.12 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,48 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
+To: laurent@vivier.eu
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-On 09/03/2018 07:13, Thomas Huth wrote:
-> +
-> +@item --nic none
-> +Indicate that no network devices should be configured. It is used to o=
-verride
-> +the default configuration (default NIC with @option{--net user} backen=
-d) which
-
-the default @option{--nic user} configuration (default model and
-user-mode networking backend), which...
-
-> +is activated if no other networking options are provided.
-> +
-
-> -qemu-system-i386 -net user,hostfwd=3Dtcp::5555-:23 [...]
-> +qemu-system-i386 --device e1000,netdev=3Dn1 --netdev user,id=3Dn1,host=
-fwd=3Dtcp::5555-:23
-
-I would use --nic here.  --device/--netdev is covered by
-docs/qdev-device-use.txt, which should be updated separately (it even
-has -usbdevice still).
-
-> -qemu -net 'user,guestfwd=3Dtcp:10.0.2.100:1234-cmd:netcat 10.10.1.1 43=
-21'
-> +qemu-system-i386 --device e1000,netdev=3Dn1 \
-> +  --netdev 'user,id=3Dn1,guestfwd=3Dtcp:10.0.2.100:1234-cmd:netcat 10.=
-10.1.1 4321'
-
-Same here.
-
-Single vs. double-dash options is a confusing one and I'm not sure how
-to proceed.  On one hand single-dash is what everyone uses, on the other
-double-dash is a bit more consistent with e.g. qemu-img.  But:
-
-1) the command-line of qemu-img is anyway completely different from QEMU'=
-s
-
-2) mixing them is the worst of both worlds.
-
-I honestly would use single-dashes, and add a note that double-dash
-options are supported as well.
-
-Paolo
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMzA5MTQyNjMwLjIxNzAtMS1sYXVyZW50QHZpdmllci5ldQpTdWJqZWN0
+OiBbUWVtdS1kZXZlbF0gW1BVTEwgMC84XSBNNjhrIGZvciAyLjEyIHBhdGNoZXMKCj09PSBURVNU
+IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQg
+bG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1
+ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIk
+KGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0
+czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEg
+LS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8
+IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxl
+ZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVk
+Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
+ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
+dC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODAzMDkxNDI2MzAu
+MjE3MC0xLWxhdXJlbnRAdml2aWVyLmV1IC0+IHBhdGNoZXcvMjAxODAzMDkxNDI2MzAuMjE3MC0x
+LWxhdXJlbnRAdml2aWVyLmV1CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAx
+ODAzMDkxNDM3MDQuMTM0MjAtMS1rcmF4ZWxAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwMzA5
+MTQzNzA0LjEzNDIwLTEta3JheGVsQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
+ICd0ZXN0Jwo1ZTM3NjRjZDcxIHRhcmdldC9tNjhrOiBpbXBsZW1lbnQgZnRlbnRveAoxMjlkNjc3
+YWRhIHRhcmdldC9tNjhrOiBpbXBsZW1lbnQgZnR3b3RveAo5MzhjNGJkOTliIHRhcmdldC9tNjhr
+OiBpbXBsZW1lbnQgZmV0b3gKNzM2NGRhMGY1YSB0YXJnZXQvbTY4azogaW1wbGVtZW50IGZsb2cy
+CjdlMjVmYjVhNDggdGFyZ2V0L202OGs6IGltcGxlbWVudCBmbG9nMTAKZTJlMmRiNjlkNiB0YXJn
+ZXQvbTY4azogaW1wbGVtZW50IGZsb2duCmE0ZGU3YzQ5NTAgdGFyZ2V0L202OGs6IGltcGxlbWVu
+dCBmbG9nbnAxCmNkOTMyMjZhMzEgdGFyZ2V0L202OGs6IGRlZmluZSBmbG9hdHg4MF9tb3ZlKCkK
+Cj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvODogdGFyZ2V0L202OGs6IGRl
+ZmluZSBmbG9hdHg4MF9tb3ZlKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMi84OiB0YXJnZXQvbTY4azog
+aW1wbGVtZW50IGZsb2ducDEuLi4KRVJST1I6IGRvIG5vdCBzZXQgZXhlY3V0ZSBwZXJtaXNzaW9u
+cyBmb3Igc291cmNlIGZpbGVzCiMyODE6IEZJTEU6IHRhcmdldC9tNjhrL3NvZnRmbG9hdF9mcHNw
+X3RhYmxlcy5oCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDQwOCBsaW5lcyBjaGVja2Vk
+CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAz
+Lzg6IHRhcmdldC9tNjhrOiBpbXBsZW1lbnQgZmxvZ24uLi4KQ2hlY2tpbmcgUEFUQ0ggNC84OiB0
+YXJnZXQvbTY4azogaW1wbGVtZW50IGZsb2cxMC4uLgpDaGVja2luZyBQQVRDSCA1Lzg6IHRhcmdl
+dC9tNjhrOiBpbXBsZW1lbnQgZmxvZzIuLi4KQ2hlY2tpbmcgUEFUQ0ggNi84OiB0YXJnZXQvbTY4
+azogaW1wbGVtZW50IGZldG94Li4uCkNoZWNraW5nIFBBVENIIDcvODogdGFyZ2V0L202OGs6IGlt
+cGxlbWVudCBmdHdvdG94Li4uCkNoZWNraW5nIFBBVENIIDgvODogdGFyZ2V0L202OGs6IGltcGxl
+bWVudCBmdGVudG94Li4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
+aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
+dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
+Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
