@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1euIOv-0001hf-2N
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:49:40 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1euIPV-00028K-LG
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:50:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1euIOu-0005wC-6r
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:49:37 -0500
-References: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
-	<1518893216-9983-5-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA871Ju5cV8EYiXEg65Rofh=Pn2=2h8wy4-QXj-wUzoj+g@mail.gmail.com>
-	<d8fbbd0d-3e15-92b2-9e26-fb0103abe65f@redhat.com>
-	<CAFEAcA-XzeLWfb5tjHYF=3LQbeMge2yaEYRPqeMLn72u0xJ+kg@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <ee49a2ff-3f2c-4276-50d6-1b258d0a8a60@redhat.com>
-Date: Fri, 9 Mar 2018 14:49:13 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1euIPS-0006bN-Hv
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:50:13 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:37917)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1euIPS-0006a6-Bx
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:50:10 -0500
+Received: by mail-wm0-x242.google.com with SMTP id z9so4002748wmb.3
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 05:50:10 -0800 (PST)
+References: <20180308130626.12393-1-peter.maydell@linaro.org>
+	<20180308130626.12393-7-peter.maydell@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180308130626.12393-7-peter.maydell@linaro.org>
+Date: Fri, 09 Mar 2018 13:50:07 +0000
+Message-ID: <871sgtl5o0.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-XzeLWfb5tjHYF=3LQbeMge2yaEYRPqeMLn72u0xJ+kg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v9 04/14] hw/arm/smmuv3: Skeleton
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 6/6] hw/arm/virt: Support -machine
+ gic-version=max
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +32,84 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Igor Mammedov <imammedo@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Hi Peter,
 
-On 09/03/18 14:37, Peter Maydell wrote:
-> On 9 March 2018 at 13:19, Auger Eric <eric.auger@redhat.com> wrote:
->> On 08/03/18 15:27, Peter Maydell wrote:
->>> Consider specifically catching 8-byte accesses to non-64-bit registers?
->>> This is CONSTRAINED UNPREDICTABLE (see spec section 6.2), and "one
->>> of the registers is read/written and other half is RAZ/WI" is permitted
->>> behaviour, but it does mean you need to be a little careful about not
->>> letting the top 32 bits of val become non-zero for the 32-bit register
->>> codepaths. Logging bad 64-bit accesses as LOG_GUEST_ERROR and making
->>> them RAZ/WI might be nicer for guest software developers.
->>
->> I moved to ops with attrs and if a 64-bit access is attempted on
->> something not a 64b reg base, I return an error + log a guest error.
-> 
-> Ah, you probably don't want to return MEMTX_ERROR, because that
-> becomes a guest CPU external-abort exception. An abort is listed
-> as one of the permitted constrained-unpredictable behaviours for
-> bad 64-bit accesses, but there is a note that "strongly recommends"
-> not to abort for cases where the registers might be used by software
-> associated with lower exception levels. Rather than trying to decide
-> which registers do or don't get to return MEMTX_ERROR, it's probably
-> easier just to RAZ/WI and return MEMTX_OK.
-> 
-> (We had to fix a bug like this in the gicv3 in commits f1945632b43e3
-> and 0cf09852015e when we started making MEMTX_ERROR generate aborts,
-> though in that case the spec is more definite that abort is not a
-> permitted behaviour.)
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Yes saw those modifs in gic. I will check & fix this.
+> Add support for passing 'max' to -machine gic-version. By analogy
+> with the -cpu max option, this picks the "best available" GIC version
+> whether you're using KVM or TCG, so it behaves like 'host' when
+> using KVM, and gives you GICv3 when using TCG.
+>
+> Also like '-cpu host', using -machine gic-version=3Dmax' means there
+> is no guarantee of migration compatibility between QEMU versions;
+> in future 'max' might mean '4'.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/arm/virt.c | 29 +++++++++++++++++++----------
+>  1 file changed, 19 insertions(+), 10 deletions(-)
+>
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index cda4b83586..2c07245047 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1207,16 +1207,23 @@ static void machvirt_init(MachineState *machine)
+>      /* We can probe only here because during property set
+>       * KVM is not available yet
+>       */
+> -    if (!vms->gic_version) {
+> +    if (vms->gic_version <=3D 0) {
+> +        /* "host" or "max" */
+>          if (!kvm_enabled()) {
+> -            error_report("gic-version=3Dhost requires KVM");
+> -            exit(1);
+> -        }
+> -
+> -        vms->gic_version =3D kvm_arm_vgic_probe();
+> -        if (!vms->gic_version) {
+> -            error_report("Unable to determine GIC version supported by h=
+ost");
+> -            exit(1);
+> +            if (vms->gic_version =3D=3D 0) {
+> +                error_report("gic-version=3Dhost requires KVM");
+> +                exit(1);
+> +            } else {
+> +                /* "max": currently means 3 for TCG */
+> +                vms->gic_version =3D 3;
+> +            }
+> +        } else {
+> +            vms->gic_version =3D kvm_arm_vgic_probe();
+> +            if (!vms->gic_version) {
+> +                error_report(
+> +                    "Unable to determine GIC version supported by host");
+> +                exit(1);
+> +            }
+>          }
+>      }
+>
+> @@ -1480,9 +1487,11 @@ static void virt_set_gic_version(Object *obj, cons=
+t char *value, Error **errp)
+>          vms->gic_version =3D 2;
+>      } else if (!strcmp(value, "host")) {
+>          vms->gic_version =3D 0; /* Will probe later */
+> +    } else if (!strcmp(value, "max")) {
+> +        vms->gic_version =3D -1; /* Will probe later */
+>      } else {
+>          error_setg(errp, "Invalid gic-version value");
+> -        error_append_hint(errp, "Valid values are 3, 2, host.\n");
+> +        error_append_hint(errp, "Valid values are 3, 2, host,
+> max.\n");
 
-Thanks
+nit: host is only valid on aarch64 host. However it will fail later on
+with:
 
-Eric
-> 
-> thanks
-> -- PMM
-> 
+  qemu-system-aarch64: gic-version=3Dhost requires KVM
+
+Anyway:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--
+Alex Benn=C3=A9e
