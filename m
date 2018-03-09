@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1euD5q-0001hi-KB
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 03:09:35 -0500
+	(envelope-from <famz@redhat.com>) id 1euD5r-0001ia-6D
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 03:09:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1euD5p-0008Oh-QM
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 03:09:34 -0500
+	(envelope-from <famz@redhat.com>) id 1euD5q-0008Oq-2g
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 03:09:35 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Fri,  9 Mar 2018 16:09:10 +0800
-Message-Id: <20180309080910.7274-5-famz@redhat.com>
+Date: Fri,  9 Mar 2018 16:09:07 +0800
+Message-Id: <20180309080910.7274-2-famz@redhat.com>
 In-Reply-To: <20180309080910.7274-1-famz@redhat.com>
 References: <20180309080910.7274-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/4] iotests: Add regression test for commit
- base locking
+Subject: [Qemu-devel] [PATCH 1/4] block: Pass "current_flags" in
+ BdrvChildRole.inherit_options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +23,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
+So that the current flags can influence the returned flags in the coming
+patches.
+
+For now, 0 is passed everywhere and the parameter is not used.
+
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tests/qemu-iotests/153     | 6 ++++++
- tests/qemu-iotests/153.out | 4 ++++
- 2 files changed, 10 insertions(+)
+ block.c                   | 20 +++++++++++++-------
+ block/block-backend.c     |  3 ++-
+ block/vvfat.c             |  3 ++-
+ include/block/block_int.h |  3 ++-
+ 4 files changed, 19 insertions(+), 10 deletions(-)
 
-diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
-index fa25eb24bd..5a82acebd3 100755
---- a/tests/qemu-iotests/153
-+++ b/tests/qemu-iotests/153
-@@ -177,6 +177,12 @@ rm -f "${TEST_IMG}.lnk" &>/dev/null
- ln -s ${TEST_IMG} "${TEST_IMG}.lnk" || echo "Failed to create link"
- _run_qemu_with_images "${TEST_IMG}.lnk" "${TEST_IMG}"
+diff --git a/block.c b/block.c
+index 4f76714f6b..bedbe208e6 100644
+--- a/block.c
++++ b/block.c
+@@ -869,7 +869,8 @@ static void bdrv_temp_snapshot_options(int *child_flags, QDict *child_options,
+  * is expected, based on the given options and flags for the parent BDS
+  */
+ static void bdrv_inherited_options(int *child_flags, QDict *child_options,
+-                                   int parent_flags, QDict *parent_options)
++                                   int parent_flags, QDict *parent_options,
++                                   int current_flags)
+ {
+     int flags = parent_flags;
  
-+echo
-+echo "== Active commit to intermediate layer should work when base in use =="
-+_launch_qemu -drive format=$IMGFMT,file="${TEST_IMG}.a",id=drive0 \
-+             -device virtio-blk,drive=drive0
-+_run_cmd $QEMU_IMG commit -b "${TEST_IMG}.b" "${TEST_IMG}.c"
-+
- echo
- echo "== Closing an image should unlock it =="
- _launch_qemu
-diff --git a/tests/qemu-iotests/153.out b/tests/qemu-iotests/153.out
-index 5b917b177c..60d2d661f1 100644
---- a/tests/qemu-iotests/153.out
-+++ b/tests/qemu-iotests/153.out
-@@ -373,6 +373,10 @@ Is another process using the image?
- QEMU_PROG: -drive if=none,file=TEST_DIR/t.qcow2: Failed to get "write" lock
- Is another process using the image?
+@@ -913,10 +914,12 @@ const BdrvChildRole child_file = {
+  * flags for the parent BDS
+  */
+ static void bdrv_inherited_fmt_options(int *child_flags, QDict *child_options,
+-                                       int parent_flags, QDict *parent_options)
++                                       int parent_flags, QDict *parent_options,
++                                       int current_flags)
+ {
+     child_file.inherit_options(child_flags, child_options,
+-                               parent_flags, parent_options);
++                               parent_flags, parent_options,
++                               current_flags);
  
-+== Active commit to intermediate layer should work when base in use ==
-+
-+_qemu_img_wrapper commit -b TEST_DIR/t.qcow2.b TEST_DIR/t.qcow2.c
-+
- == Closing an image should unlock it ==
- {"return": {}}
- Adding drive
+     *child_flags &= ~(BDRV_O_PROTOCOL | BDRV_O_NO_IO);
+ }
+@@ -991,7 +994,8 @@ static void bdrv_backing_detach(BdrvChild *c)
+  * given options and flags for the parent BDS
+  */
+ static void bdrv_backing_options(int *child_flags, QDict *child_options,
+-                                 int parent_flags, QDict *parent_options)
++                                 int parent_flags, QDict *parent_options,
++                                 int current_flags)
+ {
+     int flags = parent_flags;
+ 
+@@ -2548,7 +2552,8 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+     if (child_role) {
+         bs->inherits_from = parent;
+         child_role->inherit_options(&flags, options,
+-                                    parent->open_flags, parent->options);
++                                    parent->open_flags, parent->options,
++                                    0);
+     }
+ 
+     ret = bdrv_fill_options(&options, filename, &flags, &local_err);
+@@ -2576,7 +2581,7 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+                                    flags, options);
+         /* Let bdrv_backing_options() override "read-only" */
+         qdict_del(options, BDRV_OPT_READ_ONLY);
+-        bdrv_backing_options(&flags, options, flags, options);
++        bdrv_backing_options(&flags, options, flags, options, 0);
+     }
+ 
+     bs->open_flags = flags;
+@@ -2837,7 +2842,8 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
+     /* Inherit from parent node */
+     if (parent_options) {
+         assert(!flags);
+-        role->inherit_options(&flags, options, parent_flags, parent_options);
++        role->inherit_options(&flags, options, parent_flags, parent_options,
++                              0);
+     }
+ 
+     /* Old values are used for options that aren't set yet */
+diff --git a/block/block-backend.c b/block/block-backend.c
+index b3c790e2bd..a9a72f5aa8 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -107,7 +107,8 @@ static QTAILQ_HEAD(, BlockBackend) monitor_block_backends =
+     QTAILQ_HEAD_INITIALIZER(monitor_block_backends);
+ 
+ static void blk_root_inherit_options(int *child_flags, QDict *child_options,
+-                                     int parent_flags, QDict *parent_options)
++                                     int parent_flags, QDict *parent_options,
++                                     int current_flags)
+ {
+     /* We're not supposed to call this function for root nodes */
+     abort();
+diff --git a/block/vvfat.c b/block/vvfat.c
+index 4a17a49e12..ae90aa0af0 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -3126,7 +3126,8 @@ static BlockDriver vvfat_write_target = {
+ };
+ 
+ static void vvfat_qcow_options(int *child_flags, QDict *child_options,
+-                               int parent_flags, QDict *parent_options)
++                               int parent_flags, QDict *parent_options,
++                               int current_flags)
+ {
+     qdict_set_default_str(child_options, BDRV_OPT_READ_ONLY, "off");
+     *child_flags = BDRV_O_NO_FLUSH;
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 64a5700f2b..fcda7220a2 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -535,7 +535,8 @@ struct BdrvChildRole {
+     bool stay_at_node;
+ 
+     void (*inherit_options)(int *child_flags, QDict *child_options,
+-                            int parent_flags, QDict *parent_options);
++                            int parent_flags, QDict *parent_options,
++                            int current_flags);
+ 
+     void (*change_media)(BdrvChild *child, bool load);
+     void (*resize)(BdrvChild *child);
 -- 
 2.14.3
