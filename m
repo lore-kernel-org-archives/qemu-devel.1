@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1euKl1-00018F-B1
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:37 -0500
+	(envelope-from <kwolf@redhat.com>) id 1euKl8-0001HW-17
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1euKky-0006wv-Iy
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:35 -0500
+	(envelope-from <kwolf@redhat.com>) id 1euKl6-00079A-7i
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:41 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  9 Mar 2018 17:19:03 +0100
-Message-Id: <20180309161933.8168-27-kwolf@redhat.com>
+Date: Fri,  9 Mar 2018 17:19:11 +0100
+Message-Id: <20180309161933.8168-35-kwolf@redhat.com>
 In-Reply-To: <20180309161933.8168-1-kwolf@redhat.com>
 References: <20180309161933.8168-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 26/56] qdict: Introduce qdict_rename_keys()
+Subject: [Qemu-devel] [PULL 34/56] rbd: Factor out qemu_rbd_connect()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,221 +22,193 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-A few block drivers will need to rename .bdrv_create options for their
-QAPIfication, so let's have a helper function for that.
+The code to establish an RBD connection is duplicated between open and
+create. In order to be able to share the code, factor out the code from
+qemu_rbd_open() as a first step.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- include/qapi/qmp/qdict.h |   6 +++
- qobject/qdict.c          |  34 +++++++++++++
- tests/check-qdict.c      | 129 +++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 169 insertions(+)
+ block/rbd.c | 100 ++++++++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 60 insertions(+), 40 deletions(-)
 
-diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
-index ff6f7842c3..7c6d844549 100644
---- a/include/qapi/qmp/qdict.h
-+++ b/include/qapi/qmp/qdict.h
-@@ -81,4 +81,10 @@ QObject *qdict_crumple(const QDict *src, Error **errp);
- 
- void qdict_join(QDict *dest, QDict *src, bool overwrite);
- 
-+typedef struct QDictRenames {
-+    const char *from;
-+    const char *to;
-+} QDictRenames;
-+bool qdict_rename_keys(QDict *qdict, const QDictRenames *renames, Error **errp);
-+
- #endif /* QDICT_H */
-diff --git a/qobject/qdict.c b/qobject/qdict.c
-index 23df84f9cd..229b8c840b 100644
---- a/qobject/qdict.c
-+++ b/qobject/qdict.c
-@@ -1072,3 +1072,37 @@ void qdict_join(QDict *dest, QDict *src, bool overwrite)
-         entry = next;
-     }
- }
-+
-+/**
-+ * qdict_rename_keys(): Rename keys in qdict according to the replacements
-+ * specified in the array renames. The array must be terminated by an entry
-+ * with from = NULL.
-+ *
-+ * The renames are performed individually in the order of the array, so entries
-+ * may be renamed multiple times and may or may not conflict depending on the
-+ * order of the renames array.
-+ *
-+ * Returns true for success, false in error cases.
-+ */
-+bool qdict_rename_keys(QDict *qdict, const QDictRenames *renames, Error **errp)
-+{
-+    QObject *qobj;
-+
-+    while (renames->from) {
-+        if (qdict_haskey(qdict, renames->from)) {
-+            if (qdict_haskey(qdict, renames->to)) {
-+                error_setg(errp, "'%s' and its alias '%s' can't be used at the "
-+                           "same time", renames->to, renames->from);
-+                return false;
-+            }
-+
-+            qobj = qdict_get(qdict, renames->from);
-+            qobject_incref(qobj);
-+            qdict_put_obj(qdict, renames->to, qobj);
-+            qdict_del(qdict, renames->from);
-+        }
-+
-+        renames++;
-+    }
-+    return true;
-+}
-diff --git a/tests/check-qdict.c b/tests/check-qdict.c
-index ec628f3453..a3faea8bfc 100644
---- a/tests/check-qdict.c
-+++ b/tests/check-qdict.c
-@@ -665,6 +665,133 @@ static void qdict_crumple_test_empty(void)
-     QDECREF(dst);
+diff --git a/block/rbd.c b/block/rbd.c
+index c1025c8493..99fcc7ecdf 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -546,32 +546,17 @@ out:
+     return rados_str;
  }
  
-+static int qdict_count_entries(QDict *dict)
-+{
-+    const QDictEntry *e;
-+    int count = 0;
-+
-+    for (e = qdict_first(dict); e; e = qdict_next(dict, e)) {
-+        count++;
-+    }
-+
-+    return count;
-+}
-+
-+static void qdict_rename_keys_test(void)
-+{
-+    QDict *dict = qdict_new();
-+    QDict *copy;
-+    QDictRenames *renames;
-+    Error *local_err = NULL;
-+
-+    qdict_put_str(dict, "abc", "foo");
-+    qdict_put_str(dict, "abcdef", "bar");
-+    qdict_put_int(dict, "number", 42);
-+    qdict_put_bool(dict, "flag", true);
-+    qdict_put_null(dict, "nothing");
-+
-+    /* Empty rename list */
-+    renames = (QDictRenames[]) {
-+        { NULL, "this can be anything" }
-+    };
-+    copy = qdict_clone_shallow(dict);
-+    qdict_rename_keys(copy, renames, &error_abort);
-+
-+    g_assert_cmpstr(qdict_get_str(copy, "abc"), ==, "foo");
-+    g_assert_cmpstr(qdict_get_str(copy, "abcdef"), ==, "bar");
-+    g_assert_cmpint(qdict_get_int(copy, "number"), ==, 42);
-+    g_assert_cmpint(qdict_get_bool(copy, "flag"), ==, true);
-+    g_assert(qobject_type(qdict_get(copy, "nothing")) == QTYPE_QNULL);
-+    g_assert_cmpint(qdict_count_entries(copy), ==, 5);
-+
-+    QDECREF(copy);
-+
-+    /* Simple rename of all entries */
-+    renames = (QDictRenames[]) {
-+        { "abc",        "str1" },
-+        { "abcdef",     "str2" },
-+        { "number",     "int" },
-+        { "flag",       "bool" },
-+        { "nothing",    "null" },
-+        { NULL , NULL }
-+    };
-+    copy = qdict_clone_shallow(dict);
-+    qdict_rename_keys(copy, renames, &error_abort);
-+
-+    g_assert(!qdict_haskey(copy, "abc"));
-+    g_assert(!qdict_haskey(copy, "abcdef"));
-+    g_assert(!qdict_haskey(copy, "number"));
-+    g_assert(!qdict_haskey(copy, "flag"));
-+    g_assert(!qdict_haskey(copy, "nothing"));
-+
-+    g_assert_cmpstr(qdict_get_str(copy, "str1"), ==, "foo");
-+    g_assert_cmpstr(qdict_get_str(copy, "str2"), ==, "bar");
-+    g_assert_cmpint(qdict_get_int(copy, "int"), ==, 42);
-+    g_assert_cmpint(qdict_get_bool(copy, "bool"), ==, true);
-+    g_assert(qobject_type(qdict_get(copy, "null")) == QTYPE_QNULL);
-+    g_assert_cmpint(qdict_count_entries(copy), ==, 5);
-+
-+    QDECREF(copy);
-+
-+    /* Renames are processed top to bottom */
-+    renames = (QDictRenames[]) {
-+        { "abc",        "tmp" },
-+        { "abcdef",     "abc" },
-+        { "number",     "abcdef" },
-+        { "flag",       "number" },
-+        { "nothing",    "flag" },
-+        { "tmp",        "nothing" },
-+        { NULL , NULL }
-+    };
-+    copy = qdict_clone_shallow(dict);
-+    qdict_rename_keys(copy, renames, &error_abort);
-+
-+    g_assert_cmpstr(qdict_get_str(copy, "nothing"), ==, "foo");
-+    g_assert_cmpstr(qdict_get_str(copy, "abc"), ==, "bar");
-+    g_assert_cmpint(qdict_get_int(copy, "abcdef"), ==, 42);
-+    g_assert_cmpint(qdict_get_bool(copy, "number"), ==, true);
-+    g_assert(qobject_type(qdict_get(copy, "flag")) == QTYPE_QNULL);
-+    g_assert(!qdict_haskey(copy, "tmp"));
-+    g_assert_cmpint(qdict_count_entries(copy), ==, 5);
-+
-+    QDECREF(copy);
-+
-+    /* Conflicting rename */
-+    renames = (QDictRenames[]) {
-+        { "abcdef",     "abc" },
-+        { NULL , NULL }
-+    };
-+    copy = qdict_clone_shallow(dict);
-+    qdict_rename_keys(copy, renames, &local_err);
-+
-+    g_assert(local_err != NULL);
-+    error_free(local_err);
-+    local_err = NULL;
-+
-+    g_assert_cmpstr(qdict_get_str(copy, "abc"), ==, "foo");
-+    g_assert_cmpstr(qdict_get_str(copy, "abcdef"), ==, "bar");
-+    g_assert_cmpint(qdict_get_int(copy, "number"), ==, 42);
-+    g_assert_cmpint(qdict_get_bool(copy, "flag"), ==, true);
-+    g_assert(qobject_type(qdict_get(copy, "nothing")) == QTYPE_QNULL);
-+    g_assert_cmpint(qdict_count_entries(copy), ==, 5);
-+
-+    QDECREF(copy);
-+
-+    /* Renames in an empty dict */
-+    renames = (QDictRenames[]) {
-+        { "abcdef",     "abc" },
-+        { NULL , NULL }
-+    };
-+
-+    QDECREF(dict);
-+    dict = qdict_new();
-+
-+    qdict_rename_keys(dict, renames, &error_abort);
-+    g_assert(qdict_first(dict) == NULL);
-+
-+    QDECREF(dict);
-+}
-+
- static void qdict_crumple_test_bad_inputs(void)
+-static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+-                         Error **errp)
++static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
++                            char **s_snap, char **s_image_name,
++                            QDict *options, bool cache, Error **errp)
  {
-     QDict *src;
-@@ -880,6 +1007,8 @@ int main(int argc, char **argv)
-     g_test_add_func("/public/crumple/bad_inputs",
-                     qdict_crumple_test_bad_inputs);
+-    BDRVRBDState *s = bs->opaque;
+-    const char *pool, *snap, *conf, *user, *image_name, *keypairs;
+-    const char *secretid, *filename;
+     QemuOpts *opts;
+-    Error *local_err = NULL;
+     char *mon_host = NULL;
++    const char *pool, *snap, *conf, *user, *image_name, *keypairs;
++    const char *secretid;
++    Error *local_err = NULL;
+     int r;
  
-+    g_test_add_func("/public/rename_keys", qdict_rename_keys_test);
+-    /* If we are given a filename, parse the filename, with precedence given to
+-     * filename encoded options */
+-    filename = qdict_get_try_str(options, "filename");
+-    if (filename) {
+-        warn_report("'filename' option specified. "
+-                    "This is an unsupported option, and may be deprecated "
+-                    "in the future");
+-        qemu_rbd_parse_filename(filename, options, &local_err);
+-        if (local_err) {
+-            r = -EINVAL;
+-            error_propagate(errp, local_err);
+-            goto exit;
+-        }
+-    }
+-
+     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+     qemu_opts_absorb_qdict(opts, options, &local_err);
+     if (local_err) {
+@@ -602,35 +587,35 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+         goto failed_opts;
+     }
+ 
+-    r = rados_create(&s->cluster, user);
++    r = rados_create(cluster, user);
+     if (r < 0) {
+         error_setg_errno(errp, -r, "error initializing");
+         goto failed_opts;
+     }
+ 
+-    s->snap = g_strdup(snap);
+-    s->image_name = g_strdup(image_name);
++    *s_snap = g_strdup(snap);
++    *s_image_name = g_strdup(image_name);
+ 
+     /* try default location when conf=NULL, but ignore failure */
+-    r = rados_conf_read_file(s->cluster, conf);
++    r = rados_conf_read_file(*cluster, conf);
+     if (conf && r < 0) {
+         error_setg_errno(errp, -r, "error reading conf file %s", conf);
+         goto failed_shutdown;
+     }
+ 
+-    r = qemu_rbd_set_keypairs(s->cluster, keypairs, errp);
++    r = qemu_rbd_set_keypairs(*cluster, keypairs, errp);
+     if (r < 0) {
+         goto failed_shutdown;
+     }
+ 
+     if (mon_host) {
+-        r = rados_conf_set(s->cluster, "mon_host", mon_host);
++        r = rados_conf_set(*cluster, "mon_host", mon_host);
+         if (r < 0) {
+             goto failed_shutdown;
+         }
+     }
+ 
+-    if (qemu_rbd_set_auth(s->cluster, secretid, errp) < 0) {
++    if (qemu_rbd_set_auth(*cluster, secretid, errp) < 0) {
+         r = -EIO;
+         goto failed_shutdown;
+     }
+@@ -642,24 +627,65 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+      * librbd defaults to no caching. If write through caching cannot
+      * be set up, fall back to no caching.
+      */
+-    if (flags & BDRV_O_NOCACHE) {
+-        rados_conf_set(s->cluster, "rbd_cache", "false");
++    if (cache) {
++        rados_conf_set(*cluster, "rbd_cache", "true");
+     } else {
+-        rados_conf_set(s->cluster, "rbd_cache", "true");
++        rados_conf_set(*cluster, "rbd_cache", "false");
+     }
+ 
+-    r = rados_connect(s->cluster);
++    r = rados_connect(*cluster);
+     if (r < 0) {
+         error_setg_errno(errp, -r, "error connecting");
+         goto failed_shutdown;
+     }
+ 
+-    r = rados_ioctx_create(s->cluster, pool, &s->io_ctx);
++    r = rados_ioctx_create(*cluster, pool, io_ctx);
+     if (r < 0) {
+         error_setg_errno(errp, -r, "error opening pool %s", pool);
+         goto failed_shutdown;
+     }
+ 
++    qemu_opts_del(opts);
++    return 0;
 +
-     /* The Big one */
-     if (g_test_slow()) {
-         g_test_add_func("/stress/test", qdict_stress_test);
++failed_shutdown:
++    rados_shutdown(*cluster);
++    g_free(*s_snap);
++    g_free(*s_image_name);
++failed_opts:
++    qemu_opts_del(opts);
++    g_free(mon_host);
++    return r;
++}
++
++static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
++                         Error **errp)
++{
++    BDRVRBDState *s = bs->opaque;
++    Error *local_err = NULL;
++    const char *filename;
++    int r;
++
++    /* If we are given a filename, parse the filename, with precedence given to
++     * filename encoded options */
++    filename = qdict_get_try_str(options, "filename");
++    if (filename) {
++        warn_report("'filename' option specified. "
++                    "This is an unsupported option, and may be deprecated "
++                    "in the future");
++        qemu_rbd_parse_filename(filename, options, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return -EINVAL;
++        }
++    }
++
++    r = qemu_rbd_connect(&s->cluster, &s->io_ctx, &s->snap, &s->image_name,
++                         options, !(flags & BDRV_O_NOCACHE), errp);
++    if (r < 0) {
++        return r;
++    }
++
+     /* rbd_open is always r/w */
+     r = rbd_open(s->io_ctx, s->image_name, &s->image, s->snap);
+     if (r < 0) {
+@@ -684,19 +710,13 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+         }
+     }
+ 
+-    qemu_opts_del(opts);
+     return 0;
+ 
+ failed_open:
+     rados_ioctx_destroy(s->io_ctx);
+-failed_shutdown:
+-    rados_shutdown(s->cluster);
+     g_free(s->snap);
+     g_free(s->image_name);
+-failed_opts:
+-    qemu_opts_del(opts);
+-    g_free(mon_host);
+-exit:
++    rados_shutdown(s->cluster);
+     return r;
+ }
+ 
 -- 
 2.13.6
