@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1euHmD-0002MF-UB
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:09:39 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1euHmD-0002M8-EP
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:09:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1euHmC-0006Mn-Si
+	(envelope-from <marcandre.lureau@redhat.com>) id 1euHmB-0006L7-Jr
 	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:09:37 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47702 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47694 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1euHmC-0006M8-NG
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:09:36 -0500
+	id 1euHmB-0006KE-ED
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:09:35 -0500
 From: marcandre.lureau@redhat.com
-Date: Fri,  9 Mar 2018 14:09:14 +0100
-Message-Id: <20180309130918.734-4-marcandre.lureau@redhat.com>
+Date: Fri,  9 Mar 2018 14:09:13 +0100
+Message-Id: <20180309130918.734-3-marcandre.lureau@redhat.com>
 In-Reply-To: <20180309130918.734-1-marcandre.lureau@redhat.com>
 References: <20180309130918.734-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 3/7] OvmfPkg: simplify SecurityStubDxe.inf
- inclusion
+Subject: [Qemu-devel] [PATCH v3 2/7] MdeModulePkg/Core/Pei: fix REGISITER ->
+ REGISTER typo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,83 +33,172 @@ Cc: pjones@redhat.com, jiewen.yao@intel.com, stefanb@linux.vnet.ibm.com, lersek@
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-SecurityStubDxe.inf should be included unconditionally.
+No functional changes.
 
 Cc: Laszlo Ersek <lersek@redhat.com>
-Contributed-under: TianoCore Contribution Agreement 1.1
+Contributed-under: TianoCore Contribution Agreement 1.0
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Star Zeng <star.zeng@intel.com>
 ---
- OvmfPkg/OvmfPkgIa32.dsc    | 6 ++----
- OvmfPkg/OvmfPkgIa32X64.dsc | 6 ++----
- OvmfPkg/OvmfPkgX64.dsc     | 6 ++----
- 3 files changed, 6 insertions(+), 12 deletions(-)
+ MdeModulePkg/Core/Pei/Dispatcher/Dispatcher.c | 18 +++++++++---------
+ MdeModulePkg/Core/Pei/Image/Image.c           |  4 ++--
+ MdeModulePkg/Core/Pei/PeiMain.h               |  2 +-
+ MdeModulePkg/Core/Pei/PeiMain/PeiMain.c       |  2 +-
+ 4 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/OvmfPkg/OvmfPkgIa32.dsc b/OvmfPkg/OvmfPkgIa32.dsc
-index fbe0f790e431..5bd3f4f977df 100644
---- a/OvmfPkg/OvmfPkgIa32.dsc
-+++ b/OvmfPkg/OvmfPkgIa32.dsc
-@@ -611,14 +611,12 @@ [Components]
+diff --git a/MdeModulePkg/Core/Pei/Dispatcher/Dispatcher.c b/MdeModulePkg=
+/Core/Pei/Dispatcher/Dispatcher.c
+index 79f2e5cebcbe..027176d872c7 100644
+--- a/MdeModulePkg/Core/Pei/Dispatcher/Dispatcher.c
++++ b/MdeModulePkg/Core/Pei/Dispatcher/Dispatcher.c
+@@ -970,7 +970,7 @@ PeiDispatcher (
+   if ((Private->PeiMemoryInstalled) && (Private->HobList.HandoffInformat=
+ionTable->BootMode !=3D BOOT_ON_S3_RESUME || PcdGetBool (PcdShadowPeimOnS=
+3Boot))) {
+     //
+     // Once real memory is available, shadow the RegisterForShadow modul=
+es. And meanwhile
+-    // update the modules' status from PEIM_STATE_REGISITER_FOR_SHADOW t=
+o PEIM_STATE_DONE.
++    // update the modules' status from PEIM_STATE_REGISTER_FOR_SHADOW to=
+ PEIM_STATE_DONE.
+     //
+     SaveCurrentPeimCount  =3D Private->CurrentPeimCount;
+     SaveCurrentFvCount    =3D Private->CurrentPeimFvCount;
+@@ -978,7 +978,7 @@ PeiDispatcher (
 =20
-   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+     for (Index1 =3D 0; Index1 <=3D SaveCurrentFvCount; Index1++) {
+       for (Index2 =3D 0; (Index2 < PcdGet32 (PcdPeiCoreMaxPeimPerFv)) &&=
+ (Private->Fv[Index1].FvFileHandles[Index2] !=3D NULL); Index2++) {
+-        if (Private->Fv[Index1].PeimState[Index2] =3D=3D PEIM_STATE_REGI=
+SITER_FOR_SHADOW) {
++        if (Private->Fv[Index1].PeimState[Index2] =3D=3D PEIM_STATE_REGI=
+STER_FOR_SHADOW) {
+           PeimFileHandle =3D Private->Fv[Index1].FvFileHandles[Index2];
+           Private->CurrentFileHandle   =3D PeimFileHandle;
+           Private->CurrentPeimFvCount  =3D Index1;
+@@ -986,13 +986,13 @@ PeiDispatcher (
+           Status =3D PeiLoadImage (
+                     (CONST EFI_PEI_SERVICES **) &Private->Ps,
+                     PeimFileHandle,
+-                    PEIM_STATE_REGISITER_FOR_SHADOW,
++                    PEIM_STATE_REGISTER_FOR_SHADOW,
+                     &EntryPoint,
+                     &AuthenticationState
+                     );
+           if (Status =3D=3D EFI_SUCCESS) {
+             //
+-            // PEIM_STATE_REGISITER_FOR_SHADOW move to PEIM_STATE_DONE
++            // PEIM_STATE_REGISTER_FOR_SHADOW move to PEIM_STATE_DONE
+             //
+             Private->Fv[Index1].PeimState[Index2]++;
+             //
+@@ -1165,7 +1165,7 @@ PeiDispatcher (
+             //
+             PeiCheckAndSwitchStack (SecCoreData, Private);
 =20
--!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
-   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
-     <LibraryClasses>
-+!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
-       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificat=
-ionLib.inf
--	}
--!else
--  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
- !endif
-+  }
+-            if ((Private->PeiMemoryInstalled) && (Private->Fv[FvCount].P=
+eimState[PeimCount] =3D=3D PEIM_STATE_REGISITER_FOR_SHADOW) &&   \
++            if ((Private->PeiMemoryInstalled) && (Private->Fv[FvCount].P=
+eimState[PeimCount] =3D=3D PEIM_STATE_REGISTER_FOR_SHADOW) &&   \
+                 (Private->HobList.HandoffInformationTable->BootMode !=3D=
+ BOOT_ON_S3_RESUME || PcdGetBool (PcdShadowPeimOnS3Boot))) {
+               //
+               // If memory is available we shadow images by default for =
+performance reasons.
+@@ -1179,7 +1179,7 @@ PeiDispatcher (
+                 Status =3D PeiLoadImage (
+                            PeiServices,
+                            PeimFileHandle,
+-                           PEIM_STATE_REGISITER_FOR_SHADOW,
++                           PEIM_STATE_REGISTER_FOR_SHADOW,
+                            &EntryPoint,
+                            &AuthenticationState
+                            );
+@@ -1192,7 +1192,7 @@ PeiDispatcher (
+               //PERF_END (PeiServices, L"PEIM", PeimFileHandle, 0);
 =20
-   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
-   PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
-diff --git a/OvmfPkg/OvmfPkgIa32X64.dsc b/OvmfPkg/OvmfPkgIa32X64.dsc
-index fb10e0b0f2e4..7dded86c4940 100644
---- a/OvmfPkg/OvmfPkgIa32X64.dsc
-+++ b/OvmfPkg/OvmfPkgIa32X64.dsc
-@@ -620,14 +620,12 @@ [Components.X64]
+               //
+-              // PEIM_STATE_REGISITER_FOR_SHADOW move to PEIM_STATE_DONE
++              // PEIM_STATE_REGISTER_FOR_SHADOW move to PEIM_STATE_DONE
+               //
+               Private->Fv[FvCount].PeimState[PeimCount]++;
 =20
-   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+@@ -1356,14 +1356,14 @@ PeiRegisterForShadow (
+     return EFI_NOT_FOUND;
+   }
 =20
--!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
-   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
-     <LibraryClasses>
-+!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
-       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificat=
-ionLib.inf
--	}
--!else
--  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
- !endif
-+  }
+-  if (Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->Curren=
+tPeimCount] >=3D PEIM_STATE_REGISITER_FOR_SHADOW) {
++  if (Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->Curren=
+tPeimCount] >=3D PEIM_STATE_REGISTER_FOR_SHADOW) {
+     //
+     // If the PEIM has already entered the PEIM_STATE_REGISTER_FOR_SHADO=
+W or PEIM_STATE_DONE then it's already been started
+     //
+     return EFI_ALREADY_STARTED;
+   }
 =20
-   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
-   PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
-diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
-index a31551f5ae24..a8e89276c0b2 100644
---- a/OvmfPkg/OvmfPkgX64.dsc
-+++ b/OvmfPkg/OvmfPkgX64.dsc
-@@ -618,14 +618,12 @@ [Components]
+-  Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->CurrentPei=
+mCount] =3D PEIM_STATE_REGISITER_FOR_SHADOW;
++  Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->CurrentPei=
+mCount] =3D PEIM_STATE_REGISTER_FOR_SHADOW;
 =20
-   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+   return EFI_SUCCESS;
+ }
+diff --git a/MdeModulePkg/Core/Pei/Image/Image.c b/MdeModulePkg/Core/Pei/=
+Image/Image.c
+index f41d3acac77e..f07f48823117 100644
+--- a/MdeModulePkg/Core/Pei/Image/Image.c
++++ b/MdeModulePkg/Core/Pei/Image/Image.c
+@@ -387,7 +387,7 @@ LoadAndRelocatePeCoffImage (
+   }
+   IsRegisterForShadow =3D FALSE;
+   if ((Private->CurrentFileHandle =3D=3D FileHandle)=20
+-    && (Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->Curr=
+entPeimCount] =3D=3D PEIM_STATE_REGISITER_FOR_SHADOW)) {
++    && (Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->Curr=
+entPeimCount] =3D=3D PEIM_STATE_REGISTER_FOR_SHADOW)) {
+     IsRegisterForShadow =3D TRUE;
+   }
 =20
--!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
-   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
-     <LibraryClasses>
-+!if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
-       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificat=
-ionLib.inf
--	}
--!else
--  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
- !endif
-+  }
+@@ -876,7 +876,7 @@ PeiLoadImage (
+         //
+         // The shadowed PEIM must be relocatable.
+         //
+-        if (PeimState =3D=3D PEIM_STATE_REGISITER_FOR_SHADOW) {
++        if (PeimState =3D=3D PEIM_STATE_REGISTER_FOR_SHADOW) {
+           IsStrip =3D RelocationIsStrip ((VOID *) (UINTN) ImageAddress);
+           ASSERT (!IsStrip);
+           if (IsStrip) {
+diff --git a/MdeModulePkg/Core/Pei/PeiMain.h b/MdeModulePkg/Core/Pei/PeiM=
+ain.h
+index fef3753e4b3b..a1cdbc15d98a 100644
+--- a/MdeModulePkg/Core/Pei/PeiMain.h
++++ b/MdeModulePkg/Core/Pei/PeiMain.h
+@@ -104,7 +104,7 @@ typedef struct {
+ //
+ #define PEIM_STATE_NOT_DISPATCHED         0x00
+ #define PEIM_STATE_DISPATCHED             0x01
+-#define PEIM_STATE_REGISITER_FOR_SHADOW   0x02
++#define PEIM_STATE_REGISTER_FOR_SHADOW    0x02
+ #define PEIM_STATE_DONE                   0x03
 =20
-   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
-   PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
+ typedef struct {
+diff --git a/MdeModulePkg/Core/Pei/PeiMain/PeiMain.c b/MdeModulePkg/Core/=
+Pei/PeiMain/PeiMain.c
+index 3cd61906c3df..775bf18ce938 100644
+--- a/MdeModulePkg/Core/Pei/PeiMain/PeiMain.c
++++ b/MdeModulePkg/Core/Pei/PeiMain/PeiMain.c
+@@ -104,7 +104,7 @@ ShadowPeiCore (
+   Status =3D PeiLoadImage (
+               GetPeiServicesTablePointer (),
+               *((EFI_PEI_FILE_HANDLE*)&PeiCoreFileHandle),
+-              PEIM_STATE_REGISITER_FOR_SHADOW,
++              PEIM_STATE_REGISTER_FOR_SHADOW,
+               &EntryPoint,
+               &AuthenticationState
+               );
 --=20
 2.16.2.346.g9779355e34
