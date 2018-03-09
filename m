@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1euFAK-0008Ek-7s
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:22:21 -0500
+	(envelope-from <yi.l.liu@intel.com>) id 1euFDU-00010F-UW
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:25:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1euFAG-0008Kn-8n
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:22:20 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42610 helo=mx1.redhat.com)
+	(envelope-from <yi.l.liu@intel.com>) id 1euFDQ-0000uk-UN
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:25:36 -0500
+Received: from mga05.intel.com ([192.55.52.43]:53325)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1euFAG-0008KI-36
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:22:16 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5672D8D6D7
-	for <qemu-devel@nongnu.org>; Fri,  9 Mar 2018 10:22:11 +0000 (UTC)
-Date: Fri, 9 Mar 2018 10:22:04 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180309102204.GD9668@stefanha-x1.localdomain>
-References: <20180308155524.5082-1-berrange@redhat.com>
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1euFDQ-0000uE-36
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:25:32 -0500
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+Date: Fri, 9 Mar 2018 10:25:27 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C257439B9A91E@SHSMSX104.ccr.corp.intel.com>
+References: <1519900415-30314-1-git-send-email-yi.l.liu@linux.intel.com>
+	<1519900415-30314-8-git-send-email-yi.l.liu@linux.intel.com>
+	<20180306064436.GD3615@xz-mi>
+	<A2975661238FB949B60364EF0F2C257439B87886@SHSMSX104.ccr.corp.intel.com>
+	<20180306120957.GE17720@xz-mi>
+	<A2975661238FB949B60364EF0F2C257439B8AA81@SHSMSX104.ccr.corp.intel.com>
+	<20180309070550.GI32252@xz-mi>
+In-Reply-To: <20180309070550.GI32252@xz-mi>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="MAH+hnPXVZWQ5cD/"
-Content-Disposition: inline
-In-Reply-To: <20180308155524.5082-1-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] Avoid QEMU specific types in trace
- probes
+Subject: Re: [Qemu-devel] [PATCH v3 07/12] vfio/pci: register sva notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,51 +33,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: "Liu, Yi L" <yi.l.liu@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "Tian, Kevin" <kevin.tian@intel.com>, "jasowang@redhat.com" <jasowang@redhat.com>
 
-
---MAH+hnPXVZWQ5cD/
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Mar 08, 2018 at 03:55:22PM +0000, Daniel P. Berrang=E9 wrote:
-> Changed in v2:
->=20
->  - Split into 2 patches
->  - Added ptrdiff_t type to whitelist
->=20
-> Daniel P. Berrang=E9 (2):
->   trace: remove use of QEMU specific types from trace probes
->   trace: only permit standard C types and fixed size integer types
->=20
->  scripts/tracetool/__init__.py | 46 +++++++++++++++++++++++++++++++++++++=
-++++++
->  trace-events                  |  6 +++---
->  2 files changed, 49 insertions(+), 3 deletions(-)
->=20
-> --=20
-> 2.14.3
->=20
-
-Thanks, applied to my tracing tree:
-https://github.com/stefanha/qemu/commits/tracing
-
-Stefan
-
---MAH+hnPXVZWQ5cD/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaomBMAAoJEJykq7OBq3PImAIH/Ahm24Co23yR5boNON8gc7GX
-Jh02q60MDhSay92aMiAJcCeHHlkp6PmSnaZljMK/0hn4aXCDIfA8tk+tU1p0LJ+z
-23YxN09RS6Vg1z+7g5HJXTk2idtgcNnn5lS6Cm3pFruT7vwC2G3dmulG3ELeZYse
-WaOgqrQi9Y6zqDFnz1ZzoxLaYUrUC28fUmrpeCKDFqayMRjtmhSbEsx4gC65CB7m
-5Fanp62N8XbVgw9AGBqX0yQLo8aKXd7kEw4OOZiGU1sqfFuGFpW333/i0HpOIVYr
-+aMxpugg19YR80BfE6er/WoXzDDdx6JxFQdvkCz4mEGimV/TG/TZdCz4Xp4FL6I=
-=I4Kr
------END PGP SIGNATURE-----
-
---MAH+hnPXVZWQ5cD/--
+PiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBldGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBGcmlk
+YXksIE1hcmNoIDksIDIwMTggMzowNiBQTQ0KPiBUbzogTGl1LCBZaSBMIDx5aS5sLmxpdUBpbnRl
+bC5jb20+DQpbLi4uXQ0KPiA+ID4gPiA+ID4gKw0KPiA+ID4gPiA+ID4gIHN0YXRpYyB2b2lkIHZm
+aW9fcGNpX2RldmljZV9zdmFfcmVnaXN0ZXJfbm90aWZpZXIoUENJQnVzICpidXMsDQo+ID4gPiA+
+ID4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICBpbnQzMl90IGRldmZuLCBJT01NVVNWQUNv
+bnRleHQgKnN2YV9jdHgpICB7DQo+ID4gPiA+ID4gPiAtICAgIC8qIFJlZ2lzdGVyIG5vdGlmaWVy
+IGZvciBUTEIgaW52YWxpZGF0aW9uIHByb3BhZ2F0aW9uDQo+ID4gPiA+ID4gPiAtICAgICAgICov
+DQo+ID4gPiA+ID4gPiArICAgIFZGSU9Db250YWluZXIgKmNvbnRhaW5lciA9DQo+ID4gPiA+ID4g
+PiArIHZmaW9fZ2V0X2NvbnRhaW5lcl9mcm9tX2J1c2RldihidXMsDQo+ID4gPiA+ID4gPiArIGRl
+dmZuKTsNCj4gPiA+ID4gPiA+ICsNCj4gPiA+ID4gPiA+ICsgICAgaWYgKGNvbnRhaW5lciAhPSBO
+VUxMKSB7DQo+ID4gPiA+ID4gPiArICAgICAgICBWRklPR3Vlc3RJT01NVVNWQUNvbnRleHQgKmdz
+dmFfY3R4Ow0KPiA+ID4gPiA+ID4gKyAgICAgICAgZ3N2YV9jdHggPSBnX21hbGxvYzAoc2l6ZW9m
+KCpnc3ZhX2N0eCkpOw0KPiA+ID4gPiA+ID4gKyAgICAgICAgZ3N2YV9jdHgtPnN2YV9jdHggPSBz
+dmFfY3R4Ow0KPiA+ID4gPiA+ID4gKyAgICAgICAgZ3N2YV9jdHgtPmNvbnRhaW5lciA9IGNvbnRh
+aW5lcjsNCj4gPiA+ID4gPiA+ICsgICAgICAgIFFMSVNUX0lOU0VSVF9IRUFEKCZjb250YWluZXIt
+PmdzdmFfY3R4X2xpc3QsDQo+ID4gPiA+ID4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICBn
+c3ZhX2N0eCwNCj4gPiA+ID4gPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgIGdzdmFfY3R4
+X25leHQpOw0KPiA+ID4gPiA+ID4gKyAgICAgICAvKiBSZWdpc3RlciB2ZmlvX2lvbW11X3N2YV90
+bGJfaW52YWxpZGF0ZV9ub3RpZnkgd2l0aCBldmVudCBmbGFnDQo+ID4gPiA+ID4gPiArICAgICAg
+ICAgICBJT01NVV9TVkFfRVZFTlRfVExCX0lOViAqLw0KPiA+ID4gPiA+ID4gKyAgICAgICAgaW9t
+bXVfc3ZhX25vdGlmaWVyX3JlZ2lzdGVyKHN2YV9jdHgsDQo+ID4gPiA+ID4gPiArICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgJmdzdmFfY3R4LT5uLA0KPiA+ID4gPiA+ID4gKyAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHZmaW9faW9tbXVfc3ZhX3RsYl9pbnZh
+bGlkYXRlX25vdGlmeSwNCj4gPiA+ID4gPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBJT01NVV9TVkFfRVZFTlRfVExCX0lOVik7DQo+ID4gPiA+ID4NCj4gPiA+ID4gPiBJ
+IHdvdWxkIHNxdWFzaCB0aGlzIHBhdGNoIGludG8gcHJldmlvdXMgb25lIHNpbmNlIGJhc2ljYWxs
+eSB0aGlzDQo+ID4gPiA+ID4gaXMgb25seSBwYXJ0IG9mIHRoZSBpbXBsZW1lbnRhdGlvbiB0byBw
+cm92aWRlIHZmaW8tc3BlaWNpZmljIHJlZ2lzdGVyIGhvb2suDQo+ID4gPiA+DQo+ID4gPiA+IHN1
+cmUuDQo+ID4gPiA+DQo+ID4gPiA+ID4gQnV0IGEgbW9yZSBpbXBvcnRhbnQgcXVlc3Rpb24gaXMu
+Li4gd2h5IHRoaXM/DQo+ID4gPiA+ID4NCj4gPiA+ID4gPiBJTUhPIHRoZSBub3RpZmllciByZWdp
+c3RyYXRpb24gY2FuIGJlIGdlbmVyYWwgZm9yIFBDSS4gIFdoeSB2ZmlvDQo+ID4gPiA+ID4gbmVl
+ZHMgdG8gcHJvdmlkZSBpdCdzIG93biByZWdpc3RlciBjYWxsYmFjaz8gIFdvdWxkIGl0IGJlIGVu
+b3VnaA0KPiA+ID4gPiA+IGlmIGl0IG9ubHkNCj4gPiA+IHByb3ZpZGVzIGl0cyBvd24gbm90aWZ5
+IGNhbGxiYWNrPw0KPiA+ID4gPg0KPiA+ID4gPiBUaGUgbm90aWZpZXJzIGFyZSBpbiBWRklPLiBI
+b3dldmVyLCB0aGUgcmVnaXN0cmF0aW9uIGlzIGNvbnRyb2xsZWQNCj4gPiA+ID4gYnkgdklPTU1V
+DQo+ID4gPiBlbXVsYXRvci4NCj4gPiA+ID4gSW4gdGhpcyBzZXJpZXMsIFBBU0lEIHRhZ2dlZCBB
+ZGRyZXNzIFNwYWNlIGlzIGludHJvZHVjZWQuIEFuZCB0aGUNCj4gPiA+ID4gbmV3IG5vdGlmaWVy
+cyBhcmUgZm9yIHN1Y2ggQWRkcmVzcyBTcGFjZS4gU3VjaCBBZGRyZXNzIFNwYWNlIGlzDQo+ID4g
+PiA+IGNyZWF0ZWQgYW5kIGRlbGV0ZWQgaW4NCj4gPiA+IHZJT01NVSBlbXVsYXRvci4NCj4gPiA+
+ID4gU28gdGhlIG5vdGlmaWVyIHJlZ2lzdHJhdGlvbiBuZWVkcyB0byBoYXBwZW4gYWNjb3JkaW5n
+bHkuDQo+ID4gPiA+DQo+ID4gPiA+IGUuZy4gZ3Vlc3QgU1ZNIGFwcGxpY2F0aW9uIGJpbmQgYSBk
+ZXZpY2UgdG8gYSBwcm9jZXNzLCBpdCBwcm9ncmFtcw0KPiA+ID4gPiB0aGUgZ3Vlc3QgaW9tbXUg
+dHJhbnNsYXRpb24gc3RydWN0dXJlLCB2SU9NTVUgZW11bGF0b3IgY2FwdHVyZXMNCj4gPiA+ID4g
+dGhlIGNoYW5nZSwgYW5kIGNyZWF0ZSBhIFBBU0lEIHRhZ2dlZCBBZGRyZXNzIFNwYWNlIGZvciBp
+dCBhbmQgcmVnaXN0ZXINCj4gbm90aWZpZXJzLg0KPiA+ID4gPg0KPiA+ID4gPiBUaGF0J3Mgd2h5
+IEkgZG8gaXQgaW4gc3VjaCBhIG1hbm5lci4NCj4gPiA+DQo+ID4gPiBJIGFncmVlIHRoYXQgdGhl
+IHRoaW5ncyBhcmUgbW9zdGx5IG1hbmFnZWQgYnkgdklPTU1VLCBidXQgSSBzdGlsbA0KPiA+ID4g
+Y2Fubm90IHVuZGVyc3RhbmQgd2h5IHZmaW8gbXVzdCBoYXZlIGl0cyBvd24gcmVnaXN0ZXIgaG9v
+ay4NCj4gPiA+DQo+ID4gPiBMZXQgbWUgdHJ5IHRvIGV4cGxhaW4gYSBiaXQgbW9yZSBvbiBteSBx
+dWVzdGlvbi4gIEJhc2ljYWxseSBJIHdhcw0KPiA+ID4gYXNraW5nIGFib3V0IHdoZXRoZXIgd2Ug
+Y2FuIHJlbW92ZXQgdGhlIHJlZ2lzdGVyL3VucmVnaXN0ZXIgaG9vayBpbg0KPiA+ID4gdGhlIFNW
+QU9wcywgaW5zdGVhZCB3ZSBjYW4gaGF2ZSBzb21ldGhpbmcgbGlrZSAoSSdsbCBzdGFydCB0byB1
+c2UgcGFzaWQgYXMgcHJlZml4KToNCj4gPiA+DQo+ID4gPiBzdHJ1Y3QgUENJUEFTSURPcHMgew0K
+PiA+ID4gICAgIHZvaWQgKCpwYXNpZF9iaW5kX3RhYmxlKShQQ0lCdXMgKmJ1cywgaW50MzJfdCBk
+ZXZmbiwgLi4uKTsNCj4gPiA+ICAgICB2b2lkICgqcGFzaWRfaW52YWxpZGF0ZV9leHRlbmRfaW90
+bGIpKFBDSUJ1cyAqYnVzLCBpbnQzMl90DQo+ID4gPiBkZXZmbiwgLi4uKSB9Ow0KPiA+ID4NCj4g
+PiA+IEZpcnN0bHkgd2Uga2VlcCB0aGUgYmluZF90YWJsZSBvcGVyYXRpb24sIGJ1dCBpbnN0ZWFk
+IG9mIHRoZQ0KPiA+ID4gcmVnL3VucmVnIHdlIG9ubHkgcHJvdmlkZSBhIGhvb2sgdGhhdCBkZXZp
+Y2UgY2FuIG92ZXJyaWRlIHRvIGxpc3RlbiB0byBleHRlbmQNCj4gaW90bGIgaW52YWxpZGF0aW9u
+cy4NCj4gPg0KPiA+IFllYWgsIEkgYWxzbyBjb25zaWRlcmVkIGRvIGludmFsaWRhdGlvbiB0aGlz
+IG1hbm5lci4gSSB0dXJuZWQgdG8gdGhlIG9uZSBpbiB0aGlzDQo+IHBhdGNoLg0KPiA+IFJlYXNv
+biBhcyBiZWxvdzoNCj4gPiAgICAgdGhlIGludmFsaWRhdGUgb3BlcmF0aW9uIGlzIHN1cHBvc2Vk
+IHRvIHBhc3MgZG93biB0aHJ1IHZmaW8gY29udGFpbmVyIElPQ1RMLCBmb3INCj4gPiAgICAgZWFj
+aCBwYXNpZF9pbnZhbGlkYXRlX2V4dGVuZF9pb3RsYigpIGNhbGxpbmcsIGl0IG5lZWRzIHRvIGZp
+Z3VyZSBvdXQgYSB2ZmlvDQo+IGNvbnRhaW5lciwNCj4gPiAgICAgd2hpY2ggbWF5IGJlIHRpbWUg
+Y29uc3VtaW5nLiBQbHMgcmVmZXIgdG8gdmZpb19nZXRfY29udGFpbmVyX2Zyb21fYnVzZGV2KCkg
+aW4NCj4gdGhpcw0KPiA+ICAgICBwYXRjaC4gSWYgd2UgZXhwb3NlIHJlZ2lzdGVyL3VucmVnaXN0
+ZXIgaG9vaywgc2VhcmNoaW5nIGNvbnRhaW5lciB3aWxsIGhhcHBlbg0KPiBvbmx5IGluDQo+ID4g
+ICAgIHRoZSByZWdpc3Rlci91bnJlZ2lzdGVyIHBoYXNlLiBBbmQgZnV0dXJlIGludmFsaWRhdGlv
+biBjb3VsZCBvbmx5IGJlIG5vdGlmaWVyIGZpcmluZy4NCj4gPiBXaXRoIHRoZSByZWFzb24gYWJv
+dmUsIEkgY2hvc2UgdGhlIHJlZ2lzdGVyL3VucmVnaXN0ZXIgaG9vayBzb2x1dGlvbi4NCj4gPiBJ
+ZiB0aGVyZSBpcyBzb2x1dGlvbiB0byBzYXZlIHRoZSBjb250YWluZXIgc2VhcmNoaW5nLCBpdCB3
+b3VsZCBiZQ0KPiA+IGJldHRlciB0byBkbyBpdCBpbiB5b3VyIHByb3Bvc2FsLiBQbHMgZmVlbCBm
+cmVlIHRvIGxldCBtZSBrbm93IGlmIGFueSBpZGVhIGZyb20geW91Lg0KPiANCj4gSWYgdGhlcmUg
+aXMgUENJQnVzKiBhbmQgZGV2Zm4gcGFzc2VkIGludG8NCj4gcGFzaWRfaW52YWxpZGF0ZV9leHRl
+bmRfaW90bGIoKSAobGV0J3MgYXNzdW1lIGl0J3MgY2FsbGVkIHRoaXMgd2F5KSwgdGhlbiBJTUhP
+IHdlIGNhbg0KPiBnZXQgdGhlIFBDSURldmljZSosIHdoaWNoIGNhbiBiZSB1cGNhc3QgdG8gYSBW
+RklPUENJRGV2aWNlLCB0aGVuIHdvdWxkDQo+IFZGSU9QQ0lEZXZpY2UudmJhc2VkZXYuZ3JvdXAt
+PmNvbnRhaW5lciBiZSB0aGUgY29udGFpbmVyIGZvciB0aGF0IGRldmljZT8NCg0KR29vZCBjYXRj
+aC4gV291bGQgYXBwbHkuIExldCBtZSB0cnkgdG8gdXNlIGl0IGluIG5leHQgdmVyc2lvbi4NCg0K
+VGhhbmtzLA0KWWkgTGl1DQo=
