@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1euLTn-00089M-9k
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:06:53 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1euLVp-0001R0-B0
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:08:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1euLTm-0003R3-Dv
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:06:51 -0500
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:43216)
+	(envelope-from <peter.maydell@linaro.org>) id 1euLVo-0003yt-EY
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:08:57 -0500
+Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:42740)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1euLTm-0003Qx-5j
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:06:50 -0500
-Received: by mail-oi0-x241.google.com with SMTP id a207so7466240oii.10
-	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 09:06:50 -0800 (PST)
+	id 1euLVo-0003yU-9M
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:08:56 -0500
+Received: by mail-ot0-x22a.google.com with SMTP id l5so9277106otf.9
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 09:08:56 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180309153654.13518-6-f4bug@amsat.org>
+In-Reply-To: <20180309153654.13518-1-f4bug@amsat.org>
 References: <20180309153654.13518-1-f4bug@amsat.org>
-	<20180309153654.13518-6-f4bug@amsat.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 9 Mar 2018 17:06:29 +0000
-Message-ID: <CAFEAcA81Cz2d_7sL1f9piHtGhuYqCWwhV5XkBTFCqOW6Ezv-Ng@mail.gmail.com>
+Date: Fri, 9 Mar 2018 17:08:35 +0000
+Message-ID: <CAFEAcA-RQT8a6tJ9Radqt3_n=cP6FhyNcjNfJa6VyN=jtS_GZw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 5/8] sdcard: Implement the UHS-I
- SWITCH_FUNCTION entries (Spec v3)
+Subject: Re: [Qemu-devel] [PATCH 0/8] SDCard: improve tracing, support UHS-I
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,30 +34,30 @@ Cc: Alistair Francis <alistair@alistair23.me>, "Edgar E . Iglesias" <edgar.igles
 
 On 9 March 2018 at 15:36, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
 te:
-> [based on a patch from Alistair Francis <alistair.francis@xilinx.com>
->  from qemu/xilinx tag xilinx-v2015.2]
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/sd/sd.c         | 148 +++++++++++++++++++++++++++++++++++++++++++++--=
-------
->  hw/sd/trace-events |   1 +
->  2 files changed, 127 insertions(+), 22 deletions(-)
+> This series contains the leftover patches from these 2 series:
+> - SDCard: housekeeping, add tracing (part 4)
+> - SDCard: bugfixes, support UHS-I (part 5)
+> with Peter Maydell comments addressed.
 >
-> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-> index 235e0518d6..b907d62aef 100644
-> --- a/hw/sd/sd.c
-> +++ b/hw/sd/sd.c
-> @@ -124,6 +124,7 @@ struct SDState {
->      bool enable;
->      uint8_t dat_lines;
->      bool cmd_line;
-> +    bool uhs_enabled;
+> I misunderstood the 2.12 train deadline, but better to have the series
+> standing in the list rather than forgot it.
+>
+> Philippe Mathieu-Daud=C3=A9 (8):
+>   sdcard: Do not trace CMD55, except when we already expect an ACMD
+>   sdcard: Display command name when tracing CMD/ACMD
+>   sdcard: Display which protocol is used when tracing (SD or SPI)
+>   sdcard: Add the Tuning Command (CMD19)
+>   sdcard: Implement the UHS-I SWITCH_FUNCTION entries (Spec v3)
+>   sdcard: Add a 'uhs' property, update the OCR register ACCEPT_SWITCH_1V8=
+ bit
+>   sdhci: Fix a typo in comment
+>   MAINTAINERS: Add entries for SD (SDHCI, SDBus, SDCard)
 
-Oh, and what's the difference between s->uhs_enabled =3D false
-(this patch) and s->uhs_mode =3D UHS_NOT_SUPPORTED (next patch) ?
+Thanks. I've applied patches 1-4, 7 and 8 to target-arm.next, so
+they will make 2.12. Patches 5 and 6 I had review comments on.
 
-Do we need both? If so, a comment noting the difference would help
-people to know which one various bits of code should be checking.
+(We may be able to call 5/6 bugfix patches and get them into 2.12;
+depends on timing.)
 
 thanks
 -- PMM
