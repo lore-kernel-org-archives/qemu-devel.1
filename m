@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1euOUY-00018V-Ft
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:19:51 -0500
+	(envelope-from <laurent@vivier.eu>) id 1euOVm-000252-SU
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:21:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1euOUX-0003hT-MO
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:19:50 -0500
-References: <20180309172713.26318-1-kwolf@redhat.com>
-	<20180309172713.26318-5-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <07d06226-dd95-268f-fcba-f7245ee68683@redhat.com>
-Date: Fri, 9 Mar 2018 14:19:41 -0600
+	(envelope-from <laurent@vivier.eu>) id 1euOVj-0004Lv-Nz
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:21:06 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:51099)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1euOVj-0004LG-Eg
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:21:03 -0500
+References: <20171228180814.9749-1-lukeshu@lukeshu.com>
+	<20171228180814.9749-2-lukeshu@lukeshu.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <966b35a3-654c-fabf-e416-86b14da9fd29@vivier.eu>
+Date: Fri, 9 Mar 2018 21:20:30 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180309172713.26318-5-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20171228180814.9749-2-lukeshu@lukeshu.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/6] luks: Turn invalid assertion into check
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 01/10] linux-user: Use #if to only call
+ validate_guest_space for 32-bit ARM target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,52 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
+To: Luke Shumaker <lukeshu@lukeshu.com>, qemu-devel@nongnu.org
+Cc: Luke Shumaker <lukeshu@parabola.nu>, Riku Voipio <riku.voipio@iki.fi>
 
-On 03/09/2018 11:27 AM, Kevin Wolf wrote:
-> The .bdrv_getlength implementation of the crypto block driver asserted
-> that the payload offset isn't after EOF. This is an invalid assertion to
-> make as the image file could be corrupted. Instead, check it and return
-> -EIO if the file is too small for the payload offset.
-
-Good catch.  Probably not a CVE (unless someone can argue some way that 
-causing a crash on an attempt to load a maliciously corrupted file can 
-be used as a denial of service across a privilege boundary), but 
-definitely needs fixing.
-
+Le 28/12/2017 à 19:08, Luke Shumaker a écrit :
+> From: Luke Shumaker <lukeshu@parabola.nu>
 > 
-> Zero length images are fine, so trigger -EIO only on offset > len, not
-> on offset >= len as the assertion did before.
+> Instead of defining a bogus validate_guest_space that always returns 1 on
+> targets other than 32-bit ARM, use #if blocks to only call it on 32-bit ARM
+> targets.  This makes the "normal" flow control clearer.
 > 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: Luke Shumaker <lukeshu@parabola.nu>
 > ---
->   block/crypto.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/crypto.c b/block/crypto.c
-> index 2035f9ab13..4908d8627f 100644
-> --- a/block/crypto.c
-> +++ b/block/crypto.c
-> @@ -518,7 +518,10 @@ static int64_t block_crypto_getlength(BlockDriverState *bs)
->   
->       uint64_t offset = qcrypto_block_get_payload_offset(crypto->block);
->       assert(offset < INT64_MAX);
+>  linux-user/elfload.c | 21 +++++++++------------
+>  1 file changed, 9 insertions(+), 12 deletions(-)
 
-Umm, if the file can be corrupted, what's to prevent someone from 
-sticking in a negative size that fails this assertion?
+With the change request by Peter (condition "!= 1"),
+applied to my 'linux-user-for-2.12' branch.
 
-> -    assert(offset < len);
-> +
-> +    if (offset > len) {
-> +       return -EIO;
-> +    }
->   
->       len -= offset;
->   
-> 
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Thanks,
+Laurent
