@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1euJhz-0007UT-4X
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:13:27 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1euJkE-00010G-SN
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:15:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1euJhu-0002iL-Tk
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:13:23 -0500
-Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:44343)
+	(envelope-from <alex.bennee@linaro.org>) id 1euJkA-0004sg-T5
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:15:42 -0500
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:55524)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1euJhu-0002hu-L1
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:13:18 -0500
-Received: by mail-wr0-x236.google.com with SMTP id v65so9336026wrc.11
-	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 07:13:18 -0800 (PST)
-References: <CAFEAcA8Pu=SkYCPwCnRdKTEFPScsZhj4vJm0dTs+jV1jTWOAog@mail.gmail.com>
-	<0304e590-ab51-649b-7cee-bb7c5be6f5e4@redhat.com>
-	<c7b075f5-8084-99c0-02e0-3da555bea4df@mail.uni-paderborn.de>
+	id 1euJkA-0004rX-LD
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:15:38 -0500
+Received: by mail-wm0-x236.google.com with SMTP id q83so4536160wme.5
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 07:15:38 -0800 (PST)
+References: <CAHNT7NshwZh87Uui6i+ARdOj2BuW6d7gahOiZ0X48Cf3TdOrXQ@mail.gmail.com>
+	<mhng-91cb2b22-0b57-4c9b-8027-8c25eba32497@palmer-si-x1c4>
+	<CAHNT7NvDiUHs6cBTd57uO+VdaAyQnH+2s4kp4yiQ1uBS15A22g@mail.gmail.com>
+	<CAFEAcA9jWUqFenf=P3bhiJ5iGCZ2kBc7eZxv3BRzO+jd=9h7nQ@mail.gmail.com>
+	<CAHNT7NuBjcngEesbS4XSwn=gw7S8VYVE_e6FjxKuAHfjoWowjQ@mail.gmail.com>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <c7b075f5-8084-99c0-02e0-3da555bea4df@mail.uni-paderborn.de>
-Date: Fri, 09 Mar 2018 15:13:16 +0000
-Message-ID: <87y3j1jn8z.fsf@linaro.org>
+In-reply-to: <CAHNT7NuBjcngEesbS4XSwn=gw7S8VYVE_e6FjxKuAHfjoWowjQ@mail.gmail.com>
+Date: Fri, 09 Mar 2018 15:15:36 +0000
+Message-ID: <87woyljn53.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Deprecate tilegx ?
+Subject: Re: [Qemu-devel] [patches] Re: [PULL] RISC-V QEMU Port Submission
+ v8.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +34,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Chen Gang <chengang@emindsoft.com.cn>, Chen Gang <gang.chen.5i5j@gmail.com>, Chen Gang <xili_gchen_5257@hotmail.com>, Richard Henderson <rth@twiddle.net>
+To: Michael Clark <mjc@sifive.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
 
-Bastian Koppelmann <kbastian@mail.uni-paderborn.de> writes:
+Michael Clark <mjc@sifive.com> writes:
 
-> On 02/28/2018 07:11 AM, Thomas Huth wrote:
->> On 27.02.2018 12:51, Peter Maydell wrote:
->>> I propose that we deprecate and plan to remove the unicore32 code:
->> [...]
-> [...]
->>
->> Sounds reasonable to me, but let's wait a week or two for feedback from
->> Guan Xuetao.
+<snip>
 >
-> Agreed.
+> BTW - I've integrated the following 3 branches into the riscv tree:
 >
->>
->>> Possibly there are other target architectures we could reasonably
->>> deprecate-and-remove (though none of the other ones Linux is dropping
->>> in this round are ones we support)...
->>
->> I'd vote for marking tilegx as deprecated, too, since we even do not
->> have an active maintainer for that CPU core (at least I did not spot one
->> in our MAINTAINERS file). Opinions?
+> - https://github.com/riscv/riscv-qemu/tree/softfloat-snan-abort-fix
+> - https://github.com/riscv/riscv-qemu/tree/riscv-qemu-upstream-v8.2
+> - https://github.com/michaeljclark/riscv-qemu/tree/qemu-devel
 >
-> I always saw it as a big plus that QEMU supports nearly any
-> architecture, no matter how obscure it is. So I'm a bit more hesitant on
-> dropping architectures quickly.
+> into our `riscv-all` integration branch, and we're now passing all FPU
+> tests, interestingly, including the NaN-boxing of single precision values
+> into doubles. We'll need to check that the riscv-tests testsuite is
+> exhastive enough... Suprised! I think Richard might have thought about
+> our NaN-boxing
+> issue or some other sort of magic is going on :-)
+>
+> - https://github.com/riscv/riscv-qemu/tree/riscv-all
 
-All things being equal I agree, however there is a maintenance burden
-for the QEMU upstream, especially if the only active use if on
-out-of-tree branches or behind the closed doors of research groups.
-
-Looking at https://wiki.qemu.org/Documentation/Platforms/TileGX it
-doesn't give much of an idea of where I would get toolchains to build
-guest binaries or what guest user-space I could run.
+Is the SNaN patch going to get re-posted now it has had a review?
 
 --
 Alex Benn=C3=A9e
