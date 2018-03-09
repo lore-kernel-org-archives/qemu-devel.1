@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1euLDB-0001TO-Sn
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:49:42 -0500
+	(envelope-from <lersek@redhat.com>) id 1euLF4-00039f-CJ
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:51:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1euLDB-0003pG-2q
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:49:41 -0500
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:41844)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1euLDA-0003p4-Ry
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:49:41 -0500
-Received: by mail-oi0-x243.google.com with SMTP id g5so7428821oiy.8
-	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 08:49:40 -0800 (PST)
+	(envelope-from <lersek@redhat.com>) id 1euLF0-0004YB-EJ
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:51:38 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34116 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1euLF0-0004Y2-8M
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:51:34 -0500
+References: <20180309130918.734-1-marcandre.lureau@redhat.com>
+	<20180309130918.734-8-marcandre.lureau@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <4f6e9d19-0f11-4132-c9a2-7ad96597e35d@redhat.com>
+Date: Fri, 9 Mar 2018 17:51:26 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9jWUqFenf=P3bhiJ5iGCZ2kBc7eZxv3BRzO+jd=9h7nQ@mail.gmail.com>
-References: <CAHNT7NshwZh87Uui6i+ARdOj2BuW6d7gahOiZ0X48Cf3TdOrXQ@mail.gmail.com>
-	<mhng-91cb2b22-0b57-4c9b-8027-8c25eba32497@palmer-si-x1c4>
-	<CAHNT7NvDiUHs6cBTd57uO+VdaAyQnH+2s4kp4yiQ1uBS15A22g@mail.gmail.com>
-	<CAFEAcA9jWUqFenf=P3bhiJ5iGCZ2kBc7eZxv3BRzO+jd=9h7nQ@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 9 Mar 2018 16:49:19 +0000
-Message-ID: <CAFEAcA9SQ5JF4Am0F=QJ11kF+iQ4z_-ogr8t1Xj3vbcfOAJhAg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [patches] Re: [PULL] RISC-V QEMU Port Submission
- v8.2
+In-Reply-To: <20180309130918.734-8-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 7/7] OvmfPkg: plug DxeTpm2MeasureBootLib
+ into SecurityStubDxe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,57 +29,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: Palmer Dabbelt <palmer@sifive.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, QEMU Developers <qemu-devel@nongnu.org>, RISC-V Patches <patches@groups.riscv.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>
+To: marcandre.lureau@redhat.com, edk2-devel@lists.01.org
+Cc: pjones@redhat.com, jiewen.yao@intel.com, stefanb@linux.vnet.ibm.com, qemu-devel@nongnu.org, javierm@redhat.com
 
-On 9 March 2018 at 14:28, Peter Maydell <peter.maydell@linaro.org> wrote:
-> NB: there was a test failure on OpenBSD host:
->
-> TEST: tests/qom-test... (pid=64016)
->   /riscv32/qom/spike_v1.9.1:                                           **
-> ERROR:/home/qemu/tests/qom-test.c:64:test_properties: assertion
-> failed: (qdict_haskey(response, "return"))
-> FAIL
->
-> but this seems to have been intermittent -- it was only on that one
-> host, and I reran the test suite there and it passed fine the second
-> time. So it may be nothing to do with your code; we'll see if it
-> comes up again.
+On 03/09/18 14:09, marcandre.lureau@redhat.com wrote:
+> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>=20
+> The library registers a security management handler, to measure images
+> that are not measure in PEI phase. For example with the qemu PXE rom:
+>=20
+> Loading driver at 0x0003E6C2000 EntryPoint=3D0x0003E6C9076 8086100e.efi
+>=20
+> And the following binary_bios_measurements log entry seems to be
+> added:
+>=20
+> PCR: 2	type: EV_EFI_BOOT_SERVICES_DRIVER     	size: 0x4e	digest: 70a224=
+75e9f18806d2ed9193b48d80d26779d9a4
+>=20
+> The following order of operations ensures that 3rd party UEFI modules,
+> such as PCI option ROMs and other modules possibly loaded from outside
+> of firmware volumes, are measured into the TPM:
+>=20
+> (1) Tcg2Dxe is included in DXEFV, therefore it produces the TCG2
+>     protocol sometime in the DXE phase (assuming a TPM2 chip is present=
+,
+>     reported via PcdTpmInstanceGuid).
+>=20
+> (2) The DXE core finds that no more drivers are left to dispatch from
+>     DXEFV, and we enter the BDS phase.
+>=20
+> (3) OVMF's PlatformBootManagerLib connects all PCI root bridges
+>     non-recursively, producing PciIo instances and discovering PCI
+>     oproms.
+>=20
+> (4) The dispatching of images that don't originate from FVs is deferred
+>     at this point, by
+>     "MdeModulePkg/Universal/SecurityStubDxe/Defer3rdPartyImageLoad.c".
+>=20
+> (5) OVMF's PlatformBootManagerLib signals EndOfDxe.
+>=20
+> (6) OVMF's PlatformBootManagerLib calls
+>     EfiBootManagerDispatchDeferredImages() -- the images deferred in
+>     step (4) are now dispatched.
+>=20
+> (7) Image dispatch invokes the Security / Security2 Arch protocols
+>     (produced by SecurityStubDxe). In this patch, we hook
+>     DxeTpm2MeasureBootLib into SecurityStubDxe, therefore image dispatc=
+h
+>     will try to locate the TCG2 protocol, and measure the image into th=
+e
+>     TPM2 chip with the protocol. Because of step (1), the TCG2 protocol
+>     will always be found and used (assuming a TPM2 chip is present).
+>=20
+> Cc: Laszlo Ersek <lersek@redhat.com>
+> Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> Contributed-under: TianoCore Contribution Agreement 1.0
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  OvmfPkg/OvmfPkgIa32.dsc    | 3 +++
+>  OvmfPkg/OvmfPkgIa32X64.dsc | 3 +++
+>  OvmfPkg/OvmfPkgX64.dsc     | 3 +++
+>  3 files changed, 9 insertions(+)
+>=20
+> diff --git a/OvmfPkg/OvmfPkgIa32.dsc b/OvmfPkg/OvmfPkgIa32.dsc
+> index f80fb50d4a38..92c8c560a067 100644
+> --- a/OvmfPkg/OvmfPkgIa32.dsc
+> +++ b/OvmfPkg/OvmfPkgIa32.dsc
+> @@ -644,6 +644,9 @@ [Components]
+>      <LibraryClasses>
+>  !if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
+>        NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerific=
+ationLib.inf
+> +!endif
+> +!if $(TPM2_ENABLE) =3D=3D TRUE
+> +      NULL|SecurityPkg/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBoo=
+tLib.inf
+>  !endif
+>    }
+> =20
+> diff --git a/OvmfPkg/OvmfPkgIa32X64.dsc b/OvmfPkg/OvmfPkgIa32X64.dsc
+> index bc48b5b63c7a..6ecaa795b288 100644
+> --- a/OvmfPkg/OvmfPkgIa32X64.dsc
+> +++ b/OvmfPkg/OvmfPkgIa32X64.dsc
+> @@ -653,6 +653,9 @@ [Components.X64]
+>      <LibraryClasses>
+>  !if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
+>        NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerific=
+ationLib.inf
+> +!endif
+> +!if $(TPM2_ENABLE) =3D=3D TRUE
+> +      NULL|SecurityPkg/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBoo=
+tLib.inf
+>  !endif
+>    }
+> =20
+> diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
+> index e89de093d6a2..c98a3657c6f6 100644
+> --- a/OvmfPkg/OvmfPkgX64.dsc
+> +++ b/OvmfPkg/OvmfPkgX64.dsc
+> @@ -651,6 +651,9 @@ [Components]
+>      <LibraryClasses>
+>  !if $(SECURE_BOOT_ENABLE) =3D=3D TRUE
+>        NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerific=
+ationLib.inf
+> +!endif
+> +!if $(TPM2_ENABLE) =3D=3D TRUE
+> +      NULL|SecurityPkg/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBoo=
+tLib.inf
+>  !endif
+>    }
+> =20
+>=20
 
-On a later test run I got this different one; openbsd again:
-
-TEST: tests/test-hmp... (pid=45236)
-  /riscv32/hmp/spike_v1.9.1:                                           **
-ERROR:/home/qemu/qom/object.c:488:object_new_with_type: assertion
-failed: (type != NULL)
-Broken pipe
-FAIL
-
-My current best theory is that OpenBSD libc's memory allocator
-happens to be more sensitive to a memory corruption bug in the risc
-code, resulting in intermittent failures if the allocations happen
-to come out the wrong way. You do have at least one invalid-write
-off the end of a block according to valgrind:
-
-==17441== Invalid write of size 1
-==17441==    at 0x26517F: riscv_isa_string (cpu.c:399)
-==17441==    by 0x25C14D: create_fdt (spike.c:125)
-==17441==    by 0x25C14D: spike_v1_10_0_board_init (spike.c:199)
-==17441==    by 0x2CCE0A: machine_run_board_init (machine.c:807)
-==17441==    by 0x1BFF28: main (vl.c:4597)
-==17441==  Address 0x3055c425 is 0 bytes after a block of size 5 alloc'd
-==17441==    at 0x4C2FB55: calloc (in
-/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==17441==    by 0x70C8770: g_malloc0 (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.4800.2)
-==17441==    by 0x26511E: riscv_isa_string (cpu.c:395)
-==17441==    by 0x25C14D: create_fdt (spike.c:125)
-==17441==    by 0x25C14D: spike_v1_10_0_board_init (spike.c:199)
-==17441==    by 0x2CCE0A: machine_run_board_init (machine.c:807)
-==17441==    by 0x1BFF28: main (vl.c:4597)
-
-If you can prioritise a patch that fixes the bug in riscv_isa_string()
-I'll apply that and hopefully these intermittent failures will go away.
-
-thanks
--- PMM
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
