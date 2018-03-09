@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1euFLt-0006CH-83
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:34:19 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1euFN0-00070E-ET
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:35:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1euFLs-0003ov-7O
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:34:17 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1euFMz-0004XT-Gk
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:35:26 -0500
 References: <20180308223946.26784-1-f4bug@amsat.org>
-	<20180308223946.26784-6-f4bug@amsat.org>
+	<20180308223946.26784-8-f4bug@amsat.org>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <3bd5ba56-dede-f66b-d6e0-114dd580a78c@ilande.co.uk>
-Date: Fri, 9 Mar 2018 10:33:57 +0000
+Message-ID: <d649ccc6-0b91-40d7-38f0-2fbc3a57494b@ilande.co.uk>
+Date: Fri, 9 Mar 2018 10:35:08 +0000
 MIME-Version: 1.0
-In-Reply-To: <20180308223946.26784-6-f4bug@amsat.org>
+In-Reply-To: <20180308223946.26784-8-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 05/25] hw/isa/pc87312: Rename the device
- type as TYPE_PC87312_SUPERIO
+Subject: Re: [Qemu-devel] [PATCH 07/25] hw/isa/pc87312: Use 'unsigned int'
+ for the irq value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +25,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Marcel Apfelbaum <marcel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexey Kardashevskiy <aik@ozlabs.ru>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>
-Cc: Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, "open list:PReP" <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Yongbok Kim <yongbok.kim@mips.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Marcel Apfelbaum <marcel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexey Kardashevskiy <aik@ozlabs.ru>, Thomas Huth <thuth@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, "open list:PReP" <qemu-ppc@nongnu.org>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Yongbok Kim <yongbok.kim@mips.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 
 On 08/03/18 22:39, Philippe Mathieu-Daudé wrote:
+
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Acked-by: David Gibson <david@gibson.dropbear.id.au> (hw/ppc)
 > ---
->   include/hw/isa/pc87312.h | 4 ++--
->   hw/isa/pc87312.c         | 2 +-
->   hw/ppc/prep.c            | 2 +-
->   3 files changed, 4 insertions(+), 4 deletions(-)
+>   hw/isa/pc87312.c | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/include/hw/isa/pc87312.h b/include/hw/isa/pc87312.h
-> index bf74470d40..710eb1c807 100644
-> --- a/include/hw/isa/pc87312.h
-> +++ b/include/hw/isa/pc87312.h
-> @@ -28,8 +28,8 @@
->   #include "hw/isa/isa.h"
->   
->   
-> -#define TYPE_PC87312 "pc87312"
-> -#define PC87312(obj) OBJECT_CHECK(PC87312State, (obj), TYPE_PC87312)
-> +#define TYPE_PC87312_SUPERIO "pc87312"
-> +#define PC87312(obj) OBJECT_CHECK(PC87312State, (obj), TYPE_PC87312_SUPERIO)
->   
->   typedef struct PC87312State {
->       ISADevice dev;
 > diff --git a/hw/isa/pc87312.c b/hw/isa/pc87312.c
-> index 48b29e3c3c..e9edbc6c50 100644
+> index 105c23e680..fda91fed21 100644
 > --- a/hw/isa/pc87312.c
 > +++ b/hw/isa/pc87312.c
-> @@ -391,7 +391,7 @@ static void pc87312_class_init(ObjectClass *klass, void *data)
+> @@ -76,9 +76,9 @@ static inline uint16_t get_parallel_iobase(PC87312State *s)
+>       return parallel_base[s->regs[REG_FAR] & FAR_PARALLEL_ADDR];
 >   }
 >   
->   static const TypeInfo pc87312_type_info = {
-> -    .name          = TYPE_PC87312,
-> +    .name          = TYPE_PC87312_SUPERIO,
->       .parent        = TYPE_ISA_DEVICE,
->       .instance_size = sizeof(PC87312State),
->       .instance_init = pc87312_initfn,
-> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-> index ae724b0613..610ec7ec32 100644
-> --- a/hw/ppc/prep.c
-> +++ b/hw/ppc/prep.c
-> @@ -613,7 +613,7 @@ static void ppc_prep_init(MachineState *machine)
->       isa_bus = ISA_BUS(qdev_get_child_bus(DEVICE(pci), "isa.0"));
+> -static const uint32_t parallel_irq[] = { 5, 7, 5, 0 };
+> +static const unsigned int parallel_irq[] = { 5, 7, 5, 0 };
 >   
->       /* Super I/O (parallel + serial ports) */
-> -    isa = isa_create(isa_bus, TYPE_PC87312);
-> +    isa = isa_create(isa_bus, TYPE_PC87312_SUPERIO);
->       dev = DEVICE(isa);
->       qdev_prop_set_uint8(dev, "config", 13); /* fdc, ser0, ser1, par0 */
->       qdev_init_nofail(dev);
+> -static inline uint32_t get_parallel_irq(PC87312State *s)
+> +static inline unsigned int get_parallel_irq(PC87312State *s)
+>   {
+>       int idx;
+>       idx = (s->regs[REG_FAR] & FAR_PARALLEL_ADDR);
+> @@ -110,7 +110,7 @@ static inline uint16_t get_uart_iobase(PC87312State *s, int i)
+>       }
+>   }
+>   
+> -static inline uint32_t get_uart_irq(PC87312State *s, int i)
+> +static inline unsigned int get_uart_irq(PC87312State *s, int i)
+>   {
+>       int idx;
+>       idx = (s->regs[REG_FAR] >> (2 * i + 2)) & 0x3;
 > 
 
 Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
