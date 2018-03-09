@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwankhede@nvidia.com>) id 1euBO6-00066T-4L
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 01:20:19 -0500
+	(envelope-from <kraxel@redhat.com>) id 1euBtp-0002OP-NT
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 01:53:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwankhede@nvidia.com>) id 1euBO2-00031o-Ub
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 01:20:18 -0500
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:4464)
+	(envelope-from <kraxel@redhat.com>) id 1euBtl-0004fF-RI
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 01:53:05 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55830 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
-	id 1euBO2-00031a-KA
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 01:20:14 -0500
-References: <20180306113442.15295-1-kraxel@redhat.com>
-	<20180306113442.15295-9-kraxel@redhat.com>
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <cea1021a-216c-4fc0-4989-571e5943f31e@nvidia.com>
-Date: Fri, 9 Mar 2018 11:49:58 +0530
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1euBtl-0004f6-MA
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 01:53:01 -0500
+Date: Fri, 9 Mar 2018 07:52:47 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180309065247.xzribx4zjgx5bnj5@sirius.home.kraxel.org>
+References: <20180308083231.20180-1-kraxel@redhat.com>
+	<CAFEAcA8wUN_T9XrUULCROVFdv+vGipdMuhNz5km1mcX_nVrQgg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180306113442.15295-9-kraxel@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 8/9] vfio/display: adding region support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8wUN_T9XrUULCROVFdv+vGipdMuhNz5km1mcX_nVrQgg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 0/8] Ui 20180308 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,194 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: intel-gvt-dev@lists.freedesktop.org, Alex Williamson <alex.williamson@redhat.com>, Tina Zhang <tina.zhang@intel.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+  Hi,
 
-Reviewed By: Kirti Wankhede <kwankhede@nvidia.com>
-
-Thanks,
-Kirti
-
-On 3/6/2018 5:04 PM, Gerd Hoffmann wrote:
-> Wire up region-based display.
+> Hi. This gives me a new warning on FreeBSD:
 > 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/vfio/pci.h                 |   1 +
->  include/hw/vfio/vfio-common.h |   8 +++
->  hw/vfio/display.c             | 117 +++++++++++++++++++++++++++++++++++++++++-
->  3 files changed, 124 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-> index a846cf6237..629c875701 100644
-> --- a/hw/vfio/pci.h
-> +++ b/hw/vfio/pci.h
-> @@ -148,6 +148,7 @@ typedef struct VFIOPCIDevice {
->      bool no_kvm_msi;
->      bool no_kvm_msix;
->      bool no_geforce_quirks;
-> +    VFIODisplay *dpy;
->  } VFIOPCIDevice;
->  
->  uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len);
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> index f3a2ac9fee..fc8ae14fb7 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -142,6 +142,14 @@ typedef struct VFIOGroup {
->      QLIST_ENTRY(VFIOGroup) container_next;
->  } VFIOGroup;
->  
-> +typedef struct VFIODisplay {
-> +    QemuConsole *con;
-> +    struct {
-> +        VFIORegion buffer;
-> +        DisplaySurface *surface;
-> +    } region;
-> +} VFIODisplay;
-> +
->  void vfio_put_base_device(VFIODevice *vbasedev);
->  void vfio_disable_irqindex(VFIODevice *vbasedev, int index);
->  void vfio_unmask_single_irqindex(VFIODevice *vbasedev, int index);
-> diff --git a/hw/vfio/display.c b/hw/vfio/display.c
-> index 3e997f8a44..0add223039 100644
-> --- a/hw/vfio/display.c
-> +++ b/hw/vfio/display.c
-> @@ -19,6 +19,113 @@
->  #include "qapi/error.h"
->  #include "pci.h"
->  
-> +/* ---------------------------------------------------------------------- */
-> +
-> +static void vfio_display_region_update(void *opaque)
-> +{
-> +    VFIOPCIDevice *vdev = opaque;
-> +    VFIODisplay *dpy = vdev->dpy;
-> +    struct vfio_device_gfx_plane_info plane = {
-> +        .argsz = sizeof(plane),
-> +        .flags = VFIO_GFX_PLANE_TYPE_REGION
-> +    };
-> +    pixman_format_code_t format;
-> +    int ret;
-> +
-> +    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_QUERY_GFX_PLANE, &plane);
-> +    if (ret < 0) {
-> +        error_report("ioctl VFIO_DEVICE_QUERY_GFX_PLANE: %s",
-> +                     strerror(errno));
-> +        return;
-> +    }
-> +    if (!plane.drm_format || !plane.size) {
-> +        return;
-> +    }
-> +    format = qemu_drm_format_to_pixman(plane.drm_format);
-> +    if (!format) {
-> +        return;
-> +    }
-> +
-> +    if (dpy->region.buffer.size &&
-> +        dpy->region.buffer.nr != plane.region_index) {
-> +        /* region changed */
-> +        vfio_region_exit(&dpy->region.buffer);
-> +        vfio_region_finalize(&dpy->region.buffer);
-> +        dpy->region.surface = NULL;
-> +    }
-> +
-> +    if (dpy->region.surface &&
-> +        (surface_width(dpy->region.surface) != plane.width ||
-> +         surface_height(dpy->region.surface) != plane.height ||
-> +         surface_format(dpy->region.surface) != format)) {
-> +        /* size changed */
-> +        dpy->region.surface = NULL;
-> +    }
-> +
-> +    if (!dpy->region.buffer.size) {
-> +        /* mmap region */
-> +        ret = vfio_region_setup(OBJECT(vdev), &vdev->vbasedev,
-> +                                &dpy->region.buffer,
-> +                                plane.region_index,
-> +                                "display");
-> +        if (ret != 0) {
-> +            error_report("%s: vfio_region_setup(%d): %s",
-> +                         __func__, plane.region_index, strerror(-ret));
-> +            goto err;
-> +        }
-> +        ret = vfio_region_mmap(&dpy->region.buffer);
-> +        if (ret != 0) {
-> +            error_report("%s: vfio_region_mmap(%d): %s", __func__,
-> +                         plane.region_index, strerror(-ret));
-> +            goto err;
-> +        }
-> +        assert(dpy->region.buffer.mmaps[0].mmap != NULL);
-> +    }
-> +
-> +    if (dpy->region.surface == NULL) {
-> +        /* create surface */
-> +        dpy->region.surface = qemu_create_displaysurface_from
-> +            (plane.width, plane.height, format,
-> +             plane.stride, dpy->region.buffer.mmaps[0].mmap);
-> +        dpy_gfx_replace_surface(dpy->con, dpy->region.surface);
-> +    }
-> +
-> +    /* full screen update */
-> +    dpy_gfx_update(dpy->con, 0, 0,
-> +                   surface_width(dpy->region.surface),
-> +                   surface_height(dpy->region.surface));
-> +    return;
-> +
-> +err:
-> +    vfio_region_exit(&dpy->region.buffer);
-> +    vfio_region_finalize(&dpy->region.buffer);
-> +}
-> +
-> +static const GraphicHwOps vfio_display_region_ops = {
-> +    .gfx_update = vfio_display_region_update,
-> +};
-> +
-> +static int vfio_display_region_init(VFIOPCIDevice *vdev, Error **errp)
-> +{
-> +    vdev->dpy = g_new0(VFIODisplay, 1);
-> +    vdev->dpy->con = graphic_console_init(DEVICE(vdev), 0,
-> +                                          &vfio_display_region_ops,
-> +                                          vdev);
-> +    return 0;
-> +}
-> +
-> +static void vfio_display_region_exit(VFIODisplay *dpy)
-> +{
-> +    if (!dpy->region.buffer.size) {
-> +        return;
-> +    }
-> +
-> +    vfio_region_exit(&dpy->region.buffer);
-> +    vfio_region_finalize(&dpy->region.buffer);
-> +}
-> +
-> +/* ---------------------------------------------------------------------- */
-> +
->  int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp)
->  {
->      struct vfio_device_gfx_plane_info probe;
-> @@ -38,8 +145,7 @@ int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp)
->      probe.flags = VFIO_GFX_PLANE_TYPE_PROBE | VFIO_GFX_PLANE_TYPE_REGION;
->      ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_QUERY_GFX_PLANE, &probe);
->      if (ret == 0) {
-> -        error_setg(errp, "vfio-display: region support not implemented yet");
-> -        return -1;
-> +        return vfio_display_region_init(vdev, errp);
->      }
->  
->      if (vdev->display == ON_OFF_AUTO_AUTO) {
-> @@ -53,4 +159,11 @@ int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp)
->  
->  void vfio_display_finalize(VFIOPCIDevice *vdev)
->  {
-> +    if (!vdev->dpy) {
-> +        return;
-> +    }
-> +
-> +    graphic_console_close(vdev->dpy->con);
-> +    vfio_display_region_exit(vdev->dpy);
-> +    g_free(vdev->dpy);
->  }
-> 
+>   CC      ui/gtk.o
+> /root/qemu/ui/gtk.c:2141:13: warning: 'gtk_widget_set_double_buffered'
+> is deprecated [-Wdeprecated-declarations]
+>             gtk_widget_set_double_buffered(vc->gfx.drawing_area, FALSE);
+>             ^
+> /usr/local/include/gtk-3.0/gtk/gtkwidget.h:876:23: note:
+> 'gtk_widget_set_double_buffered' has been explicitly marked deprecated
+> here
+> void                  gtk_widget_set_double_buffered    (GtkWidget    *widget,
+
+Known issue.  The gtk-egl.c code needs this even though it is
+deprecated.  We have a diagnostic pragma in place for gcc, seems that
+doesn't work on freebsd because it builds with clang not gcc.
+
+Hmm, quick googling shows clang seems to support this too.
+https://clang.llvm.org/docs/UsersManual.html#pragma-gcc-diagnostic
+
+/me looks puzzled.  Test for CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE not
+working properly on freebsd?
+
+Seems clang doesn't support a pragma used in qemu, config.log says:
+
+error: unknown warning group '-Wunused-but-set-variable'.
+
+Maybe I should move the code to a separate source file so it can be
+built with different compiler flags, without needing #pragma?  I don't
+feel like building all gtk code with -Wno-deprecated-declarations ...
+
+cheers,
+  Gerd
