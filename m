@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1euKkk-0000oa-2g
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:21 -0500
+	(envelope-from <kwolf@redhat.com>) id 1euKkn-0000u2-Gw
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1euKkh-0006WN-MH
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:17 -0500
+	(envelope-from <kwolf@redhat.com>) id 1euKkm-0006db-7l
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:21 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  9 Mar 2018 17:18:44 +0100
-Message-Id: <20180309161933.8168-8-kwolf@redhat.com>
+Date: Fri,  9 Mar 2018 17:18:48 +0100
+Message-Id: <20180309161933.8168-12-kwolf@redhat.com>
 In-Reply-To: <20180309161933.8168-1-kwolf@redhat.com>
 References: <20180309161933.8168-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 07/56] block: convert bdrv_check callback to
- coroutine_fn
+Subject: [Qemu-devel] [PULL 11/56] qcow2: Check snapshot L1 tables in
+ qcow2_check_metadata_overlap()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,424 +23,86 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+From: Alberto Garcia <berto@igalia.com>
 
-Suggested-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <1516279431-30424-8-git-send-email-pbonzini@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+The inactive-l2 overlap check iterates uses the L1 tables from all
+snapshots, but it does not validate them first.
+
+We now have a function to take care of this, so let's use it.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/block_int.h |  5 +++--
- block.c                   | 43 ++++++++++++++++++++++++++++++++++++++++---
- block/parallels.c         | 17 +++++++++++------
- block/qcow2.c             | 23 +++++++++++++++++++----
- block/qed-check.c         |  1 +
- block/qed-table.c         | 26 +++++++++-----------------
- block/qed.c               | 13 +++++++++----
- block/vdi.c               |  6 +++---
- block/vhdx.c              |  7 ++++---
- block/vmdk.c              |  7 ++++---
- 10 files changed, 103 insertions(+), 45 deletions(-)
+ block/qcow2-refcount.c     | 10 +++++++++-
+ tests/qemu-iotests/080     |  4 ++++
+ tests/qemu-iotests/080.out |  4 ++++
+ 3 files changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index e391cae53b..a84cc04d55 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -307,8 +307,9 @@ struct BlockDriver {
-      * Returns 0 for completed check, -errno for internal errors.
-      * The check results are stored in result.
-      */
--    int (*bdrv_check)(BlockDriverState *bs, BdrvCheckResult *result,
--        BdrvCheckMode fix);
-+    int coroutine_fn (*bdrv_co_check)(BlockDriverState *bs,
-+                                      BdrvCheckResult *result,
-+                                      BdrvCheckMode fix);
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 2f7e710fa6..b18ea0ca98 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -2642,9 +2642,17 @@ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
+             uint64_t l1_ofs = s->snapshots[i].l1_table_offset;
+             uint32_t l1_sz  = s->snapshots[i].l1_size;
+             uint64_t l1_sz2 = l1_sz * sizeof(uint64_t);
+-            uint64_t *l1 = g_try_malloc(l1_sz2);
++            uint64_t *l1;
+             int ret;
  
-     int (*bdrv_amend_options)(BlockDriverState *bs, QemuOpts *opts,
-                               BlockDriverAmendStatusCB *status_cb,
-diff --git a/block.c b/block.c
-index 603befb325..8f1c43d037 100644
---- a/block.c
-+++ b/block.c
-@@ -3455,17 +3455,54 @@ static void bdrv_delete(BlockDriverState *bs)
-  * free of errors) or -errno when an internal error occurred. The results of the
-  * check are stored in res.
-  */
--int bdrv_check(BlockDriverState *bs, BdrvCheckResult *res, BdrvCheckMode fix)
-+static int coroutine_fn bdrv_co_check(BlockDriverState *bs,
-+                                      BdrvCheckResult *res, BdrvCheckMode fix)
- {
-     if (bs->drv == NULL) {
-         return -ENOMEDIUM;
-     }
--    if (bs->drv->bdrv_check == NULL) {
-+    if (bs->drv->bdrv_co_check == NULL) {
-         return -ENOTSUP;
-     }
- 
-     memset(res, 0, sizeof(*res));
--    return bs->drv->bdrv_check(bs, res, fix);
-+    return bs->drv->bdrv_co_check(bs, res, fix);
-+}
++            ret = qcow2_validate_table(bs, l1_ofs, l1_sz, sizeof(uint64_t),
++                                       QCOW_MAX_L1_SIZE, "", NULL);
++            if (ret < 0) {
++                return ret;
++            }
 +
-+typedef struct CheckCo {
-+    BlockDriverState *bs;
-+    BdrvCheckResult *res;
-+    BdrvCheckMode fix;
-+    int ret;
-+} CheckCo;
++            l1 = g_try_malloc(l1_sz2);
 +
-+static void bdrv_check_co_entry(void *opaque)
-+{
-+    CheckCo *cco = opaque;
-+    cco->ret = bdrv_co_check(cco->bs, cco->res, cco->fix);
-+}
-+
-+int bdrv_check(BlockDriverState *bs,
-+               BdrvCheckResult *res, BdrvCheckMode fix)
-+{
-+    Coroutine *co;
-+    CheckCo cco = {
-+        .bs = bs,
-+        .res = res,
-+        .ret = -EINPROGRESS,
-+        .fix = fix,
-+    };
-+
-+    if (qemu_in_coroutine()) {
-+        /* Fast-path if already in coroutine context */
-+        bdrv_check_co_entry(&cco);
-+    } else {
-+        co = qemu_coroutine_create(bdrv_check_co_entry, &cco);
-+        qemu_coroutine_enter(co);
-+        BDRV_POLL_WHILE(bs, cco.ret == -EINPROGRESS);
-+    }
-+
-+    return cco.ret;
- }
- 
- /*
-diff --git a/block/parallels.c b/block/parallels.c
-index 81085795c2..c13cb619e6 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -378,8 +378,9 @@ static coroutine_fn int parallels_co_readv(BlockDriverState *bs,
- }
- 
- 
--static int parallels_check(BlockDriverState *bs, BdrvCheckResult *res,
--                           BdrvCheckMode fix)
-+static int coroutine_fn parallels_co_check(BlockDriverState *bs,
-+                                           BdrvCheckResult *res,
-+                                           BdrvCheckMode fix)
- {
-     BDRVParallelsState *s = bs->opaque;
-     int64_t size, prev_off, high_off;
-@@ -394,6 +395,7 @@ static int parallels_check(BlockDriverState *bs, BdrvCheckResult *res,
-         return size;
-     }
- 
-+    qemu_co_mutex_lock(&s->lock);
-     if (s->header_unclean) {
-         fprintf(stderr, "%s image was not closed correctly\n",
-                 fix & BDRV_FIX_ERRORS ? "Repairing" : "ERROR");
-@@ -442,11 +444,12 @@ static int parallels_check(BlockDriverState *bs, BdrvCheckResult *res,
-         prev_off = off;
-     }
- 
-+    ret = 0;
-     if (flush_bat) {
-         ret = bdrv_pwrite_sync(bs->file, 0, s->header, s->header_size);
-         if (ret < 0) {
-             res->check_errors++;
--            return ret;
-+            goto out;
-         }
-     }
- 
-@@ -465,13 +468,15 @@ static int parallels_check(BlockDriverState *bs, BdrvCheckResult *res,
-             if (ret < 0) {
-                 error_report_err(local_err);
-                 res->check_errors++;
--                return ret;
-+                goto out;
+             if (l1_sz2 && l1 == NULL) {
+                 return -ENOMEM;
              }
-             res->leaks_fixed += count;
-         }
-     }
+diff --git a/tests/qemu-iotests/080 b/tests/qemu-iotests/080
+index 5622604f83..018f815697 100755
+--- a/tests/qemu-iotests/080
++++ b/tests/qemu-iotests/080
+@@ -178,6 +178,8 @@ _make_test_img 64M
+ poke_file "$TEST_IMG" "$offset_snap1_l1_offset" "\x00\x00\x00\x00\x00\x40\x02\x00"
+ { $QEMU_IMG convert -s test $TEST_IMG $TEST_IMG.snap; } 2>&1 | _filter_testdir
+ { $QEMU_IMG amend -o compat=0.10 $TEST_IMG; } 2>&1 | _filter_testdir
++{ $QEMU_IO -c "open -o overlap-check.inactive-l2=on $TEST_IMG" \
++           -c 'write 0 4k'; } 2>&1 | _filter_qemu_io | _filter_testdir
  
--    return 0;
-+out:
-+    qemu_co_mutex_unlock(&s->lock);
-+    return ret;
- }
+ echo
+ echo "== Invalid snapshot L1 table size =="
+@@ -187,6 +189,8 @@ _make_test_img 64M
+ poke_file "$TEST_IMG" "$offset_snap1_l1_size" "\x10\x00\x00\x00"
+ { $QEMU_IMG convert -s test $TEST_IMG $TEST_IMG.snap; } 2>&1 | _filter_testdir
+ { $QEMU_IMG amend -o compat=0.10 $TEST_IMG; } 2>&1 | _filter_testdir
++{ $QEMU_IO -c "open -o overlap-check.inactive-l2=on $TEST_IMG" \
++           -c 'write 0 4k'; } 2>&1 | _filter_qemu_io | _filter_testdir
  
+ # success, all done
+ echo "*** done"
+diff --git a/tests/qemu-iotests/080.out b/tests/qemu-iotests/080.out
+index 315edbc26f..d622ac06c0 100644
+--- a/tests/qemu-iotests/080.out
++++ b/tests/qemu-iotests/080.out
+@@ -66,6 +66,8 @@ wrote 512/512 bytes at offset 0
+ qemu-img: Failed to load snapshot: Snapshot L1 table offset invalid
+ qemu-img: Snapshot L1 table offset invalid
+ qemu-img: Error while amending options: Invalid argument
++Failed to flush the refcount block cache: Invalid argument
++write failed: Invalid argument
  
-@@ -799,7 +804,7 @@ static BlockDriver bdrv_parallels = {
-     .bdrv_co_writev = parallels_co_writev,
-     .supports_backing = true,
-     .bdrv_co_create_opts = parallels_co_create_opts,
--    .bdrv_check     = parallels_check,
-+    .bdrv_co_check  = parallels_co_check,
-     .create_opts    = &parallels_create_opts,
- };
- 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index ac8703fa47..9fb00f2373 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -541,8 +541,9 @@ int qcow2_mark_consistent(BlockDriverState *bs)
-     return 0;
- }
- 
--static int qcow2_check(BlockDriverState *bs, BdrvCheckResult *result,
--                       BdrvCheckMode fix)
-+static int coroutine_fn qcow2_co_check_locked(BlockDriverState *bs,
-+                                              BdrvCheckResult *result,
-+                                              BdrvCheckMode fix)
- {
-     int ret = qcow2_check_refcounts(bs, result, fix);
-     if (ret < 0) {
-@@ -559,6 +560,19 @@ static int qcow2_check(BlockDriverState *bs, BdrvCheckResult *result,
-     return ret;
- }
- 
-+static int coroutine_fn qcow2_co_check(BlockDriverState *bs,
-+                                       BdrvCheckResult *result,
-+                                       BdrvCheckMode fix)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    int ret;
-+
-+    qemu_co_mutex_lock(&s->lock);
-+    ret = qcow2_co_check_locked(bs, result, fix);
-+    qemu_co_mutex_unlock(&s->lock);
-+    return ret;
-+}
-+
- static int validate_table_offset(BlockDriverState *bs, uint64_t offset,
-                                  uint64_t entries, size_t entry_len)
- {
-@@ -1506,7 +1520,8 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-         (s->incompatible_features & QCOW2_INCOMPAT_DIRTY)) {
-         BdrvCheckResult result = {0};
- 
--        ret = qcow2_check(bs, &result, BDRV_FIX_ERRORS | BDRV_FIX_LEAKS);
-+        ret = qcow2_co_check_locked(bs, &result,
-+                                    BDRV_FIX_ERRORS | BDRV_FIX_LEAKS);
-         if (ret < 0 || result.check_errors) {
-             if (ret >= 0) {
-                 ret = -EIO;
-@@ -4413,7 +4428,7 @@ BlockDriver bdrv_qcow2 = {
-     .bdrv_inactivate            = qcow2_inactivate,
- 
-     .create_opts         = &qcow2_create_opts,
--    .bdrv_check          = qcow2_check,
-+    .bdrv_co_check       = qcow2_co_check,
-     .bdrv_amend_options  = qcow2_amend_options,
- 
-     .bdrv_detach_aio_context  = qcow2_detach_aio_context,
-diff --git a/block/qed-check.c b/block/qed-check.c
-index dcd4f036b8..0edac03159 100644
---- a/block/qed-check.c
-+++ b/block/qed-check.c
-@@ -217,6 +217,7 @@ static void qed_check_mark_clean(BDRVQEDState *s, BdrvCheckResult *result)
-     qed_write_header_sync(s);
- }
- 
-+/* Called with table_lock held.  */
- int qed_check(BDRVQEDState *s, BdrvCheckResult *result, bool fix)
- {
-     QEDCheck check = {
-diff --git a/block/qed-table.c b/block/qed-table.c
-index eead8b0fc7..7df5680adb 100644
---- a/block/qed-table.c
-+++ b/block/qed-table.c
-@@ -18,7 +18,7 @@
- #include "qed.h"
- #include "qemu/bswap.h"
- 
--/* Called either from qed_check or with table_lock held.  */
-+/* Called with table_lock held.  */
- static int qed_read_table(BDRVQEDState *s, uint64_t offset, QEDTable *table)
- {
-     QEMUIOVector qiov;
-@@ -33,13 +33,9 @@ static int qed_read_table(BDRVQEDState *s, uint64_t offset, QEDTable *table)
- 
-     trace_qed_read_table(s, offset, table);
- 
--    if (qemu_in_coroutine()) {
--        qemu_co_mutex_unlock(&s->table_lock);
--    }
-+    qemu_co_mutex_unlock(&s->table_lock);
-     ret = bdrv_preadv(s->bs->file, offset, &qiov);
--    if (qemu_in_coroutine()) {
--        qemu_co_mutex_lock(&s->table_lock);
--    }
-+    qemu_co_mutex_lock(&s->table_lock);
-     if (ret < 0) {
-         goto out;
-     }
-@@ -67,7 +63,7 @@ out:
-  * @n:          Number of elements
-  * @flush:      Whether or not to sync to disk
-  *
-- * Called either from qed_check or with table_lock held.
-+ * Called with table_lock held.
-  */
- static int qed_write_table(BDRVQEDState *s, uint64_t offset, QEDTable *table,
-                            unsigned int index, unsigned int n, bool flush)
-@@ -104,13 +100,9 @@ static int qed_write_table(BDRVQEDState *s, uint64_t offset, QEDTable *table,
-     /* Adjust for offset into table */
-     offset += start * sizeof(uint64_t);
- 
--    if (qemu_in_coroutine()) {
--        qemu_co_mutex_unlock(&s->table_lock);
--    }
-+    qemu_co_mutex_unlock(&s->table_lock);
-     ret = bdrv_pwritev(s->bs->file, offset, &qiov);
--    if (qemu_in_coroutine()) {
--        qemu_co_mutex_lock(&s->table_lock);
--    }
-+    qemu_co_mutex_lock(&s->table_lock);
-     trace_qed_write_table_cb(s, table, flush, ret);
-     if (ret < 0) {
-         goto out;
-@@ -134,7 +126,7 @@ int qed_read_l1_table_sync(BDRVQEDState *s)
-     return qed_read_table(s, s->header.l1_table_offset, s->l1_table);
- }
- 
--/* Called either from qed_check or with table_lock held.  */
-+/* Called with table_lock held.  */
- int qed_write_l1_table(BDRVQEDState *s, unsigned int index, unsigned int n)
- {
-     BLKDBG_EVENT(s->bs->file, BLKDBG_L1_UPDATE);
-@@ -148,7 +140,7 @@ int qed_write_l1_table_sync(BDRVQEDState *s, unsigned int index,
-     return qed_write_l1_table(s, index, n);
- }
- 
--/* Called either from qed_check or with table_lock held.  */
-+/* Called with table_lock held.  */
- int qed_read_l2_table(BDRVQEDState *s, QEDRequest *request, uint64_t offset)
- {
-     int ret;
-@@ -191,7 +183,7 @@ int qed_read_l2_table_sync(BDRVQEDState *s, QEDRequest *request, uint64_t offset
-     return qed_read_l2_table(s, request, offset);
- }
- 
--/* Called either from qed_check or with table_lock held.  */
-+/* Called with table_lock held.  */
- int qed_write_l2_table(BDRVQEDState *s, QEDRequest *request,
-                        unsigned int index, unsigned int n, bool flush)
- {
-diff --git a/block/qed.c b/block/qed.c
-index 5a5414bfc3..5e6a6bfaa0 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -1544,12 +1544,17 @@ static void coroutine_fn bdrv_qed_co_invalidate_cache(BlockDriverState *bs,
-     }
- }
- 
--static int bdrv_qed_check(BlockDriverState *bs, BdrvCheckResult *result,
--                          BdrvCheckMode fix)
-+static int bdrv_qed_co_check(BlockDriverState *bs, BdrvCheckResult *result,
-+                             BdrvCheckMode fix)
- {
-     BDRVQEDState *s = bs->opaque;
-+    int ret;
- 
--    return qed_check(s, result, !!fix);
-+    qemu_co_mutex_lock(&s->table_lock);
-+    ret = qed_check(s, result, !!fix);
-+    qemu_co_mutex_unlock(&s->table_lock);
-+
-+    return ret;
- }
- 
- static QemuOptsList qed_create_opts = {
-@@ -1609,7 +1614,7 @@ static BlockDriver bdrv_qed = {
-     .bdrv_refresh_limits      = bdrv_qed_refresh_limits,
-     .bdrv_change_backing_file = bdrv_qed_change_backing_file,
-     .bdrv_co_invalidate_cache = bdrv_qed_co_invalidate_cache,
--    .bdrv_check               = bdrv_qed_check,
-+    .bdrv_co_check            = bdrv_qed_co_check,
-     .bdrv_detach_aio_context  = bdrv_qed_detach_aio_context,
-     .bdrv_attach_aio_context  = bdrv_qed_attach_aio_context,
-     .bdrv_co_drain_begin      = bdrv_qed_co_drain_begin,
-diff --git a/block/vdi.c b/block/vdi.c
-index 68592cc58d..2b5ddd0666 100644
---- a/block/vdi.c
-+++ b/block/vdi.c
-@@ -263,8 +263,8 @@ static void vdi_header_print(VdiHeader *header)
- }
- #endif
- 
--static int vdi_check(BlockDriverState *bs, BdrvCheckResult *res,
--                     BdrvCheckMode fix)
-+static int coroutine_fn vdi_co_check(BlockDriverState *bs, BdrvCheckResult *res,
-+                                     BdrvCheckMode fix)
- {
-     /* TODO: additional checks possible. */
-     BDRVVdiState *s = (BDRVVdiState *)bs->opaque;
-@@ -908,7 +908,7 @@ static BlockDriver bdrv_vdi = {
-     .bdrv_get_info = vdi_get_info,
- 
-     .create_opts = &vdi_create_opts,
--    .bdrv_check = vdi_check,
-+    .bdrv_co_check = vdi_co_check,
- };
- 
- static void bdrv_vdi_init(void)
-diff --git a/block/vhdx.c b/block/vhdx.c
-index 3fbff5048b..d82350d07c 100644
---- a/block/vhdx.c
-+++ b/block/vhdx.c
-@@ -1944,8 +1944,9 @@ exit:
-  * r/w and any log has already been replayed, so there is nothing (currently)
-  * for us to do here
-  */
--static int vhdx_check(BlockDriverState *bs, BdrvCheckResult *result,
--                       BdrvCheckMode fix)
-+static int coroutine_fn vhdx_co_check(BlockDriverState *bs,
-+                                      BdrvCheckResult *result,
-+                                      BdrvCheckMode fix)
- {
-     BDRVVHDXState *s = bs->opaque;
- 
-@@ -2006,7 +2007,7 @@ static BlockDriver bdrv_vhdx = {
-     .bdrv_co_writev         = vhdx_co_writev,
-     .bdrv_co_create_opts    = vhdx_co_create_opts,
-     .bdrv_get_info          = vhdx_get_info,
--    .bdrv_check             = vhdx_check,
-+    .bdrv_co_check          = vhdx_co_check,
-     .bdrv_has_zero_init     = bdrv_has_zero_init_1,
- 
-     .create_opts            = &vhdx_create_opts,
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 67342ed69b..f94c49a9c0 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -2221,8 +2221,9 @@ static ImageInfo *vmdk_get_extent_info(VmdkExtent *extent)
-     return info;
- }
- 
--static int vmdk_check(BlockDriverState *bs, BdrvCheckResult *result,
--                      BdrvCheckMode fix)
-+static int coroutine_fn vmdk_co_check(BlockDriverState *bs,
-+                                      BdrvCheckResult *result,
-+                                      BdrvCheckMode fix)
- {
-     BDRVVmdkState *s = bs->opaque;
-     VmdkExtent *extent = NULL;
-@@ -2391,7 +2392,7 @@ static BlockDriver bdrv_vmdk = {
-     .instance_size                = sizeof(BDRVVmdkState),
-     .bdrv_probe                   = vmdk_probe,
-     .bdrv_open                    = vmdk_open,
--    .bdrv_check                   = vmdk_check,
-+    .bdrv_co_check                = vmdk_co_check,
-     .bdrv_reopen_prepare          = vmdk_reopen_prepare,
-     .bdrv_child_perm              = bdrv_format_default_perms,
-     .bdrv_co_preadv               = vmdk_co_preadv,
+ == Invalid snapshot L1 table size ==
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+@@ -74,4 +76,6 @@ wrote 512/512 bytes at offset 0
+ qemu-img: Failed to load snapshot: Snapshot L1 table too large
+ qemu-img: Snapshot L1 table too large
+ qemu-img: Error while amending options: File too large
++Failed to flush the refcount block cache: File too large
++write failed: File too large
+ *** done
 -- 
 2.13.6
