@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1euMuq-0000jT-1l
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:38:53 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1euN2v-0005RQ-TU
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:47:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1euMum-0000Gd-P4
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:38:52 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47242 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1euMum-0000GZ-JZ
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:38:48 -0500
-References: <20180309130918.734-1-marcandre.lureau@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <f055b8f0-0642-b9d4-978d-77da2ba9ec11@redhat.com>
-Date: Fri, 9 Mar 2018 19:38:40 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1euN2t-0003Bq-LU
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:47:13 -0500
+Received: from mail-ot0-x229.google.com ([2607:f8b0:4003:c0f::229]:41759)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1euN2t-0003Bc-De
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 13:47:11 -0500
+Received: by mail-ot0-x229.google.com with SMTP id w38so9562558ota.8
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 10:47:11 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180309130918.734-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [edk2] [PATCH v3 0/7] ovmf: preliminary TPM2
- support
+In-Reply-To: <1518893216-9983-10-git-send-email-eric.auger@redhat.com>
+References: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
+	<1518893216-9983-10-git-send-email-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 9 Mar 2018 18:46:49 +0000
+Message-ID: <CAFEAcA-g5u+OAcsQ4oFapRF55tJLkjiNqk4PBvcjaTUGpwc0bA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v9 09/14] hw/arm/smmuv3: Implement
+ translate callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,156 +30,624 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@redhat.com, edk2-devel@lists.01.org
-Cc: qemu-devel@nongnu.org, javierm@redhat.com, pjones@redhat.com, jiewen.yao@intel.com, Brijesh Singh <brijesh.singh@amd.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>
 
-Hi Marc-Andr=C3=A9,
+On 17 February 2018 at 18:46, Eric Auger <eric.auger@redhat.com> wrote:
+> This patch implements the IOMMU Memory Region translate()
+> callback. Most of the code relates to the translation
+> configuration decoding and check (STE, CD).
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>
+> ---
+> v8 -> v9:
+> - use SMMU_EVENT_STRING macro
+> - get rid of last erro_report's
+> - decode asid
+> - handle config abort before ptw
+> - add 64-bit single-copy atomic comment
+>
+> v7 -> v8:
+> - use address_space_rw
+> - s/Ste/STE, s/Cd/CD
+> - use dma_memory_read
+> - remove everything related to stage 2
+> - collect data for both TTx
+> - renamings
+> - pass the event handle all along the config decoding path
+> - decode tbi, ars
+> ---
+>  hw/arm/smmuv3-internal.h | 146 ++++++++++++++++++++
+>  hw/arm/smmuv3.c          | 341 +++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/arm/trace-events      |   9 ++
+>  3 files changed, 496 insertions(+)
+>
+> diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
+> index 3929f69..b203426 100644
+> --- a/hw/arm/smmuv3-internal.h
+> +++ b/hw/arm/smmuv3-internal.h
+> @@ -462,4 +462,150 @@ typedef struct SMMUEventInfo {
+>
+>  void smmuv3_record_event(SMMUv3State *s, SMMUEventInfo *event);
+>
+> +/* Configuration Data */
+> +
+> +/* STE Level 1 Descriptor */
+> +typedef struct STEDesc {
+> +    uint32_t word[2];
+> +} STEDesc;
+> +
+> +/* CD Level 1 Descriptor */
+> +typedef struct CDDesc {
+> +    uint32_t word[2];
+> +} CDDesc;
+> +
+> +/* Stream Table Entry(STE) */
+> +typedef struct STE {
+> +    uint32_t word[16];
+> +} STE;
+> +
+> +/* Context Descriptor(CD) */
+> +typedef struct CD {
+> +    uint32_t word[16];
+> +} CD;
+> +
+> +/* STE fields */
+> +
+> +#define STE_VALID(x)   extract32((x)->word[0], 0, 1) /* 0 */
 
-On 03/09/18 14:09, marcandre.lureau@redhat.com wrote:
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> Hi,
->=20
-> The following series adds basic TPM2 support for OVMF-on-QEMU (I
-> haven't tested TPM1, for lack of interest). It links with the modules
-> to initializes the device in PEI phase, and do measurements (both PEI
-> and DXE). The Tcg2Dxe module provides the Tcg2 protocol which allows
-> the guest to access the measurement log and other facilities.
->=20
-> DxeTpm2MeasureBootLib seems to do its job at measuring images that are
-> not measured in PEI phase (such as PCI PXE rom)
->=20
-> Tcg2ConfigDxe is not included due to its integration with edk2 own PPI
-> implementation which conflicts with qemu design. PPI design is still
-> being discussed & experimented at this point.
->=20
-> Linux guests seem to work fine. But windows guest generally complains
-> about the lack of PPI interface (most HLK tests require it, tpm.msc
-> admin interactions too). I haven't done "real" use-cases tests, as I
-> lack experience with TPM usage. Any help appreciated to test the TPM.
->=20
-> I build edk2 with:
->=20
-> $ build -DTPM2_ENABLE -DSECURE_BOOT_ENABLE  -DMEM_VARSTORE_EMU_ENABLE=3D=
-FALSE
->=20
-> I test with qemu & swtpm/libtpms (tpm2 branches, swtpm_setup.sh --tpm2 =
---tpm-state tpmstatedir)
->=20
-> $ swtpm socket --tpmstate tpmstatedir --ctrl type=3Dunixio,path=3Dtpmso=
-ck  --tpm2 &
-> $ qemu .. -chardev socket,id=3Dchrtpm,path=3Dtpmsock -tpmdev emulator,i=
-d=3Dtpm0,chardev=3Dchrtpm -device tpm-crb,tpmdev=3Dtpm0
->=20
-> Thanks
->=20
-> Github tree:
-> https://github.com/elmarco/edk2/tree/tpm2 (tpm2-v2 tag)
->=20
-> Related bug:
-> https://bugzilla.tianocore.org/show_bug.cgi?id=3D594
->=20
-> v3:  after Laszlo review
-> - many simplifications to "add customized Tcg2ConfigPei clone" patch
-> - various move of fdf/dsc sections
-> - modify Ia32 & Ia32x64 fdf/dsc too
-> - modify commit messages
-> - add r-b tags
->=20
-> v2:
-> - the series can now be applied to master directly, thanks to dropping
->   PeiReadOnlyVariable requirement
-> - remove the HOB list workaround, the main fix is now upstream. Add a
->   preliminary patch to complete it.
-> - removed traces of TPM1.2 support
-> - add own OvmfPkg Tcg2ConfigPei, which performs only TPM2 detection
-> - make PcdTpmInstanceGuid default all-bits-zero
-> - drop unneeded Pcd values
-> - explain why SHA1 is still nice to have (for 1.2 log format)
-> - drop Tcg2ConfigDxe
-> - more detailed commit messages, thanks to Laszlo explanations!
-> - rebased
->=20
-> TODO:
-> - modify Ia32 and Ia32X64 builds
->=20
-> Marc-Andr=C3=A9 Lureau (7):
->   SecurityPkg/Tcg2Pei: drop PeiReadOnlyVariable from Depex
->   MdeModulePkg/Core/Pei: fix REGISITER -> REGISTER typo
->   OvmfPkg: simplify SecurityStubDxe.inf inclusion
->   OvmfPkg: add customized Tcg2ConfigPei clone
->   OvmfPkg: include Tcg2Pei module
->   OvmfPkg: include Tcg2Dxe module
->   OvmfPkg: plug DxeTpm2MeasureBootLib into SecurityStubDxe
->=20
->  MdeModulePkg/Core/Pei/Dispatcher/Dispatcher.c | 18 ++--
->  MdeModulePkg/Core/Pei/Image/Image.c           |  4 +-
->  MdeModulePkg/Core/Pei/PeiMain.h               |  2 +-
->  MdeModulePkg/Core/Pei/PeiMain/PeiMain.c       |  2 +-
->  OvmfPkg/OvmfPkgIa32.dsc                       | 49 ++++++++++-
->  OvmfPkg/OvmfPkgIa32.fdf                       |  9 ++
->  OvmfPkg/OvmfPkgIa32X64.dsc                    | 49 ++++++++++-
->  OvmfPkg/OvmfPkgIa32X64.fdf                    |  9 ++
->  OvmfPkg/OvmfPkgX64.dsc                        | 49 ++++++++++-
->  OvmfPkg/OvmfPkgX64.fdf                        |  9 ++
->  OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf      | 53 ++++++++++++
->  OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPeim.c       | 84 +++++++++++++++++++
->  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf           |  1 -
->  13 files changed, 312 insertions(+), 26 deletions(-)
->  create mode 100644 OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
->  create mode 100644 OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPeim.c
->=20
+I'm not sure what the comment is supposed to be telling me ?
 
-huge kudos for this work. I've pushed it now: commit range
-7878f706e7eb..d5a002aba0aa.
+> +
+> +#define STE_CONFIG(x)  extract32((x)->word[0], 1, 3)
+> +#define STE_CFG_S1_ENABLED(config) (config & 0x1)
+> +#define STE_CFG_S2_ENABLED(config) (config & 0x2)
+> +#define STE_CFG_ABORT(config)      (!(config & 0x4))
+> +#define STE_CFG_BYPASS(config)     (config == 0x4)
+> +
+> +#define STE_S1FMT(x)   extract32((x)->word[0], 4 , 2)
+> +#define STE_S1CDMAX(x) extract32((x)->word[1], 27, 5)
+> +#define STE_EATS(x)    extract32((x)->word[2], 28, 2)
+> +#define STE_STRW(x)    extract32((x)->word[2], 30, 2)
+> +#define STE_S2VMID(x)  extract32((x)->word[4], 0 , 16)
+> +#define STE_S2T0SZ(x)  extract32((x)->word[5], 0 , 6)
+> +#define STE_S2SL0(x)   extract32((x)->word[5], 6 , 2)
+> +#define STE_S2TG(x)    extract32((x)->word[5], 14, 2)
+> +#define STE_S2PS(x)    extract32((x)->word[5], 16, 3)
+> +#define STE_S2AA64(x)  extract32((x)->word[5], 19, 1)
+> +#define STE_S2HD(x)    extract32((x)->word[5], 24, 1)
+> +#define STE_S2HA(x)    extract32((x)->word[5], 25, 1)
+> +#define STE_S2S(x)     extract32((x)->word[5], 26, 1)
+> +#define STE_CTXPTR(x)                                           \
+> +    ({                                                          \
+> +        unsigned long addr;                                     \
+> +        addr = (uint64_t)extract32((x)->word[1], 0, 16) << 32;  \
+> +        addr |= (uint64_t)((x)->word[0] & 0xffffffc0);          \
+> +        addr;                                                   \
+> +    })
+> +
+> +#define STE_S2TTB(x)                                            \
+> +    ({                                                          \
+> +        unsigned long addr;                                     \
+> +        addr = (uint64_t)extract32((x)->word[7], 0, 16) << 32;  \
+> +        addr |= (uint64_t)((x)->word[6] & 0xfffffff0);          \
+> +        addr;                                                   \
+> +    })
+> +
+> +static inline int oas2bits(int oas_field)
+> +{
+> +    switch (oas_field) {
+> +    case 0b011:
+> +        return 42;
+> +    case 0b100:
+> +        return 44;
+> +    default:
+> +        return 32 + (1 << oas_field);
 
-* For future work, please update your git setting so that you include,
-in your commit message:
+Is this right? For instance OAS == 0b001 should be 36,
+but 32 + (1 << 1) == 34 ?  0b110 should be 52, but
+32 + (1 << 6) == 96 ?
 
-    Contributed-under: TianoCore Contribution Agreement 1.1
-                                                        ^^^
+I'm not sure there's a neat relationship between the field
+values and the address sizes here, so maybe we should just
+have a switch with a case for each value?
 
-The patches in this series vary between 1.0 and 1.1. For now, 1.0 is
-acceptable as well (see
-<https://bugzilla.tianocore.org/show_bug.cgi?id=3D628> and commit
-f2d1b866dfd9, "BaseTools/PatchCheck: Support Contribution Agreement
-1.1", 2017-08-03).
+> +   }
+> +}
+> +
+> +static inline int pa_range(STE *ste)
+> +{
+> +    int oas_field = MIN(STE_S2PS(ste), SMMU_IDR5_OAS);
+> +
+> +    if (!STE_S2AA64(ste)) {
+> +        return 40;
+> +    }
+> +
+> +    return oas2bits(oas_field);
+> +}
+> +
+> +#define MAX_PA(ste) ((1 << pa_range(ste)) - 1)
+> +
+> +/* CD fields */
+> +
+> +#define CD_VALID(x)   extract32((x)->word[0], 30, 1)
+> +#define CD_ASID(x)    extract32((x)->word[1], 16, 16)
+> +#define CD_TTB(x, sel)                                      \
+> +    ({                                                      \
+> +        uint64_t hi, lo;                                    \
+> +        hi = extract32((x)->word[(sel) * 2 + 3], 0, 16);    \
 
-The difference between 1.0 and 1.1 is basically "docs files" -- please
-see commit b6538c118ae8 ("edk2: Update to TianoCore Contribution
-Agreement 1.1", 2017-08-03). You don't touch documentation in this
-series, just source code, so 1.0 is fine (wherever you used that); in
-the future 1.1 should be used consistently.
+Spec says TTB0/1 fields go up to bit 19. You want the whole lot
+even if we don't support address sizes that wide because out
+of range high bits should cause an illegal CD error, not be ignored.
 
-* I did some regression testing too, with this set applied, for both
-TRUE and FALSE values of TPM2_ENABLE. (Note that I didn't actually set
-up swtpm, so my regression-testing for TRUE exercised the "detection
-failed" branch.) Normal boot and S3 suspend/resume continues to work
-under all the usual circumstances (with or without SMM etc).
+> +        hi <<= 32;                                          \
+> +        lo = (x)->word[(sel) * 2 + 2] & ~0xf;               \
 
-* One scenario that I didn't test (and I expect it *not* to work) is
-TPM2 detection in a SEV guest (CC'ing Brijesh for this, just as a
-heads-up). In a SEV guest, we currently mark MMIO ranges as decrypted /
-plaintext in the DXE phase first. This means that Tcg2ConfigPei (which
-detects the TPM2 chip) and Tcg2Pei (which measures the firmware volumes
-into TPM2) wouldn't be able to access the TPM2 chip. We might attempt to
-massage the PTE C-bit in the PEI phase specifically on the TPM2 MMIO
-range, however that's architecturally impossible in the IA32 and IA32X64
-builds (where the PEI phase is 32-bit). And, if we use the X64 build,
-then the SMM+S3 combination doesn't work (because S3Resume2Pei doesn't
-support that scenario).
+Does this ~0xf end up correctly sign extending up into the top 32 bits?
+ULL suffix would make it certain.
 
-All in all, with all of these seemingly orthogonal features, we
-unavoidably run into obscure combinations that don't, or even can't,
-work. This is a hard problem; we should figure it out later. (One dirty
-hack could be to add an IO-port mapped register block to the TPM2 chip
-in QEMU, and create adapted variants of the necessary edk2 libs -- IO
-access is entirely unaffected by SEV.) For now, TPM2_ENABLE defaults to
-FALSE (a good choice), so no issue for SEV guests. And, Peter and Javier
-on the RH Bootloader Team can rebuild OVMF with TPM2_ENABLE, for testing
-their TCG2 protocol client code -- that use case doesn't involve SEV. So
-I think this is an acceptable state to push to the master branch, for
-the time being.
+> +        hi | lo;                                            \
+> +    })
+> +
+> +#define CD_TSZ(x, sel)   extract32((x)->word[0], (16 * (sel)) + 0, 6)
+> +#define CD_TG(x, sel)    extract32((x)->word[0], (16 * (sel)) + 6, 2)
+> +#define CD_EPD(x, sel)   extract32((x)->word[0], (16 * (sel)) + 14, 1)
+> +#define CD_ENDI(x)       extract32((x)->word[0], 15, 1)
+> +#define CD_IPS(x)        extract32((x)->word[1], 0 , 3)
+> +#define CD_TBI(x)        extract32((x)->word[1], 6 , 2)
+> +#define CD_S(x)          extract32((x)->word[1], 12, 1)
+> +#define CD_R(x)          extract32((x)->word[1], 13, 1)
+> +#define CD_A(x)          extract32((x)->word[1], 14, 1)
+> +#define CD_AARCH64(x)    extract32((x)->word[1], 9 , 1)
+> +
+> +#define CDM_VALID(x)    ((x)->word[0] & 0x1)
+> +
+> +static inline int is_cd_valid(SMMUv3State *s, STE *ste, CD *cd)
+> +{
+> +    return CD_VALID(cd);
+> +}
+> +
+> +/**
+> + * tg2granule - Decodes the CD translation granule size field according
+> + * to the ttbr in use
+> + * @bits: TG0/1 fields
+> + * @ttbr: ttbr index in use
+> + */
+> +static inline int tg2granule(int bits, int ttbr)
+> +{
+> +    switch (bits) {
+> +    case 1:
+> +        return ttbr ? 14 : 16;
+> +    case 2:
+> +        return ttbr ? 12 : 14;
+> +    case 3:
+> +        return ttbr ? 16 : 12;
+> +    default:
+> +        return 12;
 
-Thanks!
-Laszlo
+TG0 == 0b11 and TG1 == 0b00 are reserved and should cause
+an illegal CD error if the config means they would be used,
+not be treated as if they were one of the other values.
+
+The spec has a definition of a CD_ILLEGAL expression which
+specifies what conditions should cause an illegal CD error.
+It might be useful to have something in the patchset that looks
+like that, and then later you can just assert that you're
+not dealing with illegal values, or ignore them.
+
+> +    }
+> +}
+> +
+> +#define L1STD_L2PTR(stm) ({                                 \
+> +            uint64_t hi, lo;                            \
+> +            hi = (stm)->word[1];                        \
+> +            lo = (stm)->word[0] & ~(uint64_t)0x1f;      \
+
+I see here you have a cast to force the mask to 64-bits wide.
+ULL suffix would be shorter, but in any case do the same thing
+in all places.
+
+> +            hi << 32 | lo;                              \
+> +        })
+
+This would definitely be better as an inline function rather than
+a multiline macro that has to use the GCC extension to define
+macro-local variables and return a value.
+
+> +
+> +#define L1STD_SPAN(stm) (extract32((stm)->word[0], 0, 4))
+> +
+>  #endif
+> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+> index 0adfe53..384393f 100644
+> --- a/hw/arm/smmuv3.c
+> +++ b/hw/arm/smmuv3.c
+> @@ -289,6 +289,344 @@ static void smmuv3_init_regs(SMMUv3State *s)
+>      s->sid_split = 0;
+>  }
+>
+> +static int smmu_get_ste(SMMUv3State *s, dma_addr_t addr, STE *buf,
+> +                        SMMUEventInfo *event)
+> +{
+> +    int ret;
+> +
+> +    trace_smmuv3_get_ste(addr);
+> +    /* TODO: guarantee 64-bit single-copy atomicity */
+> +    ret = dma_memory_read(&address_space_memory, addr,
+> +                          (void *)buf, sizeof(*buf));
+> +    if (ret != MEMTX_OK) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "Cannot fetch pte at address=0x%"PRIx64"\n", addr);
+> +        event->type = SMMU_EVT_F_STE_FETCH;
+> +        event->u.f_ste_fetch.addr = addr;
+> +        return -EINVAL;
+> +    }
+> +    return 0;
+> +
+> +}
+> +
+> +/* @ssid > 0 not supported yet */
+> +static int smmu_get_cd(SMMUv3State *s, STE *ste, uint32_t ssid,
+> +                       CD *buf, SMMUEventInfo *event)
+> +{
+> +    dma_addr_t addr = STE_CTXPTR(ste);
+> +    int ret;
+> +
+> +    trace_smmuv3_get_cd(addr);
+> +    /* TODO: guarantee 64-bit single-copy atomicity */
+> +    ret = dma_memory_read(&address_space_memory, addr,
+> +                           (void *)buf, sizeof(*buf));
+> +    if (ret != MEMTX_OK) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "Cannot fetch pte at address=0x%"PRIx64"\n", addr);
+> +        event->type = SMMU_EVT_F_CD_FETCH;
+> +        event->u.f_ste_fetch.addr = addr;
+> +        return -EINVAL;
+> +    }
+> +    return 0;
+> +}
+> +
+> +static int decode_ste(SMMUv3State *s, SMMUTransCfg *cfg,
+> +                      STE *ste, SMMUEventInfo *event)
+> +{
+> +    uint32_t config = STE_CONFIG(ste);
+> +    int ret = -EINVAL;
+> +
+> +    if (STE_CFG_ABORT(config)) {
+> +        /* abort but don't record any event */
+> +        cfg->aborted = true;
+> +        return ret;
+> +    }
+> +
+> +    if (STE_CFG_BYPASS(config)) {
+> +        cfg->bypassed = true;
+> +        return ret;
+> +    }
+> +
+> +    if (!STE_VALID(ste)) {
+> +        goto bad_ste;
+> +    }
+> +
+> +    if (STE_CFG_S2_ENABLED(config)) {
+> +        error_setg(&error_fatal, "SMMUv3 does not support stage 2 yet");
+
+Usual remarks about not using error_setg() for this kind of thing.
+
+> +    }
+> +
+> +    if (STE_S1CDMAX(ste) != 0) {
+> +        error_setg(&error_fatal,
+> +                   "SMMUv3 does not support multiple context descriptors yet");
+> +        goto bad_ste;
+> +    }
+> +    return 0;
+> +
+> +bad_ste:
+> +    event->type = SMMU_EVT_C_BAD_STE;
+> +    return -EINVAL;
+> +}
+> +
+> +/**
+> + * smmu_find_ste - Return the stream table entry associated
+> + * to the sid
+> + *
+> + * @s: smmuv3 handle
+> + * @sid: stream ID
+> + * @ste: returned stream table entry
+> + * @event: handle to an event info
+> + *
+> + * Supports linear and 2-level stream table
+> + * Return 0 on success, -EINVAL otherwise
+> + */
+> +static int smmu_find_ste(SMMUv3State *s, uint32_t sid, STE *ste,
+> +                         SMMUEventInfo *event)
+> +{
+> +    dma_addr_t addr;
+> +    int ret;
+> +
+> +    trace_smmuv3_find_ste(sid, s->features, s->sid_split);
+> +    /* Check SID range */
+> +    if (sid > (1 << SMMU_IDR1_SIDSIZE)) {
+> +        event->type = SMMU_EVT_C_BAD_STREAMID;
+> +        return -EINVAL;
+> +    }
+> +    if (s->features & SMMU_FEATURE_2LVL_STE) {
+> +        int l1_ste_offset, l2_ste_offset, max_l2_ste, span;
+> +        dma_addr_t strtab_base, l1ptr, l2ptr;
+> +        STEDesc l1std;
+> +
+> +        strtab_base = s->strtab_base & SMMU_BASE_ADDR_MASK;
+> +        l1_ste_offset = sid >> s->sid_split;
+> +        l2_ste_offset = sid & ((1 << s->sid_split) - 1);
+> +        l1ptr = (dma_addr_t)(strtab_base + l1_ste_offset * sizeof(l1std));
+> +        /* TODO: guarantee 64-bit single-copy atomicity */
+> +        ret = dma_memory_read(&address_space_memory, l1ptr,
+> +                              (uint8_t *)&l1std, sizeof(l1std));
+> +        if (ret != MEMTX_OK) {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                          "Could not read L1PTR at 0X%"PRIx64"\n", l1ptr);
+> +            event->type = SMMU_EVT_F_STE_FETCH;
+> +            event->u.f_ste_fetch.addr = l1ptr;
+> +            return -EINVAL;
+> +        }
+> +
+> +        span = L1STD_SPAN(&l1std);
+> +
+> +        if (!span) {
+> +            /* l2ptr is not valid */
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                          "invalid sid=%d (L1STD span=0)\n", sid);
+> +            event->type = SMMU_EVT_C_BAD_STREAMID;
+> +            return -EINVAL;
+> +        }
+> +        max_l2_ste = (1 << span) - 1;
+> +        l2ptr = L1STD_L2PTR(&l1std);
+> +        trace_smmuv3_find_ste_2lvl(s->strtab_base, l1ptr, l1_ste_offset,
+> +                                   l2ptr, l2_ste_offset, max_l2_ste);
+> +        if (l2_ste_offset > max_l2_ste) {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                          "l2_ste_offset=%d > max_l2_ste=%d\n",
+> +                          l2_ste_offset, max_l2_ste);
+> +            event->type = SMMU_EVT_C_BAD_STE;
+> +            return -EINVAL;
+> +        }
+> +        addr = L1STD_L2PTR(&l1std) + l2_ste_offset * sizeof(*ste);
+> +    } else {
+> +        addr = s->strtab_base + sid * sizeof(*ste);
+> +    }
+> +
+> +    if (smmu_get_ste(s, addr, ste, event)) {
+> +        return -EINVAL;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static int decode_cd(SMMUTransCfg *cfg, CD *cd, SMMUEventInfo *event)
+> +{
+> +    int ret = -EINVAL;
+> +    int i;
+> +
+> +    if (!CD_VALID(cd) || !CD_AARCH64(cd)) {
+> +        goto error;
+> +    }
+> +
+> +    /* we support only those at the moment */
+> +    cfg->aa64 = true;
+> +    cfg->stage = 1;
+> +
+> +    cfg->oas = oas2bits(CD_IPS(cd));
+> +    cfg->oas = MIN(oas2bits(SMMU_IDR5_OAS), cfg->oas);
+> +    cfg->tbi = CD_TBI(cd);
+> +    cfg->asid = CD_ASID(cd);
+> +
+> +    trace_smmuv3_decode_cd(cfg->oas);
+> +
+> +    /* decode data dependent on TT */
+> +    for (i = 0; i <= 1; i++) {
+> +        int tg, tsz;
+> +        SMMUTransTableInfo *tt = &cfg->tt[i];
+> +
+> +        cfg->tt[i].disabled = CD_EPD(cd, i);
+> +        if (cfg->tt[i].disabled) {
+> +            continue;
+> +        }
+> +
+> +        tsz = CD_TSZ(cd, i);
+> +        if (tsz < 16 || tsz > 39) {
+> +            goto error;
+> +        }
+> +
+> +        tg = CD_TG(cd, i);
+> +        tt->granule_sz = tg2granule(tg, i);
+> +        if ((tt->granule_sz != 12 && tt->granule_sz != 16) || CD_ENDI(cd)) {
+> +            goto error;
+> +        }
+> +
+> +        tt->tsz = tsz;
+> +        tt->initial_level = 4 - (64 - tsz - 4) / (tt->granule_sz - 3);
+> +        tt->ttb = CD_TTB(cd, i);
+> +        tt->ttb = extract64(tt->ttb, 0, cfg->oas);
+> +        trace_smmuv3_decode_cd_tt(i, tt->tsz, tt->ttb,
+> +                                  tt->granule_sz, tt->initial_level);
+> +    }
+> +
+> +    event->record_trans_faults = CD_R(cd);
+> +
+> +    return 0;
+> +
+> +error:
+> +    event->type = SMMU_EVT_C_BAD_CD;
+> +    return ret;
+> +}
+> +
+> +/**
+> + * smmuv3_decode_config - Prepare the translation configuration
+> + * for the @mr iommu region
+> + * @mr: iommu memory region the translation config must be prepared for
+> + * @cfg: output translation configuration which is populated through
+> + *       the different configuration decodng steps
+
+"decoding"
+
+> + * @event: must be zero'ed by the caller
+> + *
+> + * return < 0 if the translation needs to be aborted (@event is filled
+> + * accordingly). Return 0 otherwise.
+> + */
+> +static int smmuv3_decode_config(IOMMUMemoryRegion *mr, SMMUTransCfg *cfg,
+> +                                SMMUEventInfo *event)
+> +{
+> +    SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
+> +    uint32_t sid = smmu_get_sid(sdev);
+> +    SMMUv3State *s = sdev->smmu;
+> +    int ret = -EINVAL;
+> +    STE ste;
+> +    CD cd;
+> +
+> +    if (smmu_find_ste(s, sid, &ste, event)) {
+> +        return ret;
+> +    }
+> +
+> +    if (decode_ste(s, cfg, &ste, event)) {
+> +        return ret;
+> +    }
+> +
+> +    if (smmu_get_cd(s, &ste, 0 /* ssid */, &cd, event)) {
+> +        return ret;
+> +    }
+> +
+> +    return decode_cd(cfg, &cd, event);
+> +}
+> +
+> +static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+> +                                      IOMMUAccessFlags flag)
+> +{
+> +    SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
+> +    SMMUv3State *s = sdev->smmu;
+> +    uint32_t sid = smmu_get_sid(sdev);
+> +    SMMUEventInfo event = {.type = SMMU_EVT_OK, .sid = sid};
+> +    SMMUPTWEventInfo ptw_info = {};
+> +    SMMUTransCfg cfg = {};
+> +    IOMMUTLBEntry entry = {
+> +        .target_as = &address_space_memory,
+> +        .iova = addr,
+> +        .translated_addr = addr,
+> +        .addr_mask = ~(hwaddr)0,
+> +        .perm = IOMMU_NONE,
+> +    };
+> +    int ret = 0;
+> +
+> +    if (!smmu_enabled(s)) {
+> +        goto out;
+> +    }
+> +
+> +    ret = smmuv3_decode_config(mr, &cfg, &event);
+> +    if (ret) {
+> +        goto out;
+> +    }
+> +
+> +    if (cfg.aborted) {
+> +        goto out;
+> +    }
+> +
+> +    ret = smmu_ptw(&cfg, addr, flag, &entry, &ptw_info);
+> +    if (ret) {
+> +        switch (ptw_info.type) {
+> +        case SMMU_PTW_ERR_WALK_EABT:
+> +            event.type = SMMU_EVT_F_WALK_EABT;
+> +            event.u.f_walk_eabt.addr = addr;
+> +            event.u.f_walk_eabt.rnw = flag & 0x1;
+> +            event.u.f_walk_eabt.class = 0x1;
+> +            event.u.f_walk_eabt.addr2 = ptw_info.addr;
+> +            break;
+> +        case SMMU_PTW_ERR_TRANSLATION:
+> +            if (event.record_trans_faults) {
+> +                event.type = SMMU_EVT_F_TRANSLATION;
+> +                event.u.f_translation.addr = addr;
+> +                event.u.f_translation.rnw = flag & 0x1;
+> +            }
+> +            break;
+> +        case SMMU_PTW_ERR_ADDR_SIZE:
+> +            if (event.record_trans_faults) {
+> +                event.type = SMMU_EVT_F_ADDR_SIZE;
+> +                event.u.f_addr_size.addr = addr;
+> +                event.u.f_addr_size.rnw = flag & 0x1;
+> +            }
+> +            break;
+> +        case SMMU_PTW_ERR_ACCESS:
+> +            if (event.record_trans_faults) {
+> +                event.type = SMMU_EVT_F_ACCESS;
+> +                event.u.f_access.addr = addr;
+> +                event.u.f_access.rnw = flag & 0x1;
+> +            }
+> +            break;
+> +        case SMMU_PTW_ERR_PERMISSION:
+> +            if (event.record_trans_faults) {
+> +                event.type = SMMU_EVT_F_PERMISSION;
+> +                event.u.f_permission.addr = addr;
+> +                event.u.f_permission.rnw = flag & 0x1;
+> +            }
+> +            break;
+> +        default:
+> +            error_setg(&error_fatal, "SMMUV3 BUG");
+
+g_assert_not_reached(), I guess ?
+
+> +        }
+> +    }
+> +
+> +    trace_smmuv3_translate(mr->parent_obj.name, sid, addr,
+> +                           entry.translated_addr, entry.perm);
+> +out:
+> +    if (ret) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "%s translation failed for iova=0x%"PRIx64" (%s)\n",
+> +                      mr->parent_obj.name, addr, SMMU_EVENT_STRING(event.type));
+> +        entry.perm = IOMMU_NONE;
+> +        smmuv3_record_event(s, &event);
+> +    } else if (!cfg.aborted) {
+> +        entry.perm = flag;
+> +    }
+> +
+> +    return entry;
+> +}
+> +
+>  static int smmuv3_cmdq_consume(SMMUv3State *s)
+>  {
+>      SMMUCmdError cmd_error = SMMU_CERROR_NONE;
+> @@ -739,6 +1077,9 @@ static void smmuv3_class_init(ObjectClass *klass, void *data)
+>  static void smmuv3_iommu_memory_region_class_init(ObjectClass *klass,
+>                                                    void *data)
+>  {
+> +    IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
+> +
+> +    imrc->translate = smmuv3_translate;
+>  }
+>
+>  static const TypeInfo smmuv3_type_info = {
+> diff --git a/hw/arm/trace-events b/hw/arm/trace-events
+> index c79c15e..1102bd4 100644
+> --- a/hw/arm/trace-events
+> +++ b/hw/arm/trace-events
+> @@ -29,3 +29,12 @@ smmuv3_write_mmio_idr(hwaddr addr, uint64_t val) "write to RO/Unimpl reg 0x%lx v
+>  smmuv3_write_mmio_evtq_cons_bef_clear(uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t cons_wrap) "Before clearing interrupt prod:0x%x cons:0x%x prod.w:%d cons.w:%d"
+>  smmuv3_write_mmio_evtq_cons_after_clear(uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t cons_wrap) "after clearing interrupt prod:0x%x cons:0x%x prod.w:%d cons.w:%d"
+>  smmuv3_record_event(const char *type, uint32_t sid) "%s sid=%d"
+> +smmuv3_find_ste(uint16_t sid, uint32_t features, uint16_t sid_split) "SID:0x%x features:0x%x, sid_split:0x%x"
+> +smmuv3_find_ste_2lvl(uint64_t strtab_base, hwaddr l1ptr, int l1_ste_offset, hwaddr l2ptr, int l2_ste_offset, int max_l2_ste) "strtab_base:0x%lx l1ptr:0x%"PRIx64" l1_off:0x%x, l2ptr:0x%"PRIx64" l2_off:0x%x max_l2_ste:%d"
+> +smmuv3_get_ste(hwaddr addr) "STE addr: 0x%"PRIx64
+> +smmuv3_translate_bypass(const char *n, uint16_t sid, hwaddr addr, bool is_write) "%s sid=%d bypass iova:0x%"PRIx64" is_write=%d"
+> +smmuv3_translate_in(uint16_t sid, int pci_bus_num, hwaddr strtab_base) "SID:0x%x bus:%d strtab_base:0x%"PRIx64
+> +smmuv3_get_cd(hwaddr addr) "CD addr: 0x%"PRIx64
+> +smmuv3_translate(const char *n, uint16_t sid, hwaddr iova, hwaddr translated, int perm) "%s sid=%d iova=0x%"PRIx64" translated=0x%"PRIx64" perm=0x%x"
+> +smmuv3_decode_cd(uint32_t oas) "oas=%d"
+> +smmuv3_decode_cd_tt(int i, uint32_t tsz, uint64_t ttb, uint32_t granule_sz, int initial_level) "TT[%d]:tsz:%d ttb:0x%"PRIx64" granule_sz:%d, initial_level = %d"
+> --
+
+More hwaddrs in here that should be uint64_t.
+
+thanks
+-- PMM
