@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50321)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50322)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1euK4s-0006Ju-VH
+	id 1euK4s-0006Jv-Va
 	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:37:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1euK4p-0008At-QQ
+	id 1euK4r-0008BT-29
 	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:37:02 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:34350)
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:32840)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1euK4p-0008AN-KA
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:36:59 -0500
-Received: by mail-wm0-x241.google.com with SMTP id a20so3955245wmd.1
-	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 07:36:59 -0800 (PST)
+	id 1euK4q-0008Az-N7
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:37:00 -0500
+Received: by mail-wm0-x241.google.com with SMTP id s206so3968075wme.0
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 07:37:00 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri,  9 Mar 2018 16:36:46 +0100
-Message-Id: <20180309153654.13518-1-f4bug@amsat.org>
+Date: Fri,  9 Mar 2018 16:36:47 +0100
+Message-Id: <20180309153654.13518-2-f4bug@amsat.org>
+In-Reply-To: <20180309153654.13518-1-f4bug@amsat.org>
+References: <20180309153654.13518-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 0/8] SDCard: improve tracing, support UHS-I
+Subject: [Qemu-devel] [PATCH 1/8] sdcard: Do not trace CMD55,
+ except when we already expect an ACMD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,33 +37,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alistair Francis <alistair@alistair23.me>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-This series contains the leftover patches from these 2 series:
-- SDCard: housekeeping, add tracing (part 4)
-- SDCard: bugfixes, support UHS-I (part 5)
-with Peter Maydell comments addressed.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Acked-by: Alistair Francis <alistair.francis@xilinx.com>
+---
+ hw/sd/sd.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-I misunderstood the 2.12 train deadline, but better to have the series
-standing in the list rather than forgot it.
-
-Philippe Mathieu-Daudé (8):
-  sdcard: Do not trace CMD55, except when we already expect an ACMD
-  sdcard: Display command name when tracing CMD/ACMD
-  sdcard: Display which protocol is used when tracing (SD or SPI)
-  sdcard: Add the Tuning Command (CMD19)
-  sdcard: Implement the UHS-I SWITCH_FUNCTION entries (Spec v3)
-  sdcard: Add a 'uhs' property, update the OCR register ACCEPT_SWITCH_1V8 bit
-  sdhci: Fix a typo in comment
-  MAINTAINERS: Add entries for SD (SDHCI, SDBus, SDCard)
-
- hw/sd/sdmmc-internal.h |  20 +++++
- hw/sd/sd.c             | 208 ++++++++++++++++++++++++++++++++++++++++++-------
- hw/sd/sdhci.c          |   4 +-
- hw/sd/sdmmc-internal.c |  72 +++++++++++++++++
- hw/sd/Makefile.objs    |   2 +-
- hw/sd/trace-events     |   9 ++-
- MAINTAINERS            |   8 ++
- 7 files changed, 288 insertions(+), 35 deletions(-)
- create mode 100644 hw/sd/sdmmc-internal.c
-
+diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+index 933890e86f..4a9520e38e 100644
+--- a/hw/sd/sd.c
++++ b/hw/sd/sd.c
+@@ -866,13 +866,18 @@ static void sd_lock_command(SDState *sd)
+         sd->card_status &= ~CARD_IS_LOCKED;
+ }
+ 
+-static sd_rsp_type_t sd_normal_command(SDState *sd,
+-                                       SDRequest req)
++static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+ {
+     uint32_t rca = 0x0000;
+     uint64_t addr = (sd->ocr & (1 << 30)) ? (uint64_t) req.arg << 9 : req.arg;
+ 
+-    trace_sdcard_normal_command(req.cmd, req.arg, sd_state_name(sd->state));
++    /* CMD55 precedes an ACMD, so we are not interested in tracing it.
++     * However there is no ACMD55, so we want to trace this particular case.
++     */
++    if (req.cmd != 55 || sd->expecting_acmd) {
++        trace_sdcard_normal_command(req.cmd, req.arg,
++                                    sd_state_name(sd->state));
++    }
+ 
+     /* Not interpreting this as an app command */
+     sd->card_status &= ~APP_CMD;
 -- 
 2.16.2
