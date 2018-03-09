@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1euOAW-0006ok-1O
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 14:59:08 -0500
+	(envelope-from <eblake@redhat.com>) id 1euOIK-0003JR-NF
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:07:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1euOAR-00031Q-6r
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 14:59:08 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:60687)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1euOAQ-000319-Sq
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 14:59:03 -0500
-References: <20180228221609.11265-1-jcmvbkbc@gmail.com>
-	<20180228221609.11265-11-jcmvbkbc@gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <f6993c0c-0314-b942-20ac-d697c2e41c27@vivier.eu>
-Date: Fri, 9 Mar 2018 20:58:52 +0100
+	(envelope-from <eblake@redhat.com>) id 1euOIJ-0006av-Un
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:07:12 -0500
+References: <20180309172713.26318-1-kwolf@redhat.com>
+	<20180309172713.26318-3-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7d16f763-a8fe-7e0f-9bbf-7ec5b51d6222@redhat.com>
+Date: Fri, 9 Mar 2018 14:06:47 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180228221609.11265-11-jcmvbkbc@gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180309172713.26318-3-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 10/11] qemu-binfmt-conf.sh: add
- qemu-xtensa
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/6] luks: Create
+ block_crypto_co_create_generic()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,22 +25,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
 
-Le 28/02/2018 à 23:16, Max Filippov a écrit :
-> Register qemu-xtensa and qemu-xtensaeb for transparent linux userspace
-> emulation.
+On 03/09/2018 11:27 AM, Kevin Wolf wrote:
+> Everything that refers to the protocol layer or QemuOpts is moved out of
+> block_crypto_create_generic(), so that the remaining function is
+> suitable to be called by a .bdrv_co_create implementation.
 > 
-> Cc: Riku Voipio <riku.voipio@iki.fi>
-> Cc: Laurent Vivier <laurent@vivier.eu>
-> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+> LUKS is the only driver that actually implements the old interface, and
+> we don't intend to use it in any new drivers, so put the moved out code
+> directly into a LUKS function rather than creating a generic
+> intermediate one.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  scripts/qemu-binfmt-conf.sh | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
+>   block/crypto.c | 95 +++++++++++++++++++++++++++++++++++++---------------------
+>   1 file changed, 61 insertions(+), 34 deletions(-)
 > 
 
-Applied to my 'linux-user-for-2.12' branch.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Thanks,
-Laurent
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
