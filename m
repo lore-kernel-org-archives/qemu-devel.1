@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1euJkE-00010G-SN
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:15:46 -0500
+	(envelope-from <lersek@redhat.com>) id 1euJnP-0002qc-Ak
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:19:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1euJkA-0004sg-T5
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:15:42 -0500
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:55524)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1euJkA-0004rX-LD
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:15:38 -0500
-Received: by mail-wm0-x236.google.com with SMTP id q83so4536160wme.5
-	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 07:15:38 -0800 (PST)
-References: <CAHNT7NshwZh87Uui6i+ARdOj2BuW6d7gahOiZ0X48Cf3TdOrXQ@mail.gmail.com>
-	<mhng-91cb2b22-0b57-4c9b-8027-8c25eba32497@palmer-si-x1c4>
-	<CAHNT7NvDiUHs6cBTd57uO+VdaAyQnH+2s4kp4yiQ1uBS15A22g@mail.gmail.com>
-	<CAFEAcA9jWUqFenf=P3bhiJ5iGCZ2kBc7eZxv3BRzO+jd=9h7nQ@mail.gmail.com>
-	<CAHNT7NuBjcngEesbS4XSwn=gw7S8VYVE_e6FjxKuAHfjoWowjQ@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAHNT7NuBjcngEesbS4XSwn=gw7S8VYVE_e6FjxKuAHfjoWowjQ@mail.gmail.com>
-Date: Fri, 09 Mar 2018 15:15:36 +0000
-Message-ID: <87woyljn53.fsf@linaro.org>
+	(envelope-from <lersek@redhat.com>) id 1euJnL-0006hQ-A4
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:18:59 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42916 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1euJnL-0006hG-4j
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 10:18:55 -0500
+References: <20180307144951.d75lo5rgzi2vf27z@eukaryote>
+	<90ba320e-2a05-8962-dc6b-252b3e15d1b7@redhat.com>
+	<20180309142737.2qlsf6hhyayenmjl@sirius.home.kraxel.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <88267dcb-2484-e9b9-19bf-7819403450d9@redhat.com>
+Date: Fri, 9 Mar 2018 16:18:45 +0100
 MIME-Version: 1.0
+In-Reply-To: <20180309142737.2qlsf6hhyayenmjl@sirius.home.kraxel.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [patches] Re: [PULL] RISC-V QEMU Port Submission
- v8.2
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] Defining firmware (OVMF,
+ et al) metadata format & file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,30 +30,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
+On 03/09/18 15:27, Gerd Hoffmann wrote:
+>   Hi,
+> 
+>> For OVMF (x86), I guess the initial set of properties should come from
+>> the "-D FOO[=BAR]" build flags that OVMF currently supports. (The list
+>> might grow or change incompatibly over time, so this is just a raw
+>> starter idea.)
+> 
+>> (0) ARCH (one of IA32, IA32X64, X64) -- the bitnesses of the PEI and DXE
+>> phases of the firmware.
+>>
+>> IA32 stands for "32-bit PEI and DXE". Such firmware is usable for
+>> booting 32-bit OSes only, and runs on both qemu-system-i386 and
+>> qemu-system-x86_64.
+>>
+>> IA32X64 stands for "32-bit PEI, 64-bit DXE". Needs qemu-system-x86_64
+>> and runs 64-bit OSes only.
+>>
+>> X64 stands for "64-bit PEI and DXE". Needs qemu-system-x86_64 and runs
+>> 64-bit OSes only.
+> 
+> I'd simply put that info the 'arch' bucket.  IA32 gets 'i386' (assuming
+> we simply use qemu target names), IA32X64 + X64 get 'x86_64'.
+> 
+>> (1) SECURE_BOOT_ENABLE (boolean) -- whether the Secure Boot UEFI feature
+>> is built into the firmware image.
+> 
+> Probably useful for upper management (above libvirt), for enabling
+> secure boot key enrollment etc. in the UI.
+> 
+>> (2) SMM_REQUIRE (boolean) -- whether the SMM driver stack is included in
+>> the firmware.
+> 
+> Needed (libvirt must enable smm).
+> 
+>> (3) HTTP_BOOT_ENABLE (boolean) -- whether UEFI HTTP boot is available in
+>> the firmware image, in addition to the default PXE boot.
+> 
+>> (4) TLS_ENABLE (boolean) -- configurable independently of
+>> HTTP_BOOT_ENABLE, but only really makes sense in combination.
+> 
+>> (5) NETWORK_IP6_ENABLE (boolean) -- determines whether IPv6 support is
+>> available.
+> 
+> Do we actually need formal flags for these?  Which application would
+> use them?
+> 
+> For humans this can go into the freeform "description" text field.
+> 
+>> (6) FD_SIZE_IN_KB (one of: 1024, 2048, 4096) -- the size of the combined
+>> firmware image (executable portion and variable store together), in KB.
+> 
+> Hmm, dunno.  Might be useful as varstores are not portable between
+> builds of different sizes, so libvirt could use this for sanity checks.
+> 
+>> (7) DEBUG_ON_SERIAL_PORT (boolean) -- whether OVMF sends its debug
+>> messages to the QEMU debug IO port, or to the serial port.
+> 
+>> (8) SOURCE_DEBUG_ENABLE (boolean) -- whether OVMF includes the edk2
+>> debug agent that allows it to be debugged from a proprietary debugger
+>> program, likely connected via the emulated serial port.
+> 
+>> (9) CSM_ENABLE (boolean) -- whether OVMF includes traditional BIOS
+>> support, by including the SeaBIOS Compatibility Support Module.
+> 
+> Same question as for 3+4+5: Do we really need those?
+> 
+>> Given that the SeaBIOS CSM itself can be built with various
+>> configurations, it might make sense to list further properties when this
+>> property is enabled.
+> 
+> I doubt this is useful, established practice is that people just use
+> seabios directly instead if using the ovmf+csm combo.
+> 
+>> (10) E1000_ENABLE (boolean) -- whether OVMF includes the
+>> non-redistributable, binary only E1000(E) UEFI driver module from Intel
+>> (previously known as "PROEFI", more recently known as "BootUtil").
+> 
+>> (11) USE_OLD_SHELL (boolean) -- whether the UEFI shell implementation
+>> built into OVMF is the old (EDK1 / EFI-1 style) shell which lives in a
+>> separate repository, or the new (EDK2 / UEFI-2 style) shell which lives
+>> within the edk2 project.
+> 
+>> (12) TOOLCHAIN (string): the edk2 toolchain identifier with which the
+>> firmware was built.
+> 
+>> (13) TARGET (one of NOOPT, DEBUG, RELEASE) -- the target for which the
+>> firmware image was built.
+> 
+> Same question as for 3+4+5+7+8+9: Do we really need those?
 
-Michael Clark <mjc@sifive.com> writes:
+I can't judge that. To me all these flags are meaningful. It doesn't
+hurt to keep them spelled out in the metadata; they don't take much
+space, they are easy to ignore, and if someone searches for them, they
+are there.
 
-<snip>
->
-> BTW - I've integrated the following 3 branches into the riscv tree:
->
-> - https://github.com/riscv/riscv-qemu/tree/softfloat-snan-abort-fix
-> - https://github.com/riscv/riscv-qemu/tree/riscv-qemu-upstream-v8.2
-> - https://github.com/michaeljclark/riscv-qemu/tree/qemu-devel
->
-> into our `riscv-all` integration branch, and we're now passing all FPU
-> tests, interestingly, including the NaN-boxing of single precision values
-> into doubles. We'll need to check that the riscv-tests testsuite is
-> exhastive enough... Suprised! I think Richard might have thought about
-> our NaN-boxing
-> issue or some other sort of magic is going on :-)
->
-> - https://github.com/riscv/riscv-qemu/tree/riscv-all
+I'll offer an analogy. Sometimes it would be useful to know the full
+kernel config used on a distro's Live or Installer ISO. Just today I got
+a question off-list as to whether the aarch64 Fedora 28 Live iso has
+CONFIG_ARM64_PMEM enabled or not. I have no clue, but this type of
+question is not far from the domain of "libosinfo" (which basically
+tells you what OS release has drivers for what devices). Is "libfwinfo"
+such a stretch? Maybe. :)
 
-Is the SNaN patch going to get re-posted now it has had a review?
+So, whether this level of detail is useful to end-users and/or
+management applications, I cannot tell; I just wanted to expose the
+"current spectrum" (for OVMF and ArmVirtQemu) in reasonable detail.
 
---
-Alex Benn=C3=A9e
+Thanks
+Laszlo
