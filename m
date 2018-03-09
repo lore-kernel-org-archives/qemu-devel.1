@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <apahim@redhat.com>) id 1euFTl-0002GV-60
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:42:26 -0500
+	(envelope-from <apahim@redhat.com>) id 1euFTo-0002J2-SM
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:42:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <apahim@redhat.com>) id 1euFTk-0001Ob-E4
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:42:25 -0500
+	(envelope-from <apahim@redhat.com>) id 1euFTo-0001RF-1i
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:42:28 -0500
 From: Amador Pahim <apahim@redhat.com>
-Date: Fri,  9 Mar 2018 11:41:50 +0100
-Message-Id: <20180309104151.2431-2-apahim@redhat.com>
+Date: Fri,  9 Mar 2018 11:41:51 +0100
+Message-Id: <20180309104151.2431-3-apahim@redhat.com>
 In-Reply-To: <20180309104151.2431-1-apahim@redhat.com>
 References: <20180309104151.2431-1-apahim@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] qemu-iotests: skip test 205 for
- unsupported formats
+Subject: [Qemu-devel] [PATCH 2/2] qemu-iotests: set exec permission for
+ tests lacking it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,28 +23,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, Amador Pahim <apahim@redhat.com>
 
-Using bochs or cloop, qemu-img will fail with:
-
-  Format driver 'bochs' does not support image creation
+Some tests are not executables. This patch sets the executable
+permission for those tests lacking that.
 
 Signed-off-by: Amador Pahim <apahim@redhat.com>
 ---
- tests/qemu-iotests/205 | 3 +++
- 1 file changed, 3 insertions(+)
+ tests/qemu-iotests/096 | 0
+ tests/qemu-iotests/124 | 0
+ tests/qemu-iotests/129 | 0
+ tests/qemu-iotests/132 | 0
+ tests/qemu-iotests/136 | 0
+ tests/qemu-iotests/139 | 0
+ tests/qemu-iotests/148 | 0
+ tests/qemu-iotests/152 | 0
+ tests/qemu-iotests/163 | 0
+ tests/qemu-iotests/205 | 0
+ 10 files changed, 0 insertions(+), 0 deletions(-)
+ mode change 100644 => 100755 tests/qemu-iotests/096
+ mode change 100644 => 100755 tests/qemu-iotests/124
+ mode change 100644 => 100755 tests/qemu-iotests/129
+ mode change 100644 => 100755 tests/qemu-iotests/132
+ mode change 100644 => 100755 tests/qemu-iotests/136
+ mode change 100644 => 100755 tests/qemu-iotests/139
+ mode change 100644 => 100755 tests/qemu-iotests/148
+ mode change 100644 => 100755 tests/qemu-iotests/152
+ mode change 100644 => 100755 tests/qemu-iotests/163
+ mode change 100644 => 100755 tests/qemu-iotests/205
 
+diff --git a/tests/qemu-iotests/096 b/tests/qemu-iotests/096
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/124 b/tests/qemu-iotests/124
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/129 b/tests/qemu-iotests/129
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/132 b/tests/qemu-iotests/132
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/136 b/tests/qemu-iotests/136
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/139 b/tests/qemu-iotests/139
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/148 b/tests/qemu-iotests/148
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/152 b/tests/qemu-iotests/152
+old mode 100644
+new mode 100755
+diff --git a/tests/qemu-iotests/163 b/tests/qemu-iotests/163
+old mode 100644
+new mode 100755
 diff --git a/tests/qemu-iotests/205 b/tests/qemu-iotests/205
-index e7b2eae51d..fff9be97d2 100644
---- a/tests/qemu-iotests/205
-+++ b/tests/qemu-iotests/205
-@@ -24,6 +24,9 @@ import iotests
- import time
- from iotests import qemu_img_create, qemu_io, filter_qemu_io, QemuIoInteractive
- 
-+
-+iotests.verify_image_format(unsupported_fmts=['bochs', 'cloop'])
-+
- nbd_sock = 'nbd_sock'
- nbd_uri = 'nbd+unix:///exp?socket=' + nbd_sock
- disk = os.path.join(iotests.test_dir, 'disk')
+old mode 100644
+new mode 100755
 -- 
 2.14.3
