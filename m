@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1euKlJ-0001Ux-2r
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:54 -0500
+	(envelope-from <kwolf@redhat.com>) id 1euKlJ-0001VS-ED
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1euKlC-0007IA-Nh
+	(envelope-from <kwolf@redhat.com>) id 1euKlG-0007Ln-2y
 	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:53 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  9 Mar 2018 17:19:18 +0100
-Message-Id: <20180309161933.8168-42-kwolf@redhat.com>
+Date: Fri,  9 Mar 2018 17:19:23 +0100
+Message-Id: <20180309161933.8168-47-kwolf@redhat.com>
 In-Reply-To: <20180309161933.8168-1-kwolf@redhat.com>
 References: <20180309161933.8168-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 41/56] nfs: Support .bdrv_co_create
+Subject: [Qemu-devel] [PULL 46/56] ssh: Pass BlockdevOptionsSsh to
+ connect_to_ssh()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,189 +23,129 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-This adds the .bdrv_co_create driver callback to nfs, which enables
-image creation over QMP.
+Move the parsing of the QDict options up to the callers, in preparation
+for the .bdrv_co_create implementation that directly gets a QAPI type.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json | 16 ++++++++++-
- block/nfs.c          | 76 +++++++++++++++++++++++++++++++++++++++++-----------
- 2 files changed, 75 insertions(+), 17 deletions(-)
+ block/ssh.c | 34 +++++++++++++++++++++-------------
+ 1 file changed, 21 insertions(+), 13 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index d4351877fc..39e53c7791 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3393,6 +3393,20 @@
-             '*preallocation':   'PreallocMode' } }
- 
- ##
-+# @BlockdevCreateOptionsNfs:
-+#
-+# Driver specific image creation options for NFS.
-+#
-+# @location         Where to store the new image file
-+# @size             Size of the virtual disk in bytes
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'BlockdevCreateOptionsNfs',
-+  'data': { 'location':         'BlockdevOptionsNfs',
-+            'size':             'size' } }
-+
-+##
- # @BlockdevQcow2Version:
- #
- # @v2:  The original QCOW2 format as introduced in qemu 0.10 (version 2)
-@@ -3491,7 +3505,7 @@
-       'iscsi':          'BlockdevCreateNotSupported',
-       'luks':           'BlockdevCreateNotSupported',
-       'nbd':            'BlockdevCreateNotSupported',
--      'nfs':            'BlockdevCreateNotSupported',
-+      'nfs':            'BlockdevCreateOptionsNfs',
-       'null-aio':       'BlockdevCreateNotSupported',
-       'null-co':        'BlockdevCreateNotSupported',
-       'nvme':           'BlockdevCreateNotSupported',
-diff --git a/block/nfs.c b/block/nfs.c
-index e402d643fe..2577df4b26 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -551,33 +551,45 @@ out:
-     return ret;
+diff --git a/block/ssh.c b/block/ssh.c
+index 30cdf9a99f..80f59055cc 100644
+--- a/block/ssh.c
++++ b/block/ssh.c
+@@ -656,19 +656,13 @@ fail:
+     return result;
  }
  
--static int64_t nfs_client_open_qdict(NFSClient *client, QDict *options,
--                                     int flags, int open_flags, Error **errp)
-+static BlockdevOptionsNfs *nfs_options_qdict_to_qapi(QDict *options,
-+                                                     Error **errp)
+-static int connect_to_ssh(BDRVSSHState *s, QDict *options,
++static int connect_to_ssh(BDRVSSHState *s, BlockdevOptionsSsh *opts,
+                           int ssh_flags, int creat_mode, Error **errp)
  {
-     BlockdevOptionsNfs *opts = NULL;
-     QObject *crumpled = NULL;
-     Visitor *v;
-     Error *local_err = NULL;
--    int ret;
+-    BlockdevOptionsSsh *opts;
+     int r, ret;
+     const char *user;
+     long port = 0;
  
-     crumpled = qdict_crumple(options, errp);
-     if (crumpled == NULL) {
+-    opts = ssh_parse_options(options, errp);
+-    if (opts == NULL) {
 -        return -EINVAL;
-+        return NULL;
+-    }
+-
+     if (opts->has_user) {
+         user = opts->user;
+     } else {
+@@ -748,8 +742,6 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
+         goto err;
      }
  
-     v = qobject_input_visitor_new_keyval(crumpled);
-     visit_type_BlockdevOptionsNfs(v, NULL, &opts, &local_err);
-     visit_free(v);
-+    qobject_decref(crumpled);
- 
-     if (local_err) {
--        error_propagate(errp, local_err);
-+        return NULL;
-+    }
-+
-+    return opts;
-+}
-+
-+static int64_t nfs_client_open_qdict(NFSClient *client, QDict *options,
-+                                     int flags, int open_flags, Error **errp)
-+{
-+    BlockdevOptionsNfs *opts;
-+    int ret;
-+
-+    opts = nfs_options_qdict_to_qapi(options, errp);
-+    if (opts == NULL) {
-         ret = -EINVAL;
-         goto fail;
+-    qapi_free_BlockdevOptionsSsh(opts);
+-
+     r = libssh2_sftp_fstat(s->sftp_handle, &s->attrs);
+     if (r < 0) {
+         sftp_error_setg(errp, s, "failed to read file attributes");
+@@ -775,8 +767,6 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
      }
+     s->session = NULL;
  
-     ret = nfs_client_open(client, opts, flags, open_flags, errp);
- fail:
--    qobject_decref(crumpled);
-     qapi_free_BlockdevOptionsNfs(opts);
+-    qapi_free_BlockdevOptionsSsh(opts);
+-
      return ret;
  }
-@@ -614,18 +626,43 @@ static QemuOptsList nfs_create_opts = {
-     }
- };
  
--static int coroutine_fn nfs_file_co_create_opts(const char *url, QemuOpts *opts,
--                                                Error **errp)
-+static int nfs_file_co_create(BlockdevCreateOptions *options, Error **errp)
+@@ -784,6 +774,7 @@ static int ssh_file_open(BlockDriverState *bs, QDict *options, int bdrv_flags,
+                          Error **errp)
  {
--    int64_t ret, total_size;
-+    BlockdevCreateOptionsNfs *opts = &options->u.nfs;
-     NFSClient *client = g_new0(NFSClient, 1);
--    QDict *options = NULL;
-+    int ret;
-+
-+    assert(options->driver == BLOCKDEV_DRIVER_NFS);
+     BDRVSSHState *s = bs->opaque;
++    BlockdevOptionsSsh *opts;
+     int ret;
+     int ssh_flags;
  
-     client->aio_context = qemu_get_aio_context();
+@@ -794,8 +785,13 @@ static int ssh_file_open(BlockDriverState *bs, QDict *options, int bdrv_flags,
+         ssh_flags |= LIBSSH2_FXF_WRITE;
+     }
  
-+    ret = nfs_client_open(client, opts->location, O_CREAT, 0, errp);
-+    if (ret < 0) {
-+        goto out;
++    opts = ssh_parse_options(options, errp);
++    if (opts == NULL) {
++        return -EINVAL;
 +    }
-+    ret = nfs_ftruncate(client->context, client->fh, opts->size);
-+    nfs_client_close(client);
 +
-+out:
-+    g_free(client);
-+    return ret;
-+}
-+
-+static int coroutine_fn nfs_file_co_create_opts(const char *url, QemuOpts *opts,
-+                                                Error **errp)
-+{
-+    BlockdevCreateOptions *create_options;
-+    BlockdevCreateOptionsNfs *nfs_opts;
-+    QDict *options;
-+    int ret;
-+
-+    create_options = g_new0(BlockdevCreateOptions, 1);
-+    create_options->driver = BLOCKDEV_DRIVER_NFS;
-+    nfs_opts = &create_options->u.nfs;
-+
-     /* Read out options */
--    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
--                          BDRV_SECTOR_SIZE);
-+    nfs_opts->size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
-+                              BDRV_SECTOR_SIZE);
+     /* Start up SSH. */
+-    ret = connect_to_ssh(s, options, ssh_flags, 0, errp);
++    ret = connect_to_ssh(s, opts, ssh_flags, 0, errp);
+     if (ret < 0) {
+         goto err;
+     }
+@@ -803,6 +799,8 @@ static int ssh_file_open(BlockDriverState *bs, QDict *options, int bdrv_flags,
+     /* Go non-blocking. */
+     libssh2_session_set_blocking(s->session, 0);
  
-     options = qdict_new();
-     ret = nfs_parse_uri(url, options, errp);
-@@ -633,15 +670,21 @@ static int coroutine_fn nfs_file_co_create_opts(const char *url, QemuOpts *opts,
++    qapi_free_BlockdevOptionsSsh(opts);
++
+     return 0;
+ 
+  err:
+@@ -811,6 +809,8 @@ static int ssh_file_open(BlockDriverState *bs, QDict *options, int bdrv_flags,
+     }
+     s->sock = -1;
+ 
++    qapi_free_BlockdevOptionsSsh(opts);
++
+     return ret;
+ }
+ 
+@@ -860,6 +860,7 @@ static int coroutine_fn ssh_co_create_opts(const char *filename, QemuOpts *opts,
+     int r, ret;
+     int64_t total_size = 0;
+     QDict *uri_options = NULL;
++    BlockdevOptionsSsh *ssh_opts = NULL;
+     BDRVSSHState s;
+ 
+     ssh_state_init(&s);
+@@ -876,7 +877,13 @@ static int coroutine_fn ssh_co_create_opts(const char *filename, QemuOpts *opts,
          goto out;
      }
  
--    ret = nfs_client_open_qdict(client, options, O_CREAT, 0, errp);
-+    nfs_opts->location = nfs_options_qdict_to_qapi(options, errp);
-+    if (nfs_opts->location == NULL) {
+-    r = connect_to_ssh(&s, uri_options,
++    ssh_opts = ssh_parse_options(uri_options, errp);
++    if (ssh_opts == NULL) {
 +        ret = -EINVAL;
 +        goto out;
 +    }
 +
-+    ret = nfs_file_co_create(create_options, errp);
-     if (ret < 0) {
-         goto out;
++    r = connect_to_ssh(&s, ssh_opts,
+                        LIBSSH2_FXF_READ|LIBSSH2_FXF_WRITE|
+                        LIBSSH2_FXF_CREAT|LIBSSH2_FXF_TRUNC,
+                        0644, errp);
+@@ -899,6 +906,7 @@ static int coroutine_fn ssh_co_create_opts(const char *filename, QemuOpts *opts,
+     if (uri_options != NULL) {
+         QDECREF(uri_options);
      }
--    ret = nfs_ftruncate(client->context, client->fh, total_size);
--    nfs_client_close(client);
-+
-+    ret = 0;
- out:
-     QDECREF(options);
--    g_free(client);
-+    qapi_free_BlockdevCreateOptions(create_options);
++    qapi_free_BlockdevOptionsSsh(ssh_opts);
      return ret;
  }
- 
-@@ -828,6 +871,7 @@ static BlockDriver bdrv_nfs = {
- 
-     .bdrv_file_open                 = nfs_file_open,
-     .bdrv_close                     = nfs_file_close,
-+    .bdrv_co_create                 = nfs_file_co_create,
-     .bdrv_co_create_opts            = nfs_file_co_create_opts,
-     .bdrv_reopen_prepare            = nfs_reopen_prepare,
  
 -- 
 2.13.6
