@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1euE8k-0004B0-Uj
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:39 -0500
+	(envelope-from <peterx@redhat.com>) id 1euE8l-0004Bj-Jb
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1euE8h-0006Ef-Nw
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:38 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59404 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1euE8k-0006Fa-Ob
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:39 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60714 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1euE8h-0006E3-Iz
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:35 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1euE8k-0006FS-KG
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:16:38 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Fri,  9 Mar 2018 17:15:29 +0800
-Message-Id: <20180309091535.13315-18-peterx@redhat.com>
+Date: Fri,  9 Mar 2018 17:15:30 +0800
+Message-Id: <20180309091535.13315-19-peterx@redhat.com>
 In-Reply-To: <20180309091535.13315-1-peterx@redhat.com>
 References: <20180309091535.13315-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 17/23] migration: setup ramstate for resume
+Subject: [Qemu-devel] [PATCH v7 18/23] migration: final handshake for the
+ resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,90 +27,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-After we updated the dirty bitmaps of ramblocks, we also need to update
-the critical fields in RAMState to make sure it is ready for a resume.
+Finish the last step to do the final handshake for the recovery.
 
+First source sends one MIG_CMD_RESUME to dst, telling that source is
+ready to resume.
+
+Then, dest replies with MIG_RP_MSG_RESUME_ACK to source, telling that
+dest is ready to resume (after switch to postcopy-active state).
+
+When source received the RESUME_ACK, it switches its state to
+postcopy-active, and finally the recovery is completed.
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/ram.c        | 45 ++++++++++++++++++++++++++++++++++++++++++++-
- migration/trace-events |  1 +
- 2 files changed, 45 insertions(+), 1 deletion(-)
+ migration/migration.c | 28 ++++++++++++++++++++++++----
+ 1 file changed, 24 insertions(+), 4 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 196b1ba876..5cd9f43728 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2254,6 +2254,41 @@ static int ram_init_all(RAMState **rsp)
+diff --git a/migration/migration.c b/migration/migration.c
+index 71e4195422..17578e2731 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1853,7 +1853,8 @@ static int migrate_handle_rp_resume_ack(MigrationState *s, uint32_t value)
+     migrate_set_state(&s->state, MIGRATION_STATUS_POSTCOPY_RECOVER,
+                       MIGRATION_STATUS_POSTCOPY_ACTIVE);
+ 
+-    /* TODO: notify send thread that time to continue send pages */
++    /* Notify send thread that time to continue send pages */
++    qemu_sem_post(&s->rp_state.rp_sem);
+ 
      return 0;
  }
+@@ -2380,6 +2381,21 @@ typedef enum MigThrError {
+     MIG_THR_ERR_FATAL = 2,
+ } MigThrError;
  
-+static void ram_state_resume_prepare(RAMState *rs, QEMUFile *out)
++static int postcopy_resume_handshake(MigrationState *s)
 +{
-+    RAMBlock *block;
-+    uint64_t pages = 0;
++    qemu_savevm_send_postcopy_resume(s->to_dst_file);
 +
-+    /*
-+     * Postcopy is not using xbzrle/compression, so no need for that.
-+     * Also, since source are already halted, we don't need to care
-+     * about dirty page logging as well.
-+     */
-+
-+    RAMBLOCK_FOREACH(block) {
-+        pages += bitmap_count_one(block->bmap,
-+                                  block->used_length >> TARGET_PAGE_BITS);
++    while (s->state == MIGRATION_STATUS_POSTCOPY_RECOVER) {
++        qemu_sem_wait(&s->rp_state.rp_sem);
 +    }
 +
-+    /* This may not be aligned with current bitmaps. Recalculate. */
-+    rs->migration_dirty_pages = pages;
++    if (s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
++        return 0;
++    }
 +
-+    rs->last_seen_block = NULL;
-+    rs->last_sent_block = NULL;
-+    rs->last_page = 0;
-+    rs->last_version = ram_list.version;
-+    /*
-+     * Disable the bulk stage, otherwise we'll resend the whole RAM no
-+     * matter what we have sent.
-+     */
-+    rs->ram_bulk_stage = false;
-+
-+    /* Update RAMState cache of output QEMUFile */
-+    rs->f = out;
-+
-+    trace_ram_state_resume_prepare(pages);
++    return -1;
 +}
 +
- /*
-  * Each of ram_save_setup, ram_save_iterate and ram_save_complete has
-  * long-running RCU critical section.  When rcu-reclaims in the code
-@@ -3182,8 +3217,16 @@ out:
- static int ram_resume_prepare(MigrationState *s, void *opaque)
+ /* Return zero if success, or <0 for error */
+ static int postcopy_do_resume(MigrationState *s)
  {
-     RAMState *rs = *(RAMState **)opaque;
-+    int ret;
+@@ -2397,10 +2413,14 @@ static int postcopy_do_resume(MigrationState *s)
+     }
  
--    return ram_dirty_bitmap_sync_all(s, rs);
-+    ret = ram_dirty_bitmap_sync_all(s, rs);
+     /*
+-     * TODO: handshake with dest using MIG_CMD_RESUME,
+-     * MIG_RP_MSG_RESUME_ACK, then switch source state to
+-     * "postcopy-active"
++     * Last handshake with destination on the resume (destination will
++     * switch to postcopy-active afterwards)
+      */
++    ret = postcopy_resume_handshake(s);
 +    if (ret) {
++        error_report("%s: handshake failed: %d", __func__, ret);
 +        return ret;
 +    }
-+
-+    ram_state_resume_prepare(rs, s->to_dst_file);
-+
-+    return 0;
+ 
+     return 0;
  }
- 
- static SaveVMHandlers savevm_ram_handlers = {
-diff --git a/migration/trace-events b/migration/trace-events
-index 45b1d89217..f5913ff51c 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -88,6 +88,7 @@ ram_dirty_bitmap_reload_complete(char *str) "%s"
- ram_dirty_bitmap_sync_start(void) ""
- ram_dirty_bitmap_sync_wait(void) ""
- ram_dirty_bitmap_sync_complete(void) ""
-+ram_state_resume_prepare(long v) "%ld"
- 
- # migration/migration.c
- await_return_path_close_on_source_close(void) ""
 -- 
 2.14.3
