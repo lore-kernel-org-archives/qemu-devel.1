@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1euIDR-0004wg-Ud
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:37:47 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1euIDv-0005E2-Ca
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:38:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1euIDO-000057-Pa
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:37:45 -0500
-Resent-Message-Id: <E1euIDO-000057-Pa@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21107)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1euIDO-0008W7-Ic
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:37:42 -0500
-In-Reply-To: <20180309132922.24211-1-pbonzini@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152060263771.1494.1588062613505239337@bdbb90650ae5>
+	(envelope-from <peter.maydell@linaro.org>) id 1euIDu-0000KV-Jk
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:38:15 -0500
+Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:38334)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1euIDu-0000KD-DY
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:38:14 -0500
+Received: by mail-oi0-x230.google.com with SMTP id h23so6974933oib.5
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 05:38:14 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 9 Mar 2018 05:37:18 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/4] Optionally use membarrier system call
- for RCU
+In-Reply-To: <d8fbbd0d-3e15-92b2-9e26-fb0103abe65f@redhat.com>
+References: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
+	<1518893216-9983-5-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA871Ju5cV8EYiXEg65Rofh=Pn2=2h8wy4-QXj-wUzoj+g@mail.gmail.com>
+	<d8fbbd0d-3e15-92b2-9e26-fb0103abe65f@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 9 Mar 2018 13:37:53 +0000
+Message-ID: <CAFEAcA-XzeLWfb5tjHYF=3LQbeMge2yaEYRPqeMLn72u0xJ+kg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v9 04/14] hw/arm/smmuv3: Skeleton
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, cota@braap.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMzA5MTMyOTIyLjI0MjExLTEtcGJvbnppbmlAcmVkaGF0LmNvbQpTdWJq
-ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNF0gT3B0aW9uYWxseSB1c2UgbWVtYmFycmllciBz
-eXN0ZW0gY2FsbCBmb3IgUkNVCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
-CgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1s
-KQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
-b3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
-ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
-SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
-Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
-aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
-PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
-YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
-Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAg
-ICAgICBwYXRjaGV3LzIwMTgwMzA5MTMyOTIyLjI0MjExLTEtcGJvbnppbmlAcmVkaGF0LmNvbSAt
-PiBwYXRjaGV3LzIwMTgwMzA5MTMyOTIyLjI0MjExLTEtcGJvbnppbmlAcmVkaGF0LmNvbQpTd2l0
-Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjI5MTJkNzIxY2UgbWVtYmFycmllcjogYWRkIC0t
-ZW5hYmxlLW1lbWJhcnJpZXIKNWYwZjU3NTNjYyBtZW1iYXJyaWVyOiBpbnRyb2R1Y2UgcWVtdS9z
-eXNfbWVtYmFycmllci5oCjhhY2IwZWNmOTAgcmN1OiBtYWtlIG1lbW9yeSBiYXJyaWVycyBtb3Jl
-IGV4cGxpY2l0CjdjNTA2YjlkNWQgcmN1dG9ydHVyZTogcmVtb3ZlIHN5bmNocm9uaXplX3JjdSBm
-cm9tIHJlYWRlcnMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNDogcmN1
-dG9ydHVyZTogcmVtb3ZlIHN5bmNocm9uaXplX3JjdSBmcm9tIHJlYWRlcnMuLi4KQ2hlY2tpbmcg
-UEFUQ0ggMi80OiByY3U6IG1ha2UgbWVtb3J5IGJhcnJpZXJzIG1vcmUgZXhwbGljaXQuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMy80OiBtZW1iYXJyaWVyOiBpbnRyb2R1Y2UgcWVtdS9zeXNfbWVtYmFycmll
-ci5oLi4uCkVSUk9SOiBtZW1vcnkgYmFycmllciB3aXRob3V0IGNvbW1lbnQKIzcwOiBGSUxFOiBp
-bmNsdWRlL3FlbXUvc3lzX21lbWJhcnJpZXIuaDoxNDoKKyNkZWZpbmUgc21wX21iX2dsb2JhbCgp
-ICAgICAgICAgICAgc21wX21iKCkKCkVSUk9SOiBtZW1vcnkgYmFycmllciB3aXRob3V0IGNvbW1l
-bnQKIzcxOiBGSUxFOiBpbmNsdWRlL3FlbXUvc3lzX21lbWJhcnJpZXIuaDoxNToKKyNkZWZpbmUg
-c21wX21iX3BsYWNlaG9sZGVyKCkgICAgICAgc21wX21iKCkKCnRvdGFsOiAyIGVycm9ycywgMCB3
-YXJuaW5ncywgNzcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNC80OiBtZW1iYXJyaWVyOiBhZGQgLS1lbmFibGUtbWVt
-YmFycmllci4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTkwOiBGSUxFOiB1
-dGlsL3N5c19tZW1iYXJyaWVyLmM6NDU6CisgICAgICAgIGVycm9yX3JlcG9ydCgiVGhpcyBRRU1V
-IGJpbmFyeSByZXF1aXJlcyBNRU1CQVJSSUVSX0NNRF9TSEFSRUQgc3VwcG9ydC4iKTsKCnRvdGFs
-OiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTUyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
-ZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
-eSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
-ayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On 9 March 2018 at 13:19, Auger Eric <eric.auger@redhat.com> wrote:
+> On 08/03/18 15:27, Peter Maydell wrote:
+>> Consider specifically catching 8-byte accesses to non-64-bit registers?
+>> This is CONSTRAINED UNPREDICTABLE (see spec section 6.2), and "one
+>> of the registers is read/written and other half is RAZ/WI" is permitted
+>> behaviour, but it does mean you need to be a little careful about not
+>> letting the top 32 bits of val become non-zero for the 32-bit register
+>> codepaths. Logging bad 64-bit accesses as LOG_GUEST_ERROR and making
+>> them RAZ/WI might be nicer for guest software developers.
+>
+> I moved to ops with attrs and if a 64-bit access is attempted on
+> something not a 64b reg base, I return an error + log a guest error.
+
+Ah, you probably don't want to return MEMTX_ERROR, because that
+becomes a guest CPU external-abort exception. An abort is listed
+as one of the permitted constrained-unpredictable behaviours for
+bad 64-bit accesses, but there is a note that "strongly recommends"
+not to abort for cases where the registers might be used by software
+associated with lower exception levels. Rather than trying to decide
+which registers do or don't get to return MEMTX_ERROR, it's probably
+easier just to RAZ/WI and return MEMTX_OK.
+
+(We had to fix a bug like this in the gicv3 in commits f1945632b43e3
+and 0cf09852015e when we started making MEMTX_ERROR generate aborts,
+though in that case the spec is more definite that abort is not a
+permitted behaviour.)
+
+thanks
+-- PMM
