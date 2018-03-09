@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1euDv5-0000cH-La
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:02:34 -0500
+	(envelope-from <bounces@canonical.com>) id 1euE7n-0003LI-VP
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:15:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1euDuz-0000PF-NH
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:02:31 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44940 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1euDuz-0000P5-HO
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:02:25 -0500
-From: Peter Xu <peterx@redhat.com>
-Date: Fri,  9 Mar 2018 17:00:06 +0800
-Message-Id: <20180309090006.10018-24-peterx@redhat.com>
-In-Reply-To: <20180309090006.10018-1-peterx@redhat.com>
-References: <20180309090006.10018-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 23/23] tests: qmp-test: add oob test
+	(envelope-from <bounces@canonical.com>) id 1euE7j-0005UW-0k
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:15:39 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48392)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1euE7i-0005U5-Qy
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:15:34 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1euE7h-0007xU-S4
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 09:15:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D20232E80C9
+	for <qemu-devel@nongnu.org>; Fri,  9 Mar 2018 09:15:33 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 09 Mar 2018 09:07:53 -0000
+From: eezacque <eezacque@xs4all.nl>
+Reply-To: Bug 1754597 <1754597@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <152058647369.4543.14826209514925164924.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1754597] [NEW] qemu-system-x86_64 broken on
+ ubuntu 17.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,101 +37,97 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Test the new OOB capability.  Here we used the new "x-oob-test" command.
-Firstly, we send a lock=true and oob=false command to hang the main
-thread.  Then send another lock=false and oob=true command (which will
-be run inside parser this time) to free that hanged command.
+Public bug reported:
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- tests/qmp-test.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 65 insertions(+)
+I have run a virtual machine over the past three years without problems,
+but the update to Ubuntu 17.10 broke it: the machine falls into an
+infinite boot loop.
 
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index caf3ec4a78..4c591cbc80 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -164,6 +164,70 @@ static void test_qmp_protocol(void)
-     qtest_quit(qts);
- }
- 
-+/* Tests for Out-Of-Band support. */
-+static void test_qmp_oob(void)
-+{
-+    QDict *resp;
-+    int acks = 0;
-+    const char *cmd_id;
-+
-+    global_qtest = qtest_init_without_qmp_handshake(common_args);
-+
-+    /* Ignore the greeting message. */
-+    resp = qmp_receive();
-+    g_assert(qdict_get_qdict(resp, "QMP"));
-+    QDECREF(resp);
-+
-+    /* Try a fake capability, it should fail. */
-+    resp = qmp("{ 'execute': 'qmp_capabilities', "
-+               "  'arguments': { 'enable': [ 'cap-does-not-exist' ] } }");
-+    g_assert(qdict_haskey(resp, "error"));
-+    QDECREF(resp);
-+
-+    /* Now, enable OOB in current QMP session, it should success. */
-+    resp = qmp("{ 'execute': 'qmp_capabilities', "
-+               "  'arguments': { 'enable': [ 'oob' ] } }");
-+    g_assert(qdict_haskey(resp, "return"));
-+    QDECREF(resp);
-+
-+    /*
-+     * Try any command that does not support OOB but with OOB flag. We
-+     * should get failure.
-+     */
-+    resp = qmp("{ 'execute': 'query-cpus',"
-+               "  'control': { 'run-oob': true } }");
-+    g_assert(qdict_haskey(resp, "error"));
-+    QDECREF(resp);
-+
-+    /*
-+     * Firstly send the "x-oob-test" command with lock=true and
-+     * oob=false, it should hang the dispatcher and main thread;
-+     * later, we send another lock=false with oob=true to continue
-+     * that thread processing.  Finally we should receive replies from
-+     * both commands.
-+     */
-+    qmp_async("{ 'execute': 'x-oob-test',"
-+              "  'arguments': { 'lock': true }, "
-+              "  'id': 'lock-cmd'}");
-+    qmp_async("{ 'execute': 'x-oob-test', "
-+              "  'arguments': { 'lock': false }, "
-+              "  'control': { 'run-oob': true }, "
-+              "  'id': 'unlock-cmd' }");
-+
-+    /* Ignore all events.  Wait for 2 acks */
-+    while (acks < 2) {
-+        resp = qmp_receive();
-+        cmd_id = qdict_get_str(resp, "id");
-+        if (!g_strcmp0(cmd_id, "lock-cmd") ||
-+            !g_strcmp0(cmd_id, "unlock-cmd")) {
-+            acks++;
-+        }
-+        QDECREF(resp);
-+    }
-+
-+    qtest_end();
-+}
-+
- static int query_error_class(const char *cmd)
- {
-     static struct {
-@@ -343,6 +407,7 @@ int main(int argc, char *argv[])
-     g_test_init(&argc, &argv, NULL);
- 
-     qtest_add_func("qmp/protocol", test_qmp_protocol);
-+    qtest_add_func("qmp/oob", test_qmp_oob);
-     qmp_schema_init(&schema);
-     add_query_tests(&schema);
- 
--- 
-2.14.3
+$ qemu-system-x86_64 --version
+QEMU emulator version 2.10.1(Debian 1:2.10+dfsg-0ubuntu3.5)
+
+$ sudo qemu-system-x86_64 -enable-kvm -usb \
+    -chardev stdio,id=3Dchar0 \
+    -device usb-host,vendorid=3D0x056a,productid=3D0x00c6 \
+    -device usb-host,vendorid=3D0x04a9,productid=3D0x2220 \
+    -soundhw all \
+    -m 2048 -cpu core2duo -machine q35  \
+    -smp 2 \
+    -device usb-mouse  \
+    -vga std  \
+    -device isa-applesmc,osk=3D"CONFIDENTIAL" \
+    -smbios type=3D2 \
+    -device ide-drive,bus=3Dide.0,drive=3DHDD \
+    -drive id=3DHDD,if=3Dnone,cache=3Dnone,file=3Dhdd.img \
+    -device ide-drive,bus=3Dide.3,drive=3DScrapHDD \
+    -drive id=3DScrapHDD,if=3Dnone,cache=3Dnone,file=3Dscrap.img \
+    -netdev tap,id=3Dnet0,ifname=3Dtap0,script=3Dno \
+    -device e1000,netdev=3Dnet0,id=3Dnic0,mac=3D00:aa:00:60:00:01
+
+$ uname -a
+Linux behemoth 4.13.0-36-generic #40-Ubuntu SMP Fri Feb 16 20:07:48 UTC 201=
+8 x86_64 x86_64 x86_64 GNU/Linux
+
+$ lsb_release -a
+No LSB modules are available.
+Distributor ID:	Ubuntu
+Description:	Ubuntu 17.10
+Release:	17.10
+Codename:	artful
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1754597
+
+Title:
+  qemu-system-x86_64 broken on ubuntu 17.10
+
+Status in QEMU:
+  New
+
+Bug description:
+  I have run a virtual machine over the past three years without
+  problems, but the update to Ubuntu 17.10 broke it: the machine falls
+  into an infinite boot loop.
+
+  $ qemu-system-x86_64 --version
+  QEMU emulator version 2.10.1(Debian 1:2.10+dfsg-0ubuntu3.5)
+
+  $ sudo qemu-system-x86_64 -enable-kvm -usb \
+      -chardev stdio,id=3Dchar0 \
+      -device usb-host,vendorid=3D0x056a,productid=3D0x00c6 \
+      -device usb-host,vendorid=3D0x04a9,productid=3D0x2220 \
+      -soundhw all \
+      -m 2048 -cpu core2duo -machine q35  \
+      -smp 2 \
+      -device usb-mouse  \
+      -vga std  \
+      -device isa-applesmc,osk=3D"CONFIDENTIAL" \
+      -smbios type=3D2 \
+      -device ide-drive,bus=3Dide.0,drive=3DHDD \
+      -drive id=3DHDD,if=3Dnone,cache=3Dnone,file=3Dhdd.img \
+      -device ide-drive,bus=3Dide.3,drive=3DScrapHDD \
+      -drive id=3DScrapHDD,if=3Dnone,cache=3Dnone,file=3Dscrap.img \
+      -netdev tap,id=3Dnet0,ifname=3Dtap0,script=3Dno \
+      -device e1000,netdev=3Dnet0,id=3Dnic0,mac=3D00:aa:00:60:00:01
+
+  $ uname -a
+  Linux behemoth 4.13.0-36-generic #40-Ubuntu SMP Fri Feb 16 20:07:48 UTC 2=
+018 x86_64 x86_64 x86_64 GNU/Linux
+
+  $ lsb_release -a
+  No LSB modules are available.
+  Distributor ID:	Ubuntu
+  Description:	Ubuntu 17.10
+  Release:	17.10
+  Codename:	artful
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1754597/+subscriptions
