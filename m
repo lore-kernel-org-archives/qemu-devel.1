@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1euOdL-00007R-Iw
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:28:56 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1euOdP-0000Bn-8p
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:29:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1euOdK-0006tA-Gu
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:28:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55556)
+	(envelope-from <ehabkost@redhat.com>) id 1euOdO-0006ug-Fe
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:28:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50548)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1euOdK-0006sv-8m
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:28:54 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1euOdO-0006uR-AW
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:28:58 -0500
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri,  9 Mar 2018 17:28:25 -0300
-Message-Id: <20180309202827.12085-7-ehabkost@redhat.com>
+Date: Fri,  9 Mar 2018 17:28:27 -0300
+Message-Id: <20180309202827.12085-9-ehabkost@redhat.com>
 In-Reply-To: <20180309202827.12085-1-ehabkost@redhat.com>
 References: <20180309202827.12085-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH 6/8] device-crash-test: Use WARN for known
- crashes
+Subject: [Qemu-devel] [PATCH 8/8] tests: Run device-crash-test on "make
+ check"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,68 +27,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Cleber Rosa <crosa@redhat.com>
 
-We're going to run device-crash-test on "make check", so it's
-better to make the script less noisy on known errors.
+Run a subset of tests using device-crash-test on "make check", to
+help us catch device crashes earlier.
+
+This also add a "check-device-crash-test-full" rule, that will
+check all machine/device combinations.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/device-crash-test | 44 ++++++++++++++++++++++----------------------
- 1 file changed, 22 insertions(+), 22 deletions(-)
+ tests/Makefile.include | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/device-crash-test b/scripts/device-crash-test
-index f406890519..ed9a552fa1 100755
---- a/scripts/device-crash-test
-+++ b/scripts/device-crash-test
-@@ -228,28 +228,28 @@ ERROR_WHITELIST = [
-     {'exitcode':1, 'loglevel':logging.INFO},
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index ef9b88c369..0ba641b8d4 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -942,6 +942,17 @@ check-decodetree:
+           ./check.sh "$(PYTHON)" "$(SRC_PATH)/scripts/decodetree.py", \
+           TEST, decodetree.py)
  
-     # KNOWN CRASHES:
--    # Known crashes will generate error messages, but won't be fatal.
--    # Those entries must be removed once we fix the crashes.
--    {'exitcode':-6, 'log':r"Device 'serial0' is in use", 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r"qemu_net_client_setup: Assertion `!peer->peer' failed", 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r'RAMBlock "[\w.-]+" already registered', 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r"find_ram_offset: Assertion `size != 0' failed.", 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r"add_cpreg_to_hashtable: code should not be reached", 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r"qemu_alloc_display: Assertion `surface->image != NULL' failed", 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r"Unexpected error in error_set_from_qdev_prop_error", 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r"Object .* is not an instance of type spapr-machine", 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r"Object .* is not an instance of type generic-pc-machine", 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r"Object .* is not an instance of type e500-ccsr", 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r"vmstate_register_with_alias_id: Assertion `!se->compat \|\| se->instance_id == 0' failed", 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'device':'isa-fdc', 'loglevel':logging.ERROR, 'expected':True},
--    {'exitcode':-11, 'device':'gus', 'loglevel':logging.ERROR, 'expected':True},
--    {'exitcode':-11, 'device':'isa-serial', 'loglevel':logging.ERROR, 'expected':True},
--    {'exitcode':-11, 'device':'sb16', 'loglevel':logging.ERROR, 'expected':True},
--    {'exitcode':-11, 'device':'cs4231a', 'loglevel':logging.ERROR, 'expected':True},
--    {'exitcode':-11, 'machine':'isapc', 'device':'.*-iommu', 'loglevel':logging.ERROR, 'expected':True},
--    {'exitcode':-11, 'device':'mioe3680_pci', 'loglevel':logging.ERROR, 'expected':True},
--    {'exitcode':-11, 'device':'pcm3680_pci', 'loglevel':logging.ERROR, 'expected':True},
--    {'exitcode':-11, 'device':'kvaser_pci', 'loglevel':logging.ERROR, 'expected':True},
-+    # Known crashes will generate warn messages
-+    # FIXME: all those crashes MUST be fixed, and all these entries MUST be removed
-+    {'exitcode':-6, 'log':r"Device 'serial0' is in use", 'loglevel':logging.WARN},
-+    {'exitcode':-6, 'log':r"qemu_net_client_setup: Assertion `!peer->peer' failed", 'loglevel':logging.WARN},
-+    {'exitcode':-6, 'log':r'RAMBlock "[\w.-]+" already registered', 'loglevel':logging.WARN},
-+    {'exitcode':-6, 'log':r"find_ram_offset: Assertion `size != 0' failed.", 'loglevel':logging.WARN},
-+    {'exitcode':-6, 'log':r"add_cpreg_to_hashtable: code should not be reached", 'loglevel':logging.WARN},
-+    {'exitcode':-6, 'log':r"qemu_alloc_display: Assertion `surface->image != NULL' failed", 'loglevel':logging.WARN},
-+    {'exitcode':-6, 'log':r"Unexpected error in error_set_from_qdev_prop_error", 'loglevel':logging.WARN},
-+    {'exitcode':-6, 'log':r"Object .* is not an instance of type spapr-machine", 'loglevel':logging.WARN},
-+    {'exitcode':-6, 'log':r"Object .* is not an instance of type generic-pc-machine", 'loglevel':logging.WARN},
-+    {'exitcode':-6, 'log':r"Object .* is not an instance of type e500-ccsr", 'loglevel':logging.WARN},
-+    {'exitcode':-6, 'log':r"vmstate_register_with_alias_id: Assertion `!se->compat \|\| se->instance_id == 0' failed", 'loglevel':logging.WARN},
-+    {'exitcode':-6, 'device':'isa-fdc', 'loglevel':logging.WARN, 'expected':True},
-+    {'exitcode':-11, 'device':'gus', 'loglevel':logging.WARN, 'expected':True},
-+    {'exitcode':-11, 'device':'isa-serial', 'loglevel':logging.WARN, 'expected':True},
-+    {'exitcode':-11, 'device':'sb16', 'loglevel':logging.WARN, 'expected':True},
-+    {'exitcode':-11, 'device':'cs4231a', 'loglevel':logging.WARN, 'expected':True},
-+    {'exitcode':-11, 'machine':'isapc', 'device':'.*-iommu', 'loglevel':logging.WARN, 'expected':True},
-+    {'exitcode':-11, 'device':'mioe3680_pci', 'loglevel':logging.WARN, 'expected':True},
-+    {'exitcode':-11, 'device':'pcm3680_pci', 'loglevel':logging.WARN, 'expected':True},
-+    {'exitcode':-11, 'device':'kvaser_pci', 'loglevel':logging.WARN, 'expected':True},
++CRASH_TEST = $(SRC_PATH)/scripts/device-crash-test
++CRASH_TEST_OPTIONS = $(if $(V),-v,-q)
++CRASH_TEST_BINARIES = $(foreach TARGET,$(TARGETS), $(TARGET)-softmmu/qemu-system-$(TARGET))
++
++.PHONY: check-device-crash-quick
++check-device-crash-quick:
++	$(CRASH_TEST) $(CRASH_TEST_OPTIONS) -t machine=DEFAULT accel=tcg -- $(CRASH_TEST_BINARIES)
++
++check-device-crash-full:
++	$(CRASH_TEST) $(CRASH_TEST_OPTIONS) -F $(CRASH_TEST_BINARIES)
++
+ # Consolidated targets
  
-     # everything else (including SIGABRT and SIGSEGV) will be a fatal error:
-     {'exitcode':None, 'fatal':True, 'loglevel':logging.FATAL},
+ .PHONY: check-qapi-schema check-qtest check-unit check check-clean
+@@ -950,7 +961,7 @@ check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
+ check-unit: $(patsubst %,check-%, $(check-unit-y))
+ check-speed: $(patsubst %,check-%, $(check-speed-y))
+ check-block: $(patsubst %,check-%, $(check-block-y))
+-check: check-qapi-schema check-unit check-qtest check-decodetree
++check: check-qapi-schema check-unit check-qtest check-decodetree check-device-crash-quick
+ check-clean:
+ 	$(MAKE) -C tests/tcg clean
+ 	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
 -- 
 2.14.3
