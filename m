@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1euGIL-0005nT-Dm
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:34:42 -0500
+	(envelope-from <mjc@sifive.com>) id 1euGIn-00068Y-30
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:35:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1euGIH-0006Mw-6d
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:34:41 -0500
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:45303)
+	(envelope-from <mjc@sifive.com>) id 1euGIl-0006VR-Sm
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:35:09 -0500
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:37332)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1euGIG-0006Md-SC
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:34:37 -0500
-Received: by mail-wr0-x243.google.com with SMTP id h2so1413127wre.12
-	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 03:34:36 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1519998711-73430-1-git-send-email-mjc@sifive.com>
-	<1519998711-73430-12-git-send-email-mjc@sifive.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7ac7ae79-b437-67b4-6887-9ad2db2d71d9@amsat.org>
-Date: Fri, 9 Mar 2018 12:34:33 +0100
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1euGIl-0006V5-LJ
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:35:07 -0500
+Received: by mail-ot0-x243.google.com with SMTP id t2so8396159otj.4
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 03:35:07 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1519998711-73430-12-git-send-email-mjc@sifive.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v8 11/23] Add symbol table callback
- interface to load_elf
+References: <CAHNT7NtB16m=Sn7bWugeOOiqVyeCT4Z7VrXijMDVZBA+tUdgPw@mail.gmail.com>
+	<CAFEAcA_rPkjEgNc=uyQ2C+at8Zs28YZVAkOLAZk17JaVyjxuNw@mail.gmail.com>
+	<CAHNT7NvZER8r0Jk2K_vLeB53tDS=rcpZg7S3Yy-7OFy=Gt+4CA@mail.gmail.com>
+In-Reply-To: <CAHNT7NvZER8r0Jk2K_vLeB53tDS=rcpZg7S3Yy-7OFy=Gt+4CA@mail.gmail.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Fri, 09 Mar 2018 11:34:56 +0000
+Message-ID: <CAHNT7NtLVFU08oC0ReduK-2mFBwgwjvgfEWaZpYFY-GkjKWv=g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Apparently fpu/softfloat.c:1374 is reachable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,179 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, Stefan O'Rear <sorear2@gmail.com>
 
-On 03/02/2018 02:51 PM, Michael Clark wrote:
-> The RISC-V HTIF (Host Target Interface) console device requires access
-> to the symbol table to locate the 'tohost' and 'fromhost' symbols.
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Michael Clark <mjc@sifive.com>
+On Sat, 10 Mar 2018 at 12:17 AM, Michael Clark <mjc@sifive.com> wrote:
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> On Fri, 9 Mar 2018 at 11:45 PM, Peter Maydell <peter.maydell@linaro.org>
+> wrote:
+>
+>> On 9 March 2018 at 04:22, Michael Clark <mjc@sifive.com> wrote:
+>> > I need to dig into this. I'll need to take the assertions out, or run
+>> with
+>> > tracing to see which fcvt test is triggering this unreachable piece of
+>> > code. FYI. I can look into it.
+>>
+>> >
+>> ERROR:/Users/mclark/src/sifive/riscv-qemu/fpu/softfloat.c:1374:round_to_=
+int_and_pack:
+>> > code should not be reached
+>> > qemu-images/run-tests.sh: line 6: 58437 Abort trap: 6           ${QEMU=
+}
+>> > -nographic -machine spike_v1.10 -kernel $i
+>>
+>> This looks like maybe it's the issue Richard Jones sent a patch for ?
+>> https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg01005.html
+>
+>
+> Thanks. Seems I wasn=E2=80=99t on the =E2=80=98cc.
+>
+> We need this patch in our downstream repo... We also need to automate
+> riscv-tests in the riscv.org repo .travis.yml so we can pick these things
+> up automatically...
+>
 
-> ---
->  hw/core/loader.c     | 18 ++++++++++++++++--
->  include/hw/elf_ops.h | 34 +++++++++++++++++++++-------------
->  include/hw/loader.h  | 17 ++++++++++++++++-
->  3 files changed, 53 insertions(+), 16 deletions(-)
-> 
-> diff --git a/hw/core/loader.c b/hw/core/loader.c
-> index c08f130..1d26c6e 100644
-> --- a/hw/core/loader.c
-> +++ b/hw/core/loader.c
-> @@ -450,6 +450,20 @@ int load_elf_ram(const char *filename,
->                   int clear_lsb, int data_swab, AddressSpace *as,
->                   bool load_rom)
->  {
-> +    return load_elf_ram_sym(filename, translate_fn, translate_opaque,
-> +                            pentry, lowaddr, highaddr, big_endian,
-> +                            elf_machine, clear_lsb, data_swab, as,
-> +                            load_rom, NULL);
-> +}
-> +
-> +/* return < 0 if error, otherwise the number of bytes loaded in memory */
-> +int load_elf_ram_sym(const char *filename,
-> +                     uint64_t (*translate_fn)(void *, uint64_t),
-> +                     void *translate_opaque, uint64_t *pentry,
-> +                     uint64_t *lowaddr, uint64_t *highaddr, int big_endian,
-> +                     int elf_machine, int clear_lsb, int data_swab,
-> +                     AddressSpace *as, bool load_rom, symbol_fn_t sym_cb)
-> +{
->      int fd, data_order, target_data_order, must_swab, ret = ELF_LOAD_FAILED;
->      uint8_t e_ident[EI_NIDENT];
->  
-> @@ -488,11 +502,11 @@ int load_elf_ram(const char *filename,
->      if (e_ident[EI_CLASS] == ELFCLASS64) {
->          ret = load_elf64(filename, fd, translate_fn, translate_opaque, must_swab,
->                           pentry, lowaddr, highaddr, elf_machine, clear_lsb,
-> -                         data_swab, as, load_rom);
-> +                         data_swab, as, load_rom, sym_cb);
->      } else {
->          ret = load_elf32(filename, fd, translate_fn, translate_opaque, must_swab,
->                           pentry, lowaddr, highaddr, elf_machine, clear_lsb,
-> -                         data_swab, as, load_rom);
-> +                         data_swab, as, load_rom, sym_cb);
->      }
->  
->   fail:
-> diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
-> index d192e7e..b6e19e3 100644
-> --- a/include/hw/elf_ops.h
-> +++ b/include/hw/elf_ops.h
-> @@ -105,7 +105,7 @@ static int glue(symcmp, SZ)(const void *s0, const void *s1)
->  }
->  
->  static int glue(load_symbols, SZ)(struct elfhdr *ehdr, int fd, int must_swab,
-> -                                  int clear_lsb)
-> +                                  int clear_lsb, symbol_fn_t sym_cb)
->  {
->      struct elf_shdr *symtab, *strtab, *shdr_table = NULL;
->      struct elf_sym *syms = NULL;
-> @@ -133,10 +133,26 @@ static int glue(load_symbols, SZ)(struct elfhdr *ehdr, int fd, int must_swab,
->  
->      nsyms = symtab->sh_size / sizeof(struct elf_sym);
->  
-> +    /* String table */
-> +    if (symtab->sh_link >= ehdr->e_shnum) {
-> +        goto fail;
-> +    }
-> +    strtab = &shdr_table[symtab->sh_link];
-> +
-> +    str = load_at(fd, strtab->sh_offset, strtab->sh_size);
-> +    if (!str) {
-> +        goto fail;
-> +    }
-> +
->      i = 0;
->      while (i < nsyms) {
-> -        if (must_swab)
-> +        if (must_swab) {
->              glue(bswap_sym, SZ)(&syms[i]);
-> +        }
-> +        if (sym_cb) {
-> +            sym_cb(str + syms[i].st_name, syms[i].st_info,
-> +                   syms[i].st_value, syms[i].st_size);
-> +        }
->          /* We are only interested in function symbols.
->             Throw everything else away.  */
->          if (syms[i].st_shndx == SHN_UNDEF ||
-> @@ -163,15 +179,6 @@ static int glue(load_symbols, SZ)(struct elfhdr *ehdr, int fd, int must_swab,
->          }
->      }
->  
-> -    /* String table */
-> -    if (symtab->sh_link >= ehdr->e_shnum)
-> -        goto fail;
-> -    strtab = &shdr_table[symtab->sh_link];
-> -
-> -    str = load_at(fd, strtab->sh_offset, strtab->sh_size);
-> -    if (!str)
-> -        goto fail;
-> -
->      /* Commit */
->      s = g_malloc0(sizeof(*s));
->      s->lookup_symbol = glue(lookup_symbol, SZ);
-> @@ -264,7 +271,8 @@ static int glue(load_elf, SZ)(const char *name, int fd,
->                                int must_swab, uint64_t *pentry,
->                                uint64_t *lowaddr, uint64_t *highaddr,
->                                int elf_machine, int clear_lsb, int data_swab,
-> -                              AddressSpace *as, bool load_rom)
-> +                              AddressSpace *as, bool load_rom,
-> +                              symbol_fn_t sym_cb)
->  {
->      struct elfhdr ehdr;
->      struct elf_phdr *phdr = NULL, *ph;
-> @@ -329,7 +337,7 @@ static int glue(load_elf, SZ)(const char *name, int fd,
->      if (pentry)
->     	*pentry = (uint64_t)(elf_sword)ehdr.e_entry;
->  
-> -    glue(load_symbols, SZ)(&ehdr, fd, must_swab, clear_lsb);
-> +    glue(load_symbols, SZ)(&ehdr, fd, must_swab, clear_lsb, sym_cb);
->  
->      size = ehdr.e_phnum * sizeof(phdr[0]);
->      if (lseek(fd, ehdr.e_phoff, SEEK_SET) != ehdr.e_phoff) {
-> diff --git a/include/hw/loader.h b/include/hw/loader.h
-> index 5edbe02..7b05e8b 100644
-> --- a/include/hw/loader.h
-> +++ b/include/hw/loader.h
-> @@ -64,7 +64,7 @@ int load_image_gzipped(const char *filename, hwaddr addr, uint64_t max_sz);
->  #define ELF_LOAD_WRONG_ENDIAN -4
->  const char *load_elf_strerror(int error);
->  
-> -/** load_elf_ram:
-> +/** load_elf_ram_sym:
->   * @filename: Path of ELF file
->   * @translate_fn: optional function to translate load addresses
->   * @translate_opaque: opaque data passed to @translate_fn
-> @@ -81,6 +81,7 @@ const char *load_elf_strerror(int error);
->   * @as: The AddressSpace to load the ELF to. The value of address_space_memory
->   *      is used if nothing is supplied here.
->   * @load_rom : Load ELF binary as ROM
-> + * @sym_cb: Callback function for symbol table entries
->   *
->   * Load an ELF file's contents to the emulated system's address space.
->   * Clients may optionally specify a callback to perform address
-> @@ -93,6 +94,20 @@ const char *load_elf_strerror(int error);
->   * If @elf_machine is EM_NONE then the machine type will be read from the
->   * ELF header and no checks will be carried out against the machine type.
->   */
-> +typedef void (*symbol_fn_t)(const char *st_name, int st_info,
-> +                            uint64_t st_value, uint64_t st_size);
-> +
-> +int load_elf_ram_sym(const char *filename,
-> +                     uint64_t (*translate_fn)(void *, uint64_t),
-> +                     void *translate_opaque, uint64_t *pentry,
-> +                     uint64_t *lowaddr, uint64_t *highaddr, int big_endian,
-> +                     int elf_machine, int clear_lsb, int data_swab,
-> +                     AddressSpace *as, bool load_rom, symbol_fn_t sym_cb);
-> +
-> +/** load_elf_ram:
-> + * Same as load_elf_ram_sym(), but doesn't allow the caller to specify a
-> + * symbol callback function
-> + */
->  int load_elf_ram(const char *filename,
->                   uint64_t (*translate_fn)(void *, uint64_t),
->                   void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
-> 
+BTW how does one hide signed-off-by or cc email addresses with the
+git-send-email workflow?
+
+Seems like editing the patch after git format-patch is likely the only way
+around for contributors whose wishes I might not have honoured, except
+originally when I was using an advoc albeit buggy workflow, where the Cc=E2=
+=80=99s
+et all we=E2=80=99re later added to the patch headers and not the commits. =
+I=E2=80=99ve
+probably inadvertently violated someone=E2=80=99s wish to keep their email =
+address
+out of the list archives, which is an understandable wish.
+
+This is not an issue with GitHub PR=E2=80=99s as they keep identity informa=
+tion
+differently however slicing up the port for upstreaming has lost some of
+our contributor history. I have made tags before every squash and rebase so
+we can find all history in the riscv repo, as well as previously trying to
+keep personal emails out of the cover letters in the first series. With the
+change to the git-sendemail  workflow i=E2=80=99ve likely regressed here.
+
+I also probably have to manually edit patches to add =E2=80=98Cc to the
+riscv-patches mailing list, as it doesn=E2=80=99t seem right to put that em=
+ail in
+the commit messages.
+
+I=E2=80=99ll guess we=E2=80=99ll figure it all out eventually...
+
+Michael
+
+>
