@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1euO9Q-0005rG-J2
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 14:58:01 -0500
+	(envelope-from <laurent@vivier.eu>) id 1euO9p-0006DE-Vr
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 14:58:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1euO9L-0002i8-Qj
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 14:58:00 -0500
+	(envelope-from <laurent@vivier.eu>) id 1euO9l-0002qk-T3
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 14:58:26 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:46141)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1euO9l-0002qF-KW
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 14:58:21 -0500
 References: <20180228221609.11265-1-jcmvbkbc@gmail.com>
-	<20180228221609.11265-8-jcmvbkbc@gmail.com>
+	<20180228221609.11265-9-jcmvbkbc@gmail.com>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <f5a9ec0e-b1dd-9f18-bad8-d419a4fafa37@vivier.eu>
-Date: Fri, 9 Mar 2018 20:57:45 +0100
+Message-ID: <0aeaa948-2e16-77fd-4edb-0c49791469ed@vivier.eu>
+Date: Fri, 9 Mar 2018 20:58:11 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180228221609.11265-8-jcmvbkbc@gmail.com>
+In-Reply-To: <20180228221609.11265-9-jcmvbkbc@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 07/11] linux-user: fix
- target_mprotect/target_munmap error return values
+Subject: Re: [Qemu-devel] [PATCH v2 08/11] linux-user: drop unused
+ target_msync function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,21 +30,19 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-stable@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>
 
 Le 28/02/2018 à 23:16, Max Filippov a écrit :
-> target_mprotect/target_munmap return value goes through get_errno at the
-> call site, thus the functions must either set errno to host error code
-> and return -1 or return negative guest error code. Do the latter.
+> target_msync is not used, remove its declaration and implementation.
 > 
-> Cc: qemu-stable@nongnu.org
 > Cc: Riku Voipio <riku.voipio@iki.fi>
 > Cc: Laurent Vivier <laurent@vivier.eu>
 > Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 > ---
->  linux-user/mmap.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
+>  linux-user/mmap.c | 17 -----------------
+>  linux-user/qemu.h |  1 -
+>  2 files changed, 18 deletions(-)
+>
 
 Applied to my 'linux-user-for-2.12' branch.
 
