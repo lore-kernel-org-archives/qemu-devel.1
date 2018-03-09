@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1euJ91-0000nr-BB
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:37:20 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1euJD5-0002ik-6Q
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:41:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1euJ8y-0003HK-6b
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:37:15 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58858 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1euJD2-0004dh-14
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:41:27 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56110 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1euJ8y-0003HC-1t
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:37:12 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1euJD1-0004dW-T5
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:41:23 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 87693406E8A4
-	for <qemu-devel@nongnu.org>; Fri,  9 Mar 2018 14:37:07 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri,  9 Mar 2018 15:37:04 +0100
-Message-Id: <20180309143704.13420-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] vga: fix region calculation
+	by mx1.redhat.com (Postfix) with ESMTPS id 7775276FBA
+	for <qemu-devel@nongnu.org>; Fri,  9 Mar 2018 14:41:23 +0000 (UTC)
+References: <1520576005-27647-1-git-send-email-thuth@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5464ff65-85d4-4537-a603-fd20074d375f@redhat.com>
+Date: Fri, 9 Mar 2018 15:41:21 +0100
+MIME-Version: 1.0
+In-Reply-To: <1520576005-27647-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] qemu-doc: Rework the network options
+ chapter to make "-net" less prominent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +34,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
 
-Typically the scanline length and the line offset are identical.  But
-in case they are not our calculation for region_end is incorrect.  Using
-line_offset is fine for all scanlines, except the last one where we have
-to use the actual scanline length.
+On 09/03/2018 07:13, Thomas Huth wrote:
+> +
+> +@item --nic none
+> +Indicate that no network devices should be configured. It is used to o=
+verride
+> +the default configuration (default NIC with @option{--net user} backen=
+d) which
 
-Fixes: CVE-2018-7550
-Reported-by: Ross Lagerwall <ross.lagerwall@citrix.com>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Prasad J Pandit <pjp@fedoraproject.org>
-Tested-by: Ross Lagerwall <ross.lagerwall@citrix.com>
----
- hw/display/vga.c | 2 ++
- 1 file changed, 2 insertions(+)
+the default @option{--nic user} configuration (default model and
+user-mode networking backend), which...
 
-diff --git a/hw/display/vga.c b/hw/display/vga.c
-index 28f298b342..72181330b8 100644
---- a/hw/display/vga.c
-+++ b/hw/display/vga.c
-@@ -1483,6 +1483,8 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
- 
-     region_start = (s->start_addr * 4);
-     region_end = region_start + (ram_addr_t)s->line_offset * height;
-+    region_end += width * s->get_bpp(s) / 8; /* scanline length */
-+    region_end -= s->line_offset;
-     if (region_end > s->vbe_size) {
-         /* wraps around (can happen with cirrus vbe modes) */
-         region_start = 0;
--- 
-2.9.3
+> +is activated if no other networking options are provided.
+> +
+
+> -qemu-system-i386 -net user,hostfwd=3Dtcp::5555-:23 [...]
+> +qemu-system-i386 --device e1000,netdev=3Dn1 --netdev user,id=3Dn1,host=
+fwd=3Dtcp::5555-:23
+
+I would use --nic here.  --device/--netdev is covered by
+docs/qdev-device-use.txt, which should be updated separately (it even
+has -usbdevice still).
+
+> -qemu -net 'user,guestfwd=3Dtcp:10.0.2.100:1234-cmd:netcat 10.10.1.1 43=
+21'
+> +qemu-system-i386 --device e1000,netdev=3Dn1 \
+> +  --netdev 'user,id=3Dn1,guestfwd=3Dtcp:10.0.2.100:1234-cmd:netcat 10.=
+10.1.1 4321'
+
+Same here.
+
+Single vs. double-dash options is a confusing one and I'm not sure how
+to proceed.  On one hand single-dash is what everyone uses, on the other
+double-dash is a bit more consistent with e.g. qemu-img.  But:
+
+1) the command-line of qemu-img is anyway completely different from QEMU'=
+s
+
+2) mixing them is the worst of both worlds.
+
+I honestly would use single-dashes, and add a note that double-dash
+options are supported as well.
+
+Paolo
