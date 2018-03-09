@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1euER5-00042s-TR
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:35:38 -0500
+	(envelope-from <kraxel@redhat.com>) id 1euEZR-0001pW-MH
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:44:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1euER2-0005fJ-0U
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:35:35 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60190)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1euER1-0005dY-QP
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:35:31 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1euER0-0005Jy-E0
-	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 09:35:30 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4D7E12E80C8
-	for <qemu-devel@nongnu.org>; Fri,  9 Mar 2018 09:35:30 +0000 (UTC)
+	(envelope-from <kraxel@redhat.com>) id 1euEZQ-0008S5-HY
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:44:13 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41420 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1euEZQ-0008S1-Cv
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 04:44:12 -0500
+Date: Fri, 9 Mar 2018 10:44:03 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180309094403.gcsspbs4lzozx2zl@sirius.home.kraxel.org>
+References: <20180308083231.20180-1-kraxel@redhat.com>
+	<CAFEAcA8wUN_T9XrUULCROVFdv+vGipdMuhNz5km1mcX_nVrQgg@mail.gmail.com>
+	<20180309065247.xzribx4zjgx5bnj5@sirius.home.kraxel.org>
+	<20180309075054.e4bpa4wsl2wak57w@sirius.home.kraxel.org>
+	<f0968a33-fb14-4de2-3a1b-130e2ae7b0ee@redhat.com>
+	<20180309091533.uj3qpyjnczugfivh@sirius.home.kraxel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 09 Mar 2018 09:24:50 -0000
-From: Thomas Huth <1754597@bugs.launchpad.net>
-Reply-To: Bug 1754597 <1754597@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152058647369.4543.14826209514925164924.malonedeb@soybean.canonical.com>
-Message-Id: <152058749127.7769.615446987286480468.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1754597] Re: qemu-system-x86_64 broken on ubuntu
- 17.10
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180309091533.uj3qpyjnczugfivh@sirius.home.kraxel.org>
+Subject: Re: [Qemu-devel] [PULL 0/8] Ui 20180308 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,58 +31,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-** Project changed: qemu =3D> qemu (Ubuntu)
+On Fri, Mar 09, 2018 at 10:15:33AM +0100, Gerd Hoffmann wrote:
+> On Fri, Mar 09, 2018 at 09:46:44AM +0100, Thomas Huth wrote:
+> > On 09.03.2018 08:50, Gerd Hoffmann wrote:
+> > >   Hi,
+> > > 
+> > >> Maybe I should move the code to a separate source file so it can be
+> > >> built with different compiler flags, without needing #pragma?  I don't
+> > >> feel like building all gtk code with -Wno-deprecated-declarations ...
+> > > 
+> > > Hmm, that idea doesn't fly, seems per-object cflags don't work for
+> > > object files which get linked into a module.
+> > > 
+> > > Other ideas anyone?
+> > 
+> > Maybe simply remove the '#pragma GCC diagnostic ignored
+> > "-Wunused-but-set-variable"' from the configure test and change
+> > util/coroutine-ucontext.c:
+> 
+> I'll try.  Will probably have the effect that freebsd builds with
+> -Werror then (which is now turned off by configure due to missing
+> pragma support), which might trigger more issues ...
 
--- =
+Well, guessed almost right.  -Werror is enabled on linux only, so
+freebsd builds do not fail.  But clang builds on linux fail, due to a
+bunch of warnings (now errors) about unaligned access to struct members.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1754597
-
-Title:
-  qemu-system-x86_64 broken on ubuntu 17.10
-
-Status in qemu package in Ubuntu:
-  New
-
-Bug description:
-  I have run a virtual machine over the past three years without
-  problems, but the update to Ubuntu 17.10 broke it: the machine falls
-  into an infinite boot loop.
-
-  $ qemu-system-x86_64 --version
-  QEMU emulator version 2.10.1(Debian 1:2.10+dfsg-0ubuntu3.5)
-
-  $ sudo qemu-system-x86_64 -enable-kvm -usb \
-      -chardev stdio,id=3Dchar0 \
-      -device usb-host,vendorid=3D0x056a,productid=3D0x00c6 \
-      -device usb-host,vendorid=3D0x04a9,productid=3D0x2220 \
-      -soundhw all \
-      -m 2048 -cpu core2duo -machine q35  \
-      -smp 2 \
-      -device usb-mouse  \
-      -vga std  \
-      -device isa-applesmc,osk=3D"CONFIDENTIAL" \
-      -smbios type=3D2 \
-      -device ide-drive,bus=3Dide.0,drive=3DHDD \
-      -drive id=3DHDD,if=3Dnone,cache=3Dnone,file=3Dhdd.img \
-      -device ide-drive,bus=3Dide.3,drive=3DScrapHDD \
-      -drive id=3DScrapHDD,if=3Dnone,cache=3Dnone,file=3Dscrap.img \
-      -netdev tap,id=3Dnet0,ifname=3Dtap0,script=3Dno \
-      -device e1000,netdev=3Dnet0,id=3Dnic0,mac=3D00:aa:00:60:00:01
-
-  $ uname -a
-  Linux behemoth 4.13.0-36-generic #40-Ubuntu SMP Fri Feb 16 20:07:48 UTC 2=
-018 x86_64 x86_64 x86_64 GNU/Linux
-
-  $ lsb_release -a
-  No LSB modules are available.
-  Distributor ID:	Ubuntu
-  Description:	Ubuntu 17.10
-  Release:	17.10
-  Codename:	artful
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1754597/+subscriptions
+cheers,
+  Gerd
