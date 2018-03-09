@@ -1,29 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groeck7@gmail.com>) id 1euPip-0004eH-1k
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 16:38:40 -0500
+	(envelope-from <kwolf@redhat.com>) id 1euPqZ-0007Gp-J0
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 16:46:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groeck7@gmail.com>) id 1euPil-00056u-UF
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 16:38:39 -0500
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:35473)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <groeck7@gmail.com>) id 1euPil-00055b-Lx
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 16:38:35 -0500
-Received: by mail-pg0-x244.google.com with SMTP id l131so4048538pga.2
-	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 13:38:35 -0800 (PST)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date: Fri, 9 Mar 2018 13:38:32 -0800
-From: Guenter Roeck <linux@roeck-us.net>
-Message-ID: <20180309213832.GA8594@roeck-us.net>
-References: <1520444223-8389-1-git-send-email-linux@roeck-us.net>
-	<CAFEAcA9T=sydu47UGry2TVOa0gZF8SZLnaaQ5gqzTQmAgm2b1w@mail.gmail.com>
-	<20180309182030.GA22836@roeck-us.net>
-	<201803091053.43494.wpaul@windriver.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <201803091053.43494.wpaul@windriver.com>
-Subject: Re: [Qemu-devel] [PATCH] fsl-imx6: Swap Ethernet interrupt defines
+	(envelope-from <kwolf@redhat.com>) id 1euPqY-0000pC-P3
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 16:46:39 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Fri,  9 Mar 2018 22:46:06 +0100
+Message-Id: <20180309214611.19122-3-kwolf@redhat.com>
+In-Reply-To: <20180309214611.19122-1-kwolf@redhat.com>
+References: <20180309214611.19122-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/7] qemu-iotests: Enable write tests for
+ parallels
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,94 +20,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bill Paul <wpaul@windriver.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Chris Healy <cphealy@gmail.com>, Jason Wang <jasowang@redhat.com>, Jean-Christophe Dubois <jcd@tribudubois.net>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, jcody@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-On Fri, Mar 09, 2018 at 10:53:43AM -0800, Bill Paul wrote:
-> Of all the gin joints in all the towns in all the world, Guenter Roeck had to 
-> walk into mine at 10:20 on Friday 09 March 2018 and say:
-> 
-> > On Fri, Mar 09, 2018 at 05:47:16PM +0000, Peter Maydell wrote:
-> > > On 8 March 2018 at 18:28, Bill Paul <wpaul@windriver.com> wrote:
-> > > > Anyway, this means that the only reason older Linux kernels worked in
-> > > > QEMU with the broken interrupt configuration is that they also
-> > > > registered a handler on vector 151 (119). Even though QEMU could not
-> > > > send events via GPIO6, it was mistakenly sending them via vector 151,
-> > > > so it looked like things worked. On real hardware, the older kernels
-> > > > would have gotten their interrupts via GPIO6 and also worked. The
-> > > > older kernels would _not_ work if you fix QEMU because now they would
-> > > > never get interrupts on either vector, unless you fudge things so that
-> > > > the ENET module triggers both vector 150 and the vector for GPIO6 in
-> > > > the GIC or patch them to back out the erratum 6678 workaround as later
-> > > > kernels do.
-> > > 
-> > > Thanks for that really useful writeup. So if I understand correctly
-> > > 
-> > > we have several choices here:
-> > >  (1) we could implement a model of the IOMUX block that is at least
-> > >  sufficient to support guests that configure it to route the ENET
-> > >  interrupt line to a GPIO pin. Then we could apply this patch that fixes
-> > >  the ENET line definitions. Old kernels would continue to work (for the
-> > >  same reason they worked on hardware), and new ones would work now too.
-> > >  This is in some ways the preferred option, but it's possibly a lot of
-> > >  code and we're nearly in freeze for 2.12.
-> > >  
-> > >  (2) we could leave everything as it is for 2.12. This would mean that
-> > >  at least we don't regress setups that used to work on older QEMU
-> > >  versions. Downside is that we wouldn't be able to run Linux v4.15+, or
-> > >  other guest OSes that don't have the bug that older Linux kernels do.
-> > >  (Presumably we'd only do this on the understanding that we were going
-> > >  to go down route (1) for 2.13.)
-> > >  
-> > >  (3) we could apply this patch for 2.12. Linux v4.15+ now works, as
-> > >  do other guest OSes that use the ENET interrupt. v4.1 and older Linux
-> > >  guests that used to boot in QEMU stop doing so, and 4.2-4.9 boot but
-> > >  lose the ethernet device support. Perhaps for 2.13 we might
-> > >  take route (1) to make those older guests start working again.
-> > > 
-> > > Do I have that right?
-> > 
-> > Pretty much.
-> 
-> There may be a 4th option.
-> 
-> Since older kernels work because they were looking at vector 151, you could 
-> patch the imx_fec.c module so that when it signals an event for vector 150, it 
-> also signals vector 151 too. This would keep newer versions of QEMU "bug-
-> compatible" with older versions while also fixing support for newer Linux 
-> kernels and other guests (e.g. VxWorks) that follow the hardware spec 
-> correctly.
-> 
-> I think this would require only a small modification to this function:
-> 
-> static void imx_eth_update(IMXFECState *s)
-> {
->     if (s->regs[ENET_EIR] & s->regs[ENET_EIMR] & ENET_INT_TS_TIMER) {
->         qemu_set_irq(s->irq[1], 1);
->     } else {
->         qemu_set_irq(s->irq[1], 0);
->     }
-> 
->     if (s->regs[ENET_EIR] & s->regs[ENET_EIMR] & ENET_INT_MAC) {
->         qemu_set_irq(s->irq[0], 1);
->     } else {
->         qemu_set_irq(s->irq[0], 0);
->     }
-> }
-> 
-> (For ENET_INT_MAC events, just signal both s->irq[0] and s->irq[1]).
-> 
-Now this is an excellent idea.
+Originally we added parallels as a read-only format to qemu-iotests
+where we did just some tests with a binary image. Since then, write and
+image creation support has been added to the driver, so we can now
+enable it in _supported_fmt generic.
 
-> This of course means signaling spurious events on vector 151, but you're doing 
-> that now anyway. :)
-> 
-Actually, it doesn't. It looks like the first interrupt is handled, resetting
-the interrupt status, and the second interrupt is never even executed. I tested
-this with all kernel releases back to v3.16.
+The driver doesn't support migration yet, though, so we need to add it
+to the list of exceptions in 181.
 
-I'll send out patch v2 with this change and let Peter decide which version to
-apply.
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ tests/qemu-iotests/181   | 2 +-
+ tests/qemu-iotests/check | 1 -
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
-Thanks,
-Guenter
+diff --git a/tests/qemu-iotests/181 b/tests/qemu-iotests/181
+index 0c91e8f9de..5e767c6195 100755
+--- a/tests/qemu-iotests/181
++++ b/tests/qemu-iotests/181
+@@ -44,7 +44,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+ _supported_fmt generic
+ # Formats that do not support live migration
+-_unsupported_fmt qcow vdi vhdx vmdk vpc vvfat
++_unsupported_fmt qcow vdi vhdx vmdk vpc vvfat parallels
+ _supported_proto generic
+ _supported_os Linux
+ 
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index e6b6ff7a04..469142cd58 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -284,7 +284,6 @@ testlist options
+ 
+         -parallels)
+             IMGFMT=parallels
+-            IMGFMT_GENERIC=false
+             xpand=false
+             ;;
+ 
+-- 
+2.13.6
