@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1euG22-0006Fr-VG
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:17:52 -0500
+	(envelope-from <kchamart@redhat.com>) id 1euGBf-00019A-VR
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:27:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1euG21-0008CY-Rj
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:17:50 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:34128)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1euG21-0008C4-J9
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:17:49 -0500
-Received: by mail-ot0-x244.google.com with SMTP id n74so8376204ota.1
-	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 03:17:49 -0800 (PST)
+	(envelope-from <kchamart@redhat.com>) id 1euGBc-0003pj-RV
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:27:47 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44624 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1euGBc-0003pc-Mf
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:27:44 -0500
+Date: Fri, 9 Mar 2018 12:27:23 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20180309112723.deci6fc2k66pbwdj@eukaryote>
+References: <20180307144951.d75lo5rgzi2vf27z@eukaryote>
+	<90ba320e-2a05-8962-dc6b-252b3e15d1b7@redhat.com>
+	<20180308154730.GZ4718@redhat.com>
+	<c455f46b-dc25-fe7e-acc8-140f4a703e94@redhat.com>
 MIME-Version: 1.0
-References: <CAHNT7NtB16m=Sn7bWugeOOiqVyeCT4Z7VrXijMDVZBA+tUdgPw@mail.gmail.com>
-	<CAFEAcA_rPkjEgNc=uyQ2C+at8Zs28YZVAkOLAZk17JaVyjxuNw@mail.gmail.com>
-In-Reply-To: <CAFEAcA_rPkjEgNc=uyQ2C+at8Zs28YZVAkOLAZk17JaVyjxuNw@mail.gmail.com>
-From: Michael Clark <mjc@sifive.com>
-Date: Fri, 09 Mar 2018 11:17:38 +0000
-Message-ID: <CAHNT7NvZER8r0Jk2K_vLeB53tDS=rcpZg7S3Yy-7OFy=Gt+4CA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <c455f46b-dc25-fe7e-acc8-140f4a703e94@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Apparently fpu/softfloat.c:1374 is reachable
+Subject: Re: [Qemu-devel] [RFC] Defining firmware (OVMF,
+ et al) metadata format & file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, kraxel@redhat.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-On Fri, 9 Mar 2018 at 11:45 PM, Peter Maydell <peter.maydell@linaro.org>
-wrote:
+On Thu, Mar 08, 2018 at 09:47:27PM +0100, Laszlo Ersek wrote:
+> On 03/08/18 16:47, Daniel P. Berrang=E9 wrote:
+> > On Thu, Mar 08, 2018 at 12:10:30PM +0100, Laszlo Ersek wrote:
 
-> On 9 March 2018 at 04:22, Michael Clark <mjc@sifive.com> wrote:
-> > I need to dig into this. I'll need to take the assertions out, or run
-> with
-> > tracing to see which fcvt test is triggering this unreachable piece of
-> > code. FYI. I can look into it.
->
-> >
-> ERROR:/Users/mclark/src/sifive/riscv-qemu/fpu/softfloat.c:1374:round_to_i=
-nt_and_pack:
-> > code should not be reached
-> > qemu-images/run-tests.sh: line 6: 58437 Abort trap: 6           ${QEMU}
-> > -nographic -machine spike_v1.10 -kernel $i
->
-> This looks like maybe it's the issue Richard Jones sent a patch for ?
-> https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg01005.html
+[...]
 
+> >> For OVMF (x86), I guess the initial set of properties should come fr=
+om
+> >> the "-D FOO[=3DBAR]" build flags that OVMF currently supports. (The =
+list
+> >> might grow or change incompatibly over time, so this is just a raw
+> >> starter idea.)
+> >=20
+> > I really don't want to see us using firmware implementation specific
+> > property names in these files. It means libvirt will require knowledg=
+e
+> > of what each different firmware's property names mean.
+> >=20
+> > We need to have some core standardized set of property names that can
+> > be provided by any firmware implementation using the same terminology=
+.
+> >=20
+> > If we want to /also/ provide some extra firmeware-specific property
+> > names that would be ok for informative purposes, but when lbivirt is
+> > picking which firmware file to use, it would only ever look at the
+> > standardized property names/values.
+>=20
+> This is a reasonable requirement from the libvirt side.
+>=20
+> Unfortunately (or not), it requires someone (or a tight group of people=
+)
+> to collect the features of all virtual firmwares in existence, and
+> extract a common set of properties that maps back to each firmware one
+> way or another.=20
 
-Thanks. Seems I wasn=E2=80=99t on the =E2=80=98cc.
+Hmm, if people consider the above worthwhile (no clue how much time &
+investigation it takes to arrive at a common set of properties) maybe
+slowly we should start collecting such a page?  From a quick look up,
+list of open source firmware implementations I found so (besides OVMF &
+ArmVirt):
 
-We need this patch in our downstream repo... We also need to automate
-riscv-tests in the riscv.org repo .travis.yml so we can pick these things
-up automatically...
+  - OpenBIOS
+  - SmartFirmware
+  - OpenBoot
+  - CoreBoot
+  - U-Boot
+  - SLOF
+  - ...
+
+Source: https://en.wikipedia.org/wiki/OpenBIOS
+
+I notice you said "virtual firmwares".  I couldn't find such a list from
+my look up.
+
+Hmm, I also wonder if the "arriving at a common set of properties across
+existing virtual firmwares" is an absolute blocker.
+
+> This is not unusual (basically this is how all standards
+> bodies work that intend to codify existing practice), it just needs a
+> bunch of work and coordination. We'll have to maintain a registry.
+>=20
+> Personally I can't comment on anything else than OVMF and the ArmVirt
+> firmwares.
+>=20
+> Thanks,
+> Laszlo
+
+--=20
+/kashyap
