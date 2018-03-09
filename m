@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=5995bc012=Ian.Jackson@citrix.com>)
-	id 1euGHT-0005DA-Hl
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:33:48 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1euGIL-0005nT-Dm
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:34:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=5995bc012=Ian.Jackson@citrix.com>)
-	id 1euGHN-00066q-7r
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:33:46 -0500
-Received: from smtp.citrix.com ([66.165.176.89]:20086)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=5995bc012=Ian.Jackson@citrix.com>)
-	id 1euGHN-000668-1u
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:33:41 -0500
-From: Ian Jackson <ian.jackson@citrix.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1euGIH-0006Mw-6d
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:34:41 -0500
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:45303)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1euGIG-0006Md-SC
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:34:37 -0500
+Received: by mail-wr0-x243.google.com with SMTP id h2so1413127wre.12
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 03:34:36 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1519998711-73430-1-git-send-email-mjc@sifive.com>
+	<1519998711-73430-12-git-send-email-mjc@sifive.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7ac7ae79-b437-67b4-6887-9ad2db2d71d9@amsat.org>
+Date: Fri, 9 Mar 2018 12:34:33 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Message-ID: <23202.28943.344150.512881@mariner.uk.xensource.com>
-Date: Fri, 9 Mar 2018 11:33:35 +0000
-In-Reply-To: <20180308200345.GD3417@localhost.localdomain>
-References: <1520530757-4477-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1520530757-4477-4-git-send-email-ian.jackson@eu.citrix.com>
-	<20180308200345.GD3417@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH 03/11] xen: defer call to xen_restrict
- until just before os_setup_post
+In-Reply-To: <1519998711-73430-12-git-send-email-mjc@sifive.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v8 11/23] Add symbol table callback
+ interface to load_elf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,23 +36,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-Eduardo Habkost writes ("Re: [PATCH 03/11] xen: defer call to xen_restrict until just before os_setup_post"):
-> On Thu, Mar 08, 2018 at 05:39:09PM +0000, Ian Jackson wrote:
-> [...]
-> > diff --git a/vl.c b/vl.c
-> > +    xen_setup_post();
+On 03/02/2018 02:51 PM, Michael Clark wrote:
+> The RISC-V HTIF (Host Target Interface) console device requires access
+> to the symbol table to locate the 'tohost' and 'fromhost' symbols.
 > 
-> I don't think we should have accelerator-specific code in main(),
-> if we already have accelerator classes that can abstract that
-> out.  I suggest adding a AccelClass;:setup_post() method that can
-> be called here.
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Michael Clark <mjc@sifive.com>
 
-I think I can do that.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Although, it is a bit disappointing to be given this feedback in v6 of
-this series.  Did the right people not get CC'd on v5 in October ?
-
-Ian.
+> ---
+>  hw/core/loader.c     | 18 ++++++++++++++++--
+>  include/hw/elf_ops.h | 34 +++++++++++++++++++++-------------
+>  include/hw/loader.h  | 17 ++++++++++++++++-
+>  3 files changed, 53 insertions(+), 16 deletions(-)
+> 
+> diff --git a/hw/core/loader.c b/hw/core/loader.c
+> index c08f130..1d26c6e 100644
+> --- a/hw/core/loader.c
+> +++ b/hw/core/loader.c
+> @@ -450,6 +450,20 @@ int load_elf_ram(const char *filename,
+>                   int clear_lsb, int data_swab, AddressSpace *as,
+>                   bool load_rom)
+>  {
+> +    return load_elf_ram_sym(filename, translate_fn, translate_opaque,
+> +                            pentry, lowaddr, highaddr, big_endian,
+> +                            elf_machine, clear_lsb, data_swab, as,
+> +                            load_rom, NULL);
+> +}
+> +
+> +/* return < 0 if error, otherwise the number of bytes loaded in memory */
+> +int load_elf_ram_sym(const char *filename,
+> +                     uint64_t (*translate_fn)(void *, uint64_t),
+> +                     void *translate_opaque, uint64_t *pentry,
+> +                     uint64_t *lowaddr, uint64_t *highaddr, int big_endian,
+> +                     int elf_machine, int clear_lsb, int data_swab,
+> +                     AddressSpace *as, bool load_rom, symbol_fn_t sym_cb)
+> +{
+>      int fd, data_order, target_data_order, must_swab, ret = ELF_LOAD_FAILED;
+>      uint8_t e_ident[EI_NIDENT];
+>  
+> @@ -488,11 +502,11 @@ int load_elf_ram(const char *filename,
+>      if (e_ident[EI_CLASS] == ELFCLASS64) {
+>          ret = load_elf64(filename, fd, translate_fn, translate_opaque, must_swab,
+>                           pentry, lowaddr, highaddr, elf_machine, clear_lsb,
+> -                         data_swab, as, load_rom);
+> +                         data_swab, as, load_rom, sym_cb);
+>      } else {
+>          ret = load_elf32(filename, fd, translate_fn, translate_opaque, must_swab,
+>                           pentry, lowaddr, highaddr, elf_machine, clear_lsb,
+> -                         data_swab, as, load_rom);
+> +                         data_swab, as, load_rom, sym_cb);
+>      }
+>  
+>   fail:
+> diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+> index d192e7e..b6e19e3 100644
+> --- a/include/hw/elf_ops.h
+> +++ b/include/hw/elf_ops.h
+> @@ -105,7 +105,7 @@ static int glue(symcmp, SZ)(const void *s0, const void *s1)
+>  }
+>  
+>  static int glue(load_symbols, SZ)(struct elfhdr *ehdr, int fd, int must_swab,
+> -                                  int clear_lsb)
+> +                                  int clear_lsb, symbol_fn_t sym_cb)
+>  {
+>      struct elf_shdr *symtab, *strtab, *shdr_table = NULL;
+>      struct elf_sym *syms = NULL;
+> @@ -133,10 +133,26 @@ static int glue(load_symbols, SZ)(struct elfhdr *ehdr, int fd, int must_swab,
+>  
+>      nsyms = symtab->sh_size / sizeof(struct elf_sym);
+>  
+> +    /* String table */
+> +    if (symtab->sh_link >= ehdr->e_shnum) {
+> +        goto fail;
+> +    }
+> +    strtab = &shdr_table[symtab->sh_link];
+> +
+> +    str = load_at(fd, strtab->sh_offset, strtab->sh_size);
+> +    if (!str) {
+> +        goto fail;
+> +    }
+> +
+>      i = 0;
+>      while (i < nsyms) {
+> -        if (must_swab)
+> +        if (must_swab) {
+>              glue(bswap_sym, SZ)(&syms[i]);
+> +        }
+> +        if (sym_cb) {
+> +            sym_cb(str + syms[i].st_name, syms[i].st_info,
+> +                   syms[i].st_value, syms[i].st_size);
+> +        }
+>          /* We are only interested in function symbols.
+>             Throw everything else away.  */
+>          if (syms[i].st_shndx == SHN_UNDEF ||
+> @@ -163,15 +179,6 @@ static int glue(load_symbols, SZ)(struct elfhdr *ehdr, int fd, int must_swab,
+>          }
+>      }
+>  
+> -    /* String table */
+> -    if (symtab->sh_link >= ehdr->e_shnum)
+> -        goto fail;
+> -    strtab = &shdr_table[symtab->sh_link];
+> -
+> -    str = load_at(fd, strtab->sh_offset, strtab->sh_size);
+> -    if (!str)
+> -        goto fail;
+> -
+>      /* Commit */
+>      s = g_malloc0(sizeof(*s));
+>      s->lookup_symbol = glue(lookup_symbol, SZ);
+> @@ -264,7 +271,8 @@ static int glue(load_elf, SZ)(const char *name, int fd,
+>                                int must_swab, uint64_t *pentry,
+>                                uint64_t *lowaddr, uint64_t *highaddr,
+>                                int elf_machine, int clear_lsb, int data_swab,
+> -                              AddressSpace *as, bool load_rom)
+> +                              AddressSpace *as, bool load_rom,
+> +                              symbol_fn_t sym_cb)
+>  {
+>      struct elfhdr ehdr;
+>      struct elf_phdr *phdr = NULL, *ph;
+> @@ -329,7 +337,7 @@ static int glue(load_elf, SZ)(const char *name, int fd,
+>      if (pentry)
+>     	*pentry = (uint64_t)(elf_sword)ehdr.e_entry;
+>  
+> -    glue(load_symbols, SZ)(&ehdr, fd, must_swab, clear_lsb);
+> +    glue(load_symbols, SZ)(&ehdr, fd, must_swab, clear_lsb, sym_cb);
+>  
+>      size = ehdr.e_phnum * sizeof(phdr[0]);
+>      if (lseek(fd, ehdr.e_phoff, SEEK_SET) != ehdr.e_phoff) {
+> diff --git a/include/hw/loader.h b/include/hw/loader.h
+> index 5edbe02..7b05e8b 100644
+> --- a/include/hw/loader.h
+> +++ b/include/hw/loader.h
+> @@ -64,7 +64,7 @@ int load_image_gzipped(const char *filename, hwaddr addr, uint64_t max_sz);
+>  #define ELF_LOAD_WRONG_ENDIAN -4
+>  const char *load_elf_strerror(int error);
+>  
+> -/** load_elf_ram:
+> +/** load_elf_ram_sym:
+>   * @filename: Path of ELF file
+>   * @translate_fn: optional function to translate load addresses
+>   * @translate_opaque: opaque data passed to @translate_fn
+> @@ -81,6 +81,7 @@ const char *load_elf_strerror(int error);
+>   * @as: The AddressSpace to load the ELF to. The value of address_space_memory
+>   *      is used if nothing is supplied here.
+>   * @load_rom : Load ELF binary as ROM
+> + * @sym_cb: Callback function for symbol table entries
+>   *
+>   * Load an ELF file's contents to the emulated system's address space.
+>   * Clients may optionally specify a callback to perform address
+> @@ -93,6 +94,20 @@ const char *load_elf_strerror(int error);
+>   * If @elf_machine is EM_NONE then the machine type will be read from the
+>   * ELF header and no checks will be carried out against the machine type.
+>   */
+> +typedef void (*symbol_fn_t)(const char *st_name, int st_info,
+> +                            uint64_t st_value, uint64_t st_size);
+> +
+> +int load_elf_ram_sym(const char *filename,
+> +                     uint64_t (*translate_fn)(void *, uint64_t),
+> +                     void *translate_opaque, uint64_t *pentry,
+> +                     uint64_t *lowaddr, uint64_t *highaddr, int big_endian,
+> +                     int elf_machine, int clear_lsb, int data_swab,
+> +                     AddressSpace *as, bool load_rom, symbol_fn_t sym_cb);
+> +
+> +/** load_elf_ram:
+> + * Same as load_elf_ram_sym(), but doesn't allow the caller to specify a
+> + * symbol callback function
+> + */
+>  int load_elf_ram(const char *filename,
+>                   uint64_t (*translate_fn)(void *, uint64_t),
+>                   void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
+> 
