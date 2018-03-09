@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1euIgv-00030Q-Gk
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:08:14 -0500
+	(envelope-from <berto@igalia.com>) id 1euIkB-0004SO-FC
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:11:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1euIgr-0008Fa-MB
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:08:13 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40628 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1euIgr-0008FI-I0
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:08:09 -0500
-References: <20180309135945.20436-1-kraxel@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <6df623d1-d171-a208-dde4-0a6a7d0d9426@redhat.com>
-Date: Fri, 9 Mar 2018 15:08:05 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180309135945.20436-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] build: try improve handling of clang
- warnings
+	(envelope-from <berto@igalia.com>) id 1euIk6-0001MD-GN
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:11:35 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Fri,  9 Mar 2018 16:11:07 +0200
+Message-Id: <20180309141107.13964-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH] hmp: Allow using a qdev id in
+ block_set_io_throttle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +18,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 09.03.2018 14:59, Gerd Hoffmann wrote:
-> This patch disables the pragma diagnostic -Wunused-but-set-variable for
-> clang in util/coroutine-ucontext.c.
->=20
-> This in turn allows us to remove it from the configure check, so the
-> CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE will succeed for clang.
->=20
-> With that in place clang builds (linux) will use -Werror by default,
-> which breaks the build due to warning about unaligned struct members.
->=20
-> Just turning off this warning isn't a good idea as it indicates
-> portability problems.  So make it a warning again, using
-> -Wno-error=3Daddress-of-packed-member.  That way it doesn't break the
-> build but still shows up in the logs.
->=20
-> Now clang builds qemu without errors.  Well, almost.  There are some
-> left in the rdma code.  Leaving that to the rdma people.  All others ca=
-n
-> use --disable-rdma to workarounds this.
->=20
-> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Cc: Thomas Huth <thuth@redhat.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  configure                 | 2 +-
->  util/coroutine-ucontext.c | 4 ++--
->  2 files changed, 3 insertions(+), 3 deletions(-)
+The QMP version of this command can take a qdev ID since 7a9877a02635,
+but the HMP version is still using the deprecated block device name so
+there's no way to refer to a block device added like this:
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+  -blockdev node-name=disk0,driver=qcow2,file.driver=file,file.filename=hd.qcow2
+  -device virtio-blk-pci,id=virtio-blk-pci0,drive=disk0
+
+This patch works around this problem by using the specified name as a
+qdev ID if the block device name is not found.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ hmp-commands.hx |  3 ++-
+ hmp.c           | 14 ++++++++++++--
+ 2 files changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 964eb515cf..097ed0909b 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1645,7 +1645,8 @@ ETEXI
+ STEXI
+ @item block_set_io_throttle @var{device} @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
+ @findex block_set_io_throttle
+-Change I/O throttle limits for a block drive to @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
++Change I/O throttle limits for a block drive to @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}.
++@var{device} can be a block device name, a qdev ID or a QOM path.
+ ETEXI
+ 
+     {
+diff --git a/hmp.c b/hmp.c
+index 016cb5c4f1..8520d86869 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1774,9 +1774,8 @@ void hmp_change(Monitor *mon, const QDict *qdict)
+ void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
+ {
+     Error *err = NULL;
++    char *device = (char *) qdict_get_str(qdict, "device");
+     BlockIOThrottle throttle = {
+-        .has_device = true,
+-        .device = (char *) qdict_get_str(qdict, "device"),
+         .bps = qdict_get_int(qdict, "bps"),
+         .bps_rd = qdict_get_int(qdict, "bps_rd"),
+         .bps_wr = qdict_get_int(qdict, "bps_wr"),
+@@ -1785,6 +1784,17 @@ void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
+         .iops_wr = qdict_get_int(qdict, "iops_wr"),
+     };
+ 
++    /* qmp_block_set_io_throttle has separate parameters for the
++     * (deprecated) block device name and the qdev ID but the HMP
++     * version has only one, so we must decide which one to pass. */
++    if (blk_by_name(device)) {
++        throttle.has_device = true;
++        throttle.device = device;
++    } else {
++        throttle.has_id = true;
++        throttle.id = device;
++    }
++
+     qmp_block_set_io_throttle(&throttle, &err);
+     hmp_handle_error(mon, &err);
+ }
+-- 
+2.11.0
