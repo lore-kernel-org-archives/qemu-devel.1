@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1euIwm-0007wk-Se
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:24:37 -0500
+	(envelope-from <laurent@vivier.eu>) id 1euIyq-0000vf-1H
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:26:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1euIwi-0006N8-PW
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:24:36 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39380 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1euIwi-0006N0-KZ
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:24:32 -0500
-References: <20180226075846.20307-1-famz@redhat.com>
-	<20180226075846.20307-3-famz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0deeab65-9c94-c4e2-7dba-a254b185d5d9@redhat.com>
-Date: Fri, 9 Mar 2018 08:24:31 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180226075846.20307-3-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] tests: Use query-usernet instead of
- 'info usernet'
+	(envelope-from <laurent@vivier.eu>) id 1euIym-0007Bb-0I
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:26:43 -0500
+Received: from mout.kundenserver.de ([217.72.192.75]:50665)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1euIyl-0007AR-NJ
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:26:39 -0500
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Fri,  9 Mar 2018 15:26:23 +0100
+Message-Id: <20180309142630.2170-2-laurent@vivier.eu>
+In-Reply-To: <20180309142630.2170-1-laurent@vivier.eu>
+References: <20180309142630.2170-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PULL 1/8] target/m68k: define floatx80_move()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,22 +23,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>
 
-On 02/26/2018 01:58 AM, Fam Zheng wrote:
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->   tests/vm/basevm.py | 14 +++++++-------
->   1 file changed, 7 insertions(+), 7 deletions(-)
-> 
+This functions is needed by upcoming m68k softfloat functions.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Source code copied for WinUAE (tag 3500)
+(The WinUAE file has been copied from QEMU and has
+the QEMU licensing notice)
 
-I think this series can go through either my QAPI tree, or through the 
-Jason's net tree, once v3 fixes the issues I pointed out on 1/2.
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20180305203910.10391-2-laurent@vivier.eu>
+---
+ target/m68k/softfloat.c | 27 +++++++++++++++++++++++++++
+ target/m68k/softfloat.h |  1 +
+ 2 files changed, 28 insertions(+)
 
+diff --git a/target/m68k/softfloat.c b/target/m68k/softfloat.c
+index 9cb141900c..55eb7a260a 100644
+--- a/target/m68k/softfloat.c
++++ b/target/m68k/softfloat.c
+@@ -247,3 +247,30 @@ floatx80 floatx80_scale(floatx80 a, floatx80 b, float_status *status)
+     return roundAndPackFloatx80(status->floatx80_rounding_precision,
+                                 aSign, aExp, aSig, 0, status);
+ }
++
++floatx80 floatx80_move(floatx80 a, float_status *status)
++{
++    flag aSign;
++    int32_t aExp;
++    uint64_t aSig;
++
++    aSig = extractFloatx80Frac(a);
++    aExp = extractFloatx80Exp(a);
++    aSign = extractFloatx80Sign(a);
++
++    if (aExp == 0x7FFF) {
++        if ((uint64_t)(aSig << 1)) {
++            return propagateFloatx80NaNOneArg(a, status);
++        }
++        return a;
++    }
++    if (aExp == 0) {
++        if (aSig == 0) {
++            return a;
++        }
++        normalizeRoundAndPackFloatx80(status->floatx80_rounding_precision,
++                                      aSign, aExp, aSig, 0, status);
++    }
++    return roundAndPackFloatx80(status->floatx80_rounding_precision, aSign,
++                                aExp, aSig, 0, status);
++}
+diff --git a/target/m68k/softfloat.h b/target/m68k/softfloat.h
+index 78fbc0cd0c..18561b870d 100644
+--- a/target/m68k/softfloat.h
++++ b/target/m68k/softfloat.h
+@@ -26,4 +26,5 @@ floatx80 floatx80_mod(floatx80 a, floatx80 b, float_status *status);
+ floatx80 floatx80_getman(floatx80 a, float_status *status);
+ floatx80 floatx80_getexp(floatx80 a, float_status *status);
+ floatx80 floatx80_scale(floatx80 a, floatx80 b, float_status *status);
++floatx80 floatx80_move(floatx80 a, float_status *status);
+ #endif
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.14.3
