@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1euIRd-0003Mx-Of
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:52:26 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1euITO-0004W8-G5
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:54:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1euIRa-0000Q6-N4
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:52:25 -0500
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:53055)
+	(envelope-from <peter.maydell@linaro.org>) id 1euITN-00016V-Nt
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:54:14 -0500
+Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:46022)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1euIRa-0000Po-Gp
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:52:22 -0500
-Received: by mail-wm0-x235.google.com with SMTP id t3so4039134wmc.2
-	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 05:52:22 -0800 (PST)
-References: <20180308130626.12393-1-peter.maydell@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180308130626.12393-1-peter.maydell@linaro.org>
-Date: Fri, 09 Mar 2018 13:52:19 +0000
-Message-ID: <87zi3hjqzw.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1euITN-00016I-If
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:54:13 -0500
+Received: by mail-oi0-x236.google.com with SMTP id j79so6991494oib.12
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 05:54:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <871sgtl5o0.fsf@linaro.org>
+References: <20180308130626.12393-1-peter.maydell@linaro.org>
+	<20180308130626.12393-7-peter.maydell@linaro.org>
+	<871sgtl5o0.fsf@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 9 Mar 2018 13:53:52 +0000
+Message-ID: <CAFEAcA-JDyRPy1MiCf49+0W3VVgn3O6wWN=8v22Kpc+e7bRN9A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 0/6] arm: support -cpu max (and
- gic-version=max)
+Subject: Re: [Qemu-devel] [PATCH v3 6/6] hw/arm/virt: Support -machine
+ gic-version=max
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +32,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Igor Mammedov <imammedo@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> This patchset adds support for '-cpu max' to Arm, along the lines
-> of the existing support we have for x86 targets:
+On 9 March 2018 at 13:50, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
 >
->  * under KVM, -cpu max is the same as -cpu host
->  * under TCG, -cpu max means "emulate with as many features as
->    possible"
-<snip>
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>> @@ -1480,9 +1487,11 @@ static void virt_set_gic_version(Object *obj, con=
+st char *value, Error **errp)
+>>          vms->gic_version =3D 2;
+>>      } else if (!strcmp(value, "host")) {
+>>          vms->gic_version =3D 0; /* Will probe later */
+>> +    } else if (!strcmp(value, "max")) {
+>> +        vms->gic_version =3D -1; /* Will probe later */
+>>      } else {
+>>          error_setg(errp, "Invalid gic-version value");
+>> -        error_append_hint(errp, "Valid values are 3, 2, host.\n");
+>> +        error_append_hint(errp, "Valid values are 3, 2, host,
+>> max.\n");
+>
+> nit: host is only valid on aarch64 host. However it will fail later on
+> with:
+>
+>   qemu-system-aarch64: gic-version=3Dhost requires KVM
 
-It all looks good to me. The only minor problem I ran into was setting
--M virt,gic-version=3Dmax silently hangs with the stock QEMU_EFI.fd on my
-version of Ubuntu. It would be nice if there was better feedback we
-could give to the user in this case.
+'host' was already in this string. It's valid in the sense that
+it's not a syntax error, though it won't work in all situations.
+(Similarly, if you try '3' and you have KVM enabled and a gicv2
+host system you'll get an error.)
 
-It works with the latest snapshot from:
-
-  http://snapshots.linaro.org/reference-platform/enterprise/firmware/15/rel=
-ease/qemu-aarch64/
-
-Anyway this series can have:
-
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
---
-Alex Benn=C3=A9e
+thanks
+-- PMM
