@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1euI5Y-0008E4-UE
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:29:38 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1euI5Y-0008E5-UG
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:29:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1euI5V-0003op-Pr
+	(envelope-from <pbonzini@redhat.com>) id 1euI5V-0003oh-PR
 	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:29:36 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37622 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53316 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1euI5V-0003ny-K8
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1euI5V-0003nw-K6
 	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:29:33 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri,  9 Mar 2018 14:29:22 +0100
-Message-Id: <20180309132922.24211-5-pbonzini@redhat.com>
-In-Reply-To: <20180309132922.24211-1-pbonzini@redhat.com>
-References: <20180309132922.24211-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/4] membarrier: add --enable-membarrier
+Date: Fri,  9 Mar 2018 14:29:18 +0100
+Message-Id: <20180309132922.24211-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/4] Optionally use membarrier system call for
+ RCU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,201 +25,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Emilio G . Cota" <cota@braap.org>
 
-Actually enable the global memory barriers if supported by the OS.
-Because only recent versions of Linux include the support, they
-are disabled by default.  Note that it also has to be disabled
-for QEMU to run under Wine.
+I didn't have time to check whether it improves performance (not
+too likely, since QEMU tends to have pretty long RCU critical
+sections), but it cannot hurt either. :)
 
-Before this patch, rcutorture reports 85 ns/read for my machine,
-after the patch it reports 12.5 ns/read.  On the other hand updates
-go from 50 *micro*seconds to 20 *milli*seconds.
+For microbenchmark results, see patch 4.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
+Paolo
+
+
+Paolo Bonzini (4):
+  rcutorture: remove synchronize_rcu from readers
+  rcu: make memory barriers more explicit
+  membarrier: introduce qemu/sys_membarrier.h
+  membarrier: add --enable-membarrier
+
  configure                     | 41 ++++++++++++++++++++++++++++++++++-
- include/qemu/sys_membarrier.h | 10 +++++++++
+ include/qemu/rcu.h            | 16 ++++++++++++--
+ include/qemu/sys_membarrier.h | 27 +++++++++++++++++++++++
+ tests/rcutorture.c            |  4 ---
  util/Makefile.objs            |  1 +
+ util/rcu.c                    | 15 +++++++++----
  util/sys_membarrier.c         | 50 +++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 101 insertions(+), 1 deletion(-)
+ 7 files changed, 143 insertions(+), 11 deletions(-)
+ create mode 100644 include/qemu/sys_membarrier.h
  create mode 100644 util/sys_membarrier.c
 
-diff --git a/configure b/configure
-index 6f3921c02a..4fcd18f136 100755
---- a/configure
-+++ b/configure
-@@ -342,7 +342,7 @@ attr=""
- libattr=""
- xfs=""
- tcg="yes"
--
-+membarrier=""
- vhost_net="no"
- vhost_crypto="no"
- vhost_scsi="no"
-@@ -1161,6 +1161,10 @@ for opt do
-   ;;
-   --enable-attr) attr="yes"
-   ;;
-+  --disable-membarrier) membarrier="no"
-+  ;;
-+  --enable-membarrier) membarrier="yes"
-+  ;;
-   --disable-blobs) blobs="no"
-   ;;
-   --with-pkgversion=*) pkgversion=" ($optarg)"
-@@ -1577,6 +1581,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   xen-pci-passthrough
-   brlapi          BrlAPI (Braile)
-   curl            curl connectivity
-+  membarrier      membarrier system call (for Linux 4.14+ or Windows)
-   fdt             fdt device tree
-   bluez           bluez stack connectivity
-   kvm             KVM acceleration support
-@@ -5137,6 +5142,35 @@ if compile_prog "" "" ; then
-     have_fsxattr=yes
- fi
- 
-+##########################################
-+# check for usable membarrier system call
-+if test "$membarrier" = "yes"; then
-+    have_membarrier=no
-+    if test "$mingw32" = "yes" ; then
-+        have_membarrier=yes
-+    elif test "$linux" = "yes" ; then
-+        cat > $TMPC << EOF
-+    #include <linux/membarrier.h>
-+    #include <sys/syscall.h>
-+    #include <unistd.h>
-+    int main(void) {
-+        syscall(__NR_membarrier, MEMBARRIER_CMD_QUERY, 0);
-+        syscall(__NR_membarrier, MEMBARRIER_CMD_SHARED, 0);
-+    }
-+EOF
-+        if compile_prog "" "" ; then
-+            have_membarrier=yes
-+        fi
-+    fi
-+    if test "$have_membarrier" = "no"; then
-+      feature_not_found "membarrier" "membarrier system call not available"
-+    fi
-+else
-+    # Do not enable it by default even for Mingw32, because it doesn't
-+    # work on Wine.
-+    membarrier=no
-+fi
-+
- ##########################################
- # check if rtnetlink.h exists and is useful
- have_rtnetlink=no
-@@ -5763,6 +5798,7 @@ fi
- echo "malloc trim support $malloc_trim"
- echo "RDMA support      $rdma"
- echo "fdt support       $fdt"
-+echo "membarrier        $membarrier"
- echo "preadv support    $preadv"
- echo "fdatasync         $fdatasync"
- echo "madvise           $madvise"
-@@ -6245,6 +6281,9 @@ fi
- if test "$fdt" = "yes" ; then
-   echo "CONFIG_FDT=y" >> $config_host_mak
- fi
-+if test "$membarrier" = "yes" ; then
-+  echo "CONFIG_MEMBARRIER=y" >> $config_host_mak
-+fi
- if test "$signalfd" = "yes" ; then
-   echo "CONFIG_SIGNALFD=y" >> $config_host_mak
- fi
-diff --git a/include/qemu/sys_membarrier.h b/include/qemu/sys_membarrier.h
-index 9ce7f5210b..316e3dc4a2 100644
---- a/include/qemu/sys_membarrier.h
-+++ b/include/qemu/sys_membarrier.h
-@@ -9,9 +9,19 @@
- #ifndef QEMU_SYS_MEMBARRIER_H
- #define QEMU_SYS_MEMBARRIER_H 1
- 
-+#ifdef CONFIG_MEMBARRIER
-+/* Only block reordering at the compiler level in the performance-critical
-+ * side.  The slow side forces processor-level ordering on all other cores
-+ * through a system call.
-+ */
-+extern void smp_mb_global_init(void);
-+extern void smp_mb_global(void);
-+#define smp_mb_placeholder()       barrier()
-+#else
- /* Keep it simple, execute a real memory barrier on both sides.  */
- static inline void smp_mb_global_init(void) {}
- #define smp_mb_global()            smp_mb()
- #define smp_mb_placeholder()       smp_mb()
-+#endif
- 
- #endif
-diff --git a/util/Makefile.objs b/util/Makefile.objs
-index ae90b9963d..728c3541db 100644
---- a/util/Makefile.objs
-+++ b/util/Makefile.objs
-@@ -33,6 +33,7 @@ util-obj-y += throttle.o
- util-obj-y += getauxval.o
- util-obj-y += readline.o
- util-obj-y += rcu.o
-+util-obj-$(CONFIG_MEMBARRIER) += sys_membarrier.o
- util-obj-y += qemu-coroutine.o qemu-coroutine-lock.o qemu-coroutine-io.o
- util-obj-y += qemu-coroutine-sleep.o
- util-obj-y += coroutine-$(CONFIG_COROUTINE_BACKEND).o
-diff --git a/util/sys_membarrier.c b/util/sys_membarrier.c
-new file mode 100644
-index 0000000000..8dcb53e63e
---- /dev/null
-+++ b/util/sys_membarrier.c
-@@ -0,0 +1,50 @@
-+/*
-+ * Process-global memory barriers
-+ *
-+ * Copyright (c) 2018 Red Hat, Inc.
-+ *
-+ * Author: Paolo Bonzini <pbonzini@redhat.com>
-+ */
-+
-+#include <qemu/osdep.h>
-+#include <qemu/sys_membarrier.h>
-+#include <qemu/error-report.h>
-+
-+#ifdef CONFIG_LINUX
-+#include <linux/membarrier.h>
-+#include <sys/syscall.h>
-+
-+static int
-+membarrier(int cmd, int flags)
-+{
-+    return syscall(__NR_membarrier, cmd, flags);
-+}
-+#endif
-+
-+void smp_mb_global(void)
-+{
-+#if defined CONFIG_WIN32
-+    FlushProcessWriteBuffers();
-+#elif defined CONFIG_LINUX
-+    membarrier(MEMBARRIER_CMD_SHARED, 0);
-+#else
-+#error --enable-membarrier is not supported on this operating system.
-+#endif
-+}
-+
-+void smp_mb_global_init(void)
-+{
-+#ifdef CONFIG_LINUX
-+    int ret = membarrier(MEMBARRIER_CMD_QUERY, 0);
-+    if (ret < 0) {
-+        error_report("This QEMU binary requires the membarrier system call.");
-+        error_report("Please upgrade your system to a newer version of Linux");
-+        exit(1);
-+    }
-+    if (!(ret & MEMBARRIER_CMD_SHARED)) {
-+        error_report("This QEMU binary requires MEMBARRIER_CMD_SHARED support.");
-+        error_report("Please upgrade your system to a newer version of Linux");
-+        exit(1);
-+    }
-+#endif
-+}
 -- 
 2.14.3
