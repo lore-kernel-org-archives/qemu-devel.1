@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1euLnm-0000pZ-Mx
+	(envelope-from <kwolf@redhat.com>) id 1euLnm-0000pX-MT
 	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:27:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1euLnl-0006cp-LD
+	(envelope-from <kwolf@redhat.com>) id 1euLnl-0006cv-Om
 	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:27:30 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  9 Mar 2018 18:27:10 +0100
-Message-Id: <20180309172713.26318-4-kwolf@redhat.com>
+Date: Fri,  9 Mar 2018 18:27:08 +0100
+Message-Id: <20180309172713.26318-2-kwolf@redhat.com>
 In-Reply-To: <20180309172713.26318-1-kwolf@redhat.com>
 References: <20180309172713.26318-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/6] luks: Support .bdrv_co_create
+Subject: [Qemu-devel] [PATCH 1/6] luks: Separate image file creation from
+ formatting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,101 +23,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, berrange@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-This adds the .bdrv_co_create driver callback to luks, which enables
-image creation over QMP.
+The crypto driver used to create the image file in a callback from the
+crypto subsystem. If we want to implement .bdrv_co_create, this needs to
+go away because that callback will get a reference to an already
+existing block node.
+
+Move the image file creation to block_crypto_create_generic().
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-core.json | 17 ++++++++++++++++-
- block/crypto.c       | 34 ++++++++++++++++++++++++++++++++++
- 2 files changed, 50 insertions(+), 1 deletion(-)
+ block/crypto.c | 37 +++++++++++++++++--------------------
+ 1 file changed, 17 insertions(+), 20 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 524d51567a..07039bfe9c 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3452,6 +3452,21 @@
-             '*preallocation':   'PreallocMode' } }
- 
- ##
-+# @BlockdevCreateOptionsLUKS:
-+#
-+# Driver specific image creation options for LUKS.
-+#
-+# @file             Node to create the image format on
-+# @size             Size of the virtual disk in bytes
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'BlockdevCreateOptionsLUKS',
-+  'data': { 'file':             'BlockdevRef',
-+            'qcrypto':          'QCryptoBlockCreateOptionsLUKS',
-+            'size':             'size' } }
-+
-+##
- # @BlockdevCreateOptionsNfs:
- #
- # Driver specific image creation options for NFS.
-@@ -3643,7 +3658,7 @@
-       'http':           'BlockdevCreateNotSupported',
-       'https':          'BlockdevCreateNotSupported',
-       'iscsi':          'BlockdevCreateNotSupported',
--      'luks':           'BlockdevCreateNotSupported',
-+      'luks':           'BlockdevCreateOptionsLUKS',
-       'nbd':            'BlockdevCreateNotSupported',
-       'nfs':            'BlockdevCreateOptionsNfs',
-       'null-aio':       'BlockdevCreateNotSupported',
 diff --git a/block/crypto.c b/block/crypto.c
-index b0a4cb3388..2035f9ab13 100644
+index e6095e7807..77871640cc 100644
 --- a/block/crypto.c
 +++ b/block/crypto.c
-@@ -543,6 +543,39 @@ static int block_crypto_open_luks(BlockDriverState *bs,
-                                      bs, options, flags, errp);
+@@ -71,8 +71,6 @@ static ssize_t block_crypto_read_func(QCryptoBlock *block,
+ 
+ 
+ struct BlockCryptoCreateData {
+-    const char *filename;
+-    QemuOpts *opts;
+     BlockBackend *blk;
+     uint64_t size;
+ };
+@@ -103,27 +101,13 @@ static ssize_t block_crypto_init_func(QCryptoBlock *block,
+                                       Error **errp)
+ {
+     struct BlockCryptoCreateData *data = opaque;
+-    int ret;
+ 
+     /* User provided size should reflect amount of space made
+      * available to the guest, so we must take account of that
+      * which will be used by the crypto header
+      */
+-    data->size += headerlen;
+-
+-    qemu_opt_set_number(data->opts, BLOCK_OPT_SIZE, data->size, &error_abort);
+-    ret = bdrv_create_file(data->filename, data->opts, errp);
+-    if (ret < 0) {
+-        return -1;
+-    }
+-
+-    data->blk = blk_new_open(data->filename, NULL, NULL,
+-                             BDRV_O_RDWR | BDRV_O_PROTOCOL, errp);
+-    if (!data->blk) {
+-        return -1;
+-    }
+-
+-    return 0;
++    return blk_truncate(data->blk, data->size + headerlen, PREALLOC_MODE_OFF,
++                        errp);
  }
  
-+static int coroutine_fn
-+block_crypto_co_create_luks(BlockdevCreateOptions *create_options, Error **errp)
-+{
-+    BlockdevCreateOptionsLUKS *luks_opts;
-+    BlockDriverState *bs = NULL;
-+    QCryptoBlockCreateOptions create_opts;
-+    int ret;
-+
-+    assert(create_options->driver == BLOCKDEV_DRIVER_LUKS);
-+    luks_opts = &create_options->u.luks;
-+
-+    bs = bdrv_open_blockdev_ref(luks_opts->file, errp);
-+    if (bs == NULL) {
-+        return -EIO;
-+    }
-+
-+    create_opts = (QCryptoBlockCreateOptions) {
-+        .format = Q_CRYPTO_BLOCK_FORMAT_LUKS,
-+        .u.luks = *luks_opts->qcrypto,
-+    };
-+
-+    ret = block_crypto_co_create_generic(bs, luks_opts->size, &create_opts,
-+                                         errp);
+ 
+@@ -333,11 +317,10 @@ static int block_crypto_create_generic(QCryptoBlockFormat format,
+     struct BlockCryptoCreateData data = {
+         .size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+                          BDRV_SECTOR_SIZE),
+-        .opts = opts,
+-        .filename = filename,
+     };
+     QDict *cryptoopts;
+ 
++    /* Parse options */
+     cryptoopts = qemu_opts_to_qdict(opts, NULL);
+ 
+     create_opts = block_crypto_create_opts_init(format, cryptoopts, errp);
+@@ -345,6 +328,20 @@ static int block_crypto_create_generic(QCryptoBlockFormat format,
+         return -1;
+     }
+ 
++    /* Create protocol layer */
++    ret = bdrv_create_file(filename, opts, errp);
 +    if (ret < 0) {
-+        goto fail;
++        return ret;
 +    }
 +
-+    ret = 0;
-+fail:
-+    bdrv_unref(bs);
-+    return ret;
-+}
++    data.blk = blk_new_open(filename, NULL, NULL,
++                            BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
++                            errp);
++    if (!data.blk) {
++        return -EINVAL;
++    }
 +
- static int coroutine_fn block_crypto_co_create_opts_luks(const char *filename,
-                                                          QemuOpts *opts,
-                                                          Error **errp)
-@@ -647,6 +680,7 @@ BlockDriver bdrv_crypto_luks = {
-     .bdrv_open          = block_crypto_open_luks,
-     .bdrv_close         = block_crypto_close,
-     .bdrv_child_perm    = bdrv_format_default_perms,
-+    .bdrv_co_create     = block_crypto_co_create_luks,
-     .bdrv_co_create_opts = block_crypto_co_create_opts_luks,
-     .bdrv_truncate      = block_crypto_truncate,
-     .create_opts        = &block_crypto_create_opts_luks,
++    /* Create format layer */
+     crypto = qcrypto_block_create(create_opts, NULL,
+                                   block_crypto_init_func,
+                                   block_crypto_write_func,
 -- 
 2.13.6
