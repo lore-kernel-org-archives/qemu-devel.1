@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1euIyq-0000vf-1H
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:26:44 -0500
+	(envelope-from <laurent@vivier.eu>) id 1euIyq-0000vd-0Q
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:26:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1euIym-0007Bb-0I
+	(envelope-from <laurent@vivier.eu>) id 1euIyo-0007CP-6n
 	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:26:43 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:50665)
+Received: from mout.kundenserver.de ([217.72.192.75]:45337)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1euIyl-0007AR-NJ
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:26:39 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1euIyn-0007CE-Sk
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 09:26:42 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Fri,  9 Mar 2018 15:26:23 +0100
-Message-Id: <20180309142630.2170-2-laurent@vivier.eu>
+Date: Fri,  9 Mar 2018 15:26:27 +0100
+Message-Id: <20180309142630.2170-6-laurent@vivier.eu>
 In-Reply-To: <20180309142630.2170-1-laurent@vivier.eu>
 References: <20180309142630.2170-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 1/8] target/m68k: define floatx80_move()
+Subject: [Qemu-devel] [PULL 5/8] target/m68k: implement flog2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,63 +26,143 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>
 
-This functions is needed by upcoming m68k softfloat functions.
-
-Source code copied for WinUAE (tag 3500)
-(The WinUAE file has been copied from QEMU and has
-the QEMU licensing notice)
+Using a local m68k floatx80_log2()
+[copied from previous:
+Written by Andreas Grabher for Previous, NeXT Computer Emulator.]
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20180305203910.10391-2-laurent@vivier.eu>
+Message-Id: <20180305203910.10391-6-laurent@vivier.eu>
 ---
- target/m68k/softfloat.c | 27 +++++++++++++++++++++++++++
- target/m68k/softfloat.h |  1 +
- 2 files changed, 28 insertions(+)
+ target/m68k/fpu_helper.c |  5 ++++
+ target/m68k/helper.h     |  1 +
+ target/m68k/softfloat.c  | 67 ++++++++++++++++++++++++++++++++++++++++++++++++
+ target/m68k/softfloat.h  |  1 +
+ target/m68k/translate.c  |  3 +++
+ 5 files changed, 77 insertions(+)
 
-diff --git a/target/m68k/softfloat.c b/target/m68k/softfloat.c
-index 9cb141900c..55eb7a260a 100644
---- a/target/m68k/softfloat.c
-+++ b/target/m68k/softfloat.c
-@@ -247,3 +247,30 @@ floatx80 floatx80_scale(floatx80 a, floatx80 b, float_status *status)
-     return roundAndPackFloatx80(status->floatx80_rounding_precision,
-                                 aSign, aExp, aSig, 0, status);
+diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
+index 2628534136..97a4501126 100644
+--- a/target/m68k/fpu_helper.c
++++ b/target/m68k/fpu_helper.c
+@@ -572,3 +572,8 @@ void HELPER(flog10)(CPUM68KState *env, FPReg *res, FPReg *val)
+ {
+     res->d = floatx80_log10(val->d, &env->fp_status);
  }
 +
-+floatx80 floatx80_move(floatx80 a, float_status *status)
++void HELPER(flog2)(CPUM68KState *env, FPReg *res, FPReg *val)
++{
++    res->d = floatx80_log2(val->d, &env->fp_status);
++}
+diff --git a/target/m68k/helper.h b/target/m68k/helper.h
+index d1f38f260f..15f63b353f 100644
+--- a/target/m68k/helper.h
++++ b/target/m68k/helper.h
+@@ -71,6 +71,7 @@ DEF_HELPER_4(fscale, void, env, fp, fp, fp)
+ DEF_HELPER_3(flognp1, void, env, fp, fp)
+ DEF_HELPER_3(flogn, void, env, fp, fp)
+ DEF_HELPER_3(flog10, void, env, fp, fp)
++DEF_HELPER_3(flog2, void, env, fp, fp)
+ 
+ DEF_HELPER_3(mac_move, void, env, i32, i32)
+ DEF_HELPER_3(macmulf, i64, env, i32, i32)
+diff --git a/target/m68k/softfloat.c b/target/m68k/softfloat.c
+index 22fd7f6341..9fa6d6fd05 100644
+--- a/target/m68k/softfloat.c
++++ b/target/m68k/softfloat.c
+@@ -715,3 +715,70 @@ floatx80 floatx80_log10(floatx80 a, float_status *status)
+ 
+     return a;
+ }
++
++/*----------------------------------------------------------------------------
++ | Log base 2
++ *----------------------------------------------------------------------------*/
++
++floatx80 floatx80_log2(floatx80 a, float_status *status)
 +{
 +    flag aSign;
 +    int32_t aExp;
 +    uint64_t aSig;
++
++    int8_t user_rnd_mode, user_rnd_prec;
++
++    floatx80 fp0, fp1;
 +
 +    aSig = extractFloatx80Frac(a);
 +    aExp = extractFloatx80Exp(a);
 +    aSign = extractFloatx80Sign(a);
 +
 +    if (aExp == 0x7FFF) {
-+        if ((uint64_t)(aSig << 1)) {
-+            return propagateFloatx80NaNOneArg(a, status);
++        if ((uint64_t) (aSig << 1)) {
++            propagateFloatx80NaNOneArg(a, status);
 +        }
-+        return a;
++        if (aSign == 0) {
++            return packFloatx80(0, floatx80_infinity.high,
++                                floatx80_infinity.low);
++        }
 +    }
++
 +    if (aExp == 0) {
 +        if (aSig == 0) {
-+            return a;
++            float_raise(float_flag_divbyzero, status);
++            return packFloatx80(1, floatx80_infinity.high,
++                                floatx80_infinity.low);
 +        }
-+        normalizeRoundAndPackFloatx80(status->floatx80_rounding_precision,
-+                                      aSign, aExp, aSig, 0, status);
++        normalizeFloatx80Subnormal(aSig, &aExp, &aSig);
 +    }
-+    return roundAndPackFloatx80(status->floatx80_rounding_precision, aSign,
-+                                aExp, aSig, 0, status);
++
++    if (aSign) {
++        float_raise(float_flag_invalid, status);
++        return floatx80_default_nan(status);
++    }
++
++    user_rnd_mode = status->float_rounding_mode;
++    user_rnd_prec = status->floatx80_rounding_precision;
++    status->float_rounding_mode = float_round_nearest_even;
++    status->floatx80_rounding_precision = 80;
++
++    if (aSig == one_sig) { /* X is 2^k */
++        status->float_rounding_mode = user_rnd_mode;
++        status->floatx80_rounding_precision = user_rnd_prec;
++
++        a = int32_to_floatx80(aExp - 0x3FFF, status);
++    } else {
++        fp0 = floatx80_logn(a, status);
++        fp1 = packFloatx80(0, 0x3FFF, LIT64(0xB8AA3B295C17F0BC)); /* INV_L2 */
++
++        status->float_rounding_mode = user_rnd_mode;
++        status->floatx80_rounding_precision = user_rnd_prec;
++
++        a = floatx80_mul(fp0, fp1, status); /* LOGN(X)*INV_L2 */
++    }
++
++    float_raise(float_flag_inexact, status);
++
++    return a;
 +}
 diff --git a/target/m68k/softfloat.h b/target/m68k/softfloat.h
-index 78fbc0cd0c..18561b870d 100644
+index ac29e76189..c0b77cf01b 100644
 --- a/target/m68k/softfloat.h
 +++ b/target/m68k/softfloat.h
-@@ -26,4 +26,5 @@ floatx80 floatx80_mod(floatx80 a, floatx80 b, float_status *status);
- floatx80 floatx80_getman(floatx80 a, float_status *status);
- floatx80 floatx80_getexp(floatx80 a, float_status *status);
- floatx80 floatx80_scale(floatx80 a, floatx80 b, float_status *status);
-+floatx80 floatx80_move(floatx80 a, float_status *status);
+@@ -30,4 +30,5 @@ floatx80 floatx80_move(floatx80 a, float_status *status);
+ floatx80 floatx80_lognp1(floatx80 a, float_status *status);
+ floatx80 floatx80_logn(floatx80 a, float_status *status);
+ floatx80 floatx80_log10(floatx80 a, float_status *status);
++floatx80 floatx80_log2(floatx80 a, float_status *status);
  #endif
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index f1130df314..189b23d38d 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -5063,6 +5063,9 @@ DISAS_INSN(fpu)
+     case 0x15: /* flog10 */
+         gen_helper_flog10(cpu_env, cpu_dest, cpu_src);
+         break;
++    case 0x16: /* flog2 */
++        gen_helper_flog2(cpu_env, cpu_dest, cpu_src);
++        break;
+     case 0x18: /* fabs */
+         gen_helper_fabs(cpu_env, cpu_dest, cpu_src);
+         break;
 -- 
 2.14.3
