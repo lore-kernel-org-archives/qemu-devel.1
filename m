@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47414)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1euOVm-000252-SU
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:21:09 -0500
+	(envelope-from <mjc@sifive.com>) id 1euOWE-0002QP-FD
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:21:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1euOVj-0004Lv-Nz
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:21:06 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:51099)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1euOVj-0004LG-Eg
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:21:03 -0500
-References: <20171228180814.9749-1-lukeshu@lukeshu.com>
-	<20171228180814.9749-2-lukeshu@lukeshu.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <966b35a3-654c-fabf-e416-86b14da9fd29@vivier.eu>
-Date: Fri, 9 Mar 2018 21:20:30 +0100
-MIME-Version: 1.0
-In-Reply-To: <20171228180814.9749-2-lukeshu@lukeshu.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 01/10] linux-user: Use #if to only call
- validate_guest_space for 32-bit ARM target
+	(envelope-from <mjc@sifive.com>) id 1euOWB-0004Z5-CE
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:21:34 -0500
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:33489)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1euOWB-0004Yy-4j
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 15:21:31 -0500
+Received: by mail-pg0-x243.google.com with SMTP id g12so3979345pgs.0
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 12:21:31 -0800 (PST)
+From: Michael Clark <mjc@sifive.com>
+Date: Sat, 10 Mar 2018 09:20:18 +1300
+Message-Id: <1520626818-93348-1-git-send-email-mjc@sifive.com>
+Subject: [Qemu-devel] [PATCH] RISC-V: Fix isa string logic bug,
+ use popcount to count bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +24,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Luke Shumaker <lukeshu@lukeshu.com>, qemu-devel@nongnu.org
-Cc: Luke Shumaker <lukeshu@parabola.nu>, Riku Voipio <riku.voipio@iki.fi>
+To: qemu-devel@nongnu.org
+Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Peter Maydell <peter.maydell@linaro.org>
 
-Le 28/12/2017 à 19:08, Luke Shumaker a écrit :
-> From: Luke Shumaker <lukeshu@parabola.nu>
-> 
-> Instead of defining a bogus validate_guest_space that always returns 1 on
-> targets other than 32-bit ARM, use #if blocks to only call it on 32-bit ARM
-> targets.  This makes the "normal" flow control clearer.
-> 
-> Signed-off-by: Luke Shumaker <lukeshu@parabola.nu>
-> ---
->  linux-user/elfload.c | 21 +++++++++------------
->  1 file changed, 9 insertions(+), 12 deletions(-)
+Cc: Palmer Dabbelt <palmer@sifive.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Michael Clark <mjc@sifive.com>
+---
+ target/riscv/cpu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-With the change request by Peter (condition "!= 1"),
-applied to my 'linux-user-for-2.12' branch.
-
-Thanks,
-Laurent
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 4851890..f0d6d1d 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -391,7 +391,7 @@ static const TypeInfo riscv_cpu_type_info = {
+ char *riscv_isa_string(RISCVCPU *cpu)
+ {
+     int i;
+-    size_t maxlen = 5 + ctz32(cpu->env.misa);
++    size_t maxlen = 5 + __builtin_popcountll(cpu->env.misa);
+     char *isa_string = g_new0(char, maxlen);
+     snprintf(isa_string, maxlen, "rv%d", TARGET_LONG_BITS);
+     for (i = 0; i < sizeof(riscv_exts); i++) {
+-- 
+2.7.0
