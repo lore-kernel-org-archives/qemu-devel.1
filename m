@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41581)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1euO6p-0003ag-Bg
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 14:55:20 -0500
+	(envelope-from <laurent@vivier.eu>) id 1euO7B-0003sJ-7z
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 14:55:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1euO6o-0000lZ-5O
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 14:55:19 -0500
-References: <20180308184636.178534-1-vsementsov@virtuozzo.com>
-	<20180308184636.178534-3-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <86c81751-e7f8-e609-afe0-efa6fea20354@redhat.com>
-Date: Fri, 9 Mar 2018 13:55:10 -0600
+	(envelope-from <laurent@vivier.eu>) id 1euO7A-00017S-Fm
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 14:55:41 -0500
+References: <20180307215010.30706-1-jcmvbkbc@gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <22d1a396-c59c-b546-6d0b-52302a7b69db@vivier.eu>
+Date: Fri, 9 Mar 2018 20:55:25 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180308184636.178534-3-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180307215010.30706-1-jcmvbkbc@gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] nbd/server: fix sparse read
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v6 05/11] linux-user: fix
+ mmap/munmap/mprotect/mremap/shmat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,108 +24,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: pbonzini@redhat.com, den@openvz.org
+To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-stable@nongnu.org
 
-On 03/08/2018 12:46 PM, Vladimir Sementsov-Ogievskiy wrote:
-> In case of io error in nbd_co_send_sparse_read we should not
-> "goto reply:", as it is fatal error and common behavior is
-> disconnect in this case. We should not try to send client an
-
-s/send/send the/
-
-> error reply, representing channel-io error on previous try to
-> send a reply.
-
-s/representing .../since we already hit a channel-io error on our 
-previous attempt to send a reply/
-
+Le 07/03/2018 à 22:50, Max Filippov a écrit :
+> In linux-user QEMU that runs for a target with TARGET_ABI_BITS bigger
+> than L1_MAP_ADDR_SPACE_BITS an assertion in page_set_flags fires when
+> mmap, munmap, mprotect, mremap or shmat is called for an address outside
+> the guest address space. mmap and mprotect should return ENOMEM in such
+> case.
 > 
-> Fix this by handle block-status error in nbd_co_send_sparse_read,
-
-s/handle/handling/
-
-> so nbd_co_send_sparse_read fails only on io error. Then just skip
-> common "reply:" code path in nbd_trip.
+> Change definition of GUEST_ADDR_MAX to always be the last valid guest
+> address. Account for this change in open_self_maps.
+> Add macro guest_addr_valid that verifies if the guest address is valid.
+> Add function guest_range_valid that verifies if address range is within
+> guest address space and does not wrap around. Use that macro in
+> mmap/munmap/mprotect/mremap/shmat for error checking.
 > 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Cc: qemu-stable@nongnu.org
+> Cc: Riku Voipio <riku.voipio@iki.fi>
+> Cc: Laurent Vivier <laurent@vivier.eu>
+> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 > ---
+> Changes v5->v6:
+> - drop 'if (len)' clause from guest_range_valid and explicitly compare
+>   len with GUEST_ADDR_MAX.
 > 
-> v2: code movement splitted to 01
->      remove error_report
->      fix indent
->      fix commit message subject line
->      add comment to nbd_co_send_sparse_read (be free to adjust it)
-
-Not a problem, I know English is not your native tongue, so I don't mind 
-touching it up, and I already admire your efforts at programming in a 
-second language (a skill I lack).
-
+> Changes v4->v5:
+> - change definition of GUEST_ADDR_MAX to always be the last valid guest
+>   address. Account for this change in guest_addr_valid and open_self_maps.
+> - turn guest_range_valid into a function.
 > 
->   nbd/server.c | 17 ++++++++++++++---
->   1 file changed, 14 insertions(+), 3 deletions(-)
+> Changes v3->v4:
+> - change GUEST_ADDR_MAX and h2g_valid definitions as suggested by Laurent
+>   Vivier.
 > 
-> diff --git a/nbd/server.c b/nbd/server.c
-> index c406b0656d..e0de431e10 100644
-> --- a/nbd/server.c
-> +++ b/nbd/server.c
-> @@ -1365,6 +1365,10 @@ static int coroutine_fn nbd_co_send_structured_error(NBDClient *client,
->       return nbd_co_send_iov(client, iov, 1 + !!iov[1].iov_len, errp);
->   }
->   
-> +/* Do sparse read and send structured reply to the client.
+> Changes v2->v3:
+> - fix comparison in guest_valid: it must be 'less' to preserve the existing
+>   functionality, not 'less or equal'.
+> - fix guest_range_valid: it may not use guest_valid, because single range
+>   that occupies all of the guest address space is valid.
+> 
+>  include/exec/cpu-all.h  |  6 +++++-
+>  include/exec/cpu_ldst.h | 16 +++++++---------
+>  linux-user/mmap.c       | 20 +++++++++++++++-----
+>  linux-user/syscall.c    |  5 ++++-
+>  4 files changed, 31 insertions(+), 16 deletions(-)
+> 
 
-s/Do/Do a/
+Applied to my 'linux-user-for-2.12' branch.
 
-> + * Returns -errno if sending fails. bdrv_block_status_above() fail is not
-
-s/fail/failure/
-
-> + * considered as an error, but reported to the client instead (as a structured
-> + * error). */
-
-The comment tail */ usually gets its own line.
-
-Here's what I used:
-
-/* Do a sparse read and send the structured reply to the client.
-  * Returns -errno if sending fails. bdrv_block_status_above() failure is
-  * reported to the client, at which point this function succeeds.
-  */
-
->   static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
->                                                   uint64_t handle,
->                                                   uint64_t offset,
-> @@ -1385,8 +1389,13 @@ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
->           bool final;
->   
->           if (status < 0) {
-> -            error_setg_errno(errp, -status, "unable to check for holes");
-> -            return status;
-> +            char *msg = g_strdup_printf("unable to check for holes: %s",
-> +                                        strerror(-status));
-
-I had to double-check block/io.c, but it looks like 
-bdrv_block-status_above() does indeed document a return of negative 
-errno on failure.  (My suspicion is that the documentation might be 
-wrong, because I did not audit error returns when doing my byte-based 
-work; but a quick audit of a couple of random drivers shows that at 
-least iscsi.c and qed.c appear to comply.)
-
-> +
-> +            ret = nbd_co_send_structured_error(client, handle, -status, msg,
-> +                                               errp);
-> +            g_free(msg);
-> +            return ret;
-
-I wonder if a separate patch should clean this up to let 
-nbd_co_send_structured_error() do message formatting (making it varargs) 
-- but doesn't affect this patch.
-
-With grammar tweaks,
-Reviewed-by: Eric Blake <eblake@redhat.com
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Thanks,
+Laurent
