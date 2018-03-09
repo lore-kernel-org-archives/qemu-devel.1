@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1euFRP-000123-Lt
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:40:00 -0500
+	(envelope-from <kraxel@redhat.com>) id 1euFTL-00021O-Oc
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:42:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1euFRO-0007bH-ML
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:39:59 -0500
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:40483)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1euFRO-0007av-Hh
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:39:58 -0500
-Received: by mail-oi0-x242.google.com with SMTP id c12so6636948oic.7
-	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 02:39:58 -0800 (PST)
+	(envelope-from <kraxel@redhat.com>) id 1euFTI-000173-Jl
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:41:59 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33696 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1euFTI-00016k-Eb
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 05:41:56 -0500
+Date: Fri, 9 Mar 2018 11:41:45 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180309104145.dfkqpoq3ajr6nzjh@sirius.home.kraxel.org>
+References: <20180308083231.20180-1-kraxel@redhat.com>
+	<CAFEAcA8wUN_T9XrUULCROVFdv+vGipdMuhNz5km1mcX_nVrQgg@mail.gmail.com>
+	<20180309065247.xzribx4zjgx5bnj5@sirius.home.kraxel.org>
+	<20180309075054.e4bpa4wsl2wak57w@sirius.home.kraxel.org>
+	<f0968a33-fb14-4de2-3a1b-130e2ae7b0ee@redhat.com>
+	<20180309091533.uj3qpyjnczugfivh@sirius.home.kraxel.org>
+	<20180309094403.gcsspbs4lzozx2zl@sirius.home.kraxel.org>
+	<e38420ec-3c31-7a11-da80-43200d83b77b@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180309030541.GU3083@umbus.fritz.box>
-References: <20180308111305.C9F56745707@zero.eik.bme.hu>
-	<20180308144845.0D7647456CD@zero.eik.bme.hu>
-	<20180308234446.GQ3083@umbus.fritz.box>
-	<20180309030541.GU3083@umbus.fritz.box>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 9 Mar 2018 10:39:37 +0000
-Message-ID: <CAFEAcA_64nFSt3+0-BAyaZZ+yBQFiFTRTK88xWb5eE7yYJnCKw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] ppc440_pcix: Change some error_report
- to qemu_log_mask(LOG_UNIMP, ...)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e38420ec-3c31-7a11-da80-43200d83b77b@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 0/8] Ui 20180308 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +33,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: BALATON Zoltan <balaton@eik.bme.hu>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 9 March 2018 at 03:05, David Gibson <david@gibson.dropbear.id.au> wrote:
-> On Fri, Mar 09, 2018 at 10:44:46AM +1100, David Gibson wrote:
->> On Thu, Mar 08, 2018 at 12:08:08PM +0100, BALATON Zoltan wrote:
->> > Using log unimp is more appropriate for these messages and this also
->> > silences them by default so they won't clobber make check output when
->> > tests are added for this board.
->> >
->> > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->> > Reviewed-by: Thomas Huth <thuth@redhat.com>
->>
->> Applied, thanks.
->
-> Wait.. I've taken it out again.  Under some configurations (exercised
-> by Travis) qemu_log_mask() is undeclared here you're using it.  See
-> https://travis-ci.org/dgibson/qemu/jobs/351093986 for some more
-> information.
+On Fri, Mar 09, 2018 at 10:48:13AM +0100, Thomas Huth wrote:
+> On 09.03.2018 10:44, Gerd Hoffmann wrote:
+> > On Fri, Mar 09, 2018 at 10:15:33AM +0100, Gerd Hoffmann wrote:
+> >> On Fri, Mar 09, 2018 at 09:46:44AM +0100, Thomas Huth wrote:
+> >>> On 09.03.2018 08:50, Gerd Hoffmann wrote:
+> >>>>   Hi,
+> >>>>
+> >>>>> Maybe I should move the code to a separate source file so it can be
+> >>>>> built with different compiler flags, without needing #pragma?  I don't
+> >>>>> feel like building all gtk code with -Wno-deprecated-declarations ...
+> >>>>
+> >>>> Hmm, that idea doesn't fly, seems per-object cflags don't work for
+> >>>> object files which get linked into a module.
+> >>>>
+> >>>> Other ideas anyone?
+> >>>
+> >>> Maybe simply remove the '#pragma GCC diagnostic ignored
+> >>> "-Wunused-but-set-variable"' from the configure test and change
+> >>> util/coroutine-ucontext.c:
+> >>
+> >> I'll try.  Will probably have the effect that freebsd builds with
+> >> -Werror then (which is now turned off by configure due to missing
+> >> pragma support), which might trigger more issues ...
+> > 
+> > Well, guessed almost right.  -Werror is enabled on linux only, so
+> > freebsd builds do not fail.  But clang builds on linux fail, due to a
+> > bunch of warnings (now errors) about unaligned access to struct members.
+> 
+> Ugh, this is getting messy ... could you maybe turn them back into
+> warnings again with -Wno-error=... when compiling with clang?
 
-Ah, that one again. There's a patch in Stefan's tracing tree
-that makes that a fails-everywhere rather than only-some-configs,
-but he hasn't done the pullreq for 2.12 yet I think.
+Well, I can add -Wno-address-of-packed-member to the list of flags
+configure tries to use with the compiler.  That gets me past that
+warning, but the build will stop on the next then.  qemu simply doesn't
+build warning-clean with clang ...
 
-You need a #include "qemu/log.h".
-
-thanks
--- PMM
+cheers,
+  Gerd
