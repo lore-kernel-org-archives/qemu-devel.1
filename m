@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eu9QE-0003u9-IV
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 23:14:23 -0500
+	(envelope-from <mjc@sifive.com>) id 1eu9QN-00040I-FN
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 23:14:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eu9QB-0006qN-EL
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 23:14:22 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:42652)
+	(envelope-from <mjc@sifive.com>) id 1eu9QK-0006tU-9j
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 23:14:31 -0500
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:44591)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eu9QB-0006q4-8g
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 23:14:19 -0500
-Received: by mail-pg0-x241.google.com with SMTP id y8so3114770pgr.9
-	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 20:14:19 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eu9QK-0006tG-14
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 23:14:28 -0500
+Received: by mail-pl0-x243.google.com with SMTP id 9-v6so4604142ple.11
+	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 20:14:27 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Fri,  9 Mar 2018 17:12:25 +1300
-Message-Id: <1520568765-58189-4-git-send-email-mjc@sifive.com>
+Date: Fri,  9 Mar 2018 17:12:28 +1300
+Message-Id: <1520568765-58189-7-git-send-email-mjc@sifive.com>
 In-Reply-To: <1520568765-58189-1-git-send-email-mjc@sifive.com>
 References: <1520568765-58189-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v2 03/23] RISC-V: Make virt board description
- match spike
+Subject: [Qemu-devel] [PATCH v2 06/23] RISC-V: Mark ROM read-only after
+ copying in code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +29,182 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>
 
-This makes 'qemu-system-riscv64 -machine help' output more tidy
-and consistent.
+The sifive_u machine already marks its ROM readonly. This fixes
+the remaining boards.
 
 Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- hw/riscv/virt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/riscv/sifive_u.c      |  9 +++++----
+ hw/riscv/spike.c         | 18 ++++++++++--------
+ hw/riscv/virt.c          |  7 ++++---
+ include/hw/riscv/spike.h |  8 --------
+ 4 files changed, 19 insertions(+), 23 deletions(-)
 
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 6116c38..25df16c 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -223,7 +223,7 @@ static void riscv_sifive_u_init(MachineState *machine)
+     SiFiveUState *s = g_new0(SiFiveUState, 1);
+     MemoryRegion *sys_memory = get_system_memory();
+     MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+-    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
++    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+ 
+     /* Initialize SOC */
+     object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
+@@ -246,10 +246,10 @@ static void riscv_sifive_u_init(MachineState *machine)
+     create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+ 
+     /* boot rom */
+-    memory_region_init_ram(boot_rom, NULL, "riscv.sifive.u.mrom",
++    memory_region_init_ram(mask_rom, NULL, "riscv.sifive.u.mrom",
+                            memmap[SIFIVE_U_MROM].base, &error_fatal);
+-    memory_region_set_readonly(boot_rom, true);
+-    memory_region_add_subregion(sys_memory, 0x0, boot_rom);
++    memory_region_set_readonly(mask_rom, true);
++    memory_region_add_subregion(sys_memory, 0x0, mask_rom);
+ 
+     if (machine->kernel_filename) {
+         load_kernel(machine->kernel_filename);
+@@ -279,6 +279,7 @@ static void riscv_sifive_u_init(MachineState *machine)
+     qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
+     cpu_physical_memory_write(memmap[SIFIVE_U_MROM].base +
+         sizeof(reset_vec), s->fdt, s->fdt_size);
++    memory_region_set_readonly(mask_rom, true);
+ 
+     /* MMIO */
+     s->plic = sifive_plic_create(memmap[SIFIVE_U_PLIC].base,
+diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+index 7710333..74edf33 100644
+--- a/hw/riscv/spike.c
++++ b/hw/riscv/spike.c
+@@ -173,7 +173,7 @@ static void spike_v1_10_0_board_init(MachineState *machine)
+     SpikeState *s = g_new0(SpikeState, 1);
+     MemoryRegion *system_memory = get_system_memory();
+     MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+-    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
++    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+ 
+     /* Initialize SOC */
+     object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
+@@ -196,9 +196,9 @@ static void spike_v1_10_0_board_init(MachineState *machine)
+     create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+ 
+     /* boot rom */
+-    memory_region_init_ram(boot_rom, NULL, "riscv.spike.bootrom",
++    memory_region_init_ram(mask_rom, NULL, "riscv.spike.mrom",
+                            s->fdt_size + 0x2000, &error_fatal);
+-    memory_region_add_subregion(system_memory, 0x0, boot_rom);
++    memory_region_add_subregion(system_memory, 0x0, mask_rom);
+ 
+     if (machine->kernel_filename) {
+         load_kernel(machine->kernel_filename);
+@@ -228,9 +228,10 @@ static void spike_v1_10_0_board_init(MachineState *machine)
+     qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
+     cpu_physical_memory_write(memmap[SPIKE_MROM].base + sizeof(reset_vec),
+         s->fdt, s->fdt_size);
++    memory_region_set_readonly(mask_rom, true);
+ 
+     /* initialize HTIF using symbols found in load_kernel */
+-    htif_mm_init(system_memory, boot_rom, &s->soc.harts[0].env, serial_hds[0]);
++    htif_mm_init(system_memory, mask_rom, &s->soc.harts[0].env, serial_hds[0]);
+ 
+     /* Core Local Interruptor (timer and IPI) */
+     sifive_clint_create(memmap[SPIKE_CLINT].base, memmap[SPIKE_CLINT].size,
+@@ -244,7 +245,7 @@ static void spike_v1_09_1_board_init(MachineState *machine)
+     SpikeState *s = g_new0(SpikeState, 1);
+     MemoryRegion *system_memory = get_system_memory();
+     MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+-    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
++    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+ 
+     /* Initialize SOC */
+     object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
+@@ -264,9 +265,9 @@ static void spike_v1_09_1_board_init(MachineState *machine)
+         main_mem);
+ 
+     /* boot rom */
+-    memory_region_init_ram(boot_rom, NULL, "riscv.spike.bootrom",
++    memory_region_init_ram(mask_rom, NULL, "riscv.spike.mrom",
+                            0x40000, &error_fatal);
+-    memory_region_add_subregion(system_memory, 0x0, boot_rom);
++    memory_region_add_subregion(system_memory, 0x0, mask_rom);
+ 
+     if (machine->kernel_filename) {
+         load_kernel(machine->kernel_filename);
+@@ -325,9 +326,10 @@ static void spike_v1_09_1_board_init(MachineState *machine)
+     /* copy in the config string */
+     cpu_physical_memory_write(memmap[SPIKE_MROM].base + sizeof(reset_vec),
+         config_string, config_string_len);
++    memory_region_set_readonly(mask_rom, true);
+ 
+     /* initialize HTIF using symbols found in load_kernel */
+-    htif_mm_init(system_memory, boot_rom, &s->soc.harts[0].env, serial_hds[0]);
++    htif_mm_init(system_memory, mask_rom, &s->soc.harts[0].env, serial_hds[0]);
+ 
+     /* Core Local Interruptor (timer and IPI) */
+     sifive_clint_create(memmap[SPIKE_CLINT].base, memmap[SPIKE_CLINT].size,
 diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index a402856..0055439 100644
+index f8c19b4..f1e3641 100644
 --- a/hw/riscv/virt.c
 +++ b/hw/riscv/virt.c
-@@ -404,7 +404,7 @@ static const TypeInfo riscv_virt_board_device = {
+@@ -270,7 +270,7 @@ static void riscv_virt_board_init(MachineState *machine)
+     RISCVVirtState *s = g_new0(RISCVVirtState, 1);
+     MemoryRegion *system_memory = get_system_memory();
+     MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+-    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
++    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+     char *plic_hart_config;
+     size_t plic_hart_config_len;
+     int i;
+@@ -296,9 +296,9 @@ static void riscv_virt_board_init(MachineState *machine)
+     create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
  
- static void riscv_virt_board_machine_init(MachineClass *mc)
- {
--    mc->desc = "RISC-V VirtIO Board (Privileged spec v1.10)";
-+    mc->desc = "RISC-V VirtIO Board (Privileged ISA v1.10)";
-     mc->init = riscv_virt_board_init;
-     mc->max_cpus = 8; /* hardcoded limit in BBL */
- }
+     /* boot rom */
+-    memory_region_init_ram(boot_rom, NULL, "riscv_virt_board.bootrom",
++    memory_region_init_ram(mask_rom, NULL, "riscv_virt_board.mrom",
+                            s->fdt_size + 0x2000, &error_fatal);
+-    memory_region_add_subregion(system_memory, 0x0, boot_rom);
++    memory_region_add_subregion(system_memory, 0x0, mask_rom);
+ 
+     if (machine->kernel_filename) {
+         uint64_t kernel_entry = load_kernel(machine->kernel_filename);
+@@ -339,6 +339,7 @@ static void riscv_virt_board_init(MachineState *machine)
+     qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
+     cpu_physical_memory_write(memmap[VIRT_MROM].base + sizeof(reset_vec),
+         s->fdt, s->fdt_size);
++    memory_region_set_readonly(mask_rom, true);
+ 
+     /* create PLIC hart topology configuration string */
+     plic_hart_config_len = (strlen(VIRT_PLIC_HART_CONFIG) + 1) * smp_cpus;
+diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
+index d85a64e..179b6cf 100644
+--- a/include/hw/riscv/spike.h
++++ b/include/hw/riscv/spike.h
+@@ -22,20 +22,12 @@
+ #define TYPE_RISCV_SPIKE_V1_09_1_BOARD "riscv.spike_v1_9_1"
+ #define TYPE_RISCV_SPIKE_V1_10_0_BOARD "riscv.spike_v1_10"
+ 
+-#define SPIKE(obj) \
+-    OBJECT_CHECK(SpikeState, (obj), TYPE_RISCV_SPIKE_BOARD)
+-
+ typedef struct {
+-    /*< private >*/
+-    SysBusDevice parent_obj;
+-
+-    /*< public >*/
+     RISCVHartArrayState soc;
+     void *fdt;
+     int fdt_size;
+ } SpikeState;
+ 
+-
+ enum {
+     SPIKE_MROM,
+     SPIKE_CLINT,
 -- 
 2.7.0
