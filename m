@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1euI8F-0001x5-PH
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:32:24 -0500
+	(envelope-from <no-reply@patchew.org>) id 1euIDR-0004wg-Ud
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:37:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1euI8C-0006BE-Jt
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:32:23 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:46069)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1euI8C-0006Ac-9N
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:32:20 -0500
-Received: by mail-wr0-x241.google.com with SMTP id h2so1746644wre.12
-	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 05:32:20 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180308161803.6152-1-kraxel@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a2900440-a0a6-43e6-2763-afd93c72fe7b@amsat.org>
-Date: Fri, 9 Mar 2018 14:32:17 +0100
+	(envelope-from <no-reply@patchew.org>) id 1euIDO-000057-Pa
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:37:45 -0500
+Resent-Message-Id: <E1euIDO-000057-Pa@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21107)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1euIDO-0008W7-Ic
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 08:37:42 -0500
+In-Reply-To: <20180309132922.24211-1-pbonzini@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152060263771.1494.1588062613505239337@bdbb90650ae5>
 MIME-Version: 1.0
-In-Reply-To: <20180308161803.6152-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] vnc: deal with surface NULL pointers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 9 Mar 2018 05:37:18 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/4] Optionally use membarrier system call
+ for RCU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,97 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, cota@braap.org
 
-On 03/08/2018 05:18 PM, Gerd Hoffmann wrote:
-> Secondary displays in multihead setups are allowed to have a NULL
-> DisplaySurface.  Typically user interfaces handle this by hiding the
-> window which shows the display in question.
-> 
-> This isn't an option for vnc though because it simply hasn't a concept
-> of windows or outputs.  So handle the situation by showing a placeholder
-> DisplaySurface instead.  Also check in console_select whenever a surface
-> is preset in the first place before requesting an update.
-> 
-> This fixes a segfault which can be triggered by switching to an unused
-> display (via vtrl-alt-<nr>) in a multihead setup, for example using
-> -device virtio-vga,max_outputs=2.
-> 
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> ---
->  include/ui/console.h |  2 ++
->  ui/console.c         | 10 ++++++----
->  ui/vnc.c             | 10 ++++++++++
->  3 files changed, 18 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/ui/console.h b/include/ui/console.h
-> index aae9e44cb3..5fca9afcbc 100644
-> --- a/include/ui/console.h
-> +++ b/include/ui/console.h
-> @@ -260,6 +260,8 @@ DisplaySurface *qemu_create_displaysurface_guestmem(int width, int height,
->                                                      pixman_format_code_t format,
->                                                      int linesize,
->                                                      uint64_t addr);
-> +DisplaySurface *qemu_create_message_surface(int w, int h,
-> +                                            const char *msg);
->  PixelFormat qemu_default_pixelformat(int bpp);
->  
->  DisplaySurface *qemu_create_displaysurface(int width, int height);
-> diff --git a/ui/console.c b/ui/console.c
-> index 6ab4ff3baf..348610dd43 100644
-> --- a/ui/console.c
-> +++ b/ui/console.c
-> @@ -1039,8 +1039,10 @@ void console_select(unsigned int index)
->                      dcl->ops->dpy_gfx_switch(dcl, s->surface);
->                  }
->              }
-> -            dpy_gfx_update(s, 0, 0, surface_width(s->surface),
-> -                           surface_height(s->surface));
-> +            if (s->surface) {
-> +                dpy_gfx_update(s, 0, 0, surface_width(s->surface),
-> +                               surface_height(s->surface));
-> +            }
->          }
->          if (ds->have_text) {
->              dpy_text_resize(s, s->width, s->height);
-> @@ -1370,8 +1372,8 @@ DisplaySurface *qemu_create_displaysurface_guestmem(int width, int height,
->      return surface;
->  }
->  
-> -static DisplaySurface *qemu_create_message_surface(int w, int h,
-> -                                                   const char *msg)
-> +DisplaySurface *qemu_create_message_surface(int w, int h,
-> +                                            const char *msg)
->  {
->      DisplaySurface *surface = qemu_create_displaysurface(w, h);
->      pixman_color_t bg = color_table_rgb[0][QEMU_COLOR_BLACK];
-> diff --git a/ui/vnc.c b/ui/vnc.c
-> index 13c28cabb0..e164eb798c 100644
-> --- a/ui/vnc.c
-> +++ b/ui/vnc.c
-> @@ -746,9 +746,19 @@ static void vnc_update_server_surface(VncDisplay *vd)
->  static void vnc_dpy_switch(DisplayChangeListener *dcl,
->                             DisplaySurface *surface)
->  {
-> +    static const char placeholder_msg[] =
-> +        "Display output is not active.";
-> +    static DisplaySurface *placeholder;
->      VncDisplay *vd = container_of(dcl, VncDisplay, dcl);
->      VncState *vs;
->  
-> +    if (surface == NULL) {
-> +        if (placeholder == NULL) {
-> +            placeholder = qemu_create_message_surface(640, 480, placeholder_msg);
-> +        }
-> +        surface = placeholder;
-> +    }
-> +
->      vnc_abort_display_jobs(vd);
->      vd->ds = surface;
->  
-> 
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMzA5MTMyOTIyLjI0MjExLTEtcGJvbnppbmlAcmVkaGF0LmNvbQpTdWJq
+ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNF0gT3B0aW9uYWxseSB1c2UgbWVtYmFycmllciBz
+eXN0ZW0gY2FsbCBmb3IgUkNVCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
+CgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1s
+KQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
+b3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
+ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
+SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
+Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
+aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
+PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
+YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
+Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAg
+ICAgICBwYXRjaGV3LzIwMTgwMzA5MTMyOTIyLjI0MjExLTEtcGJvbnppbmlAcmVkaGF0LmNvbSAt
+PiBwYXRjaGV3LzIwMTgwMzA5MTMyOTIyLjI0MjExLTEtcGJvbnppbmlAcmVkaGF0LmNvbQpTd2l0
+Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjI5MTJkNzIxY2UgbWVtYmFycmllcjogYWRkIC0t
+ZW5hYmxlLW1lbWJhcnJpZXIKNWYwZjU3NTNjYyBtZW1iYXJyaWVyOiBpbnRyb2R1Y2UgcWVtdS9z
+eXNfbWVtYmFycmllci5oCjhhY2IwZWNmOTAgcmN1OiBtYWtlIG1lbW9yeSBiYXJyaWVycyBtb3Jl
+IGV4cGxpY2l0CjdjNTA2YjlkNWQgcmN1dG9ydHVyZTogcmVtb3ZlIHN5bmNocm9uaXplX3JjdSBm
+cm9tIHJlYWRlcnMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNDogcmN1
+dG9ydHVyZTogcmVtb3ZlIHN5bmNocm9uaXplX3JjdSBmcm9tIHJlYWRlcnMuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMi80OiByY3U6IG1ha2UgbWVtb3J5IGJhcnJpZXJzIG1vcmUgZXhwbGljaXQuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMy80OiBtZW1iYXJyaWVyOiBpbnRyb2R1Y2UgcWVtdS9zeXNfbWVtYmFycmll
+ci5oLi4uCkVSUk9SOiBtZW1vcnkgYmFycmllciB3aXRob3V0IGNvbW1lbnQKIzcwOiBGSUxFOiBp
+bmNsdWRlL3FlbXUvc3lzX21lbWJhcnJpZXIuaDoxNDoKKyNkZWZpbmUgc21wX21iX2dsb2JhbCgp
+ICAgICAgICAgICAgc21wX21iKCkKCkVSUk9SOiBtZW1vcnkgYmFycmllciB3aXRob3V0IGNvbW1l
+bnQKIzcxOiBGSUxFOiBpbmNsdWRlL3FlbXUvc3lzX21lbWJhcnJpZXIuaDoxNToKKyNkZWZpbmUg
+c21wX21iX3BsYWNlaG9sZGVyKCkgICAgICAgc21wX21iKCkKCnRvdGFsOiAyIGVycm9ycywgMCB3
+YXJuaW5ncywgNzcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNC80OiBtZW1iYXJyaWVyOiBhZGQgLS1lbmFibGUtbWVt
+YmFycmllci4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTkwOiBGSUxFOiB1
+dGlsL3N5c19tZW1iYXJyaWVyLmM6NDU6CisgICAgICAgIGVycm9yX3JlcG9ydCgiVGhpcyBRRU1V
+IGJpbmFyeSByZXF1aXJlcyBNRU1CQVJSSUVSX0NNRF9TSEFSRUQgc3VwcG9ydC4iKTsKCnRvdGFs
+OiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTUyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFz
+IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
+cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
+Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
+ZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
+eSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
+ayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
