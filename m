@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1euL4E-0001kG-I2
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:40:27 -0500
+	(envelope-from <eblake@redhat.com>) id 1euL4w-0002PV-Iy
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:41:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1euL49-0000F6-Em
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:40:26 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43460 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1euL49-0000ER-6h
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:40:21 -0500
-References: <20180309130918.734-1-marcandre.lureau@redhat.com>
-	<20180309130918.734-6-marcandre.lureau@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <15291730-3285-a554-89ac-e8c359053cc3@redhat.com>
-Date: Fri, 9 Mar 2018 17:40:05 +0100
+	(envelope-from <eblake@redhat.com>) id 1euL4v-0000wY-M1
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:41:10 -0500
+References: <20180308184636.178534-1-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ca5bbf03-a506-b10b-2db9-cb6a7aad3075@redhat.com>
+Date: Fri, 9 Mar 2018 10:41:05 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180309130918.734-6-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180308184636.178534-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 5/7] OvmfPkg: include Tcg2Pei module
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/5] nbd server fixing and refactoring
+ before BLOCK_STATUS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@redhat.com, edk2-devel@lists.01.org
-Cc: pjones@redhat.com, jiewen.yao@intel.com, stefanb@linux.vnet.ibm.com, qemu-devel@nongnu.org, javierm@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: pbonzini@redhat.com, den@openvz.org
 
-On 03/09/18 14:09, marcandre.lureau@redhat.com wrote:
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> This module will initialize TPM device, measure reported FVs and BIOS
-> version. We keep both SHA-1 and SHA-256 for the TCG 1.2 log format
-> compatibility, but the SHA-256 measurements and TCG 2 log format are
-> now recommended.
->=20
-> Cc: Laszlo Ersek <lersek@redhat.com>
-> Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> Contributed-under: TianoCore Contribution Agreement 1.0
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  OvmfPkg/OvmfPkgIa32.dsc    | 7 +++++++
->  OvmfPkg/OvmfPkgIa32.fdf    | 1 +
->  OvmfPkg/OvmfPkgIa32X64.dsc | 7 +++++++
->  OvmfPkg/OvmfPkgIa32X64.fdf | 1 +
->  OvmfPkg/OvmfPkgX64.dsc     | 7 +++++++
->  OvmfPkg/OvmfPkgX64.fdf     | 1 +
->  6 files changed, 24 insertions(+)
+On 03/08/2018 12:46 PM, Vladimir Sementsov-Ogievskiy wrote:
+> 01 and 02 are splitted and updated "[PATCH] nbd/server: fix space read",
+> others are new.
+> 
+> Vladimir Sementsov-Ogievskiy (5):
+>    nbd/server: move nbd_co_send_structured_error up
+>    nbd/server: fix sparse read
+>    nbd/server: fix: check client->closing before reply sending
+>    nbd/server: refactor nbd_trip: cmd_read and generic reply
+>    nbd/server: refactor nbd_trip: split out nbd_handle_request
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+I had a tough time applying this one:
+
+Applying: nbd/server: move nbd_co_send_structured_error up
+Applying: nbd/server: fix: check client->closing before reply sending
+Applying: nbd/server: refactor nbd_trip: cmd_read and generic reply
+error: sha1 information is lacking or useless (nbd/server.c).
+error: could not build fake ancestor
+Patch failed at 0004 nbd/server: refactor nbd_trip: cmd_read and generic 
+reply
+The copy of the patch that failed is found in: .git/rebase-apply/patch
+When you have resolved this problem, run "git am --continue".
+If you prefer to skip this patch, run "git am --skip" instead.
+To restore the original branch and stop patching, run "git am --abort".
+
+I think I've resolved the conflicts correctly, but if I get through 
+reviewing this series and posting it to my NBD queue, you may want to 
+double-check things.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
