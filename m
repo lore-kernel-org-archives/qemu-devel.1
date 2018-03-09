@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1euGOM-0000kQ-BD
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:40:55 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1euGQm-0002QP-8z
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:43:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1euGOH-0000lz-CJ
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:40:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47384)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1euGOH-0000ip-2T
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:40:49 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1euGOG-0003Vt-5D
-	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 11:40:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 20E272E80C7
-	for <qemu-devel@nongnu.org>; Fri,  9 Mar 2018 11:40:48 +0000 (UTC)
+	(envelope-from <dgilbert@redhat.com>) id 1euGQh-0001sK-FU
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:43:24 -0500
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36766 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1euGQh-0001sC-9j
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 06:43:19 -0500
+Date: Fri, 9 Mar 2018 11:43:11 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180309114311.GA3214@work-vm>
+References: <1520229653-10658-1-git-send-email-yulei.zhang@intel.com>
+	<1520229653-10658-2-git-send-email-yulei.zhang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 09 Mar 2018 11:32:12 -0000
-From: Antoine <1754038@bugs.launchpad.net>
-Reply-To: Bug 1754038 <1754038@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152043137992.20954.13820740787208030462.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152059513274.20784.6747898802211648143.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1754038] Re: ARM M: Systick first wrap delayed
- (qemu-timers/icount prb?)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1520229653-10658-2-git-send-email-yulei.zhang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH V3 1/4] vfio: introduce a new VFIO
+ subregion for mdev device migration support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,178 +28,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Yulei Zhang <yulei.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, kevin.tian@intel.com, alex.williamson@redhat.com, kwankhede@nvidia.com, zhenyuw@linux.intel.com
 
-The workaround I described above is actually not the good one, because
-of this check occurring just before:
+* Yulei Zhang (yulei.zhang@intel.com) wrote:
+> New VFIO sub region VFIO_REGION_SUBTYPE_DEVICE_STATE is added
+> to fetch and restore the status of mdev device vGPU during the
+> live migration.
+> 
+> Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
+> ---
+>  hw/vfio/pci.c              | 14 +++++++++++++-
+>  hw/vfio/pci.h              |  1 +
+>  linux-headers/linux/vfio.h |  9 ++++++---
+>  3 files changed, 20 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 31e1edf..2fe20e4 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -37,6 +37,7 @@
+>  
+>  static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
+>  static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
+> +static VMStateDescription vfio_pci_vmstate;
+>  
+>  /*
+>   * Disabling BAR mmaping can be slow, but toggling it around INTx can
+> @@ -2813,6 +2814,17 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+>          vfio_vga_quirk_setup(vdev);
+>      }
+>  
+> +    struct vfio_region_info *device_state;
+> +    /* device state region setup */
+> +    if (!vfio_get_dev_region_info(&vdev->vbasedev,
+> +                VFIO_REGION_TYPE_PCI_VENDOR_TYPE | PCI_VENDOR_ID_INTEL,
+> +                VFIO_REGION_SUBTYPE_DEVICE_STATE, &device_state)) {
+> +        memcpy(&vdev->device_state, device_state,
+> +               sizeof(struct vfio_region_info));
+> +        g_free(device_state);
+> +        vfio_pci_vmstate.unmigratable = 0;
+> +    }
 
-    if (!all_cpu_threads_idle()) {
-        return;
-    }
+I don't think we've got any other code that changes the 'unmigratable'
+flag on a vmstate.  If you've got a device that you don't know whether
+it's migratable until runtime, then you should add a 'migration blocker'
+if the device isn't migratable.
+See for example the calls to migrate_add_blocker in hw/virtio/vhost.c
 
-The exit request setting must be done before, so my code looks like
-this:
+Dave
 
-
-    CPUState *cpu;
-    CPU_FOREACH(cpu) {
-        atomic_mb_set(&cpu->exit_request, 1);
-    }
-
-    if (!all_cpu_threads_idle()) {
-        return;
-    }
-
-(version is v2.11.0-2122-g9fa673c-dirty)
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1754038
-
-Title:
-  ARM M: Systick first wrap delayed (qemu-timers/icount prb?)
-
-Status in QEMU:
-  New
-
-Bug description:
-  When running this kind of code with qemu:
-
-  static void SysTickISR(void)
-  {
-  	printf("SysTick\n");
-  }
-
-  void main()
-  {
-  	volatile int i, j;
-  	printf("setup timer\n");
-  	*(uint32_t*) 0xE000E014 =3D 0x8FFFFF; //reload value
-  	*(uint32_t*) 0xE000E018 =3D 0;        //force reload
-  	*(uint32_t*) 0xE000E010 =3D 7;        //cpu clk + ISR + enable =
-
-
-  	for (j =3D 0; j < 0x100; j++) {
-  		for (i =3D 0; i < 0x100000; i++)
-  			;
-  		printf("cnt %08x  -- %8x\n", *(uint32_t*) 0xE000E018, *(uint32_t*)0xE00=
-0E010);
-  	}
-  }
-
-  I get the following output (comments added after '#'):
-
-  setup timer
-  cnt 007cccca  --        7
-  cnt 006998a2  --        7
-  cnt 00566479  --        7
-  cnt 0043304f  --        7
-  cnt 002ffc26  --        7
-  cnt 001cc7fd  --        7
-  cnt 000993d5  --        7
-  cnt 00000000  --        7  <--- problem here, systick should wrap and rai=
-se isr
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  cnt 00000000  --        7
-  SysTick                     <--- delayed isr occuring here
-  cnt 000986e0  --    10007
-  SysTick
-  cnt 00865290  --    10007   <---- then running fine as long as regs not m=
-odified
-  cnt 00731e51  --        7
-  cnt 005fea27  --        7
-  cnt 004cb5ff  --        7
-  cnt 003981d6  --        7
-  cnt 00264dad  --        7
-  cnt 00131984  --        7
-  SysTick
-  cnt 008fe545  --    10007
-  cnt 007cb106  --        7
-  cnt 00697cdd  --        7
-  cnt 005648b4  --        7
-  cnt 0043148b  --        7
-  cnt 002fe061  --        7
-  cnt 001cac38  --        7
-  cnt 00097810  --        7
-  SysTick
-  cnt 008643d6  --    10007
-  cnt 00730f97  --        7
-  cnt 005fdb6d  --        7
-  cnt 004ca745  --        7
-  cnt 0039731c  --        7
-  cnt 00263ef3  --        7
-  cnt 00130aca  --        7
-  SysTick
-  cnt 008fd68b  --    10007
-  cnt 007ca24c  --        7
-  cnt 00696e23  --        7
-  cnt 005639fa  --        7
-  cnt 004305d1  --        7
-  cnt 002fd1a8  --        7
-  cnt 001c9d7f  --        7
-  cnt 00096956  --        7
-  SysTick
-  cnt 0086351d  --    10007
-  cnt 007300dd  --        7
-  cnt 005fccb4  --        7
-  cnt 004c988c  --        7
-  cnt 00396463  --        7
-  cnt 00263039  --        7
-  cnt 0012fc10  --        7
-  [...]
-
-  Command line and version:
-  qemu-system-arm -M lm3s6965evb -nographic -kernel hello.bin -monitor stdi=
-o -serial file:/dev/pts/6 -icount 4 -cpu cortex-m4
-  QEMU 2.11.50
-
-  I am compiling from git repo, head is:
-  commit f32408f3b472a088467474ab152be3b6285b2d7b
-  Author: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-  Date:   Tue Mar 6 13:43:17 2018 +0000
-
-  Config options:
-  ./configure --target-list=3Darm-softmmu --enable-debug --disable-slirp --=
-enable-tcg-interpreter --disable-blobs --disable-docs --disable-guest-agent=
- --disable-gnutls --disable-nettle --disable-gcrypt --disable-sdl --disable=
--gtk --disable-vnc --disable-virtfs --disable-mpath --disable-xen --disable=
--brlapi --disable-curl --disable-bluez --disable-kvm --disable-hax --disabl=
-e-hvf --disable-whpx --disable-rdma --disable-vde --disable-netmap --disabl=
-e-linux-aio --disable-cap-ng --disable-attr --disable-vhost-net --disable-s=
-pice --disable-rbd --disable-libiscsi --disable-libnfs --disable-smartcard =
---disable-libusb --disable-live-block-migration --disable-usb-redir --disab=
-le-lzo --disable-snappy --disable-bzip2 --disable-seccomp --disable-gluster=
-fs --disable-tpm --disable-libssh2 --disable-numa --disable-libxml2 --disab=
-le-tcmalloc --disable-jemalloc --disable-replication --disable-vhost-vsock =
---disable-opengl --disable-virglrenderer --disable-xfsctl --disable-qom-cas=
-t-debug --disable-vxhs --disable-crypto-afalg --disable-vhost-user --disabl=
-e-capstone --disable-pie --extra-cflags=3D-mtune=3Dnative
-
-  =
-
-  Not working with git tag 2.10.0 (almost same config)
-
-  Working with stock qemu-arm 2.5.0 from Ubuntu 16.04.
-
-  I started investigating, though I am not familiar with qemu code and I
-  could see that the execution is not geting out of
-  qemu_tcg_rr_cpu_thread_fn() 'while' loop and timers are not triggered
-  because the values in cpu->icount_extra or cpu->icount_budget are not
-  to modified accordingly after the timer is set (host side) when the
-  systick register is written (target side).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1754038/+subscriptions
+>      for (i = 0; i < PCI_ROM_SLOT; i++) {
+>          vfio_bar_quirk_setup(vdev, i);
+>      }
+> @@ -2994,7 +3006,7 @@ static Property vfio_pci_dev_properties[] = {
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> -static const VMStateDescription vfio_pci_vmstate = {
+> +static VMStateDescription vfio_pci_vmstate = {
+>      .name = "vfio-pci",
+>      .unmigratable = 1,
+>  };
+> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+> index a8366bb..6a1d26e 100644
+> --- a/hw/vfio/pci.h
+> +++ b/hw/vfio/pci.h
+> @@ -116,6 +116,7 @@ typedef struct VFIOPCIDevice {
+>      VFIOBAR bars[PCI_NUM_REGIONS - 1]; /* No ROM */
+>      VFIOVGA *vga; /* 0xa0000, 0x3b0, 0x3c0 */
+>      void *igd_opregion;
+> +    struct vfio_region_info device_state;
+>      PCIHostDeviceAddress host;
+>      EventNotifier err_notifier;
+>      EventNotifier req_notifier;
+> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+> index 4e7ab4c..c3b8e4a 100644
+> --- a/linux-headers/linux/vfio.h
+> +++ b/linux-headers/linux/vfio.h
+> @@ -296,9 +296,12 @@ struct vfio_region_info_cap_type {
+>  #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
+>  
+>  /* 8086 Vendor sub-types */
+> -#define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION	(1)
+> -#define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
+> -#define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
+> +#define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION		(1)
+> +#define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG		(2)
+> +#define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG		(3)
+> +
+> +/* Mdev sub-type for device state save and restore */
+> +#define VFIO_REGION_SUBTYPE_DEVICE_STATE	(4)
+>  
+>  /**
+>   * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
+> -- 
+> 2.7.4
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
