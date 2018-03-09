@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1euLmz-0008WO-92
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:26:42 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1euLmx-0008Tm-By
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:26:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1euLmx-0006AW-FX
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:26:41 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47006)
+	(envelope-from <pm215@archaic.org.uk>) id 1euLmv-00068j-7E
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:26:39 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47000)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1euLmx-000693-3U
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:26:39 -0500
+	id 1euLmu-00064P-VR
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 12:26:37 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1euLmv-00078t-Uz
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 17:26:37 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1euLmh-00073e-Oc
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 17:26:23 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  9 Mar 2018 17:26:18 +0000
-Message-Id: <20180309172622.4277-22-peter.maydell@linaro.org>
+Date: Fri,  9 Mar 2018 17:25:58 +0000
+Message-Id: <20180309172622.4277-2-peter.maydell@linaro.org>
 In-Reply-To: <20180309172622.4277-1-peter.maydell@linaro.org>
 References: <20180309172622.4277-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 21/25] sdcard: Display command name when tracing
- CMD/ACMD
+Subject: [Qemu-devel] [PULL 01/25] target/arm: Add a core count property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,218 +29,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
 
-The SDBus will reuse these functions, so we put them in a new source file.
+The cortex A53 TRM specifies that bits 24 and 25 of the L2CTLR register
+specify the number of cores in the processor, not the total number of
+cores in the system. To report this correctly on machines with multiple
+CPU clusters (ARM's big.LITTLE or Xilinx's ZynqMP) we need to allow
+the machine to overwrite this value. To do this let's add an optional
+property.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20180309153654.13518-3-f4bug@amsat.org
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Message-id: ef01d95c0759e88f47f22d11b14c91512a658b4f.1520018138.git.alistair.francis@xilinx.com
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-[PMM: slight wordsmithing of comments, added note that string
- returned does not need to be freed]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/sd/Makefile.objs    |  2 +-
- hw/sd/sdmmc-internal.h | 24 +++++++++++++++++
- hw/sd/sd.c             | 13 +++++----
- hw/sd/sdmmc-internal.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++
- hw/sd/trace-events     |  8 +++---
- 5 files changed, 109 insertions(+), 10 deletions(-)
- create mode 100644 hw/sd/sdmmc-internal.c
+ target/arm/cpu.h   | 5 +++++
+ target/arm/cpu.c   | 6 ++++++
+ target/arm/cpu64.c | 6 ++++--
+ 3 files changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/hw/sd/Makefile.objs b/hw/sd/Makefile.objs
-index c2b7664264..a99d9fbb04 100644
---- a/hw/sd/Makefile.objs
-+++ b/hw/sd/Makefile.objs
-@@ -1,6 +1,6 @@
- common-obj-$(CONFIG_PL181) += pl181.o
- common-obj-$(CONFIG_SSI_SD) += ssi-sd.o
--common-obj-$(CONFIG_SD) += sd.o core.o
-+common-obj-$(CONFIG_SD) += sd.o core.o sdmmc-internal.o
- common-obj-$(CONFIG_SDHCI) += sdhci.o
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 8dd6b788df..3fa8fdad21 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -745,6 +745,11 @@ struct ARMCPU {
+     /* Uniprocessor system with MP extensions */
+     bool mp_is_up;
  
- obj-$(CONFIG_MILKYMIST) += milkymist-memcard.o
-diff --git a/hw/sd/sdmmc-internal.h b/hw/sd/sdmmc-internal.h
-index 0e96cb0081..9aa04766fc 100644
---- a/hw/sd/sdmmc-internal.h
-+++ b/hw/sd/sdmmc-internal.h
-@@ -12,4 +12,28 @@
- 
- #define SDMMC_CMD_MAX 64
- 
-+/**
-+ * sd_cmd_name:
-+ * @cmd: A SD "normal" command, up to SDMMC_CMD_MAX.
-+ *
-+ * Returns a human-readable name describing the command.
-+ * The return value is always a static string which does not need
-+ * to be freed after use.
-+ *
-+ * Returns: The command name of @cmd or "UNKNOWN_CMD".
-+ */
-+const char *sd_cmd_name(uint8_t cmd);
++    /* Specify the number of cores in this CPU cluster. Used for the L2CTLR
++     * register.
++     */
++    int32_t core_count;
 +
-+/**
-+ * sd_acmd_name:
-+ * @cmd: A SD "Application-Specific" command, up to SDMMC_CMD_MAX.
-+ *
-+ * Returns a human-readable name describing the application command.
-+ * The return value is always a static string which does not need
-+ * to be freed after use.
-+ *
-+ * Returns: The application command name of @cmd or "UNKNOWN_ACMD".
-+ */
-+const char *sd_acmd_name(uint8_t cmd);
-+
- #endif
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 4a9520e38e..bb149aa644 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -875,8 +875,8 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
-      * However there is no ACMD55, so we want to trace this particular case.
-      */
-     if (req.cmd != 55 || sd->expecting_acmd) {
--        trace_sdcard_normal_command(req.cmd, req.arg,
--                                    sd_state_name(sd->state));
-+        trace_sdcard_normal_command(sd_cmd_name(req.cmd), req.cmd,
-+                                    req.arg, sd_state_name(sd->state));
+     /* The instance init functions for implementation-specific subclasses
+      * set these fields to specify the implementation-dependent values of
+      * various constant registers and reset values of non-constant
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 6b77aaa445..3e4e9f1873 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -939,6 +939,11 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+         cs->num_ases = 1;
      }
+     cpu_address_space_init(cs, ARMASIdx_NS, "cpu-memory", cs->memory);
++
++    /* No core_count specified, default to smp_cpus. */
++    if (cpu->core_count == -1) {
++        cpu->core_count = smp_cpus;
++    }
+ #endif
  
-     /* Not interpreting this as an app command */
-@@ -1455,7 +1455,8 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
- static sd_rsp_type_t sd_app_command(SDState *sd,
-                                     SDRequest req)
+     qemu_init_vcpu(cs);
+@@ -1765,6 +1770,7 @@ static Property arm_cpu_properties[] = {
+     DEFINE_PROP_UINT64("mp-affinity", ARMCPU,
+                         mp_affinity, ARM64_AFFINITY_INVALID),
+     DEFINE_PROP_INT32("node-id", ARMCPU, node_id, CPU_UNSET_NUMA_NODE_ID),
++    DEFINE_PROP_INT32("core-count", ARMCPU, core_count, -1),
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 4228713b19..dd9ba973f7 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -42,8 +42,10 @@ static inline void unset_feature(CPUARMState *env, int feature)
+ #ifndef CONFIG_USER_ONLY
+ static uint64_t a57_a53_l2ctlr_read(CPUARMState *env, const ARMCPRegInfo *ri)
  {
--    trace_sdcard_app_command(req.cmd, req.arg);
-+    trace_sdcard_app_command(sd_acmd_name(req.cmd),
-+                             req.cmd, req.arg, sd_state_name(sd->state));
-     sd->card_status |= APP_CMD;
-     switch (req.cmd) {
-     case 6:	/* ACMD6:  SET_BUS_WIDTH */
-@@ -1770,7 +1771,8 @@ void sd_write_data(SDState *sd, uint8_t value)
-     if (sd->card_status & (ADDRESS_ERROR | WP_VIOLATION))
-         return;
- 
--    trace_sdcard_write_data(sd->current_cmd, value);
-+    trace_sdcard_write_data(sd_acmd_name(sd->current_cmd),
-+                            sd->current_cmd, value);
-     switch (sd->current_cmd) {
-     case 24:	/* CMD24:  WRITE_SINGLE_BLOCK */
-         sd->data[sd->data_offset ++] = value;
-@@ -1908,7 +1910,8 @@ uint8_t sd_read_data(SDState *sd)
- 
-     io_len = (sd->ocr & (1 << 30)) ? 512 : sd->blk_len;
- 
--    trace_sdcard_read_data(sd->current_cmd, io_len);
-+    trace_sdcard_read_data(sd_acmd_name(sd->current_cmd),
-+                           sd->current_cmd, io_len);
-     switch (sd->current_cmd) {
-     case 6:	/* CMD6:   SWITCH_FUNCTION */
-         ret = sd->data[sd->data_offset ++];
-diff --git a/hw/sd/sdmmc-internal.c b/hw/sd/sdmmc-internal.c
-new file mode 100644
-index 0000000000..2053def3f1
---- /dev/null
-+++ b/hw/sd/sdmmc-internal.c
-@@ -0,0 +1,72 @@
-+/*
-+ * SD/MMC cards common helpers
-+ *
-+ * Copyright (c) 2018  Philippe Mathieu-Daudé <f4bug@amsat.org>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
+-    /* Number of processors is in [25:24]; otherwise we RAZ */
+-    return (smp_cpus - 1) << 24;
++    ARMCPU *cpu = arm_env_get_cpu(env);
 +
-+#include "qemu/osdep.h"
-+#include "sdmmc-internal.h"
-+
-+const char *sd_cmd_name(uint8_t cmd)
-+{
-+    static const char *cmd_abbrev[SDMMC_CMD_MAX] = {
-+         [0]    = "GO_IDLE_STATE",
-+         [2]    = "ALL_SEND_CID",            [3]    = "SEND_RELATIVE_ADDR",
-+         [4]    = "SET_DSR",                 [5]    = "IO_SEND_OP_COND",
-+         [6]    = "SWITCH_FUNC",             [7]    = "SELECT/DESELECT_CARD",
-+         [8]    = "SEND_IF_COND",            [9]    = "SEND_CSD",
-+        [10]    = "SEND_CID",               [11]    = "VOLTAGE_SWITCH",
-+        [12]    = "STOP_TRANSMISSION",      [13]    = "SEND_STATUS",
-+                                            [15]    = "GO_INACTIVE_STATE",
-+        [16]    = "SET_BLOCKLEN",           [17]    = "READ_SINGLE_BLOCK",
-+        [18]    = "READ_MULTIPLE_BLOCK",    [19]    = "SEND_TUNING_BLOCK",
-+        [20]    = "SPEED_CLASS_CONTROL",    [21]    = "DPS_spec",
-+                                            [23]    = "SET_BLOCK_COUNT",
-+        [24]    = "WRITE_BLOCK",            [25]    = "WRITE_MULTIPLE_BLOCK",
-+        [26]    = "MANUF_RSVD",             [27]    = "PROGRAM_CSD",
-+        [28]    = "SET_WRITE_PROT",         [29]    = "CLR_WRITE_PROT",
-+        [30]    = "SEND_WRITE_PROT",
-+        [32]    = "ERASE_WR_BLK_START",     [33]    = "ERASE_WR_BLK_END",
-+        [34]    = "SW_FUNC_RSVD",           [35]    = "SW_FUNC_RSVD",
-+        [36]    = "SW_FUNC_RSVD",           [37]    = "SW_FUNC_RSVD",
-+        [38]    = "ERASE",
-+        [40]    = "DPS_spec",
-+        [42]    = "LOCK_UNLOCK",            [43]    = "Q_MANAGEMENT",
-+        [44]    = "Q_TASK_INFO_A",          [45]    = "Q_TASK_INFO_B",
-+        [46]    = "Q_RD_TASK",              [47]    = "Q_WR_TASK",
-+        [48]    = "READ_EXTR_SINGLE",       [49]    = "WRITE_EXTR_SINGLE",
-+        [50]    = "SW_FUNC_RSVD",
-+        [52]    = "IO_RW_DIRECT",           [53]    = "IO_RW_EXTENDED",
-+        [54]    = "SDIO_RSVD",              [55]    = "APP_CMD",
-+        [56]    = "GEN_CMD",                [57]    = "SW_FUNC_RSVD",
-+        [58]    = "READ_EXTR_MULTI",        [59]    = "WRITE_EXTR_MULTI",
-+        [60]    = "MANUF_RSVD",             [61]    = "MANUF_RSVD",
-+        [62]    = "MANUF_RSVD",             [63]    = "MANUF_RSVD",
-+    };
-+    return cmd_abbrev[cmd] ? cmd_abbrev[cmd] : "UNKNOWN_CMD";
-+}
-+
-+const char *sd_acmd_name(uint8_t cmd)
-+{
-+    static const char *acmd_abbrev[SDMMC_CMD_MAX] = {
-+         [6] = "SET_BUS_WIDTH",
-+        [13] = "SD_STATUS",
-+        [14] = "DPS_spec",                  [15] = "DPS_spec",
-+        [16] = "DPS_spec",
-+        [18] = "SECU_spec",
-+        [22] = "SEND_NUM_WR_BLOCKS",        [23] = "SET_WR_BLK_ERASE_COUNT",
-+        [41] = "SD_SEND_OP_COND",
-+        [42] = "SET_CLR_CARD_DETECT",
-+        [51] = "SEND_SCR",
-+        [52] = "SECU_spec",                 [53] = "SECU_spec",
-+        [54] = "SECU_spec",
-+        [56] = "SECU_spec",                 [57] = "SECU_spec",
-+        [58] = "SECU_spec",                 [59] = "SECU_spec",
-+    };
-+
-+    return acmd_abbrev[cmd] ? acmd_abbrev[cmd] : "UNKNOWN_ACMD";
-+}
-diff --git a/hw/sd/trace-events b/hw/sd/trace-events
-index 3040d32560..cdddca3dbf 100644
---- a/hw/sd/trace-events
-+++ b/hw/sd/trace-events
-@@ -24,8 +24,8 @@ sdhci_write_dataport(uint16_t data_count) "write buffer filled with %u bytes of
- sdhci_capareg(const char *desc, uint16_t val) "%s: %u"
++    /* Number of cores is in [25:24]; otherwise we RAZ */
++    return (cpu->core_count - 1) << 24;
+ }
+ #endif
  
- # hw/sd/sd.c
--sdcard_normal_command(uint8_t cmd, uint32_t arg, const char *state) "CMD%d arg 0x%08x (state %s)"
--sdcard_app_command(uint8_t acmd, uint32_t arg) "ACMD%d arg 0x%08x"
-+sdcard_normal_command(const char *cmd_desc, uint8_t cmd, uint32_t arg, const char *state) "%20s/ CMD%02d arg 0x%08x (state %s)"
-+sdcard_app_command(const char *acmd_desc, uint8_t acmd, uint32_t arg, const char *state) "%23s/ACMD%02d arg 0x%08x (state %s)"
- sdcard_response(const char *rspdesc, int rsplen) "%s (sz:%d)"
- sdcard_powerup(void) ""
- sdcard_inquiry_cmd41(void) ""
-@@ -39,8 +39,8 @@ sdcard_lock(void) ""
- sdcard_unlock(void) ""
- sdcard_read_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size 0x%x"
- sdcard_write_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size 0x%x"
--sdcard_write_data(uint8_t cmd, uint8_t value) "CMD%02d value 0x%02x"
--sdcard_read_data(uint8_t cmd, int length) "CMD%02d len %d"
-+sdcard_write_data(const char *cmd_desc, uint8_t cmd, uint8_t value) "%20s/ CMD%02d value 0x%02x"
-+sdcard_read_data(const char *cmd_desc, uint8_t cmd, int length) "%20s/ CMD%02d len %d"
- sdcard_set_voltage(uint16_t millivolts) "%u mV"
- 
- # hw/sd/milkymist-memcard.c
 -- 
 2.16.2
