@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1euKkv-000136-Mb
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:31 -0500
+	(envelope-from <kwolf@redhat.com>) id 1euKl5-0001E3-Kc
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1euKku-0006rs-46
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:29 -0500
+	(envelope-from <kwolf@redhat.com>) id 1euKl3-00073h-BH
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:20:39 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  9 Mar 2018 17:18:57 +0100
-Message-Id: <20180309161933.8168-21-kwolf@redhat.com>
+Date: Fri,  9 Mar 2018 17:19:09 +0100
+Message-Id: <20180309161933.8168-33-kwolf@redhat.com>
 In-Reply-To: <20180309161933.8168-1-kwolf@redhat.com>
 References: <20180309161933.8168-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 20/56] qcow2: Use BlockdevRef in
- qcow2_co_create()
+Subject: [Qemu-devel] [PULL 32/56] gluster: Support .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,211 +22,269 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Instead of passing a separate BlockDriverState* into qcow2_co_create(),
-make use of the BlockdevRef that is included in BlockdevCreateOptions.
+This adds the .bdrv_co_create driver callback to gluster, which enables
+image creation over QMP.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- include/block/block.h |  1 +
- block.c               | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- block/qcow2.c         | 39 +++++++++++++++++++++++++--------------
- 3 files changed, 73 insertions(+), 14 deletions(-)
+ qapi/block-core.json |  18 ++++++-
+ block/gluster.c      | 135 ++++++++++++++++++++++++++++++++++-----------------
+ 2 files changed, 108 insertions(+), 45 deletions(-)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 8b6db952a2..7805187b30 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -246,6 +246,7 @@ BdrvChild *bdrv_open_child(const char *filename,
-                            BlockDriverState* parent,
-                            const BdrvChildRole *child_role,
-                            bool allow_none, Error **errp);
-+BlockDriverState *bdrv_open_blockdev_ref(BlockdevRef *ref, Error **errp);
- void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd,
-                          Error **errp);
- int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
-diff --git a/block.c b/block.c
-index 8f1c43d037..4fc65f7621 100644
---- a/block.c
-+++ b/block.c
-@@ -34,6 +34,8 @@
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qjson.h"
- #include "qapi/qmp/qstring.h"
-+#include "qapi/qobject-output-visitor.h"
-+#include "qapi/qapi-visit-block-core.h"
- #include "sysemu/block-backend.h"
- #include "sysemu/sysemu.h"
- #include "qemu/notify.h"
-@@ -2406,6 +2408,51 @@ BdrvChild *bdrv_open_child(const char *filename,
-     return c;
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 41955b097f..9170fbf6e6 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3377,6 +3377,22 @@
+             '*nocow':           'bool' } }
+ 
+ ##
++# @BlockdevCreateOptionsGluster:
++#
++# Driver specific image creation options for gluster.
++#
++# @location         Where to store the new image file
++# @size             Size of the virtual disk in bytes
++# @preallocation    Preallocation mode for the new image (default: off)
++#
++# Since: 2.12
++##
++{ 'struct': 'BlockdevCreateOptionsGluster',
++  'data': { 'location':         'BlockdevOptionsGluster',
++            'size':             'size',
++            '*preallocation':   'PreallocMode' } }
++
++##
+ # @BlockdevQcow2Version:
+ #
+ # @v2:  The original QCOW2 format as introduced in qemu 0.10 (version 2)
+@@ -3450,7 +3466,7 @@
+       'file':           'BlockdevCreateOptionsFile',
+       'ftp':            'BlockdevCreateNotSupported',
+       'ftps':           'BlockdevCreateNotSupported',
+-      'gluster':        'BlockdevCreateNotSupported',
++      'gluster':        'BlockdevCreateOptionsGluster',
+       'host_cdrom':     'BlockdevCreateNotSupported',
+       'host_device':    'BlockdevCreateNotSupported',
+       'http':           'BlockdevCreateNotSupported',
+diff --git a/block/gluster.c b/block/gluster.c
+index 79b4cfdf74..63d3c37d4c 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -655,9 +655,11 @@ out:
+     return -errno;
  }
  
-+/* TODO Future callers may need to specify parent/child_role in order for
-+ * option inheritance to work. Existing callers use it for the root node. */
-+BlockDriverState *bdrv_open_blockdev_ref(BlockdevRef *ref, Error **errp)
-+{
-+    BlockDriverState *bs = NULL;
-+    Error *local_err = NULL;
-+    QObject *obj = NULL;
-+    QDict *qdict = NULL;
-+    const char *reference = NULL;
-+    Visitor *v = NULL;
-+
-+    if (ref->type == QTYPE_QSTRING) {
-+        reference = ref->u.reference;
-+    } else {
-+        BlockdevOptions *options = &ref->u.definition;
-+        assert(ref->type == QTYPE_QDICT);
-+
-+        v = qobject_output_visitor_new(&obj);
-+        visit_type_BlockdevOptions(v, NULL, &options, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            goto fail;
-+        }
-+        visit_complete(v, &obj);
-+
-+        qdict = qobject_to_qdict(obj);
-+        qdict_flatten(qdict);
-+
-+        /* bdrv_open_inherit() defaults to the values in bdrv_flags (for
-+         * compatibility with other callers) rather than what we want as the
-+         * real defaults. Apply the defaults here instead. */
-+        qdict_set_default_str(qdict, BDRV_OPT_CACHE_DIRECT, "off");
-+        qdict_set_default_str(qdict, BDRV_OPT_CACHE_NO_FLUSH, "off");
-+        qdict_set_default_str(qdict, BDRV_OPT_READ_ONLY, "off");
+-static struct glfs *qemu_gluster_init(BlockdevOptionsGluster *gconf,
+-                                      const char *filename,
+-                                      QDict *options, Error **errp)
++/* Converts options given in @filename and the @options QDict into the QAPI
++ * object @gconf. */
++static int qemu_gluster_parse(BlockdevOptionsGluster *gconf,
++                              const char *filename,
++                              QDict *options, Error **errp)
+ {
+     int ret;
+     if (filename) {
+@@ -668,8 +670,7 @@ static struct glfs *qemu_gluster_init(BlockdevOptionsGluster *gconf,
+                                     "[host[:port]]volume/path[?socket=...]"
+                                     "[,file.debug=N]"
+                                     "[,file.logfile=/path/filename.log]\n");
+-            errno = -ret;
+-            return NULL;
++            return ret;
+         }
+     } else {
+         ret = qemu_gluster_parse_json(gconf, options, errp);
+@@ -685,10 +686,23 @@ static struct glfs *qemu_gluster_init(BlockdevOptionsGluster *gconf,
+                              "file.server.1.transport=unix,"
+                              "file.server.1.socket=/var/run/glusterd.socket ..."
+                              "\n");
+-            errno = -ret;
+-            return NULL;
++            return ret;
+         }
 +    }
-+
-+    bs = bdrv_open_inherit(NULL, reference, qdict, 0, NULL, NULL, errp);
-+    obj = NULL;
-+
-+fail:
-+    qobject_decref(obj);
-+    visit_free(v);
-+    return bs;
+ 
++    return 0;
 +}
 +
- static BlockDriverState *bdrv_append_temp_snapshot(BlockDriverState *bs,
-                                                    int flags,
-                                                    QDict *snapshot_options,
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 7679c28f57..b7df2d5cab 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2768,8 +2768,8 @@ static uint64_t qcow2_opt_get_refcount_bits_del(QemuOpts *opts, int version,
++static struct glfs *qemu_gluster_init(BlockdevOptionsGluster *gconf,
++                                      const char *filename,
++                                      QDict *options, Error **errp)
++{
++    int ret;
++
++    ret = qemu_gluster_parse(gconf, filename, options, errp);
++    if (ret < 0) {
++        errno = -ret;
++        return NULL;
+     }
+ 
+     return qemu_gluster_glfs_init(gconf, errp);
+@@ -1021,20 +1035,72 @@ static int qemu_gluster_do_truncate(struct glfs_fd *fd, int64_t offset,
+     return 0;
  }
  
- static int coroutine_fn
--qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
--                QemuOpts *opts, const char *encryptfmt, Error **errp)
-+qcow2_co_create(BlockdevCreateOptions *create_options, QemuOpts *opts,
-+                const char *encryptfmt, Error **errp)
- {
-     BlockdevCreateOptionsQcow2 *qcow2_opts;
-     QDict *options;
-@@ -2786,7 +2786,8 @@ qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
-      * 2 GB for 64k clusters, and we don't want to have a 2 GB initial file
-      * size for any qcow2 image.
-      */
--    BlockBackend *blk;
-+    BlockBackend *blk = NULL;
-+    BlockDriverState *bs = NULL;
-     QCowHeader *header;
-     size_t cluster_size;
-     int version;
-@@ -2795,10 +2796,15 @@ qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
-     Error *local_err = NULL;
-     int ret;
- 
--    /* Validate options and set default values */
-     assert(create_options->driver == BLOCKDEV_DRIVER_QCOW2);
-     qcow2_opts = &create_options->u.qcow2;
- 
-+    bs = bdrv_open_blockdev_ref(qcow2_opts->file, errp);
-+    if (bs == NULL) {
-+        return -EIO;
++static int qemu_gluster_co_create(BlockdevCreateOptions *options,
++                                  Error **errp)
++{
++    BlockdevCreateOptionsGluster *opts = &options->u.gluster;
++    struct glfs *glfs;
++    struct glfs_fd *fd = NULL;
++    int ret = 0;
++
++    assert(options->driver == BLOCKDEV_DRIVER_GLUSTER);
++
++    glfs = qemu_gluster_glfs_init(opts->location, errp);
++    if (!glfs) {
++        ret = -errno;
++        goto out;
 +    }
 +
-+    /* Validate options and set default values */
-     if (!QEMU_IS_ALIGNED(qcow2_opts->size, BDRV_SECTOR_SIZE)) {
-         error_setg(errp, "Image size must be a multiple of 512 bytes");
-         ret = -EINVAL;
-@@ -2827,7 +2833,8 @@ qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
-     }
- 
-     if (!validate_cluster_size(cluster_size, errp)) {
--        return -EINVAL;
-+        ret = -EINVAL;
++    fd = glfs_creat(glfs, opts->location->path,
++                    O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRUSR | S_IWUSR);
++    if (!fd) {
++        ret = -errno;
 +        goto out;
-     }
++    }
++
++    ret = qemu_gluster_do_truncate(fd, opts->size, opts->preallocation, errp);
++
++out:
++    if (fd) {
++        if (glfs_close(fd) != 0 && ret == 0) {
++            ret = -errno;
++        }
++    }
++    glfs_clear_preopened(glfs);
++    return ret;
++}
++
+ static int coroutine_fn qemu_gluster_co_create_opts(const char *filename,
+                                                     QemuOpts *opts,
+                                                     Error **errp)
+ {
++    BlockdevCreateOptions *options;
++    BlockdevCreateOptionsGluster *gopts;
+     BlockdevOptionsGluster *gconf;
+-    struct glfs *glfs;
+-    struct glfs_fd *fd = NULL;
+-    int ret = 0;
+-    PreallocMode prealloc;
+-    int64_t total_size = 0;
+     char *tmp = NULL;
+     Error *local_err = NULL;
++    int ret;
++
++    options = g_new0(BlockdevCreateOptions, 1);
++    options->driver = BLOCKDEV_DRIVER_GLUSTER;
++    gopts = &options->u.gluster;
  
-     if (!qcow2_opts->has_preallocation) {
-@@ -2838,11 +2845,13 @@ qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
-     {
-         error_setg(errp, "Backing file and preallocation cannot be used at "
-                    "the same time");
--        return -EINVAL;
+     gconf = g_new0(BlockdevOptionsGluster, 1);
++    gopts->location = gconf;
++
++    gopts->size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
++                           BDRV_SECTOR_SIZE);
++
++    tmp = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
++    gopts->preallocation = qapi_enum_parse(&PreallocMode_lookup, tmp,
++                                           PREALLOC_MODE_OFF, &local_err);
++    g_free(tmp);
++    if (local_err) {
++        error_propagate(errp, local_err);
 +        ret = -EINVAL;
-+        goto out;
++        goto fail;
++    }
++
+     gconf->debug = qemu_opt_get_number_del(opts, GLUSTER_OPT_DEBUG,
+                                            GLUSTER_DEBUG_DEFAULT);
+     if (gconf->debug < 0) {
+@@ -1050,42 +1116,19 @@ static int coroutine_fn qemu_gluster_co_create_opts(const char *filename,
      }
-     if (qcow2_opts->has_backing_fmt && !qcow2_opts->has_backing_file) {
-         error_setg(errp, "Backing format cannot be used without backing file");
--        return -EINVAL;
-+        ret = -EINVAL;
-+        goto out;
-     }
+     gconf->has_logfile = true;
  
-     if (!qcow2_opts->has_lazy_refcounts) {
-@@ -2851,7 +2860,8 @@ qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
-     if (version < 3 && qcow2_opts->lazy_refcounts) {
-         error_setg(errp, "Lazy refcounts only supported with compatibility "
-                    "level 1.1 and above (use compat=1.1 or greater)");
--        return -EINVAL;
-+        ret = -EINVAL;
-+        goto out;
-     }
- 
-     if (!qcow2_opts->has_refcount_bits) {
-@@ -2862,13 +2872,15 @@ qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
-     {
-         error_setg(errp, "Refcount width must be a power of two and may not "
-                    "exceed 64 bits");
--        return -EINVAL;
-+        ret = -EINVAL;
-+        goto out;
-     }
-     if (version < 3 && qcow2_opts->refcount_bits != 16) {
-         error_setg(errp, "Different refcount widths than 16 bits require "
-                    "compatibility level 1.1 or above (use compat=1.1 or "
-                    "greater)");
--        return -EINVAL;
-+        ret = -EINVAL;
-+        goto out;
-     }
-     refcount_order = ctz32(qcow2_opts->refcount_bits);
- 
-@@ -3026,9 +3038,8 @@ qcow2_co_create(BlockDriverState *bs, BlockdevCreateOptions *create_options,
- 
-     ret = 0;
- out:
--    if (blk) {
--        blk_unref(blk);
+-    glfs = qemu_gluster_init(gconf, filename, NULL, errp);
+-    if (!glfs) {
+-        ret = -errno;
+-        goto out;
 -    }
-+    blk_unref(blk);
-+    bdrv_unref(bs);
+-
+-    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+-                          BDRV_SECTOR_SIZE);
+-
+-    tmp = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
+-    prealloc = qapi_enum_parse(&PreallocMode_lookup, tmp, PREALLOC_MODE_OFF,
+-                               &local_err);
+-    g_free(tmp);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        ret = -EINVAL;
+-        goto out;
++    ret = qemu_gluster_parse(gconf, filename, NULL, errp);
++    if (ret < 0) {
++        goto fail;
+     }
+ 
+-    fd = glfs_creat(glfs, gconf->path,
+-                    O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRUSR | S_IWUSR);
+-    if (!fd) {
+-        ret = -errno;
+-        goto out;
++    ret = qemu_gluster_co_create(options, errp);
++    if (ret < 0) {
++        goto fail;
+     }
+ 
+-    ret = qemu_gluster_do_truncate(fd, total_size, prealloc, errp);
+-
+-out:
+-    if (fd) {
+-        if (glfs_close(fd) != 0 && ret == 0) {
+-            ret = -errno;
+-        }
+-    }
+-    qapi_free_BlockdevOptionsGluster(gconf);
+-    glfs_clear_preopened(glfs);
++    ret = 0;
++fail:
++    qapi_free_BlockdevCreateOptions(options);
      return ret;
  }
  
-@@ -3157,7 +3168,7 @@ static int coroutine_fn qcow2_co_create_opts(const char *filename, QemuOpts *opt
-             .refcount_bits      = refcount_bits,
-         },
-     };
--    ret = qcow2_co_create(bs, &create_options, opts, encryptfmt, errp);
-+    ret = qcow2_co_create(&create_options, opts, encryptfmt, errp);
-     if (ret < 0) {
-         goto finish;
-     }
+@@ -1436,6 +1479,7 @@ static BlockDriver bdrv_gluster = {
+     .bdrv_reopen_commit           = qemu_gluster_reopen_commit,
+     .bdrv_reopen_abort            = qemu_gluster_reopen_abort,
+     .bdrv_close                   = qemu_gluster_close,
++    .bdrv_co_create               = qemu_gluster_co_create,
+     .bdrv_co_create_opts          = qemu_gluster_co_create_opts,
+     .bdrv_getlength               = qemu_gluster_getlength,
+     .bdrv_get_allocated_file_size = qemu_gluster_allocated_file_size,
+@@ -1464,6 +1508,7 @@ static BlockDriver bdrv_gluster_tcp = {
+     .bdrv_reopen_commit           = qemu_gluster_reopen_commit,
+     .bdrv_reopen_abort            = qemu_gluster_reopen_abort,
+     .bdrv_close                   = qemu_gluster_close,
++    .bdrv_co_create               = qemu_gluster_co_create,
+     .bdrv_co_create_opts          = qemu_gluster_co_create_opts,
+     .bdrv_getlength               = qemu_gluster_getlength,
+     .bdrv_get_allocated_file_size = qemu_gluster_allocated_file_size,
+@@ -1492,6 +1537,7 @@ static BlockDriver bdrv_gluster_unix = {
+     .bdrv_reopen_commit           = qemu_gluster_reopen_commit,
+     .bdrv_reopen_abort            = qemu_gluster_reopen_abort,
+     .bdrv_close                   = qemu_gluster_close,
++    .bdrv_co_create               = qemu_gluster_co_create,
+     .bdrv_co_create_opts          = qemu_gluster_co_create_opts,
+     .bdrv_getlength               = qemu_gluster_getlength,
+     .bdrv_get_allocated_file_size = qemu_gluster_allocated_file_size,
+@@ -1526,6 +1572,7 @@ static BlockDriver bdrv_gluster_rdma = {
+     .bdrv_reopen_commit           = qemu_gluster_reopen_commit,
+     .bdrv_reopen_abort            = qemu_gluster_reopen_abort,
+     .bdrv_close                   = qemu_gluster_close,
++    .bdrv_co_create               = qemu_gluster_co_create,
+     .bdrv_co_create_opts          = qemu_gluster_co_create_opts,
+     .bdrv_getlength               = qemu_gluster_getlength,
+     .bdrv_get_allocated_file_size = qemu_gluster_allocated_file_size,
 -- 
 2.13.6
