@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41331)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1euLCV-0000wI-I5
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:49:02 -0500
+	id 1euLCy-0001Jx-Ti
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:49:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1euLCR-0003LG-JU
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:48:59 -0500
+	id 1euLCu-0003Sf-Ts
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 11:49:28 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180308130626.12393-1-peter.maydell@linaro.org>
-	<20180308130626.12393-5-peter.maydell@linaro.org>
+	<20180308130626.12393-6-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <dc240c4c-275d-8084-276c-c905ccbce008@amsat.org>
-Date: Fri, 9 Mar 2018 17:48:51 +0100
+Message-ID: <1de4234e-fa02-fc82-4057-f1be7b11d2e5@amsat.org>
+Date: Fri, 9 Mar 2018 17:49:21 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180308130626.12393-5-peter.maydell@linaro.org>
+In-Reply-To: <20180308130626.12393-6-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 4/6] target/arm: Make 'any' CPU just an
- alias for 'max'
+Subject: Re: [Qemu-devel] [PATCH v3 5/6] hw/arm/virt: Add "max" to the list
+ of CPU types "virt" supports
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,183 +33,27 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@no
 Cc: patches@linaro.org, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
 On 03/08/2018 02:06 PM, Peter Maydell wrote:
-> Now we have a working '-cpu max', the linux-user-only
-> 'any' CPU is pretty much the same thing, so implement it
-> that way.
-> 
-> For the moment we don't add any of the extra feature bits
-> to the system-emulation "max", because we don't set the
-> ID register bits we would need to to advertise those
-> features as present.
+> Allow the virt board to support '-cpu max' in the same way
+> it already handles '-cpu host'.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  target/arm/cpu.c   | 52 +++++++++++++++++++++++++----------------------
->  target/arm/cpu64.c | 59 ++++++++++++++++++++++++++----------------------------
->  2 files changed, 56 insertions(+), 55 deletions(-)
+>  hw/arm/virt.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index e46ddcc613..6068efb8ff 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -965,9 +965,19 @@ static ObjectClass *arm_cpu_class_by_name(const char *cpu_model)
->      ObjectClass *oc;
->      char *typename;
->      char **cpuname;
-> +    const char *cpunamestr;
->  
->      cpuname = g_strsplit(cpu_model, ",", 1);
-> -    typename = g_strdup_printf(ARM_CPU_TYPE_NAME("%s"), cpuname[0]);
-> +    cpunamestr = cpuname[0];
-> +#ifdef CONFIG_USER_ONLY
-> +    /* For backwards compatibility usermode emulation allows "-cpu any",
-> +     * which has the same semantics as "-cpu max".
-> +     */
-> +    if (!strcmp(cpunamestr, "any")) {
-> +        cpunamestr = "max";
-> +    }
-> +#endif
-> +    typename = g_strdup_printf(ARM_CPU_TYPE_NAME("%s"), cpunamestr);
->      oc = object_class_by_name(typename);
->      g_strfreev(cpuname);
->      g_free(typename);
-> @@ -1711,29 +1721,23 @@ static void arm_max_initfn(Object *obj)
->          kvm_arm_set_cpu_features_from_host(cpu);
->      } else {
->          cortex_a15_initfn(obj);
-> -        /* In future we might add feature bits here even if the
-> -         * real-world A15 doesn't implement them.
-> -         */
-> -    }
-> -}
-> -#endif
-> -
->  #ifdef CONFIG_USER_ONLY
-> -static void arm_any_initfn(Object *obj)
-> -{
-> -    ARMCPU *cpu = ARM_CPU(obj);
-> -    set_feature(&cpu->env, ARM_FEATURE_V8);
-> -    set_feature(&cpu->env, ARM_FEATURE_VFP4);
-> -    set_feature(&cpu->env, ARM_FEATURE_NEON);
-> -    set_feature(&cpu->env, ARM_FEATURE_THUMB2EE);
-> -    set_feature(&cpu->env, ARM_FEATURE_V8_AES);
-> -    set_feature(&cpu->env, ARM_FEATURE_V8_SHA1);
-> -    set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
-> -    set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
-> -    set_feature(&cpu->env, ARM_FEATURE_CRC);
-> -    set_feature(&cpu->env, ARM_FEATURE_V8_RDM);
-> -    set_feature(&cpu->env, ARM_FEATURE_V8_FCMA);
-> -    cpu->midr = 0xffffffff;
-> +        /* We don't set these in system emulation mode for the moment,
-> +         * since we don't correctly set the ID registers to advertise them,
-> +         */
-> +        set_feature(&cpu->env, ARM_FEATURE_V8);
-> +        set_feature(&cpu->env, ARM_FEATURE_VFP4);
-> +        set_feature(&cpu->env, ARM_FEATURE_NEON);
-> +        set_feature(&cpu->env, ARM_FEATURE_THUMB2EE);
-> +        set_feature(&cpu->env, ARM_FEATURE_V8_AES);
-> +        set_feature(&cpu->env, ARM_FEATURE_V8_SHA1);
-> +        set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
-> +        set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
-> +        set_feature(&cpu->env, ARM_FEATURE_CRC);
-> +        set_feature(&cpu->env, ARM_FEATURE_V8_RDM);
-> +        set_feature(&cpu->env, ARM_FEATURE_V8_FCMA);
-> +#endif
-> +    }
->  }
->  #endif
->  
-> @@ -1789,7 +1793,7 @@ static const ARMCPUInfo arm_cpus[] = {
->      { .name = "max",         .initfn = arm_max_initfn },
->  #endif
->  #ifdef CONFIG_USER_ONLY
-> -    { .name = "any",         .initfn = arm_any_initfn },
-> +    { .name = "any",         .initfn = arm_max_initfn },
->  #endif
->  #endif
->      { .name = NULL }
-> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> index 9042d3dfd1..3429875787 100644
-> --- a/target/arm/cpu64.c
-> +++ b/target/arm/cpu64.c
-> @@ -226,38 +226,38 @@ static void aarch64_max_initfn(Object *obj)
->          kvm_arm_set_cpu_features_from_host(cpu);
->      } else {
->          aarch64_a57_initfn(obj);
-> -        /* In future we might add feature bits here even if the
-> -         * real-world A57 doesn't implement them.
-> +#ifdef CONFIG_USER_ONLY
-> +        /* We don't set these in system emulation mode for the moment,
-> +         * since we don't correctly set the ID registers to advertise them,
-> +         * and in some cases they're only available in AArch64 and not AArch32,
-> +         * whereas the architecture requires them to be present in both if
-> +         * present in either.
->           */
-> +        set_feature(&cpu->env, ARM_FEATURE_V8);
-> +        set_feature(&cpu->env, ARM_FEATURE_VFP4);
-> +        set_feature(&cpu->env, ARM_FEATURE_NEON);
-> +        set_feature(&cpu->env, ARM_FEATURE_AARCH64);
-> +        set_feature(&cpu->env, ARM_FEATURE_V8_AES);
-> +        set_feature(&cpu->env, ARM_FEATURE_V8_SHA1);
-> +        set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
-> +        set_feature(&cpu->env, ARM_FEATURE_V8_SHA512);
-> +        set_feature(&cpu->env, ARM_FEATURE_V8_SHA3);
-> +        set_feature(&cpu->env, ARM_FEATURE_V8_SM3);
-> +        set_feature(&cpu->env, ARM_FEATURE_V8_SM4);
-> +        set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
-> +        set_feature(&cpu->env, ARM_FEATURE_CRC);
-> +        set_feature(&cpu->env, ARM_FEATURE_V8_RDM);
-> +        set_feature(&cpu->env, ARM_FEATURE_V8_FP16);
-> +        set_feature(&cpu->env, ARM_FEATURE_V8_FCMA);
-> +        /* For usermode -cpu max we can use a larger and more efficient DCZ
-> +         * blocksize since we don't have to follow what the hardware does.
-> +         */
-> +        cpu->ctr = 0x80038003; /* 32 byte I and D cacheline size, VIPT icache */
-> +        cpu->dcz_blocksize = 7; /*  512 bytes */
-> +#endif
->      }
->  }
->  
-> -#ifdef CONFIG_USER_ONLY
-> -static void aarch64_any_initfn(Object *obj)
-> -{
-> -    ARMCPU *cpu = ARM_CPU(obj);
-> -
-> -    set_feature(&cpu->env, ARM_FEATURE_V8);
-> -    set_feature(&cpu->env, ARM_FEATURE_VFP4);
-> -    set_feature(&cpu->env, ARM_FEATURE_NEON);
-> -    set_feature(&cpu->env, ARM_FEATURE_AARCH64);
-> -    set_feature(&cpu->env, ARM_FEATURE_V8_AES);
-> -    set_feature(&cpu->env, ARM_FEATURE_V8_SHA1);
-> -    set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
-> -    set_feature(&cpu->env, ARM_FEATURE_V8_SHA512);
-> -    set_feature(&cpu->env, ARM_FEATURE_V8_SHA3);
-> -    set_feature(&cpu->env, ARM_FEATURE_V8_SM3);
-> -    set_feature(&cpu->env, ARM_FEATURE_V8_SM4);
-> -    set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
-> -    set_feature(&cpu->env, ARM_FEATURE_CRC);
-> -    set_feature(&cpu->env, ARM_FEATURE_V8_RDM);
-> -    set_feature(&cpu->env, ARM_FEATURE_V8_FP16);
-> -    set_feature(&cpu->env, ARM_FEATURE_V8_FCMA);
-> -    cpu->ctr = 0x80038003; /* 32 byte I and D cacheline size, VIPT icache */
-> -    cpu->dcz_blocksize = 7; /*  512 bytes */
-> -}
-> -#endif
-> -
->  typedef struct ARMCPUInfo {
->      const char *name;
->      void (*initfn)(Object *obj);
-> @@ -268,9 +268,6 @@ static const ARMCPUInfo aarch64_cpus[] = {
->      { .name = "cortex-a57",         .initfn = aarch64_a57_initfn },
->      { .name = "cortex-a53",         .initfn = aarch64_a53_initfn },
->      { .name = "max",                .initfn = aarch64_max_initfn },
-> -#ifdef CONFIG_USER_ONLY
-> -    { .name = "any",         .initfn = aarch64_any_initfn },
-> -#endif
->      { .name = NULL }
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index dbb3c8036a..cda4b83586 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -169,6 +169,7 @@ static const char *valid_cpus[] = {
+>      ARM_CPU_TYPE_NAME("cortex-a53"),
+>      ARM_CPU_TYPE_NAME("cortex-a57"),
+>      ARM_CPU_TYPE_NAME("host"),
+> +    ARM_CPU_TYPE_NAME("max"),
 >  };
 >  
+>  static bool cpu_type_valid(const char *cpu)
 > 
