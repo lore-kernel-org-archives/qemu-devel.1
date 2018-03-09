@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiewen.yao@intel.com>) id 1eu64T-0005zc-3s
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 19:39:42 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eu6B9-0007kt-IA
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 19:46:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiewen.yao@intel.com>) id 1eu64P-0003G7-5z
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 19:39:41 -0500
-Received: from mga18.intel.com ([134.134.136.126]:8507)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jiewen.yao@intel.com>)
-	id 1eu64O-0003Ee-R6
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 19:39:37 -0500
-From: "Yao, Jiewen" <jiewen.yao@intel.com>
-Date: Fri, 9 Mar 2018 00:39:27 +0000
-Message-ID: <74D8A39837DF1E4DA445A8C0B3885C503AAEEFF3@shsmsx102.ccr.corp.intel.com>
-References: <20180307155746.18526-1-marcandre.lureau@redhat.com>
-	<20180307155746.18526-9-marcandre.lureau@redhat.com>
-	<a62073a3-cc41-ca4b-4822-e28ebcf5204b@redhat.com>
-In-Reply-To: <a62073a3-cc41-ca4b-4822-e28ebcf5204b@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <dgibson@ozlabs.org>) id 1eu6B8-000637-Az
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 19:46:35 -0500
+Date: Fri, 9 Mar 2018 11:41:07 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180309004107.GT3083@umbus.fritz.box>
+References: <20180308115036.23461-1-david.engraf@sysgo.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 8/8] ovmf: add DxeTpm2MeasureBootLib
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="u+FGODhbLwgAeSOU"
+Content-Disposition: inline
+In-Reply-To: <20180308115036.23461-1-david.engraf@sysgo.com>
+Subject: Re: [Qemu-devel] [PATCH] PPC e500: Fix gap between u-boot and kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,97 +23,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>
-Cc: "pjones@redhat.com" <pjones@redhat.com>, "stefanb@linux.vnet.ibm.com" <stefanb@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "javierm@redhat.com" <javierm@redhat.com>
+To: David Engraf <david.engraf@sysgo.com>
+Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-VmVyeSBnb29kIHF1ZXN0aW9uLg0KQ29tbWVudCBiZWxvdzoNCg0KPiAtLS0tLU9yaWdpbmFsIE1l
-c3NhZ2UtLS0tLQ0KPiBGcm9tOiBMYXN6bG8gRXJzZWsgW21haWx0bzpsZXJzZWtAcmVkaGF0LmNv
-bV0NCj4gU2VudDogRnJpZGF5LCBNYXJjaCA5LCAyMDE4IDM6NTQgQU0NCj4gVG86IG1hcmNhbmRy
-ZS5sdXJlYXVAcmVkaGF0LmNvbTsgZWRrMi1kZXZlbEBsaXN0cy4wMS5vcmc7IFlhbywgSmlld2Vu
-DQo+IDxqaWV3ZW4ueWFvQGludGVsLmNvbT4NCj4gQ2M6IHBqb25lc0ByZWRoYXQuY29tOyBzdGVm
-YW5iQGxpbnV4LnZuZXQuaWJtLmNvbTsNCj4gcWVtdS1kZXZlbEBub25nbnUub3JnOyBqYXZpZXJt
-QHJlZGhhdC5jb20NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MiA4LzhdIG92bWY6IGFkZCBEeGVU
-cG0yTWVhc3VyZUJvb3RMaWINCj4gDQo+IChKaWV3ZW4sIGJlbG93IEkgaGF2ZSBhIHF1ZXN0aW9u
-IGZvciB5b3UgYXMgd2VsbDsgcGxlYXNlIGhlbHAgd2l0aCB0aGF0LikNCj4gDQo+IE9uIDAzLzA3
-LzE4IDE2OjU3LCBtYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20gd3JvdGU6DQo+ID4gRnJvbTog
-TWFyYy1BbmRyw6kgTHVyZWF1IDxtYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20+DQo+ID4NCj4g
-PiBUaGUgbGlicmFyeSByZWdpc3RlcnMgYSBzZWN1cml0eSBtYW5hZ2VtZW50IGhhbmRsZXIsIHRv
-IG1lYXN1cmUgaW1hZ2VzDQo+ID4gdGhhdCBhcmUgbm90IG1lYXN1cmUgaW4gUEVJIHBoYXNlLg0K
-PiA+DQo+ID4gVGhpcyBzZWVtcyB0byB3b3JrIGZvciBleGFtcGxlIHdpdGggdGhlIHFlbXUgUFhF
-IHJvbToNCj4gPg0KPiA+IExvYWRpbmcgZHJpdmVyIGF0IDB4MDAwM0U2QzIwMDAgRW50cnlQb2lu
-dD0weDAwMDNFNkM5MDc2IDgwODYxMDBlLmVmaQ0KPiA+DQo+ID4gQW5kIHRoZSBmb2xsb3dpbmcg
-YmluYXJ5X2Jpb3NfbWVhc3VyZW1lbnRzIGxvZyBlbnRyeSBzZWVtcyB0byBiZQ0KPiA+IGFkZGVk
-Og0KPiA+DQo+ID4gUENSOiAyCXR5cGU6IEVWX0VGSV9CT09UX1NFUlZJQ0VTX0RSSVZFUiAgICAg
-CXNpemU6IDB4NGUJZGlnZXN0Og0KPiA3MGEyMjQ3NWU5ZjE4ODA2ZDJlZDkxOTNiNDhkODBkMjY3
-NzlkOWE0DQo+ID4NCj4gPiBDYzogTGFzemxvIEVyc2VrIDxsZXJzZWtAcmVkaGF0LmNvbT4NCj4g
-PiBDYzogU3RlZmFuIEJlcmdlciA8c3RlZmFuYkBsaW51eC52bmV0LmlibS5jb20+DQo+ID4gQ29u
-dHJpYnV0ZWQtdW5kZXI6IFRpYW5vQ29yZSBDb250cmlidXRpb24gQWdyZWVtZW50IDEuMA0KPiA+
-IFNpZ25lZC1vZmYtYnk6IE1hcmMtQW5kcsOpIEx1cmVhdSA8bWFyY2FuZHJlLmx1cmVhdUByZWRo
-YXQuY29tPg0KPiA+IC0tLQ0KPiA+ICBPdm1mUGtnL092bWZQa2dYNjQuZHNjIHwgMyArKysNCj4g
-PiAgMSBmaWxlIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBh
-L092bWZQa2cvT3ZtZlBrZ1g2NC5kc2MgYi9Pdm1mUGtnL092bWZQa2dYNjQuZHNjDQo+ID4gaW5k
-ZXggNzc1Mzg1MjE0NGZiLi45ZGIxNzEyZTM2MjMgMTAwNjQ0DQo+ID4gLS0tIGEvT3ZtZlBrZy9P
-dm1mUGtnWDY0LmRzYw0KPiA+ICsrKyBiL092bWZQa2cvT3ZtZlBrZ1g2NC5kc2MNCj4gPiBAQCAt
-NjYyLDYgKzY2Miw5IEBAIFtDb21wb25lbnRzXQ0KPiA+ICAgICAgPExpYnJhcnlDbGFzc2VzPg0K
-PiA+ICAhaWYgJChTRUNVUkVfQk9PVF9FTkFCTEUpID09IFRSVUUNCj4gPg0KPiBOVUxMfFNlY3Vy
-aXR5UGtnL0xpYnJhcnkvRHhlSW1hZ2VWZXJpZmljYXRpb25MaWIvRHhlSW1hZ2VWZXJpZmljYXRp
-b25MaWIuaW5mDQo+ID4gKyFlbmRpZg0KPiA+ICshaWYgJChUUE0yX0VOQUJMRSkgPT0gVFJVRQ0K
-PiA+ICsNCj4gTlVMTHxTZWN1cml0eVBrZy9MaWJyYXJ5L0R4ZVRwbTJNZWFzdXJlQm9vdExpYi9E
-eGVUcG0yTWVhc3VyZUJvb3RMaWIuaQ0KPiBuZg0KPiA+ICAhZW5kaWYNCj4gPiAgICB9DQo+ID4N
-Cj4gPg0KPiANCj4gKDEpIE1hcmMtQW5kcsOpLCBwbGVhc2UgY2hhbmdlIHRoZSBzdWJqZWN0IGxp
-bmUgdG86DQo+IA0KPiBPdm1mUGtnOiBwbHVnIER4ZVRwbTJNZWFzdXJlQm9vdExpYiBpbnRvIFNl
-Y3VyaXR5U3R1YkR4ZQ0KPiANCj4gDQo+ICgyKSBJIGhhdmUgYSBxdWVzdGlvbiBmb3IgSmlld2Vu
-Og0KPiANCj4gRHhlVHBtMk1lYXN1cmVCb290TGliIGNvbnN1bWVzIHRoZSBUQ0cyIHByb3RvY29s
-LCBidXQgaXQgZG9lcyBub3QgZGVwZW5kDQo+IG9uIGl0IHdpdGggYSBERVBFWC4gSW5zdGVhZCwg
-RHhlVHBtMk1lYXN1cmVCb290SGFuZGxlcigpIHRyaWVzIHRvIGxvY2F0ZQ0KPiB0aGUgcHJvdG9j
-b2wgb24gZXZlcnkgaW52b2NhdGlvbi4NCltKaWV3ZW5dIFllcy4NCg0KPiBUaGlzIG1lYW5zIHRo
-YXQgU2VjdXJpdHlTdHViRHhlIG1heSBwcm9kdWNlIHRoZSBTZWN1cml0eSBhbmQgU2VjdXJpdHky
-DQo+IEFyY2hpdGVjdHVyYWwgUHJvdG9jb2xzIGJlZm9yZSBtZWFzdXJlbWVudHMgaW50byB0aGUg
-VFBNMiBkZXZpY2UgYXJlDQo+IHBvc3NpYmxlLg0KW0ppZXdlbl0gWWVzLg0KDQo+IFRoZXJlZm9y
-ZSwgVUVGSV9EUklWRVIgbW9kdWxlcyAod2hpY2ggZGVwZW5kIG9uIGFsbCBvZiB0aGUNCj4gQXJj
-aCBwcm90b2NvbHMpIG1heSBiZSBzdGFydGVkIGJlZm9yZSB0aGV5IGNhbiBiZSBtZWFzdXJlZCBp
-bnRvIHRoZSBUUE0uDQo+IA0KPiBOb3csIHRoaXMgaXMgbGlrZWx5IG5vIHByb2JsZW0gZm9yIFVF
-RklfRFJJVkVSIG1vZHVsZXMgdGhhdCBhcmUgYnVpbHQNCj4gaW50byB0aGUgZmlybXdhcmUgdm9s
-dW1lKHMpLCBiZWNhdXNlIHRob3NlIGFyZSBtZWFzdXJlZCBieSBUY2cyUGVpDQo+IGFueXdheS4N
-CltKaWV3ZW5dIFRoYXQgaXMgVFJVRS4NCg0KSG93ZXZlciwgaXQgd291bGQgYmUgYSBwcm9ibGVt
-IGZvciBVRUZJX0RSSVZFUiBtb2R1bGVzIC8gYXBwcw0KPiB0aGF0IGNvbWUgZnJvbSBleHRlcm5h
-bCBtZWRpYSAoZGlzaywgbmV0d29yaywgUENJIG9wcm9tLCBldGMpLg0KW0ppZXdlbl0gQnkgZGVz
-aWduLCB0aGUgM3JkIHBhcnQgbW9kdWxlIHNob3VsZCBub3QgYmUgaW52b2tlZCBiZWZvcmUgRW5k
-T2ZEeGUuDQpBbGwgQXJjaCBQcm90b2NvbCBSZWFkeSBpcyBub3Qgc3Ryb25nIGVub3VnaC4gOi0p
-DQpQbGVhc2UgcmVmZXIgdG8gaHR0cHM6Ly9naXRodWIuY29tL3RpYW5vY29yZS9lZGsyL2Jsb2Iv
-bWFzdGVyL01kZU1vZHVsZVBrZy9Vbml2ZXJzYWwvU2VjdXJpdHlTdHViRHhlL0RlZmVyM3JkUGFy
-dHlJbWFnZUxvYWQuYw0KDQpJZiBhIG5vbi1GViBpbWFnZSBpcyBsb2FkZWQgYmVmb3JlIEVuZE9m
-RHhlLCBpdCB3aWxsIGJlIHF1ZXVlZCBpbnRvIG1EZWZlcnJlZDNyZFBhcnR5SW1hZ2UuDQoNCldl
-IGFsc28gYWRkZWQgRWZpQm9vdE1hbmFnZXJEaXNwYXRjaERlZmVycmVkSW1hZ2VzKCkgQVBJIGlu
-IGh0dHBzOi8vZ2l0aHViLmNvbS90aWFub2NvcmUvZWRrMi9ibG9iL21hc3Rlci9NZGVNb2R1bGVQ
-a2cvSW5jbHVkZS9MaWJyYXJ5L1VlZmlCb290TWFuYWdlckxpYi5oIGFuZCBpbXBsZW1lbnRlZCBp
-biBodHRwczovL2dpdGh1Yi5jb20vdGlhbm9jb3JlL2VkazIvYmxvYi9tYXN0ZXIvTWRlTW9kdWxl
-UGtnL0xpYnJhcnkvVWVmaUJvb3RNYW5hZ2VyTGliL0JtTWlzYy5jDQpBIHBsYXRmb3JtIG11c3Qg
-Y2FsbCBFZmlCb290TWFuYWdlckRpc3BhdGNoRGVmZXJyZWRJbWFnZXMoKSwgaWYgdGhlIHBsYXRm
-b3JtIHN1cHBvcnRzIFBDSSBPUk9NLg0KDQpZb3UgY2FuIGZpbmQgdGhlIHNhbXBsZSBjb2RlIGlu
-IGh0dHBzOi8vZ2l0aHViLmNvbS90aWFub2NvcmUvZWRrMi1wbGF0Zm9ybXMvYmxvYi9kZXZlbC1N
-aW5QbGF0Zm9ybS9QbGF0Zm9ybS9JbnRlbC9NaW5QbGF0Zm9ybVBrZy9CZHMvTGlicmFyeS9EeGVQ
-bGF0Zm9ybUJvb3RNYW5hZ2VyTGliL0Jkc1BsYXRmb3JtLmMNCg0KDQoNCj4gSG93ZXZlciwgc3Vj
-aCBhcmUgbG9hZGVkIG9ubHkgaW4gdGhlIEJEUyBwaGFzZSwgYW5kIEJEUyBpcyBvbmx5IGVudGVy
-ZWQNCj4gYWZ0ZXIgYWxsIG9mIHRoZSBEWEUgZHJpdmVycyBhcmUgZGlzcGF0Y2hlZCBmcm9tIHRo
-ZSBmaXJtd2FyZSB2b2x1bWVzLg0KPiBJbiBvdGhlciB3b3JkcywgdGhlIG9yZGVyaW5nIGJldHdl
-ZW4gVGNnMkR4ZSBhbmQgZXh0ZXJuYWwgVUVGSV9EUklWRVIgLw0KPiBVRUZJX0FQUExJQ0FUSU9O
-IG1vZHVsZXMgaXMgZW5zdXJlZCB0aGF0IFRjZzJEeGUgd2lsbCBiZSBkaXNwYXRjaGVkIGluDQo+
-IHRoZSBEWEUgcGhhc2UsIHdoaWxlIHRoZSBsYXR0ZXIgd2lsbCBvbmx5IGJlIGxvYWRlZCBpbiBC
-RFMuDQo+IA0KPiBJcyB0aGlzIGludGVudGlvbmFsPyBJcyBteSB1bmRlcnN0YW5kaW5nIGNvcnJl
-Y3Q/DQoNCltKaWV3ZW5dIFJpZ2h0LiBUaGUgb25seSBhc3N1bXB0aW9uIGlzOiBUY2cyRHhlIGlz
-IGluY2x1ZGVkIGluIHRoZSBmaXJtd2FyZSB2b2x1bWUgYW5kIGl0IGlzIGRpc3BhdGNoZWQgYmVm
-b3JlIEVuZE9mRHhlLg0KDQoNCg0KPiANCj4gKDMpIElmIHRoYXQncyB0aGUgY2FzZSwgdGhlbiBN
-YXJjLUFuZHLDqSwgcGxlYXNlIGFkZCB0aGUgZm9sbG93aW5nIHRvIHRoZQ0KPiBjb21taXQgbWVz
-c2FnZToNCj4gDQo+IC0tLS0tLS0tDQo+IEhvb2tpbmcgRHhlVHBtMk1lYXN1cmVCb290TGliIGlu
-dG8gU2VjdXJpdHlTdHViRHhlIGVuc3VyZXMgdGhhdCB0aGUNCj4gU2VjdXJpdHkgYW5kIFNlY3Vy
-aXR5MiBBcmNoIHByb3RvY29scyB3aWxsIGVudGFpbCwgYnkgdGhlIHRpbWUgb2YNCj4gZW50ZXJp
-bmcgdGhlIEJEUyBwaGFzZSwgdGhlIG1lYXN1cmluZyBvZiBVRUZJIGJpbmFyaWVzIGludG8gdGhl
-IFRQTS4NCj4gVGh1cywgZXh0ZXJuYWwgVUVGSV9EUklWRVIgYW5kIFVFRklfQVBQTElDQVRJT04g
-bW9kdWxlcyAod2hpY2ggYXJlDQo+IGxvYWRlZCBpbiB0aGUgQkRTIHBoYXNlLCBmcm9tIGRpc2ss
-IG5ldHdvcmssIFBDSSBvcHJvbSwgZXRjKSB3aWxsIGJlDQo+IG1lYXN1cmVkLg0KPiANCj4gRHJp
-dmVycyBkaXNwYXRjaGVkIGluIHRoZSBEWEUgcGhhc2UgYmVmb3JlIFRjZzJEeGUgd2lsbCBub3Qg
-YmUgbWVhc3VyZWQNCj4gaW5kaXZpZHVhbGx5OyBob3dldmVyIHN1Y2ggZHJpdmVycyBjb21lIGZy
-b20gdGhlIGZpcm13YXJlIHZvbHVtZShzKSwgYW5kDQo+IHRob3NlIGFyZSBtZWFzdXJlZCBpbiB0
-aGUgUEVJIHBoYXNlIGJ5IFRjZzJQZWkuDQo+IC0tLS0tLS0tDQo+IA0KPiBUaGFua3MhDQo+IExh
-c3psbw0K
+
+--u+FGODhbLwgAeSOU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Mar 08, 2018 at 12:50:36PM +0100, David Engraf wrote:
+> This patch moves the gap between u-boot and kernel at the correct locatio=
+n.
+>=20
+> Signed-off-by: David Engraf <david.engraf@sysgo.com>
+
+Applied, thanks.
+
+> ---
+>  hw/ppc/e500.c | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+> index 43c15d18c4..bdef2bddc6 100644
+> --- a/hw/ppc/e500.c
+> +++ b/hw/ppc/e500.c
+> @@ -1009,6 +1009,10 @@ void ppce500_init(MachineState *machine, PPCE500Pa=
+rams *params)
+>      }
+> =20
+>      cur_base =3D loadaddr + payload_size;
+> +    if (cur_base < (32 * 1024 * 1024)) {
+> +        /* u-boot occupies memory up to 32MB, so load blobs above */
+> +        cur_base =3D (32 * 1024 * 1024);
+> +    }
+> =20
+>      /* Load bare kernel only if no bios/u-boot has been provided */
+>      if (machine->kernel_filename && !kernel_as_payload) {
+> @@ -1025,11 +1029,6 @@ void ppce500_init(MachineState *machine, PPCE500Pa=
+rams *params)
+>          cur_base +=3D kernel_size;
+>      }
+> =20
+> -    if (cur_base < (32 * 1024 * 1024)) {
+> -        /* u-boot occupies memory up to 32MB, so load blobs above */
+> -        cur_base =3D (32 * 1024 * 1024);
+> -    }
+> -
+>      /* Load initrd. */
+>      if (machine->initrd_filename) {
+>          initrd_base =3D (cur_base + INITRD_LOAD_PAD) & ~INITRD_PAD_MASK;
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--u+FGODhbLwgAeSOU
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqh2CMACgkQbDjKyiDZ
+s5K6lxAA3Bm6dnCDmKhPMW8H6q4IIEky1rIGpSf/P0wnJOov8gWG0cmJgga/0pvi
+aGamXb2uKUrTSCTbG5zH6Q3MpGmFbHRo1Ze1sVupsk/RPk+3TJRUX6j+BvDDPB2B
+XLf3mYhHay/Wjzy2V0bh0E3oxXhT4HrnwFP3URX6NrxE0oooTEQsB8mVtfhBD5mY
+9DiZkMgYDKdSdn+FicjN4VTpZpCVESkU+Q9kn3TJG3+u1sXKdITQT2KKG7Xy3GqT
+FawxO5VjZBEQ8fqwlOImb3OZwWKnP2HB2PNqnVBu3ShZFc1GsS/LxiZdIJIsxmFp
+I8+GryF04N5Jh3wHjrBwCtw6GNDR39/390ldiXMfTNEneXbTofcWF6j6Cd/JASXu
+1cdzmakoVEb9i2nID5X17K3BGSQO2t6jILn3f8B+WepHg9tbWO2AooJG6hWiOlwT
+OPgiWLTX3UH8CiseWLm8F/YRsVdLNxw/p723yZb+eHIZ5pokq4p2FbL/jd1shdsG
+u00wNcdklqUO7CNT3HhcS83A0EJYnqvIXqdBV4xEa86X1UhZbhTTs9GH5KKhMaWN
+5pRaRzNNi0Rb+ENfDrIUBJ0sGnIGskLAtNH0Zz9jbw/OO4q8W8GdU9HqetW01KEX
+9wkEOgl/js4x4FxNpCqqNAbe9cmMVsV0345cfQ6Ib2n591O/3MI=
+=OUbN
+-----END PGP SIGNATURE-----
+
+--u+FGODhbLwgAeSOU--
