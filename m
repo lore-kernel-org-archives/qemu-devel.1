@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eu8ad-00024h-7c
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 22:21:04 -0500
+	(envelope-from <mjc@sifive.com>) id 1eu977-0000Lw-9V
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 22:54:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eu8aY-0007pR-87
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 22:21:03 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50472)
+	(envelope-from <mjc@sifive.com>) id 1eu975-0007b0-QF
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 22:54:37 -0500
+Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:46699)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eu8aX-0007p8-V6
-	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 22:20:58 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eu8aU-0003Kb-S2
-	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 03:20:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B46522E80CE
-	for <qemu-devel@nongnu.org>; Fri,  9 Mar 2018 03:20:53 +0000 (UTC)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eu975-0007ak-I3
+	for qemu-devel@nongnu.org; Thu, 08 Mar 2018 22:54:35 -0500
+Received: by mail-ot0-x232.google.com with SMTP id g97so7534962otg.13
+	for <qemu-devel@nongnu.org>; Thu, 08 Mar 2018 19:54:35 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 09 Mar 2018 03:08:13 -0000
-From: =?utf-8?b?5p2O56mX5oGS?= <1754542@bugs.launchpad.net>
-Reply-To: Bug 1754542 <1754542@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152056405865.7543.8980677605113063936.malonedeb@wampee.canonical.com>
-Message-Id: <152056489391.7577.4078697343303510659.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1754542] Re: colo: secondary vm crash when
- execute x-colo-lost-heartbeat
+In-Reply-To: <1520369037-37977-12-git-send-email-mjc@sifive.com>
+References: <1520369037-37977-1-git-send-email-mjc@sifive.com>
+	<1520369037-37977-12-git-send-email-mjc@sifive.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Fri, 9 Mar 2018 16:54:33 +1300
+Message-ID: <CAHNT7NuwqMY9WVsBoWCcDbEZ3gNwo-nwuDZPXD+FwZ+5oBv6Qg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 11/22] RISC-V: Improve page table walker
+ spec compliance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,205 +29,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
 
-** Description changed:
+On Wed, Mar 7, 2018 at 9:43 AM, Michael Clark <mjc@sifive.com> wrote:
 
-  I use Arch Linux x86_64
-  both qemu 2.11.1 and Zhang Chen's(https://github.com/zhangckid/qemu/commi=
-ts/colo-with-virtio-net-internal-jul10)
-  Following document 'COLO-FT.txt',
-  I test colo feature on my hosts
-  =
+> - Inline PTE_TABLE check for better readability
+> - Improve readibility of User page U mode and SUM test
+> - Disallow non U mode from fetching from User pages
+> - Add reserved PTE flag check: W or W|X
+> - Add misaligned PPN check
+> - Change access checks from ternary operator to if statements
+> - Improves page walker comments
+> - No measurable performance impact on dd test
+>
+> Signed-off-by: Michael Clark <mjc@sifive.com>
+> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+> ---
+>  target/riscv/cpu_bits.h |  2 --
+>  target/riscv/helper.c   | 57 ++++++++++++++++++++++++++++++
+> ++++---------------
+>  2 files changed, 40 insertions(+), 19 deletions(-)
+>
+> diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+> index 64aa097..12b4757 100644
+> --- a/target/riscv/cpu_bits.h
+> +++ b/target/riscv/cpu_bits.h
+> @@ -407,5 +407,3 @@
+>  #define PTE_SOFT  0x300 /* Reserved for Software */
+>
+>  #define PTE_PPN_SHIFT 10
+> -
+> -#define PTE_TABLE(PTE) (((PTE) & (PTE_V | PTE_R | PTE_W | PTE_X)) ==
+> PTE_V)
+> diff --git a/target/riscv/helper.c b/target/riscv/helper.c
+> index 228933c..2165ecb 100644
+> --- a/target/riscv/helper.c
+> +++ b/target/riscv/helper.c
+> @@ -185,16 +185,36 @@ restart:
+>  #endif
+>          target_ulong ppn = pte >> PTE_PPN_SHIFT;
+>
+> -        if (PTE_TABLE(pte)) { /* next level of page table */
+> +        if (!(pte & PTE_V)) {
+> +            /* Invalid PTE */
+> +            return TRANSLATE_FAIL;
+> +        } else if (!(pte & (PTE_R | PTE_W | PTE_X))) {
+> +            /* Inner PTE, continue walking */
+>              base = ppn << PGSHIFT;
+> -        } else if ((pte & PTE_U) ? (mode == PRV_S) && !sum : !(mode ==
+> PRV_S)) {
+> -            break;
+> -        } else if (!(pte & PTE_V) || (!(pte & PTE_R) && (pte & PTE_W))) {
+> -            break;
+> -        } else if (access_type == MMU_INST_FETCH ? !(pte & PTE_X) :
+> -                  access_type == MMU_DATA_LOAD ?  !(pte & PTE_R) &&
+> -                  !(mxr && (pte & PTE_X)) : !((pte & PTE_R) && (pte &
+> PTE_W))) {
+> -            break;
+> +        } else if ((pte & (PTE_R | PTE_W | PTE_X)) == PTE_W) {
+> +            /* Reserved leaf PTE flags: PTE_W */
+> +            return TRANSLATE_FAIL;
+> +        } else if ((pte & (PTE_R | PTE_W | PTE_X)) == (PTE_W | PTE_X)) {
+> +            /* Reserved leaf PTE flags: PTE_W + PTE_X */
+> +            return TRANSLATE_FAIL;
+> +        } else if ((pte & PTE_U) && ((mode != PRV_U) &&
+> +                   (!sum || access_type == MMU_INST_FETCH))) {
+> +            /* User PTE flags when not U mode and mstats.SUM is not set,
+> +               or the access type is an instruction fetch */
+> +            return TRANSLATE_FAIL;
+> +        } else if (ppn & ((1ULL << ptshift) - 1)) {
+> +            /* Misasligned PPN */
+> +            return TRANSLATE_FAIL;
+> +        } else if (access_type == MMU_DATA_LOAD && !((pte & PTE_R) ||
+> +                   ((pte & PTE_X) && mxr))) {
+>
 
-  I run this command
-  Primary:
-  sudo qemu-system-x86_64 -boot c   -enable-kvm -m 2048 -smp 2  -qmp stdio =
- -name primary \
-  -device piix3-usb-uhci \
-  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
-  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
-  -drive if=3Dvirtio,id=3Dcolo-disk0,driver=3Dquorum,read-pattern=3Dfifo,vo=
-te-threshold=3D1,children.0.file.filename=3D/var/lib/libvirt/images/1.raw,c=
-hildren.0.driver=3Draw -S
-  =
+This should only honor the mstatus.MXR flags if mode != PRV_U
 
-  Secondary:
-  sudo qemu-system-x86_64 -boot c -enable-kvm -m 2048 -smp 2 -qmp stdio  -n=
-ame secondary \
-  -device piix3-usb-uhci \
-  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
-  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
-  -drive if=3Dnone,id=3Dcolo-disk0,file.filename=3D/var/lib/libvirt/images/=
-2.raw,driver=3Draw,node-name=3Dnode0 \
-  -drive if=3Dvirtio,id=3Dactive-disk0,driver=3Dreplication,mode=3Dsecondar=
-y,\
-  file.driver=3Dqcow2,top-id=3Dactive-disk0,\
-  file.file.filename=3D/mnt/ramfs/active_disk.img,\
-  file.backing.driver=3Dqcow2,\
-  file.backing.file.filename=3D/mnt/ramfs/hidden_disk.img,\
-  file.backing.backing=3Dcolo-disk0 \
-  -incoming tcp:0:8888
-  =
++            /* Read access check failed */
+> +            return TRANSLATE_FAIL;
+> +        } else if (access_type == MMU_DATA_STORE && !(pte & PTE_W)) {
+> +            /* Write access check failed */
+> +            return TRANSLATE_FAIL;
+> +        } else if (access_type == MMU_INST_FETCH && !(pte & PTE_X)) {
+> +            /* Fetch access check failed */
+> +            return TRANSLATE_FAIL;
+>          } else {
+>              /* if necessary, set accessed and dirty bits. */
+>              target_ulong updated_pte = pte | PTE_A |
+> @@ -202,11 +222,14 @@ restart:
+>
+>              /* Page table updates need to be atomic with MTTCG enabled */
+>              if (updated_pte != pte) {
+> -                /* if accessed or dirty bits need updating, and the PTE is
+> -                 * in RAM, then we do so atomically with a compare and
+> swap.
+> -                 * if the PTE is in IO space, then it can't be updated.
+> -                 * if the PTE changed, then we must re-walk the page table
+> -                   as the PTE is no longer valid */
+> +                /*
+> +                 * - if accessed or dirty bits need updating, and the PTE
+> is
+> +                 *   in RAM, then we do so atomically with a compare and
+> swap.
+> +                 * - if the PTE is in IO space or ROM, then it can't be
+> updated
+> +                 *   and we return TRANSLATE_FAIL.
+> +                 * - if the PTE changed by the time we went to update it,
+> then
+> +                 *   it is no longer valid and we must re-walk the page
+> table.
+> +                 */
+>                  MemoryRegion *mr;
+>                  hwaddr l = sizeof(target_ulong), addr1;
+>                  rcu_read_lock();
+> @@ -243,15 +266,15 @@ restart:
+>              target_ulong vpn = addr >> PGSHIFT;
+>              *physical = (ppn | (vpn & ((1L << ptshift) - 1))) << PGSHIFT;
+>
+> +            /* set permissions on the TLB entry */
+>              if ((pte & PTE_R)) {
+>                  *prot |= PAGE_READ;
+>              }
+>
 
-  Secondary:
-  {'execute':'qmp_capabilities'}
-  { 'execute': 'nbd-server-start',
-  =C2=A0=C2=A0'arguments': {'addr': {'type': 'inet', 'data': {'host': '192.=
-168.0.33', 'port': '8889'} } }
-  }
-  {'execute': 'nbd-server-add', 'arguments': {'device': 'colo-disk0', 'writ=
-able': true } }
-  =
+There is a logic bug here, but it is pre-existing. If mxr and mode is not
+U, the X flag needs to make the page readable i.e. (MXR) Make eXecute
+Readable.
 
-  Primary:
-  {'execute':'qmp_capabilities'}
-  { 'execute': 'human-monitor-command',
-- =C2=A0=C2=A0'arguments': {'command-line': 'drive_add -n buddy driver=3Dre=
-plication,mode=3Dprimary,file.driver=3Dnbd,file.host=3D192.168.0.33,file.po=
-rt=3D8889,file.export=3Dcolo-disk0,node-name=3Dnbd_client0'}}
-+ =C2=A0=C2=A0'arguments': {'command-line': 'drive_add -n buddy driver=3Dre=
-plication,mode=3Dprimary,file.driver=3Dnbd,file.host=3D192.168.0.34,file.po=
-rt=3D8889,file.export=3Dcolo-disk0,node-name=3Dnbd_client0'}}
-  { 'execute':'x-blockdev-change', 'arguments':{'parent': 'colo-disk0', 'no=
-de': 'nbd_client0' } }
-  { 'execute': 'migrate-set-capabilities',
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0'arguments': {'capabilities': [ {'cap=
-ability': 'x-colo', 'state': true } ] } }
-- { 'execute': 'migrate', 'arguments': {'uri': 'tcp:192.168.0.33:8888' } }
-+ { 'execute': 'migrate', 'arguments': {'uri': 'tcp:192.168.0.34:8888' } }
-  { 'execute': 'migrate-set-parameters' , 'arguments':{ 'x-checkpoint-delay=
-': 2000 } }
-  =
 
-  Above are all OK.Two VM syncing.
-  =
-
-  Primary:
-  { 'execute': 'x-blockdev-change', 'arguments': {'parent': 'colo-disk0', '=
-child': 'children.1'}}
-  { 'execute': 'human-monitor-command','arguments': {'command-line': 'drive=
-_del blk-buddy0'}}
-  =
-
-  Secondary:
-  { 'execute': 'nbd-server-stop' }
-  { 'execute': 'x-colo-lost-heartbeat' }
-  =
-
-  But When I execute x-colo-lost-heartbeat.Primary run Secondary cash
-  =
-
-  =C2=A0{ 'execute': 'nbd-server-stop' }
-  {"return": {}}
-  qemu-system-x86_64: Disconnect client, due to: Unexpected end-of-file bef=
-ore all bytes were read
-  =C2=A0{ 'execute': 'x-colo-lost-heartbeat' }
-  {"return": {}}
-  qemu-system-x86_64: Can't receive COLO message: Input/output error
-  **
-  ERROR:/build/qemu/src/qemu-2.11.1/qom/object.c:907:object_unref: assertio=
-n failed (obj->ref > 0): (0 > 0)
-  [1]    2972 abort      sudo /usr/bin/qemu-system-x86_64 -boot c -enable-k=
-vm -m 2048 -smp 2 -qmp stdi
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1754542
-
-Title:
-  colo: secondary vm crash when execute x-colo-lost-heartbeat
-
-Status in QEMU:
-  New
-
-Bug description:
-  I use Arch Linux x86_64
-  both qemu 2.11.1 and Zhang Chen's(https://github.com/zhangckid/qemu/commi=
-ts/colo-with-virtio-net-internal-jul10)
-  Following document 'COLO-FT.txt',
-  I test colo feature on my hosts
-
-  I run this command
-  Primary:
-  sudo qemu-system-x86_64 -boot c   -enable-kvm -m 2048 -smp 2  -qmp stdio =
- -name primary \
-  -device piix3-usb-uhci \
-  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
-  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
-  -drive if=3Dvirtio,id=3Dcolo-disk0,driver=3Dquorum,read-pattern=3Dfifo,vo=
-te-threshold=3D1,children.0.file.filename=3D/var/lib/libvirt/images/1.raw,c=
-hildren.0.driver=3Draw -S
-
-  Secondary:
-  sudo qemu-system-x86_64 -boot c -enable-kvm -m 2048 -smp 2 -qmp stdio  -n=
-ame secondary \
-  -device piix3-usb-uhci \
-  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
-  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
-  -drive if=3Dnone,id=3Dcolo-disk0,file.filename=3D/var/lib/libvirt/images/=
-2.raw,driver=3Draw,node-name=3Dnode0 \
-  -drive if=3Dvirtio,id=3Dactive-disk0,driver=3Dreplication,mode=3Dsecondar=
-y,\
-  file.driver=3Dqcow2,top-id=3Dactive-disk0,\
-  file.file.filename=3D/mnt/ramfs/active_disk.img,\
-  file.backing.driver=3Dqcow2,\
-  file.backing.file.filename=3D/mnt/ramfs/hidden_disk.img,\
-  file.backing.backing=3Dcolo-disk0 \
-  -incoming tcp:0:8888
-
-  Secondary:
-  {'execute':'qmp_capabilities'}
-  { 'execute': 'nbd-server-start',
-  =C2=A0=C2=A0'arguments': {'addr': {'type': 'inet', 'data': {'host': '192.=
-168.0.33', 'port': '8889'} } }
-  }
-  {'execute': 'nbd-server-add', 'arguments': {'device': 'colo-disk0', 'writ=
-able': true } }
-
-  Primary:
-  {'execute':'qmp_capabilities'}
-  { 'execute': 'human-monitor-command',
-  =C2=A0=C2=A0'arguments': {'command-line': 'drive_add -n buddy driver=3Dre=
-plication,mode=3Dprimary,file.driver=3Dnbd,file.host=3D192.168.0.34,file.po=
-rt=3D8889,file.export=3Dcolo-disk0,node-name=3Dnbd_client0'}}
-  { 'execute':'x-blockdev-change', 'arguments':{'parent': 'colo-disk0', 'no=
-de': 'nbd_client0' } }
-  { 'execute': 'migrate-set-capabilities',
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0'arguments': {'capabilities': [ {'cap=
-ability': 'x-colo', 'state': true } ] } }
-  { 'execute': 'migrate', 'arguments': {'uri': 'tcp:192.168.0.34:8888' } }
-  { 'execute': 'migrate-set-parameters' , 'arguments':{ 'x-checkpoint-delay=
-': 2000 } }
-
-  Above are all OK.Two VM syncing.
-
-  Primary:
-  { 'execute': 'x-blockdev-change', 'arguments': {'parent': 'colo-disk0', '=
-child': 'children.1'}}
-  { 'execute': 'human-monitor-command','arguments': {'command-line': 'drive=
-_del blk-buddy0'}}
-
-  Secondary:
-  { 'execute': 'nbd-server-stop' }
-  { 'execute': 'x-colo-lost-heartbeat' }
-
-  But When I execute x-colo-lost-heartbeat.Primary run Secondary cash
-
-  =C2=A0{ 'execute': 'nbd-server-stop' }
-  {"return": {}}
-  qemu-system-x86_64: Disconnect client, due to: Unexpected end-of-file bef=
-ore all bytes were read
-  =C2=A0{ 'execute': 'x-colo-lost-heartbeat' }
-  {"return": {}}
-  qemu-system-x86_64: Can't receive COLO message: Input/output error
-  **
-  ERROR:/build/qemu/src/qemu-2.11.1/qom/object.c:907:object_unref: assertio=
-n failed (obj->ref > 0): (0 > 0)
-  [1]    2972 abort      sudo /usr/bin/qemu-system-x86_64 -boot c -enable-k=
-vm -m 2048 -smp 2 -qmp stdi
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1754542/+subscriptions
+>              if ((pte & PTE_X)) {
+>                  *prot |= PAGE_EXEC;
+>              }
+> -           /* only add write permission on stores or if the page
+> -              is already dirty, so that we don't miss further
+> -              page table walks to update the dirty bit */
+> +            /* add write permission on stores or if the page is already
+> dirty,
+> +               so that we TLB miss on later writes to update the dirty
+> bit */
+>              if ((pte & PTE_W) &&
+>                      (access_type == MMU_DATA_STORE || (pte & PTE_D))) {
+>                  *prot |= PAGE_WRITE;
+> --
+> 2.7.0
+>
+>
