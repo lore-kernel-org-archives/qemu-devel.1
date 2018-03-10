@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37667)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eul8f-00037h-16
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 15:30:47 -0500
+	id 1eul9Z-0003mD-7D
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 15:31:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eul8b-0005TR-UK
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 15:30:45 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:38508)
+	id 1eul9W-0005vi-3m
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 15:31:41 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:40239)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eul8b-0005T2-MR
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 15:30:41 -0500
-Received: by mail-wm0-x241.google.com with SMTP id z9so9458275wmb.3
-	for <qemu-devel@nongnu.org>; Sat, 10 Mar 2018 12:30:41 -0800 (PST)
+	id 1eul9V-0005vU-Sr
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 15:31:38 -0500
+Received: by mail-wm0-x241.google.com with SMTP id t6so9494891wmt.5
+	for <qemu-devel@nongnu.org>; Sat, 10 Mar 2018 12:31:37 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1520568765-58189-1-git-send-email-mjc@sifive.com>
-	<1520568765-58189-14-git-send-email-mjc@sifive.com>
+	<1520568765-58189-15-git-send-email-mjc@sifive.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4f890300-ee99-e2ed-3fff-26ed8348cf3e@amsat.org>
-Date: Sat, 10 Mar 2018 21:30:38 +0100
+Message-ID: <f5c22b39-0f5a-80be-08b2-2f647615b222@amsat.org>
+Date: Sat, 10 Mar 2018 21:31:34 +0100
 MIME-Version: 1.0
-In-Reply-To: <1520568765-58189-14-git-send-email-mjc@sifive.com>
+In-Reply-To: <1520568765-58189-15-git-send-email-mjc@sifive.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 13/23] RISC-V: Make some header guards
- more specific
+Subject: Re: [Qemu-devel] [PATCH v2 14/23] RISC-V: Make virt header comment
+ title consistent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,38 +48,18 @@ On 03/09/2018 05:12 AM, Michael Clark wrote:
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  include/hw/riscv/spike.h | 4 ++--
->  include/hw/riscv/virt.h  | 4 ++--
->  2 files changed, 4 insertions(+), 4 deletions(-)
+>  include/hw/riscv/virt.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
-> index 8410430..641b70d 100644
-> --- a/include/hw/riscv/spike.h
-> +++ b/include/hw/riscv/spike.h
-> @@ -16,8 +16,8 @@
->   * this program.  If not, see <http://www.gnu.org/licenses/>.
->   */
->  
-> -#ifndef HW_SPIKE_H
-> -#define HW_SPIKE_H
-> +#ifndef HW_RISCV_SPIKE_H
-> +#define HW_RISCV_SPIKE_H
->  
->  typedef struct {
->      /*< private >*/
 > diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
-> index b91a412..3a4f23e 100644
+> index 3a4f23e..91163d6 100644
 > --- a/include/hw/riscv/virt.h
 > +++ b/include/hw/riscv/virt.h
-> @@ -16,8 +16,8 @@
->   * this program.  If not, see <http://www.gnu.org/licenses/>.
->   */
->  
-> -#ifndef HW_VIRT_H
-> -#define HW_VIRT_H
-> +#ifndef HW_RISCV_VIRT_H
-> +#define HW_RISCV_VIRT_H
->  
->  typedef struct {
->      /*< private >*/
+> @@ -1,5 +1,5 @@
+>  /*
+> - * SiFive VirtIO Board
+> + * QEMU RISC-V VirtIO machine interface
+>   *
+>   * Copyright (c) 2017 SiFive, Inc.
+>   *
 > 
