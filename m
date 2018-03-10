@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1euZrL-0002Oy-36
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 03:28:09 -0500
+	(envelope-from <jsnow@redhat.com>) id 1euZrL-0002Pc-Lm
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 03:28:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1euZrI-0000Br-RL
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 03:28:06 -0500
+	(envelope-from <jsnow@redhat.com>) id 1euZrJ-0000CA-8H
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 03:28:07 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Sat, 10 Mar 2018 03:27:39 -0500
-Message-Id: <20180310082746.24198-15-jsnow@redhat.com>
+Date: Sat, 10 Mar 2018 03:27:28 -0500
+Message-Id: <20180310082746.24198-4-jsnow@redhat.com>
 In-Reply-To: <20180310082746.24198-1-jsnow@redhat.com>
 References: <20180310082746.24198-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 14/21] blockjobs: add block_job_txn_apply
- function
+Subject: [Qemu-devel] [PATCH v5 03/21] Blockjobs: documentation touchup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,66 +22,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-Simply apply a function transaction-wide.
-A few more uses of this in forthcoming patches.
+Trivial; Document what the job creation flags do,
+and some general tidying.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- blockjob.c | 25 ++++++++++++++++---------
- 1 file changed, 16 insertions(+), 9 deletions(-)
+ include/block/blockjob.h     | 8 ++++----
+ include/block/blockjob_int.h | 4 +++-
+ 2 files changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/blockjob.c b/blockjob.c
-index 0c64fadc6d..7e03824751 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -487,6 +487,19 @@ static void block_job_cancel_async(BlockJob *job)
-     job->cancelled = true;
- }
+diff --git a/include/block/blockjob.h b/include/block/blockjob.h
+index 29cde3ffe3..b77fac118d 100644
+--- a/include/block/blockjob.h
++++ b/include/block/blockjob.h
+@@ -127,12 +127,10 @@ typedef struct BlockJob {
+     /** Reference count of the block job */
+     int refcnt;
  
-+static void block_job_txn_apply(BlockJobTxn *txn, void fn(BlockJob *))
-+{
-+    AioContext *ctx;
-+    BlockJob *job, *next;
-+
-+    QLIST_FOREACH_SAFE(job, &txn->jobs, txn_list, next) {
-+        ctx = blk_get_aio_context(job->blk);
-+        aio_context_acquire(ctx);
-+        fn(job);
-+        aio_context_release(ctx);
-+    }
-+}
-+
- static int block_job_finish_sync(BlockJob *job,
-                                  void (*finish)(BlockJob *, Error **errp),
-                                  Error **errp)
-@@ -565,9 +578,8 @@ static void block_job_completed_txn_abort(BlockJob *job)
+-    /* True if this job has reported completion by calling block_job_completed.
+-     */
++    /** True when job has reported completion by calling block_job_completed. */
+     bool completed;
  
- static void block_job_completed_txn_success(BlockJob *job)
- {
--    AioContext *ctx;
-     BlockJobTxn *txn = job->txn;
--    BlockJob *other_job, *next;
-+    BlockJob *other_job;
-     /*
-      * Successful completion, see if there are other running jobs in this
-      * txn.
-@@ -576,15 +588,10 @@ static void block_job_completed_txn_success(BlockJob *job)
-         if (!other_job->completed) {
-             return;
-         }
--    }
--    /* We are the last completed job, commit the transaction. */
--    QLIST_FOREACH_SAFE(other_job, &txn->jobs, txn_list, next) {
--        ctx = blk_get_aio_context(other_job->blk);
--        aio_context_acquire(ctx);
-         assert(other_job->ret == 0);
--        block_job_completed_single(other_job);
--        aio_context_release(ctx);
-     }
-+    /* We are the last completed job, commit the transaction. */
-+    block_job_txn_apply(txn, block_job_completed_single);
- }
+-    /* ret code passed to block_job_completed.
+-     */
++    /** ret code passed to block_job_completed. */
+     int ret;
  
- /* Assumes the block_job_mutex is held */
+     /**
+@@ -146,7 +144,9 @@ typedef struct BlockJob {
+ } BlockJob;
+ 
+ typedef enum BlockJobCreateFlags {
++    /* Default behavior */
+     BLOCK_JOB_DEFAULT = 0x00,
++    /* BlockJob is not QMP-created and should not send QMP events */
+     BLOCK_JOB_INTERNAL = 0x01,
+ } BlockJobCreateFlags;
+ 
+diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
+index becaae74c2..259d49b32a 100644
+--- a/include/block/blockjob_int.h
++++ b/include/block/blockjob_int.h
+@@ -114,11 +114,13 @@ struct BlockJobDriver {
+  * block_job_create:
+  * @job_id: The id of the newly-created job, or %NULL to have one
+  * generated automatically.
+- * @job_type: The class object for the newly-created job.
++ * @driver: The class object for the newly-created job.
+  * @txn: The transaction this job belongs to, if any. %NULL otherwise.
+  * @bs: The block
+  * @perm, @shared_perm: Permissions to request for @bs
+  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
++ * @flags: Creation flags for the Block Job.
++ *         See @BlockJobCreateFlags
+  * @cb: Completion function for the job.
+  * @opaque: Opaque pointer value passed to @cb.
+  * @errp: Error object.
 -- 
 2.14.3
