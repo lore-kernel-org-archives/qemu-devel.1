@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1euZrN-0002RI-IK
+	(envelope-from <jsnow@redhat.com>) id 1euZrO-0002TF-HY
 	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 03:28:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1euZrK-0000D1-80
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 03:28:09 -0500
+	(envelope-from <jsnow@redhat.com>) id 1euZrK-0000DU-Sw
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 03:28:10 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Sat, 10 Mar 2018 03:27:35 -0500
-Message-Id: <20180310082746.24198-11-jsnow@redhat.com>
+Date: Sat, 10 Mar 2018 03:27:36 -0500
+Message-Id: <20180310082746.24198-12-jsnow@redhat.com>
 In-Reply-To: <20180310082746.24198-1-jsnow@redhat.com>
 References: <20180310082746.24198-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 10/21] blockjobs: add NULL state
+Subject: [Qemu-devel] [PATCH v5 11/21] blockjobs: add block_job_dismiss
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,184 +22,228 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-Add a new state that specifically demarcates when we begin to permanently
-demolish a job after it has performed all work. This makes the transition
-explicit in the STM table and highlights conditions under which a job may
-be demolished.
+For jobs that have reached their CONCLUDED state, prior to having their
+last reference put down (meaning jobs that have completed successfully,
+unsuccessfully, or have been canceled), allow the user to dismiss the
+job's lingering status report via block-job-dismiss.
 
-Alongside this state, add a new helper command "block_job_decommission",
-which transitions to the NULL state and puts down our implicit reference.
-This separates instances in the code for "block_job_unref" which merely
-undo a matching "block_job_ref" with instances intended to initiate the
-full destruction of the object.
+This gives management APIs the chance to conclusively determine if a job
+failed or succeeded, even if the event broadcast was missed.
 
-This decommission action also sets a number of fields to make sure that
-block internals or external users that are holding a reference to a job
-to see when it "finishes" are convinced that the job object is "done."
-This is necessary, for instance, to do a block_job_cancel_sync on a
-created object which will not make any progress.
+Note: block_job_do_dismiss and block_job_decommission happen to do
+exactly the same thing, but they're called from different semantic
+contexts, so both aliases are kept to improve readability.
 
-Now, all jobs must go through block_job_decommission prior to being
-freed, giving us start-to-finish state machine coverage for jobs.
+Note 2: Don't worry about the 0x04 flag definition for AUTO_DISMISS, she
+has a friend coming in a future patch to fill the hole where 0x02 is.
 
-
-Transitions:
-Created   -> Null: Early failure event before the job is started
-Concluded -> Null: Standard transition.
 
 Verbs:
-None. This should not ever be visible to the monitor.
-
-             +---------+
-             |UNDEFINED|
-             +--+------+
-                |
-             +--v----+
-   +---------+CREATED+------------------+
-   |         +--+----+                  |
-   |            |                       |
-   |         +--v----+     +------+     |
-   +---------+RUNNING<----->PAUSED|     |
-   |         +--+-+--+     +------+     |
-   |            | |                     |
-   |            | +------------------+  |
-   |            |                    |  |
-   |         +--v--+       +-------+ |  |
-   +---------+READY<------->STANDBY| |  |
-   |         +--+--+       +-------+ |  |
-   |            |                    |  |
-+--v-----+   +--v------+             |  |
-|ABORTING+--->CONCLUDED<-------------+  |
-+--------+   +--+------+                |
-                |                       |
-             +--v-+                     |
-             |NULL<---------------------+
-             +----+
-
+Dismiss: operates on CONCLUDED jobs only.
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- blockjob.c           | 50 ++++++++++++++++++++++++++++++++------------------
- qapi/block-core.json |  5 ++++-
- 2 files changed, 36 insertions(+), 19 deletions(-)
+ block/trace-events       |  1 +
+ blockdev.c               | 14 ++++++++++++++
+ blockjob.c               | 26 ++++++++++++++++++++++++--
+ include/block/blockjob.h | 14 ++++++++++++++
+ qapi/block-core.json     | 24 +++++++++++++++++++++++-
+ 5 files changed, 76 insertions(+), 3 deletions(-)
 
+diff --git a/block/trace-events b/block/trace-events
+index 3fe89f7ea6..266afd9e99 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -50,6 +50,7 @@ qmp_block_job_cancel(void *job) "job %p"
+ qmp_block_job_pause(void *job) "job %p"
+ qmp_block_job_resume(void *job) "job %p"
+ qmp_block_job_complete(void *job) "job %p"
++qmp_block_job_dismiss(void *job) "job %p"
+ qmp_block_stream(void *bs, void *job) "bs %p job %p"
+ 
+ # block/file-win32.c
+diff --git a/blockdev.c b/blockdev.c
+index f70a783803..9900cbc7dd 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3853,6 +3853,20 @@ void qmp_block_job_complete(const char *device, Error **errp)
+     aio_context_release(aio_context);
+ }
+ 
++void qmp_block_job_dismiss(const char *id, Error **errp)
++{
++    AioContext *aio_context;
++    BlockJob *job = find_block_job(id, &aio_context, errp);
++
++    if (!job) {
++        return;
++    }
++
++    trace_qmp_block_job_dismiss(job);
++    block_job_dismiss(&job, errp);
++    aio_context_release(aio_context);
++}
++
+ void qmp_change_backing_file(const char *device,
+                              const char *image_node_name,
+                              const char *backing_file,
 diff --git a/blockjob.c b/blockjob.c
-index 3f730967b3..2ef48075b0 100644
+index 2ef48075b0..59ac4a13c7 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -44,24 +44,25 @@ static QemuMutex block_job_mutex;
- 
- /* BlockJob State Transition Table */
- bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
--                                          /* U, C, R, P, Y, S, X, E */
--    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0, 0, 0},
--    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0, 1, 0},
--    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0, 1, 1},
--    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0, 0, 0},
--    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1, 1, 1},
--    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0, 0, 0},
--    /* X: */ [BLOCK_JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 0, 1},
--    /* E: */ [BLOCK_JOB_STATUS_CONCLUDED] = {0, 0, 0, 0, 0, 0, 0, 0},
-+                                          /* U, C, R, P, Y, S, X, E, N */
-+    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0, 0, 0, 0},
-+    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0, 1, 0, 1},
-+    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0, 1, 1, 0},
-+    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0, 0, 0, 0},
-+    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1, 1, 1, 0},
-+    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0, 0, 0, 0},
-+    /* X: */ [BLOCK_JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 0, 1, 0},
-+    /* E: */ [BLOCK_JOB_STATUS_CONCLUDED] = {0, 0, 0, 0, 0, 0, 0, 0, 1},
-+    /* N: */ [BLOCK_JOB_STATUS_NULL]      = {0, 0, 0, 0, 0, 0, 0, 0, 0},
- };
- 
- bool BlockJobVerbTable[BLOCK_JOB_VERB__MAX][BLOCK_JOB_STATUS__MAX] = {
--                                          /* U, C, R, P, Y, S, X, E */
--    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1, 0, 0},
--    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1, 0, 0},
--    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0, 0},
--    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0, 0},
--    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0, 0},
-+                                          /* U, C, R, P, Y, S, X, E, N */
-+    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1, 0, 0, 0},
-+    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1, 0, 0, 0},
-+    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0, 0, 0},
-+    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0, 0, 0},
-+    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0, 0, 0},
+@@ -63,6 +63,7 @@ bool BlockJobVerbTable[BLOCK_JOB_VERB__MAX][BLOCK_JOB_STATUS__MAX] = {
+     [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0, 0, 0},
+     [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0, 0, 0},
+     [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0, 0, 0},
++    [BLOCK_JOB_VERB_DISMISS]              = {0, 0, 0, 0, 0, 0, 0, 1, 0},
  };
  
  static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
-@@ -225,6 +226,7 @@ static void block_job_detach_aio_context(void *opaque);
- void block_job_unref(BlockJob *job)
- {
-     if (--job->refcnt == 0) {
-+        assert(job->status == BLOCK_JOB_STATUS_NULL);
-         BlockDriverState *bs = blk_bs(job->blk);
-         QLIST_REMOVE(job, job_list);
-         bs->job = NULL;
-@@ -378,6 +380,17 @@ void block_job_start(BlockJob *job)
-     bdrv_coroutine_enter(blk_bs(job->blk), job->co);
+@@ -391,9 +392,17 @@ static void block_job_decommission(BlockJob *job)
+     block_job_unref(job);
  }
  
-+static void block_job_decommission(BlockJob *job)
++static void block_job_do_dismiss(BlockJob *job)
 +{
-+    assert(job);
-+    job->completed = true;
-+    job->busy = false;
-+    job->paused = false;
-+    job->deferred_to_main_loop = true;
-+    block_job_state_transition(job, BLOCK_JOB_STATUS_NULL);
-+    block_job_unref(job);
++    block_job_decommission(job);
 +}
 +
  static void block_job_conclude(BlockJob *job)
  {
      block_job_state_transition(job, BLOCK_JOB_STATUS_CONCLUDED);
-@@ -424,7 +437,7 @@ static void block_job_completed_single(BlockJob *job)
++    if (job->auto_dismiss || !block_job_started(job)) {
++        block_job_do_dismiss(job);
++    }
+ }
+ 
+ static void block_job_completed_single(BlockJob *job)
+@@ -437,7 +446,6 @@ static void block_job_completed_single(BlockJob *job)
      QLIST_REMOVE(job, txn_list);
      block_job_txn_unref(job->txn);
      block_job_conclude(job);
--    block_job_unref(job);
-+    block_job_decommission(job);
+-    block_job_decommission(job);
  }
  
  static void block_job_cancel_async(BlockJob *job)
-@@ -817,7 +830,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
- 
-         block_job_set_speed(job, speed, &local_err);
-         if (local_err) {
--            block_job_unref(job);
-+            block_job_early_fail(job);
-             error_propagate(errp, local_err);
-             return NULL;
-         }
-@@ -851,7 +864,8 @@ void block_job_pause_all(void)
- 
- void block_job_early_fail(BlockJob *job)
- {
--    block_job_unref(job);
-+    assert(job->status == BLOCK_JOB_STATUS_CREATED);
-+    block_job_decommission(job);
+@@ -602,6 +610,19 @@ void block_job_complete(BlockJob *job, Error **errp)
+     job->driver->complete(job, errp);
  }
  
- void block_job_completed(BlockJob *job, int ret)
++void block_job_dismiss(BlockJob **jobptr, Error **errp)
++{
++    BlockJob *job = *jobptr;
++    /* similarly to _complete, this is QMP-interface only. */
++    assert(job->id);
++    if (block_job_apply_verb(job, BLOCK_JOB_VERB_DISMISS, errp)) {
++        return;
++    }
++
++    block_job_do_dismiss(job);
++    *jobptr = NULL;
++}
++
+ void block_job_user_pause(BlockJob *job, Error **errp)
+ {
+     if (block_job_apply_verb(job, BLOCK_JOB_VERB_PAUSE, errp)) {
+@@ -638,7 +659,7 @@ void block_job_user_resume(BlockJob *job, Error **errp)
+ void block_job_cancel(BlockJob *job)
+ {
+     if (job->status == BLOCK_JOB_STATUS_CONCLUDED) {
+-        return;
++        block_job_do_dismiss(job);
+     } else if (block_job_started(job)) {
+         block_job_cancel_async(job);
+         block_job_enter(job);
+@@ -807,6 +828,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+     job->paused        = true;
+     job->pause_count   = 1;
+     job->refcnt        = 1;
++    job->auto_dismiss  = !(flags & BLOCK_JOB_MANUAL_DISMISS);
+     block_job_state_transition(job, BLOCK_JOB_STATUS_CREATED);
+     aio_timer_init(qemu_get_aio_context(), &job->sleep_timer,
+                    QEMU_CLOCK_REALTIME, SCALE_NS,
+diff --git a/include/block/blockjob.h b/include/block/blockjob.h
+index df0a9773d1..c535829b46 100644
+--- a/include/block/blockjob.h
++++ b/include/block/blockjob.h
+@@ -142,6 +142,9 @@ typedef struct BlockJob {
+     /** Current state; See @BlockJobStatus for details. */
+     BlockJobStatus status;
+ 
++    /** True if this job should automatically dismiss itself */
++    bool auto_dismiss;
++
+     BlockJobTxn *txn;
+     QLIST_ENTRY(BlockJob) txn_list;
+ } BlockJob;
+@@ -151,6 +154,8 @@ typedef enum BlockJobCreateFlags {
+     BLOCK_JOB_DEFAULT = 0x00,
+     /* BlockJob is not QMP-created and should not send QMP events */
+     BLOCK_JOB_INTERNAL = 0x01,
++    /* BlockJob requires manual dismiss step */
++    BLOCK_JOB_MANUAL_DISMISS = 0x04,
+ } BlockJobCreateFlags;
+ 
+ /**
+@@ -234,6 +239,15 @@ void block_job_cancel(BlockJob *job);
+  */
+ void block_job_complete(BlockJob *job, Error **errp);
+ 
++/**
++ * block_job_dismiss:
++ * @job: The job to be dismissed.
++ * @errp: Error object.
++ *
++ * Remove a concluded job from the query list.
++ */
++void block_job_dismiss(BlockJob **job, Error **errp);
++
+ /**
+  * block_job_query:
+  * @job: The job to get information about.
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index e489660886..dc25d1d306 100644
+index dc25d1d306..e815d7d255 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -1003,11 +1003,14 @@
- # @concluded: The job has finished all work. If manual was set to true, the job
- #             will remain in the query list until it is dismissed.
+@@ -970,10 +970,12 @@
  #
-+# @null: The job is in the process of being dismantled. This state should not
-+#        ever be visible externally.
+ # @complete: see @block-job-complete
+ #
++# @dismiss: see @block-job-dismiss
 +#
  # Since: 2.12
  ##
- { 'enum': 'BlockJobStatus',
-   'data': ['undefined', 'created', 'running', 'paused', 'ready', 'standby',
--           'aborting', 'concluded' ] }
-+           'aborting', 'concluded', 'null' ] }
+ { 'enum': 'BlockJobVerb',
+-  'data': ['cancel', 'pause', 'resume', 'set-speed', 'complete' ] }
++  'data': ['cancel', 'pause', 'resume', 'set-speed', 'complete', 'dismiss' ] }
  
  ##
- # @BlockJobInfo:
+ # @BlockJobStatus:
+@@ -2243,6 +2245,26 @@
+ ##
+ { 'command': 'block-job-complete', 'data': { 'device': 'str' } }
+ 
++##
++# @block-job-dismiss:
++#
++# For jobs that have already concluded, remove them from the block-job-query
++# list. This command only needs to be run for jobs which were started with
++# QEMU 2.12+ job lifetime management semantics.
++#
++# This command will refuse to operate on any job that has not yet reached
++# its terminal state, BLOCK_JOB_STATUS_CONCLUDED. For jobs that make use of
++# BLOCK_JOB_READY event, block-job-cancel or block-job-complete will still need
++# to be used as appropriate.
++#
++# @id: The job identifier.
++#
++# Returns: Nothing on success
++#
++# Since: 2.12
++##
++{ 'command': 'block-job-dismiss', 'data': { 'id': 'str' } }
++
+ ##
+ # @BlockdevDiscardOptions:
+ #
 -- 
 2.14.3
