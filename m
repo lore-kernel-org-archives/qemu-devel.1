@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Bill.Paul@windriver.com>) id 1euRzZ-0007HA-Fp
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 19:04:06 -0500
+	(envelope-from <kernellwp@gmail.com>) id 1euTY6-0002OR-JF
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 20:43:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Bill.Paul@windriver.com>) id 1euRzV-0003Sv-FR
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 19:04:05 -0500
-Received: from mail1.windriver.com ([147.11.146.13]:49340)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Bill.Paul@windriver.com>)
-	id 1euRzV-0003H4-13
-	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 19:04:01 -0500
-From: Bill Paul <wpaul@windriver.com>
-Date: Fri, 9 Mar 2018 15:03:15 -0800
-References: <1520444223-8389-1-git-send-email-linux@roeck-us.net>
-	<201803091053.43494.wpaul@windriver.com>
-	<20180309213832.GA8594@roeck-us.net>
-In-Reply-To: <20180309213832.GA8594@roeck-us.net>
+	(envelope-from <kernellwp@gmail.com>) id 1euTY5-00028v-CN
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 20:43:50 -0500
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:42779)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1euTY5-00028V-6v
+	for qemu-devel@nongnu.org; Fri, 09 Mar 2018 20:43:49 -0500
+Received: by mail-oi0-x242.google.com with SMTP id c18so8361597oiy.9
+	for <qemu-devel@nongnu.org>; Fri, 09 Mar 2018 17:43:48 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Message-ID: <201803091503.16120.wpaul@windriver.com>
-Subject: Re: [Qemu-devel] [PATCH] fsl-imx6: Swap Ethernet interrupt defines
+In-Reply-To: <20180309141653.GA2871@localhost.localdomain>
+References: <1518185725-69559-1-git-send-email-wanpengli@tencent.com>
+	<20180309141653.GA2871@localhost.localdomain>
+From: Wanpeng Li <kernellwp@gmail.com>
+Date: Sat, 10 Mar 2018 09:43:47 +0800
+Message-ID: <CANRm+CyB6aziOToWQBxRJg5jVriQT3B7GfGpJT8rgmLDLUVCxA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] target-i386: add KVM_HINTS_DEDICATED
+ performance hint
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,78 +30,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Chris Healy <cphealy@gmail.com>, Jason Wang <jasowang@redhat.com>, Jean-Christophe Dubois <jcd@tribudubois.net>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Peter Zijlstra <peterz@infradead.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Of all the gin joints in all the towns in all the world, Guenter Roeck had to 
-walk into mine at 13:38 on Friday 09 March 2018 and say:
+2018-03-09 22:16 GMT+08:00 Eduardo Habkost <ehabkost@redhat.com>:
+> On Fri, Feb 09, 2018 at 06:15:25AM -0800, Wanpeng Li wrote:
+>> From: Wanpeng Li <wanpengli@tencent.com>
+>>
+>> Add KVM_HINTS_DEDICATED performance hint, guest checks this feature bit
+>> to determine if they run on dedicated vCPUs, allowing optimizations such
+>> as usage of qspinlocks.
+>>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
+>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+>> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+>> ---
+>> v1 -> v2:
+>>  * add a new feature word
+>>
+>>  target/i386/cpu.c | 14 ++++++++++++++
+>>  target/i386/cpu.h |  3 +++
+>>  target/i386/kvm.c |  4 ++++
+>>  3 files changed, 21 insertions(+)
+>>
+>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> index d70954b..e2974ad 100644
+>> --- a/target/i386/cpu.c
+>> +++ b/target/i386/cpu.c
+>> @@ -358,6 +358,20 @@ static FeatureWordInfo feature_word_info[FEATURE_WO=
+RDS] =3D {
+>>          .cpuid_eax =3D KVM_CPUID_FEATURES, .cpuid_reg =3D R_EAX,
+>>          .tcg_features =3D TCG_KVM_FEATURES,
+>>      },
+>> +    [FEAT_KVM_HINTS] =3D {
+>> +        .feat_names =3D {
+>> +            "hint-dedicated", NULL, NULL, NULL,
+>
+> I suggest naming it "kvm-hint-dedicated", to indicate it's
+> KVM-specific.
+>
+> If there are no objections, I can rename it while applying.
 
-[...]
-> > > > Do I have that right?
-> > > 
-> > > Pretty much.
-> > 
-> > There may be a 4th option.
-> > 
-> > Since older kernels work because they were looking at vector 151, you
-> > could patch the imx_fec.c module so that when it signals an event for
-> > vector 150, it also signals vector 151 too. This would keep newer
-> > versions of QEMU "bug- compatible" with older versions while also fixing
-> > support for newer Linux kernels and other guests (e.g. VxWorks) that
-> > follow the hardware spec correctly.
-> > 
-> > I think this would require only a small modification to this function:
-> > 
-> > static void imx_eth_update(IMXFECState *s)
-> > {
-> > 
-> >     if (s->regs[ENET_EIR] & s->regs[ENET_EIMR] & ENET_INT_TS_TIMER) {
-> >     
-> >         qemu_set_irq(s->irq[1], 1);
-> >     
-> >     } else {
-> >     
-> >         qemu_set_irq(s->irq[1], 0);
-> >     
-> >     }
-> >     
-> >     if (s->regs[ENET_EIR] & s->regs[ENET_EIMR] & ENET_INT_MAC) {
-> >     
-> >         qemu_set_irq(s->irq[0], 1);
-> >     
-> >     } else {
-> >     
-> >         qemu_set_irq(s->irq[0], 0);
-> >     
-> >     }
-> > 
-> > }
-> > 
-> > (For ENET_INT_MAC events, just signal both s->irq[0] and s->irq[1]).
-> 
-> Now this is an excellent idea.
-> 
-> > This of course means signaling spurious events on vector 151, but you're
-> > doing that now anyway. :)
-> 
-> Actually, it doesn't. It looks like the first interrupt is handled,
-> resetting the interrupt status, and the second interrupt is never even
-> executed. I tested this with all kernel releases back to v3.16.
+Looks good to me, thanks Eduardo.
 
-I just did a quick test with your patch and I can confirm that VxWorks 7 also 
-works correctly.
+Regards,
+Wanpeng Li
 
--Bill
-
-> I'll send out patch v2 with this change and let Peter decide which version
-> to apply.
-> 
-> Thanks,
-> Guenter
--- 
-=============================================================================
--Bill Paul            (510) 749-2329 | Senior Member of Technical Staff,
-                 wpaul@windriver.com | Master of Unix-Fu - Wind River Systems
-=============================================================================
-   "I put a dollar in a change machine. Nothing changed." - George Carlin
-=============================================================================
+>
+> With the rename:
+>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>
+>
+>> +            NULL, NULL, NULL, NULL,
+>> +            NULL, NULL, NULL, NULL,
+>> +            NULL, NULL, NULL, NULL,
+>> +            NULL, NULL, NULL, NULL,
+>> +            NULL, NULL, NULL, NULL,
+>> +            NULL, NULL, NULL, NULL,
+>> +            NULL, NULL, NULL, NULL,
+>> +        },
+>> +        .cpuid_eax =3D KVM_CPUID_FEATURES, .cpuid_reg =3D R_EDX,
+>> +        .tcg_features =3D TCG_KVM_FEATURES,
+>> +    },
+>>      [FEAT_HYPERV_EAX] =3D {
+>>          .feat_names =3D {
+>>              NULL /* hv_msr_vp_runtime_access */, NULL /* hv_msr_time_re=
+fcount_access */,
+>> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+>> index f91e37d..9f73692 100644
+>> --- a/target/i386/cpu.h
+>> +++ b/target/i386/cpu.h
+>> @@ -475,6 +475,7 @@ typedef enum FeatureWord {
+>>      FEAT_8000_0008_EBX, /* CPUID[8000_0008].EBX */
+>>      FEAT_C000_0001_EDX, /* CPUID[C000_0001].EDX */
+>>      FEAT_KVM,           /* CPUID[4000_0001].EAX (KVM_CPUID_FEATURES) */
+>> +    FEAT_KVM_HINTS,     /* CPUID[4000_0001].EDX */
+>>      FEAT_HYPERV_EAX,    /* CPUID[4000_0003].EAX */
+>>      FEAT_HYPERV_EBX,    /* CPUID[4000_0003].EBX */
+>>      FEAT_HYPERV_EDX,    /* CPUID[4000_0003].EDX */
+>> @@ -670,6 +671,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+>>  #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumu=
+lation Single Precision */
+>>  #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control *=
+/
+>>
+>> +#define KVM_HINTS_DEDICATED (1U << 0)
+>> +
+>>  #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Predi=
+ction Barrier */
+>>
+>>  #define CPUID_XSAVE_XSAVEOPT   (1U << 0)
+>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+>> index ad4b159..44ee524 100644
+>> --- a/target/i386/kvm.c
+>> +++ b/target/i386/kvm.c
+>> @@ -383,6 +383,9 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, u=
+int32_t function,
+>>          if (!kvm_irqchip_in_kernel()) {
+>>              ret &=3D ~(1U << KVM_FEATURE_PV_UNHALT);
+>>          }
+>> +    } else if (function =3D=3D KVM_CPUID_FEATURES && reg =3D=3D R_EDX) =
+{
+>> +        ret |=3D KVM_HINTS_DEDICATED;
+>> +        found =3D 1;
+>>      }
+>>
+>>      /* fallback for older kernels */
+>> @@ -801,6 +804,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>>          c =3D &cpuid_data.entries[cpuid_i++];
+>>          c->function =3D KVM_CPUID_FEATURES | kvm_base;
+>>          c->eax =3D env->features[FEAT_KVM];
+>> +        c->edx =3D env->features[FEAT_KVM_HINTS];
+>>      }
+>>
+>>      cpu_x86_cpuid(env, 0, 0, &limit, &unused, &unused, &unused);
+>> --
+>> 2.7.4
+>>
+>
+> --
+> Eduardo
