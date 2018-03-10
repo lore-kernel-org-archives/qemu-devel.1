@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1euZrL-0002Pc-Lm
+	(envelope-from <jsnow@redhat.com>) id 1euZrM-0002Q5-4N
 	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 03:28:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1euZrJ-0000CA-8H
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 03:28:07 -0500
+	(envelope-from <jsnow@redhat.com>) id 1euZrJ-0000CO-K2
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 03:28:08 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Sat, 10 Mar 2018 03:27:28 -0500
-Message-Id: <20180310082746.24198-4-jsnow@redhat.com>
+Date: Sat, 10 Mar 2018 03:27:31 -0500
+Message-Id: <20180310082746.24198-7-jsnow@redhat.com>
 In-Reply-To: <20180310082746.24198-1-jsnow@redhat.com>
 References: <20180310082746.24198-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 03/21] Blockjobs: documentation touchup
+Subject: [Qemu-devel] [PATCH v5 06/21] iotests: add pause_wait
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,62 +22,117 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-Trivial; Document what the job creation flags do,
-and some general tidying.
+Split out the pause command into the actual pause and the wait.
+Not every usage presently needs to resubmit a pause request.
+
+The intent with the next commit will be to explicitly disallow
+redundant or meaningless pause/resume requests, so the tests
+need to become more judicious to reflect that.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- include/block/blockjob.h     | 8 ++++----
- include/block/blockjob_int.h | 4 +++-
- 2 files changed, 7 insertions(+), 5 deletions(-)
+ tests/qemu-iotests/030        |  6 ++----
+ tests/qemu-iotests/055        | 17 ++++++-----------
+ tests/qemu-iotests/iotests.py | 12 ++++++++----
+ 3 files changed, 16 insertions(+), 19 deletions(-)
 
-diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index 29cde3ffe3..b77fac118d 100644
---- a/include/block/blockjob.h
-+++ b/include/block/blockjob.h
-@@ -127,12 +127,10 @@ typedef struct BlockJob {
-     /** Reference count of the block job */
-     int refcnt;
+diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+index 457984b8e9..251883226c 100755
+--- a/tests/qemu-iotests/030
++++ b/tests/qemu-iotests/030
+@@ -86,11 +86,9 @@ class TestSingleDrive(iotests.QMPTestCase):
+         result = self.vm.qmp('block-stream', device='drive0')
+         self.assert_qmp(result, 'return', {})
  
--    /* True if this job has reported completion by calling block_job_completed.
--     */
-+    /** True when job has reported completion by calling block_job_completed. */
-     bool completed;
+-        result = self.vm.qmp('block-job-pause', device='drive0')
+-        self.assert_qmp(result, 'return', {})
+-
++        self.pause_job('drive0', wait=False)
+         self.vm.resume_drive('drive0')
+-        self.pause_job('drive0')
++        self.pause_wait('drive0')
  
--    /* ret code passed to block_job_completed.
--     */
-+    /** ret code passed to block_job_completed. */
-     int ret;
+         result = self.vm.qmp('query-block-jobs')
+         offset = self.dictpath(result, 'return[0]/offset')
+diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
+index 8a5d9fd269..3437c11507 100755
+--- a/tests/qemu-iotests/055
++++ b/tests/qemu-iotests/055
+@@ -86,11 +86,9 @@ class TestSingleDrive(iotests.QMPTestCase):
+                              target=target, sync='full')
+         self.assert_qmp(result, 'return', {})
  
-     /**
-@@ -146,7 +144,9 @@ typedef struct BlockJob {
- } BlockJob;
+-        result = self.vm.qmp('block-job-pause', device='drive0')
+-        self.assert_qmp(result, 'return', {})
+-
++        self.pause_job('drive0', wait=False)
+         self.vm.resume_drive('drive0')
+-        self.pause_job('drive0')
++        self.pause_wait('drive0')
  
- typedef enum BlockJobCreateFlags {
-+    /* Default behavior */
-     BLOCK_JOB_DEFAULT = 0x00,
-+    /* BlockJob is not QMP-created and should not send QMP events */
-     BLOCK_JOB_INTERNAL = 0x01,
- } BlockJobCreateFlags;
+         result = self.vm.qmp('query-block-jobs')
+         offset = self.dictpath(result, 'return[0]/offset')
+@@ -303,13 +301,12 @@ class TestSingleTransaction(iotests.QMPTestCase):
+         ])
+         self.assert_qmp(result, 'return', {})
  
-diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index becaae74c2..259d49b32a 100644
---- a/include/block/blockjob_int.h
-+++ b/include/block/blockjob_int.h
-@@ -114,11 +114,13 @@ struct BlockJobDriver {
-  * block_job_create:
-  * @job_id: The id of the newly-created job, or %NULL to have one
-  * generated automatically.
-- * @job_type: The class object for the newly-created job.
-+ * @driver: The class object for the newly-created job.
-  * @txn: The transaction this job belongs to, if any. %NULL otherwise.
-  * @bs: The block
-  * @perm, @shared_perm: Permissions to request for @bs
-  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
-+ * @flags: Creation flags for the Block Job.
-+ *         See @BlockJobCreateFlags
-  * @cb: Completion function for the job.
-  * @opaque: Opaque pointer value passed to @cb.
-  * @errp: Error object.
+-        result = self.vm.qmp('block-job-pause', device='drive0')
+-        self.assert_qmp(result, 'return', {})
++        self.pause_job('drive0', wait=False)
+ 
+         result = self.vm.qmp('block-job-set-speed', device='drive0', speed=0)
+         self.assert_qmp(result, 'return', {})
+ 
+-        self.pause_job('drive0')
++        self.pause_wait('drive0')
+ 
+         result = self.vm.qmp('query-block-jobs')
+         offset = self.dictpath(result, 'return[0]/offset')
+@@ -534,11 +531,9 @@ class TestDriveCompression(iotests.QMPTestCase):
+         result = self.vm.qmp(cmd, device='drive0', sync='full', compress=True, **args)
+         self.assert_qmp(result, 'return', {})
+ 
+-        result = self.vm.qmp('block-job-pause', device='drive0')
+-        self.assert_qmp(result, 'return', {})
+-
++        self.pause_job('drive0', wait=False)
+         self.vm.resume_drive('drive0')
+-        self.pause_job('drive0')
++        self.pause_wait('drive0')
+ 
+         result = self.vm.qmp('query-block-jobs')
+         offset = self.dictpath(result, 'return[0]/offset')
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 1bcc9ca57d..5303bbc8e2 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -473,10 +473,7 @@ class QMPTestCase(unittest.TestCase):
+         event = self.wait_until_completed(drive=drive)
+         self.assert_qmp(event, 'data/type', 'mirror')
+ 
+-    def pause_job(self, job_id='job0'):
+-        result = self.vm.qmp('block-job-pause', device=job_id)
+-        self.assert_qmp(result, 'return', {})
+-
++    def pause_wait(self, job_id='job0'):
+         with Timeout(1, "Timeout waiting for job to pause"):
+             while True:
+                 result = self.vm.qmp('query-block-jobs')
+@@ -484,6 +481,13 @@ class QMPTestCase(unittest.TestCase):
+                     if job['device'] == job_id and job['paused'] == True and job['busy'] == False:
+                         return job
+ 
++    def pause_job(self, job_id='job0', wait=True):
++        result = self.vm.qmp('block-job-pause', device=job_id)
++        self.assert_qmp(result, 'return', {})
++        if wait:
++            return self.pause_wait(job_id)
++        return result
++
+ 
+ def notrun(reason):
+     '''Skip this test suite'''
 -- 
 2.14.3
