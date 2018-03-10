@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1eulwx-0002G3-97
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 16:22:44 -0500
+	(envelope-from <zhangckid@gmail.com>) id 1eulx3-0002Lj-8m
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 16:22:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1eulww-0003Kd-45
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 16:22:43 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:36788)
+	(envelope-from <zhangckid@gmail.com>) id 1eulx0-0003L7-3A
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 16:22:49 -0500
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:32850)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1eulwv-0003KM-Rg
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 16:22:42 -0500
-Received: by mail-pg0-x241.google.com with SMTP id i14so4940982pgv.3
-	for <qemu-devel@nongnu.org>; Sat, 10 Mar 2018 13:22:41 -0800 (PST)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1eulwz-0003Kw-Rr
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 16:22:46 -0500
+Received: by mail-pf0-x243.google.com with SMTP id q13so2726049pff.0
+	for <qemu-devel@nongnu.org>; Sat, 10 Mar 2018 13:22:45 -0800 (PST)
 From: Zhang Chen <zhangckid@gmail.com>
-Date: Sun, 11 Mar 2018 05:21:54 +0800
-Message-Id: <1520716927-17068-5-git-send-email-zhangckid@gmail.com>
+Date: Sun, 11 Mar 2018 05:21:55 +0800
+Message-Id: <1520716927-17068-6-git-send-email-zhangckid@gmail.com>
 In-Reply-To: <1520716927-17068-1-git-send-email-zhangckid@gmail.com>
 References: <1520716927-17068-1-git-send-email-zhangckid@gmail.com>
-Subject: [Qemu-devel] [PATCH V5 04/17] COLO: integrate colo compare with
- colo frame
+Subject: [Qemu-devel] [PATCH V5 05/17] COLO: Add block replication into colo
+ process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,145 +29,156 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-For COLO FT, both the PVM and SVM run at the same time,
-only sync the state while it needs.
+Make sure master start block replication after slave's block
+replication started.
 
-So here, let SVM runs while not doing checkpoint, change
-DEFAULT_MIGRATE_X_CHECKPOINT_DELAY to 200*100.
-
-Besides, we forgot to release colo_checkpoint_semd and
-colo_delay_timer, fix them here.
+Besides, we need to activate VM's blocks before goes into
+COLO state.
 
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/colo.c      | 42 ++++++++++++++++++++++++++++++++++++++++--
- migration/migration.c |  4 ++--
- 2 files changed, 42 insertions(+), 4 deletions(-)
+ migration/colo.c      | 43 +++++++++++++++++++++++++++++++++++++++++++
+ migration/migration.c |  9 +++++++++
+ 2 files changed, 52 insertions(+)
 
 diff --git a/migration/colo.c b/migration/colo.c
-index 4381067..081df18 100644
+index 081df18..e06640c 100644
 --- a/migration/colo.c
 +++ b/migration/colo.c
-@@ -25,8 +25,11 @@
- #include "qemu/error-report.h"
- #include "migration/failover.h"
+@@ -27,6 +27,7 @@
  #include "replication.h"
-+#include "net/colo-compare.h"
-+#include "net/colo.h"
+ #include "net/colo-compare.h"
+ #include "net/colo.h"
++#include "block/block.h"
  
  static bool vmstate_loading;
-+static Notifier packets_compare_notifier;
+ static Notifier packets_compare_notifier;
+@@ -56,6 +57,7 @@ static void secondary_vm_do_failover(void)
+ {
+     int old_state;
+     MigrationIncomingState *mis = migration_incoming_get_current();
++    Error *local_err = NULL;
  
- #define COLO_BUFFER_BASE_SIZE (4 * 1024 * 1024)
+     /* Can not do failover during the process of VM's loading VMstate, Or
+      * it will break the secondary VM.
+@@ -73,6 +75,11 @@ static void secondary_vm_do_failover(void)
+     migrate_set_state(&mis->state, MIGRATION_STATUS_COLO,
+                       MIGRATION_STATUS_COMPLETED);
  
-@@ -343,6 +346,11 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
-         goto out;
-     }
- 
-+    colo_notify_compares_event(NULL, COLO_EVENT_CHECKPOINT, &local_err);
++    replication_stop_all(true, &local_err);
 +    if (local_err) {
++        error_report_err(local_err);
++    }
++
+     if (!autostart) {
+         error_report("\"-S\" qemu option will be ignored in secondary side");
+         /* recover runstate to normal migration finish state */
+@@ -110,6 +117,7 @@ static void primary_vm_do_failover(void)
+ {
+     MigrationState *s = migrate_get_current();
+     int old_state;
++    Error *local_err = NULL;
+ 
+     migrate_set_state(&s->state, MIGRATION_STATUS_COLO,
+                       MIGRATION_STATUS_COMPLETED);
+@@ -133,6 +141,13 @@ static void primary_vm_do_failover(void)
+                      FailoverStatus_str(old_state));
+         return;
+     }
++
++    replication_stop_all(true, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        local_err = NULL;
++    }
++
+     /* Notify COLO thread that failover work is finished */
+     qemu_sem_post(&s->colo_exit_sem);
+ }
+@@ -356,6 +371,11 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
+     qemu_savevm_state_header(fb);
+     qemu_savevm_state_setup(fb);
+     qemu_mutex_lock_iothread();
++    replication_do_checkpoint_all(&local_err);
++    if (local_err) {
++        qemu_mutex_unlock_iothread();
++        goto out;
++    }
+     qemu_savevm_state_complete_precopy(fb, false, false);
+     qemu_mutex_unlock_iothread();
+ 
+@@ -446,6 +466,12 @@ static void colo_process_checkpoint(MigrationState *s)
+     object_unref(OBJECT(bioc));
+ 
+     qemu_mutex_lock_iothread();
++    replication_start_all(REPLICATION_MODE_PRIMARY, &local_err);
++    if (local_err) {
++        qemu_mutex_unlock_iothread();
 +        goto out;
 +    }
 +
-     /* Disable block migration */
-     migrate_set_block_enabled(false, &local_err);
-     qemu_savevm_state_header(fb);
-@@ -400,6 +408,11 @@ out:
-     return ret;
- }
- 
-+static void colo_compare_notify_checkpoint(Notifier *notifier, void *data)
-+{
-+    colo_checkpoint_notify(data);
-+}
-+
- static void colo_process_checkpoint(MigrationState *s)
- {
-     QIOChannelBuffer *bioc;
-@@ -416,6 +429,9 @@ static void colo_process_checkpoint(MigrationState *s)
-         goto out;
-     }
- 
-+    packets_compare_notifier.notify = colo_compare_notify_checkpoint;
-+    colo_compare_register_notifier(&packets_compare_notifier);
-+
-     /*
-      * Wait for Secondary finish loading VM states and enter COLO
-      * restore.
-@@ -461,11 +477,21 @@ out:
-         qemu_fclose(fb);
-     }
- 
--    timer_del(s->colo_delay_timer);
--
-     /* Hope this not to be too long to wait here */
-     qemu_sem_wait(&s->colo_exit_sem);
-     qemu_sem_destroy(&s->colo_exit_sem);
-+
-+    /*
-+     * It is safe to unregister notifier after failover finished.
-+     * Besides, colo_delay_timer and colo_checkpoint_sem can't be
-+     * released befor unregister notifier, or there will be use-after-free
-+     * error.
-+     */
-+    colo_compare_unregister_notifier(&packets_compare_notifier);
-+    timer_del(s->colo_delay_timer);
-+    timer_free(s->colo_delay_timer);
-+    qemu_sem_destroy(&s->colo_checkpoint_sem);
-+
-     /*
-      * Must be called after failover BH is completed,
-      * Or the failover BH may shutdown the wrong fd that
-@@ -558,6 +584,11 @@ void *colo_process_incoming_thread(void *opaque)
-     fb = qemu_fopen_channel_input(QIO_CHANNEL(bioc));
+     vm_start();
+     qemu_mutex_unlock_iothread();
+     trace_colo_vm_state_change("stop", "run");
+@@ -585,6 +611,11 @@ void *colo_process_incoming_thread(void *opaque)
      object_unref(OBJECT(bioc));
  
-+    qemu_mutex_lock_iothread();
-+    vm_start();
-+    trace_colo_vm_state_change("stop", "run");
-+    qemu_mutex_unlock_iothread();
-+
-     colo_send_message(mis->to_src_file, COLO_MESSAGE_CHECKPOINT_READY,
-                       &local_err);
-     if (local_err) {
-@@ -577,6 +608,11 @@ void *colo_process_incoming_thread(void *opaque)
+     qemu_mutex_lock_iothread();
++    replication_start_all(REPLICATION_MODE_SECONDARY, &local_err);
++    if (local_err) {
++        qemu_mutex_unlock_iothread();
++        goto out;
++    }
+     vm_start();
+     trace_colo_vm_state_change("stop", "run");
+     qemu_mutex_unlock_iothread();
+@@ -665,6 +696,18 @@ void *colo_process_incoming_thread(void *opaque)
              goto out;
          }
  
-+        qemu_mutex_lock_iothread();
-+        vm_stop_force_state(RUN_STATE_COLO);
-+        trace_colo_vm_state_change("run", "stop");
-+        qemu_mutex_unlock_iothread();
++        replication_get_error_all(&local_err);
++        if (local_err) {
++            qemu_mutex_unlock_iothread();
++            goto out;
++        }
++        /* discard colo disk buffer */
++        replication_do_checkpoint_all(&local_err);
++        if (local_err) {
++            qemu_mutex_unlock_iothread();
++            goto out;
++        }
 +
-         /* FIXME: This is unnecessary for periodic checkpoint mode */
-         colo_send_message(mis->to_src_file, COLO_MESSAGE_CHECKPOINT_REPLY,
-                      &local_err);
-@@ -630,6 +666,8 @@ void *colo_process_incoming_thread(void *opaque)
-         }
- 
          vmstate_loading = false;
-+        vm_start();
-+        trace_colo_vm_state_change("stop", "run");
-         qemu_mutex_unlock_iothread();
- 
-         if (failover_get_state() == FAILOVER_STATUS_RELAUNCH) {
+         vm_start();
+         trace_colo_vm_state_change("stop", "run");
 diff --git a/migration/migration.c b/migration/migration.c
-index e345d0c..7f72f78 100644
+index 7f72f78..128daaa 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -76,9 +76,9 @@
- #define DEFAULT_MIGRATE_XBZRLE_CACHE_SIZE (64 * 1024 * 1024)
+@@ -346,6 +346,7 @@ static void process_incoming_migration_co(void *opaque)
+     MigrationIncomingState *mis = migration_incoming_get_current();
+     PostcopyState ps;
+     int ret;
++    Error *local_err = NULL;
  
- /* The delay time (in ms) between two COLO checkpoints
-- * Note: Please change this default value to 10000 when we support hybrid mode.
-+ * Note: Please change this default value to 20000 when we support hybrid mode.
-  */
--#define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY 200
-+#define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY (200 * 100)
- #define DEFAULT_MIGRATE_MULTIFD_CHANNELS 2
- #define DEFAULT_MIGRATE_MULTIFD_PAGE_COUNT 16
+     assert(mis->from_src_file);
+     mis->largest_page_size = qemu_ram_pagesize_largest();
+@@ -377,6 +378,14 @@ static void process_incoming_migration_co(void *opaque)
  
+     /* we get COLO info, and know if we are in COLO mode */
+     if (!ret && migration_incoming_enable_colo()) {
++        /* Make sure all file formats flush their mutable metadata */
++        bdrv_invalidate_cache_all(&local_err);
++        if (local_err) {
++            migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
++                    MIGRATION_STATUS_FAILED);
++            error_report_err(local_err);
++            exit(EXIT_FAILURE);
++        }
+         mis->migration_incoming_co = qemu_coroutine_self();
+         qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
+              colo_process_incoming_thread, mis, QEMU_THREAD_JOINABLE);
 -- 
 2.7.4
