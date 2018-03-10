@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1eulxq-0003FT-0K
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 16:23:38 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eulzp-0004ua-55
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 16:25:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1eulxm-0003U2-Sf
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 16:23:37 -0500
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:46891)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eulzm-0003vj-0L
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 16:25:41 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:39932)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1eulxm-0003Tw-Mt
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 16:23:34 -0500
-Received: by mail-pl0-x244.google.com with SMTP id y8-v6so7140987pll.13
-	for <qemu-devel@nongnu.org>; Sat, 10 Mar 2018 13:23:34 -0800 (PST)
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Sun, 11 Mar 2018 05:22:07 +0800
-Message-Id: <1520716927-17068-18-git-send-email-zhangckid@gmail.com>
-In-Reply-To: <1520716927-17068-1-git-send-email-zhangckid@gmail.com>
-References: <1520716927-17068-1-git-send-email-zhangckid@gmail.com>
-Subject: [Qemu-devel] [PATCH V5 17/17] COLO: quick failover process by kick
- COLO thread
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eulzl-0003vE-Pu
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 16:25:37 -0500
+Received: by mail-wm0-x242.google.com with SMTP id i3so9566286wmi.4
+	for <qemu-devel@nongnu.org>; Sat, 10 Mar 2018 13:25:37 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1520629272-98060-1-git-send-email-mjc@sifive.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a407b0b4-17fc-e399-d0b1-c2eaf87a4836@amsat.org>
+Date: Sat, 10 Mar 2018 22:25:35 +0100
+MIME-Version: 1.0
+In-Reply-To: <1520629272-98060-1-git-send-email-mjc@sifive.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] RISC-V: Fix riscv_isa_string,
+ use popcount to count bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +35,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Palmer Dabbelt <palmer@sifive.com>
 
-From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+On 03/09/2018 10:01 PM, Michael Clark wrote:
+> Logic bug caused the string size calculation for the RISC-V
+> format ISA string to be small. This fix allows slack for rv128.
+> 
+> Cc: Palmer Dabbelt <palmer@sifive.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Michael Clark <mjc@sifive.com>
+> ---
+>  target/riscv/cpu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> index 4851890..1456535 100644
+> --- a/target/riscv/cpu.c
+> +++ b/target/riscv/cpu.c
+> @@ -391,7 +391,7 @@ static const TypeInfo riscv_cpu_type_info = {
+>  char *riscv_isa_string(RISCVCPU *cpu)
+>  {
+>      int i;
+> -    size_t maxlen = 5 + ctz32(cpu->env.misa);
+> +    size_t maxlen = 8 + ctpop64(cpu->env.misa);
 
-COLO thread may sleep at qemu_sem_wait(&s->colo_checkpoint_sem),
-while failover works begin, It's better to wakeup it to quick
-the process.
+Can you document the magic 5/8?
 
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
----
- migration/colo.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+This looks nice, but this seems to me too much optimization to save few
+bytes, using sizeof(riscv_exts) is overflow-free.
 
-diff --git a/migration/colo.c b/migration/colo.c
-index 5fb4d8c..de0442e 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -134,6 +134,11 @@ static void primary_vm_do_failover(void)
- 
-     migrate_set_state(&s->state, MIGRATION_STATUS_COLO,
-                       MIGRATION_STATUS_COMPLETED);
-+    /*
-+     * kick COLO thread which might wait at
-+     * qemu_sem_wait(&s->colo_checkpoint_sem).
-+     */
-+    colo_checkpoint_notify(migrate_get_current());
- 
-     /*
-      * Wake up COLO thread which may blocked in recv() or send(),
-@@ -553,6 +558,9 @@ static void colo_process_checkpoint(MigrationState *s)
- 
-         qemu_sem_wait(&s->colo_checkpoint_sem);
- 
-+        if (s->state != MIGRATION_STATUS_COLO) {
-+            goto out;
-+        }
-         ret = colo_do_checkpoint_transaction(s, bioc, fb);
-         if (ret < 0) {
-             goto out;
--- 
-2.7.4
+Maybe this is enough and self-explanatory:
+
+       const size_t maxlen = sizeof("rv128") + sizeof(riscv_exts);
+
+>      char *isa_string = g_new0(char, maxlen);
+>      snprintf(isa_string, maxlen, "rv%d", TARGET_LONG_BITS);
+
+Also, if you keep the snprintf() return value, you can (naming it 'n')
+simplify (also easier to review):
+
+>      for (i = 0; i < sizeof(riscv_exts); i++) {
+> 
+        if (cpu->env.misa & RV(riscv_exts[i])) {
+-           isa_string[strlen(isa_string)] = riscv_exts[i] - 'A' + 'a';
++           isa_string[n++] = tolower(riscv_exts[i]);
+        }
+    }
+
+and simply use g_new() with:
+
++   isa_string[n] = '\0';
+
+    return isa_string;
+}
+
+Regards,
+
+Phil.
