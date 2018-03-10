@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1euZrR-0002Yb-W8
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 03:28:16 -0500
+	(envelope-from <jsnow@redhat.com>) id 1euZrN-0002RI-IK
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 03:28:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1euZrP-0000Fo-25
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 03:28:13 -0500
+	(envelope-from <jsnow@redhat.com>) id 1euZrK-0000D1-80
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 03:28:09 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Sat, 10 Mar 2018 03:27:29 -0500
-Message-Id: <20180310082746.24198-5-jsnow@redhat.com>
+Date: Sat, 10 Mar 2018 03:27:35 -0500
+Message-Id: <20180310082746.24198-11-jsnow@redhat.com>
 In-Reply-To: <20180310082746.24198-1-jsnow@redhat.com>
 References: <20180310082746.24198-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 04/21] blockjobs: add status enum
+Subject: [Qemu-devel] [PATCH v5 10/21] blockjobs: add NULL state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,283 +22,184 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-We're about to add several new states, and booleans are becoming
-unwieldly and difficult to reason about. It would help to have a
-more explicit bookkeeping of the state of blockjobs. To this end,
-add a new "status" field and add our existing states in a redundant
-manner alongside the bools they are replacing:
+Add a new state that specifically demarcates when we begin to permanently
+demolish a job after it has performed all work. This makes the transition
+explicit in the STM table and highlights conditions under which a job may
+be demolished.
 
-UNDEFINED: Placeholder, default state. Not currently visible to QMP
-           unless changes occur in the future to allow creating jobs
-           without starting them via QMP.
-CREATED:   replaces !!job->co && paused && !busy
-RUNNING:   replaces effectively (!paused && busy)
-PAUSED:    Nearly redundant with info->paused, which shows pause_count.
-           This reports the actual status of the job, which almost always
-           matches the paused request status. It differs in that it is
-           strictly only true when the job has actually gone dormant.
-READY:     replaces job->ready.
-STANDBY:   Paused, but job->ready is true.
+Alongside this state, add a new helper command "block_job_decommission",
+which transitions to the NULL state and puts down our implicit reference.
+This separates instances in the code for "block_job_unref" which merely
+undo a matching "block_job_ref" with instances intended to initiate the
+full destruction of the object.
 
-New state additions in coming commits will not be quite so redundant:
+This decommission action also sets a number of fields to make sure that
+block internals or external users that are holding a reference to a job
+to see when it "finishes" are convinced that the job object is "done."
+This is necessary, for instance, to do a block_job_cancel_sync on a
+created object which will not make any progress.
 
-WAITING:   Waiting on transaction. This job has finished all the work
-           it can until the transaction converges, fails, or is canceled.
-PENDING:   Pending authorization from user. This job has finished all the
-           work it can until the job or transaction is finalized via
-           block_job_finalize. This implies the transaction has converged
-           and left the WAITING phase.
-ABORTING:  Job has encountered an error condition and is in the process
-           of aborting.
-CONCLUDED: Job has ceased all operations and has a return code available
-           for query and may be dismissed via block_job_dismiss.
-NULL:      Job has been dismissed and (should) be destroyed. Should never
-           be visible to QMP.
+Now, all jobs must go through block_job_decommission prior to being
+freed, giving us start-to-finish state machine coverage for jobs.
 
-Some of these states appear somewhat superfluous, but it helps define the
-expected flow of a job; so some of the states wind up being synchronous
-empty transitions. Importantly, jobs can be in only one of these states
-at any given time, which helps code and external users alike reason about
-the current condition of a job unambiguously.
+
+Transitions:
+Created   -> Null: Early failure event before the job is started
+Concluded -> Null: Standard transition.
+
+Verbs:
+None. This should not ever be visible to the monitor.
+
+             +---------+
+             |UNDEFINED|
+             +--+------+
+                |
+             +--v----+
+   +---------+CREATED+------------------+
+   |         +--+----+                  |
+   |            |                       |
+   |         +--v----+     +------+     |
+   +---------+RUNNING<----->PAUSED|     |
+   |         +--+-+--+     +------+     |
+   |            | |                     |
+   |            | +------------------+  |
+   |            |                    |  |
+   |         +--v--+       +-------+ |  |
+   +---------+READY<------->STANDBY| |  |
+   |         +--+--+       +-------+ |  |
+   |            |                    |  |
++--v-----+   +--v------+             |  |
+|ABORTING+--->CONCLUDED<-------------+  |
++--------+   +--+------+                |
+                |                       |
+             +--v-+                     |
+             |NULL<---------------------+
+             +----+
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- blockjob.c                 |  9 +++++++++
- include/block/blockjob.h   |  3 +++
- qapi/block-core.json       | 31 ++++++++++++++++++++++++++++++-
- tests/qemu-iotests/109.out | 24 ++++++++++++------------
- 4 files changed, 54 insertions(+), 13 deletions(-)
+ blockjob.c           | 50 ++++++++++++++++++++++++++++++++------------------
+ qapi/block-core.json |  5 ++++-
+ 2 files changed, 36 insertions(+), 19 deletions(-)
 
 diff --git a/blockjob.c b/blockjob.c
-index ecc5fcbdf8..719169cccd 100644
+index 3f730967b3..2ef48075b0 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -320,6 +320,7 @@ void block_job_start(BlockJob *job)
-     job->pause_count--;
-     job->busy = true;
-     job->paused = false;
-+    job->status = BLOCK_JOB_STATUS_RUNNING;
+@@ -44,24 +44,25 @@ static QemuMutex block_job_mutex;
+ 
+ /* BlockJob State Transition Table */
+ bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
+-                                          /* U, C, R, P, Y, S, X, E */
+-    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0, 0, 0},
+-    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0, 1, 0},
+-    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0, 1, 1},
+-    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0, 0, 0},
+-    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1, 1, 1},
+-    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0, 0, 0},
+-    /* X: */ [BLOCK_JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 0, 1},
+-    /* E: */ [BLOCK_JOB_STATUS_CONCLUDED] = {0, 0, 0, 0, 0, 0, 0, 0},
++                                          /* U, C, R, P, Y, S, X, E, N */
++    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0, 0, 0, 0},
++    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0, 1, 0, 1},
++    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0, 1, 1, 0},
++    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0, 0, 0, 0},
++    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1, 1, 1, 0},
++    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0, 0, 0, 0},
++    /* X: */ [BLOCK_JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 0, 1, 0},
++    /* E: */ [BLOCK_JOB_STATUS_CONCLUDED] = {0, 0, 0, 0, 0, 0, 0, 0, 1},
++    /* N: */ [BLOCK_JOB_STATUS_NULL]      = {0, 0, 0, 0, 0, 0, 0, 0, 0},
+ };
+ 
+ bool BlockJobVerbTable[BLOCK_JOB_VERB__MAX][BLOCK_JOB_STATUS__MAX] = {
+-                                          /* U, C, R, P, Y, S, X, E */
+-    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1, 0, 0},
+-    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1, 0, 0},
+-    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0, 0},
+-    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0, 0},
+-    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0, 0},
++                                          /* U, C, R, P, Y, S, X, E, N */
++    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1, 0, 0, 0},
++    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1, 0, 0, 0},
++    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0, 0, 0},
++    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0, 0, 0},
++    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0, 0, 0},
+ };
+ 
+ static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
+@@ -225,6 +226,7 @@ static void block_job_detach_aio_context(void *opaque);
+ void block_job_unref(BlockJob *job)
+ {
+     if (--job->refcnt == 0) {
++        assert(job->status == BLOCK_JOB_STATUS_NULL);
+         BlockDriverState *bs = blk_bs(job->blk);
+         QLIST_REMOVE(job, job_list);
+         bs->job = NULL;
+@@ -378,6 +380,17 @@ void block_job_start(BlockJob *job)
      bdrv_coroutine_enter(blk_bs(job->blk), job->co);
  }
  
-@@ -598,6 +599,7 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
-     info->speed     = job->speed;
-     info->io_status = job->iostatus;
-     info->ready     = job->ready;
-+    info->status    = job->status;
-     return info;
++static void block_job_decommission(BlockJob *job)
++{
++    assert(job);
++    job->completed = true;
++    job->busy = false;
++    job->paused = false;
++    job->deferred_to_main_loop = true;
++    block_job_state_transition(job, BLOCK_JOB_STATUS_NULL);
++    block_job_unref(job);
++}
++
+ static void block_job_conclude(BlockJob *job)
+ {
+     block_job_state_transition(job, BLOCK_JOB_STATUS_CONCLUDED);
+@@ -424,7 +437,7 @@ static void block_job_completed_single(BlockJob *job)
+     QLIST_REMOVE(job, txn_list);
+     block_job_txn_unref(job->txn);
+     block_job_conclude(job);
+-    block_job_unref(job);
++    block_job_decommission(job);
  }
  
-@@ -700,6 +702,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-     job->paused        = true;
-     job->pause_count   = 1;
-     job->refcnt        = 1;
-+    job->status        = BLOCK_JOB_STATUS_CREATED;
-     aio_timer_init(qemu_get_aio_context(), &job->sleep_timer,
-                    QEMU_CLOCK_REALTIME, SCALE_NS,
-                    block_job_sleep_timer_cb, job);
-@@ -813,9 +816,14 @@ void coroutine_fn block_job_pause_point(BlockJob *job)
-     }
+ static void block_job_cancel_async(BlockJob *job)
+@@ -817,7 +830,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
  
-     if (block_job_should_pause(job) && !block_job_is_cancelled(job)) {
-+        BlockJobStatus status = job->status;
-+        job->status = status == BLOCK_JOB_STATUS_READY ? \
-+                                BLOCK_JOB_STATUS_STANDBY : \
-+                                BLOCK_JOB_STATUS_PAUSED;
-         job->paused = true;
-         block_job_do_yield(job, -1);
-         job->paused = false;
-+        job->status = status;
-     }
+         block_job_set_speed(job, speed, &local_err);
+         if (local_err) {
+-            block_job_unref(job);
++            block_job_early_fail(job);
+             error_propagate(errp, local_err);
+             return NULL;
+         }
+@@ -851,7 +864,8 @@ void block_job_pause_all(void)
  
-     if (job->driver->resume) {
-@@ -921,6 +929,7 @@ void block_job_iostatus_reset(BlockJob *job)
- 
- void block_job_event_ready(BlockJob *job)
+ void block_job_early_fail(BlockJob *job)
  {
-+    job->status = BLOCK_JOB_STATUS_READY;
-     job->ready = true;
+-    block_job_unref(job);
++    assert(job->status == BLOCK_JOB_STATUS_CREATED);
++    block_job_decommission(job);
+ }
  
-     if (block_job_is_internal(job)) {
-diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index b77fac118d..b39a2f9521 100644
---- a/include/block/blockjob.h
-+++ b/include/block/blockjob.h
-@@ -139,6 +139,9 @@ typedef struct BlockJob {
-      */
-     QEMUTimer sleep_timer;
- 
-+    /** Current state; See @BlockJobStatus for details. */
-+    BlockJobStatus status;
-+
-     BlockJobTxn *txn;
-     QLIST_ENTRY(BlockJob) txn_list;
- } BlockJob;
+ void block_job_completed(BlockJob *job, int ret)
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 00475f08d4..8dfed5c7da 100644
+index e489660886..dc25d1d306 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -955,6 +955,32 @@
- { 'enum': 'BlockJobType',
-   'data': ['commit', 'stream', 'mirror', 'backup'] }
+@@ -1003,11 +1003,14 @@
+ # @concluded: The job has finished all work. If manual was set to true, the job
+ #             will remain in the query list until it is dismissed.
+ #
++# @null: The job is in the process of being dismantled. This state should not
++#        ever be visible externally.
++#
+ # Since: 2.12
+ ##
+ { 'enum': 'BlockJobStatus',
+   'data': ['undefined', 'created', 'running', 'paused', 'ready', 'standby',
+-           'aborting', 'concluded' ] }
++           'aborting', 'concluded', 'null' ] }
  
-+##
-+# @BlockJobStatus:
-+#
-+# Indicates the present state of a given blockjob in its lifetime.
-+#
-+# @undefined: Erroneous, default state. Should not ever be visible.
-+#
-+# @created: The job has been created, but not yet started.
-+#
-+# @running: The job is currently running.
-+#
-+# @paused: The job is running, but paused. The pause may be requested by
-+#          either the QMP user or by internal processes.
-+#
-+# @ready: The job is running, but is ready for the user to signal completion.
-+#         This is used for long-running jobs like mirror that are designed to
-+#         run indefinitely.
-+#
-+# @standby: The job is ready, but paused. This is nearly identical to @paused.
-+#           The job may return to @ready or otherwise be canceled.
-+#
-+# Since: 2.12
-+##
-+{ 'enum': 'BlockJobStatus',
-+  'data': ['undefined', 'created', 'running', 'paused', 'ready', 'standby'] }
-+
  ##
  # @BlockJobInfo:
- #
-@@ -981,12 +1007,15 @@
- #
- # @ready: true if the job may be completed (since 2.2)
- #
-+# @status: Current job state/status (since 2.12)
-+#
- # Since: 1.1
- ##
- { 'struct': 'BlockJobInfo',
-   'data': {'type': 'str', 'device': 'str', 'len': 'int',
-            'offset': 'int', 'busy': 'bool', 'paused': 'bool', 'speed': 'int',
--           'io-status': 'BlockDeviceIoStatus', 'ready': 'bool'} }
-+           'io-status': 'BlockDeviceIoStatus', 'ready': 'bool',
-+           'status': 'BlockJobStatus' } }
- 
- ##
- # @query-block-jobs:
-diff --git a/tests/qemu-iotests/109.out b/tests/qemu-iotests/109.out
-index c189e2833d..d288f2eef6 100644
---- a/tests/qemu-iotests/109.out
-+++ b/tests/qemu-iotests/109.out
-@@ -19,7 +19,7 @@ read 65536/65536 bytes at offset 0
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 1024, "offset": 1024, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 1024, "offset": 1024, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 1024, "offset": 1024, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 1024, "offset": 1024, "speed": 0, "type": "mirror"}}
-@@ -45,7 +45,7 @@ read 65536/65536 bytes at offset 0
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 197120, "offset": 197120, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 197120, "offset": 197120, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 197120, "offset": 197120, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 197120, "offset": 197120, "speed": 0, "type": "mirror"}}
-@@ -71,7 +71,7 @@ read 65536/65536 bytes at offset 0
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 327680, "offset": 327680, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 327680, "offset": 327680, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 327680, "offset": 327680, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 327680, "offset": 327680, "speed": 0, "type": "mirror"}}
-@@ -97,7 +97,7 @@ read 65536/65536 bytes at offset 0
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 1024, "offset": 1024, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 1024, "offset": 1024, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 1024, "offset": 1024, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 1024, "offset": 1024, "speed": 0, "type": "mirror"}}
-@@ -123,7 +123,7 @@ read 65536/65536 bytes at offset 0
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 65536, "offset": 65536, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 65536, "offset": 65536, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 65536, "offset": 65536, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 65536, "offset": 65536, "speed": 0, "type": "mirror"}}
-@@ -149,7 +149,7 @@ read 65536/65536 bytes at offset 0
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 2560, "offset": 2560, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 2560, "offset": 2560, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 2560, "offset": 2560, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 2560, "offset": 2560, "speed": 0, "type": "mirror"}}
-@@ -174,7 +174,7 @@ read 65536/65536 bytes at offset 0
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 2560, "offset": 2560, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 2560, "offset": 2560, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 2560, "offset": 2560, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 2560, "offset": 2560, "speed": 0, "type": "mirror"}}
-@@ -199,7 +199,7 @@ read 65536/65536 bytes at offset 0
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 31457280, "offset": 31457280, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 31457280, "offset": 31457280, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 31457280, "offset": 31457280, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 31457280, "offset": 31457280, "speed": 0, "type": "mirror"}}
-@@ -224,7 +224,7 @@ read 65536/65536 bytes at offset 0
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 327680, "offset": 327680, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 327680, "offset": 327680, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 327680, "offset": 327680, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 327680, "offset": 327680, "speed": 0, "type": "mirror"}}
-@@ -249,7 +249,7 @@ read 65536/65536 bytes at offset 0
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 2048, "offset": 2048, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 2048, "offset": 2048, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 2048, "offset": 2048, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 2048, "offset": 2048, "speed": 0, "type": "mirror"}}
-@@ -265,7 +265,7 @@ Automatically detecting the format is dangerous for raw images, write operations
- Specify the 'raw' format explicitly to remove the restrictions.
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 512, "offset": 512, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 512, "offset": 512, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 512, "offset": 512, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 512, "offset": 512, "speed": 0, "type": "mirror"}}
-@@ -274,7 +274,7 @@ Images are identical.
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 512, "offset": 512, "speed": 0, "type": "mirror"}}
--{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 512, "offset": 512, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 512, "offset": 512, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 512, "offset": 512, "speed": 0, "type": "mirror"}}
 -- 
 2.14.3
