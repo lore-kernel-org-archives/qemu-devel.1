@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1euZrR-0002Y2-Gh
+	(envelope-from <jsnow@redhat.com>) id 1euZrR-0002Y0-Gh
 	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 03:28:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1euZrP-0000G4-Ai
+	(envelope-from <jsnow@redhat.com>) id 1euZrP-0000GL-Qj
 	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 03:28:13 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Sat, 10 Mar 2018 03:27:45 -0500
-Message-Id: <20180310082746.24198-21-jsnow@redhat.com>
+Date: Sat, 10 Mar 2018 03:27:46 -0500
+Message-Id: <20180310082746.24198-22-jsnow@redhat.com>
 In-Reply-To: <20180310082746.24198-1-jsnow@redhat.com>
 References: <20180310082746.24198-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 20/21] iotests: test manual job dismissal
+Subject: [Qemu-devel] [PATCH v5 21/21] tests/test-blockjob: test
+ cancellations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,227 +23,281 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
+Whatever the state a blockjob is in, it should be able to be canceled
+by the block layer.
+
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- tests/qemu-iotests/056     | 187 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/056.out |   4 +-
- 2 files changed, 189 insertions(+), 2 deletions(-)
+ tests/test-blockjob.c | 233 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 229 insertions(+), 4 deletions(-)
 
-diff --git a/tests/qemu-iotests/056 b/tests/qemu-iotests/056
-index 04f2c3c841..223292175a 100755
---- a/tests/qemu-iotests/056
-+++ b/tests/qemu-iotests/056
-@@ -29,6 +29,26 @@ backing_img = os.path.join(iotests.test_dir, 'backing.img')
- test_img = os.path.join(iotests.test_dir, 'test.img')
- target_img = os.path.join(iotests.test_dir, 'target.img')
+diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
+index 599e28d732..8946bfd37b 100644
+--- a/tests/test-blockjob.c
++++ b/tests/test-blockjob.c
+@@ -24,14 +24,15 @@ static void block_job_cb(void *opaque, int ret)
+ {
+ }
  
-+def img_create(img, fmt=iotests.imgfmt, size='64M', **kwargs):
-+    fullname = os.path.join(iotests.test_dir, '%s.%s' % (img, fmt))
-+    optargs = []
-+    for k,v in kwargs.iteritems():
-+        optargs = optargs + ['-o', '%s=%s' % (k,v)]
-+    args = ['create', '-f', fmt] + optargs + [fullname, size]
-+    iotests.qemu_img(*args)
-+    return fullname
-+
-+def try_remove(img):
-+    try:
-+        os.remove(img)
-+    except OSError:
-+        pass
-+
-+def io_write_patterns(img, patterns):
-+    for pattern in patterns:
-+        iotests.qemu_io('-c', 'write -P%s %s %s' % pattern, img)
-+
-+
- class TestSyncModesNoneAndTop(iotests.QMPTestCase):
-     image_len = 64 * 1024 * 1024 # MB
+-static BlockJob *do_test_id(BlockBackend *blk, const char *id,
+-                            bool should_succeed)
++static BlockJob *mk_job(BlockBackend *blk, const char *id,
++                        const BlockJobDriver *drv, bool should_succeed,
++                        int flags)
+ {
+     BlockJob *job;
+     Error *errp = NULL;
  
-@@ -108,5 +128,172 @@ class TestBeforeWriteNotifier(iotests.QMPTestCase):
-         event = self.cancel_and_wait()
-         self.assert_qmp(event, 'data/type', 'backup')
+-    job = block_job_create(id, &test_block_job_driver, NULL, blk_bs(blk),
+-                           0, BLK_PERM_ALL, 0, BLOCK_JOB_DEFAULT, block_job_cb,
++    job = block_job_create(id, drv, NULL, blk_bs(blk),
++                           0, BLK_PERM_ALL, 0, flags, block_job_cb,
+                            NULL, &errp);
+     if (should_succeed) {
+         g_assert_null(errp);
+@@ -50,6 +51,13 @@ static BlockJob *do_test_id(BlockBackend *blk, const char *id,
+     return job;
+ }
  
-+class BackupTest(iotests.QMPTestCase):
-+    def setUp(self):
-+        self.vm = iotests.VM()
-+        self.test_img = img_create('test')
-+        self.dest_img = img_create('dest')
-+        self.vm.add_drive(self.test_img)
-+        self.vm.launch()
++static BlockJob *do_test_id(BlockBackend *blk, const char *id,
++                            bool should_succeed)
++{
++    return mk_job(blk, id, &test_block_job_driver,
++                  should_succeed, BLOCK_JOB_DEFAULT);
++}
 +
-+    def tearDown(self):
-+        self.vm.shutdown()
-+        try_remove(self.test_img)
-+        try_remove(self.dest_img)
-+
-+    def hmp_io_writes(self, drive, patterns):
-+        for pattern in patterns:
-+            self.vm.hmp_qemu_io(drive, 'write -P%s %s %s' % pattern)
-+        self.vm.hmp_qemu_io(drive, 'flush')
-+
-+    def qmp_backup_and_wait(self, cmd='drive-backup', serror=None,
-+                            aerror=None, **kwargs):
-+        if not self.qmp_backup(cmd, serror, **kwargs):
-+            return False
-+        return self.qmp_backup_wait(kwargs['device'], aerror)
-+
-+    def qmp_backup(self, cmd='drive-backup',
-+                   error=None, **kwargs):
-+        self.assertTrue('device' in kwargs)
-+        res = self.vm.qmp(cmd, **kwargs)
-+        if error:
-+            self.assert_qmp(res, 'error/desc', error)
-+            return False
-+        self.assert_qmp(res, 'return', {})
-+        return True
-+
-+    def qmp_backup_wait(self, device, error=None):
-+        event = self.vm.event_wait(name="BLOCK_JOB_COMPLETED",
-+                                   match={'data': {'device': device}})
-+        self.assertNotEqual(event, None)
-+        try:
-+            failure = self.dictpath(event, 'data/error')
-+        except AssertionError:
-+            # Backup succeeded.
-+            self.assert_qmp(event, 'data/offset', event['data']['len'])
-+            return True
-+        else:
-+            # Failure.
-+            self.assert_qmp(event, 'data/error', qerror)
-+            return False
-+
-+    def test_dismiss_false(self):
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return', [])
-+        self.qmp_backup_and_wait(device='drive0', format=iotests.imgfmt,
-+                                 sync='full', target=self.dest_img,
-+                                 auto_dismiss=True)
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return', [])
-+
-+    def test_dismiss_true(self):
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return', [])
-+        self.qmp_backup_and_wait(device='drive0', format=iotests.imgfmt,
-+                                 sync='full', target=self.dest_img,
-+                                 auto_dismiss=False)
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return[0]/status', 'concluded')
-+        res = self.vm.qmp('block-job-dismiss', id='drive0')
-+        self.assert_qmp(res, 'return', {})
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return', [])
-+
-+    def test_dismiss_bad_id(self):
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return', [])
-+        res = self.vm.qmp('block-job-dismiss', id='foobar')
-+        self.assert_qmp(res, 'error/class', 'DeviceNotActive')
-+
-+    def test_dismiss_collision(self):
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return', [])
-+        self.qmp_backup_and_wait(device='drive0', format=iotests.imgfmt,
-+                                 sync='full', target=self.dest_img,
-+                                 auto_dismiss=False)
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return[0]/status', 'concluded')
-+        # Leave zombie job un-dismissed, observe a failure:
-+        res = self.qmp_backup_and_wait(serror='Need a root block node',
-+                                       device='drive0', format=iotests.imgfmt,
-+                                       sync='full', target=self.dest_img,
-+                                       auto_dismiss=False)
-+        self.assertEqual(res, False)
-+        # OK, dismiss the zombie.
-+        res = self.vm.qmp('block-job-dismiss', id='drive0')
-+        self.assert_qmp(res, 'return', {})
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return', [])
-+        # Ensure it's really gone.
-+        self.qmp_backup_and_wait(device='drive0', format=iotests.imgfmt,
-+                                 sync='full', target=self.dest_img,
-+                                 auto_dismiss=False)
-+
-+    def dismissal_failure(self, dismissal_opt):
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return', [])
-+        # Give blkdebug something to chew on
-+        self.hmp_io_writes('drive0',
-+                           (('0x9a', 0, 512),
-+                           ('0x55', '8M', '352k'),
-+                           ('0x78', '15872k', '1M')))
-+        # Add destination node via blkdebug
-+        res = self.vm.qmp('blockdev-add',
-+                          node_name='target0',
-+                          driver=iotests.imgfmt,
-+                          file={
-+                              'driver': 'blkdebug',
-+                              'image': {
-+                                  'driver': 'file',
-+                                  'filename': self.dest_img
-+                              },
-+                              'inject-error': [{
-+                                  'event': 'write_aio',
-+                                  'errno': 5,
-+                                  'immediately': False,
-+                                  'once': True
-+                              }],
-+                          })
-+        self.assert_qmp(res, 'return', {})
-+
-+        res = self.qmp_backup(cmd='blockdev-backup',
-+                              device='drive0', target='target0',
-+                              on_target_error='stop',
-+                              sync='full',
-+                              auto_dismiss=dismissal_opt)
-+        self.assertTrue(res)
-+        event = self.vm.event_wait(name="BLOCK_JOB_ERROR",
-+                                   match={'data': {'device': 'drive0'}})
-+        self.assertNotEqual(event, None)
-+        # OK, job should be wedged
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return[0]/status', 'paused')
-+        res = self.vm.qmp('block-job-dismiss', id='drive0')
-+        self.assert_qmp(res, 'error/desc',
-+                        "Job 'drive0' in state 'paused' cannot accept"
-+                        " command verb 'dismiss'")
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return[0]/status', 'paused')
-+        # OK, unstick job and move forward.
-+        res = self.vm.qmp('block-job-resume', device='drive0')
-+        self.assert_qmp(res, 'return', {})
-+        # And now we need to wait for it to conclude;
-+        res = self.qmp_backup_wait(device='drive0')
-+        self.assertTrue(res)
-+        if not dismissal_opt:
-+            # Job should now be languishing:
-+            res = self.vm.qmp('query-block-jobs')
-+            self.assert_qmp(res, 'return[0]/status', 'concluded')
-+            res = self.vm.qmp('block-job-dismiss', id='drive0')
-+            self.assert_qmp(res, 'return', {})
-+            res = self.vm.qmp('query-block-jobs')
-+            self.assert_qmp(res, 'return', [])
-+
-+    def test_dismiss_premature(self):
-+        self.dismissal_failure(False)
-+
-+    def test_dismiss_erroneous(self):
-+        self.dismissal_failure(True)
-+
- if __name__ == '__main__':
-     iotests.main(supported_fmts=['qcow2', 'qed'])
-diff --git a/tests/qemu-iotests/056.out b/tests/qemu-iotests/056.out
-index 8d7e996700..dae404e278 100644
---- a/tests/qemu-iotests/056.out
-+++ b/tests/qemu-iotests/056.out
-@@ -1,5 +1,5 @@
--...
-+.........
- ----------------------------------------------------------------------
--Ran 3 tests
-+Ran 9 tests
+ /* This creates a BlockBackend (optionally with a name) with a
+  * BlockDriverState inserted. */
+ static BlockBackend *create_blk(const char *name)
+@@ -142,6 +150,216 @@ static void test_job_ids(void)
+     destroy_blk(blk[2]);
+ }
  
- OK
++typedef struct CancelJob {
++    BlockJob common;
++    BlockBackend *blk;
++    bool should_converge;
++    bool should_complete;
++    bool completed;
++} CancelJob;
++
++static void cancel_job_completed(BlockJob *job, void *opaque)
++{
++    CancelJob *s = opaque;
++    s->completed = true;
++    block_job_completed(job, 0);
++}
++
++static void cancel_job_complete(BlockJob *job, Error **errp)
++{
++    CancelJob *s = container_of(job, CancelJob, common);
++    s->should_complete = true;
++}
++
++static void coroutine_fn cancel_job_start(void *opaque)
++{
++    CancelJob *s = opaque;
++
++    while (!s->should_complete) {
++        if (block_job_is_cancelled(&s->common)) {
++            goto defer;
++        }
++
++        if (!s->common.ready && s->should_converge) {
++            block_job_event_ready(&s->common);
++        }
++
++        block_job_sleep_ns(&s->common, 100000);
++    }
++
++ defer:
++    block_job_defer_to_main_loop(&s->common, cancel_job_completed, s);
++}
++
++static const BlockJobDriver test_cancel_driver = {
++    .instance_size = sizeof(CancelJob),
++    .start         = cancel_job_start,
++    .complete      = cancel_job_complete,
++};
++
++static CancelJob *create_common(BlockJob **pjob)
++{
++    BlockBackend *blk;
++    BlockJob *job;
++    CancelJob *s;
++
++    blk = create_blk(NULL);
++    job = mk_job(blk, "Steve", &test_cancel_driver, true,
++                 BLOCK_JOB_MANUAL_FINALIZE | BLOCK_JOB_MANUAL_DISMISS);
++    block_job_ref(job);
++    assert(job->status == BLOCK_JOB_STATUS_CREATED);
++    s = container_of(job, CancelJob, common);
++    s->blk = blk;
++
++    *pjob = job;
++    return s;
++}
++
++static void cancel_common(CancelJob *s)
++{
++    BlockJob *job = &s->common;
++    BlockBackend *blk = s->blk;
++    BlockJobStatus sts = job->status;
++
++    block_job_cancel_sync(job);
++    if ((sts != BLOCK_JOB_STATUS_CREATED) &&
++        (sts != BLOCK_JOB_STATUS_CONCLUDED)) {
++        BlockJob *dummy = job;
++        block_job_dismiss(&dummy, &error_abort);
++    }
++    assert(job->status == BLOCK_JOB_STATUS_NULL);
++    block_job_unref(job);
++    destroy_blk(blk);
++}
++
++static void test_cancel_created(void)
++{
++    BlockJob *job;
++    CancelJob *s;
++
++    s = create_common(&job);
++    cancel_common(s);
++}
++
++static void test_cancel_running(void)
++{
++    BlockJob *job;
++    CancelJob *s;
++
++    s = create_common(&job);
++
++    block_job_start(job);
++    assert(job->status == BLOCK_JOB_STATUS_RUNNING);
++
++    cancel_common(s);
++}
++
++static void test_cancel_paused(void)
++{
++    BlockJob *job;
++    CancelJob *s;
++
++    s = create_common(&job);
++
++    block_job_start(job);
++    assert(job->status == BLOCK_JOB_STATUS_RUNNING);
++
++    block_job_user_pause(job, &error_abort);
++    block_job_enter(job);
++    assert(job->status == BLOCK_JOB_STATUS_PAUSED);
++
++    cancel_common(s);
++}
++
++static void test_cancel_ready(void)
++{
++    BlockJob *job;
++    CancelJob *s;
++
++    s = create_common(&job);
++
++    block_job_start(job);
++    assert(job->status == BLOCK_JOB_STATUS_RUNNING);
++
++    s->should_converge = true;
++    block_job_enter(job);
++    assert(job->status == BLOCK_JOB_STATUS_READY);
++
++    cancel_common(s);
++}
++
++static void test_cancel_standby(void)
++{
++    BlockJob *job;
++    CancelJob *s;
++
++    s = create_common(&job);
++
++    block_job_start(job);
++    assert(job->status == BLOCK_JOB_STATUS_RUNNING);
++
++    s->should_converge = true;
++    block_job_enter(job);
++    assert(job->status == BLOCK_JOB_STATUS_READY);
++
++    block_job_user_pause(job, &error_abort);
++    block_job_enter(job);
++    assert(job->status == BLOCK_JOB_STATUS_STANDBY);
++
++    cancel_common(s);
++}
++
++static void test_cancel_pending(void)
++{
++    BlockJob *job;
++    CancelJob *s;
++
++    s = create_common(&job);
++
++    block_job_start(job);
++    assert(job->status == BLOCK_JOB_STATUS_RUNNING);
++
++    s->should_converge = true;
++    block_job_enter(job);
++    assert(job->status == BLOCK_JOB_STATUS_READY);
++
++    block_job_complete(job, &error_abort);
++    block_job_enter(job);
++    while (!s->completed) {
++        aio_poll(qemu_get_aio_context(), true);
++    }
++    assert(job->status == BLOCK_JOB_STATUS_PENDING);
++
++    cancel_common(s);
++}
++
++static void test_cancel_concluded(void)
++{
++    BlockJob *job;
++    CancelJob *s;
++
++    s = create_common(&job);
++
++    block_job_start(job);
++    assert(job->status == BLOCK_JOB_STATUS_RUNNING);
++
++    s->should_converge = true;
++    block_job_enter(job);
++    assert(job->status == BLOCK_JOB_STATUS_READY);
++
++    block_job_complete(job, &error_abort);
++    block_job_enter(job);
++    while (!s->completed) {
++        aio_poll(qemu_get_aio_context(), true);
++    }
++    assert(job->status == BLOCK_JOB_STATUS_PENDING);
++
++    block_job_finalize(job, &error_abort);
++    assert(job->status == BLOCK_JOB_STATUS_CONCLUDED);
++
++    cancel_common(s);
++}
++
+ int main(int argc, char **argv)
+ {
+     qemu_init_main_loop(&error_abort);
+@@ -149,5 +367,12 @@ int main(int argc, char **argv)
+ 
+     g_test_init(&argc, &argv, NULL);
+     g_test_add_func("/blockjob/ids", test_job_ids);
++    g_test_add_func("/blockjob/cancel/created", test_cancel_created);
++    g_test_add_func("/blockjob/cancel/running", test_cancel_running);
++    g_test_add_func("/blockjob/cancel/paused", test_cancel_paused);
++    g_test_add_func("/blockjob/cancel/ready", test_cancel_ready);
++    g_test_add_func("/blockjob/cancel/standby", test_cancel_standby);
++    g_test_add_func("/blockjob/cancel/pending", test_cancel_pending);
++    g_test_add_func("/blockjob/cancel/concluded", test_cancel_concluded);
+     return g_test_run();
+ }
 -- 
 2.14.3
