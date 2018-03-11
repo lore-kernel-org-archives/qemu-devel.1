@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eupsn-0003ul-K5
+	(envelope-from <haozhong.zhang@intel.com>) id 1eupsn-0003um-Ka
 	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 20:34:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eupsk-0004oA-Es
+	(envelope-from <haozhong.zhang@intel.com>) id 1eupsm-0004oo-Ci
 	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 20:34:41 -0500
+Received: from mga01.intel.com ([192.55.52.88]:17414)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1eupsm-0004nm-1J
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 20:34:40 -0500
 From: Haozhong Zhang <haozhong.zhang@intel.com>
-Date: Sun, 11 Mar 2018 09:34:22 +0800
-Message-Id: <20180311013426.32610-2-haozhong.zhang@intel.com>
+Date: Sun, 11 Mar 2018 09:34:23 +0800
+Message-Id: <20180311013426.32610-3-haozhong.zhang@intel.com>
 In-Reply-To: <20180311013426.32610-1-haozhong.zhang@intel.com>
 References: <20180311013426.32610-1-haozhong.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH v5 1/5] pc-dimm: make qmp_pc_dimm_device_list()
- sort devices by address
+Subject: [Qemu-devel] [PATCH v5 2/5] qmp: distinguish PC-DIMM and NVDIMM in
+ MemoryDeviceInfoList
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,215 +26,150 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-ppc@nongnu.org
+Cc: mst@redhat.com, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, dgilbert@redhat.com
 
-Make qmp_pc_dimm_device_list() return sorted by start address
-list of devices so that it could be reused in places that
-would need sorted list*. Reuse existing pc_dimm_built_list()
-to get sorted list.
+It may need to treat PC-DIMM and NVDIMM differently, e.g., when
+deciding the necessity of non-volatile flag bit in SRAT memory
+affinity structures.
 
-While at it hide recursive callbacks from callers, so that:
+NVDIMMDeviceInfo, which inherits from PCDIMMDeviceInfo, is added to
+union type MemoryDeviceInfo to record information of NVDIMM devices.
+The NVDIMM-specific data is currently left empty and will be filled
+when necessary in the future.
 
-  qmp_pc_dimm_device_list(qdev_get_machine(), &list);
-
-could be replaced with simpler:
-
-  list = qmp_pc_dimm_device_list();
-
-* follow up patch will use it in build_srat()
+It also fixes "info memory-devices"/query-memory-devices which
+currently show nvdimm devices as dimm devices since
+object_dynamic_cast(obj, TYPE_PC_DIMM) happily cast nvdimm to
+TYPE_PC_DIMM which it's been inherited from.
 
 Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au> for ppc part
-Reviewed-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 ---
- hw/mem/pc-dimm.c         | 83 +++++++++++++++++++++++++-----------------------
- hw/ppc/spapr.c           |  3 +-
- include/hw/mem/pc-dimm.h |  2 +-
- numa.c                   |  4 +--
- qmp.c                    |  7 +---
- stubs/qmp_pc_dimm.c      |  4 +--
- 6 files changed, 50 insertions(+), 53 deletions(-)
+ hmp.c            | 14 +++++++++++---
+ hw/mem/pc-dimm.c | 10 +++++++++-
+ numa.c           | 19 +++++++++++++------
+ qapi/misc.json   |  6 +++++-
+ 4 files changed, 38 insertions(+), 11 deletions(-)
 
+diff --git a/hmp.c b/hmp.c
+index 016cb5c4f1..011a7c6f35 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -2421,7 +2421,18 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
+             switch (value->type) {
+             case MEMORY_DEVICE_INFO_KIND_DIMM:
+                 di = value->u.dimm.data;
++                break;
++
++            case MEMORY_DEVICE_INFO_KIND_NVDIMM:
++                di = value->u.nvdimm.data;
++                break;
++
++            default:
++                di = NULL;
++                break;
++            }
+ 
++            if (di) {
+                 monitor_printf(mon, "Memory device [%s]: \"%s\"\n",
+                                MemoryDeviceInfoKind_str(value->type),
+                                di->id ? di->id : "");
+@@ -2434,9 +2445,6 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
+                                di->hotplugged ? "true" : "false");
+                 monitor_printf(mon, "  hotpluggable: %s\n",
+                                di->hotpluggable ? "true" : "false");
+-                break;
+-            default:
+-                break;
+             }
+         }
+     }
 diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 6e74b61cb6..4d050fe2cd 100644
+index 4d050fe2cd..51350d9c2d 100644
 --- a/hw/mem/pc-dimm.c
 +++ b/hw/mem/pc-dimm.c
-@@ -162,45 +162,6 @@ uint64_t get_plugged_memory_size(void)
-     return pc_existing_dimms_capacity(&error_abort);
- }
+@@ -20,6 +20,7 @@
  
--int qmp_pc_dimm_device_list(Object *obj, void *opaque)
--{
--    MemoryDeviceInfoList ***prev = opaque;
--
--    if (object_dynamic_cast(obj, TYPE_PC_DIMM)) {
--        DeviceState *dev = DEVICE(obj);
--
--        if (dev->realized) {
--            MemoryDeviceInfoList *elem = g_new0(MemoryDeviceInfoList, 1);
--            MemoryDeviceInfo *info = g_new0(MemoryDeviceInfo, 1);
--            PCDIMMDeviceInfo *di = g_new0(PCDIMMDeviceInfo, 1);
--            DeviceClass *dc = DEVICE_GET_CLASS(obj);
--            PCDIMMDevice *dimm = PC_DIMM(obj);
--
--            if (dev->id) {
--                di->has_id = true;
--                di->id = g_strdup(dev->id);
--            }
--            di->hotplugged = dev->hotplugged;
--            di->hotpluggable = dc->hotpluggable;
--            di->addr = dimm->addr;
--            di->slot = dimm->slot;
--            di->node = dimm->node;
--            di->size = object_property_get_uint(OBJECT(dimm), PC_DIMM_SIZE_PROP,
--                                                NULL);
--            di->memdev = object_get_canonical_path(OBJECT(dimm->hostmem));
--
--            info->u.dimm.data = di;
--            elem->value = info;
--            elem->next = NULL;
--            **prev = elem;
--            *prev = &elem->next;
--        }
--    }
--
--    object_child_foreach(obj, qmp_pc_dimm_device_list, opaque);
--    return 0;
--}
--
- static int pc_dimm_slot2bitmap(Object *obj, void *opaque)
- {
-     unsigned long *bitmap = opaque;
-@@ -276,6 +237,50 @@ static int pc_dimm_built_list(Object *obj, void *opaque)
-     return 0;
- }
+ #include "qemu/osdep.h"
+ #include "hw/mem/pc-dimm.h"
++#include "hw/mem/nvdimm.h"
+ #include "qapi/error.h"
+ #include "qemu/config-file.h"
+ #include "qapi/visitor.h"
+@@ -250,6 +251,7 @@ MemoryDeviceInfoList *qmp_pc_dimm_device_list(void)
+         MemoryDeviceInfoList *elem = g_new0(MemoryDeviceInfoList, 1);
+         MemoryDeviceInfo *info = g_new0(MemoryDeviceInfo, 1);
+         PCDIMMDeviceInfo *di = g_new0(PCDIMMDeviceInfo, 1);
++        bool is_nvdimm = object_dynamic_cast(obj, TYPE_NVDIMM);
+         DeviceClass *dc = DEVICE_GET_CLASS(obj);
+         DeviceState *dev = DEVICE(obj);
  
-+MemoryDeviceInfoList *qmp_pc_dimm_device_list(void)
-+{
-+    GSList *dimms = NULL, *item;
-+    MemoryDeviceInfoList *list = NULL, *prev = NULL;
-+
-+    object_child_foreach(qdev_get_machine(), pc_dimm_built_list, &dimms);
-+
-+    for (item = dimms; item; item = g_slist_next(item)) {
-+        PCDIMMDevice *dimm = PC_DIMM(item->data);
-+        Object *obj = OBJECT(dimm);
-+        MemoryDeviceInfoList *elem = g_new0(MemoryDeviceInfoList, 1);
-+        MemoryDeviceInfo *info = g_new0(MemoryDeviceInfo, 1);
-+        PCDIMMDeviceInfo *di = g_new0(PCDIMMDeviceInfo, 1);
-+        DeviceClass *dc = DEVICE_GET_CLASS(obj);
-+        DeviceState *dev = DEVICE(obj);
-+
-+        if (dev->id) {
-+            di->has_id = true;
-+            di->id = g_strdup(dev->id);
-+        }
-+        di->hotplugged = dev->hotplugged;
-+        di->hotpluggable = dc->hotpluggable;
-+        di->addr = dimm->addr;
-+        di->slot = dimm->slot;
-+        di->node = dimm->node;
-+        di->size = object_property_get_uint(obj, PC_DIMM_SIZE_PROP, NULL);
-+        di->memdev = object_get_canonical_path(OBJECT(dimm->hostmem));
-+
-+        info->u.dimm.data = di;
-+        elem->value = info;
-+        elem->next = NULL;
-+        if (prev) {
-+            prev->next = elem;
+@@ -265,7 +267,13 @@ MemoryDeviceInfoList *qmp_pc_dimm_device_list(void)
+         di->size = object_property_get_uint(obj, PC_DIMM_SIZE_PROP, NULL);
+         di->memdev = object_get_canonical_path(OBJECT(dimm->hostmem));
+ 
+-        info->u.dimm.data = di;
++        if (!is_nvdimm) {
++            info->u.dimm.data = di;
++            info->type = MEMORY_DEVICE_INFO_KIND_DIMM;
 +        } else {
-+            list = elem;
++            info->u.nvdimm.data = di;
++            info->type = MEMORY_DEVICE_INFO_KIND_NVDIMM;
 +        }
-+        prev = elem;
-+    }
-+
-+    g_slist_free(dimms);
-+
-+    return list;
-+}
-+
- uint64_t pc_dimm_get_free_addr(uint64_t address_space_start,
-                                uint64_t address_space_size,
-                                uint64_t *hint, uint64_t align, uint64_t size,
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 7e1c858566..44a0670d11 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -722,8 +722,7 @@ static int spapr_populate_drconf_memory(sPAPRMachineState *spapr, void *fdt)
-     }
- 
-     if (hotplug_lmb_start) {
--        MemoryDeviceInfoList **prev = &dimms;
--        qmp_pc_dimm_device_list(qdev_get_machine(), &prev);
-+        dimms = qmp_pc_dimm_device_list();
-     }
- 
-     /* ibm,dynamic-memory */
-diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-index d83b957829..1fc479281c 100644
---- a/include/hw/mem/pc-dimm.h
-+++ b/include/hw/mem/pc-dimm.h
-@@ -93,7 +93,7 @@ uint64_t pc_dimm_get_free_addr(uint64_t address_space_start,
- 
- int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
- 
--int qmp_pc_dimm_device_list(Object *obj, void *opaque);
-+MemoryDeviceInfoList *qmp_pc_dimm_device_list(void);
- uint64_t pc_existing_dimms_capacity(Error **errp);
- uint64_t get_plugged_memory_size(void);
- void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+         elem->value = info;
+         elem->next = NULL;
+         if (prev) {
 diff --git a/numa.c b/numa.c
-index 398e2c9a85..94427046ec 100644
+index 94427046ec..1116c90af9 100644
 --- a/numa.c
 +++ b/numa.c
-@@ -520,12 +520,10 @@ void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
+@@ -529,18 +529,25 @@ static void numa_stat_memory_devices(NumaNodeMem node_mem[])
  
- static void numa_stat_memory_devices(NumaNodeMem node_mem[])
- {
--    MemoryDeviceInfoList *info_list = NULL;
--    MemoryDeviceInfoList **prev = &info_list;
-+    MemoryDeviceInfoList *info_list = qmp_pc_dimm_device_list();
-     MemoryDeviceInfoList *info;
-     PCDIMMDeviceInfo     *pcdimm_info;
- 
--    qmp_pc_dimm_device_list(qdev_get_machine(), &prev);
-     for (info = info_list; info; info = info->next) {
-         MemoryDeviceInfo *value = info->value;
- 
-diff --git a/qmp.c b/qmp.c
-index 8c7d1cc479..4b2517d8b5 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -731,12 +731,7 @@ void qmp_object_del(const char *id, Error **errp)
- 
- MemoryDeviceInfoList *qmp_query_memory_devices(Error **errp)
- {
--    MemoryDeviceInfoList *head = NULL;
--    MemoryDeviceInfoList **prev = &head;
+         if (value) {
+             switch (value->type) {
+-            case MEMORY_DEVICE_INFO_KIND_DIMM: {
++            case MEMORY_DEVICE_INFO_KIND_DIMM:
+                 pcdimm_info = value->u.dimm.data;
++                break;
++
++            case MEMORY_DEVICE_INFO_KIND_NVDIMM:
++                pcdimm_info = value->u.nvdimm.data;
++                break;
++
++            default:
++                pcdimm_info = NULL;
++                break;
++            }
++
++            if (pcdimm_info) {
+                 node_mem[pcdimm_info->node].node_mem += pcdimm_info->size;
+                 if (pcdimm_info->hotpluggable && pcdimm_info->hotplugged) {
+                     node_mem[pcdimm_info->node].node_plugged_mem +=
+                         pcdimm_info->size;
+                 }
+-                break;
+-            }
 -
--    qmp_pc_dimm_device_list(qdev_get_machine(), &prev);
--
--    return head;
-+    return qmp_pc_dimm_device_list();
- }
+-            default:
+-                break;
+             }
+         }
+     }
+diff --git a/qapi/misc.json b/qapi/misc.json
+index bcd5d10778..6bf082f612 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -2852,7 +2852,11 @@
+ #
+ # Since: 2.1
+ ##
+-{ 'union': 'MemoryDeviceInfo', 'data': {'dimm': 'PCDIMMDeviceInfo'} }
++{ 'union': 'MemoryDeviceInfo',
++  'data': { 'dimm': 'PCDIMMDeviceInfo',
++            'nvdimm': 'PCDIMMDeviceInfo'
++          }
++}
  
- ACPIOSTInfoList *qmp_query_acpi_ospm_status(Error **errp)
-diff --git a/stubs/qmp_pc_dimm.c b/stubs/qmp_pc_dimm.c
-index 9ddc4f619a..b6b2cca89e 100644
---- a/stubs/qmp_pc_dimm.c
-+++ b/stubs/qmp_pc_dimm.c
-@@ -2,9 +2,9 @@
- #include "qom/object.h"
- #include "hw/mem/pc-dimm.h"
- 
--int qmp_pc_dimm_device_list(Object *obj, void *opaque)
-+MemoryDeviceInfoList *qmp_pc_dimm_device_list(void)
- {
--   return 0;
-+   return NULL;
- }
- 
- uint64_t get_plugged_memory_size(void)
+ ##
+ # @query-memory-devices:
 -- 
 2.14.1
