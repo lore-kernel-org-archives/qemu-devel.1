@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eurFj-0004CK-Up
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 22:02:31 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1eurFo-0004F0-VI
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 22:02:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eurFh-00024g-N5
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 22:02:28 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1eurFn-00026m-Tw
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 22:02:33 -0500
+Received: from mga04.intel.com ([192.55.52.120]:52978)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1eurFn-00023F-HG
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 22:02:31 -0500
 From: Haozhong Zhang <haozhong.zhang@intel.com>
-Date: Sun, 11 Mar 2018 11:02:11 +0800
-Message-Id: <20180311030215.11488-2-haozhong.zhang@intel.com>
+Date: Sun, 11 Mar 2018 11:02:13 +0800
+Message-Id: <20180311030215.11488-4-haozhong.zhang@intel.com>
 In-Reply-To: <20180311030215.11488-1-haozhong.zhang@intel.com>
 References: <20180311030215.11488-1-haozhong.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH v6 1/5] pc-dimm: make qmp_pc_dimm_device_list()
- sort devices by address
+Subject: [Qemu-devel] [PATCH v6 3/5] hw/acpi-build: build SRAT memory
+ affinity structures for DIMM devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,215 +26,106 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-ppc@nongnu.org
+Cc: mst@redhat.com, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>
 
-Make qmp_pc_dimm_device_list() return sorted by start address
-list of devices so that it could be reused in places that
-would need sorted list*. Reuse existing pc_dimm_built_list()
-to get sorted list.
+ACPI 6.2A Table 5-129 "SPA Range Structure" requires the proximity
+domain of a NVDIMM SPA range must match with corresponding entry in
+SRAT table.
 
-While at it hide recursive callbacks from callers, so that:
+The address ranges of vNVDIMM in QEMU are allocated from the
+hot-pluggable address space, which is entirely covered by one SRAT
+memory affinity structure. However, users can set the vNVDIMM
+proximity domain in NFIT SPA range structure by the 'node' property of
+'-device nvdimm' to a value different than the one in the above SRAT
+memory affinity structure.
 
-  qmp_pc_dimm_device_list(qdev_get_machine(), &list);
+In order to solve such proximity domain mismatch, this patch builds
+one SRAT memory affinity structure for each DIMM device present at
+boot time, including both PC-DIMM and NVDIMM, with the proximity
+domain specified in '-device pc-dimm' or '-device nvdimm'.
 
-could be replaced with simpler:
-
-  list = qmp_pc_dimm_device_list();
-
-* follow up patch will use it in build_srat()
+The remaining hot-pluggable address space is covered by one or multiple
+SRAT memory affinity structures with the proximity domain of the last
+node as before.
 
 Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au> for ppc part
-Reviewed-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 ---
- hw/mem/pc-dimm.c         | 83 +++++++++++++++++++++++++-----------------------
- hw/ppc/spapr.c           |  3 +-
- include/hw/mem/pc-dimm.h |  2 +-
- numa.c                   |  4 +--
- qmp.c                    |  7 +---
- stubs/qmp_pc_dimm.c      |  4 +--
- 6 files changed, 50 insertions(+), 53 deletions(-)
+ hw/i386/acpi-build.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 52 insertions(+), 4 deletions(-)
 
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 6e74b61cb6..4d050fe2cd 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -162,45 +162,6 @@ uint64_t get_plugged_memory_size(void)
-     return pc_existing_dimms_capacity(&error_abort);
- }
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index deb440f286..2c1f694da4 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2323,6 +2323,55 @@ build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+ #define HOLE_640K_START  (640 * 1024)
+ #define HOLE_640K_END   (1024 * 1024)
  
--int qmp_pc_dimm_device_list(Object *obj, void *opaque)
--{
--    MemoryDeviceInfoList ***prev = opaque;
--
--    if (object_dynamic_cast(obj, TYPE_PC_DIMM)) {
--        DeviceState *dev = DEVICE(obj);
--
--        if (dev->realized) {
--            MemoryDeviceInfoList *elem = g_new0(MemoryDeviceInfoList, 1);
--            MemoryDeviceInfo *info = g_new0(MemoryDeviceInfo, 1);
--            PCDIMMDeviceInfo *di = g_new0(PCDIMMDeviceInfo, 1);
--            DeviceClass *dc = DEVICE_GET_CLASS(obj);
--            PCDIMMDevice *dimm = PC_DIMM(obj);
--
--            if (dev->id) {
--                di->has_id = true;
--                di->id = g_strdup(dev->id);
--            }
--            di->hotplugged = dev->hotplugged;
--            di->hotpluggable = dc->hotpluggable;
--            di->addr = dimm->addr;
--            di->slot = dimm->slot;
--            di->node = dimm->node;
--            di->size = object_property_get_uint(OBJECT(dimm), PC_DIMM_SIZE_PROP,
--                                                NULL);
--            di->memdev = object_get_canonical_path(OBJECT(dimm->hostmem));
--
--            info->u.dimm.data = di;
--            elem->value = info;
--            elem->next = NULL;
--            **prev = elem;
--            *prev = &elem->next;
--        }
--    }
--
--    object_child_foreach(obj, qmp_pc_dimm_device_list, opaque);
--    return 0;
--}
--
- static int pc_dimm_slot2bitmap(Object *obj, void *opaque)
- {
-     unsigned long *bitmap = opaque;
-@@ -276,6 +237,50 @@ static int pc_dimm_built_list(Object *obj, void *opaque)
-     return 0;
- }
- 
-+MemoryDeviceInfoList *qmp_pc_dimm_device_list(void)
++static void build_srat_hotpluggable_memory(GArray *table_data, uint64_t base,
++                                           uint64_t len, int default_node)
 +{
-+    GSList *dimms = NULL, *item;
-+    MemoryDeviceInfoList *list = NULL, *prev = NULL;
++    MemoryDeviceInfoList *info_list = qmp_pc_dimm_device_list();
++    MemoryDeviceInfoList *info;
++    MemoryDeviceInfo *mi;
++    PCDIMMDeviceInfo *di;
++    uint64_t end = base + len, cur, size;
++    bool is_nvdimm;
++    AcpiSratMemoryAffinity *numamem;
++    MemoryAffinityFlags flags;
 +
-+    object_child_foreach(qdev_get_machine(), pc_dimm_built_list, &dimms);
++    for (cur = base, info = info_list;
++         cur < end;
++         cur += size, info = info->next) {
++        numamem = acpi_data_push(table_data, sizeof *numamem);
 +
-+    for (item = dimms; item; item = g_slist_next(item)) {
-+        PCDIMMDevice *dimm = PC_DIMM(item->data);
-+        Object *obj = OBJECT(dimm);
-+        MemoryDeviceInfoList *elem = g_new0(MemoryDeviceInfoList, 1);
-+        MemoryDeviceInfo *info = g_new0(MemoryDeviceInfo, 1);
-+        PCDIMMDeviceInfo *di = g_new0(PCDIMMDeviceInfo, 1);
-+        DeviceClass *dc = DEVICE_GET_CLASS(obj);
-+        DeviceState *dev = DEVICE(obj);
-+
-+        if (dev->id) {
-+            di->has_id = true;
-+            di->id = g_strdup(dev->id);
++        if (!info) {
++            build_srat_memory(numamem, cur, end - cur, default_node,
++                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
++            break;
 +        }
-+        di->hotplugged = dev->hotplugged;
-+        di->hotpluggable = dc->hotpluggable;
-+        di->addr = dimm->addr;
-+        di->slot = dimm->slot;
-+        di->node = dimm->node;
-+        di->size = object_property_get_uint(obj, PC_DIMM_SIZE_PROP, NULL);
-+        di->memdev = object_get_canonical_path(OBJECT(dimm->hostmem));
 +
-+        info->u.dimm.data = di;
-+        elem->value = info;
-+        elem->next = NULL;
-+        if (prev) {
-+            prev->next = elem;
-+        } else {
-+            list = elem;
++        mi = info->value;
++        is_nvdimm = (mi->type == MEMORY_DEVICE_INFO_KIND_NVDIMM);
++        di = !is_nvdimm ? mi->u.dimm.data : mi->u.nvdimm.data;
++
++        if (cur < di->addr) {
++            build_srat_memory(numamem, cur, di->addr - cur, default_node,
++                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
++            numamem = acpi_data_push(table_data, sizeof *numamem);
 +        }
-+        prev = elem;
++
++        size = di->size;
++
++        flags = MEM_AFFINITY_ENABLED;
++        if (di->hotpluggable) {
++            flags |= MEM_AFFINITY_HOTPLUGGABLE;
++        }
++        if (is_nvdimm) {
++            flags |= MEM_AFFINITY_NON_VOLATILE;
++        }
++
++        build_srat_memory(numamem, di->addr, size, di->node, flags);
 +    }
 +
-+    g_slist_free(dimms);
-+
-+    return list;
++    qapi_free_MemoryDeviceInfoList(info_list);
 +}
 +
- uint64_t pc_dimm_get_free_addr(uint64_t address_space_start,
-                                uint64_t address_space_size,
-                                uint64_t *hint, uint64_t align, uint64_t size,
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 7e1c858566..44a0670d11 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -722,8 +722,7 @@ static int spapr_populate_drconf_memory(sPAPRMachineState *spapr, void *fdt)
+ static void
+ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+ {
+@@ -2434,10 +2483,9 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+      * providing _PXM method if necessary.
+      */
+     if (hotplugabble_address_space_size) {
+-        numamem = acpi_data_push(table_data, sizeof *numamem);
+-        build_srat_memory(numamem, pcms->hotplug_memory.base,
+-                          hotplugabble_address_space_size, pcms->numa_nodes - 1,
+-                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
++        build_srat_hotpluggable_memory(table_data, pcms->hotplug_memory.base,
++                                       hotplugabble_address_space_size,
++                                       pcms->numa_nodes - 1);
      }
  
-     if (hotplug_lmb_start) {
--        MemoryDeviceInfoList **prev = &dimms;
--        qmp_pc_dimm_device_list(qdev_get_machine(), &prev);
-+        dimms = qmp_pc_dimm_device_list();
-     }
- 
-     /* ibm,dynamic-memory */
-diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-index d83b957829..1fc479281c 100644
---- a/include/hw/mem/pc-dimm.h
-+++ b/include/hw/mem/pc-dimm.h
-@@ -93,7 +93,7 @@ uint64_t pc_dimm_get_free_addr(uint64_t address_space_start,
- 
- int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
- 
--int qmp_pc_dimm_device_list(Object *obj, void *opaque);
-+MemoryDeviceInfoList *qmp_pc_dimm_device_list(void);
- uint64_t pc_existing_dimms_capacity(Error **errp);
- uint64_t get_plugged_memory_size(void);
- void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
-diff --git a/numa.c b/numa.c
-index 398e2c9a85..94427046ec 100644
---- a/numa.c
-+++ b/numa.c
-@@ -520,12 +520,10 @@ void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
- 
- static void numa_stat_memory_devices(NumaNodeMem node_mem[])
- {
--    MemoryDeviceInfoList *info_list = NULL;
--    MemoryDeviceInfoList **prev = &info_list;
-+    MemoryDeviceInfoList *info_list = qmp_pc_dimm_device_list();
-     MemoryDeviceInfoList *info;
-     PCDIMMDeviceInfo     *pcdimm_info;
- 
--    qmp_pc_dimm_device_list(qdev_get_machine(), &prev);
-     for (info = info_list; info; info = info->next) {
-         MemoryDeviceInfo *value = info->value;
- 
-diff --git a/qmp.c b/qmp.c
-index 8c7d1cc479..4b2517d8b5 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -731,12 +731,7 @@ void qmp_object_del(const char *id, Error **errp)
- 
- MemoryDeviceInfoList *qmp_query_memory_devices(Error **errp)
- {
--    MemoryDeviceInfoList *head = NULL;
--    MemoryDeviceInfoList **prev = &head;
--
--    qmp_pc_dimm_device_list(qdev_get_machine(), &prev);
--
--    return head;
-+    return qmp_pc_dimm_device_list();
- }
- 
- ACPIOSTInfoList *qmp_query_acpi_ospm_status(Error **errp)
-diff --git a/stubs/qmp_pc_dimm.c b/stubs/qmp_pc_dimm.c
-index 9ddc4f619a..b6b2cca89e 100644
---- a/stubs/qmp_pc_dimm.c
-+++ b/stubs/qmp_pc_dimm.c
-@@ -2,9 +2,9 @@
- #include "qom/object.h"
- #include "hw/mem/pc-dimm.h"
- 
--int qmp_pc_dimm_device_list(Object *obj, void *opaque)
-+MemoryDeviceInfoList *qmp_pc_dimm_device_list(void)
- {
--   return 0;
-+   return NULL;
- }
- 
- uint64_t get_plugged_memory_size(void)
+     build_header(linker, table_data,
 -- 
 2.14.1
