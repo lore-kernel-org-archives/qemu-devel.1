@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eurDR-0002hk-Su
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 22:00:06 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1eurDz-00038H-B5
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 22:00:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eurDN-0000wt-La
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 22:00:05 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50914 helo=mx1.redhat.com)
+	(envelope-from <haozhong.zhang@intel.com>) id 1eurDv-0001Sp-7W
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 22:00:39 -0500
+Received: from mga09.intel.com ([134.134.136.24]:7544)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eurDN-0000wm-Hl
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 22:00:01 -0500
-References: <20180309090006.10018-1-peterx@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c0b6d582-743b-f2c1-5eef-a1577e73ae80@redhat.com>
-Date: Sat, 10 Mar 2018 20:59:38 -0600
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1eurDu-0001RJ-UL
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 22:00:35 -0500
+Date: Sun, 11 Mar 2018 11:00:30 +0800
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Message-ID: <20180311030030.xow4nzssgxtxdpmu@hz-desktop>
+References: <20180311013426.32610-1-haozhong.zhang@intel.com>
+	<20180311013426.32610-3-haozhong.zhang@intel.com>
+	<c8e811b5-251a-6621-6ada-e894d7eaee43@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180309090006.10018-1-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 00/23] QMP: out-of-band (OOB) execution
- support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c8e811b5-251a-6621-6ada-e894d7eaee43@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 2/5] qmp: distinguish PC-DIMM and NVDIMM
+ in MemoryDeviceInfoList
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +30,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Markus Armbruster <armbru@redhat.com>, dgilbert@redhat.com
 
-On 03/09/2018 02:59 AM, Peter Xu wrote:
-> Based-on: <20180306053320.15401-1-peterx@redhat.com>
+On 03/10/18 20:31 -0600, Eric Blake wrote:
+> On 03/10/2018 07:34 PM, Haozhong Zhang wrote:
+> > It may need to treat PC-DIMM and NVDIMM differently, e.g., when
+> > deciding the necessity of non-volatile flag bit in SRAT memory
+> > affinity structures.
+> > 
+> > NVDIMMDeviceInfo, which inherits from PCDIMMDeviceInfo, is added to
+> > union type MemoryDeviceInfo to record information of NVDIMM devices.
+> > The NVDIMM-specific data is currently left empty and will be filled
+> > when necessary in the future.
 > 
-> The series is based on the following series:
-> 
->    [PATCH v2 0/9] chardev: qio related non-default context support
->    (actually patch 9 is based on version 2.1, Dan's version)
-> 
-> This version only contains some trivial changes, most of the work is
-> posted separately in either the QIO or CHARDEV series.
-> 
-> Four days until soft freeze.  Hmm...
-> 
-> Please review.  Thanks,
-> 
-> v8:
-> - fix up doc patch as suggested [Eric]
-> - rename functions in form of X_get_Y() or X_bh() [Stefan]
-> - English fixes [Stefan]
-> - make sure to kick iothread after suspend count update [Stefan]
-> - remove the hack to remove fd in monitor_init(), since now we have
->    the QIO/CHARDEV series to solve the root problem.
+> Stale comment.
 
-Still a lot that I had to clean up (in part due to conflicts with other 
-pending patches that also touch qapi), but given the utility of this 
-feature, and the impending deadline for freeze, I've gone ahead and done 
-the cleanup work.  Your patches are now stages on my QAPI tree.
+Oops, my stupid miss. I'll send another version soon. 
 
-git://repo.or.cz/qemu/ericb.git qapi
-http://repo.or.cz/qemu/ericb.git/shortlog/refs/heads/qapi
+Thanks,
+Haozhong
 
-Note that I had some ideas for followup patches (mainly strengthening 
-the testsuite, which is typically safe early on in freeze because it is 
-not introducing features but strengthening the quality of the release).
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> 
+> > 
+> > It also fixes "info memory-devices"/query-memory-devices which
+> > currently show nvdimm devices as dimm devices since
+> > object_dynamic_cast(obj, TYPE_PC_DIMM) happily cast nvdimm to
+> > TYPE_PC_DIMM which it's been inherited from.
+> > 
+> > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> > ---
+> >   hmp.c            | 14 +++++++++++---
+> >   hw/mem/pc-dimm.c | 10 +++++++++-
+> >   numa.c           | 19 +++++++++++++------
+> >   qapi/misc.json   |  6 +++++-
+> >   4 files changed, 38 insertions(+), 11 deletions(-)
+> > 
+> 
+> > +++ b/qapi/misc.json
+> > @@ -2852,7 +2852,11 @@
+> >   #
+> >   # Since: 2.1
+> 
+> Perhaps this could somehow use a '(since 2.12)' tag; but as this is a
+> "simple union" (which is anything but simple in the QAPI generator), and
+> we're trying to avoid introducing new ones where possible, I'm fine
+> overlooking it for now.
+> 
+> >   ##
+> > -{ 'union': 'MemoryDeviceInfo', 'data': {'dimm': 'PCDIMMDeviceInfo'} }
+> > +{ 'union': 'MemoryDeviceInfo',
+> > +  'data': { 'dimm': 'PCDIMMDeviceInfo',
+> > +            'nvdimm': 'PCDIMMDeviceInfo'
+> > +          }
+> > +}
+> 
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> 
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
