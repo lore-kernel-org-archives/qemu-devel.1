@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1euvtF-0000aL-Gu
-	for qemu-devel@nongnu.org; Sun, 11 Mar 2018 03:59:34 -0400
+	(envelope-from <bounces@canonical.com>) id 1euyPO-00065O-Vm
+	for qemu-devel@nongnu.org; Sun, 11 Mar 2018 06:40:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1euvtE-0007WK-AI
-	for qemu-devel@nongnu.org; Sun, 11 Mar 2018 03:59:33 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:40602)
+	(envelope-from <bounces@canonical.com>) id 1euyPL-0002mv-RR
+	for qemu-devel@nongnu.org; Sun, 11 Mar 2018 06:40:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34136)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1euvtD-0007Vw-Vi
-	for qemu-devel@nongnu.org; Sun, 11 Mar 2018 03:59:32 -0400
-Received: by mail-wm0-x230.google.com with SMTP id t6so10625753wmt.5
-	for <qemu-devel@nongnu.org>; Sat, 10 Mar 2018 23:59:31 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1euyPL-0002lU-Hi
+	for qemu-devel@nongnu.org; Sun, 11 Mar 2018 06:40:51 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1euyPK-0001ur-Iu
+	for <qemu-devel@nongnu.org>; Sun, 11 Mar 2018 10:40:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8DEF92E80C9
+	for <qemu-devel@nongnu.org>; Sun, 11 Mar 2018 10:40:50 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <0fa05445-5342-7e29-12dc-d3ac1d86ec99@redhat.com>
-References: <1520716927-17068-1-git-send-email-zhangckid@gmail.com>
-	<1520716927-17068-12-git-send-email-zhangckid@gmail.com>
-	<0fa05445-5342-7e29-12dc-d3ac1d86ec99@redhat.com>
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Sun, 11 Mar 2018 15:59:30 +0800
-Message-ID: <CAK3tnvLtyDrYTL4MKVzjjGksJNybzaUr+6Woq016ESTsj-pJww@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V5 11/17] qapi: Add new command to query
- colo status
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 11 Mar 2018 10:31:03 -0000
+From: =?utf-8?b?5p2O56mX5oGS?= <1754542@bugs.launchpad.net>
+Reply-To: Bug 1754542 <1754542@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152056405865.7543.8980677605113063936.malonedeb@wampee.canonical.com>
+Message-Id: <152076426382.3778.8799867969948033997.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1754542] Re: colo: secondary vm crash when
+ execute x-colo-lost-heartbeat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,113 +37,331 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: qemu-devel@nongnu.org
 
-On Sun, Mar 11, 2018 at 5:33 AM, Eric Blake <eblake@redhat.com> wrote:
+** Description changed:
 
-> On 03/10/2018 03:22 PM, Zhang Chen wrote:
->
->> Libvirt or other high level sofware can use this command query colo
->> status.
->>
->
-> s/sofware/software/
+  I use Arch Linux x86_64
+- both qemu 2.11.1 and Zhang Chen's(https://github.com/zhangckid/qemu/commi=
+ts/colo-with-virtio-net-internal-jul10)
++ Zhang Chen's(https://github.com/zhangckid/qemu/commits/colo-with-virtio-n=
+et-internal-jul10)
+  Following document 'COLO-FT.txt',
+  I test colo feature on my hosts
+  =
+
+  I run this command
+  Primary:
+  sudo qemu-system-x86_64 -boot c   -enable-kvm -m 2048 -smp 2  -qmp stdio =
+ -name primary \
+  -device piix3-usb-uhci \
+  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
+  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
+  -drive if=3Dvirtio,id=3Dcolo-disk0,driver=3Dquorum,read-pattern=3Dfifo,vo=
+te-threshold=3D1,children.0.file.filename=3D/var/lib/libvirt/images/1.raw,c=
+hildren.0.driver=3Draw -S
+  =
+
+  Secondary:
+  sudo qemu-system-x86_64 -boot c -enable-kvm -m 2048 -smp 2 -qmp stdio  -n=
+ame secondary \
+  -device piix3-usb-uhci \
+  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
+  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
+  -drive if=3Dnone,id=3Dcolo-disk0,file.filename=3D/var/lib/libvirt/images/=
+2.raw,driver=3Draw,node-name=3Dnode0 \
+  -drive if=3Dvirtio,id=3Dactive-disk0,driver=3Dreplication,mode=3Dsecondar=
+y,\
+  file.driver=3Dqcow2,top-id=3Dactive-disk0,\
+  file.file.filename=3D/mnt/ramfs/active_disk.img,\
+  file.backing.driver=3Dqcow2,\
+  file.backing.file.filename=3D/mnt/ramfs/hidden_disk.img,\
+  file.backing.backing=3Dcolo-disk0 \
+  -incoming tcp:0:8888
+  =
+
+  Secondary:
+  {'execute':'qmp_capabilities'}
+  { 'execute': 'nbd-server-start',
+  =C2=A0=C2=A0'arguments': {'addr': {'type': 'inet', 'data': {'host': '192.=
+168.0.33', 'port': '8889'} } }
+  }
+  {'execute': 'nbd-server-add', 'arguments': {'device': 'colo-disk0', 'writ=
+able': true } }
+  =
+
+  Primary:
+  {'execute':'qmp_capabilities'}
+  { 'execute': 'human-monitor-command',
+  =C2=A0=C2=A0'arguments': {'command-line': 'drive_add -n buddy driver=3Dre=
+plication,mode=3Dprimary,file.driver=3Dnbd,file.host=3D192.168.0.34,file.po=
+rt=3D8889,file.export=3Dcolo-disk0,node-name=3Dnbd_client0'}}
+  { 'execute':'x-blockdev-change', 'arguments':{'parent': 'colo-disk0', 'no=
+de': 'nbd_client0' } }
+  { 'execute': 'migrate-set-capabilities',
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0'arguments': {'capabilities': [ {'cap=
+ability': 'x-colo', 'state': true } ] } }
+  { 'execute': 'migrate', 'arguments': {'uri': 'tcp:192.168.0.34:8888' } }
+  { 'execute': 'migrate-set-parameters' , 'arguments':{ 'x-checkpoint-delay=
+': 2000 } }
+  =
+
+- Above are all OK.Two VM syncing.
+- =
+
++ And two VM with cash =
+
+  Primary:
+- { 'execute': 'x-blockdev-change', 'arguments': {'parent': 'colo-disk0', '=
+child': 'children.1'}}
+- { 'execute': 'human-monitor-command','arguments': {'command-line': 'drive=
+_del blk-buddy0'}}
++ {"timestamp": {"seconds": 1520763655, "microseconds": 511415}, "event": "=
+RESUME"}
++ [1]    329 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -bo=
+ot c -enable-kvm -m 2048 -smp 2 -qm
+  =
+
+  Secondary:
+- { 'execute': 'nbd-server-stop' }
+- { 'execute': 'x-colo-lost-heartbeat' }
++ {"timestamp": {"seconds": 1520763655, "microseconds": 510907}, "event": "=
+RESUME"}
++ [1]    367 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -bo=
+ot c -enable-kvm -m 2048 -smp 2 -qm
+  =
+
+- But When I execute x-colo-lost-heartbeat.Primary run Secondary cash
+- =
+
+- =C2=A0{ 'execute': 'nbd-server-stop' }
+- {"return": {}}
+- qemu-system-x86_64: Disconnect client, due to: Unexpected end-of-file bef=
+ore all bytes were read
+- =C2=A0{ 'execute': 'x-colo-lost-heartbeat' }
+- {"return": {}}
+- qemu-system-x86_64: Can't receive COLO message: Input/output error
+- **
+- ERROR:/build/qemu/src/qemu-2.11.1/qom/object.c:907:object_unref: assertio=
+n failed (obj->ref > 0): (0 > 0)
+- [1]    2972 abort      sudo /usr/bin/qemu-system-x86_64 -boot c -enable-k=
+vm -m 2048 -smp 2 -qmp stdi
++ if use qemu 2.11.1 =
+
++ The sync will success,but when Secondary VM execute x-colo-lost-heartbeat=
+,Secondary VM will crash
+
+** Description changed:
+
+  I use Arch Linux x86_64
+  Zhang Chen's(https://github.com/zhangckid/qemu/commits/colo-with-virtio-n=
+et-internal-jul10)
+  Following document 'COLO-FT.txt',
+  I test colo feature on my hosts
+  =
+
+  I run this command
+  Primary:
+  sudo qemu-system-x86_64 -boot c   -enable-kvm -m 2048 -smp 2  -qmp stdio =
+ -name primary \
+  -device piix3-usb-uhci \
+  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
+  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
+  -drive if=3Dvirtio,id=3Dcolo-disk0,driver=3Dquorum,read-pattern=3Dfifo,vo=
+te-threshold=3D1,children.0.file.filename=3D/var/lib/libvirt/images/1.raw,c=
+hildren.0.driver=3Draw -S
+  =
+
+  Secondary:
+  sudo qemu-system-x86_64 -boot c -enable-kvm -m 2048 -smp 2 -qmp stdio  -n=
+ame secondary \
+  -device piix3-usb-uhci \
+  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
+  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
+  -drive if=3Dnone,id=3Dcolo-disk0,file.filename=3D/var/lib/libvirt/images/=
+2.raw,driver=3Draw,node-name=3Dnode0 \
+  -drive if=3Dvirtio,id=3Dactive-disk0,driver=3Dreplication,mode=3Dsecondar=
+y,\
+  file.driver=3Dqcow2,top-id=3Dactive-disk0,\
+  file.file.filename=3D/mnt/ramfs/active_disk.img,\
+  file.backing.driver=3Dqcow2,\
+  file.backing.file.filename=3D/mnt/ramfs/hidden_disk.img,\
+  file.backing.backing=3Dcolo-disk0 \
+  -incoming tcp:0:8888
+  =
+
+  Secondary:
+  {'execute':'qmp_capabilities'}
+  { 'execute': 'nbd-server-start',
+  =C2=A0=C2=A0'arguments': {'addr': {'type': 'inet', 'data': {'host': '192.=
+168.0.33', 'port': '8889'} } }
+  }
+  {'execute': 'nbd-server-add', 'arguments': {'device': 'colo-disk0', 'writ=
+able': true } }
+  =
+
+  Primary:
+  {'execute':'qmp_capabilities'}
+  { 'execute': 'human-monitor-command',
+  =C2=A0=C2=A0'arguments': {'command-line': 'drive_add -n buddy driver=3Dre=
+plication,mode=3Dprimary,file.driver=3Dnbd,file.host=3D192.168.0.34,file.po=
+rt=3D8889,file.export=3Dcolo-disk0,node-name=3Dnbd_client0'}}
+  { 'execute':'x-blockdev-change', 'arguments':{'parent': 'colo-disk0', 'no=
+de': 'nbd_client0' } }
+  { 'execute': 'migrate-set-capabilities',
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0'arguments': {'capabilities': [ {'cap=
+ability': 'x-colo', 'state': true } ] } }
+  { 'execute': 'migrate', 'arguments': {'uri': 'tcp:192.168.0.34:8888' } }
+  { 'execute': 'migrate-set-parameters' , 'arguments':{ 'x-checkpoint-delay=
+': 2000 } }
+  =
+
+- And two VM with cash =
+
++ And two VM with cash
+  Primary:
+  {"timestamp": {"seconds": 1520763655, "microseconds": 511415}, "event": "=
+RESUME"}
+  [1]    329 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -bo=
+ot c -enable-kvm -m 2048 -smp 2 -qm
+  =
+
+  Secondary:
+  {"timestamp": {"seconds": 1520763655, "microseconds": 510907}, "event": "=
+RESUME"}
+  [1]    367 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -bo=
+ot c -enable-kvm -m 2048 -smp 2 -qm
+  =
+
+- if use qemu 2.11.1 =
+
++ =
+
++ =
+
++ ---------------------------------------------------------------------
++ if use qemu 2.11.1
+  The sync will success,but when Secondary VM execute x-colo-lost-heartbeat=
+,Secondary VM will crash
++ Secondary:
++  { 'execute': 'nbd-server-stop' }
++  { 'execute': 'x-colo-lost-heartbeat' }{"return": {}}
++ qemu-system-x86_64: Disconnect client, due to: Unexpected end-of-file bef=
+ore all bytes were read
++ =
+
++ {"return": {}}
++ qemu-system-x86_64: Can't receive COLO message: Input/output error
++ **
++ ERROR:/build/qemu/src/qemu-2.11.1/qom/object.c:907:object_unref: assertio=
+n failed (obj->ref > 0): (0 > 0)
++ [1]    1276 abort      sudo /usr/bin/qemu-system-x86_64 -boot c -enable-k=
+vm -m 2048 -smp 2 -qmp stdi
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1754542
+
+Title:
+  colo:  vm crash with segmentation fault
+
+Status in QEMU:
+  New
+
+Bug description:
+  I use Arch Linux x86_64
+  Zhang Chen's(https://github.com/zhangckid/qemu/commits/colo-with-virtio-n=
+et-internal-jul10)
+  Following document 'COLO-FT.txt',
+  I test colo feature on my hosts
+
+  I run this command
+  Primary:
+  sudo qemu-system-x86_64 -boot c   -enable-kvm -m 2048 -smp 2  -qmp stdio =
+ -name primary \
+  -device piix3-usb-uhci \
+  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
+  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
+  -drive if=3Dvirtio,id=3Dcolo-disk0,driver=3Dquorum,read-pattern=3Dfifo,vo=
+te-threshold=3D1,children.0.file.filename=3D/var/lib/libvirt/images/1.raw,c=
+hildren.0.driver=3Draw -S
+
+  Secondary:
+  sudo qemu-system-x86_64 -boot c -enable-kvm -m 2048 -smp 2 -qmp stdio  -n=
+ame secondary \
+  -device piix3-usb-uhci \
+  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
+  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
+  -drive if=3Dnone,id=3Dcolo-disk0,file.filename=3D/var/lib/libvirt/images/=
+2.raw,driver=3Draw,node-name=3Dnode0 \
+  -drive if=3Dvirtio,id=3Dactive-disk0,driver=3Dreplication,mode=3Dsecondar=
+y,\
+  file.driver=3Dqcow2,top-id=3Dactive-disk0,\
+  file.file.filename=3D/mnt/ramfs/active_disk.img,\
+  file.backing.driver=3Dqcow2,\
+  file.backing.file.filename=3D/mnt/ramfs/hidden_disk.img,\
+  file.backing.backing=3Dcolo-disk0 \
+  -incoming tcp:0:8888
+
+  Secondary:
+  {'execute':'qmp_capabilities'}
+  { 'execute': 'nbd-server-start',
+  =C2=A0=C2=A0'arguments': {'addr': {'type': 'inet', 'data': {'host': '192.=
+168.0.33', 'port': '8889'} } }
+  }
+  {'execute': 'nbd-server-add', 'arguments': {'device': 'colo-disk0', 'writ=
+able': true } }
+
+  Primary:
+  {'execute':'qmp_capabilities'}
+  { 'execute': 'human-monitor-command',
+  =C2=A0=C2=A0'arguments': {'command-line': 'drive_add -n buddy driver=3Dre=
+plication,mode=3Dprimary,file.driver=3Dnbd,file.host=3D192.168.0.34,file.po=
+rt=3D8889,file.export=3Dcolo-disk0,node-name=3Dnbd_client0'}}
+  { 'execute':'x-blockdev-change', 'arguments':{'parent': 'colo-disk0', 'no=
+de': 'nbd_client0' } }
+  { 'execute': 'migrate-set-capabilities',
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0'arguments': {'capabilities': [ {'cap=
+ability': 'x-colo', 'state': true } ] } }
+  { 'execute': 'migrate', 'arguments': {'uri': 'tcp:192.168.0.34:8888' } }
+  { 'execute': 'migrate-set-parameters' , 'arguments':{ 'x-checkpoint-delay=
+': 2000 } }
+
+  And two VM with cash
+  Primary:
+  {"timestamp": {"seconds": 1520763655, "microseconds": 511415}, "event": "=
+RESUME"}
+  [1]    329 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -bo=
+ot c -enable-kvm -m 2048 -smp 2 -qm
+
+  Secondary:
+  {"timestamp": {"seconds": 1520763655, "microseconds": 510907}, "event": "=
+RESUME"}
+  [1]    367 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -bo=
+ot c -enable-kvm -m 2048 -smp 2 -qm
 
 
->
-> You can test this command like that:
->> {'execute':'query-colo-status'}
->>
->> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
->> ---
->>   migration/colo.c    | 35 +++++++++++++++++++++++++++++++++++
->>   qapi/migration.json | 35 +++++++++++++++++++++++++++++++++++
->>   2 files changed, 70 insertions(+)
->>
->>
-> +++ b/qapi/migration.json
->> @@ -1201,3 +1201,38 @@
->>   # Since: 2.9
->>   ##
->>   { 'command': 'xen-colo-do-checkpoint' }
->> +
->> +##
->> +# @COLOStatus:
->> +#
->> +# The result format for 'query-colo-status'.
->> +#
->> +# @mode: which COLO mode the VM was in when it exited.
->> +#        true is primary mode, false is secondary mode.
->>
->
-> Eww. Why not make this an enum ("primary", "secondary") instead of having
-> to remember what true means?
+  =
 
+  ---------------------------------------------------------------------
+  if use qemu 2.11.1
+  The sync will success,but when Secondary VM execute x-colo-lost-heartbeat=
+,Secondary VM will crash
+  Secondary:
+   { 'execute': 'nbd-server-stop' }
+   { 'execute': 'x-colo-lost-heartbeat' }{"return": {}}
+  qemu-system-x86_64: Disconnect client, due to: Unexpected end-of-file bef=
+ore all bytes were read
 
->
-> +#
->> +# @colo_running: if true means COLO running well, otherwise COLO have
->> done.
->>
->
-> New interfaces should use '-' rather than '_' as the separator; this
-> should be 'colo-running'
->
-> +#
->> +# @reason: describes the reason for the COLO exit.
->> +#          true is error, false is user request.
->>
->
-> Again, would an enum ("error", "user") be nicer than a bool?  It is also
-> more extensible if you add a third reason down the road.
->
-> +#
->> +# Since: 2.12
->> +##
->> +{ 'struct': 'COLOStatus',
->> +  'data': { 'mode': 'bool', 'colo_running': 'bool', 'reason': 'bool' } }
->> +
->> +##
->> +# @query-colo-status:
->> +#
->> +# Query COLO status while the vm is running.
->> +#
->> +# Returns: A @COLOStatus object showing the status.
->> +#
->> +# Example:
->> +#
->> +# -> { "execute": "query-colo-status" }
->> +# <- { "return": { "colo_running": "true", "mode": "true", "reason":
->> "true" } }
->>
->
-> Inconsistent with your declaration above; if these are truly declared
-> 'bool', then the example should be (with the spelling fix, but not fixing
-> where you should have been using enums instead of bools):
->
-> { "return": { "colo-running": true, "mode": true, "reason": true } }
->
-> We're awfully close to soft freeze, and this is a new feature - which
-> maintainer will be trying to get this polished and into the tree in time?
+  {"return": {}}
+  qemu-system-x86_64: Can't receive COLO message: Input/output error
+  **
+  ERROR:/build/qemu/src/qemu-2.11.1/qom/object.c:907:object_unref: assertio=
+n failed (obj->ref > 0): (0 > 0)
+  [1]    1276 abort      sudo /usr/bin/qemu-system-x86_64 -boot c -enable-k=
+vm -m 2048 -smp 2 -qmp stdi
 
-
-
-Maybe Paolo or David?  CC paolo and David, any comments about this series?
-
-I have addressed all comments about this patch and sent the PATCH V6,
-Thanks your comments and please review it.
-
-Thanks
-Zhang Chen
-
-
-
-
->
->
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
->
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1754542/+subscriptions
