@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1euvfg-0005yr-QI
-	for qemu-devel@nongnu.org; Sun, 11 Mar 2018 03:45:34 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1euvfi-0005z0-IU
+	for qemu-devel@nongnu.org; Sun, 11 Mar 2018 03:45:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1euvfd-0000Rj-GM
-	for qemu-devel@nongnu.org; Sun, 11 Mar 2018 03:45:32 -0400
-Received: from mail-pl0-x229.google.com ([2607:f8b0:400e:c01::229]:43157)
+	(envelope-from <zhangckid@gmail.com>) id 1euvfh-0000Tk-7x
+	for qemu-devel@nongnu.org; Sun, 11 Mar 2018 03:45:34 -0400
+Received: from mail-pg0-x22c.google.com ([2607:f8b0:400e:c05::22c]:41328)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1euvfd-0000RQ-A5
-	for qemu-devel@nongnu.org; Sun, 11 Mar 2018 03:45:29 -0400
-Received: by mail-pl0-x229.google.com with SMTP id f23-v6so7597030plr.10
-	for <qemu-devel@nongnu.org>; Sat, 10 Mar 2018 23:45:29 -0800 (PST)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1euvfh-0000TJ-1C
+	for qemu-devel@nongnu.org; Sun, 11 Mar 2018 03:45:33 -0400
+Received: by mail-pg0-x22c.google.com with SMTP id w17so1177899pgq.8
+	for <qemu-devel@nongnu.org>; Sat, 10 Mar 2018 23:45:32 -0800 (PST)
 From: Zhang Chen <zhangckid@gmail.com>
-Date: Sun, 11 Mar 2018 15:44:56 +0800
-Message-Id: <1520754314-5969-1-git-send-email-zhangckid@gmail.com>
+Date: Sun, 11 Mar 2018 15:44:57 +0800
+Message-Id: <1520754314-5969-2-git-send-email-zhangckid@gmail.com>
+In-Reply-To: <1520754314-5969-1-git-send-email-zhangckid@gmail.com>
+References: <1520754314-5969-1-git-send-email-zhangckid@gmail.com>
 Subject: [Qemu-devel] [PATCH V6 00/17] COLO: integrate colo frame with block
  replication and COLO proxy
 List-Id: <qemu-devel.nongnu.org>
@@ -27,7 +29,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-Hi~ All~
+Hi~
 
 COLO Frame, block replication and COLO proxy(colo-compare,filter-mirror,
 filter-redirector,filter-rewriter) have been exist in qemu
@@ -45,7 +47,7 @@ help COLO frame to notify filters and colo-compare about checkpoint/failover eve
 it is flexible.
 
 For the neweset version, please refer to:
-https://github.com/zhangckid/qemu/tree/qemu-colo-18mar11
+https://github.com/zhangckid/qemu/tree/qemu-colo-18mar10
 
 Please review, thanks.
 
