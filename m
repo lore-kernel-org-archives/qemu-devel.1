@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eupjq-00025L-7t
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 20:25:27 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1eupsl-0003uX-Gf
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 20:34:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eupjm-0000ww-SA
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 20:25:26 -0500
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58464 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eupjm-0000v3-N3
-	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 20:25:22 -0500
-References: <20180309090006.10018-1-peterx@redhat.com>
-	<20180309090006.10018-11-peterx@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <037ab20b-0abc-0622-3d68-1093bc0ec8be@redhat.com>
-Date: Sat, 10 Mar 2018 19:25:13 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180309090006.10018-11-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 10/23] qmp: introduce QMPCapability
+	(envelope-from <haozhong.zhang@intel.com>) id 1eupsi-0004mb-CD
+	for qemu-devel@nongnu.org; Sat, 10 Mar 2018 20:34:39 -0500
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Date: Sun, 11 Mar 2018 09:34:21 +0800
+Message-Id: <20180311013426.32610-1-haozhong.zhang@intel.com>
+Subject: [Qemu-devel] [PATCH v5 0/5] hw/acpi-build: build SRAT memory
+ affinity structures for DIMM devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,65 +18,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>, dgilbert@redhat.com, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org
 
-On 03/09/2018 02:59 AM, Peter Xu wrote:
-> There were no QMP capabilities defined.  Define the first "oob" as
-> capability to allow out-of-band messages.
+(Patch 5 is only for reviewers to run test cases in patch 4)
 
-Reads better as "Define the first capability, "oob", to allow..."
+ACPI 6.2A Table 5-129 "SPA Range Structure" requires the proximity
+domain of a NVDIMM SPA range must match with corresponding entry in
+SRAT table.
 
-> 
-> After this patch, we will allow QMP clients to enable QMP capabilities
-> when sending the first "qmp_capabilities" command.  Originally we are
-> starting QMP session with no arguments like:
-> 
->    { "execute": "qmp_capabilities" }
-> 
-> Now we can enable some QMP capabilities using (take OOB as example,
-> which is the only one capability that we support):
-> 
->    { "execute": "qmp_capabilities",
->      "argument": { "enable": [ "oob" ] } }
+The address ranges of vNVDIMM in QEMU are allocated from the
+hot-pluggable address space, which is entirely covered by one SRAT
+memory affinity structure. However, users can set the vNVDIMM
+proximity domain in NFIT SPA range structure by the 'node' property of
+'-device nvdimm' to a value different than the one in the above SRAT
+memory affinity structure.
 
-s/argument/arguments/
+In order to solve such proximity domain mismatch, this patch builds
+one SRAT memory affinity structure for each DIMM device present at
+boot time, including both PC-DIMM and NVDIMM, with the proximity
+domain specified in '-device pc-dimm' or '-device nvdimm'.
 
-> 
-> When the "argument" key is not provided, no capability is enabled.
+The remaining hot-pluggable address space is covered by one or multiple
+SRAT memory affinity structures with the proximity domain of the last
+node as before.
 
-again.  Also when "arguments":{} is provided with an empty dict, or even 
-with "arguments":{"enable":[]} an empty enable array.  But no need to 
-mention them here.
+Changes in v5:
+ * (Patch 2) Inline qmp nvdimm info in MemoryDeviceInfo.
 
-> 
-> For capability "oob", the monitor needs to be run on dedicated IO
+Changes in v4:
+ * (Patch 1) Update the commit message and add R-b from Igor Mammedov.
+ * (Patch 2) Rebase on misc.json and update the commit message.
+ * (Patch 3) Directly use di-addr and di-node.
+ * (Patch 4) Drop the previous v3 patch 3 and add '-machine nvdimm=on'
+   to parameters of test_acpi_one().
+ * (Patch 4) Put PC-DIMM and NVDIMM to different numa nodes.
+ * (Patch 4&5) Move binary blobs of ACPI tables to DO-NOT-APPLY patch 5.
 
-s/on/on a/
+Changes in v3:
+ * (Patch 1&2) Use qmp_pc_dimm_device_list to get information of DIMM
+   devices and move it to separate patches.
+ * (Patch 3) Replace while loop by a more readable for loop.
+ * (Patch 3) Refactor the flag setting code.
+ * (Patch 3) s/'static-plugged'/'present at boot time' in commit message.
 
-> thread, otherwise the command will fail.  For example, trying to enable
-> OOB on a MUXed typed QMP monitor will fail.
-> 
-> One thing to mention is that, QMP capabilities are per-monitor, and also
+Changes in v2:
+ * Build SRAT memory affinity structures of PC-DIMM devices as well.
+ * Add test cases.
 
-s/that,/that/
+Haozhong Zhang (5):
+  pc-dimm: make qmp_pc_dimm_device_list() sort devices by address
+  qmp: distinguish PC-DIMM and NVDIMM in MemoryDeviceInfoList
+  hw/acpi-build: build SRAT memory affinity structures for DIMM devices
+  tests/bios-tables-test: add test cases for DIMM proximity
+  [DO NOT APPLY] test/acpi-test-data: add ACPI tables for dimmpxm test
 
-> when the connection is closed due to some reason, the capabilities will
-> be reset.
-> 
-> Also, touch up qmp-test.c to test the new bits.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->   monitor.c        | 77 ++++++++++++++++++++++++++++++++++++++++++++++++++++----
->   qapi/misc.json   | 32 ++++++++++++++++++++---
->   tests/qmp-test.c | 10 +++++++-
->   3 files changed, 110 insertions(+), 9 deletions(-)
-> 
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
+ hmp.c                                 |  14 ++++--
+ hw/i386/acpi-build.c                  |  56 +++++++++++++++++++--
+ hw/mem/pc-dimm.c                      |  91 +++++++++++++++++++---------------
+ hw/ppc/spapr.c                        |   3 +-
+ include/hw/mem/pc-dimm.h              |   2 +-
+ numa.c                                |  23 +++++----
+ qapi/misc.json                        |   6 ++-
+ qmp.c                                 |   7 +--
+ stubs/qmp_pc_dimm.c                   |   4 +-
+ tests/acpi-test-data/pc/APIC.dimmpxm  | Bin 0 -> 144 bytes
+ tests/acpi-test-data/pc/DSDT.dimmpxm  | Bin 0 -> 6803 bytes
+ tests/acpi-test-data/pc/NFIT.dimmpxm  | Bin 0 -> 224 bytes
+ tests/acpi-test-data/pc/SRAT.dimmpxm  | Bin 0 -> 472 bytes
+ tests/acpi-test-data/pc/SSDT.dimmpxm  | Bin 0 -> 685 bytes
+ tests/acpi-test-data/q35/APIC.dimmpxm | Bin 0 -> 144 bytes
+ tests/acpi-test-data/q35/DSDT.dimmpxm | Bin 0 -> 9487 bytes
+ tests/acpi-test-data/q35/NFIT.dimmpxm | Bin 0 -> 224 bytes
+ tests/acpi-test-data/q35/SRAT.dimmpxm | Bin 0 -> 472 bytes
+ tests/acpi-test-data/q35/SSDT.dimmpxm | Bin 0 -> 685 bytes
+ tests/bios-tables-test.c              |  38 ++++++++++++++
+ 20 files changed, 177 insertions(+), 67 deletions(-)
+ create mode 100644 tests/acpi-test-data/pc/APIC.dimmpxm
+ create mode 100644 tests/acpi-test-data/pc/DSDT.dimmpxm
+ create mode 100644 tests/acpi-test-data/pc/NFIT.dimmpxm
+ create mode 100644 tests/acpi-test-data/pc/SRAT.dimmpxm
+ create mode 100644 tests/acpi-test-data/pc/SSDT.dimmpxm
+ create mode 100644 tests/acpi-test-data/q35/APIC.dimmpxm
+ create mode 100644 tests/acpi-test-data/q35/DSDT.dimmpxm
+ create mode 100644 tests/acpi-test-data/q35/NFIT.dimmpxm
+ create mode 100644 tests/acpi-test-data/q35/SRAT.dimmpxm
+ create mode 100644 tests/acpi-test-data/q35/SSDT.dimmpxm
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.14.1
