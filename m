@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <x1917x@gmail.com>) id 1evUV0-0006oy-K9
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:56:51 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1evUZA-0001R4-Cd
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 17:01:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <x1917x@gmail.com>) id 1evUUw-0005Sv-IE
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:56:50 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:37682)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <x1917x@gmail.com>) id 1evUUw-0005SO-8I
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:56:46 -0400
-Received: by mail-lf0-x241.google.com with SMTP id y19-v6so25409244lfd.4
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 13:56:46 -0700 (PDT)
-Date: Tue, 13 Mar 2018 06:56:37 +1000
-From: Alexey G <x1917x@gmail.com>
-Message-ID: <20180313065637.00005cee@gmail.com>
-In-Reply-To: <20180312194406.GX3417@localhost.localdomain>
-References: <cover.1520867740.git.x1917x@gmail.com>
-	<4a65e8b30fe9d2a6c1c53b85ef2697f02e01d13f.1520867956.git.x1917x@gmail.com>
-	<20180312194406.GX3417@localhost.localdomain>
+	(envelope-from <Babu.Moger@amd.com>) id 1evUZ6-0007UH-Bl
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 17:01:08 -0400
+Received: from mail-bn3nam01on0045.outbound.protection.outlook.com
+	([104.47.33.45]:51664
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1evUZ6-0007U3-1P
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 17:01:04 -0400
+From: Babu Moger <babu.moger@amd.com>
+Date: Mon, 12 Mar 2018 17:00:44 -0400
+Message-ID: <1520888449-4352-1-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 16/30] q35/xen: Add Xen platform device
- support for Q35
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 0/5] Enable TOPOEXT to support
+ hyperthreading on AMD CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,67 +27,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>
+To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, rkrcmar@redhat.com
+Cc: mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, Gary.Hook@amd.com, Thomas.Lendacky@amd.com, brijesh.singh@amd.com, babu.moger@amd.com, kash@tripleback.net
 
-On Mon, 12 Mar 2018 16:44:06 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+This series enables the TOPOEXT feature for AMD CPUs. This is required to
+support hyperthreading on kvm guests.
 
->On Tue, Mar 13, 2018 at 04:34:01AM +1000, Alexey Gerasimenko wrote:
->> Current Xen/QEMU method to control Xen Platform device on i440 is a
->> bit odd -- enabling/disabling Xen platform device actually modifies
->> the QEMU emulated machine type, namely xenfv <--> pc.
->> 
->> In order to avoid multiplying machine types, use a new way to
->> control Xen Platform device for QEMU -- "xen-platform-dev" machine
->> property (bool). To maintain backward compatibility with existing
->> Xen/QEMU setups, this is only applicable to q35 machine currently.
->> i440 emulation still uses the old method (i.e. xenfv/pc machine
->> selection) to control Xen Platform device, this may be changed later
->> to xen-platform-dev property as well.
->> 
->> This way we can use a single machine type (q35) and change just
->> xen-platform-dev value to on/off to control Xen platform device.
->> 
->> Signed-off-by: Alexey Gerasimenko <x1917x@gmail.com>
->> ---  
->[...]
->> diff --git a/qemu-options.hx b/qemu-options.hx
->> index 6585058c6c..cee0b92028 100644
->> --- a/qemu-options.hx
->> +++ b/qemu-options.hx
->> @@ -38,6 +38,7 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
->>      "                dump-guest-core=on|off include guest memory in
->> a core dump (default=on)\n" "                mem-merge=on|off
->> controls memory merge support (default: on)\n" "
->> igd-passthru=on|off controls IGD GFX passthrough support
->> (default=off)\n"
->> +    "                xen-platform-dev=on|off controls Xen Platform
->> device (default=off)\n" "                aes-key-wrap=on|off
->> controls support for AES key wrapping (default=on)\n"
->> "                dea-key-wrap=on|off controls support for DEA key
->> wrapping (default=on)\n" "                suppress-vmdesc=on|off
->> disables self-describing migration (default=off)\n"  
->
->What are the obstacles preventing "-device xen-platform" from
->working?  It would be better than adding a new boolean option to
->-machine.
+This addresses the issues reported in these bugs:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1481253
+https://bugs.launchpad.net/qemu/+bug/1703506=20
 
-I guess the initial assumption was that changing the
-xen_platform_device value in Xen's options may cause some additional
-changes in platform configuration besides adding (or not) the Xen
-Platform device, hence a completely different machine type was chosen
-(xenfv).
+v4:
+1.Removed the checks under cpuid 0x8000001D leaf(patch #2). These check are
+  not necessary. Found this during internal review.
+2.Added CPUID_EXT3_TOPOEXT feature for all the 17 family(patch #4). This wa=
+s
+  found by Kash Pande during his testing.
+3.Removed th hardcoded cpuid xlevel and dynamically extended if CPUID_EXT3_=
+TOPOEXT
+  is supported(Suggested by Brijesh Singh).=20
 
-At the moment pc,accel=xen/xenfv selection mostly governs
-only the Xen Platform device presence. Also setting max_cpus to
-HVM_MAX_VCPUS depends on it, but this doesn't applicable to a
-'pc,accel=xen' machine for some reason.
+v3:
+1.Removed the patch #1. Radim mentioned that original typo problem is in=20
+  linux kernel header. qemu is just copying those files.
+2.In previous version, I used the cpuid 4 definitions for AMDs cpuid leaf
+  0x8000001D. CPUID 4 is very intel specific and we dont want to expose tho=
+se
+  details under AMD. I have renamed some of these definitions as generic.
+  These changes are in patch#1. Radim, let me know if this is what you inte=
+nded.
+3.Added assert to for core_id(Suggested by Radim Kr=C4=8Dm=C3=A1=C5=99).
+4.Changed the if condition under "L3 cache info"(Suggested by Gary Hook).
+5.Addressed few more text correction and code cleanup(Suggested by Thomas L=
+endacky).
 
-If applying HVM_MAX_VCPUS to max_cpus is really necessary I think it's
-better to set it unconditionally for all 'accel=xen' HVM machine
-types inside xen_enabled() block. Right now it's missing for
-pc,accel=xen and q35,accel=xen.
+v2:
+  Fixed few more minor issues per Gary Hook's comments. Thank you Gary.
+  Removed the patch#1. We need to handle the instruction cache associativit=
+y=20
+  seperately. It varies based on the cpu family. I will comeback to that la=
+ter.
+  Added two more typo corrections in patch#1 and patch#5.
 
-I'll check if supplying the Xen platform device via the '-device' option
-will be ok for all usage cases.
+v1:
+  Stanislav Lanci posted few patches earlier.=20
+  https://patchwork.kernel.org/patch/10040903/
+
+Rebased his patches with few changes.
+1.Spit the patches into two, separating cpuid functions=20
+  0x8000001D and 0x8000001E (Patch 2 and 3).
+2.Removed the generic non-intel check and made a separate patch
+  with some changes(Patch 5).
+3.Fixed L3_N_SETS_AMD(from 4096 to 8192) based on CPUID_Fn8000001D_ECX_x03.
+
+Added 2 more patches.
+Patch 1. Fixes cache associativity.
+Patch 4. Adds TOPOEXT feature on AMD EPYC CPU.
+
+Babu Moger (3):
+  target/i386: Generalize some of the macro definitions
+  target/i386: Enable TOPOEXT feature on AMD EPYC CPU
+  target/i386: Remove generic SMT thread check
+
+Stanislav Lanci (2):
+  target/i386: Populate AMD Processor Cache Information
+  target/i386: Add support for CPUID_8000_001E for AMD
+
+ target/i386/cpu.c | 150 +++++++++++++++++++++++++++++++++++++++++---------=
+----
+ target/i386/kvm.c |  29 +++++++++--
+ 2 files changed, 142 insertions(+), 37 deletions(-)
+
+--=20
+1.8.3.1
