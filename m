@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evSJe-0000vL-N2
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:59 -0400
+	(envelope-from <eblake@redhat.com>) id 1evSJf-0000ws-Tl
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:37:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evSJd-00065e-QV
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:58 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58844 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1evSJe-00066W-Si
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49272 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1evSJd-00065I-MR
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:57 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1evSJe-00066J-Nx
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:58 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4B2FF401C9AE
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 18:36:57 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 550D14000B6E
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 18:36:58 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 12 Mar 2018 13:36:23 -0500
-Message-Id: <20180312183628.394722-33-eblake@redhat.com>
+Date: Mon, 12 Mar 2018 13:36:25 -0500
+Message-Id: <20180312183628.394722-35-eblake@redhat.com>
 In-Reply-To: <20180312183628.394722-1-eblake@redhat.com>
 References: <20180312183628.394722-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 32/36] qmp: add command "x-oob-test"
+Subject: [Qemu-devel] [PULL 34/36] tests: qmp-test: add oob test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,70 +34,103 @@ Cc: Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
 From: Peter Xu <peterx@redhat.com>
 
-This command is only used to test OOB functionality.  It should not be
-used for any other purposes.
+Test the new OOB capability.  Here we used the new "x-oob-test" command.
+First, we send a lock=true and oob=false command to hang the main
+thread.  Then send another lock=false and oob=true command (which will
+be run inside parser this time) to free that hanged command.
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180309090006.10018-22-peterx@redhat.com>
+Message-Id: <20180309090006.10018-24-peterx@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-[eblake: grammar tweak]
+[eblake: grammar tweaks]
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- qapi/misc.json | 18 ++++++++++++++++++
- qmp.c          | 16 ++++++++++++++++
- 2 files changed, 34 insertions(+)
+ tests/qmp-test.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
 
-diff --git a/qapi/misc.json b/qapi/misc.json
-index b6ebf210ba8..fc3550f3acc 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -3279,3 +3279,21 @@
- ##
- { 'event': 'COMMAND_DROPPED' ,
-   'data': { 'id': 'any', 'reason': 'CommandDropReason' } }
-+
-+##
-+# @x-oob-test:
-+#
-+# Test OOB functionality.  When sending this command with lock=true,
-+# it'll try to hang the dispatcher.  When sending it with lock=false,
-+# it'll try to notify the locked thread to continue.  Note: it should
-+# only be used by QMP test program rather than anything else.
-+#
-+# Since: 2.12
-+#
-+# Example:
-+#
-+# { "execute": "x-oob-test",
-+#   "arguments": { "lock": true } }
-+##
-+{ 'command': 'x-oob-test', 'data' : { 'lock': 'bool' },
-+  'allow-oob': true }
-diff --git a/qmp.c b/qmp.c
-index 7e606d84867..ea3760acb12 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -770,3 +770,19 @@ MemoryInfo *qmp_query_memory_size_summary(Error **errp)
-
-     return mem_info;
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index fd4033a13fd..17cf4ccf4c9 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -164,6 +164,70 @@ static void test_qmp_protocol(void)
+     qtest_quit(qts);
  }
-+
-+static QemuSemaphore x_oob_test_sem;
-+
-+static void __attribute__((constructor)) x_oob_test_init(void)
+
++/* Tests for Out-Of-Band support. */
++static void test_qmp_oob(void)
 +{
-+    qemu_sem_init(&x_oob_test_sem, 0);
-+}
++    QDict *resp;
++    int acks = 0;
++    const char *cmd_id;
 +
-+void qmp_x_oob_test(bool lock, Error **errp)
-+{
-+    if (lock) {
-+        qemu_sem_wait(&x_oob_test_sem);
-+    } else {
-+        qemu_sem_post(&x_oob_test_sem);
++    global_qtest = qtest_init_without_qmp_handshake(common_args);
++
++    /* Ignore the greeting message. */
++    resp = qmp_receive();
++    g_assert(qdict_get_qdict(resp, "QMP"));
++    QDECREF(resp);
++
++    /* Try a fake capability, it should fail. */
++    resp = qmp("{ 'execute': 'qmp_capabilities', "
++               "  'arguments': { 'enable': [ 'cap-does-not-exist' ] } }");
++    g_assert(qdict_haskey(resp, "error"));
++    QDECREF(resp);
++
++    /* Now, enable OOB in current QMP session, it should succeed. */
++    resp = qmp("{ 'execute': 'qmp_capabilities', "
++               "  'arguments': { 'enable': [ 'oob' ] } }");
++    g_assert(qdict_haskey(resp, "return"));
++    QDECREF(resp);
++
++    /*
++     * Try any command that does not support OOB but with OOB flag. We
++     * should get failure.
++     */
++    resp = qmp("{ 'execute': 'query-cpus',"
++               "  'control': { 'run-oob': true } }");
++    g_assert(qdict_haskey(resp, "error"));
++    QDECREF(resp);
++
++    /*
++     * First send the "x-oob-test" command with lock=true and
++     * oob=false, it should hang the dispatcher and main thread;
++     * later, we send another lock=false with oob=true to continue
++     * that thread processing.  Finally we should receive replies from
++     * both commands.
++     */
++    qmp_async("{ 'execute': 'x-oob-test',"
++              "  'arguments': { 'lock': true }, "
++              "  'id': 'lock-cmd'}");
++    qmp_async("{ 'execute': 'x-oob-test', "
++              "  'arguments': { 'lock': false }, "
++              "  'control': { 'run-oob': true }, "
++              "  'id': 'unlock-cmd' }");
++
++    /* Ignore all events.  Wait for 2 acks */
++    while (acks < 2) {
++        resp = qmp_receive();
++        cmd_id = qdict_get_str(resp, "id");
++        if (!g_strcmp0(cmd_id, "lock-cmd") ||
++            !g_strcmp0(cmd_id, "unlock-cmd")) {
++            acks++;
++        }
++        QDECREF(resp);
 +    }
++
++    qtest_end();
 +}
++
+ static int query_error_class(const char *cmd)
+ {
+     static struct {
+@@ -343,6 +407,7 @@ int main(int argc, char *argv[])
+     g_test_init(&argc, &argv, NULL);
+
+     qtest_add_func("qmp/protocol", test_qmp_protocol);
++    qtest_add_func("qmp/oob", test_qmp_oob);
+     qmp_schema_init(&schema);
+     add_query_tests(&schema);
+
 -- 
 2.14.3
