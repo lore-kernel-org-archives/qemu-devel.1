@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evOyE-0004ZM-Em
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:02:43 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evOyM-0004gi-7H
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:02:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evOyD-0002nY-KB
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:02:38 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evOyH-0002rx-CI
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:02:46 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 12 Mar 2018 16:02:12 +0100
-Message-Id: <20180312150218.1314-1-kwolf@redhat.com>
+Date: Mon, 12 Mar 2018 16:02:13 +0100
+Message-Id: <20180312150218.1314-2-kwolf@redhat.com>
+In-Reply-To: <20180312150218.1314-1-kwolf@redhat.com>
+References: <20180312150218.1314-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 0/6] luks: Implement .bdrv_co_create
+Subject: [Qemu-devel] [PATCH v2 1/6] luks: Separate image file creation from
+ formatting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,35 +26,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, berrange@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-This series implements the .bdrv_co_create callback for luks, adds an
-image creation test for it and contains some bonus fixes for bugs that
-the test triggered.
+The crypto driver used to create the image file in a callback from the
+crypto subsystem. If we want to implement .bdrv_co_create, this needs to
+go away because that callback will get a reference to an already
+existing block node.
 
-v2:
-- Use QCryptoBlockCreateOptionsLUKS as the base type for
-  BlockdevCreateOptionsLUKS [Dan]
-- Use INT64_MAX instead of UINT64_MAX as the maximum image size [Eric]
-- Use iter_time=3D10 in tests where the creation succeeds [Dan]
+Move the image file creation to block_crypto_create_generic().
 
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ block/crypto.c | 37 +++++++++++++++++--------------------
+ 1 file changed, 17 insertions(+), 20 deletions(-)
 
-Kevin Wolf (6):
-  luks: Separate image file creation from formatting
-  luks: Create block_crypto_co_create_generic()
-  luks: Support .bdrv_co_create
-  luks: Turn invalid assertion into check
-  luks: Catch integer overflow for huge sizes
-  qemu-iotests: Test luks QMP image creation
-
- qapi/block-core.json         |  17 +++-
- block/crypto.c               | 150 ++++++++++++++++++++++---------
- tests/qemu-iotests/209       | 210 +++++++++++++++++++++++++++++++++++++=
-++++++
- tests/qemu-iotests/209.out   | 136 ++++++++++++++++++++++++++++
- tests/qemu-iotests/common.rc |   2 +-
- tests/qemu-iotests/group     |   1 +
- 6 files changed, 472 insertions(+), 44 deletions(-)
- create mode 100755 tests/qemu-iotests/209
- create mode 100644 tests/qemu-iotests/209.out
-
+diff --git a/block/crypto.c b/block/crypto.c
+index e6095e7807..77871640cc 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -71,8 +71,6 @@ static ssize_t block_crypto_read_func(QCryptoBlock *blo=
+ck,
+=20
+=20
+ struct BlockCryptoCreateData {
+-    const char *filename;
+-    QemuOpts *opts;
+     BlockBackend *blk;
+     uint64_t size;
+ };
+@@ -103,27 +101,13 @@ static ssize_t block_crypto_init_func(QCryptoBlock =
+*block,
+                                       Error **errp)
+ {
+     struct BlockCryptoCreateData *data =3D opaque;
+-    int ret;
+=20
+     /* User provided size should reflect amount of space made
+      * available to the guest, so we must take account of that
+      * which will be used by the crypto header
+      */
+-    data->size +=3D headerlen;
+-
+-    qemu_opt_set_number(data->opts, BLOCK_OPT_SIZE, data->size, &error_a=
+bort);
+-    ret =3D bdrv_create_file(data->filename, data->opts, errp);
+-    if (ret < 0) {
+-        return -1;
+-    }
+-
+-    data->blk =3D blk_new_open(data->filename, NULL, NULL,
+-                             BDRV_O_RDWR | BDRV_O_PROTOCOL, errp);
+-    if (!data->blk) {
+-        return -1;
+-    }
+-
+-    return 0;
++    return blk_truncate(data->blk, data->size + headerlen, PREALLOC_MODE=
+_OFF,
++                        errp);
+ }
+=20
+=20
+@@ -333,11 +317,10 @@ static int block_crypto_create_generic(QCryptoBlock=
+Format format,
+     struct BlockCryptoCreateData data =3D {
+         .size =3D ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0=
+),
+                          BDRV_SECTOR_SIZE),
+-        .opts =3D opts,
+-        .filename =3D filename,
+     };
+     QDict *cryptoopts;
+=20
++    /* Parse options */
+     cryptoopts =3D qemu_opts_to_qdict(opts, NULL);
+=20
+     create_opts =3D block_crypto_create_opts_init(format, cryptoopts, er=
+rp);
+@@ -345,6 +328,20 @@ static int block_crypto_create_generic(QCryptoBlockF=
+ormat format,
+         return -1;
+     }
+=20
++    /* Create protocol layer */
++    ret =3D bdrv_create_file(filename, opts, errp);
++    if (ret < 0) {
++        return ret;
++    }
++
++    data.blk =3D blk_new_open(filename, NULL, NULL,
++                            BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCO=
+L,
++                            errp);
++    if (!data.blk) {
++        return -EINVAL;
++    }
++
++    /* Create format layer */
+     crypto =3D qcrypto_block_create(create_opts, NULL,
+                                   block_crypto_init_func,
+                                   block_crypto_write_func,
 --=20
 2.13.6
