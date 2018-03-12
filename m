@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1ev8GX-0001tN-62
-	for qemu-devel@nongnu.org; Sun, 11 Mar 2018 17:12:26 -0400
+	(envelope-from <mst@redhat.com>) id 1evAw2-0004mI-No
+	for qemu-devel@nongnu.org; Sun, 11 Mar 2018 20:03:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1ev8GT-00049t-5J
-	for qemu-devel@nongnu.org; Sun, 11 Mar 2018 17:12:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55588)
+	(envelope-from <mst@redhat.com>) id 1evAvz-0000kf-N8
+	for qemu-devel@nongnu.org; Sun, 11 Mar 2018 20:03:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58452 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1ev8GS-00049D-Um
-	for qemu-devel@nongnu.org; Sun, 11 Mar 2018 17:12:21 -0400
-Date: Sun, 11 Mar 2018 14:12:10 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <20180309125833.GI3417@localhost.localdomain>
-Message-ID: <alpine.DEB.2.10.1803111409550.23583@sstabellini-ThinkPad-X260>
-References: <1520530757-4477-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1520530757-4477-4-git-send-email-ian.jackson@eu.citrix.com>
-	<20180308200345.GD3417@localhost.localdomain>
-	<23202.28943.344150.512881@mariner.uk.xensource.com>
-	<23202.30969.590920.764930@mariner.uk.xensource.com>
-	<20180309125833.GI3417@localhost.localdomain>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1evAvz-0000k2-I2
+	for qemu-devel@nongnu.org; Sun, 11 Mar 2018 20:03:23 -0400
+Date: Mon, 12 Mar 2018 02:03:17 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180312020236-mutt-send-email-mst@kernel.org>
+References: <20171217204912.12420-1-f4bug@amsat.org>
+	<20171217204912.12420-5-f4bug@amsat.org>
+	<42aa5fe6-1cf0-4912-a773-72cc8950afb5@amsat.org>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH 03/11] xen: defer call to xen_restrict
- until just before os_setup_post
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <42aa5fe6-1cf0-4912-a773-72cc8950afb5@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/4] hw/pci: remove obsolete
+ PCIDevice->init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,46 +30,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Ian Jackson <ian.jackson@citrix.com>, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
 
-On Fri, 9 Mar 2018, Eduardo Habkost wrote:
-> On Fri, Mar 09, 2018 at 12:07:21PM +0000, Ian Jackson wrote:
-> > Ian Jackson writes ("Re: [PATCH 03/11] xen: defer call to xen_restrict until just before os_setup_post"):
-> > > Eduardo Habkost writes ("Re: [PATCH 03/11] xen: defer call to xen_restrict until just before os_setup_post"):
-> > > > I don't think we should have accelerator-specific code in main(),
-> > > > if we already have accelerator classes that can abstract that
-> > > > out.  I suggest adding a AccelClass;:setup_post() method that can
-> > > > be called here.
-> > > 
-> > > I think I can do that.
-> > 
-> > How about this ?
-> > 
-> > From 61f11221afaa29e10021599420238e03836ba413 Mon Sep 17 00:00:00 2001
-> > From: Ian Jackson <ian.jackson@eu.citrix.com>
-> > Date: Fri, 9 Mar 2018 12:02:50 +0000
-> > Subject: [PATCH v6.2 12/11] AccelClass: Introduce accel_setup_post
-> > 
-> > This is called just before os_setup_post.  Currently none of the
-> > accelerators provide this hook, but the Xen one is going to provide
-> > one in a moment.
-> > 
-> > Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
-> 
-> Looks good to me.
-> 
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> 
-> That said, I don't think this should block the inclusion of the
-> previous patch in 2.12, if the Xen maintainers were already going
-> to merge it.
+On Sun, Mar 11, 2018 at 04:46:52PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Hi Michael, Paolo.
+>=20
+> Now than all other PCI QOM'ification patches got applied, can you take
+> this patch for 2.12?
+>=20
+> Thanks,
+>=20
+> Phil.
+>=20
+> On 12/17/2017 09:49 PM, Philippe Mathieu-Daud=E9 wrote:
+> > All PCI devices are now QOM'ified.
+> >=20
+> > Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> > ---
+> >  include/hw/pci/pci.h |  1 -
+> >  hw/pci/pci.c         | 14 --------------
+> >  2 files changed, 15 deletions(-)
+> >=20
+> > diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> > index 8d02a0a383..0f1ed64c2f 100644
+> > --- a/include/hw/pci/pci.h
+> > +++ b/include/hw/pci/pci.h
+> > @@ -217,7 +217,6 @@ typedef struct PCIDeviceClass {
+> >      DeviceClass parent_class;
+> > =20
+> >      void (*realize)(PCIDevice *dev, Error **errp);
+> > -    int (*init)(PCIDevice *dev);/* TODO convert to realize() and rem=
+ove */
+> >      PCIUnregisterFunc *exit;
+> >      PCIConfigReadFunc *config_read;
+> >      PCIConfigWriteFunc *config_write;
+> > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> > index b2d139bd9a..cd25ab6f6b 100644
+> > --- a/hw/pci/pci.c
+> > +++ b/hw/pci/pci.c
+> > @@ -2054,18 +2054,6 @@ static void pci_qdev_realize(DeviceState *qdev=
+, Error **errp)
+> >      }
+> >  }
+> > =20
+> > -static void pci_default_realize(PCIDevice *dev, Error **errp)
+> > -{
+> > -    PCIDeviceClass *pc =3D PCI_DEVICE_GET_CLASS(dev);
+> > -
+> > -    if (pc->init) {
+> > -        if (pc->init(dev) < 0) {
+> > -            error_setg(errp, "Device initialization failed");
+> > -            return;
+> > -        }
+> > -    }
+> > -}
+> > -
+> >  PCIDevice *pci_create_multifunction(PCIBus *bus, int devfn, bool mul=
+tifunction,
+> >                                      const char *name)
+> >  {
+> > @@ -2538,13 +2526,11 @@ MemoryRegion *pci_address_space_io(PCIDevice =
+*dev)
+> >  static void pci_device_class_init(ObjectClass *klass, void *data)
+> >  {
+> >      DeviceClass *k =3D DEVICE_CLASS(klass);
+> > -    PCIDeviceClass *pc =3D PCI_DEVICE_CLASS(klass);
+> > =20
+> >      k->realize =3D pci_qdev_realize;
+> >      k->unrealize =3D pci_qdev_unrealize;
+> >      k->bus_type =3D TYPE_PCI_BUS;
+> >      k->props =3D pci_props;
+> > -    pc->realize =3D pci_default_realize;
 
-Ian,
+How about we assert !init here?
 
-The Xen side is almost entirely reviewed and should be OK, but you need
-reviewed-bys on some non-Xen specific patches: #7 #8 #11.
++	assert(!pc->init);
 
-Cheers,
-
-Stefano
+> >  }
+> > =20
+> >  static void pci_device_class_base_init(ObjectClass *klass, void *dat=
+a)
+> >=20
