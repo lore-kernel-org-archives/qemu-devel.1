@@ -1,27 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evSJV-0000ib-SM
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:53 -0400
+	(envelope-from <eblake@redhat.com>) id 1evSJU-0000hy-Oh
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evSJU-0005yx-WC
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38332 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1evSJU-0005yf-ST
+	(envelope-from <eblake@redhat.com>) id 1evSJT-0005xp-KR
 	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:48 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 76CCE8D6D7
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 18:36:48 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 12 Mar 2018 13:36:08 -0500
-Message-Id: <20180312183628.394722-18-eblake@redhat.com>
+Date: Mon, 12 Mar 2018 13:36:01 -0500
+Message-Id: <20180312183628.394722-11-eblake@redhat.com>
 In-Reply-To: <20180312183628.394722-1-eblake@redhat.com>
 References: <20180312183628.394722-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 17/36] monitor: move the cur_mon hack deeper for
- QMP
+Subject: [Qemu-devel] [PULL 10/36] block: Handle null backing link
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,74 +20,132 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-From: Peter Xu <peterx@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 
-In monitor_qmp_read(), we have the hack to temporarily replace the
-cur_mon pointer.  Now we move this hack deeper inside the QMP dispatcher
-routine since the Monitor pointer can be actually obtained using
-container_of() upon the parser object, just like most of the other JSON
-parser users do.
+Instead of converting all "backing": null instances into "backing": "",
+handle a null value directly in bdrv_open_inherit().
 
-This does not make much sense as a single patch.  However, this will be
-a big step for the next patch, when the QMP dispatcher routine will be
-split from the QMP parser.
+This enables explicitly null backing links for json:{} filenames.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+Message-Id: <20180224154033.29559-7-mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180309090006.10018-7-peterx@redhat.com>
-[eblake: rebase context of qobject_to() macro]
+[eblake: rebase to qobject_to() parameter order and qapi headers split]
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- monitor.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+ block.c                    |  5 ++++-
+ blockdev.c                 | 14 --------------
+ tests/qemu-iotests/089     | 20 ++++++++++++++++++++
+ tests/qemu-iotests/089.out |  8 ++++++++
+ 4 files changed, 32 insertions(+), 15 deletions(-)
 
-diff --git a/monitor.c b/monitor.c
-index b5acc92b735..83e98741b4c 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -3762,7 +3762,9 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
- {
-     QObject *req, *rsp = NULL, *id = NULL;
-     QDict *qdict = NULL;
--    Monitor *mon = cur_mon;
-+    MonitorQMP *mon_qmp = container_of(parser, MonitorQMP, parser);
-+    Monitor *old_mon, *mon = container_of(mon_qmp, Monitor, qmp);
-+
-     Error *err = NULL;
+diff --git a/block.c b/block.c
+index cd74da3a601..b673a004daf 100644
+--- a/block.c
++++ b/block.c
+@@ -33,6 +33,7 @@
+ #include "qapi/error.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qjson.h"
++#include "qapi/qmp/qnull.h"
+ #include "qapi/qmp/qstring.h"
+ #include "qapi/qobject-output-visitor.h"
+ #include "qapi/qapi-visit-block-core.h"
+@@ -2645,7 +2646,9 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
 
-     req = json_parser_parse_err(tokens, NULL, &err);
-@@ -3787,8 +3789,13 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
-         QDECREF(req_json);
+     /* See cautionary note on accessing @options above */
+     backing = qdict_get_try_str(options, "backing");
+-    if (backing && *backing == '\0') {
++    if (qobject_to(QNull, qdict_get(options, "backing")) != NULL ||
++        (backing && *backing == '\0'))
++    {
+         flags |= BDRV_O_NO_BACKING;
+         qdict_del(options, "backing");
      }
+diff --git a/blockdev.c b/blockdev.c
+index c9a212b3149..6a751996022 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3973,7 +3973,6 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
+     QObject *obj;
+     Visitor *v = qobject_output_visitor_new(&obj);
+     QDict *qdict;
+-    const QDictEntry *ent;
+     Error *local_err = NULL;
 
-+    old_mon = cur_mon;
-+    cur_mon = mon;
-+
-     rsp = qmp_dispatch(cur_mon->qmp.commands, req);
+     visit_type_BlockdevOptions(v, NULL, &options, &local_err);
+@@ -3987,19 +3986,6 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
 
-+    cur_mon = old_mon;
-+
-     if (mon->qmp.commands == &qmp_cap_negotiation_commands) {
-         qdict = qdict_get_qdict(qobject_to(QDict, rsp), "error");
-         if (qdict
-@@ -3825,13 +3832,9 @@ err_out:
+     qdict_flatten(qdict);
 
- static void monitor_qmp_read(void *opaque, const uint8_t *buf, int size)
- {
--    Monitor *old_mon = cur_mon;
-+    Monitor *mon = opaque;
-
--    cur_mon = opaque;
+-    /*
+-     * Rewrite "backing": null to "backing": ""
+-     * TODO Rewrite "" to null instead, and perhaps not even here
+-     */
+-    for (ent = qdict_first(qdict); ent; ent = qdict_next(qdict, ent)) {
+-        char *dot = strrchr(ent->key, '.');
 -
--    json_message_parser_feed(&cur_mon->qmp.parser, (const char *) buf, size);
+-        if (!strcmp(dot ? dot + 1 : ent->key, "backing")
+-            && qobject_type(ent->value) == QTYPE_QNULL) {
+-            qdict_put(qdict, ent->key, qstring_new());
+-        }
+-    }
 -
--    cur_mon = old_mon;
-+    json_message_parser_feed(&mon->qmp.parser, (const char *) buf, size);
- }
+     if (!qdict_get_try_str(qdict, "node-name")) {
+         error_setg(errp, "'node-name' must be specified for the root node");
+         goto fail;
+diff --git a/tests/qemu-iotests/089 b/tests/qemu-iotests/089
+index 0b059aba905..aa1ba4a98e7 100755
+--- a/tests/qemu-iotests/089
++++ b/tests/qemu-iotests/089
+@@ -82,6 +82,26 @@ $QEMU_IO_PROG --cache $CACHEMODE \
+ $QEMU_IO -c 'read -P 42 0 512' "$TEST_IMG" | _filter_qemu_io
 
- static void monitor_read(void *opaque, const uint8_t *buf, int size)
+
++echo
++echo "=== Testing correct handling of 'backing':null ==="
++echo
++
++_make_test_img -b "$TEST_IMG.base" $IMG_SIZE
++
++# This should read 42
++$QEMU_IO -c 'read -P 42 0 512' "$TEST_IMG" | _filter_qemu_io
++
++# This should read 0
++$QEMU_IO -c 'read -P 0 0 512' "json:{\
++    'driver': '$IMGFMT',
++    'file': {
++        'driver': 'file',
++        'filename': '$TEST_IMG'
++    },
++    'backing': null
++}" | _filter_qemu_io
++
++
+ # Taken from test 071
+ echo
+ echo "=== Testing blkdebug ==="
+diff --git a/tests/qemu-iotests/089.out b/tests/qemu-iotests/089.out
+index 0bf5a13ec18..89e3e4340a4 100644
+--- a/tests/qemu-iotests/089.out
++++ b/tests/qemu-iotests/089.out
+@@ -19,6 +19,14 @@ Pattern verification failed at offset 0, 512 bytes
+ read 512/512 bytes at offset 0
+ 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+
++=== Testing correct handling of 'backing':null ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base
++read 512/512 bytes at offset 0
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 512/512 bytes at offset 0
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
+ === Testing blkdebug ===
+
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
 -- 
 2.14.3
