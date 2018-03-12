@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aishwaryakadlag@gmail.com>) id 1evRir-0007bQ-2o
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:58:58 -0400
+	(envelope-from <no-reply@patchew.org>) id 1evRjp-0008VF-MU
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:59:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aishwaryakadlag@gmail.com>) id 1evRip-0003At-V8
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:58:57 -0400
-Received: from mail-ot0-x22d.google.com ([2607:f8b0:4003:c0f::22d]:39925)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aishwaryakadlag@gmail.com>)
-	id 1evRip-0003AS-Q6
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:58:55 -0400
-Received: by mail-ot0-x22d.google.com with SMTP id h8so16178481oti.6
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 10:58:55 -0700 (PDT)
+	(envelope-from <no-reply@patchew.org>) id 1evRjo-0003it-Lu
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:59:57 -0400
+Resent-Message-Id: <E1evRjo-0003it-Lu@eggs.gnu.org>
+In-Reply-To: <20180312150218.1314-1-kwolf@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152087758899.39.17918973194206100712@71c20359a636>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8XSC1Tm_0AfQPA4Nz5sOZd3HLNDZD7jdBzmEzB5pEyzQ@mail.gmail.com>
-References: <1520786414-8806-1-git-send-email-aishwaryakadlag@gmail.com>
-	<6666720e-6f5c-0e8c-6c5a-ac36d708e314@redhat.com>
-	<20180312070545.ktvvgp2kn2uxjpzk@sirius.home.kraxel.org>
-	<CAFEAcA8XSC1Tm_0AfQPA4Nz5sOZd3HLNDZD7jdBzmEzB5pEyzQ@mail.gmail.com>
-From: Aishwarya Kadlag <aishwaryakadlag@gmail.com>
-Date: Mon, 12 Mar 2018 23:28:54 +0530
-Message-ID: <CAFPFVbdTdDhvf-vymmVv5SXnp4UD=7adkS8r89YR3O809B787w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V1]sm501: dead code removal
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 12 Mar 2018 10:59:49 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] luks: Implement .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +23,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: kwolf@redhat.com
+Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
 
-Really glad to get a feedback so soon on my first attempt.
-
-Yes Thomas sir, I will apply these changes in my next patch. Now that this
-patch is already been implemented by Gerd sir in 2014 and it was not
-applied, should I consider finding some other task or should I improve this
-patch to get it merged or applied? Also as this was my first attempt, I
-selected the task mentioned in the wiki page
-https://wiki.qemu.org/BiteSizedTasks#Dead_code_removal
-As Paolo sir said, if this is too easy then can someone please suggest me
-any other task to work on so that I can create something useful to qemu??
-
-
-Thanks,
-Aishwarya
-
-
-
-On Mon, Mar 12, 2018 at 6:33 PM, Peter Maydell <peter.maydell@linaro.org>
-wrote:
-
-> On 12 March 2018 at 07:05, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> > Might be it actually is that easy.
->
-> In fact looking through the list archives I see you actually
-> sent a patchset to do this for the sm501 device back in March
-> last year:
-> http://lists.gnu.org/archive/html/qemu-devel/2017-03/msg01172.html
->
-> I think it didn't get applied mostly because it was on list
-> at the same time as a significant revamp of the sm501 device
-> code. So it probably won't apply cleanly to the current code,
-> but it looks like a good starting point for identifying what
-> the changes needed here are.
->
-> thanks
-> -- PMM
->
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMzEyMTUwMjE4LjEzMTQtMS1rd29sZkByZWRoYXQuY29tClN1YmplY3Q6
+IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC82XSBsdWtzOiBJbXBsZW1lbnQgLmJkcnZfY29fY3Jl
+YXRlCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
+CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
+bQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9y
+IGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQo
+Z2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1m
+b3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4K
+ICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUK
+CmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
+MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
+J3Rlc3QnCjIxNzA3YzcyNTIgcWVtdS1pb3Rlc3RzOiBUZXN0IGx1a3MgUU1QIGltYWdlIGNyZWF0
+aW9uCmMzY2NlMTE2OGYgbHVrczogQ2F0Y2ggaW50ZWdlciBvdmVyZmxvdyBmb3IgaHVnZSBzaXpl
+cwpiZWUwNjVlMGJhIGx1a3M6IFR1cm4gaW52YWxpZCBhc3NlcnRpb24gaW50byBjaGVjawpiOWQz
+MTQ3OWY4IGx1a3M6IFN1cHBvcnQgLmJkcnZfY29fY3JlYXRlCjJkYzlmOTViNTkgbHVrczogQ3Jl
+YXRlIGJsb2NrX2NyeXB0b19jb19jcmVhdGVfZ2VuZXJpYygpCjI2ODIxZTM3ZTkgbHVrczogU2Vw
+YXJhdGUgaW1hZ2UgZmlsZSBjcmVhdGlvbiBmcm9tIGZvcm1hdHRpbmcKCj09PSBPVVRQVVQgQkVH
+SU4gPT09CkNoZWNraW5nIFBBVENIIDEvNjogbHVrczogU2VwYXJhdGUgaW1hZ2UgZmlsZSBjcmVh
+dGlvbiBmcm9tIGZvcm1hdHRpbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggMi82OiBsdWtzOiBDcmVhdGUg
+YmxvY2tfY3J5cHRvX2NvX2NyZWF0ZV9nZW5lcmljKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMy82OiBs
+dWtzOiBTdXBwb3J0IC5iZHJ2X2NvX2NyZWF0ZS4uLgpDaGVja2luZyBQQVRDSCA0LzY6IGx1a3M6
+IFR1cm4gaW52YWxpZCBhc3NlcnRpb24gaW50byBjaGVjay4uLgpFUlJPUjogc3VzcGVjdCBjb2Rl
+IGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVtZW50cyAoNCwgNykKIzMxOiBGSUxFOiBibG9j
+ay9jcnlwdG8uYzo1MjI6CisgICAgaWYgKG9mZnNldCA+IGxlbikgeworICAgICAgIHJldHVybiAt
+RUlPOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMSBsaW5lcyBjaGVja2VkCgpZb3Vy
+IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
+ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
+ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA1LzY6IGx1
+a3M6IENhdGNoIGludGVnZXIgb3ZlcmZsb3cgZm9yIGh1Z2Ugc2l6ZXMuLi4KQ2hlY2tpbmcgUEFU
+Q0ggNi82OiBxZW11LWlvdGVzdHM6IFRlc3QgbHVrcyBRTVAgaW1hZ2UgY3JlYXRpb24uLi4KPT09
+IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpF
+bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
+cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0
+cy5vcmc=
