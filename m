@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evTp0-0004FI-BT
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:13:28 -0400
+	(envelope-from <berrange@redhat.com>) id 1evTp0-0004FL-Bz
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:13:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evTow-00074x-94
+	(envelope-from <berrange@redhat.com>) id 1evTow-00074w-9I
 	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:13:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32798 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43324 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1evTow-00074M-3W
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1evTow-00074N-3I
 	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:13:22 -0400
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Mon, 12 Mar 2018 20:12:59 +0000
-Message-Id: <20180312201305.16972-4-berrange@redhat.com>
+Date: Mon, 12 Mar 2018 20:12:58 +0000
+Message-Id: <20180312201305.16972-3-berrange@redhat.com>
 In-Reply-To: <20180312201305.16972-1-berrange@redhat.com>
 References: <20180312201305.16972-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 3/9] sockets: pull code for testing IP
- availability out of specific test
+Subject: [Qemu-devel] [PULL 2/9] cutils: add qemu_strtoi & qemu_strtoui
+ parsers for int/unsigned int types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,290 +32,829 @@ Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Gerd Hoffma
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-The test-io-channel-socket.c file has some useful helper functions for
-checking if a specific IP protocol is available. Other tests need to
-perform similar kinds of checks to avoid running tests that will fail
-due to missing IP protocols.
+There are qemu_strtoNN functions for various sized integers. This adds tw=
+o
+more for plain int & unsigned int types, with suitable range checking.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- tests/Makefile.include         |   2 +-
- tests/socket-helpers.c         | 100 +++++++++++++++++++++++++++++++++++=
+ include/qemu/cutils.h |   4 +
+ tests/test-cutils.c   | 657 ++++++++++++++++++++++++++++++++++++++++++++=
 ++++++
- tests/socket-helpers.h         |  42 +++++++++++++++++
- tests/test-io-channel-socket.c |  72 +----------------------------
- 4 files changed, 145 insertions(+), 71 deletions(-)
- create mode 100644 tests/socket-helpers.c
- create mode 100644 tests/socket-helpers.h
+ util/cutils.c         | 108 +++++++++
+ 3 files changed, 769 insertions(+)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index ef9b88c369..3d5b6174a8 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -715,7 +715,7 @@ tests/test-crypto-tlssession$(EXESUF): tests/test-cry=
-pto-tlssession.o \
- 	tests/crypto-tls-x509-helpers.o tests/pkix_asn1_tab.o $(test-crypto-obj=
--y)
- tests/test-io-task$(EXESUF): tests/test-io-task.o $(test-io-obj-y)
- tests/test-io-channel-socket$(EXESUF): tests/test-io-channel-socket.o \
--        tests/io-channel-helpers.o $(test-io-obj-y)
-+        tests/io-channel-helpers.o tests/socket-helpers.o $(test-io-obj-=
-y)
- tests/tpm-crb-test$(EXESUF): tests/tpm-crb-test.o tests/tpm-emu.o $(test=
--io-obj-y)
- tests/tpm-tis-test$(EXESUF): tests/tpm-tis-test.o tests/tpm-emu.o $(test=
--io-obj-y)
- tests/test-io-channel-file$(EXESUF): tests/test-io-channel-file.o \
-diff --git a/tests/socket-helpers.c b/tests/socket-helpers.c
-new file mode 100644
-index 0000000000..6f4bf07aa9
---- /dev/null
-+++ b/tests/socket-helpers.c
-@@ -0,0 +1,100 @@
-+/*
-+ * Helper functions for tests using sockets
-+ *
-+ * Copyright 2015-2018 Red Hat, Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License as
-+ * published by the Free Software Foundation; either version 2 or
-+ * (at your option) version 3 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "qemu/sockets.h"
-+#include "socket-helpers.h"
-+
-+#ifndef AI_ADDRCONFIG
-+# define AI_ADDRCONFIG 0
-+#endif
-+#ifndef EAI_ADDRFAMILY
-+# define EAI_ADDRFAMILY 0
-+#endif
-+
-+int socket_can_bind(const char *hostname)
+diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
+index f0878eaafa..a663340b23 100644
+--- a/include/qemu/cutils.h
++++ b/include/qemu/cutils.h
+@@ -126,6 +126,10 @@ time_t mktimegm(struct tm *tm);
+ int qemu_fdatasync(int fd);
+ int fcntl_setfl(int fd, int flag);
+ int qemu_parse_fd(const char *param);
++int qemu_strtoi(const char *nptr, const char **endptr, int base,
++                int *result);
++int qemu_strtoui(const char *nptr, const char **endptr, int base,
++                 unsigned int *result);
+ int qemu_strtol(const char *nptr, const char **endptr, int base,
+                 long *result);
+ int qemu_strtoul(const char *nptr, const char **endptr, int base,
+diff --git a/tests/test-cutils.c b/tests/test-cutils.c
+index f64a49b7fb..64a489c2e9 100644
+--- a/tests/test-cutils.c
++++ b/tests/test-cutils.c
+@@ -223,6 +223,583 @@ static void test_parse_uint_full_correct(void)
+     g_assert_cmpint(i, =3D=3D, 123);
+ }
+=20
++static void test_qemu_strtoi_correct(void)
 +{
-+    int fd =3D -1;
-+    struct addrinfo ai, *res =3D NULL;
-+    int rc;
-+    int ret =3D -1;
++    const char *str =3D "12345 foo";
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    int res =3D 999;
++    int err;
 +
-+    memset(&ai, 0, sizeof(ai));
-+    ai.ai_flags =3D AI_CANONNAME | AI_ADDRCONFIG;
-+    ai.ai_family =3D AF_UNSPEC;
-+    ai.ai_socktype =3D SOCK_STREAM;
++    err =3D qemu_strtoi(str, &endptr, 0, &res);
 +
-+    /* lookup */
-+    rc =3D getaddrinfo(hostname, NULL, &ai, &res);
-+    if (rc !=3D 0) {
-+        if (rc =3D=3D EAI_ADDRFAMILY ||
-+            rc =3D=3D EAI_FAMILY) {
-+            errno =3D EADDRNOTAVAIL;
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpint(res, =3D=3D, 12345);
++    g_assert(endptr =3D=3D str + 5);
++}
++
++static void test_qemu_strtoi_null(void)
++{
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoi(NULL, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, -EINVAL);
++    g_assert(endptr =3D=3D NULL);
++}
++
++static void test_qemu_strtoi_empty(void)
++{
++    const char *str =3D "";
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoi(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, -EINVAL);
++    g_assert(endptr =3D=3D str);
++}
++
++static void test_qemu_strtoi_whitespace(void)
++{
++    const char *str =3D "  \t  ";
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoi(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, -EINVAL);
++    g_assert(endptr =3D=3D str);
++}
++
++static void test_qemu_strtoi_invalid(void)
++{
++    const char *str =3D "   xxxx  \t abc";
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoi(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, -EINVAL);
++    g_assert(endptr =3D=3D str);
++}
++
++static void test_qemu_strtoi_trailing(void)
++{
++    const char *str =3D "123xxx";
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoi(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpint(res, =3D=3D, 123);
++    g_assert(endptr =3D=3D str + 3);
++}
++
++static void test_qemu_strtoi_octal(void)
++{
++    const char *str =3D "0123";
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoi(str, &endptr, 8, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpint(res, =3D=3D, 0123);
++    g_assert(endptr =3D=3D str + strlen(str));
++
++    res =3D 999;
++    endptr =3D &f;
++    err =3D qemu_strtoi(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpint(res, =3D=3D, 0123);
++    g_assert(endptr =3D=3D str + strlen(str));
++}
++
++static void test_qemu_strtoi_decimal(void)
++{
++    const char *str =3D "0123";
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoi(str, &endptr, 10, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpint(res, =3D=3D, 123);
++    g_assert(endptr =3D=3D str + strlen(str));
++
++    str =3D "123";
++    res =3D 999;
++    endptr =3D &f;
++    err =3D qemu_strtoi(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpint(res, =3D=3D, 123);
++    g_assert(endptr =3D=3D str + strlen(str));
++}
++
++static void test_qemu_strtoi_hex(void)
++{
++    const char *str =3D "0123";
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoi(str, &endptr, 16, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpint(res, =3D=3D, 0x123);
++    g_assert(endptr =3D=3D str + strlen(str));
++
++    str =3D "0x123";
++    res =3D 999;
++    endptr =3D &f;
++    err =3D qemu_strtoi(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpint(res, =3D=3D, 0x123);
++    g_assert(endptr =3D=3D str + strlen(str));
++}
++
++static void test_qemu_strtoi_max(void)
++{
++    char *str =3D g_strdup_printf("%d", INT_MAX);
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoi(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpint(res, =3D=3D, INT_MAX);
++    g_assert(endptr =3D=3D str + strlen(str));
++    g_free(str);
++}
++
++static void test_qemu_strtoi_overflow(void)
++{
++    char *str =3D g_strdup_printf("%lld", (long long)INT_MAX + 1ll);
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoi(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, -ERANGE);
++    g_assert_cmpint(res, =3D=3D, INT_MAX);
++    g_assert(endptr =3D=3D str + strlen(str));
++    g_free(str);
++}
++
++static void test_qemu_strtoi_underflow(void)
++{
++    char *str =3D g_strdup_printf("%lld", (long long)INT_MIN - 1ll);
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    int res =3D 999;
++    int err;
++
++    err  =3D qemu_strtoi(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, -ERANGE);
++    g_assert_cmpint(res, =3D=3D, INT_MIN);
++    g_assert(endptr =3D=3D str + strlen(str));
++    g_free(str);
++}
++
++static void test_qemu_strtoi_negative(void)
++{
++    const char *str =3D "  \t -321";
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoi(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpint(res, =3D=3D, -321);
++    g_assert(endptr =3D=3D str + strlen(str));
++}
++
++static void test_qemu_strtoi_full_correct(void)
++{
++    const char *str =3D "123";
++    int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoi(str, NULL, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpint(res, =3D=3D, 123);
++}
++
++static void test_qemu_strtoi_full_null(void)
++{
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoi(NULL, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, -EINVAL);
++    g_assert(endptr =3D=3D NULL);
++}
++
++static void test_qemu_strtoi_full_empty(void)
++{
++    const char *str =3D "";
++    int res =3D 999L;
++    int err;
++
++    err =3D  qemu_strtoi(str, NULL, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, -EINVAL);
++}
++
++static void test_qemu_strtoi_full_negative(void)
++{
++    const char *str =3D " \t -321";
++    int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoi(str, NULL, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpint(res, =3D=3D, -321);
++}
++
++static void test_qemu_strtoi_full_trailing(void)
++{
++    const char *str =3D "123xxx";
++    int res;
++    int err;
++
++    err =3D qemu_strtoi(str, NULL, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, -EINVAL);
++}
++
++static void test_qemu_strtoi_full_max(void)
++{
++    char *str =3D g_strdup_printf("%d", INT_MAX);
++    int res;
++    int err;
++
++    err =3D qemu_strtoi(str, NULL, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpint(res, =3D=3D, INT_MAX);
++    g_free(str);
++}
++
++static void test_qemu_strtoui_correct(void)
++{
++    const char *str =3D "12345 foo";
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    unsigned int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoui(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpuint(res, =3D=3D, 12345);
++    g_assert(endptr =3D=3D str + 5);
++}
++
++static void test_qemu_strtoui_null(void)
++{
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    unsigned int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoui(NULL, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, -EINVAL);
++    g_assert(endptr =3D=3D NULL);
++}
++
++static void test_qemu_strtoui_empty(void)
++{
++    const char *str =3D "";
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    unsigned int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoui(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, -EINVAL);
++    g_assert(endptr =3D=3D str);
++}
++
++static void test_qemu_strtoui_whitespace(void)
++{
++    const char *str =3D "  \t  ";
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    unsigned int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoui(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, -EINVAL);
++    g_assert(endptr =3D=3D str);
++}
++
++static void test_qemu_strtoui_invalid(void)
++{
++    const char *str =3D "   xxxx  \t abc";
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    unsigned int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoui(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, -EINVAL);
++    g_assert(endptr =3D=3D str);
++}
++
++static void test_qemu_strtoui_trailing(void)
++{
++    const char *str =3D "123xxx";
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    unsigned int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoui(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpuint(res, =3D=3D, 123);
++    g_assert(endptr =3D=3D str + 3);
++}
++
++static void test_qemu_strtoui_octal(void)
++{
++    const char *str =3D "0123";
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    unsigned int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoui(str, &endptr, 8, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpuint(res, =3D=3D, 0123);
++    g_assert(endptr =3D=3D str + strlen(str));
++
++    res =3D 999;
++    endptr =3D &f;
++    err =3D qemu_strtoui(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpuint(res, =3D=3D, 0123);
++    g_assert(endptr =3D=3D str + strlen(str));
++}
++
++static void test_qemu_strtoui_decimal(void)
++{
++    const char *str =3D "0123";
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    unsigned int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoui(str, &endptr, 10, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpuint(res, =3D=3D, 123);
++    g_assert(endptr =3D=3D str + strlen(str));
++
++    str =3D "123";
++    res =3D 999;
++    endptr =3D &f;
++    err =3D qemu_strtoui(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpuint(res, =3D=3D, 123);
++    g_assert(endptr =3D=3D str + strlen(str));
++}
++
++static void test_qemu_strtoui_hex(void)
++{
++    const char *str =3D "0123";
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    unsigned int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoui(str, &endptr, 16, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmphex(res, =3D=3D, 0x123);
++    g_assert(endptr =3D=3D str + strlen(str));
++
++    str =3D "0x123";
++    res =3D 999;
++    endptr =3D &f;
++    err =3D qemu_strtoui(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmphex(res, =3D=3D, 0x123);
++    g_assert(endptr =3D=3D str + strlen(str));
++}
++
++static void test_qemu_strtoui_max(void)
++{
++    char *str =3D g_strdup_printf("%u", UINT_MAX);
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    unsigned int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoui(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmphex(res, =3D=3D, UINT_MAX);
++    g_assert(endptr =3D=3D str + strlen(str));
++    g_free(str);
++}
++
++static void test_qemu_strtoui_overflow(void)
++{
++    char *str =3D g_strdup_printf("%lld", (long long)UINT_MAX + 1ll);
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    unsigned int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoui(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, -ERANGE);
++    g_assert_cmphex(res, =3D=3D, UINT_MAX);
++    g_assert(endptr =3D=3D str + strlen(str));
++    g_free(str);
++}
++
++static void test_qemu_strtoui_underflow(void)
++{
++    char *str =3D g_strdup_printf("%lld", (long long)INT_MIN - 1ll);
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    unsigned int res =3D 999;
++    int err;
++
++    err  =3D qemu_strtoui(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, -ERANGE);
++    g_assert_cmpuint(res, =3D=3D, (unsigned int)-1);
++    g_assert(endptr =3D=3D str + strlen(str));
++    g_free(str);
++}
++
++static void test_qemu_strtoui_negative(void)
++{
++    const char *str =3D "  \t -321";
++    char f =3D 'X';
++    const char *endptr =3D &f;
++    unsigned int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoui(str, &endptr, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpuint(res, =3D=3D, (unsigned int)-321);
++    g_assert(endptr =3D=3D str + strlen(str));
++}
++
++static void test_qemu_strtoui_full_correct(void)
++{
++    const char *str =3D "123";
++    unsigned int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoui(str, NULL, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpuint(res, =3D=3D, 123);
++}
++
++static void test_qemu_strtoui_full_null(void)
++{
++    unsigned int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoui(NULL, NULL, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, -EINVAL);
++}
++
++static void test_qemu_strtoui_full_empty(void)
++{
++    const char *str =3D "";
++    unsigned int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoui(str, NULL, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, -EINVAL);
++}
++static void test_qemu_strtoui_full_negative(void)
++{
++    const char *str =3D " \t -321";
++    unsigned int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoui(str, NULL, 0, &res);
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmpuint(res, =3D=3D, (unsigned int)-321);
++}
++
++static void test_qemu_strtoui_full_trailing(void)
++{
++    const char *str =3D "123xxx";
++    unsigned int res;
++    int err;
++
++    err =3D qemu_strtoui(str, NULL, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, -EINVAL);
++}
++
++static void test_qemu_strtoui_full_max(void)
++{
++    char *str =3D g_strdup_printf("%u", UINT_MAX);
++    unsigned int res =3D 999;
++    int err;
++
++    err =3D qemu_strtoui(str, NULL, 0, &res);
++
++    g_assert_cmpint(err, =3D=3D, 0);
++    g_assert_cmphex(res, =3D=3D, UINT_MAX);
++    g_free(str);
++}
++
+ static void test_qemu_strtol_correct(void)
+ {
+     const char *str =3D "12345 foo";
+@@ -1612,6 +2189,86 @@ int main(int argc, char **argv)
+     g_test_add_func("/cutils/parse_uint_full/correct",
+                     test_parse_uint_full_correct);
+=20
++    /* qemu_strtoi() tests */
++    g_test_add_func("/cutils/qemu_strtoi/correct",
++                    test_qemu_strtoi_correct);
++    g_test_add_func("/cutils/qemu_strtoi/null",
++                    test_qemu_strtoi_null);
++    g_test_add_func("/cutils/qemu_strtoi/empty",
++                    test_qemu_strtoi_empty);
++    g_test_add_func("/cutils/qemu_strtoi/whitespace",
++                    test_qemu_strtoi_whitespace);
++    g_test_add_func("/cutils/qemu_strtoi/invalid",
++                    test_qemu_strtoi_invalid);
++    g_test_add_func("/cutils/qemu_strtoi/trailing",
++                    test_qemu_strtoi_trailing);
++    g_test_add_func("/cutils/qemu_strtoi/octal",
++                    test_qemu_strtoi_octal);
++    g_test_add_func("/cutils/qemu_strtoi/decimal",
++                    test_qemu_strtoi_decimal);
++    g_test_add_func("/cutils/qemu_strtoi/hex",
++                    test_qemu_strtoi_hex);
++    g_test_add_func("/cutils/qemu_strtoi/max",
++                    test_qemu_strtoi_max);
++    g_test_add_func("/cutils/qemu_strtoi/overflow",
++                    test_qemu_strtoi_overflow);
++    g_test_add_func("/cutils/qemu_strtoi/underflow",
++                    test_qemu_strtoi_underflow);
++    g_test_add_func("/cutils/qemu_strtoi/negative",
++                    test_qemu_strtoi_negative);
++    g_test_add_func("/cutils/qemu_strtoi_full/correct",
++                    test_qemu_strtoi_full_correct);
++    g_test_add_func("/cutils/qemu_strtoi_full/null",
++                    test_qemu_strtoi_full_null);
++    g_test_add_func("/cutils/qemu_strtoi_full/empty",
++                    test_qemu_strtoi_full_empty);
++    g_test_add_func("/cutils/qemu_strtoi_full/negative",
++                    test_qemu_strtoi_full_negative);
++    g_test_add_func("/cutils/qemu_strtoi_full/trailing",
++                    test_qemu_strtoi_full_trailing);
++    g_test_add_func("/cutils/qemu_strtoi_full/max",
++                    test_qemu_strtoi_full_max);
++
++    /* qemu_strtoui() tests */
++    g_test_add_func("/cutils/qemu_strtoui/correct",
++                    test_qemu_strtoui_correct);
++    g_test_add_func("/cutils/qemu_strtoui/null",
++                    test_qemu_strtoui_null);
++    g_test_add_func("/cutils/qemu_strtoui/empty",
++                    test_qemu_strtoui_empty);
++    g_test_add_func("/cutils/qemu_strtoui/whitespace",
++                    test_qemu_strtoui_whitespace);
++    g_test_add_func("/cutils/qemu_strtoui/invalid",
++                    test_qemu_strtoui_invalid);
++    g_test_add_func("/cutils/qemu_strtoui/trailing",
++                    test_qemu_strtoui_trailing);
++    g_test_add_func("/cutils/qemu_strtoui/octal",
++                    test_qemu_strtoui_octal);
++    g_test_add_func("/cutils/qemu_strtoui/decimal",
++                    test_qemu_strtoui_decimal);
++    g_test_add_func("/cutils/qemu_strtoui/hex",
++                    test_qemu_strtoui_hex);
++    g_test_add_func("/cutils/qemu_strtoui/max",
++                    test_qemu_strtoui_max);
++    g_test_add_func("/cutils/qemu_strtoui/overflow",
++                    test_qemu_strtoui_overflow);
++    g_test_add_func("/cutils/qemu_strtoui/underflow",
++                    test_qemu_strtoui_underflow);
++    g_test_add_func("/cutils/qemu_strtoui/negative",
++                    test_qemu_strtoui_negative);
++    g_test_add_func("/cutils/qemu_strtoui_full/correct",
++                    test_qemu_strtoui_full_correct);
++    g_test_add_func("/cutils/qemu_strtoui_full/null",
++                    test_qemu_strtoui_full_null);
++    g_test_add_func("/cutils/qemu_strtoui_full/empty",
++                    test_qemu_strtoui_full_empty);
++    g_test_add_func("/cutils/qemu_strtoui_full/negative",
++                    test_qemu_strtoui_full_negative);
++    g_test_add_func("/cutils/qemu_strtoui_full/trailing",
++                    test_qemu_strtoui_full_trailing);
++    g_test_add_func("/cutils/qemu_strtoui_full/max",
++                    test_qemu_strtoui_full_max);
++
+     /* qemu_strtol() tests */
+     g_test_add_func("/cutils/qemu_strtol/correct",
+                     test_qemu_strtol_correct);
+diff --git a/util/cutils.c b/util/cutils.c
+index b33ede83d1..774d5f7362 100644
+--- a/util/cutils.c
++++ b/util/cutils.c
+@@ -297,6 +297,114 @@ static int check_strtox_error(const char *nptr, cha=
+r *ep,
+     return -libc_errno;
+ }
+=20
++/**
++ * Convert string @nptr to an integer, and store it in @result.
++ *
++ * This is a wrapper around strtol() that is harder to misuse.
++ * Semantics of @nptr, @endptr, @base match strtol() with differences
++ * noted below.
++ *
++ * @nptr may be null, and no conversion is performed then.
++ *
++ * If no conversion is performed, store @nptr in *@endptr and return
++ * -EINVAL.
++ *
++ * If @endptr is null, and the string isn't fully converted, return
++ * -EINVAL.  This is the case when the pointer that would be stored in
++ * a non-null @endptr points to a character other than '\0'.
++ *
++ * If the conversion overflows @result, store INT_MAX in @result,
++ * and return -ERANGE.
++ *
++ * If the conversion underflows @result, store INT_MIN in @result,
++ * and return -ERANGE.
++ *
++ * Else store the converted value in @result, and return zero.
++ */
++int qemu_strtoi(const char *nptr, const char **endptr, int base,
++                int *result)
++{
++    char *ep;
++    long lresult;
++
++    if (!nptr) {
++        if (endptr) {
++            *endptr =3D nptr;
++        }
++        return -EINVAL;
++    }
++
++    errno =3D 0;
++    lresult =3D strtol(nptr, &ep, base);
++    if (lresult < INT_MIN) {
++        *result =3D INT_MIN;
++        errno =3D ERANGE;
++    } else if (lresult > INT_MAX) {
++        *result =3D INT_MAX;
++        errno =3D ERANGE;
++    } else {
++        *result =3D lresult;
++    }
++    return check_strtox_error(nptr, ep, endptr, errno);
++}
++
++/**
++ * Convert string @nptr to an unsigned integer, and store it in @result.
++ *
++ * This is a wrapper around strtoul() that is harder to misuse.
++ * Semantics of @nptr, @endptr, @base match strtoul() with differences
++ * noted below.
++ *
++ * @nptr may be null, and no conversion is performed then.
++ *
++ * If no conversion is performed, store @nptr in *@endptr and return
++ * -EINVAL.
++ *
++ * If @endptr is null, and the string isn't fully converted, return
++ * -EINVAL.  This is the case when the pointer that would be stored in
++ * a non-null @endptr points to a character other than '\0'.
++ *
++ * If the conversion overflows @result, store UINT_MAX in @result,
++ * and return -ERANGE.
++ *
++ * Else store the converted value in @result, and return zero.
++ *
++ * Note that a number with a leading minus sign gets converted without
++ * the minus sign, checked for overflow (see above), then negated (in
++ * @result's type).  This is exactly how strtoul() works.
++ */
++int qemu_strtoui(const char *nptr, const char **endptr, int base,
++                 unsigned int *result)
++{
++    char *ep;
++    long lresult;
++
++    if (!nptr) {
++        if (endptr) {
++            *endptr =3D nptr;
++        }
++        return -EINVAL;
++    }
++
++    errno =3D 0;
++    lresult =3D strtoul(nptr, &ep, base);
++    /* Windows returns 1 for negative out-of-range values.  */
++    if (errno =3D=3D ERANGE) {
++        *result =3D -1;
++    } else {
++        if (lresult > UINT_MAX) {
++            *result =3D UINT_MAX;
++            errno =3D ERANGE;
++        } else if (lresult < INT_MIN) {
++            *result =3D UINT_MAX;
++            errno =3D ERANGE;
 +        } else {
-+            errno =3D EINVAL;
++            *result =3D lresult;
 +        }
-+        goto cleanup;
 +    }
-+
-+    fd =3D qemu_socket(res->ai_family, res->ai_socktype, res->ai_protoco=
-l);
-+    if (fd < 0) {
-+        goto cleanup;
-+    }
-+
-+    if (bind(fd, res->ai_addr, res->ai_addrlen) < 0) {
-+        goto cleanup;
-+    }
-+
-+    ret =3D 0;
-+
-+ cleanup:
-+    if (fd !=3D -1) {
-+        close(fd);
-+    }
-+    if (res) {
-+        freeaddrinfo(res);
-+    }
-+    return ret;
++    return check_strtox_error(nptr, ep, endptr, errno);
 +}
 +
-+
-+int socket_check_protocol_support(bool *has_ipv4, bool *has_ipv6)
-+{
-+    *has_ipv4 =3D *has_ipv6 =3D false;
-+
-+    if (socket_can_bind("127.0.0.1") < 0) {
-+        if (errno !=3D EADDRNOTAVAIL) {
-+            return -1;
-+        }
-+    } else {
-+        *has_ipv4 =3D true;
-+    }
-+
-+    if (socket_can_bind("::1") < 0) {
-+        if (errno !=3D EADDRNOTAVAIL) {
-+            return -1;
-+        }
-+    } else {
-+        *has_ipv6 =3D true;
-+    }
-+
-+    return 0;
-+}
-diff --git a/tests/socket-helpers.h b/tests/socket-helpers.h
-new file mode 100644
-index 0000000000..efa96eddc2
---- /dev/null
-+++ b/tests/socket-helpers.h
-@@ -0,0 +1,42 @@
-+/*
-+ * Helper functions for tests using sockets
-+ *
-+ * Copyright 2015-2018 Red Hat, Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License as
-+ * published by the Free Software Foundation; either version 2 or
-+ * (at your option) version 3 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+/*
-+ * @hostname: a DNS name or numeric IP address
-+ *
-+ * Check whether it is possible to bind to ports
-+ * on the DNS name or IP address @hostname. If an IP address
-+ * is used, it must not be a wildcard address.
-+ *
-+ * Returns 0 on success, -1 on error with errno set
-+ */
-+int socket_can_bind(const char *hostname);
-+
-+/*
-+ * @has_ipv4: set to true on return if IPv4 is available
-+ * @has_ipv6: set to true on return if IPv6 is available
-+ *
-+ * Check whether IPv4 and/or IPv6 are available for use.
-+ * On success, @has_ipv4 and @has_ipv6 will be set to
-+ * indicate whether the respective protocols are available.
-+ *
-+ * Returns 0 on success, -1 on fatal error
-+ */
-+int socket_check_protocol_support(bool *has_ipv4, bool *has_ipv6);
-diff --git a/tests/test-io-channel-socket.c b/tests/test-io-channel-socke=
-t.c
-index b273fd3ba2..0597213f93 100644
---- a/tests/test-io-channel-socket.c
-+++ b/tests/test-io-channel-socket.c
-@@ -22,77 +22,9 @@
- #include "io/channel-socket.h"
- #include "io/channel-util.h"
- #include "io-channel-helpers.h"
-+#include "socket-helpers.h"
- #include "qapi/error.h"
-=20
--#ifndef AI_ADDRCONFIG
--# define AI_ADDRCONFIG 0
--#endif
--#ifndef EAI_ADDRFAMILY
--# define EAI_ADDRFAMILY 0
--#endif
--
--static int check_bind(const char *hostname, bool *has_proto)
--{
--    int fd =3D -1;
--    struct addrinfo ai, *res =3D NULL;
--    int rc;
--    int ret =3D -1;
--
--    memset(&ai, 0, sizeof(ai));
--    ai.ai_flags =3D AI_CANONNAME | AI_ADDRCONFIG;
--    ai.ai_family =3D AF_UNSPEC;
--    ai.ai_socktype =3D SOCK_STREAM;
--
--    /* lookup */
--    rc =3D getaddrinfo(hostname, NULL, &ai, &res);
--    if (rc !=3D 0) {
--        if (rc =3D=3D EAI_ADDRFAMILY ||
--            rc =3D=3D EAI_FAMILY) {
--            *has_proto =3D false;
--            goto done;
--        }
--        goto cleanup;
--    }
--
--    fd =3D qemu_socket(res->ai_family, res->ai_socktype, res->ai_protoco=
-l);
--    if (fd < 0) {
--        goto cleanup;
--    }
--
--    if (bind(fd, res->ai_addr, res->ai_addrlen) < 0) {
--        if (errno =3D=3D EADDRNOTAVAIL) {
--            *has_proto =3D false;
--            goto done;
--        }
--        goto cleanup;
--    }
--
--    *has_proto =3D true;
-- done:
--    ret =3D 0;
--
-- cleanup:
--    if (fd !=3D -1) {
--        close(fd);
--    }
--    if (res) {
--        freeaddrinfo(res);
--    }
--    return ret;
--}
--
--static int check_protocol_support(bool *has_ipv4, bool *has_ipv6)
--{
--    if (check_bind("127.0.0.1", has_ipv4) < 0) {
--        return -1;
--    }
--    if (check_bind("::1", has_ipv6) < 0) {
--        return -1;
--    }
--
--    return 0;
--}
--
-=20
- static void test_io_channel_set_socket_bufs(QIOChannel *src,
-                                             QIOChannel *dst)
-@@ -566,7 +498,7 @@ int main(int argc, char **argv)
-      * each protocol to avoid breaking tests on machines
-      * with either IPv4 or IPv6 disabled.
-      */
--    if (check_protocol_support(&has_ipv4, &has_ipv6) < 0) {
-+    if (socket_check_protocol_support(&has_ipv4, &has_ipv6) < 0) {
-         return 1;
-     }
-=20
+ /**
+  * Convert string @nptr to a long integer, and store it in @result.
+  *
 --=20
 2.14.3
