@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evN7U-0000ay-Uq
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:04:05 -0400
+	(envelope-from <groug@kaod.org>) id 1evNA3-0002XP-H9
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:06:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evN7O-0007Sq-Rn
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:04:04 -0400
-Received: from mail-oi0-x231.google.com ([2607:f8b0:4003:c06::231]:32951)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1evN7O-0007Rk-L2
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:03:58 -0400
-Received: by mail-oi0-x231.google.com with SMTP id e9so12222898oii.0
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 06:03:58 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1evNA0-0003dl-3p
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:06:43 -0400
+Received: from 5.mo179.mail-out.ovh.net ([46.105.43.140]:60162)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1evN9z-0003bd-Sg
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:06:40 -0400
+Received: from player693.ha.ovh.net (unknown [10.109.120.190])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 04FAAA8853
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 14:06:37 +0100 (CET)
+Date: Mon, 12 Mar 2018 14:02:29 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180312140229.66930d5d@bahia.lan>
+In-Reply-To: <486e1b60-e453-c3de-040b-8b2951ddf3a5@redhat.com>
+References: <20180311201239.25506-1-nia.alarie@gmail.com>
+	<486e1b60-e453-c3de-040b-8b2951ddf3a5@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180312070545.ktvvgp2kn2uxjpzk@sirius.home.kraxel.org>
-References: <1520786414-8806-1-git-send-email-aishwaryakadlag@gmail.com>
-	<6666720e-6f5c-0e8c-6c5a-ac36d708e314@redhat.com>
-	<20180312070545.ktvvgp2kn2uxjpzk@sirius.home.kraxel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 12 Mar 2018 13:03:37 +0000
-Message-ID: <CAFEAcA8XSC1Tm_0AfQPA4Nz5sOZd3HLNDZD7jdBzmEzB5pEyzQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V1]sm501: dead code removal
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] 9p: Convert use of atoi to qemu_strtol to
+ allow error checking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,22 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Aishwarya Kadlag <aishwaryakadlag@gmail.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Nia Alarie <nia.alarie@gmail.com>, qemu-devel@nongnu.org, stefanha@gmail.com, jim@groklearning.com, joel@jms.id.au, "Daniel P.
+	Berrange" <berrange@redhat.com>
 
-On 12 March 2018 at 07:05, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> Might be it actually is that easy.
+On Mon, 12 Mar 2018 07:12:52 -0500
+Eric Blake <eblake@redhat.com> wrote:
 
-In fact looking through the list archives I see you actually
-sent a patchset to do this for the sm501 device back in March
-last year:
-http://lists.gnu.org/archive/html/qemu-devel/2017-03/msg01172.html
+> On 03/11/2018 03:12 PM, Nia Alarie wrote:
+> > Signed-off-by: Nia Alarie <nia.alarie@gmail.com>
+> > ---
+> >   hw/9pfs/9p.c | 12 ++++++++++--
+> >   1 file changed, 10 insertions(+), 2 deletions(-)
+> >   
+> 
+> >       } else if (perm & P9_STAT_MODE_LINK) {
+> > -        int32_t ofid = atoi(extension.data);
+> > -        V9fsFidState *ofidp = get_fid(pdu, ofid);
+> > +        long ofid;
+> > +        V9fsFidState *ofidp;
+> > +
+> > +        if (qemu_strtol(extension.data, NULL, 10, &ofid) ||
+> > +            ofid > INT32_MAX || ofid < INT32_MIN) {  
+> 
+> Dan has a pending patch that will add qemu_strtoi, which might be a 
+> nicer fit for this situation:
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg00952.html
+> 
+> int32_t is not necessarily int, but all platforms that compile qemu have 
+> 'int32_t' and 'int' both at 32 bits, so it's simpler to change to 'int 
+> ofid' and use Dan's function than it is to parse to long and then do 
+> bounds checking.  Except that Dan still needs to post an updated version 
+> of his patch...
+> 
 
-I think it didn't get applied mostly because it was on list
-at the same time as a significant revamp of the sm501 device
-code. So it probably won't apply cleanly to the current code,
-but it looks like a good starting point for identifying what
-the changes needed here are.
-
-thanks
--- PMM
+I wasn't aware of Dan's patch but I agree it would result in a nicer
+change for 9p. This being said, tomorrow is soft freeze... is there
+a chance Dan's patch reaches master anytime soon ?
