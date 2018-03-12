@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45420)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evSJc-0000rr-2h
+	(envelope-from <eblake@redhat.com>) id 1evSJc-0000rk-0C
 	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evSJb-00063K-0H
+	(envelope-from <eblake@redhat.com>) id 1evSJZ-00062Q-SD
 	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33612 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58842 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1evSJa-000635-Qw
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:54 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1evSJZ-000626-Ml
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:53 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5FEF9814F0D2
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 18:36:54 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4C0B4401C9AE
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 18:36:53 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 12 Mar 2018 13:36:18 -0500
-Message-Id: <20180312183628.394722-28-eblake@redhat.com>
+Date: Mon, 12 Mar 2018 13:36:16 -0500
+Message-Id: <20180312183628.394722-26-eblake@redhat.com>
 In-Reply-To: <20180312183628.394722-1-eblake@redhat.com>
 References: <20180312183628.394722-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 27/36] monitor: send event when command queue
- full
+Subject: [Qemu-devel] [PULL 25/36] monitor: separate QMP parser and
+ dispatcher
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,74 +35,324 @@ Cc: Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. Da
 
 From: Peter Xu <peterx@redhat.com>
 
-Set maximum QMP command queue length to 8.  If the queue is full,
-instead of queuing the command, we directly return a "command-dropped"
-event, telling the client that a specific command is dropped.
+Originally QMP goes through these steps:
 
-Note that this flow control mechanism is only valid if OOB is enabled.
-If it's not, the effective queue length will always be 1, which strictly
-follows original behavior of QMP command handling (which never drops
-messages).
+  JSON Parser --> QMP Dispatcher --> Respond
+      /|\    (2)                (3)     |
+   (1) |                               \|/ (4)
+       +---------  main thread  --------+
+
+This patch does this:
+
+  JSON Parser     QMP Dispatcher --> Respond
+      /|\ |           /|\       (4)     |
+       |  | (2)        | (3)            |  (5)
+   (1) |  +----->      |               \|/
+       +---------  main thread  <-------+
+
+So the parsing job and the dispatching job is isolated now.  It gives us
+a chance in follow up patches to totally move the parser outside.
+
+The isolation is done using one QEMUBH. Only one dispatcher QEMUBH is
+used for all the monitors.
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180309090006.10018-17-peterx@redhat.com>
+Message-Id: <20180309090006.10018-15-peterx@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-[eblake: commit message grammar, abort on failure to send event]
+[eblake: grammar tweaks, rebase to qobject_to()]
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- monitor.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ monitor.c | 201 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 178 insertions(+), 23 deletions(-)
 
 diff --git a/monitor.c b/monitor.c
-index 07446d6b879..d28457d60d7 100644
+index 6b225e9fc5c..07446d6b879 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -4007,6 +4007,8 @@ static void monitor_qmp_bh_dispatcher(void *data)
-     }
+@@ -172,6 +172,13 @@ typedef struct {
+      */
+     QmpCommandList *commands;
+     bool qmp_caps[QMP_CAPABILITY__MAX];
++    /*
++     * Protects qmp request/response queue.  Please take monitor_lock
++     * first when used together.
++     */
++    QemuMutex qmp_queue_lock;
++    /* Input queue that holds all the parsed QMP requests */
++    GQueue *qmp_requests;
+ } MonitorQMP;
+
+ /*
+@@ -218,6 +225,8 @@ struct Monitor {
+ /* Let's add monitor global variables to this struct. */
+ static struct {
+     IOThread *mon_iothread;
++    /* Bottom half to dispatch the requests received from IO thread */
++    QEMUBH *qmp_dispatcher_bh;
+ } mon_global;
+
+ /* QMP checker flags */
+@@ -600,11 +609,13 @@ static void monitor_data_init(Monitor *mon, bool skip_flush,
+ {
+     memset(mon, 0, sizeof(Monitor));
+     qemu_mutex_init(&mon->out_lock);
++    qemu_mutex_init(&mon->qmp.qmp_queue_lock);
+     mon->outbuf = qstring_new();
+     /* Use *mon_cmds by default. */
+     mon->cmd_table = mon_cmds;
+     mon->skip_flush = skip_flush;
+     mon->use_io_thr = use_io_thr;
++    mon->qmp.qmp_requests = g_queue_new();
  }
 
-+#define  QMP_REQ_QUEUE_LEN_MAX  (8)
-+
- static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
- {
-     QObject *req, *id = NULL;
-@@ -4040,6 +4042,9 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
-     req_obj->req = req;
-     req_obj->need_resume = false;
+ static void monitor_data_destroy(Monitor *mon)
+@@ -617,6 +628,8 @@ static void monitor_data_destroy(Monitor *mon)
+     readline_free(mon->rs);
+     QDECREF(mon->outbuf);
+     qemu_mutex_destroy(&mon->out_lock);
++    qemu_mutex_destroy(&mon->qmp.qmp_queue_lock);
++    g_queue_free(mon->qmp.qmp_requests);
+ }
 
-+    /* Protect qmp_requests and fetching its length. */
-+    qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
+ char *qmp_human_monitor_command(const char *command_line, bool has_cpu_index,
+@@ -1056,6 +1069,16 @@ static void monitor_init_qmp_commands(void)
+                          qmp_marshal_qmp_capabilities, QCO_NO_OPTIONS);
+ }
+
++static bool qmp_cap_enabled(Monitor *mon, QMPCapability cap)
++{
++    return mon->qmp.qmp_caps[cap];
++}
 +
-     /*
-      * If OOB is not enabled on the current monitor, we'll emulate the
-      * old behavior that we won't process the current monitor any more
-@@ -4049,6 +4054,18 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
-     if (!qmp_oob_enabled(mon)) {
-         monitor_suspend(mon);
-         req_obj->need_resume = true;
-+    } else {
-+        /* Drop the request if queue is full. */
-+        if (mon->qmp.qmp_requests->length >= QMP_REQ_QUEUE_LEN_MAX) {
-+            qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
-+            qapi_event_send_command_dropped(id,
-+                                            COMMAND_DROP_REASON_QUEUE_FULL,
-+                                            &error_abort);
-+            qobject_decref(id);
-+            qobject_decref(req);
-+            g_free(req_obj);
-+            return;
-+        }
++static bool qmp_oob_enabled(Monitor *mon)
++{
++    return qmp_cap_enabled(mon, QMP_CAPABILITY_OOB);
++}
++
+ static void qmp_caps_check(Monitor *mon, QMPCapabilityList *list,
+                            Error **errp)
+ {
+@@ -3866,30 +3889,39 @@ static void monitor_qmp_respond(Monitor *mon, QObject *rsp,
+     qobject_decref(rsp);
+ }
+
+-static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
++struct QMPRequest {
++    /* Owner of the request */
++    Monitor *mon;
++    /* "id" field of the request */
++    QObject *id;
++    /* Request object to be handled */
++    QObject *req;
++    /*
++     * Whether we need to resume the monitor afterward.  This flag is
++     * used to emulate the old QMP server behavior that the current
++     * command must be completed before execution of the next one.
++     */
++    bool need_resume;
++};
++typedef struct QMPRequest QMPRequest;
++
++/*
++ * Dispatch one single QMP request. The function will free the req_obj
++ * and objects inside it before return.
++ */
++static void monitor_qmp_dispatch_one(QMPRequest *req_obj)
+ {
+-    QObject *req, *rsp = NULL, *id = NULL;
++    Monitor *mon, *old_mon;
++    QObject *req, *rsp = NULL, *id;
+     QDict *qdict = NULL;
+-    MonitorQMP *mon_qmp = container_of(parser, MonitorQMP, parser);
+-    Monitor *old_mon, *mon = container_of(mon_qmp, Monitor, qmp);
++    bool need_resume;
+
+-    Error *err = NULL;
++    req = req_obj->req;
++    mon = req_obj->mon;
++    id = req_obj->id;
++    need_resume = req_obj->need_resume;
+
+-    req = json_parser_parse_err(tokens, NULL, &err);
+-    if (!req && !err) {
+-        /* json_parser_parse_err() sucks: can fail without setting @err */
+-        error_setg(&err, QERR_JSON_PARSING);
+-    }
+-    if (err) {
+-        goto err_out;
+-    }
+-
+-    qdict = qobject_to(QDict, req);
+-    if (qdict) {
+-        id = qdict_get(qdict, "id");
+-        qobject_incref(id);
+-        qdict_del(qdict, "id");
+-    } /* else will fail qmp_dispatch() */
++    g_free(req_obj);
+
+     if (trace_event_get_state_backends(TRACE_HANDLE_QMP_COMMAND)) {
+         QString *req_json = qobject_to_json(req);
+@@ -3900,7 +3932,7 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+     old_mon = cur_mon;
+     cur_mon = mon;
+
+-    rsp = qmp_dispatch(cur_mon->qmp.commands, req);
++    rsp = qmp_dispatch(mon->qmp.commands, req);
+
+     cur_mon = old_mon;
+
+@@ -3916,12 +3948,122 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+         }
      }
 
-     /*
-@@ -4056,7 +4073,6 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
-      * handled in time order.  Ownership for req_obj, req, id,
-      * etc. will be delivered to the handler side.
-      */
--    qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
-     g_queue_push_tail(mon->qmp.qmp_requests, req_obj);
-     qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
+-err_out:
+-    monitor_qmp_respond(mon, rsp, err, id);
++    /* Respond if necessary */
++    monitor_qmp_respond(mon, rsp, NULL, id);
++
++    /* This pairs with the monitor_suspend() in handle_qmp_command(). */
++    if (need_resume) {
++        monitor_resume(mon);
++    }
 
+     qobject_decref(req);
+ }
+
++/*
++ * Pop one QMP request from monitor queues, return NULL if not found.
++ * We are using round-robin fashion to pop the request, to avoid
++ * processing commands only on a very busy monitor.  To achieve that,
++ * when we process one request on a specific monitor, we put that
++ * monitor to the end of mon_list queue.
++ */
++static QMPRequest *monitor_qmp_requests_pop_one(void)
++{
++    QMPRequest *req_obj = NULL;
++    Monitor *mon;
++
++    qemu_mutex_lock(&monitor_lock);
++
++    QTAILQ_FOREACH(mon, &mon_list, entry) {
++        qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
++        req_obj = g_queue_pop_head(mon->qmp.qmp_requests);
++        qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
++        if (req_obj) {
++            break;
++        }
++    }
++
++    if (req_obj) {
++        /*
++         * We found one request on the monitor. Degrade this monitor's
++         * priority to lowest by re-inserting it to end of queue.
++         */
++        QTAILQ_REMOVE(&mon_list, mon, entry);
++        QTAILQ_INSERT_TAIL(&mon_list, mon, entry);
++    }
++
++    qemu_mutex_unlock(&monitor_lock);
++
++    return req_obj;
++}
++
++static void monitor_qmp_bh_dispatcher(void *data)
++{
++    QMPRequest *req_obj = monitor_qmp_requests_pop_one();
++
++    if (req_obj) {
++        monitor_qmp_dispatch_one(req_obj);
++        /* Reschedule instead of looping so the main loop stays responsive */
++        qemu_bh_schedule(mon_global.qmp_dispatcher_bh);
++    }
++}
++
++static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
++{
++    QObject *req, *id = NULL;
++    QDict *qdict = NULL;
++    MonitorQMP *mon_qmp = container_of(parser, MonitorQMP, parser);
++    Monitor *mon = container_of(mon_qmp, Monitor, qmp);
++    Error *err = NULL;
++    QMPRequest *req_obj;
++
++    req = json_parser_parse_err(tokens, NULL, &err);
++    if (!req && !err) {
++        /* json_parser_parse_err() sucks: can fail without setting @err */
++        error_setg(&err, QERR_JSON_PARSING);
++    }
++    if (err) {
++        monitor_qmp_respond(mon, NULL, err, NULL);
++        qobject_decref(req);
++        return;
++    }
++
++    qdict = qobject_to(QDict, req);
++    if (qdict) {
++        id = qdict_get(qdict, "id");
++        qobject_incref(id);
++        qdict_del(qdict, "id");
++    } /* else will fail qmp_dispatch() */
++
++    req_obj = g_new0(QMPRequest, 1);
++    req_obj->mon = mon;
++    req_obj->id = id;
++    req_obj->req = req;
++    req_obj->need_resume = false;
++
++    /*
++     * If OOB is not enabled on the current monitor, we'll emulate the
++     * old behavior that we won't process the current monitor any more
++     * until it has responded.  This helps make sure that as long as
++     * OOB is not enabled, the server will never drop any command.
++     */
++    if (!qmp_oob_enabled(mon)) {
++        monitor_suspend(mon);
++        req_obj->need_resume = true;
++    }
++
++    /*
++     * Put the request to the end of queue so that requests will be
++     * handled in time order.  Ownership for req_obj, req, id,
++     * etc. will be delivered to the handler side.
++     */
++    qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
++    g_queue_push_tail(mon->qmp.qmp_requests, req_obj);
++    qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
++
++    /* Kick the dispatcher routine */
++    qemu_bh_schedule(mon_global.qmp_dispatcher_bh);
++}
++
+ static void monitor_qmp_read(void *opaque, const uint8_t *buf, int size)
+ {
+     Monitor *mon = opaque;
+@@ -4134,6 +4276,15 @@ static void monitor_iothread_init(void)
+ {
+     mon_global.mon_iothread = iothread_create("mon_iothread",
+                                               &error_abort);
++
++    /*
++     * This MUST be on main loop thread since we have commands that
++     * have assumption to be run on main loop thread.  It would be
++     * nice that one day we can remove this assumption in the future.
++     */
++    mon_global.qmp_dispatcher_bh = aio_bh_new(qemu_get_aio_context(),
++                                              monitor_qmp_bh_dispatcher,
++                                              NULL);
+ }
+
+ void monitor_init_globals(void)
+@@ -4280,6 +4431,10 @@ void monitor_cleanup(void)
+     }
+     qemu_mutex_unlock(&monitor_lock);
+
++    /* QEMUBHs needs to be deleted before destroying the IOThread. */
++    qemu_bh_delete(mon_global.qmp_dispatcher_bh);
++    mon_global.qmp_dispatcher_bh = NULL;
++
+     iothread_destroy(mon_global.mon_iothread);
+     mon_global.mon_iothread = NULL;
+ }
 -- 
 2.14.3
