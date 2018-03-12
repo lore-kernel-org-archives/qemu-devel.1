@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1evNhl-0004lx-7S
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:41:34 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1evNk6-0005kg-23
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:43:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1evNhh-0007sr-6u
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:41:33 -0400
-References: <20180309182202.31206-1-farosas@linux.vnet.ibm.com>
-	<20180309182202.31206-2-farosas@linux.vnet.ibm.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <ef7445b2-073c-d51f-a753-bb9f01287513@redhat.com>
-Date: Mon, 12 Mar 2018 14:41:06 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1evNk5-00035q-0u
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:43:58 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:45290)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1evNk4-000350-QB
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:43:56 -0400
+Received: by mail-oi0-x241.google.com with SMTP id j79so12306365oib.12
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 06:43:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180309182202.31206-2-farosas@linux.vnet.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Yl6HKNBJEJUH1mXlmITo13fnanN1l2Gdf"
-Subject: Re: [Qemu-devel] [PATCH 1/5] block/replication: Remove
- protocol_name field
+In-Reply-To: <1520723090-22130-1-git-send-email-linux@roeck-us.net>
+References: <1520723090-22130-1-git-send-email-linux@roeck-us.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 12 Mar 2018 13:43:35 +0000
+Message-ID: <CAFEAcA_M51Yv-B78uY9NXBYSD02aXf5As+eXNTcyrNxYqtML=Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3] fsl-imx6: Swap Ethernet interrupt
+ defines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,105 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fabiano Rosas <farosas@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, Wen Congyang <wencongyang2@huawei.com>, Xie Changlong <xiechanglong.d@gmail.com>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Chris Healy <cphealy@gmail.com>, Jason Wang <jasowang@redhat.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Bill Paul <wpaul@windriver.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Yl6HKNBJEJUH1mXlmITo13fnanN1l2Gdf
-From: Max Reitz <mreitz@redhat.com>
-To: Fabiano Rosas <farosas@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com,
- Wen Congyang <wencongyang2@huawei.com>,
- Xie Changlong <xiechanglong.d@gmail.com>
-Message-ID: <ef7445b2-073c-d51f-a753-bb9f01287513@redhat.com>
-Subject: Re: [PATCH 1/5] block/replication: Remove protocol_name field
-References: <20180309182202.31206-1-farosas@linux.vnet.ibm.com>
- <20180309182202.31206-2-farosas@linux.vnet.ibm.com>
-In-Reply-To: <20180309182202.31206-2-farosas@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 10 March 2018 at 23:04, Guenter Roeck <linux@roeck-us.net> wrote:
+> The sabrelite machine model used by qemu-system-arm is based on the
+> Freescale/NXP i.MX6Q processor. This SoC has an on-board ethernet
+> controller which is supported in QEMU using the imx_fec.c module
+> (actually called imx.enet for this model.)
+>
+> The include/hw/arm/fsm-imx6.h file defines the interrupt vectors for the
+> imx.enet device like this:
+>
+>  #define FSL_IMX6_ENET_MAC_1588_IRQ 118
+>  #define FSL_IMX6_ENET_MAC_IRQ 119
+>
+> According to https://www.nxp.com/docs/en/reference-manual/IMX6DQRM.pdf,
+> page 225, in Table 3-1. ARM Cortex A9 domain interrupt summary,
+> interrupts are as follows.
+>
+> 150 ENET MAC 0 IRQ
+> 151 ENET MAC 0 1588 Timer interrupt
+>
+> where
+>
+> 150 - 32 == 118
+> 151 - 32 == 119
+>
+> In other words, the vector definitions in the fsl-imx6.h file are reversed.
+>
+> Fixing the interrupts alone causes problems with older Linux kernels:
+> The Ethernet interface will fail to probe with Linux v4.9 and earlier.
+> Linux v4.1 and earlier will crash due to a bug in Ethernet driver probe
+> error handling. This is a Linux kernel problem, not a qemu problem:
+> the Linux kernel only worked by accident since it requested both interrupts.
+>
+> For backward compatibility, generate the Ethernet interrupt on both interrupt
+> lines. This was shown to work from all Linux kernel releases starting with
+> v3.16.
+>
+> Link: https://bugs.launchpad.net/qemu/+bug/1753309
+> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
 
-On 2018-03-09 19:21, Fabiano Rosas wrote:
-> The replication driver is only selected explicitly (via
-> driver=3Dreplication,mode=3Dprimary,...) so it is not a protocol driver=
-=2E
+Applied to target-arm.next for 2.12.
 
-That's not really the point.  It isn't a protocol driver because it has
-a "file" child (opened in replication_open).  All in all it's a filter
-driver.
+Thanks to everybody who helped in identifying what the behaviour here
+was and coming up with this useful workaround to avoid breaking
+previously-working guests.
 
-Apart from that, having a protocol_name might still be OK even for
-non-protocol drivers; for instance, blkdebug and blkverify are both
-filter drivers, but since they implement bdrv_parse_filename() it's OK
-for them to specify protocol_name.
-
-So your sentence is half correct.  Because it can only be selected
-explicitly (for several reasons), giving a protocol_name doesn't make
-sense.  (Independently of whether it is a protocol driver or not.)
-
-But anyway:
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-> This patch removes the protocol_name field from the brdv_replication
-> structure so that attempts to invoke this driver using protocol
-> syntax (i.e. replication:<filename:options:...>) will fail gracefully:
->=20
->   $ qemu-img info replication:foo
->   qemu-img: Could not open 'replication:': Unknown protocol 'replicatio=
-n'
->=20
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1726733
-> Signed-off-by: Fabiano Rosas <farosas@linux.vnet.ibm.com>
-> ---
->  block/replication.c | 1 -
->  replication.h       | 1 -
->  2 files changed, 2 deletions(-)
->=20
-> diff --git a/block/replication.c b/block/replication.c
-> index f98ef094b9..6c0c7186d9 100644
-> --- a/block/replication.c
-> +++ b/block/replication.c
-> @@ -703,7 +703,6 @@ static void replication_stop(ReplicationState *rs, =
-bool failover, Error **errp)
-> =20
->  BlockDriver bdrv_replication =3D {
->      .format_name                =3D "replication",
-> -    .protocol_name              =3D "replication",
->      .instance_size              =3D sizeof(BDRVReplicationState),
-> =20
->      .bdrv_open                  =3D replication_open,
-> diff --git a/replication.h b/replication.h
-> index 8faefe005f..4c8354de23 100644
-> --- a/replication.h
-> +++ b/replication.h
-> @@ -67,7 +67,6 @@ typedef struct ReplicationState ReplicationState;
->   *
->   * BlockDriver bdrv_replication =3D {
->   *     .format_name                =3D "replication",
-> - *     .protocol_name              =3D "replication",
->   *     .instance_size              =3D sizeof(BDRVReplicationState),
->   *
->   *     .bdrv_open                  =3D replication_open,
->=20
-
-
-
---Yl6HKNBJEJUH1mXlmITo13fnanN1l2Gdf
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqmg3ISHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A+98IAKYObiI7Q4kBm0BN7QVES8nP32DrYAR+
-Ff55UWvDwINwHe7IjljT7KEuieQlZHcXCaHo1cZ74XbcGz3HqeDMMtV0obyRa5MF
-VqU24VS4ZtIhkS7RWPlFTx+cfoj0+Tb7Iy35pHJTeqUDqdQsTPWCNiuYy1piCPbk
-BfVhAJ+51NrnnNfptf3pvoh+HIIm4y08xgFC9mzy/o1gMmlVGxRt+JLtyTA6H47H
-41I0rrwThD3K2D9RxtUnsEChf835TbCrML9iKyEJZq2tE0Z90YYmPI1GLdbjCv9H
-HGxSbb2eKkxGzb2uxj22UZSu5Os92Y1y49yG4pNFzZauBI0luurpt+8=
-=ilBW
------END PGP SIGNATURE-----
-
---Yl6HKNBJEJUH1mXlmITo13fnanN1l2Gdf--
+-- PMM
