@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evR95-0008KV-Lk
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:22:00 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evR94-0007kC-Jx
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:21:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57624 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evR94-0007jl-Eb
+	(envelope-from <dgilbert@redhat.com>) id 1evR93-0008IE-CX
 	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:21:58 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgilbert@redhat.com>) id 1evR91-0007hO-M7
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:21:57 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36138 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evR91-0007ge-Gj
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:21:55 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1ECC7401DE93
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 17:21:58 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2AE758424C
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 17:21:55 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 12 Mar 2018 17:21:13 +0000
-Message-Id: <20180312172124.56461-19-dgilbert@redhat.com>
+Date: Mon, 12 Mar 2018 17:21:11 +0000
+Message-Id: <20180312172124.56461-17-dgilbert@redhat.com>
 In-Reply-To: <20180312172124.56461-1-dgilbert@redhat.com>
 References: <20180312172124.56461-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 18/29] vhost+postcopy: Resolve client address
+Subject: [Qemu-devel] [PATCH v5 16/29] vhost+postcopy: Stash RAMBlock and
+ offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,90 +38,115 @@ Cc: aarcange@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Resolve fault addresses read off the clients UFD into RAMBlock
-and offset, and call back to the postcopy code to ask for the page.
+Stash the RAMBlock and offset for later use looking up
+addresses.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/virtio/trace-events |  3 +++
- hw/virtio/vhost-user.c | 31 ++++++++++++++++++++++++++++++-
- 2 files changed, 33 insertions(+), 1 deletion(-)
+ hw/virtio/trace-events |  1 +
+ hw/virtio/vhost-user.c | 34 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 35 insertions(+)
 
 diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index d7e9e1084b..3afd12cfea 100644
+index 05d18ada77..d7e9e1084b 100644
 --- a/hw/virtio/trace-events
 +++ b/hw/virtio/trace-events
-@@ -7,6 +7,9 @@ vhost_region_add_section_abut(const char *name, uint64_t =
-new_size) "%s: 0x%"PRIx
- vhost_section(const char *name, int r) "%s:%d"
-=20
+@@ -9,6 +9,7 @@ vhost_section(const char *name, int r) "%s:%d"
  # hw/virtio/vhost-user.c
-+vhost_user_postcopy_fault_handler(const char *name, uint64_t fault_addre=
-ss, int nregions) "%s: @0x%"PRIx64" nregions:%d"
-+vhost_user_postcopy_fault_handler_loop(int i, uint64_t client_base, uint=
-64_t size) "%d: client 0x%"PRIx64" +0x%"PRIx64
-+vhost_user_postcopy_fault_handler_found(int i, uint64_t region_offset, u=
-int64_t rb_offset) "%d: region_offset: 0x%"PRIx64" rb_offset:0x%"PRIx64
  vhost_user_postcopy_listen(void) ""
  vhost_user_set_mem_table_postcopy(uint64_t client_addr, uint64_t qhva, i=
 nt reply_i, int region_i) "client:0x%"PRIx64" for hva: 0x%"PRIx64" reply =
 %d region %d"
- vhost_user_set_mem_table_withfd(int index, const char *name, uint64_t me=
++vhost_user_set_mem_table_withfd(int index, const char *name, uint64_t me=
 mory_size, uint64_t guest_phys_addr, uint64_t userspace_addr, uint64_t of=
 fset) "%d:%s: size:0x%"PRIx64" GPA:0x%"PRIx64" QVA/userspace:0x%"PRIx64" =
 RB offset:0x%"PRIx64
+=20
+ # hw/virtio/virtio.c
+ virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned=
+ out_num) "elem %p size %zd in_num %u out_num %u"
 diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index b47de62c47..6dee1b565c 100644
+index 1603d70bea..b47de62c47 100644
 --- a/hw/virtio/vhost-user.c
 +++ b/hw/virtio/vhost-user.c
-@@ -26,6 +26,7 @@
- #include <sys/socket.h>
- #include <sys/un.h>
- #include <linux/vhost.h>
-+#include <linux/userfaultfd.h>
-=20
- #define VHOST_MEMORY_MAX_NREGIONS    8
- #define VHOST_USER_F_PROTOCOL_FEATURES 30
-@@ -974,7 +975,35 @@ out:
- static int vhost_user_postcopy_fault_handler(struct PostCopyFD *pcfd,
-                                              void *ufd)
- {
--    return 0;
-+    struct vhost_dev *dev =3D pcfd->data;
-+    struct vhost_user *u =3D dev->opaque;
-+    struct uffd_msg *msg =3D ufd;
-+    uint64_t faultaddr =3D msg->arg.pagefault.address;
-+    RAMBlock *rb =3D NULL;
-+    uint64_t rb_offset;
-+    int i;
+@@ -175,6 +175,15 @@ struct vhost_user {
+     NotifierWithReturn postcopy_notifier;
+     struct PostCopyFD  postcopy_fd;
+     uint64_t           postcopy_client_bases[VHOST_MEMORY_MAX_NREGIONS];
++    /* Length of the region_rb and region_rb_offset arrays */
++    size_t             region_rb_len;
++    /* RAMBlock associated with a given region */
++    RAMBlock         **region_rb;
++    /* The offset from the start of the RAMBlock to the start of the
++     * vhost region.
++     */
++    ram_addr_t        *region_rb_offset;
 +
-+    trace_vhost_user_postcopy_fault_handler(pcfd->idstr, faultaddr,
-+                                            dev->mem->nregions);
-+    for (i =3D 0; i < MIN(dev->mem->nregions, u->region_rb_len); i++) {
-+        trace_vhost_user_postcopy_fault_handler_loop(i,
-+                u->postcopy_client_bases[i], dev->mem->regions[i].memory=
-_size);
-+        if (faultaddr >=3D u->postcopy_client_bases[i]) {
-+            /* Ofset of the fault address in the vhost region */
-+            uint64_t region_offset =3D faultaddr - u->postcopy_client_ba=
-ses[i];
-+            if (region_offset < dev->mem->regions[i].memory_size) {
-+                rb_offset =3D region_offset + u->region_rb_offset[i];
-+                trace_vhost_user_postcopy_fault_handler_found(i,
-+                        region_offset, rb_offset);
-+                rb =3D u->region_rb[i];
-+                return postcopy_request_shared_page(pcfd, rb, faultaddr,
-+                                                    rb_offset);
-+            }
-+        }
-+    }
-+    error_report("%s: Failed to find region for fault %" PRIx64,
-+                 __func__, faultaddr);
-+    return -1;
- }
+     /* True once we've entered postcopy_listen */
+     bool               postcopy_listen;
+ };
+@@ -362,6 +371,17 @@ static int vhost_user_set_mem_table_postcopy(struct =
+vhost_dev *dev,
+         msg.hdr.flags |=3D VHOST_USER_NEED_REPLY_MASK;
+     }
 =20
- /*
++    if (u->region_rb_len < dev->mem->nregions) {
++        u->region_rb =3D g_renew(RAMBlock*, u->region_rb, dev->mem->nreg=
+ions);
++        u->region_rb_offset =3D g_renew(ram_addr_t, u->region_rb_offset,
++                                      dev->mem->nregions);
++        memset(&(u->region_rb[u->region_rb_len]), '\0',
++               sizeof(RAMBlock *) * (dev->mem->nregions - u->region_rb_l=
+en));
++        memset(&(u->region_rb_offset[u->region_rb_len]), '\0',
++               sizeof(ram_addr_t) * (dev->mem->nregions - u->region_rb_l=
+en));
++        u->region_rb_len =3D dev->mem->nregions;
++    }
++
+     for (i =3D 0; i < dev->mem->nregions; ++i) {
+         struct vhost_memory_region *reg =3D dev->mem->regions + i;
+         ram_addr_t offset;
+@@ -372,6 +392,12 @@ static int vhost_user_set_mem_table_postcopy(struct =
+vhost_dev *dev,
+                                      &offset);
+         fd =3D memory_region_get_fd(mr);
+         if (fd > 0) {
++            trace_vhost_user_set_mem_table_withfd(fd_num, mr->name,
++                                                  reg->memory_size,
++                                                  reg->guest_phys_addr,
++                                                  reg->userspace_addr, o=
+ffset);
++            u->region_rb_offset[i] =3D offset;
++            u->region_rb[i] =3D mr->ram_block;
+             msg.payload.memory.regions[fd_num].userspace_addr =3D
+                 reg->userspace_addr;
+             msg.payload.memory.regions[fd_num].memory_size  =3D reg->mem=
+ory_size;
+@@ -380,6 +406,9 @@ static int vhost_user_set_mem_table_postcopy(struct v=
+host_dev *dev,
+             msg.payload.memory.regions[fd_num].mmap_offset =3D offset;
+             assert(fd_num < VHOST_MEMORY_MAX_NREGIONS);
+             fds[fd_num++] =3D fd;
++        } else {
++            u->region_rb_offset[i] =3D 0;
++            u->region_rb[i] =3D NULL;
+         }
+     }
+=20
+@@ -1148,6 +1177,11 @@ static int vhost_user_cleanup(struct vhost_dev *de=
+v)
+         close(u->slave_fd);
+         u->slave_fd =3D -1;
+     }
++    g_free(u->region_rb);
++    u->region_rb =3D NULL;
++    g_free(u->region_rb_offset);
++    u->region_rb_offset =3D NULL;
++    u->region_rb_len =3D 0;
+     g_free(u);
+     dev->opaque =3D 0;
+=20
 --=20
 2.14.3
