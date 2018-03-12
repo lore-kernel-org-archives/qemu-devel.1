@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evLpT-0003xE-5L
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:41:26 -0400
+	(envelope-from <berrange@redhat.com>) id 1evLqF-0004aa-PD
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:42:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evLpS-0005z6-5x
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:41:23 -0400
-Date: Mon, 12 Mar 2018 11:41:01 +0000
+	(envelope-from <berrange@redhat.com>) id 1evLqE-0007OG-Pr
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:42:11 -0400
+Date: Mon, 12 Mar 2018 11:42:05 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180312114101.GJ3493@redhat.com>
+Message-ID: <20180312114205.GK3493@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20180309172713.26318-1-kwolf@redhat.com>
-	<20180309172713.26318-5-kwolf@redhat.com>
+	<20180309172713.26318-6-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180309172713.26318-5-kwolf@redhat.com>
+In-Reply-To: <20180309172713.26318-6-kwolf@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/6] luks: Turn invalid assertion into check
+Subject: Re: [Qemu-devel] [PATCH 5/6] luks: Catch integer overflow for huge
+ sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +29,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Kevin Wolf <kwolf@redhat.com>
 Cc: qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-On Fri, Mar 09, 2018 at 06:27:11PM +0100, Kevin Wolf wrote:
-> The .bdrv_getlength implementation of the crypto block driver asserted
-> that the payload offset isn't after EOF. This is an invalid assertion t=
-o
-> make as the image file could be corrupted. Instead, check it and return
-> -EIO if the file is too small for the payload offset.
->=20
-> Zero length images are fine, so trigger -EIO only on offset > len, not
-> on offset >=3D len as the assertion did before.
+On Fri, Mar 09, 2018 at 06:27:12PM +0100, Kevin Wolf wrote:
+> When you request an image size close to UINT64_MAX, the addition of the
+> crypto header may cause an integer overflow. Catch it instead of
+> silently truncating the image size.
 >=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  block/crypto.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+>  block/crypto.c | 5 +++++
+>  1 file changed, 5 insertions(+)
 >=20
 > diff --git a/block/crypto.c b/block/crypto.c
-> index 2035f9ab13..4908d8627f 100644
+> index 4908d8627f..1b46519c53 100644
 > --- a/block/crypto.c
 > +++ b/block/crypto.c
-> @@ -518,7 +518,10 @@ static int64_t block_crypto_getlength(BlockDriverS=
-tate *bs)
+> @@ -102,6 +102,11 @@ static ssize_t block_crypto_init_func(QCryptoBlock=
+ *block,
+>  {
+>      struct BlockCryptoCreateData *data =3D opaque;
 > =20
->      uint64_t offset =3D qcrypto_block_get_payload_offset(crypto->block=
-);
->      assert(offset < INT64_MAX);
-> -    assert(offset < len);
-> +
-> +    if (offset > len) {
-> +       return -EIO;
+> +    if (headerlen > UINT64_MAX - data->size) {
+> +        error_setg(errp, "The requested file size is too large");
+> +        return -EFBIG;
 > +    }
-> =20
->      len -=3D offset;
+> +
+>      /* User provided size should reflect amount of space made
+>       * available to the guest, so we must take account of that
+>       * which will be used by the crypto header
 
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+
+(if using INT64_MAX as Eric suggests)
 
 Regards,
 Daniel
