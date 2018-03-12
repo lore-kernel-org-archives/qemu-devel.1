@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evKNN-0008NB-L6
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 06:08:18 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1evKWG-0002iv-1z
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 06:17:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evKNM-000319-Mn
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 06:08:17 -0400
-Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:41837)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1evKNM-0002zT-HJ
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 06:08:16 -0400
-Received: by mail-oi0-x22c.google.com with SMTP id g5so11809691oiy.8
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 03:08:16 -0700 (PDT)
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1evKWC-0006bB-7Z
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 06:17:27 -0400
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Date: Mon, 12 Mar 2018 13:16:51 +0300
+Message-Id: <1520849818-6915-3-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <1520849818-6915-1-git-send-email-anton.nefedov@virtuozzo.com>
+References: <1520849818-6915-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20180309145717.9603-1-laurent@vivier.eu>
-References: <20180309145717.9603-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 12 Mar 2018 10:07:55 +0000
-Message-ID: <CAFEAcA9cQz0PjHn_G-Y3oMigAz2SjOaaPVxHNOXJaK26T3__2w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 0/8] M68k for 2.12 patches
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v8 2/9] blkverify: set supported write/zero
+ flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +22,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, den@virtuozzo.com, berto@igalia.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-On 9 March 2018 at 14:57, Laurent Vivier <laurent@vivier.eu> wrote:
-> The following changes since commit e1ee9ee139ed7091c2c592d5b784fbb7227bfc0d:
->
->   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.12-20180306' into staging (2018-03-06 10:21:35 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/vivier/qemu-m68k.git tags/m68k-for-2.12-pull-request
->
-> for you to fetch changes up to 6c25be6e30bda0e470f8f0b6b93d53a6efe469e8:
->
->   target/m68k: implement ftentox (2018-03-09 15:50:38 +0100)
->
-> ----------------------------------------------------------------
-> v2 fixes permissions of file target/m68k/softfloat_fpsp_tables.h
-> ----------------------------------------------------------------
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ block/blkverify.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-Applied, thanks.
-
--- PMM
+diff --git a/block/blkverify.c b/block/blkverify.c
+index 331365b..de2fdc1 100644
+--- a/block/blkverify.c
++++ b/block/blkverify.c
+@@ -141,6 +141,15 @@ static int blkverify_open(BlockDriverState *bs, QDict *options, int flags,
+         goto fail;
+     }
+ 
++    bs->supported_write_flags = BDRV_REQ_FUA &
++        bs->file->bs->supported_write_flags &
++        s->test_file->bs->supported_write_flags;
++
++    bs->supported_zero_flags =
++        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
++        bs->file->bs->supported_zero_flags &
++        s->test_file->bs->supported_zero_flags;
++
+     ret = 0;
+ fail:
+     qemu_opts_del(opts);
+-- 
+2.7.4
