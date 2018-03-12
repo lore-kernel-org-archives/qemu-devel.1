@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evR8l-00080F-G1
+	(envelope-from <dgilbert@redhat.com>) id 1evR8l-00080I-Gb
 	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:21:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evR8i-0007RU-Cn
+	(envelope-from <dgilbert@redhat.com>) id 1evR8i-0007RB-BJ
 	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:21:39 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47213 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56678 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evR8i-0007Qa-70
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evR8i-0007Qb-6e
 	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:21:36 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 391E7406E97D
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 17:21:32 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id AF51F401C9AE
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 17:21:33 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 12 Mar 2018 17:20:56 +0000
-Message-Id: <20180312172124.56461-2-dgilbert@redhat.com>
+Date: Mon, 12 Mar 2018 17:20:57 +0000
+Message-Id: <20180312172124.56461-3-dgilbert@redhat.com>
 In-Reply-To: <20180312172124.56461-1-dgilbert@redhat.com>
 References: <20180312172124.56461-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 01/29] migrate: Update
- ram_block_discard_range for shared
+Subject: [Qemu-devel] [PATCH v5 02/29] qemu_ram_block_host_offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,123 +34,48 @@ Cc: aarcange@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-The choice of call to discard a block is getting more complicated
-for other cases.   We use fallocate PUNCH_HOLE in any file cases;
-it works for both hugepage and for tmpfs.
-We use the DONTNEED for non-hugepage cases either where they're
-anonymous or where they're private.
-
-Care should be taken when trying other backing files.
+Utility to give the offset of a host pointer within a RAMBlock
+(assuming we already know it's in that RAMBlock)
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- exec.c       | 60 ++++++++++++++++++++++++++++++++++++++++++++++--------------
- trace-events |  3 ++-
- 2 files changed, 48 insertions(+), 15 deletions(-)
+ exec.c                    | 10 ++++++++++
+ include/exec/cpu-common.h |  1 +
+ 2 files changed, 11 insertions(+)
 
 diff --git a/exec.c b/exec.c
-index a9181e6417..34fdfd966e 100644
+index 34fdfd966e..2199b093bd 100644
 --- a/exec.c
 +++ b/exec.c
-@@ -3721,6 +3721,7 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
-     }
+@@ -2297,6 +2297,16 @@ static void *qemu_ram_ptr_length(RAMBlock *ram_block, ram_addr_t addr,
+     return ramblock_ptr(block, addr);
+ }
  
-     if ((start + length) <= rb->used_length) {
-+        bool need_madvise, need_fallocate;
-         uint8_t *host_endaddr = host_startaddr + length;
-         if ((uintptr_t)host_endaddr & (rb->page_size - 1)) {
-             error_report("ram_block_discard_range: Unaligned end address: %p",
-@@ -3730,29 +3731,60 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
- 
-         errno = ENOTSUP; /* If we are missing MADVISE etc */
- 
--        if (rb->page_size == qemu_host_page_size) {
--#if defined(CONFIG_MADVISE)
--            /* Note: We need the madvise MADV_DONTNEED behaviour of definitely
--             * freeing the page.
--             */
--            ret = madvise(host_startaddr, length, MADV_DONTNEED);
--#endif
--        } else {
--            /* Huge page case  - unfortunately it can't do DONTNEED, but
--             * it can do the equivalent by FALLOC_FL_PUNCH_HOLE in the
--             * huge page file.
-+        /* The logic here is messy;
-+         *    madvise DONTNEED fails for hugepages
-+         *    fallocate works on hugepages and shmem
-+         */
-+        need_madvise = (rb->page_size == qemu_host_page_size);
-+        need_fallocate = rb->fd != -1;
-+        if (need_fallocate) {
-+            /* For a file, this causes the area of the file to be zero'd
-+             * if read, and for hugetlbfs also causes it to be unmapped
-+             * so a userfault will trigger.
-              */
- #ifdef CONFIG_FALLOCATE_PUNCH_HOLE
-             ret = fallocate(rb->fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
-                             start, length);
-+            if (ret) {
-+                ret = -errno;
-+                error_report("ram_block_discard_range: Failed to fallocate "
-+                             "%s:%" PRIx64 " +%zx (%d)",
-+                             rb->idstr, start, length, ret);
-+                goto err;
-+            }
-+#else
-+            ret = -ENOSYS;
-+            error_report("ram_block_discard_range: fallocate not available/file"
-+                         "%s:%" PRIx64 " +%zx (%d)",
-+                         rb->idstr, start, length, ret);
-+            goto err;
- #endif
-         }
--        if (ret) {
--            ret = -errno;
--            error_report("ram_block_discard_range: Failed to discard range "
-+        if (need_madvise) {
-+            /* For normal RAM this causes it to be unmapped,
-+             * for shared memory it causes the local mapping to disappear
-+             * and to fall back on the file contents (which we just
-+             * fallocate'd away).
-+             */
-+#if defined(CONFIG_MADVISE)
-+            ret =  madvise(host_startaddr, length, MADV_DONTNEED);
-+            if (ret) {
-+                ret = -errno;
-+                error_report("ram_block_discard_range: Failed to discard range "
-+                             "%s:%" PRIx64 " +%zx (%d)",
-+                             rb->idstr, start, length, ret);
-+                goto err;
-+            }
-+#else
-+            ret = -ENOSYS;
-+            error_report("ram_block_discard_range: MADVISE not available"
-                          "%s:%" PRIx64 " +%zx (%d)",
-                          rb->idstr, start, length, ret);
-+            goto err;
-+#endif
-         }
-+        trace_ram_block_discard_range(rb->idstr, host_startaddr, length,
-+                                      need_madvise, need_fallocate, ret);
-     } else {
-         error_report("ram_block_discard_range: Overrun block '%s' (%" PRIu64
-                      "/%zx/" RAM_ADDR_FMT")",
-diff --git a/trace-events b/trace-events
-index 89fcad0fd1..196598a6f8 100644
---- a/trace-events
-+++ b/trace-events
-@@ -55,9 +55,10 @@ dma_complete(void *dbs, int ret, void *cb) "dbs=%p ret=%d cb=%p"
- dma_blk_cb(void *dbs, int ret) "dbs=%p ret=%d"
- dma_map_wait(void *dbs) "dbs=%p"
- 
--#  # exec.c
-+# exec.c
- find_ram_offset(uint64_t size, uint64_t offset) "size: 0x%" PRIx64 " @ 0x%" PRIx64
- find_ram_offset_loop(uint64_t size, uint64_t candidate, uint64_t offset, uint64_t next, uint64_t mingap) "trying size: 0x%" PRIx64 " @ 0x%" PRIx64 ", offset: 0x%" PRIx64" next: 0x%" PRIx64 " mingap: 0x%" PRIx64
-+ram_block_discard_range(const char *rbname, void *hva, size_t length, bool need_madvise, bool need_fallocate, int ret) "%s@%p + 0x%zx: madvise: %d fallocate: %d ret: %d"
- 
- # memory.c
- memory_region_ops_read(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
++/* Return the offset of a hostpointer within a ramblock */
++ram_addr_t qemu_ram_block_host_offset(RAMBlock *rb, void *host)
++{
++    ram_addr_t res = (uint8_t *)host - (uint8_t *)rb->host;
++    assert((uintptr_t)host >= (uintptr_t)rb->host);
++    assert(res < rb->max_length);
++
++    return res;
++}
++
+ /*
+  * Translates a host ptr back to a RAMBlock, a ram_addr and an offset
+  * in that RAMBlock.
+diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+index 74341b19d2..0d861a6289 100644
+--- a/include/exec/cpu-common.h
++++ b/include/exec/cpu-common.h
+@@ -68,6 +68,7 @@ ram_addr_t qemu_ram_addr_from_host(void *ptr);
+ RAMBlock *qemu_ram_block_by_name(const char *name);
+ RAMBlock *qemu_ram_block_from_host(void *ptr, bool round_offset,
+                                    ram_addr_t *offset);
++ram_addr_t qemu_ram_block_host_offset(RAMBlock *rb, void *host);
+ void qemu_ram_set_idstr(RAMBlock *block, const char *name, DeviceState *dev);
+ void qemu_ram_unset_idstr(RAMBlock *block);
+ const char *qemu_ram_get_idstr(RAMBlock *rb);
 -- 
 2.14.3
