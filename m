@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46641)
+Received: from eggs.gnu.org ([208.118.235.92]:44006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1evPh1-0006NU-4v
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:49:55 -0400
+	(envelope-from <nia.alarie@gmail.com>) id 1evPji-0008Qk-C2
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:52:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1evPg7-0003gc-Ia
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:48:55 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:46781)
+	(envelope-from <nia.alarie@gmail.com>) id 1evPin-00080D-K7
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:51:42 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:34681)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1evPg6-0003ay-Dm
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:47:59 -0400
-Received: by mail-wr0-x244.google.com with SMTP id m12so16166098wrm.13
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 08:47:58 -0700 (PDT)
+	(Exim 4.71) (envelope-from <nia.alarie@gmail.com>)
+	id 1evPin-0007yF-Bb
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:50:45 -0400
+Received: by mail-lf0-x241.google.com with SMTP id l191-v6so24011737lfe.1
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 08:50:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180308195811.24894-22-dgilbert@redhat.com>
-References: <20180308195811.24894-1-dgilbert@redhat.com>
-	<20180308195811.24894-22-dgilbert@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 12 Mar 2018 16:47:55 +0100
-Message-ID: <CAJ+F1CLTL-y5ru8Fcn7V21fnsyCs-FnH5rQeDYDjMpSHpq2=Lg@mail.gmail.com>
+In-Reply-To: <ad11c22e-294b-d7e3-1589-7c4a42351980@redhat.com>
+References: <20180312153344.23453-1-nia.alarie@gmail.com>
+	<ad11c22e-294b-d7e3-1589-7c4a42351980@redhat.com>
+From: nee <nia.alarie@gmail.com>
+Date: Mon, 12 Mar 2018 15:50:43 +0000
+Message-ID: <CA+k8WDptLRVNBstB4UEoaorS++_Xqn-j+FHYZhHG1igAJWB-rg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 21/29] vhost+postcopy: Add vhost waker
+Subject: Re: [Qemu-devel] [PATCH v2] 9p: Convert use of atoi to qemu_strtoi
+ to allow error checking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,109 +30,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>, Jim Mussared <jim@groklearning.com>, groug@kaod.org, Joel Stanley <joel@jms.id.au>
 
-On Thu, Mar 8, 2018 at 8:58 PM, Dr. David Alan Gilbert (git)
-<dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Mon, Mar 12, 2018 at 3:43 PM, Eric Blake <eblake@redhat.com> wrote:
+> On 03/12/2018 10:33 AM, Nia Alarie wrote:
+>>
+>> Signed-off-by: Nia Alarie <nia.alarie@gmail.com>
+>> ---
+>>   hw/9pfs/9p.c | 11 +++++++++--
+>>   1 file changed, 9 insertions(+), 2 deletions(-)
 >
-> Register a waker function in vhost-user code to be notified when
-> pages arrive or requests to previously mapped pages get requested.
 >
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
-> ---
->  hw/virtio/trace-events |  3 +++
->  hw/virtio/vhost-user.c | 30 ++++++++++++++++++++++++++++++
->  2 files changed, 33 insertions(+)
+> Helping out our CI tools:
+> Based-on: <20180312124939.20562-1-berrange@redhat.com>
 >
-> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> index 3afd12cfea..fe5e0ff856 100644
-> --- a/hw/virtio/trace-events
-> +++ b/hw/virtio/trace-events
-> @@ -13,6 +13,9 @@ vhost_user_postcopy_fault_handler_found(int i, uint64_t=
- region_offset, uint64_t
->  vhost_user_postcopy_listen(void) ""
->  vhost_user_set_mem_table_postcopy(uint64_t client_addr, uint64_t qhva, i=
-nt reply_i, int region_i) "client:0x%"PRIx64" for hva: 0x%"PRIx64" reply %d=
- region %d"
->  vhost_user_set_mem_table_withfd(int index, const char *name, uint64_t me=
-mory_size, uint64_t guest_phys_addr, uint64_t userspace_addr, uint64_t offs=
-et) "%d:%s: size:0x%"PRIx64" GPA:0x%"PRIx64" QVA/userspace:0x%"PRIx64" RB o=
-ffset:0x%"PRIx64
-> +vhost_user_postcopy_waker(const char *rb, uint64_t rb_offset) "%s + 0x%"=
-PRIx64
-> +vhost_user_postcopy_waker_found(uint64_t client_addr) "0x%"PRIx64
-> +vhost_user_postcopy_waker_nomatch(const char *rb, uint64_t rb_offset) "%=
-s + 0x%"PRIx64
+>>
+>> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+>> index 48fa48e720..254385dfa4 100644
+>> --- a/hw/9pfs/9p.c
+>> +++ b/hw/9pfs/9p.c
+>> @@ -15,6 +15,7 @@
+>>   #include <glib/gprintf.h>
+>>   #include "hw/virtio/virtio.h"
+>>   #include "qapi/error.h"
+>> +#include "qemu/cutils.h"
+>>   #include "qemu/error-report.h"
+>>   #include "qemu/iov.h"
+>>   #include "qemu/sockets.h"
+>> @@ -2213,8 +2214,14 @@ static void coroutine_fn v9fs_create(void *opaque)
+>>           }
+>>           v9fs_path_copy(&fidp->path, &path);
+>>       } else if (perm & P9_STAT_MODE_LINK) {
+>> -        int32_t ofid = atoi(extension.data);
+>> -        V9fsFidState *ofidp = get_fid(pdu, ofid);
+>> +        int ofid;
 >
->  # hw/virtio/virtio.c
->  virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned=
- out_num) "elem %p size %zd in_num %u out_num %u"
-> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> index e19b9ef9cf..b304bc475e 100644
-> --- a/hw/virtio/vhost-user.c
-> +++ b/hw/virtio/vhost-user.c
-> @@ -1006,6 +1006,35 @@ static int vhost_user_postcopy_fault_handler(struc=
-t PostCopyFD *pcfd,
->      return -1;
->  }
 >
-> +static int vhost_user_postcopy_waker(struct PostCopyFD *pcfd, RAMBlock *=
-rb,
-> +                                     uint64_t offset)
-> +{
-> +    struct vhost_dev *dev =3D pcfd->data;
-> +    struct vhost_user *u =3D dev->opaque;
-> +    int i;
-> +
-> +    trace_vhost_user_postcopy_waker(qemu_ram_get_idstr(rb), offset);
-> +
-> +    if (!u) {
-> +        return 0;
-> +    }
-> +    /* Translate the offset into an address in the clients address space=
- */
-> +    for (i =3D 0; i < MIN(dev->mem->nregions, u->region_rb_len); i++) {
-> +        if (u->region_rb[i] =3D=3D rb &&
-> +            offset >=3D u->region_rb_offset[i] &&
-> +            offset < (u->region_rb_offset[i] +
-> +                      dev->mem->regions[i].memory_size)) {
-> +            uint64_t client_addr =3D (offset - u->region_rb_offset[i]) +
-> +                                   u->postcopy_client_bases[i];
-> +            trace_vhost_user_postcopy_waker_found(client_addr);
-> +            return postcopy_wake_shared(pcfd, client_addr, rb);
-> +        }
-> +    }
-> +
-> +    trace_vhost_user_postcopy_waker_nomatch(qemu_ram_get_idstr(rb), offs=
-et);
-> +    return 0;
-> +}
-> +
->  /*
->   * Called at the start of an inbound postcopy on reception of the
->   * 'advise' command.
-> @@ -1051,6 +1080,7 @@ static int vhost_user_postcopy_advise(struct vhost_=
-dev *dev, Error **errp)
->      u->postcopy_fd.fd =3D ufd;
->      u->postcopy_fd.data =3D dev;
->      u->postcopy_fd.handler =3D vhost_user_postcopy_fault_handler;
-> +    u->postcopy_fd.waker =3D vhost_user_postcopy_waker;
->      u->postcopy_fd.idstr =3D "vhost-user"; /* Need to find unique name *=
-/
->      postcopy_register_shared_ufd(&u->postcopy_fd);
->      return 0;
+> 'unsigned int' and...
+>
+>> +        V9fsFidState *ofidp;
+>> +
+>> +        if (qemu_strtoi(extension.data, NULL, 10, &ofid)) {
+>
+>
+> qemu_strtoui() might be smarter, per Greg's comments on v1.
+>
+>> +            err = -EINVAL;
+>> +            goto out;
+>> +        }
+>> +        ofidp = get_fid(pdu, (int32_t)ofid);
+>
+>
+> This cast is spurious.
+>
 > --
-> 2.14.3
->
->
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
 
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+I did this because get_fid() takes an int32_t, not an unsigned int.
+The struct V9fsFidState also uses an int32_t for its `fid` member. Do
+you want me to change all these types, or just the function being used
+here?
