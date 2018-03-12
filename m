@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1evU2W-0004rY-G5
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:27:26 -0400
+	(envelope-from <laurent@vivier.eu>) id 1evU35-0005EK-4B
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:28:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1evU2T-0001tg-7q
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:27:24 -0400
-Resent-Message-Id: <E1evU2T-0001tg-7q@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21073)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1evU2S-0001oZ-V8
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:27:21 -0400
-In-Reply-To: <20180312201305.16972-1-berrange@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152088642028.39.5956317026943589628@71c20359a636>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 12 Mar 2018 13:27:01 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 0/9] Socket next patches
+	(envelope-from <laurent@vivier.eu>) id 1evU31-0004az-Q2
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:27:59 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:49247)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1evU31-0004SA-GU
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:27:55 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Mon, 12 Mar 2018 21:27:17 +0100
+Message-Id: <20180312202728.23790-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH 00/11] implement 680x0 FPU (part 5)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +21,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: berrange@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, armbru@redhat.com, kraxel@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>, Thomas Huth <huth@tuxfamily.org>, Richard Henderson <rth@twiddle.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMzEyMjAxMzA1LjE2OTcyLTEtYmVycmFuZ2VAcmVkaGF0LmNvbQpTdWJq
-ZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMC85XSBTb2NrZXQgbmV4dCBwYXRjaGVzCgo9PT0gVEVT
-VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0
-IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRy
-dWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0i
-JChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1p
-dHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAx
-IC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwg
-fCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWls
-ZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxl
-ZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRk
-MWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2pl
-Y3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwMzEyMjAxMzA1
-LjE2OTcyLTEtYmVycmFuZ2VAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwMzEyMjAxMzA1LjE2
-OTcyLTEtYmVycmFuZ2VAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
-CmI0OGFlZjJkYjUgY2hhcjogYWxsb3cgcGFzc2luZyBwcmUtb3BlbmVkIHNvY2tldCBmaWxlIGRl
-c2NyaXB0b3IgYXQgc3RhcnR1cAo3YWNhYzQ2OWE1IGNoYXI6IHJlZmFjdG9yIHBhcnNpbmcgb2Yg
-c29ja2V0IGFkZHJlc3MgaW5mb3JtYXRpb24KNTJhOTcxYWNhZSBzb2NrZXRzOiBhbGxvdyBTb2Nr
-ZXRBZGRyZXNzICdmZCcgdG8gcmVmZXJlbmNlIG51bWVyaWMgZmlsZSBkZXNjcmlwdG9ycwozYzQy
-YzU1M2RmIHNvY2tldHM6IGNoZWNrIHRoYXQgdGhlIG5hbWVkIGZpbGUgZGVzY3JpcHRvciBpcyBh
-IHNvY2tldApmZDU1YzYwMDgzIHNvY2tldHM6IG1vdmUgZmRfaXNfc29ja2V0KCkgaW50byBjb21t
-b24gc29ja2V0cyBjb2RlCjNjMWRkNDIyNDYgc29ja2V0czogc3RyZW5ndGhlbiB0ZXN0IHN1aXRl
-IElQIHByb3RvY29sIGF2YWlsYWJpbGl0eSBjaGVja3MKNTY1ODEzMzNhMSBzb2NrZXRzOiBwdWxs
-IGNvZGUgZm9yIHRlc3RpbmcgSVAgYXZhaWxhYmlsaXR5IG91dCBvZiBzcGVjaWZpYyB0ZXN0CjE0
-ODdhMzE5NTkgY3V0aWxzOiBhZGQgcWVtdV9zdHJ0b2kgJiBxZW11X3N0cnRvdWkgcGFyc2VycyBm
-b3IgaW50L3Vuc2lnbmVkIGludCB0eXBlcwozNjIzZDg1MThlIGNoYXI6IGRvbid0IHNpbGVudGx5
-IHNraXAgdG4zMjcwIHByb3RvY29sIGluaXQgd2hlbiBUTFMgaXMgZW5hYmxlZAoKPT09IE9VVFBV
-VCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS85OiBjaGFyOiBkb24ndCBzaWxlbnRseSBza2lw
-IHRuMzI3MCBwcm90b2NvbCBpbml0IHdoZW4gVExTIGlzIGVuYWJsZWQuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMi85OiBjdXRpbHM6IGFkZCBxZW11X3N0cnRvaSAmIHFlbXVfc3RydG91aSBwYXJzZXJzIGZv
-ciBpbnQvdW5zaWduZWQgaW50IHR5cGVzLi4uCkVSUk9SOiBjb25zaWRlciB1c2luZyBxZW11X3N0
-cnRvbCBpbiBwcmVmZXJlbmNlIHRvIHN0cnRvbAojNzUzOiBGSUxFOiB1dGlsL2N1dGlscy5jOjMz
-ODoKKyAgICBscmVzdWx0ID0gc3RydG9sKG5wdHIsICZlcCwgYmFzZSk7CgpFUlJPUjogY29uc2lk
-ZXIgdXNpbmcgcWVtdV9zdHJ0b3VsIGluIHByZWZlcmVuY2UgdG8gc3RydG91bAojODA1OiBGSUxF
-OiB1dGlsL2N1dGlscy5jOjM5MDoKKyAgICBscmVzdWx0ID0gc3RydG91bChucHRyLCAmZXAsIGJh
-c2UpOwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA3OTMgbGluZXMgY2hlY2tlZAoKWW91
-ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMy85OiBz
-b2NrZXRzOiBwdWxsIGNvZGUgZm9yIHRlc3RpbmcgSVAgYXZhaWxhYmlsaXR5IG91dCBvZiBzcGVj
-aWZpYyB0ZXN0Li4uCkNoZWNraW5nIFBBVENIIDQvOTogc29ja2V0czogc3RyZW5ndGhlbiB0ZXN0
-IHN1aXRlIElQIHByb3RvY29sIGF2YWlsYWJpbGl0eSBjaGVja3MuLi4KQ2hlY2tpbmcgUEFUQ0gg
-NS85OiBzb2NrZXRzOiBtb3ZlIGZkX2lzX3NvY2tldCgpIGludG8gY29tbW9uIHNvY2tldHMgY29k
-ZS4uLgpDaGVja2luZyBQQVRDSCA2Lzk6IHNvY2tldHM6IGNoZWNrIHRoYXQgdGhlIG5hbWVkIGZp
-bGUgZGVzY3JpcHRvciBpcyBhIHNvY2tldC4uLgpDaGVja2luZyBQQVRDSCA3Lzk6IHNvY2tldHM6
-IGFsbG93IFNvY2tldEFkZHJlc3MgJ2ZkJyB0byByZWZlcmVuY2UgbnVtZXJpYyBmaWxlIGRlc2Ny
-aXB0b3JzLi4uCkNoZWNraW5nIFBBVENIIDgvOTogY2hhcjogcmVmYWN0b3IgcGFyc2luZyBvZiBz
-b2NrZXQgYWRkcmVzcyBpbmZvcm1hdGlvbi4uLgpDaGVja2luZyBQQVRDSCA5Lzk6IGNoYXI6IGFs
-bG93IHBhc3NpbmcgcHJlLW9wZW5lZCBzb2NrZXQgZmlsZSBkZXNjcmlwdG9yIGF0IHN0YXJ0dXAu
-Li4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoK
-Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0
-Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZy
-ZWVsaXN0cy5vcmc=
+Implement fcosh, fsinh, ftanh, fatanh, facos, fasin,
+fatan, fsincos, fcos, fsin, ftan.
+
+This is the last series to implement FPU instructions for 680x0...
+
+As previously, all the floatx80 functions are copied from "Previous",
+the NeXT Computer Emulator, and written by Andreas Grabher.
+
+I did not improve or clean up the code, it's a simple port of
+Andreas' work from "Previous".
+
+I think this series will need some improvemants in the future:
+for intance sin and cos functions can be merged in sincos
+function (and we have unmodified "adjn" variable in floatx80_cos()
+and floatx80_sin() that can be removed otherwise).
+
+"Previous" code I have ported to QEMU can be found in (r844):
+
+  http://svn.code.sf.net/p/previous/code/trunk/src/softfloat/
+
+"Previous" code is a C implementation of m68040 assembly language functions
+found in ($NetBSD: copyright.s,v 1.2 1994/10/26 07:48:57 cgd Exp)
+
+  https://ftp.netbsd.org/pub/NetBSD/NetBSD-current/src/sys/arch/m68k/fpsp/
+
+All the original work is under SoftFloat-2a license, and additional work
+under BSD license or GPL-v2-or-later license.
+
+All softfloat new functions are added in target/m68k as they are derived
+from m68k code.
+
+I have compared results of these instructions from a real m68040 and from
+QEMU, and they match (sincos differs [1] because in QEMU we compute it as
+sin and cos, and on m68040 sin and cos results differ also with
+sincos results. It looks like a rounding problem, perhaps a bug in m68040
+FPU? or in my test program?)
+
+I know this will need more work, but for the moment I only would
+like to provide these new instructions to the maintream of QEMU.
+
+[1] Example:
+
+sincos -6.125952 -> (0.156586, 0.987664)
+
+QEMU:
+
+  sincos c0010000c407cd1182c2bb27 -> 3ffc0000a05812beea449a4d
+                                     3ffe0000fcd791d65887d19a
+  sin c0010000c407cd1182c2bb27    -> 3ffc0000a05812beea449a4d
+  cos c0010000c407cd1182c2bb27    -> 3ffe0000fcd791d65887d19a
+
+m68040:
+
+  sincos c0010000c407cd1182c2bb27 -> 3ffc0000a05812beea449a4d
+                                     3ffe0000fcd791d65887d199 <<--
+  sin c0010000c407cd1182c2bb27    -> 3ffc0000a05812beea449a4d
+  cos c0010000c407cd1182c2bb27    -> 3ffe0000fcd791d65887d19a
+
+test program is basically:
+
+    register long double a, sin, cos, pi;
+    long double step;
+
+    asm("fmovecr #0, %0" : "=f" (pi));
+    step = pi / 1024;
+    for (a = -2*pi; a <= 2*pi; a+= step) {
+        asm("fsincos.x %2, %0, %1" : "=f" (cos), "=f" (sin) : "f" (a));
+        print_result(a, sin, cos);
+        asm("fsin.x %1, %0" : "=f" (sin) : "f" (a));
+        asm("fcos.x %1, %0" : "=f" (cos) : "f" (a));
+        print_result(a, sin, cos);
+    }
+
+Laurent Vivier (11):
+  target/m68k: implement ftan
+  target/m68k: implement fsin
+  target/m68k: implement fcos
+  target/m68k: implement fsincos
+  target/m68k: implement fatan
+  target/m68k: implement fasin
+  target/m68k: implement facos
+  target/m68k: implement fatanh
+  target/m68k: implement ftanh
+  target/m68k: implement fsinh
+  target/m68k: implement fcosh
+
+ target/m68k/fpu_helper.c            |   61 ++
+ target/m68k/helper.h                |   11 +
+ target/m68k/softfloat.c             | 1637 +++++++++++++++++++++++++++++++++++
+ target/m68k/softfloat.h             |   11 +
+ target/m68k/softfloat_fpsp_tables.h |  267 ++++++
+ target/m68k/translate.c             |   38 +
+ 6 files changed, 2025 insertions(+)
+
+-- 
+2.14.3
