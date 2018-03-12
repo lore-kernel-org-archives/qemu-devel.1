@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evS8I-0003Fk-NS
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:25:15 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1evS8O-0003Mj-Fu
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:25:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evS8F-0000wN-J6
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:25:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40098 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1evS8K-0000yA-Sx
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:25:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39942)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1evS8F-0000w5-EN
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:25:11 -0400
-References: <1520568765-58189-1-git-send-email-mjc@sifive.com>
-	<1520568765-58189-5-git-send-email-mjc@sifive.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <bc075c89-06bf-4dfc-782e-ba7caf1c9b9f@redhat.com>
-Date: Mon, 12 Mar 2018 13:24:54 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1evS8K-0000xr-Mf
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:25:16 -0400
+Date: Mon, 12 Mar 2018 15:25:14 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180312182514.GD28578@localhost.localdomain>
+References: <20180309202827.12085-1-ehabkost@redhat.com>
+	<20180309202827.12085-9-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1520568765-58189-5-git-send-email-mjc@sifive.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 04/23] RISC-V: Use ROM base address and
- size from memmap
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180309202827.12085-9-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 8/8] tests: Add check-device-crash-* rules
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +27,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-On 03/08/2018 10:12 PM, Michael Clark wrote:
-> Another case of replaceing hard coded constants, this time
+Add check-device-crash-quick and check-device-crash-full rules,
+that can be used to run device-crash-test on the built QEMU
+binaries.
 
-s/replaceing/replacing/
+The plan was to run check-device-crash-quick on "make check",
+but qemu.py/qmp.py still don't work with Python 3.
 
-> referring to the definition in the virt machine's memmap.
-> 
-> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Signed-off-by: Michael Clark <mjc@sifive.com>
-> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
-> ---
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+Changes v1 -> v2:
+* Don't try to run the script on "make check" yet because it
+  won't work if only Python 3 is available
 
+---
+ tests/Makefile.include | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index ef9b88c369..19f5ee73dc 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -942,6 +942,17 @@ check-decodetree:
+           ./check.sh "$(PYTHON)" "$(SRC_PATH)/scripts/decodetree.py", \
+           TEST, decodetree.py)
+ 
++CRASH_TEST = $(SRC_PATH)/scripts/device-crash-test
++CRASH_TEST_OPTIONS = $(if $(V),-v,-q)
++CRASH_TEST_BINARIES = $(foreach TARGET,$(TARGETS), $(TARGET)-softmmu/qemu-system-$(TARGET))
++
++.PHONY: check-device-crash-quick
++check-device-crash-quick:
++	$(CRASH_TEST) $(CRASH_TEST_OPTIONS) -t machine=DEFAULT accel=tcg -- $(CRASH_TEST_BINARIES)
++
++check-device-crash-full:
++	$(CRASH_TEST) $(CRASH_TEST_OPTIONS) -F $(CRASH_TEST_BINARIES)
++
+ # Consolidated targets
+ 
+ .PHONY: check-qapi-schema check-qtest check-unit check check-clean
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.14.3
