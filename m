@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evO5c-0005NX-3h
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 10:06:16 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1evO60-0005fL-Vj
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 10:06:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evO5W-0007c2-BB
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 10:06:12 -0400
-References: <20180312132204.23683-1-stefanha@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d47e7441-0166-07c6-20fd-6020e553903a@redhat.com>
-Date: Mon, 12 Mar 2018 09:05:48 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1evO5z-0000ro-V9
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 10:06:36 -0400
+Received: from mail-oi0-x231.google.com ([2607:f8b0:4003:c06::231]:37000)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1evO5z-0000pk-Pu
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 10:06:35 -0400
+Received: by mail-oi0-x231.google.com with SMTP id f186so12383821oig.4
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 07:06:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180312132204.23683-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: add include/block/aio-wait.h
+In-Reply-To: <20180309175453.41548-1-dgilbert@redhat.com>
+References: <20180309175453.41548-1-dgilbert@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 12 Mar 2018 14:06:14 +0000
+Message-ID: <CAFEAcA-8Gt-DhWfdYkf7gDKTEuySU7M9Lc5MEhOEbXmmqfBYuA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 0/6] migration queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Peter Lieven <pl@kamp.de>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On 03/12/2018 08:22 AM, Stefan Hajnoczi wrote:
-> The include/block/aio-wait.h header file was added by commit
-> 7719f3c968c59e1bcda7e177679dc765b59e578f ("block: extract
-> AIO_WAIT_WHILE() from BlockDriverState") without updating MAINTAINERS.
+On 9 March 2018 at 17:54, Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> The following changes since commit b39b61e410022f96ceb53d4381d25cba5126ac=
+44:
+>
+>   memory: fix flatview_access_valid RCU read lock/unlock imbalance (2018-=
+03-09 15:55:20 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/dagrh/qemu.git tags/pull-migration-20180309a
+>
+> for you to fetch changes up to f96d6651e4b7cb8a8e91774b9330d82c333171d6:
+>
+>   tests: Silence migration-test 'bad' test (2018-03-09 17:39:25 +0000)
+>
+> ----------------------------------------------------------------
+> Migration pull 2018-03-09
+>
+> ----------------------------------------------------------------
+> Dr. David Alan Gilbert (1):
+>       tests: Silence migration-test 'bad' test
+>
+> Marc-Andr=C3=A9 Lureau (1):
+>       migration: fix minor finalize leak
+>
+> Peter Lieven (3):
+>       migration: do not transfer ram during bulk storage migration
+>       migration/block: reset dirty bitmap before read in bulk phase
+>       migration/block: rename MAX_INFLIGHT_IO to MAX_IO_BUFFERS
+>
+> Peter Xu (1):
+>       migration: fix applying wrong capabilities
+>
 
-A shame checkpatch.pl and/or patchew still doesn't flag this, even 
-though it's been proposed as a syntax check.
+Applied, thanks.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->   MAINTAINERS | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index f409f3b158..7adc04e477 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1331,6 +1331,7 @@ F: util/aio-*.c
->   F: block/io.c
->   F: migration/block*
->   F: include/block/aio.h
-> +F: include/block/aio-wait.h
->   F: scripts/qemugdb/aio.py
->   T: git git://github.com/stefanha/qemu.git block
->   
-> 
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+-- PMM
