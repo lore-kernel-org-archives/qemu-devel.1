@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evSJd-0000u6-Ql
+	(envelope-from <eblake@redhat.com>) id 1evSJZ-0000no-3J
 	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evSJb-000640-TH
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49264 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1evSJX-00060W-HU
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38338 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1evSJb-00063U-MX
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:55 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1evSJX-00060L-B8
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:51 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E20098D6D7
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 18:36:50 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 12 Mar 2018 13:36:19 -0500
-Message-Id: <20180312183628.394722-29-eblake@redhat.com>
+Date: Mon, 12 Mar 2018 13:36:12 -0500
+Message-Id: <20180312183628.394722-22-eblake@redhat.com>
 In-Reply-To: <20180312183628.394722-1-eblake@redhat.com>
 References: <20180312183628.394722-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 28/36] qapi: introduce new cmd option "allow-oob"
+Subject: [Qemu-devel] [PULL 21/36] qmp: introduce QMPCapability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,255 +30,266 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
 From: Peter Xu <peterx@redhat.com>
 
-Here "oob" stands for "Out-Of-Band".  When "allow-oob" is set, it means
-the command allows out-of-band execution.
+There were no QMP capabilities defined.  Define the first capability,
+"oob", to allow out-of-band messages.
 
-The "oob" idea is proposed by Markus Armbruster in following thread:
+After this patch, we will allow QMP clients to enable QMP capabilities
+when sending the first "qmp_capabilities" command.  Originally we are
+starting QMP session with no arguments like:
 
-  https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg02057.html
+  { "execute": "qmp_capabilities" }
 
-This new "allow-oob" boolean will be exposed by "query-qmp-schema" as
-well for command entries, so that QMP clients can know which commands
-can be used in out-of-band calls. For example the command "migrate"
-originally looks like:
+Now we can enable some QMP capabilities using (take OOB as example,
+which is the only capability that we support):
 
-  {"name": "migrate", "ret-type": "17", "meta-type": "command",
-   "arg-type": "86"}
+  { "execute": "qmp_capabilities",
+    "arguments": { "enable": [ "oob" ] } }
 
-And it'll be changed into:
+When the "arguments" key is not provided, no capability is enabled.
 
-  {"name": "migrate", "ret-type": "17", "allow-oob": false,
-   "meta-type": "command", "arg-type": "86"}
+For capability "oob", the monitor needs to be run on a dedicated IO
+thread, otherwise the command will fail.  For example, trying to enable
+OOB on a MUXed typed QMP monitor will fail.
 
-This patch only provides the QMP interface level changes.  It does not
-contain the real out-of-band execution implementation yet.
+One thing to mention is that QMP capabilities are per-monitor, and also
+when the connection is closed due to some reason, the capabilities will
+be reset.
 
-Suggested-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
+Also, touch up qmp-test.c to test the new bits.
+
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180309090006.10018-18-peterx@redhat.com>
+Message-Id: <20180309090006.10018-11-peterx@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-[eblake: rebase on introspection done by qlit]
+[eblake: touch up commit message]
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- qapi/introspect.json           |  6 +++++-
- scripts/qapi/commands.py       | 18 +++++++++++++-----
- scripts/qapi/common.py         | 15 ++++++++++-----
- scripts/qapi/doc.py            |  2 +-
- scripts/qapi/introspect.py     |  7 +++++--
- include/qapi/qmp/dispatch.h    |  5 +++--
- tests/qapi-schema/test-qapi.py |  2 +-
- 7 files changed, 38 insertions(+), 17 deletions(-)
+ qapi/misc.json   | 32 ++++++++++++++++++++---
+ monitor.c        | 77 ++++++++++++++++++++++++++++++++++++++++++++++++++++----
+ tests/qmp-test.c | 10 +++++++-
+ 3 files changed, 110 insertions(+), 9 deletions(-)
 
-diff --git a/qapi/introspect.json b/qapi/introspect.json
-index 5b3e6e9d78b..c7f67b7d78b 100644
---- a/qapi/introspect.json
-+++ b/qapi/introspect.json
-@@ -259,12 +259,16 @@
+diff --git a/qapi/misc.json b/qapi/misc.json
+index bcd5d10778a..b2f69eb4ece 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -10,21 +10,47 @@
  #
- # @ret-type: the name of the command's result type.
+ # Enable QMP capabilities.
  #
-+# @allow-oob: whether the command allows out-of-band execution.
-+#             (Since: 2.12)
+-# Arguments: None.
++# Arguments:
 +#
- # TODO: @success-response (currently irrelevant, because it's QGA, not QMP)
++# @enable:   An optional list of QMPCapability values to enable.  The
++#            client must not enable any capability that is not
++#            mentioned in the QMP greeting message.  If the field is not
++#            provided, it means no QMP capabilities will be enabled.
++#            (since 2.12)
  #
- # Since: 2.5
+ # Example:
+ #
+-# -> { "execute": "qmp_capabilities" }
++# -> { "execute": "qmp_capabilities",
++#      "arguments": { "enable": [ "oob" ] } }
+ # <- { "return": {} }
+ #
+ # Notes: This command is valid exactly when first connecting: it must be
+ # issued before any other command will be accepted, and will fail once the
+ # monitor is accepting other commands. (see qemu docs/interop/qmp-spec.txt)
+ #
++# The QMP client needs to explicitly enable QMP capabilities, otherwise
++# all the QMP capabilities will be turned off by default.
++#
+ # Since: 0.13
+ #
  ##
- { 'struct': 'SchemaInfoCommand',
--  'data': { 'arg-type': 'str', 'ret-type': 'str' } }
-+  'data': { 'arg-type': 'str', 'ret-type': 'str',
-+            'allow-oob': 'bool' } }
+-{ 'command': 'qmp_capabilities' }
++{ 'command': 'qmp_capabilities',
++  'data': { '*enable': [ 'QMPCapability' ] } }
++
++##
++# @QMPCapability:
++#
++# Enumeration of capabilities to be advertised during initial client
++# connection, used for agreeing on particular QMP extension behaviors.
++#
++# @oob:   QMP ability to support Out-Of-Band requests.
++#         (Please refer to qmp-spec.txt for more information on OOB)
++#
++# Since: 2.12
++#
++##
++{ 'enum': 'QMPCapability',
++  'data': [ 'oob' ] }
 
  ##
- # @SchemaInfoEvent:
-diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
-index 21a7e0dbe61..0c5da3a54d6 100644
---- a/scripts/qapi/commands.py
-+++ b/scripts/qapi/commands.py
-@@ -193,10 +193,18 @@ out:
-     return ret
+ # @VersionTriple:
+diff --git a/monitor.c b/monitor.c
+index ce9f7fc8e8a..1a95fb372c6 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -59,6 +59,7 @@
+ #include "qapi/qmp/qjson.h"
+ #include "qapi/qmp/json-streamer.h"
+ #include "qapi/qmp/json-parser.h"
++#include "qapi/qmp/qlist.h"
+ #include "qom/object_interfaces.h"
+ #include "trace-root.h"
+ #include "trace/control.h"
+@@ -170,6 +171,7 @@ typedef struct {
+      * mode.
+      */
+     QmpCommandList *commands;
++    bool qmp_caps[QMP_CAPABILITY__MAX];
+ } MonitorQMP;
 
+ /*
+@@ -1039,8 +1041,42 @@ static void monitor_init_qmp_commands(void)
+                          qmp_marshal_qmp_capabilities, QCO_NO_OPTIONS);
+ }
 
--def gen_register_command(name, success_response):
--    options = 'QCO_NO_OPTIONS'
-+def gen_register_command(name, success_response, allow_oob):
-+    options = []
-+
-     if not success_response:
--        options = 'QCO_NO_SUCCESS_RESP'
-+        options += ['QCO_NO_SUCCESS_RESP']
-+    if allow_oob:
-+        options += ['QCO_ALLOW_OOB']
-+
-+    if not options:
-+        options = ['QCO_NO_OPTIONS']
-+
-+    options = " | ".join(options)
-
-     ret = mcgen('''
-     qmp_register_command(cmds, "%(name)s",
-@@ -268,7 +276,7 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
-         genc.add(gen_registry(self._regy, self._prefix))
-
-     def visit_command(self, name, info, arg_type, ret_type,
--                      gen, success_response, boxed):
-+                      gen, success_response, boxed, allow_oob):
-         if not gen:
-             return
-         self._genh.add(gen_command_decl(name, arg_type, boxed, ret_type))
-@@ -277,7 +285,7 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
-             self._genc.add(gen_marshal_output(ret_type))
-         self._genh.add(gen_marshal_decl(name))
-         self._genc.add(gen_marshal(name, arg_type, boxed, ret_type))
--        self._regy += gen_register_command(name, success_response)
-+        self._regy += gen_register_command(name, success_response, allow_oob)
-
-
- def gen_commands(schema, output_dir, prefix):
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 97e9060b674..2c05e3c2845 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -921,7 +921,8 @@ def check_exprs(exprs):
-         elif 'command' in expr:
-             meta = 'command'
-             check_keys(expr_elem, 'command', [],
--                       ['data', 'returns', 'gen', 'success-response', 'boxed'])
-+                       ['data', 'returns', 'gen', 'success-response',
-+                        'boxed', 'allow-oob'])
-         elif 'event' in expr:
-             meta = 'event'
-             check_keys(expr_elem, 'event', [], ['data', 'boxed'])
-@@ -1044,7 +1045,7 @@ class QAPISchemaVisitor(object):
-         pass
-
-     def visit_command(self, name, info, arg_type, ret_type,
--                      gen, success_response, boxed):
-+                      gen, success_response, boxed, allow_oob):
-         pass
-
-     def visit_event(self, name, info, arg_type, boxed):
-@@ -1421,7 +1422,7 @@ class QAPISchemaAlternateType(QAPISchemaType):
-
- class QAPISchemaCommand(QAPISchemaEntity):
-     def __init__(self, name, info, doc, arg_type, ret_type,
--                 gen, success_response, boxed):
-+                 gen, success_response, boxed, allow_oob):
-         QAPISchemaEntity.__init__(self, name, info, doc)
-         assert not arg_type or isinstance(arg_type, str)
-         assert not ret_type or isinstance(ret_type, str)
-@@ -1432,6 +1433,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
-         self.gen = gen
-         self.success_response = success_response
-         self.boxed = boxed
-+        self.allow_oob = allow_oob
-
-     def check(self, schema):
-         if self._arg_type_name:
-@@ -1455,7 +1457,8 @@ class QAPISchemaCommand(QAPISchemaEntity):
-     def visit(self, visitor):
-         visitor.visit_command(self.name, self.info,
-                               self.arg_type, self.ret_type,
--                              self.gen, self.success_response, self.boxed)
-+                              self.gen, self.success_response,
-+                              self.boxed, self.allow_oob)
-
-
- class QAPISchemaEvent(QAPISchemaEntity):
-@@ -1674,6 +1677,7 @@ class QAPISchema(object):
-         gen = expr.get('gen', True)
-         success_response = expr.get('success-response', True)
-         boxed = expr.get('boxed', False)
-+        allow_oob = expr.get('allow-oob', False)
-         if isinstance(data, OrderedDict):
-             data = self._make_implicit_object_type(
-                 name, info, doc, 'arg', self._make_members(data, info))
-@@ -1681,7 +1685,8 @@ class QAPISchema(object):
-             assert len(rets) == 1
-             rets = self._make_array_type(rets[0], info)
-         self._def_entity(QAPISchemaCommand(name, info, doc, data, rets,
--                                           gen, success_response, boxed))
-+                                           gen, success_response,
-+                                           boxed, allow_oob))
-
-     def _def_event(self, expr, info, doc):
-         name = expr['event']
-diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
-index 79d11bbe9b5..9b312b2c51b 100644
---- a/scripts/qapi/doc.py
-+++ b/scripts/qapi/doc.py
-@@ -227,7 +227,7 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaVisitor):
-                                body=texi_entity(doc, 'Members')))
-
-     def visit_command(self, name, info, arg_type, ret_type,
--                      gen, success_response, boxed):
-+                      gen, success_response, boxed, allow_oob):
-         doc = self.cur_doc
-         if boxed:
-             body = texi_body(doc)
-diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-index 1d46a6d6b6f..f9e67e8227b 100644
---- a/scripts/qapi/introspect.py
-+++ b/scripts/qapi/introspect.py
-@@ -41,6 +41,8 @@ def to_qlit(obj, level=0, suppress_first_indent=False):
-         ret += 'QLIT_QDICT(((QLitDictEntry[]) {\n'
-         ret += ',\n'.join(elts) + '\n'
-         ret += indent(level) + '}))'
-+    elif isinstance(obj, bool):
-+        ret += 'QLIT_QBOOL(%s)' % ('true' if obj else 'false')
-     else:
-         assert False                # not implemented
-     return ret
-@@ -170,12 +172,13 @@ const QLitObject %(c_name)s = %(c_string)s;
-                                     for m in variants.variants]})
-
-     def visit_command(self, name, info, arg_type, ret_type,
--                      gen, success_response, boxed):
-+                      gen, success_response, boxed, allow_oob):
-         arg_type = arg_type or self._schema.the_empty_object_type
-         ret_type = ret_type or self._schema.the_empty_object_type
-         self._gen_qlit(name, 'command',
-                        {'arg-type': self._use_type(arg_type),
--                        'ret-type': self._use_type(ret_type)})
-+                        'ret-type': self._use_type(ret_type),
-+                        'allow-oob': allow_oob})
-
-     def visit_event(self, name, info, arg_type, boxed):
-         arg_type = arg_type or self._schema.the_empty_object_type
-diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
-index 1e694b5ecf9..26eb13ff417 100644
---- a/include/qapi/qmp/dispatch.h
-+++ b/include/qapi/qmp/dispatch.h
-@@ -20,8 +20,9 @@ typedef void (QmpCommandFunc)(QDict *, QObject **, Error **);
-
- typedef enum QmpCommandOptions
+-void qmp_qmp_capabilities(Error **errp)
++static void qmp_caps_check(Monitor *mon, QMPCapabilityList *list,
++                           Error **errp)
  {
--    QCO_NO_OPTIONS = 0x0,
--    QCO_NO_SUCCESS_RESP = 0x1,
-+    QCO_NO_OPTIONS            =  0x0,
-+    QCO_NO_SUCCESS_RESP       =  (1U << 0),
-+    QCO_ALLOW_OOB             =  (1U << 1),
- } QmpCommandOptions;
++    for (; list; list = list->next) {
++        assert(list->value < QMP_CAPABILITY__MAX);
++        switch (list->value) {
++        case QMP_CAPABILITY_OOB:
++            if (!mon->use_io_thr) {
++                /*
++                 * Out-Of-Band only works with monitors that are
++                 * running on dedicated IOThread.
++                 */
++                error_setg(errp, "This monitor does not support "
++                           "Out-Of-Band (OOB)");
++                return;
++            }
++            break;
++        default:
++            break;
++        }
++    }
++}
++
++/* This function should only be called after capabilities are checked. */
++static void qmp_caps_apply(Monitor *mon, QMPCapabilityList *list)
++{
++    for (; list; list = list->next) {
++        mon->qmp.qmp_caps[list->value] = true;
++    }
++}
++
++void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
++                          Error **errp)
++{
++    Error *local_err = NULL;
++
+     if (cur_mon->qmp.commands == &qmp_commands) {
+         error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
+                   "Capabilities negotiation is already complete, command "
+@@ -1048,6 +1084,21 @@ void qmp_qmp_capabilities(Error **errp)
+         return;
+     }
 
- typedef struct QmpCommand
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.py
-index 67e417e2980..10e68b01d98 100644
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -42,7 +42,7 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-         self._print_variants(variants)
++    /* Enable QMP capabilities provided by the client if applicable. */
++    if (has_enable) {
++        qmp_caps_check(cur_mon, enable, &local_err);
++        if (local_err) {
++            /*
++             * Failed check on any of the capabilities will fail the
++             * entire command (and thus not apply any of the other
++             * capabilities that were also requested).
++             */
++            error_propagate(errp, local_err);
++            return;
++        }
++        qmp_caps_apply(cur_mon, enable);
++    }
++
+     cur_mon->qmp.commands = &qmp_commands;
+ }
 
-     def visit_command(self, name, info, arg_type, ret_type,
--                      gen, success_response, boxed):
-+                      gen, success_response, boxed, allow_oob):
-         print('command %s %s -> %s' % \
-               (name, arg_type and arg_type.name, ret_type and ret_type.name))
-         print('   gen=%s success_response=%s boxed=%s' % \
+@@ -3893,14 +3944,29 @@ void monitor_resume(Monitor *mon)
+         readline_show_prompt(mon->rs);
+ }
+
+-static QObject *get_qmp_greeting(void)
++static QObject *get_qmp_greeting(Monitor *mon)
+ {
++    QList *cap_list = qlist_new();
+     QObject *ver = NULL;
++    QMPCapability cap;
+
+     qmp_marshal_query_version(NULL, &ver, NULL);
+
+-    return qobject_from_jsonf("{'QMP': {'version': %p, 'capabilities': []}}",
+-                              ver);
++    for (cap = 0; cap < QMP_CAPABILITY__MAX; cap++) {
++        if (!mon->use_io_thr && cap == QMP_CAPABILITY_OOB) {
++            /* Monitors that are not using IOThread won't support OOB */
++            continue;
++        }
++        qlist_append(cap_list, qstring_from_str(QMPCapability_str(cap)));
++    }
++
++    return qobject_from_jsonf("{'QMP': {'version': %p, 'capabilities': %p}}",
++                              ver, cap_list);
++}
++
++static void monitor_qmp_caps_reset(Monitor *mon)
++{
++    memset(mon->qmp.qmp_caps, 0, sizeof(mon->qmp.qmp_caps));
+ }
+
+ static void monitor_qmp_event(void *opaque, int event)
+@@ -3911,7 +3977,8 @@ static void monitor_qmp_event(void *opaque, int event)
+     switch (event) {
+     case CHR_EVENT_OPENED:
+         mon->qmp.commands = &qmp_cap_negotiation_commands;
+-        data = get_qmp_greeting();
++        monitor_qmp_caps_reset(mon);
++        data = get_qmp_greeting(mon);
+         monitor_json_emitter(mon, data);
+         qobject_decref(data);
+         mon_refcount++;
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index 22445d9ec25..a8384bdda3b 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -20,6 +20,7 @@
+ #include "qapi/qobject-input-visitor.h"
+ #include "qapi/util.h"
+ #include "qapi/visitor.h"
++#include "qapi/qmp/qstring.h"
+
+ const char common_args[] = "-nodefaults -machine none";
+
+@@ -79,6 +80,8 @@ static void test_qmp_protocol(void)
+     QDict *resp, *q, *ret;
+     QList *capabilities;
+     QTestState *qts;
++    const QListEntry *entry;
++    QString *qstr;
+
+     qts = qtest_init_without_qmp_handshake(common_args);
+
+@@ -88,7 +91,12 @@ static void test_qmp_protocol(void)
+     g_assert(q);
+     test_version(qdict_get(q, "version"));
+     capabilities = qdict_get_qlist(q, "capabilities");
+-    g_assert(capabilities && qlist_empty(capabilities));
++    g_assert(capabilities);
++    entry = qlist_first(capabilities);
++    g_assert(entry);
++    qstr = qobject_to(QString, entry->value);
++    g_assert(qstr);
++    g_assert_cmpstr(qstring_get_str(qstr), ==, "oob");
+     QDECREF(resp);
+
+     /* Test valid command before handshake */
 -- 
 2.14.3
