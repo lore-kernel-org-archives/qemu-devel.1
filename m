@@ -1,31 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evLLU-0000Ma-Uy
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:10:25 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1evLLX-0000Ny-Mi
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:10:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evLLT-0004cM-Ui
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:10:24 -0400
-Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:45263)
+	(envelope-from <pbonzini@redhat.com>) id 1evLLS-0004VY-0J
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:10:27 -0400
+Received: from mail-wr0-f175.google.com ([209.85.128.175]:35582)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1evLLT-0004aU-O9
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:10:23 -0400
-Received: by mail-ot0-x232.google.com with SMTP id f11so14817922otj.12
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 04:10:23 -0700 (PDT)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1evLLR-0004Rm-Kz
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:10:21 -0400
+Received: by mail-wr0-f175.google.com with SMTP id n12so4089506wra.2
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 04:10:21 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+References: <20180207163622.29935-1-pbonzini@redhat.com>
+	<20180207163622.29935-3-pbonzini@redhat.com>
+	<20180208013517.GB24289@lemon.usersys.redhat.com>
+	<5ac0b76e-213a-60c3-c010-87512d3a564a@redhat.com>
+	<20180212135206.GG5103@localhost.localdomain>
+	<81af35f9-4934-0c21-e3b1-b27c2fa7fdd9@redhat.com>
+	<20180212143040.GH5103@localhost.localdomain>
+	<3d6031b0-7d75-c3ab-e466-ce3d87d630df@redhat.com>
+	<20180212144824.GI5103@localhost.localdomain>
+	<31e295bd-3012-c34c-a96d-54122557b20c@redhat.com>
+Message-ID: <2d47ca9e-6f68-ab4e-0ec0-9f932128a93f@redhat.com>
+Date: Mon, 12 Mar 2018 12:10:18 +0100
 MIME-Version: 1.0
-In-Reply-To: <8ecafc78-5ea0-5d83-41d4-0b9b95bcdf21@gmail.com>
-References: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
-	<1518893216-9983-11-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA8grbFO7E0yoci_dwr2xnH8ujS8cJnpNxGdz=JOged=Gw@mail.gmail.com>
-	<a35ca106-b405-8c07-95b6-ff65f324fae4@redhat.com>
-	<CAFEAcA-08=3jyf1fpdD6AumJmbL=64iLOpoySVCfot7CXiD4Og@mail.gmail.com>
-	<8ecafc78-5ea0-5d83-41d4-0b9b95bcdf21@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 12 Mar 2018 11:10:02 +0000
-Message-ID: <CAFEAcA9--5Ja9-jNVp7dJEN_y4is25NT9TSQcakDdSkpSV8R9A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v9 10/14] hw/arm/smmuv3: Abort on vfio or
- vhost case
+In-Reply-To: <31e295bd-3012-c34c-a96d-54122557b20c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] scsi: add block job
+ opblockers for scsi-block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,44 +39,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger.pro@gmail.com>
-Cc: Auger Eric <eric.auger@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 12 March 2018 at 10:53, Eric Auger <eric.auger.pro@gmail.com> wrote:
-> Hi Peter,
->
-> On 09/03/18 18:59, Peter Maydell wrote:
->> On 9 March 2018 at 17:53, Auger Eric <eric.auger@redhat.com> wrote:
->>> Hi Peter,
->>> On 08/03/18 20:06, Peter Maydell wrote:
->>>> On 17 February 2018 at 18:46, Eric Auger <eric.auger@redhat.com> wrote:
->>>>> +static void smmuv3_notify_flag_changed(IOMMUMemoryRegion *iommu,
->>>>> +                                       IOMMUNotifierFlag old,
->>>>> +                                       IOMMUNotifierFlag new)
->>>>> +{
->>>>> +    if (old == IOMMU_NOTIFIER_NONE) {
->>>>> +        error_setg(&error_fatal,
->>>>> +                   "SMMUV3: vhost and vfio notifiers not yet supported");
->>>>> +    }
->>>>> +}
->>>>
->>>> Is this triggerable by the guest, or by the user on the command
->>>> line, or only by a bug in the board or other QEMU code?
->>> by the user on the command line.
->>
->> OK. Do they get this error immediately on startup, or only later
->> in execution? (If the latter, is it possible to make the error
->> happen earlier?)
+On 12/02/2018 15:50, Paolo Bonzini wrote:
+> On 12/02/2018 15:48, Kevin Wolf wrote:
+>> Am 12.02.2018 um 15:32 hat Paolo Bonzini geschrieben:
+>>> Okay, we are in agreement about this and you expressed very well why I
+>>> (at the gut feeling level) didn't like the old op blockers.  But you
+>>> bypassed the real question, which is: should I send a pull request for
+>>> these two patches or not? :)
+>> I didn't spell it out that explicitly, but this is essentially a NACK.
+>> I'd very much prefer if you could replace it with the proper solution.
+>> Of course, we can always make exceptions when there is a good reason,
+>> but with 2.12 still two months away, I doubt we have one.
+> Ok, I don't mind explicitness.  I'll keep these two patches in the queue
+> for now.
 
-> later in execution. We also have to handle the case where such device is
-> hot-plugged. At best if could be done on smmu_find_add_as() by checking
-> the type of attached device but this wouldn't happen much earlier. By
-> the way we will soon support vhost and we will just rule out vfio
-> integration by detecting map notifiers.
+It's now one month away.  Regarding the solution below:
 
-Hmm. error_fatal is a bit unfortunate for a hotplug event -- ideally
-you would want to cause the hotplug to cleanly fail without aborting
-the running QEMU session.
+> I propose a new BLK_PERM_BYPASS that allows its users to bypass the
+> block layer I/O functions. In other words, bdrv_aio_ioctl() would
+> require that you got this permission. A dirty bitmap would keep a
+> BdrvChild with perm=0, shared=BLK_PERM_ALL & ~BLK_PERM_BYPASS, so you
+> can never have a dirty bitmap and a device using ioctls attached to the
+> BDS at the same time.
 
-thanks
--- PMM
+I suppose it would be like:
+
+- scsi-block/scsi-generic call blk_set_perm with perm == shared ==
+BLK_PERM_BYPASS
+
+- users of dirty bitmaps would call use perm/shared_perm as in your
+message above
+
+- dirty bitmaps creation calls bdrv_get_cumulative_perm (which should
+now become public) and checks that it doesn't have BLK_PERM_BYPASS in
+shared_perm
+
+Anything I'm missing?
+
+Paolo
