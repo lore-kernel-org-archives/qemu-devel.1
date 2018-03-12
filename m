@@ -1,27 +1,14 @@
-Received: from eggs.gnu.org ([208.118.235.92]:51175)
+Received: from eggs.gnu.org ([208.118.235.92]:51452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evPsP-00054S-Nm
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:00:42 -0400
+	(envelope-from <stefanha@redhat.com>) id 1evPtO-0005oy-I6
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:01:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evPsO-00010k-V1
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:00:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33214 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1evPsO-0000zQ-QL
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:00:40 -0400
-References: <20180312153344.23453-1-nia.alarie@gmail.com>
-	<ad11c22e-294b-d7e3-1589-7c4a42351980@redhat.com>
-	<CA+k8WDptLRVNBstB4UEoaorS++_Xqn-j+FHYZhHG1igAJWB-rg@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9e1dbfe9-e26b-66b6-7009-1c2015160c97@redhat.com>
-Date: Mon, 12 Mar 2018 11:00:39 -0500
-MIME-Version: 1.0
-In-Reply-To: <CA+k8WDptLRVNBstB4UEoaorS++_Xqn-j+FHYZhHG1igAJWB-rg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] 9p: Convert use of atoi to qemu_strtoi
- to allow error checking
+	(envelope-from <stefanha@redhat.com>) id 1evPtN-0002Bn-Pl
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:01:42 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Mon, 12 Mar 2018 16:01:24 +0000
+Message-Id: <20180312160125.7596-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL 0/1] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +17,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: nee <nia.alarie@gmail.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>, Jim Mussared <jim@groklearning.com>, groug@kaod.org, Joel Stanley <joel@jms.id.au>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On 03/12/2018 10:50 AM, nee wrote:
+The following changes since commit e4ae62b802cec437f877f2cadc4ef059cc0eca76:
 
->>>        } else if (perm & P9_STAT_MODE_LINK) {
->>> -        int32_t ofid = atoi(extension.data);
->>> -        V9fsFidState *ofidp = get_fid(pdu, ofid);
->>> +        int ofid;
->>
->>
->> 'unsigned int' and...
->>
->>> +        V9fsFidState *ofidp;
->>> +
->>> +        if (qemu_strtoi(extension.data, NULL, 10, &ofid)) {
->>
->>
->> qemu_strtoui() might be smarter, per Greg's comments on v1.
->>
->>> +            err = -EINVAL;
->>> +            goto out;
->>> +        }
->>> +        ofidp = get_fid(pdu, (int32_t)ofid);
->>
->>
->> This cast is spurious.
->>
->> --
->> Eric Blake, Principal Software Engineer
->> Red Hat, Inc.           +1-919-301-3266
->> Virtualization:  qemu.org | libvirt.org
-> 
-> I did this because get_fid() takes an int32_t, not an unsigned int.
-> The struct V9fsFidState also uses an int32_t for its `fid` member. Do
-> you want me to change all these types, or just the function being used
-> here?
+  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2018-03-09 17:28:16 +0000)
 
-I'll let Greg answer; he's more familiar with the 9p code (I was just 
-commenting based on his initial answer to v1).
+are available in the Git repository at:
+
+  git://github.com/stefanha/qemu.git tags/block-pull-request
+
+for you to fetch changes up to 7376eda7c2e0451e819e81bd05fabc56a9deb946:
+
+  block: make BDRV_POLL_WHILE() re-entrancy safe (2018-03-12 11:07:37 +0000)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+
+Stefan Hajnoczi (1):
+  block: make BDRV_POLL_WHILE() re-entrancy safe
+
+ include/block/aio-wait.h | 61 ++++++++++++++++++++++++------------------------
+ util/aio-wait.c          |  2 +-
+ 2 files changed, 31 insertions(+), 32 deletions(-)
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.14.3
