@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1evNZq-0000M8-W5
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:33:23 -0400
+	(envelope-from <thuth@redhat.com>) id 1evNZv-0000P0-5I
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:33:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1evNZp-00042Y-WC
+	(envelope-from <thuth@redhat.com>) id 1evNZq-00042j-43
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:33:27 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55658 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1evNZp-00041q-V0
 	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:33:22 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:44777)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1evNZp-000418-Pb
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:33:21 -0400
-Received: by mail-wr0-x244.google.com with SMTP id v65so15689327wrc.11
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 06:33:21 -0700 (PDT)
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 72537D143F
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 13:33:21 +0000 (UTC)
+References: <1520839658-20499-1-git-send-email-thuth@redhat.com>
+	<2a85941f-48bf-9e9b-0d6d-832a270d882b@redhat.com>
+	<7413bf34-63ec-837d-d418-af2cfd1038d7@redhat.com>
+	<bc5f376b-ee95-5ce9-8c7c-32e75df97ec3@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <47d9f2ab-b9b4-4184-4a39-d5eb73e66996@redhat.com>
+Date: Mon, 12 Mar 2018 14:33:16 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180312131806.23209-1-stefanha@redhat.com>
-References: <20180312131806.23209-1-stefanha@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 12 Mar 2018 14:33:19 +0100
-Message-ID: <CAJ+F1CJAizAo34R7g0LgOZ7UTe+xsFBOw=eCo-U1iRRfui49NA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <bc5f376b-ee95-5ce9-8c7c-32e75df97ec3@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] checkpatch: warn about missing MAINTAINERS
- file changes
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-doc: Rework the network options
+ chapter to make "-net" less prominent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,80 +37,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On Mon, Mar 12, 2018 at 2:18 PM, Stefan Hajnoczi <stefanha@redhat.com> wrot=
-e:
-> Warn if files are added/renamed/deleted without MAINTAINERS file
-> changes.  This has helped me in Linux and we could benefit from this
-> check in QEMU.
->
-> This patch is a manual cherry-pick of Linux commit
-> 13f1937ef33950b1112049972249e6191b82e6c9 ("checkpatch: emit a warning on
-> file add/move/delete") by Joe Perches <joe@perches.com>.
->
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On 12.03.2018 13:44, Paolo Bonzini wrote:
+> On 12/03/2018 13:18, Eric Blake wrote:
+>> On 03/12/2018 04:07 AM, Paolo Bonzini wrote:
+>>> On 12/03/2018 08:27, Thomas Huth wrote:
+>>>> "-net" is clearly a legacy option. Yet we still use it in almost all
+>>>> examples in the qemu documentation, and many other spots in the netw=
+ork
+>>>> chapter. We should make it less prominent that users are not lured i=
+nto
+>>>> using it so often anymore. So instead of starting the network chapte=
+r
+>>>> with
+>>>> "-net nic" and documenting "-net <backend>" below "-netdev <backend>=
+"
+>>>> everywhere, all the "-net" related documentation is now moved to the=
+ end
+>>>> of the chapter. The new "--nic" option is moved to the beginning of =
+the
+>>>> chapter instead, with a new example that should demonstrate how "--n=
+ic"
+>>>> can be used to shortcut "--device" with "--netdev". The examples in =
+this
+>>>> chapter are changed to use the "--device" and "--netdev" options or
+>>>> "--nic" instead of "-net nic -net <backend>".
+>>>>
+>>>> While we're at it, also remove a legacy remark about very old Linux
+>>>> distributions. Also remove the "[...]" from the examples in this cha=
+pter
+>>>> since we are not using this ellipsis in any other examples in our do=
+cu-
+>>>> mentation.
+>>>>
+>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>> ---
+>>>> =C2=A0 v2:
+>>>> =C2=A0 - Fixed the bad "--device=3De1000" example
+>>>
+>>> Frankly I think this is the proof that double-dash option names are a
+>>> bad idea.=C2=A0 The reason to do that was to make qemu-img and qemu c=
+ommand
+>>> lines more similar in the documentation, but the truth is they are no=
+t
+>>> similar and shouldn't be made similar.=C2=A0 The equal sign is one ex=
+ample,
+>>> where qemu-img supports "--format=3Draw" but QEMU doesn't support
+>>> "--device=3De1000", but it's not the only one.
+>>
+>> Our hand-rolled parser sucks.=C2=A0 We should fix it to be more like g=
+etopt,
+>> at which point --device=3De1000 would work.
+>=20
+> "--device=3De1000,netdev=3Duser0" is also pretty confusing, as is
+> "--machine=3Dkernel_irqchip=3Doff".
+>=20
+>>> qemu-img supports things such as "-fraw", qemu doesn't---for example
+>>> "-m1024" doesn't work).
+>>
+>> Our hand-rolled parser sucks.=C2=A0 We should fix it to be more like g=
+etopt,
+>> at which point -m1024 would work.
+>=20
+> For -m1024 it makes sense, but what about -d?  How do you explain that
+> "-din_asm" is a short form of "-d in_asm", but "-device" is not a short
+> form of "-d evice"?
 
-nice,
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Slightly off-topic, but: I think it is also quite unfortunate that we
+use a short option "-d" for something that you need rather seldomly,
+while something important like "-device" does not have an abbreviated
+one-letter alternative.
 
+> I agree that having a non-standard option parser is bad, but
+> getopt_long_only always seemed to me like the worst of both worlds.
+> "All options are 'long', cannot be abbreviated, must be separated from
+> their argument" is pretty easy.
 
-> ---
-> Note the 80-char lines are from upstream code.  Keep them as-is.
->
->  scripts/checkpatch.pl | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
->
-> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-> index d1fe79bcc4..d0d8f63d48 100755
-> --- a/scripts/checkpatch.pl
-> +++ b/scripts/checkpatch.pl
-> @@ -1177,6 +1177,7 @@ sub process {
->         our $clean =3D 1;
->         my $signoff =3D 0;
->         my $is_patch =3D 0;
-> +       my $reported_maintainer_file =3D 0;
->
->         our @report =3D ();
->         our $cnt_lines =3D 0;
-> @@ -1379,6 +1380,24 @@ sub process {
->                         }
->                 }
->
-> +# Check if MAINTAINERS is being updated.  If so, there's probably no nee=
-d to
-> +# emit the "does MAINTAINERS need updating?" message on file add/move/de=
-lete
-> +               if ($line =3D~ /^\s*MAINTAINERS\s*\|/) {
-> +                       $reported_maintainer_file =3D 1;
-> +               }
-> +
-> +# Check for added, moved or deleted files
-> +               if (!$reported_maintainer_file &&
-> +                   ($line =3D~ /^(?:new|deleted) file mode\s*\d+\s*$/ ||
-> +                    $line =3D~ /^rename (?:from|to) [\w\/\.\-]+\s*$/ ||
-> +                    ($line =3D~ /\{\s*([\w\/\.\-]*)\s*\=3D\>\s*([\w\/\.\=
--]*)\s*\}/ &&
-> +                     (defined($1) || defined($2))))) {
-> +                       $is_patch =3D 1;
-> +                       $reported_maintainer_file =3D 1;
-> +                       WARN("added, moved or deleted file(s), does MAINT=
-AINERS need updating?\n" .
-> +                               $herecurr);
-> +               }
-> +
->  # Check for wrappage within a valid hunk of the file
->                 if ($realcnt !=3D 0 && $line !~ m{^(?:\+|-| |\\ No newlin=
-e|$)}) {
->                         ERROR("patch seems to be corrupt (line wrapped?)\=
-n" .
-> --
-> 2.14.3
->
->
+Hey, what about switching to getopt_long(), breaking with traditions and
+call the first version that contains the change "QEMU v3.0"? ;-)
+... SCNR.
 
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+ Thomas
