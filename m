@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1evRcL-0001ja-Pv
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:52:16 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1evRei-0003qR-M4
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:54:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1evRcH-0008S7-LZ
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:52:13 -0400
-Resent-Message-Id: <E1evRcH-0008S7-LZ@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21112)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1evRcH-0008Rc-E4
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:52:09 -0400
-In-Reply-To: <20180310082746.24198-1-jsnow@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152087710701.39.5133949794255901178@71c20359a636>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 12 Mar 2018 10:51:48 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v5 00/21] blockjobs: add explicit job
- management
+	(envelope-from <a.perevalov@samsung.com>) id 1evRee-0000oT-MN
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:54:40 -0400
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:60888)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1evRee-0000mr-5J
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:54:36 -0400
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Message-id: <3224d090-0ec5-86ee-1f5f-ad20c1e66836@samsung.com>
+Date: Mon, 12 Mar 2018 20:54:28 +0300
+MIME-version: 1.0
+In-reply-to: <20180308125913.GA3038@work-vm>
+Content-type: text/plain; charset="utf-8"; format="flowed"
+Content-transfer-encoding: 7bit
+Content-language: en-GB
+References: <1519289107-20251-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20180222084520eucas1p16aa4a165d2e1c0f5ec4da12257eda269@eucas1p1.samsung.com>
+	<1519289107-20251-2-git-send-email-a.perevalov@samsung.com>
+	<20180308125913.GA3038@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v4] migration: change blocktime type to
+ uint32_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,280 +32,253 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jsnow@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, v.kuramshin@samsung.com, ash.billore@samsung.com, f4bug@amsat.org, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMzEwMDgyNzQ2LjI0MTk4LTEtanNub3dAcmVkaGF0LmNvbQpTdWJqZWN0
-OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY1IDAwLzIxXSBibG9ja2pvYnM6IGFkZCBleHBsaWNpdCBq
-b2IgbWFuYWdlbWVudAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFT
-RT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFp
-bGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRo
-bSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJB
-U0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4v
-JHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBz
-aG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
-ayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChu
-KzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5n
-IDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dp
-dGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAg
-cGF0Y2hldy8xNTIwNjkyMzc4LTE4MzUtMS1naXQtc2VuZC1lbWFpbC1saWRvbmdjaGVuQHRlbmNl
-bnQuY29tIC0+IHBhdGNoZXcvMTUyMDY5MjM3OC0xODM1LTEtZ2l0LXNlbmQtZW1haWwtbGlkb25n
-Y2hlbkB0ZW5jZW50LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzE1MjA3
-MTY5MjctMTcwNjgtMS1naXQtc2VuZC1lbWFpbC16aGFuZ2NraWRAZ21haWwuY29tIC0+IHBhdGNo
-ZXcvMTUyMDcxNjkyNy0xNzA2OC0xLWdpdC1zZW5kLWVtYWlsLXpoYW5nY2tpZEBnbWFpbC5jb20K
-ICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8xNTIwNzIzMDkwLTIyMTMwLTEtZ2l0
-LXNlbmQtZW1haWwtbGludXhAcm9lY2stdXMubmV0IC0+IHBhdGNoZXcvMTUyMDcyMzA5MC0yMjEz
-MC0xLWdpdC1zZW5kLWVtYWlsLWxpbnV4QHJvZWNrLXVzLm5ldAogKiBbbmV3IHRhZ10gICAgICAg
-ICAgICAgICBwYXRjaGV3LzE1MjA3NTQzMTQtNTk2OS0xLWdpdC1zZW5kLWVtYWlsLXpoYW5nY2tp
-ZEBnbWFpbC5jb20gLT4gcGF0Y2hldy8xNTIwNzU0MzE0LTU5NjktMS1naXQtc2VuZC1lbWFpbC16
-aGFuZ2NraWRAZ21haWwuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMTUy
-MDgzOTY1OC0yMDQ5OS0xLWdpdC1zZW5kLWVtYWlsLXRodXRoQHJlZGhhdC5jb20gLT4gcGF0Y2hl
-dy8xNTIwODM5NjU4LTIwNDk5LTEtZ2l0LXNlbmQtZW1haWwtdGh1dGhAcmVkaGF0LmNvbQogKiBb
-bmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzE1MjA4NDU3NTk2NC4yNDA3OS4zNzA4NDgw
-NDkyNzQ2NzAxNjI3LnN0Z2l0QGJhaGlhLmxhbiAtPiBwYXRjaGV3LzE1MjA4NDU3NTk2NC4yNDA3
-OS4zNzA4NDgwNDkyNzQ2NzAxNjI3LnN0Z2l0QGJhaGlhLmxhbgogKiBbbmV3IHRhZ10gICAgICAg
-ICAgICAgICBwYXRjaGV3LzE1MjA4NDk4MTgtNjkxNS0xLWdpdC1zZW5kLWVtYWlsLWFudG9uLm5l
-ZmVkb3ZAdmlydHVvenpvLmNvbSAtPiBwYXRjaGV3LzE1MjA4NDk4MTgtNjkxNS0xLWdpdC1zZW5k
-LWVtYWlsLWFudG9uLm5lZmVkb3ZAdmlydHVvenpvLmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAg
-ICAgICBwYXRjaGV3LzE1MjA4NTA2OTAtMjMyNDUtMS1naXQtc2VuZC1lbWFpbC1hYmRhbGxhaC5i
-b3Vhc3NpZGFAbGF1dGVyYmFjaC5jb20gLT4gcGF0Y2hldy8xNTIwODUwNjkwLTIzMjQ1LTEtZ2l0
-LXNlbmQtZW1haWwtYWJkYWxsYWguYm91YXNzaWRhQGxhdXRlcmJhY2guY29tCiB0IFt0YWcgdXBk
-YXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxODAzMDkxNjUyMTIuOTcxNDQtMS12c2VtZW50c292
-QHZpcnR1b3p6by5jb20gLT4gcGF0Y2hldy8yMDE4MDMwOTE2NTIxMi45NzE0NC0xLXZzZW1lbnRz
-b3ZAdmlydHVvenpvLmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgw
-MzA5MTcyNzEzLjI2MzE4LTEta3dvbGZAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwMzA5MTcy
-NzEzLjI2MzE4LTEta3dvbGZAcmVkaGF0LmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBw
-YXRjaGV3LzIwMTgwMzA5MTc1NDUzLjQxNTQ4LTEtZGdpbGJlcnRAcmVkaGF0LmNvbSAtPiBwYXRj
-aGV3LzIwMTgwMzA5MTc1NDUzLjQxNTQ4LTEtZGdpbGJlcnRAcmVkaGF0LmNvbQogdCBbdGFnIHVw
-ZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwMzA5MTgyMjAyLjMxMjA2LTEtZmFyb3Nhc0Bs
-aW51eC52bmV0LmlibS5jb20gLT4gcGF0Y2hldy8yMDE4MDMwOTE4MjIwMi4zMTIwNi0xLWZhcm9z
-YXNAbGludXgudm5ldC5pYm0uY29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcv
-MjAxODAzMTAwODI3NDYuMjQxOTgtMS1qc25vd0ByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODAz
-MTAwODI3NDYuMjQxOTgtMS1qc25vd0ByZWRoYXQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAg
-ICAgIHBhdGNoZXcvMjAxODAzMTAyMTQ1NTQuMTU3MTU1LTEtZWJsYWtlQHJlZGhhdC5jb20gLT4g
-cGF0Y2hldy8yMDE4MDMxMDIxNDU1NC4xNTcxNTUtMS1lYmxha2VAcmVkaGF0LmNvbQogKiBbbmV3
-IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwMzExMjAxMjM5LjI1NTA2LTEtbmlhLmFs
-YXJpZUBnbWFpbC5jb20gLT4gcGF0Y2hldy8yMDE4MDMxMTIwMTIzOS4yNTUwNi0xLW5pYS5hbGFy
-aWVAZ21haWwuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODAzMTIw
-OTQzMDguMjE3MTYtMS1wYm9uemluaUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODAzMTIwOTQz
-MDguMjE3MTYtMS1wYm9uemluaUByZWRoYXQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAg
-IHBhdGNoZXcvMjAxODAzMTIxMDQyNDEuMjQ5NjUtMS1rcmF4ZWxAcmVkaGF0LmNvbSAtPiBwYXRj
-aGV3LzIwMTgwMzEyMTA0MjQxLjI0OTY1LTEta3JheGVsQHJlZGhhdC5jb20KICogW25ldyB0YWdd
-ICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDMxMjEwNTk0MS4xNTQzOS0xLWtyYXhlbEByZWRo
-YXQuY29tIC0+IHBhdGNoZXcvMjAxODAzMTIxMDU5NDEuMTU0MzktMS1rcmF4ZWxAcmVkaGF0LmNv
-bQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwMzEyMTEwNTMyLjMwOTY3
-LTEta3JheGVsQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MDMxMjExMDUzMi4zMDk2Ny0xLWty
-YXhlbEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNjhhYmQwMzc3
-ZCB0ZXN0cy90ZXN0LWJsb2Nram9iOiB0ZXN0IGNhbmNlbGxhdGlvbnMKZGU1OGNmYzdmNyBpb3Rl
-c3RzOiB0ZXN0IG1hbnVhbCBqb2IgZGlzbWlzc2FsCmYzOWQ5MjJjNjQgYmxvY2tqb2JzOiBFeHBv
-c2UgbWFudWFsIHByb3BlcnR5CmI0ODhjNTJmYzMgYmxvY2tqb2JzOiBhZGQgYmxvY2stam9iLWZp
-bmFsaXplCmViNWZjYjcxYmIgYmxvY2tqb2JzOiBhZGQgUEVORElORyBzdGF0dXMgYW5kIGV2ZW50
-CjAwNjlkYjJjZjMgYmxvY2tqb2JzOiBhZGQgd2FpdGluZyBzdGF0dXMKOWZlZDMzZjFiOCBibG9j
-a2pvYnM6IGFkZCBwcmVwYXJlIGNhbGxiYWNrCjRiM2UwYTJjODkgYmxvY2tqb2JzOiBhZGQgYmxv
-Y2tfam9iX3R4bl9hcHBseSBmdW5jdGlvbgpmMWM4ZGE4ODQ0IGJsb2Nram9iczogYWRkIGNvbW1p
-dCwgYWJvcnQsIGNsZWFuIGhlbHBlcnMKYmRlOWQ3OTc2NSBibG9ja2pvYnM6IGVuc3VyZSBhYm9y
-dCBpcyBjYWxsZWQgZm9yIGNhbmNlbGxlZCBqb2JzCjdmYjcxOTU3NGMgYmxvY2tqb2JzOiBhZGQg
-YmxvY2tfam9iX2Rpc21pc3MKOTYwMzU3Zjg4ZCBibG9ja2pvYnM6IGFkZCBOVUxMIHN0YXRlCmQ1
-NWNkNTZiYzggYmxvY2tqb2JzOiBhZGQgQ09OQ0xVREVEIHN0YXRlCjVjOTc2MjkyMmYgYmxvY2tq
-b2JzOiBhZGQgQUJPUlRJTkcgc3RhdGUKZmExMDU2ZWZlNiBibG9ja2pvYnM6IGFkZCBibG9ja19q
-b2JfdmVyYiBwZXJtaXNzaW9uIHRhYmxlCjEwZjEyYmNjMjIgaW90ZXN0czogYWRkIHBhdXNlX3dh
-aXQKMGM4OGIwZGI2MSBibG9ja2pvYnM6IGFkZCBzdGF0ZSB0cmFuc2l0aW9uIHRhYmxlCjUzMzAx
-NDE4ZDkgYmxvY2tqb2JzOiBhZGQgc3RhdHVzIGVudW0KZmNhMjI2ZDkzNCBCbG9ja2pvYnM6IGRv
-Y3VtZW50YXRpb24gdG91Y2h1cApkOGE5M2M0NzU1IGJsb2Nram9iczogbW9kZWwgc2luZ2xlIGpv
-YnMgYXMgdHJhbnNhY3Rpb25zCjE1OGVlZTEzYWIgYmxvY2tqb2JzOiBmaXggc2V0LXNwZWVkIGtp
-Y2sKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjE6IGJsb2Nram9iczog
-Zml4IHNldC1zcGVlZCBraWNrLi4uCkNoZWNraW5nIFBBVENIIDIvMjE6IGJsb2Nram9iczogbW9k
-ZWwgc2luZ2xlIGpvYnMgYXMgdHJhbnNhY3Rpb25zLi4uCkNoZWNraW5nIFBBVENIIDMvMjE6IEJs
-b2Nram9iczogZG9jdW1lbnRhdGlvbiB0b3VjaHVwLi4uCkNoZWNraW5nIFBBVENIIDQvMjE6IGJs
-b2Nram9iczogYWRkIHN0YXR1cyBlbnVtLi4uCkNoZWNraW5nIFBBVENIIDUvMjE6IGJsb2Nram9i
-czogYWRkIHN0YXRlIHRyYW5zaXRpb24gdGFibGUuLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQg
-YmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM4MTogRklMRTogYmxvY2tqb2IuYzo0ODoK
-KyAgICAvKiBVOiAqLyBbQkxPQ0tfSk9CX1NUQVRVU19VTkRFRklORURdID0gezAsIDEsIDAsIDAs
-IDAsIDB9LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNr
-ZXQgJ1snCiM4MjogRklMRTogYmxvY2tqb2IuYzo0OToKKyAgICAvKiBDOiAqLyBbQkxPQ0tfSk9C
-X1NUQVRVU19DUkVBVEVEXSAgID0gezAsIDAsIDEsIDAsIDAsIDB9LAoKRVJST1I6IHNwYWNlIHBy
-b2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM4MzogRklMRTogYmxvY2tq
-b2IuYzo1MDoKKyAgICAvKiBSOiAqLyBbQkxPQ0tfSk9CX1NUQVRVU19SVU5OSU5HXSAgID0gezAs
-IDAsIDAsIDEsIDEsIDB9LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1
-YXJlIGJyYWNrZXQgJ1snCiM4NDogRklMRTogYmxvY2tqb2IuYzo1MToKKyAgICAvKiBQOiAqLyBb
-QkxPQ0tfSk9CX1NUQVRVU19QQVVTRURdICAgID0gezAsIDAsIDEsIDAsIDAsIDB9LAoKRVJST1I6
-IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM4NTogRklM
-RTogYmxvY2tqb2IuYzo1MjoKKyAgICAvKiBZOiAqLyBbQkxPQ0tfSk9CX1NUQVRVU19SRUFEWV0g
-ICAgID0gezAsIDAsIDAsIDAsIDAsIDF9LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3Jl
-IG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM4NjogRklMRTogYmxvY2tqb2IuYzo1MzoKKyAgICAv
-KiBTOiAqLyBbQkxPQ0tfSk9CX1NUQVRVU19TVEFOREJZXSAgID0gezAsIDAsIDAsIDAsIDEsIDB9
-LAoKdG90YWw6IDYgZXJyb3JzLCAwIHdhcm5pbmdzLCA4OCBsaW5lcyBjaGVja2VkCgpZb3VyIHBh
-dGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA2LzIxOiBpb3Rl
-c3RzOiBhZGQgcGF1c2Vfd2FpdC4uLgpDaGVja2luZyBQQVRDSCA3LzIxOiBibG9ja2pvYnM6IGFk
-ZCBibG9ja19qb2JfdmVyYiBwZXJtaXNzaW9uIHRhYmxlLi4uCkNoZWNraW5nIFBBVENIIDgvMjE6
-IGJsb2Nram9iczogYWRkIEFCT1JUSU5HIHN0YXRlLi4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVk
-IGJlZm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojNjQ6IEZJTEU6IGJsb2Nram9iLmM6NDg6
-CisgICAgLyogVTogKi8gW0JMT0NLX0pPQl9TVEFUVVNfVU5ERUZJTkVEXSA9IHswLCAxLCAwLCAw
-LCAwLCAwLCAwfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBi
-cmFja2V0ICdbJwojNjU6IEZJTEU6IGJsb2Nram9iLmM6NDk6CisgICAgLyogQzogKi8gW0JMT0NL
-X0pPQl9TVEFUVVNfQ1JFQVRFRF0gICA9IHswLCAwLCAxLCAwLCAwLCAwLCAxfSwKCkVSUk9SOiBz
-cGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojNjY6IEZJTEU6
-IGJsb2Nram9iLmM6NTA6CisgICAgLyogUjogKi8gW0JMT0NLX0pPQl9TVEFUVVNfUlVOTklOR10g
-ICA9IHswLCAwLCAwLCAxLCAxLCAwLCAxfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9y
-ZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojNjc6IEZJTEU6IGJsb2Nram9iLmM6NTE6CisgICAg
-LyogUDogKi8gW0JMT0NLX0pPQl9TVEFUVVNfUEFVU0VEXSAgICA9IHswLCAwLCAxLCAwLCAwLCAw
-LCAwfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBicmFja2V0
-ICdbJwojNjg6IEZJTEU6IGJsb2Nram9iLmM6NTI6CisgICAgLyogWTogKi8gW0JMT0NLX0pPQl9T
-VEFUVVNfUkVBRFldICAgICA9IHswLCAwLCAwLCAwLCAwLCAxLCAxfSwKCkVSUk9SOiBzcGFjZSBw
-cm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojNjk6IEZJTEU6IGJsb2Nr
-am9iLmM6NTM6CisgICAgLyogUzogKi8gW0JMT0NLX0pPQl9TVEFUVVNfU1RBTkRCWV0gICA9IHsw
-LCAwLCAwLCAwLCAxLCAwLCAwfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVu
-IHNxdWFyZSBicmFja2V0ICdbJwojNzA6IEZJTEU6IGJsb2Nram9iLmM6NTQ6CisgICAgLyogWDog
-Ki8gW0JMT0NLX0pPQl9TVEFUVVNfQUJPUlRJTkddICA9IHswLCAwLCAwLCAwLCAwLCAwLCAwfSwK
-CnRvdGFsOiA3IGVycm9ycywgMCB3YXJuaW5ncywgNjIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRj
-aCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggOS8yMTogYmxvY2tq
-b2JzOiBhZGQgQ09OQ0xVREVEIHN0YXRlLi4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9y
-ZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojNjM6IEZJTEU6IGJsb2Nram9iLmM6NDg6CisgICAg
-LyogVTogKi8gW0JMT0NLX0pPQl9TVEFUVVNfVU5ERUZJTkVEXSA9IHswLCAxLCAwLCAwLCAwLCAw
-LCAwLCAwfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBicmFj
-a2V0ICdbJwojNjQ6IEZJTEU6IGJsb2Nram9iLmM6NDk6CisgICAgLyogQzogKi8gW0JMT0NLX0pP
-Ql9TVEFUVVNfQ1JFQVRFRF0gICA9IHswLCAwLCAxLCAwLCAwLCAwLCAxLCAwfSwKCkVSUk9SOiBz
-cGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojNjU6IEZJTEU6
-IGJsb2Nram9iLmM6NTA6CisgICAgLyogUjogKi8gW0JMT0NLX0pPQl9TVEFUVVNfUlVOTklOR10g
-ICA9IHswLCAwLCAwLCAxLCAxLCAwLCAxLCAxfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJl
-Zm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojNjY6IEZJTEU6IGJsb2Nram9iLmM6NTE6Cisg
-ICAgLyogUDogKi8gW0JMT0NLX0pPQl9TVEFUVVNfUEFVU0VEXSAgICA9IHswLCAwLCAxLCAwLCAw
-LCAwLCAwLCAwfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBi
-cmFja2V0ICdbJwojNjc6IEZJTEU6IGJsb2Nram9iLmM6NTI6CisgICAgLyogWTogKi8gW0JMT0NL
-X0pPQl9TVEFUVVNfUkVBRFldICAgICA9IHswLCAwLCAwLCAwLCAwLCAxLCAxLCAxfSwKCkVSUk9S
-OiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojNjg6IEZJ
-TEU6IGJsb2Nram9iLmM6NTM6CisgICAgLyogUzogKi8gW0JMT0NLX0pPQl9TVEFUVVNfU1RBTkRC
-WV0gICA9IHswLCAwLCAwLCAwLCAxLCAwLCAwLCAwfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVk
-IGJlZm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojNjk6IEZJTEU6IGJsb2Nram9iLmM6NTQ6
-CisgICAgLyogWDogKi8gW0JMT0NLX0pPQl9TVEFUVVNfQUJPUlRJTkddICA9IHswLCAwLCAwLCAw
-LCAwLCAwLCAwLCAxfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFy
-ZSBicmFja2V0ICdbJwojNzA6IEZJTEU6IGJsb2Nram9iLmM6NTU6CisgICAgLyogRTogKi8gW0JM
-T0NLX0pPQl9TVEFUVVNfQ09OQ0xVREVEXSA9IHswLCAwLCAwLCAwLCAwLCAwLCAwLCAwfSwKCnRv
-dGFsOiA4IGVycm9ycywgMCB3YXJuaW5ncywgODUgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTAvMjE6IGJsb2Nram9i
-czogYWRkIE5VTEwgc3RhdGUuLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4g
-c3F1YXJlIGJyYWNrZXQgJ1snCiM4MDogRklMRTogYmxvY2tqb2IuYzo0ODoKKyAgICAvKiBVOiAq
-LyBbQkxPQ0tfSk9CX1NUQVRVU19VTkRFRklORURdID0gezAsIDEsIDAsIDAsIDAsIDAsIDAsIDAs
-IDB9LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQg
-J1snCiM4MTogRklMRTogYmxvY2tqb2IuYzo0OToKKyAgICAvKiBDOiAqLyBbQkxPQ0tfSk9CX1NU
-QVRVU19DUkVBVEVEXSAgID0gezAsIDAsIDEsIDAsIDAsIDAsIDEsIDAsIDF9LAoKRVJST1I6IHNw
-YWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM4MjogRklMRTog
-YmxvY2tqb2IuYzo1MDoKKyAgICAvKiBSOiAqLyBbQkxPQ0tfSk9CX1NUQVRVU19SVU5OSU5HXSAg
-ID0gezAsIDAsIDAsIDEsIDEsIDAsIDEsIDEsIDB9LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQg
-YmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM4MzogRklMRTogYmxvY2tqb2IuYzo1MToK
-KyAgICAvKiBQOiAqLyBbQkxPQ0tfSk9CX1NUQVRVU19QQVVTRURdICAgID0gezAsIDAsIDEsIDAs
-IDAsIDAsIDAsIDAsIDB9LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1
-YXJlIGJyYWNrZXQgJ1snCiM4NDogRklMRTogYmxvY2tqb2IuYzo1MjoKKyAgICAvKiBZOiAqLyBb
-QkxPQ0tfSk9CX1NUQVRVU19SRUFEWV0gICAgID0gezAsIDAsIDAsIDAsIDAsIDEsIDEsIDEsIDB9
-LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1sn
-CiM4NTogRklMRTogYmxvY2tqb2IuYzo1MzoKKyAgICAvKiBTOiAqLyBbQkxPQ0tfSk9CX1NUQVRV
-U19TVEFOREJZXSAgID0gezAsIDAsIDAsIDAsIDEsIDAsIDAsIDAsIDB9LAoKRVJST1I6IHNwYWNl
-IHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM4NjogRklMRTogYmxv
-Y2tqb2IuYzo1NDoKKyAgICAvKiBYOiAqLyBbQkxPQ0tfSk9CX1NUQVRVU19BQk9SVElOR10gID0g
-ezAsIDAsIDAsIDAsIDAsIDAsIDAsIDEsIDB9LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVm
-b3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM4NzogRklMRTogYmxvY2tqb2IuYzo1NToKKyAg
-ICAvKiBFOiAqLyBbQkxPQ0tfSk9CX1NUQVRVU19DT05DTFVERURdID0gezAsIDAsIDAsIDAsIDAs
-IDAsIDAsIDAsIDF9LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJl
-IGJyYWNrZXQgJ1snCiM4ODogRklMRTogYmxvY2tqb2IuYzo1NjoKKyAgICAvKiBOOiAqLyBbQkxP
-Q0tfSk9CX1NUQVRVU19OVUxMXSAgICAgID0gezAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDB9LAoK
-dG90YWw6IDkgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMDQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRj
-aCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTEvMjE6IGJsb2Nr
-am9iczogYWRkIGJsb2NrX2pvYl9kaXNtaXNzLi4uCkNoZWNraW5nIFBBVENIIDEyLzIxOiBibG9j
-a2pvYnM6IGVuc3VyZSBhYm9ydCBpcyBjYWxsZWQgZm9yIGNhbmNlbGxlZCBqb2JzLi4uCkVSUk9S
-OiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojNzU6IEZJ
-TEU6IGJsb2Nram9iLmM6NTQ6CisgICAgLyogWDogKi8gW0JMT0NLX0pPQl9TVEFUVVNfQUJPUlRJ
-TkddICA9IHswLCAwLCAwLCAwLCAwLCAwLCAxLCAxLCAwfSwKCnRvdGFsOiAxIGVycm9ycywgMCB3
-YXJuaW5ncywgNTggbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTMvMjE6IGJsb2Nram9iczogYWRkIGNvbW1pdCwgYWJv
-cnQsIGNsZWFuIGhlbHBlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvMjE6IGJsb2Nram9iczogYWRk
-IGJsb2NrX2pvYl90eG5fYXBwbHkgZnVuY3Rpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvMjE6IGJs
-b2Nram9iczogYWRkIHByZXBhcmUgY2FsbGJhY2suLi4KQ2hlY2tpbmcgUEFUQ0ggMTYvMjE6IGJs
-b2Nram9iczogYWRkIHdhaXRpbmcgc3RhdHVzLi4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJl
-Zm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojODA6IEZJTEU6IGJsb2Nram9iLmM6NDg6Cisg
-ICAgLyogVTogKi8gW0JMT0NLX0pPQl9TVEFUVVNfVU5ERUZJTkVEXSA9IHswLCAxLCAwLCAwLCAw
-LCAwLCAwLCAwLCAwLCAwfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNx
-dWFyZSBicmFja2V0ICdbJwojODE6IEZJTEU6IGJsb2Nram9iLmM6NDk6CisgICAgLyogQzogKi8g
-W0JMT0NLX0pPQl9TVEFUVVNfQ1JFQVRFRF0gICA9IHswLCAwLCAxLCAwLCAwLCAwLCAwLCAxLCAw
-LCAxfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBicmFja2V0
-ICdbJwojODI6IEZJTEU6IGJsb2Nram9iLmM6NTA6CisgICAgLyogUjogKi8gW0JMT0NLX0pPQl9T
-VEFUVVNfUlVOTklOR10gICA9IHswLCAwLCAwLCAxLCAxLCAwLCAxLCAxLCAwLCAwfSwKCkVSUk9S
-OiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojODM6IEZJ
-TEU6IGJsb2Nram9iLmM6NTE6CisgICAgLyogUDogKi8gW0JMT0NLX0pPQl9TVEFUVVNfUEFVU0VE
-XSAgICA9IHswLCAwLCAxLCAwLCAwLCAwLCAwLCAwLCAwLCAwfSwKCkVSUk9SOiBzcGFjZSBwcm9o
-aWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojODQ6IEZJTEU6IGJsb2Nram9i
-LmM6NTI6CisgICAgLyogWTogKi8gW0JMT0NLX0pPQl9TVEFUVVNfUkVBRFldICAgICA9IHswLCAw
-LCAwLCAwLCAwLCAxLCAxLCAxLCAwLCAwfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9y
-ZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojODU6IEZJTEU6IGJsb2Nram9iLmM6NTM6CisgICAg
-LyogUzogKi8gW0JMT0NLX0pPQl9TVEFUVVNfU1RBTkRCWV0gICA9IHswLCAwLCAwLCAwLCAxLCAw
-LCAwLCAwLCAwLCAwfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFy
-ZSBicmFja2V0ICdbJwojODY6IEZJTEU6IGJsb2Nram9iLmM6NTQ6CisgICAgLyogVzogKi8gW0JM
-T0NLX0pPQl9TVEFUVVNfV0FJVElOR10gICA9IHswLCAwLCAwLCAwLCAwLCAwLCAwLCAxLCAxLCAw
-fSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdb
-JwojODc6IEZJTEU6IGJsb2Nram9iLmM6NTU6CisgICAgLyogWDogKi8gW0JMT0NLX0pPQl9TVEFU
-VVNfQUJPUlRJTkddICA9IHswLCAwLCAwLCAwLCAwLCAwLCAwLCAxLCAxLCAwfSwKCkVSUk9SOiBz
-cGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojODg6IEZJTEU6
-IGJsb2Nram9iLmM6NTY6CisgICAgLyogRTogKi8gW0JMT0NLX0pPQl9TVEFUVVNfQ09OQ0xVREVE
-XSA9IHswLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAxfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJp
-dGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojODk6IEZJTEU6IGJsb2Nram9iLmM6
-NTc6CisgICAgLyogTjogKi8gW0JMT0NLX0pPQl9TVEFUVVNfTlVMTF0gICAgICA9IHswLCAwLCAw
-LCAwLCAwLCAwLCAwLCAwLCAwLCAwfSwKCnRvdGFsOiAxMCBlcnJvcnMsIDAgd2FybmluZ3MsIDcw
-IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNo
-ZWNraW5nIFBBVENIIDE3LzIxOiBibG9ja2pvYnM6IGFkZCBQRU5ESU5HIHN0YXR1cyBhbmQgZXZl
-bnQuLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQg
-J1snCiM4NDogRklMRTogYmxvY2tqb2IuYzo0ODoKKyAgICAvKiBVOiAqLyBbQkxPQ0tfSk9CX1NU
-QVRVU19VTkRFRklORURdID0gezAsIDEsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDB9LAoKRVJS
-T1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM4NTog
-RklMRTogYmxvY2tqb2IuYzo0OToKKyAgICAvKiBDOiAqLyBbQkxPQ0tfSk9CX1NUQVRVU19DUkVB
-VEVEXSAgID0gezAsIDAsIDEsIDAsIDAsIDAsIDAsIDAsIDEsIDAsIDF9LAoKRVJST1I6IHNwYWNl
-IHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM4NjogRklMRTogYmxv
-Y2tqb2IuYzo1MDoKKyAgICAvKiBSOiAqLyBbQkxPQ0tfSk9CX1NUQVRVU19SVU5OSU5HXSAgID0g
-ezAsIDAsIDAsIDEsIDEsIDAsIDEsIDAsIDEsIDAsIDB9LAoKRVJST1I6IHNwYWNlIHByb2hpYml0
-ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM4NzogRklMRTogYmxvY2tqb2IuYzo1
-MToKKyAgICAvKiBQOiAqLyBbQkxPQ0tfSk9CX1NUQVRVU19QQVVTRURdICAgID0gezAsIDAsIDEs
-IDAsIDAsIDAsIDAsIDAsIDAsIDAsIDB9LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3Jl
-IG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM4ODogRklMRTogYmxvY2tqb2IuYzo1MjoKKyAgICAv
-KiBZOiAqLyBbQkxPQ0tfSk9CX1NUQVRVU19SRUFEWV0gICAgID0gezAsIDAsIDAsIDAsIDAsIDEs
-IDEsIDAsIDEsIDAsIDB9LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1
-YXJlIGJyYWNrZXQgJ1snCiM4OTogRklMRTogYmxvY2tqb2IuYzo1MzoKKyAgICAvKiBTOiAqLyBb
-QkxPQ0tfSk9CX1NUQVRVU19TVEFOREJZXSAgID0gezAsIDAsIDAsIDAsIDEsIDAsIDAsIDAsIDAs
-IDAsIDB9LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNr
-ZXQgJ1snCiM5MDogRklMRTogYmxvY2tqb2IuYzo1NDoKKyAgICAvKiBXOiAqLyBbQkxPQ0tfSk9C
-X1NUQVRVU19XQUlUSU5HXSAgID0gezAsIDAsIDAsIDAsIDAsIDAsIDAsIDEsIDEsIDAsIDB9LAoK
-RVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM5
-MTogRklMRTogYmxvY2tqb2IuYzo1NToKKyAgICAvKiBEOiAqLyBbQkxPQ0tfSk9CX1NUQVRVU19Q
-RU5ESU5HXSAgID0gezAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDEsIDEsIDB9LAoKRVJST1I6IHNw
-YWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM5MjogRklMRTog
-YmxvY2tqb2IuYzo1NjoKKyAgICAvKiBYOiAqLyBbQkxPQ0tfSk9CX1NUQVRVU19BQk9SVElOR10g
-ID0gezAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDEsIDEsIDB9LAoKRVJST1I6IHNwYWNlIHByb2hp
-Yml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM5MzogRklMRTogYmxvY2tqb2Iu
-Yzo1NzoKKyAgICAvKiBFOiAqLyBbQkxPQ0tfSk9CX1NUQVRVU19DT05DTFVERURdID0gezAsIDAs
-IDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDF9LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVm
-b3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM5NDogRklMRTogYmxvY2tqb2IuYzo1ODoKKyAg
-ICAvKiBOOiAqLyBbQkxPQ0tfSk9CX1NUQVRVU19OVUxMXSAgICAgID0gezAsIDAsIDAsIDAsIDAs
-IDAsIDAsIDAsIDAsIDAsIDB9LAoKdG90YWw6IDExIGVycm9ycywgMCB3YXJuaW5ncywgMTg1IGxp
-bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNr
-aW5nIFBBVENIIDE4LzIxOiBibG9ja2pvYnM6IGFkZCBibG9jay1qb2ItZmluYWxpemUuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMTkvMjE6IGJsb2Nram9iczogRXhwb3NlIG1hbnVhbCBwcm9wZXJ0eS4uLgpD
-aGVja2luZyBQQVRDSCAyMC8yMTogaW90ZXN0czogdGVzdCBtYW51YWwgam9iIGRpc21pc3NhbC4u
-LgpDaGVja2luZyBQQVRDSCAyMS8yMTogdGVzdHMvdGVzdC1ibG9ja2pvYjogdGVzdCBjYW5jZWxs
-YXRpb25zLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNv
-ZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
-cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1k
-ZXZlbEBmcmVlbGlzdHMub3Jn
+On 03/08/2018 03:59 PM, Dr. David Alan Gilbert wrote:
+> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
+>> Initially int64_t was used, but on PowerPC architecture,
+>> clang doesn't have atomic_*_8 function, so it produces
+>> link time error.
+>>
+>> QEMU is working with time as with 64bit value, but by
+>> fact 32 bit is enough with CLOCK_REALTIME. In this case
+>> blocktime will keep only 1200 hours time interval.
+>>
+>> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+>> Acked-by: Eric Blake <eblake@redhat.com>
+> Hi Alexey,
+>    So yes, I think that works;  can you repost this merged with your full
+> set of block-time code; because we had to revert it, we need to put it
+> back all  in again.
+Do you mean just to add this patch to set of reverted patches,
+or merge code of this patch into "migration: calculate vCPU blocktime on 
+dst side"?
+
+>
+> Thanks,
+>
+> Dave
+>
+>> ---
+>>   hmp.c                    |  4 ++--
+>>   migration/postcopy-ram.c | 52 ++++++++++++++++++++++++++++--------------------
+>>   migration/trace-events   |  4 ++--
+>>   qapi/migration.json      |  4 ++--
+>>   4 files changed, 36 insertions(+), 28 deletions(-)
+>>
+>> diff --git a/hmp.c b/hmp.c
+>> index be091e0..ec90043 100644
+>> --- a/hmp.c
+>> +++ b/hmp.c
+>> @@ -267,7 +267,7 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+>>       }
+>>   
+>>       if (info->has_postcopy_blocktime) {
+>> -        monitor_printf(mon, "postcopy blocktime: %" PRId64 "\n",
+>> +        monitor_printf(mon, "postcopy blocktime: %u\n",
+>>                          info->postcopy_blocktime);
+>>       }
+>>   
+>> @@ -275,7 +275,7 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+>>           Visitor *v;
+>>           char *str;
+>>           v = string_output_visitor_new(false, &str);
+>> -        visit_type_int64List(v, NULL, &info->postcopy_vcpu_blocktime, NULL);
+>> +        visit_type_uint32List(v, NULL, &info->postcopy_vcpu_blocktime, NULL);
+>>           visit_complete(v, &str);
+>>           monitor_printf(mon, "postcopy vcpu blocktime: %s\n", str);
+>>           g_free(str);
+>> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+>> index 05475e0..c46225c 100644
+>> --- a/migration/postcopy-ram.c
+>> +++ b/migration/postcopy-ram.c
+>> @@ -63,16 +63,17 @@ struct PostcopyDiscardState {
+>>   
+>>   typedef struct PostcopyBlocktimeContext {
+>>       /* time when page fault initiated per vCPU */
+>> -    int64_t *page_fault_vcpu_time;
+>> +    uint32_t *page_fault_vcpu_time;
+>>       /* page address per vCPU */
+>>       uintptr_t *vcpu_addr;
+>> -    int64_t total_blocktime;
+>> +    uint32_t total_blocktime;
+>>       /* blocktime per vCPU */
+>> -    int64_t *vcpu_blocktime;
+>> +    uint32_t *vcpu_blocktime;
+>>       /* point in time when last page fault was initiated */
+>> -    int64_t last_begin;
+>> +    uint32_t last_begin;
+>>       /* number of vCPU are suspended */
+>>       int smp_cpus_down;
+>> +    uint64_t start_time;
+>>   
+>>       /*
+>>        * Handler for exit event, necessary for
+>> @@ -99,22 +100,23 @@ static void migration_exit_cb(Notifier *n, void *data)
+>>   static struct PostcopyBlocktimeContext *blocktime_context_new(void)
+>>   {
+>>       PostcopyBlocktimeContext *ctx = g_new0(PostcopyBlocktimeContext, 1);
+>> -    ctx->page_fault_vcpu_time = g_new0(int64_t, smp_cpus);
+>> +    ctx->page_fault_vcpu_time = g_new0(uint32_t, smp_cpus);
+>>       ctx->vcpu_addr = g_new0(uintptr_t, smp_cpus);
+>> -    ctx->vcpu_blocktime = g_new0(int64_t, smp_cpus);
+>> +    ctx->vcpu_blocktime = g_new0(uint32_t, smp_cpus);
+>>   
+>>       ctx->exit_notifier.notify = migration_exit_cb;
+>> +    ctx->start_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+>>       qemu_add_exit_notifier(&ctx->exit_notifier);
+>>       return ctx;
+>>   }
+>>   
+>> -static int64List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
+>> +static uint32List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
+>>   {
+>> -    int64List *list = NULL, *entry = NULL;
+>> +    uint32List *list = NULL, *entry = NULL;
+>>       int i;
+>>   
+>>       for (i = smp_cpus - 1; i >= 0; i--) {
+>> -        entry = g_new0(int64List, 1);
+>> +        entry = g_new0(uint32List, 1);
+>>           entry->value = ctx->vcpu_blocktime[i];
+>>           entry->next = list;
+>>           list = entry;
+>> @@ -145,7 +147,7 @@ void fill_destination_postcopy_migration_info(MigrationInfo *info)
+>>       info->postcopy_vcpu_blocktime = get_vcpu_blocktime_list(bc);
+>>   }
+>>   
+>> -static uint64_t get_postcopy_total_blocktime(void)
+>> +static uint32_t get_postcopy_total_blocktime(void)
+>>   {
+>>       MigrationIncomingState *mis = migration_incoming_get_current();
+>>       PostcopyBlocktimeContext *bc = mis->blocktime_ctx;
+>> @@ -610,6 +612,13 @@ static int get_mem_fault_cpu_index(uint32_t pid)
+>>       return -1;
+>>   }
+>>   
+>> +static uint32_t get_low_time_offset(PostcopyBlocktimeContext *dc)
+>> +{
+>> +    int64_t start_time_offset = qemu_clock_get_ms(QEMU_CLOCK_REALTIME) -
+>> +                                    dc->start_time;
+>> +    return start_time_offset < 1 ? 1 : start_time_offset & UINT32_MAX;
+>> +}
+>> +
+>>   /*
+>>    * This function is being called when pagefault occurs. It
+>>    * tracks down vCPU blocking time.
+>> @@ -624,7 +633,7 @@ static void mark_postcopy_blocktime_begin(uintptr_t addr, uint32_t ptid,
+>>       int cpu, already_received;
+>>       MigrationIncomingState *mis = migration_incoming_get_current();
+>>       PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
+>> -    int64_t now_ms;
+>> +    uint32_t low_time_offset;
+>>   
+>>       if (!dc || ptid == 0) {
+>>           return;
+>> @@ -634,14 +643,14 @@ static void mark_postcopy_blocktime_begin(uintptr_t addr, uint32_t ptid,
+>>           return;
+>>       }
+>>   
+>> -    now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+>> +    low_time_offset = get_low_time_offset(dc);
+>>       if (dc->vcpu_addr[cpu] == 0) {
+>>           atomic_inc(&dc->smp_cpus_down);
+>>       }
+>>   
+>> -    atomic_xchg__nocheck(&dc->last_begin, now_ms);
+>> -    atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], now_ms);
+>> -    atomic_xchg__nocheck(&dc->vcpu_addr[cpu], addr);
+>> +    atomic_xchg(&dc->last_begin, low_time_offset);
+>> +    atomic_xchg(&dc->page_fault_vcpu_time[cpu], low_time_offset);
+>> +    atomic_xchg(&dc->vcpu_addr[cpu], addr);
+>>   
+>>       /* check it here, not at the begining of the function,
+>>        * due to, check could accur early than bitmap_set in
+>> @@ -688,22 +697,20 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
+>>       MigrationIncomingState *mis = migration_incoming_get_current();
+>>       PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
+>>       int i, affected_cpu = 0;
+>> -    int64_t now_ms;
+>>       bool vcpu_total_blocktime = false;
+>> -    int64_t read_vcpu_time;
+>> +    uint32_t read_vcpu_time, low_time_offset;
+>>   
+>>       if (!dc) {
+>>           return;
+>>       }
+>>   
+>> -    now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+>> -
+>> +    low_time_offset = get_low_time_offset(dc);
+>>       /* lookup cpu, to clear it,
+>>        * that algorithm looks straighforward, but it's not
+>>        * optimal, more optimal algorithm is keeping tree or hash
+>>        * where key is address value is a list of  */
+>>       for (i = 0; i < smp_cpus; i++) {
+>> -        uint64_t vcpu_blocktime = 0;
+>> +        uint32_t vcpu_blocktime = 0;
+>>   
+>>           read_vcpu_time = atomic_fetch_add(&dc->page_fault_vcpu_time[i], 0);
+>>           if (atomic_fetch_add(&dc->vcpu_addr[i], 0) != addr ||
+>> @@ -711,7 +718,7 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
+>>               continue;
+>>           }
+>>           atomic_xchg__nocheck(&dc->vcpu_addr[i], 0);
+>> -        vcpu_blocktime = now_ms - read_vcpu_time;
+>> +        vcpu_blocktime = low_time_offset - read_vcpu_time;
+>>           affected_cpu += 1;
+>>           /* we need to know is that mark_postcopy_end was due to
+>>            * faulted page, another possible case it's prefetched
+>> @@ -726,7 +733,8 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
+>>   
+>>       atomic_sub(&dc->smp_cpus_down, affected_cpu);
+>>       if (vcpu_total_blocktime) {
+>> -        dc->total_blocktime += now_ms - atomic_fetch_add(&dc->last_begin, 0);
+>> +        dc->total_blocktime += low_time_offset - atomic_fetch_add(
+>> +                &dc->last_begin, 0);
+>>       }
+>>       trace_mark_postcopy_blocktime_end(addr, dc, dc->total_blocktime,
+>>                                         affected_cpu);
+>> diff --git a/migration/trace-events b/migration/trace-events
+>> index 59b1a2d..def03c4 100644
+>> --- a/migration/trace-events
+>> +++ b/migration/trace-events
+>> @@ -115,8 +115,8 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
+>>   process_incoming_migration_co_postcopy_end_main(void) ""
+>>   migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
+>>   migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname, void *err)  "ioc=%p ioctype=%s hostname=%s err=%p"
+>> -mark_postcopy_blocktime_begin(uint64_t addr, void *dd, int64_t time, int cpu, int received) "addr: 0x%" PRIx64 ", dd: %p, time: %" PRId64 ", cpu: %d, already_received: %d"
+>> -mark_postcopy_blocktime_end(uint64_t addr, void *dd, int64_t time, int affected_cpu) "addr: 0x%" PRIx64 ", dd: %p, time: %" PRId64 ", affected_cpu: %d"
+>> +mark_postcopy_blocktime_begin(uint64_t addr, void *dd, uint32_t time, int cpu, int received) "addr: 0x%" PRIx64 ", dd: %p, time: %u, cpu: %d, already_received: %d"
+>> +mark_postcopy_blocktime_end(uint64_t addr, void *dd, uint32_t time, int affected_cpu) "addr: 0x%" PRIx64 ", dd: %p, time: %u, affected_cpu: %d"
+>>   
+>>   # migration/rdma.c
+>>   qemu_rdma_accept_incoming_migration(void) ""
+>> diff --git a/qapi/migration.json b/qapi/migration.json
+>> index 90d125c..c4737f8 100644
+>> --- a/qapi/migration.json
+>> +++ b/qapi/migration.json
+>> @@ -175,8 +175,8 @@
+>>              '*setup-time': 'int',
+>>              '*cpu-throttle-percentage': 'int',
+>>              '*error-desc': 'str',
+>> -           '*postcopy-blocktime' : 'int64',
+>> -           '*postcopy-vcpu-blocktime': ['int64']} }
+>> +           '*postcopy-blocktime' : 'uint32',
+>> +           '*postcopy-vcpu-blocktime': ['uint32']} }
+>>   
+>>   ##
+>>   # @query-migrate:
+>> -- 
+>> 2.7.4
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+>
+>
+
+-- 
+Best regards,
+Alexey Perevalov
