@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evLvw-0000nb-Tv
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:48:07 -0400
+	(envelope-from <berrange@redhat.com>) id 1evLw0-0000oS-T5
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:48:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evLvw-0007wu-5G
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:48:04 -0400
-Received: from mail-oi0-x229.google.com ([2607:f8b0:4003:c06::229]:40188)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1evLvv-0007w3-Ul
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:48:04 -0400
-Received: by mail-oi0-x229.google.com with SMTP id c12so12013770oic.7
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 04:48:03 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1evLvz-00083B-TZ
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:48:08 -0400
+Date: Mon, 12 Mar 2018 11:48:01 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180312114801.GN3493@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180309172713.26318-1-kwolf@redhat.com>
+	<20180309172713.26318-3-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180309161933.8168-1-kwolf@redhat.com>
-References: <20180309161933.8168-1-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 12 Mar 2018 11:47:42 +0000
-Message-ID: <CAFEAcA_5HKpY_NsLmByBgz-WuoPF7VNzxG2OaFu+bA+RFHRABg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/56] Block layer patches
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180309172713.26318-3-kwolf@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/6] luks: Create
+ block_crypto_co_create_generic()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +27,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Kevin Wolf <kwolf@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-On 9 March 2018 at 16:18, Kevin Wolf <kwolf@redhat.com> wrote:
-> The following changes since commit d9bbfea646e86426d549bd612cd9f91e49aa50c2:
->
->   Merge remote-tracking branch 'remotes/riscv/tags/riscv-qemu-upstream-v8.2' into staging (2018-03-09 10:58:57 +0000)
->
-> are available in the git repository at:
->
->   git://repo.or.cz/qemu/kevin.git tags/for-upstream
->
-> for you to fetch changes up to a1be5921e35dcf84ce9e3c9a5c3029cea530a60b:
->
->   Merge remote-tracking branch 'mreitz/tags/pull-block-2018-03-09' into queue-block (2018-03-09 16:09:06 +0100)
->
-> ----------------------------------------------------------------
-> Block layer patches
->
-> ----------------------------------------------------------------
+On Fri, Mar 09, 2018 at 06:27:09PM +0100, Kevin Wolf wrote:
+> Everything that refers to the protocol layer or QemuOpts is moved out o=
+f
+> block_crypto_create_generic(), so that the remaining function is
+> suitable to be called by a .bdrv_co_create implementation.
+>=20
+> LUKS is the only driver that actually implements the old interface, and
+> we don't intend to use it in any new drivers, so put the moved out code
+> directly into a LUKS function rather than creating a generic
+> intermediate one.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/crypto.c | 95 +++++++++++++++++++++++++++++++++++++-------------=
+--------
+>  1 file changed, 61 insertions(+), 34 deletions(-)
 
-Applied, thanks.
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
--- PMM
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
