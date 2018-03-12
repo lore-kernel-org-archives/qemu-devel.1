@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <x1917x@gmail.com>) id 1evSIG-0007zz-Mh
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:35:35 -0400
+	(envelope-from <x1917x@gmail.com>) id 1evSIL-000835-Ke
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:35:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <x1917x@gmail.com>) id 1evSIF-0005Gy-IR
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:35:32 -0400
-Received: from mail-pl0-x231.google.com ([2607:f8b0:400e:c01::231]:46576)
+	(envelope-from <x1917x@gmail.com>) id 1evSIK-0005Ir-Go
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:35:37 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:43792)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <x1917x@gmail.com>) id 1evSIF-0005GQ-AV
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:35:31 -0400
-Received: by mail-pl0-x231.google.com with SMTP id f5-v6so2245861plj.13
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 11:35:31 -0700 (PDT)
+	(Exim 4.71) (envelope-from <x1917x@gmail.com>) id 1evSIK-0005Ic-90
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:35:36 -0400
+Received: by mail-pg0-x241.google.com with SMTP id e9so6864016pgs.10
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 11:35:36 -0700 (PDT)
 From: Alexey Gerasimenko <x1917x@gmail.com>
-Date: Tue, 13 Mar 2018 04:34:00 +1000
-Message-Id: <7379b9a20e56554ec683261d0bdcd8d706d2232a.1520867956.git.x1917x@gmail.com>
+Date: Tue, 13 Mar 2018 04:34:01 +1000
+Message-Id: <4a65e8b30fe9d2a6c1c53b85ef2697f02e01d13f.1520867956.git.x1917x@gmail.com>
 In-Reply-To: <cover.1520867740.git.x1917x@gmail.com>
 References: <cover.1520867740.git.x1917x@gmail.com>
 In-Reply-To: <cover.1520867740.git.x1917x@gmail.com>
 References: <cover.1520867740.git.x1917x@gmail.com>
-Subject: [Qemu-devel] [RFC PATCH 15/30] q35/acpi/xen: Provide ACPI PCI
- hotplug interface for Xen on Q35
+Subject: [Qemu-devel] [RFC PATCH 16/30] q35/xen: Add Xen platform device
+ support for Q35
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,131 +29,124 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: xen-devel@lists.xenproject.org
-Cc: Alexey Gerasimenko <x1917x@gmail.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Alexey Gerasimenko <x1917x@gmail.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>
 
-This patch allows to use ACPI PCI hotplug functionality for Xen on Q35.
-All added code depends on xen_enabled(), so no functionality change for
-non-Xen usage.
+Current Xen/QEMU method to control Xen Platform device on i440 is a bit
+odd -- enabling/disabling Xen platform device actually modifies the QEMU
+emulated machine type, namely xenfv <--> pc.
 
-We need to call the acpi_set_pci_info function from ich9_pm_init as well,
-so it was made globally visible again (as it was before).
+In order to avoid multiplying machine types, use a new way to control Xen
+Platform device for QEMU -- "xen-platform-dev" machine property (bool).
+To maintain backward compatibility with existing Xen/QEMU setups, this
+is only applicable to q35 machine currently. i440 emulation still uses the
+old method (i.e. xenfv/pc machine selection) to control Xen Platform
+device, this may be changed later to xen-platform-dev property as well.
+
+This way we can use a single machine type (q35) and change just
+xen-platform-dev value to on/off to control Xen platform device.
 
 Signed-off-by: Alexey Gerasimenko <x1917x@gmail.com>
 ---
- hw/acpi/ich9.c          | 24 ++++++++++++++++++++++++
- hw/acpi/pcihp.c         |  2 +-
- include/hw/acpi/ich9.h  |  2 ++
- include/hw/acpi/pcihp.h |  2 ++
- 4 files changed, 29 insertions(+), 1 deletion(-)
+ hw/core/machine.c   | 21 +++++++++++++++++++++
+ hw/i386/pc_q35.c    | 14 ++++++++++++++
+ include/hw/boards.h |  1 +
+ qemu-options.hx     |  1 +
+ 4 files changed, 37 insertions(+)
 
-diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
-index c5d8646abc..62e2582e1a 100644
---- a/hw/acpi/ich9.c
-+++ b/hw/acpi/ich9.c
-@@ -37,6 +37,7 @@
- 
- #include "hw/i386/ich9.h"
- #include "hw/mem/pc-dimm.h"
-+#include "hw/xen/xen.h"
- 
- //#define DEBUG
- 
-@@ -258,6 +259,10 @@ static void pm_reset(void *opaque)
-     pm->smi_en_wmask = ~0;
- 
-     acpi_update_sci(&pm->acpi_regs, pm->irq);
-+
-+    if (xen_enabled()) {
-+        acpi_pcihp_reset(&pm->acpi_pci_hotplug);
-+    }
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 5e2bbcdace..205e7da3ce 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -290,6 +290,20 @@ static void machine_set_igd_gfx_passthru(Object *obj, bool value, Error **errp)
+     ms->igd_gfx_passthru = value;
  }
  
- static void pm_powerdown_req(Notifier *n, void *opaque)
-@@ -300,6 +305,17 @@ void ich9_pm_init(PCIDevice *lpc_pci, ICH9LPCPMRegs *pm,
-     pm->powerdown_notifier.notify = pm_powerdown_req;
-     qemu_register_powerdown_notifier(&pm->powerdown_notifier);
- 
-+    if (xen_enabled()) {
-+        PCIBus *bus = pci_get_bus(lpc_pci);
++static bool machine_get_xen_platform_dev(Object *obj, Error **errp)
++{
++    MachineState *ms = MACHINE(obj);
 +
-+        qbus_set_hotplug_handler(BUS(bus), DEVICE(lpc_pci), &error_abort);
++    return ms->xen_platform_dev;
++}
 +
-+        acpi_pcihp_init(OBJECT(lpc_pci), &pm->acpi_pci_hotplug, bus,
-+                        pci_address_space_io(lpc_pci), false);
++static void machine_set_xen_platform_dev(Object *obj, bool value, Error **errp)
++{
++    MachineState *ms = MACHINE(obj);
 +
-+        acpi_set_pci_info();
-+    }
++    ms->xen_platform_dev = value;
++}
 +
-     legacy_acpi_cpu_hotplug_init(pci_address_space_io(lpc_pci),
-         OBJECT(lpc_pci), &pm->gpe_cpu, ICH9_CPU_HOTPLUG_IO_BASE);
- 
-@@ -496,6 +512,10 @@ void ich9_pm_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-             acpi_memory_plug_cb(hotplug_dev, &lpc->pm.acpi_memory_hotplug,
-                                 dev, errp);
-         }
-+    } else if (xen_enabled() &&
-+               object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-+        acpi_pcihp_device_plug_cb(hotplug_dev, &lpc->pm.acpi_pci_hotplug,
-+                                  dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         if (lpc->pm.cpu_hotplug_legacy) {
-             legacy_acpi_cpu_plug_cb(hotplug_dev, &lpc->pm.gpe_cpu, dev, errp);
-@@ -522,6 +542,10 @@ void ich9_pm_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-                !lpc->pm.cpu_hotplug_legacy) {
-         acpi_cpu_unplug_request_cb(hotplug_dev, &lpc->pm.cpuhp_state,
-                                    dev, errp);
-+    } else if (xen_enabled() &&
-+               object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-+        acpi_pcihp_device_unplug_cb(hotplug_dev, &lpc->pm.acpi_pci_hotplug,
-+                                    dev, errp);
-     } else {
-         error_setg(errp, "acpi: device unplug request for not supported device"
-                    " type: %s", object_get_typename(OBJECT(dev)));
-diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-index f70d8620d7..d822f93293 100644
---- a/hw/acpi/pcihp.c
-+++ b/hw/acpi/pcihp.c
-@@ -94,7 +94,7 @@ static void *acpi_set_bsel(PCIBus *bus, void *opaque)
-     return bsel_alloc;
- }
- 
--static void acpi_set_pci_info(void)
-+void acpi_set_pci_info(void)
+ static char *machine_get_firmware(Object *obj, Error **errp)
  {
-     static bool bsel_is_set;
-     PCIBus *bus;
-diff --git a/include/hw/acpi/ich9.h b/include/hw/acpi/ich9.h
-index 59aeb06393..4a47d93745 100644
---- a/include/hw/acpi/ich9.h
-+++ b/include/hw/acpi/ich9.h
-@@ -26,6 +26,7 @@
- #include "hw/acpi/cpu.h"
- #include "hw/acpi/memory_hotplug.h"
- #include "hw/acpi/acpi_dev_interface.h"
-+#include "hw/acpi/pcihp.h"
- #include "hw/acpi/tco.h"
+     MachineState *ms = MACHINE(obj);
+@@ -595,6 +609,13 @@ static void machine_class_init(ObjectClass *oc, void *data)
+     object_class_property_set_description(oc, "igd-passthru",
+         "Set on/off to enable/disable igd passthrou", &error_abort);
  
- typedef struct ICH9LPCPMRegs {
-@@ -52,6 +53,7 @@ typedef struct ICH9LPCPMRegs {
-     bool cpu_hotplug_legacy;
-     AcpiCpuHotplug gpe_cpu;
-     CPUHotplugState cpuhp_state;
-+    AcpiPciHpState acpi_pci_hotplug;
- 
-     MemHotplugState acpi_memory_hotplug;
- 
-diff --git a/include/hw/acpi/pcihp.h b/include/hw/acpi/pcihp.h
-index 8a65f99fc8..0a685dd228 100644
---- a/include/hw/acpi/pcihp.h
-+++ b/include/hw/acpi/pcihp.h
-@@ -64,6 +64,8 @@ void acpi_pcihp_device_unplug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
- /* Called on reset */
- void acpi_pcihp_reset(AcpiPciHpState *s);
- 
-+void acpi_set_pci_info(void);
++    object_class_property_add_bool(oc, "xen-platform-dev",
++        machine_get_xen_platform_dev,
++        machine_set_xen_platform_dev, &error_abort);
++    object_class_property_set_description(oc, "xen-platform-dev",
++        "Set on/off to enable/disable Xen Platform device",
++        &error_abort);
 +
- extern const VMStateDescription vmstate_acpi_pcihp_pci_status;
+     object_class_property_add_str(oc, "firmware",
+         machine_get_firmware, machine_set_firmware,
+         &error_abort);
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 0db670f6d7..62caf924cf 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -56,6 +56,18 @@
+ /* ICH9 AHCI has 6 ports */
+ #define MAX_SATA_PORTS     6
  
- #define VMSTATE_PCI_HOTPLUG(pcihp, state, test_pcihp) \
++static void q35_xen_hvm_init(MachineState *machine)
++{
++    PCMachineState *pcms = PC_MACHINE(machine);
++
++    if (xen_enabled()) {
++        /* check if Xen Platform device is enabled */
++        if (machine->xen_platform_dev) {
++            pci_create_simple(pcms->bus, -1, "xen-platform");
++        }
++    }
++}
++
+ /* PC hardware initialisation */
+ static void pc_q35_init(MachineState *machine)
+ {
+@@ -207,6 +219,8 @@ static void pc_q35_init(MachineState *machine)
+     if (xen_enabled()) {
+         pci_bus_irqs(host_bus, xen_cmn_set_irq, xen_cmn_pci_slot_get_pirq,
+                      ich9_lpc, ICH9_XEN_NUM_IRQ_SOURCES);
++
++        q35_xen_hvm_init(machine);
+     } else {
+         pci_bus_irqs(host_bus, ich9_lpc_set_irq, ich9_lpc_map_irq, ich9_lpc,
+                      ICH9_LPC_NB_PIRQS);
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index efb0a9edfd..f35fc1cc03 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -238,6 +238,7 @@ struct MachineState {
+     bool usb;
+     bool usb_disabled;
+     bool igd_gfx_passthru;
++    bool xen_platform_dev;
+     char *firmware;
+     bool iommu;
+     bool suppress_vmdesc;
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 6585058c6c..cee0b92028 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -38,6 +38,7 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
+     "                dump-guest-core=on|off include guest memory in a core dump (default=on)\n"
+     "                mem-merge=on|off controls memory merge support (default: on)\n"
+     "                igd-passthru=on|off controls IGD GFX passthrough support (default=off)\n"
++    "                xen-platform-dev=on|off controls Xen Platform device (default=off)\n"
+     "                aes-key-wrap=on|off controls support for AES key wrapping (default=on)\n"
+     "                dea-key-wrap=on|off controls support for DEA key wrapping (default=on)\n"
+     "                suppress-vmdesc=on|off disables self-describing migration (default=off)\n"
 -- 
 2.11.0
