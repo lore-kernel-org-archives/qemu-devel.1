@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1evMGq-00036o-5T
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 08:09:41 -0400
+	(envelope-from <eblake@redhat.com>) id 1evMK9-00045G-Qa
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 08:13:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1evMGm-0004JG-Vh
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 08:09:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47322 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1evMK5-0002hZ-Q0
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 08:13:05 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37896 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1evMGm-0004FP-Qt
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 08:09:36 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 12 Mar 2018 13:08:48 +0100
-Message-Id: <20180312120849.20073-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1evMK5-0002gf-LJ
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 08:13:01 -0400
+References: <20180311201239.25506-1-nia.alarie@gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <486e1b60-e453-c3de-040b-8b2951ddf3a5@redhat.com>
+Date: Mon, 12 Mar 2018 07:12:52 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] tests: make docker-test-debug@fedora run
- sanitizers
+In-Reply-To: <20180311201239.25506-1-nia.alarie@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] 9p: Convert use of atoi to qemu_strtol to
+ allow error checking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,62 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Nia Alarie <nia.alarie@gmail.com>, qemu-devel@nongnu.org
+Cc: stefanha@gmail.com, jim@groklearning.com, groug@kaod.org, joel@jms.id.au, "Daniel P. Berrange" <berrange@redhat.com>
 
-Since --enable-debug no longer enable sanitizers, we need explicit
---enable-sanitizers.
+On 03/11/2018 03:12 PM, Nia Alarie wrote:
+> Signed-off-by: Nia Alarie <nia.alarie@gmail.com>
+> ---
+>   hw/9pfs/9p.c | 12 ++++++++++--
+>   1 file changed, 10 insertions(+), 2 deletions(-)
+> 
 
-llvm package is required for llvm-symbolizer, to get symbols in
-backtraces.
+>       } else if (perm & P9_STAT_MODE_LINK) {
+> -        int32_t ofid = atoi(extension.data);
+> -        V9fsFidState *ofidp = get_fid(pdu, ofid);
+> +        long ofid;
+> +        V9fsFidState *ofidp;
+> +
+> +        if (qemu_strtol(extension.data, NULL, 10, &ofid) ||
+> +            ofid > INT32_MAX || ofid < INT32_MIN) {
 
-Add make V=3D1 to get details about failing tests.
+Dan has a pending patch that will add qemu_strtoi, which might be a 
+nicer fit for this situation:
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- tests/docker/dockerfiles/fedora.docker | 2 +-
- tests/docker/test-debug                | 6 +++---
- 2 files changed, 4 insertions(+), 4 deletions(-)
+https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg00952.html
 
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/docker=
-files/fedora.docker
-index 994a35a332..a00004319e 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -2,7 +2,7 @@ FROM fedora:27
- ENV PACKAGES \
-     ccache gettext git tar PyYAML sparse flex bison python3 bzip2 hostna=
-me \
-     glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
--    gcc gcc-c++ clang make perl which bc findutils libaio-devel \
-+    gcc gcc-c++ llvm clang make perl which bc findutils libaio-devel \
-     nettle-devel libasan libubsan \
-     mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-con=
-fig \
-     mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libt=
-asn1 \
-diff --git a/tests/docker/test-debug b/tests/docker/test-debug
-index d020b06917..d3f9f70d01 100755
---- a/tests/docker/test-debug
-+++ b/tests/docker/test-debug
-@@ -1,6 +1,6 @@
- #!/bin/bash -e
- #
--# Compile and check with clang & --enable-debug.
-+# Compile and check with clang & --enable-debug --enable-sanitizers.
- #
- # Copyright (c) 2016-2018 Red Hat Inc.
- #
-@@ -19,8 +19,8 @@ requires clang asan
- cd "$BUILD_DIR"
-=20
- OPTS=3D"--cxx=3Dclang++ --cc=3Dclang --host-cc=3Dclang"
--OPTS=3D"--enable-debug $OPTS"
-+OPTS=3D"--enable-debug --enable-sanitizers $OPTS"
-=20
- build_qemu $OPTS
--make $MAKEFLAGS check
-+make $MAKEFLAGS V=3D1 check
- install_qemu
---=20
-2.16.2.346.g9779355e34
+int32_t is not necessarily int, but all platforms that compile qemu have 
+'int32_t' and 'int' both at 32 bits, so it's simpler to change to 'int 
+ofid' and use Dan's function than it is to parse to long and then do 
+bounds checking.  Except that Dan still needs to post an updated version 
+of his patch...
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
