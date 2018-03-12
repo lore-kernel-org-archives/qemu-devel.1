@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evTp4-0004I5-5S
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:13:31 -0400
+	(envelope-from <no-reply@patchew.org>) id 1evU2W-0004rY-G5
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:27:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evTp2-00078x-Ni
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:13:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32806 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1evTp2-00078g-IE
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:13:28 -0400
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Mon, 12 Mar 2018 20:13:05 +0000
-Message-Id: <20180312201305.16972-10-berrange@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1evU2T-0001tg-7q
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:27:24 -0400
+Resent-Message-Id: <E1evU2T-0001tg-7q@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21073)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1evU2S-0001oZ-V8
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:27:21 -0400
 In-Reply-To: <20180312201305.16972-1-berrange@redhat.com>
-References: <20180312201305.16972-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL 9/9] char: allow passing pre-opened socket file
- descriptor at startup
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152088642028.39.5956317026943589628@71c20359a636>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 12 Mar 2018 13:27:01 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 0/9] Socket next patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,216 +28,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: berrange@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, armbru@redhat.com, kraxel@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
-
-When starting QEMU management apps will usually setup a monitor socket, and
-then open it immediately after startup. If not using QEMU's own -daemonize
-arg, this process can be troublesome to handle correctly. The mgmt app will
-need to repeatedly call connect() until it succeeds, because it does not
-know when QEMU has created the listener socket. If can't retry connect()
-forever though, because an error might have caused QEMU to exit before it
-even creates the monitor.
-
-The obvious way to fix this kind of problem is to just pass in a pre-opened
-socket file descriptor for the QEMU monitor to listen on. The management
-app can now immediately call connect() just once. If connect() fails it
-knows that QEMU has exited with an error.
-
-The SocketAddress(Legacy) structs allow for FD passing via the monitor, and
-now via inherited file descriptors from the process that spawned QEMU. The
-final missing piece is adding a 'fd' parameter in the socket chardev
-options.
-
-This allows both HMP usage, pass any FD number with SCM_RIGHTS, then
-running HMP commands:
-
-   getfd myfd
-   chardev-add socket,fd=myfd
-
-Note that numeric FDs cannot be referenced directly in HMP, only named FDs.
-
-And also CLI usage, by leak FD 3 from parent by clearing O_CLOEXEC, then
-spawning QEMU with
-
-  -chardev socket,fd=3,id=mon
-  -mon chardev=mon,mode=control
-
-Note that named FDs cannot be referenced in CLI args, only numeric FDs.
-
-We do not wire this up in the legacy chardev syntax, so you cannot use FD
-passing with '-qmp', you must use the modern '-mon' + '-chardev' pair.
-
-When passing pre-opened FDs there is a restriction on use of TLS encryption.
-It can be used on a server socket chardev, but cannot be used for a client
-socket chardev. This is because when validating a server's certificate, the
-client needs to have a hostname available to match against the certificate
-identity.
-
-An illustrative example of usage is:
-
-  #!/usr/bin/perl
-
-  use IO::Socket::UNIX;
-  use Fcntl;
-
-  unlink "/tmp/qmp";
-  my $srv = IO::Socket::UNIX->new(
-    Type => SOCK_STREAM(),
-    Local => "/tmp/qmp",
-    Listen => 1,
-  );
-
-  my $flags = fcntl $srv, F_GETFD, 0;
-  fcntl $srv, F_SETFD, $flags & ~FD_CLOEXEC;
-
-  my $fd = $srv->fileno();
-
-  exec "qemu-system-x86_64", \
-      "-chardev", "socket,fd=$fd,server,nowait,id=mon", \
-      "-mon", "chardev=mon,mode=control";
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- chardev/char-socket.c | 15 +++++++++++++--
- chardev/char.c        |  3 +++
- tests/test-char.c     | 47 ++++++++++++++++++++++++++++++++++++++++++++---
- 3 files changed, 60 insertions(+), 5 deletions(-)
-
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index a916ef4012..0c8d6d430a 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -1008,13 +1008,14 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
-     const char *path = qemu_opt_get(opts, "path");
-     const char *host = qemu_opt_get(opts, "host");
-     const char *port = qemu_opt_get(opts, "port");
-+    const char *fd = qemu_opt_get(opts, "fd");
-     const char *tls_creds = qemu_opt_get(opts, "tls-creds");
-     SocketAddressLegacy *addr;
-     ChardevSocket *sock;
- 
--    if ((!!path + !!host) != 1) {
-+    if ((!!path + !!fd + !!host) != 1) {
-         error_setg(errp,
--                   "Exactly one of 'path' or 'host' required");
-+                   "Exactly one of 'path', 'fd' or 'host' required");
-         return;
-     }
- 
-@@ -1029,6 +1030,12 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
-             error_setg(errp, "chardev: socket: no port given");
-             return;
-         }
-+    } else if (fd) {
-+        /* We don't know what host to validate against when in client mode */
-+        if (tls_creds && !is_listen) {
-+            error_setg(errp, "TLS can not be used with pre-opened client FD");
-+            return;
-+        }
-     } else {
-         g_assert_not_reached();
-     }
-@@ -1069,6 +1076,10 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
-             .has_ipv6 = qemu_opt_get(opts, "ipv6"),
-             .ipv6 = qemu_opt_get_bool(opts, "ipv6", 0),
-         };
-+    } else if (fd) {
-+        addr->type = SOCKET_ADDRESS_LEGACY_KIND_FD;
-+        addr->u.fd.data = g_new(String, 1);
-+        addr->u.fd.data->str = g_strdup(fd);
-     } else {
-         g_assert_not_reached();
-     }
-diff --git a/chardev/char.c b/chardev/char.c
-index 5d7b079ef0..f7e0d37f24 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -807,6 +807,9 @@ QemuOptsList qemu_chardev_opts = {
-         },{
-             .name = "port",
-             .type = QEMU_OPT_STRING,
-+        },{
-+            .name = "fd",
-+            .type = QEMU_OPT_STRING,
-         },{
-             .name = "localaddr",
-             .type = QEMU_OPT_STRING,
-diff --git a/tests/test-char.c b/tests/test-char.c
-index b3a77af085..dffb354202 100644
---- a/tests/test-char.c
-+++ b/tests/test-char.c
-@@ -302,9 +302,8 @@ static int socket_can_read_hello(void *opaque)
-     return 10;
- }
- 
--static void char_socket_test(void)
-+static void char_socket_test_common(Chardev *chr)
- {
--    Chardev *chr = qemu_chr_new("server", "tcp:127.0.0.1:0,server,nowait");
-     Chardev *chr_client;
-     QObject *addr;
-     QDict *qdict;
-@@ -359,6 +358,47 @@ static void char_socket_test(void)
-     object_unparent(OBJECT(chr));
- }
- 
-+
-+static void char_socket_basic_test(void)
-+{
-+    Chardev *chr = qemu_chr_new("server", "tcp:127.0.0.1:0,server,nowait");
-+
-+    char_socket_test_common(chr);
-+}
-+
-+
-+static void char_socket_fdpass_test(void)
-+{
-+    Chardev *chr;
-+    char *optstr;
-+    QemuOpts *opts;
-+    int fd;
-+    SocketAddress *addr = g_new0(SocketAddress, 1);
-+
-+    addr->type = SOCKET_ADDRESS_TYPE_INET;
-+    addr->u.inet.host = g_strdup("127.0.0.1");
-+    addr->u.inet.port = g_strdup("0");
-+
-+    fd = socket_listen(addr, &error_abort);
-+    g_assert(fd >= 0);
-+
-+    qapi_free_SocketAddress(addr);
-+
-+    optstr = g_strdup_printf("socket,id=cdev,fd=%d,server,nowait", fd);
-+
-+    opts = qemu_opts_parse_noisily(qemu_find_opts("chardev"),
-+                                   optstr, true);
-+    g_free(optstr);
-+    g_assert_nonnull(opts);
-+
-+    chr = qemu_chr_new_from_opts(opts, &error_abort);
-+
-+    qemu_opts_del(opts);
-+
-+    char_socket_test_common(chr);
-+}
-+
-+
- #ifndef _WIN32
- static void char_pipe_test(void)
- {
-@@ -775,7 +815,8 @@ int main(int argc, char **argv)
- #ifndef _WIN32
-     g_test_add_func("/char/file-fifo", char_file_fifo_test);
- #endif
--    g_test_add_func("/char/socket", char_socket_test);
-+    g_test_add_func("/char/socket/basic", char_socket_basic_test);
-+    g_test_add_func("/char/socket/fdpass", char_socket_fdpass_test);
-     g_test_add_func("/char/udp", char_udp_test);
- #ifdef HAVE_CHARDEV_SERIAL
-     g_test_add_func("/char/serial", char_serial_test);
--- 
-2.14.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMzEyMjAxMzA1LjE2OTcyLTEtYmVycmFuZ2VAcmVkaGF0LmNvbQpTdWJq
+ZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMC85XSBTb2NrZXQgbmV4dCBwYXRjaGVzCgo9PT0gVEVT
+VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0
+IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRy
+dWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0i
+JChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1p
+dHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAx
+IC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwg
+fCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWls
+ZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxl
+ZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRk
+MWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2pl
+Y3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwMzEyMjAxMzA1
+LjE2OTcyLTEtYmVycmFuZ2VAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwMzEyMjAxMzA1LjE2
+OTcyLTEtYmVycmFuZ2VAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
+CmI0OGFlZjJkYjUgY2hhcjogYWxsb3cgcGFzc2luZyBwcmUtb3BlbmVkIHNvY2tldCBmaWxlIGRl
+c2NyaXB0b3IgYXQgc3RhcnR1cAo3YWNhYzQ2OWE1IGNoYXI6IHJlZmFjdG9yIHBhcnNpbmcgb2Yg
+c29ja2V0IGFkZHJlc3MgaW5mb3JtYXRpb24KNTJhOTcxYWNhZSBzb2NrZXRzOiBhbGxvdyBTb2Nr
+ZXRBZGRyZXNzICdmZCcgdG8gcmVmZXJlbmNlIG51bWVyaWMgZmlsZSBkZXNjcmlwdG9ycwozYzQy
+YzU1M2RmIHNvY2tldHM6IGNoZWNrIHRoYXQgdGhlIG5hbWVkIGZpbGUgZGVzY3JpcHRvciBpcyBh
+IHNvY2tldApmZDU1YzYwMDgzIHNvY2tldHM6IG1vdmUgZmRfaXNfc29ja2V0KCkgaW50byBjb21t
+b24gc29ja2V0cyBjb2RlCjNjMWRkNDIyNDYgc29ja2V0czogc3RyZW5ndGhlbiB0ZXN0IHN1aXRl
+IElQIHByb3RvY29sIGF2YWlsYWJpbGl0eSBjaGVja3MKNTY1ODEzMzNhMSBzb2NrZXRzOiBwdWxs
+IGNvZGUgZm9yIHRlc3RpbmcgSVAgYXZhaWxhYmlsaXR5IG91dCBvZiBzcGVjaWZpYyB0ZXN0CjE0
+ODdhMzE5NTkgY3V0aWxzOiBhZGQgcWVtdV9zdHJ0b2kgJiBxZW11X3N0cnRvdWkgcGFyc2VycyBm
+b3IgaW50L3Vuc2lnbmVkIGludCB0eXBlcwozNjIzZDg1MThlIGNoYXI6IGRvbid0IHNpbGVudGx5
+IHNraXAgdG4zMjcwIHByb3RvY29sIGluaXQgd2hlbiBUTFMgaXMgZW5hYmxlZAoKPT09IE9VVFBV
+VCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS85OiBjaGFyOiBkb24ndCBzaWxlbnRseSBza2lw
+IHRuMzI3MCBwcm90b2NvbCBpbml0IHdoZW4gVExTIGlzIGVuYWJsZWQuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMi85OiBjdXRpbHM6IGFkZCBxZW11X3N0cnRvaSAmIHFlbXVfc3RydG91aSBwYXJzZXJzIGZv
+ciBpbnQvdW5zaWduZWQgaW50IHR5cGVzLi4uCkVSUk9SOiBjb25zaWRlciB1c2luZyBxZW11X3N0
+cnRvbCBpbiBwcmVmZXJlbmNlIHRvIHN0cnRvbAojNzUzOiBGSUxFOiB1dGlsL2N1dGlscy5jOjMz
+ODoKKyAgICBscmVzdWx0ID0gc3RydG9sKG5wdHIsICZlcCwgYmFzZSk7CgpFUlJPUjogY29uc2lk
+ZXIgdXNpbmcgcWVtdV9zdHJ0b3VsIGluIHByZWZlcmVuY2UgdG8gc3RydG91bAojODA1OiBGSUxF
+OiB1dGlsL2N1dGlscy5jOjM5MDoKKyAgICBscmVzdWx0ID0gc3RydG91bChucHRyLCAmZXAsIGJh
+c2UpOwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA3OTMgbGluZXMgY2hlY2tlZAoKWW91
+ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMy85OiBz
+b2NrZXRzOiBwdWxsIGNvZGUgZm9yIHRlc3RpbmcgSVAgYXZhaWxhYmlsaXR5IG91dCBvZiBzcGVj
+aWZpYyB0ZXN0Li4uCkNoZWNraW5nIFBBVENIIDQvOTogc29ja2V0czogc3RyZW5ndGhlbiB0ZXN0
+IHN1aXRlIElQIHByb3RvY29sIGF2YWlsYWJpbGl0eSBjaGVja3MuLi4KQ2hlY2tpbmcgUEFUQ0gg
+NS85OiBzb2NrZXRzOiBtb3ZlIGZkX2lzX3NvY2tldCgpIGludG8gY29tbW9uIHNvY2tldHMgY29k
+ZS4uLgpDaGVja2luZyBQQVRDSCA2Lzk6IHNvY2tldHM6IGNoZWNrIHRoYXQgdGhlIG5hbWVkIGZp
+bGUgZGVzY3JpcHRvciBpcyBhIHNvY2tldC4uLgpDaGVja2luZyBQQVRDSCA3Lzk6IHNvY2tldHM6
+IGFsbG93IFNvY2tldEFkZHJlc3MgJ2ZkJyB0byByZWZlcmVuY2UgbnVtZXJpYyBmaWxlIGRlc2Ny
+aXB0b3JzLi4uCkNoZWNraW5nIFBBVENIIDgvOTogY2hhcjogcmVmYWN0b3IgcGFyc2luZyBvZiBz
+b2NrZXQgYWRkcmVzcyBpbmZvcm1hdGlvbi4uLgpDaGVja2luZyBQQVRDSCA5Lzk6IGNoYXI6IGFs
+bG93IHBhc3NpbmcgcHJlLW9wZW5lZCBzb2NrZXQgZmlsZSBkZXNjcmlwdG9yIGF0IHN0YXJ0dXAu
+Li4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoK
+Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0
+Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZy
+ZWVsaXN0cy5vcmc=
