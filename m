@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1evF66-0007u6-0k
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 00:30:07 -0400
+	(envelope-from <bounces@canonical.com>) id 1evF64-0007th-Cj
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 00:30:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1evF64-0005va-Ty
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 00:30:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35948)
+	(envelope-from <bounces@canonical.com>) id 1evF61-0005t5-8I
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 00:30:04 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35758)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1evF64-0005uw-NQ
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 00:30:04 -0400
+	id 1evF61-0005sn-1q
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 00:30:01 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1evF63-0001I1-Ut
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 04:30:03 +0000
+	id 1evF5z-0001Bt-Vv
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 04:30:00 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E69B02E806F
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 04:30:03 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id E0FA02E80D4
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 04:29:59 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 12 Mar 2018 04:17:36 -0000
-From: Launchpad Bug Tracker <1090726@bugs.launchpad.net>
-Reply-To: Bug 1090726 <1090726@bugs.launchpad.net>
+Date: Mon, 12 Mar 2018 04:17:39 -0000
+From: Launchpad Bug Tracker <1175089@bugs.launchpad.net>
+Reply-To: Bug 1175089 <1175089@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20121215143506.25420.15556.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152082825647.7858.4170512709623856396.malone@loganberry.canonical.com>
+References: <20130501082935.389.58262.malonedeb@soybean.canonical.com>
+Message-Id: <152082825949.7858.13997529962112769760.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1090726] Re: qemu does not generate guest cpu
- topology properly
+Subject: [Qemu-devel] [Bug 1175089] Re: Crash why dragon fly 3.4.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,67 +47,45 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1090726
+https://bugs.launchpad.net/bugs/1175089
 
 Title:
-  qemu does not generate guest cpu topology properly
+  Crash why dragon fly 3.4.1
 
 Status in QEMU:
   Expired
 
 Bug description:
-  Adding the option
+  Hello, all is here (kernel 3.8, qemu 1.2.2-r3):
+  /usr/bin/qemu-system-x86_64 -k fr -alt-grab -m 2048 -vga vmware -net nic,=
+vlan=3D0,model=3Dvirtio -net user -rtc base=3Dlocaltime -smp 4,cores=3D4,so=
+ckets=3D1 -boot once=3Dd -cdrom dfly-x86_64-gui-3.4.1_REL.iso =
 
-  -smp 12,sockets=3D2,cores=3D6,threads=3D1
+  KVM internal error. Suberror: 1
+  emulation failure
+  EAX=3D00000010 EBX=3D00009338 ECX=3D00000000 EDX=3D00000000
+  ESI=3D000017fc EDI=3D000017c8 EBP=3D000364a0 ESP=3D000017b8
+  EIP=3D00009318 EFL=3D00003002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
+T=3D0
+  ES =3D0010 00000000 ffffffff 00c09300
+  CS =3D0018 00000000 0000ffff 00009b00
+  SS =3D0010 00000000 ffffffff 00c09300
+  DS =3D0010 00000000 ffffffff 00c09300
+  FS =3D0033 0000a000 ffffffff 00c0f300
+  GS =3D0033 0000a000 ffffffff 00c0f300
+  LDT=3D0000 00000000 0000ffff 00008200
+  TR =3D0038 00005f98 00002067 00008b00
+  GDT=3D     00009590 0000003f
+  IDT=3D     00005e00 00000197
+  CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
+  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
+=3D0000000000000000 =
 
-  exposes
-
-  =
-
-  Machine (12GB)
-    Socket #0
-          L2 L#0 (512KB) + L1 L#0 (64KB) + Core L#0 + PU L#0 (P#0)
-          L2 L#1 (512KB) + L1 L#1 (64KB) + Core L#1 + PU L#1 (P#1)
-          L2 L#2 (512KB) + L1 L#2 (64KB) + Core L#2 + PU L#2 (P#2)
-          L2 L#3 (512KB) + L1 L#3 (64KB) + Core L#3 + PU L#3 (P#3)
-          L2 L#4 (512KB) + L1 L#4 (64KB) + Core L#4 + PU L#4 (P#4)
-          L2 L#5 (512KB) + L1 L#5 (64KB) + Core L#5 + PU L#5 (P#5)
-          L2 L#6 (512KB) + L1 L#6 (64KB) + Core L#6 + PU L#6 (P#6)
-          L2 L#7 (512KB) + L1 L#7 (64KB) + Core L#7 + PU L#7 (P#7)
-    Socket #1
-        L2 L#8 (512KB) + L1 L#8 (64KB) + Core L#8 + PU L#8 (P#8)
-        L2 L#9 (512KB) + L1 L#9 (64KB) + Core L#9 + PU L#9 (P#9)
-        L2 L#10 (512KB) + L1 L#10 (64KB) + Core L#10 + PU L#10 (P#10)
-        L2 L#11 (512KB) + L1 L#11 (64KB) + Core L#11 + PU L#11 (P#11)
-
-  =
-
-  Rather than:
-
-  Machine (12GB)
-    Socket #0
-          L2 L#0 (512KB) + L1 L#0 (64KB) + Core L#0 + PU L#0 (P#0)
-          L2 L#1 (512KB) + L1 L#1 (64KB) + Core L#1 + PU L#1 (P#1)
-          L2 L#2 (512KB) + L1 L#2 (64KB) + Core L#2 + PU L#2 (P#2)
-          L2 L#3 (512KB) + L1 L#3 (64KB) + Core L#3 + PU L#3 (P#3)
-          L2 L#4 (512KB) + L1 L#4 (64KB) + Core L#4 + PU L#4 (P#4)
-          L2 L#5 (512KB) + L1 L#5 (64KB) + Core L#5 + PU L#5 (P#5)
-    Socket #1
-          L2 L#6 (512KB) + L1 L#6 (64KB) + Core L#6 + PU L#6 (P#6)
-          L2 L#7 (512KB) + L1 L#7 (64KB) + Core L#7 + PU L#7 (P#7)
-          L2 L#8 (512KB) + L1 L#8 (64KB) + Core L#8 + PU L#8 (P#8)
-          L2 L#9 (512KB) + L1 L#9 (64KB) + Core L#9 + PU L#9 (P#9)
-          L2 L#10 (512KB) + L1 L#10 (64KB) + Core L#10 + PU L#10 (P#10)
-          L2 L#11 (512KB) + L1 L#11 (64KB) + Core L#11 + PU L#11 (P#11)
-
-  =
-
-  Here is a cpuid dump from inside the guest and dump from more recent vers=
-ion of cpuid, in which you can see a bit more detail. The later contains da=
-ta for a single CPU, because the others are the same.
-
-  Reproducible on qemu 1.0 and 1.2. with guest os Fedora 17, Debian 6,
-  Debian Squeeze and Windows 2008 R2.
+  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
+  EFER=3D0000000000000000
+  Code=3D00 a3 ea 5d 00 00 66 ea 10 93 18 00 0f 20 c0 fe c8 0f 22 c0 <ea> 1=
+d 93 00 00 31 c0 8e d8 8e d0 0f 01 1e dc 95 66 07 66 1f 66 0f a1 66 0f a9 6=
+6 61 bc ea
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1090726/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1175089/+subscriptions
