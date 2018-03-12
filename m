@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1evUZK-0001Zv-H3
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 17:01:19 -0400
+	(envelope-from <eblake@redhat.com>) id 1evUjr-0001b6-Bg
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 17:12:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1evUZG-0007Xp-Fv
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 17:01:18 -0400
-Received: from mail-bn3nam01on0051.outbound.protection.outlook.com
-	([104.47.33.51]:1953
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1evUZG-0007XX-9V
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 17:01:14 -0400
-From: Babu Moger <babu.moger@amd.com>
-Date: Mon, 12 Mar 2018 17:00:49 -0400
-Message-Id: <1520888449-4352-6-git-send-email-babu.moger@amd.com>
-In-Reply-To: <1520888449-4352-1-git-send-email-babu.moger@amd.com>
-References: <1520888449-4352-1-git-send-email-babu.moger@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 5/5] target/i386: Remove generic SMT thread
- check
+	(envelope-from <eblake@redhat.com>) id 1evUjq-0004I0-Ga
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 17:12:11 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Mon, 12 Mar 2018 16:11:56 -0500
+Message-Id: <20180312211156.452139-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH] iotests: Fix stuck NBD process on 33
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +17,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, rkrcmar@redhat.com
-Cc: mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, Gary.Hook@amd.com, Thomas.Lendacky@amd.com, brijesh.singh@amd.com, babu.moger@amd.com, kash@tripleback.net
+To: qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, qemu-block@nongnu.org, anton.nefedov@virtuozzo.com, Kevin Wolf <kwolf@redhat.com>
 
-Remove generic non-intel check while validating hyperthreading support.
-Certain AMD CPUs can support hyperthreading now.
+Commit afe35cde6 added additional actions to test 33, but forgot
+to reset the image between tests.  As a result, './check -nbd 33'
+fails because the qemu-nbd process from the first half is still
+occupying the port, preventing the second half from starting a
+new qemu-nbd process.  Worse, the failure leaves a rogue qemu-nbd
+process behind even after the test fails, which causes knock-on
+failures to later tests that also want to start qemu-nbd.
 
-CPU family with TOPOEXT feature can support hyperthreading now.
-
-Signed-off-by: Babu Moger <babu.moger@amd.com>
+Reported-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- target/i386/cpu.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index ade272e..10970b7 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4330,17 +4330,20 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
- 
-     qemu_init_vcpu(cs);
- 
--    /* Only Intel CPUs support hyperthreading. Even though QEMU fixes this
--     * issue by adjusting CPUID_0000_0001_EBX and CPUID_8000_0008_ECX
--     * based on inputs (sockets,cores,threads), it is still better to gives
-+    /* Most Intel and certain AMD CPUs support hyperthreading. Even though QEMU
-+     * fixes this issue by adjusting CPUID_0000_0001_EBX and CPUID_8000_0008_ECX
-+     * based on inputs (sockets,cores,threads), it is still better to give
-      * users a warning.
-      *
-      * NOTE: the following code has to follow qemu_init_vcpu(). Otherwise
-      * cs->nr_threads hasn't be populated yet and the checking is incorrect.
-      */
--    if (!IS_INTEL_CPU(env) && cs->nr_threads > 1 && !ht_warned) {
--        error_report("AMD CPU doesn't support hyperthreading. Please configure"
--                     " -smp options properly.");
-+     if (IS_AMD_CPU(env) &&
-+         !(env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) &&
-+         cs->nr_threads > 1 && !ht_warned) {
-+            error_report("This family of AMD CPU doesn't support "
-+                         "hyperthreading. Please configure -smp "
-+                         "options properly.");
-         ht_warned = true;
-     }
- 
+I'll take this through my NBD queue (pull request within the next 16
+hours), as obviously I want to test that the other patches on that
+queue can get past the iotests for NBD :)
+
+ tests/qemu-iotests/033 | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/qemu-iotests/033 b/tests/qemu-iotests/033
+index a1d8357331d..ee8a1338bbd 100755
+--- a/tests/qemu-iotests/033
++++ b/tests/qemu-iotests/033
+@@ -105,6 +105,7 @@ for align in 512 4k; do
+ done
+ done
+
++_cleanup_test_img
+
+ # Trigger truncate that would shrink qcow2 L1 table, which is done by
+ #   clearing one entry (8 bytes) with bdrv_co_pwrite_zeroes()
 -- 
-1.8.3.1
+2.14.3
