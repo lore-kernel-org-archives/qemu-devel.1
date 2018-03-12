@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1evRjp-0008VF-MU
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:59:58 -0400
+	(envelope-from <eblake@redhat.com>) id 1evRsg-0005ou-Ig
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:09:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1evRjo-0003it-Lu
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:59:57 -0400
-Resent-Message-Id: <E1evRjo-0003it-Lu@eggs.gnu.org>
-In-Reply-To: <20180312150218.1314-1-kwolf@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152087758899.39.17918973194206100712@71c20359a636>
+	(envelope-from <eblake@redhat.com>) id 1evRsb-0000je-PZ
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:09:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60946 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1evRsb-0000jF-Ki
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:09:01 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BEAA5814F0D2
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 18:08:49 +0000 (UTC)
+References: <20180312124939.20562-1-berrange@redhat.com>
+	<20180312124939.20562-4-berrange@redhat.com>
+	<20180312174621.GA14096@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8ed40a69-95a9-c259-d21e-eb239b950754@redhat.com>
+Date: Mon, 12 Mar 2018 13:08:44 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 12 Mar 2018 10:59:49 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] luks: Implement .bdrv_co_create
+In-Reply-To: <20180312174621.GA14096@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 3/9] sockets: pull code for testing IP
+ availability out of specific test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,44 +36,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMzEyMTUwMjE4LjEzMTQtMS1rd29sZkByZWRoYXQuY29tClN1YmplY3Q6
-IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC82XSBsdWtzOiBJbXBsZW1lbnQgLmJkcnZfY29fY3Jl
-YXRlCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
-CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
-bQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9y
-IGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQo
-Z2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1m
-b3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4K
-ICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUK
-CmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
-MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
-J3Rlc3QnCjIxNzA3YzcyNTIgcWVtdS1pb3Rlc3RzOiBUZXN0IGx1a3MgUU1QIGltYWdlIGNyZWF0
-aW9uCmMzY2NlMTE2OGYgbHVrczogQ2F0Y2ggaW50ZWdlciBvdmVyZmxvdyBmb3IgaHVnZSBzaXpl
-cwpiZWUwNjVlMGJhIGx1a3M6IFR1cm4gaW52YWxpZCBhc3NlcnRpb24gaW50byBjaGVjawpiOWQz
-MTQ3OWY4IGx1a3M6IFN1cHBvcnQgLmJkcnZfY29fY3JlYXRlCjJkYzlmOTViNTkgbHVrczogQ3Jl
-YXRlIGJsb2NrX2NyeXB0b19jb19jcmVhdGVfZ2VuZXJpYygpCjI2ODIxZTM3ZTkgbHVrczogU2Vw
-YXJhdGUgaW1hZ2UgZmlsZSBjcmVhdGlvbiBmcm9tIGZvcm1hdHRpbmcKCj09PSBPVVRQVVQgQkVH
-SU4gPT09CkNoZWNraW5nIFBBVENIIDEvNjogbHVrczogU2VwYXJhdGUgaW1hZ2UgZmlsZSBjcmVh
-dGlvbiBmcm9tIGZvcm1hdHRpbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggMi82OiBsdWtzOiBDcmVhdGUg
-YmxvY2tfY3J5cHRvX2NvX2NyZWF0ZV9nZW5lcmljKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMy82OiBs
-dWtzOiBTdXBwb3J0IC5iZHJ2X2NvX2NyZWF0ZS4uLgpDaGVja2luZyBQQVRDSCA0LzY6IGx1a3M6
-IFR1cm4gaW52YWxpZCBhc3NlcnRpb24gaW50byBjaGVjay4uLgpFUlJPUjogc3VzcGVjdCBjb2Rl
-IGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVtZW50cyAoNCwgNykKIzMxOiBGSUxFOiBibG9j
-ay9jcnlwdG8uYzo1MjI6CisgICAgaWYgKG9mZnNldCA+IGxlbikgeworICAgICAgIHJldHVybiAt
-RUlPOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMSBsaW5lcyBjaGVja2VkCgpZb3Vy
-IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA1LzY6IGx1
-a3M6IENhdGNoIGludGVnZXIgb3ZlcmZsb3cgZm9yIGh1Z2Ugc2l6ZXMuLi4KQ2hlY2tpbmcgUEFU
-Q0ggNi82OiBxZW11LWlvdGVzdHM6IFRlc3QgbHVrcyBRTVAgaW1hZ2UgY3JlYXRpb24uLi4KPT09
-IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpF
-bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
-cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0
-cy5vcmc=
+On 03/12/2018 12:46 PM, Daniel P. Berrang=C3=A9 wrote:
+> On Mon, Mar 12, 2018 at 12:49:33PM +0000, Daniel P. Berrang=C3=A9 wrote=
+:
+>> From: "Daniel P. Berrange" <berrange@redhat.com>
+>>
+>> The test-io-channel-socket.c file has some useful helper functions for
+>> checking if a specific IP protocol is available. Other tests need to
+>> perform similar kinds of checks to avoid running tests that will fail
+>> due to missing IP protocols.
+>>
+>> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+>> ---
+
+>> +    if (socket_can_bind("::1") < 0) {
+>> +        if (errno !=3D EADDRNOTAVAIL) {
+>> +            return -1;
+>> +        }
+>> +    } else {
+>> +        *has_ipv6 =3D true;
+>> +    }
+>> +
+>=20
+> Sigh, I should have kept the new code identical to the old code,
+> rather than trying to improve it, as this is in fact broken. The
+> socket_can_bind() is mistakenly returning '0' when EADDRNOTAVAIL
+> is set, so we always set the has_ipv4|6 vars to true.
+>=20
+> It needs this squashed in:
+
+The squash makes sense; with that, you can keep the R-b I added on the=20
+series (I guess that shows I only read the code, not tried to run the=20
+testsuite with the code applied, or I might have found this too).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
