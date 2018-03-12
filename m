@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evLoU-0003B2-C9
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:40:25 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1evLoq-0003PX-Ih
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:40:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evLoS-0004Je-Ss
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:40:22 -0400
-Date: Mon, 12 Mar 2018 11:40:09 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180312114009.GI3493@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180309172713.26318-1-kwolf@redhat.com>
-	<20180309172713.26318-4-kwolf@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1evLop-0004su-Gv
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:40:44 -0400
+Received: from mail-ot0-x231.google.com ([2607:f8b0:4003:c0f::231]:41591)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1evLop-0004s6-BR
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:40:43 -0400
+Received: by mail-ot0-x231.google.com with SMTP id w38so14898861ota.8
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 04:40:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180309172713.26318-4-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/6] luks: Support .bdrv_co_create
+In-Reply-To: <359ea922.4a3d5.16219f40e21.Coremail.suhang16@mails.ucas.ac.cn>
+References: <359ea922.4a3d5.16219f40e21.Coremail.suhang16@mails.ucas.ac.cn>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 12 Mar 2018 11:40:22 +0000
+Message-ID: <CAFEAcA-U4_gKK744dwY1+8yRX8APSpa+7EUgNB0SW9Omfc_SGw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] BiteSizedTasks: API conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,124 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
+To: Su Hang <suhang16@mails.ucas.ac.cn>
+Cc: thomas huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Mar 09, 2018 at 06:27:10PM +0100, Kevin Wolf wrote:
-> This adds the .bdrv_co_create driver callback to luks, which enables
-> image creation over QMP.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  qapi/block-core.json | 17 ++++++++++++++++-
->  block/crypto.c       | 34 ++++++++++++++++++++++++++++++++++
->  2 files changed, 50 insertions(+), 1 deletion(-)
-> 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 524d51567a..07039bfe9c 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -3452,6 +3452,21 @@
->              '*preallocation':   'PreallocMode' } }
->  
->  ##
-> +# @BlockdevCreateOptionsLUKS:
-> +#
-> +# Driver specific image creation options for LUKS.
-> +#
-> +# @file             Node to create the image format on
-> +# @size             Size of the virtual disk in bytes
-> +#
-> +# Since: 2.12
-> +##
-> +{ 'struct': 'BlockdevCreateOptionsLUKS',
-> +  'data': { 'file':             'BlockdevRef',
-> +            'qcrypto':          'QCryptoBlockCreateOptionsLUKS',
-> +            'size':             'size' } }
+On 12 March 2018 at 11:24, Su Hang <suhang16@mails.ucas.ac.cn> wrote:
+> Dear Thomas,
+> I'm tring to work on this job:
+> BiteSizedTasks:
+>     API conversion:
+>         Replace calls to functions named cpu_physical_memory_* with address_space_*.
 
-s/qcrypto/crypto/ in this field.
+This is a generic suggestion, but not all cpu_physical_memory_*
+functions currently have a direct counterpart in address_space_*.
+(Note also that it is not as simple as "change the function name
+at the call site -- there are more parameters to the address_space_*
+functions. Ideally it also requires examining each call site to
+see what it should do if the memory access fails, and what
+address space it should really be using. This is rather more
+complicated than it appears from the fact it's on a bite-sized-task
+list. Any individual conversion of a callsite is probably small
+enough to be bite-sized, but you shouldn't consider "change
+everywhere" to be a single small task.)
 
+As you've found, cpu_physical_memory_write_rom() is one of those
+functions that doesn't currently have an address_space_* equivalent.
 
-I do wonder about whether instead of embedding QCryptoBlockCreateOptionsLUKS
-as a field, we could instead use QCryptoBlockCreateOptionsLUKS as the
-base struct and just inherit from it to add file/size.
+There's actually a 'TODO' note in our API docs in
+docs/devel/loads-stores.rst about this:
 
-I'm not really fussed, but I wonder if you/Eric have any thoughts on the pros
-or cons of inheritance vs embedding in this case.
+# Note that unlike ``cpu_physical_memory_write()`` this function takes
+# an AddressSpace argument, but unlike ``address_space_write()`` this
+# function does not take a ``MemTxAttrs`` or return a ``MemTxResult``.
+#
+# **TODO**: we should probably clean up this inconsistency and
+# turn the function into ``address_space_write_rom`` with an API
+# matching ``address_space_write``.
 
-> +
-> +##
->  # @BlockdevCreateOptionsNfs:
->  #
->  # Driver specific image creation options for NFS.
-> @@ -3643,7 +3658,7 @@
->        'http':           'BlockdevCreateNotSupported',
->        'https':          'BlockdevCreateNotSupported',
->        'iscsi':          'BlockdevCreateNotSupported',
-> -      'luks':           'BlockdevCreateNotSupported',
-> +      'luks':           'BlockdevCreateOptionsLUKS',
->        'nbd':            'BlockdevCreateNotSupported',
->        'nfs':            'BlockdevCreateOptionsNfs',
->        'null-aio':       'BlockdevCreateNotSupported',
-> diff --git a/block/crypto.c b/block/crypto.c
-> index b0a4cb3388..2035f9ab13 100644
-> --- a/block/crypto.c
-> +++ b/block/crypto.c
-> @@ -543,6 +543,39 @@ static int block_crypto_open_luks(BlockDriverState *bs,
->                                       bs, options, flags, errp);
->  }
->  
-> +static int coroutine_fn
-> +block_crypto_co_create_luks(BlockdevCreateOptions *create_options, Error **errp)
-> +{
-> +    BlockdevCreateOptionsLUKS *luks_opts;
-> +    BlockDriverState *bs = NULL;
-> +    QCryptoBlockCreateOptions create_opts;
-> +    int ret;
-> +
-> +    assert(create_options->driver == BLOCKDEV_DRIVER_LUKS);
-> +    luks_opts = &create_options->u.luks;
-> +
-> +    bs = bdrv_open_blockdev_ref(luks_opts->file, errp);
-> +    if (bs == NULL) {
-> +        return -EIO;
-> +    }
-> +
-> +    create_opts = (QCryptoBlockCreateOptions) {
-> +        .format = Q_CRYPTO_BLOCK_FORMAT_LUKS,
-> +        .u.luks = *luks_opts->qcrypto,
-> +    };
-> +
-> +    ret = block_crypto_co_create_generic(bs, luks_opts->size, &create_opts,
-> +                                         errp);
-> +    if (ret < 0) {
-> +        goto fail;
-> +    }
-> +
-> +    ret = 0;
-> +fail:
-> +    bdrv_unref(bs);
-> +    return ret;
-> +}
-> +
->  static int coroutine_fn block_crypto_co_create_opts_luks(const char *filename,
->                                                           QemuOpts *opts,
->                                                           Error **errp)
-> @@ -647,6 +680,7 @@ BlockDriver bdrv_crypto_luks = {
->      .bdrv_open          = block_crypto_open_luks,
->      .bdrv_close         = block_crypto_close,
->      .bdrv_child_perm    = bdrv_format_default_perms,
-> +    .bdrv_co_create     = block_crypto_co_create_luks,
->      .bdrv_co_create_opts = block_crypto_co_create_opts_luks,
->      .bdrv_truncate      = block_crypto_truncate,
->      .create_opts        = &block_crypto_create_opts_luks,
-> -- 
-> 2.13.6
-> 
+and I think that would be the best thing:
+ (1) have address_space_write_rom() which takes the extra
+ MemTxAttrs argument and returns the MemTxResult, and
+ make cpu_physical_memory_write_rom() just be a trivial
+ wrapper around it
+ (2) then change the callers to use address_space_write_rom()
+ (3) remove the cpu_physical_memory_write_rom() wrapper
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Step 2 is the harder part, because really it requires looking at
+the call sites to see what they should do if the memory access
+fails.
+
+thanks
+-- PMM
