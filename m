@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1evJPu-0002Fo-5D
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:06:51 -0400
+	(envelope-from <luwei.kang@intel.com>) id 1evJQt-00031c-U0
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:07:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1evJPt-0002aM-7k
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:06:50 -0400
-References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
-	<1518702707-7077-7-git-send-email-vsementsov@virtuozzo.com>
-	<b570a199-9139-5652-5ad8-407820680620@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <2cd2fd4e-ea14-90c5-ed63-d2569295d4e0@virtuozzo.com>
-Date: Mon, 12 Mar 2018 12:06:34 +0300
-MIME-Version: 1.0
-In-Reply-To: <b570a199-9139-5652-5ad8-407820680620@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <luwei.kang@intel.com>) id 1evJQo-00058a-Rx
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:07:51 -0400
+Received: from mga04.intel.com ([192.55.52.120]:26985)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
+	id 1evJQo-00054G-Is
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:07:46 -0400
+From: "Kang, Luwei" <luwei.kang@intel.com>
+Date: Mon, 12 Mar 2018 09:07:41 +0000
+Message-ID: <82D7661F83C1A047AF7DC287873BF1E167EF4877@SHSMSX101.ccr.corp.intel.com>
+References: <1520182116-16485-1-git-send-email-luwei.kang@intel.com>
+	<20180309191048.GA28578@localhost.localdomain>
+In-Reply-To: <20180309191048.GA28578@localhost.localdomain>
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 6/9] nbd: BLOCK_STATUS for standard
- get_block_status function: client part
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] i386: Add Intel Processor Trace
+ feature support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,57 +30,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mtosatti@redhat.com" <mtosatti@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
 
-16.02.2018 23:40, Eric Blake wrote:
-> On 02/15/2018 07:51 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Minimal realization: only one extent in server answer is supported.
->> Flag NBD_CMD_FLAG_REQ_ONE is used to force this behavior.
->>
->> Tests 140, 147 and 205 are fixed due to now server failed on searching
->> export in context of NBD_OPT_SET_META_CONTEXT option negotiation.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->
+> > +
+> > +        if (!eax_0 ||
+> > +           ((ebx_0 & INTEL_PT_MINIMAL_EBX) !=3D INTEL_PT_MINIMAL_EBX) =
+||
+> > +           ((ecx_0 & INTEL_PT_MINIMAL_ECX) !=3D INTEL_PT_MINIMAL_ECX) =
+||
+> > +           ((eax_1 & INTEL_PT_MTC_BITMAP) !=3D INTEL_PT_MTC_BITMAP) ||
+> > +           ((eax_1 & INTEL_PT_ADDR_RANGES_NUM_MASK) <
+> > +                                           INTEL_PT_ADDR_RANGES_NUM) |=
+|
+> > +           ((ebx_1 & (INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP)) !=
+=3D
+> > +                (INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP))) {
+>=20
+> I still don't see a check to ensure the host has bit 31 on ecx_0 set to 0=
+, as I mentioned when reviewing v3.
 
-[...]
+Hi Eduardo,
+    Thanks for the code review. I don't quite understand here why bit31 mus=
+t same with host (meaning we must reject a host
+where ecx_0 & (1 << 31) is set).
+    Do you mean PT must be disabled in guest when host bit31 is set?=20
+    Bit 31: If 1, generated packets which contain IP payloads have LIP valu=
+es, which include the CS base component.
+    I can't find any special on this bit. Could you help clarify?
 
->> +
->> =C2=A0 static int nbd_co_request(BlockDriverState *bs, NBDRequest *reque=
-st,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 QEMUIOVector *write_qiov)
->> =C2=A0 {
->> @@ -784,6 +878,50 @@ int nbd_client_co_pdiscard(BlockDriverState *bs,=20
->> int64_t offset, int bytes)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return nbd_co_request(bs, &request, NULL)=
-;
->> =C2=A0 }
->> =C2=A0 +int64_t coroutine_fn=20
->> nbd_client_co_get_block_status(BlockDriverState *bs,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 int64_t sector_num,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 int nb_sectors,=20
->> int *pnum,
->> + BlockDriverState **file)
->
-> Needs rebasing on top of Kevin's block branch to use the byte-based=20
-> interface.=C2=A0 I also need to finish up my promised followups on that=20
-> series, as NBD (and other protocol drivers) should have consistent=20
-> behavior on what it means to report OFFSET_VALID (or whether that=20
-> should be limited to just format/filter drivers).
+Thanks,
+Luwei Kang
 
-Looks like it's already in master, so I should just rebase on master.--
-
-Best regards,
-Vladimir
+>=20
+> The rest of the patch looks good.
+>=20
+> > +            /*
+> > +             * Processor Trace capabilities aren't configurable, so if=
+ the
+> > +             * host can't emulate the capabilities we report on
+> > +             * cpu_x86_cpuid(), intel-pt can't be enabled on the curre=
+nt host.
+> > +             */
+> > +            env->features[FEAT_7_0_EBX] &=3D ~CPUID_7_0_EBX_INTEL_PT;
+> > +            cpu->filtered_features[FEAT_7_0_EBX] |=3D CPUID_7_0_EBX_IN=
+TEL_PT;
+> > +            rv =3D 1;
+> > +        }
+> > +    }
+> > +
+> >      return rv;
+> >  }
+> >
+> [...]
+>=20
+> --
+> Eduardo
