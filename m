@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evQFB-0007Bg-0D
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:24:15 -0400
+	(envelope-from <mreitz@redhat.com>) id 1evQIh-0001AS-Sw
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:27:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evQF9-0001y7-Df
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:24:13 -0400
-Date: Mon, 12 Mar 2018 16:24:01 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180312162400.GL3219@work-vm>
-References: <20180207155837.92351-1-vsementsov@virtuozzo.com>
-	<20180207155837.92351-13-vsementsov@virtuozzo.com>
+	(envelope-from <mreitz@redhat.com>) id 1evQIg-0005DX-ND
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:27:51 -0400
+References: <20180306204819.11266-1-stefanha@redhat.com>
+	<20180306204819.11266-3-stefanha@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <e8c46fbd-318f-20a1-b04f-4b323331409f@redhat.com>
+Date: Mon, 12 Mar 2018 17:27:41 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180207155837.92351-13-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v10 12/12] iotests: add dirty bitmap
- postcopy test
+In-Reply-To: <20180306204819.11266-3-stefanha@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="qry4SfYNPpAp7kXc1yitvwQELSO8fLmBa"
+Subject: Re: [Qemu-devel] [PATCH 2/2] iotests: add 208 nbd-server +
+ blockdev-snapshot-sync test case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Stefano Panella <spanella@gmail.com>, Kevin Wolf <kwolf@redhat.com>
 
-* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
-> Test
-> - start two vms (vm_a, vm_b)
-> 
-> - in a
->     - do writes from set A
->     - do writes from set B
->     - fix bitmap sha256
->     - clear bitmap
->     - do writes from set A
->     - start migration
-> - than, in b
->     - wait vm start (postcopy should start)
->     - do writes from set B
->     - check bitmap sha256
-> 
-> The test should verify postcopy migration and then merging with delta
-> (changes in target, during postcopy process).
-> 
-> Reduce supported cache modes to only 'none', because with cache on time
-> from source.STOP to target.RESUME is unpredictable and we can fail with
-> timout while waiting for target.RESUME.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Fam Zheng <famz@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--qry4SfYNPpAp7kXc1yitvwQELSO8fLmBa
+From: Max Reitz <mreitz@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Stefano Panella <spanella@gmail.com>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <e8c46fbd-318f-20a1-b04f-4b323331409f@redhat.com>
+Subject: Re: [PATCH 2/2] iotests: add 208 nbd-server + blockdev-snapshot-sync
+ test case
+References: <20180306204819.11266-1-stefanha@redhat.com>
+ <20180306204819.11266-3-stefanha@redhat.com>
+In-Reply-To: <20180306204819.11266-3-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-03-06 21:48, Stefan Hajnoczi wrote:
+> This test case adds an NBD server export and then invokes
+> blockdev-snapshot-sync, which changes the BlockDriverState node that th=
+e
+> NBD server's BlockBackend points to.  This is an interesting scenario t=
+o
+> test and exercises the code path fixed by the previous commit.
+>=20
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  tests/qemu-iotests/199        | 105 ++++++++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/199.out    |   5 ++
->  tests/qemu-iotests/group      |   1 +
->  tests/qemu-iotests/iotests.py |   7 ++-
->  4 files changed, 117 insertions(+), 1 deletion(-)
->  create mode 100755 tests/qemu-iotests/199
->  create mode 100644 tests/qemu-iotests/199.out
-> 
-> diff --git a/tests/qemu-iotests/199 b/tests/qemu-iotests/199
+>  tests/qemu-iotests/208     | 55 ++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  tests/qemu-iotests/208.out |  9 ++++++++
+>  tests/qemu-iotests/group   |  1 +
+>  3 files changed, 65 insertions(+)
+>  create mode 100755 tests/qemu-iotests/208
+>  create mode 100644 tests/qemu-iotests/208.out
+>=20
+> diff --git a/tests/qemu-iotests/208 b/tests/qemu-iotests/208
 > new file mode 100755
-> index 0000000000..f872040a81
+> index 0000000000..4e82b96c82
 > --- /dev/null
-> +++ b/tests/qemu-iotests/199
-> @@ -0,0 +1,105 @@
+> +++ b/tests/qemu-iotests/208
+> @@ -0,0 +1,55 @@
 > +#!/usr/bin/env python
 > +#
-> +# Tests for dirty bitmaps postcopy migration.
+> +# Copyright (C) 2018 Red Hat, Inc.
 > +#
-> +# Copyright (c) 2016-2017 Virtuozzo International GmbH. All rights reserved.
-> +#
-> +# This program is free software; you can redistribute it and/or modify
-> +# it under the terms of the GNU General Public License as published by
+> +# This program is free software; you can redistribute it and/or modify=
+
+> +# it under the terms of the GNU General Public License as published by=
+
 > +# the Free Software Foundation; either version 2 of the License, or
 > +# (at your option) any later version.
 > +#
@@ -84,161 +84,89 @@ Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@re
 > +# GNU General Public License for more details.
 > +#
 > +# You should have received a copy of the GNU General Public License
-> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>=
+=2E
 > +#
+> +# Creator/Owner: Stefan Hajnoczi <stefanha@redhat.com>
+> +#
+> +# Check that the runtime NBD server does not crash when stopped after
+> +# blockdev-snapshot-sync.
 > +
-> +import os
 > +import iotests
-> +import time
-> +from iotests import qemu_img
 > +
-> +disk_a = os.path.join(iotests.test_dir, 'disk_a')
-> +disk_b = os.path.join(iotests.test_dir, 'disk_b')
-> +size = '256G'
-> +fifo = os.path.join(iotests.test_dir, 'mig_fifo')
+> +with iotests.FilePath('disk.img') as disk_img_path, \
+> +     iotests.FilePath('disk-snapshot.img') as disk_snapshot_img_path, =
+\
+> +     iotests.FilePath('nbd.sock') as nbd_sock_path, \
+> +     iotests.VM() as vm:
 > +
-> +class TestDirtyBitmapPostcopyMigration(iotests.QMPTestCase):
+> +    img_size =3D '10M'
+> +    iotests.qemu_img_pipe('create', '-f', iotests.imgfmt, disk_img_pat=
+h, img_size)
 > +
-> +    def tearDown(self):
-> +        self.vm_a.shutdown()
-> +        self.vm_b.shutdown()
-> +        os.remove(disk_a)
-> +        os.remove(disk_b)
-> +        os.remove(fifo)
+> +    iotests.log('Launching VM...')
+> +    (vm.add_drive(disk_img_path, 'node-name=3Ddrive0-node', interface=3D=
+'none')
+> +       .launch())
 > +
-> +    def setUp(self):
-> +        os.mkfifo(fifo)
-> +        qemu_img('create', '-f', iotests.imgfmt, disk_a, size)
-> +        qemu_img('create', '-f', iotests.imgfmt, disk_b, size)
-> +        self.vm_a = iotests.VM(path_suffix='a').add_drive(disk_a)
-> +        self.vm_b = iotests.VM(path_suffix='b').add_drive(disk_b)
-> +        self.vm_b.add_incoming("exec: cat '" + fifo + "'")
-> +        self.vm_a.launch()
-> +        self.vm_b.launch()
+> +    iotests.log('Starting NBD server...')
+> +    iotests.log(vm.qmp('nbd-server-start', addr=3D{
+> +            "type": "unix",
+> +            "data": {
+> +                "path": nbd_sock_path,
+> +            }
+> +        }))
 > +
-> +    def test_postcopy(self):
-> +        write_size = 0x40000000
-> +        granularity = 512
-> +        chunk = 4096
+> +    iotests.log('Adding NBD export...')
+> +    iotests.log(vm.qmp('nbd-server-add', device=3D'drive0-node', writa=
+ble=3DTrue))
 > +
-> +        result = self.vm_a.qmp('block-dirty-bitmap-add', node='drive0',
-> +                               name='bitmap', granularity=granularity)
-> +        self.assert_qmp(result, 'return', {});
+> +    iotests.log('Creating external snapshot...')
+> +    iotests.log(vm.qmp('blockdev-snapshot-sync',
+> +        node_name=3D'drive0-node',
+> +        snapshot_node_name=3D'drive0-snapshot-node',
+> +        snapshot_file=3Ddisk_snapshot_img_path))
 > +
-> +        s = 0
-> +        while s < write_size:
-> +            self.vm_a.hmp_qemu_io('drive0', 'write %d %d' % (s, chunk))
-> +            s += 0x10000
-> +        s = 0x8000
-> +        while s < write_size:
-> +            self.vm_a.hmp_qemu_io('drive0', 'write %d %d' % (s, chunk))
-> +            s += 0x10000
-> +
-> +        result = self.vm_a.qmp('x-debug-block-dirty-bitmap-sha256',
-> +                               node='drive0', name='bitmap')
-> +        sha256 = result['return']['sha256']
-> +
-> +        result = self.vm_a.qmp('block-dirty-bitmap-clear', node='drive0',
-> +                               name='bitmap')
-> +        self.assert_qmp(result, 'return', {});
-> +        s = 0
-> +        while s < write_size:
-> +            self.vm_a.hmp_qemu_io('drive0', 'write %d %d' % (s, chunk))
-> +            s += 0x10000
-> +
-> +        result = self.vm_a.qmp('migrate-set-capabilities',
-> +                               capabilities=[{'capability': 'dirty-bitmaps',
-> +                                              'state': True}])
+> +    iotests.log('Stopping NBD server...')
+> +    iotests.log(vm.qmp('nbd-server-stop'))
 
-Generally these days we set the capability on both sides of the
-migration (which helps if the destination tells you it can't do it for
-some reason).
+Hm.  Tests what it's supposed to test.
 
-Again from the migration side this looks OK, but it's really mostly the
-details of the IO that I'll leave to the block people.
+However, I'm not sure whether that's what we want...  If I give a node
+name to nbd-server-add, I'd probably expect the NBD server to stay at
+that node.  We have BdrvChild.stay_at_node for that, so we could
+implement it.  The question is whether we want to.
 
-Dave
+However, both wanting the snapshot to be below and above the NBD server
+makes sense...  Perhaps it's best to leave it as-is, even if it is
+surprising to some, because this way we at least don't have to switch to
+RO mode (which we probably would if the NBD server is suddenly below the
+snapshot).
 
-> +        self.assert_qmp(result, 'return', {})
-> +
-> +        result = self.vm_a.qmp('migrate', uri='exec:cat>' + fifo)
-> +        self.assertNotEqual(self.vm_a.event_wait("STOP"), None)
-> +        self.assertNotEqual(self.vm_b.event_wait("RESUME"), None)
-> +
-> +        s = 0x8000
-> +        while s < write_size:
-> +            self.vm_b.hmp_qemu_io('drive0', 'write %d %d' % (s, chunk))
-> +            s += 0x10000
-> +
-> +        result = self.vm_b.qmp('query-block');
-> +        while len(result['return'][0]['dirty-bitmaps']) > 1:
-> +            time.sleep(2)
-> +            result = self.vm_b.qmp('query-block');
-> +
-> +        result = self.vm_b.qmp('x-debug-block-dirty-bitmap-sha256',
-> +                               node='drive0', name='bitmap')
-> +
-> +        self.assert_qmp(result, 'return/sha256', sha256);
-> +
-> +if __name__ == '__main__':
-> +    iotests.main(supported_fmts=['qcow2'], supported_cache_modes=['none'])
-> diff --git a/tests/qemu-iotests/199.out b/tests/qemu-iotests/199.out
-> new file mode 100644
-> index 0000000000..ae1213e6f8
-> --- /dev/null
-> +++ b/tests/qemu-iotests/199.out
-> @@ -0,0 +1,5 @@
-> +.
-> +----------------------------------------------------------------------
-> +Ran 1 tests
-> +
-> +OK
-> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-> index 498c52c4c1..282c5ebd5c 100644
-> --- a/tests/qemu-iotests/group
-> +++ b/tests/qemu-iotests/group
-> @@ -197,6 +197,7 @@
->  196 rw auto quick
->  197 rw auto quick
->  198 rw auto
-> +199 rw auto
->  200 rw auto
->  201 rw auto migration
->  202 rw auto quick
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-> index 5a10b2d534..a9bded77e4 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -473,6 +473,10 @@ def verify_platform(supported_oses=['linux']):
->      if True not in [sys.platform.startswith(x) for x in supported_oses]:
->          notrun('not suitable for this OS: %s' % sys.platform)
->  
-> +def verify_cache_mode(supported_cache_modes=[]):
-> +    if supported_cache_modes and (cachemode not in supported_cache_modes):
-> +        notrun('not suitable for this cache mode: %s' % cachemode)
-> +
->  def supports_quorum():
->      return 'quorum' in qemu_img_pipe('--help')
->  
-> @@ -481,7 +485,7 @@ def verify_quorum():
->      if not supports_quorum():
->          notrun('quorum support missing')
->  
-> -def main(supported_fmts=[], supported_oses=['linux']):
-> +def main(supported_fmts=[], supported_oses=['linux'], supported_cache_modes=[]):
->      '''Run tests'''
->  
->      global debug
-> @@ -498,6 +502,7 @@ def main(supported_fmts=[], supported_oses=['linux']):
->      verbosity = 1
->      verify_image_format(supported_fmts)
->      verify_platform(supported_oses)
-> +    verify_cache_mode(supported_cache_modes)
->  
->      # We need to filter out the time taken from the output so that qemu-iotest
->      # can reliably diff the results against master output.
-> -- 
-> 2.11.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+I'm sure adding atomic graph change operations to QMP will fix all of
+that.  I'm sure.
+
+Anyway, since your test doesn't even check whether the NBD server is
+above or below the snapshot (clever! :-))...
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--qry4SfYNPpAp7kXc1yitvwQELSO8fLmBa
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqmqn0SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ALtUH/jibCSw1+vicJmnlJXoNp3AjEgHdermv
+PcuTOAAS8manXIWvp/7upNNUxzK2OMoeTm3PJpeEQhwVYdJf64qPsjRSHv7TfIum
+UyuClaZCSGowbhfJ5962l2RDvdZAk8nqbfrbqubxtDHgQFnPORb9DS+jpQzLszdx
+fR03kgLsoGzHfajVmmOLHAJn9V0jGRw7TlGXNxsLoEZvYttHnNN2KDxF6ROX0smC
+UtGGhuvVBn/tGP8rBn8JyUWiVN0yIKmpHXpgy7OXq9dshBcqs2vc+SBqHBEfHnxU
+w8bEClVfpY5vYp+WtLRxGRZmP575SZcNXWyGVvY5aEZfeZBqtN+oWLw=
+=d+E/
+-----END PGP SIGNATURE-----
+
+--qry4SfYNPpAp7kXc1yitvwQELSO8fLmBa--
