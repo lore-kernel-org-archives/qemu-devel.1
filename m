@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1evNlB-0006g9-RT
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:45:06 -0400
+	(envelope-from <rth7680@gmail.com>) id 1evNlW-0006zw-UX
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:45:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1evNlA-0004s2-PU
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:45:05 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:39499)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1evNlA-0004qc-Iy
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:45:04 -0400
-Received: by mail-wr0-x241.google.com with SMTP id r66so8143396wrb.6
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 06:45:04 -0700 (PDT)
+	(envelope-from <rth7680@gmail.com>) id 1evNlW-0005Uo-17
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:45:26 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20180127134908.24095-1-anatoly.trosinenko@gmail.com>
+	<20180127134908.24095-2-anatoly.trosinenko@gmail.com>
+	<aab013fb-5ada-6ee5-d038-0277d8ef0b24@weilnetz.de>
+	<CAE5jQCfxjM9ykBCes0oDhrc0B6g8AC5Se39sXBsbZo=-dKQpyg@mail.gmail.com>
+	<CAE5jQCe8O3BT=6SDdm2p7J_wxgzZTcqhyS1mfnEr=4tci9fipg@mail.gmail.com>
+	<efe4a642-a220-5a40-b1e0-769a4216389d@twiddle.net>
+	<CAE5jQCcCA=3kkVa=5eMZs-BGAM_p4fZG+GPu1SmQMg7_sPAH5Q@mail.gmail.com>
+	<57abe9de-1258-3624-2f8a-882f1de1d19d@weilnetz.de>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <3f76df88-f08e-1178-52ab-2d9906793540@twiddle.net>
+Date: Mon, 12 Mar 2018 15:45:09 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180308195811.24894-9-dgilbert@redhat.com>
-References: <20180308195811.24894-1-dgilbert@redhat.com>
-	<20180308195811.24894-9-dgilbert@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 12 Mar 2018 14:45:02 +0100
-Message-ID: <CAJ+F1C+tu7YO9NAsTc1VVOzR1MA6jtHDbB6uMJw_oR5unkFV2w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 08/29] libvhost-user: Open userfaultfd
+In-Reply-To: <57abe9de-1258-3624-2f8a-882f1de1d19d@weilnetz.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] tci: eliminate UB due to unaligned
+ reads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,117 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Stefan Weil <sw@weilnetz.de>, Anatoly Trosinenko <anatoly.trosinenko@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On Thu, Mar 8, 2018 at 8:57 PM, Dr. David Alan Gilbert (git)
-<dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> Open a userfaultfd (on a postcopy_advise) and send it back in
-> the reply to the qemu for it to monitor.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On 03/03/2018 05:41 PM, Stefan Weil wrote:
+> Richard, the discussion about non-portable calls to helper functions is
+> not new, but I still have no test case which fails. Do you think of a
+> special case (architecture, helper function)?
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+The two that come to mind immediately are:
 
+i386 with a compiler defaulting to stdcall (which I admit is unlikely; it also
+would not work for TCG without modification).
 
-> ---
->  contrib/libvhost-user/libvhost-user.c | 45 +++++++++++++++++++++++++++++=
-++----
->  contrib/libvhost-user/libvhost-user.h |  3 +++
->  2 files changed, 44 insertions(+), 4 deletions(-)
->
-> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
-r/libvhost-user.c
-> index eb0ab9338c..0b563fc5ae 100644
-> --- a/contrib/libvhost-user/libvhost-user.c
-> +++ b/contrib/libvhost-user/libvhost-user.c
-> @@ -26,9 +26,20 @@
->  #include <sys/socket.h>
->  #include <sys/eventfd.h>
->  #include <sys/mman.h>
-> +#include "qemu/compiler.h"
-> +
-> +#if defined(__linux__)
-> +#include <sys/syscall.h>
-> +#include <fcntl.h>
-> +#include <sys/ioctl.h>
->  #include <linux/vhost.h>
->
-> -#include "qemu/compiler.h"
-> +#ifdef __NR_userfaultfd
-> +#include <linux/userfaultfd.h>
-> +#endif
-> +
-> +#endif
-> +
->  #include "qemu/atomic.h"
->
->  #include "libvhost-user.h"
-> @@ -888,11 +899,37 @@ vu_set_config(VuDev *dev, VhostUserMsg *vmsg)
->  static bool
->  vu_set_postcopy_advise(VuDev *dev, VhostUserMsg *vmsg)
->  {
-> -    /* TODO: Open ufd, pass it back in the request
-> -     * TODO: Add addresses
-> -     */
-> +    dev->postcopy_ufd =3D -1;
-> +#ifdef UFFDIO_API
-> +    struct uffdio_api api_struct;
-> +
-> +    dev->postcopy_ufd =3D syscall(__NR_userfaultfd, O_CLOEXEC | O_NONBLO=
-CK);
-> +    /* TODO: Add addresses */
->      vmsg->payload.u64 =3D 0xcafe;
->      vmsg->size =3D sizeof(vmsg->payload.u64);
-> +#endif
-> +
-> +    if (dev->postcopy_ufd =3D=3D -1) {
-> +        vu_panic(dev, "Userfaultfd not available: %s", strerror(errno));
-> +        goto out;
-> +    }
-> +
-> +#ifdef UFFDIO_API
-> +    api_struct.api =3D UFFD_API;
-> +    api_struct.features =3D 0;
-> +    if (ioctl(dev->postcopy_ufd, UFFDIO_API, &api_struct)) {
-> +        vu_panic(dev, "Failed UFFDIO_API: %s", strerror(errno));
-> +        close(dev->postcopy_ufd);
-> +        dev->postcopy_ufd =3D -1;
-> +        goto out;
-> +    }
-> +    /* TODO: Stash feature flags somewhere */
-> +#endif
-> +
-> +out:
-> +    /* Return a ufd to the QEMU */
-> +    vmsg->fd_num =3D 1;
-> +    vmsg->fds[0] =3D dev->postcopy_ufd;
->      return true; /* =3D send a reply */
->  }
->
-> diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
-r/libvhost-user.h
-> index 00d78a8810..074b7860f6 100644
-> --- a/contrib/libvhost-user/libvhost-user.h
-> +++ b/contrib/libvhost-user/libvhost-user.h
-> @@ -282,6 +282,9 @@ struct VuDev {
->       * re-initialize */
->      vu_panic_cb panic;
->      const VuDevIface *iface;
-> +
-> +    /* Postcopy data */
-> +    int postcopy_ufd;
->  };
->
->  typedef struct VuVirtqElement {
-> --
-> 2.14.3
->
->
+m68k (pointers passed in address registers; integrals passed in data registers).
 
 
-
---=20
-Marc-Andr=C3=A9 Lureau
+r~
