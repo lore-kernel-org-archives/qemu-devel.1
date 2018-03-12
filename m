@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evLqF-0004aa-PD
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:42:12 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evLrw-00060M-BU
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:43:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evLqE-0007OG-Pr
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:42:11 -0400
-Date: Mon, 12 Mar 2018 11:42:05 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180312114205.GK3493@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1evLrv-0001ds-E5
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:43:56 -0400
+Date: Mon, 12 Mar 2018 12:43:47 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180312114347.GA31537@localhost.localdomain>
 References: <20180309172713.26318-1-kwolf@redhat.com>
-	<20180309172713.26318-6-kwolf@redhat.com>
+	<20180309172713.26318-2-kwolf@redhat.com>
+	<20180312113526.GH3493@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20180309172713.26318-6-kwolf@redhat.com>
+In-Reply-To: <20180312113526.GH3493@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 5/6] luks: Catch integer overflow for huge
- sizes
+Subject: Re: [Qemu-devel] [PATCH 1/6] luks: Separate image file creation
+ from formatting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,47 +26,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
 Cc: qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-On Fri, Mar 09, 2018 at 06:27:12PM +0100, Kevin Wolf wrote:
-> When you request an image size close to UINT64_MAX, the addition of the
-> crypto header may cause an integer overflow. Catch it instead of
-> silently truncating the image size.
+Am 12.03.2018 um 12:35 hat Daniel P. Berrang=E9 geschrieben:
+> On Fri, Mar 09, 2018 at 06:27:08PM +0100, Kevin Wolf wrote:
+> > The crypto driver used to create the image file in a callback from th=
+e
+> > crypto subsystem. If we want to implement .bdrv_co_create, this needs=
+ to
+> > go away because that callback will get a reference to an already
+> > existing block node.
+> >=20
+> > Move the image file creation to block_crypto_create_generic().
+> >=20
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >  block/crypto.c | 37 +++++++++++++++++--------------------
+> >  1 file changed, 17 insertions(+), 20 deletions(-)
+> >=20
+> > diff --git a/block/crypto.c b/block/crypto.c
+> > index e6095e7807..77871640cc 100644
+> > --- a/block/crypto.c
+> > +++ b/block/crypto.c
+> > @@ -71,8 +71,6 @@ static ssize_t block_crypto_read_func(QCryptoBlock =
+*block,
+> > =20
+> > =20
+> >  struct BlockCryptoCreateData {
+> > -    const char *filename;
+> > -    QemuOpts *opts;
+> >      BlockBackend *blk;
+> >      uint64_t size;
+> >  };
+> > @@ -103,27 +101,13 @@ static ssize_t block_crypto_init_func(QCryptoBl=
+ock *block,
+> >                                        Error **errp)
+> >  {
+> >      struct BlockCryptoCreateData *data =3D opaque;
+> > -    int ret;
+> > =20
+> >      /* User provided size should reflect amount of space made
+> >       * available to the guest, so we must take account of that
+> >       * which will be used by the crypto header
+> >       */
+> > -    data->size +=3D headerlen;
+> > -
+> > -    qemu_opt_set_number(data->opts, BLOCK_OPT_SIZE, data->size, &err=
+or_abort);
+> > -    ret =3D bdrv_create_file(data->filename, data->opts, errp);
+> > -    if (ret < 0) {
+> > -        return -1;
+> > -    }
+> > -
+> > -    data->blk =3D blk_new_open(data->filename, NULL, NULL,
+> > -                             BDRV_O_RDWR | BDRV_O_PROTOCOL, errp);
+> > -    if (!data->blk) {
+> > -        return -1;
+> > -    }
+> > -
+> > -    return 0;
+> > +    return blk_truncate(data->blk, data->size + headerlen, PREALLOC_=
+MODE_OFF,
+> > +                        errp);
+> >  }
 >=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/crypto.c | 5 +++++
->  1 file changed, 5 insertions(+)
->=20
-> diff --git a/block/crypto.c b/block/crypto.c
-> index 4908d8627f..1b46519c53 100644
-> --- a/block/crypto.c
-> +++ b/block/crypto.c
-> @@ -102,6 +102,11 @@ static ssize_t block_crypto_init_func(QCryptoBlock=
- *block,
->  {
->      struct BlockCryptoCreateData *data =3D opaque;
-> =20
-> +    if (headerlen > UINT64_MAX - data->size) {
-> +        error_setg(errp, "The requested file size is too large");
-> +        return -EFBIG;
-> +    }
-> +
->      /* User provided size should reflect amount of space made
->       * available to the guest, so we must take account of that
->       * which will be used by the crypto header
+> I wonder if we should pass in the value of the PREALLOC_MODE from the
+> block_crypto_create_generic() function via BlockCryptoCreateData, so
+> that we honour it. By using PREALLOC_MODE_OFF here, all LUKS volumes
+> created with PREALLOC_MODE_FULL are going to have several MB of
+> unallocated extents at the end of the file.
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+That would be an easy way to implement preallocation support. But you
+can't create LUKS volumes with PREALLOC_MODE_FULL today because it
+doesn't support preallocation at all (there's no option for it in
+&block_crypto_create_opts_luks), so implementing that is matter for a
+different patch.
 
-(if using INT64_MAX as Eric suggests)
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Kevin
