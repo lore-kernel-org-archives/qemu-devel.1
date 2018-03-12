@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evR8x-00089N-3X
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:21:52 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1evR8y-0008CX-8w
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:21:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evR8v-0007c2-Q2
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:21:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56690 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1evR8x-0007cy-79
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:21:52 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36132 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evR8v-0007bo-Ka
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:21:49 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evR8x-0007cc-3B
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:21:51 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 46272401C9AE
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 17:21:49 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B896E8424C
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 17:21:50 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 12 Mar 2018 17:21:07 +0000
-Message-Id: <20180312172124.56461-13-dgilbert@redhat.com>
+Date: Mon, 12 Mar 2018 17:21:08 +0000
+Message-Id: <20180312172124.56461-14-dgilbert@redhat.com>
 In-Reply-To: <20180312172124.56461-1-dgilbert@redhat.com>
 References: <20180312172124.56461-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 12/29] postcopy+vhost-user: Split
- set_mem_table for postcopy
+Subject: [Qemu-devel] [PATCH v5 13/29] migration/ram:
+ ramblock_recv_bitmap_test_byte_offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,210 +38,50 @@ Cc: aarcange@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Split the set_mem_table routines in both qemu and libvhost-user
-because the postcopy versions are going to be quite different
-once changes in the later patches are added. However, this patch
-doesn't produce any functional change, just the split.
+Utility for testing the map when you already know the offset
+in the RAMBlock.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- contrib/libvhost-user/libvhost-user.c | 53 ++++++++++++++++++++++++
- hw/virtio/vhost-user.c                | 77 +++++++++++++++++++++++++++++=
-+++++-
- 2 files changed, 128 insertions(+), 2 deletions(-)
+ migration/ram.c | 5 +++++
+ migration/ram.h | 1 +
+ 2 files changed, 6 insertions(+)
 
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
-r/libvhost-user.c
-index e53b1953df..b2de8ed0a8 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -448,6 +448,55 @@ vu_reset_device_exec(VuDev *dev, VhostUserMsg *vmsg)
-     return false;
+diff --git a/migration/ram.c b/migration/ram.c
+index 7266351fd0..6ce7770b8c 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -169,6 +169,11 @@ int ramblock_recv_bitmap_test(RAMBlock *rb, void *ho=
+st_addr)
+                     rb->receivedmap);
  }
 =20
-+static bool
-+vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
++bool ramblock_recv_bitmap_test_byte_offset(RAMBlock *rb, uint64_t byte_o=
+ffset)
 +{
-+    int i;
-+    VhostUserMemory *memory =3D &vmsg->payload.memory;
-+    dev->nregions =3D memory->nregions;
-+    /* TODO: Postcopy specific code */
-+    DPRINT("Nregions: %d\n", memory->nregions);
-+    for (i =3D 0; i < dev->nregions; i++) {
-+        void *mmap_addr;
-+        VhostUserMemoryRegion *msg_region =3D &memory->regions[i];
-+        VuDevRegion *dev_region =3D &dev->regions[i];
-+
-+        DPRINT("Region %d\n", i);
-+        DPRINT("    guest_phys_addr: 0x%016"PRIx64"\n",
-+               msg_region->guest_phys_addr);
-+        DPRINT("    memory_size:     0x%016"PRIx64"\n",
-+               msg_region->memory_size);
-+        DPRINT("    userspace_addr   0x%016"PRIx64"\n",
-+               msg_region->userspace_addr);
-+        DPRINT("    mmap_offset      0x%016"PRIx64"\n",
-+               msg_region->mmap_offset);
-+
-+        dev_region->gpa =3D msg_region->guest_phys_addr;
-+        dev_region->size =3D msg_region->memory_size;
-+        dev_region->qva =3D msg_region->userspace_addr;
-+        dev_region->mmap_offset =3D msg_region->mmap_offset;
-+
-+        /* We don't use offset argument of mmap() since the
-+         * mapped address has to be page aligned, and we use huge
-+         * pages.  */
-+        mmap_addr =3D mmap(0, dev_region->size + dev_region->mmap_offset=
-,
-+                         PROT_READ | PROT_WRITE, MAP_SHARED,
-+                         vmsg->fds[i], 0);
-+
-+        if (mmap_addr =3D=3D MAP_FAILED) {
-+            vu_panic(dev, "region mmap error: %s", strerror(errno));
-+        } else {
-+            dev_region->mmap_addr =3D (uint64_t)(uintptr_t)mmap_addr;
-+            DPRINT("    mmap_addr:       0x%016"PRIx64"\n",
-+                   dev_region->mmap_addr);
-+        }
-+
-+        close(vmsg->fds[i]);
-+    }
-+
-+    return false;
++    return test_bit(byte_offset >> TARGET_PAGE_BITS, rb->receivedmap);
 +}
 +
- static bool
- vu_set_mem_table_exec(VuDev *dev, VhostUserMsg *vmsg)
+ void ramblock_recv_bitmap_set(RAMBlock *rb, void *host_addr)
  {
-@@ -464,6 +513,10 @@ vu_set_mem_table_exec(VuDev *dev, VhostUserMsg *vmsg=
-)
-     }
-     dev->nregions =3D memory->nregions;
+     set_bit_atomic(ramblock_recv_bitmap_offset(host_addr, rb), rb->recei=
+vedmap);
+diff --git a/migration/ram.h b/migration/ram.h
+index 53f0021c51..5030be110a 100644
+--- a/migration/ram.h
++++ b/migration/ram.h
+@@ -60,6 +60,7 @@ int ram_postcopy_incoming_init(MigrationIncomingState *=
+mis);
+ void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
 =20
-+    if (dev->postcopy_listening) {
-+        return vu_set_mem_table_exec_postcopy(dev, vmsg);
-+    }
-+
-     DPRINT("Nregions: %d\n", memory->nregions);
-     for (i =3D 0; i < dev->nregions; i++) {
-         void *mmap_addr;
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index c3ab2994fb..b6757ebae3 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -340,15 +340,86 @@ static int vhost_user_set_log_base(struct vhost_dev=
- *dev, uint64_t base,
-     return 0;
- }
+ int ramblock_recv_bitmap_test(RAMBlock *rb, void *host_addr);
++bool ramblock_recv_bitmap_test_byte_offset(RAMBlock *rb, uint64_t byte_o=
+ffset);
+ void ramblock_recv_bitmap_set(RAMBlock *rb, void *host_addr);
+ void ramblock_recv_bitmap_set_range(RAMBlock *rb, void *host_addr, size_=
+t nr);
 =20
-+static int vhost_user_set_mem_table_postcopy(struct vhost_dev *dev,
-+                                             struct vhost_memory *mem)
-+{
-+    int fds[VHOST_MEMORY_MAX_NREGIONS];
-+    int i, fd;
-+    size_t fd_num =3D 0;
-+    bool reply_supported =3D virtio_has_feature(dev->protocol_features,
-+                                              VHOST_USER_PROTOCOL_F_REPL=
-Y_ACK);
-+    /* TODO: Add actual postcopy differences */
-+    VhostUserMsg msg =3D {
-+        .hdr.request =3D VHOST_USER_SET_MEM_TABLE,
-+        .hdr.flags =3D VHOST_USER_VERSION,
-+    };
-+
-+    if (reply_supported) {
-+        msg.hdr.flags |=3D VHOST_USER_NEED_REPLY_MASK;
-+    }
-+
-+    for (i =3D 0; i < dev->mem->nregions; ++i) {
-+        struct vhost_memory_region *reg =3D dev->mem->regions + i;
-+        ram_addr_t offset;
-+        MemoryRegion *mr;
-+
-+        assert((uintptr_t)reg->userspace_addr =3D=3D reg->userspace_addr=
-);
-+        mr =3D memory_region_from_host((void *)(uintptr_t)reg->userspace=
-_addr,
-+                                     &offset);
-+        fd =3D memory_region_get_fd(mr);
-+        if (fd > 0) {
-+            msg.payload.memory.regions[fd_num].userspace_addr =3D
-+                reg->userspace_addr;
-+            msg.payload.memory.regions[fd_num].memory_size  =3D reg->mem=
-ory_size;
-+            msg.payload.memory.regions[fd_num].guest_phys_addr =3D
-+                reg->guest_phys_addr;
-+            msg.payload.memory.regions[fd_num].mmap_offset =3D offset;
-+            assert(fd_num < VHOST_MEMORY_MAX_NREGIONS);
-+            fds[fd_num++] =3D fd;
-+        }
-+    }
-+
-+    msg.payload.memory.nregions =3D fd_num;
-+
-+    if (!fd_num) {
-+        error_report("Failed initializing vhost-user memory map, "
-+                     "consider using -object memory-backend-file share=3D=
-on");
-+        return -1;
-+    }
-+
-+    msg.hdr.size =3D sizeof(msg.payload.memory.nregions);
-+    msg.hdr.size +=3D sizeof(msg.payload.memory.padding);
-+    msg.hdr.size +=3D fd_num * sizeof(VhostUserMemoryRegion);
-+
-+    if (vhost_user_write(dev, &msg, fds, fd_num) < 0) {
-+        return -1;
-+    }
-+
-+    if (reply_supported) {
-+        return process_message_reply(dev, &msg);
-+    }
-+
-+    return 0;
-+}
-+
- static int vhost_user_set_mem_table(struct vhost_dev *dev,
-                                     struct vhost_memory *mem)
- {
-+    struct vhost_user *u =3D dev->opaque;
-     int fds[VHOST_MEMORY_MAX_NREGIONS];
-     int i, fd;
-     size_t fd_num =3D 0;
-+    bool do_postcopy =3D u->postcopy_listen && u->postcopy_fd.handler;
-     bool reply_supported =3D virtio_has_feature(dev->protocol_features,
-                                               VHOST_USER_PROTOCOL_F_REPL=
-Y_ACK);
-=20
-+    if (do_postcopy) {
-+        /* Postcopy has enough differences that it's best done in it's o=
-wn
-+         * version
-+         */
-+        return vhost_user_set_mem_table_postcopy(dev, mem);
-+    }
-+
-     VhostUserMsg msg =3D {
-         .hdr.request =3D VHOST_USER_SET_MEM_TABLE,
-         .hdr.flags =3D VHOST_USER_VERSION,
-@@ -372,9 +443,11 @@ static int vhost_user_set_mem_table(struct vhost_dev=
- *dev,
-                 error_report("Failed preparing vhost-user memory table m=
-sg");
-                 return -1;
-             }
--            msg.payload.memory.regions[fd_num].userspace_addr =3D reg->u=
-serspace_addr;
-+            msg.payload.memory.regions[fd_num].userspace_addr =3D
-+                reg->userspace_addr;
-             msg.payload.memory.regions[fd_num].memory_size  =3D reg->mem=
-ory_size;
--            msg.payload.memory.regions[fd_num].guest_phys_addr =3D reg->=
-guest_phys_addr;
-+            msg.payload.memory.regions[fd_num].guest_phys_addr =3D
-+                reg->guest_phys_addr;
-             msg.payload.memory.regions[fd_num].mmap_offset =3D offset;
-             fds[fd_num++] =3D fd;
-         }
 --=20
 2.14.3
