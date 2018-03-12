@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evR9M-0000A4-Ni
+	(envelope-from <dgilbert@redhat.com>) id 1evR9I-000062-To
 	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:22:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evR9L-0007wC-Og
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:22:16 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38232 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1evR9H-0007u0-Oh
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:22:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47230 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evR9L-0007vv-Im
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:22:15 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evR9H-0007tk-JH
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:22:11 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 399E476FB9
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 17:22:15 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C5F3D406E97D
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 17:22:10 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 12 Mar 2018 17:21:24 +0000
-Message-Id: <20180312172124.56461-30-dgilbert@redhat.com>
+Date: Mon, 12 Mar 2018 17:21:21 +0000
+Message-Id: <20180312172124.56461-27-dgilbert@redhat.com>
 In-Reply-To: <20180312172124.56461-1-dgilbert@redhat.com>
 References: <20180312172124.56461-1-dgilbert@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 29/29] postcopy shared docs
+Subject: [Qemu-devel] [PATCH v5 26/29] vhost: Huge page align and merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,71 +34,121 @@ Cc: aarcange@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Add some notes to the migration documentation for shared memory
-postcopy.
+Align RAMBlocks to page size alignment, and adjust the merging code
+to deal with partial overlap due to that alignment.
+
+This is needed for postcopy so that we can place/fetch whole hugepages
+when under userfault.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- docs/devel/migration.rst | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ hw/virtio/trace-events |  3 ++-
+ hw/virtio/vhost.c      | 66 ++++++++++++++++++++++++++++++++++++++++++--------
+ 2 files changed, 58 insertions(+), 11 deletions(-)
 
-diff --git a/docs/devel/migration.rst b/docs/devel/migration.rst
-index 9d1b7657f0..e32b087f6e 100644
---- a/docs/devel/migration.rst
-+++ b/docs/devel/migration.rst
-@@ -577,3 +577,44 @@ Postcopy now works with hugetlbfs backed memory:
-      hugepages works well, however 1GB hugepages are likely to be proble=
-matic
-      since it takes ~1 second to transfer a 1GB hugepage across a 10Gbps=
- link,
-      and until the full page is transferred the destination thread is bl=
-ocked.
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 857c495e65..1422ff03ab 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -3,7 +3,8 @@
+ # hw/virtio/vhost.c
+ vhost_commit(bool started, bool changed) "Started: %d Changed: %d"
+ vhost_region_add_section(const char *name, uint64_t gpa, uint64_t size, uint64_t host) "%s: 0x%"PRIx64"+0x%"PRIx64" @ 0x%"PRIx64
+-vhost_region_add_section_abut(const char *name, uint64_t new_size) "%s: 0x%"PRIx64
++vhost_region_add_section_merge(const char *name, uint64_t new_size, uint64_t gpa, uint64_t owr) "%s: size: 0x%"PRIx64 " gpa: 0x%"PRIx64 " owr: 0x%"PRIx64
++vhost_region_add_section_aligned(const char *name, uint64_t gpa, uint64_t size, uint64_t host) "%s: 0x%"PRIx64"+0x%"PRIx64" @ 0x%"PRIx64
+ vhost_section(const char *name, int r) "%s:%d"
+ 
+ # hw/virtio/vhost-user.c
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index d8d0ef92e1..250f886acb 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -522,10 +522,28 @@ static void vhost_region_add_section(struct vhost_dev *dev,
+     uint64_t mrs_gpa = section->offset_within_address_space;
+     uintptr_t mrs_host = (uintptr_t)memory_region_get_ram_ptr(section->mr) +
+                          section->offset_within_region;
++    RAMBlock *mrs_rb = section->mr->ram_block;
++    size_t mrs_page = qemu_ram_pagesize(mrs_rb);
+ 
+     trace_vhost_region_add_section(section->mr->name, mrs_gpa, mrs_size,
+                                    mrs_host);
+ 
++    /* Round the section to it's page size */
++    /* First align the start down to a page boundary */
++    uint64_t alignage = mrs_host & (mrs_page - 1);
++    if (alignage) {
++        mrs_host -= alignage;
++        mrs_size += alignage;
++        mrs_gpa  -= alignage;
++    }
++    /* Now align the size up to a page boundary */
++    alignage = mrs_size & (mrs_page - 1);
++    if (alignage) {
++        mrs_size += mrs_page - alignage;
++    }
++    trace_vhost_region_add_section_aligned(section->mr->name, mrs_gpa, mrs_size,
++                                           mrs_host);
 +
-+Postcopy with shared memory
-+---------------------------
+     if (dev->n_tmp_sections) {
+         /* Since we already have at least one section, lets see if
+          * this extends it; since we're scanning in order, we only
+@@ -542,18 +560,46 @@ static void vhost_region_add_section(struct vhost_dev *dev,
+                         prev_sec->offset_within_region;
+         uint64_t prev_host_end   = range_get_last(prev_host_start, prev_size);
+ 
+-        if (prev_gpa_end + 1 == mrs_gpa &&
+-            prev_host_end + 1 == mrs_host &&
+-            section->mr == prev_sec->mr &&
+-            (!dev->vhost_ops->vhost_backend_can_merge ||
+-                dev->vhost_ops->vhost_backend_can_merge(dev,
++        if (mrs_gpa <= (prev_gpa_end + 1)) {
++            /* OK, looks like overlapping/intersecting - it's possible that
++             * the rounding to page sizes has made them overlap, but they should
++             * match up in the same RAMBlock if they do.
++             */
++            if (mrs_gpa < prev_gpa_start) {
++                error_report("%s:Section rounded to %"PRIx64
++                             " prior to previous %"PRIx64,
++                             __func__, mrs_gpa, prev_gpa_start);
++                /* A way to cleanly fail here would be better */
++                return;
++            }
++            /* Offset from the start of the previous GPA to this GPA */
++            size_t offset = mrs_gpa - prev_gpa_start;
 +
-+Postcopy migration with shared memory needs explicit support from the ot=
-her
-+processes that share memory and from QEMU. There are restrictions on the=
- type of
-+memory that userfault can support shared.
-+
-+The Linux kernel userfault support works on `/dev/shm` memory and on `hu=
-getlbfs`
-+(although the kernel doesn't provide an equivalent to `madvise(MADV_DONT=
-NEED)`
-+for hugetlbfs which may be a problem in some configurations).
-+
-+The vhost-user code in QEMU supports clients that have Postcopy support,
-+and the `vhost-user-bridge` (in `tests/`) and the DPDK package have chan=
-ges
-+to support postcopy.
-+
-+The client needs to open a userfaultfd and register the areas
-+of memory that it maps with userfault.  The client must then pass the
-+userfaultfd back to QEMU together with a mapping table that allows
-+fault addresses in the clients address space to be converted back to
-+RAMBlock/offsets.  The client's userfaultfd is added to the postcopy
-+fault-thread and page requests are made on behalf of the client by QEMU.
-+QEMU performs 'wake' operations on the client's userfaultfd to allow it
-+to continue after a page has arrived.
-+
-+.. note::
-+  There are two future improvements that would be nice:
-+    a) Some way to make QEMU ignorant of the addresses in the clients
-+       address space
-+    b) Avoiding the need for QEMU to perform ufd-wake calls after the
-+       pages have arrived
-+
-+Retro-fitting postcopy to existing clients is possible:
-+  a) A mechanism is needed for the registration with userfault as above,
-+     and the registration needs to be coordinated with the phases of
-+     postcopy.  In vhost-user extra messages are added to the existing
-+     control channel.
-+  b) Any thread that can block due to guest memory accesses must be
-+     identified and the implication understood; for example if the
-+     guest memory access is made while holding a lock then all other
-+     threads waiting for that lock will also be blocked.
---=20
++            if (prev_host_start + offset == mrs_host &&
++                section->mr == prev_sec->mr &&
++                (!dev->vhost_ops->vhost_backend_can_merge ||
++                 dev->vhost_ops->vhost_backend_can_merge(dev,
+                     mrs_host, mrs_size,
+                     prev_host_start, prev_size))) {
+-            /* The two sections abut */
+-            need_add = false;
+-            prev_sec->size = int128_add(prev_sec->size, section->size);
+-            trace_vhost_region_add_section_abut(section->mr->name,
+-                                                mrs_size + prev_size);
++                uint64_t max_end = MAX(prev_host_end, mrs_host + mrs_size);
++                need_add = false;
++                prev_sec->offset_within_address_space =
++                    MIN(prev_gpa_start, mrs_gpa);
++                prev_sec->offset_within_region =
++                    MIN(prev_host_start, mrs_host) -
++                    (uintptr_t)memory_region_get_ram_ptr(prev_sec->mr);
++                prev_sec->size = int128_make64(max_end - MIN(prev_host_start,
++                                               mrs_host));
++                trace_vhost_region_add_section_merge(section->mr->name,
++                                        int128_get64(prev_sec->size),
++                                        prev_sec->offset_within_address_space,
++                                        prev_sec->offset_within_region);
++            } else {
++                error_report("%s: Overlapping but not coherent sections "
++                             "at %"PRIx64,
++                             __func__, mrs_gpa);
++                return;
++            }
+         }
+     }
+ 
+-- 
 2.14.3
