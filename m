@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1evJQt-00031c-U0
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:07:52 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1evJR8-0003AE-3S
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:08:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1evJQo-00058a-Rx
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:07:51 -0400
-Received: from mga04.intel.com ([192.55.52.120]:26985)
+	(envelope-from <pbonzini@redhat.com>) id 1evJR3-0005hO-1t
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:08:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47048 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
-	id 1evJQo-00054G-Is
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:07:46 -0400
-From: "Kang, Luwei" <luwei.kang@intel.com>
-Date: Mon, 12 Mar 2018 09:07:41 +0000
-Message-ID: <82D7661F83C1A047AF7DC287873BF1E167EF4877@SHSMSX101.ccr.corp.intel.com>
-References: <1520182116-16485-1-git-send-email-luwei.kang@intel.com>
-	<20180309191048.GA28578@localhost.localdomain>
-In-Reply-To: <20180309191048.GA28578@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1evJR2-0005b7-To
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:08:00 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1CF128D6D7
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 09:07:55 +0000 (UTC)
+References: <1520839658-20499-1-git-send-email-thuth@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2a85941f-48bf-9e9b-0d6d-832a270d882b@redhat.com>
+Date: Mon, 12 Mar 2018 10:07:43 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 1/2] i386: Add Intel Processor Trace
- feature support
+In-Reply-To: <1520839658-20499-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-doc: Rework the network options
+ chapter to make "-net" less prominent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +34,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mtosatti@redhat.com" <mtosatti@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
 
-> > +
-> > +        if (!eax_0 ||
-> > +           ((ebx_0 & INTEL_PT_MINIMAL_EBX) !=3D INTEL_PT_MINIMAL_EBX) =
-||
-> > +           ((ecx_0 & INTEL_PT_MINIMAL_ECX) !=3D INTEL_PT_MINIMAL_ECX) =
-||
-> > +           ((eax_1 & INTEL_PT_MTC_BITMAP) !=3D INTEL_PT_MTC_BITMAP) ||
-> > +           ((eax_1 & INTEL_PT_ADDR_RANGES_NUM_MASK) <
-> > +                                           INTEL_PT_ADDR_RANGES_NUM) |=
-|
-> > +           ((ebx_1 & (INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP)) !=
-=3D
-> > +                (INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP))) {
+On 12/03/2018 08:27, Thomas Huth wrote:
+> "-net" is clearly a legacy option. Yet we still use it in almost all
+> examples in the qemu documentation, and many other spots in the network
+> chapter. We should make it less prominent that users are not lured into
+> using it so often anymore. So instead of starting the network chapter w=
+ith
+> "-net nic" and documenting "-net <backend>" below "-netdev <backend>"
+> everywhere, all the "-net" related documentation is now moved to the en=
+d
+> of the chapter. The new "--nic" option is moved to the beginning of the
+> chapter instead, with a new example that should demonstrate how "--nic"
+> can be used to shortcut "--device" with "--netdev". The examples in thi=
+s
+> chapter are changed to use the "--device" and "--netdev" options or
+> "--nic" instead of "-net nic -net <backend>".
 >=20
-> I still don't see a check to ensure the host has bit 31 on ecx_0 set to 0=
-, as I mentioned when reviewing v3.
+> While we're at it, also remove a legacy remark about very old Linux
+> distributions. Also remove the "[...]" from the examples in this chapte=
+r
+> since we are not using this ellipsis in any other examples in our docu-
+> mentation.
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  v2:
+>  - Fixed the bad "--device=3De1000" example
 
-Hi Eduardo,
-    Thanks for the code review. I don't quite understand here why bit31 mus=
-t same with host (meaning we must reject a host
-where ecx_0 & (1 << 31) is set).
-    Do you mean PT must be disabled in guest when host bit31 is set?=20
-    Bit 31: If 1, generated packets which contain IP payloads have LIP valu=
-es, which include the CS base component.
-    I can't find any special on this bit. Could you help clarify?
+Frankly I think this is the proof that double-dash option names are a
+bad idea.  The reason to do that was to make qemu-img and qemu command
+lines more similar in the documentation, but the truth is they are not
+similar and shouldn't be made similar.  The equal sign is one example,
+where qemu-img supports "--format=3Draw" but QEMU doesn't support
+"--device=3De1000", but it's not the only one.
 
-Thanks,
-Luwei Kang
+qemu-img supports things such as "-fraw", qemu doesn't---for example
+"-m1024" doesn't work).  qemu-img can combine single-letter options
+(e.g. "qemu-img convert -pc") but qemu cannot---e.g. "-sm" doesn't
+combine "-s" and "-m".
 
->=20
-> The rest of the patch looks good.
->=20
-> > +            /*
-> > +             * Processor Trace capabilities aren't configurable, so if=
- the
-> > +             * host can't emulate the capabilities we report on
-> > +             * cpu_x86_cpuid(), intel-pt can't be enabled on the curre=
-nt host.
-> > +             */
-> > +            env->features[FEAT_7_0_EBX] &=3D ~CPUID_7_0_EBX_INTEL_PT;
-> > +            cpu->filtered_features[FEAT_7_0_EBX] |=3D CPUID_7_0_EBX_IN=
-TEL_PT;
-> > +            rv =3D 1;
-> > +        }
-> > +    }
-> > +
-> >      return rv;
-> >  }
-> >
-> [...]
->=20
-> --
-> Eduardo
+No need to drop them in QEMU, since it's more or less just a convenience
+for people that are used to double-dash long options, but using them in
+the documentation is confusing.
+
+Paolo
+
+>  - Fixed some typos discovered by Eric
+>  - Use --nic in even more examples (Paolo)
+>  - Improved patch description
+>  - Use single dash only in @findex tags (the appendix with the index lo=
+oks
+>    strange otherwise)
