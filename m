@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52259)
+Received: from eggs.gnu.org ([208.118.235.92]:52868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evPva-0007X4-IT
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:03:59 -0400
+	(envelope-from <berrange@redhat.com>) id 1evPyG-0000zs-Ig
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:06:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evPvZ-0003gj-IM
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:03:58 -0400
-Date: Mon, 12 Mar 2018 16:03:46 +0000
+	(envelope-from <berrange@redhat.com>) id 1evPyF-0005c3-H3
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:06:44 -0400
+Date: Mon, 12 Mar 2018 16:06:26 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180312160346.GH3493@redhat.com>
+Message-ID: <20180312160626.GI3493@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20180312150218.1314-1-kwolf@redhat.com>
-	<20180312150218.1314-5-kwolf@redhat.com>
+	<20180312150218.1314-7-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180312150218.1314-5-kwolf@redhat.com>
+In-Reply-To: <20180312150218.1314-7-kwolf@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] luks: Turn invalid assertion into
- check
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] qemu-iotests: Test luks QMP image
+ creation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,24 +29,19 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Kevin Wolf <kwolf@redhat.com>
 Cc: qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-On Mon, Mar 12, 2018 at 04:02:16PM +0100, Kevin Wolf wrote:
-> The .bdrv_getlength implementation of the crypto block driver asserted
-> that the payload offset isn't after EOF. This is an invalid assertion t=
-o
-> make as the image file could be corrupted. Instead, check it and return
-> -EIO if the file is too small for the payload offset.
->=20
-> Zero length images are fine, so trigger -EIO only on offset > len, not
-> on offset >=3D len as the assertion did before.
->=20
+On Mon, Mar 12, 2018 at 04:02:18PM +0100, Kevin Wolf wrote:
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  block/crypto.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-
+>  tests/qemu-iotests/209       | 210 +++++++++++++++++++++++++++++++++++=
+++++++++
+>  tests/qemu-iotests/209.out   | 136 ++++++++++++++++++++++++++++
+>  tests/qemu-iotests/common.rc |   2 +-
+>  tests/qemu-iotests/group     |   1 +
+>  4 files changed, 348 insertions(+), 1 deletion(-)
+>  create mode 100755 tests/qemu-iotests/209
+>  create mode 100644 tests/qemu-iotests/209.out
 
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-
 
 Regards,
 Daniel
