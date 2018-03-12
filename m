@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1evRDx-0004ia-Me
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:27:02 -0400
+	(envelope-from <famz@redhat.com>) id 1evRE3-0004na-6v
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:27:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1evRDu-00026C-Ef
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:27:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59988 helo=mx1.redhat.com)
+	(envelope-from <famz@redhat.com>) id 1evRDz-00028q-Eq
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:27:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38380 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1evRDu-000260-AB
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:26:58 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1evRDz-00028g-AH
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:27:03 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Tue, 13 Mar 2018 01:26:40 +0800
-Message-Id: <20180312172640.15647-2-famz@redhat.com>
-In-Reply-To: <20180312172640.15647-1-famz@redhat.com>
-References: <20180312172640.15647-1-famz@redhat.com>
+Date: Tue, 13 Mar 2018 01:26:39 +0800
+Message-Id: <20180312172640.15647-1-famz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/1] tests: make docker-test-debug@fedora run
- sanitizers
+Subject: [Qemu-devel] [PULL 0/1] Docker patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +27,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+The following changes since commit b16a54da0696efc5d91b6c3597a37a317abb5d=
+e7:
 
-Since --enable-debug no longer enable sanitizers, we need explicit
---enable-sanitizers.
+  Merge remote-tracking branch 'remotes/kraxel/tags/ui-20180312-pull-requ=
+est' into staging (2018-03-12 14:06:23 +0000)
 
-llvm package is required for llvm-symbolizer, to get symbols in
-backtraces.
+are available in the Git repository at:
 
-Add make V=3D1 to get details about failing tests.
+  git://github.com/famz/qemu.git tags/staging-pull-request
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20180312120849.20073-1-marcandre.lureau@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
+for you to fetch changes up to 02f769b7ee72aa962ee22de64c14414298237da5:
+
+  tests: make docker-test-debug@fedora run sanitizers (2018-03-13 01:19:5=
+6 +0800)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+
+Marc-Andr=C3=A9 Lureau (1):
+  tests: make docker-test-debug@fedora run sanitizers
+
  tests/docker/dockerfiles/fedora.docker | 2 +-
  tests/docker/test-debug                | 6 +++---
  2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/docker=
-files/fedora.docker
-index 994a35a332..a00004319e 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -2,7 +2,7 @@ FROM fedora:27
- ENV PACKAGES \
-     ccache gettext git tar PyYAML sparse flex bison python3 bzip2 hostna=
-me \
-     glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
--    gcc gcc-c++ clang make perl which bc findutils libaio-devel \
-+    gcc gcc-c++ llvm clang make perl which bc findutils libaio-devel \
-     nettle-devel libasan libubsan \
-     mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-con=
-fig \
-     mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libt=
-asn1 \
-diff --git a/tests/docker/test-debug b/tests/docker/test-debug
-index d020b06917..d3f9f70d01 100755
---- a/tests/docker/test-debug
-+++ b/tests/docker/test-debug
-@@ -1,6 +1,6 @@
- #!/bin/bash -e
- #
--# Compile and check with clang & --enable-debug.
-+# Compile and check with clang & --enable-debug --enable-sanitizers.
- #
- # Copyright (c) 2016-2018 Red Hat Inc.
- #
-@@ -19,8 +19,8 @@ requires clang asan
- cd "$BUILD_DIR"
-=20
- OPTS=3D"--cxx=3Dclang++ --cc=3Dclang --host-cc=3Dclang"
--OPTS=3D"--enable-debug $OPTS"
-+OPTS=3D"--enable-debug --enable-sanitizers $OPTS"
-=20
- build_qemu $OPTS
--make $MAKEFLAGS check
-+make $MAKEFLAGS V=3D1 check
- install_qemu
 --=20
 2.14.3
