@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1evQUs-0007en-A6
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:40:27 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1evQX7-0000OZ-Iw
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:42:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1evQUr-0005NP-DH
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:40:26 -0400
-References: <20180309214611.19122-1-kwolf@redhat.com>
-	<20180309214611.19122-2-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <dc941df3-64cf-d798-7003-852efa8e0e4a@redhat.com>
-Date: Mon, 12 Mar 2018 17:40:08 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1evQX3-00074R-ED
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:42:45 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46326 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evQX3-000744-96
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:42:41 -0400
+Date: Mon, 12 Mar 2018 16:42:30 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180312164230.GM3219@work-vm>
+References: <20180216131625.9639-1-dgilbert@redhat.com>
+	<20180216131625.9639-20-dgilbert@redhat.com>
+	<CAJ+F1CJr-HJ2CDCNkYSRvUZebyqJVX=KUMj0V1iXQ-==h6CeYQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180309214611.19122-2-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="C2H222jsrYEO5kHql7NXiTIO4e12XGN1A"
-Subject: Re: [Qemu-devel] [PATCH 1/7] parallels: Support .bdrv_co_create
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CJr-HJ2CDCNkYSRvUZebyqJVX=KUMj0V1iXQ-==h6CeYQ@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 19/29] postcopy: wake shared
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,97 +29,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: den@openvz.org, jcody@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, Peter Xu <peterx@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---C2H222jsrYEO5kHql7NXiTIO4e12XGN1A
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: den@openvz.org, jcody@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
-Message-ID: <dc941df3-64cf-d798-7003-852efa8e0e4a@redhat.com>
-Subject: Re: [PATCH 1/7] parallels: Support .bdrv_co_create
-References: <20180309214611.19122-1-kwolf@redhat.com>
- <20180309214611.19122-2-kwolf@redhat.com>
-In-Reply-To: <20180309214611.19122-2-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-03-09 22:46, Kevin Wolf wrote:
-> This adds the .bdrv_co_create driver callback to parallels, which
-> enables image creation over QMP.
+* Marc-Andr=E9 Lureau (marcandre.lureau@gmail.com) wrote:
+> Hi
 >=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  qapi/block-core.json |  18 ++++-
->  block/parallels.c    | 199 ++++++++++++++++++++++++++++++++++++++-----=
---------
->  2 files changed, 168 insertions(+), 49 deletions(-)
+> On Fri, Feb 16, 2018 at 2:16 PM, Dr. David Alan Gilbert (git)
+> <dgilbert@redhat.com> wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> >
+> > Send a 'wake' request on a userfaultfd for a shared process.
+> > The address in the clients address space is specified together
+> > with the RAMBlock it was resolved to.
+> >
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>=20
+> Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
 
-[...]
+Thanks.
 
-> diff --git a/block/parallels.c b/block/parallels.c
-> index c13cb619e6..2da5e56a9d 100644
-> --- a/block/parallels.c
-> +++ b/block/parallels.c
+>=20
+> > ---
+> >  migration/postcopy-ram.c | 26 ++++++++++++++++++++++++++
+> >  migration/postcopy-ram.h |  6 ++++++
+> >  migration/trace-events   |  1 +
+> >  3 files changed, 33 insertions(+)
+> >
+> > diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> > index 277ff749a0..67deae7e1c 100644
+> > --- a/migration/postcopy-ram.c
+> > +++ b/migration/postcopy-ram.c
+> > @@ -534,6 +534,25 @@ static int ram_block_enable_notify(const char *b=
+lock_name, void *host_addr,
+> >      return 0;
+> >  }
+> >
+> > +int postcopy_wake_shared(struct PostCopyFD *pcfd,
+> > +                         uint64_t client_addr,
+> > +                         RAMBlock *rb)
+> > +{
+> > +    size_t pagesize =3D qemu_ram_pagesize(rb);
+> > +    struct uffdio_range range;
+> > +    int ret;
+> > +    trace_postcopy_wake_shared(client_addr, qemu_ram_get_idstr(rb));
+> > +    range.start =3D client_addr & ~(pagesize - 1);
+> > +    range.len =3D pagesize;
+> > +    ret =3D ioctl(pcfd->fd, UFFDIO_WAKE, &range);
+> > +    if (ret) {
+> > +        error_report("%s: Failed to wake: %zx in %s (%s)",
+> > +                     __func__, (size_t)client_addr, qemu_ram_get_ids=
+tr(rb),
+> > +                     strerror(errno));
+> > +    }
+> > +    return ret;
+> > +}
+> > +
+> >  /*
+> >   * Callback from shared fault handlers to ask for a page,
+> >   * the page must be specified by a RAMBlock and an offset in that rb
+> > @@ -951,6 +970,13 @@ void *postcopy_get_tmp_page(MigrationIncomingSta=
+te *mis)
+> >      return NULL;
+> >  }
+> >
+> > +int postcopy_wake_shared(struct PostCopyFD *pcfd,
+> > +                         uint64_t client_addr,
+> > +                         RAMBlock *rb)
+> > +{
+> > +    assert(0);
+> > +    return -1;
+> > +}
+> >  #endif
+> >
+> >  /* -----------------------------------------------------------------=
+-------- */
+> > diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+> > index 4c63f20df4..2e3dd844d5 100644
+> > --- a/migration/postcopy-ram.h
+> > +++ b/migration/postcopy-ram.h
+> > @@ -162,6 +162,12 @@ struct PostCopyFD {
+> >   */
+> >  void postcopy_register_shared_ufd(struct PostCopyFD *pcfd);
+> >  void postcopy_unregister_shared_ufd(struct PostCopyFD *pcfd);
+> > +/* Notify a client ufd that a page is available
+> > + * Note: The 'client_address' is in the address space of the client
+> > + * program not QEMU
+> > + */
+>=20
+> Any reason not to follow the classic function declaration / API
+> documentation style:
+> /**
+>  * func:
+>  * @arg: blah
+>  *
+>  * Lorem ipsum...
+>  */
+>=20
+> (future documentation tooling will hopefully parse it etc)
 
-[...]
+I've added it; it's not something I generally do except for big external
+interfaces.
 
-> @@ -542,24 +580,107 @@ static int coroutine_fn parallels_co_create_opts=
-(const char *filename,
+Dave
 
-[...]
-
-> +static int coroutine_fn parallels_co_create_opts(const char *filename,=
-
-> +                                                 QemuOpts *opts,
-> +                                                 Error **errp)
-> +{
-
-[...]
-
-> +    /* Now get the QAPI type BlockdevCreateOptions */
-> +    qdict_put_str(qdict, "driver", "parallels");
-> +    qdict_put_str(qdict, "file", bs->node_name);
-> +
-> +    qobj =3D qdict_crumple(qdict, errp);
-
-Any reason for this crumpling other than because it doesn't change
-anything and if it did, it would be for the better?
-
-The rest looks OK to me, and I just think this creates an exact copy of
-qdict, so I guess:
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-> +    QDECREF(qdict);
-> +    qdict =3D qobject_to_qdict(qobj);
-> +    if (qdict =3D=3D NULL) {
-> +        ret =3D -EINVAL;
-> +        goto done;
-> +    }
-> +
-> +    v =3D qobject_input_visitor_new_keyval(QOBJECT(qdict));
-> +    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_=
-err);
-> +    visit_free(v);
-
-
---C2H222jsrYEO5kHql7NXiTIO4e12XGN1A
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqmrWgSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AcYYH/iJcZlbaZ4XGPmzWbMUPpO7fBOFacFOW
-azTZdUfDNCOGzKcc7Bjhd51y8+BUyELok6BxnqtNmpvr3IMGVT8phnCZn3pBAvrj
-/LeEirtYIJFGPEOgZ5l6mYF9OINjtp8dnSGhjY6pLLUhnegDIri2JZzEgiZi9jIF
-xG4NUHJ7hq1rZUnkP/Tfn42UMlBspPdva+4kdndP1yj8vfe225yCNHZBOJMNjvRC
-ZopoQsPolZ5xKsB/rPqBnzluQijI4Rww8GEUy/2bqqb+TROav3nAtCllOAIDTniY
-f3mMuW9gl1HvF3jsiX99V10c60oGGjL0288kJ1LpM0HMbfmRQ4B8xQk=
-=CWXJ
------END PGP SIGNATURE-----
-
---C2H222jsrYEO5kHql7NXiTIO4e12XGN1A--
+>=20
+> > +int postcopy_wake_shared(struct PostCopyFD *pcfd, uint64_t client_ad=
+dr,
+> > +                         RAMBlock *rb);
+> >  /* Callback from shared fault handlers to ask for a page */
+> >  int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *=
+rb,
+> >                                   uint64_t client_addr, uint64_t offs=
+et);
+> > diff --git a/migration/trace-events b/migration/trace-events
+> > index 7c910b5479..b0acaaa8a0 100644
+> > --- a/migration/trace-events
+> > +++ b/migration/trace-events
+> > @@ -199,6 +199,7 @@ postcopy_ram_incoming_cleanup_entry(void) ""
+> >  postcopy_ram_incoming_cleanup_exit(void) ""
+> >  postcopy_ram_incoming_cleanup_join(void) ""
+> >  postcopy_request_shared_page(const char *sharer, const char *rb, uin=
+t64_t rb_offset) "for %s in %s offset 0x%"PRIx64
+> > +postcopy_wake_shared(uint64_t client_addr, const char *rb) "at 0x%"P=
+RIx64" in %s"
+> >
+> >  save_xbzrle_page_skipping(void) ""
+> >  save_xbzrle_page_overflow(void) ""
+> > --
+> > 2.14.3
+> >
+> >
+>=20
+>=20
+>=20
+> --=20
+> Marc-Andr=E9 Lureau
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
