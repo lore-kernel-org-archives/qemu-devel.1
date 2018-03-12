@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1evVfU-0000ao-M6
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 18:11:45 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1evVfW-0000cI-H3
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 18:11:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1evVfT-0002Ch-Si
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 18:11:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59938)
+	(envelope-from <ehabkost@redhat.com>) id 1evVfV-0002DP-LF
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 18:11:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44862)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1evVfT-0002C5-N0
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 18:11:43 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1evVfV-0002DF-Fs
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 18:11:45 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 12 Mar 2018 19:11:31 -0300
-Message-Id: <20180312221132.14141-4-ehabkost@redhat.com>
+Date: Mon, 12 Mar 2018 19:11:32 -0300
+Message-Id: <20180312221132.14141-5-ehabkost@redhat.com>
 In-Reply-To: <20180312221132.14141-1-ehabkost@redhat.com>
 References: <20180312221132.14141-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 3/4] qmp.py: Encode json data before sending
+Subject: [Qemu-devel] [PULL 4/4] device-crash-test: Use 'python' binary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +29,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Cc: Cleber Rosa <crosa@redhat.com>
 
-On Python 3, json.dumps() return a str object, which can't be
-sent directly through a socket and must be encoded into a bytes
-object.  Use .encode('utf-8'), which will work on both Python 2
-and Python 3.
+Now the script works with Python 3, so we can use the 'python'
+binary provided by the system.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20180312185503.5746-3-ehabkost@redhat.com>
+Message-Id: <20180312185503.5746-4-ehabkost@redhat.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/qmp/qmp.py | 2 +-
+ scripts/device-crash-test | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
-index 07c9632e9e..5c8cf6a056 100644
---- a/scripts/qmp/qmp.py
-+++ b/scripts/qmp/qmp.py
-@@ -166,7 +166,7 @@ class QEMUMonitorProtocol(object):
-         """
-         self.logger.debug(">>> %s", qmp_cmd)
-         try:
--            self.__sock.sendall(json.dumps(qmp_cmd))
-+            self.__sock.sendall(json.dumps(qmp_cmd).encode('utf-8'))
-         except socket.error as err:
-             if err[0] =3D=3D errno.EPIPE:
-                 return
+diff --git a/scripts/device-crash-test b/scripts/device-crash-test
+index 7443d0f2c5..f04f34924e 100755
+--- a/scripts/device-crash-test
++++ b/scripts/device-crash-test
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python2.7
++#!/usr/bin/env python
+ #
+ #  Copyright (c) 2017 Red Hat Inc
+ #
 --=20
 2.14.3
