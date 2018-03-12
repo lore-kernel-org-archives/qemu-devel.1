@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1evK2z-0000ad-93
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:47:14 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1evK46-0001B4-HD
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:48:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1evK2w-0001D5-2Q
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:47:13 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33924 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1evK2v-0001B6-SC
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:47:09 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 23D744000B6E
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 09:47:09 +0000 (UTC)
-Date: Mon, 12 Mar 2018 17:47:02 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180312094702.GB11787@xz-mi>
-References: <20180308195811.24894-1-dgilbert@redhat.com>
-	<20180308195811.24894-11-dgilbert@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1evK45-0003VR-LC
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:48:22 -0400
+References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
+	<1518702707-7077-7-git-send-email-vsementsov@virtuozzo.com>
+	<b570a199-9139-5652-5ad8-407820680620@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <5794d630-c4ba-a691-60a1-6e568e9663e8@virtuozzo.com>
+Date: Mon, 12 Mar 2018 12:48:07 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180308195811.24894-11-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 10/29] vhost+postcopy: Register shared
- ufd with postcopy
+In-Reply-To: <b570a199-9139-5652-5ad8-407820680620@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 6/9] nbd: BLOCK_STATUS for standard
+ get_block_status function: client part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,18 +26,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, maxime.coquelin@redhat.com, marcandre.lureau@redhat.com, quintela@redhat.com, aarcange@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On Thu, Mar 08, 2018 at 07:57:52PM +0000, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Register the UFD that comes in as the response to the 'advise' method
-> with the postcopy code.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+16.02.2018 23:40, Eric Blake wrote:
+> On 02/15/2018 07:51 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Minimal realization: only one extent in server answer is supported.
+>> Flag NBD_CMD_FLAG_REQ_ONE is used to force this behavior.
+>>
+>> Tests 140, 147 and 205 are fixed due to now server failed on searching
+>> export in context of NBD_OPT_SET_META_CONTEXT option negotiation.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+[...]
 
--- 
-Peter Xu
+>> =C2=A0 void nbd_client_detach_aio_context(BlockDriverState *bs)
+>> =C2=A0 {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 NBDClientSession *client =3D nbd_get_clie=
+nt_session(bs);
+>> @@ -828,6 +966,7 @@ int nbd_client_init(BlockDriverState *bs,
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 client->info.request_sizes =3D tru=
+e;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 client->info.structured_reply =3D true;
+>> +=C2=A0=C2=A0=C2=A0 client->info.base_allocation =3D true;
+>
+> Hmm - the combination structured_reply =3D false and base_allocation =3D=
+=20
+> true is bogus.=C2=A0 Then again, these two fields are in-out; left false=
+=20
+> when handing over to the kernel NBD transmission phase (since the=20
+> kernel module does not yet support structured replies let alone block=20
+> status), and true when requested with qemu as the transmission driver=20
+> (since we want to use it if available).=C2=A0 I don't know if having a=20
+> single tri-state enum is any better than two bools (on input, it is=20
+> either all-or-none; on output, it is either none (old server),=20
+> structured reads only (qemu 2.11 server, for example), or all (this=20
+> series' server).
+>
+
+
+ohh, sorry for replying in so many emails.
+
+about this: I'd prefer to leave it as is, and rethink (if needed) when=20
+implementing dirty-bitmaps context, because it's now obvious now, how it=20
+will be refactored for dirty bitmaps.
+
+
+
+--=20
+Best regards,
+Vladimir
