@@ -1,16 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evSJU-0000hy-Oh
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:50 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evSJT-0005xp-KR
+	(envelope-from <eblake@redhat.com>) id 1evSJT-0000g9-D6
 	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:48 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <eblake@redhat.com>) id 1evSJS-0005wr-6a
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38326 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1evSJS-0005wF-0j
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:46 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 718338D6D7
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 18:36:45 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 12 Mar 2018 13:36:01 -0500
-Message-Id: <20180312183628.394722-11-eblake@redhat.com>
+Date: Mon, 12 Mar 2018 13:36:04 -0500
+Message-Id: <20180312183628.394722-14-eblake@redhat.com>
 In-Reply-To: <20180312183628.394722-1-eblake@redhat.com>
 References: <20180312183628.394722-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 10/36] block: Handle null backing link
+Subject: [Qemu-devel] [PULL 13/36] qobject: introduce qstring_get_try_str()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,132 +30,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
+Cc: Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-From: Max Reitz <mreitz@redhat.com>
+From: Peter Xu <peterx@redhat.com>
 
-Instead of converting all "backing": null instances into "backing": "",
-handle a null value directly in bdrv_open_inherit().
+The only difference from qstring_get_str() is that it allows the qstring
+to be NULL.  If so, NULL is returned.
 
-This enables explicitly null backing links for json:{} filenames.
-
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Message-Id: <20180224154033.29559-7-mreitz@redhat.com>
+CC: Eric Blake <eblake@redhat.com>
+CC: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-[eblake: rebase to qobject_to() parameter order and qapi headers split]
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20180309090006.10018-3-peterx@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- block.c                    |  5 ++++-
- blockdev.c                 | 14 --------------
- tests/qemu-iotests/089     | 20 ++++++++++++++++++++
- tests/qemu-iotests/089.out |  8 ++++++++
- 4 files changed, 32 insertions(+), 15 deletions(-)
+ include/qapi/qmp/qstring.h |  1 +
+ qobject/qstring.c          | 10 ++++++++++
+ 2 files changed, 11 insertions(+)
 
-diff --git a/block.c b/block.c
-index cd74da3a601..b673a004daf 100644
---- a/block.c
-+++ b/block.c
-@@ -33,6 +33,7 @@
- #include "qapi/error.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qjson.h"
-+#include "qapi/qmp/qnull.h"
- #include "qapi/qmp/qstring.h"
- #include "qapi/qobject-output-visitor.h"
- #include "qapi/qapi-visit-block-core.h"
-@@ -2645,7 +2646,9 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+diff --git a/include/qapi/qmp/qstring.h b/include/qapi/qmp/qstring.h
+index b72843fc1b0..38c680b7185 100644
+--- a/include/qapi/qmp/qstring.h
++++ b/include/qapi/qmp/qstring.h
+@@ -27,6 +27,7 @@ QString *qstring_from_str(const char *str);
+ QString *qstring_from_substr(const char *str, int start, int end);
+ size_t qstring_get_length(const QString *qstring);
+ const char *qstring_get_str(const QString *qstring);
++const char *qstring_get_try_str(const QString *qstring);
+ void qstring_append_int(QString *qstring, int64_t value);
+ void qstring_append(QString *qstring, const char *str);
+ void qstring_append_chr(QString *qstring, int c);
+diff --git a/qobject/qstring.c b/qobject/qstring.c
+index 8bae529ef79..5777f0af231 100644
+--- a/qobject/qstring.c
++++ b/qobject/qstring.c
+@@ -116,6 +116,16 @@ const char *qstring_get_str(const QString *qstring)
+     return qstring->string;
+ }
 
-     /* See cautionary note on accessing @options above */
-     backing = qdict_get_try_str(options, "backing");
--    if (backing && *backing == '\0') {
-+    if (qobject_to(QNull, qdict_get(options, "backing")) != NULL ||
-+        (backing && *backing == '\0'))
-+    {
-         flags |= BDRV_O_NO_BACKING;
-         qdict_del(options, "backing");
-     }
-diff --git a/blockdev.c b/blockdev.c
-index c9a212b3149..6a751996022 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3973,7 +3973,6 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
-     QObject *obj;
-     Visitor *v = qobject_output_visitor_new(&obj);
-     QDict *qdict;
--    const QDictEntry *ent;
-     Error *local_err = NULL;
-
-     visit_type_BlockdevOptions(v, NULL, &options, &local_err);
-@@ -3987,19 +3986,6 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
-
-     qdict_flatten(qdict);
-
--    /*
--     * Rewrite "backing": null to "backing": ""
--     * TODO Rewrite "" to null instead, and perhaps not even here
--     */
--    for (ent = qdict_first(qdict); ent; ent = qdict_next(qdict, ent)) {
--        char *dot = strrchr(ent->key, '.');
--
--        if (!strcmp(dot ? dot + 1 : ent->key, "backing")
--            && qobject_type(ent->value) == QTYPE_QNULL) {
--            qdict_put(qdict, ent->key, qstring_new());
--        }
--    }
--
-     if (!qdict_get_try_str(qdict, "node-name")) {
-         error_setg(errp, "'node-name' must be specified for the root node");
-         goto fail;
-diff --git a/tests/qemu-iotests/089 b/tests/qemu-iotests/089
-index 0b059aba905..aa1ba4a98e7 100755
---- a/tests/qemu-iotests/089
-+++ b/tests/qemu-iotests/089
-@@ -82,6 +82,26 @@ $QEMU_IO_PROG --cache $CACHEMODE \
- $QEMU_IO -c 'read -P 42 0 512' "$TEST_IMG" | _filter_qemu_io
-
-
-+echo
-+echo "=== Testing correct handling of 'backing':null ==="
-+echo
++/**
++ * qstring_get_try_str(): Return a pointer to the stored string
++ *
++ * NOTE: will return NULL if qstring is not provided.
++ */
++const char *qstring_get_try_str(const QString *qstring)
++{
++    return qstring ? qstring_get_str(qstring) : NULL;
++}
 +
-+_make_test_img -b "$TEST_IMG.base" $IMG_SIZE
-+
-+# This should read 42
-+$QEMU_IO -c 'read -P 42 0 512' "$TEST_IMG" | _filter_qemu_io
-+
-+# This should read 0
-+$QEMU_IO -c 'read -P 0 0 512' "json:{\
-+    'driver': '$IMGFMT',
-+    'file': {
-+        'driver': 'file',
-+        'filename': '$TEST_IMG'
-+    },
-+    'backing': null
-+}" | _filter_qemu_io
-+
-+
- # Taken from test 071
- echo
- echo "=== Testing blkdebug ==="
-diff --git a/tests/qemu-iotests/089.out b/tests/qemu-iotests/089.out
-index 0bf5a13ec18..89e3e4340a4 100644
---- a/tests/qemu-iotests/089.out
-+++ b/tests/qemu-iotests/089.out
-@@ -19,6 +19,14 @@ Pattern verification failed at offset 0, 512 bytes
- read 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-
-+=== Testing correct handling of 'backing':null ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base
-+read 512/512 bytes at offset 0
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 0
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
- === Testing blkdebug ===
-
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ /**
+  * qstring_is_equal(): Test whether the two QStrings are equal
+  */
 -- 
 2.14.3
