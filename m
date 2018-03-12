@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1evRLS-00031r-Gg
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:34:48 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1evRMs-0004P7-Hm
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:36:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1evRLP-0007EV-Bx
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:34:46 -0400
-Resent-Message-Id: <E1evRLP-0007EV-Bx@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21033)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1evRLP-0007Av-5S
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:34:43 -0400
-In-Reply-To: <1520568765-58189-1-git-send-email-mjc@sifive.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152087604767.39.15065188404026172544@71c20359a636>
+	(envelope-from <dgilbert@redhat.com>) id 1evRMr-0008NP-Gh
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:36:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60170 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evRMr-0008My-7N
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:36:13 -0400
+Date: Mon, 12 Mar 2018 17:36:09 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180312173609.GV3219@work-vm>
+References: <20180309091535.13315-1-peterx@redhat.com>
+	<20180309091535.13315-23-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 12 Mar 2018 10:34:08 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 00/23] RISC-V Post-merge spec
- conformance and cleanup
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180309091535.13315-23-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 22/23] migration/qmp: add command
+ migrate-pause
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,105 +28,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mjc@sifive.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kbastian@mail.uni-paderborn.de, palmer@sifive.com, sagark@eecs.berkeley.edu, pbonzini@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MjA1Njg3NjUtNTgxODktMS1naXQtc2VuZC1lbWFpbC1tamNAc2lmaXZlLmNv
-bQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyIDAwLzIzXSBSSVNDLVYgUG9zdC1tZXJn
-ZSBzcGVjIGNvbmZvcm1hbmNlIGFuZCBjbGVhbnVwCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
-CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
-U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
-PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
-aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
-LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
-YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
-ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
-RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
-NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVw
-ZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzE1MjA1MzA3NTctNDQ3Ny0xLWdpdC1zZW5kLWVtYWls
-LWlhbi5qYWNrc29uQGV1LmNpdHJpeC5jb20gLT4gcGF0Y2hldy8xNTIwNTMwNzU3LTQ0NzctMS1n
-aXQtc2VuZC1lbWFpbC1pYW4uamFja3NvbkBldS5jaXRyaXguY29tCiAqIFtuZXcgdGFnXSAgICAg
-ICAgICAgICAgIHBhdGNoZXcvMTUyMDU2ODc2NS01ODE4OS0xLWdpdC1zZW5kLWVtYWlsLW1qY0Bz
-aWZpdmUuY29tIC0+IHBhdGNoZXcvMTUyMDU2ODc2NS01ODE4OS0xLWdpdC1zZW5kLWVtYWlsLW1q
-Y0BzaWZpdmUuY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxODAyMjgw
-NzI1NTguNzQzNC0xLWhhb3pob25nLnpoYW5nQGludGVsLmNvbSAtPiBwYXRjaGV3LzIwMTgwMjI4
-MDcyNTU4Ljc0MzQtMS1oYW96aG9uZy56aGFuZ0BpbnRlbC5jb20KIHQgW3RhZyB1cGRhdGVdICAg
-ICAgICAgICAgcGF0Y2hldy8yMDE4MDIyODA5MzIzMi4yNDg1NC0xLXBib256aW5pQHJlZGhhdC5j
-b20gLT4gcGF0Y2hldy8yMDE4MDIyODA5MzIzMi4yNDg1NC0xLXBib256aW5pQHJlZGhhdC5jb20K
-IHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDMwNjIwMzEwMy4yNTU2My0x
-LW1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrIC0+IHBhdGNoZXcvMjAxODAzMDYyMDMxMDMu
-MjU1NjMtMS1tYXJrLmNhdmUtYXlsYW5kQGlsYW5kZS5jby51awogdCBbdGFnIHVwZGF0ZV0gICAg
-ICAgICAgICBwYXRjaGV3LzIwMTgwMzA4MTg0NjM2LjE3ODUzNC0xLXZzZW1lbnRzb3ZAdmlydHVv
-enpvLmNvbSAtPiBwYXRjaGV3LzIwMTgwMzA4MTg0NjM2LjE3ODUzNC0xLXZzZW1lbnRzb3ZAdmly
-dHVvenpvLmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwMzA4MTk1
-ODExLjI0ODk0LTEtZGdpbGJlcnRAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwMzA4MTk1ODEx
-LjI0ODk0LTEtZGdpbGJlcnRAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
-c3QnCjFhMDkzZmEzMTIgUklTQy1WOiBDb252ZXJ0IGNwdSBkZWZpbml0aW9uIHRvd2FyZHMgZnV0
-dXJlIG1vZGVsCjYwZjI4NWFiOGQgUklTQy1WOiBSZW1vdmUgc3VwcG9ydCBmb3IgYWRob2MgWF9D
-T1AgaW50ZXJydXB0CjUzMzUxMWZiZmIgUklTQy1WOiBObyB0cmFwcyBvbiB3cml0ZXMgdG8gbWlz
-YSwgbWluc3RyZXQsIG1jeWNsZQozOTViNWZmNWRmIFJJU0MtVjogdmVjdG9yZWQgdHJhcHMgYXJl
-IG9wdGlvbmFsCjAxZjI1MGVjMTMgUklTQy1WOiByaXNjdi1xZW11IHBvcnQgc3VwcG9ydHMgc3Yz
-OSBhbmQgc3Y0OAo3MjhhMzFmOWJhIFJJU0MtVjogUmVtb3ZlIGJyYWNlcyBmcm9tIHNhdHAgY2Fz
-ZSBzdGF0ZW1lbnQKMWVlYTEwNmMzZCBSSVNDLVY6IEhhcmR3aXJlIHNhdHAgdG8gMCBmb3Igbm8t
-bW11IGNhc2UKNjYyNGIzMzBmOCBSSVNDLVY6IFJlbW92ZSBFTV9SSVNDViBFTEZfTUFDSElORSBp
-bmRpcmVjdGlvbgowYzQxYjdjNjNlIFJJU0MtVjogVXNlIG1lbW9yeV9yZWdpb25faXNfcmFtIGlu
-IHB0ZSB1cGRhdGUKMzE0MDRlYzA0MyBSSVNDLVY6IE1ha2UgdmlydCBoZWFkZXIgY29tbWVudCB0
-aXRsZSBjb25zaXN0ZW50CjhjMmQyNTBmZDQgUklTQy1WOiBNYWtlIHNvbWUgaGVhZGVyIGd1YXJk
-cyBtb3JlIHNwZWNpZmljCmJjYTA2ZDg2NjcgUklTQy1WOiBVcGRhdGUgRSBvcmRlciBhbmQgSSBl
-eHRlbnNpb24gb3JkZXIKMzExZjU2OWUxYSBSSVNDLVY6IEltcHJvdmUgcGFnZSB0YWJsZSB3YWxr
-ZXIgc3BlYyBjb21wbGlhbmNlCjBlM2EwOGYwMmYgUklTQy1WOiBIb2xkIHJjdV9yZWFkX2xvY2sg
-d2hlbiBhY2Nlc3NpbmcgbWVtb3J5CmY0YjU2YjY2MDMgUklTQy1WOiBJbmNsdWRlIGludHJ1Y3Rp
-b24gaGV4IGluIGRpc2Fzc2VtYmx5CjI1MmM1YTdiM2YgUklTQy1WOiBNYWtlIHN1cmUgcm9tIGhh
-cyBzcGFjZSBmb3IgZmR0CjA3YzFmOGJjMDUgUklTQy1WOiBSZW1vdmUgdW51c2VkIGNsYXNzIGRl
-ZmluaXRpb25zCmI1NWJmMTM2ZWEgUklTQy1WOiBNYXJrIFJPTSByZWFkLW9ubHkgYWZ0ZXIgY29w
-eWluZyBpbiBjb2RlCjY4ZGI2MmU1YWUgUklTQy1WOiBSZW1vdmUgaWRlbnRpdHlfdHJhbnNsYXRl
-IGZyb20gbG9hZF9lbGYKMDg5YzAwMmExNiBSSVNDLVY6IFVzZSBST00gYmFzZSBhZGRyZXNzIGFu
-ZCBzaXplIGZyb20gbWVtbWFwCjU2MGI4ZTMzMjcgUklTQy1WOiBNYWtlIHZpcnQgYm9hcmQgZGVz
-Y3JpcHRpb24gbWF0Y2ggc3Bpa2UKZTdhZjVmMTAyYyBSSVNDLVY6IFJlcGxhY2UgaGFyZGNvZGVk
-IGNvbnN0YW50cyB3aXRoIGVudW0gdmFsdWVzCjlmNTAzOGJiN2IgUklTQy1WOiBNYWtlIHZpcnQg
-Y3JlYXRlX2ZkdCBpbnRlcmZhY2UgY29uc2lzdGVudAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hl
-Y2tpbmcgUEFUQ0ggMS8yMzogUklTQy1WOiBNYWtlIHZpcnQgY3JlYXRlX2ZkdCBpbnRlcmZhY2Ug
-Y29uc2lzdGVudC4uLgpDaGVja2luZyBQQVRDSCAyLzIzOiBSSVNDLVY6IFJlcGxhY2UgaGFyZGNv
-ZGVkIGNvbnN0YW50cyB3aXRoIGVudW0gdmFsdWVzLi4uCkNoZWNraW5nIFBBVENIIDMvMjM6IFJJ
-U0MtVjogTWFrZSB2aXJ0IGJvYXJkIGRlc2NyaXB0aW9uIG1hdGNoIHNwaWtlLi4uCkNoZWNraW5n
-IFBBVENIIDQvMjM6IFJJU0MtVjogVXNlIFJPTSBiYXNlIGFkZHJlc3MgYW5kIHNpemUgZnJvbSBt
-ZW1tYXAuLi4KQ2hlY2tpbmcgUEFUQ0ggNS8yMzogUklTQy1WOiBSZW1vdmUgaWRlbnRpdHlfdHJh
-bnNsYXRlIGZyb20gbG9hZF9lbGYuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8yMzogUklTQy1WOiBNYXJr
-IFJPTSByZWFkLW9ubHkgYWZ0ZXIgY29weWluZyBpbiBjb2RlLi4uCkNoZWNraW5nIFBBVENIIDcv
-MjM6IFJJU0MtVjogUmVtb3ZlIHVudXNlZCBjbGFzcyBkZWZpbml0aW9ucy4uLgpDaGVja2luZyBQ
-QVRDSCA4LzIzOiBSSVNDLVY6IE1ha2Ugc3VyZSByb20gaGFzIHNwYWNlIGZvciBmZHQuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggOS8yMzogUklTQy1WOiBJbmNsdWRlIGludHJ1Y3Rpb24gaGV4IGluIGRpc2Fz
-c2VtYmx5Li4uCkNoZWNraW5nIFBBVENIIDEwLzIzOiBSSVNDLVY6IEhvbGQgcmN1X3JlYWRfbG9j
-ayB3aGVuIGFjY2Vzc2luZyBtZW1vcnkuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMjM6IFJJU0MtVjog
-SW1wcm92ZSBwYWdlIHRhYmxlIHdhbGtlciBzcGVjIGNvbXBsaWFuY2UuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMTIvMjM6IFJJU0MtVjogVXBkYXRlIEUgb3JkZXIgYW5kIEkgZXh0ZW5zaW9uIG9yZGVyLi4u
-CkNoZWNraW5nIFBBVENIIDEzLzIzOiBSSVNDLVY6IE1ha2Ugc29tZSBoZWFkZXIgZ3VhcmRzIG1v
-cmUgc3BlY2lmaWMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvMjM6IFJJU0MtVjogTWFrZSB2aXJ0IGhl
-YWRlciBjb21tZW50IHRpdGxlIGNvbnNpc3RlbnQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvMjM6IFJJ
-U0MtVjogVXNlIG1lbW9yeV9yZWdpb25faXNfcmFtIGluIHB0ZSB1cGRhdGUuLi4KQ2hlY2tpbmcg
-UEFUQ0ggMTYvMjM6IFJJU0MtVjogUmVtb3ZlIEVNX1JJU0NWIEVMRl9NQUNISU5FIGluZGlyZWN0
-aW9uLi4uCkNoZWNraW5nIFBBVENIIDE3LzIzOiBSSVNDLVY6IEhhcmR3aXJlIHNhdHAgdG8gMCBm
-b3Igbm8tbW11IGNhc2UuLi4KQ2hlY2tpbmcgUEFUQ0ggMTgvMjM6IFJJU0MtVjogUmVtb3ZlIGJy
-YWNlcyBmcm9tIHNhdHAgY2FzZSBzdGF0ZW1lbnQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTkvMjM6IFJJ
-U0MtVjogcmlzY3YtcWVtdSBwb3J0IHN1cHBvcnRzIHN2MzkgYW5kIHN2NDguLi4KQ2hlY2tpbmcg
-UEFUQ0ggMjAvMjM6IFJJU0MtVjogdmVjdG9yZWQgdHJhcHMgYXJlIG9wdGlvbmFsLi4uCkVSUk9S
-OiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMyNzogRklMRTogdGFyZ2V0L3Jpc2N2L29wX2hlbHBlci5j
-OjI2NToKKyAgICAgICAgLyogd2UgZG8gbm90IHN1cHBvcnQgdmVjdG9yZWQgdHJhcHMgZm9yIGFz
-eW5jaHJvdW5vdXMgaW50ZXJydXB0cyAqLyAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQoj
-NDI6IEZJTEU6IHRhcmdldC9yaXNjdi9vcF9oZWxwZXIuYzoyODY6CisgICAgICAgIC8qIHdlIGRv
-IG5vdCBzdXBwb3J0IHZlY3RvcmVkIHRyYXBzIGZvciBhc3luY2hyb3Vub3VzIGludGVycnVwdHMg
-Ki8gJAoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAyOCBsaW5lcyBjaGVja2VkCgpZb3Vy
-IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyMS8yMzog
-UklTQy1WOiBObyB0cmFwcyBvbiB3cml0ZXMgdG8gbWlzYSwgbWluc3RyZXQsIG1jeWNsZS4uLgpD
-aGVja2luZyBQQVRDSCAyMi8yMzogUklTQy1WOiBSZW1vdmUgc3VwcG9ydCBmb3IgYWRob2MgWF9D
-T1AgaW50ZXJydXB0Li4uCkNoZWNraW5nIFBBVENIIDIzLzIzOiBSSVNDLVY6IENvbnZlcnQgY3B1
-IGRlZmluaXRpb24gdG93YXJkcyBmdXR1cmUgbW9kZWwuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpU
-ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
-b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
-eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+* Peter Xu (peterx@redhat.com) wrote:
+> It pauses an ongoing migration.  Currently it only supports postcopy.
+> Note that this command will work on either side of the migration.
+> Basically when we trigger this on one side, it'll interrupt the other
+> side as well since the other side will get notified on the disconnect
+> event.
+> 
+> However, it's still possible that the other side is not notified, for
+> example, when the network is totally broken, or due to some firewall
+> configuration changes.  In that case, we will also need to run the same
+> command on the other side so both sides will go into the paused state.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  migration/migration.c | 27 +++++++++++++++++++++++++++
+>  qapi/migration.json   | 16 ++++++++++++++++
+>  2 files changed, 43 insertions(+)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 180552329c..f31fcbb0d5 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1448,6 +1448,33 @@ void qmp_migrate_recover(const char *uri, Error **errp)
+>      qemu_start_incoming_migration(uri, errp);
+>  }
+>  
+> +void qmp_migrate_pause(Error **errp)
+> +{
+> +    MigrationState *ms = migrate_get_current();
+> +    MigrationIncomingState *mis = migration_incoming_get_current();
+> +    int ret;
+> +
+> +    if (ms->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
+> +        /* Source side, during postcopy */
+> +        ret = qemu_file_shutdown(ms->to_dst_file);
+
+How did this fix the race I mentioned last time?
+
+Dave
+
+> +        if (ret) {
+> +            error_setg(errp, "Failed to pause source migration");
+> +        }
+> +        return;
+> +    }
+> +
+> +    if (mis->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
+> +        ret = qemu_file_shutdown(mis->from_src_file);
+> +        if (ret) {
+> +            error_setg(errp, "Failed to pause destination migration");
+> +        }
+> +        return;
+> +    }
+> +
+> +    error_setg(errp, "migrate-pause is currently only supported "
+> +               "during postcopy-active state");
+> +}
+> +
+>  bool migration_is_blocked(Error **errp)
+>  {
+>      if (qemu_savevm_state_blocked(errp)) {
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index 451d8c572b..b8827d5ace 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -1194,3 +1194,19 @@
+>  ##
+>  { 'command': 'migrate-recover', 'data': { 'uri': 'str' },
+>    'allow-oob': true }
+> +
+> +##
+> +# @migrate-pause:
+> +#
+> +# Pause a migration.  Currently it only supports postcopy.
+> +#
+> +# Returns: nothing.
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "migrate-pause" }
+> +# <- { "return": {} }
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'command': 'migrate-pause', 'allow-oob': true }
+> -- 
+> 2.14.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
