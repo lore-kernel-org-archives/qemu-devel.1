@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1evGpu-0005V7-Uu
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 02:21:31 -0400
+	(envelope-from <bounces@canonical.com>) id 1evHIL-0001Ik-3P
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 02:50:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1evGpr-0002V4-RF
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 02:21:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38684 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1evGpr-0002U2-ND
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 02:21:27 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0C931401C9AE
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 06:21:24 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b3bc46ce-ac1a-c146-76a1-5019e6c914bd@redhat.com>
-Date: Mon, 12 Mar 2018 07:21:16 +0100
+	(envelope-from <bounces@canonical.com>) id 1evHII-00015V-17
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 02:50:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39654)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1evHIH-00015E-Qf
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 02:50:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1evHIG-0007V5-3k
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 06:50:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1B7532E80CE
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 06:50:48 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] BiteSIzeTasks
+Date: Mon, 12 Mar 2018 06:42:05 -0000
+From: Thomas Huth <1753437@bugs.launchpad.net>
+Reply-To: Bug 1753437 <1753437@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152024589806.7327.9844777027357521578.malonedeb@gac.canonical.com>
+Message-Id: <152083692535.7345.10962252346599581806.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1753437] Re: qemu/pc-bios/s390-ccw/libc.c:82: bad
+ test ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,23 +37,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
 
- Hi all,
+Looks like the mailing list <-> launchpad bridge again ignored mails to the=
+ corresponding mailing list thread. It's not a real bug, see here for detai=
+ls:
+https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg01142.html
+I'll try to remember to clean this up the next time we update the s390-ccw =
+bios.
 
-it's great that we have https://wiki.qemu.org/BiteSizedTasks - but
-apparently some tasks are apparently described a little bit too
-scarcely. Many newcomers seem to have problems understanding the tasks
-that are mentioned here. To improve the experience of people willing to
-contribute to QEMU a little bit, may I ask everybody who put a task on
-that page to have another look at it, and if a task is written without a
-good description, please rephrase it a little bit?
-I think it would be also good to have a contact person related to each
-task. I've added my contact information ("THH" + description at the
-bottom of the page) to the tasks that I put on the list. So I'd like to
-ask everybody else who put a task on that list to put their contact
-information next to their tasks, too.
+** Changed in: qemu
+     Assignee: (unassigned) =3D> Thomas Huth (th-huth)
 
- Thanks,
-  Thomas
+** Changed in: qemu
+   Importance: Undecided =3D> Low
+
+** Changed in: qemu
+       Status: New =3D> Confirmed
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1753437
+
+Title:
+  qemu/pc-bios/s390-ccw/libc.c:82: bad test ?
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  qemu/pc-bios/s390-ccw/libc.c:82]: (style) Unsigned variable 'num_idx'
+  can't be negative so it is unnecessary to test it.
+
+  Source code is
+
+  =
+
+      while (num_idx >=3D 0) {
+
+  but
+
+      size_t num_idx =3D 1; /* account for NUL */
+
+  So there is no escape from the while loop.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1753437/+subscriptions
