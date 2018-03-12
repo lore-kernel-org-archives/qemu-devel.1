@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1evKZv-00063o-KS
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 06:21:16 -0400
+	(envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1evKkI-0004Mj-9c
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 06:31:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1evKZs-000639-EQ
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 06:21:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49256 helo=mx1.redhat.com)
+	(envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1evKkF-0003aa-CI
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 06:31:58 -0400
+Received: from smtp1.lauterbach.com ([62.154.241.196]:38619)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1evKZs-00062F-97
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 06:21:12 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6282A8D6D7
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 10:21:08 +0000 (UTC)
-Date: Mon, 12 Mar 2018 18:20:59 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180312102059.GD11787@xz-mi>
-References: <20180308195811.24894-1-dgilbert@redhat.com>
-	<20180308195811.24894-15-dgilbert@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180308195811.24894-15-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 14/29] libvhost-user+postcopy: Register
- new regions with the ufd
+	(Exim 4.71) (envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1evKkF-00034V-2j
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 06:31:55 -0400
+Received: from unknown (HELO localhost.localdomain)
+	(Authenticated_SSL:abouassida@[41.224.44.126])
+	(envelope-sender <abdallah.bouassida@lauterbach.com>)
+	by smtp1.lauterbach.com (qmail-ldap-1.03) with ECDHE-RSA-AES256-SHA
+	encrypted SMTP
+	for <qemu-devel@nongnu.org>; 12 Mar 2018 10:31:37 -0000
+From: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+Date: Mon, 12 Mar 2018 11:31:27 +0100
+Message-Id: <1520850690-23245-2-git-send-email-abdallah.bouassida@lauterbach.com>
+In-Reply-To: <1520850690-23245-1-git-send-email-abdallah.bouassida@lauterbach.com>
+References: <1520850690-23245-1-git-send-email-abdallah.bouassida@lauterbach.com>
+Subject: [Qemu-devel] [PATCH v4 1/4] target/arm: Add "ARM_CP_NO_GDB" as a
+ new bit field for ARMCPRegInfo type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,88 +33,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, maxime.coquelin@redhat.com, marcandre.lureau@redhat.com, quintela@redhat.com, aarcange@redhat.com
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: qemu-arm@nongnu.org, khaled.jmal@lauterbach.com, Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
 
-On Thu, Mar 08, 2018 at 07:57:56PM +0000, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> When new regions are sent to the client using SET_MEM_TABLE, register
-> them with the userfaultfd.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  contrib/libvhost-user/libvhost-user.c | 34 ++++++++++++++++++++++++++++++++++
->  1 file changed, 34 insertions(+)
-> 
-> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-> index 4922b2c722..a18bc74a7c 100644
-> --- a/contrib/libvhost-user/libvhost-user.c
-> +++ b/contrib/libvhost-user/libvhost-user.c
-> @@ -494,6 +494,40 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
->          close(vmsg->fds[i]);
->      }
->  
-> +    /* TODO: Get address back to QEMU */
-> +    for (i = 0; i < dev->nregions; i++) {
-> +        VuDevRegion *dev_region = &dev->regions[i];
-> +#ifdef UFFDIO_REGISTER
-> +        /* We should already have an open ufd. Mark each memory
-> +         * range as ufd.
-> +         * Note: Do we need any madvises? Well it's not been accessed
-> +         * yet, still probably need no THP to be safe, discard to be safe?
-> +         */
-> +        struct uffdio_register reg_struct;
-> +        reg_struct.range.start = (uintptr_t)dev_region->mmap_addr;
-> +        reg_struct.range.len = dev_region->size + dev_region->mmap_offset;
+This is a preparation for the coming feature of creating dynamically an XML
+description for the ARM sysregs.
+A register has ARM_CP_NO_GDB enabled will not be shown in the dynamic XML.
+This bit is enabled automatically when creating CP_ANY wildcard aliases.
+This bit could be enabled manually for any register we want to remove from the
+dynamic XML description.
 
-Do we really care the page faults between offset zero to mmap_offset?
-I'm thinking whether we should add that mmap_offset into range.start
-instead of range.len.
+Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/cpu.h    | 3 ++-
+ target/arm/helper.c | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-Also, I see that in current vu_set_mem_table_exec():
-
-        /* We don't use offset argument of mmap() since the
-         * mapped address has to be page aligned, and we use huge
-         * pages.  */
-        mmap_addr = mmap(0, dev_region->size + dev_region->mmap_offset,
-                         PROT_READ | PROT_WRITE, MAP_SHARED,
-                         vmsg->fds[i], 0);
-
-So adding the mmap_offset will help to make sure we'll use huge pages?
-Could it?  Or say, how could we be sure that size+mmap_offset would be
-page aligned?
-
-Thanks,
-
-> +        reg_struct.mode = UFFDIO_REGISTER_MODE_MISSING;
-> +
-> +        if (ioctl(dev->postcopy_ufd, UFFDIO_REGISTER, &reg_struct)) {
-> +            vu_panic(dev, "%s: Failed to userfault region %d "
-> +                          "@%p + size:%zx offset: %zx: (ufd=%d)%s\n",
-> +                     __func__, i,
-> +                     dev_region->mmap_addr,
-> +                     dev_region->size, dev_region->mmap_offset,
-> +                     dev->postcopy_ufd, strerror(errno));
-> +            return false;
-> +        }
-> +        if (!(reg_struct.ioctls & ((__u64)1 << _UFFDIO_COPY))) {
-> +            vu_panic(dev, "%s Region (%d) doesn't support COPY",
-> +                     __func__, i);
-> +            return false;
-> +        }
-> +        DPRINT("%s: region %d: Registered userfault for %llx + %llx\n",
-> +                __func__, i, reg_struct.range.start, reg_struct.range.len);
-> +        /* TODO: Stash 'zero' support flags somewhere */
-> +#endif
-> +    }
-> +
->      return false;
->  }
->  
-> -- 
-> 2.14.3
-> 
-
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 2b97408..818a98a 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1796,10 +1796,11 @@ static inline uint64_t cpreg_to_kvm_id(uint32_t cpregid)
+ #define ARM_LAST_SPECIAL         ARM_CP_DC_ZVA
+ #define ARM_CP_FPU               0x1000
+ #define ARM_CP_SVE               0x2000
++#define ARM_CP_NO_GDB            0x4000
+ /* Used only as a terminator for ARMCPRegInfo lists */
+ #define ARM_CP_SENTINEL          0xffff
+ /* Mask of only the flag bits in a type field */
+-#define ARM_CP_FLAG_MASK         0x30ff
++#define ARM_CP_FLAG_MASK         0x70ff
+ 
+ /* Valid values for ARMCPRegInfo state field, indicating which of
+  * the AArch32 and AArch64 execution states this register is visible in.
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index c82f63d..c5d62c8 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -5663,7 +5663,7 @@ static void add_cpreg_to_hashtable(ARMCPU *cpu, const ARMCPRegInfo *r,
+     if (((r->crm == CP_ANY) && crm != 0) ||
+         ((r->opc1 == CP_ANY) && opc1 != 0) ||
+         ((r->opc2 == CP_ANY) && opc2 != 0)) {
+-        r2->type |= ARM_CP_ALIAS;
++        r2->type |= ARM_CP_ALIAS | ARM_CP_NO_GDB;
+     }
+ 
+     /* Check that raw accesses are either forbidden or handled. Note that
 -- 
-Peter Xu
+2.7.4
