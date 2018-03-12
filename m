@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evM6a-0005Za-6Y
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:59:05 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1evM7T-0006JA-4e
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 08:00:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evM6Z-0003qw-4I
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:59:04 -0400
-Date: Mon, 12 Mar 2018 12:58:46 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180312115846.GC31537@localhost.localdomain>
-References: <20180207163622.29935-3-pbonzini@redhat.com>
-	<20180208013517.GB24289@lemon.usersys.redhat.com>
-	<5ac0b76e-213a-60c3-c010-87512d3a564a@redhat.com>
-	<20180212135206.GG5103@localhost.localdomain>
-	<81af35f9-4934-0c21-e3b1-b27c2fa7fdd9@redhat.com>
-	<20180212143040.GH5103@localhost.localdomain>
-	<3d6031b0-7d75-c3ab-e466-ce3d87d630df@redhat.com>
-	<20180212144824.GI5103@localhost.localdomain>
-	<31e295bd-3012-c34c-a96d-54122557b20c@redhat.com>
-	<2d47ca9e-6f68-ab4e-0ec0-9f932128a93f@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1evM7S-0005fn-7Q
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:59:59 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:45225)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1evM7S-0005ec-1o
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:59:58 -0400
+Received: by mail-ot0-x241.google.com with SMTP id f11so14946293otj.12
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 04:59:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2d47ca9e-6f68-ab4e-0ec0-9f932128a93f@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] scsi: add block job
- opblockers for scsi-block
+In-Reply-To: <1518893216-9983-12-git-send-email-eric.auger@redhat.com>
+References: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
+	<1518893216-9983-12-git-send-email-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 12 Mar 2018 11:59:36 +0000
+Message-ID: <CAFEAcA_9cmK9gebqE9997fzhTzKT6Ky9q4jn=fxwziopDyK9Ew@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v9 11/14] target/arm/kvm: Translate the MSI
+ doorbell in kvm_arch_fixup_msi_route
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,76 +30,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Am 12.03.2018 um 12:10 hat Paolo Bonzini geschrieben:
-> On 12/02/2018 15:50, Paolo Bonzini wrote:
-> > On 12/02/2018 15:48, Kevin Wolf wrote:
-> >> Am 12.02.2018 um 15:32 hat Paolo Bonzini geschrieben:
-> >>> Okay, we are in agreement about this and you expressed very well why I
-> >>> (at the gut feeling level) didn't like the old op blockers.  But you
-> >>> bypassed the real question, which is: should I send a pull request for
-> >>> these two patches or not? :)
-> >> I didn't spell it out that explicitly, but this is essentially a NACK.
-> >> I'd very much prefer if you could replace it with the proper solution.
-> >> Of course, we can always make exceptions when there is a good reason,
-> >> but with 2.12 still two months away, I doubt we have one.
-> > Ok, I don't mind explicitness.  I'll keep these two patches in the queue
-> > for now.
-> 
-> It's now one month away.  Regarding the solution below:
-> 
-> > I propose a new BLK_PERM_BYPASS that allows its users to bypass the
-> > block layer I/O functions. In other words, bdrv_aio_ioctl() would
-> > require that you got this permission. A dirty bitmap would keep a
-> > BdrvChild with perm=0, shared=BLK_PERM_ALL & ~BLK_PERM_BYPASS, so you
-> > can never have a dirty bitmap and a device using ioctls attached to the
-> > BDS at the same time.
-> 
-> I suppose it would be like:
-> 
-> - scsi-block/scsi-generic call blk_set_perm with perm == shared ==
-> BLK_PERM_BYPASS
+On 17 February 2018 at 18:46, Eric Auger <eric.auger@redhat.com> wrote:
+> In case the MSI is translated by an IOMMU we need to fixup the
+> MSI route with the translated address.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>
+> ---
+>
+> v5 -> v6:
+> - use IOMMUMemoryRegionClass API
+>
+> It is still unclear to me if we need to register an IOMMUNotifier
+> to handle any change in the MSI doorbell which would occur behind
+> the scene and would not lead to any call to kvm_arch_fixup_msi_route().
 
-perm = BLK_PERM_BYPASS is fine, but for shared it seems overly
-restrictive. I don't think the device minds another user accessing the
-device.
+Paolo, do you know the answer to this question ?
 
-Other block devices do this in blkconf_apply_backend_options():
+> ---
+>  target/arm/kvm.c        | 27 +++++++++++++++++++++++++++
+>  target/arm/trace-events |  3 +++
+>  2 files changed, 30 insertions(+)
+>
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index 1219d00..9f5976a 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -20,8 +20,13 @@
+>  #include "sysemu/kvm.h"
+>  #include "kvm_arm.h"
+>  #include "cpu.h"
+> +#include "trace.h"
+>  #include "internals.h"
+>  #include "hw/arm/arm.h"
+> +#include "hw/pci/pci.h"
+> +#include "hw/pci/msi.h"
+> +#include "hw/arm/smmu-common.h"
+> +#include "hw/arm/smmuv3.h"
+>  #include "exec/memattrs.h"
+>  #include "exec/address-spaces.h"
+>  #include "hw/boards.h"
+> @@ -666,6 +671,28 @@ int kvm_arm_vgic_probe(void)
+>  int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
+>                               uint64_t address, uint32_t data, PCIDevice *dev)
+>  {
+> +    AddressSpace *as = pci_device_iommu_address_space(dev);
+> +    IOMMUMemoryRegionClass *imrc;
+> +    IOMMUTLBEntry entry;
+> +    SMMUDevice *sdev;
+> +
+> +    if (as == &address_space_memory) {
+> +        return 0;
+> +    }
+> +
+> +    /* MSI doorbell address is translated by an IOMMU */
+> +    sdev = container_of(as, SMMUDevice, as);
+> +    imrc = IOMMU_MEMORY_REGION_GET_CLASS(&sdev->iommu);
+> +
+> +    entry = imrc->translate(&sdev->iommu, address, IOMMU_WO);
+> +
+> +    route->u.msi.address_lo = entry.translated_addr;
+> +    route->u.msi.address_hi = entry.translated_addr >> 32;
+> +
+> +    trace_kvm_arm_fixup_msi_route(address, sdev->devfn,
+> +                                  sdev->iommu.parent_obj.name,
+> +                                  entry.translated_addr);
+> +
+>      return 0;
+>  }
 
-    shared_perm = BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
-                  BLK_PERM_GRAPH_MOD;
-    if (resizable) {
-        shared_perm |= BLK_PERM_RESIZE;
-    }
-    if (conf->share_rw) {
-        shared_perm |= BLK_PERM_WRITE;
-    }
+It seems a bit odd that:
+ * the code for arm for "PCI devices behind IOMMU need to have
+   the MSI doorbell writes go through the IOMMU" looks rather
+   different from the code for x86 for the same thing
+ * the code here needs to know specifically that this is an SMMU
+   and not some other kind of IOMMU
 
-I suppose scsi-generic is never resizable, so that part can go away, but
-we do have a share-rw qdev property that can be used.
+I would have expected this to be more generic-to-all-IOMMU
+APIs and maybe even implemented in the generic KVM support code...
 
-> - users of dirty bitmaps would call use perm/shared_perm as in your
-> message above
-> 
-> - dirty bitmaps creation calls bdrv_get_cumulative_perm (which should
-> now become public) and checks that it doesn't have BLK_PERM_BYPASS in
-> shared_perm
+The x86 code seems to be similarly x86-specific though, so
+this is more of a "perhaps there is a cleanup opportunity here"
+observation I guess.
 
-My proposal was really that users of dirty bitmaps don't change
-anything, but we do everything in the dirty bitmap implementation. Dirty
-bitmap creation would add a BdrvChild with the above permissions.
-Deleting a dirty bitmap would remove the BdrvChild again.
-
-Then you don't need to manually call bdrv_get_cumulative_perm(), because
-the permission check is included when you attach the BdrvChild.
-
-> Anything I'm missing?
-
-Ideally, bdrv_co_ioctl() should take a BdrvChild instead of a BDS and
-assert that the caller correctly requested the permission:
-
-    assert(child->perm & BLK_PERM_BYPASS);
-
-Kevin
+thanks
+-- PMM
