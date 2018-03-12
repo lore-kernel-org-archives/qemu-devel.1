@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evQAp-0003gB-Jq
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:19:45 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1evQBw-0004XT-58
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:20:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evQAo-0006ga-5l
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:19:43 -0400
-Date: Mon, 12 Mar 2018 16:19:21 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180312161921.GK3219@work-vm>
-References: <20180207155837.92351-1-vsementsov@virtuozzo.com>
-	<20180207155837.92351-12-vsementsov@virtuozzo.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1evQBu-0007Z8-VK
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:20:52 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:55712)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1evQBu-0007YO-Kl
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:20:50 -0400
+Received: by mail-wm0-x244.google.com with SMTP id q83so17836384wme.5
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 09:20:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180207155837.92351-12-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v10 11/12] iotests: add dirty bitmap
- migration test
+In-Reply-To: <20180308195811.24894-26-dgilbert@redhat.com>
+References: <20180308195811.24894-1-dgilbert@redhat.com>
+	<20180308195811.24894-26-dgilbert@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 12 Mar 2018 17:20:48 +0100
+Message-ID: <CAJ+F1CKPR7JHasx_bU2Q8iGzZNBmEZEMb=8nKb3E54__iy_0Gw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 25/29] vhost+postcopy: Wire up
+ POSTCOPY_END notify
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,205 +31,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
-> The test starts two vms (vm_a, vm_b), create dirty bitmap in
-> the first one, do several writes to corresponding device and
-> then migrate vm_a to vm_b.
+On Thu, Mar 8, 2018 at 8:58 PM, Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> Wire up a call to VHOST_USER_POSTCOPY_END message to the vhost clients
+> right before we ask the listener thread to shutdown.
+>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
 > ---
->  tests/qemu-iotests/169     | 141 +++++++++++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/169.out |   5 ++
->  tests/qemu-iotests/group   |   1 +
->  3 files changed, 147 insertions(+)
->  create mode 100755 tests/qemu-iotests/169
->  create mode 100644 tests/qemu-iotests/169.out
-> 
-> diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
-> new file mode 100755
-> index 0000000000..8801f73b10
-> --- /dev/null
-> +++ b/tests/qemu-iotests/169
-> @@ -0,0 +1,141 @@
-> +#!/usr/bin/env python
-> +#
-> +# Tests for dirty bitmaps migration.
-> +#
-> +# Copyright (c) 2016-2017 Virtuozzo International GmbH. All rights reserved.
-> +#
-> +# This program is free software; you can redistribute it and/or modify
-> +# it under the terms of the GNU General Public License as published by
-> +# the Free Software Foundation; either version 2 of the License, or
-> +# (at your option) any later version.
-> +#
-> +# This program is distributed in the hope that it will be useful,
-> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> +# GNU General Public License for more details.
-> +#
-> +# You should have received a copy of the GNU General Public License
-> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> +#
+>  hw/virtio/trace-events   |  2 ++
+>  hw/virtio/vhost-user.c   | 34 ++++++++++++++++++++++++++++++++++
+>  migration/postcopy-ram.c |  7 +++++++
+>  migration/postcopy-ram.h |  1 +
+>  4 files changed, 44 insertions(+)
+>
+> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> index fe5e0ff856..857c495e65 100644
+> --- a/hw/virtio/trace-events
+> +++ b/hw/virtio/trace-events
+> @@ -7,6 +7,8 @@ vhost_region_add_section_abut(const char *name, uint64_t =
+new_size) "%s: 0x%"PRIx
+>  vhost_section(const char *name, int r) "%s:%d"
+>
+>  # hw/virtio/vhost-user.c
+> +vhost_user_postcopy_end_entry(void) ""
+> +vhost_user_postcopy_end_exit(void) ""
+>  vhost_user_postcopy_fault_handler(const char *name, uint64_t fault_addre=
+ss, int nregions) "%s: @0x%"PRIx64" nregions:%d"
+>  vhost_user_postcopy_fault_handler_loop(int i, uint64_t client_base, uint=
+64_t size) "%d: client 0x%"PRIx64" +0x%"PRIx64
+>  vhost_user_postcopy_fault_handler_found(int i, uint64_t region_offset, u=
+int64_t rb_offset) "%d: region_offset: 0x%"PRIx64" rb_offset:0x%"PRIx64
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index 45de6d8a53..eb7d753b1a 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -1114,6 +1114,37 @@ static int vhost_user_postcopy_listen(struct vhost=
+_dev *dev, Error **errp)
+>      return 0;
+>  }
+>
+> +/*
+> + * Called at the end of postcopy
+> + */
+> +static int vhost_user_postcopy_end(struct vhost_dev *dev, Error **errp)
+> +{
+> +    VhostUserMsg msg =3D {
+> +        .hdr.request =3D VHOST_USER_POSTCOPY_END,
+> +        .hdr.flags =3D VHOST_USER_VERSION | VHOST_USER_NEED_REPLY_MASK,
+> +    };
+> +    int ret;
+> +    struct vhost_user *u =3D dev->opaque;
 > +
-> +import os
-> +import iotests
-> +import time
-> +import itertools
-> +import operator
-> +import new
-> +from iotests import qemu_img
+> +    trace_vhost_user_postcopy_end_entry();
+> +    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
+> +        error_setg(errp, "Failed to send postcopy_end to vhost");
+> +        return -1;
+> +    }
 > +
+> +    ret =3D process_message_reply(dev, &msg);
+> +    if (ret) {
+> +        error_setg(errp, "Failed to receive reply to postcopy_end");
+> +        return ret;
+> +    }
+> +    postcopy_unregister_shared_ufd(&u->postcopy_fd);
+> +    u->postcopy_fd.handler =3D NULL;
 > +
-> +disk_a = os.path.join(iotests.test_dir, 'disk_a')
-> +disk_b = os.path.join(iotests.test_dir, 'disk_b')
-> +size = '1M'
-> +mig_file = os.path.join(iotests.test_dir, 'mig_file')
+> +    trace_vhost_user_postcopy_end_exit();
 > +
+> +    return 0;
+> +}
 > +
-> +class TestDirtyBitmapMigration(iotests.QMPTestCase):
-> +    def tearDown(self):
-> +        self.vm_a.shutdown()
-> +        self.vm_b.shutdown()
-> +        os.remove(disk_a)
-> +        os.remove(disk_b)
-> +        os.remove(mig_file)
+>  static int vhost_user_postcopy_notifier(NotifierWithReturn *notifier,
+>                                          void *opaque)
+>  {
+> @@ -1139,6 +1170,9 @@ static int vhost_user_postcopy_notifier(NotifierWit=
+hReturn *notifier,
+>      case POSTCOPY_NOTIFY_INBOUND_LISTEN:
+>          return vhost_user_postcopy_listen(dev, pnd->errp);
+>
+> +    case POSTCOPY_NOTIFY_INBOUND_END:
+> +        return vhost_user_postcopy_end(dev, pnd->errp);
 > +
-> +    def setUp(self):
-> +        qemu_img('create', '-f', iotests.imgfmt, disk_a, size)
-> +        qemu_img('create', '-f', iotests.imgfmt, disk_b, size)
+>      default:
+>          /* We ignore notifications we don't know */
+>          break;
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 36db900e8f..1379923cfc 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -413,6 +413,13 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingS=
+tate *mis)
+>      trace_postcopy_ram_incoming_cleanup_entry();
+>
+>      if (mis->have_fault_thread) {
+> +        Error *local_err =3D NULL;
 > +
-> +        self.vm_a = iotests.VM(path_suffix='a').add_drive(disk_a)
-> +        self.vm_a.launch()
+> +        if (postcopy_notify(POSTCOPY_NOTIFY_INBOUND_END, &local_err)) {
+> +            error_report_err(local_err);
+> +            return -1;
+> +        }
 > +
-> +        self.vm_b = iotests.VM(path_suffix='b')
-> +        self.vm_b.add_incoming("exec: cat '" + mig_file + "'")
-> +
-> +    def add_bitmap(self, vm, granularity, persistent):
-> +        params = {'node': 'drive0',
-> +                  'name': 'bitmap0',
-> +                  'granularity': granularity}
-> +        if persistent:
-> +            params['persistent'] = True
-> +            params['autoload'] = True
-> +
-> +        result = vm.qmp('block-dirty-bitmap-add', **params)
-> +        self.assert_qmp(result, 'return', {});
-> +
-> +    def get_bitmap_hash(self, vm):
-> +        result = vm.qmp('x-debug-block-dirty-bitmap-sha256',
-> +                        node='drive0', name='bitmap0')
-> +        return result['return']['sha256']
-> +
-> +    def check_bitmap(self, vm, sha256):
-> +        result = vm.qmp('x-debug-block-dirty-bitmap-sha256',
-> +                        node='drive0', name='bitmap0')
-> +        if sha256:
-> +            self.assert_qmp(result, 'return/sha256', sha256);
-> +        else:
-> +            self.assert_qmp(result, 'error/desc',
-> +                            "Dirty bitmap 'bitmap0' not found");
-> +
-> +    def do_test_migration(self, persistent, migrate_bitmaps, online,
-> +                          shared_storage):
-> +        granularity = 512
-> +
-> +        # regions = ((start, count), ...)
-> +        regions = ((0, 0x10000),
-> +                   (0xf0000, 0x10000),
-> +                   (0xa0201, 0x1000))
-> +
-> +        should_migrate = migrate_bitmaps or persistent and shared_storage
-> +
-> +        self.vm_b.add_drive(disk_a if shared_storage else disk_b)
-> +
-> +        if online:
-> +            os.mkfifo(mig_file)
-> +            self.vm_b.launch()
-> +
-> +        self.add_bitmap(self.vm_a, granularity, persistent)
-> +        for r in regions:
-> +            self.vm_a.hmp_qemu_io('drive0', 'write %d %d' % r)
-> +        sha256 = self.get_bitmap_hash(self.vm_a)
-> +
-> +        if migrate_bitmaps:
-> +            result = self.vm_a.qmp('migrate-set-capabilities',
-> +                                   capabilities=[{'capability': 'dirty-bitmaps',
-> +                                                  'state': True}])
-> +            self.assert_qmp(result, 'return', {})
-> +
-> +        result = self.vm_a.qmp('migrate', uri='exec:cat>' + mig_file)
-> +        self.vm_a.event_wait("STOP")
+>          if (qemu_ram_foreach_block(cleanup_range, mis)) {
+>              return -1;
+>          }
+> diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+> index fef7448e4b..1d11276c94 100644
+> --- a/migration/postcopy-ram.h
+> +++ b/migration/postcopy-ram.h
+> @@ -132,6 +132,7 @@ enum PostcopyNotifyReason {
+>      POSTCOPY_NOTIFY_PROBE =3D 0,
+>      POSTCOPY_NOTIFY_INBOUND_ADVISE,
+>      POSTCOPY_NOTIFY_INBOUND_LISTEN,
+> +    POSTCOPY_NOTIFY_INBOUND_END,
+>  };
+>
+>  struct PostcopyNotifyData {
+> --
+> 2.14.3
+>
+>
 
-Stefan recently fixed a similar case in another test; 'STOP' is not
-sufficient to know migration has finished, just that it's in the last
-stage.   The trick is to use the new migration events and wait for the
-finish in there.
 
-Other than that I'm not really a python person, but it looks OK fromt he
-migration side of it.
 
-Dave
-
-> +        if not online:
-> +            self.vm_a.shutdown()
-> +            self.vm_b.launch()
-> +
-> +        self.vm_b.event_wait("RESUME", timeout=10.0)
-> +
-> +        self.check_bitmap(self.vm_b, sha256 if should_migrate else False)
-> +
-> +        if should_migrate:
-> +            self.vm_b.shutdown()
-> +            self.vm_b.launch()
-> +            self.check_bitmap(self.vm_b, sha256 if persistent else False)
-> +
-> +
-> +def inject_test_case(klass, name, method, *args, **kwargs):
-> +    mc = operator.methodcaller(method, *args, **kwargs)
-> +    setattr(klass, 'test_' + name, new.instancemethod(mc, None, klass))
-> +
-> +for cmb in list(itertools.product((True, False), repeat=3)):
-> +    name = ('_' if cmb[0] else '_not_') + 'persistent_'
-> +    name += ('_' if cmb[1] else '_not_') + 'migbitmap_'
-> +    name += '_online' if cmb[2] else '_offline'
-> +
-> +    # TODO fix shared-storage bitmap migration and enable cases for it
-> +    args = list(cmb) + [False]
-> +
-> +    inject_test_case(TestDirtyBitmapMigration, name, 'do_test_migration',
-> +                     *args)
-> +
-> +
-> +if __name__ == '__main__':
-> +    iotests.main(supported_fmts=['qcow2'])
-> diff --git a/tests/qemu-iotests/169.out b/tests/qemu-iotests/169.out
-> new file mode 100644
-> index 0000000000..594c16f49f
-> --- /dev/null
-> +++ b/tests/qemu-iotests/169.out
-> @@ -0,0 +1,5 @@
-> +........
-> +----------------------------------------------------------------------
-> +Ran 8 tests
-> +
-> +OK
-> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-> index a2dfe79d86..498c52c4c1 100644
-> --- a/tests/qemu-iotests/group
-> +++ b/tests/qemu-iotests/group
-> @@ -169,6 +169,7 @@
->  162 auto quick
->  163 rw auto quick
->  165 rw auto quick
-> +169 rw auto quick
->  170 rw auto quick
->  171 rw auto quick
->  172 auto
-> -- 
-> 2.11.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--=20
+Marc-Andr=C3=A9 Lureau
