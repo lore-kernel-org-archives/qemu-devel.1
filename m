@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1evU3Q-0005ZS-7O
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:28:21 -0400
+	(envelope-from <laurent@vivier.eu>) id 1evU3V-0005fQ-WC
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:28:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1evU3M-00068e-TX
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:28:20 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:36819)
+	(envelope-from <laurent@vivier.eu>) id 1evU3S-0006aO-Nd
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:28:25 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:51143)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1evU3M-00063Q-Fj
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:28:16 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1evU3S-0006V2-E1
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:28:22 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 12 Mar 2018 21:27:25 +0100
-Message-Id: <20180312202728.23790-9-laurent@vivier.eu>
+Date: Mon, 12 Mar 2018 21:27:28 +0100
+Message-Id: <20180312202728.23790-12-laurent@vivier.eu>
 In-Reply-To: <20180312202728.23790-1-laurent@vivier.eu>
 References: <20180312202728.23790-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH 08/11] target/m68k: implement fatanh
+Subject: [Qemu-devel] [PATCH 11/11] target/m68k: implement fcosh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,140 +26,156 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>, Thomas Huth <huth@tuxfamily.org>, Richard Henderson <rth@twiddle.net>
 
-Using a local m68k floatx80_atanh()
+Using a local m68k  floatx80_cosh()
 [copied from previous:
 Written by Andreas Grabher for Previous, NeXT Computer Emulator.]
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- target/m68k/fpu_helper.c |  5 ++++
+ target/m68k/fpu_helper.c |  5 +++
  target/m68k/helper.h     |  1 +
- target/m68k/softfloat.c  | 65 ++++++++++++++++++++++++++++++++++++++++++++++++
+ target/m68k/softfloat.c  | 81 ++++++++++++++++++++++++++++++++++++++++++++++++
  target/m68k/softfloat.h  |  1 +
- target/m68k/translate.c  |  3 +++
- 5 files changed, 75 insertions(+)
+ target/m68k/translate.c  |  3 ++
+ 5 files changed, 91 insertions(+)
 
 diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
-index 18ad6999cb..38b663e1d2 100644
+index 4c969dfe00..6eeffdf9bb 100644
 --- a/target/m68k/fpu_helper.c
 +++ b/target/m68k/fpu_helper.c
-@@ -633,3 +633,8 @@ void HELPER(facos)(CPUM68KState *env, FPReg *res, FPReg *val)
+@@ -648,3 +648,8 @@ void HELPER(fsinh)(CPUM68KState *env, FPReg *res, FPReg *val)
  {
-     res->d = floatx80_acos(val->d, &env->fp_status);
+     res->d = floatx80_sinh(val->d, &env->fp_status);
  }
 +
-+void HELPER(fatanh)(CPUM68KState *env, FPReg *res, FPReg *val)
++void HELPER(fcosh)(CPUM68KState *env, FPReg *res, FPReg *val)
 +{
-+    res->d = floatx80_atanh(val->d, &env->fp_status);
++    res->d = floatx80_cosh(val->d, &env->fp_status);
 +}
 diff --git a/target/m68k/helper.h b/target/m68k/helper.h
-index 83247a8143..092baec3d5 100644
+index acdca1af03..feee7be626 100644
 --- a/target/m68k/helper.h
 +++ b/target/m68k/helper.h
-@@ -82,6 +82,7 @@ DEF_HELPER_4(fsincos, void, env, fp, fp, fp)
- DEF_HELPER_3(fatan, void, env, fp, fp)
- DEF_HELPER_3(fasin, void, env, fp, fp)
- DEF_HELPER_3(facos, void, env, fp, fp)
-+DEF_HELPER_3(fatanh, void, env, fp, fp)
+@@ -85,6 +85,7 @@ DEF_HELPER_3(facos, void, env, fp, fp)
+ DEF_HELPER_3(fatanh, void, env, fp, fp)
+ DEF_HELPER_3(ftanh, void, env, fp, fp)
+ DEF_HELPER_3(fsinh, void, env, fp, fp)
++DEF_HELPER_3(fcosh, void, env, fp, fp)
  
  DEF_HELPER_3(mac_move, void, env, i32, i32)
  DEF_HELPER_3(macmulf, i64, env, i32, i32)
 diff --git a/target/m68k/softfloat.c b/target/m68k/softfloat.c
-index 3d66f6946f..5ce8413e96 100644
+index 1528bfd147..dffb371c71 100644
 --- a/target/m68k/softfloat.c
 +++ b/target/m68k/softfloat.c
-@@ -2302,3 +2302,68 @@ floatx80 floatx80_acos(floatx80 a, float_status *status)
- 
-     return a;
+@@ -2822,3 +2822,84 @@ floatx80 floatx80_sinh(floatx80 a, float_status *status)
+         return a;
+     }
  }
 +
 +/*----------------------------------------------------------------------------
-+ | Hyperbolic arc tangent
++ | Hyperbolic cosine
 + *----------------------------------------------------------------------------*/
 +
-+floatx80 floatx80_atanh(floatx80 a, float_status *status)
++floatx80 floatx80_cosh(floatx80 a, float_status *status)
 +{
-+    flag aSign;
 +    int32_t aExp;
 +    uint64_t aSig;
 +
 +    int8_t user_rnd_mode, user_rnd_prec;
 +
 +    int32_t compact;
-+    floatx80 fp0, fp1, fp2, one;
++    floatx80 fp0, fp1;
 +
 +    aSig = extractFloatx80Frac(a);
 +    aExp = extractFloatx80Exp(a);
-+    aSign = extractFloatx80Sign(a);
 +
-+    if (aExp == 0x7FFF && (uint64_t) (aSig << 1)) {
-+        return propagateFloatx80NaNOneArg(a, status);
++    if (aExp == 0x7FFF) {
++        if ((uint64_t) (aSig << 1)) {
++            return propagateFloatx80NaNOneArg(a, status);
++        }
++        return packFloatx80(0, floatx80_infinity.high,
++                            floatx80_infinity.low);
 +    }
 +
 +    if (aExp == 0 && aSig == 0) {
-+        return packFloatx80(aSign, 0, 0);
++        return packFloatx80(0, one_exp, one_sig);
 +    }
-+
-+    compact = floatx80_make_compact(aExp, aSig);
-+
-+    if (compact >= 0x3FFF8000) { /* |X| >= 1 */
-+        if (aExp == one_exp && aSig == one_sig) { /* |X| == 1 */
-+            float_raise(float_flag_divbyzero, status);
-+            return packFloatx80(aSign, floatx80_infinity.high,
-+                                floatx80_infinity.low);
-+        } else { /* |X| > 1 */
-+            float_raise(float_flag_invalid, status);
-+            return floatx80_default_nan(status);
-+        }
-+    } /* |X| < 1 */
 +
 +    user_rnd_mode = status->float_rounding_mode;
 +    user_rnd_prec = status->floatx80_rounding_precision;
 +    status->float_rounding_mode = float_round_nearest_even;
 +    status->floatx80_rounding_precision = 80;
 +
-+    one = packFloatx80(0, one_exp, one_sig);
-+    fp2 = packFloatx80(aSign, 0x3FFE, one_sig); /* SIGN(X) * (1/2) */
-+    fp0 = packFloatx80(0, aExp, aSig); /* Y = |X| */
-+    fp1 = packFloatx80(1, aExp, aSig); /* -Y */
-+    fp0 = floatx80_add(fp0, fp0, status); /* 2Y */
-+    fp1 = floatx80_add(fp1, one, status); /* 1-Y */
-+    fp0 = floatx80_div(fp0, fp1, status); /* Z = 2Y/(1-Y) */
-+    fp0 = floatx80_lognp1(fp0, status); /* LOG1P(Z) */
++    compact = floatx80_make_compact(aExp, aSig);
++
++    if (compact > 0x400CB167) {
++        if (compact > 0x400CB2B3) {
++            status->float_rounding_mode = user_rnd_mode;
++            status->floatx80_rounding_precision = user_rnd_prec;
++            return roundAndPackFloatx80(status->floatx80_rounding_precision, 0,
++                                        0x8000, one_sig, 0, status);
++        } else {
++            fp0 = packFloatx80(0, aExp, aSig);
++            fp0 = floatx80_sub(fp0, float64_to_floatx80(
++                               make_float64(0x40C62D38D3D64634), status),
++                               status);
++            fp0 = floatx80_sub(fp0, float64_to_floatx80(
++                               make_float64(0x3D6F90AEB1E75CC7), status),
++                               status);
++            fp0 = floatx80_etox(fp0, status);
++            fp1 = packFloatx80(0, 0x7FFB, one_sig);
++
++            status->float_rounding_mode = user_rnd_mode;
++            status->floatx80_rounding_precision = user_rnd_prec;
++
++            a = floatx80_mul(fp0, fp1, status);
++
++            float_raise(float_flag_inexact, status);
++
++            return a;
++        }
++    }
++
++    fp0 = packFloatx80(0, aExp, aSig); /* |X| */
++    fp0 = floatx80_etox(fp0, status); /* EXP(|X|) */
++    fp0 = floatx80_mul(fp0, float32_to_floatx80(make_float32(0x3F000000),
++                       status), status); /* (1/2)*EXP(|X|) */
++    fp1 = float32_to_floatx80(make_float32(0x3E800000), status); /* 1/4 */
++    fp1 = floatx80_div(fp1, fp0, status); /* 1/(2*EXP(|X|)) */
 +
 +    status->float_rounding_mode = user_rnd_mode;
 +    status->floatx80_rounding_precision = user_rnd_prec;
 +
-+    a = floatx80_mul(fp0, fp2,
-+                     status); /* ATANH(X) = SIGN(X) * (1/2) * LOG1P(Z) */
++    a = floatx80_add(fp0, fp1, status);
 +
 +    float_raise(float_flag_inexact, status);
 +
 +    return a;
 +}
 diff --git a/target/m68k/softfloat.h b/target/m68k/softfloat.h
-index 1140491c81..e9943aed20 100644
+index f033abf9ea..602661d5a8 100644
 --- a/target/m68k/softfloat.h
 +++ b/target/m68k/softfloat.h
-@@ -40,4 +40,5 @@ floatx80 floatx80_cos(floatx80 a, float_status *status);
- floatx80 floatx80_atan(floatx80 a, float_status *status);
- floatx80 floatx80_asin(floatx80 a, float_status *status);
- floatx80 floatx80_acos(floatx80 a, float_status *status);
-+floatx80 floatx80_atanh(floatx80 a, float_status *status);
+@@ -44,4 +44,5 @@ floatx80 floatx80_atanh(floatx80 a, float_status *status);
+ floatx80 floatx80_etoxm1(floatx80 a, float_status *status);
+ floatx80 floatx80_tanh(floatx80 a, float_status *status);
+ floatx80 floatx80_sinh(floatx80 a, float_status *status);
++floatx80 floatx80_cosh(floatx80 a, float_status *status);
  #endif
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 5fad76c785..2f7caa0ca0 100644
+index 7d83aaf91d..cef6f663ad 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -5063,6 +5063,9 @@ DISAS_INSN(fpu)
-     case 0x0c: /* fasin */
-         gen_helper_fasin(cpu_env, cpu_dest, cpu_src);
+@@ -5105,6 +5105,9 @@ DISAS_INSN(fpu)
+     case 0x5c: /* fdabs */
+         gen_helper_fdabs(cpu_env, cpu_dest, cpu_src);
          break;
-+    case 0x0d: /* fatanh */
-+        gen_helper_fatanh(cpu_env, cpu_dest, cpu_src);
++    case 0x19: /* fcosh */
++        gen_helper_fcosh(cpu_env, cpu_dest, cpu_src);
 +        break;
-     case 0x0e: /* fsin */
-         gen_helper_fsin(cpu_env, cpu_dest, cpu_src);
+     case 0x1a: /* fneg */
+         gen_helper_fneg(cpu_env, cpu_dest, cpu_src);
          break;
 -- 
 2.14.3
