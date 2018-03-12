@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44642)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <x1917x@gmail.com>) id 1evSIT-0008A1-2E
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:35:46 -0400
+	(envelope-from <x1917x@gmail.com>) id 1evSIX-0008EB-6e
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:35:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <x1917x@gmail.com>) id 1evSIR-0005Nt-SJ
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:35:45 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:43623)
+	(envelope-from <x1917x@gmail.com>) id 1evSIV-0005R1-J4
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:35:49 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:38208)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <x1917x@gmail.com>) id 1evSIR-0005Ms-K5
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:35:43 -0400
-Received: by mail-pf0-x242.google.com with SMTP id j2so4723218pff.10
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 11:35:43 -0700 (PDT)
+	(Exim 4.71) (envelope-from <x1917x@gmail.com>) id 1evSIV-0005Qd-BE
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:35:47 -0400
+Received: by mail-pl0-x241.google.com with SMTP id m22-v6so9835858pls.5
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 11:35:47 -0700 (PDT)
 From: Alexey Gerasimenko <x1917x@gmail.com>
-Date: Tue, 13 Mar 2018 04:34:03 +1000
-Message-Id: <ed61d0ef5ff1326c045a585e49e492e5776a6d96.1520867956.git.x1917x@gmail.com>
+Date: Tue, 13 Mar 2018 04:34:04 +1000
+Message-Id: <836d7504943af1390458dc2bc8341a654eee234a.1520867956.git.x1917x@gmail.com>
 In-Reply-To: <cover.1520867740.git.x1917x@gmail.com>
 References: <cover.1520867740.git.x1917x@gmail.com>
 In-Reply-To: <cover.1520867740.git.x1917x@gmail.com>
 References: <cover.1520867740.git.x1917x@gmail.com>
-Subject: [Qemu-devel] [RFC PATCH 18/30] xen/pt: XenHostPCIDevice: provide
- functions for PCI Capabilities and PCIe Extended Capabilities enumeration
+Subject: [Qemu-devel] [RFC PATCH 19/30] xen/pt: avoid reading PCIe device
+ type and cap version multiple times
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,195 +31,150 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: xen-devel@lists.xenproject.org
 Cc: Alexey Gerasimenko <x1917x@gmail.com>, qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
 
-This patch introduces 2 new functions,
-- xen_host_pci_find_next_ext_cap (actually a reworked
-  xen_host_pci_find_ext_cap_offset function which is unused)
-- xen_host_pci_find_next_cap
+xen_pt_config_init.c reads Device/Port Type and Capability version fields
+in many places. Two functions are used for this purpose:
+get_capability_version and get_device_type. These functions perform PCI
+conf space reading every time they're called. Another bad thing is that
+these functions know nothing about where PCI Expess Capability is located,
+so its offset must be provided explicitly in function arguments. Their
+typical usage is like this:
+    uint8_t cap_ver = get_capability_version(s, real_offset - reg->offset);
+    uint8_t dev_type = get_device_type(s, real_offset - reg->offset);
 
-These functions allow to search for PCI/PCIe capabilities in a uniform
-way. Both functions allow to search either a specific capability or any
-encountered next (by specifying CAP_ID_ANY as a capability ID) -- this may
-be useful when we merely need to traverse the capability list one-by-one.
-In both functions the 'pos' argument allows to continue searching from
-last position (0 means to start from beginning).
-
-In order not to probe PCIe Extended Capabilities existence every time,
-xen_host_pci_find_next_ext_cap makes use of the new 'has_pcie_ext_caps'
-field in XenHostPCIDevice structure which is filled only once (in
-xen_host_pci_device_get).
+To avoid this, the PCI Express Capability register now being read only
+once and stored in  XenHostPCIDevice structure (pcie_flags field). The
+capabiliy offset parameter is no longer needed, simplifying functions
+usage. Also, get_device_type and get_capability_version were renamed
+to more descriptive get_pcie_device_type and get_pcie_capability_version.
 
 Signed-off-by: Alexey Gerasimenko <x1917x@gmail.com>
 ---
- hw/xen/xen-host-pci-device.c | 95 +++++++++++++++++++++++++++++++++++++-------
- hw/xen/xen-host-pci-device.h |  5 ++-
- 2 files changed, 85 insertions(+), 15 deletions(-)
+ hw/xen/xen-host-pci-device.c | 15 +++++++++++++++
+ hw/xen/xen-host-pci-device.h |  1 +
+ hw/xen/xen_pt_config_init.c  | 34 ++++++++++++++--------------------
+ 3 files changed, 30 insertions(+), 20 deletions(-)
 
 diff --git a/hw/xen/xen-host-pci-device.c b/hw/xen/xen-host-pci-device.c
-index eed8cc88e3..9d76b199af 100644
+index 9d76b199af..11e9e26d31 100644
 --- a/hw/xen/xen-host-pci-device.c
 +++ b/hw/xen/xen-host-pci-device.c
-@@ -14,6 +14,7 @@
- 
- #define XEN_HOST_PCI_MAX_EXT_CAP \
-     ((PCIE_CONFIG_SPACE_SIZE - PCI_CONFIG_SPACE_SIZE) / (PCI_CAP_SIZEOF + 4))
-+#define XEN_HOST_PCI_CAP_MAX 48
- 
- #ifdef XEN_HOST_PCI_DEVICE_DEBUG
- #  define XEN_HOST_PCI_LOG(f, a...) fprintf(stderr, "%s: " f, __func__, ##a)
-@@ -199,6 +200,19 @@ static bool xen_host_pci_dev_is_virtfn(XenHostPCIDevice *d)
-     return !stat(path, &buf);
- }
- 
-+static bool xen_host_pci_dev_has_pcie_ext_caps(XenHostPCIDevice *d)
-+{
-+    uint32_t header;
-+
-+    if (xen_host_pci_get_long(d, PCI_CONFIG_SPACE_SIZE, &header))
-+        return false;
-+
-+    if (header == 0 || header == ~0U)
-+        return false;
-+
-+    return true;
-+}
-+
- static void xen_host_pci_config_open(XenHostPCIDevice *d, Error **errp)
+@@ -402,6 +402,7 @@ void xen_host_pci_device_get(XenHostPCIDevice *d, uint16_t domain,
  {
-     char path[PATH_MAX];
-@@ -297,37 +311,89 @@ int xen_host_pci_set_block(XenHostPCIDevice *d, int pos, uint8_t *buf, int len)
-     return xen_host_pci_config_write(d, pos, buf, len);
- }
+     unsigned int v;
+     Error *err = NULL;
++    int pcie_cap_pos;
  
--int xen_host_pci_find_ext_cap_offset(XenHostPCIDevice *d, uint32_t cap)
-+int xen_host_pci_find_next_ext_cap(XenHostPCIDevice *d, int pos, uint32_t cap)
- {
-     uint32_t header = 0;
-     int max_cap = XEN_HOST_PCI_MAX_EXT_CAP;
--    int pos = PCI_CONFIG_SPACE_SIZE;
+     d->config_fd = -1;
+     d->domain = domain;
+@@ -446,6 +447,20 @@ void xen_host_pci_device_get(XenHostPCIDevice *d, uint16_t domain,
+     d->is_virtfn         = xen_host_pci_dev_is_virtfn(d);
+     d->has_pcie_ext_caps = xen_host_pci_dev_has_pcie_ext_caps(d);
+ 
++    /* read and store PCIe Capabilities field for later use */
++    pcie_cap_pos = xen_host_pci_find_next_cap(d, 0, PCI_CAP_ID_EXP);
 +
-+    if (!d->has_pcie_ext_caps)
-+        return 0;
-+
-+    if (!pos) {
-+        pos = PCI_CONFIG_SPACE_SIZE;
++    if (pcie_cap_pos) {
++        if (xen_host_pci_get_word(d, pcie_cap_pos + PCI_EXP_FLAGS,
++                                  &d->pcie_flags)) {
++            error_setg(&err, "Unable to read from PCI Express capability "
++                       "structure at 0x%x", pcie_cap_pos);
++            goto error;
++        }
 +    } else {
-+        if (xen_host_pci_get_long(d, pos, &header))
-+            return 0;
-+
-+        pos = PCI_EXT_CAP_NEXT(header);
-+    }
- 
-     do {
--        if (xen_host_pci_get_long(d, pos, &header)) {
-+        if (!pos || pos < PCI_CONFIG_SPACE_SIZE)
-+            break;
-+
-+        if (xen_host_pci_get_long(d, pos, &header))
-             break;
--        }
-         /*
-          * If we have no capabilities, this is indicated by cap ID,
-          * cap version and next pointer all being 0.
-+         * Also check for all F's returned (which means PCIe ext conf space
-+         * is unreadable for some reason)
-          */
--        if (header == 0) {
-+        if (header == 0 || header == ~0U)
-             break;
--        }
- 
--        if (PCI_EXT_CAP_ID(header) == cap) {
-+        if (cap == CAP_ID_ANY)
-+            return pos;
-+        else if (PCI_EXT_CAP_ID(header) == cap)
-             return pos;
--        }
- 
-         pos = PCI_EXT_CAP_NEXT(header);
--        if (pos < PCI_CONFIG_SPACE_SIZE) {
-+    } while (--max_cap);
-+
-+    return 0;
-+}
-+
-+int xen_host_pci_find_next_cap(XenHostPCIDevice *d, int pos, uint32_t cap)
-+{
-+    uint8_t id;
-+    unsigned max_cap = XEN_HOST_PCI_CAP_MAX;
-+    uint8_t status = 0;
-+    uint8_t curpos;
-+
-+    if (xen_host_pci_get_byte(d, PCI_STATUS, &status))
-+        return 0;
-+
-+    if ((status & PCI_STATUS_CAP_LIST) == 0)
-+        return 0;
-+
-+    if (pos < PCI_CAPABILITY_LIST) {
-+        curpos = PCI_CAPABILITY_LIST;
-+    } else {
-+        curpos = (uint8_t) pos;
++        d->pcie_flags = 0xFFFF;
 +    }
 +
-+    while (max_cap--) {
-+        if (xen_host_pci_get_byte(d, curpos, &curpos))
-+            break;
-+        if (!curpos)
-             break;
--        }
- 
--        max_cap--;
--    } while (max_cap > 0);
-+        if (cap == CAP_ID_ANY)
-+            return curpos;
- 
--    return -1;
-+        if (xen_host_pci_get_byte(d, curpos + PCI_CAP_LIST_ID, &id))
-+            break;
-+
-+        if (id == 0xff)
-+            break;
-+        else if (id == cap)
-+            return curpos;
-+
-+        curpos += PCI_CAP_LIST_NEXT;
-+    }
-+
-+    return 0;
- }
- 
- void xen_host_pci_device_get(XenHostPCIDevice *d, uint16_t domain,
-@@ -377,7 +443,8 @@ void xen_host_pci_device_get(XenHostPCIDevice *d, uint16_t domain,
-     }
-     d->class_code = v;
- 
--    d->is_virtfn = xen_host_pci_dev_is_virtfn(d);
-+    d->is_virtfn         = xen_host_pci_dev_is_virtfn(d);
-+    d->has_pcie_ext_caps = xen_host_pci_dev_has_pcie_ext_caps(d);
- 
      return;
  
+ error:
 diff --git a/hw/xen/xen-host-pci-device.h b/hw/xen/xen-host-pci-device.h
-index 4d8d34ecb0..37c5614a24 100644
+index 37c5614a24..2884c4b4b9 100644
 --- a/hw/xen/xen-host-pci-device.h
 +++ b/hw/xen/xen-host-pci-device.h
-@@ -32,6 +32,7 @@ typedef struct XenHostPCIDevice {
+@@ -27,6 +27,7 @@ typedef struct XenHostPCIDevice {
+     uint16_t device_id;
+     uint32_t class_code;
+     int irq;
++    uint16_t pcie_flags;
+ 
+     XenHostPCIIORegion io_regions[PCI_NUM_REGIONS - 1];
      XenHostPCIIORegion rom;
+diff --git a/hw/xen/xen_pt_config_init.c b/hw/xen/xen_pt_config_init.c
+index a3ce33e78b..02e8c97f3c 100644
+--- a/hw/xen/xen_pt_config_init.c
++++ b/hw/xen/xen_pt_config_init.c
+@@ -828,24 +828,18 @@ static XenPTRegInfo xen_pt_emu_reg_vendor[] = {
+  * PCI Express Capability
+  */
  
-     bool is_virtfn;
-+    bool has_pcie_ext_caps;
+-static inline uint8_t get_capability_version(XenPCIPassthroughState *s,
+-                                             uint32_t offset)
++static inline uint8_t get_pcie_capability_version(XenPCIPassthroughState *s)
+ {
+-    uint8_t flag;
+-    if (xen_host_pci_get_byte(&s->real_device, offset + PCI_EXP_FLAGS, &flag)) {
+-        return 0;
+-    }
+-    return flag & PCI_EXP_FLAGS_VERS;
++    assert(s->real_device.pcie_flags != 0xFFFF);
++
++    return (uint8_t) (s->real_device.pcie_flags & PCI_EXP_FLAGS_VERS);
+ }
  
-     int config_fd;
- } XenHostPCIDevice;
-@@ -53,6 +54,8 @@ int xen_host_pci_set_long(XenHostPCIDevice *d, int pos, uint32_t data);
- int xen_host_pci_set_block(XenHostPCIDevice *d, int pos, uint8_t *buf,
-                            int len);
+-static inline uint8_t get_device_type(XenPCIPassthroughState *s,
+-                                      uint32_t offset)
++static inline uint8_t get_pcie_device_type(XenPCIPassthroughState *s)
+ {
+-    uint8_t flag;
+-    if (xen_host_pci_get_byte(&s->real_device, offset + PCI_EXP_FLAGS, &flag)) {
+-        return 0;
+-    }
+-    return (flag & PCI_EXP_FLAGS_TYPE) >> 4;
++    assert(s->real_device.pcie_flags != 0xFFFF);
++
++    return (uint8_t) ((s->real_device.pcie_flags & PCI_EXP_FLAGS_TYPE) >> 4);
+ }
  
--int xen_host_pci_find_ext_cap_offset(XenHostPCIDevice *s, uint32_t cap);
-+#define CAP_ID_ANY  (~0U)
-+int xen_host_pci_find_next_cap(XenHostPCIDevice *s, int pos, uint32_t cap);
-+int xen_host_pci_find_next_ext_cap(XenHostPCIDevice *d, int pos, uint32_t cap);
+ /* initialize Link Control register */
+@@ -853,8 +847,8 @@ static int xen_pt_linkctrl_reg_init(XenPCIPassthroughState *s,
+                                     XenPTRegInfo *reg, uint32_t real_offset,
+                                     uint32_t *data)
+ {
+-    uint8_t cap_ver = get_capability_version(s, real_offset - reg->offset);
+-    uint8_t dev_type = get_device_type(s, real_offset - reg->offset);
++    uint8_t cap_ver  = get_pcie_capability_version(s);
++    uint8_t dev_type = get_pcie_device_type(s);
  
- #endif /* XEN_HOST_PCI_DEVICE_H */
+     /* no need to initialize in case of Root Complex Integrated Endpoint
+      * with cap_ver 1.x
+@@ -871,7 +865,7 @@ static int xen_pt_devctrl2_reg_init(XenPCIPassthroughState *s,
+                                     XenPTRegInfo *reg, uint32_t real_offset,
+                                     uint32_t *data)
+ {
+-    uint8_t cap_ver = get_capability_version(s, real_offset - reg->offset);
++    uint8_t cap_ver = get_pcie_capability_version(s);
+ 
+     /* no need to initialize in case of cap_ver 1.x */
+     if (cap_ver == 1) {
+@@ -886,7 +880,7 @@ static int xen_pt_linkctrl2_reg_init(XenPCIPassthroughState *s,
+                                      XenPTRegInfo *reg, uint32_t real_offset,
+                                      uint32_t *data)
+ {
+-    uint8_t cap_ver = get_capability_version(s, real_offset - reg->offset);
++    uint8_t cap_ver = get_pcie_capability_version(s);
+     uint32_t reg_field = 0;
+ 
+     /* no need to initialize in case of cap_ver 1.x */
+@@ -1586,8 +1580,8 @@ static int xen_pt_pcie_size_init(XenPCIPassthroughState *s,
+                                  uint32_t base_offset, uint8_t *size)
+ {
+     PCIDevice *d = &s->dev;
+-    uint8_t version = get_capability_version(s, base_offset);
+-    uint8_t type = get_device_type(s, base_offset);
++    uint8_t version = get_pcie_capability_version(s);
++    uint8_t type = get_pcie_device_type(s);
+     uint8_t pcie_size = 0;
+ 
+ 
 -- 
 2.11.0
