@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1evF64-0007th-Cj
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 00:30:05 -0400
+	(envelope-from <bounces@canonical.com>) id 1evF6A-0007zq-LN
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 00:30:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1evF61-0005t5-8I
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 00:30:04 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35758)
+	(envelope-from <bounces@canonical.com>) id 1evF69-0005y1-GY
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 00:30:10 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36038)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1evF61-0005sn-1q
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 00:30:01 -0400
+	id 1evF69-0005x6-B1
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 00:30:09 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1evF5z-0001Bt-Vv
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 04:30:00 +0000
+	id 1evF68-0001LB-HO
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 04:30:08 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E0FA02E80D4
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 04:29:59 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 7F9962E80C7
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 04:30:08 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 12 Mar 2018 04:17:39 -0000
-From: Launchpad Bug Tracker <1175089@bugs.launchpad.net>
-Reply-To: Bug 1175089 <1175089@bugs.launchpad.net>
+Date: Mon, 12 Mar 2018 04:17:34 -0000
+From: Launchpad Bug Tracker <1055090@bugs.launchpad.net>
+Reply-To: Bug 1055090 <1055090@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20130501082935.389.58262.malonedeb@soybean.canonical.com>
-Message-Id: <152082825949.7858.13997529962112769760.malone@loganberry.canonical.com>
+References: <20120923165018.22472.41239.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152082825482.7858.15769829611230092158.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1175089] Re: Crash why dragon fly 3.4.1
+Subject: [Qemu-devel] [Bug 1055090] Re: esp error: NetBSD/sparc on
+ qemu-system-sparc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,45 +48,40 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1175089
+https://bugs.launchpad.net/bugs/1055090
 
 Title:
-  Crash why dragon fly 3.4.1
+  esp error: NetBSD/sparc on qemu-system-sparc
 
 Status in QEMU:
   Expired
 
 Bug description:
-  Hello, all is here (kernel 3.8, qemu 1.2.2-r3):
-  /usr/bin/qemu-system-x86_64 -k fr -alt-grab -m 2048 -vga vmware -net nic,=
-vlan=3D0,model=3Dvirtio -net user -rtc base=3Dlocaltime -smp 4,cores=3D4,so=
-ckets=3D1 -boot once=3Dd -cdrom dfly-x86_64-gui-3.4.1_REL.iso =
+  On qemu-1.2.0's qemu-system-sparc, NetBSD/sparc (32bit) 5.1.2 and
+  6.0_RC2 generates the following NetBSD's errors.
 
-  KVM internal error. Suberror: 1
-  emulation failure
-  EAX=3D00000010 EBX=3D00009338 ECX=3D00000000 EDX=3D00000000
-  ESI=3D000017fc EDI=3D000017c8 EBP=3D000364a0 ESP=3D000017b8
-  EIP=3D00009318 EFL=3D00003002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D0
-  ES =3D0010 00000000 ffffffff 00c09300
-  CS =3D0018 00000000 0000ffff 00009b00
-  SS =3D0010 00000000 ffffffff 00c09300
-  DS =3D0010 00000000 ffffffff 00c09300
-  FS =3D0033 0000a000 ffffffff 00c0f300
-  GS =3D0033 0000a000 ffffffff 00c0f300
-  LDT=3D0000 00000000 0000ffff 00008200
-  TR =3D0038 00005f98 00002067 00008b00
-  GDT=3D     00009590 0000003f
-  IDT=3D     00005e00 00000197
-  CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000 =
+  esp0: !TC on DATA XFER [intr 18, stat 82, step 4] prevphase 2, resid 0
+  esp0: !TC on DATA XFER [intr 10, stat 83, step 0] prevphase 2, resid 0
 
-  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-  EFER=3D0000000000000000
-  Code=3D00 a3 ea 5d 00 00 66 ea 10 93 18 00 0f 20 c0 fe c8 0f 22 c0 <ea> 1=
-d 93 00 00 31 c0 8e d8 8e d0 0f 01 1e dc 95 66 07 66 1f 66 0f a1 66 0f a9 6=
-6 61 bc ea
+  On qemu-0.15.1's qemu-system-sparc, NetBSD/sparc 5.1.2 and 6.0_RC2
+  works fine.
+
+  To reproduce with NetBSD/sparc 6.0_RC2, run
+
+  % qemu-system-sparc -M SS-20 -m 265M -hda NetBSD-sparc-6.0_RC2.qed
+  -nographic -cdrom NetBSD-6.0_RC2-sparc.iso -boot d
+
+  and try to install NetBSD. You can get above errors when newfs command is=
+ invoked.
+  I can reporduce this problem on NetBSD/i386 (32bit) and NetBSD/amd64(64bi=
+t; x86_64) host OSes.
+
+  NetBSD-6.0_RC2-sparc.iso is here,
+  ftp://ftp.netbsd.org/pub/NetBSD/NetBSD-6.0_RC2/images/NetBSD-6.0_RC2-spar=
+c.iso
+
+  NetBSD-sparc-6.0_RC2.qed is created with
+  % qemu-img create -f qed NetBSD-sparc-6.0_RC2.qed 3G
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1175089/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1055090/+subscriptions
