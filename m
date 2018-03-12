@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1evQ6P-0008CB-HO
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:15:10 -0400
+	(envelope-from <mreitz@redhat.com>) id 1evQ8l-0001v8-Bb
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:17:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1evQ6O-00037F-H2
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:15:09 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:40901)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1evQ6N-00036i-T6
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:15:08 -0400
-Received: by mail-wr0-x244.google.com with SMTP id m4so3483303wrb.7
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 09:15:07 -0700 (PDT)
+	(envelope-from <mreitz@redhat.com>) id 1evQ8k-0004pT-JJ
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:17:35 -0400
+References: <20180306204819.11266-1-stefanha@redhat.com>
+	<20180306204819.11266-2-stefanha@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <700879b4-0d9f-3ed6-9317-504fd43f7e5e@redhat.com>
+Date: Mon, 12 Mar 2018 17:17:18 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180308195811.24894-24-dgilbert@redhat.com>
-References: <20180308195811.24894-1-dgilbert@redhat.com>
-	<20180308195811.24894-24-dgilbert@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 12 Mar 2018 17:15:05 +0100
-Message-ID: <CAJ+F1CK3A3Z18ez8-9MzrD_+tsF=E+nq_3fUCEbm-TQE6xPRVg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 23/29] libvhost-user: mprotect &
- madvises for postcopy
+In-Reply-To: <20180306204819.11266-2-stefanha@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="TpT76TlwZ3pyM0geOvl4YjC9PbjUOiL4R"
+Subject: Re: [Qemu-devel] [PATCH 1/2] block: let
+ blk_add/remove_aio_context_notifier() tolerate BDS changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,133 +25,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Stefano Panella <spanella@gmail.com>, Kevin Wolf <kwolf@redhat.com>
 
-Hi
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--TpT76TlwZ3pyM0geOvl4YjC9PbjUOiL4R
+From: Max Reitz <mreitz@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Stefano Panella <spanella@gmail.com>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <700879b4-0d9f-3ed6-9317-504fd43f7e5e@redhat.com>
+Subject: Re: [PATCH 1/2] block: let blk_add/remove_aio_context_notifier()
+ tolerate BDS changes
+References: <20180306204819.11266-1-stefanha@redhat.com>
+ <20180306204819.11266-2-stefanha@redhat.com>
+In-Reply-To: <20180306204819.11266-2-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 8, 2018 at 8:58 PM, Dr. David Alan Gilbert (git)
-<dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> Clear the area and turn off THP.
-> PROT_NONE the area until after we've userfault advised it
-> to catch any unexpected changes.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On 2018-03-06 21:48, Stefan Hajnoczi wrote:
+> Commit 2019ba0a0197 ("block: Add AioContextNotifier functions to BB")
+> added blk_add/remove_aio_context_notifier() and implemented them by
+> passing through the bdrv_*() equivalent.
+>=20
+> This doesn't work across bdrv_append(), which detaches child->bs and
+> re-attaches it to a new BlockDriverState.  When
+> blk_remove_aio_context_notifier() is called we will access the new BDS
+> instead of the one where the notifier was added!
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+And nice that we just did not do anything if there was no BDS (in
+practice that can never happen, but still nice).
 
+Also, I like your exclamation mark.  It makes this sound so excited! :D
 
+> From the point of view of the blk_*() API user, changes to the root BDS=
+
+> should be transparent.
+>=20
+> This patch maintains a list of AioContext notifiers in BlockBackend and=
+
+> adds/removes them from the BlockDriverState as needed.
+>=20
+> Reported-by: Stefano Panella <spanella@gmail.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  contrib/libvhost-user/libvhost-user.c | 46 +++++++++++++++++++++++++++++=
-++----
->  1 file changed, 41 insertions(+), 5 deletions(-)
->
-> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
-r/libvhost-user.c
-> index e02e5d6f46..1b224af706 100644
-> --- a/contrib/libvhost-user/libvhost-user.c
-> +++ b/contrib/libvhost-user/libvhost-user.c
-> @@ -454,7 +454,7 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserM=
-sg *vmsg)
->      int i;
->      VhostUserMemory *memory =3D &vmsg->payload.memory;
->      dev->nregions =3D memory->nregions;
-> -    /* TODO: Postcopy specific code */
-> +
->      DPRINT("Nregions: %d\n", memory->nregions);
->      for (i =3D 0; i < dev->nregions; i++) {
->          void *mmap_addr;
-> @@ -478,9 +478,12 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUser=
-Msg *vmsg)
->
->          /* We don't use offset argument of mmap() since the
->           * mapped address has to be page aligned, and we use huge
-> -         * pages.  */
-> +         * pages.
-> +         * In postcopy we're using PROT_NONE here to catch anyone
-> +         * accessing it before we userfault
-> +         */
->          mmap_addr =3D mmap(0, dev_region->size + dev_region->mmap_offset=
-,
-> -                         PROT_READ | PROT_WRITE, MAP_SHARED,
-> +                         PROT_NONE, MAP_SHARED,
->                           vmsg->fds[i], 0);
->
->          if (mmap_addr =3D=3D MAP_FAILED) {
-> @@ -519,12 +522,38 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUse=
-rMsg *vmsg)
->      /* OK, now we can go and register the memory and generate faults */
->      for (i =3D 0; i < dev->nregions; i++) {
->          VuDevRegion *dev_region =3D &dev->regions[i];
-> +        int ret;
->  #ifdef UFFDIO_REGISTER
->          /* We should already have an open ufd. Mark each memory
->           * range as ufd.
-> -         * Note: Do we need any madvises? Well it's not been accessed
-> -         * yet, still probably need no THP to be safe, discard to be saf=
-e?
-> +         * Discard any mapping we have here; note I can't use MADV_REMOV=
-E
-> +         * or fallocate to make the hole since I don't want to lose
-> +         * data that's already arrived in the shared process.
-> +         * TODO: How to do hugepage
->           */
-> +        ret =3D madvise((void *)dev_region->mmap_addr,
-> +                      dev_region->size + dev_region->mmap_offset,
-> +                      MADV_DONTNEED);
-> +        if (ret) {
-> +            fprintf(stderr,
-> +                    "%s: Failed to madvise(DONTNEED) region %d: %s\n",
-> +                    __func__, i, strerror(errno));
-> +        }
-> +        /* Turn off transparent hugepages so we dont get lose wakeups
-> +         * in neighbouring pages.
-> +         * TODO: Turn this backon later.
-> +         */
-> +        ret =3D madvise((void *)dev_region->mmap_addr,
-> +                      dev_region->size + dev_region->mmap_offset,
-> +                      MADV_NOHUGEPAGE);
-> +        if (ret) {
-> +            /* Note: This can happen legally on kernels that are configu=
-red
-> +             * without madvise'able hugepages
-> +             */
-> +            fprintf(stderr,
-> +                    "%s: Failed to madvise(NOHUGEPAGE) region %d: %s\n",
-> +                    __func__, i, strerror(errno));
-> +        }
->          struct uffdio_register reg_struct;
->          reg_struct.range.start =3D (uintptr_t)dev_region->mmap_addr;
->          reg_struct.range.len =3D dev_region->size + dev_region->mmap_off=
-set;
-> @@ -546,6 +575,13 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUser=
-Msg *vmsg)
->          }
->          DPRINT("%s: region %d: Registered userfault for %llx + %llx\n",
->                  __func__, i, reg_struct.range.start, reg_struct.range.le=
-n);
-> +        /* Now it's registered we can let the client at it */
-> +        if (mprotect((void *)dev_region->mmap_addr,
-> +                     dev_region->size + dev_region->mmap_offset,
-> +                     PROT_READ | PROT_WRITE)) {
-> +            vu_panic(dev, "failed to mprotect region %d for postcopy", i=
-);
+>  block/block-backend.c | 63 +++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  block/trace-events    |  2 ++
+>  2 files changed, 65 insertions(+)
 
-You could also strerror(errno) here.
-
-> +            return false;
-> +        }
->          /* TODO: Stash 'zero' support flags somewhere */
->  #endif
->      }
-> --
-> 2.14.3
->
->
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
+--TpT76TlwZ3pyM0geOvl4YjC9PbjUOiL4R
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
---=20
-Marc-Andr=C3=A9 Lureau
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqmqA4SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AjYIH/Rct/xC0e2R9IK2C/FHq0vXtZcp4YImD
+ztBZ898c8FiMTq1zX17GIFG6qj1i/mfgbLC3FQzsAXKNFCtx+dM+eJJftPah7d4b
+/4MntsMk2Cq+K/b5JSnQ+6vVGN9mIZrZphMyyPmWreIyuGJtCZ0iFMTdVY3Ca6D+
+qNug26tLwci29m6TLWpj5KAXT0odd+J9tMSoef27WdiclTfp+ohanx1L3DXdat/Z
+LNeH9E7O1kF61SuMIokyV2AiJnFNPAUTsZlgMsuhoJYj8PSYkJ//FZuJKXyQGyks
+FC5TpBtyottPUcWV4vtzZBCGpbhx+kTlbGU3PajuGdPis94ZqaLuGYQ=
+=YsyC
+-----END PGP SIGNATURE-----
+
+--TpT76TlwZ3pyM0geOvl4YjC9PbjUOiL4R--
