@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54420)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1evUZA-0001R4-Cd
+	(envelope-from <Babu.Moger@amd.com>) id 1evUZA-0001R5-DD
 	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 17:01:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1evUZ6-0007UH-Bl
+	(envelope-from <Babu.Moger@amd.com>) id 1evUZ8-0007Uv-3O
 	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 17:01:08 -0400
-Received: from mail-bn3nam01on0045.outbound.protection.outlook.com
-	([104.47.33.45]:51664
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+Received: from mail-co1nam03on0609.outbound.protection.outlook.com
+	([2a01:111:f400:fe48::609]:45310
+	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1evUZ6-0007U3-1P
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 17:01:04 -0400
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1evUZ7-0007Uf-Rk
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 17:01:06 -0400
 From: Babu Moger <babu.moger@amd.com>
-Date: Mon, 12 Mar 2018 17:00:44 -0400
-Message-ID: <1520888449-4352-1-git-send-email-babu.moger@amd.com>
+Date: Mon, 12 Mar 2018 17:00:45 -0400
+Message-Id: <1520888449-4352-2-git-send-email-babu.moger@amd.com>
+In-Reply-To: <1520888449-4352-1-git-send-email-babu.moger@amd.com>
+References: <1520888449-4352-1-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 0/5] Enable TOPOEXT to support
- hyperthreading on AMD CPU
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v4 1/5] target/i386: Generalize some of the
+ macro definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +31,122 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, rkrcmar@redhat.com
 Cc: mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, Gary.Hook@amd.com, Thomas.Lendacky@amd.com, brijesh.singh@amd.com, babu.moger@amd.com, kash@tripleback.net
 
-This series enables the TOPOEXT feature for AMD CPUs. This is required to
-support hyperthreading on kvm guests.
+Generalize some of the macro definitions which are generic cache
+properties that are common between CPUID 4 and CPUID 0x8000001D
+in preparation for adding support for 0x8000001D.
 
-This addresses the issues reported in these bugs:
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1481253
-https://bugs.launchpad.net/qemu/+bug/1703506=20
+Signed-off-by: Babu Moger <babu.moger@amd.com>
+---
+ target/i386/cpu.c | 52 ++++++++++++++++++++++++++--------------------------
+ 1 file changed, 26 insertions(+), 26 deletions(-)
 
-v4:
-1.Removed the checks under cpuid 0x8000001D leaf(patch #2). These check are
-  not necessary. Found this during internal review.
-2.Added CPUID_EXT3_TOPOEXT feature for all the 17 family(patch #4). This wa=
-s
-  found by Kash Pande during his testing.
-3.Removed th hardcoded cpuid xlevel and dynamically extended if CPUID_EXT3_=
-TOPOEXT
-  is supported(Suggested by Brijesh Singh).=20
-
-v3:
-1.Removed the patch #1. Radim mentioned that original typo problem is in=20
-  linux kernel header. qemu is just copying those files.
-2.In previous version, I used the cpuid 4 definitions for AMDs cpuid leaf
-  0x8000001D. CPUID 4 is very intel specific and we dont want to expose tho=
-se
-  details under AMD. I have renamed some of these definitions as generic.
-  These changes are in patch#1. Radim, let me know if this is what you inte=
-nded.
-3.Added assert to for core_id(Suggested by Radim Kr=C4=8Dm=C3=A1=C5=99).
-4.Changed the if condition under "L3 cache info"(Suggested by Gary Hook).
-5.Addressed few more text correction and code cleanup(Suggested by Thomas L=
-endacky).
-
-v2:
-  Fixed few more minor issues per Gary Hook's comments. Thank you Gary.
-  Removed the patch#1. We need to handle the instruction cache associativit=
-y=20
-  seperately. It varies based on the cpu family. I will comeback to that la=
-ter.
-  Added two more typo corrections in patch#1 and patch#5.
-
-v1:
-  Stanislav Lanci posted few patches earlier.=20
-  https://patchwork.kernel.org/patch/10040903/
-
-Rebased his patches with few changes.
-1.Spit the patches into two, separating cpuid functions=20
-  0x8000001D and 0x8000001E (Patch 2 and 3).
-2.Removed the generic non-intel check and made a separate patch
-  with some changes(Patch 5).
-3.Fixed L3_N_SETS_AMD(from 4096 to 8192) based on CPUID_Fn8000001D_ECX_x03.
-
-Added 2 more patches.
-Patch 1. Fixes cache associativity.
-Patch 4. Adds TOPOEXT feature on AMD EPYC CPU.
-
-Babu Moger (3):
-  target/i386: Generalize some of the macro definitions
-  target/i386: Enable TOPOEXT feature on AMD EPYC CPU
-  target/i386: Remove generic SMT thread check
-
-Stanislav Lanci (2):
-  target/i386: Populate AMD Processor Cache Information
-  target/i386: Add support for CPUID_8000_001E for AMD
-
- target/i386/cpu.c | 150 +++++++++++++++++++++++++++++++++++++++++---------=
-----
- target/i386/kvm.c |  29 +++++++++--
- 2 files changed, 142 insertions(+), 37 deletions(-)
-
---=20
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index b5e431e..42dd381 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -66,22 +66,22 @@
+ #define CPUID_2_L3_16MB_16WAY_64B 0x4d
+ 
+ 
+-/* CPUID Leaf 4 constants: */
++/* Cache specific constants: */
+ 
+ /* EAX: */
+-#define CPUID_4_TYPE_DCACHE  1
+-#define CPUID_4_TYPE_ICACHE  2
+-#define CPUID_4_TYPE_UNIFIED 3
++#define TYPE_DCACHE  1
++#define TYPE_ICACHE  2
++#define TYPE_UNIFIED 3
+ 
+-#define CPUID_4_LEVEL(l)          ((l) << 5)
++#define CACHE_LEVEL(l)          ((l) << 5)
+ 
+-#define CPUID_4_SELF_INIT_LEVEL (1 << 8)
+-#define CPUID_4_FULLY_ASSOC     (1 << 9)
++#define CACHE_SELF_INIT_LEVEL (1 << 8)
++#define CACHE_FULLY_ASSOC     (1 << 9)
+ 
+ /* EDX: */
+-#define CPUID_4_NO_INVD_SHARING (1 << 0)
+-#define CPUID_4_INCLUSIVE       (1 << 1)
+-#define CPUID_4_COMPLEX_IDX     (1 << 2)
++#define CACHE_NO_INVD_SHARING (1 << 0)
++#define CACHE_INCLUSIVE       (1 << 1)
++#define CACHE_COMPLEX_IDX     (1 << 2)
+ 
+ #define ASSOC_FULL 0xFF
+ 
+@@ -3273,29 +3273,29 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+             *eax = 0;
+             switch (count) {
+             case 0: /* L1 dcache info */
+-                *eax |= CPUID_4_TYPE_DCACHE | \
+-                        CPUID_4_LEVEL(1) | \
+-                        CPUID_4_SELF_INIT_LEVEL;
++                *eax |= TYPE_DCACHE | \
++                        CACHE_LEVEL(1) | \
++                        CACHE_SELF_INIT_LEVEL;
+                 *ebx = (L1D_LINE_SIZE - 1) | \
+                        ((L1D_PARTITIONS - 1) << 12) | \
+                        ((L1D_ASSOCIATIVITY - 1) << 22);
+                 *ecx = L1D_SETS - 1;
+-                *edx = CPUID_4_NO_INVD_SHARING;
++                *edx = CACHE_NO_INVD_SHARING;
+                 break;
+             case 1: /* L1 icache info */
+-                *eax |= CPUID_4_TYPE_ICACHE | \
+-                        CPUID_4_LEVEL(1) | \
+-                        CPUID_4_SELF_INIT_LEVEL;
++                *eax |= TYPE_ICACHE | \
++                        CACHE_LEVEL(1) | \
++                        CACHE_SELF_INIT_LEVEL;
+                 *ebx = (L1I_LINE_SIZE - 1) | \
+                        ((L1I_PARTITIONS - 1) << 12) | \
+                        ((L1I_ASSOCIATIVITY - 1) << 22);
+                 *ecx = L1I_SETS - 1;
+-                *edx = CPUID_4_NO_INVD_SHARING;
++                *edx = CACHE_NO_INVD_SHARING;
+                 break;
+             case 2: /* L2 cache info */
+-                *eax |= CPUID_4_TYPE_UNIFIED | \
+-                        CPUID_4_LEVEL(2) | \
+-                        CPUID_4_SELF_INIT_LEVEL;
++                *eax |= TYPE_UNIFIED | \
++                        CACHE_LEVEL(2) | \
++                        CACHE_SELF_INIT_LEVEL;
+                 if (cs->nr_threads > 1) {
+                     *eax |= (cs->nr_threads - 1) << 14;
+                 }
+@@ -3303,7 +3303,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+                        ((L2_PARTITIONS - 1) << 12) | \
+                        ((L2_ASSOCIATIVITY - 1) << 22);
+                 *ecx = L2_SETS - 1;
+-                *edx = CPUID_4_NO_INVD_SHARING;
++                *edx = CACHE_NO_INVD_SHARING;
+                 break;
+             case 3: /* L3 cache info */
+                 if (!cpu->enable_l3_cache) {
+@@ -3313,16 +3313,16 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+                     *edx = 0;
+                     break;
+                 }
+-                *eax |= CPUID_4_TYPE_UNIFIED | \
+-                        CPUID_4_LEVEL(3) | \
+-                        CPUID_4_SELF_INIT_LEVEL;
++                *eax |= TYPE_UNIFIED | \
++                        CACHE_LEVEL(3) | \
++                        CACHE_SELF_INIT_LEVEL;
+                 pkg_offset = apicid_pkg_offset(cs->nr_cores, cs->nr_threads);
+                 *eax |= ((1 << pkg_offset) - 1) << 14;
+                 *ebx = (L3_N_LINE_SIZE - 1) | \
+                        ((L3_N_PARTITIONS - 1) << 12) | \
+                        ((L3_N_ASSOCIATIVITY - 1) << 22);
+                 *ecx = L3_N_SETS - 1;
+-                *edx = CPUID_4_INCLUSIVE | CPUID_4_COMPLEX_IDX;
++                *edx = CACHE_INCLUSIVE | CACHE_COMPLEX_IDX;
+                 break;
+             default: /* end of info */
+                 *eax = 0;
+-- 
 1.8.3.1
