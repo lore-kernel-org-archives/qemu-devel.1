@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1evU3Z-0005fU-Cf
+	(envelope-from <laurent@vivier.eu>) id 1evU3Z-0005fV-Jv
 	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:28:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1evU3W-0006rn-2Q
+	(envelope-from <laurent@vivier.eu>) id 1evU3W-0006sR-8E
 	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:28:29 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:57035)
+Received: from mout.kundenserver.de ([212.227.126.187]:48735)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1evU3V-0006mA-P3
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1evU3V-0006nV-Tv
 	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:28:26 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 12 Mar 2018 21:27:21 +0100
-Message-Id: <20180312202728.23790-5-laurent@vivier.eu>
+Date: Mon, 12 Mar 2018 21:27:23 +0100
+Message-Id: <20180312202728.23790-7-laurent@vivier.eu>
 In-Reply-To: <20180312202728.23790-1-laurent@vivier.eu>
 References: <20180312202728.23790-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH 04/11] target/m68k: implement fsincos
+Subject: [Qemu-devel] [PATCH 06/11] target/m68k: implement fasin
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,64 +26,140 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>, Thomas Huth <huth@tuxfamily.org>, Richard Henderson <rth@twiddle.net>
 
-using floatx80_sin() and floatx80_cos()
+Using a local m68k floatx80_asin()
+[copied from previous:
+Written by Andreas Grabher for Previous, NeXT Computer Emulator.]
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- target/m68k/fpu_helper.c | 11 +++++++++++
+ target/m68k/fpu_helper.c |  5 ++++
  target/m68k/helper.h     |  1 +
- target/m68k/translate.c  |  8 ++++++++
- 3 files changed, 20 insertions(+)
+ target/m68k/softfloat.c  | 65 ++++++++++++++++++++++++++++++++++++++++++++++++
+ target/m68k/softfloat.h  |  1 +
+ target/m68k/translate.c  |  3 +++
+ 5 files changed, 75 insertions(+)
 
 diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
-index 71df19c685..36e34d42a8 100644
+index 47328490ee..972cc97d96 100644
 --- a/target/m68k/fpu_helper.c
 +++ b/target/m68k/fpu_helper.c
-@@ -607,3 +607,14 @@ void HELPER(fcos)(CPUM68KState *env, FPReg *res, FPReg *val)
+@@ -623,3 +623,8 @@ void HELPER(fatan)(CPUM68KState *env, FPReg *res, FPReg *val)
  {
-     res->d = floatx80_cos(val->d, &env->fp_status);
+     res->d = floatx80_atan(val->d, &env->fp_status);
  }
 +
-+void HELPER(fsincos)(CPUM68KState *env, FPReg *res0, FPReg *res1, FPReg *val)
++void HELPER(fasin)(CPUM68KState *env, FPReg *res, FPReg *val)
 +{
-+    floatx80 a = val->d;
-+    /* If res0 and res1 specify the same floating-point data register,
-+     * the sine result is stored in the register, and the cosine
-+     * result is discarded.
-+     */
-+    res1->d = floatx80_cos(a, &env->fp_status);
-+    res0->d = floatx80_sin(a, &env->fp_status);
++    res->d = floatx80_asin(val->d, &env->fp_status);
 +}
 diff --git a/target/m68k/helper.h b/target/m68k/helper.h
-index 767baf75a3..a168ffbaea 100644
+index 304569e997..e1aca375e0 100644
 --- a/target/m68k/helper.h
 +++ b/target/m68k/helper.h
-@@ -78,6 +78,7 @@ DEF_HELPER_3(ftentox, void, env, fp, fp)
- DEF_HELPER_3(ftan, void, env, fp, fp)
- DEF_HELPER_3(fsin, void, env, fp, fp)
+@@ -80,6 +80,7 @@ DEF_HELPER_3(fsin, void, env, fp, fp)
  DEF_HELPER_3(fcos, void, env, fp, fp)
-+DEF_HELPER_4(fsincos, void, env, fp, fp, fp)
+ DEF_HELPER_4(fsincos, void, env, fp, fp, fp)
+ DEF_HELPER_3(fatan, void, env, fp, fp)
++DEF_HELPER_3(fasin, void, env, fp, fp)
  
  DEF_HELPER_3(mac_move, void, env, i32, i32)
  DEF_HELPER_3(macmulf, i64, env, i32, i32)
+diff --git a/target/m68k/softfloat.c b/target/m68k/softfloat.c
+index 00ac9a1e0a..91f0435ac3 100644
+--- a/target/m68k/softfloat.c
++++ b/target/m68k/softfloat.c
+@@ -2167,3 +2167,68 @@ floatx80 floatx80_atan(floatx80 a, float_status *status)
+         return a;
+     }
+ }
++
++/*----------------------------------------------------------------------------
++ | Arc sine
++ *----------------------------------------------------------------------------*/
++
++floatx80 floatx80_asin(floatx80 a, float_status *status)
++{
++    flag aSign;
++    int32_t aExp;
++    uint64_t aSig;
++
++    int8_t user_rnd_mode, user_rnd_prec;
++
++    int32_t compact;
++    floatx80 fp0, fp1, fp2, one;
++
++    aSig = extractFloatx80Frac(a);
++    aExp = extractFloatx80Exp(a);
++    aSign = extractFloatx80Sign(a);
++
++    if (aExp == 0x7FFF && (uint64_t) (aSig << 1)) {
++        return propagateFloatx80NaNOneArg(a, status);
++    }
++
++    if (aExp == 0 && aSig == 0) {
++        return packFloatx80(aSign, 0, 0);
++    }
++
++    compact = floatx80_make_compact(aExp, aSig);
++
++    if (compact >= 0x3FFF8000) { /* |X| >= 1 */
++        if (aExp == one_exp && aSig == one_sig) { /* |X| == 1 */
++            float_raise(float_flag_inexact, status);
++            a = packFloatx80(aSign, piby2_exp, pi_sig);
++            return floatx80_move(a, status);
++        } else { /* |X| > 1 */
++            float_raise(float_flag_invalid, status);
++            return floatx80_default_nan(status);
++        }
++
++    } /* |X| < 1 */
++
++    user_rnd_mode = status->float_rounding_mode;
++    user_rnd_prec = status->floatx80_rounding_precision;
++    status->float_rounding_mode = float_round_nearest_even;
++    status->floatx80_rounding_precision = 80;
++
++    one = packFloatx80(0, one_exp, one_sig);
++    fp0 = a;
++
++    fp1 = floatx80_sub(one, fp0, status);   /* 1 - X */
++    fp2 = floatx80_add(one, fp0, status);   /* 1 + X */
++    fp1 = floatx80_mul(fp2, fp1, status);   /* (1+X)*(1-X) */
++    fp1 = floatx80_sqrt(fp1, status);       /* SQRT((1+X)*(1-X)) */
++    fp0 = floatx80_div(fp0, fp1, status);   /* X/SQRT((1+X)*(1-X)) */
++
++    status->float_rounding_mode = user_rnd_mode;
++    status->floatx80_rounding_precision = user_rnd_prec;
++
++    a = floatx80_atan(fp0, status);         /* ATAN(X/SQRT((1+X)*(1-X))) */
++
++    float_raise(float_flag_inexact, status);
++
++    return a;
++}
+diff --git a/target/m68k/softfloat.h b/target/m68k/softfloat.h
+index eec45f3ffe..ca0eb674aa 100644
+--- a/target/m68k/softfloat.h
++++ b/target/m68k/softfloat.h
+@@ -38,4 +38,5 @@ floatx80 floatx80_tan(floatx80 a, float_status *status);
+ floatx80 floatx80_sin(floatx80 a, float_status *status);
+ floatx80 floatx80_cos(floatx80 a, float_status *status);
+ floatx80 floatx80_atan(floatx80 a, float_status *status);
++floatx80 floatx80_asin(floatx80 a, float_status *status);
+ #endif
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index f47388da4b..a78edd8825 100644
+index 88015e7ed8..d4169c4533 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -5159,6 +5159,14 @@ DISAS_INSN(fpu)
-     case 0x6c: /* fdsub */
-         gen_helper_fdsub(cpu_env, cpu_dest, cpu_src, cpu_dest);
+@@ -5060,6 +5060,9 @@ DISAS_INSN(fpu)
+     case 0x0a: /* fatan */
+         gen_helper_fatan(cpu_env, cpu_dest, cpu_src);
          break;
-+    case 0x30: case 0x31: case 0x32:
-+    case 0x33: case 0x34: case 0x35:
-+    case 0x36: case 0x37: {
-+            TCGv_ptr cpu_dest2 = gen_fp_ptr(REG(ext, 0));
-+            gen_helper_fsincos(cpu_env, cpu_dest, cpu_dest2, cpu_src);
-+            tcg_temp_free_ptr(cpu_dest2);
-+        }
++    case 0x0c: /* fasin */
++        gen_helper_fasin(cpu_env, cpu_dest, cpu_src);
 +        break;
-     case 0x38: /* fcmp */
-         gen_helper_fcmp(cpu_env, cpu_src, cpu_dest);
-         return;
+     case 0x0e: /* fsin */
+         gen_helper_fsin(cpu_env, cpu_dest, cpu_src);
+         break;
 -- 
 2.14.3
