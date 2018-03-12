@@ -1,36 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farosas@linux.vnet.ibm.com>) id 1evVcI-0006J3-Rp
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 18:08:28 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1evVfQ-0000XN-Et
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 18:11:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farosas@linux.vnet.ibm.com>) id 1evVcE-00015m-9t
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 18:08:26 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60584
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farosas@linux.vnet.ibm.com>)
-	id 1evVcE-00015c-4S
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 18:08:22 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w2CM4lJw004023
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 18:08:21 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2gnx6y0npw-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 18:08:21 -0400
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farosas@linux.vnet.ibm.com>;
-	Mon, 12 Mar 2018 18:08:20 -0400
-From: Fabiano Rosas <farosas@linux.vnet.ibm.com>
-Date: Mon, 12 Mar 2018 19:07:53 -0300
-In-Reply-To: <20180312220753.20096-1-farosas@linux.vnet.ibm.com>
-References: <20180312220753.20096-1-farosas@linux.vnet.ibm.com>
-Message-Id: <20180312220753.20096-6-farosas@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 5/5] include/block/block_int: Document
- protocol related functions
+	(envelope-from <ehabkost@redhat.com>) id 1evVfM-00028i-9j
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 18:11:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44784)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1evVfM-00028T-2l
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 18:11:36 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Mon, 12 Mar 2018 19:11:28 -0300
+Message-Id: <20180312221132.14141-1-ehabkost@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/4] Python queue, 2018-03-12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,47 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Cleber Rosa <crosa@redhat.com>
 
-Clarify that:
+The following changes since commit 6ceb1b51f05f9e1892d082960ed602dca7b669=
+6e:
 
-- for protocols the brdv_file_open function is used instead
-of bdrv_open;
+  Merge remote-tracking branch 'remotes/kraxel/tags/audio-20180312-pull-r=
+equest' into staging (2018-03-12 16:14:37 +0000)
 
-- when protocol_name is set, a driver should expect
-to be given only a filename and no other options.
+are available in the Git repository at:
 
-Signed-off-by: Fabiano Rosas <farosas@linux.vnet.ibm.com>
----
- include/block/block_int.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+  git://github.com/ehabkost/qemu.git tags/python-next-pull-request
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 27e17addba..c4dd1d4bb8 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -126,6 +126,8 @@ struct BlockDriver {
- 
-     int (*bdrv_open)(BlockDriverState *bs, QDict *options, int flags,
-                      Error **errp);
-+
-+    /* Protocol drivers should implement this instead of bdrv_open */
-     int (*bdrv_file_open)(BlockDriverState *bs, QDict *options, int flags,
-                           Error **errp);
-     void (*bdrv_close)(BlockDriverState *bs);
-@@ -251,6 +253,12 @@ struct BlockDriver {
-      */
-     int coroutine_fn (*bdrv_co_flush_to_os)(BlockDriverState *bs);
- 
-+    /*
-+     * Drivers setting this field must be able to work with just a plain
-+     * filename with '<protocol_name>:' as a prefix, and no other options.
-+     * Options may be extracted from the filename by implementing
-+     * bdrv_parse_filename.
-+     */
-     const char *protocol_name;
-     int (*bdrv_truncate)(BlockDriverState *bs, int64_t offset,
-                          PreallocMode prealloc, Error **errp);
--- 
-2.13.6
+for you to fetch changes up to 006cc558359d23f070c84d6db324bbb9b54962d7:
+
+  device-crash-test: Use 'python' binary (2018-03-12 19:10:16 -0300)
+
+----------------------------------------------------------------
+Python queue, 2018-03-12
+
+----------------------------------------------------------------
+
+Eduardo Habkost (4):
+  device-crash-test: New known crashes
+  qemu.py: Use items() instead of iteritems()
+  qmp.py: Encode json data before sending
+  device-crash-test: Use 'python' binary
+
+ scripts/qemu.py           | 2 +-
+ scripts/qmp/qmp.py        | 2 +-
+ scripts/device-crash-test | 6 +++++-
+ 3 files changed, 7 insertions(+), 3 deletions(-)
+
+--=20
+2.14.3
