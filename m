@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evN20-0004YX-HZ
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 08:58:25 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1evN69-0007q8-Og
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:02:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evN1z-0005dE-NE
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 08:58:24 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:42292)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1evN63-00050x-JQ
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:02:41 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:39250)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1evN1z-0005cQ-Id
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 08:58:23 -0400
-Received: by mail-oi0-x243.google.com with SMTP id c18so12176691oiy.9
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 05:58:23 -0700 (PDT)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1evN63-0004z4-BU
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:02:35 -0400
+Received: by mail-wm0-x244.google.com with SMTP id i3so15906292wmi.4
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 06:02:35 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20180227095135.1060.36549.stgit@pasha-VirtualBox>
+	<20180227095248.1060.40374.stgit@pasha-VirtualBox>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <53570b7e-8975-ce4e-acc1-fb5a752dc203@redhat.com>
+Date: Mon, 12 Mar 2018 14:02:31 +0100
 MIME-Version: 1.0
-In-Reply-To: <74aa2e5e-ed1b-3cf8-8ddc-41f7ef90ad7b@redhat.com>
-References: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA9KzitEO21Rgh8Azip+gVJjyobzNbk8sHuQf-ngg+Jjxg@mail.gmail.com>
-	<74aa2e5e-ed1b-3cf8-8ddc-41f7ef90ad7b@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 12 Mar 2018 12:58:02 +0000
-Message-ID: <CAFEAcA-Mb_o88ieynaY8k6xehTyAoC13Dkf0QUUyOGmEjRd7XA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v9 00/14] ARM SMMUv3 Emulation Support
+In-Reply-To: <20180227095248.1060.40374.stgit@pasha-VirtualBox>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 13/22] replay: push replay_mutex_lock up
+ the call tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +33,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Tomasz Nowicki <tn@semihalf.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Christoffer Dall <christoffer.dall@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, linuc.decode@gmail.com, Bharat Bhushan <bharat.bhushan@nxp.com>, Prem Mallappa <prem.mallappa@gmail.com>, Eric Auger <eric.auger.pro@gmail.com>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, alex.bennee@linaro.org
 
-On 28 February 2018 at 08:44, Auger Eric <eric.auger@redhat.com> wrote:
-> On 27/02/18 20:02, Peter Maydell wrote:
->> On 17 February 2018 at 18:46, Eric Auger <eric.auger@redhat.com> wrote:
->>> This series implements the emulation code for ARM SMMUv3.
+On 27/02/2018 10:52, Pavel Dovgalyuk wrote:
+>  
+> +void replay_init_locks(void)
+> +{
+> +    replay_mutex_init();
+> +}
+> +
 
->> What state is this series in now? Is it "seems ready to
->> go, needs review"? Are you hoping it might get in for 2.12,
->> or targeting 2.13 ?
+This should not be needed as a public function: until replay_mode
+is set, replay_lock and replay_unlock do nothing.  I'm squashing this:
 
-> Yes I think it is in a decent state and I would be happy to get some new
-> reviews, for a tentative pull in 2.12. In any case I will be reactive on
-> any comment in that prospect.
-
-Hi, Eric. I've now gone through the patchset and reviewed it. Sorry
-I didn't manage to get to this in time to be able to put it into 2.12,
-but there weren't any major or structural issues, so we should be
-able to get this into the tree early in the 2.13 dev cycle.
-
-thanks
--- PMM
+diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+index eeec66b8f4..3ced6bc231 100644
+--- a/include/sysemu/replay.h
++++ b/include/sysemu/replay.h
+@@ -63,8 +63,6 @@ void replay_mutex_unlock(void);
+ 
+ /* Replay process control functions */
+ 
+-/*! Enables and take replay locks (even if we don't use it) */
+-void replay_init_locks(void);
+ /*! Enables recording or saving event log with specified parameters */
+ void replay_configure(struct QemuOpts *opts);
+ /*! Initializes timers used for snapshotting and enables events recording */
+diff --git a/replay/replay.c b/replay/replay.c
+index a8b57cd077..b3e814a875 100644
+--- a/replay/replay.c
++++ b/replay/replay.c
+@@ -207,11 +207,6 @@ out:
+     return res;
+ }
+ 
+-void replay_init_locks(void)
+-{
+-    replay_mutex_init();
+-}
+-
+ static void replay_enable(const char *fname, int mode)
+ {
+     const char *fmode = NULL;
+@@ -238,8 +233,9 @@ static void replay_enable(const char *fname, int mode)
+     }
+ 
+     replay_filename = g_strdup(fname);
+-
+     replay_mode = mode;
++    replay_mutex_init();
++
+     replay_state.data_kind = -1;
+     replay_state.instructions_count = 0;
+     replay_state.current_step = 0;
+diff --git a/vl.c b/vl.c
+index 08e81c46a0..5925a4b502 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3059,7 +3059,6 @@ int main(int argc, char **argv, char **envp)
+     qemu_init_cpu_list();
+     qemu_init_cpu_loop();
+ 
+-    replay_init_locks();
+     qemu_mutex_lock_iothread();
+ 
+     atexit(qemu_run_exit_notifiers);
