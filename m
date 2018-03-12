@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <x1917x@gmail.com>) id 1evSJ8-0000N6-Dm
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:27 -0400
+	(envelope-from <x1917x@gmail.com>) id 1evSJC-0000R8-K2
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <x1917x@gmail.com>) id 1evSJ7-0005kK-C2
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:26 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:40079)
+	(envelope-from <x1917x@gmail.com>) id 1evSJB-0005mL-Bm
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:30 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:37762)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <x1917x@gmail.com>) id 1evSJ7-0005k3-6Z
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:25 -0400
-Received: by mail-pf0-x242.google.com with SMTP id x1so4728740pfh.7
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 11:36:25 -0700 (PDT)
+	(Exim 4.71) (envelope-from <x1917x@gmail.com>) id 1evSJB-0005m1-44
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:29 -0400
+Received: by mail-pg0-x244.google.com with SMTP id t186so292099pgc.4
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 11:36:29 -0700 (PDT)
 From: Alexey Gerasimenko <x1917x@gmail.com>
-Date: Tue, 13 Mar 2018 04:34:14 +1000
-Message-Id: <303852531690715bd3b5abfe884bd072523d0072.1520867956.git.x1917x@gmail.com>
+Date: Tue, 13 Mar 2018 04:34:15 +1000
+Message-Id: <f449e401ad36401e6a5814d5b8d054e6783d8742.1520867956.git.x1917x@gmail.com>
 In-Reply-To: <cover.1520867740.git.x1917x@gmail.com>
 References: <cover.1520867740.git.x1917x@gmail.com>
 In-Reply-To: <cover.1520867740.git.x1917x@gmail.com>
 References: <cover.1520867740.git.x1917x@gmail.com>
-Subject: [Qemu-devel] [RFC PATCH 29/30] xen/pt: add Resizable BAR PCIe
- Extended Capability descriptor and sizing
+Subject: [Qemu-devel] [RFC PATCH 30/30] xen/pt: add VC/VC9/MFVC PCIe
+ Extended Capabilities descriptors and sizing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,69 +31,238 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: xen-devel@lists.xenproject.org
 Cc: Alexey Gerasimenko <x1917x@gmail.com>, qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
 
-Unlike other PCIe Extended Capabilities, we currently cannot allow attempts
-to use Resizable BAR Capability. Without specifically handling BAR resizing
-we're likely end up with corrupted MMIO hole layout if guest OS will
-attempt to use this feature. Actually, recent Windows versions started
-to understand and use the Resizable BAR Capability (see [1]).
+Virtual Channel/MFVC capabilities are relatively useless for emulation
+(passing through accesses to them should be enough in most cases) yet they
+have hardest format of all PCIe Extended Capabilities, mostly because
+VC capability format allows the sparse config space layout with gaps
+between the parts which make up the VC capability.
 
-For now, we need to hide the Resizable BAR Capability from guest OS until
-BAR resizing emulation support will be implemented in Xen. This support
-is a pretty much mandatory todo-feature as the effect of writing
-to Resizable BAR control registers can be considered similar
-to reprogramming normal BAR registers -- i.e. this needs to be handled
-explicitly, resulting in corresponding MMIO BAR range(s) remapping.
-Until then, we mark the Resizable BAR Capability as
-XEN_PT_GRP_TYPE_HARDWIRED.
+We have the main capability body followed by variable number of entries
+where each entry may additionally reference the arbitration table outside
+main capability body. There are no constrains on these arbitration table
+offsets -- in theory, they may reside outside the VC capability range
+anywhere in PCIe extended config space. Also, every arbitration table size
+is not fixed - it depends on current VC/Port Arbitration Select field
+value.
 
-[1]: https://docs.microsoft.com/en-us/windows-hardware/drivers/display/resizable-bar-support
+To simplify things, this patch assume that changing VC/Port Arbitration
+Select value (i.e. resizing arbitration tables) do not cause arbitration
+table offsets to change. Normally the device must place arbitration tables
+considering their maximum size, not current one. Maximum arbitration table
+size depends on VC/Port Arbitration Capability bitmask -- this is what
+actually used to calculate the arbitration table size.
 
 Signed-off-by: Alexey Gerasimenko <x1917x@gmail.com>
 ---
- hw/xen/xen_pt_config_init.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ hw/xen/xen_pt_config_init.c | 192 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 192 insertions(+)
 
 diff --git a/hw/xen/xen_pt_config_init.c b/hw/xen/xen_pt_config_init.c
-index 326f5671ff..b03b071b22 100644
+index b03b071b22..ab9c233d84 100644
 --- a/hw/xen/xen_pt_config_init.c
 +++ b/hw/xen/xen_pt_config_init.c
-@@ -2156,6 +2156,26 @@ static int xen_pt_ext_cap_pmux_size_init(XenPCIPassthroughState *s,
+@@ -2177,6 +2177,174 @@ static int xen_pt_ext_cap_rebar_size_init(XenPCIPassthroughState *s,
      return ret;
  }
  
-+/* get Resizable BAR Extended Capability register group size */
-+static int xen_pt_ext_cap_rebar_size_init(XenPCIPassthroughState *s,
++/* get VC/VC9/MFVC Extended Capability register group size */
++static uint32_t get_arb_table_len_max(XenPCIPassthroughState *s,
++                                      uint32_t max_bit_supported,
++                                      uint32_t arb_cap)
++{
++    int n_bit;
++    uint32_t table_max_size = 0;
++
++    if (!arb_cap) {
++        return 0;
++    }
++
++    for (n_bit = 7; n_bit >= 0 && !(arb_cap & (1 << n_bit)); n_bit--);
++
++    if (n_bit > max_bit_supported) {
++        XEN_PT_ERR(&s->dev, "Warning: encountered unknown VC arbitration "
++                   "capability supported: 0x%02x\n", (uint8_t) arb_cap);
++    }
++
++    switch (n_bit) {
++    case 0: break;
++    case 1: return 32;
++    case 2: return 64;
++    case 3: /*128 too*/
++    case 4: return 128;
++    default:
++        table_max_size = 8 << n_bit;
++    }
++
++    return table_max_size;
++}
++
++#define GET_ARB_TABLE_OFFSET(x)           (((x) >> 24) * 0x10)
++#define GET_VC_ARB_CAPABILITY(x)          ((x) & 0xFF)
++#define ARB_TABLE_ENTRY_SIZE_BITS(x)      (1 << (((x) & PCI_VC_CAP1_ARB_SIZE)\
++                                          >> 10))
++static int xen_pt_ext_cap_vchan_size_init(XenPCIPassthroughState *s,
 +                                          const XenPTRegGroupInfo *grp_reg,
 +                                          uint32_t base_offset,
 +                                          uint32_t *size)
 +{
-+    uint32_t rebar_ctl = 0;
-+    uint32_t num_entries;
++    uint32_t header;
++    uint32_t vc_cap_max_size = PCIE_CONFIG_SPACE_SIZE - base_offset;
++    uint32_t next_ptr;
++    uint32_t arb_table_start_max = 0, arb_table_end_max = 0;
++    uint32_t port_vc_cap1, port_vc_cap2, vc_rsrc_cap;
++    uint32_t ext_vc_count = 0;
++    uint32_t arb_table_entry_size;  /* in bits */
++    const char *cap_name;
++    int ret;
++    int i;
 +
-+    int ret = xen_host_pci_get_long(&s->real_device,
-+                                    base_offset + PCI_REBAR_CTRL,
-+                                    &rebar_ctl);
-+    num_entries =
-+        (rebar_ctl & PCI_REBAR_CTRL_NBAR_MASK) >> PCI_REBAR_CTRL_NBAR_SHIFT;
++    ret = xen_host_pci_get_long(&s->real_device, base_offset, &header);
++    if (ret) {
++        goto err_read;
++    }
 +
-+    *size = num_entries*8 + 4;
++    next_ptr = PCI_EXT_CAP_NEXT(header);
 +
-+    log_pcie_extended_cap(s, "Resizable BAR", base_offset, *size);
++    switch (PCI_EXT_CAP_ID(header)) {
++    case PCI_EXT_CAP_ID_VC:
++    case PCI_EXT_CAP_ID_VC9:
++        cap_name = "Virtual Channel";
++        break;
++    case PCI_EXT_CAP_ID_MFVC:
++        cap_name = "Multi-Function VC";
++        break;
++    default:
++        XEN_PT_ERR(&s->dev, "Unknown VC Extended Capability ID "
++                   "encountered: 0x%04x\n", PCI_EXT_CAP_ID(header));
++        return -1;
++    }
++
++    if (next_ptr && next_ptr > base_offset) {
++        vc_cap_max_size = next_ptr - base_offset;
++    }
++
++    ret = xen_host_pci_get_long(&s->real_device,
++                                base_offset + PCI_VC_PORT_CAP1,
++                                &port_vc_cap1);
++    if (ret) {
++        goto err_read;
++    }
++
++    ret = xen_host_pci_get_long(&s->real_device,
++                                base_offset + PCI_VC_PORT_CAP2,
++                                &port_vc_cap2);
++    if (ret) {
++        goto err_read;
++    }
++
++    ext_vc_count = port_vc_cap1 & PCI_VC_CAP1_EVCC;
++
++    arb_table_start_max = GET_ARB_TABLE_OFFSET(port_vc_cap2);
++
++    /* check arbitration table offset for validity */
++    if (arb_table_start_max >= vc_cap_max_size) {
++        XEN_PT_ERR(&s->dev, "Warning: VC arbitration table offset points "
++                   "outside the expected range: %#04x\n",
++                   (uint16_t) arb_table_start_max);
++        /* skip this arbitration table */
++        arb_table_start_max = 0;
++    }
++
++    if (arb_table_start_max) {
++        uint32_t vc_arb_cap = GET_VC_ARB_CAPABILITY(port_vc_cap2);
++        uint32_t num_phases = get_arb_table_len_max(s, 3, vc_arb_cap);
++        uint32_t arb_tbl_sz = QEMU_ALIGN_UP(num_phases * 4, 32) / 8;
++
++        arb_table_end_max = base_offset + arb_table_start_max + arb_tbl_sz;
++    }
++
++    /* get Function/Port Arbitration Table Entry size */
++    arb_table_entry_size = ARB_TABLE_ENTRY_SIZE_BITS(port_vc_cap1);
++
++    /* process all VC Resource entries */
++    for (i = 0; i < ext_vc_count; i++) {
++        uint32_t arb_table_offset;
++
++        /* read VC Resource Capability */
++        ret = xen_host_pci_get_long(&s->real_device,
++            base_offset + PCI_VC_RES_CAP + i * PCI_CAP_VC_PER_VC_SIZEOF,
++            &vc_rsrc_cap);
++        if (ret) {
++            goto err_read;
++        }
++
++        arb_table_offset = GET_ARB_TABLE_OFFSET(vc_rsrc_cap);
++
++        if (arb_table_offset > arb_table_start_max) {
++            /* check arbitration table offset for validity */
++            if (arb_table_offset >= vc_cap_max_size) {
++                XEN_PT_ERR(&s->dev, "Warning: Port/Function arbitration table "
++                           "offset points outside the expected range: %#04x\n",
++                           (uint16_t) arb_table_offset);
++                /* skip this arbitration table */
++                arb_table_offset = 0;
++            } else {
++                arb_table_start_max = arb_table_offset;
++            }
++
++            if (arb_table_offset) {
++                uint32_t vc_arb_cap = GET_VC_ARB_CAPABILITY(vc_rsrc_cap);
++                uint32_t num_phases = get_arb_table_len_max(s, 5, vc_arb_cap);
++                uint32_t arb_tbl_sz =
++                    QEMU_ALIGN_UP(num_phases * arb_table_entry_size, 32) / 8;
++
++                arb_table_end_max = base_offset + arb_table_offset + arb_tbl_sz;
++            }
++        }
++    }
++
++    if (arb_table_end_max) {
++        *size = arb_table_end_max - base_offset;
++    } else {
++        *size = PCI_CAP_VC_BASE_SIZEOF +
++                ext_vc_count * PCI_CAP_VC_PER_VC_SIZEOF;
++    }
++
++    log_pcie_extended_cap(s, cap_name, base_offset, *size);
++    return 0;
++
++err_read:
++    XEN_PT_ERR(&s->dev, "Error while reading VC Extended Capability\n");
 +    return ret;
 +}
- 
++
++
  static const XenPTRegGroupInfo xen_pt_emu_reg_grps[] = {
      /* Header Type0 reg group */
-@@ -2488,6 +2508,13 @@ static const XenPTRegGroupInfo xen_pt_emu_reg_grps[] = {
-         .size_init  = xen_pt_ext_cap_dpc_size_init,
-         .emu_regs   = xen_pt_ext_cap_emu_reg_dummy,
+     {
+@@ -2515,6 +2683,30 @@ static const XenPTRegGroupInfo xen_pt_emu_reg_grps[] = {
+         .grp_size   = 0xFF,
+         .size_init  = xen_pt_ext_cap_rebar_size_init,
      },
-+    /* Resizable BAR Extended Capability reg group */
++    /* Virtual Channel Extended Capability reg group (2) */
 +    {
-+        .grp_id     = PCIE_EXT_CAP_ID(PCI_EXT_CAP_ID_REBAR),
-+        .grp_type   = XEN_PT_GRP_TYPE_HARDWIRED,
++        .grp_id     = PCIE_EXT_CAP_ID(PCI_EXT_CAP_ID_VC),
++        .grp_type   = XEN_PT_GRP_TYPE_EMU,
 +        .grp_size   = 0xFF,
-+        .size_init  = xen_pt_ext_cap_rebar_size_init,
++        .size_init  = xen_pt_ext_cap_vchan_size_init,
++        .emu_regs   = xen_pt_ext_cap_emu_reg_dummy,
++    },
++    /* Virtual Channel Extended Capability reg group (9) */
++    {
++        .grp_id     = PCIE_EXT_CAP_ID(PCI_EXT_CAP_ID_VC9),
++        .grp_type   = XEN_PT_GRP_TYPE_EMU,
++        .grp_size   = 0xFF,
++        .size_init  = xen_pt_ext_cap_vchan_size_init,
++        .emu_regs   = xen_pt_ext_cap_emu_reg_dummy,
++    },
++    /* Multi-Function Virtual Channel Extended Capability reg group */
++    {
++        .grp_id     = PCIE_EXT_CAP_ID(PCI_EXT_CAP_ID_MFVC),
++        .grp_type   = XEN_PT_GRP_TYPE_EMU,
++        .grp_size   = 0xFF,
++        .size_init  = xen_pt_ext_cap_vchan_size_init,
++        .emu_regs   = xen_pt_ext_cap_emu_reg_dummy,
 +    },
      {
          .grp_size = 0,
