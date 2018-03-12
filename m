@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evMLp-0004zI-G7
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 08:14:50 -0400
+	(envelope-from <eblake@redhat.com>) id 1evMPF-0006Bc-Ex
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 08:18:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evMLo-0005nc-HX
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 08:14:49 -0400
-Date: Mon, 12 Mar 2018 13:14:41 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180312121441.GD31537@localhost.localdomain>
-References: <20180309172713.26318-1-kwolf@redhat.com>
-	<20180309172713.26318-4-kwolf@redhat.com>
-	<20180312114009.GI3493@redhat.com>
-	<20180312114721.GB31537@localhost.localdomain>
-	<20180312115058.GO3493@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1evMPC-0003Qr-5x
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 08:18:21 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38018 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1evMPB-0003Q4-W4
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 08:18:18 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 058FF4000B6E
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 12:18:14 +0000 (UTC)
+References: <1520839658-20499-1-git-send-email-thuth@redhat.com>
+	<2a85941f-48bf-9e9b-0d6d-832a270d882b@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7413bf34-63ec-837d-d418-af2cfd1038d7@redhat.com>
+Date: Mon, 12 Mar 2018 07:18:08 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180312115058.GO3493@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/6] luks: Support .bdrv_co_create
+In-Reply-To: <2a85941f-48bf-9e9b-0d6d-832a270d882b@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-doc: Rework the network options
+ chapter to make "-net" less prominent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +35,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Am 12.03.2018 um 12:50 hat Daniel P. Berrang=E9 geschrieben:
-> On Mon, Mar 12, 2018 at 12:47:21PM +0100, Kevin Wolf wrote:
-> > Am 12.03.2018 um 12:40 hat Daniel P. Berrang=E9 geschrieben:
-> > > On Fri, Mar 09, 2018 at 06:27:10PM +0100, Kevin Wolf wrote:
-> > > > This adds the .bdrv_co_create driver callback to luks, which enab=
-les
-> > > > image creation over QMP.
-> > > >=20
-> > > > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > > > ---
-> > > >  qapi/block-core.json | 17 ++++++++++++++++-
-> > > >  block/crypto.c       | 34 ++++++++++++++++++++++++++++++++++
-> > > >  2 files changed, 50 insertions(+), 1 deletion(-)
-> > > >=20
-> > > > diff --git a/qapi/block-core.json b/qapi/block-core.json
-> > > > index 524d51567a..07039bfe9c 100644
-> > > > --- a/qapi/block-core.json
-> > > > +++ b/qapi/block-core.json
-> > > > @@ -3452,6 +3452,21 @@
-> > > >              '*preallocation':   'PreallocMode' } }
-> > > > =20
-> > > >  ##
-> > > > +# @BlockdevCreateOptionsLUKS:
-> > > > +#
-> > > > +# Driver specific image creation options for LUKS.
-> > > > +#
-> > > > +# @file             Node to create the image format on
-> > > > +# @size             Size of the virtual disk in bytes
-> > > > +#
-> > > > +# Since: 2.12
-> > > > +##
-> > > > +{ 'struct': 'BlockdevCreateOptionsLUKS',
-> > > > +  'data': { 'file':             'BlockdevRef',
-> > > > +            'qcrypto':          'QCryptoBlockCreateOptionsLUKS',
-> > > > +            'size':             'size' } }
-> > >=20
-> > > s/qcrypto/crypto/ in this field.
-> > >=20
-> > > I do wonder about whether instead of embedding QCryptoBlockCreateOp=
-tionsLUKS
-> > > as a field, we could instead use QCryptoBlockCreateOptionsLUKS as t=
-he
-> > > base struct and just inherit from it to add file/size.
-> > >=20
-> > > I'm not really fussed, but I wonder if you/Eric have any thoughts o=
-n the pros
-> > > or cons of inheritance vs embedding in this case.
-> >=20
-> > I don't think QAPI has a way to embed it in JSON, but still provide a
-> > QCryptoBlockCreateOptionsLUKS C object. Originally I wanted to use
-> > inheritance, but instead of having the struct type reused, you get al=
-l
-> > field definitions copied. I guess you could then manually cast to the
-> > base type and it would still work, but it didn't really feel clean.
->=20
-> IIRC, QAPI generates a method
->=20
->    $BASETYPE *qapi_$TYPENAME_base(const $TYPENAME *obj)
->=20
-> which just does the blind cast to the base type.
+On 03/12/2018 04:07 AM, Paolo Bonzini wrote:
+> On 12/03/2018 08:27, Thomas Huth wrote:
+>> "-net" is clearly a legacy option. Yet we still use it in almost all
+>> examples in the qemu documentation, and many other spots in the network
+>> chapter. We should make it less prominent that users are not lured into
+>> using it so often anymore. So instead of starting the network chapter with
+>> "-net nic" and documenting "-net <backend>" below "-netdev <backend>"
+>> everywhere, all the "-net" related documentation is now moved to the end
+>> of the chapter. The new "--nic" option is moved to the beginning of the
+>> chapter instead, with a new example that should demonstrate how "--nic"
+>> can be used to shortcut "--device" with "--netdev". The examples in this
+>> chapter are changed to use the "--device" and "--netdev" options or
+>> "--nic" instead of "-net nic -net <backend>".
+>>
+>> While we're at it, also remove a legacy remark about very old Linux
+>> distributions. Also remove the "[...]" from the examples in this chapter
+>> since we are not using this ellipsis in any other examples in our docu-
+>> mentation.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>   v2:
+>>   - Fixed the bad "--device=e1000" example
+> 
+> Frankly I think this is the proof that double-dash option names are a
+> bad idea.  The reason to do that was to make qemu-img and qemu command
+> lines more similar in the documentation, but the truth is they are not
+> similar and shouldn't be made similar.  The equal sign is one example,
+> where qemu-img supports "--format=raw" but QEMU doesn't support
+> "--device=e1000", but it's not the only one.
 
-Oh, thanks, I didn't know that one! That makes it an offical API that
-the QAPI generators must keep working, so it should be fine to use. I'll
-give it a try then.
+Our hand-rolled parser sucks.  We should fix it to be more like getopt, 
+at which point --device=e1000 would work.
 
-Kevin
+> 
+> qemu-img supports things such as "-fraw", qemu doesn't---for example
+> "-m1024" doesn't work).
+
+Our hand-rolled parser sucks.  We should fix it to be more like getopt, 
+at which point -m1024 would work.
+
+>  qemu-img can combine single-letter options
+> (e.g. "qemu-img convert -pc") but qemu cannot---e.g. "-sm" doesn't
+> combine "-s" and "-m".
+
+That's a legitimate difference between getopt_long() and 
+getopt_long_only() - but to some extent, even getopt_long_only() can 
+bundle unambiguous short options correctly.  Again, fixing our 
+hand-rolled parser to use getopt_long_only() might make this better.
+
+> 
+> No need to drop them in QEMU, since it's more or less just a convenience
+> for people that are used to double-dash long options, but using them in
+> the documentation is confusing.
+
+For -object vs. --object (which IS used identically between qemu-img and 
+qemu proper), we really do want to favor a common spelling (which 
+perhaps means we need to first fix our hand-rolled parser to not suck so 
+much - possibly by rewriting it to use getopt_long_only()).  For options 
+like -nic vs. --nic, which have no (current) counterpart in qemu-img, 
+it's a harder sell (as you continue to argue), but Dan's original 
+suggestion to prefer double-dash in the documentation was because 
+consistency helps (and if that means improving our parser to behave more 
+consistently, that's a good thing).
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
