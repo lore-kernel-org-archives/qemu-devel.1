@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evRGL-00072g-5g
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:29:30 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1evRHC-0007vL-Iw
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:30:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evRGI-0003jH-0B
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:29:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38430 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1evRH9-0004U1-Db
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:30:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56916 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evRGH-0003iu-Rc
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:29:25 -0400
-Date: Mon, 12 Mar 2018 17:29:22 +0000
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evRH9-0004TQ-6y
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:30:19 -0400
+Date: Mon, 12 Mar 2018 17:30:12 +0000
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180312172921.GS3219@work-vm>
+Message-ID: <20180312173011.GT3219@work-vm>
 References: <20180309091535.13315-1-peterx@redhat.com>
 	<20180309091535.13315-18-peterx@redhat.com>
 MIME-Version: 1.0
@@ -36,9 +36,6 @@ Cc: qemu-devel@nongnu.org, Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . B
 > the critical fields in RAMState to make sure it is ready for a resume.
 > 
 > Signed-off-by: Peter Xu <peterx@redhat.com>
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
 > ---
 >  migration/ram.c        | 45 ++++++++++++++++++++++++++++++++++++++++++++-
 >  migration/trace-events |  1 +
@@ -117,7 +114,12 @@ Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 >  ram_dirty_bitmap_sync_wait(void) ""
 >  ram_dirty_bitmap_sync_complete(void) ""
 > +ram_state_resume_prepare(long v) "%ld"
->  
+
+Actually, just noticed that's a long but the values passed is now
+uint64_t - be careful.
+
+Dave
+
 >  # migration/migration.c
 >  await_return_path_close_on_source_close(void) ""
 > -- 
