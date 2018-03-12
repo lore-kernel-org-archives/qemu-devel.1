@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evO0D-00026z-UL
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 10:00:41 -0400
+	(envelope-from <eblake@redhat.com>) id 1evO1R-0002yI-CU
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 10:01:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evO08-0004xL-Bd
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 10:00:38 -0400
-References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
-	<1518702707-7077-7-git-send-email-vsementsov@virtuozzo.com>
-	<b570a199-9139-5652-5ad8-407820680620@redhat.com>
-	<540897fd-ceff-548e-ce96-11fc47ea4cd7@virtuozzo.com>
+	(envelope-from <eblake@redhat.com>) id 1evO1L-00014Z-Di
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 10:01:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53368 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1evO1L-00013m-9F
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 10:01:47 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C26B98011454
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 14:01:46 +0000 (UTC)
+References: <20180312124939.20562-1-berrange@redhat.com>
+	<c9bbe182-4a13-0063-4ce8-98151f1bd228@redhat.com>
+	<20180312131445.GS3493@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <e10c055d-e90a-3500-ded6-f8c78598d575@redhat.com>
-Date: Mon, 12 Mar 2018 09:00:12 -0500
+Message-ID: <9d9b8ddd-ccef-f486-6195-b1a17ea1991a@redhat.com>
+Date: Mon, 12 Mar 2018 09:01:39 -0500
 MIME-Version: 1.0
-In-Reply-To: <540897fd-ceff-548e-ce96-11fc47ea4cd7@virtuozzo.com>
+In-Reply-To: <20180312131445.GS3493@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 6/9] nbd: BLOCK_STATUS for standard
- get_block_status function: client part
+Subject: Re: [Qemu-devel] [PATCH v5 0/9] Enable passing pre-opened chardev
+ socket FD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +36,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On 03/12/2018 08:13 AM, Vladimir Sementsov-Ogievskiy wrote:
->>
->> We should probably validate that the length field is a multiple of=20
->> min_block (if a server tells us that all operations must be 512-byte=20
->> aligned, then reports an extent that is smaller than 512 bytes, we=20
->> have no way to ask for the status of the second half of the sector).=20
->> Probably also something that needs to be explicitly stated in the NBD=20
->> spec. [1]
->=20
-> related question: what server should reply on zero-length request? I'll=
- add
->=20
-> +=C2=A0=C2=A0=C2=A0=C2=A0 if (!bytes) {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *pnum =3D 0;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
-> +=C2=A0=C2=A0=C2=A0=C2=A0 }
->=20
-> to nbd_client_co_block_status, to prevent such situation, but looks lik=
-e=20
-> spec lacks the information.
+On 03/12/2018 08:14 AM, Daniel P. Berrang=C3=A9 wrote:
+> On Mon, Mar 12, 2018 at 08:12:44AM -0500, Eric Blake wrote:
+>> On 03/12/2018 07:49 AM, Daniel P. Berrang=C3=A9 wrote:
+>>> An update of:
+>>>
+>>>     v1: https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg0461=
+8.html
+>>>     v2: https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg0470=
+6.html
+>>>     v3: https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg0489=
+2.html
+>>>     v4: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg0095=
+0.html
+>>>
+>>> This enables fixing a long standing problem that libvirt has with
+>>> starting up QEMU. It has to busy-wait retrying connect() on the QMP
+>>> monitor socket until QEMU finally creates & listens on it, but at sam=
+e
+>>> time must be careful to not wait forever if QEMU exits.
+>>>
+>>> With this patch series, libvirt can simply pass in a pre-opened UNIX =
+domain
+>>> socket file descriptor, which it can immediately connect to with no b=
+usy-wait.
+>>>
 
-nbd.git commit ee926037 mentions that NBD_CMD_READ, _WRITE, _TRIM, and=20
-_WRITE_ZEROES have unspecified behavior for zero-length transactions; we=20
-should do the same for NBD_CMD_BLOCK_STATUS.  But in the meantime,=20
-handling it gracefully with a no-op reply (the way qemu.git commit=20
-ef8c887e handles 0-length structured read) is fine.
+>> Whose tree should this go through?  It's got some QAPI impact, so I'm =
+okay
+>> including it in my QAPI pull request later today, if there is no bette=
+r
+>> tree...
+>=20
+> These days I usually send PR for stuff touching sockets code myself. So
+> unless someone else strongly prefers to take it via their tree for sake
+> of any easy of conflict / merge resolution, I can do a PR once acked.
+
+Okay, I'll go through one more round of reviews, then let you send the=20
+PR; we still have time to make softfreeze tomorrow.
 
 --=20
 Eric Blake, Principal Software Engineer
