@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1evLJD-0007f5-1r
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:08:07 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1evLLU-0000Ma-Uy
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:10:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1evLJ8-0007Bd-R6
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:08:03 -0400
-Date: Mon, 12 Mar 2018 11:07:55 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180312110755.GB5681@stefanha-x1.localdomain>
-References: <20180307124619.6218-1-stefanha@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1evLLT-0004cM-Ui
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:10:24 -0400
+Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:45263)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1evLLT-0004aU-O9
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:10:23 -0400
+Received: by mail-ot0-x232.google.com with SMTP id f11so14817922otj.12
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 04:10:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="TRYliJ5NKNqkz5bu"
-Content-Disposition: inline
-In-Reply-To: <20180307124619.6218-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] block: make
- BDRV_POLL_WHILE() re-entrancy safe
+In-Reply-To: <8ecafc78-5ea0-5d83-41d4-0b9b95bcdf21@gmail.com>
+References: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
+	<1518893216-9983-11-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA8grbFO7E0yoci_dwr2xnH8ujS8cJnpNxGdz=JOged=Gw@mail.gmail.com>
+	<a35ca106-b405-8c07-95b6-ff65f324fae4@redhat.com>
+	<CAFEAcA-08=3jyf1fpdD6AumJmbL=64iLOpoySVCfot7CXiD4Og@mail.gmail.com>
+	<8ecafc78-5ea0-5d83-41d4-0b9b95bcdf21@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 12 Mar 2018 11:10:02 +0000
+Message-ID: <CAFEAcA9--5Ja9-jNVp7dJEN_y4is25NT9TSQcakDdSkpSV8R9A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v9 10/14] hw/arm/smmuv3: Abort on vfio or
+ vhost case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,56 +34,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, "fuweiwei (C)" <fuweiwei2@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Auger <eric.auger.pro@gmail.com>
+Cc: Auger Eric <eric.auger@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>
 
+On 12 March 2018 at 10:53, Eric Auger <eric.auger.pro@gmail.com> wrote:
+> Hi Peter,
+>
+> On 09/03/18 18:59, Peter Maydell wrote:
+>> On 9 March 2018 at 17:53, Auger Eric <eric.auger@redhat.com> wrote:
+>>> Hi Peter,
+>>> On 08/03/18 20:06, Peter Maydell wrote:
+>>>> On 17 February 2018 at 18:46, Eric Auger <eric.auger@redhat.com> wrote:
+>>>>> +static void smmuv3_notify_flag_changed(IOMMUMemoryRegion *iommu,
+>>>>> +                                       IOMMUNotifierFlag old,
+>>>>> +                                       IOMMUNotifierFlag new)
+>>>>> +{
+>>>>> +    if (old == IOMMU_NOTIFIER_NONE) {
+>>>>> +        error_setg(&error_fatal,
+>>>>> +                   "SMMUV3: vhost and vfio notifiers not yet supported");
+>>>>> +    }
+>>>>> +}
+>>>>
+>>>> Is this triggerable by the guest, or by the user on the command
+>>>> line, or only by a bug in the board or other QEMU code?
+>>> by the user on the command line.
+>>
+>> OK. Do they get this error immediately on startup, or only later
+>> in execution? (If the latter, is it possible to make the error
+>> happen earlier?)
 
---TRYliJ5NKNqkz5bu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> later in execution. We also have to handle the case where such device is
+> hot-plugged. At best if could be done on smmu_find_add_as() by checking
+> the type of attached device but this wouldn't happen much earlier. By
+> the way we will soon support vhost and we will just rule out vfio
+> integration by detecting map notifiers.
 
-On Wed, Mar 07, 2018 at 12:46:19PM +0000, Stefan Hajnoczi wrote:
-> Nested BDRV_POLL_WHILE() calls can occur.  Currently
-> assert(!wait_->wakeup) fails in AIO_WAIT_WHILE() when this happens.
->=20
-> This patch converts the bool wait_->need_kick flag to an unsigned
-> wait_->num_waiters counter.
->=20
-> Nesting works correctly because outer AIO_WAIT_WHILE() callers evaluate
-> the condition again after the inner caller completes (invoking the inner
-> caller counts as aio_poll() progress).
->=20
-> Reported-by: "fuweiwei (C)" <fuweiwei2@huawei.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
-> v2:
->  * Rebase onto qemu.git/master now that AIO_WAIT_WHILE() has landed
->    [Kevin]
->=20
->  include/block/aio-wait.h | 61 ++++++++++++++++++++++++------------------=
-------
->  util/aio-wait.c          |  2 +-
->  2 files changed, 31 insertions(+), 32 deletions(-)
+Hmm. error_fatal is a bit unfortunate for a hotplug event -- ideally
+you would want to cause the hotplug to cleanly fail without aborting
+the running QEMU session.
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
-
-Stefan
-
---TRYliJ5NKNqkz5bu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJapl+LAAoJEJykq7OBq3PIAVQH/R2aRkbc6hbVhf+Q47WlFODT
-zs/ecO0X6JeDmaDS8ec6fIGNwsA6qjZyZALXcsTCka894xSbhnb13KF82bsn2zGm
-rDnonDbW1hDr4H65EvjMrBZPnpQ9CPsAXragxzEBMl7ZHqdvz9+F5bU45ScgHLsK
-nESfznIPoZ+OHKbgK0Zshp/XqURJogJRYpvng6JXoPIZTY6UEOKxF0LNY8lAyyvl
-pM4+yNZivmuLXlp96Ho8fGlD18mKLtPKGeP3kYl3b3x++dqIAV9DrVKiB7nHUuWX
-bsw9bI2ec2lDP7q30qE0xjYVALcxgZNevTVCWyUPgekJqSGLngwQGdpUjfldtnw=
-=ZTCT
------END PGP SIGNATURE-----
-
---TRYliJ5NKNqkz5bu--
+thanks
+-- PMM
