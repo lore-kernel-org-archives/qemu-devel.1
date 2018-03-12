@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56648)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1evNlU-0006xe-CM
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:45:31 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1evNln-0007Gf-Pf
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:45:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1evNlT-0005P1-1B
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:45:24 -0400
-References: <20180309182202.31206-1-farosas@linux.vnet.ibm.com>
-	<20180309182202.31206-5-farosas@linux.vnet.ibm.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <78c48f4a-1da1-e5da-4c0a-69f9ee799d04@redhat.com>
-Date: Mon, 12 Mar 2018 14:45:16 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1evNln-0005z7-49
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:45:43 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:34385)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1evNlm-0005yU-Vn
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:45:43 -0400
+Received: by mail-ot0-x241.google.com with SMTP id n74so15308544ota.1
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 06:45:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180309182202.31206-5-farosas@linux.vnet.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="XV6YTBtRivLpiuhs0iZ9noaA4UGXxtqb2"
-Subject: Re: [Qemu-devel] [PATCH 4/5] block/blkreplay: Remove
- protocol-related fields
+In-Reply-To: <CAMxuvayOHENoibkYscXP5x-u8iTBYrLWkfL0eBuXX2YPBi5nYw@mail.gmail.com>
+References: <1520615003-20869-1-git-send-email-wei@redhat.com>
+	<CAMxuvayOHENoibkYscXP5x-u8iTBYrLWkfL0eBuXX2YPBi5nYw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 12 Mar 2018 13:45:21 +0000
+Message-ID: <CAFEAcA-qcFSTzhGYKdWE9QxPgRESMzMCWJ7UT6RfD1YV9xhsgA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/1] dump: Update correct kdump phys_base
+ field for AArch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fabiano Rosas <farosas@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Cc: Wei Huang <wei@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XV6YTBtRivLpiuhs0iZ9noaA4UGXxtqb2
-From: Max Reitz <mreitz@redhat.com>
-To: Fabiano Rosas <farosas@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <78c48f4a-1da1-e5da-4c0a-69f9ee799d04@redhat.com>
-Subject: Re: [PATCH 4/5] block/blkreplay: Remove protocol-related fields
-References: <20180309182202.31206-1-farosas@linux.vnet.ibm.com>
- <20180309182202.31206-5-farosas@linux.vnet.ibm.com>
-In-Reply-To: <20180309182202.31206-5-farosas@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 11 March 2018 at 17:42, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+> Hi
+>
+> On Fri, Mar 9, 2018 at 6:03 PM, Wei Huang <wei@redhat.com> wrote:
+>> For guest kernel that supports KASLR, the load address can change every
+>> time when guest VM runs. To find the physical base address correctly,
+>> current QEMU dump searches VMCOREINFO for the string "NUMBER(phys_base)=
+=3D".
+>> However this string pattern is only available on x86_64. AArch64 uses a
+>> different field, called "NUMBER(PHYS_OFFSET)=3D". This patch makes sure
+>> QEMU dump uses the correct string on AArch64.
+>>
+>> Signed-off-by: Wei Huang <wei@redhat.com>
+>
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-On 2018-03-09 19:22, Fabiano Rosas wrote:
-> The blkreplay driver is not a protocol so it should implement bdrv_open=
+Thanks; applied to target-arm.next for 2.12.
 
-> instead of bdrv_file_open and not provide a protocol_name.
->=20
-> Attempts to invoke this driver using protocol syntax
-> (i.e. blkreplay:<filename:options:...>) will now fail gracefully:
->=20
->   $ qemu-img info blkreplay:foo
->   qemu-img: Could not open 'blkreplay:foo': Unknown protocol 'blkreplay=
-'
->=20
-> Signed-off-by: Fabiano Rosas <farosas@linux.vnet.ibm.com>
-> ---
->  block/blkreplay.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---XV6YTBtRivLpiuhs0iZ9noaA4UGXxtqb2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqmhGwSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AO/UH/1mfq8MrtHJuTELeFzJGvLDZaEwaAdzK
-7j4GW2MuXEQsa3k8R1zWt5DU0au3Z6WrV/8P0s1AruHqTBKUdUY8UXSBQDF/z9Mc
-VBE9div48NbJu29gY12fx9QBmUvTRBVeFh1ks+4XwHMaYJGtvh/+O7HOrLKK15po
-l8IcwkG1wX88EDG5/hFosUEQXqiSOPN6yNoY+izBa2GiXWj6ugOWTm2EFgUXSOe8
-hsJ0VqWENqkWoa7LVS8sCQvf8yEljnVavEDgDxNILso67qhCLBn+gGFudruXi7oT
-O992/l1HYnoXctaYw7IdU5Nkb/wDX+JH9HCr0jwmFpVgGyc/1hIBWVE=
-=oUVY
------END PGP SIGNATURE-----
-
---XV6YTBtRivLpiuhs0iZ9noaA4UGXxtqb2--
+-- PMM
