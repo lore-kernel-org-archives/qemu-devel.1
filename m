@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evOyT-0004oS-MG
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:02:54 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evOyP-0004ii-9Q
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:02:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evOyN-0002zs-QV
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:02:53 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evOyJ-0002ty-IG
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:02:49 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 12 Mar 2018 16:02:15 +0100
-Message-Id: <20180312150218.1314-4-kwolf@redhat.com>
+Date: Mon, 12 Mar 2018 16:02:16 +0100
+Message-Id: <20180312150218.1314-5-kwolf@redhat.com>
 In-Reply-To: <20180312150218.1314-1-kwolf@redhat.com>
 References: <20180312150218.1314-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/6] luks: Support .bdrv_co_create
+Subject: [Qemu-devel] [PATCH v2 4/6] luks: Turn invalid assertion into check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,101 +22,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, berrange@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-This adds the .bdrv_co_create driver callback to luks, which enables
-image creation over QMP.
+The .bdrv_getlength implementation of the crypto block driver asserted
+that the payload offset isn't after EOF. This is an invalid assertion to
+make as the image file could be corrupted. Instead, check it and return
+-EIO if the file is too small for the payload offset.
+
+Zero length images are fine, so trigger -EIO only on offset > len, not
+on offset >= len as the assertion did before.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-core.json | 17 ++++++++++++++++-
- block/crypto.c       | 34 ++++++++++++++++++++++++++++++++++
- 2 files changed, 50 insertions(+), 1 deletion(-)
+ block/crypto.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 524d51567a..751adf89f4 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3452,6 +3452,21 @@
-             '*preallocation':   'PreallocMode' } }
- 
- ##
-+# @BlockdevCreateOptionsLUKS:
-+#
-+# Driver specific image creation options for LUKS.
-+#
-+# @file             Node to create the image format on
-+# @size             Size of the virtual disk in bytes
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'BlockdevCreateOptionsLUKS',
-+  'base': 'QCryptoBlockCreateOptionsLUKS',
-+  'data': { 'file':             'BlockdevRef',
-+            'size':             'size' } }
-+
-+##
- # @BlockdevCreateOptionsNfs:
- #
- # Driver specific image creation options for NFS.
-@@ -3643,7 +3658,7 @@
-       'http':           'BlockdevCreateNotSupported',
-       'https':          'BlockdevCreateNotSupported',
-       'iscsi':          'BlockdevCreateNotSupported',
--      'luks':           'BlockdevCreateNotSupported',
-+      'luks':           'BlockdevCreateOptionsLUKS',
-       'nbd':            'BlockdevCreateNotSupported',
-       'nfs':            'BlockdevCreateOptionsNfs',
-       'null-aio':       'BlockdevCreateNotSupported',
 diff --git a/block/crypto.c b/block/crypto.c
-index b0a4cb3388..a1139b6f09 100644
+index a1139b6f09..16c371ec9c 100644
 --- a/block/crypto.c
 +++ b/block/crypto.c
-@@ -543,6 +543,39 @@ static int block_crypto_open_luks(BlockDriverState *bs,
-                                      bs, options, flags, errp);
- }
+@@ -518,7 +518,10 @@ static int64_t block_crypto_getlength(BlockDriverState *bs)
  
-+static int coroutine_fn
-+block_crypto_co_create_luks(BlockdevCreateOptions *create_options, Error **errp)
-+{
-+    BlockdevCreateOptionsLUKS *luks_opts;
-+    BlockDriverState *bs = NULL;
-+    QCryptoBlockCreateOptions create_opts;
-+    int ret;
+     uint64_t offset = qcrypto_block_get_payload_offset(crypto->block);
+     assert(offset < INT64_MAX);
+-    assert(offset < len);
 +
-+    assert(create_options->driver == BLOCKDEV_DRIVER_LUKS);
-+    luks_opts = &create_options->u.luks;
-+
-+    bs = bdrv_open_blockdev_ref(luks_opts->file, errp);
-+    if (bs == NULL) {
-+        return -EIO;
++    if (offset > len) {
++       return -EIO;
 +    }
-+
-+    create_opts = (QCryptoBlockCreateOptions) {
-+        .format = Q_CRYPTO_BLOCK_FORMAT_LUKS,
-+        .u.luks = *qapi_BlockdevCreateOptionsLUKS_base(luks_opts),
-+    };
-+
-+    ret = block_crypto_co_create_generic(bs, luks_opts->size, &create_opts,
-+                                         errp);
-+    if (ret < 0) {
-+        goto fail;
-+    }
-+
-+    ret = 0;
-+fail:
-+    bdrv_unref(bs);
-+    return ret;
-+}
-+
- static int coroutine_fn block_crypto_co_create_opts_luks(const char *filename,
-                                                          QemuOpts *opts,
-                                                          Error **errp)
-@@ -647,6 +680,7 @@ BlockDriver bdrv_crypto_luks = {
-     .bdrv_open          = block_crypto_open_luks,
-     .bdrv_close         = block_crypto_close,
-     .bdrv_child_perm    = bdrv_format_default_perms,
-+    .bdrv_co_create     = block_crypto_co_create_luks,
-     .bdrv_co_create_opts = block_crypto_co_create_opts_luks,
-     .bdrv_truncate      = block_crypto_truncate,
-     .create_opts        = &block_crypto_create_opts_luks,
+ 
+     len -= offset;
+ 
 -- 
 2.13.6
