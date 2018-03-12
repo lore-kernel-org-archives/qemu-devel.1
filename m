@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1evN69-0007q8-Og
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:02:42 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1evN7N-0000VB-By
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:04:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1evN63-00050x-JQ
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:02:41 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:39250)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1evN7F-0007Ca-Rl
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:03:57 -0400
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:43185)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1evN63-0004z4-BU
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:02:35 -0400
-Received: by mail-wm0-x244.google.com with SMTP id i3so15906292wmi.4
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 06:02:35 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20180227095135.1060.36549.stgit@pasha-VirtualBox>
-	<20180227095248.1060.40374.stgit@pasha-VirtualBox>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <53570b7e-8975-ce4e-acc1-fb5a752dc203@redhat.com>
-Date: Mon, 12 Mar 2018 14:02:31 +0100
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1evN7F-0007An-GT
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:03:49 -0400
+Received: by mail-wr0-x230.google.com with SMTP id o1so3850595wro.10
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 06:03:49 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180309153654.13518-1-f4bug@amsat.org>
+	<20180309153654.13518-6-f4bug@amsat.org>
+	<CAFEAcA8jPcjk+sj0FVE8P5dA82GdNDNr-Zg_7T6PGqufr2157A@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <0cf434fe-a8f3-dc24-4350-197d2d56c4f3@amsat.org>
+Date: Mon, 12 Mar 2018 14:03:46 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180227095248.1060.40374.stgit@pasha-VirtualBox>
+In-Reply-To: <CAFEAcA8jPcjk+sj0FVE8P5dA82GdNDNr-Zg_7T6PGqufr2157A@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 13/22] replay: push replay_mutex_lock up
- the call tree
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 5/8] sdcard: Implement the UHS-I
+ SWITCH_FUNCTION entries (Spec v3)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,69 +37,269 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, alex.bennee@linaro.org
+To: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair@alistair23.me>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 27/02/2018 10:52, Pavel Dovgalyuk wrote:
->  
-> +void replay_init_locks(void)
-> +{
-> +    replay_mutex_init();
-> +}
-> +
+Hi Peter,
 
-This should not be needed as a public function: until replay_mode
-is set, replay_lock and replay_unlock do nothing.  I'm squashing this:
+On 03/09/2018 06:03 PM, Peter Maydell wrote:
+> On 9 March 2018 at 15:36, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> [based on a patch from Alistair Francis <alistair.francis@xilinx.com>
+>>  from qemu/xilinx tag xilinx-v2015.2]
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
+> This should ideally have a Signed-off-by: from somebody @xilinx.com as
+> well as you, then.
+> 
+>> ---
+>>  hw/sd/sd.c         | 148 +++++++++++++++++++++++++++++++++++++++++++++--------
+>>  hw/sd/trace-events |   1 +
+>>  2 files changed, 127 insertions(+), 22 deletions(-)
+>>
+>> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+>> index 235e0518d6..b907d62aef 100644
+>> --- a/hw/sd/sd.c
+>> +++ b/hw/sd/sd.c
+>> @@ -124,6 +124,7 @@ struct SDState {
+>>      bool enable;
+>>      uint8_t dat_lines;
+>>      bool cmd_line;
+>> +    bool uhs_enabled;
+>>  };
+>>
+>>  static const char *sd_state_name(enum SDCardStates state)
+>> @@ -563,6 +564,7 @@ static void sd_reset(DeviceState *dev)
+>>      sd->expecting_acmd = false;
+>>      sd->dat_lines = 0xf;
+>>      sd->cmd_line = true;
+>> +    sd->uhs_enabled = false;
+>>      sd->multi_blk_cnt = 0;
+>>  }
+>>
+>> @@ -761,30 +763,132 @@ static uint32_t sd_wpbits(SDState *sd, uint64_t addr)
+>>      return ret;
+>>  }
+>>
+>> +/* Function Group */
+>> +enum {
+>> +    SD_FG_MIN               = 1,
+>> +    SD_FG_ACCESS_MODE       = 1,
+>> +    SD_FG_COMMAND_SYSTEM    = 2,
+>> +    SD_FG_DRIVER_STRENGTH   = 3,
+>> +    SD_FG_CURRENT_LIMIT     = 4,
+>> +    SD_FG_RSVD_5            = 5,
+>> +    SD_FG_RSVD_6            = 6,
+>> +    SD_FG_COUNT
+>> +};
+> 
+> Since the minimum isn't 0, this means SD_FG_COUNT isn't
+> actually the count of the number of FGs. I think having
+>     SD_FG_MAX = 6,
+> 
+> would make the loops below clearer, since they become
+>   for (fn_grp = SD_FG_MAX; fn_grp >= SD_FG_MIN; fn_grp--) {
+> 
+>> +
+>> +/* Function name */
+>> +#define SD_FN_COUNT 16
+>> +
+>> +static const char *sd_fn_grp_name[SD_FG_COUNT] = {
+>> +    [SD_FG_ACCESS_MODE]     = "ACCESS_MODE",
+>> +    [SD_FG_COMMAND_SYSTEM]  = "COMMAND_SYSTEM",
+>> +    [SD_FG_DRIVER_STRENGTH] = "DRIVER_STRENGTH",
+>> +    [SD_FG_CURRENT_LIMIT]   = "CURRENT_LIMIT",
+>> +    [SD_FG_RSVD_5]          = "RSVD5",
+>> +    [SD_FG_RSVD_6]          = "RSVD6",
+>> +};
+>> +
+>> +typedef struct sd_fn_support {
+>> +    const char *name;
+>> +    bool uhs_only;
+>> +    bool unimp;
+>> +} sd_fn_support;
+>> +
+>> +static const sd_fn_support *sd_fn_support_defs[SD_FG_COUNT] = {
+>> +    [SD_FG_ACCESS_MODE] = (sd_fn_support [SD_FN_COUNT]) {
+>> +        [0] = { .name = "default/SDR12" },
+>> +        [1] = { .name = "high-speed/SDR25" },
+>> +        [2] = { .name = "SDR50",    .uhs_only = true },
+>> +        [3] = { .name = "SDR104",   .uhs_only = true },
+>> +        [4] = { .name = "DDR50",    .uhs_only = true },
+>> +    },
+>> +    [SD_FG_COMMAND_SYSTEM] = (sd_fn_support [SD_FN_COUNT]) {
+>> +        [0] = { .name = "default" },
+>> +        [1] = { .name = "For eC" },
+>> +        [3] = { .name = "OTP",      .unimp = true },
+>> +        [4] = { .name = "ASSD",     .unimp = true },
+>> +    },
+>> +    [SD_FG_DRIVER_STRENGTH] = (sd_fn_support [SD_FN_COUNT]) {
+>> +        [0] = { .name = "default/Type B" },
+>> +        [1] = { .name = "Type A",   .uhs_only = true },
+>> +        [2] = { .name = "Type C",   .uhs_only = true },
+>> +        [3] = { .name = "Type D",   .uhs_only = true },
+>> +    },
+>> +    [SD_FG_CURRENT_LIMIT] = (sd_fn_support [SD_FN_COUNT]) {
+>> +        [0] = { .name = "default/200mA" },
+>> +        [1] = { .name = "400mA",    .uhs_only = true },
+>> +        [2] = { .name = "600mA",    .uhs_only = true },
+>> +        [3] = { .name = "800mA",    .uhs_only = true },
+>> +    },
+>> +    [SD_FG_RSVD_5] = (sd_fn_support [SD_FN_COUNT]) {
+>> +        [0] = { .name = "default" },
+>> +    },
+>> +    [SD_FG_RSVD_6] = (sd_fn_support [SD_FN_COUNT]) {
+>> +        [0] = { .name = "default" },
+>> +    },
+>> +};
+>> +
+>> +#define SD_FN_NO_INFLUENCE          (1 << 15)
+>> +
+>>  static void sd_function_switch(SDState *sd, uint32_t arg)
+>>  {
+>> -    int i, mode, new_func;
+>> -    mode = !!(arg & 0x80000000);
+>> -
+>> -    sd->data[0] = 0x00;                /* Maximum current consumption */
+>> -    sd->data[1] = 0x01;
+>> -    sd->data[2] = 0x80;                /* Supported group 6 functions */
+>> -    sd->data[3] = 0x01;
+>> -    sd->data[4] = 0x80;                /* Supported group 5 functions */
+>> -    sd->data[5] = 0x01;
+>> -    sd->data[6] = 0x80;                /* Supported group 4 functions */
+>> -    sd->data[7] = 0x01;
+>> -    sd->data[8] = 0x80;                /* Supported group 3 functions */
+>> -    sd->data[9] = 0x01;
+>> -    sd->data[10] = 0x80;       /* Supported group 2 functions */
+>> -    sd->data[11] = 0x43;
+>> -    sd->data[12] = 0x80;       /* Supported group 1 functions */
+>> -    sd->data[13] = 0x03;
+>> -    for (i = 0; i < 6; i ++) {
+>> -        new_func = (arg >> (i * 4)) & 0x0f;
+>> -        if (mode && new_func != 0x0f)
+>> -            sd->function_group[i] = new_func;
+>> -        sd->data[14 + (i >> 1)] = new_func << ((i * 4) & 4);
+>> +    int fn_grp, new_func, i;
+>> +    uint8_t *data_p;
+>> +    bool mode = extract32(arg, 31, 1);  /* 0: check only, 1: do switch */
+>> +
+>> +    stw_be_p(sd->data + 0, 0x0001);     /* Maximum current consumption */
+> 
+> Previously we were writing 0x00, 0x01 to the first 2 bytes of data;
+> now we will write 0x01, 0x00. Are you sure that's right ? I guess
+> it's the difference between claiming 1mA and 256mA.
+> (I can't make any sense of the table in the spec so I have no idea.)
+> 
+> Also the spec says that if the guest selects an invalid function then
+> this value should be 0.
+> 
+>> +
+>> +    data_p = &sd->data[2];
+>> +    for (fn_grp = SD_FG_COUNT - 1; fn_grp >= SD_FG_MIN; fn_grp--) {
+>> +        uint16_t supported_fns = SD_FN_NO_INFLUENCE;
+>> +        for (i = 0; i < SD_FN_COUNT; ++i) {
+>> +            const sd_fn_support *def = &sd_fn_support_defs[fn_grp][i];
+>> +
+>> +            if (def->name && !def->unimp &&
+>> +                    !(def->uhs_only && !sd->uhs_enabled)) {
+>> +                supported_fns |= 1 << i;
+>> +            }
+>> +        }
+>> +        stw_be_p(data_p, supported_fns);
+>> +        data_p += 2;
+>> +    }
+>> +
+>> +    assert(data_p == &sd->data[14]);
+>> +    for (fn_grp = SD_FG_COUNT - 1; fn_grp >= SD_FG_MIN; fn_grp--) {
+>> +        new_func = (arg >> ((fn_grp - 1) * 4)) & 0x0f;
+>> +        if (new_func == 0xf) {
+> 
+> /* Guest requested no influence, so this function group stays the same */
+> 
+>> +            new_func = sd->function_group[fn_grp - 1];
+>> +        } else {
+>> +            const sd_fn_support *def = &sd_fn_support_defs[fn_grp][new_func];
+>> +            if (mode) {
+>> +                if (!def->name) {
+>> +                    qemu_log_mask(LOG_GUEST_ERROR,
+>> +                                  "Function %d not a valid for "
+> 
+> "not valid for"
+> 
+>> +                                  "function group %d\n",
+>> +                                  new_func, fn_grp);
+>> +                    new_func = 0xf;
+>> +                } else if (def->unimp) {
+>> +                    qemu_log_mask(LOG_UNIMP,
+>> +                                  "Function %s (fn grp %d) not implemented\n",
+>> +                                  def->name, fn_grp);
+>> +                    new_func = 0xf;
+>> +                } else if (def->uhs_only && !sd->uhs_enabled) {
+>> +                    qemu_log_mask(LOG_GUEST_ERROR,
+>> +                                  "Function %s (fn grp %d) only "
+>> +                                  "valid in UHS mode\n",
+>> +                                  def->name, fn_grp);
+>> +                    new_func = 0xf;
+>> +                } else {
+>> +                    sd->function_group[fn_grp - 1] = new_func;
+> 
+> I think the spec says that if the guest makes an invalid selection
+> for one function in the group then we must ignore all the set values,
 
-diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-index eeec66b8f4..3ced6bc231 100644
---- a/include/sysemu/replay.h
-+++ b/include/sysemu/replay.h
-@@ -63,8 +63,6 @@ void replay_mutex_unlock(void);
- 
- /* Replay process control functions */
- 
--/*! Enables and take replay locks (even if we don't use it) */
--void replay_init_locks(void);
- /*! Enables recording or saving event log with specified parameters */
- void replay_configure(struct QemuOpts *opts);
- /*! Initializes timers used for snapshotting and enables events recording */
-diff --git a/replay/replay.c b/replay/replay.c
-index a8b57cd077..b3e814a875 100644
---- a/replay/replay.c
-+++ b/replay/replay.c
-@@ -207,11 +207,6 @@ out:
-     return res;
- }
- 
--void replay_init_locks(void)
--{
--    replay_mutex_init();
--}
--
- static void replay_enable(const char *fname, int mode)
- {
-     const char *fmode = NULL;
-@@ -238,8 +233,9 @@ static void replay_enable(const char *fname, int mode)
-     }
- 
-     replay_filename = g_strdup(fname);
--
-     replay_mode = mode;
-+    replay_mutex_init();
-+
-     replay_state.data_kind = -1;
-     replay_state.instructions_count = 0;
-     replay_state.current_step = 0;
-diff --git a/vl.c b/vl.c
-index 08e81c46a0..5925a4b502 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3059,7 +3059,6 @@ int main(int argc, char **argv, char **envp)
-     qemu_init_cpu_list();
-     qemu_init_cpu_loop();
- 
--    replay_init_locks();
-     qemu_mutex_lock_iothread();
- 
-     atexit(qemu_run_exit_notifiers);
+... for the current group? ...
+
+> not just the one that was wrong, so we need to check everything
+> first before we start writing the new values back.
+
+I'm following the "Physical Layer Simplified Specification Version 3.01".
+
+  4.3.10.3 Mode 1 Operation - Set Function
+
+  Switching to a new functionality is done by:
+  • When a function cannot be switched because it is busy,
+    the card returns the current function number (not returns 0xF),
+    the other functions in the other groups may still be switched.
+
+  In response to a set function, the switch function will return ...
+  • The function that is the result of the switch command. In case
+    of invalid selection of one function or more, all set values
+    are ignored and no change will be done (identical to the case
+    where the host selects 0xF for all functions groups). The
+    response to an invalid selection of function will be 0xF.
+
+I'm not sure how to interpret this paragraph, I understand it as:
+"all set values are ignored [in the current group]" but this is
+confusing because of the "identical to ... all functions groups".
+
+> 
+>> +                }
+>> +            }
+>> +            trace_sdcard_function_select(def->name, sd_fn_grp_name[fn_grp],
+>> +                                         mode);
+>> +        }
+>> +        if (!(fn_grp & 0x1)) { /* evens go in high nibble */
+>> +            *data_p = new_func << 4;
+>> +        } else { /* odds go in low nibble */
+>> +            *(data_p++) |= new_func;
+>> +        }
+>>      }
+>>      memset(&sd->data[17], 0, 47);
+>>      stw_be_p(sd->data + 65, sd_crc16(sd->data, 64));
+>> diff --git a/hw/sd/trace-events b/hw/sd/trace-events
+>> index 2059ace61f..c106541a47 100644
+>> --- a/hw/sd/trace-events
+>> +++ b/hw/sd/trace-events
+>> @@ -42,6 +42,7 @@ sdcard_write_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size 0x%x"
+>>  sdcard_write_data(const char *proto, const char *cmd_desc, uint8_t cmd, uint8_t value) "%s %20s/ CMD%02d value 0x%02x"
+>>  sdcard_read_data(const char *proto, const char *cmd_desc, uint8_t cmd, int length) "%s %20s/ CMD%02d len %d"
+>>  sdcard_set_voltage(uint16_t millivolts) "%u mV"
+>> +sdcard_function_select(const char *fn_name, const char *grp_name, bool do_switch) "Function %s (group: %s, sw: %u)"
+>>
+>>  # hw/sd/milkymist-memcard.c
+>>  milkymist_memcard_memory_read(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
+>> --
+>> 2.16.2
+>>
+> 
+> thanks
+> -- PMM
+> 
