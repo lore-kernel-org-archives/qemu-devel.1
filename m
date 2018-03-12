@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evR9C-0008Ry-MM
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:22:07 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1evR9E-0008TU-42
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:22:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evR99-0007oy-TA
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:22:06 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38224 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1evR9C-0007r3-SV
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:22:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57632 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evR99-0007og-Os
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:22:03 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evR9C-0007qf-NO
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:22:06 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6CC4976FB9
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 17:22:03 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6054D401DE71
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 17:22:06 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 12 Mar 2018 17:21:16 +0000
-Message-Id: <20180312172124.56461-22-dgilbert@redhat.com>
+Date: Mon, 12 Mar 2018 17:21:18 +0000
+Message-Id: <20180312172124.56461-24-dgilbert@redhat.com>
 In-Reply-To: <20180312172124.56461-1-dgilbert@redhat.com>
 References: <20180312172124.56461-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 21/29] vhost+postcopy: Add vhost waker
+Subject: [Qemu-devel] [PATCH v5 23/29] libvhost-user: mprotect & madvises
+ for postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,92 +38,112 @@ Cc: aarcange@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Register a waker function in vhost-user code to be notified when
-pages arrive or requests to previously mapped pages get requested.
+Clear the area and turn off THP.
+PROT_NONE the area until after we've userfault advised it
+to catch any unexpected changes.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/virtio/trace-events |  3 +++
- hw/virtio/vhost-user.c | 30 ++++++++++++++++++++++++++++++
- 2 files changed, 33 insertions(+)
+ contrib/libvhost-user/libvhost-user.c | 47 +++++++++++++++++++++++++++++=
+++----
+ 1 file changed, 42 insertions(+), 5 deletions(-)
 
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 3afd12cfea..fe5e0ff856 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -13,6 +13,9 @@ vhost_user_postcopy_fault_handler_found(int i, uint64_t=
- region_offset, uint64_t
- vhost_user_postcopy_listen(void) ""
- vhost_user_set_mem_table_postcopy(uint64_t client_addr, uint64_t qhva, i=
-nt reply_i, int region_i) "client:0x%"PRIx64" for hva: 0x%"PRIx64" reply =
-%d region %d"
- vhost_user_set_mem_table_withfd(int index, const char *name, uint64_t me=
-mory_size, uint64_t guest_phys_addr, uint64_t userspace_addr, uint64_t of=
-fset) "%d:%s: size:0x%"PRIx64" GPA:0x%"PRIx64" QVA/userspace:0x%"PRIx64" =
-RB offset:0x%"PRIx64
-+vhost_user_postcopy_waker(const char *rb, uint64_t rb_offset) "%s + 0x%"=
-PRIx64
-+vhost_user_postcopy_waker_found(uint64_t client_addr) "0x%"PRIx64
-+vhost_user_postcopy_waker_nomatch(const char *rb, uint64_t rb_offset) "%=
-s + 0x%"PRIx64
-=20
- # hw/virtio/virtio.c
- virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned=
- out_num) "elem %p size %zd in_num %u out_num %u"
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 6dee1b565c..a785aefd3e 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -1006,6 +1006,35 @@ static int vhost_user_postcopy_fault_handler(struc=
-t PostCopyFD *pcfd,
-     return -1;
- }
-=20
-+static int vhost_user_postcopy_waker(struct PostCopyFD *pcfd, RAMBlock *=
-rb,
-+                                     uint64_t offset)
-+{
-+    struct vhost_dev *dev =3D pcfd->data;
-+    struct vhost_user *u =3D dev->opaque;
-+    int i;
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
+r/libvhost-user.c
+index 6314549b65..5feed52098 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -454,7 +454,7 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserM=
+sg *vmsg)
+     int i;
+     VhostUserMemory *memory =3D &vmsg->payload.memory;
+     dev->nregions =3D memory->nregions;
+-    /* TODO: Postcopy specific code */
 +
-+    trace_vhost_user_postcopy_waker(qemu_ram_get_idstr(rb), offset);
-+
-+    if (!u) {
-+        return 0;
-+    }
-+    /* Translate the offset into an address in the clients address space=
- */
-+    for (i =3D 0; i < MIN(dev->mem->nregions, u->region_rb_len); i++) {
-+        if (u->region_rb[i] =3D=3D rb &&
-+            offset >=3D u->region_rb_offset[i] &&
-+            offset < (u->region_rb_offset[i] +
-+                      dev->mem->regions[i].memory_size)) {
-+            uint64_t client_addr =3D (offset - u->region_rb_offset[i]) +
-+                                   u->postcopy_client_bases[i];
-+            trace_vhost_user_postcopy_waker_found(client_addr);
-+            return postcopy_wake_shared(pcfd, client_addr, rb);
+     DPRINT("Nregions: %d\n", memory->nregions);
+     for (i =3D 0; i < dev->nregions; i++) {
+         void *mmap_addr;
+@@ -478,9 +478,12 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUser=
+Msg *vmsg)
+=20
+         /* We don't use offset argument of mmap() since the
+          * mapped address has to be page aligned, and we use huge
+-         * pages.  */
++         * pages.
++         * In postcopy we're using PROT_NONE here to catch anyone
++         * accessing it before we userfault
++         */
+         mmap_addr =3D mmap(0, dev_region->size + dev_region->mmap_offset=
+,
+-                         PROT_READ | PROT_WRITE, MAP_SHARED,
++                         PROT_NONE, MAP_SHARED,
+                          vmsg->fds[i], 0);
+=20
+         if (mmap_addr =3D=3D MAP_FAILED) {
+@@ -519,12 +522,38 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUse=
+rMsg *vmsg)
+     /* OK, now we can go and register the memory and generate faults */
+     for (i =3D 0; i < dev->nregions; i++) {
+         VuDevRegion *dev_region =3D &dev->regions[i];
++        int ret;
+ #ifdef UFFDIO_REGISTER
+         /* We should already have an open ufd. Mark each memory
+          * range as ufd.
+-         * Note: Do we need any madvises? Well it's not been accessed
+-         * yet, still probably need no THP to be safe, discard to be saf=
+e?
++         * Discard any mapping we have here; note I can't use MADV_REMOV=
+E
++         * or fallocate to make the hole since I don't want to lose
++         * data that's already arrived in the shared process.
++         * TODO: How to do hugepage
+          */
++        ret =3D madvise((void *)dev_region->mmap_addr,
++                      dev_region->size + dev_region->mmap_offset,
++                      MADV_DONTNEED);
++        if (ret) {
++            fprintf(stderr,
++                    "%s: Failed to madvise(DONTNEED) region %d: %s\n",
++                    __func__, i, strerror(errno));
 +        }
-+    }
-+
-+    trace_vhost_user_postcopy_waker_nomatch(qemu_ram_get_idstr(rb), offs=
-et);
-+    return 0;
-+}
-+
- /*
-  * Called at the start of an inbound postcopy on reception of the
-  * 'advise' command.
-@@ -1051,6 +1080,7 @@ static int vhost_user_postcopy_advise(struct vhost_=
-dev *dev, Error **errp)
-     u->postcopy_fd.fd =3D ufd;
-     u->postcopy_fd.data =3D dev;
-     u->postcopy_fd.handler =3D vhost_user_postcopy_fault_handler;
-+    u->postcopy_fd.waker =3D vhost_user_postcopy_waker;
-     u->postcopy_fd.idstr =3D "vhost-user"; /* Need to find unique name *=
-/
-     postcopy_register_shared_ufd(&u->postcopy_fd);
-     return 0;
++        /* Turn off transparent hugepages so we dont get lose wakeups
++         * in neighbouring pages.
++         * TODO: Turn this backon later.
++         */
++        ret =3D madvise((void *)dev_region->mmap_addr,
++                      dev_region->size + dev_region->mmap_offset,
++                      MADV_NOHUGEPAGE);
++        if (ret) {
++            /* Note: This can happen legally on kernels that are configu=
+red
++             * without madvise'able hugepages
++             */
++            fprintf(stderr,
++                    "%s: Failed to madvise(NOHUGEPAGE) region %d: %s\n",
++                    __func__, i, strerror(errno));
++        }
+         struct uffdio_register reg_struct;
+         reg_struct.range.start =3D (uintptr_t)dev_region->mmap_addr;
+         reg_struct.range.len =3D dev_region->size + dev_region->mmap_off=
+set;
+@@ -546,6 +575,14 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUser=
+Msg *vmsg)
+         }
+         DPRINT("%s: region %d: Registered userfault for %llx + %llx\n",
+                 __func__, i, reg_struct.range.start, reg_struct.range.le=
+n);
++        /* Now it's registered we can let the client at it */
++        if (mprotect((void *)dev_region->mmap_addr,
++                     dev_region->size + dev_region->mmap_offset,
++                     PROT_READ | PROT_WRITE)) {
++            vu_panic(dev, "failed to mprotect region %d for postcopy (%s=
+)",
++                     i, strerror(errno));
++            return false;
++        }
+         /* TODO: Stash 'zero' support flags somewhere */
+ #endif
+     }
 --=20
 2.14.3
