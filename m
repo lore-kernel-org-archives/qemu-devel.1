@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evTp0-0004FJ-Bl
+	(envelope-from <berrange@redhat.com>) id 1evTp0-0004FO-E4
 	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:13:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evToy-00076A-MD
+	(envelope-from <berrange@redhat.com>) id 1evTox-00075W-D4
 	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:13:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35858 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35846 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1evToy-00075x-H9
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:13:24 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1evTox-00075K-7O
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:13:23 -0400
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Mon, 12 Mar 2018 20:13:02 +0000
-Message-Id: <20180312201305.16972-7-berrange@redhat.com>
+Date: Mon, 12 Mar 2018 20:13:01 +0000
+Message-Id: <20180312201305.16972-6-berrange@redhat.com>
 In-Reply-To: <20180312201305.16972-1-berrange@redhat.com>
 References: <20180312201305.16972-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 6/9] sockets: check that the named file
- descriptor is a socket
+Subject: [Qemu-devel] [PULL 5/9] sockets: move fd_is_socket() into common
+ sockets code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,180 +32,196 @@ Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Gerd Hoffma
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-The SocketAddress struct has an "fd" type, which references the name of a
-file descriptor passed over the monitor using the "getfd" command. We
-currently blindly assume the FD is a socket, which can lead to hard to
-diagnose errors later. This adds an explicit check that the FD is actuall=
-y
-a socket to improve the error diagnosis.
+The fd_is_socket() helper method is useful in a few places, so put it in
+the common sockets code. Make the code more compact while moving it.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- tests/test-util-sockets.c | 89 +++++++++++++++++++++++++++++++++++++++++=
+ include/qemu/sockets.h    |  1 +
+ io/channel-util.c         | 13 --------
+ tests/.gitignore          |  1 +
+ tests/Makefile.include    |  3 ++
+ tests/test-util-sockets.c | 77 +++++++++++++++++++++++++++++++++++++++++=
 ++++++
- util/qemu-sockets.c       | 18 ++++++++--
- 2 files changed, 105 insertions(+), 2 deletions(-)
+ util/qemu-sockets.c       |  8 +++++
+ 6 files changed, 90 insertions(+), 13 deletions(-)
+ create mode 100644 tests/test-util-sockets.c
 
+diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+index e88d4c37ab..8140fea685 100644
+--- a/include/qemu/sockets.h
++++ b/include/qemu/sockets.h
+@@ -12,6 +12,7 @@ int inet_aton(const char *cp, struct in_addr *ia);
+ #include "qapi/qapi-types-sockets.h"
+=20
+ /* misc helpers */
++bool fd_is_socket(int fd);
+ int qemu_socket(int domain, int type, int protocol);
+ int qemu_accept(int s, struct sockaddr *addr, socklen_t *addrlen);
+ int socket_set_cork(int fd, int v);
+diff --git a/io/channel-util.c b/io/channel-util.c
+index 0fb4bd0837..423d79845a 100644
+--- a/io/channel-util.c
++++ b/io/channel-util.c
+@@ -24,19 +24,6 @@
+ #include "io/channel-socket.h"
+=20
+=20
+-static bool fd_is_socket(int fd)
+-{
+-    int optval;
+-    socklen_t optlen;
+-    optlen =3D sizeof(optval);
+-    return qemu_getsockopt(fd,
+-                           SOL_SOCKET,
+-                           SO_TYPE,
+-                           (char *)&optval,
+-                           &optlen) =3D=3D 0;
+-}
+-
+-
+ QIOChannel *qio_channel_new_fd(int fd,
+                                Error **errp)
+ {
+diff --git a/tests/.gitignore b/tests/.gitignore
+index 18e58b2183..fb62d2299b 100644
+--- a/tests/.gitignore
++++ b/tests/.gitignore
+@@ -86,6 +86,7 @@ test-thread-pool
+ test-throttle
+ test-timed-average
+ test-uuid
++test-util-sockets
+ test-visitor-serialization
+ test-vmstate
+ test-write-threshold
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3d5b6174a8..42fd426cd0 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -146,6 +146,7 @@ ifneq (,$(findstring qemu-ga,$(TOOLS)))
+ check-unit-$(CONFIG_LINUX) +=3D tests/test-qga$(EXESUF)
+ endif
+ check-unit-y +=3D tests/test-timed-average$(EXESUF)
++check-unit-y +=3D tests/test-util-sockets$(EXESUF)
+ check-unit-y +=3D tests/test-io-task$(EXESUF)
+ check-unit-y +=3D tests/test-io-channel-socket$(EXESUF)
+ check-unit-y +=3D tests/test-io-channel-file$(EXESUF)
+@@ -713,6 +714,8 @@ tests/test-crypto-tlscredsx509$(EXESUF): tests/test-c=
+rypto-tlscredsx509.o \
+ tests/test-crypto-tlssession.o-cflags :=3D $(TASN1_CFLAGS)
+ tests/test-crypto-tlssession$(EXESUF): tests/test-crypto-tlssession.o \
+ 	tests/crypto-tls-x509-helpers.o tests/pkix_asn1_tab.o $(test-crypto-obj=
+-y)
++tests/test-util-sockets$(EXESUF): tests/test-util-sockets.o \
++	tests/socket-helpers.o $(test-util-obj-y)
+ tests/test-io-task$(EXESUF): tests/test-io-task.o $(test-io-obj-y)
+ tests/test-io-channel-socket$(EXESUF): tests/test-io-channel-socket.o \
+         tests/io-channel-helpers.o tests/socket-helpers.o $(test-io-obj-=
+y)
 diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
-index 65190e0530..06eb0e4a28 100644
---- a/tests/test-util-sockets.c
+new file mode 100644
+index 0000000000..65190e0530
+--- /dev/null
 +++ b/tests/test-util-sockets.c
-@@ -23,6 +23,7 @@
- #include "qemu/sockets.h"
- #include "qapi/error.h"
- #include "socket-helpers.h"
-+#include "monitor/monitor.h"
-=20
- static void test_fd_is_socket_bad(void)
- {
-@@ -49,6 +50,90 @@ static void test_fd_is_socket_good(void)
-     close(fd);
- }
-=20
-+static int mon_fd =3D -1;
-+static const char *mon_fdname;
-+
-+int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp)
-+{
-+    g_assert(cur_mon);
-+    g_assert(mon =3D=3D cur_mon);
-+    if (mon_fd =3D=3D -1 || !g_str_equal(mon_fdname, fdname)) {
-+        error_setg(errp, "No fd named %s", fdname);
-+        return -1;
-+    }
-+    return dup(mon_fd);
-+}
-+
-+/* Syms in libqemustub.a are discarded at .o file granularity.
-+ * To replace monitor_get_fd() we must ensure everything in
-+ * stubs/monitor.c is defined, to make sure monitor.o is discarded
-+ * otherwise we get duplicate syms at link time.
+@@ -0,0 +1,77 @@
++/*
++ * Tests for util/qemu-sockets.c
++ *
++ * Copyright 2018 Red Hat, Inc.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this library; if not, see <http://www.gnu.org/licenses/>.
++ *
 + */
-+Monitor *cur_mon;
-+void monitor_init(Chardev *chr, int flags) {}
 +
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "qemu/sockets.h"
++#include "qapi/error.h"
++#include "socket-helpers.h"
 +
-+static void test_socket_fd_pass_good(void)
++static void test_fd_is_socket_bad(void)
 +{
-+    SocketAddress addr;
-+    int fd;
++    char *tmp =3D g_strdup("qemu-test-util-sockets-XXXXXX");
++    int fd =3D mkstemp(tmp);
++    if (fd !=3D 0) {
++        unlink(tmp);
++    }
++    g_free(tmp);
 +
-+    cur_mon =3D g_malloc(1); /* Fake a monitor */
-+    mon_fdname =3D "myfd";
-+    mon_fd =3D qemu_socket(AF_INET, SOCK_STREAM, 0);
-+    g_assert_cmpint(mon_fd, >, STDERR_FILENO);
++    g_assert(fd >=3D 0);
 +
-+    addr.type =3D SOCKET_ADDRESS_TYPE_FD;
-+    addr.u.fd.str =3D g_strdup(mon_fdname);
-+
-+    fd =3D socket_connect(&addr, &error_abort);
-+    g_assert_cmpint(fd, !=3D, -1);
-+    g_assert_cmpint(fd, !=3D, mon_fd);
++    g_assert(!fd_is_socket(fd));
 +    close(fd);
-+
-+    fd =3D socket_listen(&addr, &error_abort);
-+    g_assert_cmpint(fd, !=3D, -1);
-+    g_assert_cmpint(fd, !=3D, mon_fd);
-+    close(fd);
-+
-+    g_free(addr.u.fd.str);
-+    mon_fdname =3D NULL;
-+    close(mon_fd);
-+    mon_fd =3D -1;
-+    g_free(cur_mon);
-+    cur_mon =3D NULL;
 +}
 +
-+static void test_socket_fd_pass_bad(void)
++static void test_fd_is_socket_good(void)
 +{
-+    SocketAddress addr;
-+    Error *err =3D NULL;
-+    int fd;
++    int fd =3D qemu_socket(PF_INET, SOCK_STREAM, 0);
 +
-+    cur_mon =3D g_malloc(1); /* Fake a monitor */
-+    mon_fdname =3D "myfd";
-+    mon_fd =3D dup(STDOUT_FILENO);
-+    g_assert_cmpint(mon_fd, >, STDERR_FILENO);
++    g_assert(fd >=3D 0);
 +
-+    addr.type =3D SOCKET_ADDRESS_TYPE_FD;
-+    addr.u.fd.str =3D g_strdup(mon_fdname);
-+
-+    fd =3D socket_connect(&addr, &err);
-+    g_assert_cmpint(fd, =3D=3D, -1);
-+    error_free_or_abort(&err);
-+
-+    fd =3D socket_listen(&addr, &err);
-+    g_assert_cmpint(fd, =3D=3D, -1);
-+    error_free_or_abort(&err);
-+
-+    g_free(addr.u.fd.str);
-+    mon_fdname =3D NULL;
-+    close(mon_fd);
-+    mon_fd =3D -1;
-+    g_free(cur_mon);
-+    cur_mon =3D NULL;
++    g_assert(fd_is_socket(fd));
++    close(fd);
 +}
 +
- int main(int argc, char **argv)
- {
-     bool has_ipv4, has_ipv6;
-@@ -71,6 +156,10 @@ int main(int argc, char **argv)
-                         test_fd_is_socket_bad);
-         g_test_add_func("/util/socket/is-socket/good",
-                         test_fd_is_socket_good);
-+        g_test_add_func("/socket/fd-pass/good",
-+                        test_socket_fd_pass_good);
-+        g_test_add_func("/socket/fd-pass/bad",
-+                        test_socket_fd_pass_bad);
-     }
-=20
-     return g_test_run();
++int main(int argc, char **argv)
++{
++    bool has_ipv4, has_ipv6;
++
++    socket_init();
++
++    g_test_init(&argc, &argv, NULL);
++
++    /* We're creating actual IPv4/6 sockets, so we should
++     * check if the host running tests actually supports
++     * each protocol to avoid breaking tests on machines
++     * with either IPv4 or IPv6 disabled.
++     */
++    if (socket_check_protocol_support(&has_ipv4, &has_ipv6) < 0) {
++        return 1;
++    }
++
++    if (has_ipv4) {
++        g_test_add_func("/util/socket/is-socket/bad",
++                        test_fd_is_socket_bad);
++        g_test_add_func("/util/socket/is-socket/good",
++                        test_fd_is_socket_good);
++    }
++
++    return g_test_run();
++}
 diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index fa79471647..6dc4613855 100644
+index 7f13e8a338..fa79471647 100644
 --- a/util/qemu-sockets.c
 +++ b/util/qemu-sockets.c
-@@ -1042,6 +1042,20 @@ fail:
-     return NULL;
+@@ -91,6 +91,14 @@ NetworkAddressFamily inet_netfamily(int family)
+     return NETWORK_ADDRESS_FAMILY_UNKNOWN;
  }
 =20
-+static int socket_get_fd(const char *fdstr, Error **errp)
++bool fd_is_socket(int fd)
 +{
-+    int fd =3D monitor_get_fd(cur_mon, fdstr, errp);
-+    if (fd < 0) {
-+        return -1;
-+    }
-+    if (!fd_is_socket(fd)) {
-+        error_setg(errp, "File descriptor '%s' is not a socket", fdstr);
-+        close(fd);
-+        return -1;
-+    }
-+    return fd;
++    int optval;
++    socklen_t optlen =3D sizeof(optval);
++    return !qemu_getsockopt(fd, SOL_SOCKET, SO_TYPE, &optval, &optlen);
 +}
 +
- int socket_connect(SocketAddress *addr, Error **errp)
- {
-     int fd;
-@@ -1056,7 +1070,7 @@ int socket_connect(SocketAddress *addr, Error **err=
-p)
-         break;
-=20
-     case SOCKET_ADDRESS_TYPE_FD:
--        fd =3D monitor_get_fd(cur_mon, addr->u.fd.str, errp);
-+        fd =3D socket_get_fd(addr->u.fd.str, errp);
-         break;
-=20
-     case SOCKET_ADDRESS_TYPE_VSOCK:
-@@ -1083,7 +1097,7 @@ int socket_listen(SocketAddress *addr, Error **errp=
-)
-         break;
-=20
-     case SOCKET_ADDRESS_TYPE_FD:
--        fd =3D monitor_get_fd(cur_mon, addr->u.fd.str, errp);
-+        fd =3D socket_get_fd(addr->u.fd.str, errp);
-         break;
-=20
-     case SOCKET_ADDRESS_TYPE_VSOCK:
++
+ /*
+  * Matrix we're trying to apply
+  *
 --=20
 2.14.3
