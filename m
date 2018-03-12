@@ -1,33 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farosas@linux.vnet.ibm.com>) id 1evVc5-00067h-U6
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 18:08:14 -0400
+	(envelope-from <farosas@linux.vnet.ibm.com>) id 1evVc9-00069c-5V
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 18:08:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farosas@linux.vnet.ibm.com>) id 1evVc3-0000zs-2I
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 18:08:13 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56474)
+	(envelope-from <farosas@linux.vnet.ibm.com>) id 1evVc4-000115-CR
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 18:08:17 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53184
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <farosas@linux.vnet.ibm.com>)
-	id 1evVc2-0000yJ-Q6
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 18:08:10 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w2CM4kiI117933
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 18:08:07 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gnxck07xb-1
+	id 1evVc4-00010Y-8E
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 18:08:12 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w2CM57Pq109425
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 18:08:11 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2gp1c1hbp6-1
 	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 18:08:06 -0400
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 18:08:11 -0400
 Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <farosas@linux.vnet.ibm.com>;
-	Mon, 12 Mar 2018 18:08:05 -0400
+	Mon, 12 Mar 2018 18:08:10 -0400
 From: Fabiano Rosas <farosas@linux.vnet.ibm.com>
-Date: Mon, 12 Mar 2018 19:07:48 -0300
-Message-Id: <20180312220753.20096-1-farosas@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 0/5] block: Ensure non-protocol drivers can
- only be selected explicitly
+Date: Mon, 12 Mar 2018 19:07:50 -0300
+In-Reply-To: <20180312220753.20096-1-farosas@linux.vnet.ibm.com>
+References: <20180312220753.20096-1-farosas@linux.vnet.ibm.com>
+Message-Id: <20180312220753.20096-3-farosas@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 2/5] block/quorum: Remove protocol-related
+ fields
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,61 +40,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, Alberto Garcia <berto@igalia.com>
 
-Block drivers can be selected by either protocol syntax:
+The quorum driver is not a protocol so it should implement bdrv_open
+instead of bdrv_file_open and not provide a protocol_name.
 
-  <protocol>:<filename>[:options]
+Attempts to invoke this driver using protocol syntax
+(i.e. quorum:<filename:options:...>) will now fail gracefully:
 
-or explicitly:
+  $ qemu-img info quorum:foo
+  qemu-img: Could not open 'quorum:foo': Unknown protocol 'quorum'
 
-  driver=<driver>[,option=<opt1>...]
+Signed-off-by: Fabiano Rosas <farosas@linux.vnet.ibm.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ block/quorum.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-For the protocol syntax to work, drivers should set the protocol_name
-field of the BlockDriver structure and provide bdrv_file_open and
-bdrv_parse_filename implementations.
-
-Conversely, block drivers that do not support the protocol syntax
-should instead implement bdrv_open and not have a protocol_name field.
-
-Some drivers do not currently adhere to this and errors arise when
-trying to select them using the protocol syntax. For instance:
-
-  $ qemu-img info replication:foo
-  qemu-img: block.c:2401: bdrv_open_inherit: \
-  Assertion `!!(flags & BDRV_O_PROTOCOL) == !!drv->bdrv_file_open' failed.
-  Aborted (core dumped)
-
-This patch-set ensures that the following drivers are meeting the
-above criteria:
-- blkreplay
-- quorum
-- replication
-- throttle
-
-Aside from that, documentation was added to make the above more
-explicit.
-
-v1 -> v2:
- - patch 1: updated commit message
- - patch 5: improved protocol_name documentation
-
- https://lists.nongnu.org/archive/html/qemu-devel/2018-03/msg02998.html
-
-Fabiano Rosas (5):
-  block/replication: Remove protocol_name field
-  block/quorum: Remove protocol-related fields
-  block/throttle: Remove protocol-related fields
-  block/blkreplay: Remove protocol-related fields
-  include/block/block_int: Document protocol related functions
-
- block/blkreplay.c         | 3 +--
- block/quorum.c            | 3 +--
- block/replication.c       | 1 -
- block/throttle.c          | 3 +--
- include/block/block_int.h | 8 ++++++++
- replication.h             | 1 -
- 6 files changed, 11 insertions(+), 8 deletions(-)
-
---
+diff --git a/block/quorum.c b/block/quorum.c
+index 14333c18aa..cfe484a945 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -1098,11 +1098,10 @@ static void quorum_refresh_filename(BlockDriverState *bs, QDict *options)
+ 
+ static BlockDriver bdrv_quorum = {
+     .format_name                        = "quorum",
+-    .protocol_name                      = "quorum",
+ 
+     .instance_size                      = sizeof(BDRVQuorumState),
+ 
+-    .bdrv_file_open                     = quorum_open,
++    .bdrv_open                          = quorum_open,
+     .bdrv_close                         = quorum_close,
+     .bdrv_refresh_filename              = quorum_refresh_filename,
+ 
+-- 
 2.13.6
