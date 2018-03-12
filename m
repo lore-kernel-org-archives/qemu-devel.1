@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nia.alarie@gmail.com>) id 1evPT1-0003Mg-SU
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:34:28 -0400
+	(envelope-from <vkuznets@redhat.com>) id 1evP7w-0004P5-G3
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:12:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nia.alarie@gmail.com>) id 1evPSy-0003TN-NN
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:34:27 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:38584)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nia.alarie@gmail.com>)
-	id 1evPSy-0003Si-Fc
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:34:24 -0400
-Received: by mail-wm0-x242.google.com with SMTP id z9so16935037wmb.3
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 08:34:24 -0700 (PDT)
-From: Nia Alarie <nia.alarie@gmail.com>
-Date: Mon, 12 Mar 2018 15:33:44 +0000
-Message-Id: <20180312153344.23453-1-nia.alarie@gmail.com>
-Subject: [Qemu-devel] [PATCH v2] 9p: Convert use of atoi to qemu_strtoi to
- allow error checking
+	(envelope-from <vkuznets@redhat.com>) id 1evP7u-00044D-I5
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:12:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43264 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1evP7u-00043h-EG
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:12:38 -0400
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+Date: Mon, 12 Mar 2018 16:12:33 +0100
+Message-Id: <20180312151233.16565-3-vkuznets@redhat.com>
+In-Reply-To: <20180312151233.16565-1-vkuznets@redhat.com>
+References: <20180312151233.16565-1-vkuznets@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/2] i386/kvm: lower requirements for Hyper-V
+ frequency MSRs exposure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +24,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: groug@kaod.org, stefanha@gmail.com, jim@groklearning.com, joel@jms.id.au, Nia Alarie <nia.alarie@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
+Cc: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org
 
-Signed-off-by: Nia Alarie <nia.alarie@gmail.com>
+Requiring tsc_is_stable_and_known() is too restrictive: even without INVTCS
+nested Hyper-V-on-KVM enables TSC pages for its guests e.g. when
+Reenlightenment MSRs are present. Presence of frequency MSRs doesn't mean
+these frequencies are stable, it just means they're available for reading.
+
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- hw/9pfs/9p.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ target/i386/kvm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index 48fa48e720..254385dfa4 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -15,6 +15,7 @@
- #include <glib/gprintf.h>
- #include "hw/virtio/virtio.h"
- #include "qapi/error.h"
-+#include "qemu/cutils.h"
- #include "qemu/error-report.h"
- #include "qemu/iov.h"
- #include "qemu/sockets.h"
-@@ -2213,8 +2214,14 @@ static void coroutine_fn v9fs_create(void *opaque)
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 21e06deaf1..43c521f61a 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -646,7 +646,7 @@ static int hyperv_handle_properties(CPUState *cs)
+         env->features[FEAT_HYPERV_EAX] |= HV_TIME_REF_COUNT_AVAILABLE;
+         env->features[FEAT_HYPERV_EAX] |= HV_REFERENCE_TSC_AVAILABLE;
+ 
+-        if (has_msr_hv_frequencies && tsc_is_stable_and_known(env)) {
++        if (has_msr_hv_frequencies && env->tsc_khz) {
+             env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_FREQUENCY_MSRS;
+             env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
          }
-         v9fs_path_copy(&fidp->path, &path);
-     } else if (perm & P9_STAT_MODE_LINK) {
--        int32_t ofid = atoi(extension.data);
--        V9fsFidState *ofidp = get_fid(pdu, ofid);
-+        int ofid;
-+        V9fsFidState *ofidp;
-+
-+        if (qemu_strtoi(extension.data, NULL, 10, &ofid)) {
-+            err = -EINVAL;
-+            goto out;
-+        }
-+        ofidp = get_fid(pdu, (int32_t)ofid);
-         if (ofidp == NULL) {
-             err = -EINVAL;
-             goto out;
 -- 
-2.16.2
+2.14.3
