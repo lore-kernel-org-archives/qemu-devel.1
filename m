@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1evTcY-0008J7-55
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:00:35 -0400
+	(envelope-from <berrange@redhat.com>) id 1evTp0-0004FJ-Bl
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:13:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1evTcW-000123-Vl
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:00:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44420)
+	(envelope-from <berrange@redhat.com>) id 1evToy-00076A-MD
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:13:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35858 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1evTcW-00011U-OU
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:00:32 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 12 Mar 2018 17:00:22 -0300
-Message-Id: <20180312200022.9760-4-ehabkost@redhat.com>
-In-Reply-To: <20180312200022.9760-1-ehabkost@redhat.com>
-References: <20180312200022.9760-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 3/3] i386: Add support to get/set/migrate Intel
- Processor Trace feature
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1evToy-00075x-H9
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:13:24 -0400
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 12 Mar 2018 20:13:02 +0000
+Message-Id: <20180312201305.16972-7-berrange@redhat.com>
+In-Reply-To: <20180312201305.16972-1-berrange@redhat.com>
+References: <20180312201305.16972-1-berrange@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 6/9] sockets: check that the named file
+ descriptor is a socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,195 +27,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Chao Peng <chao.p.peng@linux.intel.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-From: Chao Peng <chao.p.peng@linux.intel.com>
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-Add Intel Processor Trace related definition. It also add
-corresponding part to kvm_get/set_msr and vmstate.
+The SocketAddress struct has an "fd" type, which references the name of a
+file descriptor passed over the monitor using the "getfd" command. We
+currently blindly assume the FD is a socket, which can lead to hard to
+diagnose errors later. This adds an explicit check that the FD is actuall=
+y
+a socket to improve the error diagnosis.
 
-Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-Signed-off-by: Luwei Kang <luwei.kang@intel.com>
-Message-Id: <1520182116-16485-2-git-send-email-luwei.kang@intel.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- target/i386/cpu.h     | 22 ++++++++++++++++++++++
- target/i386/kvm.c     | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
- target/i386/machine.c | 38 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 111 insertions(+)
+ tests/test-util-sockets.c | 89 +++++++++++++++++++++++++++++++++++++++++=
+++++++
+ util/qemu-sockets.c       | 18 ++++++++--
+ 2 files changed, 105 insertions(+), 2 deletions(-)
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index ec2a771299..0c3f51445e 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -415,6 +415,21 @@ typedef enum X86Seg {
- #define MSR_MC0_ADDR                    0x402
- #define MSR_MC0_MISC                    0x403
- 
-+#define MSR_IA32_RTIT_OUTPUT_BASE       0x560
-+#define MSR_IA32_RTIT_OUTPUT_MASK       0x561
-+#define MSR_IA32_RTIT_CTL               0x570
-+#define MSR_IA32_RTIT_STATUS            0x571
-+#define MSR_IA32_RTIT_CR3_MATCH         0x572
-+#define MSR_IA32_RTIT_ADDR0_A           0x580
-+#define MSR_IA32_RTIT_ADDR0_B           0x581
-+#define MSR_IA32_RTIT_ADDR1_A           0x582
-+#define MSR_IA32_RTIT_ADDR1_B           0x583
-+#define MSR_IA32_RTIT_ADDR2_A           0x584
-+#define MSR_IA32_RTIT_ADDR2_B           0x585
-+#define MSR_IA32_RTIT_ADDR3_A           0x586
-+#define MSR_IA32_RTIT_ADDR3_B           0x587
-+#define MAX_RTIT_ADDRS                  8
+diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
+index 65190e0530..06eb0e4a28 100644
+--- a/tests/test-util-sockets.c
++++ b/tests/test-util-sockets.c
+@@ -23,6 +23,7 @@
+ #include "qemu/sockets.h"
+ #include "qapi/error.h"
+ #include "socket-helpers.h"
++#include "monitor/monitor.h"
+=20
+ static void test_fd_is_socket_bad(void)
+ {
+@@ -49,6 +50,90 @@ static void test_fd_is_socket_good(void)
+     close(fd);
+ }
+=20
++static int mon_fd =3D -1;
++static const char *mon_fdname;
 +
- #define MSR_EFER                        0xc0000080
- 
- #define MSR_EFER_SCE   (1 << 0)
-@@ -1157,6 +1172,13 @@ typedef struct CPUX86State {
-     uint64_t msr_hv_stimer_config[HV_STIMER_COUNT];
-     uint64_t msr_hv_stimer_count[HV_STIMER_COUNT];
- 
-+    uint64_t msr_rtit_ctrl;
-+    uint64_t msr_rtit_status;
-+    uint64_t msr_rtit_output_base;
-+    uint64_t msr_rtit_output_mask;
-+    uint64_t msr_rtit_cr3_match;
-+    uint64_t msr_rtit_addrs[MAX_RTIT_ADDRS];
-+
-     /* exception/interrupt handling */
-     int error_code;
-     int exception_is_int;
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index f5d3d73ed6..d996cca68b 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1815,6 +1815,25 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-                 kvm_msr_entry_add(cpu, MSR_MTRRphysMask(i), mask);
-             }
-         }
-+        if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
-+            int addr_num = kvm_arch_get_supported_cpuid(kvm_state,
-+                                                    0x14, 1, R_EAX) & 0x7;
-+
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL,
-+                            env->msr_rtit_ctrl);
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS,
-+                            env->msr_rtit_status);
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE,
-+                            env->msr_rtit_output_base);
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_MASK,
-+                            env->msr_rtit_output_mask);
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CR3_MATCH,
-+                            env->msr_rtit_cr3_match);
-+            for (i = 0; i < addr_num; i++) {
-+                kvm_msr_entry_add(cpu, MSR_IA32_RTIT_ADDR0_A + i,
-+                            env->msr_rtit_addrs[i]);
-+            }
-+        }
- 
-         /* Note: MSR_IA32_FEATURE_CONTROL is written separately, see
-          *       kvm_put_msr_feature_control. */
-@@ -2128,6 +2147,20 @@ static int kvm_get_msrs(X86CPU *cpu)
-         }
-     }
- 
-+    if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
-+        int addr_num =
-+            kvm_arch_get_supported_cpuid(kvm_state, 0x14, 1, R_EAX) & 0x7;
-+
-+        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_MASK, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CR3_MATCH, 0);
-+        for (i = 0; i < addr_num; i++) {
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_ADDR0_A + i, 0);
-+        }
-+    }
-+
-     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, cpu->kvm_msr_buf);
-     if (ret < 0) {
-         return ret;
-@@ -2368,6 +2401,24 @@ static int kvm_get_msrs(X86CPU *cpu)
-         case MSR_IA32_SPEC_CTRL:
-             env->spec_ctrl = msrs[i].data;
-             break;
-+        case MSR_IA32_RTIT_CTL:
-+            env->msr_rtit_ctrl = msrs[i].data;
-+            break;
-+        case MSR_IA32_RTIT_STATUS:
-+            env->msr_rtit_status = msrs[i].data;
-+            break;
-+        case MSR_IA32_RTIT_OUTPUT_BASE:
-+            env->msr_rtit_output_base = msrs[i].data;
-+            break;
-+        case MSR_IA32_RTIT_OUTPUT_MASK:
-+            env->msr_rtit_output_mask = msrs[i].data;
-+            break;
-+        case MSR_IA32_RTIT_CR3_MATCH:
-+            env->msr_rtit_cr3_match = msrs[i].data;
-+            break;
-+        case MSR_IA32_RTIT_ADDR0_A ... MSR_IA32_RTIT_ADDR3_B:
-+            env->msr_rtit_addrs[index - MSR_IA32_RTIT_ADDR0_A] = msrs[i].data;
-+            break;
-         }
-     }
- 
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 361c05aedf..c05fe6fb1a 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -837,6 +837,43 @@ static const VMStateDescription vmstate_spec_ctrl = {
-     }
- };
- 
-+static bool intel_pt_enable_needed(void *opaque)
++int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp)
 +{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+    int i;
-+
-+    if (env->msr_rtit_ctrl || env->msr_rtit_status ||
-+        env->msr_rtit_output_base || env->msr_rtit_output_mask ||
-+        env->msr_rtit_cr3_match) {
-+        return true;
++    g_assert(cur_mon);
++    g_assert(mon =3D=3D cur_mon);
++    if (mon_fd =3D=3D -1 || !g_str_equal(mon_fdname, fdname)) {
++        error_setg(errp, "No fd named %s", fdname);
++        return -1;
 +    }
-+
-+    for (i = 0; i < MAX_RTIT_ADDRS; i++) {
-+        if (env->msr_rtit_addrs[i]) {
-+            return true;
-+        }
-+    }
-+
-+    return false;
++    return dup(mon_fd);
 +}
 +
-+static const VMStateDescription vmstate_msr_intel_pt = {
-+    .name = "cpu/intel_pt",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = intel_pt_enable_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.msr_rtit_ctrl, X86CPU),
-+        VMSTATE_UINT64(env.msr_rtit_status, X86CPU),
-+        VMSTATE_UINT64(env.msr_rtit_output_base, X86CPU),
-+        VMSTATE_UINT64(env.msr_rtit_output_mask, X86CPU),
-+        VMSTATE_UINT64(env.msr_rtit_cr3_match, X86CPU),
-+        VMSTATE_UINT64_ARRAY(env.msr_rtit_addrs, X86CPU, MAX_RTIT_ADDRS),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
++/* Syms in libqemustub.a are discarded at .o file granularity.
++ * To replace monitor_get_fd() we must ensure everything in
++ * stubs/monitor.c is defined, to make sure monitor.o is discarded
++ * otherwise we get duplicate syms at link time.
++ */
++Monitor *cur_mon;
++void monitor_init(Chardev *chr, int flags) {}
 +
- VMStateDescription vmstate_x86_cpu = {
-     .name = "cpu",
-     .version_id = 12,
-@@ -957,6 +994,7 @@ VMStateDescription vmstate_x86_cpu = {
- #endif
-         &vmstate_spec_ctrl,
-         &vmstate_mcg_ext_ctl,
-+        &vmstate_msr_intel_pt,
-         NULL
++
++static void test_socket_fd_pass_good(void)
++{
++    SocketAddress addr;
++    int fd;
++
++    cur_mon =3D g_malloc(1); /* Fake a monitor */
++    mon_fdname =3D "myfd";
++    mon_fd =3D qemu_socket(AF_INET, SOCK_STREAM, 0);
++    g_assert_cmpint(mon_fd, >, STDERR_FILENO);
++
++    addr.type =3D SOCKET_ADDRESS_TYPE_FD;
++    addr.u.fd.str =3D g_strdup(mon_fdname);
++
++    fd =3D socket_connect(&addr, &error_abort);
++    g_assert_cmpint(fd, !=3D, -1);
++    g_assert_cmpint(fd, !=3D, mon_fd);
++    close(fd);
++
++    fd =3D socket_listen(&addr, &error_abort);
++    g_assert_cmpint(fd, !=3D, -1);
++    g_assert_cmpint(fd, !=3D, mon_fd);
++    close(fd);
++
++    g_free(addr.u.fd.str);
++    mon_fdname =3D NULL;
++    close(mon_fd);
++    mon_fd =3D -1;
++    g_free(cur_mon);
++    cur_mon =3D NULL;
++}
++
++static void test_socket_fd_pass_bad(void)
++{
++    SocketAddress addr;
++    Error *err =3D NULL;
++    int fd;
++
++    cur_mon =3D g_malloc(1); /* Fake a monitor */
++    mon_fdname =3D "myfd";
++    mon_fd =3D dup(STDOUT_FILENO);
++    g_assert_cmpint(mon_fd, >, STDERR_FILENO);
++
++    addr.type =3D SOCKET_ADDRESS_TYPE_FD;
++    addr.u.fd.str =3D g_strdup(mon_fdname);
++
++    fd =3D socket_connect(&addr, &err);
++    g_assert_cmpint(fd, =3D=3D, -1);
++    error_free_or_abort(&err);
++
++    fd =3D socket_listen(&addr, &err);
++    g_assert_cmpint(fd, =3D=3D, -1);
++    error_free_or_abort(&err);
++
++    g_free(addr.u.fd.str);
++    mon_fdname =3D NULL;
++    close(mon_fd);
++    mon_fd =3D -1;
++    g_free(cur_mon);
++    cur_mon =3D NULL;
++}
++
+ int main(int argc, char **argv)
+ {
+     bool has_ipv4, has_ipv6;
+@@ -71,6 +156,10 @@ int main(int argc, char **argv)
+                         test_fd_is_socket_bad);
+         g_test_add_func("/util/socket/is-socket/good",
+                         test_fd_is_socket_good);
++        g_test_add_func("/socket/fd-pass/good",
++                        test_socket_fd_pass_good);
++        g_test_add_func("/socket/fd-pass/bad",
++                        test_socket_fd_pass_bad);
      }
- };
--- 
+=20
+     return g_test_run();
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index fa79471647..6dc4613855 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -1042,6 +1042,20 @@ fail:
+     return NULL;
+ }
+=20
++static int socket_get_fd(const char *fdstr, Error **errp)
++{
++    int fd =3D monitor_get_fd(cur_mon, fdstr, errp);
++    if (fd < 0) {
++        return -1;
++    }
++    if (!fd_is_socket(fd)) {
++        error_setg(errp, "File descriptor '%s' is not a socket", fdstr);
++        close(fd);
++        return -1;
++    }
++    return fd;
++}
++
+ int socket_connect(SocketAddress *addr, Error **errp)
+ {
+     int fd;
+@@ -1056,7 +1070,7 @@ int socket_connect(SocketAddress *addr, Error **err=
+p)
+         break;
+=20
+     case SOCKET_ADDRESS_TYPE_FD:
+-        fd =3D monitor_get_fd(cur_mon, addr->u.fd.str, errp);
++        fd =3D socket_get_fd(addr->u.fd.str, errp);
+         break;
+=20
+     case SOCKET_ADDRESS_TYPE_VSOCK:
+@@ -1083,7 +1097,7 @@ int socket_listen(SocketAddress *addr, Error **errp=
+)
+         break;
+=20
+     case SOCKET_ADDRESS_TYPE_FD:
+-        fd =3D monitor_get_fd(cur_mon, addr->u.fd.str, errp);
++        fd =3D socket_get_fd(addr->u.fd.str, errp);
+         break;
+=20
+     case SOCKET_ADDRESS_TYPE_VSOCK:
+--=20
 2.14.3
