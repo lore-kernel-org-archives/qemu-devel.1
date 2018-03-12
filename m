@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evTJY-0002nD-Ng
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 15:40:57 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1evTMo-0004ZE-On
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 15:44:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evTJY-00009K-5L
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 15:40:56 -0400
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:34930)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1evTJY-000091-0M
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 15:40:56 -0400
-Received: by mail-ot0-x241.google.com with SMTP id r30so16549024otr.2
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 12:40:55 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1evTMl-000261-LB
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 15:44:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32846)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1evTMl-00025h-El
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 15:44:15 -0400
+Date: Mon, 12 Mar 2018 16:44:06 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180312194406.GX3417@localhost.localdomain>
+References: <cover.1520867740.git.x1917x@gmail.com>
+	<4a65e8b30fe9d2a6c1c53b85ef2697f02e01d13f.1520867956.git.x1917x@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180312105941.15439-1-kraxel@redhat.com>
-References: <20180312105941.15439-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 12 Mar 2018 19:40:34 +0000
-Message-ID: <CAFEAcA9wup-UsdKv8bgaDCjC1yS=3q-BhJwLPfNT1fG7TmFaxA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/1] Vga 20180312 patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4a65e8b30fe9d2a6c1c53b85ef2697f02e01d13f.1520867956.git.x1917x@gmail.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 16/30] q35/xen: Add Xen platform device
+ support for Q35
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Alexey Gerasimenko <x1917x@gmail.com>
+Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 12 March 2018 at 10:59, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> The following changes since commit e4ae62b802cec437f877f2cadc4ef059cc0eca76:
->
->   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2018-03-09 17:28:16 +0000)
->
-> are available in the git repository at:
->
->   git://git.kraxel.org/qemu tags/vga-20180312-pull-request
->
-> for you to fetch changes up to 7cdc61becd095b64a786b2625f321624e7111f3d:
->
->   vga: fix region calculation (2018-03-12 11:45:21 +0100)
->
-> ----------------------------------------------------------------
-> 7cdc61becd vga: fix region calculation
->
-> ----------------------------------------------------------------
->
-> Gerd Hoffmann (1):
->   vga: fix region calculation
->
->  hw/display/vga.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> --
+On Tue, Mar 13, 2018 at 04:34:01AM +1000, Alexey Gerasimenko wrote:
+> Current Xen/QEMU method to control Xen Platform device on i440 is a bit
+> odd -- enabling/disabling Xen platform device actually modifies the QEMU
+> emulated machine type, namely xenfv <--> pc.
+> 
+> In order to avoid multiplying machine types, use a new way to control Xen
+> Platform device for QEMU -- "xen-platform-dev" machine property (bool).
+> To maintain backward compatibility with existing Xen/QEMU setups, this
+> is only applicable to q35 machine currently. i440 emulation still uses the
+> old method (i.e. xenfv/pc machine selection) to control Xen Platform
+> device, this may be changed later to xen-platform-dev property as well.
+> 
+> This way we can use a single machine type (q35) and change just
+> xen-platform-dev value to on/off to control Xen platform device.
+> 
+> Signed-off-by: Alexey Gerasimenko <x1917x@gmail.com>
+> ---
+[...]
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 6585058c6c..cee0b92028 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -38,6 +38,7 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
+>      "                dump-guest-core=on|off include guest memory in a core dump (default=on)\n"
+>      "                mem-merge=on|off controls memory merge support (default: on)\n"
+>      "                igd-passthru=on|off controls IGD GFX passthrough support (default=off)\n"
+> +    "                xen-platform-dev=on|off controls Xen Platform device (default=off)\n"
+>      "                aes-key-wrap=on|off controls support for AES key wrapping (default=on)\n"
+>      "                dea-key-wrap=on|off controls support for DEA key wrapping (default=on)\n"
+>      "                suppress-vmdesc=on|off disables self-describing migration (default=off)\n"
 
-Applied, thanks.
+What are the obstacles preventing "-device xen-platform" from
+working?  It would be better than adding a new boolean option to
+-machine.
 
--- PMM
+-- 
+Eduardo
