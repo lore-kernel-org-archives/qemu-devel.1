@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1evNFn-0007DC-21
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:12:47 -0400
+	(envelope-from <imammedo@redhat.com>) id 1evNFq-0007Gy-Sz
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:12:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1evNFl-0005FB-IW
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:12:39 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39576 helo=mx1.redhat.com)
+	(envelope-from <imammedo@redhat.com>) id 1evNFo-0005NZ-Mf
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:12:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51774 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1evNFl-0005DP-Cy
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:12:37 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1evNFo-0005MW-Gh
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:12:40 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Mon, 12 Mar 2018 14:11:09 +0100
-Message-Id: <1520860275-101576-4-git-send-email-imammedo@redhat.com>
+Date: Mon, 12 Mar 2018 14:11:11 +0100
+Message-Id: <1520860275-101576-6-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1520860275-101576-1-git-send-email-imammedo@redhat.com>
 References: <1520860275-101576-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 3/9] cli: add -preconfig option
+Subject: [Qemu-devel] [PATCH v4 5/9] qapi: introduce new cmd option
+ "allowed-in-preconfig"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,214 +27,380 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, ehabkost@redhat.com, pkrempa@redhat.com, david@gibson.dropbear.id.au, peter.maydell@linaro.org, pbonzini@redhat.com, cohuck@redhat.com
 
-This option allows pausing QEMU in the new RUN_STATE_PRECONFIG state,
-allowing the configuration of QEMU from QMP before the machine jumps
-into board initialization code of machine_run_board_init()
+New option will be used to allow commands, which are prepared/need
+to run run in preconfig state. Other commands that should be able
+to run in preconfig state, should be ammeded to not expect machine
+in initialized state or deal with it.
 
-Intent is to allow management to query machine state and additionally
-configure it using previous query results within one QEMU instance
-(i.e. eliminate need to start QEMU twice, 1st to query board specific
-parameters and 2nd for actual VM start using query results for
-additional parameters).
+For compatibility reasons, commands, that don't use new flag
+'allowed-in-preconfig' explicitly, are not permited to run in
+preconfig state but allowed in all other states like they used
+to be.
 
-New option complements -S option and could be used with or without
-it. Difference is that -S pauses QEMU when machine is completely
-build with all devices wired up and ready run (QEMU need only to
-unpause CPUs to let guest execute its code).
-And "preconfig" option pauses QEMU early before board specific init
-callback (machine_run_board_init) is executed and will allow to
-configure machine parameters which will be used by board init code.
-
-When early introspection/configuration is done, command 'cont' should
-be used to exit RUN_STATE_PRECONFIG and transition to the next
-requested state (i.e. if -S is used then QEMU will pause the second
-time when board/device initialization is completed or start guest
-execution if -S isn't provided on CLI)
+Within this patch allow following commands in preconfig state:
+   qmp_capabilities
+   query-qmp-schema
+   query-commands
+   query-status
+   cont
+to allow qmp connection, basic introspection and moving to the next
+state.
 
 PS:
-Initially 'preconfig' is planned to be used for configuring numa
-topology depending on board specified possible cpus layout.
+set-numa-node and query-hotpluggable-cpus will be enabled later in
+a separate patch.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
 v4:
-  * Explain more on behaviour in commit message and use suggested
-    wording in message and patch (Eric Blake <eblake@redhat.com>)
+  * replaces complex "universal" approach
+     "[PATCH v3 5/9] QAPI: allow to specify valid runstates  per command"
+    with a simpler new command flag "allowed-in-preconfig".
+    (Eric Blake <eblake@redhat.com>)
 ---
- include/sysemu/sysemu.h |  1 +
- qapi/run-state.json     |  5 ++++-
- qemu-options.hx         | 13 +++++++++++++
- qmp.c                   |  5 +++++
- vl.c                    | 35 ++++++++++++++++++++++++++++++++++-
- 5 files changed, 57 insertions(+), 2 deletions(-)
+ include/qapi/qmp/dispatch.h    |  3 ++-
+ docs/devel/qapi-code-gen.txt   | 10 +++++++++-
+ monitor.c                      |  5 +++--
+ qapi/introspect.json           |  6 +++++-
+ qapi/misc.json                 |  7 ++++---
+ qapi/qmp-dispatch.c            |  8 ++++++++
+ qapi/run-state.json            |  3 ++-
+ scripts/qapi/commands.py       | 19 ++++++++++++++-----
+ scripts/qapi/common.py         | 15 ++++++++++-----
+ scripts/qapi/doc.py            |  2 +-
+ scripts/qapi/introspect.py     | 10 ++++++++--
+ tests/qapi-schema/test-qapi.py |  2 +-
+ 12 files changed, 67 insertions(+), 23 deletions(-)
 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 356bfdc..996bc38 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -66,6 +66,7 @@ typedef enum WakeupReason {
-     QEMU_WAKEUP_REASON_OTHER,
- } WakeupReason;
+diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
+index 1e694b5..2d02b75 100644
+--- a/include/qapi/qmp/dispatch.h
++++ b/include/qapi/qmp/dispatch.h
+@@ -21,7 +21,8 @@ typedef void (QmpCommandFunc)(QDict *, QObject **, Error **);
+ typedef enum QmpCommandOptions
+ {
+     QCO_NO_OPTIONS = 0x0,
+-    QCO_NO_SUCCESS_RESP = 0x1,
++    QCO_NO_SUCCESS_RESP = 1U << 0,
++    QCO_ALLOWED_IN_PRECONFIG =  1U << 1,
+ } QmpCommandOptions;
  
-+void qemu_exit_preconfig_request(void);
- void qemu_system_reset_request(ShutdownCause reason);
- void qemu_system_suspend_request(void);
- void qemu_register_suspend_notifier(Notifier *notifier);
-diff --git a/qapi/run-state.json b/qapi/run-state.json
-index 1c9fff3..ce846a5 100644
---- a/qapi/run-state.json
-+++ b/qapi/run-state.json
-@@ -49,12 +49,15 @@
- # @colo: guest is paused to save/restore VM state under colo checkpoint,
- #        VM can not get into this state unless colo capability is enabled
- #        for migration. (since 2.8)
-+# @preconfig: QEMU is paused before board specific init callback is executed.
-+#             The state is reachable only if -preconfig CLI option is used.
-+#             (Since 2.12)
- ##
- { 'enum': 'RunState',
-   'data': [ 'debug', 'inmigrate', 'internal-error', 'io-error', 'paused',
-             'postmigrate', 'prelaunch', 'finish-migrate', 'restore-vm',
-             'running', 'save-vm', 'shutdown', 'suspended', 'watchdog',
--            'guest-panicked', 'colo' ] }
-+            'guest-panicked', 'colo', 'preconfig' ] }
+ typedef struct QmpCommand
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index 25b7180..170f15f 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -556,7 +556,8 @@ following example objects:
  
- ##
- # @StatusInfo:
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 6585058..7c8aaa5 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3302,6 +3302,19 @@ STEXI
- Run the emulation in single step mode.
- ETEXI
+ Usage: { 'command': STRING, '*data': COMPLEX-TYPE-NAME-OR-DICT,
+          '*returns': TYPE-NAME, '*boxed': true,
+-         '*gen': false, '*success-response': false }
++         '*gen': false, '*success-response': false,
++         '*allowed-in-preconfig': true }
  
-+DEF("preconfig", 0, QEMU_OPTION_preconfig, \
-+    "-preconfig      pause QEMU before machine is initialized\n",
-+    QEMU_ARCH_ALL)
-+STEXI
-+@item -preconfig
-+@findex -preconfig
-+Pause QEMU for interactive configuration before the machine is created,
-+which allows querying and configuring properties that will affect
-+machine initialization. Use the QMP command 'cont' to exit the preconfig
-+state and move to the next state (ie. run guest if -S isn't used or
-+pause the second time is -S is used).
-+ETEXI
+ Commands are defined by using a dictionary containing several members,
+ where three members are most common.  The 'command' member is a
+@@ -636,6 +637,13 @@ possible, the command expression should include the optional key
+ 'success-response' with boolean value false.  So far, only QGA makes
+ use of this member.
+ 
++A command may use optional 'allowed-in-preconfig' key to permit
++its execution at early runtime configuration stage (preconfig runstate).
++If not specified then a command defaults to 'allowed-in-preconfig: false'.
 +
- DEF("S", 0, QEMU_OPTION_S, \
-     "-S              freeze CPU at startup (use 'c' to start execution)\n",
-     QEMU_ARCH_ALL)
-diff --git a/qmp.c b/qmp.c
-index 8c7d1cc..b38090d 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -166,6 +166,11 @@ void qmp_cont(Error **errp)
-     BlockBackend *blk;
-     Error *local_err = NULL;
++An example of declaring preconfig enabled command:
++ { 'command': 'qmp_capabilities',
++   'allowed-in-preconfig': true }
  
-+    if (runstate_check(RUN_STATE_PRECONFIG)) {
-+        qemu_exit_preconfig_request();
-+        return;
-+    }
-+
-     /* if there is a dump in background, we should wait until the dump
-      * finished */
-     if (dump_in_progress()) {
-diff --git a/vl.c b/vl.c
-index 3ef04ce..69b1997 100644
---- a/vl.c
-+++ b/vl.c
-@@ -593,7 +593,7 @@ static int default_driver_check(void *opaque, QemuOpts *opts, Error **errp)
- /***********************************************************/
- /* QEMU state */
+ === Events ===
  
--static RunState current_run_state = RUN_STATE_PRELAUNCH;
-+static RunState current_run_state = RUN_STATE_PRECONFIG;
+diff --git a/monitor.c b/monitor.c
+index ea0ca57..0adf220 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1016,7 +1016,7 @@ void monitor_init_qmp_commands(void)
  
- /* We use RUN_STATE__MAX but any invalid value will do */
- static RunState vmstop_requested = RUN_STATE__MAX;
-@@ -606,6 +606,9 @@ typedef struct {
+     qmp_register_command(&qmp_commands, "query-qmp-schema",
+                          qmp_query_qmp_schema,
+-                         QCO_NO_OPTIONS);
++                         QCO_ALLOWED_IN_PRECONFIG);
+     qmp_register_command(&qmp_commands, "device_add", qmp_device_add,
+                          QCO_NO_OPTIONS);
+     qmp_register_command(&qmp_commands, "netdev_add", qmp_netdev_add,
+@@ -1026,7 +1026,8 @@ void monitor_init_qmp_commands(void)
  
- static const RunStateTransition runstate_transitions_def[] = {
-     /*     from      ->     to      */
-+    { RUN_STATE_PRECONFIG, RUN_STATE_PRELAUNCH },
-+    { RUN_STATE_PRECONFIG, RUN_STATE_INMIGRATE },
-+
-     { RUN_STATE_DEBUG, RUN_STATE_RUNNING },
-     { RUN_STATE_DEBUG, RUN_STATE_FINISH_MIGRATE },
-     { RUN_STATE_DEBUG, RUN_STATE_PRELAUNCH },
-@@ -1629,6 +1632,7 @@ static pid_t shutdown_pid;
- static int powerdown_requested;
- static int debug_requested;
- static int suspend_requested;
-+static bool preconfig_exit_requested = true;
- static WakeupReason wakeup_reason;
- static NotifierList powerdown_notifiers =
-     NOTIFIER_LIST_INITIALIZER(powerdown_notifiers);
-@@ -1713,6 +1717,11 @@ static int qemu_debug_requested(void)
-     return r;
+     QTAILQ_INIT(&qmp_cap_negotiation_commands);
+     qmp_register_command(&qmp_cap_negotiation_commands, "qmp_capabilities",
+-                         qmp_marshal_qmp_capabilities, QCO_NO_OPTIONS);
++                         qmp_marshal_qmp_capabilities,
++                         QCO_ALLOWED_IN_PRECONFIG);
  }
  
-+void qemu_exit_preconfig_request(void)
-+{
-+    preconfig_exit_requested = true;
-+}
-+
- /*
-  * Reset the VM. Issue an event unless @reason is SHUTDOWN_CAUSE_NONE.
-  */
-@@ -1886,6 +1895,13 @@ static bool main_loop_should_exit(void)
-     RunState r;
-     ShutdownCause request;
+ void qmp_qmp_capabilities(Error **errp)
+diff --git a/qapi/introspect.json b/qapi/introspect.json
+index 5b3e6e9..05faded 100644
+--- a/qapi/introspect.json
++++ b/qapi/introspect.json
+@@ -259,12 +259,16 @@
+ #
+ # @ret-type: the name of the command's result type.
+ #
++# @allowed-in-preconfig: command could be executed  in preconfig runstate,
++#                        default: 'false' (Since 2.12)
++#
+ # TODO: @success-response (currently irrelevant, because it's QGA, not QMP)
+ #
+ # Since: 2.5
+ ##
+ { 'struct': 'SchemaInfoCommand',
+-  'data': { 'arg-type': 'str', 'ret-type': 'str' } }
++  'data': { 'arg-type': 'str', 'ret-type': 'str',
++            'allowed-in-preconfig': 'bool' } }
  
-+    if (preconfig_exit_requested) {
-+        if (runstate_check(RUN_STATE_PRECONFIG)) {
-+            runstate_set(RUN_STATE_PRELAUNCH);
-+        }
-+        preconfig_exit_requested = false;
-+        return true;
+ ##
+ # @SchemaInfoEvent:
+diff --git a/qapi/misc.json b/qapi/misc.json
+index bcd5d10..1f48d35 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -24,7 +24,7 @@
+ # Since: 0.13
+ #
+ ##
+-{ 'command': 'qmp_capabilities' }
++{ 'command': 'qmp_capabilities', 'allowed-in-preconfig': true }
+ 
+ ##
+ # @VersionTriple:
+@@ -127,7 +127,8 @@
+ # Note: This example has been shortened as the real response is too long.
+ #
+ ##
+-{ 'command': 'query-commands', 'returns': ['CommandInfo'] }
++{ 'command': 'query-commands', 'returns': ['CommandInfo'],
++  'allowed-in-preconfig': true }
+ 
+ ##
+ # @LostTickPolicy:
+@@ -1180,7 +1181,7 @@
+ # <- { "return": {} }
+ #
+ ##
+-{ 'command': 'cont' }
++{ 'command': 'cont', 'allowed-in-preconfig': true }
+ 
+ ##
+ # @system_wakeup:
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index e31ac4b..81dbd19 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -17,6 +17,7 @@
+ #include "qapi/qmp/json-parser.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qjson.h"
++#include "sysemu/sysemu.h"
+ 
+ static QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
+ {
+@@ -92,6 +93,13 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
+         return NULL;
+     }
+ 
++    if (runstate_check(RUN_STATE_PRECONFIG) &&
++        !(cmd->options & QCO_ALLOWED_IN_PRECONFIG)) {
++        error_setg(errp, "The command '%s' isn't permitted in '%s' state",
++                   cmd->name, RunState_str(RUN_STATE_PRECONFIG));
++        return NULL;
 +    }
-     if (qemu_debug_requested()) {
-         vm_stop(RUN_STATE_DEBUG);
-     }
-@@ -3697,6 +3713,14 @@ int main(int argc, char **argv, char **envp)
-                     exit(1);
-                 }
-                 break;
-+            case QEMU_OPTION_preconfig:
-+                if (runstate_check(RUN_STATE_INMIGRATE)) {
-+                    error_report("option can not be used with "
-+                                 "-incoming option");
-+                    exit(EXIT_FAILURE);
-+                }
-+                preconfig_exit_requested = false;
-+                break;
-             case QEMU_OPTION_enable_kvm:
-                 olist = qemu_find_opts("machine");
-                 qemu_opts_parse_noisily(olist, "accel=kvm", false);
-@@ -3902,6 +3926,11 @@ int main(int argc, char **argv, char **envp)
-                 }
-                 break;
-             case QEMU_OPTION_incoming:
-+                if (!preconfig_exit_requested) {
-+                    error_report("option can not be used with "
-+                                 "-preconfig option");
-+                    exit(EXIT_FAILURE);
-+                }
-                 if (!incoming) {
-                     runstate_set(RUN_STATE_INMIGRATE);
-                 }
-@@ -4594,6 +4623,10 @@ int main(int argc, char **argv, char **envp)
-     }
-     parse_numa_opts(current_machine);
- 
-+    /* do monitor/qmp handling at preconfig state if requested */
-+    main_loop();
 +
-+    /* from here on runstate is RUN_STATE_PRELAUNCH */
-     machine_run_board_init(current_machine);
+     if (!qdict_haskey(dict, "arguments")) {
+         args = qdict_new();
+     } else {
+diff --git a/qapi/run-state.json b/qapi/run-state.json
+index ce846a5..174a2a3 100644
+--- a/qapi/run-state.json
++++ b/qapi/run-state.json
+@@ -94,7 +94,8 @@
+ #                  "status": "running" } }
+ #
+ ##
+-{ 'command': 'query-status', 'returns': 'StatusInfo' }
++{ 'command': 'query-status', 'returns': 'StatusInfo',
++  'allowed-in-preconfig': true }
  
-     realtime_init();
+ ##
+ # @SHUTDOWN:
+diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+index 21a7e0d..bd8dc5e 100644
+--- a/scripts/qapi/commands.py
++++ b/scripts/qapi/commands.py
+@@ -193,10 +193,18 @@ out:
+     return ret
+ 
+ 
+-def gen_register_command(name, success_response):
+-    options = 'QCO_NO_OPTIONS'
++def gen_register_command(name, success_response, allowed_in_preconfig):
++    options = []
++
+     if not success_response:
+-        options = 'QCO_NO_SUCCESS_RESP'
++        options += ['QCO_NO_SUCCESS_RESP']
++    if allowed_in_preconfig:
++        options += ['QCO_ALLOWED_IN_PRECONFIG']
++
++    if not options:
++        options = ['QCO_NO_OPTIONS']
++
++    options = " | ".join(options)
+ 
+     ret = mcgen('''
+     qmp_register_command(cmds, "%(name)s",
+@@ -268,7 +276,7 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
+         genc.add(gen_registry(self._regy, self._prefix))
+ 
+     def visit_command(self, name, info, arg_type, ret_type,
+-                      gen, success_response, boxed):
++                      gen, success_response, boxed, allowed_in_preconfig):
+         if not gen:
+             return
+         self._genh.add(gen_command_decl(name, arg_type, boxed, ret_type))
+@@ -277,7 +285,8 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
+             self._genc.add(gen_marshal_output(ret_type))
+         self._genh.add(gen_marshal_decl(name))
+         self._genc.add(gen_marshal(name, arg_type, boxed, ret_type))
+-        self._regy += gen_register_command(name, success_response)
++        self._regy += gen_register_command(name, success_response,
++                                           allowed_in_preconfig)
+ 
+ 
+ def gen_commands(schema, output_dir, prefix):
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 97e9060..e92f514 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -921,7 +921,8 @@ def check_exprs(exprs):
+         elif 'command' in expr:
+             meta = 'command'
+             check_keys(expr_elem, 'command', [],
+-                       ['data', 'returns', 'gen', 'success-response', 'boxed'])
++                       ['data', 'returns', 'gen', 'success-response',
++                        'boxed', 'allowed-in-preconfig'])
+         elif 'event' in expr:
+             meta = 'event'
+             check_keys(expr_elem, 'event', [], ['data', 'boxed'])
+@@ -1044,7 +1045,7 @@ class QAPISchemaVisitor(object):
+         pass
+ 
+     def visit_command(self, name, info, arg_type, ret_type,
+-                      gen, success_response, boxed):
++                      gen, success_response, boxed, allowed_in_preconfig):
+         pass
+ 
+     def visit_event(self, name, info, arg_type, boxed):
+@@ -1421,7 +1422,7 @@ class QAPISchemaAlternateType(QAPISchemaType):
+ 
+ class QAPISchemaCommand(QAPISchemaEntity):
+     def __init__(self, name, info, doc, arg_type, ret_type,
+-                 gen, success_response, boxed):
++                 gen, success_response, boxed, allowed_in_preconfig):
+         QAPISchemaEntity.__init__(self, name, info, doc)
+         assert not arg_type or isinstance(arg_type, str)
+         assert not ret_type or isinstance(ret_type, str)
+@@ -1432,6 +1433,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
+         self.gen = gen
+         self.success_response = success_response
+         self.boxed = boxed
++        self.allowed_in_preconfig = allowed_in_preconfig
+ 
+     def check(self, schema):
+         if self._arg_type_name:
+@@ -1455,7 +1457,8 @@ class QAPISchemaCommand(QAPISchemaEntity):
+     def visit(self, visitor):
+         visitor.visit_command(self.name, self.info,
+                               self.arg_type, self.ret_type,
+-                              self.gen, self.success_response, self.boxed)
++                              self.gen, self.success_response, self.boxed,
++                              self.allowed_in_preconfig)
+ 
+ 
+ class QAPISchemaEvent(QAPISchemaEntity):
+@@ -1674,6 +1677,7 @@ class QAPISchema(object):
+         gen = expr.get('gen', True)
+         success_response = expr.get('success-response', True)
+         boxed = expr.get('boxed', False)
++        allowed_in_preconfig = expr.get('allowed-in-preconfig', False)
+         if isinstance(data, OrderedDict):
+             data = self._make_implicit_object_type(
+                 name, info, doc, 'arg', self._make_members(data, info))
+@@ -1681,7 +1685,8 @@ class QAPISchema(object):
+             assert len(rets) == 1
+             rets = self._make_array_type(rets[0], info)
+         self._def_entity(QAPISchemaCommand(name, info, doc, data, rets,
+-                                           gen, success_response, boxed))
++                                           gen, success_response, boxed,
++                                           allowed_in_preconfig))
+ 
+     def _def_event(self, expr, info, doc):
+         name = expr['event']
+diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
+index 0ea68bf..464c89b 100644
+--- a/scripts/qapi/doc.py
++++ b/scripts/qapi/doc.py
+@@ -228,7 +228,7 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaVisitor):
+                                body=texi_entity(doc, 'Members')))
+ 
+     def visit_command(self, name, info, arg_type, ret_type,
+-                      gen, success_response, boxed):
++                      gen, success_response, boxed, allowed_in_preconfig):
+         doc = self.cur_doc
+         if boxed:
+             body = texi_body(doc)
+diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+index f66c397..fa7dc01 100644
+--- a/scripts/qapi/introspect.py
++++ b/scripts/qapi/introspect.py
+@@ -29,6 +29,11 @@ def to_json(obj, level=0):
+                               to_json(obj[key], level + 1))
+                 for key in sorted(obj.keys())]
+         ret = '{' + ', '.join(elts) + '}'
++    elif isinstance(obj, bool):
++        if obj:
++            ret = 'true'
++        else:
++            ret = 'false'
+     else:
+         assert False                # not implemented
+     if level == 1:
+@@ -160,12 +165,13 @@ const char %(c_name)s[] = %(c_string)s;
+                                     for m in variants.variants]})
+ 
+     def visit_command(self, name, info, arg_type, ret_type,
+-                      gen, success_response, boxed):
++                      gen, success_response, boxed, allowed_in_preconfig):
+         arg_type = arg_type or self._schema.the_empty_object_type
+         ret_type = ret_type or self._schema.the_empty_object_type
+         self._gen_json(name, 'command',
+                        {'arg-type': self._use_type(arg_type),
+-                        'ret-type': self._use_type(ret_type)})
++                        'ret-type': self._use_type(ret_type),
++                        'allowed-in-preconfig': allowed_in_preconfig})
+ 
+     def visit_event(self, name, info, arg_type, boxed):
+         arg_type = arg_type or self._schema.the_empty_object_type
+diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.py
+index 67e417e..7b22c90 100644
+--- a/tests/qapi-schema/test-qapi.py
++++ b/tests/qapi-schema/test-qapi.py
+@@ -42,7 +42,7 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+         self._print_variants(variants)
+ 
+     def visit_command(self, name, info, arg_type, ret_type,
+-                      gen, success_response, boxed):
++                      gen, success_response, boxed, allowed_in_preconfig):
+         print('command %s %s -> %s' % \
+               (name, arg_type and arg_type.name, ret_type and ret_type.name))
+         print('   gen=%s success_response=%s boxed=%s' % \
 -- 
 2.7.4
