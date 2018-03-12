@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evTp0-0004FP-EF
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:13:27 -0400
+	(envelope-from <berrange@redhat.com>) id 1evTp1-0004Fr-SL
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:13:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evTow-00074g-7b
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:13:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43326 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1evTp0-00077d-I5
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:13:27 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34012 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1evTow-00074O-1m
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:13:22 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1evTp0-000770-D8
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 16:13:26 -0400
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Mon, 12 Mar 2018 20:13:00 +0000
-Message-Id: <20180312201305.16972-5-berrange@redhat.com>
-In-Reply-To: <20180312201305.16972-1-berrange@redhat.com>
-References: <20180312201305.16972-1-berrange@redhat.com>
+Date: Mon, 12 Mar 2018 20:12:56 +0000
+Message-Id: <20180312201305.16972-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 4/9] sockets: strengthen test suite IP protocol
- availability checks
+Subject: [Qemu-devel] [PULL 0/9] Socket next patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,159 +27,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
+The following changes since commit 819fd4699c7b36d574292bcbd8bc25e9d716c8=
+4b:
 
-Instead of just checking whether it is possible to bind() on a socket, al=
-so
-check that we can successfully connect() to the socket we bound to. This
-more closely replicates the level of functionality that tests will actual=
-ly
-use.
+  Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-2018=
+0309a' into staging (2018-03-12 13:21:53 +0000)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- tests/socket-helpers.c | 67 +++++++++++++++++++++++++++++++++++++++++++-=
-------
- tests/socket-helpers.h |  4 +--
- 2 files changed, 60 insertions(+), 11 deletions(-)
+are available in the Git repository at:
 
-diff --git a/tests/socket-helpers.c b/tests/socket-helpers.c
-index 6f4bf07aa9..8112763f5b 100644
---- a/tests/socket-helpers.c
-+++ b/tests/socket-helpers.c
-@@ -30,10 +30,15 @@
- # define EAI_ADDRFAMILY 0
- #endif
-=20
--int socket_can_bind(const char *hostname)
-+int socket_can_bind_connect(const char *hostname)
- {
--    int fd =3D -1;
-+    int lfd =3D -1, cfd =3D -1, afd =3D -1;
-     struct addrinfo ai, *res =3D NULL;
-+    struct sockaddr_storage ss;
-+    socklen_t sslen =3D sizeof(ss);
-+    int soerr;
-+    socklen_t soerrlen =3D sizeof(soerr);
-+    bool check_soerr =3D false;
-     int rc;
-     int ret =3D -1;
-=20
-@@ -54,20 +59,64 @@ int socket_can_bind(const char *hostname)
-         goto cleanup;
-     }
-=20
--    fd =3D qemu_socket(res->ai_family, res->ai_socktype, res->ai_protoco=
-l);
--    if (fd < 0) {
-+    lfd =3D qemu_socket(res->ai_family, res->ai_socktype, res->ai_protoc=
-ol);
-+    if (lfd < 0) {
-         goto cleanup;
-     }
-=20
--    if (bind(fd, res->ai_addr, res->ai_addrlen) < 0) {
-+    cfd =3D qemu_socket(res->ai_family, res->ai_socktype, res->ai_protoc=
-ol);
-+    if (cfd < 0) {
-         goto cleanup;
-     }
-=20
-+    if (bind(lfd, res->ai_addr, res->ai_addrlen) < 0) {
-+        goto cleanup;
-+    }
-+
-+    if (listen(lfd, 1) < 0) {
-+        goto cleanup;
-+    }
-+
-+    if (getsockname(lfd, (struct sockaddr *)&ss, &sslen) < 0) {
-+        goto cleanup;
-+    }
-+
-+    qemu_set_nonblock(cfd);
-+    if (connect(cfd, (struct sockaddr *)&ss, sslen) < 0) {
-+        if (errno =3D=3D EINPROGRESS) {
-+            check_soerr =3D true;
-+        } else {
-+            goto cleanup;
-+        }
-+    }
-+
-+    sslen =3D sizeof(ss);
-+    afd =3D accept(lfd,  (struct sockaddr *)&ss, &sslen);
-+    if (afd < 0) {
-+        goto cleanup;
-+    }
-+
-+    if (check_soerr) {
-+        if (qemu_getsockopt(cfd, SOL_SOCKET, SO_ERROR, &soerr, &soerrlen=
-) < 0) {
-+            goto cleanup;
-+        }
-+        if (soerr) {
-+            errno =3D soerr;
-+            goto cleanup;
-+        }
-+    }
-+
-     ret =3D 0;
-=20
-  cleanup:
--    if (fd !=3D -1) {
--        close(fd);
-+    if (afd !=3D -1) {
-+        close(afd);
-+    }
-+    if (cfd !=3D -1) {
-+        close(cfd);
-+    }
-+    if (lfd !=3D -1) {
-+        close(lfd);
-     }
-     if (res) {
-         freeaddrinfo(res);
-@@ -80,7 +129,7 @@ int socket_check_protocol_support(bool *has_ipv4, bool=
- *has_ipv6)
- {
-     *has_ipv4 =3D *has_ipv6 =3D false;
-=20
--    if (socket_can_bind("127.0.0.1") < 0) {
-+    if (socket_can_bind_connect("127.0.0.1") < 0) {
-         if (errno !=3D EADDRNOTAVAIL) {
-             return -1;
-         }
-@@ -88,7 +137,7 @@ int socket_check_protocol_support(bool *has_ipv4, bool=
- *has_ipv6)
-         *has_ipv4 =3D true;
-     }
-=20
--    if (socket_can_bind("::1") < 0) {
-+    if (socket_can_bind_connect("::1") < 0) {
-         if (errno !=3D EADDRNOTAVAIL) {
-             return -1;
-         }
-diff --git a/tests/socket-helpers.h b/tests/socket-helpers.h
-index efa96eddc2..1c07d6d656 100644
---- a/tests/socket-helpers.h
-+++ b/tests/socket-helpers.h
-@@ -21,13 +21,13 @@
- /*
-  * @hostname: a DNS name or numeric IP address
-  *
-- * Check whether it is possible to bind to ports
-+ * Check whether it is possible to bind & connect to ports
-  * on the DNS name or IP address @hostname. If an IP address
-  * is used, it must not be a wildcard address.
-  *
-  * Returns 0 on success, -1 on error with errno set
-  */
--int socket_can_bind(const char *hostname);
-+int socket_can_bind_connect(const char *hostname);
-=20
- /*
-  * @has_ipv4: set to true on return if IPv4 is available
+  https://github.com/berrange/qemu tags/socket-next-pull-request
+
+for you to fetch changes up to f4d2a296de2ccf5ff80ddd343c09f0075d10583a:
+
+  char: allow passing pre-opened socket file descriptor at startup (2018-=
+03-12 17:50:52 +0000)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+
+Daniel P. Berrang=C3=A9 (9):
+  char: don't silently skip tn3270 protocol init when TLS is enabled
+  cutils: add qemu_strtoi & qemu_strtoui parsers for int/unsigned int
+    types
+  sockets: pull code for testing IP availability out of specific test
+  sockets: strengthen test suite IP protocol availability checks
+  sockets: move fd_is_socket() into common sockets code
+  sockets: check that the named file descriptor is a socket
+  sockets: allow SocketAddress 'fd' to reference numeric file
+    descriptors
+  char: refactor parsing of socket address information
+  char: allow passing pre-opened socket file descriptor at startup
+
+ chardev/char-socket.c          |  34 ++-
+ chardev/char.c                 |   3 +
+ include/qemu/cutils.h          |   4 +
+ include/qemu/sockets.h         |   1 +
+ io/channel-util.c              |  13 -
+ qapi/sockets.json              |   7 +
+ tests/.gitignore               |   1 +
+ tests/Makefile.include         |   5 +-
+ tests/socket-helpers.c         | 149 ++++++++++
+ tests/socket-helpers.h         |  42 +++
+ tests/test-char.c              |  47 ++-
+ tests/test-cutils.c            | 657 +++++++++++++++++++++++++++++++++++=
+++++++
+ tests/test-io-channel-socket.c |  72 +----
+ tests/test-util-sockets.c      | 266 +++++++++++++++++
+ util/cutils.c                  | 108 +++++++
+ util/qemu-sockets.c            |  36 ++-
+ 16 files changed, 1347 insertions(+), 98 deletions(-)
+ create mode 100644 tests/socket-helpers.c
+ create mode 100644 tests/socket-helpers.h
+ create mode 100644 tests/test-util-sockets.c
+
 --=20
 2.14.3
