@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evSJf-0000vp-7S
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:37:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1evSJl-00013H-8R
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:37:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evSJe-000667-AW
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33618 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1evSJe-00065w-7C
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:36:58 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C93ED814F0D2
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 18:36:57 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1evSJk-000697-3b
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 14:37:05 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 12 Mar 2018 13:36:24 -0500
-Message-Id: <20180312183628.394722-34-eblake@redhat.com>
+Date: Mon, 12 Mar 2018 13:36:26 -0500
+Message-Id: <20180312183628.394722-36-eblake@redhat.com>
 In-Reply-To: <20180312183628.394722-1-eblake@redhat.com>
 References: <20180312183628.394722-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 33/36] tests: qmp-test: verify command batching
+Subject: [Qemu-devel] [PULL 35/36] block/accounting: introduce latency
+ histogram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +21,199 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-From: Peter Xu <peterx@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-OOB introduced DROP event for flow control.  This should not affect old
-QMP clients.  Add a command batching check to make sure of it.
+Introduce latency histogram statics for block devices.
+For each accounted operation type, the latency region [0, +inf) is
+divided into subregions by several points. Then, calculate
+hits for each subregion.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180309090006.10018-23-peterx@redhat.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-Id: <20180309165212.97144-2-vsementsov@virtuozzo.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qmp-test.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ include/block/accounting.h | 35 ++++++++++++++++++
+ block/accounting.c         | 91 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 126 insertions(+)
 
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index a8384bdda3b..fd4033a13fd 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -82,6 +82,7 @@ static void test_qmp_protocol(void)
-     QTestState *qts;
-     const QListEntry *entry;
-     QString *qstr;
-+    int i;
+diff --git a/include/block/accounting.h b/include/block/accounting.h
+index b833d26d6c7..d1f67b10ddf 100644
+--- a/include/block/accounting.h
++++ b/include/block/accounting.h
+@@ -27,6 +27,7 @@
 
-     qts = qtest_init_without_qmp_handshake(common_args);
+ #include "qemu/timed-average.h"
+ #include "qemu/thread.h"
++#include "qapi/qapi-builtin-types.h"
 
-@@ -139,6 +140,27 @@ static void test_qmp_protocol(void)
-     g_assert_cmpint(qdict_get_int(resp, "id"), ==, 2);
-     QDECREF(resp);
+ typedef struct BlockAcctTimedStats BlockAcctTimedStats;
+ typedef struct BlockAcctStats BlockAcctStats;
+@@ -45,6 +46,36 @@ struct BlockAcctTimedStats {
+     QSLIST_ENTRY(BlockAcctTimedStats) entries;
+ };
 
-+    /*
-+     * Test command batching.  In current test OOB is not enabled, we
-+     * should be able to run as many commands in batch as we like.
-+     * Using 16 (>8, which is OOB queue length) to make sure OOB won't
-+     * break existing clients.  Note: this test does not control the
-+     * scheduling of QEMU's QMP command processing threads so it may
-+     * not really trigger batching inside QEMU.  This is just a
-+     * best-effort test.
++typedef struct BlockLatencyHistogram {
++    /* The following histogram is represented like this:
++     *
++     * 5|           *
++     * 4|           *
++     * 3| *         *
++     * 2| *         *    *
++     * 1| *    *    *    *
++     *  +------------------
++     *      10   50   100
++     *
++     * BlockLatencyHistogram histogram = {
++     *     .nbins = 4,
++     *     .boundaries = {10, 50, 100},
++     *     .bins = {3, 1, 5, 2},
++     * };
++     *
++     * @boundaries array define histogram intervals as follows:
++     * [0, boundaries[0]), [boundaries[0], boundaries[1]), ...
++     * [boundaries[nbins-2], +inf)
++     *
++     * So, for example above, histogram intervals are:
++     * [0, 10), [10, 50), [50, 100), [100, +inf)
 +     */
-+    for (i = 0; i < 16; i++) {
-+        qtest_async_qmp(qts, "{ 'execute': 'query-version' }");
-+    }
-+    /* Verify the replies to make sure no command is dropped. */
-+    for (i = 0; i < 16; i++) {
-+        resp = qtest_qmp_receive(qts);
-+        /* It should never be dropped.  Each of them should be a reply. */
-+        g_assert(qdict_haskey(resp, "return"));
-+        g_assert(!qdict_haskey(resp, "event"));
-+        QDECREF(resp);
-+    }
++    int nbins;
++    uint64_t *boundaries; /* @nbins-1 numbers here
++                             (all boundaries, except 0 and +inf) */
++    uint64_t *bins;
++} BlockLatencyHistogram;
 +
-     qtest_quit(qts);
+ struct BlockAcctStats {
+     QemuMutex lock;
+     uint64_t nr_bytes[BLOCK_MAX_IOTYPE];
+@@ -57,6 +88,7 @@ struct BlockAcctStats {
+     QSLIST_HEAD(, BlockAcctTimedStats) intervals;
+     bool account_invalid;
+     bool account_failed;
++    BlockLatencyHistogram latency_histogram[BLOCK_MAX_IOTYPE];
+ };
+
+ typedef struct BlockAcctCookie {
+@@ -82,5 +114,8 @@ void block_acct_merge_done(BlockAcctStats *stats, enum BlockAcctType type,
+ int64_t block_acct_idle_time_ns(BlockAcctStats *stats);
+ double block_acct_queue_depth(BlockAcctTimedStats *stats,
+                               enum BlockAcctType type);
++int block_latency_histogram_set(BlockAcctStats *stats, enum BlockAcctType type,
++                                uint64List *boundaries);
++void block_latency_histograms_clear(BlockAcctStats *stats);
+
+ #endif
+diff --git a/block/accounting.c b/block/accounting.c
+index 87ef5bbfaa0..70a3d9a426c 100644
+--- a/block/accounting.c
++++ b/block/accounting.c
+@@ -94,6 +94,94 @@ void block_acct_start(BlockAcctStats *stats, BlockAcctCookie *cookie,
+     cookie->type = type;
  }
 
++/* block_latency_histogram_compare_func:
++ * Compare @key with interval [@it[0], @it[1]).
++ * Return: -1 if @key < @it[0]
++ *          0 if @key in [@it[0], @it[1])
++ *         +1 if @key >= @it[1]
++ */
++static int block_latency_histogram_compare_func(const void *key, const void *it)
++{
++    uint64_t k = *(uint64_t *)key;
++    uint64_t a = ((uint64_t *)it)[0];
++    uint64_t b = ((uint64_t *)it)[1];
++
++    return k < a ? -1 : (k < b ? 0 : 1);
++}
++
++static void block_latency_histogram_account(BlockLatencyHistogram *hist,
++                                            int64_t latency_ns)
++{
++    uint64_t *pos;
++
++    if (hist->bins == NULL) {
++        /* histogram disabled */
++        return;
++    }
++
++
++    if (latency_ns < hist->boundaries[0]) {
++        hist->bins[0]++;
++        return;
++    }
++
++    if (latency_ns >= hist->boundaries[hist->nbins - 2]) {
++        hist->bins[hist->nbins - 1]++;
++        return;
++    }
++
++    pos = bsearch(&latency_ns, hist->boundaries, hist->nbins - 2,
++                  sizeof(hist->boundaries[0]),
++                  block_latency_histogram_compare_func);
++    assert(pos != NULL);
++
++    hist->bins[pos - hist->boundaries + 1]++;
++}
++
++int block_latency_histogram_set(BlockAcctStats *stats, enum BlockAcctType type,
++                                uint64List *boundaries)
++{
++    BlockLatencyHistogram *hist = &stats->latency_histogram[type];
++    uint64List *entry;
++    uint64_t *ptr;
++    uint64_t prev = 0;
++    int new_nbins = 1;
++
++    for (entry = boundaries; entry; entry = entry->next) {
++        if (entry->value <= prev) {
++            return -EINVAL;
++        }
++        new_nbins++;
++        prev = entry->value;
++    }
++
++    hist->nbins = new_nbins;
++    g_free(hist->boundaries);
++    hist->boundaries = g_new(uint64_t, hist->nbins - 1);
++    for (entry = boundaries, ptr = hist->boundaries; entry;
++         entry = entry->next, ptr++)
++    {
++        *ptr = entry->value;
++    }
++
++    g_free(hist->bins);
++    hist->bins = g_new0(uint64_t, hist->nbins);
++
++    return 0;
++}
++
++void block_latency_histograms_clear(BlockAcctStats *stats)
++{
++    int i;
++
++    for (i = 0; i < BLOCK_MAX_IOTYPE; i++) {
++        BlockLatencyHistogram *hist = &stats->latency_histogram[i];
++        g_free(hist->bins);
++        g_free(hist->boundaries);
++        memset(hist, 0, sizeof(*hist));
++    }
++}
++
+ static void block_account_one_io(BlockAcctStats *stats, BlockAcctCookie *cookie,
+                                  bool failed)
+ {
+@@ -116,6 +204,9 @@ static void block_account_one_io(BlockAcctStats *stats, BlockAcctCookie *cookie,
+         stats->nr_ops[cookie->type]++;
+     }
+
++    block_latency_histogram_account(&stats->latency_histogram[cookie->type],
++                                    latency_ns);
++
+     if (!failed || stats->account_failed) {
+         stats->total_time_ns[cookie->type] += latency_ns;
+         stats->last_access_time_ns = time_ns;
 -- 
 2.14.3
