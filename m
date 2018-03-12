@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evLvL-0000MI-8X
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:47:28 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1evLvw-0000nb-Tv
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:48:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evLvK-0006vB-BY
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:47:27 -0400
-Date: Mon, 12 Mar 2018 12:47:21 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180312114721.GB31537@localhost.localdomain>
-References: <20180309172713.26318-1-kwolf@redhat.com>
-	<20180309172713.26318-4-kwolf@redhat.com>
-	<20180312114009.GI3493@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1evLvw-0007wu-5G
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:48:04 -0400
+Received: from mail-oi0-x229.google.com ([2607:f8b0:4003:c06::229]:40188)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1evLvv-0007w3-Ul
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:48:04 -0400
+Received: by mail-oi0-x229.google.com with SMTP id c12so12013770oic.7
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 04:48:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180312114009.GI3493@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/6] luks: Support .bdrv_co_create
+In-Reply-To: <20180309161933.8168-1-kwolf@redhat.com>
+References: <20180309161933.8168-1-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 12 Mar 2018 11:47:42 +0000
+Message-ID: <CAFEAcA_5HKpY_NsLmByBgz-WuoPF7VNzxG2OaFu+bA+RFHRABg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/56] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Am 12.03.2018 um 12:40 hat Daniel P. Berrang=E9 geschrieben:
-> On Fri, Mar 09, 2018 at 06:27:10PM +0100, Kevin Wolf wrote:
-> > This adds the .bdrv_co_create driver callback to luks, which enables
-> > image creation over QMP.
-> >=20
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  qapi/block-core.json | 17 ++++++++++++++++-
-> >  block/crypto.c       | 34 ++++++++++++++++++++++++++++++++++
-> >  2 files changed, 50 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/qapi/block-core.json b/qapi/block-core.json
-> > index 524d51567a..07039bfe9c 100644
-> > --- a/qapi/block-core.json
-> > +++ b/qapi/block-core.json
-> > @@ -3452,6 +3452,21 @@
-> >              '*preallocation':   'PreallocMode' } }
-> > =20
-> >  ##
-> > +# @BlockdevCreateOptionsLUKS:
-> > +#
-> > +# Driver specific image creation options for LUKS.
-> > +#
-> > +# @file             Node to create the image format on
-> > +# @size             Size of the virtual disk in bytes
-> > +#
-> > +# Since: 2.12
-> > +##
-> > +{ 'struct': 'BlockdevCreateOptionsLUKS',
-> > +  'data': { 'file':             'BlockdevRef',
-> > +            'qcrypto':          'QCryptoBlockCreateOptionsLUKS',
-> > +            'size':             'size' } }
->=20
-> s/qcrypto/crypto/ in this field.
->=20
-> I do wonder about whether instead of embedding QCryptoBlockCreateOption=
-sLUKS
-> as a field, we could instead use QCryptoBlockCreateOptionsLUKS as the
-> base struct and just inherit from it to add file/size.
->=20
-> I'm not really fussed, but I wonder if you/Eric have any thoughts on th=
-e pros
-> or cons of inheritance vs embedding in this case.
+On 9 March 2018 at 16:18, Kevin Wolf <kwolf@redhat.com> wrote:
+> The following changes since commit d9bbfea646e86426d549bd612cd9f91e49aa50c2:
+>
+>   Merge remote-tracking branch 'remotes/riscv/tags/riscv-qemu-upstream-v8.2' into staging (2018-03-09 10:58:57 +0000)
+>
+> are available in the git repository at:
+>
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>
+> for you to fetch changes up to a1be5921e35dcf84ce9e3c9a5c3029cea530a60b:
+>
+>   Merge remote-tracking branch 'mreitz/tags/pull-block-2018-03-09' into queue-block (2018-03-09 16:09:06 +0100)
+>
+> ----------------------------------------------------------------
+> Block layer patches
+>
+> ----------------------------------------------------------------
 
-I don't think QAPI has a way to embed it in JSON, but still provide a
-QCryptoBlockCreateOptionsLUKS C object. Originally I wanted to use
-inheritance, but instead of having the struct type reused, you get all
-field definitions copied. I guess you could then manually cast to the
-base type and it would still work, but it didn't really feel clean.
+Applied, thanks.
 
-Kevin
+-- PMM
