@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1evVJu-00077j-76
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 17:49:27 -0400
+	(envelope-from <eblake@redhat.com>) id 1evVLt-0008Fy-FN
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 17:51:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1evVJt-0000X9-DO
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 17:49:26 -0400
-References: <20180309214611.19122-1-kwolf@redhat.com>
-	<20180309214611.19122-8-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <11f93eeb-19f3-9f3e-edb9-00c1bfb86b37@redhat.com>
-Date: Mon, 12 Mar 2018 22:49:02 +0100
+	(envelope-from <eblake@redhat.com>) id 1evVLs-0001PT-I3
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 17:51:29 -0400
+References: <20180308184636.178534-1-vsementsov@virtuozzo.com>
+	<20180308184636.178534-4-vsementsov@virtuozzo.com>
+	<bc19fbc1-71b9-59cd-2556-3b388a886091@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <efa02563-7c61-9812-2487-90d2a6cb9f97@redhat.com>
+Date: Mon, 12 Mar 2018 16:51:22 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180309214611.19122-8-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Yxxgep1B7lcw73fmLXkeOXnG1gRiTPiCY"
-Subject: Re: [Qemu-devel] [PATCH 7/7] vpc: Support .bdrv_co_create
+In-Reply-To: <bc19fbc1-71b9-59cd-2556-3b388a886091@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/5] nbd/server: fix: check client->closing
+ before reply sending
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,116 +26,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: den@openvz.org, jcody@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: pbonzini@redhat.com, den@openvz.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Yxxgep1B7lcw73fmLXkeOXnG1gRiTPiCY
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: den@openvz.org, jcody@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
-Message-ID: <11f93eeb-19f3-9f3e-edb9-00c1bfb86b37@redhat.com>
-Subject: Re: [PATCH 7/7] vpc: Support .bdrv_co_create
-References: <20180309214611.19122-1-kwolf@redhat.com>
- <20180309214611.19122-8-kwolf@redhat.com>
-In-Reply-To: <20180309214611.19122-8-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 03/09/2018 03:51 PM, Eric Blake wrote:
+> On 03/08/2018 12:46 PM, Vladimir Sementsov-Ogievskiy wrote:
 
-On 2018-03-09 22:46, Kevin Wolf wrote:
-> This adds the .bdrv_co_create driver callback to vpc, which
-> enables image creation over QMP.
+In the subject: s/reply sending/sending reply/
+
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>
+>> It's like an RFC. I'm not sure, but this place looks like a bug.=20
+>> Shouldn't
+>> we chack client-closing even before nbd_client_receive_next_request()=20
+>> call?
+>>
+
+> Your RFC question is whether we can just check client->closing before=20
+> checking ret, and skip nbd_client_receive_next_request() in that case=20
+> (in other words, why even bother to queue up a coroutine that will do=20
+> nothing, if we already know the client is going away).=C2=A0 And my ans=
+wer is=20
+> yes, I think that makes more sense.=C2=A0 So that would be:
 >=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  qapi/block-core.json |  33 ++++++++++-
->  block/vpc.c          | 152 ++++++++++++++++++++++++++++++++++++++-----=
---------
->  2 files changed, 147 insertions(+), 38 deletions(-)
+> diff --git c/nbd/server.c w/nbd/server.c
+> index 5f292064af0..b230ecb4fb8 100644
+> --- c/nbd/server.c
+> +++ w/nbd/server.c
+> @@ -1543,14 +1543,6 @@ static coroutine_fn void nbd_trip(void *opaque)
+>  =C2=A0=C2=A0=C2=A0=C2=A0 req =3D nbd_request_get(client);
+>  =C2=A0=C2=A0=C2=A0=C2=A0 ret =3D nbd_co_receive_request(req, &request,=
+ &local_err);
+>  =C2=A0=C2=A0=C2=A0=C2=A0 client->recv_coroutine =3D NULL;
+> -=C2=A0=C2=A0=C2=A0 nbd_client_receive_next_request(client);
+> -=C2=A0=C2=A0=C2=A0 if (ret =3D=3D -EIO) {
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto disconnect;
+> -=C2=A0=C2=A0=C2=A0 }
+> -
+> -=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto reply;
+> -=C2=A0=C2=A0=C2=A0 }
 >=20
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 3a65909c47..ca645a0067 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -3734,6 +3734,37 @@
->              '*block-state-zero':    'bool' } }
-> =20
->  ##
-> +# @BlockdevVpcSubformat:
-> +#
-> +# @dynamic: Growing image file
-> +# @fixed:   Preallocated fixed-size imge file
-
-s/imge/image/
-
-> +#
-> +# Since: 2.12
-> +##
-> +{ 'enum': 'BlockdevVpcSubformat',
-> +  'data': [ 'dynamic', 'fixed' ] }
+>  =C2=A0=C2=A0=C2=A0=C2=A0 if (client->closing) {
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
+> @@ -1560,6 +1552,15 @@ static coroutine_fn void nbd_trip(void *opaque)
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto done;
+>  =C2=A0=C2=A0=C2=A0=C2=A0 }
+>=20
+> +=C2=A0=C2=A0=C2=A0 nbd_client_receive_next_request(client);
+> +=C2=A0=C2=A0=C2=A0 if (ret =3D=3D -EIO) {
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto disconnect;
+> +=C2=A0=C2=A0=C2=A0 }
 > +
-> +##
-> +# @BlockdevCreateOptionsVpc:
-> +#
-> +# Driver specific image creation options for vpc (VHD).
-> +#
-> +# @file             Node to create the image format on
-> +# @size             Size of the virtual disk in bytes
-> +# @subformat        vhdx subformat (default: dynamic)
-> +# @force-size       Force use of the exact byte size instead of roundi=
-ng to the
-> +#                   next size that can be represented in CHS geometry
-> +#                   (default: false)
-
-Now that's weird, again considering your previous approach of only
-rounding things in the legacy path and instead throwing errors from
-blockdev-create.  If you think this is OK to have here, than that's OK
-with me, but I'm not sure this is the ideal way.
-
-Alternatives:
-
-1. Swap the default, not sure this is such a good idea either.
-
-2. Maybe add an enum instead.  Default: If the given size doesn't fit
-CHS, generate an error.  Second choice: Use the given size, even if it
-doesn't fit.  Third choice: Round to CHS.
-
-I don't want to be stuck up, but once it's a public interface...
-
-So if you think the bool is OK like it is...
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-> +#
-> +# Since: 2.12
-> +##
-> +{ 'struct': 'BlockdevCreateOptionsVpc',
-> +  'data': { 'file':                 'BlockdevRef',
-> +            'size':                 'size',
-> +            '*subformat':           'BlockdevVpcSubformat',
-> +            '*force-size':          'bool' } }
+> +=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto reply;
+> +=C2=A0=C2=A0=C2=A0 }
 > +
-> +##
->  # @BlockdevCreateNotSupported:
->  #
->  # This is used for all drivers that don't support creating images.
+>  =C2=A0=C2=A0=C2=A0=C2=A0 switch (request.type) {
+>  =C2=A0=C2=A0=C2=A0=C2=A0 case NBD_CMD_READ:
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* XXX: NBD Protocol =
+only documents use of FUA with WRITE */
+>=20
+>=20
+> Unless this revised form fails testing or gets any other review=20
+> comments, I will go ahead and amend your commit in this manner.
 
+I figured out why iotests were failing for an unrelated issue (thanks to=20
+Max for recognizing the symptoms on IRC), and my changes still passed,=20
+so I'm squashing them in as part of staging this series on my NBD queue.
 
---Yxxgep1B7lcw73fmLXkeOXnG1gRiTPiCY
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqm9c4SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9Av28IAKUEfIxft/Hz6WfSVdYtkF5s/InZpEqA
-oJ/nUy5XWd+aQx90JL2KdMTg+NSVe/eclcdw4vB/0laByeKk7oqldsoOFSNHr2Hm
-kAncKKhMa9z7TEPy9mhJlNxas3At5R8OFofTRYYY2Hhzx/UmgpYbjWMEh/DYg2Yh
-XmD0xTyYu2uqWXCxxBqE1iJp9SCnf50NPCp7hgoGTi9DKztuKTqa5NlTC7RJwv0I
-OFMYF2I7OFXyyxxTn+jN2jasiuSdEQab1lDC26BHrGI4BHbuy8xwqNlHj45svFEY
-JhgyRz4kSD/i67+mD4l4ug+Srn48nXGK850XO0bW1trhIuWRgiO9Q1Q=
-=9PZC
------END PGP SIGNATURE-----
-
---Yxxgep1B7lcw73fmLXkeOXnG1gRiTPiCY--
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
