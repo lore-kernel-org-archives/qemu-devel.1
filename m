@@ -1,22 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1evPBz-0007dz-DM
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:16:52 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1evPGY-0000sO-7y
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:21:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1evPBy-00019c-9q
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:16:51 -0400
-References: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
-	<1518893216-9983-12-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA_9cmK9gebqE9997fzhTzKT6Ky9q4jn=fxwziopDyK9Ew@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <cc6029a1-c177-ee8c-d09b-0ed2af81c897@redhat.com>
-Date: Mon, 12 Mar 2018 16:16:25 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_9cmK9gebqE9997fzhTzKT6Ky9q4jn=fxwziopDyK9Ew@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v9 11/14] target/arm/kvm: Translate the MSI
- doorbell in kvm_arch_fixup_msi_route
+	(envelope-from <vsementsov@virtuozzo.com>) id 1evPGU-0006cE-U1
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:21:34 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 12 Mar 2018 18:21:22 +0300
+Message-Id: <20180312152126.286890-5-vsementsov@virtuozzo.com>
+In-Reply-To: <20180312152126.286890-1-vsementsov@virtuozzo.com>
+References: <20180312152126.286890-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v2 4/8] block/nbd-client: save first fatal
+ error in nbd_iter_error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,105 +20,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eric Auger <eric.auger.pro@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Hi Peter,
-On 12/03/18 12:59, Peter Maydell wrote:
-> On 17 February 2018 at 18:46, Eric Auger <eric.auger@redhat.com> wrote:
->> In case the MSI is translated by an IOMMU we need to fixup the
->> MSI route with the translated address.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> v5 -> v6:
->> - use IOMMUMemoryRegionClass API
->>
->> It is still unclear to me if we need to register an IOMMUNotifier
->> to handle any change in the MSI doorbell which would occur behind
->> the scene and would not lead to any call to kvm_arch_fixup_msi_route().
-> 
-> Paolo, do you know the answer to this question ?
-> 
->> ---
->>  target/arm/kvm.c        | 27 +++++++++++++++++++++++++++
->>  target/arm/trace-events |  3 +++
->>  2 files changed, 30 insertions(+)
->>
->> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
->> index 1219d00..9f5976a 100644
->> --- a/target/arm/kvm.c
->> +++ b/target/arm/kvm.c
->> @@ -20,8 +20,13 @@
->>  #include "sysemu/kvm.h"
->>  #include "kvm_arm.h"
->>  #include "cpu.h"
->> +#include "trace.h"
->>  #include "internals.h"
->>  #include "hw/arm/arm.h"
->> +#include "hw/pci/pci.h"
->> +#include "hw/pci/msi.h"
->> +#include "hw/arm/smmu-common.h"
->> +#include "hw/arm/smmuv3.h"
->>  #include "exec/memattrs.h"
->>  #include "exec/address-spaces.h"
->>  #include "hw/boards.h"
->> @@ -666,6 +671,28 @@ int kvm_arm_vgic_probe(void)
->>  int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
->>                               uint64_t address, uint32_t data, PCIDevice *dev)
->>  {
->> +    AddressSpace *as = pci_device_iommu_address_space(dev);
->> +    IOMMUMemoryRegionClass *imrc;
->> +    IOMMUTLBEntry entry;
->> +    SMMUDevice *sdev;
->> +
->> +    if (as == &address_space_memory) {
->> +        return 0;
->> +    }
->> +
->> +    /* MSI doorbell address is translated by an IOMMU */
->> +    sdev = container_of(as, SMMUDevice, as);
->> +    imrc = IOMMU_MEMORY_REGION_GET_CLASS(&sdev->iommu);
->> +
->> +    entry = imrc->translate(&sdev->iommu, address, IOMMU_WO);
->> +
->> +    route->u.msi.address_lo = entry.translated_addr;
->> +    route->u.msi.address_hi = entry.translated_addr >> 32;
->> +
->> +    trace_kvm_arm_fixup_msi_route(address, sdev->devfn,
->> +                                  sdev->iommu.parent_obj.name,
->> +                                  entry.translated_addr);
->> +
->>      return 0;
->>  }
-> 
-> It seems a bit odd that:
->  * the code for arm for "PCI devices behind IOMMU need to have
->    the MSI doorbell writes go through the IOMMU" looks rather
->    different from the code for x86 for the same thing
-ARM SMMU translates MSIs whereas Intel/AMD IOMMU do not translate them.
-Hence this implementation
->  * the code here needs to know specifically that this is an SMMU
->    and not some other kind of IOMMU
-Yes when introducing virtio-iommu we will need to get this fixed. We
-need a way to retrieve the iommu mr from the as. I will work on this
-concurrently.
-> 
-> I would have expected this to be more generic-to-all-IOMMU
-> APIs and maybe even implemented in the generic KVM support code...
-> 
-> The x86 code seems to be similarly x86-specific though, so
-> this is more of a "perhaps there is a cleanup opportunity here"
-> observation I guess.
+It is ok, that fatal error hides previous not fatal, but hiding
+first fatal error is a bad feature.
 
-OK
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
 
-Thanks
+v2: add Eric's r-b
 
-Eric
-> 
-> thanks
-> -- PMM
-> 
+ block/nbd-client.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 7b68499b76..0d9f73a137 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -481,6 +481,7 @@ static coroutine_fn int nbd_co_receive_one_chunk(
+ 
+ typedef struct NBDReplyChunkIter {
+     int ret;
++    bool fatal;
+     Error *err;
+     bool done, only_structured;
+ } NBDReplyChunkIter;
+@@ -490,11 +491,12 @@ static void nbd_iter_error(NBDReplyChunkIter *iter, bool fatal,
+ {
+     assert(ret < 0);
+ 
+-    if (fatal || iter->ret == 0) {
++    if ((fatal && !iter->fatal) || iter->ret == 0) {
+         if (iter->ret != 0) {
+             error_free(iter->err);
+             iter->err = NULL;
+         }
++        iter->fatal = fatal;
+         iter->ret = ret;
+         error_propagate(&iter->err, *local_err);
+     } else {
+-- 
+2.11.1
