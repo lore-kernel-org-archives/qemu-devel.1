@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49919)
+Received: from eggs.gnu.org ([208.118.235.92]:51035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1evPiu-0007oB-QJ
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:52:16 -0400
+	(envelope-from <stefanha@redhat.com>) id 1evPsF-0004vc-9d
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:00:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1evPiF-00072F-TG
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:50:52 -0400
-References: <20180205202232.19254-1-mreitz@redhat.com>
-	<73838a0c-d960-d24d-b706-a0ecbcbe7aaf@redhat.com>
-	<20180307100424.GA7917@localhost.localdomain>
-	<2d97780c-4a06-1b08-8211-760fc3567c2a@redhat.com>
-	<20180308021241.GM13844@lemon.usersys.redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <d062c042-e69f-566d-7a1f-518e20778f60@redhat.com>
-Date: Mon, 12 Mar 2018 11:47:58 -0400
+	(envelope-from <stefanha@redhat.com>) id 1evPsE-0000l4-F6
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:00:31 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57156 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1evPsE-0000ki-6K
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:00:30 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Mon, 12 Mar 2018 16:00:13 +0000
+Message-Id: <20180312160014.6804-5-stefanha@redhat.com>
+In-Reply-To: <20180312160014.6804-1-stefanha@redhat.com>
+References: <20180312160014.6804-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180308021241.GM13844@lemon.usersys.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/2] block/ssh: Implement
- .bdrv_refresh_filename()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 4/5] trace: remove use of QEMU specific types
+ from trace probes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, "Richard W . M . Jones" <rjones@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
+From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
+Any compound structs / unions / etc, should always be declared as
+'void *' pointers, since it cannot be assumed that trace backends
+are able to resolve QEMU typedefs.
 
-On 03/07/2018 09:12 PM, Fam Zheng wrote:
-> On Wed, 03/07 12:50, John Snow wrote:
->> It's something I'd like to see patchew do, actually:
->>
->> "Here's a list of what's on the list that has no reviews or NACKs, and
->> needs some love"
-> 
-> It's not hard to define a search condition for that:
-> 
-> http://patchew.org/search-help
-> 
-> http://patchew.org/search?q=project%3AQEMU+age%3A%3E1m+not%3Areviewed+not%3Areplied+not%3Amerged+is%3Atested+to%3Aqemu-block
-> 
->>
->> coupled with a 30 day "Hey, nobody looked at this" ping to the list
->> before it NACKs a set for being too old.
-> 
-> If the initial landing of the patch didn't get enough attention, chances are the
-> pings will not change much about it especially it's from a bot.
-> 
-> A summary list sounds good, though.
-> 
-> Fam
-> 
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Message-id: 20180308155524.5082-2-berrange@redhat.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ trace-events | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-It's not really to *get* the patch attention as much as it's meant to
-inform the sender that it's not under consideration anymore.
-
-"Yeah, but everyone knows this...?"
-
-Consider it a formalization of the process.
-
---js
+diff --git a/trace-events b/trace-events
+index 89fcad0fd1..855b0ab240 100644
+--- a/trace-events
++++ b/trace-events
+@@ -68,9 +68,9 @@ memory_region_tb_read(int cpu_index, uint64_t addr, uin=
+t64_t value, unsigned siz
+ memory_region_tb_write(int cpu_index, uint64_t addr, uint64_t value, uns=
+igned size) "cpu %d addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
+ memory_region_ram_device_read(int cpu_index, void *mr, uint64_t addr, ui=
+nt64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRI=
+x64" size %u"
+ memory_region_ram_device_write(int cpu_index, void *mr, uint64_t addr, u=
+int64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PR=
+Ix64" size %u"
+-flatview_new(FlatView *view, MemoryRegion *root) "%p (root %p)"
+-flatview_destroy(FlatView *view, MemoryRegion *root) "%p (root %p)"
+-flatview_destroy_rcu(FlatView *view, MemoryRegion *root) "%p (root %p)"
++flatview_new(void *view, void *root) "%p (root %p)"
++flatview_destroy(void *view, void *root) "%p (root %p)"
++flatview_destroy_rcu(void *view, void *root) "%p (root %p)"
+=20
+ # gdbstub.c
+ gdbstub_op_start(const char *device) "Starting gdbstub using device %s"
+--=20
+2.14.3
