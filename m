@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evNFx-0007O3-Rg
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:12:55 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1evNHE-0000MM-Si
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:14:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evNFt-0005YD-6q
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:12:49 -0400
-Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:46513)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1evNFt-0005XF-1Q
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:12:45 -0400
-Received: by mail-oi0-x22e.google.com with SMTP id x12so12223555oie.13
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 06:12:45 -0700 (PDT)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1evNH8-0007nJ-VE
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 09:14:08 -0400
+References: <1518702707-7077-1-git-send-email-vsementsov@virtuozzo.com>
+	<1518702707-7077-7-git-send-email-vsementsov@virtuozzo.com>
+	<b570a199-9139-5652-5ad8-407820680620@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <540897fd-ceff-548e-ce96-11fc47ea4cd7@virtuozzo.com>
+Date: Mon, 12 Mar 2018 16:13:49 +0300
 MIME-Version: 1.0
-In-Reply-To: <053e7d2f-a551-793f-c990-d742de98a54a@amsat.org>
-References: <20180309153654.13518-1-f4bug@amsat.org>
-	<20180309153654.13518-6-f4bug@amsat.org>
-	<CAFEAcA8jPcjk+sj0FVE8P5dA82GdNDNr-Zg_7T6PGqufr2157A@mail.gmail.com>
-	<053e7d2f-a551-793f-c990-d742de98a54a@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 12 Mar 2018 13:12:12 +0000
-Message-ID: <CAFEAcA8gP2q-23igwWJP4EAfmh2YZCYTdm4a0_wPSw3bxQuJbw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 5/8] sdcard: Implement the UHS-I
- SWITCH_FUNCTION entries (Spec v3)
+In-Reply-To: <b570a199-9139-5652-5ad8-407820680620@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 6/9] nbd: BLOCK_STATUS for standard
+ get_block_status function: client part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,26 +26,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair@alistair23.me>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On 12 March 2018 at 12:36, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wr=
-ote:
-> On 03/09/2018 06:03 PM, Peter Maydell wrote:
->> Previously we were writing 0x00, 0x01 to the first 2 bytes of data;
->> now we will write 0x01, 0x00. Are you sure that's right ? I guess
->> it's the difference between claiming 1mA and 256mA.
->> (I can't make any sense of the table in the spec so I have no idea.)
+16.02.2018 23:40, Eric Blake wrote:
+> On 02/15/2018 07:51 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Minimal realization: only one extent in server answer is supported.
+>> Flag NBD_CMD_FLAG_REQ_ONE is used to force this behavior.
+>>
+>> Tests 140, 147 and 205 are fixed due to now server failed on searching
+>> export in context of NBD_OPT_SET_META_CONTEXT option negotiation.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
 >
-> Good catch. I'm not sure which default value we want here, I doubt 256
-> mA matches the card used, but the hw tests pass so I'll keep it.
-> We might change it to a property later.
 
-Do the tests fail if we report 1mA ? If not, then I'd prefer us
-to keep the current behaviour. (QEMU's implementation obviously
-has no current draw limits, so reporting the lowest possible value
-means we won't ever accidentally cause the guest to think it
-can't do something because the current requirement is too high.)
+[...]
 
-thanks
--- PMM
+> Instead of doing a memcpy() and then in-place bit-swizzling, you could 
+> do the swapping as part of assignment, for one less function call (and 
+> make the code a bit easier to extend, if we later drop our REQ_ONE 
+> limitation on only having one extent, because you'll advance payload 
+> as needed):
+>
+> extent->length = payload_advance32(&payload);
+> extent->flags = payload_advance32(&payload);
+>
+> We should probably validate that the length field is a multiple of 
+> min_block (if a server tells us that all operations must be 512-byte 
+> aligned, then reports an extent that is smaller than 512 bytes, we 
+> have no way to ask for the status of the second half of the sector). 
+> Probably also something that needs to be explicitly stated in the NBD 
+> spec. [1]
+
+related question: what server should reply on zero-length request? I'll add
+
++     if (!bytes) {
++         *pnum = 0;
++         return 0;
++     }
+
+to nbd_client_co_block_status, to prevent such situation, but looks like 
+spec lacks the information.
+
+
+
+
+-- 
+Best regards,
+Vladimir
