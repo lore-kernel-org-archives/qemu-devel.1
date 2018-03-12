@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evQdq-0004m4-9N
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:49:45 -0400
+	(envelope-from <mreitz@redhat.com>) id 1evQjg-0006uv-SR
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:55:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evQdk-0002tw-1I
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:49:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46474 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evQdj-0002tU-ST
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:49:35 -0400
-Date: Mon, 12 Mar 2018 16:49:25 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180312164925.GN3219@work-vm>
-References: <20180308195811.24894-1-dgilbert@redhat.com>
-	<20180308195811.24894-25-dgilbert@redhat.com>
-	<CAJ+F1CJJsF_gb3Sg80Xk937YO91owkTaMyke=uGntLboP+yrBQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CJJsF_gb3Sg80Xk937YO91owkTaMyke=uGntLboP+yrBQ@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 24/29] vhost-user: Add
- VHOST_USER_POSTCOPY_END message
+	(envelope-from <mreitz@redhat.com>) id 1evQjf-0006hs-RN
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:55:44 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Mon, 12 Mar 2018 17:55:27 +0100
+Message-Id: <20180312165528.8969-3-mreitz@redhat.com>
+In-Reply-To: <20180312165528.8969-1-mreitz@redhat.com>
+References: <20180312165528.8969-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/3] vdi: Move file creation to
+ vdi_co_create_opts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,154 +20,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Weil <sw@weilnetz.de>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-* Marc-Andr=E9 Lureau (marcandre.lureau@gmail.com) wrote:
-> On Thu, Mar 8, 2018 at 8:58 PM, Dr. David Alan Gilbert (git)
-> <dgilbert@redhat.com> wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >
-> > This message is sent just before the end of postcopy to get the
-> > client to stop using userfault since we wont respond to any more
-> > requests.  It should close userfaultfd so that any other pages
-> > get mapped to the backing file automatically by the kernel, since
-> > at this point we know we've received everything.
-> >
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > Reviewed-by: Peter Xu <peterx@redhat.com>
->=20
-> Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block/vdi.c | 46 ++++++++++++++++++++++++++++------------------
+ 1 file changed, 28 insertions(+), 18 deletions(-)
 
-Thanks.
-
->=20
-> > ---
-> >  contrib/libvhost-user/libvhost-user.c | 23 +++++++++++++++++++++++
-> >  contrib/libvhost-user/libvhost-user.h |  1 +
-> >  docs/interop/vhost-user.txt           | 11 +++++++++++
-> >  hw/virtio/vhost-user.c                |  1 +
-> >  4 files changed, 36 insertions(+)
-> >
-> > diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost=
--user/libvhost-user.c
-> > index 1b224af706..1f988ab787 100644
-> > --- a/contrib/libvhost-user/libvhost-user.c
-> > +++ b/contrib/libvhost-user/libvhost-user.c
-> > @@ -99,6 +99,7 @@ vu_request_to_string(unsigned int req)
-> >          REQ(VHOST_USER_SET_CONFIG),
-> >          REQ(VHOST_USER_POSTCOPY_ADVISE),
-> >          REQ(VHOST_USER_POSTCOPY_LISTEN),
-> > +        REQ(VHOST_USER_POSTCOPY_END),
-> >          REQ(VHOST_USER_MAX),
-> >      };
-> >  #undef REQ
-> > @@ -1095,6 +1096,26 @@ vu_set_postcopy_listen(VuDev *dev, VhostUserMs=
-g *vmsg)
-> >      vmsg->payload.u64 =3D 0; /* Success */
-> >      return true;
-> >  }
-> > +
-> > +static bool
-> > +vu_set_postcopy_end(VuDev *dev, VhostUserMsg *vmsg)
-> > +{
-> > +    DPRINT("%s: Entry\n", __func__);
-> > +    dev->postcopy_listening =3D false;
-> > +    if (dev->postcopy_ufd > 0) {
-> > +        close(dev->postcopy_ufd);
-> > +        dev->postcopy_ufd =3D -1;
-> > +        DPRINT("%s: Done close\n", __func__);
-> > +    }
-> > +
-> > +    vmsg->fd_num =3D 0;
-> > +    vmsg->payload.u64 =3D 0;
-> > +    vmsg->size =3D sizeof(vmsg->payload.u64);
-> > +    vmsg->flags =3D VHOST_USER_VERSION |  VHOST_USER_REPLY_MASK;
-> > +    DPRINT("%s: exit\n", __func__);
-> > +    return true;
-> > +}
-> > +
-> >  static bool
-> >  vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
-> >  {
-> > @@ -1170,6 +1191,8 @@ vu_process_message(VuDev *dev, VhostUserMsg *vm=
-sg)
-> >          return vu_set_postcopy_advise(dev, vmsg);
-> >      case VHOST_USER_POSTCOPY_LISTEN:
-> >          return vu_set_postcopy_listen(dev, vmsg);
-> > +    case VHOST_USER_POSTCOPY_END:
-> > +        return vu_set_postcopy_end(dev, vmsg);
-> >      default:
-> >          vmsg_close_fds(vmsg);
-> >          vu_panic(dev, "Unhandled request: %d", vmsg->request);
-> > diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost=
--user/libvhost-user.h
-> > index ed505cf0c1..79f7a53ee8 100644
-> > --- a/contrib/libvhost-user/libvhost-user.h
-> > +++ b/contrib/libvhost-user/libvhost-user.h
-> > @@ -87,6 +87,7 @@ typedef enum VhostUserRequest {
-> >      VHOST_USER_CLOSE_CRYPTO_SESSION =3D 27,
-> >      VHOST_USER_POSTCOPY_ADVISE  =3D 28,
-> >      VHOST_USER_POSTCOPY_LISTEN  =3D 29,
-> > +    VHOST_USER_POSTCOPY_END     =3D 30,
-> >      VHOST_USER_MAX
-> >  } VhostUserRequest;
-> >
-> > diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.tx=
-t
-> > index cc049196c9..5a31e4234e 100644
-> > --- a/docs/interop/vhost-user.txt
-> > +++ b/docs/interop/vhost-user.txt
-> > @@ -729,6 +729,17 @@ Master message types
-> >        This is always sent sometime after a VHOST_USER_POSTCOPY_ADVIS=
-E, and
-> >        thus only when VHOST_USER_PROTOCOL_F_PAGEFAULT is supported.
-> >
-> > + * VHOST_USER_POSTCOPY_END
-> > +      Id: 30
-> > +      Slave payload: u64
-> > +
-> > +      Master advises that postcopy migration has now completed.  The
-> > +      slave must disable the userfaultfd. The response is an acknowl=
-edgement
-> > +      only.
->=20
-> I guess 0 for success, non-zero otherwise - please update the spec.
-
-Thanks, comment added.  Actually it's a place holder for it, we only
-send 0 currently.
-
-Dave
->=20
-> > +      When VHOST_USER_PROTOCOL_F_PAGEFAULT is supported, this messag=
-e
-> > +      is sent at the end of the migration, after VHOST_USER_POSTCOPY=
-_LISTEN
-> > +      was previously sent
-> > +
-> >  Slave message types
-> >  -------------------
-> >
-> > diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> > index b304bc475e..45de6d8a53 100644
-> > --- a/hw/virtio/vhost-user.c
-> > +++ b/hw/virtio/vhost-user.c
-> > @@ -82,6 +82,7 @@ typedef enum VhostUserRequest {
-> >      VHOST_USER_CLOSE_CRYPTO_SESSION =3D 27,
-> >      VHOST_USER_POSTCOPY_ADVISE  =3D 28,
-> >      VHOST_USER_POSTCOPY_LISTEN  =3D 29,
-> > +    VHOST_USER_POSTCOPY_END     =3D 30,
-> >      VHOST_USER_MAX
-> >  } VhostUserRequest;
-> >
-> > --
-> > 2.14.3
-> >
-> >
->=20
->=20
->=20
-> --=20
-> Marc-Andr=E9 Lureau
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/block/vdi.c b/block/vdi.c
+index 0c8f8204ce..2a39b0ac98 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -721,9 +721,7 @@ nonallocating_write:
+     return ret;
+ }
+ 
+-static int coroutine_fn vdi_co_do_create(const char *filename,
+-                                         QemuOpts *file_opts,
+-                                         BlockdevCreateOptionsVdi *vdi_opts,
++static int coroutine_fn vdi_co_do_create(BlockdevCreateOptionsVdi *vdi_opts,
+                                          size_t block_size, Error **errp)
+ {
+     int ret = 0;
+@@ -734,7 +732,7 @@ static int coroutine_fn vdi_co_do_create(const char *filename,
+     size_t i;
+     size_t bmap_size;
+     int64_t offset = 0;
+-    Error *local_err = NULL;
++    BlockDriverState *bs_file = NULL;
+     BlockBackend *blk = NULL;
+     uint32_t *bmap = NULL;
+ 
+@@ -770,18 +768,15 @@ static int coroutine_fn vdi_co_do_create(const char *filename,
+         goto exit;
+     }
+ 
+-    ret = bdrv_create_file(filename, file_opts, &local_err);
+-    if (ret < 0) {
+-        error_propagate(errp, local_err);
++    bs_file = bdrv_open_blockdev_ref(vdi_opts->file, errp);
++    if (!bs_file) {
++        ret = -EIO;
+         goto exit;
+     }
+ 
+-    blk = blk_new_open(filename, NULL, NULL,
+-                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
+-                       &local_err);
+-    if (blk == NULL) {
+-        error_propagate(errp, local_err);
+-        ret = -EIO;
++    blk = blk_new(BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
++    ret = blk_insert_bs(blk, bs_file, errp);
++    if (ret < 0) {
+         goto exit;
+     }
+ 
+@@ -818,7 +813,7 @@ static int coroutine_fn vdi_co_do_create(const char *filename,
+     vdi_header_to_le(&header);
+     ret = blk_pwrite(blk, offset, &header, sizeof(header), 0);
+     if (ret < 0) {
+-        error_setg(errp, "Error writing header to %s", filename);
++        error_setg(errp, "Error writing header");
+         goto exit;
+     }
+     offset += sizeof(header);
+@@ -839,7 +834,7 @@ static int coroutine_fn vdi_co_do_create(const char *filename,
+         }
+         ret = blk_pwrite(blk, offset, bmap, bmap_size, 0);
+         if (ret < 0) {
+-            error_setg(errp, "Error writing bmap to %s", filename);
++            error_setg(errp, "Error writing bmap");
+             goto exit;
+         }
+         offset += bmap_size;
+@@ -849,13 +844,14 @@ static int coroutine_fn vdi_co_do_create(const char *filename,
+         ret = blk_truncate(blk, offset + blocks * block_size,
+                            PREALLOC_MODE_OFF, errp);
+         if (ret < 0) {
+-            error_prepend(errp, "Failed to statically allocate %s", filename);
++            error_prepend(errp, "Failed to statically allocate file");
+             goto exit;
+         }
+     }
+ 
+ exit:
+     blk_unref(blk);
++    bdrv_unref(bs_file);
+     g_free(bmap);
+     return ret;
+ }
+@@ -865,6 +861,7 @@ static int coroutine_fn vdi_co_create_opts(const char *filename, QemuOpts *opts,
+ {
+     QDict *qdict = NULL;
+     BlockdevCreateOptionsVdi *create_options = NULL;
++    BlockDriverState *bs_file = NULL;
+     uint64_t block_size = DEFAULT_CLUSTER_SIZE;
+     Visitor *v;
+     Error *local_err = NULL;
+@@ -888,7 +885,19 @@ static int coroutine_fn vdi_co_create_opts(const char *filename, QemuOpts *opts,
+ 
+     qdict = qemu_opts_to_qdict_filtered(opts, NULL, &vdi_create_opts, true);
+ 
+-    qdict_put_str(qdict, "file", ""); /* FIXME */
++    ret = bdrv_create_file(filename, opts, errp);
++    if (ret < 0) {
++        goto done;
++    }
++
++    bs_file = bdrv_open(filename, NULL, NULL,
++                        BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL, errp);
++    if (!bs_file) {
++        ret = -EIO;
++        goto done;
++    }
++
++    qdict_put_str(qdict, "file", bs_file->node_name);
+ 
+     /* Get the QAPI object */
+     v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
+@@ -903,10 +912,11 @@ static int coroutine_fn vdi_co_create_opts(const char *filename, QemuOpts *opts,
+ 
+     create_options->size = ROUND_UP(create_options->size, BDRV_SECTOR_SIZE);
+ 
+-    ret = vdi_co_do_create(filename, opts, create_options, block_size, errp);
++    ret = vdi_co_do_create(create_options, block_size, errp);
+ done:
+     QDECREF(qdict);
+     qapi_free_BlockdevCreateOptionsVdi(create_options);
++    bdrv_unref(bs_file);
+     return ret;
+ }
+ 
+-- 
+2.14.3
