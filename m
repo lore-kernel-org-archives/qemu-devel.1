@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1evQEY-0006cV-Gn
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:23:35 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1evQFB-0007Bg-0D
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:24:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1evQEX-0001Vc-4G
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:23:34 -0400
-References: <20180310082746.24198-1-jsnow@redhat.com>
-	<20180310082746.24198-11-jsnow@redhat.com>
-	<20180312152835.GF31537@localhost.localdomain>
-	<07da6f60-4ef4-7d0e-b81c-c18fce085764@redhat.com>
-	<20180312160706.GG31537@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <2daecd20-40c5-ad9b-ad5d-4fb1f5d4bc28@redhat.com>
-Date: Mon, 12 Mar 2018 12:23:23 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1evQF9-0001y7-Df
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:24:13 -0400
+Date: Mon, 12 Mar 2018 16:24:01 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180312162400.GL3219@work-vm>
+References: <20180207155837.92351-1-vsementsov@virtuozzo.com>
+	<20180207155837.92351-13-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20180312160706.GG31537@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 10/21] blockjobs: add NULL state
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180207155837.92351-13-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v10 12/12] iotests: add dirty bitmap
+ postcopy test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,148 +24,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
-
-
-On 03/12/2018 12:07 PM, Kevin Wolf wrote:
-> Am 12.03.2018 um 16:41 hat John Snow geschrieben:
->> On 03/12/2018 11:28 AM, Kevin Wolf wrote:
->>> Am 10.03.2018 um 09:27 hat John Snow geschrieben:
->>>> Add a new state that specifically demarcates when we begin to permanently
->>>> demolish a job after it has performed all work. This makes the transition
->>>> explicit in the STM table and highlights conditions under which a job may
->>>> be demolished.
->>>>
->>>> Alongside this state, add a new helper command "block_job_decommission",
->>>> which transitions to the NULL state and puts down our implicit reference.
->>>> This separates instances in the code for "block_job_unref" which merely
->>>> undo a matching "block_job_ref" with instances intended to initiate the
->>>> full destruction of the object.
->>>>
->>>> This decommission action also sets a number of fields to make sure that
->>>> block internals or external users that are holding a reference to a job
->>>> to see when it "finishes" are convinced that the job object is "done."
->>>> This is necessary, for instance, to do a block_job_cancel_sync on a
->>>> created object which will not make any progress.
->>>>
->>>> Now, all jobs must go through block_job_decommission prior to being
->>>> freed, giving us start-to-finish state machine coverage for jobs.
->>>>
->>>>
->>>> Transitions:
->>>> Created   -> Null: Early failure event before the job is started
->>>> Concluded -> Null: Standard transition.
->>>>
->>>> Verbs:
->>>> None. This should not ever be visible to the monitor.
->>>>
->>>>              +---------+
->>>>              |UNDEFINED|
->>>>              +--+------+
->>>>                 |
->>>>              +--v----+
->>>>    +---------+CREATED+------------------+
->>>>    |         +--+----+                  |
->>>>    |            |                       |
->>>>    |         +--v----+     +------+     |
->>>>    +---------+RUNNING<----->PAUSED|     |
->>>>    |         +--+-+--+     +------+     |
->>>>    |            | |                     |
->>>>    |            | +------------------+  |
->>>>    |            |                    |  |
->>>>    |         +--v--+       +-------+ |  |
->>>>    +---------+READY<------->STANDBY| |  |
->>>>    |         +--+--+       +-------+ |  |
->>>>    |            |                    |  |
->>>> +--v-----+   +--v------+             |  |
->>>> |ABORTING+--->CONCLUDED<-------------+  |
->>>> +--------+   +--+------+                |
->>>>                 |                       |
->>>>              +--v-+                     |
->>>>              |NULL<---------------------+
->>>>              +----+
->>>>
->>>> Signed-off-by: John Snow <jsnow@redhat.com>
->>>
->>>> +static void block_job_decommission(BlockJob *job)
->>>> +{
->>>> +    assert(job);
->>>> +    job->completed = true;
->>>> +    job->busy = false;
->>>> +    job->paused = false;
->>>> +    job->deferred_to_main_loop = true;
->>>
->>> Why do we set all of these fields now? I don't see the use of it, and
->>> overwriting fields here potentially makes debugging harder.
->>>
->>> Especially for deferred_to_main_loop I might expect an assert() that it
->>> already is true, but shouldn't setting it always be done while actually
->>> deferring to the main loop?
->>>
->>> Can we turn all of these assignments into asserts or are there some that
->>> actually aren't already guaranteed, but that we want anyway?
->>>
->>>> +    block_job_state_transition(job, BLOCK_JOB_STATUS_NULL);
->>>> +    block_job_unref(job);
->>>> +}
->>>
->>> Kevin
->>>
->>
->> Gonna be real honest; we probably only need to set maybe one field
->> (job->completed = true) but it was late and I started hitting things
->> with big hammers.
->>
->> The problem is that if jobs do not look "done" to functions like
->> finish_sync, they will loop forever trying to make progress on a job
->> that doesn't do anything.
->>
->> I set a bunch of fields here more as a semantic statement than a
->> necessity, to be really really honest. ("Well, the job definitely has
->> these properties if it made it here, so let's update these fields to be
->> correct and the rest of the code will hopefully Do The Right Thing.")
+* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+> Test
+> - start two vms (vm_a, vm_b)
 > 
-> So essentially, we want this to be assert(), but currently that breaks
-> for some reasons and we can't figure out why before the freeze?
+> - in a
+>     - do writes from set A
+>     - do writes from set B
+>     - fix bitmap sha256
+>     - clear bitmap
+>     - do writes from set A
+>     - start migration
+> - than, in b
+>     - wait vm start (postcopy should start)
+>     - do writes from set B
+>     - check bitmap sha256
 > 
-
-Nah, I knew exactly why it broke.
-
-> I guess that's fair enough, but then it would be good to use the freeze
-> period to find the offenders and actually turn it into assertions.
+> The test should verify postcopy migration and then merging with delta
+> (changes in target, during postcopy process).
 > 
-> Kevin
+> Reduce supported cache modes to only 'none', because with cache on time
+> from source.STOP to target.RESUME is unpredictable and we can fail with
+> timout while waiting for target.RESUME.
 > 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Fam Zheng <famz@redhat.com>
+> ---
+>  tests/qemu-iotests/199        | 105 ++++++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/199.out    |   5 ++
+>  tests/qemu-iotests/group      |   1 +
+>  tests/qemu-iotests/iotests.py |   7 ++-
+>  4 files changed, 117 insertions(+), 1 deletion(-)
+>  create mode 100755 tests/qemu-iotests/199
+>  create mode 100644 tests/qemu-iotests/199.out
+> 
+> diff --git a/tests/qemu-iotests/199 b/tests/qemu-iotests/199
+> new file mode 100755
+> index 0000000000..f872040a81
+> --- /dev/null
+> +++ b/tests/qemu-iotests/199
+> @@ -0,0 +1,105 @@
+> +#!/usr/bin/env python
+> +#
+> +# Tests for dirty bitmaps postcopy migration.
+> +#
+> +# Copyright (c) 2016-2017 Virtuozzo International GmbH. All rights reserved.
+> +#
+> +# This program is free software; you can redistribute it and/or modify
+> +# it under the terms of the GNU General Public License as published by
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> +#
+> +
+> +import os
+> +import iotests
+> +import time
+> +from iotests import qemu_img
+> +
+> +disk_a = os.path.join(iotests.test_dir, 'disk_a')
+> +disk_b = os.path.join(iotests.test_dir, 'disk_b')
+> +size = '256G'
+> +fifo = os.path.join(iotests.test_dir, 'mig_fifo')
+> +
+> +class TestDirtyBitmapPostcopyMigration(iotests.QMPTestCase):
+> +
+> +    def tearDown(self):
+> +        self.vm_a.shutdown()
+> +        self.vm_b.shutdown()
+> +        os.remove(disk_a)
+> +        os.remove(disk_b)
+> +        os.remove(fifo)
+> +
+> +    def setUp(self):
+> +        os.mkfifo(fifo)
+> +        qemu_img('create', '-f', iotests.imgfmt, disk_a, size)
+> +        qemu_img('create', '-f', iotests.imgfmt, disk_b, size)
+> +        self.vm_a = iotests.VM(path_suffix='a').add_drive(disk_a)
+> +        self.vm_b = iotests.VM(path_suffix='b').add_drive(disk_b)
+> +        self.vm_b.add_incoming("exec: cat '" + fifo + "'")
+> +        self.vm_a.launch()
+> +        self.vm_b.launch()
+> +
+> +    def test_postcopy(self):
+> +        write_size = 0x40000000
+> +        granularity = 512
+> +        chunk = 4096
+> +
+> +        result = self.vm_a.qmp('block-dirty-bitmap-add', node='drive0',
+> +                               name='bitmap', granularity=granularity)
+> +        self.assert_qmp(result, 'return', {});
+> +
+> +        s = 0
+> +        while s < write_size:
+> +            self.vm_a.hmp_qemu_io('drive0', 'write %d %d' % (s, chunk))
+> +            s += 0x10000
+> +        s = 0x8000
+> +        while s < write_size:
+> +            self.vm_a.hmp_qemu_io('drive0', 'write %d %d' % (s, chunk))
+> +            s += 0x10000
+> +
+> +        result = self.vm_a.qmp('x-debug-block-dirty-bitmap-sha256',
+> +                               node='drive0', name='bitmap')
+> +        sha256 = result['return']['sha256']
+> +
+> +        result = self.vm_a.qmp('block-dirty-bitmap-clear', node='drive0',
+> +                               name='bitmap')
+> +        self.assert_qmp(result, 'return', {});
+> +        s = 0
+> +        while s < write_size:
+> +            self.vm_a.hmp_qemu_io('drive0', 'write %d %d' % (s, chunk))
+> +            s += 0x10000
+> +
+> +        result = self.vm_a.qmp('migrate-set-capabilities',
+> +                               capabilities=[{'capability': 'dirty-bitmaps',
+> +                                              'state': True}])
 
-I appear to be horridly confused, and you haven't seen the intermediate
-mess that caused my confusion. A veritable maelstrom of confusion. Mr
-Babbage would not be able to rightly comprehend, &c.
+Generally these days we set the capability on both sides of the
+migration (which helps if the destination tells you it can't do it for
+some reason).
 
-Let's give this another shot.
+Again from the migration side this looks OK, but it's really mostly the
+details of the IO that I'll leave to the block people.
 
-I added that code at a time when my local branch was not calling
-block_job_completed, because I declared in v4's STM that a pre-created
-job "shall not pass go, and shall not collect $200" -- that CREATED jobs
-should either go to RUNNING or NULL.
+Dave
 
-The discovery here is that directly decommissioning a created job
-actually breaks finish_sync because it polls on the completed boolean,
-which nothing ever sets. So, under the reasoning I gave you in my last
-reply;
-
-"I'm simply setting these booleans based on the facts of the state
-machine at this point: we ARE completed, we AREN'T busy, we AREN'T
-paused, and we have technically now deferred back to the main loop (we
-never entered it.)"
-
-this was enough for finish_sync to get out of the way, but there were
-other problems with the approach -- a CREATED job has pre-2.12 called
-the abort/commit callbacks, so I went back to the 2.11 style and added
-the appropriate transition into the graph. I forgot to check if this
-code was still necessary at that point.
-
-So actually, as of right now, these lines in decommission are useless;
-but they shouldn't be assertions ... they might fail in a few cases. for
-instance, "deferred to main loop" won't be set when we cancel a CREATED job.
+> +        self.assert_qmp(result, 'return', {})
+> +
+> +        result = self.vm_a.qmp('migrate', uri='exec:cat>' + fifo)
+> +        self.assertNotEqual(self.vm_a.event_wait("STOP"), None)
+> +        self.assertNotEqual(self.vm_b.event_wait("RESUME"), None)
+> +
+> +        s = 0x8000
+> +        while s < write_size:
+> +            self.vm_b.hmp_qemu_io('drive0', 'write %d %d' % (s, chunk))
+> +            s += 0x10000
+> +
+> +        result = self.vm_b.qmp('query-block');
+> +        while len(result['return'][0]['dirty-bitmaps']) > 1:
+> +            time.sleep(2)
+> +            result = self.vm_b.qmp('query-block');
+> +
+> +        result = self.vm_b.qmp('x-debug-block-dirty-bitmap-sha256',
+> +                               node='drive0', name='bitmap')
+> +
+> +        self.assert_qmp(result, 'return/sha256', sha256);
+> +
+> +if __name__ == '__main__':
+> +    iotests.main(supported_fmts=['qcow2'], supported_cache_modes=['none'])
+> diff --git a/tests/qemu-iotests/199.out b/tests/qemu-iotests/199.out
+> new file mode 100644
+> index 0000000000..ae1213e6f8
+> --- /dev/null
+> +++ b/tests/qemu-iotests/199.out
+> @@ -0,0 +1,5 @@
+> +.
+> +----------------------------------------------------------------------
+> +Ran 1 tests
+> +
+> +OK
+> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+> index 498c52c4c1..282c5ebd5c 100644
+> --- a/tests/qemu-iotests/group
+> +++ b/tests/qemu-iotests/group
+> @@ -197,6 +197,7 @@
+>  196 rw auto quick
+>  197 rw auto quick
+>  198 rw auto
+> +199 rw auto
+>  200 rw auto
+>  201 rw auto migration
+>  202 rw auto quick
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+> index 5a10b2d534..a9bded77e4 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -473,6 +473,10 @@ def verify_platform(supported_oses=['linux']):
+>      if True not in [sys.platform.startswith(x) for x in supported_oses]:
+>          notrun('not suitable for this OS: %s' % sys.platform)
+>  
+> +def verify_cache_mode(supported_cache_modes=[]):
+> +    if supported_cache_modes and (cachemode not in supported_cache_modes):
+> +        notrun('not suitable for this cache mode: %s' % cachemode)
+> +
+>  def supports_quorum():
+>      return 'quorum' in qemu_img_pipe('--help')
+>  
+> @@ -481,7 +485,7 @@ def verify_quorum():
+>      if not supports_quorum():
+>          notrun('quorum support missing')
+>  
+> -def main(supported_fmts=[], supported_oses=['linux']):
+> +def main(supported_fmts=[], supported_oses=['linux'], supported_cache_modes=[]):
+>      '''Run tests'''
+>  
+>      global debug
+> @@ -498,6 +502,7 @@ def main(supported_fmts=[], supported_oses=['linux']):
+>      verbosity = 1
+>      verify_image_format(supported_fmts)
+>      verify_platform(supported_oses)
+> +    verify_cache_mode(supported_cache_modes)
+>  
+>      # We need to filter out the time taken from the output so that qemu-iotest
+>      # can reliably diff the results against master output.
+> -- 
+> 2.11.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
