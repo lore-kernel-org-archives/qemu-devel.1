@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evR9H-0008WF-Jz
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:22:12 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1evR9L-000095-US
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:22:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evR9F-0007t7-RT
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:22:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47228 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1evR9K-0007vR-95
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:22:15 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47236 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evR9F-0007sp-MK
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:22:09 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evR9K-0007v5-4C
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:22:14 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 533EF406E97D
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 17:22:09 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B9C98406E97D
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 17:22:13 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 12 Mar 2018 17:21:20 +0000
-Message-Id: <20180312172124.56461-26-dgilbert@redhat.com>
+Date: Mon, 12 Mar 2018 17:21:23 +0000
+Message-Id: <20180312172124.56461-29-dgilbert@redhat.com>
 In-Reply-To: <20180312172124.56461-1-dgilbert@redhat.com>
 References: <20180312172124.56461-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 25/29] vhost+postcopy: Wire up POSTCOPY_END
- notify
+Subject: [Qemu-devel] [PATCH v5 28/29] libvhost-user: Claim support for
+ postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,119 +38,67 @@ Cc: aarcange@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Wire up a call to VHOST_USER_POSTCOPY_END message to the vhost clients
-right before we ask the listener thread to shutdown.
+Tell QEMU we understand the protocol features needed for postcopy.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/virtio/trace-events   |  2 ++
- hw/virtio/vhost-user.c   | 34 ++++++++++++++++++++++++++++++++++
- migration/postcopy-ram.c |  7 +++++++
- migration/postcopy-ram.h |  1 +
- 4 files changed, 44 insertions(+)
+ contrib/libvhost-user/libvhost-user.c | 33 +++++++++++++++++++++++++++++=
+++++
+ 1 file changed, 33 insertions(+)
 
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index fe5e0ff856..857c495e65 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -7,6 +7,8 @@ vhost_region_add_section_abut(const char *name, uint64_t =
-new_size) "%s: 0x%"PRIx
- vhost_section(const char *name, int r) "%s:%d"
-=20
- # hw/virtio/vhost-user.c
-+vhost_user_postcopy_end_entry(void) ""
-+vhost_user_postcopy_end_exit(void) ""
- vhost_user_postcopy_fault_handler(const char *name, uint64_t fault_addre=
-ss, int nregions) "%s: @0x%"PRIx64" nregions:%d"
- vhost_user_postcopy_fault_handler_loop(int i, uint64_t client_base, uint=
-64_t size) "%d: client 0x%"PRIx64" +0x%"PRIx64
- vhost_user_postcopy_fault_handler_found(int i, uint64_t region_offset, u=
-int64_t rb_offset) "%d: region_offset: 0x%"PRIx64" rb_offset:0x%"PRIx64
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 230f2f9d55..44aea5c0a8 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -1114,6 +1114,37 @@ static int vhost_user_postcopy_listen(struct vhost=
-_dev *dev, Error **errp)
-     return 0;
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
+r/libvhost-user.c
+index 504ff5ea59..beeed0c43f 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -185,6 +185,35 @@ vmsg_close_fds(VhostUserMsg *vmsg)
+     }
  }
 =20
-+/*
-+ * Called at the end of postcopy
-+ */
-+static int vhost_user_postcopy_end(struct vhost_dev *dev, Error **errp)
++/* A test to see if we have userfault available */
++static bool
++have_userfault(void)
 +{
-+    VhostUserMsg msg =3D {
-+        .hdr.request =3D VHOST_USER_POSTCOPY_END,
-+        .hdr.flags =3D VHOST_USER_VERSION | VHOST_USER_NEED_REPLY_MASK,
-+    };
-+    int ret;
-+    struct vhost_user *u =3D dev->opaque;
-+
-+    trace_vhost_user_postcopy_end_entry();
-+    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-+        error_setg(errp, "Failed to send postcopy_end to vhost");
-+        return -1;
++#if defined(__linux__) && defined(__NR_userfaultfd) &&\
++        defined(UFFD_FEATURE_MISSING_SHMEM) &&\
++        defined(UFFD_FEATURE_MISSING_HUGETLBFS)
++    /* Now test the kernel we're running on really has the features */
++    int ufd =3D syscall(__NR_userfaultfd, O_CLOEXEC | O_NONBLOCK);
++    struct uffdio_api api_struct;
++    if (ufd < 0) {
++        return false;
 +    }
 +
-+    ret =3D process_message_reply(dev, &msg);
-+    if (ret) {
-+        error_setg(errp, "Failed to receive reply to postcopy_end");
-+        return ret;
++    api_struct.api =3D UFFD_API;
++    api_struct.features =3D UFFD_FEATURE_MISSING_SHMEM |
++                          UFFD_FEATURE_MISSING_HUGETLBFS;
++    if (ioctl(ufd, UFFDIO_API, &api_struct)) {
++        close(ufd);
++        return false;
 +    }
-+    postcopy_unregister_shared_ufd(&u->postcopy_fd);
-+    u->postcopy_fd.handler =3D NULL;
++    close(ufd);
++    return true;
 +
-+    trace_vhost_user_postcopy_end_exit();
-+
-+    return 0;
++#else
++    return false;
++#endif
 +}
 +
- static int vhost_user_postcopy_notifier(NotifierWithReturn *notifier,
-                                         void *opaque)
+ static bool
+ vu_message_read(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
  {
-@@ -1139,6 +1170,9 @@ static int vhost_user_postcopy_notifier(NotifierWit=
-hReturn *notifier,
-     case POSTCOPY_NOTIFY_INBOUND_LISTEN:
-         return vhost_user_postcopy_listen(dev, pnd->errp);
+@@ -939,6 +968,10 @@ vu_get_protocol_features_exec(VuDev *dev, VhostUserM=
+sg *vmsg)
+     uint64_t features =3D 1ULL << VHOST_USER_PROTOCOL_F_LOG_SHMFD |
+                         1ULL << VHOST_USER_PROTOCOL_F_SLAVE_REQ;
 =20
-+    case POSTCOPY_NOTIFY_INBOUND_END:
-+        return vhost_user_postcopy_end(dev, pnd->errp);
++    if (have_userfault()) {
++        features |=3D 1ULL << VHOST_USER_PROTOCOL_F_PAGEFAULT;
++    }
 +
-     default:
-         /* We ignore notifications we don't know */
-         break;
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 36db900e8f..1379923cfc 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -413,6 +413,13 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingS=
-tate *mis)
-     trace_postcopy_ram_incoming_cleanup_entry();
-=20
-     if (mis->have_fault_thread) {
-+        Error *local_err =3D NULL;
-+
-+        if (postcopy_notify(POSTCOPY_NOTIFY_INBOUND_END, &local_err)) {
-+            error_report_err(local_err);
-+            return -1;
-+        }
-+
-         if (qemu_ram_foreach_block(cleanup_range, mis)) {
-             return -1;
-         }
-diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
-index 2c73d77a5c..d900d9c34f 100644
---- a/migration/postcopy-ram.h
-+++ b/migration/postcopy-ram.h
-@@ -132,6 +132,7 @@ enum PostcopyNotifyReason {
-     POSTCOPY_NOTIFY_PROBE =3D 0,
-     POSTCOPY_NOTIFY_INBOUND_ADVISE,
-     POSTCOPY_NOTIFY_INBOUND_LISTEN,
-+    POSTCOPY_NOTIFY_INBOUND_END,
- };
-=20
- struct PostcopyNotifyData {
+     if (dev->iface->get_protocol_features) {
+         features |=3D dev->iface->get_protocol_features(dev);
+     }
 --=20
 2.14.3
