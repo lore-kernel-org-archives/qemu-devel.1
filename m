@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1evHzW-0001VQ-IF
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 03:35:31 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1evISP-0006SN-PB
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 04:05:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1evHzT-0004Q9-FY
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 03:35:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44092 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1evHzT-0004Pm-Al
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 03:35:27 -0400
-References: <1520786414-8806-1-git-send-email-aishwaryakadlag@gmail.com>
-	<6666720e-6f5c-0e8c-6c5a-ac36d708e314@redhat.com>
-	<20180312070545.ktvvgp2kn2uxjpzk@sirius.home.kraxel.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <9c6ebbda-af49-64b1-6283-771c9a9bfac3@redhat.com>
-Date: Mon, 12 Mar 2018 08:35:14 +0100
+	(envelope-from <dovgaluk@ispras.ru>) id 1evISO-0005hW-SQ
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 04:05:21 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20180309182202.31206-1-farosas@linux.vnet.ibm.com>
+	<20180309182202.31206-5-farosas@linux.vnet.ibm.com>
+In-Reply-To: <20180309182202.31206-5-farosas@linux.vnet.ibm.com>
+Date: Mon, 12 Mar 2018 11:05:10 +0300
+Message-ID: <000601d3b9d8$d7d129c0$87737d40$@ru>
 MIME-Version: 1.0
-In-Reply-To: <20180312070545.ktvvgp2kn2uxjpzk@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V1]sm501: dead code removal
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH 4/5] block/blkreplay: Remove
+ protocol-related fields
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +26,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Aishwarya Kadlag <aishwaryakadlag@gmail.com>, qemu-devel@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, Paolo Bonzini <pbonzini@redhat.com>
+To: 'Fabiano Rosas' <farosas@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, 'Paolo Bonzini' <pbonzini@redhat.com>
 
-On 12.03.2018 08:05, Gerd Hoffmann wrote:
->   Hi,
->=20
->> I don't know the hw/display code very well, but I think it's not that
->> easy... Putting Gerd on CC:, maybe he can describe the details of that
->> BiteSizeTask a little bit better.
->=20
-> [ Side note: Is there a wiki page for this? ]
+> From: Fabiano Rosas [mailto:farosas@linux.vnet.ibm.com]
+> The blkreplay driver is not a protocol so it should implement bdrv_open
+> instead of bdrv_file_open and not provide a protocol_name.
+> 
+> Attempts to invoke this driver using protocol syntax
+> (i.e. blkreplay:<filename:options:...>) will now fail gracefully:
+> 
+>   $ qemu-img info blkreplay:foo
+>   qemu-img: Could not open 'blkreplay:foo': Unknown protocol 'blkreplay'
+> 
+> Signed-off-by: Fabiano Rosas <farosas@linux.vnet.ibm.com>
+> ---
+>  block/blkreplay.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/block/blkreplay.c b/block/blkreplay.c
+> index 61e44a1949..fe5a9b4a98 100755
+> --- a/block/blkreplay.c
+> +++ b/block/blkreplay.c
+> @@ -129,10 +129,9 @@ static int coroutine_fn blkreplay_co_flush(BlockDriverState *bs)
+> 
+>  static BlockDriver bdrv_blkreplay = {
+>      .format_name            = "blkreplay",
+> -    .protocol_name          = "blkreplay",
+>      .instance_size          = 0,
+> 
+> -    .bdrv_file_open         = blkreplay_open,
+> +    .bdrv_open              = blkreplay_open,
+>      .bdrv_close             = blkreplay_close,
+>      .bdrv_child_perm        = bdrv_filter_default_perms,
+>      .bdrv_getlength         = blkreplay_getlength,
+> --
+> 2.13.6
 
-There is an entry here:
+Reviewed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-https://wiki.qemu.org/BiteSizedTasks#Dead_code_removal
-
-Sorry Gerd, I thought it was likely you who added that task, but seems
-like this specific task has rather been added by Paolo back in 2014 alrea=
-dy:
-
-https://wiki.qemu.org/index.php?title=3DContribute/BiteSizedTasks&diff=3D=
-4449&oldid=3D4444
-
- Thomas
+Pavel Dovgalyuk
