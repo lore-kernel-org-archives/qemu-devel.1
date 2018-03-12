@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1evQXU-0000dV-7s
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:43:08 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1evQZh-0002dz-VN
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:45:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1evQXT-0007Mx-HD
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:43:08 -0400
-References: <20180309214611.19122-1-kwolf@redhat.com>
-	<20180309214611.19122-3-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <88cae9b6-cf44-c52c-3dcd-52fe3c2e2fe0@redhat.com>
-Date: Mon, 12 Mar 2018 17:42:58 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1evQZd-0000Jn-TO
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:45:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58178)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1evQZd-0000IJ-L1
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 12:45:21 -0400
+Date: Mon, 12 Mar 2018 13:45:17 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180312164517.GS3417@localhost.localdomain>
+References: <1520182116-16485-1-git-send-email-luwei.kang@intel.com>
+	<20180309191048.GA28578@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167EF4877@SHSMSX101.ccr.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20180309214611.19122-3-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="aRHbZzfR85U8GyWHFpVmJoPPcWoYf9Izw"
-Subject: Re: [Qemu-devel] [PATCH 2/7] qemu-iotests: Enable write tests for
- parallels
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <82D7661F83C1A047AF7DC287873BF1E167EF4877@SHSMSX101.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] i386: Add Intel Processor Trace
+ feature support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: den@openvz.org, jcody@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
+To: "Kang, Luwei" <luwei.kang@intel.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mtosatti@redhat.com" <mtosatti@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aRHbZzfR85U8GyWHFpVmJoPPcWoYf9Izw
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: den@openvz.org, jcody@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
-Message-ID: <88cae9b6-cf44-c52c-3dcd-52fe3c2e2fe0@redhat.com>
-Subject: Re: [PATCH 2/7] qemu-iotests: Enable write tests for parallels
-References: <20180309214611.19122-1-kwolf@redhat.com>
- <20180309214611.19122-3-kwolf@redhat.com>
-In-Reply-To: <20180309214611.19122-3-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, Mar 12, 2018 at 09:07:41AM +0000, Kang, Luwei wrote:
+> > > +
+> > > +        if (!eax_0 ||
+> > > +           ((ebx_0 & INTEL_PT_MINIMAL_EBX) != INTEL_PT_MINIMAL_EBX) ||
+> > > +           ((ecx_0 & INTEL_PT_MINIMAL_ECX) != INTEL_PT_MINIMAL_ECX) ||
+> > > +           ((eax_1 & INTEL_PT_MTC_BITMAP) != INTEL_PT_MTC_BITMAP) ||
+> > > +           ((eax_1 & INTEL_PT_ADDR_RANGES_NUM_MASK) <
+> > > +                                           INTEL_PT_ADDR_RANGES_NUM) ||
+> > > +           ((ebx_1 & (INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP)) !=
+> > > +                (INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP))) {
+> > 
+> > I still don't see a check to ensure the host has bit 31 on ecx_0 set to 0, as I mentioned when reviewing v3.
+> 
+> Hi Eduardo,
+>     Thanks for the code review. I don't quite understand here why bit31 must same with host (meaning we must reject a host
+> where ecx_0 & (1 << 31) is set).
 
-On 2018-03-09 22:46, Kevin Wolf wrote:
-> Originally we added parallels as a read-only format to qemu-iotests
-> where we did just some tests with a binary image. Since then, write and=
-
-> image creation support has been added to the driver, so we can now
-> enable it in _supported_fmt generic.
->=20
-> The driver doesn't support migration yet, though, so we need to add it
-> to the list of exceptions in 181.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/qemu-iotests/181   | 2 +-
->  tests/qemu-iotests/check | 1 -
->  2 files changed, 1 insertion(+), 2 deletions(-)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+If the guest sees the bit set to 0, it will expect IP payloads
+with RIP values, but the host CPU will generate IP payloads with
+LIP values.  I assume KVM won't do RIP<->LIP translation on the
+packets generated by the host before the guest sees them, will
+it?
 
 
---aRHbZzfR85U8GyWHFpVmJoPPcWoYf9Izw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+>     Do you mean PT must be disabled in guest when host bit31 is set? 
+>     Bit 31: If 1, generated packets which contain IP payloads have LIP values, which include the CS base component.
+>     I can't find any special on this bit. Could you help clarify?
 
------BEGIN PGP SIGNATURE-----
+As far as I understand, this bit is special because KVM can't
+emulate a value that's different from the host.
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqmrhMSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9APk4IALDXHMXmOqJnV1sz6XcjdP+eE+pnlYel
-/9fIyYZJDthCo3Zddu1ZPmHoSgC50100+Mb3hXY35X+Cvi/ODupK6MTgffvdVZn5
-vWq9c+eD54wIaZLOP3yk5KBVESATtSL9a4+7yT0/haJULYwotMWfuePiyKxdoUJO
-v1fCOg4sfnwPRMkthp63tbr4/wkMXg8OIkVq0rMU24l/rzCgx+1rqtrFYy4YHQw/
-sATk+05p187KWoDiQ16JEwlhSlGfwCVpJh51bN4duskm9CPKfXoElf5dLDkpbll6
-JcAD0tYAUIihSt3N06CcZCCBTEaZcttGQ33nR8i1OSIZ998YJmjLLz8=
-=fWhw
------END PGP SIGNATURE-----
-
---aRHbZzfR85U8GyWHFpVmJoPPcWoYf9Izw--
+-- 
+Eduardo
