@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evOyS-0004nT-GW
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:02:59 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1evOzt-0006FM-7P
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:04:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evOyL-0002x8-Sd
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:02:52 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 12 Mar 2018 16:02:18 +0100
-Message-Id: <20180312150218.1314-7-kwolf@redhat.com>
-In-Reply-To: <20180312150218.1314-1-kwolf@redhat.com>
-References: <20180312150218.1314-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 6/6] qemu-iotests: Test luks QMP image
- creation
+	(envelope-from <marcandre.lureau@gmail.com>) id 1evOzn-00048T-5y
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:04:21 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:35170)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1evOzm-00047k-Sc
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 11:04:15 -0400
+Received: by mail-wr0-x244.google.com with SMTP id n12so4891580wra.2
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 08:04:14 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180308195811.24894-18-dgilbert@redhat.com>
+References: <20180308195811.24894-1-dgilbert@redhat.com>
+	<20180308195811.24894-18-dgilbert@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 12 Mar 2018 16:04:13 +0100
+Message-ID: <CAJ+F1CKtPE6R_jNk+C48jHwjwfriH=ujFwzCpeE5yooH+k9WCA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 17/29] vhost+postcopy: Send requests to
+ source for shared pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,398 +31,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, berrange@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- tests/qemu-iotests/209       | 210 +++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/209.out   | 136 ++++++++++++++++++++++++++++
- tests/qemu-iotests/common.rc |   2 +-
- tests/qemu-iotests/group     |   1 +
- 4 files changed, 348 insertions(+), 1 deletion(-)
- create mode 100755 tests/qemu-iotests/209
- create mode 100644 tests/qemu-iotests/209.out
+Hi
 
-diff --git a/tests/qemu-iotests/209 b/tests/qemu-iotests/209
-new file mode 100755
-index 0000000000..96a5213e77
---- /dev/null
-+++ b/tests/qemu-iotests/209
-@@ -0,0 +1,210 @@
-+#!/bin/bash
-+#
-+# Test luks and file image creation
-+#
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=kwolf@redhat.com
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1	# failure is the default!
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt luks
-+_supported_proto file
-+_supported_os Linux
-+
-+function do_run_qemu()
-+{
-+    echo Testing: "$@"
-+    $QEMU -nographic -qmp stdio -serial none "$@"
-+    echo
-+}
-+
-+function run_qemu()
-+{
-+    do_run_qemu "$@" 2>&1 | _filter_testdir | _filter_qmp \
-+                          | _filter_qemu | _filter_imgfmt \
-+                          | _filter_actual_image_size
-+}
-+
-+echo
-+echo "=== Successful image creation (defaults) ==="
-+echo
-+
-+size=$((128 * 1024 * 1024))
-+
-+run_qemu -object secret,id=keysec0,data="foo" <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "x-blockdev-create",
-+  "arguments": {
-+      "driver": "file",
-+      "filename": "$TEST_IMG_FILE",
-+      "size": 0
-+  }
-+}
-+{ "execute": "blockdev-add",
-+  "arguments": {
-+      "driver": "file",
-+      "node-name": "imgfile",
-+      "filename": "$TEST_IMG_FILE"
-+  }
-+}
-+{ "execute": "x-blockdev-create",
-+  "arguments": {
-+      "driver": "$IMGFMT",
-+      "file": "imgfile",
-+      "key-secret": "keysec0",
-+      "size": $size,
-+      "iter-time": 10
-+  }
-+}
-+{ "execute": "quit" }
-+EOF
-+
-+_img_info --format-specific | _filter_img_info --format-specific
-+
-+echo
-+echo "=== Successful image creation (with non-default options) ==="
-+echo
-+
-+# Choose a different size to show that we got a new image
-+size=$((64 * 1024 * 1024))
-+
-+run_qemu -object secret,id=keysec0,data="foo" <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "x-blockdev-create",
-+  "arguments": {
-+      "driver": "file",
-+      "filename": "$TEST_IMG_FILE",
-+      "size": 0
-+  }
-+}
-+{ "execute": "x-blockdev-create",
-+  "arguments": {
-+      "driver": "$IMGFMT",
-+      "file": {
-+          "driver": "file",
-+          "filename": "$TEST_IMG_FILE"
-+      },
-+      "size": $size,
-+      "key-secret": "keysec0",
-+      "cipher-alg": "twofish-128",
-+      "cipher-mode": "ctr",
-+      "ivgen-alg": "plain64",
-+      "ivgen-hash-alg": "md5",
-+      "hash-alg": "sha1",
-+      "iter-time": 10
-+  }
-+}
-+{ "execute": "quit" }
-+EOF
-+
-+_img_info --format-specific | _filter_img_info --format-specific
-+
-+echo
-+echo "=== Invalid BlockdevRef ==="
-+echo
-+
-+run_qemu <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "x-blockdev-create",
-+  "arguments": {
-+      "driver": "$IMGFMT",
-+      "file": "this doesn't exist",
-+      "size": $size
-+  }
-+}
-+{ "execute": "quit" }
-+EOF
-+
-+echo
-+echo "=== Zero size ==="
-+echo
-+
-+run_qemu -blockdev driver=file,filename="$TEST_IMG_FILE",node-name=node0 \
-+         -object secret,id=keysec0,data="foo" <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "x-blockdev-create",
-+  "arguments": {
-+      "driver": "$IMGFMT",
-+      "file": "node0",
-+      "key-secret": "keysec0",
-+      "size": 0,
-+      "iter-time": 10
-+  }
-+}
-+{ "execute": "quit" }
-+EOF
-+
-+_img_info | _filter_img_info
-+
-+
-+echo
-+echo "=== Invalid sizes ==="
-+echo
-+
-+# TODO Negative image sizes aren't handled correctly, but this is a problem
-+# with QAPI's implementation of the 'size' type and affects other commands as
-+# well. Once this is fixed, we may want to add a test case here.
-+
-+# 1. 2^64 - 512
-+# 2. 2^63 = 8 EB (qemu-img enforces image sizes less than this)
-+# 3. 2^63 - 512 (generally valid, but with the crypto header the file will
-+#                exceed 63 bits)
-+
-+run_qemu -blockdev driver=file,filename="$TEST_IMG_FILE",node-name=node0 \
-+         -object secret,id=keysec0,data="foo" <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "x-blockdev-create",
-+  "arguments": {
-+      "driver": "$IMGFMT",
-+      "file": "node0",
-+      "key-secret": "keysec0",
-+      "size": 18446744073709551104
-+  }
-+}
-+{ "execute": "x-blockdev-create",
-+  "arguments": {
-+      "driver": "$IMGFMT",
-+      "file": "node0",
-+      "key-secret": "keysec0",
-+      "size": 9223372036854775808
-+  }
-+}
-+{ "execute": "x-blockdev-create",
-+  "arguments": {
-+      "driver": "$IMGFMT",
-+      "file": "node0",
-+      "key-secret": "keysec0",
-+      "size": 9223372036854775296
-+  }
-+}
-+{ "execute": "quit" }
-+EOF
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/209.out b/tests/qemu-iotests/209.out
-new file mode 100644
-index 0000000000..f3dd2074a3
---- /dev/null
-+++ b/tests/qemu-iotests/209.out
-@@ -0,0 +1,136 @@
-+QA output created by 209
-+
-+=== Successful image creation (defaults) ===
-+
-+Testing: -object secret,id=keysec0,data=foo
-+QMP_VERSION
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+
-+image: json:{"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, "key-secret": "keysec0"}
-+file format: IMGFMT
-+virtual size: 128M (134217728 bytes)
-+Format specific information:
-+    ivgen alg: plain64
-+    hash alg: sha256
-+    cipher alg: aes-256
-+    uuid: 00000000-0000-0000-0000-000000000000
-+    cipher mode: xts
-+    slots:
-+        [0]:
-+            active: true
-+            iters: 1024
-+            key offset: 4096
-+            stripes: 4000
-+        [1]:
-+            active: false
-+            key offset: 262144
-+        [2]:
-+            active: false
-+            key offset: 520192
-+        [3]:
-+            active: false
-+            key offset: 778240
-+        [4]:
-+            active: false
-+            key offset: 1036288
-+        [5]:
-+            active: false
-+            key offset: 1294336
-+        [6]:
-+            active: false
-+            key offset: 1552384
-+        [7]:
-+            active: false
-+            key offset: 1810432
-+    payload offset: 2068480
-+    master key iters: 1024
-+
-+=== Successful image creation (with non-default options) ===
-+
-+Testing: -object secret,id=keysec0,data=foo
-+QMP_VERSION
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+
-+image: json:{"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, "key-secret": "keysec0"}
-+file format: IMGFMT
-+virtual size: 64M (67108864 bytes)
-+Format specific information:
-+    ivgen alg: plain64
-+    hash alg: sha1
-+    cipher alg: twofish-128
-+    uuid: 00000000-0000-0000-0000-000000000000
-+    cipher mode: ctr
-+    slots:
-+        [0]:
-+            active: true
-+            iters: 1024
-+            key offset: 4096
-+            stripes: 4000
-+        [1]:
-+            active: false
-+            key offset: 69632
-+        [2]:
-+            active: false
-+            key offset: 135168
-+        [3]:
-+            active: false
-+            key offset: 200704
-+        [4]:
-+            active: false
-+            key offset: 266240
-+        [5]:
-+            active: false
-+            key offset: 331776
-+        [6]:
-+            active: false
-+            key offset: 397312
-+        [7]:
-+            active: false
-+            key offset: 462848
-+    payload offset: 528384
-+    master key iters: 1024
-+
-+=== Invalid BlockdevRef ===
-+
-+Testing:
-+QMP_VERSION
-+{"return": {}}
-+{"error": {"class": "GenericError", "desc": "Cannot find device=this doesn't exist nor node_name=this doesn't exist"}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+
-+
-+=== Zero size ===
-+
-+Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=node0 -object secret,id=keysec0,data=foo
-+QMP_VERSION
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+
-+image: json:{"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, "key-secret": "keysec0"}
-+file format: IMGFMT
-+virtual size: 0 (0 bytes)
-+
-+=== Invalid sizes ===
-+
-+Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=node0 -object secret,id=keysec0,data=foo
-+QMP_VERSION
-+{"return": {}}
-+{"error": {"class": "GenericError", "desc": "The requested file size is too large"}}
-+{"error": {"class": "GenericError", "desc": "The requested file size is too large"}}
-+{"error": {"class": "GenericError", "desc": "The requested file size is too large"}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+
-+*** done
-diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-index 6fa0495e10..9a65a11026 100644
---- a/tests/qemu-iotests/common.rc
-+++ b/tests/qemu-iotests/common.rc
-@@ -332,7 +332,7 @@ _img_info()
- 
-     discard=0
-     regex_json_spec_start='^ *"format-specific": \{'
--    $QEMU_IMG info "$@" "$TEST_IMG" 2>&1 | \
-+    $QEMU_IMG info $QEMU_IMG_EXTRA_ARGS "$@" "$TEST_IMG" 2>&1 | \
-         sed -e "s#$IMGPROTO:$TEST_DIR#TEST_DIR#g" \
-             -e "s#$TEST_DIR#TEST_DIR#g" \
-             -e "s#$IMGFMT#IMGFMT#g" \
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index c401791fcd..b8d0fd6177 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -204,3 +204,4 @@
- 205 rw auto quick
- 206 rw auto
- 207 rw auto
-+209 rw auto
--- 
-2.13.6
+On Thu, Mar 8, 2018 at 8:57 PM, Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> Send requests back to the source for shared page requests.
+>
+
+Well, you could update the commit message to say that it introduces a
+callback to be used in the following patches, as well as saving RB of
+last request.
+
+For now that patch does no functional change :)
+
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
+> ---
+>  migration/migration.h    |  2 ++
+>  migration/postcopy-ram.c | 32 +++++++++++++++++++++++++++++---
+>  migration/postcopy-ram.h |  3 +++
+>  migration/trace-events   |  2 ++
+>  4 files changed, 36 insertions(+), 3 deletions(-)
+>
+> diff --git a/migration/migration.h b/migration/migration.h
+> index d02a759331..83dc36b57a 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -49,6 +49,8 @@ struct MigrationIncomingState {
+>      int       userfault_event_fd;
+>      QEMUFile *to_src_file;
+>      QemuMutex rp_mutex;    /* We send replies from multiple threads */
+> +    /* RAMBlock of last request sent to source */
+> +    RAMBlock *last_rb;
+>      void     *postcopy_tmp_page;
+>      void     *postcopy_tmp_zero_page;
+>      /* PostCopyFD's for external userfaultfds & handlers of shared memor=
+y */
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 4ab1b7d36d..83780576ca 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -525,6 +525,32 @@ static int ram_block_enable_notify(const char *block=
+_name, void *host_addr,
+>      return 0;
+>  }
+>
+> +/*
+> + * Callback from shared fault handlers to ask for a page,
+> + * the page must be specified by a RAMBlock and an offset in that rb
+> + * Note: Only for use by shared fault handlers (in fault thread)
+> + */
+> +int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb,
+> +                                 uint64_t client_addr, uint64_t rb_offse=
+t)
+> +{
+> +    size_t pagesize =3D qemu_ram_pagesize(rb);
+> +    uint64_t aligned_rbo =3D rb_offset & ~(pagesize - 1);
+> +    MigrationIncomingState *mis =3D migration_incoming_get_current();
+> +
+> +    trace_postcopy_request_shared_page(pcfd->idstr, qemu_ram_get_idstr(r=
+b),
+> +                                       rb_offset);
+> +    /* TODO: Check bitmap to see if we already have the page */
+> +    if (rb !=3D mis->last_rb) {
+> +        mis->last_rb =3D rb;
+> +        migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
+> +                                  aligned_rbo, pagesize);
+> +    } else {
+> +        /* Save some space */
+> +        migrate_send_rp_req_pages(mis, NULL, aligned_rbo, pagesize);
+> +    }
+> +    return 0;
+> +}
+> +
+>  /*
+>   * Handle faults detected by the USERFAULT markings
+>   */
+> @@ -535,9 +561,9 @@ static void *postcopy_ram_fault_thread(void *opaque)
+>      int ret;
+>      size_t index;
+>      RAMBlock *rb =3D NULL;
+> -    RAMBlock *last_rb =3D NULL; /* last RAMBlock we sent part of */
+>
+>      trace_postcopy_ram_fault_thread_entry();
+> +    mis->last_rb =3D NULL; /* last RAMBlock we sent part of */
+>      qemu_sem_post(&mis->fault_thread_sem);
+>
+>      struct pollfd *pfd;
+> @@ -636,8 +662,8 @@ static void *postcopy_ram_fault_thread(void *opaque)
+>               * Send the request to the source - we want to request one
+>               * of our host page sizes (which is >=3D TPS)
+>               */
+> -            if (rb !=3D last_rb) {
+> -                last_rb =3D rb;
+> +            if (rb !=3D mis->last_rb) {
+> +                mis->last_rb =3D rb;
+>                  migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
+>                                           rb_offset, qemu_ram_pagesize(rb=
+));
+>              } else {
+> diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+> index c8ced3470b..d7afab07d7 100644
+> --- a/migration/postcopy-ram.h
+> +++ b/migration/postcopy-ram.h
+> @@ -164,5 +164,8 @@ struct PostCopyFD {
+>   */
+>  void postcopy_register_shared_ufd(struct PostCopyFD *pcfd);
+>  void postcopy_unregister_shared_ufd(struct PostCopyFD *pcfd);
+> +/* Callback from shared fault handlers to ask for a page */
+> +int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb,
+> +                                 uint64_t client_addr, uint64_t offset);
+>
+>  #endif
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 1e617ad7a6..7c910b5479 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -198,6 +198,8 @@ postcopy_ram_incoming_cleanup_closeuf(void) ""
+>  postcopy_ram_incoming_cleanup_entry(void) ""
+>  postcopy_ram_incoming_cleanup_exit(void) ""
+>  postcopy_ram_incoming_cleanup_join(void) ""
+> +postcopy_request_shared_page(const char *sharer, const char *rb, uint64_=
+t rb_offset) "for %s in %s offset 0x%"PRIx64
+> +
+>  save_xbzrle_page_skipping(void) ""
+>  save_xbzrle_page_overflow(void) ""
+>  ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait=
+: %" PRIu64 " milliseconds, %d iterations"
+> --
+> 2.14.3
+>
+>
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
