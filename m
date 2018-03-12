@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1evJR8-0003AE-3S
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:08:07 -0400
+	(envelope-from <groug@kaod.org>) id 1evJSh-0004M0-Ov
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:09:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1evJR3-0005hO-1t
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:08:06 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47048 helo=mx1.redhat.com)
+	(envelope-from <groug@kaod.org>) id 1evJSc-0001DT-MR
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:09:43 -0400
+Received: from 4.mo4.mail-out.ovh.net ([178.32.98.131]:40948)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1evJR2-0005b7-To
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:08:00 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1CF128D6D7
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 09:07:55 +0000 (UTC)
-References: <1520839658-20499-1-git-send-email-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2a85941f-48bf-9e9b-0d6d-832a270d882b@redhat.com>
-Date: Mon, 12 Mar 2018 10:07:43 +0100
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1evJSc-0000nd-Eu
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 05:09:38 -0400
+Received: from player693.ha.ovh.net (unknown [10.109.122.93])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 2A005156DCC
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 10:09:28 +0100 (CET)
+From: Greg Kurz <groug@kaod.org>
+Date: Mon, 12 Mar 2018 10:09:19 +0100
+Message-ID: <152084575964.24079.3708480492746701627.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <1520839658-20499-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] qemu-doc: Rework the network options
- chapter to make "-net" less prominent
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] 9p: add trace event for v9fs_setattr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,56 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>
 
-On 12/03/2018 08:27, Thomas Huth wrote:
-> "-net" is clearly a legacy option. Yet we still use it in almost all
-> examples in the qemu documentation, and many other spots in the network
-> chapter. We should make it less prominent that users are not lured into
-> using it so often anymore. So instead of starting the network chapter w=
-ith
-> "-net nic" and documenting "-net <backend>" below "-netdev <backend>"
-> everywhere, all the "-net" related documentation is now moved to the en=
-d
-> of the chapter. The new "--nic" option is moved to the beginning of the
-> chapter instead, with a new example that should demonstrate how "--nic"
-> can be used to shortcut "--device" with "--netdev". The examples in thi=
-s
-> chapter are changed to use the "--device" and "--netdev" options or
-> "--nic" instead of "-net nic -net <backend>".
->=20
-> While we're at it, also remove a legacy remark about very old Linux
-> distributions. Also remove the "[...]" from the examples in this chapte=
-r
-> since we are not using this ellipsis in any other examples in our docu-
-> mentation.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  v2:
->  - Fixed the bad "--device=3De1000" example
+Don't print the tv_nsec part of atime and mtime, to stay below the 10
+argument limit of trace events.
 
-Frankly I think this is the proof that double-dash option names are a
-bad idea.  The reason to do that was to make qemu-img and qemu command
-lines more similar in the documentation, but the truth is they are not
-similar and shouldn't be made similar.  The equal sign is one example,
-where qemu-img supports "--format=3Draw" but QEMU doesn't support
-"--device=3De1000", but it's not the only one.
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/9pfs/9p.c         |    5 +++++
+ hw/9pfs/trace-events |    2 ++
+ 2 files changed, 7 insertions(+)
 
-qemu-img supports things such as "-fraw", qemu doesn't---for example
-"-m1024" doesn't work).  qemu-img can combine single-letter options
-(e.g. "qemu-img convert -pc") but qemu cannot---e.g. "-sm" doesn't
-combine "-s" and "-m".
-
-No need to drop them in QEMU, since it's more or less just a convenience
-for people that are used to double-dash long options, but using them in
-the documentation is confusing.
-
-Paolo
-
->  - Fixed some typos discovered by Eric
->  - Use --nic in even more examples (Paolo)
->  - Improved patch description
->  - Use single dash only in @findex tags (the appendix with the index lo=
-oks
->    strange otherwise)
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index 64f3bb976c92..33825e16c150 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -1196,6 +1196,10 @@ static void coroutine_fn v9fs_setattr(void *opaque)
+         goto out_nofid;
+     }
+ 
++    trace_v9fs_setattr(pdu->tag, pdu->id, fid,
++                       v9iattr.valid, v9iattr.mode, v9iattr.uid, v9iattr.gid,
++                       v9iattr.size, v9iattr.atime_sec, v9iattr.mtime_sec);
++
+     fidp = get_fid(pdu, fid);
+     if (fidp == NULL) {
+         err = -EINVAL;
+@@ -1260,6 +1264,7 @@ static void coroutine_fn v9fs_setattr(void *opaque)
+         }
+     }
+     err = offset;
++    trace_v9fs_setattr_return(pdu->tag, pdu->id);
+ out:
+     put_fid(pdu, fidp);
+ out_nofid:
+diff --git a/hw/9pfs/trace-events b/hw/9pfs/trace-events
+index 1aee350c42f1..881e4c4dd80b 100644
+--- a/hw/9pfs/trace-events
++++ b/hw/9pfs/trace-events
+@@ -46,3 +46,5 @@ v9fs_xattrwalk_return(uint16_t tag, uint8_t id, int64_t size) "tag %d id %d size
+ v9fs_xattrcreate(uint16_t tag, uint8_t id, int32_t fid, char* name, uint64_t size, int flags) "tag %d id %d fid %d name %s size %"PRIu64" flags %d"
+ v9fs_readlink(uint16_t tag, uint8_t id, int32_t fid) "tag %d id %d fid %d"
+ v9fs_readlink_return(uint16_t tag, uint8_t id, char* target) "tag %d id %d name %s"
++v9fs_setattr(uint16_t tag, uint8_t id, int32_t fid, int32_t valid, int32_t mode, int32_t uid, int32_t gid, int64_t size, int64_t atime_sec, int64_t mtime_sec) "tag %u id %u fid %d iattr={valid %d mode %d uid %d gid %d size %"PRId64" atime=%"PRId64" mtime=%"PRId64" }"
++v9fs_setattr_return(uint16_t tag, uint8_t id) "tag %u id %u"
