@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1evRi8-0006se-3f
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:58:13 -0400
+	(envelope-from <aishwaryakadlag@gmail.com>) id 1evRir-0007bQ-2o
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:58:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1evRi4-0002lw-6U
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:58:12 -0400
-Resent-Message-Id: <E1evRi4-0002lw-6U@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21007)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1evRi3-0002l3-Vd
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:58:08 -0400
-In-Reply-To: <20180312124939.20562-1-berrange@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152087747793.39.11235916619861333400@71c20359a636>
+	(envelope-from <aishwaryakadlag@gmail.com>) id 1evRip-0003At-V8
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:58:57 -0400
+Received: from mail-ot0-x22d.google.com ([2607:f8b0:4003:c0f::22d]:39925)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aishwaryakadlag@gmail.com>)
+	id 1evRip-0003AS-Q6
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 13:58:55 -0400
+Received: by mail-ot0-x22d.google.com with SMTP id h8so16178481oti.6
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 10:58:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 12 Mar 2018 10:57:58 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v5 0/9] Enable passing pre-opened chardev
- socket FD
+In-Reply-To: <CAFEAcA8XSC1Tm_0AfQPA4Nz5sOZd3HLNDZD7jdBzmEzB5pEyzQ@mail.gmail.com>
+References: <1520786414-8806-1-git-send-email-aishwaryakadlag@gmail.com>
+	<6666720e-6f5c-0e8c-6c5a-ac36d708e314@redhat.com>
+	<20180312070545.ktvvgp2kn2uxjpzk@sirius.home.kraxel.org>
+	<CAFEAcA8XSC1Tm_0AfQPA4Nz5sOZd3HLNDZD7jdBzmEzB5pEyzQ@mail.gmail.com>
+From: Aishwarya Kadlag <aishwaryakadlag@gmail.com>
+Date: Mon, 12 Mar 2018 23:28:54 +0530
+Message-ID: <CAFPFVbdTdDhvf-vymmVv5SXnp4UD=7adkS8r89YR3O809B787w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH V1]sm501: dead code removal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +31,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: berrange@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMzEyMTI0OTM5LjIwNTYyLTEtYmVycmFuZ2VAcmVkaGF0LmNvbQpTdWJq
-ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY1IDAvOV0gRW5hYmxlIHBhc3NpbmcgcHJlLW9wZW5l
-ZCBjaGFyZGV2IHNvY2tldCBGRAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
-aAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAt
-bCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFs
-Z29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
-c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
-Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
-IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
-YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
-bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
-ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQg
-dG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoxMWEyZDI0ODU0IGNoYXI6IGFsbG93IHBhc3NpbmcgcHJl
-LW9wZW5lZCBzb2NrZXQgZmlsZSBkZXNjcmlwdG9yIGF0IHN0YXJ0dXAKMzhkN2VkODU1YSBjaGFy
-OiByZWZhY3RvciBwYXJzaW5nIG9mIHNvY2tldCBhZGRyZXNzIGluZm9ybWF0aW9uCmRhY2M2Zjhl
-YmUgc29ja2V0czogYWxsb3cgU29ja2V0QWRkcmVzcyAnZmQnIHRvIHJlZmVyZW5jZSBudW1lcmlj
-IGZpbGUgZGVzY3JpcHRvcnMKOGQ5MWQ3NzZjNyBzb2NrZXRzOiBjaGVjayB0aGF0IHRoZSBuYW1l
-ZCBmaWxlIGRlc2NyaXB0b3IgaXMgYSBzb2NrZXQKNGFjOWQwNGQ3YiBzb2NrZXRzOiBtb3ZlIGZk
-X2lzX3NvY2tldCgpIGludG8gY29tbW9uIHNvY2tldHMgY29kZQoxNzkxMTgwNTJhIHNvY2tldHM6
-IHN0cmVuZ3RoZW4gdGVzdCBzdWl0ZSBJUCBwcm90b2NvbCBhdmFpbGFiaWxpdHkgY2hlY2tzCjM1
-N2VkZWE4ZDMgc29ja2V0czogcHVsbCBjb2RlIGZvciB0ZXN0aW5nIElQIGF2YWlsYWJpbGl0eSBv
-dXQgb2Ygc3BlY2lmaWMgdGVzdAo3ZmNhMDI1ZWE4IGN1dGlsczogYWRkIHFlbXVfc3RydG9pICYg
-cWVtdV9zdHJ0b3VpIHBhcnNlcnMgZm9yIGludC91bnNpZ25lZCBpbnQgdHlwZXMKNjhkNTE1MThm
-YiBjaGFyOiBkb24ndCBzaWxlbnRseSBza2lwIHRuMzI3MCBwcm90b2NvbCBpbml0IHdoZW4gVExT
-IGlzIGVuYWJsZWQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvOTogY2hh
-cjogZG9uJ3Qgc2lsZW50bHkgc2tpcCB0bjMyNzAgcHJvdG9jb2wgaW5pdCB3aGVuIFRMUyBpcyBl
-bmFibGVkLi4uCkNoZWNraW5nIFBBVENIIDIvOTogY3V0aWxzOiBhZGQgcWVtdV9zdHJ0b2kgJiBx
-ZW11X3N0cnRvdWkgcGFyc2VycyBmb3IgaW50L3Vuc2lnbmVkIGludCB0eXBlcy4uLgpFUlJPUjog
-Y29uc2lkZXIgdXNpbmcgcWVtdV9zdHJ0b2wgaW4gcHJlZmVyZW5jZSB0byBzdHJ0b2wKIzc1Mzog
-RklMRTogdXRpbC9jdXRpbHMuYzozMzg6CisgICAgbHJlc3VsdCA9IHN0cnRvbChucHRyLCAmZXAs
-IGJhc2UpOwoKRVJST1I6IGNvbnNpZGVyIHVzaW5nIHFlbXVfc3RydG91bCBpbiBwcmVmZXJlbmNl
-IHRvIHN0cnRvdWwKIzgwNTogRklMRTogdXRpbC9jdXRpbHMuYzozOTA6CisgICAgbHJlc3VsdCA9
-IHN0cnRvdWwobnB0ciwgJmVwLCBiYXNlKTsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywg
-NzkzIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-CkNoZWNraW5nIFBBVENIIDMvOTogc29ja2V0czogcHVsbCBjb2RlIGZvciB0ZXN0aW5nIElQIGF2
-YWlsYWJpbGl0eSBvdXQgb2Ygc3BlY2lmaWMgdGVzdC4uLgpDaGVja2luZyBQQVRDSCA0Lzk6IHNv
-Y2tldHM6IHN0cmVuZ3RoZW4gdGVzdCBzdWl0ZSBJUCBwcm90b2NvbCBhdmFpbGFiaWxpdHkgY2hl
-Y2tzLi4uCkNoZWNraW5nIFBBVENIIDUvOTogc29ja2V0czogbW92ZSBmZF9pc19zb2NrZXQoKSBp
-bnRvIGNvbW1vbiBzb2NrZXRzIGNvZGUuLi4KQ2hlY2tpbmcgUEFUQ0ggNi85OiBzb2NrZXRzOiBj
-aGVjayB0aGF0IHRoZSBuYW1lZCBmaWxlIGRlc2NyaXB0b3IgaXMgYSBzb2NrZXQuLi4KQ2hlY2tp
-bmcgUEFUQ0ggNy85OiBzb2NrZXRzOiBhbGxvdyBTb2NrZXRBZGRyZXNzICdmZCcgdG8gcmVmZXJl
-bmNlIG51bWVyaWMgZmlsZSBkZXNjcmlwdG9ycy4uLgpDaGVja2luZyBQQVRDSCA4Lzk6IGNoYXI6
-IHJlZmFjdG9yIHBhcnNpbmcgb2Ygc29ja2V0IGFkZHJlc3MgaW5mb3JtYXRpb24uLi4KQ2hlY2tp
-bmcgUEFUQ0ggOS85OiBjaGFyOiBhbGxvdyBwYXNzaW5nIHByZS1vcGVuZWQgc29ja2V0IGZpbGUg
-ZGVzY3JpcHRvciBhdCBzdGFydHVwLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5k
-IGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
-YnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
-Y2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+Really glad to get a feedback so soon on my first attempt.
+
+Yes Thomas sir, I will apply these changes in my next patch. Now that this
+patch is already been implemented by Gerd sir in 2014 and it was not
+applied, should I consider finding some other task or should I improve this
+patch to get it merged or applied? Also as this was my first attempt, I
+selected the task mentioned in the wiki page
+https://wiki.qemu.org/BiteSizedTasks#Dead_code_removal
+As Paolo sir said, if this is too easy then can someone please suggest me
+any other task to work on so that I can create something useful to qemu??
+
+
+Thanks,
+Aishwarya
+
+
+
+On Mon, Mar 12, 2018 at 6:33 PM, Peter Maydell <peter.maydell@linaro.org>
+wrote:
+
+> On 12 March 2018 at 07:05, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> > Might be it actually is that easy.
+>
+> In fact looking through the list archives I see you actually
+> sent a patchset to do this for the sm501 device back in March
+> last year:
+> http://lists.gnu.org/archive/html/qemu-devel/2017-03/msg01172.html
+>
+> I think it didn't get applied mostly because it was on list
+> at the same time as a significant revamp of the sm501 device
+> code. So it probably won't apply cleanly to the current code,
+> but it looks like a good starting point for identifying what
+> the changes needed here are.
+>
+> thanks
+> -- PMM
+>
