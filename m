@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1evLH1-0006GN-5i
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:05:48 -0400
+	(envelope-from <stefanha@gmail.com>) id 1evLJD-0007f5-1r
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:08:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1evLGw-000253-LD
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:05:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48290 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1evLGw-00023t-FR
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:05:42 -0400
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 12 Mar 2018 12:05:32 +0100
-Message-Id: <20180312110532.30967-2-kraxel@redhat.com>
-In-Reply-To: <20180312110532.30967-1-kraxel@redhat.com>
-References: <20180312110532.30967-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 1/1] usbredir: reorder fields in USBRedirDevice
- to reduce padding
+	(envelope-from <stefanha@gmail.com>) id 1evLJ8-0007Bd-R6
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 07:08:03 -0400
+Date: Mon, 12 Mar 2018 11:07:55 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180312110755.GB5681@stefanha-x1.localdomain>
+References: <20180307124619.6218-1-stefanha@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="TRYliJ5NKNqkz5bu"
+Content-Disposition: inline
+In-Reply-To: <20180307124619.6218-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] block: make
+ BDRV_POLL_WHILE() re-entrancy safe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +24,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, "zhenwei.pi" <zhenwei.pi@youruncloud.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, "fuweiwei (C)" <fuweiwei2@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: "zhenwei.pi" <zhenwei.pi@youruncloud.com>
 
-Changing the current ordering saves 8 bytes per entry in x86_64.
+--TRYliJ5NKNqkz5bu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: zhenwei.pi <zhenwei.pi@youruncloud.com>
-Message-id: 1520318781-22644-1-git-send-email-zhenwei.pi@youruncloud.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/usb/redirect.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Wed, Mar 07, 2018 at 12:46:19PM +0000, Stefan Hajnoczi wrote:
+> Nested BDRV_POLL_WHILE() calls can occur.  Currently
+> assert(!wait_->wakeup) fails in AIO_WAIT_WHILE() when this happens.
+>=20
+> This patch converts the bool wait_->need_kick flag to an unsigned
+> wait_->num_waiters counter.
+>=20
+> Nesting works correctly because outer AIO_WAIT_WHILE() callers evaluate
+> the condition again after the inner caller completes (invoking the inner
+> caller counts as aio_poll() progress).
+>=20
+> Reported-by: "fuweiwei (C)" <fuweiwei2@huawei.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+> v2:
+>  * Rebase onto qemu.git/master now that AIO_WAIT_WHILE() has landed
+>    [Kevin]
+>=20
+>  include/block/aio-wait.h | 61 ++++++++++++++++++++++++------------------=
+------
+>  util/aio-wait.c          |  2 +-
+>  2 files changed, 31 insertions(+), 32 deletions(-)
 
-diff --git a/hw/usb/redirect.c b/hw/usb/redirect.c
-index ec174309db..65a9196c1a 100644
---- a/hw/usb/redirect.c
-+++ b/hw/usb/redirect.c
-@@ -106,10 +106,10 @@ struct USBRedirDevice {
-     USBDevice dev;
-     /* Properties */
-     CharBackend cs;
-+    bool enable_streams;
-     uint8_t debug;
--    char *filter_str;
-     int32_t bootindex;
--    bool enable_streams;
-+    char *filter_str;
-     /* Data passed from chardev the fd_read cb to the usbredirparser read cb */
-     const uint8_t *read_buf;
-     int read_buf_size;
--- 
-2.9.3
+Thanks, applied to my block tree:
+https://github.com/stefanha/qemu/commits/block
+
+Stefan
+
+--TRYliJ5NKNqkz5bu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJapl+LAAoJEJykq7OBq3PIAVQH/R2aRkbc6hbVhf+Q47WlFODT
+zs/ecO0X6JeDmaDS8ec6fIGNwsA6qjZyZALXcsTCka894xSbhnb13KF82bsn2zGm
+rDnonDbW1hDr4H65EvjMrBZPnpQ9CPsAXragxzEBMl7ZHqdvz9+F5bU45ScgHLsK
+nESfznIPoZ+OHKbgK0Zshp/XqURJogJRYpvng6JXoPIZTY6UEOKxF0LNY8lAyyvl
+pM4+yNZivmuLXlp96Ho8fGlD18mKLtPKGeP3kYl3b3x++dqIAV9DrVKiB7nHUuWX
+bsw9bI2ec2lDP7q30qE0xjYVALcxgZNevTVCWyUPgekJqSGLngwQGdpUjfldtnw=
+=ZTCT
+-----END PGP SIGNATURE-----
+
+--TRYliJ5NKNqkz5bu--
