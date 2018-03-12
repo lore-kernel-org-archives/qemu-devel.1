@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1evISP-0006SN-PB
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 04:05:22 -0400
+	(envelope-from <nitin.gupta981@gmail.com>) id 1evId6-0000KA-Op
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 04:16:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1evISO-0005hW-SQ
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 04:05:21 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20180309182202.31206-1-farosas@linux.vnet.ibm.com>
-	<20180309182202.31206-5-farosas@linux.vnet.ibm.com>
-In-Reply-To: <20180309182202.31206-5-farosas@linux.vnet.ibm.com>
-Date: Mon, 12 Mar 2018 11:05:10 +0300
-Message-ID: <000601d3b9d8$d7d129c0$87737d40$@ru>
+	(envelope-from <nitin.gupta981@gmail.com>) id 1evId5-0000Zx-RD
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 04:16:24 -0400
+Received: from mail-ua0-x233.google.com ([2607:f8b0:400c:c08::233]:45939)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <nitin.gupta981@gmail.com>)
+	id 1evId5-0000ZL-Kk
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 04:16:23 -0400
+Received: by mail-ua0-x233.google.com with SMTP id n24so6188658ual.12
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 01:16:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH 4/5] block/blkreplay: Remove
- protocol-related fields
+In-Reply-To: <20180306113457.GE31045@stefanha-x1.localdomain>
+References: <CAB3_1NuKx8EspXZstkUYRTtXfNLQiDBF3QUW2WsGtycOd4Vmpw@mail.gmail.com>
+	<20180306113457.GE31045@stefanha-x1.localdomain>
+From: Nitin Gupta <nitin.gupta981@gmail.com>
+Date: Mon, 12 Mar 2018 13:46:22 +0530
+Message-ID: <CAB3_1Ns+AcnVSkkw-aDBrJzrbmChkoO4dczxApyBDhPgSV1Gqw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] SSD virtio-scsi passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,43 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Fabiano Rosas' <farosas@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, 'Paolo Bonzini' <pbonzini@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-> From: Fabiano Rosas [mailto:farosas@linux.vnet.ibm.com]
-> The blkreplay driver is not a protocol so it should implement bdrv_open
-> instead of bdrv_file_open and not provide a protocol_name.
-> 
-> Attempts to invoke this driver using protocol syntax
-> (i.e. blkreplay:<filename:options:...>) will now fail gracefully:
-> 
->   $ qemu-img info blkreplay:foo
->   qemu-img: Could not open 'blkreplay:foo': Unknown protocol 'blkreplay'
-> 
-> Signed-off-by: Fabiano Rosas <farosas@linux.vnet.ibm.com>
-> ---
->  block/blkreplay.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/block/blkreplay.c b/block/blkreplay.c
-> index 61e44a1949..fe5a9b4a98 100755
-> --- a/block/blkreplay.c
-> +++ b/block/blkreplay.c
-> @@ -129,10 +129,9 @@ static int coroutine_fn blkreplay_co_flush(BlockDriverState *bs)
-> 
->  static BlockDriver bdrv_blkreplay = {
->      .format_name            = "blkreplay",
-> -    .protocol_name          = "blkreplay",
->      .instance_size          = 0,
-> 
-> -    .bdrv_file_open         = blkreplay_open,
-> +    .bdrv_open              = blkreplay_open,
->      .bdrv_close             = blkreplay_close,
->      .bdrv_child_perm        = bdrv_filter_default_perms,
->      .bdrv_getlength         = blkreplay_getlength,
-> --
-> 2.13.6
+Hi   Stefan
 
-Reviewed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Thanks for your response , i tried the the command provided by you and it
+did not work as well
+somehow i find that  after changing the controller to LSI in qemu command
+it started working , please find command below
 
-Pavel Dovgalyuk
+-device lsi,id=scsi0,bus=pci.0,addr=0xa    -drive
+file=/dev/sdc,format=raw,if=none,id=drive-scsi1-0-0-0,cache=none -device
+scsi-block,bus=scsi1.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi1-0-0-0,id=scsi1-0-0-0
+
+
+looks like virtio-pci is not able to bind when i am using qemu command ,
+its working with virsh(libvirt).
+
+Regards
+Nitin
+
+On Tue, Mar 6, 2018 at 5:04 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+
+> On Wed, Feb 21, 2018 at 02:51:38PM +0530, Nitin Gupta wrote:
+> > Please let me know the qemu command for doing ssd virtio-scsi
+> passthrough .
+> > i am able to do the pass through with virsh .but same command when i am
+> > trying with qemu , VM is not coming up
+> >
+> > Please let me know how can i proceed further . any help will be
+> appreciated
+>
+> Something like this:
+>
+>   -drive if=none,id=drive0,file=/dev/sdX,format=raw,aio=native,cache=none
+>   -device virtio-scsi-pci,id=virtio-scsi-pci0
+>   -device scsi-block,drive=drive0,bus=virtio-scsi-pci0.0
+>
+> Stefan
+>
