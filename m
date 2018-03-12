@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1evOBJ-0008Vq-Fv
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 10:12:06 -0400
+	(envelope-from <berrange@redhat.com>) id 1evOGX-0003AF-HY
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 10:17:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1evOBD-0003yr-M4
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 10:12:05 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:44073)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1evOBD-0003tb-FV
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 10:11:59 -0400
-Received: by mail-wr0-x243.google.com with SMTP id v65so15829091wrc.11
-	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 07:11:59 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180312120849.20073-1-marcandre.lureau@redhat.com>
-References: <20180312120849.20073-1-marcandre.lureau@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 12 Mar 2018 15:11:57 +0100
-Message-ID: <CAJ+F1CJM2mk8BKUm=kkKwTJJSjqNT7Hd0pdLM_=ZTMzxnb6FHw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tests: make docker-test-debug@fedora run
- sanitizers
+	(envelope-from <berrange@redhat.com>) id 1evOGU-0007mr-Rh
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 10:17:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51700 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1evOGU-0007l9-MQ
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 10:17:26 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6CF8240201A3
+	for <qemu-devel@nongnu.org>; Mon, 12 Mar 2018 14:17:22 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 12 Mar 2018 14:17:14 +0000
+Message-Id: <20180312141714.7223-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.12 REPOST] migration: convert socket
+ server to QIONetListener
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,84 +28,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Hi Fam,
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-It would be great if patchew could run the debug/sanitizer build.
-Unfortunately, except x86 target, the run is full of ASAN leaks or
-warnings.
+Instead of creating a QIOChannelSocket directly for the migration
+server socket, use a QIONetListener. This provides the ability
+to listen on multiple sockets at the same time, so enables
+full support for IPv4/IPv6 dual stack.
 
-Do you think patchew could learn to do regression testing? By that I
-mean that patchew could compare a patchset output with the current
-master (that output should be cached for multiple tests). The output
-to compare here would be the errors reported by ASAN during the build.
-(eventually, this could be used for other metrics some day). If so,
-would you be willing to help me implementing it?
+For example,   '$QEMU -incoming tcp::9000' now correctly listens
+on both 0.0.0.0 and :: at the same time, instead of only on 0.0.0.0.
 
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ migration/socket.c | 48 ++++++++++++++++--------------------------------
+ 1 file changed, 16 insertions(+), 32 deletions(-)
 
-On Mon, Mar 12, 2018 at 1:08 PM, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
-> Since --enable-debug no longer enable sanitizers, we need explicit
-> --enable-sanitizers.
->
-> llvm package is required for llvm-symbolizer, to get symbols in
-> backtraces.
->
-> Add make V=3D1 to get details about failing tests.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  tests/docker/dockerfiles/fedora.docker | 2 +-
->  tests/docker/test-debug                | 6 +++---
->  2 files changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/docker=
-files/fedora.docker
-> index 994a35a332..a00004319e 100644
-> --- a/tests/docker/dockerfiles/fedora.docker
-> +++ b/tests/docker/dockerfiles/fedora.docker
-> @@ -2,7 +2,7 @@ FROM fedora:27
->  ENV PACKAGES \
->      ccache gettext git tar PyYAML sparse flex bison python3 bzip2 hostna=
-me \
->      glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
-> -    gcc gcc-c++ clang make perl which bc findutils libaio-devel \
-> +    gcc gcc-c++ llvm clang make perl which bc findutils libaio-devel \
->      nettle-devel libasan libubsan \
->      mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-con=
-fig \
->      mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libt=
-asn1 \
-> diff --git a/tests/docker/test-debug b/tests/docker/test-debug
-> index d020b06917..d3f9f70d01 100755
-> --- a/tests/docker/test-debug
-> +++ b/tests/docker/test-debug
-> @@ -1,6 +1,6 @@
->  #!/bin/bash -e
->  #
-> -# Compile and check with clang & --enable-debug.
-> +# Compile and check with clang & --enable-debug --enable-sanitizers.
->  #
->  # Copyright (c) 2016-2018 Red Hat Inc.
->  #
-> @@ -19,8 +19,8 @@ requires clang asan
->  cd "$BUILD_DIR"
->
->  OPTS=3D"--cxx=3Dclang++ --cc=3Dclang --host-cc=3Dclang"
-> -OPTS=3D"--enable-debug $OPTS"
-> +OPTS=3D"--enable-debug --enable-sanitizers $OPTS"
->
->  build_qemu $OPTS
-> -make $MAKEFLAGS check
-> +make $MAKEFLAGS V=3D1 check
->  install_qemu
-> --
-> 2.16.2.346.g9779355e34
->
->
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+diff --git a/migration/socket.c b/migration/socket.c
+index 8a93fb1af5..122d8ccfbe 100644
+--- a/migration/socket.c
++++ b/migration/socket.c
+@@ -24,6 +24,7 @@
+ #include "migration.h"
+ #include "qemu-file.h"
+ #include "io/channel-socket.h"
++#include "io/net-listener.h"
+ #include "trace.h"
+ 
+ 
+@@ -129,34 +130,20 @@ void unix_start_outgoing_migration(MigrationState *s,
+ }
+ 
+ 
+-static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
+-                                                 GIOCondition condition,
+-                                                 gpointer opaque)
++static void socket_accept_incoming_migration(QIONetListener *listener,
++                                             QIOChannelSocket *cioc,
++                                             gpointer opaque)
+ {
+-    QIOChannelSocket *sioc;
+-    Error *err = NULL;
+-
+-    sioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
+-                                     &err);
+-    if (!sioc) {
+-        error_report("could not accept migration connection (%s)",
+-                     error_get_pretty(err));
+-        goto out;
+-    }
+-
+     trace_migration_socket_incoming_accepted();
+ 
+-    qio_channel_set_name(QIO_CHANNEL(sioc), "migration-socket-incoming");
+-    migration_channel_process_incoming(QIO_CHANNEL(sioc));
+-    object_unref(OBJECT(sioc));
++    qio_channel_set_name(QIO_CHANNEL(cioc), "migration-socket-incoming");
++    migration_channel_process_incoming(QIO_CHANNEL(cioc));
+ 
+-out:
+     if (migration_has_all_channels()) {
+         /* Close listening socket as its no longer needed */
+-        qio_channel_close(ioc, NULL);
+-        return G_SOURCE_REMOVE;
+-    } else {
+-        return G_SOURCE_CONTINUE;
++        qio_net_listener_disconnect(listener);
++
++        object_unref(OBJECT(listener));
+     }
+ }
+ 
+@@ -164,21 +151,18 @@ out:
+ static void socket_start_incoming_migration(SocketAddress *saddr,
+                                             Error **errp)
+ {
+-    QIOChannelSocket *listen_ioc = qio_channel_socket_new();
++    QIONetListener *listener = qio_net_listener_new();
+ 
+-    qio_channel_set_name(QIO_CHANNEL(listen_ioc),
+-                         "migration-socket-listener");
++    qio_net_listener_set_name(listener, "migration-socket-listener");
+ 
+-    if (qio_channel_socket_listen_sync(listen_ioc, saddr, errp) < 0) {
+-        object_unref(OBJECT(listen_ioc));
++    if (qio_net_listener_open_sync(listener, saddr, errp) < 0) {
++        object_unref(OBJECT(listener));
+         return;
+     }
+ 
+-    qio_channel_add_watch(QIO_CHANNEL(listen_ioc),
+-                          G_IO_IN,
+-                          socket_accept_incoming_migration,
+-                          listen_ioc,
+-                          (GDestroyNotify)object_unref);
++    qio_net_listener_set_client_func(listener,
++                                     socket_accept_incoming_migration,
++                                     NULL, NULL);
+ }
+ 
+ void tcp_start_incoming_migration(const char *host_port, Error **errp)
+-- 
+2.14.3
