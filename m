@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdE-0001RY-HR
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:33 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdF-0001SX-Mc
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdC-0004di-SX
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:32 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdE-0004ee-6e
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:33 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Mar 2018 17:17:38 +0100
-Message-Id: <20180313161803.1814-17-kwolf@redhat.com>
+Date: Tue, 13 Mar 2018 17:17:40 +0100
+Message-Id: <20180313161803.1814-19-kwolf@redhat.com>
 In-Reply-To: <20180313161803.1814-1-kwolf@redhat.com>
 References: <20180313161803.1814-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 16/41] blockjobs: add waiting status
+Subject: [Qemu-devel] [PULL 18/41] blockjobs: add block-job-finalize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,146 +24,259 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: John Snow <jsnow@redhat.com>
 
-For jobs that are stuck waiting on others in a transaction, it would
-be nice to know that they are no longer "running" in that sense, but
-instead are waiting on other jobs in the transaction.
+Instead of automatically transitioning from PENDING to CONCLUDED, gate
+the .prepare() and .commit() phases behind an explicit acknowledgement
+provided by the QMP monitor if auto_finalize = false has been requested.
 
-Jobs that are "waiting" in this sense cannot be meaningfully altered
-any longer as they have left their running loop. The only meaningful
-user verb for jobs in this state is "cancel," which will cancel the
-whole transaction, too.
+This allows us to perform graph changes in prepare and/or commit so that
+graph changes do not occur autonomously without knowledge of the
+controlling management layer.
 
-Transitions:
-Running -> Waiting:   Normal transition.
-Ready   -> Waiting:   Normal transition.
-Waiting -> Aborting:  Transactional cancellation.
-Waiting -> Concluded: Normal transition.
+Transactions that have reached the "PENDING" state together can all be
+moved to invoke their finalization methods by issuing block_job_finalize
+to any one job in the transaction.
 
-Removed Transitions:
-Running -> Concluded: Jobs must go to WAITING first.
-Ready   -> Concluded: Jobs must go to WAITING first.
-
-Verbs:
-Cancel: Can be applied to WAITING jobs.
-
-             +---------+
-             |UNDEFINED|
-             +--+------+
-                |
-             +--v----+
-   +---------+CREATED+-----------------+
-   |         +--+----+                 |
-   |            |                      |
-   |         +--v----+     +------+    |
-   +---------+RUNNING<----->PAUSED|    |
-   |         +--+-+--+     +------+    |
-   |            | |                    |
-   |            | +------------------+ |
-   |            |                    | |
-   |         +--v--+       +-------+ | |
-   +---------+READY<------->STANDBY| | |
-   |         +--+--+       +-------+ | |
-   |            |                    | |
-   |         +--v----+               | |
-   +---------+WAITING<---------------+ |
-   |         +--+----+                 |
-   |            |                      |
-+--v-----+   +--v------+               |
-|ABORTING+--->CONCLUDED|               |
-+--------+   +--+------+               |
-                |                      |
-             +--v-+                    |
-             |NULL<--------------------+
-             +----+
+Jobs in a transaction with mixed job->auto_finalize settings will all
+remain stuck in the "PENDING" state, as if the entire transaction was
+specified with auto_finalize = false. Jobs that specified
+auto_finalize = true, however, will still not emit the PENDING event.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-core.json |  6 +++++-
- blockjob.c           | 37 ++++++++++++++++++++-----------------
- 2 files changed, 25 insertions(+), 18 deletions(-)
+ qapi/block-core.json     | 23 ++++++++++++++++++-
+ include/block/blockjob.h | 17 ++++++++++++++
+ blockdev.c               | 14 +++++++++++
+ blockjob.c               | 60 +++++++++++++++++++++++++++++++++++-------------
+ block/trace-events       |  1 +
+ 5 files changed, 98 insertions(+), 17 deletions(-)
 
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index fb577d45f8..6631614d0b 100644
+index 0ae12272ff..2c32fc69f9 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -998,6 +998,10 @@
- # @standby: The job is ready, but paused. This is nearly identical to @paused.
- #           The job may return to @ready or otherwise be canceled.
+@@ -972,10 +972,13 @@
  #
-+# @waiting: The job is waiting for other jobs in the transaction to converge
-+#           to the waiting state. This status will likely not be visible for
-+#           the last job in a transaction.
+ # @dismiss: see @block-job-dismiss
+ #
++# @finalize: see @block-job-finalize
 +#
- # @aborting: The job is in the process of being aborted, and will finish with
- #            an error. The job will afterwards report that it is @concluded.
- #            This status may not be visible to the management process.
-@@ -1012,7 +1016,7 @@
+ # Since: 2.12
  ##
- { 'enum': 'BlockJobStatus',
-   'data': ['undefined', 'created', 'running', 'paused', 'ready', 'standby',
--           'aborting', 'concluded', 'null' ] }
-+           'waiting', 'aborting', 'concluded', 'null' ] }
+ { 'enum': 'BlockJobVerb',
+-  'data': ['cancel', 'pause', 'resume', 'set-speed', 'complete', 'dismiss' ] }
++  'data': ['cancel', 'pause', 'resume', 'set-speed', 'complete', 'dismiss',
++           'finalize' ] }
  
  ##
- # @BlockJobInfo:
+ # @BlockJobStatus:
+@@ -2275,6 +2278,24 @@
+ { 'command': 'block-job-dismiss', 'data': { 'id': 'str' } }
+ 
+ ##
++# @block-job-finalize:
++#
++# Once a job that has manual=true reaches the pending state, it can be
++# instructed to finalize any graph changes and do any necessary cleanup
++# via this command.
++# For jobs in a transaction, instructing one job to finalize will force
++# ALL jobs in the transaction to finalize, so it is only necessary to instruct
++# a single member job to finalize.
++#
++# @id: The job identifier.
++#
++# Returns: Nothing on success
++#
++# Since: 2.12
++##
++{ 'command': 'block-job-finalize', 'data': { 'id': 'str' } }
++
++##
+ # @BlockdevDiscardOptions:
+ #
+ # Determines how to handle discard requests.
+diff --git a/include/block/blockjob.h b/include/block/blockjob.h
+index 7c8d51effa..978274ed2b 100644
+--- a/include/block/blockjob.h
++++ b/include/block/blockjob.h
+@@ -244,6 +244,23 @@ void block_job_cancel(BlockJob *job);
+  */
+ void block_job_complete(BlockJob *job, Error **errp);
+ 
++
++/**
++ * block_job_finalize:
++ * @job: The job to fully commit and finish.
++ * @errp: Error object.
++ *
++ * For jobs that have finished their work and are pending
++ * awaiting explicit acknowledgement to commit their work,
++ * This will commit that work.
++ *
++ * FIXME: Make the below statement universally true:
++ * For jobs that support the manual workflow mode, all graph
++ * changes that occur as a result will occur after this command
++ * and before a successful reply.
++ */
++void block_job_finalize(BlockJob *job, Error **errp);
++
+ /**
+  * block_job_dismiss:
+  * @job: The job to be dismissed.
+diff --git a/blockdev.c b/blockdev.c
+index 9900cbc7dd..efd3ab2e99 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3853,6 +3853,20 @@ void qmp_block_job_complete(const char *device, Error **errp)
+     aio_context_release(aio_context);
+ }
+ 
++void qmp_block_job_finalize(const char *id, Error **errp)
++{
++    AioContext *aio_context;
++    BlockJob *job = find_block_job(id, &aio_context, errp);
++
++    if (!job) {
++        return;
++    }
++
++    trace_qmp_block_job_finalize(job);
++    block_job_finalize(job, errp);
++    aio_context_release(aio_context);
++}
++
+ void qmp_block_job_dismiss(const char *id, Error **errp)
+ {
+     AioContext *aio_context;
 diff --git a/blockjob.c b/blockjob.c
-index 1395d8eed1..996278ed9c 100644
+index 3880a89678..4b73cb0263 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -44,26 +44,27 @@ static QemuMutex block_job_mutex;
- 
- /* BlockJob State Transition Table */
- bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
--                                          /* U, C, R, P, Y, S, X, E, N */
--    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0, 0, 0, 0},
--    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0, 1, 0, 1},
--    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0, 1, 1, 0},
--    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0, 0, 0, 0},
--    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1, 1, 1, 0},
--    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0, 0, 0, 0},
--    /* X: */ [BLOCK_JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 1, 1, 0},
--    /* E: */ [BLOCK_JOB_STATUS_CONCLUDED] = {0, 0, 0, 0, 0, 0, 0, 0, 1},
--    /* N: */ [BLOCK_JOB_STATUS_NULL]      = {0, 0, 0, 0, 0, 0, 0, 0, 0},
-+                                          /* U, C, R, P, Y, S, W, X, E, N */
-+    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-+    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0, 0, 1, 0, 1},
-+    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0, 1, 1, 0, 0},
-+    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
-+    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1, 1, 1, 0, 0},
-+    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-+    /* W: */ [BLOCK_JOB_STATUS_WAITING]   = {0, 0, 0, 0, 0, 0, 0, 1, 1, 0},
-+    /* X: */ [BLOCK_JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 0, 1, 1, 0},
-+    /* E: */ [BLOCK_JOB_STATUS_CONCLUDED] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-+    /* N: */ [BLOCK_JOB_STATUS_NULL]      = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+@@ -65,6 +65,7 @@ bool BlockJobVerbTable[BLOCK_JOB_VERB__MAX][BLOCK_JOB_STATUS__MAX] = {
+     [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
+     [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
+     [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
++    [BLOCK_JOB_VERB_FINALIZE]             = {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+     [BLOCK_JOB_VERB_DISMISS]              = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
  };
  
- bool BlockJobVerbTable[BLOCK_JOB_VERB__MAX][BLOCK_JOB_STATUS__MAX] = {
--                                          /* U, C, R, P, Y, S, X, E, N */
--    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1, 0, 0, 0},
--    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1, 0, 0, 0},
--    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0, 0, 0},
--    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0, 0, 0},
--    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0, 0, 0},
--    [BLOCK_JOB_VERB_DISMISS]              = {0, 0, 0, 0, 0, 0, 0, 1, 0},
-+                                          /* U, C, R, P, Y, S, W, X, E, N */
-+    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1, 1, 0, 0, 0},
-+    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0},
-+    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0},
-+    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0},
-+    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-+    [BLOCK_JOB_VERB_DISMISS]              = {0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
- };
+@@ -449,7 +450,7 @@ static void block_job_clean(BlockJob *job)
+     }
+ }
  
- static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
-@@ -596,6 +597,8 @@ static void block_job_completed_txn_success(BlockJob *job)
-     BlockJob *other_job;
-     int rc = 0;
+-static int block_job_completed_single(BlockJob *job)
++static int block_job_finalize_single(BlockJob *job)
+ {
+     assert(job->completed);
  
-+    block_job_state_transition(job, BLOCK_JOB_STATUS_WAITING);
+@@ -590,18 +591,36 @@ static void block_job_completed_txn_abort(BlockJob *job)
+             assert(other_job->cancelled);
+             block_job_finish_sync(other_job, NULL, NULL);
+         }
+-        block_job_completed_single(other_job);
++        block_job_finalize_single(other_job);
+         aio_context_release(ctx);
+     }
+ 
+     block_job_txn_unref(txn);
+ }
+ 
++static int block_job_needs_finalize(BlockJob *job)
++{
++    return !job->auto_finalize;
++}
 +
-     /*
-      * Successful completion, see if there are other running jobs in this
-      * txn.
++static void block_job_do_finalize(BlockJob *job)
++{
++    int rc;
++    assert(job && job->txn);
++
++    /* prepare the transaction to complete */
++    rc = block_job_txn_apply(job->txn, block_job_prepare, true);
++    if (rc) {
++        block_job_completed_txn_abort(job);
++    } else {
++        block_job_txn_apply(job->txn, block_job_finalize_single, true);
++    }
++}
++
+ static void block_job_completed_txn_success(BlockJob *job)
+ {
+     BlockJobTxn *txn = job->txn;
+     BlockJob *other_job;
+-    int rc = 0;
+ 
+     block_job_state_transition(job, BLOCK_JOB_STATUS_WAITING);
+ 
+@@ -616,16 +635,12 @@ static void block_job_completed_txn_success(BlockJob *job)
+         assert(other_job->ret == 0);
+     }
+ 
+-    /* Jobs may require some prep-work to complete without failure */
+-    rc = block_job_txn_apply(txn, block_job_prepare, true);
+-    if (rc) {
+-        block_job_completed_txn_abort(job);
+-        return;
+-    }
+-
+-    /* We are the last completed job, commit the transaction. */
+     block_job_txn_apply(txn, block_job_event_pending, false);
+-    block_job_txn_apply(txn, block_job_completed_single, true);
++
++    /* If no jobs need manual finalization, automatically do so */
++    if (block_job_txn_apply(txn, block_job_needs_finalize, false) == 0) {
++        block_job_do_finalize(job);
++    }
+ }
+ 
+ /* Assumes the block_job_mutex is held */
+@@ -677,6 +692,15 @@ void block_job_complete(BlockJob *job, Error **errp)
+     job->driver->complete(job, errp);
+ }
+ 
++void block_job_finalize(BlockJob *job, Error **errp)
++{
++    assert(job && job->id && job->txn);
++    if (block_job_apply_verb(job, BLOCK_JOB_VERB_FINALIZE, errp)) {
++        return;
++    }
++    block_job_do_finalize(job);
++}
++
+ void block_job_dismiss(BlockJob **jobptr, Error **errp)
+ {
+     BlockJob *job = *jobptr;
+@@ -727,11 +751,15 @@ void block_job_cancel(BlockJob *job)
+ {
+     if (job->status == BLOCK_JOB_STATUS_CONCLUDED) {
+         block_job_do_dismiss(job);
+-    } else if (block_job_started(job)) {
+-        block_job_cancel_async(job);
+-        block_job_enter(job);
+-    } else {
++        return;
++    }
++    block_job_cancel_async(job);
++    if (!block_job_started(job)) {
+         block_job_completed(job, -ECANCELED);
++    } else if (job->deferred_to_main_loop) {
++        block_job_completed_txn_abort(job);
++    } else {
++        block_job_enter(job);
+     }
+ }
+ 
+diff --git a/block/trace-events b/block/trace-events
+index 5e531e0310..a81b66ff36 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -51,6 +51,7 @@ qmp_block_job_cancel(void *job) "job %p"
+ qmp_block_job_pause(void *job) "job %p"
+ qmp_block_job_resume(void *job) "job %p"
+ qmp_block_job_complete(void *job) "job %p"
++qmp_block_job_finalize(void *job) "job %p"
+ qmp_block_job_dismiss(void *job) "job %p"
+ qmp_block_stream(void *bs, void *job) "bs %p job %p"
+ 
 -- 
 2.13.6
