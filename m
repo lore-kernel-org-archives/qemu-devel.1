@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46135)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evnQu-0003o5-0z
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:09:53 -0400
+	(envelope-from <jsnow@redhat.com>) id 1evnRu-0004kh-QK
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:10:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evnQt-00064W-3Q
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:09:51 -0400
-Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:46034)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1evnQs-00063C-VH
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:09:51 -0400
-Received: by mail-ot0-x232.google.com with SMTP id w12-v6so334283ote.12
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 10:09:50 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1evnRt-0006yp-PN
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:10:54 -0400
+References: <20180207155837.92351-1-vsementsov@virtuozzo.com>
+	<20180207155837.92351-6-vsementsov@virtuozzo.com>
+	<20180312153020.GI3219@work-vm>
+	<af82d663-f37c-2857-214c-83e348a5f52a@virtuozzo.com>
+	<20180313103056.GB3545@work-vm>
+	<9bc43da5-027a-cd11-0c13-b9a9432e0fdb@virtuozzo.com>
+	<20180313153513.GG3545@work-vm>
+	<9f65e973-d3d3-09bf-5cf0-eac8d9e20b97@virtuozzo.com>
+	<3a057d44-13e0-b208-cdce-96884bc03952@redhat.com>
+	<76f42ea0-86df-a389-568c-95f31a57f1da@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <239c1962-44d0-8776-23d7-488f2a84896c@redhat.com>
+Date: Tue, 13 Mar 2018 13:10:39 -0400
 MIME-Version: 1.0
-In-Reply-To: <MWHPR21MB018983B74A652443B70680F19ED20@MWHPR21MB0189.namprd21.prod.outlook.com>
-References: <20180313153458.26822-1-peter.maydell@linaro.org>
-	<20180313153458.26822-9-peter.maydell@linaro.org>
-	<MWHPR21MB018983B74A652443B70680F19ED20@MWHPR21MB0189.namprd21.prod.outlook.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Mar 2018 17:09:30 +0000
-Message-ID: <CAFEAcA8O7EEhoS83eRLH5bVmog_Qu1tAgUzR6NsE+GD2a7FsDw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 8/9] hw/arm/bcm2836: Hardcode correct CPU
- type
+In-Reply-To: <76f42ea0-86df-a389-568c-95f31a57f1da@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v10 05/12] migration: introduce
+ postcopy-only pending
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +33,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Pekka Enberg <penberg@iki.fi>, "patches@linaro.org" <patches@linaro.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, den@openvz.org, lirans@il.ibm.com
 
-On 13 March 2018 at 16:55, Andrew Baumann <Andrew.Baumann@microsoft.com> wrote:
->> From: Qemu-devel <qemu-devel-
->> bounces+andrew.baumann=microsoft.com@nongnu.org> On Behalf Of Peter
->> Maydell
->> Sent: Tuesday, 13 March 2018 08:35
+
+
+On 03/13/2018 12:33 PM, Vladimir Sementsov-Ogievskiy wrote:
+> 13.03.2018 19:16, John Snow wrote:
 >>
->> Now we have separate types for BCM2386 and BCM2387, we might as well
->> just hard-code the CPU type they use rather than having it passed
->> through as an object property. This then lets us put the initialization
->> of the CPU object in init rather than realize.
+>> On 03/13/2018 12:14 PM, Vladimir Sementsov-Ogievskiy wrote:
+>>> Hmm, I agree, it is the simplest thing we can do for now, and I'll
+>>> rethink later,
+>>> how (and is it worth doing) to go to postcopy automatically in case of
+>>> only-dirty-bitmaps.
+>>> Should I respin?
+>> Please do. I already staged patches 1-4 in my branch, so if you'd like,
+>> you can respin just 5+.
 >>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> https://github.com/jnsnow/qemu/tree/bitmaps
+>>
+>> --js
+> 
+> Ok, I'll base on your branch. How should I write Based-on: for patchew
+> in this case?
+> 
 
->>  static const BCM283XInfo bcm283x_socs[] = {
->>      {
->>          .name = TYPE_BCM2836,
->> +        .cpu_type = ARM_CPU_TYPE_NAME("cortex-a15"),
->
-> At some point I remember seeing a patch to change this to cortex-a7. Is there a reason we didn't make that change?
->
-> (Background: the real Pi2 has an A7. When I first implemented the machine model there was no A7 emulation in QEMU, so I used the A15 which was the closest equivalent.)
+You know, that's actually a good question... just send out the whole
+series for the sake of patchew. I Added an R-B to patches 1-4 and edited
+a single comment in #4.
 
-Yeah, we should do that. I'd forgotten about that, I think
-things just got lost in the shuffle of having several
-patchsets that tried to change the same things at once.
-
-I guess the simplest thing is to add a patch at the end of
-the series that fixes the cpu type for bcm2836.
-
-
->> --- a/hw/arm/raspi.c
->> +++ b/hw/arm/raspi.c
->> @@ -150,8 +150,6 @@ static void raspi_init(MachineState *machine, int
->> version)
->>      /* Setup the SOC */
->>      object_property_add_const_link(OBJECT(&s->soc), "ram", OBJECT(&s->ram),
->>                                     &error_abort);
->> -    object_property_set_str(OBJECT(&s->soc), machine->cpu_type, "cpu-type",
->> -                            &error_abort);
->>      object_property_set_int(OBJECT(&s->soc), smp_cpus, "enabled-cpus",
->>                              &error_abort);
->>      int board_rev = version == 3 ? 0xa02082 : 0xa21041;
->
-> What about the default_cpu_type field of MachineClass set in
-> raspi[23]_machine_init? That seems irrelevant now...
-
-Mmm. It doesn't hurt anything, though.
-
-> Also, if anyone cares (I don't), we also just lost the ability
-> to override the CPU type of a raspi model.
-
-Yeah, that's deliberate -- I think that letting the user randomly
-plug nonexistent combinations together just confuses people when
-they don't work. I guess I should call it out in the commit message
-though.
-
-thanks
--- PMM
+--js
