@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdI-0001W3-6Q
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:40 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdH-0001Up-4Q
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdG-0004gV-So
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:36 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdF-0004fT-DV
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:35 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Mar 2018 17:17:45 +0100
-Message-Id: <20180313161803.1814-24-kwolf@redhat.com>
+Date: Tue, 13 Mar 2018 17:17:39 +0100
+Message-Id: <20180313161803.1814-18-kwolf@redhat.com>
 In-Reply-To: <20180313161803.1814-1-kwolf@redhat.com>
 References: <20180313161803.1814-1-kwolf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 23/41] luks: Create
- block_crypto_co_create_generic()
+Subject: [Qemu-devel] [PULL 17/41] blockjobs: add PENDING status and event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,160 +22,278 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-Everything that refers to the protocol layer or QemuOpts is moved out of
-block_crypto_create_generic(), so that the remaining function is
-suitable to be called by a .bdrv_co_create implementation.
+From: John Snow <jsnow@redhat.com>
 
-LUKS is the only driver that actually implements the old interface, and
-we don't intend to use it in any new drivers, so put the moved out code
-directly into a LUKS function rather than creating a generic
-intermediate one.
+For jobs utilizing the new manual workflow, we intend to prohibit
+them from modifying the block graph until the management layer provides
+an explicit ACK via block-job-finalize to move the process forward.
 
+To distinguish this runstate from "ready" or "waiting," we add a new
+"pending" event and status.
+
+For now, the transition from PENDING to CONCLUDED/ABORTING is automatic,
+but a future commit will add the explicit block-job-finalize step.
+
+Transitions:
+Waiting -> Pending:   Normal transition.
+Pending -> Concluded: Normal transition.
+Pending -> Aborting:  Late transactional failures and cancellations.
+
+Removed Transitions:
+Waiting -> Concluded: Jobs must go to PENDING first.
+
+Verbs:
+Cancel: Can be applied to a pending job.
+
+             +---------+
+             |UNDEFINED|
+             +--+------+
+                |
+             +--v----+
+   +---------+CREATED+-----------------+
+   |         +--+----+                 |
+   |            |                      |
+   |         +--+----+     +------+    |
+   +---------+RUNNING<----->PAUSED|    |
+   |         +--+-+--+     +------+    |
+   |            | |                    |
+   |            | +------------------+ |
+   |            |                    | |
+   |         +--v--+       +-------+ | |
+   +---------+READY<------->STANDBY| | |
+   |         +--+--+       +-------+ | |
+   |            |                    | |
+   |         +--v----+               | |
+   +---------+WAITING<---------------+ |
+   |         +--+----+                 |
+   |            |                      |
+   |         +--v----+                 |
+   +---------+PENDING|                 |
+   |         +--+----+                 |
+   |            |                      |
++--v-----+   +--v------+               |
+|ABORTING+--->CONCLUDED|               |
++--------+   +--+------+               |
+                |                      |
+             +--v-+                    |
+             |NULL<--------------------+
+             +----+
+
+Signed-off-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/crypto.c | 95 +++++++++++++++++++++++++++++++++++++---------------=
-------
- 1 file changed, 61 insertions(+), 34 deletions(-)
+ qapi/block-core.json     | 31 +++++++++++++++++++++-
+ include/block/blockjob.h |  5 ++++
+ blockjob.c               | 67 +++++++++++++++++++++++++++++++-----------------
+ 3 files changed, 78 insertions(+), 25 deletions(-)
 
-diff --git a/block/crypto.c b/block/crypto.c
-index 77871640cc..b0a4cb3388 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -306,43 +306,29 @@ static int block_crypto_open_generic(QCryptoBlockFo=
-rmat format,
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 6631614d0b..0ae12272ff 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1002,6 +1002,11 @@
+ #           to the waiting state. This status will likely not be visible for
+ #           the last job in a transaction.
+ #
++# @pending: The job has finished its work, but has finalization steps that it
++#           needs to make prior to completing. These changes may require
++#           manual intervention by the management process if manual was set
++#           to true. These changes may still fail.
++#
+ # @aborting: The job is in the process of being aborted, and will finish with
+ #            an error. The job will afterwards report that it is @concluded.
+ #            This status may not be visible to the management process.
+@@ -1016,7 +1021,7 @@
+ ##
+ { 'enum': 'BlockJobStatus',
+   'data': ['undefined', 'created', 'running', 'paused', 'ready', 'standby',
+-           'waiting', 'aborting', 'concluded', 'null' ] }
++           'waiting', 'pending', 'aborting', 'concluded', 'null' ] }
+ 
+ ##
+ # @BlockJobInfo:
+@@ -4263,6 +4268,30 @@
+             'speed' : 'int' } }
+ 
+ ##
++# @BLOCK_JOB_PENDING:
++#
++# Emitted when a block job is awaiting explicit authorization to finalize graph
++# changes via @block-job-finalize. If this job is part of a transaction, it will
++# not emit this event until the transaction has converged first.
++#
++# @type: job type
++#
++# @id: The job identifier.
++#
++# Since: 2.12
++#
++# Example:
++#
++# <- { "event": "BLOCK_JOB_WAITING",
++#      "data": { "device": "drive0", "type": "mirror" },
++#      "timestamp": { "seconds": 1265044230, "microseconds": 450486 } }
++#
++##
++{ 'event': 'BLOCK_JOB_PENDING',
++  'data': { 'type'  : 'BlockJobType',
++            'id'    : 'str' } }
++
++##
+ # @PreallocMode:
+ #
+ # Preallocation mode of QEMU image file
+diff --git a/include/block/blockjob.h b/include/block/blockjob.h
+index c535829b46..7c8d51effa 100644
+--- a/include/block/blockjob.h
++++ b/include/block/blockjob.h
+@@ -142,6 +142,9 @@ typedef struct BlockJob {
+     /** Current state; See @BlockJobStatus for details. */
+     BlockJobStatus status;
+ 
++    /** True if this job should automatically finalize itself */
++    bool auto_finalize;
++
+     /** True if this job should automatically dismiss itself */
+     bool auto_dismiss;
+ 
+@@ -154,6 +157,8 @@ typedef enum BlockJobCreateFlags {
+     BLOCK_JOB_DEFAULT = 0x00,
+     /* BlockJob is not QMP-created and should not send QMP events */
+     BLOCK_JOB_INTERNAL = 0x01,
++    /* BlockJob requires manual finalize step */
++    BLOCK_JOB_MANUAL_FINALIZE = 0x02,
+     /* BlockJob requires manual dismiss step */
+     BLOCK_JOB_MANUAL_DISMISS = 0x04,
+ } BlockJobCreateFlags;
+diff --git a/blockjob.c b/blockjob.c
+index 996278ed9c..3880a89678 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -44,27 +44,28 @@ static QemuMutex block_job_mutex;
+ 
+ /* BlockJob State Transition Table */
+ bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
+-                                          /* U, C, R, P, Y, S, W, X, E, N */
+-    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+-    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0, 0, 1, 0, 1},
+-    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0, 1, 1, 0, 0},
+-    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+-    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1, 1, 1, 0, 0},
+-    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+-    /* W: */ [BLOCK_JOB_STATUS_WAITING]   = {0, 0, 0, 0, 0, 0, 0, 1, 1, 0},
+-    /* X: */ [BLOCK_JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 0, 1, 1, 0},
+-    /* E: */ [BLOCK_JOB_STATUS_CONCLUDED] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+-    /* N: */ [BLOCK_JOB_STATUS_NULL]      = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
++                                          /* U, C, R, P, Y, S, W, D, X, E, N */
++    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
++    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1},
++    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0},
++    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
++    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0},
++    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
++    /* W: */ [BLOCK_JOB_STATUS_WAITING]   = {0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0},
++    /* D: */ [BLOCK_JOB_STATUS_PENDING]   = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0},
++    /* X: */ [BLOCK_JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0},
++    /* E: */ [BLOCK_JOB_STATUS_CONCLUDED] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
++    /* N: */ [BLOCK_JOB_STATUS_NULL]      = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+ };
+ 
+ bool BlockJobVerbTable[BLOCK_JOB_VERB__MAX][BLOCK_JOB_STATUS__MAX] = {
+-                                          /* U, C, R, P, Y, S, W, X, E, N */
+-    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1, 1, 0, 0, 0},
+-    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0},
+-    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0},
+-    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0},
+-    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+-    [BLOCK_JOB_VERB_DISMISS]              = {0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
++                                          /* U, C, R, P, Y, S, W, D, X, E, N */
++    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
++    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
++    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
++    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
++    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
++    [BLOCK_JOB_VERB_DISMISS]              = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
+ };
+ 
+ static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
+@@ -115,6 +116,7 @@ static void __attribute__((__constructor__)) block_job_init(void)
+ 
+ static void block_job_event_cancelled(BlockJob *job);
+ static void block_job_event_completed(BlockJob *job, const char *msg);
++static int block_job_event_pending(BlockJob *job);
+ static void block_job_enter_cond(BlockJob *job, bool(*fn)(BlockJob *job));
+ 
+ /* Transactional group of block jobs */
+@@ -497,17 +499,21 @@ static void block_job_cancel_async(BlockJob *job)
+     job->cancelled = true;
  }
-=20
-=20
--static int block_crypto_create_generic(QCryptoBlockFormat format,
--                                       const char *filename,
--                                       QemuOpts *opts,
--                                       Error **errp)
-+static int block_crypto_co_create_generic(BlockDriverState *bs,
-+                                          int64_t size,
-+                                          QCryptoBlockCreateOptions *opt=
-s,
-+                                          Error **errp)
+ 
+-static int block_job_txn_apply(BlockJobTxn *txn, int fn(BlockJob *))
++static int block_job_txn_apply(BlockJobTxn *txn, int fn(BlockJob *), bool lock)
  {
--    int ret =3D -EINVAL;
--    QCryptoBlockCreateOptions *create_opts =3D NULL;
-+    int ret;
-+    BlockBackend *blk;
-     QCryptoBlock *crypto =3D NULL;
--    struct BlockCryptoCreateData data =3D {
--        .size =3D ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0=
-),
--                         BDRV_SECTOR_SIZE),
--    };
--    QDict *cryptoopts;
--
--    /* Parse options */
--    cryptoopts =3D qemu_opts_to_qdict(opts, NULL);
-+    struct BlockCryptoCreateData data;
-=20
--    create_opts =3D block_crypto_create_opts_init(format, cryptoopts, er=
-rp);
--    if (!create_opts) {
--        return -1;
--    }
-+    blk =3D blk_new(BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
-=20
--    /* Create protocol layer */
--    ret =3D bdrv_create_file(filename, opts, errp);
-+    ret =3D blk_insert_bs(blk, bs, errp);
-     if (ret < 0) {
--        return ret;
-+        goto cleanup;
+     AioContext *ctx;
+     BlockJob *job, *next;
+     int rc;
+ 
+     QLIST_FOREACH_SAFE(job, &txn->jobs, txn_list, next) {
+-        ctx = blk_get_aio_context(job->blk);
+-        aio_context_acquire(ctx);
++        if (lock) {
++            ctx = blk_get_aio_context(job->blk);
++            aio_context_acquire(ctx);
++        }
+         rc = fn(job);
+-        aio_context_release(ctx);
++        if (lock) {
++            aio_context_release(ctx);
++        }
+         if (rc) {
+             break;
+         }
+@@ -611,14 +617,15 @@ static void block_job_completed_txn_success(BlockJob *job)
      }
-=20
--    data.blk =3D blk_new_open(filename, NULL, NULL,
--                            BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCO=
-L,
--                            errp);
--    if (!data.blk) {
--        return -EINVAL;
--    }
-+    data =3D (struct BlockCryptoCreateData) {
-+        .blk =3D blk,
-+        .size =3D size,
-+    };
-=20
--    /* Create format layer */
--    crypto =3D qcrypto_block_create(create_opts, NULL,
-+    crypto =3D qcrypto_block_create(opts, NULL,
-                                   block_crypto_init_func,
-                                   block_crypto_write_func,
-                                   &data,
-@@ -355,10 +341,8 @@ static int block_crypto_create_generic(QCryptoBlockF=
-ormat format,
-=20
-     ret =3D 0;
-  cleanup:
--    QDECREF(cryptoopts);
-     qcrypto_block_free(crypto);
--    blk_unref(data.blk);
--    qapi_free_QCryptoBlockCreateOptions(create_opts);
-+    blk_unref(blk);
-     return ret;
+ 
+     /* Jobs may require some prep-work to complete without failure */
+-    rc = block_job_txn_apply(txn, block_job_prepare);
++    rc = block_job_txn_apply(txn, block_job_prepare, true);
+     if (rc) {
+         block_job_completed_txn_abort(job);
+         return;
+     }
+ 
+     /* We are the last completed job, commit the transaction. */
+-    block_job_txn_apply(txn, block_job_completed_single);
++    block_job_txn_apply(txn, block_job_event_pending, false);
++    block_job_txn_apply(txn, block_job_completed_single, true);
  }
-=20
-@@ -563,8 +547,51 @@ static int coroutine_fn block_crypto_co_create_opts_=
-luks(const char *filename,
-                                                          QemuOpts *opts,
-                                                          Error **errp)
- {
--    return block_crypto_create_generic(Q_CRYPTO_BLOCK_FORMAT_LUKS,
--                                       filename, opts, errp);
-+    QCryptoBlockCreateOptions *create_opts =3D NULL;
-+    BlockDriverState *bs =3D NULL;
-+    QDict *cryptoopts;
-+    int64_t size;
-+    int ret;
-+
-+    /* Parse options */
-+    size =3D qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0);
-+
-+    cryptoopts =3D qemu_opts_to_qdict_filtered(opts, NULL,
-+                                             &block_crypto_create_opts_l=
-uks,
-+                                             true);
-+
-+    create_opts =3D block_crypto_create_opts_init(Q_CRYPTO_BLOCK_FORMAT_=
-LUKS,
-+                                                cryptoopts, errp);
-+    if (!create_opts) {
-+        ret =3D -EINVAL;
-+        goto fail;
-+    }
-+
-+    /* Create protocol layer */
-+    ret =3D bdrv_create_file(filename, opts, errp);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    bs =3D bdrv_open(filename, NULL, NULL,
-+                   BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL, errp);
-+    if (!bs) {
-+        ret =3D -EINVAL;
-+        goto fail;
-+    }
-+
-+    /* Create format layer */
-+    ret =3D block_crypto_co_create_generic(bs, size, create_opts, errp);
-+    if (ret < 0) {
-+        goto fail;
-+    }
-+
-+    ret =3D 0;
-+fail:
-+    bdrv_unref(bs);
-+    qapi_free_QCryptoBlockCreateOptions(create_opts);
-+    QDECREF(cryptoopts);
-+    return ret;
+ 
+ /* Assumes the block_job_mutex is held */
+@@ -827,6 +834,17 @@ static void block_job_event_completed(BlockJob *job, const char *msg)
+                                         &error_abort);
  }
-=20
- static int block_crypto_get_info_luks(BlockDriverState *bs,
---=20
+ 
++static int block_job_event_pending(BlockJob *job)
++{
++    block_job_state_transition(job, BLOCK_JOB_STATUS_PENDING);
++    if (!job->auto_finalize && !block_job_is_internal(job)) {
++        qapi_event_send_block_job_pending(job->driver->job_type,
++                                          job->id,
++                                          &error_abort);
++    }
++    return 0;
++}
++
+ /*
+  * API for block job drivers and the block layer.  These functions are
+  * declared in blockjob_int.h.
+@@ -888,6 +906,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+     job->paused        = true;
+     job->pause_count   = 1;
+     job->refcnt        = 1;
++    job->auto_finalize = !(flags & BLOCK_JOB_MANUAL_FINALIZE);
+     job->auto_dismiss  = !(flags & BLOCK_JOB_MANUAL_DISMISS);
+     block_job_state_transition(job, BLOCK_JOB_STATUS_CREATED);
+     aio_timer_init(qemu_get_aio_context(), &job->sleep_timer,
+-- 
 2.13.6
