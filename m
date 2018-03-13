@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1evkAh-00052j-Ta
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:40:57 -0400
+	(envelope-from <eblake@redhat.com>) id 1evkHA-00088r-N2
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:47:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1evkAd-00065q-Un
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:40:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51408)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1evkAd-00065Z-OJ
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:40:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1evkAc-0000KY-Oz
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 13:40:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B3DA92E8055
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 13:40:50 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1evkH8-0000G3-OL
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:47:36 -0400
+References: <20180312152126.286890-1-vsementsov@virtuozzo.com>
+	<20180312152126.286890-4-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <88dd6a74-56a4-b63d-2b33-354443586331@redhat.com>
+Date: Tue, 13 Mar 2018 08:47:17 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 13 Mar 2018 13:34:53 -0000
-From: Antoine <1755479@bugs.launchpad.net>
-Reply-To: Bug 1755479 <1755479@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <152094809386.3778.6282045564987107259.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1755479] [NEW] Cortex M:qemu abort with optimized
- code and icount
+In-Reply-To: <20180312152126.286890-4-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/8] nbd: BLOCK_STATUS for standard
+ get_block_status function: server part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,112 +25,399 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-Public bug reported:
+On 03/12/2018 10:21 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Minimal realization: only one extent in server answer is supported.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+> 
+> v2: - constants and type defs were splitted out by Eric, except for
+>      NBD_META_ID_BASE_ALLOCATION
 
-A basic program runs fine if compiled with flag -O0 with gcc, but triggers =
-a qemu abort when compiled with -O1 and run with icount:
-"qemu: fatal: IO on conditional branch instruction"
+The constant for NBD_META_ID_BASE_ALLOCATION was intentionally not split 
+out; it is the only constant that is relevant only to the server side ;) 
+  In fact,...
 
-I also noticed the problem on C source like this with -O0:
-"int foo =3D *bar; bar++;" : OK
-"int foo =3D *bar++;" : FAIL (!!!)
+>      - add nbd_opt_skip, to skip meta query remainder, if we are already sure,
+>      that the query selects nothing
+>      - check meta export name in OPT_EXPORT_NAME and OPT_GO
+>      - always set context_id = 0 for NBD_OPT_LIST_META_CONTEXT
+>      - negotiation rewritten to avoid wasting time and memory on reading long,
+>      obviously invalid meta queries
+>      - fixed ERR_INVALID->ERR_UNKNOWN if export not found in nbd_negotiate_meta_queries
+>      - check client->export_meta.valid in "case NBD_CMD_BLOCK_STATUS"
+> 
+> 
+>   include/block/nbd.h |   2 +
+>   nbd/server.c        | 310 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 312 insertions(+)
+> 
+> diff --git a/include/block/nbd.h b/include/block/nbd.h
+> index 2285637e67..9f2be18186 100644
+> --- a/include/block/nbd.h
+> +++ b/include/block/nbd.h
+> @@ -188,6 +188,8 @@ typedef struct NBDExtent {
+>   #define NBD_CMD_FLAG_REQ_ONE    (1 << 3) /* only one extent in BLOCK_STATUS
+>                                             * reply chunk */
+>   
+> +#define NBD_META_ID_BASE_ALLOCATION 0
+> +
 
-Optimized binary attached to this ticket.
+...I will be squashing in a change to move it out of the .h and into the .c.
 
-command line:
-qemu-system-arm -M lm3s6965evb -nographic -kernel hello.bin -serial file:$(=
-tty) -icount 4 -cpu cortex-m4
-(working fine without icount)
+>   /* Supported request types */
+>   enum {
+>       NBD_CMD_READ = 0,
+> diff --git a/nbd/server.c b/nbd/server.c
+> index 085e14afbf..16d7388085 100644
+> --- a/nbd/server.c
 
-version: =
+> @@ -371,6 +396,12 @@ static int nbd_negotiate_handle_list(NBDClient *client, Error **errp)
+>       return nbd_negotiate_send_rep(client, NBD_REP_ACK, errp);
+>   }
+>   
+> +static void nbd_check_meta_export_name(NBDClient *client)
+> +{
+> +    client->export_meta.valid = client->export_meta.valid &&
+> +        strcmp(client->exp->name, client->export_meta.export_name) == 0;
 
-QEMU emulator version 2.11.50 (v2.11.0-2146-gd9bbfea-dirty)
+The indentation makes this harder for me to parse (at first glance, I 
+thought you had (a) && (b), and were either missing a side effect or 
+return statement).  It's a lot more obvious what you are doing with:
 
-Compilation options:
-./configure --target-list=3Darm-softmmu --disable-slirp --disable-blobs --d=
-isable-docs --disable-guest-agent --disable-gnutls --disable-nettle --disab=
-le-gcrypt --disable-sdl --disable-gtk --disable-vnc --disable-virtfs --disa=
-ble-mpath --disable-xen --disable-brlapi --disable-curl --disable-bluez --d=
-isable-kvm --disable-hax --disable-hvf --disable-whpx --disable-rdma --disa=
-ble-vde --disable-netmap --disable-linux-aio --disable-cap-ng --disable-att=
-r --disable-vhost-net --disable-spice --disable-rbd --disable-libiscsi --di=
-sable-libnfs --disable-smartcard --disable-libusb --disable-live-block-migr=
-ation --disable-usb-redir --disable-lzo --disable-snappy --disable-bzip2 --=
-disable-seccomp --disable-glusterfs --disable-tpm --disable-libssh2 --disab=
-le-numa --disable-libxml2 --disable-tcmalloc --disable-jemalloc --disable-r=
-eplication --disable-vhost-vsock --disable-opengl --disable-virglrenderer -=
--disable-xfsctl --disable-qom-cast-debug --disable-vxhs --disable-crypto-af=
-alg --disable-vhost-user --disable-capstone --disable-pie --extra-cflags=3D=
--mtune=3Dnative
+client->export_meta.valid &= !strcmp(client->exp->name,
+                                      client->export_meta.export_name);
 
-I have also tested previous versions:
-- stock qemu-system-arm 2.5.0 from ubuntu 16.04: OK
-- git version: QEMU emulator version 2.10.0 (v2.10.2-dirty): OK
-- git version: QEMU emulator version 2.10.90 (v2.11.0-rc0-dirty): FAIL
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+> +/* nbd_meta_base_query
+> + *
+> + * Handle query to 'base' namespace. For now, only base:allocation context is
+> + * available in it.
+> + *
+> + * Return -errno on I/O error, 0 if option was completely handled by
+> + * sending a reply about inconsistent lengths, or 1 on success. */
+> +static int nbd_meta_base_query(NBDClient *client, NBDExportMetaContexts *meta,
+> +                               uint32_t len, Error **errp)
 
-** Attachment added: "hello.bin"
-   https://bugs.launchpad.net/bugs/1755479/+attachment/5078133/+files/hello=
-.bin
+The comments don't describe what 'len' represents, I had to go read the 
+call-site before I could understand this function.  If I understand 
+correctly, this function is called at the point that we have parsed 
+"base:" out of the longer overall name given to LIST or SET, and len is 
+the remaining length of the overall name that still needs parsing.
 
--- =
+> +{
+> +    int ret;
+> +    char query[sizeof("allocation") - 1];
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1755479
+Why discard the trailing NUL from the size?  It doesn't hurt to leave it 
+in, unless...
 
-Title:
-  Cortex M:qemu abort with optimized code and icount
+> +    size_t alen = strlen("allocation");
 
-Status in QEMU:
-  New
+...Better than strlen() would be sizeof(query), as long as the trailing 
+NUL is not changing the size of the array.
 
-Bug description:
-  A basic program runs fine if compiled with flag -O0 with gcc, but trigger=
-s a qemu abort when compiled with -O1 and run with icount:
-  "qemu: fatal: IO on conditional branch instruction"
+> +
+> +    if (len == 0) {
+> +        if (client->opt == NBD_OPT_LIST_META_CONTEXT) {
+> +            meta->base_allocation = true;
+> +        }
+> +        return 1;
+> +    }
 
-  I also noticed the problem on C source like this with -O0:
-  "int foo =3D *bar; bar++;" : OK
-  "int foo =3D *bar++;" : FAIL (!!!)
+Okay, so here, the user requested "base:"; on list we return all 
+contexts that we know (base:allocation); on set we fall through.
 
-  Optimized binary attached to this ticket.
+> +
+> +    if (len != alen) {
+> +        return nbd_opt_skip(client, len, errp);
+> +    }
 
-  command line:
-  qemu-system-arm -M lm3s6965evb -nographic -kernel hello.bin -serial file:=
-$(tty) -icount 4 -cpu cortex-m4
-  (working fine without icount)
+Here, the user requested "base:garbage", where the garbage (including 
+empty string on set) is a different length than "base:allocation".  It 
+may be a valid string for a future NBD version, but for us, we know 
+right away it is is not something we recognize, so we gracefully skip it.
 
-  version: =
+Checking myself: if nbd_opt_skip returned -1, we have detected 
+communication problems with the client; it does not matter if there is 
+any unparsed data remaining in the current option.  It can only return 0 
+if nbd_opt_invalid has already finished parsing the entire option (we 
+are ready to parse the next NBD_OPT command, no further queries in the 
+current option matter).  It can only return 1 if we finished parsing the 
+current query, and are positioned ready to parse the next query. [1]
 
-  QEMU emulator version 2.11.50 (v2.11.0-2146-gd9bbfea-dirty)
+> +
+> +    ret = nbd_opt_read(client, query, len, errp);
+> +    if (ret <= 0) {
+> +        return ret;
+> +    }
+> +
+> +    if (strncmp(query, "allocation", alen) == 0) {
 
-  Compilation options:
-  ./configure --target-list=3Darm-softmmu --disable-slirp --disable-blobs -=
--disable-docs --disable-guest-agent --disable-gnutls --disable-nettle --dis=
-able-gcrypt --disable-sdl --disable-gtk --disable-vnc --disable-virtfs --di=
-sable-mpath --disable-xen --disable-brlapi --disable-curl --disable-bluez -=
--disable-kvm --disable-hax --disable-hvf --disable-whpx --disable-rdma --di=
-sable-vde --disable-netmap --disable-linux-aio --disable-cap-ng --disable-a=
-ttr --disable-vhost-net --disable-spice --disable-rbd --disable-libiscsi --=
-disable-libnfs --disable-smartcard --disable-libusb --disable-live-block-mi=
-gration --disable-usb-redir --disable-lzo --disable-snappy --disable-bzip2 =
---disable-seccomp --disable-glusterfs --disable-tpm --disable-libssh2 --dis=
-able-numa --disable-libxml2 --disable-tcmalloc --disable-jemalloc --disable=
--replication --disable-vhost-vsock --disable-opengl --disable-virglrenderer=
- --disable-xfsctl --disable-qom-cast-debug --disable-vxhs --disable-crypto-=
-afalg --disable-vhost-user --disable-capstone --disable-pie --extra-cflags=
-=3D-mtune=3Dnative
+Here, you HAD to use strncmp because you didn't leave room for the 
+trailing NUL in the array above.  Tradeoffs.  So I guess your approach 
+is okay.
 
-  I have also tested previous versions:
-  - stock qemu-system-arm 2.5.0 from ubuntu 16.04: OK
-  - git version: QEMU emulator version 2.10.0 (v2.10.2-dirty): OK
-  - git version: QEMU emulator version 2.10.90 (v2.11.0-rc0-dirty): FAIL
+> +        meta->base_allocation = true;
+> +    }
+> +
+> +    return 1;
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1755479/+subscriptions
+And if we get here, the user requested exactly "base:allocation", so we 
+enabled exactly that context.
+
+> +}
+> +
+> +/* nbd_negotiate_meta_query
+> + *
+> + * Parse namespace name and call corresponding function to parse body of the
+> + * query.
+> + *
+> + * The only supported namespace now is 'base'.
+> + *
+> + * The function aims not wasting time and memory to read long unknown namespace
+> + * names.
+> + *
+> + * Return -errno on I/O error, 0 if option was completely handled by
+> + * sending a reply about inconsistent lengths, or 1 on success. */
+> +static int nbd_negotiate_meta_query(NBDClient *client,
+> +                                    NBDExportMetaContexts *meta, Error **errp)
+> +{
+> +    int ret;
+> +    char query[sizeof("base:") - 1];
+> +    size_t baselen = strlen("base:");
+
+And since this matches the approach in the previous function, we'll keep 
+it consistent.
+
+> +    uint32_t len;
+> +
+> +    ret = nbd_opt_read(client, &len, sizeof(len), errp);
+> +    if (ret <= 0) {
+> +        return ret;
+> +    }
+> +    cpu_to_be32s(&len);
+> +
+> +    /* The only supported namespace for now is 'base'. So query should start
+> +     * with 'base:'. Otherwise, we can ignore it and skip the remainder. */
+> +    if (len < baselen) {
+> +        return nbd_opt_skip(client, len, errp);
+> +    }
+> +
+> +    len -= baselen;
+> +    ret = nbd_opt_read(client, query, baselen, errp);
+> +    if (ret <= 0) {
+> +        return ret;
+> +    }
+> +    if (strncmp(query, "base:", baselen) != 0) {
+
+Again, strncmp is a bit awkward compared to strcmp, but it works.
+
+> +        return nbd_opt_skip(client, len, errp);
+> +    }
+> +
+> +    return nbd_meta_base_query(client, meta, len, errp);
+> +}
+> +
+> +/* nbd_negotiate_meta_queries
+> + * Handle NBD_OPT_LIST_META_CONTEXT and NBD_OPT_SET_META_CONTEXT
+> + *
+> + * @meta may be NULL, if caller isn't interested in selected contexts (for
+> + *     NBD_OPT_LIST_META_CONTEXT)
+> + *
+> + * Return -errno on I/O error, 0 if option was completely handled by
+> + * sending a reply about inconsistent lengths, or 1 on success. */
+
+Comment is wrong - this function never returns 1 (nor should it, as 
+nbd_negotiate_options() expects a return of 1 only from NBD_OPT_ABORT).
+
+> +static int nbd_negotiate_meta_queries(NBDClient *client,
+> +                                      NBDExportMetaContexts *meta, Error **errp)
+> +{
+> +    int ret;
+> +    NBDExport *exp;
+> +    NBDExportMetaContexts local_meta;
+> +    uint32_t nb_queries;
+> +    int i;
+> +
+> +    assert(client->structured_reply);
+
+Perhaps worth a comment that this is safe because we already filtered it 
+out at the caller.
+
+> +
+> +    if (!meta) {
+> +        meta = &local_meta;
+> +    }
+> +
+> +    memset(meta, 0, sizeof(*meta));
+> +
+> +    ret = nbd_opt_read_name(client, meta->export_name, NULL, errp);
+> +    if (ret <= 0) {
+> +        return ret;
+> +    }
+> +
+> +    exp = nbd_export_find(meta->export_name);
+> +    if (exp == NULL) {
+> +        return nbd_opt_drop(client, NBD_REP_ERR_UNKNOWN, errp,
+> +                            "export '%s' not present", meta->export_name);
+> +    }
+> +
+
+It's nice to see my review comments from v1 fixed here ;)
+
+> +    ret = nbd_opt_read(client, &nb_queries, sizeof(nb_queries), errp);
+> +    if (ret <= 0) {
+> +        return ret;
+> +    }
+> +    cpu_to_be32s(&nb_queries);
+> +
+> +    for (i = 0; i < nb_queries; ++i) {
+> +        ret = nbd_negotiate_meta_query(client, meta, errp);
+> +        if (ret <= 0) {
+> +            return ret;
+
+[1] Okay, I've convinced myself we are good.  We can only early return 
+from this loop if we encountered a disconnect (result -1, either read or 
+write to client failed, no further communication is worth trying, so it 
+doesn't matter if we are left mid-option) or if we encountered an 
+inconsistent length and already replied successfully to the client about 
+their bogus request (result 0, we've already skipped to the end of the 
+current option, ready to parse the next NBD_OPT).
+
+> +        }
+> +    }
+
+Missing: On LIST, if nb_queries is 0 before the loop, then we must reply 
+with ALL supported contexts, rather than none (the behavior for SET is 
+correct, though).
+
+> +
+> +    if (meta->base_allocation) {
+> +        ret = nbd_negotiate_send_meta_context(client, "base:allocation",
+> +                                              NBD_META_ID_BASE_ALLOCATION,
+> +                                              errp);
+> +        if (ret < 0) {
+> +            return ret;
+> +        }
+> +    }
+> +
+> +    ret = nbd_negotiate_send_rep(client, NBD_REP_ACK, errp);
+> +    if (ret == 0) {
+> +        meta->valid = true;
+> +    }
+> +
+> +    return ret;
+
+Code is correct - all early returns and this final return are negative 
+or 0, where 0 means we parsed the entire NBD_OPT, gave a reply, and the 
+connection is ready for the next NBD_OPT.
+
+> +}
+> +
+>   /* nbd_negotiate_options
+>    * Process all NBD_OPT_* client option commands, during fixed newstyle
+>    * negotiation.
+> @@ -856,6 +1064,22 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
+>                   }
+>                   break;
+>   
+> +            case NBD_OPT_LIST_META_CONTEXT:
+> +            case NBD_OPT_SET_META_CONTEXT:
+> +                if (!client->structured_reply) {
+> +                    ret = nbd_opt_invalid(
+> +                            client, errp,
+> +                            "request option '%s' when structured reply "
+> +                            "is not negotiated", nbd_opt_lookup(option));
+> +                } else if (option == NBD_OPT_LIST_META_CONTEXT) {
+> +                    ret = nbd_negotiate_meta_queries(client, NULL, errp);
+> +                } else {
+> +                    ret = nbd_negotiate_meta_queries(client,
+> +                                                     &client->export_meta,
+> +                                                     errp);
+> +                }
+
+Looks good.
+
+If we WANTED to split this patch into two, then part 1 would be NBD_OPT 
+handling (were we just always return 0 contexts in reply to LIST or 
+SET), and part 2 would be NBD_CMD_BLOCK_STATUS handling plus enabling 
+base:allocation advertisement during NBD_OPT handling.  But I'm not 
+going to ask for a split now.
+
+> +                break;
+> +
+>               default:
+>                   ret = nbd_opt_drop(client, NBD_REP_ERR_UNSUP, errp,
+>                                      "Unsupported option %" PRIu32 " (%s)",
+> @@ -1485,6 +1709,79 @@ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
+>       return ret;
+>   }
+>   
+> +static int blockstatus_to_extent_be(BlockDriverState *bs, uint64_t offset,
+> +                                    uint64_t bytes, NBDExtent *extent)
+> +{
+> +    uint64_t remaining_bytes = bytes;
+> +
+> +    while (remaining_bytes) {
+> +        uint32_t flags;
+> +        int64_t num;
+> +        int ret = bdrv_block_status_above(bs, NULL, offset, remaining_bytes,
+> +                                          &num, NULL, NULL);
+> +        if (ret < 0) {
+> +            return ret;
+> +        }
+> +
+> +        flags = (ret & BDRV_BLOCK_ALLOCATED ? 0 : NBD_STATE_HOLE) |
+> +                (ret & BDRV_BLOCK_ZERO      ? NBD_STATE_ZERO : 0);
+
+I still need to fix what block_status_above returns for protocol drivers 
+per Kevin's review of my byte-based status patches, but that will be 
+during soft freeze (as it is in the bug fix category); it may have a 
+minor impact to this code.  But it shouldn't hold up this series.
+
+> @@ -1562,6 +1859,8 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
+>           valid_flags |= NBD_CMD_FLAG_DF;
+>       } else if (request->type == NBD_CMD_WRITE_ZEROES) {
+>           valid_flags |= NBD_CMD_FLAG_NO_HOLE;
+> +    } else if (request->type == NBD_CMD_BLOCK_STATUS) {
+> +        valid_flags |= NBD_CMD_FLAG_REQ_ONE;
+>       }
+>       if (request->flags & ~valid_flags) {
+>           error_setg(errp, "unsupported flags for command %s (got 0x%x)",
+> @@ -1690,6 +1989,17 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
+>   
+>           return nbd_send_generic_reply(client, request->handle, ret,
+>                                         "discard failed", errp);
+> +    case NBD_CMD_BLOCK_STATUS:
+> +        if (client->export_meta.valid && client->export_meta.base_allocation) {
+> +            return nbd_co_send_block_status(client, request->handle,
+> +                                            blk_bs(exp->blk), request->from,
+> +                                            request->len,
+> +                                            NBD_META_ID_BASE_ALLOCATION, errp);
+
+Will obviously be expanded as we add more namespaces (for dirty bitmap 
+queries), but works for your first cut of just reporting block status.
+
+> +        } else {
+> +            return nbd_send_generic_reply(client, request->handle, -EINVAL,
+> +                                          "CMD_BLOCK_STATUS not negotiated",
+> +                                          errp);
+> +        }
+>       default:
+>           msg = g_strdup_printf("invalid request type (%" PRIu32 ") received",
+>                                 request->type);
+> 
+
+I'm making tweaks as mentioned above, but this is close enough to get 
+into softfreeze.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
