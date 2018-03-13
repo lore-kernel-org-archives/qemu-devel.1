@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evnuA-0005AS-8B
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:40:07 -0400
+	(envelope-from <bounces@canonical.com>) id 1evo9G-00028B-6H
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:55:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evnu8-00032T-VP
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:40:06 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:33410)
+	(envelope-from <bounces@canonical.com>) id 1evo9B-0004AW-Ax
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:55:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56640)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1evnu8-00032A-Pe
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:40:04 -0400
-Received: by mail-oi0-x244.google.com with SMTP id e9so406055oii.0
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 10:40:04 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1evo9B-00048l-4G
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:55:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1evo99-0006g2-Qn
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 17:55:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C38E32E806B
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 17:55:35 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <08f1ea76-5b50-267e-4dfa-fbd39d19baff@mail.uni-paderborn.de>
-References: <CAFEAcA8Pu=SkYCPwCnRdKTEFPScsZhj4vJm0dTs+jV1jTWOAog@mail.gmail.com>
-	<0304e590-ab51-649b-7cee-bb7c5be6f5e4@redhat.com>
-	<c7b075f5-8084-99c0-02e0-3da555bea4df@mail.uni-paderborn.de>
-	<87y3j1jn8z.fsf@linaro.org>
-	<08f1ea76-5b50-267e-4dfa-fbd39d19baff@mail.uni-paderborn.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Mar 2018 17:39:43 +0000
-Message-ID: <CAFEAcA-JwWcB42CbL0rmZVYj06L+jT4BoK4tDaYmEprfcezNFg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Deprecate tilegx ?
+Date: Tue, 13 Mar 2018 17:48:25 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1755479 <1755479@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152094809386.3778.6282045564987107259.malonedeb@gac.canonical.com>
+Message-Id: <152096330564.15385.12269811726989702954.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1755479] Re: Cortex M:qemu abort with optimized
+ code and icount
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,46 +37,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Chen Gang <chengang@emindsoft.com.cn>, Chen Gang <gang.chen.5i5j@gmail.com>, Chen Gang <xili_gchen_5257@hotmail.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-On 13 March 2018 at 17:18, Bastian Koppelmann
-<kbastian@mail.uni-paderborn.de> wrote:
-> On 03/09/2018 04:13 PM, Alex Benn=C3=A9e wrote:
->>
->> Bastian Koppelmann <kbastian@mail.uni-paderborn.de> writes:
->
-> [...]
->>>
->>> I always saw it as a big plus that QEMU supports nearly any
->>> architecture, no matter how obscure it is. So I'm a bit more hesitant o=
-n
->>> dropping architectures quickly.
->>
->> All things being equal I agree, however there is a maintenance burden
->> for the QEMU upstream, especially if the only active use if on
->> out-of-tree branches or behind the closed doors of research groups.
->>
->> Looking at https://wiki.qemu.org/Documentation/Platforms/TileGX it
->> doesn't give much of an idea of where I would get toolchains to build
->> guest binaries or what guest user-space I could run.
->
->
-> I'm not saying, we shouldn't drop them. To me it felt like we brought jus=
-t
-> another target to the chop block while we were at it.
->
-> Maybe a good approach is to deprecate the target first, then ask if someb=
-ody
-> else is willing to maintain it, and if this fails, drop it.
+Yes, it looks like we accidentally broke icount. This patch from the mailin=
+g list fixes it:
+https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06595.html
 
-Personally, I think it's useful to consider not merely "do we
-have anybody actively maintaining this" (after all our x86 frontend
-is not exactly very well-loved!) but also "are there users of QEMU
-out there using it?" and "is this actually something that exists
-in the real world as actual silicon in any quantity?". I think
-unicore32 failed on both of those, but tilegx passes the latter
-and possibly the former.
+though it hasn't been code-reviewed yet.
 
-thanks
--- PMM
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1755479
+
+Title:
+  Cortex M:qemu abort with optimized code and icount
+
+Status in QEMU:
+  New
+
+Bug description:
+  A basic program runs fine if compiled with flag -O0 with gcc, but trigger=
+s a qemu abort when compiled with -O1 and run with icount:
+  "qemu: fatal: IO on conditional branch instruction"
+
+  I also noticed the problem on C source like this with -O0:
+  "int foo =3D *bar; bar++;" : OK
+  "int foo =3D *bar++;" : FAIL (!!!)
+
+  Optimized binary attached to this ticket.
+
+  command line:
+  qemu-system-arm -M lm3s6965evb -nographic -kernel hello.bin -serial file:=
+$(tty) -icount 4 -cpu cortex-m4
+  (working fine without icount)
+
+  version: =
+
+  QEMU emulator version 2.11.50 (v2.11.0-2146-gd9bbfea-dirty)
+
+  Compilation options:
+  ./configure --target-list=3Darm-softmmu --disable-slirp --disable-blobs -=
+-disable-docs --disable-guest-agent --disable-gnutls --disable-nettle --dis=
+able-gcrypt --disable-sdl --disable-gtk --disable-vnc --disable-virtfs --di=
+sable-mpath --disable-xen --disable-brlapi --disable-curl --disable-bluez -=
+-disable-kvm --disable-hax --disable-hvf --disable-whpx --disable-rdma --di=
+sable-vde --disable-netmap --disable-linux-aio --disable-cap-ng --disable-a=
+ttr --disable-vhost-net --disable-spice --disable-rbd --disable-libiscsi --=
+disable-libnfs --disable-smartcard --disable-libusb --disable-live-block-mi=
+gration --disable-usb-redir --disable-lzo --disable-snappy --disable-bzip2 =
+--disable-seccomp --disable-glusterfs --disable-tpm --disable-libssh2 --dis=
+able-numa --disable-libxml2 --disable-tcmalloc --disable-jemalloc --disable=
+-replication --disable-vhost-vsock --disable-opengl --disable-virglrenderer=
+ --disable-xfsctl --disable-qom-cast-debug --disable-vxhs --disable-crypto-=
+afalg --disable-vhost-user --disable-capstone --disable-pie --extra-cflags=
+=3D-mtune=3Dnative
+
+  I have also tested previous versions:
+  - stock qemu-system-arm 2.5.0 from ubuntu 16.04: OK
+  - git version: QEMU emulator version 2.10.0 (v2.10.2-dirty): OK
+  - git version: QEMU emulator version 2.10.90 (v2.11.0-rc0-dirty): FAIL
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1755479/+subscriptions
