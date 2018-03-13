@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robinhe@robinhe-hp.sh.intel.com>) id 1ewSxC-0000de-Ev
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:30:13 -0400
+	(envelope-from <robinhe@robinhe-hp.sh.intel.com>) id 1ewSzy-0001tY-6L
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:32:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robinhe@robinhe-hp.sh.intel.com>) id 1ewSx7-0006tV-Bx
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:29:58 -0400
-Received: from [112.64.68.174] (port=34618 helo=robinhe-hp.sh.intel.com)
+	(envelope-from <robinhe@robinhe-hp.sh.intel.com>) id 1ewSzu-0000tE-7n
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:32:50 -0400
+Received: from [112.64.68.174] (port=39094 helo=robinhe-hp.sh.intel.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <robinhe@robinhe-hp.sh.intel.com>)
-	id 1ewSx6-0006pN-SW
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:29:53 -0400
+	id 1ewSzt-0000r1-NH
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:32:46 -0400
 From: junyan.he@intel.com
-Date: Tue, 13 Mar 2018 16:33:43 +0800
-Message-Id: <1520930033-18885-1-git-send-email-junyan.he@intel.com>
-Subject: [Qemu-devel] [PATCH 00/10] RFC: Optimize nvdimm kind memory for
- snapshot.
+Date: Tue, 13 Mar 2018 16:33:53 +0800
+Message-Id: <1520930033-18885-11-git-send-email-junyan.he@intel.com>
+In-Reply-To: <1520930033-18885-1-git-send-email-junyan.he@intel.com>
+References: <1520930033-18885-1-git-send-email-junyan.he@intel.com>
+Subject: [Qemu-devel] [PATCH 10/10] RFC: Enable nvdimm snapshot functions.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +29,78 @@ Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, crosthwaite.peter@
 
 From: Junyan He <junyan.he@intel.com>
 
-The nvdimm size is huge, sometimes it is more than 256G or even more.
-This is a huge burden for snapshot saving. One snapshot point with
-nvdimm may occupy more than 50G disk space even with compression
-enabled.
-We need to introduce dependent snapshot manner to solve this problem.
-The first snapshot point should always be saved completely, and enable
-dirty log trace after saving for nvdimm memory region. The later snapshot
-point should add the reference to previous snapshot's nvdimm data and
-just saving dirty pages. This can save a lot of disk and time if the
-snapshot operations are triggered frequently.
-We add save_snapshot_dependency functions to QCOW2 file system firstly, the
-later snapshot will add reference to previous dependent snapshot's data
-cluster. There is an alignment problem here, the dependent data should
-always be cluster aligned. We need to add some padding data when saving
-the snapshot to make it always cluster aligned.
-The logic between nvdimm and ram for snapshot saving is a little confused
-now, we need to exclude nvdimm kind memory region from ram list and the
-dirty log tracing setting is also not very clear. Maybe we can separate the
-snapshot saving from the migration logic later to make code clean.
-In theory, this kind of manner can apply to any kind of memory. But because
-it need to turn dirty log trace on, the performance may decline. So we just
-enable it for nvdimm kind memory firstly.
+In snapshot saving, all nvdimm kind memory will be saved in different way
+and we exclude all nvdimm kind memory region in ram.c
 
 Signed-off-by: Junyan He <junyan.he@intel.com>
 ---
-Makefile.target              |    1 +
-block/qcow2-snapshot.c       |  154 ++++++++++++++++++++++
-block/qcow2.c                |    2 +
-block/qcow2.h                |    7 +
-block/snapshot.c             |   45 +++++++
-exec.c                       |    7 +
-hw/ppc/spapr.c               |    2 +-
-hw/s390x/s390-stattrib.c     |    2 +-
-include/block/block_int.h    |    9 ++
-include/block/snapshot.h     |    7 +
-include/exec/memory.h        |    9 ++
-include/exec/ram_addr.h      |    2 +
-include/migration/misc.h     |    4 +
-include/migration/register.h |    2 +-
-include/migration/snapshot.h |    3 +
-memory.c                     |   18 ++-
-migration/block.c            |    2 +-
-migration/nvdimm.c           | 1033 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-migration/qemu-file.c        |   61 +++++++++
-migration/qemu-file.h        |   14 ++
-migration/ram.c              |   19 ++-
-migration/savevm.c           |   62 ++++++++-
-vl.c                         |    1 +
-23 files changed, 1452 insertions(+), 14 deletions(-)
+ migration/ram.c | 17 +++++++++++++++++
+ vl.c            |  1 +
+ 2 files changed, 18 insertions(+)
+
+diff --git a/migration/ram.c b/migration/ram.c
+index d1db422..ad32469 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -1219,9 +1219,15 @@ static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss, bool *again)
+         /* Didn't find anything in this RAM Block */
+         pss->page = 0;
+         pss->block = QLIST_NEXT_RCU(pss->block, next);
++        while (ram_block_is_nvdimm_active(pss->block)) {
++            pss->block = QLIST_NEXT_RCU(pss->block, next);
++        }
+         if (!pss->block) {
+             /* Hit the end of the list */
+             pss->block = QLIST_FIRST_RCU(&ram_list.blocks);
++            while (ram_block_is_nvdimm_active(pss->block)) {
++                pss->block = QLIST_NEXT_RCU(pss->block, next);
++            }
+             /* Flag that we've looped */
+             pss->complete_round = true;
+             rs->ram_bulk_stage = false;
+@@ -1541,6 +1547,9 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
+ 
+     if (!pss.block) {
+         pss.block = QLIST_FIRST_RCU(&ram_list.blocks);
++        while (ram_block_is_nvdimm_active(pss.block)) {
++            pss.block = QLIST_NEXT_RCU(pss.block, next);
++        }
+     }
+ 
+     do {
+@@ -1583,6 +1592,10 @@ uint64_t ram_bytes_total(void)
+ 
+     rcu_read_lock();
+     RAMBLOCK_FOREACH(block) {
++        if (ram_block_is_nvdimm_active(block)) {
++            // If snapshot and the block is nvdimm, let nvdimm do the job
++            continue;
++        }
+         total += block->used_length;
+     }
+     rcu_read_unlock();
+@@ -2222,6 +2235,10 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
+     qemu_put_be64(f, ram_bytes_total() | RAM_SAVE_FLAG_MEM_SIZE);
+ 
+     RAMBLOCK_FOREACH(block) {
++        if (ram_block_is_nvdimm_active(block)) {
++            // If snapshot and the block is nvdimm, let nvdimm do the job
++            continue;
++        }
+         qemu_put_byte(f, strlen(block->idstr));
+         qemu_put_buffer(f, (uint8_t *)block->idstr, strlen(block->idstr));
+         qemu_put_be64(f, block->used_length);
+diff --git a/vl.c b/vl.c
+index 3ef04ce..1bd5711 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4502,6 +4502,7 @@ int main(int argc, char **argv, char **envp)
+ 
+     blk_mig_init();
+     ram_mig_init();
++    nvdimm_snapshot_init();
+ 
+     /* If the currently selected machine wishes to override the units-per-bus
+      * property of its default HBA interface type, do so now. */
+-- 
+2.7.4
