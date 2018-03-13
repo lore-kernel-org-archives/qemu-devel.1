@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robinhe@robinhe-hp.sh.intel.com>) id 1ewSvA-0007FE-SS
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:27:57 -0400
+	(envelope-from <robinhe@robinhe-hp.sh.intel.com>) id 1ewSxC-0000de-Ev
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:30:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robinhe@robinhe-hp.sh.intel.com>) id 1ewSv9-0005V7-TY
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:27:52 -0400
-Received: from [112.64.68.174] (port=34617 helo=robinhe-hp.sh.intel.com)
+	(envelope-from <robinhe@robinhe-hp.sh.intel.com>) id 1ewSx7-0006tV-Bx
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:29:58 -0400
+Received: from [112.64.68.174] (port=34618 helo=robinhe-hp.sh.intel.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <robinhe@robinhe-hp.sh.intel.com>)
-	id 1ewSv8-0005Sq-U1
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:27:51 -0400
+	id 1ewSx6-0006pN-SW
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:29:53 -0400
 From: junyan.he@intel.com
-Date: Tue, 13 Mar 2018 16:33:50 +0800
-Message-Id: <1520930033-18885-8-git-send-email-junyan.he@intel.com>
-In-Reply-To: <1520930033-18885-1-git-send-email-junyan.he@intel.com>
-References: <1520930033-18885-1-git-send-email-junyan.he@intel.com>
-Subject: [Qemu-devel] [PATCH 07/10] RFC: Add get_current_snapshot_info to
- get the snapshot state.
+Date: Tue, 13 Mar 2018 16:33:43 +0800
+Message-Id: <1520930033-18885-1-git-send-email-junyan.he@intel.com>
+Subject: [Qemu-devel] [PATCH 00/10] RFC: Optimize nvdimm kind memory for
+ snapshot.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,82 +28,52 @@ Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, crosthwaite.peter@
 
 From: Junyan He <junyan.he@intel.com>
 
-We need to know the snapshot saving information when we do dependent
-snapshot saving, e.g the name of previous snapshot. Add this global
-function to query the snapshot status is usable.
+The nvdimm size is huge, sometimes it is more than 256G or even more.
+This is a huge burden for snapshot saving. One snapshot point with
+nvdimm may occupy more than 50G disk space even with compression
+enabled.
+We need to introduce dependent snapshot manner to solve this problem.
+The first snapshot point should always be saved completely, and enable
+dirty log trace after saving for nvdimm memory region. The later snapshot
+point should add the reference to previous snapshot's nvdimm data and
+just saving dirty pages. This can save a lot of disk and time if the
+snapshot operations are triggered frequently.
+We add save_snapshot_dependency functions to QCOW2 file system firstly, the
+later snapshot will add reference to previous dependent snapshot's data
+cluster. There is an alignment problem here, the dependent data should
+always be cluster aligned. We need to add some padding data when saving
+the snapshot to make it always cluster aligned.
+The logic between nvdimm and ram for snapshot saving is a little confused
+now, we need to exclude nvdimm kind memory region from ram list and the
+dirty log tracing setting is also not very clear. Maybe we can separate the
+snapshot saving from the migration logic later to make code clean.
+In theory, this kind of manner can apply to any kind of memory. But because
+it need to turn dirty log trace on, the performance may decline. So we just
+enable it for nvdimm kind memory firstly.
 
 Signed-off-by: Junyan He <junyan.he@intel.com>
 ---
- include/migration/snapshot.h |  3 +++
- migration/savevm.c           | 27 +++++++++++++++++++++++++++
- 2 files changed, 30 insertions(+)
-
-diff --git a/include/migration/snapshot.h b/include/migration/snapshot.h
-index c85b6ec..0b950ce 100644
---- a/include/migration/snapshot.h
-+++ b/include/migration/snapshot.h
-@@ -15,7 +15,10 @@
- #ifndef QEMU_MIGRATION_SNAPSHOT_H
- #define QEMU_MIGRATION_SNAPSHOT_H
- 
-+#include "block/snapshot.h"
-+
- int save_snapshot(const char *name, Error **errp);
- int load_snapshot(const char *name, Error **errp);
-+int get_current_snapshot_info(QEMUSnapshotInfo *sn);
- 
- #endif
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 1bbd6aa..3a9b904 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2212,6 +2212,29 @@ int qemu_loadvm_state(QEMUFile *f)
-     return ret;
- }
- 
-+static int in_snap_saving;
-+static QEMUSnapshotInfo in_snap_saving_sn;
-+
-+int get_current_snapshot_info(QEMUSnapshotInfo *sn)
-+{
-+    if (in_snap_saving && sn) {
-+        memcpy(sn, &in_snap_saving_sn, sizeof(QEMUSnapshotInfo));
-+    }
-+
-+    return in_snap_saving;
-+}
-+
-+static void set_current_snapshot_info(QEMUSnapshotInfo *sn)
-+{
-+    if (sn) {
-+        memcpy(&in_snap_saving_sn, sn, sizeof(QEMUSnapshotInfo));
-+        in_snap_saving = 1;
-+    } else {
-+        memset(&in_snap_saving_sn, 0, sizeof(QEMUSnapshotInfo));
-+        in_snap_saving = 0;
-+    }
-+}
-+
- int save_snapshot(const char *name, Error **errp)
- {
-     BlockDriverState *bs, *bs1;
-@@ -2282,6 +2305,8 @@ int save_snapshot(const char *name, Error **errp)
-         strftime(sn->name, sizeof(sn->name), "vm-%Y%m%d%H%M%S", &tm);
-     }
- 
-+    set_current_snapshot_info(sn);
-+
-     /* save the VM state */
-     f = qemu_fopen_bdrv(bs, 1);
-     if (!f) {
-@@ -2313,6 +2338,8 @@ int save_snapshot(const char *name, Error **errp)
-     ret = 0;
- 
-  the_end:
-+    set_current_snapshot_info(NULL);
-+
-     if (aio_context) {
-         aio_context_release(aio_context);
-     }
--- 
-2.7.4
+Makefile.target              |    1 +
+block/qcow2-snapshot.c       |  154 ++++++++++++++++++++++
+block/qcow2.c                |    2 +
+block/qcow2.h                |    7 +
+block/snapshot.c             |   45 +++++++
+exec.c                       |    7 +
+hw/ppc/spapr.c               |    2 +-
+hw/s390x/s390-stattrib.c     |    2 +-
+include/block/block_int.h    |    9 ++
+include/block/snapshot.h     |    7 +
+include/exec/memory.h        |    9 ++
+include/exec/ram_addr.h      |    2 +
+include/migration/misc.h     |    4 +
+include/migration/register.h |    2 +-
+include/migration/snapshot.h |    3 +
+memory.c                     |   18 ++-
+migration/block.c            |    2 +-
+migration/nvdimm.c           | 1033 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+migration/qemu-file.c        |   61 +++++++++
+migration/qemu-file.h        |   14 ++
+migration/ram.c              |   19 ++-
+migration/savevm.c           |   62 ++++++++-
+vl.c                         |    1 +
+23 files changed, 1452 insertions(+), 14 deletions(-)
