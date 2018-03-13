@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robinhe@robinhe-hp.sh.intel.com>) id 1ewT4q-0005hY-LQ
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:37:55 -0400
+	(envelope-from <robinhe@robinhe-hp.sh.intel.com>) id 1ewT4t-0005jj-7d
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:38:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robinhe@robinhe-hp.sh.intel.com>) id 1ewT4k-0004sb-GV
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:37:52 -0400
-Received: from [112.64.68.174] (port=39097 helo=robinhe-hp.sh.intel.com)
+	(envelope-from <robinhe@robinhe-hp.sh.intel.com>) id 1ewT4p-0004vw-7N
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:37:55 -0400
+Received: from [112.64.68.174] (port=39096 helo=robinhe-hp.sh.intel.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <robinhe@robinhe-hp.sh.intel.com>)
-	id 1ewT4j-0004lN-JQ
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:37:46 -0400
+	id 1ewT4o-0004kw-93
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:37:51 -0400
 From: junyan.he@intel.com
-Date: Tue, 13 Mar 2018 16:33:49 +0800
-Message-Id: <1520930033-18885-7-git-send-email-junyan.he@intel.com>
+Date: Tue, 13 Mar 2018 16:33:45 +0800
+Message-Id: <1520930033-18885-3-git-send-email-junyan.he@intel.com>
 In-Reply-To: <1520930033-18885-1-git-send-email-junyan.he@intel.com>
 References: <1520930033-18885-1-git-send-email-junyan.he@intel.com>
-Subject: [Qemu-devel] [PATCH 06/10] RFC: Add save dependency functions to
- qemu_file
+Subject: [Qemu-devel] [PATCH 02/10] RFC: Implement qcow2's snapshot
+ dependent saving function.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,192 +30,211 @@ Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, crosthwaite.peter@
 
 From: Junyan He <junyan.he@intel.com>
 
-When we save snapshot, we need qemu_file to support save dependency
-operations. It should call brv_driver's save dependency functions
-to implement these operations.
+For qcow2 format, we can increase the cluster's reference count of
+dependent snapshot content and link the offset to the L2 table of
+the new snapshot point. This way can avoid obvious snapshot's dependent
+relationship, so when we delete some snapshot point, just decrease the
+cluster count and no need to check further.
 
 Signed-off-by: Junyan He <junyan.he@intel.com>
 ---
- migration/qemu-file.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++
- migration/qemu-file.h | 14 ++++++++++++
- migration/savevm.c    | 33 +++++++++++++++++++++++++---
- 3 files changed, 105 insertions(+), 3 deletions(-)
+ block/qcow2-snapshot.c | 154 +++++++++++++++++++++++++++++++++++++++++++++++++
+ block/qcow2.c          |   2 +
+ block/qcow2.h          |   7 +++
+ 3 files changed, 163 insertions(+)
 
-diff --git a/migration/qemu-file.c b/migration/qemu-file.c
-index 2ab2bf3..9d2a39a 100644
---- a/migration/qemu-file.c
-+++ b/migration/qemu-file.c
-@@ -46,10 +46,13 @@ struct QEMUFile {
-     int buf_index;
-     int buf_size; /* 0 when writing */
-     uint8_t buf[IO_BUF_SIZE];
-+    char ref_name_str[128]; /* maybe snapshot id */
+diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
+index cee25f5..8e83084 100644
+--- a/block/qcow2-snapshot.c
++++ b/block/qcow2-snapshot.c
+@@ -736,3 +736,157 @@ int qcow2_snapshot_load_tmp(BlockDriverState *bs,
  
-     DECLARE_BITMAP(may_free, MAX_IOV_SIZE);
-     struct iovec iov[MAX_IOV_SIZE];
-     unsigned int iovcnt;
-+    bool support_dependency;
-+    int32_t dependency_aligment;
- 
-     int last_error;
- };
-@@ -745,3 +748,61 @@ void qemu_file_set_blocking(QEMUFile *f, bool block)
-         f->ops->set_blocking(f->opaque, block);
-     }
+     return 0;
  }
 +
-+void qemu_file_set_support_dependency(QEMUFile *f, int32_t alignment)
++int qcow2_snapshot_save_dependency(BlockDriverState *bs,
++                                   const char *depend_snapshot_id,
++                                   int64_t depend_offset,
++                                   int64_t depend_size,
++                                   int64_t offset,
++                                   Error **errp)
 +{
-+    f->dependency_aligment = alignment;
-+    f->support_dependency = true;
-+}
++    int snapshot_index;
++    BDRVQcow2State *s = bs->opaque;
++    QCowSnapshot *sn;
++    int ret;
++    int64_t i;
++    int64_t total_bytes = depend_size;
++    int64_t depend_offset1, offset1;
++    uint64_t *depend_l1_table = NULL;
++    uint64_t depend_l1_bytes;
++    uint64_t *depend_l2_table = NULL;
++    uint64_t depend_l2_offset;
++    uint64_t depend_entry;
++    QCowL2Meta l2meta;
 +
-+bool qemu_file_is_support_dependency(QEMUFile *f, int32_t *alignment)
-+{
-+    if (f->support_dependency && alignment) {
-+        *alignment = f->dependency_aligment;
++    assert(bs->read_only == false);
++
++    if (depend_snapshot_id == NULL) {
++        return 0;
 +    }
 +
-+    return f->support_dependency;
-+}
-+
-+/* This function set the reference name for snapshot usage. Sometimes it needs
-+ * to depend on other snapshot's data to avoid redundance.
-+ */
-+bool qemu_file_set_ref_name(QEMUFile *f, const char *name)
-+{
-+    if (strlen(name) + 1 > sizeof(f->ref_name_str)) {
-+        return false;
++    if (!QEMU_IS_ALIGNED(depend_offset,  s->cluster_size)) {
++        error_setg(errp, "Specified snapshot offset is not multiple of %u",
++                s->cluster_size);
++        return -EINVAL;
 +    }
 +
-+    memcpy(f->ref_name_str, name, strlen(name) + 1);
-+    return true;
-+}
-+
-+ssize_t qemu_file_save_dependency(QEMUFile *f, int64_t depend_offset,
-+                                  int64_t size)
-+{
-+    ssize_t ret;
-+
-+    if (f->support_dependency == false) {
-+        return -1;
++    if (!QEMU_IS_ALIGNED(offset,  s->cluster_size)) {
++        error_setg(errp, "Offset is not multiple of %u", s->cluster_size);
++        return -EINVAL;
 +    }
 +
-+    assert(f->ops->save_dependency);
-+
-+    if (!QEMU_IS_ALIGNED(depend_offset, f->dependency_aligment)) {
-+        return -1;
++    if (!QEMU_IS_ALIGNED(depend_size,  s->cluster_size)) {
++        error_setg(errp, "depend_size is not multiple of %u", s->cluster_size);
++        return -EINVAL;
 +    }
 +
-+    qemu_fflush(f);
-+
-+    if (!QEMU_IS_ALIGNED(f->pos, f->dependency_aligment)) {
-+        return -1;
++    snapshot_index = find_snapshot_by_id_and_name(bs, NULL, depend_snapshot_id);
++    /* Search the snapshot */
++    if (snapshot_index < 0) {
++        error_setg(errp, "Can't find snapshot");
++        return -ENOENT;
 +    }
 +
-+    ret = f->ops->save_dependency(f->opaque, f->ref_name_str,
-+                                  depend_offset, size, f->pos);
-+    if (ret > 0) {
-+        f->pos += size;
++    sn = &s->snapshots[snapshot_index];
++    if (sn->disk_size != bs->total_sectors * BDRV_SECTOR_SIZE) {
++        error_report("qcow2: depend on the snapshots with different disk "
++                "size is not implemented");
++        return -ENOTSUP;
 +    }
 +
-+    return ret;
-+}
-diff --git a/migration/qemu-file.h b/migration/qemu-file.h
-index aae4e5e..137b917 100644
---- a/migration/qemu-file.h
-+++ b/migration/qemu-file.h
-@@ -57,6 +57,14 @@ typedef ssize_t (QEMUFileWritevBufferFunc)(void *opaque, struct iovec *iov,
-                                            int iovcnt, int64_t pos);
- 
- /*
-+ * This function add reference to the dependency data in snapshot specified by
-+ * ref_name_str to this file's offset
-+ */
-+typedef ssize_t (QEMUFileSaveDependencyFunc)(void *opaque, const char *name,
-+                                             int64_t depend_offset,
-+                                             int64_t offset, int64_t size);
++    /* Only can save dependency of snapshot's vmstate data */
++    depend_offset1 = depend_offset + qcow2_vm_state_offset(s);
++    offset1 = offset + qcow2_vm_state_offset(s);
 +
-+/*
-  * This function provides hooks around different
-  * stages of RAM migration.
-  * 'opaque' is the backend specific data in QEMUFile
-@@ -104,6 +112,7 @@ typedef struct QEMUFileOps {
-     QEMUFileWritevBufferFunc *writev_buffer;
-     QEMURetPathFunc *get_return_path;
-     QEMUFileShutdownFunc *shut_down;
-+    QEMUFileSaveDependencyFunc *save_dependency;
- } QEMUFileOps;
- 
- typedef struct QEMUFileHooks {
-@@ -153,6 +162,11 @@ int qemu_file_shutdown(QEMUFile *f);
- QEMUFile *qemu_file_get_return_path(QEMUFile *f);
- void qemu_fflush(QEMUFile *f);
- void qemu_file_set_blocking(QEMUFile *f, bool block);
-+bool qemu_file_set_ref_name(QEMUFile *f, const char *name);
-+void qemu_file_set_support_dependency(QEMUFile *f, int32_t alignment);
-+bool qemu_file_is_support_dependency(QEMUFile *f, int32_t *alignment);
-+ssize_t qemu_file_save_dependency(QEMUFile *f, int64_t depend_offset,
-+                                  int64_t size);
- 
- size_t qemu_get_counted_string(QEMUFile *f, char buf[256]);
- 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 358c5b5..1bbd6aa 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -196,6 +196,20 @@ static ssize_t block_writev_buffer(void *opaque, struct iovec *iov, int iovcnt,
-     return qiov.size;
- }
- 
-+static ssize_t block_save_dependency(void *opaque, const char *id_name,
-+                                     int64_t depend_offset,
-+                                     int64_t offset, int64_t size)
-+{
-+    int ret = bdrv_snapshot_save_dependency(opaque, id_name,
-+                                            depend_offset, offset,
-+                                            size, NULL);
++    depend_l1_bytes = s->l1_size * sizeof(uint64_t);
++    depend_l1_table = g_try_malloc0(depend_l1_bytes);
++    if (depend_l1_table == NULL) {
++        return -ENOMEM;
++    }
++
++    ret = bdrv_pread(bs->file, sn->l1_table_offset, depend_l1_table,
++                     depend_l1_bytes);
 +    if (ret < 0) {
-+        return ret;
++        g_free(depend_l1_table);
++        goto out;
++    }
++    for (i = 0; i < depend_l1_bytes / sizeof(uint64_t); i++) {
++        be64_to_cpus(&depend_l1_table[i]);
 +    }
 +
-+    return size;
-+}
-+
- static ssize_t block_get_buffer(void *opaque, uint8_t *buf, int64_t pos,
-                                 size_t size)
- {
-@@ -213,15 +227,28 @@ static const QEMUFileOps bdrv_read_ops = {
- };
- 
- static const QEMUFileOps bdrv_write_ops = {
--    .writev_buffer  = block_writev_buffer,
--    .close          = bdrv_fclose
-+    .writev_buffer   = block_writev_buffer,
-+    .close           = bdrv_fclose,
-+    .save_dependency = block_save_dependency
- };
- 
- static QEMUFile *qemu_fopen_bdrv(BlockDriverState *bs, int is_writable)
- {
-+    int ret = 0;
-+    int32_t alignment = 0;
-+    QEMUFile *f = NULL;
-+
-     if (is_writable) {
--        return qemu_fopen_ops(bs, &bdrv_write_ops);
-+        f = qemu_fopen_ops(bs, &bdrv_write_ops);
-+
-+        ret = bdrv_snapshot_support_dependency(bs, &alignment);
-+        if (ret > 0) {
-+            qemu_file_set_support_dependency(f, alignment);
++    while (total_bytes) {
++        assert(total_bytes > 0);
++        /* Find the cluster of depend */
++        depend_l2_offset =
++            depend_l1_table[depend_offset1 >> (s->l2_bits + s->cluster_bits)];
++        depend_l2_offset &= L1E_OFFSET_MASK;
++        if (depend_l2_offset == 0) {
++            ret = -EINVAL;
++            goto out;
 +        }
 +
-+        return f;
-     }
++        if (offset_into_cluster(s, depend_l2_offset)) {
++            qcow2_signal_corruption(bs, true, -1, -1, "L2 table offset %#"
++                                    PRIx64 " unaligned (L1 index: %#"
++                                    PRIx64 ")",
++                                    depend_l2_offset,
++                                    depend_offset1 >>
++                                        (s->l2_bits + s->cluster_bits));
++            return -EIO;
++        }
 +
-     return qemu_fopen_ops(bs, &bdrv_read_ops);
- }
++        ret = qcow2_cache_get(bs, s->l2_table_cache, depend_l2_offset,
++                              (void **)(&depend_l2_table));
++        if (ret < 0) {
++            goto out;
++        }
++
++        depend_entry =
++            be64_to_cpu(
++                depend_l2_table[offset_to_l2_index(s, depend_offset1)]);
++        if (depend_entry == 0) {
++            ret = -EINVAL;
++            qcow2_cache_put(s->l2_table_cache, (void **)(&depend_l2_table));
++            goto out;
++        }
++
++        memset(&l2meta, 0, sizeof(l2meta));
++        l2meta.offset = offset1;
++        l2meta.alloc_offset = (depend_entry & L2E_OFFSET_MASK);
++        l2meta.nb_clusters = 1;
++        /* Add a ref to this cluster */
++        ret = qcow2_update_cluster_refcount(
++                  bs, l2meta.alloc_offset >> s->cluster_bits,
++                  1, false, QCOW2_DISCARD_SNAPSHOT);
++        if (ret < 0) {
++            qcow2_cache_put(s->l2_table_cache, (void **)(&depend_l2_table));
++            goto out;
++        }
++
++        ret = qcow2_alloc_cluster_link_l2(bs, &l2meta);
++        if (ret < 0) {
++            qcow2_cache_put(s->l2_table_cache, (void **)(&depend_l2_table));
++            goto out;
++        }
++
++        total_bytes -= s->cluster_size;
++        offset1 += s->cluster_size;
++        depend_offset1 += s->cluster_size;
++
++        qcow2_cache_put(s->l2_table_cache, (void **)(&depend_l2_table));
++    }
++
++out:
++    g_free(depend_l1_table);
++    return ret;
++}
++
++int qcow2_snapshot_support_dependency(BlockDriverState *bs, int32_t *alignment)
++{
++    BDRVQcow2State *s = bs->opaque;
++    if (alignment) {
++        *alignment = s->cluster_size;
++    }
++
++    return 1;
++}
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 071dc4d..9786ba4 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -4371,6 +4371,8 @@ BlockDriver bdrv_qcow2 = {
+     .bdrv_snapshot_delete   = qcow2_snapshot_delete,
+     .bdrv_snapshot_list     = qcow2_snapshot_list,
+     .bdrv_snapshot_load_tmp = qcow2_snapshot_load_tmp,
++    .bdrv_snapshot_support_dependency = qcow2_snapshot_support_dependency,
++    .bdrv_snapshot_save_dependency = qcow2_snapshot_save_dependency,
+     .bdrv_measure           = qcow2_measure,
+     .bdrv_get_info          = qcow2_get_info,
+     .bdrv_get_specific_info = qcow2_get_specific_info,
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 1a84cc7..dc7ef45 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -640,6 +640,13 @@ int qcow2_snapshot_load_tmp(BlockDriverState *bs,
  
+ void qcow2_free_snapshots(BlockDriverState *bs);
+ int qcow2_read_snapshots(BlockDriverState *bs);
++int qcow2_snapshot_save_dependency(BlockDriverState *bs,
++                                  const char *depend_snapshot_id,
++                                  int64_t depend_offset,
++                                  int64_t depend_size,
++                                  int64_t offset,
++                                  Error **errp);
++int qcow2_snapshot_support_dependency(BlockDriverState *bs, int32_t *alignment);
+ 
+ /* qcow2-cache.c functions */
+ Qcow2Cache *qcow2_cache_create(BlockDriverState *bs, int num_tables,
 -- 
 2.7.4
