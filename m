@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evoQ4-00014V-UD
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:13:09 -0400
+	(envelope-from <berrange@redhat.com>) id 1evoQ9-00018T-0C
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:13:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evoQ3-0007JJ-04
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:13:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40946 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1evoQ5-0007Ke-5s
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:13:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40950 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1evoQ2-0007J3-Q2
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:13:02 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1evoQ5-0007KO-18
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:13:05 -0400
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Tue, 13 Mar 2018 18:12:42 +0000
-Message-Id: <20180313181248.16215-4-berrange@redhat.com>
+Date: Tue, 13 Mar 2018 18:12:43 +0000
+Message-Id: <20180313181248.16215-5-berrange@redhat.com>
 In-Reply-To: <20180313181248.16215-1-berrange@redhat.com>
 References: <20180313181248.16215-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 3/9] sockets: pull code for testing IP
- availability out of specific test
+Subject: [Qemu-devel] [PULL v2 4/9] sockets: strengthen test suite IP
+ protocol availability checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,290 +32,157 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>,
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-The test-io-channel-socket.c file has some useful helper functions for
-checking if a specific IP protocol is available. Other tests need to
-perform similar kinds of checks to avoid running tests that will fail
-due to missing IP protocols.
+Instead of just checking whether it is possible to bind() on a socket, al=
+so
+check that we can successfully connect() to the socket we bound to. This
+more closely replicates the level of functionality that tests will actual=
+ly
+use.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- tests/Makefile.include         |   2 +-
- tests/socket-helpers.c         | 100 +++++++++++++++++++++++++++++++++++=
-++++++
- tests/socket-helpers.h         |  42 +++++++++++++++++
- tests/test-io-channel-socket.c |  72 +----------------------------
- 4 files changed, 145 insertions(+), 71 deletions(-)
- create mode 100644 tests/socket-helpers.c
- create mode 100644 tests/socket-helpers.h
+ tests/socket-helpers.c | 67 +++++++++++++++++++++++++++++++++++++++++++-=
+------
+ tests/socket-helpers.h |  4 +--
+ 2 files changed, 60 insertions(+), 11 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index ef9b88c369..3d5b6174a8 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -715,7 +715,7 @@ tests/test-crypto-tlssession$(EXESUF): tests/test-cry=
-pto-tlssession.o \
- 	tests/crypto-tls-x509-helpers.o tests/pkix_asn1_tab.o $(test-crypto-obj=
--y)
- tests/test-io-task$(EXESUF): tests/test-io-task.o $(test-io-obj-y)
- tests/test-io-channel-socket$(EXESUF): tests/test-io-channel-socket.o \
--        tests/io-channel-helpers.o $(test-io-obj-y)
-+        tests/io-channel-helpers.o tests/socket-helpers.o $(test-io-obj-=
-y)
- tests/tpm-crb-test$(EXESUF): tests/tpm-crb-test.o tests/tpm-emu.o $(test=
--io-obj-y)
- tests/tpm-tis-test$(EXESUF): tests/tpm-tis-test.o tests/tpm-emu.o $(test=
--io-obj-y)
- tests/test-io-channel-file$(EXESUF): tests/test-io-channel-file.o \
 diff --git a/tests/socket-helpers.c b/tests/socket-helpers.c
-new file mode 100644
-index 0000000000..6f4bf07aa9
---- /dev/null
+index 6f4bf07aa9..8112763f5b 100644
+--- a/tests/socket-helpers.c
 +++ b/tests/socket-helpers.c
-@@ -0,0 +1,100 @@
-+/*
-+ * Helper functions for tests using sockets
-+ *
-+ * Copyright 2015-2018 Red Hat, Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License as
-+ * published by the Free Software Foundation; either version 2 or
-+ * (at your option) version 3 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "qemu/sockets.h"
-+#include "socket-helpers.h"
-+
-+#ifndef AI_ADDRCONFIG
-+# define AI_ADDRCONFIG 0
-+#endif
-+#ifndef EAI_ADDRFAMILY
-+# define EAI_ADDRFAMILY 0
-+#endif
-+
-+int socket_can_bind(const char *hostname)
-+{
-+    int fd =3D -1;
-+    struct addrinfo ai, *res =3D NULL;
-+    int rc;
-+    int ret =3D -1;
-+
-+    memset(&ai, 0, sizeof(ai));
-+    ai.ai_flags =3D AI_CANONNAME | AI_ADDRCONFIG;
-+    ai.ai_family =3D AF_UNSPEC;
-+    ai.ai_socktype =3D SOCK_STREAM;
-+
-+    /* lookup */
-+    rc =3D getaddrinfo(hostname, NULL, &ai, &res);
-+    if (rc !=3D 0) {
-+        if (rc =3D=3D EAI_ADDRFAMILY ||
-+            rc =3D=3D EAI_FAMILY) {
-+            errno =3D EADDRNOTAVAIL;
-+        } else {
-+            errno =3D EINVAL;
-+        }
-+        goto cleanup;
-+    }
-+
-+    fd =3D qemu_socket(res->ai_family, res->ai_socktype, res->ai_protoco=
-l);
-+    if (fd < 0) {
-+        goto cleanup;
-+    }
-+
-+    if (bind(fd, res->ai_addr, res->ai_addrlen) < 0) {
-+        goto cleanup;
-+    }
-+
-+    ret =3D 0;
-+
-+ cleanup:
-+    if (fd !=3D -1) {
-+        close(fd);
-+    }
-+    if (res) {
-+        freeaddrinfo(res);
-+    }
-+    return ret;
-+}
-+
-+
-+int socket_check_protocol_support(bool *has_ipv4, bool *has_ipv6)
-+{
-+    *has_ipv4 =3D *has_ipv6 =3D false;
-+
-+    if (socket_can_bind("127.0.0.1") < 0) {
-+        if (errno !=3D EADDRNOTAVAIL) {
-+            return -1;
-+        }
-+    } else {
-+        *has_ipv4 =3D true;
-+    }
-+
-+    if (socket_can_bind("::1") < 0) {
-+        if (errno !=3D EADDRNOTAVAIL) {
-+            return -1;
-+        }
-+    } else {
-+        *has_ipv6 =3D true;
-+    }
-+
-+    return 0;
-+}
-diff --git a/tests/socket-helpers.h b/tests/socket-helpers.h
-new file mode 100644
-index 0000000000..efa96eddc2
---- /dev/null
-+++ b/tests/socket-helpers.h
-@@ -0,0 +1,42 @@
-+/*
-+ * Helper functions for tests using sockets
-+ *
-+ * Copyright 2015-2018 Red Hat, Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License as
-+ * published by the Free Software Foundation; either version 2 or
-+ * (at your option) version 3 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+/*
-+ * @hostname: a DNS name or numeric IP address
-+ *
-+ * Check whether it is possible to bind to ports
-+ * on the DNS name or IP address @hostname. If an IP address
-+ * is used, it must not be a wildcard address.
-+ *
-+ * Returns 0 on success, -1 on error with errno set
-+ */
-+int socket_can_bind(const char *hostname);
-+
-+/*
-+ * @has_ipv4: set to true on return if IPv4 is available
-+ * @has_ipv6: set to true on return if IPv6 is available
-+ *
-+ * Check whether IPv4 and/or IPv6 are available for use.
-+ * On success, @has_ipv4 and @has_ipv6 will be set to
-+ * indicate whether the respective protocols are available.
-+ *
-+ * Returns 0 on success, -1 on fatal error
-+ */
-+int socket_check_protocol_support(bool *has_ipv4, bool *has_ipv6);
-diff --git a/tests/test-io-channel-socket.c b/tests/test-io-channel-socke=
-t.c
-index b273fd3ba2..0597213f93 100644
---- a/tests/test-io-channel-socket.c
-+++ b/tests/test-io-channel-socket.c
-@@ -22,77 +22,9 @@
- #include "io/channel-socket.h"
- #include "io/channel-util.h"
- #include "io-channel-helpers.h"
-+#include "socket-helpers.h"
- #include "qapi/error.h"
+@@ -30,10 +30,15 @@
+ # define EAI_ADDRFAMILY 0
+ #endif
 =20
--#ifndef AI_ADDRCONFIG
--# define AI_ADDRCONFIG 0
--#endif
--#ifndef EAI_ADDRFAMILY
--# define EAI_ADDRFAMILY 0
--#endif
--
--static int check_bind(const char *hostname, bool *has_proto)
--{
+-int socket_can_bind(const char *hostname)
++int socket_can_bind_connect(const char *hostname)
+ {
 -    int fd =3D -1;
--    struct addrinfo ai, *res =3D NULL;
--    int rc;
--    int ret =3D -1;
--
--    memset(&ai, 0, sizeof(ai));
--    ai.ai_flags =3D AI_CANONNAME | AI_ADDRCONFIG;
--    ai.ai_family =3D AF_UNSPEC;
--    ai.ai_socktype =3D SOCK_STREAM;
--
--    /* lookup */
--    rc =3D getaddrinfo(hostname, NULL, &ai, &res);
--    if (rc !=3D 0) {
--        if (rc =3D=3D EAI_ADDRFAMILY ||
--            rc =3D=3D EAI_FAMILY) {
--            *has_proto =3D false;
--            goto done;
--        }
--        goto cleanup;
--    }
--
++    int lfd =3D -1, cfd =3D -1, afd =3D -1;
+     struct addrinfo ai, *res =3D NULL;
++    struct sockaddr_storage ss;
++    socklen_t sslen =3D sizeof(ss);
++    int soerr;
++    socklen_t soerrlen =3D sizeof(soerr);
++    bool check_soerr =3D false;
+     int rc;
+     int ret =3D -1;
+=20
+@@ -54,20 +59,64 @@ int socket_can_bind(const char *hostname)
+         goto cleanup;
+     }
+=20
 -    fd =3D qemu_socket(res->ai_family, res->ai_socktype, res->ai_protoco=
 l);
 -    if (fd < 0) {
--        goto cleanup;
--    }
--
--    if (bind(fd, res->ai_addr, res->ai_addrlen) < 0) {
--        if (errno =3D=3D EADDRNOTAVAIL) {
--            *has_proto =3D false;
--            goto done;
--        }
--        goto cleanup;
--    }
--
--    *has_proto =3D true;
-- done:
--    ret =3D 0;
--
-- cleanup:
--    if (fd !=3D -1) {
--        close(fd);
--    }
--    if (res) {
--        freeaddrinfo(res);
--    }
--    return ret;
--}
--
--static int check_protocol_support(bool *has_ipv4, bool *has_ipv6)
--{
--    if (check_bind("127.0.0.1", has_ipv4) < 0) {
--        return -1;
--    }
--    if (check_bind("::1", has_ipv6) < 0) {
--        return -1;
--    }
--
--    return 0;
--}
--
-=20
- static void test_io_channel_set_socket_bufs(QIOChannel *src,
-                                             QIOChannel *dst)
-@@ -566,7 +498,7 @@ int main(int argc, char **argv)
-      * each protocol to avoid breaking tests on machines
-      * with either IPv4 or IPv6 disabled.
-      */
--    if (check_protocol_support(&has_ipv4, &has_ipv6) < 0) {
-+    if (socket_check_protocol_support(&has_ipv4, &has_ipv6) < 0) {
-         return 1;
++    lfd =3D qemu_socket(res->ai_family, res->ai_socktype, res->ai_protoc=
+ol);
++    if (lfd < 0) {
+         goto cleanup;
      }
 =20
+-    if (bind(fd, res->ai_addr, res->ai_addrlen) < 0) {
++    cfd =3D qemu_socket(res->ai_family, res->ai_socktype, res->ai_protoc=
+ol);
++    if (cfd < 0) {
+         goto cleanup;
+     }
+=20
++    if (bind(lfd, res->ai_addr, res->ai_addrlen) < 0) {
++        goto cleanup;
++    }
++
++    if (listen(lfd, 1) < 0) {
++        goto cleanup;
++    }
++
++    if (getsockname(lfd, (struct sockaddr *)&ss, &sslen) < 0) {
++        goto cleanup;
++    }
++
++    qemu_set_nonblock(cfd);
++    if (connect(cfd, (struct sockaddr *)&ss, sslen) < 0) {
++        if (errno =3D=3D EINPROGRESS) {
++            check_soerr =3D true;
++        } else {
++            goto cleanup;
++        }
++    }
++
++    sslen =3D sizeof(ss);
++    afd =3D accept(lfd,  (struct sockaddr *)&ss, &sslen);
++    if (afd < 0) {
++        goto cleanup;
++    }
++
++    if (check_soerr) {
++        if (qemu_getsockopt(cfd, SOL_SOCKET, SO_ERROR, &soerr, &soerrlen=
+) < 0) {
++            goto cleanup;
++        }
++        if (soerr) {
++            errno =3D soerr;
++            goto cleanup;
++        }
++    }
++
+     ret =3D 0;
+=20
+  cleanup:
+-    if (fd !=3D -1) {
+-        close(fd);
++    if (afd !=3D -1) {
++        close(afd);
++    }
++    if (cfd !=3D -1) {
++        close(cfd);
++    }
++    if (lfd !=3D -1) {
++        close(lfd);
+     }
+     if (res) {
+         freeaddrinfo(res);
+@@ -80,7 +129,7 @@ int socket_check_protocol_support(bool *has_ipv4, bool=
+ *has_ipv6)
+ {
+     *has_ipv4 =3D *has_ipv6 =3D false;
+=20
+-    if (socket_can_bind("127.0.0.1") < 0) {
++    if (socket_can_bind_connect("127.0.0.1") < 0) {
+         if (errno !=3D EADDRNOTAVAIL) {
+             return -1;
+         }
+@@ -88,7 +137,7 @@ int socket_check_protocol_support(bool *has_ipv4, bool=
+ *has_ipv6)
+         *has_ipv4 =3D true;
+     }
+=20
+-    if (socket_can_bind("::1") < 0) {
++    if (socket_can_bind_connect("::1") < 0) {
+         if (errno !=3D EADDRNOTAVAIL) {
+             return -1;
+         }
+diff --git a/tests/socket-helpers.h b/tests/socket-helpers.h
+index efa96eddc2..1c07d6d656 100644
+--- a/tests/socket-helpers.h
++++ b/tests/socket-helpers.h
+@@ -21,13 +21,13 @@
+ /*
+  * @hostname: a DNS name or numeric IP address
+  *
+- * Check whether it is possible to bind to ports
++ * Check whether it is possible to bind & connect to ports
+  * on the DNS name or IP address @hostname. If an IP address
+  * is used, it must not be a wildcard address.
+  *
+  * Returns 0 on success, -1 on error with errno set
+  */
+-int socket_can_bind(const char *hostname);
++int socket_can_bind_connect(const char *hostname);
+=20
+ /*
+  * @has_ipv4: set to true on return if IPv4 is available
 --=20
 2.14.3
