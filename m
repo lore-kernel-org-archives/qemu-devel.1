@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1evfQN-0008Dz-Jr
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 04:36:49 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1evfWL-0001Od-EX
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 04:42:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1evfQJ-0003Rw-KU
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 04:36:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41352 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1evfQJ-0003Qv-EA
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 04:36:43 -0400
-Date: Tue, 13 Mar 2018 16:36:33 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180313083633.GG11787@xz-mi>
-References: <20180309091535.13315-1-peterx@redhat.com>
-	<20180309091535.13315-18-peterx@redhat.com>
-	<20180312173011.GT3219@work-vm>
+	(envelope-from <pbonzini@redhat.com>) id 1evfWI-0002w4-8v
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 04:42:57 -0400
+Received: from mail-wr0-f180.google.com ([209.85.128.180]:41651)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1evfWI-0002uq-2Q
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 04:42:54 -0400
+Received: by mail-wr0-f180.google.com with SMTP id f14so20092634wre.8
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 01:42:53 -0700 (PDT)
+References: <20180308124901.83533-1-brijesh.singh@amd.com>
+	<20180308124901.83533-9-brijesh.singh@amd.com>
+	<20180308164910.GF4718@redhat.com>
+	<e39191c3-9c83-8c44-f1d2-9fa7a2f7695d@amd.com>
+	<20180308224412.GF3417@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8cf2f9bc-0339-1c80-b53b-ef5915248d1f@redhat.com>
+Date: Tue, 13 Mar 2018 09:42:51 +0100
 MIME-Version: 1.0
+In-Reply-To: <20180308224412.GF3417@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180312173011.GT3219@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v7 17/23] migration: setup ramstate for
- resume
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v12 08/28] target/i386: add Secure
+ Encrypted Virtulization (SEV) object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,98 +34,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, Brijesh Singh <brijesh.singh@amd.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Markus Armbruster <armbru@redhat.com>, Bruce Rogers <brogers@suse.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, Borislav Petkov <bp@suse.de>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Richard Henderson <richard.henderson@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On Mon, Mar 12, 2018 at 05:30:12PM +0000, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > After we updated the dirty bitmaps of ramblocks, we also need to update
-> > the critical fields in RAMState to make sure it is ready for a resume.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  migration/ram.c        | 45 ++++++++++++++++++++++++++++++++++++++++++++-
-> >  migration/trace-events |  1 +
-> >  2 files changed, 45 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/migration/ram.c b/migration/ram.c
-> > index 196b1ba876..5cd9f43728 100644
-> > --- a/migration/ram.c
-> > +++ b/migration/ram.c
-> > @@ -2254,6 +2254,41 @@ static int ram_init_all(RAMState **rsp)
-> >      return 0;
-> >  }
-> >  
-> > +static void ram_state_resume_prepare(RAMState *rs, QEMUFile *out)
-> > +{
-> > +    RAMBlock *block;
-> > +    uint64_t pages = 0;
-> > +
-> > +    /*
-> > +     * Postcopy is not using xbzrle/compression, so no need for that.
-> > +     * Also, since source are already halted, we don't need to care
-> > +     * about dirty page logging as well.
-> > +     */
-> > +
-> > +    RAMBLOCK_FOREACH(block) {
-> > +        pages += bitmap_count_one(block->bmap,
-> > +                                  block->used_length >> TARGET_PAGE_BITS);
-> > +    }
-> > +
-> > +    /* This may not be aligned with current bitmaps. Recalculate. */
-> > +    rs->migration_dirty_pages = pages;
-> > +
-> > +    rs->last_seen_block = NULL;
-> > +    rs->last_sent_block = NULL;
-> > +    rs->last_page = 0;
-> > +    rs->last_version = ram_list.version;
-> > +    /*
-> > +     * Disable the bulk stage, otherwise we'll resend the whole RAM no
-> > +     * matter what we have sent.
-> > +     */
-> > +    rs->ram_bulk_stage = false;
-> > +
-> > +    /* Update RAMState cache of output QEMUFile */
-> > +    rs->f = out;
-> > +
-> > +    trace_ram_state_resume_prepare(pages);
-> > +}
-> > +
-> >  /*
-> >   * Each of ram_save_setup, ram_save_iterate and ram_save_complete has
-> >   * long-running RCU critical section.  When rcu-reclaims in the code
-> > @@ -3182,8 +3217,16 @@ out:
-> >  static int ram_resume_prepare(MigrationState *s, void *opaque)
-> >  {
-> >      RAMState *rs = *(RAMState **)opaque;
-> > +    int ret;
-> >  
-> > -    return ram_dirty_bitmap_sync_all(s, rs);
-> > +    ret = ram_dirty_bitmap_sync_all(s, rs);
-> > +    if (ret) {
-> > +        return ret;
-> > +    }
-> > +
-> > +    ram_state_resume_prepare(rs, s->to_dst_file);
-> > +
-> > +    return 0;
-> >  }
-> >  
-> >  static SaveVMHandlers savevm_ram_handlers = {
-> > diff --git a/migration/trace-events b/migration/trace-events
-> > index 45b1d89217..f5913ff51c 100644
-> > --- a/migration/trace-events
-> > +++ b/migration/trace-events
-> > @@ -88,6 +88,7 @@ ram_dirty_bitmap_reload_complete(char *str) "%s"
-> >  ram_dirty_bitmap_sync_start(void) ""
-> >  ram_dirty_bitmap_sync_wait(void) ""
-> >  ram_dirty_bitmap_sync_complete(void) ""
-> > +ram_state_resume_prepare(long v) "%ld"
+On 08/03/2018 23:44, Eduardo Habkost wrote:
+>> I think doing so will be an issue for the migration. Consider your above
+>> use case, a SEV guest is running on EPYC with cbitpos=47 and if we
+>> migrate to some $NEXT AMD CPU which uses need to use cbitpos=48 and we
+>> will fail to resume the guest on destination after migrating.
 > 
-> Actually, just noticed that's a long but the values passed is now
-> uint64_t - be careful.
+> Exactly, in other words these two options are part of the guest
+> ABI, and QEMU promises to never make the guest ABI depend on the
+> host hardware unless you're using "-cpu host".
 
-Yeah, will fix that up.  Thanks,
+This is not entirely true; while MAXPHYADDR is constant downstream
+unless using "-cpu host", in practice that behavior is wrong and a guest
+could misbehave if passed a MAXPHYADDR that is different from the host's.
 
--- 
-Peter Xu
+I think this is the same, and management software will have to live with it.
+
+Paolo
+
+> In theory we could make QEMU choose the right values
+> automatically if we document very clearly that the default
+> behavior is unsafe.  But I would rather not take that risk and
+> force management software to be aware of the gotchas involved in
+> using SEV + live-migration.
