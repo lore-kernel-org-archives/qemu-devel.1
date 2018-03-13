@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55274)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evhDV-0004Lx-N2
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 06:31:43 -0400
+	(envelope-from <stefanha@redhat.com>) id 1evhJd-0006R3-Hd
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 06:37:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evhDR-0001P5-FX
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 06:31:37 -0400
-Date: Tue, 13 Mar 2018 10:30:57 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180313103056.GB3545@work-vm>
-References: <20180207155837.92351-1-vsementsov@virtuozzo.com>
-	<20180207155837.92351-6-vsementsov@virtuozzo.com>
-	<20180312153020.GI3219@work-vm>
-	<af82d663-f37c-2857-214c-83e348a5f52a@virtuozzo.com>
+	(envelope-from <stefanha@redhat.com>) id 1evhJa-0007p8-By
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 06:37:57 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54322 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1evhJa-0007oR-5w
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 06:37:54 -0400
+Date: Tue, 13 Mar 2018 10:37:36 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180313103736.GC16582@stefanha-x1.localdomain>
+References: <20180312131806.23209-1-stefanha@redhat.com>
+	<43378184-a291-263f-b8b2-dedc455622e3@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="WfZ7S8PLGjBY9Voh"
 Content-Disposition: inline
-In-Reply-To: <af82d663-f37c-2857-214c-83e348a5f52a@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v10 05/12] migration: introduce
- postcopy-only pending
+In-Reply-To: <43378184-a291-263f-b8b2-dedc455622e3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] checkpatch: warn about missing MAINTAINERS
+ file changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,98 +29,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
-> 12.03.2018 18:30, Dr. David Alan Gilbert wrote:
-> > * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
-> > > There would be savevm states (dirty-bitmap) which can migrate only in
-> > > postcopy stage. The corresponding pending is introduced here.
-> > > 
-> > > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> > > ---
-> 
-> [...]
-> 
-> > >   static MigIterateState migration_iteration_run(MigrationState *s)
-> > >   {
-> > > -    uint64_t pending_size, pend_post, pend_nonpost;
-> > > +    uint64_t pending_size, pend_pre, pend_compat, pend_post;
-> > >       bool in_postcopy = s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE;
-> > > -    qemu_savevm_state_pending(s->to_dst_file, s->threshold_size,
-> > > -                              &pend_nonpost, &pend_post);
-> > > -    pending_size = pend_nonpost + pend_post;
-> > > +    qemu_savevm_state_pending(s->to_dst_file, s->threshold_size, &pend_pre,
-> > > +                              &pend_compat, &pend_post);
-> > > +    pending_size = pend_pre + pend_compat + pend_post;
-> > >       trace_migrate_pending(pending_size, s->threshold_size,
-> > > -                          pend_post, pend_nonpost);
-> > > +                          pend_pre, pend_compat, pend_post);
-> > >       if (pending_size && pending_size >= s->threshold_size) {
-> > >           /* Still a significant amount to transfer */
-> > >           if (migrate_postcopy() && !in_postcopy &&
-> > > -            pend_nonpost <= s->threshold_size &&
-> > > -            atomic_read(&s->start_postcopy)) {
-> > > +            pend_pre <= s->threshold_size &&
-> > > +            (atomic_read(&s->start_postcopy) ||
-> > > +             (pend_pre + pend_compat <= s->threshold_size)))
-> > This change does something different from the description;
-> > it causes a postcopy_start even if the user never ran the postcopy-start
-> > command; so sorry, we can't do that; because postcopy for RAM is
-> > something that users can enable but only switch into when they've given
-> > up on it completing normally.
-> > 
-> > However, I guess that leaves you with a problem; which is what happens
-> > to the system when you've run out of pend_pre+pend_compat but can't
-> > complete because pend_post is non-0; so I don't know the answer to that.
-> > 
-> > 
-> 
-> Hmm. Here, we go to postcopy only if "pend_pre + pend_compat <=
-> s->threshold_size". Pre-patch, in this case we will go to
-> migration_completion(). So, precopy stage is finishing anyway.
 
-Right.
+--WfZ7S8PLGjBY9Voh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> So, we want
-> in this case to finish ram migration like it was finished by
-> migration_completion(), and then, run postcopy, which will handle only dirty
-> bitmaps, yes?
+On Mon, Mar 12, 2018 at 02:46:20PM +0100, Thomas Huth wrote:
+> On 12.03.2018 14:18, Stefan Hajnoczi wrote:
+> > Warn if files are added/renamed/deleted without MAINTAINERS file
+> > changes.  This has helped me in Linux and we could benefit from this
+> > check in QEMU.
+> >=20
+> > This patch is a manual cherry-pick of Linux commit
+> > 13f1937ef33950b1112049972249e6191b82e6c9 ("checkpatch: emit a warning on
+> > file add/move/delete") by Joe Perches <joe@perches.com>.
+> >=20
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> > Note the 80-char lines are from upstream code.  Keep them as-is.
+> >=20
+> >  scripts/checkpatch.pl | 19 +++++++++++++++++++
+> >  1 file changed, 19 insertions(+)
+> >=20
+> > diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> > index d1fe79bcc4..d0d8f63d48 100755
+> > --- a/scripts/checkpatch.pl
+> > +++ b/scripts/checkpatch.pl
+> > @@ -1177,6 +1177,7 @@ sub process {
+> >  	our $clean =3D 1;
+> >  	my $signoff =3D 0;
+> >  	my $is_patch =3D 0;
+> > +	my $reported_maintainer_file =3D 0;
+> > =20
+> >  	our @report =3D ();
+> >  	our $cnt_lines =3D 0;
+> > @@ -1379,6 +1380,24 @@ sub process {
+> >  			}
+> >  		}
+> > =20
+> > +# Check if MAINTAINERS is being updated.  If so, there's probably no n=
+eed to
+> > +# emit the "does MAINTAINERS need updating?" message on file add/move/=
+delete
+> > +		if ($line =3D~ /^\s*MAINTAINERS\s*\|/) {
+> > +			$reported_maintainer_file =3D 1;
+> > +		}
+> > +
+> > +# Check for added, moved or deleted files
+> > +		if (!$reported_maintainer_file &&
+> > +		    ($line =3D~ /^(?:new|deleted) file mode\s*\d+\s*$/ ||
+> > +		     $line =3D~ /^rename (?:from|to) [\w\/\.\-]+\s*$/ ||
+> > +		     ($line =3D~ /\{\s*([\w\/\.\-]*)\s*\=3D\>\s*([\w\/\.\-]*)\s*\}/ =
+&&
+> > +		      (defined($1) || defined($2))))) {
+> > +			$is_patch =3D 1;
+> > +			$reported_maintainer_file =3D 1;
+> > +			WARN("added, moved or deleted file(s), does MAINTAINERS need updati=
+ng?\n" .
+> > +				$herecurr);
+>=20
+> Could you please turn this into a notification instead of a warning? For
+> rationale, please see the discussion of this patch last year:
+>=20
+> http://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05753.html
 
-It's a bit tricky; the first important thing is that we can't change the
-semantics of the migration without the 'dirty bitmaps'.
+It's a warning, not an error, so this already means "don't treat it as
+fatal".
 
-So then there's the question of how  a migration with both
-postcopy-ram+dirty bitmaps should work;  again I don't think we should
-enter the postcopy-ram phase until start-postcopy is issued.
+Why is a warning a bad user experience but a notification would be fine?
 
-Then there's the 3rd case; dirty-bitmaps but no postcopy-ram; in that
-case I worry less about the semantics of how you want to do it.
+Stefan
 
-> Hmm2. Looked through migration_completion(), I don't understand, how it
-> finishes ram migration without postcopy. It calls
-> qemu_savevm_state_complete_precopy(), which skips states with
-> has_postcopy=true, which is ram...
+--WfZ7S8PLGjBY9Voh
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Because savevm_state_complete_precopy only skips has_postcopy=true in
-the in_postcopy case:
+-----BEGIN PGP SIGNATURE-----
 
-            (in_postcopy && se->ops->has_postcopy &&
-             se->ops->has_postcopy(se->opaque)) ||
+iQEcBAEBAgAGBQJap6nwAAoJEJykq7OBq3PIwosH/11Oa+BkUyhFf4YgTYolaSF4
+UpqNUwlWR5Nb/uC2CKRXdoe08P4CtKYzoHHf57fedr1xTNaaCTbXPuSZIeHfQmAf
+xJPON1f9pcRW+547qRElq9Th32OM9OxhrBZyOD1D4YqP7ncWiiRm+EeOC8wUtUXi
+gzCa0ELlErY7hzX+j6ptvGpZHoCtVs2qaQiQrt55JdVnYgL5REmhhedAfmin08Ls
+vaVeHbE8OKerE34QfFH0Y1L1k9jEs2fNAGlsogQxFcEr0PIdJg4UKGub4SuJGiui
+PGA/X1g/9eUnm4BYjNm5rZn8cC521zuPcpMYppPRTj+NPIMLgxszwItEgBd7eJQ=
+=RFqK
+-----END PGP SIGNATURE-----
 
-so when we call it in migration_completion(), if we've not entered
-postcopy yet, then that test doesn't trigger.
-
-(Apologies for not spotting this earlier; but I thought this patch was
-a nice easy one just adding the postcopy_only_pending - I didn't realise it changed
-existing semantics until I spotted that)
-
-Dave
-
-> -- 
-> Best regards,
-> Vladimir
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--WfZ7S8PLGjBY9Voh--
