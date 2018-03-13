@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58660)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1evmc2-0000Qr-7l
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:17:19 -0400
+	(envelope-from <chengang@emindsoft.com.cn>) id 1evmcj-0000ze-Tx
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1evmby-00040c-8o
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:17:18 -0400
-References: <20180207155837.92351-1-vsementsov@virtuozzo.com>
-	<20180207155837.92351-6-vsementsov@virtuozzo.com>
-	<20180312153020.GI3219@work-vm>
-	<af82d663-f37c-2857-214c-83e348a5f52a@virtuozzo.com>
-	<20180313103056.GB3545@work-vm>
-	<9bc43da5-027a-cd11-0c13-b9a9432e0fdb@virtuozzo.com>
-	<20180313153513.GG3545@work-vm>
-	<9f65e973-d3d3-09bf-5cf0-eac8d9e20b97@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <3a057d44-13e0-b208-cdce-96884bc03952@redhat.com>
-Date: Tue, 13 Mar 2018 12:16:47 -0400
+	(envelope-from <chengang@emindsoft.com.cn>) id 1evmcf-0004Hx-Um
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:01 -0400
+Received: from regular1.263xmail.com ([211.150.99.137]:59332)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <chengang@emindsoft.com.cn>)
+	id 1evmcf-0004Ex-CD
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:17:57 -0400
+Message-ID: <5AA7FE59.9020206@emindsoft.com.cn>
+Date: Wed, 14 Mar 2018 00:37:45 +0800
+From: Chen Gang <chengang@emindsoft.com.cn>
 MIME-Version: 1.0
-In-Reply-To: <9f65e973-d3d3-09bf-5cf0-eac8d9e20b97@virtuozzo.com>
+References: <CAFEAcA8Pu=SkYCPwCnRdKTEFPScsZhj4vJm0dTs+jV1jTWOAog@mail.gmail.com>
+	<0304e590-ab51-649b-7cee-bb7c5be6f5e4@redhat.com>
+	<c7b075f5-8084-99c0-02e0-3da555bea4df@mail.uni-paderborn.de>
+In-Reply-To: <c7b075f5-8084-99c0-02e0-3da555bea4df@mail.uni-paderborn.de>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v10 05/12] migration: introduce
- postcopy-only pending
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Deprecate tilegx ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,22 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, den@openvz.org, lirans@il.ibm.com
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>, Chen Gang <gang.chen.5i5j@gmail.com>, Chen Gang <xili_gchen_5257@hotmail.com>, Richard Henderson <rth@twiddle.net>, Chris Metcalf <cmetcalf@ezchip.com>, "walt@tilera.com" <walt@tilera.com>
 
 
+On 2/28/18 20:41, Bastian Koppelmann wrote:
+> On 02/28/2018 07:11 AM, Thomas Huth wrote:
+>> On 27.02.2018 12:51, Peter Maydell wrote:
+>>
+>>> Possibly there are other target architectures we could reasonably
+>>> deprecate-and-remove (though none of the other ones Linux is dropping
+>>> in this round are ones we support)...
+>>
+>> I'd vote for marking tilegx as deprecated, too, since we even do not
+>> have an active maintainer for that CPU core (at least I did not spot o=
+ne
+>> in our MAINTAINERS file). Opinions?
+>=20
+> I always saw it as a big plus that QEMU supports nearly any
+> architecture, no matter how obscure it is. So I'm a bit more hesitant o=
+n
+> dropping architectures quickly.
+>=20
 
-On 03/13/2018 12:14 PM, Vladimir Sementsov-Ogievskiy wrote:
-> 
-> Hmm, I agree, it is the simplest thing we can do for now, and I'll
-> rethink later,
-> how (and is it worth doing) to go to postcopy automatically in case of
-> only-dirty-bitmaps.
-> Should I respin?
+Firstly, sorry for too long time to no response about tilegx.
 
-Please do. I already staged patches 1-4 in my branch, so if you'd like,
-you can respin just 5+.
+During latest 2 years, I turned to android development (custom aosp with
+java/c++/c, merge android and linux together), and revert engineering
+about android (java/c).
 
-https://github.com/jnsnow/qemu/tree/bitmaps
+At present, sorry, I really have no time for tilegx any more. :(
 
---js
+For me, tilegx is still a good platform, and we have done much things,
+now, so if we can find another maintainers/volunteers for it, I hope
+qemu can still support tilegx.
+
+By the way, for floating point instructions patches, I have sent before
+(2 years ago), it seems I did not get any reply. I hope they are useful
+for tilegx.
+
+Thanks.
+--=20
+Chen Gang (=E9=99=88=E5=88=9A)
