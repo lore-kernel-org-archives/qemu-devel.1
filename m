@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1evqMr-0005J3-PY
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 16:17:57 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1evqN1-0005QV-Ey
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 16:18:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1evqMo-0003Ye-JJ
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 16:17:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56856)
+	(envelope-from <alex.williamson@redhat.com>) id 1evqMy-0003fM-AN
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 16:18:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42792)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1evqMo-0003Y1-9v
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 16:17:50 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	id 1evqMy-0003f0-4A
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 16:18:00 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9E59480468
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 20:17:49 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7672881127
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 20:17:59 +0000 (UTC)
 From: Alex Williamson <alex.williamson@redhat.com>
-Date: Tue, 13 Mar 2018 14:17:43 -0600
-Message-ID: <20180313201743.2327.50578.stgit@gimli.home>
+Date: Tue, 13 Mar 2018 14:17:54 -0600
+Message-ID: <20180313201754.2327.44722.stgit@gimli.home>
 In-Reply-To: <20180313201415.2327.62402.stgit@gimli.home>
 References: <20180313201415.2327.62402.stgit@gimli.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PULL 01/11] standard-headers: add drm/drm_fourcc.h
+Subject: [Qemu-devel] [PULL 02/11] ui/pixman: add qemu_drm_format_to_pixman()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,460 +37,83 @@ To: qemu-devel@nongnu.org
 
 From: Gerd Hoffmann <kraxel@redhat.com>
 
-So we can use the drm fourcc codes without a dependency on libdrm-devel.
+Map drm fourcc codes to pixman formats.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed by: Kirti Wankhede <kwankhede@nvidia.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- include/standard-headers/drm/drm_fourcc.h |  411 +++++++++++++++++++++++++++++
- scripts/update-linux-headers.sh           |    5 
- 2 files changed, 416 insertions(+)
- create mode 100644 include/standard-headers/drm/drm_fourcc.h
+ include/ui/qemu-pixman.h |    5 +++++
+ ui/qemu-pixman.c         |   22 ++++++++++++++++++++++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/include/standard-headers/drm/drm_fourcc.h b/include/standard-headers/drm/drm_fourcc.h
-new file mode 100644
-index 000000000000..11912fde24bb
---- /dev/null
-+++ b/include/standard-headers/drm/drm_fourcc.h
-@@ -0,0 +1,411 @@
-+/*
-+ * Copyright 2011 Intel Corporation
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a
-+ * copy of this software and associated documentation files (the "Software"),
-+ * to deal in the Software without restriction, including without limitation
-+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
-+ * and/or sell copies of the Software, and to permit persons to whom the
-+ * Software is furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice (including the next
-+ * paragraph) shall be included in all copies or substantial portions of the
-+ * Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
-+ * VA LINUX SYSTEMS AND/OR ITS SUPPLIERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-+ * OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-+ * OTHER DEALINGS IN THE SOFTWARE.
-+ */
-+
-+#ifndef DRM_FOURCC_H
-+#define DRM_FOURCC_H
-+
-+
-+#if defined(__cplusplus)
-+extern "C" {
-+#endif
-+
-+#define fourcc_code(a, b, c, d) ((uint32_t)(a) | ((uint32_t)(b) << 8) | \
-+				 ((uint32_t)(c) << 16) | ((uint32_t)(d) << 24))
-+
-+#define DRM_FORMAT_BIG_ENDIAN (1<<31) /* format is big endian instead of little endian */
-+
-+/* color index */
-+#define DRM_FORMAT_C8		fourcc_code('C', '8', ' ', ' ') /* [7:0] C */
-+
-+/* 8 bpp Red */
-+#define DRM_FORMAT_R8		fourcc_code('R', '8', ' ', ' ') /* [7:0] R */
-+
-+/* 16 bpp Red */
-+#define DRM_FORMAT_R16		fourcc_code('R', '1', '6', ' ') /* [15:0] R little endian */
-+
-+/* 16 bpp RG */
-+#define DRM_FORMAT_RG88		fourcc_code('R', 'G', '8', '8') /* [15:0] R:G 8:8 little endian */
-+#define DRM_FORMAT_GR88		fourcc_code('G', 'R', '8', '8') /* [15:0] G:R 8:8 little endian */
-+
-+/* 32 bpp RG */
-+#define DRM_FORMAT_RG1616	fourcc_code('R', 'G', '3', '2') /* [31:0] R:G 16:16 little endian */
-+#define DRM_FORMAT_GR1616	fourcc_code('G', 'R', '3', '2') /* [31:0] G:R 16:16 little endian */
-+
-+/* 8 bpp RGB */
-+#define DRM_FORMAT_RGB332	fourcc_code('R', 'G', 'B', '8') /* [7:0] R:G:B 3:3:2 */
-+#define DRM_FORMAT_BGR233	fourcc_code('B', 'G', 'R', '8') /* [7:0] B:G:R 2:3:3 */
-+
-+/* 16 bpp RGB */
-+#define DRM_FORMAT_XRGB4444	fourcc_code('X', 'R', '1', '2') /* [15:0] x:R:G:B 4:4:4:4 little endian */
-+#define DRM_FORMAT_XBGR4444	fourcc_code('X', 'B', '1', '2') /* [15:0] x:B:G:R 4:4:4:4 little endian */
-+#define DRM_FORMAT_RGBX4444	fourcc_code('R', 'X', '1', '2') /* [15:0] R:G:B:x 4:4:4:4 little endian */
-+#define DRM_FORMAT_BGRX4444	fourcc_code('B', 'X', '1', '2') /* [15:0] B:G:R:x 4:4:4:4 little endian */
-+
-+#define DRM_FORMAT_ARGB4444	fourcc_code('A', 'R', '1', '2') /* [15:0] A:R:G:B 4:4:4:4 little endian */
-+#define DRM_FORMAT_ABGR4444	fourcc_code('A', 'B', '1', '2') /* [15:0] A:B:G:R 4:4:4:4 little endian */
-+#define DRM_FORMAT_RGBA4444	fourcc_code('R', 'A', '1', '2') /* [15:0] R:G:B:A 4:4:4:4 little endian */
-+#define DRM_FORMAT_BGRA4444	fourcc_code('B', 'A', '1', '2') /* [15:0] B:G:R:A 4:4:4:4 little endian */
-+
-+#define DRM_FORMAT_XRGB1555	fourcc_code('X', 'R', '1', '5') /* [15:0] x:R:G:B 1:5:5:5 little endian */
-+#define DRM_FORMAT_XBGR1555	fourcc_code('X', 'B', '1', '5') /* [15:0] x:B:G:R 1:5:5:5 little endian */
-+#define DRM_FORMAT_RGBX5551	fourcc_code('R', 'X', '1', '5') /* [15:0] R:G:B:x 5:5:5:1 little endian */
-+#define DRM_FORMAT_BGRX5551	fourcc_code('B', 'X', '1', '5') /* [15:0] B:G:R:x 5:5:5:1 little endian */
-+
-+#define DRM_FORMAT_ARGB1555	fourcc_code('A', 'R', '1', '5') /* [15:0] A:R:G:B 1:5:5:5 little endian */
-+#define DRM_FORMAT_ABGR1555	fourcc_code('A', 'B', '1', '5') /* [15:0] A:B:G:R 1:5:5:5 little endian */
-+#define DRM_FORMAT_RGBA5551	fourcc_code('R', 'A', '1', '5') /* [15:0] R:G:B:A 5:5:5:1 little endian */
-+#define DRM_FORMAT_BGRA5551	fourcc_code('B', 'A', '1', '5') /* [15:0] B:G:R:A 5:5:5:1 little endian */
-+
-+#define DRM_FORMAT_RGB565	fourcc_code('R', 'G', '1', '6') /* [15:0] R:G:B 5:6:5 little endian */
-+#define DRM_FORMAT_BGR565	fourcc_code('B', 'G', '1', '6') /* [15:0] B:G:R 5:6:5 little endian */
-+
-+/* 24 bpp RGB */
-+#define DRM_FORMAT_RGB888	fourcc_code('R', 'G', '2', '4') /* [23:0] R:G:B little endian */
-+#define DRM_FORMAT_BGR888	fourcc_code('B', 'G', '2', '4') /* [23:0] B:G:R little endian */
-+
-+/* 32 bpp RGB */
-+#define DRM_FORMAT_XRGB8888	fourcc_code('X', 'R', '2', '4') /* [31:0] x:R:G:B 8:8:8:8 little endian */
-+#define DRM_FORMAT_XBGR8888	fourcc_code('X', 'B', '2', '4') /* [31:0] x:B:G:R 8:8:8:8 little endian */
-+#define DRM_FORMAT_RGBX8888	fourcc_code('R', 'X', '2', '4') /* [31:0] R:G:B:x 8:8:8:8 little endian */
-+#define DRM_FORMAT_BGRX8888	fourcc_code('B', 'X', '2', '4') /* [31:0] B:G:R:x 8:8:8:8 little endian */
-+
-+#define DRM_FORMAT_ARGB8888	fourcc_code('A', 'R', '2', '4') /* [31:0] A:R:G:B 8:8:8:8 little endian */
-+#define DRM_FORMAT_ABGR8888	fourcc_code('A', 'B', '2', '4') /* [31:0] A:B:G:R 8:8:8:8 little endian */
-+#define DRM_FORMAT_RGBA8888	fourcc_code('R', 'A', '2', '4') /* [31:0] R:G:B:A 8:8:8:8 little endian */
-+#define DRM_FORMAT_BGRA8888	fourcc_code('B', 'A', '2', '4') /* [31:0] B:G:R:A 8:8:8:8 little endian */
-+
-+#define DRM_FORMAT_XRGB2101010	fourcc_code('X', 'R', '3', '0') /* [31:0] x:R:G:B 2:10:10:10 little endian */
-+#define DRM_FORMAT_XBGR2101010	fourcc_code('X', 'B', '3', '0') /* [31:0] x:B:G:R 2:10:10:10 little endian */
-+#define DRM_FORMAT_RGBX1010102	fourcc_code('R', 'X', '3', '0') /* [31:0] R:G:B:x 10:10:10:2 little endian */
-+#define DRM_FORMAT_BGRX1010102	fourcc_code('B', 'X', '3', '0') /* [31:0] B:G:R:x 10:10:10:2 little endian */
-+
-+#define DRM_FORMAT_ARGB2101010	fourcc_code('A', 'R', '3', '0') /* [31:0] A:R:G:B 2:10:10:10 little endian */
-+#define DRM_FORMAT_ABGR2101010	fourcc_code('A', 'B', '3', '0') /* [31:0] A:B:G:R 2:10:10:10 little endian */
-+#define DRM_FORMAT_RGBA1010102	fourcc_code('R', 'A', '3', '0') /* [31:0] R:G:B:A 10:10:10:2 little endian */
-+#define DRM_FORMAT_BGRA1010102	fourcc_code('B', 'A', '3', '0') /* [31:0] B:G:R:A 10:10:10:2 little endian */
-+
-+/* packed YCbCr */
-+#define DRM_FORMAT_YUYV		fourcc_code('Y', 'U', 'Y', 'V') /* [31:0] Cr0:Y1:Cb0:Y0 8:8:8:8 little endian */
-+#define DRM_FORMAT_YVYU		fourcc_code('Y', 'V', 'Y', 'U') /* [31:0] Cb0:Y1:Cr0:Y0 8:8:8:8 little endian */
-+#define DRM_FORMAT_UYVY		fourcc_code('U', 'Y', 'V', 'Y') /* [31:0] Y1:Cr0:Y0:Cb0 8:8:8:8 little endian */
-+#define DRM_FORMAT_VYUY		fourcc_code('V', 'Y', 'U', 'Y') /* [31:0] Y1:Cb0:Y0:Cr0 8:8:8:8 little endian */
-+
-+#define DRM_FORMAT_AYUV		fourcc_code('A', 'Y', 'U', 'V') /* [31:0] A:Y:Cb:Cr 8:8:8:8 little endian */
-+
-+/*
-+ * 2 plane RGB + A
-+ * index 0 = RGB plane, same format as the corresponding non _A8 format has
-+ * index 1 = A plane, [7:0] A
-+ */
-+#define DRM_FORMAT_XRGB8888_A8	fourcc_code('X', 'R', 'A', '8')
-+#define DRM_FORMAT_XBGR8888_A8	fourcc_code('X', 'B', 'A', '8')
-+#define DRM_FORMAT_RGBX8888_A8	fourcc_code('R', 'X', 'A', '8')
-+#define DRM_FORMAT_BGRX8888_A8	fourcc_code('B', 'X', 'A', '8')
-+#define DRM_FORMAT_RGB888_A8	fourcc_code('R', '8', 'A', '8')
-+#define DRM_FORMAT_BGR888_A8	fourcc_code('B', '8', 'A', '8')
-+#define DRM_FORMAT_RGB565_A8	fourcc_code('R', '5', 'A', '8')
-+#define DRM_FORMAT_BGR565_A8	fourcc_code('B', '5', 'A', '8')
-+
-+/*
-+ * 2 plane YCbCr
-+ * index 0 = Y plane, [7:0] Y
-+ * index 1 = Cr:Cb plane, [15:0] Cr:Cb little endian
-+ * or
-+ * index 1 = Cb:Cr plane, [15:0] Cb:Cr little endian
-+ */
-+#define DRM_FORMAT_NV12		fourcc_code('N', 'V', '1', '2') /* 2x2 subsampled Cr:Cb plane */
-+#define DRM_FORMAT_NV21		fourcc_code('N', 'V', '2', '1') /* 2x2 subsampled Cb:Cr plane */
-+#define DRM_FORMAT_NV16		fourcc_code('N', 'V', '1', '6') /* 2x1 subsampled Cr:Cb plane */
-+#define DRM_FORMAT_NV61		fourcc_code('N', 'V', '6', '1') /* 2x1 subsampled Cb:Cr plane */
-+#define DRM_FORMAT_NV24		fourcc_code('N', 'V', '2', '4') /* non-subsampled Cr:Cb plane */
-+#define DRM_FORMAT_NV42		fourcc_code('N', 'V', '4', '2') /* non-subsampled Cb:Cr plane */
-+
-+/*
-+ * 3 plane YCbCr
-+ * index 0: Y plane, [7:0] Y
-+ * index 1: Cb plane, [7:0] Cb
-+ * index 2: Cr plane, [7:0] Cr
-+ * or
-+ * index 1: Cr plane, [7:0] Cr
-+ * index 2: Cb plane, [7:0] Cb
-+ */
-+#define DRM_FORMAT_YUV410	fourcc_code('Y', 'U', 'V', '9') /* 4x4 subsampled Cb (1) and Cr (2) planes */
-+#define DRM_FORMAT_YVU410	fourcc_code('Y', 'V', 'U', '9') /* 4x4 subsampled Cr (1) and Cb (2) planes */
-+#define DRM_FORMAT_YUV411	fourcc_code('Y', 'U', '1', '1') /* 4x1 subsampled Cb (1) and Cr (2) planes */
-+#define DRM_FORMAT_YVU411	fourcc_code('Y', 'V', '1', '1') /* 4x1 subsampled Cr (1) and Cb (2) planes */
-+#define DRM_FORMAT_YUV420	fourcc_code('Y', 'U', '1', '2') /* 2x2 subsampled Cb (1) and Cr (2) planes */
-+#define DRM_FORMAT_YVU420	fourcc_code('Y', 'V', '1', '2') /* 2x2 subsampled Cr (1) and Cb (2) planes */
-+#define DRM_FORMAT_YUV422	fourcc_code('Y', 'U', '1', '6') /* 2x1 subsampled Cb (1) and Cr (2) planes */
-+#define DRM_FORMAT_YVU422	fourcc_code('Y', 'V', '1', '6') /* 2x1 subsampled Cr (1) and Cb (2) planes */
-+#define DRM_FORMAT_YUV444	fourcc_code('Y', 'U', '2', '4') /* non-subsampled Cb (1) and Cr (2) planes */
-+#define DRM_FORMAT_YVU444	fourcc_code('Y', 'V', '2', '4') /* non-subsampled Cr (1) and Cb (2) planes */
-+
-+
-+/*
-+ * Format Modifiers:
-+ *
-+ * Format modifiers describe, typically, a re-ordering or modification
-+ * of the data in a plane of an FB.  This can be used to express tiled/
-+ * swizzled formats, or compression, or a combination of the two.
-+ *
-+ * The upper 8 bits of the format modifier are a vendor-id as assigned
-+ * below.  The lower 56 bits are assigned as vendor sees fit.
-+ */
-+
-+/* Vendor Ids: */
-+#define DRM_FORMAT_MOD_NONE           0
-+#define DRM_FORMAT_MOD_VENDOR_NONE    0
-+#define DRM_FORMAT_MOD_VENDOR_INTEL   0x01
-+#define DRM_FORMAT_MOD_VENDOR_AMD     0x02
-+#define DRM_FORMAT_MOD_VENDOR_NVIDIA  0x03
-+#define DRM_FORMAT_MOD_VENDOR_SAMSUNG 0x04
-+#define DRM_FORMAT_MOD_VENDOR_QCOM    0x05
-+#define DRM_FORMAT_MOD_VENDOR_VIVANTE 0x06
-+#define DRM_FORMAT_MOD_VENDOR_BROADCOM 0x07
-+/* add more to the end as needed */
-+
-+#define DRM_FORMAT_RESERVED	      ((1ULL << 56) - 1)
-+
-+#define fourcc_mod_code(vendor, val) \
-+	((((uint64_t)DRM_FORMAT_MOD_VENDOR_## vendor) << 56) | ((val) & 0x00ffffffffffffffULL))
-+
-+/*
-+ * Format Modifier tokens:
-+ *
-+ * When adding a new token please document the layout with a code comment,
-+ * similar to the fourcc codes above. drm_fourcc.h is considered the
-+ * authoritative source for all of these.
-+ */
-+
-+/*
-+ * Invalid Modifier
-+ *
-+ * This modifier can be used as a sentinel to terminate the format modifiers
-+ * list, or to initialize a variable with an invalid modifier. It might also be
-+ * used to report an error back to userspace for certain APIs.
-+ */
-+#define DRM_FORMAT_MOD_INVALID	fourcc_mod_code(NONE, DRM_FORMAT_RESERVED)
-+
-+/*
-+ * Linear Layout
-+ *
-+ * Just plain linear layout. Note that this is different from no specifying any
-+ * modifier (e.g. not setting DRM_MODE_FB_MODIFIERS in the DRM_ADDFB2 ioctl),
-+ * which tells the driver to also take driver-internal information into account
-+ * and so might actually result in a tiled framebuffer.
-+ */
-+#define DRM_FORMAT_MOD_LINEAR	fourcc_mod_code(NONE, 0)
-+
-+/* Intel framebuffer modifiers */
-+
-+/*
-+ * Intel X-tiling layout
-+ *
-+ * This is a tiled layout using 4Kb tiles (except on gen2 where the tiles 2Kb)
-+ * in row-major layout. Within the tile bytes are laid out row-major, with
-+ * a platform-dependent stride. On top of that the memory can apply
-+ * platform-depending swizzling of some higher address bits into bit6.
-+ *
-+ * This format is highly platforms specific and not useful for cross-driver
-+ * sharing. It exists since on a given platform it does uniquely identify the
-+ * layout in a simple way for i915-specific userspace.
-+ */
-+#define I915_FORMAT_MOD_X_TILED	fourcc_mod_code(INTEL, 1)
-+
-+/*
-+ * Intel Y-tiling layout
-+ *
-+ * This is a tiled layout using 4Kb tiles (except on gen2 where the tiles 2Kb)
-+ * in row-major layout. Within the tile bytes are laid out in OWORD (16 bytes)
-+ * chunks column-major, with a platform-dependent height. On top of that the
-+ * memory can apply platform-depending swizzling of some higher address bits
-+ * into bit6.
-+ *
-+ * This format is highly platforms specific and not useful for cross-driver
-+ * sharing. It exists since on a given platform it does uniquely identify the
-+ * layout in a simple way for i915-specific userspace.
-+ */
-+#define I915_FORMAT_MOD_Y_TILED	fourcc_mod_code(INTEL, 2)
-+
-+/*
-+ * Intel Yf-tiling layout
-+ *
-+ * This is a tiled layout using 4Kb tiles in row-major layout.
-+ * Within the tile pixels are laid out in 16 256 byte units / sub-tiles which
-+ * are arranged in four groups (two wide, two high) with column-major layout.
-+ * Each group therefore consits out of four 256 byte units, which are also laid
-+ * out as 2x2 column-major.
-+ * 256 byte units are made out of four 64 byte blocks of pixels, producing
-+ * either a square block or a 2:1 unit.
-+ * 64 byte blocks of pixels contain four pixel rows of 16 bytes, where the width
-+ * in pixel depends on the pixel depth.
-+ */
-+#define I915_FORMAT_MOD_Yf_TILED fourcc_mod_code(INTEL, 3)
-+
-+/*
-+ * Intel color control surface (CCS) for render compression
-+ *
-+ * The framebuffer format must be one of the 8:8:8:8 RGB formats.
-+ * The main surface will be plane index 0 and must be Y/Yf-tiled,
-+ * the CCS will be plane index 1.
-+ *
-+ * Each CCS tile matches a 1024x512 pixel area of the main surface.
-+ * To match certain aspects of the 3D hardware the CCS is
-+ * considered to be made up of normal 128Bx32 Y tiles, Thus
-+ * the CCS pitch must be specified in multiples of 128 bytes.
-+ *
-+ * In reality the CCS tile appears to be a 64Bx64 Y tile, composed
-+ * of QWORD (8 bytes) chunks instead of OWORD (16 bytes) chunks.
-+ * But that fact is not relevant unless the memory is accessed
-+ * directly.
-+ */
-+#define I915_FORMAT_MOD_Y_TILED_CCS	fourcc_mod_code(INTEL, 4)
-+#define I915_FORMAT_MOD_Yf_TILED_CCS	fourcc_mod_code(INTEL, 5)
-+
-+/*
-+ * Tiled, NV12MT, grouped in 64 (pixels) x 32 (lines) -sized macroblocks
-+ *
-+ * Macroblocks are laid in a Z-shape, and each pixel data is following the
-+ * standard NV12 style.
-+ * As for NV12, an image is the result of two frame buffers: one for Y,
-+ * one for the interleaved Cb/Cr components (1/2 the height of the Y buffer).
-+ * Alignment requirements are (for each buffer):
-+ * - multiple of 128 pixels for the width
-+ * - multiple of  32 pixels for the height
-+ *
-+ * For more information: see https://linuxtv.org/downloads/v4l-dvb-apis/re32.html
-+ */
-+#define DRM_FORMAT_MOD_SAMSUNG_64_32_TILE	fourcc_mod_code(SAMSUNG, 1)
-+
-+/* Vivante framebuffer modifiers */
-+
-+/*
-+ * Vivante 4x4 tiling layout
-+ *
-+ * This is a simple tiled layout using tiles of 4x4 pixels in a row-major
-+ * layout.
-+ */
-+#define DRM_FORMAT_MOD_VIVANTE_TILED		fourcc_mod_code(VIVANTE, 1)
-+
-+/*
-+ * Vivante 64x64 super-tiling layout
-+ *
-+ * This is a tiled layout using 64x64 pixel super-tiles, where each super-tile
-+ * contains 8x4 groups of 2x4 tiles of 4x4 pixels (like above) each, all in row-
-+ * major layout.
-+ *
-+ * For more information: see
-+ * https://github.com/etnaviv/etna_viv/blob/master/doc/hardware.md#texture-tiling
-+ */
-+#define DRM_FORMAT_MOD_VIVANTE_SUPER_TILED	fourcc_mod_code(VIVANTE, 2)
-+
-+/*
-+ * Vivante 4x4 tiling layout for dual-pipe
-+ *
-+ * Same as the 4x4 tiling layout, except every second 4x4 pixel tile starts at a
-+ * different base address. Offsets from the base addresses are therefore halved
-+ * compared to the non-split tiled layout.
-+ */
-+#define DRM_FORMAT_MOD_VIVANTE_SPLIT_TILED	fourcc_mod_code(VIVANTE, 3)
-+
-+/*
-+ * Vivante 64x64 super-tiling layout for dual-pipe
-+ *
-+ * Same as the 64x64 super-tiling layout, except every second 4x4 pixel tile
-+ * starts at a different base address. Offsets from the base addresses are
-+ * therefore halved compared to the non-split super-tiled layout.
-+ */
-+#define DRM_FORMAT_MOD_VIVANTE_SPLIT_SUPER_TILED fourcc_mod_code(VIVANTE, 4)
-+
-+/* NVIDIA frame buffer modifiers */
-+
-+/*
-+ * Tegra Tiled Layout, used by Tegra 2, 3 and 4.
-+ *
-+ * Pixels are arranged in simple tiles of 16 x 16 bytes.
-+ */
-+#define DRM_FORMAT_MOD_NVIDIA_TEGRA_TILED fourcc_mod_code(NVIDIA, 1)
-+
-+/*
-+ * 16Bx2 Block Linear layout, used by desktop GPUs, and Tegra K1 and later
-+ *
-+ * Pixels are arranged in 64x8 Groups Of Bytes (GOBs). GOBs are then stacked
-+ * vertically by a power of 2 (1 to 32 GOBs) to form a block.
-+ *
-+ * Within a GOB, data is ordered as 16B x 2 lines sectors laid in Z-shape.
-+ *
-+ * Parameter 'v' is the log2 encoding of the number of GOBs stacked vertically.
-+ * Valid values are:
-+ *
-+ * 0 == ONE_GOB
-+ * 1 == TWO_GOBS
-+ * 2 == FOUR_GOBS
-+ * 3 == EIGHT_GOBS
-+ * 4 == SIXTEEN_GOBS
-+ * 5 == THIRTYTWO_GOBS
-+ *
-+ * Chapter 20 "Pixel Memory Formats" of the Tegra X1 TRM describes this format
-+ * in full detail.
-+ */
-+#define DRM_FORMAT_MOD_NVIDIA_16BX2_BLOCK(v) \
-+	fourcc_mod_code(NVIDIA, 0x10 | ((v) & 0xf))
-+
-+#define DRM_FORMAT_MOD_NVIDIA_16BX2_BLOCK_ONE_GOB \
-+	fourcc_mod_code(NVIDIA, 0x10)
-+#define DRM_FORMAT_MOD_NVIDIA_16BX2_BLOCK_TWO_GOB \
-+	fourcc_mod_code(NVIDIA, 0x11)
-+#define DRM_FORMAT_MOD_NVIDIA_16BX2_BLOCK_FOUR_GOB \
-+	fourcc_mod_code(NVIDIA, 0x12)
-+#define DRM_FORMAT_MOD_NVIDIA_16BX2_BLOCK_EIGHT_GOB \
-+	fourcc_mod_code(NVIDIA, 0x13)
-+#define DRM_FORMAT_MOD_NVIDIA_16BX2_BLOCK_SIXTEEN_GOB \
-+	fourcc_mod_code(NVIDIA, 0x14)
-+#define DRM_FORMAT_MOD_NVIDIA_16BX2_BLOCK_THIRTYTWO_GOB \
-+	fourcc_mod_code(NVIDIA, 0x15)
-+
-+/*
-+ * Broadcom VC4 "T" format
-+ *
-+ * This is the primary layout that the V3D GPU can texture from (it
-+ * can't do linear).  The T format has:
-+ *
-+ * - 64b utiles of pixels in a raster-order grid according to cpp.  It's 4x4
-+ *   pixels at 32 bit depth.
-+ *
-+ * - 1k subtiles made of a 4x4 raster-order grid of 64b utiles (so usually
-+ *   16x16 pixels).
-+ *
-+ * - 4k tiles made of a 2x2 grid of 1k subtiles (so usually 32x32 pixels).  On
-+ *   even 4k tile rows, they're arranged as (BL, TL, TR, BR), and on odd rows
-+ *   they're (TR, BR, BL, TL), where bottom left is start of memory.
-+ *
-+ * - an image made of 4k tiles in rows either left-to-right (even rows of 4k
-+ *   tiles) or right-to-left (odd rows of 4k tiles).
-+ */
-+#define DRM_FORMAT_MOD_BROADCOM_VC4_T_TILED fourcc_mod_code(BROADCOM, 1)
-+
-+#if defined(__cplusplus)
-+}
-+#endif
-+
-+#endif /* DRM_FOURCC_H */
-diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
-index e15241793664..da9030a01c49 100755
---- a/scripts/update-linux-headers.sh
-+++ b/scripts/update-linux-headers.sh
-@@ -39,6 +39,7 @@ cp_portable() {
-                                      -e 'input-event-codes' \
-                                      -e 'sys/' \
-                                      -e 'pvrdma_verbs' \
-+                                     -e 'drm.h' \
-                                      > /dev/null
-     then
-         echo "Unexpected #include in input file $f".
-@@ -57,6 +58,7 @@ cp_portable() {
-         -e 's/__attribute__((packed))/QEMU_PACKED/' \
-         -e 's/__inline__/inline/' \
-         -e 's/__BITS_PER_LONG/HOST_LONG_BITS/' \
-+        -e '/\"drm.h\"/d' \
-         -e '/sys\/ioctl.h/d' \
-         -e 's/SW_MAX/SW_MAX_/' \
-         -e 's/atomic_t/int/' \
-@@ -152,6 +154,9 @@ for i in "$tmpdir"/include/linux/*virtio*.h "$tmpdir/include/linux/input.h" \
-          "$tmpdir/include/linux/pci_regs.h"; do
-     cp_portable "$i" "$output/include/standard-headers/linux"
- done
-+mkdir -p "$output/include/standard-headers/drm"
-+cp_portable "$tmpdir/include/drm/drm_fourcc.h" \
-+            "$output/include/standard-headers/drm"
+diff --git a/include/ui/qemu-pixman.h b/include/ui/qemu-pixman.h
+index 4a67e01232d7..b7c82d17fc5f 100644
+--- a/include/ui/qemu-pixman.h
++++ b/include/ui/qemu-pixman.h
+@@ -33,6 +33,8 @@
+ # define PIXMAN_BE_r8g8b8a8   PIXMAN_r8g8b8a8
+ # define PIXMAN_BE_x8b8g8r8   PIXMAN_x8b8g8r8
+ # define PIXMAN_BE_a8b8g8r8   PIXMAN_a8b8g8r8
++# define PIXMAN_LE_r8g8b8     PIXMAN_b8g8r8
++# define PIXMAN_LE_a8r8g8b8   PIXMAN_b8g8r8a8
+ # define PIXMAN_LE_x8r8g8b8   PIXMAN_b8g8r8x8
+ #else
+ # define PIXMAN_BE_r8g8b8     PIXMAN_b8g8r8
+@@ -44,6 +46,8 @@
+ # define PIXMAN_BE_r8g8b8a8   PIXMAN_a8b8g8r8
+ # define PIXMAN_BE_x8b8g8r8   PIXMAN_r8g8b8x8
+ # define PIXMAN_BE_a8b8g8r8   PIXMAN_r8g8b8a8
++# define PIXMAN_LE_r8g8b8     PIXMAN_r8g8b8
++# define PIXMAN_LE_a8r8g8b8   PIXMAN_a8r8g8b8
+ # define PIXMAN_LE_x8r8g8b8   PIXMAN_x8r8g8b8
+ #endif
  
- rm -rf "$output/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma"
- mkdir -p "$output/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma"
+@@ -51,6 +55,7 @@
+ 
+ PixelFormat qemu_pixelformat_from_pixman(pixman_format_code_t format);
+ pixman_format_code_t qemu_default_pixman_format(int bpp, bool native_endian);
++pixman_format_code_t qemu_drm_format_to_pixman(uint32_t drm_format);
+ int qemu_pixman_get_type(int rshift, int gshift, int bshift);
+ pixman_format_code_t qemu_pixman_get_format(PixelFormat *pf);
+ bool qemu_pixman_check_format(DisplayChangeListener *dcl,
+diff --git a/ui/qemu-pixman.c b/ui/qemu-pixman.c
+index 6e591ab82131..3e52abd92d0a 100644
+--- a/ui/qemu-pixman.c
++++ b/ui/qemu-pixman.c
+@@ -6,6 +6,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "ui/console.h"
++#include "standard-headers/drm/drm_fourcc.h"
+ 
+ PixelFormat qemu_pixelformat_from_pixman(pixman_format_code_t format)
+ {
+@@ -88,6 +89,27 @@ pixman_format_code_t qemu_default_pixman_format(int bpp, bool native_endian)
+     return 0;
+ }
+ 
++/* Note: drm is little endian, pixman is native endian */
++pixman_format_code_t qemu_drm_format_to_pixman(uint32_t drm_format)
++{
++    static const struct {
++        uint32_t drm_format;
++        pixman_format_code_t pixman;
++    } map[] = {
++        { DRM_FORMAT_RGB888,   PIXMAN_LE_r8g8b8   },
++        { DRM_FORMAT_ARGB8888, PIXMAN_LE_a8r8g8b8 },
++        { DRM_FORMAT_XRGB8888, PIXMAN_LE_x8r8g8b8 }
++    };
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(map); i++) {
++        if (drm_format == map[i].drm_format) {
++            return map[i].pixman;
++        }
++    }
++    return 0;
++}
++
+ int qemu_pixman_get_type(int rshift, int gshift, int bshift)
+ {
+     int type = PIXMAN_TYPE_OTHER;
