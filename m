@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1evig1-00021s-2n
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:05:09 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1evihK-0002m7-P8
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:06:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1evifv-0001Pe-GP
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:05:09 -0400
-Received: from mail-wr0-f195.google.com ([209.85.128.195]:40748)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1evihG-0002D9-Qe
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:06:30 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:46770)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1evifv-0001PH-9s
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:05:03 -0400
-Received: by mail-wr0-f195.google.com with SMTP id m4so9108180wrb.7
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 05:05:03 -0700 (PDT)
-References: <1520937591-27088-1-git-send-email-pbonzini@redhat.com>
-	<2c23a5aa-ea1f-b561-1b63-bdeca3bb0c25@de.ibm.com>
-	<CAFEAcA9TJ0okEipdBrr+TmJOa2VN3TT2QhRs=Kx-6Gp8LO4xaw@mail.gmail.com>
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1evihG-0002Cs-Ig
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:06:26 -0400
+Received: by mail-wr0-x242.google.com with SMTP id m12so21893527wrm.13
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 05:06:26 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9abfa500-0ed5-104f-eb15-27759be94a51@redhat.com>
-Date: Tue, 13 Mar 2018 13:05:01 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9TJ0okEipdBrr+TmJOa2VN3TT2QhRs=Kx-6Gp8LO4xaw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] update Linux headers to 4.15
+Date: Tue, 13 Mar 2018 13:05:52 +0100
+Message-Id: <1520942752-19449-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] docker: fedora: test more components
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +25,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com
 
-On 13/03/2018 12:57, Peter Maydell wrote:
-> On 13 March 2018 at 11:45, Christian Borntraeger <borntraeger@de.ibm.com> wrote:
->>
->>
->> On 03/13/2018 11:39 AM, Paolo Bonzini wrote:
->>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>> ---
->>>  include/standard-headers/linux/input-event-codes.h |   1 +
->>>  include/standard-headers/linux/pci_regs.h          |  30 +-
->>>  include/standard-headers/linux/virtio_gpu.h        |   1 -
->>>  include/standard-headers/linux/virtio_net.h        |  13 +
->>>  include/standard-headers/linux/virtio_ring.h       |   2 +-
->>>  include/standard-headers/rdma/vmw_pvrdma-abi.h     |  13 +-
->>>  linux-headers/asm-powerpc/kvm.h                    |   2 +
->>>  linux-headers/asm-powerpc/unistd.h                 |   3 +
->>>  linux-headers/asm-s390/unistd.h                    | 401 +--------------------
->>>  linux-headers/asm-s390/unistd_32.h                 | 364 +++++++++++++++++++
->>>  linux-headers/asm-s390/unistd_64.h                 | 331 +++++++++++++++++
->>>  linux-headers/asm-x86/kvm_para.h                   |   5 +
->>>  linux-headers/linux/kvm.h                          |  92 +++++
->>>  linux-headers/linux/psci.h                         |   3 +
->>>  linux-headers/linux/vfio.h                         |  72 ++++
->>>  scripts/update-linux-headers.sh                    |   2 +
->>>  16 files changed, 918 insertions(+), 417 deletions(-)
->>>  create mode 100644 linux-headers/asm-s390/unistd_32.h
->>>  create mode 100644 linux-headers/asm-s390/unistd_64.h
->>
->> s390 part look sane.
-> 
-> ...patchew thinks it failed the build test on s390 though.
+Install optional dependencies of QEMU to get better coverage.
 
-Yeah, I didn't catch it because virglrenderer is missing in the Docker
-configs.  One recent virtio-gpu patch modified linux-headers/ with
-something that's not yet in Linux's tree.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ tests/docker/dockerfiles/fedora.docker | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-Paolo
+diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
+index 994a35a..0d9da45 100644
+--- a/tests/docker/dockerfiles/fedora.docker
++++ b/tests/docker/dockerfiles/fedora.docker
+@@ -1,9 +1,16 @@
+ FROM fedora:27
+ ENV PACKAGES \
+     ccache gettext git tar PyYAML sparse flex bison python3 bzip2 hostname \
+-    glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
+-    gcc gcc-c++ clang make perl which bc findutils libaio-devel \
+-    nettle-devel libasan libubsan \
++    gcc gcc-c++ clang make perl which bc findutils glib2-devel \
++    libaio-devel pixman-devel zlib-devel libfdt-devel libasan libubsan \
++    bluez-libs-devel brlapi-devel bzip2-devel \
++    device-mapper-multipath-devel glusterfs-api-devel gnutls-devel \
++    gtk3-devel libattr-devel libcap-devel libcap-ng-devel libcurl-devel \
++    libjpeg-devel libpng-devel librbd-devel libssh2-devel libusbx-devel \
++    libxml2-devel lzo-devel ncurses-devel nettle-devel nss-devel \
++    numactl-devel SDL2-devel snappy-devel spice-server-devel \
++    systemtap-sdt-devel usbredir-devel virglrenderer-devel vte3-devel \
++    xen-devel \
+     mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-config \
+     mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libtasn1 \
+     mingw32-libjpeg-turbo mingw32-libpng mingw32-curl mingw32-libssh2 \
+-- 
+1.8.3.1
