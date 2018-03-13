@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdr-00029w-GL
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:19:13 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1evmfK-0003OQ-3K
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:20:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdl-000572-QS
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:19:11 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Mar 2018 17:18:03 +0100
-Message-Id: <20180313161803.1814-42-kwolf@redhat.com>
-In-Reply-To: <20180313161803.1814-1-kwolf@redhat.com>
-References: <20180313161803.1814-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 41/41] block/mirror: change the semantic of
- 'force' of block-job-cancel
+	(envelope-from <peter.maydell@linaro.org>) id 1evmfI-0005xL-UH
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:20:42 -0400
+Received: from mail-ot0-x231.google.com ([2607:f8b0:4003:c0f::231]:45719)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1evmfI-0005wa-NX
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:20:40 -0400
+Received: by mail-ot0-x231.google.com with SMTP id w12-v6so160850ote.12
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 09:20:40 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180312201305.16972-1-berrange@redhat.com>
+References: <20180312201305.16972-1-berrange@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 13 Mar 2018 16:20:19 +0000
+Message-ID: <CAFEAcA-AHbzvbaxNeMRakB-gA_w3ZnD1x50dLx_hD+3-L9yuTg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 0/9] Socket next patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,284 +29,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Liang Li <liliang.opensource@gmail.com>
+On 12 March 2018 at 20:12, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wr=
+ote:
+> The following changes since commit 819fd4699c7b36d574292bcbd8bc25e9d716c8=
+4b:
+>
+>   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-2018=
+0309a' into staging (2018-03-12 13:21:53 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/berrange/qemu tags/socket-next-pull-request
+>
+> for you to fetch changes up to f4d2a296de2ccf5ff80ddd343c09f0075d10583a:
+>
+>   char: allow passing pre-opened socket file descriptor at startup (2018-=
+03-12 17:50:52 +0000)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
+>
+> Daniel P. Berrang=C3=A9 (9):
+>   char: don't silently skip tn3270 protocol init when TLS is enabled
+>   cutils: add qemu_strtoi & qemu_strtoui parsers for int/unsigned int
+>     types
+>   sockets: pull code for testing IP availability out of specific test
+>   sockets: strengthen test suite IP protocol availability checks
+>   sockets: move fd_is_socket() into common sockets code
+>   sockets: check that the named file descriptor is a socket
+>   sockets: allow SocketAddress 'fd' to reference numeric file
+>     descriptors
+>   char: refactor parsing of socket address information
+>   char: allow passing pre-opened socket file descriptor at startup
+>
 
-When doing drive mirror to a low speed shared storage, if there was heavy
-BLK IO write workload in VM after the 'ready' event, drive mirror block job
-can't be canceled immediately, it would keep running until the heavy BLK IO
-workload stopped in the VM.
+Test failure, 32-bit arm:
 
-Libvirt depends on the current block-job-cancel semantics, which is that
-when used without a flag after the 'ready' event, the command blocks
-until data is in sync.  However, these semantics are awkward in other
-situations, for example, people may use drive mirror for realtime
-backups while still wanting to use block live migration.  Libvirt cannot
-start a block live migration while another drive mirror is in progress,
-but the user would rather abandon the backup attempt as broken and
-proceed with the live migration than be stuck waiting for the current
-drive mirror backup to finish.
+MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
+gtester -k --verbose -m=3Dquick tests/test-c
+utils
+TEST: tests/test-cutils... (pid=3D21029)
+  /cutils/parse_uint/null:                                             OK
+[etc]
+  /cutils/parse_uint_full/trailing:                                    **
+ERROR:/home/peter.maydell/qemu/tests/test-cutils.c:715:test_qemu_strtoui_un=
+derflow:
+assertion failed (err =3D
+=3D -ERANGE): (0 =3D=3D -34)
+OK
+  /cutils/parse_uint_full/correct:                                     OK
 
-The drive-mirror command already includes a 'force' flag, which libvirt
-does not use, although it documented the flag as only being useful to
-quit a job which is paused.  However, since quitting a paused job has
-the same effect as abandoning a backup in a non-paused job (namely, the
-destination file is not in sync, and the command completes immediately),
-we can just improve the documentation to make the force flag obviously
-useful.
+Test failure, x86-64 Linux:
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Jeff Cody <jcody@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>
-Cc: John Snow <jsnow@redhat.com>
-Reported-by: Huaitong Han <huanhuaitong@didichuxing.com>
-Signed-off-by: Huaitong Han <huanhuaitong@didichuxing.com>
-Signed-off-by: Liang Li <liliangleo@didichuxing.com>
-Signed-off-by: Jeff Cody <jcody@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- qapi/block-core.json      |  5 +++--
- include/block/blockjob.h  | 12 ++++++++++--
- block/mirror.c            | 10 ++++------
- blockdev.c                |  4 ++--
- blockjob.c                | 16 +++++++++-------
- tests/test-blockjob-txn.c |  8 ++++----
- hmp-commands.hx           |  3 ++-
- 7 files changed, 34 insertions(+), 24 deletions(-)
+TEST: tests/boot-serial-test... (pid=3D11205)
+  /sparc64/boot-serial/sun4u:                                          **
+ERROR:/home/petmay01/linaro/qemu-for-merges/tests/boot-serial-test.c:137:ch=
+eck_guest_output:
+assertion failed: (output_ok)
+FAIL
+GTester: last random seed: R02S99166ae475faeb3280608eeed6d61c4f
+(pid=3D15216)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 47ff5f8ce5..00ef614c03 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2204,8 +2204,9 @@
- #          the name of the parameter), but since QEMU 2.7 it can have
- #          other values.
- #
--# @force: whether to allow cancellation of a paused job (default
--#         false).  Since 1.3.
-+# @force: If true, and the job has already emitted the event BLOCK_JOB_READY,
-+#         abandon the job immediately (even if it is paused) instead of waiting
-+#         for the destination to complete its final synchronization (since 1.3)
- #
- # Returns: Nothing on success
- #          If no background operation is active on this device, DeviceNotActive
-diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index 978274ed2b..fc645dac68 100644
---- a/include/block/blockjob.h
-+++ b/include/block/blockjob.h
-@@ -63,6 +63,12 @@ typedef struct BlockJob {
-     bool cancelled;
- 
-     /**
-+     * Set to true if the job should abort immediately without waiting
-+     * for data to be in sync.
-+     */
-+    bool force;
-+
-+    /**
-      * Counter for pause request. If non-zero, the block job is either paused,
-      * or if busy == true will pause itself as soon as possible.
-      */
-@@ -230,10 +236,11 @@ void block_job_start(BlockJob *job);
- /**
-  * block_job_cancel:
-  * @job: The job to be canceled.
-+ * @force: Quit a job without waiting for data to be in sync.
-  *
-  * Asynchronously cancel the specified job.
-  */
--void block_job_cancel(BlockJob *job);
-+void block_job_cancel(BlockJob *job, bool force);
- 
- /**
-  * block_job_complete:
-@@ -307,11 +314,12 @@ void block_job_user_resume(BlockJob *job, Error **errp);
- /**
-  * block_job_user_cancel:
-  * @job: The job to be cancelled.
-+ * @force: Quit a job without waiting for data to be in sync.
-  *
-  * Cancels the specified job, but may refuse to do so if the
-  * operation isn't currently meaningful.
-  */
--void block_job_user_cancel(BlockJob *job, Error **errp);
-+void block_job_user_cancel(BlockJob *job, bool force, Error **errp);
- 
- /**
-  * block_job_cancel_sync:
-diff --git a/block/mirror.c b/block/mirror.c
-index 76fddb3838..820f512c7b 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -869,11 +869,8 @@ static void coroutine_fn mirror_run(void *opaque)
- 
-         ret = 0;
-         trace_mirror_before_sleep(s, cnt, s->synced, delay_ns);
--        if (!s->synced) {
--            block_job_sleep_ns(&s->common, delay_ns);
--            if (block_job_is_cancelled(&s->common)) {
--                break;
--            }
-+        if (block_job_is_cancelled(&s->common) && s->common.force) {
-+            break;
-         } else if (!should_complete) {
-             delay_ns = (s->in_flight == 0 && cnt == 0 ? SLICE_TIME : 0);
-             block_job_sleep_ns(&s->common, delay_ns);
-@@ -887,7 +884,8 @@ immediate_exit:
-          * or it was cancelled prematurely so that we do not guarantee that
-          * the target is a copy of the source.
-          */
--        assert(ret < 0 || (!s->synced && block_job_is_cancelled(&s->common)));
-+        assert(ret < 0 || ((s->common.force || !s->synced) &&
-+               block_job_is_cancelled(&s->common)));
-         assert(need_drain);
-         mirror_wait_for_all_io(s);
-     }
-diff --git a/blockdev.c b/blockdev.c
-index 809adbe7f9..6ac4467ac4 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -150,7 +150,7 @@ void blockdev_mark_auto_del(BlockBackend *blk)
-         aio_context_acquire(aio_context);
- 
-         if (bs->job) {
--            block_job_cancel(bs->job);
-+            block_job_cancel(bs->job, false);
-         }
- 
-         aio_context_release(aio_context);
-@@ -3831,7 +3831,7 @@ void qmp_block_job_cancel(const char *device,
-     }
- 
-     trace_qmp_block_job_cancel(job);
--    block_job_user_cancel(job, errp);
-+    block_job_user_cancel(job, force, errp);
- out:
-     aio_context_release(aio_context);
- }
-diff --git a/blockjob.c b/blockjob.c
-index ba538c93dd..885197abf6 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -487,7 +487,7 @@ static int block_job_finalize_single(BlockJob *job)
-     return 0;
- }
- 
--static void block_job_cancel_async(BlockJob *job)
-+static void block_job_cancel_async(BlockJob *job, bool force)
- {
-     if (job->iostatus != BLOCK_DEVICE_IO_STATUS_OK) {
-         block_job_iostatus_reset(job);
-@@ -498,6 +498,8 @@ static void block_job_cancel_async(BlockJob *job)
-         job->pause_count--;
-     }
-     job->cancelled = true;
-+    /* To prevent 'force == false' overriding a previous 'force == true' */
-+    job->force |= force;
- }
- 
- static int block_job_txn_apply(BlockJobTxn *txn, int fn(BlockJob *), bool lock)
-@@ -581,7 +583,7 @@ static void block_job_completed_txn_abort(BlockJob *job)
-      * on the caller, so leave it. */
-     QLIST_FOREACH(other_job, &txn->jobs, txn_list) {
-         if (other_job != job) {
--            block_job_cancel_async(other_job);
-+            block_job_cancel_async(other_job, false);
-         }
-     }
-     while (!QLIST_EMPTY(&txn->jobs)) {
-@@ -747,13 +749,13 @@ void block_job_user_resume(BlockJob *job, Error **errp)
-     block_job_resume(job);
- }
- 
--void block_job_cancel(BlockJob *job)
-+void block_job_cancel(BlockJob *job, bool force)
- {
-     if (job->status == BLOCK_JOB_STATUS_CONCLUDED) {
-         block_job_do_dismiss(job);
-         return;
-     }
--    block_job_cancel_async(job);
-+    block_job_cancel_async(job, force);
-     if (!block_job_started(job)) {
-         block_job_completed(job, -ECANCELED);
-     } else if (job->deferred_to_main_loop) {
-@@ -763,12 +765,12 @@ void block_job_cancel(BlockJob *job)
-     }
- }
- 
--void block_job_user_cancel(BlockJob *job, Error **errp)
-+void block_job_user_cancel(BlockJob *job, bool force, Error **errp)
- {
-     if (block_job_apply_verb(job, BLOCK_JOB_VERB_CANCEL, errp)) {
-         return;
-     }
--    block_job_cancel(job);
-+    block_job_cancel(job, force);
- }
- 
- /* A wrapper around block_job_cancel() taking an Error ** parameter so it may be
-@@ -776,7 +778,7 @@ void block_job_user_cancel(BlockJob *job, Error **errp)
-  * function pointer casts there. */
- static void block_job_cancel_err(BlockJob *job, Error **errp)
- {
--    block_job_cancel(job);
-+    block_job_cancel(job, false);
- }
- 
- int block_job_cancel_sync(BlockJob *job)
-diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
-index 34f09ef8c1..5789893dda 100644
---- a/tests/test-blockjob-txn.c
-+++ b/tests/test-blockjob-txn.c
-@@ -124,7 +124,7 @@ static void test_single_job(int expected)
-     block_job_start(job);
- 
-     if (expected == -ECANCELED) {
--        block_job_cancel(job);
-+        block_job_cancel(job, false);
-     }
- 
-     while (result == -EINPROGRESS) {
-@@ -170,10 +170,10 @@ static void test_pair_jobs(int expected1, int expected2)
-     block_job_txn_unref(txn);
- 
-     if (expected1 == -ECANCELED) {
--        block_job_cancel(job1);
-+        block_job_cancel(job1, false);
-     }
-     if (expected2 == -ECANCELED) {
--        block_job_cancel(job2);
-+        block_job_cancel(job2, false);
-     }
- 
-     while (result1 == -EINPROGRESS || result2 == -EINPROGRESS) {
-@@ -226,7 +226,7 @@ static void test_pair_jobs_fail_cancel_race(void)
-     block_job_start(job1);
-     block_job_start(job2);
- 
--    block_job_cancel(job1);
-+    block_job_cancel(job1, false);
- 
-     /* Now make job2 finish before the main loop kicks jobs.  This simulates
-      * the race between a pending kick and another job completing.
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 1723cbe1df..35d862a5d2 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -106,7 +106,8 @@ ETEXI
-         .args_type  = "force:-f,device:B",
-         .params     = "[-f] device",
-         .help       = "stop an active background block operation (use -f"
--                      "\n\t\t\t if the operation is currently paused)",
-+                      "\n\t\t\t if you want to abort the operation immediately"
-+                      "\n\t\t\t instead of keep running until data is in sync)",
-         .cmd        = hmp_block_job_cancel,
-     },
- 
--- 
-2.13.6
+Test failure, 64-bit arm:
+
+ERROR:/home/pm215/qemu/tests/test-aio-multithread.c:365:test_multi_fair_mut=
+ex:
+assertion failed (counter =3D=3D
+ atomic_counter): (59827 =3D=3D 59828)
+
+thanks
+-- PMM
