@@ -1,35 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evi3E-0000so-76
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:25:05 -0400
+	(envelope-from <brijesh.singh@amd.com>) id 1evi6P-0001zy-GN
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:28:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evi3B-0002Lb-1R
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:25:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59728 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evi3A-0002L0-RW
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:25:00 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DAF228182D16
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 11:24:55 +0000 (UTC)
-Date: Tue, 13 Mar 2018 11:24:50 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180313112450.GD3545@work-vm>
-References: <20180312141714.7223-1-berrange@redhat.com>
-	<20180313092053.GA3545@work-vm>
-	<be16f4e2-7b97-e251-332e-9445e4d9965c@redhat.com>
-	<20180313110652.GS3048@redhat.com>
-	<92106b88-98f4-cc19-95f0-5d59020c2357@redhat.com>
+	(envelope-from <brijesh.singh@amd.com>) id 1evi6L-0004lk-I5
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:28:21 -0400
+Received: from mail-co1nam03on0079.outbound.protection.outlook.com
+	([104.47.40.79]:9984
+	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1evi6L-0004kp-7u
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:28:17 -0400
+References: <20180308124901.83533-1-brijesh.singh@amd.com>
+	<20180308124901.83533-25-brijesh.singh@amd.com>
+	<0218f497-d397-0f49-3256-79d461e25be2@redhat.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <a76057f1-ca48-721c-7c5d-948a0b2b7917@amd.com>
+Date: Tue, 13 Mar 2018 06:28:03 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <92106b88-98f4-cc19-95f0-5d59020c2357@redhat.com>
+In-Reply-To: <0218f497-d397-0f49-3256-79d461e25be2@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.12 REPOST] migration: convert socket
- server to QIONetListener
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v12 24/28] sev/i386: add migration blocker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,71 +32,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: brijesh.singh@amd.com, Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Alexander Graf <agraf@suse.de>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Markus Armbruster <armbru@redhat.com>, Bruce Rogers <brogers@suse.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, Borislav Petkov <bp@suse.de>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> On 13/03/2018 12:06, Daniel P. Berrang=E9 wrote:
-> > On Tue, Mar 13, 2018 at 11:57:17AM +0100, Paolo Bonzini wrote:
-> >> On 13/03/2018 10:20, Dr. David Alan Gilbert wrote:
-> >>>>  static void socket_start_incoming_migration(SocketAddress *saddr,
-> >>>>                                              Error **errp)
-> >>>>  {
-> >>>> -    QIOChannelSocket *listen_ioc =3D qio_channel_socket_new();
-> >>>> +    QIONetListener *listener =3D qio_net_listener_new();
-> >>>> =20
-> >>>> -    qio_channel_set_name(QIO_CHANNEL(listen_ioc),
-> >>>> -                         "migration-socket-listener");
-> >>>> +    qio_net_listener_set_name(listener, "migration-socket-listene=
-r");
-> >>>> =20
-> >>>> -    if (qio_channel_socket_listen_sync(listen_ioc, saddr, errp) <=
- 0) {
-> >>>> -        object_unref(OBJECT(listen_ioc));
-> >>>> +    if (qio_net_listener_open_sync(listener, saddr, errp) < 0) {
-> >>>> +        object_unref(OBJECT(listener));
-> >>>>          return;
-> >>>>      }
-> >>>> =20
-> >>>> -    qio_channel_add_watch(QIO_CHANNEL(listen_ioc),
-> >>>> -                          G_IO_IN,
-> >>>> -                          socket_accept_incoming_migration,
-> >>>> -                          listen_ioc,
-> >>>> -                          (GDestroyNotify)object_unref);
-> >>>> +    qio_net_listener_set_client_func(listener,
-> >>>> +                                     socket_accept_incoming_migra=
-tion,
-> >>>> +                                     NULL, NULL);
-> >>>>  }
-> >>>> =20
-> >>>>  void tcp_start_incoming_migration(const char *host_port, Error **=
-errp)
-> >>>> --=20
-> >>>> 2.14.3
-> >>>>
-> >>> --
-> >>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >>>
-> >>
-> >> Could this get in 2.12 as a bugfix, even after soft freeze?  It's th=
-e
-> >> last user of qio_channel_listen_sync that blocks full IPv4/IPv6 supp=
-ort.
-> >>  All other users are for vsock/AF_UNIX.
-> >=20
-> > I had been thinking of all this conversion as feature, but I guess if=
- we
-> > squint our eyes a bit we could claim it is just a bugfix on the groun=
-ds
-> > that it is fixing broken IPv4/6 dual stack support.
->=20
-> It is certainly a feature, but when only one listener remains broken
-> then it becomes more of a bugfix.
 
-Sounds reasonable to me.
 
-Dave
+On 3/13/18 4:33 AM, Paolo Bonzini wrote:
+> On 08/03/2018 13:48, Brijesh Singh wrote:
+>>      sev_set_guest_state(SEV_STATE_RUNNING);
+>> +
+>> +    /* add migration blocker */
+>> +    error_setg(&sev_mig_blocker,
+>> +               "SEV: Migration is not implemented");
+>> +    ret =3D migrate_add_blocker(sev_mig_blocker, &local_err);
+>> +    if (local_err) {
+>> +        error_report_err(local_err);
+>> +        error_free(sev_mig_blocker);
+>> +        exit(1);
+>> +    }
+>>  }
+> I think this should be in sev_guest_init instead?  Does migration
+> transfer the measurement, or is it lost forever?  Not a blocker though.
 
+The launch measurement does not get transferred during the migration.
+During migration we get totally different measurement which is wrapped
+with transport key etc and that need to send to destination. IIRC, in my
+first attempt I was adding this blocker in sev_guest_init() but
+migration_add_blocker() was failing because=C2=A0 sev_guest_init() is calle=
+d
+before the migration_object_init().
+
+>
 > Paolo
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
