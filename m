@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1evmu7-0008Vm-D8
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:36:00 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmvP-00018N-E5
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:37:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1evmu4-0004JR-6E
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:35:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39890)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1evmu3-0004J0-UC
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:35:56 -0400
-Date: Tue, 13 Mar 2018 18:35:36 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180313183050-mutt-send-email-mst@kernel.org>
-References: <1520426065-40265-1-git-send-email-wei.w.wang@intel.com>
-	<1520426065-40265-5-git-send-email-wei.w.wang@intel.com>
+	(envelope-from <kwolf@redhat.com>) id 1evmvO-0004p0-9l
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:37:19 -0400
+Date: Tue, 13 Mar 2018 17:37:01 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180313163701.GL4642@localhost.localdomain>
+References: <20180306164504.9138-1-berto@igalia.com>
+	<309ef189-6bd6-c9f3-60aa-9d45112d8e47@redhat.com>
+	<20180313160843.GH4642@localhost.localdomain>
+	<23b501f7-5f5c-bf75-20b7-7c89de21d5dc@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1520426065-40265-5-git-send-email-wei.w.wang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v4 4/4] migration: use the free page hint
- feature from balloon
+In-Reply-To: <23b501f7-5f5c-bf75-20b7-7c89de21d5dc@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] iotests: Update output of 051 and 186
+ after commit 1454509726719e0933c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,106 +26,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Qemu-block <qemu-block@nongnu.org>
 
-On Wed, Mar 07, 2018 at 08:34:25PM +0800, Wei Wang wrote:
-> Start the free page optimization after the migration bitmap is
-> synchronized. This can't be used in the stop&copy phase since the guest
-> is paused. Make sure the guest reporting has stopped before
-> synchronizing the migration dirty bitmap. Currently, the optimization is
-> added to precopy only.
+Am 13.03.2018 um 17:22 hat Thomas Huth geschrieben:
+> On 13.03.2018 17:08, Kevin Wolf wrote:
+> > Am 06.03.2018 um 17:52 hat Thomas Huth geschrieben:
+> >> On 06.03.2018 17:45, Alberto Garcia wrote:
+> >>> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> >>> ---
+> >>>  tests/qemu-iotests/051.pc.out | 20 --------------------
+> >>>  tests/qemu-iotests/186.out    | 22 +++-------------------
+> >>>  2 files changed, 3 insertions(+), 39 deletions(-)
+> >>>
+> >>> diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
+> >>> index 830c11880a..b01f9a90d7 100644
+> >>> --- a/tests/qemu-iotests/051.pc.out
+> >>> +++ b/tests/qemu-iotests/051.pc.out
+> >>> @@ -117,20 +117,10 @@ Testing: -drive if=ide,media=cdrom
+> >>>  QEMU X.Y.Z monitor - type 'help' for more information
+> >>>  (qemu) quit
+> >>>  
+> >>> -Testing: -drive if=scsi,media=cdrom
+> >>> -QEMU X.Y.Z monitor - type 'help' for more information
+> >>> -(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
+> >>> -quit
+> >>> -
+> >>>  Testing: -drive if=ide
+> >>>  QEMU X.Y.Z monitor - type 'help' for more information
+> >>>  (qemu) QEMU_PROG: Initialization of device ide-hd failed: Device needs media, but drive is empty
+> >>>  
+> >>> -Testing: -drive if=scsi
+> >>> -QEMU X.Y.Z monitor - type 'help' for more information
+> >>> -(qemu) QEMU_PROG: -drive if=scsi: warning: bus=0,unit=0 is deprecated with this machine type
+> >>> -QEMU_PROG: -drive if=scsi: Device needs media, but drive is empty
+> >>> -
+> >>>  Testing: -drive if=virtio
+> >>>  QEMU X.Y.Z monitor - type 'help' for more information
+> >>>  (qemu) QEMU_PROG: -drive if=virtio: Device needs media, but drive is empty
+> >>> @@ -170,20 +160,10 @@ Testing: -drive file=TEST_DIR/t.qcow2,if=ide,media=cdrom,readonly=on
+> >>>  QEMU X.Y.Z monitor - type 'help' for more information
+> >>>  (qemu) quit
+> >>>  
+> >>> -Testing: -drive file=TEST_DIR/t.qcow2,if=scsi,media=cdrom,readonly=on
+> >>> -QEMU X.Y.Z monitor - type 'help' for more information
+> >>> -(qemu) QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=scsi,media=cdrom,readonly=on: warning: bus=0,unit=0 is deprecated with this machine type
+> >>> -quit
+> >>> -
+> >>>  Testing: -drive file=TEST_DIR/t.qcow2,if=ide,readonly=on
+> >>>  QEMU X.Y.Z monitor - type 'help' for more information
+> >>>  (qemu) QEMU_PROG: Initialization of device ide-hd failed: Block node is read-only
+> >>>  
+> >>> -Testing: -drive file=TEST_DIR/t.qcow2,if=scsi,readonly=on
+> >>> -QEMU X.Y.Z monitor - type 'help' for more information
+> >>> -(qemu) QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=scsi,readonly=on: warning: bus=0,unit=0 is deprecated with this machine type
+> >>> -quit
+> >>> -
+> >>>  Testing: -drive file=TEST_DIR/t.qcow2,if=virtio,readonly=on
+> >>>  QEMU X.Y.Z monitor - type 'help' for more information
+> >>>  (qemu) quit
+> >>
+> >> Ack for that part.
+> >>
+> >>> diff --git a/tests/qemu-iotests/186.out b/tests/qemu-iotests/186.out
+> >>> index c8377fe146..d83bba1a88 100644
+> >>> --- a/tests/qemu-iotests/186.out
+> >>> +++ b/tests/qemu-iotests/186.out
+> >>> @@ -444,31 +444,15 @@ ide0-cd0 (NODE_NAME): null-co:// (null-co, read-only)
+> >>>  
+> >>>  Testing: -drive if=scsi,driver=null-co
+> >>>  QEMU X.Y.Z monitor - type 'help' for more information
+> >>> -(qemu) QEMU_PROG: -drive if=scsi,driver=null-co: warning: bus=0,unit=0 is deprecated with this machine type
+> >>> -info block
+> >>> -scsi0-hd0 (NODE_NAME): null-co:// (null-co)
+> >>> -    Attached to:      /machine/unattached/device[27]/scsi.0/legacy[0]
+> >>> -    Cache mode:       writeback
+> >>> -(qemu) quit
+> >>> +(qemu) QEMU_PROG: -drive if=scsi,driver=null-co: machine type does not support if=scsi,bus=0,unit=0
+> >>>  
+> >>>  Testing: -drive if=scsi,media=cdrom
+> >>>  QEMU X.Y.Z monitor - type 'help' for more information
+> >>> -(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
+> >>> -info block
+> >>> -scsi0-cd0: [not inserted]
+> >>> -    Attached to:      /machine/unattached/device[27]/scsi.0/legacy[0]
+> >>> -    Removable device: not locked, tray closed
+> >>> -(qemu) quit
+> >>> +(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: machine type does not support if=scsi,bus=0,unit=0
+> >>>  
+> >>>  Testing: -drive if=scsi,driver=null-co,media=cdrom
+> >>>  QEMU X.Y.Z monitor - type 'help' for more information
+> >>> -(qemu) QEMU_PROG: -drive if=scsi,driver=null-co,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
+> >>> -info block
+> >>> -scsi0-cd0 (NODE_NAME): null-co:// (null-co, read-only)
+> >>> -    Attached to:      /machine/unattached/device[27]/scsi.0/legacy[0]
+> >>> -    Removable device: not locked, tray closed
+> >>> -    Cache mode:       writeback
+> >>> -(qemu) quit
+> >>> +(qemu) QEMU_PROG: -drive if=scsi,driver=null-co,media=cdrom: machine type does not support if=scsi,bus=0,unit=0
+> >>
+> >> That rather sounds like this "if=scsi" test should be removed now?
+> > 
+> > I think, it actually sounds like a SCSI adapter should be added manually
+> > now.
 > 
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> CC: Juan Quintela <quintela@redhat.com>
-> CC: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  migration/ram.c | 19 ++++++++++++++++++-
->  1 file changed, 18 insertions(+), 1 deletion(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index e172798..7b4c9b1 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -51,6 +51,8 @@
->  #include "qemu/rcu_queue.h"
->  #include "migration/colo.h"
->  #include "migration/block.h"
-> +#include "sysemu/balloon.h"
-> +#include "sysemu/sysemu.h"
->  
->  /***********************************************************/
->  /* ram save/restore */
-> @@ -208,6 +210,8 @@ struct RAMState {
->      uint32_t last_version;
->      /* We are in the first round */
->      bool ram_bulk_stage;
-> +    /* The free pages optimization feature is supported */
-> +    bool free_page_support;
->      /* How many times we have dirty too many pages */
->      int dirty_rate_high_cnt;
->      /* these variables are used for bitmap sync */
-> @@ -775,7 +779,7 @@ unsigned long migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
->      unsigned long *bitmap = rb->bmap;
->      unsigned long next;
->  
-> -    if (rs->ram_bulk_stage && start > 0) {
-> +    if (rs->ram_bulk_stage && start > 0 && !rs->free_page_support) {
->          next = start + 1;
->      } else {
->          next = find_next_bit(bitmap, size, start);
-> @@ -833,6 +837,10 @@ static void migration_bitmap_sync(RAMState *rs)
->      int64_t end_time;
->      uint64_t bytes_xfer_now;
->  
-> +    if (rs->free_page_support) {
-> +        balloon_free_page_stop();
-> +    }
-> +
->      ram_counters.dirty_sync_count++;
->  
->      if (!rs->time_last_bitmap_sync) {
-> @@ -899,6 +907,10 @@ static void migration_bitmap_sync(RAMState *rs)
->      if (migrate_use_events()) {
->          qapi_event_send_migration_pass(ram_counters.dirty_sync_count, NULL);
->      }
-> +
-> +    if (rs->free_page_support && runstate_is_running()) {
-> +        balloon_free_page_start();
-> +    }
->  }
+> The "-drive if=scsi" syntax was deprecated for x86 and has now been
+> completely removed. It also does not work there anymore if you configure
+> a SCSI adapter manually first. For SCSI device, you now have to use
+> "-device scsi-hd" etc. on x86 instead.
 
-I think some of these conditions should go into
-balloon_free_page_start/stop.
+I see. Yes, the part with -evice scsi-hd is already covered in another
+part of the test case, so removing it should be fine.
 
-Checking runstate is generally problematic unless you
-also handle run state change notifiers as it can
-be manipulated from QMP.
-
->  
->  /**
-> @@ -1656,6 +1668,8 @@ static void ram_state_reset(RAMState *rs)
->      rs->last_page = 0;
->      rs->last_version = ram_list.version;
->      rs->ram_bulk_stage = true;
-> +    rs->free_page_support = balloon_free_page_support() &
-> +                            !migration_in_postcopy();
-
-Probably &&?
-
->  }
->  
->  #define MAX_WAIT 50 /* ms, half buffered_file limit */
-> @@ -2330,6 +2344,9 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
->  
->      ret = qemu_file_get_error(f);
->      if (ret < 0) {
-> +        if (rs->free_page_support) {
-> +            balloon_free_page_stop();
-> +        }
->          return ret;
->      }
->  
-> -- 
-> 1.8.3.1
+Kevin
