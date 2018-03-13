@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1evk2t-0001tW-Po
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:32:53 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1evk7O-0003R7-58
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:37:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1evk2o-0002zc-QQ
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:32:51 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20180207155837.92351-1-vsementsov@virtuozzo.com>
-	<20180207155837.92351-6-vsementsov@virtuozzo.com>
-	<20180312153020.GI3219@work-vm>
-	<af82d663-f37c-2857-214c-83e348a5f52a@virtuozzo.com>
-	<20180313103056.GB3545@work-vm>
-	<9bc43da5-027a-cd11-0c13-b9a9432e0fdb@virtuozzo.com>
-Message-ID: <71db8542-d4dd-9f63-ae91-aa568ba625e5@virtuozzo.com>
-Date: Tue, 13 Mar 2018 16:32:39 +0300
+	(envelope-from <pbonzini@redhat.com>) id 1evk7N-0004m4-6i
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:37:30 -0400
+References: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
+	<1518893216-9983-12-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA_9cmK9gebqE9997fzhTzKT6Ky9q4jn=fxwziopDyK9Ew@mail.gmail.com>
+	<cc6029a1-c177-ee8c-d09b-0ed2af81c897@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <75aee987-a08b-570f-ec10-8b4853d853c6@redhat.com>
+Date: Tue, 13 Mar 2018 14:37:13 +0100
 MIME-Version: 1.0
-In-Reply-To: <9bc43da5-027a-cd11-0c13-b9a9432e0fdb@virtuozzo.com>
+In-Reply-To: <cc6029a1-c177-ee8c-d09b-0ed2af81c897@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v10 05/12] migration: introduce
- postcopy-only pending
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v9 11/14] target/arm/kvm: Translate the MSI
+ doorbell in kvm_arch_fixup_msi_route
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,129 +27,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
+To: Auger Eric <eric.auger@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>
 
-13.03.2018 16:11, Vladimir Sementsov-Ogievskiy wrote:
-> 13.03.2018 13:30, Dr. David Alan Gilbert wrote:
->> * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
->>> 12.03.2018 18:30, Dr. David Alan Gilbert wrote:
->>>> * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
->>>>> There would be savevm states (dirty-bitmap) which can migrate only in
->>>>> postcopy stage. The corresponding pending is introduced here.
->>>>>
->>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>
->>>>> ---
->>> [...]
->>>
->>>>>    static MigIterateState migration_iteration_run(MigrationState *s)
->>>>>    {
->>>>> -    uint64_t pending_size, pend_post, pend_nonpost;
->>>>> +    uint64_t pending_size, pend_pre, pend_compat, pend_post;
->>>>>        bool in_postcopy = s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE;
->>>>> -    qemu_savevm_state_pending(s->to_dst_file, s->threshold_size,
->>>>> -                              &pend_nonpost, &pend_post);
->>>>> -    pending_size = pend_nonpost + pend_post;
->>>>> +    qemu_savevm_state_pending(s->to_dst_file, s->threshold_size, &pend_pre,
->>>>> +                              &pend_compat, &pend_post);
->>>>> +    pending_size = pend_pre + pend_compat + pend_post;
->>>>>        trace_migrate_pending(pending_size, s->threshold_size,
->>>>> -                          pend_post, pend_nonpost);
->>>>> +                          pend_pre, pend_compat, pend_post);
->>>>>        if (pending_size && pending_size >= s->threshold_size) {
->>>>>            /* Still a significant amount to transfer */
->>>>>            if (migrate_postcopy() && !in_postcopy &&
->>>>> -            pend_nonpost <= s->threshold_size &&
->>>>> -            atomic_read(&s->start_postcopy)) {
->>>>> +            pend_pre <= s->threshold_size &&
->>>>> +            (atomic_read(&s->start_postcopy) ||
->>>>> +             (pend_pre + pend_compat <= s->threshold_size)))
->>>> This change does something different from the description;
->>>> it causes a postcopy_start even if the user never ran the postcopy-start
->>>> command; so sorry, we can't do that; because postcopy for RAM is
->>>> something that users can enable but only switch into when they've given
->>>> up on it completing normally.
->>>>
->>>> However, I guess that leaves you with a problem; which is what happens
->>>> to the system when you've run out of pend_pre+pend_compat but can't
->>>> complete because pend_post is non-0; so I don't know the answer to that.
->>>>
->>>>
->>> Hmm. Here, we go to postcopy only if "pend_pre + pend_compat <=
->>> s->threshold_size". Pre-patch, in this case we will go to
->>> migration_completion(). So, precopy stage is finishing anyway.
->> Right.
->>
->>> So, we want
->>> in this case to finish ram migration like it was finished by
->>> migration_completion(), and then, run postcopy, which will handle only dirty
->>> bitmaps, yes?
->> It's a bit tricky; the first important thing is that we can't change the
->> semantics of the migration without the 'dirty bitmaps'.
->>
->> So then there's the question of how  a migration with both
->> postcopy-ram+dirty bitmaps should work;  again I don't think we should
->> enter the postcopy-ram phase until start-postcopy is issued.
->>
->> Then there's the 3rd case; dirty-bitmaps but no postcopy-ram; in that
->> case I worry less about the semantics of how you want to do it.
->
-> I have an idea:
->
-> in postcopy_start(), in ram_has_postcopy() (and may be some other 
-> places?), check atomic_read(&s->start_postcopy) instead of 
-> migrate_postcopy_ram()
->
-> then:
->
-> 1. behavior without dirty-bitmaps is not changed, as currently we cant 
-> go into postcopy_start and ram_has_postcopy without s->start_postcopy
-> 2. dirty-bitmaps+ram: if user don't set s->start_postcopy, 
-> postcopy_start() will operate as if migration capability was not 
-> enabled, so ram should complete its migration
-> 3. only dirty-bitmaps: again, postcopy_start() will operate as if 
-> migration capability was not enabled, so ram should complete its migration
+On 12/03/2018 16:16, Auger Eric wrote:
+>> It is still unclear to me if we need to register an IOMMUNotifier
+>> to handle any change in the MSI doorbell which would occur behind
+>> the scene and would not lead to any call to kvm_arch_fixup_msi_route()=
+.
+>=20
+> Paolo, do you know the answer to this question ?
 
-I mean s/migration capability/migration capability for ram postcopy/.
+Yes, x86 is wrong in this respect (it wouldn't use an IOMMUNotifier, but
+it still should process Interrupt Entry Cache invalidations).
 
-What do you think, will that work?
+>> It seems a bit odd that:
+>>  * the code for arm for "PCI devices behind IOMMU need to have
+>>    the MSI doorbell writes go through the IOMMU" looks rather
+>>    different from the code for x86 for the same thing
+>
+> ARM SMMU translates MSIs whereas Intel/AMD IOMMU do not translate them.
+> Hence this implementation
 
->
->
->>> Hmm2. Looked through migration_completion(), I don't understand, how it
->>> finishes ram migration without postcopy. It calls
->>> qemu_savevm_state_complete_precopy(), which skips states with
->>> has_postcopy=true, which is ram...
->> Because savevm_state_complete_precopy only skips has_postcopy=true in
->> the in_postcopy case:
->>
->>              (in_postcopy && se->ops->has_postcopy &&
->>               se->ops->has_postcopy(se->opaque)) ||
->>
->> so when we call it in migration_completion(), if we've not entered
->> postcopy yet, then that test doesn't trigger.
->>
->> (Apologies for not spotting this earlier; but I thought this patch was
->> a nice easy one just adding the postcopy_only_pending - I didn't realise it changed
->> existing semantics until I spotted that)
->
-> oh, yes, I was inattentive :(
->
->> Dave
->>
->>> -- 
->>> Best regards,
->>> Vladimir
->>>
->> --
->> Dr. David Alan Gilbert /dgilbert@redhat.com  / Manchester, UK
->
->
-> -- 
-> Best regards,
-> Vladimir
+More precisely, Intel IOMMU implements interrupt remapping through an
+MMIO region instead of an IOMMU region, because on x86 interrupt
+remapping can also change the MSI value and not just the address.
 
+>>  * the code here needs to know specifically that this is an SMMU
+>>    and not some other kind of IOMMU
+> Yes when introducing virtio-iommu we will need to get this fixed. We
+> need a way to retrieve the iommu mr from the as. I will work on this
+> concurrently.
 
--- 
-Best regards,
-Vladimir
+Probably something like address_space_translate can be used?
+
+Paolo
