@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdV-0001jK-CE
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:50 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdW-0001ks-Ab
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdU-0004qE-CL
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:49 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdV-0004rP-3y
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:50 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Mar 2018 17:17:48 +0100
-Message-Id: <20180313161803.1814-27-kwolf@redhat.com>
+Date: Tue, 13 Mar 2018 17:17:56 +0100
+Message-Id: <20180313161803.1814-35-kwolf@redhat.com>
 In-Reply-To: <20180313161803.1814-1-kwolf@redhat.com>
 References: <20180313161803.1814-1-kwolf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 26/41] luks: Catch integer overflow for huge
- sizes
+Subject: [Qemu-devel] [PULL 34/41] qemu-iotests: Enable write tests for
+ parallels
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,32 +23,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-When you request an image size close to UINT64_MAX, the addition of the
-crypto header may cause an integer overflow. Catch it instead of
-silently truncating the image size.
+Originally we added parallels as a read-only format to qemu-iotests
+where we did just some tests with a binary image. Since then, write and
+image creation support has been added to the driver, so we can now
+enable it in _supported_fmt generic.
+
+The driver doesn't support migration yet, though, so we need to add it
+to the list of exceptions in 181.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 ---
- block/crypto.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ tests/qemu-iotests/181   | 2 +-
+ tests/qemu-iotests/check | 1 -
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/block/crypto.c b/block/crypto.c
-index 00fb40c631..e0b8856f74 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -102,6 +102,11 @@ static ssize_t block_crypto_init_func(QCryptoBlock *=
-block,
- {
-     struct BlockCryptoCreateData *data =3D opaque;
-=20
-+    if (data->size > INT64_MAX || headerlen > INT64_MAX - data->size) {
-+        error_setg(errp, "The requested file size is too large");
-+        return -EFBIG;
-+    }
-+
-     /* User provided size should reflect amount of space made
-      * available to the guest, so we must take account of that
-      * which will be used by the crypto header
---=20
+diff --git a/tests/qemu-iotests/181 b/tests/qemu-iotests/181
+index 0c91e8f9de..5e767c6195 100755
+--- a/tests/qemu-iotests/181
++++ b/tests/qemu-iotests/181
+@@ -44,7 +44,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+ _supported_fmt generic
+ # Formats that do not support live migration
+-_unsupported_fmt qcow vdi vhdx vmdk vpc vvfat
++_unsupported_fmt qcow vdi vhdx vmdk vpc vvfat parallels
+ _supported_proto generic
+ _supported_os Linux
+ 
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index e6b6ff7a04..469142cd58 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -284,7 +284,6 @@ testlist options
+ 
+         -parallels)
+             IMGFMT=parallels
+-            IMGFMT_GENERIC=false
+             xpand=false
+             ;;
+ 
+-- 
 2.13.6
