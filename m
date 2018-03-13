@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1evsig-0006KK-7i
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 18:48:35 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1evsij-0006Ne-Eo
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 18:48:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1evsie-000475-SR
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 18:48:34 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:46919)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1evsii-0004AK-HW
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 18:48:37 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:33977)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1evsie-00046i-Kq
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 18:48:32 -0400
-Received: by mail-wr0-x243.google.com with SMTP id m12so2473691wrm.13
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 15:48:32 -0700 (PDT)
+	id 1evsii-00049c-9l
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 18:48:36 -0400
+Received: by mail-wr0-x243.google.com with SMTP id o8so2599343wra.1
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 15:48:36 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 13 Mar 2018 23:47:07 +0100
-Message-Id: <20180313224719.4954-58-pbonzini@redhat.com>
+Date: Tue, 13 Mar 2018 23:47:10 +0100
+Message-Id: <20180313224719.4954-61-pbonzini@redhat.com>
 In-Reply-To: <20180313224719.4954-1-pbonzini@redhat.com>
 References: <20180313224719.4954-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 57/69] replay: save prior value of the host clock
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 60/69] replay: make locking visible outside
+ replay code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,114 +32,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+From: Alex Bennée <alex.bennee@linaro.org>
 
-This patch adds saving/restoring of the host clock field 'last'.
-It is used in host clock calculation and therefore clock may
-become incorrect when using restored vmstate.
+The replay_mutex_lock/unlock/locked functions are now going to be used
+for ensuring lock-step behaviour between the two threads. Make them
+public API functions and also provide stubs for non-QEMU builds on
+common paths.
 
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20180227095226.1060.50975.stgit@pasha-VirtualBox>
+Message-Id: <20180227095242.1060.16601.stgit@pasha-VirtualBox>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 ---
- include/qemu/timer.h     | 14 ++++++++++++++
- replay/replay-internal.h |  2 ++
- replay/replay-snapshot.c |  3 +++
- util/qemu-timer.c        | 12 ++++++++++++
- 4 files changed, 31 insertions(+)
+ include/sysemu/replay.h  | 13 +++++++++++++
+ replay/replay-internal.c |  2 +-
+ replay/replay-internal.h |  6 +++---
+ stubs/replay.c           |  8 ++++++++
+ 4 files changed, 25 insertions(+), 4 deletions(-)
 
-diff --git a/include/qemu/timer.h b/include/qemu/timer.h
-index 3b5a54b014..39ea907e65 100644
---- a/include/qemu/timer.h
-+++ b/include/qemu/timer.h
-@@ -251,6 +251,20 @@ bool qemu_clock_run_timers(QEMUClockType type);
-  */
- bool qemu_clock_run_all_timers(void);
+diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+index 401de12130..3ced6bc231 100644
+--- a/include/sysemu/replay.h
++++ b/include/sysemu/replay.h
+@@ -48,6 +48,19 @@ extern ReplayMode replay_mode;
+ /* Name of the initial VM snapshot */
+ extern char *replay_snapshot;
  
-+/**
-+ * qemu_clock_get_last:
++/* Replay locking
 + *
-+ * Returns last clock query time.
++ * The locks are needed to protect the shared structures and log file
++ * when doing record/replay. They also are the main sync-point between
++ * the main-loop thread and the vCPU thread. This was a role
++ * previously filled by the BQL which has been busy trying to reduce
++ * its impact across the code. This ensures blocks of events stay
++ * sequential and reproducible.
 + */
-+uint64_t qemu_clock_get_last(QEMUClockType type);
-+/**
-+ * qemu_clock_set_last:
-+ *
-+ * Sets last clock query time.
-+ */
-+void qemu_clock_set_last(QEMUClockType type, uint64_t last);
 +
++void replay_mutex_lock(void);
++void replay_mutex_unlock(void);
 +
- /*
-  * QEMUTimerList
-  */
+ /* Replay process control functions */
+ 
+ /*! Enables recording or saving event log with specified parameters */
+diff --git a/replay/replay-internal.c b/replay/replay-internal.c
+index 0d7e1d6bc4..7cdefeaa04 100644
+--- a/replay/replay-internal.c
++++ b/replay/replay-internal.c
+@@ -181,7 +181,7 @@ void replay_mutex_destroy(void)
+     qemu_mutex_destroy(&lock);
+ }
+ 
+-static bool replay_mutex_locked(void)
++bool replay_mutex_locked(void)
+ {
+     return replay_locked;
+ }
 diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-index 3ebb19912a..be96d7e879 100644
+index 8e4c701751..41eee66e9b 100644
 --- a/replay/replay-internal.h
 +++ b/replay/replay-internal.h
-@@ -78,6 +78,8 @@ typedef struct ReplayState {
-         This counter is global, because requests from different
-         block devices should not get overlapping ids. */
-     uint64_t block_request_id;
-+    /*! Prior value of the host clock */
-+    uint64_t host_clock_last;
- } ReplayState;
- extern ReplayState replay_state;
+@@ -100,12 +100,12 @@ int64_t replay_get_qword(void);
+ void replay_get_array(uint8_t *buf, size_t *size);
+ void replay_get_array_alloc(uint8_t **buf, size_t *size);
  
-diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
-index 7075986ab5..e0b2204765 100644
---- a/replay/replay-snapshot.c
-+++ b/replay/replay-snapshot.c
-@@ -25,6 +25,7 @@ static int replay_pre_save(void *opaque)
+-/* Mutex functions for protecting replay log file */
++/* Mutex functions for protecting replay log file and ensuring
++ * synchronisation between vCPU and main-loop threads. */
+ 
+ void replay_mutex_init(void);
+ void replay_mutex_destroy(void);
+-void replay_mutex_lock(void);
+-void replay_mutex_unlock(void);
++bool replay_mutex_locked(void);
+ 
+ /*! Checks error status of the file. */
+ void replay_check_error(void);
+diff --git a/stubs/replay.c b/stubs/replay.c
+index 9c8aa48c9c..04279abb2c 100644
+--- a/stubs/replay.c
++++ b/stubs/replay.c
+@@ -72,3 +72,11 @@ uint64_t blkreplay_next_id(void)
  {
-     ReplayState *state = opaque;
-     state->file_offset = ftell(replay_file);
-+    state->host_clock_last = qemu_clock_get_last(QEMU_CLOCK_HOST);
- 
      return 0;
  }
-@@ -33,6 +34,7 @@ static int replay_post_load(void *opaque, int version_id)
- {
-     ReplayState *state = opaque;
-     fseek(replay_file, state->file_offset, SEEK_SET);
-+    qemu_clock_set_last(QEMU_CLOCK_HOST, state->host_clock_last);
-     /* If this was a vmstate, saved in recording mode,
-        we need to initialize replay data fields. */
-     replay_fetch_data_kind();
-@@ -54,6 +56,7 @@ static const VMStateDescription vmstate_replay = {
-         VMSTATE_UINT32(has_unread_data, ReplayState),
-         VMSTATE_UINT64(file_offset, ReplayState),
-         VMSTATE_UINT64(block_request_id, ReplayState),
-+        VMSTATE_UINT64(host_clock_last, ReplayState),
-         VMSTATE_END_OF_LIST()
-     },
- };
-diff --git a/util/qemu-timer.c b/util/qemu-timer.c
-index 82d56507a2..2ed1bf2778 100644
---- a/util/qemu-timer.c
-+++ b/util/qemu-timer.c
-@@ -622,6 +622,18 @@ int64_t qemu_clock_get_ns(QEMUClockType type)
-     }
- }
- 
-+uint64_t qemu_clock_get_last(QEMUClockType type)
++
++void replay_mutex_lock(void)
 +{
-+    QEMUClock *clock = qemu_clock_ptr(type);
-+    return clock->last;
 +}
 +
-+void qemu_clock_set_last(QEMUClockType type, uint64_t last)
++void replay_mutex_unlock(void)
 +{
-+    QEMUClock *clock = qemu_clock_ptr(type);
-+    clock->last = last;
 +}
-+
- void qemu_clock_register_reset_notifier(QEMUClockType type,
-                                         Notifier *notifier)
- {
 -- 
 2.14.3
