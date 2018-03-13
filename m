@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1evlxb-0005qm-Qe
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 11:35:35 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1evlxf-0005vd-UM
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 11:35:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1evlxb-00067Z-61
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 11:35:31 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Mar 2018 15:34:51 +0000
-Message-Id: <20180313153458.26822-3-peter.maydell@linaro.org>
-In-Reply-To: <20180313153458.26822-1-peter.maydell@linaro.org>
-References: <20180313153458.26822-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/9] hw/arm/boot: assert that secure_boot and
- secure_board_setup are false for AArch64
+	(envelope-from <dgilbert@redhat.com>) id 1evlxb-000681-MB
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 11:35:35 -0400
+Date: Tue, 13 Mar 2018 15:35:14 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180313153513.GG3545@work-vm>
+References: <20180207155837.92351-1-vsementsov@virtuozzo.com>
+	<20180207155837.92351-6-vsementsov@virtuozzo.com>
+	<20180312153020.GI3219@work-vm>
+	<af82d663-f37c-2857-214c-83e348a5f52a@virtuozzo.com>
+	<20180313103056.GB3545@work-vm>
+	<9bc43da5-027a-cd11-0c13-b9a9432e0fdb@virtuozzo.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9bc43da5-027a-cd11-0c13-b9a9432e0fdb@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v10 05/12] migration: introduce
+ postcopy-only pending
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,43 +28,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Pekka Enberg <penberg@iki.fi>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
-Add some assertions that if we're about to boot an AArch64 kernel,
-the board code has not mistakenly set either secure_boot or
-secure_board_setup. It doesn't make sense to set secure_boot,
-because all AArch64 kernels must be booted in non-secure mode.
+* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+> 13.03.2018 13:30, Dr. David Alan Gilbert wrote:
+> > * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+> > > 12.03.2018 18:30, Dr. David Alan Gilbert wrote:
+> > > > * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+> > > > > There would be savevm states (dirty-bitmap) which can migrate only in
+> > > > > postcopy stage. The corresponding pending is introduced here.
+> > > > > 
+> > > > > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> > > > > ---
+> > > [...]
+> > > 
+> > > > >    static MigIterateState migration_iteration_run(MigrationState *s)
+> > > > >    {
+> > > > > -    uint64_t pending_size, pend_post, pend_nonpost;
+> > > > > +    uint64_t pending_size, pend_pre, pend_compat, pend_post;
+> > > > >        bool in_postcopy = s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE;
+> > > > > -    qemu_savevm_state_pending(s->to_dst_file, s->threshold_size,
+> > > > > -                              &pend_nonpost, &pend_post);
+> > > > > -    pending_size = pend_nonpost + pend_post;
+> > > > > +    qemu_savevm_state_pending(s->to_dst_file, s->threshold_size, &pend_pre,
+> > > > > +                              &pend_compat, &pend_post);
+> > > > > +    pending_size = pend_pre + pend_compat + pend_post;
+> > > > >        trace_migrate_pending(pending_size, s->threshold_size,
+> > > > > -                          pend_post, pend_nonpost);
+> > > > > +                          pend_pre, pend_compat, pend_post);
+> > > > >        if (pending_size && pending_size >= s->threshold_size) {
+> > > > >            /* Still a significant amount to transfer */
+> > > > >            if (migrate_postcopy() && !in_postcopy &&
+> > > > > -            pend_nonpost <= s->threshold_size &&
+> > > > > -            atomic_read(&s->start_postcopy)) {
+> > > > > +            pend_pre <= s->threshold_size &&
+> > > > > +            (atomic_read(&s->start_postcopy) ||
+> > > > > +             (pend_pre + pend_compat <= s->threshold_size)))
+> > > > This change does something different from the description;
+> > > > it causes a postcopy_start even if the user never ran the postcopy-start
+> > > > command; so sorry, we can't do that; because postcopy for RAM is
+> > > > something that users can enable but only switch into when they've given
+> > > > up on it completing normally.
+> > > > 
+> > > > However, I guess that leaves you with a problem; which is what happens
+> > > > to the system when you've run out of pend_pre+pend_compat but can't
+> > > > complete because pend_post is non-0; so I don't know the answer to that.
+> > > > 
+> > > > 
+> > > Hmm. Here, we go to postcopy only if "pend_pre + pend_compat <=
+> > > s->threshold_size". Pre-patch, in this case we will go to
+> > > migration_completion(). So, precopy stage is finishing anyway.
+> > Right.
+> > 
+> > > So, we want
+> > > in this case to finish ram migration like it was finished by
+> > > migration_completion(), and then, run postcopy, which will handle only dirty
+> > > bitmaps, yes?
+> > It's a bit tricky; the first important thing is that we can't change the
+> > semantics of the migration without the 'dirty bitmaps'.
+> > 
+> > So then there's the question of how  a migration with both
+> > postcopy-ram+dirty bitmaps should work;  again I don't think we should
+> > enter the postcopy-ram phase until start-postcopy is issued.
+> > 
+> > Then there's the 3rd case; dirty-bitmaps but no postcopy-ram; in that
+> > case I worry less about the semantics of how you want to do it.
+> 
+> I have an idea:
+> 
+> in postcopy_start(), in ram_has_postcopy() (and may be some other places?),
+> check atomic_read(&s->start_postcopy) instead of migrate_postcopy_ram()
 
-It might in theory make sense to set secure_board_setup, but
-we don't currently support that, because only the AArch32
-bootloader[] code calls this hook; bootloader_aarch64[] does not.
-Since we don't have a current need for this functionality, just
-assert that we don't try to use it. If it's needed we'll add
-it later.
+We've got to use migrate_postcopy_ram() to decide whether we should do
+ram specific things, e.g. send the ram discard data.
+I'm wanting to make sure that if we have another full postcopy device
+(like RAM, maybe storage say) that we'll just add that in with
+migrate_postcopy_whatever().
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/arm/boot.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+> then:
+> 
+> 1. behavior without dirty-bitmaps is not changed, as currently we cant go
+> into postcopy_start and ram_has_postcopy without s->start_postcopy
+> 2. dirty-bitmaps+ram: if user don't set s->start_postcopy, postcopy_start()
+> will operate as if migration capability was not enabled, so ram should
+> complete its migration
+> 3. only dirty-bitmaps: again, postcopy_start() will operate as if migration
+> capability was not enabled, so ram should complete its migration
 
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index 196c7fb242..e21a92f972 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -720,6 +720,13 @@ static void do_cpu_reset(void *opaque)
-                     } else {
-                         env->pstate = PSTATE_MODE_EL1h;
-                     }
-+                    /* AArch64 kernels never boot in secure mode */
-+                    assert(!info->secure_boot);
-+                    /* This hook is only supported for AArch32 currently:
-+                     * bootloader_aarch64[] will not call the hook, and
-+                     * the code above has already dropped us into EL2 or EL1.
-+                     */
-+                    assert(!info->secure_board_setup);
-                 }
- 
-                 /* Set to non-secure if not a secure boot */
--- 
-2.16.2
+Why can't we just remove the change to the trigger condition in this
+patch?  Then I think everything works as long as the management layer
+does eventually call migration-start-postcopy ?
+(It might waste some bandwidth at the point where there's otherwise
+nothing left to send).
+
+Even with the use of migrate-start-postcopy, you're going to need to be
+careful about the higher level story; you need to document when to do it
+and what the higher levels should do after a migration failure - at the
+moment they know that once postcopy starts migration is irrecoverable if
+it fails; I suspect that's not true with your dirty bitmaps.
+
+IMHO this still comes back to my original observation from ~18months ago
+that in many ways this isn't very postcopy like; in the sense that all
+the semantics are quite different from RAM.
+
+Dave
+
+> > 
+> > > Hmm2. Looked through migration_completion(), I don't understand, how it
+> > > finishes ram migration without postcopy. It calls
+> > > qemu_savevm_state_complete_precopy(), which skips states with
+> > > has_postcopy=true, which is ram...
+> > Because savevm_state_complete_precopy only skips has_postcopy=true in
+> > the in_postcopy case:
+> > 
+> >              (in_postcopy && se->ops->has_postcopy &&
+> >               se->ops->has_postcopy(se->opaque)) ||
+> > 
+> > so when we call it in migration_completion(), if we've not entered
+> > postcopy yet, then that test doesn't trigger.
+> > 
+> > (Apologies for not spotting this earlier; but I thought this patch was
+> > a nice easy one just adding the postcopy_only_pending - I didn't realise it changed
+> > existing semantics until I spotted that)
+> 
+> oh, yes, I was inattentive :(
+> 
+> > 
+> > Dave
+> > 
+> > > -- 
+> > > Best regards,
+> > > Vladimir
+> > > 
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+> 
+> -- 
+> Best regards,
+> Vladimir
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
