@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evqLz-0004oC-QM
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 16:17:00 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1evqMg-0005AU-2C
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 16:17:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evqLy-0003AP-MZ
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 16:16:59 -0400
-References: <152090675906.39.6932440748522025318@71c20359a636>
-	<2ccc79fb-1454-85db-5e31-c18a67a32b7c@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f63c2e9a-a52f-e028-8bd7-50ea9d3310f9@redhat.com>
-Date: Tue, 13 Mar 2018 15:16:35 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1evqMc-0003Rs-TU
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 16:17:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42654)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1evqMc-0003Re-Mv
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 16:17:38 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 075E08050A
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 20:17:38 +0000 (UTC)
+From: Alex Williamson <alex.williamson@redhat.com>
+Date: Tue, 13 Mar 2018 14:17:34 -0600
+Message-ID: <20180313201415.2327.62402.stgit@gimli.home>
 MIME-Version: 1.0
-In-Reply-To: <2ccc79fb-1454-85db-5e31-c18a67a32b7c@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/8] nbd block status base:allocation
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PULL 00/11] vfio updates for QEMU-2.12 soft freeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,96 +31,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, no-reply@patchew.org, vsementsov@virtuozzo.com
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, den@openvz.org, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
 
-On 03/12/2018 10:11 PM, Eric Blake wrote:
+The following changes since commit 9f750794985d7386f088da941c76b73880b2b6c4:
 
->>
->=20
->> =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 block/nbd-client.o
->> =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 block/sheepdog.o
->> /var/tmp/patchew-tester-tmp-erqpie2w/src/block/nbd-client.c: In=20
->> function =E2=80=98nbd_client_co_block_status=E2=80=99:
->> /var/tmp/patchew-tester-tmp-erqpie2w/src/block/nbd-client.c:890:15:=20
->> error: =E2=80=98extent.flags=E2=80=99 may be used uninitialized in thi=
-s function=20
->> [-Werror=3Dmaybe-uninitialized]
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 NBDExtent extent;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 ^~~~~~
->> /var/tmp/patchew-tester-tmp-erqpie2w/src/block/nbd-client.c:925:19:=20
->> error: =E2=80=98extent.length=E2=80=99 may be used uninitialized in th=
-is function=20
->> [-Werror=3Dmaybe-uninitialized]
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *pnum =3D extent.length;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 ~~~~~~^~~~~~~
->=20
-> May be a false positive where the compiler merely can't see through the=
-=20
-> logic, or it might be a real bug; but I suspect either way that the=20
-> solution is to initialize this (I'm guessing patch 5), as in:
->=20
-> NBDExtent extent =3D { 0 };
+  sev/i386: add sev_get_capabilities() (2018-03-13 17:36:06 +0100)
 
-Not a sufficient fix - it's probably a real bug in that extent is never=20
-initialized if the NBD_FOREACH_REPLY_CHUNK() loop in=20
-nbd_co_receive_blockstatus_reply() never encounters an=20
-NBD_REPLY_TYPE_BLOCK_STATUS chunk.  A malicious server could just reply=20
-with NBD_REPLY_TYPE_NONE (no status reported after all), but the block=20
-layer contract requires us to make progress or return an error.  So, if=20
-the server didn't give us any extents, we need to turn it into an error=20
-even if the server did not.
+are available in the Git repository at:
 
->=20
-> Will squash that in when I get to that part of the review.
->=20
+  git://github.com/awilliam/qemu-vfio.git tags/vfio-update-20180313.0
 
-And I forgot to do it before the pull request v1, oops.  Here's what I'm=20
-squashing in for v2:
+for you to fetch changes up to fcad0d2121976df4b422b4007a5eb7fcaac01134:
 
-diff --git i/block/nbd-client.c w/block/nbd-client.c
-index be160052cb1..486d73f1c63 100644
---- i/block/nbd-client.c
-+++ w/block/nbd-client.c
-@@ -694,6 +694,7 @@ static int=20
-nbd_co_receive_blockstatus_reply(NBDClientSession *s,
-      Error *local_err =3D NULL;
-      bool received =3D false;
+  ppc/spapr, vfio: Turn off MSIX emulation for VFIO devices (2018-03-13 11:17:31 -0600)
 
-+    extent->length =3D 0;
-      NBD_FOREACH_REPLY_CHUNK(s, iter, handle, s->info.structured_reply,
-                              NULL, &reply, &payload)
-      {
-@@ -734,6 +735,13 @@ static int=20
-nbd_co_receive_blockstatus_reply(NBDClientSession *s,
-          payload =3D NULL;
-      }
+----------------------------------------------------------------
+VFIO updates 2018-03-13
 
-+    if (!extent->length && !iter.err) {
-+        error_setg(&iter.err,
-+                   "Server did not reply with any status extents");
-+        if (!iter.ret) {
-+            iter.ret =3D -EIO;
-+        }
-+    }
-      error_propagate(errp, iter.err);
-      return iter.ret;
-  }
-@@ -919,6 +927,7 @@ int coroutine_fn=20
-nbd_client_co_block_status(BlockDriverState *bs,
-          return ret;
-      }
+ - Display support for vGPUs (Gerd Hoffmann)
 
-+    assert(extent.length);
-      *pnum =3D extent.length;
-      return (extent.flags & NBD_STATE_HOLE ? 0 : BDRV_BLOCK_DATA) |
-             (extent.flags & NBD_STATE_ZERO ? BDRV_BLOCK_ZERO : 0);
+ - Enable new kernel support for mmaps overlapping MSI-X vector table,
+   disable MSI-X emulation on POWER (Alexey Kardashevskiy)
 
+----------------------------------------------------------------
 
+NOTE: Above tag is based on Paolo's v2 KVM pull request[1] as both
+      series here depend on v4.16 header updates.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+[1] 1520959261-96820-1-git-send-email-pbonzini@redhat.com
+
+Alexey Kardashevskiy (3):
+      vfio/pci: Relax DMA map errors for MMIO regions
+      vfio-pci: Allow mmap of MSIX BAR
+      ppc/spapr, vfio: Turn off MSIX emulation for VFIO devices
+
+Gerd Hoffmann (8):
+      standard-headers: add drm/drm_fourcc.h
+      ui/pixman: add qemu_drm_format_to_pixman()
+      console: minimal hotplug suport
+      secondary-vga: properly close QemuConsole on unplug
+      vfio/common: cleanup in vfio_region_finalize
+      vfio/display: core & wireup
+      vfio/display: adding region support
+      vfio/display: adding dmabuf support
+
+ hw/display/vga-pci.c                      |   9 +
+ hw/ppc/spapr.c                            |   7 +
+ hw/vfio/Makefile.objs                     |   2 +-
+ hw/vfio/common.c                          |  77 +++++-
+ hw/vfio/display.c                         | 347 +++++++++++++++++++++++++
+ hw/vfio/pci.c                             |  32 +++
+ hw/vfio/pci.h                             |   5 +
+ include/hw/vfio/vfio-common.h             |  23 ++
+ include/standard-headers/drm/drm_fourcc.h | 411 ++++++++++++++++++++++++++++++
+ include/ui/console.h                      |   2 +
+ include/ui/qemu-pixman.h                  |   5 +
+ scripts/update-linux-headers.sh           |   5 +
+ ui/console.c                              |  79 +++++-
+ ui/qemu-pixman.c                          |  22 ++
+ ui/trace-events                           |   2 +
+ 15 files changed, 1015 insertions(+), 13 deletions(-)
+ create mode 100644 hw/vfio/display.c
+ create mode 100644 include/standard-headers/drm/drm_fourcc.h
