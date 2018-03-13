@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1evfWL-0001Od-EX
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 04:42:58 -0400
+	(envelope-from <peterx@redhat.com>) id 1evfhW-0005la-2H
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 04:54:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1evfWI-0002w4-8v
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 04:42:57 -0400
-Received: from mail-wr0-f180.google.com ([209.85.128.180]:41651)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1evfWI-0002uq-2Q
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 04:42:54 -0400
-Received: by mail-wr0-f180.google.com with SMTP id f14so20092634wre.8
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 01:42:53 -0700 (PDT)
-References: <20180308124901.83533-1-brijesh.singh@amd.com>
-	<20180308124901.83533-9-brijesh.singh@amd.com>
-	<20180308164910.GF4718@redhat.com>
-	<e39191c3-9c83-8c44-f1d2-9fa7a2f7695d@amd.com>
-	<20180308224412.GF3417@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8cf2f9bc-0339-1c80-b53b-ef5915248d1f@redhat.com>
-Date: Tue, 13 Mar 2018 09:42:51 +0100
+	(envelope-from <peterx@redhat.com>) id 1evfhR-0002KE-3c
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 04:54:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54688 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1evfhQ-0002J9-Tw
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 04:54:25 -0400
+Date: Tue, 13 Mar 2018 16:54:04 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180313085404.GH11787@xz-mi>
+References: <20180309091535.13315-1-peterx@redhat.com>
+	<20180309091535.13315-23-peterx@redhat.com>
+	<20180312173609.GV3219@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20180308224412.GF3417@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v12 08/28] target/i386: add Secure
- Encrypted Virtulization (SEV) object
+Content-Disposition: inline
+In-Reply-To: <20180312173609.GV3219@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v7 22/23] migration/qmp: add command
+ migrate-pause
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,29 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Brijesh Singh <brijesh.singh@amd.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Markus Armbruster <armbru@redhat.com>, Bruce Rogers <brogers@suse.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, Borislav Petkov <bp@suse.de>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Richard Henderson <richard.henderson@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>
 
-On 08/03/2018 23:44, Eduardo Habkost wrote:
->> I think doing so will be an issue for the migration. Consider your above
->> use case, a SEV guest is running on EPYC with cbitpos=47 and if we
->> migrate to some $NEXT AMD CPU which uses need to use cbitpos=48 and we
->> will fail to resume the guest on destination after migrating.
+On Mon, Mar 12, 2018 at 05:36:09PM +0000, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > It pauses an ongoing migration.  Currently it only supports postcopy.
+> > Note that this command will work on either side of the migration.
+> > Basically when we trigger this on one side, it'll interrupt the other
+> > side as well since the other side will get notified on the disconnect
+> > event.
+> > 
+> > However, it's still possible that the other side is not notified, for
+> > example, when the network is totally broken, or due to some firewall
+> > configuration changes.  In that case, we will also need to run the same
+> > command on the other side so both sides will go into the paused state.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  migration/migration.c | 27 +++++++++++++++++++++++++++
+> >  qapi/migration.json   | 16 ++++++++++++++++
+> >  2 files changed, 43 insertions(+)
+> > 
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index 180552329c..f31fcbb0d5 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -1448,6 +1448,33 @@ void qmp_migrate_recover(const char *uri, Error **errp)
+> >      qemu_start_incoming_migration(uri, errp);
+> >  }
+> >  
+> > +void qmp_migrate_pause(Error **errp)
+> > +{
+> > +    MigrationState *ms = migrate_get_current();
+> > +    MigrationIncomingState *mis = migration_incoming_get_current();
+> > +    int ret;
+> > +
+> > +    if (ms->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
+> > +        /* Source side, during postcopy */
+> > +        ret = qemu_file_shutdown(ms->to_dst_file);
 > 
-> Exactly, in other words these two options are part of the guest
-> ABI, and QEMU promises to never make the guest ABI depend on the
-> host hardware unless you're using "-cpu host".
+> How did this fix the race I mentioned last time?
 
-This is not entirely true; while MAXPHYADDR is constant downstream
-unless using "-cpu host", in practice that behavior is wrong and a guest
-could misbehave if passed a MAXPHYADDR that is different from the host's.
+Ah sorry I missed that one.  I'll reply there.
 
-I think this is the same, and management software will have to live with it.
-
-Paolo
-
-> In theory we could make QEMU choose the right values
-> automatically if we document very clearly that the default
-> behavior is unsafe.  But I would rather not take that risk and
-> force management software to be aware of the gotchas involved in
-> using SEV + live-migration.
+-- 
+Peter Xu
