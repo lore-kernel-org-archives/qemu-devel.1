@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evj9w-0001FL-7n
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:36:05 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1evjBx-0002dp-E8
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:38:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evj9t-0007lz-1w
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:36:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44906 helo=mx1.redhat.com)
+	(envelope-from <eric.auger@redhat.com>) id 1evjBw-0000Cc-8d
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:38:09 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48728 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evj9s-0007lC-Rf
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:36:00 -0400
-Date: Tue, 13 Mar 2018 12:35:56 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180313123556.GF3545@work-vm>
-References: <20180208103132.28452-1-peterx@redhat.com>
-	<20180208103132.28452-28-peterx@redhat.com>
-	<20180213201059.GU2378@work-vm> <20180214045639.GI4472@xz-mi>
-	<20180214185658.GF2507@work-vm> <20180222074346.GG18962@xz-mi>
-	<20180228201418.GQ2981@work-vm> <20180313091318.GI11787@xz-mi>
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1evjBw-0000C9-2x
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:38:08 -0400
+References: <20180207000731.32764.95992.stgit@gimli.home>
+	<cfe31ae1-2557-d15a-45a2-0ba03d8d71fa@ozlabs.ru>
+	<20180206212538.50ef0e13@w520.home>
+	<6014d60c-9bdb-4dc0-7cd7-9299005d9c5a@ozlabs.ru>
+	<20180207071253.7c606594@w520.home>
+	<86c09adf-c4ab-5eca-629a-4d6c6a5692be@ozlabs.ru>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <777482c6-8180-df0f-0a0c-5d6e000553ba@redhat.com>
+Date: Tue, 13 Mar 2018 13:38:00 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180313091318.GI11787@xz-mi>
-Subject: Re: [Qemu-devel] [PATCH v6 27/28] migration/qmp: add command
- migrate-pause
+In-Reply-To: <86c09adf-c4ab-5eca-629a-4d6c6a5692be@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH] vfio/pci: Add ioeventfd support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,201 +32,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, Alex Williamson <alex.williamson@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Wed, Feb 28, 2018 at 08:14:19PM +0000, Dr. David Alan Gilbert wrote:
-> > * Peter Xu (peterx@redhat.com) wrote:
-> > > On Wed, Feb 14, 2018 at 06:56:59PM +0000, Dr. David Alan Gilbert wrote:
-> > > > * Peter Xu (peterx@redhat.com) wrote:
-> > > > > On Tue, Feb 13, 2018 at 08:11:00PM +0000, Dr. David Alan Gilbert wrote:
-> > > > > > * Peter Xu (peterx@redhat.com) wrote:
-> > > > > > > It pauses an ongoing migration.  Currently it only supports postcopy.
-> > > > > > > Note that this command will work on either side of the migration.
-> > > > > > > Basically when we trigger this on one side, it'll interrupt the other
-> > > > > > > side as well since the other side will get notified on the disconnect
-> > > > > > > event.
-> > > > > > > 
-> > > > > > > However, it's still possible that the other side is not notified, for
-> > > > > > > example, when the network is totally broken, or due to some firewall
-> > > > > > > configuration changes.  In that case, we will also need to run the same
-> > > > > > > command on the other side so both sides will go into the paused state.
-> > > > > > > 
-> > > > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > > > > > ---
-> > > > > > >  migration/migration.c | 27 +++++++++++++++++++++++++++
-> > > > > > >  qapi/migration.json   | 16 ++++++++++++++++
-> > > > > > >  2 files changed, 43 insertions(+)
-> > > > > > > 
-> > > > > > > diff --git a/migration/migration.c b/migration/migration.c
-> > > > > > > index bb57ed9ade..139abec0c3 100644
-> > > > > > > --- a/migration/migration.c
-> > > > > > > +++ b/migration/migration.c
-> > > > > > > @@ -1448,6 +1448,33 @@ void qmp_migrate_recover(const char *uri, Error **errp)
-> > > > > > >      qemu_start_incoming_migration(uri, errp);
-> > > > > > >  }
-> > > > > > >  
-> > > > > > > +void qmp_migrate_pause(Error **errp)
-> > > > > > > +{
-> > > > > > > +    MigrationState *ms = migrate_get_current();
-> > > > > > > +    MigrationIncomingState *mis = migration_incoming_get_current();
-> > > > > > > +    int ret;
-> > > > > > > +
-> > > > > > > +    if (ms->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-> > > > > > > +        /* Source side, during postcopy */
-> > > > > > > +        ret = qemu_file_shutdown(ms->to_dst_file);
-> > > > > > 
-> > > > > > This doesn't feel thread safe; although I'm not sure how to make it so.
-> > > > > > If the migration finishes just after we check the state but before the
-> > > > > > shutdown we end up using a bogus QEMUFile*
-> > > > > > Making all the places that close a QEMUFile* set hte pointer Null before
-> > > > > > they do the close doesn't help because you still race with that.
-> > > > > > 
-> > > > > > (The race is small, but still)
-> > > > > 
-> > > > > IMHO we can fix it by adding a migration lock for management code. If
-> > > > > you see my previous migrate cleanup series, it's in my todo. ;)
-> > > > > 
-> > > > > The basic idea is that we take the lock for critical paths (but not
-> > > > > during most of the migration process).  E.g., we may need the lock
-> > > > > for:
-> > > > > 
-> > > > > - very beginning of migration, during setup
-> > > > > - reaching the end of migration
-> > > > > - every single migration QMP command (since HMP calls them so HMP will
-> > > > >   also acquire the lock)
-> > > > > - anywhere else I didn't mention that may necessary, e.g., when we
-> > > > >   change migrate state, meanwhile we do something else - basically
-> > > > >   that should be an "atomic operation", and we need the lock to make
-> > > > >   sure of that.
-> > > > 
-> > > > But then we couldn't take that lock in an OOB command, you'd have to
-> > > > audit all of those places that took it to make sure it didn't do any of
-> > > > the things OOB commands aren't allowed to do.
-> > > 
-> > > Yeah OOB commands will be special - my plan is that they just never
-> > > take the lock.  E.g., they only touches FDs, and FDs are naturally
-> > > thread safe (like this command).
-> > > 
-> > > And some major migration commands (like "migrate" itself) should never
-> > > be an OOB command.
-> > 
-> > OK; I'm not sure what makes FDs naturally thread safe though; but
-> > lets see the code you have in mind.
-> 
-> I think I was wrong... it should need a lock.
-> 
-> > 
-> > > > 
-> > > > > For the recovery series, I would prefer that we ignore this issue for
-> > > > > now - since this problem is there for quite a long time AFAICT in the
-> > > > > whole migration code rather than this series only, and we need to
-> > > > > solve it once and for all.
-> > > > 
-> > > > I don't think those problems happen (much) in the existing code, because
-> > > > everything is done in the main thread.
-> > > 
-> > > But migration is running in its own thread (migration_thread)?
-> > > 
-> > > For example: What if we send migration commands during the end of
-> > > migration or a failing migration?  Could there be risk in old code
-> > > too since both main thread and migration thread may be manipulating
-> > > MigrationState object?
-> > 
-> > Maybe; although migrate_set_state uses atomic_cmpxchg to ensure
-> > that it's safe, and starting a migration can't happen unless there
-> > isn't a migration in progress - and that's run under lock.
-> 
-> Yes I think if without OOB we should be fine since even the cleanup is
-> running with the BQL.
-> 
-> Now I don't have good idea to solve this problem except introducing a
-> lock.  How about I add a patch to introduce the mgmt_lock, which
-> currently only protect the QEMUFile?  Like:
-> 
-> ----------------------------------
-> diff --git a/migration/migration.c b/migration/migration.c
-> index f31fcbb0d5..00c630326d 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1195,8 +1195,10 @@ static void migrate_fd_cleanup(void *opaque)
->          if (multifd_save_cleanup(&local_err) != 0) {
->              error_report_err(local_err);
->          }
-> +        qemu_mutex_lock(&s->mgmt_lock);
->          qemu_fclose(s->to_dst_file);
->          s->to_dst_file = NULL;
-> +        qemu_mutex_unlock(&s->mgmt_lock);
->      }
-> 
->      assert((s->state != MIGRATION_STATUS_ACTIVE) &&
-> @@ -2493,8 +2495,10 @@ static MigThrError postcopy_pause(MigrationState *s)
-> 
->          /* Current channel is possibly broken. Release it. */
->          assert(s->to_dst_file);
-> +        qemu_mutex_lock(&s->mgmt_lock);
->          qemu_file_shutdown(s->to_dst_file);
->          qemu_fclose(s->to_dst_file);
->          s->to_dst_file = NULL;
-> +        qemu_mutex_unlock(&s->mgmt_lock);
+Hi,
 
-That's only safe if we know qemu_fclose() can never block; otherwise
-we're not allowed to take the same lock in the OOB command.
+On 08/02/18 02:22, Alexey Kardashevskiy wrote:
+> On 08/02/18 01:12, Alex Williamson wrote:
+>> On Wed, 7 Feb 2018 15:48:26 +1100
+>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>>
+>>> On 07/02/18 15:25, Alex Williamson wrote:
+>>>> On Wed, 7 Feb 2018 15:09:22 +1100
+>>>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:  
+>>>>> On 07/02/18 11:08, Alex Williamson wrote:  
+>>>>>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+>>>>>> index e3301dbd27d4..07966a5f0832 100644
+>>>>>> --- a/include/uapi/linux/vfio.h
+>>>>>> +++ b/include/uapi/linux/vfio.h
+>>>>>> @@ -503,6 +503,30 @@ struct vfio_pci_hot_reset {
+>>>>>>  
+>>>>>>  #define VFIO_DEVICE_PCI_HOT_RESET	_IO(VFIO_TYPE, VFIO_BASE + 13)
+>>>>>>  
+>>>>>> +/**
+>>>>>> + * VFIO_DEVICE_IOEVENTFD - _IOW(VFIO_TYPE, VFIO_BASE + 14,
+>>>>>> + *                              struct vfio_device_ioeventfd)
+>>>>>> + *
+>>>>>> + * Perform a write to the device at the specified device fd offset, with
+>>>>>> + * the specified data and width when the provided eventfd is triggered.
+>>>>>> + *
+>>>>>> + * Return: 0 on success, -errno on failure.
+>>>>>> + */
+>>>>>> +struct vfio_device_ioeventfd {
+>>>>>> +	__u32	argsz;
+>>>>>> +	__u32	flags;
+>>>>>> +#define VFIO_DEVICE_IOEVENTFD_8		(1 << 0) /* 1-byte write */
+>>>>>> +#define VFIO_DEVICE_IOEVENTFD_16	(1 << 1) /* 2-byte write */
+>>>>>> +#define VFIO_DEVICE_IOEVENTFD_32	(1 << 2) /* 4-byte write */
+>>>>>> +#define VFIO_DEVICE_IOEVENTFD_64	(1 << 3) /* 8-byte write */
+>>>>>> +#define VFIO_DEVICE_IOEVENTFD_SIZE_MASK	(0xf)
+>>>>>> +	__u64	offset;			/* device fd offset of write */
+>>>>>> +	__u64	data;			/* data to be written */
+>>>>>> +	__s32	fd;			/* -1 for de-assignment */
+>>>>>> +};
+>>>>>> +
+>>>>>> +#define VFIO_DEVICE_IOEVENTFD		_IO(VFIO_TYPE, VFIO_BASE + 14)    
+>>>>>
+>>>>>
+>>>>> Is this a first ioctl with endianness fixed to little-endian? I'd suggest
+>>>>> to comment on that as things like vfio_info_cap_header do use the host
+>>>>> endianness.  
+>>>>
+>>>> Look at our current read and write interface, we call leXX_to_cpu
+>>>> before calling iowriteXX there and I think a user would logically
+>>>> expect to use the same data format here as they would there.  
+>>>
+>>> If the data is "char data[8]" (i.e. bytestream), then it can be expected to
+>>> be device/bus endian (i.e. PCI == little endian), but if it is u64 - then I
+>>> am not so sure really, and this made me look around. It could be "__le64
+>>> data" too.
+>>>
+>>>> Also note
+>>>> that iowriteXX does a cpu_to_leXX, so are we really defining the
+>>>> interface as little-endian or are we just trying to make ourselves
+>>>> endian neutral and counter that implicit conversion?  Thanks,  
+>>>
+>>> Defining it LE is fine, I just find it a bit confusing when
+>>> vfio_info_cap_header is host endian but vfio_device_ioeventfd is not.
+>>
+>> But I don't think we are defining the interface as little-endian.
+>> iowriteXX does a cpu_to_leXX byteswap.  Therefore in order to maintain
+>> endian neutrality, if the data does a cpu->le swap on the way out, I
+>> need to do a le->cpu swap on the way in, right?  Please defend the
+>> assertion that we're creating a little-endian interface.  Thanks,
+> 
+> 
+> vfio_pci_ioctl() passes "endian-neutral" ioeventfd.data to
+> vfio_pci_ioeventfd() which immediately does the leXX_to_cpu() conversion
+> (and uses the result later on in iowriteXX(), which is not VFIO API) so I
+> read it as the ioctl really expects LE.
+> 
+> The QEMU part - vfio_nvidia_mirror_quirk MR - does not swap bytes but the
+> MR itself it declared DEVICE_LITTLE_ENDIAN which means
+> vfio_nvidia_quirk_mirror_write() receives byteswapped @data in the host
+> endian == bigendian on a big endian host. So the ioctl() handler will
+> receive a BE value, do byteswap #1 in leXX_to_cpu(), and then do byteswap
+> #2 in iowriteXX() so after all a BE will be written to a device. So I'd say
+> we rather do not need leXX_to_cpu() in vfio_pci_ioeventfd(). Correct me
+> where I am wrong. Thanks,
 
-I think perhaps it's safer to always do something like:
-  tmp = atomic_xchg(s->to_dst_file, NULL);
-  qemu_file_shutdown(tmp);
-  qemu_fclose(tmp);
+It is not crystal clear to me what is the outcome of this discussion.
+Please can you clarify?
 
-then the OOB code can do the same?
-Would that work - avoiding the lock?
+At the beginning I understood we had a chain of lexx_to_cpu and
+cpu_to_lexx (in iowritexx) so it was neutral. Now I am lost about what
+we want.
 
-Dave
+Thanks
 
-
->          error_report("Detected IO failure for postcopy. "
-> @@ -2970,6 +2974,7 @@ static void migration_instance_finalize(Object *obj)
->      qemu_sem_destroy(&ms->postcopy_pause_sem);
->      qemu_sem_destroy(&ms->postcopy_pause_rp_sem);
->      qemu_sem_destroy(&ms->rp_state.rp_sem);
-> +    qemu_mutex_destroy(&ms->mgmt_lock);
->  }
+Eric
 > 
->  static void migration_instance_init(Object *obj)
-> @@ -3002,6 +3007,7 @@ static void migration_instance_init(Object *obj)
->      qemu_sem_init(&ms->postcopy_pause_sem, 0);
->      qemu_sem_init(&ms->postcopy_pause_rp_sem, 0);
->      qemu_sem_init(&ms->rp_state.rp_sem, 0);
-> +    qemu_mutex_init(&ms->mgmt_lock);
->  }
 > 
->  /*
-> diff --git a/migration/migration.h b/migration/migration.h
-> index c549859cc3..7fcb841978 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -98,6 +98,11 @@ struct MigrationState
->      QemuThread thread;
->      QEMUBH *cleanup_bh;
->      QEMUFile *to_dst_file;
-> +    /*
-> +     * Currently it only protects to_dst_file.  We need to hold this
-> +     * lock when we want to modify in/out QEMUFiles.
-> +     */
-> +    QemuMutex mgmt_lock;
 > 
->      /* bytes already send at the beggining of current interation */
->      uint64_t iteration_initial_bytes;
-> ----------------------------------
-> 
-> Then I take this lock in the OOB postcopy-pause handler.  Since the
-> lock holding scenarios are always extremely fast, I assume it's pretty
-> safe.  Would that be okay with you?
-> 
-> Thanks,
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
