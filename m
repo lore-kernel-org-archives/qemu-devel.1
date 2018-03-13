@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1evrjo-00047w-Rr
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 17:45:42 -0400
+	(envelope-from <mst@redhat.com>) id 1evrju-0004DW-1w
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 17:45:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1evrjn-0007nG-Jd
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 17:45:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35408 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1evrjr-0007p6-3S
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 17:45:46 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45952 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1evrjn-0007mx-Dh
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 17:45:39 -0400
-Date: Tue, 13 Mar 2018 23:45:38 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1evrjq-0007ol-UU
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 17:45:43 -0400
+Date: Tue, 13 Mar 2018 23:45:41 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1520977432-187679-20-git-send-email-mst@redhat.com>
+Message-ID: <1520977432-187679-22-git-send-email-mst@redhat.com>
 References: <1520977432-187679-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1520977432-187679-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 19/22] qmp: distinguish PC-DIMM and NVDIMM in
- MemoryDeviceInfoList
+Subject: [Qemu-devel] [PULL 21/22] tests/bios-tables-test: add test cases
+ for DIMM proximity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,155 +28,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Haozhong Zhang <haozhong.zhang@intel.com>, Eric Blake <eblake@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Haozhong Zhang <haozhong.zhang@intel.com>, Igor Mammedov <imammedo@redhat.com>
 
 From: Haozhong Zhang <haozhong.zhang@intel.com>
 
-It may need to treat PC-DIMM and NVDIMM differently, e.g., when
-deciding the necessity of non-volatile flag bit in SRAT memory
-affinity structures.
+QEMU now builds one SRAT memory affinity structure for each PC-DIMM
+and NVDIMM device presented at boot time with the proximity domain
+specified in the device option 'node', rather than only one SRAT
+memory affinity structure covering the entire hotpluggable address
+space with the proximity domain of the last node.
 
-A new field 'nvdimm' is added to the union type MemoryDeviceInfo for
-such purpose. Its type is currently PCDIMMDeviceInfo and will be
-updated when necessary in the future.
+Add test cases on PC and Q35 machines with 4 proximity domains, and
+one PC-DIMM and one NVDIMM attached to the 2nd and 3rd proximity
+domains respectively. Check whether the QEMU-built SRAT tables match
+with the expected ones.
 
-It also fixes "info memory-devices"/query-memory-devices which
-currently show nvdimm devices as dimm devices since
-object_dynamic_cast(obj, TYPE_PC_DIMM) happily cast nvdimm to
-TYPE_PC_DIMM which it's been inherited from.
+The following ACPI tables need to be added for this test:
+  tests/acpi-test-data/pc/APIC.dimmpxm
+  tests/acpi-test-data/pc/DSDT.dimmpxm
+  tests/acpi-test-data/pc/NFIT.dimmpxm
+  tests/acpi-test-data/pc/SRAT.dimmpxm
+  tests/acpi-test-data/pc/SSDT.dimmpxm
+  tests/acpi-test-data/q35/APIC.dimmpxm
+  tests/acpi-test-data/q35/DSDT.dimmpxm
+  tests/acpi-test-data/q35/NFIT.dimmpxm
+  tests/acpi-test-data/q35/SRAT.dimmpxm
+  tests/acpi-test-data/q35/SSDT.dimmpxm
+New APIC and DSDT are needed because of the multiple processors
+configuration. New NFIT and SSDT are needed because of NVDIMM.
 
 Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- qapi/misc.json   |  6 +++++-
- hmp.c            | 14 +++++++++++---
- hw/mem/pc-dimm.c | 10 +++++++++-
- numa.c           | 19 +++++++++++++------
- 4 files changed, 38 insertions(+), 11 deletions(-)
+ tests/bios-tables-test.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-diff --git a/qapi/misc.json b/qapi/misc.json
-index bcd5d10..6bf082f 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -2852,7 +2852,11 @@
- #
- # Since: 2.1
- ##
--{ 'union': 'MemoryDeviceInfo', 'data': {'dimm': 'PCDIMMDeviceInfo'} }
-+{ 'union': 'MemoryDeviceInfo',
-+  'data': { 'dimm': 'PCDIMMDeviceInfo',
-+            'nvdimm': 'PCDIMMDeviceInfo'
-+          }
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index cd753ff..bf3e193 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -823,6 +823,42 @@ static void test_acpi_piix4_tcg_numamem(void)
+     free_test_data(&data);
+ }
+ 
++static void test_acpi_tcg_dimm_pxm(const char *machine)
++{
++    test_data data;
++
++    memset(&data, 0, sizeof(data));
++    data.machine = machine;
++    data.variant = ".dimmpxm";
++    test_acpi_one(" -machine nvdimm=on"
++                  " -smp 4,sockets=4"
++                  " -m 128M,slots=3,maxmem=1G"
++                  " -numa node,mem=32M,nodeid=0"
++                  " -numa node,mem=32M,nodeid=1"
++                  " -numa node,mem=32M,nodeid=2"
++                  " -numa node,mem=32M,nodeid=3"
++                  " -numa cpu,node-id=0,socket-id=0"
++                  " -numa cpu,node-id=1,socket-id=1"
++                  " -numa cpu,node-id=2,socket-id=2"
++                  " -numa cpu,node-id=3,socket-id=3"
++                  " -object memory-backend-ram,id=ram0,size=128M"
++                  " -object memory-backend-ram,id=nvm0,size=128M"
++                  " -device pc-dimm,id=dimm0,memdev=ram0,node=1"
++                  " -device nvdimm,id=dimm1,memdev=nvm0,node=2",
++                  &data);
++    free_test_data(&data);
 +}
- 
- ##
- # @query-memory-devices:
-diff --git a/hmp.c b/hmp.c
-index ba9e299..a277517 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -2423,7 +2423,18 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
-             switch (value->type) {
-             case MEMORY_DEVICE_INFO_KIND_DIMM:
-                 di = value->u.dimm.data;
-+                break;
 +
-+            case MEMORY_DEVICE_INFO_KIND_NVDIMM:
-+                di = value->u.nvdimm.data;
-+                break;
++static void test_acpi_q35_tcg_dimm_pxm(void)
++{
++    test_acpi_tcg_dimm_pxm(MACHINE_Q35);
++}
 +
-+            default:
-+                di = NULL;
-+                break;
-+            }
- 
-+            if (di) {
-                 monitor_printf(mon, "Memory device [%s]: \"%s\"\n",
-                                MemoryDeviceInfoKind_str(value->type),
-                                di->id ? di->id : "");
-@@ -2436,9 +2447,6 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
-                                di->hotplugged ? "true" : "false");
-                 monitor_printf(mon, "  hotpluggable: %s\n",
-                                di->hotpluggable ? "true" : "false");
--                break;
--            default:
--                break;
-             }
-         }
++static void test_acpi_piix4_tcg_dimm_pxm(void)
++{
++    test_acpi_tcg_dimm_pxm(MACHINE_PC);
++}
++
+ int main(int argc, char *argv[])
+ {
+     const char *arch = qtest_get_arch();
+@@ -847,6 +883,8 @@ int main(int argc, char *argv[])
+         qtest_add_func("acpi/q35/memhp", test_acpi_q35_tcg_memhp);
+         qtest_add_func("acpi/piix4/numamem", test_acpi_piix4_tcg_numamem);
+         qtest_add_func("acpi/q35/numamem", test_acpi_q35_tcg_numamem);
++        qtest_add_func("acpi/piix4/dimmpxm", test_acpi_piix4_tcg_dimm_pxm);
++        qtest_add_func("acpi/q35/dimmpxm", test_acpi_q35_tcg_dimm_pxm);
      }
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 4d050fe..51350d9 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -20,6 +20,7 @@
- 
- #include "qemu/osdep.h"
- #include "hw/mem/pc-dimm.h"
-+#include "hw/mem/nvdimm.h"
- #include "qapi/error.h"
- #include "qemu/config-file.h"
- #include "qapi/visitor.h"
-@@ -250,6 +251,7 @@ MemoryDeviceInfoList *qmp_pc_dimm_device_list(void)
-         MemoryDeviceInfoList *elem = g_new0(MemoryDeviceInfoList, 1);
-         MemoryDeviceInfo *info = g_new0(MemoryDeviceInfo, 1);
-         PCDIMMDeviceInfo *di = g_new0(PCDIMMDeviceInfo, 1);
-+        bool is_nvdimm = object_dynamic_cast(obj, TYPE_NVDIMM);
-         DeviceClass *dc = DEVICE_GET_CLASS(obj);
-         DeviceState *dev = DEVICE(obj);
- 
-@@ -265,7 +267,13 @@ MemoryDeviceInfoList *qmp_pc_dimm_device_list(void)
-         di->size = object_property_get_uint(obj, PC_DIMM_SIZE_PROP, NULL);
-         di->memdev = object_get_canonical_path(OBJECT(dimm->hostmem));
- 
--        info->u.dimm.data = di;
-+        if (!is_nvdimm) {
-+            info->u.dimm.data = di;
-+            info->type = MEMORY_DEVICE_INFO_KIND_DIMM;
-+        } else {
-+            info->u.nvdimm.data = di;
-+            info->type = MEMORY_DEVICE_INFO_KIND_NVDIMM;
-+        }
-         elem->value = info;
-         elem->next = NULL;
-         if (prev) {
-diff --git a/numa.c b/numa.c
-index 9442704..1116c90 100644
---- a/numa.c
-+++ b/numa.c
-@@ -529,18 +529,25 @@ static void numa_stat_memory_devices(NumaNodeMem node_mem[])
- 
-         if (value) {
-             switch (value->type) {
--            case MEMORY_DEVICE_INFO_KIND_DIMM: {
-+            case MEMORY_DEVICE_INFO_KIND_DIMM:
-                 pcdimm_info = value->u.dimm.data;
-+                break;
-+
-+            case MEMORY_DEVICE_INFO_KIND_NVDIMM:
-+                pcdimm_info = value->u.nvdimm.data;
-+                break;
-+
-+            default:
-+                pcdimm_info = NULL;
-+                break;
-+            }
-+
-+            if (pcdimm_info) {
-                 node_mem[pcdimm_info->node].node_mem += pcdimm_info->size;
-                 if (pcdimm_info->hotpluggable && pcdimm_info->hotplugged) {
-                     node_mem[pcdimm_info->node].node_plugged_mem +=
-                         pcdimm_info->size;
-                 }
--                break;
--            }
--
--            default:
--                break;
-             }
-         }
-     }
+     ret = g_test_run();
+     boot_sector_cleanup(disk);
 -- 
 MST
