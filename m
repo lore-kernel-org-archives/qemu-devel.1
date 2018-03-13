@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evpw5-0003qh-P3
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:50:14 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1evq7U-0006sJ-Ku
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 16:02:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evpw1-00038G-P3
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:50:13 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59552 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evpw1-00037y-Is
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:50:09 -0400
-Date: Tue, 13 Mar 2018 19:49:45 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180313194944.GN3545@work-vm>
-References: <20180308124901.83533-1-brijesh.singh@amd.com>
-	<20180308124901.83533-9-brijesh.singh@amd.com>
-	<20180308164910.GF4718@redhat.com>
-	<e39191c3-9c83-8c44-f1d2-9fa7a2f7695d@amd.com>
-	<20180308224412.GF3417@localhost.localdomain>
-	<8cf2f9bc-0339-1c80-b53b-ef5915248d1f@redhat.com>
-	<20180313184950.GB3417@localhost.localdomain>
-	<253374a3-0d09-a29a-94fc-ea4f5718f477@redhat.com>
-	<20180313192056.GD3417@localhost.localdomain>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1evq7R-0001AS-C1
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 16:02:00 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 13 Mar 2018 20:01:52 +0000
+Message-ID: <DB6PR0801MB20563C8F2FAF24F77D3101A5C1D20@DB6PR0801MB2056.eurprd08.prod.outlook.com>
+References: <20180313180320.339796-1-vsementsov@virtuozzo.com>,
+	<152096780751.39.15281812348627104231@71c20359a636>
+In-Reply-To: <152096780751.39.15281812348627104231@71c20359a636>
+Content-Language: ru-RU
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180313192056.GD3417@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v12 08/28] target/i386: add Secure
- Encrypted Virtulization (SEV) object
+Content-Type: text/plain; charset="koi8-r"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v11 00/13] Dirty bitmaps postcopy migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,51 +24,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Brijesh Singh <brijesh.singh@amd.com>, Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Markus Armbruster <armbru@redhat.com>, Bruce Rogers <brogers@suse.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, Borislav Petkov <bp@suse.de>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Richard Henderson <richard.henderson@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "famz@redhat.com" <famz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "lirans@il.ibm.com" <lirans@il.ibm.com>, "quintela@redhat.com" <quintela@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>
 
-* Eduardo Habkost (ehabkost@redhat.com) wrote:
-> On Tue, Mar 13, 2018 at 08:04:51PM +0100, Paolo Bonzini wrote:
-> > On 13/03/2018 19:49, Eduardo Habkost wrote:
-> > >>>
-> > >>> Exactly, in other words these two options are part of the guest
-> > >>> ABI, and QEMU promises to never make the guest ABI depend on the
-> > >>> host hardware unless you're using "-cpu host".
-> > >>
-> > >> This is not entirely true; while MAXPHYADDR is constant downstream
-> > >> unless using "-cpu host", in practice that behavior is wrong and a guest
-> > >> could misbehave if passed a MAXPHYADDR that is different from the host's.
-> > >>
-> > >> I think this is the same, and management software will have to live with it.
-> > > 
-> > > I think they are very far from being equivalent.
-> > 
-> > Right, I only meant to say that guest ABI actually does depend on the
-> > host hardware, even outside of "-cpu host".
-> > 
-> > > But if you tell the guest the wrong C-bit location, guests are
-> > > likely to rely on it and break.  Migration between hosts with
-> > > different C-bit locations won't work, will it?
-> > 
-> > It won't---but as long as the destination hosts fails fast when the
-> > C-bit location is wrong, it's okay.  What matters is that we don't run
-> > guest code with the wrong C bit, as you noted.
-> 
-> Are you proposing we change the default to simply use cbitpos
-> from the host?
+It looks like a bug in a recent commit to checkpatch. It don't support do {=
+ } while
 
-Hmm I don't like that idea; as an option that's fine, as the only
-way it's not.
 
-> I would agree with this only if we make QEMU able to prevent live
-> migration to a host with mismatching cbitpos.
+Best regards,
 
-Yeh; especially since I suspect debugging stuff with a failed SEV
-migration like that is going to be really hard.
+Vladimir.
 
-Dave
+________________________________
+=EF=D4: no-reply@patchew.org <no-reply@patchew.org>
+=EF=D4=D0=D2=C1=D7=CC=C5=CE=CF: 13 =CD=C1=D2=D4=C1 2018 =C7. 22:03:29
+=EB=CF=CD=D5: Vladimir Sementsov-Ogievskiy
+=EB=CF=D0=C9=D1: famz@redhat.com; qemu-block@nongnu.org; qemu-devel@nongnu.=
+org; kwolf@redhat.com; peter.maydell@linaro.org; Vladimir Sementsov-Ogievsk=
+iy; famz@redhat.com; lirans@il.ibm.com; quintela@redhat.com; jsnow@redhat.c=
+om; armbru@redhat.com; mreitz@redhat.com; stefanha@redhat.com; Denis Lunev;=
+ amit.shah@redhat.com; pbonzini@redhat.com; dgilbert@redhat.com
+=F4=C5=CD=C1: Re: [Qemu-devel] [PATCH v11 00/13] Dirty bitmaps postcopy mig=
+ration
 
-> -- 
-> Eduardo
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Hi,
+
+This series seems to have some coding style problems. See output below for
+more information:
+
+Type: series
+Message-id: 20180313180320.339796-1-vsementsov@virtuozzo.com
+Subject: [Qemu-devel] [PATCH v11 00/13] Dirty bitmaps postcopy migration
+
+=3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+#!/bin/bash
+
+BASE=3Dbase
+n=3D1
+total=3D$(git log --oneline $BASE.. | wc -l)
+failed=3D0
+
+git config --local diff.renamelimit 0
+git config --local diff.renames True
+git config --local diff.algorithm histogram
+
+commits=3D"$(git log --format=3D%H --reverse $BASE..)"
+for c in $commits; do
+    echo "Checking PATCH $n/$total: $(git log -n 1 --format=3D%s $c)..."
+    if ! git show $c --format=3Demail | ./scripts/checkpatch.pl --mailback =
+-; then
+        failed=3D1
+        echo
+    fi
+    n=3D$((n+1))
+done
+
+exit $failed
+=3D=3D=3D TEST SCRIPT END =3D=3D=3D
+
+Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+>From https://github.com/patchew-project/qemu
+ * [new tag]               patchew/20180313180320.339796-1-vsementsov@virtu=
+ozzo.com -> patchew/20180313180320.339796-1-vsementsov@virtuozzo.com
+Auto packing the repository in background for optimum performance.
+See "git help gc" for manual housekeeping.
+Switched to a new branch 'test'
+71e03c4ecc iotests: add dirty bitmap postcopy test
+daa548f79f iotests: add dirty bitmap migration test
+353c5fdae1 migration: add postcopy migration of dirty bitmaps
+1da07d4ba2 migration: allow qmp command migrate-start-postcopy for any post=
+copy
+b789a2887e migration: add is_active_iterate handler
+48eb14f856 migration/qemu-file: add qemu_put_counted_string()
+1d6549dae1 migration: include migrate_dirty_bitmaps in migrate_postcopy
+e9e40af39a qapi: add dirty-bitmaps migration capability
+c575185038 migration: introduce postcopy-only pending
+7cae35cd7c dirty-bitmap: add locked state
+47bbd2a70c block/dirty-bitmap: add _locked version of bdrv_reclaim_dirty_bi=
+tmap
+870ff1d916 block/dirty-bitmap: fix locking in bdrv_reclaim_dirty_bitmap
+5dca3ae226 block/dirty-bitmap: add bdrv_dirty_bitmap_enable_successor()
+
+=3D=3D=3D OUTPUT BEGIN =3D=3D=3D
+Checking PATCH 1/13: block/dirty-bitmap: add bdrv_dirty_bitmap_enable_succe=
+ssor()...
+Checking PATCH 2/13: block/dirty-bitmap: fix locking in bdrv_reclaim_dirty_=
+bitmap...
+Checking PATCH 3/13: block/dirty-bitmap: add _locked version of bdrv_reclai=
+m_dirty_bitmap...
+Checking PATCH 4/13: dirty-bitmap: add locked state...
+Checking PATCH 5/13: migration: introduce postcopy-only pending...
+Checking PATCH 6/13: qapi: add dirty-bitmaps migration capability...
+Checking PATCH 7/13: migration: include migrate_dirty_bitmaps in migrate_po=
+stcopy...
+Checking PATCH 8/13: migration/qemu-file: add qemu_put_counted_string()...
+Checking PATCH 9/13: migration: add is_active_iterate handler...
+Checking PATCH 10/13: migration: allow qmp command migrate-start-postcopy f=
+or any postcopy...
+Checking PATCH 11/13: migration: add postcopy migration of dirty bitmaps...
+ERROR: braces {} are necessary for all arms of this statement
+#737: FILE: migration/block-dirty-bitmap.c:690:
++    } while (!(s.flags & DIRTY_BITMAP_MIG_FLAG_EOS));
+[...]
+
+total: 1 errors, 0 warnings, 816 lines checked
+
+Your patch has style problems, please review.  If any of these errors
+are false positives report them to the maintainer, see
+CHECKPATCH in MAINTAINERS.
+
+Checking PATCH 12/13: iotests: add dirty bitmap migration test...
+Checking PATCH 13/13: iotests: add dirty bitmap postcopy test...
+=3D=3D=3D OUTPUT END =3D=3D=3D
+
+Test command exited with code: 1
+
+
+---
+Email generated automatically by Patchew [http://patchew.org/].
+Please send your feedback to patchew-devel@freelists.org
