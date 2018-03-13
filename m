@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1evhf2-0001V8-Dc
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:00:09 -0400
+	(envelope-from <berrange@redhat.com>) id 1evhlq-0003UC-QI
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:07:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1evhex-00019p-Gb
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:00:04 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:41453)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1evhex-00019H-A9
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 06:59:59 -0400
-Received: by mail-wr0-x242.google.com with SMTP id f14so21324002wre.8
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 03:59:59 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180312214230.17561-1-wsa+renesas@sang-engineering.com>
-	<20180312214230.17561-3-wsa+renesas@sang-engineering.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a6e49f6a-5c78-6628-d530-cfd47b566296@amsat.org>
-Date: Tue, 13 Mar 2018 11:59:56 +0100
+	(envelope-from <berrange@redhat.com>) id 1evhlm-0005ak-Qx
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:07:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42172 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1evhlm-0005aH-Lh
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:07:02 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7335776FB9
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 11:06:57 +0000 (UTC)
+Date: Tue, 13 Mar 2018 11:06:52 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180313110652.GS3048@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180312141714.7223-1-berrange@redhat.com>
+	<20180313092053.GA3545@work-vm>
+	<be16f4e2-7b97-e251-332e-9445e4d9965c@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180312214230.17561-3-wsa+renesas@sang-engineering.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] nvram: at24c: prevent segfault by
- checking "rom-size"
+Content-Disposition: inline
+In-Reply-To: <be16f4e2-7b97-e251-332e-9445e4d9965c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.12 REPOST] migration: convert socket
+ server to QIONetListener
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,37 +36,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wolfram Sang <wsa+renesas@sang-engineering.com>, qemu-devel@nongnu.org
-Cc: linux-renesas-soc@vger.kernel.org, Michael Davidsaver <mdavidsaver@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-On 03/12/2018 10:42 PM, Wolfram Sang wrote:
-> The value for "rom-size" is used as a divisor, so it must not be 0 or it
-> will segfault. A size of 0 wouldn't make sense as well.
+On Tue, Mar 13, 2018 at 11:57:17AM +0100, Paolo Bonzini wrote:
+> On 13/03/2018 10:20, Dr. David Alan Gilbert wrote:
+> >>  static void socket_start_incoming_migration(SocketAddress *saddr,
+> >>                                              Error **errp)
+> >>  {
+> >> -    QIOChannelSocket *listen_ioc = qio_channel_socket_new();
+> >> +    QIONetListener *listener = qio_net_listener_new();
+> >>  
+> >> -    qio_channel_set_name(QIO_CHANNEL(listen_ioc),
+> >> -                         "migration-socket-listener");
+> >> +    qio_net_listener_set_name(listener, "migration-socket-listener");
+> >>  
+> >> -    if (qio_channel_socket_listen_sync(listen_ioc, saddr, errp) < 0) {
+> >> -        object_unref(OBJECT(listen_ioc));
+> >> +    if (qio_net_listener_open_sync(listener, saddr, errp) < 0) {
+> >> +        object_unref(OBJECT(listener));
+> >>          return;
+> >>      }
+> >>  
+> >> -    qio_channel_add_watch(QIO_CHANNEL(listen_ioc),
+> >> -                          G_IO_IN,
+> >> -                          socket_accept_incoming_migration,
+> >> -                          listen_ioc,
+> >> -                          (GDestroyNotify)object_unref);
+> >> +    qio_net_listener_set_client_func(listener,
+> >> +                                     socket_accept_incoming_migration,
+> >> +                                     NULL, NULL);
+> >>  }
+> >>  
+> >>  void tcp_start_incoming_migration(const char *host_port, Error **errp)
+> >> -- 
+> >> 2.14.3
+> >>
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
 > 
-> Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
-> ---
->  hw/nvram/eeprom_at24c.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/hw/nvram/eeprom_at24c.c b/hw/nvram/eeprom_at24c.c
-> index 8507516b7e..d82710e1df 100644
-> --- a/hw/nvram/eeprom_at24c.c
-> +++ b/hw/nvram/eeprom_at24c.c
-> @@ -120,6 +120,11 @@ int at24c_eeprom_init(I2CSlave *i2c)
->  {
->      EEPROMState *ee = AT24C_EE(i2c);
->  
-> +    if (!ee->rsize) {
-> +        ERR("rom-size not allowed to be 0\n");
+> Could this get in 2.12 as a bugfix, even after soft freeze?  It's the
+> last user of qio_channel_listen_sync that blocks full IPv4/IPv6 support.
+>  All other users are for vsock/AF_UNIX.
 
-This might be more useful:
+I had been thinking of all this conversion as feature, but I guess if we
+squint our eyes a bit we could claim it is just a bugfix on the grounds
+that it is fixing broken IPv4/6 dual stack support.
 
-           error_report("Minimum rom-size is %u", AT24C_ROMSIZE_MIN);
-
-> +        exit(1);
-> +    }
-> +
->      ee->mem = g_malloc0(ee->rsize);
->  
->      if (ee->blk) {
-> 
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
