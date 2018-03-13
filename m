@@ -1,15 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1evlSP-0003Qn-M1
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 11:03:23 -0400
+	(envelope-from <mreitz@redhat.com>) id 1evlUF-0005Qm-In
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 11:05:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1evlSJ-0005uE-Gw
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 11:03:17 -0400
-From: Alberto Garcia <berto@igalia.com>
-Date: Tue, 13 Mar 2018 17:02:10 +0200
-Message-Id: <cover.1520952419.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 0/2] Give the refcount cache the minimum
- possible size by default
+	(envelope-from <mreitz@redhat.com>) id 1evlU6-0006Vh-2Q
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 11:05:11 -0400
+References: <20180313144730.2184-1-kwolf@redhat.com>
+	<20180313144730.2184-9-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <c36b638a-f8be-670a-f2fb-88584af1dbca@redhat.com>
+Date: Tue, 13 Mar 2018 16:04:50 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180313144730.2184-9-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="L4WpSLWk8Osv6HZ8FnLILNBrGfUqwFaLg"
+Subject: Re: [Qemu-devel] [PATCH v2 8/8] vpc: Require aligned size in
+ .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,51 +25,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: den@openvz.org, jcody@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-Hi,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--L4WpSLWk8Osv6HZ8FnLILNBrGfUqwFaLg
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: den@openvz.org, jcody@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
+Message-ID: <c36b638a-f8be-670a-f2fb-88584af1dbca@redhat.com>
+Subject: Re: [PATCH v2 8/8] vpc: Require aligned size in .bdrv_co_create
+References: <20180313144730.2184-1-kwolf@redhat.com>
+ <20180313144730.2184-9-kwolf@redhat.com>
+In-Reply-To: <20180313144730.2184-9-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-we talked about this the other day, so here are the patches to change
-the default cache sizes in qcow2.
+On 2018-03-13 15:47, Kevin Wolf wrote:
+> Perform the rounding to match a CHS geometry only in the legacy code
+> path in .bdrv_co_create_opts. QMP now requires that the user already
+> passes a CHS aligned image size, unless force-size=3Dtrue is given.
+>=20
+> CHS alignment is required to make the image compatible with Virtual PC,=
 
-Without this patch:
+> but not for use with newer Microsoft hypervisors.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/vpc.c | 113 +++++++++++++++++++++++++++++++++++++++++++---------=
+--------
+>  1 file changed, 82 insertions(+), 31 deletions(-)
 
- * refcount-cache-size = l2-cache-size / 4
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-unless otherwise specified by the user. This is wasteful, the refcount
-cache is accessed sequentially during normal I/O, so there's no point
-in caching more tables. I measured the effect on the refcount cache
-size when populating an empty qcow2 image using random writes, and
-there's no difference between having the minimum or the maximum
-sizes(*).
 
-With this patch:
+--L4WpSLWk8Osv6HZ8FnLILNBrGfUqwFaLg
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
- * refcount-cache-size is always 4 clusters by default (the minimum)
+-----BEGIN PGP SIGNATURE-----
 
- * If "cache-size" is set then l2-cache-size is set to the maximum if
-   possible (disk_size * 8 / cluster_size) and the remainder is
-   assigned to the refcount cache.
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqn6JMSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AU78H/0c7i6rE3qRagH474XhvrNQhD7qzEpdR
+M56bDV1h6kWQzcZMs1+WZLLIifdAiLxvpsd27L+qhkawL3iPRUedMCT+cwyUWjiM
+autFLleXs+cuH3mW8AYQ3FOUXofxYfebIU3ktD0fLNeKwHP68jknCRGOHwcYEkRd
+frg0OuzBFVjgIQDt3fw7R0iTdw1zRf1pNEYq/qj+UccvbmTSILxIBjYAg6cuvpRS
+/PUqr2NWB3AeolvIsAO+JCbTQbyNNBqao4vv4QqtfhT/hdj4ybx6fCEsii3S5nEh
+qIlW7TShdWLUEI695bUhYw+oIe2wIe60B9pvrMbTXPQ3nU/lhze4MaQ=
+=Xwjb
+-----END PGP SIGNATURE-----
 
-Regards,
-
-Berto
-
-(*) there is, actually: having a very large cache can even make the
-    I/O slightly slower, because the larger the cache the longer it
-    takes longer to find a cached entry. I only noticed this under
-    tmpfs anyway.
-
-Alberto Garcia (2):
-  qcow2: Give the refcount cache the minimum possible size by default
-  docs: Document the new default sizes of the qcow2 caches
-
- block/qcow2.c              | 31 +++++++++++++++++++------------
- block/qcow2.h              |  4 ----
- docs/qcow2-cache.txt       | 31 ++++++++++++++-----------------
- tests/qemu-iotests/137.out |  2 +-
- 4 files changed, 34 insertions(+), 34 deletions(-)
-
--- 
-2.11.0
+--L4WpSLWk8Osv6HZ8FnLILNBrGfUqwFaLg--
