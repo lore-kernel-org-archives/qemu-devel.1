@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37336)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1evt74-0002Qi-Ht
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 19:13:47 -0400
+	id 1evtE7-0008S7-DA
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 19:21:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1evt71-00080I-D4
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 19:13:46 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:44231)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1evt71-0007zw-5a
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 19:13:43 -0400
-Received: by mail-wr0-x241.google.com with SMTP id v65so2570991wrc.11
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 16:13:42 -0700 (PDT)
+	id 1evtE4-0002wX-8h
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 19:21:03 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <cover.1517532021.git.alistair.francis@xilinx.com>
+References: <20180313153458.26822-1-peter.maydell@linaro.org>
+	<20180313153458.26822-2-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4c7b83ad-8306-5c52-22e9-044a9f926a56@amsat.org>
-Date: Wed, 14 Mar 2018 00:13:40 +0100
+Message-ID: <e77539c8-5c9e-4ee5-edc4-a4d044e5c476@amsat.org>
+Date: Wed, 14 Mar 2018 00:20:57 +0100
 MIME-Version: 1.0
-In-Reply-To: <cover.1517532021.git.alistair.francis@xilinx.com>
+In-Reply-To: <20180313153458.26822-2-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 0/6] Add a valid_cpu_types property
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/9] hw/arm/raspi: Don't do
+ board-setup or secure-boot for raspi3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,77 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, alistair23@gmail.com, Andrew Baumann <Andrew.Baumann@microsoft.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, marcel@redhat.com, imammedo@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Pekka Enberg <penberg@iki.fi>, Andrew Baumann <Andrew.Baumann@microsoft.com>, patches@linaro.org
 
-On 02/02/2018 01:42 AM, Alistair Francis wrote:
+On 03/13/2018 04:34 PM, Peter Maydell wrote:
+> For the rpi1 and 2 we want to boot the Linux kernel via some
+> custom setup code that makes sure that the SMC instruction
+> acts as a no-op, because it's used for cache maintenance.
+> The rpi3 boots AArch64 kernels, which don't need SMC for
+> cache maintenance and always expect to be booted non-secure.
+> Don't fill in the aarch32-specific parts of the binfo struct.
 > 
-> There are numorous QEMU machines that only have a single or a handful of
-> valid CPU options. To simplyfy the management of specificying which CPU
-> is/isn't valid let's create a property that can be set in the machine
-> init. We can then check to see if the user supplied CPU is in that list
-> or not.
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/arm/raspi.c | 17 +++++++++++++----
+>  1 file changed, 13 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+> index a37881433c..1ac0737149 100644
+> --- a/hw/arm/raspi.c
+> +++ b/hw/arm/raspi.c
+> @@ -82,10 +82,19 @@ static void setup_boot(MachineState *machine, int version, size_t ram_size)
+>      binfo.board_id = raspi_boardid[version];
+>      binfo.ram_size = ram_size;
+>      binfo.nb_cpus = smp_cpus;
+> -    binfo.board_setup_addr = BOARDSETUP_ADDR;
+> -    binfo.write_board_setup = write_board_setup;
+> -    binfo.secure_board_setup = true;
+> -    binfo.secure_boot = true;
+> +
+> +    if (version <= 2) {
+> +        /* The rpi1 and 2 require some custom setup code to run in Secure
+> +         * mode before booting a kernel (to set up the SMC vectors so
+> +         * that we get a no-op SMC; this is used by Linux to call the
+> +         * firmware for some cache maintenance operations.
+> +         * The rpi3 doesn't need this.
+> +         */
 
-Sadly this series missed the 2.12 train.
+I was expecting a much complicated fix... neat.
 
-> 
-> I have added the valid_cpu_types for some ARM machines only at the
-> moment.
-> 
-> Here is what specifying the CPUs looks like now:
-> 
-> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m3" -S
-> QEMU 2.10.50 monitor - type 'help' for more information
-> (qemu) info cpus
-> * CPU #0: thread_id=24175
-> (qemu) q
-> 
-> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m4" -S
-> QEMU 2.10.50 monitor - type 'help' for more information
-> (qemu) q
-> 
-> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m5" -S
-> qemu-system-aarch64: unable to find CPU model 'cortex-m5'
-> 
-> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-a9" -S
-> qemu-system-aarch64: Invalid CPU type: cortex-a9-arm-cpu
-> The valid models are: cortex-m3, cortex-m4
-> 
-> V5:
->  - Use cpu_model instead of cpu_type
-> V4:
->  - Rebase
->  - Remove spaces
-> V3:
->  - Make the varialbes static
-> V2:
->  - Rebase
->  - Reorder patches
->  - Add a Raspberry Pi 2 CPU fix
-> V1:
->  - Small fixes to prepare a series instead of RFC
->  - Add commit messages for the commits
->  - Expand the machine support to ARM machines
-> RFC v2:
->  - Rebase on Igor's work
->  - Use more QEMUisms inside the code
->  - List the supported machines in a NULL terminated array
-> 
-> 
-> 
-> Alistair Francis (6):
->   machine: Convert the valid cpu types to use cpu_model
->   netduino2: Specify the valid CPUs
->   bcm2836: Use the Cortex-A7 instead of Cortex-A15
->   raspi: Specify the valid CPUs
->   xlnx-zcu102: Specify the valid CPUs
->   xilinx_zynq: Specify the valid CPUs
-> 
->  hw/arm/bcm2836.c     |  2 +-
->  hw/arm/netduino2.c   | 10 +++++++++-
->  hw/arm/raspi.c       |  7 +++++++
->  hw/arm/xilinx_zynq.c |  6 ++++++
->  hw/arm/xlnx-zcu102.c | 17 +++++++++++++++++
->  hw/core/machine.c    | 11 +++++------
->  6 files changed, 45 insertions(+), 8 deletions(-)
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> +        binfo.board_setup_addr = BOARDSETUP_ADDR;
+> +        binfo.write_board_setup = write_board_setup;
+> +        binfo.secure_board_setup = true;
+> +        binfo.secure_boot = true;
+> +    }
+>  
+>      /* Pi2 and Pi3 requires SMP setup */
+>      if (version >= 2) {
 > 
