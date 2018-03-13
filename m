@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47075)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evnUo-0007Fv-7u
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:13:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1evnUv-0007OA-K7
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:14:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evnUn-0000pN-8S
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:13:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1evnUu-0000xM-OX
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:14:01 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 13 Mar 2018 12:13:29 -0500
-Message-Id: <20180313171345.659672-2-eblake@redhat.com>
+Date: Tue, 13 Mar 2018 12:13:41 -0500
+Message-Id: <20180313171345.659672-14-eblake@redhat.com>
 In-Reply-To: <20180313171345.659672-1-eblake@redhat.com>
 References: <20180313171345.659672-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 01/17] iotests: Fix stuck NBD process on 33
+Subject: [Qemu-devel] [PULL 13/17] block/nbd-client: save first fatal error
+ in nbd_iter_error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,35 +21,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-Commit afe35cde6 added additional actions to test 33, but forgot
-to reset the image between tests.  As a result, './check -nbd 33'
-fails because the qemu-nbd process from the first half is still
-occupying the port, preventing the second half from starting a
-new qemu-nbd process.  Worse, the failure leaves a rogue qemu-nbd
-process behind even after the test fails, which causes knock-on
-failures to later tests that also want to start qemu-nbd.
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Reported-by: Max Reitz <mreitz@redhat.com>
+It is ok, that fatal error hides previous not fatal, but hiding
+first fatal error is a bad feature.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20180312152126.286890-5-vsementsov@virtuozzo.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180312211156.452139-1-eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/033 | 1 +
- 1 file changed, 1 insertion(+)
+ block/nbd-client.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/033 b/tests/qemu-iotests/033
-index a1d8357331d..ee8a1338bbd 100755
---- a/tests/qemu-iotests/033
-+++ b/tests/qemu-iotests/033
-@@ -105,6 +105,7 @@ for align in 512 4k; do
- done
- done
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 7b68499b76a..0d9f73a137f 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -481,6 +481,7 @@ static coroutine_fn int nbd_co_receive_one_chunk(
 
-+_cleanup_test_img
+ typedef struct NBDReplyChunkIter {
+     int ret;
++    bool fatal;
+     Error *err;
+     bool done, only_structured;
+ } NBDReplyChunkIter;
+@@ -490,11 +491,12 @@ static void nbd_iter_error(NBDReplyChunkIter *iter, bool fatal,
+ {
+     assert(ret < 0);
 
- # Trigger truncate that would shrink qcow2 L1 table, which is done by
- #   clearing one entry (8 bytes) with bdrv_co_pwrite_zeroes()
+-    if (fatal || iter->ret == 0) {
++    if ((fatal && !iter->fatal) || iter->ret == 0) {
+         if (iter->ret != 0) {
+             error_free(iter->err);
+             iter->err = NULL;
+         }
++        iter->fatal = fatal;
+         iter->ret = ret;
+         error_propagate(&iter->err, *local_err);
+     } else {
 -- 
 2.14.3
