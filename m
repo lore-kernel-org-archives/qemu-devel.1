@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1evnRu-0004kh-QK
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:10:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1evnUl-0007C7-Ge
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:13:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1evnRt-0006yp-PN
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:10:54 -0400
-References: <20180207155837.92351-1-vsementsov@virtuozzo.com>
-	<20180207155837.92351-6-vsementsov@virtuozzo.com>
-	<20180312153020.GI3219@work-vm>
-	<af82d663-f37c-2857-214c-83e348a5f52a@virtuozzo.com>
-	<20180313103056.GB3545@work-vm>
-	<9bc43da5-027a-cd11-0c13-b9a9432e0fdb@virtuozzo.com>
-	<20180313153513.GG3545@work-vm>
-	<9f65e973-d3d3-09bf-5cf0-eac8d9e20b97@virtuozzo.com>
-	<3a057d44-13e0-b208-cdce-96884bc03952@redhat.com>
-	<76f42ea0-86df-a389-568c-95f31a57f1da@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <239c1962-44d0-8776-23d7-488f2a84896c@redhat.com>
-Date: Tue, 13 Mar 2018 13:10:39 -0400
-MIME-Version: 1.0
-In-Reply-To: <76f42ea0-86df-a389-568c-95f31a57f1da@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v10 05/12] migration: introduce
- postcopy-only pending
+	(envelope-from <eblake@redhat.com>) id 1evnUi-0000jb-88
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:13:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54260 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1evnUi-0000j1-2r
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:13:48 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BC78B7CBBA
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 17:13:47 +0000 (UTC)
+Received: from red.redhat.com (ovpn-121-135.rdu2.redhat.com [10.10.121.135])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 871202026DFD
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 17:13:47 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Tue, 13 Mar 2018 12:13:28 -0500
+Message-Id: <20180313171345.659672-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PULL 00/17] NBD patches for 2018-03-13 (2.12
+ softfreeze)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,33 +31,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, den@openvz.org, lirans@il.ibm.com
+To: qemu-devel@nongnu.org
 
+The following changes since commit 59667bb167f773965ce6547352f312eff0d4d523:
 
+  Merge remote-tracking branch 'remotes/ehabkost/tags/x86-next-pull-request' into staging (2018-03-13 14:02:47 +0000)
 
-On 03/13/2018 12:33 PM, Vladimir Sementsov-Ogievskiy wrote:
-> 13.03.2018 19:16, John Snow wrote:
->>
->> On 03/13/2018 12:14 PM, Vladimir Sementsov-Ogievskiy wrote:
->>> Hmm, I agree, it is the simplest thing we can do for now, and I'll
->>> rethink later,
->>> how (and is it worth doing) to go to postcopy automatically in case of
->>> only-dirty-bitmaps.
->>> Should I respin?
->> Please do. I already staged patches 1-4 in my branch, so if you'd like,
->> you can respin just 5+.
->>
->> https://github.com/jnsnow/qemu/tree/bitmaps
->>
->> --js
-> 
-> Ok, I'll base on your branch. How should I write Based-on: for patchew
-> in this case?
-> 
+are available in the Git repository at:
 
-You know, that's actually a good question... just send out the whole
-series for the sake of patchew. I Added an R-B to patches 1-4 and edited
-a single comment in #4.
+  git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2018-03-13
 
---js
+for you to fetch changes up to d3bd7052ce7574998ebd6cb262bad59c2b048396:
+
+  iotests: new test 209 for NBD BLOCK_STATUS (2018-03-13 10:55:17 -0500)
+
+----------------------------------------------------------------
+nbd patches for 2018-03-13
+
+- Eric Blake: iotests: Fix stuck NBD process on 33
+- Vladimir Sementsov-Ogievskiy: 0/5 nbd server fixing and refactoring before BLOCK_STATUS
+- Eric Blake: nbd/server: Honor FUA request on NBD_CMD_TRIM
+- Stefan Hajnoczi: 0/2 block: fix nbd-server-stop crash after blockdev-snapshot-sync
+- Vladimir Sementsov-Ogievskiy: nbd block status base:allocation
+
+----------------------------------------------------------------
+Eric Blake (2):
+      iotests: Fix stuck NBD process on 33
+      nbd/server: Honor FUA request on NBD_CMD_TRIM
+
+Stefan Hajnoczi (2):
+      block: let blk_add/remove_aio_context_notifier() tolerate BDS changes
+      iotests: add 208 nbd-server + blockdev-snapshot-sync test case
+
+Vladimir Sementsov-Ogievskiy (13):
+      nbd/server: move nbd_co_send_structured_error up
+      nbd/server: fix sparse read
+      nbd/server: fix: check client->closing before sending reply
+      nbd/server: refactor nbd_trip: cmd_read and generic reply
+      nbd/server: refactor nbd_trip: split out nbd_handle_request
+      nbd/server: add nbd_opt_invalid helper
+      nbd/server: add nbd_read_opt_name helper
+      nbd: BLOCK_STATUS for standard get_block_status function: server part
+      block/nbd-client: save first fatal error in nbd_iter_error
+      nbd: BLOCK_STATUS for standard get_block_status function: client part
+      iotests.py: tiny refactor: move system imports up
+      iotests: add file_path helper
+      iotests: new test 209 for NBD BLOCK_STATUS
+
+ block/nbd-client.h            |   6 +
+ include/block/nbd.h           |   3 +
+ block/block-backend.c         |  63 ++++
+ block/nbd-client.c            | 145 ++++++++-
+ block/nbd.c                   |   3 +
+ nbd/client.c                  | 117 +++++++
+ nbd/server.c                  | 725 ++++++++++++++++++++++++++++++++----------
+ block/trace-events            |   2 +
+ tests/qemu-iotests/033        |   1 +
+ tests/qemu-iotests/208        |  55 ++++
+ tests/qemu-iotests/208.out    |   9 +
+ tests/qemu-iotests/209        |  34 ++
+ tests/qemu-iotests/209.out    |   2 +
+ tests/qemu-iotests/group      |   2 +
+ tests/qemu-iotests/iotests.py |  37 ++-
+ 15 files changed, 1038 insertions(+), 166 deletions(-)
+ create mode 100755 tests/qemu-iotests/208
+ create mode 100644 tests/qemu-iotests/208.out
+ create mode 100755 tests/qemu-iotests/209
+ create mode 100644 tests/qemu-iotests/209.out
+
+-- 
+2.14.3
