@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdl-00024h-QL
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:19:09 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdr-00029w-GL
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:19:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdf-00053Q-ER
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:19:05 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdl-000572-QS
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:19:11 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Mar 2018 17:18:01 +0100
-Message-Id: <20180313161803.1814-40-kwolf@redhat.com>
+Date: Tue, 13 Mar 2018 17:18:03 +0100
+Message-Id: <20180313161803.1814-42-kwolf@redhat.com>
 In-Reply-To: <20180313161803.1814-1-kwolf@redhat.com>
 References: <20180313161803.1814-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 39/41] vpc: Support .bdrv_co_create
+Subject: [Qemu-devel] [PULL 41/41] block/mirror: change the semantic of
+ 'force' of block-job-cancel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,292 +23,281 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-This adds the .bdrv_co_create driver callback to vpc, which
-enables image creation over QMP.
+From: Liang Li <liliang.opensource@gmail.com>
 
+When doing drive mirror to a low speed shared storage, if there was heavy
+BLK IO write workload in VM after the 'ready' event, drive mirror block job
+can't be canceled immediately, it would keep running until the heavy BLK IO
+workload stopped in the VM.
+
+Libvirt depends on the current block-job-cancel semantics, which is that
+when used without a flag after the 'ready' event, the command blocks
+until data is in sync.  However, these semantics are awkward in other
+situations, for example, people may use drive mirror for realtime
+backups while still wanting to use block live migration.  Libvirt cannot
+start a block live migration while another drive mirror is in progress,
+but the user would rather abandon the backup attempt as broken and
+proceed with the live migration than be stuck waiting for the current
+drive mirror backup to finish.
+
+The drive-mirror command already includes a 'force' flag, which libvirt
+does not use, although it documented the flag as only being useful to
+quit a job which is paused.  However, since quitting a paused job has
+the same effect as abandoning a backup in a non-paused job (namely, the
+destination file is not in sync, and the command completes immediately),
+we can just improve the documentation to make the force flag obviously
+useful.
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Jeff Cody <jcody@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>
+Cc: John Snow <jsnow@redhat.com>
+Reported-by: Huaitong Han <huanhuaitong@didichuxing.com>
+Signed-off-by: Huaitong Han <huanhuaitong@didichuxing.com>
+Signed-off-by: Liang Li <liliangleo@didichuxing.com>
+Signed-off-by: Jeff Cody <jcody@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json |  33 ++++++++++-
- block/vpc.c          | 152 ++++++++++++++++++++++++++++++++++++++-------------
- 2 files changed, 147 insertions(+), 38 deletions(-)
+ qapi/block-core.json      |  5 +++--
+ include/block/blockjob.h  | 12 ++++++++++--
+ block/mirror.c            | 10 ++++------
+ blockdev.c                |  4 ++--
+ blockjob.c                | 16 +++++++++-------
+ tests/test-blockjob-txn.c |  8 ++++----
+ hmp-commands.hx           |  3 ++-
+ 7 files changed, 34 insertions(+), 24 deletions(-)
 
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 350094f46a..47ff5f8ce5 100644
+index 47ff5f8ce5..00ef614c03 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -3880,6 +3880,37 @@
-             '*block-state-zero':    'bool' } }
- 
- ##
-+# @BlockdevVpcSubformat:
-+#
-+# @dynamic: Growing image file
-+# @fixed:   Preallocated fixed-size image file
-+#
-+# Since: 2.12
-+##
-+{ 'enum': 'BlockdevVpcSubformat',
-+  'data': [ 'dynamic', 'fixed' ] }
-+
-+##
-+# @BlockdevCreateOptionsVpc:
-+#
-+# Driver specific image creation options for vpc (VHD).
-+#
-+# @file             Node to create the image format on
-+# @size             Size of the virtual disk in bytes
-+# @subformat        vhdx subformat (default: dynamic)
-+# @force-size       Force use of the exact byte size instead of rounding to the
-+#                   next size that can be represented in CHS geometry
-+#                   (default: false)
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'BlockdevCreateOptionsVpc',
-+  'data': { 'file':                 'BlockdevRef',
-+            'size':                 'size',
-+            '*subformat':           'BlockdevVpcSubformat',
-+            '*force-size':          'bool' } }
-+
-+##
- # @BlockdevCreateNotSupported:
+@@ -2204,8 +2204,9 @@
+ #          the name of the parameter), but since QEMU 2.7 it can have
+ #          other values.
  #
- # This is used for all drivers that don't support creating images.
-@@ -3936,7 +3967,7 @@
-       'vdi':            'BlockdevCreateOptionsVdi',
-       'vhdx':           'BlockdevCreateOptionsVhdx',
-       'vmdk':           'BlockdevCreateNotSupported',
--      'vpc':            'BlockdevCreateNotSupported',
-+      'vpc':            'BlockdevCreateOptionsVpc',
-       'vvfat':          'BlockdevCreateNotSupported',
-       'vxhs':           'BlockdevCreateNotSupported'
-   } }
-diff --git a/block/vpc.c b/block/vpc.c
-index b2e2b9ebd4..8824211713 100644
---- a/block/vpc.c
-+++ b/block/vpc.c
-@@ -32,6 +32,9 @@
- #include "migration/blocker.h"
- #include "qemu/bswap.h"
- #include "qemu/uuid.h"
-+#include "qapi/qmp/qdict.h"
-+#include "qapi/qobject-input-visitor.h"
-+#include "qapi/qapi-visit-block-core.h"
+-# @force: whether to allow cancellation of a paused job (default
+-#         false).  Since 1.3.
++# @force: If true, and the job has already emitted the event BLOCK_JOB_READY,
++#         abandon the job immediately (even if it is paused) instead of waiting
++#         for the destination to complete its final synchronization (since 1.3)
+ #
+ # Returns: Nothing on success
+ #          If no background operation is active on this device, DeviceNotActive
+diff --git a/include/block/blockjob.h b/include/block/blockjob.h
+index 978274ed2b..fc645dac68 100644
+--- a/include/block/blockjob.h
++++ b/include/block/blockjob.h
+@@ -63,6 +63,12 @@ typedef struct BlockJob {
+     bool cancelled;
  
- /**************************************************************/
- 
-@@ -166,6 +169,8 @@ static QemuOptsList vpc_runtime_opts = {
-     }
- };
- 
-+static QemuOptsList vpc_create_opts;
+     /**
++     * Set to true if the job should abort immediately without waiting
++     * for data to be in sync.
++     */
++    bool force;
 +
- static uint32_t vpc_checksum(uint8_t* buf, size_t size)
- {
-     uint32_t res = 0;
-@@ -897,12 +902,15 @@ static int create_fixed_disk(BlockBackend *blk, uint8_t *buf,
-     return ret;
- }
- 
--static int coroutine_fn vpc_co_create_opts(const char *filename, QemuOpts *opts,
--                                           Error **errp)
-+static int coroutine_fn vpc_co_create(BlockdevCreateOptions *opts,
-+                                      Error **errp)
- {
-+    BlockdevCreateOptionsVpc *vpc_opts;
-+    BlockBackend *blk = NULL;
-+    BlockDriverState *bs = NULL;
-+
-     uint8_t buf[1024];
-     VHDFooter *footer = (VHDFooter *) buf;
--    char *disk_type_param;
-     int i;
-     uint16_t cyls = 0;
-     uint8_t heads = 0;
-@@ -911,45 +919,38 @@ static int coroutine_fn vpc_co_create_opts(const char *filename, QemuOpts *opts,
-     int64_t total_size;
-     int disk_type;
-     int ret = -EIO;
--    bool force_size;
--    Error *local_err = NULL;
--    BlockBackend *blk = NULL;
- 
--    /* Read out options */
--    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
--                          BDRV_SECTOR_SIZE);
--    disk_type_param = qemu_opt_get_del(opts, BLOCK_OPT_SUBFMT);
--    if (disk_type_param) {
--        if (!strcmp(disk_type_param, "dynamic")) {
--            disk_type = VHD_DYNAMIC;
--        } else if (!strcmp(disk_type_param, "fixed")) {
--            disk_type = VHD_FIXED;
--        } else {
--            error_setg(errp, "Invalid disk type, %s", disk_type_param);
--            ret = -EINVAL;
--            goto out;
--        }
--    } else {
-+    assert(opts->driver == BLOCKDEV_DRIVER_VPC);
-+    vpc_opts = &opts->u.vpc;
-+
-+    /* Validate options and set default values */
-+    total_size = vpc_opts->size;
-+
-+    if (!vpc_opts->has_subformat) {
-+        vpc_opts->subformat = BLOCKDEV_VPC_SUBFORMAT_DYNAMIC;
-+    }
-+    switch (vpc_opts->subformat) {
-+    case BLOCKDEV_VPC_SUBFORMAT_DYNAMIC:
-         disk_type = VHD_DYNAMIC;
-+        break;
-+    case BLOCKDEV_VPC_SUBFORMAT_FIXED:
-+        disk_type = VHD_FIXED;
-+        break;
-+    default:
-+        g_assert_not_reached();
-     }
- 
--    force_size = qemu_opt_get_bool_del(opts, VPC_OPT_FORCE_SIZE, false);
--
--    ret = bdrv_create_file(filename, opts, &local_err);
--    if (ret < 0) {
--        error_propagate(errp, local_err);
--        goto out;
-+    /* Create BlockBackend to write to the image */
-+    bs = bdrv_open_blockdev_ref(vpc_opts->file, errp);
-+    if (bs == NULL) {
-+        return -EIO;
-     }
- 
--    blk = blk_new_open(filename, NULL, NULL,
--                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
--                       &local_err);
--    if (blk == NULL) {
--        error_propagate(errp, local_err);
--        ret = -EIO;
-+    blk = blk_new(BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
-+    ret = blk_insert_bs(blk, bs, errp);
-+    if (ret < 0) {
-         goto out;
-     }
--
-     blk_set_allow_write_beyond_eof(blk, true);
- 
-     /*
-@@ -961,7 +962,7 @@ static int coroutine_fn vpc_co_create_opts(const char *filename, QemuOpts *opts,
-      * we set the geometry to 65535 x 16 x 255 (CxHxS) sectors and use
-      * the image size from the VHD footer to calculate total_sectors.
++    /**
+      * Counter for pause request. If non-zero, the block job is either paused,
+      * or if busy == true will pause itself as soon as possible.
       */
--    if (force_size) {
-+    if (vpc_opts->force_size) {
-         /* This will force the use of total_size for sector count, below */
-         cyls         = VHD_CHS_MAX_C;
-         heads        = VHD_CHS_MAX_H;
-@@ -990,7 +991,7 @@ static int coroutine_fn vpc_co_create_opts(const char *filename, QemuOpts *opts,
-     memset(buf, 0, 1024);
+@@ -230,10 +236,11 @@ void block_job_start(BlockJob *job);
+ /**
+  * block_job_cancel:
+  * @job: The job to be canceled.
++ * @force: Quit a job without waiting for data to be in sync.
+  *
+  * Asynchronously cancel the specified job.
+  */
+-void block_job_cancel(BlockJob *job);
++void block_job_cancel(BlockJob *job, bool force);
  
-     memcpy(footer->creator, "conectix", 8);
--    if (force_size) {
-+    if (vpc_opts->force_size) {
-         memcpy(footer->creator_app, "qem2", 4);
-     } else {
-         memcpy(footer->creator_app, "qemu", 4);
-@@ -1032,10 +1033,86 @@ static int coroutine_fn vpc_co_create_opts(const char *filename, QemuOpts *opts,
+ /**
+  * block_job_complete:
+@@ -307,11 +314,12 @@ void block_job_user_resume(BlockJob *job, Error **errp);
+ /**
+  * block_job_user_cancel:
+  * @job: The job to be cancelled.
++ * @force: Quit a job without waiting for data to be in sync.
+  *
+  * Cancels the specified job, but may refuse to do so if the
+  * operation isn't currently meaningful.
+  */
+-void block_job_user_cancel(BlockJob *job, Error **errp);
++void block_job_user_cancel(BlockJob *job, bool force, Error **errp);
  
+ /**
+  * block_job_cancel_sync:
+diff --git a/block/mirror.c b/block/mirror.c
+index 76fddb3838..820f512c7b 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -869,11 +869,8 @@ static void coroutine_fn mirror_run(void *opaque)
+ 
+         ret = 0;
+         trace_mirror_before_sleep(s, cnt, s->synced, delay_ns);
+-        if (!s->synced) {
+-            block_job_sleep_ns(&s->common, delay_ns);
+-            if (block_job_is_cancelled(&s->common)) {
+-                break;
+-            }
++        if (block_job_is_cancelled(&s->common) && s->common.force) {
++            break;
+         } else if (!should_complete) {
+             delay_ns = (s->in_flight == 0 && cnt == 0 ? SLICE_TIME : 0);
+             block_job_sleep_ns(&s->common, delay_ns);
+@@ -887,7 +884,8 @@ immediate_exit:
+          * or it was cancelled prematurely so that we do not guarantee that
+          * the target is a copy of the source.
+          */
+-        assert(ret < 0 || (!s->synced && block_job_is_cancelled(&s->common)));
++        assert(ret < 0 || ((s->common.force || !s->synced) &&
++               block_job_is_cancelled(&s->common)));
+         assert(need_drain);
+         mirror_wait_for_all_io(s);
+     }
+diff --git a/blockdev.c b/blockdev.c
+index 809adbe7f9..6ac4467ac4 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -150,7 +150,7 @@ void blockdev_mark_auto_del(BlockBackend *blk)
+         aio_context_acquire(aio_context);
+ 
+         if (bs->job) {
+-            block_job_cancel(bs->job);
++            block_job_cancel(bs->job, false);
+         }
+ 
+         aio_context_release(aio_context);
+@@ -3831,7 +3831,7 @@ void qmp_block_job_cancel(const char *device,
+     }
+ 
+     trace_qmp_block_job_cancel(job);
+-    block_job_user_cancel(job, errp);
++    block_job_user_cancel(job, force, errp);
  out:
-     blk_unref(blk);
--    g_free(disk_type_param);
-+    bdrv_unref(bs);
-+    return ret;
-+}
-+
-+static int coroutine_fn vpc_co_create_opts(const char *filename,
-+                                           QemuOpts *opts, Error **errp)
-+{
-+    BlockdevCreateOptions *create_options = NULL;
-+    QDict *qdict = NULL;
-+    QObject *qobj;
-+    Visitor *v;
-+    BlockDriverState *bs = NULL;
-+    Error *local_err = NULL;
-+    int ret;
-+
-+    static const QDictRenames opt_renames[] = {
-+        { VPC_OPT_FORCE_SIZE,           "force-size" },
-+        { NULL, NULL },
-+    };
-+
-+    /* Parse options and convert legacy syntax */
-+    qdict = qemu_opts_to_qdict_filtered(opts, NULL, &vpc_create_opts, true);
-+
-+    if (!qdict_rename_keys(qdict, opt_renames, errp)) {
-+        ret = -EINVAL;
-+        goto fail;
-+    }
-+
-+    /* Create and open the file (protocol layer) */
-+    ret = bdrv_create_file(filename, opts, &local_err);
-+    if (ret < 0) {
-+        error_propagate(errp, local_err);
-+        goto fail;
-+    }
-+
-+    bs = bdrv_open(filename, NULL, NULL,
-+                   BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL, errp);
-+    if (bs == NULL) {
-+        ret = -EIO;
-+        goto fail;
-+    }
-+
-+    /* Now get the QAPI type BlockdevCreateOptions */
-+    qdict_put_str(qdict, "driver", "vpc");
-+    qdict_put_str(qdict, "file", bs->node_name);
-+
-+    qobj = qdict_crumple(qdict, errp);
-+    QDECREF(qdict);
-+    qdict = qobject_to_qdict(qobj);
-+    if (qdict == NULL) {
-+        ret = -EINVAL;
-+        goto fail;
-+    }
-+
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-+    visit_free(v);
-+
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        ret = -EINVAL;
-+        goto fail;
-+    }
-+
-+    /* Silently round up size */
-+    assert(create_options->driver == BLOCKDEV_DRIVER_VPC);
-+    create_options->u.vpc.size =
-+        ROUND_UP(create_options->u.vpc.size, BDRV_SECTOR_SIZE);
-+
-+    /* Create the vpc image (format layer) */
-+    ret = vpc_co_create(create_options, errp);
-+
-+fail:
-+    QDECREF(qdict);
-+    bdrv_unref(bs);
-+    qapi_free_BlockdevCreateOptions(create_options);
-     return ret;
+     aio_context_release(aio_context);
+ }
+diff --git a/blockjob.c b/blockjob.c
+index ba538c93dd..885197abf6 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -487,7 +487,7 @@ static int block_job_finalize_single(BlockJob *job)
+     return 0;
  }
  
-+
- static int vpc_has_zero_init(BlockDriverState *bs)
+-static void block_job_cancel_async(BlockJob *job)
++static void block_job_cancel_async(BlockJob *job, bool force)
  {
-     BDRVVPCState *s = bs->opaque;
-@@ -1096,6 +1173,7 @@ static BlockDriver bdrv_vpc = {
-     .bdrv_close             = vpc_close,
-     .bdrv_reopen_prepare    = vpc_reopen_prepare,
-     .bdrv_child_perm        = bdrv_format_default_perms,
-+    .bdrv_co_create         = vpc_co_create,
-     .bdrv_co_create_opts    = vpc_co_create_opts,
+     if (job->iostatus != BLOCK_DEVICE_IO_STATUS_OK) {
+         block_job_iostatus_reset(job);
+@@ -498,6 +498,8 @@ static void block_job_cancel_async(BlockJob *job)
+         job->pause_count--;
+     }
+     job->cancelled = true;
++    /* To prevent 'force == false' overriding a previous 'force == true' */
++    job->force |= force;
+ }
  
-     .bdrv_co_preadv             = vpc_co_preadv,
+ static int block_job_txn_apply(BlockJobTxn *txn, int fn(BlockJob *), bool lock)
+@@ -581,7 +583,7 @@ static void block_job_completed_txn_abort(BlockJob *job)
+      * on the caller, so leave it. */
+     QLIST_FOREACH(other_job, &txn->jobs, txn_list) {
+         if (other_job != job) {
+-            block_job_cancel_async(other_job);
++            block_job_cancel_async(other_job, false);
+         }
+     }
+     while (!QLIST_EMPTY(&txn->jobs)) {
+@@ -747,13 +749,13 @@ void block_job_user_resume(BlockJob *job, Error **errp)
+     block_job_resume(job);
+ }
+ 
+-void block_job_cancel(BlockJob *job)
++void block_job_cancel(BlockJob *job, bool force)
+ {
+     if (job->status == BLOCK_JOB_STATUS_CONCLUDED) {
+         block_job_do_dismiss(job);
+         return;
+     }
+-    block_job_cancel_async(job);
++    block_job_cancel_async(job, force);
+     if (!block_job_started(job)) {
+         block_job_completed(job, -ECANCELED);
+     } else if (job->deferred_to_main_loop) {
+@@ -763,12 +765,12 @@ void block_job_cancel(BlockJob *job)
+     }
+ }
+ 
+-void block_job_user_cancel(BlockJob *job, Error **errp)
++void block_job_user_cancel(BlockJob *job, bool force, Error **errp)
+ {
+     if (block_job_apply_verb(job, BLOCK_JOB_VERB_CANCEL, errp)) {
+         return;
+     }
+-    block_job_cancel(job);
++    block_job_cancel(job, force);
+ }
+ 
+ /* A wrapper around block_job_cancel() taking an Error ** parameter so it may be
+@@ -776,7 +778,7 @@ void block_job_user_cancel(BlockJob *job, Error **errp)
+  * function pointer casts there. */
+ static void block_job_cancel_err(BlockJob *job, Error **errp)
+ {
+-    block_job_cancel(job);
++    block_job_cancel(job, false);
+ }
+ 
+ int block_job_cancel_sync(BlockJob *job)
+diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
+index 34f09ef8c1..5789893dda 100644
+--- a/tests/test-blockjob-txn.c
++++ b/tests/test-blockjob-txn.c
+@@ -124,7 +124,7 @@ static void test_single_job(int expected)
+     block_job_start(job);
+ 
+     if (expected == -ECANCELED) {
+-        block_job_cancel(job);
++        block_job_cancel(job, false);
+     }
+ 
+     while (result == -EINPROGRESS) {
+@@ -170,10 +170,10 @@ static void test_pair_jobs(int expected1, int expected2)
+     block_job_txn_unref(txn);
+ 
+     if (expected1 == -ECANCELED) {
+-        block_job_cancel(job1);
++        block_job_cancel(job1, false);
+     }
+     if (expected2 == -ECANCELED) {
+-        block_job_cancel(job2);
++        block_job_cancel(job2, false);
+     }
+ 
+     while (result1 == -EINPROGRESS || result2 == -EINPROGRESS) {
+@@ -226,7 +226,7 @@ static void test_pair_jobs_fail_cancel_race(void)
+     block_job_start(job1);
+     block_job_start(job2);
+ 
+-    block_job_cancel(job1);
++    block_job_cancel(job1, false);
+ 
+     /* Now make job2 finish before the main loop kicks jobs.  This simulates
+      * the race between a pending kick and another job completing.
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 1723cbe1df..35d862a5d2 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -106,7 +106,8 @@ ETEXI
+         .args_type  = "force:-f,device:B",
+         .params     = "[-f] device",
+         .help       = "stop an active background block operation (use -f"
+-                      "\n\t\t\t if the operation is currently paused)",
++                      "\n\t\t\t if you want to abort the operation immediately"
++                      "\n\t\t\t instead of keep running until data is in sync)",
+         .cmd        = hmp_block_job_cancel,
+     },
+ 
 -- 
 2.13.6
