@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59411)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdD-0001Qk-SY
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:33 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdQ-0001gW-R7
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdC-0004dc-TO
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:31 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdP-0004nL-U6
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:44 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Mar 2018 17:17:36 +0100
-Message-Id: <20180313161803.1814-15-kwolf@redhat.com>
+Date: Tue, 13 Mar 2018 17:17:54 +0100
+Message-Id: <20180313161803.1814-33-kwolf@redhat.com>
 In-Reply-To: <20180313161803.1814-1-kwolf@redhat.com>
 References: <20180313161803.1814-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 14/41] blockjobs: add block_job_txn_apply
- function
+Subject: [Qemu-devel] [PULL 32/41] iotests: Add regression test for commit
+ base locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,69 +23,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: John Snow <jsnow@redhat.com>
+From: Fam Zheng <famz@redhat.com>
 
-Simply apply a function transaction-wide.
-A few more uses of this in forthcoming patches.
-
-Signed-off-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- blockjob.c | 25 ++++++++++++++++---------
- 1 file changed, 16 insertions(+), 9 deletions(-)
+ tests/qemu-iotests/153     | 12 ++++++++++++
+ tests/qemu-iotests/153.out |  5 +++++
+ 2 files changed, 17 insertions(+)
 
-diff --git a/blockjob.c b/blockjob.c
-index 0c64fadc6d..7e03824751 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -487,6 +487,19 @@ static void block_job_cancel_async(BlockJob *job)
-     job->cancelled = true;
- }
+diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
+index adfd02695b..a0fd815483 100755
+--- a/tests/qemu-iotests/153
++++ b/tests/qemu-iotests/153
+@@ -178,6 +178,18 @@ rm -f "${TEST_IMG}.lnk" &>/dev/null
+ ln -s ${TEST_IMG} "${TEST_IMG}.lnk" || echo "Failed to create link"
+ _run_qemu_with_images "${TEST_IMG}.lnk" "${TEST_IMG}"
  
-+static void block_job_txn_apply(BlockJobTxn *txn, void fn(BlockJob *))
-+{
-+    AioContext *ctx;
-+    BlockJob *job, *next;
++echo
++echo "== Active commit to intermediate layer should work when base in use =="
++_launch_qemu -drive format=$IMGFMT,file="${TEST_IMG}.a",id=drive0,if=none \
++             -device virtio-blk,drive=drive0
 +
-+    QLIST_FOREACH_SAFE(job, &txn->jobs, txn_list, next) {
-+        ctx = blk_get_aio_context(job->blk);
-+        aio_context_acquire(ctx);
-+        fn(job);
-+        aio_context_release(ctx);
-+    }
-+}
++_send_qemu_cmd $QEMU_HANDLE \
++    "{ 'execute': 'qmp_capabilities' }" \
++    'return'
++_run_cmd $QEMU_IMG commit -b "${TEST_IMG}.b" "${TEST_IMG}.c"
 +
- static int block_job_finish_sync(BlockJob *job,
-                                  void (*finish)(BlockJob *, Error **errp),
-                                  Error **errp)
-@@ -565,9 +578,8 @@ static void block_job_completed_txn_abort(BlockJob *job)
++_cleanup_qemu
++
+ _launch_qemu
  
- static void block_job_completed_txn_success(BlockJob *job)
- {
--    AioContext *ctx;
-     BlockJobTxn *txn = job->txn;
--    BlockJob *other_job, *next;
-+    BlockJob *other_job;
-     /*
-      * Successful completion, see if there are other running jobs in this
-      * txn.
-@@ -576,15 +588,10 @@ static void block_job_completed_txn_success(BlockJob *job)
-         if (!other_job->completed) {
-             return;
-         }
--    }
--    /* We are the last completed job, commit the transaction. */
--    QLIST_FOREACH_SAFE(other_job, &txn->jobs, txn_list, next) {
--        ctx = blk_get_aio_context(other_job->blk);
--        aio_context_acquire(ctx);
-         assert(other_job->ret == 0);
--        block_job_completed_single(other_job);
--        aio_context_release(ctx);
-     }
-+    /* We are the last completed job, commit the transaction. */
-+    block_job_txn_apply(txn, block_job_completed_single);
- }
+ _send_qemu_cmd $QEMU_HANDLE \
+diff --git a/tests/qemu-iotests/153.out b/tests/qemu-iotests/153.out
+index 34309cfb20..bb721cb747 100644
+--- a/tests/qemu-iotests/153.out
++++ b/tests/qemu-iotests/153.out
+@@ -372,6 +372,11 @@ Is another process using the image?
+ == Symbolic link ==
+ QEMU_PROG: -drive if=none,file=TEST_DIR/t.qcow2: Failed to get "write" lock
+ Is another process using the image?
++
++== Active commit to intermediate layer should work when base in use ==
++{"return": {}}
++
++_qemu_img_wrapper commit -b TEST_DIR/t.qcow2.b TEST_DIR/t.qcow2.c
+ {"return": {}}
+ Adding drive
  
- /* Assumes the block_job_mutex is held */
 -- 
 2.13.6
