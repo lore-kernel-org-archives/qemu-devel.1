@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdE-0001Qy-4E
+	(envelope-from <kwolf@redhat.com>) id 1evmdD-0001QA-D0
 	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdC-0004dX-S5
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:32 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmd9-0004bV-1n
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:31 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Mar 2018 17:17:37 +0100
-Message-Id: <20180313161803.1814-16-kwolf@redhat.com>
+Date: Tue, 13 Mar 2018 17:17:34 +0100
+Message-Id: <20180313161803.1814-13-kwolf@redhat.com>
 In-Reply-To: <20180313161803.1814-1-kwolf@redhat.com>
 References: <20180313161803.1814-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 15/41] blockjobs: add prepare callback
+Subject: [Qemu-devel] [PULL 12/41] blockjobs: ensure abort is called for
+ cancelled jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,135 +25,120 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: John Snow <jsnow@redhat.com>
 
-Some jobs upon finalization may need to perform some work that can
-still fail. If these jobs are part of a transaction, it's important
-that these callbacks fail the entire transaction.
+Presently, even if a job is canceled post-completion as a result of
+a failing peer in a transaction, it will still call .commit because
+nothing has updated or changed its return code.
 
-We allow for a new callback in addition to commit/abort/clean that
-allows us the opportunity to have fairly late-breaking failures
-in the transactional process.
+The reason why this does not cause problems currently is because
+backup's implementation of .commit checks for cancellation itself.
 
-The expected flow is:
+I'd like to simplify this contract:
 
-- All jobs in a transaction converge to the PENDING state,
-  added in a forthcoming commit.
-- Upon being finalized, either automatically or explicitly
-  by the user, jobs prepare to complete.
-- If any job fails preparation, all jobs call .abort.
-- Otherwise, they succeed and call .commit.
+(1) Abort is called if the job/transaction fails
+(2) Commit is called if the job/transaction succeeds
+
+To this end: A job's return code, if 0, will be forcibly set as
+-ECANCELED if that job has already concluded. Remove the now
+redundant check in the backup job implementation.
+
+We need to check for cancellation in both block_job_completed
+AND block_job_completed_single, because jobs may be cancelled between
+those two calls; for instance in transactions. This also necessitates
+an ABORTING -> ABORTING transition to be allowed.
+
+The check in block_job_completed could be removed, but there's no
+point in starting to attempt to succeed a transaction that we know
+in advance will fail.
+
+This does NOT affect mirror jobs that are "canceled" during their
+synchronous phase. The mirror job itself forcibly sets the canceled
+property to false prior to ceding control, so such cases will invoke
+the "commit" callback.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/blockjob_int.h | 10 ++++++++++
- blockjob.c                   | 30 +++++++++++++++++++++++++++---
- 2 files changed, 37 insertions(+), 3 deletions(-)
+ block/backup.c     |  2 +-
+ blockjob.c         | 21 ++++++++++++++++-----
+ block/trace-events |  1 +
+ 3 files changed, 18 insertions(+), 6 deletions(-)
 
-diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index 259d49b32a..642adce68b 100644
---- a/include/block/blockjob_int.h
-+++ b/include/block/blockjob_int.h
-@@ -54,6 +54,16 @@ struct BlockJobDriver {
-     void (*complete)(BlockJob *job, Error **errp);
+diff --git a/block/backup.c b/block/backup.c
+index 7e254dabff..453cd62c24 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -206,7 +206,7 @@ static void backup_cleanup_sync_bitmap(BackupBlockJob *job, int ret)
+     BdrvDirtyBitmap *bm;
+     BlockDriverState *bs = blk_bs(job->common.blk);
  
-     /**
-+     * If the callback is not NULL, prepare will be invoked when all the jobs
-+     * belonging to the same transaction complete; or upon this job's completion
-+     * if it is not in a transaction.
-+     *
-+     * This callback will not be invoked if the job has already failed.
-+     * If it fails, abort and then clean will be called.
-+     */
-+    int (*prepare)(BlockJob *job);
-+
-+    /**
-      * If the callback is not NULL, it will be invoked when all the jobs
-      * belonging to the same transaction complete; or upon this job's
-      * completion if it is not in a transaction. Skipped if NULL.
+-    if (ret < 0 || block_job_is_cancelled(&job->common)) {
++    if (ret < 0) {
+         /* Merge the successor back into the parent, delete nothing. */
+         bm = bdrv_reclaim_dirty_bitmap(bs, job->sync_bitmap, NULL);
+         assert(bm);
 diff --git a/blockjob.c b/blockjob.c
-index 7e03824751..1395d8eed1 100644
+index 59ac4a13c7..61af628376 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -415,6 +415,14 @@ static void block_job_update_rc(BlockJob *job)
+@@ -51,7 +51,7 @@ bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
+     /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0, 0, 0, 0},
+     /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1, 1, 1, 0},
+     /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0, 0, 0, 0},
+-    /* X: */ [BLOCK_JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 0, 1, 0},
++    /* X: */ [BLOCK_JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 1, 1, 0},
+     /* E: */ [BLOCK_JOB_STATUS_CONCLUDED] = {0, 0, 0, 0, 0, 0, 0, 0, 1},
+     /* N: */ [BLOCK_JOB_STATUS_NULL]      = {0, 0, 0, 0, 0, 0, 0, 0, 0},
+ };
+@@ -405,13 +405,22 @@ static void block_job_conclude(BlockJob *job)
      }
  }
  
-+static int block_job_prepare(BlockJob *job)
++static void block_job_update_rc(BlockJob *job)
 +{
-+    if (job->ret == 0 && job->driver->prepare) {
-+        job->ret = job->driver->prepare(job);
++    if (!job->ret && block_job_is_cancelled(job)) {
++        job->ret = -ECANCELED;
 +    }
-+    return job->ret;
++    if (job->ret) {
++        block_job_state_transition(job, BLOCK_JOB_STATUS_ABORTING);
++    }
 +}
 +
- static void block_job_commit(BlockJob *job)
- {
-     assert(!job->ret);
-@@ -438,7 +446,7 @@ static void block_job_clean(BlockJob *job)
-     }
- }
- 
--static void block_job_completed_single(BlockJob *job)
-+static int block_job_completed_single(BlockJob *job)
+ static void block_job_completed_single(BlockJob *job)
  {
      assert(job->completed);
  
-@@ -472,6 +480,7 @@ static void block_job_completed_single(BlockJob *job)
-     QLIST_REMOVE(job, txn_list);
-     block_job_txn_unref(job->txn);
-     block_job_conclude(job);
-+    return 0;
- }
+-    if (job->ret || block_job_is_cancelled(job)) {
+-        block_job_state_transition(job, BLOCK_JOB_STATUS_ABORTING);
+-    }
++    /* Ensure abort is called for late-transactional failures */
++    block_job_update_rc(job);
  
- static void block_job_cancel_async(BlockJob *job)
-@@ -487,17 +496,22 @@ static void block_job_cancel_async(BlockJob *job)
-     job->cancelled = true;
- }
+     if (!job->ret) {
+         if (job->driver->commit) {
+@@ -896,7 +905,9 @@ void block_job_completed(BlockJob *job, int ret)
+     assert(blk_bs(job->blk)->job == job);
+     job->completed = true;
+     job->ret = ret;
+-    if (ret < 0 || block_job_is_cancelled(job)) {
++    block_job_update_rc(job);
++    trace_block_job_completed(job, ret, job->ret);
++    if (job->ret) {
+         block_job_completed_txn_abort(job);
+     } else {
+         block_job_completed_txn_success(job);
+diff --git a/block/trace-events b/block/trace-events
+index 266afd9e99..5e531e0310 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -5,6 +5,7 @@ bdrv_open_common(void *bs, const char *filename, int flags, const char *format_n
+ bdrv_lock_medium(void *bs, bool locked) "bs %p locked %d"
  
--static void block_job_txn_apply(BlockJobTxn *txn, void fn(BlockJob *))
-+static int block_job_txn_apply(BlockJobTxn *txn, int fn(BlockJob *))
- {
-     AioContext *ctx;
-     BlockJob *job, *next;
-+    int rc;
+ # blockjob.c
++block_job_completed(void *job, int ret, int jret) "job %p ret %d corrected ret %d"
+ block_job_state_transition(void *job,  int ret, const char *legal, const char *s0, const char *s1) "job %p (ret: %d) attempting %s transition (%s-->%s)"
+ block_job_apply_verb(void *job, const char *state, const char *verb, const char *legal) "job %p in state %s; applying verb %s (%s)"
  
-     QLIST_FOREACH_SAFE(job, &txn->jobs, txn_list, next) {
-         ctx = blk_get_aio_context(job->blk);
-         aio_context_acquire(ctx);
--        fn(job);
-+        rc = fn(job);
-         aio_context_release(ctx);
-+        if (rc) {
-+            break;
-+        }
-     }
-+    return rc;
- }
- 
- static int block_job_finish_sync(BlockJob *job,
-@@ -580,6 +594,8 @@ static void block_job_completed_txn_success(BlockJob *job)
- {
-     BlockJobTxn *txn = job->txn;
-     BlockJob *other_job;
-+    int rc = 0;
-+
-     /*
-      * Successful completion, see if there are other running jobs in this
-      * txn.
-@@ -590,6 +606,14 @@ static void block_job_completed_txn_success(BlockJob *job)
-         }
-         assert(other_job->ret == 0);
-     }
-+
-+    /* Jobs may require some prep-work to complete without failure */
-+    rc = block_job_txn_apply(txn, block_job_prepare);
-+    if (rc) {
-+        block_job_completed_txn_abort(job);
-+        return;
-+    }
-+
-     /* We are the last completed job, commit the transaction. */
-     block_job_txn_apply(txn, block_job_completed_single);
- }
 -- 
 2.13.6
