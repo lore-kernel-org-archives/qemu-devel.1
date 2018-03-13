@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evocD-0003mh-1J
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:25:37 -0400
+	(envelope-from <bounces@canonical.com>) id 1evocb-00048G-02
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:26:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evocC-0006Xw-8U
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:25:37 -0400
-References: <cover.1520952419.git.berto@igalia.com>
-	<b0f41d78fb61352d58e1f3442c3eec8f94ec6e16.1520952419.git.berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c328607b-edcc-b452-388f-3b95d951b3f4@redhat.com>
-Date: Tue, 13 Mar 2018 13:25:30 -0500
+	(envelope-from <bounces@canonical.com>) id 1evocX-0006hj-Rj
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:26:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34478)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1evocX-0006gx-LW
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:25:57 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1evocR-0002E2-Md
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 18:25:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E9C9F2E80D4
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 18:25:49 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <b0f41d78fb61352d58e1f3442c3eec8f94ec6e16.1520952419.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] docs: Document the new default sizes
- of the qcow2 caches
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 13 Mar 2018 18:11:54 -0000
+From: Antoine <1755479@bugs.launchpad.net>
+Reply-To: Bug 1755479 <1755479@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152094809386.3778.6282045564987107259.malonedeb@gac.canonical.com>
+Message-Id: <152096471440.7017.828161755912988460.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1755479] Re: Cortex M:qemu abort with optimized
+ code and icount
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,29 +37,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 03/13/2018 10:02 AM, Alberto Garcia wrote:
-> We have just reduced the refcount cache size to the minimum unless
-> the user explicitly requests a larger one, so we have to update the
-> documentation to reflect this change.
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->   docs/qcow2-cache.txt | 31 ++++++++++++++-----------------
->   1 file changed, 14 insertions(+), 17 deletions(-)
-> 
+I just tested the patch and it resolves this problem. Thanks!
 
-> +Before QEMU 2.12 the refcount cache had a default size of 1/4 of the
-> +L2 cache size. This resulted in unnecessarily large caches, so now the
-> +refcount cache is as small as possible unless overriden by the user.
+-- =
 
-s/overriden/overridden/
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1755479
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Title:
+  Cortex M:qemu abort with optimized code and icount
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Status in QEMU:
+  New
+
+Bug description:
+  A basic program runs fine if compiled with flag -O0 with gcc, but trigger=
+s a qemu abort when compiled with -O1 and run with icount:
+  "qemu: fatal: IO on conditional branch instruction"
+
+  I also noticed the problem on C source like this with -O0:
+  "int foo =3D *bar; bar++;" : OK
+  "int foo =3D *bar++;" : FAIL (!!!)
+
+  Optimized binary attached to this ticket.
+
+  command line:
+  qemu-system-arm -M lm3s6965evb -nographic -kernel hello.bin -serial file:=
+$(tty) -icount 4 -cpu cortex-m4
+  (working fine without icount)
+
+  version: =
+
+  QEMU emulator version 2.11.50 (v2.11.0-2146-gd9bbfea-dirty)
+
+  Compilation options:
+  ./configure --target-list=3Darm-softmmu --disable-slirp --disable-blobs -=
+-disable-docs --disable-guest-agent --disable-gnutls --disable-nettle --dis=
+able-gcrypt --disable-sdl --disable-gtk --disable-vnc --disable-virtfs --di=
+sable-mpath --disable-xen --disable-brlapi --disable-curl --disable-bluez -=
+-disable-kvm --disable-hax --disable-hvf --disable-whpx --disable-rdma --di=
+sable-vde --disable-netmap --disable-linux-aio --disable-cap-ng --disable-a=
+ttr --disable-vhost-net --disable-spice --disable-rbd --disable-libiscsi --=
+disable-libnfs --disable-smartcard --disable-libusb --disable-live-block-mi=
+gration --disable-usb-redir --disable-lzo --disable-snappy --disable-bzip2 =
+--disable-seccomp --disable-glusterfs --disable-tpm --disable-libssh2 --dis=
+able-numa --disable-libxml2 --disable-tcmalloc --disable-jemalloc --disable=
+-replication --disable-vhost-vsock --disable-opengl --disable-virglrenderer=
+ --disable-xfsctl --disable-qom-cast-debug --disable-vxhs --disable-crypto-=
+afalg --disable-vhost-user --disable-capstone --disable-pie --extra-cflags=
+=3D-mtune=3Dnative
+
+  I have also tested previous versions:
+  - stock qemu-system-arm 2.5.0 from ubuntu 16.04: OK
+  - git version: QEMU emulator version 2.10.0 (v2.10.2-dirty): OK
+  - git version: QEMU emulator version 2.10.90 (v2.11.0-rc0-dirty): FAIL
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1755479/+subscriptions
