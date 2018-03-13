@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1evep8-000348-N6
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 03:58:19 -0400
+	(envelope-from <no-reply@patchew.org>) id 1evf1f-0002YB-3r
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 04:11:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1evep7-0007pq-8D
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 03:58:18 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:42258)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1evep7-0007p5-2c
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 03:58:17 -0400
-Received: by mail-pf0-x243.google.com with SMTP id a16so5531824pfn.9
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 00:58:16 -0700 (PDT)
-From: guangrong.xiao@gmail.com
-Date: Tue, 13 Mar 2018 15:57:39 +0800
-Message-Id: <20180313075739.11194-9-xiaoguangrong@tencent.com>
-In-Reply-To: <20180313075739.11194-1-xiaoguangrong@tencent.com>
-References: <20180313075739.11194-1-xiaoguangrong@tencent.com>
-Subject: [Qemu-devel] [PATCH 8/8] migration: remove
- ram_save_compressed_page()
+	(envelope-from <no-reply@patchew.org>) id 1evf1a-00014N-Jk
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 04:11:15 -0400
+Resent-Message-Id: <E1evf1a-00014N-Jk@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21120)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1evf1a-00012W-CH
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 04:11:10 -0400
+In-Reply-To: <20180313044944.21058-1-aik@ozlabs.ru>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152092863880.39.6601723952687722936@71c20359a636>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 13 Mar 2018 01:10:39 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH qemu v2] slirp/debug: Print IP addresses in
+ human readable form
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,82 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: aik@ozlabs.ru
+Cc: famz@redhat.com, qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org
 
-From: Xiao Guangrong <xiaoguangrong@tencent.com>
-
-Now, we can reuse the path in ram_save_page() to post the page out
-as normal, then the only thing remained in ram_save_compressed_page()
-is compression that we can move it out to the caller
-
-Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
----
- migration/ram.c | 45 ++++++++-------------------------------------
- 1 file changed, 8 insertions(+), 37 deletions(-)
-
-diff --git a/migration/ram.c b/migration/ram.c
-index f778627992..8f4f8aca86 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1162,41 +1162,6 @@ static int compress_page_with_multi_thread(RAMState *rs, RAMBlock *block,
-     return pages;
- }
- 
--/**
-- * ram_save_compressed_page: compress the given page and send it to the stream
-- *
-- * Returns the number of pages written.
-- *
-- * @rs: current RAM state
-- * @block: block that contains the page we want to send
-- * @offset: offset inside the block for the page
-- * @last_stage: if we are at the completion stage
-- */
--static int ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
--                                    bool last_stage)
--{
--    int pages = -1;
--    uint8_t *p;
--    RAMBlock *block = pss->block;
--    ram_addr_t offset = pss->page << TARGET_PAGE_BITS;
--
--    p = block->host + offset;
--
--    if (block != rs->last_sent_block) {
--        /*
--         * Make sure the first page is sent out before other pages.
--         *
--         * we post it as normal page as compression will take much
--         * CPU resource.
--         */
--        pages = save_normal_page(rs, block, offset, p, true);
--    } else {
--        pages = compress_page_with_multi_thread(rs, block, offset);
--    }
--
--    return pages;
--}
--
- /**
-  * find_dirty_block: find the next dirty page and update any state
-  * associated with the search process.
-@@ -1501,8 +1466,14 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
-             goto page_saved;
-         }
- 
--        if (save_page_use_compression(rs)) {
--            res = ram_save_compressed_page(rs, pss, last_stage);
-+        /*
-+         * Make sure the first page is sent out before other pages.
-+         *
-+         * we post it as normal page as compression will take much
-+         * CPU resource.
-+         */
-+        if (block == rs->last_sent_block && save_page_use_compression(rs)) {
-+            res = compress_page_with_multi_thread(rs, block, offset);
-         } else {
-             res = ram_save_page(rs, pss, last_stage);
-         }
--- 
-2.14.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMzEzMDQ0OTQ0LjIxMDU4LTEtYWlrQG96bGFicy5ydQpTdWJqZWN0OiBb
+UWVtdS1kZXZlbF0gW1BBVENIIHFlbXUgdjJdIHNsaXJwL2RlYnVnOiBQcmludCBJUCBhZGRyZXNz
+ZXMgaW4gaHVtYW4gcmVhZGFibGUgZm9ybQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4g
+fCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAt
+LXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tp
+bmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAg
+ICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gu
+cGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBm
+aQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9
+PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dp
+dGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwplOTFkNmNjZWI1IHNsaXJwL2RlYnVnOiBQcmlu
+dCBJUCBhZGRyZXNzZXMgaW4gaHVtYW4gcmVhZGFibGUgZm9ybQoKPT09IE9VVFBVVCBCRUdJTiA9
+PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBzbGlycC9kZWJ1ZzogUHJpbnQgSVAgYWRkcmVzc2VzIGlu
+IGh1bWFuIHJlYWRhYmxlIGZvcm0uLi4KRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1
+c2UgdGFicwojNDM6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjcwNDoKK15JREVCVUdfQVJHKCJoYWRk
+ciA9ICVzIiwgaW5ldF9udG9hKChzdHJ1Y3QgaW5fYWRkcil7LnNfYWRkciA9IGhhZGRyfSkpOyQK
+CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQ0OiBGSUxFOiBzbGly
+cC9zb2NrZXQuYzo3MDU6CiteSURFQlVHX0FSRygiaHBvcnQgPSAlZCIsIG50b2hzKGhwb3J0KSk7
+JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDU6IEZJTEU6IHNs
+aXJwL3NvY2tldC5jOjcwNjoKK15JREVCVUdfQVJHKCJsYWRkciA9ICVzIiwgaW5ldF9udG9hKChz
+dHJ1Y3QgaW5fYWRkcil7LnNfYWRkciA9IGxhZGRyfSkpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBz
+aG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQ2OiBGSUxFOiBzbGlycC9zb2NrZXQuYzo3MDc6CiteSURF
+QlVHX0FSRygibHBvcnQgPSAlZCIsIG50b2hzKGxwb3J0KSk7JAoKRVJST1I6IGNvZGUgaW5kZW50
+IHNob3VsZCBuZXZlciB1c2UgdGFicwojNjA6IEZJTEU6IHNsaXJwL3VkcC5jOjI0NDoKK15JREVC
+VUdfQVJHKCJzYWRkciA9ICVzIiwgaW5ldF9udG9hKHNhZGRyLT5zaW5fYWRkcikpOyQKCkVSUk9S
+OiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzYxOiBGSUxFOiBzbGlycC91ZHAu
+YzoyNDU6CiteSURFQlVHX0FSRygiZGFkZHIgPSAlcyIsIGluZXRfbnRvYShkYWRkci0+c2luX2Fk
+ZHIpKTskCgp0b3RhbDogNiBlcnJvcnMsIDAgd2FybmluZ3MsIDQwIGxpbmVzIGNoZWNrZWQKCllv
+dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoK
+VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
+dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
+IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
