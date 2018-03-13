@@ -1,16 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1evkn7-0004jK-1j
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 10:20:41 -0400
+	(envelope-from <mreitz@redhat.com>) id 1evkpQ-0006es-Dv
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 10:23:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1evkn3-00033x-TI
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 10:20:37 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Tue, 13 Mar 2018 22:20:02 +0800
-Message-Id: <20180313142003.12124-2-famz@redhat.com>
-In-Reply-To: <20180313142003.12124-1-famz@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1evkpP-0004AY-Hi
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 10:23:00 -0400
 References: <20180313142003.12124-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 1/2] block: Fix flags in reopen queue
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <958efb4e-89fa-def5-0963-42c8259e99ca@redhat.com>
+Date: Tue, 13 Mar 2018 15:22:53 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180313142003.12124-1-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="7Ejob497YZblYocwhR7bAcB8MwwlT77an"
+Subject: Re: [Qemu-devel] [PATCH v3 0/2] block: Fix permission during reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,46 +23,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-Reopen flags are not synchronized according to the
-bdrv_reopen_queue_child precedence until bdrv_reopen_prepare. It is a
-bit too late: we already check the consistency in bdrv_check_perm before
-that.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--7Ejob497YZblYocwhR7bAcB8MwwlT77an
+From: Max Reitz <mreitz@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Message-ID: <958efb4e-89fa-def5-0963-42c8259e99ca@redhat.com>
+Subject: Re: [PATCH v3 0/2] block: Fix permission during reopen
+References: <20180313142003.12124-1-famz@redhat.com>
+In-Reply-To: <20180313142003.12124-1-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This fixes the bug that when bdrv_reopen a RO node as RW, the flags for
-backing child are wrong. Before, we could recurse with flags.rw=1; now,
-role->inherit_options + update_flags_from_options will make sure to
-clear the bit when necessary.  Note that this will not clear an
-explicitly set bit, as in the case of parallel block jobs (e.g.
-test_stream_parallel in 030), because the explicit options include
-'read-only=false' (for an intermediate node used by a different job).
+On 2018-03-13 15:20, Fam Zheng wrote:
+> v3: Fix test case. [Max]
+>=20
+> v2: Use update_flags_from_options. [Kevin]
+>=20
+> We write open the whole backing chain during reopen. It is not necessar=
+y and
+> will cause image locking problems if the backing image is shared.
+>=20
+> Fam Zheng (2):
+>   block: Fix flags in reopen queue
+>   iotests: Add regression test for commit base locking
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- block.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-diff --git a/block.c b/block.c
-index 75a9fd49de..a121d2ebcc 100644
---- a/block.c
-+++ b/block.c
-@@ -2883,8 +2883,15 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
- 
-     /* Inherit from parent node */
-     if (parent_options) {
-+        QemuOpts *opts;
-+        QDict *options_copy;
-         assert(!flags);
-         role->inherit_options(&flags, options, parent_flags, parent_options);
-+        options_copy = qdict_clone_shallow(options);
-+        opts = qemu_opts_create(&bdrv_runtime_opts, NULL, 0, &error_abort);
-+        qemu_opts_absorb_qdict(opts, options_copy, NULL);
-+        update_flags_from_options(&flags, opts);
-+        qemu_opts_del(opts);
-     }
- 
-     /* Old values are used for options that aren't set yet */
--- 
-2.14.3
+
+--7Ejob497YZblYocwhR7bAcB8MwwlT77an
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqn3r0SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A/ukH/2zvFia6Ani7t+toYeC+ed4pPr/2UTVE
+w0ZnxJxeiYppZS/Ia6B75GLPhXfdslen2LgftA36RS3SumAYQpdo4vQ2/WDuFsoT
+FOl3fEQHuVq/p0FTYhTw5nccq3GmxW6rDoqGpwObbcmzTDsKsjxOrAKDJO0iyGnV
+qUlt4rA3dHQWYnj0GEQgqwYDU7sKD4+UdedPVmYb2CIo+oBn0v0mdRpVWshH+P3T
+alsmEL4u8eFUw2iKdgx2FbwP5c2Re6/cFAoAEMhu0qIdGS2qy1Vkq22zWM8cWBHl
+Ut7QN7lPVJqxPNEWw/Eg2MFUBbmFtFsD8H5idtzaTyxTMi2AwExa+rU=
+=VWAc
+-----END PGP SIGNATURE-----
+
+--7Ejob497YZblYocwhR7bAcB8MwwlT77an--
