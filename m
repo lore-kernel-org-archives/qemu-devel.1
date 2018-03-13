@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43537)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eviKW-000086-QU
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:42:57 -0400
+	(envelope-from <berrange@redhat.com>) id 1eviM6-0001CQ-Ev
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:44:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eviKV-0006gH-T3
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:42:56 -0400
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:39132)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eviKV-0006fs-NT
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:42:55 -0400
-Received: by mail-ot0-x241.google.com with SMTP id h8so18596966oti.6
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 04:42:55 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1eviM2-0007JZ-GD
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:44:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60140 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eviM2-0007JG-AW
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:44:30 -0400
+Date: Tue, 13 Mar 2018 11:44:18 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180313114418.GT3048@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <cover.1520867740.git.x1917x@gmail.com>
+	<20180313092154.GA3048@redhat.com>
+	<20180313213755.00006cd9@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180312160125.7596-1-stefanha@redhat.com>
-References: <20180312160125.7596-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Mar 2018 11:42:34 +0000
-Message-ID: <CAFEAcA9zfh+QXf_DFW+LyNnMVkQpZzZD5cCmG5jaeKpPHQ3Jrw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/1] Block patches
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180313213755.00006cd9@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 00/30] Xen Q35 Bringup patches +
+ support for PCIe Extended Capabilities for passed through devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +31,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Alexey G <x1917x@gmail.com>
+Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
 
-On 12 March 2018 at 16:01, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> The following changes since commit e4ae62b802cec437f877f2cadc4ef059cc0eca76:
->
->   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2018-03-09 17:28:16 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/stefanha/qemu.git tags/block-pull-request
->
-> for you to fetch changes up to 7376eda7c2e0451e819e81bd05fabc56a9deb946:
->
->   block: make BDRV_POLL_WHILE() re-entrancy safe (2018-03-12 11:07:37 +0000)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
->
-> Stefan Hajnoczi (1):
->   block: make BDRV_POLL_WHILE() re-entrancy safe
->
->  include/block/aio-wait.h | 61 ++++++++++++++++++++++++------------------------
->  util/aio-wait.c          |  2 +-
->  2 files changed, 31 insertions(+), 32 deletions(-)
+On Tue, Mar 13, 2018 at 09:37:55PM +1000, Alexey G wrote:
+> On Tue, 13 Mar 2018 09:21:54 +0000
+> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+>=20
+> >The subject line says to expect 30 patches, but you've only sent 18 to
+> >the list here. I eventually figured out that the first 12 patches were
+> >in Xen code and so not sent to qemu-devel.
+> >
+> >For future if you have changes that affect multiple completely separat=
+e
+> >projects, send them as separate series. ie just send PATCH 00/18 to
+> >QEMU devel so it doesn't look like a bunch of patches have gone
+> >missing.
+>=20
+> OK, we'll do for next versions.
+>=20
+> >> A new domain config option was implemented: device_model_machine.
+> >> It's a string which has following possible values:
+> >> - "i440" -- i440 emulation (default)
+> >> - "q35"  -- emulate a Q35 machine. By default, the storage interface
+> >> is AHCI. =20
+> >
+> >Presumably this is mapping to the QEMU -machine arg, so it feels
+> >desirable to keep the same naming scheme. ie allow any of the
+> >versioned machine names that QEMU uses. eg any of "pc-q35-2.x"
+> >versioned types, or 'q35' as an alias for latest, and use
+> >"pc-i440fx-2.x" versioned types of 'pc' as an alias for latest, rather
+> >than 'i440' which is needlessly divering from the QEMU machine type.
+>=20
+> Yes, it is translated into the '-machine' argument.
+>=20
+> A direct mapping between the Xen device_model_machine option and QEMU
+> '-machine' argument won't be accepted by Xen maintainers I guess.
+>=20
+> The main problem with this approach is a requirement to have a match
+> between Xen/libxl and QEMU versions. If, for example,
+> device_model_machine tells something like "pc-q35-2.11" and later we
+> downgrade QEMU to some older version we'll likely have a problem
+> without changing anything in the domain config. So I guess the "use the
+> latest available" approach for machine selection (pc, q35, etc) is the
+> only possible option. Perhaps having the way to specify the exact QEMU
+> machine name and version in a separate domain config parameter (for
+> advanced use) might be feasible.
 
-Applied, thanks.
+At least with plain QEMU or KVM, using the versioned machine type
+names is important as that is what guarantees you a stable guest
+machine ABI, independant of QEMU version.  If your deployment has
+a mixture of QEMU versions on different hosts, then you very much
+want to pick a versioned machine type to ensure compatibility for
+live migration. With libvirt we accept the short "pc" or "q35"
+names on input, but expand them to the fully versioned name
+when saving the config file, so no matter which QEMU version is
+used each time the guest is launched, the ABI is always the same.
 
--- PMM
+>=20
+> Also, parameter names do not speak for themselves I'm afraid. This way
+> we'll have, for example, device_model_machine=3D"pc" vs
+> device_model_machine=3D"q35"... a bit unclear I think. This may be
+> obvious for a QEMU user, but many Xen users didn't get used to QEMU
+> machines and there might be some wondering why "q35" is not "pc" and
+> why "pc" is an i440 system precisely.
+>=20
+> Another obstacle here is xen_platform_device option which indirectly
+> selects QEMU machine type for i440 at the moment (pc/xenfv), but this
+> may be addressed by controlling the Xen platform device independently
+> via a separate machine property or '-device xen-platform' like
+> Eduardo Habkost suggested.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
