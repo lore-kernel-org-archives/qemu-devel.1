@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1evqNw-00067C-7C
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 16:19:01 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1evqO2-0006Bo-0E
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 16:19:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1evqNt-0004MY-0j
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 16:19:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54964)
+	(envelope-from <alex.williamson@redhat.com>) id 1evqO0-0004T5-T1
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 16:19:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46282)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1evqNs-0004Lz-Or
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 16:18:56 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	id 1evqO0-0004SJ-KP
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 16:19:04 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 19D5228203
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 20:18:56 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 015503A181
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 20:19:04 +0000 (UTC)
 From: Alex Williamson <alex.williamson@redhat.com>
-Date: Tue, 13 Mar 2018 14:18:52 -0600
-Message-ID: <20180313201852.2327.45170.stgit@gimli.home>
+Date: Tue, 13 Mar 2018 14:19:01 -0600
+Message-ID: <20180313201901.2327.51191.stgit@gimli.home>
 In-Reply-To: <20180313201415.2327.62402.stgit@gimli.home>
 References: <20180313201415.2327.62402.stgit@gimli.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PULL 09/11] vfio/pci: Relax DMA map errors for MMIO
- regions
+Subject: [Qemu-devel] [PULL 10/11] vfio-pci: Allow mmap of MSIX BAR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,127 +37,85 @@ To: qemu-devel@nongnu.org
 
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-At the moment if vfio_memory_listener is registered in the system memory
-address space, it maps/unmaps every RAM memory region for DMA.
-It expects system page size aligned memory sections so vfio_dma_map
-would not fail and so far this has been the case. A mapping failure
-would be fatal. A side effect of such behavior is that some MMIO pages
-would not be mapped silently.
+At the moment we unconditionally avoid mapping MSIX data of a BAR and
+emulate MSIX table in QEMU. However it is 1) not always necessary as
+a platform may provide a paravirt interface for MSIX configuration;
+2) can affect the speed of MMIO access by emulating them in QEMU when
+frequently accessed registers share same system page with MSIX data,
+this is particularly a problem for systems with the page size bigger
+than 4KB.
 
-However we are going to change MSIX BAR handling so we will end having
-non-aligned sections in vfio_memory_listener (more details is in
-the next patch) and vfio_dma_map will exit QEMU.
+A new capability - VFIO_REGION_INFO_CAP_MSIX_MAPPABLE - has been added
+to the kernel [1] which tells the userspace that mapping of the MSIX data
+is possible now. This makes use of it so from now on QEMU tries mapping
+the entire BAR as a whole and emulate MSIX on top of that.
 
-In order to avoid fatal failures on what previously was not a failure and
-was just silently ignored, this checks the section alignment to
-the smallest supported IOMMU page size and prints an error if not aligned;
-it also prints an error if vfio_dma_map failed despite the page size check.
-Both errors are not fatal; only MMIO RAM regions are checked
-(aka "RAM device" regions).
-
-If the amount of errors printed is overwhelming, the MSIX relocation
-could be used to avoid excessive error output.
-
-This is unlikely to cause any behavioral change.
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a32295c612c57990d17fb0f41e7134394b2f35f6
 
 Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-[aw: Fix Int128 bit ops]
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- hw/vfio/common.c |   55 ++++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 49 insertions(+), 6 deletions(-)
+ hw/vfio/common.c              |   15 +++++++++++++++
+ hw/vfio/pci.c                 |    9 +++++++++
+ include/hw/vfio/vfio-common.h |    1 +
+ 3 files changed, 25 insertions(+)
 
 diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 6a8203a53245..07c03d78b666 100644
+index 07c03d78b666..5e8471621800 100644
 --- a/hw/vfio/common.c
 +++ b/hw/vfio/common.c
-@@ -544,18 +544,40 @@ static void vfio_listener_region_add(MemoryListener *listener,
+@@ -1471,6 +1471,21 @@ int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+     return -ENODEV;
+ }
  
-     llsize = int128_sub(llend, int128_make64(iova));
- 
-+    if (memory_region_is_ram_device(section->mr)) {
-+        hwaddr pgmask = (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
++bool vfio_has_region_cap(VFIODevice *vbasedev, int region, uint16_t cap_type)
++{
++    struct vfio_region_info *info = NULL;
++    bool ret = false;
 +
-+        if ((iova & pgmask) || (int128_get64(llsize) & pgmask)) {
-+            error_report("Region 0x%"HWADDR_PRIx"..0x%"HWADDR_PRIx
-+                         " is not aligned to 0x%"HWADDR_PRIx
-+                         " and cannot be mapped for DMA",
-+                         section->offset_within_region,
-+                         int128_getlo(section->size),
-+                         pgmask + 1);
-+            return;
++    if (!vfio_get_region_info(vbasedev, region, &info)) {
++        if (vfio_get_region_info_cap(info, cap_type)) {
++            ret = true;
 +        }
++        g_free(info);
 +    }
 +
-     ret = vfio_dma_map(container, iova, int128_get64(llsize),
-                        vaddr, section->readonly);
-     if (ret) {
-         error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
-                      "0x%"HWADDR_PRIx", %p) = %d (%m)",
-                      container, iova, int128_get64(llsize), vaddr, ret);
-+        if (memory_region_is_ram_device(section->mr)) {
-+            /* Allow unexpected mappings not to be fatal for RAM devices */
-+            return;
-+        }
-         goto fail;
-     }
++    return ret;
++}
++
+ /*
+  * Interfaces for IBM EEH (Enhanced Error Handling)
+  */
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index b9d2c12b8273..02974f4eb976 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -1294,6 +1294,15 @@ static void vfio_pci_fixup_msix_region(VFIOPCIDevice *vdev)
+     off_t start, end;
+     VFIORegion *region = &vdev->bars[vdev->msix->table_bar].region;
  
-     return;
- 
- fail:
-+    if (memory_region_is_ram_device(section->mr)) {
-+        error_report("failed to vfio_dma_map. pci p2p may not work");
++    /*
++     * If the host driver allows mapping of a MSIX data, we are going to
++     * do map the entire BAR and emulate MSIX table on top of that.
++     */
++    if (vfio_has_region_cap(&vdev->vbasedev, region->nr,
++                            VFIO_REGION_INFO_CAP_MSIX_MAPPABLE)) {
 +        return;
 +    }
++
      /*
-      * On the initfn path, store the first error in the container so we
-      * can gracefully fail.  Runtime, there's not much we can do other
-@@ -577,6 +599,7 @@ static void vfio_listener_region_del(MemoryListener *listener,
-     hwaddr iova, end;
-     Int128 llend, llsize;
-     int ret;
-+    bool try_unmap = true;
+      * We expect to find a single mmap covering the whole BAR, anything else
+      * means it's either unsupported or already setup.
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index c5efa32750e7..d9360148e6a7 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -193,6 +193,7 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
+                          struct vfio_region_info **info);
+ int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+                              uint32_t subtype, struct vfio_region_info **info);
++bool vfio_has_region_cap(VFIODevice *vbasedev, int region, uint16_t cap_type);
+ #endif
+ extern const MemoryListener vfio_prereg_listener;
  
-     if (vfio_listener_skipped_section(section)) {
-         trace_vfio_listener_region_del_skip(
-@@ -629,14 +652,34 @@ static void vfio_listener_region_del(MemoryListener *listener,
- 
-     trace_vfio_listener_region_del(iova, end);
- 
--    ret = vfio_dma_unmap(container, iova, int128_get64(llsize));
--    memory_region_unref(section->mr);
--    if (ret) {
--        error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
--                     "0x%"HWADDR_PRIx") = %d (%m)",
--                     container, iova, int128_get64(llsize), ret);
-+    if (memory_region_is_ram_device(section->mr)) {
-+        hwaddr pgmask;
-+        VFIOHostDMAWindow *hostwin;
-+        bool hostwin_found = false;
-+
-+        QLIST_FOREACH(hostwin, &container->hostwin_list, hostwin_next) {
-+            if (hostwin->min_iova <= iova && end <= hostwin->max_iova) {
-+                hostwin_found = true;
-+                break;
-+            }
-+        }
-+        assert(hostwin_found); /* or region_add() would have failed */
-+
-+        pgmask = (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
-+        try_unmap = !((iova & pgmask) || (int128_get64(llsize) & pgmask));
-+    }
-+
-+    if (try_unmap) {
-+        ret = vfio_dma_unmap(container, iova, int128_get64(llsize));
-+        if (ret) {
-+            error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
-+                         "0x%"HWADDR_PRIx") = %d (%m)",
-+                         container, iova, int128_get64(llsize), ret);
-+        }
-     }
- 
-+    memory_region_unref(section->mr);
-+
-     if (container->iommu_type == VFIO_SPAPR_TCE_v2_IOMMU) {
-         vfio_spapr_remove_window(container,
-                                  section->offset_within_address_space);
