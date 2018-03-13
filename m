@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evgAu-0008K4-GF
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 05:24:54 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1evgJX-0003mv-AA
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 05:33:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evgAp-0001ox-UJ
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 05:24:52 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42368 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1evgAp-0001oW-OC
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 05:24:47 -0400
-Date: Tue, 13 Mar 2018 09:24:42 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180313092442.GB3048@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <cover.1520867740.git.x1917x@gmail.com>
-	<4a65e8b30fe9d2a6c1c53b85ef2697f02e01d13f.1520867956.git.x1917x@gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1evgJS-0002Ev-D7
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 05:33:47 -0400
+Received: from mail-wr0-f173.google.com ([209.85.128.173]:43602)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1evgJS-0002A1-6c
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 05:33:42 -0400
+Received: by mail-wr0-f173.google.com with SMTP id o1so8785844wro.10
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 02:33:36 -0700 (PDT)
+References: <20180308124901.83533-1-brijesh.singh@amd.com>
+	<20180308124901.83533-25-brijesh.singh@amd.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0218f497-d397-0f49-3256-79d461e25be2@redhat.com>
+Date: Tue, 13 Mar 2018 10:33:33 +0100
 MIME-Version: 1.0
+In-Reply-To: <20180308124901.83533-25-brijesh.singh@amd.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4a65e8b30fe9d2a6c1c53b85ef2697f02e01d13f.1520867956.git.x1917x@gmail.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 16/30] q35/xen: Add Xen platform device
- support for Q35
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v12 24/28] sev/i386: add migration blocker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,140 +30,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Gerasimenko <x1917x@gmail.com>
-Cc: xen-devel@lists.xenproject.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Alexander Graf <agraf@suse.de>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Markus Armbruster <armbru@redhat.com>, Bruce Rogers <brogers@suse.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, Borislav Petkov <bp@suse.de>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On Tue, Mar 13, 2018 at 04:34:01AM +1000, Alexey Gerasimenko wrote:
-> Current Xen/QEMU method to control Xen Platform device on i440 is a bit
-> odd -- enabling/disabling Xen platform device actually modifies the QEMU
-> emulated machine type, namely xenfv <--> pc.
-> 
-> In order to avoid multiplying machine types, use a new way to control Xen
-> Platform device for QEMU -- "xen-platform-dev" machine property (bool).
-> To maintain backward compatibility with existing Xen/QEMU setups, this
-> is only applicable to q35 machine currently. i440 emulation still uses the
-> old method (i.e. xenfv/pc machine selection) to control Xen Platform
-> device, this may be changed later to xen-platform-dev property as well.
-
-The change you made to q35 is pretty tiny, so I imagine the equiv
-change to pc machine is equally small. IOW, I think you should just
-convert them both straight away rather than providing an inconsistent
-configuration approach for q35 vs pc.
-
-> This way we can use a single machine type (q35) and change just
-> xen-platform-dev value to on/off to control Xen platform device.
-> 
-> Signed-off-by: Alexey Gerasimenko <x1917x@gmail.com>
-> ---
->  hw/core/machine.c   | 21 +++++++++++++++++++++
->  hw/i386/pc_q35.c    | 14 ++++++++++++++
->  include/hw/boards.h |  1 +
->  qemu-options.hx     |  1 +
->  4 files changed, 37 insertions(+)
-> 
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 5e2bbcdace..205e7da3ce 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -290,6 +290,20 @@ static void machine_set_igd_gfx_passthru(Object *obj, bool value, Error **errp)
->      ms->igd_gfx_passthru = value;
->  }
->  
-> +static bool machine_get_xen_platform_dev(Object *obj, Error **errp)
-> +{
-> +    MachineState *ms = MACHINE(obj);
+On 08/03/2018 13:48, Brijesh Singh wrote:
+>      sev_set_guest_state(SEV_STATE_RUNNING);
 > +
-> +    return ms->xen_platform_dev;
-> +}
-> +
-> +static void machine_set_xen_platform_dev(Object *obj, bool value, Error **errp)
-> +{
-> +    MachineState *ms = MACHINE(obj);
-> +
-> +    ms->xen_platform_dev = value;
-> +}
-> +
->  static char *machine_get_firmware(Object *obj, Error **errp)
->  {
->      MachineState *ms = MACHINE(obj);
-> @@ -595,6 +609,13 @@ static void machine_class_init(ObjectClass *oc, void *data)
->      object_class_property_set_description(oc, "igd-passthru",
->          "Set on/off to enable/disable igd passthrou", &error_abort);
->  
-> +    object_class_property_add_bool(oc, "xen-platform-dev",
-> +        machine_get_xen_platform_dev,
-> +        machine_set_xen_platform_dev, &error_abort);
-> +    object_class_property_set_description(oc, "xen-platform-dev",
-> +        "Set on/off to enable/disable Xen Platform device",
-> +        &error_abort);
-> +
->      object_class_property_add_str(oc, "firmware",
->          machine_get_firmware, machine_set_firmware,
->          &error_abort);
-> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> index 0db670f6d7..62caf924cf 100644
-> --- a/hw/i386/pc_q35.c
-> +++ b/hw/i386/pc_q35.c
-> @@ -56,6 +56,18 @@
->  /* ICH9 AHCI has 6 ports */
->  #define MAX_SATA_PORTS     6
->  
-> +static void q35_xen_hvm_init(MachineState *machine)
-> +{
-> +    PCMachineState *pcms = PC_MACHINE(machine);
-> +
-> +    if (xen_enabled()) {
-> +        /* check if Xen Platform device is enabled */
-> +        if (machine->xen_platform_dev) {
-> +            pci_create_simple(pcms->bus, -1, "xen-platform");
-> +        }
+> +    /* add migration blocker */
+> +    error_setg(&sev_mig_blocker,
+> +               "SEV: Migration is not implemented");
+> +    ret = migrate_add_blocker(sev_mig_blocker, &local_err);
+> +    if (local_err) {
+> +        error_report_err(local_err);
+> +        error_free(sev_mig_blocker);
+> +        exit(1);
 > +    }
-> +}
-> +
->  /* PC hardware initialisation */
->  static void pc_q35_init(MachineState *machine)
->  {
-> @@ -207,6 +219,8 @@ static void pc_q35_init(MachineState *machine)
->      if (xen_enabled()) {
->          pci_bus_irqs(host_bus, xen_cmn_set_irq, xen_cmn_pci_slot_get_pirq,
->                       ich9_lpc, ICH9_XEN_NUM_IRQ_SOURCES);
-> +
-> +        q35_xen_hvm_init(machine);
->      } else {
->          pci_bus_irqs(host_bus, ich9_lpc_set_irq, ich9_lpc_map_irq, ich9_lpc,
->                       ICH9_LPC_NB_PIRQS);
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index efb0a9edfd..f35fc1cc03 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -238,6 +238,7 @@ struct MachineState {
->      bool usb;
->      bool usb_disabled;
->      bool igd_gfx_passthru;
-> +    bool xen_platform_dev;
->      char *firmware;
->      bool iommu;
->      bool suppress_vmdesc;
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 6585058c6c..cee0b92028 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -38,6 +38,7 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
->      "                dump-guest-core=on|off include guest memory in a core dump (default=on)\n"
->      "                mem-merge=on|off controls memory merge support (default: on)\n"
->      "                igd-passthru=on|off controls IGD GFX passthrough support (default=off)\n"
-> +    "                xen-platform-dev=on|off controls Xen Platform device (default=off)\n"
->      "                aes-key-wrap=on|off controls support for AES key wrapping (default=on)\n"
->      "                dea-key-wrap=on|off controls support for DEA key wrapping (default=on)\n"
->      "                suppress-vmdesc=on|off disables self-describing migration (default=off)\n"
-> -- 
-> 2.11.0
-> 
-> 
+>  }
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+I think this should be in sev_guest_init instead?  Does migration
+transfer the measurement, or is it lost forever?  Not a blocker though.
+
+Paolo
