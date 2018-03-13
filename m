@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1evpDg-0001kb-7R
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:04:22 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1evpEb-0002iK-Ct
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:05:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1evpDc-0003a8-9T
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:04:20 -0400
-Resent-Message-Id: <E1evpDc-0003a8-9T@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21088)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1evpDc-0003ZY-2a
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:04:16 -0400
-In-Reply-To: <20180313180320.339796-1-vsementsov@virtuozzo.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152096780751.39.15281812348627104231@71c20359a636>
+	(envelope-from <pbonzini@redhat.com>) id 1evpEX-0004Ac-9F
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:05:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44702 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1evpEX-0004AA-2A
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:05:13 -0400
+References: <20180308124901.83533-1-brijesh.singh@amd.com>
+	<20180308124901.83533-9-brijesh.singh@amd.com>
+	<20180308164910.GF4718@redhat.com>
+	<e39191c3-9c83-8c44-f1d2-9fa7a2f7695d@amd.com>
+	<20180308224412.GF3417@localhost.localdomain>
+	<8cf2f9bc-0339-1c80-b53b-ef5915248d1f@redhat.com>
+	<20180313184950.GB3417@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <253374a3-0d09-a29a-94fc-ea4f5718f477@redhat.com>
+Date: Tue, 13 Mar 2018 20:04:51 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 13 Mar 2018 12:03:29 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v11 00/13] Dirty bitmaps postcopy migration
+In-Reply-To: <20180313184950.GB3417@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v12 08/28] target/i386: add Secure
+ Encrypted Virtulization (SEV) object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +34,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: vsementsov@virtuozzo.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.orgfamz@redhat.com, lirans@il.ibm.com, quintela@redhat.com, jsnow@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, amit.shah@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>, Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Markus Armbruster <armbru@redhat.com>, Bruce Rogers <brogers@suse.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, Borislav Petkov <bp@suse.de>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Richard Henderson <richard.henderson@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMzEzMTgwMzIwLjMzOTc5Ni0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNv
-bQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYxMSAwMC8xM10gRGlydHkgYml0bWFwcyBw
-b3N0Y29weSBtaWdyYXRpb24KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gK
-CkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwp
-CmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNl
-ICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENI
-ICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBn
-aXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
-bGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49
-JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRh
-dGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6
-Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAg
-ICAgIHBhdGNoZXcvMjAxODAzMTMxODAzMjAuMzM5Nzk2LTEtdnNlbWVudHNvdkB2aXJ0dW96em8u
-Y29tIC0+IHBhdGNoZXcvMjAxODAzMTMxODAzMjAuMzM5Nzk2LTEtdnNlbWVudHNvdkB2aXJ0dW96
-em8uY29tCkF1dG8gcGFja2luZyB0aGUgcmVwb3NpdG9yeSBpbiBiYWNrZ3JvdW5kIGZvciBvcHRp
-bXVtIHBlcmZvcm1hbmNlLgpTZWUgImdpdCBoZWxwIGdjIiBmb3IgbWFudWFsIGhvdXNla2VlcGlu
-Zy4KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo3MWUwM2M0ZWNjIGlvdGVzdHM6IGFk
-ZCBkaXJ0eSBiaXRtYXAgcG9zdGNvcHkgdGVzdApkYWE1NDhmNzlmIGlvdGVzdHM6IGFkZCBkaXJ0
-eSBiaXRtYXAgbWlncmF0aW9uIHRlc3QKMzUzYzVmZGFlMSBtaWdyYXRpb246IGFkZCBwb3N0Y29w
-eSBtaWdyYXRpb24gb2YgZGlydHkgYml0bWFwcwoxZGEwN2Q0YmEyIG1pZ3JhdGlvbjogYWxsb3cg
-cW1wIGNvbW1hbmQgbWlncmF0ZS1zdGFydC1wb3N0Y29weSBmb3IgYW55IHBvc3Rjb3B5CmI3ODlh
-Mjg4N2UgbWlncmF0aW9uOiBhZGQgaXNfYWN0aXZlX2l0ZXJhdGUgaGFuZGxlcgo0OGViMTRmODU2
-IG1pZ3JhdGlvbi9xZW11LWZpbGU6IGFkZCBxZW11X3B1dF9jb3VudGVkX3N0cmluZygpCjFkNjU0
-OWRhZTEgbWlncmF0aW9uOiBpbmNsdWRlIG1pZ3JhdGVfZGlydHlfYml0bWFwcyBpbiBtaWdyYXRl
-X3Bvc3Rjb3B5CmU5ZTQwYWYzOWEgcWFwaTogYWRkIGRpcnR5LWJpdG1hcHMgbWlncmF0aW9uIGNh
-cGFiaWxpdHkKYzU3NTE4NTAzOCBtaWdyYXRpb246IGludHJvZHVjZSBwb3N0Y29weS1vbmx5IHBl
-bmRpbmcKN2NhZTM1Y2Q3YyBkaXJ0eS1iaXRtYXA6IGFkZCBsb2NrZWQgc3RhdGUKNDdiYmQyYTcw
-YyBibG9jay9kaXJ0eS1iaXRtYXA6IGFkZCBfbG9ja2VkIHZlcnNpb24gb2YgYmRydl9yZWNsYWlt
-X2RpcnR5X2JpdG1hcAo4NzBmZjFkOTE2IGJsb2NrL2RpcnR5LWJpdG1hcDogZml4IGxvY2tpbmcg
-aW4gYmRydl9yZWNsYWltX2RpcnR5X2JpdG1hcAo1ZGNhM2FlMjI2IGJsb2NrL2RpcnR5LWJpdG1h
-cDogYWRkIGJkcnZfZGlydHlfYml0bWFwX2VuYWJsZV9zdWNjZXNzb3IoKQoKPT09IE9VVFBVVCBC
-RUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMzogYmxvY2svZGlydHktYml0bWFwOiBhZGQgYmRy
-dl9kaXJ0eV9iaXRtYXBfZW5hYmxlX3N1Y2Nlc3NvcigpLi4uCkNoZWNraW5nIFBBVENIIDIvMTM6
-IGJsb2NrL2RpcnR5LWJpdG1hcDogZml4IGxvY2tpbmcgaW4gYmRydl9yZWNsYWltX2RpcnR5X2Jp
-dG1hcC4uLgpDaGVja2luZyBQQVRDSCAzLzEzOiBibG9jay9kaXJ0eS1iaXRtYXA6IGFkZCBfbG9j
-a2VkIHZlcnNpb24gb2YgYmRydl9yZWNsYWltX2RpcnR5X2JpdG1hcC4uLgpDaGVja2luZyBQQVRD
-SCA0LzEzOiBkaXJ0eS1iaXRtYXA6IGFkZCBsb2NrZWQgc3RhdGUuLi4KQ2hlY2tpbmcgUEFUQ0gg
-NS8xMzogbWlncmF0aW9uOiBpbnRyb2R1Y2UgcG9zdGNvcHktb25seSBwZW5kaW5nLi4uCkNoZWNr
-aW5nIFBBVENIIDYvMTM6IHFhcGk6IGFkZCBkaXJ0eS1iaXRtYXBzIG1pZ3JhdGlvbiBjYXBhYmls
-aXR5Li4uCkNoZWNraW5nIFBBVENIIDcvMTM6IG1pZ3JhdGlvbjogaW5jbHVkZSBtaWdyYXRlX2Rp
-cnR5X2JpdG1hcHMgaW4gbWlncmF0ZV9wb3N0Y29weS4uLgpDaGVja2luZyBQQVRDSCA4LzEzOiBt
-aWdyYXRpb24vcWVtdS1maWxlOiBhZGQgcWVtdV9wdXRfY291bnRlZF9zdHJpbmcoKS4uLgpDaGVj
-a2luZyBQQVRDSCA5LzEzOiBtaWdyYXRpb246IGFkZCBpc19hY3RpdmVfaXRlcmF0ZSBoYW5kbGVy
-Li4uCkNoZWNraW5nIFBBVENIIDEwLzEzOiBtaWdyYXRpb246IGFsbG93IHFtcCBjb21tYW5kIG1p
-Z3JhdGUtc3RhcnQtcG9zdGNvcHkgZm9yIGFueSBwb3N0Y29weS4uLgpDaGVja2luZyBQQVRDSCAx
-MS8xMzogbWlncmF0aW9uOiBhZGQgcG9zdGNvcHkgbWlncmF0aW9uIG9mIGRpcnR5IGJpdG1hcHMu
-Li4KRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0
-YXRlbWVudAojNzM3OiBGSUxFOiBtaWdyYXRpb24vYmxvY2stZGlydHktYml0bWFwLmM6NjkwOgor
-ICAgIH0gd2hpbGUgKCEocy5mbGFncyAmIERJUlRZX0JJVE1BUF9NSUdfRkxBR19FT1MpKTsKWy4u
-Ll0KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgODE2IGxpbmVzIGNoZWNrZWQKCllvdXIg
-cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDEyLzEzOiBp
-b3Rlc3RzOiBhZGQgZGlydHkgYml0bWFwIG1pZ3JhdGlvbiB0ZXN0Li4uCkNoZWNraW5nIFBBVENI
-IDEzLzEzOiBpb3Rlc3RzOiBhZGQgZGlydHkgYml0bWFwIHBvc3Rjb3B5IHRlc3QuLi4KPT09IE9V
-VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFp
-bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
-XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5v
-cmc=
+On 13/03/2018 19:49, Eduardo Habkost wrote:
+>>>
+>>> Exactly, in other words these two options are part of the guest
+>>> ABI, and QEMU promises to never make the guest ABI depend on the
+>>> host hardware unless you're using "-cpu host".
+>>
+>> This is not entirely true; while MAXPHYADDR is constant downstream
+>> unless using "-cpu host", in practice that behavior is wrong and a guest
+>> could misbehave if passed a MAXPHYADDR that is different from the host's.
+>>
+>> I think this is the same, and management software will have to live with it.
+> 
+> I think they are very far from being equivalent.
+
+Right, I only meant to say that guest ABI actually does depend on the
+host hardware, even outside of "-cpu host".
+
+> But if you tell the guest the wrong C-bit location, guests are
+> likely to rely on it and break.  Migration between hosts with
+> different C-bit locations won't work, will it?
+
+It won't---but as long as the destination hosts fails fast when the
+C-bit location is wrong, it's okay.  What matters is that we don't run
+guest code with the wrong C bit, as you noted.
+
+Paolo
