@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evhlq-0003UC-QI
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:07:07 -0400
+	(envelope-from <luwei.kang@intel.com>) id 1evhuu-0005kT-7X
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:16:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evhlm-0005ak-Qx
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:07:06 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42172 helo=mx1.redhat.com)
+	(envelope-from <luwei.kang@intel.com>) id 1evhur-0003cK-1Z
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:16:28 -0400
+Received: from mga02.intel.com ([134.134.136.20]:63545)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1evhlm-0005aH-Lh
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:07:02 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7335776FB9
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 11:06:57 +0000 (UTC)
-Date: Tue, 13 Mar 2018 11:06:52 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180313110652.GS3048@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180312141714.7223-1-berrange@redhat.com>
-	<20180313092053.GA3545@work-vm>
-	<be16f4e2-7b97-e251-332e-9445e4d9965c@redhat.com>
+	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
+	id 1evhuq-0003ac-Oi
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:16:24 -0400
+From: "Kang, Luwei" <luwei.kang@intel.com>
+Date: Tue, 13 Mar 2018 11:16:18 +0000
+Message-ID: <82D7661F83C1A047AF7DC287873BF1E167EF731C@SHSMSX101.ccr.corp.intel.com>
+References: <1520182116-16485-1-git-send-email-luwei.kang@intel.com>
+	<20180309191048.GA28578@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167EF4877@SHSMSX101.ccr.corp.intel.com>
+	<20180312164517.GS3417@localhost.localdomain>
+In-Reply-To: <20180312164517.GS3417@localhost.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <be16f4e2-7b97-e251-332e-9445e4d9965c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.12 REPOST] migration: convert socket
- server to QIONetListener
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] i386: Add Intel Processor Trace
+ feature support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,57 +32,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mtosatti@redhat.com" <mtosatti@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
 
-On Tue, Mar 13, 2018 at 11:57:17AM +0100, Paolo Bonzini wrote:
-> On 13/03/2018 10:20, Dr. David Alan Gilbert wrote:
-> >>  static void socket_start_incoming_migration(SocketAddress *saddr,
-> >>                                              Error **errp)
-> >>  {
-> >> -    QIOChannelSocket *listen_ioc = qio_channel_socket_new();
-> >> +    QIONetListener *listener = qio_net_listener_new();
-> >>  
-> >> -    qio_channel_set_name(QIO_CHANNEL(listen_ioc),
-> >> -                         "migration-socket-listener");
-> >> +    qio_net_listener_set_name(listener, "migration-socket-listener");
-> >>  
-> >> -    if (qio_channel_socket_listen_sync(listen_ioc, saddr, errp) < 0) {
-> >> -        object_unref(OBJECT(listen_ioc));
-> >> +    if (qio_net_listener_open_sync(listener, saddr, errp) < 0) {
-> >> +        object_unref(OBJECT(listener));
-> >>          return;
-> >>      }
-> >>  
-> >> -    qio_channel_add_watch(QIO_CHANNEL(listen_ioc),
-> >> -                          G_IO_IN,
-> >> -                          socket_accept_incoming_migration,
-> >> -                          listen_ioc,
-> >> -                          (GDestroyNotify)object_unref);
-> >> +    qio_net_listener_set_client_func(listener,
-> >> +                                     socket_accept_incoming_migration,
-> >> +                                     NULL, NULL);
-> >>  }
-> >>  
-> >>  void tcp_start_incoming_migration(const char *host_port, Error **errp)
-> >> -- 
-> >> 2.14.3
-> >>
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
-> 
-> Could this get in 2.12 as a bugfix, even after soft freeze?  It's the
-> last user of qio_channel_listen_sync that blocks full IPv4/IPv6 support.
->  All other users are for vsock/AF_UNIX.
+> > > > +        if (!eax_0 ||
+> > > > +           ((ebx_0 & INTEL_PT_MINIMAL_EBX) !=3D INTEL_PT_MINIMAL_E=
+BX) ||
+> > > > +           ((ecx_0 & INTEL_PT_MINIMAL_ECX) !=3D INTEL_PT_MINIMAL_E=
+CX) ||
+> > > > +           ((eax_1 & INTEL_PT_MTC_BITMAP) !=3D INTEL_PT_MTC_BITMAP=
+) ||
+> > > > +           ((eax_1 & INTEL_PT_ADDR_RANGES_NUM_MASK) <
+> > > > +                                           INTEL_PT_ADDR_RANGES_NU=
+M) ||
+> > > > +           ((ebx_1 & (INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP)=
+) !=3D
+> > > > +                (INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP))) {
+> > >
+> > > I still don't see a check to ensure the host has bit 31 on ecx_0 set =
+to 0, as I mentioned when reviewing v3.
+> >
+> > Hi Eduardo,
+> >     Thanks for the code review. I don't quite understand here why
+> > bit31 must same with host (meaning we must reject a host where ecx_0 & =
+(1 << 31) is set).
+>=20
+> If the guest sees the bit set to 0, it will expect IP payloads with RIP v=
+alues, but the host CPU will generate IP payloads with LIP values.
+> I assume KVM won't do RIP<->LIP translation on the packets generated by t=
+he host before the guest sees them, will it?
 
-I had been thinking of all this conversion as feature, but I guess if we
-squint our eyes a bit we could claim it is just a bugfix on the grounds
-that it is fixing broken IPv4/6 dual stack support.
+Fully understand. Will make a separate patch on this.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Thanks,
+Luwei Kang
+
+>=20
+>=20
+> >     Do you mean PT must be disabled in guest when host bit31 is set?
+> >     Bit 31: If 1, generated packets which contain IP payloads have LIP =
+values, which include the CS base component.
+> >     I can't find any special on this bit. Could you help clarify?
+>=20
+> As far as I understand, this bit is special because KVM can't emulate a v=
+alue that's different from the host.
+>=20
+> --
+> Eduardo
