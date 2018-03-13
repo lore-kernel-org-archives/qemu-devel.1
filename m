@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1evYgr-00059h-Qt
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 21:25:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1evYjb-00065v-OS
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 21:28:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1evYgo-0000hW-At
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 21:25:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34004)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1evYgo-0000gh-3y
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 21:25:18 -0400
-Date: Mon, 12 Mar 2018 22:25:15 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180313012515.GZ3417@localhost.localdomain>
-References: <20180312185503.5746-1-ehabkost@redhat.com>
-	<20180312185503.5746-2-ehabkost@redhat.com>
-	<f8185612-019e-aa2d-7c45-bd1923099f1f@amsat.org>
+	(envelope-from <eblake@redhat.com>) id 1evYja-0003FR-VH
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 21:28:11 -0400
+References: <20180306204819.11266-1-stefanha@redhat.com>
+	<b0babfd7-71b7-c1cb-52a2-994c7cff843b@redhat.com>
+	<20180308173742.GH2769@stefanha-x1.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <784c7895-d140-8236-2ca5-a88946853b09@redhat.com>
+Date: Mon, 12 Mar 2018 20:27:48 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f8185612-019e-aa2d-7c45-bd1923099f1f@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/3] qemu.py: Use items() instead of
- iteritems()
+In-Reply-To: <20180308173742.GH2769@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/2] block: fix
+ nbd-server-stop crash after blockdev-snapshot-sync
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +26,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Stefano Panella <spanella@gmail.com>
 
-On Tue, Mar 13, 2018 at 12:02:39AM +0100, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> On 03/12/2018 07:55 PM, Eduardo Habkost wrote:
-> > items() is less efficient on Python 2.x, but makes the code work
-> > on both Python 2 and Python 3.
-> >=20
-> > Cc: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-> > Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > Cc: Cleber Rosa <crosa@redhat.com>
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >  scripts/qemu.py | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/scripts/qemu.py b/scripts/qemu.py
-> > index 305a946562..08a3e9af5a 100644
-> > --- a/scripts/qemu.py
-> > +++ b/scripts/qemu.py
-> > @@ -277,7 +277,7 @@ class QEMUMachine(object):
-> >      def qmp(self, cmd, conv_keys=3DTrue, **args):
-> >          '''Invoke a QMP command and return the response dict'''
-> >          qmp_args =3D dict()
-> > -        for key, value in args.iteritems():
-> > +        for key, value in args.items():
-> >              if conv_keys:
-> >                  qmp_args[key.replace('_', '-')] =3D value
-> >              else:
-> >=20
->=20
-> http://lists.nongnu.org/archive/html/qemu-devel/2017-12/msg04046.html
+On 03/08/2018 11:37 AM, Stefan Hajnoczi wrote:
+> On Wed, Mar 07, 2018 at 05:27:45PM -0600, Eric Blake wrote:
+>> On 03/06/2018 02:48 PM, Stefan Hajnoczi wrote:
+>>> The blockdev-snapshot-sync command uses bdrv_append() to update all parents to
+>>> point at the external snapshot node.  This breaks BlockBackend's
+>>> blk_add/remove_aio_context_notifier(), which doesn't expect a BDS change.
+>>>
 
-Oops, that series had fallen through the cracks, sorry!
+>> Whose tree should this series go through?  MAINTAINERS didn't flag it as
+>> directly touching any files that normally affect my NBD queue, but given
+>> that the iotest that reproduces the problem uses NBD, I'm fine if you want
+>> it to go through me.
+> 
+> Good question.  Max and Kevin maintain block/block-backend.c so one of
+> them should be happy with this series before it gets merged.
+> 
+> When a patch affects multiple trees, the last sub-maintainer to review
+> it can do the merge.
+> 
+> So if they have already posted their R-b when you are finished, then
+> feel free to merge it!  And vice versa.
 
-I remember merging a series with fixes for Python 3, but now I
-see there were two separate series: "Support building with py2 or
-py3=C2=A8 (already merged), and yours ("iotests: python3
-compatibility=C2=A8).
+Max has reviewed, so this is now queued on my NBD tree, pull request to 
+come shortly.
 
---=20
-Eduardo
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
