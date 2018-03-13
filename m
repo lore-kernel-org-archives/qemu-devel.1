@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eveey-0007vr-UJ
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 03:47:50 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1eveol-0002r3-LN
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 03:57:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eveev-0000WQ-QQ
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 03:47:48 -0400
-References: <20180207155837.92351-1-vsementsov@virtuozzo.com>
-	<20180207155837.92351-6-vsementsov@virtuozzo.com>
-	<20180312153020.GI3219@work-vm>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <af82d663-f37c-2857-214c-83e348a5f52a@virtuozzo.com>
-Date: Tue, 13 Mar 2018 10:47:36 +0300
-MIME-Version: 1.0
-In-Reply-To: <20180312153020.GI3219@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v10 05/12] migration: introduce
- postcopy-only pending
+	(envelope-from <guangrong.xiao@gmail.com>) id 1eveoi-0007L2-Ko
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 03:57:55 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:41357)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1eveoi-0007K5-EG
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 03:57:52 -0400
+Received: by mail-pl0-x241.google.com with SMTP id d9-v6so10875862plo.8
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 00:57:52 -0700 (PDT)
+From: guangrong.xiao@gmail.com
+Date: Tue, 13 Mar 2018 15:57:31 +0800
+Message-Id: <20180313075739.11194-1-xiaoguangrong@tencent.com>
+Subject: [Qemu-devel] [PATCH 0/8] migration: improve and cleanup compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,68 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
+To: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-12.03.2018 18:30, Dr. David Alan Gilbert wrote:
-> * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
->> There would be savevm states (dirty-bitmap) which can migrate only in
->> postcopy stage. The corresponding pending is introduced here.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
+From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-[...]
+This is the first part of our work to improve compression to make it
+be more useful in the production.
 
->>   static MigIterateState migration_iteration_run(MigrationState *s)
->>   {
->> -    uint64_t pending_size, pend_post, pend_nonpost;
->> +    uint64_t pending_size, pend_pre, pend_compat, pend_post;
->>       bool in_postcopy = s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE;
->>   
->> -    qemu_savevm_state_pending(s->to_dst_file, s->threshold_size,
->> -                              &pend_nonpost, &pend_post);
->> -    pending_size = pend_nonpost + pend_post;
->> +    qemu_savevm_state_pending(s->to_dst_file, s->threshold_size, &pend_pre,
->> +                              &pend_compat, &pend_post);
->> +    pending_size = pend_pre + pend_compat + pend_post;
->>   
->>       trace_migrate_pending(pending_size, s->threshold_size,
->> -                          pend_post, pend_nonpost);
->> +                          pend_pre, pend_compat, pend_post);
->>   
->>       if (pending_size && pending_size >= s->threshold_size) {
->>           /* Still a significant amount to transfer */
->>           if (migrate_postcopy() && !in_postcopy &&
->> -            pend_nonpost <= s->threshold_size &&
->> -            atomic_read(&s->start_postcopy)) {
->> +            pend_pre <= s->threshold_size &&
->> +            (atomic_read(&s->start_postcopy) ||
->> +             (pend_pre + pend_compat <= s->threshold_size)))
-> This change does something different from the description;
-> it causes a postcopy_start even if the user never ran the postcopy-start
-> command; so sorry, we can't do that; because postcopy for RAM is
-> something that users can enable but only switch into when they've given
-> up on it completing normally.
->
-> However, I guess that leaves you with a problem; which is what happens
-> to the system when you've run out of pend_pre+pend_compat but can't
-> complete because pend_post is non-0; so I don't know the answer to that.
->
->
+The first patch resolves the problem that the migration thread spends
+too much CPU resource to compression memory if it jumps to a new block
+that causes the network is used very deficient.
 
-Hmm. Here, we go to postcopy only if "pend_pre + pend_compat <= 
-s->threshold_size". Pre-patch, in this case we will go to 
-migration_completion(). So, precopy stage is finishing anyway. So, we 
-want in this case to finish ram migration like it was finished by 
-migration_completion(), and then, run postcopy, which will handle only 
-dirty bitmaps, yes?
+The second patch fixes the performance issue that too many VM-exits
+happen during live migration if compression is being used, it is caused
+by huge memory returned to kernel frequently as the memory is allocated
+and freed for every signal call to compress2()
 
-Hmm2. Looked through migration_completion(), I don't understand, how it 
-finishes ram migration without postcopy. It calls 
-qemu_savevm_state_complete_precopy(), which skips states with 
-has_postcopy=true, which is ram...
+The remaining patches clean the code up dramatically  
+
+
+Xiao Guangrong (8):
+  migration: stop compressing page in migration thread
+  migration: stop allocating and freeing memory frequently
+  migration: support to detect compression and decompression errors
+  migration: introduce control_save_page()
+  migration: move calling control_save_page to the common place
+  migration: move calling save_zero_page to the common place
+  migration: introduce save_normal_page()
+  migration: remove ram_save_compressed_page()
+
+ migration/qemu-file.c |  38 ++++-
+ migration/qemu-file.h |   6 +-
+ migration/ram.c       | 430 +++++++++++++++++++++++++++++---------------------
+ 3 files changed, 290 insertions(+), 184 deletions(-)
 
 -- 
-Best regards,
-Vladimir
+2.14.3
