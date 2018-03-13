@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evnUz-0007U3-UI
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:14:09 -0400
+	(envelope-from <jsnow@redhat.com>) id 1evnZq-0003QS-HQ
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:19:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evnUw-0000ys-2u
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:14:05 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Tue, 13 Mar 2018 12:13:43 -0500
-Message-Id: <20180313171345.659672-16-eblake@redhat.com>
-In-Reply-To: <20180313171345.659672-1-eblake@redhat.com>
-References: <20180313171345.659672-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 15/17] iotests.py: tiny refactor: move system
- imports up
+	(envelope-from <jsnow@redhat.com>) id 1evnZn-0003uu-91
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:19:06 -0400
+References: <20171128121055.6954-1-den@openvz.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <36e5edb4-f9c9-de14-2134-fd8d0eb102f4@redhat.com>
+Date: Tue, 13 Mar 2018 13:18:54 -0400
+MIME-Version: 1.0
+In-Reply-To: <20171128121055.6954-1-den@openvz.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for 2.11 0/2] QEMU crashes with CD device
+ without media
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,39 +24,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
+To: "Denis V. Lunev" <den@openvz.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180312152126.286890-7-vsementsov@virtuozzo.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- tests/qemu-iotests/iotests.py | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 1bcc9ca57dc..c1302a2f9b1 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -23,13 +23,14 @@ import subprocess
- import string
- import unittest
- import sys
--sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'scripts'))
--import qtest
- import struct
- import json
- import signal
- import logging
+On 11/28/2017 07:10 AM, Denis V. Lunev wrote:
+> There are 2 cases I have spotted so far:
+> 1) IDE ATAPI read processing. Actually this was reported from field
+> 2) QEMU IO hmp command (found during evaluation of (1))
+> 
+> SCSI code checks during access that blk_is_available(). These patches add
+> same checks on different code paths.
+> 
+> Pls decide whether these patches should go through sub-system trees or via
+> block tree.
+> 
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> CC: John Snow <jsnow@redhat.com>
+> CC: Kevin Wolf <kwolf@redhat.com>
+> CC: Stefan Hajnoczi <stefanha@redhat.com>
+> 
+> 
 
-+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'scripts'))
-+import qtest
-+
+Denis, I was never able to figure this out, but Stefan added a more
+rigorous block-wide fix that should prevent these crashes. If you see
+any anomalies in the ATAPI device again please let me know.
 
- # This will not work if arguments contain spaces but is necessary if we
- # want to support the override options that ./check supports.
--- 
-2.14.3
+Sorry I wasn't able to help any faster.
