@@ -1,16 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdQ-0001fn-0v
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:48 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdV-0001jK-CE
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdP-0004mH-2H
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:43 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdU-0004qE-CL
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:49 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Mar 2018 17:17:53 +0100
-Message-Id: <20180313161803.1814-32-kwolf@redhat.com>
+Date: Tue, 13 Mar 2018 17:17:48 +0100
+Message-Id: <20180313161803.1814-27-kwolf@redhat.com>
 In-Reply-To: <20180313161803.1814-1-kwolf@redhat.com>
 References: <20180313161803.1814-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 31/41] block: Fix flags in reopen queue
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 26/41] luks: Catch integer overflow for huge
+ sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,48 +26,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Fam Zheng <famz@redhat.com>
+When you request an image size close to UINT64_MAX, the addition of the
+crypto header may cause an integer overflow. Catch it instead of
+silently truncating the image size.
 
-Reopen flags are not synchronized according to the
-bdrv_reopen_queue_child precedence until bdrv_reopen_prepare. It is a
-bit too late: we already check the consistency in bdrv_check_perm before
-that.
-
-This fixes the bug that when bdrv_reopen a RO node as RW, the flags for
-backing child are wrong. Before, we could recurse with flags.rw=1; now,
-role->inherit_options + update_flags_from_options will make sure to
-clear the bit when necessary.  Note that this will not clear an
-explicitly set bit, as in the case of parallel block jobs (e.g.
-test_stream_parallel in 030), because the explicit options include
-'read-only=false' (for an intermediate node used by a different job).
-
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- block.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ block/crypto.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/block.c b/block.c
-index 75a9fd49de..e02d83b027 100644
---- a/block.c
-+++ b/block.c
-@@ -2883,8 +2883,16 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
- 
-     /* Inherit from parent node */
-     if (parent_options) {
-+        QemuOpts *opts;
-+        QDict *options_copy;
-         assert(!flags);
-         role->inherit_options(&flags, options, parent_flags, parent_options);
-+        options_copy = qdict_clone_shallow(options);
-+        opts = qemu_opts_create(&bdrv_runtime_opts, NULL, 0, &error_abort);
-+        qemu_opts_absorb_qdict(opts, options_copy, NULL);
-+        update_flags_from_options(&flags, opts);
-+        qemu_opts_del(opts);
-+        QDECREF(options_copy);
-     }
- 
-     /* Old values are used for options that aren't set yet */
--- 
+diff --git a/block/crypto.c b/block/crypto.c
+index 00fb40c631..e0b8856f74 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -102,6 +102,11 @@ static ssize_t block_crypto_init_func(QCryptoBlock *=
+block,
+ {
+     struct BlockCryptoCreateData *data =3D opaque;
+=20
++    if (data->size > INT64_MAX || headerlen > INT64_MAX - data->size) {
++        error_setg(errp, "The requested file size is too large");
++        return -EFBIG;
++    }
++
+     /* User provided size should reflect amount of space made
+      * available to the guest, so we must take account of that
+      * which will be used by the crypto header
+--=20
 2.13.6
