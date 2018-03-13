@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60169)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdf-0001yV-Be
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:19:04 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdi-00022M-71
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:19:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdX-0004x6-QF
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:59 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdX-0004wW-Ky
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:19:02 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Mar 2018 17:17:58 +0100
-Message-Id: <20180313161803.1814-37-kwolf@redhat.com>
+Date: Tue, 13 Mar 2018 17:17:57 +0100
+Message-Id: <20180313161803.1814-36-kwolf@redhat.com>
 In-Reply-To: <20180313161803.1814-1-kwolf@redhat.com>
 References: <20180313161803.1814-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 36/41] qed: Support .bdrv_co_create
+Subject: [Qemu-devel] [PULL 35/41] qcow: Support .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,269 +22,278 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-This adds the .bdrv_co_create driver callback to qed, which
+This adds the .bdrv_co_create driver callback to qcow, which
 enables image creation over QMP.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 ---
- qapi/block-core.json |  25 ++++++-
- block/qed.c          | 204 ++++++++++++++++++++++++++++++++++-----------------
- 2 files changed, 162 insertions(+), 67 deletions(-)
+ qapi/block-core.json |  21 +++++-
+ block/qcow.c         | 196 ++++++++++++++++++++++++++++++++++-----------------
+ 2 files changed, 150 insertions(+), 67 deletions(-)
 
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 7b7d5a01fd..d091817855 100644
+index e0ab01d92d..7b7d5a01fd 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -3703,6 +3703,29 @@
-             '*refcount-bits':   'int' } }
+@@ -3641,6 +3641,25 @@
+             '*cluster-size':    'size' } }
  
  ##
-+# @BlockdevCreateOptionsQed:
++# @BlockdevCreateOptionsQcow:
 +#
-+# Driver specific image creation options for qed.
++# Driver specific image creation options for qcow.
 +#
 +# @file             Node to create the image format on
 +# @size             Size of the virtual disk in bytes
 +# @backing-file     File name of the backing file if a backing file
 +#                   should be used
-+# @backing-fmt      Name of the block driver to use for the backing file
-+# @cluster-size     Cluster size in bytes (default: 65536)
-+# @table-size       L1/L2 table size (in clusters)
++# @encrypt          Encryption options if the image should be encrypted
 +#
 +# Since: 2.12
 +##
-+{ 'struct': 'BlockdevCreateOptionsQed',
++{ 'struct': 'BlockdevCreateOptionsQcow',
 +  'data': { 'file':             'BlockdevRef',
 +            'size':             'size',
 +            '*backing-file':    'str',
-+            '*backing-fmt':     'BlockdevDriver',
-+            '*cluster-size':    'size',
-+            '*table-size':      'int' } }
++            '*encrypt':         'QCryptoBlockCreateOptions' } }
 +
 +##
- # @BlockdevCreateOptionsRbd:
+ # @BlockdevQcow2Version:
  #
- # Driver specific image creation options for rbd/Ceph.
-@@ -3864,7 +3887,7 @@
+ # @v2:  The original QCOW2 format as introduced in qemu 0.10 (version 2)
+@@ -3843,8 +3862,8 @@
+       'null-co':        'BlockdevCreateNotSupported',
+       'nvme':           'BlockdevCreateNotSupported',
        'parallels':      'BlockdevCreateOptionsParallels',
-       'qcow':           'BlockdevCreateOptionsQcow',
++      'qcow':           'BlockdevCreateOptionsQcow',
        'qcow2':          'BlockdevCreateOptionsQcow2',
--      'qed':            'BlockdevCreateNotSupported',
-+      'qed':            'BlockdevCreateOptionsQed',
+-      'qcow':           'BlockdevCreateNotSupported',
+       'qed':            'BlockdevCreateNotSupported',
        'quorum':         'BlockdevCreateNotSupported',
        'raw':            'BlockdevCreateNotSupported',
-       'rbd':            'BlockdevCreateOptionsRbd',
-diff --git a/block/qed.c b/block/qed.c
-index 5e6a6bfaa0..46a84beeed 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -20,6 +20,11 @@
- #include "trace.h"
- #include "qed.h"
- #include "sysemu/block-backend.h"
-+#include "qapi/qmp/qdict.h"
+diff --git a/block/qcow.c b/block/qcow.c
+index 47a18d9a3a..2e3770ca63 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -33,6 +33,8 @@
+ #include <zlib.h>
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qstring.h"
 +#include "qapi/qobject-input-visitor.h"
 +#include "qapi/qapi-visit-block-core.h"
-+
-+static QemuOptsList qed_create_opts;
+ #include "crypto/block.h"
+ #include "migration/blocker.h"
+ #include "block/crypto.h"
+@@ -86,6 +88,8 @@ typedef struct BDRVQcowState {
+     Error *migration_blocker;
+ } BDRVQcowState;
  
- static int bdrv_qed_probe(const uint8_t *buf, int buf_size,
-                           const char *filename)
-@@ -594,57 +599,95 @@ static void bdrv_qed_close(BlockDriverState *bs)
-     qemu_vfree(s->l1_table);
++static QemuOptsList qcow_create_opts;
++
+ static int decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset);
+ 
+ static int qcow_probe(const uint8_t *buf, int buf_size, const char *filename)
+@@ -810,62 +814,50 @@ static void qcow_close(BlockDriverState *bs)
+     error_free(s->migration_blocker);
  }
  
--static int qed_create(const char *filename, uint32_t cluster_size,
--                      uint64_t image_size, uint32_t table_size,
--                      const char *backing_file, const char *backing_fmt,
--                      QemuOpts *opts, Error **errp)
-+static int coroutine_fn bdrv_qed_co_create(BlockdevCreateOptions *opts,
-+                                           Error **errp)
+-static int coroutine_fn qcow_co_create_opts(const char *filename, QemuOpts *opts,
+-                                            Error **errp)
++static int coroutine_fn qcow_co_create(BlockdevCreateOptions *opts,
++                                       Error **errp)
  {
--    QEDHeader header = {
--        .magic = QED_MAGIC,
--        .cluster_size = cluster_size,
--        .table_size = table_size,
--        .header_size = 1,
--        .features = 0,
--        .compat_features = 0,
--        .l1_table_offset = cluster_size,
--        .image_size = image_size,
--    };
-+    BlockdevCreateOptionsQed *qed_opts;
-+    BlockBackend *blk = NULL;
-+    BlockDriverState *bs = NULL;
-+
-+    QEDHeader header;
-     QEDHeader le_header;
-     uint8_t *l1_table = NULL;
--    size_t l1_size = header.cluster_size * header.table_size;
++    BlockdevCreateOptionsQcow *qcow_opts;
+     int header_size, backing_filename_len, l1_size, shift, i;
+     QCowHeader header;
+     uint8_t *tmp;
+     int64_t total_size = 0;
+-    char *backing_file = NULL;
 -    Error *local_err = NULL;
-+    size_t l1_size;
-     int ret = 0;
--    BlockBackend *blk;
+     int ret;
++    BlockDriverState *bs;
+     BlockBackend *qcow_blk;
+-    char *encryptfmt = NULL;
+-    QDict *options;
+-    QDict *encryptopts = NULL;
+-    QCryptoBlockCreateOptions *crypto_opts = NULL;
+     QCryptoBlock *crypto = NULL;
+ 
+-    /* Read out options */
+-    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+-                          BDRV_SECTOR_SIZE);
++    assert(opts->driver == BLOCKDEV_DRIVER_QCOW);
++    qcow_opts = &opts->u.qcow;
++
++    /* Sanity checks */
++    total_size = qcow_opts->size;
+     if (total_size == 0) {
+         error_setg(errp, "Image size is too small, cannot be zero length");
+-        ret = -EINVAL;
+-        goto cleanup;
++        return -EINVAL;
+     }
+ 
+-    backing_file = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
+-    encryptfmt = qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT_FORMAT);
+-    if (encryptfmt) {
+-        if (qemu_opt_get(opts, BLOCK_OPT_ENCRYPT)) {
+-            error_setg(errp, "Options " BLOCK_OPT_ENCRYPT " and "
+-                       BLOCK_OPT_ENCRYPT_FORMAT " are mutually exclusive");
+-            ret = -EINVAL;
+-            goto cleanup;
+-        }
+-    } else if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
+-        encryptfmt = g_strdup("aes");
++    if (qcow_opts->has_encrypt &&
++        qcow_opts->encrypt->format != Q_CRYPTO_BLOCK_FORMAT_QCOW)
++    {
++        error_setg(errp, "Unsupported encryption format");
++        return -EINVAL;
+     }
  
 -    ret = bdrv_create_file(filename, opts, &local_err);
 -    if (ret < 0) {
 -        error_propagate(errp, local_err);
--        return ret;
-+    assert(opts->driver == BLOCKDEV_DRIVER_QED);
-+    qed_opts = &opts->u.qed;
-+
-+    /* Validate options and set default values */
-+    if (!qed_opts->has_cluster_size) {
-+        qed_opts->cluster_size = QED_DEFAULT_CLUSTER_SIZE;
-+    }
-+    if (!qed_opts->has_table_size) {
-+        qed_opts->table_size = QED_DEFAULT_TABLE_SIZE;
-     }
- 
--    blk = blk_new_open(filename, NULL, NULL,
--                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
--                       &local_err);
--    if (blk == NULL) {
--        error_propagate(errp, local_err);
-+    if (!qed_is_cluster_size_valid(qed_opts->cluster_size)) {
-+        error_setg(errp, "QED cluster size must be within range [%u, %u] "
-+                         "and power of 2",
-+                   QED_MIN_CLUSTER_SIZE, QED_MAX_CLUSTER_SIZE);
-+        return -EINVAL;
-+    }
-+    if (!qed_is_table_size_valid(qed_opts->table_size)) {
-+        error_setg(errp, "QED table size must be within range [%u, %u] "
-+                         "and power of 2",
-+                   QED_MIN_TABLE_SIZE, QED_MAX_TABLE_SIZE);
-+        return -EINVAL;
-+    }
-+    if (!qed_is_image_size_valid(qed_opts->size, qed_opts->cluster_size,
-+                                 qed_opts->table_size))
-+    {
-+        error_setg(errp, "QED image size must be a non-zero multiple of "
-+                         "cluster size and less than %" PRIu64 " bytes",
-+                   qed_max_image_size(qed_opts->cluster_size,
-+                                      qed_opts->table_size));
-+        return -EINVAL;
-+    }
-+
+-        goto cleanup;
 +    /* Create BlockBackend to write to the image */
-+    bs = bdrv_open_blockdev_ref(qed_opts->file, errp);
++    bs = bdrv_open_blockdev_ref(qcow_opts->file, errp);
 +    if (bs == NULL) {
-         return -EIO;
++        return -EIO;
      }
  
-+    blk = blk_new(BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
-+    ret = blk_insert_bs(blk, bs, errp);
+-    qcow_blk = blk_new_open(filename, NULL, NULL,
+-                            BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
+-                            &local_err);
+-    if (qcow_blk == NULL) {
+-        error_propagate(errp, local_err);
+-        ret = -EIO;
+-        goto cleanup;
++    qcow_blk = blk_new(BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
++    ret = blk_insert_bs(qcow_blk, bs, errp);
 +    if (ret < 0) {
-+        goto out;
-+    }
-     blk_set_allow_write_beyond_eof(blk, true);
++        goto exit;
+     }
+-
+     blk_set_allow_write_beyond_eof(qcow_blk, true);
  
-+    /* Prepare image format */
-+    header = (QEDHeader) {
-+        .magic = QED_MAGIC,
-+        .cluster_size = qed_opts->cluster_size,
-+        .table_size = qed_opts->table_size,
-+        .header_size = 1,
-+        .features = 0,
-+        .compat_features = 0,
-+        .l1_table_offset = qed_opts->cluster_size,
-+        .image_size = qed_opts->size,
-+    };
-+
-+    l1_size = header.cluster_size * header.table_size;
-+
-     /* File must start empty and grow, check truncate is supported */
-     ret = blk_truncate(blk, 0, PREALLOC_MODE_OFF, errp);
++    /* Create image format */
+     ret = blk_truncate(qcow_blk, 0, PREALLOC_MODE_OFF, errp);
      if (ret < 0) {
-         goto out;
+         goto exit;
+@@ -877,16 +869,15 @@ static int coroutine_fn qcow_co_create_opts(const char *filename, QemuOpts *opts
+     header.size = cpu_to_be64(total_size);
+     header_size = sizeof(header);
+     backing_filename_len = 0;
+-    if (backing_file) {
+-        if (strcmp(backing_file, "fat:")) {
++    if (qcow_opts->has_backing_file) {
++        if (strcmp(qcow_opts->backing_file, "fat:")) {
+             header.backing_file_offset = cpu_to_be64(header_size);
+-            backing_filename_len = strlen(backing_file);
++            backing_filename_len = strlen(qcow_opts->backing_file);
+             header.backing_file_size = cpu_to_be32(backing_filename_len);
+             header_size += backing_filename_len;
+         } else {
+             /* special backing file for vvfat */
+-            g_free(backing_file);
+-            backing_file = NULL;
++            qcow_opts->has_backing_file = false;
+         }
+         header.cluster_bits = 9; /* 512 byte cluster to avoid copying
+                                     unmodified sectors */
+@@ -901,26 +892,10 @@ static int coroutine_fn qcow_co_create_opts(const char *filename, QemuOpts *opts
+ 
+     header.l1_table_offset = cpu_to_be64(header_size);
+ 
+-    options = qemu_opts_to_qdict(opts, NULL);
+-    qdict_extract_subqdict(options, &encryptopts, "encrypt.");
+-    QDECREF(options);
+-    if (encryptfmt) {
+-        if (!g_str_equal(encryptfmt, "aes")) {
+-            error_setg(errp, "Unknown encryption format '%s', expected 'aes'",
+-                       encryptfmt);
+-            ret = -EINVAL;
+-            goto exit;
+-        }
++    if (qcow_opts->has_encrypt) {
+         header.crypt_method = cpu_to_be32(QCOW_CRYPT_AES);
+ 
+-        crypto_opts = block_crypto_create_opts_init(
+-            Q_CRYPTO_BLOCK_FORMAT_QCOW, encryptopts, errp);
+-        if (!crypto_opts) {
+-            ret = -EINVAL;
+-            goto exit;
+-        }
+-
+-        crypto = qcrypto_block_create(crypto_opts, "encrypt.",
++        crypto = qcrypto_block_create(qcow_opts->encrypt, "encrypt.",
+                                       NULL, NULL, NULL, errp);
+         if (!crypto) {
+             ret = -EINVAL;
+@@ -936,9 +911,9 @@ static int coroutine_fn qcow_co_create_opts(const char *filename, QemuOpts *opts
+         goto exit;
      }
  
 -    if (backing_file) {
-+    if (qed_opts->has_backing_file) {
-         header.features |= QED_F_BACKING_FILE;
-         header.backing_filename_offset = sizeof(le_header);
--        header.backing_filename_size = strlen(backing_file);
-+        header.backing_filename_size = strlen(qed_opts->backing_file);
- 
--        if (qed_fmt_is_raw(backing_fmt)) {
--            header.features |= QED_F_BACKING_FORMAT_NO_PROBE;
-+        if (qed_opts->has_backing_fmt) {
-+            const char *backing_fmt = BlockdevDriver_str(qed_opts->backing_fmt);
-+            if (qed_fmt_is_raw(backing_fmt)) {
-+                header.features |= QED_F_BACKING_FORMAT_NO_PROBE;
-+            }
++    if (qcow_opts->has_backing_file) {
+         ret = blk_pwrite(qcow_blk, sizeof(header),
+-                         backing_file, backing_filename_len, 0);
++                         qcow_opts->backing_file, backing_filename_len, 0);
+         if (ret != backing_filename_len) {
+             goto exit;
          }
-     }
- 
-@@ -653,7 +696,7 @@ static int qed_create(const char *filename, uint32_t cluster_size,
-     if (ret < 0) {
-         goto out;
-     }
--    ret = blk_pwrite(blk, sizeof(le_header), backing_file,
-+    ret = blk_pwrite(blk, sizeof(le_header), qed_opts->backing_file,
-                      header.backing_filename_size, 0);
-     if (ret < 0) {
-         goto out;
-@@ -669,6 +712,7 @@ static int qed_create(const char *filename, uint32_t cluster_size,
- out:
-     g_free(l1_table);
-     blk_unref(blk);
-+    bdrv_unref(bs);
-     return ret;
- }
- 
-@@ -676,51 +720,78 @@ static int coroutine_fn bdrv_qed_co_create_opts(const char *filename,
-                                                 QemuOpts *opts,
-                                                 Error **errp)
- {
--    uint64_t image_size = 0;
--    uint32_t cluster_size = QED_DEFAULT_CLUSTER_SIZE;
--    uint32_t table_size = QED_DEFAULT_TABLE_SIZE;
--    char *backing_file = NULL;
--    char *backing_fmt = NULL;
+@@ -959,12 +934,100 @@ static int coroutine_fn qcow_co_create_opts(const char *filename, QemuOpts *opts
+     ret = 0;
+ exit:
+     blk_unref(qcow_blk);
+-cleanup:
+-    QDECREF(encryptopts);
+-    g_free(encryptfmt);
+     qcrypto_block_free(crypto);
+-    qapi_free_QCryptoBlockCreateOptions(crypto_opts);
+-    g_free(backing_file);
++    return ret;
++}
++
++static int coroutine_fn qcow_co_create_opts(const char *filename,
++                                            QemuOpts *opts, Error **errp)
++{
 +    BlockdevCreateOptions *create_options = NULL;
++    BlockDriverState *bs = NULL;
 +    QDict *qdict = NULL;
 +    QObject *qobj;
 +    Visitor *v;
-+    BlockDriverState *bs = NULL;
++    const char *val;
 +    Error *local_err = NULL;
-     int ret;
- 
--    image_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
--                          BDRV_SECTOR_SIZE);
--    backing_file = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
--    backing_fmt = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FMT);
--    cluster_size = qemu_opt_get_size_del(opts,
--                                         BLOCK_OPT_CLUSTER_SIZE,
--                                         QED_DEFAULT_CLUSTER_SIZE);
--    table_size = qemu_opt_get_size_del(opts, BLOCK_OPT_TABLE_SIZE,
--                                       QED_DEFAULT_TABLE_SIZE);
--
--    if (!qed_is_cluster_size_valid(cluster_size)) {
--        error_setg(errp, "QED cluster size must be within range [%u, %u] "
--                         "and power of 2",
--                   QED_MIN_CLUSTER_SIZE, QED_MAX_CLUSTER_SIZE);
++    int ret;
++
 +    static const QDictRenames opt_renames[] = {
 +        { BLOCK_OPT_BACKING_FILE,       "backing-file" },
-+        { BLOCK_OPT_BACKING_FMT,        "backing-fmt" },
-+        { BLOCK_OPT_CLUSTER_SIZE,       "cluster-size" },
-+        { BLOCK_OPT_TABLE_SIZE,         "table-size" },
++        { BLOCK_OPT_ENCRYPT,            BLOCK_OPT_ENCRYPT_FORMAT },
 +        { NULL, NULL },
 +    };
 +
 +    /* Parse options and convert legacy syntax */
-+    qdict = qemu_opts_to_qdict_filtered(opts, NULL, &qed_create_opts, true);
++    qdict = qemu_opts_to_qdict_filtered(opts, NULL, &qcow_create_opts, true);
++
++    val = qdict_get_try_str(qdict, BLOCK_OPT_ENCRYPT);
++    if (val && !strcmp(val, "on")) {
++        qdict_put_str(qdict, BLOCK_OPT_ENCRYPT, "qcow");
++    } else if (val && !strcmp(val, "off")) {
++        qdict_del(qdict, BLOCK_OPT_ENCRYPT);
++    }
++
++    val = qdict_get_try_str(qdict, BLOCK_OPT_ENCRYPT_FORMAT);
++    if (val && !strcmp(val, "aes")) {
++        qdict_put_str(qdict, BLOCK_OPT_ENCRYPT_FORMAT, "qcow");
++    }
 +
 +    if (!qdict_rename_keys(qdict, opt_renames, errp)) {
-         ret = -EINVAL;
--        goto finish;
++        ret = -EINVAL;
 +        goto fail;
-     }
--    if (!qed_is_table_size_valid(table_size)) {
--        error_setg(errp, "QED table size must be within range [%u, %u] "
--                         "and power of 2",
--                   QED_MIN_TABLE_SIZE, QED_MAX_TABLE_SIZE);
++    }
 +
 +    /* Create and open the file (protocol layer) */
 +    ret = bdrv_create_file(filename, opts, &local_err);
@@ -301,21 +310,16 @@ index 5e6a6bfaa0..46a84beeed 100644
 +    }
 +
 +    /* Now get the QAPI type BlockdevCreateOptions */
-+    qdict_put_str(qdict, "driver", "qed");
++    qdict_put_str(qdict, "driver", "qcow");
 +    qdict_put_str(qdict, "file", bs->node_name);
 +
 +    qobj = qdict_crumple(qdict, errp);
 +    QDECREF(qdict);
 +    qdict = qobject_to_qdict(qobj);
 +    if (qdict == NULL) {
-         ret = -EINVAL;
--        goto finish;
++        ret = -EINVAL;
 +        goto fail;
-     }
--    if (!qed_is_image_size_valid(image_size, cluster_size, table_size)) {
--        error_setg(errp, "QED image size must be a non-zero multiple of "
--                         "cluster size and less than %" PRIu64 " bytes",
--                   qed_max_image_size(cluster_size, table_size));
++    }
 +
 +    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
 +    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
@@ -323,24 +327,22 @@ index 5e6a6bfaa0..46a84beeed 100644
 +
 +    if (local_err) {
 +        error_propagate(errp, local_err);
-         ret = -EINVAL;
--        goto finish;
++        ret = -EINVAL;
 +        goto fail;
-     }
- 
--    ret = qed_create(filename, cluster_size, image_size, table_size,
--                     backing_file, backing_fmt, opts, errp);
-+    /* Silently round up size */
-+    assert(create_options->driver == BLOCKDEV_DRIVER_QED);
-+    create_options->u.qed.size =
-+        ROUND_UP(create_options->u.qed.size, BDRV_SECTOR_SIZE);
++    }
 +
-+    /* Create the qed image (format layer) */
-+    ret = bdrv_qed_co_create(create_options, errp);
- 
--finish:
--    g_free(backing_file);
--    g_free(backing_fmt);
++    /* Silently round up size */
++    assert(create_options->driver == BLOCKDEV_DRIVER_QCOW);
++    create_options->u.qcow.size =
++        ROUND_UP(create_options->u.qcow.size, BDRV_SECTOR_SIZE);
++
++    /* Create the qcow image (format layer) */
++    ret = qcow_co_create(create_options, errp);
++    if (ret < 0) {
++        goto fail;
++    }
++
++    ret = 0;
 +fail:
 +    QDECREF(qdict);
 +    bdrv_unref(bs);
@@ -348,13 +350,13 @@ index 5e6a6bfaa0..46a84beeed 100644
      return ret;
  }
  
-@@ -1602,6 +1673,7 @@ static BlockDriver bdrv_qed = {
-     .bdrv_close               = bdrv_qed_close,
-     .bdrv_reopen_prepare      = bdrv_qed_reopen_prepare,
-     .bdrv_child_perm          = bdrv_format_default_perms,
-+    .bdrv_co_create           = bdrv_qed_co_create,
-     .bdrv_co_create_opts      = bdrv_qed_co_create_opts,
-     .bdrv_has_zero_init       = bdrv_has_zero_init_1,
-     .bdrv_co_block_status     = bdrv_qed_co_block_status,
+@@ -1128,6 +1191,7 @@ static BlockDriver bdrv_qcow = {
+     .bdrv_close		= qcow_close,
+     .bdrv_child_perm        = bdrv_format_default_perms,
+     .bdrv_reopen_prepare    = qcow_reopen_prepare,
++    .bdrv_co_create         = qcow_co_create,
+     .bdrv_co_create_opts    = qcow_co_create_opts,
+     .bdrv_has_zero_init     = bdrv_has_zero_init_1,
+     .supports_backing       = true,
 -- 
 2.13.6
