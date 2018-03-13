@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1evmnd-0002qx-Px
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:29:18 -0400
+	(envelope-from <groug@kaod.org>) id 1evmnh-0002uX-CI
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:29:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1evmna-0000ty-Jb
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:29:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37112)
+	(envelope-from <groug@kaod.org>) id 1evmne-0000vj-4f
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:29:21 -0400
+Received: from 10.mo173.mail-out.ovh.net ([46.105.74.148]:37989)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1evmna-0000tS-Aw
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:29:14 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7A8D665D1F
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 16:29:13 +0000 (UTC)
-Date: Tue, 13 Mar 2018 10:29:11 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180313102911.339d7ffa@w520.home>
-In-Reply-To: <1520945798-50640-1-git-send-email-pbonzini@redhat.com>
-References: <1520945798-50640-1-git-send-email-pbonzini@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1evmnd-0000pz-Qq
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:29:18 -0400
+Received: from player711.ha.ovh.net (unknown [10.109.105.110])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 74BB6B12BE
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 17:29:07 +0100 (CET)
+Date: Tue, 13 Mar 2018 17:28:55 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180313172855.41995f0b@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <CAJSP0QX6jciq69Q69Dv_jsy2_aC6sx-e9ev-8faVn11+YK-xhg@mail.gmail.com>
+References: <20180311201239.25506-1-nia.alarie@gmail.com>
+	<486e1b60-e453-c3de-040b-8b2951ddf3a5@redhat.com>
+	<20180312140229.66930d5d@bahia.lan>
+	<20180312130829.GR3493@redhat.com>
+	<20180312142131.397c5ba1@bahia.lan>
+	<CA+k8WDrpNMcDSqSy_L3Ucyj++Kvz2AQR_DsbHAdOiPbW9WVn5w@mail.gmail.com>
+	<CAJSP0QX6jciq69Q69Dv_jsy2_aC6sx-e9ev-8faVn11+YK-xhg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 00/22] KVM patches for QEMU 2.12 soft freeze
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] 9p: Convert use of atoi to qemu_strtol to
+ allow error checking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,114 +36,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: nee <nia.alarie@gmail.com>, "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Jim Mussared <jim@groklearning.com>, Joel Stanley <joel@jms.id.au>
 
-On Tue, 13 Mar 2018 13:56:16 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Tue, 13 Mar 2018 15:52:41 +0000
+Stefan Hajnoczi <stefanha@gmail.com> wrote:
 
-> The following changes since commit fb5fff15881ba7a002924b967eb211c002897983:
-> 
->   Merge remote-tracking branch 'remotes/kraxel/tags/vga-20180312-pull-request' into staging (2018-03-12 18:35:37 +0000)
-> 
-> are available in the git repository at:
-> 
-> 
->   git://github.com/bonzini/qemu.git tags/for-upstream-sev
-> 
-> for you to fetch changes up to 297dabdd6b39ce1e2ed2e69b4b2afc024e07ad09:
-> 
->   sev/i386: add sev_get_capabilities() (2018-03-13 12:04:04 +0100)
-> 
-> ----------------------------------------------------------------
-> * Migrate MSR_SMI_COUNT (Liran)
-> * Update kernel headers (Gerd, myself)
-> * SEV support (Brijesh)
-> 
-> I have not tested non-x86 compilation, but I reordered the SEV patches
-> so that all non-x86-specific changes go first to catch any possible
-> issues (which weren't there anyway :)).
+> On Tue, Mar 13, 2018 at 3:25 PM, nee <nia.alarie@gmail.com> wrote:
+> > On Mon, Mar 12, 2018 at 1:21 PM, Greg Kurz <groug@kaod.org> wrote: =20
+> >> On Mon, 12 Mar 2018 13:08:29 +0000
+> >> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+> >> =20
+> >>> On Mon, Mar 12, 2018 at 02:02:29PM +0100, Greg Kurz wrote: =20
+> >>> > On Mon, 12 Mar 2018 07:12:52 -0500
+> >>> > Eric Blake <eblake@redhat.com> wrote:
+> >>> > =20
+> >>> > > On 03/11/2018 03:12 PM, Nia Alarie wrote: =20
+> >>> > > > Signed-off-by: Nia Alarie <nia.alarie@gmail.com>
+> >>> > > > ---
+> >>> > > >   hw/9pfs/9p.c | 12 ++++++++++--
+> >>> > > >   1 file changed, 10 insertions(+), 2 deletions(-)
+> >>> > > > =20
+> >>> > > =20
+> >>> > > >       } else if (perm & P9_STAT_MODE_LINK) {
+> >>> > > > -        int32_t ofid =3D atoi(extension.data);
+> >>> > > > -        V9fsFidState *ofidp =3D get_fid(pdu, ofid);
+> >>> > > > +        long ofid;
+> >>> > > > +        V9fsFidState *ofidp;
+> >>> > > > +
+> >>> > > > +        if (qemu_strtol(extension.data, NULL, 10, &ofid) ||
+> >>> > > > +            ofid > INT32_MAX || ofid < INT32_MIN) { =20
+> >>> > >
+> >>> > > Dan has a pending patch that will add qemu_strtoi, which might be=
+ a
+> >>> > > nicer fit for this situation:
+> >>> > >
+> >>> > > https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg00952.ht=
+ml
+> >>> > >
+> >>> > > int32_t is not necessarily int, but all platforms that compile qe=
+mu have
+> >>> > > 'int32_t' and 'int' both at 32 bits, so it's simpler to change to=
+ 'int
+> >>> > > ofid' and use Dan's function than it is to parse to long and then=
+ do
+> >>> > > bounds checking.  Except that Dan still needs to post an updated =
+version
+> >>> > > of his patch...
+> >>> > > =20
+> >>> >
+> >>> > I wasn't aware of Dan's patch but I agree it would result in a nicer
+> >>> > change for 9p. This being said, tomorrow is soft freeze... is there
+> >>> > a chance Dan's patch reaches master anytime soon ? =20
+> >>>
+> >>> I just sent an update of my series. If it gets acked by Eric, I'd be =
+able
+> >>> to send a pull request today.
+> >>>
+> >>> Regards,
+> >>> Daniel =20
+> >>
+> >> Great !
+> >>
+> >> Nia,
+> >>
+> >> Could you please respin your patch on top of Daniel's series, using
+> >> qemu_strtoui() ?
+> >>
+> >> Thanks,
+> >>
+> >> --
+> >> Greg =20
+> >
+> > I'm a bit unclear on how this works so I thought I'd ask here before I
+> > send any more patches - this is CCed to my mentors as well. It's
+> > "tomorrow" now, but I don't understand how soft freezes work or the
+> > process beyond "I send this patch to qemu-devel and people say if I
+> > should re-send it with changes, or that it's been accepted" :) =20
+>=20
+> Don't worry about the soft freeze for now.  The soft freeze is the
+> deadline for new features.  People are trying to get their new
+> features into the upcoming QEMU 2.12 release.
+>=20
+> Either Greg will still merge your patch after soft freeze since it can
+> be considered a bug fix (fixes are allowed during freeze).  Or Greg
+> might keep your patch queued until the QEMU 2.12 release has been made
+> (around April 17th 2018).
+>=20
 
-32bit build issues, feel free to roll into culprit commits:
+Nia (or Nee?) 's patch is a bug fix. I'll happily merge it when it's
+ready.
 
-commit b9ca34408a4d523d4484e6e8f3334723132eacd9
-Author: Alex Williamson <alex.williamson@redhat.com>
-Date:   Tue Mar 13 10:03:22 2018 -0600
+> The QEMU release schedule is here (but don't worry about it):
+> https://wiki.qemu.org/Planning/2.12
+>=20
+> I suggest taking the following action.  Wait until Daniel Berrange's
+> pull request is merged (it will probably happen today):
+> https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg03662.html
+>=20
+> Then rebase your patch onto the latest qemu.git/master so you can take
+> advantage of qemu_strtoi().  You can use "git rebase -i origin/master"
+> to do this.
+>=20
+> Recompile/test your patch and then send it with "[PATCH v2] 9p:
+> Convert use of atoi to qemu_strtoi to allow error checking" as the
+> email subject.
+>=20
 
-    i386/sev: 32bit build fixes
-    
-    Use %z for portable size_t printing.
-    
-    Cannot cast directly from point to integer of different size.
-    
-    Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+Nia had already sent a v2, which got comments, so it'll be v3.
 
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 34733f925475..019d84cef2c7 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -70,7 +70,7 @@ sev_ioctl(int fd, int cmd, void *data, int *error)
- 
-     input.id = cmd;
-     input.sev_fd = fd;
--    input.data = (__u64)data;
-+    input.data = (__u64)(unsigned long)data;
- 
-     r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_OP, &input);
- 
-@@ -131,13 +131,13 @@ sev_ram_block_added(RAMBlockNotifier *n, void *host, size_t size)
-     int r;
-     struct kvm_enc_region range;
- 
--    range.addr = (__u64)host;
-+    range.addr = (__u64)(unsigned long)host;
-     range.size = size;
- 
-     trace_kvm_memcrypt_register_region(host, size);
-     r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_REG_REGION, &range);
-     if (r) {
--        error_report("%s: failed to register region (%p+%#lx) error '%s'",
-+        error_report("%s: failed to register region (%p+%#zx) error '%s'",
-                      __func__, host, size, strerror(errno));
-         exit(1);
-     }
-@@ -149,13 +149,13 @@ sev_ram_block_removed(RAMBlockNotifier *n, void *host, size_t size)
-     int r;
-     struct kvm_enc_region range;
- 
--    range.addr = (__u64)host;
-+    range.addr = (__u64)(unsigned long)host;
-     range.size = size;
- 
-     trace_kvm_memcrypt_unregister_region(host, size);
-     r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_UNREG_REGION, &range);
-     if (r) {
--        error_report("%s: failed to unregister region (%p+%#lx)",
-+        error_report("%s: failed to unregister region (%p+%#zx)",
-                      __func__, host, size);
-     }
- }
-@@ -588,7 +588,7 @@ sev_launch_update_data(uint8_t *addr, uint64_t len)
-         return 1;
-     }
- 
--    update.uaddr = (__u64)addr;
-+    update.uaddr = (__u64)(unsigned long)addr;
-     update.len = len;
-     trace_kvm_sev_launch_update_data(addr, len);
-     ret = sev_ioctl(sev_state->sev_fd, KVM_SEV_LAUNCH_UPDATE_DATA,
-diff --git a/target/i386/trace-events b/target/i386/trace-events
-index b1fbde6e40fe..6a19a69af5d0 100644
---- a/target/i386/trace-events
-+++ b/target/i386/trace-events
-@@ -8,8 +8,8 @@ kvm_x86_update_msi_routes(int num) "Updated %d MSI routes"
- 
- # target/i386/sev.c
- kvm_sev_init(void) ""
--kvm_memcrypt_register_region(void *addr, size_t len) "addr %p len 0x%lu"
--kvm_memcrypt_unregister_region(void *addr, size_t len) "addr %p len 0x%lu"
-+kvm_memcrypt_register_region(void *addr, size_t len) "addr %p len 0x%zu"
-+kvm_memcrypt_unregister_region(void *addr, size_t len) "addr %p len 0x%zu"
- kvm_sev_change_state(const char *old, const char *new) "%s -> %s"
- kvm_sev_launch_start(int policy, void *session, void *pdh) "policy 0x%x session %p pdh %p"
- kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len 0x%" PRIu64
+> > There are several more conversions from ato* to qemu_strto* I'd like
+> > to submit from now on. Should I send them as using qemu_strtol now, to
+> > get them "out there" before my own personal deadlines, and send
+> > further patches to convert them to qemu_strtoi later, or should I
+> > submit patches that use qemu_strtoi? I'm not sure of the current
+> > status of Daniel's patches. =20
+>=20
+> Daniel's patches will be in qemu.git/master (probably) later today.  I
+> suggest waiting for them and using qemu_strtoi() where using an int
+> type is appropriate.
+>=20
+> If you have questions along the way, feel free to ask on the QEMU IRC
+> channel: #qemu on irc.oftc.net.
+>=20
+> Stefan
+
+Agreed with all of the above. Thanks Stefan for providing this comprehensive
+explanation to Nia.
+
+Cheers,
+
+--
+Greg
