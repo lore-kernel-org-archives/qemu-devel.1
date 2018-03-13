@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1evlUF-0005Qm-In
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 11:05:14 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1evla5-000167-Lx
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 11:11:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1evlU6-0006Vh-2Q
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 11:05:11 -0400
-References: <20180313144730.2184-1-kwolf@redhat.com>
-	<20180313144730.2184-9-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <c36b638a-f8be-670a-f2fb-88584af1dbca@redhat.com>
-Date: Tue, 13 Mar 2018 16:04:50 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1evla1-0000dg-87
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 11:11:13 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49758 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1evla1-0000dM-37
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 11:11:09 -0400
+References: <1520535787-6223-1-git-send-email-ian.jackson@eu.citrix.com>
+	<1520535787-6223-2-git-send-email-ian.jackson@eu.citrix.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e2f1cee4-8dad-d901-ae2f-51495a855b4e@redhat.com>
+Date: Tue, 13 Mar 2018 16:11:00 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180313144730.2184-9-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="L4WpSLWk8Osv6HZ8FnLILNBrGfUqwFaLg"
-Subject: Re: [Qemu-devel] [PATCH v2 8/8] vpc: Require aligned size in
- .bdrv_co_create
+In-Reply-To: <1520535787-6223-2-git-send-email-ian.jackson@eu.citrix.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 01/12] checkpatch: Add
+ xendevicemodel_handle to the list of types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: den@openvz.org, jcody@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
+To: Ian Jackson <ian.jackson@eu.citrix.com>, qemu-devel@nongnu.org
+Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---L4WpSLWk8Osv6HZ8FnLILNBrGfUqwFaLg
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: den@openvz.org, jcody@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
-Message-ID: <c36b638a-f8be-670a-f2fb-88584af1dbca@redhat.com>
-Subject: Re: [PATCH v2 8/8] vpc: Require aligned size in .bdrv_co_create
-References: <20180313144730.2184-1-kwolf@redhat.com>
- <20180313144730.2184-9-kwolf@redhat.com>
-In-Reply-To: <20180313144730.2184-9-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-03-13 15:47, Kevin Wolf wrote:
-> Perform the rounding to match a CHS geometry only in the legacy code
-> path in .bdrv_co_create_opts. QMP now requires that the user already
-> passes a CHS aligned image size, unless force-size=3Dtrue is given.
->=20
-> CHS alignment is required to make the image compatible with Virtual PC,=
-
-> but not for use with newer Microsoft hypervisors.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+On 08/03/2018 20:02, Ian Jackson wrote:
+> This avoids checkpatch misparsing (as statements) long function
+> definitions or declarations, which sometimes start with constructs
+> like this:
+> 
+>   static inline int xendevicemodel_relocate_memory(
+>       xendevicemodel_handle *dmod, domid_t domid, ...
+> 
+> CC: Eric Blake <eblake@redhat.com>
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> CC: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
 > ---
->  block/vpc.c | 113 +++++++++++++++++++++++++++++++++++++++++++---------=
---------
->  1 file changed, 82 insertions(+), 31 deletions(-)
+> v6.1: New patch
+> ---
+>  scripts/checkpatch.pl | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index d1fe79b..3e488f7 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -266,6 +266,7 @@ our @typeList = (
+>  	qr{target_(?:u)?long},
+>  	qr{hwaddr},
+>  	qr{xml${Ident}},
+> +	qr{xendevicemodel_handle},
+>  );
+>  
+>  # This can be modified by sub possible.  Since it can be empty, be careful
+> -- 
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Or just rename it so that it is CamelCase.  Then checkpatch will be happy.
 
-
---L4WpSLWk8Osv6HZ8FnLILNBrGfUqwFaLg
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqn6JMSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AU78H/0c7i6rE3qRagH474XhvrNQhD7qzEpdR
-M56bDV1h6kWQzcZMs1+WZLLIifdAiLxvpsd27L+qhkawL3iPRUedMCT+cwyUWjiM
-autFLleXs+cuH3mW8AYQ3FOUXofxYfebIU3ktD0fLNeKwHP68jknCRGOHwcYEkRd
-frg0OuzBFVjgIQDt3fw7R0iTdw1zRf1pNEYq/qj+UccvbmTSILxIBjYAg6cuvpRS
-/PUqr2NWB3AeolvIsAO+JCbTQbyNNBqao4vv4QqtfhT/hdj4ybx6fCEsii3S5nEh
-qIlW7TShdWLUEI695bUhYw+oIe2wIe60B9pvrMbTXPQ3nU/lhze4MaQ=
-=Xwjb
------END PGP SIGNATURE-----
-
---L4WpSLWk8Osv6HZ8FnLILNBrGfUqwFaLg--
+Paolo
