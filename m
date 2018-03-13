@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1evkn8-0004km-7g
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 10:20:39 -0400
+	(envelope-from <famz@redhat.com>) id 1evkn7-0004jK-1j
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 10:20:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1evkn4-00034D-7h
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 10:20:38 -0400
+	(envelope-from <famz@redhat.com>) id 1evkn3-00033x-TI
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 10:20:37 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Tue, 13 Mar 2018 22:20:03 +0800
-Message-Id: <20180313142003.12124-3-famz@redhat.com>
+Date: Tue, 13 Mar 2018 22:20:02 +0800
+Message-Id: <20180313142003.12124-2-famz@redhat.com>
 In-Reply-To: <20180313142003.12124-1-famz@redhat.com>
 References: <20180313142003.12124-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/2] iotests: Add regression test for commit
- base locking
+Subject: [Qemu-devel] [PATCH v3 1/2] block: Fix flags in reopen queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,50 +22,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
+Reopen flags are not synchronized according to the
+bdrv_reopen_queue_child precedence until bdrv_reopen_prepare. It is a
+bit too late: we already check the consistency in bdrv_check_perm before
+that.
+
+This fixes the bug that when bdrv_reopen a RO node as RW, the flags for
+backing child are wrong. Before, we could recurse with flags.rw=1; now,
+role->inherit_options + update_flags_from_options will make sure to
+clear the bit when necessary.  Note that this will not clear an
+explicitly set bit, as in the case of parallel block jobs (e.g.
+test_stream_parallel in 030), because the explicit options include
+'read-only=false' (for an intermediate node used by a different job).
+
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tests/qemu-iotests/153     | 12 ++++++++++++
- tests/qemu-iotests/153.out |  5 +++++
- 2 files changed, 17 insertions(+)
+ block.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
-index adfd02695b..a0fd815483 100755
---- a/tests/qemu-iotests/153
-+++ b/tests/qemu-iotests/153
-@@ -178,6 +178,18 @@ rm -f "${TEST_IMG}.lnk" &>/dev/null
- ln -s ${TEST_IMG} "${TEST_IMG}.lnk" || echo "Failed to create link"
- _run_qemu_with_images "${TEST_IMG}.lnk" "${TEST_IMG}"
+diff --git a/block.c b/block.c
+index 75a9fd49de..a121d2ebcc 100644
+--- a/block.c
++++ b/block.c
+@@ -2883,8 +2883,15 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
  
-+echo
-+echo "== Active commit to intermediate layer should work when base in use =="
-+_launch_qemu -drive format=$IMGFMT,file="${TEST_IMG}.a",id=drive0,if=none \
-+             -device virtio-blk,drive=drive0
-+
-+_send_qemu_cmd $QEMU_HANDLE \
-+    "{ 'execute': 'qmp_capabilities' }" \
-+    'return'
-+_run_cmd $QEMU_IMG commit -b "${TEST_IMG}.b" "${TEST_IMG}.c"
-+
-+_cleanup_qemu
-+
- _launch_qemu
+     /* Inherit from parent node */
+     if (parent_options) {
++        QemuOpts *opts;
++        QDict *options_copy;
+         assert(!flags);
+         role->inherit_options(&flags, options, parent_flags, parent_options);
++        options_copy = qdict_clone_shallow(options);
++        opts = qemu_opts_create(&bdrv_runtime_opts, NULL, 0, &error_abort);
++        qemu_opts_absorb_qdict(opts, options_copy, NULL);
++        update_flags_from_options(&flags, opts);
++        qemu_opts_del(opts);
+     }
  
- _send_qemu_cmd $QEMU_HANDLE \
-diff --git a/tests/qemu-iotests/153.out b/tests/qemu-iotests/153.out
-index 34309cfb20..bb721cb747 100644
---- a/tests/qemu-iotests/153.out
-+++ b/tests/qemu-iotests/153.out
-@@ -372,6 +372,11 @@ Is another process using the image?
- == Symbolic link ==
- QEMU_PROG: -drive if=none,file=TEST_DIR/t.qcow2: Failed to get "write" lock
- Is another process using the image?
-+
-+== Active commit to intermediate layer should work when base in use ==
-+{"return": {}}
-+
-+_qemu_img_wrapper commit -b TEST_DIR/t.qcow2.b TEST_DIR/t.qcow2.c
- {"return": {}}
- Adding drive
- 
+     /* Old values are used for options that aren't set yet */
 -- 
 2.14.3
