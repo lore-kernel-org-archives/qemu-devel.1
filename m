@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57690)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1evpHK-0004Ou-4B
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:08:07 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58841)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <eblake@redhat.com>) id 1evpKA-0006LS-Ne
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:11:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1evpHG-0005jz-3R
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:08:06 -0400
-Received: from mout.gmx.net ([212.227.17.20]:39685)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1evpHF-0005is-Pb
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:08:02 -0400
-References: <20180312201305.16972-1-berrange@redhat.com>
-	<20180312201305.16972-3-berrange@redhat.com>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <8462ca2a-5f81-21d5-0a03-6e5bda18b00e@gmx.com>
-Date: Tue, 13 Mar 2018 20:10:10 +0100
+	(envelope-from <eblake@redhat.com>) id 1evpK9-00075J-Q3
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:11:02 -0400
+References: <cover.1520952419.git.berto@igalia.com>
+	<0b8f83b4f26071753dc409645ad8c6f6e215468a.1520952419.git.berto@igalia.com>
+	<979d86bf-f1fa-4049-a811-94d6d8b9c667@redhat.com>
+	<w51muzb4xs7.fsf@maestria.local.igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <31c00205-3c65-4274-8201-3453b2904491@redhat.com>
+Date: Tue, 13 Mar 2018 14:10:40 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180312201305.16972-3-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="1kIb1wMDFnxCm7c5GwbQ8eB5obF7DbgbN"
-Subject: Re: [Qemu-devel] [PULL 2/9] cutils: add qemu_strtoi & qemu_strtoui
- parsers for int/unsigned int types
+In-Reply-To: <w51muzb4xs7.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] qcow2: Give the refcount cache the
+ minimum possible size by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +27,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1kIb1wMDFnxCm7c5GwbQ8eB5obF7DbgbN
-From: Kamil Rytarowski <n54@gmx.com>
-To: =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8462ca2a-5f81-21d5-0a03-6e5bda18b00e@gmx.com>
-Subject: Re: [Qemu-devel] [PULL 2/9] cutils: add qemu_strtoi & qemu_strtoui
- parsers for int/unsigned int types
-References: <20180312201305.16972-1-berrange@redhat.com>
- <20180312201305.16972-3-berrange@redhat.com>
-In-Reply-To: <20180312201305.16972-3-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 03/13/2018 01:48 PM, Alberto Garcia wrote:
+> On Tue 13 Mar 2018 07:23:36 PM CET, Eric Blake wrote:
+>>> +                *refcount_cache_size =
+>>> +                    MIN(combined_cache_size, min_refcount_cache);
+>>
+>> but here, if combined_cache_size is smaller than min_refcount_cache,
+>>
+>>> +                *l2_cache_size = combined_cache_size - *refcount_cache_size;
+>>
+>> then l2_cache_size is set to a negative value.
+> 
+> No, it's set to 0.
+> 
+> If combined == 4k and min_refcount == 256, then
+> 
+>     refcount_cache_size = MIN(4k, 256k) // 4k
+>     l2_cache_size = 4k - 4k; // 0
 
-On 12.03.2018 21:12, Daniel P. Berrang=C3=A9 wrote:
-> From: "Daniel P. Berrange" <berrange@redhat.com>
->=20
-> There are qemu_strtoNN functions for various sized integers. This adds =
-two
-> more for plain int & unsigned int types, with suitable range checking.
->=20
+Ah. Mental breakdown on my part in trying to compute (x - MIN()).
 
-There is a prior art in NetBSD with strtoi(3) and strtou(3).
+> 
+> Then the caller ensures that it's always set to the minimum (as it did
+> with the previous code).
 
-http://netbsd.gw.com/cgi-bin/man-cgi?strtoi++NetBSD-current
-http://netbsd.gw.com/cgi-bin/man-cgi?strtou++NetBSD-current
+So the caller will use larger than the requested limits if the requested 
+limits are too small, and we are okay with calculations resulting in 0 
+here.  All right, thanks for stepping me through my error; you're good 
+to go with:
 
-This is a clean room alternative for strtonum(3) with compat with some
-other OSes.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-The original code is in:
-
-https://github.com/NetBSD/src/blob/trunk/common/lib/libc/stdlib/
-
-It uses a wrapper for regular strtol(3)-like functions and strtol_l(3).
-
-A simpler strtoi(3) wrapper is used in dhcpcd:
-
-https://github.com/NetBSD/src/blob/trunk/external/bsd/dhcpcd/dist/compat/=
-
-
-It has one difference compared to new POSIX (release 2016 or so) - no
-conversion at all is ECANCELED, not EINVAL. I think ECANCELED makes more
-sense and is distinguishable with input base error, and should be preserv=
-ed.
-
-
---1kIb1wMDFnxCm7c5GwbQ8eB5obF7DbgbN
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlqoIhIMHG41NEBnbXgu
-Y29tAAoJEEuzCOmwLnZsX7MP/1gTs1+snXtCpE05ASXqL1TzwB53AZQhW5QQoXS+
-n9sEw4BQsJPMrrPod5Jo8WZ29sGpZHvjpgXm9PKssTLFzLceR/H6KQ0pZO4vwz8V
-tbgbgyvNjr84wo56TInXpL8Vyrw9RcdAKtOCOuzTioEyx/b+XI1UWM7jZokImUUL
-msOPyvTVYtSBccln67Y6F/a2N/QO2gHUsSdBVOznR4AnVcfzqSHPXdpQHsbS2V9P
-Qpj4n97Li/XKTzBqkpeavl92FQt30pOfbLWhcDBYIU6Qt2ljJOGS0fQoQglbufqh
-xI3ESlKJ7W2AjJsfUl4hlEku94zeiVKofn0B7VkWlbO1VwIdsyvvGsfjRrYgebnT
-yrmb0chdobXTadwUqzzEjtfhYwgT5PkDr1NTwwiNGlEEuPv+h+EJOnRKulFvRzZn
-h7bHzChTnnmlEwkYSlToxCtKV2+ZIvBZtv0cCj3KI9Xj6H/uUqZVGI9UVLUV8O3p
-SKYy0Qy2g+KYejRutfCSOBZ6tx7+BX9p6ttz6ZfOW6MnFp8Y+PpdtAN9k4e3lfyY
-z2aBozeeBqMmsPUTzyrplylkZNsZuYHecLdnCnn9DCeRJSCUCraYRAWiGwN6VTfn
-MhkU4VFrEsAG5emeDH3zDzCncV5AmtesjwECJKMhajN0IVRfrAzlkRy7JxC8Q6Gb
-rIrw
-=RGxA
------END PGP SIGNATURE-----
-
---1kIb1wMDFnxCm7c5GwbQ8eB5obF7DbgbN--
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
