@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1evsif-0006Jh-Hr
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 18:48:34 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1evsig-0006KG-5y
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 18:48:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1evsib-00044h-6a
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 18:48:33 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:36937)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1evsid-00046M-QY
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 18:48:34 -0400
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:44650)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1evsia-000444-Vx
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 18:48:29 -0400
-Received: by mail-wr0-x242.google.com with SMTP id z12so2563700wrg.4
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 15:48:28 -0700 (PDT)
+	id 1evsid-00045p-Gm
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 18:48:31 -0400
+Received: by mail-wr0-x22b.google.com with SMTP id v65so2494678wrc.11
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 15:48:31 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 13 Mar 2018 23:47:04 +0100
-Message-Id: <20180313224719.4954-55-pbonzini@redhat.com>
+Date: Tue, 13 Mar 2018 23:47:06 +0100
+Message-Id: <20180313224719.4954-57-pbonzini@redhat.com>
 In-Reply-To: <20180313224719.4954-1-pbonzini@redhat.com>
 References: <20180313224719.4954-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 54/69] replay: fixed replay_enable_events
+Subject: [Qemu-devel] [PULL 56/69] replay: added replay log format
+ description
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +29,97 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Cc: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-This patch fixes assignment to internal events_enabled variable.
-Now it is set only in record/replay mode. This affects the behavior
-of the external functions that check this flag.
+This patch adds description of the replay log file format
+into the docs/replay.txt.
 
 Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20180227095209.1060.45884.stgit@pasha-VirtualBox>
+Message-Id: <20180227095220.1060.58759.stgit@pasha-VirtualBox>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 ---
- replay/replay-events.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ docs/replay.txt | 69 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 69 insertions(+)
 
-diff --git a/replay/replay-events.c b/replay/replay-events.c
-index 768b505f3d..e858254074 100644
---- a/replay/replay-events.c
-+++ b/replay/replay-events.c
-@@ -67,7 +67,9 @@ static void replay_run_event(Event *event)
- 
- void replay_enable_events(void)
- {
--    events_enabled = true;
-+    if (replay_mode != REPLAY_MODE_NONE) {
-+        events_enabled = true;
-+    }
- }
- 
- bool replay_has_events(void)
-@@ -141,7 +143,7 @@ void replay_add_event(ReplayAsyncEventKind event_kind,
- 
- void replay_bh_schedule_event(QEMUBH *bh)
- {
--    if (replay_mode != REPLAY_MODE_NONE && events_enabled) {
-+    if (events_enabled) {
-         uint64_t id = replay_get_current_step();
-         replay_add_event(REPLAY_ASYNC_EVENT_BH, bh, NULL, id);
-     } else {
-@@ -161,7 +163,7 @@ void replay_add_input_sync_event(void)
- 
- void replay_block_event(QEMUBH *bh, uint64_t id)
- {
--    if (replay_mode != REPLAY_MODE_NONE && events_enabled) {
-+    if (events_enabled) {
-         replay_add_event(REPLAY_ASYNC_EVENT_BLOCK, bh, NULL, id);
-     } else {
-         qemu_bh_schedule(bh);
+diff --git a/docs/replay.txt b/docs/replay.txt
+index 486c1e0e9d..c52407fe23 100644
+--- a/docs/replay.txt
++++ b/docs/replay.txt
+@@ -232,3 +232,72 @@ Audio devices
+ Audio data is recorded and replay automatically. The command line for recording
+ and replaying must contain identical specifications of audio hardware, e.g.:
+  -soundhw ac97
++
++Replay log format
++-----------------
++
++Record/replay log consits of the header and the sequence of execution
++events. The header includes 4-byte replay version id and 8-byte reserved
++field. Version is updated every time replay log format changes to prevent
++using replay log created by another build of qemu.
++
++The sequence of the events describes virtual machine state changes.
++It includes all non-deterministic inputs of VM, synchronization marks and
++instruction counts used to correctly inject inputs at replay.
++
++Synchronization marks (checkpoints) are used for synchronizing qemu threads
++that perform operations with virtual hardware. These operations may change
++system's state (e.g., change some register or generate interrupt) and
++therefore should execute synchronously with CPU thread.
++
++Every event in the log includes 1-byte event id and optional arguments.
++When argument is an array, it is stored as 4-byte array length
++and corresponding number of bytes with data.
++Here is the list of events that are written into the log:
++
++ - EVENT_INSTRUCTION. Instructions executed since last event.
++   Argument: 4-byte number of executed instructions.
++ - EVENT_INTERRUPT. Used to synchronize interrupt processing.
++ - EVENT_EXCEPTION. Used to synchronize exception handling.
++ - EVENT_ASYNC. This is a group of events. They are always processed
++   together with checkpoints. When such an event is generated, it is
++   stored in the queue and processed only when checkpoint occurs.
++   Every such event is followed by 1-byte checkpoint id and 1-byte
++   async event id from the following list:
++     - REPLAY_ASYNC_EVENT_BH. Bottom-half callback. This event synchronizes
++       callbacks that affect virtual machine state, but normally called
++       asyncronously.
++       Argument: 8-byte operation id.
++     - REPLAY_ASYNC_EVENT_INPUT. Input device event. Contains
++       parameters of keyboard and mouse input operations
++       (key press/release, mouse pointer movement).
++       Arguments: 9-16 bytes depending of input event.
++     - REPLAY_ASYNC_EVENT_INPUT_SYNC. Internal input synchronization event.
++     - REPLAY_ASYNC_EVENT_CHAR_READ. Character (e.g., serial port) device input
++       initiated by the sender.
++       Arguments: 1-byte character device id.
++                  Array with bytes were read.
++     - REPLAY_ASYNC_EVENT_BLOCK. Block device operation. Used to synchronize
++       operations with disk and flash drives with CPU.
++       Argument: 8-byte operation id.
++     - REPLAY_ASYNC_EVENT_NET. Incoming network packet.
++       Arguments: 1-byte network adapter id.
++                  4-byte packet flags.
++                  Array with packet bytes.
++ - EVENT_SHUTDOWN. Occurs when user sends shutdown event to qemu,
++   e.g., by closing the window.
++ - EVENT_CHAR_WRITE. Used to synchronize character output operations.
++   Arguments: 4-byte output function return value.
++              4-byte offset in the output array.
++ - EVENT_CHAR_READ_ALL. Used to synchronize character input operations,
++   initiated by qemu.
++   Argument: Array with bytes that were read.
++ - EVENT_CHAR_READ_ALL_ERROR. Unsuccessful character input operation,
++   initiated by qemu.
++   Argument: 4-byte error code.
++ - EVENT_CLOCK + clock_id. Group of events for host clock read operations.
++   Argument: 8-byte clock value.
++ - EVENT_CHECKPOINT + checkpoint_id. Checkpoint for synchronization of
++   CPU, internal threads, and asynchronous input events. May be followed
++   by one or more EVENT_ASYNC events.
++ - EVENT_END. Last event in the log.
 -- 
 2.14.3
