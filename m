@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1evnZq-0003QS-HQ
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:19:07 -0400
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1evnZv-0003VV-N5
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:19:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1evnZn-0003uu-91
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:19:06 -0400
-References: <20171128121055.6954-1-den@openvz.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <36e5edb4-f9c9-de14-2134-fd8d0eb102f4@redhat.com>
-Date: Tue, 13 Mar 2018 13:18:54 -0400
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1evnZs-0003yz-90
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:19:11 -0400
+Received: from mail.uni-paderborn.de ([131.234.142.9]:56368)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1evnZr-0003xX-Uy
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:19:08 -0400
+References: <CAFEAcA8Pu=SkYCPwCnRdKTEFPScsZhj4vJm0dTs+jV1jTWOAog@mail.gmail.com>
+	<0304e590-ab51-649b-7cee-bb7c5be6f5e4@redhat.com>
+	<c7b075f5-8084-99c0-02e0-3da555bea4df@mail.uni-paderborn.de>
+	<87y3j1jn8z.fsf@linaro.org>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <08f1ea76-5b50-267e-4dfa-fbd39d19baff@mail.uni-paderborn.de>
+Date: Tue, 13 Mar 2018 18:18:54 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171128121055.6954-1-den@openvz.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <87y3j1jn8z.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for 2.11 0/2] QEMU crashes with CD device
- without media
+Subject: Re: [Qemu-devel] Deprecate tilegx ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,32 +31,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Chen Gang <chengang@emindsoft.com.cn>, Chen Gang <gang.chen.5i5j@gmail.com>, Chen Gang <xili_gchen_5257@hotmail.com>, Richard Henderson <rth@twiddle.net>
 
+On 03/09/2018 04:13 PM, Alex Bennée wrote:
+> Bastian Koppelmann <kbastian@mail.uni-paderborn.de> writes:
+[...]
+>> I always saw it as a big plus that QEMU supports nearly any
+>> architecture, no matter how obscure it is. So I'm a bit more hesitant on
+>> dropping architectures quickly.
+> All things being equal I agree, however there is a maintenance burden
+> for the QEMU upstream, especially if the only active use if on
+> out-of-tree branches or behind the closed doors of research groups.
+>
+> Looking at https://wiki.qemu.org/Documentation/Platforms/TileGX it
+> doesn't give much of an idea of where I would get toolchains to build
+> guest binaries or what guest user-space I could run.
 
+I'm not saying, we shouldn't drop them. To me it felt like we brought 
+just another target to the chop block while we were at it.
 
-On 11/28/2017 07:10 AM, Denis V. Lunev wrote:
-> There are 2 cases I have spotted so far:
-> 1) IDE ATAPI read processing. Actually this was reported from field
-> 2) QEMU IO hmp command (found during evaluation of (1))
-> 
-> SCSI code checks during access that blk_is_available(). These patches add
-> same checks on different code paths.
-> 
-> Pls decide whether these patches should go through sub-system trees or via
-> block tree.
-> 
-> Signed-off-by: Denis V. Lunev <den@openvz.org>
-> CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> CC: John Snow <jsnow@redhat.com>
-> CC: Kevin Wolf <kwolf@redhat.com>
-> CC: Stefan Hajnoczi <stefanha@redhat.com>
-> 
-> 
+Maybe a good approach is to deprecate the target first, then ask if 
+somebody else is willing to maintain it, and if this fails, drop it.
 
-Denis, I was never able to figure this out, but Stefan added a more
-rigorous block-wide fix that should prevent these crashes. If you see
-any anomalies in the ATAPI device again please let me know.
-
-Sorry I wasn't able to help any faster.
+Cheers,
+Bastian
