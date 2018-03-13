@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1evkn7-0004jJ-0x
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 10:20:37 -0400
+	(envelope-from <famz@redhat.com>) id 1evkn8-0004km-7g
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 10:20:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1evkn4-000344-0J
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 10:20:37 -0400
+	(envelope-from <famz@redhat.com>) id 1evkn4-00034D-7h
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 10:20:38 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Tue, 13 Mar 2018 22:20:01 +0800
-Message-Id: <20180313142003.12124-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 0/2] block: Fix permission during reopen
+Date: Tue, 13 Mar 2018 22:20:03 +0800
+Message-Id: <20180313142003.12124-3-famz@redhat.com>
+In-Reply-To: <20180313142003.12124-1-famz@redhat.com>
+References: <20180313142003.12124-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 2/2] iotests: Add regression test for commit
+ base locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,21 +23,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-v3: Fix test case. [Max]
-
-v2: Use update_flags_from_options. [Kevin]
-
-We write open the whole backing chain during reopen. It is not necessary and
-will cause image locking problems if the backing image is shared.
-
-Fam Zheng (2):
-  block: Fix flags in reopen queue
-  iotests: Add regression test for commit base locking
-
- block.c                    |  7 +++++++
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
  tests/qemu-iotests/153     | 12 ++++++++++++
  tests/qemu-iotests/153.out |  5 +++++
- 3 files changed, 24 insertions(+)
+ 2 files changed, 17 insertions(+)
 
+diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
+index adfd02695b..a0fd815483 100755
+--- a/tests/qemu-iotests/153
++++ b/tests/qemu-iotests/153
+@@ -178,6 +178,18 @@ rm -f "${TEST_IMG}.lnk" &>/dev/null
+ ln -s ${TEST_IMG} "${TEST_IMG}.lnk" || echo "Failed to create link"
+ _run_qemu_with_images "${TEST_IMG}.lnk" "${TEST_IMG}"
+ 
++echo
++echo "== Active commit to intermediate layer should work when base in use =="
++_launch_qemu -drive format=$IMGFMT,file="${TEST_IMG}.a",id=drive0,if=none \
++             -device virtio-blk,drive=drive0
++
++_send_qemu_cmd $QEMU_HANDLE \
++    "{ 'execute': 'qmp_capabilities' }" \
++    'return'
++_run_cmd $QEMU_IMG commit -b "${TEST_IMG}.b" "${TEST_IMG}.c"
++
++_cleanup_qemu
++
+ _launch_qemu
+ 
+ _send_qemu_cmd $QEMU_HANDLE \
+diff --git a/tests/qemu-iotests/153.out b/tests/qemu-iotests/153.out
+index 34309cfb20..bb721cb747 100644
+--- a/tests/qemu-iotests/153.out
++++ b/tests/qemu-iotests/153.out
+@@ -372,6 +372,11 @@ Is another process using the image?
+ == Symbolic link ==
+ QEMU_PROG: -drive if=none,file=TEST_DIR/t.qcow2: Failed to get "write" lock
+ Is another process using the image?
++
++== Active commit to intermediate layer should work when base in use ==
++{"return": {}}
++
++_qemu_img_wrapper commit -b TEST_DIR/t.qcow2.b TEST_DIR/t.qcow2.c
+ {"return": {}}
+ Adding drive
+ 
 -- 
 2.14.3
