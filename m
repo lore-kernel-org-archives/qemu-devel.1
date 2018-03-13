@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1evnb8-0004Zq-3E
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:20:27 -0400
+	(envelope-from <den@virtuozzo.com>) id 1evngX-000142-1A
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:26:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1evnb4-00055Z-Q9
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:20:26 -0400
-References: <20180119224735.12169-1-jsnow@redhat.com>
-	<086ccaa6-eefb-47e4-a865-78075ddd827d@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <56b7204f-a0d8-3a4e-6e48-6913b1f52a5f@redhat.com>
-Date: Tue, 13 Mar 2018 13:20:11 -0400
+	(envelope-from <den@virtuozzo.com>) id 1evngU-0001Ev-E4
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:26:01 -0400
+References: <20171128121055.6954-1-den@openvz.org>
+	<36e5edb4-f9c9-de14-2134-fd8d0eb102f4@redhat.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <331011c4-be57-5166-f5ca-5b25ac200f7e@openvz.org>
+Date: Tue, 13 Mar 2018 20:25:48 +0300
 MIME-Version: 1.0
-In-Reply-To: <086ccaa6-eefb-47e4-a865-78075ddd827d@redhat.com>
+In-Reply-To: <36e5edb4-f9c9-de14-2134-fd8d0eb102f4@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4] file-posix: specify expected filetypes
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH for 2.11 0/2] QEMU crashes with CD device
+ without media
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +25,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-
-
-On 01/19/2018 06:03 PM, Eric Blake wrote:
-> On 01/19/2018 04:47 PM, John Snow wrote:
->> Adjust each caller of raw_open_common to specify if they are expecting
->> host and character devices or not. Tighten expectations of file types upon
->> open in the common code and refuse types that are not expected.
+On 03/13/2018 08:18 PM, John Snow wrote:
+>
+> On 11/28/2017 07:10 AM, Denis V. Lunev wrote:
+>> There are 2 cases I have spotted so far:
+>> 1) IDE ATAPI read processing. Actually this was reported from field
+>> 2) QEMU IO hmp command (found during evaluation of (1))
 >>
->> This has two effects:
+>> SCSI code checks during access that blk_is_available(). These patches add
+>> same checks on different code paths.
 >>
->> (1) Character and block devices are now considered deprecated for the
->>     'file' driver, which expects only S_IFREG, and
->> (2) no file-posix driver (file, host_cdrom, or host_device) can open
->>     directories now.
+>> Pls decide whether these patches should go through sub-system trees or via
+>> block tree.
 >>
->> I don't think there's a legitimate reason to open directories as if
->> they were files. This prevents QEMU from opening and attempting to probe
->> a directory inode, which can break in exciting ways. One of those ways
->> is lseek on ext4/xfs, which will return 0x7fffffffffffffff as the file
->> size instead of EISDIR. This can coax QEMU into responding with a
->> confusing "file too big" instead of "Hey, that's not a file".
+>> Signed-off-by: Denis V. Lunev <den@openvz.org>
+>> CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> CC: John Snow <jsnow@redhat.com>
+>> CC: Kevin Wolf <kwolf@redhat.com>
+>> CC: Stefan Hajnoczi <stefanha@redhat.com>
 >>
->> See: https://bugs.launchpad.net/qemu/+bug/1739304/
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
-> 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> 
+>>
+> Denis, I was never able to figure this out, but Stefan added a more
+> rigorous block-wide fix that should prevent these crashes. If you see
+> any anomalies in the ATAPI device again please let me know.
+>
+> Sorry I wasn't able to help any faster.
+ok, no prob. Thank you for a feedback
 
-Whoops, I let this one rot. It could still be considered a bugfix for
-next week.
-
---js
+Den
