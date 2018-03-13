@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evoQI-0001HP-5d
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:13:19 -0400
+	(envelope-from <berrange@redhat.com>) id 1evoQL-0001Ko-NC
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:13:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evoQE-0007QS-5C
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:13:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39902 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1evoQK-0007Ur-D3
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:13:21 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40958 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1evoQD-0007QD-VQ
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:13:14 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1evoQK-0007UV-85
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:13:20 -0400
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Tue, 13 Mar 2018 18:12:45 +0000
-Message-Id: <20180313181248.16215-7-berrange@redhat.com>
+Date: Tue, 13 Mar 2018 18:12:48 +0000
+Message-Id: <20180313181248.16215-10-berrange@redhat.com>
 In-Reply-To: <20180313181248.16215-1-berrange@redhat.com>
 References: <20180313181248.16215-1-berrange@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 6/9] sockets: check that the named file
- descriptor is a socket
+Subject: [Qemu-devel] [PULL v2 9/9] char: allow passing pre-opened socket
+ file descriptor at startup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,180 +29,211 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>,
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-The SocketAddress struct has an "fd" type, which references the name of a
-file descriptor passed over the monitor using the "getfd" command. We
-currently blindly assume the FD is a socket, which can lead to hard to
-diagnose errors later. This adds an explicit check that the FD is actuall=
-y
-a socket to improve the error diagnosis.
+When starting QEMU management apps will usually setup a monitor socket, and
+then open it immediately after startup. If not using QEMU's own -daemonize
+arg, this process can be troublesome to handle correctly. The mgmt app will
+need to repeatedly call connect() until it succeeds, because it does not
+know when QEMU has created the listener socket. If can't retry connect()
+forever though, because an error might have caused QEMU to exit before it
+even creates the monitor.
+
+The obvious way to fix this kind of problem is to just pass in a pre-opened
+socket file descriptor for the QEMU monitor to listen on. The management
+app can now immediately call connect() just once. If connect() fails it
+knows that QEMU has exited with an error.
+
+The SocketAddress(Legacy) structs allow for FD passing via the monitor, and
+now via inherited file descriptors from the process that spawned QEMU. The
+final missing piece is adding a 'fd' parameter in the socket chardev
+options.
+
+This allows both HMP usage, pass any FD number with SCM_RIGHTS, then
+running HMP commands:
+
+   getfd myfd
+   chardev-add socket,fd=myfd
+
+Note that numeric FDs cannot be referenced directly in HMP, only named FDs.
+
+And also CLI usage, by leak FD 3 from parent by clearing O_CLOEXEC, then
+spawning QEMU with
+
+  -chardev socket,fd=3,id=mon
+  -mon chardev=mon,mode=control
+
+Note that named FDs cannot be referenced in CLI args, only numeric FDs.
+
+We do not wire this up in the legacy chardev syntax, so you cannot use FD
+passing with '-qmp', you must use the modern '-mon' + '-chardev' pair.
+
+When passing pre-opened FDs there is a restriction on use of TLS encryption.
+It can be used on a server socket chardev, but cannot be used for a client
+socket chardev. This is because when validating a server's certificate, the
+client needs to have a hostname available to match against the certificate
+identity.
+
+An illustrative example of usage is:
+
+  #!/usr/bin/perl
+
+  use IO::Socket::UNIX;
+  use Fcntl;
+
+  unlink "/tmp/qmp";
+  my $srv = IO::Socket::UNIX->new(
+    Type => SOCK_STREAM(),
+    Local => "/tmp/qmp",
+    Listen => 1,
+  );
+
+  my $flags = fcntl $srv, F_GETFD, 0;
+  fcntl $srv, F_SETFD, $flags & ~FD_CLOEXEC;
+
+  my $fd = $srv->fileno();
+
+  exec "qemu-system-x86_64", \
+      "-chardev", "socket,fd=$fd,server,nowait,id=mon", \
+      "-mon", "chardev=mon,mode=control";
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- tests/test-util-sockets.c | 89 +++++++++++++++++++++++++++++++++++++++++=
-++++++
- util/qemu-sockets.c       | 18 ++++++++--
- 2 files changed, 105 insertions(+), 2 deletions(-)
+ chardev/char-socket.c | 15 +++++++++++++--
+ chardev/char.c        |  3 +++
+ tests/test-char.c     | 47 ++++++++++++++++++++++++++++++++++++++++++++---
+ 3 files changed, 60 insertions(+), 5 deletions(-)
 
-diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
-index 65190e0530..06eb0e4a28 100644
---- a/tests/test-util-sockets.c
-+++ b/tests/test-util-sockets.c
-@@ -23,6 +23,7 @@
- #include "qemu/sockets.h"
- #include "qapi/error.h"
- #include "socket-helpers.h"
-+#include "monitor/monitor.h"
-=20
- static void test_fd_is_socket_bad(void)
- {
-@@ -49,6 +50,90 @@ static void test_fd_is_socket_good(void)
-     close(fd);
- }
-=20
-+static int mon_fd =3D -1;
-+static const char *mon_fdname;
-+
-+int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp)
-+{
-+    g_assert(cur_mon);
-+    g_assert(mon =3D=3D cur_mon);
-+    if (mon_fd =3D=3D -1 || !g_str_equal(mon_fdname, fdname)) {
-+        error_setg(errp, "No fd named %s", fdname);
-+        return -1;
-+    }
-+    return dup(mon_fd);
-+}
-+
-+/* Syms in libqemustub.a are discarded at .o file granularity.
-+ * To replace monitor_get_fd() we must ensure everything in
-+ * stubs/monitor.c is defined, to make sure monitor.o is discarded
-+ * otherwise we get duplicate syms at link time.
-+ */
-+Monitor *cur_mon;
-+void monitor_init(Chardev *chr, int flags) {}
-+
-+
-+static void test_socket_fd_pass_good(void)
-+{
-+    SocketAddress addr;
-+    int fd;
-+
-+    cur_mon =3D g_malloc(1); /* Fake a monitor */
-+    mon_fdname =3D "myfd";
-+    mon_fd =3D qemu_socket(AF_INET, SOCK_STREAM, 0);
-+    g_assert_cmpint(mon_fd, >, STDERR_FILENO);
-+
-+    addr.type =3D SOCKET_ADDRESS_TYPE_FD;
-+    addr.u.fd.str =3D g_strdup(mon_fdname);
-+
-+    fd =3D socket_connect(&addr, &error_abort);
-+    g_assert_cmpint(fd, !=3D, -1);
-+    g_assert_cmpint(fd, !=3D, mon_fd);
-+    close(fd);
-+
-+    fd =3D socket_listen(&addr, &error_abort);
-+    g_assert_cmpint(fd, !=3D, -1);
-+    g_assert_cmpint(fd, !=3D, mon_fd);
-+    close(fd);
-+
-+    g_free(addr.u.fd.str);
-+    mon_fdname =3D NULL;
-+    close(mon_fd);
-+    mon_fd =3D -1;
-+    g_free(cur_mon);
-+    cur_mon =3D NULL;
-+}
-+
-+static void test_socket_fd_pass_bad(void)
-+{
-+    SocketAddress addr;
-+    Error *err =3D NULL;
-+    int fd;
-+
-+    cur_mon =3D g_malloc(1); /* Fake a monitor */
-+    mon_fdname =3D "myfd";
-+    mon_fd =3D dup(STDOUT_FILENO);
-+    g_assert_cmpint(mon_fd, >, STDERR_FILENO);
-+
-+    addr.type =3D SOCKET_ADDRESS_TYPE_FD;
-+    addr.u.fd.str =3D g_strdup(mon_fdname);
-+
-+    fd =3D socket_connect(&addr, &err);
-+    g_assert_cmpint(fd, =3D=3D, -1);
-+    error_free_or_abort(&err);
-+
-+    fd =3D socket_listen(&addr, &err);
-+    g_assert_cmpint(fd, =3D=3D, -1);
-+    error_free_or_abort(&err);
-+
-+    g_free(addr.u.fd.str);
-+    mon_fdname =3D NULL;
-+    close(mon_fd);
-+    mon_fd =3D -1;
-+    g_free(cur_mon);
-+    cur_mon =3D NULL;
-+}
-+
- int main(int argc, char **argv)
- {
-     bool has_ipv4, has_ipv6;
-@@ -71,6 +156,10 @@ int main(int argc, char **argv)
-                         test_fd_is_socket_bad);
-         g_test_add_func("/util/socket/is-socket/good",
-                         test_fd_is_socket_good);
-+        g_test_add_func("/socket/fd-pass/good",
-+                        test_socket_fd_pass_good);
-+        g_test_add_func("/socket/fd-pass/bad",
-+                        test_socket_fd_pass_bad);
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index a916ef4012..0c8d6d430a 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -1008,13 +1008,14 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
+     const char *path = qemu_opt_get(opts, "path");
+     const char *host = qemu_opt_get(opts, "host");
+     const char *port = qemu_opt_get(opts, "port");
++    const char *fd = qemu_opt_get(opts, "fd");
+     const char *tls_creds = qemu_opt_get(opts, "tls-creds");
+     SocketAddressLegacy *addr;
+     ChardevSocket *sock;
+ 
+-    if ((!!path + !!host) != 1) {
++    if ((!!path + !!fd + !!host) != 1) {
+         error_setg(errp,
+-                   "Exactly one of 'path' or 'host' required");
++                   "Exactly one of 'path', 'fd' or 'host' required");
+         return;
      }
-=20
-     return g_test_run();
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index fa79471647..6dc4613855 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -1042,6 +1042,20 @@ fail:
-     return NULL;
+ 
+@@ -1029,6 +1030,12 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
+             error_setg(errp, "chardev: socket: no port given");
+             return;
+         }
++    } else if (fd) {
++        /* We don't know what host to validate against when in client mode */
++        if (tls_creds && !is_listen) {
++            error_setg(errp, "TLS can not be used with pre-opened client FD");
++            return;
++        }
+     } else {
+         g_assert_not_reached();
+     }
+@@ -1069,6 +1076,10 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
+             .has_ipv6 = qemu_opt_get(opts, "ipv6"),
+             .ipv6 = qemu_opt_get_bool(opts, "ipv6", 0),
+         };
++    } else if (fd) {
++        addr->type = SOCKET_ADDRESS_LEGACY_KIND_FD;
++        addr->u.fd.data = g_new(String, 1);
++        addr->u.fd.data->str = g_strdup(fd);
+     } else {
+         g_assert_not_reached();
+     }
+diff --git a/chardev/char.c b/chardev/char.c
+index 5d7b079ef0..f7e0d37f24 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -807,6 +807,9 @@ QemuOptsList qemu_chardev_opts = {
+         },{
+             .name = "port",
+             .type = QEMU_OPT_STRING,
++        },{
++            .name = "fd",
++            .type = QEMU_OPT_STRING,
+         },{
+             .name = "localaddr",
+             .type = QEMU_OPT_STRING,
+diff --git a/tests/test-char.c b/tests/test-char.c
+index b3a77af085..dffb354202 100644
+--- a/tests/test-char.c
++++ b/tests/test-char.c
+@@ -302,9 +302,8 @@ static int socket_can_read_hello(void *opaque)
+     return 10;
  }
-=20
-+static int socket_get_fd(const char *fdstr, Error **errp)
+ 
+-static void char_socket_test(void)
++static void char_socket_test_common(Chardev *chr)
+ {
+-    Chardev *chr = qemu_chr_new("server", "tcp:127.0.0.1:0,server,nowait");
+     Chardev *chr_client;
+     QObject *addr;
+     QDict *qdict;
+@@ -359,6 +358,47 @@ static void char_socket_test(void)
+     object_unparent(OBJECT(chr));
+ }
+ 
++
++static void char_socket_basic_test(void)
 +{
-+    int fd =3D monitor_get_fd(cur_mon, fdstr, errp);
-+    if (fd < 0) {
-+        return -1;
-+    }
-+    if (!fd_is_socket(fd)) {
-+        error_setg(errp, "File descriptor '%s' is not a socket", fdstr);
-+        close(fd);
-+        return -1;
-+    }
-+    return fd;
++    Chardev *chr = qemu_chr_new("server", "tcp:127.0.0.1:0,server,nowait");
++
++    char_socket_test_common(chr);
 +}
 +
- int socket_connect(SocketAddress *addr, Error **errp)
++
++static void char_socket_fdpass_test(void)
++{
++    Chardev *chr;
++    char *optstr;
++    QemuOpts *opts;
++    int fd;
++    SocketAddress *addr = g_new0(SocketAddress, 1);
++
++    addr->type = SOCKET_ADDRESS_TYPE_INET;
++    addr->u.inet.host = g_strdup("127.0.0.1");
++    addr->u.inet.port = g_strdup("0");
++
++    fd = socket_listen(addr, &error_abort);
++    g_assert(fd >= 0);
++
++    qapi_free_SocketAddress(addr);
++
++    optstr = g_strdup_printf("socket,id=cdev,fd=%d,server,nowait", fd);
++
++    opts = qemu_opts_parse_noisily(qemu_find_opts("chardev"),
++                                   optstr, true);
++    g_free(optstr);
++    g_assert_nonnull(opts);
++
++    chr = qemu_chr_new_from_opts(opts, &error_abort);
++
++    qemu_opts_del(opts);
++
++    char_socket_test_common(chr);
++}
++
++
+ #ifndef _WIN32
+ static void char_pipe_test(void)
  {
-     int fd;
-@@ -1056,7 +1070,7 @@ int socket_connect(SocketAddress *addr, Error **err=
-p)
-         break;
-=20
-     case SOCKET_ADDRESS_TYPE_FD:
--        fd =3D monitor_get_fd(cur_mon, addr->u.fd.str, errp);
-+        fd =3D socket_get_fd(addr->u.fd.str, errp);
-         break;
-=20
-     case SOCKET_ADDRESS_TYPE_VSOCK:
-@@ -1083,7 +1097,7 @@ int socket_listen(SocketAddress *addr, Error **errp=
-)
-         break;
-=20
-     case SOCKET_ADDRESS_TYPE_FD:
--        fd =3D monitor_get_fd(cur_mon, addr->u.fd.str, errp);
-+        fd =3D socket_get_fd(addr->u.fd.str, errp);
-         break;
-=20
-     case SOCKET_ADDRESS_TYPE_VSOCK:
---=20
+@@ -775,7 +815,8 @@ int main(int argc, char **argv)
+ #ifndef _WIN32
+     g_test_add_func("/char/file-fifo", char_file_fifo_test);
+ #endif
+-    g_test_add_func("/char/socket", char_socket_test);
++    g_test_add_func("/char/socket/basic", char_socket_basic_test);
++    g_test_add_func("/char/socket/fdpass", char_socket_fdpass_test);
+     g_test_add_func("/char/udp", char_udp_test);
+ #ifdef HAVE_CHARDEV_SERIAL
+     g_test_add_func("/char/serial", char_serial_test);
+-- 
 2.14.3
