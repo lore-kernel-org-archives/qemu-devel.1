@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdN-0001cI-CD
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:42 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdP-0001fW-Oe
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdM-0004kX-8v
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:41 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdO-0004m5-KH
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:43 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Mar 2018 17:17:44 +0100
-Message-Id: <20180313161803.1814-23-kwolf@redhat.com>
+Date: Tue, 13 Mar 2018 17:17:52 +0100
+Message-Id: <20180313161803.1814-31-kwolf@redhat.com>
 In-Reply-To: <20180313161803.1814-1-kwolf@redhat.com>
 References: <20180313161803.1814-1-kwolf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 22/41] luks: Separate image file creation from
- formatting
+Subject: [Qemu-devel] [PULL 30/41] vdi: Implement .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,105 +22,111 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-The crypto driver used to create the image file in a callback from the
-crypto subsystem. If we want to implement .bdrv_co_create, this needs to
-go away because that callback will get a reference to an already
-existing block node.
+From: Max Reitz <mreitz@redhat.com>
 
-Move the image file creation to block_crypto_create_generic().
-
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/crypto.c | 37 +++++++++++++++++--------------------
- 1 file changed, 17 insertions(+), 20 deletions(-)
+ qapi/block-core.json |  2 +-
+ block/vdi.c          | 24 +++++++++++++++++++-----
+ 2 files changed, 20 insertions(+), 6 deletions(-)
 
-diff --git a/block/crypto.c b/block/crypto.c
-index e6095e7807..77871640cc 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -71,8 +71,6 @@ static ssize_t block_crypto_read_func(QCryptoBlock *blo=
-ck,
-=20
-=20
- struct BlockCryptoCreateData {
--    const char *filename;
--    QemuOpts *opts;
-     BlockBackend *blk;
-     uint64_t size;
- };
-@@ -103,27 +101,13 @@ static ssize_t block_crypto_init_func(QCryptoBlock =
-*block,
-                                       Error **errp)
- {
-     struct BlockCryptoCreateData *data =3D opaque;
--    int ret;
-=20
-     /* User provided size should reflect amount of space made
-      * available to the guest, so we must take account of that
-      * which will be used by the crypto header
-      */
--    data->size +=3D headerlen;
--
--    qemu_opt_set_number(data->opts, BLOCK_OPT_SIZE, data->size, &error_a=
-bort);
--    ret =3D bdrv_create_file(data->filename, data->opts, errp);
--    if (ret < 0) {
--        return -1;
--    }
--
--    data->blk =3D blk_new_open(data->filename, NULL, NULL,
--                             BDRV_O_RDWR | BDRV_O_PROTOCOL, errp);
--    if (!data->blk) {
--        return -1;
--    }
--
--    return 0;
-+    return blk_truncate(data->blk, data->size + headerlen, PREALLOC_MODE=
-_OFF,
-+                        errp);
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index c69d70d7a8..6211b8222c 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3837,7 +3837,7 @@
+       'sheepdog':       'BlockdevCreateOptionsSheepdog',
+       'ssh':            'BlockdevCreateOptionsSsh',
+       'throttle':       'BlockdevCreateNotSupported',
+-      'vdi':            'BlockdevCreateNotSupported',
++      'vdi':            'BlockdevCreateOptionsVdi',
+       'vhdx':           'BlockdevCreateNotSupported',
+       'vmdk':           'BlockdevCreateNotSupported',
+       'vpc':            'BlockdevCreateNotSupported',
+diff --git a/block/vdi.c b/block/vdi.c
+index 2a39b0ac98..8132e3adfe 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -721,9 +721,10 @@ nonallocating_write:
+     return ret;
  }
-=20
-=20
-@@ -333,11 +317,10 @@ static int block_crypto_create_generic(QCryptoBlock=
-Format format,
-     struct BlockCryptoCreateData data =3D {
-         .size =3D ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0=
-),
-                          BDRV_SECTOR_SIZE),
--        .opts =3D opts,
--        .filename =3D filename,
-     };
-     QDict *cryptoopts;
-=20
-+    /* Parse options */
-     cryptoopts =3D qemu_opts_to_qdict(opts, NULL);
-=20
-     create_opts =3D block_crypto_create_opts_init(format, cryptoopts, er=
-rp);
-@@ -345,6 +328,20 @@ static int block_crypto_create_generic(QCryptoBlockF=
-ormat format,
-         return -1;
+ 
+-static int coroutine_fn vdi_co_do_create(BlockdevCreateOptionsVdi *vdi_opts,
++static int coroutine_fn vdi_co_do_create(BlockdevCreateOptions *create_options,
+                                          size_t block_size, Error **errp)
+ {
++    BlockdevCreateOptionsVdi *vdi_opts;
+     int ret = 0;
+     uint64_t bytes = 0;
+     uint32_t blocks;
+@@ -736,6 +737,9 @@ static int coroutine_fn vdi_co_do_create(BlockdevCreateOptionsVdi *vdi_opts,
+     BlockBackend *blk = NULL;
+     uint32_t *bmap = NULL;
+ 
++    assert(create_options->driver == BLOCKDEV_DRIVER_VDI);
++    vdi_opts = &create_options->u.vdi;
++
+     logout("\n");
+ 
+     /* Read out options. */
+@@ -856,11 +860,17 @@ exit:
+     return ret;
+ }
+ 
++static int coroutine_fn vdi_co_create(BlockdevCreateOptions *create_options,
++                                      Error **errp)
++{
++    return vdi_co_do_create(create_options, DEFAULT_CLUSTER_SIZE, errp);
++}
++
+ static int coroutine_fn vdi_co_create_opts(const char *filename, QemuOpts *opts,
+                                            Error **errp)
+ {
+     QDict *qdict = NULL;
+-    BlockdevCreateOptionsVdi *create_options = NULL;
++    BlockdevCreateOptions *create_options = NULL;
+     BlockDriverState *bs_file = NULL;
+     uint64_t block_size = DEFAULT_CLUSTER_SIZE;
+     Visitor *v;
+@@ -897,11 +907,12 @@ static int coroutine_fn vdi_co_create_opts(const char *filename, QemuOpts *opts,
+         goto done;
      }
-=20
-+    /* Create protocol layer */
-+    ret =3D bdrv_create_file(filename, opts, errp);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    data.blk =3D blk_new_open(filename, NULL, NULL,
-+                            BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCO=
-L,
-+                            errp);
-+    if (!data.blk) {
-+        return -EINVAL;
-+    }
-+
-+    /* Create format layer */
-     crypto =3D qcrypto_block_create(create_opts, NULL,
-                                   block_crypto_init_func,
-                                   block_crypto_write_func,
---=20
+ 
++    qdict_put_str(qdict, "driver", "vdi");
+     qdict_put_str(qdict, "file", bs_file->node_name);
+ 
+     /* Get the QAPI object */
+     v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
+-    visit_type_BlockdevCreateOptionsVdi(v, NULL, &create_options, &local_err);
++    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
+     visit_free(v);
+ 
+     if (local_err) {
+@@ -910,12 +921,14 @@ static int coroutine_fn vdi_co_create_opts(const char *filename, QemuOpts *opts,
+         goto done;
+     }
+ 
+-    create_options->size = ROUND_UP(create_options->size, BDRV_SECTOR_SIZE);
++    assert(create_options->driver == BLOCKDEV_DRIVER_VDI);
++    create_options->u.vdi.size = ROUND_UP(create_options->u.vdi.size,
++                                          BDRV_SECTOR_SIZE);
+ 
+     ret = vdi_co_do_create(create_options, block_size, errp);
+ done:
+     QDECREF(qdict);
+-    qapi_free_BlockdevCreateOptionsVdi(create_options);
++    qapi_free_BlockdevCreateOptions(create_options);
+     bdrv_unref(bs_file);
+     return ret;
+ }
+@@ -969,6 +982,7 @@ static BlockDriver bdrv_vdi = {
+     .bdrv_reopen_prepare = vdi_reopen_prepare,
+     .bdrv_child_perm          = bdrv_format_default_perms,
+     .bdrv_co_create_opts = vdi_co_create_opts,
++    .bdrv_co_create      = vdi_co_create,
+     .bdrv_has_zero_init = bdrv_has_zero_init_1,
+     .bdrv_co_block_status = vdi_co_block_status,
+     .bdrv_make_empty = vdi_make_empty,
+-- 
 2.13.6
