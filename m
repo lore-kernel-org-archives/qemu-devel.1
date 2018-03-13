@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdC-0001Ov-4T
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:31 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdD-0001Qk-SY
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmd7-0004af-OP
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:30 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdC-0004dc-TO
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:31 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Mar 2018 17:17:31 +0100
-Message-Id: <20180313161803.1814-10-kwolf@redhat.com>
+Date: Tue, 13 Mar 2018 17:17:36 +0100
+Message-Id: <20180313161803.1814-15-kwolf@redhat.com>
 In-Reply-To: <20180313161803.1814-1-kwolf@redhat.com>
 References: <20180313161803.1814-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 09/41] blockjobs: add CONCLUDED state
+Subject: [Qemu-devel] [PULL 14/41] blockjobs: add block_job_txn_apply
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,147 +25,67 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: John Snow <jsnow@redhat.com>
 
-add a new state "CONCLUDED" that identifies a job that has ceased all
-operations. The wording was chosen to avoid any phrasing that might
-imply success, error, or cancellation. The task has simply ceased all
-operation and can never again perform any work.
-
-("finished", "done", and "completed" might all imply success.)
-
-Transitions:
-Running  -> Concluded: normal completion
-Ready    -> Concluded: normal completion
-Aborting -> Concluded: error and cancellations
-
-Verbs:
-None as of this commit. (a future commit adds 'dismiss')
-
-             +---------+
-             |UNDEFINED|
-             +--+------+
-                |
-             +--v----+
-   +---------+CREATED|
-   |         +--+----+
-   |            |
-   |         +--v----+     +------+
-   +---------+RUNNING<----->PAUSED|
-   |         +--+-+--+     +------+
-   |            | |
-   |            | +------------------+
-   |            |                    |
-   |         +--v--+       +-------+ |
-   +---------+READY<------->STANDBY| |
-   |         +--+--+       +-------+ |
-   |            |                    |
-+--v-----+   +--v------+             |
-|ABORTING+--->CONCLUDED<-------------+
-+--------+   +---------+
+Simply apply a function transaction-wide.
+A few more uses of this in forthcoming patches.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-core.json |  7 +++++--
- blockjob.c           | 39 ++++++++++++++++++++++++---------------
- 2 files changed, 29 insertions(+), 17 deletions(-)
+ blockjob.c | 25 ++++++++++++++++---------
+ 1 file changed, 16 insertions(+), 9 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index c33a9e91a7..2edfd194e3 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -997,14 +997,17 @@
- #           The job may return to @ready or otherwise be canceled.
- #
- # @aborting: The job is in the process of being aborted, and will finish with
--#            an error.
-+#            an error. The job will afterwards report that it is @concluded.
- #            This status may not be visible to the management process.
- #
-+# @concluded: The job has finished all work. If manual was set to true, the job
-+#             will remain in the query list until it is dismissed.
-+#
- # Since: 2.12
- ##
- { 'enum': 'BlockJobStatus',
-   'data': ['undefined', 'created', 'running', 'paused', 'ready', 'standby',
--           'aborting' ] }
-+           'aborting', 'concluded' ] }
- 
- ##
- # @BlockJobInfo:
 diff --git a/blockjob.c b/blockjob.c
-index fe5b0041f7..3f730967b3 100644
+index 0c64fadc6d..7e03824751 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -44,23 +44,24 @@ static QemuMutex block_job_mutex;
- 
- /* BlockJob State Transition Table */
- bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
--                                          /* U, C, R, P, Y, S, X */
--    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0, 0},
--    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0, 1},
--    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0, 1},
--    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0, 0},
--    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1, 1},
--    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0, 0},
--    /* X: */ [BLOCK_JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 0},
-+                                          /* U, C, R, P, Y, S, X, E */
-+    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0, 0, 0},
-+    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0, 1, 0},
-+    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0, 1, 1},
-+    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0, 0, 0},
-+    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1, 1, 1},
-+    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0, 0, 0},
-+    /* X: */ [BLOCK_JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 0, 1},
-+    /* E: */ [BLOCK_JOB_STATUS_CONCLUDED] = {0, 0, 0, 0, 0, 0, 0, 0},
- };
- 
- bool BlockJobVerbTable[BLOCK_JOB_VERB__MAX][BLOCK_JOB_STATUS__MAX] = {
--                                          /* U, C, R, P, Y, S, X */
--    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1, 0},
--    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1, 0},
--    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0},
--    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0},
--    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0},
-+                                          /* U, C, R, P, Y, S, X, E */
-+    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1, 0, 0},
-+    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1, 0, 0},
-+    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0, 0},
-+    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0, 0},
-+    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0, 0},
- };
- 
- static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
-@@ -377,6 +378,11 @@ void block_job_start(BlockJob *job)
-     bdrv_coroutine_enter(blk_bs(job->blk), job->co);
+@@ -487,6 +487,19 @@ static void block_job_cancel_async(BlockJob *job)
+     job->cancelled = true;
  }
  
-+static void block_job_conclude(BlockJob *job)
++static void block_job_txn_apply(BlockJobTxn *txn, void fn(BlockJob *))
 +{
-+    block_job_state_transition(job, BLOCK_JOB_STATUS_CONCLUDED);
++    AioContext *ctx;
++    BlockJob *job, *next;
++
++    QLIST_FOREACH_SAFE(job, &txn->jobs, txn_list, next) {
++        ctx = blk_get_aio_context(job->blk);
++        aio_context_acquire(ctx);
++        fn(job);
++        aio_context_release(ctx);
++    }
 +}
 +
- static void block_job_completed_single(BlockJob *job)
- {
-     assert(job->completed);
-@@ -417,6 +423,7 @@ static void block_job_completed_single(BlockJob *job)
+ static int block_job_finish_sync(BlockJob *job,
+                                  void (*finish)(BlockJob *, Error **errp),
+                                  Error **errp)
+@@ -565,9 +578,8 @@ static void block_job_completed_txn_abort(BlockJob *job)
  
-     QLIST_REMOVE(job, txn_list);
-     block_job_txn_unref(job->txn);
-+    block_job_conclude(job);
-     block_job_unref(job);
+ static void block_job_completed_txn_success(BlockJob *job)
+ {
+-    AioContext *ctx;
+     BlockJobTxn *txn = job->txn;
+-    BlockJob *other_job, *next;
++    BlockJob *other_job;
+     /*
+      * Successful completion, see if there are other running jobs in this
+      * txn.
+@@ -576,15 +588,10 @@ static void block_job_completed_txn_success(BlockJob *job)
+         if (!other_job->completed) {
+             return;
+         }
+-    }
+-    /* We are the last completed job, commit the transaction. */
+-    QLIST_FOREACH_SAFE(other_job, &txn->jobs, txn_list, next) {
+-        ctx = blk_get_aio_context(other_job->blk);
+-        aio_context_acquire(ctx);
+         assert(other_job->ret == 0);
+-        block_job_completed_single(other_job);
+-        aio_context_release(ctx);
+     }
++    /* We are the last completed job, commit the transaction. */
++    block_job_txn_apply(txn, block_job_completed_single);
  }
  
-@@ -617,7 +624,9 @@ void block_job_user_resume(BlockJob *job, Error **errp)
- 
- void block_job_cancel(BlockJob *job)
- {
--    if (block_job_started(job)) {
-+    if (job->status == BLOCK_JOB_STATUS_CONCLUDED) {
-+        return;
-+    } else if (block_job_started(job)) {
-         block_job_cancel_async(job);
-         block_job_enter(job);
-     } else {
+ /* Assumes the block_job_mutex is held */
 -- 
 2.13.6
