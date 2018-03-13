@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1evrjk-00043J-F4
+	(envelope-from <mst@redhat.com>) id 1evrjl-00044E-7j
 	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 17:45:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1evrjh-0007e0-7z
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 17:45:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35382 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1evrjh-0007d0-1a
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 17:45:33 -0400
-Date: Tue, 13 Mar 2018 23:45:32 +0200
+	(envelope-from <mst@redhat.com>) id 1evrjj-0007jP-UD
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 17:45:37 -0400
+Date: Tue, 13 Mar 2018 23:45:29 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1520977432-187679-15-git-send-email-mst@redhat.com>
+Message-ID: <1520977432-187679-13-git-send-email-mst@redhat.com>
 References: <1520977432-187679-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1520977432-187679-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 14/22] vhost: used_memslots refactoring
+Subject: [Qemu-devel] [PULL 12/22] virt_arm: acpi: reuse common build_fadt()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,308 +23,159 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jay Zhou <jianjay.zhou@huawei.com>, Igor Mammedov <imammedo@redhat.com>, Liuzhe <liuzhe13@huawei.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Eric Auger <eric.auger@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org
 
-From: Jay Zhou <jianjay.zhou@huawei.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-Used_memslots is shared by vhost kernel and user, it is equal to
-dev->mem->nregions, which is correct for vhost kernel, but not for
-vhost user, the latter one uses memory regions that have file
-descriptor. E.g. a VM has a vhost-user NIC and 8(vhost user memslot
-upper limit) memory slots, it will be failed to hotplug a new DIMM
-device since vhost_has_free_slot() finds no free slot left. It
-should be successful if only part of memory slots have file
-descriptor, so setting used memslots for vhost-user and
-vhost-kernel respectively.
+Extend generic build_fadt() to support rev5.1 FADT
+and reuse it for 'virt' board, it would allow to
+phase out usage of AcpiFadtDescriptorRev5_1 and
+later ACPI_FADT_COMMON_DEF.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
-Signed-off-by: Liuzhe <liuzhe13@huawei.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Tested-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/virtio/vhost-backend.h |  6 ++-
- hw/virtio/vhost-backend.c         | 15 +++++++-
- hw/virtio/vhost-user.c            | 77 ++++++++++++++++++++++++++-------------
- hw/virtio/vhost.c                 | 13 +++----
- 4 files changed, 75 insertions(+), 36 deletions(-)
+ include/hw/acpi/acpi-defs.h | 12 ++----------
+ hw/acpi/aml-build.c         | 23 +++++++++++++++++++++--
+ hw/arm/virt-acpi-build.c    | 33 ++++++++++++---------------------
+ 3 files changed, 35 insertions(+), 33 deletions(-)
 
-diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
-index 5dac61f..ff06c2d 100644
---- a/include/hw/virtio/vhost-backend.h
-+++ b/include/hw/virtio/vhost-backend.h
-@@ -36,7 +36,7 @@ struct vhost_iotlb_msg;
+diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+index 3fb0ace..fe15e95 100644
+--- a/include/hw/acpi/acpi-defs.h
++++ b/include/hw/acpi/acpi-defs.h
+@@ -165,16 +165,6 @@ struct AcpiFadtDescriptorRev3 {
+ } QEMU_PACKED;
+ typedef struct AcpiFadtDescriptorRev3 AcpiFadtDescriptorRev3;
  
- typedef int (*vhost_backend_init)(struct vhost_dev *dev, void *opaque);
- typedef int (*vhost_backend_cleanup)(struct vhost_dev *dev);
--typedef int (*vhost_backend_memslots_limit)(struct vhost_dev *dev);
-+typedef bool (*vhost_backend_has_free_memslots)(struct vhost_dev *dev);
+-struct AcpiFadtDescriptorRev5_1 {
+-    ACPI_FADT_COMMON_DEF
+-    /* 64-bit Sleep Control register (ACPI 5.0) */
+-    struct AcpiGenericAddress sleep_control;
+-    /* 64-bit Sleep Status register (ACPI 5.0) */
+-    struct AcpiGenericAddress sleep_status;
+-} QEMU_PACKED;
+-
+-typedef struct AcpiFadtDescriptorRev5_1 AcpiFadtDescriptorRev5_1;
+-
+ typedef struct AcpiFadtData {
+     struct AcpiGenericAddress pm1a_cnt;   /* PM1a_CNT_BLK */
+     struct AcpiGenericAddress pm1a_evt;   /* PM1a_EVT_BLK */
+@@ -192,6 +182,8 @@ typedef struct AcpiFadtData {
+     uint8_t  rtc_century;      /* CENTURY */
+     uint16_t plvl2_lat;        /* P_LVL2_LAT */
+     uint16_t plvl3_lat;        /* P_LVL3_LAT */
++    uint16_t arm_boot_arch;    /* ARM_BOOT_ARCH */
++    uint8_t minor_ver;         /* FADT Minor Version */
  
- typedef int (*vhost_net_set_backend_op)(struct vhost_dev *dev,
-                                 struct vhost_vring_file *file);
-@@ -94,6 +94,7 @@ typedef int (*vhost_set_config_op)(struct vhost_dev *dev, const uint8_t *data,
-                                    uint32_t flags);
- typedef int (*vhost_get_config_op)(struct vhost_dev *dev, uint8_t *config,
-                                    uint32_t config_len);
-+typedef void (*vhost_set_used_memslots_op)(struct vhost_dev *dev);
+     /*
+      * respective tables offsets within ACPI_BUILD_TABLE_FILE,
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 8f45298..3fa557c 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -1679,7 +1679,7 @@ void build_slit(GArray *table_data, BIOSLinker *linker)
+                  table_data->len - slit_start, 1, NULL, NULL);
+ }
  
- typedef int (*vhost_crypto_create_session_op)(struct vhost_dev *dev,
-                                               void *session_info,
-@@ -105,7 +106,7 @@ typedef struct VhostOps {
-     VhostBackendType backend_type;
-     vhost_backend_init vhost_backend_init;
-     vhost_backend_cleanup vhost_backend_cleanup;
--    vhost_backend_memslots_limit vhost_backend_memslots_limit;
-+    vhost_backend_has_free_memslots vhost_backend_has_free_memslots;
-     vhost_net_set_backend_op vhost_net_set_backend;
-     vhost_net_set_mtu_op vhost_net_set_mtu;
-     vhost_scsi_set_endpoint_op vhost_scsi_set_endpoint;
-@@ -136,6 +137,7 @@ typedef struct VhostOps {
-     vhost_send_device_iotlb_msg_op vhost_send_device_iotlb_msg;
-     vhost_get_config_op vhost_get_config;
-     vhost_set_config_op vhost_set_config;
-+    vhost_set_used_memslots_op vhost_set_used_memslots;
-     vhost_crypto_create_session_op vhost_crypto_create_session;
-     vhost_crypto_close_session_op vhost_crypto_close_session;
- } VhostOps;
-diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
-index 7f09efa..59def69 100644
---- a/hw/virtio/vhost-backend.c
-+++ b/hw/virtio/vhost-backend.c
-@@ -15,6 +15,8 @@
- #include "hw/virtio/vhost-backend.h"
- #include "qemu/error-report.h"
- 
-+static unsigned int vhost_kernel_used_memslots;
-+
- static int vhost_kernel_call(struct vhost_dev *dev, unsigned long int request,
-                              void *arg)
+-/* build rev1/rev3 FADT */
++/* build rev1/rev3/rev5.1 FADT */
+ void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
+                 const char *oem_id, const char *oem_table_id)
  {
-@@ -62,6 +64,11 @@ static int vhost_kernel_memslots_limit(struct vhost_dev *dev)
-     return limit;
- }
+@@ -1755,7 +1755,14 @@ void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
  
-+static bool vhost_kernel_has_free_memslots(struct vhost_dev *dev)
-+{
-+    return vhost_kernel_used_memslots < vhost_kernel_memslots_limit(dev);
-+}
-+
- static int vhost_kernel_net_set_backend(struct vhost_dev *dev,
-                                         struct vhost_vring_file *file)
- {
-@@ -233,11 +240,16 @@ static void vhost_kernel_set_iotlb_callback(struct vhost_dev *dev,
-         qemu_set_fd_handler((uintptr_t)dev->opaque, NULL, NULL, NULL);
- }
+     build_append_gas_from_struct(tbl, &f->reset_reg); /* RESET_REG */
+     build_append_int_noprefix(tbl, f->reset_val, 1); /* RESET_VALUE */
+-    build_append_int_noprefix(tbl, 0, 3); /* Reserved, ACPI 3.0 */
++    /* Since ACPI 5.1 */
++    if ((f->rev >= 6) || ((f->rev == 5) && f->minor_ver > 0)) {
++        build_append_int_noprefix(tbl, f->arm_boot_arch, 2); /* ARM_BOOT_ARCH */
++        /* FADT Minor Version */
++        build_append_int_noprefix(tbl, f->minor_ver, 1);
++    } else {
++        build_append_int_noprefix(tbl, 0, 3); /* Reserved upto ACPI 5.0 */
++    }
+     build_append_int_noprefix(tbl, 0, 8); /* X_FIRMWARE_CTRL */
  
-+static void vhost_kernel_set_used_memslots(struct vhost_dev *dev)
-+{
-+    vhost_kernel_used_memslots = dev->mem->nregions;
-+}
-+
- static const VhostOps kernel_ops = {
-         .backend_type = VHOST_BACKEND_TYPE_KERNEL,
-         .vhost_backend_init = vhost_kernel_init,
-         .vhost_backend_cleanup = vhost_kernel_cleanup,
--        .vhost_backend_memslots_limit = vhost_kernel_memslots_limit,
-+        .vhost_backend_has_free_memslots = vhost_kernel_has_free_memslots,
-         .vhost_net_set_backend = vhost_kernel_net_set_backend,
-         .vhost_scsi_set_endpoint = vhost_kernel_scsi_set_endpoint,
-         .vhost_scsi_clear_endpoint = vhost_kernel_scsi_clear_endpoint,
-@@ -264,6 +276,7 @@ static const VhostOps kernel_ops = {
- #endif /* CONFIG_VHOST_VSOCK */
-         .vhost_set_iotlb_callback = vhost_kernel_set_iotlb_callback,
-         .vhost_send_device_iotlb_msg = vhost_kernel_send_device_iotlb_msg,
-+        .vhost_set_used_memslots = vhost_kernel_set_used_memslots,
- };
+     /* XDSDT address to be filled by Guest linker at runtime */
+@@ -1779,6 +1786,18 @@ void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
+     build_append_gas_from_struct(tbl, &f->gpe0_blk); /* X_GPE0_BLK */
+     build_append_gas(tbl, AML_AS_SYSTEM_MEMORY, 0 , 0, 0, 0); /* X_GPE1_BLK */
  
- int vhost_set_backend_type(struct vhost_dev *dev, VhostBackendType backend_type)
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 41ff5cf..ef14249 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -163,6 +163,8 @@ static VhostUserMsg m __attribute__ ((unused));
- /* The version of the protocol we support */
- #define VHOST_USER_VERSION    (0x1)
- 
-+static bool vhost_user_free_memslots = true;
-+
- struct vhost_user {
-     CharBackend *chr;
-     int slave_fd;
-@@ -330,12 +332,43 @@ static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t base,
-     return 0;
- }
- 
-+static int vhost_user_prepare_msg(struct vhost_dev *dev, VhostUserMemory *mem,
-+                                  int *fds)
-+{
-+    int i, fd;
-+
-+    vhost_user_free_memslots = true;
-+    for (i = 0, mem->nregions = 0; i < dev->mem->nregions; ++i) {
-+        struct vhost_memory_region *reg = dev->mem->regions + i;
-+        ram_addr_t offset;
-+        MemoryRegion *mr;
-+
-+        assert((uintptr_t)reg->userspace_addr == reg->userspace_addr);
-+        mr = memory_region_from_host((void *)(uintptr_t)reg->userspace_addr,
-+                                     &offset);
-+        fd = memory_region_get_fd(mr);
-+        if (fd > 0) {
-+            if (mem->nregions == VHOST_MEMORY_MAX_NREGIONS) {
-+                vhost_user_free_memslots = false;
-+                return -1;
-+            }
-+
-+            mem->regions[mem->nregions].userspace_addr = reg->userspace_addr;
-+            mem->regions[mem->nregions].memory_size = reg->memory_size;
-+            mem->regions[mem->nregions].guest_phys_addr = reg->guest_phys_addr;
-+            mem->regions[mem->nregions].mmap_offset = offset;
-+            fds[mem->nregions++] = fd;
-+        }
++    if (f->rev <= 4) {
++        goto build_hdr;
 +    }
 +
-+    return 0;
-+}
++    /* SLEEP_CONTROL_REG */
++    build_append_gas(tbl, AML_AS_SYSTEM_MEMORY, 0 , 0, 0, 0);
++    /* SLEEP_STATUS_REG */
++    build_append_gas(tbl, AML_AS_SYSTEM_MEMORY, 0 , 0, 0, 0);
 +
- static int vhost_user_set_mem_table(struct vhost_dev *dev,
-                                     struct vhost_memory *mem)
++    /* TODO: extra fields need to be added to support revisions above rev5 */
++    assert(f->rev == 5);
++
+ build_hdr:
+     build_header(linker, tbl, (void *)(tbl->data + fadt_start),
+                  "FACP", tbl->len - fadt_start, f->rev, oem_id, oem_table_id);
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index b644da9..c7c6a57 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -654,39 +654,30 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+ static void build_fadt_rev5(GArray *table_data, BIOSLinker *linker,
+                             VirtMachineState *vms, unsigned dsdt_tbl_offset)
  {
-     int fds[VHOST_MEMORY_MAX_NREGIONS];
--    int i, fd;
--    size_t fd_num = 0;
-+    size_t fd_num;
-     bool reply_supported = virtio_has_feature(dev->protocol_features,
-                                               VHOST_USER_PROTOCOL_F_REPLY_ACK);
+-    int fadt_start = table_data->len;
+-    AcpiFadtDescriptorRev5_1 *fadt = acpi_data_push(table_data, sizeof(*fadt));
+-    unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
+-    uint16_t bootflags;
++    /* ACPI v5.1 */
++    AcpiFadtData fadt = {
++        .rev = 5,
++        .minor_ver = 1,
++        .flags = 1 << ACPI_FADT_F_HW_REDUCED_ACPI,
++        .xdsdt_tbl_offset = &dsdt_tbl_offset,
++    };
  
-@@ -348,29 +381,12 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
-         msg.hdr.flags |= VHOST_USER_NEED_REPLY_MASK;
+     switch (vms->psci_conduit) {
+     case QEMU_PSCI_CONDUIT_DISABLED:
+-        bootflags = 0;
++        fadt.arm_boot_arch = 0;
+         break;
+     case QEMU_PSCI_CONDUIT_HVC:
+-        bootflags = ACPI_FADT_ARM_PSCI_COMPLIANT | ACPI_FADT_ARM_PSCI_USE_HVC;
++        fadt.arm_boot_arch = ACPI_FADT_ARM_PSCI_COMPLIANT |
++                             ACPI_FADT_ARM_PSCI_USE_HVC;
+         break;
+     case QEMU_PSCI_CONDUIT_SMC:
+-        bootflags = ACPI_FADT_ARM_PSCI_COMPLIANT;
++        fadt.arm_boot_arch = ACPI_FADT_ARM_PSCI_COMPLIANT;
+         break;
+     default:
+         g_assert_not_reached();
      }
  
--    for (i = 0; i < dev->mem->nregions; ++i) {
--        struct vhost_memory_region *reg = dev->mem->regions + i;
--        ram_addr_t offset;
--        MemoryRegion *mr;
+-    /* Hardware Reduced = 1 and use PSCI 0.2+ */
+-    fadt->flags = cpu_to_le32(1 << ACPI_FADT_F_HW_REDUCED_ACPI);
+-    fadt->arm_boot_flags = cpu_to_le16(bootflags);
 -
--        assert((uintptr_t)reg->userspace_addr == reg->userspace_addr);
--        mr = memory_region_from_host((void *)(uintptr_t)reg->userspace_addr,
--                                     &offset);
--        fd = memory_region_get_fd(mr);
--        if (fd > 0) {
--            if (fd_num == VHOST_MEMORY_MAX_NREGIONS) {
--                error_report("Failed preparing vhost-user memory table msg");
--                return -1;
--            }
--            msg.payload.memory.regions[fd_num].userspace_addr = reg->userspace_addr;
--            msg.payload.memory.regions[fd_num].memory_size  = reg->memory_size;
--            msg.payload.memory.regions[fd_num].guest_phys_addr = reg->guest_phys_addr;
--            msg.payload.memory.regions[fd_num].mmap_offset = offset;
--            fds[fd_num++] = fd;
--        }
-+    if (vhost_user_prepare_msg(dev, &msg.payload.memory, fds) < 0) {
-+        error_report("Failed preparing vhost-user memory table msg");
-+        return -1;
-     }
- 
--    msg.payload.memory.nregions = fd_num;
-+    fd_num = msg.payload.memory.nregions;
- 
-     if (!fd_num) {
-         error_report("Failed initializing vhost-user memory map, "
-@@ -886,9 +902,9 @@ static int vhost_user_get_vq_index(struct vhost_dev *dev, int idx)
-     return idx;
+-    /* ACPI v5.1 (fadt->revision.fadt->minor_revision) */
+-    fadt->minor_revision = 0x1;
+-
+-    /* DSDT address to be filled by Guest linker */
+-    bios_linker_loader_add_pointer(linker,
+-        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
+-        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+-
+-    build_header(linker, table_data, (void *)(table_data->data + fadt_start),
+-                 "FACP", table_data->len - fadt_start, 5, NULL, NULL);
++    build_fadt(table_data, linker, &fadt, NULL, NULL);
  }
  
--static int vhost_user_memslots_limit(struct vhost_dev *dev)
-+static bool vhost_user_has_free_memslots(struct vhost_dev *dev)
- {
--    return VHOST_MEMORY_MAX_NREGIONS;
-+    return vhost_user_free_memslots;
- }
- 
- static bool vhost_user_requires_shm_log(struct vhost_dev *dev)
-@@ -1156,11 +1172,19 @@ vhost_user_crypto_close_session(struct vhost_dev *dev, uint64_t session_id)
-     return 0;
- }
- 
-+static void vhost_user_set_used_memslots(struct vhost_dev *dev)
-+{
-+    int fds[VHOST_MEMORY_MAX_NREGIONS];
-+    VhostUserMsg msg;
-+
-+    vhost_user_prepare_msg(dev, &msg.payload.memory, fds);
-+}
-+
- const VhostOps user_ops = {
-         .backend_type = VHOST_BACKEND_TYPE_USER,
-         .vhost_backend_init = vhost_user_init,
-         .vhost_backend_cleanup = vhost_user_cleanup,
--        .vhost_backend_memslots_limit = vhost_user_memslots_limit,
-+        .vhost_backend_has_free_memslots = vhost_user_has_free_memslots,
-         .vhost_set_log_base = vhost_user_set_log_base,
-         .vhost_set_mem_table = vhost_user_set_mem_table,
-         .vhost_set_vring_addr = vhost_user_set_vring_addr,
-@@ -1184,6 +1208,7 @@ const VhostOps user_ops = {
-         .vhost_send_device_iotlb_msg = vhost_user_send_device_iotlb_msg,
-         .vhost_get_config = vhost_user_get_config,
-         .vhost_set_config = vhost_user_set_config,
-+        .vhost_set_used_memslots = vhost_user_set_used_memslots,
-         .vhost_crypto_create_session = vhost_user_crypto_create_session,
-         .vhost_crypto_close_session = vhost_user_crypto_close_session,
- };
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index d8d0ef9..17262d2 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -44,20 +44,19 @@
- static struct vhost_log *vhost_log;
- static struct vhost_log *vhost_log_shm;
- 
--static unsigned int used_memslots;
- static QLIST_HEAD(, vhost_dev) vhost_devices =
-     QLIST_HEAD_INITIALIZER(vhost_devices);
- 
- bool vhost_has_free_slot(void)
- {
--    unsigned int slots_limit = ~0U;
-     struct vhost_dev *hdev;
- 
-     QLIST_FOREACH(hdev, &vhost_devices, entry) {
--        unsigned int r = hdev->vhost_ops->vhost_backend_memslots_limit(hdev);
--        slots_limit = MIN(slots_limit, r);
-+        if (!hdev->vhost_ops->vhost_backend_has_free_memslots(hdev)) {
-+            return false;
-+        }
-     }
--    return slots_limit > used_memslots;
-+    return true;
- }
- 
- static void vhost_dev_sync_region(struct vhost_dev *dev,
-@@ -446,7 +445,6 @@ static void vhost_commit(MemoryListener *listener)
-                        dev->n_mem_sections * sizeof dev->mem->regions[0];
-     dev->mem = g_realloc(dev->mem, regions_size);
-     dev->mem->nregions = dev->n_mem_sections;
--    used_memslots = dev->mem->nregions;
-     for (i = 0; i < dev->n_mem_sections; i++) {
-         struct vhost_memory_region *cur_vmr = dev->mem->regions + i;
-         struct MemoryRegionSection *mrs = dev->mem_sections + i;
-@@ -458,6 +456,7 @@ static void vhost_commit(MemoryListener *listener)
-             mrs->offset_within_region;
-         cur_vmr->flags_padding   = 0;
-     }
-+    dev->vhost_ops->vhost_set_used_memslots(dev);
- 
-     if (!dev->started) {
-         goto out;
-@@ -1202,7 +1201,7 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
-     memory_listener_register(&hdev->memory_listener, &address_space_memory);
-     QLIST_INSERT_HEAD(&vhost_devices, hdev, entry);
- 
--    if (used_memslots > hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
-+    if (!hdev->vhost_ops->vhost_backend_has_free_memslots(hdev)) {
-         error_report("vhost backend memory slots limit is less"
-                 " than current number of present memory slots");
-         r = -1;
+ /* DSDT */
 -- 
 MST
