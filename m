@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1evk1H-0001A3-02
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:31:11 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1evk2t-0001tW-Po
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:32:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1evk1C-0002FJ-2U
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:31:11 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:59549)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1evk1B-0002EX-OY
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:31:06 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-References: <20171228180814.9749-1-lukeshu@lukeshu.com>
-	<20171228180814.9749-8-lukeshu@lukeshu.com>
-	<b7b5505b-34a9-9ca3-c257-385ef91eed60@vivier.eu>
-Message-ID: <8ac4ea80-7a1d-e52e-9e54-85a1f910a002@vivier.eu>
-Date: Tue, 13 Mar 2018 14:30:37 +0100
+	(envelope-from <vsementsov@virtuozzo.com>) id 1evk2o-0002zc-QQ
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:32:51 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20180207155837.92351-1-vsementsov@virtuozzo.com>
+	<20180207155837.92351-6-vsementsov@virtuozzo.com>
+	<20180312153020.GI3219@work-vm>
+	<af82d663-f37c-2857-214c-83e348a5f52a@virtuozzo.com>
+	<20180313103056.GB3545@work-vm>
+	<9bc43da5-027a-cd11-0c13-b9a9432e0fdb@virtuozzo.com>
+Message-ID: <71db8542-d4dd-9f63-ae91-aa568ba625e5@virtuozzo.com>
+Date: Tue, 13 Mar 2018 16:32:39 +0300
 MIME-Version: 1.0
-In-Reply-To: <b7b5505b-34a9-9ca3-c257-385ef91eed60@vivier.eu>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <9bc43da5-027a-cd11-0c13-b9a9432e0fdb@virtuozzo.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 07/10] linux-user: init_guest_space: Clean
- up control flow a bit
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v10 05/12] migration: introduce
+ postcopy-only pending
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,89 +29,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Luke Shumaker <lukeshu@lukeshu.com>, qemu-devel@nongnu.org
-Cc: Luke Shumaker <lukeshu@parabola.nu>, Riku Voipio <riku.voipio@iki.fi>, Peter Maydell <peter.maydell@linaro.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
-Le 09/03/2018 à 21:37, Laurent Vivier a écrit :
-> Le 28/12/2017 à 19:08, Luke Shumaker a écrit :
->> From: Luke Shumaker <lukeshu@parabola.nu>
+13.03.2018 16:11, Vladimir Sementsov-Ogievskiy wrote:
+> 13.03.2018 13:30, Dr. David Alan Gilbert wrote:
+>> * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+>>> 12.03.2018 18:30, Dr. David Alan Gilbert wrote:
+>>>> * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+>>>>> There would be savevm states (dirty-bitmap) which can migrate only in
+>>>>> postcopy stage. The corresponding pending is introduced here.
+>>>>>
+>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>
+>>>>> ---
+>>> [...]
+>>>
+>>>>>    static MigIterateState migration_iteration_run(MigrationState *s)
+>>>>>    {
+>>>>> -    uint64_t pending_size, pend_post, pend_nonpost;
+>>>>> +    uint64_t pending_size, pend_pre, pend_compat, pend_post;
+>>>>>        bool in_postcopy = s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE;
+>>>>> -    qemu_savevm_state_pending(s->to_dst_file, s->threshold_size,
+>>>>> -                              &pend_nonpost, &pend_post);
+>>>>> -    pending_size = pend_nonpost + pend_post;
+>>>>> +    qemu_savevm_state_pending(s->to_dst_file, s->threshold_size, &pend_pre,
+>>>>> +                              &pend_compat, &pend_post);
+>>>>> +    pending_size = pend_pre + pend_compat + pend_post;
+>>>>>        trace_migrate_pending(pending_size, s->threshold_size,
+>>>>> -                          pend_post, pend_nonpost);
+>>>>> +                          pend_pre, pend_compat, pend_post);
+>>>>>        if (pending_size && pending_size >= s->threshold_size) {
+>>>>>            /* Still a significant amount to transfer */
+>>>>>            if (migrate_postcopy() && !in_postcopy &&
+>>>>> -            pend_nonpost <= s->threshold_size &&
+>>>>> -            atomic_read(&s->start_postcopy)) {
+>>>>> +            pend_pre <= s->threshold_size &&
+>>>>> +            (atomic_read(&s->start_postcopy) ||
+>>>>> +             (pend_pre + pend_compat <= s->threshold_size)))
+>>>> This change does something different from the description;
+>>>> it causes a postcopy_start even if the user never ran the postcopy-start
+>>>> command; so sorry, we can't do that; because postcopy for RAM is
+>>>> something that users can enable but only switch into when they've given
+>>>> up on it completing normally.
+>>>>
+>>>> However, I guess that leaves you with a problem; which is what happens
+>>>> to the system when you've run out of pend_pre+pend_compat but can't
+>>>> complete because pend_post is non-0; so I don't know the answer to that.
+>>>>
+>>>>
+>>> Hmm. Here, we go to postcopy only if "pend_pre + pend_compat <=
+>>> s->threshold_size". Pre-patch, in this case we will go to
+>>> migration_completion(). So, precopy stage is finishing anyway.
+>> Right.
 >>
->> Instead of doing
+>>> So, we want
+>>> in this case to finish ram migration like it was finished by
+>>> migration_completion(), and then, run postcopy, which will handle only dirty
+>>> bitmaps, yes?
+>> It's a bit tricky; the first important thing is that we can't change the
+>> semantics of the migration without the 'dirty bitmaps'.
 >>
->>         if (check1) {
->>             if (check2) {
->>                success;
->>             }
->>         }
+>> So then there's the question of how  a migration with both
+>> postcopy-ram+dirty bitmaps should work;  again I don't think we should
+>> enter the postcopy-ram phase until start-postcopy is issued.
 >>
->>         retry;
->>
->> Do a clearer
->>
->>         if (!check1) {
->>            goto try_again;
->>         }
->>
->>         if (!check2) {
->>            goto try_again;
->>         }
->>
->>         success;
->>
->>     try_again:
->>         retry;
->>
->> Besides being clearer, this makes it easier to insert more checks that
->> need to trigger a retry on check failure, or rearrange them, or anything
->> like that.
->>
->> Because some indentation is changing, "ignore space change" may be useful
->> for viewing this patch.
->>
->> Signed-off-by: Luke Shumaker <lukeshu@parabola.nu>
->> ---
->>  linux-user/elfload.c | 34 +++++++++++++++++++---------------
->>  1 file changed, 19 insertions(+), 15 deletions(-)
->>
->> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
->> index b560f5d6fe..5c0ad65611 100644
->> --- a/linux-user/elfload.c
->> +++ b/linux-user/elfload.c
->> @@ -1906,24 +1906,28 @@ unsigned long init_guest_space(unsigned long host_start,
->>          }
->>  
->>          /* Check to see if the address is valid.  */
->> -        if (!host_start || aligned_start == current_start) {
->> +        if (host_start && aligned_start != current_start) {
->> +            goto try_again;
->> +        }
->> +
->>  #if defined(TARGET_ARM) && !defined(TARGET_AARCH64)
->> -            /* On 32-bit ARM, we need to also be able to map the commpage.  */
->> -            int valid = init_guest_commpage(aligned_start - guest_start,
->> -                                            aligned_size + guest_start);
->> -            if (valid == 1) {
->> -                break;
->> -            } else if (valid == -1) {
->> -                munmap((void *)real_start, real_size);
->> -                return (unsigned long)-1;
->> -            }
->> -            /* valid == 0, so try again. */
->> -#else
->> -            /* On other architectures, whatever we have here is fine.  */
->> -            break;
->> -#endif
->> +        /* On 32-bit ARM, we need to also be able to map the commpage.  */
->> +        int valid = init_guest_commpage(aligned_start - guest_start,
->> +                                        aligned_size + guest_start);
->> +        if (valid == -1) {
->> +            munmap((void *)real_start, real_size);
->> +            return (unsigned long)-1;
->> +        } else if (valid == -1) {
-> 
-> I think it should be "if (valid == 0)" here.
+>> Then there's the 3rd case; dirty-bitmaps but no postcopy-ram; in that
+>> case I worry less about the semantics of how you want to do it.
+>
+> I have an idea:
+>
+> in postcopy_start(), in ram_has_postcopy() (and may be some other 
+> places?), check atomic_read(&s->start_postcopy) instead of 
+> migrate_postcopy_ram()
+>
+> then:
+>
+> 1. behavior without dirty-bitmaps is not changed, as currently we cant 
+> go into postcopy_start and ram_has_postcopy without s->start_postcopy
+> 2. dirty-bitmaps+ram: if user don't set s->start_postcopy, 
+> postcopy_start() will operate as if migration capability was not 
+> enabled, so ram should complete its migration
+> 3. only dirty-bitmaps: again, postcopy_start() will operate as if 
+> migration capability was not enabled, so ram should complete its migration
 
-Any comment?
+I mean s/migration capability/migration capability for ram postcopy/.
 
-Thanks,
-Laurent
+What do you think, will that work?
+
+>
+>
+>>> Hmm2. Looked through migration_completion(), I don't understand, how it
+>>> finishes ram migration without postcopy. It calls
+>>> qemu_savevm_state_complete_precopy(), which skips states with
+>>> has_postcopy=true, which is ram...
+>> Because savevm_state_complete_precopy only skips has_postcopy=true in
+>> the in_postcopy case:
+>>
+>>              (in_postcopy && se->ops->has_postcopy &&
+>>               se->ops->has_postcopy(se->opaque)) ||
+>>
+>> so when we call it in migration_completion(), if we've not entered
+>> postcopy yet, then that test doesn't trigger.
+>>
+>> (Apologies for not spotting this earlier; but I thought this patch was
+>> a nice easy one just adding the postcopy_only_pending - I didn't realise it changed
+>> existing semantics until I spotted that)
+>
+> oh, yes, I was inattentive :(
+>
+>> Dave
+>>
+>>> -- 
+>>> Best regards,
+>>> Vladimir
+>>>
+>> --
+>> Dr. David Alan Gilbert /dgilbert@redhat.com  / Manchester, UK
+>
+>
+> -- 
+> Best regards,
+> Vladimir
+
+
+-- 
+Best regards,
+Vladimir
