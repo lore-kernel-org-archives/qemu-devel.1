@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47274)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evnUu-0007Mb-HC
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:14:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1evnUx-0007RN-PT
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:14:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evnUr-0000uU-QZ
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:14:00 -0400
+	(envelope-from <eblake@redhat.com>) id 1evnUw-0000zA-IP
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:14:03 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 13 Mar 2018 12:13:38 -0500
-Message-Id: <20180313171345.659672-11-eblake@redhat.com>
+Date: Tue, 13 Mar 2018 12:13:45 -0500
+Message-Id: <20180313171345.659672-18-eblake@redhat.com>
 In-Reply-To: <20180313171345.659672-1-eblake@redhat.com>
 References: <20180313171345.659672-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 10/17] nbd/server: add nbd_opt_invalid helper
+Subject: [Qemu-devel] [PULL 17/17] iotests: new test 209 for NBD BLOCK_STATUS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,112 +20,77 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-NBD_REP_ERR_INVALID is often parameter to nbd_opt_drop and it would
-be used more in following patches. So, let's add a helper.
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180312152126.286890-2-vsementsov@virtuozzo.com>
+Message-Id: <20180312152126.286890-9-vsementsov@virtuozzo.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- nbd/server.c | 50 ++++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 36 insertions(+), 14 deletions(-)
+ tests/qemu-iotests/209     | 34 ++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/209.out |  2 ++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 37 insertions(+)
+ create mode 100755 tests/qemu-iotests/209
+ create mode 100644 tests/qemu-iotests/209.out
 
-diff --git a/nbd/server.c b/nbd/server.c
-index 4776009a2d1..01ea97afe98 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -218,22 +218,46 @@ nbd_negotiate_send_rep_err(NBDClient *client, uint32_t type,
- /* Drop remainder of the current option, and send a reply with the
-  * given error type and message. Return -errno on read or write
-  * failure; or 0 if connection is still live. */
--static int GCC_FMT_ATTR(4, 5)
--nbd_opt_drop(NBDClient *client, uint32_t type, Error **errp,
--             const char *fmt, ...)
-+static int GCC_FMT_ATTR(4, 0)
-+nbd_opt_vdrop(NBDClient *client, uint32_t type, Error **errp,
-+              const char *fmt, va_list va)
- {
-     int ret = nbd_drop(client->ioc, client->optlen, errp);
--    va_list va;
-
-     client->optlen = 0;
-     if (!ret) {
--        va_start(va, fmt);
-         ret = nbd_negotiate_send_rep_verr(client, type, errp, fmt, va);
--        va_end(va);
-     }
-     return ret;
- }
-
-+static int GCC_FMT_ATTR(4, 5)
-+nbd_opt_drop(NBDClient *client, uint32_t type, Error **errp,
-+             const char *fmt, ...)
-+{
-+    int ret;
-+    va_list va;
+diff --git a/tests/qemu-iotests/209 b/tests/qemu-iotests/209
+new file mode 100755
+index 00000000000..259e991ec6e
+--- /dev/null
++++ b/tests/qemu-iotests/209
+@@ -0,0 +1,34 @@
++#!/usr/bin/env python
++#
++# Tests for NBD BLOCK_STATUS extension
++#
++# Copyright (c) 2018 Virtuozzo International GmbH
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-+    va_start(va, fmt);
-+    ret = nbd_opt_vdrop(client, type, errp, fmt, va);
-+    va_end(va);
++import iotests
++from iotests import qemu_img_create, qemu_io, qemu_img_verbose, qemu_nbd, \
++                    file_path
 +
-+    return ret;
-+}
++iotests.verify_image_format(supported_fmts=['qcow2'])
 +
-+static int GCC_FMT_ATTR(3, 4)
-+nbd_opt_invalid(NBDClient *client, Error **errp, const char *fmt, ...)
-+{
-+    int ret;
-+    va_list va;
++disk, nbd_sock = file_path('disk', 'nbd-sock')
++nbd_uri = 'nbd+unix:///exp?socket=' + nbd_sock
 +
-+    va_start(va, fmt);
-+    ret = nbd_opt_vdrop(client, NBD_REP_ERR_INVALID, errp, fmt, va);
-+    va_end(va);
++qemu_img_create('-f', iotests.imgfmt, disk, '1M')
++qemu_io('-f', iotests.imgfmt, '-c', 'write 0 512K', disk)
 +
-+    return ret;
-+}
-+
- /* Read size bytes from the unparsed payload of the current option.
-  * Return -errno on I/O error, 0 if option was completely handled by
-  * sending a reply about inconsistent lengths, or 1 on success. */
-@@ -241,9 +265,9 @@ static int nbd_opt_read(NBDClient *client, void *buffer, size_t size,
-                         Error **errp)
- {
-     if (size > client->optlen) {
--        return nbd_opt_drop(client, NBD_REP_ERR_INVALID, errp,
--                            "Inconsistent lengths in option %s",
--                            nbd_opt_lookup(client->opt));
-+        return nbd_opt_invalid(client, errp,
-+                               "Inconsistent lengths in option %s",
-+                               nbd_opt_lookup(client->opt));
-     }
-     client->optlen -= size;
-     return qio_channel_read_all(client->ioc, buffer, size, errp) < 0 ? -EIO : 1;
-@@ -398,9 +422,8 @@ static int nbd_reject_length(NBDClient *client, bool fatal, Error **errp)
-     int ret;
-
-     assert(client->optlen);
--    ret = nbd_opt_drop(client, NBD_REP_ERR_INVALID, errp,
--                       "option '%s' has unexpected length",
--                       nbd_opt_lookup(client->opt));
-+    ret = nbd_opt_invalid(client, errp, "option '%s' has unexpected length",
-+                          nbd_opt_lookup(client->opt));
-     if (fatal && !ret) {
-         error_setg(errp, "option '%s' has unexpected length",
-                    nbd_opt_lookup(client->opt));
-@@ -438,8 +461,7 @@ static int nbd_negotiate_handle_info(NBDClient *client, uint16_t myflags,
-     }
-     be32_to_cpus(&namelen);
-     if (namelen >= sizeof(name)) {
--        return nbd_opt_drop(client, NBD_REP_ERR_INVALID, errp,
--                            "name too long for qemu");
-+        return nbd_opt_invalid(client, errp, "name too long for qemu");
-     }
-     rc = nbd_opt_read(client, name, namelen, errp);
-     if (rc <= 0) {
++qemu_nbd('-k', nbd_sock, '-x', 'exp', '-f', iotests.imgfmt, disk)
++qemu_img_verbose('map', '-f', 'raw', '--output=json', nbd_uri)
+diff --git a/tests/qemu-iotests/209.out b/tests/qemu-iotests/209.out
+new file mode 100644
+index 00000000000..0d29724e84a
+--- /dev/null
++++ b/tests/qemu-iotests/209.out
+@@ -0,0 +1,2 @@
++[{ "start": 0, "length": 524288, "depth": 0, "zero": false, "data": true},
++{ "start": 524288, "length": 524288, "depth": 0, "zero": true, "data": false}]
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 890fe91f2b1..624e1fbd4fe 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -205,3 +205,4 @@
+ 206 rw auto
+ 207 rw auto
+ 208 rw auto quick
++209 rw auto quick
 -- 
 2.14.3
