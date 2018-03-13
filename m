@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1evjUp-0001XB-L2
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:57:40 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1evjUq-0001YV-Ph
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:57:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1evjUo-0000wz-Ow
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:57:39 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:33257)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1evjUp-0000xr-Sl
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:57:40 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:46809)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1evjUo-0000wd-I2
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:57:38 -0400
-Received: by mail-wr0-x243.google.com with SMTP id r8so7237238wrg.0
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 05:57:38 -0700 (PDT)
+	id 1evjUp-0000xF-Li
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:57:39 -0400
+Received: by mail-wr0-x242.google.com with SMTP id m12so22360093wrm.13
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 05:57:39 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 13 Mar 2018 13:56:36 +0100
-Message-Id: <1520945798-50640-21-git-send-email-pbonzini@redhat.com>
+Date: Tue, 13 Mar 2018 13:56:37 +0100
+Message-Id: <1520945798-50640-22-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1520945798-50640-1-git-send-email-pbonzini@redhat.com>
 References: <1520945798-50640-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 20/22] sev/i386: qmp: add
- query-sev-launch-measure command
+Subject: [Qemu-devel] [PULL 21/22] sev/i386: qmp: add query-sev-capabilities
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,122 +36,120 @@ Cc: Brijesh Singh <brijesh.singh@amd.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=
 
 From: Brijesh Singh <brijesh.singh@amd.com>
 
-The command can be used by libvirt to retrieve the measurement of SEV guest.
-This measurement is a signature of the memory contents that was encrypted
-through the LAUNCH_UPDATE_DATA.
+The command can be used by libvirt to query the SEV capabilities.
 
 Cc: "Daniel P. Berrangé" <berrange@redhat.com>
 Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Cc: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
  monitor.c             |  7 +++++++
- qapi/misc.json        | 29 +++++++++++++++++++++++++++++
- target/i386/monitor.c | 17 +++++++++++++++++
- tests/qmp-test.c      |  2 ++
- 4 files changed, 55 insertions(+)
+ qapi/misc.json        | 42 ++++++++++++++++++++++++++++++++++++++++++
+ target/i386/monitor.c |  6 ++++++
+ tests/qmp-test.c      |  1 +
+ 4 files changed, 56 insertions(+)
 
 diff --git a/monitor.c b/monitor.c
-index af11654..36ed087 100644
+index 36ed087..3117a3e 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -984,6 +984,7 @@ static void qmp_unregister_commands_hack(void)
- #ifndef TARGET_I386
+@@ -985,6 +985,7 @@ static void qmp_unregister_commands_hack(void)
      qmp_unregister_command(&qmp_commands, "rtc-reset-reinjection");
      qmp_unregister_command(&qmp_commands, "query-sev");
-+    qmp_unregister_command(&qmp_commands, "query-sev-launch-measure");
+     qmp_unregister_command(&qmp_commands, "query-sev-launch-measure");
++    qmp_unregister_command(&qmp_commands, "query-sev-capabilities");
  #endif
  #ifndef TARGET_S390X
      qmp_unregister_command(&qmp_commands, "dump-skeys");
-@@ -4110,6 +4111,12 @@ SevInfo *qmp_query_sev(Error **errp)
-     error_setg(errp, QERR_FEATURE_DISABLED, "query-sev");
+@@ -4117,6 +4118,12 @@ SevLaunchMeasureInfo *qmp_query_sev_launch_measure(Error **errp)
+     error_setg(errp, QERR_FEATURE_DISABLED, "query-sev-launch-measure");
      return NULL;
  }
 +
-+SevLaunchMeasureInfo *qmp_query_sev_launch_measure(Error **errp)
++SevCapability *qmp_query_sev_capabilities(Error **errp)
 +{
-+    error_setg(errp, QERR_FEATURE_DISABLED, "query-sev-launch-measure");
++    error_setg(errp, QERR_FEATURE_DISABLED, "query-sev-capabilities");
 +    return NULL;
 +}
  #endif
  
  #ifndef TARGET_S390X
 diff --git a/qapi/misc.json b/qapi/misc.json
-index 7b628c2..b8318f5 100644
+index b8318f5..6150b9a 100644
 --- a/qapi/misc.json
 +++ b/qapi/misc.json
-@@ -3293,3 +3293,32 @@
+@@ -3322,3 +3322,45 @@
  #
  ##
- { 'command': 'query-sev', 'returns': 'SevInfo' }
+ { 'command': 'query-sev-launch-measure', 'returns': 'SevLaunchMeasureInfo' }
 +
 +##
-+# @SevLaunchMeasureInfo:
++# @SevCapability:
 +#
-+# SEV Guest Launch measurement information
++# The struct describes capability for a Secure Encrypted Virtualization
++# feature.
 +#
-+# @data: the measurement value encoded in base64
++# @pdh:  Platform Diffie-Hellman key (base64 encoded)
++#
++# @cert-chain:  PDH certificate chain (base64 encoded)
++#
++# @cbitpos: C-bit location in page table entry
++#
++# @reduced-phys-bits: Number of physical Address bit reduction when SEV is
++#                     enabled
 +#
 +# Since: 2.12
-+#
 +##
-+{ 'struct': 'SevLaunchMeasureInfo', 'data': {'data': 'str'} }
++{ 'struct': 'SevCapability',
++  'data': { 'pdh': 'str',
++            'cert-chain': 'str',
++            'cbitpos': 'int',
++            'reduced-phys-bits': 'int'} }
 +
 +##
-+# @query-sev-launch-measure:
++# @query-sev-capabilities:
 +#
-+# Query the SEV guest launch information.
++# This command is used to get the SEV capabilities, and is supported on AMD
++# X86 platforms only.
 +#
-+# Returns: The @SevLaunchMeasureInfo for the guest
++# Returns: SevCapability objects.
 +#
 +# Since: 2.12
 +#
 +# Example:
 +#
-+# -> { "execute": "query-sev-launch-measure" }
-+# <- { "return": { "data": "4l8LXeNlSPUDlXPJG5966/8%YZ" } }
++# -> { "execute": "query-sev-capabilities" }
++# <- { "return": { "pdh": "8CCDD8DDD", "cert-chain": "888CCCDDDEE",
++#                  "cbitpos": 47, "reduced-phys-bits": 5}}
 +#
 +##
-+{ 'command': 'query-sev-launch-measure', 'returns': 'SevLaunchMeasureInfo' }
++{ 'command': 'query-sev-capabilities', 'returns': 'SevCapability' }
 diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-index 64b5e6e..f8a0e4b 100644
+index f8a0e4b..8a786fb 100644
 --- a/target/i386/monitor.c
 +++ b/target/i386/monitor.c
-@@ -697,3 +697,20 @@ void hmp_info_sev(Monitor *mon, const QDict *qdict)
-         monitor_printf(mon, "SEV is not enabled\n");
-     }
+@@ -714,3 +714,9 @@ SevLaunchMeasureInfo *qmp_query_sev_launch_measure(Error **errp)
+ 
+     return info;
  }
 +
-+SevLaunchMeasureInfo *qmp_query_sev_launch_measure(Error **errp)
++SevCapability *qmp_query_sev_capabilities(Error **errp)
 +{
-+    char *data;
-+    SevLaunchMeasureInfo *info;
-+
-+    data = sev_get_launch_measurement();
-+    if (!data) {
-+        error_setg(errp, "Measurement is not available");
-+        return NULL;
-+    }
-+
-+    info = g_malloc0(sizeof(*info));
-+    info->data = data;
-+
-+    return info;
++    error_setg(errp, "SEV feature is not available");
++    return NULL;
 +}
 diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index a77ff92..ec8c7c7 100644
+index ec8c7c7..7470c6b 100644
 --- a/tests/qmp-test.c
 +++ b/tests/qmp-test.c
-@@ -204,6 +204,8 @@ static bool query_is_blacklisted(const char *cmd)
-         "query-gic-capabilities", /* arm */
-         /* Success depends on target-specific build configuration: */
-         "query-pci",              /* CONFIG_PCI */
-+        /* Success depends on launching SEV guest */
-+        "query-sev-launch-measure",
+@@ -208,6 +208,7 @@ static bool query_is_blacklisted(const char *cmd)
+         "query-sev-launch-measure",
          /* Success depends on Host or Hypervisor SEV support */
          "query-sev",
++        "query-sev-capabilities",
          NULL
+     };
+     int i;
 -- 
 1.8.3.1
