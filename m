@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1evogF-0007Nw-7f
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:29:48 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1evonS-000512-80
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:37:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1evogC-0008Pw-3J
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:29:47 -0400
-References: <20180313180320.339796-1-vsementsov@virtuozzo.com>
-	<20180313180320.339796-12-vsementsov@virtuozzo.com>
-	<20180313182208.GM3545@work-vm>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <14ad1e8a-4b08-7707-0a8f-d443c65abb22@virtuozzo.com>
-Date: Tue, 13 Mar 2018 21:29:36 +0300
+	(envelope-from <ehabkost@redhat.com>) id 1evonP-0005nk-3y
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:37:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38990)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1evonO-0005n9-U3
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:37:11 -0400
+Date: Tue, 13 Mar 2018 15:37:04 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180313183704.GA3417@localhost.localdomain>
+References: <20180312223455.18124-1-ehabkost@redhat.com>
+	<CAFEAcA9W=CLdogF+gHUfQOy7Gb=UHg0oTLYhYMRh7S363ss9wQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180313182208.GM3545@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v11 11/13] migration: add postcopy
- migration of dirty bitmaps
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9W=CLdogF+gHUfQOy7Gb=UHg0oTLYhYMRh7S363ss9wQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 0/7] Machine queue, 2018-03-12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,57 +27,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>
 
-13.03.2018 21:22, Dr. David Alan Gilbert wrote:
-> * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
->> Postcopy migration of dirty bitmaps. Only named dirty bitmaps are migrated.
->>
->> If destination qemu is already containing a dirty bitmap with the same name
->> as a migrated bitmap (for the same node), then, if their granularities are
->> the same the migration will be done, otherwise the error will be generated.
->>
->> If destination qemu doesn't contain such bitmap it will be created.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
+On Tue, Mar 13, 2018 at 06:29:10PM +0000, Peter Maydell wrote:
+> On 12 March 2018 at 22:34, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > The following changes since commit 6ceb1b51f05f9e1892d082960ed602dca7b6696e:
+> >
+> >   Merge remote-tracking branch 'remotes/kraxel/tags/audio-20180312-pull-request' into staging (2018-03-12 16:14:37 +0000)
+> >
+> > are available in the Git repository at:
+> >
+> >   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
+> >
+> > for you to fetch changes up to a82664f2f8b1ce2db90e644df01d7ca7845881a6:
+> >
+> >   cpu: drop unnecessary NULL check and cpu_common_class_by_name() (2018-03-12 19:33:32 -0300)
+> >
+> > ----------------------------------------------------------------
+> > Machine queue, 2018-03-12
+> >
+> 
+> Hi. It looks like this breaks bsd-user compilation:
+> 
+> /root/qemu/bsd-user/main.c: In function 'main':
+> /root/qemu/bsd-user/main.c:905:5: warning: implicit declaration of
+> function 'create' [-Wimplicit-function-declaration]
+>      cpu = create(cpu_type);
+>      ^
+> /root/qemu/bsd-user/main.c:905:5: warning: nested extern declaration
+> of 'create' [-Wnested-externs]
+> /root/qemu/bsd-user/main.c:905:9: warning: assignment makes pointer
+> from integer without a cast [enabled by default]
+>      cpu = create(cpu_type);
+>          ^
+> 
+> and then later it fails to link with
+> /root/qemu/bsd-user/main.c:905: undefined reference to `create'
 
-[...]
+Oops, sorry.  I don't have a BSD host handy right now, are you able to confirm
+if the new tag I pushed fixes it?
 
->> +
->> +static int dirty_bitmap_load_bits(QEMUFile *f, DirtyBitmapLoadState *s)
->> +{
->> +    uint64_t first_byte = qemu_get_be64(f) << BDRV_SECTOR_BITS;
->> +    uint64_t nr_bytes = (uint64_t)qemu_get_be32(f) << BDRV_SECTOR_BITS;
->> +    trace_dirty_bitmap_load_bits_enter(first_byte >> BDRV_SECTOR_BITS,
->> +                                       nr_bytes >> BDRV_SECTOR_BITS);
->> +
->> +    if (s->flags & DIRTY_BITMAP_MIG_FLAG_ZEROES) {
->> +        trace_dirty_bitmap_load_bits_zeroes();
->> +        bdrv_dirty_bitmap_deserialize_zeroes(s->bitmap, first_byte, nr_bytes,
->> +                                             false);
->> +    } else {
->> +        size_t ret;
->> +        uint8_t *buf;
->> +        uint64_t buf_size = qemu_get_be64(f);
->> +        uint64_t needed_size =
->> +            bdrv_dirty_bitmap_serialization_size(s->bitmap,
->> +                                                 first_byte, nr_bytes);
->> +
->> +        if (needed_size > buf_size ||
->> +            buf_size > QEMU_ALIGN_UP(needed_size, 4 + sizeof(long))
-> I think you meant '4 * sizeof(long)';  other than that, from the
-> migration side I'm OK, so with that fixed, and someone from the block
-> side checking the block code:
->
->
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->
+The following changes since commit 026aaf47c02b79036feb830206cfebb2a726510d:
 
-Ohh, yes, 4 * sizeof(long).
-Who will finally pull it? Should I respin, or you fix it inflight?
+  Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-request' into staging (2018-03-13 16:26:44 +0000)
+
+are available in the Git repository at:
+
+  git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
+
+for you to fetch changes up to e291aefcd38ca3d048e45f644e9321d02fc253cc:
+
+  cpu: drop unnecessary NULL check and cpu_common_class_by_name() (2018-03-13 15:33:26 -0300)
+
+----------------------------------------------------------------
+machine queue, 2018-03-13
+
+----------------------------------------------------------------
+
+Igor Mammedov (6):
+  nios2: 10m50_devboard: replace cpu_model with cpu_type
+  tests: add machine 'none' with -cpu test
+  cpu: add CPU_RESOLVING_TYPE macro
+  Use cpu_create(type) instead of cpu_init(cpu_model)
+  cpu: get rid of unused cpu_init() defines
+  cpu: drop unnecessary NULL check and cpu_common_class_by_name()
+
+Wang Xin (1):
+  pc: correct misspelled CPU model-id for pc 2.2
 
 -- 
-Best regards,
-Vladimir
+Eduardo
