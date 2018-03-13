@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1evluT-0002fv-3l
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 11:32:18 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1evluV-0002gt-DO
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 11:32:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1evluP-0004AI-4x
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 11:32:17 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:38005)
+	(envelope-from <alex.bennee@linaro.org>) id 1evluR-0004BV-Os
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 11:32:19 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:40214)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1evluO-00049l-U6
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 11:32:13 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id l8so25151wrg.5
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 08:32:12 -0700 (PDT)
+	id 1evluR-0004B7-IU
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 11:32:15 -0400
+Received: by mail-wr0-x242.google.com with SMTP id m4so3796wrb.7
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 08:32:15 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 13 Mar 2018 15:32:06 +0000
-Message-Id: <20180313153210.28264-1-alex.bennee@linaro.org>
+Date: Tue, 13 Mar 2018 15:32:08 +0000
+Message-Id: <20180313153210.28264-3-alex.bennee@linaro.org>
+In-Reply-To: <20180313153210.28264-1-alex.bennee@linaro.org>
+References: <20180313153210.28264-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 0/4] Travis Build Speed-ups
+Subject: [Qemu-devel] [PATCH v1 2/4] .travis.yml: split default config into
+ system and user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +31,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, peter.maydell@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: berrange@redhat.com, peter.maydell@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Hi,
+As the build times have risen we keep timing out. Split the default
+config into system and user builds.
 
-As QEMU has grown it has started to hit the Travis timeouts a lot
-more. These patches try and address that by selectively adding
---disable-user and --disable-system to the place (and adding a new
-matrix entry).
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ .travis.yml | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-: patch 0001/.travis.yml drop setting default log output.patch needs review
-: patch 0002/.travis.yml split default config into system and .patch needs review
-: patch 0003/.travis.yml add disable user with the rest of the.patch needs review
-: patch 0004/.travis.yml add disable tools to the modules buil.patch needs review
-
-Alex Bennée (4):
-  .travis.yml: drop setting default log output
-  .travis.yml: split default config into system and user
-  .travis.yml: add --disable-user with the rest of the disables
-  .travis.yml: add --disable-tools to the modules build
-
- .travis.yml | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
+diff --git a/.travis.yml b/.travis.yml
+index 92c343a1ef..75e5b408d0 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -49,7 +49,8 @@ env:
+     - TEST_CMD="make check"
+     - MAKEFLAGS="-j3"
+   matrix:
+-    - CONFIG=""
++    - CONFIG="--disable-system"
++    - CONFIG="--disable-user"
+     - CONFIG="--enable-debug --enable-debug-tcg"
+     - CONFIG="--disable-linux-aio --disable-cap-ng --disable-attr --disable-brlapi --disable-uuid --disable-libusb"
+     - CONFIG="--enable-modules --disable-linux-user"
 -- 
 2.16.2
