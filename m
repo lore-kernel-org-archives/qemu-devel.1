@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1evppE-0001pk-6E
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:43:09 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1evpw5-0003qh-P3
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:50:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1evppD-00076X-8y
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:43:08 -0400
-References: <20180313180320.339796-1-vsementsov@virtuozzo.com>
-	<20180313180320.339796-12-vsementsov@virtuozzo.com>
-	<20180313182208.GM3545@work-vm>
-	<14ad1e8a-4b08-7707-0a8f-d443c65abb22@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <2c256209-a5e6-1e57-eb75-27fd3ef6860c@redhat.com>
-Date: Tue, 13 Mar 2018 15:42:33 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1evpw1-00038G-P3
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:50:13 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59552 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evpw1-00037y-Is
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:50:09 -0400
+Date: Tue, 13 Mar 2018 19:49:45 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180313194944.GN3545@work-vm>
+References: <20180308124901.83533-1-brijesh.singh@amd.com>
+	<20180308124901.83533-9-brijesh.singh@amd.com>
+	<20180308164910.GF4718@redhat.com>
+	<e39191c3-9c83-8c44-f1d2-9fa7a2f7695d@amd.com>
+	<20180308224412.GF3417@localhost.localdomain>
+	<8cf2f9bc-0339-1c80-b53b-ef5915248d1f@redhat.com>
+	<20180313184950.GB3417@localhost.localdomain>
+	<253374a3-0d09-a29a-94fc-ea4f5718f477@redhat.com>
+	<20180313192056.GD3417@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <14ad1e8a-4b08-7707-0a8f-d443c65abb22@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v11 11/13] migration: add postcopy
- migration of dirty bitmaps
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180313192056.GD3417@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v12 08/28] target/i386: add Secure
+ Encrypted Virtulization (SEV) object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +35,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, famz@redhat.com, lirans@il.ibm.com, qemu-block@nongnu.org, quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com, den@openvz.org, amit.shah@redhat.com, pbonzini@redhat.com, mreitz@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Brijesh Singh <brijesh.singh@amd.com>, Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Markus Armbruster <armbru@redhat.com>, Bruce Rogers <brogers@suse.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, Borislav Petkov <bp@suse.de>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Richard Henderson <richard.henderson@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
+* Eduardo Habkost (ehabkost@redhat.com) wrote:
+> On Tue, Mar 13, 2018 at 08:04:51PM +0100, Paolo Bonzini wrote:
+> > On 13/03/2018 19:49, Eduardo Habkost wrote:
+> > >>>
+> > >>> Exactly, in other words these two options are part of the guest
+> > >>> ABI, and QEMU promises to never make the guest ABI depend on the
+> > >>> host hardware unless you're using "-cpu host".
+> > >>
+> > >> This is not entirely true; while MAXPHYADDR is constant downstream
+> > >> unless using "-cpu host", in practice that behavior is wrong and a guest
+> > >> could misbehave if passed a MAXPHYADDR that is different from the host's.
+> > >>
+> > >> I think this is the same, and management software will have to live with it.
+> > > 
+> > > I think they are very far from being equivalent.
+> > 
+> > Right, I only meant to say that guest ABI actually does depend on the
+> > host hardware, even outside of "-cpu host".
+> > 
+> > > But if you tell the guest the wrong C-bit location, guests are
+> > > likely to rely on it and break.  Migration between hosts with
+> > > different C-bit locations won't work, will it?
+> > 
+> > It won't---but as long as the destination hosts fails fast when the
+> > C-bit location is wrong, it's okay.  What matters is that we don't run
+> > guest code with the wrong C bit, as you noted.
+> 
+> Are you proposing we change the default to simply use cbitpos
+> from the host?
 
+Hmm I don't like that idea; as an option that's fine, as the only
+way it's not.
 
-On 03/13/2018 02:29 PM, Vladimir Sementsov-Ogievskiy wrote:
-> 13.03.2018 21:22, Dr. David Alan Gilbert wrote:
->> * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
->>> Postcopy migration of dirty bitmaps. Only named dirty bitmaps are
->>> migrated.
->>>
->>> If destination qemu is already containing a dirty bitmap with the
->>> same name
->>> as a migrated bitmap (for the same node), then, if their
->>> granularities are
->>> the same the migration will be done, otherwise the error will be
->>> generated.
->>>
->>> If destination qemu doesn't contain such bitmap it will be created.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
->
->>> ---
->=20
-> [...]
->=20
->>> +
->>> +static int dirty_bitmap_load_bits(QEMUFile *f, DirtyBitmapLoadState =
-*s)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 uint64_t first_byte =3D qemu_get_be64(f) << BDRV_=
-SECTOR_BITS;
->>> +=C2=A0=C2=A0=C2=A0 uint64_t nr_bytes =3D (uint64_t)qemu_get_be32(f) =
-<< BDRV_SECTOR_BITS;
->>> +=C2=A0=C2=A0=C2=A0 trace_dirty_bitmap_load_bits_enter(first_byte >> =
-BDRV_SECTOR_BITS,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 nr_bytes >> BDRV_SECTOR_BITS);
->>> +
->>> +=C2=A0=C2=A0=C2=A0 if (s->flags & DIRTY_BITMAP_MIG_FLAG_ZEROES) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 trace_dirty_bitmap_load_b=
-its_zeroes();
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmap_deseria=
-lize_zeroes(s->bitmap, first_byte,
->>> nr_bytes,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 false);
->>> +=C2=A0=C2=A0=C2=A0 } else {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 size_t ret;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t *buf;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t buf_size =3D qem=
-u_get_be64(f);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t needed_size =3D
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 b=
-drv_dirty_bitmap_serialization_size(s->bitmap,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fir=
-st_byte, nr_bytes);
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (needed_size > buf_siz=
-e ||
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 b=
-uf_size > QEMU_ALIGN_UP(needed_size, 4 + sizeof(long))
->> I think you meant '4 * sizeof(long)';=C2=A0 other than that, from the
->> migration side I'm OK, so with that fixed, and someone from the block
->> side checking the block code:
->>
->>
->> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>
->=20
-> Ohh, yes, 4 * sizeof(long).
-> Who will finally pull it? Should I respin, or you fix it inflight?
->=20
+> I would agree with this only if we make QEMU able to prevent live
+> migration to a host with mismatching cbitpos.
 
-I'm testing and staging it right now. David gave his blessing for me to
-send a Pull Request.
+Yeh; especially since I suspect debugging stuff with a failed SEV
+migration like that is going to be really hard.
 
---js
+Dave
+
+> -- 
+> Eduardo
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
