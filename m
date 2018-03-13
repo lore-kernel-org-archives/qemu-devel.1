@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1evjUe-0001Kc-Pe
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:57:30 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1evjUd-0001Is-98
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:57:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1evjUd-0000oF-Kf
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:57:28 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:39010)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1evjUa-0000kY-Lt
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:57:27 -0400
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:38011)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1evjUd-0000n7-96
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:57:27 -0400
-Received: by mail-wr0-x243.google.com with SMTP id k3so2974384wrg.6
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 05:57:27 -0700 (PDT)
+	id 1evjUa-0000jw-D4
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:57:24 -0400
+Received: by mail-wr0-x234.google.com with SMTP id l8so8045564wrg.5
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 05:57:24 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 13 Mar 2018 13:56:27 +0100
-Message-Id: <1520945798-50640-12-git-send-email-pbonzini@redhat.com>
+Date: Tue, 13 Mar 2018 13:56:24 +0100
+Message-Id: <1520945798-50640-9-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1520945798-50640-1-git-send-email-pbonzini@redhat.com>
 References: <1520945798-50640-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 11/22] sev/i386: register the guest memory range
- which may contain encrypted data
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 08/22] sev/i386: qmp: add query-sev command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,99 +31,172 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
 From: Brijesh Singh <brijesh.singh@amd.com>
 
-When SEV is enabled, the hardware encryption engine uses a tweak such
-that the two identical plaintext at different location will have a
-different ciphertexts. So swapping or moving a ciphertexts of two guest
-pages will not result in plaintexts being swapped. Hence relocating
-a physical backing pages of the SEV guest will require some additional
-steps in KVM driver. The KVM_MEMORY_ENCRYPT_{UN,}REG_REGION ioctl can be
-used to register/unregister the guest memory region which may contain the
-encrypted data. KVM driver will internally handle the relocating physical
-backing pages of registered memory regions.
+The QMP query command can used to retrieve the SEV information when
+memory encryption is enabled on AMD platform.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>
+Cc: "Daniel P. Berrangé" <berrange@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/sev.c        | 42 ++++++++++++++++++++++++++++++++++++++++++
- target/i386/trace-events |  2 ++
- 2 files changed, 44 insertions(+)
+ monitor.c             |  7 +++++
+ qapi/misc.json        | 77 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ target/i386/monitor.c |  8 ++++++
+ tests/qmp-test.c      |  2 ++
+ 4 files changed, 94 insertions(+)
 
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 91b5190..c63012a 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -106,6 +106,46 @@ fw_error_to_str(int code)
- }
- 
- static void
-+sev_ram_block_added(RAMBlockNotifier *n, void *host, size_t size)
-+{
-+    int r;
-+    struct kvm_enc_region range;
-+
-+    range.addr = (__u64)host;
-+    range.size = size;
-+
-+    trace_kvm_memcrypt_register_region(host, size);
-+    r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_REG_REGION, &range);
-+    if (r) {
-+        error_report("%s: failed to register region (%p+%#lx) error '%s'",
-+                     __func__, host, size, strerror(errno));
-+        exit(1);
-+    }
-+}
-+
-+static void
-+sev_ram_block_removed(RAMBlockNotifier *n, void *host, size_t size)
-+{
-+    int r;
-+    struct kvm_enc_region range;
-+
-+    range.addr = (__u64)host;
-+    range.size = size;
-+
-+    trace_kvm_memcrypt_unregister_region(host, size);
-+    r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_UNREG_REGION, &range);
-+    if (r) {
-+        error_report("%s: failed to unregister region (%p+%#lx)",
-+                     __func__, host, size);
-+    }
-+}
-+
-+static struct RAMBlockNotifier sev_ram_notifier = {
-+    .ram_block_added = sev_ram_block_added,
-+    .ram_block_removed = sev_ram_block_removed,
-+};
-+
-+static void
- qsev_guest_finalize(Object *obj)
+diff --git a/monitor.c b/monitor.c
+index a4417f2..af11654 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -983,6 +983,7 @@ static void qmp_unregister_commands_hack(void)
+ #endif
+ #ifndef TARGET_I386
+     qmp_unregister_command(&qmp_commands, "rtc-reset-reinjection");
++    qmp_unregister_command(&qmp_commands, "query-sev");
+ #endif
+ #ifndef TARGET_S390X
+     qmp_unregister_command(&qmp_commands, "dump-skeys");
+@@ -4103,6 +4104,12 @@ void qmp_rtc_reset_reinjection(Error **errp)
  {
+     error_setg(errp, QERR_FEATURE_DISABLED, "rtc-reset-reinjection");
  }
-@@ -436,6 +476,8 @@ sev_guest_init(const char *id)
-         goto err;
-     }
- 
-+    ram_block_notifier_add(&sev_ram_notifier);
 +
-     return s;
- err:
-     g_free(sev_state);
-diff --git a/target/i386/trace-events b/target/i386/trace-events
-index 797b716..ffa3d22 100644
---- a/target/i386/trace-events
-+++ b/target/i386/trace-events
-@@ -8,3 +8,5 @@ kvm_x86_update_msi_routes(int num) "Updated %d MSI routes"
++SevInfo *qmp_query_sev(Error **errp)
++{
++    error_setg(errp, QERR_FEATURE_DISABLED, "query-sev");
++    return NULL;
++}
+ #endif
  
- # target/i386/sev.c
- kvm_sev_init(void) ""
-+kvm_memcrypt_register_region(void *addr, size_t len) "addr %p len 0x%lu"
-+kvm_memcrypt_unregister_region(void *addr, size_t len) "addr %p len 0x%lu"
+ #ifndef TARGET_S390X
+diff --git a/qapi/misc.json b/qapi/misc.json
+index bcd5d10..7b628c2 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -3216,3 +3216,80 @@
+ # Since: 2.9
+ ##
+ { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
++
++
++##
++# @SevState:
++#
++# An enumeration of SEV state information used during @query-sev.
++#
++# @uninit: The guest is uninitialized.
++#
++# @launch-update: The guest is currently being launched; plaintext data and
++#                 register state is being imported.
++#
++# @launch-secret: The guest is currently being launched; ciphertext data
++#                 is being imported.
++#
++# @running: The guest is fully launched or migrated in.
++#
++# @send-update: The guest is currently being migrated out to another machine.
++#
++# @receive-update: The guest is currently being migrated from another machine.
++#
++# Since: 2.12
++##
++{ 'enum': 'SevState',
++  'data': ['uninit', 'launch-update', 'launch-secret', 'running',
++           'send-update', 'receive-update' ] }
++
++##
++# @SevInfo:
++#
++# Information about Secure Encrypted Virtualization (SEV) support
++#
++# @enabled: true if SEV is active
++#
++# @api-major: SEV API major version
++#
++# @api-minor: SEV API minor version
++#
++# @build-id: SEV FW build id
++#
++# @policy: SEV policy value
++#
++# @state: SEV guest state
++#
++# @handle: SEV firmware handle
++#
++# Since: 2.12
++##
++{ 'struct': 'SevInfo',
++    'data': { 'enabled': 'bool',
++              'api-major': 'uint8',
++              'api-minor' : 'uint8',
++              'build-id' : 'uint8',
++              'policy' : 'uint32',
++              'state' : 'SevState',
++              'handle' : 'uint32'
++            }
++}
++
++##
++# @query-sev:
++#
++# Returns information about SEV
++#
++# Returns: @SevInfo
++#
++# Since: 2.12
++#
++# Example:
++#
++# -> { "execute": "query-sev" }
++# <- { "return": { "enabled": true, "api-major" : 0, "api-minor" : 0,
++#                  "build-id" : 0, "policy" : 0, "state" : "running",
++#                  "handle" : 1 } }
++#
++##
++{ 'command': 'query-sev', 'returns': 'SevInfo' }
+diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+index 7542912..0d1556f 100644
+--- a/target/i386/monitor.c
++++ b/target/i386/monitor.c
+@@ -30,6 +30,8 @@
+ #include "hw/i386/pc.h"
+ #include "sysemu/kvm.h"
+ #include "hmp.h"
++#include "qapi/error.h"
++#include "qapi/qapi-commands-misc.h"
+ 
+ 
+ static void print_pte(Monitor *mon, CPUArchState *env, hwaddr addr,
+@@ -661,3 +663,9 @@ void hmp_info_io_apic(Monitor *mon, const QDict *qdict)
+         ioapic_dump_state(mon, qdict);
+     }
+ }
++
++SevInfo *qmp_query_sev(Error **errp)
++{
++    error_setg(errp, "SEV feature is not available");
++    return NULL;
++}
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index 22445d9..a77ff92 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -204,6 +204,8 @@ static bool query_is_blacklisted(const char *cmd)
+         "query-gic-capabilities", /* arm */
+         /* Success depends on target-specific build configuration: */
+         "query-pci",              /* CONFIG_PCI */
++        /* Success depends on Host or Hypervisor SEV support */
++        "query-sev",
+         NULL
+     };
+     int i;
 -- 
 1.8.3.1
