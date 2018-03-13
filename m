@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evkPf-0003r4-AR
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:56:24 -0400
+	(envelope-from <laurent@vivier.eu>) id 1evkUR-0005Og-3c
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 10:01:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evkPe-0005yX-CJ
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:56:23 -0400
-References: <20180312152126.286890-1-vsementsov@virtuozzo.com>
-	<20180312152126.286890-4-vsementsov@virtuozzo.com>
-	<88dd6a74-56a4-b63d-2b33-354443586331@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3a4bef9f-30de-2805-6db8-0ac64687f373@redhat.com>
-Date: Tue, 13 Mar 2018 08:56:14 -0500
+	(envelope-from <laurent@vivier.eu>) id 1evkUL-0000xh-BT
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 10:01:19 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:52463)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1evkUL-0000wc-1e
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 10:01:13 -0400
+References: <20171228180814.9749-1-lukeshu@lukeshu.com>
+	<20171228180814.9749-8-lukeshu@lukeshu.com>
+	<b7b5505b-34a9-9ca3-c257-385ef91eed60@vivier.eu>
+	<8ac4ea80-7a1d-e52e-9e54-85a1f910a002@vivier.eu>
+	<CAFEAcA8Oi3put6VzTQLh7JtAjSX3eFoRKXdV8WLBzE+89frB+A@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <5588086c-5cc7-7930-c094-6334ef103942@vivier.eu>
+Date: Tue, 13 Mar 2018 15:00:46 +0100
 MIME-Version: 1.0
-In-Reply-To: <88dd6a74-56a4-b63d-2b33-354443586331@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CAFEAcA8Oi3put6VzTQLh7JtAjSX3eFoRKXdV8WLBzE+89frB+A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/8] nbd: BLOCK_STATUS for standard
- get_block_status function: server part
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 07/10] linux-user: init_guest_space: Clean
+ up control flow a bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,108 +32,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, mreitz@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Luke Shumaker <lukeshu@parabola.nu>, Luke Shumaker <lukeshu@lukeshu.com>, Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 03/13/2018 08:47 AM, Eric Blake wrote:
-> On 03/12/2018 10:21 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Minimal realization: only one extent in server answer is supported.
+Le 13/03/2018 à 14:54, Peter Maydell a écrit :
+> On 13 March 2018 at 13:30, Laurent Vivier <laurent@vivier.eu> wrote:
+>> Le 09/03/2018 à 21:37, Laurent Vivier a écrit :
+>>> Le 28/12/2017 à 19:08, Luke Shumaker a écrit :
+>>>> --- a/linux-user/elfload.c
+>>>> +++ b/linux-user/elfload.c
+>>>> @@ -1906,24 +1906,28 @@ unsigned long init_guest_space(unsigned long host_start,
+>>>>          }
+>>>>
+>>>>          /* Check to see if the address is valid.  */
+>>>> -        if (!host_start || aligned_start == current_start) {
+>>>> +        if (host_start && aligned_start != current_start) {
+>>>> +            goto try_again;
+>>>> +        }
+>>>> +
+>>>>  #if defined(TARGET_ARM) && !defined(TARGET_AARCH64)
+>>>> -            /* On 32-bit ARM, we need to also be able to map the commpage.  */
+>>>> -            int valid = init_guest_commpage(aligned_start - guest_start,
+>>>> -                                            aligned_size + guest_start);
+>>>> -            if (valid == 1) {
+>>>> -                break;
+>>>> -            } else if (valid == -1) {
+>>>> -                munmap((void *)real_start, real_size);
+>>>> -                return (unsigned long)-1;
+>>>> -            }
+>>>> -            /* valid == 0, so try again. */
+>>>> -#else
+>>>> -            /* On other architectures, whatever we have here is fine.  */
+>>>> -            break;
+>>>> -#endif
+>>>> +        /* On 32-bit ARM, we need to also be able to map the commpage.  */
+>>>> +        int valid = init_guest_commpage(aligned_start - guest_start,
+>>>> +                                        aligned_size + guest_start);
+>>>> +        if (valid == -1) {
+>>>> +            munmap((void *)real_start, real_size);
+>>>> +            return (unsigned long)-1;
+>>>> +        } else if (valid == -1) {
+>>>
+>>> I think it should be "if (valid == 0)" here.
 >>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>
+>> Any comment?
+> 
+> Yes, I think I agree.
+> 
 
->> +/* nbd_negotiate_meta_queries
->> + * Handle NBD_OPT_LIST_META_CONTEXT and NBD_OPT_SET_META_CONTEXT
->> + *
->> + * @meta may be NULL, if caller isn't interested in selected contexts=
-=20
->> (for
->> + *=C2=A0=C2=A0=C2=A0=C2=A0 NBD_OPT_LIST_META_CONTEXT)
->> + *
->> + * Return -errno on I/O error, 0 if option was completely handled by
->> + * sending a reply about inconsistent lengths, or 1 on success. */
->=20
-> Comment is wrong - this function never returns 1 (nor should it, as=20
-> nbd_negotiate_options() expects a return of 1 only from NBD_OPT_ABORT).
->=20
->> +static int nbd_negotiate_meta_queries(NBDClient *client,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 NBDExportMetaContexts *meta,=20
->> Error **errp)
->> +{
->> +=C2=A0=C2=A0=C2=A0 int ret;
->> +=C2=A0=C2=A0=C2=A0 NBDExport *exp;
->> +=C2=A0=C2=A0=C2=A0 NBDExportMetaContexts local_meta;
->> +=C2=A0=C2=A0=C2=A0 uint32_t nb_queries;
->> +=C2=A0=C2=A0=C2=A0 int i;
->> +
->> +=C2=A0=C2=A0=C2=A0 assert(client->structured_reply);
->=20
-> Perhaps worth a comment that this is safe because we already filtered i=
-t=20
-> out at the caller.
->=20
->> +
->> +=C2=A0=C2=A0=C2=A0 if (!meta) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 meta =3D &local_meta;
->> +=C2=A0=C2=A0=C2=A0 }
+Applied to my 'linux-user-for-2.12' branch with this change.
 
-Or, we could check here, and even base our decision on whether to change=20
-'meta' due to client->opt...
-
-
->> @@ -856,6 +1064,22 @@ static int nbd_negotiate_options(NBDClient=20
->> *client, uint16_t myflags,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ca=
-se NBD_OPT_LIST_META_CONTEXT:
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ca=
-se NBD_OPT_SET_META_CONTEXT:
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 if (!client->structured_reply) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D nbd_opt_invalid(
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 client, errp,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 "request option '%s' when structured reply "
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 "is not negotiated",=20
->> nbd_opt_lookup(option));
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 } else if (option =3D=3D NBD_OPT_LIST_META_CONTEXT)=
- {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D nbd_negotiate_meta_=
-queries(client, NULL,=20
->> errp);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 } else {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D nbd_negotiate_meta_=
-queries(client,
->> +                                                    =20
->> &client->export_meta,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 errp);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 }
-
-Then here, we just do a single ret =3D nbd_negotiate_meta_queries().
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Thanks,
+Laurent
