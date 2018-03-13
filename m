@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdW-0001ks-Ab
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:52 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdY-0001q6-Pq
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdV-0004rP-3y
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:50 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdW-0004st-CS
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:52 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Mar 2018 17:17:56 +0100
-Message-Id: <20180313161803.1814-35-kwolf@redhat.com>
+Date: Tue, 13 Mar 2018 17:17:59 +0100
+Message-Id: <20180313161803.1814-38-kwolf@redhat.com>
 In-Reply-To: <20180313161803.1814-1-kwolf@redhat.com>
 References: <20180313161803.1814-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 34/41] qemu-iotests: Enable write tests for
- parallels
+Subject: [Qemu-devel] [PULL 37/41] vdi: Make comments consistent with other
+ drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,46 +23,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-Originally we added parallels as a read-only format to qemu-iotests
-where we did just some tests with a binary image. Since then, write and
-image creation support has been added to the driver, so we can now
-enable it in _supported_fmt generic.
-
-The driver doesn't support migration yet, though, so we need to add it
-to the list of exceptions in 181.
+This makes the .bdrv_co_create(_opts) implementation of vdi look more
+like the other recently converted block drivers.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
 ---
- tests/qemu-iotests/181   | 2 +-
- tests/qemu-iotests/check | 1 -
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ block/vdi.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/tests/qemu-iotests/181 b/tests/qemu-iotests/181
-index 0c91e8f9de..5e767c6195 100755
---- a/tests/qemu-iotests/181
-+++ b/tests/qemu-iotests/181
-@@ -44,7 +44,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+diff --git a/block/vdi.c b/block/vdi.c
+index 8132e3adfe..d939b034c4 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -742,7 +742,7 @@ static int coroutine_fn vdi_co_do_create(BlockdevCreateOptions *create_options,
  
- _supported_fmt generic
- # Formats that do not support live migration
--_unsupported_fmt qcow vdi vhdx vmdk vpc vvfat
-+_unsupported_fmt qcow vdi vhdx vmdk vpc vvfat parallels
- _supported_proto generic
- _supported_os Linux
+     logout("\n");
  
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index e6b6ff7a04..469142cd58 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -284,7 +284,6 @@ testlist options
+-    /* Read out options. */
++    /* Validate options and set default values */
+     bytes = vdi_opts->size;
+     if (vdi_opts->q_static) {
+         image_type = VDI_TYPE_STATIC;
+@@ -772,6 +772,7 @@ static int coroutine_fn vdi_co_do_create(BlockdevCreateOptions *create_options,
+         goto exit;
+     }
  
-         -parallels)
-             IMGFMT=parallels
--            IMGFMT_GENERIC=false
-             xpand=false
-             ;;
++    /* Create BlockBackend to write to the image */
+     bs_file = bdrv_open_blockdev_ref(vdi_opts->file, errp);
+     if (!bs_file) {
+         ret = -EIO;
+@@ -877,7 +878,9 @@ static int coroutine_fn vdi_co_create_opts(const char *filename, QemuOpts *opts,
+     Error *local_err = NULL;
+     int ret;
  
+-    /* Since CONFIG_VDI_BLOCK_SIZE is disabled by default,
++    /* Parse options and convert legacy syntax.
++     *
++     * Since CONFIG_VDI_BLOCK_SIZE is disabled by default,
+      * cluster-size is not part of the QAPI schema; therefore we have
+      * to parse it before creating the QAPI object. */
+ #if defined(CONFIG_VDI_BLOCK_SIZE)
+@@ -895,6 +898,7 @@ static int coroutine_fn vdi_co_create_opts(const char *filename, QemuOpts *opts,
+ 
+     qdict = qemu_opts_to_qdict_filtered(opts, NULL, &vdi_create_opts, true);
+ 
++    /* Create and open the file (protocol layer) */
+     ret = bdrv_create_file(filename, opts, errp);
+     if (ret < 0) {
+         goto done;
+@@ -921,10 +925,12 @@ static int coroutine_fn vdi_co_create_opts(const char *filename, QemuOpts *opts,
+         goto done;
+     }
+ 
++    /* Silently round up size */
+     assert(create_options->driver == BLOCKDEV_DRIVER_VDI);
+     create_options->u.vdi.size = ROUND_UP(create_options->u.vdi.size,
+                                           BDRV_SECTOR_SIZE);
+ 
++    /* Create the vdi image (format layer) */
+     ret = vdi_co_do_create(create_options, block_size, errp);
+ done:
+     QDECREF(qdict);
+@@ -981,8 +987,8 @@ static BlockDriver bdrv_vdi = {
+     .bdrv_close = vdi_close,
+     .bdrv_reopen_prepare = vdi_reopen_prepare,
+     .bdrv_child_perm          = bdrv_format_default_perms,
+-    .bdrv_co_create_opts = vdi_co_create_opts,
+     .bdrv_co_create      = vdi_co_create,
++    .bdrv_co_create_opts = vdi_co_create_opts,
+     .bdrv_has_zero_init = bdrv_has_zero_init_1,
+     .bdrv_co_block_status = vdi_co_block_status,
+     .bdrv_make_empty = vdi_make_empty,
 -- 
 2.13.6
