@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evoQ9-00018T-0C
+	(envelope-from <berrange@redhat.com>) id 1evoQ9-00018U-0m
 	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:13:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evoQ5-0007Ke-5s
+	(envelope-from <berrange@redhat.com>) id 1evoQ7-0007ME-Cl
 	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:13:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40950 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39898 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1evoQ5-0007KO-18
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:13:05 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1evoQ7-0007Lj-7B
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:13:07 -0400
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Tue, 13 Mar 2018 18:12:43 +0000
-Message-Id: <20180313181248.16215-5-berrange@redhat.com>
+Date: Tue, 13 Mar 2018 18:12:44 +0000
+Message-Id: <20180313181248.16215-6-berrange@redhat.com>
 In-Reply-To: <20180313181248.16215-1-berrange@redhat.com>
 References: <20180313181248.16215-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 4/9] sockets: strengthen test suite IP
- protocol availability checks
+Subject: [Qemu-devel] [PULL v2 5/9] sockets: move fd_is_socket() into common
+ sockets code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,157 +32,196 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>,
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-Instead of just checking whether it is possible to bind() on a socket, al=
-so
-check that we can successfully connect() to the socket we bound to. This
-more closely replicates the level of functionality that tests will actual=
-ly
-use.
+The fd_is_socket() helper method is useful in a few places, so put it in
+the common sockets code. Make the code more compact while moving it.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- tests/socket-helpers.c | 67 +++++++++++++++++++++++++++++++++++++++++++-=
-------
- tests/socket-helpers.h |  4 +--
- 2 files changed, 60 insertions(+), 11 deletions(-)
+ include/qemu/sockets.h    |  1 +
+ io/channel-util.c         | 13 --------
+ tests/.gitignore          |  1 +
+ tests/Makefile.include    |  3 ++
+ tests/test-util-sockets.c | 77 +++++++++++++++++++++++++++++++++++++++++=
+++++++
+ util/qemu-sockets.c       |  8 +++++
+ 6 files changed, 90 insertions(+), 13 deletions(-)
+ create mode 100644 tests/test-util-sockets.c
 
-diff --git a/tests/socket-helpers.c b/tests/socket-helpers.c
-index 6f4bf07aa9..8112763f5b 100644
---- a/tests/socket-helpers.c
-+++ b/tests/socket-helpers.c
-@@ -30,10 +30,15 @@
- # define EAI_ADDRFAMILY 0
- #endif
+diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+index e88d4c37ab..8140fea685 100644
+--- a/include/qemu/sockets.h
++++ b/include/qemu/sockets.h
+@@ -12,6 +12,7 @@ int inet_aton(const char *cp, struct in_addr *ia);
+ #include "qapi/qapi-types-sockets.h"
 =20
--int socket_can_bind(const char *hostname)
-+int socket_can_bind_connect(const char *hostname)
+ /* misc helpers */
++bool fd_is_socket(int fd);
+ int qemu_socket(int domain, int type, int protocol);
+ int qemu_accept(int s, struct sockaddr *addr, socklen_t *addrlen);
+ int socket_set_cork(int fd, int v);
+diff --git a/io/channel-util.c b/io/channel-util.c
+index 0fb4bd0837..423d79845a 100644
+--- a/io/channel-util.c
++++ b/io/channel-util.c
+@@ -24,19 +24,6 @@
+ #include "io/channel-socket.h"
+=20
+=20
+-static bool fd_is_socket(int fd)
+-{
+-    int optval;
+-    socklen_t optlen;
+-    optlen =3D sizeof(optval);
+-    return qemu_getsockopt(fd,
+-                           SOL_SOCKET,
+-                           SO_TYPE,
+-                           (char *)&optval,
+-                           &optlen) =3D=3D 0;
+-}
+-
+-
+ QIOChannel *qio_channel_new_fd(int fd,
+                                Error **errp)
  {
--    int fd =3D -1;
-+    int lfd =3D -1, cfd =3D -1, afd =3D -1;
-     struct addrinfo ai, *res =3D NULL;
-+    struct sockaddr_storage ss;
-+    socklen_t sslen =3D sizeof(ss);
-+    int soerr;
-+    socklen_t soerrlen =3D sizeof(soerr);
-+    bool check_soerr =3D false;
-     int rc;
-     int ret =3D -1;
-=20
-@@ -54,20 +59,64 @@ int socket_can_bind(const char *hostname)
-         goto cleanup;
-     }
-=20
--    fd =3D qemu_socket(res->ai_family, res->ai_socktype, res->ai_protoco=
-l);
--    if (fd < 0) {
-+    lfd =3D qemu_socket(res->ai_family, res->ai_socktype, res->ai_protoc=
-ol);
-+    if (lfd < 0) {
-         goto cleanup;
-     }
-=20
--    if (bind(fd, res->ai_addr, res->ai_addrlen) < 0) {
-+    cfd =3D qemu_socket(res->ai_family, res->ai_socktype, res->ai_protoc=
-ol);
-+    if (cfd < 0) {
-         goto cleanup;
-     }
-=20
-+    if (bind(lfd, res->ai_addr, res->ai_addrlen) < 0) {
-+        goto cleanup;
+diff --git a/tests/.gitignore b/tests/.gitignore
+index 18e58b2183..fb62d2299b 100644
+--- a/tests/.gitignore
++++ b/tests/.gitignore
+@@ -86,6 +86,7 @@ test-thread-pool
+ test-throttle
+ test-timed-average
+ test-uuid
++test-util-sockets
+ test-visitor-serialization
+ test-vmstate
+ test-write-threshold
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3d5b6174a8..42fd426cd0 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -146,6 +146,7 @@ ifneq (,$(findstring qemu-ga,$(TOOLS)))
+ check-unit-$(CONFIG_LINUX) +=3D tests/test-qga$(EXESUF)
+ endif
+ check-unit-y +=3D tests/test-timed-average$(EXESUF)
++check-unit-y +=3D tests/test-util-sockets$(EXESUF)
+ check-unit-y +=3D tests/test-io-task$(EXESUF)
+ check-unit-y +=3D tests/test-io-channel-socket$(EXESUF)
+ check-unit-y +=3D tests/test-io-channel-file$(EXESUF)
+@@ -713,6 +714,8 @@ tests/test-crypto-tlscredsx509$(EXESUF): tests/test-c=
+rypto-tlscredsx509.o \
+ tests/test-crypto-tlssession.o-cflags :=3D $(TASN1_CFLAGS)
+ tests/test-crypto-tlssession$(EXESUF): tests/test-crypto-tlssession.o \
+ 	tests/crypto-tls-x509-helpers.o tests/pkix_asn1_tab.o $(test-crypto-obj=
+-y)
++tests/test-util-sockets$(EXESUF): tests/test-util-sockets.o \
++	tests/socket-helpers.o $(test-util-obj-y)
+ tests/test-io-task$(EXESUF): tests/test-io-task.o $(test-io-obj-y)
+ tests/test-io-channel-socket$(EXESUF): tests/test-io-channel-socket.o \
+         tests/io-channel-helpers.o tests/socket-helpers.o $(test-io-obj-=
+y)
+diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
+new file mode 100644
+index 0000000000..65190e0530
+--- /dev/null
++++ b/tests/test-util-sockets.c
+@@ -0,0 +1,77 @@
++/*
++ * Tests for util/qemu-sockets.c
++ *
++ * Copyright 2018 Red Hat, Inc.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this library; if not, see <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "qemu/sockets.h"
++#include "qapi/error.h"
++#include "socket-helpers.h"
++
++static void test_fd_is_socket_bad(void)
++{
++    char *tmp =3D g_strdup("qemu-test-util-sockets-XXXXXX");
++    int fd =3D mkstemp(tmp);
++    if (fd !=3D 0) {
++        unlink(tmp);
++    }
++    g_free(tmp);
++
++    g_assert(fd >=3D 0);
++
++    g_assert(!fd_is_socket(fd));
++    close(fd);
++}
++
++static void test_fd_is_socket_good(void)
++{
++    int fd =3D qemu_socket(PF_INET, SOCK_STREAM, 0);
++
++    g_assert(fd >=3D 0);
++
++    g_assert(fd_is_socket(fd));
++    close(fd);
++}
++
++int main(int argc, char **argv)
++{
++    bool has_ipv4, has_ipv6;
++
++    socket_init();
++
++    g_test_init(&argc, &argv, NULL);
++
++    /* We're creating actual IPv4/6 sockets, so we should
++     * check if the host running tests actually supports
++     * each protocol to avoid breaking tests on machines
++     * with either IPv4 or IPv6 disabled.
++     */
++    if (socket_check_protocol_support(&has_ipv4, &has_ipv6) < 0) {
++        return 1;
 +    }
 +
-+    if (listen(lfd, 1) < 0) {
-+        goto cleanup;
++    if (has_ipv4) {
++        g_test_add_func("/util/socket/is-socket/bad",
++                        test_fd_is_socket_bad);
++        g_test_add_func("/util/socket/is-socket/good",
++                        test_fd_is_socket_good);
 +    }
 +
-+    if (getsockname(lfd, (struct sockaddr *)&ss, &sslen) < 0) {
-+        goto cleanup;
-+    }
-+
-+    qemu_set_nonblock(cfd);
-+    if (connect(cfd, (struct sockaddr *)&ss, sslen) < 0) {
-+        if (errno =3D=3D EINPROGRESS) {
-+            check_soerr =3D true;
-+        } else {
-+            goto cleanup;
-+        }
-+    }
-+
-+    sslen =3D sizeof(ss);
-+    afd =3D accept(lfd,  (struct sockaddr *)&ss, &sslen);
-+    if (afd < 0) {
-+        goto cleanup;
-+    }
-+
-+    if (check_soerr) {
-+        if (qemu_getsockopt(cfd, SOL_SOCKET, SO_ERROR, &soerr, &soerrlen=
-) < 0) {
-+            goto cleanup;
-+        }
-+        if (soerr) {
-+            errno =3D soerr;
-+            goto cleanup;
-+        }
-+    }
-+
-     ret =3D 0;
++    return g_test_run();
++}
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 7f13e8a338..fa79471647 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -91,6 +91,14 @@ NetworkAddressFamily inet_netfamily(int family)
+     return NETWORK_ADDRESS_FAMILY_UNKNOWN;
+ }
 =20
-  cleanup:
--    if (fd !=3D -1) {
--        close(fd);
-+    if (afd !=3D -1) {
-+        close(afd);
-+    }
-+    if (cfd !=3D -1) {
-+        close(cfd);
-+    }
-+    if (lfd !=3D -1) {
-+        close(lfd);
-     }
-     if (res) {
-         freeaddrinfo(res);
-@@ -80,7 +129,7 @@ int socket_check_protocol_support(bool *has_ipv4, bool=
- *has_ipv6)
- {
-     *has_ipv4 =3D *has_ipv6 =3D false;
-=20
--    if (socket_can_bind("127.0.0.1") < 0) {
-+    if (socket_can_bind_connect("127.0.0.1") < 0) {
-         if (errno !=3D EADDRNOTAVAIL) {
-             return -1;
-         }
-@@ -88,7 +137,7 @@ int socket_check_protocol_support(bool *has_ipv4, bool=
- *has_ipv6)
-         *has_ipv4 =3D true;
-     }
-=20
--    if (socket_can_bind("::1") < 0) {
-+    if (socket_can_bind_connect("::1") < 0) {
-         if (errno !=3D EADDRNOTAVAIL) {
-             return -1;
-         }
-diff --git a/tests/socket-helpers.h b/tests/socket-helpers.h
-index efa96eddc2..1c07d6d656 100644
---- a/tests/socket-helpers.h
-+++ b/tests/socket-helpers.h
-@@ -21,13 +21,13 @@
++bool fd_is_socket(int fd)
++{
++    int optval;
++    socklen_t optlen =3D sizeof(optval);
++    return !qemu_getsockopt(fd, SOL_SOCKET, SO_TYPE, &optval, &optlen);
++}
++
++
  /*
-  * @hostname: a DNS name or numeric IP address
+  * Matrix we're trying to apply
   *
-- * Check whether it is possible to bind to ports
-+ * Check whether it is possible to bind & connect to ports
-  * on the DNS name or IP address @hostname. If an IP address
-  * is used, it must not be a wildcard address.
-  *
-  * Returns 0 on success, -1 on error with errno set
-  */
--int socket_can_bind(const char *hostname);
-+int socket_can_bind_connect(const char *hostname);
-=20
- /*
-  * @has_ipv4: set to true on return if IPv4 is available
 --=20
 2.14.3
