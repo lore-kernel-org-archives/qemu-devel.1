@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eviEk-0005ty-KR
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:36:59 -0400
+	(envelope-from <x1917x@gmail.com>) id 1eviFt-0006gJ-EF
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:38:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eviEh-0003A9-IQ
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:36:58 -0400
-Received: from mail-wr0-f181.google.com ([209.85.128.181]:36685)
+	(envelope-from <x1917x@gmail.com>) id 1eviFo-0003o8-I2
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:38:09 -0400
+Received: from mail-lf0-x22b.google.com ([2a00:1450:4010:c07::22b]:42120)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eviEh-00039P-Ax
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:36:55 -0400
-Received: by mail-wr0-f181.google.com with SMTP id d10so9205011wrf.3
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 04:36:55 -0700 (PDT)
-References: <20180308124901.83533-1-brijesh.singh@amd.com>
-	<20180308124901.83533-25-brijesh.singh@amd.com>
-	<0218f497-d397-0f49-3256-79d461e25be2@redhat.com>
-	<a76057f1-ca48-721c-7c5d-948a0b2b7917@amd.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <12fc57d6-f3cc-1054-1618-8780dbf0ae5d@redhat.com>
-Date: Tue, 13 Mar 2018 12:36:49 +0100
+	(Exim 4.71) (envelope-from <x1917x@gmail.com>) id 1eviFo-0003na-At
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:38:04 -0400
+Received: by mail-lf0-x22b.google.com with SMTP id a22-v6so6326759lfg.9
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 04:38:04 -0700 (PDT)
+Date: Tue, 13 Mar 2018 21:37:55 +1000
+From: Alexey G <x1917x@gmail.com>
+Message-ID: <20180313213755.00006cd9@gmail.com>
+In-Reply-To: <20180313092154.GA3048@redhat.com>
+References: <cover.1520867740.git.x1917x@gmail.com>
+	<20180313092154.GA3048@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a76057f1-ca48-721c-7c5d-948a0b2b7917@amd.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v12 24/28] sev/i386: add migration blocker
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 00/30] Xen Q35 Bringup patches +
+ support for PCIe Extended Capabilities for passed through devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org
-Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Borislav Petkov <bp@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Bruce Rogers <brogers@suse.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
+Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
 
-On 13/03/2018 12:28, Brijesh Singh wrote:
-> 
-> 
-> On 3/13/18 4:33 AM, Paolo Bonzini wrote:
->> On 08/03/2018 13:48, Brijesh Singh wrote:
->>>      sev_set_guest_state(SEV_STATE_RUNNING);
->>> +
->>> +    /* add migration blocker */
->>> +    error_setg(&sev_mig_blocker,
->>> +               "SEV: Migration is not implemented");
->>> +    ret = migrate_add_blocker(sev_mig_blocker, &local_err);
->>> +    if (local_err) {
->>> +        error_report_err(local_err);
->>> +        error_free(sev_mig_blocker);
->>> +        exit(1);
->>> +    }
->>>  }
->> I think this should be in sev_guest_init instead?  Does migration
->> transfer the measurement, or is it lost forever?  Not a blocker though.
-> 
-> The launch measurement does not get transferred during the migration.
-> During migration we get totally different measurement which is wrapped
-> with transport key etc and that need to send to destination. IIRC, in my
-> first attempt I was adding this blocker in sev_guest_init() but
-> migration_add_blocker() was failing because  sev_guest_init() is called
-> before the migration_object_init().
+On Tue, 13 Mar 2018 09:21:54 +0000
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 
-I see, thanks.  I'm not going to touch this part anyway. :)
+>The subject line says to expect 30 patches, but you've only sent 18 to
+>the list here. I eventually figured out that the first 12 patches were
+>in Xen code and so not sent to qemu-devel.
+>
+>For future if you have changes that affect multiple completely separate
+>projects, send them as separate series. ie just send PATCH 00/18 to
+>QEMU devel so it doesn't look like a bunch of patches have gone
+>missing.
 
-We can fix it during the freeze period.
+OK, we'll do for next versions.
 
-Paolo
+>> A new domain config option was implemented: device_model_machine.
+>> It's a string which has following possible values:
+>> - "i440" -- i440 emulation (default)
+>> - "q35"  -- emulate a Q35 machine. By default, the storage interface
+>> is AHCI. =20
+>
+>Presumably this is mapping to the QEMU -machine arg, so it feels
+>desirable to keep the same naming scheme. ie allow any of the
+>versioned machine names that QEMU uses. eg any of "pc-q35-2.x"
+>versioned types, or 'q35' as an alias for latest, and use
+>"pc-i440fx-2.x" versioned types of 'pc' as an alias for latest, rather
+>than 'i440' which is needlessly divering from the QEMU machine type.
+
+Yes, it is translated into the '-machine' argument.
+
+A direct mapping between the Xen device_model_machine option and QEMU
+'-machine' argument won't be accepted by Xen maintainers I guess.
+
+The main problem with this approach is a requirement to have a match
+between Xen/libxl and QEMU versions. If, for example,
+device_model_machine tells something like "pc-q35-2.11" and later we
+downgrade QEMU to some older version we'll likely have a problem
+without changing anything in the domain config. So I guess the "use the
+latest available" approach for machine selection (pc, q35, etc) is the
+only possible option. Perhaps having the way to specify the exact QEMU
+machine name and version in a separate domain config parameter (for
+advanced use) might be feasible.
+
+Also, parameter names do not speak for themselves I'm afraid. This way
+we'll have, for example, device_model_machine=3D"pc" vs
+device_model_machine=3D"q35"... a bit unclear I think. This may be
+obvious for a QEMU user, but many Xen users didn't get used to QEMU
+machines and there might be some wondering why "q35" is not "pc" and
+why "pc" is an i440 system precisely.
+
+Another obstacle here is xen_platform_device option which indirectly
+selects QEMU machine type for i440 at the moment (pc/xenfv), but this
+may be addressed by controlling the Xen platform device independently
+via a separate machine property or '-device xen-platform' like
+Eduardo Habkost suggested.
