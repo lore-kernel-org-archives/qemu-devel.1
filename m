@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1evcSm-0006UU-HH
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 01:27:05 -0400
+	(envelope-from <jsnow@redhat.com>) id 1evced-0000Uy-5z
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 01:39:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1evcSi-0000IN-2m
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 01:27:04 -0400
-Received: from [107.173.13.209] (port=49697 helo=ozlabs.ru)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1evcSh-0000FL-SK
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 01:27:00 -0400
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Tue, 13 Mar 2018 15:49:44 +1100
-Message-Id: <20180313044944.21058-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu v2] slirp/debug: Print IP addresses in
- human readable form
+	(envelope-from <jsnow@redhat.com>) id 1evcec-0000eg-0G
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 01:39:19 -0400
+References: <20180207155837.92351-1-vsementsov@virtuozzo.com>
+	<20180207155837.92351-6-vsementsov@virtuozzo.com>
+	<20180312153020.GI3219@work-vm>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <85d52f63-851d-870f-3af3-5b75cbf6219d@redhat.com>
+Date: Tue, 13 Mar 2018 01:38:45 -0400
+MIME-Version: 1.0
+In-Reply-To: <20180312153020.GI3219@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v10 05/12] migration: introduce
+ postcopy-only pending
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,80 +26,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, famz@redhat.com, lirans@il.ibm.com, qemu-block@nongnu.org, quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com, den@openvz.org, amit.shah@redhat.com, pbonzini@redhat.com, mreitz@redhat.com
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
 
-checkpatch.pl complains on every single changed line as it keeps
-using tabs - do I need to post 's/\t/    /g'?
 
----
-Changes:
-v2:
-* replaced static cast to (in_addr*) with temporary structs
----
- slirp/arp_table.c | 4 ++--
- slirp/socket.c    | 8 ++++----
- slirp/udp.c       | 4 ++--
- 3 files changed, 8 insertions(+), 8 deletions(-)
+On 03/12/2018 11:30 AM, Dr. David Alan Gilbert wrote:
+> * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+>> There would be savevm states (dirty-bitmap) which can migrate only in
+>> postcopy stage. The corresponding pending is introduced here.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>  include/migration/register.h | 17 +++++++++++++++--
+>>  migration/savevm.h           |  5 +++--
+>>  hw/s390x/s390-stattrib.c     |  7 ++++---
+>>  migration/block.c            |  7 ++++---
+>>  migration/migration.c        | 16 +++++++++-------
+>>  migration/ram.c              |  9 +++++----
+>>  migration/savevm.c           | 13 ++++++++-----
+>>  migration/trace-events       |  2 +-
+>>  8 files changed, 49 insertions(+), 27 deletions(-)
+>>
+>> diff --git a/include/migration/register.h b/include/migration/register.h
+>> index f4f7bdc177..9436a87678 100644
+>> --- a/include/migration/register.h
+>> +++ b/include/migration/register.h
+>> @@ -37,8 +37,21 @@ typedef struct SaveVMHandlers {
+>>      int (*save_setup)(QEMUFile *f, void *opaque);
+>>      void (*save_live_pending)(QEMUFile *f, void *opaque,
+>>                                uint64_t threshold_size,
+>> -                              uint64_t *non_postcopiable_pending,
+>> -                              uint64_t *postcopiable_pending);
+>> +                              uint64_t *res_precopy_only,
+>> +                              uint64_t *res_compatible,
+>> +                              uint64_t *res_postcopy_only);
+>> +    /* Note for save_live_pending:
+>> +     * - res_precopy_only is for data which must be migrated in precopy phase
+>> +     *     or in stopped state, in other words - before target vm start
+>> +     * - res_compatible is for data which may be migrated in any phase
+>> +     * - res_postcopy_only is for data which must be migrated in postcopy phase
+>> +     *     or in stopped state, in other words - after source vm stop
+>> +     *
+>> +     * Sum of res_postcopy_only, res_compatible and res_postcopy_only is the
+>> +     * whole amount of pending data.
+>> +     */
+>> +
+>> +
+>>      LoadStateHandler *load_state;
+>>      int (*load_setup)(QEMUFile *f, void *opaque);
+>>      int (*load_cleanup)(void *opaque);
+>> diff --git a/migration/savevm.h b/migration/savevm.h
+>> index 295c4a1f2c..cf4f0d37ca 100644
+>> --- a/migration/savevm.h
+>> +++ b/migration/savevm.h
+>> @@ -38,8 +38,9 @@ void qemu_savevm_state_complete_postcopy(QEMUFile *f);
+>>  int qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only,
+>>                                         bool inactivate_disks);
+>>  void qemu_savevm_state_pending(QEMUFile *f, uint64_t max_size,
+>> -                               uint64_t *res_non_postcopiable,
+>> -                               uint64_t *res_postcopiable);
+>> +                               uint64_t *res_precopy_only,
+>> +                               uint64_t *res_compatible,
+>> +                               uint64_t *res_postcopy_only);
+>>  void qemu_savevm_send_ping(QEMUFile *f, uint32_t value);
+>>  void qemu_savevm_send_open_return_path(QEMUFile *f);
+>>  int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len);
+>> diff --git a/hw/s390x/s390-stattrib.c b/hw/s390x/s390-stattrib.c
+>> index 2902f54f11..dd3fbfd1eb 100644
+>> --- a/hw/s390x/s390-stattrib.c
+>> +++ b/hw/s390x/s390-stattrib.c
+>> @@ -183,15 +183,16 @@ static int cmma_save_setup(QEMUFile *f, void *opaque)
+>>  }
+>>  
+>>  static void cmma_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
+>> -                             uint64_t *non_postcopiable_pending,
+>> -                             uint64_t *postcopiable_pending)
+>> +                              uint64_t *res_precopy_only,
+>> +                              uint64_t *res_compatible,
+>> +                              uint64_t *res_postcopy_only)
+>>  {
+>>      S390StAttribState *sas = S390_STATTRIB(opaque);
+>>      S390StAttribClass *sac = S390_STATTRIB_GET_CLASS(sas);
+>>      long long res = sac->get_dirtycount(sas);
+>>  
+>>      if (res >= 0) {
+>> -        *non_postcopiable_pending += res;
+>> +        *res_precopy_only += res;
+>>      }
+>>  }
+>>  
+>> diff --git a/migration/block.c b/migration/block.c
+>> index 1f03946797..5652ca3337 100644
+>> --- a/migration/block.c
+>> +++ b/migration/block.c
+>> @@ -866,8 +866,9 @@ static int block_save_complete(QEMUFile *f, void *opaque)
+>>  }
+>>  
+>>  static void block_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
+>> -                               uint64_t *non_postcopiable_pending,
+>> -                               uint64_t *postcopiable_pending)
+>> +                               uint64_t *res_precopy_only,
+>> +                               uint64_t *res_compatible,
+>> +                               uint64_t *res_postcopy_only)
+>>  {
+>>      /* Estimate pending number of bytes to send */
+>>      uint64_t pending;
+>> @@ -888,7 +889,7 @@ static void block_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
+>>  
+>>      DPRINTF("Enter save live pending  %" PRIu64 "\n", pending);
+>>      /* We don't do postcopy */
+>> -    *non_postcopiable_pending += pending;
+>> +    *res_precopy_only += pending;
+>>  }
+>>  
+>>  static int block_load(QEMUFile *f, void *opaque, int version_id)
+>> diff --git a/migration/migration.c b/migration/migration.c
+>> index c99a4e62d7..3beedd676e 100644
+>> --- a/migration/migration.c
+>> +++ b/migration/migration.c
+>> @@ -2215,21 +2215,23 @@ typedef enum {
+>>   */
+>>  static MigIterateState migration_iteration_run(MigrationState *s)
+>>  {
+>> -    uint64_t pending_size, pend_post, pend_nonpost;
+>> +    uint64_t pending_size, pend_pre, pend_compat, pend_post;
+>>      bool in_postcopy = s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE;
+>>  
+>> -    qemu_savevm_state_pending(s->to_dst_file, s->threshold_size,
+>> -                              &pend_nonpost, &pend_post);
+>> -    pending_size = pend_nonpost + pend_post;
+>> +    qemu_savevm_state_pending(s->to_dst_file, s->threshold_size, &pend_pre,
+>> +                              &pend_compat, &pend_post);
+>> +    pending_size = pend_pre + pend_compat + pend_post;
+>>  
+>>      trace_migrate_pending(pending_size, s->threshold_size,
+>> -                          pend_post, pend_nonpost);
+>> +                          pend_pre, pend_compat, pend_post);
+>>  
+>>      if (pending_size && pending_size >= s->threshold_size) {
+>>          /* Still a significant amount to transfer */
+>>          if (migrate_postcopy() && !in_postcopy &&
+>> -            pend_nonpost <= s->threshold_size &&
+>> -            atomic_read(&s->start_postcopy)) {
+>> +            pend_pre <= s->threshold_size &&
+>> +            (atomic_read(&s->start_postcopy) ||
+>> +             (pend_pre + pend_compat <= s->threshold_size)))
+> 
+> This change does something different from the description;
+> it causes a postcopy_start even if the user never ran the postcopy-start
+> command; so sorry, we can't do that; because postcopy for RAM is
+> something that users can enable but only switch into when they've given
+> up on it completing normally.
+> 
+> However, I guess that leaves you with a problem; which is what happens
+> to the system when you've run out of pend_pre+pend_compat but can't
+> complete because pend_post is non-0; so I don't know the answer to that.
+> 
+> Dave
+> 
 
-diff --git a/slirp/arp_table.c b/slirp/arp_table.c
-index 3547043..f81963b 100644
---- a/slirp/arp_table.c
-+++ b/slirp/arp_table.c
-@@ -33,7 +33,7 @@ void arp_table_add(Slirp *slirp, uint32_t ip_addr, uint8_t ethaddr[ETH_ALEN])
-     int i;
- 
-     DEBUG_CALL("arp_table_add");
--    DEBUG_ARG("ip = 0x%x", ip_addr);
-+    DEBUG_ARG("ip = %s", inet_ntoa((struct in_addr){.s_addr = ip_addr}));
-     DEBUG_ARGS((dfd, " hw addr = %02x:%02x:%02x:%02x:%02x:%02x\n",
-                 ethaddr[0], ethaddr[1], ethaddr[2],
-                 ethaddr[3], ethaddr[4], ethaddr[5]));
-@@ -67,7 +67,7 @@ bool arp_table_search(Slirp *slirp, uint32_t ip_addr,
-     int i;
- 
-     DEBUG_CALL("arp_table_search");
--    DEBUG_ARG("ip = 0x%x", ip_addr);
-+    DEBUG_ARG("ip = %s", inet_ntoa((struct in_addr){.s_addr = ip_addr}));
- 
-     /* If broadcast address */
-     if (ip_addr == 0xffffffff || ip_addr == broadcast_addr) {
-diff --git a/slirp/socket.c b/slirp/socket.c
-index cb7b5b6..318301f 100644
---- a/slirp/socket.c
-+++ b/slirp/socket.c
-@@ -701,10 +701,10 @@ tcp_listen(Slirp *slirp, uint32_t haddr, u_int hport, uint32_t laddr,
- 	memset(&addr, 0, addrlen);
- 
- 	DEBUG_CALL("tcp_listen");
--	DEBUG_ARG("haddr = %x", haddr);
--	DEBUG_ARG("hport = %d", hport);
--	DEBUG_ARG("laddr = %x", laddr);
--	DEBUG_ARG("lport = %d", lport);
-+	DEBUG_ARG("haddr = %s", inet_ntoa((struct in_addr){.s_addr = haddr}));
-+	DEBUG_ARG("hport = %d", ntohs(hport));
-+	DEBUG_ARG("laddr = %s", inet_ntoa((struct in_addr){.s_addr = laddr}));
-+	DEBUG_ARG("lport = %d", ntohs(lport));
- 	DEBUG_ARG("flags = %x", flags);
- 
- 	so = socreate(slirp);
-diff --git a/slirp/udp.c b/slirp/udp.c
-index 227d779..e5bf065 100644
---- a/slirp/udp.c
-+++ b/slirp/udp.c
-@@ -241,8 +241,8 @@ int udp_output(struct socket *so, struct mbuf *m,
- 	DEBUG_CALL("udp_output");
- 	DEBUG_ARG("so = %p", so);
- 	DEBUG_ARG("m = %p", m);
--	DEBUG_ARG("saddr = %lx", (long)saddr->sin_addr.s_addr);
--	DEBUG_ARG("daddr = %lx", (long)daddr->sin_addr.s_addr);
-+	DEBUG_ARG("saddr = %s", inet_ntoa(saddr->sin_addr));
-+	DEBUG_ARG("daddr = %s", inet_ntoa(daddr->sin_addr));
- 
- 	/*
- 	 * Adjust for header
--- 
-2.11.0
+I'm willing to pull the bitmap related changes into my tree for 2.12,
+but it would be _really_ nice to have this patchset in 2.12 -- is there
+anything we can do to get this into the migration queue?
+
+I'm afraid I don't know what the right answer here is either, so I can't
+fix this up myself and I imagine Vladimir will need some feedback from
+you to change this design.
+
+Are we -hosed- ?
