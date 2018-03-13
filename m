@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmd7-0001Lt-IV
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:26 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdE-0001Qy-4E
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmd3-0004XH-8Q
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:25 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdC-0004dX-S5
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:32 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Mar 2018 17:17:30 +0100
-Message-Id: <20180313161803.1814-9-kwolf@redhat.com>
+Date: Tue, 13 Mar 2018 17:17:37 +0100
+Message-Id: <20180313161803.1814-16-kwolf@redhat.com>
 In-Reply-To: <20180313161803.1814-1-kwolf@redhat.com>
 References: <20180313161803.1814-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 08/41] blockjobs: add ABORTING state
+Subject: [Qemu-devel] [PULL 15/41] blockjobs: add prepare callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,124 +24,135 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: John Snow <jsnow@redhat.com>
 
-Add a new state ABORTING.
+Some jobs upon finalization may need to perform some work that can
+still fail. If these jobs are part of a transaction, it's important
+that these callbacks fail the entire transaction.
 
-This makes transitions from normative states to error states explicit
-in the STM, and serves as a disambiguation for which states may complete
-normally when normal end-states (CONCLUDED) are added in future commits.
+We allow for a new callback in addition to commit/abort/clean that
+allows us the opportunity to have fairly late-breaking failures
+in the transactional process.
 
-Notably, Paused/Standby jobs do not transition directly to aborting,
-as they must wake up first and cooperate in their cancellation.
+The expected flow is:
 
-Transitions:
-Created -> Aborting: can be cancelled (by the system)
-Running -> Aborting: can be cancelled or encounter an error
-Ready   -> Aborting: can be cancelled or encounter an error
-
-Verbs:
-None. The job must finish cleaning itself up and report its final status.
-
-             +---------+
-             |UNDEFINED|
-             +--+------+
-                |
-             +--v----+
-   +---------+CREATED|
-   |         +--+----+
-   |            |
-   |         +--v----+     +------+
-   +---------+RUNNING<----->PAUSED|
-   |         +--+----+     +------+
-   |            |
-   |         +--v--+       +-------+
-   +---------+READY<------->STANDBY|
-   |         +-----+       +-------+
-   |
-+--v-----+
-|ABORTING|
-+--------+
+- All jobs in a transaction converge to the PENDING state,
+  added in a forthcoming commit.
+- Upon being finalized, either automatically or explicitly
+  by the user, jobs prepare to complete.
+- If any job fails preparation, all jobs call .abort.
+- Otherwise, they succeed and call .commit.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-core.json |  7 ++++++-
- blockjob.c           | 31 ++++++++++++++++++-------------
- 2 files changed, 24 insertions(+), 14 deletions(-)
+ include/block/blockjob_int.h | 10 ++++++++++
+ blockjob.c                   | 30 +++++++++++++++++++++++++++---
+ 2 files changed, 37 insertions(+), 3 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 217a31385f..c33a9e91a7 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -996,10 +996,15 @@
- # @standby: The job is ready, but paused. This is nearly identical to @paused.
- #           The job may return to @ready or otherwise be canceled.
- #
-+# @aborting: The job is in the process of being aborted, and will finish with
-+#            an error.
-+#            This status may not be visible to the management process.
-+#
- # Since: 2.12
- ##
- { 'enum': 'BlockJobStatus',
--  'data': ['undefined', 'created', 'running', 'paused', 'ready', 'standby'] }
-+  'data': ['undefined', 'created', 'running', 'paused', 'ready', 'standby',
-+           'aborting' ] }
+diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
+index 259d49b32a..642adce68b 100644
+--- a/include/block/blockjob_int.h
++++ b/include/block/blockjob_int.h
+@@ -54,6 +54,16 @@ struct BlockJobDriver {
+     void (*complete)(BlockJob *job, Error **errp);
  
- ##
- # @BlockJobInfo:
+     /**
++     * If the callback is not NULL, prepare will be invoked when all the jobs
++     * belonging to the same transaction complete; or upon this job's completion
++     * if it is not in a transaction.
++     *
++     * This callback will not be invoked if the job has already failed.
++     * If it fails, abort and then clean will be called.
++     */
++    int (*prepare)(BlockJob *job);
++
++    /**
+      * If the callback is not NULL, it will be invoked when all the jobs
+      * belonging to the same transaction complete; or upon this job's
+      * completion if it is not in a transaction. Skipped if NULL.
 diff --git a/blockjob.c b/blockjob.c
-index d369c0cb4d..fe5b0041f7 100644
+index 7e03824751..1395d8eed1 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -44,22 +44,23 @@ static QemuMutex block_job_mutex;
+@@ -415,6 +415,14 @@ static void block_job_update_rc(BlockJob *job)
+     }
+ }
  
- /* BlockJob State Transition Table */
- bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
--                                          /* U, C, R, P, Y, S */
--    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0},
--    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0},
--    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0},
--    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0},
--    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1},
--    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0},
-+                                          /* U, C, R, P, Y, S, X */
-+    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0, 0},
-+    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0, 1},
-+    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0, 1},
-+    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0, 0},
-+    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1, 1},
-+    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0, 0},
-+    /* X: */ [BLOCK_JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 0},
- };
++static int block_job_prepare(BlockJob *job)
++{
++    if (job->ret == 0 && job->driver->prepare) {
++        job->ret = job->driver->prepare(job);
++    }
++    return job->ret;
++}
++
+ static void block_job_commit(BlockJob *job)
+ {
+     assert(!job->ret);
+@@ -438,7 +446,7 @@ static void block_job_clean(BlockJob *job)
+     }
+ }
  
- bool BlockJobVerbTable[BLOCK_JOB_VERB__MAX][BLOCK_JOB_STATUS__MAX] = {
--                                          /* U, C, R, P, Y, S */
--    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1},
--    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1},
--    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1},
--    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1},
--    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0},
-+                                          /* U, C, R, P, Y, S, X */
-+    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1, 0},
-+    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1, 0},
-+    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0},
-+    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0},
-+    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0},
- };
- 
- static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
-@@ -380,6 +381,10 @@ static void block_job_completed_single(BlockJob *job)
+-static void block_job_completed_single(BlockJob *job)
++static int block_job_completed_single(BlockJob *job)
  {
      assert(job->completed);
  
-+    if (job->ret || block_job_is_cancelled(job)) {
-+        block_job_state_transition(job, BLOCK_JOB_STATUS_ABORTING);
+@@ -472,6 +480,7 @@ static void block_job_completed_single(BlockJob *job)
+     QLIST_REMOVE(job, txn_list);
+     block_job_txn_unref(job->txn);
+     block_job_conclude(job);
++    return 0;
+ }
+ 
+ static void block_job_cancel_async(BlockJob *job)
+@@ -487,17 +496,22 @@ static void block_job_cancel_async(BlockJob *job)
+     job->cancelled = true;
+ }
+ 
+-static void block_job_txn_apply(BlockJobTxn *txn, void fn(BlockJob *))
++static int block_job_txn_apply(BlockJobTxn *txn, int fn(BlockJob *))
+ {
+     AioContext *ctx;
+     BlockJob *job, *next;
++    int rc;
+ 
+     QLIST_FOREACH_SAFE(job, &txn->jobs, txn_list, next) {
+         ctx = blk_get_aio_context(job->blk);
+         aio_context_acquire(ctx);
+-        fn(job);
++        rc = fn(job);
+         aio_context_release(ctx);
++        if (rc) {
++            break;
++        }
+     }
++    return rc;
+ }
+ 
+ static int block_job_finish_sync(BlockJob *job,
+@@ -580,6 +594,8 @@ static void block_job_completed_txn_success(BlockJob *job)
+ {
+     BlockJobTxn *txn = job->txn;
+     BlockJob *other_job;
++    int rc = 0;
++
+     /*
+      * Successful completion, see if there are other running jobs in this
+      * txn.
+@@ -590,6 +606,14 @@ static void block_job_completed_txn_success(BlockJob *job)
+         }
+         assert(other_job->ret == 0);
+     }
++
++    /* Jobs may require some prep-work to complete without failure */
++    rc = block_job_txn_apply(txn, block_job_prepare);
++    if (rc) {
++        block_job_completed_txn_abort(job);
++        return;
 +    }
 +
-     if (!job->ret) {
-         if (job->driver->commit) {
-             job->driver->commit(job);
+     /* We are the last completed job, commit the transaction. */
+     block_job_txn_apply(txn, block_job_completed_single);
+ }
 -- 
 2.13.6
