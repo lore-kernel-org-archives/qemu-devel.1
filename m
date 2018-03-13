@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evnUs-0007Lz-V9
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:14:00 -0400
+	(envelope-from <eblake@redhat.com>) id 1evnUw-0007Of-1T
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:14:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evnUq-0000tE-LT
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:13:58 -0400
+	(envelope-from <eblake@redhat.com>) id 1evnUu-0000xG-MJ
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:14:01 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 13 Mar 2018 12:13:33 -0500
-Message-Id: <20180313171345.659672-6-eblake@redhat.com>
+Date: Tue, 13 Mar 2018 12:13:39 -0500
+Message-Id: <20180313171345.659672-12-eblake@redhat.com>
 In-Reply-To: <20180313171345.659672-1-eblake@redhat.com>
 References: <20180313171345.659672-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 05/17] nbd/server: refactor nbd_trip: cmd_read
- and generic reply
+Subject: [Qemu-devel] [PULL 11/17] nbd/server: add nbd_read_opt_name helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,267 +24,95 @@ Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Paolo Bonzini <pbon
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-nbd_trip has difficult logic when sending replies: it tries to use one
-code path for all replies. It is ok for simple replies, but is not
-comfortable for structured replies. Also, two types of error (and
-corresponding messages in local_err) - fatal (leading to disconnect)
-and not-fatal (just to be sent to the client) are difficult to follow.
+Add helper to read name in format:
 
-To make things a bit clearer, the following is done:
- - split CMD_READ logic to separate function. It is the most difficult
-   command for now, and it is definitely cramped inside nbd_trip. Also,
-   it is difficult to follow CMD_READ logic, shared between
-   "case NBD_CMD_READ" and "if"s under "reply:" label.
- - create separate helper function nbd_send_generic_reply() and use it
-   both in new nbd_do_cmd_read and for other commands in nbd_trip instead
-   of common code-path under "reply:" label in nbd_trip. The helper
-   supports an error message, so logic with local_err in nbd_trip is
-   simplified.
+  uint32 len       (<= NBD_MAX_NAME_SIZE)
+  len bytes string (not 0-terminated)
+
+The helper will be reused in following patch.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20180308184636.178534-5-vsementsov@virtuozzo.com>
+Message-Id: <20180312152126.286890-3-vsementsov@virtuozzo.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-[eblake: grammar tweaks and blank line placement]
+[eblake: grammar fixes, actually check error]
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- nbd/server.c | 176 ++++++++++++++++++++++++++++++++---------------------------
- 1 file changed, 95 insertions(+), 81 deletions(-)
+ nbd/server.c | 53 +++++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 43 insertions(+), 10 deletions(-)
 
 diff --git a/nbd/server.c b/nbd/server.c
-index b230ecb4fb8..297d314bd0b 100644
+index 01ea97afe98..280bdbb1040 100644
 --- a/nbd/server.c
 +++ b/nbd/server.c
-@@ -1521,6 +1521,72 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
-     return 0;
+@@ -273,6 +273,48 @@ static int nbd_opt_read(NBDClient *client, void *buffer, size_t size,
+     return qio_channel_read_all(client->ioc, buffer, size, errp) < 0 ? -EIO : 1;
  }
 
-+/* Send simple reply without a payload, or a structured error
-+ * @error_msg is ignored if @ret >= 0
-+ * Returns 0 if connection is still live, -errno on failure to talk to client
++/* nbd_opt_read_name
++ *
++ * Read a string with the format:
++ *   uint32_t len     (<= NBD_MAX_NAME_SIZE)
++ *   len bytes string (not 0-terminated)
++ *
++ * @name should be enough to store NBD_MAX_NAME_SIZE+1.
++ * If @length is non-null, it will be set to the actual string length.
++ *
++ * Return -errno on I/O error, 0 if option was completely handled by
++ * sending a reply about inconsistent lengths, or 1 on success.
 + */
-+static coroutine_fn int nbd_send_generic_reply(NBDClient *client,
-+                                               uint64_t handle,
-+                                               int ret,
-+                                               const char *error_msg,
-+                                               Error **errp)
-+{
-+    if (client->structured_reply && ret < 0) {
-+        return nbd_co_send_structured_error(client, handle, -ret, error_msg,
-+                                            errp);
-+    } else {
-+        return nbd_co_send_simple_reply(client, handle, ret < 0 ? -ret : 0,
-+                                        NULL, 0, errp);
-+    }
-+}
-+
-+/* Handle NBD_CMD_READ request.
-+ * Return -errno if sending fails. Other errors are reported directly to the
-+ * client as an error reply. */
-+static coroutine_fn int nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
-+                                        uint8_t *data, Error **errp)
++static int nbd_opt_read_name(NBDClient *client, char *name, uint32_t *length,
++                             Error **errp)
 +{
 +    int ret;
-+    NBDExport *exp = client->exp;
++    uint32_t len;
 +
-+    assert(request->type == NBD_CMD_READ);
++    ret = nbd_opt_read(client, &len, sizeof(len), errp);
++    if (ret <= 0) {
++        return ret;
++    }
++    cpu_to_be32s(&len);
 +
-+    /* XXX: NBD Protocol only documents use of FUA with WRITE */
-+    if (request->flags & NBD_CMD_FLAG_FUA) {
-+        ret = blk_co_flush(exp->blk);
-+        if (ret < 0) {
-+            return nbd_send_generic_reply(client, request->handle, ret,
-+                                          "flush failed", errp);
-+        }
++    if (len > NBD_MAX_NAME_SIZE) {
++        return nbd_opt_invalid(client, errp,
++                               "Invalid name length: %" PRIu32, len);
 +    }
 +
-+    if (client->structured_reply && !(request->flags & NBD_CMD_FLAG_DF) &&
-+        request->len) {
-+        return nbd_co_send_sparse_read(client, request->handle, request->from,
-+                                       data, request->len, errp);
++    ret = nbd_opt_read(client, name, len, errp);
++    if (ret <= 0) {
++        return ret;
++    }
++    name[len] = '\0';
++
++    if (length) {
++        *length = len;
 +    }
 +
-+    ret = blk_pread(exp->blk, request->from + exp->dev_offset, data,
-+                    request->len);
-+    if (ret < 0) {
-+        return nbd_send_generic_reply(client, request->handle, ret,
-+                                      "reading from file failed", errp);
-+    }
-+
-+    if (client->structured_reply) {
-+        if (request->len) {
-+            return nbd_co_send_structured_read(client, request->handle,
-+                                               request->from, data,
-+                                               request->len, true, errp);
-+        } else {
-+            return nbd_co_send_structured_done(client, request->handle, errp);
-+        }
-+    } else {
-+        return nbd_co_send_simple_reply(client, request->handle, 0,
-+                                        data, request->len, errp);
-+    }
++    return 1;
 +}
 +
- /* Owns a reference to the NBDClient passed as opaque.  */
- static coroutine_fn void nbd_trip(void *opaque)
- {
-@@ -1530,7 +1596,6 @@ static coroutine_fn void nbd_trip(void *opaque)
-     NBDRequest request = { 0 };    /* GCC thinks it can be used uninitialized */
-     int ret;
-     int flags;
--    int reply_data_len = 0;
-     Error *local_err = NULL;
-     char *msg = NULL;
-
-@@ -1558,41 +1623,23 @@ static coroutine_fn void nbd_trip(void *opaque)
+ /* Send a single NBD_REP_SERVER reply to NBD_OPT_LIST, including payload.
+  * Return -errno on error, 0 on success. */
+ static int nbd_negotiate_send_rep_list(NBDClient *client, NBDExport *exp,
+@@ -455,19 +497,10 @@ static int nbd_negotiate_handle_info(NBDClient *client, uint16_t myflags,
+         2 bytes: N, number of requests (can be 0)
+         N * 2 bytes: N requests
+     */
+-    rc = nbd_opt_read(client, &namelen, sizeof(namelen), errp);
++    rc = nbd_opt_read_name(client, name, &namelen, errp);
+     if (rc <= 0) {
+         return rc;
      }
-
-     if (ret < 0) {
--        goto reply;
-+        /* It wans't -EIO, so, according to nbd_co_receive_request()
-+         * semantics, we should return the error to the client. */
-+        Error *export_err = local_err;
-+
-+        local_err = NULL;
-+        ret = nbd_send_generic_reply(client, request.handle, -EINVAL,
-+                                     error_get_pretty(export_err), &local_err);
-+        error_free(export_err);
-+
-+        goto replied;
-     }
-
-     switch (request.type) {
-     case NBD_CMD_READ:
--        /* XXX: NBD Protocol only documents use of FUA with WRITE */
--        if (request.flags & NBD_CMD_FLAG_FUA) {
--            ret = blk_co_flush(exp->blk);
--            if (ret < 0) {
--                error_setg_errno(&local_err, -ret, "flush failed");
--                break;
--            }
--        }
--
--        if (client->structured_reply && !(request.flags & NBD_CMD_FLAG_DF) &&
--            request.len) {
--            ret = nbd_co_send_sparse_read(req->client, request.handle,
--                                          request.from, req->data, request.len,
--                                          &local_err);
--            if (ret < 0) {
--                goto replied;
--            }
--            goto done;
--        }
--
--        ret = blk_pread(exp->blk, request.from + exp->dev_offset,
--                        req->data, request.len);
--        if (ret < 0) {
--            error_setg_errno(&local_err, -ret, "reading from file failed");
--            break;
--        }
--
--        reply_data_len = request.len;
--
-+        ret = nbd_do_cmd_read(client, &request, req->data, &local_err);
-         break;
-+
-     case NBD_CMD_WRITE:
-         flags = 0;
-         if (request.flags & NBD_CMD_FLAG_FUA) {
-@@ -1600,11 +1647,10 @@ static coroutine_fn void nbd_trip(void *opaque)
-         }
-         ret = blk_pwrite(exp->blk, request.from + exp->dev_offset,
-                          req->data, request.len, flags);
--        if (ret < 0) {
--            error_setg_errno(&local_err, -ret, "writing to file failed");
--        }
--
-+        ret = nbd_send_generic_reply(client, request.handle, ret,
-+                                     "writing to file failed", &local_err);
-         break;
-+
-     case NBD_CMD_WRITE_ZEROES:
-         flags = 0;
-         if (request.flags & NBD_CMD_FLAG_FUA) {
-@@ -1615,67 +1661,35 @@ static coroutine_fn void nbd_trip(void *opaque)
-         }
-         ret = blk_pwrite_zeroes(exp->blk, request.from + exp->dev_offset,
-                                 request.len, flags);
--        if (ret < 0) {
--            error_setg_errno(&local_err, -ret, "writing to file failed");
--        }
--
-+        ret = nbd_send_generic_reply(client, request.handle, ret,
-+                                     "writing to file failed", &local_err);
-         break;
-+
-     case NBD_CMD_DISC:
-         /* unreachable, thanks to special case in nbd_co_receive_request() */
-         abort();
-
-     case NBD_CMD_FLUSH:
-         ret = blk_co_flush(exp->blk);
--        if (ret < 0) {
--            error_setg_errno(&local_err, -ret, "flush failed");
--        }
--
-+        ret = nbd_send_generic_reply(client, request.handle, ret,
-+                                     "flush failed", &local_err);
-         break;
-+
-     case NBD_CMD_TRIM:
-         ret = blk_co_pdiscard(exp->blk, request.from + exp->dev_offset,
-                               request.len);
--        if (ret < 0) {
--            error_setg_errno(&local_err, -ret, "discard failed");
--        }
--
-+        ret = nbd_send_generic_reply(client, request.handle, ret,
-+                                     "discard failed", &local_err);
-         break;
-+
-     default:
--        error_setg(&local_err, "invalid request type (%" PRIu32 ") received",
--                   request.type);
--        ret = -EINVAL;
-+        msg = g_strdup_printf("invalid request type (%" PRIu32 ") received",
-+                              request.type);
-+        ret = nbd_send_generic_reply(client, request.handle, -EINVAL, msg,
-+                                     &local_err);
-+        g_free(msg);
-     }
-
--reply:
--    if (local_err) {
--        /* If we get here, local_err was not a fatal error, and should be sent
--         * to the client. */
--        assert(ret < 0);
--        msg = g_strdup(error_get_pretty(local_err));
--        error_report_err(local_err);
--        local_err = NULL;
+-    be32_to_cpus(&namelen);
+-    if (namelen >= sizeof(name)) {
+-        return nbd_opt_invalid(client, errp, "name too long for qemu");
 -    }
--
--    if (client->structured_reply &&
--        (ret < 0 || request.type == NBD_CMD_READ)) {
--        if (ret < 0) {
--            ret = nbd_co_send_structured_error(req->client, request.handle,
--                                               -ret, msg, &local_err);
--        } else if (reply_data_len) {
--            ret = nbd_co_send_structured_read(req->client, request.handle,
--                                              request.from, req->data,
--                                              reply_data_len, true,
--                                              &local_err);
--        } else {
--            ret = nbd_co_send_structured_done(req->client, request.handle,
--                                              &local_err);
--        }
--    } else {
--        ret = nbd_co_send_simple_reply(req->client, request.handle,
--                                       ret < 0 ? -ret : 0,
--                                       req->data, reply_data_len, &local_err);
+-    rc = nbd_opt_read(client, name, namelen, errp);
+-    if (rc <= 0) {
+-        return rc;
 -    }
--    g_free(msg);
--
- replied:
-     if (ret < 0) {
-         error_prepend(&local_err, "Failed to send reply: ");
+-    name[namelen] = '\0';
+     trace_nbd_negotiate_handle_export_name_request(name);
+
+     rc = nbd_opt_read(client, &requests, sizeof(requests), errp);
 -- 
 2.14.3
