@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1evk7O-0003R7-58
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:37:31 -0400
+	(envelope-from <berrange@redhat.com>) id 1evkAD-0004mz-Du
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:40:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1evk7N-0004m4-6i
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:37:30 -0400
-References: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
-	<1518893216-9983-12-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA_9cmK9gebqE9997fzhTzKT6Ky9q4jn=fxwziopDyK9Ew@mail.gmail.com>
-	<cc6029a1-c177-ee8c-d09b-0ed2af81c897@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <75aee987-a08b-570f-ec10-8b4853d853c6@redhat.com>
-Date: Tue, 13 Mar 2018 14:37:13 +0100
+	(envelope-from <berrange@redhat.com>) id 1evkA9-0005gE-Iq
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:40:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46200 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1evkA9-0005fa-DL
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:40:21 -0400
+Date: Tue, 13 Mar 2018 13:40:17 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180313134017.GA24191@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180209141514.18840-1-alex.bennee@linaro.org>
+	<20180209141514.18840-2-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <cc6029a1-c177-ee8c-d09b-0ed2af81c897@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <20180209141514.18840-2-alex.bennee@linaro.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v9 11/14] target/arm/kvm: Translate the MSI
- doorbell in kvm_arch_fixup_msi_route
+Subject: Re: [Qemu-devel] [PULL 1/1] .travis.yml: add --disable-linux-user
+ for some jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,38 +30,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Eric Auger <eric.auger.pro@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On 12/03/2018 16:16, Auger Eric wrote:
->> It is still unclear to me if we need to register an IOMMUNotifier
->> to handle any change in the MSI doorbell which would occur behind
->> the scene and would not lead to any call to kvm_arch_fixup_msi_route()=
-.
+On Fri, Feb 09, 2018 at 02:15:14PM +0000, Alex Benn=C3=A9e wrote:
+> The modules and co-routine builds are only really relevant to softmmu
+> builds and regularly timeout on Travis. Let's disable linux-user
+> builds here for more headroom.
 >=20
-> Paolo, do you know the answer to this question ?
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+>=20
+> diff --git a/.travis.yml b/.travis.yml
+> index 01a57399b5..0dd5020552 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -52,9 +52,9 @@ env:
+>      - CONFIG=3D""
+>      - CONFIG=3D"--enable-debug --enable-debug-tcg --enable-trace-backe=
+nds=3Dlog"
+>      - CONFIG=3D"--disable-linux-aio --disable-cap-ng --disable-attr --=
+disable-brlapi --disable-uuid --disable-libusb"
+> -    - CONFIG=3D"--enable-modules"
+> -    - CONFIG=3D"--with-coroutine=3Ducontext"
+> -    - CONFIG=3D"--with-coroutine=3Dsigaltstack"
+> +    - CONFIG=3D"--enable-modules --disable-linux-user"
+> +    - CONFIG=3D"--with-coroutine=3Ducontext --disable-linux-user"
+> +    - CONFIG=3D"--with-coroutine=3Dsigaltstack --disable-linux-user"
 
-Yes, x86 is wrong in this respect (it wouldn't use an IOMMUNotifier, but
-it still should process Interrupt Entry Cache invalidations).
+Since this merged, the 4th, 5th & 6th jobs are now reliably completing in
+time, but the 1st and 3rd jobs are hitting timeouts on the majority of
+runs :-(
 
->> It seems a bit odd that:
->>  * the code for arm for "PCI devices behind IOMMU need to have
->>    the MSI doorbell writes go through the IOMMU" looks rather
->>    different from the code for x86 for the same thing
->
-> ARM SMMU translates MSIs whereas Intel/AMD IOMMU do not translate them.
-> Hence this implementation
+We've already got a lot of jobs, but for sake of reliability should we
+consider splitting the 1st & 3rd jobs. Add --disable-linux-user to both
+of the existing jobs, and then adding 2 new jobs with --disable-system
+and --disable-tools set ?
 
-More precisely, Intel IOMMU implements interrupt remapping through an
-MMIO region instead of an IOMMU region, because on x86 interrupt
-remapping can also change the MSI value and not just the address.
-
->>  * the code here needs to know specifically that this is an SMMU
->>    and not some other kind of IOMMU
-> Yes when introducing virtio-iommu we will need to get this fixed. We
-> need a way to retrieve the iommu mr from the as. I will work on this
-> concurrently.
-
-Probably something like address_space_translate can be used?
-
-Paolo
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
