@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1evn4K-0000yV-Uf
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:46:34 -0400
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1evn5Q-0001rD-8T
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:47:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1evn4G-0000Tb-RA
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:46:32 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:39526)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1evn4G-0000TG-Ky
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:46:28 -0400
-Received: by mail-wr0-x244.google.com with SMTP id k3so729514wrg.6
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 09:46:28 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 13 Mar 2018 16:46:23 +0000
-Message-Id: <20180313164625.4646-2-alex.bennee@linaro.org>
-In-Reply-To: <20180313164625.4646-1-alex.bennee@linaro.org>
-References: <20180313164625.4646-1-alex.bennee@linaro.org>
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1evn5P-000134-FS
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:47:40 -0400
+From: Andrew Baumann <Andrew.Baumann@microsoft.com>
+Date: Tue, 13 Mar 2018 16:47:30 +0000
+Message-ID: <MWHPR21MB018956AFEA7FC79D5ADF870F9ED20@MWHPR21MB0189.namprd21.prod.outlook.com>
+References: <20180313153458.26822-1-peter.maydell@linaro.org>
+	<20180313153458.26822-7-peter.maydell@linaro.org>
+In-Reply-To: <20180313153458.26822-7-peter.maydell@linaro.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 1/3] .travis.yml: drop setting default log output
+Subject: Re: [Qemu-devel] [PATCH 6/9] hw/arm/bcm2836: Create proper bcm2837
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +25,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Peter Maydell <peter.maydell@linaro.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "patches@linaro.org" <patches@linaro.org>, Pekka Enberg <penberg@iki.fi>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-The log backend is the default one, we don't need to explicitly set it.
+> From: Peter Maydell <peter.maydell@linaro.org>
+> Sent: Tuesday, 13 March 2018 08:35
+>=20
+> The bcm2837 is pretty similar to the bcm2836, but it does have
+> some differences. Notably, the MPIDR affinity aff1 values it
+> sets for the CPUs are 0x0, rather than the 0xf that the bcm2836
+> uses, and if this is wrong Linux will not boot.
+>=20
+> Rather than trying to have one device with properties that
+> configure it differently for the two cases, create two
+> separate QOM devices for the two SoCs. We use the same approach
+> as hw/arm/aspeed_soc.c and share code and have a data table
+> that might differ per-SoC. For the moment the two types don't
+> actually have different behaviour.
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  include/hw/arm/bcm2836.h | 19 +++++++++++++++++++
+>  hw/arm/bcm2836.c         | 37 ++++++++++++++++++++++++++++++++-----
+>  hw/arm/raspi.c           |  3 ++-
+>  3 files changed, 53 insertions(+), 6 deletions(-)
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+I haven't tried to understand enough of QOM to review this one... (It looks=
+ sane to me though.)
 
-diff --git a/.travis.yml b/.travis.yml
-index 79377c8de0..92c343a1ef 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -50,7 +50,7 @@ env:
-     - MAKEFLAGS="-j3"
-   matrix:
-     - CONFIG=""
--    - CONFIG="--enable-debug --enable-debug-tcg --enable-trace-backends=log"
-+    - CONFIG="--enable-debug --enable-debug-tcg"
-     - CONFIG="--disable-linux-aio --disable-cap-ng --disable-attr --disable-brlapi --disable-uuid --disable-libusb"
-     - CONFIG="--enable-modules --disable-linux-user"
-     - CONFIG="--with-coroutine=ucontext --disable-linux-user"
--- 
-2.16.2
+Andrew
