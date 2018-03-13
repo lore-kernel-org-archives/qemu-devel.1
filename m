@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evoMo-0006LY-2w
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:09:45 -0400
+	(envelope-from <berrange@redhat.com>) id 1evoOk-0008Dk-7T
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:11:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1evoMm-00042M-B3
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:09:42 -0400
-Date: Tue, 13 Mar 2018 18:09:21 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180313180920.GK3545@work-vm>
-References: <20180313180320.339796-1-vsementsov@virtuozzo.com>
-	<20180313180320.339796-6-vsementsov@virtuozzo.com>
+	(envelope-from <berrange@redhat.com>) id 1evoOh-0006bZ-5i
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:11:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40878 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1evoOh-0006bH-0n
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:11:39 -0400
+Date: Tue, 13 Mar 2018 18:11:34 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180313181134.GD3784@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180312201305.16972-1-berrange@redhat.com>
+	<20180312201305.16972-3-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180313180320.339796-6-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v11 05/13] migration: introduce
- postcopy-only pending
+In-Reply-To: <20180312201305.16972-3-berrange@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 2/9] cutils: add qemu_strtoi & qemu_strtoui
+ parsers for int/unsigned int types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,229 +30,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
-> There would be savevm states (dirty-bitmap) which can migrate only in
-> postcopy stage. The corresponding pending is introduced here.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> ---
->  include/migration/register.h | 17 +++++++++++++++--
->  migration/savevm.h           |  5 +++--
->  hw/s390x/s390-stattrib.c     |  7 ++++---
->  migration/block.c            |  7 ++++---
->  migration/migration.c        | 12 ++++++------
->  migration/ram.c              |  9 +++++----
->  migration/savevm.c           | 13 ++++++++-----
->  migration/trace-events       |  2 +-
->  8 files changed, 46 insertions(+), 26 deletions(-)
-> 
-> diff --git a/include/migration/register.h b/include/migration/register.h
-> index f4f7bdc177..9436a87678 100644
-> --- a/include/migration/register.h
-> +++ b/include/migration/register.h
-> @@ -37,8 +37,21 @@ typedef struct SaveVMHandlers {
->      int (*save_setup)(QEMUFile *f, void *opaque);
->      void (*save_live_pending)(QEMUFile *f, void *opaque,
->                                uint64_t threshold_size,
-> -                              uint64_t *non_postcopiable_pending,
-> -                              uint64_t *postcopiable_pending);
-> +                              uint64_t *res_precopy_only,
-> +                              uint64_t *res_compatible,
-> +                              uint64_t *res_postcopy_only);
-> +    /* Note for save_live_pending:
-> +     * - res_precopy_only is for data which must be migrated in precopy phase
-> +     *     or in stopped state, in other words - before target vm start
-> +     * - res_compatible is for data which may be migrated in any phase
-> +     * - res_postcopy_only is for data which must be migrated in postcopy phase
-> +     *     or in stopped state, in other words - after source vm stop
-> +     *
-> +     * Sum of res_postcopy_only, res_compatible and res_postcopy_only is the
-> +     * whole amount of pending data.
-> +     */
+On Mon, Mar 12, 2018 at 08:12:58PM +0000, Daniel P. Berrang=C3=A9 wrote:
+> From: "Daniel P. Berrange" <berrange@redhat.com>
+>=20
+> There are qemu_strtoNN functions for various sized integers. This adds =
+two
+> more for plain int & unsigned int types, with suitable range checking.
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> diff --git a/util/cutils.c b/util/cutils.c
+> index b33ede83d1..774d5f7362 100644
+> --- a/util/cutils.c
+> +++ b/util/cutils.c
+> +int qemu_strtoui(const char *nptr, const char **endptr, int base,
+> +                 unsigned int *result)
+> +{
+> +    char *ep;
+> +    long lresult;
 > +
+> +    if (!nptr) {
+> +        if (endptr) {
+> +            *endptr =3D nptr;
+> +        }
+> +        return -EINVAL;
+> +    }
 > +
->      LoadStateHandler *load_state;
->      int (*load_setup)(QEMUFile *f, void *opaque);
->      int (*load_cleanup)(void *opaque);
-> diff --git a/migration/savevm.h b/migration/savevm.h
-> index 295c4a1f2c..cf4f0d37ca 100644
-> --- a/migration/savevm.h
-> +++ b/migration/savevm.h
-> @@ -38,8 +38,9 @@ void qemu_savevm_state_complete_postcopy(QEMUFile *f);
->  int qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only,
->                                         bool inactivate_disks);
->  void qemu_savevm_state_pending(QEMUFile *f, uint64_t max_size,
-> -                               uint64_t *res_non_postcopiable,
-> -                               uint64_t *res_postcopiable);
-> +                               uint64_t *res_precopy_only,
-> +                               uint64_t *res_compatible,
-> +                               uint64_t *res_postcopy_only);
->  void qemu_savevm_send_ping(QEMUFile *f, uint32_t value);
->  void qemu_savevm_send_open_return_path(QEMUFile *f);
->  int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len);
-> diff --git a/hw/s390x/s390-stattrib.c b/hw/s390x/s390-stattrib.c
-> index adf07ef312..70b95550a8 100644
-> --- a/hw/s390x/s390-stattrib.c
-> +++ b/hw/s390x/s390-stattrib.c
-> @@ -183,15 +183,16 @@ static int cmma_save_setup(QEMUFile *f, void *opaque)
->  }
->  
->  static void cmma_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
-> -                             uint64_t *non_postcopiable_pending,
-> -                             uint64_t *postcopiable_pending)
-> +                              uint64_t *res_precopy_only,
-> +                              uint64_t *res_compatible,
-> +                              uint64_t *res_postcopy_only)
->  {
->      S390StAttribState *sas = S390_STATTRIB(opaque);
->      S390StAttribClass *sac = S390_STATTRIB_GET_CLASS(sas);
->      long long res = sac->get_dirtycount(sas);
->  
->      if (res >= 0) {
-> -        *non_postcopiable_pending += res;
-> +        *res_precopy_only += res;
->      }
->  }
->  
-> diff --git a/migration/block.c b/migration/block.c
-> index 41b95d1dd8..5c03632257 100644
-> --- a/migration/block.c
-> +++ b/migration/block.c
-> @@ -864,8 +864,9 @@ static int block_save_complete(QEMUFile *f, void *opaque)
->  }
->  
->  static void block_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
-> -                               uint64_t *non_postcopiable_pending,
-> -                               uint64_t *postcopiable_pending)
-> +                               uint64_t *res_precopy_only,
-> +                               uint64_t *res_compatible,
-> +                               uint64_t *res_postcopy_only)
->  {
->      /* Estimate pending number of bytes to send */
->      uint64_t pending;
-> @@ -886,7 +887,7 @@ static void block_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
->  
->      DPRINTF("Enter save live pending  %" PRIu64 "\n", pending);
->      /* We don't do postcopy */
-> -    *non_postcopiable_pending += pending;
-> +    *res_precopy_only += pending;
->  }
->  
->  static int block_load(QEMUFile *f, void *opaque, int version_id)
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 6a4780ef6f..90307f8ab5 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -2242,20 +2242,20 @@ typedef enum {
->   */
->  static MigIterateState migration_iteration_run(MigrationState *s)
->  {
-> -    uint64_t pending_size, pend_post, pend_nonpost;
-> +    uint64_t pending_size, pend_pre, pend_compat, pend_post;
->      bool in_postcopy = s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE;
->  
-> -    qemu_savevm_state_pending(s->to_dst_file, s->threshold_size,
-> -                              &pend_nonpost, &pend_post);
-> -    pending_size = pend_nonpost + pend_post;
-> +    qemu_savevm_state_pending(s->to_dst_file, s->threshold_size, &pend_pre,
-> +                              &pend_compat, &pend_post);
-> +    pending_size = pend_pre + pend_compat + pend_post;
->  
->      trace_migrate_pending(pending_size, s->threshold_size,
-> -                          pend_post, pend_nonpost);
-> +                          pend_pre, pend_compat, pend_post);
->  
->      if (pending_size && pending_size >= s->threshold_size) {
->          /* Still a significant amount to transfer */
->          if (migrate_postcopy() && !in_postcopy &&
-> -            pend_nonpost <= s->threshold_size &&
-> +            pend_pre <= s->threshold_size &&
->              atomic_read(&s->start_postcopy)) {
->              if (postcopy_start(s)) {
->                  error_report("%s: postcopy failed to start", __func__);
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 7266351fd0..590fceb7e9 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -2370,8 +2370,9 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
->  }
->  
->  static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
-> -                             uint64_t *non_postcopiable_pending,
-> -                             uint64_t *postcopiable_pending)
-> +                             uint64_t *res_precopy_only,
-> +                             uint64_t *res_compatible,
-> +                             uint64_t *res_postcopy_only)
->  {
->      RAMState **temp = opaque;
->      RAMState *rs = *temp;
-> @@ -2391,9 +2392,9 @@ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
->  
->      if (migrate_postcopy_ram()) {
->          /* We can do postcopy, and all the data is postcopiable */
-> -        *postcopiable_pending += remaining_size;
-> +        *res_compatible += remaining_size;
->      } else {
-> -        *non_postcopiable_pending += remaining_size;
-> +        *res_precopy_only += remaining_size;
->      }
->  }
->  
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 358c5b51e2..cd5944b81f 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -1220,13 +1220,15 @@ int qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only,
->   * for units that can't do postcopy.
->   */
->  void qemu_savevm_state_pending(QEMUFile *f, uint64_t threshold_size,
-> -                               uint64_t *res_non_postcopiable,
-> -                               uint64_t *res_postcopiable)
-> +                               uint64_t *res_precopy_only,
-> +                               uint64_t *res_compatible,
-> +                               uint64_t *res_postcopy_only)
->  {
->      SaveStateEntry *se;
->  
-> -    *res_non_postcopiable = 0;
-> -    *res_postcopiable = 0;
-> +    *res_precopy_only = 0;
-> +    *res_compatible = 0;
-> +    *res_postcopy_only = 0;
->  
->  
->      QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-> @@ -1239,7 +1241,8 @@ void qemu_savevm_state_pending(QEMUFile *f, uint64_t threshold_size,
->              }
->          }
->          se->ops->save_live_pending(f, se->opaque, threshold_size,
-> -                                   res_non_postcopiable, res_postcopiable);
-> +                                   res_precopy_only, res_compatible,
-> +                                   res_postcopy_only);
->      }
->  }
->  
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 93961dea16..8ec84d82fd 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -86,7 +86,7 @@ migrate_fd_cleanup(void) ""
->  migrate_fd_error(const char *error_desc) "error=%s"
->  migrate_fd_cancel(void) ""
->  migrate_handle_rp_req_pages(const char *rbname, size_t start, size_t len) "in %s at 0x%zx len 0x%zx"
-> -migrate_pending(uint64_t size, uint64_t max, uint64_t post, uint64_t nonpost) "pending size %" PRIu64 " max %" PRIu64 " (post=%" PRIu64 " nonpost=%" PRIu64 ")"
-> +migrate_pending(uint64_t size, uint64_t max, uint64_t pre, uint64_t compat, uint64_t post) "pending size %" PRIu64 " max %" PRIu64 " (pre = %" PRIu64 " compat=%" PRIu64 " post=%" PRIu64 ")"
->  migrate_send_rp_message(int msg_type, uint16_t len) "%d: len %d"
->  migration_completion_file_err(void) ""
->  migration_completion_postcopy_end(void) ""
-> -- 
-> 2.11.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> +    errno =3D 0;
+> +    lresult =3D strtoul(nptr, &ep, base);
+
+The test failure on 32-bit is caused by use of strtoul instead
+of strtoull here, so I'll just switch them, so the logic that
+follows below actually works on 32-bit.
+
+> +    /* Windows returns 1 for negative out-of-range values.  */
+> +    if (errno =3D=3D ERANGE) {
+> +        *result =3D -1;
+> +    } else {
+> +        if (lresult > UINT_MAX) {
+> +            *result =3D UINT_MAX;
+> +            errno =3D ERANGE;
+> +        } else if (lresult < INT_MIN) {
+> +            *result =3D UINT_MAX;
+> +            errno =3D ERANGE;
+> +        } else {
+> +            *result =3D lresult;
+> +        }
+> +    }
+> +    return check_strtox_error(nptr, ep, endptr, errno);
+> +}
+> +
+>  /**
+>   * Convert string @nptr to a long integer, and store it in @result.
+>   *
+> --=20
+> 2.14.3
+>=20
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
