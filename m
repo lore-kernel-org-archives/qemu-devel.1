@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1evp32-0001yY-SQ
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:53:22 -0400
+	(envelope-from <no-reply@patchew.org>) id 1evpDg-0001kb-7R
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:04:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1evp31-0005kK-SU
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:53:20 -0400
-Received: from mail-lf0-x22a.google.com ([2a00:1450:4010:c07::22a]:34014)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1evp31-0005jh-Jn
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:53:19 -0400
-Received: by mail-lf0-x22a.google.com with SMTP id l191-v6so1016430lfe.1
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 11:53:19 -0700 (PDT)
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Tue, 13 Mar 2018 11:53:03 -0700
-Message-Id: <20180313185303.21914-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PULL 00/11] target/xtensa linux-user support
+	(envelope-from <no-reply@patchew.org>) id 1evpDc-0003a8-9T
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:04:20 -0400
+Resent-Message-Id: <E1evpDc-0003a8-9T@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21088)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1evpDc-0003ZY-2a
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:04:16 -0400
+In-Reply-To: <20180313180320.339796-1-vsementsov@virtuozzo.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152096780751.39.15281812348627104231@71c20359a636>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 13 Mar 2018 12:03:29 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v11 00/13] Dirty bitmaps postcopy migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,101 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
+To: vsementsov@virtuozzo.com
+Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.orgfamz@redhat.com, lirans@il.ibm.com, quintela@redhat.com, jsnow@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, amit.shah@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com
 
-Hi Peter,
-
-please pull the following series that adds linux-user support for
-target/xtensa.
-There's a trivial merge conflict with linux-user pull request from
-Laurent Vivier.
-
-Changes since v6 patch series:
-- rebase to the current master.
-
-The following changes since commit 026aaf47c02b79036feb830206cfebb2a726510d:
-
-  Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-request' into staging (2018-03-13 16:26:44 +0000)
-
-are available in the git repository at:
-
-  git://github.com/OSLL/qemu-xtensa.git tags/20180313-xtensa
-
-for you to fetch changes up to be00d35eab124bb4e4e393ac2b0a451e065b7041:
-
-  MAINTAINERS: fix W: address for xtensa (2018-03-13 11:30:23 -0700)
-
-----------------------------------------------------------------
-target/xtensa linux-user support.
-
-- small cleanup for xtensa registers dumping (-d cpu);
-- add support for debugging linux-user process with xtensa-linux-gdb
-  (as opposed to xtensa-elf-gdb), which can only access unprivileged
-  registers;
-- enable MTTCG for target/xtensa;
-- cleanup in linux-user/mmap area making sure that it works correctly
-  with limited 30-bit-wide user address space;
-- import xtensa-specific definitions from the linux kernel,
-  conditionalize user-only/softmmu-only code and add handlers for
-  signals, exceptions, process/thread creation and core registers dumping.
-
-----------------------------------------------------------------
-Max Filippov (11):
-      target/xtensa: dump correct physical registers
-      target/xtensa: mark register windows in the dump
-      target/xtensa: use correct number of registers in gdbstub
-      target/xtensa: support MTTCG
-      linux-user: fix mmap/munmap/mprotect/mremap/shmat
-      linux-user: fix assertion in shmdt
-      linux-user: fix target_mprotect/target_munmap error return values
-      linux-user: drop unused target_msync function
-      target/xtensa: add linux-user support
-      qemu-binfmt-conf.sh: add qemu-xtensa
-      MAINTAINERS: fix W: address for xtensa
-
- MAINTAINERS                             |   2 +-
- configure                               |   1 +
- default-configs/xtensa-linux-user.mak   |   1 +
- default-configs/xtensaeb-linux-user.mak |   1 +
- include/exec/cpu-all.h                  |   6 +-
- include/exec/cpu_ldst.h                 |  16 +-
- linux-user/elfload.c                    |  58 +++++
- linux-user/main.c                       | 245 ++++++++++++++++++
- linux-user/mmap.c                       |  43 ++--
- linux-user/qemu.h                       |   1 -
- linux-user/signal.c                     | 256 ++++++++++++++++++-
- linux-user/syscall.c                    |  15 +-
- linux-user/syscall_defs.h               |  65 ++++-
- linux-user/xtensa/syscall.h             |   0
- linux-user/xtensa/syscall_nr.h          | 437 ++++++++++++++++++++++++++++++++
- linux-user/xtensa/target_cpu.h          |  22 ++
- linux-user/xtensa/target_elf.h          |  16 ++
- linux-user/xtensa/target_signal.h       |  28 ++
- linux-user/xtensa/target_structs.h      |  28 ++
- linux-user/xtensa/target_syscall.h      |  49 ++++
- linux-user/xtensa/termbits.h            | 328 ++++++++++++++++++++++++
- scripts/qemu-binfmt-conf.sh             |  12 +-
- target/xtensa/Makefile.objs             |   3 +-
- target/xtensa/cpu.c                     |  26 +-
- target/xtensa/cpu.h                     |  60 +++--
- target/xtensa/gdbstub.c                 |  14 +-
- target/xtensa/helper.c                  |  58 ++++-
- target/xtensa/helper.h                  |   4 +
- target/xtensa/op_helper.c               |  50 +++-
- target/xtensa/overlay_tool.h            |  11 +-
- target/xtensa/translate.c               |  99 ++++++--
- 31 files changed, 1840 insertions(+), 115 deletions(-)
- create mode 100644 default-configs/xtensa-linux-user.mak
- create mode 100644 default-configs/xtensaeb-linux-user.mak
- create mode 100644 linux-user/xtensa/syscall.h
- create mode 100644 linux-user/xtensa/syscall_nr.h
- create mode 100644 linux-user/xtensa/target_cpu.h
- create mode 100644 linux-user/xtensa/target_elf.h
- create mode 100644 linux-user/xtensa/target_signal.h
- create mode 100644 linux-user/xtensa/target_structs.h
- create mode 100644 linux-user/xtensa/target_syscall.h
- create mode 100644 linux-user/xtensa/termbits.h
--- 
-Thanks.
--- Max
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMzEzMTgwMzIwLjMzOTc5Ni0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNv
+bQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYxMSAwMC8xM10gRGlydHkgYml0bWFwcyBw
+b3N0Y29weSBtaWdyYXRpb24KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gK
+CkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwp
+CmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
+cml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNl
+ICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENI
+ICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBn
+aXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
+bGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49
+JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRh
+dGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6
+Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAg
+ICAgIHBhdGNoZXcvMjAxODAzMTMxODAzMjAuMzM5Nzk2LTEtdnNlbWVudHNvdkB2aXJ0dW96em8u
+Y29tIC0+IHBhdGNoZXcvMjAxODAzMTMxODAzMjAuMzM5Nzk2LTEtdnNlbWVudHNvdkB2aXJ0dW96
+em8uY29tCkF1dG8gcGFja2luZyB0aGUgcmVwb3NpdG9yeSBpbiBiYWNrZ3JvdW5kIGZvciBvcHRp
+bXVtIHBlcmZvcm1hbmNlLgpTZWUgImdpdCBoZWxwIGdjIiBmb3IgbWFudWFsIGhvdXNla2VlcGlu
+Zy4KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo3MWUwM2M0ZWNjIGlvdGVzdHM6IGFk
+ZCBkaXJ0eSBiaXRtYXAgcG9zdGNvcHkgdGVzdApkYWE1NDhmNzlmIGlvdGVzdHM6IGFkZCBkaXJ0
+eSBiaXRtYXAgbWlncmF0aW9uIHRlc3QKMzUzYzVmZGFlMSBtaWdyYXRpb246IGFkZCBwb3N0Y29w
+eSBtaWdyYXRpb24gb2YgZGlydHkgYml0bWFwcwoxZGEwN2Q0YmEyIG1pZ3JhdGlvbjogYWxsb3cg
+cW1wIGNvbW1hbmQgbWlncmF0ZS1zdGFydC1wb3N0Y29weSBmb3IgYW55IHBvc3Rjb3B5CmI3ODlh
+Mjg4N2UgbWlncmF0aW9uOiBhZGQgaXNfYWN0aXZlX2l0ZXJhdGUgaGFuZGxlcgo0OGViMTRmODU2
+IG1pZ3JhdGlvbi9xZW11LWZpbGU6IGFkZCBxZW11X3B1dF9jb3VudGVkX3N0cmluZygpCjFkNjU0
+OWRhZTEgbWlncmF0aW9uOiBpbmNsdWRlIG1pZ3JhdGVfZGlydHlfYml0bWFwcyBpbiBtaWdyYXRl
+X3Bvc3Rjb3B5CmU5ZTQwYWYzOWEgcWFwaTogYWRkIGRpcnR5LWJpdG1hcHMgbWlncmF0aW9uIGNh
+cGFiaWxpdHkKYzU3NTE4NTAzOCBtaWdyYXRpb246IGludHJvZHVjZSBwb3N0Y29weS1vbmx5IHBl
+bmRpbmcKN2NhZTM1Y2Q3YyBkaXJ0eS1iaXRtYXA6IGFkZCBsb2NrZWQgc3RhdGUKNDdiYmQyYTcw
+YyBibG9jay9kaXJ0eS1iaXRtYXA6IGFkZCBfbG9ja2VkIHZlcnNpb24gb2YgYmRydl9yZWNsYWlt
+X2RpcnR5X2JpdG1hcAo4NzBmZjFkOTE2IGJsb2NrL2RpcnR5LWJpdG1hcDogZml4IGxvY2tpbmcg
+aW4gYmRydl9yZWNsYWltX2RpcnR5X2JpdG1hcAo1ZGNhM2FlMjI2IGJsb2NrL2RpcnR5LWJpdG1h
+cDogYWRkIGJkcnZfZGlydHlfYml0bWFwX2VuYWJsZV9zdWNjZXNzb3IoKQoKPT09IE9VVFBVVCBC
+RUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMzogYmxvY2svZGlydHktYml0bWFwOiBhZGQgYmRy
+dl9kaXJ0eV9iaXRtYXBfZW5hYmxlX3N1Y2Nlc3NvcigpLi4uCkNoZWNraW5nIFBBVENIIDIvMTM6
+IGJsb2NrL2RpcnR5LWJpdG1hcDogZml4IGxvY2tpbmcgaW4gYmRydl9yZWNsYWltX2RpcnR5X2Jp
+dG1hcC4uLgpDaGVja2luZyBQQVRDSCAzLzEzOiBibG9jay9kaXJ0eS1iaXRtYXA6IGFkZCBfbG9j
+a2VkIHZlcnNpb24gb2YgYmRydl9yZWNsYWltX2RpcnR5X2JpdG1hcC4uLgpDaGVja2luZyBQQVRD
+SCA0LzEzOiBkaXJ0eS1iaXRtYXA6IGFkZCBsb2NrZWQgc3RhdGUuLi4KQ2hlY2tpbmcgUEFUQ0gg
+NS8xMzogbWlncmF0aW9uOiBpbnRyb2R1Y2UgcG9zdGNvcHktb25seSBwZW5kaW5nLi4uCkNoZWNr
+aW5nIFBBVENIIDYvMTM6IHFhcGk6IGFkZCBkaXJ0eS1iaXRtYXBzIG1pZ3JhdGlvbiBjYXBhYmls
+aXR5Li4uCkNoZWNraW5nIFBBVENIIDcvMTM6IG1pZ3JhdGlvbjogaW5jbHVkZSBtaWdyYXRlX2Rp
+cnR5X2JpdG1hcHMgaW4gbWlncmF0ZV9wb3N0Y29weS4uLgpDaGVja2luZyBQQVRDSCA4LzEzOiBt
+aWdyYXRpb24vcWVtdS1maWxlOiBhZGQgcWVtdV9wdXRfY291bnRlZF9zdHJpbmcoKS4uLgpDaGVj
+a2luZyBQQVRDSCA5LzEzOiBtaWdyYXRpb246IGFkZCBpc19hY3RpdmVfaXRlcmF0ZSBoYW5kbGVy
+Li4uCkNoZWNraW5nIFBBVENIIDEwLzEzOiBtaWdyYXRpb246IGFsbG93IHFtcCBjb21tYW5kIG1p
+Z3JhdGUtc3RhcnQtcG9zdGNvcHkgZm9yIGFueSBwb3N0Y29weS4uLgpDaGVja2luZyBQQVRDSCAx
+MS8xMzogbWlncmF0aW9uOiBhZGQgcG9zdGNvcHkgbWlncmF0aW9uIG9mIGRpcnR5IGJpdG1hcHMu
+Li4KRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0
+YXRlbWVudAojNzM3OiBGSUxFOiBtaWdyYXRpb24vYmxvY2stZGlydHktYml0bWFwLmM6NjkwOgor
+ICAgIH0gd2hpbGUgKCEocy5mbGFncyAmIERJUlRZX0JJVE1BUF9NSUdfRkxBR19FT1MpKTsKWy4u
+Ll0KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgODE2IGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDEyLzEzOiBp
+b3Rlc3RzOiBhZGQgZGlydHkgYml0bWFwIG1pZ3JhdGlvbiB0ZXN0Li4uCkNoZWNraW5nIFBBVENI
+IDEzLzEzOiBpb3Rlc3RzOiBhZGQgZGlydHkgYml0bWFwIHBvc3Rjb3B5IHRlc3QuLi4KPT09IE9V
+VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
+XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5v
+cmc=
