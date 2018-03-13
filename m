@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1evrNT-0004PC-Ux
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 17:22:38 -0400
+	(envelope-from <mst@redhat.com>) id 1evrjS-0003lb-RU
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 17:45:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1evrNP-0002XD-US
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 17:22:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46308 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1evrjP-00078t-O9
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 17:45:18 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36212 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1evrNP-0002Wg-NJ
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 17:22:31 -0400
-Date: Tue, 13 Mar 2018 23:22:21 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1evrjP-00078U-Iw
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 17:45:15 -0400
+Date: Tue, 13 Mar 2018 23:45:06 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180313231844-mutt-send-email-mst@kernel.org>
-References: <20180302083720.25137-1-idgar@virtualoco.com>
+Message-ID: <1520977432-187679-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180302083720.25137-1-idgar@virtualoco.com>
-Subject: Re: [Qemu-devel] [PATCH v3] vmgenid: allow VM Generation ID
- modification via QMP/HMP
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/22] virtio,vhost,pci,pc: features, cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,227 +25,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Or Idgar <idgar@virtualoco.com>
-Cc: ben@skyportsystems.com, dgilbert@redhat.com, imammedo@redhat.com, eblake@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, ghammer@redhat.com, Or Idgar <oridgar@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-On Fri, Mar 02, 2018 at 10:37:20AM +0200, Or Idgar wrote:
-> From: Or Idgar <oridgar@gmail.com>
-> 
-> This patch allow changing the Virtual Machine Generation
-> ID through QMP/HMP while the vm guest is running.
-> the spec (http://go.microsoft.com/fwlink/?LinkId=260709)
-> mentions that "when the generation ID changes, execute an
-> ACPI Notify operation on the generation ID device".
-> To test it we need the ability to set the generation ID
-> online. QMP/HMP allows that.
-> 
-> QMP command example:
->     { "execute": "set-vm-generation-id",
->           "arguments": {
->               "guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
->           }
->     }
-> 
-> HMP command example:
->     set-vm-generation-id 324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87
+The following changes since commit 026aaf47c02b79036feb830206cfebb2a72651=
+0d:
 
-would it make sense to use qom-set for this instead?
+  Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-re=
+quest' into staging (2018-03-13 16:26:44 +0000)
 
+are available in the git repository at:
 
-> This patch is based off an earlier version by
-> Igor Mammedov (imammedo@redhat.com)
-> 
-> Signed-off-by: Or Idgar <oridgar@gmail.com>
-> Reviewed-by: Gal Hammer <ghammer@redhat.com>
-> ---
-> 
-> Changes in v3:
-> - Explaining why we need this patch in the commit message.
-> 
->  docs/specs/vmgenid.txt |  7 ++++---
->  hmp-commands.hx        | 13 +++++++++++++
->  hmp.c                  | 10 ++++++++++
->  hmp.h                  |  1 +
->  hw/acpi/vmgenid.c      | 10 ++++++++++
->  qapi-schema.json       | 11 +++++++++++
->  tests/vmgenid-test.c   | 31 +++++++++++++++++++++++++++++++
->  7 files changed, 80 insertions(+), 3 deletions(-)
-> 
-> diff --git a/docs/specs/vmgenid.txt b/docs/specs/vmgenid.txt
-> index aa9f518..04443de 100644
-> --- a/docs/specs/vmgenid.txt
-> +++ b/docs/specs/vmgenid.txt
-> @@ -240,6 +240,7 @@ The property may be queried via QMP/HMP:
->    (QEMU) query-vm-generation-id
->    {"return": {"guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"}}
->  
-> -Setting of this parameter is intentionally left out from the QMP/HMP
-> -interfaces.  There are no known use cases for changing the GUID once QEMU is
-> -running, and adding this capability would greatly increase the complexity.
-> +Also, the property may be set via QMP/HMP:
-> +
-> +  (QEMU) set-vm-generation-id guid=ee6726ce-73b4-4a8b-863c-708f26515847
-> +  {"return": {}}
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
 
-I see you dropped the text that said it's not really useful.
-It's probably a good idea to supply some use-case examples
-where it *is* useful. Testing could be one but as you see
-it didn't impress others in this thread too much.
+for you to fetch changes up to 8750b78fcfcb6f49bf037242624953195ada69a8:
 
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index 4afd57c..4524669 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -1871,5 +1871,18 @@ ETEXI
->      },
->  
->  STEXI
-> +@item set-vm-generation-id @var{uuid}
-> +Set Virtual Machine Generation ID counter to @var{guid}
-> +ETEXI
-> +
-> +    {
-> +        .name       = "set-vm-generation-id",
-> +        .args_type  = "guid:s",
-> +        .params     = "guid",
-> +        .help       = "Set Virtual Machine Generation ID counter",
-> +        .cmd        = hmp_set_vm_generation_id,
-> +    },
-> +
-> +STEXI
->  @end table
->  ETEXI
-> diff --git a/hmp.c b/hmp.c
-> index 35a7041..73f9b00 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -2901,6 +2901,16 @@ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict)
->      qapi_free_GuidInfo(info);
->  }
->  
-> +void hmp_set_vm_generation_id(Monitor *mon, const QDict *qdict)
-> +{
-> +    Error *errp = NULL;
-> +    const char *guid = qdict_get_str(qdict, "guid");
-> +
-> +    qmp_set_vm_generation_id(guid, &errp);
-> +    if (errp)
-> +        hmp_handle_error(mon, &errp);
-> +}
-> +
->  void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict)
->  {
->      Error *err = NULL;
-> diff --git a/hmp.h b/hmp.h
-> index a6f56b1..8cc74d5 100644
-> --- a/hmp.h
-> +++ b/hmp.h
-> @@ -147,5 +147,6 @@ void hmp_info_ramblock(Monitor *mon, const QDict *qdict);
->  void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
->  void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
->  void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
-> +void hmp_set_vm_generation_id(Monitor *mon, const QDict *qdict);
->  
->  #endif
-> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-> index 105044f..5319d70 100644
-> --- a/hw/acpi/vmgenid.c
-> +++ b/hw/acpi/vmgenid.c
-> @@ -129,6 +129,16 @@ void vmgenid_add_fw_cfg(VmGenIdState *vms, FWCfgState *s, GArray *guid)
->                               ARRAY_SIZE(vms->vmgenid_addr_le), false);
->  }
->  
-> +void qmp_set_vm_generation_id(const char *guid, Error **errp)
-> +{
-> +    Object *obj = find_vmgenid_dev();
-> +
-> +    if (!obj) {
-> +        return;
-> +    }
-> +    object_property_set_str(obj, guid, VMGENID_GUID, errp);
-> +}
-> +
->  static void vmgenid_update_guest(VmGenIdState *vms)
->  {
->      Object *obj = object_resolve_path_type("", TYPE_ACPI_DEVICE_IF, NULL);
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 1845795..c2ab733 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -3193,6 +3193,17 @@
->  { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
->  
->  ##
-> +# @set-vm-generation-id:
-> +#
-> +# Set Virtual Machine Generation ID
-> +#
-> +# @guid: new GUID to set as Virtual Machine Generation ID
-> +#
-> +# Since 2.12
-> +##
-> +{ 'command': 'set-vm-generation-id', 'data': { 'guid': 'str' } }
-> +
-> +##
->  # @watchdog-set-action:
->  #
->  # Set watchdog action
-> diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-> index 5a86b40..544cf0f 100644
-> --- a/tests/vmgenid-test.c
-> +++ b/tests/vmgenid-test.c
-> @@ -130,6 +130,24 @@ static void read_guid_from_monitor(QemuUUID *guid)
->      QDECREF(rsp);
->  }
->  
-> +static void set_guid_via_monitor(QemuUUID *guid)
-> +{
-> +    QDict *rsp, *rsp_ret;
-> +    char command[256];
-> +    char *guid_str;
-> +
-> +    guid_str = qemu_uuid_unparse_strdup(guid);
-> +    sprintf(command, "{ 'execute': 'set-vm-generation-id', 'arguments': \
-> +                      { 'guid': '%s' } }",
-> +            guid_str);
-> +    free(guid_str);
-> +    rsp = qmp(command);
-> +    if (qdict_haskey(rsp, "return")) {
-> +        rsp_ret = qdict_get_qdict(rsp, "return");
-> +        g_assert(qdict_size(rsp_ret) == 0);
-> +    }
-> +}
-> +
->  static char disk[] = "tests/vmgenid-test-disk-XXXXXX";
->  
->  #define GUID_CMD(guid)                          \
-> @@ -182,6 +200,17 @@ static void vmgenid_query_monitor_test(void)
->      qtest_quit(global_qtest);
->  }
->  
-> +static void vmgenid_set_monitor_test(void)
-> +{
-> +    QemuUUID expected, measured;
-> +
-> +    global_qtest = qtest_startf(GUID_CMD(VGID_GUID));
-> +    qemu_uuid_generate(&expected);
-> +    set_guid_via_monitor(&expected);
-> +    read_guid_from_monitor(&measured);
-> +    g_assert(memcmp(measured.data, expected.data, sizeof(measured.data)) == 0);
-> +}
-> +
->  int main(int argc, char **argv)
->  {
->      int ret;
-> @@ -199,6 +228,8 @@ int main(int argc, char **argv)
->                     vmgenid_set_guid_auto_test);
->      qtest_add_func("/vmgenid/vmgenid/query-monitor",
->                     vmgenid_query_monitor_test);
-> +    qtest_add_func("/vmgenid/vmgenid/set-guid-qmp",
-> +                   vmgenid_set_monitor_test);
->      ret = g_test_run();
->      boot_sector_cleanup(disk);
->  
-> -- 
-> 2.9.5
-> 
+  test/acpi-test-data: add ACPI tables for dimmpxm test (2018-03-13 23:09=
+:51 +0200)
+
+----------------------------------------------------------------
+virtio,vhost,pci,pc: features, cleanups
+
+SRAT tables for DIMM devices
+new virtio net flags for speed/duplex
+cleanups in pci and vhost
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Haozhong Zhang (5):
+      pc-dimm: make qmp_pc_dimm_device_list() sort devices by address
+      qmp: distinguish PC-DIMM and NVDIMM in MemoryDeviceInfoList
+      hw/acpi-build: build SRAT memory affinity structures for DIMM devic=
+es
+      tests/bios-tables-test: add test cases for DIMM proximity
+      test/acpi-test-data: add ACPI tables for dimmpxm test
+
+Igor Mammedov (10):
+      acpi: remove unused acpi-dsdt.aml
+      pc: replace pm object initialization with one-liner in acpi_get_pm_=
+info()
+      acpi: reuse AcpiGenericAddress instead of Acpi20GenericAddress
+      acpi: add build_append_gas() helper for Generic Address Structure
+      acpi: move ACPI_PORT_SMI_CMD define to header it belongs to
+      pc: acpi: isolate FADT specific data into AcpiFadtData structure
+      pc: acpi: use build_append_foo() API to construct FADT
+      acpi: move build_fadt() from i386 specific to generic ACPI source
+      virt_arm: acpi: reuse common build_fadt()
+      tests: acpi: don't read all fields in test_acpi_fadt_table()
+
+Jason Baron (3):
+      scripts/update-linux-headers: add ethtool.h and update to 4.16.0-rc=
+4
+      virtio-net: use 64-bit values for feature flags
+      virtio-net: add linkspeed and duplex settings to virtio-net
+
+Jay Zhou (1):
+      vhost: used_memslots refactoring
+
+Michael S. Tsirkin (2):
+      qemu-options-wrapper.h: fix include patch
+      standard-headers: update virtio_net.h
+
+Philippe Mathieu-Daud=C3=A9 (1):
+      hw/pci: remove obsolete PCIDevice->init()
+
+ Makefile                                    |    1 -
+ qapi/misc.json                              |    6 +-
+ include/hw/acpi/acpi-defs.h                 |  136 +-
+ include/hw/acpi/aml-build.h                 |   23 +
+ include/hw/isa/apm.h                        |    3 +
+ include/hw/mem/pc-dimm.h                    |    2 +-
+ include/hw/pci/pci.h                        |    1 -
+ include/hw/virtio/vhost-backend.h           |    6 +-
+ include/hw/virtio/virtio-net.h              |    5 +-
+ include/standard-headers/linux/ethtool.h    | 1821 +++++++++++++++++++++=
+++++++
+ include/standard-headers/linux/kernel.h     |   15 +
+ include/standard-headers/linux/sysinfo.h    |   25 +
+ include/standard-headers/linux/virtio_net.h |   13 +
+ qemu-options-wrapper.h                      |    2 +-
+ hmp.c                                       |   14 +-
+ hw/acpi/aml-build.c                         |  140 ++
+ hw/arm/virt-acpi-build.c                    |   39 +-
+ hw/i386/acpi-build.c                        |  252 ++--
+ hw/isa/apm.c                                |    1 -
+ hw/mem/pc-dimm.c                            |   91 +-
+ hw/net/virtio-net.c                         |   81 +-
+ hw/pci/pci.c                                |   14 -
+ hw/ppc/spapr.c                              |    3 +-
+ hw/virtio/vhost-backend.c                   |   15 +-
+ hw/virtio/vhost-user.c                      |   77 +-
+ hw/virtio/vhost.c                           |   13 +-
+ numa.c                                      |   23 +-
+ qmp.c                                       |    7 +-
+ stubs/qmp_pc_dimm.c                         |    4 +-
+ tests/bios-tables-test.c                    |  120 +-
+ pc-bios/acpi-dsdt.aml                       |  Bin 4405 -> 0 bytes
+ scripts/update-linux-headers.sh             |   11 +-
+ tests/acpi-test-data/pc/APIC.dimmpxm        |  Bin 0 -> 144 bytes
+ tests/acpi-test-data/pc/DSDT.dimmpxm        |  Bin 0 -> 6803 bytes
+ tests/acpi-test-data/pc/NFIT.dimmpxm        |  Bin 0 -> 224 bytes
+ tests/acpi-test-data/pc/SRAT.dimmpxm        |  Bin 0 -> 472 bytes
+ tests/acpi-test-data/pc/SSDT.dimmpxm        |  Bin 0 -> 685 bytes
+ tests/acpi-test-data/q35/APIC.dimmpxm       |  Bin 0 -> 144 bytes
+ tests/acpi-test-data/q35/DSDT.dimmpxm       |  Bin 0 -> 9487 bytes
+ tests/acpi-test-data/q35/NFIT.dimmpxm       |  Bin 0 -> 224 bytes
+ tests/acpi-test-data/q35/SRAT.dimmpxm       |  Bin 0 -> 472 bytes
+ tests/acpi-test-data/q35/SSDT.dimmpxm       |  Bin 0 -> 685 bytes
+ 42 files changed, 2489 insertions(+), 475 deletions(-)
+ create mode 100644 include/standard-headers/linux/ethtool.h
+ create mode 100644 include/standard-headers/linux/kernel.h
+ create mode 100644 include/standard-headers/linux/sysinfo.h
+ delete mode 100644 pc-bios/acpi-dsdt.aml
+ create mode 100644 tests/acpi-test-data/pc/APIC.dimmpxm
+ create mode 100644 tests/acpi-test-data/pc/DSDT.dimmpxm
+ create mode 100644 tests/acpi-test-data/pc/NFIT.dimmpxm
+ create mode 100644 tests/acpi-test-data/pc/SRAT.dimmpxm
+ create mode 100644 tests/acpi-test-data/pc/SSDT.dimmpxm
+ create mode 100644 tests/acpi-test-data/q35/APIC.dimmpxm
+ create mode 100644 tests/acpi-test-data/q35/DSDT.dimmpxm
+ create mode 100644 tests/acpi-test-data/q35/NFIT.dimmpxm
+ create mode 100644 tests/acpi-test-data/q35/SRAT.dimmpxm
+ create mode 100644 tests/acpi-test-data/q35/SSDT.dimmpxm
