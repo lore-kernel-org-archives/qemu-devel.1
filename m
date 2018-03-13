@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sochin.jiang@huawei.com>) id 1evgP1-0006An-Ne
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 05:39:28 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1evgTL-0007rZ-06
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 05:43:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sochin.jiang@huawei.com>) id 1evgOx-0007G7-OO
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 05:39:27 -0400
-From: sochin.jiang <sochin.jiang@huawei.com>
-Message-ID: <8848a27f-4bac-b6be-08ab-a366438791a6@huawei.com>
-Date: Tue, 13 Mar 2018 17:38:09 +0800
+	(envelope-from <peter.maydell@linaro.org>) id 1evgTK-0002gj-1A
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 05:43:54 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:38557)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1evgTJ-0002gR-Rd
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 05:43:53 -0400
+Received: by mail-oi0-x242.google.com with SMTP id h23so14765446oib.5
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 02:43:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] Question: an IO hang problem
+In-Reply-To: <20180312110532.30967-1-kraxel@redhat.com>
+References: <20180312110532.30967-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 13 Mar 2018 09:43:32 +0000
+Message-ID: <CAFEAcA_15NvxrfdoDYGwBk=_JS3iPNq==+sE7YqVXVBO1z0fcg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/1] Usb 20180312 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,31 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com, mreitz@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel <qemu-devel@nongnu.org>, "Subo (A)" <subo7@huawei.com>, "Lulina (A)" <lina.lulina@huawei.com>, "Fangyi (C)" <eric.fangyi@huawei.com>, sochin.jiang@huawei.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+On 12 March 2018 at 11:05, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit e4ae62b802cec437f877f2cadc4ef059cc0eca76:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2018-03-09 17:28:16 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/usb-20180312-pull-request
+>
+> for you to fetch changes up to c7ac1ab0201d47d12b75e1c98d79869bcdad5732:
+>
+>   usbredir: reorder fields in USBRedirDevice to reduce padding (2018-03-12 11:43:49 +0100)
+>
+> ----------------------------------------------------------------
+> usbredir: reorder fields in USBRedirDevice to reduce padding
+>
+> ----------------------------------------------------------------
+>
+> zhenwei.pi (1):
+>   usbredir: reorder fields in USBRedirDevice to reduce padding
+>
+>  hw/usb/redirect.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
- Hi, guys,
+Applied, thanks.
 
- Recently, I encountered an IO hang problem in occasion which I cannot reproduce it now.
-
- I analyzed this problem carefully, the critical stack is as following:
-
-
-After reading the codes in linux-aio.c(see ioq_submit() function), I found two situations could lead us here.
-
-1) no AIOs are in flight(s->ioq.in_flight is 0) and another call to io_submit returns -EAGAIN
-
-2) no AIOs are in flight(s->ioq.in_flight is 0) and s->io_q.pending IOs reach to MAX_EVENTS at once
-
-In both the two situations above, the do{...}while loop breaks out and set s->io_q.blocked true.
-
-After that, AIO completion callback will never be called,  ioq_submit() either, all pended requests will hang.
-
-
-Is there a proper way we can fix this while do not affect(stuck) the guest ?
-
-Hope for a reply, thanks.
-
-
-Sochin.
+-- PMM
