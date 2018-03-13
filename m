@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eviZj-0006ls-Nu
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:58:40 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1evig1-00021s-2n
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:05:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eviZj-0006LF-1m
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 07:58:39 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Tue, 13 Mar 2018 19:58:14 +0800
-Message-Id: <20180313115814.23774-3-famz@redhat.com>
-In-Reply-To: <20180313115814.23774-1-famz@redhat.com>
-References: <20180313115814.23774-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] iotests: Add regression test for commit
- base locking
+	(envelope-from <pbonzini@redhat.com>) id 1evifv-0001Pe-GP
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:05:09 -0400
+Received: from mail-wr0-f195.google.com ([209.85.128.195]:40748)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1evifv-0001PH-9s
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:05:03 -0400
+Received: by mail-wr0-f195.google.com with SMTP id m4so9108180wrb.7
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 05:05:03 -0700 (PDT)
+References: <1520937591-27088-1-git-send-email-pbonzini@redhat.com>
+	<2c23a5aa-ea1f-b561-1b63-bdeca3bb0c25@de.ibm.com>
+	<CAFEAcA9TJ0okEipdBrr+TmJOa2VN3TT2QhRs=Kx-6Gp8LO4xaw@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9abfa500-0ed5-104f-eb15-27759be94a51@redhat.com>
+Date: Tue, 13 Mar 2018 13:05:01 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9TJ0okEipdBrr+TmJOa2VN3TT2QhRs=Kx-6Gp8LO4xaw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] update Linux headers to 4.15
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,48 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- tests/qemu-iotests/153     | 8 ++++++++
- tests/qemu-iotests/153.out | 4 ++++
- 2 files changed, 12 insertions(+)
+On 13/03/2018 12:57, Peter Maydell wrote:
+> On 13 March 2018 at 11:45, Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+>>
+>>
+>> On 03/13/2018 11:39 AM, Paolo Bonzini wrote:
+>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>>> ---
+>>>  include/standard-headers/linux/input-event-codes.h |   1 +
+>>>  include/standard-headers/linux/pci_regs.h          |  30 +-
+>>>  include/standard-headers/linux/virtio_gpu.h        |   1 -
+>>>  include/standard-headers/linux/virtio_net.h        |  13 +
+>>>  include/standard-headers/linux/virtio_ring.h       |   2 +-
+>>>  include/standard-headers/rdma/vmw_pvrdma-abi.h     |  13 +-
+>>>  linux-headers/asm-powerpc/kvm.h                    |   2 +
+>>>  linux-headers/asm-powerpc/unistd.h                 |   3 +
+>>>  linux-headers/asm-s390/unistd.h                    | 401 +--------------------
+>>>  linux-headers/asm-s390/unistd_32.h                 | 364 +++++++++++++++++++
+>>>  linux-headers/asm-s390/unistd_64.h                 | 331 +++++++++++++++++
+>>>  linux-headers/asm-x86/kvm_para.h                   |   5 +
+>>>  linux-headers/linux/kvm.h                          |  92 +++++
+>>>  linux-headers/linux/psci.h                         |   3 +
+>>>  linux-headers/linux/vfio.h                         |  72 ++++
+>>>  scripts/update-linux-headers.sh                    |   2 +
+>>>  16 files changed, 918 insertions(+), 417 deletions(-)
+>>>  create mode 100644 linux-headers/asm-s390/unistd_32.h
+>>>  create mode 100644 linux-headers/asm-s390/unistd_64.h
+>>
+>> s390 part look sane.
+> 
+> ...patchew thinks it failed the build test on s390 though.
 
-diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
-index adfd02695b..a7875e6899 100755
---- a/tests/qemu-iotests/153
-+++ b/tests/qemu-iotests/153
-@@ -178,6 +178,14 @@ rm -f "${TEST_IMG}.lnk" &>/dev/null
- ln -s ${TEST_IMG} "${TEST_IMG}.lnk" || echo "Failed to create link"
- _run_qemu_with_images "${TEST_IMG}.lnk" "${TEST_IMG}"
- 
-+echo
-+echo "== Active commit to intermediate layer should work when base in use =="
-+_launch_qemu -drive format=$IMGFMT,file="${TEST_IMG}.a",id=drive0 \
-+             -device virtio-blk,drive=drive0
-+_run_cmd $QEMU_IMG commit -b "${TEST_IMG}.b" "${TEST_IMG}.c"
-+
-+_cleanup_qemu
-+
- _launch_qemu
- 
- _send_qemu_cmd $QEMU_HANDLE \
-diff --git a/tests/qemu-iotests/153.out b/tests/qemu-iotests/153.out
-index 34309cfb20..28f8250dd2 100644
---- a/tests/qemu-iotests/153.out
-+++ b/tests/qemu-iotests/153.out
-@@ -372,6 +372,10 @@ Is another process using the image?
- == Symbolic link ==
- QEMU_PROG: -drive if=none,file=TEST_DIR/t.qcow2: Failed to get "write" lock
- Is another process using the image?
-+
-+== Active commit to intermediate layer should work when base in use ==
-+
-+_qemu_img_wrapper commit -b TEST_DIR/t.qcow2.b TEST_DIR/t.qcow2.c
- {"return": {}}
- Adding drive
- 
--- 
-2.14.3
+Yeah, I didn't catch it because virglrenderer is missing in the Docker
+configs.  One recent virtio-gpu patch modified linux-headers/ with
+something that's not yet in Linux's tree.
+
+Paolo
