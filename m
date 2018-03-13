@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1evo9G-00028B-6H
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:55:43 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1evoGS-0000RJ-Oz
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:03:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1evo9B-0004AW-Ax
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:55:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56640)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1evo9B-00048l-4G
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 13:55:37 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1evo99-0006g2-Qn
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 17:55:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C38E32E806B
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 17:55:35 +0000 (UTC)
+	(envelope-from <dgilbert@redhat.com>) id 1evoGN-0007q6-Tn
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 14:03:08 -0400
+Date: Tue, 13 Mar 2018 18:02:38 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180313180237.GJ3545@work-vm>
+References: <20180207155837.92351-1-vsementsov@virtuozzo.com>
+	<20180207155837.92351-11-vsementsov@virtuozzo.com>
+	<20180312160901.GJ3219@work-vm>
+	<e4883029-31b5-2b09-8ac3-186b04ce6075@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 13 Mar 2018 17:48:25 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1755479 <1755479@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152094809386.3778.6282045564987107259.malonedeb@gac.canonical.com>
-Message-Id: <152096330564.15385.12269811726989702954.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1755479] Re: Cortex M:qemu abort with optimized
- code and icount
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e4883029-31b5-2b09-8ac3-186b04ce6075@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v10 10/12] migration: add postcopy
+ migration of dirty bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,67 +26,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
-Yes, it looks like we accidentally broke icount. This patch from the mailin=
-g list fixes it:
-https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06595.html
+* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+> 12.03.2018 19:09, Dr. David Alan Gilbert wrote:
+> > * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+> > > Postcopy migration of dirty bitmaps. Only named dirty bitmaps are migrated.
+> > > 
+> > > +
+> > > +        init_dirty_bitmap_incoming_migration();
+> > > +
+> > You might want to consider if that's better in vl.c near where
+> > ram_mig_init() is, OR whether there should be a call in
+> > migratation_incoming_state_destroy to clean it up.
+> > (Although I doubt the cases where the destroy happens are interesting
+> > for postcopy bitmaps).
+> 
+> If you don't mind, let's leave it as is for now
 
-though it hasn't been code-reviewed yet.
+Yep, that's OK.
 
--- =
+Dave
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1755479
-
-Title:
-  Cortex M:qemu abort with optimized code and icount
-
-Status in QEMU:
-  New
-
-Bug description:
-  A basic program runs fine if compiled with flag -O0 with gcc, but trigger=
-s a qemu abort when compiled with -O1 and run with icount:
-  "qemu: fatal: IO on conditional branch instruction"
-
-  I also noticed the problem on C source like this with -O0:
-  "int foo =3D *bar; bar++;" : OK
-  "int foo =3D *bar++;" : FAIL (!!!)
-
-  Optimized binary attached to this ticket.
-
-  command line:
-  qemu-system-arm -M lm3s6965evb -nographic -kernel hello.bin -serial file:=
-$(tty) -icount 4 -cpu cortex-m4
-  (working fine without icount)
-
-  version: =
-
-  QEMU emulator version 2.11.50 (v2.11.0-2146-gd9bbfea-dirty)
-
-  Compilation options:
-  ./configure --target-list=3Darm-softmmu --disable-slirp --disable-blobs -=
--disable-docs --disable-guest-agent --disable-gnutls --disable-nettle --dis=
-able-gcrypt --disable-sdl --disable-gtk --disable-vnc --disable-virtfs --di=
-sable-mpath --disable-xen --disable-brlapi --disable-curl --disable-bluez -=
--disable-kvm --disable-hax --disable-hvf --disable-whpx --disable-rdma --di=
-sable-vde --disable-netmap --disable-linux-aio --disable-cap-ng --disable-a=
-ttr --disable-vhost-net --disable-spice --disable-rbd --disable-libiscsi --=
-disable-libnfs --disable-smartcard --disable-libusb --disable-live-block-mi=
-gration --disable-usb-redir --disable-lzo --disable-snappy --disable-bzip2 =
---disable-seccomp --disable-glusterfs --disable-tpm --disable-libssh2 --dis=
-able-numa --disable-libxml2 --disable-tcmalloc --disable-jemalloc --disable=
--replication --disable-vhost-vsock --disable-opengl --disable-virglrenderer=
- --disable-xfsctl --disable-qom-cast-debug --disable-vxhs --disable-crypto-=
-afalg --disable-vhost-user --disable-capstone --disable-pie --extra-cflags=
-=3D-mtune=3Dnative
-
-  I have also tested previous versions:
-  - stock qemu-system-arm 2.5.0 from ubuntu 16.04: OK
-  - git version: QEMU emulator version 2.10.0 (v2.10.2-dirty): OK
-  - git version: QEMU emulator version 2.10.90 (v2.11.0-rc0-dirty): FAIL
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1755479/+subscriptions
+> > 
+> > >           once = true;
+> > >       }
+> > >       return &mis_current;
+> > > @@ -297,6 +300,8 @@ static void process_incoming_migration_bh(void *opaque)
+> > >          state, we need to obey autostart. Any other state is set with
+> > >          runstate_set. */
+> > > +    dirty_bitmap_mig_before_vm_start();
+> > > +
+> > >       if (!global_state_received() ||
+> > >           global_state_get_runstate() == RUN_STATE_RUNNING) {
+> > >           if (autostart) {
+> > > diff --git a/migration/savevm.c b/migration/savevm.c
+> > > index e5d557458e..93b339646b 100644
+> > > --- a/migration/savevm.c
+> > > +++ b/migration/savevm.c
+> > > @@ -1673,6 +1673,8 @@ static void loadvm_postcopy_handle_run_bh(void *opaque)
+> > >       trace_loadvm_postcopy_handle_run_vmstart();
+> > > +    dirty_bitmap_mig_before_vm_start();
+> > > +
+> > >       if (autostart) {
+> > >           /* Hold onto your hats, starting the CPU */
+> > >           vm_start();
+> > > diff --git a/vl.c b/vl.c
+> > > index e517a8d995..0ef3f2b5a2 100644
+> > > --- a/vl.c
+> > > +++ b/vl.c
+> > > @@ -4514,6 +4514,7 @@ int main(int argc, char **argv, char **envp)
+> > >       blk_mig_init();
+> > >       ram_mig_init();
+> > > +    dirty_bitmap_mig_init();
+> > >       /* If the currently selected machine wishes to override the units-per-bus
+> > >        * property of its default HBA interface type, do so now. */
+> > > diff --git a/migration/Makefile.objs b/migration/Makefile.objs
+> > > index 99e038024d..c83ec47ba8 100644
+> > > --- a/migration/Makefile.objs
+> > > +++ b/migration/Makefile.objs
+> > > @@ -6,6 +6,7 @@ common-obj-y += qemu-file.o global_state.o
+> > >   common-obj-y += qemu-file-channel.o
+> > >   common-obj-y += xbzrle.o postcopy-ram.o
+> > >   common-obj-y += qjson.o
+> > > +common-obj-y += block-dirty-bitmap.o
+> > >   common-obj-$(CONFIG_RDMA) += rdma.o
+> > > diff --git a/migration/trace-events b/migration/trace-events
+> > > index a04fffb877..e9eb8078d4 100644
+> > > --- a/migration/trace-events
+> > > +++ b/migration/trace-events
+> > > @@ -227,3 +227,17 @@ colo_vm_state_change(const char *old, const char *new) "Change '%s' => '%s'"
+> > >   colo_send_message(const char *msg) "Send '%s' message"
+> > >   colo_receive_message(const char *msg) "Receive '%s' message"
+> > >   colo_failover_set_state(const char *new_state) "new state %s"
+> > > +
+> > > +# migration/block-dirty-bitmap.c
+> > > +send_bitmap_header_enter(void) ""
+> > > +send_bitmap_bits(uint32_t flags, uint64_t start_sector, uint32_t nr_sectors, uint64_t data_size) "\n   flags:        0x%x\n   start_sector: %" PRIu64 "\n   nr_sectors:   %" PRIu32 "\n   data_size:    %" PRIu64 "\n"
+> > Tracing doesn't have \n's in
+> 
+> will fix.
+> 
+> > 
+> > > +dirty_bitmap_save_iterate(int in_postcopy) "in postcopy: %d"
+> > > +dirty_bitmap_save_complete_enter(void) ""
+> > > +dirty_bitmap_save_complete_finish(void) ""
+> > > +dirty_bitmap_save_pending(uint64_t pending, uint64_t max_size) "pending %" PRIu64 " max: %" PRIu64
+> > > +dirty_bitmap_load_complete(void) ""
+> > > +dirty_bitmap_load_bits_enter(uint64_t first_sector, uint32_t nr_sectors) "chunk: %" PRIu64 " %" PRIu32
+> > > +dirty_bitmap_load_bits_zeroes(void) ""
+> > > +dirty_bitmap_load_header(uint32_t flags) "flags 0x%x"
+> > > +dirty_bitmap_load_enter(void) ""
+> > > +dirty_bitmap_load_success(void) ""
+> > So other than minor bits, this one looks OK from a migration side; I
+> > can't say I've followed the block side of the patch though.
+> > 
+> > Dave
+> > 
+> > > -- 
+> > > 2.11.1
+> > > 
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+> 
+> -- 
+> Best regards,
+> Vladimir
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
