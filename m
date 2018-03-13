@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1evt0N-000593-1u
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 19:06:52 -0400
+	(envelope-from <prvs=603125fd5=igor.druzhinin@citrix.com>)
+	id 1evt8K-0002wv-ED
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 19:15:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1evt0I-0005qI-W5
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 19:06:51 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180313153458.26822-1-peter.maydell@linaro.org>
-	<20180313153458.26822-9-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <459dc453-911a-0d9c-dc8a-26f39fa9cf75@amsat.org>
-Date: Wed, 14 Mar 2018 00:06:43 +0100
+	(envelope-from <prvs=603125fd5=igor.druzhinin@citrix.com>)
+	id 1evt8H-0000Kg-A6
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 19:15:04 -0400
+Received: from smtp02.citrix.com ([66.165.176.63]:42852)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71)
+	(envelope-from <prvs=603125fd5=igor.druzhinin@citrix.com>)
+	id 1evt8G-0000Ix-GJ
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 19:15:00 -0400
+From: Igor Druzhinin <igor.druzhinin@citrix.com>
+Date: Tue, 13 Mar 2018 23:14:54 +0000
+Message-ID: <1520982894-4180-1-git-send-email-igor.druzhinin@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <20180313153458.26822-9-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 8/9] hw/arm/bcm2836: Hardcode correct CPU
- type
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] xen-pvdevice: Introduce a simplistic
+ xen-pvdevice save state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,99 +28,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Pekka Enberg <penberg@iki.fi>, Andrew Baumann <Andrew.Baumann@microsoft.com>
+To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
+Cc: sstabellini@kernel.org, anthony.perard@citrix.com, paul.durrant@citrix.com, pbonzini@redhat.com, mst@redhat.com, Igor Druzhinin <igor.druzhinin@citrix.com>
 
-On 03/13/2018 04:34 PM, Peter Maydell wrote:
-> Now we have separate types for BCM2386 and BCM2387, we might as well
-> just hard-code the CPU type they use rather than having it passed
-> through as an object property. This then lets us put the initialization
-> of the CPU object in init rather than realize.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+This should help to avoid problems with accessing the device after
+migration/resume without PV drivers by migrating its PCI configuration
+space state. Without an explicitly defined state record it resets
+every time a VM migrates which confuses the OS and makes every
+access to xen-pvdevice MMIO region to fail. PV tools enable some
+logic to save and restore PCI configuration state from within the VM
+every time it migrates which basically hides the issue.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Older systems will acquire the new record when migrated which should
+not change their state for worse.
 
-> ---
->  hw/arm/bcm2836.c | 22 +++++++++++++---------
->  hw/arm/raspi.c   |  2 --
->  2 files changed, 13 insertions(+), 11 deletions(-)
-> 
-> diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-> index 7140257c98..12f75b55a7 100644
-> --- a/hw/arm/bcm2836.c
-> +++ b/hw/arm/bcm2836.c
-> @@ -25,16 +25,19 @@
->  
->  struct BCM283XInfo {
->      const char *name;
-> +    const char *cpu_type;
->      int clusterid;
->  };
->  
->  static const BCM283XInfo bcm283x_socs[] = {
->      {
->          .name = TYPE_BCM2836,
-> +        .cpu_type = ARM_CPU_TYPE_NAME("cortex-a15"),
->          .clusterid = 0xf,
->      },
->      {
->          .name = TYPE_BCM2837,
-> +        .cpu_type = ARM_CPU_TYPE_NAME("cortex-a53"),
->          .clusterid = 0x0,
->      },
->  };
-> @@ -42,6 +45,16 @@ static const BCM283XInfo bcm283x_socs[] = {
->  static void bcm2836_init(Object *obj)
->  {
->      BCM283XState *s = BCM283X(obj);
-> +    BCM283XClass *bc = BCM283X_GET_CLASS(obj);
-> +    const BCM283XInfo *info = bc->info;
-> +    int n;
-> +
-> +    for (n = 0; n < BCM283X_NCPUS; n++) {
-> +        object_initialize(&s->cpus[n], sizeof(s->cpus[n]),
-> +                          info->cpu_type);
-> +        object_property_add_child(obj, "cpu[*]", OBJECT(&s->cpus[n]),
-> +                                  &error_abort);
-> +    }
->  
->      object_initialize(&s->control, sizeof(s->control), TYPE_BCM2836_CONTROL);
->      object_property_add_child(obj, "control", OBJECT(&s->control), NULL);
-> @@ -69,14 +82,6 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
->  
->      /* common peripherals from bcm2835 */
->  
-> -    obj = OBJECT(dev);
-> -    for (n = 0; n < BCM283X_NCPUS; n++) {
-> -        object_initialize(&s->cpus[n], sizeof(s->cpus[n]),
-> -                          s->cpu_type);
-> -        object_property_add_child(obj, "cpu[*]", OBJECT(&s->cpus[n]),
-> -                                  &error_abort);
-> -    }
-> -
->      obj = object_property_get_link(OBJECT(dev), "ram", &err);
->      if (obj == NULL) {
->          error_setg(errp, "%s: required ram link not found: %s",
-> @@ -168,7 +173,6 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
->  }
->  
->  static Property bcm2836_props[] = {
-> -    DEFINE_PROP_STRING("cpu-type", BCM283XState, cpu_type),
->      DEFINE_PROP_UINT32("enabled-cpus", BCM283XState, enabled_cpus,
->                         BCM283X_NCPUS),
->      DEFINE_PROP_END_OF_LIST()
-> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-> index f588720138..ae15997669 100644
-> --- a/hw/arm/raspi.c
-> +++ b/hw/arm/raspi.c
-> @@ -150,8 +150,6 @@ static void raspi_init(MachineState *machine, int version)
->      /* Setup the SOC */
->      object_property_add_const_link(OBJECT(&s->soc), "ram", OBJECT(&s->ram),
->                                     &error_abort);
-> -    object_property_set_str(OBJECT(&s->soc), machine->cpu_type, "cpu-type",
-> -                            &error_abort);
->      object_property_set_int(OBJECT(&s->soc), smp_cpus, "enabled-cpus",
->                              &error_abort);
->      int board_rev = version == 3 ? 0xa02082 : 0xa21041;
-> 
+Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
+Reviewed-by: Paul Durrant <paul.durrant@citrix.com>
+---
+v2: add more concrete info
+---
+ hw/i386/xen/xen_pvdevice.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/hw/i386/xen/xen_pvdevice.c b/hw/i386/xen/xen_pvdevice.c
+index f748823..a146f18 100644
+--- a/hw/i386/xen/xen_pvdevice.c
++++ b/hw/i386/xen/xen_pvdevice.c
+@@ -71,6 +71,16 @@ static const MemoryRegionOps xen_pv_mmio_ops = {
+     .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
++static const VMStateDescription vmstate_xen_pvdevice = {
++    .name = "xen-pvdevice",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_PCI_DEVICE(parent_obj, XenPVDevice),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static void xen_pv_realize(PCIDevice *pci_dev, Error **errp)
+ {
+     XenPVDevice *d = XEN_PV_DEVICE(pci_dev);
+@@ -120,6 +130,7 @@ static void xen_pv_class_init(ObjectClass *klass, void *data)
+     k->class_id = PCI_CLASS_SYSTEM_OTHER;
+     dc->desc = "Xen PV Device";
+     dc->props = xen_pv_props;
++    dc->vmsd = &vmstate_xen_pvdevice;
+ }
+ 
+ static const TypeInfo xen_pv_type_info = {
+-- 
+2.7.4
