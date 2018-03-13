@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdH-0001VE-HD
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:37 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdI-0001WY-Ky
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdG-0004g7-3r
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:35 -0400
+	(envelope-from <kwolf@redhat.com>) id 1evmdF-0004fx-S5
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:36 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Mar 2018 17:17:43 +0100
-Message-Id: <20180313161803.1814-22-kwolf@redhat.com>
+Date: Tue, 13 Mar 2018 17:17:41 +0100
+Message-Id: <20180313161803.1814-20-kwolf@redhat.com>
 In-Reply-To: <20180313161803.1814-1-kwolf@redhat.com>
 References: <20180313161803.1814-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 21/41] tests/test-blockjob: test cancellations
+Subject: [Qemu-devel] [PULL 19/41] blockjobs: Expose manual property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,282 +24,322 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: John Snow <jsnow@redhat.com>
 
-Whatever the state a blockjob is in, it should be able to be canceled
-by the block layer.
+Expose the "manual" property via QAPI for the backup-related jobs.
+As of this commit, this allows the management API to request the
+"concluded" and "dismiss" semantics for backup jobs.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/test-blockjob.c | 233 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 229 insertions(+), 4 deletions(-)
+ qapi/block-core.json       | 48 ++++++++++++++++++++++++++++++++++++++--------
+ blockdev.c                 | 31 +++++++++++++++++++++++++++---
+ blockjob.c                 |  2 ++
+ tests/qemu-iotests/109.out | 24 +++++++++++------------
+ 4 files changed, 82 insertions(+), 23 deletions(-)
 
-diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index 599e28d732..8946bfd37b 100644
---- a/tests/test-blockjob.c
-+++ b/tests/test-blockjob.c
-@@ -24,14 +24,15 @@ static void block_job_cb(void *opaque, int ret)
- {
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 2c32fc69f9..3e52d248eb 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1054,13 +1054,20 @@
+ #
+ # @status: Current job state/status (since 2.12)
+ #
++# @auto-finalize: Job will finalize itself when PENDING, moving to
++#                 the CONCLUDED state. (since 2.12)
++#
++# @auto-dismiss: Job will dismiss itself when CONCLUDED, moving to the NULL
++#                state and disappearing from the query list. (since 2.12)
++#
+ # Since: 1.1
+ ##
+ { 'struct': 'BlockJobInfo',
+   'data': {'type': 'str', 'device': 'str', 'len': 'int',
+            'offset': 'int', 'busy': 'bool', 'paused': 'bool', 'speed': 'int',
+            'io-status': 'BlockDeviceIoStatus', 'ready': 'bool',
+-           'status': 'BlockJobStatus' } }
++           'status': 'BlockJobStatus',
++           'auto-finalize': 'bool', 'auto-dismiss': 'bool' } }
+ 
+ ##
+ # @query-block-jobs:
+@@ -1210,6 +1217,18 @@
+ #                   default 'report' (no limitations, since this applies to
+ #                   a different block device than @device).
+ #
++# @auto-finalize: When false, this job will wait in a PENDING state after it has
++#                 finished its work, waiting for @block-job-finalize.
++#                 When true, this job will automatically perform its abort or
++#                 commit actions.
++#                 Defaults to true. (Since 2.12)
++#
++# @auto-dismiss: When false, this job will wait in a CONCLUDED state after it
++#                has completed ceased all work, and wait for @block-job-dismiss.
++#                When true, this job will automatically disappear from the query
++#                list without user intervention.
++#                Defaults to true. (Since 2.12)
++#
+ # Note: @on-source-error and @on-target-error only affect background
+ # I/O.  If an error occurs during a guest write request, the device's
+ # rerror/werror actions will be used.
+@@ -1218,10 +1237,12 @@
+ ##
+ { 'struct': 'DriveBackup',
+   'data': { '*job-id': 'str', 'device': 'str', 'target': 'str',
+-            '*format': 'str', 'sync': 'MirrorSyncMode', '*mode': 'NewImageMode',
+-            '*speed': 'int', '*bitmap': 'str', '*compress': 'bool',
++            '*format': 'str', 'sync': 'MirrorSyncMode',
++            '*mode': 'NewImageMode', '*speed': 'int',
++            '*bitmap': 'str', '*compress': 'bool',
+             '*on-source-error': 'BlockdevOnError',
+-            '*on-target-error': 'BlockdevOnError' } }
++            '*on-target-error': 'BlockdevOnError',
++            '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
+ 
+ ##
+ # @BlockdevBackup:
+@@ -1251,6 +1272,18 @@
+ #                   default 'report' (no limitations, since this applies to
+ #                   a different block device than @device).
+ #
++# @auto-finalize: When false, this job will wait in a PENDING state after it has
++#                 finished its work, waiting for @block-job-finalize.
++#                 When true, this job will automatically perform its abort or
++#                 commit actions.
++#                 Defaults to true. (Since 2.12)
++#
++# @auto-dismiss: When false, this job will wait in a CONCLUDED state after it
++#                has completed ceased all work, and wait for @block-job-dismiss.
++#                When true, this job will automatically disappear from the query
++#                list without user intervention.
++#                Defaults to true. (Since 2.12)
++#
+ # Note: @on-source-error and @on-target-error only affect background
+ # I/O.  If an error occurs during a guest write request, the device's
+ # rerror/werror actions will be used.
+@@ -1259,11 +1292,10 @@
+ ##
+ { 'struct': 'BlockdevBackup',
+   'data': { '*job-id': 'str', 'device': 'str', 'target': 'str',
+-            'sync': 'MirrorSyncMode',
+-            '*speed': 'int',
+-            '*compress': 'bool',
++            'sync': 'MirrorSyncMode', '*speed': 'int', '*compress': 'bool',
+             '*on-source-error': 'BlockdevOnError',
+-            '*on-target-error': 'BlockdevOnError' } }
++            '*on-target-error': 'BlockdevOnError',
++            '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
+ 
+ ##
+ # @blockdev-snapshot-sync:
+diff --git a/blockdev.c b/blockdev.c
+index efd3ab2e99..809adbe7f9 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3261,7 +3261,7 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
+     AioContext *aio_context;
+     QDict *options = NULL;
+     Error *local_err = NULL;
+-    int flags;
++    int flags, job_flags = BLOCK_JOB_DEFAULT;
+     int64_t size;
+     bool set_backing_hd = false;
+ 
+@@ -3280,6 +3280,12 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
+     if (!backup->has_job_id) {
+         backup->job_id = NULL;
+     }
++    if (!backup->has_auto_finalize) {
++        backup->auto_finalize = true;
++    }
++    if (!backup->has_auto_dismiss) {
++        backup->auto_dismiss = true;
++    }
+     if (!backup->has_compress) {
+         backup->compress = false;
+     }
+@@ -3371,11 +3377,17 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
+             goto out;
+         }
+     }
++    if (!backup->auto_finalize) {
++        job_flags |= BLOCK_JOB_MANUAL_FINALIZE;
++    }
++    if (!backup->auto_dismiss) {
++        job_flags |= BLOCK_JOB_MANUAL_DISMISS;
++    }
+ 
+     job = backup_job_create(backup->job_id, bs, target_bs, backup->speed,
+                             backup->sync, bmap, backup->compress,
+                             backup->on_source_error, backup->on_target_error,
+-                            BLOCK_JOB_DEFAULT, NULL, NULL, txn, &local_err);
++                            job_flags, NULL, NULL, txn, &local_err);
+     bdrv_unref(target_bs);
+     if (local_err != NULL) {
+         error_propagate(errp, local_err);
+@@ -3410,6 +3422,7 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, BlockJobTxn *txn,
+     Error *local_err = NULL;
+     AioContext *aio_context;
+     BlockJob *job = NULL;
++    int job_flags = BLOCK_JOB_DEFAULT;
+ 
+     if (!backup->has_speed) {
+         backup->speed = 0;
+@@ -3423,6 +3436,12 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, BlockJobTxn *txn,
+     if (!backup->has_job_id) {
+         backup->job_id = NULL;
+     }
++    if (!backup->has_auto_finalize) {
++        backup->auto_finalize = true;
++    }
++    if (!backup->has_auto_dismiss) {
++        backup->auto_dismiss = true;
++    }
+     if (!backup->has_compress) {
+         backup->compress = false;
+     }
+@@ -3451,10 +3470,16 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, BlockJobTxn *txn,
+             goto out;
+         }
+     }
++    if (!backup->auto_finalize) {
++        job_flags |= BLOCK_JOB_MANUAL_FINALIZE;
++    }
++    if (!backup->auto_dismiss) {
++        job_flags |= BLOCK_JOB_MANUAL_DISMISS;
++    }
+     job = backup_job_create(backup->job_id, bs, target_bs, backup->speed,
+                             backup->sync, NULL, backup->compress,
+                             backup->on_source_error, backup->on_target_error,
+-                            BLOCK_JOB_DEFAULT, NULL, NULL, txn, &local_err);
++                            job_flags, NULL, NULL, txn, &local_err);
+     if (local_err != NULL) {
+         error_propagate(errp, local_err);
+     }
+diff --git a/blockjob.c b/blockjob.c
+index 4b73cb0263..ba538c93dd 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -821,6 +821,8 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
+     info->io_status = job->iostatus;
+     info->ready     = job->ready;
+     info->status    = job->status;
++    info->auto_finalize = job->auto_finalize;
++    info->auto_dismiss  = job->auto_dismiss;
+     return info;
  }
  
--static BlockJob *do_test_id(BlockBackend *blk, const char *id,
--                            bool should_succeed)
-+static BlockJob *mk_job(BlockBackend *blk, const char *id,
-+                        const BlockJobDriver *drv, bool should_succeed,
-+                        int flags)
- {
-     BlockJob *job;
-     Error *errp = NULL;
- 
--    job = block_job_create(id, &test_block_job_driver, NULL, blk_bs(blk),
--                           0, BLK_PERM_ALL, 0, BLOCK_JOB_DEFAULT, block_job_cb,
-+    job = block_job_create(id, drv, NULL, blk_bs(blk),
-+                           0, BLK_PERM_ALL, 0, flags, block_job_cb,
-                            NULL, &errp);
-     if (should_succeed) {
-         g_assert_null(errp);
-@@ -50,6 +51,13 @@ static BlockJob *do_test_id(BlockBackend *blk, const char *id,
-     return job;
- }
- 
-+static BlockJob *do_test_id(BlockBackend *blk, const char *id,
-+                            bool should_succeed)
-+{
-+    return mk_job(blk, id, &test_block_job_driver,
-+                  should_succeed, BLOCK_JOB_DEFAULT);
-+}
-+
- /* This creates a BlockBackend (optionally with a name) with a
-  * BlockDriverState inserted. */
- static BlockBackend *create_blk(const char *name)
-@@ -142,6 +150,216 @@ static void test_job_ids(void)
-     destroy_blk(blk[2]);
- }
- 
-+typedef struct CancelJob {
-+    BlockJob common;
-+    BlockBackend *blk;
-+    bool should_converge;
-+    bool should_complete;
-+    bool completed;
-+} CancelJob;
-+
-+static void cancel_job_completed(BlockJob *job, void *opaque)
-+{
-+    CancelJob *s = opaque;
-+    s->completed = true;
-+    block_job_completed(job, 0);
-+}
-+
-+static void cancel_job_complete(BlockJob *job, Error **errp)
-+{
-+    CancelJob *s = container_of(job, CancelJob, common);
-+    s->should_complete = true;
-+}
-+
-+static void coroutine_fn cancel_job_start(void *opaque)
-+{
-+    CancelJob *s = opaque;
-+
-+    while (!s->should_complete) {
-+        if (block_job_is_cancelled(&s->common)) {
-+            goto defer;
-+        }
-+
-+        if (!s->common.ready && s->should_converge) {
-+            block_job_event_ready(&s->common);
-+        }
-+
-+        block_job_sleep_ns(&s->common, 100000);
-+    }
-+
-+ defer:
-+    block_job_defer_to_main_loop(&s->common, cancel_job_completed, s);
-+}
-+
-+static const BlockJobDriver test_cancel_driver = {
-+    .instance_size = sizeof(CancelJob),
-+    .start         = cancel_job_start,
-+    .complete      = cancel_job_complete,
-+};
-+
-+static CancelJob *create_common(BlockJob **pjob)
-+{
-+    BlockBackend *blk;
-+    BlockJob *job;
-+    CancelJob *s;
-+
-+    blk = create_blk(NULL);
-+    job = mk_job(blk, "Steve", &test_cancel_driver, true,
-+                 BLOCK_JOB_MANUAL_FINALIZE | BLOCK_JOB_MANUAL_DISMISS);
-+    block_job_ref(job);
-+    assert(job->status == BLOCK_JOB_STATUS_CREATED);
-+    s = container_of(job, CancelJob, common);
-+    s->blk = blk;
-+
-+    *pjob = job;
-+    return s;
-+}
-+
-+static void cancel_common(CancelJob *s)
-+{
-+    BlockJob *job = &s->common;
-+    BlockBackend *blk = s->blk;
-+    BlockJobStatus sts = job->status;
-+
-+    block_job_cancel_sync(job);
-+    if ((sts != BLOCK_JOB_STATUS_CREATED) &&
-+        (sts != BLOCK_JOB_STATUS_CONCLUDED)) {
-+        BlockJob *dummy = job;
-+        block_job_dismiss(&dummy, &error_abort);
-+    }
-+    assert(job->status == BLOCK_JOB_STATUS_NULL);
-+    block_job_unref(job);
-+    destroy_blk(blk);
-+}
-+
-+static void test_cancel_created(void)
-+{
-+    BlockJob *job;
-+    CancelJob *s;
-+
-+    s = create_common(&job);
-+    cancel_common(s);
-+}
-+
-+static void test_cancel_running(void)
-+{
-+    BlockJob *job;
-+    CancelJob *s;
-+
-+    s = create_common(&job);
-+
-+    block_job_start(job);
-+    assert(job->status == BLOCK_JOB_STATUS_RUNNING);
-+
-+    cancel_common(s);
-+}
-+
-+static void test_cancel_paused(void)
-+{
-+    BlockJob *job;
-+    CancelJob *s;
-+
-+    s = create_common(&job);
-+
-+    block_job_start(job);
-+    assert(job->status == BLOCK_JOB_STATUS_RUNNING);
-+
-+    block_job_user_pause(job, &error_abort);
-+    block_job_enter(job);
-+    assert(job->status == BLOCK_JOB_STATUS_PAUSED);
-+
-+    cancel_common(s);
-+}
-+
-+static void test_cancel_ready(void)
-+{
-+    BlockJob *job;
-+    CancelJob *s;
-+
-+    s = create_common(&job);
-+
-+    block_job_start(job);
-+    assert(job->status == BLOCK_JOB_STATUS_RUNNING);
-+
-+    s->should_converge = true;
-+    block_job_enter(job);
-+    assert(job->status == BLOCK_JOB_STATUS_READY);
-+
-+    cancel_common(s);
-+}
-+
-+static void test_cancel_standby(void)
-+{
-+    BlockJob *job;
-+    CancelJob *s;
-+
-+    s = create_common(&job);
-+
-+    block_job_start(job);
-+    assert(job->status == BLOCK_JOB_STATUS_RUNNING);
-+
-+    s->should_converge = true;
-+    block_job_enter(job);
-+    assert(job->status == BLOCK_JOB_STATUS_READY);
-+
-+    block_job_user_pause(job, &error_abort);
-+    block_job_enter(job);
-+    assert(job->status == BLOCK_JOB_STATUS_STANDBY);
-+
-+    cancel_common(s);
-+}
-+
-+static void test_cancel_pending(void)
-+{
-+    BlockJob *job;
-+    CancelJob *s;
-+
-+    s = create_common(&job);
-+
-+    block_job_start(job);
-+    assert(job->status == BLOCK_JOB_STATUS_RUNNING);
-+
-+    s->should_converge = true;
-+    block_job_enter(job);
-+    assert(job->status == BLOCK_JOB_STATUS_READY);
-+
-+    block_job_complete(job, &error_abort);
-+    block_job_enter(job);
-+    while (!s->completed) {
-+        aio_poll(qemu_get_aio_context(), true);
-+    }
-+    assert(job->status == BLOCK_JOB_STATUS_PENDING);
-+
-+    cancel_common(s);
-+}
-+
-+static void test_cancel_concluded(void)
-+{
-+    BlockJob *job;
-+    CancelJob *s;
-+
-+    s = create_common(&job);
-+
-+    block_job_start(job);
-+    assert(job->status == BLOCK_JOB_STATUS_RUNNING);
-+
-+    s->should_converge = true;
-+    block_job_enter(job);
-+    assert(job->status == BLOCK_JOB_STATUS_READY);
-+
-+    block_job_complete(job, &error_abort);
-+    block_job_enter(job);
-+    while (!s->completed) {
-+        aio_poll(qemu_get_aio_context(), true);
-+    }
-+    assert(job->status == BLOCK_JOB_STATUS_PENDING);
-+
-+    block_job_finalize(job, &error_abort);
-+    assert(job->status == BLOCK_JOB_STATUS_CONCLUDED);
-+
-+    cancel_common(s);
-+}
-+
- int main(int argc, char **argv)
- {
-     qemu_init_main_loop(&error_abort);
-@@ -149,5 +367,12 @@ int main(int argc, char **argv)
- 
-     g_test_init(&argc, &argv, NULL);
-     g_test_add_func("/blockjob/ids", test_job_ids);
-+    g_test_add_func("/blockjob/cancel/created", test_cancel_created);
-+    g_test_add_func("/blockjob/cancel/running", test_cancel_running);
-+    g_test_add_func("/blockjob/cancel/paused", test_cancel_paused);
-+    g_test_add_func("/blockjob/cancel/ready", test_cancel_ready);
-+    g_test_add_func("/blockjob/cancel/standby", test_cancel_standby);
-+    g_test_add_func("/blockjob/cancel/pending", test_cancel_pending);
-+    g_test_add_func("/blockjob/cancel/concluded", test_cancel_concluded);
-     return g_test_run();
- }
+diff --git a/tests/qemu-iotests/109.out b/tests/qemu-iotests/109.out
+index d288f2eef6..8a9b93672b 100644
+--- a/tests/qemu-iotests/109.out
++++ b/tests/qemu-iotests/109.out
+@@ -19,7 +19,7 @@ read 65536/65536 bytes at offset 0
+ {"return": {}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 1024, "offset": 1024, "speed": 0, "type": "mirror"}}
+-{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 1024, "offset": 1024, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
++{"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 1024, "offset": 1024, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 1024, "offset": 1024, "speed": 0, "type": "mirror"}}
+@@ -45,7 +45,7 @@ read 65536/65536 bytes at offset 0
+ {"return": {}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 197120, "offset": 197120, "speed": 0, "type": "mirror"}}
+-{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 197120, "offset": 197120, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
++{"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 197120, "offset": 197120, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 197120, "offset": 197120, "speed": 0, "type": "mirror"}}
+@@ -71,7 +71,7 @@ read 65536/65536 bytes at offset 0
+ {"return": {}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 327680, "offset": 327680, "speed": 0, "type": "mirror"}}
+-{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 327680, "offset": 327680, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
++{"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 327680, "offset": 327680, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 327680, "offset": 327680, "speed": 0, "type": "mirror"}}
+@@ -97,7 +97,7 @@ read 65536/65536 bytes at offset 0
+ {"return": {}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 1024, "offset": 1024, "speed": 0, "type": "mirror"}}
+-{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 1024, "offset": 1024, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
++{"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 1024, "offset": 1024, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 1024, "offset": 1024, "speed": 0, "type": "mirror"}}
+@@ -123,7 +123,7 @@ read 65536/65536 bytes at offset 0
+ {"return": {}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 65536, "offset": 65536, "speed": 0, "type": "mirror"}}
+-{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 65536, "offset": 65536, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
++{"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 65536, "offset": 65536, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 65536, "offset": 65536, "speed": 0, "type": "mirror"}}
+@@ -149,7 +149,7 @@ read 65536/65536 bytes at offset 0
+ {"return": {}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 2560, "offset": 2560, "speed": 0, "type": "mirror"}}
+-{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 2560, "offset": 2560, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
++{"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 2560, "offset": 2560, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 2560, "offset": 2560, "speed": 0, "type": "mirror"}}
+@@ -174,7 +174,7 @@ read 65536/65536 bytes at offset 0
+ {"return": {}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 2560, "offset": 2560, "speed": 0, "type": "mirror"}}
+-{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 2560, "offset": 2560, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
++{"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 2560, "offset": 2560, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 2560, "offset": 2560, "speed": 0, "type": "mirror"}}
+@@ -199,7 +199,7 @@ read 65536/65536 bytes at offset 0
+ {"return": {}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 31457280, "offset": 31457280, "speed": 0, "type": "mirror"}}
+-{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 31457280, "offset": 31457280, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
++{"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 31457280, "offset": 31457280, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 31457280, "offset": 31457280, "speed": 0, "type": "mirror"}}
+@@ -224,7 +224,7 @@ read 65536/65536 bytes at offset 0
+ {"return": {}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 327680, "offset": 327680, "speed": 0, "type": "mirror"}}
+-{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 327680, "offset": 327680, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
++{"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 327680, "offset": 327680, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 327680, "offset": 327680, "speed": 0, "type": "mirror"}}
+@@ -249,7 +249,7 @@ read 65536/65536 bytes at offset 0
+ {"return": {}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 2048, "offset": 2048, "speed": 0, "type": "mirror"}}
+-{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 2048, "offset": 2048, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
++{"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 2048, "offset": 2048, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 2048, "offset": 2048, "speed": 0, "type": "mirror"}}
+@@ -265,7 +265,7 @@ Automatically detecting the format is dangerous for raw images, write operations
+ Specify the 'raw' format explicitly to remove the restrictions.
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 512, "offset": 512, "speed": 0, "type": "mirror"}}
+-{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 512, "offset": 512, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
++{"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 512, "offset": 512, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 512, "offset": 512, "speed": 0, "type": "mirror"}}
+@@ -274,7 +274,7 @@ Images are identical.
+ {"return": {}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 512, "offset": 512, "speed": 0, "type": "mirror"}}
+-{"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 512, "offset": 512, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
++{"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 512, "offset": 512, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 512, "offset": 512, "speed": 0, "type": "mirror"}}
 -- 
 2.13.6
