@@ -1,37 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evpQz-0002t4-6I
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:18:06 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1evpU0-0005G3-2x
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:21:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1evpQv-0003EL-Up
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:18:05 -0400
-References: <20180212051954.GE11634@umbus.fritz.box>
-	<0a57f0ec-4300-f4f3-3957-4bced8b57e14@ozlabs.ru>
-	<20180212090653.42bdd2e2@w520.home>
-	<0c594a0b-488c-b5f8-e8ed-ffa8f4a98088@ozlabs.ru>
-	<20180213053630.GL11634@umbus.fritz.box>
-	<20180213054124.GN11634@umbus.fritz.box>
-	<8282d070-b2d3-7e43-3da9-b17c77b99a67@ozlabs.ru>
-	<20180214013323.GA5247@umbus.fritz.box>
-	<843efd62-7a39-8536-91ad-1abea2beb190@ozlabs.ru>
-	<20180214085541.5491705f@w520.home>
-	<20180216052824.GI2074@umbus.fritz.box>
-	<c11af933-3f08-f2c8-0552-ce43ac8f5741@ozlabs.ru>
-	<a29658e8-d2da-161d-d9b8-41f186969927@ozlabs.ru>
-	<821596dc-35b0-60cf-3e1f-3df0809b2f8e@ozlabs.ru>
-	<8e909bd8-2c24-abde-aa42-fd3f46ff649e@ozlabs.ru>
-	<20180313105606.18d0d8af@w520.home>
-	<f081b19e-b80d-b889-e916-ad0e361c9512@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f670a57f-0972-7a91-b2e7-314c9e3608e2@redhat.com>
-Date: Tue, 13 Mar 2018 14:17:40 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1evpTw-0005Dw-Rk
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:21:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34418)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1evpTw-0005Co-Lb
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 15:21:08 -0400
+Date: Tue, 13 Mar 2018 16:20:56 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180313192056.GD3417@localhost.localdomain>
+References: <20180308124901.83533-1-brijesh.singh@amd.com>
+	<20180308124901.83533-9-brijesh.singh@amd.com>
+	<20180308164910.GF4718@redhat.com>
+	<e39191c3-9c83-8c44-f1d2-9fa7a2f7695d@amd.com>
+	<20180308224412.GF3417@localhost.localdomain>
+	<8cf2f9bc-0339-1c80-b53b-ef5915248d1f@redhat.com>
+	<20180313184950.GB3417@localhost.localdomain>
+	<253374a3-0d09-a29a-94fc-ea4f5718f477@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <f081b19e-b80d-b889-e916-ad0e361c9512@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v7 2/4] vfio/pci: Relax DMA map errors
- for MMIO regions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <253374a3-0d09-a29a-94fc-ea4f5718f477@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v12 08/28] target/i386: add Secure
+ Encrypted Virtulization (SEV) object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,34 +34,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>, Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Markus Armbruster <armbru@redhat.com>, Bruce Rogers <brogers@suse.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, Borislav Petkov <bp@suse.de>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Richard Henderson <richard.henderson@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-[Making a meta-comment that I've pointed out to others before]
+On Tue, Mar 13, 2018 at 08:04:51PM +0100, Paolo Bonzini wrote:
+> On 13/03/2018 19:49, Eduardo Habkost wrote:
+> >>>
+> >>> Exactly, in other words these two options are part of the guest
+> >>> ABI, and QEMU promises to never make the guest ABI depend on the
+> >>> host hardware unless you're using "-cpu host".
+> >>
+> >> This is not entirely true; while MAXPHYADDR is constant downstream
+> >> unless using "-cpu host", in practice that behavior is wrong and a guest
+> >> could misbehave if passed a MAXPHYADDR that is different from the host's.
+> >>
+> >> I think this is the same, and management software will have to live with it.
+> > 
+> > I think they are very far from being equivalent.
+> 
+> Right, I only meant to say that guest ABI actually does depend on the
+> host hardware, even outside of "-cpu host".
+> 
+> > But if you tell the guest the wrong C-bit location, guests are
+> > likely to rely on it and break.  Migration between hosts with
+> > different C-bit locations won't work, will it?
+> 
+> It won't---but as long as the destination hosts fails fast when the
+> C-bit location is wrong, it's okay.  What matters is that we don't run
+> guest code with the wrong C bit, as you noted.
 
-On 03/13/2018 12:13 PM, Auger Eric wrote:
-> Hi Alex,
-...
+Are you proposing we change the default to simply use cbitpos
+from the host?
 
->>>>>>>>>>>>>>>>> On Fri, Feb 09, 2018 at 06:55:01PM +1100, Alexey Kardashevskiy wrote:
->>>>>>>>>>>>>>>>>> At the moment if vfio_memory_listener is registered in the system memory
-
-17 levels of '>' before I even began my reply.  And several screenfuls 
-of content that I'm snipping...
-
->> Clearly llsize needs to be wrapped in int128_get64() here.  Should I
->> presume that testing of this patch is equally lacking?  Eric, have you
->> done any testing of this?  I think this was fixing a mapping issue you
->> reported.  Thanks,
-> not that version unfortunately. I don't have access to the HW on which I
-> had the issue anymore. Maybe I could by the beg of next week?
-
-before getting to the 2-line meat of the message.  It's okay to snip 
-portions of the quoted content that are no longer relevant to the 
-immediate message, as it helps improve the signal-to-noise ratio (we 
-have list archives, for when referring to prior context is needed)
+I would agree with this only if we make QEMU able to prevent live
+migration to a host with mismatching cbitpos.
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Eduardo
