@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1evfAd-0000vh-TB
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 04:20:33 -0400
+	(envelope-from <yulei.zhang@intel.com>) id 1evfI0-0004ja-2w
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 04:28:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1evfAZ-00067O-0g
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 04:20:31 -0400
-Received: from mail-wr0-f194.google.com ([209.85.128.194]:41381)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1evfAY-00063t-7L
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 04:20:26 -0400
-Received: by mail-wr0-f194.google.com with SMTP id f14so19908078wre.8
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 01:20:26 -0700 (PDT)
-References: <35513ca9-0395-4a86-9e77-ef947bfe518d@default>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <99c0aae6-c828-56b4-9789-18208a7a8bec@redhat.com>
-Date: Tue, 13 Mar 2018 09:20:23 +0100
-MIME-Version: 1.0
-In-Reply-To: <35513ca9-0395-4a86-9e77-ef947bfe518d@default>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <yulei.zhang@intel.com>) id 1evfHw-00085O-4k
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 04:28:08 -0400
+Received: from mga11.intel.com ([192.55.52.93]:63814)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yulei.zhang@intel.com>)
+	id 1evfHv-00082q-Dl
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 04:28:04 -0400
+From: "Zhang, Yulei" <yulei.zhang@intel.com>
+Date: Tue, 13 Mar 2018 08:27:42 +0000
+Message-ID: <01FDBDDE256B79498DC57789713132D46A0A8E92@SHSMSX101.ccr.corp.intel.com>
+References: <1520229653-10658-1-git-send-email-yulei.zhang@intel.com>
+	<1520229653-10658-2-git-send-email-yulei.zhang@intel.com>
+	<20180309114311.GA3214@work-vm>
+In-Reply-To: <20180309114311.GA3214@work-vm>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] KVM: x86: Add support for save/load
- MSR_SMI_COUNT
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH V3 1/4] vfio: introduce a new VFIO
+ subregion for mdev device migration support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,177 +31,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
-Cc: habkost@redhat.com, kvm@vger.kernel.org, konrad.wilk@oracle.com, mtosatti@redhat.com, rth@twiddle.net
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Tian, Kevin" <kevin.tian@intel.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "kwankhede@nvidia.com" <kwankhede@nvidia.com>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>
 
-On 13/03/2018 01:22, Liran Alon wrote:
-> 
-> Another gentle ping.
-> 
-> (Just following "If your patch seems to have been ignored" section in QEMU's submitting patches guidelines...)
-> 
-> ----- liran.alon@oracle.com wrote:
-> 
->> Gentle ping.
->> (https://urldefense.proofpoint.com/v2/url?u=http-3A__patchwork.ozlabs.org_patch_878657_&d=DwIFaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=Jk6Q8nNzkQ6LJ6g42qARkg6ryIDGQr-yKXPNGZbpTx0&m=0Tkp5xsMC2T3S-eFyhiskC78npxkFbKd-ImC38ZLY6U&s=Nac2AezmnhywhWwDPWr-KOimFCc0U72S3QBvuO0vvJs&e=)
->>
->> ----- liran.alon@oracle.com wrote:
->>
->>> This MSR returns the number of #SMIs that occurred on
->>> CPU since boot.
->>>
->>> KVM commit 52797bf9a875 ("KVM: x86: Add emulation of
->> MSR_SMI_COUNT")
->>> introduced support for emulating this MSR.
->>>
->>> This commit adds support for QEMU to save/load this
->>> MSR for migration purposes.
->>>
->>> Signed-off-by: Liran Alon <liran.alon@oracle.com>
->>> Reviewed-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
->>> Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
->>> ---
->>>  target/i386/cpu.c     |  1 +
->>>  target/i386/cpu.h     |  3 +++
->>>  target/i386/kvm.c     | 13 +++++++++++++
->>>  target/i386/machine.c | 20 ++++++++++++++++++++
->>>  4 files changed, 37 insertions(+)
->>>
->>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->>> index b5e431e769da..ba9ec6a6116b 100644
->>> --- a/target/i386/cpu.c
->>> +++ b/target/i386/cpu.c
->>> @@ -3645,6 +3645,7 @@ static void x86_cpu_reset(CPUState *s)
->>>      cpu_x86_update_cr0(env, 0x60000010);
->>>      env->a20_mask = ~0x0;
->>>      env->smbase = 0x30000;
->>> +    env->msr_smi_count = 0;
->>>  
->>>      env->idt.limit = 0xffff;
->>>      env->gdt.limit = 0xffff;
->>> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
->>> index faf39ec1ce77..254e557bb8fa 100644
->>> --- a/target/i386/cpu.h
->>> +++ b/target/i386/cpu.h
->>> @@ -1,3 +1,4 @@
->>> +
->>>  /*
->>>   * i386 virtual CPU header
->>>   *
->>> @@ -359,6 +360,7 @@ typedef enum X86Seg {
->>>  #define MSR_P6_PERFCTR0                 0xc1
->>>  
->>>  #define MSR_IA32_SMBASE                 0x9e
->>> +#define MSR_SMI_COUNT                   0x34
->>>  #define MSR_MTRRcap                     0xfe
->>>  #define MSR_MTRRcap_VCNT                8
->>>  #define MSR_MTRRcap_FIXRANGE_SUPPORT    (1 << 8)
->>> @@ -1123,6 +1125,7 @@ typedef struct CPUX86State {
->>>  
->>>      uint64_t pat;
->>>      uint32_t smbase;
->>> +    uint64_t msr_smi_count;
->>>  
->>>      uint32_t pkru;
->>>  
->>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->>> index ad4b159b28af..a53735f266c5 100644
->>> --- a/target/i386/kvm.c
->>> +++ b/target/i386/kvm.c
->>> @@ -92,6 +92,7 @@ static bool has_msr_hv_stimer;
->>>  static bool has_msr_hv_frequencies;
->>>  static bool has_msr_xss;
->>>  static bool has_msr_spec_ctrl;
->>> +static bool has_msr_smi_count;
->>>  
->>>  static uint32_t has_architectural_pmu_version;
->>>  static uint32_t num_architectural_pmu_gp_counters;
->>> @@ -1124,6 +1125,9 @@ static int kvm_get_supported_msrs(KVMState
->> *s)
->>>                  case MSR_IA32_SMBASE:
->>>                      has_msr_smbase = true;
->>>                      break;
->>> +                case MSR_SMI_COUNT:
->>> +                    has_msr_smi_count = true;
->>> +                    break;
->>>                  case MSR_IA32_MISC_ENABLE:
->>>                      has_msr_misc_enable = true;
->>>                      break;
->>> @@ -1633,6 +1637,9 @@ static int kvm_put_msrs(X86CPU *cpu, int
->> level)
->>>      if (has_msr_smbase) {
->>>          kvm_msr_entry_add(cpu, MSR_IA32_SMBASE, env->smbase);
->>>      }
->>> +    if (has_msr_smi_count) {
->>> +        kvm_msr_entry_add(cpu, MSR_SMI_COUNT, env->msr_smi_count);
->>> +    }
->>>      if (has_msr_bndcfgs) {
->>>          kvm_msr_entry_add(cpu, MSR_IA32_BNDCFGS,
->> env->msr_bndcfgs);
->>>      }
->>> @@ -1979,6 +1986,9 @@ static int kvm_get_msrs(X86CPU *cpu)
->>>      if (has_msr_smbase) {
->>>          kvm_msr_entry_add(cpu, MSR_IA32_SMBASE, 0);
->>>      }
->>> +    if (has_msr_smi_count) {
->>> +        kvm_msr_entry_add(cpu, MSR_SMI_COUNT, 0);
->>> +    }
->>>      if (has_msr_feature_control) {
->>>          kvm_msr_entry_add(cpu, MSR_IA32_FEATURE_CONTROL, 0);
->>>      }
->>> @@ -2205,6 +2215,9 @@ static int kvm_get_msrs(X86CPU *cpu)
->>>          case MSR_IA32_SMBASE:
->>>              env->smbase = msrs[i].data;
->>>              break;
->>> +        case MSR_SMI_COUNT:
->>> +            env->msr_smi_count = msrs[i].data;
->>> +            break;
->>>          case MSR_IA32_FEATURE_CONTROL:
->>>              env->msr_ia32_feature_control = msrs[i].data;
->>>              break;
->>> diff --git a/target/i386/machine.c b/target/i386/machine.c
->>> index 361c05aedfdc..9432496cbda8 100644
->>> --- a/target/i386/machine.c
->>> +++ b/target/i386/machine.c
->>> @@ -395,6 +395,25 @@ static const VMStateDescription
->>> vmstate_msr_tsc_adjust = {
->>>      }
->>>  };
->>>  
->>> +static bool msr_smi_count_needed(void *opaque)
->>> +{
->>> +    X86CPU *cpu = opaque;
->>> +    CPUX86State *env = &cpu->env;
->>> +
->>> +    return env->msr_smi_count != 0;
->>> +}
->>> +
->>> +static const VMStateDescription vmstate_msr_smi_count = {
->>> +    .name = "cpu/msr_smi_count",
->>> +    .version_id = 1,
->>> +    .minimum_version_id = 1,
->>> +    .needed = msr_smi_count_needed,
->>> +    .fields = (VMStateField[]) {
->>> +        VMSTATE_UINT64(env.msr_smi_count, X86CPU),
->>> +        VMSTATE_END_OF_LIST()
->>> +    }
->>> +};
->>> +
->>>  static bool tscdeadline_needed(void *opaque)
->>>  {
->>>      X86CPU *cpu = opaque;
->>> @@ -952,6 +971,7 @@ VMStateDescription vmstate_x86_cpu = {
->>>          &vmstate_avx512,
->>>          &vmstate_xss,
->>>          &vmstate_tsc_khz,
->>> +        &vmstate_msr_smi_count,
->>>  #ifdef TARGET_X86_64
->>>          &vmstate_pkru,
->>>  #endif
->>> -- 
->>> 1.9.1
-> 
 
-Applied, thanks.
 
-Paolo
+> -----Original Message-----
+> From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]
+> Sent: Friday, March 9, 2018 7:43 PM
+> To: Zhang, Yulei <yulei.zhang@intel.com>
+> Cc: qemu-devel@nongnu.org; Tian, Kevin <kevin.tian@intel.com>;
+> alex.williamson@redhat.com; kwankhede@nvidia.com;
+> zhenyuw@linux.intel.com
+> Subject: Re: [Qemu-devel] [PATCH V3 1/4] vfio: introduce a new VFIO
+> subregion for mdev device migration support
+>=20
+> * Yulei Zhang (yulei.zhang@intel.com) wrote:
+> > New VFIO sub region VFIO_REGION_SUBTYPE_DEVICE_STATE is added to
+> fetch
+> > and restore the status of mdev device vGPU during the live migration.
+> >
+> > Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
+> > ---
+> >  hw/vfio/pci.c              | 14 +++++++++++++-
+> >  hw/vfio/pci.h              |  1 +
+> >  linux-headers/linux/vfio.h |  9 ++++++---
+> >  3 files changed, 20 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c index 31e1edf..2fe20e4
+> > 100644
+> > --- a/hw/vfio/pci.c
+> > +++ b/hw/vfio/pci.c
+> > @@ -37,6 +37,7 @@
+> >
+> >  static void vfio_disable_interrupts(VFIOPCIDevice *vdev);  static
+> > void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
+> > +static VMStateDescription vfio_pci_vmstate;
+> >
+> >  /*
+> >   * Disabling BAR mmaping can be slow, but toggling it around INTx can
+> > @@ -2813,6 +2814,17 @@ static void vfio_realize(PCIDevice *pdev, Error
+> **errp)
+> >          vfio_vga_quirk_setup(vdev);
+> >      }
+> >
+> > +    struct vfio_region_info *device_state;
+> > +    /* device state region setup */
+> > +    if (!vfio_get_dev_region_info(&vdev->vbasedev,
+> > +                VFIO_REGION_TYPE_PCI_VENDOR_TYPE |
+> PCI_VENDOR_ID_INTEL,
+> > +                VFIO_REGION_SUBTYPE_DEVICE_STATE, &device_state)) {
+> > +        memcpy(&vdev->device_state, device_state,
+> > +               sizeof(struct vfio_region_info));
+> > +        g_free(device_state);
+> > +        vfio_pci_vmstate.unmigratable =3D 0;
+> > +    }
+>=20
+> I don't think we've got any other code that changes the 'unmigratable'
+> flag on a vmstate.  If you've got a device that you don't know whether it=
+'s
+> migratable until runtime, then you should add a 'migration blocker'
+> if the device isn't migratable.
+> See for example the calls to migrate_add_blocker in hw/virtio/vhost.c
+>=20
+> Dave
+>=20
+Thanks, I see. We will leave the default value of unmigratable as 0 for=20
+vfio pci, and add blocker if the subtype region doesn't exist.=20
+
+> >      for (i =3D 0; i < PCI_ROM_SLOT; i++) {
+> >          vfio_bar_quirk_setup(vdev, i);
+> >      }
+> > @@ -2994,7 +3006,7 @@ static Property vfio_pci_dev_properties[] =3D {
+> >      DEFINE_PROP_END_OF_LIST(),
+> >  };
+> >
+> > -static const VMStateDescription vfio_pci_vmstate =3D {
+> > +static VMStateDescription vfio_pci_vmstate =3D {
+> >      .name =3D "vfio-pci",
+> >      .unmigratable =3D 1,
+> >  };
+> > diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h index a8366bb..6a1d26e
+> > 100644
+> > --- a/hw/vfio/pci.h
+> > +++ b/hw/vfio/pci.h
+> > @@ -116,6 +116,7 @@ typedef struct VFIOPCIDevice {
+> >      VFIOBAR bars[PCI_NUM_REGIONS - 1]; /* No ROM */
+> >      VFIOVGA *vga; /* 0xa0000, 0x3b0, 0x3c0 */
+> >      void *igd_opregion;
+> > +    struct vfio_region_info device_state;
+> >      PCIHostDeviceAddress host;
+> >      EventNotifier err_notifier;
+> >      EventNotifier req_notifier;
+> > diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+> > index 4e7ab4c..c3b8e4a 100644
+> > --- a/linux-headers/linux/vfio.h
+> > +++ b/linux-headers/linux/vfio.h
+> > @@ -296,9 +296,12 @@ struct vfio_region_info_cap_type {
+> >  #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
+> >
+> >  /* 8086 Vendor sub-types */
+> > -#define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION	(1)
+> > -#define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
+> > -#define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
+> > +#define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION		(1)
+> > +#define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG		(2)
+> > +#define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG		(3)
+> > +
+> > +/* Mdev sub-type for device state save and restore */
+> > +#define VFIO_REGION_SUBTYPE_DEVICE_STATE	(4)
+> >
+> >  /**
+> >   * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
+> > --
+> > 2.7.4
+> >
+> >
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
