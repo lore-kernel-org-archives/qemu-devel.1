@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57046)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evjCy-0003Lo-Ae
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:39:13 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1evjT8-0000V1-D3
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:55:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evjCx-0000ff-Dm
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:39:12 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:38232)
+	(envelope-from <jemmy858585@gmail.com>) id 1evjT7-0000FE-IU
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:55:54 -0400
+Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:36401)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1evjCx-0000fR-8Y
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:39:11 -0400
-Received: by mail-ot0-x244.google.com with SMTP id 95so18760871ote.5
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 05:39:11 -0700 (PDT)
+	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
+	id 1evjT7-0000Ew-CY
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 08:55:53 -0400
+Received: by mail-io0-x243.google.com with SMTP id e30so15629705ioc.3
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 05:55:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180312172640.15647-1-famz@redhat.com>
-References: <20180312172640.15647-1-famz@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Mar 2018 12:38:50 +0000
-Message-ID: <CAFEAcA9CfsSSSX-8VOUkSRW6Jff80DV-D-J=LFWcvfEkYUPxVw@mail.gmail.com>
+In-Reply-To: <1520692378-1835-1-git-send-email-lidongchen@tencent.com>
+References: <1520692378-1835-1-git-send-email-lidongchen@tencent.com>
+From: 858585 jemmy <jemmy858585@gmail.com>
+Date: Tue, 13 Mar 2018 20:55:51 +0800
+Message-ID: <CAOGPPbcbnerXf1uJMCcPLiX6DBohVuhy1Ekjtyk+CqkGxbDLog@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/1] Docker patches
+Subject: Re: [Qemu-devel] [PATCH] migration: Fix rate limiting issue on RDMA
+ migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Juan Quintela <quintela@redhat.com>, Dave Gilbert <dgilbert@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+Cc: Lidong Chen <lidongchen@tencent.com>
 
-On 12 March 2018 at 17:26, Fam Zheng <famz@redhat.com> wrote:
-> The following changes since commit b16a54da0696efc5d91b6c3597a37a317abb5d=
-e7:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20180312-pull-requ=
-est' into staging (2018-03-12 14:06:23 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/famz/qemu.git tags/staging-pull-request
->
-> for you to fetch changes up to 02f769b7ee72aa962ee22de64c14414298237da5:
->
->   tests: make docker-test-debug@fedora run sanitizers (2018-03-13 01:19:5=
-6 +0800)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
->
-> Marc-Andr=C3=A9 Lureau (1):
->   tests: make docker-test-debug@fedora run sanitizers
->
->  tests/docker/dockerfiles/fedora.docker | 2 +-
->  tests/docker/test-debug                | 6 +++---
->  2 files changed, 4 insertions(+), 4 deletions(-)
+Ping.
 
-Applied, thanks.
-
--- PMM
+On Sat, Mar 10, 2018 at 10:32 PM, Lidong Chen <jemmy858585@gmail.com> wrote:
+> RDMA migration implement save_page function for QEMUFile, but
+> ram_control_save_page do not increase bytes_xfer. So when doing
+> RDMA migration, it will use whole bandwidth.
+>
+> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+> ---
+>  migration/qemu-file.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+> index 2ab2bf3..217609d 100644
+> --- a/migration/qemu-file.c
+> +++ b/migration/qemu-file.c
+> @@ -253,7 +253,7 @@ size_t ram_control_save_page(QEMUFile *f, ram_addr_t block_offset,
+>      if (f->hooks && f->hooks->save_page) {
+>          int ret = f->hooks->save_page(f, f->opaque, block_offset,
+>                                        offset, size, bytes_sent);
+> -
+> +        f->bytes_xfer += size;
+>          if (ret != RAM_SAVE_CONTROL_DELAYED) {
+>              if (bytes_sent && *bytes_sent > 0) {
+>                  qemu_update_position(f, *bytes_sent);
+> --
+> 1.8.3.1
+>
