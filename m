@@ -1,19 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdI-0001Wn-TA
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:40 -0400
+	(envelope-from <mark.kanda@oracle.com>) id 1evmdL-0001Zb-Rr
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1evmdH-0004hB-ON
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:36 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 13 Mar 2018 17:17:46 +0100
-Message-Id: <20180313161803.1814-25-kwolf@redhat.com>
-In-Reply-To: <20180313161803.1814-1-kwolf@redhat.com>
-References: <20180313161803.1814-1-kwolf@redhat.com>
+	(envelope-from <mark.kanda@oracle.com>) id 1evmdH-0004hS-UV
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:39 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:43038)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.kanda@oracle.com>)
+	id 1evmdH-0004fv-Iw
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:18:35 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+	by aserp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id
+	w2DGIXTD076606
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 16:18:33 GMT
+Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
+	by aserp2130.oracle.com with ESMTP id 2gph200e13-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 16:18:32 +0000
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+	by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id w2DGDdk3023217
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK) for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 16:13:39 GMT
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+	by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id w2DGDdCb004126
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 16:13:39 GMT
+References: <20180312105941.15439-1-kraxel@redhat.com>
+	<20180312105941.15439-2-kraxel@redhat.com>
+From: Mark Kanda <mark.kanda@oracle.com>
+Message-ID: <59d527f3-1ef6-1e4b-8daa-c0ebcd89cb9b@oracle.com>
+Date: Tue, 13 Mar 2018 11:13:38 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 24/41] luks: Support .bdrv_co_create
+In-Reply-To: <20180312105941.15439-2-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 1/1] vga: fix region calculation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,109 +44,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-This adds the .bdrv_co_create driver callback to luks, which enables
-image creation over QMP.
+On 3/12/2018 5:59 AM, Gerd Hoffmann wrote:
+> Typically the scanline length and the line offset are identical.  But
+> in case they are not our calculation for region_end is incorrect.  Using
+> line_offset is fine for all scanlines, except the last one where we have
+> to use the actual scanline length.
+> 
+> Fixes: CVE-2018-7550
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- qapi/block-core.json | 17 ++++++++++++++++-
- block/crypto.c       | 34 ++++++++++++++++++++++++++++++++++
- 2 files changed, 50 insertions(+), 1 deletion(-)
+This doesn't appear to be the correct CVE number.
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 3e52d248eb..ba2d10d13a 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3596,6 +3596,21 @@
-             '*preallocation':   'PreallocMode' } }
-=20
- ##
-+# @BlockdevCreateOptionsLUKS:
-+#
-+# Driver specific image creation options for LUKS.
-+#
-+# @file             Node to create the image format on
-+# @size             Size of the virtual disk in bytes
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'BlockdevCreateOptionsLUKS',
-+  'base': 'QCryptoBlockCreateOptionsLUKS',
-+  'data': { 'file':             'BlockdevRef',
-+            'size':             'size' } }
-+
-+##
- # @BlockdevCreateOptionsNfs:
- #
- # Driver specific image creation options for NFS.
-@@ -3787,7 +3802,7 @@
-       'http':           'BlockdevCreateNotSupported',
-       'https':          'BlockdevCreateNotSupported',
-       'iscsi':          'BlockdevCreateNotSupported',
--      'luks':           'BlockdevCreateNotSupported',
-+      'luks':           'BlockdevCreateOptionsLUKS',
-       'nbd':            'BlockdevCreateNotSupported',
-       'nfs':            'BlockdevCreateOptionsNfs',
-       'null-aio':       'BlockdevCreateNotSupported',
-diff --git a/block/crypto.c b/block/crypto.c
-index b0a4cb3388..a1139b6f09 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -543,6 +543,39 @@ static int block_crypto_open_luks(BlockDriverState *=
-bs,
-                                      bs, options, flags, errp);
- }
-=20
-+static int coroutine_fn
-+block_crypto_co_create_luks(BlockdevCreateOptions *create_options, Error=
- **errp)
-+{
-+    BlockdevCreateOptionsLUKS *luks_opts;
-+    BlockDriverState *bs =3D NULL;
-+    QCryptoBlockCreateOptions create_opts;
-+    int ret;
-+
-+    assert(create_options->driver =3D=3D BLOCKDEV_DRIVER_LUKS);
-+    luks_opts =3D &create_options->u.luks;
-+
-+    bs =3D bdrv_open_blockdev_ref(luks_opts->file, errp);
-+    if (bs =3D=3D NULL) {
-+        return -EIO;
-+    }
-+
-+    create_opts =3D (QCryptoBlockCreateOptions) {
-+        .format =3D Q_CRYPTO_BLOCK_FORMAT_LUKS,
-+        .u.luks =3D *qapi_BlockdevCreateOptionsLUKS_base(luks_opts),
-+    };
-+
-+    ret =3D block_crypto_co_create_generic(bs, luks_opts->size, &create_=
-opts,
-+                                         errp);
-+    if (ret < 0) {
-+        goto fail;
-+    }
-+
-+    ret =3D 0;
-+fail:
-+    bdrv_unref(bs);
-+    return ret;
-+}
-+
- static int coroutine_fn block_crypto_co_create_opts_luks(const char *fil=
-ename,
-                                                          QemuOpts *opts,
-                                                          Error **errp)
-@@ -647,6 +680,7 @@ BlockDriver bdrv_crypto_luks =3D {
-     .bdrv_open          =3D block_crypto_open_luks,
-     .bdrv_close         =3D block_crypto_close,
-     .bdrv_child_perm    =3D bdrv_format_default_perms,
-+    .bdrv_co_create     =3D block_crypto_co_create_luks,
-     .bdrv_co_create_opts =3D block_crypto_co_create_opts_luks,
-     .bdrv_truncate      =3D block_crypto_truncate,
-     .create_opts        =3D &block_crypto_create_opts_luks,
---=20
-2.13.6
+https://nvd.nist.gov/vuln/detail/CVE-2018-7550
+
+..please confirm..
+
+Thanks,
+
+-Mark
+
+> Reported-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> Reviewed-by: Prasad J Pandit <pjp@fedoraproject.org>
+> Tested-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+> Message-id: 20180309143704.13420-1-kraxel@redhat.com
+> ---
+>   hw/display/vga.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/hw/display/vga.c b/hw/display/vga.c
+> index 28f298b342..72181330b8 100644
+> --- a/hw/display/vga.c
+> +++ b/hw/display/vga.c
+> @@ -1483,6 +1483,8 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+>   
+>       region_start = (s->start_addr * 4);
+>       region_end = region_start + (ram_addr_t)s->line_offset * height;
+> +    region_end += width * s->get_bpp(s) / 8; /* scanline length */
+> +    region_end -= s->line_offset;
+>       if (region_end > s->vbe_size) {
+>           /* wraps around (can happen with cirrus vbe modes) */
+>           region_start = 0;
+> 
