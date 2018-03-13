@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1evmsn-0007Nb-Rw
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:34:43 -0400
+	(envelope-from <mst@redhat.com>) id 1evmu7-0008Vm-D8
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:36:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1evmsn-0003RJ-21
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:34:37 -0400
-From: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Date: Tue, 13 Mar 2018 16:34:30 +0000
-Message-ID: <MWHPR21MB01895D8620B67C98D730B25C9ED20@MWHPR21MB0189.namprd21.prod.outlook.com>
-References: <20180313153458.26822-1-peter.maydell@linaro.org>
-	<20180313153458.26822-2-peter.maydell@linaro.org>
-In-Reply-To: <20180313153458.26822-2-peter.maydell@linaro.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <mst@redhat.com>) id 1evmu4-0004JR-6E
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:35:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39890)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1evmu3-0004J0-UC
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:35:56 -0400
+Date: Tue, 13 Mar 2018 18:35:36 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180313183050-mutt-send-email-mst@kernel.org>
+References: <1520426065-40265-1-git-send-email-wei.w.wang@intel.com>
+	<1520426065-40265-5-git-send-email-wei.w.wang@intel.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/9] hw/arm/raspi: Don't do board-setup or
- secure-boot for raspi3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1520426065-40265-5-git-send-email-wei.w.wang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v4 4/4] migration: use the free page hint
+ feature from balloon
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +28,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, Pekka Enberg <penberg@iki.fi>, "patches@linaro.org" <patches@linaro.org>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-> From: Qemu-devel <qemu-devel-
-> bounces+andrew.baumann=3Dmicrosoft.com@nongnu.org> On Behalf Of Peter
-> Maydell
-> Sent: Tuesday, 13 March 2018 08:35
->=20
-> For the rpi1 and 2 we want to boot the Linux kernel via some
-> custom setup code that makes sure that the SMC instruction
-> acts as a no-op, because it's used for cache maintenance.
-> The rpi3 boots AArch64 kernels, which don't need SMC for
-> cache maintenance and always expect to be booted non-secure.
-> Don't fill in the aarch32-specific parts of the binfo struct.
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On Wed, Mar 07, 2018 at 08:34:25PM +0800, Wei Wang wrote:
+> Start the free page optimization after the migration bitmap is
+> synchronized. This can't be used in the stop&copy phase since the guest
+> is paused. Make sure the guest reporting has stopped before
+> synchronizing the migration dirty bitmap. Currently, the optimization is
+> added to precopy only.
+> 
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> CC: Juan Quintela <quintela@redhat.com>
+> CC: Michael S. Tsirkin <mst@redhat.com>
 > ---
->  hw/arm/raspi.c | 17 +++++++++++++----
->  1 file changed, 13 insertions(+), 4 deletions(-)
->=20
-> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-> index a37881433c..1ac0737149 100644
-> --- a/hw/arm/raspi.c
-> +++ b/hw/arm/raspi.c
-> @@ -82,10 +82,19 @@ static void setup_boot(MachineState *machine, int
-> version, size_t ram_size)
->      binfo.board_id =3D raspi_boardid[version];
->      binfo.ram_size =3D ram_size;
->      binfo.nb_cpus =3D smp_cpus;
-> -    binfo.board_setup_addr =3D BOARDSETUP_ADDR;
-> -    binfo.write_board_setup =3D write_board_setup;
-> -    binfo.secure_board_setup =3D true;
-> -    binfo.secure_boot =3D true;
-> +
-> +    if (version <=3D 2) {
-> +        /* The rpi1 and 2 require some custom setup code to run in Secur=
-e
-> +         * mode before booting a kernel (to set up the SMC vectors so
-> +         * that we get a no-op SMC; this is used by Linux to call the
-> +         * firmware for some cache maintenance operations.
-> +         * The rpi3 doesn't need this.
-> +         */
-> +        binfo.board_setup_addr =3D BOARDSETUP_ADDR;
-> +        binfo.write_board_setup =3D write_board_setup;
-> +        binfo.secure_board_setup =3D true;
-> +        binfo.secure_boot =3D true;
+>  migration/ram.c | 19 ++++++++++++++++++-
+>  1 file changed, 18 insertions(+), 1 deletion(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index e172798..7b4c9b1 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -51,6 +51,8 @@
+>  #include "qemu/rcu_queue.h"
+>  #include "migration/colo.h"
+>  #include "migration/block.h"
+> +#include "sysemu/balloon.h"
+> +#include "sysemu/sysemu.h"
+>  
+>  /***********************************************************/
+>  /* ram save/restore */
+> @@ -208,6 +210,8 @@ struct RAMState {
+>      uint32_t last_version;
+>      /* We are in the first round */
+>      bool ram_bulk_stage;
+> +    /* The free pages optimization feature is supported */
+> +    bool free_page_support;
+>      /* How many times we have dirty too many pages */
+>      int dirty_rate_high_cnt;
+>      /* these variables are used for bitmap sync */
+> @@ -775,7 +779,7 @@ unsigned long migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
+>      unsigned long *bitmap = rb->bmap;
+>      unsigned long next;
+>  
+> -    if (rs->ram_bulk_stage && start > 0) {
+> +    if (rs->ram_bulk_stage && start > 0 && !rs->free_page_support) {
+>          next = start + 1;
+>      } else {
+>          next = find_next_bit(bitmap, size, start);
+> @@ -833,6 +837,10 @@ static void migration_bitmap_sync(RAMState *rs)
+>      int64_t end_time;
+>      uint64_t bytes_xfer_now;
+>  
+> +    if (rs->free_page_support) {
+> +        balloon_free_page_stop();
 > +    }
->=20
->      /* Pi2 and Pi3 requires SMP setup */
->      if (version >=3D 2) {
+> +
+>      ram_counters.dirty_sync_count++;
+>  
+>      if (!rs->time_last_bitmap_sync) {
+> @@ -899,6 +907,10 @@ static void migration_bitmap_sync(RAMState *rs)
+>      if (migrate_use_events()) {
+>          qapi_event_send_migration_pass(ram_counters.dirty_sync_count, NULL);
+>      }
+> +
+> +    if (rs->free_page_support && runstate_is_running()) {
+> +        balloon_free_page_start();
+> +    }
+>  }
 
-Reviewed-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
+I think some of these conditions should go into
+balloon_free_page_start/stop.
+
+Checking runstate is generally problematic unless you
+also handle run state change notifiers as it can
+be manipulated from QMP.
+
+>  
+>  /**
+> @@ -1656,6 +1668,8 @@ static void ram_state_reset(RAMState *rs)
+>      rs->last_page = 0;
+>      rs->last_version = ram_list.version;
+>      rs->ram_bulk_stage = true;
+> +    rs->free_page_support = balloon_free_page_support() &
+> +                            !migration_in_postcopy();
+
+Probably &&?
+
+>  }
+>  
+>  #define MAX_WAIT 50 /* ms, half buffered_file limit */
+> @@ -2330,6 +2344,9 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+>  
+>      ret = qemu_file_get_error(f);
+>      if (ret < 0) {
+> +        if (rs->free_page_support) {
+> +            balloon_free_page_stop();
+> +        }
+>          return ret;
+>      }
+>  
+> -- 
+> 1.8.3.1
