@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evmLn-0003G5-Q3
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:00:37 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1evmR0-0007Zv-Ox
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:05:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1evmLk-0003CL-1M
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:00:31 -0400
-Received: from mail-ot0-x236.google.com ([2607:f8b0:4003:c0f::236]:41928)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1evmLj-0003Bs-Gp
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:00:27 -0400
-Received: by mail-ot0-x236.google.com with SMTP id w38-v6so101095ota.8
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 09:00:27 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1evmQv-000632-Lx
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:05:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36118 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1evmQv-00062Z-GR
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:05:49 -0400
+Date: Tue, 13 Mar 2018 16:05:39 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180313160538.GH3545@work-vm>
+References: <20180208103132.28452-1-peterx@redhat.com>
+	<20180208103132.28452-28-peterx@redhat.com>
+	<20180213201059.GU2378@work-vm> <20180214045639.GI4472@xz-mi>
+	<20180214185658.GF2507@work-vm> <20180222074346.GG18962@xz-mi>
+	<20180228201418.GQ2981@work-vm> <20180313091318.GI11787@xz-mi>
+	<20180313123556.GF3545@work-vm> <20180313155738.GK11787@xz-mi>
 MIME-Version: 1.0
-In-Reply-To: <1520850690-23245-3-git-send-email-abdallah.bouassida@lauterbach.com>
-References: <1520850690-23245-1-git-send-email-abdallah.bouassida@lauterbach.com>
-	<1520850690-23245-3-git-send-email-abdallah.bouassida@lauterbach.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Mar 2018 16:00:05 +0000
-Message-ID: <CAFEAcA9Jcb11QgYkPh6VnR3CT2ADaCRdwn3TLtBOgCr+WRsYhQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 2/4] target/arm: Add "_S" suffix to the
- secure version of a sysreg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180313155738.GK11787@xz-mi>
+Subject: Re: [Qemu-devel] [PATCH v6 27/28] migration/qmp: add command
+ migrate-pause
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,20 +32,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Khaled Jmal <khaled.jmal@lauterbach.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-On 12 March 2018 at 10:31, Abdallah Bouassida
-<abdallah.bouassida@lauterbach.com> wrote:
-> This is a preparation for the coming feature of creating dynamically an XML
-> description for the ARM sysregs.
-> Add "_S" suffix to the secure version of sysregs that have both S and NS views
-> Replace (S) by _S and remove (NS) for the register that are manually defined,
-> so all the registers follow the same convention.
->
-> Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+* Peter Xu (peterx@redhat.com) wrote:
+> On Tue, Mar 13, 2018 at 12:35:56PM +0000, Dr. David Alan Gilbert wrote:
+> 
+> [...]
+> 
+> > > Yes I think if without OOB we should be fine since even the cleanup is
+> > > running with the BQL.
+> > > 
+> > > Now I don't have good idea to solve this problem except introducing a
+> > > lock.  How about I add a patch to introduce the mgmt_lock, which
+> > > currently only protect the QEMUFile?  Like:
+> > > 
+> > > ----------------------------------
+> > > diff --git a/migration/migration.c b/migration/migration.c
+> > > index f31fcbb0d5..00c630326d 100644
+> > > --- a/migration/migration.c
+> > > +++ b/migration/migration.c
+> > > @@ -1195,8 +1195,10 @@ static void migrate_fd_cleanup(void *opaque)
+> > >          if (multifd_save_cleanup(&local_err) != 0) {
+> > >              error_report_err(local_err);
+> > >          }
+> > > +        qemu_mutex_lock(&s->mgmt_lock);
+> > >          qemu_fclose(s->to_dst_file);
+> > >          s->to_dst_file = NULL;
+> > > +        qemu_mutex_unlock(&s->mgmt_lock);
+> > >      }
+> > > 
+> > >      assert((s->state != MIGRATION_STATUS_ACTIVE) &&
+> > > @@ -2493,8 +2495,10 @@ static MigThrError postcopy_pause(MigrationState *s)
+> > > 
+> > >          /* Current channel is possibly broken. Release it. */
+> > >          assert(s->to_dst_file);
+> > > +        qemu_mutex_lock(&s->mgmt_lock);
+> > >          qemu_file_shutdown(s->to_dst_file);
+> > >          qemu_fclose(s->to_dst_file);
+> > >          s->to_dst_file = NULL;
+> > > +        qemu_mutex_unlock(&s->mgmt_lock);
+> > 
+> > That's only safe if we know qemu_fclose() can never block; otherwise
+> > we're not allowed to take the same lock in the OOB command.
+> > 
+> > I think perhaps it's safer to always do something like:
+> >   tmp = atomic_xchg(s->to_dst_file, NULL);
+> >   qemu_file_shutdown(tmp);
+> >   qemu_fclose(tmp);
+> > 
+> > then the OOB code can do the same?
+> > Would that work - avoiding the lock?
+> 
+> According to what we discussed offlist: I'll still introduce that
+> lock, but instead I'll move the close() out of the lock section since
+> that can block.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Yep, it feels like that should work.
 
-thanks
--- PMM
+> I'll see whether I need a repost tomorrow, or after 2.12 release if
+> the series will never have a chance for 2.12.
+
+Yes, I think the boat has probably sailed on 2.12; still with the OOB
+stuff in, things are much closer.
+
+Dave
+
+> Thanks,
+> 
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
