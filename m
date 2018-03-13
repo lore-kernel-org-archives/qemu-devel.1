@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1evshm-0005SX-1K
+	(envelope-from <paolo.bonzini@gmail.com>) id 1evshm-0005SW-1H
 	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 18:47:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1evshk-0002to-6Q
+	(envelope-from <paolo.bonzini@gmail.com>) id 1evshi-0002s6-Ug
 	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 18:47:38 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:52829)
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:55341)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1evshj-0002sj-V0
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 18:47:36 -0400
-Received: by mail-wm0-x242.google.com with SMTP id t3so867637wmc.2
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 15:47:35 -0700 (PDT)
+	id 1evshi-0002r6-Nl
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 18:47:34 -0400
+Received: by mail-wm0-x244.google.com with SMTP id q83so871076wme.5
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 15:47:34 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 13 Mar 2018 23:46:21 +0100
-Message-Id: <20180313224719.4954-12-pbonzini@redhat.com>
+Date: Tue, 13 Mar 2018 23:46:20 +0100
+Message-Id: <20180313224719.4954-11-pbonzini@redhat.com>
 In-Reply-To: <20180313224719.4954-1-pbonzini@redhat.com>
 References: <20180313224719.4954-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 11/69] chardev: fix handling of EAGAIN for TCP
- chardev
+Subject: [Qemu-devel] [PULL 10/69] vl: export machine_init_done
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,51 +31,77 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Peter Xu <peterx@redhat.com>
 
-From: Daniel P. Berrangé <berrange@redhat.com>
+From: Peter Xu <peterx@redhat.com>
 
-When this commit was applied
+We have that variable but not exported.  Export that so modules can have
+a way to poke on whether machine init has finished.
 
-  commit 9894dc0cdcc397ee5b26370bc53da6d360a363c2
-  Author: Daniel P. Berrange <berrange@redhat.com>
-  Date:   Tue Jan 19 11:14:29 2016 +0000
+Meanwhile, set that up even before calling the notifiers, so that
+notifiers who may depend on this field will get a correct answer.
 
-    char: convert from GIOChannel to QIOChannel
-
-The tcp_chr_recv() function was changed to return QIO_CHANNEL_ERR_BLOCK
-which corresonds to -2. As such the handling for EAGAIN was able to be
-removed from tcp_chr_read(). Unfortunately in a later commit:
-
-  commit b6572b4f97a7b126c7b24e165893ed9fe3d72e1f
-  Author: Marc-André Lureau <marcandre.lureau@redhat.com>
-  Date:   Fri Mar 11 18:55:24 2016 +0100
-
-    char: translate from QIOChannel error to errno
-
-The tcp_chr_recv() function was changed back to return -1, with errno
-set to EAGAIN, without also re-addding support for this to tcp_chr_read()
-
-Reported-by: Aleksey Kuleshov <rndfax@yandex.ru>
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20180222121351.26191-1-berrange@redhat.com>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20180306053320.15401-2-peterx@redhat.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- chardev/char-socket.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/sysemu/sysemu.h   | 2 ++
+ stubs/machine-init-done.c | 2 ++
+ vl.c                      | 4 ++--
+ 3 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index a220803c01..541fcf487d 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -450,7 +450,7 @@ static gboolean tcp_chr_read(QIOChannel *chan, GIOCondition cond, void *opaque)
-         len = s->max_size;
-     }
-     size = tcp_chr_recv(chr, (void *)buf, len);
--    if (size == 0 || size == -1) {
-+    if (size == 0 || (size == -1 && errno != EAGAIN)) {
-         /* connection closed */
-         tcp_chr_disconnect(chr);
-     } else if (size > 0) {
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 356bfdc1c1..2b42151c63 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -88,6 +88,8 @@ void qemu_system_guest_panicked(GuestPanicInformation *info);
+ void qemu_add_exit_notifier(Notifier *notify);
+ void qemu_remove_exit_notifier(Notifier *notify);
+ 
++extern bool machine_init_done;
++
+ void qemu_add_machine_init_done_notifier(Notifier *notify);
+ void qemu_remove_machine_init_done_notifier(Notifier *notify);
+ 
+diff --git a/stubs/machine-init-done.c b/stubs/machine-init-done.c
+index 9a0d62514f..4121f1709b 100644
+--- a/stubs/machine-init-done.c
++++ b/stubs/machine-init-done.c
+@@ -2,6 +2,8 @@
+ #include "qemu-common.h"
+ #include "sysemu/sysemu.h"
+ 
++bool machine_init_done = true;
++
+ void qemu_add_machine_init_done_notifier(Notifier *notify)
+ {
+ }
+diff --git a/vl.c b/vl.c
+index 3ef04ce991..26662eb9e7 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2696,7 +2696,7 @@ static void qemu_run_exit_notifiers(void)
+     notifier_list_notify(&exit_notifiers, NULL);
+ }
+ 
+-static bool machine_init_done;
++bool machine_init_done;
+ 
+ void qemu_add_machine_init_done_notifier(Notifier *notify)
+ {
+@@ -2713,8 +2713,8 @@ void qemu_remove_machine_init_done_notifier(Notifier *notify)
+ 
+ static void qemu_run_machine_init_done_notifiers(void)
+ {
+-    notifier_list_notify(&machine_init_done_notifiers, NULL);
+     machine_init_done = true;
++    notifier_list_notify(&machine_init_done_notifiers, NULL);
+ }
+ 
+ static const QEMUOption *lookup_opt(int argc, char **argv,
 -- 
 2.14.3
