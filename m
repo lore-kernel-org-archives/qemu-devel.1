@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1evXXw-0005vT-7L
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 20:12:05 -0400
+	(envelope-from <liran.alon@oracle.com>) id 1evXib-0000cC-OM
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 20:23:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1evXXr-0003qJ-O0
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 20:12:04 -0400
-Received: from mga11.intel.com ([192.55.52.93]:44415)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1evXXr-0003lS-Af
-	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 20:11:59 -0400
-Date: Tue, 13 Mar 2018 08:11:50 +0800
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-ID: <20180313001150.gtbs4jz4degeblba@hz-desktop>
-References: <20180228072558.7434-1-haozhong.zhang@intel.com>
-	<20180312153954.GA24440@stefanha-x1.localdomain>
+	(envelope-from <liran.alon@oracle.com>) id 1evXiY-0004pw-JI
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 20:23:05 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:56970)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+	id 1evXiY-0004mP-8R
+	for qemu-devel@nongnu.org; Mon, 12 Mar 2018 20:23:02 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Message-ID: <35513ca9-0395-4a86-9e77-ef947bfe518d@default>
+Date: Mon, 12 Mar 2018 17:22:55 -0700 (PDT)
+From: Liran Alon <liran.alon@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-In-Reply-To: <20180312153954.GA24440@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v4 0/8] nvdimm: guarantee persistence of
- QEMU writes to persistent memory
+Subject: Re: [Qemu-devel] [PATCH] KVM: x86: Add support for save/load
+ MSR_SMI_COUNT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,128 +27,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, mst@redhat.com, Juan Quintela <quintela@redhat.com>, dgilbert@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Eduardo Habkost <ehabkost@redhat.com>
-
-On 03/12/18 15:39 +0000, Stefan Hajnoczi wrote:
-> On Wed, Feb 28, 2018 at 03:25:50PM +0800, Haozhong Zhang wrote:
-> > QEMU writes to vNVDIMM backends in the vNVDIMM label emulation and
-> > live migration. If the backend is on the persistent memory, QEMU needs
-> > to take proper operations to ensure its writes persistent on the
-> > persistent memory. Otherwise, a host power failure may result in the
-> > loss the guest data on the persistent memory.
-> > 
-> > This v3 patch series is based on Marcel's patch "mem: add share
-> > parameter to memory-backend-ram" [1] because of the changes in patch 1.
-> > 
-> > [1] https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg03858.html
-> > 
-> > Previous versions can be found at
-> > v3: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg04365.html
-> > v2: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg01579.html
-> > v1: https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg05040.html
-> > 
-> > Changes in v4:
-> >  * (Patch 2) Fix compilation errors found by patchew.
-> > 
-> > Changes in v3:
-> >  * (Patch 5) Add a is_pmem flag to ram_handle_compressed() and handle
-> >    PMEM writes in it, so we don't need the _common function.
-> >  * (Patch 6) Expose qemu_get_buffer_common so we can remove the
-> >    unnecessary qemu_get_buffer_to_pmem wrapper.
-> >  * (Patch 8) Add a is_pmem flag to xbzrle_decode_buffer() and handle
-> >    PMEM writes in it, so we can remove the unnecessary
-> >    xbzrle_decode_buffer_{common, to_pmem}.
-> >  * Move libpmem stubs to stubs/pmem.c and fix the compilation failures
-> >    of test-{xbzrle,vmstate}.c.
-> > 
-> > Changes in v2:
-> >  * (Patch 1) Use a flags parameter in file ram allocation functions.
-> >  * (Patch 2) Add a new option 'pmem' to hostmem-file.
-> >  * (Patch 3) Use libpmem to operate on the persistent memory, rather
-> >    than re-implementing those operations in QEMU.
-> >  * (Patch 5-8) Consider the write persistence in the migration path.
-> > 
-> > Haozhong Zhang (8):
-> >   [1/8] memory, exec: switch file ram allocation functions to 'flags' parameters
-> >   [2/8] hostmem-file: add the 'pmem' option
-> >   [3/8] configure: add libpmem support
-> >   [4/8] mem/nvdimm: ensure write persistence to PMEM in label emulation
-> >   [5/8] migration/ram: ensure write persistence on loading zero pages to PMEM
-> >   [6/8] migration/ram: ensure write persistence on loading normal pages to PMEM
-> >   [7/8] migration/ram: ensure write persistence on loading compressed pages to PMEM
-> >   [8/8] migration/ram: ensure write persistence on loading xbzrle pages to PMEM
-> > 
-> >  backends/hostmem-file.c             | 27 +++++++++++++++++++-
-> >  configure                           | 35 ++++++++++++++++++++++++++
-> >  docs/nvdimm.txt                     | 14 +++++++++++
-> >  exec.c                              | 20 ++++++++++++---
-> >  hw/mem/nvdimm.c                     |  9 ++++++-
-> >  include/exec/memory.h               | 12 +++++++--
-> >  include/exec/ram_addr.h             | 28 +++++++++++++++++++--
-> >  include/migration/qemu-file-types.h |  2 ++
-> >  include/qemu/pmem.h                 | 27 ++++++++++++++++++++
-> >  memory.c                            |  8 +++---
-> >  migration/qemu-file.c               | 29 ++++++++++++++--------
-> >  migration/ram.c                     | 49 +++++++++++++++++++++++++++----------
-> >  migration/ram.h                     |  2 +-
-> >  migration/rdma.c                    |  2 +-
-> >  migration/xbzrle.c                  |  8 ++++--
-> >  migration/xbzrle.h                  |  3 ++-
-> >  numa.c                              |  2 +-
-> >  qemu-options.hx                     |  9 ++++++-
-> >  stubs/Makefile.objs                 |  1 +
-> >  stubs/pmem.c                        | 37 ++++++++++++++++++++++++++++
-> >  tests/Makefile.include              |  4 +--
-> >  tests/test-xbzrle.c                 |  4 +--
-> >  22 files changed, 285 insertions(+), 47 deletions(-)
-> >  create mode 100644 include/qemu/pmem.h
-> >  create mode 100644 stubs/pmem.c
-> 
-> A few thoughts:
-> 
-> 1. Can you use pmem_is_pmem() to auto-detect the pmem=on|off value?
-
-The manpage [1] of pmem_is_pmem says:
-
- "The result of pmem_is_pmem() query is only valid for the mappings
-  created using pmem_map_file().  For other memory regions, in
-  particular those created by a direct call to mmap(2), pmem_is_pmem()
-  always returns false, even if the queried range is entirely
-  persistent memory."
-
-QEMU is using mmap for NVDIMM mapping, so pmem_is_pmem does not work.
-
-[1] http://pmem.io/pmdk/manpages/linux/master/libpmem/pmem_is_pmem.3#caveats
-
-> 
-> 2. The migration/ram code is invasive.  Is it really necessary to
->    persist data each time pages are loaded from a migration stream?  It
->    seems simpler to migrate as normal and call pmem_persist() just once
->    after RAM has been migrated but before the migration completes.
-
-The concern is about the overhead of cache flush.
-
-In this patch series, if possible, QEMU will use pmem_mem{set,cpy}_nodrain
-APIs to copy NVDIMM blocks. Those APIs use movnt (if it's available) and
-can avoid the subsequent cache flush.
-
-Anyway, I'll make some microbenchmark to check which one will be better.
+To: qemu-devel@nongnu.org
+Cc: konrad.wilk@oracle.com, rth@twiddle.net, pbonzini@redhat.com, mtosatti@redhat.com, habkost@redhat.com, kvm@vger.kernel.org
 
 
-> 
-> 3. This is independent of this patch series and can be done later.
->    NVDIMM seems incompatible with post-copy live migration.  It would be
->    good to have a postcopy_add_blocker() API so that a nice error
->    message is printed if post-copy live migration is attempted.
+Another gentle ping.
 
-Post-copy with NVDIMM currently fails with message "Postcopy on shared
-RAM (...) is not yet supported". Is it enough?
+(Just following "If your patch seems to have been ignored" section in QEMU'=
+s submitting patches guidelines...)
 
-> 
-> The code itself seems fine though:
-> 
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+----- liran.alon@oracle.com wrote:
 
-Thanks,
-Haozhong
+> Gentle ping.
+> (https://urldefense.proofpoint.com/v2/url?u=3Dhttp-3A__patchwork.ozlabs.o=
+rg_patch_878657_&d=3DDwIFaQ&c=3DRoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE=
+&r=3DJk6Q8nNzkQ6LJ6g42qARkg6ryIDGQr-yKXPNGZbpTx0&m=3D0Tkp5xsMC2T3S-eFyhiskC=
+78npxkFbKd-ImC38ZLY6U&s=3DNac2AezmnhywhWwDPWr-KOimFCc0U72S3QBvuO0vvJs&e=3D)
+>=20
+> ----- liran.alon@oracle.com wrote:
+>=20
+> > This MSR returns the number of #SMIs that occurred on
+> > CPU since boot.
+> >=20
+> > KVM commit 52797bf9a875 ("KVM: x86: Add emulation of
+> MSR_SMI_COUNT")
+> > introduced support for emulating this MSR.
+> >=20
+> > This commit adds support for QEMU to save/load this
+> > MSR for migration purposes.
+> >=20
+> > Signed-off-by: Liran Alon <liran.alon@oracle.com>
+> > Reviewed-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+> > Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+> > ---
+> >  target/i386/cpu.c     |  1 +
+> >  target/i386/cpu.h     |  3 +++
+> >  target/i386/kvm.c     | 13 +++++++++++++
+> >  target/i386/machine.c | 20 ++++++++++++++++++++
+> >  4 files changed, 37 insertions(+)
+> >=20
+> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > index b5e431e769da..ba9ec6a6116b 100644
+> > --- a/target/i386/cpu.c
+> > +++ b/target/i386/cpu.c
+> > @@ -3645,6 +3645,7 @@ static void x86_cpu_reset(CPUState *s)
+> >      cpu_x86_update_cr0(env, 0x60000010);
+> >      env->a20_mask =3D ~0x0;
+> >      env->smbase =3D 0x30000;
+> > +    env->msr_smi_count =3D 0;
+> > =20
+> >      env->idt.limit =3D 0xffff;
+> >      env->gdt.limit =3D 0xffff;
+> > diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> > index faf39ec1ce77..254e557bb8fa 100644
+> > --- a/target/i386/cpu.h
+> > +++ b/target/i386/cpu.h
+> > @@ -1,3 +1,4 @@
+> > +
+> >  /*
+> >   * i386 virtual CPU header
+> >   *
+> > @@ -359,6 +360,7 @@ typedef enum X86Seg {
+> >  #define MSR_P6_PERFCTR0                 0xc1
+> > =20
+> >  #define MSR_IA32_SMBASE                 0x9e
+> > +#define MSR_SMI_COUNT                   0x34
+> >  #define MSR_MTRRcap                     0xfe
+> >  #define MSR_MTRRcap_VCNT                8
+> >  #define MSR_MTRRcap_FIXRANGE_SUPPORT    (1 << 8)
+> > @@ -1123,6 +1125,7 @@ typedef struct CPUX86State {
+> > =20
+> >      uint64_t pat;
+> >      uint32_t smbase;
+> > +    uint64_t msr_smi_count;
+> > =20
+> >      uint32_t pkru;
+> > =20
+> > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> > index ad4b159b28af..a53735f266c5 100644
+> > --- a/target/i386/kvm.c
+> > +++ b/target/i386/kvm.c
+> > @@ -92,6 +92,7 @@ static bool has_msr_hv_stimer;
+> >  static bool has_msr_hv_frequencies;
+> >  static bool has_msr_xss;
+> >  static bool has_msr_spec_ctrl;
+> > +static bool has_msr_smi_count;
+> > =20
+> >  static uint32_t has_architectural_pmu_version;
+> >  static uint32_t num_architectural_pmu_gp_counters;
+> > @@ -1124,6 +1125,9 @@ static int kvm_get_supported_msrs(KVMState
+> *s)
+> >                  case MSR_IA32_SMBASE:
+> >                      has_msr_smbase =3D true;
+> >                      break;
+> > +                case MSR_SMI_COUNT:
+> > +                    has_msr_smi_count =3D true;
+> > +                    break;
+> >                  case MSR_IA32_MISC_ENABLE:
+> >                      has_msr_misc_enable =3D true;
+> >                      break;
+> > @@ -1633,6 +1637,9 @@ static int kvm_put_msrs(X86CPU *cpu, int
+> level)
+> >      if (has_msr_smbase) {
+> >          kvm_msr_entry_add(cpu, MSR_IA32_SMBASE, env->smbase);
+> >      }
+> > +    if (has_msr_smi_count) {
+> > +        kvm_msr_entry_add(cpu, MSR_SMI_COUNT, env->msr_smi_count);
+> > +    }
+> >      if (has_msr_bndcfgs) {
+> >          kvm_msr_entry_add(cpu, MSR_IA32_BNDCFGS,
+> env->msr_bndcfgs);
+> >      }
+> > @@ -1979,6 +1986,9 @@ static int kvm_get_msrs(X86CPU *cpu)
+> >      if (has_msr_smbase) {
+> >          kvm_msr_entry_add(cpu, MSR_IA32_SMBASE, 0);
+> >      }
+> > +    if (has_msr_smi_count) {
+> > +        kvm_msr_entry_add(cpu, MSR_SMI_COUNT, 0);
+> > +    }
+> >      if (has_msr_feature_control) {
+> >          kvm_msr_entry_add(cpu, MSR_IA32_FEATURE_CONTROL, 0);
+> >      }
+> > @@ -2205,6 +2215,9 @@ static int kvm_get_msrs(X86CPU *cpu)
+> >          case MSR_IA32_SMBASE:
+> >              env->smbase =3D msrs[i].data;
+> >              break;
+> > +        case MSR_SMI_COUNT:
+> > +            env->msr_smi_count =3D msrs[i].data;
+> > +            break;
+> >          case MSR_IA32_FEATURE_CONTROL:
+> >              env->msr_ia32_feature_control =3D msrs[i].data;
+> >              break;
+> > diff --git a/target/i386/machine.c b/target/i386/machine.c
+> > index 361c05aedfdc..9432496cbda8 100644
+> > --- a/target/i386/machine.c
+> > +++ b/target/i386/machine.c
+> > @@ -395,6 +395,25 @@ static const VMStateDescription
+> > vmstate_msr_tsc_adjust =3D {
+> >      }
+> >  };
+> > =20
+> > +static bool msr_smi_count_needed(void *opaque)
+> > +{
+> > +    X86CPU *cpu =3D opaque;
+> > +    CPUX86State *env =3D &cpu->env;
+> > +
+> > +    return env->msr_smi_count !=3D 0;
+> > +}
+> > +
+> > +static const VMStateDescription vmstate_msr_smi_count =3D {
+> > +    .name =3D "cpu/msr_smi_count",
+> > +    .version_id =3D 1,
+> > +    .minimum_version_id =3D 1,
+> > +    .needed =3D msr_smi_count_needed,
+> > +    .fields =3D (VMStateField[]) {
+> > +        VMSTATE_UINT64(env.msr_smi_count, X86CPU),
+> > +        VMSTATE_END_OF_LIST()
+> > +    }
+> > +};
+> > +
+> >  static bool tscdeadline_needed(void *opaque)
+> >  {
+> >      X86CPU *cpu =3D opaque;
+> > @@ -952,6 +971,7 @@ VMStateDescription vmstate_x86_cpu =3D {
+> >          &vmstate_avx512,
+> >          &vmstate_xss,
+> >          &vmstate_tsc_khz,
+> > +        &vmstate_msr_smi_count,
+> >  #ifdef TARGET_X86_64
+> >          &vmstate_pkru,
+> >  #endif
+> > --=20
+> > 1.9.1
