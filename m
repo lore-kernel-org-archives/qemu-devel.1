@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1evrjY-0003sx-0D
+	(envelope-from <mst@redhat.com>) id 1evrjY-0003sw-03
 	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 17:45:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1evrjX-0007GX-10
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 17:45:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47162 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1evrjW-0007Eq-Oy
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 17:45:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35344 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1evrjW-0007ER-SD
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1evrjW-0007DS-9j
 	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 17:45:22 -0400
-Date: Tue, 13 Mar 2018 23:45:21 +0200
+Date: Tue, 13 Mar 2018 23:45:20 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1520977432-187679-8-git-send-email-mst@redhat.com>
+Message-ID: <1520977432-187679-7-git-send-email-mst@redhat.com>
 References: <1520977432-187679-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1520977432-187679-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 07/22] acpi: add build_append_gas() helper for
- Generic Address Structure
+Subject: [Qemu-devel] [PULL 06/22] acpi: reuse AcpiGenericAddress instead of
+ Acpi20GenericAddress
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,9 +32,8 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-it will help to add Generic Address Structure to ACPI tables
-without using packed C structures and avoid endianness
-issues as API doesn't need an explicit conversion.
+Drop duplicate in form of Acpi20GenericAddress and reuse
+AcpiGenericAddress.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
@@ -42,74 +41,50 @@ Tested-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/acpi/aml-build.h | 20 ++++++++++++++++++++
- hw/acpi/aml-build.c         | 16 ++++++++++++++++
- 2 files changed, 36 insertions(+)
+ include/hw/acpi/acpi-defs.h | 17 +++--------------
+ 1 file changed, 3 insertions(+), 14 deletions(-)
 
-diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-index 88d0738..8692ccc 100644
---- a/include/hw/acpi/aml-build.h
-+++ b/include/hw/acpi/aml-build.h
-@@ -78,6 +78,15 @@ typedef enum {
- } AmlUpdateRule;
+diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+index 80c8099..9942bc5 100644
+--- a/include/hw/acpi/acpi-defs.h
++++ b/include/hw/acpi/acpi-defs.h
+@@ -40,18 +40,6 @@ enum {
+     ACPI_FADT_F_LOW_POWER_S0_IDLE_CAPABLE,
+ };
  
- typedef enum {
-+    AML_AS_SYSTEM_MEMORY = 0X00,
-+    AML_AS_SYSTEM_IO = 0X01,
-+    AML_AS_PCI_CONFIG = 0X02,
-+    AML_AS_EMBEDDED_CTRL = 0X03,
-+    AML_AS_SMBUS = 0X04,
-+    AML_AS_FFH = 0X7F,
-+} AmlAddressSpace;
-+
-+typedef enum {
-     AML_SYSTEM_MEMORY = 0X00,
-     AML_SYSTEM_IO = 0X01,
-     AML_PCI_CONFIG = 0X02,
-@@ -389,6 +398,17 @@ int
- build_append_named_dword(GArray *array, const char *name_format, ...)
- GCC_FMT_ATTR(2, 3);
+-/*
+- * ACPI 2.0 Generic Address Space definition.
+- */
+-struct Acpi20GenericAddress {
+-    uint8_t  address_space_id;
+-    uint8_t  register_bit_width;
+-    uint8_t  register_bit_offset;
+-    uint8_t  reserved;
+-    uint64_t address;
+-} QEMU_PACKED;
+-typedef struct Acpi20GenericAddress Acpi20GenericAddress;
+-
+ struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
+     uint64_t signature;              /* ACPI signature, contains "RSD PTR " */
+     uint8_t  checksum;               /* To make sum of struct == 0 */
+@@ -167,7 +155,8 @@ struct AcpiGenericAddress {
+     uint8_t space_id;        /* Address space where struct or register exists */
+     uint8_t bit_width;       /* Size in bits of given register */
+     uint8_t bit_offset;      /* Bit offset within the register */
+-    uint8_t access_width;    /* Minimum Access size (ACPI 3.0) */
++    uint8_t access_width;    /* ACPI 3.0: Minimum Access size (ACPI 3.0),
++                                ACPI 2.0: Reserved, Table 5-1 */
+     uint64_t address;        /* 64-bit address of struct or register */
+ } QEMU_PACKED;
  
-+void build_append_gas(GArray *table, AmlAddressSpace as,
-+                      uint8_t bit_width, uint8_t bit_offset,
-+                      uint8_t access_width, uint64_t address);
-+
-+static inline void
-+build_append_gas_from_struct(GArray *table, const struct AcpiGenericAddress *s)
-+{
-+    build_append_gas(table, s->space_id, s->bit_width, s->bit_offset,
-+                     s->access_width, s->address);
-+}
-+
- void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
-                        uint64_t len, int node, MemoryAffinityFlags flags);
- 
-diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-index 36a6cc4..3fef5f6 100644
---- a/hw/acpi/aml-build.c
-+++ b/hw/acpi/aml-build.c
-@@ -258,6 +258,22 @@ static void build_append_int(GArray *table, uint64_t value)
-     }
- }
- 
-+/* Generic Address Structure (GAS)
-+ * ACPI 2.0/3.0: 5.2.3.1 Generic Address Structure
-+ * 2.0 compat note:
-+ *    @access_width must be 0, see ACPI 2.0:Table 5-1
-+ */
-+void build_append_gas(GArray *table, AmlAddressSpace as,
-+                      uint8_t bit_width, uint8_t bit_offset,
-+                      uint8_t access_width, uint64_t address)
-+{
-+    build_append_int_noprefix(table, as, 1);
-+    build_append_int_noprefix(table, bit_width, 1);
-+    build_append_int_noprefix(table, bit_offset, 1);
-+    build_append_int_noprefix(table, access_width, 1);
-+    build_append_int_noprefix(table, address, 8);
-+}
-+
- /*
-  * Build NAME(XXXX, 0x00000000) where 0x00000000 is encoded as a dword,
-  * and return the offset to 0x00000000 for runtime patching.
+@@ -456,7 +445,7 @@ typedef struct AcpiGenericTimerTable AcpiGenericTimerTable;
+ struct Acpi20Hpet {
+     ACPI_TABLE_HEADER_DEF                    /* ACPI common table header */
+     uint32_t           timer_block_id;
+-    Acpi20GenericAddress addr;
++    struct AcpiGenericAddress addr;
+     uint8_t            hpet_number;
+     uint16_t           min_tick;
+     uint8_t            page_protect;
 -- 
 MST
