@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1evhVZ-0004z1-Tk
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 06:50:19 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1evhZE-0006hW-4g
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 06:54:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1evhVU-0000yh-14
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 06:50:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58326 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1evhVT-0000xX-QI
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 06:50:11 -0400
-References: <20180312131806.23209-1-stefanha@redhat.com>
-	<43378184-a291-263f-b8b2-dedc455622e3@redhat.com>
-	<20180313103736.GC16582@stefanha-x1.localdomain>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <98b9bf37-5bca-35f0-7178-dd640ee3fe81@redhat.com>
-Date: Tue, 13 Mar 2018 11:49:57 +0100
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1evhZ9-0003ra-72
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 06:54:04 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:46343)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1evhZ8-0003qQ-WD
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 06:53:59 -0400
+Received: by mail-wr0-x244.google.com with SMTP id m12so21239896wrm.13
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 03:53:58 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180312214230.17561-1-wsa+renesas@sang-engineering.com>
+	<20180312214230.17561-4-wsa+renesas@sang-engineering.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <5108cc9b-9fb9-d202-d4bc-a5c1dd4d4f76@amsat.org>
+Date: Tue, 13 Mar 2018 11:53:55 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180313103736.GC16582@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="lguqfeAOWzgoVvy1jAffyzqj57vhPw8VL"
-Subject: Re: [Qemu-devel] [PATCH] checkpatch: warn about missing MAINTAINERS
- file changes
+In-Reply-To: <20180312214230.17561-4-wsa+renesas@sang-engineering.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] nvram: at24c: use a sane default for
+ "rom-size"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,120 +36,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: Wolfram Sang <wsa+renesas@sang-engineering.com>, qemu-devel@nongnu.org
+Cc: linux-renesas-soc@vger.kernel.org, Michael Davidsaver <mdavidsaver@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lguqfeAOWzgoVvy1jAffyzqj57vhPw8VL
-From: Thomas Huth <thuth@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <98b9bf37-5bca-35f0-7178-dd640ee3fe81@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] checkpatch: warn about missing MAINTAINERS
- file changes
-References: <20180312131806.23209-1-stefanha@redhat.com>
- <43378184-a291-263f-b8b2-dedc455622e3@redhat.com>
- <20180313103736.GC16582@stefanha-x1.localdomain>
-In-Reply-To: <20180313103736.GC16582@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Wolfram,
 
-On 13.03.2018 11:37, Stefan Hajnoczi wrote:
-> On Mon, Mar 12, 2018 at 02:46:20PM +0100, Thomas Huth wrote:
->> On 12.03.2018 14:18, Stefan Hajnoczi wrote:
->>> Warn if files are added/renamed/deleted without MAINTAINERS file
->>> changes.  This has helped me in Linux and we could benefit from this
->>> check in QEMU.
->>>
->>> This patch is a manual cherry-pick of Linux commit
->>> 13f1937ef33950b1112049972249e6191b82e6c9 ("checkpatch: emit a warning=
- on
->>> file add/move/delete") by Joe Perches <joe@perches.com>.
->>>
->>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->>> ---
->>> Note the 80-char lines are from upstream code.  Keep them as-is.
->>>
->>>  scripts/checkpatch.pl | 19 +++++++++++++++++++
->>>  1 file changed, 19 insertions(+)
->>>
->>> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
->>> index d1fe79bcc4..d0d8f63d48 100755
->>> --- a/scripts/checkpatch.pl
->>> +++ b/scripts/checkpatch.pl
->>> @@ -1177,6 +1177,7 @@ sub process {
->>>  	our $clean =3D 1;
->>>  	my $signoff =3D 0;
->>>  	my $is_patch =3D 0;
->>> +	my $reported_maintainer_file =3D 0;
->>> =20
->>>  	our @report =3D ();
->>>  	our $cnt_lines =3D 0;
->>> @@ -1379,6 +1380,24 @@ sub process {
->>>  			}
->>>  		}
->>> =20
->>> +# Check if MAINTAINERS is being updated.  If so, there's probably no=
- need to
->>> +# emit the "does MAINTAINERS need updating?" message on file add/mov=
-e/delete
->>> +		if ($line =3D~ /^\s*MAINTAINERS\s*\|/) {
->>> +			$reported_maintainer_file =3D 1;
->>> +		}
->>> +
->>> +# Check for added, moved or deleted files
->>> +		if (!$reported_maintainer_file &&
->>> +		    ($line =3D~ /^(?:new|deleted) file mode\s*\d+\s*$/ ||
->>> +		     $line =3D~ /^rename (?:from|to) [\w\/\.\-]+\s*$/ ||
->>> +		     ($line =3D~ /\{\s*([\w\/\.\-]*)\s*\=3D\>\s*([\w\/\.\-]*)\s*\}=
-/ &&
->>> +		      (defined($1) || defined($2))))) {
->>> +			$is_patch =3D 1;
->>> +			$reported_maintainer_file =3D 1;
->>> +			WARN("added, moved or deleted file(s), does MAINTAINERS need upda=
-ting?\n" .
->>> +				$herecurr);
->>
->> Could you please turn this into a notification instead of a warning? F=
-or
->> rationale, please see the discussion of this patch last year:
->>
->> http://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05753.html
->=20
-> It's a warning, not an error, so this already means "don't treat it as
-> fatal".
->=20
-> Why is a warning a bad user experience but a notification would be fine=
-?
+On 03/12/2018 10:42 PM, Wolfram Sang wrote:
+> 0 as "rom-size" doesn't make much sense, let's use the smallest 24cXX
+> which has 128 byte.
+> 
+> Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+> ---
+>  hw/nvram/eeprom_at24c.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/nvram/eeprom_at24c.c b/hw/nvram/eeprom_at24c.c
+> index d82710e1df..de988f8d07 100644
+> --- a/hw/nvram/eeprom_at24c.c
+> +++ b/hw/nvram/eeprom_at24c.c
+> @@ -168,7 +168,7 @@ void at24c_eeprom_reset(DeviceState *state)
+>  }
+>  
+>  static Property at24c_eeprom_props[] = {
+> -    DEFINE_PROP_UINT32("rom-size", EEPROMState, rsize, 0),
+> +    DEFINE_PROP_UINT32("rom-size", EEPROMState, rsize, 128),
 
-Since this will likely cause a lot of false positives. I think people
-will then rather be annoyed if checkpatch.pl nags them with a warning in
-these cases.
+This patch should goes before your 2/3 in your series.
 
- Thomas
+Can you add a #define for this value? Such AT24C_ROMSIZE_MIN.
 
+With a #define you can add:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
---lguqfeAOWzgoVvy1jAffyzqj57vhPw8VL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJap6zaAAoJEC7Z13T+cC21dicQAKDwNzZlwd6f6XeClpf8xhII
-DuDIu2mkpCJoSisjTX2Sb7v3J5Tg/0A4N86LQNwNW5J5zBLiwwbujzw+N4o9bBPr
-ED/6tEyacTvFUBYTt+IeTjwKZr6vBPnv0FhiK8zkiZ6bWtqcZom0ppMZRupCg5z+
-PClHRFHxJljqrqZQQoWHdjkDRonzXEQux3lP3cy/MFzqY4xdlczjR0PVa/e5ALle
-rCxf6fdjSbCeI0XpLqbk3CisAzem6NBHqenWXOueHWSrF9jc68hszWDBsumkeK/u
-KKv+m/3pxPL8c80NtJhrOGa7untLegHiRMJT8VV3/7P/NFxKwuFrM882+i58p/Rr
-NKQxLoWvAKc0eDsSDsEvPXsIcFFl74087mPtSkTSglJltcpgWC5wfCw6Ws/3ai7C
-QBSsGVbEwIY0XWuiPi5VP3oLQnfQjAnzgGIJO09/9h0TutiwWj0UdUFKzZK8eXMG
-BOsUh40pDLk7D5iczxmXWVlqyWHrwPAGczVWeVmRjCLFG+eLiG56Y+Q51oOxGu2L
-efR+p5DR0dSRT0RQ8z8gwJtZ5jB+Qc34lDi+A1zEQ17qWSJHcp7K/6DB7U36iZu4
-xUibo3pfwslbAsKXCJmHuTt4ErYyGM+jG7T3+Fb56oISOjyMp3Lau6mjyYsE0Z9u
-+koNaSoNy186Fob29ASf
-=DJC8
------END PGP SIGNATURE-----
-
---lguqfeAOWzgoVvy1jAffyzqj57vhPw8VL--
+>      DEFINE_PROP_BOOL("writable", EEPROMState, writable, true),
+>      DEFINE_PROP_DRIVE("drive", EEPROMState, blk),
+>      DEFINE_PROP_END_OF_LIST()
+> 
