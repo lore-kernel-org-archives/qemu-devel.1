@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evkAD-0004mz-Du
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:40:31 -0400
+	(envelope-from <bounces@canonical.com>) id 1evkAh-00052j-Ta
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:40:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1evkA9-0005gE-Iq
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:40:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46200 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1evkA9-0005fa-DL
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:40:21 -0400
-Date: Tue, 13 Mar 2018 13:40:17 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180313134017.GA24191@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180209141514.18840-1-alex.bennee@linaro.org>
-	<20180209141514.18840-2-alex.bennee@linaro.org>
+	(envelope-from <bounces@canonical.com>) id 1evkAd-00065q-Un
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:40:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51408)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1evkAd-00065Z-OJ
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 09:40:51 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1evkAc-0000KY-Oz
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 13:40:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B3DA92E8055
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 13:40:50 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180209141514.18840-2-alex.bennee@linaro.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 1/1] .travis.yml: add --disable-linux-user
- for some jobs
+Date: Tue, 13 Mar 2018 13:34:53 -0000
+From: Antoine <1755479@bugs.launchpad.net>
+Reply-To: Bug 1755479 <1755479@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <152094809386.3778.6282045564987107259.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1755479] [NEW] Cortex M:qemu abort with optimized
+ code and icount
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +36,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: peter.maydell@linaro.org, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
 
-On Fri, Feb 09, 2018 at 02:15:14PM +0000, Alex Benn=C3=A9e wrote:
-> The modules and co-routine builds are only really relevant to softmmu
-> builds and regularly timeout on Travis. Let's disable linux-user
-> builds here for more headroom.
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
->=20
-> diff --git a/.travis.yml b/.travis.yml
-> index 01a57399b5..0dd5020552 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -52,9 +52,9 @@ env:
->      - CONFIG=3D""
->      - CONFIG=3D"--enable-debug --enable-debug-tcg --enable-trace-backe=
-nds=3Dlog"
->      - CONFIG=3D"--disable-linux-aio --disable-cap-ng --disable-attr --=
-disable-brlapi --disable-uuid --disable-libusb"
-> -    - CONFIG=3D"--enable-modules"
-> -    - CONFIG=3D"--with-coroutine=3Ducontext"
-> -    - CONFIG=3D"--with-coroutine=3Dsigaltstack"
-> +    - CONFIG=3D"--enable-modules --disable-linux-user"
-> +    - CONFIG=3D"--with-coroutine=3Ducontext --disable-linux-user"
-> +    - CONFIG=3D"--with-coroutine=3Dsigaltstack --disable-linux-user"
+Public bug reported:
 
-Since this merged, the 4th, 5th & 6th jobs are now reliably completing in
-time, but the 1st and 3rd jobs are hitting timeouts on the majority of
-runs :-(
+A basic program runs fine if compiled with flag -O0 with gcc, but triggers =
+a qemu abort when compiled with -O1 and run with icount:
+"qemu: fatal: IO on conditional branch instruction"
 
-We've already got a lot of jobs, but for sake of reliability should we
-consider splitting the 1st & 3rd jobs. Add --disable-linux-user to both
-of the existing jobs, and then adding 2 new jobs with --disable-system
-and --disable-tools set ?
+I also noticed the problem on C source like this with -O0:
+"int foo =3D *bar; bar++;" : OK
+"int foo =3D *bar++;" : FAIL (!!!)
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Optimized binary attached to this ticket.
+
+command line:
+qemu-system-arm -M lm3s6965evb -nographic -kernel hello.bin -serial file:$(=
+tty) -icount 4 -cpu cortex-m4
+(working fine without icount)
+
+version: =
+
+QEMU emulator version 2.11.50 (v2.11.0-2146-gd9bbfea-dirty)
+
+Compilation options:
+./configure --target-list=3Darm-softmmu --disable-slirp --disable-blobs --d=
+isable-docs --disable-guest-agent --disable-gnutls --disable-nettle --disab=
+le-gcrypt --disable-sdl --disable-gtk --disable-vnc --disable-virtfs --disa=
+ble-mpath --disable-xen --disable-brlapi --disable-curl --disable-bluez --d=
+isable-kvm --disable-hax --disable-hvf --disable-whpx --disable-rdma --disa=
+ble-vde --disable-netmap --disable-linux-aio --disable-cap-ng --disable-att=
+r --disable-vhost-net --disable-spice --disable-rbd --disable-libiscsi --di=
+sable-libnfs --disable-smartcard --disable-libusb --disable-live-block-migr=
+ation --disable-usb-redir --disable-lzo --disable-snappy --disable-bzip2 --=
+disable-seccomp --disable-glusterfs --disable-tpm --disable-libssh2 --disab=
+le-numa --disable-libxml2 --disable-tcmalloc --disable-jemalloc --disable-r=
+eplication --disable-vhost-vsock --disable-opengl --disable-virglrenderer -=
+-disable-xfsctl --disable-qom-cast-debug --disable-vxhs --disable-crypto-af=
+alg --disable-vhost-user --disable-capstone --disable-pie --extra-cflags=3D=
+-mtune=3Dnative
+
+I have also tested previous versions:
+- stock qemu-system-arm 2.5.0 from ubuntu 16.04: OK
+- git version: QEMU emulator version 2.10.0 (v2.10.2-dirty): OK
+- git version: QEMU emulator version 2.10.90 (v2.11.0-rc0-dirty): FAIL
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Attachment added: "hello.bin"
+   https://bugs.launchpad.net/bugs/1755479/+attachment/5078133/+files/hello=
+.bin
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1755479
+
+Title:
+  Cortex M:qemu abort with optimized code and icount
+
+Status in QEMU:
+  New
+
+Bug description:
+  A basic program runs fine if compiled with flag -O0 with gcc, but trigger=
+s a qemu abort when compiled with -O1 and run with icount:
+  "qemu: fatal: IO on conditional branch instruction"
+
+  I also noticed the problem on C source like this with -O0:
+  "int foo =3D *bar; bar++;" : OK
+  "int foo =3D *bar++;" : FAIL (!!!)
+
+  Optimized binary attached to this ticket.
+
+  command line:
+  qemu-system-arm -M lm3s6965evb -nographic -kernel hello.bin -serial file:=
+$(tty) -icount 4 -cpu cortex-m4
+  (working fine without icount)
+
+  version: =
+
+  QEMU emulator version 2.11.50 (v2.11.0-2146-gd9bbfea-dirty)
+
+  Compilation options:
+  ./configure --target-list=3Darm-softmmu --disable-slirp --disable-blobs -=
+-disable-docs --disable-guest-agent --disable-gnutls --disable-nettle --dis=
+able-gcrypt --disable-sdl --disable-gtk --disable-vnc --disable-virtfs --di=
+sable-mpath --disable-xen --disable-brlapi --disable-curl --disable-bluez -=
+-disable-kvm --disable-hax --disable-hvf --disable-whpx --disable-rdma --di=
+sable-vde --disable-netmap --disable-linux-aio --disable-cap-ng --disable-a=
+ttr --disable-vhost-net --disable-spice --disable-rbd --disable-libiscsi --=
+disable-libnfs --disable-smartcard --disable-libusb --disable-live-block-mi=
+gration --disable-usb-redir --disable-lzo --disable-snappy --disable-bzip2 =
+--disable-seccomp --disable-glusterfs --disable-tpm --disable-libssh2 --dis=
+able-numa --disable-libxml2 --disable-tcmalloc --disable-jemalloc --disable=
+-replication --disable-vhost-vsock --disable-opengl --disable-virglrenderer=
+ --disable-xfsctl --disable-qom-cast-debug --disable-vxhs --disable-crypto-=
+afalg --disable-vhost-user --disable-capstone --disable-pie --extra-cflags=
+=3D-mtune=3Dnative
+
+  I have also tested previous versions:
+  - stock qemu-system-arm 2.5.0 from ubuntu 16.04: OK
+  - git version: QEMU emulator version 2.10.0 (v2.10.2-dirty): OK
+  - git version: QEMU emulator version 2.10.90 (v2.11.0-rc0-dirty): FAIL
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1755479/+subscriptions
