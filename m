@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1evmzf-0004w9-LI
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:41:45 -0400
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1evn1P-0006UY-Aj
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:43:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1evmzb-0006tK-7D
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:41:43 -0400
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:39145)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1evmza-0006t0-RS
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:41:39 -0400
-Received: by mail-wr0-x229.google.com with SMTP id k3so683842wrg.6
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 09:41:38 -0700 (PDT)
-Received: from 640k.lan (94-36-191-219.adsl-ull.clienti.tiscali.it.
-	[94.36.191.219])
-	by smtp.gmail.com with ESMTPSA id u22sm743937wrf.86.2018.03.13.09.41.33
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 13 Mar 2018 09:41:34 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 13 Mar 2018 17:41:01 +0100
-Message-Id: <1520959261-96820-1-git-send-email-pbonzini@redhat.com>
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1evn1O-0007Yy-4F
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 12:43:31 -0400
+From: Andrew Baumann <Andrew.Baumann@microsoft.com>
+Date: Tue, 13 Mar 2018 16:43:21 +0000
+Message-ID: <MWHPR21MB0189A866E273E023FC1D73119ED20@MWHPR21MB0189.namprd21.prod.outlook.com>
+References: <20180313153458.26822-1-peter.maydell@linaro.org>
+	<20180313153458.26822-6-peter.maydell@linaro.org>
+In-Reply-To: <20180313153458.26822-6-peter.maydell@linaro.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 00/22] KVM patches for QEMU 2.12 soft freeze
+Subject: Re: [Qemu-devel] [PATCH 5/9] hw/arm/bcm2836: Rename bcm2836
+ type/struct to bcm283x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,188 +25,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, Pekka Enberg <penberg@iki.fi>, "patches@linaro.org" <patches@linaro.org>
 
-The following changes since commit fb5fff15881ba7a002924b967eb211c002897983:
+> From: Qemu-devel <qemu-devel-
+> bounces+andrew.baumann=3Dmicrosoft.com@nongnu.org> On Behalf Of Peter
+> Maydell
+> Sent: Tuesday, 13 March 2018 08:35
+>=20
+> Our BCM2836 type is really a generic one that can be any of
+> the bcm283x family. Rename it accordingly. We change only
+> the names which are visible via the header file to the
+> rest of the QEMU code, leaving private function names
+> in bcm2836.c as they are.
+>=20
+> This is a preliminary to making bcm283x be an abstract
+> parent class to specific types for the bcm2836 and bcm2837.
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  include/hw/arm/bcm2836.h | 12 ++++++------
+>  hw/arm/bcm2836.c         | 17 +++++++++--------
+>  hw/arm/raspi.c           | 16 ++++++++--------
+>  3 files changed, 23 insertions(+), 22 deletions(-)
+>=20
+> diff --git a/include/hw/arm/bcm2836.h b/include/hw/arm/bcm2836.h
+> index 4758b4ae54..9a10a76631 100644
+> --- a/include/hw/arm/bcm2836.h
+> +++ b/include/hw/arm/bcm2836.h
+> @@ -15,12 +15,12 @@
+>  #include "hw/arm/bcm2835_peripherals.h"
+>  #include "hw/intc/bcm2836_control.h"
+>=20
+> -#define TYPE_BCM2836 "bcm2836"
+> -#define BCM2836(obj) OBJECT_CHECK(BCM2836State, (obj), TYPE_BCM2836)
+> +#define TYPE_BCM283X "bcm283x"
+> +#define BCM283X(obj) OBJECT_CHECK(BCM283XState, (obj), TYPE_BCM283X)
+>=20
+> -#define BCM2836_NCPUS 4
+> +#define BCM283X_NCPUS 4
+>
+>=20
+> -typedef struct BCM2836State {
+> +typedef struct BCM283XState {
+>      /*< private >*/
+>      DeviceState parent_obj;
+>      /*< public >*/
+> @@ -28,9 +28,9 @@ typedef struct BCM2836State {
+>      char *cpu_type;
+>      uint32_t enabled_cpus;
+>=20
+> -    ARMCPU cpus[BCM2836_NCPUS];
+> +    ARMCPU cpus[BCM283X_NCPUS];
+>      BCM2836ControlState control;
+>      BCM2835PeripheralState peripherals;
+> -} BCM2836State;
+> +} BCM283XState;
+>=20
+>  #endif /* BCM2836_H */
+> diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
+> index 9266f27c14..1d1908654b 100644
+> --- a/hw/arm/bcm2836.c
+> +++ b/hw/arm/bcm2836.c
+> @@ -25,7 +25,7 @@
+>=20
+>  static void bcm2836_init(Object *obj)
+>  {
+> -    BCM2836State *s =3D BCM2836(obj);
+> +    BCM283XState *s =3D BCM283X(obj);
+>=20
+>      object_initialize(&s->control, sizeof(s->control), TYPE_BCM2836_CONT=
+ROL);
+>      object_property_add_child(obj, "control", OBJECT(&s->control), NULL)=
+;
+> @@ -44,7 +44,7 @@ static void bcm2836_init(Object *obj)
+>=20
+>  static void bcm2836_realize(DeviceState *dev, Error **errp)
+>  {
+> -    BCM2836State *s =3D BCM2836(dev);
+> +    BCM283XState *s =3D BCM283X(dev);
+>      Object *obj;
+>      Error *err =3D NULL;
+>      int n;
+> @@ -52,7 +52,7 @@ static void bcm2836_realize(DeviceState *dev, Error
+> **errp)
+>      /* common peripherals from bcm2835 */
+>=20
+>      obj =3D OBJECT(dev);
+> -    for (n =3D 0; n < BCM2836_NCPUS; n++) {
+> +    for (n =3D 0; n < BCM283X_NCPUS; n++) {
+>          object_initialize(&s->cpus[n], sizeof(s->cpus[n]),
+>                            s->cpu_type);
+>          object_property_add_child(obj, "cpu[*]", OBJECT(&s->cpus[n]),
+> @@ -102,7 +102,7 @@ static void bcm2836_realize(DeviceState *dev, Error
+> **errp)
+>      sysbus_connect_irq(SYS_BUS_DEVICE(&s->peripherals), 1,
+>          qdev_get_gpio_in_named(DEVICE(&s->control), "gpu-fiq", 0));
+>=20
+> -    for (n =3D 0; n < BCM2836_NCPUS; n++) {
+> +    for (n =3D 0; n < BCM283X_NCPUS; n++) {
+>          /* Mirror bcm2836, which has clusterid set to 0xf
+>           * TODO: this should be converted to a property of ARM_CPU
+>           */
+> @@ -150,8 +150,9 @@ static void bcm2836_realize(DeviceState *dev, Error
+> **errp)
+>  }
+>=20
+>  static Property bcm2836_props[] =3D {
+> -    DEFINE_PROP_STRING("cpu-type", BCM2836State, cpu_type),
+> -    DEFINE_PROP_UINT32("enabled-cpus", BCM2836State, enabled_cpus,
+> BCM2836_NCPUS),
+> +    DEFINE_PROP_STRING("cpu-type", BCM283XState, cpu_type),
+> +    DEFINE_PROP_UINT32("enabled-cpus", BCM283XState, enabled_cpus,
+> +                       BCM283X_NCPUS),
+>      DEFINE_PROP_END_OF_LIST()
+>  };
+>=20
+> @@ -164,9 +165,9 @@ static void bcm2836_class_init(ObjectClass *oc, void
+> *data)
+>  }
+>=20
+>  static const TypeInfo bcm2836_type_info =3D {
+> -    .name =3D TYPE_BCM2836,
+> +    .name =3D TYPE_BCM283X,
+>      .parent =3D TYPE_DEVICE,
+> -    .instance_size =3D sizeof(BCM2836State),
+> +    .instance_size =3D sizeof(BCM283XState),
+>      .instance_init =3D bcm2836_init,
+>      .class_init =3D bcm2836_class_init,
+>  };
+> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+> index 1ac0737149..58c6e80a17 100644
+> --- a/hw/arm/raspi.c
+> +++ b/hw/arm/raspi.c
+> @@ -32,7 +32,7 @@
+>  static const int raspi_boardid[] =3D {[1] =3D 0xc42, [2] =3D 0xc43, [3] =
+=3D 0xc44};
+>=20
+>  typedef struct RasPiState {
+> -    BCM2836State soc;
+> +    BCM283XState soc;
+>      MemoryRegion ram;
+>  } RasPiState;
+>=20
+> @@ -136,7 +136,7 @@ static void raspi_init(MachineState *machine, int
+> version)
+>      BusState *bus;
+>      DeviceState *carddev;
+>=20
+> -    object_initialize(&s->soc, sizeof(s->soc), TYPE_BCM2836);
+> +    object_initialize(&s->soc, sizeof(s->soc), TYPE_BCM283X);
+>      object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
+>                                &error_abort);
+>=20
+> @@ -189,9 +189,9 @@ static void raspi2_machine_init(MachineClass *mc)
+>      mc->no_floppy =3D 1;
+>      mc->no_cdrom =3D 1;
+>      mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a15");
+> -    mc->max_cpus =3D BCM2836_NCPUS;
+> -    mc->min_cpus =3D BCM2836_NCPUS;
+> -    mc->default_cpus =3D BCM2836_NCPUS;
+> +    mc->max_cpus =3D BCM283X_NCPUS;
+> +    mc->min_cpus =3D BCM283X_NCPUS;
+> +    mc->default_cpus =3D BCM283X_NCPUS;
+>      mc->default_ram_size =3D 1024 * 1024 * 1024;
+>      mc->ignore_memory_transaction_failures =3D true;
+>  };
+> @@ -212,9 +212,9 @@ static void raspi3_machine_init(MachineClass *mc)
+>      mc->no_floppy =3D 1;
+>      mc->no_cdrom =3D 1;
+>      mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a53");
+> -    mc->max_cpus =3D BCM2836_NCPUS;
+> -    mc->min_cpus =3D BCM2836_NCPUS;
+> -    mc->default_cpus =3D BCM2836_NCPUS;
+> +    mc->max_cpus =3D BCM283X_NCPUS;
+> +    mc->min_cpus =3D BCM283X_NCPUS;
+> +    mc->default_cpus =3D BCM283X_NCPUS;
+>      mc->default_ram_size =3D 1024 * 1024 * 1024;
+>  }
+>  DEFINE_MACHINE("raspi3", raspi3_machine_init)
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/vga-20180312-pull-request' into staging (2018-03-12 18:35:37 +0000)
-
-are available in the git repository at:
-
-
-  git://github.com/bonzini/qemu.git tags/for-upstream-sev
-
-for you to fetch changes up to 9f750794985d7386f088da941c76b73880b2b6c4:
-
-  sev/i386: add sev_get_capabilities() (2018-03-13 12:04:04 +0100)
-
-----------------------------------------------------------------
-* Migrate MSR_SMI_COUNT (Liran)
-* Update kernel headers (Gerd, myself)
-* SEV support (Brijesh)
-
-I have not tested non-x86 compilation, but I reordered the SEV patches
-so that all non-x86-specific changes go first to catch any possible
-issues (which weren't there anyway :)).
-
-----------------------------------------------------------------
-
-v1->v2: squash fixes from Alex
-
-Brijesh Singh (20):
-      machine: add memory-encryption option
-      docs: add AMD Secure Encrypted Virtualization (SEV)
-      kvm: add memory encryption context
-      kvm: introduce memory encryption APIs
-      target/i386: add Secure Encrypted Virtualization (SEV) object
-      sev/i386: qmp: add query-sev command
-      include: add psp-sev.h header file
-      sev/i386: add command to initialize the memory encryption context
-      sev/i386: register the guest memory range which may contain encrypted data
-      sev/i386: add command to create launch memory encryption context
-      sev/i386: add command to encrypt guest memory region
-      target/i386: encrypt bios rom
-      sev/i386: add support to LAUNCH_MEASURE command
-      sev/i386: finalize the SEV guest launch flow
-      sev/i386: add migration blocker
-      cpu/i386: populate CPUID 0x8000_001F when SEV is active
-      sev/i386: hmp: add 'info sev' command
-      sev/i386: qmp: add query-sev-launch-measure command
-      sev/i386: qmp: add query-sev-capabilities command
-      sev/i386: add sev_get_capabilities()
-
-Liran Alon (1):
-      KVM: x86: Add support for save/load MSR_SMI_COUNT
-
-Paolo Bonzini (1):
-      update Linux headers to 4.16-rc5
-
- accel/Makefile.objs                                |   2 +-
- accel/kvm/Makefile.objs                            |   3 +-
- accel/kvm/kvm-all.c                                |  39 +
- accel/kvm/sev-stub.c                               |  26 +
- accel/stubs/kvm-stub.c                             |  10 +
- default-configs/i386-softmmu.mak                   |   1 +
- default-configs/x86_64-softmmu.mak                 |   1 +
- docs/amd-memory-encryption.txt                     | 109 +++
- hmp-commands-info.hx                               |  16 +
- hmp.h                                              |   1 +
- hw/core/machine.c                                  |  22 +
- hw/i386/pc_sysfw.c                                 |  13 +
- include/hw/boards.h                                |   1 +
- include/standard-headers/linux/input-event-codes.h |   1 +
- include/standard-headers/linux/input.h             |  11 +
- include/standard-headers/linux/pci_regs.h          |  30 +-
- include/standard-headers/linux/virtio_net.h        |  13 +
- include/standard-headers/linux/virtio_ring.h       |   2 +-
- include/standard-headers/rdma/vmw_pvrdma-abi.h     |  13 +-
- include/sysemu/kvm.h                               |  17 +
- include/sysemu/sev.h                               |  21 +
- linux-headers/asm-powerpc/kvm.h                    |   2 +
- linux-headers/asm-powerpc/unistd.h                 |   3 +
- linux-headers/asm-s390/unistd.h                    | 401 +---------
- linux-headers/asm-s390/unistd_32.h                 | 364 +++++++++
- linux-headers/asm-s390/unistd_64.h                 | 331 +++++++++
- linux-headers/asm-x86/kvm_para.h                   |   5 +
- linux-headers/linux/kvm.h                          |  92 +++
- linux-headers/linux/psci.h                         |   3 +
- linux-headers/linux/psp-sev.h                      | 142 ++++
- linux-headers/linux/vfio.h                         |  72 ++
- monitor.c                                          |  21 +
- qapi/misc.json                                     | 148 ++++
- qemu-options.hx                                    |  49 +-
- scripts/update-linux-headers.sh                    |   5 +-
- target/i386/Makefile.objs                          |   2 +
- target/i386/cpu.c                                  |  14 +
- target/i386/cpu.h                                  |   3 +
- target/i386/kvm.c                                  |  13 +
- target/i386/machine.c                              |  20 +
- target/i386/monitor.c                              |  66 ++
- target/i386/sev-stub.c                             |  51 ++
- target/i386/sev.c                                  | 811 +++++++++++++++++++++
- target/i386/sev_i386.h                             |  88 +++
- target/i386/trace-events                           |  10 +
- tests/qmp-test.c                                   |   5 +
- 46 files changed, 2653 insertions(+), 420 deletions(-)
- create mode 100644 accel/kvm/sev-stub.c
- create mode 100644 docs/amd-memory-encryption.txt
- create mode 100644 include/sysemu/sev.h
- create mode 100644 linux-headers/asm-s390/unistd_32.h
- create mode 100644 linux-headers/asm-s390/unistd_64.h
- create mode 100644 linux-headers/linux/psp-sev.h
- create mode 100644 target/i386/sev-stub.c
- create mode 100644 target/i386/sev.c
- create mode 100644 target/i386/sev_i386.h
--- 
-1.8.3.1
-
-
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 34733f9..019d84c 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -70,7 +70,7 @@ sev_ioctl(int fd, int cmd, void *data, int *error)
- 
-     input.id = cmd;
-     input.sev_fd = fd;
--    input.data = (__u64)data;
-+    input.data = (__u64)(unsigned long)data;
- 
-     r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_OP, &input);
- 
-@@ -131,13 +131,13 @@ sev_ram_block_added(RAMBlockNotifier *n, void *host, size_t size)
-     int r;
-     struct kvm_enc_region range;
- 
--    range.addr = (__u64)host;
-+    range.addr = (__u64)(unsigned long)host;
-     range.size = size;
- 
-     trace_kvm_memcrypt_register_region(host, size);
-     r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_REG_REGION, &range);
-     if (r) {
--        error_report("%s: failed to register region (%p+%#lx) error '%s'",
-+        error_report("%s: failed to register region (%p+%#zx) error '%s'",
-                      __func__, host, size, strerror(errno));
-         exit(1);
-     }
-@@ -149,13 +149,13 @@ sev_ram_block_removed(RAMBlockNotifier *n, void *host, size_t size)
-     int r;
-     struct kvm_enc_region range;
- 
--    range.addr = (__u64)host;
-+    range.addr = (__u64)(unsigned long)host;
-     range.size = size;
- 
-     trace_kvm_memcrypt_unregister_region(host, size);
-     r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_UNREG_REGION, &range);
-     if (r) {
--        error_report("%s: failed to unregister region (%p+%#lx)",
-+        error_report("%s: failed to unregister region (%p+%#zx)",
-                      __func__, host, size);
-     }
- }
-@@ -588,7 +588,7 @@ sev_launch_update_data(uint8_t *addr, uint64_t len)
-         return 1;
-     }
- 
--    update.uaddr = (__u64)addr;
-+    update.uaddr = (__u64)(unsigned long)addr;
-     update.len = len;
-     trace_kvm_sev_launch_update_data(addr, len);
-     ret = sev_ioctl(sev_state->sev_fd, KVM_SEV_LAUNCH_UPDATE_DATA,
-diff --git a/target/i386/trace-events b/target/i386/trace-events
-index b1fbde6..6a19a69 100644
---- a/target/i386/trace-events
-+++ b/target/i386/trace-events
-@@ -8,8 +8,8 @@ kvm_x86_update_msi_routes(int num) "Updated %d MSI routes"
- 
- # target/i386/sev.c
- kvm_sev_init(void) ""
--kvm_memcrypt_register_region(void *addr, size_t len) "addr %p len 0x%lu"
--kvm_memcrypt_unregister_region(void *addr, size_t len) "addr %p len 0x%lu"
-+kvm_memcrypt_register_region(void *addr, size_t len) "addr %p len 0x%zu"
-+kvm_memcrypt_unregister_region(void *addr, size_t len) "addr %p len 0x%zu"
- kvm_sev_change_state(const char *old, const char *new) "%s -> %s"
- kvm_sev_launch_start(int policy, void *session, void *pdh) "policy 0x%x session %p pdh %p"
- kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len 0x%" PRIu64
+Reviewed-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
