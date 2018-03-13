@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1evsir-0006UY-0I
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 18:48:46 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1evsin-0004Do-Pt
+	(envelope-from <paolo.bonzini@gmail.com>) id 1evsiq-0006UV-US
 	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 18:48:45 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:40563)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1evsim-0004Ci-Ib
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 18:48:44 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33976)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1evsin-0004DG-KI
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 18:48:41 -0400
-Received: by mail-wr0-x244.google.com with SMTP id s12so14667wre.7
-	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 15:48:41 -0700 (PDT)
+	id 1evsim-0004C0-Bw
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 18:48:40 -0400
+Received: by mail-wr0-x241.google.com with SMTP id o8so2599429wra.1
+	for <qemu-devel@nongnu.org>; Tue, 13 Mar 2018 15:48:40 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 13 Mar 2018 23:47:14 +0100
-Message-Id: <20180313224719.4954-65-pbonzini@redhat.com>
+Date: Tue, 13 Mar 2018 23:47:13 +0100
+Message-Id: <20180313224719.4954-64-pbonzini@redhat.com>
 In-Reply-To: <20180313224719.4954-1-pbonzini@redhat.com>
 References: <20180313224719.4954-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 64/69] replay: avoid recursive call of
- checkpoints
+Subject: [Qemu-devel] [PULL 63/69] replay: check return values of fwrite
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,55 +32,55 @@ Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, Pavel Dovgalyuk <pavel.dovgaluk@
 
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-This patch adds a flag which denies recursive call of replay_checkpoint
-function. Checkpoints may be accompanied by the hardware events. When event
-is processed, virtual device may invoke timer modification functions that
-also invoke the checkpoint function. This leads to infinite loop.
+This patch adds error reporting when fwrite cannot completely
+save the buffer to the file.
 
 Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Message-Id: <20180227095305.1060.56463.stgit@pasha-VirtualBox>
+Message-Id: <20180227095259.1060.86410.stgit@pasha-VirtualBox>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 ---
- replay/replay.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ replay/replay-internal.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/replay/replay.c b/replay/replay.c
-index 90f98b7490..eae8daf18a 100644
---- a/replay/replay.c
-+++ b/replay/replay.c
-@@ -176,13 +176,24 @@ void replay_shutdown_request(ShutdownCause cause)
- bool replay_checkpoint(ReplayCheckpoint checkpoint)
- {
-     bool res = false;
-+    static bool in_checkpoint;
-     assert(EVENT_CHECKPOINT + checkpoint <= EVENT_CHECKPOINT_LAST);
--    replay_save_instructions();
+diff --git a/replay/replay-internal.c b/replay/replay-internal.c
+index 8e7474f787..b077cb5fd5 100644
+--- a/replay/replay-internal.c
++++ b/replay/replay-internal.c
+@@ -24,12 +24,23 @@
+ static QemuMutex lock;
  
-     if (!replay_file) {
-         return true;
-     }
+ /* File for replay writing */
++static bool write_error;
+ FILE *replay_file;
  
-+    if (in_checkpoint) {
-+        /* If we are already in checkpoint, then there is no need
-+           for additional synchronization.
-+           Recursion occurs when HW event modifies timers.
-+           Timer modification may invoke the checkpoint and
-+           proceed to recursion. */
-+        return true;
++static void replay_write_error(void)
++{
++    if (!write_error) {
++        error_report("replay write error");
++        write_error = true;
 +    }
-+    in_checkpoint = true;
++}
 +
-+    replay_save_instructions();
- 
-     if (replay_mode == REPLAY_MODE_PLAY) {
-         g_assert(replay_mutex_locked());
-@@ -204,6 +215,7 @@ bool replay_checkpoint(ReplayCheckpoint checkpoint)
-         res = true;
+ void replay_put_byte(uint8_t byte)
+ {
+     if (replay_file) {
+-        putc(byte, replay_file);
++        if (putc(byte, replay_file) == EOF) {
++            replay_write_error();
++        }
      }
- out:
-+    in_checkpoint = false;
-     return res;
+ }
+ 
+@@ -62,7 +73,9 @@ void replay_put_array(const uint8_t *buf, size_t size)
+ {
+     if (replay_file) {
+         replay_put_dword(size);
+-        fwrite(buf, 1, size, replay_file);
++        if (fwrite(buf, 1, size, replay_file) != size) {
++            replay_write_error();
++        }
+     }
  }
  
 -- 
