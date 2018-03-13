@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robinhe@robinhe-hp.sh.intel.com>) id 1ewT4f-0005ZY-Pl
+	(envelope-from <robinhe@robinhe-hp.sh.intel.com>) id 1ewT4f-0005ZZ-Pm
 	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:37:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robinhe@robinhe-hp.sh.intel.com>) id 1ewT4b-0004nQ-Nl
+	(envelope-from <robinhe@robinhe-hp.sh.intel.com>) id 1ewT4b-0004nG-Dd
 	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:37:41 -0400
-Received: from [112.64.68.174] (port=39097 helo=robinhe-hp.sh.intel.com)
+Received: from [112.64.68.174] (port=39096 helo=robinhe-hp.sh.intel.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <robinhe@robinhe-hp.sh.intel.com>)
-	id 1ewT4b-0004lN-64
+	id 1ewT4a-0004kw-Ot
 	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:37:37 -0400
 From: junyan.he@intel.com
-Date: Tue, 13 Mar 2018 16:33:51 +0800
-Message-Id: <1520930033-18885-9-git-send-email-junyan.he@intel.com>
+Date: Tue, 13 Mar 2018 16:33:46 +0800
+Message-Id: <1520930033-18885-4-git-send-email-junyan.he@intel.com>
 In-Reply-To: <1520930033-18885-1-git-send-email-junyan.he@intel.com>
 References: <1520930033-18885-1-git-send-email-junyan.he@intel.com>
-Subject: [Qemu-devel] [PATCH 08/10] RFC: Add a section_id parameter to
- save_live_iterate call.
+Subject: [Qemu-devel] [PATCH 03/10] RFC: Implement save and support snapshot
+ dependency in block driver layer.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,96 +30,85 @@ Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, crosthwaite.peter@
 
 From: Junyan He <junyan.he@intel.com>
 
-We need to know the section_id when we do snapshot saving.
-Add a parameter to save_live_iterate function call.
-
 Signed-off-by: Junyan He <junyan.he@intel.com>
 ---
- hw/ppc/spapr.c               | 2 +-
- hw/s390x/s390-stattrib.c     | 2 +-
- include/migration/register.h | 2 +-
- migration/block.c            | 2 +-
- migration/ram.c              | 2 +-
- migration/savevm.c           | 2 +-
- 6 files changed, 6 insertions(+), 6 deletions(-)
+ block/snapshot.c         | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ include/block/snapshot.h |  7 +++++++
+ 2 files changed, 52 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 7e1c858..4cde4f4 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1974,7 +1974,7 @@ static int htab_save_later_pass(QEMUFile *f, sPAPRMachineState *spapr,
- #define MAX_ITERATION_NS    5000000 /* 5 ms */
- #define MAX_KVM_BUF_SIZE    2048
- 
--static int htab_save_iterate(QEMUFile *f, void *opaque)
-+static int htab_save_iterate(QEMUFile *f, void *opaque, int section_id)
- {
-     sPAPRMachineState *spapr = opaque;
-     int fd;
-diff --git a/hw/s390x/s390-stattrib.c b/hw/s390x/s390-stattrib.c
-index adf07ef..18ece84 100644
---- a/hw/s390x/s390-stattrib.c
-+++ b/hw/s390x/s390-stattrib.c
-@@ -246,7 +246,7 @@ static int cmma_save(QEMUFile *f, void *opaque, int final)
+diff --git a/block/snapshot.c b/block/snapshot.c
+index eacc1f1..8cc40ac 100644
+--- a/block/snapshot.c
++++ b/block/snapshot.c
+@@ -401,6 +401,51 @@ int bdrv_snapshot_load_tmp_by_id_or_name(BlockDriverState *bs,
      return ret;
  }
  
--static int cmma_save_iterate(QEMUFile *f, void *opaque)
-+static int cmma_save_iterate(QEMUFile *f, void *opaque, int section_id)
- {
-     return cmma_save(f, opaque, 0);
- }
-diff --git a/include/migration/register.h b/include/migration/register.h
-index f4f7bdc..7f7df2c 100644
---- a/include/migration/register.h
-+++ b/include/migration/register.h
-@@ -31,7 +31,7 @@ typedef struct SaveVMHandlers {
-      * use data that is local to the migration thread or protected
-      * by other locks.
-      */
--    int (*save_live_iterate)(QEMUFile *f, void *opaque);
-+    int (*save_live_iterate)(QEMUFile *f, void *opaque, int section_id);
++int bdrv_snapshot_save_dependency(BlockDriverState *bs,
++                                  const char *depend_snapshot_id,
++                                  int64_t depend_offset,
++                                  int64_t depend_size,
++                                  int64_t offset,
++                                  Error **errp)
++{
++    BlockDriver *drv = bs->drv;
++
++    if (!drv) {
++        return -ENOMEDIUM;
++    }
++
++    if (drv->bdrv_snapshot_save_dependency) {
++        return drv->bdrv_snapshot_save_dependency(bs, depend_snapshot_id,
++                                                  depend_offset, depend_size,
++                                                  offset, errp);
++    }
++
++    if (bs->file) {
++        return bdrv_snapshot_save_dependency(bs->file->bs, depend_snapshot_id,
++                                             depend_offset, depend_size,
++                                             offset, errp);
++    }
++
++    return -ENOTSUP;
++}
++
++int bdrv_snapshot_support_dependency(BlockDriverState *bs, int32_t *alignment)
++{
++    BlockDriver *drv = bs->drv;
++    if (!drv || !bdrv_is_inserted(bs) || bdrv_is_read_only(bs)) {
++        return 0;
++    }
++
++    if (drv->bdrv_snapshot_support_dependency) {
++        return drv->bdrv_snapshot_support_dependency(bs, alignment);
++    }
++
++    if (bs->file != NULL) {
++        return bdrv_snapshot_support_dependency(bs->file->bs, alignment);
++    }
++
++    return -ENOTSUP;
++}
  
-     /* This runs outside the iothread lock!  */
-     int (*save_setup)(QEMUFile *f, void *opaque);
-diff --git a/migration/block.c b/migration/block.c
-index 1f03946..6d4c8a3 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -755,7 +755,7 @@ static int block_save_setup(QEMUFile *f, void *opaque)
-     return ret;
- }
+ /* Group operations. All block drivers are involved.
+  * These functions will properly handle dataplane (take aio_context_acquire
+diff --git a/include/block/snapshot.h b/include/block/snapshot.h
+index f73d109..e5bf06f 100644
+--- a/include/block/snapshot.h
++++ b/include/block/snapshot.h
+@@ -73,6 +73,13 @@ int bdrv_snapshot_load_tmp(BlockDriverState *bs,
+ int bdrv_snapshot_load_tmp_by_id_or_name(BlockDriverState *bs,
+                                          const char *id_or_name,
+                                          Error **errp);
++int bdrv_snapshot_save_dependency(BlockDriverState *bs,
++                                  const char *depend_snapshot_id,
++                                  int64_t depend_offset,
++                                  int64_t depend_size,
++                                  int64_t offset,
++                                  Error **errp);
++int bdrv_snapshot_support_dependency(BlockDriverState *bs, int32_t *alignment);
  
--static int block_save_iterate(QEMUFile *f, void *opaque)
-+static int block_save_iterate(QEMUFile *f, void *opaque, int section_id)
- {
-     int ret;
-     int64_t last_ftell = qemu_ftell(f);
-diff --git a/migration/ram.c b/migration/ram.c
-index 3b6c077..d1db422 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2249,7 +2249,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
-  * @f: QEMUFile where to send the data
-  * @opaque: RAMState pointer
-  */
--static int ram_save_iterate(QEMUFile *f, void *opaque)
-+static int ram_save_iterate(QEMUFile *f, void *opaque, int section_id)
- {
-     RAMState **temp = opaque;
-     RAMState *rs = *temp;
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 3a9b904..ce4133a 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1072,7 +1072,7 @@ int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy)
  
-         save_section_header(f, se, QEMU_VM_SECTION_PART);
- 
--        ret = se->ops->save_live_iterate(f, se->opaque);
-+        ret = se->ops->save_live_iterate(f, se->opaque, se->section_id);
-         trace_savevm_section_end(se->idstr, se->section_id, ret);
-         save_section_footer(f, se);
- 
+ /* Group operations. All block drivers are involved.
 -- 
 2.7.4
