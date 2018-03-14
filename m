@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ewA8E-0008FQ-Ia
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 13:24:07 -0400
+	(envelope-from <kwolf@redhat.com>) id 1ewAGH-00038j-SI
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 13:32:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ewA8B-0007do-El
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 13:24:06 -0400
-Date: Wed, 14 Mar 2018 18:23:51 +0100
+	(envelope-from <kwolf@redhat.com>) id 1ewAGG-0004C4-2S
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 13:32:25 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180314172351.GA4764@localhost.localdomain>
-References: <1513877118-3149-1-git-send-email-jack.schwartz@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1513877118-3149-1-git-send-email-jack.schwartz@oracle.com>
-Subject: [Qemu-devel] CVE-2018-7550 (was: multiboot: bss_end_addr can be
- zero / cleanup)
+Date: Wed, 14 Mar 2018 18:32:09 +0100
+Message-Id: <20180314173213.18563-2-kwolf@redhat.com>
+In-Reply-To: <20180314173213.18563-1-kwolf@redhat.com>
+References: <20180314173213.18563-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/5] multiboot: Reject kernels exceeding the
+ address space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,28 +20,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jack Schwartz <jack.schwartz@oracle.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, konrad.wilk@oracle.com, daniel.kiper@oracle.com, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ppandit@redhat.com, qemu-stable@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-stable@nongnu.org, jack.schwartz@oracle.com, anatol.pomozov@gmail.com, ppandit@redhat.com
 
-Am 21.12.2017 um 18:25 hat Jack Schwartz geschrieben:
-> Properly account for the possibility of multiboot kernels with a zero
-> bss_end_addr.  The Multiboot Specification, section 3.1.3 allows for
-> kernels without a bss section, by allowing a zeroed bss_end_addr multiboot
-> header field.
-> 
-> Do some cleanup to multiboot.c as well:
-> - Remove some unused variables.
-> - Use more intuitive header names when displaying fields in messages.
-> - Change fprintf(stderr...) to error_report
+The code path with a manually set mh_load_addr in the Multiboot header
+checks that load_end_addr <= load_addr, but the path where load_end_addr
+is automatically detected if 0 is given in the header misses the
+corresponding check. If the kernel binary size is larger than can fit in
+the address space after load_addr, we ended up with a kernel_size that
+is smaller than load_size, which means that we read the file into a too
+small buffer.
 
-[ Cc: qemu-stable ]
+Add a check to reject kernel files with such Multiboot headers.
 
-This series happens to fix CVE-2018-7550.
-http://www.openwall.com/lists/oss-security/2018/03/08/4
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ hw/i386/multiboot.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Just a shame that we weren't told before merging it so that the
-appropriate tags could have been set in the commit message (and all of
-the problems could have been addressed; I'm going to send another
-Multiboot series now).
-
-Kevin
+diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
+index b9064264d8..1e215bf8d3 100644
+--- a/hw/i386/multiboot.c
++++ b/hw/i386/multiboot.c
+@@ -247,6 +247,10 @@ int load_multiboot(FWCfgState *fw_cfg,
+             }
+             mb_load_size = kernel_file_size - mb_kernel_text_offset;
+         }
++        if (mb_load_size > UINT32_MAX - mh_load_addr) {
++            error_report("kernel does not fit in address space");
++            exit(1);
++        }
+         if (mh_bss_end_addr) {
+             if (mh_bss_end_addr < (mh_load_addr + mb_load_size)) {
+                 error_report("invalid bss_end_addr address");
+-- 
+2.13.6
