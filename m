@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ew7kv-0001mp-5e
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 10:51:54 -0400
+	(envelope-from <juterry@microsoft.com>) id 1ew7mI-0002fT-LG
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 10:53:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ew7ku-0000HJ-HV
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 10:51:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43644 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ew7ku-0000Gy-Dk
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 10:51:52 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 41EF24023155
-	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 14:51:48 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180313165339.GI3545@work-vm> (David Alan Gilbert's message of
-	"Tue, 13 Mar 2018 16:53:40 +0000")
-References: <20180307110010.2205-1-quintela@redhat.com>
-	<20180307110010.2205-9-quintela@redhat.com>
-	<20180313165339.GI3545@work-vm>
-Reply-To: quintela@redhat.com
-Date: Wed, 14 Mar 2018 15:52:31 +0100
-Message-ID: <87vadyso9c.fsf@secure.laptop>
+	(envelope-from <juterry@microsoft.com>) id 1ew7mE-0001AY-Fs
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 10:53:18 -0400
+Received: from mail-co1nam03on0105.outbound.protection.outlook.com
+	([104.47.40.105]:27552
+	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <juterry@microsoft.com>)
+	id 1ew7mE-00018f-8K
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 10:53:14 -0400
+From: "Justin Terry (VM)" <juterry@microsoft.com>
+Date: Wed, 14 Mar 2018 07:52:42 -0700
+Message-Id: <1521039163-138-3-git-send-email-juterry@microsoft.com>
+In-Reply-To: <1521039163-138-1-git-send-email-juterry@microsoft.com>
+References: <1521039163-138-1-git-send-email-juterry@microsoft.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v10 08/24] migration: Add multifd test
+Subject: [Qemu-devel] [PATCH 2/3] WHPX fix WHvSetPartitionProperty in
+ PropertyCode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,30 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, "Justin Terry (VM)" <juterry@microsoft.com>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> * Juan Quintela (quintela@redhat.com) wrote:
->> We set the x-multifd-page-count and x-multifd-channels.
->> 
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->
->
-> This should probably go nearer the end of the series;
+This fixes a breaking change to WHvSetPartitionProperty to pass the 'in'
+PropertyCode on function invocation introduced in Windows Insider SDK 17110.
+Usage of this indicates the PropertyCode of the opaque PropertyBuffer passed in
+on function invocation.
 
-it is _much_ better here.  It makes so much easier to test that I don't
-break neither migration nor multifd while developing O:-)
+Also fixes the removal of the PropertyCode parameter from the
+WHV_PARTITION_PROPERTY struct as it is now passed to the function directly.
 
-> we've also got the problem that things are a bit delicate with TCG so
-> adding more migration tests probably shouldn't happen until Paolo's
-> TCG fixes are worked out.
+Signed-off-by: Justin Terry (VM) <juterry@microsoft.com>
+---
+ target/i386/whpx-all.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-
-> Also, should we be checking for some stats to show all 4 channels were
-> used?
-
-There are traces now, I can add new counters is that is what you want.
-
-Later, Juan.
+diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
+index 2080d58c4c..63e6e1b6f2 100644
+--- a/target/i386/whpx-all.c
++++ b/target/i386/whpx-all.c
+@@ -1278,9 +1278,9 @@ static int whpx_accel_init(MachineState *ms)
+     }
+ 
+     memset(&prop, 0, sizeof(WHV_PARTITION_PROPERTY));
+-    prop.PropertyCode = WHvPartitionPropertyCodeProcessorCount;
+     prop.ProcessorCount = smp_cpus;
+     hr = WHvSetPartitionProperty(whpx->partition,
++                                 WHvPartitionPropertyCodeProcessorCount,
+                                  &prop,
+                                  sizeof(WHV_PARTITION_PROPERTY));
+ 
+-- 
+2.13.6
