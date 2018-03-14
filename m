@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ewDAX-0004jW-6N
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 16:38:42 -0400
+	(envelope-from <sjitindarsingh@gmail.com>) id 1ewGIX-0008KB-Si
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 19:59:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ewDAT-0002Tp-8x
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 16:38:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53606 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ewDAT-0002Ta-4B
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 16:38:37 -0400
-Date: Wed, 14 Mar 2018 22:38:19 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180314223732-mutt-send-email-mst@kernel.org>
-References: <1520426065-40265-1-git-send-email-wei.w.wang@intel.com>
-	<1520426065-40265-3-git-send-email-wei.w.wang@intel.com>
-	<20180314181137.GG3006@work-vm>
-	<20180314211302-mutt-send-email-mst@kernel.org>
-	<20180314194258.GI3006@work-vm>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180314194258.GI3006@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v4 2/4] migration: API to clear bits of
- guest free pages from the dirty bitmap
+	(envelope-from <sjitindarsingh@gmail.com>) id 1ewGIX-0004xj-2K
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 19:59:09 -0400
+Message-ID: <1521071936.5486.0.camel@gmail.com>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Thu, 15 Mar 2018 10:58:56 +1100
+In-Reply-To: <20180314173336.20055-1-clg@kaod.org>
+References: <20180314173336.20055-1-clg@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc: fix tlbsync to
+ check privilege level depending on GTSE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,57 +23,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Wei Wang <wei.w.wang@intel.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Wed, Mar 14, 2018 at 07:42:59PM +0000, Dr. David Alan Gilbert wrote:
-> * Michael S. Tsirkin (mst@redhat.com) wrote:
-> > On Wed, Mar 14, 2018 at 06:11:37PM +0000, Dr. David Alan Gilbert wrote:
-> > > > +            used_len = block->used_length - offset;
-> > > > +            addr += used_len;
-> > > > +        }
-> > > > +
-> > > > +        start = offset >> TARGET_PAGE_BITS;
-> > > > +        npages = used_len >> TARGET_PAGE_BITS;
-> > > > +        ram_state->migration_dirty_pages -=
-> > > > +                      bitmap_count_one_with_offset(block->bmap, start, npages);
-> > > > +        bitmap_clear(block->bmap, start, npages);
-> > > 
-> > > If this is happening while the migration is running, this isn't safe -
-> > > the migration code could clear a bit at about the same point this
-> > > happens, so that the count returned by bitmap_count_one_with_offset
-> > > wouldn't match the word that was cleared by bitmap_clear.
-> > > 
-> > > The only way I can see to fix it is to run over the range using
-> > > bitmap_test_and_clear_atomic, using the return value to decrement
-> > > the number of dirty pages.
-> > > But you also need to be careful with the update of the
-> > > migration_dirty_pages value itself, because that's also being read
-> > > by the migration thread.
-> > > 
-> > > Dave
-> > 
-> > I see that there's migration_bitmap_sync but it does not seem to be
+On Wed, 2018-03-14 at 18:33 +0100, Cédric Le Goater wrote:
+> tlbsync also needs to check the Guest Translation Shootdown Enable
+> (GTSE) bit in the Logical Partition Control Register (LPCR) to
+> determine at which privilege level it is running.
 > 
-> Do you mean bitmap_mutex?
+> See commit c6fd28fd573d ("target/ppc: Update tlbie to check privilege
+> level based on GTSE")
+> 
+> Signed-off-by: Cédric Le Goater <clg@kaod.org>
 
-Yes. Sorry.
+Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-> > taken on all paths. E.g. migration_bitmap_clear_dirty and
-> > migration_bitmap_find_dirty are called without that lock sometimes.
-> > Thoughts?
+> ---
 > 
-> Hmm, that doesn't seem to protect much at all!  It looks like it was
-> originally added to handle hotplug causing the bitmaps to be resized;
-> that extension code was removed in 66103a5 so that lock can probably go.
+>  This will have its importance when we activate the HV bit on the
+>  POWER9 CPU for the PowerNV machine.
 > 
-> I don't see how the lock would help us though; the migration thread is
-> scanning it most of the time so would have to have the lock held
-> most of the time.
+>  target/ppc/translate.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 > 
-> Dave
-> 
-> > -- 
-> > MST
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index 0a0c090c9978..218665b4080b 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -4526,7 +4526,7 @@ static void gen_tlbie(DisasContext *ctx)
+>      TCGv_i32 t1;
+>  
+>      if (ctx->gtse) {
+> -        CHK_SV; /* If gtse is set then tblie is supervisor
+> privileged */
+> +        CHK_SV; /* If gtse is set then tlbie is supervisor
+> privileged */
+
+^^^ Did that line actually change? :)
+
+>      } else {
+>          CHK_HV; /* Else hypervisor privileged */
+>      }
+> @@ -4553,7 +4553,12 @@ static void gen_tlbsync(DisasContext *ctx)
+>  #if defined(CONFIG_USER_ONLY)
+>      GEN_PRIV;
+>  #else
+> -    CHK_HV;
+> +
+> +    if (ctx->gtse) {
+> +        CHK_SV; /* If gtse is set then tlbsync is supervisor
+> privileged */
+> +    } else {
+> +        CHK_HV; /* Else hypervisor privileged */
+> +    }
+>  
+>      /* BookS does both ptesync and tlbsync make tlbsync a nop for
+> server */
+>      if (ctx->insns_flags & PPC_BOOKE) {
