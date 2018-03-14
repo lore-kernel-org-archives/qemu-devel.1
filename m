@@ -1,40 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60508)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1ew6DA-0006vY-Mf
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 09:12:57 -0400
+	(envelope-from <dhildenb@redhat.com>) id 1ew6EL-0007ex-Oe
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 09:14:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1ew6D7-0001fh-Fs
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 09:12:56 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52956
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1ew6D7-0001fN-9I
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 09:12:53 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w2ED970W120562
-	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 09:12:52 -0400
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gq445s3y4-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 09:12:51 -0400
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Wed, 14 Mar 2018 09:12:51 -0400
-References: <20180219141259.26526-1-danielhb@linux.vnet.ibm.com>
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Wed, 14 Mar 2018 10:12:46 -0300
+	(envelope-from <dhildenb@redhat.com>) id 1ew6EI-00023l-Kb
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 09:14:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41258)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dhildenb@redhat.com>) id 1ew6EI-00023M-Cd
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 09:14:06 -0400
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: base64
+From: David Hildenbrand <dhildenb@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180219141259.26526-1-danielhb@linux.vnet.ibm.com>
-Content-Language: en-US
-Message-Id: <eebc1ad7-2191-d9cc-81fd-5fefa9e3b1c8@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 0/2] qmp: 'wakeup-suspend-support' in
- query-target
+Message-Id: <71BA0BC4-C5FD-4286-B3A7-EFF579588F63@redhat.com>
+Date: Wed, 14 Mar 2018 09:14:03 -0400 (EDT)
+References: <797197129.10905208.1521004004370.JavaMail.zimbra@redhat.com>
+In-Reply-To: <797197129.10905208.1521004004370.JavaMail.zimbra@redhat.com>
+Subject: Re: [Qemu-devel] Suggestion on 'virtio-pmem' implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,50 +27,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, armbru@redhat.com, dgilbert@redhat.com, Eric Blake <eblake@redhat.com>
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Rik van Riel <riel@surriel.com>
 
-Ping
-
-On 02/19/2018 11:12 AM, Daniel Henrique Barboza wrote:
-> v5:
-> - removed a paragraph in the recently added qemu_register_wakeup_notifier
-> comment that was added. That paragraph was adding too much in-depth
-> information about the current design of the system_wakeup, making it
-> harder to understand the whole point (suggested by Mike Roth).
-> - previous version link:
-> https://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg00879.html
->
-> v4:
-> - added a comment in 'qemu_register_wakeup_notifier' about the effects
-> of adding a wakeup notifier without proper suspend/wakeup support in the
-> logic of the new wakeup-suspend-support flag, as suggested by Mike Roth
-> - previous version link:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg00358.html
->
-> v3:
-> - added a "(since 2.12)" notation in the new flag, as suggested by
-> Eric Blake
-> - added a "backwards compatible" note in the commit msg
-> - previous version link:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg00093.html
->
-> v2:
-> - changed the approach based on v1 discussions: instead of a new API, add
-> the required flag in QMP query-target
-> - dropped patch 2 since query-target does not have an HMP counterpart
-> - previous version link:
-> https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg00889.html
->
->
-> Daniel Henrique Barboza (2):
->    qmp: adding 'wakeup-suspend-support' in query-target
->    qga: update guest-suspend-ram and guest-suspend-hybrid descriptions
->
->   arch_init.c             |  1 +
->   include/sysemu/sysemu.h |  1 +
->   qapi-schema.json        |  4 +++-
->   qga/qapi-schema.json    | 14 ++++++++++----
->   vl.c                    | 21 +++++++++++++++++++++
->   5 files changed, 36 insertions(+), 5 deletions(-)
->
+SGkgUGFua2FqLA0KDQpJIGhhdmUgYSBwcm90b3R5cGUgKG5ldyBvbmUgZm9yIHZpcnRpby1tZW0g
+SSB3YXMgd29ya2luZyBvbiBvdmVyIHRoZSBsYXN0IHdlZWtzKSBmb3IgZXhhY3RseSB3aGF0IHlv
+dSBuZWVkLiBJIGJhc2ljYWxseSBmYWN0b3JlZCBvdXQgdGhlIG5vdGlvbiBvZiBhIG1lbW9yeSBk
+ZXZpY2UuIFNvIGFsc28gdmlydGlvIGRldmljZXMgY2FuIGJlIG1lbW9yeSBkZXZpY2VzIGFuZCBn
+ZXQgcmVjb2duaXplZCBlLmcuIGluIGZvcm1lcmx5IGtub3duIHBjX2RpbW1fZ2V0X2ZyZWVfYWRk
+cmVzcygpLCBzbyBpdCB3b3JrcyBvdXQgbmljZWx5IHdpdGggb3JkaW5hcnkgbWVtb3J5IGhvdHBs
+dWcgYW5kIHN1Y2guIA0KDQpHdWVzcyB5b3VyIG1haW4gcHJvYmxlbSByaWdodCBub3cgaXMgdGhh
+dCB5b3UgZG9u4oCYdCBjcmVhdGUgYSBtZW1vcnkgc2xvdCBwcm9wZXJseS4gQnV0IEkgYWxzbyBo
+YXZlIGNvZGUgZm9yIHRoYXQgdGhhdCB5b3UgY2FuIGJ1aWx0IG9udG8uDQoNCknigJhtIHJpZ2h0
+IG5vdyBpbiBTcmkgTGFua2Egb24gdmFjYXRpb24sIEnigJhsbCBiZSBiYWNrIG9uIDIzLiBTZXB0
+ZW1iZXIgYW5kIHdpbGwgc2VuZCB5b3UgdGhlIGxpbmsgdG8gYSBicmFuY2ggd2l0aCB0aGUgcHJv
+dG90eXBlIGFzYXAuDQoNClRoYW5rcywNCg0KRGF2aWQgLyBkaGlsZGVuYiAvIGRhdmlkQHJlZGhh
+dC5jb20NCg0KVm9uIG1laW5lbSBpUGhvbmUgZ2VzZW5kZXQNCg0KPiBBbSAxNC4wMy4yMDE4IHVt
+IDEwOjM2IHNjaHJpZWIgUGFua2FqIEd1cHRhIDxwYWd1cHRhQHJlZGhhdC5jb20+Og0KPiANCj4g
+DQo+IA0KPiBIaSwNCj4gDQo+IA0KPiBJIGFtIGltcGxlbWVudGluZyAndmlydGlvLXBtZW0nIGFz
+IGEgbWVjaGFuaXNtIHRvDQo+IGZsdXNoIGd1ZXN0IHdyaXRlcyB3aXRoICdmYWtlIERBWCcgZmx1
+c2hpbmcgaW50ZXJmYWNlLg0KPiANCj4gQmVsb3cgaXMgdGhlIGhpZ2ggbGV2ZWwgZGV0YWlscyBv
+ZiBjb21wb25lbnRzOg0KPiANCj4gMV0gJ3ZpcnRpby1wbWVtJyBkZXZpY2UgZXhwb3NlIGd1ZXN0
+IHBoeXNpY2FsIGFkZHJlc3MNCj4gIGRldGFpbHMoc3RhcnQsIGxlbikuICAgDQo+IA0KPiAyXSAn
+dmlydGlvLXBtZW0nIGRyaXZlciBpbiBndWVzdCBkaXNjb3ZlcnMgdGhpcyANCj4gICAgaW5mb3Jt
+YXRpb24gYW5kIGNvbmZpZ3VyZXMgJ2xpYm52ZGltbScuIEd1ZXN0ICdwbWVtJyANCj4gICAgZHJp
+dmVyIHdvcmtzIG9uIHRoaXMgbWVtb3J5IHJhbmdlLg0KPiANCj4gM10gR3Vlc3QgJ3BtZW0nIGRy
+aXZlciB1c2VzICd2aXJ0aW8tcG1lbScgUFYgZHJpdmVyIHRvIA0KPiAgIHNlbmQgZmx1c2ggY29t
+bWFuZHMuDQo+IA0KPiANCj4gSSBuZWVkIHN1Z2dlc3Rpb24gaW1wbGVtZW50aW5nIHBhcnQgMV0N
+Cj4gDQo+ICogV2hlbiB0cmllZCB3aXRoICdob3RwbHVnX21lbW9yeS5iYXNlJyBhZGRyZXNzIGFz
+IGd1ZXN0IHBoeXNpY2FsIA0KPiAgYWRkcmVzcywgSSBhbSBmYWNpbmcgJ0VQVF9NSVNDT05GSUcn
+IGVycm9ycyB3aGVuIHBtZW0gZG9lcyBta2ZzLiANCj4gIEFmdGVyIGRpZ2dpbmcgbW9yZSBpdCBs
+b29rcyBsaWtlIGFkZHJlc3MgcmFuZ2UgSSBhbSB1c2luZyBhcyBndWVzdA0KPiAgcGh5c2ljYWwg
+YWRkcmVzcyBpcyBlaXRoZXIgYWxyZWFkeSBtYXBwZWQgYXMgTU1JTyBvciByZXNlcnZlZC4gDQo+
+ICBUaG91Z2ggR3Vlc3QgaG90LXBsdWdzIHRoaXMgcGh5c2ljYWwgYWRkcmVzcyBpbnRvIGl0cyB2
+aXJ0dWFsIA0KPiAgbWVtb3J5IHJhbmdlIHdoZW4gZ3Vlc3QgdHJpZXMgdG8gcmVhZC93cml0ZSB0
+aGUgbWVtb3J5IEtWTSBjYW5ub3QgDQo+ICB0cmFuc2xhdGUgdGhlIGFkZHJlc3MgYW5kIHRocm93
+ICdFUFRfTUlTQ09ORklHJyBlcnJvci4NCj4gDQo+ICogV2hpbGUgSSBhbSB0cnlpbmcgdG8gZ2V0
+IHRoZSBhcHByb3ByaWF0ZSBndWVzdCBwaHlzaWNhbCBhZGRyZXNzDQo+ICB3aGljaCBpcyBmcmVl
+LCBJIGNvdWxkIHNlZSBtZW1vcnkgJ3BjX2RpbW1fbWVtb3J5X3BsdWcnIGNvZGUgDQo+ICBoYXMg
+YSBmdW5jdGlvbiAncGNfZGltbV9nZXRfZnJlZV9hZGRyJyB3aGljaCB3b3JrcyB3aXRoICdQQyBE
+SU1NJw0KPiAgY2xhc3MuIEFzIEkgYW0gdXNpbmcgJ1ZJUlRJTycsIHRoZXJlIGlzIG5vIHdheSBB
+RkFJSyB0aGlzIGZ1bmN0aW9uIA0KPiAgY2FuIGJlIHVzZWQgYnkgVklSVElPIG9yIG15IFBWIGRl
+dmljZSBjb2RlLg0KPiANCj4gDQo+IEkgbmVlZCBpZGVhcyB0byBnZXQgdGhlIGZyZWUgZ3Vlc3Qg
+cGh5c2ljYWwgYWRkcmVzcyBmcm9tIG15IFBWIA0KPiBkZXZpY2UgY29kZSBzbyB0aGF0IHdlIGNh
+biB1c2UgdGhpcyByYW5nZSBpbiBndWVzdCBhZGRyZXNzIHNwYWNlLg0KPiANCj4gRmluZCBiZWxv
+dyBwb2ludGVyIHRvIHByZXZpb3VzIGRpc2N1c3Npb246DQo+IA0KPiBodHRwczovL21hcmMuaW5m
+by8/bD1rdm0mbT0xNTE2Mjk3MDk5MDM5NDYmdz0yDQo+IA0KPiBUaGFua3MsDQo+IFBhbmthaiAg
+DQo+IA0K
