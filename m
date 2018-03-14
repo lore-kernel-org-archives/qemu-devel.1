@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ew9QW-0007bA-Qy
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:38:57 -0400
+	(envelope-from <no-reply@patchew.org>) id 1ewA47-00062r-RC
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 13:19:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ew9QV-0004Q7-V6
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:38:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35966 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ew9QV-0004Ph-Px
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:38:55 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4ADCE406E946
-	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 16:38:55 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 14 Mar 2018 17:38:38 +0100
-Message-Id: <20180314163838.7158-9-quintela@redhat.com>
-In-Reply-To: <20180314163838.7158-1-quintela@redhat.com>
-References: <20180314163838.7158-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 8/8] [RFH] tests: Add migration compress
- threads tests
+	(envelope-from <no-reply@patchew.org>) id 1ewA44-000584-IS
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 13:19:51 -0400
+Resent-Message-Id: <E1ewA44-000584-IS@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21148)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ewA44-00056n-BE
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 13:19:48 -0400
+In-Reply-To: <20180314142018.13612-1-james.cowgill@mips.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152104156464.51.2090533779770240410@71c20359a636>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 14 Mar 2018 08:32:45 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] linux-user: implement HWCAP bits on MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,89 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: james.cowgill@mips.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu
 
-Yeap, it is still not working. trying to learn how to debug threads
-for guests running from the testt hardness.
-
-For some reason, compression is not working at the moment, test is
-disabled until I found why.
-
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- tests/migration-test.c | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
-
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index eba40812fc..38c6d281c7 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -785,6 +785,55 @@ static void test_multifd_tcp(void)
-     test_migrate_end(from, to, true);
- }
- 
-+static void test_compress(const char *uri)
-+{
-+    QTestState *from, *to;
-+
-+    test_migrate_start(&from, &to, uri, false);
-+
-+    /* We want to pick a speed slow enough that the test completes
-+     * quickly, but that it doesn't complete precopy even on a slow
-+     * machine, so also set the downtime.
-+     */
-+    /* 1 ms should make it not converge*/
-+    migrate_set_parameter(from, "downtime-limit", "1");
-+    /* 1GB/s */
-+    migrate_set_parameter(from, "max-bandwidth", "1000000000");
-+
-+    migrate_set_parameter(from, "compress-threads", "4");
-+    migrate_set_parameter(to, "decompress-threads", "3");
-+
-+    migrate_set_capability(from, "compress", "true");
-+    migrate_set_capability(to, "compress", "true");
-+    /* Wait for the first serial output from the source */
-+    wait_for_serial("src_serial");
-+
-+    migrate(from, uri);
-+
-+    wait_for_migration_pass(from);
-+
-+    /* 300ms it should converge */
-+    migrate_set_parameter(from, "downtime-limit", "300");
-+
-+    if (!got_stop) {
-+        qtest_qmp_eventwait(from, "STOP");
-+    }
-+    qtest_qmp_eventwait(to, "RESUME");
-+
-+    wait_for_serial("dest_serial");
-+    wait_for_migration_complete(from);
-+
-+    test_migrate_end(from, to, true);
-+}
-+
-+static void test_compress_unix(void)
-+{
-+    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
-+
-+    test_compress(uri);
-+    g_free(uri);
-+}
-+
- int main(int argc, char **argv)
- {
-     char template[] = "/tmp/migration-test-XXXXXX";
-@@ -811,6 +860,9 @@ int main(int argc, char **argv)
-     qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
-     qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
-     qtest_add_func("/migration/multifd/tcp", test_multifd_tcp);
-+    if (0) {
-+        qtest_add_func("/migration/compress/unix", test_compress_unix);
-+    }
- 
-     ret = g_test_run();
- 
--- 
-2.14.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMzE0MTQyMDE4LjEzNjEyLTEtamFtZXMuY293Z2lsbEBtaXBzLmNvbQpT
+dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBsaW51eC11c2VyOiBpbXBsZW1lbnQgSFdDQVAg
+Yml0cyBvbiBNSVBTCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNF
+PWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWls
+ZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGht
+IGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFT
+RS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8k
+dG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNo
+b3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
+IC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4r
+MSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcg
+M2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0
+aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBw
+YXRjaGV3LzIwMTgwMzEyMjIwNzUzLjIwMDk2LTEtZmFyb3Nhc0BsaW51eC52bmV0LmlibS5jb20g
+LT4gcGF0Y2hldy8yMDE4MDMxMjIyMDc1My4yMDA5Ni0xLWZhcm9zYXNAbGludXgudm5ldC5pYm0u
+Y29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODAzMTQxNDIwMTguMTM2
+MTItMS1qYW1lcy5jb3dnaWxsQG1pcHMuY29tIC0+IHBhdGNoZXcvMjAxODAzMTQxNDIwMTguMTM2
+MTItMS1qYW1lcy5jb3dnaWxsQG1pcHMuY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBh
+dGNoZXcvMjAxODAzMTQxNDIxMzMuMTQxNjYtMS1kcmpvbmVzQHJlZGhhdC5jb20gLT4gcGF0Y2hl
+dy8yMDE4MDMxNDE0MjEzMy4xNDE2Ni0xLWRyam9uZXNAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBh
+IG5ldyBicmFuY2ggJ3Rlc3QnCjYyNzAxMDNlOGUgbGludXgtdXNlcjogaW1wbGVtZW50IEhXQ0FQ
+IGJpdHMgb24gTUlQUwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBs
+aW51eC11c2VyOiBpbXBsZW1lbnQgSFdDQVAgYml0cyBvbiBNSVBTLi4uCkVSUk9SOiBicmFjZXMg
+e30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzM1OiBGSUxF
+OiBsaW51eC11c2VyL2VsZmxvYWQuYzo5Njc6CisgICAgZG8geyBpZiAoY3B1LT5lbnYuaW5zbl9m
+bGFncyAmIChmbGFnKSkgeyBod2NhcHMgfD0gaHdjYXA7IH0gfSB3aGlsZSAoMCkKWy4uLl0KCnRv
+dGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMzAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
+bmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
+eSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
+YmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
