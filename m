@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ew51t-0003Gd-4u
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 07:57:14 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ew51u-0003IN-OB
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 07:57:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ew51s-0004k1-EM
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 07:57:13 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40904 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1ew51t-0004kc-TA
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 07:57:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40906 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ew51s-0004js-AC
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 07:57:12 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ew51t-0004kM-OZ
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 07:57:13 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CE2E08182D16
-	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 11:57:11 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4E0508182D16
+	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 11:57:13 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 14 Mar 2018 11:56:02 +0000
-Message-Id: <20180314115618.28831-14-dgilbert@redhat.com>
+Date: Wed, 14 Mar 2018 11:56:03 +0000
+Message-Id: <20180314115618.28831-15-dgilbert@redhat.com>
 In-Reply-To: <20180314115618.28831-1-dgilbert@redhat.com>
 References: <20180314115618.28831-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 13/29] migration/ram:
- ramblock_recv_bitmap_test_byte_offset
+Subject: [Qemu-devel] [PATCH v6 14/29] libvhost-user+postcopy: Register new
+ regions with the ufd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,50 +38,65 @@ Cc: aarcange@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Utility for testing the map when you already know the offset
-in the RAMBlock.
+When new regions are sent to the client using SET_MEM_TABLE, register
+them with the userfaultfd.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- migration/ram.c | 5 +++++
- migration/ram.h | 1 +
- 2 files changed, 6 insertions(+)
+ contrib/libvhost-user/libvhost-user.c | 34 +++++++++++++++++++++++++++++=
++++++
+ 1 file changed, 34 insertions(+)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 7266351fd0..6ce7770b8c 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -169,6 +169,11 @@ int ramblock_recv_bitmap_test(RAMBlock *rb, void *ho=
-st_addr)
-                     rb->receivedmap);
- }
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
+r/libvhost-user.c
+index b2de8ed0a8..7c8cd5878e 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -494,6 +494,40 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUser=
+Msg *vmsg)
+         close(vmsg->fds[i]);
+     }
 =20
-+bool ramblock_recv_bitmap_test_byte_offset(RAMBlock *rb, uint64_t byte_o=
-ffset)
-+{
-+    return test_bit(byte_offset >> TARGET_PAGE_BITS, rb->receivedmap);
-+}
++    /* TODO: Get address back to QEMU */
++    for (i =3D 0; i < dev->nregions; i++) {
++        VuDevRegion *dev_region =3D &dev->regions[i];
++#ifdef UFFDIO_REGISTER
++        /* We should already have an open ufd. Mark each memory
++         * range as ufd.
++         * Note: Do we need any madvises? Well it's not been accessed
++         * yet, still probably need no THP to be safe, discard to be saf=
+e?
++         */
++        struct uffdio_register reg_struct;
++        reg_struct.range.start =3D (uintptr_t)dev_region->mmap_addr;
++        reg_struct.range.len =3D dev_region->size + dev_region->mmap_off=
+set;
++        reg_struct.mode =3D UFFDIO_REGISTER_MODE_MISSING;
 +
- void ramblock_recv_bitmap_set(RAMBlock *rb, void *host_addr)
- {
-     set_bit_atomic(ramblock_recv_bitmap_offset(host_addr, rb), rb->recei=
-vedmap);
-diff --git a/migration/ram.h b/migration/ram.h
-index 53f0021c51..5030be110a 100644
---- a/migration/ram.h
-+++ b/migration/ram.h
-@@ -60,6 +60,7 @@ int ram_postcopy_incoming_init(MigrationIncomingState *=
-mis);
- void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
-=20
- int ramblock_recv_bitmap_test(RAMBlock *rb, void *host_addr);
-+bool ramblock_recv_bitmap_test_byte_offset(RAMBlock *rb, uint64_t byte_o=
-ffset);
- void ramblock_recv_bitmap_set(RAMBlock *rb, void *host_addr);
- void ramblock_recv_bitmap_set_range(RAMBlock *rb, void *host_addr, size_=
-t nr);
++        if (ioctl(dev->postcopy_ufd, UFFDIO_REGISTER, &reg_struct)) {
++            vu_panic(dev, "%s: Failed to userfault region %d "
++                          "@%p + size:%zx offset: %zx: (ufd=3D%d)%s\n",
++                     __func__, i,
++                     dev_region->mmap_addr,
++                     dev_region->size, dev_region->mmap_offset,
++                     dev->postcopy_ufd, strerror(errno));
++            return false;
++        }
++        if (!(reg_struct.ioctls & ((__u64)1 << _UFFDIO_COPY))) {
++            vu_panic(dev, "%s Region (%d) doesn't support COPY",
++                     __func__, i);
++            return false;
++        }
++        DPRINT("%s: region %d: Registered userfault for %llx + %llx\n",
++                __func__, i, reg_struct.range.start, reg_struct.range.le=
+n);
++        /* TODO: Stash 'zero' support flags somewhere */
++#endif
++    }
++
+     return false;
+ }
 =20
 --=20
 2.14.3
