@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ew2by-0000BH-Bn
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 05:22:19 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1ew2tz-0007cR-0h
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 05:40:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ew2bu-0006Bn-0P
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 05:22:18 -0400
-Resent-Message-Id: <E1ew2bu-0006Bn-0P@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21143)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ew2bt-0006BS-R8
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 05:22:13 -0400
-In-Reply-To: <20180313211441.5179-1-jsnow@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152097696263.39.14937366547659300363@71c20359a636>
+	(envelope-from <jcmvbkbc@gmail.com>) id 1ew2ty-0007pa-4J
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 05:40:55 -0400
+Received: from mail-yw0-x230.google.com ([2607:f8b0:4002:c05::230]:39575)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1ew2tx-0007oV-VK
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 05:40:54 -0400
+Received: by mail-yw0-x230.google.com with SMTP id l24so1692028ywk.6
+	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 02:40:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 13 Mar 2018 14:36:03 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 00/13] Bitmaps patches
+In-Reply-To: <000301d3bb73$e997a8e0$bcc6faa0$@ru>
+References: <CAMo8BfLuAdsdRScY+CgTzd0EBn3_kAFc=ysEwgp3MrM_+42viQ@mail.gmail.com>
+	<000301d3bb73$e997a8e0$bcc6faa0$@ru>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Wed, 14 Mar 2018 02:40:52 -0700
+Message-ID: <CAMo8Bf+seSrT9HBFL1tspoDQ-9s9nGrXueYRt6v2nF4XzZbdfA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] regression in timer code?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +28,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jsnow@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: Pavel Dovgaluk <Pavel.Dovgaluk@ispras.ru>, qemu-devel <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMzEzMjExNDQxLjUxNzktMS1qc25vd0ByZWRoYXQuY29tClN1YmplY3Q6
-IFtRZW11LWRldmVsXSBbUFVMTCAwMC8xM10gQml0bWFwcyBwYXRjaGVzCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAt
-LW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQg
-bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
-CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
-bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
-cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
-ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
-VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
-NDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVt
-dQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwMzEyMTcyMTI0LjU2NDYx
-LTEtZGdpbGJlcnRAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwMzEyMTcyMTI0LjU2NDYxLTEt
-ZGdpbGJlcnRAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIw
-MTgwMzEzMjExNDQxLjUxNzktMS1qc25vd0ByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODAzMTMy
-MTE0NDEuNTE3OS0xLWpzbm93QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0Jwo2ZGJhZmY0OTA5IGlvdGVzdHM6IGFkZCBkaXJ0eSBiaXRtYXAgcG9zdGNvcHkgdGVzdAo5
-NzAyNzJhNzY5IGlvdGVzdHM6IGFkZCBkaXJ0eSBiaXRtYXAgbWlncmF0aW9uIHRlc3QKMGE0Y2Zk
-MDI2NiBtaWdyYXRpb246IGFkZCBwb3N0Y29weSBtaWdyYXRpb24gb2YgZGlydHkgYml0bWFwcwoz
-OWZkYmIwZTc4IG1pZ3JhdGlvbjogYWxsb3cgcW1wIGNvbW1hbmQgbWlncmF0ZS1zdGFydC1wb3N0
-Y29weSBmb3IgYW55IHBvc3Rjb3B5Cjk1YmUzN2I0ZGYgbWlncmF0aW9uOiBhZGQgaXNfYWN0aXZl
-X2l0ZXJhdGUgaGFuZGxlcgplYmNlNWExMWM5IG1pZ3JhdGlvbi9xZW11LWZpbGU6IGFkZCBxZW11
-X3B1dF9jb3VudGVkX3N0cmluZygpCmIyZTNhM2UwZjcgbWlncmF0aW9uOiBpbmNsdWRlIG1pZ3Jh
-dGVfZGlydHlfYml0bWFwcyBpbiBtaWdyYXRlX3Bvc3Rjb3B5CmQyMzQ0ODNiNDAgcWFwaTogYWRk
-IGRpcnR5LWJpdG1hcHMgbWlncmF0aW9uIGNhcGFiaWxpdHkKNmIyNGVlYmQzMiBtaWdyYXRpb246
-IGludHJvZHVjZSBwb3N0Y29weS1vbmx5IHBlbmRpbmcKYThjYTM4OTUyOCBkaXJ0eS1iaXRtYXA6
-IGFkZCBsb2NrZWQgc3RhdGUKNDhjZmMxMTc2YyBibG9jay9kaXJ0eS1iaXRtYXA6IGFkZCBfbG9j
-a2VkIHZlcnNpb24gb2YgYmRydl9yZWNsYWltX2RpcnR5X2JpdG1hcAo4YmM5ZTE3ZTYyIGJsb2Nr
-L2RpcnR5LWJpdG1hcDogZml4IGxvY2tpbmcgaW4gYmRydl9yZWNsYWltX2RpcnR5X2JpdG1hcApj
-ZTJjZjE3Yjk4IGJsb2NrL2RpcnR5LWJpdG1hcDogYWRkIGJkcnZfZGlydHlfYml0bWFwX2VuYWJs
-ZV9zdWNjZXNzb3IoKQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMzog
-YmxvY2svZGlydHktYml0bWFwOiBhZGQgYmRydl9kaXJ0eV9iaXRtYXBfZW5hYmxlX3N1Y2Nlc3Nv
-cigpLi4uCkNoZWNraW5nIFBBVENIIDIvMTM6IGJsb2NrL2RpcnR5LWJpdG1hcDogZml4IGxvY2tp
-bmcgaW4gYmRydl9yZWNsYWltX2RpcnR5X2JpdG1hcC4uLgpDaGVja2luZyBQQVRDSCAzLzEzOiBi
-bG9jay9kaXJ0eS1iaXRtYXA6IGFkZCBfbG9ja2VkIHZlcnNpb24gb2YgYmRydl9yZWNsYWltX2Rp
-cnR5X2JpdG1hcC4uLgpDaGVja2luZyBQQVRDSCA0LzEzOiBkaXJ0eS1iaXRtYXA6IGFkZCBsb2Nr
-ZWQgc3RhdGUuLi4KQ2hlY2tpbmcgUEFUQ0ggNS8xMzogbWlncmF0aW9uOiBpbnRyb2R1Y2UgcG9z
-dGNvcHktb25seSBwZW5kaW5nLi4uCkNoZWNraW5nIFBBVENIIDYvMTM6IHFhcGk6IGFkZCBkaXJ0
-eS1iaXRtYXBzIG1pZ3JhdGlvbiBjYXBhYmlsaXR5Li4uCkNoZWNraW5nIFBBVENIIDcvMTM6IG1p
-Z3JhdGlvbjogaW5jbHVkZSBtaWdyYXRlX2RpcnR5X2JpdG1hcHMgaW4gbWlncmF0ZV9wb3N0Y29w
-eS4uLgpDaGVja2luZyBQQVRDSCA4LzEzOiBtaWdyYXRpb24vcWVtdS1maWxlOiBhZGQgcWVtdV9w
-dXRfY291bnRlZF9zdHJpbmcoKS4uLgpDaGVja2luZyBQQVRDSCA5LzEzOiBtaWdyYXRpb246IGFk
-ZCBpc19hY3RpdmVfaXRlcmF0ZSBoYW5kbGVyLi4uCkNoZWNraW5nIFBBVENIIDEwLzEzOiBtaWdy
-YXRpb246IGFsbG93IHFtcCBjb21tYW5kIG1pZ3JhdGUtc3RhcnQtcG9zdGNvcHkgZm9yIGFueSBw
-b3N0Y29weS4uLgpDaGVja2luZyBQQVRDSCAxMS8xMzogbWlncmF0aW9uOiBhZGQgcG9zdGNvcHkg
-bWlncmF0aW9uIG9mIGRpcnR5IGJpdG1hcHMuLi4KRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNz
-YXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNzQwOiBGSUxFOiBtaWdyYXRpb24v
-YmxvY2stZGlydHktYml0bWFwLmM6NjkwOgorICAgIH0gd2hpbGUgKCEocy5mbGFncyAmIERJUlRZ
-X0JJVE1BUF9NSUdfRkxBR19FT1MpKTsKWy4uLl0KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
-cywgODE2IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KCkNoZWNraW5nIFBBVENIIDEyLzEzOiBpb3Rlc3RzOiBhZGQgZGlydHkgYml0bWFwIG1pZ3Jh
-dGlvbiB0ZXN0Li4uCkNoZWNraW5nIFBBVENIIDEzLzEzOiBpb3Rlc3RzOiBhZGQgZGlydHkgYml0
-bWFwIHBvc3Rjb3B5IHRlc3QuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhp
-dGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
-YXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
-byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Wed, Mar 14, 2018 at 2:07 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
+>> From: Max Filippov [mailto:jcmvbkbc@gmail.com]
+>> the commit b39e3f34c9de7ead6a11a74aa2de78baf41d81a7
+>> ("icount: fixed saving/restoring of icount warp timers") has changed
+>> something that made timers test for target/xtensa unstable.
+>> Specifically ccount_write case in the tests/tcg/xtensa/test_timer.S
+>> now fails for me about half of the times it is run. Given that it is run
+>> under -icount I guess this is a bug. Could you please take a look?
+>>
+>> The minimal test case is available here:
+>>   http://jcmvbkbc.spb.ru/~dumb/tmp/201803131306/test_timer.tst
+>> It is run as
+>>   qemu-system-xtensa -M sim -cpu dc232b -nographic -semihosting
+>> -icount 7  -kernel ./test_timer.tst
+>
+> I investigated your test and concluded the following.
+> First, update_ccount is inaccurate opration because of the division
+> with the remainder:
+>     env->sregs[CCOUNT] = env->ccount_base +
+>         (uint32_t)((now - env->time_base) *
+>                    env->config->clock_freq_khz / 1000000);
+>
+> Therefore, the following sequence in the test may give different result depending
+> of the actual value of "now" variable.
+
+But the expression above depends on the difference between the now
+and env->time_base, both these values are read from
+ qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) and, most importantly,
+the test is 100% deterministic, i.e. it runs under -icount and there's no
+external factors involved, no waiting for anything, not even interrupts.
+Thus the difference must be constant, i.e. I must see consistent results.
+Am I wrong somewhere?
+
+>     rsr     a3, ccount
+>     rsr     a4, ccount
+>     sub     a4, a4, a3
+>
+> Consider the code:
+>
+> test ccount_write
+>     rsr     a3, ccount
+>     rsr     a4, ccount
+>     sub     a4, a4, a3 ; usually 1, but sometimes 2 because of rounding
+>     movi    a2, 0x12345678
+>     wsr     a2, ccount
+>     esync
+>     rsr     a3, ccount
+>     sub     a3, a3, a2 ; usually 3 (esync + yield + rsr), but sometimes 4 because of rounding
+>     slli    a4, a4, 2  ; 4 or 8
+>     assert  ltu, a3, a4 ; (3 or 4) < (4 or 8) ?
+> test_end
+>
+> Therefore in some cases we get a4=4 and a3=4 that forces the test to fail.
+
+-- 
+Thanks.
+-- Max
