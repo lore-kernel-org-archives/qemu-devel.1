@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ewBOA-0001bL-EG
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 14:44:40 -0400
+	(envelope-from <benjamin.drung@profitbricks.com>) id 1ewBkl-0007pw-HY
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 15:08:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ewBO5-0003oI-FU
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 14:44:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50606 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ewBO5-0003ny-8D
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 14:44:33 -0400
-Date: Wed, 14 Mar 2018 18:44:20 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180314184419.GH3006@work-vm>
-References: <1520426065-40265-1-git-send-email-wei.w.wang@intel.com>
-	<1520426065-40265-4-git-send-email-wei.w.wang@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1520426065-40265-4-git-send-email-wei.w.wang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v4 3/4] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_HINT
+	(envelope-from <benjamin.drung@profitbricks.com>) id 1ewBkh-0007ID-C0
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 15:07:59 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:53742)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <benjamin.drung@profitbricks.com>)
+	id 1ewBkh-0007Ha-2l
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 15:07:55 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id e194so6096532wmd.3
+	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 12:07:54 -0700 (PDT)
+Message-ID: <1521054471.6268.26.camel@profitbricks.com>
+From: Benjamin Drung <benjamin.drung@profitbricks.com>
+Date: Wed, 14 Mar 2018 20:07:51 +0100
+In-Reply-To: <e5af8c70-e6e4-682a-bbd7-6b914b813737@redhat.com>
+References: <20180304210608.vn33p6pn7t2nsxv4@var.youpi.perso.aquilenet.fr>
+	<20180308185743.3408-1-benjamin.drung@profitbricks.com>
+	<88890d90-4dc6-bac3-4591-f29a271181df@redhat.com>
+	<1520539656.6051.11.camel@profitbricks.com>
+	<e5af8c70-e6e4-682a-bbd7-6b914b813737@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 2/2 v2] slirp: Add classless static routes
+ support to DHCP server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,314 +34,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: Eric Blake <eblake@redhat.com>, Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Samuel Thibault <samuel.thibault@gnu.org>, Jan Kiszka <jan.kiszka@siemens.com>
+Cc: qemu-devel@nongnu.org
 
-* Wei Wang (wei.w.wang@intel.com) wrote:
-> The new feature enables the virtio-balloon device to receive hints of
-> guest free pages from the free page vq.
+Am Donnerstag, den 08.03.2018, 14:21 -0600 schrieb Eric Blake:
+> On 03/08/2018 02:07 PM, Benjamin Drung wrote:
+> > Am Donnerstag, den 08.03.2018, 13:46 -0600 schrieb Eric Blake:
+> > > On 03/08/2018 12:57 PM, Benjamin Drung wrote:
+> > > >        '*dnssearch': ['String'],
+> > > >        '*domainname': 'str',
+> > > > +    '*route':     ['String'],
+> > > 
+> > > I know we've used ['String'] for previous members, but that's
+> > > rather
+> > > heavyweight - it transmits over QMP as:
+> > > 
+> > > "dnssearch": [ { "str": "foo" }, { "str": "bar" } ]
+> > > 
+> > > Nicer is ['str'], which transmits as:
+> > > 
+> > > "route": [ "foo", "bar" ]
+> > > 
+> > > so the question boils down to whether cross-member consistency is
+> > > more
+> > > important than making your additions concise.
+> > 
+> > Agreed that ['str'] is nicer. I will update the patch.
 > 
-> balloon_free_page_start - start guest free page hint reporting.
-> balloon_free_page_stop - stop guest free page hint reporting.
+> The problem is that ['str'] might not work easily for the command
+> line 
+> glue; I'm more familiar with how QMP exposes things than with the 
+> command line parsing, and Markus, who is trying to improve command
+> line 
+> parsing to share more common infrastructure with QMP, might have
+> better 
+> comments on the topic, except that he's on leave for a few weeks and 
+> won't respond until after 2.12 is frozen.  Using ['String'] for 
+> consistency is therefore okay, if you can't get ['str'] working
+> quickly.
+
+['str'] works and was easily changeable.
+
+> > > > @@ -1904,7 +1904,7 @@ DEF("netdev", HAS_ARG,
+> > > > QEMU_OPTION_netdev,
+> > > >        "         [,ipv6[=on|off]][,ipv6-net=addr[/int]][,ipv6-
+> > > > host=addr]\n"
 > 
-> Note: balloon will report pages which were free at the time
-> of this call. As the reporting happens asynchronously, dirty bit logging
-> must be enabled before this call is made. Guest reporting must be
-> disabled before the migration dirty bitmap is synchronized.
+> Here's an example where we made the command line smart.  ipv6-net
+> takes 
+> TWO pieces of information: addr/int; on the QMP side, we spelled it 
+> '*ipv6-prefix':'str' + 'ipv6-prefixlen':'int'.  So somewhere in the 
+> command line parsing code for --net (which I'm less familiar with), 
+> there is some glue code taking the compact representation and
+> splitting 
+> it into the more verbose but more direct QMP representation - well,
+> that 
+> is, if we are converting it into QMP form at all (part of the problem
+> is 
+> that our command line and runtime control don't always share code, 
+> although we're trying to get better at that).
+
+The split is done net_client_init() before iterating over the options.
+This is equivalent to having following command line parameter:
+
+  [,ipv6-prefix=addr][,ipv6-prefixlen=int]
+
+instead of
+
+  [,ipv6-net=addr[/int]]
+
+> > > > +    "         [,route=addr/mask[:gateway]][,tftp=dir][,bootfil
+> > > > e=f]
+> > > > [,hostfwd=rule][,guestfwd=rule]"
+> > > 
+> > > Urgh - your QMP interface HAS to be further parsed to get to the
+> > > useful
+> > > information.  While it's nice to have compact syntax on the
+> > > command
+> > > line, it is really worth thinking about making information easier
+> > > to
+> > > consume (that is, NO further parsing required once the
+> > > information is
+> > > in
+> > > JSON format).  Would it be any better to send things over the
+> > > wire
+> > > as:
+> > > 
+> > > "route": [ { "addr": "...", "mask": 24, "gateway": "..." } ]
+> > 
+> > That's looks good.
 > 
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> Signed-off-by: Liang Li <liang.z.li@intel.com>
-> CC: Michael S. Tsirkin <mst@redhat.com>
-> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> CC: Juan Quintela <quintela@redhat.com>
-> ---
->  balloon.c                                       |  49 +++++--
->  hw/virtio/virtio-balloon.c                      | 183 +++++++++++++++++++++---
->  include/hw/virtio/virtio-balloon.h              |  15 +-
->  include/standard-headers/linux/virtio_balloon.h |   7 +
->  include/sysemu/balloon.h                        |  15 +-
->  5 files changed, 240 insertions(+), 29 deletions(-)
-
-<snip>
-
-> +    qemu_thread_create(&s->free_page_thread, "free_page_optimization_thread",
-
-Note the maximum size of thread name is normally 14 chars, and also we
-don't need to say 'thread' since we know it's a thread; I suggest
-shortening it to "free_page_opt" or "balloon_fpo"
-
-Dave
-
-> +                       virtio_balloon_poll_free_page_hints, s,
-> +                       QEMU_THREAD_JOINABLE);
-> +}
-> +
-> +static void virtio_balloon_free_page_stop(void *opaque)
-> +{
-> +    VirtIOBalloon *s = opaque;
-> +    VirtIODevice *vdev = VIRTIO_DEVICE(s);
-> +
-> +    switch (s->free_page_report_status) {
-> +    case FREE_PAGE_REPORT_S_REQUESTED:
-> +    case FREE_PAGE_REPORT_S_START:
-> +        /*
-> +         * The guest hasn't done the reporting, so host sends a notification
-> +         * to the guest to actively stop the reporting before joining the
-> +         * optimization thread.
-> +         */
-> +        s->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
-> +        virtio_notify_config(vdev);
-> +    case FREE_PAGE_REPORT_S_STOP:
-> +        /* The guest has stopped the reporting. Join the optimization thread */
-> +        qemu_thread_join(&s->free_page_thread);
-> +        s->free_page_report_status = FREE_PAGE_REPORT_S_EXIT;
-> +    case FREE_PAGE_REPORT_S_EXIT:
-> +        /* The optimization thread has gone. No actions needded so far. */
-> +        break;
-> +    }
-> +}
-> +
->  static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
->  {
->      VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
-> @@ -315,6 +421,15 @@ static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
->  
->      config.num_pages = cpu_to_le32(dev->num_pages);
->      config.actual = cpu_to_le32(dev->actual);
-> +    config.poison_val = cpu_to_le32(dev->poison_val);
-> +
-> +    if (dev->free_page_report_status >= FREE_PAGE_REPORT_S_STOP) {
-> +        config.free_page_report_cmd_id =
-> +                       cpu_to_le32(VIRTIO_BALLOON_FREE_PAGE_REPORT_STOP_ID);
-> +    } else {
-> +        config.free_page_report_cmd_id =
-> +                       cpu_to_le32(dev->free_page_report_cmd_id);
-> +    }
->  
->      trace_virtio_balloon_get_config(config.num_pages, config.actual);
->      memcpy(config_data, &config, sizeof(struct virtio_balloon_config));
-> @@ -368,6 +483,7 @@ static void virtio_balloon_set_config(VirtIODevice *vdev,
->                          ((ram_addr_t) dev->actual << VIRTIO_BALLOON_PFN_SHIFT),
->                          &error_abort);
->      }
-> +    dev->poison_val = le32_to_cpu(config.poison_val);
->      trace_virtio_balloon_set_config(dev->actual, oldactual);
->  }
->  
-> @@ -377,6 +493,11 @@ static uint64_t virtio_balloon_get_features(VirtIODevice *vdev, uint64_t f,
->      VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
->      f |= dev->host_features;
->      virtio_add_feature(&f, VIRTIO_BALLOON_F_STATS_VQ);
-> +
-> +    if (dev->host_features & 1ULL << VIRTIO_BALLOON_F_FREE_PAGE_HINT) {
-> +        virtio_add_feature(&f, VIRTIO_BALLOON_F_PAGE_POISON);
-> +    }
-> +
->      return f;
->  }
->  
-> @@ -413,6 +534,18 @@ static int virtio_balloon_post_load_device(void *opaque, int version_id)
->      return 0;
->  }
->  
-> +static const VMStateDescription vmstate_virtio_balloon_free_page_report = {
-> +    .name = "virtio-balloon-device/free-page-report",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .needed = virtio_balloon_free_page_support,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT32(free_page_report_cmd_id, VirtIOBalloon),
-> +        VMSTATE_UINT32(poison_val, VirtIOBalloon),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->  static const VMStateDescription vmstate_virtio_balloon_device = {
->      .name = "virtio-balloon-device",
->      .version_id = 1,
-> @@ -423,30 +556,30 @@ static const VMStateDescription vmstate_virtio_balloon_device = {
->          VMSTATE_UINT32(actual, VirtIOBalloon),
->          VMSTATE_END_OF_LIST()
->      },
-> +    .subsections = (const VMStateDescription * []) {
-> +        &vmstate_virtio_balloon_free_page_report,
-> +        NULL
-> +    }
->  };
->  
->  static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
->  {
->      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
->      VirtIOBalloon *s = VIRTIO_BALLOON(dev);
-> -    int ret;
->  
->      virtio_init(vdev, "virtio-balloon", VIRTIO_ID_BALLOON,
->                  sizeof(struct virtio_balloon_config));
->  
-> -    ret = qemu_add_balloon_handler(virtio_balloon_to_target,
-> -                                   virtio_balloon_stat, s);
-> -
-> -    if (ret < 0) {
-> -        error_setg(errp, "Only one balloon device is supported");
-> -        virtio_cleanup(vdev);
-> -        return;
-> -    }
-> -
->      s->ivq = virtio_add_queue(vdev, 128, virtio_balloon_handle_output);
->      s->dvq = virtio_add_queue(vdev, 128, virtio_balloon_handle_output);
->      s->svq = virtio_add_queue(vdev, 128, virtio_balloon_receive_stats);
-> -
-> +    if (virtio_has_feature(s->host_features,
-> +                           VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-> +        s->free_page_vq = virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE, NULL);
-> +        s->free_page_report_status = FREE_PAGE_REPORT_S_EXIT;
-> +        s->free_page_report_cmd_id =
-> +                           VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN - 1;
-> +    }
->      reset_stats(s);
->  }
->  
-> @@ -475,11 +608,27 @@ static void virtio_balloon_set_status(VirtIODevice *vdev, uint8_t status)
->  {
->      VirtIOBalloon *s = VIRTIO_BALLOON(vdev);
->  
-> -    if (!s->stats_vq_elem && vdev->vm_running &&
-> -        (status & VIRTIO_CONFIG_S_DRIVER_OK) && virtqueue_rewind(s->svq, 1)) {
-> -        /* poll stats queue for the element we have discarded when the VM
-> -         * was stopped */
-> -        virtio_balloon_receive_stats(vdev, s->svq);
-> +    if (status & VIRTIO_CONFIG_S_DRIVER_OK) {
-> +        if (!s->stats_vq_elem && vdev->vm_running &&
-> +            virtqueue_rewind(s->svq, 1)) {
-> +            /*
-> +             * Poll stats queue for the element we have discarded when the VM
-> +             * was stopped.
-> +             */
-> +            virtio_balloon_receive_stats(vdev, s->svq);
-> +        }
-> +
-> +        if (virtio_balloon_free_page_support(s)) {
-> +            qemu_add_balloon_handler(virtio_balloon_to_target,
-> +                                     virtio_balloon_stat,
-> +                                     virtio_balloon_free_page_support,
-> +                                     virtio_balloon_free_page_start,
-> +                                     virtio_balloon_free_page_stop,
-> +                                     s);
-> +        } else {
-> +            qemu_add_balloon_handler(virtio_balloon_to_target,
-> +                                     virtio_balloon_stat, NULL, NULL, NULL, s);
-> +        }
->      }
->  }
->  
-> @@ -509,6 +658,8 @@ static const VMStateDescription vmstate_virtio_balloon = {
->  static Property virtio_balloon_properties[] = {
->      DEFINE_PROP_BIT("deflate-on-oom", VirtIOBalloon, host_features,
->                      VIRTIO_BALLOON_F_DEFLATE_ON_OOM, false),
-> +    DEFINE_PROP_BIT("free-page-hint", VirtIOBalloon, host_features,
-> +                    VIRTIO_BALLOON_F_FREE_PAGE_HINT, false),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
-> index 1ea13bd..12fde2f 100644
-> --- a/include/hw/virtio/virtio-balloon.h
-> +++ b/include/hw/virtio/virtio-balloon.h
-> @@ -23,6 +23,8 @@
->  #define VIRTIO_BALLOON(obj) \
->          OBJECT_CHECK(VirtIOBalloon, (obj), TYPE_VIRTIO_BALLOON)
->  
-> +#define VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN 0x80000000
-> +
->  typedef struct virtio_balloon_stat VirtIOBalloonStat;
->  
->  typedef struct virtio_balloon_stat_modern {
-> @@ -31,15 +33,26 @@ typedef struct virtio_balloon_stat_modern {
->         uint64_t val;
->  } VirtIOBalloonStatModern;
->  
-> +enum virtio_balloon_free_page_report_status {
-> +    FREE_PAGE_REPORT_S_REQUESTED,
-> +    FREE_PAGE_REPORT_S_START,
-> +    FREE_PAGE_REPORT_S_STOP,
-> +    FREE_PAGE_REPORT_S_EXIT,
-> +};
-> +
->  typedef struct VirtIOBalloon {
->      VirtIODevice parent_obj;
-> -    VirtQueue *ivq, *dvq, *svq;
-> +    VirtQueue *ivq, *dvq, *svq, *free_page_vq;
-> +    uint32_t free_page_report_status;
->      uint32_t num_pages;
->      uint32_t actual;
-> +    uint32_t free_page_report_cmd_id;
-> +    uint32_t poison_val;
->      uint64_t stats[VIRTIO_BALLOON_S_NR];
->      VirtQueueElement *stats_vq_elem;
->      size_t stats_vq_offset;
->      QEMUTimer *stats_timer;
-> +    QemuThread free_page_thread;
->      int64_t stats_last_update;
->      int64_t stats_poll_interval;
->      uint32_t host_features;
-> diff --git a/include/standard-headers/linux/virtio_balloon.h b/include/standard-headers/linux/virtio_balloon.h
-> index 7b0a41b..f89e80f 100644
-> --- a/include/standard-headers/linux/virtio_balloon.h
-> +++ b/include/standard-headers/linux/virtio_balloon.h
-> @@ -34,15 +34,22 @@
->  #define VIRTIO_BALLOON_F_MUST_TELL_HOST	0 /* Tell before reclaiming pages */
->  #define VIRTIO_BALLOON_F_STATS_VQ	1 /* Memory Stats virtqueue */
->  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
-> +#define VIRTIO_BALLOON_F_FREE_PAGE_HINT 3 /* VQ to report free pages */
-> +#define VIRTIO_BALLOON_F_PAGE_POISON	4 /* Guest is using page poisoning */
->  
->  /* Size of a PFN in the balloon interface. */
->  #define VIRTIO_BALLOON_PFN_SHIFT 12
->  
-> +#define VIRTIO_BALLOON_FREE_PAGE_REPORT_STOP_ID 0
->  struct virtio_balloon_config {
->  	/* Number of pages host wants Guest to give up. */
->  	uint32_t num_pages;
->  	/* Number of pages we've actually got in balloon. */
->  	uint32_t actual;
-> +	/* Free page report command id, readonly by guest */
-> +	uint32_t free_page_report_cmd_id;
-> +	/* Stores PAGE_POISON if page poisoning is in use */
-> +	uint32_t poison_val;
->  };
->  
->  #define VIRTIO_BALLOON_S_SWAP_IN  0   /* Amount of memory swapped in */
-> diff --git a/include/sysemu/balloon.h b/include/sysemu/balloon.h
-> index af49e19..16a2aae 100644
-> --- a/include/sysemu/balloon.h
-> +++ b/include/sysemu/balloon.h
-> @@ -18,11 +18,22 @@
->  
->  typedef void (QEMUBalloonEvent)(void *opaque, ram_addr_t target);
->  typedef void (QEMUBalloonStatus)(void *opaque, BalloonInfo *info);
-> +typedef bool (QEMUBalloonFreePageSupport)(void *opaque);
-> +typedef void (QEMUBalloonFreePageStart)(void *opaque);
-> +typedef void (QEMUBalloonFreePageStop)(void *opaque);
->  
-> -int qemu_add_balloon_handler(QEMUBalloonEvent *event_func,
-> -			     QEMUBalloonStatus *stat_func, void *opaque);
->  void qemu_remove_balloon_handler(void *opaque);
->  bool qemu_balloon_is_inhibited(void);
->  void qemu_balloon_inhibit(bool state);
-> +bool balloon_free_page_support(void);
-> +void balloon_free_page_start(void);
-> +void balloon_free_page_stop(void);
-> +
-> +void qemu_add_balloon_handler(QEMUBalloonEvent *event_fn,
-> +                              QEMUBalloonStatus *stat_fn,
-> +                              QEMUBalloonFreePageSupport *free_page_support_fn,
-> +                              QEMUBalloonFreePageStart *free_page_start_fn,
-> +                              QEMUBalloonFreePageStop *free_page_stop_fn,
-> +                              void *opaque);
->  
->  #endif
-> -- 
-> 1.8.3.1
+> Okay, doing that would mean using something like:
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> { 'struct': 'RouteEntry', 'data': { 'addr': 'str', '*mask': 'int', 
+> '*gateway': 'str' } }
+> ...
+> 'route': [ 'RouteEntry' ]
+> 
+> (but reuse, rather than inventing a new type, if one of the existing
+> QMP 
+> types already resembles what I proposed for RouteEntry)
+> 
+> The command line can still use route=addr/mask:gateway syntax, parse
+> it 
+> down into components, then compile the QMP array of already-parsed 
+> structs (rather than making QMP take a direct ['String'] that still 
+> needs further parsing).  It may take more glue code, but the idea is 
+> that all the glue code should live on the front end, so that the QMP 
+> backend should be easy to work with.
+
+The problem is that the opts visitor code only supports lists with a
+single mandatory scalar member. Bigger changes are needed to support
+splitting 'route'. I have looked into the code for several hours, but
+found no simple and non-ugly way to add the splitting without major
+changes to the code. I am willing to adapt the patch if someone changes
+the opts visitor to support lists with multiple members.
+
+-- 
+Benjamin Drung
+System Developer
+Debian & Ubuntu Developer
+
+ProfitBricks GmbH
+Greifswalder Str. 207
+D - 10405 Berlin
+
+Email: benjamin.drung@profitbricks.com
+URL: https://www.profitbricks.de
+
+Sitz der Gesellschaft: Berlin
+Registergericht: Amtsgericht Charlottenburg, HRB 125506 B
+Geschäftsführer: Achim Weiss, Matthias Steinberg
