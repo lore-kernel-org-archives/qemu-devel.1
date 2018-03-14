@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abdallah.bouassida@lauterbach.com>)
-	id 1ew6UD-0004Px-6L
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 09:30:40 -0400
+	(envelope-from <mst@redhat.com>) id 1ew78j-0007gU-UH
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 10:12:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abdallah.bouassida@lauterbach.com>)
-	id 1ew6U9-0001x6-J7
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 09:30:33 -0400
-Received: from smtp1.lauterbach.com ([62.154.241.196]:48106)
+	(envelope-from <mst@redhat.com>) id 1ew78g-0005n8-OR
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 10:12:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42168 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abdallah.bouassida@lauterbach.com>)
-	id 1ew6U8-0001mR-Rq
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 09:30:29 -0400
-Received: from unknown (HELO localhost.localdomain)
-	(Authenticated_SSL:abouassida@[41.224.44.126])
-	(envelope-sender <abdallah.bouassida@lauterbach.com>)
-	by smtp1.lauterbach.com (qmail-ldap-1.03) with ECDHE-RSA-AES256-SHA
-	encrypted SMTP
-	for <qemu-devel@nongnu.org>; 14 Mar 2018 13:30:11 -0000
-From: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-Date: Wed, 14 Mar 2018 14:28:03 +0100
-Message-Id: <1521034084-17344-3-git-send-email-abdallah.bouassida@lauterbach.com>
-In-Reply-To: <1521034084-17344-1-git-send-email-abdallah.bouassida@lauterbach.com>
-References: <1521034084-17344-1-git-send-email-abdallah.bouassida@lauterbach.com>
-Subject: [Qemu-devel] [PATCH v5 2/3] target/arm: Add "_S" suffix to the
- secure version of a sysreg
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ew78g-0005mm-IY
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 10:12:22 -0400
+Date: Wed, 14 Mar 2018 16:12:08 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180314160832-mutt-send-email-mst@kernel.org>
+References: <1520426065-40265-1-git-send-email-wei.w.wang@intel.com>
+	<1520426065-40265-4-git-send-email-wei.w.wang@intel.com>
+	<20180313183558-mutt-send-email-mst@kernel.org>
+	<5AA88C35.90300@intel.com>
+	<20180314045130-mutt-send-email-mst@kernel.org>
+	<5AA8BB27.6030205@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5AA8BB27.6030205@intel.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v4 3/4] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_HINT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,130 +32,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: qemu-arm@nongnu.org, khaled.jmal@lauterbach.com, Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-This is a preparation for the coming feature of creating dynamically an XML
-description for the ARM sysregs.
-Add "_S" suffix to the secure version of sysregs that have both S and NS views
-Replace (S) and (NS) by _S and _NS for the register that are manually defined,
-so all the registers follow the same convention.
+On Wed, Mar 14, 2018 at 02:03:19PM +0800, Wei Wang wrote:
+> On 03/14/2018 10:53 AM, Michael S. Tsirkin wrote:
+> > On Wed, Mar 14, 2018 at 10:43:01AM +0800, Wei Wang wrote:
+> > > On 03/14/2018 12:49 AM, Michael S. Tsirkin wrote:
+> > > > On Wed, Mar 07, 2018 at 08:34:24PM +0800, Wei Wang wrote:
+> > > > 
+> > > > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> > > > > Signed-off-by: Liang Li <liang.z.li@intel.com>
+> > > > > CC: Michael S. Tsirkin <mst@redhat.com>
+> > > > > CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > > > CC: Juan Quintela <quintela@redhat.com>
+> > > > I find it suspicious that neither unrealize nor reset
+> > > > functions have been touched at all.
+> > > > Are you sure you have thought through scenarious like
+> > > > hot-unplug or disabling the device by guest?
+> > > OK. I think we can call balloon_free_page_stop in unrealize and reset.
+> > > 
+> > > 
+> > > > +static void *virtio_balloon_poll_free_page_hints(void *opaque)
+> > > > +{
+> > > > +    VirtQueueElement *elem;
+> > > > +    VirtIOBalloon *dev = opaque;
+> > > > +    VirtQueue *vq = dev->free_page_vq;
+> > > > +    uint32_t id;
+> > > > +    size_t size;
+> > > > What makes it safe to poke at this device from multiple threads?
+> > > > I think that it would be safer to do it from e.g. BH.
+> > > > 
+> > > Actually the free_page_optimization thread is the only user of free_page_vq,
+> > > and there is only one optimization thread each time. Would this be safe
+> > > enough?
+> > > 
+> > > Best,
+> > > Wei
+> > Aren't there other fields there? Also things like reset affect all VQs.
+> > 
+> 
+> Yes. But I think BHs are used to avoid re-entrancy, which isn't the issue
+> here.
 
-Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/helper.c | 29 ++++++++++++++++++-----------
- 1 file changed, 18 insertions(+), 11 deletions(-)
+Since you are adding locks to address the issue - doesn't this imply
+reentrancy is exactly the issue?
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index db8c925..1360a14 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -695,12 +695,12 @@ static const ARMCPRegInfo cp_reginfo[] = {
-      * the secure register to be properly reset and migrated. There is also no
-      * v8 EL1 version of the register so the non-secure instance stands alone.
-      */
--    { .name = "FCSEIDR(NS)",
-+    { .name = "FCSEIDR",
-       .cp = 15, .opc1 = 0, .crn = 13, .crm = 0, .opc2 = 0,
-       .access = PL1_RW, .secure = ARM_CP_SECSTATE_NS,
-       .fieldoffset = offsetof(CPUARMState, cp15.fcseidr_ns),
-       .resetvalue = 0, .writefn = fcse_write, .raw_writefn = raw_write, },
--    { .name = "FCSEIDR(S)",
-+    { .name = "FCSEIDR_S",
-       .cp = 15, .opc1 = 0, .crn = 13, .crm = 0, .opc2 = 0,
-       .access = PL1_RW, .secure = ARM_CP_SECSTATE_S,
-       .fieldoffset = offsetof(CPUARMState, cp15.fcseidr_s),
-@@ -716,7 +716,7 @@ static const ARMCPRegInfo cp_reginfo[] = {
-       .access = PL1_RW, .secure = ARM_CP_SECSTATE_NS,
-       .fieldoffset = offsetof(CPUARMState, cp15.contextidr_el[1]),
-       .resetvalue = 0, .writefn = contextidr_write, .raw_writefn = raw_write, },
--    { .name = "CONTEXTIDR(S)", .state = ARM_CP_STATE_AA32,
-+    { .name = "CONTEXTIDR_S", .state = ARM_CP_STATE_AA32,
-       .cp = 15, .opc1 = 0, .crn = 13, .crm = 0, .opc2 = 1,
-       .access = PL1_RW, .secure = ARM_CP_SECSTATE_S,
-       .fieldoffset = offsetof(CPUARMState, cp15.contextidr_s),
-@@ -1967,7 +1967,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
-                                    cp15.c14_timer[GTIMER_PHYS].ctl),
-       .writefn = gt_phys_ctl_write, .raw_writefn = raw_write,
-     },
--    { .name = "CNTP_CTL(S)",
-+    { .name = "CNTP_CTL_S",
-       .cp = 15, .crn = 14, .crm = 2, .opc1 = 0, .opc2 = 1,
-       .secure = ARM_CP_SECSTATE_S,
-       .type = ARM_CP_IO | ARM_CP_ALIAS, .access = PL1_RW | PL0_R,
-@@ -2006,7 +2006,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
-       .accessfn = gt_ptimer_access,
-       .readfn = gt_phys_tval_read, .writefn = gt_phys_tval_write,
-     },
--    { .name = "CNTP_TVAL(S)",
-+    { .name = "CNTP_TVAL_S",
-       .cp = 15, .crn = 14, .crm = 2, .opc1 = 0, .opc2 = 0,
-       .secure = ARM_CP_SECSTATE_S,
-       .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_R,
-@@ -2060,7 +2060,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
-       .accessfn = gt_ptimer_access,
-       .writefn = gt_phys_cval_write, .raw_writefn = raw_write,
-     },
--    { .name = "CNTP_CVAL(S)", .cp = 15, .crm = 14, .opc1 = 2,
-+    { .name = "CNTP_CVAL_S", .cp = 15, .crm = 14, .opc1 = 2,
-       .secure = ARM_CP_SECSTATE_S,
-       .access = PL1_RW | PL0_R,
-       .type = ARM_CP_64BIT | ARM_CP_IO | ARM_CP_ALIAS,
-@@ -5563,7 +5563,8 @@ CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
- 
- static void add_cpreg_to_hashtable(ARMCPU *cpu, const ARMCPRegInfo *r,
-                                    void *opaque, int state, int secstate,
--                                   int crm, int opc1, int opc2)
-+                                   int crm, int opc1, int opc2,
-+                                   const char *name)
- {
-     /* Private utility function for define_one_arm_cp_reg_with_opaque():
-      * add a single reginfo struct to the hash table.
-@@ -5573,6 +5574,7 @@ static void add_cpreg_to_hashtable(ARMCPU *cpu, const ARMCPRegInfo *r,
-     int is64 = (r->type & ARM_CP_64BIT) ? 1 : 0;
-     int ns = (secstate & ARM_CP_SECSTATE_NS) ? 1 : 0;
- 
-+    r2->name = g_strdup(name);
-     /* Reset the secure state to the specific incoming state.  This is
-      * necessary as the register may have been defined with both states.
-      */
-@@ -5804,19 +5806,24 @@ void define_one_arm_cp_reg_with_opaque(ARMCPU *cpu,
-                         /* Under AArch32 CP registers can be common
-                          * (same for secure and non-secure world) or banked.
-                          */
-+                        char *name;
-+
-                         switch (r->secure) {
-                         case ARM_CP_SECSTATE_S:
-                         case ARM_CP_SECSTATE_NS:
-                             add_cpreg_to_hashtable(cpu, r, opaque, state,
--                                                   r->secure, crm, opc1, opc2);
-+                                                   r->secure, crm, opc1, opc2,
-+                                                   r->name);
-                             break;
-                         default:
-+                            name = g_strdup_printf("%s_S", r->name);
-                             add_cpreg_to_hashtable(cpu, r, opaque, state,
-                                                    ARM_CP_SECSTATE_S,
--                                                   crm, opc1, opc2);
-+                                                   crm, opc1, opc2, name);
-+                            g_free(name);
-                             add_cpreg_to_hashtable(cpu, r, opaque, state,
-                                                    ARM_CP_SECSTATE_NS,
--                                                   crm, opc1, opc2);
-+                                                   crm, opc1, opc2, r->name);
-                             break;
-                         }
-                     } else {
-@@ -5824,7 +5831,7 @@ void define_one_arm_cp_reg_with_opaque(ARMCPU *cpu,
-                          * of AArch32 */
-                         add_cpreg_to_hashtable(cpu, r, opaque, state,
-                                                ARM_CP_SECSTATE_NS,
--                                               crm, opc1, opc2);
-+                                               crm, opc1, opc2, r->name);
-                     }
-                 }
-             }
+> The potential issue I could observe here is that
+> "dev->free_page_report_status" is read and written by the optimization
+> thread, and it is also modified by the migration thread and reset via
+> virtio_balloon_free_page_stop.
+> 
+> How about adding a QEMU SpinLock, like this:
+> 
+> virtio_balloon_poll_free_page_hints()
+> {
+> 
+>     while (1) {
+>         qemu_spin_lock();
+>         /* If the status has been changed to STOP or EXIT, or the VM is
+> stopped, just exit */
+>         if (dev->free_page_report_status >= FREE_PAGE_REPORT_S_STOP ||
+> !runstate_is_running()) {
+>             qemu_spin_unlock();
+>             break;
+>         }
+>         ....
+>         qemu_spin_unlock();
+>     }
+> }
+> 
+> 
+> Best,
+> Wei
+
+That will address the issue but it does look weird.
+
 -- 
-2.7.4
+MST
