@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1ew0CT-000553-3a
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 02:47:50 -0400
+	(envelope-from <kraxel@redhat.com>) id 1ew1NS-00011n-IX
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 04:03:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1ew0CP-0007Fi-8c
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 02:47:48 -0400
-Received: from mga09.intel.com ([134.134.136.24]:37558)
+	(envelope-from <kraxel@redhat.com>) id 1ew1NP-00017d-Fp
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 04:03:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35168 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1ew0CO-0007DY-Tz
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 02:47:45 -0400
-Message-ID: <5AA8C644.1020308@intel.com>
-Date: Wed, 14 Mar 2018 14:50:44 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ew1NP-00017E-Ar
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 04:03:11 -0400
+Date: Wed, 14 Mar 2018 09:03:01 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180314080301.366zycak3whqvvqx@sirius.home.kraxel.org>
+References: <20180313154826.20436-1-kraxel@redhat.com>
+	<20180313161035.GL4788@phenom.ffwll.local>
 MIME-Version: 1.0
-References: <1520426065-40265-1-git-send-email-wei.w.wang@intel.com>
-	<1520426065-40265-5-git-send-email-wei.w.wang@intel.com>
-	<20180313183050-mutt-send-email-mst@kernel.org>
-	<5AA88BE0.3020004@intel.com>
-	<20180314044737-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20180314044737-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 4/4] migration: use the free page hint
- feature from balloon
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180313161035.GL4788@phenom.ffwll.local>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RfC PATCH] Add udmabuf misc device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,103 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: dri-devel@lists.freedesktop.org, Tomeu Vizoso <tomeu.vizoso@collabora.com>, David Airlie <airlied@linux.ie>, open list <linux-kernel@vger.kernel.org>, qemu-devel@nongnu.org, "moderated list:DMA BUFFER SHARING FRAMEWORK" <linaro-mm-sig@lists.linaro.org>, "open list:DMA BUFFER SHARING FRAMEWORK" <linux-media@vger.kernel.org>
 
-On 03/14/2018 10:51 AM, Michael S. Tsirkin wrote:
-> On Wed, Mar 14, 2018 at 10:41:36AM +0800, Wei Wang wrote:
->> On 03/14/2018 12:35 AM, Michael S. Tsirkin wrote:
->>> On Wed, Mar 07, 2018 at 08:34:25PM +0800, Wei Wang wrote:
->>>> Start the free page optimization after the migration bitmap is
->>>> synchronized. This can't be used in the stop&copy phase since the guest
->>>> is paused. Make sure the guest reporting has stopped before
->>>> synchronizing the migration dirty bitmap. Currently, the optimization is
->>>> added to precopy only.
->>>>
->>>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
->>>> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>>> CC: Juan Quintela <quintela@redhat.com>
->>>> CC: Michael S. Tsirkin <mst@redhat.com>
->>>> ---
->>>>    migration/ram.c | 19 ++++++++++++++++++-
->>>>    1 file changed, 18 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/migration/ram.c b/migration/ram.c
->>>> index e172798..7b4c9b1 100644
->>>> --- a/migration/ram.c
->>>> +++ b/migration/ram.c
->>>> @@ -51,6 +51,8 @@
->>>>    #include "qemu/rcu_queue.h"
->>>>    #include "migration/colo.h"
->>>>    #include "migration/block.h"
->>>> +#include "sysemu/balloon.h"
->>>> +#include "sysemu/sysemu.h"
->>>>    /***********************************************************/
->>>>    /* ram save/restore */
->>>> @@ -208,6 +210,8 @@ struct RAMState {
->>>>        uint32_t last_version;
->>>>        /* We are in the first round */
->>>>        bool ram_bulk_stage;
->>>> +    /* The free pages optimization feature is supported */
->>>> +    bool free_page_support;
->>>>        /* How many times we have dirty too many pages */
->>>>        int dirty_rate_high_cnt;
->>>>        /* these variables are used for bitmap sync */
->>>> @@ -775,7 +779,7 @@ unsigned long migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
->>>>        unsigned long *bitmap = rb->bmap;
->>>>        unsigned long next;
->>>> -    if (rs->ram_bulk_stage && start > 0) {
->>>> +    if (rs->ram_bulk_stage && start > 0 && !rs->free_page_support) {
->>>>            next = start + 1;
->>>>        } else {
->>>>            next = find_next_bit(bitmap, size, start);
->>>> @@ -833,6 +837,10 @@ static void migration_bitmap_sync(RAMState *rs)
->>>>        int64_t end_time;
->>>>        uint64_t bytes_xfer_now;
->>>> +    if (rs->free_page_support) {
->>>> +        balloon_free_page_stop();
->>>> +    }
->>>> +
->>>>        ram_counters.dirty_sync_count++;
->>>>        if (!rs->time_last_bitmap_sync) {
->>>> @@ -899,6 +907,10 @@ static void migration_bitmap_sync(RAMState *rs)
->>>>        if (migrate_use_events()) {
->>>>            qapi_event_send_migration_pass(ram_counters.dirty_sync_count, NULL);
->>>>        }
->>>> +
->>>> +    if (rs->free_page_support && runstate_is_running()) {
->>>> +        balloon_free_page_start();
->>>> +    }
->>>>    }
->>> I think some of these conditions should go into
->>> balloon_free_page_start/stop.
->>>
->>> Checking runstate is generally problematic unless you
->>> also handle run state change notifiers as it can
->>> be manipulated from QMP.
->> How about moving the check of runstate to
->> virtio_balloon_poll_free_page_hints:
->>
->> while (dev->free_page_report_status < FREE_PAGE_REPORT_S_STOP &&
->> runstate_is_running()) {
->> ...
->> }
-> Hard to tell on the outset. E.g. why is just stop affected?  Pls add
-> comments explaining what happens if VM is not running when start or stop
-> is called.
->
->
->> In this case, I think we won't need a notifier - if the run state is changed
->> by qmp, the optimization thread will just exist.
-> But you need to wake it up and notify the guest presumably?
->
+  Hi,
 
+> Either mlock account (because it's mlocked defacto), and get_user_pages
+> won't do that for you.
+>=20
+> Or you write the full-blown userptr implementation, including mmu_notif=
+ier
+> support (see i915 or amdgpu), but that also requires Christian K=F6nigs
+> latest ->invalidate_mapping RFC for dma-buf (since atm exporting userpt=
+r
+> buffers is a no-go).
 
-I think it's not necessary to wake it up, because when the VM is not 
-running, there will be no hints reported to the vq, and the optimization 
-thread exits. (there is no issue in that case)
-Probably we can add a notifier which calls 
-virtio_balloon_free_page_stop() when qmp wakes up the VM.
+I guess I'll look at mlock accounting for starters then.  Easier for
+now, and leaves the door open to switch to userptr later as this should
+be transparent to userspace.
 
-Best,
-Wei
+> > Known issue:  Driver API isn't complete yet.  Need add some flags, fo=
+r
+> > example to support read-only buffers.
+>=20
+> dma-buf has no concept of read-only. I don't think we can even enforce
+> that (not many iommus can enforce this iirc), so pretty much need to
+> require r/w memory.
+
+Ah, ok.  Just saw the 'write' arg for get_user_pages_fast and figured we
+might support that, but if iommus can't handle that anyway it's
+pointless indeed.
+
+> > Cc: David Airlie <airlied@linux.ie>
+> > Cc: Tomeu Vizoso <tomeu.vizoso@collabora.com>
+> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+>=20
+> btw there's also the hyperdmabuf stuff from the xen folks, but imo thei=
+r
+> solution of forwarding the entire dma-buf api is over the top. This her=
+e
+> looks _much_ better, pls cc all the hyperdmabuf people on your next
+> version.
+
+Fun fact: googling for "hyperdmabuf" found me your mail and nothing else =
+:-o
+(Trying "hyper dmabuf" instead worked better then).
+
+Yes, will cc them on the next version.  Not sure it'll help much on xen
+though due to the memory management being very different.  Basically xen
+owns the memory, not the kernel of the control domain (dom0), so
+creating dmabufs for guest memory chunks isn't that simple ...
+
+Also it's not clear whenever they really need guest -> guest exports or
+guest -> dom0 exports.
+
+> Overall I like the idea, but too lazy to review.
+
+Cool.  General comments on the idea was all I was looking for for the
+moment.  Spare yor review cycles for the next version ;)
+
+> Oh, some kselftests for this stuff would be lovely.
+
+I'll look into it.
+
+thanks,
+  Gerd
