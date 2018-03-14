@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <junyan.he@hotmail.com>) id 1evv5m-0000PL-0D
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 21:20:38 -0400
+	(envelope-from <junyan.he@hotmail.com>) id 1evv5q-0000Tx-Vp
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 21:20:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <junyan.he@hotmail.com>) id 1evv5l-0006R5-2O
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 21:20:33 -0400
+	(envelope-from <junyan.he@hotmail.com>) id 1evv5p-0006UC-ED
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 21:20:38 -0400
 Received: from mga18.intel.com ([134.134.136.126]:28906)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <junyan.he@hotmail.com>)
-	id 1evv5k-0006Hx-QT
-	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 21:20:33 -0400
+	id 1evv5p-0006Hx-5u
+	for qemu-devel@nongnu.org; Tue, 13 Mar 2018 21:20:37 -0400
 From: junyan.he@hotmail.com
-Date: Wed, 14 Mar 2018 09:20:13 +0800
-Message-Id: <1520990418-28258-6-git-send-email-junyan.he@hotmail.com>
+Date: Wed, 14 Mar 2018 09:20:15 +0800
+Message-Id: <1520990418-28258-8-git-send-email-junyan.he@hotmail.com>
 In-Reply-To: <1520990418-28258-1-git-send-email-junyan.he@hotmail.com>
 References: <1520990418-28258-1-git-send-email-junyan.he@hotmail.com>
-Subject: [Qemu-devel] [PATCH 05/10] RFC: Add memory region snapshot bitmap
- get function.
+Subject: [Qemu-devel] [PATCH 07/10] RFC: Add get_current_snapshot_info to
+ get the snapshot state.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +30,82 @@ Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, crosthwaite.peter@
 
 From: Junyan He <junyan.he@intel.com>
 
-We need to get the bitmap content of the snapshot when enable dirty
-log trace for nvdimm.
+We need to know the snapshot saving information when we do dependent
+snapshot saving, e.g the name of previous snapshot. Add this global
+function to query the snapshot status is usable.
 
 Signed-off-by: Junyan He <junyan.he@intel.com>
 ---
- exec.c                  | 7 +++++++
- include/exec/memory.h   | 9 +++++++++
- include/exec/ram_addr.h | 2 ++
- memory.c                | 7 +++++++
- 4 files changed, 25 insertions(+)
+ include/migration/snapshot.h |  3 +++
+ migration/savevm.c           | 27 +++++++++++++++++++++++++++
+ 2 files changed, 30 insertions(+)
 
-diff --git a/exec.c b/exec.c
-index a9181e6..3d2bf0d 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1235,6 +1235,13 @@ bool cpu_physical_memory_snapshot_get_dirty(DirtyBitmapSnapshot *snap,
-     return false;
+diff --git a/include/migration/snapshot.h b/include/migration/snapshot.h
+index c85b6ec..0b950ce 100644
+--- a/include/migration/snapshot.h
++++ b/include/migration/snapshot.h
+@@ -15,7 +15,10 @@
+ #ifndef QEMU_MIGRATION_SNAPSHOT_H
+ #define QEMU_MIGRATION_SNAPSHOT_H
+ 
++#include "block/snapshot.h"
++
+ int save_snapshot(const char *name, Error **errp);
+ int load_snapshot(const char *name, Error **errp);
++int get_current_snapshot_info(QEMUSnapshotInfo *sn);
+ 
+ #endif
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 1bbd6aa..3a9b904 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2212,6 +2212,29 @@ int qemu_loadvm_state(QEMUFile *f)
+     return ret;
  }
  
-+unsigned long *cpu_physical_memory_snapshot_get_dirty_bitmap
-+     (DirtyBitmapSnapshot *snap)
++static int in_snap_saving;
++static QEMUSnapshotInfo in_snap_saving_sn;
++
++int get_current_snapshot_info(QEMUSnapshotInfo *sn)
 +{
-+    assert(snap);
-+    return snap->dirty;
++    if (in_snap_saving && sn) {
++        memcpy(sn, &in_snap_saving_sn, sizeof(QEMUSnapshotInfo));
++    }
++
++    return in_snap_saving;
 +}
 +
- /* Called from RCU critical section */
- hwaddr memory_region_section_get_iotlb(CPUState *cpu,
-                                        MemoryRegionSection *section,
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 31eae0a..f742995 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -1179,6 +1179,15 @@ bool memory_region_snapshot_get_dirty(MemoryRegion *mr,
-                                       hwaddr addr, hwaddr size);
- 
- /**
-+ * memory_region_snapshot_get_dirty_bitmap: Get the dirty bitmap data of
-+ * snapshot.
-+ *
-+ * @snap: the dirty bitmap snapshot
-+ */
-+unsigned long *memory_region_snapshot_get_dirty_bitmap
-+     (DirtyBitmapSnapshot *snap);
-+
-+/**
-  * memory_region_reset_dirty: Mark a range of pages as clean, for a specified
-  *                            client.
-  *
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index cf2446a..ce366c1 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -371,6 +371,8 @@ DirtyBitmapSnapshot *cpu_physical_memory_snapshot_and_clear_dirty
- bool cpu_physical_memory_snapshot_get_dirty(DirtyBitmapSnapshot *snap,
-                                             ram_addr_t start,
-                                             ram_addr_t length);
-+unsigned long *cpu_physical_memory_snapshot_get_dirty_bitmap
-+    (DirtyBitmapSnapshot *snap);
- 
- static inline void cpu_physical_memory_clear_dirty_range(ram_addr_t start,
-                                                          ram_addr_t length)
-diff --git a/memory.c b/memory.c
-index 4a8a2fe..68f17f0 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1991,6 +1991,13 @@ DirtyBitmapSnapshot *memory_region_snapshot_and_clear_dirty(MemoryRegion *mr,
-                 memory_region_get_ram_addr(mr) + addr, size, client);
- }
- 
-+unsigned long *memory_region_snapshot_get_dirty_bitmap
-+     (DirtyBitmapSnapshot *snap)
++static void set_current_snapshot_info(QEMUSnapshotInfo *sn)
 +{
-+    assert(snap);
-+    return cpu_physical_memory_snapshot_get_dirty_bitmap(snap);
++    if (sn) {
++        memcpy(&in_snap_saving_sn, sn, sizeof(QEMUSnapshotInfo));
++        in_snap_saving = 1;
++    } else {
++        memset(&in_snap_saving_sn, 0, sizeof(QEMUSnapshotInfo));
++        in_snap_saving = 0;
++    }
 +}
 +
- bool memory_region_snapshot_get_dirty(MemoryRegion *mr, DirtyBitmapSnapshot *snap,
-                                       hwaddr addr, hwaddr size)
+ int save_snapshot(const char *name, Error **errp)
  {
+     BlockDriverState *bs, *bs1;
+@@ -2282,6 +2305,8 @@ int save_snapshot(const char *name, Error **errp)
+         strftime(sn->name, sizeof(sn->name), "vm-%Y%m%d%H%M%S", &tm);
+     }
+ 
++    set_current_snapshot_info(sn);
++
+     /* save the VM state */
+     f = qemu_fopen_bdrv(bs, 1);
+     if (!f) {
+@@ -2313,6 +2338,8 @@ int save_snapshot(const char *name, Error **errp)
+     ret = 0;
+ 
+  the_end:
++    set_current_snapshot_info(NULL);
++
+     if (aio_context) {
+         aio_context_release(aio_context);
+     }
 -- 
 2.7.4
