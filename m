@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ewAiq-00027E-1T
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 14:01:57 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1ewAlt-0003Aa-S5
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 14:05:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ewAil-00065z-Li
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 14:01:56 -0400
-Date: Wed, 14 Mar 2018 19:01:40 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180314180140.GB4764@localhost.localdomain>
-References: <1513877118-3149-1-git-send-email-jack.schwartz@oracle.com>
-	<20180314172351.GA4764@localhost.localdomain>
-	<7F85C9E4-D04F-474C-A8E3-2EAFC5B864B9@oracle.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1ewAlo-0007jg-UR
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 14:05:05 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:32800)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ewAlo-0007it-Ng
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 14:05:00 -0400
+Received: by mail-wr0-x243.google.com with SMTP id z73so1427020wrb.0
+	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 11:05:00 -0700 (PDT)
+References: <20180314120906.30872-1-berrange@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180314120906.30872-1-berrange@redhat.com>
+Date: Wed, 14 Mar 2018 18:04:57 +0000
+Message-ID: <87k1uebkja.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7F85C9E4-D04F-474C-A8E3-2EAFC5B864B9@oracle.com>
-Subject: Re: [Qemu-devel] CVE-2018-7550 (was: multiboot: bss_end_addr can be
- zero / cleanup)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RFC] configure: shorthand for only enabling
+ native softmmu target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,60 +30,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: Jack Schwartz <jack.schwartz@oracle.com>, qemu-devel@nongnu.org, ehabkost@redhat.com, daniel.kiper@oracle.com, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ppandit@redhat.com, qemu-stable@nongnu.org
+To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Am 14.03.2018 um 18:35 hat Konrad Rzeszutek Wilk geschrieben:
-> On March 14, 2018 1:23:51 PM EDT, Kevin Wolf <kwolf@redhat.com> wrote:
-> >Am 21.12.2017 um 18:25 hat Jack Schwartz geschrieben:
-> >> Properly account for the possibility of multiboot kernels with a zero
-> >> bss_end_addr.  The Multiboot Specification, section 3.1.3 allows for
-> >> kernels without a bss section, by allowing a zeroed bss_end_addr
-> >multiboot
-> >> header field.
-> >> 
-> >> Do some cleanup to multiboot.c as well:
-> >> - Remove some unused variables.
-> >> - Use more intuitive header names when displaying fields in messages.
-> >> - Change fprintf(stderr...) to error_report
-> >
-> >[ Cc: qemu-stable ]
-> >
-> >This series happens to fix CVE-2018-7550.
-> >http://www.openwall.com/lists/oss-security/2018/03/08/4
-> >
-> >Just a shame that we weren't told before merging it so that the
-> >appropriate tags could have been set in the commit message (and all of
-> >the problems could have been addressed; I'm going to send another
-> >Multiboot series now).
-> 
-> Huh?
-> 
-> You mean the CVE tags that were created in 2018 for a patch posted in
-> 2017?
 
-Well, it seems to me that this patch was created for a different
-purpose, but it happens to fix the bug for which this CVE was assigned
-now. It's not your or Jack's fault, that's just how things go sometimes.
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-I think PJP knew that this CVE was coming before the patches were merged
-into master, so if he had told us, we could have had a better commit
-message. But either way, it's not a disaster to have a suboptimal commit
-message.
+> With the huge number of QEMU targets, a default configuration will take
+> a very long time to rebuild. When developing most code changes, it is
+> sufficient to test compilation with a single target - rebuilding all
+> targets just extends compile times while not detecting any new problems.
+>
+> Developers will often thus specify a single target for configure,
+> commonly matching the host architecture. eg
+>
+>   ./configure --target-list=3Dx86_64-softmmu
 
-> Or that the reporter of the security issue didn't point to this particular patch?
-> 
-> Irrespective of that,  is there a write-up  of how security process
-> works at QEMU?
-> 
-> That is what is the usual embargo period, the list of security folks,
-> how one can become one, what are the responsibilities, how changes to
-> process are being carried out (and discussed), what breath of testing
-> and PoC work is done , how security fixes are being reviewed, etc?
+A while back I messed with a patch that allowed stems in --target-list
+so you could quickly select targets with stems:
 
-I don't think a problem like this would be embargoed at all. Anyway,
-have a look here:
+  Subject: [PATCH 0/4] Current Travis queue
+  Date: Fri, 15 Apr 2016 16:56:57 +0100
+  Message-Id: <1460735821-12775-1-git-send-email-alex.bennee@linaro.org>
 
-https://wiki.qemu.org/SecurityProcess
+but if I recall Peter was worried about it breaking existing configure
+lines.
 
-Kevin
+>
+> This works fine, but is a bit of a verbose thing to type out everytime
+> configure is invoked. There are already short-hand args to disable all
+> user targets, all softmmu targets, or all tcg targets. This adds one
+> further shorthand to disable all non-native architecture targets.
+>
+>   ./configure --native
+
+I'm not sure this is really the case. My history tends to be littered
+with things like:
+
+  ./configure --enable-debug --enable-debug-tcg --extra-cflags=3D"-O0 -g3" =
+--target-list=3Daarch64-linux-user
+
+when compile time is an issue although my development box is an x86.
+Normally I do compile all targets and rely on ccache to keep the compile
+time reasonable.
+
+>
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>
+> Suggestions welcomed for better names than --native, but bear in mind
+> the goal is to minimise amount of typing so nothing too verbose, hence
+> why I didn't do something like --disable-non-native ...
+
+I would argue it's "almost" equivalent to --disable-tcg as most native
+users in my experience aren't looking to run X on X via TCG. I could be
+wrong of course.
+
+>
+>  configure | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
+>
+> diff --git a/configure b/configure
+> index af72fc852e..807af93116 100755
+> --- a/configure
+> +++ b/configure
+> @@ -233,6 +233,22 @@ supported_whpx_target() {
+>      return 1
+>  }
+>
+> +supported_native_target() {
+> +    glob "$1" "*-softmmu" || return 1
+> +    case "${1%-softmmu}:$cpu" in
+> +        arm:arm | aarch64:aarch64 | \
+> +        i386:i386 | i386:x32 | \
+> +        x86_64:x86_64 | \
+> +        mips:mips | mipsel:mips | \
+> +        ppc:ppc | ppcemb:ppc | \
+> +        ppc64:ppc64 | \
+> +        s390x:s390x)
+> +            return 0
+> +        ;;
+> +    esac
+> +    return 1
+> +}
+> +
+
+This strikes me as another place to mess about with when doing target
+specific changes to configure.
+
+>  supported_target() {
+>      case "$1" in
+>          *-softmmu)
+> @@ -254,6 +270,10 @@ supported_target() {
+>              return 1
+>              ;;
+>      esac
+> +    if test "$native" =3D "yes"
+> +    then
+> +	supported_native_target "$1" || return 1
+> +    fi
+>      test "$tcg" =3D "yes" && return 0
+>      supported_kvm_target "$1" && return 0
+>      supported_xen_target "$1" && return 0
+> @@ -390,6 +410,7 @@ cocoa=3D"no"
+>  softmmu=3D"yes"
+>  linux_user=3D"no"
+>  bsd_user=3D"no"
+> +native=3D"no"
+>  blobs=3D"yes"
+>  pkgversion=3D""
+>  pie=3D""
+> @@ -1112,6 +1133,8 @@ for opt do
+>        cocoa=3D"yes" ;
+>        audio_drv_list=3D"coreaudio $(echo $audio_drv_list | sed s,coreaud=
+io,,g)"
+>    ;;
+> +  --native) native=3D"yes"
+> +  ;;
+>    --disable-system) softmmu=3D"no"
+>    ;;
+>    --enable-system) softmmu=3D"yes"
+> @@ -1540,6 +1563,7 @@ Advanced options (experts only):
+>                             xen pv domain builder
+>    --enable-debug-stack-usage
+>                             track the maximum stack usage of stacks creat=
+ed by qemu_alloc_stack
+> +  --native                 only enable the softmmu target matching host =
+architecture
+>
+>  Optional features, enabled with --enable-FEATURE and
+>  disabled with --disable-FEATURE, default is enabled if available:
+
+
+--
+Alex Benn=C3=A9e
