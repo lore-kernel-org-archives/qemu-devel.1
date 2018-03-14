@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1evyka-0006g0-VK
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 01:14:57 -0400
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1evym4-0007X7-9R
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 01:16:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1evykX-0002Fp-QX
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 01:14:56 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39960)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
-	id 1evykX-0002E1-IE
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 01:14:53 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w2E5EiaQ139726
-	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 01:14:51 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gpw4d0j0n-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 01:14:50 -0400
-Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
-	Wed, 14 Mar 2018 01:14:49 -0400
-From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Date: Wed, 14 Mar 2018 13:14:40 +0800
-Message-Id: <20180314051440.9538-1-zyimin@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH] s390x/pci: forbid multifunction pci device
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1evym1-00031R-21
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 01:16:28 -0400
+Date: Wed, 14 Mar 2018 13:16:07 +0800 (GMT+08:00)
+From: "Su Hang" <suhang16@mails.ucas.ac.cn>
+In-Reply-To: <20180313201023.GP3545@work-vm>
+References: <20180313180320.339796-1-vsementsov@virtuozzo.com>
+	<152096780751.39.15281812348627104231@71c20359a636>
+	<DB6PR0801MB20563C8F2FAF24F77D3101A5C1D20@DB6PR0801MB2056.eurprd08.prod.outlook.com>
+	<20180313201023.GP3545@work-vm>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
+Message-ID: <76133c4e.1db4b.16222efdca4.Coremail.suhang16@mails.ucas.ac.cn>
+Subject: Re: [Qemu-devel] [PATCH v11 00/13] Dirty bitmaps postcopy migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,46 +25,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, cohuck@redhat.com, alex.williamson@redhat.com, marcel@redhat.com, zyimin@linux.vnet.ibm.com
+To: "dr. david alan gilbert" <dgilbert@redhat.com>, eblake@redhat.com, vladimir sementsov-ogievskiy <vsementsov@virtuozzo.com>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, denis lunev <den@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
 
-Currently we don't support pci multifunction. If a pci with
-multifucntion is plugged, the guest will spin forever. This patch fixes
-this.
-
-Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
----
- hw/s390x/s390-pci-bus.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 77a50cab36..10da87458e 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -816,6 +816,11 @@ static void s390_pcihost_hot_plug(HotplugHandler *hotplug_dev,
-         PCIBridge *pb = PCI_BRIDGE(dev);
-         PCIDevice *pdev = PCI_DEVICE(dev);
- 
-+        if (pdev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION) {
-+            error_setg(errp, "multifunction not supported in s390");
-+            return;
-+        }
-+
-         pci_bridge_map_irq(pb, dev->id, s390_pci_map_irq);
-         pci_setup_iommu(&pb->sec_bus, s390_pci_dma_iommu, s);
- 
-@@ -835,6 +840,11 @@ static void s390_pcihost_hot_plug(HotplugHandler *hotplug_dev,
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-         pdev = PCI_DEVICE(dev);
- 
-+        if (pdev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION) {
-+            error_setg(errp, "multifunction not supported in s390");
-+            return;
-+        }
-+
-         if (!dev->id) {
-             /* In the case the PCI device does not define an id */
-             /* we generate one based on the PCI address         */
--- 
-2.14.3 (Apple Git-98)
+ClNpbmNlcmVseSBzb3JyeSBmb3IgbXkgbmVnbGlnZW5jZSB0byBjYXVzZSB0aGlzIGJ1ZyEKSSB3
+aWxsIGZpeCBpdCBhcyBxdWljayBhcyBJIGNhbiEKClNvcnJ5IGFnYWluLCBJJ20gcmVhbGx5IGFz
+aGFtZWQgYWJvdXQgdGhlIG1pc3Rha2UgSSBoYXZlIG1hZGUuClN1IEhhbmcKCj4gLS0tLS1Pcmln
+aW5hbCBNZXNzYWdlcy0tLS0tCj4gRnJvbTogIkRyLiBEYXZpZCBBbGFuIEdpbGJlcnQiIDxkZ2ls
+YmVydEByZWRoYXQuY29tPgo+IFNlbnQgVGltZTogMjAxOC0wMy0xNCAwNDoxMDoyNCAoV2VkbmVz
+ZGF5KQo+IFRvOiAiVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSIgPHZzZW1lbnRzb3ZAdmly
+dHVvenpvLmNvbT4sIHN1aGFuZzE2QG1haWxzLnVjYXMuYWMuY24sIGVibGFrZUByZWRoYXQuY29t
+Cj4gQ2M6ICJwZXRlci5tYXlkZWxsQGxpbmFyby5vcmciIDxwZXRlci5tYXlkZWxsQGxpbmFyby5v
+cmc+LCAiRGVuaXMgTHVuZXYiIDxkZW5AdmlydHVvenpvLmNvbT4sICJxZW11LWJsb2NrQG5vbmdu
+dS5vcmciIDxxZW11LWJsb2NrQG5vbmdudS5vcmc+LCAicWVtdS1kZXZlbEBub25nbnUub3JnIiA8
+cWVtdS1kZXZlbEBub25nbnUub3JnPiwgImFybWJydUByZWRoYXQuY29tIiA8YXJtYnJ1QHJlZGhh
+dC5jb20+LCAicGJvbnppbmlAcmVkaGF0LmNvbSIgPHBib256aW5pQHJlZGhhdC5jb20+LCAianNu
+b3dAcmVkaGF0LmNvbSIgPGpzbm93QHJlZGhhdC5jb20+Cj4gU3ViamVjdDogUmU6IFtRZW11LWRl
+dmVsXSBbUEFUQ0ggdjExIDAwLzEzXSBEaXJ0eSBiaXRtYXBzIHBvc3Rjb3B5IG1pZ3JhdGlvbgo+
+IAo+ICogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSAodnNlbWVudHNvdkB2aXJ0dW96em8u
+Y29tKSB3cm90ZToKPiA+IEl0IGxvb2tzIGxpa2UgYSBidWcgaW4gYSByZWNlbnQgY29tbWl0IHRv
+IGNoZWNrcGF0Y2guIEl0IGRvbid0IHN1cHBvcnQgZG8geyB9IHdoaWxlCj4gCj4gWWVzLCBhZGRp
+bmcgU3UgSGFuZyBhbmQgRXJpYyBpbiBhbmQgdHJpbW1pbmcgc29tZSBvdGhlcnMgb3V0Lgo+IFNv
+IHllcywgaWdub3JlIHRoaXMgcGF0Y2hldyBmYWlsdXJlIGZvciB0aGlzIGNhc2UsIGJ1dCB3ZSBu
+ZWVkIHRvIGZpeAo+IHRoYXQgc2VwYXJhdGVseS4KPiAKPiBEYXZlCj4gCj4gPiAKPiA+IEJlc3Qg
+cmVnYXJkcywKPiA+IAo+ID4gVmxhZGltaXIuCj4gPiAKPiA+IF9fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fCj4gPiDQntGCOiBuby1yZXBseUBwYXRjaGV3Lm9yZyA8bm8tcmVwbHlAcGF0
+Y2hldy5vcmc+Cj4gPiDQntGC0L/RgNCw0LLQu9C10L3QvjogMTMg0LzQsNGA0YLQsCAyMDE4INCz
+LiAyMjowMzoyOQo+ID4g0JrQvtC80YM6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkKPiA+
+INCa0L7Qv9C40Y86IGZhbXpAcmVkaGF0LmNvbTsgcWVtdS1ibG9ja0Bub25nbnUub3JnOyBxZW11
+LWRldmVsQG5vbmdudS5vcmc7IGt3b2xmQHJlZGhhdC5jb207IHBldGVyLm1heWRlbGxAbGluYXJv
+Lm9yZzsgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeTsgZmFtekByZWRoYXQuY29tOyBsaXJh
+bnNAaWwuaWJtLmNvbTsgcXVpbnRlbGFAcmVkaGF0LmNvbTsganNub3dAcmVkaGF0LmNvbTsgYXJt
+YnJ1QHJlZGhhdC5jb207IG1yZWl0ekByZWRoYXQuY29tOyBzdGVmYW5oYUByZWRoYXQuY29tOyBE
+ZW5pcyBMdW5ldjsgYW1pdC5zaGFoQHJlZGhhdC5jb207IHBib256aW5pQHJlZGhhdC5jb207IGRn
+aWxiZXJ0QHJlZGhhdC5jb20KPiA+INCi0LXQvNCwOiBSZTogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2
+MTEgMDAvMTNdIERpcnR5IGJpdG1hcHMgcG9zdGNvcHkgbWlncmF0aW9uCj4gPiAKPiA+IEhpLAo+
+ID4gCj4gPiBUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2Js
+ZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgo+ID4gbW9yZSBpbmZvcm1hdGlvbjoKPiA+IAo+ID4g
+VHlwZTogc2VyaWVzCj4gPiBNZXNzYWdlLWlkOiAyMDE4MDMxMzE4MDMyMC4zMzk3OTYtMS12c2Vt
+ZW50c292QHZpcnR1b3p6by5jb20KPiA+IFN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjEx
+IDAwLzEzXSBEaXJ0eSBiaXRtYXBzIHBvc3Rjb3B5IG1pZ3JhdGlvbgo+ID4gCj4gPiA9PT0gVEVT
+VCBTQ1JJUFQgQkVHSU4gPT09Cj4gPiAjIS9iaW4vYmFzaAo+ID4gCj4gPiBCQVNFPWJhc2UKPiA+
+IG49MQo+ID4gdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCj4gPiBm
+YWlsZWQ9MAo+ID4gCj4gPiBnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCj4g
+PiBnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKPiA+IGdpdCBjb25maWcgLS1s
+b2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KPiA+IAo+ID4gY29tbWl0cz0iJChnaXQgbG9n
+IC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKPiA+IGZvciBjIGluICRjb21taXRzOyBk
+bwo+ID4gICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEg
+LS1mb3JtYXQ9JXMgJGMpLi4uIgo+ID4gICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1h
+aWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KPiA+ICAgICAg
+ICAgZmFpbGVkPTEKPiA+ICAgICAgICAgZWNobwo+ID4gICAgIGZpCj4gPiAgICAgbj0kKChuKzEp
+KQo+ID4gZG9uZQo+ID4gCj4gPiBleGl0ICRmYWlsZWQKPiA+ID09PSBURVNUIFNDUklQVCBFTkQg
+PT09Cj4gPiAKPiA+IFVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
+MTMzODQKPiA+IEZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11Cj4g
+PiAgKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwMzEzMTgwMzIwLjMzOTc5
+Ni0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbSAtPiBwYXRjaGV3LzIwMTgwMzEzMTgwMzIwLjMz
+OTc5Ni0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbQo+ID4gQXV0byBwYWNraW5nIHRoZSByZXBv
+c2l0b3J5IGluIGJhY2tncm91bmQgZm9yIG9wdGltdW0gcGVyZm9ybWFuY2UuCj4gPiBTZWUgImdp
+dCBoZWxwIGdjIiBmb3IgbWFudWFsIGhvdXNla2VlcGluZy4KPiA+IFN3aXRjaGVkIHRvIGEgbmV3
+IGJyYW5jaCAndGVzdCcKPiA+IDcxZTAzYzRlY2MgaW90ZXN0czogYWRkIGRpcnR5IGJpdG1hcCBw
+b3N0Y29weSB0ZXN0Cj4gPiBkYWE1NDhmNzlmIGlvdGVzdHM6IGFkZCBkaXJ0eSBiaXRtYXAgbWln
+cmF0aW9uIHRlc3QKPiA+IDM1M2M1ZmRhZTEgbWlncmF0aW9uOiBhZGQgcG9zdGNvcHkgbWlncmF0
+aW9uIG9mIGRpcnR5IGJpdG1hcHMKPiA+IDFkYTA3ZDRiYTIgbWlncmF0aW9uOiBhbGxvdyBxbXAg
+Y29tbWFuZCBtaWdyYXRlLXN0YXJ0LXBvc3Rjb3B5IGZvciBhbnkgcG9zdGNvcHkKPiA+IGI3ODlh
+Mjg4N2UgbWlncmF0aW9uOiBhZGQgaXNfYWN0aXZlX2l0ZXJhdGUgaGFuZGxlcgo+ID4gNDhlYjE0
+Zjg1NiBtaWdyYXRpb24vcWVtdS1maWxlOiBhZGQgcWVtdV9wdXRfY291bnRlZF9zdHJpbmcoKQo+
+ID4gMWQ2NTQ5ZGFlMSBtaWdyYXRpb246IGluY2x1ZGUgbWlncmF0ZV9kaXJ0eV9iaXRtYXBzIGlu
+IG1pZ3JhdGVfcG9zdGNvcHkKPiA+IGU5ZTQwYWYzOWEgcWFwaTogYWRkIGRpcnR5LWJpdG1hcHMg
+bWlncmF0aW9uIGNhcGFiaWxpdHkKPiA+IGM1NzUxODUwMzggbWlncmF0aW9uOiBpbnRyb2R1Y2Ug
+cG9zdGNvcHktb25seSBwZW5kaW5nCj4gPiA3Y2FlMzVjZDdjIGRpcnR5LWJpdG1hcDogYWRkIGxv
+Y2tlZCBzdGF0ZQo+ID4gNDdiYmQyYTcwYyBibG9jay9kaXJ0eS1iaXRtYXA6IGFkZCBfbG9ja2Vk
+IHZlcnNpb24gb2YgYmRydl9yZWNsYWltX2RpcnR5X2JpdG1hcAo+ID4gODcwZmYxZDkxNiBibG9j
+ay9kaXJ0eS1iaXRtYXA6IGZpeCBsb2NraW5nIGluIGJkcnZfcmVjbGFpbV9kaXJ0eV9iaXRtYXAK
+PiA+IDVkY2EzYWUyMjYgYmxvY2svZGlydHktYml0bWFwOiBhZGQgYmRydl9kaXJ0eV9iaXRtYXBf
+ZW5hYmxlX3N1Y2Nlc3NvcigpCj4gPiAKPiA+ID09PSBPVVRQVVQgQkVHSU4gPT09Cj4gPiBDaGVj
+a2luZyBQQVRDSCAxLzEzOiBibG9jay9kaXJ0eS1iaXRtYXA6IGFkZCBiZHJ2X2RpcnR5X2JpdG1h
+cF9lbmFibGVfc3VjY2Vzc29yKCkuLi4KPiA+IENoZWNraW5nIFBBVENIIDIvMTM6IGJsb2NrL2Rp
+cnR5LWJpdG1hcDogZml4IGxvY2tpbmcgaW4gYmRydl9yZWNsYWltX2RpcnR5X2JpdG1hcC4uLgo+
+ID4gQ2hlY2tpbmcgUEFUQ0ggMy8xMzogYmxvY2svZGlydHktYml0bWFwOiBhZGQgX2xvY2tlZCB2
+ZXJzaW9uIG9mIGJkcnZfcmVjbGFpbV9kaXJ0eV9iaXRtYXAuLi4KPiA+IENoZWNraW5nIFBBVENI
+IDQvMTM6IGRpcnR5LWJpdG1hcDogYWRkIGxvY2tlZCBzdGF0ZS4uLgo+ID4gQ2hlY2tpbmcgUEFU
+Q0ggNS8xMzogbWlncmF0aW9uOiBpbnRyb2R1Y2UgcG9zdGNvcHktb25seSBwZW5kaW5nLi4uCj4g
+PiBDaGVja2luZyBQQVRDSCA2LzEzOiBxYXBpOiBhZGQgZGlydHktYml0bWFwcyBtaWdyYXRpb24g
+Y2FwYWJpbGl0eS4uLgo+ID4gQ2hlY2tpbmcgUEFUQ0ggNy8xMzogbWlncmF0aW9uOiBpbmNsdWRl
+IG1pZ3JhdGVfZGlydHlfYml0bWFwcyBpbiBtaWdyYXRlX3Bvc3Rjb3B5Li4uCj4gPiBDaGVja2lu
+ZyBQQVRDSCA4LzEzOiBtaWdyYXRpb24vcWVtdS1maWxlOiBhZGQgcWVtdV9wdXRfY291bnRlZF9z
+dHJpbmcoKS4uLgo+ID4gQ2hlY2tpbmcgUEFUQ0ggOS8xMzogbWlncmF0aW9uOiBhZGQgaXNfYWN0
+aXZlX2l0ZXJhdGUgaGFuZGxlci4uLgo+ID4gQ2hlY2tpbmcgUEFUQ0ggMTAvMTM6IG1pZ3JhdGlv
+bjogYWxsb3cgcW1wIGNvbW1hbmQgbWlncmF0ZS1zdGFydC1wb3N0Y29weSBmb3IgYW55IHBvc3Rj
+b3B5Li4uCj4gPiBDaGVja2luZyBQQVRDSCAxMS8xMzogbWlncmF0aW9uOiBhZGQgcG9zdGNvcHkg
+bWlncmF0aW9uIG9mIGRpcnR5IGJpdG1hcHMuLi4KPiA+IEVSUk9SOiBicmFjZXMge30gYXJlIG5l
+Y2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKPiA+ICM3Mzc6IEZJTEU6IG1p
+Z3JhdGlvbi9ibG9jay1kaXJ0eS1iaXRtYXAuYzo2OTA6Cj4gPiArICAgIH0gd2hpbGUgKCEocy5m
+bGFncyAmIERJUlRZX0JJVE1BUF9NSUdfRkxBR19FT1MpKTsKPiA+IFsuLi5dCj4gPiAKPiA+IHRv
+dGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgODE2IGxpbmVzIGNoZWNrZWQKPiA+IAo+ID4gWW91
+ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCj4gPiBhcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
+dGFpbmVyLCBzZWUKPiA+IENIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj4gPiAKPiA+IENoZWNr
+aW5nIFBBVENIIDEyLzEzOiBpb3Rlc3RzOiBhZGQgZGlydHkgYml0bWFwIG1pZ3JhdGlvbiB0ZXN0
+Li4uCj4gPiBDaGVja2luZyBQQVRDSCAxMy8xMzogaW90ZXN0czogYWRkIGRpcnR5IGJpdG1hcCBw
+b3N0Y29weSB0ZXN0Li4uCj4gPiA9PT0gT1VUUFVUIEVORCA9PT0KPiA+IAo+ID4gVGVzdCBjb21t
+YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKPiA+IAo+ID4gCj4gPiAtLS0KPiA+IEVtYWlsIGdlbmVy
+YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgo+ID4g
+UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmcK
+PiAtLQo+IERyLiBEYXZpZCBBbGFuIEdpbGJlcnQgLyBkZ2lsYmVydEByZWRoYXQuY29tIC8gTWFu
+Y2hlc3RlciwgVUsK
