@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Cowgill@mips.com>) id 1ew8Li-0000AT-9i
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:29:55 -0400
+	(envelope-from <James.Cowgill@mips.com>) id 1ew8Qn-0001fa-C9
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:35:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <James.Cowgill@mips.com>) id 1ew8Le-0003KF-BL
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:29:54 -0400
-Received: from 9pmail.ess.barracuda.com ([64.235.150.224]:53283)
+	(envelope-from <James.Cowgill@mips.com>) id 1ew8Qj-0006tN-Cv
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:35:09 -0400
+Received: from 9pmail.ess.barracuda.com ([64.235.154.211]:51204)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <James.Cowgill@mips.com>)
-	id 1ew8Le-0003Ho-5X
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:29:50 -0400
+	id 1ew8Qf-0006aF-9a
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:35:05 -0400
 From: James Cowgill <james.cowgill@mips.com>
-Date: Wed, 14 Mar 2018 14:20:18 +0000
-Message-ID: <20180314142018.13612-1-james.cowgill@mips.com>
+Date: Wed, 14 Mar 2018 15:31:21 +0000
+Message-ID: <20180314153121.23838-1-james.cowgill@mips.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Subject: [Qemu-devel] [PATCH] linux-user: implement HWCAP bits on MIPS
@@ -33,6 +33,9 @@ MSA.
 Buglink: https://bugs.launchpad.net/qemu/+bug/1754372
 Signed-off-by: James Cowgill <james.cowgill@mips.com>
 ---
+This was resent because I think I messed up my email config. Apologies if you
+receive this twice.
+
  linux-user/elfload.c | 24 ++++++++++++++++++++++++
  1 file changed, 24 insertions(+)
 
