@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ewAHn-0004Im-MQ
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 13:34:00 -0400
+	(envelope-from <konrad.wilk@oracle.com>) id 1ewAJS-0005fE-1k
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 13:35:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ewAHk-0004zM-JH
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 13:33:59 -0400
-Received: from 19.mo7.mail-out.ovh.net ([178.33.251.118]:40084)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ewAHk-0004sE-7n
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 13:33:56 -0400
-Received: from player159.ha.ovh.net (unknown [10.109.122.225])
-	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 32FF892701
-	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 18:33:45 +0100 (CET)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Wed, 14 Mar 2018 18:33:36 +0100
-Message-Id: <20180314173336.20055-1-clg@kaod.org>
+	(envelope-from <konrad.wilk@oracle.com>) id 1ewAJO-00065l-Tq
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 13:35:42 -0400
+Date: Wed, 14 Mar 2018 13:35:33 -0400
+In-Reply-To: <20180314172351.GA4764@localhost.localdomain>
+References: <1513877118-3149-1-git-send-email-jack.schwartz@oracle.com>
+	<20180314172351.GA4764@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] target/ppc: fix tlbsync to check privilege
- level depending on GTSE
+From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Message-ID: <7F85C9E4-D04F-474C-A8E3-2EAFC5B864B9@oracle.com>
+Subject: Re: [Qemu-devel] CVE-2018-7550 (was: multiboot: bss_end_addr can be
+ zero / cleanup)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +25,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Kevin Wolf <kwolf@redhat.com>, Jack Schwartz <jack.schwartz@oracle.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, daniel.kiper@oracle.com, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ppandit@redhat.com, qemu-stable@nongnu.org
 
-tlbsync also needs to check the Guest Translation Shootdown Enable
-(GTSE) bit in the Logical Partition Control Register (LPCR) to
-determine at which privilege level it is running.
+On March 14, 2018 1:23:51 PM EDT, Kevin Wolf <kwolf@redhat=2Ecom> wrote:
+>Am 21=2E12=2E2017 um 18:25 hat Jack Schwartz geschrieben:
+>> Properly account for the possibility of multiboot kernels with a zero
+>> bss_end_addr=2E  The Multiboot Specification, section 3=2E1=2E3 allows =
+for
+>> kernels without a bss section, by allowing a zeroed bss_end_addr
+>multiboot
+>> header field=2E
+>>=20
+>> Do some cleanup to multiboot=2Ec as well:
+>> - Remove some unused variables=2E
+>> - Use more intuitive header names when displaying fields in messages=2E
+>> - Change fprintf(stderr=2E=2E=2E) to error_report
+>
+>[ Cc: qemu-stable ]
+>
+>This series happens to fix CVE-2018-7550=2E
+>http://www=2Eopenwall=2Ecom/lists/oss-security/2018/03/08/4
+>
+>Just a shame that we weren't told before merging it so that the
+>appropriate tags could have been set in the commit message (and all of
+>the problems could have been addressed; I'm going to send another
+>Multiboot series now)=2E
 
-See commit c6fd28fd573d ("target/ppc: Update tlbie to check privilege
-level based on GTSE")
+Huh?
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
+You mean the CVE tags that were created in 2018 for a patch posted in 2017=
+?
 
- This will have its importance when we activate the HV bit on the
- POWER9 CPU for the PowerNV machine.
+Or that the reporter of the security issue didn't point to this particular=
+ patch?
 
- target/ppc/translate.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+Irrespective of that,  is there a write-up  of how security process works =
+at QEMU?
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 0a0c090c9978..218665b4080b 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -4526,7 +4526,7 @@ static void gen_tlbie(DisasContext *ctx)
-     TCGv_i32 t1;
-=20
-     if (ctx->gtse) {
--        CHK_SV; /* If gtse is set then tblie is supervisor privileged */
-+        CHK_SV; /* If gtse is set then tlbie is supervisor privileged */
-     } else {
-         CHK_HV; /* Else hypervisor privileged */
-     }
-@@ -4553,7 +4553,12 @@ static void gen_tlbsync(DisasContext *ctx)
- #if defined(CONFIG_USER_ONLY)
-     GEN_PRIV;
- #else
--    CHK_HV;
-+
-+    if (ctx->gtse) {
-+        CHK_SV; /* If gtse is set then tlbsync is supervisor privileged =
-*/
-+    } else {
-+        CHK_HV; /* Else hypervisor privileged */
-+    }
-=20
-     /* BookS does both ptesync and tlbsync make tlbsync a nop for server=
- */
-     if (ctx->insns_flags & PPC_BOOKE) {
---=20
-2.13.6
+ That is what is the usual embargo period, the list of security folks, how=
+ one can become one, what are the responsibilities, how changes to process =
+are being carried out (and discussed), what breath of testing and PoC work =
+is done , how security fixes are being reviewed, etc?
+
+Thanks!
+
+>
+>Kevin
