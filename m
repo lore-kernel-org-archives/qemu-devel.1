@@ -1,19 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ew1mv-0007ym-W5
+	(envelope-from <berto@igalia.com>) id 1ew1mv-0007yk-VS
 	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 04:29:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ew1mr-0004kg-2v
+	(envelope-from <berto@igalia.com>) id 1ew1mr-0004kc-3A
 	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 04:29:33 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Wed, 14 Mar 2018 10:29:06 +0200
-Message-Id: <14bbd13c5c93211ed4e36188624f429087a6a273.1521016003.git.berto@igalia.com>
-In-Reply-To: <cover.1521016003.git.berto@igalia.com>
-References: <cover.1521016003.git.berto@igalia.com>
-In-Reply-To: <cover.1521016003.git.berto@igalia.com>
-References: <cover.1521016003.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 1/2] qcow2: Give the refcount cache the
- minimum possible size by default
+Date: Wed, 14 Mar 2018 10:29:05 +0200
+Message-Id: <cover.1521016003.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v2 0/2] Give the refcount cache the minimum
+ possible size by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,131 +21,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-The L2 and refcount caches have default sizes that can be overridden
-using the l2-cache-size and refcount-cache-size (an additional
-parameter named cache-size sets the combined size of both caches).
+Hi,
 
-Unless forced by one of the aforementioned parameters, QEMU will set
-the unspecified sizes so that the L2 cache is 4 times larger than the
-refcount cache.
+we talked about this the other day, so here are the patches to change
+the default cache sizes in qcow2.
 
-This is based on the premise that the refcount metadata needs to be
-only a fourth of the L2 metadata to cover the same amount of disk
-space. This is incorrect for two reasons:
+Without this patch:
 
- a) The amount of disk covered by an L2 table depends solely on the
-    cluster size, but in the case of a refcount block it depends on
-    the cluster size *and* the width of each refcount entry.
-    The 4/1 ratio is only valid with 16-bit entries (the default).
+ * refcount-cache-size = l2-cache-size / 4
 
- b) When we talk about disk space and L2 tables we are talking about
-    guest space (L2 tables map guest clusters to host clusters),
-    whereas refcount blocks are used for host clusters (including
-    L1/L2 tables and the refcount blocks themselves). On a fully
-    populated (and uncompressed) qcow2 file, image size > virtual size
-    so there are more refcount entries than L2 entries.
+unless otherwise specified by the user. This is wasteful, the refcount
+cache is accessed sequentially during normal I/O, so there's no point
+in caching more tables. I measured the effect on the refcount cache
+size when populating an empty qcow2 image using random writes, and
+there's no difference between having the minimum or the maximum
+sizes(*).
 
-Problem (a) could be fixed by adjusting the algorithm to take into
-account the refcount entry width. Problem (b) could be fixed by
-increasing a bit the refcount cache size to account for the clusters
-used for qcow2 metadata.
+With this patch:
 
-However this patch takes a completely different approach and instead
-of keeping a ratio between both cache sizes it assigns as much as
-possible to the L2 cache and the remainder to the refcount cache.
+ * refcount-cache-size is always 4 clusters by default (the minimum)
 
-The reason is that L2 tables are used for every single I/O request
-from the guest and the effect of increasing the cache is significant
-and clearly measurable. Refcount blocks are however only used for
-cluster allocation and internal snapshots and in practice are accessed
-sequentially in most cases, so the effect of increasing the cache is
-negligible (even when doing random writes from the guest).
+ * If "cache-size" is set then l2-cache-size is set to the maximum if
+   possible (disk_size * 8 / cluster_size) and the remainder is
+   assigned to the refcount cache.
 
-So, make the refcount cache as small as possible unless the user
-explicitly asks for a larger one.
+Regards,
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
+Berto
+
+(*) there is, actually: having a very large cache can even make the
+    I/O slightly slower, because the larger the cache the longer it
+    takes longer to find a cached entry. I only noticed this under
+    tmpfs anyway.
+
+Changes:
+v2:
+- s/overriden/overridden/ (in both patches)
+
+v1: https://lists.gnu.org/archive/html/qemu-block/2018-03/msg00709.html
+- Initial release
+
+Alberto Garcia (2):
+  qcow2: Give the refcount cache the minimum possible size by default
+  docs: Document the new default sizes of the qcow2 caches
+
  block/qcow2.c              | 31 +++++++++++++++++++------------
  block/qcow2.h              |  4 ----
+ docs/qcow2-cache.txt       | 31 ++++++++++++++-----------------
  tests/qemu-iotests/137.out |  2 +-
- 3 files changed, 20 insertions(+), 17 deletions(-)
+ 4 files changed, 34 insertions(+), 34 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 7472af6931..8342b0186f 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -802,23 +802,30 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
-         } else if (refcount_cache_size_set) {
-             *l2_cache_size = combined_cache_size - *refcount_cache_size;
-         } else {
--            *refcount_cache_size = combined_cache_size
--                                 / (DEFAULT_L2_REFCOUNT_SIZE_RATIO + 1);
--            *l2_cache_size = combined_cache_size - *refcount_cache_size;
-+            uint64_t virtual_disk_size = bs->total_sectors * BDRV_SECTOR_SIZE;
-+            uint64_t max_l2_cache = virtual_disk_size / (s->cluster_size / 8);
-+            uint64_t min_refcount_cache =
-+                (uint64_t) MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
-+
-+            /* Assign as much memory as possible to the L2 cache, and
-+             * use the remainder for the refcount cache */
-+            if (combined_cache_size >= max_l2_cache + min_refcount_cache) {
-+                *l2_cache_size = max_l2_cache;
-+                *refcount_cache_size = combined_cache_size - *l2_cache_size;
-+            } else {
-+                *refcount_cache_size =
-+                    MIN(combined_cache_size, min_refcount_cache);
-+                *l2_cache_size = combined_cache_size - *refcount_cache_size;
-+            }
-         }
-     } else {
--        if (!l2_cache_size_set && !refcount_cache_size_set) {
-+        if (!l2_cache_size_set) {
-             *l2_cache_size = MAX(DEFAULT_L2_CACHE_BYTE_SIZE,
-                                  (uint64_t)DEFAULT_L2_CACHE_CLUSTERS
-                                  * s->cluster_size);
--            *refcount_cache_size = *l2_cache_size
--                                 / DEFAULT_L2_REFCOUNT_SIZE_RATIO;
--        } else if (!l2_cache_size_set) {
--            *l2_cache_size = *refcount_cache_size
--                           * DEFAULT_L2_REFCOUNT_SIZE_RATIO;
--        } else if (!refcount_cache_size_set) {
--            *refcount_cache_size = *l2_cache_size
--                                 / DEFAULT_L2_REFCOUNT_SIZE_RATIO;
-+        }
-+        if (!refcount_cache_size_set) {
-+            *refcount_cache_size = MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
-         }
-     }
- 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index ccb92a9696..cdf41055ae 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -77,10 +77,6 @@
- #define DEFAULT_L2_CACHE_CLUSTERS 8 /* clusters */
- #define DEFAULT_L2_CACHE_BYTE_SIZE 1048576 /* bytes */
- 
--/* The refblock cache needs only a fourth of the L2 cache size to cover as many
-- * clusters */
--#define DEFAULT_L2_REFCOUNT_SIZE_RATIO 4
--
- #define DEFAULT_CLUSTER_SIZE 65536
- 
- 
-diff --git a/tests/qemu-iotests/137.out b/tests/qemu-iotests/137.out
-index e28e1eadba..96724a6c33 100644
---- a/tests/qemu-iotests/137.out
-+++ b/tests/qemu-iotests/137.out
-@@ -22,7 +22,7 @@ refcount-cache-size may not exceed cache-size
- L2 cache size too big
- L2 cache entry size must be a power of two between 512 and the cluster size (65536)
- L2 cache entry size must be a power of two between 512 and the cluster size (65536)
--L2 cache size too big
-+Refcount cache size too big
- Conflicting values for qcow2 options 'overlap-check' ('constant') and 'overlap-check.template' ('all')
- Unsupported value 'blubb' for qcow2 option 'overlap-check'. Allowed are any of the following: none, constant, cached, all
- Unsupported value 'blubb' for qcow2 option 'overlap-check'. Allowed are any of the following: none, constant, cached, all
 -- 
 2.11.0
