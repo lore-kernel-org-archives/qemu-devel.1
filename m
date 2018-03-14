@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ew93A-0006JE-J4
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:14:49 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ew99M-0001BH-P8
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:21:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ew935-0006WY-Jv
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:14:48 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:49377)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ew935-0006W6-9U
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:14:43 -0400
-References: <20180314153121.23838-1-james.cowgill@mips.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <46dbae6e-4ff6-5003-e8e6-175bf0fbd51f@vivier.eu>
-Date: Wed, 14 Mar 2018 17:13:56 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1ew99H-0002Wr-Uu
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:21:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40686 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ew99H-0002WK-Q0
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:21:07 -0400
+Date: Wed, 14 Mar 2018 16:20:58 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180314162058.GF3006@work-vm>
+References: <1520426065-40265-1-git-send-email-wei.w.wang@intel.com>
+	<1520426065-40265-2-git-send-email-wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20180314153121.23838-1-james.cowgill@mips.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: implement HWCAP bits on MIPS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1520426065-40265-2-git-send-email-wei.w.wang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/4] bitmap: bitmap_count_one_with_offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: James Cowgill <james.cowgill@mips.com>, Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-Le 14/03/2018 à 16:31, James Cowgill a écrit :
-> Add support for the two currently defined HWCAP bits on MIPS - R6 and
-> MSA.
+* Wei Wang (wei.w.wang@intel.com) wrote:
+> Count the number of 1s in a bitmap starting from an offset.
 > 
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1754372
-> Signed-off-by: James Cowgill <james.cowgill@mips.com>
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> CC: Juan Quintela <quintela@redhat.com>
+> CC: Michael S. Tsirkin <mst@redhat.com>
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
 > ---
-> This was resent because I think I messed up my email config. Apologies if you
-> receive this twice.
+>  include/qemu/bitmap.h | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
 > 
->  linux-user/elfload.c | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
-> 
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index 5fc130cc20..747b0ed10b 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -950,6 +950,30 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUMIPSState *e
->  #define USE_ELF_CORE_DUMP
->  #define ELF_EXEC_PAGESIZE        4096
+> diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
+> index 509eedd..e3f31f1 100644
+> --- a/include/qemu/bitmap.h
+> +++ b/include/qemu/bitmap.h
+> @@ -228,6 +228,19 @@ static inline long bitmap_count_one(const unsigned long *bitmap, long nbits)
+>      }
+>  }
 >  
-> +/* See arch/mips/include/uapi/hwcap.h.  */
-
-in fact arch/mips/include/uapi/asm/hwcap.h
-
-> +enum {
-> +    HWCAP_MIPS_R6           = (1 << 0),
-> +    HWCAP_MIPS_MSA          = (1 << 1),
-> +};
-
-We have this for ARM only in elfload.c since:
-
-    afce2927aa Arm AT_HWCAP AUXV entry (Paul Brook) [2005]
-
-but they have been added in include/elf.h since:
-
-    41d9ea80ac tcg-arm: Use qemu_getauxval [Richard Henderson, 2013]
-
-and I think we should remove them (they are prefixed by ARM_)
-
-So the MIPS ones should be in include/elf.h (with the #define form).
-
-Richard, any comment?
-
-Thanks,
-Laurent
+> +static inline long bitmap_count_one_with_offset(const unsigned long *bitmap,
+> +                                                long offset, long nbits)
+> +{
+> +    long aligned_offset = QEMU_ALIGN_DOWN(offset, BITS_PER_LONG);
+> +    long redundant_bits = offset - aligned_offset;
+> +    long bits_to_count = nbits + redundant_bits;
+> +    const unsigned long *bitmap_start = bitmap +
+> +                                        aligned_offset / BITS_PER_LONG;
+> +
+> +    return bitmap_count_one(bitmap_start, bits_to_count) -
+> +           bitmap_count_one(bitmap_start, redundant_bits);
+> +}
+> +
+>  void bitmap_set(unsigned long *map, long i, long len);
+>  void bitmap_set_atomic(unsigned long *map, long i, long len);
+>  void bitmap_clear(unsigned long *map, long start, long nr);
+> -- 
+> 1.8.3.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
