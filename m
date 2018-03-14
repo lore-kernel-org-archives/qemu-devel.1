@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ewAlt-0003Aa-S5
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 14:05:06 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ewAsZ-0005Rq-7z
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 14:12:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ewAlo-0007jg-UR
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 14:05:05 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:32800)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ewAlo-0007it-Ng
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 14:05:00 -0400
-Received: by mail-wr0-x243.google.com with SMTP id z73so1427020wrb.0
-	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 11:05:00 -0700 (PDT)
-References: <20180314120906.30872-1-berrange@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180314120906.30872-1-berrange@redhat.com>
-Date: Wed, 14 Mar 2018 18:04:57 +0000
-Message-ID: <87k1uebkja.fsf@linaro.org>
+	(envelope-from <dgilbert@redhat.com>) id 1ewAsV-0002z8-6I
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 14:11:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45452 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ewAsV-0002yW-1A
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 14:11:55 -0400
+Date: Wed, 14 Mar 2018 18:11:37 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180314181137.GG3006@work-vm>
+References: <1520426065-40265-1-git-send-email-wei.w.wang@intel.com>
+	<1520426065-40265-3-git-send-email-wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC] configure: shorthand for only enabling
- native softmmu target
+In-Reply-To: <1520426065-40265-3-git-send-email-wei.w.wang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] migration: API to clear bits of
+ guest free pages from the dirty bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,137 +29,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
-
-> With the huge number of QEMU targets, a default configuration will take
-> a very long time to rebuild. When developing most code changes, it is
-> sufficient to test compilation with a single target - rebuilding all
-> targets just extends compile times while not detecting any new problems.
->
-> Developers will often thus specify a single target for configure,
-> commonly matching the host architecture. eg
->
->   ./configure --target-list=3Dx86_64-softmmu
-
-A while back I messed with a patch that allowed stems in --target-list
-so you could quickly select targets with stems:
-
-  Subject: [PATCH 0/4] Current Travis queue
-  Date: Fri, 15 Apr 2016 16:56:57 +0100
-  Message-Id: <1460735821-12775-1-git-send-email-alex.bennee@linaro.org>
-
-but if I recall Peter was worried about it breaking existing configure
-lines.
-
->
-> This works fine, but is a bit of a verbose thing to type out everytime
-> configure is invoked. There are already short-hand args to disable all
-> user targets, all softmmu targets, or all tcg targets. This adds one
-> further shorthand to disable all non-native architecture targets.
->
->   ./configure --native
-
-I'm not sure this is really the case. My history tends to be littered
-with things like:
-
-  ./configure --enable-debug --enable-debug-tcg --extra-cflags=3D"-O0 -g3" =
---target-list=3Daarch64-linux-user
-
-when compile time is an issue although my development box is an x86.
-Normally I do compile all targets and rely on ccache to keep the compile
-time reasonable.
-
->
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+* Wei Wang (wei.w.wang@intel.com) wrote:
+> This patch adds an API to clear bits corresponding to guest free pages
+> from the dirty bitmap. Spilt the free page block if it crosses the QEMU
+> RAMBlock boundary.
+>=20
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> CC: Juan Quintela <quintela@redhat.com>
+> CC: Michael S. Tsirkin <mst@redhat.com>
 > ---
->
-> Suggestions welcomed for better names than --native, but bear in mind
-> the goal is to minimise amount of typing so nothing too verbose, hence
-> why I didn't do something like --disable-non-native ...
-
-I would argue it's "almost" equivalent to --disable-tcg as most native
-users in my experience aren't looking to run X on X via TCG. I could be
-wrong of course.
-
->
->  configure | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
->
-> diff --git a/configure b/configure
-> index af72fc852e..807af93116 100755
-> --- a/configure
-> +++ b/configure
-> @@ -233,6 +233,22 @@ supported_whpx_target() {
->      return 1
+>  include/migration/misc.h |  2 ++
+>  migration/ram.c          | 21 +++++++++++++++++++++
+>  2 files changed, 23 insertions(+)
+>=20
+> diff --git a/include/migration/misc.h b/include/migration/misc.h
+> index 77fd4f5..fae1acf 100644
+> --- a/include/migration/misc.h
+> +++ b/include/migration/misc.h
+> @@ -14,11 +14,13 @@
+>  #ifndef MIGRATION_MISC_H
+>  #define MIGRATION_MISC_H
+> =20
+> +#include "exec/cpu-common.h"
+>  #include "qemu/notify.h"
+> =20
+>  /* migration/ram.c */
+> =20
+>  void ram_mig_init(void);
+> +void qemu_guest_free_page_hint(void *addr, size_t len);
+> =20
+>  /* migration/block.c */
+> =20
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 5e33e5c..e172798 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -2189,6 +2189,27 @@ static int ram_init_all(RAMState **rsp)
+>      return 0;
 >  }
->
-> +supported_native_target() {
-> +    glob "$1" "*-softmmu" || return 1
-> +    case "${1%-softmmu}:$cpu" in
-> +        arm:arm | aarch64:aarch64 | \
-> +        i386:i386 | i386:x32 | \
-> +        x86_64:x86_64 | \
-> +        mips:mips | mipsel:mips | \
-> +        ppc:ppc | ppcemb:ppc | \
-> +        ppc64:ppc64 | \
-> +        s390x:s390x)
-> +            return 0
-> +        ;;
-> +    esac
-> +    return 1
+> =20
+
+This could do with some comments
+
+> +void qemu_guest_free_page_hint(void *addr, size_t len)
+> +{
+> +    RAMBlock *block;
+> +    ram_addr_t offset;
+> +    size_t used_len, start, npages;
+
+=46rom your use I think the addr and len are coming raw from the guest;
+so we need to take some care.
+
+> +
+> +    for (used_len =3D len; len > 0; len -=3D used_len) {
+
+That initialisation of used_len is unusual; I'd rather put that
+in the body.
+
+> +        block =3D qemu_ram_block_from_host(addr, false, &offset);
+
+CHeck for block !=3D 0
+
+> +        if (unlikely(offset + len > block->used_length)) {
+
+I think to make that overflow safe, that should be:
+  if (len > (block->used_length - offset)) {
+
+But we'll need another test before it, because qemu_ram_block_from_host
+seems to check max_length not used_length, so we need to check
+for offset > block->used_length first
+
+> +            used_len =3D block->used_length - offset;
+> +            addr +=3D used_len;
+> +        }
+> +
+> +        start =3D offset >> TARGET_PAGE_BITS;
+> +        npages =3D used_len >> TARGET_PAGE_BITS;
+> +        ram_state->migration_dirty_pages -=3D
+> +                      bitmap_count_one_with_offset(block->bmap, start, n=
+pages);
+> +        bitmap_clear(block->bmap, start, npages);
+
+If this is happening while the migration is running, this isn't safe -
+the migration code could clear a bit at about the same point this
+happens, so that the count returned by bitmap_count_one_with_offset
+wouldn't match the word that was cleared by bitmap_clear.
+
+The only way I can see to fix it is to run over the range using
+bitmap_test_and_clear_atomic, using the return value to decrement
+the number of dirty pages.
+But you also need to be careful with the update of the
+migration_dirty_pages value itself, because that's also being read
+by the migration thread.
+
+Dave
+
+> +    }
 > +}
 > +
-
-This strikes me as another place to mess about with when doing target
-specific changes to configure.
-
->  supported_target() {
->      case "$1" in
->          *-softmmu)
-> @@ -254,6 +270,10 @@ supported_target() {
->              return 1
->              ;;
->      esac
-> +    if test "$native" =3D "yes"
-> +    then
-> +	supported_native_target "$1" || return 1
-> +    fi
->      test "$tcg" =3D "yes" && return 0
->      supported_kvm_target "$1" && return 0
->      supported_xen_target "$1" && return 0
-> @@ -390,6 +410,7 @@ cocoa=3D"no"
->  softmmu=3D"yes"
->  linux_user=3D"no"
->  bsd_user=3D"no"
-> +native=3D"no"
->  blobs=3D"yes"
->  pkgversion=3D""
->  pie=3D""
-> @@ -1112,6 +1133,8 @@ for opt do
->        cocoa=3D"yes" ;
->        audio_drv_list=3D"coreaudio $(echo $audio_drv_list | sed s,coreaud=
-io,,g)"
->    ;;
-> +  --native) native=3D"yes"
-> +  ;;
->    --disable-system) softmmu=3D"no"
->    ;;
->    --enable-system) softmmu=3D"yes"
-> @@ -1540,6 +1563,7 @@ Advanced options (experts only):
->                             xen pv domain builder
->    --enable-debug-stack-usage
->                             track the maximum stack usage of stacks creat=
-ed by qemu_alloc_stack
-> +  --native                 only enable the softmmu target matching host =
-architecture
->
->  Optional features, enabled with --enable-FEATURE and
->  disabled with --disable-FEATURE, default is enabled if available:
-
-
+>  /*
+>   * Each of ram_save_setup, ram_save_iterate and ram_save_complete has
+>   * long-running RCU critical section.  When rcu-reclaims in the code
+> --=20
+> 1.8.3.1
+>=20
 --
-Alex Benn=C3=A9e
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
