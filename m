@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37758)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ew8cM-0008RR-3H
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:47:07 -0400
+	(envelope-from <aleksandar.rikalo@rt-rk.com>) id 1ew8CT-0007EJ-RU
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:20:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ew8cJ-0005zC-0N
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:47:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42078)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ew8cI-0005yW-Pg
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:47:02 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ew8cG-0001Hc-2D
-	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 15:47:00 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2B94D2E8190
-	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 15:46:56 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 14 Mar 2018 15:32:28 -0000
-From: =?utf-8?b?SmFuw6VrZSBSw7ZubmJsb20=?= <jan-ake@ronnblom.se>
-Reply-To: Bug 1587065 <1587065@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160530134240.21929.85128.malonedeb@wampee.canonical.com>
-Message-Id: <152104154887.15155.16458762202939099722.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1587065] Re: btrfs qemu-ga - multiple mounts
- block fsfreeze
+	(envelope-from <aleksandar.rikalo@rt-rk.com>) id 1ew8CO-0006lL-S4
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:20:21 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:42233 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.rikalo@rt-rk.com>)
+	id 1ew8CO-0006V0-EA
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:20:16 -0400
+From: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+Date: Wed, 14 Mar 2018 16:17:55 +0100
+Message-Id: <1521040675-31054-1-git-send-email-aleksandar.rikalo@rt-rk.com>
+Subject: [Qemu-devel] [PATCH] target-mips: Add initrd support for the Boston
+ board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,100 +24,104 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Paul Burton <paul.burton@mips.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, Petar Jovanovic <petar.jovanovic@mips.com>, Aleksandar Rikalo <aleksandar.rikalo@mips.com>
 
-This affects Ubuntu 16.04 as in #4
+From: Aleksandar Rikalo <aleksandar.rikalo@mips.com>
 
+Add support for initial ramdisk loading for the Mips Boston board.
 
+Signed-off-by: Aleksandar Rikalo <aleksandar.rikalo@mips.com>
+---
+ hw/mips/boston.c | 54 +++++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 45 insertions(+), 9 deletions(-)
 
-** Also affects: qemu (Ubuntu)
-   Importance: Undecided
-       Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1587065
-
-Title:
-  btrfs qemu-ga - multiple mounts block fsfreeze
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  New
-
-Bug description:
-  Having two mounts of the same device makes fsfreeze through qemu-ga impos=
-sible.
-  root@CmsrvMTA:/# mount -l | grep /dev/vda2
-  /dev/vda2 on / type btrfs (rw,relatime,space_cache,subvolid=3D257,subvol=
-=3D/@)
-  /dev/vda2 on /home type btrfs (rw,relatime,space_cache,subvolid=3D258,sub=
-vol=3D/@home)
-
-  Having two mounts is rather common with btrfs, so the feature fsfreeze
-  is unusable on these systems.
-
-  =
-
-  Below more information about how we encountered this issue...
-
-  Message send to qemu-discuss@nongnu.org:
-
-  Message 1:
-  ----------
-  I use external snapshots to backup my guests. I use the 'quiesce' option =
-to flush and frees the guest file system with the qemu guest agent.
-
-  With the exeption of one guest, this procedure works fine. On the 'unwill=
-ing' guest, I get this error message:
-  "ERROR 2016-05-25 00:51:19 | T25-bakVMSCmsrvVH2 | fout: internal error: u=
-nable to execute QEMU agent command 'guest-fsfreeze-freeze': failed to free=
-ze /: Device or resource busy"
-
-  I don't think this is not some sort of time-out error, because
-  activation of the fsfreeze and the error message happen immediately
-  after each other:
-
-  $ grep qemu-ga syslog.1
-  May 25 00:51:19 CmsrvMTA qemu-ga: info: guest-fsfreeze called
-
-  This is the only entry of the qemu guest agent in syslog.
-
-  $ sudo virsh version
-  Compiled against library: libvirt 1.3.1
-  Using library: libvirt 1.3.1
-  Gebruikte API: QEMU 1.3.1
-  Draaiende hypervisor: QEMU 2.5.0
-
-  $ virsh qemu-agent-command CmsrvMTA '{"execute": "guest-info"}'
-  {"return":{"version":"2.5.0", ... ,{"enabled":true,"name":"guest-fstrim",=
-"success-response":true},{"enabled":true,"name":"guest-fsfreeze-thaw","succ=
-ess-response":true},{"enabled":true,"name":"guest-fsfreeze-status","success=
--response":true},{"enabled":true,"name":"guest-fsfreeze-freeze-list","succe=
-ss-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze","success-=
-response":true}, ... }
-
-  For making an external snapshot, I use this command:
-  $ virsh snapshot-create-as --domain CmsrvMTA sn1 --disk-only --atomic --q=
-uiesce --no-metadata --diskspec vda,file=3D/srv/poolVMS/CmsrvMTA.sn1
-
-  Piece of reply 1:
-  -----------------
-  I have encountered this before. Some operating systems
-   may have bind-mounts that let a device appear multiple times in the moun=
-t list. Unfortunately the guest agent is not smart enough to consider a dev=
-ice that has been frozen as succesfull and keep going. This causes this spe=
-cific error.
-
-  Piece of reply 2:
-  -----------------
-  Ok, that seems to be it.
-
-  I=E2=80=99ve got the =E2=80=98/=E2=80=99 and =E2=80=98/home=E2=80=99 on t=
-he same device formatted as btrfs on
-  two separate sub volumes.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1587065/+subscriptions
+diff --git a/hw/mips/boston.c b/hw/mips/boston.c
+index fb23161..67ca54f 100644
+--- a/hw/mips/boston.c
++++ b/hw/mips/boston.c
+@@ -30,6 +30,7 @@
+ #include "hw/loader-fit.h"
+ #include "hw/mips/cps.h"
+ #include "hw/mips/cpudevs.h"
++#include "hw/mips/mips.h"
+ #include "hw/pci-host/xilinx-pcie.h"
+ #include "qapi/error.h"
+ #include "qemu/cutils.h"
+@@ -333,10 +334,12 @@ static const void *boston_fdt_filter(void *opaque, const void *fdt_orig,
+ {
+     BostonState *s = BOSTON(opaque);
+     MachineState *machine = s->mach;
+-    const char *cmdline;
++    GString *cmdline;
+     int err;
+     void *fdt;
+     size_t fdt_sz, ram_low_sz, ram_high_sz;
++    long initrd_size;
++    ram_addr_t initrd_offset;
+ 
+     fdt_sz = fdt_totalsize(fdt_orig) * 2;
+     fdt = g_malloc0(fdt_sz);
+@@ -347,20 +350,53 @@ static const void *boston_fdt_filter(void *opaque, const void *fdt_orig,
+         return NULL;
+     }
+ 
+-    cmdline = (machine->kernel_cmdline && machine->kernel_cmdline[0])
+-            ? machine->kernel_cmdline : " ";
+-    err = qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
+-    if (err < 0) {
+-        fprintf(stderr, "couldn't set /chosen/bootargs\n");
+-        return NULL;
+-    }
+-
+     ram_low_sz = MIN(256 * M_BYTE, machine->ram_size);
+     ram_high_sz = machine->ram_size - ram_low_sz;
+     qemu_fdt_setprop_sized_cells(fdt, "/memory@0", "reg",
+                                  1, 0x00000000, 1, ram_low_sz,
+                                  1, 0x90000000, 1, ram_high_sz);
+ 
++    cmdline = g_string_new(machine->kernel_cmdline);
++
++    /* load initrd */
++    initrd_offset = 0;
++    if (machine->initrd_filename) {
++        initrd_size = get_image_size(machine->initrd_filename);
++        if (initrd_size > 0) {
++            /* The kernel allocates the bootmap memory in the low memory after
++               the initrd.  It takes at most 128kiB for 2GB RAM and 4kiB
++               pages.  */
++            initrd_offset = (ram_low_sz - initrd_size - 131072
++                             - ~INITRD_PAGE_MASK) & INITRD_PAGE_MASK;
++
++            if ((int64_t)cpu_mips_kseg0_to_phys(NULL, *load_addr + fdt_sz)
++                >= (int64_t)initrd_offset) {
++                error_report("memory too small for initial ram disk '%s'",
++                             machine->initrd_filename);
++                exit(1);
++            }
++
++            initrd_size = load_image_targphys(machine->initrd_filename,
++                                              initrd_offset,
++                                              initrd_size);
++        }
++        if (initrd_size == (target_ulong) -1) {
++            error_report("could not load initial ram disk '%s'",
++                         machine->initrd_filename);
++            exit(1);
++        }
++        g_string_append_printf(cmdline, " rd_start=0x%" PRIx64 " rd_size=%li",
++                               cpu_mips_phys_to_kseg0(NULL, initrd_offset),
++                               initrd_size);
++    }
++
++    err = qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline->str);
++    g_string_free(cmdline, true);
++    if (err < 0) {
++        fprintf(stderr, "couldn't set /chosen/bootargs\n");
++        return NULL;
++    }
++
+     fdt = g_realloc(fdt, fdt_totalsize(fdt));
+     qemu_fdt_dumpdtb(fdt, fdt_sz);
+ 
+-- 
+1.9.1
