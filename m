@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ew99M-0001BH-P8
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:21:13 -0400
+	(envelope-from <quintela@redhat.com>) id 1ew9QT-0007aA-HR
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:38:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ew99H-0002Wr-Uu
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:21:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40686 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1ew9QQ-0004Ki-7t
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:38:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49288 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ew99H-0002WK-Q0
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:21:07 -0400
-Date: Wed, 14 Mar 2018 16:20:58 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180314162058.GF3006@work-vm>
-References: <1520426065-40265-1-git-send-email-wei.w.wang@intel.com>
-	<1520426065-40265-2-git-send-email-wei.w.wang@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1520426065-40265-2-git-send-email-wei.w.wang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/4] bitmap: bitmap_count_one_with_offset
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ew9QQ-0004K0-2t
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:38:50 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 54B6F8182D2A
+	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 16:38:47 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed, 14 Mar 2018 17:38:32 +0100
+Message-Id: <20180314163838.7158-3-quintela@redhat.com>
+In-Reply-To: <20180314163838.7158-1-quintela@redhat.com>
+References: <20180314163838.7158-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 2/8] tests: Add migration precopy test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +29,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-* Wei Wang (wei.w.wang@intel.com) wrote:
-> Count the number of 1s in a bitmap starting from an offset.
-> 
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> CC: Juan Quintela <quintela@redhat.com>
-> CC: Michael S. Tsirkin <mst@redhat.com>
-
+Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+---
+ tests/migration-test.c | 44 ++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 42 insertions(+), 2 deletions(-)
 
-> ---
->  include/qemu/bitmap.h | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
-> 
-> diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
-> index 509eedd..e3f31f1 100644
-> --- a/include/qemu/bitmap.h
-> +++ b/include/qemu/bitmap.h
-> @@ -228,6 +228,19 @@ static inline long bitmap_count_one(const unsigned long *bitmap, long nbits)
->      }
->  }
->  
-> +static inline long bitmap_count_one_with_offset(const unsigned long *bitmap,
-> +                                                long offset, long nbits)
-> +{
-> +    long aligned_offset = QEMU_ALIGN_DOWN(offset, BITS_PER_LONG);
-> +    long redundant_bits = offset - aligned_offset;
-> +    long bits_to_count = nbits + redundant_bits;
-> +    const unsigned long *bitmap_start = bitmap +
-> +                                        aligned_offset / BITS_PER_LONG;
-> +
-> +    return bitmap_count_one(bitmap_start, bits_to_count) -
-> +           bitmap_count_one(bitmap_start, redundant_bits);
-> +}
-> +
->  void bitmap_set(unsigned long *map, long i, long len);
->  void bitmap_set_atomic(unsigned long *map, long i, long len);
->  void bitmap_clear(unsigned long *map, long start, long nr);
-> -- 
-> 1.8.3.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 422bf1afdf..834cdf50f2 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -524,7 +524,7 @@ static void test_deprecated(void)
+     qtest_quit(from);
+ }
+ 
+-static void test_migrate(void)
++static void test_postcopy(void)
+ {
+     char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
+     QTestState *from, *to;
+@@ -595,6 +595,45 @@ static void test_baddest(void)
+     test_migrate_end(from, to, false);
+ }
+ 
++static void test_precopy_unix(void)
++{
++    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
++    QTestState *from, *to;
++
++    test_migrate_start(&from, &to, uri, false);
++
++    /* We want to pick a speed slow enough that the test completes
++     * quickly, but that it doesn't complete precopy even on a slow
++     * machine, so also set the downtime.
++     */
++    /* 1 ms should make it not converge*/
++    migrate_set_parameter(from, "downtime-limit", "1");
++    /* 1GB/s */
++    migrate_set_parameter(from, "max-bandwidth", "1000000000");
++
++    /* Wait for the first serial output from the source */
++    wait_for_serial("src_serial");
++
++    migrate(from, uri);
++
++    wait_for_migration_pass(from);
++
++    /* 300 ms should converge */
++    migrate_set_parameter(from, "downtime-limit", "300");
++
++    if (!got_stop) {
++        qtest_qmp_eventwait(from, "STOP");
++    }
++
++    qtest_qmp_eventwait(to, "RESUME");
++
++    wait_for_serial("dest_serial");
++    wait_for_migration_complete(from);
++
++    test_migrate_end(from, to, true);
++    g_free(uri);
++}
++
+ int main(int argc, char **argv)
+ {
+     char template[] = "/tmp/migration-test-XXXXXX";
+@@ -614,9 +653,10 @@ int main(int argc, char **argv)
+ 
+     module_call_init(MODULE_INIT_QOM);
+ 
+-    qtest_add_func("/migration/postcopy/unix", test_migrate);
++    qtest_add_func("/migration/postcopy/unix", test_postcopy);
+     qtest_add_func("/migration/deprecated", test_deprecated);
+     qtest_add_func("/migration/bad_dest", test_baddest);
++    qtest_add_func("/migration/precopy/unix", test_precopy_unix);
+ 
+     ret = g_test_run();
+ 
+-- 
+2.14.3
