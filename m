@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ew92R-0005nR-0y
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:14:04 -0400
+	(envelope-from <bounces@canonical.com>) id 1ew8cM-0008RR-3H
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:47:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ew92M-0006Ct-1u
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:14:03 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:55740)
+	(envelope-from <bounces@canonical.com>) id 1ew8cJ-0005zC-0N
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:47:06 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42078)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1ew92L-0006CX-Qy
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:13:57 -0400
-Received: by mail-wm0-x244.google.com with SMTP id q83so5179208wme.5
-	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 09:13:57 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1521039163-138-1-git-send-email-juterry@microsoft.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <99e60a02-d242-b79e-b4c0-95a6eb273f62@redhat.com>
-Date: Wed, 14 Mar 2018 17:13:54 +0100
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ew8cI-0005yW-Pg
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:47:02 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ew8cG-0001Hc-2D
+	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 15:47:00 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2B94D2E8190
+	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 15:46:56 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1521039163-138-1-git-send-email-juterry@microsoft.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/3] WHPX introduce changes for Windows
- Insider SDK 17110
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 14 Mar 2018 15:32:28 -0000
+From: =?utf-8?b?SmFuw6VrZSBSw7ZubmJsb20=?= <jan-ake@ronnblom.se>
+Reply-To: Bug 1587065 <1587065@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160530134240.21929.85128.malonedeb@wampee.canonical.com>
+Message-Id: <152104154887.15155.16458762202939099722.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1587065] Re: btrfs qemu-ga - multiple mounts
+ block fsfreeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,36 +37,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Justin Terry (VM)" <juterry@microsoft.com>, qemu-devel@nongnu.org
-Cc: rth@twiddle.net, ehabkost@redhat.com
+To: qemu-devel@nongnu.org
 
-On 14/03/2018 15:52, Justin Terry (VM) wrote:
-> This change set fixes two breaking changes that were introduced in the
-> Windows Insider SDK 17110. First, a change to the WHvGetCapability function
-> decl to include the 'out' WrittenSizeInBytes. Second, changes to the
-> WHvSetPartitionProperty function decl and WHV_PARTITION_PROPERTY structure
-> to directly pass the PropertyCode at invocation.
-> 
-> Lastly, it introduces a major performance improvement in whpx_vcpu_post_run
-> using the VpContext exit structure rather than another round trip call to
-> WHvGetVirtualProcessorRegisters to synchronize vp state.
-> 
-> QEMU compiled against this SDK (17110+) is expected to work on all Windows
-> Insider Builds (17115+).
-> 
-> Thanks,
-> Justin Terry
-> 
-> Justin Terry (VM) (3):
->   WHPX fix WHvGetCapability out WrittenSizeInBytes
->   WHPX fix WHvSetPartitionProperty in PropertyCode
->   WHPX improve vcpu_post_run perf
-> 
->  configure              |  4 +++-
->  target/i386/whpx-all.c | 46 ++++++++++++++--------------------------------
->  2 files changed, 17 insertions(+), 33 deletions(-)
-> 
+This affects Ubuntu 16.04 as in #4
 
-Queued, thanks.
 
-Paolo
+
+** Also affects: qemu (Ubuntu)
+   Importance: Undecided
+       Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1587065
+
+Title:
+  btrfs qemu-ga - multiple mounts block fsfreeze
+
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  New
+
+Bug description:
+  Having two mounts of the same device makes fsfreeze through qemu-ga impos=
+sible.
+  root@CmsrvMTA:/# mount -l | grep /dev/vda2
+  /dev/vda2 on / type btrfs (rw,relatime,space_cache,subvolid=3D257,subvol=
+=3D/@)
+  /dev/vda2 on /home type btrfs (rw,relatime,space_cache,subvolid=3D258,sub=
+vol=3D/@home)
+
+  Having two mounts is rather common with btrfs, so the feature fsfreeze
+  is unusable on these systems.
+
+  =
+
+  Below more information about how we encountered this issue...
+
+  Message send to qemu-discuss@nongnu.org:
+
+  Message 1:
+  ----------
+  I use external snapshots to backup my guests. I use the 'quiesce' option =
+to flush and frees the guest file system with the qemu guest agent.
+
+  With the exeption of one guest, this procedure works fine. On the 'unwill=
+ing' guest, I get this error message:
+  "ERROR 2016-05-25 00:51:19 | T25-bakVMSCmsrvVH2 | fout: internal error: u=
+nable to execute QEMU agent command 'guest-fsfreeze-freeze': failed to free=
+ze /: Device or resource busy"
+
+  I don't think this is not some sort of time-out error, because
+  activation of the fsfreeze and the error message happen immediately
+  after each other:
+
+  $ grep qemu-ga syslog.1
+  May 25 00:51:19 CmsrvMTA qemu-ga: info: guest-fsfreeze called
+
+  This is the only entry of the qemu guest agent in syslog.
+
+  $ sudo virsh version
+  Compiled against library: libvirt 1.3.1
+  Using library: libvirt 1.3.1
+  Gebruikte API: QEMU 1.3.1
+  Draaiende hypervisor: QEMU 2.5.0
+
+  $ virsh qemu-agent-command CmsrvMTA '{"execute": "guest-info"}'
+  {"return":{"version":"2.5.0", ... ,{"enabled":true,"name":"guest-fstrim",=
+"success-response":true},{"enabled":true,"name":"guest-fsfreeze-thaw","succ=
+ess-response":true},{"enabled":true,"name":"guest-fsfreeze-status","success=
+-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze-list","succe=
+ss-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze","success-=
+response":true}, ... }
+
+  For making an external snapshot, I use this command:
+  $ virsh snapshot-create-as --domain CmsrvMTA sn1 --disk-only --atomic --q=
+uiesce --no-metadata --diskspec vda,file=3D/srv/poolVMS/CmsrvMTA.sn1
+
+  Piece of reply 1:
+  -----------------
+  I have encountered this before. Some operating systems
+   may have bind-mounts that let a device appear multiple times in the moun=
+t list. Unfortunately the guest agent is not smart enough to consider a dev=
+ice that has been frozen as succesfull and keep going. This causes this spe=
+cific error.
+
+  Piece of reply 2:
+  -----------------
+  Ok, that seems to be it.
+
+  I=E2=80=99ve got the =E2=80=98/=E2=80=99 and =E2=80=98/home=E2=80=99 on t=
+he same device formatted as btrfs on
+  two separate sub volumes.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1587065/+subscriptions
