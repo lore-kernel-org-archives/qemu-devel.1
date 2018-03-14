@@ -1,16 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ewAGI-00038k-11
+	(envelope-from <kwolf@redhat.com>) id 1ewAGH-00038i-Ro
 	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 13:32:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ewAGH-0004CZ-CC
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 13:32:26 -0400
+	(envelope-from <kwolf@redhat.com>) id 1ewAGE-0004BS-Pw
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 13:32:25 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 14 Mar 2018 18:32:10 +0100
-Message-Id: <20180314173213.18563-3-kwolf@redhat.com>
-In-Reply-To: <20180314173213.18563-1-kwolf@redhat.com>
-References: <20180314173213.18563-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/5] multiboot: Check validity of mh_header_addr
+Date: Wed, 14 Mar 2018 18:32:08 +0100
+Message-Id: <20180314173213.18563-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/5] multiboot: Fix buffer overflow on invalid
+ kernels
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,29 +21,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-stable@nongnu.org, jack.schwartz@oracle.com, anatol.pomozov@gmail.com, ppandit@redhat.com
 
-I couldn't find a case where this prevents something bad from happening
-that isn't already caught by other checks, but let's err on the safe
-side and check that mh_header_addr is as expected.
+Patch 1 fixes another Multiboot kernel validation bug that could cause
+QEMU to load the kernel image file into a too small buffer. Patch 2 adds
+another check to harden the code. The rest of the series adds Multiboot
+test cases for kernels using the a.out kludge, which is where the recent
+bugs were found.
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- hw/i386/multiboot.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Kevin Wolf (5):
+  multiboot: Reject kernels exceeding the address space
+  multiboot: Check validity of mh_header_addr
+  tests/multiboot: Test exit code for every qemu run
+  tests/multiboot: Add tests for the a.out kludge
+  tests/multiboot: Add .gitignore
 
-diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
-index 1e215bf8d3..5bc0a2cddb 100644
---- a/hw/i386/multiboot.c
-+++ b/hw/i386/multiboot.c
-@@ -229,6 +229,10 @@ int load_multiboot(FWCfgState *fw_cfg,
-             error_report("invalid load_addr address");
-             exit(1);
-         }
-+        if (mh_header_addr - mh_load_addr > i) {
-+            error_report("invalid header_addr address");
-+            exit(1);
-+        }
- 
-         uint32_t mb_kernel_text_offset = i - (mh_header_addr - mh_load_addr);
-         uint32_t mb_load_size = 0;
+ hw/i386/multiboot.c             |   8 +++
+ tests/multiboot/.gitignore      |   3 +
+ tests/multiboot/Makefile        |  22 +++++--
+ tests/multiboot/aout_kludge.S   | 138 ++++++++++++++++++++++++++++++++++++++++
+ tests/multiboot/aout_kludge.out |  42 ++++++++++++
+ tests/multiboot/run_test.sh     |  34 ++++++----
+ 6 files changed, 227 insertions(+), 20 deletions(-)
+ create mode 100644 tests/multiboot/.gitignore
+ create mode 100644 tests/multiboot/aout_kludge.S
+ create mode 100644 tests/multiboot/aout_kludge.out
+
 -- 
 2.13.6
