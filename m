@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ew9QU-0007ar-Kb
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:38:58 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ew9QT-0004NS-8W
+	(envelope-from <quintela@redhat.com>) id 1ew9QT-0007aB-HT
 	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:38:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35962 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ew9QT-0004My-3A
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <quintela@redhat.com>) id 1ew9QQ-0004L0-8o
 	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:38:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35946 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ew9QQ-0004K3-3H
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 12:38:50 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A156B406E946
-	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 16:38:52 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 04C88406E968
+	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 16:38:46 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 14 Mar 2018 17:38:36 +0100
-Message-Id: <20180314163838.7158-7-quintela@redhat.com>
+Date: Wed, 14 Mar 2018 17:38:31 +0100
+Message-Id: <20180314163838.7158-2-quintela@redhat.com>
 In-Reply-To: <20180314163838.7158-1-quintela@redhat.com>
 References: <20180314163838.7158-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 6/8] tests: Add basic migration precopy tcp
- test
+Subject: [Qemu-devel] [PATCH v6 1/8] qemu-sockets: Export
+ SocketAddress_to_str
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,135 +33,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Not sharing code from precopy/unix because we have to read back the
-tcp parameter.
+Migration code needs that function in hmp.c (so we need to export it),
+and it needs it on tests/migration-test.c, so we need to move it to a
+place where it is compiled into the test framework.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- tests/migration-test.c | 79 ++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 76 insertions(+), 3 deletions(-)
+ chardev/char-socket.c  | 29 -----------------------------
+ include/qemu/sockets.h |  3 +++
+ util/qemu-sockets.c    | 29 +++++++++++++++++++++++++++++
+ 3 files changed, 32 insertions(+), 29 deletions(-)
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 4a94d3d598..8f367ea1d7 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -19,6 +19,9 @@
- #include "qemu/sockets.h"
- #include "chardev/char.h"
- #include "sysemu/sysemu.h"
-+#include "qapi/qapi-visit-sockets.h"
-+#include "qapi/qobject-input-visitor.h"
-+#include "qapi/qobject-output-visitor.h"
- 
- const unsigned start_address = 1024 * 1024;
- const unsigned end_address = 100 * 1024 * 1024;
-@@ -277,8 +280,28 @@ static void cleanup(const char *filename)
-     g_free(path);
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index a220803c01..dc27ecce81 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -373,35 +373,6 @@ static void tcp_chr_free_connection(Chardev *chr)
+     s->connected = 0;
  }
  
--static void migrate_check_parameter(QTestState *who, const char *parameter,
--                                    const char *value)
-+static char *migrate_get_socket_address(QTestState *who, const char *parameter)
-+{
-+    QDict *rsp, *rsp_return;
-+    char *result;
-+    Error *local_err = NULL;
-+    SocketAddress *saddr = NULL;
-+    Visitor *iv = NULL;
-+    QObject *object;
-+
-+    rsp = wait_command(who, "{ 'execute': 'query-migrate-parameters' }");
-+    rsp_return = qdict_get_qdict(rsp, "return");
-+    object = qdict_get(rsp_return, parameter);
-+
-+    iv = qobject_input_visitor_new(object);
-+    visit_type_SocketAddress(iv, NULL, &saddr, &local_err);
-+    result = g_strdup_printf("%s",
-+                             SocketAddress_to_str("", saddr, false, false));
-+    QDECREF(rsp);
-+    return result;
-+}
-+
-+static char *migrate_get_parameter(QTestState *who, const char *parameter)
+-static char *SocketAddress_to_str(const char *prefix, SocketAddress *addr,
+-                                  bool is_listen, bool is_telnet)
+-{
+-    switch (addr->type) {
+-    case SOCKET_ADDRESS_TYPE_INET:
+-        return g_strdup_printf("%s%s:%s:%s%s", prefix,
+-                               is_telnet ? "telnet" : "tcp",
+-                               addr->u.inet.host,
+-                               addr->u.inet.port,
+-                               is_listen ? ",server" : "");
+-        break;
+-    case SOCKET_ADDRESS_TYPE_UNIX:
+-        return g_strdup_printf("%sunix:%s%s", prefix,
+-                               addr->u.q_unix.path,
+-                               is_listen ? ",server" : "");
+-        break;
+-    case SOCKET_ADDRESS_TYPE_FD:
+-        return g_strdup_printf("%sfd:%s%s", prefix, addr->u.fd.str,
+-                               is_listen ? ",server" : "");
+-        break;
+-    case SOCKET_ADDRESS_TYPE_VSOCK:
+-        return g_strdup_printf("%svsock:%s:%s", prefix,
+-                               addr->u.vsock.cid,
+-                               addr->u.vsock.port);
+-    default:
+-        abort();
+-    }
+-}
+-
+ static void update_disconnected_filename(SocketChardev *s)
  {
-     QDict *rsp, *rsp_return;
-     char *result;
-@@ -287,9 +310,18 @@ static void migrate_check_parameter(QTestState *who, const char *parameter,
-     rsp_return = qdict_get_qdict(rsp, "return");
-     result = g_strdup_printf("%" PRId64,
-                              qdict_get_try_int(rsp_return,  parameter, -1));
-+    QDECREF(rsp);
-+    return result;
-+}
-+
-+static void migrate_check_parameter(QTestState *who, const char *parameter,
-+                                    const char *value)
-+{
-+    char *result;
-+
-+    result = migrate_get_parameter(who, parameter);
-     g_assert_cmpstr(result, ==, value);
-     g_free(result);
--    QDECREF(rsp);
- }
+     Chardev *chr = CHARDEV(s);
+diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+index e88d4c37ab..a8bc2d7cfb 100644
+--- a/include/qemu/sockets.h
++++ b/include/qemu/sockets.h
+@@ -109,4 +109,7 @@ SocketAddress *socket_remote_address(int fd, Error **errp);
+  */
+ SocketAddress *socket_address_flatten(SocketAddressLegacy *addr);
  
- static void migrate_set_parameter(QTestState *who, const char *parameter,
-@@ -666,6 +698,46 @@ static void test_xbzrle_unix(void)
-     g_free(uri);
- }
++char *SocketAddress_to_str(const char *prefix, SocketAddress *addr,
++                           bool is_listen, bool is_telnet);
++
+ #endif /* QEMU_SOCKETS_H */
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 7f13e8a338..25965c6ee1 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -1301,3 +1301,32 @@ SocketAddress *socket_address_flatten(SocketAddressLegacy *addr_legacy)
  
-+static void test_precopy_tcp(void)
+     return addr;
+ }
++
++char *SocketAddress_to_str(const char *prefix, SocketAddress *addr,
++                                  bool is_listen, bool is_telnet)
 +{
-+    char *uri;
-+    QTestState *from, *to;
-+
-+    test_migrate_start(&from, &to, "tcp:127.0.0.1:0", false);
-+
-+    /* We want to pick a speed slow enough that the test completes
-+     * quickly, but that it doesn't complete precopy even on a slow
-+     * machine, so also set the downtime.
-+     */
-+    /* 1 ms should make it not converge*/
-+    migrate_set_parameter(from, "downtime-limit", "1");
-+    /* 1GB/s */
-+    migrate_set_parameter(from, "max-bandwidth", "1000000000");
-+
-+    /* Wait for the first serial output from the source */
-+    wait_for_serial("src_serial");
-+
-+    uri = migrate_get_socket_address(to, "x-socket-address");
-+
-+    migrate(from, uri);
-+
-+    wait_for_migration_pass(from);
-+
-+    /* 300ms should converge */
-+    migrate_set_parameter(from, "downtime-limit", "300");
-+
-+    if (!got_stop) {
-+        qtest_qmp_eventwait(from, "STOP");
++    switch (addr->type) {
++    case SOCKET_ADDRESS_TYPE_INET:
++        return g_strdup_printf("%s%s:%s:%s%s", prefix,
++                               is_telnet ? "telnet" : "tcp",
++                               addr->u.inet.host,
++                               addr->u.inet.port,
++                               is_listen ? ",server" : "");
++        break;
++    case SOCKET_ADDRESS_TYPE_UNIX:
++        return g_strdup_printf("%sunix:%s%s", prefix,
++                               addr->u.q_unix.path,
++                               is_listen ? ",server" : "");
++        break;
++    case SOCKET_ADDRESS_TYPE_FD:
++        return g_strdup_printf("%sfd:%s%s", prefix, addr->u.fd.str,
++                               is_listen ? ",server" : "");
++        break;
++    case SOCKET_ADDRESS_TYPE_VSOCK:
++        return g_strdup_printf("%svsock:%s:%s", prefix,
++                               addr->u.vsock.cid,
++                               addr->u.vsock.port);
++    default:
++        abort();
 +    }
-+    qtest_qmp_eventwait(to, "RESUME");
-+
-+    wait_for_serial("dest_serial");
-+    wait_for_migration_complete(from);
-+
-+    test_migrate_end(from, to, true);
-+    g_free(uri);
 +}
-+
- int main(int argc, char **argv)
- {
-     char template[] = "/tmp/migration-test-XXXXXX";
-@@ -689,6 +761,7 @@ int main(int argc, char **argv)
-     qtest_add_func("/migration/deprecated", test_deprecated);
-     qtest_add_func("/migration/bad_dest", test_baddest);
-     qtest_add_func("/migration/precopy/unix", test_precopy_unix);
-+    qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
-     qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
- 
-     ret = g_test_run();
 -- 
 2.14.3
