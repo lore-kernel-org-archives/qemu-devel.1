@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ew51O-0002or-T6
+	(envelope-from <dgilbert@redhat.com>) id 1ew51O-0002os-T5
 	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 07:56:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ew51N-0004XU-I1
+	(envelope-from <dgilbert@redhat.com>) id 1ew51K-0004Vu-1c
 	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 07:56:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37372 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40888 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ew51N-0004XG-DD
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 07:56:41 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ew51J-0004VW-RK
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 07:56:37 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E1C034040070
-	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 11:56:40 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1FC6C8182D1E
+	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 11:56:35 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 14 Mar 2018 11:55:53 +0000
-Message-Id: <20180314115618.28831-5-dgilbert@redhat.com>
+Date: Wed, 14 Mar 2018 11:55:50 +0000
+Message-Id: <20180314115618.28831-2-dgilbert@redhat.com>
 In-Reply-To: <20180314115618.28831-1-dgilbert@redhat.com>
 References: <20180314115618.28831-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 04/29] postcopy: Add notifier chain
+Subject: [Qemu-devel] [PATCH v6 01/29] migrate: Update
+ ram_block_discard_range for shared
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,144 +35,123 @@ Cc: aarcange@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Add a notifier chain for postcopy with a 'reason' flag
-and an opportunity for a notifier member to return an error.
+The choice of call to discard a block is getting more complicated
+for other cases.   We use fallocate PUNCH_HOLE in any file cases;
+it works for both hugepage and for tmpfs.
+We use the DONTNEED for non-hugepage cases either where they're
+anonymous or where they're private.
 
-Call it when enabling postcopy.
-
-This will initially used to enable devices to declare they're unable
-to postcopy and later to notify of devices of stages within postcopy.
+Care should be taken when trying other backing files.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- migration/postcopy-ram.c | 36 ++++++++++++++++++++++++++++++++++++
- migration/postcopy-ram.h | 26 ++++++++++++++++++++++++++
- vl.c                     |  2 ++
- 3 files changed, 64 insertions(+)
+ exec.c       | 60 ++++++++++++++++++++++++++++++++++++++++++++++--------------
+ trace-events |  3 ++-
+ 2 files changed, 48 insertions(+), 15 deletions(-)
 
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index a75b5d393f..1089814d54 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -23,6 +23,8 @@
- #include "savevm.h"
- #include "postcopy-ram.h"
- #include "ram.h"
-+#include "qapi/error.h"
-+#include "qemu/notify.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/balloon.h"
- #include "qemu/error-report.h"
-@@ -45,6 +47,33 @@ struct PostcopyDiscardState {
-     unsigned int nsentcmds;
- };
- 
-+static NotifierWithReturnList postcopy_notifier_list;
-+
-+void postcopy_infrastructure_init(void)
-+{
-+    notifier_with_return_list_init(&postcopy_notifier_list);
-+}
-+
-+void postcopy_add_notifier(NotifierWithReturn *nn)
-+{
-+    notifier_with_return_list_add(&postcopy_notifier_list, nn);
-+}
-+
-+void postcopy_remove_notifier(NotifierWithReturn *n)
-+{
-+    notifier_with_return_remove(n);
-+}
-+
-+int postcopy_notify(enum PostcopyNotifyReason reason, Error **errp)
-+{
-+    struct PostcopyNotifyData pnd;
-+    pnd.reason = reason;
-+    pnd.errp = errp;
-+
-+    return notifier_with_return_list_notify(&postcopy_notifier_list,
-+                                            &pnd);
-+}
-+
- /* Postcopy needs to detect accesses to pages that haven't yet been copied
-  * across, and efficiently map new pages in, the techniques for doing this
-  * are target OS specific.
-@@ -215,6 +244,7 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
-     struct uffdio_register reg_struct;
-     struct uffdio_range range_struct;
-     uint64_t feature_mask;
-+    Error *local_err = NULL;
- 
-     if (qemu_target_page_size() > pagesize) {
-         error_report("Target page size bigger than host page size");
-@@ -228,6 +258,12 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
-         goto out;
+diff --git a/exec.c b/exec.c
+index a9181e6417..34fdfd966e 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3721,6 +3721,7 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
      }
  
-+    /* Give devices a chance to object */
-+    if (postcopy_notify(POSTCOPY_NOTIFY_PROBE, &local_err)) {
-+        error_report_err(local_err);
-+        goto out;
-+    }
-+
-     /* Version and features check */
-     if (!ufd_check_and_apply(ufd, mis)) {
-         goto out;
-diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
-index 14f6cadcbd..2e879bbacb 100644
---- a/migration/postcopy-ram.h
-+++ b/migration/postcopy-ram.h
-@@ -116,4 +116,30 @@ PostcopyState postcopy_state_set(PostcopyState new_state);
+     if ((start + length) <= rb->used_length) {
++        bool need_madvise, need_fallocate;
+         uint8_t *host_endaddr = host_startaddr + length;
+         if ((uintptr_t)host_endaddr & (rb->page_size - 1)) {
+             error_report("ram_block_discard_range: Unaligned end address: %p",
+@@ -3730,29 +3731,60 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
  
- void postcopy_fault_thread_notify(MigrationIncomingState *mis);
+         errno = ENOTSUP; /* If we are missing MADVISE etc */
  
-+/*
-+ * To be called once at the start before any device initialisation
-+ */
-+void postcopy_infrastructure_init(void);
-+
-+/* Add a notifier to a list to be called when checking whether the devices
-+ * can support postcopy.
-+ * It's data is a *PostcopyNotifyData
-+ * It should return 0 if OK, or a negative value on failure.
-+ * On failure it must set the data->errp to an error.
-+ *
-+ */
-+enum PostcopyNotifyReason {
-+    POSTCOPY_NOTIFY_PROBE = 0,
-+};
-+
-+struct PostcopyNotifyData {
-+    enum PostcopyNotifyReason reason;
-+    Error **errp;
-+};
-+
-+void postcopy_add_notifier(NotifierWithReturn *nn);
-+void postcopy_remove_notifier(NotifierWithReturn *n);
-+/* Call the notifier list set by postcopy_add_start_notifier */
-+int postcopy_notify(enum PostcopyNotifyReason reason, Error **errp);
-+
+-        if (rb->page_size == qemu_host_page_size) {
+-#if defined(CONFIG_MADVISE)
+-            /* Note: We need the madvise MADV_DONTNEED behaviour of definitely
+-             * freeing the page.
+-             */
+-            ret = madvise(host_startaddr, length, MADV_DONTNEED);
+-#endif
+-        } else {
+-            /* Huge page case  - unfortunately it can't do DONTNEED, but
+-             * it can do the equivalent by FALLOC_FL_PUNCH_HOLE in the
+-             * huge page file.
++        /* The logic here is messy;
++         *    madvise DONTNEED fails for hugepages
++         *    fallocate works on hugepages and shmem
++         */
++        need_madvise = (rb->page_size == qemu_host_page_size);
++        need_fallocate = rb->fd != -1;
++        if (need_fallocate) {
++            /* For a file, this causes the area of the file to be zero'd
++             * if read, and for hugetlbfs also causes it to be unmapped
++             * so a userfault will trigger.
+              */
+ #ifdef CONFIG_FALLOCATE_PUNCH_HOLE
+             ret = fallocate(rb->fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+                             start, length);
++            if (ret) {
++                ret = -errno;
++                error_report("ram_block_discard_range: Failed to fallocate "
++                             "%s:%" PRIx64 " +%zx (%d)",
++                             rb->idstr, start, length, ret);
++                goto err;
++            }
++#else
++            ret = -ENOSYS;
++            error_report("ram_block_discard_range: fallocate not available/file"
++                         "%s:%" PRIx64 " +%zx (%d)",
++                         rb->idstr, start, length, ret);
++            goto err;
  #endif
-diff --git a/vl.c b/vl.c
-index 3ef04ce991..0b1581107f 100644
---- a/vl.c
-+++ b/vl.c
-@@ -94,6 +94,7 @@ int main(int argc, char **argv)
- #include "audio/audio.h"
- #include "sysemu/cpus.h"
- #include "migration/colo.h"
-+#include "migration/postcopy-ram.h"
- #include "sysemu/kvm.h"
- #include "sysemu/hax.h"
- #include "qapi/qobject-input-visitor.h"
-@@ -3101,6 +3102,7 @@ int main(int argc, char **argv, char **envp)
-     module_call_init(MODULE_INIT_OPTS);
+         }
+-        if (ret) {
+-            ret = -errno;
+-            error_report("ram_block_discard_range: Failed to discard range "
++        if (need_madvise) {
++            /* For normal RAM this causes it to be unmapped,
++             * for shared memory it causes the local mapping to disappear
++             * and to fall back on the file contents (which we just
++             * fallocate'd away).
++             */
++#if defined(CONFIG_MADVISE)
++            ret =  madvise(host_startaddr, length, MADV_DONTNEED);
++            if (ret) {
++                ret = -errno;
++                error_report("ram_block_discard_range: Failed to discard range "
++                             "%s:%" PRIx64 " +%zx (%d)",
++                             rb->idstr, start, length, ret);
++                goto err;
++            }
++#else
++            ret = -ENOSYS;
++            error_report("ram_block_discard_range: MADVISE not available"
+                          "%s:%" PRIx64 " +%zx (%d)",
+                          rb->idstr, start, length, ret);
++            goto err;
++#endif
+         }
++        trace_ram_block_discard_range(rb->idstr, host_startaddr, length,
++                                      need_madvise, need_fallocate, ret);
+     } else {
+         error_report("ram_block_discard_range: Overrun block '%s' (%" PRIu64
+                      "/%zx/" RAM_ADDR_FMT")",
+diff --git a/trace-events b/trace-events
+index 855b0ab240..2c3e3d7690 100644
+--- a/trace-events
++++ b/trace-events
+@@ -55,9 +55,10 @@ dma_complete(void *dbs, int ret, void *cb) "dbs=%p ret=%d cb=%p"
+ dma_blk_cb(void *dbs, int ret) "dbs=%p ret=%d"
+ dma_map_wait(void *dbs) "dbs=%p"
  
-     runstate_init();
-+    postcopy_infrastructure_init();
+-#  # exec.c
++# exec.c
+ find_ram_offset(uint64_t size, uint64_t offset) "size: 0x%" PRIx64 " @ 0x%" PRIx64
+ find_ram_offset_loop(uint64_t size, uint64_t candidate, uint64_t offset, uint64_t next, uint64_t mingap) "trying size: 0x%" PRIx64 " @ 0x%" PRIx64 ", offset: 0x%" PRIx64" next: 0x%" PRIx64 " mingap: 0x%" PRIx64
++ram_block_discard_range(const char *rbname, void *hva, size_t length, bool need_madvise, bool need_fallocate, int ret) "%s@%p + 0x%zx: madvise: %d fallocate: %d ret: %d"
  
-     if (qcrypto_init(&err) < 0) {
-         error_reportf_err(err, "cannot initialize crypto: ");
+ # memory.c
+ memory_region_ops_read(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
 -- 
 2.14.3
