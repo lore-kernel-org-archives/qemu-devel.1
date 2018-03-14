@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35104)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <abdallah.bouassida@lauterbach.com>)
-	id 1ew6UE-0004QT-0p
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 09:30:34 -0400
+	id 1ew6UD-0004Px-6L
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 09:30:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <abdallah.bouassida@lauterbach.com>)
-	id 1ew6U8-0001wB-77
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 09:30:34 -0400
-Received: from smtp1.lauterbach.com ([62.154.241.196]:55868)
+	id 1ew6U9-0001x6-J7
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 09:30:33 -0400
+Received: from smtp1.lauterbach.com ([62.154.241.196]:48106)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <abdallah.bouassida@lauterbach.com>)
-	id 1ew6U7-0001ll-L3
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 09:30:27 -0400
+	id 1ew6U8-0001mR-Rq
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 09:30:29 -0400
 Received: from unknown (HELO localhost.localdomain)
 	(Authenticated_SSL:abouassida@[41.224.44.126])
 	(envelope-sender <abdallah.bouassida@lauterbach.com>)
 	by smtp1.lauterbach.com (qmail-ldap-1.03) with ECDHE-RSA-AES256-SHA
 	encrypted SMTP
-	for <qemu-devel@nongnu.org>; 14 Mar 2018 13:30:10 -0000
+	for <qemu-devel@nongnu.org>; 14 Mar 2018 13:30:11 -0000
 From: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-Date: Wed, 14 Mar 2018 14:28:02 +0100
-Message-Id: <1521034084-17344-2-git-send-email-abdallah.bouassida@lauterbach.com>
+Date: Wed, 14 Mar 2018 14:28:03 +0100
+Message-Id: <1521034084-17344-3-git-send-email-abdallah.bouassida@lauterbach.com>
 In-Reply-To: <1521034084-17344-1-git-send-email-abdallah.bouassida@lauterbach.com>
 References: <1521034084-17344-1-git-send-email-abdallah.bouassida@lauterbach.com>
-Subject: [Qemu-devel] [PATCH v5 1/3] target/arm: Add "ARM_CP_NO_GDB" as a
- new bit field for ARMCPRegInfo type
+Subject: [Qemu-devel] [PATCH v5 2/3] target/arm: Add "_S" suffix to the
+ secure version of a sysreg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,47 +38,125 @@ Cc: qemu-arm@nongnu.org, khaled.jmal@lauterbach.com, Abdallah Bouassida <abdalla
 
 This is a preparation for the coming feature of creating dynamically an XML
 description for the ARM sysregs.
-A register has ARM_CP_NO_GDB enabled will not be shown in the dynamic XML.
-This bit is enabled automatically when creating CP_ANY wildcard aliases.
-This bit could be enabled manually for any register we want to remove from the
-dynamic XML description.
+Add "_S" suffix to the secure version of sysregs that have both S and NS views
+Replace (S) and (NS) by _S and _NS for the register that are manually defined,
+so all the registers follow the same convention.
 
 Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h    | 3 ++-
- target/arm/helper.c | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ target/arm/helper.c | 29 ++++++++++++++++++-----------
+ 1 file changed, 18 insertions(+), 11 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 1e7e1f8..5a6ea24 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1815,10 +1815,11 @@ static inline uint64_t cpreg_to_kvm_id(uint32_t cpregid)
- #define ARM_LAST_SPECIAL         ARM_CP_DC_ZVA
- #define ARM_CP_FPU               0x1000
- #define ARM_CP_SVE               0x2000
-+#define ARM_CP_NO_GDB            0x4000
- /* Used only as a terminator for ARMCPRegInfo lists */
- #define ARM_CP_SENTINEL          0xffff
- /* Mask of only the flag bits in a type field */
--#define ARM_CP_FLAG_MASK         0x30ff
-+#define ARM_CP_FLAG_MASK         0x70ff
- 
- /* Valid values for ARMCPRegInfo state field, indicating which of
-  * the AArch32 and AArch64 execution states this register is visible in.
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 09893e3..db8c925 100644
+index db8c925..1360a14 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -5664,7 +5664,7 @@ static void add_cpreg_to_hashtable(ARMCPU *cpu, const ARMCPRegInfo *r,
-     if (((r->crm == CP_ANY) && crm != 0) ||
-         ((r->opc1 == CP_ANY) && opc1 != 0) ||
-         ((r->opc2 == CP_ANY) && opc2 != 0)) {
--        r2->type |= ARM_CP_ALIAS;
-+        r2->type |= ARM_CP_ALIAS | ARM_CP_NO_GDB;
-     }
+@@ -695,12 +695,12 @@ static const ARMCPRegInfo cp_reginfo[] = {
+      * the secure register to be properly reset and migrated. There is also no
+      * v8 EL1 version of the register so the non-secure instance stands alone.
+      */
+-    { .name = "FCSEIDR(NS)",
++    { .name = "FCSEIDR",
+       .cp = 15, .opc1 = 0, .crn = 13, .crm = 0, .opc2 = 0,
+       .access = PL1_RW, .secure = ARM_CP_SECSTATE_NS,
+       .fieldoffset = offsetof(CPUARMState, cp15.fcseidr_ns),
+       .resetvalue = 0, .writefn = fcse_write, .raw_writefn = raw_write, },
+-    { .name = "FCSEIDR(S)",
++    { .name = "FCSEIDR_S",
+       .cp = 15, .opc1 = 0, .crn = 13, .crm = 0, .opc2 = 0,
+       .access = PL1_RW, .secure = ARM_CP_SECSTATE_S,
+       .fieldoffset = offsetof(CPUARMState, cp15.fcseidr_s),
+@@ -716,7 +716,7 @@ static const ARMCPRegInfo cp_reginfo[] = {
+       .access = PL1_RW, .secure = ARM_CP_SECSTATE_NS,
+       .fieldoffset = offsetof(CPUARMState, cp15.contextidr_el[1]),
+       .resetvalue = 0, .writefn = contextidr_write, .raw_writefn = raw_write, },
+-    { .name = "CONTEXTIDR(S)", .state = ARM_CP_STATE_AA32,
++    { .name = "CONTEXTIDR_S", .state = ARM_CP_STATE_AA32,
+       .cp = 15, .opc1 = 0, .crn = 13, .crm = 0, .opc2 = 1,
+       .access = PL1_RW, .secure = ARM_CP_SECSTATE_S,
+       .fieldoffset = offsetof(CPUARMState, cp15.contextidr_s),
+@@ -1967,7 +1967,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
+                                    cp15.c14_timer[GTIMER_PHYS].ctl),
+       .writefn = gt_phys_ctl_write, .raw_writefn = raw_write,
+     },
+-    { .name = "CNTP_CTL(S)",
++    { .name = "CNTP_CTL_S",
+       .cp = 15, .crn = 14, .crm = 2, .opc1 = 0, .opc2 = 1,
+       .secure = ARM_CP_SECSTATE_S,
+       .type = ARM_CP_IO | ARM_CP_ALIAS, .access = PL1_RW | PL0_R,
+@@ -2006,7 +2006,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
+       .accessfn = gt_ptimer_access,
+       .readfn = gt_phys_tval_read, .writefn = gt_phys_tval_write,
+     },
+-    { .name = "CNTP_TVAL(S)",
++    { .name = "CNTP_TVAL_S",
+       .cp = 15, .crn = 14, .crm = 2, .opc1 = 0, .opc2 = 0,
+       .secure = ARM_CP_SECSTATE_S,
+       .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_R,
+@@ -2060,7 +2060,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
+       .accessfn = gt_ptimer_access,
+       .writefn = gt_phys_cval_write, .raw_writefn = raw_write,
+     },
+-    { .name = "CNTP_CVAL(S)", .cp = 15, .crm = 14, .opc1 = 2,
++    { .name = "CNTP_CVAL_S", .cp = 15, .crm = 14, .opc1 = 2,
+       .secure = ARM_CP_SECSTATE_S,
+       .access = PL1_RW | PL0_R,
+       .type = ARM_CP_64BIT | ARM_CP_IO | ARM_CP_ALIAS,
+@@ -5563,7 +5563,8 @@ CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
  
-     /* Check that raw accesses are either forbidden or handled. Note that
+ static void add_cpreg_to_hashtable(ARMCPU *cpu, const ARMCPRegInfo *r,
+                                    void *opaque, int state, int secstate,
+-                                   int crm, int opc1, int opc2)
++                                   int crm, int opc1, int opc2,
++                                   const char *name)
+ {
+     /* Private utility function for define_one_arm_cp_reg_with_opaque():
+      * add a single reginfo struct to the hash table.
+@@ -5573,6 +5574,7 @@ static void add_cpreg_to_hashtable(ARMCPU *cpu, const ARMCPRegInfo *r,
+     int is64 = (r->type & ARM_CP_64BIT) ? 1 : 0;
+     int ns = (secstate & ARM_CP_SECSTATE_NS) ? 1 : 0;
+ 
++    r2->name = g_strdup(name);
+     /* Reset the secure state to the specific incoming state.  This is
+      * necessary as the register may have been defined with both states.
+      */
+@@ -5804,19 +5806,24 @@ void define_one_arm_cp_reg_with_opaque(ARMCPU *cpu,
+                         /* Under AArch32 CP registers can be common
+                          * (same for secure and non-secure world) or banked.
+                          */
++                        char *name;
++
+                         switch (r->secure) {
+                         case ARM_CP_SECSTATE_S:
+                         case ARM_CP_SECSTATE_NS:
+                             add_cpreg_to_hashtable(cpu, r, opaque, state,
+-                                                   r->secure, crm, opc1, opc2);
++                                                   r->secure, crm, opc1, opc2,
++                                                   r->name);
+                             break;
+                         default:
++                            name = g_strdup_printf("%s_S", r->name);
+                             add_cpreg_to_hashtable(cpu, r, opaque, state,
+                                                    ARM_CP_SECSTATE_S,
+-                                                   crm, opc1, opc2);
++                                                   crm, opc1, opc2, name);
++                            g_free(name);
+                             add_cpreg_to_hashtable(cpu, r, opaque, state,
+                                                    ARM_CP_SECSTATE_NS,
+-                                                   crm, opc1, opc2);
++                                                   crm, opc1, opc2, r->name);
+                             break;
+                         }
+                     } else {
+@@ -5824,7 +5831,7 @@ void define_one_arm_cp_reg_with_opaque(ARMCPU *cpu,
+                          * of AArch32 */
+                         add_cpreg_to_hashtable(cpu, r, opaque, state,
+                                                ARM_CP_SECSTATE_NS,
+-                                               crm, opc1, opc2);
++                                               crm, opc1, opc2, r->name);
+                     }
+                 }
+             }
 -- 
 2.7.4
