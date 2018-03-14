@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1ew8UF-0003Mz-KB
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:38:44 -0400
+	(envelope-from <no-reply@patchew.org>) id 1ew8V2-00046H-MC
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:39:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1ew8UB-000114-N5
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:38:43 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34324 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1ew8UB-00010f-Ii
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:38:39 -0400
-From: Andrew Jones <drjones@redhat.com>
-Date: Wed, 14 Mar 2018 16:38:20 +0100
-Message-Id: <20180314153820.18426-1-drjones@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] dump-guest-memory: more descriptive
- lookup_type failure
+	(envelope-from <no-reply@patchew.org>) id 1ew8Uy-0001Ut-OG
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:39:32 -0400
+Resent-Message-Id: <E1ew8Uy-0001Ut-OG@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21148)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ew8Uy-0001Tt-GB
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:39:28 -0400
+In-Reply-To: <20180314153121.23838-1-james.cowgill@mips.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152104190857.51.3339183123690408321@71c20359a636>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 14 Mar 2018 08:38:29 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] linux-user: implement HWCAP bits on MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,48 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, marcandre.lureau@redhat.com, lersek@redhat.com
+To: james.cowgill@mips.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu
 
-We've seen a few reports of
-
- (gdb) source /usr/share/qemu-kvm/dump-guest-memory.py
- Traceback (most recent call last):
-   File "/usr/share/qemu-kvm/dump-guest-memory.py", line 19, in <module>
-     UINTPTR_T = gdb.lookup_type("uintptr_t")
- gdb.error: No type named uintptr_t.
-
-This occurs when symbols haven't been loaded first, i.e. neither a
-QEMU binary was loaded nor a QEMU process was attached first. Let's
-better inform the user of how to fix the issue themselves in order
-to avoid more reports.
-
-Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
-v2: Not quite so long a long line (< 90 only generates warnings)
-    Pick up Janosch's ack
-
- scripts/dump-guest-memory.py | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.py
-index 51acfcd0c053..276eebf0c27e 100644
---- a/scripts/dump-guest-memory.py
-+++ b/scripts/dump-guest-memory.py
-@@ -16,7 +16,12 @@ the COPYING file in the top-level directory.
- import ctypes
- import struct
- 
--UINTPTR_T = gdb.lookup_type("uintptr_t")
-+try:
-+    UINTPTR_T = gdb.lookup_type("uintptr_t")
-+except Exception as inst:
-+    raise gdb.GdbError("Symbols must be loaded prior to sourcing dump-guest-memory.\n"
-+                       "Symbols may be loaded by 'attach'ing a QEMU process id or by "
-+                       "'load'ing a QEMU binary.")
- 
- TARGET_PAGE_SIZE = 0x1000
- TARGET_PAGE_MASK = 0xFFFFFFFFFFFFF000
--- 
-2.13.6
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMzE0MTUzMTIxLjIzODM4LTEtamFtZXMuY293Z2lsbEBtaXBzLmNvbQpT
+dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBsaW51eC11c2VyOiBpbXBsZW1lbnQgSFdDQVAg
+Yml0cyBvbiBNSVBTCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNF
+PWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWls
+ZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGht
+IGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFT
+RS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8k
+dG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNo
+b3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
+IC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4r
+MSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcg
+M2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0
+aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBw
+YXRjaGV3LzIwMTgwMzE0MTUzMTIxLjIzODM4LTEtamFtZXMuY293Z2lsbEBtaXBzLmNvbSAtPiBw
+YXRjaGV3LzIwMTgwMzE0MTUzMTIxLjIzODM4LTEtamFtZXMuY293Z2lsbEBtaXBzLmNvbQpTd2l0
+Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjRiMDAxMTU3MjYgbGludXgtdXNlcjogaW1wbGVt
+ZW50IEhXQ0FQIGJpdHMgb24gTUlQUwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFU
+Q0ggMS8xOiBsaW51eC11c2VyOiBpbXBsZW1lbnQgSFdDQVAgYml0cyBvbiBNSVBTLi4uCkVSUk9S
+OiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQK
+IzM1OiBGSUxFOiBsaW51eC11c2VyL2VsZmxvYWQuYzo5Njc6CisgICAgZG8geyBpZiAoY3B1LT5l
+bnYuaW5zbl9mbGFncyAmIChmbGFnKSkgeyBod2NhcHMgfD0gaHdjYXA7IH0gfSB3aGlsZSAoMCkK
+Wy4uLl0KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMzAgbGluZXMgY2hlY2tlZAoKWW91
+ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpU
+ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
+b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
+eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
