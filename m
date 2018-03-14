@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dhildenb@redhat.com>) id 1ew6EL-0007ex-Oe
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 09:14:13 -0400
+	(envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1ew6UD-0004Pz-6S
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 09:30:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dhildenb@redhat.com>) id 1ew6EI-00023l-Kb
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 09:14:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41258)
+	(envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1ew6U8-0001wM-7o
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 09:30:33 -0400
+Received: from smtp1.lauterbach.com ([62.154.241.196]:50744)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dhildenb@redhat.com>) id 1ew6EI-00023M-Cd
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 09:14:06 -0400
-Content-Type: text/plain;
-	charset=utf-8
-Content-Transfer-Encoding: base64
-From: David Hildenbrand <dhildenb@redhat.com>
-MIME-Version: 1.0
-Message-Id: <71BA0BC4-C5FD-4286-B3A7-EFF579588F63@redhat.com>
-Date: Wed, 14 Mar 2018 09:14:03 -0400 (EDT)
-References: <797197129.10905208.1521004004370.JavaMail.zimbra@redhat.com>
-In-Reply-To: <797197129.10905208.1521004004370.JavaMail.zimbra@redhat.com>
-Subject: Re: [Qemu-devel] Suggestion on 'virtio-pmem' implementation
+	(Exim 4.71) (envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1ew6U7-0001l5-Ku
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 09:30:27 -0400
+Received: from unknown (HELO localhost.localdomain)
+	(Authenticated_SSL:abouassida@[41.224.44.126])
+	(envelope-sender <abdallah.bouassida@lauterbach.com>)
+	by smtp1.lauterbach.com (qmail-ldap-1.03) with ECDHE-RSA-AES256-SHA
+	encrypted SMTP
+	for <qemu-devel@nongnu.org>; 14 Mar 2018 13:30:08 -0000
+From: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+Date: Wed, 14 Mar 2018 14:28:01 +0100
+Message-Id: <1521034084-17344-1-git-send-email-abdallah.bouassida@lauterbach.com>
+Subject: [Qemu-devel] [PATCH v5 0/3] target/arm: Add a dynamic
+ XML-description of the cp-registers to GDB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,50 +31,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Rik van Riel <riel@surriel.com>
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: qemu-arm@nongnu.org, khaled.jmal@lauterbach.com, Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
 
-SGkgUGFua2FqLA0KDQpJIGhhdmUgYSBwcm90b3R5cGUgKG5ldyBvbmUgZm9yIHZpcnRpby1tZW0g
-SSB3YXMgd29ya2luZyBvbiBvdmVyIHRoZSBsYXN0IHdlZWtzKSBmb3IgZXhhY3RseSB3aGF0IHlv
-dSBuZWVkLiBJIGJhc2ljYWxseSBmYWN0b3JlZCBvdXQgdGhlIG5vdGlvbiBvZiBhIG1lbW9yeSBk
-ZXZpY2UuIFNvIGFsc28gdmlydGlvIGRldmljZXMgY2FuIGJlIG1lbW9yeSBkZXZpY2VzIGFuZCBn
-ZXQgcmVjb2duaXplZCBlLmcuIGluIGZvcm1lcmx5IGtub3duIHBjX2RpbW1fZ2V0X2ZyZWVfYWRk
-cmVzcygpLCBzbyBpdCB3b3JrcyBvdXQgbmljZWx5IHdpdGggb3JkaW5hcnkgbWVtb3J5IGhvdHBs
-dWcgYW5kIHN1Y2guIA0KDQpHdWVzcyB5b3VyIG1haW4gcHJvYmxlbSByaWdodCBub3cgaXMgdGhh
-dCB5b3UgZG9u4oCYdCBjcmVhdGUgYSBtZW1vcnkgc2xvdCBwcm9wZXJseS4gQnV0IEkgYWxzbyBo
-YXZlIGNvZGUgZm9yIHRoYXQgdGhhdCB5b3UgY2FuIGJ1aWx0IG9udG8uDQoNCknigJhtIHJpZ2h0
-IG5vdyBpbiBTcmkgTGFua2Egb24gdmFjYXRpb24sIEnigJhsbCBiZSBiYWNrIG9uIDIzLiBTZXB0
-ZW1iZXIgYW5kIHdpbGwgc2VuZCB5b3UgdGhlIGxpbmsgdG8gYSBicmFuY2ggd2l0aCB0aGUgcHJv
-dG90eXBlIGFzYXAuDQoNClRoYW5rcywNCg0KRGF2aWQgLyBkaGlsZGVuYiAvIGRhdmlkQHJlZGhh
-dC5jb20NCg0KVm9uIG1laW5lbSBpUGhvbmUgZ2VzZW5kZXQNCg0KPiBBbSAxNC4wMy4yMDE4IHVt
-IDEwOjM2IHNjaHJpZWIgUGFua2FqIEd1cHRhIDxwYWd1cHRhQHJlZGhhdC5jb20+Og0KPiANCj4g
-DQo+IA0KPiBIaSwNCj4gDQo+IA0KPiBJIGFtIGltcGxlbWVudGluZyAndmlydGlvLXBtZW0nIGFz
-IGEgbWVjaGFuaXNtIHRvDQo+IGZsdXNoIGd1ZXN0IHdyaXRlcyB3aXRoICdmYWtlIERBWCcgZmx1
-c2hpbmcgaW50ZXJmYWNlLg0KPiANCj4gQmVsb3cgaXMgdGhlIGhpZ2ggbGV2ZWwgZGV0YWlscyBv
-ZiBjb21wb25lbnRzOg0KPiANCj4gMV0gJ3ZpcnRpby1wbWVtJyBkZXZpY2UgZXhwb3NlIGd1ZXN0
-IHBoeXNpY2FsIGFkZHJlc3MNCj4gIGRldGFpbHMoc3RhcnQsIGxlbikuICAgDQo+IA0KPiAyXSAn
-dmlydGlvLXBtZW0nIGRyaXZlciBpbiBndWVzdCBkaXNjb3ZlcnMgdGhpcyANCj4gICAgaW5mb3Jt
-YXRpb24gYW5kIGNvbmZpZ3VyZXMgJ2xpYm52ZGltbScuIEd1ZXN0ICdwbWVtJyANCj4gICAgZHJp
-dmVyIHdvcmtzIG9uIHRoaXMgbWVtb3J5IHJhbmdlLg0KPiANCj4gM10gR3Vlc3QgJ3BtZW0nIGRy
-aXZlciB1c2VzICd2aXJ0aW8tcG1lbScgUFYgZHJpdmVyIHRvIA0KPiAgIHNlbmQgZmx1c2ggY29t
-bWFuZHMuDQo+IA0KPiANCj4gSSBuZWVkIHN1Z2dlc3Rpb24gaW1wbGVtZW50aW5nIHBhcnQgMV0N
-Cj4gDQo+ICogV2hlbiB0cmllZCB3aXRoICdob3RwbHVnX21lbW9yeS5iYXNlJyBhZGRyZXNzIGFz
-IGd1ZXN0IHBoeXNpY2FsIA0KPiAgYWRkcmVzcywgSSBhbSBmYWNpbmcgJ0VQVF9NSVNDT05GSUcn
-IGVycm9ycyB3aGVuIHBtZW0gZG9lcyBta2ZzLiANCj4gIEFmdGVyIGRpZ2dpbmcgbW9yZSBpdCBs
-b29rcyBsaWtlIGFkZHJlc3MgcmFuZ2UgSSBhbSB1c2luZyBhcyBndWVzdA0KPiAgcGh5c2ljYWwg
-YWRkcmVzcyBpcyBlaXRoZXIgYWxyZWFkeSBtYXBwZWQgYXMgTU1JTyBvciByZXNlcnZlZC4gDQo+
-ICBUaG91Z2ggR3Vlc3QgaG90LXBsdWdzIHRoaXMgcGh5c2ljYWwgYWRkcmVzcyBpbnRvIGl0cyB2
-aXJ0dWFsIA0KPiAgbWVtb3J5IHJhbmdlIHdoZW4gZ3Vlc3QgdHJpZXMgdG8gcmVhZC93cml0ZSB0
-aGUgbWVtb3J5IEtWTSBjYW5ub3QgDQo+ICB0cmFuc2xhdGUgdGhlIGFkZHJlc3MgYW5kIHRocm93
-ICdFUFRfTUlTQ09ORklHJyBlcnJvci4NCj4gDQo+ICogV2hpbGUgSSBhbSB0cnlpbmcgdG8gZ2V0
-IHRoZSBhcHByb3ByaWF0ZSBndWVzdCBwaHlzaWNhbCBhZGRyZXNzDQo+ICB3aGljaCBpcyBmcmVl
-LCBJIGNvdWxkIHNlZSBtZW1vcnkgJ3BjX2RpbW1fbWVtb3J5X3BsdWcnIGNvZGUgDQo+ICBoYXMg
-YSBmdW5jdGlvbiAncGNfZGltbV9nZXRfZnJlZV9hZGRyJyB3aGljaCB3b3JrcyB3aXRoICdQQyBE
-SU1NJw0KPiAgY2xhc3MuIEFzIEkgYW0gdXNpbmcgJ1ZJUlRJTycsIHRoZXJlIGlzIG5vIHdheSBB
-RkFJSyB0aGlzIGZ1bmN0aW9uIA0KPiAgY2FuIGJlIHVzZWQgYnkgVklSVElPIG9yIG15IFBWIGRl
-dmljZSBjb2RlLg0KPiANCj4gDQo+IEkgbmVlZCBpZGVhcyB0byBnZXQgdGhlIGZyZWUgZ3Vlc3Qg
-cGh5c2ljYWwgYWRkcmVzcyBmcm9tIG15IFBWIA0KPiBkZXZpY2UgY29kZSBzbyB0aGF0IHdlIGNh
-biB1c2UgdGhpcyByYW5nZSBpbiBndWVzdCBhZGRyZXNzIHNwYWNlLg0KPiANCj4gRmluZCBiZWxv
-dyBwb2ludGVyIHRvIHByZXZpb3VzIGRpc2N1c3Npb246DQo+IA0KPiBodHRwczovL21hcmMuaW5m
-by8/bD1rdm0mbT0xNTE2Mjk3MDk5MDM5NDYmdz0yDQo+IA0KPiBUaGFua3MsDQo+IFBhbmthaiAg
-DQo+IA0K
+The previous version:
+http://patchwork.ozlabs.org/project/qemu-devel/list/?series=33190
+
+Abdallah Bouassida (3):
+  target/arm: Add "ARM_CP_NO_GDB" as a new bit field for ARMCPRegInfo
+    type
+  target/arm: Add "_S" suffix to the secure version of a sysreg
+  target/arm: Add the XML dynamic generation
+
+ gdbstub.c            | 10 ++++++++
+ include/qom/cpu.h    |  5 +++-
+ target/arm/cpu.c     |  1 +
+ target/arm/cpu.h     | 29 ++++++++++++++++++++-
+ target/arm/gdbstub.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ target/arm/helper.c  | 58 +++++++++++++++++++++++++++++++++---------
+ 6 files changed, 160 insertions(+), 14 deletions(-)
+
+-- 
+2.7.4
