@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ew52F-0003Zj-EH
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 07:57:37 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ew52E-0004s3-IX
+	(envelope-from <dgilbert@redhat.com>) id 1ew52E-0003YV-2t
 	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 07:57:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40918 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ew52E-0004rm-DF
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgilbert@redhat.com>) id 1ew52D-0004rK-4L
 	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 07:57:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40914 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ew52C-0004r3-UF
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 07:57:33 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E3BFD8182D16
-	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 11:57:33 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 72B858182D16
+	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 11:57:32 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 14 Mar 2018 11:56:11 +0000
-Message-Id: <20180314115618.28831-23-dgilbert@redhat.com>
+Date: Wed, 14 Mar 2018 11:56:10 +0000
+Message-Id: <20180314115618.28831-22-dgilbert@redhat.com>
 In-Reply-To: <20180314115618.28831-1-dgilbert@redhat.com>
 References: <20180314115618.28831-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 22/29] vhost+postcopy: Call wakeups
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v6 21/29] vhost+postcopy: Add vhost waker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,73 +37,92 @@ Cc: aarcange@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Cause the vhost-user client to be woken up whenever:
-  a) We place a page in postcopy mode
-  b) We get a fault and the page has already been received
+Register a waker function in vhost-user code to be notified when
+pages arrive or requests to previously mapped pages get requested.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- migration/postcopy-ram.c | 14 ++++++++++----
- migration/trace-events   |  1 +
- 2 files changed, 11 insertions(+), 4 deletions(-)
+ hw/virtio/trace-events |  3 +++
+ hw/virtio/vhost-user.c | 30 ++++++++++++++++++++++++++++++
+ 2 files changed, 33 insertions(+)
 
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index d14a051b4b..7754913c12 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -558,7 +558,11 @@ int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb,
- 
-     trace_postcopy_request_shared_page(pcfd->idstr, qemu_ram_get_idstr(rb),
-                                        rb_offset);
--    /* TODO: Check bitmap to see if we already have the page */
-+    if (ramblock_recv_bitmap_test_byte_offset(rb, aligned_rbo)) {
-+        trace_postcopy_request_shared_page_present(pcfd->idstr,
-+                                        qemu_ram_get_idstr(rb), rb_offset);
-+        return postcopy_wake_shared(pcfd, client_addr, rb);
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 3afd12cfea..fe5e0ff856 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -13,6 +13,9 @@ vhost_user_postcopy_fault_handler_found(int i, uint64_t=
+ region_offset, uint64_t
+ vhost_user_postcopy_listen(void) ""
+ vhost_user_set_mem_table_postcopy(uint64_t client_addr, uint64_t qhva, i=
+nt reply_i, int region_i) "client:0x%"PRIx64" for hva: 0x%"PRIx64" reply =
+%d region %d"
+ vhost_user_set_mem_table_withfd(int index, const char *name, uint64_t me=
+mory_size, uint64_t guest_phys_addr, uint64_t userspace_addr, uint64_t of=
+fset) "%d:%s: size:0x%"PRIx64" GPA:0x%"PRIx64" QVA/userspace:0x%"PRIx64" =
+RB offset:0x%"PRIx64
++vhost_user_postcopy_waker(const char *rb, uint64_t rb_offset) "%s + 0x%"=
+PRIx64
++vhost_user_postcopy_waker_found(uint64_t client_addr) "0x%"PRIx64
++vhost_user_postcopy_waker_nomatch(const char *rb, uint64_t rb_offset) "%=
+s + 0x%"PRIx64
+=20
+ # hw/virtio/virtio.c
+ virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned=
+ out_num) "elem %p size %zd in_num %u out_num %u"
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 7cb4c17306..7c887c368a 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -1018,6 +1018,35 @@ static int vhost_user_postcopy_fault_handler(struc=
+t PostCopyFD *pcfd,
+     return -1;
+ }
+=20
++static int vhost_user_postcopy_waker(struct PostCopyFD *pcfd, RAMBlock *=
+rb,
++                                     uint64_t offset)
++{
++    struct vhost_dev *dev =3D pcfd->data;
++    struct vhost_user *u =3D dev->opaque;
++    int i;
++
++    trace_vhost_user_postcopy_waker(qemu_ram_get_idstr(rb), offset);
++
++    if (!u) {
++        return 0;
 +    }
-     if (rb != mis->last_rb) {
-         mis->last_rb = rb;
-         migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
-@@ -866,7 +870,8 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
-     }
- 
-     trace_postcopy_place_page(host);
--    return 0;
-+    return postcopy_notify_shared_wake(rb,
-+                                       qemu_ram_block_host_offset(rb, host));
- }
- 
++    /* Translate the offset into an address in the clients address space=
+ */
++    for (i =3D 0; i < MIN(dev->mem->nregions, u->region_rb_len); i++) {
++        if (u->region_rb[i] =3D=3D rb &&
++            offset >=3D u->region_rb_offset[i] &&
++            offset < (u->region_rb_offset[i] +
++                      dev->mem->regions[i].memory_size)) {
++            uint64_t client_addr =3D (offset - u->region_rb_offset[i]) +
++                                   u->postcopy_client_bases[i];
++            trace_vhost_user_postcopy_waker_found(client_addr);
++            return postcopy_wake_shared(pcfd, client_addr, rb);
++        }
++    }
++
++    trace_vhost_user_postcopy_waker_nomatch(qemu_ram_get_idstr(rb), offs=
+et);
++    return 0;
++}
++
  /*
-@@ -890,6 +895,9 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
- 
-             return -e;
-         }
-+        return postcopy_notify_shared_wake(rb,
-+                                           qemu_ram_block_host_offset(rb,
-+                                                                      host));
-     } else {
-         /* The kernel can't use UFFDIO_ZEROPAGE for hugepages */
-         if (!mis->postcopy_tmp_zero_page) {
-@@ -909,8 +917,6 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
-         return postcopy_place_page(mis, host, mis->postcopy_tmp_zero_page,
-                                    rb);
-     }
--
--    return 0;
- }
- 
- /*
-diff --git a/migration/trace-events b/migration/trace-events
-index b0acaaa8a0..1e353a317f 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -199,6 +199,7 @@ postcopy_ram_incoming_cleanup_entry(void) ""
- postcopy_ram_incoming_cleanup_exit(void) ""
- postcopy_ram_incoming_cleanup_join(void) ""
- postcopy_request_shared_page(const char *sharer, const char *rb, uint64_t rb_offset) "for %s in %s offset 0x%"PRIx64
-+postcopy_request_shared_page_present(const char *sharer, const char *rb, uint64_t rb_offset) "%s already %s offset 0x%"PRIx64
- postcopy_wake_shared(uint64_t client_addr, const char *rb) "at 0x%"PRIx64" in %s"
- 
- save_xbzrle_page_skipping(void) ""
--- 
+  * Called at the start of an inbound postcopy on reception of the
+  * 'advise' command.
+@@ -1063,6 +1092,7 @@ static int vhost_user_postcopy_advise(struct vhost_=
+dev *dev, Error **errp)
+     u->postcopy_fd.fd =3D ufd;
+     u->postcopy_fd.data =3D dev;
+     u->postcopy_fd.handler =3D vhost_user_postcopy_fault_handler;
++    u->postcopy_fd.waker =3D vhost_user_postcopy_waker;
+     u->postcopy_fd.idstr =3D "vhost-user"; /* Need to find unique name *=
+/
+     postcopy_register_shared_ufd(&u->postcopy_fd);
+     return 0;
+--=20
 2.14.3
