@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Cowgill@mips.com>) id 1ew8Qn-0001fa-C9
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:35:10 -0400
+	(envelope-from <drjones@redhat.com>) id 1ew8UF-0003Mz-KB
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:38:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <James.Cowgill@mips.com>) id 1ew8Qj-0006tN-Cv
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:35:09 -0400
-Received: from 9pmail.ess.barracuda.com ([64.235.154.211]:51204)
+	(envelope-from <drjones@redhat.com>) id 1ew8UB-000114-N5
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:38:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34324 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <James.Cowgill@mips.com>)
-	id 1ew8Qf-0006aF-9a
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:35:05 -0400
-From: James Cowgill <james.cowgill@mips.com>
-Date: Wed, 14 Mar 2018 15:31:21 +0000
-Message-ID: <20180314153121.23838-1-james.cowgill@mips.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] linux-user: implement HWCAP bits on MIPS
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1ew8UB-00010f-Ii
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 11:38:39 -0400
+From: Andrew Jones <drjones@redhat.com>
+Date: Wed, 14 Mar 2018 16:38:20 +0100
+Message-Id: <20180314153820.18426-1-drjones@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] dump-guest-memory: more descriptive
+ lookup_type failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,55 +22,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
-Cc: James Cowgill <james.cowgill@mips.com>
+To: qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, marcandre.lureau@redhat.com, lersek@redhat.com
 
-Add support for the two currently defined HWCAP bits on MIPS - R6 and
-MSA.
+We've seen a few reports of
 
-Buglink: https://bugs.launchpad.net/qemu/+bug/1754372
-Signed-off-by: James Cowgill <james.cowgill@mips.com>
+ (gdb) source /usr/share/qemu-kvm/dump-guest-memory.py
+ Traceback (most recent call last):
+   File "/usr/share/qemu-kvm/dump-guest-memory.py", line 19, in <module>
+     UINTPTR_T = gdb.lookup_type("uintptr_t")
+ gdb.error: No type named uintptr_t.
+
+This occurs when symbols haven't been loaded first, i.e. neither a
+QEMU binary was loaded nor a QEMU process was attached first. Let's
+better inform the user of how to fix the issue themselves in order
+to avoid more reports.
+
+Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
-This was resent because I think I messed up my email config. Apologies if you
-receive this twice.
+v2: Not quite so long a long line (< 90 only generates warnings)
+    Pick up Janosch's ack
 
- linux-user/elfload.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ scripts/dump-guest-memory.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 5fc130cc20..747b0ed10b 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -950,6 +950,30 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUMIPSState *e
- #define USE_ELF_CORE_DUMP
- #define ELF_EXEC_PAGESIZE        4096
+diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.py
+index 51acfcd0c053..276eebf0c27e 100644
+--- a/scripts/dump-guest-memory.py
++++ b/scripts/dump-guest-memory.py
+@@ -16,7 +16,12 @@ the COPYING file in the top-level directory.
+ import ctypes
+ import struct
  
-+/* See arch/mips/include/uapi/hwcap.h.  */
-+enum {
-+    HWCAP_MIPS_R6           = (1 << 0),
-+    HWCAP_MIPS_MSA          = (1 << 1),
-+};
-+
-+#define ELF_HWCAP get_elf_hwcap()
-+
-+static uint32_t get_elf_hwcap(void)
-+{
-+    MIPSCPU *cpu = MIPS_CPU(thread_cpu);
-+    uint32_t hwcaps = 0;
-+
-+#define GET_FEATURE(flag, hwcap) \
-+    do { if (cpu->env.insn_flags & (flag)) { hwcaps |= hwcap; } } while (0)
-+
-+    GET_FEATURE(ISA_MIPS32R6 | ISA_MIPS64R6, HWCAP_MIPS_R6);
-+    GET_FEATURE(ASE_MSA, HWCAP_MIPS_MSA);
-+
-+#undef GET_FEATURE
-+
-+    return hwcaps;
-+}
-+
- #endif /* TARGET_MIPS */
+-UINTPTR_T = gdb.lookup_type("uintptr_t")
++try:
++    UINTPTR_T = gdb.lookup_type("uintptr_t")
++except Exception as inst:
++    raise gdb.GdbError("Symbols must be loaded prior to sourcing dump-guest-memory.\n"
++                       "Symbols may be loaded by 'attach'ing a QEMU process id or by "
++                       "'load'ing a QEMU binary.")
  
- #ifdef TARGET_MICROBLAZE
+ TARGET_PAGE_SIZE = 0x1000
+ TARGET_PAGE_MASK = 0xFFFFFFFFFFFFF000
 -- 
-2.16.2
+2.13.6
