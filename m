@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ewWKC-00080o-Lw
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 13:05:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ewWRS-0001s6-0b
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 13:13:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ewWK8-0007VJ-FL
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 13:05:56 -0400
-Resent-Message-Id: <E1ewWK8-0007VJ-FL@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21014)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ewWK8-0007Sm-7m
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 13:05:52 -0400
-In-Reply-To: <20180315151348.6451-1-james.cowgill@mips.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152112716428.51.16694361292656461880@71c20359a636>
+	(envelope-from <peter.maydell@linaro.org>) id 1ewWRR-0002WK-23
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 13:13:25 -0400
+Received: from mail-oi0-x235.google.com ([2607:f8b0:4003:c06::235]:46703)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ewWRQ-0002W4-SE
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 13:13:24 -0400
+Received: by mail-oi0-x235.google.com with SMTP id x12so6307029oie.13
+	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 10:13:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 15 Mar 2018 08:19:25 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2] linux-user: implement HWCAP bits on MIPS
+In-Reply-To: <MWHPR21MB018983B74A652443B70680F19ED20@MWHPR21MB0189.namprd21.prod.outlook.com>
+References: <20180313153458.26822-1-peter.maydell@linaro.org>
+	<20180313153458.26822-9-peter.maydell@linaro.org>
+	<MWHPR21MB018983B74A652443B70680F19ED20@MWHPR21MB0189.namprd21.prod.outlook.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 15 Mar 2018 17:13:03 +0000
+Message-ID: <CAFEAcA_9YQ4bSzHgM8yLAPtPZ2C70u13kTCLf4rHGPCBUgNiZA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 8/9] hw/arm/bcm2836: Hardcode correct CPU
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +31,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: james.cowgill@mips.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu, richard.henderson@linaro.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Pekka Enberg <penberg@iki.fi>, "patches@linaro.org" <patches@linaro.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMzE1MTUxMzQ4LjY0NTEtMS1qYW1lcy5jb3dnaWxsQG1pcHMuY29tClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjJdIGxpbnV4LXVzZXI6IGltcGxlbWVudCBIV0NB
-UCBiaXRzIG9uIE1JUFMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJB
-U0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZh
-aWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0
-aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRC
-QVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRu
-LyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQg
-c2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
-Y2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgo
-bisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGlu
-ZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9n
-aXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAgIDYyNjVlMjNiMWMuLjU2ZTg2OThmZmEg
-IG1hc3RlciAgICAgLT4gbWFzdGVyCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcv
-MjAxODAzMTUxMTUxNDQuODAxMjAyLTEtZWJsYWtlQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4
-MDMxNTExNTE0NC44MDEyMDItMS1lYmxha2VAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAg
-ICAgICAgICBwYXRjaGV3LzIwMTgwMzE1MTUxMzQ4LjY0NTEtMS1qYW1lcy5jb3dnaWxsQG1pcHMu
-Y29tIC0+IHBhdGNoZXcvMjAxODAzMTUxNTEzNDguNjQ1MS0xLWphbWVzLmNvd2dpbGxAbWlwcy5j
-b20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwozMWVkM2IzNGRmIGxpbnV4LXVzZXI6
-IGltcGxlbWVudCBIV0NBUCBiaXRzIG9uIE1JUFMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
-aW5nIFBBVENIIDEvMTogbGludXgtdXNlcjogaW1wbGVtZW50IEhXQ0FQIGJpdHMgb24gTUlQUy4u
-LgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3Rh
-dGVtZW50CiMzNTogRklMRTogbGludXgtdXNlci9lbGZsb2FkLmM6OTY3OgorICAgIGRvIHsgaWYg
-KGNwdS0+ZW52Lmluc25fZmxhZ3MgJiAoZmxhZykpIHsgaHdjYXBzIHw9IGh3Y2FwOyB9IH0gd2hp
-bGUgKDApClsuLi5dCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDMwIGxpbmVzIGNoZWNr
-ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5E
-ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFz
-ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On 13 March 2018 at 16:55, Andrew Baumann <Andrew.Baumann@microsoft.com> wrote:
+>> From: Qemu-devel <qemu-devel-
+>> bounces+andrew.baumann=microsoft.com@nongnu.org> On Behalf Of Peter
+>> Maydell
+>> Sent: Tuesday, 13 March 2018 08:35
+>>
+>> Now we have separate types for BCM2386 and BCM2387, we might as well
+>> just hard-code the CPU type they use rather than having it passed
+>> through as an object property. This then lets us put the initialization
+>> of the CPU object in init rather than realize.
+
+> What about the default_cpu_type field of MachineClass set in
+> raspi[23]_machine_init? That seems irrelevant now...
+
+Igor, can you help with this question? For a board that always
+has one CPU type (because the real hardware only ever has
+one SoC, and that SoC QOM object hard codes the CPU type)
+does it still need to set the mc->default_cpu_type field in
+its MachineClass, or does that become pointless ?
+
+thanks
+-- PMM
