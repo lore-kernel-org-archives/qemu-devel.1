@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ewNdg-0007Te-8D
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 03:49:29 -0400
+	(envelope-from <thuth@redhat.com>) id 1ewNdh-0007Ub-2w
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 03:49:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ewNdf-0004d3-6A
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 03:49:28 -0400
+	(envelope-from <thuth@redhat.com>) id 1ewNdf-0004dX-Qo
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 03:49:29 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 15 Mar 2018 08:49:02 +0100
-Message-Id: <1521100145-15304-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/3] Add new CD-ROM related qtests
+Date: Thu, 15 Mar 2018 08:49:05 +0100
+Message-Id: <1521100145-15304-4-git-send-email-thuth@redhat.com>
+In-Reply-To: <1521100145-15304-1-git-send-email-thuth@redhat.com>
+References: <1521100145-15304-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH 3/3] tests/cdrom-test: Test that -cdrom
+ parameter is working
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,28 +23,155 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Victor Kaplansky <victork@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org, qemu-s390x@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-With one of my clean-up patches (see commit 1454509726719e0933c800), I
-recently accidentially broke the "-cdrom" parameter (more precisely
-"-drive if=scsi") on a couple of boards, since there was no error
-detected during the "make check" regression testing. This is clearly an
-indication that we are lacking tests in this area.
-So this small patch series now introduces some tests for CD-ROM drives:
-The first two patches introduce the possibility to check that booting
-from CD-ROM drives still works fine for x86 and s390x, and the third
-patch adds a test that certain machines can at least still be started
-with the "-cdrom" parameter (i.e. that test would have catched the
-mistake that I did with my SCSI cleanup patch).
+Commit 1454509726719e0933c800 recently broke the "-cdrom" parameter
+on a couple of boards without that we noticed it immediately. Thus
+add a test which checks that "-cdrom" can at least be used to start
+QEMU with certain machine types.
 
-Thomas Huth (3):
-  tests/boot-sector: Add magic bytes to s390x boot code header
-  tests/cdboot: Test booting from CD-ROM ISO image file
-  tests/cdrom-test: Test that -cdrom parameter is working
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tests/Makefile.include |  7 +++++-
+ tests/cdrom-test.c     | 63 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 68 insertions(+), 2 deletions(-)
 
- tests/Makefile.include |  10 ++-
- tests/boot-sector.c    |   9 ++-
- tests/cdrom-test.c     | 216 +++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 231 insertions(+), 4 deletions(-)
- create mode 100644 tests/cdrom-test.c
-
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index a104222..b744fea 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -321,8 +321,9 @@ check-qtest-microblaze-y = tests/boot-serial-test$(EXESUF)
+ check-qtest-mips-y = tests/endianness-test$(EXESUF)
+ 
+ check-qtest-mips64-y = tests/endianness-test$(EXESUF)
++check-qtest-mips64-y += tests/cdrom-test$(EXESUF)
+ 
+-check-qtest-mips64el-y = tests/endianness-test$(EXESUF)
++check-qtest-mips64el-y = $(check-qtest-mips64-y)
+ 
+ check-qtest-moxie-y = tests/boot-serial-test$(EXESUF)
+ 
+@@ -356,6 +357,7 @@ check-qtest-ppc64-y += tests/display-vga-test$(EXESUF)
+ check-qtest-ppc64-y += tests/numa-test$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_IVSHMEM) += tests/ivshmem-test$(EXESUF)
+ check-qtest-ppc64-y += tests/cpu-plug-test$(EXESUF)
++check-qtest-ppc64-y += tests/cdrom-test$(EXESUF)
+ 
+ check-qtest-sh4-y = tests/endianness-test$(EXESUF)
+ 
+@@ -365,10 +367,12 @@ check-qtest-sparc-y = tests/prom-env-test$(EXESUF)
+ check-qtest-sparc-y += tests/m48t59-test$(EXESUF)
+ gcov-files-sparc-y = hw/timer/m48t59.c
+ check-qtest-sparc-y += tests/boot-serial-test$(EXESUF)
++check-qtest-sparc-y += tests/cdrom-test$(EXESUF)
+ 
+ check-qtest-sparc64-y = tests/endianness-test$(EXESUF)
+ check-qtest-sparc64-y += tests/prom-env-test$(EXESUF)
+ check-qtest-sparc64-y += tests/boot-serial-test$(EXESUF)
++check-qtest-sparc64-y += tests/cdrom-test$(EXESUF)
+ 
+ check-qtest-arm-y = tests/tmp105-test$(EXESUF)
+ check-qtest-arm-y += tests/ds1338-test$(EXESUF)
+@@ -384,6 +388,7 @@ check-qtest-arm-y += tests/sdhci-test$(EXESUF)
+ check-qtest-aarch64-y = tests/numa-test$(EXESUF)
+ check-qtest-aarch64-y += tests/sdhci-test$(EXESUF)
+ check-qtest-aarch64-y += tests/boot-serial-test$(EXESUF)
++check-qtest-aarch64-y += tests/cdrom-test$(EXESUF)
+ 
+ check-qtest-microblazeel-y = $(check-qtest-microblaze-y)
+ 
+diff --git a/tests/cdrom-test.c b/tests/cdrom-test.c
+index 1fc5230..5e516dd 100644
+--- a/tests/cdrom-test.c
++++ b/tests/cdrom-test.c
+@@ -13,6 +13,7 @@
+ #include "qemu/osdep.h"
+ #include "libqtest.h"
+ #include "boot-sector.h"
++#include "qapi/qmp/qdict.h"
+ 
+ static char isoimage[] = "cdrom-boot-iso-XXXXXX";
+ 
+@@ -62,7 +63,13 @@ static int prepare_image(const char *arch, char *isoimage)
+             goto cleanup;
+         }
+     } else {
+-        g_assert_not_reached();
++        /* Just create a dummy file */
++        char txt[] = "empty disc";
++        codefile = g_strdup_printf("%s/readme.txt", srcdir);
++        if (!g_file_set_contents(codefile, txt, sizeof(txt) - 1, NULL)) {
++            fprintf(stderr, "Failed to create '%s'\n", codefile);
++            goto cleanup;
++        }
+     }
+ 
+     ret = gen_iso("-quiet -l -no-emul-boot -b %s -o %s %s",
+@@ -81,6 +88,32 @@ cleanup:
+     return ret;
+ }
+ 
++/**
++ * Check that at least the -cdrom parameter is basically working, i.e. we can
++ * see the filename of the ISO image in the output of "info block" afterwards
++ */
++static void test_cdrom_param(gconstpointer data)
++{
++    QTestState *qts;
++    char *resp;
++
++    qts = qtest_startf("-M %s -cdrom %s", (const char *)data, isoimage);
++    resp = qtest_hmp(qts, "info block");
++    g_assert(strstr(resp, isoimage) != 0);
++    g_free(resp);
++    qtest_quit(qts);
++}
++
++static void add_cdrom_param_tests(const char **machines)
++{
++    while (*machines) {
++        char *testname = g_strdup_printf("cdrom/param/%s", *machines);
++        qtest_add_data_func(testname, *machines, test_cdrom_param);
++        g_free(testname);
++        machines++;
++    }
++}
++
+ static void test_cdboot(gconstpointer data)
+ {
+     QTestState *qts;
+@@ -145,6 +178,34 @@ int main(int argc, char **argv)
+         add_x86_tests();
+     } else if (g_str_equal(arch, "s390x")) {
+         add_s390x_tests();
++    } else if (g_str_equal(arch, "ppc64")) {
++        const char *ppcmachines[] = {
++            "pseries", "mac99", "g3beige", "40p", "prep", NULL
++        };
++        add_cdrom_param_tests(ppcmachines);
++    } else if (g_str_equal(arch, "sparc")) {
++        const char *sparcmachines[] = {
++            "LX", "SPARCClassic", "SPARCbook", "SS-10", "SS-20", "SS-4",
++            "SS-5", "SS-600MP", "Voyager", "leon3_generic", NULL
++        };
++        add_cdrom_param_tests(sparcmachines);
++    } else if (g_str_equal(arch, "sparc64")) {
++        const char *sparc64machines[] = {
++            "niagara", "sun4u", "sun4v", NULL
++        };
++        add_cdrom_param_tests(sparc64machines);
++    } else if (!strncmp(arch, "mips64", 6)) {
++        const char *mips64machines[] = {
++            "magnum", "malta", "mips", "mipssim", "pica61", NULL
++        };
++        add_cdrom_param_tests(mips64machines);
++    } else if (g_str_equal(arch, "aarch64")) {
++        const char *aarch64machines[] = {
++            "realview-eb", "realview-eb-mpcore", "realview-pb-a8",
++            "realview-pbx-a9", "versatileab", "versatilepb", "vexpress-a15",
++            "vexpress-a9", "virt", NULL
++        };
++        add_cdrom_param_tests(aarch64machines);
+     }
+ 
+     ret = g_test_run();
 -- 
 1.8.3.1
