@@ -1,29 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1ewNqN-0004Gd-Ly
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 04:02:36 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1ewNyE-0006mo-1K
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 04:10:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1ewNqI-00050c-2z
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 04:02:35 -0400
-Received: from mail-yw0-x22a.google.com ([2607:f8b0:4002:c05::22a]:40170)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1ewNqH-00050C-UA
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 04:02:30 -0400
-Received: by mail-yw0-x22a.google.com with SMTP id r145so1190754ywe.7
-	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 01:02:29 -0700 (PDT)
+	(envelope-from <borntraeger@de.ibm.com>) id 1ewNy9-0001EN-AY
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 04:10:42 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57662)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1ewNy9-0001DH-1t
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 04:10:37 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w2F8A4le021033
+	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 04:10:35 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2gqjjv5f7n-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 04:10:34 -0400
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 15 Mar 2018 08:10:32 -0000
+References: <1521100145-15304-1-git-send-email-thuth@redhat.com>
+	<1521100145-15304-2-git-send-email-thuth@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 15 Mar 2018 09:10:28 +0100
 MIME-Version: 1.0
-In-Reply-To: <000301d3bc24$236c48e0$6a44daa0$@ru>
-References: <CAMo8BfLuAdsdRScY+CgTzd0EBn3_kAFc=ysEwgp3MrM_+42viQ@mail.gmail.com>
-	<000301d3bb73$e997a8e0$bcc6faa0$@ru>
-	<CAMo8Bf+seSrT9HBFL1tspoDQ-9s9nGrXueYRt6v2nF4XzZbdfA@mail.gmail.com>
-	<000401d3bb7a$418b9fb0$c4a2df10$@ru>
-	<CAMo8Bf+Mqjer86N0LnCf0pofo9hyBZtRUXz4CiYo6Vr9d2V0jw@mail.gmail.com>
-	<000301d3bc24$236c48e0$6a44daa0$@ru>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Thu, 15 Mar 2018 01:02:28 -0700
-Message-ID: <CAMo8BfKGTYOjRuZZUYa=Pz30yYLu4+HLO=WOc5J7FeXJrA_F7w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] regression in timer code?
+In-Reply-To: <1521100145-15304-2-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <dd517533-9b9a-3e28-9234-4ca04ace0cb5@de.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 1/3] tests/boot-sector: Add
+ magic bytes to s390x boot code header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,27 +43,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: Pavel Dovgaluk <Pavel.Dovgaluk@ispras.ru>, qemu-devel <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Victor Kaplansky <victork@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-s390x@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
 
-On Wed, Mar 14, 2018 at 11:09 PM, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
->> From: Max Filippov [mailto:jcmvbkbc@gmail.com]
->> On Wed, Mar 14, 2018 at 2:53 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
->> > icount is adjusted by icount_warp_rt when CPU sleeps.
->> > These adjustments may be different in different runs.
->> > And the first adjustment is performed at the start of the machine.
->> > Therefore "now" value includes non-deterministic component from the beginning,
->> > but its increments caused by instruction executions are deterministic.
->>
->> Ok, so the CPU reset is non-deterministic. Thanks.
->
-> BTW, your link to website in MAINTAINERS does not work.
->
-> W: http://wiki.osll.spb.ru/doku.php?id=etc:users:jcmvbkbc:qemu-target-xtensa
 
-I know, thank you. There's a fix queued for it:
-  http://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg07346.html
 
--- 
-Thanks.
--- Max
+On 03/15/2018 08:49 AM, Thomas Huth wrote:
+> We're going to use the s390x boot code for testing CD-ROM booting.
+> But the ISO loader of the s390-ccw bios is a little bit more picky
+> than the network loader and expects some magic bytes in the header
+> of the file (see linux_s390_magic in pc-bios/s390-ccw/bootmap.c), so
+> we've got to add them in our boot code here, too.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  tests/boot-sector.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tests/boot-sector.c b/tests/boot-sector.c
+> index c373f0e..04721c9 100644
+> --- a/tests/boot-sector.c
+> +++ b/tests/boot-sector.c
+> @@ -68,8 +68,11 @@ static uint8_t x86_boot_sector[512] = {
+>  };
+> 
+>  /* For s390x, use a mini "kernel" with the appropriate signature */
+> -static const uint8_t s390x_psw[] = {
+> -    0x00, 0x08, 0x00, 0x00, 0x80, 0x01, 0x00, 0x00
+> +static const uint8_t s390x_psw_and_magic[] = {
+> +    0x00, 0x08, 0x00, 0x00, 0x80, 0x01, 0x00, 0x00,
+> +    0x02, 0x00, 0x00, 0x18, 0x60, 0x00, 0x00, 0x50,
+> +    0x02, 0x00, 0x00, 0x68, 0x60, 0x00, 0x00, 0x50,
+> +    0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40
+>  };
+>  static const uint8_t s390x_code[] = {
+>      0xa7, 0xf4, 0x00, 0x0a,                                /* j 0x10010 */
+> @@ -110,7 +113,7 @@ int boot_sector_init(char *fname)
+>      } else if (g_str_equal(arch, "s390x")) {
+>          len = 0x10000 + sizeof(s390x_code);
+>          boot_code = g_malloc0(len);
+> -        memcpy(boot_code, s390x_psw, sizeof(s390x_psw));
+> +        memcpy(boot_code, s390x_psw_and_magic, sizeof(s390x_psw_and_magic));
+>          memcpy(&boot_code[0x10000], s390x_code, sizeof(s390x_code));
+>      } else {
+>          g_assert_not_reached();
+> 
