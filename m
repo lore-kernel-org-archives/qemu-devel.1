@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ewSWX-0007ai-K8
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:02:26 -0400
+	(envelope-from <schwab@suse.de>) id 1ewSpY-0004DQ-9R
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:22:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ewSWR-0008Br-T3
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:02:25 -0400
-Received: from mail-ot0-x22b.google.com ([2607:f8b0:4003:c0f::22b]:37987)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ewSWR-0008Aw-O7
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:02:19 -0400
-Received: by mail-ot0-x22b.google.com with SMTP id 95-v6so6753683ote.5
-	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 06:02:19 -0700 (PDT)
+	(envelope-from <schwab@suse.de>) id 1ewSpX-0000X2-FN
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:22:04 -0400
+From: Andreas Schwab <schwab@suse.de>
+References: <1516279431-30424-1-git-send-email-pbonzini@redhat.com>
+	<1516279431-30424-6-git-send-email-pbonzini@redhat.com>
+Date: Thu, 15 Mar 2018 14:21:55 +0100
+In-Reply-To: <1516279431-30424-6-git-send-email-pbonzini@redhat.com> (Paolo
+	Bonzini's message of "Thu, 18 Jan 2018 13:43:49 +0100")
+Message-ID: <mvmd105lbik.fsf@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <20180313155918.23591-1-laurent@vivier.eu>
-References: <20180313155918.23591-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Mar 2018 13:01:57 +0000
-Message-ID: <CAFEAcA8JBqAEj=JhH+Tfni=c4AnqfivseSFmNgxZfYYqiw5JGw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/11] M68k for 2.12 patches
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 5/7] block: convert bdrv_invalidate_cache
+ callback to coroutine_fn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +24,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-On 13 March 2018 at 15:59, Laurent Vivier <laurent@vivier.eu> wrote:
-> The following changes since commit 59667bb167f773965ce6547352f312eff0d4d523:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/x86-next-pull-request' into staging (2018-03-13 14:02:47 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/vivier/qemu-m68k.git tags/m68k-for-2.12-pull-request
->
-> for you to fetch changes up to 02f9124ebe26c36f0f7ed58085bd963e4372b2cd:
->
->   target/m68k: implement fcosh (2018-03-13 16:35:05 +0100)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
->
-> Laurent Vivier (11):
->   target/m68k: implement ftan
->   target/m68k: implement fsin
->   target/m68k: implement fcos
->   target/m68k: implement fsincos
->   target/m68k: implement fatan
->   target/m68k: implement fasin
->   target/m68k: implement facos
->   target/m68k: implement fatanh
->   target/m68k: implement ftanh
->   target/m68k: implement fsinh
->   target/m68k: implement fcosh
->
->  target/m68k/fpu_helper.c            |   61 ++
->  target/m68k/helper.h                |   11 +
->  target/m68k/softfloat.c             | 1637 +++++++++++++++++++++++++++++++++++
->  target/m68k/softfloat.h             |   11 +
->  target/m68k/softfloat_fpsp_tables.h |  267 ++++++
->  target/m68k/translate.c             |   38 +
->  6 files changed, 2025 insertions(+)
+block/iscsi.c:2247:6: error: 'BlockDriver {aka struct BlockDriver}' has no member named 'bdrv_invalidate_cache'; did you mean 'bdrv_co_invalidate_cache'?
+     .bdrv_invalidate_cache  = iscsi_invalidate_cache,
+      ^~~~~~~~~~~~~~~~~~~~~
+      bdrv_co_invalidate_cache
+block/iscsi.c:2247:31: error: 'iscsi_invalidate_cache' undeclared here (not in a function); did you mean 'iscsi_co_invalidate_cache'?
+     .bdrv_invalidate_cache  = iscsi_invalidate_cache,
+                               ^~~~~~~~~~~~~~~~~~~~~~
+                               iscsi_co_invalidate_cache
 
-Applied, thanks.
+Andreas.
 
--- PMM
+-- 
+Andreas Schwab, SUSE Labs, schwab@suse.de
+GPG Key fingerprint = 0196 BAD8 1CE9 1970 F4BE  1748 E4D4 88E3 0EEA B9D7
+"And now for something completely different."
