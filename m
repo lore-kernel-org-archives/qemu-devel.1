@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robinhe@robinhe-hp.sh.intel.com>) id 1ewSzy-0001tY-6L
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:32:54 -0400
+	(envelope-from <clg@kaod.org>) id 1ewT1Q-0002xM-EK
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:34:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robinhe@robinhe-hp.sh.intel.com>) id 1ewSzu-0000tE-7n
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:32:50 -0400
-Received: from [112.64.68.174] (port=39094 helo=robinhe-hp.sh.intel.com)
+	(envelope-from <clg@kaod.org>) id 1ewT1M-0001rJ-Bb
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:34:20 -0400
+Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:33318)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <robinhe@robinhe-hp.sh.intel.com>)
-	id 1ewSzt-0000r1-NH
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:32:46 -0400
-From: junyan.he@intel.com
-Date: Tue, 13 Mar 2018 16:33:53 +0800
-Message-Id: <1520930033-18885-11-git-send-email-junyan.he@intel.com>
-In-Reply-To: <1520930033-18885-1-git-send-email-junyan.he@intel.com>
-References: <1520930033-18885-1-git-send-email-junyan.he@intel.com>
-Subject: [Qemu-devel] [PATCH 10/10] RFC: Enable nvdimm snapshot functions.
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ewT1M-0001q5-6U
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:34:16 -0400
+Received: from player734.ha.ovh.net (unknown [10.109.122.111])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id A5F1D121DC3
+	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 14:34:14 +0100 (CET)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Thu, 15 Mar 2018 13:33:58 +0000
+Message-Id: <20180315133402.13470-1-clg@kaod.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 0/4] target/ppc: add hash MMU support for
+ the POWER9 PowerNV machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,83 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, quintela@redhat.com, rth@twiddle.net, dgilbert@redhat.com, famz@redhat.com, Junyan He <junyan.he@intel.com>
+To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-From: Junyan He <junyan.he@intel.com>
+Hello,
 
-In snapshot saving, all nvdimm kind memory will be saved in different way
-and we exclude all nvdimm kind memory region in ram.c
+This adds support for the Hash Page Table MMU mode on POWER9 PowerNV
+machines. The Radix Tree mode support for the host is still to be done
+but we are getting close.=20
 
-Signed-off-by: Junyan He <junyan.he@intel.com>
----
- migration/ram.c | 17 +++++++++++++++++
- vl.c            |  1 +
- 2 files changed, 18 insertions(+)
+Thanks,
 
-diff --git a/migration/ram.c b/migration/ram.c
-index d1db422..ad32469 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1219,9 +1219,15 @@ static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss, bool *again)
-         /* Didn't find anything in this RAM Block */
-         pss->page = 0;
-         pss->block = QLIST_NEXT_RCU(pss->block, next);
-+        while (ram_block_is_nvdimm_active(pss->block)) {
-+            pss->block = QLIST_NEXT_RCU(pss->block, next);
-+        }
-         if (!pss->block) {
-             /* Hit the end of the list */
-             pss->block = QLIST_FIRST_RCU(&ram_list.blocks);
-+            while (ram_block_is_nvdimm_active(pss->block)) {
-+                pss->block = QLIST_NEXT_RCU(pss->block, next);
-+            }
-             /* Flag that we've looped */
-             pss->complete_round = true;
-             rs->ram_bulk_stage = false;
-@@ -1541,6 +1547,9 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
- 
-     if (!pss.block) {
-         pss.block = QLIST_FIRST_RCU(&ram_list.blocks);
-+        while (ram_block_is_nvdimm_active(pss.block)) {
-+            pss.block = QLIST_NEXT_RCU(pss.block, next);
-+        }
-     }
- 
-     do {
-@@ -1583,6 +1592,10 @@ uint64_t ram_bytes_total(void)
- 
-     rcu_read_lock();
-     RAMBLOCK_FOREACH(block) {
-+        if (ram_block_is_nvdimm_active(block)) {
-+            // If snapshot and the block is nvdimm, let nvdimm do the job
-+            continue;
-+        }
-         total += block->used_length;
-     }
-     rcu_read_unlock();
-@@ -2222,6 +2235,10 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
-     qemu_put_be64(f, ram_bytes_total() | RAM_SAVE_FLAG_MEM_SIZE);
- 
-     RAMBLOCK_FOREACH(block) {
-+        if (ram_block_is_nvdimm_active(block)) {
-+            // If snapshot and the block is nvdimm, let nvdimm do the job
-+            continue;
-+        }
-         qemu_put_byte(f, strlen(block->idstr));
-         qemu_put_buffer(f, (uint8_t *)block->idstr, strlen(block->idstr));
-         qemu_put_be64(f, block->used_length);
-diff --git a/vl.c b/vl.c
-index 3ef04ce..1bd5711 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4502,6 +4502,7 @@ int main(int argc, char **argv, char **envp)
- 
-     blk_mig_init();
-     ram_mig_init();
-+    nvdimm_snapshot_init();
- 
-     /* If the currently selected machine wishes to override the units-per-bus
-      * property of its default HBA interface type, do so now. */
--- 
-2.7.4
+C.=20
+
+Changes since v2:
+
+ - extended PPCVirtualHypervisor interface to export the external HPT
+ - added an assert on MMU model in ppc_store_ptcr()
+ - reworked ppc_hash64_hpt_reg() to cover only powernv machines. pseries
+   machines being handled with cpu->vhyp at the ppc_hash64_hpt_base()
+   level.
+ - reworked ppc64_v3_radix() to distinguish pseries machine from
+   powernv machines
+
+
+Changes since v1:
+
+ - introduced ppc64_v3_get_patbe0()
+ - renamed ppc64_radix() in ppc64_v3_radix()
+ - renamed partition table definitions to match ISA
+ - moved definitions under mmu-book3s-v3.h
+=20
+C=C3=A9dric Le Goater (4):
+  target/ppc: export external HPT via virtual hypervisor
+  target/ppc: add basic support for PTCR on POWER9
+  target/ppc: add hash MMU support on POWER9 for PowerNV only
+  target/ppc: generalize check on radix when in HV mode
+
+ hw/ppc/spapr.c              |  8 +++++++
+ hw/ppc/spapr_hcall.c        |  5 +++--
+ target/ppc/cpu.h            |  3 +++
+ target/ppc/helper.h         |  1 +
+ target/ppc/misc_helper.c    | 12 +++++++++++
+ target/ppc/mmu-book3s-v3.c  | 23 ++++++++++++++++++--
+ target/ppc/mmu-book3s-v3.h  | 15 ++++++++++++-
+ target/ppc/mmu-hash64.c     | 52 +++++++++++++++++++++++++++++++++++++--=
+------
+ target/ppc/mmu-hash64.h     | 39 ++++++++++++++++++++++++++++++++--
+ target/ppc/mmu_helper.c     | 33 ++++++++++++++++++++++++++--
+ target/ppc/translate.c      |  3 +++
+ target/ppc/translate_init.c | 18 ++++++++++++++++
+ 12 files changed, 194 insertions(+), 18 deletions(-)
+
+--=20
+2.13.6
