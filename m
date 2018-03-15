@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ewKMJ-00074S-JL
+	(envelope-from <dgibson@ozlabs.org>) id 1ewKMJ-00074N-GF
 	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 00:19:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ewKMI-00043q-A1
+	(envelope-from <dgibson@ozlabs.org>) id 1ewKMF-00041v-Gr
 	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 00:19:19 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 15 Mar 2018 15:19:00 +1100
-Message-Id: <20180315041903.10046-7-david@gibson.dropbear.id.au>
+Date: Thu, 15 Mar 2018 15:18:55 +1100
+Message-Id: <20180315041903.10046-2-david@gibson.dropbear.id.au>
 In-Reply-To: <20180315041903.10046-1-david@gibson.dropbear.id.au>
 References: <20180315041903.10046-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 6/9] hw/ppc/spapr: Allow "spapr-vlan" as NIC
- model name beside "ibmveth"
+Subject: [Qemu-devel] [PULL 1/9] sii3112: Remove unneeded exit function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,43 +20,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, lvivier@redhat.com, surajjs@au1.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, lvivier@redhat.com, surajjs@au1.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Thomas Huth <thuth@redhat.com>
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-With the new "--nic" command line parameter option, the "old" way of
-specifying a NIC model via the nd_table[] is becoming more prominent
-again. But for the pseries "spapr-vlan" device, there is a confusing
-discrepancy between the model name that is used for "--device" (i.e.
-"spapr-vlan") and the model name that has to be used for "--net nic"
-or the new "--nic" parameter (i.e. "ibmveth"). Since "spapr-vlan" is
-the "real" name of the device, let's allow "spapr-vlan" to be used
-as model name for the nd_table[] entries, too.
+An exit function was mistakenly left here but it's not needed because
+the PCI bars are organised differently in this device. Calling this
+exit function during device_del was causing an abort with
+memory_region_del_subregion: `Assertion subregion->container == mr' failed.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ hw/ide/sii3112.c | 12 ------------
+ 1 file changed, 12 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 7e1c858566..dfa9e43601 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2607,10 +2607,11 @@ static void spapr_machine_init(MachineState *machine)
-         NICInfo *nd = &nd_table[i];
+diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
+index e3896c65b4..743a50ed51 100644
+--- a/hw/ide/sii3112.c
++++ b/hw/ide/sii3112.c
+@@ -327,17 +327,6 @@ static void sii3112_pci_realize(PCIDevice *dev, Error **errp)
+     qemu_register_reset(sii3112_reset, s);
+ }
  
-         if (!nd->model) {
--            nd->model = g_strdup("ibmveth");
-+            nd->model = g_strdup("spapr-vlan");
-         }
- 
--        if (strcmp(nd->model, "ibmveth") == 0) {
-+        if (g_str_equal(nd->model, "spapr-vlan") ||
-+            g_str_equal(nd->model, "ibmveth")) {
-             spapr_vlan_create(spapr->vio_bus, nd);
-         } else {
-             pci_nic_init_nofail(&nd_table[i], phb->bus, nd->model, NULL);
+-static void sii3112_pci_exitfn(PCIDevice *dev)
+-{
+-    PCIIDEState *d = PCI_IDE(dev);
+-    int i;
+-
+-    for (i = 0; i < 2; ++i) {
+-        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].extra_io);
+-        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].addr_ioport);
+-    }
+-}
+-
+ static void sii3112_pci_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -348,7 +337,6 @@ static void sii3112_pci_class_init(ObjectClass *klass, void *data)
+     pd->class_id = PCI_CLASS_STORAGE_RAID;
+     pd->revision = 1;
+     pd->realize = sii3112_pci_realize;
+-    pd->exit = sii3112_pci_exitfn;
+     dc->desc = "SiI3112A SATA controller";
+     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+ }
 -- 
 2.14.3
