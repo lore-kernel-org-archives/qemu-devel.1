@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ewPSi-0006DJ-1a
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 05:46:17 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ewPf7-0001mw-05
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 05:59:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ewPSe-0006os-SK
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 05:46:16 -0400
-Received: from 5.mo4.mail-out.ovh.net ([188.165.44.50]:35068)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ewPSe-0006cZ-KV
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 05:46:12 -0400
-Received: from player796.ha.ovh.net (unknown [10.109.122.194])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id E356215699C
-	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 10:46:03 +0100 (CET)
-Date: Thu, 15 Mar 2018 10:45:57 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180315104557.541280bb@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <OFE3A7F910.3814D427-ON6525824A.001BEDE1-6525824A.001C48BE@notes.na.collabserv.com>
-References: <152044905701.22965.8924520463227226351.stgit@bahia.lan>
-	<OFE3A7F910.3814D427-ON6525824A.001BEDE1-6525824A.001C48BE@notes.na.collabserv.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1ewPf5-0001zc-Uu
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 05:59:05 -0400
+Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:39313)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ewPf5-0001y4-PS
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 05:59:03 -0400
+Received: by mail-oi0-x233.google.com with SMTP id p9so1348072oic.6
+	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 02:59:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] virtio_net: flush uncompleted TX on reset
+In-Reply-To: <CAGaT8w45tJ32EVj20RFjmG9=WvZBfAuF_j3BgXsFy5ZmPef-Ow@mail.gmail.com>
+References: <CAGaT8w45tJ32EVj20RFjmG9=WvZBfAuF_j3BgXsFy5ZmPef-Ow@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 15 Mar 2018 09:58:42 +0000
+Message-ID: <CAFEAcA_BQxw-nQj8nfuLgRwx=uKg_Hvz+ku=P-Qj4oLG_FOAfA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] ARM64 Interrupt handling on QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,107 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Nageswara R Sastry <nasastry@in.ibm.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
+To: Brijen Raval <bjraval123@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Ping ?
+On 15 March 2018 at 03:07, Brijen Raval <bjraval123@gmail.com> wrote:
+> I am booting up a custom kernel on QEMU ARM64, upon completion of its
+> initial boot up it looks like it enters the arch_idle() state
+>
+> I enabled the -d int logging to understand what is going on, I see the
+> following repeated many times continuosly here after
+>
+> Taking exception 5 [IRQ]
+> ...from EL1 to EL1
+> ...with ESR 0x15/0x56000000
+> ...with ELR 0xffffffff0000349c
+> ...to EL1 PC 0xffffffff00008280 PSTATE 0x3c5
+>
+> Here's the dissassembly for the relevant piece of code:
+>
+>  ffffffff00003498 <arch_idle>:
+>  arch_idle():
+>  ../../kernel/arch/arm64/arch.cpp:182
+>  ffffffff00003498:       d503207f        wfi
+>  ffffffff0000349c:       d65f03c0        ret
+>
+> I am trying to understand what exceptions are occurring exactly when kernel
+> is idle (timer?). According to above ELR is pointing to arch_idle(), but I
+> believe "wfi" instruction would not be an IRQ but a sync abort which is
+> handle differently right?
 
-On Thu, 8 Mar 2018 10:38:56 +0530
-"Nageswara R Sastry" <nasastry@in.ibm.com> wrote:
+WFI is neither an IRQ nor an abort. It's just a hint to the CPU
+that it doesn't need to execute any more instructions until the
+next interrupt occurs. (It's a valid implementation for it to just
+be a NOP.) QEMU does implement WFI to be "don't execute more insns
+until the next interrupt", which is why you're seeing the ELR for
+the interrupt generally being the ret insn: if the guest is mostly
+idle and its idle loop includes a WFI then almost all the time an
+incoming interrupt will find that the CPU was in the WFI insn.
 
-> Greg Kurz <groug@kaod.org> wrote on 08/03/2018 12:27:37 AM:
-> 
-> > From: Greg Kurz <groug@kaod.org>
-> > To: qemu-devel@nongnu.org
-> > Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang 
-> > <jasowang@redhat.com>, R Nageswara Sastry <nasastry@in.ibm.com>
-> > Date: 08/03/2018 12:27 AM
-> > Subject: [PATCH] virtio_net: flush uncompleted TX on reset
-> > 
-> > If the backend could not transmit a packet right away for some reason,
-> > the packet is queued for asynchronous sending. The corresponding vq
-> > element is tracked in the async_tx.elem field of the VirtIONetQueue,
-> > for later freeing when the transmission is complete.
-> > 
-> > If a reset happens before completion, virtio_net_tx_complete() will push
-> > async_tx.elem back to the guest anyway, and we end up with the inuse   
-> flag
-> > of the vq being equal to -1. The next call to virtqueue_pop() is then
-> > likely to fail with "Virtqueue size exceeded".
-> > 
-> > This can be reproduced easily by starting a guest without a net backend,
-> > doing a system reset when it is booted, and finally snapshotting it.
-> > 
-> > The appropriate fix is to ensure that such an asynchronous transmission
-> > cannot survive a device reset. So for all queues, we first try to send
-> > the packet again, and eventually we purge it if the backend still could
-> > not deliver it.
-> > 
-> > Reported-by: R. Nageswara Sastry <nasastry@in.ibm.com>  
-> 
-> Tested-by: R. Nageswara Sastry <nasastry@in.ibm.com>
-> 
-> > Buglink: https://urldefense.proofpoint.com/v2/url?
-> >   
-> u=https-3A__github.com_open-2Dpower-2Dhost-2Dos_qemu_issues_37&d=DwICaQ&c=jf_iaSHvJObTbx-
-> > siA1ZOg&r=mxAxqGE8eb0FlPPFjDZkTNaoci-GdQbkJayE4r-
-> >   
-> wzYY&m=hPoY6b601IXJbUV2uh22jBrnYuByNQpwi1d7gvN4yZs&s=Ic3NN3mM_Nv1gAJ7dY22-
-> > ebnJsG7c0yNkbThX8Tu6xg&e=
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >  hw/net/virtio-net.c |   11 +++++++++++
-> >  1 file changed, 11 insertions(+)
-> > 
-> > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> > index 188744e17d57..eea3cdb2c700 100644
-> > --- a/hw/net/virtio-net.c
-> > +++ b/hw/net/virtio-net.c
-> > @@ -422,6 +422,7 @@ static RxFilterInfo 
-> > *virtio_net_query_rxfilter(NetClientState *nc)
-> >  static void virtio_net_reset(VirtIODevice *vdev)
-> >  {
-> >      VirtIONet *n = VIRTIO_NET(vdev);
-> > +    int i;
-> > 
-> >      /* Reset back to compatibility mode */
-> >      n->promisc = 1;
-> > @@ -445,6 +446,16 @@ static void virtio_net_reset(VirtIODevice *vdev)
-> >      memcpy(&n->mac[0], &n->nic->conf->macaddr, sizeof(n->mac));
-> >      qemu_format_nic_info_str(qemu_get_queue(n->nic), n->mac);
-> >      memset(n->vlans, 0, MAX_VLAN >> 3);
-> > +
-> > +    /* Flush any async TX */
-> > +    for (i = 0;  i < n->max_queues; i++) {
-> > +        NetClientState *nc = qemu_get_subqueue(n->nic, i);
-> > +
-> > +        if (!qemu_net_queue_flush(nc->peer->incoming_queue)) {
-> > +            qemu_net_queue_purge(nc->peer->incoming_queue, nc);
-> > +        }
-> > +        assert(!virtio_net_get_subqueue(nc)->async_tx.elem);
-> > +    }
-> >  }
-> > 
-> >  static void peer_test_vnet_hdr(VirtIONet *n)
-> >   
-> 
-> 
-> With out patch:
-> (qemu) system_reset
-> (qemu) savevm 1
-> Virtqueue size exceeded
-> (qemu) loadvm 1
-> VQ 1 size 0x100 < last_avail_idx 0x0 - used_idx 0x1
-> Failed to load virtio-net:virtio
-> error while loading state for instance 0x0 of device
-> 'pci@800000020000000:00.0/virtio-net'
-> Error -1 while loading VM state
-> 
-> With patch:
-> (qemu) system_reset
-> (qemu) savevm 1
-> (qemu) loadvm 1
-> 
-> 
-> 
-> 
+Correctly written software will not ever issue a WFI unless it
+has some mechanism for being woken up from it, which is typically
+an outstanding interrupt, perhaps timer or an interrupt for
+completed disk or network operation. For an SMP kernel it could also be
+some other CPU sending this CPU an inter-processor-interrupt to
+wake us up). "idle" for an OS just means "nothing to do right now".
+
+> Also from ESR, it looks like a SVC instruction but if I am not wrong for
+> IRQs ESRs are not updated (considered)
+
+QEMU's logging prints the ESR value for all exceptions, even those
+where architecturally the ESR is not updated. In those cases the
+printed value can be ignored.
+
+> One more thing, is there a way in QEMU I could find out what exception 5 is
+> corresponding to?
+
+The logging tells you:
+> Taking exception 5 [IRQ]
+
+Exception 5 is IRQ. (These numbers are all internal to QEMU, and
+don't have any architectural or guest-visible relevance. They're
+the EXCP_* constants defined at the top of target/arm/cpu.h.)
+
+thanks
+-- PMM
