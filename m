@@ -1,15 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ewJw5-0000Ai-6N
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 23:52:14 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1ewKMG-00073S-KQ
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 00:19:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ewJw4-00079H-Gy
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 23:52:13 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Thu, 15 Mar 2018 11:51:57 +0800
-Message-Id: <20180315035157.6929-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH] block: Fix leak of ignore_children in error
- path
+	(envelope-from <dgibson@ozlabs.org>) id 1ewKMF-00041Z-Ft
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 00:19:16 -0400
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Thu, 15 Mar 2018 15:18:56 +1100
+Message-Id: <20180315041903.10046-3-david@gibson.dropbear.id.au>
+In-Reply-To: <20180315041903.10046-1-david@gibson.dropbear.id.au>
+References: <20180315041903.10046-1-david@gibson.dropbear.id.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 2/9] tests/boot-serial: Check the 40p machine,
+ too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,32 +23,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: peter.maydell@linaro.org
+Cc: groug@kaod.org, lvivier@redhat.com, surajjs@au1.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-Reported-by: Max Reitz <mreitz@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+
+The "40p" machine is using the Open Hack'Ware BIOS, just like the "prep"
+machine, so we can test it accordingly with the boot-serial tester, too.
+While we're at it, also change the strings that we are using for the
+"prep" machine, so that this test now also checks some CLI parameters.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- block.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/boot-serial-test.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/block.c b/block.c
-index 75a9fd49de..c1fda9fd57 100644
---- a/block.c
-+++ b/block.c
-@@ -3671,12 +3671,12 @@ int bdrv_drop_intermediate(BlockDriverState *top, BlockDriverState *base,
-         GSList *ignore_children = g_slist_prepend(NULL, c);
-         bdrv_check_update_perm(base, NULL, c->perm, c->shared_perm,
-                                ignore_children, &local_err);
-+        g_slist_free(ignore_children);
-         if (local_err) {
-             ret = -EPERM;
-             error_report_err(local_err);
-             goto exit;
-         }
--        g_slist_free(ignore_children);
- 
-         /* If so, update the backing file path in the image file */
-         if (c->role->update_filename) {
--- 
+diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+index ece25c694f..5b24cd26c1 100644
+--- a/tests/boot-serial-test.c
++++ b/tests/boot-serial-test.c
+@@ -75,11 +75,13 @@ typedef struct testdef {
+ static testdef_t tests[] =3D {
+     { "alpha", "clipper", "", "PCI:" },
+     { "ppc", "ppce500", "", "U-Boot" },
+-    { "ppc", "prep", "", "Open Hack'Ware BIOS" },
++    { "ppc", "prep", "-m 96", "Memory size: 96 MB" },
++    { "ppc", "40p", "-boot d", "Booting from device d" },
+     { "ppc", "g3beige", "", "PowerPC,750" },
+     { "ppc", "mac99", "", "PowerPC,G4" },
+     { "ppc64", "ppce500", "", "U-Boot" },
+-    { "ppc64", "prep", "", "Open Hack'Ware BIOS" },
++    { "ppc64", "prep", "-boot e", "Booting from device e" },
++    { "ppc64", "40p", "-m 192", "Memory size: 192 MB" },
+     { "ppc64", "mac99", "", "PowerPC,970FX" },
+     { "ppc64", "pseries", "", "Open Firmware" },
+     { "ppc64", "powernv", "-cpu POWER8", "OPAL" },
+--=20
 2.14.3
