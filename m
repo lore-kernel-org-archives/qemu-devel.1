@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ewYca-0007xW-1z
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:33:05 -0400
+	(envelope-from <rth7680@gmail.com>) id 1ewYdm-0000Ff-Oh
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:34:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ewYcZ-0005ZZ-9A
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:33:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37338 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1ewYcZ-0005ZJ-58
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:33:03 -0400
-References: <20180314153820.18426-1-drjones@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <7e9e00fe-7d3c-7c3f-f146-beb001c1bee1@redhat.com>
-Date: Thu, 15 Mar 2018 20:32:45 +0100
+	(envelope-from <rth7680@gmail.com>) id 1ewYdj-00065T-Ml
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:34:18 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:45066)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ewYdj-00065A-FL
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:34:15 -0400
+Received: by mail-pf0-x243.google.com with SMTP id h19so3209803pfd.12
+	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 12:34:15 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20180315191958.28937-1-laurent@vivier.eu>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <8ed72173-427f-d16f-bcec-26649511836d@twiddle.net>
+Date: Fri, 16 Mar 2018 03:34:09 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180314153820.18426-1-drjones@redhat.com>
+In-Reply-To: <20180315191958.28937-1-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] dump-guest-memory: more descriptive
- lookup_type failure
+Subject: Re: [Qemu-devel] [RFC 0/3] target/m68k: fix TCGv array overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +30,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, marcandre.lureau@redhat.com
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
 
-On 03/14/18 16:38, Andrew Jones wrote:
-> We've seen a few reports of
-> 
->  (gdb) source /usr/share/qemu-kvm/dump-guest-memory.py
->  Traceback (most recent call last):
->    File "/usr/share/qemu-kvm/dump-guest-memory.py", line 19, in <module>
->      UINTPTR_T = gdb.lookup_type("uintptr_t")
->  gdb.error: No type named uintptr_t.
-> 
-> This occurs when symbols haven't been loaded first, i.e. neither a
-> QEMU binary was loaded nor a QEMU process was attached first. Let's
-> better inform the user of how to fix the issue themselves in order
-> to avoid more reports.
-> 
-> Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
-> v2: Not quite so long a long line (< 90 only generates warnings)
->     Pick up Janosch's ack
-> 
->  scripts/dump-guest-memory.py | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.py
-> index 51acfcd0c053..276eebf0c27e 100644
-> --- a/scripts/dump-guest-memory.py
-> +++ b/scripts/dump-guest-memory.py
-> @@ -16,7 +16,12 @@ the COPYING file in the top-level directory.
->  import ctypes
->  import struct
->  
-> -UINTPTR_T = gdb.lookup_type("uintptr_t")
-> +try:
-> +    UINTPTR_T = gdb.lookup_type("uintptr_t")
-> +except Exception as inst:
-> +    raise gdb.GdbError("Symbols must be loaded prior to sourcing dump-guest-memory.\n"
-> +                       "Symbols may be loaded by 'attach'ing a QEMU process id or by "
-> +                       "'load'ing a QEMU binary.")
->  
->  TARGET_PAGE_SIZE = 0x1000
->  TARGET_PAGE_MASK = 0xFFFFFFFFFFFFF000
-> 
+On 03/16/2018 03:19 AM, Laurent Vivier wrote:
+> I try to fix this by introducing a new TCG function
+> to try to free a TCGv if it is a temporary one and
+> do nothing otherwise (patches 1 and 2)
 
-Ah, cool.
+I would prefer not to approach this in this way.
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Better is to have translator helpers that allocate temps
+that are freed at the end of the insn.
 
-Thanks!
-Laszlo
+C.f. new_tmp_a64 in target/arm/translate-a64.c.
+
+
+r~
