@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33225)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ewVEQ-0004F3-5t
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 11:55:55 -0400
+	(envelope-from <rth7680@gmail.com>) id 1ewVgE-0007HG-VK
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 12:24:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ewVEN-00037p-Kg
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 11:55:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42964)
+	(envelope-from <rth7680@gmail.com>) id 1ewVgA-0000FM-2g
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 12:24:38 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:42849)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ewVEN-00034j-F8
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 11:55:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ewVEJ-0000Zu-Fr
-	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 15:55:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B5E392E80E5
-	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 15:55:46 +0000 (UTC)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ewVg9-0000Es-Rz
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 12:24:33 -0400
+Received: by mail-pf0-x242.google.com with SMTP id a16so3007711pfn.9
+	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 09:24:33 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20180312202728.23790-1-laurent@vivier.eu>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <7d6d23cf-f4cc-998a-6a7f-2ba805273c57@twiddle.net>
+Date: Fri, 16 Mar 2018 00:24:27 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 15 Mar 2018 15:42:52 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1756080 <1756080@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152112215198.15095.6439554295431781559.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152112857204.3625.17450275113242525009.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1756080] Re: QEMU does not provide non-Linux
- kernels with ATAGS structure on ARM targets
+In-Reply-To: <20180312202728.23790-1-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 00/11] implement 680x0 FPU (part 5)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,31 +30,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Thomas Huth <huth@tuxfamily.org>
 
-QEMU doesn't care whether the kernel you provide it is Linux or
-something else. If you pass -kernel something that's not an ELF file,
-we'll load and boot it using the Linux boot protocol (including ATAGS,
-potentially). If you pass an ELF file or pass -bios a binary blob, we'll
-just start it in the way the CPU usually resets, on the assumption it
-can deal with whatever that is.
+On 03/13/2018 04:27 AM, Laurent Vivier wrote:
+> I have compared results of these instructions from a real m68040 and from
+> QEMU, and they match (sincos differs [1] because in QEMU we compute it as
+> sin and cos, and on m68040 sin and cos results differ also with
+> sincos results. It looks like a rounding problem, perhaps a bug in m68040
+> FPU? or in my test program?)
+> 
+> I know this will need more work, but for the moment I only would
+> like to provide these new instructions to the maintream of QEMU.
+> 
+> [1] Example:
+> 
+> sincos -6.125952 -> (0.156586, 0.987664)
+> 
+> QEMU:
+> 
+>   sincos c0010000c407cd1182c2bb27 -> 3ffc0000a05812beea449a4d
+>                                      3ffe0000fcd791d65887d19a
+>   sin c0010000c407cd1182c2bb27    -> 3ffc0000a05812beea449a4d
+>   cos c0010000c407cd1182c2bb27    -> 3ffe0000fcd791d65887d19a
+> 
+> m68040:
+> 
+>   sincos c0010000c407cd1182c2bb27 -> 3ffc0000a05812beea449a4d
+>                                      3ffe0000fcd791d65887d199 <<--
+>   sin c0010000c407cd1182c2bb27    -> 3ffc0000a05812beea449a4d
+>   cos c0010000c407cd1182c2bb27    -> 3ffe0000fcd791d65887d19a
 
--- =
+Wow, this does seem like a processor bug.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1756080
+Anyway, I've looked through the patch set and nothing stands out,
 
-Title:
-  QEMU does not provide non-Linux kernels with ATAGS structure on ARM
-  targets
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Status in QEMU:
-  New
 
-Bug description:
-  This would be a useful feature. Many kernels, particularly hobbyist
-  kernels, have support for ATAGS.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1756080/+subscriptions
+r~
