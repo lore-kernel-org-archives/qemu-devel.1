@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ewWAI-0002V7-Mp
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 12:55:44 -0400
+	(envelope-from <jack.schwartz@oracle.com>) id 1ewWAP-0002Yk-B1
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 12:55:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ewWAH-0000pz-Ju
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 12:55:42 -0400
-Received: from mail-ot0-x231.google.com ([2607:f8b0:4003:c0f::231]:36214)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ewWAH-0000pc-Eh
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 12:55:41 -0400
-Received: by mail-ot0-x231.google.com with SMTP id 108-v6so7582707otv.3
-	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 09:55:41 -0700 (PDT)
+	(envelope-from <jack.schwartz@oracle.com>) id 1ewWAM-0000xr-5M
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 12:55:49 -0400
+References: <20180314173213.18563-1-kwolf@redhat.com>
+	<20180314173213.18563-2-kwolf@redhat.com>
+	<4ab6eff1-f4c2-1e04-5fa8-cc71c3bf308d@oracle.com>
+	<20180315155415.GA3876@localhost.localdomain>
+From: Jack Schwartz <jack.schwartz@oracle.com>
+Message-ID: <821bfa6e-9ad5-f486-49a1-f306696992ec@oracle.com>
+Date: Thu, 15 Mar 2018 09:55:49 -0700
 MIME-Version: 1.0
-In-Reply-To: <OF802C7AAD.A9501847-ON0625823D.000350FE-0625823D.0003998B@ddci.com>
-References: <OF802C7AAD.A9501847-ON0625823D.000350FE-0625823D.0003998B@ddci.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Mar 2018 16:55:19 +0000
-Message-ID: <CAFEAcA9hNNT_ooL+YKsU-V8X_FKT9x-ca+ae03DtybV13s7GoA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] -icount changes physical address assignments in
- QEMU 2.10/2.11
+In-Reply-To: <20180315155415.GA3876@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/5] multiboot: Reject kernels exceeding
+ the address space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +27,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alarson@ddci.com
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, anatol.pomozov@gmail.com, ppandit@redhat.com
 
-On 23 February 2018 at 00:39,  <alarson@ddci.com> wrote:
-> When porting our RTOS from QEMU 2.8 to 2.10/2.11, I ran into a problem
-> where 16-bit writes to the "bochs dispi interface" were being reported
-> differently depending on whether or not "-icount" was given to QEMU.
+On 03/15/18 08:54, Kevin Wolf wrote:
+> Am 15.03.2018 um 06:19 hat Jack Schwartz geschrieben:
+>> Hi Kevin.
+>>
+>> My comments are inline...
+>>
+>> On 2018-03-14 10:32, Kevin Wolf wrote:
+>>> The code path with a manually set mh_load_addr in the Multiboot heade=
+r
+>>> checks that load_end_addr <=3D load_addr, but the path where load_end=
+_addr
+>>> is automatically detected if 0 is given in the header misses the
+>>> corresponding check.
+>> 1) The code checks that load_end_addr >=3D load_addr (before letting i=
+t
+>> through).
+>>
+>> 2) load_end_addr is used only when it is read in as non-zero, so no ch=
+eck is
+>> needed if zero.=C2=A0 (It gets debug-printed even when zero, but is us=
+ed only to
+>> calculate mb_load_size and only when non-zero.)
+> Oops, good point. I'll change the start of the commit message as follow=
+s:
 >
-> For example, info mtree:
->   ...
->   11000500-11000515 (prio 0, i/o): bochs dispi interface
+>      The code path with a manually set mh_load_end_addr in the Multiboo=
+t
+>      header checks that mh_load_end_addr >=3D mh_load_addr, but the pat=
+h where
+>      mh_load_end_addr is 0 in the header and therefore automatically
+>      calculated from the file size misses the corresponding check.
 >
-> A 16-bit write to 0x11000500 was delivered to pci_vga_bochs_write() as
-> having
-> address 0, when -icount was not specified, but as address 2 when
-> -icount was specified.  Correspondingly writes to 0x11000502 were 2
-> and 0 respectively.  Essentially the words were swapped depending on
-> the presence of -icount.
->
-> I suspect a similar problem for the AARCH64 GIC (generic interrupt
-> controller), but other than observing the GIC changing from working to
-> non-working depending on the absence/presence of -icount I haven't
-> confirmed the underlying cause.
->
-> 2.10 and 2.11 were built from source on Cygwin using mingw, 2.8 from a
-> "native" MinGW.  The results are consistent for 2.10 and 2.11.  2.8
-> does not have the -icount dependency.  The "broken" command line was:
->
-> qemu-system-aarch64 -m 1077 -name "arm" -M virt,virtualization=on
->   -cpu cortex-a53 -icount align=off,shift=0,sleep=on
->   -vga std -device secondary-vga
->   -device
-> virtio-net,netdev=vlan0,addr=2,disable-modern=false,mac=52:54:00:12:67:56
->   -kernel ...deosBoot.bin -initrd "deosBoot.qemu" -netdev
-> tap,id=vlan0,ifname="DDCI-tap0"
->
-> The "working" command line omitted -icount and its argument.
->
-> FWIW, the error from the GIC with -icount was:
->
->   qemu: fatal: IO on conditional branch instruction
->
-> Any pointers?
+> Does this look better?
 
-Can you try with this patch applied?
-https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06595.html
-(that will go into git master within the next week or so but isn't
-yet applied; it does fix at least some -icount related problems).
+mb_load_size is calculated from the file size, not mh_load_end_addr, so
+I think you mean mb_load_size rather than mh_load_end_addr.=C2=A0 Do you=20
+intend to say:
 
-If that doesn't help, can you provide a demonstration test
-binary that I can use to reproduce the bug?
+ =C2=A0 The code path where mh_load_end_addr is non-zero in the Multiboot
+ =C2=A0 header checks that mh_load_end_addr >=3D mh_load_addr and so
+ =C2=A0 mb_load_size ischecked.=C2=A0 However, mb_load_size is not checke=
+d when
+ =C2=A0 calculated from thefile size, when mh_load_end_addr is 0.
 
-thanks
--- PMM
+Also, if this is what you intend to say, would the following code change=20
+be more ofwhat you want:
+
+Remove this:
+
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mb_lo=
+ad_size =3D kernel_file_size - mb_kernel_text_offset;
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (mb_load_size > UINT32_MAX - mh_=
+load_addr) {
+-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_repor=
+t("kernel does not fit in address space");
+-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 exit(1);
+-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (mh_bss_end_addr) {
+
+and instead do this a few lines further down:
+
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mb_kernel_s=
+ize =3D mh_bss_end_addr - mh_load_addr;
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mb_ke=
+rnel_size =3D mb_load_size;
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (mb_kernel_size > UINT32_MAX - m=
+h_load_addr) {
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_repor=
+t("kernel does not fit in address space");
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 exit(1);
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mb_debug("multiboot: header_a=
+ddr =3D %#x", mh_header_addr);
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mb_debug("multiboot: load_add=
+r =3D %#x", mh_load_addr);
+
+The reason would be to include the bss area in the calculation, when
+mh_bss_end_addr is non-zero.
+
+ =C2=A0=C2=A0=C2=A0 Thanks,
+ =C2=A0=C2=A0=C2=A0 Jack
+
+>
+>>> If the kernel binary size is larger than can fit in
+>>> the address space after load_addr, we ended up with a kernel_size tha=
+t
+>>> is smaller than load_size, which means that we read the file into a t=
+oo
+>>> small buffer.
+>>>
+>>> Add a check to reject kernel files with such Multiboot headers.
+>> Code itself looks fine.
+>>
+>> Modulo above comments:
+>>  =C2=A0=C2=A0=C2=A0 Reviewed-by: Jack Schwartz <jack.schwartz@oracle.c=
+om>
+> Thanks for your review of the series!
+>
+> Kevin
