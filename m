@@ -1,19 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ewSMk-0003TE-2m
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 08:52:18 -0400
+	(envelope-from <quintela@redhat.com>) id 1ewSSU-0005cq-4R
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 08:58:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ewSMh-0003vT-2X
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 08:52:18 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180315035157.6929-1-famz@redhat.com>
-References: <20180315035157.6929-1-famz@redhat.com>
-Date: Thu, 15 Mar 2018 13:52:11 +0100
-Message-ID: <w51r2ol4i2s.fsf@maestria.local.igalia.com>
+	(envelope-from <quintela@redhat.com>) id 1ewSSR-0003E9-4O
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 08:58:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52864 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ewSSQ-0003Df-UX
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 08:58:11 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 480D34072444
+	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 12:57:59 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20180312091913.GG5234@xz-mi> (Peter Xu's message of "Mon, 12 Mar
+	2018 17:19:13 +0800")
+References: <20180307110010.2205-1-quintela@redhat.com>
+	<20180307110010.2205-20-quintela@redhat.com>
+	<20180312091913.GG5234@xz-mi>
+Reply-To: quintela@redhat.com
+Date: Thu, 15 Mar 2018 13:57:54 +0100
+Message-ID: <878tata431.fsf@secure.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: Fix leak of
- ignore_children in error path
+Subject: Re: [Qemu-devel] [PATCH v10 19/24] migration: Create multifd
+ channels
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,13 +36,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
-On Thu 15 Mar 2018 04:51:57 AM CET, Fam Zheng wrote:
-> Reported-by: Max Reitz <mreitz@redhat.com>
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+Peter Xu <peterx@redhat.com> wrote:
+> On Wed, Mar 07, 2018 at 12:00:05PM +0100, Juan Quintela wrote:
+>> In both sides.  We still don't transmit anything through them.
+>
+> s/In/On/?
+>
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  migration/ram.c | 52 ++++++++++++++++++++++++++++++++++++++++++----------
+>>  1 file changed, 42 insertions(+), 10 deletions(-)
+>> 
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index b57d9fd667..7ef0c2b7e2 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -399,6 +399,7 @@ struct MultiFDSendParams {
+>>      uint8_t id;
+>>      char *name;
+>>      QemuThread thread;
+>> +    QIOChannel *c;
+>>      QemuSemaphore sem;
+>>      QemuMutex mutex;
+>>      bool running;
+>> @@ -455,6 +456,8 @@ int multifd_save_cleanup(Error **errp)
+>>              qemu_thread_join(&p->thread);
+>>              p->running = false;
+>>          }
+>> +        socket_send_channel_destroy(p->c);
+>> +        p->c = NULL;
+>>          qemu_mutex_destroy(&p->mutex);
+>>          qemu_sem_destroy(&p->sem);
+>>          g_free(p->name);
+>> @@ -514,6 +517,27 @@ static void *multifd_send_thread(void *opaque)
+>>      return NULL;
+>>  }
+>>  
+>> +static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
+>> +{
+>> +    MultiFDSendParams *p = opaque;
+>> +    QIOChannel *sioc = QIO_CHANNEL(qio_task_get_source(task));
+>> +    Error *local_err = NULL;
+>> +
+>> +    if (qio_task_propagate_error(task, &local_err)) {
+>> +        if (multifd_save_cleanup(&local_err) != 0) {
+>
+> Do we need to call multifd_save_cleanup() explicitly here?
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+Is the easiest way of stoping all multifd threads, no?
 
-Berto
+> Asked since I saw that it would also be called in migrate_fd_cleanup(),
+> and it seems that we should call migrate_fd_cleanup() soon too when
+> this happens?
+
+We need to stop migraiton. thtat migrate_set_error() is only used for
+reporting in info migrate, it is not acted upon.
+
+Yes, perhaps it should, but as it is, it is not.  So, I think it is
+right O:-)
+
+Later, Juan.
+
+> Otherwise it looks fine to me.  Thanks,
+>
+>> +            migrate_set_error(migrate_get_current(), local_err);
+>> +        }
+>> +    } else {
+>> +        p->c = QIO_CHANNEL(sioc);
+>> +        qio_channel_set_delay(p->c, false);
+>> +        p->running = true;
+>> +        qemu_thread_create(&p->thread, p->name, multifd_send_thread, p,
+>> +                           QEMU_THREAD_JOINABLE);
+>> +
+>> +        atomic_inc(&multifd_send_state->count);
+>> +    }
+>> +}
+>
+> [...]
