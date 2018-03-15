@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ewTup-00022y-4J
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:31:39 -0400
+	(envelope-from <laurent@vivier.eu>) id 1ewTyl-0003uX-8Y
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:35:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ewTul-0004BJ-5p
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:31:35 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:36837)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ewTuk-0004Al-V7
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:31:31 -0400
-Received: by mail-wr0-x244.google.com with SMTP id d10so8543806wrf.3
-	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 07:31:30 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1520942752-19449-1-git-send-email-pbonzini@redhat.com>
-	<20180313123313.GI8326@lemon.usersys.redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <bd941562-08cb-1b1f-2b36-c2414d3924c2@amsat.org>
-Date: Thu, 15 Mar 2018 15:31:28 +0100
+	(envelope-from <laurent@vivier.eu>) id 1ewTyh-0007Zi-9w
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:35:39 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:51137)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ewTyh-0007Y1-0V
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:35:35 -0400
+References: <20180314153121.23838-1-james.cowgill@mips.com>
+	<46dbae6e-4ff6-5003-e8e6-175bf0fbd51f@vivier.eu>
+	<20e6165d-70b2-d1ec-1c46-7ede39a8d816@mips.com>
+	<fbbc625b-1bcc-ab60-8998-b2b1653105fd@vivier.eu>
+	<74331770-2eac-4af7-dc4b-b4dc20fbba46@mips.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <6447da5d-a0eb-ee28-ffa3-72f75c625faa@vivier.eu>
+Date: Thu, 15 Mar 2018 15:35:10 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180313123313.GI8326@lemon.usersys.redhat.com>
+In-Reply-To: <74331770-2eac-4af7-dc4b-b4dc20fbba46@mips.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] docker: fedora: test more components
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: implement HWCAP bits on MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,51 +31,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: James Cowgill <james.cowgill@mips.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
 
-On 03/13/2018 01:33 PM, Fam Zheng wrote:
-> On Tue, 03/13 13:05, Paolo Bonzini wrote:
->> Install optional dependencies of QEMU to get better coverage.
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>  tests/docker/dockerfiles/fedora.docker | 13 ++++++++++---
->>  1 file changed, 10 insertions(+), 3 deletions(-)
->>
->> diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
->> index 994a35a..0d9da45 100644
->> --- a/tests/docker/dockerfiles/fedora.docker
->> +++ b/tests/docker/dockerfiles/fedora.docker
->> @@ -1,9 +1,16 @@
->>  FROM fedora:27
->>  ENV PACKAGES \
->>      ccache gettext git tar PyYAML sparse flex bison python3 bzip2 hostname \
->> -    glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
->> -    gcc gcc-c++ clang make perl which bc findutils libaio-devel \
->> -    nettle-devel libasan libubsan \
->> +    gcc gcc-c++ clang make perl which bc findutils glib2-devel \
->> +    libaio-devel pixman-devel zlib-devel libfdt-devel libasan libubsan \
->> +    bluez-libs-devel brlapi-devel bzip2-devel \
->> +    device-mapper-multipath-devel glusterfs-api-devel gnutls-devel \
->> +    gtk3-devel libattr-devel libcap-devel libcap-ng-devel libcurl-devel \
->> +    libjpeg-devel libpng-devel librbd-devel libssh2-devel libusbx-devel \
->> +    libxml2-devel lzo-devel ncurses-devel nettle-devel nss-devel \
->> +    numactl-devel SDL2-devel snappy-devel spice-server-devel \
->> +    systemtap-sdt-devel usbredir-devel virglrenderer-devel vte3-devel \
->> +    xen-devel \
->>      mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-config \
->>      mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libtasn1 \
->>      mingw32-libjpeg-turbo mingw32-libpng mingw32-curl mingw32-libssh2 \
->> -- 
->> 1.8.3.1
->>
+Le 15/03/2018 à 15:19, James Cowgill a écrit :
+> Hi,
 > 
-> Queued, thanks. (Conflicts with Marc-Andre's "d8204b57c5 tests: make
-> docker-test-debug@fedora run sanitizers" but easy enough to resolve.)
+> On 15/03/18 13:00, Laurent Vivier wrote:
+>> Le 15/03/2018 à 11:52, James Cowgill a écrit :
+>>> Hi,
+>>>
+>>> On 14/03/18 16:13, Laurent Vivier wrote:
+>>>> Le 14/03/2018 à 16:31, James Cowgill a écrit :
+>>>>> +enum {
+>>>>> +    HWCAP_MIPS_R6           = (1 << 0),
+>>>>> +    HWCAP_MIPS_MSA          = (1 << 1),
+>>>>> +};
+>>>>
+>>>> We have this for ARM only in elfload.c since:
+>>>>
+>>>>     afce2927aa Arm AT_HWCAP AUXV entry (Paul Brook) [2005]
+>>>>
+>>>> but they have been added in include/elf.h since:
+>>>>
+>>>>     41d9ea80ac tcg-arm: Use qemu_getauxval [Richard Henderson, 2013]
+>>>>
+>>>> and I think we should remove them (they are prefixed by ARM_)
+>>>>
+>>>> So the MIPS ones should be in include/elf.h (with the #define form).
+>>>
+>>> I can do that, although I think it's a bit unusual. The HWCAP bits are
+>>> specific to the Linux kernel and not to "the MIPS ELF format" so it
+>>> doesn't make sense to me to put them in elf.h.
+>>
+>> In fact, in a system, they come with the glibc <sys/auxv.h>. auxv.h
+>> includes <elf.h> and <bits/hwcap.h>. They are both part of glibc.
+> 
+> None of the headers you mention contain hwcap bits. They are usually
+> provided in an arch specific kernel header - on MIPS they are in
+> <asm/hwcap.h> which must be included separately.
+> 
+>> They can be used with qemu_getauxval() so it's better to have them in a
+>> header file. elfoad.c or elf.h, it's in both cases an ELF file.
+> 
+> I agree with that.
+> 
+> I tried to move them to elf.h but hit a slight problem. In elfload.c,
+> elf.h is included after all the target specific stuff so the
+> get_elf_hwcap function cannot use anything from elf.h. I think this has
+> lead to all architectures replicating the list of hwcap bits in both
+> elf.h and elfload.c. You mentioned arm before, but I can also see
+> aarch64, powerpc and sh4 do this. Some of these architectures also have
+> their bits (with different constant names) in elf.h and some do not.
 
-This is why I prefer one single package per line (like the Debian
-Dockerfiles) so the diff is easier to review, and there is no merge
-conflict (no performance penalty neither).
+OK, you're right. That's sad to have duplicated values...
 
-"sort dockerfiles" added to my 2.13 TODO.
+So your patch is correct. Perhaps just fix the typo in the path name for
+hwcap.h.
+
+Thanks,
+Laurent
