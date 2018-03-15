@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ewYEJ-0003tU-Q4
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:08:00 -0400
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ewYIE-0005xS-75
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:12:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ewYEG-0007JY-H2
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:07:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:61359)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ewYEG-0007Ix-BG
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:07:56 -0400
-Date: Thu, 15 Mar 2018 16:07:53 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180315190753.GG28578@localhost.localdomain>
-References: <1520888449-4352-1-git-send-email-babu.moger@amd.com>
-	<1520888449-4352-2-git-send-email-babu.moger@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1520888449-4352-2-git-send-email-babu.moger@amd.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/5] target/i386: Generalize some of the
- macro definitions
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ewYIA-0001a6-NE
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:12:02 -0400
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Thu, 15 Mar 2018 12:11:40 -0700
+Message-Id: <20180315191141.6789-1-andrew.smirnov@gmail.com>
+Subject: [Qemu-devel] [PATCH 1/2] char: i.MX: Simplify imx_update()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +17,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Babu Moger <babu.moger@amd.com>
-Cc: pbonzini@redhat.com, rth@twiddle.net, rkrcmar@redhat.com, Thomas.Lendacky@amd.com, brijesh.singh@amd.com, kvm@vger.kernel.org, kash@tripleback.net, mtosatti@redhat.com, Gary.Hook@amd.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Bill Paul <wpaul@windriver.com>
 
-Hi,
+Code of imx_update() is slightly confusing since the "flags" variable
+doesn't really corespond to anything in real hardware and server as a
+kitchensink accumulating events normally reported via USR1 and USR2
+registers.
 
-Sorry for not reviewing the previous versions of this series
-(making it miss soft freeze).
+Change the code to explicitly evaluate state of interrupts reported
+via USR1 and USR2 against corresponding masking bits and use the to
+detemine if IRQ line should be asserted or not.
 
+NOTE: Check for UTS1_TXEMPTY being set has been dropped for two
+reasons:
 
-On Mon, Mar 12, 2018 at 05:00:45PM -0400, Babu Moger wrote:
-> Generalize some of the macro definitions which are generic cache
-> properties that are common between CPUID 4 and CPUID 0x8000001D
-> in preparation for adding support for 0x8000001D.
-> 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
-> ---
->  target/i386/cpu.c | 52 ++++++++++++++++++++++++++--------------------------
->  1 file changed, 26 insertions(+), 26 deletions(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index b5e431e..42dd381 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -66,22 +66,22 @@
->  #define CPUID_2_L3_16MB_16WAY_64B 0x4d
->  
->  
-> -/* CPUID Leaf 4 constants: */
-> +/* Cache specific constants: */
+    1. Emulation code implements a single character FIFO, so this flag
+       will always be set since characters are trasmitted as a part of
+       the code emulating "push" into the FIFO
 
-We have too many CPUID leaves that describe caches, so I would
-like to explicitly document on which CPUID leaves these macros
-can be used.  I suggest:
+    2. imx_update() is really just a function doing ORing and maksing
+       of reported events, so checking for UTS1_TXEMPTY should happen,
+       if it's ever really needed should probably happen outside of
+       it.
 
-  /* Macros for CPUID[4] and CPUID[0x8000001D] */
+Cc: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org
+Cc: Bill Paul <wpaul@windriver.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+---
+ hw/char/imx_serial.c | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
 
-
->  
->  /* EAX: */
-> -#define CPUID_4_TYPE_DCACHE  1
-> -#define CPUID_4_TYPE_ICACHE  2
-> -#define CPUID_4_TYPE_UNIFIED 3
-> +#define TYPE_DCACHE  1
-> +#define TYPE_ICACHE  2
-> +#define TYPE_UNIFIED 3
-
-TYPE_* can be confused with QOM type names, I'd use something
-else.  Maybe CACHE_TYPE_D, CACHE_TYPE_I, CACHE_TYPE_UNIFIED?
-
-
->  
-> -#define CPUID_4_LEVEL(l)          ((l) << 5)
-> +#define CACHE_LEVEL(l)          ((l) << 5)
->  
-> -#define CPUID_4_SELF_INIT_LEVEL (1 << 8)
-> -#define CPUID_4_FULLY_ASSOC     (1 << 9)
-> +#define CACHE_SELF_INIT_LEVEL (1 << 8)
-> +#define CACHE_FULLY_ASSOC     (1 << 9)
->  
->  /* EDX: */
-> -#define CPUID_4_NO_INVD_SHARING (1 << 0)
-> -#define CPUID_4_INCLUSIVE       (1 << 1)
-> -#define CPUID_4_COMPLEX_IDX     (1 << 2)
-> +#define CACHE_NO_INVD_SHARING (1 << 0)
-> +#define CACHE_INCLUSIVE       (1 << 1)
-> +#define CACHE_COMPLEX_IDX     (1 << 2)
->  
->  #define ASSOC_FULL 0xFF
->  
-[...]
-
+diff --git a/hw/char/imx_serial.c b/hw/char/imx_serial.c
+index 70405ccf8b..d1e8586280 100644
+--- a/hw/char/imx_serial.c
++++ b/hw/char/imx_serial.c
+@@ -56,16 +56,24 @@ static const VMStateDescription vmstate_imx_serial = {
+ 
+ static void imx_update(IMXSerialState *s)
+ {
+-    uint32_t flags;
++    uint32_t usr1;
++    uint32_t usr2;
++    uint32_t mask;
+ 
+-    flags = (s->usr1 & s->ucr1) & (USR1_TRDY|USR1_RRDY);
+-    if (s->ucr1 & UCR1_TXMPTYEN) {
+-        flags |= (s->uts1 & UTS1_TXEMPTY);
+-    } else {
+-        flags &= ~USR1_TRDY;
+-    }
++    /*
++     * Lucky for us TRDY and RRDY has the same offset in both USR1 and
++     * UCR1, so we can get away with something as simple as the
++     * following:
++     */
++    usr1 = s->usr1 & s->ucr1 & (USR1_TRDY | USR1_RRDY);
++    /*
++     * Bits that we want in USR2 are not as conveniently laid out,
++     * unfortunately.
++     */
++    mask = (s->ucr1 & UCR1_TXMPTYEN) ? USR2_TXFE : 0;
++    usr2 = s->usr2 & mask;
+ 
+-    qemu_set_irq(s->irq, !!flags);
++    qemu_set_irq(s->irq, usr1 || usr2);
+ }
+ 
+ static void imx_serial_reset(IMXSerialState *s)
 -- 
-Eduardo
+2.14.3
