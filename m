@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ewYuU-0008Cb-W6
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:51:36 -0400
+	(envelope-from <bounces@canonical.com>) id 1ewZ3v-0002BX-Ji
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 16:01:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ewYuU-0007nL-6d
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:51:35 -0400
-References: <20180228180507.3964-1-mreitz@redhat.com>
-	<20180228180507.3964-13-mreitz@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <73d69c62-fdef-2c8f-8a55-ef6a2b9c9ebd@redhat.com>
-Date: Thu, 15 Mar 2018 15:51:13 -0400
+	(envelope-from <bounces@canonical.com>) id 1ewZ3r-0005MJ-GM
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 16:01:19 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51764)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ewZ3r-0005LM-80
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 16:01:15 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ewZ3o-0001uU-Ih
+	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 20:01:12 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4A9EC2E80D1
+	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 20:01:12 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180228180507.3964-13-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 12/16] block/dirty-bitmap: Add
- bdrv_dirty_iter_next_area
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 15 Mar 2018 19:47:01 -0000
+From: Bill Paul <wpaul@windriver.com>
+Reply-To: Bug 1753314 <1753314@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152019468379.20188.16040439279180777761.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152114322197.3890.1933594106426266962.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1753314] Re: UART in sabrelite machine simulation
+ doesn't work with VxWorks 7
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,102 +37,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
 
+As I said before:
 
+"I'm not submitting this as a patch to the development list as I'm not
+fully certain it complies with the hardware spec and doesn't break any
+other functionality."
 
-On 02/28/2018 01:05 PM, Max Reitz wrote:
-> This new function allows to look for a consecutively dirty area in a
-> dirty bitmap.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  include/block/dirty-bitmap.h |  2 ++
->  block/dirty-bitmap.c         | 55 ++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 57 insertions(+)
-> 
-> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-> index e3f4bbf51d..8c8f63e722 100644
-> --- a/include/block/dirty-bitmap.h
-> +++ b/include/block/dirty-bitmap.h
-> @@ -79,6 +79,8 @@ void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
->  void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
->                                      int64_t offset, int64_t bytes);
->  int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
-> +bool bdrv_dirty_iter_next_area(BdrvDirtyBitmapIter *iter, uint64_t max_offset,
-> +                               uint64_t *offset, int *bytes);
->  void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t offset);
->  int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
->  int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index d8e999226e..5d6b8dba89 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -496,6 +496,61 @@ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter)
->      return hbitmap_iter_next(&iter->hbi, true);
->  }
->  
-> +/**
-> + * Return the next consecutively dirty area in the dirty bitmap
-> + * belonging to the given iterator @iter.
-> + *
-> + * @max_offset: Maximum value that may be returned for
-> + *              *offset + *bytes
-> + * @offset:     Will contain the start offset of the next dirty area
-> + * @bytes:      Will contain the length of the next dirty area
-> + *
-> + * Returns: True if a dirty area could be found before max_offset
-> + *          (which means that *offset and *bytes then contain valid
-> + *          values), false otherwise.
-> + *
-> + * Note that @iter is never advanced if false is returned.  If an area
-> + * is found (which means that true is returned), it will be advanced
-> + * past that area.
-> + */
-> +bool bdrv_dirty_iter_next_area(BdrvDirtyBitmapIter *iter, uint64_t max_offset,
-> +                               uint64_t *offset, int *bytes)
-> +{
-> +    uint32_t granularity = bdrv_dirty_bitmap_granularity(iter->bitmap);
-> +    uint64_t gran_max_offset;
-> +    int64_t ret;
-> +    int size;
-> +
-> +    if (max_offset == iter->bitmap->size) {
-> +        /* If max_offset points to the image end, round it up by the
-> +         * bitmap granularity */
-> +        gran_max_offset = ROUND_UP(max_offset, granularity);
-> +    } else {
-> +        gran_max_offset = max_offset;
-> +    }
-> +
-> +    ret = hbitmap_iter_next(&iter->hbi, false);
-> +    if (ret < 0 || ret + granularity > gran_max_offset) {
-> +        return false;
-> +    }
-> +
-> +    *offset = ret;
-> +    size = 0;
-> +
-> +    assert(granularity <= INT_MAX);
-> +
-> +    do {
-> +        /* Advance iterator */
-> +        ret = hbitmap_iter_next(&iter->hbi, true);
-> +        size += granularity;
-> +    } while (ret + granularity <= gran_max_offset &&
-> +             hbitmap_iter_next(&iter->hbi, false) == ret + granularity &&
-> +             size <= INT_MAX - granularity);
-> +
-> +    *bytes = MIN(size, max_offset - *offset);
-> +    return true;
-> +}
-> +
->  /* Called within bdrv_dirty_bitmap_lock..unlock */
->  void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
->                                    int64_t offset, int64_t bytes)
-> 
+What I'm trying to say here is that while I may have been able to cobble
+together a hack to make the UART nominally compatible with VxWorks, I do
+not understand the hardware or QEMU well enough to really fix this the
+right way. Even with my hack, every once in a while when printing lots
+of data on the console, the output from the UART will stall unless I
+press a key on the serial port, and I don't know why it does that. I did
+try to investigate it a little but wasn't able to make much progress.
+(My suspicion is that it has something to do with the fact that the
+imx_serial module doesn't implement FIFO support, but even if that's
+true I don't know how to fix it.)
 
-10, 11, 12:
+Even so, I figured it was still worth it to attach my changes to the bug
+report so that somebody who is better at this than me could use it as a
+starting point, and so that anybody else who might want to experiment
+with VxWorks using the QEMU sabrelite machine model wouldn't be totally
+stuck like I was.
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+In short, the changes I made are good enough for my own needs (the
+output stalls don't happen often enough to really bother me), but
+they're not a fully debugged fix. That's why I filed a bug report
+instead of just submitting a patch in the first place: I wanted somebody
+sexier than me to create a fully debugged fix.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1753314
+
+Title:
+  UART in sabrelite machine simulation doesn't work with VxWorks 7
+
+Status in QEMU:
+  New
+
+Bug description:
+  The imx_serial.c driver currently implements only partial support for
+  the i.MX6 UART hardware. (I understand it's a work in progress and
+  that's fine.) dIn particular, it does not implement support for the
+  Transmit Complete Interrupt Enable bit in the UCR4 register. The
+  VxWorks 7 i.MX6 serial driver depends on the behavior of this bit in
+  actual hardware in order to send characters through the UART
+  correctly. The result is that with the current machine model, VxWorks
+  will boot and run in QEMU but it's unable to print any characters to
+  the console serial port.
+
+  I have produced a small patch for the imx_serial.c module to make it
+  nominally functional with VxWorks 7. It works well enough to allow the
+  boot banner to appear and for the user to interact with the target
+  shell.
+
+  I'm not submitting this as a patch to the development list as I'm not
+  fully certain it complies with the hardware spec and doesn't break any
+  other functionality. I would prefer if the maintainer (or someone)
+  reviewed it for any issues/refinements first.
+
+  I'm attaching the patch to this bug report. A copy can also be
+  obtained from:
+
+  http://people.freebsd.org/~wpaul/qemu/imx_serial.zip
+
+  This patch was generated against QEMU 2.11.0 but also works with QEMU
+  2.11.1.
+
+  My host environment is FreeBSD/amd64 11.1-RELEASE with QEMU
+  2.11.0/2.11.11 built from source.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1753314/+subscriptions
