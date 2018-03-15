@@ -1,17 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ewNdh-0007Ub-2w
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 03:49:30 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1ewNqN-0004Gd-Ly
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 04:02:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ewNdf-0004dX-Qo
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 03:49:29 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 15 Mar 2018 08:49:05 +0100
-Message-Id: <1521100145-15304-4-git-send-email-thuth@redhat.com>
-In-Reply-To: <1521100145-15304-1-git-send-email-thuth@redhat.com>
-References: <1521100145-15304-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] tests/cdrom-test: Test that -cdrom
- parameter is working
+	(envelope-from <jcmvbkbc@gmail.com>) id 1ewNqI-00050c-2z
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 04:02:35 -0400
+Received: from mail-yw0-x22a.google.com ([2607:f8b0:4002:c05::22a]:40170)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1ewNqH-00050C-UA
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 04:02:30 -0400
+Received: by mail-yw0-x22a.google.com with SMTP id r145so1190754ywe.7
+	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 01:02:29 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <000301d3bc24$236c48e0$6a44daa0$@ru>
+References: <CAMo8BfLuAdsdRScY+CgTzd0EBn3_kAFc=ysEwgp3MrM_+42viQ@mail.gmail.com>
+	<000301d3bb73$e997a8e0$bcc6faa0$@ru>
+	<CAMo8Bf+seSrT9HBFL1tspoDQ-9s9nGrXueYRt6v2nF4XzZbdfA@mail.gmail.com>
+	<000401d3bb7a$418b9fb0$c4a2df10$@ru>
+	<CAMo8Bf+Mqjer86N0LnCf0pofo9hyBZtRUXz4CiYo6Vr9d2V0jw@mail.gmail.com>
+	<000301d3bc24$236c48e0$6a44daa0$@ru>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Thu, 15 Mar 2018 01:02:28 -0700
+Message-ID: <CAMo8BfKGTYOjRuZZUYa=Pz30yYLu4+HLO=WOc5J7FeXJrA_F7w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] regression in timer code?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,158 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Victor Kaplansky <victork@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org, qemu-s390x@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: Pavel Dovgaluk <Pavel.Dovgaluk@ispras.ru>, qemu-devel <qemu-devel@nongnu.org>
 
-Commit 1454509726719e0933c800 recently broke the "-cdrom" parameter
-on a couple of boards without that we noticed it immediately. Thus
-add a test which checks that "-cdrom" can at least be used to start
-QEMU with certain machine types.
+On Wed, Mar 14, 2018 at 11:09 PM, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
+>> From: Max Filippov [mailto:jcmvbkbc@gmail.com]
+>> On Wed, Mar 14, 2018 at 2:53 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
+>> > icount is adjusted by icount_warp_rt when CPU sleeps.
+>> > These adjustments may be different in different runs.
+>> > And the first adjustment is performed at the start of the machine.
+>> > Therefore "now" value includes non-deterministic component from the beginning,
+>> > but its increments caused by instruction executions are deterministic.
+>>
+>> Ok, so the CPU reset is non-deterministic. Thanks.
+>
+> BTW, your link to website in MAINTAINERS does not work.
+>
+> W: http://wiki.osll.spb.ru/doku.php?id=etc:users:jcmvbkbc:qemu-target-xtensa
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/Makefile.include |  7 +++++-
- tests/cdrom-test.c     | 63 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 68 insertions(+), 2 deletions(-)
+I know, thank you. There's a fix queued for it:
+  http://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg07346.html
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index a104222..b744fea 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -321,8 +321,9 @@ check-qtest-microblaze-y = tests/boot-serial-test$(EXESUF)
- check-qtest-mips-y = tests/endianness-test$(EXESUF)
- 
- check-qtest-mips64-y = tests/endianness-test$(EXESUF)
-+check-qtest-mips64-y += tests/cdrom-test$(EXESUF)
- 
--check-qtest-mips64el-y = tests/endianness-test$(EXESUF)
-+check-qtest-mips64el-y = $(check-qtest-mips64-y)
- 
- check-qtest-moxie-y = tests/boot-serial-test$(EXESUF)
- 
-@@ -356,6 +357,7 @@ check-qtest-ppc64-y += tests/display-vga-test$(EXESUF)
- check-qtest-ppc64-y += tests/numa-test$(EXESUF)
- check-qtest-ppc64-$(CONFIG_IVSHMEM) += tests/ivshmem-test$(EXESUF)
- check-qtest-ppc64-y += tests/cpu-plug-test$(EXESUF)
-+check-qtest-ppc64-y += tests/cdrom-test$(EXESUF)
- 
- check-qtest-sh4-y = tests/endianness-test$(EXESUF)
- 
-@@ -365,10 +367,12 @@ check-qtest-sparc-y = tests/prom-env-test$(EXESUF)
- check-qtest-sparc-y += tests/m48t59-test$(EXESUF)
- gcov-files-sparc-y = hw/timer/m48t59.c
- check-qtest-sparc-y += tests/boot-serial-test$(EXESUF)
-+check-qtest-sparc-y += tests/cdrom-test$(EXESUF)
- 
- check-qtest-sparc64-y = tests/endianness-test$(EXESUF)
- check-qtest-sparc64-y += tests/prom-env-test$(EXESUF)
- check-qtest-sparc64-y += tests/boot-serial-test$(EXESUF)
-+check-qtest-sparc64-y += tests/cdrom-test$(EXESUF)
- 
- check-qtest-arm-y = tests/tmp105-test$(EXESUF)
- check-qtest-arm-y += tests/ds1338-test$(EXESUF)
-@@ -384,6 +388,7 @@ check-qtest-arm-y += tests/sdhci-test$(EXESUF)
- check-qtest-aarch64-y = tests/numa-test$(EXESUF)
- check-qtest-aarch64-y += tests/sdhci-test$(EXESUF)
- check-qtest-aarch64-y += tests/boot-serial-test$(EXESUF)
-+check-qtest-aarch64-y += tests/cdrom-test$(EXESUF)
- 
- check-qtest-microblazeel-y = $(check-qtest-microblaze-y)
- 
-diff --git a/tests/cdrom-test.c b/tests/cdrom-test.c
-index 1fc5230..5e516dd 100644
---- a/tests/cdrom-test.c
-+++ b/tests/cdrom-test.c
-@@ -13,6 +13,7 @@
- #include "qemu/osdep.h"
- #include "libqtest.h"
- #include "boot-sector.h"
-+#include "qapi/qmp/qdict.h"
- 
- static char isoimage[] = "cdrom-boot-iso-XXXXXX";
- 
-@@ -62,7 +63,13 @@ static int prepare_image(const char *arch, char *isoimage)
-             goto cleanup;
-         }
-     } else {
--        g_assert_not_reached();
-+        /* Just create a dummy file */
-+        char txt[] = "empty disc";
-+        codefile = g_strdup_printf("%s/readme.txt", srcdir);
-+        if (!g_file_set_contents(codefile, txt, sizeof(txt) - 1, NULL)) {
-+            fprintf(stderr, "Failed to create '%s'\n", codefile);
-+            goto cleanup;
-+        }
-     }
- 
-     ret = gen_iso("-quiet -l -no-emul-boot -b %s -o %s %s",
-@@ -81,6 +88,32 @@ cleanup:
-     return ret;
- }
- 
-+/**
-+ * Check that at least the -cdrom parameter is basically working, i.e. we can
-+ * see the filename of the ISO image in the output of "info block" afterwards
-+ */
-+static void test_cdrom_param(gconstpointer data)
-+{
-+    QTestState *qts;
-+    char *resp;
-+
-+    qts = qtest_startf("-M %s -cdrom %s", (const char *)data, isoimage);
-+    resp = qtest_hmp(qts, "info block");
-+    g_assert(strstr(resp, isoimage) != 0);
-+    g_free(resp);
-+    qtest_quit(qts);
-+}
-+
-+static void add_cdrom_param_tests(const char **machines)
-+{
-+    while (*machines) {
-+        char *testname = g_strdup_printf("cdrom/param/%s", *machines);
-+        qtest_add_data_func(testname, *machines, test_cdrom_param);
-+        g_free(testname);
-+        machines++;
-+    }
-+}
-+
- static void test_cdboot(gconstpointer data)
- {
-     QTestState *qts;
-@@ -145,6 +178,34 @@ int main(int argc, char **argv)
-         add_x86_tests();
-     } else if (g_str_equal(arch, "s390x")) {
-         add_s390x_tests();
-+    } else if (g_str_equal(arch, "ppc64")) {
-+        const char *ppcmachines[] = {
-+            "pseries", "mac99", "g3beige", "40p", "prep", NULL
-+        };
-+        add_cdrom_param_tests(ppcmachines);
-+    } else if (g_str_equal(arch, "sparc")) {
-+        const char *sparcmachines[] = {
-+            "LX", "SPARCClassic", "SPARCbook", "SS-10", "SS-20", "SS-4",
-+            "SS-5", "SS-600MP", "Voyager", "leon3_generic", NULL
-+        };
-+        add_cdrom_param_tests(sparcmachines);
-+    } else if (g_str_equal(arch, "sparc64")) {
-+        const char *sparc64machines[] = {
-+            "niagara", "sun4u", "sun4v", NULL
-+        };
-+        add_cdrom_param_tests(sparc64machines);
-+    } else if (!strncmp(arch, "mips64", 6)) {
-+        const char *mips64machines[] = {
-+            "magnum", "malta", "mips", "mipssim", "pica61", NULL
-+        };
-+        add_cdrom_param_tests(mips64machines);
-+    } else if (g_str_equal(arch, "aarch64")) {
-+        const char *aarch64machines[] = {
-+            "realview-eb", "realview-eb-mpcore", "realview-pb-a8",
-+            "realview-pbx-a9", "versatileab", "versatilepb", "vexpress-a15",
-+            "vexpress-a9", "virt", NULL
-+        };
-+        add_cdrom_param_tests(aarch64machines);
-     }
- 
-     ret = g_test_run();
 -- 
-1.8.3.1
+Thanks.
+-- Max
