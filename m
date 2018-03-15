@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ewTVl-00022d-16
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:05:46 -0400
+	(envelope-from <kwolf@redhat.com>) id 1ewVDA-0003UB-Q0
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 11:54:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ewTVf-00015i-6f
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:05:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52196)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ewTVf-000152-07
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:05:35 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ewTVd-0008QX-SN
-	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 14:05:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CA0572E80C0
-	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 14:05:33 +0000 (UTC)
+	(envelope-from <kwolf@redhat.com>) id 1ewVD8-0002NA-7P
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 11:54:36 -0400
+Date: Thu, 15 Mar 2018 16:54:15 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180315155415.GA3876@localhost.localdomain>
+References: <20180314173213.18563-1-kwolf@redhat.com>
+	<20180314173213.18563-2-kwolf@redhat.com>
+	<4ab6eff1-f4c2-1e04-5fa8-cc71c3bf308d@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <4ab6eff1-f4c2-1e04-5fa8-cc71c3bf308d@oracle.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 15 Mar 2018 13:55:51 -0000
-From: "barry.of.smith@gmail.com" <barry.of.smith@googlemail.com>
-Reply-To: Bug 1756080 <1756080@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <152112215198.15095.6439554295431781559.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1756080] [NEW] QEMU does not provide non-Linux
- kernels with ATAGS structure on ARM targets
+Subject: Re: [Qemu-devel] [PATCH 1/5] multiboot: Reject kernels exceeding
+ the address space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,33 +26,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jack Schwartz <jack.schwartz@oracle.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, anatol.pomozov@gmail.com, ppandit@redhat.com
 
-Public bug reported:
+Am 15.03.2018 um 06:19 hat Jack Schwartz geschrieben:
+> Hi Kevin.
+>=20
+> My comments are inline...
+>=20
+> On 2018-03-14 10:32, Kevin Wolf wrote:
+> > The code path with a manually set mh_load_addr in the Multiboot heade=
+r
+> > checks that load_end_addr <=3D load_addr, but the path where load_end=
+_addr
+> > is automatically detected if 0 is given in the header misses the
+> > corresponding check.
+> 1) The code checks that load_end_addr >=3D load_addr (before letting it
+> through).
+>=20
+> 2) load_end_addr is used only when it is read in as non-zero, so no che=
+ck is
+> needed if zero.=A0 (It gets debug-printed even when zero, but is used o=
+nly to
+> calculate mb_load_size and only when non-zero.)
 
-This would be a useful feature. Many kernels, particularly hobbyist
-kernels, have support for ATAGS.
+Oops, good point. I'll change the start of the commit message as follows:
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+    The code path with a manually set mh_load_end_addr in the Multiboot
+    header checks that mh_load_end_addr >=3D mh_load_addr, but the path w=
+here
+    mh_load_end_addr is 0 in the header and therefore automatically
+    calculated from the file size misses the corresponding check.
 
--- =
+Does this look better?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1756080
+> > If the kernel binary size is larger than can fit in
+> > the address space after load_addr, we ended up with a kernel_size tha=
+t
+> > is smaller than load_size, which means that we read the file into a t=
+oo
+> > small buffer.
+> >=20
+> > Add a check to reject kernel files with such Multiboot headers.
+> Code itself looks fine.
+>=20
+> Modulo above comments:
+> =A0=A0=A0 Reviewed-by: Jack Schwartz <jack.schwartz@oracle.com>
 
-Title:
-  QEMU does not provide non-Linux kernels with ATAGS structure on ARM
-  targets
+Thanks for your review of the series!
 
-Status in QEMU:
-  New
-
-Bug description:
-  This would be a useful feature. Many kernels, particularly hobbyist
-  kernels, have support for ATAGS.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1756080/+subscriptions
+Kevin
