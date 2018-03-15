@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ewTyl-0003uX-8Y
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:35:43 -0400
+	(envelope-from <bounces@canonical.com>) id 1ewU8k-0007S5-NN
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:45:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ewTyh-0007Zi-9w
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:35:39 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:51137)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ewTyh-0007Y1-0V
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:35:35 -0400
-References: <20180314153121.23838-1-james.cowgill@mips.com>
-	<46dbae6e-4ff6-5003-e8e6-175bf0fbd51f@vivier.eu>
-	<20e6165d-70b2-d1ec-1c46-7ede39a8d816@mips.com>
-	<fbbc625b-1bcc-ab60-8998-b2b1653105fd@vivier.eu>
-	<74331770-2eac-4af7-dc4b-b4dc20fbba46@mips.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <6447da5d-a0eb-ee28-ffa3-72f75c625faa@vivier.eu>
-Date: Thu, 15 Mar 2018 15:35:10 +0100
+	(envelope-from <bounces@canonical.com>) id 1ewU8h-0007dj-IX
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:45:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38010)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ewU8h-0007dF-C4
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:45:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ewU8e-0000iK-KC
+	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 14:45:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 847EE2E819A
+	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 14:45:50 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <74331770-2eac-4af7-dc4b-b4dc20fbba46@mips.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: implement HWCAP bits on MIPS
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 15 Mar 2018 14:37:38 -0000
+From: philmd <1755479@bugs.launchpad.net>
+Reply-To: Bug 1755479 <1755479@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152094809386.3778.6282045564987107259.malonedeb@gac.canonical.com>
+Message-Id: <152112465817.31174.2745686249985681412.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1755479] Re: Cortex M:qemu abort with optimized
+ code and icount
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,63 +37,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: James Cowgill <james.cowgill@mips.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
+To: qemu-devel@nongnu.org
 
-Le 15/03/2018 à 15:19, James Cowgill a écrit :
-> Hi,
-> 
-> On 15/03/18 13:00, Laurent Vivier wrote:
->> Le 15/03/2018 à 11:52, James Cowgill a écrit :
->>> Hi,
->>>
->>> On 14/03/18 16:13, Laurent Vivier wrote:
->>>> Le 14/03/2018 à 16:31, James Cowgill a écrit :
->>>>> +enum {
->>>>> +    HWCAP_MIPS_R6           = (1 << 0),
->>>>> +    HWCAP_MIPS_MSA          = (1 << 1),
->>>>> +};
->>>>
->>>> We have this for ARM only in elfload.c since:
->>>>
->>>>     afce2927aa Arm AT_HWCAP AUXV entry (Paul Brook) [2005]
->>>>
->>>> but they have been added in include/elf.h since:
->>>>
->>>>     41d9ea80ac tcg-arm: Use qemu_getauxval [Richard Henderson, 2013]
->>>>
->>>> and I think we should remove them (they are prefixed by ARM_)
->>>>
->>>> So the MIPS ones should be in include/elf.h (with the #define form).
->>>
->>> I can do that, although I think it's a bit unusual. The HWCAP bits are
->>> specific to the Linux kernel and not to "the MIPS ELF format" so it
->>> doesn't make sense to me to put them in elf.h.
->>
->> In fact, in a system, they come with the glibc <sys/auxv.h>. auxv.h
->> includes <elf.h> and <bits/hwcap.h>. They are both part of glibc.
-> 
-> None of the headers you mention contain hwcap bits. They are usually
-> provided in an arch specific kernel header - on MIPS they are in
-> <asm/hwcap.h> which must be included separately.
-> 
->> They can be used with qemu_getauxval() so it's better to have them in a
->> header file. elfoad.c or elf.h, it's in both cases an ELF file.
-> 
-> I agree with that.
-> 
-> I tried to move them to elf.h but hit a slight problem. In elfload.c,
-> elf.h is included after all the target specific stuff so the
-> get_elf_hwcap function cannot use anything from elf.h. I think this has
-> lead to all architectures replicating the list of hwcap bits in both
-> elf.h and elfload.c. You mentioned arm before, but I can also see
-> aarch64, powerpc and sh4 do this. Some of these architectures also have
-> their bits (with different constant names) in elf.h and some do not.
+Hey Antoine, do you mind replying to the list thread with a single line
+such:
 
-OK, you're right. That's sad to have duplicated values...
+  Tested-by: Antoine Calando <acalando@free.fr>
 
-So your patch is correct. Perhaps just fix the typo in the path name for
-hwcap.h.
+This will help the code review and the patch will probably get merged
+faster.
 
-Thanks,
-Laurent
+Thanks.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1755479
+
+Title:
+  Cortex M:qemu abort with optimized code and icount
+
+Status in QEMU:
+  New
+
+Bug description:
+  A basic program runs fine if compiled with flag -O0 with gcc, but trigger=
+s a qemu abort when compiled with -O1 and run with icount:
+  "qemu: fatal: IO on conditional branch instruction"
+
+  I also noticed the problem on C source like this with -O0:
+  "int foo =3D *bar; bar++;" : OK
+  "int foo =3D *bar++;" : FAIL (!!!)
+
+  Optimized binary attached to this ticket.
+
+  command line:
+  qemu-system-arm -M lm3s6965evb -nographic -kernel hello.bin -serial file:=
+$(tty) -icount 4 -cpu cortex-m4
+  (working fine without icount)
+
+  version: =
+
+  QEMU emulator version 2.11.50 (v2.11.0-2146-gd9bbfea-dirty)
+
+  Compilation options:
+  ./configure --target-list=3Darm-softmmu --disable-slirp --disable-blobs -=
+-disable-docs --disable-guest-agent --disable-gnutls --disable-nettle --dis=
+able-gcrypt --disable-sdl --disable-gtk --disable-vnc --disable-virtfs --di=
+sable-mpath --disable-xen --disable-brlapi --disable-curl --disable-bluez -=
+-disable-kvm --disable-hax --disable-hvf --disable-whpx --disable-rdma --di=
+sable-vde --disable-netmap --disable-linux-aio --disable-cap-ng --disable-a=
+ttr --disable-vhost-net --disable-spice --disable-rbd --disable-libiscsi --=
+disable-libnfs --disable-smartcard --disable-libusb --disable-live-block-mi=
+gration --disable-usb-redir --disable-lzo --disable-snappy --disable-bzip2 =
+--disable-seccomp --disable-glusterfs --disable-tpm --disable-libssh2 --dis=
+able-numa --disable-libxml2 --disable-tcmalloc --disable-jemalloc --disable=
+-replication --disable-vhost-vsock --disable-opengl --disable-virglrenderer=
+ --disable-xfsctl --disable-qom-cast-debug --disable-vxhs --disable-crypto-=
+afalg --disable-vhost-user --disable-capstone --disable-pie --extra-cflags=
+=3D-mtune=3Dnative
+
+  I have also tested previous versions:
+  - stock qemu-system-arm 2.5.0 from ubuntu 16.04: OK
+  - git version: QEMU emulator version 2.10.0 (v2.10.2-dirty): OK
+  - git version: QEMU emulator version 2.10.90 (v2.11.0-rc0-dirty): FAIL
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1755479/+subscriptions
