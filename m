@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjraval123@gmail.com>) id 1ewJEq-0008A5-8j
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 23:07:33 -0400
+	(envelope-from <famz@redhat.com>) id 1ewMWW-0000Ii-2B
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 02:38:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjraval123@gmail.com>) id 1ewJEp-0004LE-BZ
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 23:07:32 -0400
-Received: from mail-lf0-x22c.google.com ([2a00:1450:4010:c07::22c]:45329)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bjraval123@gmail.com>)
-	id 1ewJEo-0004Jp-VR
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 23:07:31 -0400
-Received: by mail-lf0-x22c.google.com with SMTP id h127-v6so7866501lfg.12
-	for <qemu-devel@nongnu.org>; Wed, 14 Mar 2018 20:07:30 -0700 (PDT)
+	(envelope-from <famz@redhat.com>) id 1ewMWV-0006da-Bv
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 02:38:00 -0400
+Date: Thu, 15 Mar 2018 14:37:46 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180315063746.GD2733@lemon.usersys.redhat.com>
+References: <8848a27f-4bac-b6be-08ab-a366438791a6@huawei.com>
 MIME-Version: 1.0
-From: Brijen Raval <bjraval123@gmail.com>
-Date: Thu, 15 Mar 2018 03:07:17 +0000
-Message-ID: <CAGaT8w45tJ32EVj20RFjmG9=WvZBfAuF_j3BgXsFy5ZmPef-Ow@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] ARM64 Interrupt handling on QEMU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8848a27f-4bac-b6be-08ab-a366438791a6@huawei.com>
+Subject: Re: [Qemu-devel] Question: an IO hang problem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,35 +22,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "sochin.jiang" <sochin.jiang@huawei.com>
+Cc: kwolf@redhat.com, mreitz@redhat.com, "Lulina (A)" <lina.lulina@huawei.com>, qemu-block@nongnu.org, "Subo (A)" <subo7@huawei.com>, "Fangyi (C)" <eric.fangyi@huawei.com>, qemu-devel <qemu-devel@nongnu.org>
 
-I am booting up a custom kernel on QEMU ARM64, upon completion of its
-initial boot up it looks like it enters the arch_idle() state
+On Tue, 03/13 17:38, sochin.jiang wrote:
+> 
+>  Hi, guys,
+> 
+>  Recently, I encountered an IO hang problem in occasion which I cannot reproduce it now.
+> 
+>  I analyzed this problem carefully, the critical stack is as following:
+> 
+> 
+> After reading the codes in linux-aio.c(see ioq_submit() function), I found two situations could lead us here.
+> 
+> 1) no AIOs are in flight(s->ioq.in_flight is 0) and another call to io_submit returns -EAGAIN
 
-I enabled the -d int logging to understand what is going on, I see the
-following repeated many times continuosly here after
+So if there is no inflight I/O, why it would return -EAGAIN? The tricky thing
+here is that since we're not expecting a completion, when should we retry?
 
-Taking exception 5 [IRQ]
-...from EL1 to EL1
-...with ESR 0x15/0x56000000
-...with ELR 0xffffffff0000349c
-...to EL1 PC 0xffffffff00008280 PSTATE 0x3c5
+> 
+> 2) no AIOs are in flight(s->ioq.in_flight is 0) and s->io_q.pending IOs reach to MAX_EVENTS at once
 
-Here's the dissassembly for the relevant piece of code:
+I don't understand this case. We have,
 
- ffffffff00003498 <arch_idle>:
- arch_idle():
- ../../kernel/arch/arm64/arch.cpp:182
- ffffffff00003498:       d503207f        wfi
- ffffffff0000349c:       d65f03c0        ret
+        len = 0;
+        QSIMPLEQ_FOREACH(aiocb, &s->io_q.pending, next) {
+            iocbs[len++] = &aiocb->iocb;
+            if (s->io_q.in_flight + len >= MAX_EVENTS) {
+                break;
+            }
+        }
 
-I am trying to understand what exceptions are occurring exactly when kernel
-is idle (timer?). According to above ELR is pointing to arch_idle(), but I
-believe "wfi" instruction would not be an IRQ but a sync abort which is
-handle differently right?
+        ret = io_submit(s->ctx, len, iocbs);
 
-Also from ESR, it looks like a SVC instruction but if I am not wrong for
-IRQs ESRs are not updated (considered)
+If in_flight is 0, only (MAX_EVENTS - 1) requests can be added to iocbs, so
+io_submit shouldn't return -EAGAIN.
 
-One more thing, is there a way in QEMU I could find out what exception 5 is
-corresponding to?
+> 
+> In both the two situations above, the do{...}while loop breaks out and set s->io_q.blocked true.
+> 
+> After that, AIO completion callback will never be called,  ioq_submit() either, all pended requests will hang.
+> 
+> 
+> Is there a proper way we can fix this while do not affect(stuck) the guest ?
+
+Fam
