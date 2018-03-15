@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1ewM4q-0002oC-QJ
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 02:09:25 -0400
+	(envelope-from <ppandit@redhat.com>) id 1ewM97-00040U-At
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 02:13:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1ewM4n-0006vG-Kt
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 02:09:24 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:33804)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1ewM4n-0006tj-CS
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 02:09:21 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <CAMo8BfLuAdsdRScY+CgTzd0EBn3_kAFc=ysEwgp3MrM_+42viQ@mail.gmail.com>
-	<000301d3bb73$e997a8e0$bcc6faa0$@ru>
-	<CAMo8Bf+seSrT9HBFL1tspoDQ-9s9nGrXueYRt6v2nF4XzZbdfA@mail.gmail.com>
-	<000401d3bb7a$418b9fb0$c4a2df10$@ru>
-	<CAMo8Bf+Mqjer86N0LnCf0pofo9hyBZtRUXz4CiYo6Vr9d2V0jw@mail.gmail.com>
-In-Reply-To: <CAMo8Bf+Mqjer86N0LnCf0pofo9hyBZtRUXz4CiYo6Vr9d2V0jw@mail.gmail.com>
-Date: Thu, 15 Mar 2018 09:09:11 +0300
-Message-ID: <000301d3bc24$236c48e0$6a44daa0$@ru>
+	(envelope-from <ppandit@redhat.com>) id 1ewM91-0000vT-0F
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 02:13:49 -0400
+Date: Thu, 15 Mar 2018 11:43:30 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <20180314180140.GB4764@localhost.localdomain>
+Message-ID: <nycvar.YSQ.7.76.1803151136060.7879@wniryva>
+References: <1513877118-3149-1-git-send-email-jack.schwartz@oracle.com>
+	<20180314172351.GA4764@localhost.localdomain>
+	<7F85C9E4-D04F-474C-A8E3-2EAFC5B864B9@oracle.com>
+	<20180314180140.GB4764@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] regression in timer code?
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] CVE-2018-7550 (was: multiboot: bss_end_addr can be
+ zero / cleanup)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,22 +25,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Max Filippov' <jcmvbkbc@gmail.com>
-Cc: 'Pavel Dovgaluk' <Pavel.Dovgaluk@ispras.ru>, 'qemu-devel' <qemu-devel@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Jack Schwartz <jack.schwartz@oracle.com>, qemu-devel@nongnu.org, ehabkost@redhat.com, daniel.kiper@oracle.com, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ppandit@redhat.com, qemu-stable@nongnu.org
 
-> From: Max Filippov [mailto:jcmvbkbc@gmail.com]
-> On Wed, Mar 14, 2018 at 2:53 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
-> > icount is adjusted by icount_warp_rt when CPU sleeps.
-> > These adjustments may be different in different runs.
-> > And the first adjustment is performed at the start of the machine.
-> > Therefore "now" value includes non-deterministic component from the beginning,
-> > but its increments caused by instruction executions are deterministic.
-> 
-> Ok, so the CPU reset is non-deterministic. Thanks.
++-- On Wed, 14 Mar 2018, Kevin Wolf wrote --+
+| Well, it seems to me that this patch was created for a different
+| purpose, but it happens to fix the bug for which this CVE was assigned
+| now.
 
-BTW, your link to website in MAINTAINERS does not work.
+  Right. I had sent another patch to fix it, there Jack mentioned about his 
+series from before.
+ 
+| I think PJP knew that this CVE was coming before the patches were merged
+| into master, so if he had told us, we could have had a better commit
+| message.
 
-W: http://wiki.osll.spb.ru/doku.php?id=etc:users:jcmvbkbc:qemu-target-xtensa
+  For non-embargoed issues we request CVE from Mitre after a proposed patch is 
+reviewed and acked for upstream QEMU. Nevertheless, going forward I'll mention 
+the CVE-ID here on the list, as soon as it is assigned.
 
+| I don't think a problem like this would be embargoed at all.
 
-Pavel Dovgalyuk
+  True.
+
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
