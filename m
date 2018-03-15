@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ewNdh-0007Up-6D
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 03:49:30 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ewNdf-0004dd-T0
+	(envelope-from <thuth@redhat.com>) id 1ewNdg-0007Te-8D
 	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 03:49:29 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <thuth@redhat.com>) id 1ewNdf-0004d3-6A
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 03:49:28 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 15 Mar 2018 08:49:04 +0100
-Message-Id: <1521100145-15304-3-git-send-email-thuth@redhat.com>
-In-Reply-To: <1521100145-15304-1-git-send-email-thuth@redhat.com>
-References: <1521100145-15304-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/3] tests/cdboot: Test booting from CD-ROM ISO
- image file
+Date: Thu, 15 Mar 2018 08:49:02 +0100
+Message-Id: <1521100145-15304-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/3] Add new CD-ROM related qtests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,206 +20,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Victor Kaplansky <victork@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org, qemu-s390x@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-We already have the code for a boot file in tests/boot-sector.c,
-so if the genisoimage program is available, we can easily create
-a bootable CD ISO image that we can use for testing whether our
-CD-ROM emulation and the BIOS CD-ROM boot works correctly.
+With one of my clean-up patches (see commit 1454509726719e0933c800), I
+recently accidentially broke the "-cdrom" parameter (more precisely
+"-drive if=scsi") on a couple of boards, since there was no error
+detected during the "make check" regression testing. This is clearly an
+indication that we are lacking tests in this area.
+So this small patch series now introduces some tests for CD-ROM drives:
+The first two patches introduce the possibility to check that booting
+from CD-ROM drives still works fine for x86 and s390x, and the third
+patch adds a test that certain machines can at least still be started
+with the "-cdrom" parameter (i.e. that test would have catched the
+mistake that I did with my SCSI cleanup patch).
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/Makefile.include |   3 +
- tests/cdrom-test.c     | 155 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 158 insertions(+)
+Thomas Huth (3):
+  tests/boot-sector: Add magic bytes to s390x boot code header
+  tests/cdboot: Test booting from CD-ROM ISO image file
+  tests/cdrom-test: Test that -cdrom parameter is working
+
+ tests/Makefile.include |  10 ++-
+ tests/boot-sector.c    |   9 ++-
+ tests/cdrom-test.c     | 216 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 231 insertions(+), 4 deletions(-)
  create mode 100644 tests/cdrom-test.c
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index ef9b88c..a104222 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -304,6 +304,7 @@ check-qtest-i386-$(CONFIG_POSIX) += tests/test-filter-redirector$(EXESUF)
- check-qtest-i386-y += tests/migration-test$(EXESUF)
- check-qtest-i386-y += tests/test-x86-cpuid-compat$(EXESUF)
- check-qtest-i386-y += tests/numa-test$(EXESUF)
-+check-qtest-i386-y += tests/cdrom-test$(EXESUF)
- check-qtest-x86_64-y += $(check-qtest-i386-y)
- check-qtest-x86_64-y += tests/sdhci-test$(EXESUF)
- gcov-files-i386-y += i386-softmmu/hw/timer/mc146818rtc.c
-@@ -398,6 +399,7 @@ check-qtest-s390x-y += tests/virtio-balloon-test$(EXESUF)
- check-qtest-s390x-y += tests/virtio-console-test$(EXESUF)
- check-qtest-s390x-y += tests/virtio-serial-test$(EXESUF)
- check-qtest-s390x-y += tests/cpu-plug-test$(EXESUF)
-+check-qtest-s390x-y += tests/cdrom-test$(EXESUF)
- 
- check-qtest-generic-y += tests/qom-test$(EXESUF)
- check-qtest-generic-y += tests/test-hmp$(EXESUF)
-@@ -829,6 +831,7 @@ tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-util-obj-y)
- tests/numa-test$(EXESUF): tests/numa-test.o
- tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-sector.o tests/acpi-utils.o
- tests/sdhci-test$(EXESUF): tests/sdhci-test.o $(libqos-pc-obj-y)
-+tests/cdrom-test$(EXESUF): tests/cdrom-test.o tests/boot-sector.o $(libqos-obj-y)
- 
- tests/migration/stress$(EXESUF): tests/migration/stress.o
- 	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,"LINK","$(TARGET_DIR)$@")
-diff --git a/tests/cdrom-test.c b/tests/cdrom-test.c
-new file mode 100644
-index 0000000..1fc5230
---- /dev/null
-+++ b/tests/cdrom-test.c
-@@ -0,0 +1,155 @@
-+/*
-+ * Various tests for emulated CD-ROM drives.
-+ *
-+ * Copyright (c) 2018 Red Hat Inc.
-+ *
-+ * Author:
-+ *    Thomas Huth <thuth@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2
-+ * or later. See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "boot-sector.h"
-+
-+static char isoimage[] = "cdrom-boot-iso-XXXXXX";
-+
-+static int gen_iso(const char *fmt, ...)
-+{
-+    char *params, *command;
-+    va_list args;
-+    pid_t pid;
-+    int status;
-+
-+    pid = fork();
-+    if (pid == 0) {
-+        va_start(args, fmt);
-+        params = g_strdup_vprintf(fmt, args);
-+        va_end(args);
-+        command = g_strdup_printf("exec genisoimage %s", params);
-+        g_free(params);
-+        execlp("/bin/sh", "sh", "-c", command, NULL);
-+        exit(1);
-+    }
-+    wait(&status);
-+
-+    return WEXITSTATUS(status);
-+}
-+
-+static int prepare_image(const char *arch, char *isoimage)
-+{
-+    char srcdir[] = "cdrom-test-dir-XXXXXX";
-+    char *codefile = NULL;
-+    int ifh, ret = -1;
-+
-+    ifh = mkstemp(isoimage);
-+    if (ifh < 0) {
-+        perror("Error creating temporary iso image file");
-+        return -1;
-+    }
-+    if (!mkdtemp(srcdir)) {
-+        perror("Error creating temporary directory");
-+        goto cleanup;
-+    }
-+
-+    if (g_str_equal(arch, "i386") || g_str_equal(arch, "x86_64") ||
-+        g_str_equal(arch, "s390x")) {
-+        codefile = g_strdup_printf("%s/bootcode-XXXXXX", srcdir);
-+        ret = boot_sector_init(codefile);
-+        if (ret) {
-+            goto cleanup;
-+        }
-+    } else {
-+        g_assert_not_reached();
-+    }
-+
-+    ret = gen_iso("-quiet -l -no-emul-boot -b %s -o %s %s",
-+                  strrchr(codefile, '/') + 1, isoimage, srcdir);
-+    if (ret) {
-+        fprintf(stderr, "genisoimage failed: %i\n", ret);
-+    }
-+
-+    unlink(codefile);
-+
-+cleanup:
-+    g_free(codefile);
-+    rmdir(srcdir);
-+    close(ifh);
-+
-+    return ret;
-+}
-+
-+static void test_cdboot(gconstpointer data)
-+{
-+    QTestState *qts;
-+
-+    qts = qtest_startf("-accel kvm:tcg -no-shutdown %s%s", (const char *)data,
-+                       isoimage);
-+    boot_sector_test(qts);
-+    qtest_quit(qts);
-+}
-+
-+static void add_x86_tests(void)
-+{
-+    qtest_add_data_func("cdboot/default", "-cdrom ", test_cdboot);
-+    qtest_add_data_func("cdboot/virtio-scsi",
-+                        "-device virtio-scsi -device scsi-cd,drive=cdr "
-+                        "-blockdev file,node-name=cdr,filename=", test_cdboot);
-+    qtest_add_data_func("cdboot/isapc", "-M isapc "
-+                        "-drive if=ide,media=cdrom,file=", test_cdboot);
-+    qtest_add_data_func("cdboot/am53c974",
-+                        "-device am53c974 -device scsi-cd,drive=cd1 "
-+                        "-drive if=none,id=cd1,format=raw,file=", test_cdboot);
-+    qtest_add_data_func("cdboot/dc390",
-+                        "-device dc390 -device scsi-cd,drive=cd1 "
-+                        "-blockdev file,node-name=cd1,filename=", test_cdboot);
-+    qtest_add_data_func("cdboot/lsi53c895a",
-+                        "-device lsi53c895a -device scsi-cd,drive=cd1 "
-+                        "-blockdev file,node-name=cd1,filename=", test_cdboot);
-+    qtest_add_data_func("cdboot/megasas", "-M q35 "
-+                        "-device megasas -device scsi-cd,drive=cd1 "
-+                        "-blockdev file,node-name=cd1,filename=", test_cdboot);
-+    qtest_add_data_func("cdboot/megasas-gen2", "-M q35 "
-+                        "-device megasas-gen2 -device scsi-cd,drive=cd1 "
-+                        "-blockdev file,node-name=cd1,filename=", test_cdboot);
-+}
-+
-+static void add_s390x_tests(void)
-+{
-+    qtest_add_data_func("cdboot/default", "-cdrom ", test_cdboot);
-+    qtest_add_data_func("cdboot/virtio-scsi",
-+                        "-device virtio-scsi -device scsi-cd,drive=cdr "
-+                        "-blockdev file,node-name=cdr,filename=", test_cdboot);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    int ret;
-+    const char *arch = qtest_get_arch();
-+
-+    g_test_init(&argc, &argv, NULL);
-+
-+    if (gen_iso("--version > /dev/null")) {
-+        /* genisoimage not available - so can't run tests */
-+        return 0;
-+    }
-+
-+    ret = prepare_image(arch, isoimage);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    if (g_str_equal(arch, "i386") || g_str_equal(arch, "x86_64")) {
-+        add_x86_tests();
-+    } else if (g_str_equal(arch, "s390x")) {
-+        add_s390x_tests();
-+    }
-+
-+    ret = g_test_run();
-+
-+    unlink(isoimage);
-+
-+    return ret;
-+}
 -- 
 1.8.3.1
