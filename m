@@ -1,29 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ewNBa-0001fz-O2
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 03:20:27 -0400
+	(envelope-from <thuth@redhat.com>) id 1ewNdg-0007Tc-1a
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 03:49:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ewNBW-0000LT-MP
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 03:20:26 -0400
-Received: from 3.mo173.mail-out.ovh.net ([46.105.34.1]:34664)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ewNBW-0000KD-Fh
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 03:20:22 -0400
-Received: from player159.ha.ovh.net (unknown [10.109.108.186])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id AE85BB2E4A
-	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 08:20:20 +0100 (CET)
-References: <20180314173336.20055-1-clg@kaod.org>
-	<1521071936.5486.0.camel@gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <3226f1d3-2a03-5c20-28ec-c0c016ae4b8c@kaod.org>
-Date: Thu, 15 Mar 2018 08:20:15 +0100
-MIME-Version: 1.0
-In-Reply-To: <1521071936.5486.0.camel@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc: fix tlbsync to
- check privilege level depending on GTSE
+	(envelope-from <thuth@redhat.com>) id 1ewNdf-0004d8-6m
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 03:49:28 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu, 15 Mar 2018 08:49:03 +0100
+Message-Id: <1521100145-15304-2-git-send-email-thuth@redhat.com>
+In-Reply-To: <1521100145-15304-1-git-send-email-thuth@redhat.com>
+References: <1521100145-15304-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/3] tests/boot-sector: Add magic bytes to
+ s390x boot code header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,21 +20,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: Victor Kaplansky <victork@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org, qemu-s390x@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
->> --- a/target/ppc/translate.c
->> +++ b/target/ppc/translate.c
->> @@ -4526,7 +4526,7 @@ static void gen_tlbie(DisasContext *ctx)
->>      TCGv_i32 t1;
->>  
->>      if (ctx->gtse) {
->> -        CHK_SV; /* If gtse is set then tblie is supervisor
->> privileged */
->> +        CHK_SV; /* If gtse is set then tlbie is supervisor
->> privileged */
-> 
-> ^^^ Did that line actually change? :)
+We're going to use the s390x boot code for testing CD-ROM booting.
+But the ISO loader of the s390-ccw bios is a little bit more picky
+than the network loader and expects some magic bytes in the header
+of the file (see linux_s390_magic in pc-bios/s390-ccw/bootmap.c), so
+we've got to add them in our boot code here, too.
 
-It did. Look closer :)
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tests/boot-sector.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-C.
+diff --git a/tests/boot-sector.c b/tests/boot-sector.c
+index c373f0e..04721c9 100644
+--- a/tests/boot-sector.c
++++ b/tests/boot-sector.c
+@@ -68,8 +68,11 @@ static uint8_t x86_boot_sector[512] = {
+ };
+ 
+ /* For s390x, use a mini "kernel" with the appropriate signature */
+-static const uint8_t s390x_psw[] = {
+-    0x00, 0x08, 0x00, 0x00, 0x80, 0x01, 0x00, 0x00
++static const uint8_t s390x_psw_and_magic[] = {
++    0x00, 0x08, 0x00, 0x00, 0x80, 0x01, 0x00, 0x00,
++    0x02, 0x00, 0x00, 0x18, 0x60, 0x00, 0x00, 0x50,
++    0x02, 0x00, 0x00, 0x68, 0x60, 0x00, 0x00, 0x50,
++    0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40
+ };
+ static const uint8_t s390x_code[] = {
+     0xa7, 0xf4, 0x00, 0x0a,                                /* j 0x10010 */
+@@ -110,7 +113,7 @@ int boot_sector_init(char *fname)
+     } else if (g_str_equal(arch, "s390x")) {
+         len = 0x10000 + sizeof(s390x_code);
+         boot_code = g_malloc0(len);
+-        memcpy(boot_code, s390x_psw, sizeof(s390x_psw));
++        memcpy(boot_code, s390x_psw_and_magic, sizeof(s390x_psw_and_magic));
+         memcpy(&boot_code[0x10000], s390x_code, sizeof(s390x_code));
+     } else {
+         g_assert_not_reached();
+-- 
+1.8.3.1
