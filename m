@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Cowgill@mips.com>) id 1ewTkO-0007IA-MW
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:20:54 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ewTqp-0000WG-Do
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:27:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <James.Cowgill@mips.com>) id 1ewTkJ-0004oE-PC
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:20:48 -0400
-Received: from 9pmail.ess.barracuda.com ([64.235.154.211]:54939)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <James.Cowgill@mips.com>)
-	id 1ewTkJ-0004Hb-EJ
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:20:43 -0400
-References: <20180314153121.23838-1-james.cowgill@mips.com>
-	<46dbae6e-4ff6-5003-e8e6-175bf0fbd51f@vivier.eu>
-	<20e6165d-70b2-d1ec-1c46-7ede39a8d816@mips.com>
-	<fbbc625b-1bcc-ab60-8998-b2b1653105fd@vivier.eu>
-From: James Cowgill <james.cowgill@mips.com>
-Message-ID: <74331770-2eac-4af7-dc4b-b4dc20fbba46@mips.com>
-Date: Thu, 15 Mar 2018 14:19:18 +0000
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ewTqk-0000wY-HC
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:27:27 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:45565)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ewTqk-0000vy-Bg
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:27:22 -0400
+Received: by mail-wr0-x244.google.com with SMTP id h2so8454292wre.12
+	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 07:27:22 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 15 Mar 2018 15:27:13 +0100
+Message-Id: <20180315142713.30960-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <fbbc625b-1bcc-ab60-8998-b2b1653105fd@vivier.eu>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] linux-user: implement HWCAP bits on MIPS
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2] docker: dump 'config.log' if ./configure
+ fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +32,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
+To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-Hi,
+Suggested-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+v2:
+- avoid subshell using { ; } (Eric)
+- use test_fail() instead of prep_fail() (Fam)
 
-On 15/03/18 13:00, Laurent Vivier wrote:
-> Le 15/03/2018 =C3=A0 11:52, James Cowgill a =C3=A9crit=C2=A0:
->> Hi,
->>
->> On 14/03/18 16:13, Laurent Vivier wrote:
->>> Le 14/03/2018 =C3=A0 16:31, James Cowgill a =C3=A9crit=C2=A0:
->>>> +enum {
->>>> +    HWCAP_MIPS_R6           =3D (1 << 0),
->>>> +    HWCAP_MIPS_MSA          =3D (1 << 1),
->>>> +};
->>>
->>> We have this for ARM only in elfload.c since:
->>>
->>>     afce2927aa Arm AT_HWCAP AUXV entry (Paul Brook) [2005]
->>>
->>> but they have been added in include/elf.h since:
->>>
->>>     41d9ea80ac tcg-arm: Use qemu_getauxval [Richard Henderson, 2013]
->>>
->>> and I think we should remove them (they are prefixed by ARM_)
->>>
->>> So the MIPS ones should be in include/elf.h (with the #define form).
->>
->> I can do that, although I think it's a bit unusual. The HWCAP bits are
->> specific to the Linux kernel and not to "the MIPS ELF format" so it
->> doesn't make sense to me to put them in elf.h.
->=20
-> In fact, in a system, they come with the glibc <sys/auxv.h>. auxv.h
-> includes <elf.h> and <bits/hwcap.h>. They are both part of glibc.
+ tests/docker/common.rc | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-None of the headers you mention contain hwcap bits. They are usually
-provided in an arch specific kernel header - on MIPS they are in
-<asm/hwcap.h> which must be included separately.
-
-> They can be used with qemu_getauxval() so it's better to have them in a
-> header file. elfoad.c or elf.h, it's in both cases an ELF file.
-
-I agree with that.
-
-I tried to move them to elf.h but hit a slight problem. In elfload.c,
-elf.h is included after all the target specific stuff so the
-get_elf_hwcap function cannot use anything from elf.h. I think this has
-lead to all architectures replicating the list of hwcap bits in both
-elf.h and elfload.c. You mentioned arm before, but I can also see
-aarch64, powerpc and sh4 do this. Some of these architectures also have
-their bits (with different constant names) in elf.h and some do not.
-
-James
+diff --git a/tests/docker/common.rc b/tests/docker/common.rc
+index 7951555e3f..046f8a5921 100755
+--- a/tests/docker/common.rc
++++ b/tests/docker/common.rc
+@@ -30,7 +30,9 @@ build_qemu()
+                  $@"
+     echo "Configure options:"
+     echo $config_opts
+-    $QEMU_SRC/configure $config_opts && make $MAKEFLAGS
++    $QEMU_SRC/configure $config_opts || \
++        { cat config.log && test_fail "Failed to run 'configure'"; }
++    make $MAKEFLAGS
+ }
+ 
+ test_fail()
+-- 
+2.16.2
