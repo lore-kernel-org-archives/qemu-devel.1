@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ewWRS-0001s6-0b
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 13:13:26 -0400
+	(envelope-from <kwolf@redhat.com>) id 1ewWWE-0004S0-Le
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 13:18:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ewWRR-0002WK-23
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 13:13:25 -0400
-Received: from mail-oi0-x235.google.com ([2607:f8b0:4003:c06::235]:46703)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ewWRQ-0002W4-SE
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 13:13:24 -0400
-Received: by mail-oi0-x235.google.com with SMTP id x12so6307029oie.13
-	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 10:13:24 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1ewWWD-0005FS-NS
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 13:18:22 -0400
+Date: Thu, 15 Mar 2018 18:18:11 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180315171811.GF3876@localhost.localdomain>
+References: <20180314173213.18563-1-kwolf@redhat.com>
+	<20180314173213.18563-2-kwolf@redhat.com>
+	<4ab6eff1-f4c2-1e04-5fa8-cc71c3bf308d@oracle.com>
+	<20180315155415.GA3876@localhost.localdomain>
+	<821bfa6e-9ad5-f486-49a1-f306696992ec@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <MWHPR21MB018983B74A652443B70680F19ED20@MWHPR21MB0189.namprd21.prod.outlook.com>
-References: <20180313153458.26822-1-peter.maydell@linaro.org>
-	<20180313153458.26822-9-peter.maydell@linaro.org>
-	<MWHPR21MB018983B74A652443B70680F19ED20@MWHPR21MB0189.namprd21.prod.outlook.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Mar 2018 17:13:03 +0000
-Message-ID: <CAFEAcA_9YQ4bSzHgM8yLAPtPZ2C70u13kTCLf4rHGPCBUgNiZA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 8/9] hw/arm/bcm2836: Hardcode correct CPU
- type
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <821bfa6e-9ad5-f486-49a1-f306696992ec@oracle.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/5] multiboot: Reject kernels exceeding
+ the address space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,28 +28,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Pekka Enberg <penberg@iki.fi>, "patches@linaro.org" <patches@linaro.org>
+To: Jack Schwartz <jack.schwartz@oracle.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, anatol.pomozov@gmail.com, ppandit@redhat.com
 
-On 13 March 2018 at 16:55, Andrew Baumann <Andrew.Baumann@microsoft.com> wrote:
->> From: Qemu-devel <qemu-devel-
->> bounces+andrew.baumann=microsoft.com@nongnu.org> On Behalf Of Peter
->> Maydell
->> Sent: Tuesday, 13 March 2018 08:35
->>
->> Now we have separate types for BCM2386 and BCM2387, we might as well
->> just hard-code the CPU type they use rather than having it passed
->> through as an object property. This then lets us put the initialization
->> of the CPU object in init rather than realize.
+Am 15.03.2018 um 17:55 hat Jack Schwartz geschrieben:
+> On 03/15/18 08:54, Kevin Wolf wrote:
+> > Am 15.03.2018 um 06:19 hat Jack Schwartz geschrieben:
+> > > Hi Kevin.
+> > >=20
+> > > My comments are inline...
+> > >=20
+> > > On 2018-03-14 10:32, Kevin Wolf wrote:
+> > > > The code path with a manually set mh_load_addr in the Multiboot h=
+eader
+> > > > checks that load_end_addr <=3D load_addr, but the path where load=
+_end_addr
+> > > > is automatically detected if 0 is given in the header misses the
+> > > > corresponding check.
+> > > 1) The code checks that load_end_addr >=3D load_addr (before lettin=
+g it
+> > > through).
+> > >=20
+> > > 2) load_end_addr is used only when it is read in as non-zero, so no=
+ check is
+> > > needed if zero.=A0 (It gets debug-printed even when zero, but is us=
+ed only to
+> > > calculate mb_load_size and only when non-zero.)
+> > Oops, good point. I'll change the start of the commit message as foll=
+ows:
+> >=20
+> >      The code path with a manually set mh_load_end_addr in the Multib=
+oot
+> >      header checks that mh_load_end_addr >=3D mh_load_addr, but the p=
+ath where
+> >      mh_load_end_addr is 0 in the header and therefore automatically
+> >      calculated from the file size misses the corresponding check.
+> >=20
+> > Does this look better?
+>=20
+> mb_load_size is calculated from the file size, not mh_load_end_addr, so
+> I think you mean mb_load_size rather than mh_load_end_addr.=A0 Do you i=
+ntend
+> to say:
+>=20
+> =A0 The code path where mh_load_end_addr is non-zero in the Multiboot
+> =A0 header checks that mh_load_end_addr >=3D mh_load_addr and so
+> =A0 mb_load_size ischecked.=A0 However, mb_load_size is not checked whe=
+n
+> =A0 calculated from thefile size, when mh_load_end_addr is 0.
 
-> What about the default_cpu_type field of MachineClass set in
-> raspi[23]_machine_init? That seems irrelevant now...
+Ok, technically that's more accurate.
 
-Igor, can you help with this question? For a board that always
-has one CPU type (because the real hardware only ever has
-one SoC, and that SoC QOM object hard codes the CPU type)
-does it still need to set the mc->default_cpu_type field in
-its MachineClass, or does that become pointless ?
+> Also, if this is what you intend to say, would the following code chang=
+e be
+> more ofwhat you want:
+>=20
+> Remove this:
+>=20
+> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 mb_load_size =3D kernel_file_size - m=
+b_kernel_text_offset;
+> =A0=A0=A0=A0=A0=A0=A0 }
+> -=A0=A0=A0=A0=A0=A0 if (mb_load_size > UINT32_MAX - mh_load_addr) {
+> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 error_report("kernel does not fit in ad=
+dress space");
+> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 exit(1);
+> -=A0=A0=A0=A0=A0=A0 }
+> =A0=A0=A0=A0=A0=A0=A0 if (mh_bss_end_addr) {
+>=20
+> and instead do this a few lines further down:
+>=20
+> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 mb_kernel_size =3D mh_bss_end_addr - mh_=
+load_addr;
+> =A0=A0=A0=A0=A0=A0=A0 } else {
+> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 mb_kernel_size =3D mb_load_size;
+> =A0=A0=A0=A0=A0=A0=A0 }
+>=20
+> +=A0=A0=A0=A0=A0=A0 if (mb_kernel_size > UINT32_MAX - mh_load_addr) {
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 error_report("kernel does not fit in ad=
+dress space");
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 exit(1);
+> +=A0=A0=A0=A0=A0=A0 }
+>=20
+> =A0=A0=A0=A0=A0=A0=A0 mb_debug("multiboot: header_addr =3D %#x", mh_hea=
+der_addr);
+> =A0=A0=A0=A0=A0=A0=A0 mb_debug("multiboot: load_addr =3D %#x", mh_load_=
+addr);
+>=20
+> The reason would be to include the bss area in the calculation, when
+> mh_bss_end_addr is non-zero.
 
-thanks
--- PMM
+Ultimately, mb_load_size > mb_kernel_size is what kills us, so maybe we
+could add an assertion for that.
+
+But the reason why this condition could ever be true is the integer
+overflow in this line:
+
+    if (mh_bss_end_addr < (mh_load_addr + mb_load_size))
+
+It's generally better to check for integer overflows before they happen
+than trying to infer them from the result. In fact, your condition
+wouldn't catch the error of test scenario 9:
+
+    kernel_file_size        =3D 0x2035
+    mh_header_addr          =3D 0xfffff000
+    mh_load_addr            =3D 0xfffff000
+    mh_load_end_addr        =3D 0
+    mh_bss_end_addr         =3D 0xfffff001
+
+    mb_kernel_text_offset   =3D i - (mh_header_addr - mh_load_addr)
+                            =3D 0
+
+    mb_load_size            =3D kernel_file_size - mb_kernel_text_offset
+                            =3D 0x2035
+                            > UINT32_MAX - mh_load_addr
+
+    mb_kernel_size          =3D mh_bss_end_addr - mh_load_addr
+                            =3D 1
+                            < UINT32_MAX - mh_load_addr
+
+Kevin
