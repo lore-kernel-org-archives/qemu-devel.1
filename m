@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ewUAP-0008MD-BZ
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:47:43 -0400
+	(envelope-from <bounces@canonical.com>) id 1ewULr-0003tw-PV
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:59:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ewUAM-0000MP-43
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:47:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56438 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ewUAL-0000Lc-Uo
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:47:38 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6E31F406802A
-	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 14:47:26 +0000 (UTC)
-Date: Thu, 15 Mar 2018 14:47:19 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180315144719.GT3146@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1520942752-19449-1-git-send-email-pbonzini@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1ewULo-00082e-MG
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:59:31 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43682)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ewULo-00081m-FZ
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 10:59:28 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ewULl-0004cv-Ja
+	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 14:59:25 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id CABE12E8215
+	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 14:56:30 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1520942752-19449-1-git-send-email-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] docker: fedora: test more components
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 15 Mar 2018 14:46:58 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1751674 <1751674@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151960470707.11772.10064243852456470443.malonedeb@gac.canonical.com>
+Message-Id: <152112521835.3967.3459879049205051049.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1751674] Re: qemu-system-arm segmentation fault
+ trying to dump VM memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,78 +37,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com
+To: qemu-devel@nongnu.org
 
-On Tue, Mar 13, 2018 at 01:05:52PM +0100, Paolo Bonzini wrote:
-> Install optional dependencies of QEMU to get better coverage.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  tests/docker/dockerfiles/fedora.docker | 13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
-> 
-> diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-> index 994a35a..0d9da45 100644
-> --- a/tests/docker/dockerfiles/fedora.docker
-> +++ b/tests/docker/dockerfiles/fedora.docker
-> @@ -1,9 +1,16 @@
->  FROM fedora:27
->  ENV PACKAGES \
->      ccache gettext git tar PyYAML sparse flex bison python3 bzip2 hostname \
-> -    glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
-> -    gcc gcc-c++ clang make perl which bc findutils libaio-devel \
-> -    nettle-devel libasan libubsan \
-> +    gcc gcc-c++ clang make perl which bc findutils glib2-devel \
-> +    libaio-devel pixman-devel zlib-devel libfdt-devel libasan libubsan \
-> +    bluez-libs-devel brlapi-devel bzip2-devel \
-> +    device-mapper-multipath-devel glusterfs-api-devel gnutls-devel \
-> +    gtk3-devel libattr-devel libcap-devel libcap-ng-devel libcurl-devel \
-> +    libjpeg-devel libpng-devel librbd-devel libssh2-devel libusbx-devel \
-> +    libxml2-devel lzo-devel ncurses-devel nettle-devel nss-devel \
-> +    numactl-devel SDL2-devel snappy-devel spice-server-devel \
-> +    systemtap-sdt-devel usbredir-devel virglrenderer-devel vte3-devel \
-> +    xen-devel \
+What's happening here is that the memory range you're asking to dump
+(physaddrs 0 to 0x3fffffff) includes a lot of devices, including the
+interrupt controller, which is at 0x1e000000. There's a longstanding bug
+in the GIC code where it will crash if you try to access its per-CPU
+register bank from some context that isn't a guest CPU (including the
+monitor or the QEMU gdb stub), because it doesn't know which CPU's
+version of the registers you wanted. That's what you've run into here.
 
-This still has some notable differences from the build deps we use in
-formal Fedora QEMU RPMs. I think we have missing:
+However, I suspect you didn't really want to try to take a memory dump of a=
+ pile of devices. The RAM in the vexpress-a9 board starts at 0x60000000, so=
+ if you wanted the RAM then try
+  pmemsave 0x60000000 0x9fffffff memory.dmp
 
-   alsa-lib-devel
-   capstone-devel
-   cyrus-sasl-devel
-   glusterfs-devel
-   libcacard-devel
-   libepoxy-devel
-   libiscsi-devel
-   libnfs-devel
-   librdmacm-devel
-   libseccomp-devel
-   libtasn1-devel
-   libuuid-devel
-   mesa-libgbm-devel
-   perl-podlators
-   pulseaudio-libs-devel
-   systemd-devel
-   texinfo
-   vte291-devel
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1751674
 
-Some extra bits that are not needed:
+Title:
+  qemu-system-arm segmentation fault trying to dump VM memory
 
-  glib2-devel is not required as gtk3-devel pulls it in
-  nettle-devel is not required as gnutls-devel puls it in
-  
-  nss-devel shouldn't be used by anything in QEMU - we use gnutls
-  
-  vte3-devel is obsoleted by vte291-devel
+Status in QEMU:
+  New
 
->      mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-config \
->      mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libtasn1 \
->      mingw32-libjpeg-turbo mingw32-libpng mingw32-curl mingw32-libssh2 \
+Bug description:
+  Qemu segfaults trying to generate a VM memory dump:
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+  $ QEMU_AUDIO_DRV=3Dnone qemu-git-src/arm-softmmu/qemu-system-arm -M vexpr=
+ess-a9 -smp 4 -m 1024 -machine secure=3Doff,dump-guest-core=3Don -kernel li=
+nux-4.9.75/arch/arm/boot/zImage -append "root=3D/dev/mmcblk0 rw rootfstype=
+=3Dext4 mem=3D1024M net.ifnames=3D0 console=3DttyAMA0" -dtb vexpress-v2p-ca=
+9.dtb -sd armv7-hd.qcow2 -netdev tap,ifname=3Dtap_armv7,script=3Dno,downscr=
+ipt=3Dno,id=3Dnet0 -device virtio-net-device,mac=3D00:AA:AD:BB:FF:02,netdev=
+=3Dnet0  -monitor stdio -serial vc  -loadvm SS0
+  QEMU 2.11.50 monitor - type 'help' for more information
+  (qemu) pmemsave 0 0x3FFFFFFF memory.dmp
+  Segmentation fault (core dumped)
+
+  $ git rev-parse HEAD
+  b384cd95eb9c6f73ad84ed1bb0717a26e29cc78f
+
+  It's the second time I try to submit this bug, I think last time it
+  failed because the attached core dump size (400M compressed). Have a
+  look if you can get that file, otherwise I will try to update this
+  ticket once it's created:
+
+  (Error ID: OOPS-65553b72bc14be693eb1e37814ff9267)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1751674/+subscriptions
