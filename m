@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ewTH5-0005uW-Af
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:50:32 -0400
+	(envelope-from <mst@redhat.com>) id 1ewTKS-00077u-KF
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:54:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ewTH2-00064c-3j
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:50:31 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54616 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1ewTKP-0000ZV-F9
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:54:00 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44792 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ewTH1-00063p-TV
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:50:28 -0400
-Date: Thu, 15 Mar 2018 15:50:07 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ewTKP-0000Z0-9V
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:53:57 -0400
+Date: Thu, 15 Mar 2018 15:53:56 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180315154754-mutt-send-email-mst@kernel.org>
+Message-ID: <20180315155051-mutt-send-email-mst@kernel.org>
 References: <1520426065-40265-1-git-send-email-wei.w.wang@intel.com>
-	<1520426065-40265-3-git-send-email-wei.w.wang@intel.com>
-	<20180314181137.GG3006@work-vm> <5AAA5079.2000308@intel.com>
+	<1520426065-40265-4-git-send-email-wei.w.wang@intel.com>
+	<20180313183558-mutt-send-email-mst@kernel.org>
+	<5AA88C35.90300@intel.com>
+	<20180314045130-mutt-send-email-mst@kernel.org>
+	<5AA8BB27.6030205@intel.com>
+	<20180314160832-mutt-send-email-mst@kernel.org>
+	<5AA9C944.2010403@intel.com>
+	<20180315044543-mutt-send-email-mst@kernel.org>
+	<5AAA49D0.7010200@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5AAA5079.2000308@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v4 2/4] migration: API to clear bits of
- guest free pages from the dirty bitmap
+In-Reply-To: <5AAA49D0.7010200@intel.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v4 3/4] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_HINT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,89 +37,128 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Wei Wang <wei.w.wang@intel.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-On Thu, Mar 15, 2018 at 06:52:41PM +0800, Wei Wang wrote:
-> On 03/15/2018 02:11 AM, Dr. David Alan Gilbert wrote:
-> > * Wei Wang (wei.w.wang@intel.com) wrote:
-> > > This patch adds an API to clear bits corresponding to guest free pages
-> > > from the dirty bitmap. Spilt the free page block if it crosses the QEMU
-> > > RAMBlock boundary.
+On Thu, Mar 15, 2018 at 06:24:16PM +0800, Wei Wang wrote:
+> On 03/15/2018 10:47 AM, Michael S. Tsirkin wrote:
+> > On Thu, Mar 15, 2018 at 09:15:48AM +0800, Wei Wang wrote:
+> > > On 03/14/2018 10:12 PM, Michael S. Tsirkin wrote:
+> > > > On Wed, Mar 14, 2018 at 02:03:19PM +0800, Wei Wang wrote:
+> > > > > On 03/14/2018 10:53 AM, Michael S. Tsirkin wrote:
+> > > > > > On Wed, Mar 14, 2018 at 10:43:01AM +0800, Wei Wang wrote:
+> > > > > > > On 03/14/2018 12:49 AM, Michael S. Tsirkin wrote:
+> > > > > > > > On Wed, Mar 07, 2018 at 08:34:24PM +0800, Wei Wang wrote:
+> > > > > > > > 
+> > > > > > > > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> > > > > > > > > Signed-off-by: Liang Li <liang.z.li@intel.com>
+> > > > > > > > > CC: Michael S. Tsirkin <mst@redhat.com>
+> > > > > > > > > CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > > > > > > > CC: Juan Quintela <quintela@redhat.com>
+> > > > > > > > I find it suspicious that neither unrealize nor reset
+> > > > > > > > functions have been touched at all.
+> > > > > > > > Are you sure you have thought through scenarious like
+> > > > > > > > hot-unplug or disabling the device by guest?
+> > > > > > > OK. I think we can call balloon_free_page_stop in unrealize and reset.
+> > > > > > > 
+> > > > > > > 
+> > > > > > > > +static void *virtio_balloon_poll_free_page_hints(void *opaque)
+> > > > > > > > +{
+> > > > > > > > +    VirtQueueElement *elem;
+> > > > > > > > +    VirtIOBalloon *dev = opaque;
+> > > > > > > > +    VirtQueue *vq = dev->free_page_vq;
+> > > > > > > > +    uint32_t id;
+> > > > > > > > +    size_t size;
+> > > > > > > > What makes it safe to poke at this device from multiple threads?
+> > > > > > > > I think that it would be safer to do it from e.g. BH.
+> > > > > > > > 
+> > > > > > > Actually the free_page_optimization thread is the only user of free_page_vq,
+> > > > > > > and there is only one optimization thread each time. Would this be safe
+> > > > > > > enough?
+> > > > > > > 
+> > > > > > > Best,
+> > > > > > > Wei
+> > > > > > Aren't there other fields there? Also things like reset affect all VQs.
+> > > > > > 
+> > > > > Yes. But I think BHs are used to avoid re-entrancy, which isn't the issue
+> > > > > here.
+> > > > Since you are adding locks to address the issue - doesn't this imply
+> > > > reentrancy is exactly the issue?
+> > > Not really. The lock isn't intended for any reentrancy issues, since there
+> > > will be only one run of the virtio_balloon_poll_free_page_hints function at
+> > > any given time. Instead, the lock is used to synchronize
+> > > virtio_balloon_poll_free_page_hints and virtio_balloon_free_page_stop to
+> > > access dev->free_page_report_status.
+> > I wonder whether that's enough. E.g. is there a race with guest
+> > trying to reset the device? That resets all VQs you know.
+> 
+> I think that's OK - we will call virtio_balloon_free_page_stop in the device
+> reset function, and qemu_thread_join() in virtio_balloon_free_page_stop will
+> wait till the optimization thread exits. That is, the reset will proceed
+> after the optimization thread exits.
+> 
+> 
+> > 
+> > 
+> > > Please see the whole picture below:
 > > > 
-> > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> > > CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > CC: Juan Quintela <quintela@redhat.com>
-> > > CC: Michael S. Tsirkin <mst@redhat.com>
-> > > ---
-> > >   include/migration/misc.h |  2 ++
-> > >   migration/ram.c          | 21 +++++++++++++++++++++
-> > >   2 files changed, 23 insertions(+)
+> > > virtio_balloon_poll_free_page_hints()
+> > > {
 > > > 
-> > > diff --git a/include/migration/misc.h b/include/migration/misc.h
-> > > index 77fd4f5..fae1acf 100644
-> > > --- a/include/migration/misc.h
-> > > +++ b/include/migration/misc.h
-> > > @@ -14,11 +14,13 @@
-> > >   #ifndef MIGRATION_MISC_H
-> > >   #define MIGRATION_MISC_H
-> > > +#include "exec/cpu-common.h"
-> > >   #include "qemu/notify.h"
-> > >   /* migration/ram.c */
-> > >   void ram_mig_init(void);
-> > > +void qemu_guest_free_page_hint(void *addr, size_t len);
-> > >   /* migration/block.c */
-> > > diff --git a/migration/ram.c b/migration/ram.c
-> > > index 5e33e5c..e172798 100644
-> > > --- a/migration/ram.c
-> > > +++ b/migration/ram.c
-> > > @@ -2189,6 +2189,27 @@ static int ram_init_all(RAMState **rsp)
-> > >       return 0;
-> > >   }
-> > This could do with some comments
+> > >      while (1) {
+> > >          qemu_spin_lock();
+> > >          if (dev->free_page_report_status >= FREE_PAGE_REPORT_S_STOP ||
+> > >              !runstate_is_running()) {
+> > >              qemu_spin_unlock();
+> > >              break;
+> > >          }
+> > >          ...
+> > >          if (id == dev->free_page_report_cmd_id) {
+> > > ==>        dev->free_page_report_status = FREE_PAGE_REPORT_S_START;
+> > >          ...
+> > >          qemu_spin_unlock();
+> > >      }
+> > > }
+> > > 
+> > > 
+> > > static void virtio_balloon_free_page_stop(void *opaque)
+> > > {
+> > >      VirtIOBalloon *s = opaque;
+> > >      VirtIODevice *vdev = VIRTIO_DEVICE(s);
+> > > 
+> > >      qemu_spin_lock();
+> > > ...
+> > > ==>       s->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
+> > >      ...
+> > >      qemu_spin_unlock();
+> > > }
+> > > 
+> > > 
+> > > Without the lock, there are theoretical possibilities that assigning STOP
+> > > below is overridden by START above. In that
+> > > case,virtio_balloon_free_page_stop does not effectively stop
+> > > virtio_balloon_poll_free_page_hints.
+> > > I think this issue couldn't be solved by BHs.
+> > > 
+> > > Best,
+> > > Wei
+> > Don't all BHs run under the BQL?
 > 
-> OK, I'll add some.
-> 
-> > 
-> > > +void qemu_guest_free_page_hint(void *addr, size_t len)
-> > > +{
-> > > +    RAMBlock *block;
-> > > +    ram_addr_t offset;
-> > > +    size_t used_len, start, npages;
-> >  From your use I think the addr and len are coming raw from the guest;
-> > so we need to take some care.
-> > 
-> 
-> Actually the "addr" here has been the host address that corresponds to the
-> guest free page. It's from elem->in_sg[0].iov_base.
-> 
-> > 
-> > > +        if (unlikely(offset + len > block->used_length)) {
-> > I think to make that overflow safe, that should be:
-> >    if (len > (block->used_length - offset)) {
-> > 
-> > But we'll need another test before it, because qemu_ram_block_from_host
-> > seems to check max_length not used_length, so we need to check
-> > for offset > block->used_length first
-> 
-> OK, how about adding an assert above, like this:
-> 
-> block = qemu_ram_block_from_host(addr, false, &offset);
-> assert (offset  < block->used_length );
-> if (!block)
->     ...
-> 
-> The address corresponds to a guest free page, which means it should be
-> within used_length. If not, something weird happens, I think we'd better to
-> assert it in that case.
+> Actually the virtio_balloon_free_page_stop is called by the migration thread
+> (instead of a BH). Even we guarantee the migration thread calls
+> virtio_balloon_free_page_stop under BQL, the BQL is still too big for our
+> case. Imagine this case: when the migration thread calls
+> virtio_balloon_free_page_stop to stop the reporting, it blocks by BQL as
+> virtio_balloon_poll_free_page_hints is in progress with BQL held, and the
+> migration thread won't proceed untill virtio_balloon_poll_free_page_hints
+> exits (i.e. getting all the hints). I think this isn't our intention - we
+> basically want the migration thread to stop the guest reporting immediately.
+> So I think the small lock above is better (it locks for only one hint).
 > 
 > Best,
 > Wei
 
-What if memory has been removed by hotunplug after guest sent the
-free page notification?
-
-This seems to actually be likely to happen as memory being unplugged
-would typically be mostly free.
+I am just saying that all these locking and ownership tricks need to be
+documented. BH would be much simpler.
 
 -- 
 MST
