@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ewKMJ-00074O-H5
+	(envelope-from <dgibson@ozlabs.org>) id 1ewKMJ-000748-D0
 	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 00:19:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ewKMF-00041j-Fw
+	(envelope-from <dgibson@ozlabs.org>) id 1ewKMI-000442-Cf
 	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 00:19:19 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 15 Mar 2018 15:18:58 +1100
-Message-Id: <20180315041903.10046-5-david@gibson.dropbear.id.au>
+Date: Thu, 15 Mar 2018 15:19:01 +1100
+Message-Id: <20180315041903.10046-8-david@gibson.dropbear.id.au>
 In-Reply-To: <20180315041903.10046-1-david@gibson.dropbear.id.au>
 References: <20180315041903.10046-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 4/9] hw/misc/macio: Mark the macio devices with
- user_creatable = false
+Subject: [Qemu-devel] [PULL 7/9] ppc440_pcix: Change some error_report to
+ qemu_log_mask(LOG_UNIMP, ...)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,41 +21,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, lvivier@redhat.com, surajjs@au1.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, lvivier@redhat.com, surajjs@au1.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Thomas Huth <thuth@redhat.com>
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-The macio devices currently cause a crash when the user tries to
-instantiate them on a different machine:
+Using log unimp is more appropriate for these messages and this also
+silences them by default so they won't clobber make check output when
+tests are added for this board.
 
-$ ppc64-softmmu/qemu-system-ppc64 -device macio-newworld
-Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:222:
-qemu-system-ppc64: -device macio-newworld: Device 'serial0' is in use
-Aborted (core dumped)
-
-These devices are clearly not intended to be creatable by the user
-since they are using serial_hds[] directly in their instance_init
-function. So let's mark them with user_creatable = false.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/misc/macio/macio.c | 2 ++
- 1 file changed, 2 insertions(+)
+ hw/ppc/ppc440_pcix.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-index af1bd46b4b..454244f59e 100644
---- a/hw/misc/macio/macio.c
-+++ b/hw/misc/macio/macio.c
-@@ -406,6 +406,8 @@ static void macio_class_init(ObjectClass *klass, void *data)
-     k->class_id = PCI_CLASS_OTHERS << 8;
-     dc->props = macio_properties;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-+    /* Reason: Uses serial_hds in macio_instance_init */
-+    dc->user_creatable = false;
- }
+diff --git a/hw/ppc/ppc440_pcix.c b/hw/ppc/ppc440_pcix.c
+index ab2626a9de..b1307e6477 100644
+--- a/hw/ppc/ppc440_pcix.c
++++ b/hw/ppc/ppc440_pcix.c
+@@ -21,6 +21,7 @@
  
- static const TypeInfo macio_oldworld_type_info = {
+ #include "qemu/osdep.h"
+ #include "qemu/error-report.h"
++#include "qemu/log.h"
+ #include "hw/hw.h"
+ #include "hw/ppc/ppc.h"
+ #include "hw/ppc/ppc4xx.h"
+@@ -286,8 +287,9 @@ static void ppc440_pcix_reg_write4(void *opaque, hwaddr addr,
+         break;
+ 
+     default:
+-        error_report("%s: unhandled PCI internal register 0x%lx", __func__,
+-                     (unsigned long)addr);
++        qemu_log_mask(LOG_UNIMP,
++                      "%s: unhandled PCI internal register 0x%"HWADDR_PRIx"\n",
++                      __func__, addr);
+         break;
+     }
+ }
+@@ -377,8 +379,9 @@ static uint64_t ppc440_pcix_reg_read4(void *opaque, hwaddr addr,
+         break;
+ 
+     default:
+-        error_report("%s: invalid PCI internal register 0x%lx", __func__,
+-                     (unsigned long)addr);
++        qemu_log_mask(LOG_UNIMP,
++                      "%s: invalid PCI internal register 0x%" HWADDR_PRIx "\n",
++                      __func__, addr);
+         val = 0;
+     }
+ 
 -- 
 2.14.3
