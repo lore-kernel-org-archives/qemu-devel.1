@@ -1,27 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ewZ5G-00030N-Fb
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 16:02:43 -0400
+	(envelope-from <jusual@mail.ru>) id 1ewZ9j-0005EM-22
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 16:07:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ewZ5D-0006Gt-D4
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 16:02:42 -0400
-Received: from mail-pl0-x230.google.com ([2607:f8b0:400e:c01::230]:43989)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ewZ5D-0006GE-6B
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 16:02:39 -0400
-Received: by mail-pl0-x230.google.com with SMTP id f23-v6so4434162plr.10
-	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 13:02:39 -0700 (PDT)
-References: <871sgwmcc3.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b8642b07-307a-6109-6350-e7830a1b7842@linaro.org>
-Date: Fri, 16 Mar 2018 04:02:33 +0800
-MIME-Version: 1.0
-In-Reply-To: <871sgwmcc3.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Using new TCG Vector infrastructure in PowerPC
+	(envelope-from <jusual@mail.ru>) id 1ewZ9f-0000C8-QE
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 16:07:18 -0400
+Received: from smtp52.i.mail.ru ([94.100.177.112]:39354)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1ewZ9f-0000An-Er
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 16:07:15 -0400
+From: Julia Suvorova <jusual@mail.ru>
+Date: Thu, 15 Mar 2018 23:06:32 +0300
+Message-Id: <1521144392-26203-1-git-send-email-jusual@mail.ru>
+Subject: [Qemu-devel] [PATCH] net/vde: print error on vde_open() failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,32 +21,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Jim Mussared <jim@groklearning.com>, Joel Stanley <joel@jms.id.au>, Julia Suvorova <jusual@mail.ru>
 
-On 03/07/2018 06:03 PM, Nikunj A Dadhania wrote:
-> Hi Richard,
-> 
-> I was working to get TCG vector support for PowerPC[1]. Started with
-> converting logical operations like vector AND/OR/XOR and compare
-> instructions. Found some inconsistency during my testing on x86 laptop
-> emulating PowerPC:
+Despite the fact that now when the initialization of vde fails, qemu
+does not end silently, no informative error is printed. The patch
+generates an error and pushes it through the calling function.
 
-Great.
+Related bug: https://bugs.launchpad.net/qemu/+bug/676029
 
-Well, the problem is that you cannot use TCG generic vectors and TCG global
-variables to access the same memory.
+Signed-off-by: Julia Suvorova <jusual@mail.ru>
+---
+ net/vde.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-Thus your first step must be to remove all references to cpu_avrh and cpu_avrl.
- These can be replaced by translator helpers that perform an explicit
-tcg_gen_ld_i64 or tcg_gen_st_i64 to the proper memory locations.
-
-Only after that's done can you begin converting other references to use the
-host vectors.  Otherwise, the tcg optimizer will do Bad and Unpredictable
-Things, which may well have produced the incorrect results that you saw.
-
-I'll note that it's probably worth rearranging all of {fpr,vsr,avr} to the more
-logical configuration presented by Power7 (?) such that it's one array of 64 x
-128-bit registers.
-
-
-r~
+diff --git a/net/vde.c b/net/vde.c
+index e50e5d6..99189cc 100644
+--- a/net/vde.c
++++ b/net/vde.c
+@@ -30,6 +30,7 @@
+ #include "qemu-common.h"
+ #include "qemu/option.h"
+ #include "qemu/main-loop.h"
++#include "qapi/error.h"
+ 
+ typedef struct VDEState {
+     NetClientState nc;
+@@ -76,7 +77,7 @@ static NetClientInfo net_vde_info = {
+ 
+ static int net_vde_init(NetClientState *peer, const char *model,
+                         const char *name, const char *sock,
+-                        int port, const char *group, int mode)
++                        int port, const char *group, int mode, Error **errp)
+ {
+     NetClientState *nc;
+     VDEState *s;
+@@ -92,6 +93,7 @@ static int net_vde_init(NetClientState *peer, const char *model,
+ 
+     vde = vde_open(init_sock, (char *)"QEMU", &args);
+     if (!vde){
++        error_setg_errno(errp, errno, "Could not open vde");
+         return -1;
+     }
+ 
+@@ -112,7 +114,6 @@ static int net_vde_init(NetClientState *peer, const char *model,
+ int net_init_vde(const Netdev *netdev, const char *name,
+                  NetClientState *peer, Error **errp)
+ {
+-    /* FIXME error_setg(errp, ...) on failure */
+     const NetdevVdeOptions *vde;
+ 
+     assert(netdev->type == NET_CLIENT_DRIVER_VDE);
+@@ -120,7 +121,7 @@ int net_init_vde(const Netdev *netdev, const char *name,
+ 
+     /* missing optional values have been initialized to "all bits zero" */
+     if (net_vde_init(peer, "vde", name, vde->sock, vde->port, vde->group,
+-                     vde->has_mode ? vde->mode : 0700) == -1) {
++                     vde->has_mode ? vde->mode : 0700, errp) == -1) {
+         return -1;
+     }
+ 
+-- 
+2.1.4
