@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ewS2j-0005rs-Ek
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 08:31:38 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ewS3i-0006Qw-E5
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 08:32:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ewS2f-00019Q-F1
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 08:31:37 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180313153458.26822-1-peter.maydell@linaro.org>
-	<20180313153458.26822-10-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <1d6ab08a-c21d-8a8d-abdd-b99a40605787@amsat.org>
-Date: Thu, 15 Mar 2018 13:31:30 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1ewS3f-0002bb-9V
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 08:32:38 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52278 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ewS3f-0002b7-48
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 08:32:35 -0400
+Date: Thu, 15 Mar 2018 12:32:29 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180315123228.GH3062@work-vm>
+References: <20180313075739.11194-1-xiaoguangrong@tencent.com>
+	<20180313075739.11194-9-xiaoguangrong@tencent.com>
 MIME-Version: 1.0
-In-Reply-To: <20180313153458.26822-10-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 9/9] hw/arm/raspi: Provide spin-loop code
- for AArch64 CPUs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180313075739.11194-9-xiaoguangrong@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH 8/8] migration: remove
+ ram_save_compressed_page()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,110 +28,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Pekka Enberg <penberg@iki.fi>, Andrew Baumann <Andrew.Baumann@microsoft.com>
+To: guangrong.xiao@gmail.com, quintela@redhat.com
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
 
-On 03/13/2018 04:34 PM, Peter Maydell wrote:
-> The raspi3 has AArch64 CPUs, which means that our smpboot
-> code for keeping the secondary CPUs in a pen needs to have
-> a version for A64 as well as A32. Without this, the
-> secondary CPUs go into an infinite loop of taking undefined
-> instruction exceptions.
+* guangrong.xiao@gmail.com (guangrong.xiao@gmail.com) wrote:
+> From: Xiao Guangrong <xiaoguangrong@tencent.com>
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Now, we can reuse the path in ram_save_page() to post the page out
+> as normal, then the only thing remained in ram_save_compressed_page()
+> is compression that we can move it out to the caller
+> 
+> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+
+Thanks, that does simplify stuff a lot in the end!
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
 > ---
->  hw/arm/raspi.c | 41 ++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 40 insertions(+), 1 deletion(-)
+>  migration/ram.c | 45 ++++++++-------------------------------------
+>  1 file changed, 8 insertions(+), 37 deletions(-)
 > 
-> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-> index ae15997669..06f1e08ca9 100644
-> --- a/hw/arm/raspi.c
-> +++ b/hw/arm/raspi.c
-> @@ -27,6 +27,7 @@
->  #define BOARDSETUP_ADDR (MVBAR_ADDR + 0x20) /* board setup code */
->  #define FIRMWARE_ADDR_2 0x8000 /* Pi 2 loads kernel.img here by default */
->  #define FIRMWARE_ADDR_3 0x80000 /* Pi 3 loads kernel.img here by default */
-> +#define SPINTABLE_ADDR  0xd8 /* Pi 3 bootloader spintable */
->  
->  /* Table of Linux board IDs for different Pi versions */
->  static const int raspi_boardid[] = {[1] = 0xc42, [2] = 0xc43, [3] = 0xc44};
-> @@ -63,6 +64,40 @@ static void write_smpboot(ARMCPU *cpu, const struct arm_boot_info *info)
->                         info->smp_loader_start);
+> diff --git a/migration/ram.c b/migration/ram.c
+> index f778627992..8f4f8aca86 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1162,41 +1162,6 @@ static int compress_page_with_multi_thread(RAMState *rs, RAMBlock *block,
+>      return pages;
 >  }
 >  
-> +static void write_smpboot64(ARMCPU *cpu, const struct arm_boot_info *info)
-> +{
-> +    /* Unlike the AArch32 version we don't need to call the board setup hook.
-> +     * The mechanism for doing the spin-table is also entirely different.
-> +     * We must have four 64-bit fields at absolute addresses
-> +     * 0xd8, 0xe0, 0xe8, 0xf0 in RAM, which are the flag variables for
-> +     * our CPUs, and which we must ensure are zero initialized before
-> +     * the primary CPU goes into the kernel. We put these variables inside
-> +     * a rom blob, so that the reset for ROM contents zeroes them for us.
-> +     */
-
-Checking with Linux doc/Documentation/arm64/booting.txt and
-arch/arm/boot/dts/bcm2837.dtsi.
-
-> +    static const uint32_t smpboot[] = {
-> +        0xd2801b05, /*        mov     x5, 0xd8 */
-
-x5 = &spintable;
-
-> +        0xd53800a6, /*        mrs     x6, mpidr_el1 */
-> +        0x924004c6, /*        and     x6, x6, #0x3 */
-
-x6 = clusterid;
-
-> +        0xd503205f, /* spin:  wfe */
-> +        0xf86678a4, /*        ldr     x4, [x5,x6,lsl #3] */
-
-x4 = &spintable[clusterid];
-
-> +        0xb4ffffc4, /*        cbz     x4, spin */
-
-loop if !x4 ...
-
-> +        0xd2800000, /*        mov     x0, #0x0 */
-> +        0xd2800001, /*        mov     x1, #0x0 */
-> +        0xd2800002, /*        mov     x2, #0x0 */
-> +        0xd2800003, /*        mov     x3, #0x0 */
-> +        0xd61f0080, /*        br      x4 */
-
-... else jump()
-
-> +    };
-> +
-> +    static const uint64_t spintables[] = {
-> +        0, 0, 0, 0
-
-the "naturally-aligned 64-bit zero-initalised memory"
-
-> +    };
-> +
-> +    rom_add_blob_fixed("raspi_smpboot", smpboot, sizeof(smpboot),
-> +                       info->smp_loader_start);
-> +    rom_add_blob_fixed("raspi_spintables", spintables, sizeof(spintables),
-> +                       SPINTABLE_ADDR);
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> +}
-> +
->  static void write_board_setup(ARMCPU *cpu, const struct arm_boot_info *info)
->  {
->      arm_write_secure_board_setup_dummy_smc(cpu, info, MVBAR_ADDR);
-> @@ -99,7 +134,11 @@ static void setup_boot(MachineState *machine, int version, size_t ram_size)
->      /* Pi2 and Pi3 requires SMP setup */
->      if (version >= 2) {
->          binfo.smp_loader_start = SMPBOOT_ADDR;
-> -        binfo.write_secondary_boot = write_smpboot;
-> +        if (version == 2) {
-> +            binfo.write_secondary_boot = write_smpboot;
-> +        } else {
-> +            binfo.write_secondary_boot = write_smpboot64;
-> +        }
->          binfo.secondary_cpu_reset_hook = reset_secondary;
->      }
+> -/**
+> - * ram_save_compressed_page: compress the given page and send it to the stream
+> - *
+> - * Returns the number of pages written.
+> - *
+> - * @rs: current RAM state
+> - * @block: block that contains the page we want to send
+> - * @offset: offset inside the block for the page
+> - * @last_stage: if we are at the completion stage
+> - */
+> -static int ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
+> -                                    bool last_stage)
+> -{
+> -    int pages = -1;
+> -    uint8_t *p;
+> -    RAMBlock *block = pss->block;
+> -    ram_addr_t offset = pss->page << TARGET_PAGE_BITS;
+> -
+> -    p = block->host + offset;
+> -
+> -    if (block != rs->last_sent_block) {
+> -        /*
+> -         * Make sure the first page is sent out before other pages.
+> -         *
+> -         * we post it as normal page as compression will take much
+> -         * CPU resource.
+> -         */
+> -        pages = save_normal_page(rs, block, offset, p, true);
+> -    } else {
+> -        pages = compress_page_with_multi_thread(rs, block, offset);
+> -    }
+> -
+> -    return pages;
+> -}
+> -
+>  /**
+>   * find_dirty_block: find the next dirty page and update any state
+>   * associated with the search process.
+> @@ -1501,8 +1466,14 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
+>              goto page_saved;
+>          }
 >  
+> -        if (save_page_use_compression(rs)) {
+> -            res = ram_save_compressed_page(rs, pss, last_stage);
+> +        /*
+> +         * Make sure the first page is sent out before other pages.
+> +         *
+> +         * we post it as normal page as compression will take much
+> +         * CPU resource.
+> +         */
+> +        if (block == rs->last_sent_block && save_page_use_compression(rs)) {
+> +            res = compress_page_with_multi_thread(rs, block, offset);
+>          } else {
+>              res = ram_save_page(rs, pss, last_stage);
+>          }
+> -- 
+> 2.14.3
 > 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
