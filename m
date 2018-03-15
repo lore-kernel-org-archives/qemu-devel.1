@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ewT1h-00035u-4f
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:34:41 -0400
+	(envelope-from <clg@kaod.org>) id 1ewT1n-0003Ck-6m
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:34:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ewT1d-00026i-5G
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:34:37 -0400
-Received: from 14.mo4.mail-out.ovh.net ([46.105.40.29]:44136)
+	(envelope-from <clg@kaod.org>) id 1ewT1j-0002Bc-8k
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:34:43 -0400
+Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:58780)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ewT1c-00025O-Qo
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:34:33 -0400
-Received: from player734.ha.ovh.net (unknown [10.109.105.115])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 6D836157F28
-	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 14:34:31 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ewT1i-0002AR-MD
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:34:39 -0400
+Received: from player734.ha.ovh.net (unknown [10.109.105.37])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 2F351CE9AA
+	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 14:34:37 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 15 Mar 2018 13:34:01 +0000
-Message-Id: <20180315133402.13470-4-clg@kaod.org>
+Date: Thu, 15 Mar 2018 13:34:02 +0000
+Message-Id: <20180315133402.13470-5-clg@kaod.org>
 In-Reply-To: <20180315133402.13470-1-clg@kaod.org>
 References: <20180315133402.13470-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 3/4] target/ppc: add hash MMU support on
- POWER9 for PowerNV only
+Subject: [Qemu-devel] [PATCH v3 4/4] target/ppc: generalize check on radix
+ when in HV mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,295 +33,121 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-The HPTE bits definitions are slightly modified in ISA v3.0. Let's add
-some helpers to hide the differences in the hash MMU code.
-
-On a POWER9 processor, the Partition Table is composed of a pair of
-doublewords per partition. The first doubleword indicates whether the
-partition uses HPT or Radix Trees translation and contains the address
-of the host's translation table structure and size.
-
-The first doubleword of the PTCR holds the Hash Page Table base
-address for the host when the hash MMU is in use. Also add an helper
-to retrieve the HPT base address depending on the MMU revision.
+On a POWER9 processor, the first doubleword of the partition table
+entry (as pointed to by the PTCR) indicates whether the host uses HPT
+or Radix Tree translation for that partition. Use that bit to check
+for radix mode on pseries and powernv QEMU machines.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
 
  Changes since v2:
 
- - reworked ppc_hash64_hpt_reg() to cover only powernv machines. pseries
-   machines being handled with cpu->vhyp at the ppc_hash64_hpt_base()
-   level.
+ - reworked ppc64_v3_radix() to distinguish pseries machine from
+   powernv machines
+ - kept ppc64_radix_guest()
 
  Changes since v1:
 
+ - fixed commit log
  - introduced ppc64_v3_get_patbe0()
-=20
- hw/ppc/spapr_hcall.c       |  5 +++--
- target/ppc/mmu-book3s-v3.h |  5 +++++
- target/ppc/mmu-hash64.c    | 52 ++++++++++++++++++++++++++++++++++++++--=
-------
- target/ppc/mmu-hash64.h    | 34 ++++++++++++++++++++++++++++--
- 4 files changed, 83 insertions(+), 13 deletions(-)
+ - renamed ppc64_radix() in ppc64_v3_radix()
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 3215c3b4aec3..b437f8825819 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -94,7 +94,7 @@ static target_ulong h_enter(PowerPCCPU *cpu, sPAPRMachi=
-neState *spapr,
-         return H_PARAMETER;
-     }
+ target/ppc/mmu-book3s-v3.c | 23 +++++++++++++++++++++--
+ target/ppc/mmu-book3s-v3.h |  4 +++-
+ target/ppc/mmu_helper.c    |  4 ++--
+ 3 files changed, 26 insertions(+), 5 deletions(-)
+
+diff --git a/target/ppc/mmu-book3s-v3.c b/target/ppc/mmu-book3s-v3.c
+index b60df4408f3b..89edbb6abc5c 100644
+--- a/target/ppc/mmu-book3s-v3.c
++++ b/target/ppc/mmu-book3s-v3.c
+@@ -19,16 +19,35 @@
 =20
--    raddr =3D (ptel & HPTE64_R_RPN) & ~((1ULL << apshift) - 1);
-+    raddr =3D (ptel & ppc_hash64_hpte_r_rpn(cpu)) & ~((1ULL << apshift) =
-- 1);
+ #include "qemu/osdep.h"
+ #include "cpu.h"
++#include "qemu/error-report.h"
+ #include "mmu-hash64.h"
+ #include "mmu-book3s-v3.h"
+ #include "mmu-radix64.h"
 =20
-     if (is_ram_address(spapr, raddr)) {
-         /* Regular RAM - should have WIMG=3D0010 */
-@@ -586,7 +586,8 @@ static int rehash_hpte(PowerPCCPU *cpu,
-=20
-     base_pg_shift =3D ppc_hash64_hpte_page_shift_noslb(cpu, pte0, pte1);
-     assert(base_pg_shift); /* H_ENTER shouldn't allow a bad encoding */
--    avpn =3D HPTE64_V_AVPN_VAL(pte0) & ~(((1ULL << base_pg_shift) - 1) >=
-> 23);
-+    avpn =3D ppc_hash64_hpte_v_avpn_val(cpu, pte0) &
-+        ~(((1ULL << base_pg_shift) - 1) >> 23);
-=20
-     if (pte0 & HPTE64_V_SECONDARY) {
-         pteg =3D ~pteg;
-diff --git a/target/ppc/mmu-book3s-v3.h b/target/ppc/mmu-book3s-v3.h
-index fdf80987d7b2..a7ab580c3140 100644
---- a/target/ppc/mmu-book3s-v3.h
-+++ b/target/ppc/mmu-book3s-v3.h
-@@ -54,6 +54,11 @@ static inline bool ppc64_radix_guest(PowerPCCPU *cpu)
- int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
-                               int mmu_idx);
-=20
-+static inline hwaddr ppc64_v3_get_patbe0(PowerPCCPU *cpu)
-+{
-+    return ldq_phys(CPU(cpu)->as, cpu->env.spr[SPR_PTCR] & PTCR_PATB);
-+}
-+
- #endif /* TARGET_PPC64 */
-=20
- #endif /* CONFIG_USER_ONLY */
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index c9b72b742956..c425edd93ebe 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -289,6 +289,26 @@ target_ulong helper_load_slb_vsid(CPUPPCState *env, =
-target_ulong rb)
-     return rt;
- }
-=20
-+hwaddr ppc_hash64_hpt_reg(PowerPCCPU *cpu)
++bool ppc64_v3_radix(PowerPCCPU *cpu)
 +{
 +    CPUPPCState *env =3D &cpu->env;
 +
-+    /* We should not reach this routine on sPAPR machines */
-+    assert(!cpu->vhyp);
++    /* sPAPR machine */
++    if (cpu->vhyp) {
++        return ppc64_radix_guest(cpu);
++    }
 +
-+    /* PowerNV machine */
++    /* PowerNV machine - only HV mode is supported */
 +    if (msr_hv) {
-+        if (env->mmu_model & POWERPC_MMU_V3) {
-+            return ppc64_v3_get_patbe0(cpu);
-+        } else {
-+            return cpu->env.spr[SPR_SDR1];
-+        }
++        return ppc64_v3_get_patbe0(cpu) & PATBE0_HR;
 +    } else {
 +        error_report("PowerNV guest support Unimplemented");
 +        exit(1);
 +    }
 +}
 +
- /* Check No-Execute or Guarded Storage */
- static inline int ppc_hash64_pte_noexec_guard(PowerPCCPU *cpu,
-                                               ppc_hash_pte64_t pte)
-@@ -451,8 +471,9 @@ void ppc_hash64_unmap_hptes(PowerPCCPU *cpu, const pp=
-c_hash_pte64_t *hptes,
-                         false, n * HASH_PTE_SIZE_64);
- }
-=20
--static unsigned hpte_page_shift(const struct ppc_one_seg_page_size *sps,
--    uint64_t pte0, uint64_t pte1)
-+static unsigned hpte_page_shift(PowerPCCPU *cpu,
-+                                const struct ppc_one_seg_page_size *sps,
-+                                uint64_t pte0, uint64_t pte1)
+ int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+                               int mmu_idx)
  {
-     int i;
-=20
-@@ -478,7 +499,7 @@ static unsigned hpte_page_shift(const struct ppc_one_=
-seg_page_size *sps,
-             continue;
-         }
-=20
--        mask =3D ((1ULL << ps->page_shift) - 1) & HPTE64_R_RPN;
-+        mask =3D ((1ULL << ps->page_shift) - 1) & ppc_hash64_hpte_r_rpn(=
-cpu);
-=20
-         if ((pte1 & mask) =3D=3D ((uint64_t)ps->pte_enc << HPTE64_R_RPN_=
-SHIFT)) {
-             return ps->page_shift;
-@@ -488,6 +509,18 @@ static unsigned hpte_page_shift(const struct ppc_one=
-_seg_page_size *sps,
-     return 0; /* Bad page size encoding */
- }
-=20
-+static bool ppc_hash64_hpte_v_compare(PowerPCCPU *cpu, target_ulong pte0=
-,
-+                                      target_ulong ptem)
-+{
-+    CPUPPCState *env =3D &cpu->env;
-+
-+    if (env->mmu_model & POWERPC_MMU_V3) {
-+        return HPTE64_V_COMPARE_3_0(pte0, ptem);
+-    if (ppc64_radix_guest(cpu)) { /* Guest uses radix */
++    if (ppc64_v3_radix(cpu)) {
+         return ppc_radix64_handle_mmu_fault(cpu, eaddr, rwx, mmu_idx);
+-    } else { /* Guest uses hash */
 +    } else {
-+        return HPTE64_V_COMPARE(pte0, ptem);
-+    }
-+}
-+
- static hwaddr ppc_hash64_pteg_search(PowerPCCPU *cpu, hwaddr hash,
-                                      const struct ppc_one_seg_page_size =
-*sps,
-                                      target_ulong ptem,
-@@ -508,8 +541,8 @@ static hwaddr ppc_hash64_pteg_search(PowerPCCPU *cpu,=
- hwaddr hash,
-         pte1 =3D ppc_hash64_hpte1(cpu, pteg, i);
-=20
-         /* This compares V, B, H (secondary) and the AVPN */
--        if (HPTE64_V_COMPARE(pte0, ptem)) {
--            *pshift =3D hpte_page_shift(sps, pte0, pte1);
-+        if (ppc_hash64_hpte_v_compare(cpu, pte0, ptem)) {
-+            *pshift =3D hpte_page_shift(cpu, sps, pte0, pte1);
-             /*
-              * If there is no match, ignore the PTE, it could simply
-              * be for a different segment size encoding and the
-@@ -569,7 +602,8 @@ static hwaddr ppc_hash64_htab_lookup(PowerPCCPU *cpu,
-         epn =3D (eaddr & ~SEGMENT_MASK_256M) & epnmask;
-         hash =3D vsid ^ (epn >> sps->page_shift);
+         return ppc_hash64_handle_mmu_fault(cpu, eaddr, rwx, mmu_idx);
      }
--    ptem =3D (slb->vsid & SLB_VSID_PTEM) | ((epn >> 16) & HPTE64_V_AVPN)=
-;
-+    ptem =3D (slb->vsid & SLB_VSID_PTEM) | ((epn >> 16) &
-+                                          ppc_hash64_hpte_v_avpn(cpu));
-     ptem |=3D HPTE64_V_VALID;
-=20
-     /* Page address translation */
-@@ -624,7 +658,7 @@ unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU =
-*cpu,
-             break;
-         }
-=20
--        shift =3D hpte_page_shift(sps, pte0, pte1);
-+        shift =3D hpte_page_shift(cpu, sps, pte0, pte1);
-         if (shift) {
-             return shift;
-         }
-@@ -860,7 +894,7 @@ skip_slb_search:
-=20
-     /* 7. Determine the real address from the PTE */
-=20
--    raddr =3D deposit64(pte.pte1 & HPTE64_R_RPN, 0, apshift, eaddr);
-+    raddr =3D deposit64(pte.pte1 & ppc_hash64_hpte_r_rpn(cpu), 0, apshif=
-t, eaddr);
-=20
-     tlb_set_page(cs, eaddr & TARGET_PAGE_MASK, raddr & TARGET_PAGE_MASK,
-                  prot, mmu_idx, 1ULL << apshift);
-@@ -910,7 +944,7 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cpu=
-, target_ulong addr)
-         return -1;
-     }
-=20
--    return deposit64(pte.pte1 & HPTE64_R_RPN, 0, apshift, addr)
-+    return deposit64(pte.pte1 & ppc_hash64_hpte_r_rpn(cpu), 0, apshift, =
-addr)
-         & TARGET_PAGE_MASK;
  }
+diff --git a/target/ppc/mmu-book3s-v3.h b/target/ppc/mmu-book3s-v3.h
+index a7ab580c3140..9721791d2dd3 100644
+--- a/target/ppc/mmu-book3s-v3.h
++++ b/target/ppc/mmu-book3s-v3.h
+@@ -29,7 +29,8 @@
+ #define PTCR_PATS               0x000000000000001FULL /* Partition Table=
+ Size */
 =20
-diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
-index 0ade8d15d9e4..708f4f6d222a 100644
---- a/target/ppc/mmu-hash64.h
-+++ b/target/ppc/mmu-hash64.h
-@@ -69,8 +69,12 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
- #define HPTE64_V_SSIZE_SHIFT    62
- #define HPTE64_V_AVPN_SHIFT     7
- #define HPTE64_V_AVPN           0x3fffffffffffff80ULL
-+#define HPTE64_V_AVPN_3_0       0x000fffffffffff80ULL
- #define HPTE64_V_AVPN_VAL(x)    (((x) & HPTE64_V_AVPN) >> HPTE64_V_AVPN_=
-SHIFT)
-+#define HPTE64_V_AVPN_VAL_3_0(x)                        \
-+    (((x) & HPTE64_V_AVPN_3_0) >> HPTE64_V_AVPN_SHIFT)
- #define HPTE64_V_COMPARE(x, y)  (!(((x) ^ (y)) & 0xffffffffffffff83ULL))
-+#define HPTE64_V_COMPARE_3_0(x, y)  (!(((x) ^ (y)) & 0x3fffffffffffff83U=
-LL))
- #define HPTE64_V_BOLTED         0x0000000000000010ULL
- #define HPTE64_V_LARGE          0x0000000000000004ULL
- #define HPTE64_V_SECONDARY      0x0000000000000002ULL
-@@ -81,6 +85,7 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
- #define HPTE64_R_KEY_HI         0x3000000000000000ULL
- #define HPTE64_R_RPN_SHIFT      12
- #define HPTE64_R_RPN            0x0ffffffffffff000ULL
-+#define HPTE64_R_RPN_3_0        0x01fffffffffff000ULL
- #define HPTE64_R_FLAGS          0x00000000000003ffULL
- #define HPTE64_R_PP             0x0000000000000003ULL
- #define HPTE64_R_N              0x0000000000000004ULL
-@@ -98,6 +103,31 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
- #define HPTE64_V_1TB_SEG        0x4000000000000000ULL
- #define HPTE64_V_VRMA_MASK      0x4001ffffff000000ULL
+ /* Partition Table Entry Fields */
+-#define PATBE1_GR 0x8000000000000000
++#define PATBE0_HR               PPC_BIT(0)            /* 1:Host Radix  0=
+:HPT  */
++#define PATBE1_GR               PPC_BIT(0)            /* 1:Guest Radix 0=
+:HPT  */
 =20
-+static inline target_ulong ppc_hash64_hpte_r_rpn(PowerPCCPU *cpu)
-+{
-+    CPUPPCState *env =3D &cpu->env;
-+
-+    return env->mmu_model & POWERPC_MMU_V3 ? HPTE64_R_RPN_3_0 : HPTE64_R=
-_RPN;
-+}
-+
-+static inline target_ulong ppc_hash64_hpte_v_avpn(PowerPCCPU *cpu)
-+{
-+    CPUPPCState *env =3D &cpu->env;
-+
-+    return env->mmu_model & POWERPC_MMU_V3 ? HPTE64_V_AVPN_3_0 : HPTE64_=
-V_AVPN;
-+}
-+
-+static inline target_ulong ppc_hash64_hpte_v_avpn_val(PowerPCCPU *cpu,
-+                                                      target_ulong pte0)
-+{
-+    CPUPPCState *env =3D &cpu->env;
-+
-+    return env->mmu_model & POWERPC_MMU_V3 ?
-+        HPTE64_V_AVPN_VAL_3_0(pte0) : HPTE64_V_AVPN_VAL(pte0);
-+}
-+
-+hwaddr ppc_hash64_hpt_reg(PowerPCCPU *cpu);
-+
- static inline hwaddr ppc_hash64_hpt_base(PowerPCCPU *cpu)
- {
-     if (cpu->vhyp) {
-@@ -105,7 +135,7 @@ static inline hwaddr ppc_hash64_hpt_base(PowerPCCPU *=
-cpu)
-             PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-         return vhc->hpt_base(cpu->vhyp);
-     }
--    return cpu->env.spr[SPR_SDR1] & SDR_64_HTABORG;
-+    return ppc_hash64_hpt_reg(cpu) & SDR_64_HTABORG;
+ /* Process Table Entry */
+ struct prtb_entry {
+@@ -50,6 +51,7 @@ static inline bool ppc64_radix_guest(PowerPCCPU *cpu)
+=20
+     return !!(vhc->get_patbe(cpu->vhyp) & PATBE1_GR);
  }
++bool ppc64_v3_radix(PowerPCCPU *cpu);
 =20
- static inline hwaddr ppc_hash64_hpt_mask(PowerPCCPU *cpu)
-@@ -115,7 +145,7 @@ static inline hwaddr ppc_hash64_hpt_mask(PowerPCCPU *=
-cpu)
-             PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-         return vhc->hpt_mask(cpu->vhyp);
-     }
--    return (1ULL << ((cpu->env.spr[SPR_SDR1] & SDR_64_HTABSIZE) + 18 - 7=
-)) - 1;
-+    return (1ULL << ((ppc_hash64_hpt_reg(cpu) & SDR_64_HTABSIZE) + 18 - =
-7)) - 1;
- }
-=20
- struct ppc_hash_pte64 {
+ int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+                               int mmu_idx);
+diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
+index 03009eee723a..fba203cdef18 100644
+--- a/target/ppc/mmu_helper.c
++++ b/target/ppc/mmu_helper.c
+@@ -1285,7 +1285,7 @@ void dump_mmu(FILE *f, fprintf_function cpu_fprintf=
+, CPUPPCState *env)
+         dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
+         break;
+     case POWERPC_MMU_VER_3_00:
+-        if (ppc64_radix_guest(ppc_env_get_cpu(env))) {
++        if (ppc64_v3_radix(ppc_env_get_cpu(env))) {
+             /* TODO - Unsupported */
+         } else {
+             dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
+@@ -1431,7 +1431,7 @@ hwaddr ppc_cpu_get_phys_page_debug(CPUState *cs, va=
+ddr addr)
+     case POWERPC_MMU_VER_2_07:
+         return ppc_hash64_get_phys_page_debug(cpu, addr);
+     case POWERPC_MMU_VER_3_00:
+-        if (ppc64_radix_guest(ppc_env_get_cpu(env))) {
++        if (ppc64_v3_radix(ppc_env_get_cpu(env))) {
+             return ppc_radix64_get_phys_page_debug(cpu, addr);
+         } else {
+             return ppc_hash64_get_phys_page_debug(cpu, addr);
 --=20
 2.13.6
