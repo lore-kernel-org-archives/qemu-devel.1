@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ewS3i-0006Qw-E5
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 08:32:42 -0400
+	(envelope-from <eblake@redhat.com>) id 1ewSM9-0003BD-Cp
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 08:51:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ewS3f-0002bb-9V
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 08:32:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52278 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1ewSM5-00032L-HT
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 08:51:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55352 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ewS3f-0002b7-48
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 08:32:35 -0400
-Date: Thu, 15 Mar 2018 12:32:29 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180315123228.GH3062@work-vm>
-References: <20180313075739.11194-1-xiaoguangrong@tencent.com>
-	<20180313075739.11194-9-xiaoguangrong@tencent.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ewSM5-00031a-CH
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 08:51:37 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 831AE7CBBA
+	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 12:51:25 +0000 (UTC)
+Received: from red.redhat.com (ovpn-121-135.rdu2.redhat.com [10.10.121.135])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4D4491208F79
+	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 12:51:21 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Thu, 15 Mar 2018 07:51:16 -0500
+Message-Id: <20180315125116.804342-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180313075739.11194-9-xiaoguangrong@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH 8/8] migration: remove
- ram_save_compressed_page()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 for-2.12] qapi: Pass '-u' when doing
+ non-silent diff
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,92 +34,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: guangrong.xiao@gmail.com, quintela@redhat.com
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
+To: qemu-devel@nongnu.org
 
-* guangrong.xiao@gmail.com (guangrong.xiao@gmail.com) wrote:
-> From: Xiao Guangrong <xiaoguangrong@tencent.com>
-> 
-> Now, we can reuse the path in ram_save_page() to post the page out
-> as normal, then the only thing remained in ram_save_compressed_page()
-> is compression that we can move it out to the caller
-> 
-> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+Ed-script diffs are awful compared to context diffs.  Fix another
+'diff -q' while in the area (if the files are different, being
+noisy makes it easier to diagnose why).
 
-Thanks, that does simplify stuff a lot in the end!
+While at it, diff .err before .out, because if a test fails, .err
+is more likely to contain the most important information for
+fixing the failure.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Fixes: 46ec4fce
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-> ---
->  migration/ram.c | 45 ++++++++-------------------------------------
->  1 file changed, 8 insertions(+), 37 deletions(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index f778627992..8f4f8aca86 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -1162,41 +1162,6 @@ static int compress_page_with_multi_thread(RAMState *rs, RAMBlock *block,
->      return pages;
->  }
->  
-> -/**
-> - * ram_save_compressed_page: compress the given page and send it to the stream
-> - *
-> - * Returns the number of pages written.
-> - *
-> - * @rs: current RAM state
-> - * @block: block that contains the page we want to send
-> - * @offset: offset inside the block for the page
-> - * @last_stage: if we are at the completion stage
-> - */
-> -static int ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
-> -                                    bool last_stage)
-> -{
-> -    int pages = -1;
-> -    uint8_t *p;
-> -    RAMBlock *block = pss->block;
-> -    ram_addr_t offset = pss->page << TARGET_PAGE_BITS;
-> -
-> -    p = block->host + offset;
-> -
-> -    if (block != rs->last_sent_block) {
-> -        /*
-> -         * Make sure the first page is sent out before other pages.
-> -         *
-> -         * we post it as normal page as compression will take much
-> -         * CPU resource.
-> -         */
-> -        pages = save_normal_page(rs, block, offset, p, true);
-> -    } else {
-> -        pages = compress_page_with_multi_thread(rs, block, offset);
-> -    }
-> -
-> -    return pages;
-> -}
-> -
->  /**
->   * find_dirty_block: find the next dirty page and update any state
->   * associated with the search process.
-> @@ -1501,8 +1466,14 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
->              goto page_saved;
->          }
->  
-> -        if (save_page_use_compression(rs)) {
-> -            res = ram_save_compressed_page(rs, pss, last_stage);
-> +        /*
-> +         * Make sure the first page is sent out before other pages.
-> +         *
-> +         * we post it as normal page as compression will take much
-> +         * CPU resource.
-> +         */
-> +        if (block == rs->last_sent_block && save_page_use_compression(rs)) {
-> +            res = compress_page_with_multi_thread(rs, block, offset);
->          } else {
->              res = ram_save_page(rs, pss, last_stage);
->          }
-> -- 
-> 2.14.3
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+---
+v2: diff .err first [Markus], R-b added (since swapping lines is trivial)
+
+Extracted from a larger '0/3 QAPI file renames' series; this patch
+is reasonable for inclusion during softfreeze, so I'll queue it through
+my QAPI tree.
+---
+ tests/Makefile.include | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index ef9b88c3694..5d8c730bf46 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -926,14 +926,14 @@ $(patsubst %, check-%, $(check-qapi-schema-y)): che=
+ck-%.json: $(SRC_PATH)/%.json
+ 		$^ >$*.test.out 2>$*.test.err; \
+ 		echo $$? >$*.test.exit, \
+ 		"TEST","$*.out")
+-	@diff $(SRC_PATH)/$*.out $*.test.out
+ 	@# Sanitize error messages (make them independent of build directory)
+-	@perl -p -e 's|\Q$(SRC_PATH)\E/||g' $*.test.err | diff $(SRC_PATH)/$*.e=
+rr -
+-	@diff $(SRC_PATH)/$*.exit $*.test.exit
++	@perl -p -e 's|\Q$(SRC_PATH)\E/||g' $*.test.err | diff -u $(SRC_PATH)/$=
+*.err -
++	@diff -u $(SRC_PATH)/$*.out $*.test.out
++	@diff -u $(SRC_PATH)/$*.exit $*.test.exit
+
+ .PHONY: check-tests/qapi-schema/doc-good.texi
+ check-tests/qapi-schema/doc-good.texi: tests/qapi-schema/doc-good.test.t=
+exi
+-	@diff -q $(SRC_PATH)/tests/qapi-schema/doc-good.texi $<
++	@diff -u $(SRC_PATH)/tests/qapi-schema/doc-good.texi $<
+
+ .PHONY: check-decodetree
+ check-decodetree:
+--=20
+2.14.3
