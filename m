@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ewUYw-000360-F4
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 11:13:08 -0400
+	(envelope-from <James.Cowgill@mips.com>) id 1ewUbs-0005WW-Ln
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 11:16:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ewUYv-0007oQ-FL
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 11:13:02 -0400
-Received: from mail-ot0-x22b.google.com ([2607:f8b0:4003:c0f::22b]:38865)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ewUYv-0007nz-A4
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 11:13:01 -0400
-Received: by mail-ot0-x22b.google.com with SMTP id 95-v6so7202468ote.5
-	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 08:13:01 -0700 (PDT)
+	(envelope-from <James.Cowgill@mips.com>) id 1ewUbo-0001gw-KR
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 11:16:04 -0400
+Received: from 9pmail.ess.barracuda.com ([64.235.154.210]:54708)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <James.Cowgill@mips.com>)
+	id 1ewUbo-0001K5-4G
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 11:16:00 -0400
+From: James Cowgill <james.cowgill@mips.com>
+Date: Thu, 15 Mar 2018 15:13:48 +0000
+Message-ID: <20180315151348.6451-1-james.cowgill@mips.com>
+In-Reply-To: <20180314153121.23838-1-james.cowgill@mips.com>
+References: <20180314153121.23838-1-james.cowgill@mips.com>
 MIME-Version: 1.0
-In-Reply-To: <20180313164625.4646-1-alex.bennee@linaro.org>
-References: <20180313164625.4646-1-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Mar 2018 15:12:40 +0000
-Message-ID: <CAFEAcA-h2jopPozaya0HQf4K5Cv7yOq2cfXmz4hFOftibscMGg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/3] Reduce Travis timeouts
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] linux-user: implement HWCAP bits on MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +26,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>
+To: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Cc: Richard Henderson <richard.henderson@linaro.org>, James Cowgill <james.cowgill@mips.com>
 
-On 13 March 2018 at 16:46, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
-> The following changes since commit 22ef7ba8e8ce7fef297549b3defcac333742b8=
-04:
->
->   Merge remote-tracking branch 'remotes/famz/tags/staging-pull-request' i=
-nto staging (2018-03-13 11:42:45 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/stsquad/qemu.git tags/pull-travis-speedup-130318-1
->
-> for you to fetch changes up to 0b438fa627ca192e4be2c527bf188706d64bdd0d:
->
->   .travis.yml: add --disable-user with the rest of the disables (2018-03-=
-13 16:22:23 +0000)
->
-> ----------------------------------------------------------------
-> Some updates to reduce timeouts in Travis
->
-> ----------------------------------------------------------------
-> Alex Benn=C3=A9e (3):
->       .travis.yml: drop setting default log output
->       .travis.yml: split default config into system and user
->       .travis.yml: add --disable-user with the rest of the disables
->
->  .travis.yml | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+Add support for the two currently defined HWCAP bits on MIPS - R6 and
+MSA.
 
-Applied, thanks.
+Buglink: https://bugs.launchpad.net/qemu/+bug/1754372
+Signed-off-by: James Cowgill <james.cowgill@mips.com>
+---
+v2 changes:
+ - Fix kernel hwcap.h path.
 
--- PMM
+ linux-user/elfload.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 5fc130cc20..318c124712 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -950,6 +950,30 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUMIPSState *e
+ #define USE_ELF_CORE_DUMP
+ #define ELF_EXEC_PAGESIZE        4096
+ 
++/* See arch/mips/include/uapi/asm/hwcap.h.  */
++enum {
++    HWCAP_MIPS_R6           = (1 << 0),
++    HWCAP_MIPS_MSA          = (1 << 1),
++};
++
++#define ELF_HWCAP get_elf_hwcap()
++
++static uint32_t get_elf_hwcap(void)
++{
++    MIPSCPU *cpu = MIPS_CPU(thread_cpu);
++    uint32_t hwcaps = 0;
++
++#define GET_FEATURE(flag, hwcap) \
++    do { if (cpu->env.insn_flags & (flag)) { hwcaps |= hwcap; } } while (0)
++
++    GET_FEATURE(ISA_MIPS32R6 | ISA_MIPS64R6, HWCAP_MIPS_R6);
++    GET_FEATURE(ASE_MSA, HWCAP_MIPS_MSA);
++
++#undef GET_FEATURE
++
++    return hwcaps;
++}
++
+ #endif /* TARGET_MIPS */
+ 
+ #ifdef TARGET_MICROBLAZE
+-- 
+2.16.2
