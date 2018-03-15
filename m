@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jack.schwartz@oracle.com>) id 1ewLSK-000144-0a
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 01:29:36 -0400
+	(envelope-from <jack.schwartz@oracle.com>) id 1ewLSd-0001Nc-Rt
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 01:29:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jack.schwartz@oracle.com>) id 1ewLSG-00010X-R7
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 01:29:36 -0400
+	(envelope-from <jack.schwartz@oracle.com>) id 1ewLSa-00018L-Nt
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 01:29:55 -0400
 References: <20180314173213.18563-1-kwolf@redhat.com>
+	<20180314173213.18563-2-kwolf@redhat.com>
 From: Jack Schwartz <jack.schwartz@oracle.com>
-Message-ID: <75f404ed-70f5-dba5-17bb-e7302caa05af@oracle.com>
-Date: Wed, 14 Mar 2018 22:19:25 -0700
+Message-ID: <4ab6eff1-f4c2-1e04-5fa8-cc71c3bf308d@oracle.com>
+Date: Wed, 14 Mar 2018 22:19:27 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180314173213.18563-1-kwolf@redhat.com>
+In-Reply-To: <20180314173213.18563-2-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/5] multiboot: Fix buffer overflow on
- invalid kernels
+Subject: Re: [Qemu-devel] [PATCH 1/5] multiboot: Reject kernels exceeding
+ the address space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +30,53 @@ Cc: qemu-stable@nongnu.org, anatol.pomozov@gmail.com, ppandit@redhat.com
 
 Hi Kevin.
 
-I see an issue with the commit message of patch 1; please see my reply=20
-to that patch for details.=C2=A0 I fully understand patches 1,2,3, patch =
-4=20
-except for some of the Makefile black magic, and patch 5 looks=20
-reasonable to me.
+My comments are inline...
 
-So, for patches 2,3,4,5:
+On 2018-03-14 10:32, Kevin Wolf wrote:
+> The code path with a manually set mh_load_addr in the Multiboot header
+> checks that load_end_addr <=3D load_addr, but the path where load_end_a=
+ddr
+> is automatically detected if 0 is given in the header misses the
+> corresponding check.
+1) The code checks that load_end_addr >=3D load_addr (before letting it
+through).
+
+2) load_end_addr is used only when it is read in as non-zero, so no=20
+check is needed if zero.=C2=A0 (It gets debug-printed even when zero, but=
+ is=20
+used only to calculate mb_load_size and only when non-zero.)
+> If the kernel binary size is larger than can fit in
+> the address space after load_addr, we ended up with a kernel_size that
+> is smaller than load_size, which means that we read the file into a too
+> small buffer.
+>
+> Add a check to reject kernel files with such Multiboot headers.
+Code itself looks fine.
+
+Modulo above comments:
  =C2=A0=C2=A0=C2=A0 Reviewed-by: Jack Schwartz <jack.schwartz@oracle.com>
 
  =C2=A0=C2=A0=C2=A0 Thanks,
  =C2=A0=C2=A0=C2=A0 Jack
-
-On 2018-03-14 10:32, Kevin Wolf wrote:
-> Patch 1 fixes another Multiboot kernel validation bug that could cause
-> QEMU to load the kernel image file into a too small buffer. Patch 2 add=
-s
-> another check to harden the code. The rest of the series adds Multiboot
-> test cases for kernels using the a.out kludge, which is where the recen=
-t
-> bugs were found.
 >
-> Kevin Wolf (5):
->    multiboot: Reject kernels exceeding the address space
->    multiboot: Check validity of mh_header_addr
->    tests/multiboot: Test exit code for every qemu run
->    tests/multiboot: Add tests for the a.out kludge
->    tests/multiboot: Add .gitignore
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>   hw/i386/multiboot.c | 4 ++++
+>   1 file changed, 4 insertions(+)
 >
->   hw/i386/multiboot.c             |   8 +++
->   tests/multiboot/.gitignore      |   3 +
->   tests/multiboot/Makefile        |  22 +++++--
->   tests/multiboot/aout_kludge.S   | 138 +++++++++++++++++++++++++++++++=
-+++++++++
->   tests/multiboot/aout_kludge.out |  42 ++++++++++++
->   tests/multiboot/run_test.sh     |  34 ++++++----
->   6 files changed, 227 insertions(+), 20 deletions(-)
->   create mode 100644 tests/multiboot/.gitignore
->   create mode 100644 tests/multiboot/aout_kludge.S
->   create mode 100644 tests/multiboot/aout_kludge.out
->
+> diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
+> index b9064264d8..1e215bf8d3 100644
+> --- a/hw/i386/multiboot.c
+> +++ b/hw/i386/multiboot.c
+> @@ -247,6 +247,10 @@ int load_multiboot(FWCfgState *fw_cfg,
+>               }
+>               mb_load_size =3D kernel_file_size - mb_kernel_text_offset=
+;
+>           }
+> +        if (mb_load_size > UINT32_MAX - mh_load_addr) {
+> +            error_report("kernel does not fit in address space");
+> +            exit(1);
+> +        }
+>           if (mh_bss_end_addr) {
+>               if (mh_bss_end_addr < (mh_load_addr + mb_load_size)) {
+>                   error_report("invalid bss_end_addr address");
