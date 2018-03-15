@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56616)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ewYXz-0005mF-Dh
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:28:20 -0400
+	(envelope-from <thuth@redhat.com>) id 1ewYcZ-0007wH-Nd
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:33:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ewYXy-0002qH-DS
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:28:19 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:40809)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ewYXy-0002pp-7R
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:28:18 -0400
-Received: by mail-ot0-x244.google.com with SMTP id l12-v6so8043515otj.7
-	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 12:28:18 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1ewYcY-0005ZO-WB
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:33:03 -0400
+References: <1521100145-15304-1-git-send-email-thuth@redhat.com>
+	<1521100145-15304-2-git-send-email-thuth@redhat.com>
+	<cd0806bc-6503-6cab-5f23-a92128ad0af3@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <8f02c51b-3311-465c-84a1-aacafc6c485e@redhat.com>
+Date: Thu, 15 Mar 2018 20:32:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <a407b0b4-17fc-e399-d0b1-c2eaf87a4836@amsat.org>
-References: <1520629272-98060-1-git-send-email-mjc@sifive.com>
-	<a407b0b4-17fc-e399-d0b1-c2eaf87a4836@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Mar 2018 19:27:57 +0000
-Message-ID: <CAFEAcA_eaem+n79=DmSJnWYFQzrggAdab7H3hihnuq--=hy8kA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <cd0806bc-6503-6cab-5f23-a92128ad0af3@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] RISC-V: Fix riscv_isa_string,
- use popcount to count bits
+Subject: Re: [Qemu-devel] [PATCH 1/3] tests/boot-sector: Add magic bytes to
+ s390x boot code header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,68 +26,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Michael Clark <mjc@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Palmer Dabbelt <palmer@sifive.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Victor Kaplansky <victork@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-s390x@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
 
-On 10 March 2018 at 21:25, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wr=
-ote:
-> On 03/09/2018 10:01 PM, Michael Clark wrote:
->> Logic bug caused the string size calculation for the RISC-V
->> format ISA string to be small. This fix allows slack for rv128.
+On 15.03.2018 12:47, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 03/15/2018 08:49 AM, Thomas Huth wrote:
+>> We're going to use the s390x boot code for testing CD-ROM booting.
+>> But the ISO loader of the s390-ccw bios is a little bit more picky
+>> than the network loader and expects some magic bytes in the header
+>> of the file (see linux_s390_magic in pc-bios/s390-ccw/bootmap.c), so
+>> we've got to add them in our boot code here, too.
 >>
->> Cc: Palmer Dabbelt <palmer@sifive.com>
->> Cc: Peter Maydell <peter.maydell@linaro.org>
->> Cc: Eric Blake <eblake@redhat.com>
->> Signed-off-by: Michael Clark <mjc@sifive.com>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
 >> ---
->>  target/riscv/cpu.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>  tests/boot-sector.c | 9 ++++++---
+>>  1 file changed, 6 insertions(+), 3 deletions(-)
 >>
->> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
->> index 4851890..1456535 100644
->> --- a/target/riscv/cpu.c
->> +++ b/target/riscv/cpu.c
->> @@ -391,7 +391,7 @@ static const TypeInfo riscv_cpu_type_info =3D {
->>  char *riscv_isa_string(RISCVCPU *cpu)
->>  {
->>      int i;
->> -    size_t maxlen =3D 5 + ctz32(cpu->env.misa);
->> +    size_t maxlen =3D 8 + ctpop64(cpu->env.misa);
->
-> Can you document the magic 5/8?
->
-> This looks nice, but this seems to me too much optimization to save few
-> bytes, using sizeof(riscv_exts) is overflow-free.
->
-> Maybe this is enough and self-explanatory:
->
->        const size_t maxlen =3D sizeof("rv128") + sizeof(riscv_exts);
->
->>      char *isa_string =3D g_new0(char, maxlen);
->>      snprintf(isa_string, maxlen, "rv%d", TARGET_LONG_BITS);
->
-> Also, if you keep the snprintf() return value, you can (naming it 'n')
-> simplify (also easier to review):
->
->>      for (i =3D 0; i < sizeof(riscv_exts); i++) {
->>
->         if (cpu->env.misa & RV(riscv_exts[i])) {
-> -           isa_string[strlen(isa_string)] =3D riscv_exts[i] - 'A' + 'a';
-> +           isa_string[n++] =3D tolower(riscv_exts[i]);
->         }
->     }
->
-> and simply use g_new() with:
->
-> +   isa_string[n] =3D '\0';
->
->     return isa_string;
-> }
+>> diff --git a/tests/boot-sector.c b/tests/boot-sector.c
+>> index c373f0e..04721c9 100644
+>> --- a/tests/boot-sector.c
+>> +++ b/tests/boot-sector.c
+>> @@ -68,8 +68,11 @@ static uint8_t x86_boot_sector[512] =3D {
+>>  };
+>> =20
+>>  /* For s390x, use a mini "kernel" with the appropriate signature */
+>> -static const uint8_t s390x_psw[] =3D {
+>> -    0x00, 0x08, 0x00, 0x00, 0x80, 0x01, 0x00, 0x00
+>> +static const uint8_t s390x_psw_and_magic[] =3D {
+>=20
+> Can you add a comment such "see linux_s390_magic in
+> pc-bios/s390-ccw/bootmap.c"?
 
-Hi -- any chance of a respin of this patch that addresses Philippe's
-review comments so we can fix it before rc0? This is causing
-my merge-build tests to fail about 50% of the time on OpenBSD
-at the moment...
+Sure, I'll add a comment.
 
-thanks
--- PMM
+ Thomas
