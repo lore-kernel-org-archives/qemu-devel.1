@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ewRQK-0004y7-Cw
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 07:51:57 -0400
+	(envelope-from <eblake@redhat.com>) id 1ewRWR-00019P-Lu
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 07:58:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ewRQJ-00033a-EQ
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 07:51:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34146)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ewRQJ-00032U-7K
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 07:51:55 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ewRQH-0004hu-KP
-	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 11:51:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 431F82E818D
-	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 11:51:52 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1ewRWQ-0001I0-Qn
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 07:58:15 -0400
+References: <1521100145-15304-1-git-send-email-thuth@redhat.com>
+	<1521100145-15304-3-git-send-email-thuth@redhat.com>
+	<20180315092110.GD3146@redhat.com>
+	<3d3a009b-37c3-86b0-a734-e1783f507e60@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d7ffdd54-8976-a406-6837-4a5170ca900d@redhat.com>
+Date: Thu, 15 Mar 2018 06:57:51 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 15 Mar 2018 11:41:52 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1746943 <1746943@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151756277928.2993.6454939775938128745.malonedeb@gac.canonical.com>
-Message-Id: <152111411291.30485.14374403239699826082.launchpad@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1746943] Re: qemu-aarch64-static: qemu: uncaught
- target signal 11 for ps/top cmd
+In-Reply-To: <3d3a009b-37c3-86b0-a734-e1783f507e60@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] tests/cdboot: Test booting from CD-ROM
+ ISO image file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,35 +27,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Victor Kaplansky <victork@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
 
-** Tags added: arm linux-user
+On 03/15/2018 05:48 AM, Thomas Huth wrote:
 
--- =
+>>> +    pid = fork();
+>>> +    if (pid == 0) {
+>>> +        va_start(args, fmt);
+>>> +        params = g_strdup_vprintf(fmt, args);
+>>> +        va_end(args);
+>>> +        command = g_strdup_printf("exec genisoimage %s", params);
+>>> +        g_free(params);
+>>> +        execlp("/bin/sh", "sh", "-c", command, NULL);
+>>> +        exit(1);
+>>> +    }
+>>> +    wait(&status);
+>>
+>> IMHO this should just use g_spawn_sync(), also the use of
+>> shell seems rather unneccessary
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1746943
+and potentially dangerous - if we aren't absolutely positive that we 
+aren't going to improperly expand shell metacharacters embedded in params.
 
-Title:
-  qemu-aarch64-static: qemu: uncaught target signal 11 for ps/top cmd
+>> - why not just run genisoimage
+>> directly ?
+> 
+> That code was simply "inspired" from the execlp() code in
+> qtest_init_without_qmp_handshake()
 
-Status in QEMU:
-  New
+Sounds like a good idea for a future cleanup patch ;)
 
-Bug description:
-  In a docker container created from an aarch64 image, injects qemu-aarch64=
--static (in /usr/bin)
-    run ps/top cmd  inside this container
-
-    reports "qemu: uncaught target signal 11 (Segmentation fault)"
-
-  Tried qemu-aarch64-static from fedora 27 / ubuntu artful / debian
-  unstable (i.e. qemu version 2.10 - 2.11)
-
-  The aarch64 dock image is fedora 27(and with qemu-aarch64-static
-  Fedora 27), hence I opened a related bug here
-  https://bugzilla.redhat.com/show_bug.cgi?id=3D1541252
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1746943/+subscriptions
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
