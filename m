@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ewQRQ-00088b-Pv
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 06:49:01 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1ewQS7-00006Y-VT
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 06:49:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ewQRP-0004Ap-Pt
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 06:49:00 -0400
-References: <1521100145-15304-1-git-send-email-thuth@redhat.com>
-	<1521100145-15304-3-git-send-email-thuth@redhat.com>
-	<20180315092110.GD3146@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3d3a009b-37c3-86b0-a734-e1783f507e60@redhat.com>
-Date: Thu, 15 Mar 2018 11:48:31 +0100
+	(envelope-from <wei.w.wang@intel.com>) id 1ewQS4-0004gM-Sn
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 06:49:44 -0400
+Received: from mga11.intel.com ([192.55.52.93]:23071)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1ewQS4-0004e0-Jb
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 06:49:40 -0400
+Message-ID: <5AAA5079.2000308@intel.com>
+Date: Thu, 15 Mar 2018 18:52:41 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20180315092110.GD3146@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] tests/cdboot: Test booting from CD-ROM
- ISO image file
+References: <1520426065-40265-1-git-send-email-wei.w.wang@intel.com>
+	<1520426065-40265-3-git-send-email-wei.w.wang@intel.com>
+	<20180314181137.GG3006@work-vm>
+In-Reply-To: <20180314181137.GG3006@work-vm>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] migration: API to clear bits of
+ guest free pages from the dirty bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,108 +30,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Victor Kaplansky <victork@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-s390x@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-On 15.03.2018 10:21, Daniel P. Berrang=C3=A9 wrote:
-> On Thu, Mar 15, 2018 at 08:49:04AM +0100, Thomas Huth wrote:
->> We already have the code for a boot file in tests/boot-sector.c,
->> so if the genisoimage program is available, we can easily create
->> a bootable CD ISO image that we can use for testing whether our
->> CD-ROM emulation and the BIOS CD-ROM boot works correctly.
+On 03/15/2018 02:11 AM, Dr. David Alan Gilbert wrote:
+> * Wei Wang (wei.w.wang@intel.com) wrote:
+>> This patch adds an API to clear bits corresponding to guest free pages
+>> from the dirty bitmap. Spilt the free page block if it crosses the QEMU
+>> RAMBlock boundary.
 >>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+>> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> CC: Juan Quintela <quintela@redhat.com>
+>> CC: Michael S. Tsirkin <mst@redhat.com>
 >> ---
->>  tests/Makefile.include |   3 +
->>  tests/cdrom-test.c     | 155 ++++++++++++++++++++++++++++++++++++++++=
-+++++++++
->>  2 files changed, 158 insertions(+)
->>  create mode 100644 tests/cdrom-test.c
+>>   include/migration/misc.h |  2 ++
+>>   migration/ram.c          | 21 +++++++++++++++++++++
+>>   2 files changed, 23 insertions(+)
 >>
->> diff --git a/tests/Makefile.include b/tests/Makefile.include
->> index ef9b88c..a104222 100644
->> --- a/tests/Makefile.include
->> +++ b/tests/Makefile.include
->> @@ -304,6 +304,7 @@ check-qtest-i386-$(CONFIG_POSIX) +=3D tests/test-f=
-ilter-redirector$(EXESUF)
->>  check-qtest-i386-y +=3D tests/migration-test$(EXESUF)
->>  check-qtest-i386-y +=3D tests/test-x86-cpuid-compat$(EXESUF)
->>  check-qtest-i386-y +=3D tests/numa-test$(EXESUF)
->> +check-qtest-i386-y +=3D tests/cdrom-test$(EXESUF)
->>  check-qtest-x86_64-y +=3D $(check-qtest-i386-y)
->>  check-qtest-x86_64-y +=3D tests/sdhci-test$(EXESUF)
->>  gcov-files-i386-y +=3D i386-softmmu/hw/timer/mc146818rtc.c
->> @@ -398,6 +399,7 @@ check-qtest-s390x-y +=3D tests/virtio-balloon-test=
-$(EXESUF)
->>  check-qtest-s390x-y +=3D tests/virtio-console-test$(EXESUF)
->>  check-qtest-s390x-y +=3D tests/virtio-serial-test$(EXESUF)
->>  check-qtest-s390x-y +=3D tests/cpu-plug-test$(EXESUF)
->> +check-qtest-s390x-y +=3D tests/cdrom-test$(EXESUF)
->> =20
->>  check-qtest-generic-y +=3D tests/qom-test$(EXESUF)
->>  check-qtest-generic-y +=3D tests/test-hmp$(EXESUF)
->> @@ -829,6 +831,7 @@ tests/test-qapi-util$(EXESUF): tests/test-qapi-uti=
-l.o $(test-util-obj-y)
->>  tests/numa-test$(EXESUF): tests/numa-test.o
->>  tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-sector.o=
- tests/acpi-utils.o
->>  tests/sdhci-test$(EXESUF): tests/sdhci-test.o $(libqos-pc-obj-y)
->> +tests/cdrom-test$(EXESUF): tests/cdrom-test.o tests/boot-sector.o $(l=
-ibqos-obj-y)
->> =20
->>  tests/migration/stress$(EXESUF): tests/migration/stress.o
->>  	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $=
-< ,"LINK","$(TARGET_DIR)$@")
->> diff --git a/tests/cdrom-test.c b/tests/cdrom-test.c
->> new file mode 100644
->> index 0000000..1fc5230
->> --- /dev/null
->> +++ b/tests/cdrom-test.c
->> @@ -0,0 +1,155 @@
->> +/*
->> + * Various tests for emulated CD-ROM drives.
->> + *
->> + * Copyright (c) 2018 Red Hat Inc.
->> + *
->> + * Author:
->> + *    Thomas Huth <thuth@redhat.com>
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2
->> + * or later. See the COPYING file in the top-level directory.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "libqtest.h"
->> +#include "boot-sector.h"
->> +
->> +static char isoimage[] =3D "cdrom-boot-iso-XXXXXX";
->> +
->> +static int gen_iso(const char *fmt, ...)
+>> diff --git a/include/migration/misc.h b/include/migration/misc.h
+>> index 77fd4f5..fae1acf 100644
+>> --- a/include/migration/misc.h
+>> +++ b/include/migration/misc.h
+>> @@ -14,11 +14,13 @@
+>>   #ifndef MIGRATION_MISC_H
+>>   #define MIGRATION_MISC_H
+>>   
+>> +#include "exec/cpu-common.h"
+>>   #include "qemu/notify.h"
+>>   
+>>   /* migration/ram.c */
+>>   
+>>   void ram_mig_init(void);
+>> +void qemu_guest_free_page_hint(void *addr, size_t len);
+>>   
+>>   /* migration/block.c */
+>>   
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index 5e33e5c..e172798 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -2189,6 +2189,27 @@ static int ram_init_all(RAMState **rsp)
+>>       return 0;
+>>   }
+>>   
+> This could do with some comments
+
+OK, I'll add some.
+
+>
+>> +void qemu_guest_free_page_hint(void *addr, size_t len)
 >> +{
->> +    char *params, *command;
->> +    va_list args;
->> +    pid_t pid;
->> +    int status;
->> +
->> +    pid =3D fork();
->> +    if (pid =3D=3D 0) {
->> +        va_start(args, fmt);
->> +        params =3D g_strdup_vprintf(fmt, args);
->> +        va_end(args);
->> +        command =3D g_strdup_printf("exec genisoimage %s", params);
->> +        g_free(params);
->> +        execlp("/bin/sh", "sh", "-c", command, NULL);
->> +        exit(1);
->> +    }
->> +    wait(&status);
->=20
-> IMHO this should just use g_spawn_sync(), also the use of
-> shell seems rather unneccessary - why not just run genisoimage
-> directly ?
+>> +    RAMBlock *block;
+>> +    ram_addr_t offset;
+>> +    size_t used_len, start, npages;
+>  From your use I think the addr and len are coming raw from the guest;
+> so we need to take some care.
+>
 
-That code was simply "inspired" from the execlp() code in
-qtest_init_without_qmp_handshake() ... but g_spawn_sync() sounds like a
-good alternative here, so I'll try to switch to that one instead.
+Actually the "addr" here has been the host address that corresponds to 
+the guest free page. It's from elem->in_sg[0].iov_base.
 
- Thanks,
-  Thomas
+>
+>> +        if (unlikely(offset + len > block->used_length)) {
+> I think to make that overflow safe, that should be:
+>    if (len > (block->used_length - offset)) {
+>
+> But we'll need another test before it, because qemu_ram_block_from_host
+> seems to check max_length not used_length, so we need to check
+> for offset > block->used_length first
+
+OK, how about adding an assert above, like this:
+
+block = qemu_ram_block_from_host(addr, false, &offset);
+assert (offset  < block->used_length );
+if (!block)
+     ...
+
+The address corresponds to a guest free page, which means it should be 
+within used_length. If not, something weird happens, I think we'd better 
+to assert it in that case.
+
+Best,
+Wei
