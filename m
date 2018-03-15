@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ewPNu-0004go-HD
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 05:41:19 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1ewPSc-00069c-VQ
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 05:46:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ewPNq-0001ih-I0
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 05:41:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47106 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ewPNq-0001hd-Bz
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 05:41:14 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EE29F4023141
-	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 09:41:08 +0000 (UTC)
-Date: Thu, 15 Mar 2018 09:41:00 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180315094059.GA3060@work-vm>
-References: <20180308195811.24894-1-dgilbert@redhat.com>
-	<20180308195811.24894-15-dgilbert@redhat.com>
-	<20180312102059.GD11787@xz-mi> <20180312132320.GC3219@work-vm>
-	<20180313082801.GF11787@xz-mi>
+	(envelope-from <eric.auger@redhat.com>) id 1ewPSc-0006ln-0e
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 05:46:10 -0400
+References: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
+	<1518893216-9983-12-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA_9cmK9gebqE9997fzhTzKT6Ky9q4jn=fxwziopDyK9Ew@mail.gmail.com>
+	<cc6029a1-c177-ee8c-d09b-0ed2af81c897@redhat.com>
+	<75aee987-a08b-570f-ec10-8b4853d853c6@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <ee14227e-8d0a-6f5e-cc60-2bfa0f029723@redhat.com>
+Date: Thu, 15 Mar 2018 10:45:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180313082801.GF11787@xz-mi>
-Subject: Re: [Qemu-devel] [PATCH v4 14/29] libvhost-user+postcopy: Register
- new regions with the ufd
+In-Reply-To: <75aee987-a08b-570f-ec10-8b4853d853c6@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v9 11/14] target/arm/kvm: Translate the MSI
+ doorbell in kvm_arch_fixup_msi_route
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,107 +27,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, maxime.coquelin@redhat.com, marcandre.lureau@redhat.com, quintela@redhat.com, aarcange@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Mon, Mar 12, 2018 at 01:23:21PM +0000, Dr. David Alan Gilbert wrote:
-> > * Peter Xu (peterx@redhat.com) wrote:
-> > > On Thu, Mar 08, 2018 at 07:57:56PM +0000, Dr. David Alan Gilbert (git) wrote:
-> > > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > > > 
-> > > > When new regions are sent to the client using SET_MEM_TABLE, register
-> > > > them with the userfaultfd.
-> > > > 
-> > > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > > ---
-> > > >  contrib/libvhost-user/libvhost-user.c | 34 ++++++++++++++++++++++++++++++++++
-> > > >  1 file changed, 34 insertions(+)
-> > > > 
-> > > > diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-> > > > index 4922b2c722..a18bc74a7c 100644
-> > > > --- a/contrib/libvhost-user/libvhost-user.c
-> > > > +++ b/contrib/libvhost-user/libvhost-user.c
-> > > > @@ -494,6 +494,40 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
-> > > >          close(vmsg->fds[i]);
-> > > >      }
-> > > >  
-> > > > +    /* TODO: Get address back to QEMU */
-> > > > +    for (i = 0; i < dev->nregions; i++) {
-> > > > +        VuDevRegion *dev_region = &dev->regions[i];
-> > > > +#ifdef UFFDIO_REGISTER
-> > > > +        /* We should already have an open ufd. Mark each memory
-> > > > +         * range as ufd.
-> > > > +         * Note: Do we need any madvises? Well it's not been accessed
-> > > > +         * yet, still probably need no THP to be safe, discard to be safe?
-> > > > +         */
-> > > > +        struct uffdio_register reg_struct;
-> > > > +        reg_struct.range.start = (uintptr_t)dev_region->mmap_addr;
-> > > > +        reg_struct.range.len = dev_region->size + dev_region->mmap_offset;
-> > > 
-> > > Do we really care the page faults between offset zero to mmap_offset?
-> > 
-> > No, but if we saw them we'd think it meant something had gone wrong,
-> > so it's good to trap them.
-> 
-> I'm fine with that, especially since that's now only used in the test
-> codes.  However that's a still bit confusing to me, especially if
-> current QEMU won't really handle that page fault (and it seems that
-> should never happen).  Maybe at least a comment would help on
-> explaining why we need to explicitly extend the range to listen, just
-> like below code when we do the mapping, though with a different
-> reason.
-> 
-> > 
-> > > I'm thinking whether we should add that mmap_offset into range.start
-> > > instead of range.len.
-> > > 
-> > > Also, I see that in current vu_set_mem_table_exec():
-> > > 
-> > >         /* We don't use offset argument of mmap() since the
-> > >          * mapped address has to be page aligned, and we use huge
-> > >          * pages.  */
-> > >         mmap_addr = mmap(0, dev_region->size + dev_region->mmap_offset,
-> > >                          PROT_READ | PROT_WRITE, MAP_SHARED,
-> > >                          vmsg->fds[i], 0);
-> > > 
-> > > So adding the mmap_offset will help to make sure we'll use huge pages?
-> > > Could it?  Or say, how could we be sure that size+mmap_offset would be
-> > > page aligned?
-> > 
-> > If you look into the set_mem_table_exec (non-postcopy) you'll see that
-> > code and comment comes from the non-postcopy version; but it's something
-> > which as you say we could probably simplify now.
-> > 
-> > The problem used to be, before we did the merging as part of this series
-> > (0026 vhost Huge page align and merge), we could end up with mappings
-> > being passed from the qemu that were for small ranges of memory that
-> > weren't aligned to a huge page boundary and thus the mmap would fail.
-> > With the merging code that's no longer true, so it means we
-> > could simplify as you say;  although this way it's a smaller change from
-> > the existing code.
-> 
-> I was thinking what if the memory section was e.g. splitted as below:
-> 
-> - range A: [0x0,      0x10):     non-RAM range, size     0x10
-> - range B: [0x10,     0x1ffff0):     RAM range, size 0x1fffe0
-> - range C: [0x1ffff0, 0x200000): non-RAM range, size     0x10
-> 
-> Ranges A+B+C will cover a 2M page while vhost-user master should only
-> send range B to the client. Then even size+mmap_offset (which is
-> 0x1fffe0+0x10=0x1ffff0) shouldn't be aligned with the 2M boundary.
-> If previous mmap() can fail, would this fail too?
+Hi Paolo,
 
-I think, 'vhost: Huge page align and merge' will round (B) to page
-boundaries so that the range sent to the slave will be aligned.
-
-Dave
-
-> For sure this is a question not directly related to current code -
-> it's just something I'm not sure about.  So it is not a blocker of
-> current patch.  Thanks,
+On 13/03/18 14:37, Paolo Bonzini wrote:
+> On 12/03/2018 16:16, Auger Eric wrote:
+>>> It is still unclear to me if we need to register an IOMMUNotifier
+>>> to handle any change in the MSI doorbell which would occur behind
+>>> the scene and would not lead to any call to kvm_arch_fixup_msi_route().
+>>
+>> Paolo, do you know the answer to this question ?
 > 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Yes, x86 is wrong in this respect (it wouldn't use an IOMMUNotifier, but
+> it still should process Interrupt Entry Cache invalidations).
+
+I am not sure anymore of the issue we want to fix. The concen I had in
+mind was: what if the MSI doorbell gets unmapped. We would need to be
+notified in some way. As the doorbell lies in MMIO space, no
+IOMMUNotifier is attached to it at the moment. On the other hand, if the
+doorbell gets unmapped, can't we expect some kind of tear down of the
+route? Paolo, is it the use case you are talking about here?
+> 
+>>> It seems a bit odd that:
+>>>  * the code for arm for "PCI devices behind IOMMU need to have
+>>>    the MSI doorbell writes go through the IOMMU" looks rather
+>>>    different from the code for x86 for the same thing
+>>
+>> ARM SMMU translates MSIs whereas Intel/AMD IOMMU do not translate them.
+>> Hence this implementation
+> 
+> More precisely, Intel IOMMU implements interrupt remapping through an
+> MMIO region instead of an IOMMU region, because on x86 interrupt
+> remapping can also change the MSI value and not just the address.
+thank you for the clarification. Yes I too much focused on IOMMU DMA
+translation and forgot the x86 interrupt remapping stuff which
+corresponds to what is done here.
+> 
+>>>  * the code here needs to know specifically that this is an SMMU
+>>>    and not some other kind of IOMMU
+>> Yes when introducing virtio-iommu we will need to get this fixed. We
+>> need a way to retrieve the iommu mr from the as. I will work on this
+>> concurrently.
+> 
+> Probably something like address_space_translate can be used?
+Yes achieved with address_space_translate + memory_region_find
+
+Thanks
+
+Eric
+
+> 
+> Paolo
+> 
