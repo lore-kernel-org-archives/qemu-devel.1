@@ -1,36 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56450)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ewIlN-00018x-OC
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 22:37:06 -0400
+	(envelope-from <mst@redhat.com>) id 1ewIw9-0003pR-Ku
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 22:48:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ewIlK-0004iD-FL
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 22:37:05 -0400
-Date: Wed, 14 Mar 2018 20:36:45 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180314203645.3dac9c71@t450s.home>
-In-Reply-To: <423b0a12-ed99-e9e1-eae0-d0cfd1a4d6bf@ozlabs.ru>
-References: <20180212051954.GE11634@umbus.fritz.box>
-	<0a57f0ec-4300-f4f3-3957-4bced8b57e14@ozlabs.ru>
-	<20180212090653.42bdd2e2@w520.home>
-	<0c594a0b-488c-b5f8-e8ed-ffa8f4a98088@ozlabs.ru>
-	<20180213053630.GL11634@umbus.fritz.box>
-	<20180213054124.GN11634@umbus.fritz.box>
-	<8282d070-b2d3-7e43-3da9-b17c77b99a67@ozlabs.ru>
-	<20180214013323.GA5247@umbus.fritz.box>
-	<843efd62-7a39-8536-91ad-1abea2beb190@ozlabs.ru>
-	<20180214085541.5491705f@w520.home>
-	<20180216052824.GI2074@umbus.fritz.box>
-	<c11af933-3f08-f2c8-0552-ce43ac8f5741@ozlabs.ru>
-	<a29658e8-d2da-161d-d9b8-41f186969927@ozlabs.ru>
-	<821596dc-35b0-60cf-3e1f-3df0809b2f8e@ozlabs.ru>
-	<8e909bd8-2c24-abde-aa42-fd3f46ff649e@ozlabs.ru>
-	<20180313105606.18d0d8af@w520.home>
-	<423b0a12-ed99-e9e1-eae0-d0cfd1a4d6bf@ozlabs.ru>
+	(envelope-from <mst@redhat.com>) id 1ewIw4-0002OB-Sk
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 22:48:13 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53370 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ewIw4-0002Nq-NV
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 22:48:08 -0400
+Date: Thu, 15 Mar 2018 04:47:55 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180315044543-mutt-send-email-mst@kernel.org>
+References: <1520426065-40265-1-git-send-email-wei.w.wang@intel.com>
+	<1520426065-40265-4-git-send-email-wei.w.wang@intel.com>
+	<20180313183558-mutt-send-email-mst@kernel.org>
+	<5AA88C35.90300@intel.com>
+	<20180314045130-mutt-send-email-mst@kernel.org>
+	<5AA8BB27.6030205@intel.com>
+	<20180314160832-mutt-send-email-mst@kernel.org>
+	<5AA9C944.2010403@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH qemu v7 2/4] vfio/pci: Relax DMA map errors
- for MMIO regions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5AA9C944.2010403@intel.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v4 3/4] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_HINT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,52 +34,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Auger Eric <eric.auger@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-On Wed, 14 Mar 2018 13:40:21 +1100
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+On Thu, Mar 15, 2018 at 09:15:48AM +0800, Wei Wang wrote:
+> On 03/14/2018 10:12 PM, Michael S. Tsirkin wrote:
+> > On Wed, Mar 14, 2018 at 02:03:19PM +0800, Wei Wang wrote:
+> > > On 03/14/2018 10:53 AM, Michael S. Tsirkin wrote:
+> > > > On Wed, Mar 14, 2018 at 10:43:01AM +0800, Wei Wang wrote:
+> > > > > On 03/14/2018 12:49 AM, Michael S. Tsirkin wrote:
+> > > > > > On Wed, Mar 07, 2018 at 08:34:24PM +0800, Wei Wang wrote:
+> > > > > > 
+> > > > > > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> > > > > > > Signed-off-by: Liang Li <liang.z.li@intel.com>
+> > > > > > > CC: Michael S. Tsirkin <mst@redhat.com>
+> > > > > > > CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > > > > > CC: Juan Quintela <quintela@redhat.com>
+> > > > > > I find it suspicious that neither unrealize nor reset
+> > > > > > functions have been touched at all.
+> > > > > > Are you sure you have thought through scenarious like
+> > > > > > hot-unplug or disabling the device by guest?
+> > > > > OK. I think we can call balloon_free_page_stop in unrealize and reset.
+> > > > > 
+> > > > > 
+> > > > > > +static void *virtio_balloon_poll_free_page_hints(void *opaque)
+> > > > > > +{
+> > > > > > +    VirtQueueElement *elem;
+> > > > > > +    VirtIOBalloon *dev = opaque;
+> > > > > > +    VirtQueue *vq = dev->free_page_vq;
+> > > > > > +    uint32_t id;
+> > > > > > +    size_t size;
+> > > > > > What makes it safe to poke at this device from multiple threads?
+> > > > > > I think that it would be safer to do it from e.g. BH.
+> > > > > > 
+> > > > > Actually the free_page_optimization thread is the only user of free_page_vq,
+> > > > > and there is only one optimization thread each time. Would this be safe
+> > > > > enough?
+> > > > > 
+> > > > > Best,
+> > > > > Wei
+> > > > Aren't there other fields there? Also things like reset affect all VQs.
+> > > > 
+> > > Yes. But I think BHs are used to avoid re-entrancy, which isn't the issue
+> > > here.
+> > Since you are adding locks to address the issue - doesn't this imply
+> > reentrancy is exactly the issue?
+> 
+> Not really. The lock isn't intended for any reentrancy issues, since there
+> will be only one run of the virtio_balloon_poll_free_page_hints function at
+> any given time. Instead, the lock is used to synchronize
+> virtio_balloon_poll_free_page_hints and virtio_balloon_free_page_stop to
+> access dev->free_page_report_status.
 
-> On 14/3/18 3:56 am, Alex Williamson wrote:
-> > Actually making sure it compiles would have been nice:
-> >=20
-> > qemu.git/hw/vfio/common.c: In function =E2=80=98vfio_listener_region_ad=
-d=E2=80=99:
-> > qemu.git/hw/vfio/common.c:550:40: error: invalid operands to binary & (=
-have =E2=80=98Int128 {aka struct Int128}=E2=80=99 and =E2=80=98hwaddr {aka =
-long long unsigned int}=E2=80=99)
-> >          if ((iova & pgmask) || (llsize & pgmask)) {
-> >                                         ^
-> > qemu.git/hw/vfio/common.c: In function =E2=80=98vfio_listener_region_de=
-l=E2=80=99:
-> > qemu.git/hw/vfio/common.c:669:50: error: invalid operands to binary & (=
-have =E2=80=98Int128 {aka struct Int128}=E2=80=99 and =E2=80=98hwaddr {aka =
-long long unsigned int}=E2=80=99)
-> >          try_unmap =3D !((iova & pgmask) || (llsize & pgmask));
-> >                                                   ^
-> > Clearly llsize needs to be wrapped in int128_get64() here.  Should I
-> > presume that testing of this patch is equally lacking?  =20
->=20
-> No.
->=20
-> I do not know how but this definitely compiles for me with these:
->=20
-> gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-16)
-> gcc (GCC) 6.3.1 20161221 (Red Hat 6.3.1-1)
->=20
-> I always thought Int128 is a struct but it turns out there are __uint128_t
-> and __int128_t and everywhere I compile (including x86_64 laptop) there is
-> CONFIG_INT128=3Dy in config-host.mak, hence no error.
->=20
-> I can see that you fixed it (thanks for that!) but how do you compile it =
-to
-> get this error? There is no way to disable gcc's types and even 4.8.5 can
-> do these. Thanks,
+I wonder whether that's enough. E.g. is there a race with guest
+trying to reset the device? That resets all VQs you know.
 
-Hmm, I always try to do a 32bit build before I send a pull request,
-that's where I started this time.  I thought an Int128 was always a
-structure, so I figured it always failed.  Good to know there was more
-than just my testing on this commit.  Since it's in, we can fix it
-during the freeze if it turns out to be broken.  Thanks,
 
-Alex
+> Please see the whole picture below:
+> 
+> virtio_balloon_poll_free_page_hints()
+> {
+> 
+>     while (1) {
+>         qemu_spin_lock();
+>         if (dev->free_page_report_status >= FREE_PAGE_REPORT_S_STOP ||
+>             !runstate_is_running()) {
+>             qemu_spin_unlock();
+>             break;
+>         }
+>         ...
+>         if (id == dev->free_page_report_cmd_id) {
+> ==>        dev->free_page_report_status = FREE_PAGE_REPORT_S_START;
+>         ...
+>         qemu_spin_unlock();
+>     }
+> }
+> 
+> 
+> static void virtio_balloon_free_page_stop(void *opaque)
+> {
+>     VirtIOBalloon *s = opaque;
+>     VirtIODevice *vdev = VIRTIO_DEVICE(s);
+> 
+>     qemu_spin_lock();
+> ...
+> ==>       s->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
+>     ...
+>     qemu_spin_unlock();
+> }
+> 
+> 
+> Without the lock, there are theoretical possibilities that assigning STOP
+> below is overridden by START above. In that
+> case,virtio_balloon_free_page_stop does not effectively stop
+> virtio_balloon_poll_free_page_hints.
+> I think this issue couldn't be solved by BHs.
+> 
+> Best,
+> Wei
+
+Don't all BHs run under the BQL?
