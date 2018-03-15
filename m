@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ewUXS-0002Hk-5a
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 11:11:34 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ewUYr-00033K-PW
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 11:12:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ewUXN-0006d6-2W
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 11:11:30 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48694)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ewUXM-0006cJ-QF
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 11:11:25 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ewUXL-0000vc-Uj
-	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 15:11:23 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D9BBF2E80CB
-	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 15:11:23 +0000 (UTC)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ewUYq-0007kf-LV
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 11:12:57 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180315115144.801202-1-eblake@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <dd7b0e5d-04b1-022a-6e0d-d9ebc33ef525@amsat.org>
+Date: Thu, 15 Mar 2018 16:12:46 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 15 Mar 2018 14:58:58 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1602247 <1602247@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160712124612.14797.69428.malonedeb@soybean.canonical.com>
-Message-Id: <152112593895.31058.4112091808456357876.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1602247] Re: SIGSEGV when reading ARM GIC
- registers through GDB stub
+In-Reply-To: <20180315115144.801202-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.12] iotests: Avoid realpath,
+ for CentOS 6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,133 +28,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, pbonzini@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-See also LP:1751674 -- similar crash trying to access the GICv2 per-cpu
-regs from the QEMU monitor's pmemsave command.
+On 03/15/2018 12:51 PM, Eric Blake wrote:
+> CentOS 6 lacks a realpath binary on the base install, which makes
+> all iotests runs fail since the 2.11 release:
+> 
+> 001         - output mismatch (see 001.out.bad)
+> ./check: line 815: realpath: command not found
+> diff: missing operand after `/home/dummy/qemu/tests/qemu-iotests/001.out'
+> diff: Try `diff --help' for more information.
+> 
+> Many of the uses of 'realpath' in the check script were being
+> used on the output of 'type -p' - but that is already an
+> absolute file name.  While a canonical name can often be
+> shorter (realpath gets rid of /../), it can also be longer (due
+> to symlink expansion); and we really don't care if the name is
+> canonical, merely that it was an executable file with an
+> absolute path.  These were broken in commit cceaf1db.
+> 
+> The remaining use of realpath was to convert a possibly relative
+> filename into an absolute one before calling diff to make it
+> easier to copy-and-paste the filename for moving the .bad file
+> into place as the new reference file even when running iotests
+> out-of-tree (see commit 93e53fb6), but $PWD can achieve the same
+> purpose.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
--- =
+TIL type -p :)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1602247
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Title:
-  SIGSEGV when reading ARM GIC registers through GDB stub
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  When trying to access ARM GIC CPU registers through a target GDB
-  connected to QEMU, QEMU crashes with a SIGSEGV.
-
-  Reproducible on last master revision (74e1b78 at the time of writing):
-
-  $ ./configure --target-list=3Darm-softmmu --python=3Dpython2 --enable-deb=
-ug
-  $ make
-  $ gdb --args ./arm-softmmu/qemu-system-arm -M vexpress-a15 -smp 2 -s -S
-
-  =
-
-  Connect a gdb on the other side:
-  $ arm-none-eabi-gdb
-  (gdb) tar rem :1234
-  Remote debugging using :1234
-  0x00000000 in ?? ()
-  (gdb) x /x 0x2c002000
-
-  =
-
-  QEMU crashes as it tries to access current_cpu->cpu_index while current_c=
-pu is NULL:
-
-  Thread 1 "qemu-system-arm" received signal SIGSEGV, Segmentation fault.
-  0x0000555555a372cf in gic_get_current_cpu (s=3D0x555556a34f10) at hw/intc=
-/arm_gic.c:53
-  53	        return current_cpu->cpu_index;
-  (gdb) p current_cpu
-  $1 =3D (CPUState *) 0x0
-
-  Backtrace:
-  (gdb) bt
-  #0  0x0000555555a372cf in gic_get_current_cpu (s=3D0x555556a34f10) at hw/=
-intc/arm_gic.c:53
-  #1  0x0000555555a3b0e3 in gic_thiscpu_read (opaque=3D0x555556a34f10, addr=
-=3D0, data=3D0x7fffffffa0a8, size=3D4, attrs=3D...) at hw/intc/arm_gic.c:13=
-40
-  #2  0x00005555557ae2bb in memory_region_read_with_attrs_accessor (mr=3D0x=
-555556a37a70, addr=3D0, value=3D0x7fffffffa208, size=3D4, shift=3D0, mask=
-=3D4294967295, attrs=3D...) at /home/sekoia/devel/src/qemu/memory.c:461
-  #3  0x00005555557ae7ac in access_with_adjusted_size (addr=3D0, value=3D0x=
-7fffffffa208, size=3D4, access_size_min=3D1, access_size_max=3D4, access=3D=
-0x5555557ae25f <memory_region_read_with_attrs_accessor>, mr=3D0x555556a37a7=
-0, attrs=3D...)
-      at /home/sekoia/devel/src/qemu/memory.c:591
-  #4  0x00005555557b0de7 in memory_region_dispatch_read1 (mr=3D0x555556a37a=
-70, addr=3D0, pval=3D0x7fffffffa208, size=3D4, attrs=3D...) at /home/sekoia=
-/devel/src/qemu/memory.c:1187
-  #5  0x00005555557b0e9d in memory_region_dispatch_read (mr=3D0x555556a37a7=
-0, addr=3D0, pval=3D0x7fffffffa208, size=3D4, attrs=3D...) at /home/sekoia/=
-devel/src/qemu/memory.c:1212
-  #6  0x000055555576775b in address_space_read_continue (as=3D0x5555569c70b=
-0, addr=3D738205696, attrs=3D..., buf=3D0x7fffffffb440 "", len=3D4, addr1=
-=3D0, l=3D4, mr=3D0x555556a37a70) at /home/sekoia/devel/src/qemu/exec.c:2668
-  #7  0x0000555555767929 in address_space_read_full (as=3D0x5555569c70b0, a=
-ddr=3D738205696, attrs=3D..., buf=3D0x7fffffffb440 "", len=3D4) at /home/se=
-koia/devel/src/qemu/exec.c:2725
-  #8  0x00005555557679eb in address_space_read (len=3D4, buf=3D0x7fffffffb4=
-40 "", attrs=3D..., addr=3D738205696, as=3D0x5555569c70b0) at /home/sekoia/=
-devel/src/qemu/include/exec/memory.h:1476
-  #9  address_space_rw (as=3D0x5555569c70b0, addr=3D738205696, attrs=3D...,=
- buf=3D0x7fffffffb440 "", len=3D4, is_write=3Dfalse) at /home/sekoia/devel/=
-src/qemu/exec.c:2739
-  #10 0x000055555576988f in cpu_memory_rw_debug (cpu=3D0x5555568a3d00, addr=
-=3D738205696, buf=3D0x7fffffffb440 "", len=3D4, is_write=3D0) at /home/seko=
-ia/devel/src/qemu/exec.c:3653
-  #11 0x00005555557a3db3 in target_memory_rw_debug (cpu=3D0x5555568a3d00, a=
-ddr=3D738205696, buf=3D0x7fffffffb440 "", len=3D4, is_write=3Dfalse) at /ho=
-me/sekoia/devel/src/qemu/gdbstub.c:54
-  #12 0x00005555557a53f5 in gdb_handle_packet (s=3D0x55555722c530, line_buf=
-=3D0x55555722c54c "m2c002000,4") at /home/sekoia/devel/src/qemu/gdbstub.c:9=
-68
-  #13 0x00005555557a6b84 in gdb_read_byte (s=3D0x55555722c530, ch=3D52) at =
-/home/sekoia/devel/src/qemu/gdbstub.c:1458
-  #14 0x00005555557a6ca4 in gdb_chr_receive (opaque=3D0x0, buf=3D0x7fffffff=
-c590 "$m2c002000,4#84c8ead:arm-neon.xml:7fd,802#4c;qRelocInsn+;fork-events+=
-;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;no-resumed+#df",=
- size=3D15)
-      at /home/sekoia/devel/src/qemu/gdbstub.c:1666
-  #15 0x000055555591c562 in qemu_chr_be_write_impl (s=3D0x555557226e20, buf=
-=3D0x7fffffffc590 "$m2c002000,4#84c8ead:arm-neon.xml:7fd,802#4c;qRelocInsn+=
-;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;no-=
-resumed+#df", =
-
-      len=3D15) at qemu-char.c:387
-  #16 0x000055555591c5c0 in qemu_chr_be_write (s=3D0x555557226e20, buf=3D0x=
-7fffffffc590 "$m2c002000,4#84c8ead:arm-neon.xml:7fd,802#4c;qRelocInsn+;fork=
--events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;no-resum=
-ed+#df", len=3D15)
-      at qemu-char.c:399
-  #17 0x00005555559207f3 in tcp_chr_read (chan=3D0x555556e52ff0, cond=3DG_I=
-O_IN, opaque=3D0x555557226e20) at qemu-char.c:2893
-  #18 0x0000555555c4a9b7 in qio_channel_fd_source_dispatch (source=3D0x5555=
-57226ca0, callback=3D0x55555592069d <tcp_chr_read>, user_data=3D0x555557226=
-e20) at io/channel-watch.c:84
-  #19 0x00007fffed977c8a in g_main_context_dispatch () from /usr/lib/libgli=
-b-2.0.so.0
-  #20 0x0000555555bbf711 in glib_pollfds_poll () at main-loop.c:213
-  #21 0x0000555555bbf7ec in os_host_main_loop_wait (timeout=3D29744918) at =
-main-loop.c:258
-  #22 0x0000555555bbf899 in main_loop_wait (nonblocking=3D0) at main-loop.c=
-:506
-  #23 0x0000555555929cd2 in main_loop () at vl.c:1908
-  #24 0x00005555559315b7 in main (argc=3D8, argv=3D0x7fffffffdae8, envp=3D0=
-x7fffffffdb30) at vl.c:4604
-
-  Note that this bug is triggered only when the number of simulated CPUs
-  is greater than 1.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1602247/+subscriptions
+> 
+> ---
+> v2: Don't revert 93e53fb6, add commit id mentions in commit
+> message, retitle
+> ---
+>  tests/qemu-iotests/check | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+> index 469142cd586..ec8033350d1 100755
+> --- a/tests/qemu-iotests/check
+> +++ b/tests/qemu-iotests/check
+> @@ -92,7 +92,7 @@ set_prog_path()
+>  {
+>      p=`command -v $1 2> /dev/null`
+>      if [ -n "$p" -a -x "$p" ]; then
+> -        realpath -- "$(type -p "$p")"
+> +        type -p "$p"
+>      else
+>          return 1
+>      fi
+> @@ -554,7 +554,7 @@ then
+>          [ "$QEMU_PROG" = "" ] && _init_error "qemu not found"
+>      fi
+>  fi
+> -export QEMU_PROG=$(realpath -- "$(type -p "$QEMU_PROG")")
+> +export QEMU_PROG="$(type -p "$QEMU_PROG")"
+> 
+>  if [ -z "$QEMU_IMG_PROG" ]; then
+>      if [ -x "$build_iotests/qemu-img" ]; then
+> @@ -565,7 +565,7 @@ if [ -z "$QEMU_IMG_PROG" ]; then
+>          _init_error "qemu-img not found"
+>      fi
+>  fi
+> -export QEMU_IMG_PROG=$(realpath -- "$(type -p "$QEMU_IMG_PROG")")
+> +export QEMU_IMG_PROG="$(type -p "$QEMU_IMG_PROG")"
+> 
+>  if [ -z "$QEMU_IO_PROG" ]; then
+>      if [ -x "$build_iotests/qemu-io" ]; then
+> @@ -576,7 +576,7 @@ if [ -z "$QEMU_IO_PROG" ]; then
+>          _init_error "qemu-io not found"
+>      fi
+>  fi
+> -export QEMU_IO_PROG=$(realpath -- "$(type -p "$QEMU_IO_PROG")")
+> +export QEMU_IO_PROG="$(type -p "$QEMU_IO_PROG")"
+> 
+>  if [ -z $QEMU_NBD_PROG ]; then
+>      if [ -x "$build_iotests/qemu-nbd" ]; then
+> @@ -587,7 +587,7 @@ if [ -z $QEMU_NBD_PROG ]; then
+>          _init_error "qemu-nbd not found"
+>      fi
+>  fi
+> -export QEMU_NBD_PROG=$(realpath -- "$(type -p "$QEMU_NBD_PROG")")
+> +export QEMU_NBD_PROG="$(type -p "$QEMU_NBD_PROG")"
+> 
+>  if [ -z "$QEMU_VXHS_PROG" ]; then
+>    export QEMU_VXHS_PROG="`set_prog_path qnio_server`"
+> @@ -811,7 +811,7 @@ do
+>                  else
+>                      echo " - output mismatch (see $seq.out.bad)"
+>                      mv $tmp.out $seq.out.bad
+> -                    $diff -w "$reference" $(realpath $seq.out.bad)
+> +                    $diff -w "$reference" "$PWD"/$seq.out.bad
+>                      err=true
+>                  fi
+>              fi
+> 
