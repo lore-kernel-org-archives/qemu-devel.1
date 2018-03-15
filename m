@@ -1,26 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ewIMQ-00044p-Qq
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 22:11:20 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1ewIlN-00018x-OC
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 22:37:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ewIMM-0001CF-Ds
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 22:11:18 -0400
-Resent-Message-Id: <E1ewIMM-0001CF-Ds@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21051)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ewIMM-0001B3-50
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 22:11:14 -0400
-In-Reply-To: <20180314142133.14166-1-drjones@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152103749688.51.951110294839758890@71c20359a636>
+	(envelope-from <alex.williamson@redhat.com>) id 1ewIlK-0004iD-FL
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 22:37:05 -0400
+Date: Wed, 14 Mar 2018 20:36:45 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180314203645.3dac9c71@t450s.home>
+In-Reply-To: <423b0a12-ed99-e9e1-eae0-d0cfd1a4d6bf@ozlabs.ru>
+References: <20180212051954.GE11634@umbus.fritz.box>
+	<0a57f0ec-4300-f4f3-3957-4bced8b57e14@ozlabs.ru>
+	<20180212090653.42bdd2e2@w520.home>
+	<0c594a0b-488c-b5f8-e8ed-ffa8f4a98088@ozlabs.ru>
+	<20180213053630.GL11634@umbus.fritz.box>
+	<20180213054124.GN11634@umbus.fritz.box>
+	<8282d070-b2d3-7e43-3da9-b17c77b99a67@ozlabs.ru>
+	<20180214013323.GA5247@umbus.fritz.box>
+	<843efd62-7a39-8536-91ad-1abea2beb190@ozlabs.ru>
+	<20180214085541.5491705f@w520.home>
+	<20180216052824.GI2074@umbus.fritz.box>
+	<c11af933-3f08-f2c8-0552-ce43ac8f5741@ozlabs.ru>
+	<a29658e8-d2da-161d-d9b8-41f186969927@ozlabs.ru>
+	<821596dc-35b0-60cf-3e1f-3df0809b2f8e@ozlabs.ru>
+	<8e909bd8-2c24-abde-aa42-fd3f46ff649e@ozlabs.ru>
+	<20180313105606.18d0d8af@w520.home>
+	<423b0a12-ed99-e9e1-eae0-d0cfd1a4d6bf@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 14 Mar 2018 07:24:57 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] dump-guest-memory: more descriptive
- lookup_type failure
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH qemu v7 2/4] vfio/pci: Relax DMA map errors
+ for MMIO regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +39,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: drjones@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, frankja@linux.vnet.ibm.com, lersek@redhat.com, marcandre.lureau@redhat.com
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: Auger Eric <eric.auger@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMzE0MTQyMTMzLjE0MTY2LTEtZHJqb25lc0ByZWRoYXQuY29tClN1Ympl
-Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGR1bXAtZ3Vlc3QtbWVtb3J5OiBtb3JlIGRlc2NyaXB0
-aXZlIGxvb2t1cF90eXBlIGZhaWx1cmUKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
-L2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwg
-d2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1y
-ZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5n
-IFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAg
-aWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
-IC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkK
-ICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09
-CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20g
-aHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAg
-ICAgICAgICAgIHBhdGNoZXcvMjAxODAzMTQxNDIxMzMuMTQxNjYtMS1kcmpvbmVzQHJlZGhhdC5j
-b20gLT4gcGF0Y2hldy8yMDE4MDMxNDE0MjEzMy4xNDE2Ni0xLWRyam9uZXNAcmVkaGF0LmNvbQpT
-d2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjhkYmEyMjA2OTQgZHVtcC1ndWVzdC1tZW1v
-cnk6IG1vcmUgZGVzY3JpcHRpdmUgbG9va3VwX3R5cGUgZmFpbHVyZQoKPT09IE9VVFBVVCBCRUdJ
-TiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBkdW1wLWd1ZXN0LW1lbW9yeTogbW9yZSBkZXNjcmlw
-dGl2ZSBsb29rdXBfdHlwZSBmYWlsdXJlLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
-ZXJzCiMzNDogRklMRTogc2NyaXB0cy9kdW1wLWd1ZXN0LW1lbW9yeS5weToyMjoKKyAgICByYWlz
-ZSBnZGIuR2RiRXJyb3IoIlN5bWJvbHMgbXVzdCBiZSBsb2FkZWQgcHJpb3IgdG8gc291cmNpbmcg
-ZHVtcC1ndWVzdC1tZW1vcnkuXG4iCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzM1
-OiBGSUxFOiBzY3JpcHRzL2R1bXAtZ3Vlc3QtbWVtb3J5LnB5OjIzOgorICAgICAgICAgICAgICAg
-ICAgICAgICAiU3ltYm9scyBtYXkgYmUgbG9hZGVkIGJ5IGZpcnN0ICdhdHRhY2gnaW5nIGEgUUVN
-VSBwcm9jZXNzIGlkIG9yIGJ5ICdsb2FkJ2luZyBhIFFFTVUgYmluYXJ5LiIpCgp0b3RhbDogMSBl
-cnJvcnMsIDEgd2FybmluZ3MsIDEyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
-ZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
-cGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On Wed, 14 Mar 2018 13:40:21 +1100
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+
+> On 14/3/18 3:56 am, Alex Williamson wrote:
+> > Actually making sure it compiles would have been nice:
+> >=20
+> > qemu.git/hw/vfio/common.c: In function =E2=80=98vfio_listener_region_ad=
+d=E2=80=99:
+> > qemu.git/hw/vfio/common.c:550:40: error: invalid operands to binary & (=
+have =E2=80=98Int128 {aka struct Int128}=E2=80=99 and =E2=80=98hwaddr {aka =
+long long unsigned int}=E2=80=99)
+> >          if ((iova & pgmask) || (llsize & pgmask)) {
+> >                                         ^
+> > qemu.git/hw/vfio/common.c: In function =E2=80=98vfio_listener_region_de=
+l=E2=80=99:
+> > qemu.git/hw/vfio/common.c:669:50: error: invalid operands to binary & (=
+have =E2=80=98Int128 {aka struct Int128}=E2=80=99 and =E2=80=98hwaddr {aka =
+long long unsigned int}=E2=80=99)
+> >          try_unmap =3D !((iova & pgmask) || (llsize & pgmask));
+> >                                                   ^
+> > Clearly llsize needs to be wrapped in int128_get64() here.  Should I
+> > presume that testing of this patch is equally lacking?  =20
+>=20
+> No.
+>=20
+> I do not know how but this definitely compiles for me with these:
+>=20
+> gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-16)
+> gcc (GCC) 6.3.1 20161221 (Red Hat 6.3.1-1)
+>=20
+> I always thought Int128 is a struct but it turns out there are __uint128_t
+> and __int128_t and everywhere I compile (including x86_64 laptop) there is
+> CONFIG_INT128=3Dy in config-host.mak, hence no error.
+>=20
+> I can see that you fixed it (thanks for that!) but how do you compile it =
+to
+> get this error? There is no way to disable gcc's types and even 4.8.5 can
+> do these. Thanks,
+
+Hmm, I always try to do a 32bit build before I send a pull request,
+that's where I started this time.  I thought an Int128 was always a
+structure, so I figured it always failed.  Good to know there was more
+than just my testing on this commit.  Since it's in, we can fix it
+during the freeze if it turns out to be broken.  Thanks,
+
+Alex
