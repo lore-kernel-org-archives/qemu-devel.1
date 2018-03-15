@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56236)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ewYWt-000514-Po
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:27:12 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ewYXz-0005mF-Dh
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:28:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ewYWq-0001pA-M8
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:27:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38444 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1ewYWq-0001oA-HY
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:27:08 -0400
-References: <152103749688.51.951110294839758890@71c20359a636>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <52342f07-325c-d252-1845-97c55ea87b8f@redhat.com>
-Date: Thu, 15 Mar 2018 20:26:54 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1ewYXy-0002qH-DS
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:28:19 -0400
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:40809)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ewYXy-0002pp-7R
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 15:28:18 -0400
+Received: by mail-ot0-x244.google.com with SMTP id l12-v6so8043515otj.7
+	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 12:28:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <152103749688.51.951110294839758890@71c20359a636>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <a407b0b4-17fc-e399-d0b1-c2eaf87a4836@amsat.org>
+References: <1520629272-98060-1-git-send-email-mjc@sifive.com>
+	<a407b0b4-17fc-e399-d0b1-c2eaf87a4836@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 15 Mar 2018 19:27:57 +0000
+Message-ID: <CAFEAcA_eaem+n79=DmSJnWYFQzrggAdab7H3hihnuq--=hy8kA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] dump-guest-memory: more descriptive
- lookup_type failure
+Subject: Re: [Qemu-devel] [PATCH v2] RISC-V: Fix riscv_isa_string,
+ use popcount to count bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +31,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: drjones@redhat.com
-Cc: qemu-devel@nongnu.org, famz@redhat.com, frankja@linux.vnet.ibm.com, marcandre.lureau@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Michael Clark <mjc@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Palmer Dabbelt <palmer@sifive.com>
 
-On 03/14/18 15:24, no-reply@patchew.org wrote:
+On 10 March 2018 at 21:25, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wr=
+ote:
+> On 03/09/2018 10:01 PM, Michael Clark wrote:
+>> Logic bug caused the string size calculation for the RISC-V
+>> format ISA string to be small. This fix allows slack for rv128.
+>>
+>> Cc: Palmer Dabbelt <palmer@sifive.com>
+>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>> Cc: Eric Blake <eblake@redhat.com>
+>> Signed-off-by: Michael Clark <mjc@sifive.com>
+>> ---
+>>  target/riscv/cpu.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+>> index 4851890..1456535 100644
+>> --- a/target/riscv/cpu.c
+>> +++ b/target/riscv/cpu.c
+>> @@ -391,7 +391,7 @@ static const TypeInfo riscv_cpu_type_info =3D {
+>>  char *riscv_isa_string(RISCVCPU *cpu)
+>>  {
+>>      int i;
+>> -    size_t maxlen =3D 5 + ctz32(cpu->env.misa);
+>> +    size_t maxlen =3D 8 + ctpop64(cpu->env.misa);
+>
+> Can you document the magic 5/8?
+>
+> This looks nice, but this seems to me too much optimization to save few
+> bytes, using sizeof(riscv_exts) is overflow-free.
+>
+> Maybe this is enough and self-explanatory:
+>
+>        const size_t maxlen =3D sizeof("rv128") + sizeof(riscv_exts);
+>
+>>      char *isa_string =3D g_new0(char, maxlen);
+>>      snprintf(isa_string, maxlen, "rv%d", TARGET_LONG_BITS);
+>
+> Also, if you keep the snprintf() return value, you can (naming it 'n')
+> simplify (also easier to review):
+>
+>>      for (i =3D 0; i < sizeof(riscv_exts); i++) {
+>>
+>         if (cpu->env.misa & RV(riscv_exts[i])) {
+> -           isa_string[strlen(isa_string)] =3D riscv_exts[i] - 'A' + 'a';
+> +           isa_string[n++] =3D tolower(riscv_exts[i]);
+>         }
+>     }
+>
+> and simply use g_new() with:
+>
+> +   isa_string[n] =3D '\0';
+>
+>     return isa_string;
+> }
 
-> Checking PATCH 1/1: dump-guest-memory: more descriptive lookup_type fai=
-lure...
-> WARNING: line over 80 characters
-> #34: FILE: scripts/dump-guest-memory.py:22:
-> +    raise gdb.GdbError("Symbols must be loaded prior to sourcing dump-=
-guest-memory.\n"
->=20
-> ERROR: line over 90 characters
-> #35: FILE: scripts/dump-guest-memory.py:23:
-> +                       "Symbols may be loaded by first 'attach'ing a Q=
-EMU process id or by 'load'ing a QEMU binary.")
->=20
-> total: 1 errors, 1 warnings, 12 lines checked
+Hi -- any chance of a respin of this patch that addresses Philippe's
+review comments so we can fix it before rc0? This is causing
+my merge-build tests to fail about 50% of the time on OpenBSD
+at the moment...
 
-The current "width" of the script is currently:
-
-$ wc -L scripts/dump-guest-memory.py
-81 scripts/dump-guest-memory.py
-
-I think it would be good to stick with 80 chars in this patch. (While
-adhering to whatever Python idioms are considered necessary -- I think
-Janosch and Marc-Andr=C3=A9 can help with that.)
-
-Once that's fixed, please add my:
-
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-(And, I agree, this error message has been reported several times to me
-as well.)
-
-Thanks!
-Laszlo
+thanks
+-- PMM
