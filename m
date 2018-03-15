@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ewTKS-00077u-KF
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:54:01 -0400
+	(envelope-from <no-reply@patchew.org>) id 1ewTMi-00085p-DN
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:56:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ewTKP-0000ZV-F9
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:54:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44792 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ewTKP-0000Z0-9V
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:53:57 -0400
-Date: Thu, 15 Mar 2018 15:53:56 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180315155051-mutt-send-email-mst@kernel.org>
-References: <1520426065-40265-1-git-send-email-wei.w.wang@intel.com>
-	<1520426065-40265-4-git-send-email-wei.w.wang@intel.com>
-	<20180313183558-mutt-send-email-mst@kernel.org>
-	<5AA88C35.90300@intel.com>
-	<20180314045130-mutt-send-email-mst@kernel.org>
-	<5AA8BB27.6030205@intel.com>
-	<20180314160832-mutt-send-email-mst@kernel.org>
-	<5AA9C944.2010403@intel.com>
-	<20180315044543-mutt-send-email-mst@kernel.org>
-	<5AAA49D0.7010200@intel.com>
+	(envelope-from <no-reply@patchew.org>) id 1ewTMf-0002ql-6v
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:56:20 -0400
+Resent-Message-Id: <E1ewTMf-0002ql-6v@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21012)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ewTMe-0002oc-Vi
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:56:17 -0400
+In-Reply-To: <1520930033-18885-1-git-send-email-junyan.he@intel.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152112211727.51.6572002419251025407@71c20359a636>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5AAA49D0.7010200@intel.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v4 3/4] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_HINT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 15 Mar 2018 06:55:18 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 00/10] RFC: Optimize nvdimm kind memory for
+ snapshot.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,129 +29,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: junyan.he@intel.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.comfamz@redhat.com, crosthwaite.peter@gmail.com, quintela@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 
-On Thu, Mar 15, 2018 at 06:24:16PM +0800, Wei Wang wrote:
-> On 03/15/2018 10:47 AM, Michael S. Tsirkin wrote:
-> > On Thu, Mar 15, 2018 at 09:15:48AM +0800, Wei Wang wrote:
-> > > On 03/14/2018 10:12 PM, Michael S. Tsirkin wrote:
-> > > > On Wed, Mar 14, 2018 at 02:03:19PM +0800, Wei Wang wrote:
-> > > > > On 03/14/2018 10:53 AM, Michael S. Tsirkin wrote:
-> > > > > > On Wed, Mar 14, 2018 at 10:43:01AM +0800, Wei Wang wrote:
-> > > > > > > On 03/14/2018 12:49 AM, Michael S. Tsirkin wrote:
-> > > > > > > > On Wed, Mar 07, 2018 at 08:34:24PM +0800, Wei Wang wrote:
-> > > > > > > > 
-> > > > > > > > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> > > > > > > > > Signed-off-by: Liang Li <liang.z.li@intel.com>
-> > > > > > > > > CC: Michael S. Tsirkin <mst@redhat.com>
-> > > > > > > > > CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > > > > > > > CC: Juan Quintela <quintela@redhat.com>
-> > > > > > > > I find it suspicious that neither unrealize nor reset
-> > > > > > > > functions have been touched at all.
-> > > > > > > > Are you sure you have thought through scenarious like
-> > > > > > > > hot-unplug or disabling the device by guest?
-> > > > > > > OK. I think we can call balloon_free_page_stop in unrealize and reset.
-> > > > > > > 
-> > > > > > > 
-> > > > > > > > +static void *virtio_balloon_poll_free_page_hints(void *opaque)
-> > > > > > > > +{
-> > > > > > > > +    VirtQueueElement *elem;
-> > > > > > > > +    VirtIOBalloon *dev = opaque;
-> > > > > > > > +    VirtQueue *vq = dev->free_page_vq;
-> > > > > > > > +    uint32_t id;
-> > > > > > > > +    size_t size;
-> > > > > > > > What makes it safe to poke at this device from multiple threads?
-> > > > > > > > I think that it would be safer to do it from e.g. BH.
-> > > > > > > > 
-> > > > > > > Actually the free_page_optimization thread is the only user of free_page_vq,
-> > > > > > > and there is only one optimization thread each time. Would this be safe
-> > > > > > > enough?
-> > > > > > > 
-> > > > > > > Best,
-> > > > > > > Wei
-> > > > > > Aren't there other fields there? Also things like reset affect all VQs.
-> > > > > > 
-> > > > > Yes. But I think BHs are used to avoid re-entrancy, which isn't the issue
-> > > > > here.
-> > > > Since you are adding locks to address the issue - doesn't this imply
-> > > > reentrancy is exactly the issue?
-> > > Not really. The lock isn't intended for any reentrancy issues, since there
-> > > will be only one run of the virtio_balloon_poll_free_page_hints function at
-> > > any given time. Instead, the lock is used to synchronize
-> > > virtio_balloon_poll_free_page_hints and virtio_balloon_free_page_stop to
-> > > access dev->free_page_report_status.
-> > I wonder whether that's enough. E.g. is there a race with guest
-> > trying to reset the device? That resets all VQs you know.
-> 
-> I think that's OK - we will call virtio_balloon_free_page_stop in the device
-> reset function, and qemu_thread_join() in virtio_balloon_free_page_stop will
-> wait till the optimization thread exits. That is, the reset will proceed
-> after the optimization thread exits.
-> 
-> 
-> > 
-> > 
-> > > Please see the whole picture below:
-> > > 
-> > > virtio_balloon_poll_free_page_hints()
-> > > {
-> > > 
-> > >      while (1) {
-> > >          qemu_spin_lock();
-> > >          if (dev->free_page_report_status >= FREE_PAGE_REPORT_S_STOP ||
-> > >              !runstate_is_running()) {
-> > >              qemu_spin_unlock();
-> > >              break;
-> > >          }
-> > >          ...
-> > >          if (id == dev->free_page_report_cmd_id) {
-> > > ==>        dev->free_page_report_status = FREE_PAGE_REPORT_S_START;
-> > >          ...
-> > >          qemu_spin_unlock();
-> > >      }
-> > > }
-> > > 
-> > > 
-> > > static void virtio_balloon_free_page_stop(void *opaque)
-> > > {
-> > >      VirtIOBalloon *s = opaque;
-> > >      VirtIODevice *vdev = VIRTIO_DEVICE(s);
-> > > 
-> > >      qemu_spin_lock();
-> > > ...
-> > > ==>       s->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
-> > >      ...
-> > >      qemu_spin_unlock();
-> > > }
-> > > 
-> > > 
-> > > Without the lock, there are theoretical possibilities that assigning STOP
-> > > below is overridden by START above. In that
-> > > case,virtio_balloon_free_page_stop does not effectively stop
-> > > virtio_balloon_poll_free_page_hints.
-> > > I think this issue couldn't be solved by BHs.
-> > > 
-> > > Best,
-> > > Wei
-> > Don't all BHs run under the BQL?
-> 
-> Actually the virtio_balloon_free_page_stop is called by the migration thread
-> (instead of a BH). Even we guarantee the migration thread calls
-> virtio_balloon_free_page_stop under BQL, the BQL is still too big for our
-> case. Imagine this case: when the migration thread calls
-> virtio_balloon_free_page_stop to stop the reporting, it blocks by BQL as
-> virtio_balloon_poll_free_page_hints is in progress with BQL held, and the
-> migration thread won't proceed untill virtio_balloon_poll_free_page_hints
-> exits (i.e. getting all the hints). I think this isn't our intention - we
-> basically want the migration thread to stop the guest reporting immediately.
-> So I think the small lock above is better (it locks for only one hint).
-> 
-> Best,
-> Wei
-
-I am just saying that all these locking and ownership tricks need to be
-documented. BH would be much simpler.
-
--- 
-MST
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MjA5MzAwMzMtMTg4ODUtMS1naXQtc2VuZC1lbWFpbC1qdW55YW4uaGVAaW50
+ZWwuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvMTBdIFJGQzogT3B0aW1pemUg
+bnZkaW1tIGtpbmQgbWVtb3J5IGZvciBzbmFwc2hvdC4KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
+PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAk
+QkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVs
+aW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3Jt
+YXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8g
+IkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMp
+Li4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVj
+a3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNo
+bwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQ
+VCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEz
+Mzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcg
+dGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMTUyMDkzMDAzMy0xODg4NS0xLWdpdC1zZW5kLWVt
+YWlsLWp1bnlhbi5oZUBpbnRlbC5jb20gLT4gcGF0Y2hldy8xNTIwOTMwMDMzLTE4ODg1LTEtZ2l0
+LXNlbmQtZW1haWwtanVueWFuLmhlQGludGVsLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
+J3Rlc3QnCjg1NmE1ZTk2ODcgUkZDOiBFbmFibGUgbnZkaW1tIHNuYXBzaG90IGZ1bmN0aW9ucy4K
+NGMxYWRjZWIyOCBSRkM6IEFkZCBudmRpbW0gc25hcHNob3Qgc2F2aW5nIHRvIG1pZ3JhdGlvbi4K
+NDI0Nzc4YzRkZSBSRkM6IEFkZCBhIHNlY3Rpb25faWQgcGFyYW1ldGVyIHRvIHNhdmVfbGl2ZV9p
+dGVyYXRlIGNhbGwuCmY5YWJiZTcxY2QgUkZDOiBBZGQgZ2V0X2N1cnJlbnRfc25hcHNob3RfaW5m
+byB0byBnZXQgdGhlIHNuYXBzaG90IHN0YXRlLgpmNDlhNWIwODM4IFJGQzogQWRkIHNhdmUgZGVw
+ZW5kZW5jeSBmdW5jdGlvbnMgdG8gcWVtdV9maWxlCmFkZjcxMmE2MTYgUkZDOiBBZGQgbWVtb3J5
+IHJlZ2lvbiBzbmFwc2hvdCBiaXRtYXAgZ2V0IGZ1bmN0aW9uLgozZmE5NDg0Y2I4IFJGQzogU2V0
+IG1lbW9yeV9yZWdpb25fc2V0X2xvZyBhdmFpbGFibGUgZm9yIG1vcmUgY2xpZW50Lgo5ZDQwZGJi
+MTllIFJGQzogSW1wbGVtZW50IHNhdmUgYW5kIHN1cHBvcnQgc25hcHNob3QgZGVwZW5kZW5jeSBp
+biBibG9jayBkcml2ZXIgbGF5ZXIuCmM0M2U4YTFkYTIgUkZDOiBJbXBsZW1lbnQgcWNvdzIncyBz
+bmFwc2hvdCBkZXBlbmRlbnQgc2F2aW5nIGZ1bmN0aW9uLgplMDIyOTY4Yzk0IFJGQzogQWRkIHNh
+dmUgYW5kIHN1cHBvcnQgc25hcHNob3QgZGVwZW5kZW5jeSBmdW5jdGlvbiB0byBibG9jayBkcml2
+ZXIuCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzEwOiBSRkM6IEFkZCBz
+YXZlIGFuZCBzdXBwb3J0IHNuYXBzaG90IGRlcGVuZGVuY3kgZnVuY3Rpb24gdG8gYmxvY2sgZHJp
+dmVyLi4uLgpDaGVja2luZyBQQVRDSCAyLzEwOiBSRkM6IEltcGxlbWVudCBxY293MidzIHNuYXBz
+aG90IGRlcGVuZGVudCBzYXZpbmcgZnVuY3Rpb24uLi4uCkNoZWNraW5nIFBBVENIIDMvMTA6IFJG
+QzogSW1wbGVtZW50IHNhdmUgYW5kIHN1cHBvcnQgc25hcHNob3QgZGVwZW5kZW5jeSBpbiBibG9j
+ayBkcml2ZXIgbGF5ZXIuLi4uCkNoZWNraW5nIFBBVENIIDQvMTA6IFJGQzogU2V0IG1lbW9yeV9y
+ZWdpb25fc2V0X2xvZyBhdmFpbGFibGUgZm9yIG1vcmUgY2xpZW50Li4uLgpDaGVja2luZyBQQVRD
+SCA1LzEwOiBSRkM6IEFkZCBtZW1vcnkgcmVnaW9uIHNuYXBzaG90IGJpdG1hcCBnZXQgZnVuY3Rp
+b24uLi4uCkNoZWNraW5nIFBBVENIIDYvMTA6IFJGQzogQWRkIHNhdmUgZGVwZW5kZW5jeSBmdW5j
+dGlvbnMgdG8gcWVtdV9maWxlLi4uCkNoZWNraW5nIFBBVENIIDcvMTA6IFJGQzogQWRkIGdldF9j
+dXJyZW50X3NuYXBzaG90X2luZm8gdG8gZ2V0IHRoZSBzbmFwc2hvdCBzdGF0ZS4uLi4KQ2hlY2tp
+bmcgUEFUQ0ggOC8xMDogUkZDOiBBZGQgYSBzZWN0aW9uX2lkIHBhcmFtZXRlciB0byBzYXZlX2xp
+dmVfaXRlcmF0ZSBjYWxsLi4uLgpDaGVja2luZyBQQVRDSCA5LzEwOiBSRkM6IEFkZCBudmRpbW0g
+c25hcHNob3Qgc2F2aW5nIHRvIG1pZ3JhdGlvbi4uLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNo
+YXJhY3RlcnMKIzEyMjogRklMRTogbWlncmF0aW9uL252ZGltbS5jOjcwOgorLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTIzOiBG
+SUxFOiBtaWdyYXRpb24vbnZkaW1tLmM6NzE6Cit8IERJUlRZX0JJVE1BUF9JRCB8IHRvdGFsIHNp
+emUgfCByYW0gbmFtZSBzaXplIHwgcmFtIG5hbWUgfCByYW0gc2l6ZSB8IGJpdG1hcCBzaXplIHwK
+CldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMjQ6IEZJTEU6IG1pZ3JhdGlvbi9u
+dmRpbW0uYzo3MjoKKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKV0FSTklORzogbGluZSBv
+dmVyIDgwIGNoYXJhY3RlcnMKIzEyOTogRklMRTogbWlncmF0aW9uL252ZGltbS5jOjc3OgorLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
+dGVycwojMTMwOiBGSUxFOiBtaWdyYXRpb24vbnZkaW1tLmM6Nzg6Cit8IERBVEFfSUQgfCBzaXpl
+IHwgcmFtIG5hbWUgc2l6ZSB8IHJhbSBuYW1lIHwgcmFtIHNpemUgfCBkYXRhIHNpemUgfCBkYXRh
+Li4uIHwgRU5EX0lEIHwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMzE6IEZJ
+TEU6IG1pZ3JhdGlvbi9udmRpbW0uYzo3OToKKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LQoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMyNDM6IEZJTEU6IG1pZ3JhdGlv
+bi9udmRpbW0uYzoxOTE6CisgICAgcGFkZGluZ19zeiAtPSBzaXplb2YoaW50MzJfdCk7IC8vIE5W
+RElNTV9TRUNUSU9OX1BBRERJTkdfSUQKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50
+cwojMjQ0OiBGSUxFOiBtaWdyYXRpb24vbnZkaW1tLmM6MTkyOgorICAgIHBhZGRpbmdfc3ogLT0g
+c2l6ZW9mKGludDMyX3QpOyAvLyBOVkRJTU1fUEFERElOR19CWVRFIHNpemUKCkVSUk9SOiBkbyBu
+b3QgdXNlIEM5OSAvLyBjb21tZW50cwojMjQ1OiBGSUxFOiBtaWdyYXRpb24vbnZkaW1tLmM6MTkz
+OgorICAgIHBhZGRpbmdfc3ogLT0gc2l6ZW9mKGludDMyX3QpOyAvLyBOVkRJTU1fU0VDVElPTl9F
+TkRfSUQKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMzQ0OiBGSUxFOiBtaWdy
+YXRpb24vbnZkaW1tLmM6MjkyOgorICAgICAgICAgICAgZGF0YV9zeiArPSBzaXplb2YoaW50KTsg
+Ly8gWmVybyBwYWdlLCBqdXN0IGEgSUQKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50
+cwojMzQ2OiBGSUxFOiBtaWdyYXRpb24vbnZkaW1tLmM6Mjk0OgorICAgICAgICAgICAgZGF0YV9z
+eiArPSAoKDEgPDwgVEFSR0VUX1BBR0VfQklUUykgKyBzaXplb2YoaW50KSk7IC8vIElEICsgcGFn
+ZQoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMzNTA6IEZJTEU6IG1pZ3JhdGlv
+bi9udmRpbW0uYzoyOTg6CisgICAgdG90YWxfc3ogPSBzaXplb2YodW5zaWduZWQgaW50KTsgLy8g
+TlZESU1NX1NFQ1RJT05fRElSVFlfQklUTUFQX0lECgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8g
+Y29tbWVudHMKIzM1MTogRklMRTogbWlncmF0aW9uL252ZGltbS5jOjI5OToKKyAgICB0b3RhbF9z
+eiArPSBzaXplb2YodWludDY0X3QpOyAgICAvLyB0aGUgdG90YWwgc2l6ZSBpdHNlbGYKCkVSUk9S
+OiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMzUyOiBGSUxFOiBtaWdyYXRpb24vbnZkaW1t
+LmM6MzAwOgorICAgIHRvdGFsX3N6ICs9IHNpemVvZihpbnQpOyAgICAgICAgIC8vIHJhbSBuYW1l
+IHNpemUKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMzU1OiBGSUxFOiBtaWdy
+YXRpb24vbnZkaW1tLmM6MzAzOgorICAgIHRvdGFsX3N6ICs9IHNpemVvZih1aW50NjRfdCk7IC8v
+IHJhbSBzaXplCgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzM1NjogRklMRTog
+bWlncmF0aW9uL252ZGltbS5jOjMwNDoKKyAgICB0b3RhbF9zeiArPSBzaXplb2YodWludDY0X3Qp
+OyAvLyBkYXRhIHNpemUKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMzU4OiBG
+SUxFOiBtaWdyYXRpb24vbnZkaW1tLmM6MzA2OgorICAgIHRvdGFsX3N6ICs9IHNpemVvZih1bnNp
+Z25lZCBpbnQpOyAvLyBOVkRJTU1fU0VDVElPTl9FTkRfSUQKCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiM0MTQ6IEZJTEU6IG1pZ3JhdGlvbi9udmRpbW0uYzozNjI6CisgICAgICAg
+IG1lbW9yeV9yZWdpb25fc2l6ZShudmRpbW1fc3RhdGUtPmJsb2Nrc1tpXS0+bXIpID4+IChUQVJH
+RVRfUEFHRV9CSVRTICsgMyk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNDIx
+OiBGSUxFOiBtaWdyYXRpb24vbnZkaW1tLmM6MzY5OgorICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgc25hcCwgYWRkciwgMSA8PCBUQVJHRVRfUEFHRV9CSVRTKSkg
+ewoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiM0MjY6IEZJTEU6IG1pZ3JhdGlv
+bi9udmRpbW0uYzozNzQ6CisgICAgdG90YWxfc3ogPSBzaXplb2YodW5zaWduZWQgaW50KTsgLy8g
+TlZESU1NX1NFQ1RJT05fRElSVFlfQklUTUFQX0lECgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8g
+Y29tbWVudHMKIzQyNzogRklMRTogbWlncmF0aW9uL252ZGltbS5jOjM3NToKKyAgICB0b3RhbF9z
+eiArPSBzaXplb2YodWludDY0X3QpOyAgICAvLyB0aGUgdG90YWwgc2l6ZSBpdHNlbGYKCkVSUk9S
+OiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojNDI4OiBGSUxFOiBtaWdyYXRpb24vbnZkaW1t
+LmM6Mzc2OgorICAgIHRvdGFsX3N6ICs9IHNpemVvZihpbnQpOyAgICAgICAgIC8vIHJhbSBuYW1l
+IHNpemUKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojNDMxOiBGSUxFOiBtaWdy
+YXRpb24vbnZkaW1tLmM6Mzc5OgorICAgIHRvdGFsX3N6ICs9IHNpemVvZih1aW50NjRfdCk7IC8v
+IHJhbSBzaXplCgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzQzMjogRklMRTog
+bWlncmF0aW9uL252ZGltbS5jOjM4MDoKKyAgICB0b3RhbF9zeiArPSBzaXplb2YodWludDY0X3Qp
+OyAvLyBiaXRtYXAgc2l6ZQoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiM0MzQ6
+IEZJTEU6IG1pZ3JhdGlvbi9udmRpbW0uYzozODI6CisgICAgdG90YWxfc3ogKz0gc2l6ZW9mKHVp
+bnQ2NF90KTsgLy8gZGF0YSBzaXplCgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMK
+IzQzNjogRklMRTogbWlncmF0aW9uL252ZGltbS5jOjM4NDoKKyAgICB0b3RhbF9zeiArPSBzaXpl
+b2YodW5zaWduZWQgaW50KTsgLy8gTlZESU1NX1NFQ1RJT05fRU5EX0lECgpXQVJOSU5HOiBsaW5l
+IG92ZXIgODAgY2hhcmFjdGVycwojNDUzOiBGSUxFOiBtaWdyYXRpb24vbnZkaW1tLmM6NDAxOgor
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNuYXAsIGFk
+ZHIsIDEgPDwgVEFSR0VUX1BBR0VfQklUUykpIHsKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBj
+b21tZW50cwojNTUyOiBGSUxFOiBtaWdyYXRpb24vbnZkaW1tLmM6NTAwOgorICAgIGlmIChRRU1V
+X0lTX0FMSUdORUQoY3VyX3BvcywgYWxpZ25tZW50KSkgeyAvLyBBbHJlYWR5IGFsaWduZWQKCkVS
+Uk9SOiB0cmFpbGluZyBzdGF0ZW1lbnRzIHNob3VsZCBiZSBvbiBuZXh0IGxpbmUKIzU1MjogRklM
+RTogbWlncmF0aW9uL252ZGltbS5jOjUwMDoKKyAgICBpZiAoUUVNVV9JU19BTElHTkVEKGN1cl9w
+b3MsIGFsaWdubWVudCkpIHsgLy8gQWxyZWFkeSBhbGlnbmVkCgpFUlJPUjogZ19mcmVlKE5VTEwp
+IGlzIHNhZmUgdGhpcyBjaGVjayBpcyBwcm9iYWJseSBub3QgcmVxdWlyZWQKIzU5NDogRklMRTog
+bWlncmF0aW9uL252ZGltbS5jOjU0MjoKKyAgICAgICAgaWYgKG52ZGltbV9zdGF0ZS0+Y3VyX3Nu
+YXBzaG90X2lkKSB7CisgICAgICAgICAgICBnX2ZyZWUobnZkaW1tX3N0YXRlLT5jdXJfc25hcHNo
+b3RfaWQpOwoKRVJST1I6IGdfZnJlZShOVUxMKSBpcyBzYWZlIHRoaXMgY2hlY2sgaXMgcHJvYmFi
+bHkgbm90IHJlcXVpcmVkCiM1OTc6IEZJTEU6IG1pZ3JhdGlvbi9udmRpbW0uYzo1NDU6CisgICAg
+ICAgIGlmIChudmRpbW1fc3RhdGUtPmJsb2NrcykgeworICAgICAgICAgICAgZ19mcmVlKG52ZGlt
+bV9zdGF0ZS0+YmxvY2tzKTsKCkVSUk9SOiBnX2ZyZWUoTlVMTCkgaXMgc2FmZSB0aGlzIGNoZWNr
+IGlzIHByb2JhYmx5IG5vdCByZXF1aXJlZAojNjc2OiBGSUxFOiBtaWdyYXRpb24vbnZkaW1tLmM6
+NjI0OgorICAgICAgICBpZiAobnZkaW1tX3N0YXRlLT5kZXBlbmRfc25hcHNob3RfaWQpIHsKKyAg
+ICAgICAgICAgIGdfZnJlZShudmRpbW1fc3RhdGUtPmRlcGVuZF9zbmFwc2hvdF9pZCk7CgpFUlJP
+UjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzY5NTogRklMRTogbWlncmF0aW9uL252ZGlt
+bS5jOjY0MzoKKyAgICAgICAgICAgICAgICAvLyBDYW4gbm90IGZpbmQgdGhlIHNhbWUgYmxvY2s/
+CgpFUlJPUjogZ19mcmVlKE5VTEwpIGlzIHNhZmUgdGhpcyBjaGVjayBpcyBwcm9iYWJseSBub3Qg
+cmVxdWlyZWQKIzg5NjogRklMRTogbWlncmF0aW9uL252ZGltbS5jOjg0NDoKKyAgICBpZiAoYml0
+bWFwX2J1ZikgeworICAgICAgICBnX2ZyZWUoYml0bWFwX2J1Zik7CgpFUlJPUjogZ19mcmVlKE5V
+TEwpIGlzIHNhZmUgdGhpcyBjaGVjayBpcyBwcm9iYWJseSBub3QgcmVxdWlyZWQKIzk4MzogRklM
+RTogbWlncmF0aW9uL252ZGltbS5jOjkzMToKKyAgICBpZiAoYnVmKSB7CisgICAgICAgIGdfZnJl
+ZShidWYpOwoKRVJST1I6IGdfZnJlZShOVUxMKSBpcyBzYWZlIHRoaXMgY2hlY2sgaXMgcHJvYmFi
+bHkgbm90IHJlcXVpcmVkCiMxMDYyOiBGSUxFOiBtaWdyYXRpb24vbnZkaW1tLmM6MTAxMDoKKyAg
+ICBpZiAoYnVmKSB7CisgICAgICAgIGdfZnJlZShidWYpOwoKdG90YWw6IDI3IGVycm9ycywgOSB3
+YXJuaW5ncywgMTA1MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAxMC8xMDogUkZDOiBFbmFibGUgbnZkaW1tIHNuYXBz
+aG90IGZ1bmN0aW9ucy4uLi4KRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiM0Nzog
+RklMRTogbWlncmF0aW9uL3JhbS5jOjE1OTY6CisgICAgICAgICAgICAvLyBJZiBzbmFwc2hvdCBh
+bmQgdGhlIGJsb2NrIGlzIG52ZGltbSwgbGV0IG52ZGltbSBkbyB0aGUgam9iCgpFUlJPUjogZG8g
+bm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzU4OiBGSUxFOiBtaWdyYXRpb24vcmFtLmM6MjIzOToK
+KyAgICAgICAgICAgIC8vIElmIHNuYXBzaG90IGFuZCB0aGUgYmxvY2sgaXMgbnZkaW1tLCBsZXQg
+bnZkaW1tIGRvIHRoZSBqb2IKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgNTEgbGluZXMg
+Y2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
+ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
+dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBV
+VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBn
+ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4K
+UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
