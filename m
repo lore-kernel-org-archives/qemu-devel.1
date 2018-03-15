@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1ewReX-0004s5-8f
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 08:06:43 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ewRio-0006ML-8x
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 08:11:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1ewReT-0003Cs-6r
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 08:06:37 -0400
-Received: from smtp65.cstnet.cn ([159.226.251.65]:48094 helo=cstnet.cn)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1ewReS-00038v-IB
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 08:06:33 -0400
-Date: Thu, 15 Mar 2018 20:06:24 +0800 (GMT+08:00)
-From: "Su Hang" <suhang16@mails.ucas.ac.cn>
-In-Reply-To: <CAFEAcA8sKBc--=AkwXjnJxEB484Z=Gin-u2ga5nG9UR79HN-6w@mail.gmail.com>
-References: <1521114316-19980-1-git-send-email-suhang16@mails.ucas.ac.cn>
-	<CAFEAcA8sKBc--=AkwXjnJxEB484Z=Gin-u2ga5nG9UR79HN-6w@mail.gmail.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ewRil-0000iJ-42
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 08:11:02 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180313153458.26822-1-peter.maydell@linaro.org>
+	<20180313153458.26822-8-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <8d9b206b-3d30-5ceb-cf37-07cf5857afc3@amsat.org>
+Date: Thu, 15 Mar 2018 13:10:56 +0100
 MIME-Version: 1.0
-Message-ID: <4a161e24.12a99.162298dd716.Coremail.suhang16@mails.ucas.ac.cn>
-Subject: Re: [Qemu-devel] [PATCH RFC] scripts/checkpatch.pl: Bug fix
+In-Reply-To: <20180313153458.26822-8-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 7/9] hw/arm/bcm2836: Use correct affinity
+ values for BCM2837
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,34 +29,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter maydell <peter.maydell@linaro.org>
-Cc: eric blake <eblake@redhat.com>, vladimir sementsov-ogievskiy <vsementsov@virtuozzo.com>, qemu developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Pekka Enberg <penberg@iki.fi>, Andrew Baumann <Andrew.Baumann@microsoft.com>
 
-U29ycnkgYWJvdXQgaW5hcHByb3ByaWF0ZSBleGFtcGxlLCB3aGF0IEkgd2FudCB0byBleHByZXNz
-IGlzLAp3aGVuIGNoZWNrcGF0Y2gucGwgZmluZCBwYXR0ZXJuIGxpa2UgdGhpczoKIiIiCmZvciAo
-aSA9IDA7IGkgPCAwOyArK2kpCnsKICAgIDsKfQoiIiIKSXQgc2hvdWxkIHJhaXNlCiIiIgpFUlJP
-UjogdGhhdCBvcGVuIGJyYWNlIHsgc2hvdWxkIGJlIG9uIHRoZSBwcmV2aW91cyBsaW5lCiM0OiBG
-SUxFOiB0ZXN0LmM6NDoKKyAgICBmb3IgKGkgPSAwOyBpIDwgMDsgKytpKQorICAgIHsKIiIiCgpJ
-bnN0ZWFkIG9mOgoiIiIgCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBldmVuIGZvciBz
-aW5nbGUgc3RhdGVtZW50IGJsb2NrcwojNDogRklMRTogdGVzdC5jOjQ6CisgICAgZm9yIChpID0g
-MDsgaSA8IDA7ICsraSkKKyAgICB7CisgICAgICAgIDsKKyAgICB9CiIiIgoKPiAtLS0tLU9yaWdp
-bmFsIE1lc3NhZ2VzLS0tLS0KPiBGcm9tOiAiUGV0ZXIgTWF5ZGVsbCIgPHBldGVyLm1heWRlbGxA
-bGluYXJvLm9yZz4KPiBTZW50IFRpbWU6IDIwMTgtMDMtMTUgMTk6NTA6NTUgKFRodXJzZGF5KQo+
-IFRvOiAiU3UgSGFuZyIgPHN1aGFuZzE2QG1haWxzLnVjYXMuYWMuY24+Cj4gQ2M6ICJFcmljIEJs
-YWtlIiA8ZWJsYWtlQHJlZGhhdC5jb20+LCAiVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSIg
-PHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4sICJRRU1VIERldmVsb3BlcnMiIDxxZW11LWRldmVs
-QG5vbmdudS5vcmc+Cj4gU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUEFUQ0ggUkZDXSBzY3Jp
-cHRzL2NoZWNrcGF0Y2gucGw6IEJ1ZyBmaXgKPiAKPiBPbiAxNSBNYXJjaCAyMDE4IGF0IDExOjQ1
-LCBTdSBIYW5nIDxzdWhhbmcxNkBtYWlscy51Y2FzLmFjLmNuPiB3cm90ZToKPiA+IEJ1ZyBmaXg6
-IGNoZWNrcGF0Y2gucGwgc3RvcHMgY29tcGxhaW5pbmcgYWJvdXQgZm9sbG93aW5nIHBhdHRlcm46
-Cj4gPiAiIiIKPiA+IGRvIHsKPiA+ICAgICAvL2RvIHNvbWV0aGluczsKPiA+IH0gd2hpbGUgKGNv
-bmRpdGlvbnMpOwo+ID4gIiIiCj4gPgo+ID4gVHdvIHRoaW5ncyBuZWVkIHRvIGJlIG1lbnRpb25l
-ZDoKPiA+IDEpIEJlZm9yZSBJIGNhc3VlIHRoaXMgYnVnLCBjaGVja3BhdGNoLnBsIHdpbGwgcmFp
-c2UgYSB3cm9uZwo+ID4gY29tcGxhaW46Cj4gPiAiIiIKPiA+IEVSUk9SOiBicmFjZXMge30gYXJl
-IG5lY2Vzc2FyeSBldmVuIGZvciBzaW5nbGUgc3RhdGVtZW50IGJsb2Nrcwo+ID4gKyAgICBmb3Ig
-KGkgPT0gMDsgaSA8IDA7ICsraSkKPiA+ICsgICAgewo+ID4gKyAgICAgICAgOwo+ID4gKyAgICB9
-IGVsc2UKPiA+ICIiIgo+IAo+IFRoaXMgaXMgYSBiaXQgb2YgYW4gb2RkIGV4YW1wbGUgLS0gZm9y
-KCkgbG9vcHMgZG9uJ3QKPiB0YWtlICJlbHNlIiBjbGF1c2VzLCBzbyB3aGF0IGlzIHRoZSAnZWxz
-ZScgZG9pbmcgaGVyZT8KPiAKPiAoQWxzbywgZm9yIFFFTVUgc3R5bGUgdGhlICJ7IiBzaG91bGQg
-YmUgb24gdGhlIHNhbWUgbGluZSBhcyB0aGUgZm9yKCksCj4gbm90IG9uIGEgbGluZSBvZiBpdHMg
-b3duLikKPiAKPiB0aGFua3MKPiAtLSBQTU0K
+On 03/13/2018 04:34 PM, Peter Maydell wrote:
+> The BCM2837 sets the Aff1 field of the MPIDR affinity values for the
+> CPUs to 0, whereas the BCM2836 uses 0xf. Set this correctly, as it
+> is required for Linux to boot.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+I don't have the datasheet for this SoC,
+but checked Linux dts ("ARM CPUs bindings -> cpus and cpu node bindings
+definition" from doc/Documentation/devicetree/bindings/arm/cpus.txt,
+then arch/arm/boot/dts/bcm283[67].dtsi). This might be useful to add in
+the commit description.
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>  hw/arm/bcm2836.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
+> index 07d2705f96..7140257c98 100644
+> --- a/hw/arm/bcm2836.c
+> +++ b/hw/arm/bcm2836.c
+> @@ -25,14 +25,17 @@
+>  
+>  struct BCM283XInfo {
+>      const char *name;
+> +    int clusterid;
+>  };
+>  
+>  static const BCM283XInfo bcm283x_socs[] = {
+>      {
+>          .name = TYPE_BCM2836,
+> +        .clusterid = 0xf,
+>      },
+>      {
+>          .name = TYPE_BCM2837,
+> +        .clusterid = 0x0,
+>      },
+>  };
+>  
+> @@ -58,6 +61,8 @@ static void bcm2836_init(Object *obj)
+>  static void bcm2836_realize(DeviceState *dev, Error **errp)
+>  {
+>      BCM283XState *s = BCM283X(dev);
+> +    BCM283XClass *bc = BCM283X_GET_CLASS(dev);
+> +    const BCM283XInfo *info = bc->info;
+>      Object *obj;
+>      Error *err = NULL;
+>      int n;
+> @@ -119,7 +124,7 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
+>          /* Mirror bcm2836, which has clusterid set to 0xf
+>           * TODO: this should be converted to a property of ARM_CPU
+>           */
+> -        s->cpus[n].mp_affinity = 0xF00 | n;
+> +        s->cpus[n].mp_affinity = (info->clusterid << 8) | n;
+>  
+>          /* set periphbase/CBAR value for CPU-local registers */
+>          object_property_set_int(OBJECT(&s->cpus[n]),
+> 
