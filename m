@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ewOoZ-0003T4-7t
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 05:04:48 -0400
+	(envelope-from <berrange@redhat.com>) id 1ewP4r-0007jh-C1
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 05:21:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ewOoT-0002ZL-0x
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 05:04:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48322 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ewOoS-0002Y8-HP
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 05:04:40 -0400
-Date: Thu, 15 Mar 2018 17:04:26 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180315090426.GJ2733@lemon.usersys.redhat.com>
-References: <20180309091535.13315-1-peterx@redhat.com>
-	<808d1efc-2db7-01a2-23ba-3af108d9d1e7@redhat.com>
-	<235748d9-3bc2-637b-f926-6436d11f4f61@redhat.com>
-	<20180312044504.GF5234@xz-mi>
-	<20180315081937.GI2733@lemon.usersys.redhat.com>
-	<20180315084132.GA2783@xz-mi>
+	(envelope-from <berrange@redhat.com>) id 1ewP4p-0005NC-TV
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 05:21:37 -0400
+Date: Thu, 15 Mar 2018 09:21:10 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180315092110.GD3146@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1521100145-15304-1-git-send-email-thuth@redhat.com>
+	<1521100145-15304-3-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180315084132.GA2783@xz-mi>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 00/23] Migration: postcopy failure
- recovery
+In-Reply-To: <1521100145-15304-3-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] tests/cdboot: Test booting from CD-ROM
+ ISO image file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,69 +25,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Andrea Arcangeli <aarcange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Victor Kaplansky <victork@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-s390x@nongnu.org, =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>
 
-On Thu, 03/15 16:41, Peter Xu wrote:
-> On Thu, Mar 15, 2018 at 04:19:37PM +0800, Fam Zheng wrote:
-> > On Mon, 03/12 12:45, Peter Xu wrote:
-> > > On Fri, Mar 09, 2018 at 10:59:03AM -0600, Eric Blake wrote:
-> > > > On 03/09/2018 10:54 AM, Eric Blake wrote:
-> > > > > On 03/09/2018 03:15 AM, Peter Xu wrote:
-> > > > > > Based-on: <20180309090006.10018-1-peterx@redhat.com>
-> > > > > >=20
-> > > > > > This series is based on the series:
-> > > > > >=20
-> > > > > > =A0=A0 [PATCH v8 00/23] QMP: out-of-band (OOB) execution supp=
-ort
-> > > > >=20
-> > > > > Let's spell that in a way patchew understands:
-> > > > >=20
-> > > > > Based-on: <20180309090006.10018-1-peterx@redhat.com>
-> > > > >=20
-> > > >=20
-> > > > Never mind - I missed that you snuck that in on the very first li=
-ne (which
-> > > > I'm used to overlooking because it's often a 'From:' author attri=
-bution,
-> > > > instead of a patchew directive).  I saw the patchew failure messa=
-ges, but
-> > > > didn't read them closely to see why it is failing, and merely ass=
-umed it was
-> > > > because of the missing dependency...
-> > >=20
-> > > Yeh, but there still seems to be something wrong elsewhere since th=
-e
-> > > series can pass compilation and docker tests on my host...
-> > >=20
-> > > Fam, what would happen if I firstly post OOB series, then postcopy
-> > > series (which will have "based-on" on OOB series) right away?  Coul=
-d
-> > > Patchew just ignore the "based-on" if I post the 2nd series too fas=
-t
-> > > since Patchew may have not yet went through the first one?
-> >=20
-> > Could be. Git apply of the first one races with the appearance of the=
- second one
-> > in patchew's database. Or if the emails arrive in patchew's INBOX out=
--of-order,
-> > the based-on tag will not work as expected.
->=20
-> Thanks for confirming.  Based-on is not frequently used, so I think
-> what I need to do next time is I manually query and only send the 2nd
-> series after patchew.org reported okay on the first one.
->=20
-> It'll be good too if patchew can stop running tests if there is
-> unknown based-on tag (either fully unknown, or work-in-progress), and
-> report that "unknown tag found" message directly instead of test
-> failures (since if there is a based-on, it's very possible that it'll
-> fail).
->=20
-> Further - I'm not sure whether serializing the work will be hard or
-> not. Say, if series B has a based-on of A that is known but during
-> processing, then postpone processing B until A finished.  I won't ask
-> for that though especially if it's not trivial.
+On Thu, Mar 15, 2018 at 08:49:04AM +0100, Thomas Huth wrote:
+> We already have the code for a boot file in tests/boot-sector.c,
+> so if the genisoimage program is available, we can easily create
+> a bootable CD ISO image that we can use for testing whether our
+> CD-ROM emulation and the BIOS CD-ROM boot works correctly.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tests/Makefile.include |   3 +
+>  tests/cdrom-test.c     | 155 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 158 insertions(+)
+>  create mode 100644 tests/cdrom-test.c
+> 
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index ef9b88c..a104222 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -304,6 +304,7 @@ check-qtest-i386-$(CONFIG_POSIX) += tests/test-filter-redirector$(EXESUF)
+>  check-qtest-i386-y += tests/migration-test$(EXESUF)
+>  check-qtest-i386-y += tests/test-x86-cpuid-compat$(EXESUF)
+>  check-qtest-i386-y += tests/numa-test$(EXESUF)
+> +check-qtest-i386-y += tests/cdrom-test$(EXESUF)
+>  check-qtest-x86_64-y += $(check-qtest-i386-y)
+>  check-qtest-x86_64-y += tests/sdhci-test$(EXESUF)
+>  gcov-files-i386-y += i386-softmmu/hw/timer/mc146818rtc.c
+> @@ -398,6 +399,7 @@ check-qtest-s390x-y += tests/virtio-balloon-test$(EXESUF)
+>  check-qtest-s390x-y += tests/virtio-console-test$(EXESUF)
+>  check-qtest-s390x-y += tests/virtio-serial-test$(EXESUF)
+>  check-qtest-s390x-y += tests/cpu-plug-test$(EXESUF)
+> +check-qtest-s390x-y += tests/cdrom-test$(EXESUF)
+>  
+>  check-qtest-generic-y += tests/qom-test$(EXESUF)
+>  check-qtest-generic-y += tests/test-hmp$(EXESUF)
+> @@ -829,6 +831,7 @@ tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-util-obj-y)
+>  tests/numa-test$(EXESUF): tests/numa-test.o
+>  tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-sector.o tests/acpi-utils.o
+>  tests/sdhci-test$(EXESUF): tests/sdhci-test.o $(libqos-pc-obj-y)
+> +tests/cdrom-test$(EXESUF): tests/cdrom-test.o tests/boot-sector.o $(libqos-obj-y)
+>  
+>  tests/migration/stress$(EXESUF): tests/migration/stress.o
+>  	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,"LINK","$(TARGET_DIR)$@")
+> diff --git a/tests/cdrom-test.c b/tests/cdrom-test.c
+> new file mode 100644
+> index 0000000..1fc5230
+> --- /dev/null
+> +++ b/tests/cdrom-test.c
+> @@ -0,0 +1,155 @@
+> +/*
+> + * Various tests for emulated CD-ROM drives.
+> + *
+> + * Copyright (c) 2018 Red Hat Inc.
+> + *
+> + * Author:
+> + *    Thomas Huth <thuth@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2
+> + * or later. See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "libqtest.h"
+> +#include "boot-sector.h"
+> +
+> +static char isoimage[] = "cdrom-boot-iso-XXXXXX";
+> +
+> +static int gen_iso(const char *fmt, ...)
+> +{
+> +    char *params, *command;
+> +    va_list args;
+> +    pid_t pid;
+> +    int status;
+> +
+> +    pid = fork();
+> +    if (pid == 0) {
+> +        va_start(args, fmt);
+> +        params = g_strdup_vprintf(fmt, args);
+> +        va_end(args);
+> +        command = g_strdup_printf("exec genisoimage %s", params);
+> +        g_free(params);
+> +        execlp("/bin/sh", "sh", "-c", command, NULL);
+> +        exit(1);
+> +    }
+> +    wait(&status);
 
-Nice suggestions. Added to my TODO list now. Thanks,
+IMHO this should just use g_spawn_sync(), also the use of
+shell seems rather unneccessary - why not just run genisoimage
+directly ?
 
-Fam
+  https://developer.gnome.org/glib/stable/glib-Spawning-Processes.html#g-spawn-sync
+
+> +
+> +    return WEXITSTATUS(status);
+> +}
+> +
+> +static int prepare_image(const char *arch, char *isoimage)
+> +{
+> +    char srcdir[] = "cdrom-test-dir-XXXXXX";
+> +    char *codefile = NULL;
+> +    int ifh, ret = -1;
+> +
+> +    ifh = mkstemp(isoimage);
+> +    if (ifh < 0) {
+> +        perror("Error creating temporary iso image file");
+> +        return -1;
+> +    }
+> +    if (!mkdtemp(srcdir)) {
+> +        perror("Error creating temporary directory");
+> +        goto cleanup;
+> +    }
+> +
+> +    if (g_str_equal(arch, "i386") || g_str_equal(arch, "x86_64") ||
+> +        g_str_equal(arch, "s390x")) {
+> +        codefile = g_strdup_printf("%s/bootcode-XXXXXX", srcdir);
+> +        ret = boot_sector_init(codefile);
+> +        if (ret) {
+> +            goto cleanup;
+> +        }
+> +    } else {
+> +        g_assert_not_reached();
+> +    }
+> +
+> +    ret = gen_iso("-quiet -l -no-emul-boot -b %s -o %s %s",
+> +                  strrchr(codefile, '/') + 1, isoimage, srcdir);
+
+It would be easy to just declare the args as an array here
+
+  char *genisoargv[] = {
+    "genisoimage", "-quiet", "-l", "-no-emul-boot", "-b",
+    strrchr(codefile, "/") + 1, "-o", isoimage, srcdir,
+    NULL,
+  };
+
+to then pass to g_spawn_sync
+
+> +    if (ret) {
+> +        fprintf(stderr, "genisoimage failed: %i\n", ret);
+> +    }
+> +
+> +    unlink(codefile);
+> +
+> +cleanup:
+> +    g_free(codefile);
+> +    rmdir(srcdir);
+> +    close(ifh);
+> +
+> +    return ret;
+> +}
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
