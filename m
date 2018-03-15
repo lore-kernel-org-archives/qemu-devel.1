@@ -1,31 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ewIw9-0003pR-Ku
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 22:48:14 -0400
+	(envelope-from <famz@redhat.com>) id 1ewJpZ-0006rH-BJ
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 23:45:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ewIw4-0002OB-Sk
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 22:48:13 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53370 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ewIw4-0002Nq-NV
-	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 22:48:08 -0400
-Date: Thu, 15 Mar 2018 04:47:55 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180315044543-mutt-send-email-mst@kernel.org>
-References: <1520426065-40265-1-git-send-email-wei.w.wang@intel.com>
-	<1520426065-40265-4-git-send-email-wei.w.wang@intel.com>
-	<20180313183558-mutt-send-email-mst@kernel.org>
-	<5AA88C35.90300@intel.com>
-	<20180314045130-mutt-send-email-mst@kernel.org>
-	<5AA8BB27.6030205@intel.com>
-	<20180314160832-mutt-send-email-mst@kernel.org>
-	<5AA9C944.2010403@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5AA9C944.2010403@intel.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v4 3/4] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_HINT
+	(envelope-from <famz@redhat.com>) id 1ewJpY-0003ao-E9
+	for qemu-devel@nongnu.org; Wed, 14 Mar 2018 23:45:29 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Thu, 15 Mar 2018 11:45:07 +0800
+Message-Id: <20180315034507.6341-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH] vvfat: Fix inherit_options flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,103 +17,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, stefanha@redhat.com
 
-On Thu, Mar 15, 2018 at 09:15:48AM +0800, Wei Wang wrote:
-> On 03/14/2018 10:12 PM, Michael S. Tsirkin wrote:
-> > On Wed, Mar 14, 2018 at 02:03:19PM +0800, Wei Wang wrote:
-> > > On 03/14/2018 10:53 AM, Michael S. Tsirkin wrote:
-> > > > On Wed, Mar 14, 2018 at 10:43:01AM +0800, Wei Wang wrote:
-> > > > > On 03/14/2018 12:49 AM, Michael S. Tsirkin wrote:
-> > > > > > On Wed, Mar 07, 2018 at 08:34:24PM +0800, Wei Wang wrote:
-> > > > > > 
-> > > > > > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> > > > > > > Signed-off-by: Liang Li <liang.z.li@intel.com>
-> > > > > > > CC: Michael S. Tsirkin <mst@redhat.com>
-> > > > > > > CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > > > > > CC: Juan Quintela <quintela@redhat.com>
-> > > > > > I find it suspicious that neither unrealize nor reset
-> > > > > > functions have been touched at all.
-> > > > > > Are you sure you have thought through scenarious like
-> > > > > > hot-unplug or disabling the device by guest?
-> > > > > OK. I think we can call balloon_free_page_stop in unrealize and reset.
-> > > > > 
-> > > > > 
-> > > > > > +static void *virtio_balloon_poll_free_page_hints(void *opaque)
-> > > > > > +{
-> > > > > > +    VirtQueueElement *elem;
-> > > > > > +    VirtIOBalloon *dev = opaque;
-> > > > > > +    VirtQueue *vq = dev->free_page_vq;
-> > > > > > +    uint32_t id;
-> > > > > > +    size_t size;
-> > > > > > What makes it safe to poke at this device from multiple threads?
-> > > > > > I think that it would be safer to do it from e.g. BH.
-> > > > > > 
-> > > > > Actually the free_page_optimization thread is the only user of free_page_vq,
-> > > > > and there is only one optimization thread each time. Would this be safe
-> > > > > enough?
-> > > > > 
-> > > > > Best,
-> > > > > Wei
-> > > > Aren't there other fields there? Also things like reset affect all VQs.
-> > > > 
-> > > Yes. But I think BHs are used to avoid re-entrancy, which isn't the issue
-> > > here.
-> > Since you are adding locks to address the issue - doesn't this imply
-> > reentrancy is exactly the issue?
-> 
-> Not really. The lock isn't intended for any reentrancy issues, since there
-> will be only one run of the virtio_balloon_poll_free_page_hints function at
-> any given time. Instead, the lock is used to synchronize
-> virtio_balloon_poll_free_page_hints and virtio_balloon_free_page_stop to
-> access dev->free_page_report_status.
+Overriding flags violates the precedence rules of
+bdrv_reopen_queue_child. Just like the read-only option, no-flush should
+be put into the options. The same is done in bdrv_temp_snapshot_options.
 
-I wonder whether that's enough. E.g. is there a race with guest
-trying to reset the device? That resets all VQs you know.
+Reported-by: Stefan Hajnoczi <stefanha@redhat.com
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ block/vvfat.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-> Please see the whole picture below:
-> 
-> virtio_balloon_poll_free_page_hints()
-> {
-> 
->     while (1) {
->         qemu_spin_lock();
->         if (dev->free_page_report_status >= FREE_PAGE_REPORT_S_STOP ||
->             !runstate_is_running()) {
->             qemu_spin_unlock();
->             break;
->         }
->         ...
->         if (id == dev->free_page_report_cmd_id) {
-> ==>        dev->free_page_report_status = FREE_PAGE_REPORT_S_START;
->         ...
->         qemu_spin_unlock();
->     }
-> }
-> 
-> 
-> static void virtio_balloon_free_page_stop(void *opaque)
-> {
->     VirtIOBalloon *s = opaque;
->     VirtIODevice *vdev = VIRTIO_DEVICE(s);
-> 
->     qemu_spin_lock();
-> ...
-> ==>       s->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
->     ...
->     qemu_spin_unlock();
-> }
-> 
-> 
-> Without the lock, there are theoretical possibilities that assigning STOP
-> below is overridden by START above. In that
-> case,virtio_balloon_free_page_stop does not effectively stop
-> virtio_balloon_poll_free_page_hints.
-> I think this issue couldn't be solved by BHs.
-> 
-> Best,
-> Wei
-
-Don't all BHs run under the BQL?
+diff --git a/block/vvfat.c b/block/vvfat.c
+index 4a17a49e12..1569783b0f 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -3129,7 +3129,7 @@ static void vvfat_qcow_options(int *child_flags, QDict *child_options,
+                                int parent_flags, QDict *parent_options)
+ {
+     qdict_set_default_str(child_options, BDRV_OPT_READ_ONLY, "off");
+-    *child_flags = BDRV_O_NO_FLUSH;
++    qdict_set_default_str(child_options, BDRV_OPT_CACHE_NO_FLUSH, "on");
+ }
+ 
+ static const BdrvChildRole child_vvfat_qcow = {
+-- 
+2.14.3
