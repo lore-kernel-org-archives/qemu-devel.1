@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39169)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ewSVF-0006yV-9M
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:01:11 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ewSWX-0007ai-K8
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:02:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ewSV7-0006fH-LU
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:01:05 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:48057)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ewSV7-0006cz-C1
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:00:57 -0400
-References: <20180314153121.23838-1-james.cowgill@mips.com>
-	<46dbae6e-4ff6-5003-e8e6-175bf0fbd51f@vivier.eu>
-	<20e6165d-70b2-d1ec-1c46-7ede39a8d816@mips.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <fbbc625b-1bcc-ab60-8998-b2b1653105fd@vivier.eu>
-Date: Thu, 15 Mar 2018 14:00:33 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1ewSWR-0008Br-T3
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:02:25 -0400
+Received: from mail-ot0-x22b.google.com ([2607:f8b0:4003:c0f::22b]:37987)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ewSWR-0008Aw-O7
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 09:02:19 -0400
+Received: by mail-ot0-x22b.google.com with SMTP id 95-v6so6753683ote.5
+	for <qemu-devel@nongnu.org>; Thu, 15 Mar 2018 06:02:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20e6165d-70b2-d1ec-1c46-7ede39a8d816@mips.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: implement HWCAP bits on MIPS
+In-Reply-To: <20180313155918.23591-1-laurent@vivier.eu>
+References: <20180313155918.23591-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 15 Mar 2018 13:01:57 +0000
+Message-ID: <CAFEAcA8JBqAEj=JhH+Tfni=c4AnqfivseSFmNgxZfYYqiw5JGw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/11] M68k for 2.12 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: James Cowgill <james.cowgill@mips.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Le 15/03/2018 à 11:52, James Cowgill a écrit :
-> Hi,
-> 
-> On 14/03/18 16:13, Laurent Vivier wrote:
->> Le 14/03/2018 à 16:31, James Cowgill a écrit :
->>> Add support for the two currently defined HWCAP bits on MIPS - R6 and
->>> MSA.
->>>
->>> Buglink: https://bugs.launchpad.net/qemu/+bug/1754372
->>> Signed-off-by: James Cowgill <james.cowgill@mips.com>
->>> ---
->>> This was resent because I think I messed up my email config. Apologies if you
->>> receive this twice.
->>>
->>>  linux-user/elfload.c | 24 ++++++++++++++++++++++++
->>>  1 file changed, 24 insertions(+)
->>>
->>> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
->>> index 5fc130cc20..747b0ed10b 100644
->>> --- a/linux-user/elfload.c
->>> +++ b/linux-user/elfload.c
->>> @@ -950,6 +950,30 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUMIPSState *e
->>>  #define USE_ELF_CORE_DUMP
->>>  #define ELF_EXEC_PAGESIZE        4096
->>>  
->>> +/* See arch/mips/include/uapi/hwcap.h.  */
->>
->> in fact arch/mips/include/uapi/asm/hwcap.h
-> 
-> Woops.
-> 
->>> +enum {
->>> +    HWCAP_MIPS_R6           = (1 << 0),
->>> +    HWCAP_MIPS_MSA          = (1 << 1),
->>> +};
->>
->> We have this for ARM only in elfload.c since:
->>
->>     afce2927aa Arm AT_HWCAP AUXV entry (Paul Brook) [2005]
->>
->> but they have been added in include/elf.h since:
->>
->>     41d9ea80ac tcg-arm: Use qemu_getauxval [Richard Henderson, 2013]
->>
->> and I think we should remove them (they are prefixed by ARM_)
->>
->> So the MIPS ones should be in include/elf.h (with the #define form).
-> 
-> I can do that, although I think it's a bit unusual. The HWCAP bits are
-> specific to the Linux kernel and not to "the MIPS ELF format" so it
-> doesn't make sense to me to put them in elf.h.
+On 13 March 2018 at 15:59, Laurent Vivier <laurent@vivier.eu> wrote:
+> The following changes since commit 59667bb167f773965ce6547352f312eff0d4d523:
+>
+>   Merge remote-tracking branch 'remotes/ehabkost/tags/x86-next-pull-request' into staging (2018-03-13 14:02:47 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/vivier/qemu-m68k.git tags/m68k-for-2.12-pull-request
+>
+> for you to fetch changes up to 02f9124ebe26c36f0f7ed58085bd963e4372b2cd:
+>
+>   target/m68k: implement fcosh (2018-03-13 16:35:05 +0100)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
+>
+> Laurent Vivier (11):
+>   target/m68k: implement ftan
+>   target/m68k: implement fsin
+>   target/m68k: implement fcos
+>   target/m68k: implement fsincos
+>   target/m68k: implement fatan
+>   target/m68k: implement fasin
+>   target/m68k: implement facos
+>   target/m68k: implement fatanh
+>   target/m68k: implement ftanh
+>   target/m68k: implement fsinh
+>   target/m68k: implement fcosh
+>
+>  target/m68k/fpu_helper.c            |   61 ++
+>  target/m68k/helper.h                |   11 +
+>  target/m68k/softfloat.c             | 1637 +++++++++++++++++++++++++++++++++++
+>  target/m68k/softfloat.h             |   11 +
+>  target/m68k/softfloat_fpsp_tables.h |  267 ++++++
+>  target/m68k/translate.c             |   38 +
+>  6 files changed, 2025 insertions(+)
 
-In fact, in a system, they come with the glibc <sys/auxv.h>. auxv.h
-includes <elf.h> and <bits/hwcap.h>. They are both part of glibc.
+Applied, thanks.
 
-They can be used with qemu_getauxval() so it's better to have them in a
-header file. elfoad.c or elf.h, it's in both cases an ELF file.
-
-Thanks,
-Laurent
+-- PMM
