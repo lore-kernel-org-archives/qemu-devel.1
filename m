@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ewQ4V-0001np-DN
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 06:25:20 -0400
+	(envelope-from <thuth@redhat.com>) id 1ewQRQ-00088b-Pv
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 06:49:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ewQ4S-0006o8-BE
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 06:25:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38224 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ewQ4S-0006ng-4Q
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 06:25:16 -0400
-Date: Thu, 15 Mar 2018 10:25:02 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180315102501.GA3062@work-vm>
-References: <20180313075739.11194-1-xiaoguangrong@tencent.com>
-	<20180313075739.11194-2-xiaoguangrong@tencent.com>
+	(envelope-from <thuth@redhat.com>) id 1ewQRP-0004Ap-Pt
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 06:49:00 -0400
+References: <1521100145-15304-1-git-send-email-thuth@redhat.com>
+	<1521100145-15304-3-git-send-email-thuth@redhat.com>
+	<20180315092110.GD3146@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <3d3a009b-37c3-86b0-a734-e1783f507e60@redhat.com>
+Date: Thu, 15 Mar 2018 11:48:31 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180313075739.11194-2-xiaoguangrong@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH 1/8] migration: stop compressing page in
- migration thread
+In-Reply-To: <20180315092110.GD3146@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/3] tests/cdboot: Test booting from CD-ROM
+ ISO image file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,87 +26,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: guangrong.xiao@gmail.com
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, quintela@redhat.com, liang.z.li@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Victor Kaplansky <victork@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-s390x@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
 
-* guangrong.xiao@gmail.com (guangrong.xiao@gmail.com) wrote:
-> From: Xiao Guangrong <xiaoguangrong@tencent.com>
-> 
-> As compression is a heavy work, do not do it in migration thread,
-> instead, we post it out as a normal page
-> 
-> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
-> ---
->  migration/ram.c | 32 ++++++++++++++++----------------
+On 15.03.2018 10:21, Daniel P. Berrang=C3=A9 wrote:
+> On Thu, Mar 15, 2018 at 08:49:04AM +0100, Thomas Huth wrote:
+>> We already have the code for a boot file in tests/boot-sector.c,
+>> so if the genisoimage program is available, we can easily create
+>> a bootable CD ISO image that we can use for testing whether our
+>> CD-ROM emulation and the BIOS CD-ROM boot works correctly.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  tests/Makefile.include |   3 +
+>>  tests/cdrom-test.c     | 155 ++++++++++++++++++++++++++++++++++++++++=
++++++++++
+>>  2 files changed, 158 insertions(+)
+>>  create mode 100644 tests/cdrom-test.c
+>>
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index ef9b88c..a104222 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -304,6 +304,7 @@ check-qtest-i386-$(CONFIG_POSIX) +=3D tests/test-f=
+ilter-redirector$(EXESUF)
+>>  check-qtest-i386-y +=3D tests/migration-test$(EXESUF)
+>>  check-qtest-i386-y +=3D tests/test-x86-cpuid-compat$(EXESUF)
+>>  check-qtest-i386-y +=3D tests/numa-test$(EXESUF)
+>> +check-qtest-i386-y +=3D tests/cdrom-test$(EXESUF)
+>>  check-qtest-x86_64-y +=3D $(check-qtest-i386-y)
+>>  check-qtest-x86_64-y +=3D tests/sdhci-test$(EXESUF)
+>>  gcov-files-i386-y +=3D i386-softmmu/hw/timer/mc146818rtc.c
+>> @@ -398,6 +399,7 @@ check-qtest-s390x-y +=3D tests/virtio-balloon-test=
+$(EXESUF)
+>>  check-qtest-s390x-y +=3D tests/virtio-console-test$(EXESUF)
+>>  check-qtest-s390x-y +=3D tests/virtio-serial-test$(EXESUF)
+>>  check-qtest-s390x-y +=3D tests/cpu-plug-test$(EXESUF)
+>> +check-qtest-s390x-y +=3D tests/cdrom-test$(EXESUF)
+>> =20
+>>  check-qtest-generic-y +=3D tests/qom-test$(EXESUF)
+>>  check-qtest-generic-y +=3D tests/test-hmp$(EXESUF)
+>> @@ -829,6 +831,7 @@ tests/test-qapi-util$(EXESUF): tests/test-qapi-uti=
+l.o $(test-util-obj-y)
+>>  tests/numa-test$(EXESUF): tests/numa-test.o
+>>  tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-sector.o=
+ tests/acpi-utils.o
+>>  tests/sdhci-test$(EXESUF): tests/sdhci-test.o $(libqos-pc-obj-y)
+>> +tests/cdrom-test$(EXESUF): tests/cdrom-test.o tests/boot-sector.o $(l=
+ibqos-obj-y)
+>> =20
+>>  tests/migration/stress$(EXESUF): tests/migration/stress.o
+>>  	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $=
+< ,"LINK","$(TARGET_DIR)$@")
+>> diff --git a/tests/cdrom-test.c b/tests/cdrom-test.c
+>> new file mode 100644
+>> index 0000000..1fc5230
+>> --- /dev/null
+>> +++ b/tests/cdrom-test.c
+>> @@ -0,0 +1,155 @@
+>> +/*
+>> + * Various tests for emulated CD-ROM drives.
+>> + *
+>> + * Copyright (c) 2018 Red Hat Inc.
+>> + *
+>> + * Author:
+>> + *    Thomas Huth <thuth@redhat.com>
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2
+>> + * or later. See the COPYING file in the top-level directory.
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "libqtest.h"
+>> +#include "boot-sector.h"
+>> +
+>> +static char isoimage[] =3D "cdrom-boot-iso-XXXXXX";
+>> +
+>> +static int gen_iso(const char *fmt, ...)
+>> +{
+>> +    char *params, *command;
+>> +    va_list args;
+>> +    pid_t pid;
+>> +    int status;
+>> +
+>> +    pid =3D fork();
+>> +    if (pid =3D=3D 0) {
+>> +        va_start(args, fmt);
+>> +        params =3D g_strdup_vprintf(fmt, args);
+>> +        va_end(args);
+>> +        command =3D g_strdup_printf("exec genisoimage %s", params);
+>> +        g_free(params);
+>> +        execlp("/bin/sh", "sh", "-c", command, NULL);
+>> +        exit(1);
+>> +    }
+>> +    wait(&status);
+>=20
+> IMHO this should just use g_spawn_sync(), also the use of
+> shell seems rather unneccessary - why not just run genisoimage
+> directly ?
 
-Hi,
-  Do you have some performance numbers to show this helps?  Were those
-taken on a normal system or were they taken with one of the compression
-accelerators (which I think the compression migration was designed for)?
+That code was simply "inspired" from the execlp() code in
+qtest_init_without_qmp_handshake() ... but g_spawn_sync() sounds like a
+good alternative here, so I'll try to switch to that one instead.
 
->  1 file changed, 16 insertions(+), 16 deletions(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 7266351fd0..615693f180 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -1132,7 +1132,7 @@ static int ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
->      int pages = -1;
->      uint64_t bytes_xmit = 0;
->      uint8_t *p;
-> -    int ret, blen;
-> +    int ret;
->      RAMBlock *block = pss->block;
->      ram_addr_t offset = pss->page << TARGET_PAGE_BITS;
->  
-> @@ -1162,23 +1162,23 @@ static int ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
->          if (block != rs->last_sent_block) {
->              flush_compressed_data(rs);
->              pages = save_zero_page(rs, block, offset);
-> -            if (pages == -1) {
-> -                /* Make sure the first page is sent out before other pages */
-> -                bytes_xmit = save_page_header(rs, rs->f, block, offset |
-> -                                              RAM_SAVE_FLAG_COMPRESS_PAGE);
-> -                blen = qemu_put_compression_data(rs->f, p, TARGET_PAGE_SIZE,
-> -                                                 migrate_compress_level());
-> -                if (blen > 0) {
-> -                    ram_counters.transferred += bytes_xmit + blen;
-> -                    ram_counters.normal++;
-> -                    pages = 1;
-> -                } else {
-> -                    qemu_file_set_error(rs->f, blen);
-> -                    error_report("compressed data failed!");
-> -                }
-> -            }
->              if (pages > 0) {
->                  ram_release_pages(block->idstr, offset, pages);
-> +            } else {
-> +                /*
-> +                 * Make sure the first page is sent out before other pages.
-> +                 *
-> +                 * we post it as normal page as compression will take much
-> +                 * CPU resource.
-> +                 */
-> +                ram_counters.transferred += save_page_header(rs, rs->f, block,
-> +                                                offset | RAM_SAVE_FLAG_PAGE);
-> +                qemu_put_buffer_async(rs->f, p, TARGET_PAGE_SIZE,
-> +                                      migrate_release_ram() &
-> +                                      migration_in_postcopy());
-> +                ram_counters.transferred += TARGET_PAGE_SIZE;
-> +                ram_counters.normal++;
-> +                pages = 1;
-
-
-However, the code and idea look OK, so
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
->              }
->          } else {
->              pages = save_zero_page(rs, block, offset);
-> -- 
-> 2.14.3
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+ Thanks,
+  Thomas
