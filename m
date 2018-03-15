@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ewXOl-0007Zw-V2
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 14:14:45 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1ewXOu-0007iV-Sv
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 14:14:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ewXOj-000166-TM
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 14:14:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37940)
+	(envelope-from <ehabkost@redhat.com>) id 1ewXOq-0001Bk-Pl
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 14:14:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39386)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ewXOj-00015G-Jr
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 14:14:41 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ewXOq-0001B6-FO
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 14:14:48 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 15 Mar 2018 15:14:17 -0300
-Message-Id: <20180315181420.8694-5-ehabkost@redhat.com>
+Date: Thu, 15 Mar 2018 15:14:18 -0300
+Message-Id: <20180315181420.8694-6-ehabkost@redhat.com>
 In-Reply-To: <20180315181420.8694-1-ehabkost@redhat.com>
 References: <20180315181420.8694-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL v2 4/7] cpu: add CPU_RESOLVING_TYPE macro
+Subject: [Qemu-devel] [PULL v2 5/7] Use cpu_create(type) instead of
+ cpu_init(cpu_model)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,296 +29,289 @@ Cc: Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-it will be used for providing to cpu name resolving class for
-parsing cpu model for system and user emulation code.
+With all targets defining CPU_RESOLVING_TYPE, refactor
+cpu_parse_cpu_model(type, cpu_model) to parse_cpu_model(cpu_model)
+so that callers won't have to know internal resolving cpu
+type. Place it in exec.c so it could be called from both
+target independed vl.c and *-user/main.c.
 
-Along with change add target to null-machine tests, so
-that when switch to CPU_RESOLVING_TYPE happens,
-it would ensure that null-machine usecase still works.
+That allows us to stop abusing cpu type from
+  MachineClass::default_cpu_type
+as resolver class in vl.c which were confusing part of
+cpu_parse_cpu_model().
+
+Also with new parse_cpu_model(), the last users of cpu_init()
+in null-machine.c and bsd/linux-user targets could be switched
+to cpu_create() API and cpu_init() API will be removed by
+follow up patch.
+
+With no longer users left remove MachineState::cpu_model field,
+new code should use MachineState::cpu_type instead and
+leave cpu_model parsing to generic code in vl.c.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu> (m68k)
-Acked-by: David Gibson <david@gibson.dropbear.id.au> (ppc)
-Acked-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de> (tricore)
-Message-Id: <1518000027-274608-4-git-send-email-imammedo@redhat.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-[ehabkost: Added macro to riscv too]
+Message-Id: <1518000027-274608-5-git-send-email-imammedo@redhat.com>
+[ehabkost: Fix bsd-user build error]
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/alpha/cpu.h      | 1 +
- target/arm/cpu.h        | 1 +
- target/cris/cpu.h       | 1 +
- target/hppa/cpu.h       | 1 +
- target/i386/cpu.h       | 1 +
- target/lm32/cpu.h       | 1 +
- target/m68k/cpu.h       | 1 +
- target/microblaze/cpu.h | 1 +
- target/mips/cpu.h       | 1 +
- target/moxie/cpu.h      | 1 +
- target/nios2/cpu.h      | 1 +
- target/openrisc/cpu.h   | 1 +
- target/ppc/cpu.h        | 1 +
- target/riscv/cpu.h      | 1 +
- target/s390x/cpu.h      | 1 +
- target/sh4/cpu.h        | 1 +
- target/sparc/cpu.h      | 1 +
- target/tilegx/cpu.h     | 1 +
- target/tricore/cpu.h    | 1 +
- target/unicore32/cpu.h  | 1 +
- target/xtensa/cpu.h     | 1 +
- 21 files changed, 21 insertions(+)
+ include/hw/boards.h    |  1 -
+ include/qom/cpu.h      | 16 ++--------------
+ bsd-user/main.c        |  4 +++-
+ exec.c                 | 23 +++++++++++++++++++++++
+ hw/core/null-machine.c |  6 +++---
+ linux-user/main.c      |  8 ++++++--
+ qom/cpu.c              | 47 ++++-------------------------------------------
+ vl.c                   | 10 +++-------
+ 8 files changed, 44 insertions(+), 71 deletions(-)
 
-diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
-index a79fc2e780..905855a2a1 100644
---- a/target/alpha/cpu.h
-+++ b/target/alpha/cpu.h
-@@ -470,6 +470,7 @@ void alpha_translate_init(void);
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index efb0a9edfd..16b473a4f4 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -251,7 +251,6 @@ struct MachineState {
+     char *kernel_filename;
+     char *kernel_cmdline;
+     char *initrd_filename;
+-    const char *cpu_model;
+     const char *cpu_type;
+     AccelState *accelerator;
+     CPUArchIdList *possible_cpus;
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index dc6d4956a8..14e45c4282 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -662,8 +662,7 @@ ObjectClass *cpu_class_by_name(const char *typename, const char *cpu_model);
+ CPUState *cpu_create(const char *typename);
  
- #define ALPHA_CPU_TYPE_SUFFIX "-" TYPE_ALPHA_CPU
- #define ALPHA_CPU_TYPE_NAME(model) model ALPHA_CPU_TYPE_SUFFIX
-+#define CPU_RESOLVING_TYPE TYPE_ALPHA_CPU
+ /**
+- * cpu_parse_cpu_model:
+- * @typename: The CPU base type or CPU type.
++ * parse_cpu_model:
+  * @cpu_model: The model string including optional parameters.
+  *
+  * processes optional parameters and registers them as global properties
+@@ -671,18 +670,7 @@ CPUState *cpu_create(const char *typename);
+  * Returns: type of CPU to create or prints error and terminates process
+  *          if an error occurred.
+  */
+-const char *cpu_parse_cpu_model(const char *typename, const char *cpu_model);
+-
+-/**
+- * cpu_generic_init:
+- * @typename: The CPU base type.
+- * @cpu_model: The model string including optional parameters.
+- *
+- * Instantiates a CPU, processes optional parameters and realizes the CPU.
+- *
+- * Returns: A #CPUState or %NULL if an error occurred.
+- */
+-CPUState *cpu_generic_init(const char *typename, const char *cpu_model);
++const char *parse_cpu_model(const char *cpu_model);
  
- void alpha_cpu_list(FILE *f, fprintf_function cpu_fprintf);
- /* you can call this signal handler from your SIGBUS and SIGSEGV
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 1e7e1f8a7e..f4b4258655 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -2306,6 +2306,7 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
- 
- #define ARM_CPU_TYPE_SUFFIX "-" TYPE_ARM_CPU
- #define ARM_CPU_TYPE_NAME(name) (name ARM_CPU_TYPE_SUFFIX)
-+#define CPU_RESOLVING_TYPE TYPE_ARM_CPU
- 
- #define cpu_signal_handler cpu_arm_signal_handler
- #define cpu_list arm_cpu_list
-diff --git a/target/cris/cpu.h b/target/cris/cpu.h
-index 764b35cbae..cfb877c488 100644
---- a/target/cris/cpu.h
-+++ b/target/cris/cpu.h
-@@ -271,6 +271,7 @@ enum {
- 
- #define CRIS_CPU_TYPE_SUFFIX "-" TYPE_CRIS_CPU
- #define CRIS_CPU_TYPE_NAME(name) (name CRIS_CPU_TYPE_SUFFIX)
-+#define CPU_RESOLVING_TYPE TYPE_CRIS_CPU
- 
- #define cpu_signal_handler cpu_cris_signal_handler
- 
-diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
-index c88d844938..6ea5f4c4e4 100644
---- a/target/hppa/cpu.h
-+++ b/target/hppa/cpu.h
-@@ -267,6 +267,7 @@ static inline int cpu_mmu_index(CPUHPPAState *env, bool ifetch)
- void hppa_translate_init(void);
- 
- #define cpu_init(cpu_model) cpu_generic_init(TYPE_HPPA_CPU, cpu_model)
-+#define CPU_RESOLVING_TYPE TYPE_HPPA_CPU
- 
- void hppa_cpu_list(FILE *f, fprintf_function cpu_fprintf);
- 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 0c3f51445e..a0299289ae 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1590,6 +1590,7 @@ uint64_t cpu_get_tsc(CPUX86State *env);
- 
- #define X86_CPU_TYPE_SUFFIX "-" TYPE_X86_CPU
- #define X86_CPU_TYPE_NAME(name) (name X86_CPU_TYPE_SUFFIX)
-+#define CPU_RESOLVING_TYPE TYPE_X86_CPU
- 
- #ifdef TARGET_X86_64
- #define TARGET_DEFAULT_CPU_TYPE X86_CPU_TYPE_NAME("qemu64")
-diff --git a/target/lm32/cpu.h b/target/lm32/cpu.h
-index ce0a2f24c4..6f41955528 100644
---- a/target/lm32/cpu.h
-+++ b/target/lm32/cpu.h
-@@ -259,6 +259,7 @@ bool lm32_cpu_do_semihosting(CPUState *cs);
- 
- #define LM32_CPU_TYPE_SUFFIX "-" TYPE_LM32_CPU
- #define LM32_CPU_TYPE_NAME(model) model LM32_CPU_TYPE_SUFFIX
-+#define CPU_RESOLVING_TYPE TYPE_LM32_CPU
- 
- #define cpu_list lm32_cpu_list
- #define cpu_signal_handler cpu_lm32_signal_handler
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index 2259bf22dc..f102e7216d 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -531,6 +531,7 @@ enum {
- 
- #define M68K_CPU_TYPE_SUFFIX "-" TYPE_M68K_CPU
- #define M68K_CPU_TYPE_NAME(model) model M68K_CPU_TYPE_SUFFIX
-+#define CPU_RESOLVING_TYPE TYPE_M68K_CPU
- 
- #define cpu_signal_handler cpu_m68k_signal_handler
- #define cpu_list m68k_cpu_list
-diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index 1fe21c8539..55f63f7b24 100644
---- a/target/microblaze/cpu.h
-+++ b/target/microblaze/cpu.h
-@@ -344,6 +344,7 @@ int cpu_mb_signal_handler(int host_signum, void *pinfo,
- #define TARGET_VIRT_ADDR_SPACE_BITS 32
- 
- #define cpu_init(cpu_model) cpu_generic_init(TYPE_MICROBLAZE_CPU, cpu_model)
-+#define CPU_RESOLVING_TYPE TYPE_MICROBLAZE_CPU
- 
- #define cpu_signal_handler cpu_mb_signal_handler
- 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 7f8ba5ff3e..0fcbfb3553 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -743,6 +743,7 @@ int cpu_mips_signal_handler(int host_signum, void *pinfo, void *puc);
- 
- #define MIPS_CPU_TYPE_SUFFIX "-" TYPE_MIPS_CPU
- #define MIPS_CPU_TYPE_NAME(model) model MIPS_CPU_TYPE_SUFFIX
-+#define CPU_RESOLVING_TYPE TYPE_MIPS_CPU
- 
- bool cpu_supports_cps_smp(const char *cpu_type);
- bool cpu_supports_isa(const char *cpu_type, unsigned int isa);
-diff --git a/target/moxie/cpu.h b/target/moxie/cpu.h
-index d85e1fc061..5e88c02dfb 100644
---- a/target/moxie/cpu.h
-+++ b/target/moxie/cpu.h
-@@ -123,6 +123,7 @@ int cpu_moxie_signal_handler(int host_signum, void *pinfo,
- 
- #define MOXIE_CPU_TYPE_SUFFIX "-" TYPE_MOXIE_CPU
- #define MOXIE_CPU_TYPE_NAME(model) model MOXIE_CPU_TYPE_SUFFIX
-+#define CPU_RESOLVING_TYPE TYPE_MOXIE_CPU
- 
- #define cpu_signal_handler cpu_moxie_signal_handler
- 
-diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
-index cd4e40d1b4..4ab1da3285 100644
---- a/target/nios2/cpu.h
-+++ b/target/nios2/cpu.h
-@@ -231,6 +231,7 @@ void nios2_check_interrupts(CPUNios2State *env);
+ /**
+  * cpu_has_work:
+diff --git a/bsd-user/main.c b/bsd-user/main.c
+index efef5ff8c5..984d0ff3bd 100644
+--- a/bsd-user/main.c
++++ b/bsd-user/main.c
+@@ -723,6 +723,7 @@ int main(int argc, char **argv)
+ {
+     const char *filename;
+     const char *cpu_model;
++    const char *cpu_type;
+     const char *log_file = NULL;
+     const char *log_mask = NULL;
+     struct target_pt_regs regs1, *regs = &regs1;
+@@ -900,7 +901,8 @@ int main(int argc, char **argv)
+     tcg_exec_init(0);
+     /* NOTE: we need to init the CPU at this stage to get
+        qemu_host_page_size */
+-    cpu = cpu_init(cpu_model);
++    cpu_type = parse_cpu_model(cpu_model);
++    cpu = cpu_create(cpu_type);
+     env = cpu->env_ptr;
+ #if defined(TARGET_SPARC) || defined(TARGET_PPC)
+     cpu_reset(cpu);
+diff --git a/exec.c b/exec.c
+index a9181e6417..bc643fc50f 100644
+--- a/exec.c
++++ b/exec.c
+@@ -817,6 +817,29 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
  #endif
+ }
  
- #define cpu_init(cpu_model) cpu_generic_init(TYPE_NIOS2_CPU, cpu_model)
-+#define CPU_RESOLVING_TYPE TYPE_NIOS2_CPU
++const char *parse_cpu_model(const char *cpu_model)
++{
++    ObjectClass *oc;
++    CPUClass *cc;
++    gchar **model_pieces;
++    const char *cpu_type;
++
++    model_pieces = g_strsplit(cpu_model, ",", 2);
++
++    oc = cpu_class_by_name(CPU_RESOLVING_TYPE, model_pieces[0]);
++    if (oc == NULL) {
++        error_report("unable to find CPU model '%s'", model_pieces[0]);
++        g_strfreev(model_pieces);
++        exit(EXIT_FAILURE);
++    }
++
++    cpu_type = object_class_get_name(oc);
++    cc = CPU_CLASS(oc);
++    cc->parse_features(cpu_type, model_pieces[1], &error_fatal);
++    g_strfreev(model_pieces);
++    return cpu_type;
++}
++
+ #if defined(CONFIG_USER_ONLY)
+ static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
+ {
+diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+index 864832db34..cde4d3eb57 100644
+--- a/hw/core/null-machine.c
++++ b/hw/core/null-machine.c
+@@ -24,9 +24,9 @@ static void machine_none_init(MachineState *mch)
+ {
+     CPUState *cpu = NULL;
  
- #define cpu_gen_code cpu_nios2_gen_code
- #define cpu_signal_handler cpu_nios2_signal_handler
-diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
-index 5050b1135c..87018c7b8e 100644
---- a/target/openrisc/cpu.h
-+++ b/target/openrisc/cpu.h
-@@ -393,6 +393,7 @@ int cpu_openrisc_get_phys_data(OpenRISCCPU *cpu,
+-    /* Initialize CPU (if a model has been specified) */
+-    if (mch->cpu_model) {
+-        cpu = cpu_init(mch->cpu_model);
++    /* Initialize CPU (if user asked for it) */
++    if (mch->cpu_type) {
++        cpu = cpu_create(mch->cpu_type);
+         if (!cpu) {
+             error_report("Unable to initialize CPU");
+             exit(1);
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 7bc9bc79b0..89b24d43a5 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -45,6 +45,7 @@ static const char *argv0;
+ static int gdbstub_port;
+ static envlist_t *envlist;
+ static const char *cpu_model;
++static const char *cpu_type;
+ unsigned long mmap_min_addr;
+ unsigned long guest_base;
+ int have_guest_base;
+@@ -3967,7 +3968,7 @@ void init_task_state(TaskState *ts)
+ CPUArchState *cpu_copy(CPUArchState *env)
+ {
+     CPUState *cpu = ENV_GET_CPU(env);
+-    CPUState *new_cpu = cpu_init(cpu_model);
++    CPUState *new_cpu = cpu_create(cpu_type);
+     CPUArchState *new_env = new_cpu->env_ptr;
+     CPUBreakpoint *bp;
+     CPUWatchpoint *wp;
+@@ -4450,10 +4451,13 @@ int main(int argc, char **argv, char **envp)
+     if (cpu_model == NULL) {
+         cpu_model = cpu_get_model(get_elf_eflags(execfd));
+     }
++    cpu_type = parse_cpu_model(cpu_model);
++
+     tcg_exec_init(0);
+     /* NOTE: we need to init the CPU at this stage to get
+        qemu_host_page_size */
+-    cpu = cpu_init(cpu_model);
++
++    cpu = cpu_create(cpu_type);
+     env = cpu->env_ptr;
+     cpu_reset(cpu);
  
- #define OPENRISC_CPU_TYPE_SUFFIX "-" TYPE_OPENRISC_CPU
- #define OPENRISC_CPU_TYPE_NAME(model) model OPENRISC_CPU_TYPE_SUFFIX
-+#define CPU_RESOLVING_TYPE TYPE_OPENRISC_CPU
+diff --git a/qom/cpu.c b/qom/cpu.c
+index e42d9a7f9e..60292dfde9 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -67,37 +67,6 @@ CPUState *cpu_create(const char *typename)
+     return cpu;
+ }
  
- #include "exec/cpu-all.h"
+-const char *cpu_parse_cpu_model(const char *typename, const char *cpu_model)
+-{
+-    ObjectClass *oc;
+-    CPUClass *cc;
+-    gchar **model_pieces;
+-    const char *cpu_type;
+-
+-    model_pieces = g_strsplit(cpu_model, ",", 2);
+-
+-    oc = cpu_class_by_name(typename, model_pieces[0]);
+-    if (oc == NULL) {
+-        error_report("unable to find CPU model '%s'", model_pieces[0]);
+-        g_strfreev(model_pieces);
+-        exit(EXIT_FAILURE);
+-    }
+-
+-    cpu_type = object_class_get_name(oc);
+-    cc = CPU_CLASS(oc);
+-    cc->parse_features(cpu_type, model_pieces[1], &error_fatal);
+-    g_strfreev(model_pieces);
+-    return cpu_type;
+-}
+-
+-CPUState *cpu_generic_init(const char *typename, const char *cpu_model)
+-{
+-    /* TODO: all callers of cpu_generic_init() need to be converted to
+-     * call cpu_parse_features() only once, before calling cpu_generic_init().
+-     */
+-    return cpu_create(cpu_parse_cpu_model(typename, cpu_model));
+-}
+-
+ bool cpu_paging_enabled(const CPUState *cpu)
+ {
+     CPUClass *cc = CPU_GET_CLASS(cpu);
+@@ -335,23 +304,15 @@ static ObjectClass *cpu_common_class_by_name(const char *cpu_model)
+ static void cpu_common_parse_features(const char *typename, char *features,
+                                       Error **errp)
+ {
+-    char *featurestr; /* Single "key=value" string being parsed */
+     char *val;
+     static bool cpu_globals_initialized;
++    /* Single "key=value" string being parsed */
++    char *featurestr = features ? strtok(features, ",") : NULL;
  
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 7bde1884a1..f6d0cd2f0f 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1379,6 +1379,7 @@ int ppc_dcr_write (ppc_dcr_t *dcr_env, int dcrn, uint32_t val);
+-    /* TODO: all callers of ->parse_features() need to be changed to
+-     * call it only once, so we can remove this check (or change it
+-     * to assert(!cpu_globals_initialized).
+-     * Current callers of ->parse_features() are:
+-     * - cpu_generic_init()
+-     */
+-    if (cpu_globals_initialized) {
+-        return;
+-    }
++    /* should be called only once, catch invalid users */
++    assert(!cpu_globals_initialized);
+     cpu_globals_initialized = true;
  
- #define POWERPC_CPU_TYPE_SUFFIX "-" TYPE_POWERPC_CPU
- #define POWERPC_CPU_TYPE_NAME(model) model POWERPC_CPU_TYPE_SUFFIX
-+#define CPU_RESOLVING_TYPE TYPE_POWERPC_CPU
+-    featurestr = features ? strtok(features, ",") : NULL;
+-
+     while (featurestr) {
+         val = strchr(featurestr, '=');
+         if (val) {
+diff --git a/vl.c b/vl.c
+index 3ef04ce991..61c2f19365 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4582,15 +4582,11 @@ int main(int argc, char **argv, char **envp)
+     current_machine->maxram_size = maxram_size;
+     current_machine->ram_slots = ram_slots;
+     current_machine->boot_order = boot_order;
+-    current_machine->cpu_model = cpu_model;
  
- #define cpu_signal_handler cpu_ppc_signal_handler
- #define cpu_list ppc_cpu_list
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index cff02a2857..41e06ac0f9 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -46,6 +46,7 @@
+     /* parse features once if machine provides default cpu_type */
+-    if (machine_class->default_cpu_type) {
+-        current_machine->cpu_type = machine_class->default_cpu_type;
+-        if (cpu_model) {
+-            current_machine->cpu_type =
+-                cpu_parse_cpu_model(machine_class->default_cpu_type, cpu_model);
+-        }
++    current_machine->cpu_type = machine_class->default_cpu_type;
++    if (cpu_model) {
++        current_machine->cpu_type = parse_cpu_model(cpu_model);
+     }
+     parse_numa_opts(current_machine);
  
- #define RISCV_CPU_TYPE_SUFFIX "-" TYPE_RISCV_CPU
- #define RISCV_CPU_TYPE_NAME(name) (name RISCV_CPU_TYPE_SUFFIX)
-+#define CPU_RESOLVING_TYPE TYPE_RISCV_CPU
- 
- #define TYPE_RISCV_CPU_ANY              RISCV_CPU_TYPE_NAME("any")
- #define TYPE_RISCV_CPU_RV32GCSU_V1_09_1 RISCV_CPU_TYPE_NAME("rv32gcsu-v1.9.1")
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 5f357a4e2d..fa76236bf0 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -723,6 +723,7 @@ void s390_set_qemu_cpu_model(uint16_t type, uint8_t gen, uint8_t ec_ga,
- 
- #define S390_CPU_TYPE_SUFFIX "-" TYPE_S390_CPU
- #define S390_CPU_TYPE_NAME(name) (name S390_CPU_TYPE_SUFFIX)
-+#define CPU_RESOLVING_TYPE TYPE_S390_CPU
- 
- /* you can call this signal handler from your SIGBUS and SIGSEGV
-    signal handlers to inform the virtual CPU of exceptions. non zero
-diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
-index a649b68d78..04b3d6c09b 100644
---- a/target/sh4/cpu.h
-+++ b/target/sh4/cpu.h
-@@ -276,6 +276,7 @@ void cpu_load_tlb(CPUSH4State * env);
- 
- #define SUPERH_CPU_TYPE_SUFFIX "-" TYPE_SUPERH_CPU
- #define SUPERH_CPU_TYPE_NAME(model) model SUPERH_CPU_TYPE_SUFFIX
-+#define CPU_RESOLVING_TYPE TYPE_SUPERH_CPU
- 
- #define cpu_signal_handler cpu_sh4_signal_handler
- #define cpu_list sh4_cpu_list
-diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-index 9724134a5b..dfe143a963 100644
---- a/target/sparc/cpu.h
-+++ b/target/sparc/cpu.h
-@@ -658,6 +658,7 @@ int cpu_sparc_signal_handler(int host_signum, void *pinfo, void *puc);
- 
- #define SPARC_CPU_TYPE_SUFFIX "-" TYPE_SPARC_CPU
- #define SPARC_CPU_TYPE_NAME(model) model SPARC_CPU_TYPE_SUFFIX
-+#define CPU_RESOLVING_TYPE TYPE_SPARC_CPU
- 
- #define cpu_signal_handler cpu_sparc_signal_handler
- #define cpu_list sparc_cpu_list
-diff --git a/target/tilegx/cpu.h b/target/tilegx/cpu.h
-index 71cea04589..a73215e6cf 100644
---- a/target/tilegx/cpu.h
-+++ b/target/tilegx/cpu.h
-@@ -165,6 +165,7 @@ void tilegx_tcg_init(void);
- int cpu_tilegx_signal_handler(int host_signum, void *pinfo, void *puc);
- 
- #define cpu_init(cpu_model) cpu_generic_init(TYPE_TILEGX_CPU, cpu_model)
-+#define CPU_RESOLVING_TYPE TYPE_TILEGX_CPU
- 
- #define cpu_signal_handler cpu_tilegx_signal_handler
- 
-diff --git a/target/tricore/cpu.h b/target/tricore/cpu.h
-index 07b8b59f58..9241a91faa 100644
---- a/target/tricore/cpu.h
-+++ b/target/tricore/cpu.h
-@@ -417,6 +417,7 @@ static inline void cpu_get_tb_cpu_state(CPUTriCoreState *env, target_ulong *pc,
- 
- #define TRICORE_CPU_TYPE_SUFFIX "-" TYPE_TRICORE_CPU
- #define TRICORE_CPU_TYPE_NAME(model) model TRICORE_CPU_TYPE_SUFFIX
-+#define CPU_RESOLVING_TYPE TYPE_TRICORE_CPU
- 
- /* helpers.c */
- int cpu_tricore_handle_mmu_fault(CPUState *cpu, target_ulong address,
-diff --git a/target/unicore32/cpu.h b/target/unicore32/cpu.h
-index 42e1d52478..1db9b6cdf9 100644
---- a/target/unicore32/cpu.h
-+++ b/target/unicore32/cpu.h
-@@ -168,6 +168,7 @@ static inline int cpu_mmu_index(CPUUniCore32State *env, bool ifetch)
- 
- #define UNICORE32_CPU_TYPE_SUFFIX "-" TYPE_UNICORE32_CPU
- #define UNICORE32_CPU_TYPE_NAME(model) model UNICORE32_CPU_TYPE_SUFFIX
-+#define CPU_RESOLVING_TYPE TYPE_UNICORE32_CPU
- 
- static inline void cpu_get_tb_cpu_state(CPUUniCore32State *env, target_ulong *pc,
-                                         target_ulong *cs_base, uint32_t *flags)
-diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
-index 49c2e3cf9a..0e7383b2be 100644
---- a/target/xtensa/cpu.h
-+++ b/target/xtensa/cpu.h
-@@ -499,6 +499,7 @@ void xtensa_cpu_do_unaligned_access(CPUState *cpu, vaddr addr,
- 
- #define XTENSA_CPU_TYPE_SUFFIX "-" TYPE_XTENSA_CPU
- #define XTENSA_CPU_TYPE_NAME(model) model XTENSA_CPU_TYPE_SUFFIX
-+#define CPU_RESOLVING_TYPE TYPE_XTENSA_CPU
- 
- #ifdef TARGET_WORDS_BIGENDIAN
- #define XTENSA_DEFAULT_CPU_MODEL "fsf"
 -- 
 2.14.3
