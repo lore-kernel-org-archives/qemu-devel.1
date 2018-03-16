@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1ewnQm-0006j1-Re
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:21:53 -0400
+	(envelope-from <jasowang@redhat.com>) id 1ewnX9-0000GZ-0M
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:28:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1ewnQj-0005c0-Jr
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:21:52 -0400
-Received: from mga12.intel.com ([192.55.52.136]:26115)
+	(envelope-from <jasowang@redhat.com>) id 1ewnX5-0008TA-PJ
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:28:27 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37370 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1ewnQj-0005bU-8W
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:21:49 -0400
-Message-ID: <5AABA982.3080106@intel.com>
-Date: Fri, 16 Mar 2018 19:24:50 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1ewnX5-0008Sx-KA
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:28:23 -0400
+References: <152044905701.22965.8924520463227226351.stgit@bahia.lan>
+	<edb53a74-2c21-f0ff-ec9d-2728bfb2a416@redhat.com>
+	<20180316105810.4f24078f@bahia.lan>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <89814058-2768-05b0-d894-0be0494c5381@redhat.com>
+Date: Fri, 16 Mar 2018 19:28:03 +0800
 MIME-Version: 1.0
-References: <1520426065-40265-1-git-send-email-wei.w.wang@intel.com>
-	<1520426065-40265-3-git-send-email-wei.w.wang@intel.com>
-	<20180314181137.GG3006@work-vm> <5AAA5079.2000308@intel.com>
-	<20180315154754-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20180315154754-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/4] migration: API to clear bits of
- guest free pages from the dirty bitmap
+In-Reply-To: <20180316105810.4f24078f@bahia.lan>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] virtio_net: flush uncompleted TX on reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,89 +29,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, R Nageswara Sastry <nasastry@in.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 03/15/2018 09:50 PM, Michael S. Tsirkin wrote:
-> On Thu, Mar 15, 2018 at 06:52:41PM +0800, Wei Wang wrote:
->> On 03/15/2018 02:11 AM, Dr. David Alan Gilbert wrote:
->>> * Wei Wang (wei.w.wang@intel.com) wrote:
->>>> This patch adds an API to clear bits corresponding to guest free pages
->>>> from the dirty bitmap. Spilt the free page block if it crosses the QEMU
->>>> RAMBlock boundary.
->>>>
->>>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
->>>> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>>> CC: Juan Quintela <quintela@redhat.com>
->>>> CC: Michael S. Tsirkin <mst@redhat.com>
->>>> ---
->>>>    include/migration/misc.h |  2 ++
->>>>    migration/ram.c          | 21 +++++++++++++++++++++
->>>>    2 files changed, 23 insertions(+)
->>>>
->>>> diff --git a/include/migration/misc.h b/include/migration/misc.h
->>>> index 77fd4f5..fae1acf 100644
->>>> --- a/include/migration/misc.h
->>>> +++ b/include/migration/misc.h
->>>> @@ -14,11 +14,13 @@
->>>>    #ifndef MIGRATION_MISC_H
->>>>    #define MIGRATION_MISC_H
->>>> +#include "exec/cpu-common.h"
->>>>    #include "qemu/notify.h"
->>>>    /* migration/ram.c */
->>>>    void ram_mig_init(void);
->>>> +void qemu_guest_free_page_hint(void *addr, size_t len);
->>>>    /* migration/block.c */
->>>> diff --git a/migration/ram.c b/migration/ram.c
->>>> index 5e33e5c..e172798 100644
->>>> --- a/migration/ram.c
->>>> +++ b/migration/ram.c
->>>> @@ -2189,6 +2189,27 @@ static int ram_init_all(RAMState **rsp)
->>>>        return 0;
->>>>    }
->>> This could do with some comments
->> OK, I'll add some.
->>
->>>> +void qemu_guest_free_page_hint(void *addr, size_t len)
->>>> +{
->>>> +    RAMBlock *block;
->>>> +    ram_addr_t offset;
->>>> +    size_t used_len, start, npages;
->>>   From your use I think the addr and len are coming raw from the guest;
->>> so we need to take some care.
->>>
->> Actually the "addr" here has been the host address that corresponds to the
->> guest free page. It's from elem->in_sg[0].iov_base.
->>
->>>> +        if (unlikely(offset + len > block->used_length)) {
->>> I think to make that overflow safe, that should be:
->>>     if (len > (block->used_length - offset)) {
->>>
->>> But we'll need another test before it, because qemu_ram_block_from_host
->>> seems to check max_length not used_length, so we need to check
->>> for offset > block->used_length first
->> OK, how about adding an assert above, like this:
->>
->> block = qemu_ram_block_from_host(addr, false, &offset);
->> assert (offset  < block->used_length );
->> if (!block)
->>      ...
->>
->> The address corresponds to a guest free page, which means it should be
->> within used_length. If not, something weird happens, I think we'd better to
->> assert it in that case.
->>
->> Best,
->> Wei
-> What if memory has been removed by hotunplug after guest sent the
-> free page notification?
+
+
+On 2018=E5=B9=B403=E6=9C=8816=E6=97=A5 17:58, Greg Kurz wrote:
+> On Fri, 16 Mar 2018 16:05:17 +0800
+> Jason Wang <jasowang@redhat.com> wrote:
 >
-> This seems to actually be likely to happen as memory being unplugged
-> would typically be mostly free.
+>> On 2018=E5=B9=B403=E6=9C=8808=E6=97=A5 02:57, Greg Kurz wrote:
+>>> If the backend could not transmit a packet right away for some reason=
+,
+>>> the packet is queued for asynchronous sending. The corresponding vq
+>>> element is tracked in the async_tx.elem field of the VirtIONetQueue,
+>>> for later freeing when the transmission is complete.
+>>>
+>>> If a reset happens before completion, virtio_net_tx_complete() will p=
+ush
+>>> async_tx.elem back to the guest anyway, and we end up with the inuse =
+flag
+>>> of the vq being equal to -1. The next call to virtqueue_pop() is then
+>>> likely to fail with "Virtqueue size exceeded".
+>>>
+>>> This can be reproduced easily by starting a guest without a net backe=
+nd,
+>>> doing a system reset when it is booted, and finally snapshotting it.
+>>>
+>>> The appropriate fix is to ensure that such an asynchronous transmissi=
+on
+>>> cannot survive a device reset. So for all queues, we first try to sen=
+d
+>>> the packet again, and eventually we purge it if the backend still cou=
+ld
+>>> not deliver it.
+>>>
+>>> Reported-by: R. Nageswara Sastry <nasastry@in.ibm.com>
+>>> Buglink: https://github.com/open-power-host-os/qemu/issues/37
+>>> Signed-off-by: Greg Kurz <groug@kaod.org>
+>>> ---
+>>>    hw/net/virtio-net.c |   11 +++++++++++
+>>>    1 file changed, 11 insertions(+)
+>>>
+>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+>>> index 188744e17d57..eea3cdb2c700 100644
+>>> --- a/hw/net/virtio-net.c
+>>> +++ b/hw/net/virtio-net.c
+>>> @@ -422,6 +422,7 @@ static RxFilterInfo *virtio_net_query_rxfilter(Ne=
+tClientState *nc)
+>>>    static void virtio_net_reset(VirtIODevice *vdev)
+>>>    {
+>>>        VirtIONet *n =3D VIRTIO_NET(vdev);
+>>> +    int i;
+>>>   =20
+>>>        /* Reset back to compatibility mode */
+>>>        n->promisc =3D 1;
+>>> @@ -445,6 +446,16 @@ static void virtio_net_reset(VirtIODevice *vdev)
+>>>        memcpy(&n->mac[0], &n->nic->conf->macaddr, sizeof(n->mac));
+>>>        qemu_format_nic_info_str(qemu_get_queue(n->nic), n->mac);
+>>>        memset(n->vlans, 0, MAX_VLAN >> 3);
+>>> +
+>>> +    /* Flush any async TX */
+>>> +    for (i =3D 0;  i < n->max_queues; i++) {
+>>> +        NetClientState *nc =3D qemu_get_subqueue(n->nic, i);
+>>> +
+>>> +        if (!qemu_net_queue_flush(nc->peer->incoming_queue)) {
+>>> +            qemu_net_queue_purge(nc->peer->incoming_queue, nc);
+>>> +        }
+>> Looks like we can use qemu_flush_or_purge_queued_packets(nc->peer) her=
+e.
+>>
+> It should be made extern first but we can use it indeed.
+>
+>> But a questions, you said it could be reproduced without a backend, in
+>> this case nc->peer should be NULL I believe or we won't even get here
+>> since qemu_sendv_packet_async() won't return zero?
+>>
+> My bad, I didn't use an appropriate wording. The issue is always reprod=
+ucible
+> if you only pass '-net nic,model=3Dvirtio', without any other -net opti=
+on that
+> would provide a functional network.
+>
+> ie,
+>
+> -device virtio-net-pci,netdev=3Dnetdev0 -netdev hubport,id=3Dnetdev0,hu=
+bid=3D0
+>
+> So, we do have a hubport peer, but since it isn't connected to the host=
+ network,
+> net_hub_port_can_receive() returns 0, and so does qemu_sendv_packet_asy=
+nc().
+>
+> What about the following change in the changelog ?
+>
+> "This can be reproduced easily by starting a guest with an hubport
+>   backend that is not connected to a functional network, eg,
+>
+>   -device virtio-net-pci,netdev=3Dnetdev0 -netdev hubport,id=3Dnetdev0,=
+hubid=3D0"
+>
+> Cheers,
 
+Looks good to me.
 
-OK, thanks for the reminder. Instead of using an assert, I think we can 
-let the function just return if (offset > block->used_length).
+Thanks
 
-Best,
-Wei
+> --
+> Greg
+>
+>> Thanks
+>>
+>>> +        assert(!virtio_net_get_subqueue(nc)->async_tx.elem);
+>>> +    }
+>>>    }
+>>>   =20
+>>>    static void peer_test_vnet_hdr(VirtIONet *n)
+>>>
+>>>  =20
