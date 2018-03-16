@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ewufn-0006i5-V9
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:05:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ewuhU-0007Si-05
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:07:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ewufn-0003YO-51
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:05:51 -0400
-Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:39678)
+	(envelope-from <peter.maydell@linaro.org>) id 1ewuhT-0004pk-3R
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:07:35 -0400
+Received: from mail-ot0-x22b.google.com ([2607:f8b0:4003:c0f::22b]:43097)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ewufm-0003WK-VR
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:05:51 -0400
-Received: by mail-ot0-x230.google.com with SMTP id h8-v6so11404132oti.6
-	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 12:05:50 -0700 (PDT)
+	id 1ewuhS-0004pV-V0
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:07:35 -0400
+Received: by mail-ot0-x22b.google.com with SMTP id m22-v6so11407778otf.10
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 12:07:34 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180315181420.8694-1-ehabkost@redhat.com>
-References: <20180315181420.8694-1-ehabkost@redhat.com>
+In-Reply-To: <20180315171828.5214-1-kwolf@redhat.com>
+References: <20180315171828.5214-1-kwolf@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Mar 2018 19:05:29 +0000
-Message-ID: <CAFEAcA9itE11dUF-Z22M13XT2_sgr0vgDPAsJ_QhUvdT07L5nQ@mail.gmail.com>
+Date: Fri, 16 Mar 2018 19:07:14 +0000
+Message-ID: <CAFEAcA-FmgwihxDLPq6xO2NLhHLrtfcbrEv7WX17huymrCNZgg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 0/7] Machine queue, 2018-03-15
+Subject: Re: [Qemu-devel] [PULL v2 00/44] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 15 March 2018 at 18:14, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> Changes in v2 (v1 was 2018-03-12):
-> * Fix bsd-user build error
->
+On 15 March 2018 at 17:18, Kevin Wolf <kwolf@redhat.com> wrote:
 > The following changes since commit 56e8698ffa8aba9f762f980bc21b5340b006f24b:
 >
 >   Merge remote-tracking branch 'remotes/stsquad/tags/pull-travis-speedup-130318-1' into staging (2018-03-15 14:48:09 +0000)
 >
-> are available in the Git repository at:
+> are available in the git repository at:
 >
->   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
 >
-> for you to fetch changes up to 7cbb6fd8926b9b590c0725b9b7d0a11db6aefd08:
+> for you to fetch changes up to d3137181e5e1e5e6b651b58484fc8f705a48ee36:
 >
->   cpu: drop unnecessary NULL check and cpu_common_class_by_name() (2018-03-15 14:52:40 -0300)
+>   iscsi: fix iSER compilation (2018-03-15 17:58:26 +0100)
 >
 > ----------------------------------------------------------------
-> Machine queue, 2018-03-15
+> Block layer patches
 >
 
-Hi. This produces several warning messages running make check:
+I get merge conflicts trying to apply this; please fix and resend:
 
-WARNING: cpu name for target 'riscv32' isn't defined, add it to cpus_map
-WARNING: cpu name for target 'riscv64' isn't defined, add it to cpus_map
+Auto-merging tests/qemu-iotests/group
+CONFLICT (content): Merge conflict in tests/qemu-iotests/group
+Auto-merging tests/qemu-iotests/209.out
+CONFLICT (add/add): Merge conflict in tests/qemu-iotests/209.out
+Auto-merging tests/qemu-iotests/209
+CONFLICT (add/add): Merge conflict in tests/qemu-iotests/209
 
 thanks
 -- PMM
