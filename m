@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ewnPG-000622-8B
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:20:19 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1ewnQm-0006j1-Re
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:21:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ewnPC-0004cw-Hg
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:20:18 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:36568
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1ewnPC-0004cP-6b
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:20:14 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-References: <1520010495-58172-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<be2cf515-ddf8-74ef-7854-319329ee9209@ilande.co.uk>
-Message-ID: <b73a9767-1a49-9e51-dc79-41a3547df969@ilande.co.uk>
-Date: Fri, 16 Mar 2018 11:20:05 +0000
+	(envelope-from <wei.w.wang@intel.com>) id 1ewnQj-0005c0-Jr
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:21:52 -0400
+Received: from mga12.intel.com ([192.55.52.136]:26115)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1ewnQj-0005bU-8W
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:21:49 -0400
+Message-ID: <5AABA982.3080106@intel.com>
+Date: Fri, 16 Mar 2018 19:24:50 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <be2cf515-ddf8-74ef-7854-319329ee9209@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] ide: fix invalid TRIM range abortion for
- macio
+References: <1520426065-40265-1-git-send-email-wei.w.wang@intel.com>
+	<1520426065-40265-3-git-send-email-wei.w.wang@intel.com>
+	<20180314181137.GG3006@work-vm> <5AAA5079.2000308@intel.com>
+	<20180315154754-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180315154754-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] migration: API to clear bits of
+ guest free pages from the dirty bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,99 +31,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jsnow@redhat.com, qemu-devel@nongnu.org
-Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-On 05/03/18 21:54, Mark Cave-Ayland wrote:
-
-> On 02/03/18 17:08, Anton Nefedov wrote:
-> 
->> commit 947858b0 "ide: abort TRIM operation for invalid range"
->> is incorrect for macio; just ide_dma_error() without doing a callback
->> is not enough for that errorpath.
+On 03/15/2018 09:50 PM, Michael S. Tsirkin wrote:
+> On Thu, Mar 15, 2018 at 06:52:41PM +0800, Wei Wang wrote:
+>> On 03/15/2018 02:11 AM, Dr. David Alan Gilbert wrote:
+>>> * Wei Wang (wei.w.wang@intel.com) wrote:
+>>>> This patch adds an API to clear bits corresponding to guest free pages
+>>>> from the dirty bitmap. Spilt the free page block if it crosses the QEMU
+>>>> RAMBlock boundary.
+>>>>
+>>>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+>>>> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>>> CC: Juan Quintela <quintela@redhat.com>
+>>>> CC: Michael S. Tsirkin <mst@redhat.com>
+>>>> ---
+>>>>    include/migration/misc.h |  2 ++
+>>>>    migration/ram.c          | 21 +++++++++++++++++++++
+>>>>    2 files changed, 23 insertions(+)
+>>>>
+>>>> diff --git a/include/migration/misc.h b/include/migration/misc.h
+>>>> index 77fd4f5..fae1acf 100644
+>>>> --- a/include/migration/misc.h
+>>>> +++ b/include/migration/misc.h
+>>>> @@ -14,11 +14,13 @@
+>>>>    #ifndef MIGRATION_MISC_H
+>>>>    #define MIGRATION_MISC_H
+>>>> +#include "exec/cpu-common.h"
+>>>>    #include "qemu/notify.h"
+>>>>    /* migration/ram.c */
+>>>>    void ram_mig_init(void);
+>>>> +void qemu_guest_free_page_hint(void *addr, size_t len);
+>>>>    /* migration/block.c */
+>>>> diff --git a/migration/ram.c b/migration/ram.c
+>>>> index 5e33e5c..e172798 100644
+>>>> --- a/migration/ram.c
+>>>> +++ b/migration/ram.c
+>>>> @@ -2189,6 +2189,27 @@ static int ram_init_all(RAMState **rsp)
+>>>>        return 0;
+>>>>    }
+>>> This could do with some comments
+>> OK, I'll add some.
 >>
->> Instead, pass -EINVAL to the callback and handle it there
->> (see related motivation for read/write in 58ac32113).
+>>>> +void qemu_guest_free_page_hint(void *addr, size_t len)
+>>>> +{
+>>>> +    RAMBlock *block;
+>>>> +    ram_addr_t offset;
+>>>> +    size_t used_len, start, npages;
+>>>   From your use I think the addr and len are coming raw from the guest;
+>>> so we need to take some care.
+>>>
+>> Actually the "addr" here has been the host address that corresponds to the
+>> guest free page. It's from elem->in_sg[0].iov_base.
 >>
->> It will however catch possible EINVAL from the block layer too.
+>>>> +        if (unlikely(offset + len > block->used_length)) {
+>>> I think to make that overflow safe, that should be:
+>>>     if (len > (block->used_length - offset)) {
+>>>
+>>> But we'll need another test before it, because qemu_ram_block_from_host
+>>> seems to check max_length not used_length, so we need to check
+>>> for offset > block->used_length first
+>> OK, how about adding an assert above, like this:
 >>
->> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
->> ---
->>   hw/ide/core.c | 17 +++++++++--------
->>   1 file changed, 9 insertions(+), 8 deletions(-)
+>> block = qemu_ram_block_from_host(addr, false, &offset);
+>> assert (offset  < block->used_length );
+>> if (!block)
+>>      ...
 >>
->> diff --git a/hw/ide/core.c b/hw/ide/core.c
->> index 257b429..54510d4 100644
->> --- a/hw/ide/core.c
->> +++ b/hw/ide/core.c
->> @@ -402,7 +402,6 @@ typedef struct TrimAIOCB {
->>       QEMUIOVector *qiov;
->>       BlockAIOCB *aiocb;
->>       int i, j;
->> -    bool is_invalid;
->>   } TrimAIOCB;
->>   static void trim_aio_cancel(BlockAIOCB *acb)
->> @@ -430,11 +429,8 @@ static void ide_trim_bh_cb(void *opaque)
->>   {
->>       TrimAIOCB *iocb = opaque;
->> -    if (iocb->is_invalid) {
->> -        ide_dma_error(iocb->s);
->> -    } else {
->> -        iocb->common.cb(iocb->common.opaque, iocb->ret);
->> -    }
->> +    iocb->common.cb(iocb->common.opaque, iocb->ret);
->> +
->>       qemu_bh_delete(iocb->bh);
->>       iocb->bh = NULL;
->>       qemu_aio_unref(iocb);
->> @@ -462,7 +458,7 @@ static void ide_issue_trim_cb(void *opaque, int ret)
->>                   }
->>                   if (!ide_sect_range_ok(s, sector, count)) {
->> -                    iocb->is_invalid = true;
->> +                    iocb->ret = -EINVAL;
->>                       goto done;
->>                   }
->> @@ -502,7 +498,6 @@ BlockAIOCB *ide_issue_trim(
->>       iocb->qiov = qiov;
->>       iocb->i = -1;
->>       iocb->j = 0;
->> -    iocb->is_invalid = false;
->>       ide_issue_trim_cb(iocb, 0);
->>       return &iocb->common;
->>   }
->> @@ -848,6 +843,12 @@ static void ide_dma_cb(void *opaque, int ret)
->>       if (ret == -ECANCELED) {
->>           return;
->>       }
->> +
->> +    if (ret == -EINVAL) {
->> +        ide_dma_error(s);
->> +        return;
->> +    }
->> +
->>       if (ret < 0) {
->>           if (ide_handle_rw_error(s, -ret, 
->> ide_dma_cmd_to_retry(s->dma_cmd))) {
->>               s->bus->dma->aiocb = NULL;
+>> The address corresponds to a guest free page, which means it should be
+>> within used_length. If not, something weird happens, I think we'd better to
+>> assert it in that case.
 >>
-> 
-> Hi Anton,
-> 
-> Thanks for this. I applied this patch to git master with my macio patch 
-> at https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06076.html 
-> and it allowed to continue all the way through the Debian installer for 
-> the PPC g3beige machine so I believe it is working.
-> 
-> Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-Hi John,
-
-I know that you're busy, but just wondering if you have managed to 
-review these 2 TRIM patches? They are a candidate for 2.12 since they 
-prevent a qemu-system-ppc segfault on Mac machines when issuing IDE TRIM 
-commands.
+>> Best,
+>> Wei
+> What if memory has been removed by hotunplug after guest sent the
+> free page notification?
+>
+> This seems to actually be likely to happen as memory being unplugged
+> would typically be mostly free.
 
 
-ATB,
+OK, thanks for the reminder. Instead of using an assert, I think we can 
+let the function just return if (offset > block->used_length).
 
-Mark.
+Best,
+Wei
