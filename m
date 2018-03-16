@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ewrqK-0007Gb-Vq
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 12:04:35 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1ews8l-00036J-1J
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 12:23:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ewrqE-0002e3-D5
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 12:04:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49348 helo=mx1.redhat.com)
+	(envelope-from <frederic.konrad@adacore.com>) id 1ews8h-0007b8-QA
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 12:23:35 -0400
+Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:50209
+	helo=smtp.eu.adacore.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ewrqE-0002dS-9Y
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 12:04:26 -0400
-References: <20180312151233.16565-1-vkuznets@redhat.com>
-	<20180312151233.16565-3-vkuznets@redhat.com>
-	<7d1afa27-9653-75dc-ebfe-8633b93f1ce6@redhat.com>
-	<87efkk9i2j.fsf@vitty.brq.redhat.com>
-	<cd71ecd6-7a3c-05e5-7854-d71763cbc4c2@redhat.com>
-	<87605w9gh5.fsf@vitty.brq.redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e034b288-25e4-d5ad-7dc3-220bda9aedd2@redhat.com>
-Date: Fri, 16 Mar 2018 17:04:08 +0100
-MIME-Version: 1.0
-In-Reply-To: <87605w9gh5.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] i386/kvm: lower requirements for
- Hyper-V frequency MSRs exposure
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1ews8h-0007Yc-Jb
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 12:23:31 -0400
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Date: Fri, 16 Mar 2018 17:23:13 +0100
+Message-Id: <1521217393-8162-1-git-send-email-frederic.konrad@adacore.com>
+Subject: [Qemu-devel] [PATCH] gdbstub: send a terminaison packet instead of
+ crashing gdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,31 +24,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, famz@redhat.com, frederic.konrad@adacore.com
 
-On 16/03/2018 16:40, Vitaly Kuznetsov wrote:
->> On older kernel without re-enlightenment support, you don't want to
->> expose the frequency MSRs unless invtsc is on, right?
->>
-> Actually no, I think it's OK to expose frequency MSRs even when we don't
-> have invtsc and don't support re-enlightenment. Nested Hyper-V won't
-> pass stable TSC pages to its guests unless it sees either invtsc or
-> reenlightenment. So as long as we have something to put to these MSRs
-> (env->tsc_khz) I *think* we can expose them.
-> 
-> I may actually be missing the reason why Ladi put
-> tsc_is_stable_and_known() here.
+Since the commit:
+commit 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268
+Author: Stefan Hajnoczi <stefanha@redhat.com>
+Date:   Wed Mar 7 14:42:05 2018 +0000
 
-Probably because I asked him to. :)  It looks like Hyper-V knows that
-you need re-enlightenment in order to really trust the frequency MSRs
-(of course the TSC page is special because it has the sequence count).
+    vl: introduce vm_shutdown()
 
-So the patch is good.  Thanks!
+GDB crash when qemu exits (at least on sparc-softmmu):
+Remote communication error.  Target disconnected.: Connection reset by peer.
+Quitting: putpkt: write failed: Broken pipe.
 
-Paolo
+So send a packet to kill GDB before we exit QEMU:
+[Inferior 1 (Thread 0) exited normally]
 
-> In case we're running Windows (and not
-> Hyper-V) as a guest KVM will update TSC page on migration. And genuine
-> Hyper-V also exposes these MSRs without exposing INVTSC flag by
-> default.
+Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+---
+ gdbstub.c              | 7 +++++++
+ include/exec/gdbstub.h | 2 ++
+ vl.c                   | 2 ++
+ 3 files changed, 11 insertions(+)
+
+diff --git a/gdbstub.c b/gdbstub.c
+index f1d5148..a76b2fa 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -2052,6 +2052,13 @@ int gdbserver_start(const char *device)
+     return 0;
+ }
+ 
++void gdbserver_cleanup(void)
++{
++    if (gdbserver_state) {
++        put_packet(gdbserver_state, "W00");
++    }
++}
++
+ static void register_types(void)
+ {
+     type_register_static(&char_gdb_type_info);
+diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
+index 9aa7756..2e8a4b8 100644
+--- a/include/exec/gdbstub.h
++++ b/include/exec/gdbstub.h
+@@ -103,6 +103,8 @@ int gdbserver_start(int);
+ int gdbserver_start(const char *port);
+ #endif
+ 
++void gdbserver_cleanup(void);
++
+ /**
+  * gdb_has_xml:
+  * This is an ugly hack to cope with both new and old gdb.
+diff --git a/vl.c b/vl.c
+index 3ef04ce..0427b15 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4723,6 +4723,8 @@ int main(int argc, char **argv, char **envp)
+ 
+     main_loop();
+ 
++    gdbserver_cleanup();
++
+     /* No more vcpu or device emulation activity beyond this point */
+     vm_shutdown();
+ 
+-- 
+1.8.3.1
