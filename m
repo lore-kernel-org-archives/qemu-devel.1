@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33194)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ewwNw-0007xd-1J
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 16:55:33 -0400
+	(envelope-from <no-reply@patchew.org>) id 1ewwRD-0001MN-JT
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 16:58:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ewwNt-0001vR-Vt
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 16:55:32 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:33043)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ewwNt-0001ug-K9
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 16:55:29 -0400
-Received: by mail-ot0-x244.google.com with SMTP id y11-v6so11723854otg.0
-	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 13:55:29 -0700 (PDT)
+	(envelope-from <no-reply@patchew.org>) id 1ewwRA-00063t-FQ
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 16:58:55 -0400
+Resent-Message-Id: <E1ewwRA-00063t-FQ@eggs.gnu.org>
+In-Reply-To: <1521232280-13089-1-git-send-email-alindsay@codeaurora.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152123390250.78.14000079057958081515@71c20359a636>
 MIME-Version: 1.0
-In-Reply-To: <CAHNT7NuQVXscY4GGfL7EjCMkA3pjd-Qhtm7H9rY=AhU7L85twg@mail.gmail.com>
-References: <1520629272-98060-1-git-send-email-mjc@sifive.com>
-	<a407b0b4-17fc-e399-d0b1-c2eaf87a4836@amsat.org>
-	<CAFEAcA_eaem+n79=DmSJnWYFQzrggAdab7H3hihnuq--=hy8kA@mail.gmail.com>
-	<CAHNT7NuQVXscY4GGfL7EjCMkA3pjd-Qhtm7H9rY=AhU7L85twg@mail.gmail.com>
-From: Michael Clark <mjc@sifive.com>
-Date: Fri, 16 Mar 2018 13:55:28 -0700
-Message-ID: <CAHNT7Nt06n_7wNw2Mx6s7=kF=d2M8VmQbL8G7108XKeQmM9r-g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] RISC-V: Fix riscv_isa_string,
- use popcount to count bits
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 16 Mar 2018 13:58:23 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 00/22] More fully implement ARM PMUv3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,106 +23,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Palmer Dabbelt <palmer@sifive.com>
+To: alindsay@codeaurora.org
+Cc: famz@redhat.com, qemu-arm@nongnu.org, peter.maydell@linaro.org, alistair.francis@xilinx.com, wei@redhat.com, crosthwaite.peter@gmail.com, mspradli@codeaurora.org, qemu-devel@nongnu.org, digantd@codeaurora.org
 
-On Fri, Mar 16, 2018 at 10:03 AM, Michael Clark <mjc@sifive.com> wrote:
-
->
-> On Thu, Mar 15, 2018 at 12:27 PM, Peter Maydell <peter.maydell@linaro.org=
->
-> wrote:
->
->> On 10 March 2018 at 21:25, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> wrote:
->> > On 03/09/2018 10:01 PM, Michael Clark wrote:
->> >> Logic bug caused the string size calculation for the RISC-V
->> >> format ISA string to be small. This fix allows slack for rv128.
->> >>
->> >> Cc: Palmer Dabbelt <palmer@sifive.com>
->> >> Cc: Peter Maydell <peter.maydell@linaro.org>
->> >> Cc: Eric Blake <eblake@redhat.com>
->> >> Signed-off-by: Michael Clark <mjc@sifive.com>
->> >> ---
->> >>  target/riscv/cpu.c | 2 +-
->> >>  1 file changed, 1 insertion(+), 1 deletion(-)
->> >>
->> >> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
->> >> index 4851890..1456535 100644
->> >> --- a/target/riscv/cpu.c
->> >> +++ b/target/riscv/cpu.c
->> >> @@ -391,7 +391,7 @@ static const TypeInfo riscv_cpu_type_info =3D {
->> >>  char *riscv_isa_string(RISCVCPU *cpu)
->> >>  {
->> >>      int i;
->> >> -    size_t maxlen =3D 5 + ctz32(cpu->env.misa);
->> >> +    size_t maxlen =3D 8 + ctpop64(cpu->env.misa);
->> >
->> > Can you document the magic 5/8?
->> >
->> > This looks nice, but this seems to me too much optimization to save fe=
-w
->> > bytes, using sizeof(riscv_exts) is overflow-free.
->> >
->> > Maybe this is enough and self-explanatory:
->> >
->> >        const size_t maxlen =3D sizeof("rv128") + sizeof(riscv_exts);
->> >
->> >>      char *isa_string =3D g_new0(char, maxlen);
->> >>      snprintf(isa_string, maxlen, "rv%d", TARGET_LONG_BITS);
->> >
->> > Also, if you keep the snprintf() return value, you can (naming it 'n')
->> > simplify (also easier to review):
->> >
->> >>      for (i =3D 0; i < sizeof(riscv_exts); i++) {
->> >>
->> >         if (cpu->env.misa & RV(riscv_exts[i])) {
->> > -           isa_string[strlen(isa_string)] =3D riscv_exts[i] - 'A' + '=
-a';
->> > +           isa_string[n++] =3D tolower(riscv_exts[i]);
->> >         }
->> >     }
->> >
->> > and simply use g_new() with:
->> >
->> > +   isa_string[n] =3D '\0';
->> >
->> >     return isa_string;
->> > }
->>
->> Hi -- any chance of a respin of this patch that addresses Philippe's
->> review comments so we can fix it before rc0? This is causing
->> my merge-build tests to fail about 50% of the time on OpenBSD
->> at the moment...
->
->
-> I'll respin asap.
->
-> I was out earlier this week as I was at the RISC-V Hackathon at the
-> Embedded Linux Conference in Portland. I also have to go through the revi=
-ew
-> backlog for the post merge spec conformance and cleanup series...
->
-
-I've sent out the riscv_isa_string fix patch as well as the RISC-V
-Post-merge spec conformance and cleanup series independently. I could
-combine them so we have one post-merge PR that contains the riscv_isa_strin=
-g
-string fix, the spec conformance fixes and cleanup. Many of the cleanup
-patches have been reviewed by Phil, but the patches that haven't been
-reviewed are spec conformance fixes and likely require a reading of the
-RISC-V Privileged ISA Specification, which may not happen, unless anyone
-with RISC-V knowledge has time. They have sign off.
-
-If I submit a PR it will include the checkpatch fixes that I noticed after
-sending the patches. The series has been tested pretty extensively and the
-earlier revision is what we have in the riscv.org repo and in SiFive's
-freedom-u-sdk. i.e. it is what folk are using. I've been working inside of
-QEMU RISC-V quite a lot with this series applied, running the latest Fedora
-image with SMP Linux, building QEMU inside of QEMU as I'm working on a TCG
-backend for RISC-V that I started this Monday during the RISC-V Hackathon.
-
-FYI: This is the work in progress branch on the TCG backend for RISC-V
-(it's not quite complete but the bones are there):
-
-- https://github.com/michaeljclark/riscv-qemu/tree/riscv-tcg-backend
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MjEyMzIyODAtMTMwODktMS1naXQtc2VuZC1lbWFpbC1hbGluZHNheUBjb2Rl
+YXVyb3JhLm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAwLzIyXSBNb3JlIGZ1
+bGx5IGltcGxlbWVudCBBUk0gUE1VdjMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
+L2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwg
+d2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1y
+ZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5n
+IFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAg
+aWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
+IC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkK
+ICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09
+CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20g
+aHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAg
+ICAgICAgICAgIHBhdGNoZXcvMTUyMTIzMjI4MC0xMzA4OS0xLWdpdC1zZW5kLWVtYWlsLWFsaW5k
+c2F5QGNvZGVhdXJvcmEub3JnIC0+IHBhdGNoZXcvMTUyMTIzMjI4MC0xMzA4OS0xLWdpdC1zZW5k
+LWVtYWlsLWFsaW5kc2F5QGNvZGVhdXJvcmEub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
+dGVzdCcKZDgxNzkxYjE4NCB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgUE1TV0lOQwo1MTIxMjRkMDE4
+IHRhcmdldC9hcm06IFBNVTogU2V0IFBNQ1IuTiB0byA0CmI3NDhlOTczMDYgdGFyZ2V0L2FybTog
+UE1VOiBBZGQgaW5zdHJ1Y3Rpb24gYW5kIGN5Y2xlIGV2ZW50cwo3ZTQ2YTc3Zjg5IHRhcmdldC9h
+cm06IEZpbmlzaCBpbXBsZW1lbnRhdGlvbiBvZiBQTVtYXUVWQ05UUiBhbmQgUE1bWF1FVlRZUEVS
+CjgyY2ZmZWY4NTUgdGFyZ2V0L2FybTogQWRkIGFycmF5IGZvciBzdXBwb3J0ZWQgUE1VIGV2ZW50
+cywgZ2VuZXJhdGUgUE1DRUlEWzAxXQpkNjM1MDIxZDBhIHRhcmdldC9hcm06IFNwbGl0IGFybV9j
+Y250X2VuYWJsZWQgaW50byBnZW5lcmljIHBtdV9jb3VudGVyX2VuYWJsZWQKM2UxYjQzOGRlYiB0
+YXJnZXQvYXJtOiBJbXBsZW1lbnQgUE1PVlNTRVQKYzEzYzgzMjk4OCB0YXJnZXQvYXJtOiBBZGQg
+QVJNX0ZFQVRVUkVfVjdWRSBmb3IgdjcgVmlydHVhbGl6YXRpb24gRXh0ZW5zaW9ucwo5YzgwYWY0
+ZDgyIHRhcmdldC9hcm06IE1ha2UgUE1PVlNDTFIgNjQgYml0cyB3aWRlCjhmZmJjZDNkZDggdGFy
+Z2V0L2FybTogQWxsb3cgQUFyY2gzMiBhY2Nlc3MgZm9yIFBNQ0NGSUxUUgo3ZGM0ZWM5NzE1IHRh
+cmdldC9hcm06IEZpbHRlciBjeWNsZSBjb3VudGVyIGJhc2VkIG9uIFBNQ0NGSUxUUl9FTDAKZjFl
+NDBmOWZmZiB0YXJnZXQvYXJtOiBGaXggYml0bWFzayBmb3IgUE1DQ0ZJTFRSIHdyaXRlcwplYjE0
+MmI0MmI0IHRhcmdldC9hcm06IEFsbG93IEVMIGNoYW5nZSBob29rcyB0byBkbyBJTwpkMzcxODZh
+YmRkIHRhcmdldC9hcm06IEFkZCBwcmUtRUwgY2hhbmdlIGhvb2tzCmFlMTJlMTYxZGEgdGFyZ2V0
+L2FybTogU3VwcG9ydCBtdWx0aXBsZSBFTCBjaGFuZ2UgaG9va3MKOWJmYTk5ODA1ZCB0YXJnZXQv
+YXJtOiBGZXRjaCBHSUN2MyBzdGF0ZSBkaXJlY3RseSBmcm9tIENQVUFSTVN0YXRlCjg4MWJlZTVl
+OTYgdGFyZ2V0L2FybTogTWFzayBQTVUgcmVnaXN0ZXIgd3JpdGVzIGJhc2VkIG9uIFBNQ1JfRUww
+Lk4KODkwYWQ2NDcyYiB0YXJnZXQvYXJtOiBSZW9yZ2FuaXplIFBNQ0NOVFIgcmVhZCwgd3JpdGUs
+IHN5bmMKOTIyZWVjMDIzYiB0YXJnZXQvYXJtOiBUcmVhdCBQTUNDTlRSIGFzIGFsaWFzIG9mIFBN
+Q0NOVFJfRUwwCjViMWNlMzNjMGIgdGFyZ2V0L2FybTogQ2hlY2sgUE1DTlRFTiBmb3Igd2hldGhl
+ciBQTUNDTlRSIGlzIGVuYWJsZWQKMmVjYjA5YWUwNCB0YXJnZXQvYXJtOiBBMTUgUE1DRUlEMCBp
+bml0aWFsaXphdGlvbiBzdHlsZSBuaXQKMGYyNmExNTY4YSB0YXJnZXQvYXJtOiBBNTM6IEluaXRp
+YWxpemUgUE1DRUlEWzAxXQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8y
+MjogdGFyZ2V0L2FybTogQTUzOiBJbml0aWFsaXplIFBNQ0VJRFswMV0uLi4KQ2hlY2tpbmcgUEFU
+Q0ggMi8yMjogdGFyZ2V0L2FybTogQTE1IFBNQ0VJRDAgaW5pdGlhbGl6YXRpb24gc3R5bGUgbml0
+Li4uCkNoZWNraW5nIFBBVENIIDMvMjI6IHRhcmdldC9hcm06IENoZWNrIFBNQ05URU4gZm9yIHdo
+ZXRoZXIgUE1DQ05UUiBpcyBlbmFibGVkLi4uCkNoZWNraW5nIFBBVENIIDQvMjI6IHRhcmdldC9h
+cm06IFRyZWF0IFBNQ0NOVFIgYXMgYWxpYXMgb2YgUE1DQ05UUl9FTDAuLi4KQ2hlY2tpbmcgUEFU
+Q0ggNS8yMjogdGFyZ2V0L2FybTogUmVvcmdhbml6ZSBQTUNDTlRSIHJlYWQsIHdyaXRlLCBzeW5j
+Li4uCkNoZWNraW5nIFBBVENIIDYvMjI6IHRhcmdldC9hcm06IE1hc2sgUE1VIHJlZ2lzdGVyIHdy
+aXRlcyBiYXNlZCBvbiBQTUNSX0VMMC5OLi4uCkNoZWNraW5nIFBBVENIIDcvMjI6IHRhcmdldC9h
+cm06IEZldGNoIEdJQ3YzIHN0YXRlIGRpcmVjdGx5IGZyb20gQ1BVQVJNU3RhdGUuLi4KQ2hlY2tp
+bmcgUEFUQ0ggOC8yMjogdGFyZ2V0L2FybTogU3VwcG9ydCBtdWx0aXBsZSBFTCBjaGFuZ2UgaG9v
+a3MuLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBv
+cGVuIHBhcmVudGhlc2lzICcoJwojMjY6IEZJTEU6IHRhcmdldC9hcm0vY3B1LmM6NjI6CisgICAg
+ZW50cnkgPSBnX21hbGxvYzAoc2l6ZW9mICgqZW50cnkpKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3
+YXJuaW5ncywgODcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggOS8yMjogdGFyZ2V0L2FybTogQWRkIHByZS1FTCBjaGFu
+Z2UgaG9va3MuLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1l
+IGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMjY6IEZJTEU6IHRhcmdldC9hcm0vY3B1LmM6NjI6
+CisgICAgZW50cnkgPSBnX21hbGxvYzAoc2l6ZW9mICgqZW50cnkpKTsKCnRvdGFsOiAxIGVycm9y
+cywgMCB3YXJuaW5ncywgMTEwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHBy
+b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
+cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
+biBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDEwLzIyOiB0YXJnZXQvYXJtOiBBbGxvdyBF
+TCBjaGFuZ2UgaG9va3MgdG8gZG8gSU8uLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMjI6IHRhcmdldC9h
+cm06IEZpeCBiaXRtYXNrIGZvciBQTUNDRklMVFIgd3JpdGVzLi4uCkNoZWNraW5nIFBBVENIIDEy
+LzIyOiB0YXJnZXQvYXJtOiBGaWx0ZXIgY3ljbGUgY291bnRlciBiYXNlZCBvbiBQTUNDRklMVFJf
+RUwwLi4uCkNoZWNraW5nIFBBVENIIDEzLzIyOiB0YXJnZXQvYXJtOiBBbGxvdyBBQXJjaDMyIGFj
+Y2VzcyBmb3IgUE1DQ0ZJTFRSLi4uCkNoZWNraW5nIFBBVENIIDE0LzIyOiB0YXJnZXQvYXJtOiBN
+YWtlIFBNT1ZTQ0xSIDY0IGJpdHMgd2lkZS4uLgpDaGVja2luZyBQQVRDSCAxNS8yMjogdGFyZ2V0
+L2FybTogQWRkIEFSTV9GRUFUVVJFX1Y3VkUgZm9yIHY3IFZpcnR1YWxpemF0aW9uIEV4dGVuc2lv
+bnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTYvMjI6IHRhcmdldC9hcm06IEltcGxlbWVudCBQTU9WU1NF
+VC4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzk6IEZJTEU6IHRhcmdldC9h
+cm0vaGVscGVyLmM6MTQxNzoKKyAgICAgIC5hY2Nlc3MgPSBQTDBfUlcsIC5maWVsZG9mZnNldCA9
+IG9mZnNldG9mbG93MzIoQ1BVQVJNU3RhdGUsIGNwMTUuYzlfcG1vdnNyKSwKCnRvdGFsOiAwIGVy
+cm9ycywgMSB3YXJuaW5ncywgNTkgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
+cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
+ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAxNy8yMjogdGFyZ2V0L2FybTogU3BsaXQg
+YXJtX2NjbnRfZW5hYmxlZCBpbnRvIGdlbmVyaWMgcG11X2NvdW50ZXJfZW5hYmxlZC4uLgpDaGVj
+a2luZyBQQVRDSCAxOC8yMjogdGFyZ2V0L2FybTogQWRkIGFycmF5IGZvciBzdXBwb3J0ZWQgUE1V
+IGV2ZW50cywgZ2VuZXJhdGUgUE1DRUlEWzAxXS4uLgpDaGVja2luZyBQQVRDSCAxOS8yMjogdGFy
+Z2V0L2FybTogRmluaXNoIGltcGxlbWVudGF0aW9uIG9mIFBNW1hdRVZDTlRSIGFuZCBQTVtYXUVW
+VFlQRVIuLi4KQ2hlY2tpbmcgUEFUQ0ggMjAvMjI6IHRhcmdldC9hcm06IFBNVTogQWRkIGluc3Ry
+dWN0aW9uIGFuZCBjeWNsZSBldmVudHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMjEvMjI6IHRhcmdldC9h
+cm06IFBNVTogU2V0IFBNQ1IuTiB0byA0Li4uCkNoZWNraW5nIFBBVENIIDIyLzIyOiB0YXJnZXQv
+YXJtOiBJbXBsZW1lbnQgUE1TV0lOQy4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
+ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
+IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
+YWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
