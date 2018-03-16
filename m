@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ewn6j-0004jX-RU
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:01:10 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ewn7I-00050Q-Jv
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:01:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ewn6f-0003od-KA
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:01:09 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <1520849818-6915-5-git-send-email-anton.nefedov@virtuozzo.com>
-References: <1520849818-6915-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1520849818-6915-5-git-send-email-anton.nefedov@virtuozzo.com>
-Date: Fri, 16 Mar 2018 12:01:02 +0100
-Message-ID: <w51k1ucp9n5.fsf@maestria.local.igalia.com>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ewn7D-00048C-Pu
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:01:44 -0400
+References: <1521178795-21894-1-git-send-email-thuth@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <a14ae60e-9853-9077-d9e1-9207814aec5f@ilande.co.uk>
+Date: Fri, 16 Mar 2018 11:01:01 +0000
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v8 4/9] block: introduce BDRV_REQ_ALLOCATE
- flag
+In-Reply-To: <1521178795-21894-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] Add new CD-ROM related qtests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +23,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, den@virtuozzo.com
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Victor Kaplansky <victork@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-s390x@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
 
-On Mon 12 Mar 2018 11:16:53 AM CET, Anton Nefedov wrote:
-> The flag is supposed to indicate that the region of the disk image has
-> to be sufficiently allocated so it reads as zeroes.
->
-> The call with the flag set must return -ENOTSUP if allocation cannot
-> be done efficiently.
-> This has to be made sure of by both
->   - the drivers that support the flag
->   - and the common block layer (so it will not fall back to any slowpath
->     (like writing zero buffers) in case the driver does not support
->     the flag).
->
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
+On 16/03/18 05:39, Thomas Huth wrote:
 
-Hmm... this is not the patch that I reviewed, please remove the R-b
-lines when you submit a modified patch.
+> With one of my clean-up patches (see commit 1454509726719e0933c800), I
+> recently accidentially broke the "-cdrom" parameter (more precisely
+> "-drive if=scsi") on a couple of boards, since there was no error
+> detected during the "make check" regression testing. This is clearly an
+> indication that we are lacking tests in this area.
+> So this small patch series now introduces some tests for CD-ROM drives:
+> The first two patches introduce the possibility to check that booting
+> from CD-ROM drives still works fine for x86 and s390x, and the third
+> patch adds a test that certain machines can at least still be started
+> with the "-cdrom" parameter (i.e. that test would have catched the
+> mistake that I did with my SCSI cleanup patch).
+> 
+> v2:
+>   - Use g_spawn_sync() instead of execlp() to run genisoimage
+>   - The "-cdrom" parameter test is now run on all architectures (with
+>     machine "none" for the machines that are not explicitly checked)
+>   - Some rewordings and improved comments here and there
+> 
+> Thomas Huth (3):
+>    tests/boot-sector: Add magic bytes to s390x boot code header
+>    tests/cdrom-test: Test booting from CD-ROM ISO image file
+>    tests/cdrom-test: Test that -cdrom parameter is working
+> 
+>   tests/Makefile.include |   2 +
+>   tests/boot-sector.c    |   9 +-
+>   tests/cdrom-test.c     | 222 +++++++++++++++++++++++++++++++++++++++++++++++++
+>   3 files changed, 230 insertions(+), 3 deletions(-)
+>   create mode 100644 tests/cdrom-test.c
 
-> +    /* The BDRV_REQ_ALLOCATE flag is used to indicate that the driver has to
-> +     * efficiently allocate the space so it reads as zeroes, or return an error.
-> +     * Must be used together with BDRV_REQ_ZERO_WRITE.
+Hi Thomas,
 
-I guess it's understandable from the context but it's not immediately
-obvious that you can set BDRV_REQ_ZERO_WRITE but not this one.
+Nice work - looks like a good, comprehensive test of the -cdrom option.
 
-Perhaps it could be rephrased as something like "If this is set then
-BDRV_REQ_ZERO_WRITE must also be set".
+Acked-By: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-> +     * Contradictory to BDRV_REQ_MAY_UNMAP so the two must not be used together.
 
-Or simply "This flag cannot be set together with BDRV_REQ_MAY_UNMAP".
+ATB,
 
-> +     */
-> +    BDRV_REQ_ALLOCATE           = 0x40,
-
-Berto
+Mark.
