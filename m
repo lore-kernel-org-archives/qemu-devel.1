@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ewqiZ-0001cg-It
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 10:52:28 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ewqjl-0002KU-MZ
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 10:53:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ewqiY-0004mR-QJ
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 10:52:27 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ewqjk-0005Fw-Tw
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 10:53:41 -0400
 References: <1520849818-6915-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1520849818-6915-5-git-send-email-anton.nefedov@virtuozzo.com>
-	<w51k1ucp9n5.fsf@maestria.local.igalia.com>
+	<1520849818-6915-7-git-send-email-anton.nefedov@virtuozzo.com>
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Message-ID: <7c4cae1c-80ef-b84f-67bd-b849386e3c73@virtuozzo.com>
-Date: Fri, 16 Mar 2018 17:52:13 +0300
+Message-ID: <2157719f-a2cb-1646-df75-a9aeb9f06d8d@virtuozzo.com>
+Date: Fri, 16 Mar 2018 17:53:29 +0300
 MIME-Version: 1.0
-In-Reply-To: <w51k1ucp9n5.fsf@maestria.local.igalia.com>
+In-Reply-To: <1520849818-6915-7-git-send-email-anton.nefedov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 4/9] block: introduce BDRV_REQ_ALLOCATE
- flag
+Subject: Re: [Qemu-devel] [PATCH v8 6/9] file-posix: support
+ BDRV_REQ_ALLOCATE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +25,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, den@virtuozzo.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, den@virtuozzo.com, berto@igalia.com
 
 
 
-On 16/3/2018 2:01 PM, Alberto Garcia wrote:
-> On Mon 12 Mar 2018 11:16:53 AM CET, Anton Nefedov wrote:
->> The flag is supposed to indicate that the region of the disk image has
->> to be sufficiently allocated so it reads as zeroes.
->>
->> The call with the flag set must return -ENOTSUP if allocation cannot
->> be done efficiently.
->> This has to be made sure of by both
->>    - the drivers that support the flag
->>    - and the common block layer (so it will not fall back to any slowpath
->>      (like writing zero buffers) in case the driver does not support
->>      the flag).
->>
->> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->> Reviewed-by: Alberto Garcia <berto@igalia.com>
+On 12/3/2018 1:16 PM, Anton Nefedov wrote:
+> Current write_zeroes implementation is good enough to satisfy this flag too
 > 
-> Hmm... this is not the patch that I reviewed, please remove the R-b
-> lines when you submit a modified patch.
-> 
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Oops. sorry
+strictly speaking this patch differs from v8 as well
+(rebase required an extra change, see below)
+so perhaps I should have stripped the review tags too
 
->> +    /* The BDRV_REQ_ALLOCATE flag is used to indicate that the driver has to
->> +     * efficiently allocate the space so it reads as zeroes, or return an error.
->> +     * Must be used together with BDRV_REQ_ZERO_WRITE.
+> ---
+>   block/file-posix.c | 10 +++++++++-
+>   1 file changed, 9 insertions(+), 1 deletion(-)
 > 
-> I guess it's understandable from the context but it's not immediately
-> obvious that you can set BDRV_REQ_ZERO_WRITE but not this one.
-> 
-> Perhaps it could be rephrased as something like "If this is set then
-> BDRV_REQ_ZERO_WRITE must also be set".
-> 
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 7f2cc63..2136df9 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -560,7 +560,10 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+>       }
+>       if (S_ISREG(st.st_mode)) {
+>           s->discard_zeroes = true;
+> +#ifdef CONFIG_FALLOCATE
+>           s->has_fallocate = true;
+> +        bs->supported_zero_flags |= BDRV_REQ_ALLOCATE;
+> +#endif
+>       }
+>       if (S_ISBLK(st.st_mode)) {
+>   #ifdef BLKDISCARDZEROES
+> @@ -595,10 +598,11 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+>   #ifdef CONFIG_XFS
+>       if (platform_test_xfs_fd(s->fd)) {
+>           s->is_xfs = true;
+> +        bs->supported_zero_flags |= BDRV_REQ_ALLOCATE;
+>       }
+>   #endif
+>   
+> -    bs->supported_zero_flags = s->discard_zeroes ? BDRV_REQ_MAY_UNMAP : 0;
+> +    bs->supported_zero_flags |= s->discard_zeroes ? BDRV_REQ_MAY_UNMAP : 0;
+>       ret = 0;
 
-Sound much better, fixed
+(this change is new in v9)
 
->> +     * Contradictory to BDRV_REQ_MAY_UNMAP so the two must not be used together.
-> 
-> Or simply "This flag cannot be set together with BDRV_REQ_MAY_UNMAP".
-> 
-
-Done
-
->> +     */
->> +    BDRV_REQ_ALLOCATE           = 0x40,
-> 
-> Berto
+>   fail:
+>       if (filename && (bdrv_flags & BDRV_O_TEMPORARY)) {
+> @@ -1416,6 +1420,10 @@ static ssize_t handle_aiocb_write_zeroes(RawPosixAIOData *aiocb)
+>           }
+>           s->has_fallocate = false;
+>       }
+> +
+> +    if (!s->has_fallocate) {
+> +        aiocb->bs->supported_zero_flags &= ~BDRV_REQ_ALLOCATE;
+> +    }
+>   #endif
+>   
+>       return -ENOTSUP;
 > 
