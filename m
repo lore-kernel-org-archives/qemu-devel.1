@@ -1,32 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ewpzz-0001Ul-77
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 10:06:28 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ewq1k-0002xj-89
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 10:08:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ewpzt-0005k5-95
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 10:06:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38292 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ewpzt-0005jo-5L
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 10:06:17 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C424B4023156
-	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 14:06:16 +0000 (UTC)
-Received: from red.redhat.com (ovpn-121-135.rdu2.redhat.com [10.10.121.135])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8BF2110B009C
-	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 14:06:16 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-Date: Fri, 16 Mar 2018 09:05:08 -0500
-Message-Id: <20180316140508.863778-39-eblake@redhat.com>
-In-Reply-To: <20180316140508.863778-1-eblake@redhat.com>
-References: <20180316140508.863778-1-eblake@redhat.com>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ewq1g-0006qM-Vu
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 10:08:12 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54512)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1ewq1g-0006pi-N8
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 10:08:08 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w2GE6aXe123996
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 10:08:07 -0400
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2grdpdvnty-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 10:08:06 -0400
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Fri, 16 Mar 2018 08:08:05 -0600
+References: <CAFEAcA-6vww4nUWmq1je1xq1HsAcQ08+AD_kccOCPjLTQjG7xw@mail.gmail.com>
+	<CAFEAcA_M5rD_mrkEPwyyaNah=YJvn8QSKiWs6ExKVynB0Whc-Q@mail.gmail.com>
+	<20180316132754.GJ3066@redhat.com>
+	<CAJ+F1CJZ8s9yL1LrsJkyoGKkaP61WJjUWsNetyt4SNsN6moytw@mail.gmail.com>
+	<CAJ+F1CK+hHVXQ2EVKvVjrEkAJ0aTkzvagVuOX7Tq_3CQaZGjqg@mail.gmail.com>
+	<e971a441-2118-e07a-ee77-56758ccf41af@linux.vnet.ibm.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Fri, 16 Mar 2018 10:08:01 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <e971a441-2118-e07a-ee77-56758ccf41af@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <0c3056c3-775e-a569-2b6c-ddac7aa7709b@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 38/38] qapi: Pass '-u' when doing non-silent diff
+Subject: Re: [Qemu-devel] tpm-tis-test and tpm-crb-test crash on OSX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,50 +45,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Ed-script diffs are awful compared to context diffs.  Fix another
-'diff -q' while in the area (if the files are different, being
-noisy makes it easier to diagnose why).
+On 03/16/2018 09:45 AM, Stefan Berger wrote:
+> On 03/16/2018 09:41 AM, Marc-Andr=C3=A9 Lureau wrote:
+>> Hi
+>>
+>> On Fri, Mar 16, 2018 at 2:37 PM, Marc-Andr=C3=A9 Lureau
+>> <marcandre.lureau@gmail.com> wrote:
+>>> Hi
+>>>
+>>> On Fri, Mar 16, 2018 at 2:27 PM, Daniel P. Berrang=C3=A9=20
+>>> <berrange@redhat.com> wrote:
+>>>> On Fri, Mar 16, 2018 at 01:24:53PM +0000, Peter Maydell wrote:
+>>>>> On 16 March 2018 at 13:12, Peter Maydell=20
+>>>>> <peter.maydell@linaro.org> wrote:
+>>>>>> On OSX host, I noticed that tpm-tis-test and tpm-crb-test
+>>>>>> both crash on OSX, hitting an error_abort case:
+>>>>>>
+>>>>>> (lldb) run
+>>>>>> Process 65115 launched:
+>>>>>> '/Users/pm215/src/qemu-for-merges/build/all/tests/tpm-tis-test'
+>>>>>> (x86_64)
+>>>>>> /i386/tpm-tis/test_check_localities: OK
+>>>>>> /i386/tpm-tis/test_check_access_reg: OK
+>>>>>> /i386/tpm-tis/test_check_access_reg_seize: OK
+>>>>>> /i386/tpm-tis/test_check_access_reg_release: OK
+>>>>>> /i386/tpm-tis/test_check_transmit: OK
+>>>>>> Unexpected error in qio_channel_socket_readv() at
+>>>>>> /Users/pm215/src/qemu-for-merges/io/channel-socket.c:494:
+>>>>>> Unable to read from socket: Bad file descriptor
+>>>>>>
+>>>>>> Here's a backtrace from tpm-tis-test:
+>>>>> Dan suggested a race condition, which prompted me to get an
+>>>>> all-threads backtrace:
+>>>>>
+>>>>>    thread #1: tid =3D 0xb50f19, 0x00007fff7eb97502
+>>>>> libsystem_kernel.dylib`__wait4 + 10, queue =3D 'com.apple.main-thre=
+ad'
+>>>>>      frame #0: 0x00007fff7eb97502 libsystem_kernel.dylib`__wait4 + =
+10
+>>>>>      frame #1: 0x000000010001b303 tpm-tis-test`qtest_quit [inlined]
+>>>>> kill_qemu(s=3D<unavailable>) + 99 at libqtest.c:107
+>>>>>      frame #2: 0x000000010001b2df
+>>>>> tpm-tis-test`qtest_quit(s=3D0x0000000100404c60) + 63 at libqtest.c:=
+280
+>>>>>      frame #3: 0x0000000100001bd1 tpm-tis-test`main [inlined]=20
+>>>>> qtest_end
+>>>>> + 9 at libqtest.h:555
+>>>>>      frame #4: 0x0000000100001bc8=20
+>>>>> tpm-tis-test`main(argc=3D<unavailable>,
+>>>>> argv=3D<unavailable>) + 520 at tpm-tis-test.c:477
+>>>>>      frame #5: 0x00007fff7ea47115 libdyld.dylib`start + 1
+>>>>>      frame #6: 0x00007fff7ea47115 libdyld.dylib`start + 1
+>>>>>
+>>>>>    thread #3: tid =3D 0xb50f4a, 0x00007fff7eb977d2
+>>>>> libsystem_kernel.dylib`close + 10
+>>>>>      frame #0: 0x00007fff7eb977d2 libsystem_kernel.dylib`close + 10
+>>>>>      frame #1: 0x0000000100007def
+>>>>> tpm-tis-test`qio_channel_socket_close(ioc=3D<unavailable>,
+>>>>> errp=3D0x000000010006c930) + 63 at channel-socket.c:693
+>>>>>      frame #2: 0x00000001000039f9
+>>>>> tpm-tis-test`tpm_emu_ctrl_thread(data=3D0x00007ffeefbff0e8) + 713 a=
+t
+>>>>> tpm-emu.c:128
+>>>>>      frame #3: 0x00000001001b2ec0=20
+>>>>> libglib-2.0.0.dylib`g_thread_create_proxy + 191
+>>>>>      frame #4: 0x00007fff7ecd26c1=20
+>>>>> libsystem_pthread.dylib`_pthread_body + 340
+>>>>>      frame #5: 0x00007fff7ecd256d=20
+>>>>> libsystem_pthread.dylib`_pthread_start + 377
+>>>>>      frame #6: 0x00007fff7ecd1c5d=20
+>>>>> libsystem_pthread.dylib`thread_start + 13
+>>>>>
+>>>>> * thread #2: tid =3D 0xb50f50, 0x00007fff7eb96e3e
+>>>>> libsystem_kernel.dylib`__pthread_kill + 10
+>>>>>    * frame #0: 0x00007fff7eb96e3e=20
+>>>>> libsystem_kernel.dylib`__pthread_kill + 10
+>>>>>      frame #1: 0x00007fff7ecd5150=20
+>>>>> libsystem_pthread.dylib`pthread_kill + 333
+>>>>>      frame #2: 0x00007fff7eaf3312 libsystem_c.dylib`abort + 127
+>>>>>      frame #3: 0x0000000100043431 tpm-tis-test`error_setv [inlined]
+>>>>> error_handle_fatal(errp=3D<unavailable>) + 43 at error.c:38
+>>>>>      frame #4: 0x0000000100043406
+>>>>> tpm-tis-test`error_setv(errp=3D<unavailable>, src=3D<unavailable>,
+>>>>> line=3D<unavailable>, func=3D<unavailable>,
+>>>>> err_class=3DERROR_CLASS_GENERIC_ERROR, fmt=3D<unavailable>,
+>>>>> ap=3D<unavailable>, suffix=3D<unavailable>) + 246 at error.c:71
+>>>>>      frame #5: 0x00000001000435db
+>>>>> tpm-tis-test`error_setg_errno_internal(errp=3D0x000000010006c930,
+>>>>> src=3D"/Users/pm215/src/qemu-for-merges/io/channel-socket.c", line=3D=
+494,
+>>>>> func=3D"qio_channel_socket_readv", os_errno=3D<unavailable>, fmt=3D=
+"Unable
+>>>>> to read from socket") + 219 at error.c:111
+>>>>>      frame #6: 0x0000000100007ba5
+>>>>> tpm-tis-test`qio_channel_socket_readv(ioc=3D<unavailable>,
+>>>>> iov=3D<unavailable>, niov=3D<unavailable>, fds=3D0x0000000000000000=
+,
+>>>>> nfds=3D0x0000000000000000, errp=3D0x000000010006c930) + 341 at
+>>>>> channel-socket.c:493
+>>>>>      frame #7: 0x0000000100004717 tpm-tis-test`qio_channel_read
+>>>>> [inlined] qio_channel_readv_full(ioc=3D0x00000001007006b0,
+>>>>> iov=3D<unavailable>, niov=3D1, fds=3D<unavailable>, nfds=3D<unavail=
+able>,
+>>>>> errp=3D0x000000010006c930) + 62 at channel.c:65
+>>>>>      frame #8: 0x00000001000046d9
+>>>>> tpm-tis-test`qio_channel_read(ioc=3D0x00000001007006b0,
+>>>>> buf=3D<unavailable>, buflen=3D<unavailable>, errp=3D<unavailable>) =
++ 41 at
+>>>>> channel.c:216
+>>>>>      frame #9: 0x0000000100003dd1
+>>>>> tpm-tis-test`tpm_emu_tpm_thread(data=3D0x00007ffeefbff0e8) + 241 at
+>>>>> tpm-emu.c:41
+>>>>>      frame #10: 0x00000001001b2ec0
+>>>>> libglib-2.0.0.dylib`g_thread_create_proxy + 191
+>>>>>      frame #11: 0x00007fff7ecd26c1=20
+>>>>> libsystem_pthread.dylib`_pthread_body + 340
+>>>>>      frame #12: 0x00007fff7ecd256d=20
+>>>>> libsystem_pthread.dylib`_pthread_start + 377
+>>>>>      frame #13: 0x00007fff7ecd1c5d=20
+>>>>> libsystem_pthread.dylib`thread_start + 13
+>>>>>
+>>>>>
+>>>>> My guess is that the problem here is that the tpm_emu_ctrl_thread=20
+>>>>> (thread 3) is
+>>>>> forcibly closing the channel, which causes the tpm_emu_thread=20
+>>>>> (thread 2)
+>>>>> to abort because its read returned an error.
+>>>> At least the tpm_emu_tpm_thread() there is only something in the tes=
+t
+>>>> suite, so the real system emulator code isn't at risk of crashing.
+>>>>
+>>>> Feels like the thread simply should *not* use error_abort, and inste=
+ad
+>>>> have a more graceful way to exit when the socket closes
+>>>>
+>>> The code expects the read() to return 0 on disconnect, not an error.
+>>> Apparently this works on !osx. Should we adapt qio-channel-socket to
+>>> return 0 in this case on osx too?
+>> Oh I see, it calls close() on the same end, that's not correct. I
+>> wonder if shutdown would be better. Other suggestions?
+>>
+> We could send the thread a special message, like 0xff ff ff ff, and=20
+> that terminates it...
 
-While at it, diff .err before .out, because if a test fails, .err
-is more likely to contain the most important information for
-fixing the failure.
+... wrong end of socket, so doesn't work. Other way would be to pass a=20
+pipe to the TPM emulator thread and have it poll on the pipefd and the=20
+channelfd and terminate upon pipefd reception...
 
-Fixes: 46ec4fce
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <20180315125116.804342-1-eblake@redhat.com>
----
- tests/Makefile.include | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 42fd426cd00..412aed1737f 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -929,14 +929,14 @@ $(patsubst %, check-%, $(check-qapi-schema-y)): che=
-ck-%.json: $(SRC_PATH)/%.json
- 		$^ >$*.test.out 2>$*.test.err; \
- 		echo $$? >$*.test.exit, \
- 		"TEST","$*.out")
--	@diff $(SRC_PATH)/$*.out $*.test.out
- 	@# Sanitize error messages (make them independent of build directory)
--	@perl -p -e 's|\Q$(SRC_PATH)\E/||g' $*.test.err | diff $(SRC_PATH)/$*.e=
-rr -
--	@diff $(SRC_PATH)/$*.exit $*.test.exit
-+	@perl -p -e 's|\Q$(SRC_PATH)\E/||g' $*.test.err | diff -u $(SRC_PATH)/$=
-*.err -
-+	@diff -u $(SRC_PATH)/$*.out $*.test.out
-+	@diff -u $(SRC_PATH)/$*.exit $*.test.exit
-
- .PHONY: check-tests/qapi-schema/doc-good.texi
- check-tests/qapi-schema/doc-good.texi: tests/qapi-schema/doc-good.test.t=
-exi
--	@diff -q $(SRC_PATH)/tests/qapi-schema/doc-good.texi $<
-+	@diff -u $(SRC_PATH)/tests/qapi-schema/doc-good.texi $<
-
- .PHONY: check-decodetree
- check-decodetree:
---=20
-2.14.3
+>
+>     Stefan
+>
+>
