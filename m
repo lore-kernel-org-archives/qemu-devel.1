@@ -1,32 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ewfii-0005Cs-4F
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 23:07:53 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1ewgfO-0007Z7-PD
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 00:08:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ewfid-0001mG-4v
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 23:07:52 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51718 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ewfic-0001ia-VD
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 23:07:47 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 72DEB8160F98
-	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 03:07:30 +0000 (UTC)
-Date: Fri, 16 Mar 2018 11:07:22 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180316030722.GA2477@xz-mi>
-References: <20180307110010.2205-1-quintela@redhat.com>
-	<20180307110010.2205-20-quintela@redhat.com>
-	<20180312091913.GG5234@xz-mi> <878tata431.fsf@secure.mitica>
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1ewgfK-0007FQ-Ok
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 00:08:30 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46812
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1ewgfK-0007EN-IG
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 00:08:26 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w2G44luS051390
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 00:08:24 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2gr66p0rtf-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 00:08:23 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Fri, 16 Mar 2018 04:08:22 -0000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <b8642b07-307a-6109-6350-e7830a1b7842@linaro.org>
+References: <871sgwmcc3.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<b8642b07-307a-6109-6350-e7830a1b7842@linaro.org>
+Date: Fri, 16 Mar 2018 09:38:14 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <878tata431.fsf@secure.mitica>
-Subject: Re: [Qemu-devel] [PATCH v10 19/24] migration: Create multifd
- channels
+Content-Type: text/plain
+Message-Id: <87bmfor7bl.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] Using new TCG Vector infrastructure in PowerPC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,114 +41,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
-On Thu, Mar 15, 2018 at 01:57:54PM +0100, Juan Quintela wrote:
-> Peter Xu <peterx@redhat.com> wrote:
-> > On Wed, Mar 07, 2018 at 12:00:05PM +0100, Juan Quintela wrote:
-> >> In both sides.  We still don't transmit anything through them.
-> >
-> > s/In/On/?
-> >
-> >> 
-> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> >> ---
-> >>  migration/ram.c | 52 ++++++++++++++++++++++++++++++++++++++++++----------
-> >>  1 file changed, 42 insertions(+), 10 deletions(-)
-> >> 
-> >> diff --git a/migration/ram.c b/migration/ram.c
-> >> index b57d9fd667..7ef0c2b7e2 100644
-> >> --- a/migration/ram.c
-> >> +++ b/migration/ram.c
-> >> @@ -399,6 +399,7 @@ struct MultiFDSendParams {
-> >>      uint8_t id;
-> >>      char *name;
-> >>      QemuThread thread;
-> >> +    QIOChannel *c;
-> >>      QemuSemaphore sem;
-> >>      QemuMutex mutex;
-> >>      bool running;
-> >> @@ -455,6 +456,8 @@ int multifd_save_cleanup(Error **errp)
-> >>              qemu_thread_join(&p->thread);
-> >>              p->running = false;
-> >>          }
-> >> +        socket_send_channel_destroy(p->c);
-> >> +        p->c = NULL;
-> >>          qemu_mutex_destroy(&p->mutex);
-> >>          qemu_sem_destroy(&p->sem);
-> >>          g_free(p->name);
-> >> @@ -514,6 +517,27 @@ static void *multifd_send_thread(void *opaque)
-> >>      return NULL;
-> >>  }
-> >>  
-> >> +static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
-> >> +{
-> >> +    MultiFDSendParams *p = opaque;
-> >> +    QIOChannel *sioc = QIO_CHANNEL(qio_task_get_source(task));
-> >> +    Error *local_err = NULL;
-> >> +
-> >> +    if (qio_task_propagate_error(task, &local_err)) {
-> >> +        if (multifd_save_cleanup(&local_err) != 0) {
-> >
-> > Do we need to call multifd_save_cleanup() explicitly here?
-> 
-> Is the easiest way of stoping all multifd threads, no?
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Yeah, but again, I thought it would be called later too, since...
+> On 03/07/2018 06:03 PM, Nikunj A Dadhania wrote:
+>> Hi Richard,
+>> 
+>> I was working to get TCG vector support for PowerPC[1]. Started with
+>> converting logical operations like vector AND/OR/XOR and compare
+>> instructions. Found some inconsistency during my testing on x86 laptop
+>> emulating PowerPC:
+>
+> Great.
+>
+> Well, the problem is that you cannot use TCG generic vectors and TCG global
+> variables to access the same memory.
 
-> 
-> > Asked since I saw that it would also be called in migrate_fd_cleanup(),
-> > and it seems that we should call migrate_fd_cleanup() soon too when
-> > this happens?
-> 
-> We need to stop migraiton. thtat migrate_set_error() is only used for
-> reporting in info migrate, it is not acted upon.
-> 
-> Yes, perhaps it should, but as it is, it is not.  So, I think it is
-> right O:-)
+Interesting, wasn't aware of this.
 
-... after Dave's 688a3dcba9 ("migration: Route errors down through
-migration_channel_connect", 2018-02-06), all these channel errors
-should finally be routed to migrate_fd_connect(), and in that we have:
+> Thus your first step must be to remove all references to cpu_avrh and cpu_avrl.
+>  These can be replaced by translator helpers that perform an explicit
+> tcg_gen_ld_i64 or tcg_gen_st_i64 to the proper memory locations.
+>
+> Only after that's done can you begin converting other references to use the
+> host vectors.  Otherwise, the tcg optimizer will do Bad and Unpredictable
+> Things, which may well have produced the incorrect results that you saw.
+>
+> I'll note that it's probably worth rearranging all of {fpr,vsr,avr} to the more
+> logical configuration presented by Power7 (?) such that it's one array of 64 x
+> 128-bit registers.
 
-void migrate_fd_connect(MigrationState *s, Error *error_in)
-{
-    s->expected_downtime = s->parameters.downtime_limit;
-    s->cleanup_bh = qemu_bh_new(migrate_fd_cleanup, s);
-    if (error_in) {
-        migrate_fd_error(s, error_in);
-        migrate_fd_cleanup(s);
-        return;
-    }
-    ...
-}
+I have following for taking care of making VSRs contiguous 128bits. This
+has touched lot of code even out of tcg directory. So I currently have
+32 AVRs (128bits) and 32 VSRs (128 bits).
 
-Then, in migrate_fd_cleanup() we have multifd_save_cleanup().  That's
-why I thought we can skip the cleanup here since after all we'll do it
-in other places (and we can keep the cleanup code unified).
+@@ -1026,8 +1027,8 @@ struct CPUPPCState {
+ 
+     /* Floating point execution context */
+     float_status fp_status;
+-    /* floating point registers */
+-    float64 fpr[32];
++    /* floating point registers multiplexed with vsr */
++
+     /* floating point status and control register */
+     target_ulong fpscr;
+ 
+@@ -1078,8 +1079,8 @@ struct CPUPPCState {
+     /* Altivec registers */
+     ppc_avr_t avr[32];
+     uint32_t vscr;
+-    /* VSX registers */
+-    uint64_t vsr[32];
++    /* 32 (128bit)- VSX registers */
++    ppc_avr_t vsr[32];
+     /* SPE registers */
+     uint64_t spe_acc;
+     uint32_t spe_fscr;
 
-Thanks,
-
-> 
-> Later, Juan.
-> 
-> > Otherwise it looks fine to me.  Thanks,
-> >
-> >> +            migrate_set_error(migrate_get_current(), local_err);
-> >> +        }
-> >> +    } else {
-> >> +        p->c = QIO_CHANNEL(sioc);
-> >> +        qio_channel_set_delay(p->c, false);
-> >> +        p->running = true;
-> >> +        qemu_thread_create(&p->thread, p->name, multifd_send_thread, p,
-> >> +                           QEMU_THREAD_JOINABLE);
-> >> +
-> >> +        atomic_inc(&multifd_send_state->count);
-> >> +    }
-> >> +}
-> >
-> > [...]
-
--- 
-Peter Xu
+Regards,
+Nikunj
