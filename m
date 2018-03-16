@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ewuFz-0000JK-JZ
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 14:39:12 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1ewuM4-0001iB-Pj
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 14:45:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ewuFv-0005T7-DJ
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 14:39:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37196 helo=mx1.redhat.com)
+	(envelope-from <frederic.konrad@adacore.com>) id 1ewuLz-0000Bs-P6
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 14:45:28 -0400
+Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:38643
+	helo=smtp.eu.adacore.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1ewuFv-0005Sx-7d
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 14:39:07 -0400
-References: <1520010495-58172-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<be2cf515-ddf8-74ef-7854-319329ee9209@ilande.co.uk>
-	<b73a9767-1a49-9e51-dc79-41a3547df969@ilande.co.uk>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <b72b4a98-8d54-1ae2-f110-8203200140d6@redhat.com>
-Date: Fri, 16 Mar 2018 14:38:50 -0400
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1ewuLz-0000BF-AF
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 14:45:23 -0400
+References: <1521217393-8162-1-git-send-email-frederic.konrad@adacore.com>
+	<CAFEAcA-x8PryWiOdh3CR-0o5UvL=0day0LMUyPRKzy2dE0XL=A@mail.gmail.com>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <af1ce941-2b9a-bc84-4419-52727c7bd236@adacore.com>
+Date: Fri, 16 Mar 2018 19:45:18 +0100
 MIME-Version: 1.0
-In-Reply-To: <b73a9767-1a49-9e51-dc79-41a3547df969@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAFEAcA-x8PryWiOdh3CR-0o5UvL=0day0LMUyPRKzy2dE0XL=A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ide: fix invalid TRIM range abortion for
- macio
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] gdbstub: send a terminaison packet instead
+ of crashing gdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,123 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
-Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-
-
-On 03/16/2018 07:20 AM, Mark Cave-Ayland wrote:
-> On 05/03/18 21:54, Mark Cave-Ayland wrote:
->=20
->> On 02/03/18 17:08, Anton Nefedov wrote:
+On 03/16/2018 05:34 PM, Peter Maydell wrote:
+> On 16 March 2018 at 16:23, KONRAD Frederic <frederic.konrad@adacore.com> wrote:
+>> Since the commit:
+>> commit 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268
+>> Author: Stefan Hajnoczi <stefanha@redhat.com>
+>> Date:   Wed Mar 7 14:42:05 2018 +0000
 >>
->>> commit 947858b0 "ide: abort TRIM operation for invalid range"
->>> is incorrect for macio; just ide_dma_error() without doing a callback
->>> is not enough for that errorpath.
->>>
->>> Instead, pass -EINVAL to the callback and handle it there
->>> (see related motivation for read/write in 58ac32113).
->>>
->>> It will however catch possible EINVAL from the block layer too.
->>>
->>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
->>> ---
->>> =C2=A0 hw/ide/core.c | 17 +++++++++--------
->>> =C2=A0 1 file changed, 9 insertions(+), 8 deletions(-)
->>>
->>> diff --git a/hw/ide/core.c b/hw/ide/core.c
->>> index 257b429..54510d4 100644
->>> --- a/hw/ide/core.c
->>> +++ b/hw/ide/core.c
->>> @@ -402,7 +402,6 @@ typedef struct TrimAIOCB {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QEMUIOVector *qiov;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockAIOCB *aiocb;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int i, j;
->>> -=C2=A0=C2=A0=C2=A0 bool is_invalid;
->>> =C2=A0 } TrimAIOCB;
->>> =C2=A0 static void trim_aio_cancel(BlockAIOCB *acb)
->>> @@ -430,11 +429,8 @@ static void ide_trim_bh_cb(void *opaque)
->>> =C2=A0 {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 TrimAIOCB *iocb =3D opaque;
->>> -=C2=A0=C2=A0=C2=A0 if (iocb->is_invalid) {
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ide_dma_error(iocb->s);
->>> -=C2=A0=C2=A0=C2=A0 } else {
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iocb->common.cb(iocb->com=
-mon.opaque, iocb->ret);
->>> -=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0 iocb->common.cb(iocb->common.opaque, iocb->ret);
->>> +
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_bh_delete(iocb->bh);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iocb->bh =3D NULL;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_aio_unref(iocb);
->>> @@ -462,7 +458,7 @@ static void ide_issue_trim_cb(void *opaque, int r=
-et)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!ide_sect_range_ok(s, sector, count=
-)) {
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iocb->is_invalid =3D true;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iocb->ret =3D -EINVAL;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto done;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> @@ -502,7 +498,6 @@ BlockAIOCB *ide_issue_trim(
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iocb->qiov =3D qiov;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iocb->i =3D -1;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iocb->j =3D 0;
->>> -=C2=A0=C2=A0=C2=A0 iocb->is_invalid =3D false;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ide_issue_trim_cb(iocb, 0);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return &iocb->common;
->>> =C2=A0 }
->>> @@ -848,6 +843,12 @@ static void ide_dma_cb(void *opaque, int ret)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret =3D=3D -ECANCELED) {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0 if (ret =3D=3D -EINVAL) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ide_dma_error(s);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ide_handle=
-_rw_error(s, -ret,
->>> ide_dma_cmd_to_retry(s->dma_cmd))) {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 s->bus->dma->aiocb =3D NULL;
->>>
+>>      vl: introduce vm_shutdown()
 >>
->> Hi Anton,
+>> GDB crash when qemu exits (at least on sparc-softmmu):
+>> Remote communication error.  Target disconnected.: Connection reset by peer.
+>> Quitting: putpkt: write failed: Broken pipe.
 >>
->> Thanks for this. I applied this patch to git master with my macio
->> patch at
->> https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06076.html
->> and it allowed to continue all the way through the Debian installer
->> for the PPC g3beige machine so I believe it is working.
+>> So send a packet to kill GDB before we exit QEMU:
+>> [Inferior 1 (Thread 0) exited normally]
 >>
->> Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->=20
-> Hi John,
->=20
-> I know that you're busy, but just wondering if you have managed to
-> review these 2 TRIM patches? They are a candidate for 2.12 since they
-> prevent a qemu-system-ppc segfault on Mac machines when issuing IDE TRI=
-M
-> commands.
->=20
->=20
-> ATB,
->=20
-> Mark.
+>> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+>> ---
+>>   gdbstub.c              | 7 +++++++
+>>   include/exec/gdbstub.h | 2 ++
+>>   vl.c                   | 2 ++
+>>   3 files changed, 11 insertions(+)
+> 
+> We didn't send an exiting packet before commit 4486e89c219c0,
+> so do you know why this worked before then? (Telling gdb we're
+> exiting seems like the right thing, though.)
+> 
 
-Will send a PR once it looks as if Peter Maydell has caught up with all
-of the last-minute PR panic for soft freeze -- they're not forgotten, I
-promise!
+Hmmm good question, I didn't had time to investigate in detail
 
-Thank you for checking in on me.
+Before 4486e89c219c0:
 
---John
+(gdb) tar rem :1234
+Remote debugging using :1234
+0x40000000 in trap_table ()
+(gdb) c
+Continuing.
+Remote connection closed
+
+After 4486e89c219c0:
+
+(gdb) tar rem :1234
+Remote debugging using :1234
+0x40000000 in trap_table ()
+(gdb) c
+Continuing.
+putpkt: write failed: Connection reset by peer.
+
+With the patch:
+
+(gdb) tar rem :1234
+Remote debugging using :1234
+0x40000000 in trap_table ()
+(gdb) c
+Continuing.
+[Inferior 1 (Thread 0) exited normally]
+
+We use to have this patch in our repository to avoid the remote
+connection closed above.
+
+Thanks,
+Fred
+
+> thanks
+> -- PMM
+> 
