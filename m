@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gregkh@linuxfoundation.org>) id 1ewkDW-0004wM-LB
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 03:55:59 -0400
+	(envelope-from <gregkh@linuxfoundation.org>) id 1ewkEI-0005ME-GE
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 03:56:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gregkh@linuxfoundation.org>) id 1ewkDT-0007y9-JF
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 03:55:58 -0400
-Received: from mail.linuxfoundation.org ([140.211.169.12]:47192)
+	(envelope-from <gregkh@linuxfoundation.org>) id 1ewkEF-0000Mj-T4
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 03:56:46 -0400
+Received: from mail.linuxfoundation.org ([140.211.169.12]:47304)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <gregkh@linuxfoundation.org>)
-	id 1ewkDT-0007xc-DB
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 03:55:55 -0400
-Date: Fri, 16 Mar 2018 08:55:53 +0100
+	id 1ewkEF-0000LN-Ma
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 03:56:43 -0400
+Date: Fri, 16 Mar 2018 08:56:42 +0100
 From: Greg KH <gregkh@linuxfoundation.org>
-Message-ID: <20180316075553.GA11982@kroah.com>
+Message-ID: <20180316075642.GB11982@kroah.com>
 References: <20180316074650.5415-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -32,15 +32,18 @@ Cc: dri-devel@lists.freedesktop.org, qemu-devel@nongnu.org, David Airlie <airlie
 
 On Fri, Mar 16, 2018 at 08:46:49AM +0100, Gerd Hoffmann wrote:
 > --- /dev/null
-> +++ b/drivers/dma-buf/udmabuf.c
-> @@ -0,0 +1,261 @@
-> +/*
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + */
+> +++ b/tools/testing/selftests/drivers/dma-buf/udmabuf.c
+> @@ -0,0 +1,69 @@
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <unistd.h>
+> +#include <string.h>
+> +#include <errno.h>
+> +#include <fcntl.h>
+> +#include <malloc.h>
 
-No SPDX line or copyright here?  You put it in the .h file :(
+No license text at all?  Come on, I already made one commit in the tree
+that touched 11k files, I don't want to have to do it again :)
 
 thanks,
 
