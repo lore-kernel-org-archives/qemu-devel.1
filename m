@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ewqjl-0002KU-MZ
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 10:53:42 -0400
+	(envelope-from <kernellwp@gmail.com>) id 1ewqoh-0004sp-UB
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 10:58:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ewqjk-0005Fw-Tw
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 10:53:41 -0400
-References: <1520849818-6915-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1520849818-6915-7-git-send-email-anton.nefedov@virtuozzo.com>
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Message-ID: <2157719f-a2cb-1646-df75-a9aeb9f06d8d@virtuozzo.com>
-Date: Fri, 16 Mar 2018 17:53:29 +0300
+	(envelope-from <kernellwp@gmail.com>) id 1ewqog-0007ZE-OA
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 10:58:48 -0400
+Received: from mail-it0-x22c.google.com ([2607:f8b0:4001:c0b::22c]:35093)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1ewqog-0007Z1-Ik
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 10:58:46 -0400
+Received: by mail-it0-x22c.google.com with SMTP id v194-v6so2479842itb.0
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 07:58:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1520849818-6915-7-git-send-email-anton.nefedov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 6/9] file-posix: support
- BDRV_REQ_ALLOCATE
+In-Reply-To: <152121128086.66.14391574185954997530@71c20359a636>
+References: <1521211002-4529-1-git-send-email-wanpengli@tencent.com>
+	<152121128086.66.14391574185954997530@71c20359a636>
+From: Wanpeng Li <kernellwp@gmail.com>
+Date: Fri, 16 Mar 2018 22:58:45 +0800
+Message-ID: <CANRm+CycYFoaB0pgF_43S6hcPoPx9p_boCu8xZxuniHasAGyvg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] i386/kvm: add support for
+ KVM_CAP_X86_DISABLE_EXITS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,66 +29,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, den@virtuozzo.com, berto@igalia.com
+To: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Fam Zheng <famz@redhat.com>, kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Radim Krcmar <rkrcmar@redhat.com>
 
+2018-03-16 22:41 GMT+08:00  <no-reply@patchew.org>:
+> Hi,
+>
+> This series seems to have some coding style problems. See output below for
+> more information:
+>
+> Type: series
+> Message-id: 1521211002-4529-1-git-send-email-wanpengli@tencent.com
+> Subject: [Qemu-devel] [PATCH] i386/kvm: add support for KVM_CAP_X86_DISABLE_EXITS
+>
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+>
+> BASE=base
+> n=1
+> total=$(git log --oneline $BASE.. | wc -l)
+> failed=0
+>
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> git config --local diff.algorithm histogram
+>
+> commits="$(git log --format=%H --reverse $BASE..)"
+> for c in $commits; do
+>     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
+>     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
+>         failed=1
+>         echo
+>     fi
+>     n=$((n+1))
+> done
+>
+> exit $failed
+> === TEST SCRIPT END ===
+>
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> From https://github.com/patchew-project/qemu
+>  * [new tag]               patchew/1521211002-4529-1-git-send-email-wanpengli@tencent.com -> patchew/1521211002-4529-1-git-send-email-wanpengli@tencent.com
+>  t [tag update]            patchew/20180315034507.6341-1-famz@redhat.com -> patchew/20180315034507.6341-1-famz@redhat.com
+> Switched to a new branch 'test'
+> 9ababe35bc i386/kvm: add support for KVM_CAP_X86_DISABLE_EXITS
+>
+> === OUTPUT BEGIN ===
+> Checking PATCH 1/1: i386/kvm: add support for KVM_CAP_X86_DISABLE_EXITS...
+> WARNING: line over 80 characters
+> #52: FILE: target/i386/kvm.c:1003:
+> +        int disable_exits = kvm_check_extension(cs->kvm_state, KVM_CAP_X86_DISABLE_EXITS);
+>
+> ERROR: line over 90 characters
+> #58: FILE: target/i386/kvm.c:1009:
+> +        if (kvm_vm_enable_cap(cs->kvm_state, KVM_CAP_X86_DISABLE_EXITS, 0, disable_exits)) {
+>
+> total: 1 errors, 1 warnings, 36 lines checked
 
+I think it's fine, otherwise the format looks mess, anyway, please let
+me know if they still need to be less than 80 characters here.
 
-On 12/3/2018 1:16 PM, Anton Nefedov wrote:
-> Current write_zeroes implementation is good enough to satisfy this flag too
-> 
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
+Regards,
+Wanpeng Li
 
-strictly speaking this patch differs from v8 as well
-(rebase required an extra change, see below)
-so perhaps I should have stripped the review tags too
-
+>
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+>
+> === OUTPUT END ===
+>
+> Test command exited with code: 1
+>
+>
 > ---
->   block/file-posix.c | 10 +++++++++-
->   1 file changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/file-posix.c b/block/file-posix.c
-> index 7f2cc63..2136df9 100644
-> --- a/block/file-posix.c
-> +++ b/block/file-posix.c
-> @@ -560,7 +560,10 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
->       }
->       if (S_ISREG(st.st_mode)) {
->           s->discard_zeroes = true;
-> +#ifdef CONFIG_FALLOCATE
->           s->has_fallocate = true;
-> +        bs->supported_zero_flags |= BDRV_REQ_ALLOCATE;
-> +#endif
->       }
->       if (S_ISBLK(st.st_mode)) {
->   #ifdef BLKDISCARDZEROES
-> @@ -595,10 +598,11 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
->   #ifdef CONFIG_XFS
->       if (platform_test_xfs_fd(s->fd)) {
->           s->is_xfs = true;
-> +        bs->supported_zero_flags |= BDRV_REQ_ALLOCATE;
->       }
->   #endif
->   
-> -    bs->supported_zero_flags = s->discard_zeroes ? BDRV_REQ_MAY_UNMAP : 0;
-> +    bs->supported_zero_flags |= s->discard_zeroes ? BDRV_REQ_MAY_UNMAP : 0;
->       ret = 0;
-
-(this change is new in v9)
-
->   fail:
->       if (filename && (bdrv_flags & BDRV_O_TEMPORARY)) {
-> @@ -1416,6 +1420,10 @@ static ssize_t handle_aiocb_write_zeroes(RawPosixAIOData *aiocb)
->           }
->           s->has_fallocate = false;
->       }
-> +
-> +    if (!s->has_fallocate) {
-> +        aiocb->bs->supported_zero_flags &= ~BDRV_REQ_ALLOCATE;
-> +    }
->   #endif
->   
->       return -ENOTSUP;
-> 
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@freelists.org
