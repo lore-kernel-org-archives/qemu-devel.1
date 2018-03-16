@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60196)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ewo0A-0001ed-8u
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:58:27 -0400
+	id 1ewo0j-00026O-8o
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:59:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ewo06-00053S-7F
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:58:26 -0400
+	id 1ewo0i-0005C9-FT
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:59:01 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1521178795-21894-1-git-send-email-thuth@redhat.com>
-	<1521178795-21894-3-git-send-email-thuth@redhat.com>
+	<1521178795-21894-2-git-send-email-thuth@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <22be879a-3ff3-18c5-21e2-fda1d729ceea@amsat.org>
-Date: Fri, 16 Mar 2018 12:58:05 +0100
+Message-ID: <b798372b-ea4c-a305-b4ea-3c669851a0cd@amsat.org>
+Date: Fri, 16 Mar 2018 12:58:45 +0100
 MIME-Version: 1.0
-In-Reply-To: <1521178795-21894-3-git-send-email-thuth@redhat.com>
+In-Reply-To: <1521178795-21894-2-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] tests/cdrom-test: Test booting from
- CD-ROM ISO image file
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] tests/boot-sector: Add magic bytes
+ to s390x boot code header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,209 +33,46 @@ To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 Cc: Victor Kaplansky <victork@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org, qemu-s390x@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>
 
 On 03/16/2018 06:39 AM, Thomas Huth wrote:
-> We already have the code for a boot file in tests/boot-sector.c,
-> so if the genisoimage program is available, we can easily create
-> a bootable CD ISO image that we can use for testing whether our
-> CD-ROM emulation and the BIOS CD-ROM boot works correctly.
+> We're going to use the s390x boot code for testing CD-ROM booting.
+> But the ISO loader of the s390-ccw bios is a little bit more picky
+> than the network loader and expects some magic bytes in the header
+> of the file (see linux_s390_magic in pc-bios/s390-ccw/bootmap.c), so
+> we've got to add them in our boot code here, too.
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  tests/Makefile.include |   2 +
->  tests/cdrom-test.c     | 164 +++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 166 insertions(+)
->  create mode 100644 tests/cdrom-test.c
+>  tests/boot-sector.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
 > 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index ef9b88c..37ca258 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -178,6 +178,7 @@ check-qtest-generic-y = tests/qmp-test$(EXESUF)
->  gcov-files-generic-y = monitor.c qapi/qmp-dispatch.c
->  check-qtest-generic-y += tests/device-introspect-test$(EXESUF)
->  gcov-files-generic-y = qdev-monitor.c qmp.c
-> +check-qtest-generic-y += tests/cdrom-test$(EXESUF)
+> diff --git a/tests/boot-sector.c b/tests/boot-sector.c
+> index c373f0e..7824286 100644
+> --- a/tests/boot-sector.c
+> +++ b/tests/boot-sector.c
+> @@ -68,8 +68,11 @@ static uint8_t x86_boot_sector[512] = {
+>  };
 >  
->  gcov-files-ipack-y += hw/ipack/ipack.c
->  check-qtest-ipack-y += tests/ipoctal232-test$(EXESUF)
-> @@ -829,6 +830,7 @@ tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-util-obj-y)
->  tests/numa-test$(EXESUF): tests/numa-test.o
->  tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-sector.o tests/acpi-utils.o
->  tests/sdhci-test$(EXESUF): tests/sdhci-test.o $(libqos-pc-obj-y)
-> +tests/cdrom-test$(EXESUF): tests/cdrom-test.o tests/boot-sector.o $(libqos-obj-y)
->  
->  tests/migration/stress$(EXESUF): tests/migration/stress.o
->  	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,"LINK","$(TARGET_DIR)$@")
-> diff --git a/tests/cdrom-test.c b/tests/cdrom-test.c
-> new file mode 100644
-> index 0000000..5bbf322
-> --- /dev/null
-> +++ b/tests/cdrom-test.c
-> @@ -0,0 +1,164 @@
-> +/*
-> + * Various tests for emulated CD-ROM drives.
-> + *
-> + * Copyright (c) 2018 Red Hat Inc.
-> + *
-> + * Author:
-> + *    Thomas Huth <thuth@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2
-> + * or later. See the COPYING file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "libqtest.h"
-> +#include "boot-sector.h"
-> +
-> +static char isoimage[] = "cdrom-boot-iso-XXXXXX";
-> +
-> +static int exec_genisoimg(const char **args)
-> +{
-> +    gchar *out_err = NULL;
-> +    gint exit_status = -1;
-> +    bool success;
-> +
-> +    success = g_spawn_sync(NULL, (gchar **)args, NULL,
-> +                           G_SPAWN_SEARCH_PATH | G_SPAWN_STDOUT_TO_DEV_NULL,
-> +                           NULL, NULL, NULL, &out_err, &exit_status, NULL);
-> +    if (!success) {
-> +        return -ENOENT;
-> +    }
-> +    if (out_err) {
-> +        fputs(out_err, stderr);
-> +        g_free(out_err);
-> +    }
-> +
-> +    return exit_status;
-> +}
-> +
-> +static int prepare_image(const char *arch, char *isoimage)
-> +{
-> +    char srcdir[] = "cdrom-test-dir-XXXXXX";
-> +    char *codefile = NULL;
-> +    int ifh, ret = -1;
-> +    const char *args[] = {
-> +        "genisoimage", "-quiet", "-l", "-no-emul-boot",
-> +        "-b", NULL, "-o", isoimage, srcdir, NULL
-> +    };
-> +
-> +    ifh = mkstemp(isoimage);
-> +    if (ifh < 0) {
-> +        perror("Error creating temporary iso image file");
-> +        return -1;
-> +    }
-> +    if (!mkdtemp(srcdir)) {
-> +        perror("Error creating temporary directory");
-> +        goto cleanup;
-> +    }
-> +
-> +    if (g_str_equal(arch, "i386") || g_str_equal(arch, "x86_64") ||
-> +        g_str_equal(arch, "s390x")) {
-> +        codefile = g_strdup_printf("%s/bootcode-XXXXXX", srcdir);
-> +        ret = boot_sector_init(codefile);
-> +        if (ret) {
-> +            goto cleanup;
-> +        }
-> +    } else {
-> +        /* Just create a dummy file */
-> +        char txt[] = "empty disc";
-> +        codefile = g_strdup_printf("%s/readme.txt", srcdir);
-> +        if (!g_file_set_contents(codefile, txt, sizeof(txt) - 1, NULL)) {
-> +            fprintf(stderr, "Failed to create '%s'\n", codefile);
-> +            goto cleanup;
-> +        }
-> +    }
-> +
-> +    args[5] = strchr(codefile, '/') + 1;
-> +    ret = exec_genisoimg(args);
-> +    if (ret) {
-> +        fprintf(stderr, "genisoimage failed: %i\n", ret);
-> +    }
-> +
-> +    unlink(codefile);
-> +
-> +cleanup:
-> +    g_free(codefile);
-> +    rmdir(srcdir);
-> +    close(ifh);
-> +
-> +    return ret;
-> +}
-> +
-> +static void test_cdboot(gconstpointer data)
-> +{
-> +    QTestState *qts;
-> +
-> +    qts = qtest_startf("-accel kvm:tcg -no-shutdown %s%s", (const char *)data,
-> +                       isoimage);
-> +    boot_sector_test(qts);
-> +    qtest_quit(qts);
-> +}
-> +
-> +static void add_x86_tests(void)
-> +{
-> +    qtest_add_data_func("cdrom/boot/default", "-cdrom ", test_cdboot);
-> +    qtest_add_data_func("cdrom/boot/virtio-scsi",
-> +                        "-device virtio-scsi -device scsi-cd,drive=cdr "
-> +                        "-blockdev file,node-name=cdr,filename=", test_cdboot);
-> +    qtest_add_data_func("cdrom/boot/isapc", "-M isapc "
-> +                        "-drive if=ide,media=cdrom,file=", test_cdboot);
-> +    qtest_add_data_func("cdrom/boot/am53c974",
-> +                        "-device am53c974 -device scsi-cd,drive=cd1 "
-> +                        "-drive if=none,id=cd1,format=raw,file=", test_cdboot);
-> +    qtest_add_data_func("cdrom/boot/dc390",
-> +                        "-device dc390 -device scsi-cd,drive=cd1 "
-> +                        "-blockdev file,node-name=cd1,filename=", test_cdboot);
-> +    qtest_add_data_func("cdrom/boot/lsi53c895a",
-> +                        "-device lsi53c895a -device scsi-cd,drive=cd1 "
-> +                        "-blockdev file,node-name=cd1,filename=", test_cdboot);
-> +    qtest_add_data_func("cdrom/boot/megasas", "-M q35 "
-> +                        "-device megasas -device scsi-cd,drive=cd1 "
-> +                        "-blockdev file,node-name=cd1,filename=", test_cdboot);
-> +    qtest_add_data_func("cdrom/boot/megasas-gen2", "-M q35 "
-> +                        "-device megasas-gen2 -device scsi-cd,drive=cd1 "
-> +                        "-blockdev file,node-name=cd1,filename=", test_cdboot);
-> +}
-> +
-> +static void add_s390x_tests(void)
-> +{
-> +    qtest_add_data_func("cdrom/boot/default", "-cdrom ", test_cdboot);
-> +    qtest_add_data_func("cdrom/boot/virtio-scsi",
-> +                        "-device virtio-scsi -device scsi-cd,drive=cdr "
-> +                        "-blockdev file,node-name=cdr,filename=", test_cdboot);
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +    int ret;
-> +    const char *arch = qtest_get_arch();
-> +    const char *genisocheck[] = { "genisoimage", "-version", NULL };
-> +
-> +    g_test_init(&argc, &argv, NULL);
-> +
-> +    if (exec_genisoimg(genisocheck)) {
-> +        /* genisoimage not available - so can't run tests */
-> +        return 0;
-> +    }
-> +
-> +    ret = prepare_image(arch, isoimage);
-> +    if (ret) {
-> +        return ret;
-> +    }
-> +
-> +    if (g_str_equal(arch, "i386") || g_str_equal(arch, "x86_64")) {
-> +        add_x86_tests();
-> +    } else if (g_str_equal(arch, "s390x")) {
-> +        add_s390x_tests();
-> +    }
-> +
-> +    ret = g_test_run();
-> +
-> +    unlink(isoimage);
-> +
-> +    return ret;
-> +}
+>  /* For s390x, use a mini "kernel" with the appropriate signature */
+> -static const uint8_t s390x_psw[] = {
+> -    0x00, 0x08, 0x00, 0x00, 0x80, 0x01, 0x00, 0x00
+> +static const uint8_t s390x_psw_and_magic[] = {
+> +    0x00, 0x08, 0x00, 0x00, 0x80, 0x01, 0x00, 0x00,  /* Program status word  */
+> +    0x02, 0x00, 0x00, 0x18, 0x60, 0x00, 0x00, 0x50,  /* Magic:               */
+> +    0x02, 0x00, 0x00, 0x68, 0x60, 0x00, 0x00, 0x50,  /* see linux_s390_magic */
+> +    0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40   /* in the s390-ccw bios */
+>  };
+>  static const uint8_t s390x_code[] = {
+>      0xa7, 0xf4, 0x00, 0x0a,                                /* j 0x10010 */
+> @@ -110,7 +113,7 @@ int boot_sector_init(char *fname)
+>      } else if (g_str_equal(arch, "s390x")) {
+>          len = 0x10000 + sizeof(s390x_code);
+>          boot_code = g_malloc0(len);
+> -        memcpy(boot_code, s390x_psw, sizeof(s390x_psw));
+> +        memcpy(boot_code, s390x_psw_and_magic, sizeof(s390x_psw_and_magic));
+>          memcpy(&boot_code[0x10000], s390x_code, sizeof(s390x_code));
+>      } else {
+>          g_assert_not_reached();
 > 
