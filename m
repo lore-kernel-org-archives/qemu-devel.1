@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ewrnq-0005Gq-Tk
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 12:02:02 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1ewrqK-0007Gb-Vq
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 12:04:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ewrnl-0001Zz-Jx
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 12:01:58 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:40466)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ewrnl-0001Zh-Ci
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 12:01:53 -0400
-Received: by mail-wm0-x231.google.com with SMTP id t6so3958838wmt.5
-	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 09:01:53 -0700 (PDT)
-Date: Fri, 16 Mar 2018 16:01:49 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180316160149.GD21347@stefanha-x1.localdomain>
-References: <1521144392-26203-1-git-send-email-jusual@mail.ru>
+	(envelope-from <pbonzini@redhat.com>) id 1ewrqE-0002e3-D5
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 12:04:32 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49348 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ewrqE-0002dS-9Y
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 12:04:26 -0400
+References: <20180312151233.16565-1-vkuznets@redhat.com>
+	<20180312151233.16565-3-vkuznets@redhat.com>
+	<7d1afa27-9653-75dc-ebfe-8633b93f1ce6@redhat.com>
+	<87efkk9i2j.fsf@vitty.brq.redhat.com>
+	<cd71ecd6-7a3c-05e5-7854-d71763cbc4c2@redhat.com>
+	<87605w9gh5.fsf@vitty.brq.redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e034b288-25e4-d5ad-7dc3-220bda9aedd2@redhat.com>
+Date: Fri, 16 Mar 2018 17:04:08 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="k4f25fnPtRuIRUb3"
-Content-Disposition: inline
-In-Reply-To: <1521144392-26203-1-git-send-email-jusual@mail.ru>
-Subject: Re: [Qemu-devel] [PATCH] net/vde: print error on vde_open() failure
+In-Reply-To: <87605w9gh5.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] i386/kvm: lower requirements for
+ Hyper-V frequency MSRs exposure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +33,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova <jusual@mail.ru>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Jim Mussared <jim@groklearning.com>, Joel Stanley <joel@jms.id.au>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org
 
+On 16/03/2018 16:40, Vitaly Kuznetsov wrote:
+>> On older kernel without re-enlightenment support, you don't want to
+>> expose the frequency MSRs unless invtsc is on, right?
+>>
+> Actually no, I think it's OK to expose frequency MSRs even when we don't
+> have invtsc and don't support re-enlightenment. Nested Hyper-V won't
+> pass stable TSC pages to its guests unless it sees either invtsc or
+> reenlightenment. So as long as we have something to put to these MSRs
+> (env->tsc_khz) I *think* we can expose them.
+> 
+> I may actually be missing the reason why Ladi put
+> tsc_is_stable_and_known() here.
 
---k4f25fnPtRuIRUb3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Probably because I asked him to. :)  It looks like Hyper-V knows that
+you need re-enlightenment in order to really trust the frequency MSRs
+(of course the TSC page is special because it has the sequence count).
 
-On Thu, Mar 15, 2018 at 11:06:32PM +0300, Julia Suvorova wrote:
-> Despite the fact that now when the initialization of vde fails, qemu
-> does not end silently, no informative error is printed. The patch
-> generates an error and pushes it through the calling function.
->=20
-> Related bug: https://bugs.launchpad.net/qemu/+bug/676029
->=20
-> Signed-off-by: Julia Suvorova <jusual@mail.ru>
-> ---
->  net/vde.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+So the patch is good.  Thanks!
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Paolo
 
---k4f25fnPtRuIRUb3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaq+ptAAoJEJykq7OBq3PI1aAIAKxEu9YsoXWNe9DyPH8xirec
-sB0pLjV3RTytDTeveet2LMSzLbZMH+1PQvO5d3Egx4t/8Qeo30LCJomzhpCV/yFl
-+Rx72+UQKR0woB4BrtbNLxqDs/K3sC8J7N6+Bd7egk4wcmpUcrxs5ANLKhyBFNY3
-uLebkckv4mzDNVW7PXNvx5xhgbiP3EwhlOX23qtrY/zTQqeg8U6lEcbpi2q0MbpH
-9PIa9HiAkv8PkajaEySZEr0RexfMOmxWxevRpOHhH+of66f4zbWeyym1qSlrMJm8
-rvzrKm6giUSUYNz/Bg/IwUnKa7eaUqJeYdUnBUWbZWqbIOZVyl54WV242HHWYoE=
-=Mo9j
------END PGP SIGNATURE-----
-
---k4f25fnPtRuIRUb3--
+> In case we're running Windows (and not
+> Hyper-V) as a guest KVM will update TSC page on migration. And genuine
+> Hyper-V also exposes these MSRs without exposing INVTSC flag by
+> default.
