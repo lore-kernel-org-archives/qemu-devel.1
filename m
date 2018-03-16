@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1ewsie-0005dY-49
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 13:00:40 -0400
+	(envelope-from <drjones@redhat.com>) id 1ewsjS-0006JA-7r
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 13:01:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1ewsib-0005b0-VP
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 13:00:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43434 helo=mx1.redhat.com)
+	(envelope-from <drjones@redhat.com>) id 1ewsjO-0006Gg-M6
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 13:01:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33918 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1ewsib-0005ah-Qs
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 13:00:37 -0400
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-Date: Fri, 16 Mar 2018 18:00:18 +0100
-Message-Id: <20180316170020.8212-1-vkuznets@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/2] i386/kvm: TSC page clocksource for
- Hyper-V-on-KVM fixes
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1ewsjO-0006GB-ID
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 13:01:26 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 76714406E8D1
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 17:01:25 +0000 (UTC)
+Date: Fri, 16 Mar 2018 18:01:22 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180316170122.fmo2nghyxpeaq7hp@kamzik.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] qemu master build failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,37 +31,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org, Roman Kagan <rkagan@virtuozzo.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-Changes since v1:
-- add vmstate_msr_hyperv_reenlightenment subsection to vmstate_x86_cpu
-  [Paolo Bonzini]
-- rebase.
+Hi Thomas,
 
-Previously, Ladi was working on enabling TSC page clocksource for nested
-Hyper-V-on-KVM workloads. He found out that if Hyper-V frequency MSRs are
-exposed to L1 as well as INVTSC flag Hyper-V enables TSC page clocksource
-to its guests. Qemu doesn't pass INVTSC by default as it is a migration
-blocker.
+QEMU master is failing to build on an AArch64 machine with GCC 4.8. I get
 
-I found out there's a different way to make Hyper-V like us: expose
-Reenlightenment MSRs to it. KVM doesn't fully support the feature as
-we're still unable to migrate nested environments but rudimentary support
-we have there (kvm/queue only currently) is enough.
+  ...
+  CC      qemu-nbd.o
+/home/drjones/code/qemu/qemu-nbd.c: In function =E2=80=98version=E2=80=99=
+:
+/home/drjones/code/qemu/qemu-nbd.c:133:7: error: expected =E2=80=98)=E2=80=
+=99 before =E2=80=98QEMU_FULL_VERSION=E2=80=99
+ "%s " QEMU_FULL_VERSION "\n"
+       ^
+/home/drjones/code/qemu/qemu-nbd.c:139:5: error: format =E2=80=98%s=E2=80=
+=99 expects a matching =E2=80=98char *=E2=80=99 argument [-Werror=3Dforma=
+t=3D]
+     , name);
+     ^
+cc1: all warnings being treated as errors
+make: *** [qemu-nbd.o] Error 1
 
-Enable Hyper-V reenlightenment MSRs and expose frequency MSRs even without
-INVTSC to make things work.
 
-Vitaly Kuznetsov (2):
-  i386/kvm: add support for Hyper-V reenlightenment MSRs
-  i386/kvm: lower requirements for Hyper-V frequency MSRs exposure
+Reverting 7e563bfb8 fixes the build. I figured I'd report it now,
+but I won't have time to look closer until Monday.
 
- target/i386/cpu.h          |  3 +++
- target/i386/hyperv-proto.h |  9 ++++++++-
- target/i386/kvm.c          | 35 ++++++++++++++++++++++++++++++++++-
- target/i386/machine.c      | 24 ++++++++++++++++++++++++
- 4 files changed, 69 insertions(+), 2 deletions(-)
-
--- 
-2.14.3
+Thanks,
+drew
