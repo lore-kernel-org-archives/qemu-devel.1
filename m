@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ewn7I-00050Q-Jv
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:01:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ewn7m-0005Hk-QC
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:02:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ewn7D-00048C-Pu
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:01:44 -0400
-References: <1521178795-21894-1-git-send-email-thuth@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <a14ae60e-9853-9077-d9e1-9207814aec5f@ilande.co.uk>
-Date: Fri, 16 Mar 2018 11:01:01 +0000
+	(envelope-from <peter.maydell@linaro.org>) id 1ewn7h-0004Mf-67
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:02:14 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:38081)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ewn7h-0004MU-0p
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:02:09 -0400
+Received: by mail-ot0-x242.google.com with SMTP id 95-v6so9940929ote.5
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 04:02:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1521178795-21894-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] Add new CD-ROM related qtests
+In-Reply-To: <20180316103408.22295-1-richard.henderson@linaro.org>
+References: <20180316103408.22295-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 16 Mar 2018 11:01:46 +0000
+Message-ID: <CAFEAcA_fABdsR8z4NTNP9Ux6ZLGVsfw5NpPyqB1HqV72_VjgDQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Allocate extra space for brk
+ in PIE executable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Victor Kaplansky <victork@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-s390x@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, 1749393@bugs.launchpad.net
 
-On 16/03/18 05:39, Thomas Huth wrote:
+On 16 March 2018 at 10:34, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Limit this to 16M; there does not appear to be any special
+> support for this in the kernel itself, at least for i686.
+>
+> Fixes: https://bugs.launchpad.net/bugs/1749393
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>
+> Commentary in the launchpad bug suggests 128M gap for x86_64, but that's
+> somewhat irrelevant to the given i686 test case.  There's certainly nothing
+> in the referenced kernel patch that does any more than we had been doing
+> without this patch.
 
-> With one of my clean-up patches (see commit 1454509726719e0933c800), I
-> recently accidentially broke the "-cdrom" parameter (more precisely
-> "-drive if=scsi") on a couple of boards, since there was no error
-> detected during the "make check" regression testing. This is clearly an
-> indication that we are lacking tests in this area.
-> So this small patch series now introduces some tests for CD-ROM drives:
-> The first two patches introduce the possibility to check that booting
-> from CD-ROM drives still works fine for x86 and s390x, and the third
-> patch adds a test that certain machines can at least still be started
-> with the "-cdrom" parameter (i.e. that test would have catched the
-> mistake that I did with my SCSI cleanup patch).
-> 
-> v2:
->   - Use g_spawn_sync() instead of execlp() to run genisoimage
->   - The "-cdrom" parameter test is now run on all architectures (with
->     machine "none" for the machines that are not explicitly checked)
->   - Some rewordings and improved comments here and there
-> 
-> Thomas Huth (3):
->    tests/boot-sector: Add magic bytes to s390x boot code header
->    tests/cdrom-test: Test booting from CD-ROM ISO image file
->    tests/cdrom-test: Test that -cdrom parameter is working
-> 
->   tests/Makefile.include |   2 +
->   tests/boot-sector.c    |   9 +-
->   tests/cdrom-test.c     | 222 +++++++++++++++++++++++++++++++++++++++++++++++++
->   3 files changed, 230 insertions(+), 3 deletions(-)
->   create mode 100644 tests/cdrom-test.c
+I think the 128MB is enforced by mmap_base() in arch/x86/mm/mmap.c:
+since x86-64 sots HAVE_ARCH_UNMAPPED_AREA_TOPDOWN, mmap_base is the
+highest address in memory where mmap is permitted, and mmap_base()
+enforces that it goes at least 128MB below the bottom of the stack
+(accounting for rlimit stack size requirements also). Since
+binfmt_elf() loads ELF segments via mmap this means that they won't
+go too close to the stack. (The commit a87938b2e246 ensures the
+gap is honoured by using the full binary size when it does the first
+mapping so that mmap picks an address that is sufficiently before the
+end of the mmap region for everything to fit.)
+The kernel also uses ELF_ET_DYN_BASE to ensure that PIE programs
+themselves get loaded clear of the ELF interpreter, which we
+don't have any equivalent of (so you can see that different values
+of -R result in either the interpreter or the executable getting
+loaded at lower addresses.)
 
-Hi Thomas,
+PS: do you know what the intention of the
+        if (reserved_va) {
+            mmap_next_start = reserved_va;
+        }
+code in linux-user/main.c is? It seems a bit odd to say "ok,
+we have reserved a big region. we will start trying to mmap
+outside it.", especially when that region covers the full
+4G that the guest can access...
 
-Nice work - looks like a good, comprehensive test of the -cdrom option.
-
-Acked-By: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-
-ATB,
-
-Mark.
+thanks
+-- PMM
