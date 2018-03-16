@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ewt1s-0004Yo-39
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 13:20:33 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ewt6c-0006kD-OU
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 13:25:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ewt1r-0005Pg-8y
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 13:20:32 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:43333)
+	(envelope-from <peter.maydell@linaro.org>) id 1ewt6b-0000AP-Dl
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 13:25:26 -0400
+Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:38368)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ewt1q-0005OM-QO
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 13:20:30 -0400
-Received: by mail-oi0-x243.google.com with SMTP id y27so5023629oix.10
-	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 10:20:30 -0700 (PDT)
+	id 1ewt6b-00009K-6p
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 13:25:25 -0400
+Received: by mail-oi0-x22b.google.com with SMTP id 20so2148693oiq.5
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 10:25:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <a876446f-d4a4-4df2-c986-4e45a64b9436@redhat.com>
-References: <20180316170122.fmo2nghyxpeaq7hp@kamzik.brq.redhat.com>
-	<a876446f-d4a4-4df2-c986-4e45a64b9436@redhat.com>
+In-Reply-To: <20180315041903.10046-1-david@gibson.dropbear.id.au>
+References: <20180315041903.10046-1-david@gibson.dropbear.id.au>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Mar 2018 17:20:09 +0000
-Message-ID: <CAFEAcA-4T04uw_KA5+Qn0PGPUVvQu5hk-NKYkiks43GrLAQq0g@mail.gmail.com>
+Date: Fri, 16 Mar 2018 17:25:04 +0000
+Message-ID: <CAFEAcA9Uv_EyW6E=6cp+9QDCa4w13WxHQ5pCGp6E-3iOhq-mWg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] qemu master build failure
+Subject: Re: [Qemu-devel] [PULL 0/9] ppc-for-2.12 queue 20180315
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +28,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Andrew Jones <drjones@redhat.com>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Greg Kurz <groug@kaod.org>, Laurent Vivier <lvivier@redhat.com>, surajjs@au1.ibm.com, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org
 
-On 16 March 2018 at 17:11, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 16/03/2018 18:01, Andrew Jones wrote:
->> Hi Thomas,
->>
->> QEMU master is failing to build on an AArch64 machine with GCC 4.8. I ge=
-t
->>
->>   ...
->>   CC      qemu-nbd.o
->> /home/drjones/code/qemu/qemu-nbd.c: In function =E2=80=98version=E2=80=
-=99:
->> /home/drjones/code/qemu/qemu-nbd.c:133:7: error: expected =E2=80=98)=E2=
-=80=99 before =E2=80=98QEMU_FULL_VERSION=E2=80=99
->>  "%s " QEMU_FULL_VERSION "\n"
->>        ^
->> /home/drjones/code/qemu/qemu-nbd.c:139:5: error: format =E2=80=98%s=E2=
-=80=99 expects a matching =E2=80=98char *=E2=80=99 argument [-Werror=3Dform=
-at=3D]
->>      , name);
->>      ^
->> cc1: all warnings being treated as errors
->> make: *** [qemu-nbd.o] Error 1
->>
->>
->> Reverting 7e563bfb8 fixes the build. I figured I'd report it now,
->> but I won't have time to look closer until Monday.
+On 15 March 2018 at 04:18, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit 026aaf47c02b79036feb830206cfebb2a726510d:
 >
-> You probably have a stray qemu-version.h file somewhere.  No worries, I
-> was puzzled by the same thing after I applied Thomas's patch. :)
+>   Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-request' into staging (2018-03-13 16:26:44 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/ppc-for-2.12-20180315
+>
+> for you to fetch changes up to a9ab8cc157054ea6941fb849c78d9e6c515a7730:
+>
+>   target/ppc: fix tlbsync to check privilege level depending on GTSE (2018-03-15 11:18:31 +1100)
+>
+> ----------------------------------------------------------------
+> ppc patch queue for 2018-03-15
+>
+> Here's the set of accumulated patches now that we're into soft freeze.
+> I've split new functionality into a ppc-for-2.13 branch, so this only
+> has bugfixes.  Well.. and a couple of simple cleanups to make bugfixes
+> easier, some test improvements and a trivial change to make command
+> line options more obvious.  I think those are all acceptable for soft
+> freeze.
+>
 
-Yep, stray qemu-version.h in the source tree. That bit me on one of
-my build systems and also mstsirkin...
+Hi -- this looks like it provokes new runtime error warnings from the
+clang sanitizer:
 
-(MST had a suggestion on IRC that if we used #include <> for generated
-headers rather than "" this would avoid that problem because it would
-not search the source tree before the build tree. I haven't tested that
-idea...)
+TEST: tests/boot-serial-test... (pid=926)
+  /ppc/boot-serial/ppce500:                                            OK
+  /ppc/boot-serial/prep:                                               OK
+  /ppc/boot-serial/40p:                                                OK
+  /ppc/boot-serial/g3beige:                                            OK
+  /ppc/boot-serial/mac99:                                              OK
+  /ppc/boot-serial/sam460ex:
+/home/petmay01/linaro/qemu-for-merges/target/ppc/translate.c:2979:15:
+runtime error: load of value 142, which is not a valid value for type
+'bool'
+OK
+
+TEST: tests/boot-serial-test... (pid=1016)
+  /ppc64/boot-serial/ppce500:                                          OK
+  /ppc64/boot-serial/prep:                                             OK
+  /ppc64/boot-serial/40p:                                              OK
+  /ppc64/boot-serial/mac99:                                            OK
+  /ppc64/boot-serial/pseries:                                          OK
+  /ppc64/boot-serial/powernv:                                          OK
+  /ppc64/boot-serial/sam460ex:
+/home/petmay01/linaro/qemu-for-merges/target/ppc/translate.c:2979:15:
+runtime error: load of value 85, which is not a valid value for type
+'bool'
+OK
+
+Looks like you're not initializing ctx->lazy_tlb_flush for all configs:
+    if (env->mmu_model == POWERPC_MMU_32B ||
+        env->mmu_model == POWERPC_MMU_601 ||
+        (env->mmu_model & POWERPC_MMU_64B))
+            ctx->lazy_tlb_flush = true;
+
+should perhaps be
+    ctx->lazy_tlb_flush =
+        env->mmu_model == POWERPC_MMU_32B ||
+        env->mmu_model == POWERPC_MMU_601 ||
+        (env->mmu_model & POWERPC_MMU_64B);
+
+?
 
 thanks
 -- PMM
