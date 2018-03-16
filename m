@@ -1,32 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ewotM-0001t8-PO
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 08:55:29 -0400
+	(envelope-from <mst@redhat.com>) id 1ewouO-0002RD-Gs
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 08:56:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ewotH-0004WW-RR
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 08:55:28 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:51419)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ewotH-0004WF-GK
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 08:55:23 -0400
-Received: by mail-wm0-x241.google.com with SMTP id h21so2854103wmd.1
-	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 05:55:23 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180316122540.28409-1-pbonzini@redhat.com>
-	<20180316122540.28409-2-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <872021d0-ff46-f5ec-833b-fce1557a5d8e@amsat.org>
-Date: Fri, 16 Mar 2018 13:55:19 +0100
+	(envelope-from <mst@redhat.com>) id 1ewouN-0005QR-O6
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 08:56:32 -0400
+Date: Fri, 16 Mar 2018 14:56:06 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180316145541-mutt-send-email-mst@kernel.org>
+References: <1521178795-21894-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180316122540.28409-2-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] docker: test-mingw: use SDL2 and GTK+3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1521178795-21894-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] Add new CD-ROM related qtests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,57 +22,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, famz@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Victor Kaplansky <victork@redhat.com>, qemu-block@nongnu.org, qemu-s390x@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-On 03/16/2018 01:25 PM, Paolo Bonzini wrote:
-> Do not test the deprecated API versions.  debian-win32-cross and debian-win64-cross
-> are already using SDL2 (they do not cover GTK+ at all).
+On Fri, Mar 16, 2018 at 06:39:52AM +0100, Thomas Huth wrote:
+> With one of my clean-up patches (see commit 1454509726719e0933c800), I
+> recently accidentially broke the "-cdrom" parameter (more precisely
+> "-drive if=scsi") on a couple of boards, since there was no error
+> detected during the "make check" regression testing. This is clearly an
+> indication that we are lacking tests in this area.
+> So this small patch series now introduces some tests for CD-ROM drives:
+> The first two patches introduce the possibility to check that booting
+> from CD-ROM drives still works fine for x86 and s390x, and the third
+> patch adds a test that certain machines can at least still be started
+> with the "-cdrom" parameter (i.e. that test would have catched the
+> mistake that I did with my SCSI cleanup patch).
 
-Good idea to start a doc/test/docker-coverage.txt with a matrix of
-configs tested (for example debian-amd64 tests virgl and netmap).
 
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+
+> v2:
+>  - Use g_spawn_sync() instead of execlp() to run genisoimage
+>  - The "-cdrom" parameter test is now run on all architectures (with
+>    machine "none" for the machines that are not explicitly checked)
+>  - Some rewordings and improved comments here and there
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  tests/docker/dockerfiles/fedora.docker | 8 ++++----
->  tests/docker/test-mingw                | 4 ++--
->  2 files changed, 6 insertions(+), 6 deletions(-)
+> Thomas Huth (3):
+>   tests/boot-sector: Add magic bytes to s390x boot code header
+>   tests/cdrom-test: Test booting from CD-ROM ISO image file
+>   tests/cdrom-test: Test that -cdrom parameter is working
 > 
-> diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-> index a00004319e..be3566325c 100644
-> --- a/tests/docker/dockerfiles/fedora.docker
-> +++ b/tests/docker/dockerfiles/fedora.docker
-> @@ -4,12 +4,12 @@ ENV PACKAGES \
->      glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
->      gcc gcc-c++ llvm clang make perl which bc findutils libaio-devel \
->      nettle-devel libasan libubsan \
-> -    mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-config \
-> -    mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libtasn1 \
-> +    mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL2 mingw32-pkg-config \
-> +    mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libtasn1 \
->      mingw32-libjpeg-turbo mingw32-libpng mingw32-curl mingw32-libssh2 \
->      mingw32-bzip2 \
-> -    mingw64-pixman mingw64-glib2 mingw64-gmp mingw64-SDL mingw64-pkg-config \
-> -    mingw64-gtk2 mingw64-gtk3 mingw64-gnutls mingw64-nettle mingw64-libtasn1 \
-> +    mingw64-pixman mingw64-glib2 mingw64-gmp mingw64-SDL2 mingw64-pkg-config \
-> +    mingw64-gtk3 mingw64-gnutls mingw64-nettle mingw64-libtasn1 \
->      mingw64-libjpeg-turbo mingw64-libpng mingw64-curl mingw64-libssh2 \
->      mingw64-bzip2
->  ENV QEMU_CONFIGURE_OPTS --python=/usr/bin/python3
-> diff --git a/tests/docker/test-mingw b/tests/docker/test-mingw
-> index 503a6bc6f7..7cca7e16a6 100755
-> --- a/tests/docker/test-mingw
-> +++ b/tests/docker/test-mingw
-> @@ -28,8 +28,8 @@ for prefix in x86_64-w64-mingw32- i686-w64-mingw32-; do
->          --enable-vnc \
->          --enable-bzip2 \
->          --enable-guest-agent \
-> -        --with-sdlabi=1.2 \
-> -        --with-gtkabi=2.0
-> +        --with-sdlabi=2.0 \
-> +        --with-gtkabi=3.0
->      install_qemu
->      make clean
->  
+>  tests/Makefile.include |   2 +
+>  tests/boot-sector.c    |   9 +-
+>  tests/cdrom-test.c     | 222 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 230 insertions(+), 3 deletions(-)
+>  create mode 100644 tests/cdrom-test.c
 > 
+> -- 
+> 1.8.3.1
