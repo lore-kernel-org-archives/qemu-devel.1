@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1ewnMo-00053I-TX
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:17:48 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ewnPG-000622-8B
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:20:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1ewnMk-0003Qd-SU
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:17:46 -0400
-Received: from mga06.intel.com ([134.134.136.31]:60252)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1ewnMk-0003QC-Io
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:17:42 -0400
-Message-ID: <5AABA88C.8070000@intel.com>
-Date: Fri, 16 Mar 2018 19:20:44 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ewnPC-0004cw-Hg
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:20:18 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:36568
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1ewnPC-0004cP-6b
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:20:14 -0400
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+References: <1520010495-58172-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<be2cf515-ddf8-74ef-7854-319329ee9209@ilande.co.uk>
+Message-ID: <b73a9767-1a49-9e51-dc79-41a3547df969@ilande.co.uk>
+Date: Fri, 16 Mar 2018 11:20:05 +0000
 MIME-Version: 1.0
-References: <1520426065-40265-1-git-send-email-wei.w.wang@intel.com>
-	<1520426065-40265-5-git-send-email-wei.w.wang@intel.com>
-	<20180314194954.GJ3006@work-vm>
-In-Reply-To: <20180314194954.GJ3006@work-vm>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 4/4] migration: use the free page hint
- feature from balloon
+In-Reply-To: <be2cf515-ddf8-74ef-7854-319329ee9209@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] ide: fix invalid TRIM range abortion for
+ macio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +31,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, quintela@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com
+To: jsnow@redhat.com, qemu-devel@nongnu.org
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-On 03/15/2018 03:49 AM, Dr. David Alan Gilbert wrote:
-> * Wei Wang (wei.w.wang@intel.com) wrote:
->> Start the free page optimization after the migration bitmap is
->> synchronized. This can't be used in the stop&copy phase since the guest
->> is paused. Make sure the guest reporting has stopped before
->> synchronizing the migration dirty bitmap. Currently, the optimization is
->> added to precopy only.
+On 05/03/18 21:54, Mark Cave-Ayland wrote:
+
+> On 02/03/18 17:08, Anton Nefedov wrote:
+> 
+>> commit 947858b0 "ide: abort TRIM operation for invalid range"
+>> is incorrect for macio; just ide_dma_error() without doing a callback
+>> is not enough for that errorpath.
 >>
->> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
->> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> CC: Juan Quintela <quintela@redhat.com>
->> CC: Michael S. Tsirkin <mst@redhat.com>
+>> Instead, pass -EINVAL to the callback and handle it there
+>> (see related motivation for read/write in 58ac32113).
+>>
+>> It will however catch possible EINVAL from the block layer too.
+>>
+>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 >> ---
->>   migration/ram.c | 19 ++++++++++++++++++-
->>   1 file changed, 18 insertions(+), 1 deletion(-)
+>>   hw/ide/core.c | 17 +++++++++--------
+>>   1 file changed, 9 insertions(+), 8 deletions(-)
 >>
->> diff --git a/migration/ram.c b/migration/ram.c
->> index e172798..7b4c9b1 100644
->> --- a/migration/ram.c
->> +++ b/migration/ram.c
->> @@ -51,6 +51,8 @@
->>   #include "qemu/rcu_queue.h"
->>   #include "migration/colo.h"
->>   #include "migration/block.h"
->> +#include "sysemu/balloon.h"
->> +#include "sysemu/sysemu.h"
->>   
->>   /***********************************************************/
->>   /* ram save/restore */
->> @@ -208,6 +210,8 @@ struct RAMState {
->>       uint32_t last_version;
->>       /* We are in the first round */
->>       bool ram_bulk_stage;
->> +    /* The free pages optimization feature is supported */
->> +    bool free_page_support;
->>       /* How many times we have dirty too many pages */
->>       int dirty_rate_high_cnt;
->>       /* these variables are used for bitmap sync */
->> @@ -775,7 +779,7 @@ unsigned long migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
->>       unsigned long *bitmap = rb->bmap;
->>       unsigned long next;
->>   
->> -    if (rs->ram_bulk_stage && start > 0) {
->> +    if (rs->ram_bulk_stage && start > 0 && !rs->free_page_support) {
->>           next = start + 1;
-> An easier thing is just to clear the ram_bulk_stage flag (and if you're
-> doing it in the middle of the migration you need to reset some of the
-> pointers; see postcopy_start for an example).
->
->>       } else {
->>           next = find_next_bit(bitmap, size, start);
->> @@ -833,6 +837,10 @@ static void migration_bitmap_sync(RAMState *rs)
->>       int64_t end_time;
->>       uint64_t bytes_xfer_now;
->>   
->> +    if (rs->free_page_support) {
->> +        balloon_free_page_stop();
-> Does balloon_free_page_stop cause it to immediately stop, or does it
-> just ask nicely?   Could a slow guest keep pumping advice to us even
-> when it was stopped?
->
+>> diff --git a/hw/ide/core.c b/hw/ide/core.c
+>> index 257b429..54510d4 100644
+>> --- a/hw/ide/core.c
+>> +++ b/hw/ide/core.c
+>> @@ -402,7 +402,6 @@ typedef struct TrimAIOCB {
+>>       QEMUIOVector *qiov;
+>>       BlockAIOCB *aiocb;
+>>       int i, j;
+>> -    bool is_invalid;
+>>   } TrimAIOCB;
+>>   static void trim_aio_cancel(BlockAIOCB *acb)
+>> @@ -430,11 +429,8 @@ static void ide_trim_bh_cb(void *opaque)
+>>   {
+>>       TrimAIOCB *iocb = opaque;
+>> -    if (iocb->is_invalid) {
+>> -        ide_dma_error(iocb->s);
+>> -    } else {
+>> -        iocb->common.cb(iocb->common.opaque, iocb->ret);
+>> -    }
+>> +    iocb->common.cb(iocb->common.opaque, iocb->ret);
+>> +
+>>       qemu_bh_delete(iocb->bh);
+>>       iocb->bh = NULL;
+>>       qemu_aio_unref(iocb);
+>> @@ -462,7 +458,7 @@ static void ide_issue_trim_cb(void *opaque, int ret)
+>>                   }
+>>                   if (!ide_sect_range_ok(s, sector, count)) {
+>> -                    iocb->is_invalid = true;
+>> +                    iocb->ret = -EINVAL;
+>>                       goto done;
+>>                   }
+>> @@ -502,7 +498,6 @@ BlockAIOCB *ide_issue_trim(
+>>       iocb->qiov = qiov;
+>>       iocb->i = -1;
+>>       iocb->j = 0;
+>> -    iocb->is_invalid = false;
+>>       ide_issue_trim_cb(iocb, 0);
+>>       return &iocb->common;
+>>   }
+>> @@ -848,6 +843,12 @@ static void ide_dma_cb(void *opaque, int ret)
+>>       if (ret == -ECANCELED) {
+>>           return;
+>>       }
+>> +
+>> +    if (ret == -EINVAL) {
+>> +        ide_dma_error(s);
+>> +        return;
+>> +    }
+>> +
+>>       if (ret < 0) {
+>>           if (ide_handle_rw_error(s, -ret, 
+>> ide_dma_cmd_to_retry(s->dma_cmd))) {
+>>               s->bus->dma->aiocb = NULL;
+>>
+> 
+> Hi Anton,
+> 
+> Thanks for this. I applied this patch to git master with my macio patch 
+> at https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06076.html 
+> and it allowed to continue all the way through the Debian installer for 
+> the PPC g3beige machine so I believe it is working.
+> 
+> Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Yes, balloon_free_page_stop will cause the optimization thread to exit 
-immediately. It doesn't rely on anything from the guest.
-The guest won't keep reporting, since before the optimization thread 
-exits, it sends a stop sign to the guest to stop reporting (but not 
-waiting for any ACKs as that's not needed actually).
+Hi John,
 
-I also applied other comments in the new version, please have check v5 
-patches. Thanks.
+I know that you're busy, but just wondering if you have managed to 
+review these 2 TRIM patches? They are a candidate for 2.12 since they 
+prevent a qemu-system-ppc segfault on Mac machines when issuing IDE TRIM 
+commands.
 
-Best,
-Wei
+
+ATB,
+
+Mark.
