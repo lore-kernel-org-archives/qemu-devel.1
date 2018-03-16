@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1eww1g-00068h-Ha
+	(envelope-from <alindsay@codeaurora.org>) id 1eww1g-00068Q-5J
 	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 16:32:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1eww1f-0003ew-Dh
+	(envelope-from <alindsay@codeaurora.org>) id 1eww1f-0003ep-D0
 	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 16:32:32 -0400
 From: Aaron Lindsay <alindsay@codeaurora.org>
-Date: Fri, 16 Mar 2018 16:31:16 -0400
-Message-Id: <1521232280-13089-19-git-send-email-alindsay@codeaurora.org>
+Date: Fri, 16 Mar 2018 16:31:15 -0400
+Message-Id: <1521232280-13089-18-git-send-email-alindsay@codeaurora.org>
 In-Reply-To: <1521232280-13089-1-git-send-email-alindsay@codeaurora.org>
 References: <1521232280-13089-1-git-send-email-alindsay@codeaurora.org>
-Subject: [Qemu-devel] [PATCH v3 18/22] target/arm: Add array for supported
- PMU events, generate PMCEID[01]
+Subject: [Qemu-devel] [PATCH v3 17/22] target/arm: Split arm_ccnt_enabled
+ into generic pmu_counter_enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,102 +23,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 Cc: qemu-devel@nongnu.org, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay <alindsay@codeaurora.org>
 
-This commit doesn't add any supported events, but provides the framework
-for adding them. We store the pm_event structs in a simple array, and
-provide the mapping from the event numbers to array indexes in
-the supported_event_map array.
-
 Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.c    |  4 ++++
- target/arm/cpu.h    | 10 ++++++++++
- target/arm/helper.c | 37 +++++++++++++++++++++++++++++++++++++
- 3 files changed, 51 insertions(+)
+ target/arm/helper.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index e544f1d..69d6a80 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -889,6 +889,10 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-         unset_feature(env, ARM_FEATURE_PMU);
-         cpu->id_aa64dfr0 &= ~0xf00;
-     } else {
-+        uint64_t pmceid = get_pmceid(&cpu->env);
-+        cpu->pmceid0 = pmceid & 0xffffffff;
-+        cpu->pmceid1 = (pmceid >> 32) & 0xffffffff;
-+
-         arm_register_pre_el_change_hook(cpu, &pmu_pre_el_change, 0);
-         arm_register_el_change_hook(cpu, &pmu_post_el_change, 0);
-     }
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index cc1e2fb..19f005d 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -931,6 +931,16 @@ void pmu_op_finish(CPUARMState *env, uint64_t prev_cycles);
- void pmu_pre_el_change(ARMCPU *cpu, void *ignored);
- void pmu_post_el_change(ARMCPU *cpu, void *ignored);
- 
-+/*
-+ * get_pmceid
-+ * @env: CPUARMState
-+ *
-+ * Return the PMCEID[01] register values corresponding to the counters which
-+ * are supported given the current configuration (0 is low 32, 1 is high 32
-+ * bits)
-+ */
-+uint64_t get_pmceid(CPUARMState *env);
-+
- /* SCTLR bit meanings. Several bits have been reused in newer
-  * versions of the architecture; in that case we define constants
-  * for both old and new bit meanings. Code which tests against those
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 2073d56..6a4f900 100644
+index f5e800e..2073d56 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -925,6 +925,43 @@ static const ARMCPRegInfo v6_cp_reginfo[] = {
- /* Bits allowed to be set/cleared for PMCNTEN* and PMINTEN* */
- #define PMU_COUNTER_MASK(env) ((1 << 31) | ((1 << PMU_NUM_COUNTERS(env)) - 1))
+@@ -1009,17 +1009,22 @@ static CPAccessResult pmreg_access_ccntr(CPUARMState *env,
+     return pmreg_access(env, ri, isread);
+ }
  
-+typedef struct pm_event {
-+    uint16_t number; /* PMEVTYPER.evtCount is 10 bits wide */
-+    /* If the event is supported on this CPU (used to generate PMCEID[01]) */
-+    bool (*supported)(CPUARMState *);
-+    /* Retrieve the current count of the underlying event. The programmed
-+     * counters hold a difference from the return value from this function */
-+    uint64_t (*get_count)(CPUARMState *);
-+} pm_event;
-+
-+#define SUPPORTED_EVENT_SENTINEL UINT16_MAX
-+static const pm_event pm_events[] = {
-+    { .number = SUPPORTED_EVENT_SENTINEL }
-+};
-+static uint16_t supported_event_map[0x3f];
-+
-+/*
-+ * Called upon initialization to build PMCEID0 (low 32 bits) and PMCEID1 (high
-+ * 32). We also use it to build a map of ARM event numbers to indices in
-+ * our pm_events array.
-+ */
-+uint64_t get_pmceid(CPUARMState *env)
+-static inline bool arm_ccnt_enabled(CPUARMState *env)
++static inline bool pmu_counter_enabled(CPUARMState *env, uint8_t counter)
+ {
+     /* Does not check PMCCFILTR_EL0, which is handled by pmu_counter_filtered */
+-
+-    if (!(env->cp15.c9_pmcr & PMCRE) || !(env->cp15.c9_pmcnten & (1 << 31))) {
++    if (!(env->cp15.c9_pmcr & PMCRE) ||
++            !(env->cp15.c9_pmcnten & (1 << counter))) {
+         return false;
+     }
+ 
+     return true;
+ }
+ 
++static inline bool arm_ccnt_enabled(CPUARMState *env)
 +{
-+    uint64_t pmceid = 0;
-+    unsigned int i = 0;
-+    while (pm_events[i].number != SUPPORTED_EVENT_SENTINEL) {
-+        const pm_event *cnt = &pm_events[i];
-+        if (cnt->number < 0x3f && cnt->supported(env)) {
-+            pmceid |= (1 << cnt->number);
-+            supported_event_map[cnt->number] = i;
-+        } else {
-+            supported_event_map[cnt->number] = SUPPORTED_EVENT_SENTINEL;
-+        }
-+        i++;
-+    }
-+    return pmceid;
++    return pmu_counter_enabled(env, 31);
 +}
 +
- static CPAccessResult pmreg_access(CPUARMState *env, const ARMCPRegInfo *ri,
-                                    bool isread)
- {
+ /* Returns true if the counter corresponding to the passed-in pmevtyper or
+  * pmccfiltr value is filtered using the current state */
+ static inline bool pmu_counter_filtered(CPUARMState *env, uint64_t pmxevtyper)
 -- 
 Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
 Qualcomm Technologies, Inc. is a member of the
