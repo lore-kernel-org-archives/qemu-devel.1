@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ewvFR-0007em-2r
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:42:44 -0400
+	(envelope-from <no-reply@patchew.org>) id 1ewvcz-0008KV-78
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 16:07:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ewvFP-0003rO-M4
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:42:41 -0400
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:39514)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ewvFP-0003rB-DC
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:42:39 -0400
-Received: by mail-pl0-x244.google.com with SMTP id k22-v6so5671709pls.6
-	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 12:42:39 -0700 (PDT)
-From: Michael Clark <mjc@sifive.com>
-Date: Fri, 16 Mar 2018 12:41:20 -0700
-Message-Id: <1521229281-73637-24-git-send-email-mjc@sifive.com>
+	(envelope-from <no-reply@patchew.org>) id 1ewvcw-0004RQ-Fv
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 16:07:01 -0400
+Resent-Message-Id: <E1ewvcw-0004RQ-Fv@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21068)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ewvcw-0004MH-5S
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 16:06:58 -0400
 In-Reply-To: <1521229281-73637-1-git-send-email-mjc@sifive.com>
-References: <1521229281-73637-1-git-send-email-mjc@sifive.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152123079148.75.8090271236020036291@71c20359a636>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 23/24] RISC-V: Convert cpu definition
- towards future model
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 16 Mar 2018 13:06:32 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 00/24] RISC-V Post-merge spec
+ conformance and cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,192 +29,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Igor Mammedov <imammedo@redhat.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>
+To: mjc@sifive.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de, palmer@sifive.com, f4bug@amsat.org, patches@groups.riscv.org
 
-- Model borrowed from target/sh4/cpu.c
-- Rewrote riscv_cpu_list to use object_class_get_list
-- Dropped 'struct RISCVCPUInfo' and used TypeInfo array
-- Replaced riscv_cpu_register_types with DEFINE_TYPES
-- Marked base class as abstract
-
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
-Signed-off-by: Michael Clark <mjc@sifive.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- target/riscv/cpu.c | 123 ++++++++++++++++++++++++++++++-----------------------
- 1 file changed, 69 insertions(+), 54 deletions(-)
-
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index d2ae56a..1f25968 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -115,6 +115,8 @@ static void riscv_any_cpu_init(Object *obj)
-     set_resetvec(env, DEFAULT_RSTVEC);
- }
- 
-+#if defined(TARGET_RISCV32)
-+
- static void rv32gcsu_priv1_09_1_cpu_init(Object *obj)
- {
-     CPURISCVState *env = &RISCV_CPU(obj)->env;
-@@ -141,6 +143,8 @@ static void rv32imacu_nommu_cpu_init(Object *obj)
-     set_resetvec(env, DEFAULT_RSTVEC);
- }
- 
-+#elif defined(TARGET_RISCV64)
-+
- static void rv64gcsu_priv1_09_1_cpu_init(Object *obj)
- {
-     CPURISCVState *env = &RISCV_CPU(obj)->env;
-@@ -167,20 +171,7 @@ static void rv64imacu_nommu_cpu_init(Object *obj)
-     set_resetvec(env, DEFAULT_RSTVEC);
- }
- 
--static const RISCVCPUInfo riscv_cpus[] = {
--    { 96, TYPE_RISCV_CPU_ANY,              riscv_any_cpu_init },
--    { 32, TYPE_RISCV_CPU_RV32GCSU_V1_09_1, rv32gcsu_priv1_09_1_cpu_init },
--    { 32, TYPE_RISCV_CPU_RV32GCSU_V1_10_0, rv32gcsu_priv1_10_0_cpu_init },
--    { 32, TYPE_RISCV_CPU_RV32IMACU_NOMMU,  rv32imacu_nommu_cpu_init },
--    { 32, TYPE_RISCV_CPU_SIFIVE_E31,       rv32imacu_nommu_cpu_init },
--    { 32, TYPE_RISCV_CPU_SIFIVE_U34,       rv32gcsu_priv1_10_0_cpu_init },
--    { 64, TYPE_RISCV_CPU_RV64GCSU_V1_09_1, rv64gcsu_priv1_09_1_cpu_init },
--    { 64, TYPE_RISCV_CPU_RV64GCSU_V1_10_0, rv64gcsu_priv1_10_0_cpu_init },
--    { 64, TYPE_RISCV_CPU_RV64IMACU_NOMMU,  rv64imacu_nommu_cpu_init },
--    { 64, TYPE_RISCV_CPU_SIFIVE_E51,       rv64imacu_nommu_cpu_init },
--    { 64, TYPE_RISCV_CPU_SIFIVE_U54,       rv64gcsu_priv1_10_0_cpu_init },
--    { 0, NULL, NULL }
--};
-+#endif
- 
- static ObjectClass *riscv_cpu_class_by_name(const char *cpu_model)
- {
-@@ -366,28 +357,6 @@ static void riscv_cpu_class_init(ObjectClass *c, void *data)
-     cc->vmsd = &vmstate_riscv_cpu;
- }
- 
--static void cpu_register(const RISCVCPUInfo *info)
--{
--    TypeInfo type_info = {
--        .name = info->name,
--        .parent = TYPE_RISCV_CPU,
--        .instance_size = sizeof(RISCVCPU),
--        .instance_init = info->initfn,
--    };
--
--    type_register(&type_info);
--}
--
--static const TypeInfo riscv_cpu_type_info = {
--    .name = TYPE_RISCV_CPU,
--    .parent = TYPE_CPU,
--    .instance_size = sizeof(RISCVCPU),
--    .instance_init = riscv_cpu_init,
--    .abstract = false,
--    .class_size = sizeof(RISCVCPUClass),
--    .class_init = riscv_cpu_class_init,
--};
--
- char *riscv_isa_string(RISCVCPU *cpu)
- {
-     int i;
-@@ -403,30 +372,76 @@ char *riscv_isa_string(RISCVCPU *cpu)
-     return isa_string;
- }
- 
--void riscv_cpu_list(FILE *f, fprintf_function cpu_fprintf)
-+typedef struct RISCVCPUListState {
-+    fprintf_function cpu_fprintf;
-+    FILE *file;
-+} RISCVCPUListState;
-+
-+static gint riscv_cpu_list_compare(gconstpointer a, gconstpointer b)
- {
--    const RISCVCPUInfo *info = riscv_cpus;
-+    ObjectClass *class_a = (ObjectClass *)a;
-+    ObjectClass *class_b = (ObjectClass *)b;
-+    const char *name_a, *name_b;
- 
--    while (info->name) {
--        if (info->bit_widths & TARGET_LONG_BITS) {
--            (*cpu_fprintf)(f, "%s\n", info->name);
--        }
--        info++;
--    }
-+    name_a = object_class_get_name(class_a);
-+    name_b = object_class_get_name(class_b);
-+    return strcmp(name_a, name_b);
- }
- 
--static void riscv_cpu_register_types(void)
-+static void riscv_cpu_list_entry(gpointer data, gpointer user_data)
- {
--    const RISCVCPUInfo *info = riscv_cpus;
-+    RISCVCPUListState *s = user_data;
-+    const char *typename = object_class_get_name(OBJECT_CLASS(data));
-+    int len = strlen(typename) - strlen(RISCV_CPU_TYPE_SUFFIX);
- 
--    type_register_static(&riscv_cpu_type_info);
-+    (*s->cpu_fprintf)(s->file, "%.*s\n", len, typename);
-+}
- 
--    while (info->name) {
--        if (info->bit_widths & TARGET_LONG_BITS) {
--            cpu_register(info);
--        }
--        info++;
--    }
-+void riscv_cpu_list(FILE *f, fprintf_function cpu_fprintf)
-+{
-+    RISCVCPUListState s = {
-+        .cpu_fprintf = cpu_fprintf,
-+        .file = f,
-+    };
-+    GSList *list;
-+
-+    list = object_class_get_list(TYPE_RISCV_CPU, false);
-+    list = g_slist_sort(list, riscv_cpu_list_compare);
-+    g_slist_foreach(list, riscv_cpu_list_entry, &s);
-+    g_slist_free(list);
- }
- 
--type_init(riscv_cpu_register_types)
-+#define DEFINE_CPU(type_name, initfn)      \
-+    {                                      \
-+        .name = type_name,                 \
-+        .parent = TYPE_RISCV_CPU,          \
-+        .instance_init = initfn            \
-+    }
-+
-+static const TypeInfo riscv_cpu_type_infos[] = {
-+    {
-+        .name = TYPE_RISCV_CPU,
-+        .parent = TYPE_CPU,
-+        .instance_size = sizeof(RISCVCPU),
-+        .instance_init = riscv_cpu_init,
-+        .abstract = true,
-+        .class_size = sizeof(RISCVCPUClass),
-+        .class_init = riscv_cpu_class_init,
-+    },
-+    DEFINE_CPU(TYPE_RISCV_CPU_ANY,              riscv_any_cpu_init),
-+#if defined(TARGET_RISCV32)
-+    DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_09_1, rv32gcsu_priv1_09_1_cpu_init),
-+    DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_10_0, rv32gcsu_priv1_10_0_cpu_init),
-+    DEFINE_CPU(TYPE_RISCV_CPU_RV32IMACU_NOMMU,  rv32imacu_nommu_cpu_init),
-+    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31,       rv32imacu_nommu_cpu_init),
-+    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rv32gcsu_priv1_10_0_cpu_init)
-+#elif defined(TARGET_RISCV64)
-+    DEFINE_CPU(TYPE_RISCV_CPU_RV64GCSU_V1_09_1, rv64gcsu_priv1_09_1_cpu_init),
-+    DEFINE_CPU(TYPE_RISCV_CPU_RV64GCSU_V1_10_0, rv64gcsu_priv1_10_0_cpu_init),
-+    DEFINE_CPU(TYPE_RISCV_CPU_RV64IMACU_NOMMU,  rv64imacu_nommu_cpu_init),
-+    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E51,       rv64imacu_nommu_cpu_init),
-+    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U54,       rv64gcsu_priv1_10_0_cpu_init)
-+#endif
-+};
-+
-+DEFINE_TYPES(riscv_cpu_type_infos)
--- 
-2.7.0
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MjEyMjkyODEtNzM2MzctMS1naXQtc2VuZC1lbWFpbC1tamNAc2lmaXZlLmNv
+bQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAwLzI0XSBSSVNDLVYgUG9zdC1tZXJn
+ZSBzcGVjIGNvbmZvcm1hbmNlIGFuZCBjbGVhbnVwCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
+CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
+U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
+aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
+PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
+aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
+LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
+ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
+RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
+NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRh
+Z10gICAgICAgICAgICAgICBwYXRjaGV3LzE1MjEyMjkyODEtNzM2MzctMS1naXQtc2VuZC1lbWFp
+bC1tamNAc2lmaXZlLmNvbSAtPiBwYXRjaGV3LzE1MjEyMjkyODEtNzM2MzctMS1naXQtc2VuZC1l
+bWFpbC1tamNAc2lmaXZlLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmNmOWFk
+ODQ3MWMgUklTQy1WOiBDbGVhciBtdHZhbC9zdHZhbCBvbiBleGNlcHRpb25zIHdpdGhvdXQgaW5m
+bwplMGViNWFkMDNmIFJJU0MtVjogQ29udmVydCBjcHUgZGVmaW5pdGlvbiB0b3dhcmRzIGZ1dHVy
+ZSBtb2RlbApjYjk4NmJkNjYxIFJJU0MtVjogUmVtb3ZlIHN1cHBvcnQgZm9yIGFkaG9jIFhfQ09Q
+IGludGVycnVwdApjMWJlYTk5OWZlIFJJU0MtVjogTm8gdHJhcHMgb24gd3JpdGVzIHRvIG1pc2Es
+IG1pbnN0cmV0LCBtY3ljbGUKYzQ1MDA1ZjcxZCBSSVNDLVY6IHZlY3RvcmVkIHRyYXBzIGFyZSBv
+cHRpb25hbAoyM2RjY2Y3M2FhIFJJU0MtVjogcmlzY3YtcWVtdSBwb3J0IHN1cHBvcnRzIHN2Mzkg
+YW5kIHN2NDgKOWJlZWNkZGVhMCBSSVNDLVY6IFJlbW92ZSBicmFjZXMgZnJvbSBzYXRwIGNhc2Ug
+c3RhdGVtZW50CmRiMzYyYTc3YjkgUklTQy1WOiBIYXJkd2lyZSBzYXRwIHRvIDAgZm9yIG5vLW1t
+dSBjYXNlCmM2OTYwNjA5NTkgUklTQy1WOiBSZW1vdmUgRU1fUklTQ1YgRUxGX01BQ0hJTkUgaW5k
+aXJlY3Rpb24KZTQ4YzA5ZDI1YSBSSVNDLVY6IFVzZSBtZW1vcnlfcmVnaW9uX2lzX3JhbSBpbiBw
+dGUgdXBkYXRlCmVhYTAxZDRlNjEgUklTQy1WOiBNYWtlIHZpcnQgaGVhZGVyIGNvbW1lbnQgdGl0
+bGUgY29uc2lzdGVudAo5NDM1MDQ1ZmQ4IFJJU0MtVjogTWFrZSBzb21lIGhlYWRlciBndWFyZHMg
+bW9yZSBzcGVjaWZpYwoyMzk3M2E4NGY3IFJJU0MtVjogVXBkYXRlIEUgb3JkZXIgYW5kIEkgZXh0
+ZW5zaW9uIG9yZGVyCjZlZmJiNzgxZTQgUklTQy1WOiBJbXByb3ZlIHBhZ2UgdGFibGUgd2Fsa2Vy
+IHNwZWMgY29tcGxpYW5jZQo5MjRlNDZiMGI4IFJJU0MtVjogSG9sZCByY3VfcmVhZF9sb2NrIHdo
+ZW4gYWNjZXNzaW5nIG1lbW9yeQplZWY5NWIwNjdmIFJJU0MtVjogSW5jbHVkZSBpbnRydWN0aW9u
+IGhleCBpbiBkaXNhc3NlbWJseQozODg0YTE0MDg2IFJJU0MtVjogTWFrZSBzdXJlIHJvbSBoYXMg
+c3BhY2UgZm9yIGZkdAo0OWFkNzc0NjEyIFJJU0MtVjogUmVtb3ZlIHVudXNlZCBjbGFzcyBkZWZp
+bml0aW9ucwo0Yjc3MTg3NmQ4IFJJU0MtVjogTWFyayBST00gcmVhZC1vbmx5IGFmdGVyIGNvcHlp
+bmcgaW4gY29kZQo2NDZhOGQyNTA4IFJJU0MtVjogUmVtb3ZlIGlkZW50aXR5X3RyYW5zbGF0ZSBm
+cm9tIGxvYWRfZWxmCmM1ODJiN2JiZjAgUklTQy1WOiBVc2UgUk9NIGJhc2UgYWRkcmVzcyBhbmQg
+c2l6ZSBmcm9tIG1lbW1hcAo4YTNlZjU0YjBkIFJJU0MtVjogTWFrZSB2aXJ0IGJvYXJkIGRlc2Ny
+aXB0aW9uIG1hdGNoIHNwaWtlCmJhMGNiYWNlMmQgUklTQy1WOiBSZXBsYWNlIGhhcmRjb2RlZCBj
+b25zdGFudHMgd2l0aCBlbnVtIHZhbHVlcwplYzBjMGVlYThjIFJJU0MtVjogTWFrZSB2aXJ0IGNy
+ZWF0ZV9mZHQgaW50ZXJmYWNlIGNvbnNpc3RlbnQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
+aW5nIFBBVENIIDEvMjQ6IFJJU0MtVjogTWFrZSB2aXJ0IGNyZWF0ZV9mZHQgaW50ZXJmYWNlIGNv
+bnNpc3RlbnQuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8yNDogUklTQy1WOiBSZXBsYWNlIGhhcmRjb2Rl
+ZCBjb25zdGFudHMgd2l0aCBlbnVtIHZhbHVlcy4uLgpDaGVja2luZyBQQVRDSCAzLzI0OiBSSVND
+LVY6IE1ha2UgdmlydCBib2FyZCBkZXNjcmlwdGlvbiBtYXRjaCBzcGlrZS4uLgpDaGVja2luZyBQ
+QVRDSCA0LzI0OiBSSVNDLVY6IFVzZSBST00gYmFzZSBhZGRyZXNzIGFuZCBzaXplIGZyb20gbWVt
+bWFwLi4uCkNoZWNraW5nIFBBVENIIDUvMjQ6IFJJU0MtVjogUmVtb3ZlIGlkZW50aXR5X3RyYW5z
+bGF0ZSBmcm9tIGxvYWRfZWxmLi4uCkNoZWNraW5nIFBBVENIIDYvMjQ6IFJJU0MtVjogTWFyayBS
+T00gcmVhZC1vbmx5IGFmdGVyIGNvcHlpbmcgaW4gY29kZS4uLgpDaGVja2luZyBQQVRDSCA3LzI0
+OiBSSVNDLVY6IFJlbW92ZSB1bnVzZWQgY2xhc3MgZGVmaW5pdGlvbnMuLi4KQ2hlY2tpbmcgUEFU
+Q0ggOC8yNDogUklTQy1WOiBNYWtlIHN1cmUgcm9tIGhhcyBzcGFjZSBmb3IgZmR0Li4uCkNoZWNr
+aW5nIFBBVENIIDkvMjQ6IFJJU0MtVjogSW5jbHVkZSBpbnRydWN0aW9uIGhleCBpbiBkaXNhc3Nl
+bWJseS4uLgpDaGVja2luZyBQQVRDSCAxMC8yNDogUklTQy1WOiBIb2xkIHJjdV9yZWFkX2xvY2sg
+d2hlbiBhY2Nlc3NpbmcgbWVtb3J5Li4uCkVSUk9SOiBzd2l0Y2ggYW5kIGNhc2Ugc2hvdWxkIGJl
+IGF0IHRoZSBzYW1lIGluZGVudAojNTA6IEZJTEU6IHRhcmdldC9yaXNjdi9oZWxwZXIuYzoyNDA6
+CisgICAgICAgICAgICAgICAgc3dpdGNoIChhY3Rpb24pIHsKKyAgICAgICAgICAgICAgICAgICAg
+Y2FzZSBzdWNjZXNzOiBicmVhazsKKyAgICAgICAgICAgICAgICAgICAgY2FzZSB0cmFuc2xhdGVf
+ZmFpbDogcmV0dXJuIFRSQU5TTEFURV9GQUlMOworICAgICAgICAgICAgICAgICAgICBjYXNlIHJl
+c3RhcnRfd2FsazogZ290byByZXN0YXJ0OwoKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hv
+dWxkIGJlIG9uIG5leHQgbGluZQojNTE6IEZJTEU6IHRhcmdldC9yaXNjdi9oZWxwZXIuYzoyNDE6
+CisgICAgICAgICAgICAgICAgICAgIGNhc2Ugc3VjY2VzczogYnJlYWs7CgpFUlJPUjogdHJhaWxp
+bmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24gbmV4dCBsaW5lCiM1MzogRklMRTogdGFyZ2V0L3Jp
+c2N2L2hlbHBlci5jOjI0MzoKKyAgICAgICAgICAgICAgICAgICAgY2FzZSByZXN0YXJ0X3dhbGs6
+IGdvdG8gcmVzdGFydDsKCnRvdGFsOiAzIGVycm9ycywgMCB3YXJuaW5ncywgMzIgbGluZXMgY2hl
+Y2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFU
+Q0ggMTEvMjQ6IFJJU0MtVjogSW1wcm92ZSBwYWdlIHRhYmxlIHdhbGtlciBzcGVjIGNvbXBsaWFu
+Y2UuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMjQ6IFJJU0MtVjogVXBkYXRlIEUgb3JkZXIgYW5kIEkg
+ZXh0ZW5zaW9uIG9yZGVyLi4uCkNoZWNraW5nIFBBVENIIDEzLzI0OiBSSVNDLVY6IE1ha2Ugc29t
+ZSBoZWFkZXIgZ3VhcmRzIG1vcmUgc3BlY2lmaWMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvMjQ6IFJJ
+U0MtVjogTWFrZSB2aXJ0IGhlYWRlciBjb21tZW50IHRpdGxlIGNvbnNpc3RlbnQuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMTUvMjQ6IFJJU0MtVjogVXNlIG1lbW9yeV9yZWdpb25faXNfcmFtIGluIHB0ZSB1
+cGRhdGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTYvMjQ6IFJJU0MtVjogUmVtb3ZlIEVNX1JJU0NWIEVM
+Rl9NQUNISU5FIGluZGlyZWN0aW9uLi4uCkNoZWNraW5nIFBBVENIIDE3LzI0OiBSSVNDLVY6IEhh
+cmR3aXJlIHNhdHAgdG8gMCBmb3Igbm8tbW11IGNhc2UuLi4KQ2hlY2tpbmcgUEFUQ0ggMTgvMjQ6
+IFJJU0MtVjogUmVtb3ZlIGJyYWNlcyBmcm9tIHNhdHAgY2FzZSBzdGF0ZW1lbnQuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMTkvMjQ6IFJJU0MtVjogcmlzY3YtcWVtdSBwb3J0IHN1cHBvcnRzIHN2MzkgYW5k
+IHN2NDguLi4KQ2hlY2tpbmcgUEFUQ0ggMjAvMjQ6IFJJU0MtVjogdmVjdG9yZWQgdHJhcHMgYXJl
+IG9wdGlvbmFsLi4uCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMyNzogRklMRTogdGFyZ2V0
+L3Jpc2N2L29wX2hlbHBlci5jOjI2NToKKyAgICAgICAgLyogd2UgZG8gbm90IHN1cHBvcnQgdmVj
+dG9yZWQgdHJhcHMgZm9yIGFzeW5jaHJvdW5vdXMgaW50ZXJydXB0cyAqLyAkCgpFUlJPUjogdHJh
+aWxpbmcgd2hpdGVzcGFjZQojNDI6IEZJTEU6IHRhcmdldC9yaXNjdi9vcF9oZWxwZXIuYzoyODY6
+CisgICAgICAgIC8qIHdlIGRvIG5vdCBzdXBwb3J0IHZlY3RvcmVkIHRyYXBzIGZvciBhc3luY2hy
+b3Vub3VzIGludGVycnVwdHMgKi8gJAoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAyOCBs
+aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
+dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
+bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVj
+a2luZyBQQVRDSCAyMS8yNDogUklTQy1WOiBObyB0cmFwcyBvbiB3cml0ZXMgdG8gbWlzYSwgbWlu
+c3RyZXQsIG1jeWNsZS4uLgpDaGVja2luZyBQQVRDSCAyMi8yNDogUklTQy1WOiBSZW1vdmUgc3Vw
+cG9ydCBmb3IgYWRob2MgWF9DT1AgaW50ZXJydXB0Li4uCkNoZWNraW5nIFBBVENIIDIzLzI0OiBS
+SVNDLVY6IENvbnZlcnQgY3B1IGRlZmluaXRpb24gdG93YXJkcyBmdXR1cmUgbW9kZWwuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMjQvMjQ6IFJJU0MtVjogQ2xlYXIgbXR2YWwvc3R2YWwgb24gZXhjZXB0aW9u
+cyB3aXRob3V0IGluZm8uLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
+IHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
+aGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
+YXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
