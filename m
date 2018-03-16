@@ -1,35 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ewot9-0001ni-Q0
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 08:55:16 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ewotM-0001t8-PO
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 08:55:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ewot4-0004Qz-TS
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 08:55:15 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33218)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ewotH-0004WW-RR
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 08:55:28 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:51419)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ewot4-0004Pq-Mk
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 08:55:10 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ewot3-00085E-Ik
-	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 12:55:09 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 737FF2E80C8
-	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 12:55:09 +0000 (UTC)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ewotH-0004WF-GK
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 08:55:23 -0400
+Received: by mail-wm0-x241.google.com with SMTP id h21so2854103wmd.1
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 05:55:23 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180316122540.28409-1-pbonzini@redhat.com>
+	<20180316122540.28409-2-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <872021d0-ff46-f5ec-833b-fce1557a5d8e@amsat.org>
+Date: Fri, 16 Mar 2018 13:55:19 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 16 Mar 2018 12:44:33 -0000
-From: Thomas Huth <1438572@bugs.launchpad.net>
-Reply-To: Bug 1438572 <1438572@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150331082006.7212.85829.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152120427346.3257.5670185018315682739.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1438572] Re: kvm does not support
- KVM_CAP_USER_MEMORY Please upgrade to at least kernel 2.6.29 or recent
- kvm-kmod (see http://sourceforge.net/projects/kvm)
+In-Reply-To: <20180316122540.28409-2-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] docker: test-mingw: use SDL2 and GTK+3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,50 +35,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, famz@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com
 
-Triaging old bug tickets... can you still reproduce this issue with the
-latest version of QEMU? Or could we close this ticket nowadays?
+On 03/16/2018 01:25 PM, Paolo Bonzini wrote:
+> Do not test the deprecated API versions.  debian-win32-cross and debian-win64-cross
+> are already using SDL2 (they do not cover GTK+ at all).
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Good idea to start a doc/test/docker-coverage.txt with a matrix of
+configs tested (for example debian-amd64 tests virgl and netmap).
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1438572
-
-Title:
-  kvm does not support KVM_CAP_USER_MEMORY Please upgrade to at least
-  kernel 2.6.29 or recent kvm-kmod (see
-  http://sourceforge.net/projects/kvm)
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  We have a machine which is having QEMU+KVM on below configuration of linux
-  uname -a
-  Linux cairotrior 2.6.18-308.13.1.el5 #1 SMP Thu Jul 26 05:45:09 EDT 2012 =
-x86_64 x86_64 x86_64 GNU/Linux
-  cat /etc/issue
-  Red Hat Enterprise Linux Server release 5.8 (Tikanga)
-  Kernel \r on an \m
-
-  =
-
-  But in another setup, we are trying on a different machine having RHEL 5.=
-9 having higher kernel version but it still gives below error
-  kvm does not support KVM_CAP_USER_MEMORY Please upgrade to at least kerne=
-l 2.6.29 or recent kvm-kmod (see http://sourceforge.net/projects/kvm).
-  failed to initialize KVM: Invalid argument No accelerator found!
-
-  =
-
-  I don=E2=80=99t know if the qemu version have compatibility issues with r=
-edhat 5.9 version =E2=80=93  need someone to check if the qemu can run on r=
-edhat 5.9 64 bit or not ?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1438572/+subscriptions
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  tests/docker/dockerfiles/fedora.docker | 8 ++++----
+>  tests/docker/test-mingw                | 4 ++--
+>  2 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
+> index a00004319e..be3566325c 100644
+> --- a/tests/docker/dockerfiles/fedora.docker
+> +++ b/tests/docker/dockerfiles/fedora.docker
+> @@ -4,12 +4,12 @@ ENV PACKAGES \
+>      glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
+>      gcc gcc-c++ llvm clang make perl which bc findutils libaio-devel \
+>      nettle-devel libasan libubsan \
+> -    mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-config \
+> -    mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libtasn1 \
+> +    mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL2 mingw32-pkg-config \
+> +    mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libtasn1 \
+>      mingw32-libjpeg-turbo mingw32-libpng mingw32-curl mingw32-libssh2 \
+>      mingw32-bzip2 \
+> -    mingw64-pixman mingw64-glib2 mingw64-gmp mingw64-SDL mingw64-pkg-config \
+> -    mingw64-gtk2 mingw64-gtk3 mingw64-gnutls mingw64-nettle mingw64-libtasn1 \
+> +    mingw64-pixman mingw64-glib2 mingw64-gmp mingw64-SDL2 mingw64-pkg-config \
+> +    mingw64-gtk3 mingw64-gnutls mingw64-nettle mingw64-libtasn1 \
+>      mingw64-libjpeg-turbo mingw64-libpng mingw64-curl mingw64-libssh2 \
+>      mingw64-bzip2
+>  ENV QEMU_CONFIGURE_OPTS --python=/usr/bin/python3
+> diff --git a/tests/docker/test-mingw b/tests/docker/test-mingw
+> index 503a6bc6f7..7cca7e16a6 100755
+> --- a/tests/docker/test-mingw
+> +++ b/tests/docker/test-mingw
+> @@ -28,8 +28,8 @@ for prefix in x86_64-w64-mingw32- i686-w64-mingw32-; do
+>          --enable-vnc \
+>          --enable-bzip2 \
+>          --enable-guest-agent \
+> -        --with-sdlabi=1.2 \
+> -        --with-gtkabi=2.0
+> +        --with-sdlabi=2.0 \
+> +        --with-gtkabi=3.0
+>      install_qemu
+>      make clean
+>  
+> 
