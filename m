@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ewq8m-0006vf-LV
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 10:15:29 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ewqAq-0007fT-JA
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 10:17:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ewq8h-0004cM-UI
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 10:15:28 -0400
-Received: from mail-ot0-x233.google.com ([2607:f8b0:4003:c0f::233]:41272)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ewqAp-0005lv-QU
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 10:17:36 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:42485)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ewq8h-0004bT-8n
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 10:15:23 -0400
-Received: by mail-ot0-x233.google.com with SMTP id i28-v6so5797562otf.8
-	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 07:15:23 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1ewqAp-0005lT-JG
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 10:17:35 -0400
+Received: by mail-wr0-x241.google.com with SMTP id s18so11832877wrg.9
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 07:17:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180313205023.711304-1-eblake@redhat.com>
-References: <20180313205023.711304-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Mar 2018 14:15:01 +0000
-Message-ID: <CAFEAcA_+Zh6Xw3DzizqaELm7+S63cHoc+gaO1CdBEkcRkX6CBw@mail.gmail.com>
+In-Reply-To: <cf62af9e-39f8-deeb-0465-118a9547c212@redhat.com>
+References: <20180215212552.26997-1-marcandre.lureau@redhat.com>
+	<20180215212552.26997-4-marcandre.lureau@redhat.com>
+	<cf62af9e-39f8-deeb-0465-118a9547c212@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 16 Mar 2018 15:17:33 +0100
+Message-ID: <CAJ+F1CL5xkEaD9Tkzy=zkJKBejOwYEEBhB=1q36d53=xgdgYLg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/17] NBD patches for 2018-03-13 (2.12
- softfreeze)
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/6] vhost-user-test: add back memfd check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +31,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-On 13 March 2018 at 20:50, Eric Blake <eblake@redhat.com> wrote:
-> The following changes since commit 026aaf47c02b79036feb830206cfebb2a726510d:
+Hi Paolo,
+
+Could you pick the remaining fixes acked by Maxime?
+
+thanks
+
+On Fri, Feb 23, 2018 at 3:23 PM, Maxime Coquelin
+<maxime.coquelin@redhat.com> wrote:
 >
->   Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-request' into staging (2018-03-13 16:26:44 +0000)
 >
-> are available in the Git repository at:
+> On 02/15/2018 10:25 PM, Marc-Andr=C3=A9 Lureau wrote:
+>>
+>> This revert commit fb68096da3d35e64c88cd610c1fa42766c58e92a, and
+>> modify test_read_guest_mem() to use different chardev names, when
+>> using memfd (_test_server_free(), where the chardev is removed, runs
+>> in idle).
+>>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau<marcandre.lureau@redhat.com>
+>> ---
+>>   tests/vhost-user-test.c | 93
+>> +++++++++++++++++++++++++++++++++++--------------
+>>   1 file changed, 66 insertions(+), 27 deletions(-)
 >
->   git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2018-03-13-v2
 >
-> for you to fetch changes up to 65374c1aa6263a4e2b566d15a9fd9b2105954a1b:
->
->   iotests: new test 209 for NBD BLOCK_STATUS (2018-03-13 15:44:09 -0500)
->
-> In v2: fix uninitialized variable warning [patchew]
-> (only mailing patches that changed since v1)
->
-> ----------------------------------------------------------------
-> nbd patches for 2018-03-13
->
-> - Eric Blake: iotests: Fix stuck NBD process on 33
-> - Vladimir Sementsov-Ogievskiy: 0/5 nbd server fixing and refactoring before BLOCK_STATUS
-> - Eric Blake: nbd/server: Honor FUA request on NBD_CMD_TRIM
-> - Stefan Hajnoczi: 0/2 block: fix nbd-server-stop crash after blockdev-snapshot-sync
-> - Vladimir Sementsov-Ogievskiy: nbd block status base:allocation
+> Looks good to me:
+> Acked-by: Maxime Coquelin <maxime.coquelin@redhat.com>
 >
 
-Applied, thanks.
-
--- PMM
+--=20
+Marc-Andr=C3=A9 Lureau
