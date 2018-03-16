@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ewvFR-0007en-3C
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:42:42 -0400
+	(envelope-from <mjc@sifive.com>) id 1ewvFR-0007fN-Ep
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:42:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ewvFN-0003qe-MD
+	(envelope-from <mjc@sifive.com>) id 1ewvFQ-0003rf-IK
 	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:42:41 -0400
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:33536)
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:43944)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ewvFN-0003qP-Fh
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:42:37 -0400
-Received: by mail-pl0-x242.google.com with SMTP id c11-v6so6503753plo.0
-	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 12:42:37 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ewvFQ-0003rS-Bk
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:42:40 -0400
+Received: by mail-pg0-x242.google.com with SMTP id e9so4459854pgs.10
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 12:42:40 -0700 (PDT)
 From: Michael Clark <mjc@sifive.com>
-Date: Fri, 16 Mar 2018 12:41:18 -0700
-Message-Id: <1521229281-73637-22-git-send-email-mjc@sifive.com>
+Date: Fri, 16 Mar 2018 12:41:21 -0700
+Message-Id: <1521229281-73637-25-git-send-email-mjc@sifive.com>
 In-Reply-To: <1521229281-73637-1-git-send-email-mjc@sifive.com>
 References: <1521229281-73637-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v3 21/24] RISC-V: No traps on writes to misa,
- minstret, mcycle
+Subject: [Qemu-devel] [PATCH v3 24/24] RISC-V: Clear mtval/stval on
+ exceptions without info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +29,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>
 
-These fields are marked WARL in the specification so illegal
-writes are silently dropped.
+mtval/stval must be set on all exceptions but zero is
+a legal value if there is no exception specific info.
+Placing the instruction bytes for illegal instruction
+exceptions in mtval/stval is an optional feature and
+is currently not supported by QEMU RISC-V.
 
 Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Signed-off-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- target/riscv/op_helper.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+ target/riscv/helper.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-index aa101cc..f8595a6 100644
---- a/target/riscv/op_helper.c
-+++ b/target/riscv/op_helper.c
-@@ -200,17 +200,19 @@ void csr_write_helper(CPURISCVState *env, target_ulong val_to_write,
-         break;
-     }
-     case CSR_MINSTRET:
--        qemu_log_mask(LOG_UNIMP, "CSR_MINSTRET: write not implemented");
--        goto do_illegal;
-+        /* minstret is WARL so unsupported writes are ignored */
-+        break;
-     case CSR_MCYCLE:
--        qemu_log_mask(LOG_UNIMP, "CSR_MCYCLE: write not implemented");
--        goto do_illegal;
-+        /* mcycle is WARL so unsupported writes are ignored */
-+        break;
-+#if defined(TARGET_RISCV32)
-     case CSR_MINSTRETH:
--        qemu_log_mask(LOG_UNIMP, "CSR_MINSTRETH: write not implemented");
--        goto do_illegal;
-+        /* minstreth is WARL so unsupported writes are ignored */
-+        break;
-     case CSR_MCYCLEH:
--        qemu_log_mask(LOG_UNIMP, "CSR_MCYCLEH: write not implemented");
--        goto do_illegal;
-+        /* mcycleh is WARL so unsupported writes are ignored */
-+        break;
-+#endif
-     case CSR_MUCOUNTEREN:
-         env->mucounteren = val_to_write;
-         break;
-@@ -300,10 +302,9 @@ void csr_write_helper(CPURISCVState *env, target_ulong val_to_write,
-     case CSR_MBADADDR:
-         env->mbadaddr = val_to_write;
-         break;
--    case CSR_MISA: {
--        qemu_log_mask(LOG_UNIMP, "CSR_MISA: misa writes not supported");
--        goto do_illegal;
--    }
-+    case CSR_MISA:
-+        /* misa is WARL so unsupported writes are ignored */
-+        break;
-     case CSR_PMPCFG0:
-     case CSR_PMPCFG1:
-     case CSR_PMPCFG2:
-@@ -328,7 +329,6 @@ void csr_write_helper(CPURISCVState *env, target_ulong val_to_write,
-     case CSR_PMPADDR15:
-        pmpaddr_csr_write(env, csrno - CSR_PMPADDR0, val_to_write);
-        break;
--    do_illegal:
- #endif
-     default:
-         do_raise_exception_err(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
+diff --git a/target/riscv/helper.c b/target/riscv/helper.c
+index c430e95..54d4ff7 100644
+--- a/target/riscv/helper.c
++++ b/target/riscv/helper.c
+@@ -499,6 +499,10 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+                     ": badaddr 0x" TARGET_FMT_lx, env->mhartid, env->badaddr);
+             }
+             env->sbadaddr = env->badaddr;
++        } else {
++            /* otherwise we must clear sbadaddr/stval
++             * todo: support populating stval on illegal instructions */
++            env->sbadaddr = 0;
+         }
+ 
+         target_ulong s = env->mstatus;
+@@ -520,6 +524,10 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+                     ": badaddr 0x" TARGET_FMT_lx, env->mhartid, env->badaddr);
+             }
+             env->mbadaddr = env->badaddr;
++        } else {
++            /* otherwise we must clear mbadaddr/mtval
++             * todo: support populating mtval on illegal instructions */
++            env->mbadaddr = 0;
+         }
+ 
+         target_ulong s = env->mstatus;
 -- 
 2.7.0
