@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ewty5-0002bc-M8
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 14:20:42 -0400
+	(envelope-from <berrange@redhat.com>) id 1ewu03-0003VM-5D
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 14:22:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ewty2-0000JC-4p
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 14:20:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45382 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1ewtzz-0001dQ-Vg
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 14:22:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45428 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ewty1-0000Io-VR
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 14:20:38 -0400
-Date: Fri, 16 Mar 2018 20:20:21 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1521224390-425343-1-git-send-email-mst@redhat.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ewtzz-0001ck-R4
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 14:22:39 -0400
+Date: Fri, 16 Mar 2018 18:22:36 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180316182236.GM3066@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180316170122.fmo2nghyxpeaq7hp@kamzik.brq.redhat.com>
+	<a876446f-d4a4-4df2-c986-4e45a64b9436@redhat.com>
+	<c4054b32-b2e1-acd3-52f4-8f7d5c12c2a0@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Subject: [Qemu-devel] [PATCH] vhost-user: avoid misaligned access
+In-Reply-To: <c4054b32-b2e1-acd3-52f4-8f7d5c12c2a0@de.ibm.com>
+Subject: Re: [Qemu-devel] qemu master build failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,84 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Jay Zhou <jianjay.zhou@huawei.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Andrew Jones <drjones@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-We can't pass a pointer to memory field directly since
-it's within a packed structure, so isn't aligned.
-Pass a pointer on stack and copy.
+On Fri, Mar 16, 2018 at 07:12:26PM +0100, Christian Borntraeger wrote:
+> Does it make sense to have something like
+> 
+> diff --git a/configure b/configure
+> index 831ebf2..67d7ae3 100755
+> --- a/configure
+> +++ b/configure
+> @@ -552,6 +552,10 @@ else
+>      pwd_is_source_path="n"
+>  fi
+>  
+> +if test -f $source_path\/qemu-version.h -a $pwd_is_source_path = "n" ; then
+> +error_exit "source path contains a stale configuration, cannot build outside" 
+> +fi
+> +
 
-Fixes: 30c4cc7 ("vhost: used_memslots refactoring")
-Cc: Jay Zhou <jianjay.zhou@huawei.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
+Yeah that is a check that autoconf does commonly to detect this
+kind of mistake, so I think its good.
 
-I had to apply this to fix make check errors with clang.
-Pls review, test and ack.
 
-Thanks!
-
- hw/virtio/vhost-user.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
-
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index c12fdd9..a44ee7f 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -396,6 +396,7 @@ static int vhost_user_set_mem_table_postcopy(struct vhost_dev *dev,
-     bool reply_supported = virtio_has_feature(dev->protocol_features,
-                                               VHOST_USER_PROTOCOL_F_REPLY_ACK);
-     VhostUserMsg msg_reply;
-+    VhostUserMemory memory = {};
-     int region_i, msg_i;
- 
-     VhostUserMsg msg = {
-@@ -407,10 +408,11 @@ static int vhost_user_set_mem_table_postcopy(struct vhost_dev *dev,
-         msg.hdr.flags |= VHOST_USER_NEED_REPLY_MASK;
-     }
- 
--    if (vhost_user_prepare_msg(dev, &msg.payload.memory, fds) < 0) {
-+    if (vhost_user_prepare_msg(dev, &memory, fds) < 0) {
-         error_report("Failed preparing vhost-user memory table msg");
-         return -1;
-     }
-+    msg.payload.memory = memory;
- 
-     fd_num = msg.payload.memory.nregions;
- 
-@@ -549,16 +551,19 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
-         .hdr.request = VHOST_USER_SET_MEM_TABLE,
-         .hdr.flags = VHOST_USER_VERSION,
-     };
-+    VhostUserMemory memory = {};
- 
-     if (reply_supported) {
-         msg.hdr.flags |= VHOST_USER_NEED_REPLY_MASK;
-     }
- 
--    if (vhost_user_prepare_msg(dev, &msg.payload.memory, fds) < 0) {
-+    if (vhost_user_prepare_msg(dev, &memory, fds) < 0) {
-         error_report("Failed preparing vhost-user memory table msg");
-         return -1;
-     }
- 
-+    msg.payload.memory = memory;
-+
-     fd_num = msg.payload.memory.nregions;
- 
-     if (!fd_num) {
-@@ -1575,8 +1580,11 @@ static void vhost_user_set_used_memslots(struct vhost_dev *dev)
- {
-     int fds[VHOST_MEMORY_MAX_NREGIONS];
-     VhostUserMsg msg;
-+    VhostUserMemory memory = {};
-+
-+    vhost_user_prepare_msg(dev, &memory, fds);
- 
--    vhost_user_prepare_msg(dev, &msg.payload.memory, fds);
-+    msg.payload.memory = memory;
- }
- 
- const VhostOps user_ops = {
+Regards,
+Daniel
 -- 
-MST
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
