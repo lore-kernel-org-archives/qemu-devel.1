@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ewnwE-0006dy-V0
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:54:24 -0400
+	(envelope-from <quintela@redhat.com>) id 1ewnwK-0006g1-3T
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:54:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ewnwD-0002Z9-Tj
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:54:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33548 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1ewnwJ-0002eI-5M
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:54:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33552 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ewnwD-0002Yo-NZ
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:54:21 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ewnwJ-0002eC-15
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:54:27 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 40BA7401CC41
-	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 11:54:21 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 85349401CC41
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 11:54:26 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Fri, 16 Mar 2018 12:53:55 +0100
-Message-Id: <20180316115403.4148-8-quintela@redhat.com>
+Date: Fri, 16 Mar 2018 12:53:59 +0100
+Message-Id: <20180316115403.4148-12-quintela@redhat.com>
 In-Reply-To: <20180316115403.4148-1-quintela@redhat.com>
 References: <20180316115403.4148-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v11 07/15] migration: Synchronize send threads
+Subject: [Qemu-devel] [PATCH v11 11/15] migration: Delay start of migration
+ main routines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,160 +33,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-We synchronize all threads each RAM_SAVE_FLAG_EOS.  Bitmap
-synchronizations don't happen inside a  ram section, so we are safe
-about two channels trying to overwrite the same memory.
+We need to make sure that we have started all the multifd threads.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/ram.c        | 52 +++++++++++++++++++++++++++++++++++++++++++++++++-
- migration/trace-events |  3 +++
- 2 files changed, 54 insertions(+), 1 deletion(-)
+ migration/migration.c | 4 ++--
+ migration/migration.h | 1 +
+ migration/ram.c       | 3 +++
+ migration/socket.c    | 3 +++
+ 4 files changed, 9 insertions(+), 2 deletions(-)
 
+diff --git a/migration/migration.c b/migration/migration.c
+index b3c6198e12..8856860c44 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -429,7 +429,7 @@ static void migration_incoming_setup(QEMUFile *f)
+     qemu_file_set_blocking(f, false);
+ }
+ 
+-static void migration_incoming_process(void)
++void migration_incoming_process(void)
+ {
+     Coroutine *co = qemu_coroutine_create(process_incoming_migration_co, NULL);
+     qemu_coroutine_enter(co);
+@@ -447,7 +447,7 @@ void migration_ioc_process_incoming(QIOChannel *ioc)
+ 
+     if (!mis->from_src_file) {
+         QEMUFile *f = qemu_fopen_channel_input(ioc);
+-        migration_fd_process_incoming(f);
++        migration_incoming_setup(f);
+         return;
+     }
+     multifd_recv_new_channel(ioc);
+diff --git a/migration/migration.h b/migration/migration.h
+index 36b9c70fd6..cef4c189c5 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -184,6 +184,7 @@ void migrate_set_state(int *state, int old_state, int new_state);
+ 
+ void migration_fd_process_incoming(QEMUFile *f);
+ void migration_ioc_process_incoming(QIOChannel *ioc);
++void migration_incoming_process(void);
+ 
+ bool  migration_has_all_channels(void);
+ 
 diff --git a/migration/ram.c b/migration/ram.c
-index 7e60fc82a6..6aeb63f6ef 100644
+index 5dade41243..55af077abc 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -403,6 +403,7 @@ struct MultiFDSendParams {
-     QemuMutex mutex;
-     bool running;
-     bool quit;
-+    bool sync;
- };
- typedef struct MultiFDSendParams MultiFDSendParams;
- 
-@@ -410,6 +411,8 @@ struct {
-     MultiFDSendParams *params;
-     /* number of created threads */
-     int count;
-+    /* syncs main thread and channels */
-+    QemuSemaphore sem_main;
- } *multifd_send_state;
- 
- static void multifd_send_terminate_threads(Error *errp)
-@@ -456,6 +459,7 @@ int multifd_save_cleanup(Error **errp)
-         g_free(p->name);
-         p->name = NULL;
-     }
-+    qemu_sem_destroy(&multifd_send_state->sem_main);
-     g_free(multifd_send_state->params);
-     multifd_send_state->params = NULL;
-     g_free(multifd_send_state);
-@@ -463,19 +467,59 @@ int multifd_save_cleanup(Error **errp)
-     return ret;
+@@ -767,6 +767,9 @@ void multifd_recv_new_channel(QIOChannel *ioc)
+     qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
+                        QEMU_THREAD_JOINABLE);
+     atomic_inc(&multifd_recv_state->count);
++    if (multifd_recv_state->count == migrate_multifd_channels()) {
++        migration_incoming_process();
++    }
  }
  
-+static void multifd_send_sync_main(void)
-+{
-+    int i;
-+
-+    if (!migrate_use_multifd()) {
-+        return;
-+    }
-+    for (i = 0; i < migrate_multifd_channels(); i++) {
-+        MultiFDSendParams *p = &multifd_send_state->params[i];
-+
-+        trace_multifd_send_sync_signal(p->id, p->quit, p->running);
-+
-+        qemu_mutex_lock(&p->mutex);
-+        p->sync = true;
-+        qemu_mutex_unlock(&p->mutex);
-+        qemu_sem_post(&p->sem);
-+    }
-+    for (i = 0; i < migrate_multifd_channels(); i++) {
-+        MultiFDSendParams *p = &multifd_send_state->params[i];
-+        bool wait;
-+
-+        trace_multifd_send_sync_wait(p->id, p->quit, p->running);
-+
-+        qemu_mutex_lock(&p->mutex);
-+        wait = p->running;
-+        qemu_mutex_unlock(&p->mutex);
-+
-+        if (wait) {
-+            qemu_sem_wait(&multifd_send_state->sem_main);
+ /**
+diff --git a/migration/socket.c b/migration/socket.c
+index 7889753fab..55af3b8180 100644
+--- a/migration/socket.c
++++ b/migration/socket.c
+@@ -178,6 +178,9 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
+     if (migration_has_all_channels()) {
+         /* Close listening socket as its no longer needed */
+         qio_channel_close(ioc, NULL);
++        if (!migrate_use_multifd()) {
++            migration_incoming_process();
 +        }
-+    }
-+    trace_multifd_send_sync_main();
-+}
-+
- static void *multifd_send_thread(void *opaque)
- {
-     MultiFDSendParams *p = opaque;
- 
-     while (true) {
-+        qemu_sem_wait(&p->sem);
-         qemu_mutex_lock(&p->mutex);
-+        if (p->sync) {
-+            p->sync = false;
-+            qemu_mutex_unlock(&p->mutex);
-+            qemu_sem_post(&multifd_send_state->sem_main);
-+            continue;
-+        }
-         if (p->quit) {
-             p->running = false;
-             qemu_mutex_unlock(&p->mutex);
-             break;
-         }
-         qemu_mutex_unlock(&p->mutex);
--        qemu_sem_wait(&p->sem);
-     }
- 
-     return NULL;
-@@ -493,6 +537,8 @@ int multifd_save_setup(void)
-     multifd_send_state = g_malloc0(sizeof(*multifd_send_state));
-     multifd_send_state->params = g_new0(MultiFDSendParams, thread_count);
-     atomic_set(&multifd_send_state->count, 0);
-+    qemu_sem_init(&multifd_send_state->sem_main, 0);
-+
-     for (i = 0; i < thread_count; i++) {
-         MultiFDSendParams *p = &multifd_send_state->params[i];
- 
-@@ -507,6 +553,7 @@ int multifd_save_setup(void)
- 
-         atomic_inc(&multifd_send_state->count);
-     }
-+
-     return 0;
- }
- 
-@@ -2283,6 +2330,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
-     ram_control_before_iterate(f, RAM_CONTROL_SETUP);
-     ram_control_after_iterate(f, RAM_CONTROL_SETUP);
- 
-+    multifd_send_sync_main();
-     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
- 
-     return 0;
-@@ -2358,6 +2406,7 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
-      */
-     ram_control_after_iterate(f, RAM_CONTROL_ROUND);
- 
-+    multifd_send_sync_main();
- out:
-     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
-     ram_counters.transferred += 8;
-@@ -2411,6 +2460,7 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
- 
-     rcu_read_unlock();
- 
-+    multifd_send_sync_main();
-     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
- 
-     return 0;
-diff --git a/migration/trace-events b/migration/trace-events
-index 93961dea16..845612c177 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -77,6 +77,9 @@ ram_load_postcopy_loop(uint64_t addr, int flags) "@%" PRIx64 " %x"
- ram_postcopy_send_discard_bitmap(void) ""
- ram_save_page(const char *rbname, uint64_t offset, void *host) "%s: offset: 0x%" PRIx64 " host: %p"
- ram_save_queue_pages(const char *rbname, size_t start, size_t len) "%s: start: 0x%zx len: 0x%zx"
-+multifd_send_sync_main(void) ""
-+multifd_send_sync_signal(uint8_t id, bool quit, bool running) "channel %d quit %d running %d"
-+multifd_send_sync_wait(uint8_t id, bool quit, bool running) "channel %d quit %d running %d"
- 
- # migration/migration.c
- await_return_path_close_on_source_close(void) ""
+         return G_SOURCE_REMOVE;
+     } else {
+         return G_SOURCE_CONTINUE;
 -- 
 2.14.3
