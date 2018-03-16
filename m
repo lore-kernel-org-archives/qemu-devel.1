@@ -1,41 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1ewpK8-0005Sh-4y
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 09:23:09 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ewpMC-0006OL-QD
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 09:25:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1ewpK4-0002Dl-Ub
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 09:23:08 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58196)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1ewpK4-0002CK-Lz
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 09:23:04 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w2GDMGDD028514
-	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 09:23:02 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2grbty7cdp-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 09:23:02 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Fri, 16 Mar 2018 13:22:59 -0000
-References: <1521156300-19296-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1521156300-19296-6-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<4deae7b2-ae8a-f5a9-7979-0dcd20894729@linux.vnet.ibm.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Fri, 16 Mar 2018 14:22:52 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1ewpMB-0002rm-IJ
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 09:25:16 -0400
+Received: from mail-ot0-x22e.google.com ([2607:f8b0:4003:c0f::22e]:35341)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ewpMB-0002rU-70
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 09:25:15 -0400
+Received: by mail-ot0-x22e.google.com with SMTP id r30-v6so10364922otr.2
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 06:25:15 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <4deae7b2-ae8a-f5a9-7979-0dcd20894729@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Message-Id: <d0443435-a2d2-e256-3663-4e591f0e48bf@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 5/7] s390x/vfio: ap: Introduce VFIO AP
- device
+In-Reply-To: <CAFEAcA-6vww4nUWmq1je1xq1HsAcQ08+AD_kccOCPjLTQjG7xw@mail.gmail.com>
+References: <CAFEAcA-6vww4nUWmq1je1xq1HsAcQ08+AD_kccOCPjLTQjG7xw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 16 Mar 2018 13:24:53 +0000
+Message-ID: <CAFEAcA_M5rD_mrkEPwyyaNah=YJvn8QSKiWs6ExKVynB0Whc-Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] tpm-tis-test and tpm-crb-test crash on OSX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,77 +28,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.vnet.ibm.com>, Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: mjrosato@linux.vnet.ibm.com, peter.maydell@linaro.org, alifm@linux.vnet.ibm.com, eskultet@redhat.com, david@redhat.com, cohuck@redhat.com, heiko.carstens@de.ibm.com, alex.williamson@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, jjherne@linux.vnet.ibm.com, schwidefsky@de.ibm.com, pbonzini@redhat.com, bjsdjshi@linux.vnet.ibm.com, eric.auger@redhat.com, rth@twiddle.net
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, "Daniel P. Berrange" <berrange@redhat.com>
+
+On 16 March 2018 at 13:12, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On OSX host, I noticed that tpm-tis-test and tpm-crb-test
+> both crash on OSX, hitting an error_abort case:
+>
+> (lldb) run
+> Process 65115 launched:
+> '/Users/pm215/src/qemu-for-merges/build/all/tests/tpm-tis-test'
+> (x86_64)
+> /i386/tpm-tis/test_check_localities: OK
+> /i386/tpm-tis/test_check_access_reg: OK
+> /i386/tpm-tis/test_check_access_reg_seize: OK
+> /i386/tpm-tis/test_check_access_reg_release: OK
+> /i386/tpm-tis/test_check_transmit: OK
+> Unexpected error in qio_channel_socket_readv() at
+> /Users/pm215/src/qemu-for-merges/io/channel-socket.c:494:
+> Unable to read from socket: Bad file descriptor
+>
+> Here's a backtrace from tpm-tis-test:
+
+Dan suggested a race condition, which prompted me to get an
+all-threads backtrace:
+
+  thread #1: tid = 0xb50f19, 0x00007fff7eb97502
+libsystem_kernel.dylib`__wait4 + 10, queue = 'com.apple.main-thread'
+    frame #0: 0x00007fff7eb97502 libsystem_kernel.dylib`__wait4 + 10
+    frame #1: 0x000000010001b303 tpm-tis-test`qtest_quit [inlined]
+kill_qemu(s=<unavailable>) + 99 at libqtest.c:107
+    frame #2: 0x000000010001b2df
+tpm-tis-test`qtest_quit(s=0x0000000100404c60) + 63 at libqtest.c:280
+    frame #3: 0x0000000100001bd1 tpm-tis-test`main [inlined] qtest_end
++ 9 at libqtest.h:555
+    frame #4: 0x0000000100001bc8 tpm-tis-test`main(argc=<unavailable>,
+argv=<unavailable>) + 520 at tpm-tis-test.c:477
+    frame #5: 0x00007fff7ea47115 libdyld.dylib`start + 1
+    frame #6: 0x00007fff7ea47115 libdyld.dylib`start + 1
+
+  thread #3: tid = 0xb50f4a, 0x00007fff7eb977d2
+libsystem_kernel.dylib`close + 10
+    frame #0: 0x00007fff7eb977d2 libsystem_kernel.dylib`close + 10
+    frame #1: 0x0000000100007def
+tpm-tis-test`qio_channel_socket_close(ioc=<unavailable>,
+errp=0x000000010006c930) + 63 at channel-socket.c:693
+    frame #2: 0x00000001000039f9
+tpm-tis-test`tpm_emu_ctrl_thread(data=0x00007ffeefbff0e8) + 713 at
+tpm-emu.c:128
+    frame #3: 0x00000001001b2ec0 libglib-2.0.0.dylib`g_thread_create_proxy + 191
+    frame #4: 0x00007fff7ecd26c1 libsystem_pthread.dylib`_pthread_body + 340
+    frame #5: 0x00007fff7ecd256d libsystem_pthread.dylib`_pthread_start + 377
+    frame #6: 0x00007fff7ecd1c5d libsystem_pthread.dylib`thread_start + 13
+
+* thread #2: tid = 0xb50f50, 0x00007fff7eb96e3e
+libsystem_kernel.dylib`__pthread_kill + 10
+  * frame #0: 0x00007fff7eb96e3e libsystem_kernel.dylib`__pthread_kill + 10
+    frame #1: 0x00007fff7ecd5150 libsystem_pthread.dylib`pthread_kill + 333
+    frame #2: 0x00007fff7eaf3312 libsystem_c.dylib`abort + 127
+    frame #3: 0x0000000100043431 tpm-tis-test`error_setv [inlined]
+error_handle_fatal(errp=<unavailable>) + 43 at error.c:38
+    frame #4: 0x0000000100043406
+tpm-tis-test`error_setv(errp=<unavailable>, src=<unavailable>,
+line=<unavailable>, func=<unavailable>,
+err_class=ERROR_CLASS_GENERIC_ERROR, fmt=<unavailable>,
+ap=<unavailable>, suffix=<unavailable>) + 246 at error.c:71
+    frame #5: 0x00000001000435db
+tpm-tis-test`error_setg_errno_internal(errp=0x000000010006c930,
+src="/Users/pm215/src/qemu-for-merges/io/channel-socket.c", line=494,
+func="qio_channel_socket_readv", os_errno=<unavailable>, fmt="Unable
+to read from socket") + 219 at error.c:111
+    frame #6: 0x0000000100007ba5
+tpm-tis-test`qio_channel_socket_readv(ioc=<unavailable>,
+iov=<unavailable>, niov=<unavailable>, fds=0x0000000000000000,
+nfds=0x0000000000000000, errp=0x000000010006c930) + 341 at
+channel-socket.c:493
+    frame #7: 0x0000000100004717 tpm-tis-test`qio_channel_read
+[inlined] qio_channel_readv_full(ioc=0x00000001007006b0,
+iov=<unavailable>, niov=1, fds=<unavailable>, nfds=<unavailable>,
+errp=0x000000010006c930) + 62 at channel.c:65
+    frame #8: 0x00000001000046d9
+tpm-tis-test`qio_channel_read(ioc=0x00000001007006b0,
+buf=<unavailable>, buflen=<unavailable>, errp=<unavailable>) + 41 at
+channel.c:216
+    frame #9: 0x0000000100003dd1
+tpm-tis-test`tpm_emu_tpm_thread(data=0x00007ffeefbff0e8) + 241 at
+tpm-emu.c:41
+    frame #10: 0x00000001001b2ec0
+libglib-2.0.0.dylib`g_thread_create_proxy + 191
+    frame #11: 0x00007fff7ecd26c1 libsystem_pthread.dylib`_pthread_body + 340
+    frame #12: 0x00007fff7ecd256d libsystem_pthread.dylib`_pthread_start + 377
+    frame #13: 0x00007fff7ecd1c5d libsystem_pthread.dylib`thread_start + 13
 
 
+My guess is that the problem here is that the tpm_emu_ctrl_thread (thread 3) is
+forcibly closing the channel, which causes the tpm_emu_thread (thread 2)
+to abort because its read returned an error.
 
-On 03/16/2018 11:42 AM, Pierre Morel wrote:
-> On 16/03/2018 00:24, Tony Krowiak wrote:
->> Introduces a VFIO based AP device. The device is defined via
->> the QEMU command line by specifying:
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0 -device vfio-ap,sysfsdev=3D<path-to-mediated-=
-matrix-device>
->>
->> The mediated matrix device is created by the VFIO AP device
->> driver by writing a UUID to a sysfs attribute file (see
->> docs/vfio-ap.txt). The mediated matrix device will be named
->> after the UUID. Symbolic links to the $uuid are created in
->> many places, so the path to the mediated matrix device $uuid
->> can be specified in any of the following ways:
->>
->> /sys/devices/vfio_ap/matrix/$uuid
->> /sys/devices/vfio_ap/matrix/mdev_supported_types/vfio_ap-passthrough/d=
-evices/$uuid
->> /sys/bus/mdev/devices/$uuid
->> /sys/bus/mdev/drivers/vfio_mdev/$uuid
->>
->> When the vfio-ap device is realized, it acquires and opens the
->> VFIO iommu group to which the mediated matrix device is
->> bound. This causes a VFIO group notification event to be
->> signaled. The vfio_ap device driver's group notification
->> handler will get called at which time the device driver
->> will configure the the AP devices to which the guest will
->> be granted access.
->>
->> Signed-off-by: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
->> ---
-[..]
->> +static void vfio_ap_realize(DeviceState *dev, Error **errp)
->> +{
->> +=C2=A0=C2=A0=C2=A0 VFIODevice *vbasedev;
->> +=C2=A0=C2=A0=C2=A0 VFIOGroup *vfio_group;
->> +=C2=A0=C2=A0=C2=A0 APDevice *apdev =3D DO_UPCAST(APDevice, parent_obj=
-, dev);
->> +=C2=A0=C2=A0=C2=A0 VFIOAPDevice *vapdev =3D DO_UPCAST(VFIOAPDevice, a=
-pdev, apdev);
->> +=C2=A0=C2=A0=C2=A0 char *mdevid;
->> +=C2=A0=C2=A0=C2=A0 Error *local_err =3D NULL;
->> +=C2=A0=C2=A0=C2=A0 int ret;
->> +
->> +=C2=A0=C2=A0=C2=A0 if (!s390_has_feat(S390_FEAT_AP)) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(&local_err, "AP=
- support not enabled");
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto out_err;
->> +=C2=A0=C2=A0=C2=A0 }
->> +
->> +=C2=A0=C2=A0=C2=A0 ret =3D kvm_s390_set_interpret_ap(1);
->=20
-> If we have several devices, this is called once per device.
-
-I don't think having several of these in a single vm makes
-any sense. Or does it? IMHO we should make sure there is at
-most one device taking care of the crypto pass-through.
-
-> However it is a general switch for the VM.
-> It looks strange to have this inside the realize callback
->=20
-
-I kind of semi agree.
-
-The previous solution (having this transparent for QEMU) had
-benefits. Why did we move away from that again?
-
-Regards,
-Halil
+thanks
+-- PMM
