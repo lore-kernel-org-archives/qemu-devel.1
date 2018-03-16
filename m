@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ewo0j-00026O-8o
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:59:05 -0400
+	(envelope-from <groug@kaod.org>) id 1ewo9C-0000kl-3m
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 08:07:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ewo0i-0005C9-FT
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 07:59:01 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1521178795-21894-1-git-send-email-thuth@redhat.com>
-	<1521178795-21894-2-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b798372b-ea4c-a305-b4ea-3c669851a0cd@amsat.org>
-Date: Fri, 16 Mar 2018 12:58:45 +0100
+	(envelope-from <groug@kaod.org>) id 1ewo98-00018H-PV
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 08:07:46 -0400
+Received: from 10.mo6.mail-out.ovh.net ([87.98.157.236]:44045)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ewo98-00017u-FJ
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 08:07:42 -0400
+Received: from player771.ha.ovh.net (unknown [10.109.120.199])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id C154B148FB9
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 13:07:40 +0100 (CET)
+From: Greg Kurz <groug@kaod.org>
+Date: Fri, 16 Mar 2018 13:07:29 +0100
+Message-ID: <152120204902.1103.7114773412109402452.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <1521178795-21894-2-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] tests/boot-sector: Add magic bytes
- to s390x boot code header
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v2] virtio_net: flush uncompleted TX on reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +27,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Victor Kaplansky <victork@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org, qemu-s390x@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, R Nageswara Sastry <nasastry@in.ibm.com>
 
-On 03/16/2018 06:39 AM, Thomas Huth wrote:
-> We're going to use the s390x boot code for testing CD-ROM booting.
-> But the ISO loader of the s390-ccw bios is a little bit more picky
-> than the network loader and expects some magic bytes in the header
-> of the file (see linux_s390_magic in pc-bios/s390-ccw/bootmap.c), so
-> we've got to add them in our boot code here, too.
-> 
-> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+If the backend could not transmit a packet right away for some reason,
+the packet is queued for asynchronous sending. The corresponding vq
+element is tracked in the async_tx.elem field of the VirtIONetQueue,
+for later freeing when the transmission is complete.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+If a reset happens before completion, virtio_net_tx_complete() will push
+async_tx.elem back to the guest anyway, and we end up with the inuse flag
+of the vq being equal to -1. The next call to virtqueue_pop() is then
+likely to fail with "Virtqueue size exceeded".
 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/boot-sector.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
-> 
-> diff --git a/tests/boot-sector.c b/tests/boot-sector.c
-> index c373f0e..7824286 100644
-> --- a/tests/boot-sector.c
-> +++ b/tests/boot-sector.c
-> @@ -68,8 +68,11 @@ static uint8_t x86_boot_sector[512] = {
->  };
->  
->  /* For s390x, use a mini "kernel" with the appropriate signature */
-> -static const uint8_t s390x_psw[] = {
-> -    0x00, 0x08, 0x00, 0x00, 0x80, 0x01, 0x00, 0x00
-> +static const uint8_t s390x_psw_and_magic[] = {
-> +    0x00, 0x08, 0x00, 0x00, 0x80, 0x01, 0x00, 0x00,  /* Program status word  */
-> +    0x02, 0x00, 0x00, 0x18, 0x60, 0x00, 0x00, 0x50,  /* Magic:               */
-> +    0x02, 0x00, 0x00, 0x68, 0x60, 0x00, 0x00, 0x50,  /* see linux_s390_magic */
-> +    0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40   /* in the s390-ccw bios */
->  };
->  static const uint8_t s390x_code[] = {
->      0xa7, 0xf4, 0x00, 0x0a,                                /* j 0x10010 */
-> @@ -110,7 +113,7 @@ int boot_sector_init(char *fname)
->      } else if (g_str_equal(arch, "s390x")) {
->          len = 0x10000 + sizeof(s390x_code);
->          boot_code = g_malloc0(len);
-> -        memcpy(boot_code, s390x_psw, sizeof(s390x_psw));
-> +        memcpy(boot_code, s390x_psw_and_magic, sizeof(s390x_psw_and_magic));
->          memcpy(&boot_code[0x10000], s390x_code, sizeof(s390x_code));
->      } else {
->          g_assert_not_reached();
-> 
+This can be reproduced easily by starting a guest with an hubport backend
+that is not connected to a functional network, eg,
+
+ -device virtio-net-pci,netdev=hub0 -netdev hubport,id=hub0,hubid=0
+
+and no other -netdev hubport,hubid=0 on the command line.
+
+The appropriate fix is to ensure that such an asynchronous transmission
+cannot survive a device reset. So for all queues, we first try to send
+the packet again, and eventually we purge it if the backend still could
+not deliver it.
+
+Reported-by: R. Nageswara Sastry <nasastry@in.ibm.com>
+Buglink: https://github.com/open-power-host-os/qemu/issues/37
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Tested-by: R. Nageswara Sastry <nasastry@in.ibm.com>
+---
+v2: - make qemu_flush_or_purge_queued_packets() extern and use it
+    - reworded reproducer paragraph in changelog
+---
+ hw/net/virtio-net.c |    8 ++++++++
+ include/net/net.h   |    1 +
+ net/net.c           |    1 -
+ 3 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 188744e17d57..e5ed35489380 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -422,6 +422,7 @@ static RxFilterInfo *virtio_net_query_rxfilter(NetClientState *nc)
+ static void virtio_net_reset(VirtIODevice *vdev)
+ {
+     VirtIONet *n = VIRTIO_NET(vdev);
++    int i;
+ 
+     /* Reset back to compatibility mode */
+     n->promisc = 1;
+@@ -445,6 +446,13 @@ static void virtio_net_reset(VirtIODevice *vdev)
+     memcpy(&n->mac[0], &n->nic->conf->macaddr, sizeof(n->mac));
+     qemu_format_nic_info_str(qemu_get_queue(n->nic), n->mac);
+     memset(n->vlans, 0, MAX_VLAN >> 3);
++
++    /* Flush any async TX */
++    for (i = 0;  i < n->max_queues; i++) {
++        NetClientState *nc = qemu_get_subqueue(n->nic, i);
++        qemu_flush_or_purge_queued_packets(nc->peer, true);
++        assert(!virtio_net_get_subqueue(nc)->async_tx.elem);
++    }
+ }
+ 
+ static void peer_test_vnet_hdr(VirtIONet *n)
+diff --git a/include/net/net.h b/include/net/net.h
+index a943e968a3dc..1f7341e4592b 100644
+--- a/include/net/net.h
++++ b/include/net/net.h
+@@ -153,6 +153,7 @@ ssize_t qemu_send_packet_async(NetClientState *nc, const uint8_t *buf,
+                                int size, NetPacketSent *sent_cb);
+ void qemu_purge_queued_packets(NetClientState *nc);
+ void qemu_flush_queued_packets(NetClientState *nc);
++void qemu_flush_or_purge_queued_packets(NetClientState *nc, bool purge);
+ void qemu_format_nic_info_str(NetClientState *nc, uint8_t macaddr[6]);
+ bool qemu_has_ufo(NetClientState *nc);
+ bool qemu_has_vnet_hdr(NetClientState *nc);
+diff --git a/net/net.c b/net/net.c
+index 5222e450698c..29f83983e55d 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -595,7 +595,6 @@ void qemu_purge_queued_packets(NetClientState *nc)
+     qemu_net_queue_purge(nc->peer->incoming_queue, nc);
+ }
+ 
+-static
+ void qemu_flush_or_purge_queued_packets(NetClientState *nc, bool purge)
+ {
+     nc->receive_disabled = 0;
