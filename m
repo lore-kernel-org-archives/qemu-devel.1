@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ewvF7-0007Jf-5L
+	(envelope-from <mjc@sifive.com>) id 1ewvF7-0007Jd-4Y
 	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:42:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ewvF5-0003hW-ML
+	(envelope-from <mjc@sifive.com>) id 1ewvF3-0003go-Q4
 	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:42:21 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:36312)
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:39335)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ewvF5-0003hI-GT
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:42:19 -0400
-Received: by mail-pf0-x241.google.com with SMTP id 68so4549905pfx.3
-	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 12:42:19 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ewvF3-0003gW-JX
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:42:17 -0400
+Received: by mail-pg0-x242.google.com with SMTP id e3so4461653pga.6
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 12:42:17 -0700 (PDT)
 From: Michael Clark <mjc@sifive.com>
-Date: Fri, 16 Mar 2018 12:41:00 -0700
-Message-Id: <1521229281-73637-4-git-send-email-mjc@sifive.com>
+Date: Fri, 16 Mar 2018 12:40:58 -0700
+Message-Id: <1521229281-73637-2-git-send-email-mjc@sifive.com>
 In-Reply-To: <1521229281-73637-1-git-send-email-mjc@sifive.com>
 References: <1521229281-73637-1-git-send-email-mjc@sifive.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 03/24] RISC-V: Make virt board description
- match spike
+Subject: [Qemu-devel] [PATCH v3 01/24] RISC-V: Make virt create_fdt
+ interface consistent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,8 +32,14 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>
 
-This makes 'qemu-system-riscv64 -machine help' output more tidy
-and consistent.
+create_fdt sets the fdt variable on RISCVVirtState and this is
+used to access the fdt. This reverts a change introduced in
+https://github.com/riscv/riscv-qemu/pull/109 which introduced
+a redundant return value, overlooking the RISCVVirtState
+structure member that made create_fdt inconsistent with the
+other RISC-V machines. The other alternative is to change
+the other boards to return the fdt. Note: the RISCVVirtState
+also contains fdt_size.
 
 Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
@@ -41,21 +47,60 @@ Signed-off-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/riscv/virt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/riscv/virt.c | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
 
 diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index a402856..0055439 100644
+index e2c214e..37968d2 100644
 --- a/hw/riscv/virt.c
 +++ b/hw/riscv/virt.c
-@@ -404,7 +404,7 @@ static const TypeInfo riscv_virt_board_device = {
- 
- static void riscv_virt_board_machine_init(MachineClass *mc)
- {
--    mc->desc = "RISC-V VirtIO Board (Privileged spec v1.10)";
-+    mc->desc = "RISC-V VirtIO Board (Privileged ISA v1.10)";
-     mc->init = riscv_virt_board_init;
-     mc->max_cpus = 8; /* hardcoded limit in BBL */
+@@ -108,7 +108,7 @@ static hwaddr load_initrd(const char *filename, uint64_t mem_size,
+     return *start + size;
  }
+ 
+-static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
++static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+     uint64_t mem_size, const char *cmdline)
+ {
+     void *fdt;
+@@ -264,8 +264,6 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+     qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", nodename);
+     qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
+     g_free(nodename);
+-
+-    return fdt;
+ }
+ 
+ static void riscv_virt_board_init(MachineState *machine)
+@@ -279,7 +277,6 @@ static void riscv_virt_board_init(MachineState *machine)
+     char *plic_hart_config;
+     size_t plic_hart_config_len;
+     int i;
+-    void *fdt;
+ 
+     /* Initialize SOC */
+     object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
+@@ -299,7 +296,7 @@ static void riscv_virt_board_init(MachineState *machine)
+         main_mem);
+ 
+     /* create device tree */
+-    fdt = create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
++    create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+ 
+     /* boot rom */
+     memory_region_init_ram(boot_rom, NULL, "riscv_virt_board.bootrom",
+@@ -314,9 +311,9 @@ static void riscv_virt_board_init(MachineState *machine)
+             hwaddr end = load_initrd(machine->initrd_filename,
+                                      machine->ram_size, kernel_entry,
+                                      &start);
+-            qemu_fdt_setprop_cell(fdt, "/chosen",
+-                                  "linux,initrd-start", start);
+-            qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-end",
++            qemu_fdt_setprop_cell(s->fdt, "/chosen", "linux,initrd-start",
++                                  start);
++            qemu_fdt_setprop_cell(s->fdt, "/chosen", "linux,initrd-end",
+                                   end);
+         }
+     }
 -- 
 2.7.0
