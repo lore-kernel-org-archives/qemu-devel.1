@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ewmtL-0000vK-DW
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 06:47:20 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ewmzw-0003EH-BC
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 06:54:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ewmtI-00046i-CM
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 06:47:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50460 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ewmtI-00046C-5U
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 06:47:16 -0400
-References: <20171124134644.490-1-otubo@redhat.com>
-	<1d5665fa-f425-25b5-041e-5f226192296c@redhat.com>
-	<20171127084035.GA2718@vader>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <a04427bc-3f63-9eda-dfcb-2702c4e7efcd@redhat.com>
-Date: Fri, 16 Mar 2018 11:46:57 +0100
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ewmzq-0000VE-JF
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 06:54:08 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:36513
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1ewmzq-0000Ru-C7
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 06:54:02 -0400
+References: <20180314080439.4229-1-kraxel@redhat.com>
+	<6d70d198-62d7-fd48-cef5-7b470c249de4@amsat.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <4f2b42d8-30a1-a54f-efc4-c359ab124c40@ilande.co.uk>
+Date: Fri, 16 Mar 2018 10:53:44 +0000
 MIME-Version: 1.0
-In-Reply-To: <20171127084035.GA2718@vader>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv3] dma/i82374: avoid double creation of
- i82374 device
+In-Reply-To: <6d70d198-62d7-fd48-cef5-7b470c249de4@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] gtk: drop pointless code from
+ gd_window_close
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Otubo <otubo@redhat.com>
-Cc: ehabkost@redhat.com, armbru@redhat.com, mjt@tls.msk.ru, agraf@suse.de, qemu-devel@nongnu.org, pbonzini@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 27.11.2017 09:40, Eduardo Otubo wrote:
-> On Fri, Nov 24, 2017 at 06:44:59PM +0100, Thomas Huth wrote:
->>  Hi Eduardo,
->>
->> On 24.11.2017 14:46, Eduardo Otubo wrote:
->>> v3:
->>>  * Removed all unecessary local_err
->>>  * Change return of isa_bus_dma() and DMA_init() from void to int8_t,
->>>    returning -EBUSY on error and 0 on success
->>>  * Added qdev_cleanup_nofail() in case isa_bus_dma() returns error. The
->>>    cleanup looks safe, but please review if I didn't miss any detail
->>>
->>> v2:
->>>  * Removed user_creatable=false and replaced by error handling using
->>>    Error **errp and error_propagate();
->>
->> Version changelog should go below the "---" separator, otherwise it will
->> be included in the git changelog as well, which is kind of ugly.
->>
->>> QEMU fails when used with the following command line:
->>>
->>>     ./ppc64-softmmu/qemu-system-ppc64 -S -machine 40p,accel=tcg -device i82374
->>>     qemu-system-ppc64: hw/isa/isa-bus.c:110: isa_bus_dma: Assertion `!bus->dma[0] && !bus->dma[1]' failed.
->>>     Aborted (core dumped)
->>>
->>> The 40p machine type already created the device i82374. If specified in the
->>> command line, it will try to create it again, hence generating the error. The
->>> function isa_bus_dma() isn't supposed to be called twice for the same bus. One
->>> way to avoid this problem is to set user_creatable=false.
->>
->> You don't do that user_creatable=false here anymore, so please remove it
->> from the description.
->>
->>> A possible fix in a near future would be making
->>> isa_bus_dma()/DMA_init()/i82374_realize() return an error instead of asserting
->>> as well.
->>
->> You should rephrase that sentence as well.
->>
+On 15/03/18 11:35, Philippe Mathieu-Daudé wrote:
+
+> On 03/14/2018 09:04 AM, Gerd Hoffmann wrote:
+>> Unregistering the display change listener looks like a pointless
+>> excercise given we'll exit in a moment.  When exiting qemu via
 > 
-> Well, I think one mistake lead to another here. I've always put the changelog
-> before the --- and that's why the old commit message. For example:
-> 2f668be77501c0232a84aafb6a066c9915987f0e. But I guess on that context it made
-> sense to use the changelog since the commit message was too simplistic. I'm
-> gonna fix this on the v3 then, among other thigs that I need to fix. Thanks for
-> the heads up :)
+> exercise
+> 
+>> menu/file/quit this will not happen either.  Just drop the code.
+>>
+>> Also return TRUE unconditionally.  This will tell gtk to ignore the
+>> close request, so gtk will not start destroying widgets and causing
+>> warnings due to UI code trying to talk to widgets which are gone.
+>> Just depend on qmp_quit() doing it's job instead.
+>>
+>> Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> 
+> Looks fine to me.
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
+> Mark, is your issue resolved? (you might add your Tested-by).
 
- Hi,
+Yes, I can confirm that this patch fixes my test case.
 
-did you ever send a v4? The problem seems still to persist...
+Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
- Thomas
+
+ATB,
+
+Mark.
