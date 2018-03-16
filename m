@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ewvFA-0007LR-4W
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:42:25 -0400
+	(envelope-from <mjc@sifive.com>) id 1ewvFB-0007N5-D7
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:42:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ewvF8-0003jB-Qi
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:42:24 -0400
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:33535)
+	(envelope-from <mjc@sifive.com>) id 1ewvF9-0003jX-Tw
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:42:25 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:39511)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ewvF8-0003iv-Ir
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:42:22 -0400
-Received: by mail-pl0-x242.google.com with SMTP id c11-v6so6503425plo.0
-	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 12:42:22 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ewvF9-0003jN-Lw
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 15:42:23 -0400
+Received: by mail-pl0-x241.google.com with SMTP id k22-v6so5671363pls.6
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 12:42:23 -0700 (PDT)
 From: Michael Clark <mjc@sifive.com>
-Date: Fri, 16 Mar 2018 12:41:03 -0700
-Message-Id: <1521229281-73637-7-git-send-email-mjc@sifive.com>
+Date: Fri, 16 Mar 2018 12:41:04 -0700
+Message-Id: <1521229281-73637-8-git-send-email-mjc@sifive.com>
 In-Reply-To: <1521229281-73637-1-git-send-email-mjc@sifive.com>
 References: <1521229281-73637-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v3 06/24] RISC-V: Mark ROM read-only after
- copying in code
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 07/24] RISC-V: Remove unused class
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,182 +32,274 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>
 
-The sifive_u machine already marks its ROM readonly. This fixes
-the remaining boards.
+Removes a whole lot of unnecessary boilerplate code. Machines
+don't need to be objects. The expansion of the SOC object model
+for the RISC-V machines will happen in the future as SiFive
+plans to add their FE310 and FU540 SOCs to QEMU. However, it
+seems that this present boilerplate is complete unnecessary.
 
 Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/riscv/sifive_u.c      |  9 +++++----
- hw/riscv/spike.c         | 18 ++++++++++--------
- hw/riscv/virt.c          |  7 ++++---
- include/hw/riscv/spike.h |  8 --------
- 4 files changed, 19 insertions(+), 23 deletions(-)
+ hw/riscv/riscv_hart.c       |  6 ------
+ hw/riscv/sifive_e.c         | 25 -------------------------
+ hw/riscv/sifive_u.c         | 25 -------------------------
+ hw/riscv/spike.c            | 20 --------------------
+ hw/riscv/virt.c             | 25 -------------------------
+ include/hw/riscv/sifive_e.h |  5 -----
+ include/hw/riscv/sifive_u.h |  5 -----
+ include/hw/riscv/spike.h    |  7 ++++---
+ include/hw/riscv/virt.h     |  5 -----
+ 9 files changed, 4 insertions(+), 119 deletions(-)
 
+diff --git a/hw/riscv/riscv_hart.c b/hw/riscv/riscv_hart.c
+index 14e3c18..75ba7ed 100644
+--- a/hw/riscv/riscv_hart.c
++++ b/hw/riscv/riscv_hart.c
+@@ -68,16 +68,10 @@ static void riscv_harts_class_init(ObjectClass *klass, void *data)
+     dc->realize = riscv_harts_realize;
+ }
+ 
+-static void riscv_harts_init(Object *obj)
+-{
+-    /* RISCVHartArrayState *s = SIFIVE_COREPLEX(obj); */
+-}
+-
+ static const TypeInfo riscv_harts_info = {
+     .name          = TYPE_RISCV_HART_ARRAY,
+     .parent        = TYPE_SYS_BUS_DEVICE,
+     .instance_size = sizeof(RISCVHartArrayState),
+-    .instance_init = riscv_harts_init,
+     .class_init    = riscv_harts_class_init,
+ };
+ 
+diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+index 09c9d49..4872b68 100644
+--- a/hw/riscv/sifive_e.c
++++ b/hw/riscv/sifive_e.c
+@@ -194,24 +194,6 @@ static void riscv_sifive_e_init(MachineState *machine)
+     }
+ }
+ 
+-static int riscv_sifive_e_sysbus_device_init(SysBusDevice *sysbusdev)
+-{
+-    return 0;
+-}
+-
+-static void riscv_sifive_e_class_init(ObjectClass *klass, void *data)
+-{
+-    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
+-    k->init = riscv_sifive_e_sysbus_device_init;
+-}
+-
+-static const TypeInfo riscv_sifive_e_device = {
+-    .name          = TYPE_SIFIVE_E,
+-    .parent        = TYPE_SYS_BUS_DEVICE,
+-    .instance_size = sizeof(SiFiveEState),
+-    .class_init    = riscv_sifive_e_class_init,
+-};
+-
+ static void riscv_sifive_e_machine_init(MachineClass *mc)
+ {
+     mc->desc = "RISC-V Board compatible with SiFive E SDK";
+@@ -220,10 +202,3 @@ static void riscv_sifive_e_machine_init(MachineClass *mc)
+ }
+ 
+ DEFINE_MACHINE("sifive_e", riscv_sifive_e_machine_init)
+-
+-static void riscv_sifive_e_register_types(void)
+-{
+-    type_register_static(&riscv_sifive_e_device);
+-}
+-
+-type_init(riscv_sifive_e_register_types);
 diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 6116c38..25df16c 100644
+index 25df16c..083043a 100644
 --- a/hw/riscv/sifive_u.c
 +++ b/hw/riscv/sifive_u.c
-@@ -223,7 +223,7 @@ static void riscv_sifive_u_init(MachineState *machine)
-     SiFiveUState *s = g_new0(SiFiveUState, 1);
-     MemoryRegion *sys_memory = get_system_memory();
-     MemoryRegion *main_mem = g_new(MemoryRegion, 1);
--    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
-+    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+@@ -302,31 +302,6 @@ static void riscv_sifive_u_init(MachineState *machine)
+         SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
+ }
  
-     /* Initialize SOC */
-     object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
-@@ -246,10 +246,10 @@ static void riscv_sifive_u_init(MachineState *machine)
-     create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
- 
-     /* boot rom */
--    memory_region_init_ram(boot_rom, NULL, "riscv.sifive.u.mrom",
-+    memory_region_init_ram(mask_rom, NULL, "riscv.sifive.u.mrom",
-                            memmap[SIFIVE_U_MROM].base, &error_fatal);
--    memory_region_set_readonly(boot_rom, true);
--    memory_region_add_subregion(sys_memory, 0x0, boot_rom);
-+    memory_region_set_readonly(mask_rom, true);
-+    memory_region_add_subregion(sys_memory, 0x0, mask_rom);
- 
-     if (machine->kernel_filename) {
-         load_kernel(machine->kernel_filename);
-@@ -279,6 +279,7 @@ static void riscv_sifive_u_init(MachineState *machine)
-     qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
-     cpu_physical_memory_write(memmap[SIFIVE_U_MROM].base +
-         sizeof(reset_vec), s->fdt, s->fdt_size);
-+    memory_region_set_readonly(mask_rom, true);
- 
-     /* MMIO */
-     s->plic = sifive_plic_create(memmap[SIFIVE_U_PLIC].base,
+-static int riscv_sifive_u_sysbus_device_init(SysBusDevice *sysbusdev)
+-{
+-    return 0;
+-}
+-
+-static void riscv_sifive_u_class_init(ObjectClass *klass, void *data)
+-{
+-    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
+-    k->init = riscv_sifive_u_sysbus_device_init;
+-}
+-
+-static const TypeInfo riscv_sifive_u_device = {
+-    .name          = TYPE_SIFIVE_U,
+-    .parent        = TYPE_SYS_BUS_DEVICE,
+-    .instance_size = sizeof(SiFiveUState),
+-    .class_init    = riscv_sifive_u_class_init,
+-};
+-
+-static void riscv_sifive_u_register_types(void)
+-{
+-    type_register_static(&riscv_sifive_u_device);
+-}
+-
+-type_init(riscv_sifive_u_register_types);
+-
+ static void riscv_sifive_u_machine_init(MachineClass *mc)
+ {
+     mc->desc = "RISC-V Board compatible with SiFive U SDK";
 diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-index 7710333..74edf33 100644
+index 74edf33..64e585e 100644
 --- a/hw/riscv/spike.c
 +++ b/hw/riscv/spike.c
-@@ -173,7 +173,7 @@ static void spike_v1_10_0_board_init(MachineState *machine)
-     SpikeState *s = g_new0(SpikeState, 1);
-     MemoryRegion *system_memory = get_system_memory();
-     MemoryRegion *main_mem = g_new(MemoryRegion, 1);
--    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
-+    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+@@ -336,18 +336,6 @@ static void spike_v1_09_1_board_init(MachineState *machine)
+         smp_cpus, SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
+ }
  
-     /* Initialize SOC */
-     object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
-@@ -196,9 +196,9 @@ static void spike_v1_10_0_board_init(MachineState *machine)
-     create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+-static const TypeInfo spike_v_1_09_1_device = {
+-    .name          = TYPE_RISCV_SPIKE_V1_09_1_BOARD,
+-    .parent        = TYPE_SYS_BUS_DEVICE,
+-    .instance_size = sizeof(SpikeState),
+-};
+-
+-static const TypeInfo spike_v_1_10_0_device = {
+-    .name          = TYPE_RISCV_SPIKE_V1_10_0_BOARD,
+-    .parent        = TYPE_SYS_BUS_DEVICE,
+-    .instance_size = sizeof(SpikeState),
+-};
+-
+ static void spike_v1_09_1_machine_init(MachineClass *mc)
+ {
+     mc->desc = "RISC-V Spike Board (Privileged ISA v1.9.1)";
+@@ -365,11 +353,3 @@ static void spike_v1_10_0_machine_init(MachineClass *mc)
  
-     /* boot rom */
--    memory_region_init_ram(boot_rom, NULL, "riscv.spike.bootrom",
-+    memory_region_init_ram(mask_rom, NULL, "riscv.spike.mrom",
-                            s->fdt_size + 0x2000, &error_fatal);
--    memory_region_add_subregion(system_memory, 0x0, boot_rom);
-+    memory_region_add_subregion(system_memory, 0x0, mask_rom);
- 
-     if (machine->kernel_filename) {
-         load_kernel(machine->kernel_filename);
-@@ -228,9 +228,10 @@ static void spike_v1_10_0_board_init(MachineState *machine)
-     qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
-     cpu_physical_memory_write(memmap[SPIKE_MROM].base + sizeof(reset_vec),
-         s->fdt, s->fdt_size);
-+    memory_region_set_readonly(mask_rom, true);
- 
-     /* initialize HTIF using symbols found in load_kernel */
--    htif_mm_init(system_memory, boot_rom, &s->soc.harts[0].env, serial_hds[0]);
-+    htif_mm_init(system_memory, mask_rom, &s->soc.harts[0].env, serial_hds[0]);
- 
-     /* Core Local Interruptor (timer and IPI) */
-     sifive_clint_create(memmap[SPIKE_CLINT].base, memmap[SPIKE_CLINT].size,
-@@ -244,7 +245,7 @@ static void spike_v1_09_1_board_init(MachineState *machine)
-     SpikeState *s = g_new0(SpikeState, 1);
-     MemoryRegion *system_memory = get_system_memory();
-     MemoryRegion *main_mem = g_new(MemoryRegion, 1);
--    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
-+    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
- 
-     /* Initialize SOC */
-     object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
-@@ -264,9 +265,9 @@ static void spike_v1_09_1_board_init(MachineState *machine)
-         main_mem);
- 
-     /* boot rom */
--    memory_region_init_ram(boot_rom, NULL, "riscv.spike.bootrom",
-+    memory_region_init_ram(mask_rom, NULL, "riscv.spike.mrom",
-                            0x40000, &error_fatal);
--    memory_region_add_subregion(system_memory, 0x0, boot_rom);
-+    memory_region_add_subregion(system_memory, 0x0, mask_rom);
- 
-     if (machine->kernel_filename) {
-         load_kernel(machine->kernel_filename);
-@@ -325,9 +326,10 @@ static void spike_v1_09_1_board_init(MachineState *machine)
-     /* copy in the config string */
-     cpu_physical_memory_write(memmap[SPIKE_MROM].base + sizeof(reset_vec),
-         config_string, config_string_len);
-+    memory_region_set_readonly(mask_rom, true);
- 
-     /* initialize HTIF using symbols found in load_kernel */
--    htif_mm_init(system_memory, boot_rom, &s->soc.harts[0].env, serial_hds[0]);
-+    htif_mm_init(system_memory, mask_rom, &s->soc.harts[0].env, serial_hds[0]);
- 
-     /* Core Local Interruptor (timer and IPI) */
-     sifive_clint_create(memmap[SPIKE_CLINT].base, memmap[SPIKE_CLINT].size,
+ DEFINE_MACHINE("spike_v1.9.1", spike_v1_09_1_machine_init)
+ DEFINE_MACHINE("spike_v1.10", spike_v1_10_0_machine_init)
+-
+-static void riscv_spike_board_register_types(void)
+-{
+-    type_register_static(&spike_v_1_09_1_device);
+-    type_register_static(&spike_v_1_10_0_device);
+-}
+-
+-type_init(riscv_spike_board_register_types);
 diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index f8c19b4..f1e3641 100644
+index f1e3641..5913100 100644
 --- a/hw/riscv/virt.c
 +++ b/hw/riscv/virt.c
-@@ -270,7 +270,7 @@ static void riscv_virt_board_init(MachineState *machine)
-     RISCVVirtState *s = g_new0(RISCVVirtState, 1);
-     MemoryRegion *system_memory = get_system_memory();
-     MemoryRegion *main_mem = g_new(MemoryRegion, 1);
--    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
-+    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
-     char *plic_hart_config;
-     size_t plic_hart_config_len;
-     int i;
-@@ -296,9 +296,9 @@ static void riscv_virt_board_init(MachineState *machine)
-     create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+@@ -380,24 +380,6 @@ static void riscv_virt_board_init(MachineState *machine)
+         serial_hds[0], DEVICE_LITTLE_ENDIAN);
+ }
  
-     /* boot rom */
--    memory_region_init_ram(boot_rom, NULL, "riscv_virt_board.bootrom",
-+    memory_region_init_ram(mask_rom, NULL, "riscv_virt_board.mrom",
-                            s->fdt_size + 0x2000, &error_fatal);
--    memory_region_add_subregion(system_memory, 0x0, boot_rom);
-+    memory_region_add_subregion(system_memory, 0x0, mask_rom);
+-static int riscv_virt_board_sysbus_device_init(SysBusDevice *sysbusdev)
+-{
+-    return 0;
+-}
+-
+-static void riscv_virt_board_class_init(ObjectClass *klass, void *data)
+-{
+-    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
+-    k->init = riscv_virt_board_sysbus_device_init;
+-}
+-
+-static const TypeInfo riscv_virt_board_device = {
+-    .name          = TYPE_RISCV_VIRT_BOARD,
+-    .parent        = TYPE_SYS_BUS_DEVICE,
+-    .instance_size = sizeof(RISCVVirtState),
+-    .class_init    = riscv_virt_board_class_init,
+-};
+-
+ static void riscv_virt_board_machine_init(MachineClass *mc)
+ {
+     mc->desc = "RISC-V VirtIO Board (Privileged ISA v1.10)";
+@@ -406,10 +388,3 @@ static void riscv_virt_board_machine_init(MachineClass *mc)
+ }
  
-     if (machine->kernel_filename) {
-         uint64_t kernel_entry = load_kernel(machine->kernel_filename);
-@@ -339,6 +339,7 @@ static void riscv_virt_board_init(MachineState *machine)
-     qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
-     cpu_physical_memory_write(memmap[VIRT_MROM].base + sizeof(reset_vec),
-         s->fdt, s->fdt_size);
-+    memory_region_set_readonly(mask_rom, true);
+ DEFINE_MACHINE("virt", riscv_virt_board_machine_init)
+-
+-static void riscv_virt_board_register_types(void)
+-{
+-    type_register_static(&riscv_virt_board_device);
+-}
+-
+-type_init(riscv_virt_board_register_types);
+diff --git a/include/hw/riscv/sifive_e.h b/include/hw/riscv/sifive_e.h
+index 0aebc57..12ad6d2 100644
+--- a/include/hw/riscv/sifive_e.h
++++ b/include/hw/riscv/sifive_e.h
+@@ -19,11 +19,6 @@
+ #ifndef HW_SIFIVE_E_H
+ #define HW_SIFIVE_E_H
  
-     /* create PLIC hart topology configuration string */
-     plic_hart_config_len = (strlen(VIRT_PLIC_HART_CONFIG) + 1) * smp_cpus;
+-#define TYPE_SIFIVE_E "riscv.sifive_e"
+-
+-#define SIFIVE_E(obj) \
+-    OBJECT_CHECK(SiFiveEState, (obj), TYPE_SIFIVE_E)
+-
+ typedef struct SiFiveEState {
+     /*< private >*/
+     SysBusDevice parent_obj;
+diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+index be38aa0..94a3905 100644
+--- a/include/hw/riscv/sifive_u.h
++++ b/include/hw/riscv/sifive_u.h
+@@ -19,11 +19,6 @@
+ #ifndef HW_SIFIVE_U_H
+ #define HW_SIFIVE_U_H
+ 
+-#define TYPE_SIFIVE_U "riscv.sifive_u"
+-
+-#define SIFIVE_U(obj) \
+-    OBJECT_CHECK(SiFiveUState, (obj), TYPE_SIFIVE_U)
+-
+ typedef struct SiFiveUState {
+     /*< private >*/
+     SysBusDevice parent_obj;
 diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
-index d85a64e..179b6cf 100644
+index 179b6cf..8410430 100644
 --- a/include/hw/riscv/spike.h
 +++ b/include/hw/riscv/spike.h
-@@ -22,20 +22,12 @@
- #define TYPE_RISCV_SPIKE_V1_09_1_BOARD "riscv.spike_v1_9_1"
- #define TYPE_RISCV_SPIKE_V1_10_0_BOARD "riscv.spike_v1_10"
+@@ -19,10 +19,11 @@
+ #ifndef HW_SPIKE_H
+ #define HW_SPIKE_H
  
--#define SPIKE(obj) \
--    OBJECT_CHECK(SpikeState, (obj), TYPE_RISCV_SPIKE_BOARD)
+-#define TYPE_RISCV_SPIKE_V1_09_1_BOARD "riscv.spike_v1_9_1"
+-#define TYPE_RISCV_SPIKE_V1_10_0_BOARD "riscv.spike_v1_10"
 -
  typedef struct {
--    /*< private >*/
--    SysBusDevice parent_obj;
--
--    /*< public >*/
++    /*< private >*/
++    SysBusDevice parent_obj;
++
++    /*< public >*/
      RISCVHartArrayState soc;
      void *fdt;
      int fdt_size;
- } SpikeState;
+diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
+index 655e85d..b91a412 100644
+--- a/include/hw/riscv/virt.h
++++ b/include/hw/riscv/virt.h
+@@ -19,10 +19,6 @@
+ #ifndef HW_VIRT_H
+ #define HW_VIRT_H
+ 
+-#define TYPE_RISCV_VIRT_BOARD "riscv.virt"
+-#define VIRT(obj) \
+-    OBJECT_CHECK(RISCVVirtState, (obj), TYPE_RISCV_VIRT_BOARD)
+-
+ typedef struct {
+     /*< private >*/
+     SysBusDevice parent_obj;
+@@ -45,7 +41,6 @@ enum {
+     VIRT_DRAM
+ };
  
 -
  enum {
-     SPIKE_MROM,
-     SPIKE_CLINT,
+     UART0_IRQ = 10,
+     VIRTIO_IRQ = 1, /* 1 to 8 */
 -- 
 2.7.0
