@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ewkxe-0007JU-KD
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 04:43:39 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1ewl6d-0000c3-3Q
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 04:52:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ewkxb-0005e2-Er
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 04:43:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47212 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ewkxb-0005cp-AC
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 04:43:35 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 92417402277A
-	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 08:43:22 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180316030722.GA2477@xz-mi> (Peter Xu's message of "Fri, 16 Mar
-	2018 11:07:22 +0800")
-References: <20180307110010.2205-1-quintela@redhat.com>
-	<20180307110010.2205-20-quintela@redhat.com>
-	<20180312091913.GG5234@xz-mi> <878tata431.fsf@secure.mitica>
-	<20180316030722.GA2477@xz-mi>
-Reply-To: quintela@redhat.com
-Date: Fri, 16 Mar 2018 09:43:46 +0100
-Message-ID: <87muz8s94t.fsf@secure.laptop>
+	(envelope-from <guangrong.xiao@gmail.com>) id 1ewl6Y-0004kB-8R
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 04:52:55 -0400
+Received: from mail-it0-x235.google.com ([2607:f8b0:4001:c0b::235]:34474)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1ewl6Y-0004jr-28
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 04:52:50 -0400
+Received: by mail-it0-x235.google.com with SMTP id z7-v6so1412998iti.1
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 01:52:49 -0700 (PDT)
+References: <20180313075739.11194-1-xiaoguangrong@tencent.com>
+	<20180313075739.11194-5-xiaoguangrong@tencent.com>
+	<20180315113759.GD3062@work-vm>
+From: Xiao Guangrong <guangrong.xiao@gmail.com>
+Message-ID: <7c48472f-d2b9-5b69-c427-c8f96ff71f9f@gmail.com>
+Date: Fri, 16 Mar 2018 16:52:40 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v10 19/24] migration: Create multifd
- channels
+In-Reply-To: <20180315113759.GD3062@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/8] migration: introduce
+ control_save_page()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,69 +33,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, quintela@redhat.com
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
 
-Peter Xu <peterx@redhat.com> wrote:
-> On Thu, Mar 15, 2018 at 01:57:54PM +0100, Juan Quintela wrote:
->> Peter Xu <peterx@redhat.com> wrote:
->> > On Wed, Mar 07, 2018 at 12:00:05PM +0100, Juan Quintela wrote:
->> >> In both sides.  We still don't transmit anything through them.
->> >
->> > s/In/On/?
 
->> >> +static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
->> >> +{
->> >> +    MultiFDSendParams *p = opaque;
->> >> +    QIOChannel *sioc = QIO_CHANNEL(qio_task_get_source(task));
->> >> +    Error *local_err = NULL;
->> >> +
->> >> +    if (qio_task_propagate_error(task, &local_err)) {
->> >> +        if (multifd_save_cleanup(&local_err) != 0) {
->> >
->> > Do we need to call multifd_save_cleanup() explicitly here?
->> 
->> Is the easiest way of stoping all multifd threads, no?
->
-> Yeah, but again, I thought it would be called later too, since...
 
-But we are not stopping the threads.  Only if you preffer to call there
-terminate_multifd_send_threads().  Probably it is better to call
-terminate_multifd_send_threads(), it is what we do on the rest of
-errors.
+On 03/15/2018 07:37 PM, Dr. David Alan Gilbert wrote:
+> * guangrong.xiao@gmail.com (guangrong.xiao@gmail.com) wrote:
+>> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+>>
+>> Abstract the common function control_save_page() to cleanup the code,
+>> no logic is changed
+>>
+>> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+> 
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> 
 
-Changing it.
+Thank you, Dave!
 
->> > Asked since I saw that it would also be called in migrate_fd_cleanup(),
->> > and it seems that we should call migrate_fd_cleanup() soon too when
->> > this happens?
->> 
->> We need to stop migraiton. thtat migrate_set_error() is only used for
->> reporting in info migrate, it is not acted upon.
->> 
->> Yes, perhaps it should, but as it is, it is not.  So, I think it is
->> right O:-)
->
-> ... after Dave's 688a3dcba9 ("migration: Route errors down through
-> migration_channel_connect", 2018-02-06), all these channel errors
-> should finally be routed to migrate_fd_connect(), and in that we have:
->
-> void migrate_fd_connect(MigrationState *s, Error *error_in)
-> {
->     s->expected_downtime = s->parameters.downtime_limit;
->     s->cleanup_bh = qemu_bh_new(migrate_fd_cleanup, s);
->     if (error_in) {
->         migrate_fd_error(s, error_in);
->         migrate_fd_cleanup(s);
->         return;
->     }
->     ...
-> }
->
-> Then, in migrate_fd_cleanup() we have multifd_save_cleanup().  That's
-> why I thought we can skip the cleanup here since after all we'll do it
-> in other places (and we can keep the cleanup code unified).
+>>   
+>> +/*
+>> + * @pages: the number of pages written by the control path,
+>> + *        < 0 - error
+>> + *        > 0 - number of pages written
+> 
+> What about 0 !
+> 
 
-Ok, it is better, changing to terminate_multifd_send_threads.
+The control patch does not support 0 (means duplication). :)
 
-Thanks, Juan.
+Based on the implementation of qemu_rdma_save_page(), if any data
+is properly posted out, @bytes_sent is set to 1, otherwise a error
+is detected...
