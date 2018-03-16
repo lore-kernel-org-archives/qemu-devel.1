@@ -1,20 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ewwRD-0001MN-JT
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 16:58:57 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ewxBX-00035V-6m
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 17:46:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ewwRA-00063t-FQ
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 16:58:55 -0400
-Resent-Message-Id: <E1ewwRA-00063t-FQ@eggs.gnu.org>
-In-Reply-To: <1521232280-13089-1-git-send-email-alindsay@codeaurora.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152123390250.78.14000079057958081515@71c20359a636>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ewxBU-0003V3-2K
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 17:46:47 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38634
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1ewxBT-0003Ty-Sp
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 17:46:43 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w2GLio3V073814
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 17:46:42 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2grhf09vt9-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 17:46:42 -0400
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Fri, 16 Mar 2018 15:46:41 -0600
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Fri, 16 Mar 2018 17:46:32 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 16 Mar 2018 13:58:23 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 00/22] More fully implement ARM PMUv3
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <1521236796-24551-1-git-send-email-stefanb@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 for 2.13 0/4] tpm: Extend TPM with state
+ migration support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,99 +40,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alindsay@codeaurora.org
-Cc: famz@redhat.com, qemu-arm@nongnu.org, peter.maydell@linaro.org, alistair.francis@xilinx.com, wei@redhat.com, crosthwaite.peter@gmail.com, mspradli@codeaurora.org, qemu-devel@nongnu.org, digantd@codeaurora.org
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, marcandre.lureau@gmail.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MjEyMzIyODAtMTMwODktMS1naXQtc2VuZC1lbWFpbC1hbGluZHNheUBjb2Rl
-YXVyb3JhLm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAwLzIyXSBNb3JlIGZ1
-bGx5IGltcGxlbWVudCBBUk0gUE1VdjMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
-L2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwg
-d2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1y
-ZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5n
-IFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAg
-aWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
-IC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkK
-ICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09
-CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20g
-aHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAg
-ICAgICAgICAgIHBhdGNoZXcvMTUyMTIzMjI4MC0xMzA4OS0xLWdpdC1zZW5kLWVtYWlsLWFsaW5k
-c2F5QGNvZGVhdXJvcmEub3JnIC0+IHBhdGNoZXcvMTUyMTIzMjI4MC0xMzA4OS0xLWdpdC1zZW5k
-LWVtYWlsLWFsaW5kc2F5QGNvZGVhdXJvcmEub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
-dGVzdCcKZDgxNzkxYjE4NCB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgUE1TV0lOQwo1MTIxMjRkMDE4
-IHRhcmdldC9hcm06IFBNVTogU2V0IFBNQ1IuTiB0byA0CmI3NDhlOTczMDYgdGFyZ2V0L2FybTog
-UE1VOiBBZGQgaW5zdHJ1Y3Rpb24gYW5kIGN5Y2xlIGV2ZW50cwo3ZTQ2YTc3Zjg5IHRhcmdldC9h
-cm06IEZpbmlzaCBpbXBsZW1lbnRhdGlvbiBvZiBQTVtYXUVWQ05UUiBhbmQgUE1bWF1FVlRZUEVS
-CjgyY2ZmZWY4NTUgdGFyZ2V0L2FybTogQWRkIGFycmF5IGZvciBzdXBwb3J0ZWQgUE1VIGV2ZW50
-cywgZ2VuZXJhdGUgUE1DRUlEWzAxXQpkNjM1MDIxZDBhIHRhcmdldC9hcm06IFNwbGl0IGFybV9j
-Y250X2VuYWJsZWQgaW50byBnZW5lcmljIHBtdV9jb3VudGVyX2VuYWJsZWQKM2UxYjQzOGRlYiB0
-YXJnZXQvYXJtOiBJbXBsZW1lbnQgUE1PVlNTRVQKYzEzYzgzMjk4OCB0YXJnZXQvYXJtOiBBZGQg
-QVJNX0ZFQVRVUkVfVjdWRSBmb3IgdjcgVmlydHVhbGl6YXRpb24gRXh0ZW5zaW9ucwo5YzgwYWY0
-ZDgyIHRhcmdldC9hcm06IE1ha2UgUE1PVlNDTFIgNjQgYml0cyB3aWRlCjhmZmJjZDNkZDggdGFy
-Z2V0L2FybTogQWxsb3cgQUFyY2gzMiBhY2Nlc3MgZm9yIFBNQ0NGSUxUUgo3ZGM0ZWM5NzE1IHRh
-cmdldC9hcm06IEZpbHRlciBjeWNsZSBjb3VudGVyIGJhc2VkIG9uIFBNQ0NGSUxUUl9FTDAKZjFl
-NDBmOWZmZiB0YXJnZXQvYXJtOiBGaXggYml0bWFzayBmb3IgUE1DQ0ZJTFRSIHdyaXRlcwplYjE0
-MmI0MmI0IHRhcmdldC9hcm06IEFsbG93IEVMIGNoYW5nZSBob29rcyB0byBkbyBJTwpkMzcxODZh
-YmRkIHRhcmdldC9hcm06IEFkZCBwcmUtRUwgY2hhbmdlIGhvb2tzCmFlMTJlMTYxZGEgdGFyZ2V0
-L2FybTogU3VwcG9ydCBtdWx0aXBsZSBFTCBjaGFuZ2UgaG9va3MKOWJmYTk5ODA1ZCB0YXJnZXQv
-YXJtOiBGZXRjaCBHSUN2MyBzdGF0ZSBkaXJlY3RseSBmcm9tIENQVUFSTVN0YXRlCjg4MWJlZTVl
-OTYgdGFyZ2V0L2FybTogTWFzayBQTVUgcmVnaXN0ZXIgd3JpdGVzIGJhc2VkIG9uIFBNQ1JfRUww
-Lk4KODkwYWQ2NDcyYiB0YXJnZXQvYXJtOiBSZW9yZ2FuaXplIFBNQ0NOVFIgcmVhZCwgd3JpdGUs
-IHN5bmMKOTIyZWVjMDIzYiB0YXJnZXQvYXJtOiBUcmVhdCBQTUNDTlRSIGFzIGFsaWFzIG9mIFBN
-Q0NOVFJfRUwwCjViMWNlMzNjMGIgdGFyZ2V0L2FybTogQ2hlY2sgUE1DTlRFTiBmb3Igd2hldGhl
-ciBQTUNDTlRSIGlzIGVuYWJsZWQKMmVjYjA5YWUwNCB0YXJnZXQvYXJtOiBBMTUgUE1DRUlEMCBp
-bml0aWFsaXphdGlvbiBzdHlsZSBuaXQKMGYyNmExNTY4YSB0YXJnZXQvYXJtOiBBNTM6IEluaXRp
-YWxpemUgUE1DRUlEWzAxXQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8y
-MjogdGFyZ2V0L2FybTogQTUzOiBJbml0aWFsaXplIFBNQ0VJRFswMV0uLi4KQ2hlY2tpbmcgUEFU
-Q0ggMi8yMjogdGFyZ2V0L2FybTogQTE1IFBNQ0VJRDAgaW5pdGlhbGl6YXRpb24gc3R5bGUgbml0
-Li4uCkNoZWNraW5nIFBBVENIIDMvMjI6IHRhcmdldC9hcm06IENoZWNrIFBNQ05URU4gZm9yIHdo
-ZXRoZXIgUE1DQ05UUiBpcyBlbmFibGVkLi4uCkNoZWNraW5nIFBBVENIIDQvMjI6IHRhcmdldC9h
-cm06IFRyZWF0IFBNQ0NOVFIgYXMgYWxpYXMgb2YgUE1DQ05UUl9FTDAuLi4KQ2hlY2tpbmcgUEFU
-Q0ggNS8yMjogdGFyZ2V0L2FybTogUmVvcmdhbml6ZSBQTUNDTlRSIHJlYWQsIHdyaXRlLCBzeW5j
-Li4uCkNoZWNraW5nIFBBVENIIDYvMjI6IHRhcmdldC9hcm06IE1hc2sgUE1VIHJlZ2lzdGVyIHdy
-aXRlcyBiYXNlZCBvbiBQTUNSX0VMMC5OLi4uCkNoZWNraW5nIFBBVENIIDcvMjI6IHRhcmdldC9h
-cm06IEZldGNoIEdJQ3YzIHN0YXRlIGRpcmVjdGx5IGZyb20gQ1BVQVJNU3RhdGUuLi4KQ2hlY2tp
-bmcgUEFUQ0ggOC8yMjogdGFyZ2V0L2FybTogU3VwcG9ydCBtdWx0aXBsZSBFTCBjaGFuZ2UgaG9v
-a3MuLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBv
-cGVuIHBhcmVudGhlc2lzICcoJwojMjY6IEZJTEU6IHRhcmdldC9hcm0vY3B1LmM6NjI6CisgICAg
-ZW50cnkgPSBnX21hbGxvYzAoc2l6ZW9mICgqZW50cnkpKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3
-YXJuaW5ncywgODcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggOS8yMjogdGFyZ2V0L2FybTogQWRkIHByZS1FTCBjaGFu
-Z2UgaG9va3MuLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1l
-IGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMjY6IEZJTEU6IHRhcmdldC9hcm0vY3B1LmM6NjI6
-CisgICAgZW50cnkgPSBnX21hbGxvYzAoc2l6ZW9mICgqZW50cnkpKTsKCnRvdGFsOiAxIGVycm9y
-cywgMCB3YXJuaW5ncywgMTEwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDEwLzIyOiB0YXJnZXQvYXJtOiBBbGxvdyBF
-TCBjaGFuZ2UgaG9va3MgdG8gZG8gSU8uLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMjI6IHRhcmdldC9h
-cm06IEZpeCBiaXRtYXNrIGZvciBQTUNDRklMVFIgd3JpdGVzLi4uCkNoZWNraW5nIFBBVENIIDEy
-LzIyOiB0YXJnZXQvYXJtOiBGaWx0ZXIgY3ljbGUgY291bnRlciBiYXNlZCBvbiBQTUNDRklMVFJf
-RUwwLi4uCkNoZWNraW5nIFBBVENIIDEzLzIyOiB0YXJnZXQvYXJtOiBBbGxvdyBBQXJjaDMyIGFj
-Y2VzcyBmb3IgUE1DQ0ZJTFRSLi4uCkNoZWNraW5nIFBBVENIIDE0LzIyOiB0YXJnZXQvYXJtOiBN
-YWtlIFBNT1ZTQ0xSIDY0IGJpdHMgd2lkZS4uLgpDaGVja2luZyBQQVRDSCAxNS8yMjogdGFyZ2V0
-L2FybTogQWRkIEFSTV9GRUFUVVJFX1Y3VkUgZm9yIHY3IFZpcnR1YWxpemF0aW9uIEV4dGVuc2lv
-bnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTYvMjI6IHRhcmdldC9hcm06IEltcGxlbWVudCBQTU9WU1NF
-VC4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzk6IEZJTEU6IHRhcmdldC9h
-cm0vaGVscGVyLmM6MTQxNzoKKyAgICAgIC5hY2Nlc3MgPSBQTDBfUlcsIC5maWVsZG9mZnNldCA9
-IG9mZnNldG9mbG93MzIoQ1BVQVJNU3RhdGUsIGNwMTUuYzlfcG1vdnNyKSwKCnRvdGFsOiAwIGVy
-cm9ycywgMSB3YXJuaW5ncywgNTkgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAxNy8yMjogdGFyZ2V0L2FybTogU3BsaXQg
-YXJtX2NjbnRfZW5hYmxlZCBpbnRvIGdlbmVyaWMgcG11X2NvdW50ZXJfZW5hYmxlZC4uLgpDaGVj
-a2luZyBQQVRDSCAxOC8yMjogdGFyZ2V0L2FybTogQWRkIGFycmF5IGZvciBzdXBwb3J0ZWQgUE1V
-IGV2ZW50cywgZ2VuZXJhdGUgUE1DRUlEWzAxXS4uLgpDaGVja2luZyBQQVRDSCAxOS8yMjogdGFy
-Z2V0L2FybTogRmluaXNoIGltcGxlbWVudGF0aW9uIG9mIFBNW1hdRVZDTlRSIGFuZCBQTVtYXUVW
-VFlQRVIuLi4KQ2hlY2tpbmcgUEFUQ0ggMjAvMjI6IHRhcmdldC9hcm06IFBNVTogQWRkIGluc3Ry
-dWN0aW9uIGFuZCBjeWNsZSBldmVudHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMjEvMjI6IHRhcmdldC9h
-cm06IFBNVTogU2V0IFBNQ1IuTiB0byA0Li4uCkNoZWNraW5nIFBBVENIIDIyLzIyOiB0YXJnZXQv
-YXJtOiBJbXBsZW1lbnQgUE1TV0lOQy4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
-YWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+This series of patches implements support for migrating the state of the
+external 'swtpm' TPM emulator as well as that of the TIS interface.=20
+
+For testing of TPM 2 (migration) please use the following git repos and
+branches:
+
+libtpms:=20
+   - repo: https://github.com/stefanberger/libtpms
+   - branch: tpm2-preview.rev146.v2
+
+swtpm:
+   - repo: https://github.com/stefanberger/swtpm
+   - branch: tpm2-preview.rev146.v2
+
+Regards,
+  Stefan
+
+Changes:
+ v4->v5:
+   - followed Marc-Andr=C3=A9's and Alan's comments where possible; some =
+comments
+     were not addressed and reasons posted to mailing list
+   - converted debug statements to tracing
+   - qemu_chr_fe_read_all does not return errno, so displaying expected v=
+ersus
+     received number of bytes rather than strerror(errno)
+   - added test cases
+   - added documentation for migration to docs/spec/tpm.txt
+
+ v3->v4:
+   - dropped the size limit enforcement on blobs received from the swtpm
+   - the .post_load migration function requires errno's to be returned.
+     -> some of the functions have been converted to return a better errn=
+o
+
+
+Stefan Berger (4):
+  tpm: extend TPM emulator with state migration support
+  tpm: extend TPM TIS with state migration support
+  docs: tpm: add VM save/restore example and troubleshooting guide
+  tpm: Add test cases that uses the external swtpm with CRB interface
+
+ docs/specs/tpm.txt         | 106 +++++++++++++++
+ hw/tpm/tpm_emulator.c      | 318 +++++++++++++++++++++++++++++++++++++++=
+++++--
+ hw/tpm/tpm_tis.c           |  52 +++++++-
+ hw/tpm/trace-events        |   9 +-
+ tests/Makefile.include     |   3 +
+ tests/tpm-crb-swtpm-test.c | 243 ++++++++++++++++++++++++++++++++++
+ 6 files changed, 717 insertions(+), 14 deletions(-)
+ create mode 100644 tests/tpm-crb-swtpm-test.c
+
+--=20
+2.5.5
