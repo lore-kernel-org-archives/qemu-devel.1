@@ -1,26 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ewsCQ-0004XJ-IE
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 12:27:23 -0400
+	(envelope-from <bounces@canonical.com>) id 1ewsF7-0005t2-AE
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 12:30:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ewsCN-0002Oe-DC
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 12:27:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41850 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ewsCN-0002OH-9K
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 12:27:19 -0400
-Date: Fri, 16 Mar 2018 18:27:03 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180316181953-mutt-send-email-mst@kernel.org>
-References: <1514626559-162312-1-git-send-email-longpeng2@huawei.com>
-	<1514626559-162312-2-git-send-email-longpeng2@huawei.com>
-	<fcb63fc3-22eb-7f6c-2014-744ee75784eb@linux.vnet.ibm.com>
+	(envelope-from <bounces@canonical.com>) id 1ewsF4-0004JW-45
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 12:30:09 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57884)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ewsF3-0004In-VR
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 12:30:06 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ewsF3-00075h-1D
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 16:30:05 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id EE0692E80C8
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 16:30:04 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fcb63fc3-22eb-7f6c-2014-744ee75784eb@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [v23 1/2] virtio-crypto: Add
- virtio crypto device specification
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 16 Mar 2018 16:18:02 -0000
+From: Paolo Bonzini <bonzini@gnu.org>
+Reply-To: Bug 1438572 <1438572@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150331082006.7212.85829.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152121708253.3381.16075151243071563310.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1438572] Re: kvm does not support
+ KVM_CAP_USER_MEMORY Please upgrade to at least kernel 2.6.29 or recent
+ kvm-kmod (see http://sourceforge.net/projects/kvm)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +38,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: "Longpeng(Mike)" <longpeng2@huawei.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, luonengjun@huawei.com, cornelia.huck@de.ibm.com, stefanha@redhat.com, denglingli@chinamobile.com, Jani.Kokkonen@huawei.com, Ola.Liljedahl@arm.com, Varun.Sethi@freescale.com, xin.zeng@intel.com, brian.a.keating@intel.com, liang.j.ma@intel.com, john.griffin@intel.com, weidong.huang@huawei.com, agraf@suse.de, jasowang@redhat.com, vincent.jardin@6wind.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com, jianjay.zhou@huawei.com
+To: qemu-devel@nongnu.org
 
-On Tue, Jan 09, 2018 at 06:05:41PM +0100, Halil Pasic wrote:
-> > +\item[\field{max_cipher_key_len}] is the maximum length of cipher key supported by the device.
-> 
-> I can't find what happens if this limit isn't honored by the driver. Moreover
-> reading it is only SHOULD. Is it undefined behavior or should the device reject/fail
-> such requests? I think in qemu implementation we fail the request.
-> 
-> This question is only about niceness. We are already good enough, IMHO:
-> since the implementer of the driver can't be sure what is going to happen
-> if the driver disregards max_cipher_key_len it is already an implicit
-> SHOULD.
+This error has never existed in QEMU, only in the old qemu-kvm fork
+which has been obsolete for about 5 years.  I'm closing this ticket.
 
-I am not sure documenting undefined behaviour is always required.
-We certainly do not do this for all other devices.
+** Changed in: qemu
+       Status: Incomplete =3D> Won't Fix
 
-Reading a field being SHOULD seems reasonable: e.g.
-driver might read it once and cache it in memory.
+-- =
 
-Halil, could you try to split your comments between requirements
-for more conformance clauses/clarifications as opposed to
-defects where it's wrong and does not match actual or
-expected behaviour?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1438572
 
-I think spec is better off with some documentation for this
-device than none at all like today.
+Title:
+  kvm does not support KVM_CAP_USER_MEMORY Please upgrade to at least
+  kernel 2.6.29 or recent kvm-kmod (see
+  http://sourceforge.net/projects/kvm)
 
--- 
-MST
+Status in QEMU:
+  Won't Fix
+
+Bug description:
+  We have a machine which is having QEMU+KVM on below configuration of linux
+  uname -a
+  Linux cairotrior 2.6.18-308.13.1.el5 #1 SMP Thu Jul 26 05:45:09 EDT 2012 =
+x86_64 x86_64 x86_64 GNU/Linux
+  cat /etc/issue
+  Red Hat Enterprise Linux Server release 5.8 (Tikanga)
+  Kernel \r on an \m
+
+  =
+
+  But in another setup, we are trying on a different machine having RHEL 5.=
+9 having higher kernel version but it still gives below error
+  kvm does not support KVM_CAP_USER_MEMORY Please upgrade to at least kerne=
+l 2.6.29 or recent kvm-kmod (see http://sourceforge.net/projects/kvm).
+  failed to initialize KVM: Invalid argument No accelerator found!
+
+  =
+
+  I don=E2=80=99t know if the qemu version have compatibility issues with r=
+edhat 5.9 version =E2=80=93  need someone to check if the qemu can run on r=
+edhat 5.9 64 bit or not ?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1438572/+subscriptions
