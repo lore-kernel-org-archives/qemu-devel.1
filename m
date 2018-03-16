@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <boqun.feng@intel.com>) id 1eweuN-00034t-Mf
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 22:15:52 -0400
+	(envelope-from <famz@redhat.com>) id 1ewfIS-0007Ub-Rs
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 22:40:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <boqun.feng@intel.com>) id 1eweuK-0008DV-GR
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 22:15:51 -0400
-Received: from mga03.intel.com ([134.134.136.65]:40922)
+	(envelope-from <famz@redhat.com>) id 1ewfIP-000446-Oh
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 22:40:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51698 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <boqun.feng@intel.com>)
-	id 1eweuK-0007gA-5j
-	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 22:15:48 -0400
-Date: Fri, 16 Mar 2018 10:11:57 +0800
-From: Boqun Feng <boqun.feng@intel.com>
-Message-ID: <20180316021157.GB3734@dragonstone.sh.intel.com>
-References: <20180314073000.3701-1-boqun.feng@intel.com>
-	<20180314130130.GH17603@redhat.com>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ewfIP-00043d-Ja
+	for qemu-devel@nongnu.org; Thu, 15 Mar 2018 22:40:41 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8231BEBFEF
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 02:40:29 +0000 (UTC)
+Date: Fri, 16 Mar 2018 10:40:23 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180316024023.GC13063@lemon.usersys.redhat.com>
+References: <1520942752-19449-1-git-send-email-pbonzini@redhat.com>
+	<20180315144719.GT3146@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20180314130130.GH17603@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] i386: add KNM cpu model
+In-Reply-To: <20180315144719.GT3146@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] docker: fedora: test more components
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,110 +35,97 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On Wed, Mar 14, 2018 at 01:01:30PM +0000, Daniel P. Berrangé wrote:
-> On Wed, Mar 14, 2018 at 03:29:59PM +0800, Boqun Feng wrote:
-> > A new cpu model called "KNM" is added to model Knights Mill processors.
-> 
-> Why the obscure acryonym? Can't we just call it KnightsMill so it is
-> obvious what it is to everyone, as we've done for all other Intel
-> CPU model names in the past.
-> 
-
-Ah.. my bad, good point! I will rename to "KnightsMill" in the next
-version.
-
-> > Compared to "Skylake-Server" cpu model, the following features are
-> > added:
-> > 
-> > 	avx512_4vnniw avx512_4fmaps avx512pf avx512er avx512_vpopcntdq
-> > 
-> > and the following features are removed:
-> > 
-> > 	pcid invpcid clflushopt avx512dq avx512bw axv512cd clwb smap rtm
-> > 	mpx xsavec xgetbv1 hle
-> 
-> "pcid" was one of the features critical to mitigate performance
-> downside of the Meltdown bug fix in guests. Will Knights Mill have
-> a fix for Meltdown in hardware, to avoid the need for split table
-> pages and thus avoid the perf hit in guests ?
-> 
-
-I got the confirmation the Knights Mill doesn't have PCID at all. For
-the alternative fix for Meltdown in hardware, I will ask around and info
-you if I get something.
-
-Regards,
-Boqun
-
-> > 
-> > Signed-off-by: Boqun Feng <boqun.feng@intel.com>
+On Thu, 03/15 14:47, Daniel P. Berrang=E9 wrote:
+> On Tue, Mar 13, 2018 at 01:05:52PM +0100, Paolo Bonzini wrote:
+> > Install optional dependencies of QEMU to get better coverage.
+> >=20
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > > ---
-> >  target/i386/cpu.c | 42 ++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 42 insertions(+)
-> > 
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index 2c04645ceac9..215a9ee6026a 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -1795,6 +1795,48 @@ static X86CPUDefinition builtin_x86_defs[] = {
-> >          .xlevel = 0x80000008,
-> >          .model_id = "Intel Xeon Processor (Skylake, IBRS)",
-> >      },
-> > +    {
-> > +        .name = "KNM",
-> > +        .level = 0xd,
-> > +        .vendor = CPUID_VENDOR_INTEL,
-> > +        .family = 6,
-> > +        .model = 133,
-> > +        .stepping = 0,
-> > +        .features[FEAT_1_EDX] =
-> > +            CPUID_VME | CPUID_SS | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR |
-> > +            CPUID_MMX | CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV |
-> > +            CPUID_MCA | CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC |
-> > +            CPUID_CX8 | CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC |
-> > +            CPUID_PSE | CPUID_DE | CPUID_FP87,
-> > +        .features[FEAT_1_ECX] =
-> > +            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-> > +            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
-> > +            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
-> > +            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
-> > +            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
-> > +            CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-> > +        .features[FEAT_8000_0001_EDX] =
-> > +            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
-> > +            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-> > +        .features[FEAT_8000_0001_ECX] =
-> > +            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
-> > +        .features[FEAT_7_0_EBX] =
-> > +            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
-> > +            CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS |
-> > +            CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_AVX512F |
-> > +            CPUID_7_0_EBX_AVX512CD | CPUID_7_0_EBX_AVX512PF |
-> > +            CPUID_7_0_EBX_AVX512ER,
-> > +        .features[FEAT_7_0_ECX] =
-> > +            CPUID_7_0_ECX_AVX512_VPOPCNTDQ,
-> > +        .features[FEAT_7_0_EDX] =
-> > +            CPUID_7_0_EDX_AVX512_4VNNIW | CPUID_7_0_EDX_AVX512_4FMAPS,
-> > +        .features[FEAT_XSAVE] =
-> > +            CPUID_XSAVE_XSAVEOPT,
-> > +        .features[FEAT_6_EAX] =
-> > +            CPUID_6_EAX_ARAT,
-> > +        .xlevel = 0x80000008,
-> > +        .model_id = "Intel Xeon Phi Processor (Knights Mill)",
-> > +    },
-> >      {
-> >          .name = "Opteron_G1",
-> >          .level = 5,
-> > -- 
-> > 2.16.1
-> > 
-> > 
-> 
+> >  tests/docker/dockerfiles/fedora.docker | 13 ++++++++++---
+> >  1 file changed, 10 insertions(+), 3 deletions(-)
+> >=20
+> > diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/do=
+ckerfiles/fedora.docker
+> > index 994a35a..0d9da45 100644
+> > --- a/tests/docker/dockerfiles/fedora.docker
+> > +++ b/tests/docker/dockerfiles/fedora.docker
+> > @@ -1,9 +1,16 @@
+> >  FROM fedora:27
+> >  ENV PACKAGES \
+> >      ccache gettext git tar PyYAML sparse flex bison python3 bzip2 ho=
+stname \
+> > -    glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
+> > -    gcc gcc-c++ clang make perl which bc findutils libaio-devel \
+> > -    nettle-devel libasan libubsan \
+> > +    gcc gcc-c++ clang make perl which bc findutils glib2-devel \
+> > +    libaio-devel pixman-devel zlib-devel libfdt-devel libasan libubs=
+an \
+> > +    bluez-libs-devel brlapi-devel bzip2-devel \
+> > +    device-mapper-multipath-devel glusterfs-api-devel gnutls-devel \
+> > +    gtk3-devel libattr-devel libcap-devel libcap-ng-devel libcurl-de=
+vel \
+> > +    libjpeg-devel libpng-devel librbd-devel libssh2-devel libusbx-de=
+vel \
+> > +    libxml2-devel lzo-devel ncurses-devel nettle-devel nss-devel \
+> > +    numactl-devel SDL2-devel snappy-devel spice-server-devel \
+> > +    systemtap-sdt-devel usbredir-devel virglrenderer-devel vte3-deve=
+l \
+> > +    xen-devel \
+>=20
+> This still has some notable differences from the build deps we use in
+> formal Fedora QEMU RPMs. I think we have missing:
+>=20
+>    alsa-lib-devel
+>    capstone-devel
+>    cyrus-sasl-devel
+>    glusterfs-devel
+>    libcacard-devel
+>    libepoxy-devel
+>    libiscsi-devel
+>    libnfs-devel
+>    librdmacm-devel
+>    libseccomp-devel
+>    libtasn1-devel
+>    libuuid-devel
+>    mesa-libgbm-devel
+>    perl-podlators
+>    pulseaudio-libs-devel
+>    systemd-devel
+>    texinfo
+>    vte291-devel
+
+I wonder if we should simply do "dnf build-dep qemu" and only list additi=
+onal
+(mingw, for example) packages explicitly, like the debian dockerfiles.
+
+Fam
+
+>=20
+>=20
+> Some extra bits that are not needed:
+>=20
+>   glib2-devel is not required as gtk3-devel pulls it in
+>   nettle-devel is not required as gnutls-devel puls it in
+>  =20
+>   nss-devel shouldn't be used by anything in QEMU - we use gnutls
+>  =20
+>   vte3-devel is obsoleted by vte291-devel
+>=20
+> >      mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg=
+-config \
+> >      mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-=
+libtasn1 \
+> >      mingw32-libjpeg-turbo mingw32-libpng mingw32-curl mingw32-libssh=
+2 \
+>=20
 > Regards,
 > Daniel
-> -- 
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
