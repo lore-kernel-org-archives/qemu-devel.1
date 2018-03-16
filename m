@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ewsr0-0001aN-AA
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 13:09:19 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1ewstm-0002ZE-Kv
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 13:12:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ewsqv-0004jj-2Z
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 13:09:18 -0400
-Received: from hera.aquilenet.fr ([185.233.100.1]:44180)
+	(envelope-from <pbonzini@redhat.com>) id 1ewsth-0007B3-N0
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 13:12:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43782 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1ewsqu-0004iG-SW
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 13:09:13 -0400
-Date: Fri, 16 Mar 2018 18:09:09 +0100
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20180316170909.fd4laqzyktjboyvf@var.youpi.perso.aquilenet.fr>
-References: <20180316143921.30780-1-nia.alarie@gmail.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ewsth-0007AW-I5
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 13:12:05 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 60BEA40201A3
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 17:11:54 +0000 (UTC)
+References: <20180316170122.fmo2nghyxpeaq7hp@kamzik.brq.redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a876446f-d4a4-4df2-c986-4e45a64b9436@redhat.com>
+Date: Fri, 16 Mar 2018 18:11:48 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180316143921.30780-1-nia.alarie@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] net/slirp: Convert atoi to qemu_strtoi to
- allow error checking
+In-Reply-To: <20180316170122.fmo2nghyxpeaq7hp@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] qemu master build failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +33,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nia Alarie <nia.alarie@gmail.com>
-Cc: qemu-devel@nongnu.org, stefanha@gmail.com, jim@groklearning.com, joel@jms.id.au, jasowang@redhat.com, jan.kiszka@siemens.com
+To: Andrew Jones <drjones@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Nia Alarie, on ven. 16 mars 2018 14:39:21 +0000, wrote:
-> Signed-off-by: Nia Alarie <nia.alarie@gmail.com>
+On 16/03/2018 18:01, Andrew Jones wrote:
+> Hi Thomas,
+>=20
+> QEMU master is failing to build on an AArch64 machine with GCC 4.8. I g=
+et
+>=20
+>   ...
+>   CC      qemu-nbd.o
+> /home/drjones/code/qemu/qemu-nbd.c: In function =E2=80=98version=E2=80=99=
+:
+> /home/drjones/code/qemu/qemu-nbd.c:133:7: error: expected =E2=80=98)=E2=
+=80=99 before =E2=80=98QEMU_FULL_VERSION=E2=80=99
+>  "%s " QEMU_FULL_VERSION "\n"
+>        ^
+> /home/drjones/code/qemu/qemu-nbd.c:139:5: error: format =E2=80=98%s=E2=80=
+=99 expects a matching =E2=80=98char *=E2=80=99 argument [-Werror=3Dforma=
+t=3D]
+>      , name);
+>      ^
+> cc1: all warnings being treated as errors
+> make: *** [qemu-nbd.o] Error 1
+>=20
+>=20
+> Reverting 7e563bfb8 fixes the build. I figured I'd report it now,
+> but I won't have time to look closer until Monday.
 
-Applied to my tree, thanks!
+You probably have a stray qemu-version.h file somewhere.  No worries, I
+was puzzled by the same thing after I applied Thomas's patch. :)
 
-> ---
->  net/slirp.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/slirp.c b/net/slirp.c
-> index 8991816bbf..e938944bd4 100644
-> --- a/net/slirp.c
-> +++ b/net/slirp.c
-> @@ -486,7 +486,9 @@ void hmp_hostfwd_remove(Monitor *mon, const QDict *qdict)
->          goto fail_syntax;
->      }
->  
-> -    host_port = atoi(p);
-> +    if (qemu_strtoi(p, NULL, 10, &host_port)) {
-> +        goto fail_syntax;
-> +    }
->  
->      err = slirp_remove_hostfwd(s->slirp, is_udp, host_addr, host_port);
->  
-> -- 
-> 2.16.2
-> 
-
--- 
-Samuel
-"...[Linux's] capacity to talk via any medium except smoke signals."
-(By Dr. Greg Wettstein, Roger Maris Cancer Center)
+Paolo
