@@ -1,34 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ex0cC-00062Q-Fy
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 21:26:34 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ex1Wu-0006VX-Sd
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 22:25:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ex0c9-000094-9Z
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 21:26:32 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45906)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ex0c9-00007v-12
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 21:26:29 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ex0c8-0002Z8-5H
-	for <qemu-devel@nongnu.org>; Sat, 17 Mar 2018 01:26:28 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1502A2E80CC
-	for <qemu-devel@nongnu.org>; Sat, 17 Mar 2018 01:26:28 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 17 Mar 2018 01:09:42 -0000
-From: Bart Van Assche <bart.vanassche+launchpad@gmail.com>
-Reply-To: Bug 1435359 <1435359@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150323144724.14969.83414.malonedeb@wampee.canonical.com>
-Message-Id: <152124898254.14831.12335086982281509059.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1435359] Re: Booting kernel 3.19.2 fails most of
- the time
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ex1Wp-00080W-Sl
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 22:25:08 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42358
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1ex1Wp-0007zo-Ne
+	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 22:25:03 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w2H2O5qT051675
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 22:25:02 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2grpr05dq4-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 22:25:02 -0400
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Fri, 16 Mar 2018 22:25:01 -0400
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Fri, 16 Mar 2018 22:24:56 -0400
+In-Reply-To: <1521253498-6834-1-git-send-email-stefanb@linux.vnet.ibm.com>
+References: <1521253498-6834-1-git-send-email-stefanb@linux.vnet.ibm.com>
+Message-Id: <1521253498-6834-3-git-send-email-stefanb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v5.2 for 2.13 2/4] tpm: extend TPM TIS with
+ state migration support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,150 +40,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, marcandre.lureau@gmail.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-I haven't seen this for a long time so please proceed with closing this
-ticket.
+Extend the TPM TIS interface with state migration support.
 
--- =
+We need to synchronize with the backend thread to make sure that a command
+being processed by the external TPM emulator has completed and its
+response been received.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1435359
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+---
+ hw/tpm/tpm_tis.c    | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+ hw/tpm/trace-events |  1 +
+ 2 files changed, 51 insertions(+), 2 deletions(-)
 
-Title:
-  Booting kernel 3.19.2 fails most of the time
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Host system: openSuSE 13.2 + kernel 4.0.0-rc4 + qemu 2.2.1.
-
-  When I try to boot a virtual machine with Ubuntu 14.10 and kernel
-  3.13.0 every boot succeeds. However, with kernel 3.19.2 booting fails
-  most of the time. The following appears in /var/log/libvirt/qemu
-  /ubuntu-vm.log when I try to boot that VM with kernel 3.19.2:
-
-  2015-03-23 02:44:18.801+0000: starting up
-  LC_ALL=3DC PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin=
-:/bin QEMU_AUDIO_DRV=3Dspice /usr/bin/qemu-system-x86_64 -name ubuntu-vm -S=
- -machine pc-i440fx-2.1,accel=3Dkvm,usb=3Doff -cpu Haswell -m 2048 -realtim=
-e mlock=3Doff -smp 4,sockets=3D4,cores=3D1,threads=3D1 -uuid 395110dc-9fbe-=
-4542-8fce-4ef958f24b2c -no-user-config -nodefaults -chardev socket,id=3Dcha=
-rmonitor,path=3D/var/lib/libvirt/qemu/ubuntu-vm.monitor,server,nowait -mon =
-chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc,driftfix=
-=3Dslew -global kvm-pit.lost_tick_policy=3Ddiscard -no-hpet -no-shutdown -g=
-lobal PIIX4_PM.disable_s3=3D1 -global PIIX4_PM.disable_s4=3D1 -boot strict=
-=3Don -device ich9-usb-ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0x5.0x7 -device ic=
-h9-usb-uhci1,masterbus=3Dusb.0,firstport=3D0,bus=3Dpci.0,multifunction=3Don=
-,addr=3D0x5 -device ich9-usb-uhci2,masterbus=3Dusb.0,firstport=3D2,bus=3Dpc=
-i.0,addr=3D0x5.0x1 -device ich9-usb-uhci3,masterbus=3Dusb.0,firstport=3D4,b=
-us=3Dpci.0,addr=3D0x5.0x2 -device virtio-serial-pci,id=3Dvirtio-serial0,bus=
-=3Dpci.0,addr=3D0x4 -drive file=3D/var/lib/libvirt/images/ubuntusaucy.qcow2=
-,if=3Dnone,id=3Ddrive-virtio-disk0,format=3Dqcow2 -device virtio-blk-pci,sc=
-si=3Doff,bus=3Dpci.0,addr=3D0x7,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk=
-0,bootindex=3D1 -drive file=3D/var/lib/libvirt/images/ubuntu-14.04-mini.iso=
-,if=3Dnone,id=3Ddrive-ide0-0-0,readonly=3Don,format=3Draw -device ide-cd,bu=
-s=3Dide.0,unit=3D0,drive=3Ddrive-ide0-0-0,id=3Dide0-0-0,bootindex=3D2 -netd=
-ev tap,fd=3D22,id=3Dhostnet0,vhost=3Don,vhostfd=3D23 -device virtio-net-pci=
-,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:5e:71:5e,bus=3Dpci.0,addr=3D0x3=
- -chardev spicevmc,id=3Dcharchannel0,name=3Dvdagent -device virtserialport,=
-bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dc=
-om.redhat.spice.0 -spice port=3D5900,addr=3D127.0.0.1,disable-ticketing,sea=
-mless-migration=3Don -device qxl-vga,id=3Dvideo0,ram_size=3D67108864,vram_s=
-ize=3D67108864,bus=3Dpci.0,addr=3D0x2 -chardev spicevmc,id=3Dcharredir0,nam=
-e=3Dusbredir -device usb-redir,chardev=3Dcharredir0,id=3Dredir0 -chardev sp=
-icevmc,id=3Dcharredir1,name=3Dusbredir -device usb-redir,chardev=3Dcharredi=
-r1,id=3Dredir1 -chardev spicevmc,id=3Dcharredir2,name=3Dusbredir -device us=
-b-redir,chardev=3Dcharredir2,id=3Dredir2 -chardev spicevmc,id=3Dcharredir3,=
-name=3Dusbredir -device usb-redir,chardev=3Dcharredir3,id=3Dredir3 -device =
-virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x8 -object rng-random,=
-id=3Drng0,filename=3D/dev/random -device virtio-rng-pci,rng=3Drng0,bus=3Dpc=
-i.0,addr=3D0x9 -msg timestamp=3Don
-  main_channel_link: add main channel client
-  main_channel_handle_parsed: net test: latency 0.229000 ms, bitrate 284444=
-44444 bps (27126.736111 Mbps)
-  red_dispatcher_set_cursor_peer: =
-
-  inputs_connect: inputs channel client create
-  ((null):30728): SpiceWorker-ERROR **: red_worker.c:8337:red_marshall_qxl_=
-drawable: invalid type
-  KVM: injection failed, MSI lost (Input/output error)
-  qemu-system-x86_64: /home/bart/software/qemu-2.2.1/hw/net/vhost_net.c:264=
-: vhost_net_stop_one: Assertion `r >=3D 0' failed.
-  2015-03-23 02:44:44.952+0000: shutting down
-
-  That message is similar to the message reported by the older qemu
-  version provided by openSuse (qemu 2.1.0 + qemu-kvm 2.1.0):
-
-  2015-03-21 13:51:00.724+0000: starting up
-  LC_ALL=3DC PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin=
-:/bin QEMU_AUDIO_DRV=3Dspice /usr/bin/qemu-system-x86_64 -name ubuntu-vm -S=
- -machine pc-i440fx-2.1,accel=3Dkvm,usb=3Doff -cpu Haswell -m 1024 -realtim=
-e mlock=3Doff -smp 4,sockets=3D4,cores=3D1,threads=3D1 -uuid 395110dc-9fbe-=
-4542-8fce-4ef958f24b2c -no-user-config -nodefaults -chardev socket,id=3Dcha=
-rmonitor,path=3D/var/lib/libvirt/qemu/ubuntu-vm.monitor,server,nowait -mon =
-chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc,driftfix=
-=3Dslew -global kvm-pit.lost_tick_policy=3Ddiscard -no-hpet -no-shutdown -g=
-lobal PIIX4_PM.disable_s3=3D1 -global PIIX4_PM.disable_s4=3D1 -boot strict=
-=3Don -device ich9-usb-ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0x5.0x7 -device ic=
-h9-usb-uhci1,masterbus=3Dusb.0,firstport=3D0,bus=3Dpci.0,multifunction=3Don=
-,addr
-  =3D0x5 -device ich9-usb-uhci2,masterbus=3Dusb.0,firstport=3D2,bus=3Dpci.0=
-,addr=3D0x5.0x1 -device ich9-usb-uhci3,masterbus=3Dusb.0,firstport=3D4,bus=
-=3Dpci.0,addr=3D0x5.0x2 -device virtio-serial-pci,id=3Dvirtio-serial0,bus=
-=3Dpci.0,addr=3D0x6 -drive file=3D/var/lib/libvirt/images/ubuntusaucy.qcow2=
-,if=3Dnone,id=3Ddrive-virtio-disk0,format=3Dqcow2 -device virtio-blk-pci,sc=
-si=3Doff,bus=3Dpci.0,addr=3D0x7,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk=
-0,bootindex=3D1 -drive file=3D/var/lib/libvirt/images/ubuntu-14.04-mini.iso=
-,if=3Dnone,id=3Ddrive-ide0-0-0,readonly=3Don,format=3Draw -device ide-cd,bu=
-s=3Dide.0,unit=3D0,drive=3Ddrive-ide0-0-0,id
-  =3Dide0-0-0,bootindex=3D2 -netdev tap,fd=3D22,id=3Dhostnet0,vhost=3Don,vh=
-ostfd=3D23 -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:0=
-0:5e:71:5e,bus=3Dpci.0,addr=3D0x3 -chardev pty,id=3Dcharserial0 -device isa=
--serial,chardev=3Dcharserial0,id=3Dserial0 -chardev spicevmc,id=3Dcharchann=
-el0,name=3Dvdagent -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,cha=
-rdev=3Dcharchannel0,id=3Dchannel0,name=3Dcom.redhat.spice.0 -spice port=3D5=
-900,addr=3D127.0.0.1,disable-ticketing,seamless-migration=3Don -device qxl-=
-vga,id=3Dvideo0,ram_size=3D67108864,vram_size=3D67108864,bus=3Dpci.0,addr=
-=3D0x2 -device intel-hda,id=3Dsound0,bus=3Dpci.0,addr=3D0x4 -device hda-dup=
-lex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 -chardev spicevmc,id=3Dcharre=
-dir0,name=3Dusbredir -device usb-redir,chardev=3Dcharredir0,id=3Dredir0 -ch=
-ardev spicevmc,id=3Dcharredir1,
-  name=3Dusbredir -device usb-redir,chardev=3Dcharredir1,id=3Dredir1 -chard=
-ev spicevmc,id=3Dcharredir2,name=3Dusbredir -device usb-redir,chardev=3Dcha=
-rredir2,id=3Dredir2 -chardev spicevmc,id=3Dcharredir3,name=3Dusbredir -devi=
-ce usb-redir,chardev=3Dcharredir3,id=3Dredir3 -device virtio-balloon-pci,id=
-=3Dballoon0,bus=3Dpci.0,addr=3D0x8 -object rng-random,id=3Drng0,filename=3D=
-/dev/random -device virtio-rng-pci,rng=3Drng0,bus=3Dpci.0,addr=3D0x9 -msg t=
-imestamp=3Don
-  char device redirected to /dev/pts/0 (label charserial0)
-  main_channel_link: add main channel client
-  main_channel_handle_parsed: net test: latency 0.233000 ms, bitrate 179649=
-12280 bps (17132.675438 Mbps)
-  red_dispatcher_set_cursor_peer: =
-
-  inputs_connect: inputs channel client create
-  ((null):5798): SpiceWorker-ERROR **: red_worker.c:8337:red_marshall_qxl_d=
-rawable: invalid type
-  red_channel_client_disconnect: 0x7f90397ec0c0 (channel 0x7f903812a090 typ=
-e 5 id 0)
-  ((null):8349): Spice-Warning **: red_channel.c:1661:red_channel_remove_cl=
-ient: channel type 5 id 0 - channel->thread_id (0x7f90362cba80) !=3D pthrea=
-d_self (0x7f9011fff700).If one of the threads is !=3D io-thread && !=3D vcp=
-u-thread, this might be a BUG
-  snd_channel_put: sound channel freed
-  red_channel_client_disconnect: 0x7f903a04c4c0 (channel 0x7f903812a230 typ=
-e 6 id 0)
-  ((null):8349): Spice-Warning **: red_channel.c:1661:red_channel_remove_cl=
-ient: channel type 6 id 0 - channel->thread_id (0x7f90362cba80) !=3D pthrea=
-d_self (0x7f9011fff700).If one of the threads is !=3D io-thread && !=3D vcp=
-u-thread, this might be a BUG
-  snd_channel_put: sound channel freed
-  KVM: injection failed, MSI lost (Input/output error)
-  qemu-system-x86_64: /home/abuild/rpmbuild/BUILD/qemu-2.1.0/hw/virtio/vhos=
-t.c:1003: vhost_virtqueue_mask: Assertion `r >=3D 0' failed.
-  2015-03-21 15:30:10.148+0000: shutting down
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1435359/+subscriptions
+diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+index 2ac7e74..fec3d73 100644
+--- a/hw/tpm/tpm_tis.c
++++ b/hw/tpm/tpm_tis.c
+@@ -894,9 +894,57 @@ static void tpm_tis_reset(DeviceState *dev)
+     tpm_backend_startup_tpm(s->be_driver, s->be_buffer_size);
+ }
+ 
++/* persistent state handling */
++
++static int tpm_tis_pre_save(void *opaque)
++{
++    TPMState *s = opaque;
++    uint8_t locty = s->active_locty;
++
++    trace_tpm_tis_pre_save(locty, s->rw_offset);
++
++    if (DEBUG_TIS) {
++        tpm_tis_dump_state(opaque, 0);
++    }
++
++    /*
++     * Synchronize with backend completion.
++     */
++    tpm_backend_finish_sync(s->be_driver);
++
++    return 0;
++}
++
++static const VMStateDescription vmstate_locty = {
++    .name = "tpm-tis/locty",
++    .version_id = 1,
++    .fields      = (VMStateField[]) {
++        VMSTATE_UINT32(state, TPMLocality),
++        VMSTATE_UINT32(inte, TPMLocality),
++        VMSTATE_UINT32(ints, TPMLocality),
++        VMSTATE_UINT8(access, TPMLocality),
++        VMSTATE_UINT32(sts, TPMLocality),
++        VMSTATE_UINT32(iface_id, TPMLocality),
++        VMSTATE_END_OF_LIST(),
++    }
++};
++
+ static const VMStateDescription vmstate_tpm_tis = {
+-    .name = "tpm",
+-    .unmigratable = 1,
++    .name = "tpm-tis",
++    .version_id = 1,
++    .pre_save  = tpm_tis_pre_save,
++    .fields = (VMStateField[]) {
++        VMSTATE_BUFFER(buffer, TPMState),
++        VMSTATE_UINT16(rw_offset, TPMState),
++        VMSTATE_UINT8(active_locty, TPMState),
++        VMSTATE_UINT8(aborting_locty, TPMState),
++        VMSTATE_UINT8(next_locty, TPMState),
++
++        VMSTATE_STRUCT_ARRAY(loc, TPMState, TPM_TIS_NUM_LOCALITIES, 1,
++                             vmstate_locty, TPMLocality),
++
++        VMSTATE_END_OF_LIST()
++    }
+ };
+ 
+ static Property tpm_tis_properties[] = {
+diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
+index c5bfbf1..25bee0c 100644
+--- a/hw/tpm/trace-events
++++ b/hw/tpm/trace-events
+@@ -50,3 +50,4 @@ tpm_tis_mmio_write_locty_seized(uint8_t locty, uint8_t active) "Locality %d seiz
+ tpm_tis_mmio_write_init_abort(void) "Initiating abort"
+ tpm_tis_mmio_write_lowering_irq(void) "Lowering IRQ"
+ tpm_tis_mmio_write_data2send(uint32_t value, unsigned size) "Data to send to TPM: 0x%08x (size=%d)"
++tpm_tis_pre_save(uint8_t locty, uint32_t rw_offset) "locty: %d, rw_offset = %u"
+-- 
+2.5.5
