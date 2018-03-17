@@ -1,36 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ex1Ww-0006Vm-L0
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 22:25:11 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1ex33p-0004dz-QK
+	for qemu-devel@nongnu.org; Sat, 17 Mar 2018 00:03:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ex1Wr-00084b-Lk
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 22:25:10 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54530)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1ex1Wr-00082X-Ba
-	for qemu-devel@nongnu.org; Fri, 16 Mar 2018 22:25:05 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w2H2OjHv117110
-	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 22:25:04 -0400
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2grk9pccg9-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 16 Mar 2018 22:25:03 -0400
-Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Fri, 16 Mar 2018 22:25:02 -0400
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Fri, 16 Mar 2018 22:24:54 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1ex33m-00061P-I5
+	for qemu-devel@nongnu.org; Sat, 17 Mar 2018 00:03:13 -0400
+Date: Sat, 17 Mar 2018 15:02:15 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180317040215.GE4525@umbus.fritz.box>
+References: <20180315041903.10046-1-david@gibson.dropbear.id.au>
+	<CAFEAcA9Uv_EyW6E=6cp+9QDCa4w13WxHQ5pCGp6E-3iOhq-mWg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <1521253498-6834-1-git-send-email-stefanb@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5.2 for 2.13 0/4] tpm: Extend TPM with state
- migration support
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="SWTRyWv/ijrBap1m"
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9Uv_EyW6E=6cp+9QDCa4w13WxHQ5pCGp6E-3iOhq-mWg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 0/9] ppc-for-2.12 queue 20180315
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,64 +24,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, marcandre.lureau@gmail.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
-
-This series of patches implements support for migrating the state of the
-external 'swtpm' TPM emulator as well as that of the TIS interface.=20
-
-For testing of TPM 2 (migration) please use the following git repos and
-branches:
-
-libtpms:=20
-   - repo: https://github.com/stefanberger/libtpms
-   - branch: tpm2-preview.rev146.v2
-
-swtpm:
-   - repo: https://github.com/stefanberger/swtpm
-   - branch: tpm2-preview.rev146.v2
-
-Regards,
-  Stefan
-
-Changes:
- v4->v5:
-   - followed Marc-Andr=C3=A9's and Alan's comments where possible; some =
-comments
-     were not addressed and reasons posted to mailing list
-   - converted debug statements to tracing
-   - qemu_chr_fe_read_all does not return errno, so displaying expected v=
-ersus
-     received number of bytes rather than strerror(errno)
-   - added test cases
-   - added documentation for migration to docs/spec/tpm.txt
-
- v3->v4:
-   - dropped the size limit enforcement on blobs received from the swtpm
-   - the .post_load migration function requires errno's to be returned.
-     -> some of the functions have been converted to return a better errn=
-o
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Greg Kurz <groug@kaod.org>, Laurent Vivier <lvivier@redhat.com>, surajjs@au1.ibm.com, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org
 
 
-Stefan Berger (4):
-  tpm: extend TPM emulator with state migration support
-  tpm: extend TPM TIS with state migration support
-  docs: tpm: add VM save/restore example and troubleshooting guide
-  tpm: Add test cases that uses the external swtpm with CRB interface
+--SWTRyWv/ijrBap1m
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- docs/specs/tpm.txt         | 106 +++++++++++++++
- hw/tpm/tpm_emulator.c      | 318 +++++++++++++++++++++++++++++++++++++++=
-++++--
- hw/tpm/tpm_tis.c           |  52 +++++++-
- hw/tpm/trace-events        |   9 +-
- tests/Makefile.include     |   3 +
- tests/tpm-crb-swtpm-test.c | 244 ++++++++++++++++++++++++++++++++++
- tests/tpm-util.c           | 143 ++++++++++++++++++++
- tests/tpm-util.h           |  36 +++++
- 8 files changed, 897 insertions(+), 14 deletions(-)
- create mode 100644 tests/tpm-crb-swtpm-test.c
- create mode 100644 tests/tpm-util.c
- create mode 100644 tests/tpm-util.h
+On Fri, Mar 16, 2018 at 05:25:04PM +0000, Peter Maydell wrote:
+> On 15 March 2018 at 04:18, David Gibson <david@gibson.dropbear.id.au> wro=
+te:
+> > The following changes since commit 026aaf47c02b79036feb830206cfebb2a726=
+510d:
+> >
+> >   Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-=
+request' into staging (2018-03-13 16:26:44 +0000)
+> >
+> > are available in the Git repository at:
+> >
+> >   git://github.com/dgibson/qemu.git tags/ppc-for-2.12-20180315
+> >
+> > for you to fetch changes up to a9ab8cc157054ea6941fb849c78d9e6c515a7730:
+> >
+> >   target/ppc: fix tlbsync to check privilege level depending on GTSE (2=
+018-03-15 11:18:31 +1100)
+> >
+> > ----------------------------------------------------------------
+> > ppc patch queue for 2018-03-15
+> >
+> > Here's the set of accumulated patches now that we're into soft freeze.
+> > I've split new functionality into a ppc-for-2.13 branch, so this only
+> > has bugfixes.  Well.. and a couple of simple cleanups to make bugfixes
+> > easier, some test improvements and a trivial change to make command
+> > line options more obvious.  I think those are all acceptable for soft
+> > freeze.
+> >
+>=20
+> Hi -- this looks like it provokes new runtime error warnings from the
+> clang sanitizer:
+
+Hrm.  What options do you need to trip these warnings?  Just using
+--cc=3Dclang doesn't give them to me, and using --enable-sanitizers
+gives my piles of unrelated warnings.
+
+>=20
+> TEST: tests/boot-serial-test... (pid=3D926)
+>   /ppc/boot-serial/ppce500:                                            OK
+>   /ppc/boot-serial/prep:                                               OK
+>   /ppc/boot-serial/40p:                                                OK
+>   /ppc/boot-serial/g3beige:                                            OK
+>   /ppc/boot-serial/mac99:                                              OK
+>   /ppc/boot-serial/sam460ex:
+> /home/petmay01/linaro/qemu-for-merges/target/ppc/translate.c:2979:15:
+> runtime error: load of value 142, which is not a valid value for type
+> 'bool'
+> OK
+>=20
+> TEST: tests/boot-serial-test... (pid=3D1016)
+>   /ppc64/boot-serial/ppce500:                                          OK
+>   /ppc64/boot-serial/prep:                                             OK
+>   /ppc64/boot-serial/40p:                                              OK
+>   /ppc64/boot-serial/mac99:                                            OK
+>   /ppc64/boot-serial/pseries:                                          OK
+>   /ppc64/boot-serial/powernv:                                          OK
+>   /ppc64/boot-serial/sam460ex:
+> /home/petmay01/linaro/qemu-for-merges/target/ppc/translate.c:2979:15:
+> runtime error: load of value 85, which is not a valid value for type
+> 'bool'
+> OK
+>=20
+> Looks like you're not initializing ctx->lazy_tlb_flush for all configs:
+>     if (env->mmu_model =3D=3D POWERPC_MMU_32B ||
+>         env->mmu_model =3D=3D POWERPC_MMU_601 ||
+>         (env->mmu_model & POWERPC_MMU_64B))
+>             ctx->lazy_tlb_flush =3D true;
+>=20
+> should perhaps be
+>     ctx->lazy_tlb_flush =3D
+>         env->mmu_model =3D=3D POWERPC_MMU_32B ||
+>         env->mmu_model =3D=3D POWERPC_MMU_601 ||
+>         (env->mmu_model & POWERPC_MMU_64B);
+>=20
+> ?
+
+Uh.. maybe.. except I don't see anything in the series that would be
+likely to change that behaviour.
 
 --=20
-2.5.5
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--SWTRyWv/ijrBap1m
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqsk0QACgkQbDjKyiDZ
+s5JcLBAAnSyk01ehqOHhvFlL8ZA2UYYbSK6ABpenb7RFUWj39KtoCxXHuCLbTB8y
+NJZ7KBP5FyNcIgAfuksbJyznCF7D3E3GrZvs3D4YmiPOhg7irG+1Mzd7REceNDHr
+my43Vkv2UAwF/f2SaWZM1/kEhUGunVeavFhpf9OYnswwsbm8ABTTBeVL6JSKmemb
+9XWEoaUplIv3gakV2M5CSEKrbHh8XEl5HVqAsvyBR7hbFS6sQ7VtXhZ97aShHwrT
+kEkRWBoJlOvNgEN6/IQA50ZAO7Ts69Ul5yVYnPYiul5nSNFnwhpJdpUOJ+MrYx17
+ds3bs4Pqvi3QYuYCKIgEBcvJUCEUOoN/mr6mFcu7rk95rg5Iz6Fro3dS5m79ws/J
+6/UQniDAz/58Kl2pErGcA6N8/8e/VzSJdnHKNgCzdEO8dAl+9bPJoAf2HXaXd3Za
+72EoAeZ4rIco/mK7YafE9I6gqRoxeUurXjAGMSE+S7N9tUHKkhyORrFvjK7SNczm
+hg5yWSB6MmE8P/xZMRFDExmWvExqsNxwYLdSoRAKfIdRXMa2xXx0u4TeO/iU5MzJ
+oA6jRY/E+w68i/VaCSg5UzA0E2eVyvWnit8BQmEUC23KBy3jn9loCkH6U5HH1NN0
+VubvGNu0j+I+RqrPxDYYJ6eMB87u2hS+B1V77OzdJabJND1pZZ4=
+=PVp5
+-----END PGP SIGNATURE-----
+
+--SWTRyWv/ijrBap1m--
