@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1exAfq-0004Te-JQ
-	for qemu-devel@nongnu.org; Sat, 17 Mar 2018 08:10:59 -0400
+	(envelope-from <bounces@canonical.com>) id 1exBbl-0005an-NC
+	for qemu-devel@nongnu.org; Sat, 17 Mar 2018 09:10:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1exAfp-0001YE-9U
-	for qemu-devel@nongnu.org; Sat, 17 Mar 2018 08:10:58 -0400
-Received: from mail-ot0-x22f.google.com ([2607:f8b0:4003:c0f::22f]:37610)
+	(envelope-from <bounces@canonical.com>) id 1exBbg-0003sK-OW
+	for qemu-devel@nongnu.org; Sat, 17 Mar 2018 09:10:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59474)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1exAfp-0001XQ-4l
-	for qemu-devel@nongnu.org; Sat, 17 Mar 2018 08:10:57 -0400
-Received: by mail-ot0-x22f.google.com with SMTP id t2-v6so3731095otj.4
-	for <qemu-devel@nongnu.org>; Sat, 17 Mar 2018 05:10:56 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1exBbg-0003rL-I1
+	for qemu-devel@nongnu.org; Sat, 17 Mar 2018 09:10:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1exBbf-0004Bl-49
+	for <qemu-devel@nongnu.org>; Sat, 17 Mar 2018 13:10:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1DCAB2E80C8
+	for <qemu-devel@nongnu.org>; Sat, 17 Mar 2018 13:10:43 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180316140508.863778-1-eblake@redhat.com>
-References: <20180316140508.863778-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 17 Mar 2018 12:10:35 +0000
-Message-ID: <CAFEAcA85KuXQ7afcAQWJcBeh6ghpnxnGnZWDph51XgQhxPNN4Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/38] QAPI patches for 2018-03-12,
- 2.12 softfreeze
+Date: Sat, 17 Mar 2018 12:58:54 -0000
+From: Giles Gaffney <1756538@bugs.launchpad.net>
+Reply-To: Bug 1756538 <1756538@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <152129153470.15061.1404987375350201277.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1756538] [NEW] Minimal Ubuntu vs. Debian
+ differences
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,127 +36,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 16 March 2018 at 14:04, Eric Blake <eblake@redhat.com> wrote:
-> The following changes since commit 3788c7b6e56fa34ee2a73e41706eb2a2447ba7=
-5a:
->
->   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into s=
-taging (2018-03-16 11:05:03 +0000)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/ericb.git tags/pull-qapi-2018-03-12-v2
->
-> for you to fetch changes up to 75eb57e3ed3682f011a6694863044e8b143a9821:
->
->   qapi: Pass '-u' when doing non-silent diff (2018-03-16 09:00:07 -0500)
->
-> v2: rebase on Paolo's queue (should fix tests that failed on v1),
-> fix rebase conflicts, add two more related patches
-> Sending only the changed patches from v1
->
-> ----------------------------------------------------------------
-> qapi patches for 2018-03-12, 2.12 softfreeze
->
-> - Marc-Andr=C3=A9 Lureau: 0/4 qapi: generate a literal qobject for intros=
-pection
-> - Max Reitz: 0/7 block: Handle null backing link
-> - Daniel P. Berrange: chardev: tcp: postpone TLS work until machine done
-> - Peter Xu: 00/23 QMP: out-of-band (OOB) execution support
-> - Vladimir Sementsov-Ogievskiy: 0/2 block latency histogram
-> - Eric Blake: qapi: Pass '-u' when doing non-silent diff
->
-> ----------------------------------------------------------------
+Public bug reported:
 
-Hi. I get a bunch of test assertion failures with this:
+I'm using Qemu on Ubuntu (minimal) and Debian (minimal) on Android
+(Arch64) via Linux Deploy to run Windows guests. Here's a few issues I
+encountered:
 
-ppc64 host:
+1) Qemu on (minimal) Debian 9 and Ubuntu cannot run Windows 7-10 guests
+(only Windows XP and below) because there's a black screen after the
+boot menu. Qemu on Debian 10, however, can run Windows 7. Incidentally,
+these distros run on the host in bios compatibility mode instead of
+UEFI. Ubuntu Desktop (full distro) on other hosts does not display the
+black screen when running Qemu.
 
-QTEST_QEMU_BINARY=3Dnios2-softmmu/qemu-system-nios2
-QTEST_QEMU_IMG=3Dqemu-img MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$((
-${RANDOM:-0} % 255 + 1)
-)} gtester -k --verbose -m=3Dquick  tests/qmp-test
-tests/device-introspect-test tests/qom-test tests/test-hmp
-TEST: tests/qmp-test... (pid=3D49431)
-  /nios2/qmp/protocol:                                                 OK
-  /nios2/qmp/oob:                                                      OK
-  /nios2/qmp/query-status:                                             OK
-  /nios2/qmp/query-block:                                              OK
-  /nios2/qmp/query-blockstats:                                         OK
-  /nios2/qmp/query-block-jobs:                                         OK
-  /nios2/qmp/query-named-block-nodes:
-qemu-system-nios2: /home/pm215/qemu/chardev/char-io.c:91: io_watc
-h_poll_finalize: Assertion `iwp->src =3D=3D ((void *)0)' failed.
-Broken pipe
-FAIL
+2) Qemu on Debian 9-10 (minimal) does not display fullscreen - but
+Ubuntu minimal does display full-screen.
 
-FreeBSD host:
+3) Qemu on Limbo PC Emulator and on Debian 9-10 only run windows guests
+at 1 GHz using the default Qemu CPU, but Ubuntu runs windows guests at 2
+GHz using the default Qemu CPU.
 
-TEST: tests/qmp-test... (pid=3D68428)
-  /aarch64/qmp/protocol:                                               OK
-  /aarch64/qmp/oob:                                                    OK
-[...]
-  /aarch64/qmp/query-iothreads:
-Assertion failed: (iwp->src =3D=3D NULL), function io_watch_poll_finalize,
-file /root/qemu/chardev/char-io.c, line 91.
-Broken pipe
-FAIL
-GTester: last random seed: R02S60296bacb6aea7a3d748811fc486c71e
-(pid=3D68462)
+4) Enable KVM doesn't work, and virtualization isn't detected through
+Limbo PC Emulator and minimal Linux distros running on Android - perhaps
+is a problem with running Linux distros via Linux Deploy using Chroot on
+Android (not so much a Qemu-KVM issue) and failing to detect ARMv8-A
+CPUs that are indeed capable of virtualization.
 
-OpenBSD host:
-  /cris/qmp/qom-list-types:
-assertion "iwp->src =3D=3D NULL" failed: file "/home/qemu/chardev/cha
-r-io.c", line 91, function "io_watch_poll_finalize"
-Broken pipe
-FAIL
+Can anyone explain these differences? I believe they are all using the
+latest versions of Qemu.
 
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-NetBSD host:
+-- =
 
-TEST: tests/tpm-crb-test... (pid=3D21337)
-  /i386/tpm-crb/test:                                                  OK
-Unexpected error in qio_channel_socket_readv() at
-/root/qemu/io/channel-socket.c:494:
-FAIL: tests/tpm-crb-test
-TEST: tests/tpm-tis-test... (pid=3D14763)
-  /i386/tpm-tis/test_check_localities:                                 OK
-  /i386/tpm-tis/test_check_access_reg:                                 OK
-  /i386/tpm-tis/test_check_access_reg_seize:                           OK
-  /i386/tpm-tis/test_check_access_reg_release:                         OK
-  /i386/tpm-tis/test_check_transmit:                                   OK
-Unexpected error in qio_channel_socket_readv() at
-/root/qemu/io/channel-socket.c:494:
-FAIL: tests/tpm-tis-test
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1756538
 
-SPARC host:
+Title:
+  Minimal Ubuntu vs. Debian differences
 
-  /cris/qmp/query-memory-size-summary:
-qemu-system-cris: /srv/pm215/qemu/chardev/char-io.c:91: io_watch_
-poll_finalize: Assertion `iwp->src =3D=3D NULL' failed.
-Broken pipe
-FAIL
+Status in QEMU:
+  New
 
+Bug description:
+  I'm using Qemu on Ubuntu (minimal) and Debian (minimal) on Android
+  (Arch64) via Linux Deploy to run Windows guests. Here's a few issues I
+  encountered:
 
-x86/Linux host:
-  /hppa/qmp/query-memdev:
-qemu-system-hppa: /home/petmay01/linaro/qemu-for-merges/chardev/c
-har-io.c:91: io_watch_poll_finalize: Assertion `iwp->src =3D=3D NULL' faile=
-d.
-Broken pipe
-FAIL
+  1) Qemu on (minimal) Debian 9 and Ubuntu cannot run Windows 7-10
+  guests (only Windows XP and below) because there's a black screen
+  after the boot menu. Qemu on Debian 10, however, can run Windows 7.
+  Incidentally, these distros run on the host in bios compatibility mode
+  instead of UEFI. Ubuntu Desktop (full distro) on other hosts does not
+  display the black screen when running Qemu.
 
-aarch64 host:
-qemu-system-alpha: /home/pm215/qemu/chardev/char-io.c:91:
-io_watch_poll_finalize: Assertion `iwp->src =3D=3D ((void *)0)' failed.
+  2) Qemu on Debian 9-10 (minimal) does not display fullscreen - but
+  Ubuntu minimal does display full-screen.
 
-One or two of the build hosts did pass, so that plus the varying
-tests which failed suggests that the iwp->src assert is an
-intermittent or timing based one. The tpm error on NetBSD
-is probably a separate issue.
+  3) Qemu on Limbo PC Emulator and on Debian 9-10 only run windows
+  guests at 1 GHz using the default Qemu CPU, but Ubuntu runs windows
+  guests at 2 GHz using the default Qemu CPU.
 
-thanks
--- PMM
+  4) Enable KVM doesn't work, and virtualization isn't detected through
+  Limbo PC Emulator and minimal Linux distros running on Android -
+  perhaps is a problem with running Linux distros via Linux Deploy using
+  Chroot on Android (not so much a Qemu-KVM issue) and failing to detect
+  ARMv8-A CPUs that are indeed capable of virtualization.
+
+  Can anyone explain these differences? I believe they are all using the
+  latest versions of Qemu.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1756538/+subscriptions
