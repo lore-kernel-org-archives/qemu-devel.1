@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ex7cw-00008X-8a
-	for qemu-devel@nongnu.org; Sat, 17 Mar 2018 04:55:47 -0400
+	(envelope-from <bounces@canonical.com>) id 1ex8FR-0007LQ-Lj
+	for qemu-devel@nongnu.org; Sat, 17 Mar 2018 05:35:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ex7ct-0002u2-5j
-	for qemu-devel@nongnu.org; Sat, 17 Mar 2018 04:55:46 -0400
-Received: from 15.mo4.mail-out.ovh.net ([91.121.62.11]:45549)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ex7cs-0002rz-UT
-	for qemu-devel@nongnu.org; Sat, 17 Mar 2018 04:55:43 -0400
-Received: from player762.ha.ovh.net (unknown [10.109.120.174])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 1A09815493C
-	for <qemu-devel@nongnu.org>; Sat, 17 Mar 2018 09:55:39 +0100 (CET)
-References: <20180315133402.13470-1-clg@kaod.org>
-	<20180315133402.13470-2-clg@kaod.org>
-	<20180317041504.GF4525@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <94790f82-e8d4-0d9d-ec4c-cf80f7afbace@kaod.org>
-Date: Sat, 17 Mar 2018 09:55:28 +0100
+	(envelope-from <bounces@canonical.com>) id 1ex8FM-0004au-SX
+	for qemu-devel@nongnu.org; Sat, 17 Mar 2018 05:35:33 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53084)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ex8FM-0004aF-MA
+	for qemu-devel@nongnu.org; Sat, 17 Mar 2018 05:35:28 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ex8FL-0001OH-Ri
+	for <qemu-devel@nongnu.org>; Sat, 17 Mar 2018 09:35:27 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D09AC2E8025
+	for <qemu-devel@nongnu.org>; Sat, 17 Mar 2018 09:35:27 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180317041504.GF4525@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3 1/4] target/ppc: export
- external HPT via virtual hypervisor
+Date: Sat, 17 Mar 2018 09:25:56 -0000
+From: Serge Belyshev <1756519@bugs.launchpad.net>
+Reply-To: Bug 1756519 <1756519@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152127850171.4068.8714943507984957739.malonedeb@gac.canonical.com>
+Message-Id: <152127875699.15276.3423599300461029977.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1756519] Re: qemu-riscv64 glib hash table crash
+ in qom/object.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,94 +37,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To: qemu-devel@nongnu.org
 
-On 03/17/2018 05:15 AM, David Gibson wrote:
-> On Thu, Mar 15, 2018 at 01:33:59PM +0000, C=E9dric Le Goater wrote:
->> commit e57ca75ce3b2 ("target/ppc: Manage external HPT via virtual
->> hypervisor") exported a set of methods to manipulate the HPT from the
->> core hash MMU but the base address of the HPT was not part of them and
->> SPR_SDR1 is still used under some circumstances, which is incorrect
->> for the sPAPR machines.
->>
->> This is not a major change as only the logging should be impacted but
->> nevertheless, it will help to introduce support for the hash MMU on
->> POWER9 PowerNV machines.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->=20
-> This doesn't make sense.  The whole point of the "virtual hypervisor"
-> is that the hash table doesn't live within the guest address space,
-> and therefore it *has* no meaningful base address.  Basically
-> ppc_hash64_hpt_base() should never be called if vhyp is set.  If it
-> is, that's a bug.
+** Attachment added: "statically linked riscv64 binary executable for the t=
+est case above"
+   https://bugs.launchpad.net/qemu/+bug/1756519/+attachment/5082075/+files/=
+a.out.xz
 
+-- =
 
-ppc_hash64_hpt_base() is being called in a couple of places but the
-returned value is only used if the machines is not a pseries :
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1756519
 
-  static inline hwaddr ppc_hash64_hpt_mask(PowerPCCPU *cpu)
-  {
-      if (cpu->vhyp) {
-          PPCVirtualHypervisorClass *vhc =3D
-              PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-          return vhc->hpt_mask(cpu->vhyp);
-      }
-      ....
+Title:
+  qemu-riscv64 glib hash table crash in qom/object.c
 
-  const ppc_hash_pte64_t *ppc_hash64_map_hptes(PowerPCCPU *cpu,
-                                               hwaddr ptex, int n)
-  {
-      hwaddr pte_offset =3D ptex * HASH_PTE_SIZE_64;
-      hwaddr base =3D ppc_hash64_hpt_base(cpu);
-      hwaddr plen =3D n * HASH_PTE_SIZE_64;
-      const ppc_hash_pte64_t *hptes;
- =20
-      if (cpu->vhyp) {
-          PPCVirtualHypervisorClass *vhc =3D
-              PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-          return vhc->map_hptes(cpu->vhyp, ptex, n);
-      } =20
-      ....
- =20
-and also :
- =20
-  void ppc_hash64_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
-                             uint64_t pte0, uint64_t pte1)
-  {
-      hwaddr base =3D ppc_hash64_hpt_base(cpu);
-      hwaddr offset =3D ptex * HASH_PTE_SIZE_64;
- =20
-      if (cpu->vhyp) {
-          PPCVirtualHypervisorClass *vhc =3D
-              PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-          vhc->store_hpte(cpu->vhyp, ptex, pte0, pte1);
-          return;
-      }
-      ....
+Status in QEMU:
+  New
 
-And, in ppc_hash64_htab_lookup(), the HPT base is logged so we need
-some value returned (today, this is SPR_SDR1 which equals zero but=20
-that's confusing I think).
+Bug description:
+  qemu-riscv64 version 2.11.50 (v2.11.0-2491-g2bb39a657a)  crashes
+  running gcc libgomp.c/sort-1.c testsuite test case with the following
+  message:
 
+  (process:11683): GLib-CRITICAL **: g_hash_table_iter_next: assertion 'ri-=
+>version =3D=3D ri->hash_table->version' failed
+  **
+  ERROR:qom/object.c:1665:object_get_canonical_path_component: code should =
+not be reached
+  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6013=
+9c16
 
-If you don't agree with the hpt_base() op, we can change it to
-something like :
+  =
 
-  static inline hwaddr ppc_hash64_hpt_base(PowerPCCPU *cpu)
-  {
-      if (cpu->vhyp) {
-          /* Unused on sPAPR machines */
-          return 0;
-      }
-      return ppc_hash64_hpt_reg(cpu) & SDR_64_HTABORG;
-  }
+  Backtrace obtained via gdb:
 
-to be consistent with the other routines. I would like to make sure we
-don't reach ppc_hash64_hpt_reg() on pseries machines. see patch 3/4.
+  #0  raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.c:51
+  #1  0x0000000060139b21 in abort () at abort.c:79
+  #2  0x0000000060100505 in g_assertion_message (domain=3Ddomain@entry=3D0x=
+0, file=3Dfile@entry=3D0x60213ca1 "qom/object.c", line=3Dline@entry=3D1665, =
 
+      func=3Dfunc@entry=3D0x60214420 <__func__.18106> "object_get_canonical=
+_path_component", message=3Dmessage@entry=3D0x7fffe8000cd0 "code should not=
+ be reached")
+      at gtestutils.c:2430
+  #3  0x0000000060100586 in g_assertion_message_expr (domain=3D0x0, file=3D=
+0x60213ca1 "qom/object.c", line=3D1665, =
 
-Thanks,
+      func=3D0x60214420 <__func__.18106> "object_get_canonical_path_compone=
+nt", expr=3D<optimized out>) at gtestutils.c:2453
+  #4  0x0000000060098334 in object_get_canonical_path_component (obj=3D0x7f=
+ffe81340b0) at qom/object.c:1665
+  #5  0x0000000060098366 in object_get_canonical_path (obj=3D0x7fffe81340b0=
+) at qom/object.c:1675
+  #6  0x000000006008e152 in device_set_realized (obj=3D0x7fffe81340b0, valu=
+e=3Dtrue, errp=3D0x7ffff762fe68) at hw/core/qdev.c:874
+  #7  0x0000000060098bf4 in property_set_bool (obj=3D0x7fffe81340b0, v=3D0x=
+7fffe80fd3c0, name=3D0x60213694 "realized", opaque=3D0x7fffe80fd140, errp=
+=3D0x7ffff762fe68)
+      at qom/object.c:1926
+  #8  0x0000000060096fee in object_property_set (obj=3D0x7fffe81340b0, v=3D=
+0x7fffe80fd3c0, name=3D0x60213694 "realized", errp=3D0x7ffff762fe68) at qom=
+/object.c:1122
+  #9  0x0000000060099ebd in object_property_set_qobject (obj=3D0x7fffe81340=
+b0, value=3D0x7fffe80fd310, name=3D0x60213694 "realized", errp=3D0x7ffff762=
+fe68)
+      at qom/qom-qobject.c:27
+  #10 0x0000000060097274 in object_property_set_bool (obj=3D0x7fffe81340b0,=
+ value=3Dtrue, name=3D0x60213694 "realized", errp=3D0x7ffff762fe68) at qom/=
+object.c:1191
+  #11 0x0000000060092ec5 in cpu_create (typename=3D0x6250e1a0 "any-riscv-cp=
+u") at qom/cpu.c:61
+  #12 0x000000006009301a in cpu_generic_init (typename=3D0x601dd58f "riscv-=
+cpu", cpu_model=3D0x601dd527 "any") at qom/cpu.c:98
+  #13 0x000000006004cb61 in cpu_copy (env=3D0x7ffff008cd60) at /opt/qemu/li=
+nux-user/main.c:3881
+  #14 0x000000006005b79a in do_fork (env=3D0x7ffff008cd60, flags=3D4001536,=
+ newsp=3D275531880704, parent_tidptr=3D275531882704, newtls=3D275531884288, =
 
-C.
+      child_tidptr=3D275531882704) at /opt/qemu/linux-user/syscall.c:6348
+  #15 0x0000000060063e56 in do_syscall (cpu_env=3D0x7ffff008cd60, num=3D220=
+, arg1=3D4001536, arg2=3D275531880704, arg3=3D275531882704, arg4=3D27553188=
+4288, =
+
+      arg5=3D275531882704, arg6=3D275531884288, arg7=3D0, arg8=3D0) at /opt=
+/qemu/linux-user/syscall.c:10001
+  #16 0x000000006004c89f in cpu_loop (env=3D0x7ffff008cd60) at /opt/qemu/li=
+nux-user/main.c:3600
+  #17 0x000000006005b68f in clone_func (arg=3D0x7ffff7775050) at /opt/qemu/=
+linux-user/syscall.c:6311
+  #18 0x0000000060121797 in start_thread (arg=3D0x7ffff7632700) at pthread_=
+create.c:463
+  #19 0x000000006019b4fb in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
+lone.S:95
+
+  =
+
+  Attached is a test case source code extracted from libgomp test suite.
+
+  Note that it is a multi-threaded and requires 5 or more threads to
+  fail. Number of launched threads is controlled by OMP_NUM_THREADS
+  evironment variable, defaulting to number of hardware threads.
+  Changing constants in the test case makes it fail with different
+  numbers of threads.
+
+  I will attach statically linked riscv64 binary executable if size
+  limits permit.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1756519/+subscriptions
