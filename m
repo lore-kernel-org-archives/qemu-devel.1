@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47682)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1exhky-0001u0-FO
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 19:30:29 -0400
+	id 1exhrw-0003l0-9z
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 19:37:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1exhku-0007Mh-0z
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 19:30:28 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:34293)
+	id 1exhrt-0001f6-6j
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 19:37:40 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:37441)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1exhkt-0007MQ-PQ
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 19:30:23 -0400
-Received: by mail-wr0-x243.google.com with SMTP id o8so16848645wra.1
-	for <qemu-devel@nongnu.org>; Sun, 18 Mar 2018 16:30:23 -0700 (PDT)
+	id 1exhrs-0001eb-RR
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 19:37:37 -0400
+Received: by mail-wm0-x244.google.com with SMTP id 139so12336346wmn.2
+	for <qemu-devel@nongnu.org>; Sun, 18 Mar 2018 16:37:36 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <1521217393-8162-1-git-send-email-frederic.konrad@adacore.com>
+References: <1521040675-31054-1-git-send-email-aleksandar.rikalo@rt-rk.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <1b9b4a96-c415-f96d-132a-82883d14d66c@amsat.org>
-Date: Mon, 19 Mar 2018 00:30:21 +0100
+Message-ID: <20ad0f67-f5b3-8252-0985-84c08a5fcd1c@amsat.org>
+Date: Mon, 19 Mar 2018 00:37:33 +0100
 MIME-Version: 1.0
-In-Reply-To: <1521217393-8162-1-git-send-email-frederic.konrad@adacore.com>
+In-Reply-To: <1521040675-31054-1-git-send-email-aleksandar.rikalo@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] gdbstub: send a terminaison packet instead
- of crashing gdb
+Subject: Re: [Qemu-devel] [PATCH] target-mips: Add initrd support for the
+ Boston board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,76 +35,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: KONRAD Frederic <frederic.konrad@adacore.com>, qemu-devel@nongnu.org
-Cc: famz@redhat.com, stefanha@redhat.com
+To: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>, qemu-devel@nongnu.org
+Cc: Aleksandar Rikalo <aleksandar.rikalo@mips.com>, Paul Burton <paul.burton@mips.com>, Yongbok Kim <yongbok.kim@mips.com>, Petar Jovanovic <petar.jovanovic@mips.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 03/16/2018 05:23 PM, KONRAD Frederic wrote:
-> Since the commit:
-> commit 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268
-> Author: Stefan Hajnoczi <stefanha@redhat.com>
-> Date:   Wed Mar 7 14:42:05 2018 +0000
-> 
->     vl: introduce vm_shutdown()
-> 
-> GDB crash when qemu exits (at least on sparc-softmmu):
-> Remote communication error.  Target disconnected.: Connection reset by peer.
-> Quitting: putpkt: write failed: Broken pipe.
-> 
-> So send a packet to kill GDB before we exit QEMU:
-> [Inferior 1 (Thread 0) exited normally]
-> 
-> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+Hi Aleksandar,
 
+On 03/14/2018 04:17 PM, Aleksandar Rikalo wrote:
+> From: Aleksandar Rikalo <aleksandar.rikalo@mips.com>
+> 
+> Add support for initial ramdisk loading for the Mips Boston board.
+> 
+> Signed-off-by: Aleksandar Rikalo <aleksandar.rikalo@mips.com>
+> ---
+>  hw/mips/boston.c | 54 +++++++++++++++++++++++++++++++++++++++++++++---------
+>  1 file changed, 45 insertions(+), 9 deletions(-)
+> 
+> diff --git a/hw/mips/boston.c b/hw/mips/boston.c
+> index fb23161..67ca54f 100644
+> --- a/hw/mips/boston.c
+> +++ b/hw/mips/boston.c
+> @@ -30,6 +30,7 @@
+>  #include "hw/loader-fit.h"
+>  #include "hw/mips/cps.h"
+>  #include "hw/mips/cpudevs.h"
+> +#include "hw/mips/mips.h"
+>  #include "hw/pci-host/xilinx-pcie.h"
+>  #include "qapi/error.h"
+>  #include "qemu/cutils.h"
+> @@ -333,10 +334,12 @@ static const void *boston_fdt_filter(void *opaque, const void *fdt_orig,
+>  {
+>      BostonState *s = BOSTON(opaque);
+>      MachineState *machine = s->mach;
+> -    const char *cmdline;
+> +    GString *cmdline;
+>      int err;
+>      void *fdt;
+>      size_t fdt_sz, ram_low_sz, ram_high_sz;
+> +    long initrd_size;
+
+       target_ulong initrd_size;
+
+> +    ram_addr_t initrd_offset;
+>  
+>      fdt_sz = fdt_totalsize(fdt_orig) * 2;
+>      fdt = g_malloc0(fdt_sz);
+> @@ -347,20 +350,53 @@ static const void *boston_fdt_filter(void *opaque, const void *fdt_orig,
+>          return NULL;
+>      }
+>  
+> -    cmdline = (machine->kernel_cmdline && machine->kernel_cmdline[0])
+> -            ? machine->kernel_cmdline : " ";
+> -    err = qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
+> -    if (err < 0) {
+> -        fprintf(stderr, "couldn't set /chosen/bootargs\n");
+> -        return NULL;
+> -    }
+> -
+>      ram_low_sz = MIN(256 * M_BYTE, machine->ram_size);
+>      ram_high_sz = machine->ram_size - ram_low_sz;
+>      qemu_fdt_setprop_sized_cells(fdt, "/memory@0", "reg",
+>                                   1, 0x00000000, 1, ram_low_sz,
+>                                   1, 0x90000000, 1, ram_high_sz);
+>  
+> +    cmdline = g_string_new(machine->kernel_cmdline);
+> +
+> +    /* load initrd */
+> +    initrd_offset = 0;
+> +    if (machine->initrd_filename) {
+> +        initrd_size = get_image_size(machine->initrd_filename);
+> +        if (initrd_size > 0) {
+> +            /* The kernel allocates the bootmap memory in the low memory after
+> +               the initrd.  It takes at most 128kiB for 2GB RAM and 4kiB
+> +               pages.  */
+> +            initrd_offset = (ram_low_sz - initrd_size - 131072
+> +                             - ~INITRD_PAGE_MASK) & INITRD_PAGE_MASK;
+> +
+> +            if ((int64_t)cpu_mips_kseg0_to_phys(NULL, *load_addr + fdt_sz)
+> +                >= (int64_t)initrd_offset) {
+> +                error_report("memory too small for initial ram disk '%s'",
+> +                             machine->initrd_filename);
+> +                exit(1);
+> +            }
+> +
+> +            initrd_size = load_image_targphys(machine->initrd_filename,
+> +                                              initrd_offset,
+> +                                              initrd_size);
+> +        }
+> +        if (initrd_size == (target_ulong) -1) {
+> +            error_report("could not load initial ram disk '%s'",
+> +                         machine->initrd_filename);
+> +            exit(1);
+> +        }
+> +        g_string_append_printf(cmdline, " rd_start=0x%" PRIx64 " rd_size=%li",
+> +                               cpu_mips_phys_to_kseg0(NULL, initrd_offset),
+> +                               initrd_size);
+> +    }
+> +
+> +    err = qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline->str);
+> +    g_string_free(cmdline, true);
+> +    if (err < 0) {
+> +        fprintf(stderr, "couldn't set /chosen/bootargs\n");
+
+While here, please remove the fprintf():
+
+           error_report("couldn't set /chosen/bootargs");
+
+> +        return NULL;
+> +    }
+> +
+>      fdt = g_realloc(fdt, fdt_totalsize(fdt));
+>      qemu_fdt_dumpdtb(fdt, fdt_sz);
+>  
+> 
+
+With comment addressed:
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> ---
->  gdbstub.c              | 7 +++++++
->  include/exec/gdbstub.h | 2 ++
->  vl.c                   | 2 ++
->  3 files changed, 11 insertions(+)
-> 
-> diff --git a/gdbstub.c b/gdbstub.c
-> index f1d5148..a76b2fa 100644
-> --- a/gdbstub.c
-> +++ b/gdbstub.c
-> @@ -2052,6 +2052,13 @@ int gdbserver_start(const char *device)
->      return 0;
->  }
->  
-> +void gdbserver_cleanup(void)
-> +{
-> +    if (gdbserver_state) {
-> +        put_packet(gdbserver_state, "W00");
-> +    }
-> +}
-> +
->  static void register_types(void)
->  {
->      type_register_static(&char_gdb_type_info);
-> diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
-> index 9aa7756..2e8a4b8 100644
-> --- a/include/exec/gdbstub.h
-> +++ b/include/exec/gdbstub.h
-> @@ -103,6 +103,8 @@ int gdbserver_start(int);
->  int gdbserver_start(const char *port);
->  #endif
->  
-> +void gdbserver_cleanup(void);
-> +
->  /**
->   * gdb_has_xml:
->   * This is an ugly hack to cope with both new and old gdb.
-> diff --git a/vl.c b/vl.c
-> index 3ef04ce..0427b15 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -4723,6 +4723,8 @@ int main(int argc, char **argv, char **envp)
->  
->      main_loop();
->  
-> +    gdbserver_cleanup();
-> +
->      /* No more vcpu or device emulation activity beyond this point */
->      vm_shutdown();
->  
-> 
+Regards,
+
+Phil.
