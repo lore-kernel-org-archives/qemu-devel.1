@@ -1,18 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1exeVW-0000ij-Cf
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 16:02:19 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1exgti-0003R7-ES
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 18:35:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1exeVV-0004p5-OU
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 16:02:18 -0400
-From: Programmingkid <programmingkidx@gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Message-Id: <AEEE8086-D1A3-45AD-B715-F07E9469A83B@gmail.com>
-Date: Sun, 18 Mar 2018 16:02:10 -0400
-Subject: [Qemu-devel] Google Summer of Code 2018 - add Windows NT 4.0
- PowerPC support
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1exgtf-0000BE-Aw
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 18:35:26 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1521232280-13089-1-git-send-email-alindsay@codeaurora.org>
+	<1521232280-13089-2-git-send-email-alindsay@codeaurora.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <aeacd6da-0f45-f871-9a0a-2c8a524db510@amsat.org>
+Date: Sun, 18 Mar 2018 23:35:18 +0100
+MIME-Version: 1.0
+In-Reply-To: <1521232280-13089-2-git-send-email-alindsay@codeaurora.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v3 01/22] target/arm: A53:
+ Initialize PMCEID[01]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,10 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "list@suse.de:PowerPC list:PowerPC" <qemu-ppc@nongnu.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Aaron Lindsay <alindsay@codeaurora.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: qemu-arm@nongnu.org, Michael Spradling <mspradli@codeaurora.org>, qemu-devel@nongnu.org, Digant Desai <digantd@codeaurora.org>
 
-Is there still time to add another idea to the Google Summer of Code =
-2018 list? I just came across an interesting idea to add support for =
-Windows NT 4.0 PowerPC to QEMU. If there is still time, would there be =
-anyone interested in mentoring this project?=
+Hi Aaron,
+
+On 03/16/2018 09:30 PM, Aaron Lindsay wrote:
+> A53 advertises ARM_FEATURE_PMU, but wasn't initializing pmceid[01].
+> pmceid[01] are already being initialized to zero for both A15 and A57.
+> 
+> Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+> ---
+>  target/arm/cpu64.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> index 991d764..8c4db31 100644
+> --- a/target/arm/cpu64.c
+> +++ b/target/arm/cpu64.c
+> @@ -201,6 +201,8 @@ static void aarch64_a53_initfn(Object *obj)
+>      cpu->id_isar5 = 0x00011121;
+>      cpu->id_aa64pfr0 = 0x00002222;
+>      cpu->id_aa64dfr0 = 0x10305106;
+> +    cpu->pmceid0 = 0x00000000;
+> +    cpu->pmceid1 = 0x00000000;
+>      cpu->id_aa64isar0 = 0x00011120;
+>      cpu->id_aa64mmfr0 = 0x00001122; /* 40 bit physical addr */
+>      cpu->dbgdidr = 0x3516d000;
+> 
+
+Maybe we can move this at a single place in arm_cpu_post_init():
+
+    if (arm_feature(&cpu->env, ARM_FEATURE_PMU)) {
+        cpu->pmceid0 = 0x00000000;
+        cpu->pmceid1 = 0x00000000;
+    }
+
+Regards,
+
+Phil.
