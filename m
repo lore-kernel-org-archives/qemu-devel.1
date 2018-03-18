@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45718)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45798)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1exhdD-0007kq-F3
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 19:22:28 -0400
+	id 1exhdv-00088D-1I
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 19:23:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1exhd9-0003Q1-7v
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 19:22:27 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:43563)
+	id 1exhdq-0003im-9v
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 19:23:11 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:39616)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1exhd9-0003PH-1f
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 19:22:23 -0400
-Received: by mail-wr0-x243.google.com with SMTP id o1so16775228wro.10
-	for <qemu-devel@nongnu.org>; Sun, 18 Mar 2018 16:22:22 -0700 (PDT)
+	id 1exhdq-0003ie-2g
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 19:23:06 -0400
+Received: by mail-wr0-x243.google.com with SMTP id c24so4974945wrc.6
+	for <qemu-devel@nongnu.org>; Sun, 18 Mar 2018 16:23:06 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <1521221171-47213-1-git-send-email-mjc@sifive.com>
+References: <20180316155340.25734-1-richard.henderson@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <dec4f79c-a46e-f341-ef17-7ba85086bc9a@amsat.org>
-Date: Mon, 19 Mar 2018 00:22:20 +0100
+Message-ID: <51dfa8a4-8d95-c2b4-2d1c-5560d6774adb@amsat.org>
+Date: Mon, 19 Mar 2018 00:23:03 +0100
 MIME-Version: 1.0
-In-Reply-To: <1521221171-47213-1-git-send-email-mjc@sifive.com>
+In-Reply-To: <20180316155340.25734-1-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3] RISC-V: Fix riscv_isa_string memory
- size bug
+Subject: Re: [Qemu-devel] [PATCH] tcg: fix cpu_io_recompile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,54 +34,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: Palmer Dabbelt <palmer@sifive.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Pavel.Dovgaluk@ispras.ru, pbonzini@redhat.com
 
-On 03/16/2018 06:26 PM, Michael Clark wrote:
-> This version uses a constant size memory buffer sized for
-> the maximum possible ISA string length. It also uses g_new
-> instead of g_new0, uses more efficient logic to append
-> extensions and adds manual zero termination of the string.
+On 03/16/2018 04:53 PM, Richard Henderson wrote:
+> We have confused the number of instructions that have been
+> executed in the TB with the number of instructions needed
+> to repeat the I/O instruction.
 > 
-> Cc: Palmer Dabbelt <palmer@sifive.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Signed-off-by: Michael Clark <mjc@sifive.com>
-> ---
->  target/riscv/cpu.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+> We have used cpu_restore_state_from_tb, which means that
+> the guest pc is pointing to the I/O instruction.  The only
+> time the answer to the later question is not 1 is when
+> MIPS or SH4 need to re-execute the branch for the delay
+> slot as well.
 > 
-> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-> index 4851890..298abbd 100644
-> --- a/target/riscv/cpu.c
-> +++ b/target/riscv/cpu.c
-> @@ -391,16 +391,16 @@ static const TypeInfo riscv_cpu_type_info = {
->  char *riscv_isa_string(RISCVCPU *cpu)
->  {
->      int i;
-> -    size_t maxlen = 5 + ctz32(cpu->env.misa);
-> -    char *isa_string = g_new0(char, maxlen);
-> -    snprintf(isa_string, maxlen, "rv%d", TARGET_LONG_BITS);
-> +    const size_t maxlen = sizeof("rv128") + sizeof(riscv_exts) + 1;
-> +    char *isa_str = g_new(char, maxlen);
-> +    char *p = isa_str + snprintf(isa_str, maxlen, "rv%d", TARGET_LONG_BITS);
->      for (i = 0; i < sizeof(riscv_exts); i++) {
->          if (cpu->env.misa & RV(riscv_exts[i])) {
-> -            isa_string[strlen(isa_string)] = riscv_exts[i] - 'A' + 'a';
-> -
-> +            *p++ = riscv_exts[i] - 'A' + 'a';
-                                                 /* tolower() */
-
-I prefer unobfuscated code (think newcomers and reviewers) :|
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
->          }
+> ---
+>  accel/tcg/translate-all.c | 21 ++++++++-------------
+>  1 file changed, 8 insertions(+), 13 deletions(-)
+> 
+> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+> index 67795cd78c..d4190602d1 100644
+> --- a/accel/tcg/translate-all.c
+> +++ b/accel/tcg/translate-all.c
+> @@ -1736,37 +1736,32 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+>          cpu_abort(cpu, "cpu_io_recompile: could not find TB for pc=%p",
+>                    (void *)retaddr);
 >      }
-> -    return isa_string;
-> +    *p = '\0';
-> +    return isa_str;
->  }
+> -    n = cpu->icount_decr.u16.low + tb->icount;
+>      cpu_restore_state_from_tb(cpu, tb, retaddr);
+> -    /* Calculate how many instructions had been executed before the fault
+> -       occurred.  */
+> -    n = n - cpu->icount_decr.u16.low;
+> -    /* Generate a new TB ending on the I/O insn.  */
+> -    n++;
+> +
+>      /* On MIPS and SH, delay slot instructions can only be restarted if
+>         they were already the first instruction in the TB.  If this is not
+>         the first instruction in a TB then re-execute the preceding
+>         branch.  */
+> +    n = 1;
+>  #if defined(TARGET_MIPS)
+> -    if ((env->hflags & MIPS_HFLAG_BMASK) != 0 && n > 1) {
+> +    if ((env->hflags & MIPS_HFLAG_BMASK) != 0
+> +        && env->active_tc.PC != tb->pc) {
+>          env->active_tc.PC -= (env->hflags & MIPS_HFLAG_B16 ? 2 : 4);
+>          cpu->icount_decr.u16.low++;
+>          env->hflags &= ~MIPS_HFLAG_BMASK;
+> +        n = 2;
+>      }
+>  #elif defined(TARGET_SH4)
+>      if ((env->flags & ((DELAY_SLOT | DELAY_SLOT_CONDITIONAL))) != 0
+> -            && n > 1) {
+> +        && env->pc != tb->pc) {
+>          env->pc -= 2;
+>          cpu->icount_decr.u16.low++;
+>          env->flags &= ~(DELAY_SLOT | DELAY_SLOT_CONDITIONAL);
+> +        n = 2;
+>      }
+>  #endif
+> -    /* This should never happen.  */
+> -    if (n > CF_COUNT_MASK) {
+> -        cpu_abort(cpu, "TB too big during recompile");
+> -    }
 >  
->  void riscv_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+> -    /* Adjust the execution state of the next TB.  */
+> +    /* Generate a new TB executing the I/O insn.  */
+>      cpu->cflags_next_tb = curr_cflags() | CF_LAST_IO | n;
+>  
+>      if (tb->cflags & CF_NOCACHE) {
 > 
