@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46813)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1exhih-000113-Mg
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 19:28:09 -0400
+	id 1exhky-0001u0-FO
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 19:30:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1exhid-0006Pe-4u
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 19:28:07 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:43584)
+	id 1exhku-0007Mh-0z
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 19:30:28 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:34293)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1exhic-0006OV-R7
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 19:28:03 -0400
-Received: by mail-wr0-x243.google.com with SMTP id o1so16781412wro.10
-	for <qemu-devel@nongnu.org>; Sun, 18 Mar 2018 16:28:02 -0700 (PDT)
+	id 1exhkt-0007MQ-PQ
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 19:30:23 -0400
+Received: by mail-wr0-x243.google.com with SMTP id o8so16848645wra.1
+	for <qemu-devel@nongnu.org>; Sun, 18 Mar 2018 16:30:23 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20180318161228.21307-1-laurent@vivier.eu>
+References: <1521217393-8162-1-git-send-email-frederic.konrad@adacore.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <feed5a88-b2b1-0f63-dc8c-309f5df884cf@amsat.org>
-Date: Mon, 19 Mar 2018 00:27:59 +0100
+Message-ID: <1b9b4a96-c415-f96d-132a-82883d14d66c@amsat.org>
+Date: Mon, 19 Mar 2018 00:30:21 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180318161228.21307-1-laurent@vivier.eu>
+In-Reply-To: <1521217393-8162-1-git-send-email-frederic.konrad@adacore.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] target/m68k: add a mechanism to
- automatically free TCGv
+Subject: Re: [Qemu-devel] [PATCH] gdbstub: send a terminaison packet instead
+ of crashing gdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,384 +35,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org
+To: KONRAD Frederic <frederic.konrad@adacore.com>, qemu-devel@nongnu.org
+Cc: famz@redhat.com, stefanha@redhat.com
 
-Hi Laurent,
+On 03/16/2018 05:23 PM, KONRAD Frederic wrote:
+> Since the commit:
+> commit 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268
+> Author: Stefan Hajnoczi <stefanha@redhat.com>
+> Date:   Wed Mar 7 14:42:05 2018 +0000
+> 
+>     vl: introduce vm_shutdown()
+> 
+> GDB crash when qemu exits (at least on sparc-softmmu):
+> Remote communication error.  Target disconnected.: Connection reset by peer.
+> Quitting: putpkt: write failed: Broken pipe.
+> 
+> So send a packet to kill GDB before we exit QEMU:
+> [Inferior 1 (Thread 0) exited normally]
+> 
+> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
 
-On 03/18/2018 05:12 PM, Laurent Vivier wrote:
-> SRC_EA() and gen_extend() can return either a temporary
-> TCGv or a memory allocated one. Mark them when they are
-> allocated, and free them automatically at end of the
-> instruction translation.
-> 
-> We want to free locally allocated TCGv to avoid
-> overflow in sequence like:
-> 
->   0xc00ae406:  movel %fp@(-132),%fp@(-268)
->   0xc00ae40c:  movel %fp@(-128),%fp@(-264)
->   0xc00ae412:  movel %fp@(-20),%fp@(-212)
->   0xc00ae418:  movel %fp@(-16),%fp@(-208)
->   0xc00ae41e:  movel %fp@(-60),%fp@(-220)
->   0xc00ae424:  movel %fp@(-56),%fp@(-216)
->   0xc00ae42a:  movel %fp@(-124),%fp@(-252)
->   0xc00ae430:  movel %fp@(-120),%fp@(-248)
->   0xc00ae436:  movel %fp@(-12),%fp@(-260)
->   0xc00ae43c:  movel %fp@(-8),%fp@(-256)
->   0xc00ae442:  movel %fp@(-52),%fp@(-276)
->   0xc00ae448:  movel %fp@(-48),%fp@(-272)
->   ...
-> 
-> That can fill a lot of TCGv entries in a sequence,
-> especially since 15fa08f845 ("tcg: Dynamically allocate TCGOps")
-> we have no limit to fill the TCGOps cache and we can fill
-> the entire TCG variables array and overflow it.
-> 
-> Suggested-by: Richard Henderson <rth@twiddle.net>
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->  target/m68k/translate.c | 100 +++++++++++++++++++++++++++++++-----------------
->  1 file changed, 65 insertions(+), 35 deletions(-)
-> 
-> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-> index cef6f663ad..a660388054 100644
-> --- a/target/m68k/translate.c
-> +++ b/target/m68k/translate.c
-> @@ -123,8 +123,34 @@ typedef struct DisasContext {
->      int done_mac;
->      int writeback_mask;
->      TCGv writeback[8];
-> +#define MAX_TO_RELEASE 8
-> +    int release_count;
-> +    TCGv release[MAX_TO_RELEASE];
->  } DisasContext;
->  
-> +static void init_release_array(DisasContext *s)
-> +{
-> +#ifdef CONFIG_DEBUG_TCG
-> +    memset(s->release, 0, sizeof(s->release));
-> +#endif
-> +    s->release_count = 0;
-> +}
-> +
-> +static void do_release(DisasContext *s)
-> +{
-> +    int i;
-> +    for (i = 0; i < s->release_count; i++) {
-> +        tcg_temp_free(s->release[i]);
-> +    }
-> +    init_release_array(s);
-> +}
-> +
-> +static TCGv mark_to_release(DisasContext *s, TCGv tmp)
-> +{
-> +    g_assert(s->release_count < MAX_TO_RELEASE);
-> +    return s->release[s->release_count++] = tmp;
-> +}
-> +
->  static TCGv get_areg(DisasContext *s, unsigned regno)
->  {
->      if (s->writeback_mask & (1 << regno)) {
-> @@ -347,7 +373,8 @@ static TCGv gen_ldst(DisasContext *s, int opsize, TCGv addr, TCGv val,
->          gen_store(s, opsize, addr, val, index);
->          return store_dummy;
->      } else {
-> -        return gen_load(s, opsize, addr, what == EA_LOADS, index);
-> +        return mark_to_release(s, gen_load(s, opsize, addr,
-> +                                           what == EA_LOADS, index));
->      }
->  }
->  
-> @@ -439,7 +466,7 @@ static TCGv gen_lea_indexed(CPUM68KState *env, DisasContext *s, TCGv base)
->          } else {
->              bd = 0;
->          }
-> -        tmp = tcg_temp_new();
-> +        tmp = mark_to_release(s, tcg_temp_new());
->          if ((ext & 0x44) == 0) {
->              /* pre-index */
->              add = gen_addr_index(s, ext, tmp);
-> @@ -449,7 +476,7 @@ static TCGv gen_lea_indexed(CPUM68KState *env, DisasContext *s, TCGv base)
->          if ((ext & 0x80) == 0) {
->              /* base not suppressed */
->              if (IS_NULL_QREG(base)) {
-> -                base = tcg_const_i32(offset + bd);
-> +                base = mark_to_release(s, tcg_const_i32(offset + bd));
->                  bd = 0;
->              }
->              if (!IS_NULL_QREG(add)) {
-> @@ -465,7 +492,7 @@ static TCGv gen_lea_indexed(CPUM68KState *env, DisasContext *s, TCGv base)
->                  add = tmp;
->              }
->          } else {
-> -            add = tcg_const_i32(bd);
-> +            add = mark_to_release(s, tcg_const_i32(bd));
->          }
->          if ((ext & 3) != 0) {
->              /* memory indirect */
-> @@ -494,7 +521,7 @@ static TCGv gen_lea_indexed(CPUM68KState *env, DisasContext *s, TCGv base)
->          }
->      } else {
->          /* brief extension word format */
-> -        tmp = tcg_temp_new();
-> +        tmp = mark_to_release(s, tcg_temp_new());
->          add = gen_addr_index(s, ext, tmp);
->          if (!IS_NULL_QREG(base)) {
->              tcg_gen_add_i32(tmp, add, base);
-> @@ -617,14 +644,14 @@ static void gen_flush_flags(DisasContext *s)
->      s->cc_op = CC_OP_FLAGS;
->  }
->  
-> -static inline TCGv gen_extend(TCGv val, int opsize, int sign)
-> +static inline TCGv gen_extend(DisasContext *s, TCGv val, int opsize, int sign)
-
-I'd rather see this done in 2 patches, one adding the DisasContext
-argument, and another to free the TCGv.
-
-Split in 2 or as it:
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
->  {
->      TCGv tmp;
->  
->      if (opsize == OS_LONG) {
->          tmp = val;
->      } else {
-> -        tmp = tcg_temp_new();
-> +        tmp = mark_to_release(s, tcg_temp_new());
->          gen_ext(tmp, val, opsize, sign);
->      }
->  
-> @@ -746,7 +773,7 @@ static TCGv gen_lea_mode(CPUM68KState *env, DisasContext *s,
->              return NULL_QREG;
->          }
->          reg = get_areg(s, reg0);
-> -        tmp = tcg_temp_new();
-> +        tmp = mark_to_release(s, tcg_temp_new());
->          if (reg0 == 7 && opsize == OS_BYTE &&
->              m68k_feature(s->env, M68K_FEATURE_M68000)) {
->              tcg_gen_subi_i32(tmp, reg, 2);
-> @@ -756,7 +783,7 @@ static TCGv gen_lea_mode(CPUM68KState *env, DisasContext *s,
->          return tmp;
->      case 5: /* Indirect displacement.  */
->          reg = get_areg(s, reg0);
-> -        tmp = tcg_temp_new();
-> +        tmp = mark_to_release(s, tcg_temp_new());
->          ext = read_im16(env, s);
->          tcg_gen_addi_i32(tmp, reg, (int16_t)ext);
->          return tmp;
-> @@ -767,14 +794,14 @@ static TCGv gen_lea_mode(CPUM68KState *env, DisasContext *s,
->          switch (reg0) {
->          case 0: /* Absolute short.  */
->              offset = (int16_t)read_im16(env, s);
-> -            return tcg_const_i32(offset);
-> +            return mark_to_release(s, tcg_const_i32(offset));
->          case 1: /* Absolute long.  */
->              offset = read_im32(env, s);
-> -            return tcg_const_i32(offset);
-> +            return mark_to_release(s, tcg_const_i32(offset));
->          case 2: /* pc displacement  */
->              offset = s->pc;
->              offset += (int16_t)read_im16(env, s);
-> -            return tcg_const_i32(offset);
-> +            return mark_to_release(s, tcg_const_i32(offset));
->          case 3: /* pc index+displacement.  */
->              return gen_lea_indexed(env, s, NULL_QREG);
->          case 4: /* Immediate.  */
-> @@ -811,7 +838,7 @@ static TCGv gen_ea_mode(CPUM68KState *env, DisasContext *s, int mode, int reg0,
->              gen_partset_reg(opsize, reg, val);
->              return store_dummy;
->          } else {
-> -            return gen_extend(reg, opsize, what == EA_LOADS);
-> +            return gen_extend(s, reg, opsize, what == EA_LOADS);
->          }
->      case 1: /* Address register direct.  */
->          reg = get_areg(s, reg0);
-> @@ -819,7 +846,7 @@ static TCGv gen_ea_mode(CPUM68KState *env, DisasContext *s, int mode, int reg0,
->              tcg_gen_mov_i32(reg, val);
->              return store_dummy;
->          } else {
-> -            return gen_extend(reg, opsize, what == EA_LOADS);
-> +            return gen_extend(s, reg, opsize, what == EA_LOADS);
->          }
->      case 2: /* Indirect register */
->          reg = get_areg(s, reg0);
-> @@ -900,7 +927,7 @@ static TCGv gen_ea_mode(CPUM68KState *env, DisasContext *s, int mode, int reg0,
->              default:
->                  g_assert_not_reached();
->              }
-> -            return tcg_const_i32(offset);
-> +            return mark_to_release(s, tcg_const_i32(offset));
->          default:
->              return NULL_QREG;
->          }
-> @@ -1759,8 +1786,8 @@ DISAS_INSN(abcd_reg)
->  
->      gen_flush_flags(s); /* !Z is sticky */
->  
-> -    src = gen_extend(DREG(insn, 0), OS_BYTE, 0);
-> -    dest = gen_extend(DREG(insn, 9), OS_BYTE, 0);
-> +    src = gen_extend(s, DREG(insn, 0), OS_BYTE, 0);
-> +    dest = gen_extend(s, DREG(insn, 9), OS_BYTE, 0);
->      bcd_add(dest, src);
->      gen_partset_reg(OS_BYTE, DREG(insn, 9), dest);
->  
-> @@ -1794,8 +1821,8 @@ DISAS_INSN(sbcd_reg)
->  
->      gen_flush_flags(s); /* !Z is sticky */
->  
-> -    src = gen_extend(DREG(insn, 0), OS_BYTE, 0);
-> -    dest = gen_extend(DREG(insn, 9), OS_BYTE, 0);
-> +    src = gen_extend(s, DREG(insn, 0), OS_BYTE, 0);
-> +    dest = gen_extend(s, DREG(insn, 9), OS_BYTE, 0);
->  
->      bcd_sub(dest, src);
->  
-> @@ -1856,7 +1883,7 @@ DISAS_INSN(addsub)
->  
->      add = (insn & 0x4000) != 0;
->      opsize = insn_opsize(insn);
-> -    reg = gen_extend(DREG(insn, 9), opsize, 1);
-> +    reg = gen_extend(s, DREG(insn, 9), opsize, 1);
->      dest = tcg_temp_new();
->      if (insn & 0x100) {
->          SRC_EA(env, tmp, opsize, 1, &addr);
-> @@ -2386,7 +2413,7 @@ DISAS_INSN(cas)
->          return;
->      }
->  
-> -    cmp = gen_extend(DREG(ext, 0), opsize, 1);
-> +    cmp = gen_extend(s, DREG(ext, 0), opsize, 1);
->  
->      /* if  <EA> == Dc then
->       *     <EA> = Du
-> @@ -3055,7 +3082,7 @@ DISAS_INSN(or)
->      int opsize;
->  
->      opsize = insn_opsize(insn);
-> -    reg = gen_extend(DREG(insn, 9), opsize, 0);
-> +    reg = gen_extend(s, DREG(insn, 9), opsize, 0);
->      dest = tcg_temp_new();
->      if (insn & 0x100) {
->          SRC_EA(env, src, opsize, 0, &addr);
-> @@ -3120,8 +3147,8 @@ DISAS_INSN(subx_reg)
->  
->      opsize = insn_opsize(insn);
->  
-> -    src = gen_extend(DREG(insn, 0), opsize, 1);
-> -    dest = gen_extend(DREG(insn, 9), opsize, 1);
-> +    src = gen_extend(s, DREG(insn, 0), opsize, 1);
-> +    dest = gen_extend(s, DREG(insn, 9), opsize, 1);
->  
->      gen_subx(s, src, dest, opsize);
->  
-> @@ -3176,7 +3203,7 @@ DISAS_INSN(cmp)
->  
->      opsize = insn_opsize(insn);
->      SRC_EA(env, src, opsize, 1, NULL);
-> -    reg = gen_extend(DREG(insn, 9), opsize, 1);
-> +    reg = gen_extend(s, DREG(insn, 9), opsize, 1);
->      gen_update_cc_cmp(s, reg, src, opsize);
+> ---
+>  gdbstub.c              | 7 +++++++
+>  include/exec/gdbstub.h | 2 ++
+>  vl.c                   | 2 ++
+>  3 files changed, 11 insertions(+)
+> 
+> diff --git a/gdbstub.c b/gdbstub.c
+> index f1d5148..a76b2fa 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -2052,6 +2052,13 @@ int gdbserver_start(const char *device)
+>      return 0;
 >  }
 >  
-> @@ -3329,8 +3356,8 @@ DISAS_INSN(addx_reg)
->  
->      opsize = insn_opsize(insn);
->  
-> -    dest = gen_extend(DREG(insn, 9), opsize, 1);
-> -    src = gen_extend(DREG(insn, 0), opsize, 1);
-> +    dest = gen_extend(s, DREG(insn, 9), opsize, 1);
-> +    src = gen_extend(s, DREG(insn, 0), opsize, 1);
->  
->      gen_addx(s, src, dest, opsize);
->  
-> @@ -3369,7 +3396,7 @@ static inline void shift_im(DisasContext *s, uint16_t insn, int opsize)
->      int logical = insn & 8;
->      int left = insn & 0x100;
->      int bits = opsize_bytes(opsize) * 8;
-> -    TCGv reg = gen_extend(DREG(insn, 0), opsize, !logical);
-> +    TCGv reg = gen_extend(s, DREG(insn, 0), opsize, !logical);
->  
->      if (count == 0) {
->          count = 8;
-> @@ -3419,7 +3446,7 @@ static inline void shift_reg(DisasContext *s, uint16_t insn, int opsize)
->      int logical = insn & 8;
->      int left = insn & 0x100;
->      int bits = opsize_bytes(opsize) * 8;
-> -    TCGv reg = gen_extend(DREG(insn, 0), opsize, !logical);
-> +    TCGv reg = gen_extend(s, DREG(insn, 0), opsize, !logical);
->      TCGv s32;
->      TCGv_i64 t64, s64;
->  
-> @@ -3556,7 +3583,7 @@ DISAS_INSN(shift_mem)
->             while M68000 sets if the most significant bit is changed at
->             any time during the shift operation */
->          if (!logical && m68k_feature(s->env, M68K_FEATURE_M68000)) {
-> -            src = gen_extend(src, OS_WORD, 1);
-> +            src = gen_extend(s, src, OS_WORD, 1);
->              tcg_gen_xor_i32(QREG_CC_V, QREG_CC_N, src);
->          }
->      } else {
-> @@ -3789,7 +3816,7 @@ DISAS_INSN(rotate8_im)
->      TCGv shift;
->      int tmp;
->  
-> -    reg = gen_extend(DREG(insn, 0), OS_BYTE, 0);
-> +    reg = gen_extend(s, DREG(insn, 0), OS_BYTE, 0);
->  
->      tmp = (insn >> 9) & 7;
->      if (tmp == 0) {
-> @@ -3816,7 +3843,7 @@ DISAS_INSN(rotate16_im)
->      TCGv shift;
->      int tmp;
->  
-> -    reg = gen_extend(DREG(insn, 0), OS_WORD, 0);
-> +    reg = gen_extend(s, DREG(insn, 0), OS_WORD, 0);
->      tmp = (insn >> 9) & 7;
->      if (tmp == 0) {
->          tmp = 8;
-> @@ -3876,7 +3903,7 @@ DISAS_INSN(rotate8_reg)
->      TCGv t0, t1;
->      int left = (insn & 0x100);
->  
-> -    reg = gen_extend(DREG(insn, 0), OS_BYTE, 0);
-> +    reg = gen_extend(s, DREG(insn, 0), OS_BYTE, 0);
->      src = DREG(insn, 9);
->      /* shift in [0..63] */
->      t0 = tcg_temp_new_i32();
-> @@ -3911,7 +3938,7 @@ DISAS_INSN(rotate16_reg)
->      TCGv t0, t1;
->      int left = (insn & 0x100);
->  
-> -    reg = gen_extend(DREG(insn, 0), OS_WORD, 0);
-> +    reg = gen_extend(s, DREG(insn, 0), OS_WORD, 0);
->      src = DREG(insn, 9);
->      /* shift in [0..63] */
->      t0 = tcg_temp_new_i32();
-> @@ -4353,7 +4380,7 @@ DISAS_INSN(chk)
->          return;
->      }
->      SRC_EA(env, src, opsize, 1, NULL);
-> -    reg = gen_extend(DREG(insn, 9), opsize, 1);
-> +    reg = gen_extend(s, DREG(insn, 9), opsize, 1);
->  
->      gen_flush_flags(s);
->      gen_helper_chk(cpu_env, reg, src);
-> @@ -6033,6 +6060,7 @@ static void disas_m68k_insn(CPUM68KState * env, DisasContext *s)
->      uint16_t insn = read_im16(env, s);
->      opcode_table[insn](env, s, insn);
->      do_writebacks(s);
-> +    do_release(s);
->  }
->  
->  /* generate intermediate code for basic block 'tb'.  */
-> @@ -6067,6 +6095,8 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
->          max_insns = TCG_MAX_INSNS;
->      }
->  
-> +    init_release_array(dc);
+> +void gdbserver_cleanup(void)
+> +{
+> +    if (gdbserver_state) {
+> +        put_packet(gdbserver_state, "W00");
+> +    }
+> +}
 > +
->      gen_tb_start(tb);
->      do {
->          pc_offset = dc->pc - pc_start;
+>  static void register_types(void)
+>  {
+>      type_register_static(&char_gdb_type_info);
+> diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
+> index 9aa7756..2e8a4b8 100644
+> --- a/include/exec/gdbstub.h
+> +++ b/include/exec/gdbstub.h
+> @@ -103,6 +103,8 @@ int gdbserver_start(int);
+>  int gdbserver_start(const char *port);
+>  #endif
+>  
+> +void gdbserver_cleanup(void);
+> +
+>  /**
+>   * gdb_has_xml:
+>   * This is an ugly hack to cope with both new and old gdb.
+> diff --git a/vl.c b/vl.c
+> index 3ef04ce..0427b15 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4723,6 +4723,8 @@ int main(int argc, char **argv, char **envp)
+>  
+>      main_loop();
+>  
+> +    gdbserver_cleanup();
+> +
+>      /* No more vcpu or device emulation activity beyond this point */
+>      vm_shutdown();
+>  
 > 
