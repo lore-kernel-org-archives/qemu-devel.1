@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ey5h8-00081Z-6D
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 21:04:07 -0400
+	(envelope-from <no-reply@patchew.org>) id 1ey5jK-0000bz-D1
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 21:06:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ey5h4-0006S7-9W
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 21:04:06 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1521232280-13089-1-git-send-email-alindsay@codeaurora.org>
-	<1521232280-13089-2-git-send-email-alindsay@codeaurora.org>
-	<aeacd6da-0f45-f871-9a0a-2c8a524db510@amsat.org>
-	<20180319203509.GD24561@codeaurora.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3e12e8ef-e5ee-d690-7d01-c074b6145566@amsat.org>
-Date: Tue, 20 Mar 2018 02:03:58 +0100
+	(envelope-from <no-reply@patchew.org>) id 1ey5jH-0007y0-4r
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 21:06:22 -0400
+Resent-Message-Id: <E1ey5jH-0007y0-4r@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21016)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ey5jG-0007xk-SZ
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 21:06:19 -0400
+In-Reply-To: <1521476567-21818-1-git-send-email-suhang16@mails.ucas.ac.cn>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152147994043.144.8759876168505157637@71c20359a636>
 MIME-Version: 1.0
-In-Reply-To: <20180319203509.GD24561@codeaurora.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v3 01/22] target/arm: A53:
- Initialize PMCEID[01]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 19 Mar 2018 10:19:01 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH RFC v2] scripts/checkpatch.pl: Bug fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aaron Lindsay <alindsay@codeaurora.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-arm@nongnu.org, Michael Spradling <mspradli@codeaurora.org>, qemu-devel@nongnu.org, Digant Desai <digantd@codeaurora.org>
+To: suhang16@mails.ucas.ac.cn
+Cc: famz@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org
 
-On 03/19/2018 09:35 PM, Aaron Lindsay wrote:
-> On Mar 18 23:35, Philippe Mathieu-Daudé wrote:
->> Hi Aaron,
->>
->> On 03/16/2018 09:30 PM, Aaron Lindsay wrote:
->>> A53 advertises ARM_FEATURE_PMU, but wasn't initializing pmceid[01].
->>> pmceid[01] are already being initialized to zero for both A15 and A57.
->>>
->>> Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
->>> ---
->>>  target/arm/cpu64.c | 2 ++
->>>  1 file changed, 2 insertions(+)
->>>
->>> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
->>> index 991d764..8c4db31 100644
->>> --- a/target/arm/cpu64.c
->>> +++ b/target/arm/cpu64.c
->>> @@ -201,6 +201,8 @@ static void aarch64_a53_initfn(Object *obj)
->>>      cpu->id_isar5 = 0x00011121;
->>>      cpu->id_aa64pfr0 = 0x00002222;
->>>      cpu->id_aa64dfr0 = 0x10305106;
->>> +    cpu->pmceid0 = 0x00000000;
->>> +    cpu->pmceid1 = 0x00000000;
->>>      cpu->id_aa64isar0 = 0x00011120;
->>>      cpu->id_aa64mmfr0 = 0x00001122; /* 40 bit physical addr */
->>>      cpu->dbgdidr = 0x3516d000;
->>>
->>
->> Maybe we can move this at a single place in arm_cpu_post_init():
->>
->>     if (arm_feature(&cpu->env, ARM_FEATURE_PMU)) {
->>         cpu->pmceid0 = 0x00000000;
->>         cpu->pmceid1 = 0x00000000;
->>     }
-> 
-> I like consolidating the initialization - though I think it can go in
-> arm_cpu_realizefn() with the preexisting PMU-related id_aa64dfr0
-> initialization since it is constant once you've chosen a type of
-> processor. One of the other patches in this set actually already adds
-> some PMCEID initialization there based on PMCR.N.
-
-Indeed, arm_cpu_realizefn() is a good place.
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MjE0NzY1NjctMjE4MTgtMS1naXQtc2VuZC1lbWFpbC1zdWhhbmcxNkBtYWls
+cy51Y2FzLmFjLmNuClN1YmplY3Q6IFtRZW11LWRldmVsXSAgW1BBVENIIFJGQyB2Ml0gc2NyaXB0
+cy9jaGVja3BhdGNoLnBsOiBCdWcgZml4Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
+bi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8
+IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
+cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
+ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
+IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
+CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
+PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9t
+IGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAg
+ICAgICAgICAgICBwYXRjaGV3LzE1MjE0NzY1NjctMjE4MTgtMS1naXQtc2VuZC1lbWFpbC1zdWhh
+bmcxNkBtYWlscy51Y2FzLmFjLmNuIC0+IHBhdGNoZXcvMTUyMTQ3NjU2Ny0yMTgxOC0xLWdpdC1z
+ZW5kLWVtYWlsLXN1aGFuZzE2QG1haWxzLnVjYXMuYWMuY24KIHQgW3RhZyB1cGRhdGVdICAgICAg
+ICAgICAgcGF0Y2hldy8yMDE4MDMxOTEzMTc0My4zODg1LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8u
+b3JnIC0+IHBhdGNoZXcvMjAxODAzMTkxMzE3NDMuMzg4NS0xLXBldGVyLm1heWRlbGxAbGluYXJv
+Lm9yZwogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwMzE5MTYxNTU2LjE2
+NDQ2LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxODAzMTkxNjE1NTYu
+MTY0NDYtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
+ICd0ZXN0JwpiMDk4YWVmODliIHNjcmlwdHMvY2hlY2twYXRjaC5wbDogQnVnIGZpeAoKPT09IE9V
+VFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBzY3JpcHRzL2NoZWNrcGF0Y2gucGw6
+IEJ1ZyBmaXguLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzMxOiBGSUxFOiBz
+Y3JpcHRzL2NoZWNrcGF0Y2gucGw6MjM2NjoKKwkJCQkJcHJpbnQgIkFQVzogQUxMT1dFRDogcHJl
+PCRwcmU+IGxpbmU8JGxpbmU+XG4iCgpFUlJPUjogTWlzc2luZyBTaWduZWQtb2ZmLWJ5OiBsaW5l
+KHMpCgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDMzIGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
+dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
