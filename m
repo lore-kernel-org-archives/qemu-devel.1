@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1exyrP-0006JD-9R
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 13:46:16 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1exyxx-0007yv-NQ
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 13:53:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1exyrJ-0002No-Po
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 13:46:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41562 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1exyrJ-0002NK-KY
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 13:46:09 -0400
-References: <1521217393-8162-1-git-send-email-frederic.konrad@adacore.com>
-	<1b9b4a96-c415-f96d-132a-82883d14d66c@amsat.org>
-	<4f4b939b-b4a9-eaee-a8f5-d480d02a0b64@adacore.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f8af6e56-3fd1-99c3-d9b9-ce7c4e06c52d@redhat.com>
-Date: Mon, 19 Mar 2018 12:46:03 -0500
+	(envelope-from <rkagan@virtuozzo.com>) id 1exyxu-0000mb-KM
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 13:53:01 -0400
+Received: from mail-ve1eur01hn0219.outbound.protection.outlook.com
+	([104.47.1.219]:6112
+	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1exyxt-0000kt-73
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 13:52:58 -0400
+Date: Mon, 19 Mar 2018 20:52:38 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20180319175238.GB12962@rkaganb.sw.ru>
+References: <20180316170020.8212-1-vkuznets@redhat.com>
+	<20180316170020.8212-2-vkuznets@redhat.com>
+	<20180319170603.GA12962@rkaganb.sw.ru>
+	<87a7v47z4r.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <4f4b939b-b4a9-eaee-a8f5-d480d02a0b64@adacore.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.12] gdbstub: send a terminaison
- packet instead of crashing gdb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87a7v47z4r.fsf@vitty.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] i386/kvm: add support for Hyper-V
+ reenlightenment MSRs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,23 +33,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: KONRAD Frederic <frederic.konrad@adacore.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: famz@redhat.com, stefanha@redhat.com
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org
 
-On 03/19/2018 04:52 AM, KONRAD Frederic wrote:
-> Hi Philippe,
+On Mon, Mar 19, 2018 at 06:29:08PM +0100, Vitaly Kuznetsov wrote:
+> Roman Kagan <rkagan@virtuozzo.com> writes:
 > 
-> Thanks for the review!
+> > On Fri, Mar 16, 2018 at 06:00:19PM +0100, Vitaly Kuznetsov wrote:
+> >> KVM recently gained support for Hyper-V Reenlightenment MSRs which are
+> >> required to make KVM-on-Hyper-V enable TSC page clocksource to its guests
+> >> when INVTSC is not passed to it (and it is not passed by default in Qemu
+> >> as it effectively blocks migration).
+> >> 
+> >> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> >> ---
+> >> Changes since v1:
+> >> - add vmstate_msr_hyperv_reenlightenment subsection to vmstate_x86_cpu
+> >>   [Paolo Bonzini]
+> >> ---
+> >>  target/i386/cpu.h          |  3 +++
+> >>  target/i386/hyperv-proto.h |  9 ++++++++-
+> >>  target/i386/kvm.c          | 33 +++++++++++++++++++++++++++++++++
+> >>  target/i386/machine.c      | 24 ++++++++++++++++++++++++
+> >>  4 files changed, 68 insertions(+), 1 deletion(-)
+> >> 
+> >> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> >> index 2e2bab5ff3..0b1b556a56 100644
+> >> --- a/target/i386/cpu.h
+> >> +++ b/target/i386/cpu.h
+> >> @@ -1174,6 +1174,9 @@ typedef struct CPUX86State {
+> >>      uint64_t msr_hv_synic_sint[HV_SINT_COUNT];
+> >>      uint64_t msr_hv_stimer_config[HV_STIMER_COUNT];
+> >>      uint64_t msr_hv_stimer_count[HV_STIMER_COUNT];
+> >> +    uint64_t msr_hv_reenlightenment_control;
+> >> +    uint64_t msr_hv_tsc_emulation_control;
+> >> +    uint64_t msr_hv_tsc_emulation_status;
+> >>  
+> >>      uint64_t msr_rtit_ctrl;
+> >>      uint64_t msr_rtit_status;
+> >> diff --git a/target/i386/hyperv-proto.h b/target/i386/hyperv-proto.h
+> >> index cb4d7f2b7a..93352ebd2a 100644
+> >> --- a/target/i386/hyperv-proto.h
+> >> +++ b/target/i386/hyperv-proto.h
+> >> @@ -35,7 +35,7 @@
+> >>  #define HV_RESET_AVAILABLE           (1u << 7)
+> >>  #define HV_REFERENCE_TSC_AVAILABLE   (1u << 9)
+> >>  #define HV_ACCESS_FREQUENCY_MSRS     (1u << 11)
+> >> -
+> >> +#define HV_ACCESS_REENLIGHTENMENTS_CONTROL  (1u << 13)
+> >>  
+> >>  /*
+> >>   * HV_CPUID_FEATURES.EDX bits
+> >> @@ -129,6 +129,13 @@
+> >>  #define HV_X64_MSR_CRASH_CTL                    0x40000105
+> >>  #define HV_CRASH_CTL_NOTIFY                     (1ull << 63)
+> >>  
+> >> +/*
+> >> + * Reenlightenment notification MSRs
+> >> + */
+> >> +#define HV_X64_MSR_REENLIGHTENMENT_CONTROL      0x40000106
+> >> +#define HV_X64_MSR_TSC_EMULATION_CONTROL        0x40000107
+> >> +#define HV_X64_MSR_TSC_EMULATION_STATUS         0x40000108
+> >> +
+> >>  /*
+> >>   * Hypercall status code
+> >>   */
+> >> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> >> index d23fff12f5..accf50eac3 100644
+> >> --- a/target/i386/kvm.c
+> >> +++ b/target/i386/kvm.c
+> >> @@ -90,6 +90,7 @@ static bool has_msr_hv_runtime;
+> >>  static bool has_msr_hv_synic;
+> >>  static bool has_msr_hv_stimer;
+> >>  static bool has_msr_hv_frequencies;
+> >> +static bool has_msr_hv_reenlightenment;
+> >>  static bool has_msr_xss;
+> >>  static bool has_msr_spec_ctrl;
+> >>  static bool has_msr_smi_count;
+> >> @@ -653,6 +654,11 @@ static int hyperv_handle_properties(CPUState *cs)
+> >>              env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_FREQUENCY_MSRS;
+> >>              env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
+> >>          }
+> >> +
+> >> +        if (has_msr_hv_reenlightenment) {
+> >> +            env->features[FEAT_HYPERV_EAX] |=
+> >> +                HV_ACCESS_REENLIGHTENMENTS_CONTROL;
+> >> +        }
+> >
+> > Can you please add a matching comment to the definition of
+> > feature_word_info[FEAT_HYPERV_EAX].feat_names[]?
+> >
 > 
-> BTW I forgot the for 2.12 tag can this be included in 2.12 or is
-> it too late?
+> Sure, missed that.
+> 
+> > Also there appears to be no cpu property to turn this on/off, does it?
+> > It's enabled based only on the support in the KVM it's running against.
+> > So I guess we may have a problem migrating between the hosts with
+> > different KVM versions, one supporting it and the other not.
+> 
+> Currently nested workloads don't migrate so I decided to take the
+> opportunity and squeeze the new feature in without adding a new
+> hv_reenlightenment cpu property (which would have to be added to libvirt
+> at least).
 
-It's a bug-fix, so it can be included during softfreeze.  I've amended 
-the subject line if it helps the right maintainer notice; or you can 
-resend a v2 with the typos fixed, R-b comments added, and the 2.12 tag 
-in your resend.
+Well, it (== L1) doesn't migrate with L2 running inside, but it
+certainly does without.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> 
+> > (This is also a problem with has_msr_hv_frequencies, and is in general a
+> > long-standing issue of hv_* properties being done differently from the
+> > rest of CPUID features.)
+> 
+> Suggestions? (To be honest I don't really like us adding new hv_*
+> property for every new Hyper-V feature we support. I doubt anyone needs
+> 'partial' Hyper-V emulation. It would be nice to have a single versioned
+> 'hv' feature implying everything. We may then forbid migrations to older
+> hv versions. But I don't really know the history of why we decided to go
+> with a separate hv_* for every feature we add).
+
+IIRC those hv_* features were added before the generic CPUID feature bit
+naming scheme was introduced.  We probably need to actually add the
+respective feature names to those .feat_names arrays, introduce a
+compatibility translation to/from the existing hv_* features, and
+address the conflicts, but I vaguely remember an attempt to do so ended
+up nowhere...
+
+I guess for the time being we can go on with extending hv_* features,
+but will need to do a conversion in (preferrably not too distant)
+future.  But I'd rather have Eduardo's or Paolo's word on this.
+
+Thanks,
+Roman.
