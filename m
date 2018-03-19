@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1exsqR-00056H-H7
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 07:20:57 -0400
+	(envelope-from <laurent@vivier.eu>) id 1ext5F-0000GE-R2
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 07:36:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1exsqN-0001or-MG
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 07:20:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51996 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1exsqN-0001ng-GL
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 07:20:47 -0400
-Date: Mon, 19 Mar 2018 11:20:32 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180319112032.GC3151@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <CAFEAcA9u3s=qZWN0Q1irqNu8cpHvBf2p4MsstaAaq-nbNLq1_A@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9u3s=qZWN0Q1irqNu8cpHvBf2p4MsstaAaq-nbNLq1_A@mail.gmail.com>
-Subject: Re: [Qemu-devel] qapi escape-too-big test doesn't work if LANG=C ?
+	(envelope-from <laurent@vivier.eu>) id 1ext5C-0000vY-5X
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 07:36:09 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:41653)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ext5B-0000v2-RU
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 07:36:06 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Mon, 19 Mar 2018 12:35:42 +0100
+Message-Id: <20180319113544.704-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH v2 0/2] target/m68k: add a mechanism to
+ automatically free TCGv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,61 +22,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On Mon, Mar 19, 2018 at 10:37:12AM +0000, Peter Maydell wrote:
-> I recently tweaked my build scripts to run with LANG=C (trying
-> to suppress gcc's irritating habit of using smartquotes rather
-> than plain old ''). This seems to result in an error running
-> the qapi-schema/escape-too-big test:
-> 
-> PYTHONPATH=/home/petmay01/linaro/qemu-for-merges/scripts python3 -B
-> /home/petmay01/linaro/qemu-for-merges/tests/qapi-schema/test-qapi.py
-> /home/petmay01/linaro/qemu-for-merges/tests/qapi-schema/escape-too-big.json
-> >tests/qapi-schema/escape-too-big.test.out
-> 2>tests/qapi-schema/escape-too-big.test.err; echo $?
-> >tests/qapi-schema/escape-too-big.test.exit
-> 1c1,10
-> < tests/qapi-schema/escape-too-big.json:3:14: For now, \u escape only
-> supports non-zero values up to \u007f
-> ---
-> > Traceback (most recent call last):
-> >   File "tests/qapi-schema/test-qapi.py", line 64, in <module>
-> >     schema = QAPISchema(sys.argv[1])
-> >   File "scripts/qapi/common.py", line 1492, in __init__
-> >     parser = QAPISchemaParser(open(fname, 'r'))
-> >   File "scripts/qapi/common.py", line 264, in __init__
-> >     self.src = fp.read()
-> >   File "/usr/lib/python3.5/encodings/ascii.py", line 26, in decode
-> >     return codecs.ascii_decode(input, self.errors)[0]
-> > UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position 61: ordinal not in range(128)
-> /home/petmay01/linaro/qemu-for-merges/tests/Makefile.include:927:
-> recipe for target 'check-tests/qapi-schema/escape-too-big.json' failed
+    SRC_EA() and gen_extend() can return either a temporary
+    TCGv or a memory allocated one. Mark them when they are
+    allocated, and free them automatically at end of the
+    instruction translation.
 
-So your "C" locale will be non-UTF-8, except on OS-X where the "C" locale
-is UTF-8 by default.
+    We want to free locally allocated TCGv to avoid
+    overflow in sequence like:
 
-Unfortunately while POSIX expects the "C" locale to be 8-bit cleanup,
-Python by default will reject any characters outside the 7-bit range
-with its "ascii" codec. So this is ultimately a python bug, but there's
-little we can do about that given how widely deployed the bug is.
+      0xc00ae406:  movel %fp@(-132),%fp@(-268)
+      0xc00ae40c:  movel %fp@(-128),%fp@(-264)
+      0xc00ae412:  movel %fp@(-20),%fp@(-212)
+      0xc00ae418:  movel %fp@(-16),%fp@(-208)
+      0xc00ae41e:  movel %fp@(-60),%fp@(-220)
+      0xc00ae424:  movel %fp@(-56),%fp@(-216)
+      0xc00ae42a:  movel %fp@(-124),%fp@(-252)
+      0xc00ae430:  movel %fp@(-120),%fp@(-248)
+      0xc00ae436:  movel %fp@(-12),%fp@(-260)
+      0xc00ae43c:  movel %fp@(-8),%fp@(-256)
+      0xc00ae442:  movel %fp@(-52),%fp@(-276)
+      0xc00ae448:  movel %fp@(-48),%fp@(-272)
+      ...
 
-To workaround this problem in other applications what I have done is
-add the following to Makefiles before invoking python:
+    That can fill a lot of TCGv entries in a sequence,
+    especially since 15fa08f845 ("tcg: Dynamically allocate TCGOps")
+    we have no limit to fill the TCGOps cache and we can fill
+    the entire TCG variables array and overflow it.
 
-    LC_ALL= LANG=C LC_CTYPE=en_US.UTF-8 
+v2: split patch in two (separate the patch to add
+    parameter to gen_exten())
+    mark to release missed gen_load() in gen_lea_indexed()
 
-The LC_ALL= bit is needed because if the user has set LC_ALL themselves
-it will override LANG and all other LC_* variables. Setting LANG=C is
-not strictly needed, as LC_CTYPE will override it.
+Laurent Vivier (2):
+  target/m68k: add DisasContext parameter to gen_extend()
+  target/m68k: add a mechanism to automatically free TCGv
 
-CC'ing Eric since he was involved in the discussions about this bug
-in other libvirt related apps.
+ target/m68k/translate.c | 102 +++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 66 insertions(+), 36 deletions(-)
 
-Regards,
-Daniel
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.14.3
