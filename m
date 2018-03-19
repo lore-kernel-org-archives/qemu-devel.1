@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1exzTN-00088m-00
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 14:25:29 -0400
+	(envelope-from <berrange@redhat.com>) id 1exzWR-0000eL-G6
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 14:28:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1exzTL-0001S4-Rz
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 14:25:29 -0400
-Received: from mail-oi0-x22a.google.com ([2607:f8b0:4003:c06::22a]:46710)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1exzTL-0001Rf-ME
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 14:25:27 -0400
-Received: by mail-oi0-x22a.google.com with SMTP id x12so15133506oie.13
-	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 11:25:27 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1exzWN-0003ZU-Ms
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 14:28:39 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45328 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1exzWN-0003ZH-HN
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 14:28:35 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C625C8E684
+	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 18:28:23 +0000 (UTC)
+Date: Mon, 19 Mar 2018 18:28:16 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180319182816.GA18216@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180319164939.GA3151@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180319154020.6d668399@igors-macbook-pro.local>
-References: <20180313153458.26822-1-peter.maydell@linaro.org>
-	<20180313153458.26822-9-peter.maydell@linaro.org>
-	<MWHPR21MB018983B74A652443B70680F19ED20@MWHPR21MB0189.namprd21.prod.outlook.com>
-	<CAFEAcA_9YQ4bSzHgM8yLAPtPZ2C70u13kTCLf4rHGPCBUgNiZA@mail.gmail.com>
-	<20180319154020.6d668399@igors-macbook-pro.local>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 19 Mar 2018 18:25:06 +0000
-Message-ID: <CAFEAcA9fnw90pV462Aa5CYYdrgKAYG1RsuQbXHEd-5PcnXjE4g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 8/9] hw/arm/bcm2836: Hardcode correct CPU
- type
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180319164939.GA3151@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] https:// for GIT submodules / "smart" HTTP
+ protocol on git.qemu.git
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +35,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Pekka Enberg <penberg@iki.fi>, "patches@linaro.org" <patches@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Jeff Cody <jcody@redhat.com>
 
-On 19 March 2018 at 14:40, Igor Mammedov <imammedo@redhat.com> wrote:
-> On Thu, 15 Mar 2018 17:13:03 +0000
-> Peter Maydell <peter.maydell@linaro.org> wrote:
->> Igor, can you help with this question? For a board that always
->> has one CPU type (because the real hardware only ever has
->> one SoC, and that SoC QOM object hard codes the CPU type)
->> does it still need to set the mc->default_cpu_type field in
->> its MachineClass, or does that become pointless ?
->
-> Since board ignores whatever were specified on '-cpu' and
-> there aren't any checks in board code for current_machine->cpu_type,
-> removing mc->default_cpu_type won't really affect anything.
->
-> With current code in vl.c and with default_cpu_type set, user will
-> get error if he specified non existing cpu_model with -cpu.
-> If default_cpu_type were NULL, -cpu is completely ignored.
->
-> But once http://patchwork.ozlabs.org/patch/870297/ is applied
-> it will error out the same way as if default_cpu_type were
-> set since vl.c won't rely on it anymore for parsing cpu_model.
->
-> So in short it's ok to remove mc->default_cpu_type here.
+On Mon, Mar 19, 2018 at 04:49:39PM +0000, Daniel P. Berrang=C3=A9 wrote:
+> Most of QEMU regular developers are fortunate to have unfiltered intern=
+et
+> access which allows using the git:// protocol. People working in more
+> old fashioned / paranoid environments often find access to anything oth=
+er
+> than http(s) blocked by firewalls. They'll get a bad experiance when tr=
+ying
+> to build QEMU, when we try to initialize the git submodules and git://
+> protocol fails to connect.
+>=20
+> We could improve life for people behind such nasty firewalls if we made=
+ our
+> GIT submodules use https:// URIs, instead of git:// URIs. There is one =
+snag.
+>=20
+> Historically git:// URIs were strongly preferred over http(s):// URIs f=
+or
+> reasons for performance. Modern GIT though, supports both the tradition=
+al
+> "dumb" HTTP protocol (which is horribly slow) and a modern "smart" HTTP
+> protocol whose performance matches that of git:/// URIs.
+>=20
+> Unfortunately it seems that git.qemu.org is not configured to enable th=
+e
+> smart HTTP protocol.
+>=20
+> So can we get a todo item for git.qemu.org get the web server setup to
+> enable the smart GIT protocol, so we can then enable use of http:// by
+> default for all the submodules to improve life for contributors.
 
-Thanks for the explanation. I think what I'll do is put these
-in as-is, and then have a followup patch that cleans up the
-default_cpu_types from raspi.c once that patch 870297 is in.
+FYI this doesn't seem to take much more than adding this to Apache
+config:
 
--- PMM
+  SetEnv GIT_PROJECT_ROOT /path/to/git/projects/root
+
+  <Directory /usr/libexec/git-core>
+   Require all granted
+  </Directory>
+
+  ScriptAliasMatch "^/git/(.*\.git/(HEAD|info/refs))$" \
+    /usr/libexec/git-core/git-http-backend/$1
+  ScriptAliasMatch "^/git/(.*\.git/git-(upload|receive)-pack)$" \
+    /usr/libexec/git-core/git-http-backend/$1
+
+
+And then touching the file 'git-daemon-export-ok' in each git repo
+that is intended to be public.
+
+  https://git.seveas.net/apache-gitweb-cgit-smart-http.html
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
