@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ey1zs-000620-Vs
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:07:15 -0400
+	(envelope-from <mjc@sifive.com>) id 1ey2C1-0001Jl-FY
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:19:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ey1zq-0000RY-PJ
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:07:12 -0400
-Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:36305)
+	(envelope-from <mjc@sifive.com>) id 1ey2Bx-0002Vn-Gb
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:19:45 -0400
+Received: from mail-pl0-x22a.google.com ([2607:f8b0:400e:c01::22a]:39330)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ey1zq-0000Qa-FL
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:07:10 -0400
-Received: by mail-oi0-x234.google.com with SMTP id t16so2167983oih.3
-	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 14:07:10 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <34ebe3f6-3ae6-cd7f-ab52-727119666632@redhat.com>
-References: <1521229281-73637-1-git-send-email-mjc@sifive.com>
-	<1521229281-73637-11-git-send-email-mjc@sifive.com>
-	<34ebe3f6-3ae6-cd7f-ab52-727119666632@redhat.com>
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ey2Bx-0002VO-9Z
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:19:41 -0400
+Received: by mail-pl0-x22a.google.com with SMTP id k22-v6so10205777pls.6
+	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 14:19:41 -0700 (PDT)
 From: Michael Clark <mjc@sifive.com>
-Date: Mon, 19 Mar 2018 14:07:09 -0700
-Message-ID: <CAHNT7NsjiXpLOAii3sWv9rGe0h-+xAwwuO5srNPNxX+sxi9Udg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 10/24] RISC-V: Hold rcu_read_lock when
- accessing memory
+Date: Mon, 19 Mar 2018 14:18:23 -0700
+Message-Id: <1521494329-19546-1-git-send-email-mjc@sifive.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4 00/26] RISC-V Post-merge spec conformance
+ and cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,138 +27,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, RISC-V Patches <patches@groups.riscv.org>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Stefan O'Rear <sorear2@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Peter Maydell <peter.maydell@linaro.org>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-On Mon, Mar 19, 2018 at 2:41 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+This is a series of spec conformance bug fixes and code cleanups
+that we would like to get in before the QEMU 2.12 release.
+These patches have had extensive testing in the QEMU full system
+emulator running SMP Linux. There are no linux-user changes.
 
-> On 16/03/2018 20:41, Michael Clark wrote:
-> > From reading other code that accesses memory regions directly,
-> > it appears that the rcu_read_lock needs to be held. Note: the
-> > original code for accessing RAM directly was added because
-> > there is no other way to use atomic_cmpxchg on guest physical
-> > address space.
-> >
-> > Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> > Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> > Signed-off-by: Michael Clark <mjc@sifive.com>
-> > Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
-> > ---
-> >  target/riscv/helper.c | 14 ++++++++++++--
-> >  1 file changed, 12 insertions(+), 2 deletions(-)
->
-> I think the bug here is that rcu_read_lock/unlock is missing in
-> cpu_memory_rw_debug.  Are there any other callers you had in mind?
+* Implements WARL behavior for CSRs that don't support writes
+* Improves specification conformance of the page table walker
+  * Change access checks from ternary operator to if statements
+  * Checks for misaligned PPNs
+  * Disallow M-mode or S-mode from fetching from User pages
+  * Adds reserved PTE flag check: W or W|X
+  * Set read perms for PTE X flag if mstatus.mxr is in effect
+  * Improves page walker comments and general readability 
+* Several trivial code cleanups to hw/riscv
+  * Replacing hard coded constants with reference to enums
+    or the machine memory maps.
+  * Remove unnecessary class initialization boilerplate
+* Adds bounds checks when writing device-tree to ROM
+* Updates the cpu model to use a more modern interface
+* Sets mtval/stval to zero on exceptions without addresses
+* Fixes memory allocation bug in riscv_isa_string
 
+v4
 
-So this is not a bug in our patch per se, rather a bug in
-cpu_memory_rw_debug?
+* added fix for memory allocation bug in riscv_isa_string
+* trivial fix to remove erroneous comment from translate.c
 
-It seems that most other code that that uses the address_space_* interfaces
-(e.g. hw/virtio/virtio.c) holds the rcu_read_lock, presumably to handle
-cases where the memory map might change at runtime, e.g. during ballooning.
-This would be exhibited if a page walk collided with a balloon.
+v3
 
-Ideally we could add a cpu_physical_memory_atomic_cmpxchg API to generic
-code, and we could avoid holding the rcu_read_lock in target/riscv i.e.
-encapsulate guest physical memory atomic_cmpxchg. The atomic_cmpxchg
-wrapper handles multiple word widthes, so we would need
-cpu_physical_memory_atomic_cmpxchg32
-and cpu_physical_memory_atomic_cmpxchg64. We need to use atomic_cmpxchg in
-the PTE update to detect the case where the PTE has changed between reading
-it and updating the accessed dirty bits. As far as I can tell, the code is
-correct. In fact we are reading a very strong interpretation of the RISC-V
-specification.
+* refactor rcu_read_lock in PTE update to use single unlock
+* mstatus.mxr is in effect regardless of privilege mode
+* remove unnecessary class init from riscv_hart
+* set mtval/stval to zero on exceptions without addresses
 
-This is what The RISC-V Instruction Set Manual Volume II: Privileged
-Architecture says about accessed and dirty updates, which is the reason for
-the code in question:
+v2
 
-    When a virtual page is accessed and the A bit is clear, or is written
-and the D bit is clear,
-    the implementation sets the corresponding bit in the PTE. The PTE
-update must be atomic
-    with respect to other accesses to the PTE, and must atomically check
-that the PTE is valid
-    and grants suffi cient permissions. The PTE update must be exact (i.e.,
-not speculative), and
-    observed in program order by the local hart. The ordering on loads and
-stores provided by
-    FENCE instructions and the acquire/release bits on atomic instructions
-also orders the PTE
-    updates associated with those loads and stores as observed by remote
-harts.
+* remove unused class boilerplate retains qom parent_obj
+* convert cpu definition towards future model
+* honor mstatus.mxr flag in page table walker
 
-This is an interesting constraint. I believe the intent is that we just
-AMOOR bit A+D bits on the PTE (although we don't have AMOOR, we have
-atomic_cmpxchg), however we have read a stronger interpretation (while
-stronger, it is not incorrect), and that is that the atomicity guarantee
-extends from the page walker reading the PTE entry, checking its
-permissions and then updating it, which in hardware would require the page
-walker to take load reservations, and I don't think it does. Apparently the
-hardware just AMOORs the bits, so the PTE could actually be pointing
-somewhere else by the time we go to update the bits, although it is the
-same virtual address has been accessed or dirtied (albiet with a different
-physical translation). In any case, we have a very strong interpretation of
-the specification wording, potentially stronger than hardware may provide.
-We had a long discussion about this on the RISC-V QEMU issue tracker.
-Stefan O'Rear mentioned he might make a test that hammers a PTE from
-another thread while one thread is doing a page walk to try to cause the
-page walker to set the A+D bits on a PTE that is different to the one it
-used to create the virtual to physical mapping. That's some background
-around why the code exists in the first place, which provides the strongest
-possible gaurantee on PTE atomicity.
+v1
 
-- https://github.com/riscv/riscv-qemu/pull/103
-- https://github.com/riscv/riscv-qemu/pull/105
+* initial post merge cleanup patch series
 
-The get_physical_address bug that this patch fixes does not show up in
-practice. i.e. we aren't actually hitting cases where we have page walks
-colliding with address space changes, however I think holding rcu_read_lock
-seems to be correct and this bug may show up in the future.
+Michael Clark (26):
+  RISC-V: Make virt create_fdt interface consistent
+  RISC-V: Replace hardcoded constants with enum values
+  RISC-V: Make virt board description match spike
+  RISC-V: Use ROM base address and size from memmap
+  RISC-V: Remove identity_translate from load_elf
+  RISC-V: Mark ROM read-only after copying in code
+  RISC-V: Remove unused class definitions
+  RISC-V: Make sure rom has space for fdt
+  RISC-V: Include intruction hex in disassembly
+  RISC-V: Hold rcu_read_lock when accessing memory
+  RISC-V: Improve page table walker spec compliance
+  RISC-V: Update E order and I extension order
+  RISC-V: Make some header guards more specific
+  RISC-V: Make virt header comment title consistent
+  RISC-V: Use memory_region_is_ram in pte update
+  RISC-V: Remove EM_RISCV ELF_MACHINE indirection
+  RISC-V: Hardwire satp to 0 for no-mmu case
+  RISC-V: Remove braces from satp case statement
+  RISC-V: riscv-qemu port supports sv39 and sv48
+  RISC-V: vectored traps are optional
+  RISC-V: No traps on writes to misa,minstret,mcycle
+  RISC-V: Remove support for adhoc X_COP interrupt
+  RISC-V: Convert cpu definition towards future model
+  RISC-V: Clear mtval/stval on exceptions without info
+  RISC-V: Remove erroneous comment from translate.c
+  RISC-V: Fix riscv_isa_string memory size bug
 
-> diff --git a/target/riscv/helper.c b/target/riscv/helper.c
-> > index 02cbcea..e71633a 100644
-> > --- a/target/riscv/helper.c
-> > +++ b/target/riscv/helper.c
-> > @@ -209,6 +209,9 @@ restart:
-> >                     as the PTE is no longer valid */
-> >                  MemoryRegion *mr;
-> >                  hwaddr l = sizeof(target_ulong), addr1;
-> > +                enum { success, translate_fail, restart_walk} action =
-> success;
-> > +
-> > +                rcu_read_lock();
-> >                  mr = address_space_translate(cs->as, pte_addr,
-> >                      &addr1, &l, false);
-> >                  if (memory_access_is_direct(mr, true)) {
-> > @@ -222,7 +225,7 @@ restart:
-> >                      target_ulong old_pte =
-> >                          atomic_cmpxchg(pte_pa, pte, updated_pte);
-> >                      if (old_pte != pte) {
-> > -                        goto restart;
-> > +                        action = restart_walk;
-> >                      } else {
-> >                          pte = updated_pte;
-> >                      }
-> > @@ -230,7 +233,14 @@ restart:
-> >                  } else {
-> >                      /* misconfigured PTE in ROM (AD bits are not
-> preset) or
-> >                       * PTE is in IO space and can't be updated
-> atomically */
-> > -                    return TRANSLATE_FAIL;
-> > +                    action = translate_fail;
-> > +                }
-> > +                rcu_read_unlock();
-> > +
-> > +                switch (action) {
-> > +                    case success: break;
-> > +                    case translate_fail: return TRANSLATE_FAIL;
-> > +                    case restart_walk: goto restart;
-> >                  }
-> >              }
-> >
-> >
->
->
+ disas/riscv.c                   |  39 ++++++------
+ hw/riscv/riscv_hart.c           |   6 --
+ hw/riscv/sifive_clint.c         |   9 +--
+ hw/riscv/sifive_e.c             |  34 +---------
+ hw/riscv/sifive_u.c             |  65 ++++++-------------
+ hw/riscv/spike.c                |  65 ++++++++-----------
+ hw/riscv/virt.c                 |  77 ++++++++--------------
+ include/hw/riscv/sifive_clint.h |   4 ++
+ include/hw/riscv/sifive_e.h     |   5 --
+ include/hw/riscv/sifive_u.h     |   9 ++-
+ include/hw/riscv/spike.h        |  15 ++---
+ include/hw/riscv/virt.h         |  17 ++---
+ target/riscv/cpu.c              | 137 ++++++++++++++++++++++------------------
+ target/riscv/cpu.h              |   6 +-
+ target/riscv/cpu_bits.h         |   3 -
+ target/riscv/helper.c           |  84 ++++++++++++++++++------
+ target/riscv/op_helper.c        |  52 +++++++--------
+ target/riscv/translate.c        |   1 -
+ 18 files changed, 287 insertions(+), 341 deletions(-)
+
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Palmer Dabbelt <palmer@sifive.com>
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+
+-- 
+2.7.0
